@@ -14,16 +14,15 @@ SRCS    += src/renderer/shader-fill.cpp
 SRCS    += src/renderer/shader-line.cpp
 SRCS    += src/util/mat4.c
 
-SRCS	+= macosx/main.mm
-
 OBJS     = $(patsubst %.mm,%.o,$(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(SRCS))))
 
 main: macosx
 
 library: $(OBJS)
 
+macosx: SRCS += macosx/main.mm
 macosx: library
-	$(CXX) $(OBJS) $(INCLUDE) -lglfw3 -framework OpenGL -framework Foundation -o bin/macosx
+	$(CXX) $(OBJS) $(INCLUDE) -lglfw3 -framework OpenGL -framework Foundation -o macosx/main
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDE) -c -o $@ $^
@@ -36,6 +35,6 @@ macosx: library
 
 clean:
 	rm -rf src/*/*.o
-	rm -rf bin/macosx
+	rm -rf macosx/main
 
 .PHONY: macosx

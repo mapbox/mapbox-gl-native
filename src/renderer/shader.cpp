@@ -1,6 +1,7 @@
     #include <llmr/renderer/shader.hpp>
 
 #include <cstdlib>
+#include <cstdio>
 
 using namespace llmr;
 

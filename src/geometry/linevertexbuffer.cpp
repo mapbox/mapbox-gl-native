@@ -1,5 +1,7 @@
 #include <llmr/geometry/linevertexbuffer.hpp>
 
+#include <cstdio>
+
 using namespace llmr;
 
 linevertexbuffer::linevertexbuffer()

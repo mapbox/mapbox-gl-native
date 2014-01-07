@@ -1,0 +1,223 @@
+#include <llmr/llmr.hpp>
+#include <GLFW/glfw3.h>
+#include <cstdlib>
+#import <Foundation/Foundation.h>
+
+#include <llmr/platform/platform.hpp>
+#include <llmr/map/tile.hpp>
+
+class MapView {
+public:
+    MapView() :
+        dirty(true),
+        tracking(false),
+        platform(new llmr::platform(this)),
+        painter(new llmr::painter(platform)),
+        map(new llmr::map(platform, painter)) {
+        if (!glfwInit()) {
+            fprintf(stderr, "Failed to initialize glfw\n");
+            exit(1);
+        }
+
+        window = glfwCreateWindow(640, 480, "llmr", NULL, NULL);
+        if (!window) {
+            glfwTerminate();
+            fprintf(stderr, "Failed to initialize window\n");
+            exit(1);
+        }
+
+        glfwMakeContextCurrent(window);
+
+        painter->setup();
+
+
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+        painter->resize(width, height);
+
+        glfwSwapInterval(1);
+
+
+        glfwSetCursorPosCallback(window, mousemove);
+        glfwSetMouseButtonCallback(window, mouseclick);
+        glfwSetWindowSizeCallback(window, resize);
+        glfwSetScrollCallback(window, scroll);
+
+        glfwSetWindowUserPointer(window, this);
+    }
+
+    static void scroll(GLFWwindow *window, double xoffset, double yoffset) {
+        MapView *view = (MapView *)glfwGetWindowUserPointer(window);
+        double delta = yoffset * 40;
+
+        bool is_wheel = delta != 0 && fmod(delta, 4.000244140625) == 0;
+
+        double absdelta = delta < 0 ? -delta : delta;
+        double scale = 2.0 / (1.0 + exp(-absdelta / 100.0));
+
+        // Make the scroll wheel a bit slower.
+        if (!is_wheel) {
+            scale = (scale - 1.0) / 2.0 + 1.0;
+        }
+
+        // Zooming out.
+        if (delta < 0 && scale != 0) {
+            scale = 1.0 / scale;
+        }
+
+        view->map->scaleBy(scale, view->last_x, view->last_y);
+    }
+
+    static void resize(GLFWwindow *window, int width, int height) {
+        MapView *view = (MapView *)glfwGetWindowUserPointer(window);
+        view->painter->resize(width, height);
+    }
+
+    static void mouseclick(GLFWwindow *window, int button, int action, int modifiers) {
+        MapView *view = (MapView *)glfwGetWindowUserPointer(window);
+        if (button == GLFW_MOUSE_BUTTON_1) {
+            view->tracking = action == GLFW_PRESS;
+        }
+    }
+
+    static void mousemove(GLFWwindow *window, double x, double y) {
+        MapView *view = (MapView *)glfwGetWindowUserPointer(window);
+        if (view->tracking) {
+            view->map->moveBy(x - view->last_x, y - view->last_y);
+        }
+        view->last_x = x;
+        view->last_y = y;
+    }
+
+    int run() {
+        while (!glfwWindowShouldClose(window)) {
+            if (dirty) {
+                dirty = render();
+                glfwSwapBuffers(window);
+                fps();
+            }
+
+            if (dirty) {
+                glfwPollEvents();
+            } else {
+                glfwWaitEvents();
+            }
+        }
+
+        return 0;
+    }
+
+    bool render() {
+        return map->render();
+    }
+
+    void fps() {
+        static int frames = 0;
+        static double time_elapsed = 0;
+
+        frames++;
+        double current_time = glfwGetTime();
+
+        if (current_time - time_elapsed >= 1) {
+            fprintf(stderr, "FPS: %4.2f\n", frames / (current_time - time_elapsed));
+            time_elapsed = current_time;
+            frames = 0;
+        }
+    }
+
+    ~MapView() {
+        delete map;
+        delete painter;
+        delete platform;
+        glfwTerminate();
+    }
+
+public:
+    bool dirty;
+    double last_x, last_y;
+    bool tracking;
+
+    GLFWwindow *window;
+    llmr::platform *platform;
+    llmr::painter *painter;
+    llmr::map *map;
+};
+
+
+
+
+
+
+const char *llmr::platform::shaderSource(const char *name, const char *type) {
+    char filename[80];
+    snprintf(filename, 80, "src/shader/%s.%s", name, type);
+
+    FILE *file = fopen(filename, "rb");
+    if (!file) {
+        fprintf(stderr, "Could not open file %s", filename);
+        return NULL;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char *shader = (char *)malloc(size + 1);
+    if (!fread(shader, size, 1, file)) {
+        fclose(file);
+        free(shader);
+        shader = 0;
+        fprintf(stderr, "Failed to read file %s\n", filename);
+        return NULL;
+    }
+    fclose(file);
+    shader[size] = 0;
+    return shader;
+}
+
+void llmr::platform::restart() {
+    ((MapView *)obj)->dirty = true;
+}
+
+void llmr::platform::request(tile *tile) {
+    fprintf(stderr, "request %d/%d/%d\n", tile->z, tile->x, tile->y);
+
+    fprintf(stderr, "requesting tile\n");
+    NSString *urlTemplate = @"http://api.tiles.mapbox.com/v3/mapbox.mapbox-streets-v4/%d/%d/%d.vector.pbf";
+    NSString *urlString = [NSString
+                           stringWithFormat:urlTemplate,
+                           tile->z,
+                           tile->x,
+                           tile->y];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSLog(@"Requesting %@", urlString);
+
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url];
+
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    [NSURLConnection
+     sendAsynchronousRequest:urlRequest
+     queue:queue
+     completionHandler: ^ (NSURLResponse * response,
+                           NSData * data,
+    NSError * error) {
+        if (error == nil) {
+            tile->setData((uint8_t *)[data bytes], [data length]);
+            if (tile->parse()) {
+                dispatch_async(dispatch_get_main_queue(), ^ {
+                    ((MapView *)obj)->map->tileLoaded(tile);
+                });
+                return;
+            }
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^ {
+            ((MapView *)obj)->map->tileFailed(tile);
+        });
+    }];
+}
+
+
+int main() {
+    MapView view;
+    return view.run();
+}
