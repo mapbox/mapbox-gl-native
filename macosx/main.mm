@@ -1,8 +1,6 @@
 #include <llmr/llmr.hpp>
 #include <GLFW/glfw3.h>
-#include <cstdlib>
 #import <Foundation/Foundation.h>
-
 #include <llmr/platform/platform.hpp>
 #include <llmr/map/tile.hpp>
 
@@ -142,37 +140,6 @@ public:
     llmr::painter *painter;
     llmr::map *map;
 };
-
-
-
-
-
-
-const char *llmr::platform::shaderSource(const char *name, const char *type) {
-    char filename[80];
-    snprintf(filename, 80, "src/shader/%s.%s", name, type);
-
-    FILE *file = fopen(filename, "rb");
-    if (!file) {
-        fprintf(stderr, "Could not open file %s", filename);
-        return NULL;
-    }
-
-    fseek(file, 0, SEEK_END);
-    long size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    char *shader = (char *)malloc(size + 1);
-    if (!fread(shader, size, 1, file)) {
-        fclose(file);
-        free(shader);
-        shader = 0;
-        fprintf(stderr, "Failed to read file %s\n", filename);
-        return NULL;
-    }
-    fclose(file);
-    shader[size] = 0;
-    return shader;
-}
 
 void llmr::platform::restart() {
     ((MapView *)obj)->dirty = true;

@@ -69,15 +69,15 @@ void tile::parseFeature(const uint8_t *data, uint32_t bytes) {
     pbf feature(data, bytes);
     while (feature.next()) {
         if (feature.tag == 1) {
-            uint64_t id = feature.varint();
+            uint32_t id = feature.varint();
         } else if (feature.tag == 2) {
             const uint8_t *tag_end = feature.data + feature.varint();
             while (feature.data < tag_end) {
-                uint32_t key = (uint32_t)feature.varint();
-                uint32_t value = (uint32_t)feature.varint();
+                uint32_t key = feature.varint();
+                uint32_t value = feature.varint();
             }
         } else if (feature.tag == 3) {
-            uint32_t type = (uint32_t)feature.varint();
+            uint32_t type = feature.varint();
         } else if (feature.tag == 4) {
             uint32_t bytes = (uint32_t)feature.varint();
             loadGeometry(feature.data, bytes);

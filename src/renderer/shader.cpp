@@ -1,4 +1,5 @@
-    #include <llmr/renderer/shader.hpp>
+#include <llmr/renderer/shader.hpp>
+#include <llmr/platform/gl.hpp>
 
 #include <cstdlib>
 #include <cstdio>
@@ -102,7 +103,20 @@ bool Shader::compileShader(GLuint *shader, GLenum type, const GLchar *source) {
     GLint status;
 
     *shader = glCreateShader(type);
+
+#ifdef EMSCRIPTEN
+    // Add WebGL GSLSL precision premable
+    const char *preamble = "precision mediump float;\n\n";
+    int preamble_length = strlen(preamble);
+    int source_length = strlen(source);
+    char *modified_source = (char *)malloc(preamble_length + source_length);
+    strncpy(&modified_source[0], preamble, preamble_length);
+    strncpy(&modified_source[preamble_length], source, source_length);
+    glShaderSource(*shader, 1, (const GLchar **)(&modified_source), NULL);
+#else
     glShaderSource(*shader, 1, &source, NULL);
+#endif
+
     glCompileShader(*shader);
 
 #if defined(DEBUG)

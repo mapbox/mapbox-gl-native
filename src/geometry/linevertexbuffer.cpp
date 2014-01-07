@@ -1,4 +1,5 @@
 #include <llmr/geometry/linevertexbuffer.hpp>
+#include <llmr/platform/gl.hpp>
 
 #include <cstdio>
 

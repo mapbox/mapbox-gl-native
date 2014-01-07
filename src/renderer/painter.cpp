@@ -5,6 +5,7 @@
 #include <llmr/platform/platform.hpp>
 #include <llmr/map/transform.hpp>
 #include <llmr/map/tile.hpp>
+#include <llmr/platform/gl.hpp>
 
 using namespace llmr;
 
@@ -44,6 +45,7 @@ void painter::setup() {
 
 
     assert(fillShader);
+    assert(lineShader);
 
 
 
@@ -62,20 +64,8 @@ void painter::setup() {
 }
 
 void painter::setupShaders() {
-    const GLchar *vertexSource, *fragmentSource;
-
-    vertexSource = platform->shaderSource("fill", "vertex.glsl");
-    assert((vertexSource, "Missing fill vertex shader source"));
-    fragmentSource = platform->shaderSource("fill", "fragment.glsl");
-    assert((fragmentSource, "Missing fill fragment shader source"));
-
-    fillShader = new FillShader(vertexSource, fragmentSource);
-
-    vertexSource = platform->shaderSource("line", "vertex.glsl");
-    assert((vertexSource, "Missing line vertex shader source"));
-    fragmentSource = platform->shaderSource("line", "fragment.glsl");
-    assert((fragmentSource, "Missing line fragment shader source"));
-    lineShader = new LineShader(vertexSource, fragmentSource);
+    fillShader = new FillShader();
+    lineShader = new LineShader();
 }
 
 void painter::teardown() {
@@ -108,6 +98,8 @@ void painter::resize(GLuint new_width, GLuint new_height) {
 
 void painter::changeMatrix() {
     assert(transform);
+    assert(width);
+    assert(height);
 
     // Initialize projection matrix
     float projMatrix[16];

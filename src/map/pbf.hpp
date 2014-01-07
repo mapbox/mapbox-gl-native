@@ -21,7 +21,7 @@ struct pbf {
 	// inline pbf(const std::string& buffer);
 
 	inline bool next();
-	inline uint64_t varint();
+	template <typename T = uint32_t> inline T varint();
 	inline int64_t svarint();
 	inline std::string string();
 	inline float float32();
@@ -68,17 +68,18 @@ bool pbf::next()
 }
 
 
-uint64_t pbf::varint()
+template <typename T>
+T pbf::varint()
 {
 	uint8_t byte = 0x80;
-	uint64_t result = 0;
+	T result = 0;
 	int bitpos;
 	for (bitpos = 0; bitpos < 70 && (byte & 0x80); bitpos += 7) {
 		if (data >= end) {
 			fprintf(stderr, "unterminated varint, unexpected end of buffer");
 			exit(1);
 		}
-		result |= ((uint64_t)(byte = *data) & 0x7F) << bitpos;
+		result |= ((T)(byte = *data) & 0x7F) << bitpos;
 
 		data++;
 	}

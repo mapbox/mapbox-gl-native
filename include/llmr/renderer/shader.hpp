@@ -1,21 +1,20 @@
 #ifndef LLMR_RENDERER_SHADER
 #define LLMR_RENDERER_SHADER
 
-#include "../platform/gl.hpp"
 #include <vector>
 
 namespace llmr {
 
 class Shader {
 public:
-    Shader(const GLchar *vertex, const GLchar *fragment);
+    Shader(const char *vertex, const char *fragment);
     ~Shader();
     bool valid;
-    GLuint program;
-    std::vector<GLuint> attributes;
+    uint32_t program;
+    std::vector<uint32_t> attributes;
 
 private:
-    bool compileShader(GLuint *shader, GLenum type, const GLchar *source);
+    bool compileShader(uint32_t *shader, uint32_t type, const char *source);
 };
 
 }

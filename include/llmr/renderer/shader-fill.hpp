@@ -7,11 +7,11 @@ namespace llmr {
 
 class FillShader : public Shader {
 public:
-    FillShader(const GLchar *vertex, const GLchar *fragment);
+    FillShader();
 
-    GLint a_pos;
-    GLint u_matrix;
-    GLint u_color;
+    int32_t a_pos;
+    int32_t u_matrix;
+    int32_t u_color;
 };
 
 }

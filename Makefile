@@ -12,17 +12,17 @@ SRCS    += src/renderer/painter.cpp
 SRCS    += src/renderer/shader.cpp
 SRCS    += src/renderer/shader-fill.cpp
 SRCS    += src/renderer/shader-line.cpp
+SRCS    += src/shader/shaders.c
 SRCS    += src/util/mat4.c
 
-OBJS     = $(patsubst %.mm,%.o,$(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(SRCS))))
+# OBJS     = $(patsubst %.mm,%.o,$(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(SRCS))))
 
 main: macosx
 
-library: $(OBJS)
-
 macosx: SRCS += macosx/main.mm
-macosx: library
-	$(CXX) $(OBJS) $(INCLUDE) -lglfw3 -framework OpenGL -framework Foundation -o macosx/main
+emscripten: SRCS += emscripten/main.cpp
+
+macosx emscripten: OBJS = $(patsubst %.mm,%.o,$(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(SRCS))))
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDE) -c -o $@ $^
@@ -33,8 +33,16 @@ macosx: library
 %.o: %.c
 	$(CC) $(CPPFLAGS) $(INCLUDE) -c -o $@ $^
 
+
+.SECONDEXPANSION:
+macosx: $$(OBJS)
+	$(CXX) $(OBJS) $(INCLUDE) -lglfw3 -framework OpenGL -framework Foundation -o macosx/main
+
+emscripten: $$(OBJS)
+	$(CXX) $(OBJS) $(INCLUDE) -o emscripten/main.js
+
 clean:
 	rm -rf src/*/*.o
 	rm -rf macosx/main
 
-.PHONY: macosx
+.PHONY: macosx emscripten

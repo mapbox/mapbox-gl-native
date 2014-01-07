@@ -7,11 +7,11 @@ namespace llmr {
 
 class LineShader : public Shader {
 public:
-    LineShader(const GLchar *vertex, const GLchar *fragment);
+    LineShader();
 
-    GLint a_pos;
-    GLint u_matrix;
-    GLint u_color;
+    int32_t a_pos;
+    int32_t u_matrix;
+    int32_t u_color;
 };
 
 }

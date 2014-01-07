@@ -1,8 +1,6 @@
 #ifndef LLMR_RENDERER_PAINTER
 #define LLMR_RENDERER_PAINTER
 
-#include "../platform/gl.hpp"
-
 #include "shader-fill.hpp"
 #include "shader-line.hpp"
 
@@ -19,7 +17,7 @@ public:
     void setup();
     void teardown();
 
-    void resize(GLuint new_width, GLuint new_height);
+    void resize(uint32_t new_width, uint32_t new_height);
     void viewport();
 
 
@@ -38,16 +36,16 @@ public:
 private:
     platform *platform;
     transform *transform;
-    GLuint width, height;
-    GLfloat matrix[16];
+    uint32_t width, height;
+    float matrix[16];
 
     Shader *currentShader;
     FillShader *fillShader;
     LineShader *lineShader;
 
-    GLuint vertexArray;
-    GLuint triangleVertexBuffer;
-    GLuint fillVertexBuffer;
+    uint32_t vertexArray;
+    uint32_t triangleVertexBuffer;
+    uint32_t fillVertexBuffer;
 };
 
 }
