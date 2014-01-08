@@ -25,25 +25,20 @@ void tile::setData(uint8_t *data, uint32_t bytes) {
 
 bool tile::parse()
 {
-    fprintf(stderr, "[%8zx] parsing tile\n",
-        std::hash<std::thread::id>()(std::this_thread::get_id())
-    );
+    fprintf(stderr, "[%p] parsing tile...\n", this);
 
-    // try {
-        pbf tile(data, bytes);
-        while (tile.next()) {
-            if (tile.tag == 3) { // layer
-                uint32_t bytes = (uint32_t)tile.varint();
-                parseLayer(tile.data, bytes);
-                tile.skipBytes(bytes);
-            } else {
-                tile.skip();
-            }
+    pbf tile(data, bytes);
+    while (tile.next()) {
+        if (tile.tag == 3) { // layer
+            uint32_t bytes = (uint32_t)tile.varint();
+            parseLayer(tile.data, bytes);
+            tile.skipBytes(bytes);
+        } else {
+            tile.skip();
         }
-    // } catch (std::exception& ex) {
-    //     std::cerr << ex.what();
-    //     return false;
-    // }
+    }
+
+    fprintf(stderr, "[%p] parsing tile...done\n", this);
 
     loaded = true;
     return true;
@@ -69,15 +64,15 @@ void tile::parseFeature(const uint8_t *data, uint32_t bytes) {
     pbf feature(data, bytes);
     while (feature.next()) {
         if (feature.tag == 1) {
-            uint32_t id = feature.varint();
+            /*uint32_t id =*/ feature.varint();
         } else if (feature.tag == 2) {
             const uint8_t *tag_end = feature.data + feature.varint();
             while (feature.data < tag_end) {
-                uint32_t key = feature.varint();
-                uint32_t value = feature.varint();
+                /*uint32_t key =*/ feature.varint();
+                /*uint32_t value =*/ feature.varint();
             }
         } else if (feature.tag == 3) {
-            uint32_t type = feature.varint();
+            /*uint32_t type =*/ feature.varint();
         } else if (feature.tag == 4) {
             uint32_t bytes = (uint32_t)feature.varint();
             loadGeometry(feature.data, bytes);

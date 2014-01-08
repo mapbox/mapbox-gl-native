@@ -25,18 +25,12 @@ GLfloat fill_vertices[] = {
 };
 
 
-painter::painter(class platform *platform)
+painter::painter(class platform *platform, class transform *transform)
     : platform(platform),
-      transform(NULL),
-      width(0),
-      height(0),
+      transform(transform),
       currentShader(NULL),
       fillShader(NULL) {
 
-}
-
-void painter::setTransform(class transform *transform) {
-    this->transform = transform;
 }
 
 
@@ -86,29 +80,15 @@ void painter::teardown() {
 
 }
 
-void painter::resize(GLuint new_width, GLuint new_height) {
-    if (width == new_width && height == new_height) {
-        return;
-    }
-
-    fprintf(stderr, "changing viewport size to %d/%d\n", new_width, new_height);
-    width = new_width;
-    height = new_height;
-}
-
-void painter::changeMatrix() {
+void painter::changeMatrix(tile *tile) {
     assert(transform);
-    assert(width);
-    assert(height);
 
     // Initialize projection matrix
     float projMatrix[16];
-    mat4_ortho(projMatrix, 0, width, height, 0, 1, 10);
+    mat4_ortho(projMatrix, 0, transform->width, transform->height, 0, 1, 10);
 
     float mvMatrix[16];
-    mat4_identity(mvMatrix);
-    mat4_translate(mvMatrix, mvMatrix, transform->x, transform->y, -1);
-    mat4_scale(mvMatrix, mvMatrix, transform->scale / 8, transform->scale / 8, 1);
+    transform->matrixFor(mvMatrix, tile->z, tile->x, tile->y);
 
     mat4_multiply(matrix, projMatrix, mvMatrix);
 }
@@ -119,7 +99,7 @@ void painter::clear() {
 }
 
 void painter::render(tile *tile) {
-    changeMatrix();
+    changeMatrix(tile);
 
     glDisable(GL_STENCIL_TEST);
     glEnable(GL_BLEND);

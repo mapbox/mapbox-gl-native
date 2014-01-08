@@ -10,8 +10,7 @@ public:
         dirty(true),
         tracking(false),
         platform(new llmr::platform(this)),
-        painter(new llmr::painter(platform)),
-        map(new llmr::map(platform, painter)) {
+        map(new llmr::map(platform)) {
         if (!glfwInit()) {
             fprintf(stderr, "Failed to initialize glfw\n");
             exit(1);
@@ -26,12 +25,12 @@ public:
 
         glfwMakeContextCurrent(window);
 
-        painter->setup();
+        map->setup();
 
 
         int width, height;
         glfwGetWindowSize(window, &width, &height);
-        painter->resize(width, height);
+        map->resize(width, height);
 
         glfwSwapInterval(1);
 
@@ -68,7 +67,7 @@ public:
 
     static void resize(GLFWwindow *window, int width, int height) {
         MapView *view = (MapView *)glfwGetWindowUserPointer(window);
-        view->painter->resize(width, height);
+        view->map->resize(width, height);
     }
 
     static void mouseclick(GLFWwindow *window, int button, int action, int modifiers) {
@@ -125,7 +124,6 @@ public:
 
     ~MapView() {
         delete map;
-        delete painter;
         delete platform;
         glfwTerminate();
     }
@@ -137,7 +135,6 @@ public:
 
     GLFWwindow *window;
     llmr::platform *platform;
-    llmr::painter *painter;
     llmr::map *map;
 };
 

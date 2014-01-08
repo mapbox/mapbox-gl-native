@@ -12,12 +12,10 @@ class tile;
 
 class painter {
 public:
-    painter(class platform *platform);
+    painter(class platform *platform, class transform *tranform);
 
     void setup();
     void teardown();
-
-    void resize(uint32_t new_width, uint32_t new_height);
     void viewport();
 
 
@@ -25,18 +23,16 @@ public:
     void render(tile *tile);
 
     void switchShader(Shader *shader, float matrix[16]);
-    void setTransform(transform *transform);
 
 private:
     void setupShaders();
-    void changeMatrix();
+    void changeMatrix(tile *tile);
 
 public:
 
 private:
     platform *platform;
     transform *transform;
-    uint32_t width, height;
     float matrix[16];
 
     Shader *currentShader;

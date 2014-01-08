@@ -11,8 +11,11 @@ class tile;
 
 class map {
 public:
-    map(class platform *platform, class painter *painter);
+    map(class platform *platform);
     ~map();
+
+    void setup();
+    void resize(uint32_t width, uint32_t height);
 
     /* callback */
     bool render();
@@ -23,8 +26,8 @@ public:
 
 private:
     platform *platform;
-    painter *painter;
     transform *transform;
+    painter *painter;
 
     std::vector<tile *> tiles;
 };

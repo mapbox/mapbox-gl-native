@@ -6,17 +6,25 @@
 
 using namespace llmr;
 
-map::map(class platform *platform, class painter *painter)
+map::map(class platform *platform)
     : platform(platform),
-      painter(painter),
-      transform(new class transform()) {
+      transform(new class transform()),
+      painter(new class painter(platform, transform)) {
 
-    painter->setTransform(transform);
+    transform->setLonLat(13, 50);
+    transform->setZoom(3);
 
+    tiles.push_back(new class tile(1, 0, 0));
+    platform->request(tiles.back());
 
-    tile *tile = new class tile(0, 0, 0);
-    tiles.push_back(tile);
-    platform->request(tile);
+    tiles.push_back(new class tile(1, 1, 0));
+    platform->request(tiles.back());
+
+    tiles.push_back(new class tile(1, 0, 1));
+    platform->request(tiles.back());
+
+    tiles.push_back(new class tile(1, 1, 1));
+    platform->request(tiles.back());
 
 }
 
@@ -24,6 +32,15 @@ map::~map() {
     delete transform;
 }
 
+void map::setup() {
+    painter->setup();
+}
+
+void map::resize(uint32_t width, uint32_t height) {
+    transform->width = width;
+    transform->height = height;
+    platform->restart();
+}
 
 void map::moveBy(double dx, double dy) {
     transform->moveBy(dx, dy);
