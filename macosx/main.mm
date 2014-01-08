@@ -9,6 +9,8 @@ public:
     MapView() :
         dirty(true),
         tracking(false),
+        rotating(false),
+        last_click(-1),
         platform(new llmr::platform(this)),
         map(new llmr::map(platform)) {
         if (!glfwInit()) {
@@ -72,8 +74,17 @@ public:
 
     static void mouseclick(GLFWwindow *window, int button, int action, int modifiers) {
         MapView *view = (MapView *)glfwGetWindowUserPointer(window);
+
         if (button == GLFW_MOUSE_BUTTON_LEFT) {
             view->tracking = action == GLFW_PRESS;
+
+            if (action == GLFW_RELEASE) {
+                double now = glfwGetTime();
+                if (now - view->last_click < 0.4) {
+                    view->map->scaleBy(2.0, view->last_x, view->last_y);
+                }
+                view->last_click = now;
+            }
         } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
             view->rotating = action == GLFW_PRESS;
             if (view->rotating) {
@@ -81,6 +92,7 @@ public:
                 view->start_y = view->last_y;
             }
         }
+
     }
 
     static void mousemove(GLFWwindow *window, double x, double y) {
@@ -143,6 +155,8 @@ public:
 
     double start_x, start_y;
     bool rotating;
+
+    double last_click;
 
     GLFWwindow *window;
     llmr::platform *platform;

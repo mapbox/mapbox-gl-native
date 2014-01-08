@@ -21,8 +21,6 @@ public:
     void setAngle(double angle);
     void setZoom(double zoom);
     void setLonLat(double lon, double lat);
-    // void setAngle(double angle);
-
 
     // Getters
     void matrixFor(float matrix[16], uint32_t z, uint32_t x, uint32_t y) const;
