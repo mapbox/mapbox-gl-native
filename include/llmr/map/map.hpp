@@ -21,6 +21,7 @@ public:
     bool render();
     void moveBy(double dx, double dy);
     void scaleBy(double ds, double cx, double cy);
+    void rotateBy(double cx, double cy, double dx, double dy);
     void tileLoaded(tile *tile);
     void tileFailed(tile *tile);
 

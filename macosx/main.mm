@@ -72,8 +72,14 @@ public:
 
     static void mouseclick(GLFWwindow *window, int button, int action, int modifiers) {
         MapView *view = (MapView *)glfwGetWindowUserPointer(window);
-        if (button == GLFW_MOUSE_BUTTON_1) {
+        if (button == GLFW_MOUSE_BUTTON_LEFT) {
             view->tracking = action == GLFW_PRESS;
+        } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+            view->rotating = action == GLFW_PRESS;
+            if (view->rotating) {
+                view->start_x = view->last_x;
+                view->start_y = view->last_y;
+            }
         }
     }
 
@@ -81,6 +87,8 @@ public:
         MapView *view = (MapView *)glfwGetWindowUserPointer(window);
         if (view->tracking) {
             view->map->moveBy(x - view->last_x, y - view->last_y);
+        } else if (view->rotating) {
+            view->map->rotateBy(view->start_x, view->start_y, x - view->last_x, y - view->last_y);
         }
         view->last_x = x;
         view->last_y = y;
@@ -132,6 +140,9 @@ public:
     bool dirty;
     double last_x, last_y;
     bool tracking;
+
+    double start_x, start_y;
+    bool rotating;
 
     GLFWwindow *window;
     llmr::platform *platform;

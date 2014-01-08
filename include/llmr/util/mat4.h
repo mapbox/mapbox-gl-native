@@ -31,6 +31,7 @@ void mat4_identity(float out[16]);
 void mat4_ortho(float out[16], float left, float right, float bottom, float top, float near, float far);
 void mat4_copy(float out[16], float a[16]);
 void mat4_translate(float out[16], float a[16], float x, float y, float z);
+void mat4_rotate_z(float out[16], float a[16], float rad);
 void mat4_scale(float out[16], float a[16], float x, float y, float z);
 void mat4_multiply(float out[16], float a[16], float b[16]);
 
