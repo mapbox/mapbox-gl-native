@@ -1,6 +1,7 @@
 #include <llmr/map/transform.hpp>
 
 #include <llmr/util/mat4.h>
+#include <llmr/util/math.hpp>
 #include <cmath>
 #include <cstdio>
 
@@ -42,9 +43,32 @@ void transform::scaleBy(double ds, double cx, double cy) {
     y = (y * ds) + fy;
 }
 
-void transform::rotateBy(double cx, double cy, double dx, double dy) {
-    const double distance = copysign(sqrt(dx * dx + dy * dy), dx);
-    setAngle(angle + D2R * distance);
+
+void transform::rotateBy(double anchor_x, double anchor_y, double start_x, double start_y, double end_x, double end_y) {
+    double center_x = width / 2, center_y = height / 2;
+
+    const double begin_center_x = start_x - center_x;
+    const double begin_center_y = start_y - center_y;
+
+    const double beginning_center_dist = sqrt(begin_center_x * begin_center_x + begin_center_y * begin_center_y);
+
+    // If the first click was too close to the center, move the center of rotation by 200 pixels
+    // in the direction of the click.
+    if (beginning_center_dist < 200) {
+        const double offset_x = -200, offset_y = 0;
+        const double rotate_angle = atan2(begin_center_y, begin_center_x);
+        const double rotate_angle_sin = sin(rotate_angle);
+        const double rotate_angle_cos = cos(rotate_angle);
+        center_x = start_x + rotate_angle_cos * offset_x - rotate_angle_sin * offset_y;
+        center_y = start_y + rotate_angle_sin * offset_x + rotate_angle_cos * offset_y;
+    }
+
+    const double first_x = start_x - center_x, first_y = start_y - center_y;
+    const double second_x = end_x - center_x, second_y = end_y - center_y;
+
+    const double ang = angle + util::angle_between(first_x, first_y, second_x, second_y);
+
+    setAngle(ang);
 }
 
 void transform::setAngle(double new_angle) {

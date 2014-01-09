@@ -14,7 +14,7 @@ public:
     // Relative changes
     void moveBy(double dx, double dy);
     void scaleBy(double ds, double cx, double cy);
-    void rotateBy(double cx, double cy, double dx, double dy);
+    void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey);
 
     // Absolute changes
     void setScale(double scale);

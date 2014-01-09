@@ -75,7 +75,13 @@ public:
     static void mouseclick(GLFWwindow *window, int button, int action, int modifiers) {
         MapView *view = (MapView *)glfwGetWindowUserPointer(window);
 
-        if (button == GLFW_MOUSE_BUTTON_LEFT) {
+        if (button == GLFW_MOUSE_BUTTON_RIGHT || (button == GLFW_MOUSE_BUTTON_LEFT && modifiers & GLFW_MOD_CONTROL)) {
+            view->rotating = action == GLFW_PRESS;
+            if (view->rotating) {
+                view->start_x = view->last_x;
+                view->start_y = view->last_y;
+            }
+        } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
             view->tracking = action == GLFW_PRESS;
 
             if (action == GLFW_RELEASE) {
@@ -85,14 +91,7 @@ public:
                 }
                 view->last_click = now;
             }
-        } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-            view->rotating = action == GLFW_PRESS;
-            if (view->rotating) {
-                view->start_x = view->last_x;
-                view->start_y = view->last_y;
-            }
         }
-
     }
 
     static void mousemove(GLFWwindow *window, double x, double y) {
@@ -100,7 +99,7 @@ public:
         if (view->tracking) {
             view->map->moveBy(x - view->last_x, y - view->last_y);
         } else if (view->rotating) {
-            view->map->rotateBy(view->start_x, view->start_y, x - view->last_x, y - view->last_y);
+            view->map->rotateBy(view->start_x, view->start_y, view->last_x, view->last_y, x, y);
         }
         view->last_x = x;
         view->last_y = y;

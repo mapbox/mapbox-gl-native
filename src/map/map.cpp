@@ -52,8 +52,8 @@ void map::scaleBy(double ds, double cx, double cy) {
     platform->restart();
 }
 
-void map::rotateBy(double cx, double cy, double dx, double dy) {
-    transform->rotateBy(cx, cy, dx, dy);
+void map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey) {
+    transform->rotateBy(cx, cy, sx, sy, ex, ey);
     platform->restart();
 }
 
