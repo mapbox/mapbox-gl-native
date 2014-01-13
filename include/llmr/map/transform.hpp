@@ -3,7 +3,10 @@
 
 #include <cstdint>
 
+
 namespace llmr {
+
+struct box;
 
 class tile;
 
@@ -24,7 +27,12 @@ public:
 
     // Getters
     void matrixFor(float matrix[16], uint32_t z, uint32_t x, uint32_t y) const;
+    int32_t getZoom() const;
     void getLonLat(double& lon, double& lat) const;
+
+
+    // Temporary
+    void mapCornersToBox(uint32_t z, box& b) const;
 
 private:
     double pixel_x() const;
@@ -39,6 +47,8 @@ private:
     double x, y; // pixel values of the map center in the current scale
     double angle;
     double scale;
+
+    double min_scale, max_scale;
 
     // tile size
     const int32_t size = 512;

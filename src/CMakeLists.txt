@@ -1,0 +1,43 @@
+SET(llmr_SOURCES
+    geometry/linevertexbuffer.cpp
+    map/map.cpp
+    map/tile.cpp
+    map/transform.cpp
+    renderer/painter.cpp
+    renderer/shader-fill.cpp
+    renderer/shader-line.cpp
+    renderer/shader.cpp
+    shader/shaders.c
+    util/mat4.c
+)
+
+SET(llmr_HEADERS
+    ../include/llmr/geometry/linevertexbuffer.hpp
+    ../include/llmr/llmr.hpp
+    ../include/llmr/map/map.hpp
+    ../include/llmr/map/tile.hpp
+    ../include/llmr/map/transform.hpp
+    ../include/llmr/platform/gl.hpp
+    ../include/llmr/platform/platform.hpp
+    ../include/llmr/renderer/painter.hpp
+    ../include/llmr/renderer/shader-fill.hpp
+    ../include/llmr/renderer/shader-line.hpp
+    ../include/llmr/renderer/shader.hpp
+    ../include/llmr/util/math.hpp
+    ../include/llmr/util/vec2.hpp
+)
+
+INCLUDE_DIRECTORIES(
+    ../include
+)
+
+ADD_LIBRARY(llmr STATIC
+    ${llmr_SOURCES}
+    ${llmr_HEADERS}
+)
+
+LINK_DIRECTORIES(
+)
+
+TARGET_LINK_LIBRARIES(llmr
+)

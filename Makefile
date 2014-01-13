@@ -1,5 +1,5 @@
-CXXFLAGS = -Wall -Wextra -std=c++11 -stdlib=libc++ -fno-exceptions
-CPPFLAGS = -O3 -DDEBUG
+CXXFLAGS = -O2 -Wall -Wextra -std=c++11 -stdlib=libc++ -fno-exceptions
+CPPFLAGS = -DDEBUG
 INCLUDE  = -Iinclude
 
 
@@ -21,8 +21,9 @@ main: macosx
 
 macosx: SRCS += macosx/main.mm
 emscripten: SRCS += emscripten/main.cpp
+emscripten3: SRCS += emscripten/main.cpp
 
-macosx emscripten: OBJS = $(patsubst %.mm,%.o,$(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(SRCS))))
+macosx emscripten emscripten3: OBJS = $(patsubst %.mm,%.o,$(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(SRCS))))
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDE) -c -o $@ $^
@@ -36,13 +37,18 @@ macosx emscripten: OBJS = $(patsubst %.mm,%.o,$(patsubst %.cpp,%.o,$(patsubst %.
 
 .SECONDEXPANSION:
 macosx: $$(OBJS)
-	$(CXX) $(OBJS) $(INCLUDE) -lglfw3 -framework OpenGL -framework Foundation -o macosx/main
+	$(CXX) -O3 $(OBJS) $(INCLUDE) -lglfw3 -framework OpenGL -framework Foundation -o macosx/main
 
 emscripten: $$(OBJS)
 	$(CXX) $(OBJS) $(INCLUDE) -o emscripten/main.js
 
+emscripten3: $$(OBJS)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OBJS) $(INCLUDE) -s DOUBLE_MODE=0 -s FORCE_ALIGNED_MEMORY=1 -s PRECISE_I64_MATH=0 --closure 1 -o emscripten/main.js
+	uglifyjs emscripten/main.js -mc > emscripten/main.dist.js
+	gzip -c emscripten/main.dist.js > emscripten/main.dist.js.gz
+
 clean:
-	rm -rf src/*/*.o
-	rm -rf macosx/main
+	rm -rf */*.o */*/*.o
+	rm -rf macosx/main emscripten/main.js emscripten/main.js.map
 
 .PHONY: macosx emscripten

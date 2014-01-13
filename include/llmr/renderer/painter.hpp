@@ -6,13 +6,12 @@
 
 namespace llmr {
 
-class platform;
 class transform;
 class tile;
 
 class painter {
 public:
-    painter(class platform *platform, class transform *tranform);
+    painter(class transform *tranform);
 
     void setup();
     void teardown();
@@ -31,7 +30,6 @@ private:
 public:
 
 private:
-    platform *platform;
     transform *transform;
     float matrix[16];
 
@@ -39,7 +37,7 @@ private:
     FillShader *fillShader;
     LineShader *lineShader;
 
-    uint32_t vertexArray;
+    // uint32_t vertexArray;
     uint32_t triangleVertexBuffer;
     uint32_t fillVertexBuffer;
 };

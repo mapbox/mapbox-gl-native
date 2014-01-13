@@ -1,6 +1,7 @@
 #include <llmr/map/transform.hpp>
 
 #include <llmr/util/mat4.h>
+#include <llmr/util/vec2.hpp>
 #include <llmr/util/math.hpp>
 #include <cmath>
 #include <cstdio>
@@ -22,7 +23,9 @@ transform::transform()
     x(0),
     y(0),
     angle(0.0),
-    scale(1.0) {
+    scale(1.0),
+    min_scale(pow(2, 0)),
+    max_scale(pow(2, 20)) {
     setScale(scale);
     setAngle(angle);
 }
@@ -33,6 +36,14 @@ void transform::moveBy(double dx, double dy) {
 }
 
 void transform::scaleBy(double ds, double cx, double cy) {
+    // clamp scale to min/max values
+    const double new_scale = scale * ds;
+    if (new_scale < min_scale) {
+        ds = min_scale / scale;
+    } else if (new_scale > max_scale) {
+        ds = max_scale / scale;
+    }
+
     const double dx = (cx - width / 2) * (1.0 - ds);
     const double dy = (cy - height / 2) * (1.0 - ds);
     const double fx = cos(angle) * dx + sin(angle) * dy;
@@ -41,6 +52,8 @@ void transform::scaleBy(double ds, double cx, double cy) {
     scale *= ds;
     x = (x * ds) + fx;
     y = (y * ds) + fy;
+
+    fprintf(stderr, "scale: %f, %f, %f\n", scale, x, y);
 }
 
 
@@ -78,6 +91,12 @@ void transform::setAngle(double new_angle) {
 }
 
 void transform::setScale(double new_scale) {
+    if (new_scale < min_scale) {
+        new_scale = min_scale;
+    } else if (new_scale > max_scale) {
+        new_scale = max_scale;
+    }
+
     const double factor = new_scale / scale;
     x *= factor;
     y *= factor;
@@ -99,7 +118,7 @@ void transform::setLonLat(double lon, double lat) {
     y = round(0.5 * Cc * log((1 + f) / (1 - f)));
 }
 
-void transform::getLonLat(double& lon, double& lat) const {
+void transform::getLonLat(double &lon, double &lat) const {
     lon = -x / Bc;
     lat = R2D * (2 * atan(exp(y / Cc)) - 0.5 * M_PI);
 }
@@ -132,7 +151,40 @@ void transform::matrixFor(float matrix[16], uint32_t tile_z, uint32_t tile_x, ui
 
     // Clipping plane
     mat4_translate(matrix, matrix, 0, 0, -1);
-
-
-
 }
+
+int32_t transform::getZoom() const {
+    return floor(log(scale) / M_LN2);
+}
+
+
+void transform::mapCornersToBox(uint32_t z, box& b) const {
+    const double ref_scale = pow(2, z);
+
+    // Keep the map as upright as possible.
+    double local_angle = angle;
+    if (local_angle >= M_PI_2) local_angle -= M_PI;
+    if (local_angle < -M_PI_2) local_angle += M_PI;
+
+    const double angle_sin = sin(-local_angle);
+    const double angle_cos = cos(-local_angle);
+
+    const double w_2 = width / 2;
+    const double h_2 = height / 2;
+    const double ss_1 = ref_scale / (scale * size);
+    const double ss_2 = (scale * size) / 2;
+
+    // Calculate the corners of the map view. The resulting coordinates will be
+    // in fractional tile coordinates.
+    b.tl.x = ((-w_2) * angle_cos - (-h_2) * angle_sin + ss_2 - x) * ss_1;
+    b.tl.y = ((-w_2) * angle_sin + (-h_2) * angle_cos + ss_2 - y) * ss_1;
+    b.tr.x = ((+w_2) * angle_cos - (-h_2) * angle_sin + ss_2 - x) * ss_1;
+    b.tr.y = ((+w_2) * angle_sin + (-h_2) * angle_cos + ss_2 - y) * ss_1;
+    b.bl.x = ((-w_2) * angle_cos - (+h_2) * angle_sin + ss_2 - x) * ss_1;
+    b.bl.y = ((-w_2) * angle_sin + (+h_2) * angle_cos + ss_2 - y) * ss_1;
+    b.br.x = ((+w_2) * angle_cos - (+h_2) * angle_sin + ss_2 - x) * ss_1;
+    b.br.y = ((+w_2) * angle_sin + (+h_2) * angle_cos + ss_2 - y) * ss_1;
+
+    // Quick hack: use the entire non-rotated bounding box.
+}
+

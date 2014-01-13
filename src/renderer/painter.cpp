@@ -25,9 +25,8 @@ GLfloat fill_vertices[] = {
 };
 
 
-painter::painter(class platform *platform, class transform *transform)
-    : platform(platform),
-      transform(transform),
+painter::painter(class transform *transform)
+    : transform(transform),
       currentShader(NULL),
       fillShader(NULL) {
 

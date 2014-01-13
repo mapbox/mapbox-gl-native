@@ -22,11 +22,11 @@ struct pbf {
 
 	inline bool next();
 	template <typename T = uint32_t> inline T varint();
-	inline int64_t svarint();
+	template <typename T = uint32_t> inline T svarint();
 	inline std::string string();
 	inline float float32();
 	inline double float64();
-	inline int64_t int64();
+	// inline int64_t int64();
 	inline bool boolean();
 
 	template <typename T, typename... Args>
@@ -91,10 +91,11 @@ T pbf::varint()
 	return result;
 }
 
-int64_t pbf::svarint()
+template <typename T>
+T pbf::svarint()
 {
-	uint64_t n = varint();
-	return (n >> 1) ^ -(int64_t)(n & 1);
+	T n = varint<T>();
+	return (n >> 1) ^ -(T)(n & 1);
 }
 
 std::string pbf::string()
@@ -112,6 +113,7 @@ float pbf::float32()
 	memcpy(&result, data - 4, 4);
 	return result;
 }
+
 double pbf::float64()
 {
 	skipBytes(8);
@@ -120,10 +122,10 @@ double pbf::float64()
 	return result;
 }
 
-int64_t pbf::int64()
-{
-	return (int64_t)varint();
-}
+// int64_t pbf::int64()
+// {
+// 	return (int64_t)varint();
+// }
 
 bool pbf::boolean()
 {

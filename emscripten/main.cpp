@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+ #include <unistd.h>
 
 #include <llmr/llmr.hpp>
 #include <llmr/map/tile.hpp>
@@ -18,8 +19,7 @@ public:
     MapView() :
         dirty(true),
         platform(new llmr::platform(this)),
-        painter(new llmr::painter(platform)),
-        map(new llmr::map(platform, painter)) {
+        map(new llmr::map(platform)) {
 
         // Initialize GLFW
         if (!glfwInit()) {
@@ -42,14 +42,13 @@ public:
             exit(1);
         }
 
-        painter->setup();
-        painter->resize(width, height);
+        map->setup();
+        map->resize(width, height);
 
     }
 
     ~MapView() {
         delete map;
-        delete painter;
         delete platform;
         glfwTerminate();
     }
@@ -65,7 +64,7 @@ public:
     static void scroll(float pos) {
         double delta = pos;
 
-        bool is_wheel = delta != 0 && fmod(delta, 4.000244140625) == 0;
+        // bool is_wheel = delta != 0 && fmod(delta, 4.000244140625) == 0;
 
         double absdelta = delta < 0 ? -delta : delta;
         double scale = 2.0 / (1.0 + exp(-absdelta / 100.0));
@@ -86,6 +85,8 @@ public:
     static void mouseclick(int button, int action) {
         if (button == GLFW_MOUSE_BUTTON_1) {
             view->tracking = action == GLFW_PRESS;
+        } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+            fprintf(stderr, "right mouse\n");
         }
     }
 
@@ -110,7 +111,6 @@ public:
 
 
     llmr::platform *platform;
-    llmr::painter *painter;
     llmr::map *map;
 
 };

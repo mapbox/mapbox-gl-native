@@ -5,18 +5,13 @@ namespace llmr {
 
 class tile;
 
-class platform {
-public:
-    platform(void *obj) : obj(obj) {}
-    void restart();
-    void request(tile *tile);
+namespace platform {
 
-private:
-    void *obj;
-};
+void restart(void *obj);
+void request(void *obj, tile *tile);
 
 }
 
-
+}
 
 #endif

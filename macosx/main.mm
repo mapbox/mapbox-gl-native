@@ -11,8 +11,10 @@ public:
         tracking(false),
         rotating(false),
         last_click(-1),
-        platform(new llmr::platform(this)),
-        map(new llmr::map(platform)) {
+        map(new llmr::map()) {
+        }
+
+    void init() {
         if (!glfwInit()) {
             fprintf(stderr, "Failed to initialize glfw\n");
             exit(1);
@@ -143,7 +145,6 @@ public:
 
     ~MapView() {
         delete map;
-        delete platform;
         glfwTerminate();
     }
 
@@ -158,19 +159,25 @@ public:
     double last_click;
 
     GLFWwindow *window;
-    llmr::platform *platform;
     llmr::map *map;
 };
 
-void llmr::platform::restart() {
-    ((MapView *)obj)->dirty = true;
+
+MapView *view;
+
+namespace llmr {
+namespace platform {
+
+void restart(void *) {
+    view->dirty = true;
 }
 
-void llmr::platform::request(tile *tile) {
+void request(void *, tile *tile) {
     fprintf(stderr, "request %d/%d/%d\n", tile->z, tile->x, tile->y);
 
     fprintf(stderr, "requesting tile\n");
-    NSString *urlTemplate = @"http://api.tiles.mapbox.com/v3/mapbox.mapbox-streets-v4/%d/%d/%d.vector.pbf";
+    // NSString *urlTemplate = @"http://api.tiles.mapbox.com/v3/mapbox.mapbox-streets-v4/%d/%d/%d.vector.pbf";
+    NSString *urlTemplate = @"http://localhost:3333/gl/tiles/%d-%d-%d.vector.pbf";
     NSString *urlString = [NSString
                            stringWithFormat:urlTemplate,
                            tile->z,
@@ -192,20 +199,25 @@ void llmr::platform::request(tile *tile) {
             tile->setData((uint8_t *)[data bytes], [data length]);
             if (tile->parse()) {
                 dispatch_async(dispatch_get_main_queue(), ^ {
-                    ((MapView *)obj)->map->tileLoaded(tile);
+                    view->map->tileLoaded(tile);
                 });
                 return;
             }
         }
 
         dispatch_async(dispatch_get_main_queue(), ^ {
-            ((MapView *)obj)->map->tileFailed(tile);
+            view->map->tileFailed(tile);
         });
     }];
 }
 
+}
+}
 
 int main() {
-    MapView view;
-    return view.run();
+    view = new MapView();
+    view->init();
+    int ret = view->run();
+    delete view;
+    return ret;
 }

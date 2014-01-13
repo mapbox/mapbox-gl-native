@@ -11,7 +11,7 @@ class tile;
 
 class map {
 public:
-    map(class platform *platform);
+    map();
     ~map();
 
     void setup();
@@ -26,9 +26,14 @@ public:
     void tileFailed(tile *tile);
 
 private:
-    platform *platform;
+    void updateTiles();
+
+private:
     transform *transform;
     painter *painter;
+
+    // int32_t min_zoom;
+    // int32_t max_zoom;
 
     std::vector<tile *> tiles;
 };
