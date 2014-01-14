@@ -13,6 +13,12 @@
 #include <string>
 // #include <cassert>
 
+#define PBF_USE_SETJMP
+
+#ifdef PBF_USE_SETJMP
+#include <csetjmp>
+#endif
+
 namespace llmr {
 
 struct pbf {
@@ -29,9 +35,6 @@ struct pbf {
 	// inline int64_t int64();
 	inline bool boolean();
 
-	template <typename T, typename... Args>
-	inline T *message(const Args&... args);
-
 	inline void skip();
 	inline void skipValue(uint32_t val);
 	inline void skipBytes(uint32_t bytes);
@@ -40,6 +43,17 @@ struct pbf {
 	const uint8_t *end;
 	uint32_t value;
 	uint32_t tag;
+
+	enum error_code {
+		UNTERMINATED_VARINT = 1,
+		UNKNOWN_TYPE = 2,
+		END_OF_BUFFER = 3
+	};
+
+	#ifdef PBF_USE_SETJMP
+	std::jmp_buf jump_buffer;
+	std::string msg;
+	#endif
 };
 
 pbf::pbf(const unsigned char *data, uint32_t length)
@@ -76,7 +90,10 @@ T pbf::varint()
 	int bitpos;
 	for (bitpos = 0; bitpos < 70 && (byte & 0x80); bitpos += 7) {
 		if (data >= end) {
-			fprintf(stderr, "unterminated varint, unexpected end of buffer");
+			#ifdef PBF_USE_SETJMP
+			msg = "unterminated varint, unexpected end of buffer";
+			std::longjmp(jump_buffer, UNTERMINATED_VARINT);
+			#endif
 			exit(1);
 		}
 		result |= ((T)(byte = *data) & 0x7F) << bitpos;
@@ -84,7 +101,10 @@ T pbf::varint()
 		data++;
 	}
 	if (bitpos == 70 && (byte & 0x80)) {
-		fprintf(stderr, "unterminated varint (too long)");
+		#ifdef PBF_USE_SETJMP
+		msg = "unterminated varint (too long)";
+		std::longjmp(jump_buffer, UNTERMINATED_VARINT);
+		#endif
 		exit(1);
 	}
 
@@ -133,14 +153,13 @@ bool pbf::boolean()
 	return *(bool *)(data - 1);
 }
 
-
-template <typename T, typename... Args> T *pbf::message(const Args&... args)
-{
-	uint32_t bytes = (uint32_t)varint();
-    T *result = new T(data, bytes, args...);
-    skipBytes(bytes);
-    return result;
-}
+// template <typename T, typename... Args> T *pbf::message(const Args&... args)
+// {
+// 	uint32_t bytes = (uint32_t)varint();
+//     T *result = new T(data, bytes, args...);
+//     skipBytes(bytes);
+//     return result;
+// }
 
 void pbf::skip()
 {
@@ -163,7 +182,12 @@ void pbf::skipValue(uint32_t val)
 			skipBytes(4);
 			break;
 		default:
-			fprintf(stderr, "cannot skip unknown type %d", val & 0x7);
+			char text[32];
+			snprintf(text, 32, "cannot skip unknown type %d", val & 0x7);
+			#ifdef PBF_USE_SETJMP
+			msg = text;
+			std::longjmp(jump_buffer, UNKNOWN_TYPE);
+			#endif
 			exit(1);
 	}
 }
@@ -172,7 +196,10 @@ void pbf::skipBytes(uint32_t bytes)
 {
 	data += bytes;
 	if (data > end) {
-		fprintf(stderr, "unexpected end of buffer");
+		#ifdef PBF_USE_SETJMP
+		msg = "unexpected end of buffer";
+		std::longjmp(jump_buffer, END_OF_BUFFER);
+		#endif
 		exit(1);
 	}
 }

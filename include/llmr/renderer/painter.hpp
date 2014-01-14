@@ -19,13 +19,13 @@ public:
 
 
     void clear();
-    void render(tile *tile);
+    void render(std::shared_ptr<tile> tile);
 
     void switchShader(Shader *shader, float matrix[16]);
 
 private:
     void setupShaders();
-    void changeMatrix(tile *tile);
+    void changeMatrix(std::shared_ptr<tile> tile);
 
 public:
 

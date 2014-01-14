@@ -162,7 +162,7 @@ public:
     llmr::map *map;
 };
 
-
+NSOperationQueue *queue = NULL;
 MapView *view;
 
 namespace llmr {
@@ -172,23 +172,26 @@ void restart(void *) {
     view->dirty = true;
 }
 
-void request(void *, tile *tile) {
-    fprintf(stderr, "request %d/%d/%d\n", tile->z, tile->x, tile->y);
+void request(void *, tile::ptr tile) {
+    // fprintf(stderr, "request %d/%d/%d\n", tile->z, tile->x, tile->y);
 
-    fprintf(stderr, "requesting tile\n");
+    // fprintf(stderr, "requesting tile\n");
     // NSString *urlTemplate = @"http://api.tiles.mapbox.com/v3/mapbox.mapbox-streets-v4/%d/%d/%d.vector.pbf";
-    NSString *urlTemplate = @"http://localhost:3333/gl/tiles/%d-%d-%d.vector.pbf";
+    NSString *urlTemplate = @"http://localhost:3333/gl/tiles/plain/%d-%d-%d.vector.pbf";
     NSString *urlString = [NSString
                            stringWithFormat:urlTemplate,
                            tile->z,
                            tile->x,
                            tile->y];
     NSURL *url = [NSURL URLWithString:urlString];
-    NSLog(@"Requesting %@", urlString);
+    // NSLog(@"Requesting %@", urlString);
 
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url];
 
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    if (!queue) {
+        queue = [[NSOperationQueue alloc] init];
+    }
+
     [NSURLConnection
      sendAsynchronousRequest:urlRequest
      queue:queue
@@ -196,12 +199,22 @@ void request(void *, tile *tile) {
                            NSData * data,
     NSError * error) {
         if (error == nil) {
-            tile->setData((uint8_t *)[data bytes], [data length]);
-            if (tile->parse()) {
+            NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
+            int code = [httpResponse statusCode];
+
+            if (code == 200) {
+                tile->setData((uint8_t *)[data bytes], [data length]);
+                if (tile->parse()) {
+                    dispatch_async(dispatch_get_main_queue(), ^ {
+                        view->map->tileLoaded(tile);
+                    });
+                    return;
+                }
+            } else {
+                fprintf(stderr, "[%s] status code %d\n", [urlString UTF8String], code);
                 dispatch_async(dispatch_get_main_queue(), ^ {
-                    view->map->tileLoaded(tile);
+                    view->map->tileFailed(tile);
                 });
-                return;
             }
         }
 

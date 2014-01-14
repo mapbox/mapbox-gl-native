@@ -65,11 +65,14 @@ void map::updateTiles() {
     br.x = fmin(max_dim, ceil(fmax(box.tr.x, box.br.x)));
     br.y = fmin(max_dim, ceil(fmax(box.bl.y, box.br.y)));
 
+    typedef vec3<int32_t> tile_id;
+
     // TODO: Discard tiles that are outside the viewport
-    std::vector<uint64_t> required;
+    std::vector<tile_id> required;
     for (int32_t y = tl.y; y < br.y; y++) {
         for (int32_t x = tl.x; x < br.x; x++) {
-            required.push_back(tile::toID(zoom, x, y));
+            tile_id id; id.z = zoom; id.x = x; id.y = y;
+            required.push_back(id);
         }
     }
 
@@ -79,17 +82,17 @@ void map::updateTiles() {
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
-    for (std::vector<tile *>::iterator it = tiles.begin(); it != tiles.end(); it++) {
-        tile *tile = *it;
-        uint64_t id = tile::toID(tile->z, tile->x, tile->y);
-        std::vector<uint64_t>::const_iterator required_it = std::find(required.begin(), required.end(), id);
+    for (std::vector<tile::ptr>::iterator it = tiles.begin(); it != tiles.end(); it++) {
+        tile::ptr& tile = *it;
+        tile_id id; id.z = tile->z; id.x = tile->x; id.y = tile->y;
+        std::vector<tile_id>::const_iterator required_it = std::find(required.begin(), required.end(), id);
         bool retain = required_it != required.end();
         if (retain) {
             // We already have the tile; remove it from the list of required tiles.
             required.erase(required_it);
         } else {
             // We don't need this tile, so we can remove it entirely.
-            std::vector<class tile *>::iterator to_remove = it - 1;
+            std::vector<tile::ptr>::iterator to_remove = it - 1;
             tile->cancel();
             tiles.erase(it);
             it = to_remove;
@@ -98,9 +101,8 @@ void map::updateTiles() {
 
     // Required now only contains those tiles that are not yet in the list of
     // tiles, so we should add them all.
-    for (int64_t id : required) {
-        vec4<int32_t> tile_coord = tile::fromID(id);
-        tile *tile = new class tile(tile_coord.z, tile_coord.x, tile_coord.y);
+    for (tile_id& id : required) {
+        tile::ptr tile = std::make_shared<class tile>(id.z, id.x, id.y);
         tiles.push_back(tile);
         platform::request(this, tile);
     }
@@ -109,7 +111,7 @@ void map::updateTiles() {
 bool map::render() {
     painter->clear();
 
-    for (tile *tile : tiles) {
+    for (tile::ptr& tile : tiles) {
         // painter->viewport();
         if (tile->loaded) {
             painter->render(tile);
@@ -119,12 +121,12 @@ bool map::render() {
     return false;
 }
 
-void map::tileLoaded(tile *tile) {
+void map::tileLoaded(tile::ptr tile) {
     platform::restart(this);
 }
 
-void map::tileFailed(tile *tile) {
-    fprintf(stderr, "[%8zx] tile failed to load %d/%d/%d\n",
-            std::hash<std::thread::id>()(std::this_thread::get_id()),
-            tile->z, tile->x, tile->y);
+void map::tileFailed(tile::ptr tile) {
+    // fprintf(stderr, "[%8zx] tile failed to load %d/%d/%d\n",
+    //         std::hash<std::thread::id>()(std::this_thread::get_id()),
+    //         tile->z, tile->x, tile->y);
 }

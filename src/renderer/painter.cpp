@@ -79,7 +79,7 @@ void painter::teardown() {
 
 }
 
-void painter::changeMatrix(tile *tile) {
+void painter::changeMatrix(std::shared_ptr<tile> tile) {
     assert(transform);
 
     // Initialize projection matrix
@@ -97,7 +97,7 @@ void painter::clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void painter::render(tile *tile) {
+void painter::render(std::shared_ptr<tile> tile) {
     changeMatrix(tile);
 
     glDisable(GL_STENCIL_TEST);

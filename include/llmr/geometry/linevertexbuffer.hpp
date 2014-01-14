@@ -8,6 +8,7 @@ namespace llmr {
 class linevertexbuffer {
 public:
     linevertexbuffer();
+    ~linevertexbuffer();
 
     void addDegenerate();
     void addCoordinate(int16_t x, int16_t y);

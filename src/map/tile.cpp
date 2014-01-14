@@ -12,25 +12,27 @@
 using namespace llmr;
 
 
-uint64_t tile::toID(int32_t z, int32_t x, int32_t y, int32_t w) {
-    w *= 2;
-    if (w < 0) w = w * -1 -1;
-    int32_t dim = 1 << z;
-    return ((dim * dim * w + dim * y + x) * 32) + z;
-}
+// int64_t tile::toID(int32_t z, int32_t x, int32_t y, int32_t w) {
+//     w *= 2;
+//     if (w < 0) w = w * -1 -1;
+//     int32_t dim = 1 << z;
+//     return ((dim * dim * w + dim * y + x) * 32) + z;
+// }
 
-vec4<int32_t> tile::fromID(uint64_t id) {
-    vec4<int32_t> coord;
-    coord.z = id % 32;
-    int32_t dim = 1 << coord.z;
-    int32_t xy = ((id - coord.z) / 32);
-    coord.x = xy % dim;
-    coord.y = ((xy - coord.x) / dim) % dim;
-    coord.w = floor(xy / (dim * dim));
-    if (coord.w % 2 != 0) coord.w = coord.w * -1 -1;
-    coord.w /= 2;
-    return coord;
-};
+// vec4<int32_t> tile::fromID(int64_t id) {
+//     vec4<int32_t> coord;
+//     coord.z = id % 32;
+//     int32_t dim = 1 << coord.z;
+//     int64_t xy = ((id - coord.z) / 32);
+//     coord.x = xy % dim;
+//     coord.y = ((xy - coord.x) / dim) % dim;
+//     coord.w = floor(xy / (dim * dim));
+//     if (coord.w % 2 != 0) coord.w = coord.w * -1 -1;
+//     coord.w /= 2;
+
+//     fprintf(stderr, "tile: %d/%d/%d/%d\n", coord.z, coord.x, coord.y, coord.w);
+//     return coord;
+// };
 
 tile::tile(int32_t z, int32_t x, int32_t y)
     : z(z),
@@ -42,6 +44,13 @@ tile::tile(int32_t z, int32_t x, int32_t y)
       bytes(0) {
 }
 
+tile::~tile() {
+    fprintf(stderr, "[%p] deleting tile %d/%d/%d\n", this, z, x, y);
+    if (this->data) {
+        free(this->data);
+    }
+}
+
 void tile::setData(uint8_t *data, uint32_t bytes) {
     this->data = (uint8_t *)malloc(bytes);
     this->bytes = bytes;
@@ -50,12 +59,11 @@ void tile::setData(uint8_t *data, uint32_t bytes) {
 
 void tile::cancel()
 {
+    std::lock_guard<std::mutex> lock(mutex);
+
     // TODO: thread safety
     if (!cancelled) {
         cancelled = true;
-        if (loaded) {
-            delete this;
-        }
     } else {
         assert((!"logic error? multiple cancelleations"));
     }
@@ -63,14 +71,24 @@ void tile::cancel()
 
 bool tile::parse()
 {
-    if (cancelled) {
-        delete this;
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (cancelled) {
+            return false;
+        }
+    }
+
+    // fprintf(stderr, "[%p] parsing tile [%d/%d/%d]...\n", this, z, x, y);
+
+    pbf tile(data, bytes);
+
+    int code = setjmp(tile.jump_buffer);
+    if (code > 0) {
+        fprintf(stderr, "[%p] parsing tile [%d/%d/%d]... failed: %s\n", this, z, x, y, tile.msg.c_str());
+        cancel();
         return false;
     }
 
-    fprintf(stderr, "[%p] parsing tile...\n", this);
-
-    pbf tile(data, bytes);
     while (tile.next()) {
         if (tile.tag == 3) { // layer
             uint32_t bytes = (uint32_t)tile.varint();
@@ -81,11 +99,13 @@ bool tile::parse()
         }
     }
 
-    fprintf(stderr, "[%p] parsing tile...done\n", this);
+    // fprintf(stderr, "[%p] parsing tile [%d/%d/%d]... done\n", this, z, x, y);
 
-    if (cancelled) {
-        delete this;
-        return false;
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (cancelled) {
+            return false;
+        }
     }
 
     loaded = true;

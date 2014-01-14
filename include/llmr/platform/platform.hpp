@@ -1,6 +1,8 @@
 #ifndef LLMR_PLATFORM_IOS
 #define LLMR_PLATFORM_IOS
 
+#include <memory>
+
 namespace llmr {
 
 class tile;
@@ -8,7 +10,7 @@ class tile;
 namespace platform {
 
 void restart(void *obj);
-void request(void *obj, tile *tile);
+void request(void *obj, std::shared_ptr<tile> tile);
 
 }
 

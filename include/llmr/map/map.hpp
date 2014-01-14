@@ -22,8 +22,8 @@ public:
     void moveBy(double dx, double dy);
     void scaleBy(double ds, double cx, double cy);
     void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey);
-    void tileLoaded(tile *tile);
-    void tileFailed(tile *tile);
+    void tileLoaded(std::shared_ptr<tile> tile);
+    void tileFailed(std::shared_ptr<tile> tile);
 
 private:
     void updateTiles();
@@ -35,7 +35,7 @@ private:
     // int32_t min_zoom;
     // int32_t max_zoom;
 
-    std::vector<tile *> tiles;
+    std::vector<std::shared_ptr<tile>> tiles;
 };
 
 }

@@ -9,6 +9,12 @@ linevertexbuffer::linevertexbuffer()
     : buffer(0) {
 }
 
+linevertexbuffer::~linevertexbuffer() {
+    if (buffer != 0) {
+        glDeleteBuffers(1, &buffer);
+    }
+}
+
 void linevertexbuffer::addDegenerate() {
     array.push_back(32767);
     array.push_back(0);
@@ -27,7 +33,7 @@ uint32_t linevertexbuffer::length() {
 void linevertexbuffer::bind() {
     if (buffer == 0) {
         glGenBuffers(1, &buffer);
-        fprintf(stderr, "new buffer id: %d\n", buffer);
+        // fprintf(stderr, "new buffer id: %d\n", buffer);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
         glBufferData(GL_ARRAY_BUFFER, array.size() * sizeof(uint16_t), array.data(), GL_STATIC_DRAW);
     } else {

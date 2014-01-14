@@ -52,8 +52,6 @@ void transform::scaleBy(double ds, double cx, double cy) {
     scale *= ds;
     x = (x * ds) + fx;
     y = (y * ds) + fy;
-
-    fprintf(stderr, "scale: %f, %f, %f\n", scale, x, y);
 }
 
 
