@@ -27,9 +27,11 @@ public:
     void tileFailed(tile::ptr tile);
 
 private:
+    bool findLoadedChildren(const tile_id& id, int32_t maxCoveringZoom, std::forward_list<tile_id>& retain);
+    bool findLoadedParent(const tile_id& id, int32_t minCoveringZoom, std::forward_list<tile_id>& retain);
     void updateTiles();
-    tile::ptr addTile(tile_id id);
-    tile::ptr hasTile(tile_id id);
+    tile::ptr addTile(const tile_id& id);
+    tile::ptr hasTile(const tile_id& id);
 
 private:
     transform *transform;

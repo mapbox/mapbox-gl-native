@@ -69,7 +69,7 @@ tile::tile(tile_id id)
 }
 
 tile::~tile() {
-    fprintf(stderr, "[%p] deleting tile %d/%d/%d\n", this, id.z, id.x, id.y);
+    // fprintf(stderr, "[%p] deleting tile %d/%d/%d\n", this, id.z, id.x, id.y);
     if (this->data) {
         free(this->data);
     }

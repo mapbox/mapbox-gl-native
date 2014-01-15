@@ -54,7 +54,7 @@ void map::rotateBy(double cx, double cy, double sx, double sy, double ex, double
 }
 
 
-tile::ptr map::hasTile(tile_id id) {
+tile::ptr map::hasTile(const tile_id& id) {
     for (tile::ptr& tile : tiles) {
         if (tile->id == id) {
             return tile;
@@ -64,26 +64,86 @@ tile::ptr map::hasTile(tile_id id) {
     return tile::ptr();
 }
 
-tile::ptr map::addTile(tile_id id) {
+tile::ptr map::addTile(const tile_id& id) {
     tile::ptr tile = hasTile(id);
 
     if (!tile.get()) {
         // We couldn't find the tile in the list. Create a new one.
         tile = std::make_shared<class tile>(id);
         assert(tile);
-        std::cerr << "init " << id.z << "/" << id.x << "/" << id.y << std::endl;
-        std::cerr << "add " << tile->toString() << std::endl;
+        // std::cerr << "init " << id.z << "/" << id.x << "/" << id.y << std::endl;
+        // std::cerr << "add " << tile->toString() << std::endl;
         tiles.push_front(tile);
     }
 
     return tile;
 }
 
+/**
+ * Recursively find children of the given tile that are already loaded.
+ *
+ * @param id The tile ID that we should find children for.
+ * @param maxCoveringZoom The maximum zoom level of children to look for.
+ * @param retain An object that we add the found tiles to.
+ *
+ * @return boolean Whether the children found completely cover the tile.
+ */
+bool map::findLoadedChildren(const tile_id& id, int32_t maxCoveringZoom, std::forward_list<tile_id>& retain) {
+    bool complete = true;
+    int32_t z = id.z;
+
+    auto ids = tile::children(id, z + 1);
+    for (const tile_id& child_id : ids) {
+        const tile::ptr& tile = hasTile(child_id);
+        if (tile && tile->state == tile::ready) {
+            assert(tile);
+            retain.emplace_front(tile->id);
+        } else {
+            complete = false;
+            if (z < maxCoveringZoom) {
+                // Go further down the hierarchy to find more unloaded children.
+                findLoadedChildren(child_id, maxCoveringZoom, retain);
+            }
+        }
+    }
+    return complete;
+};
+
+/**
+ * Find a loaded parent of the given tile.
+ *
+ * @param id The tile ID that we should find children for.
+ * @param minCoveringZoom The minimum zoom level of parents to look for.
+ * @param retain An object that we add the found tiles to.
+ *
+ * @return boolean Whether a parent was found.
+ */
+bool map::findLoadedParent(const tile_id& id, int32_t minCoveringZoom, std::forward_list<tile_id>& retain) {
+    for (int32_t z = id.z - 1; z >= minCoveringZoom; z--) {
+        const tile_id parent_id = tile::parent(id, z);
+        const tile::ptr tile = hasTile(parent_id);
+        if (tile && tile->state == tile::ready) {
+            assert(tile);
+            retain.emplace_front(tile->id);
+            return true;
+        }
+    }
+    return false;
+};
+
+
 void map::updateTiles() {
     // Figure out what tiles we need to load
     int32_t zoom = transform->getZoom();
     if (zoom > max_zoom) zoom = max_zoom;
     if (zoom < min_zoom) zoom = min_zoom;
+
+    int32_t max_covering_zoom = zoom + 1;
+    if (max_covering_zoom > max_zoom) max_covering_zoom = max_zoom;
+
+    int32_t min_covering_zoom = zoom - 10;
+    if (min_covering_zoom < min_zoom) min_covering_zoom = min_zoom;
+
 
     int32_t max_dim = pow(2, zoom);
 
@@ -106,6 +166,9 @@ void map::updateTiles() {
         }
     }
 
+    // Retain is a list of tiles that we shouldn't delete, even if they are not
+    // the most ideal tile for the current viewport. This may include tiles like
+    // parent or child tiles that are *already* loaded.
     std::forward_list<tile_id> retain(required);
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
@@ -113,31 +176,18 @@ void map::updateTiles() {
         tile::ptr tile = addTile(id);
         assert(tile);
 
-        if (tile->state == tile::initial || tile->state == tile::loading) {
+        if (tile->state != tile::ready) {
             // The tile we require is not yet loaded. Try to find a parent or
             // child tile that we already have.
-            std::forward_list<tile_id> covering;
 
-            // Find existing child tiles.
-            // TODO: Limit to existing tile ranges.
-            if (id.z + 1 <= max_zoom) {
-                covering = tile::children(id, id.z + 1);
-            }
+            // First, try to find existing child tiles that completely cover the
+            // missing tile.
+            bool complete = findLoadedChildren(id, max_covering_zoom, retain);
 
-            // Find existing parent tile.
-            // TODO: Limit to existing tile ranges.
-            if (id.z - 1 >= min_zoom) {
-                covering.push_front(tile::parent(id, id.z - 1));
-            }
-
-            for (const tile_id& covering_id : covering) {
-                tile::ptr covering_tile = hasTile(covering_id);
-                if (covering_tile) {
-                    assert(covering_tile);
-                    if (covering_tile->state == tile::ready) {
-                        retain.emplace_front(covering_tile->id);
-                    }
-                }
+            // Then, if there are no complete child tiles, try to find existing
+            // parent tiles that completely cover the missing tile.
+            if (!complete) {
+                findLoadedParent(id, min_covering_zoom, retain);
             }
         }
 
@@ -174,7 +224,7 @@ bool map::render() {
 }
 
 void map::tileLoaded(tile::ptr tile) {
-    std::cerr << "loaded " << tile->toString() << std::endl;
+    // std::cerr << "loaded " << tile->toString() << std::endl;
     platform::restart(this);
 }
 
