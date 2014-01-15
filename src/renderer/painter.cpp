@@ -11,49 +11,37 @@ using namespace llmr;
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-GLfloat triangle_vertices[] = {
-    100, 100,
-    100, 300,
-    150, 150
-};
-
-GLfloat fill_vertices[] = {
+GLshort tile_stencil_vertices[] = {
     0, 0,
-    300, 0,
-    0, 300,
-    300, 300
+    4096, 0,
+    0, 4096,
+    4096, 4096
 };
-
 
 painter::painter(class transform *transform)
     : transform(transform),
       currentShader(NULL),
-      fillShader(NULL) {
-
+      fillShader(NULL),
+      lineShader(NULL) {
 }
 
 
 void painter::setup() {
     setupShaders();
 
-
     assert(fillShader);
     assert(lineShader);
 
+    // Set up the stencil quad we're using to generate the stencil mask.
+    glGenBuffers(1, &tile_stencil_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(tile_stencil_vertices), tile_stencil_vertices, GL_STATIC_DRAW);
+
+    glEnable(GL_STENCIL_TEST);
 
 
-    glGenBuffers(1, &triangleVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, triangleVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_vertices), triangle_vertices, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &fillVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, fillVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(fill_vertices), fill_vertices, GL_STATIC_DRAW);
-
-
-    // glGenVertexArraysOES(1, &vertexArray);
-    // glBindVertexArrayOES(vertexArray);
-    // glBindVertexArrayOES(0);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void painter::setupShaders() {
@@ -62,10 +50,7 @@ void painter::setupShaders() {
 }
 
 void painter::teardown() {
-    glDeleteBuffers(1, &triangleVertexBuffer);
-    glDeleteBuffers(1, &fillVertexBuffer);
-
-    // glDeleteVertexArraysOES(1, &vertexArray);
+    glDeleteBuffers(1, &tile_stencil_buffer);
 
     if (fillShader) {
         delete fillShader;
@@ -87,74 +72,74 @@ void painter::changeMatrix(std::shared_ptr<tile> tile) {
     mat4_ortho(projMatrix, 0, transform->width, transform->height, 0, 1, 10);
 
     float mvMatrix[16];
-    transform->matrixFor(mvMatrix, tile->z, tile->x, tile->y);
+    transform->matrixFor(mvMatrix, tile->id);
 
     mat4_multiply(matrix, projMatrix, mvMatrix);
 }
 
+void painter::drawClippingMask() {
+    switchShader(lineShader);
+    glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
+
+    glColorMask(false, false, false, false);
+
+    // Clear the entire stencil buffer, except for the 7th bit, which stores
+    // the global clipping mask that allows us to avoid drawing in regions of
+    // tiles we've already painted in.
+    glClearStencil(0x0);
+    glStencilMask(0xBF);
+    glClear(GL_STENCIL_BUFFER_BIT);
+
+    // The stencil test will fail always, meaning we set all pixels covered
+    // by this geometry to 0x80. We use the highest bit 0x80 to mark the regions
+    // we want to draw in. All pixels that have this bit *not* set will never be
+    // drawn in.
+    glStencilFunc(GL_EQUAL, 0xC0, 0x40);
+    glStencilMask(0xC0);
+    glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
+
+    // Draw the clipping mask
+    glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
+    glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+    glUniform4f(lineShader->u_color, 1.0f, 0.0f, 1.0f, 1.0f);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, sizeof(tile_stencil_vertices));
+
+    // glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_EQUAL, 0x80, 0x80);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    glStencilMask(0x00);
+    glColorMask(true, true, true, true);
+}
+
 void painter::clear() {
     glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+    glClearStencil(0x0);
+    glStencilMask(0xFF);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void painter::render(std::shared_ptr<tile> tile) {
+void painter::render(tile::ptr tile) {
+    if (tile->state != tile::ready) {
+        return;
+    }
+
     changeMatrix(tile);
 
-    glDisable(GL_STENCIL_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    drawClippingMask();
 
-    //    fprintf(stderr, "render tile\n");
-    switchShader(lineShader, matrix);
+    switchShader(lineShader);
     glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
 
-    //    glEnable(GL_BLEND);
 
-    // glVertexAttribPointer(fillShader->a_pos, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    // glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    //    glBindBuffer(GL_ARRAY_BUFFER, triangleVertexBuffer);
+    glStencilFunc(GL_EQUAL, 0x80, 0x80);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    // glDisable(GL_STENCIL_TEST);
+
     tile->lineVertex.bind();
     glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
     glUniform4f(lineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
     glLineWidth(1.0f);
     glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
-
-    //    switchShader(fillShader, matrix);
-    //    glBindBuffer(GL_ARRAY_BUFFER, triangleVertexBuffer);
-    //    glVertexAttribPointer(fillShader->a_pos, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    //    glUniform4f(fillShader->u_color, 0.0f, 1.0f, 0.0f, 1.0f);
-    //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
-
-
-
-
-    // glBindVertexArrayOES(vertexArray);
-    // switchShader(fillShader, matrix);
-    // glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
-
-    // glEnable(GL_STENCIL_TEST);
-
-    // Draw stencil mask.
-    // glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    // glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
-    // glStencilFunc(GL_EQUAL, 0xFF, 0xFF);
-    // glStencilMask(0xFF);
-
-    // glBindBuffer(GL_ARRAY_BUFFER, triangleVertexBuffer);
-    // glVertexAttribPointer(fillShader->a_pos, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    // glUniform4f(fillShader->u_color, 0.0f, 1.0f, 0.0f, 1.0f);
-    // glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
-
-
-    // // Draw covering fill.
-    // glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    // glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-    // glStencilFunc(GL_EQUAL, 0xFF, 0xFF);
-
-    // glBindBuffer(GL_ARRAY_BUFFER, fillVertexBuffer);
-    // glVertexAttribPointer(fillShader->a_pos, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    // glUniform4f(fillShader->u_color, 1.0f, 0.0f, 0.0f, 1.0f);
-    // glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void painter::viewport() {
@@ -162,7 +147,7 @@ void painter::viewport() {
 }
 
 // Switches to a different shader program.
-void painter::switchShader(Shader *shader, float matrix[16]) {
+void painter::switchShader(Shader *shader) {
     if (currentShader != shader) {
         glUseProgram(shader->program);
 

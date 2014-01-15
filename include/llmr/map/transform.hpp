@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+#include <llmr/util/vec2.hpp>
 
 namespace llmr {
 
@@ -26,7 +27,7 @@ public:
     void setLonLat(double lon, double lat);
 
     // Getters
-    void matrixFor(float matrix[16], uint32_t z, uint32_t x, uint32_t y) const;
+    void matrixFor(float matrix[16], const vec3<int32_t>& id) const;
     int32_t getZoom() const;
     void getLonLat(double& lon, double& lat) const;
 

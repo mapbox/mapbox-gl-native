@@ -6,12 +6,15 @@
 #include <thread>
 
 #include <cmath>
+#include <cassert>
 
 using namespace llmr;
 
 map::map()
     : transform(new class transform()),
-      painter(new class painter(transform)) {
+      painter(new class painter(transform)),
+      min_zoom(0),
+      max_zoom(14) {
 
     // transform->setLonLat(13, 50);
     // transform->setZoom(3);
@@ -50,9 +53,38 @@ void map::rotateBy(double cx, double cy, double sx, double sy, double ex, double
     platform::restart(this);
 }
 
+
+tile::ptr map::hasTile(tile_id id) {
+    for (tile::ptr& tile : tiles) {
+        if (tile->id == id) {
+            return tile;
+        }
+    }
+
+    return tile::ptr();
+}
+
+tile::ptr map::addTile(tile_id id) {
+    tile::ptr tile = hasTile(id);
+
+    if (!tile.get()) {
+        // We couldn't find the tile in the list. Create a new one.
+        tile = std::make_shared<class tile>(id);
+        assert(tile);
+        std::cerr << "init " << id.z << "/" << id.x << "/" << id.y << std::endl;
+        std::cerr << "add " << tile->toString() << std::endl;
+        tiles.push_front(tile);
+    }
+
+    return tile;
+}
+
 void map::updateTiles() {
     // Figure out what tiles we need to load
     int32_t zoom = transform->getZoom();
+    if (zoom > max_zoom) zoom = max_zoom;
+    if (zoom < min_zoom) zoom = min_zoom;
+
     int32_t max_dim = pow(2, zoom);
 
     // Map four viewport corners to pixel coordinates
@@ -65,55 +97,75 @@ void map::updateTiles() {
     br.x = fmin(max_dim, ceil(fmax(box.tr.x, box.br.x)));
     br.y = fmin(max_dim, ceil(fmax(box.bl.y, box.br.y)));
 
-    typedef vec3<int32_t> tile_id;
 
     // TODO: Discard tiles that are outside the viewport
-    std::vector<tile_id> required;
+    std::forward_list<tile_id> required;
     for (int32_t y = tl.y; y < br.y; y++) {
         for (int32_t x = tl.x; x < br.x; x++) {
-            tile_id id; id.z = zoom; id.x = x; id.y = y;
-            required.push_back(id);
+            required.emplace_front(x, y, zoom);
         }
     }
 
-    // Add existing child/parent tiles if the actual tile is not yet loaded
-    // TODO
+    std::forward_list<tile_id> retain(required);
 
+    // Add existing child/parent tiles if the actual tile is not yet loaded
+    for (const tile_id& id : required) {
+        tile::ptr tile = addTile(id);
+        assert(tile);
+
+        if (tile->state == tile::initial || tile->state == tile::loading) {
+            // The tile we require is not yet loaded. Try to find a parent or
+            // child tile that we already have.
+            std::forward_list<tile_id> covering;
+
+            // Find existing child tiles.
+            // TODO: Limit to existing tile ranges.
+            if (id.z + 1 <= max_zoom) {
+                covering = tile::children(id, id.z + 1);
+            }
+
+            // Find existing parent tile.
+            // TODO: Limit to existing tile ranges.
+            if (id.z - 1 >= min_zoom) {
+                covering.push_front(tile::parent(id, id.z - 1));
+            }
+
+            for (const tile_id& covering_id : covering) {
+                tile::ptr covering_tile = hasTile(covering_id);
+                if (covering_tile) {
+                    assert(covering_tile);
+                    if (covering_tile->state == tile::ready) {
+                        retain.emplace_front(covering_tile->id);
+                    }
+                }
+            }
+        }
+
+        if (tile->state == tile::initial) {
+            // If the tile is new, we have to make sure to load it.
+            tile->state = tile::loading;
+            platform::request(this, tile);
+        }
+    }
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
-    for (std::vector<tile::ptr>::iterator it = tiles.begin(); it != tiles.end(); it++) {
-        tile::ptr& tile = *it;
-        tile_id id; id.z = tile->z; id.x = tile->x; id.y = tile->y;
-        std::vector<tile_id>::const_iterator required_it = std::find(required.begin(), required.end(), id);
-        bool retain = required_it != required.end();
-        if (retain) {
-            // We already have the tile; remove it from the list of required tiles.
-            required.erase(required_it);
-        } else {
-            // We don't need this tile, so we can remove it entirely.
-            std::vector<tile::ptr>::iterator to_remove = it - 1;
+    tiles.remove_if([&retain](const tile::ptr& tile) {
+        assert(tile);
+        bool obsolete = std::find(retain.begin(), retain.end(), tile->id) == retain.end();
+        if (obsolete) {
             tile->cancel();
-            tiles.erase(it);
-            it = to_remove;
         }
-    }
-
-    // Required now only contains those tiles that are not yet in the list of
-    // tiles, so we should add them all.
-    for (tile_id& id : required) {
-        tile::ptr tile = std::make_shared<class tile>(id.z, id.x, id.y);
-        tiles.push_back(tile);
-        platform::request(this, tile);
-    }
+        return obsolete;
+    });
 }
 
 bool map::render() {
     painter->clear();
 
     for (tile::ptr& tile : tiles) {
-        // painter->viewport();
-        if (tile->loaded) {
+        assert(tile);
+        if (tile->state == tile::ready) {
             painter->render(tile);
         }
     }
@@ -122,6 +174,7 @@ bool map::render() {
 }
 
 void map::tileLoaded(tile::ptr tile) {
+    std::cerr << "loaded " << tile->toString() << std::endl;
     platform::restart(this);
 }
 

@@ -21,7 +21,8 @@ public:
     void clear();
     void render(std::shared_ptr<tile> tile);
 
-    void switchShader(Shader *shader, float matrix[16]);
+    void drawClippingMask();
+    void switchShader(Shader *shader);
 
 private:
     void setupShaders();
@@ -37,9 +38,7 @@ private:
     FillShader *fillShader;
     LineShader *lineShader;
 
-    // uint32_t vertexArray;
-    uint32_t triangleVertexBuffer;
-    uint32_t fillVertexBuffer;
+    uint32_t tile_stencil_buffer;
 };
 
 }

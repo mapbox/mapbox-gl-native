@@ -4,10 +4,11 @@
 #include "../platform/platform.hpp"
 #include "../renderer/painter.hpp"
 #include "transform.hpp"
+#include <llmr/map/tile.hpp>
+
+#include <forward_list>
 
 namespace llmr {
-
-class tile;
 
 class map {
 public:
@@ -22,20 +23,22 @@ public:
     void moveBy(double dx, double dy);
     void scaleBy(double ds, double cx, double cy);
     void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey);
-    void tileLoaded(std::shared_ptr<tile> tile);
-    void tileFailed(std::shared_ptr<tile> tile);
+    void tileLoaded(tile::ptr tile);
+    void tileFailed(tile::ptr tile);
 
 private:
     void updateTiles();
+    tile::ptr addTile(tile_id id);
+    tile::ptr hasTile(tile_id id);
 
 private:
     transform *transform;
     painter *painter;
 
-    // int32_t min_zoom;
-    // int32_t max_zoom;
+    int32_t min_zoom;
+    int32_t max_zoom;
 
-    std::vector<std::shared_ptr<tile>> tiles;
+    std::forward_list<tile::ptr> tiles;
 };
 
 }

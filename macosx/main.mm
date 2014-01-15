@@ -20,6 +20,9 @@ public:
             exit(1);
         }
 
+        glfwWindowHint(GLFW_STENCIL_BITS, 8);
+        glfwWindowHint(GLFW_DEPTH_BITS, 16);
+
         window = glfwCreateWindow(640, 480, "llmr", NULL, NULL);
         if (!window) {
             glfwTerminate();
@@ -28,6 +31,9 @@ public:
         }
 
         glfwMakeContextCurrent(window);
+
+        int stencil_bits = glfwGetWindowAttrib(window, GLFW_STENCIL_BITS);
+        fprintf(stderr, "stencil bits: %d\n", stencil_bits);
 
         map->setup();
 
@@ -173,6 +179,7 @@ void restart(void *) {
 }
 
 void request(void *, tile::ptr tile) {
+    assert((bool)tile);
     // fprintf(stderr, "request %d/%d/%d\n", tile->z, tile->x, tile->y);
 
     // fprintf(stderr, "requesting tile\n");
@@ -180,9 +187,9 @@ void request(void *, tile::ptr tile) {
     NSString *urlTemplate = @"http://localhost:3333/gl/tiles/plain/%d-%d-%d.vector.pbf";
     NSString *urlString = [NSString
                            stringWithFormat:urlTemplate,
-                           tile->z,
-                           tile->x,
-                           tile->y];
+                           tile->id.z,
+                           tile->id.x,
+                           tile->id.y];
     NSURL *url = [NSURL URLWithString:urlString];
     // NSLog(@"Requesting %@", urlString);
 
@@ -210,12 +217,9 @@ void request(void *, tile::ptr tile) {
                     });
                     return;
                 }
-            } else {
-                fprintf(stderr, "[%s] status code %d\n", [urlString UTF8String], code);
-                dispatch_async(dispatch_get_main_queue(), ^ {
-                    view->map->tileFailed(tile);
-                });
             }
+
+            fprintf(stderr, "[%s] status code %d\n", [urlString UTF8String], code);
         }
 
         dispatch_async(dispatch_get_main_queue(), ^ {

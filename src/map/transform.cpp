@@ -1,7 +1,6 @@
 #include <llmr/map/transform.hpp>
 
 #include <llmr/util/mat4.h>
-#include <llmr/util/vec2.hpp>
 #include <llmr/util/math.hpp>
 #include <cmath>
 #include <cstdio>
@@ -131,8 +130,8 @@ double transform::pixel_y() const {
     return center + y;
 }
 
-void transform::matrixFor(float matrix[16], uint32_t tile_z, uint32_t tile_x, uint32_t tile_y) const {
-    const double tile_scale = pow(2, tile_z);
+void transform::matrixFor(float matrix[16], const vec3<int32_t>& id) const {
+    const double tile_scale = pow(2, id.z);
     const double tile_size = scale * size / tile_scale;
 
     mat4_identity(matrix);
@@ -142,7 +141,7 @@ void transform::matrixFor(float matrix[16], uint32_t tile_z, uint32_t tile_x, ui
     mat4_translate(matrix, matrix, -0.5f * (float)width, -0.5f * (float)height, 0);
 
     mat4_translate(matrix, matrix, pixel_x(), pixel_y(), 0);
-    mat4_translate(matrix, matrix, tile_x * tile_size, tile_y * tile_size, 0);
+    mat4_translate(matrix, matrix, id.x * tile_size, id.y * tile_size, 0);
 
     // TODO: Get rid of the 8 (scaling from 4096 to 512 px tile size);
     mat4_scale(matrix, matrix, scale / tile_scale / 8, scale / tile_scale / 8, 1);

@@ -7,6 +7,7 @@
 
 #include "pbf.hpp"
 #include <llmr/util/vec2.hpp>
+#include <llmr/util/string.hpp>
 #include <cmath>
 
 using namespace llmr;
@@ -34,22 +35,50 @@ using namespace llmr;
 //     return coord;
 // };
 
-tile::tile(int32_t z, int32_t x, int32_t y)
-    : z(z),
-      x(x),
-      y(y),
-      loaded(false),
-      cancelled(false),
+tile_id tile::parent(const tile_id& id, int32_t z) {
+    assert(z < id.z);
+    tile_id pos(id);
+    while (pos.z > z) {
+        pos.z--;
+        pos.x = floor(pos.x / 2);
+        pos.y = floor(pos.y / 2);
+    }
+    return pos;
+}
+
+
+std::forward_list<tile_id> tile::children(const tile_id& id, int32_t z) {
+    assert(z > id.z);
+    int32_t factor = pow(2, z - id.z);
+
+    std::forward_list<tile_id> children;
+    for (int32_t y = id.y * factor, y_max = (id.y + 1) * factor; y < y_max; y++) {
+        for (int32_t x = id.x * factor, x_max = (id.x + 1) * factor; x < x_max; x++) {
+            children.emplace_front(x, y, z);
+        }
+    }
+    return children;
+}
+
+
+tile::tile(tile_id id)
+    : id(id),
+      state(initial),
       data(0),
       bytes(0) {
 }
 
 tile::~tile() {
-    fprintf(stderr, "[%p] deleting tile %d/%d/%d\n", this, z, x, y);
+    fprintf(stderr, "[%p] deleting tile %d/%d/%d\n", this, id.z, id.x, id.y);
     if (this->data) {
         free(this->data);
     }
 }
+
+const std::string tile::toString() const {
+    return util::sprintf("[tile %d/%d/%d]", id.z, id.x, id.y);
+}
+
 
 void tile::setData(uint8_t *data, uint32_t bytes) {
     this->data = (uint8_t *)malloc(bytes);
@@ -57,25 +86,18 @@ void tile::setData(uint8_t *data, uint32_t bytes) {
     memcpy(this->data, data, bytes);
 }
 
-void tile::cancel()
-{
-    std::lock_guard<std::mutex> lock(mutex);
-
+void tile::cancel() {
     // TODO: thread safety
-    if (!cancelled) {
-        cancelled = true;
+    if (state != obsolete) {
+        state = obsolete;
     } else {
         assert((!"logic error? multiple cancelleations"));
     }
 }
 
-bool tile::parse()
-{
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        if (cancelled) {
-            return false;
-        }
+bool tile::parse() {
+    if (state == obsolete) {
+        return false;
     }
 
     // fprintf(stderr, "[%p] parsing tile [%d/%d/%d]...\n", this, z, x, y);
@@ -84,7 +106,7 @@ bool tile::parse()
 
     int code = setjmp(tile.jump_buffer);
     if (code > 0) {
-        fprintf(stderr, "[%p] parsing tile [%d/%d/%d]... failed: %s\n", this, z, x, y, tile.msg.c_str());
+        fprintf(stderr, "[%p] parsing tile [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, tile.msg.c_str());
         cancel();
         return false;
     }
@@ -101,14 +123,12 @@ bool tile::parse()
 
     // fprintf(stderr, "[%p] parsing tile [%d/%d/%d]... done\n", this, z, x, y);
 
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        if (cancelled) {
-            return false;
-        }
+    if (state == obsolete) {
+        return false;
+    } else {
+        state = ready;
     }
 
-    loaded = true;
     return true;
 }
 
