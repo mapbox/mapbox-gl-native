@@ -11,7 +11,7 @@ class tile;
 
 class painter {
 public:
-    painter(class transform *tranform);
+    painter(class transform *transform);
 
     void setup();
     void teardown();
