@@ -21,9 +21,9 @@ GLshort tile_stencil_vertices[] = {
 
 GLshort tile_border_vertices[] = {
     0, 0,
-    4095, 0,
-    4095, 4095,
-    0, 4095,
+    4096, 0,
+    4096, 4096,
+    0, 4096,
     0, 0
 };
 
