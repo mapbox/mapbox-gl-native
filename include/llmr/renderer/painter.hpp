@@ -11,7 +11,7 @@ class tile;
 
 class painter {
 public:
-    painter(class transform *transform);
+    painter(class transform *transform, class settings *settings);
 
     void setup();
     void teardown();
@@ -32,6 +32,7 @@ public:
 
 private:
     transform *transform;
+    settings *settings;
     float matrix[16];
 
     Shader *currentShader;

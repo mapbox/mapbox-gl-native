@@ -13,7 +13,7 @@ using namespace llmr;
 map::map(class settings *settings)
     : settings(settings),
       transform(new class transform()),
-      painter(new class painter(transform)),
+      painter(new class painter(transform, settings)),
       min_zoom(0),
       max_zoom(14) {
 }
