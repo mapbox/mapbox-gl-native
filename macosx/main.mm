@@ -23,7 +23,7 @@ public:
         glfwWindowHint(GLFW_STENCIL_BITS, 8);
         glfwWindowHint(GLFW_DEPTH_BITS, 16);
 
-        window = glfwCreateWindow(640, 480, "llmr", NULL, NULL);
+        window = glfwCreateWindow(1024, 768, "llmr", NULL, NULL);
         if (!window) {
             glfwTerminate();
             fprintf(stderr, "Failed to initialize window\n");
