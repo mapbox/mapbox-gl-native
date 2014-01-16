@@ -39,6 +39,7 @@ private:
     LineShader *lineShader;
 
     uint32_t tile_stencil_buffer;
+    uint32_t tile_border_buffer;
 };
 
 }

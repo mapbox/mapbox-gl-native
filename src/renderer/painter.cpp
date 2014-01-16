@@ -18,6 +18,14 @@ GLshort tile_stencil_vertices[] = {
     4096, 4096
 };
 
+GLshort tile_border_vertices[] = {
+    0, 0,
+    4095, 0,
+    4095, 4095,
+    0, 4095,
+    0, 0
+};
+
 painter::painter(class transform *transform)
     : transform(transform),
       currentShader(NULL),
@@ -36,6 +44,12 @@ void painter::setup() {
     glGenBuffers(1, &tile_stencil_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(tile_stencil_vertices), tile_stencil_vertices, GL_STATIC_DRAW);
+
+    // Set up the tile boundary lines we're using to draw the tile outlines.
+    glGenBuffers(1, &tile_border_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, tile_border_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(tile_border_vertices), tile_border_vertices, GL_STATIC_DRAW);
+
 
     glEnable(GL_STENCIL_TEST);
 
@@ -140,6 +154,19 @@ void painter::render(tile::ptr tile) {
     glUniform4f(lineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
     glLineWidth(1.0f);
     glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
+
+
+
+
+
+    // draw tile outline
+    switchShader(lineShader);
+    glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
+    glBindBuffer(GL_ARRAY_BUFFER, tile_border_buffer);
+    glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+    glUniform4f(lineShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
+    glLineWidth(4.0f);
+    glDrawArrays(GL_LINE_STRIP, 0, sizeof(tile_border_vertices));
 }
 
 void painter::viewport() {
