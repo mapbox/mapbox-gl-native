@@ -141,8 +141,7 @@ void transform::matrixFor(float matrix[16], const vec3<int32_t>& id) const {
     mat4_rotate_z(matrix, matrix, angle);
     mat4_translate(matrix, matrix, -0.5f * (float)width, -0.5f * (float)height, 0);
 
-    mat4_translate(matrix, matrix, pixel_x(), pixel_y(), 0);
-    mat4_translate(matrix, matrix, id.x * tile_size, id.y * tile_size, 0);
+    mat4_translate(matrix, matrix, pixel_x() + id.x * tile_size, pixel_y() + id.y * tile_size, 0);
 
     // TODO: Get rid of the 8 (scaling from 4096 to 512 px tile size);
     mat4_scale(matrix, matrix, scale / tile_scale / 8, scale / tile_scale / 8, 1);
