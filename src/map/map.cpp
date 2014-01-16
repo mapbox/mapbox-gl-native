@@ -251,6 +251,11 @@ void map::updateTiles() {
         }
         return obsolete;
     });
+
+    // Sort tiles by zoom level, front to back.
+    tiles.sort([](const tile::ptr& a, const tile::ptr& b) {
+        return a->id.z > b->id.z;
+    });
 }
 
 bool map::render() {
