@@ -9,6 +9,7 @@ PKG_SEARCH_MODULE(GLFW REQUIRED glfw3)
 
 SET(macosx_SOURCES
     main.mm
+    settings.mm
 )
 
 SET(macosx_HEADERS
@@ -23,9 +24,29 @@ LINK_DIRECTORIES(
     ${GLFW_LIBRARY_DIRS}
 )
 
-ADD_EXECUTABLE(macosx
+# Define some settings for the Bundle
+set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.mapbox.llmr.native")
+set(MACOSX_BUNDLE_ICON_FILE "macosx.icns")
+set(MACOSX_BUNDLE_INFO_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+set(MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+set(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+set(MACOSX_BUNDLE_COPYRIGHT "(c) 2014 Mapbox")
+
+# Add Mac OS X specific icon
+#list(APPEND macosx_RESOURCES ../resources/macosx.icns)
+
+# Ensures that resources end up in the Resources folder
+set_source_files_properties(${macosx_RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+add_executable(macosx MACOSX_BUNDLE
     ${macosx_SOURCES}
+    ${macosx_RESOURCES}
 )
+
+
+set_target_properties(macosx PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/macosx/Info.plist.in)
 
 TARGET_LINK_LIBRARIES(macosx
     llmr

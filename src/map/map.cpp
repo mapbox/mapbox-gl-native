@@ -10,14 +10,12 @@
 
 using namespace llmr;
 
-map::map()
-    : transform(new class transform()),
+map::map(class settings *settings)
+    : settings(settings),
+      transform(new class transform()),
       painter(new class painter(transform)),
       min_zoom(0),
       max_zoom(14) {
-
-    // transform->setLonLat(13, 50);
-    // transform->setZoom(3);
 }
 
 map::~map() {
@@ -28,44 +26,76 @@ void map::setup() {
     painter->setup();
 }
 
+void map::loadSettings() {
+    transform->setAngle(settings->angle);
+    transform->setScale(settings->scale);
+    transform->setLonLat(settings->longitude, settings->latitude);
+    update();
+}
+
 void map::resize(uint32_t width, uint32_t height) {
     transform->width = width;
     transform->height = height;
-    updateTiles();
-    platform::restart(this);
+    update();
 }
 
 void map::moveBy(double dx, double dy) {
     transform->moveBy(dx, dy);
-    updateTiles();
-    platform::restart(this);
+    update();
+
+    transform->getLonLat(settings->longitude, settings->latitude);
+    settings->save();
 }
 
 void map::scaleBy(double ds, double cx, double cy) {
     transform->scaleBy(ds, cx, cy);
-    updateTiles();
-    platform::restart(this);
+    update();
+
+    transform->getLonLat(settings->longitude, settings->latitude);
+    settings->scale = transform->getScale();
+    settings->save();
 }
 
 void map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey) {
     transform->rotateBy(cx, cy, sx, sy, ex, ey);
-    updateTiles();
-    platform::restart(this);
+    update();
+
+    settings->angle = transform->getAngle();
+    settings->save();
 }
 
 void map::resetNorth() {
     transform->setAngle(0);
-    updateTiles();
-    platform::restart(this);
+    update();
+
+    settings->angle = transform->getAngle();
+    settings->save();
 }
 
 void map::resetPosition() {
     transform->setAngle(0);
     transform->setLonLat(0, 0);
     transform->setZoom(0);
+    update();
+
+    transform->getLonLat(settings->longitude, settings->latitude);
+    settings->scale = transform->getScale();
+    settings->angle = transform->getAngle();
+    settings->save();
+}
+
+void map::toggleDebug() {
+    settings->debug = !settings->debug;
+    update();
+
+    settings->save();
+}
+
+void map::update() {
     updateTiles();
     platform::restart(this);
 }
+
 
 tile::ptr map::hasTile(const tile_id& id) {
     for (tile::ptr& tile : tiles) {
@@ -238,7 +268,7 @@ bool map::render() {
 
 void map::tileLoaded(tile::ptr tile) {
     // std::cerr << "loaded " << tile->toString() << std::endl;
-    platform::restart(this);
+    update();
 }
 
 void map::tileFailed(tile::ptr tile) {

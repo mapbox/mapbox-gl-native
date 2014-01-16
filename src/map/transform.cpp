@@ -36,21 +36,22 @@ void transform::moveBy(double dx, double dy) {
 
 void transform::scaleBy(double ds, double cx, double cy) {
     // clamp scale to min/max values
-    const double new_scale = scale * ds;
+    double new_scale = scale * ds;
     if (new_scale < min_scale) {
         ds = min_scale / scale;
+        new_scale = min_scale;
     } else if (new_scale > max_scale) {
         ds = max_scale / scale;
+        new_scale = max_scale;
     }
 
+    setScale(new_scale);
+
+    // Correct for non-center scaling location.
     const double dx = (cx - width / 2) * (1.0 - ds);
     const double dy = (cy - height / 2) * (1.0 - ds);
-    const double fx = cos(angle) * dx + sin(angle) * dy;
-    const double fy = cos(angle) * dy + sin(-angle) * dx;
-
-    scale *= ds;
-    x = (x * ds) + fx;
-    y = (y * ds) + fy;
+    x += cos(angle) * dx + sin(angle) * dy;
+    y += cos(angle) * dy + sin(-angle) * dx;
 }
 
 
@@ -154,6 +155,13 @@ int32_t transform::getZoom() const {
     return floor(log(scale) / M_LN2);
 }
 
+double transform::getScale() const {
+    return scale;
+}
+
+double transform::getAngle() const {
+    return angle;
+}
 
 void transform::mapCornersToBox(uint32_t z, box& b) const {
     const double ref_scale = pow(2, z);

@@ -1,8 +1,10 @@
 #include <llmr/llmr.hpp>
 #include <GLFW/glfw3.h>
 #import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 #include <llmr/platform/platform.hpp>
 #include <llmr/map/tile.hpp>
+#include "settings.hpp"
 
 class MapView {
 public:
@@ -11,7 +13,8 @@ public:
         tracking(false),
         rotating(false),
         last_click(-1),
-        map(new llmr::map()) {
+        settings(new llmr::macosx_settings()),
+        map(new llmr::map(settings)) {
         }
 
     void init() {
@@ -32,11 +35,8 @@ public:
 
         glfwMakeContextCurrent(window);
 
-        int stencil_bits = glfwGetWindowAttrib(window, GLFW_STENCIL_BITS);
-        fprintf(stderr, "stencil bits: %d\n", stencil_bits);
-
+        settings->load();
         map->setup();
-
 
         int width, height;
         glfwGetWindowSize(window, &width, &height);
@@ -44,6 +44,7 @@ public:
 
         glfwSwapInterval(1);
 
+        map->loadSettings();
 
         glfwSetCursorPosCallback(window, mousemove);
         glfwSetMouseButtonCallback(window, mouseclick);
@@ -56,27 +57,26 @@ public:
     }
 
     static void character(GLFWwindow *window, unsigned int codepoint) {
-        MapView *view = (MapView *)glfwGetWindowUserPointer(window);
-        switch (codepoint) {
-            case L'n':
-            case L'N':
-                view->map->resetNorth();
-                break;
-            case L'r':
-            case L'R':
-                view->map->resetPosition();
-                break;
-        }
+
     }
 
 
     static void key(GLFWwindow *window, int key, int scancode, int action, int mods) {
-        // MapView *view = (MapView *)glfwGetWindowUserPointer(window);
+        MapView *view = (MapView *)glfwGetWindowUserPointer(window);
 
         if (action == GLFW_RELEASE) {
             switch (key) {
                 case GLFW_KEY_ESCAPE:
                     glfwSetWindowShouldClose(window, true);
+                    break;
+                case GLFW_KEY_TAB:
+                    view->map->toggleDebug();
+                    break;
+                case GLFW_KEY_R:
+                    if (!mods) view->map->resetPosition();
+                    break;
+                case GLFW_KEY_N:
+                    if (!mods) view->map->resetNorth();
                     break;
             }
         }
@@ -195,6 +195,7 @@ public:
     double last_click;
 
     GLFWwindow *window;
+    llmr::macosx_settings *settings;
     llmr::map *map;
 };
 
@@ -210,9 +211,7 @@ void restart(void *) {
 
 void request(void *, tile::ptr tile) {
     assert((bool)tile);
-    // fprintf(stderr, "request %d/%d/%d\n", tile->z, tile->x, tile->y);
 
-    // fprintf(stderr, "requesting tile\n");
     // NSString *urlTemplate = @"http://api.tiles.mapbox.com/v3/mapbox.mapbox-streets-v4/%d/%d/%d.vector.pbf";
     NSString *urlTemplate = @"http://localhost:3333/gl/tiles/plain/%d-%d-%d.vector.pbf";
     NSString *urlString = [NSString
@@ -248,8 +247,6 @@ void request(void *, tile::ptr tile) {
                     return;
                 }
             }
-
-            fprintf(stderr, "[%s] status code %d\n", [urlString UTF8String], code);
         }
 
         dispatch_async(dispatch_get_main_queue(), ^ {

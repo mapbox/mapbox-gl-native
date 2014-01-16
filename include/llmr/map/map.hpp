@@ -5,6 +5,7 @@
 #include "../renderer/painter.hpp"
 #include "transform.hpp"
 #include <llmr/map/tile.hpp>
+#include "settings.hpp"
 
 #include <forward_list>
 
@@ -12,10 +13,11 @@ namespace llmr {
 
 class map {
 public:
-    map();
+    map(settings *settings);
     ~map();
 
     void setup();
+    void loadSettings();
     void resize(uint32_t width, uint32_t height);
 
     /* callback */
@@ -34,6 +36,8 @@ public:
     // void setZoom(double zoom);
     // void setLonLatZoom(double lon, double lat, double zoom);
 
+    void toggleDebug();
+
 private:
     bool findLoadedChildren(const tile_id& id, int32_t maxCoveringZoom, std::forward_list<tile_id>& retain);
     bool findLoadedParent(const tile_id& id, int32_t minCoveringZoom, std::forward_list<tile_id>& retain);
@@ -41,7 +45,11 @@ private:
     tile::ptr addTile(const tile_id& id);
     tile::ptr hasTile(const tile_id& id);
 
+
+    void update();
+
 private:
+    settings *settings;
     transform *transform;
     painter *painter;
 
