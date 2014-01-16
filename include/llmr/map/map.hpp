@@ -26,6 +26,14 @@ public:
     void tileLoaded(tile::ptr tile);
     void tileFailed(tile::ptr tile);
 
+    /* position */
+    void resetNorth();
+    void resetPosition();
+    // void setAngle(double angle);
+    // void setLonLat(double lon, double lat);
+    // void setZoom(double zoom);
+    // void setLonLatZoom(double lon, double lat, double zoom);
+
 private:
     bool findLoadedChildren(const tile_id& id, int32_t maxCoveringZoom, std::forward_list<tile_id>& retain);
     bool findLoadedParent(const tile_id& id, int32_t minCoveringZoom, std::forward_list<tile_id>& retain);

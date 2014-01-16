@@ -49,9 +49,39 @@ public:
         glfwSetMouseButtonCallback(window, mouseclick);
         glfwSetWindowSizeCallback(window, resize);
         glfwSetScrollCallback(window, scroll);
+        glfwSetCharCallback(window, character);
+        glfwSetKeyCallback(window, key);
 
         glfwSetWindowUserPointer(window, this);
     }
+
+    static void character(GLFWwindow *window, unsigned int codepoint) {
+        MapView *view = (MapView *)glfwGetWindowUserPointer(window);
+        switch (codepoint) {
+            case L'n':
+            case L'N':
+                view->map->resetNorth();
+                break;
+            case L'r':
+            case L'R':
+                view->map->resetPosition();
+                break;
+        }
+    }
+
+
+    static void key(GLFWwindow *window, int key, int scancode, int action, int mods) {
+        // MapView *view = (MapView *)glfwGetWindowUserPointer(window);
+
+        if (action == GLFW_RELEASE) {
+            switch (key) {
+                case GLFW_KEY_ESCAPE:
+                    glfwSetWindowShouldClose(window, true);
+                    break;
+            }
+        }
+    }
+
 
     static void scroll(GLFWwindow *window, double xoffset, double yoffset) {
         MapView *view = (MapView *)glfwGetWindowUserPointer(window);

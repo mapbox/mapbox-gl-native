@@ -53,6 +53,19 @@ void map::rotateBy(double cx, double cy, double sx, double sy, double ex, double
     platform::restart(this);
 }
 
+void map::resetNorth() {
+    transform->setAngle(0);
+    updateTiles();
+    platform::restart(this);
+}
+
+void map::resetPosition() {
+    transform->setAngle(0);
+    transform->setLonLat(0, 0);
+    transform->setZoom(0);
+    updateTiles();
+    platform::restart(this);
+}
 
 tile::ptr map::hasTile(const tile_id& id) {
     for (tile::ptr& tile : tiles) {
