@@ -1,6 +1,7 @@
 #ifndef LLMR_MAP_TILE
 #define LLMR_MAP_TILE
 
+#include "../geometry/debug_font_buffer.hpp"
 #include "../geometry/linevertexbuffer.hpp"
 
 #include <stdint.h>
@@ -46,6 +47,7 @@ public:
     const tile_id id;
     state state;
     linevertexbuffer lineVertex;
+    debug_font_buffer debugFontVertex;
 
 private:
     // Source data

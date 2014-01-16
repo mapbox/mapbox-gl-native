@@ -167,6 +167,29 @@ void painter::render(tile::ptr tile) {
     glUniform4f(lineShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
     glLineWidth(4.0f);
     glDrawArrays(GL_LINE_STRIP, 0, sizeof(tile_border_vertices));
+
+
+    // draw debug info
+    switchShader(lineShader);
+    glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
+    tile->debugFontVertex.bind();
+    glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    glUniform4f(lineShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
+    glLineWidth(4.0f);
+    glDrawArrays(GL_LINES, 0, tile->debugFontVertex.length());
+    glUniform4f(lineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
+    glLineWidth(2.0f);
+    glDrawArrays(GL_LINES, 0, tile->debugFontVertex.length());
+
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, painter.textBuffer);
+    // gl.bufferData(gl.ARRAY_BUFFER, new Int16Array(vertices), gl.STREAM_DRAW);
+    // gl.vertexAttribPointer(painter.debugShader.a_pos, painter.bufferProperties.textItemSize, gl.SHORT, false, 0, 0);
+    // gl.lineWidth(8 * window.devicePixelRatio);
+    // gl.uniform4f(painter.debugShader.u_color, 1, 1, 1, 1);
+    // gl.drawArrays(gl.LINES, 0, vertices.length / painter.bufferProperties.textItemSize);
+    // gl.lineWidth(2 * window.devicePixelRatio);
+    // gl.uniform4f(painter.debugShader.u_color, 0, 0, 0, 1);
+    // gl.drawArrays(gl.LINES, 0, vertices.length / painter.bufferProperties.textItemSize);
 }
 
 void painter::viewport() {

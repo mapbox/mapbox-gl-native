@@ -15,6 +15,7 @@ public:
 
     uint32_t length();
     void bind();
+
 private:
     std::vector<uint16_t> array;
     uint32_t buffer;

@@ -1,4 +1,5 @@
 SET(llmr_SOURCES
+    geometry/debug_font_buffer.cpp
     geometry/linevertexbuffer.cpp
     map/map.cpp
     map/tile.cpp
@@ -12,6 +13,7 @@ SET(llmr_SOURCES
 )
 
 SET(llmr_HEADERS
+    ../include/llmr/geometry/debug_font_buffer.hpp
     ../include/llmr/geometry/linevertexbuffer.hpp
     ../include/llmr/llmr.hpp
     ../include/llmr/map/map.hpp

@@ -253,6 +253,8 @@ void map::updateTiles() {
     });
 
     // Sort tiles by zoom level, front to back.
+    // We're painting front-to-back, so we want to draw more detailed tiles first
+    // before filling in other parts with lower zoom levels.
     tiles.sort([](const tile::ptr& a, const tile::ptr& b) {
         return a->id.z > b->id.z;
     });

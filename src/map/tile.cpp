@@ -66,6 +66,11 @@ tile::tile(tile_id id)
       state(initial),
       data(0),
       bytes(0) {
+
+    // Initialize tile debug coordinates
+    char coord[32];
+    snprintf(coord, sizeof(coord), "%d/%d/%d", id.z, id.x, id.y);
+    debugFontVertex.addText(coord, 50, 200, 5);
 }
 
 tile::~tile() {
