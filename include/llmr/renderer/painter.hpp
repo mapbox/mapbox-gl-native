@@ -3,6 +3,7 @@
 
 #include "shader-fill.hpp"
 #include "shader-line.hpp"
+#include "shader-outline.hpp"
 
 namespace llmr {
 
@@ -38,6 +39,7 @@ private:
     Shader *currentShader;
     FillShader *fillShader;
     LineShader *lineShader;
+    OutlineShader *outlineShader;
 
     uint32_t tile_stencil_buffer;
     uint32_t tile_border_buffer;

@@ -32,7 +32,8 @@ painter::painter(class transform *transform, class settings *settings)
       settings(settings),
       currentShader(NULL),
       fillShader(NULL),
-      lineShader(NULL) {
+      lineShader(NULL),
+      outlineShader(NULL) {
 }
 
 
@@ -41,6 +42,7 @@ void painter::setup() {
 
     assert(fillShader);
     assert(lineShader);
+    assert(outlineShader);
 
     // Set up the stencil quad we're using to generate the stencil mask.
     glGenBuffers(1, &tile_stencil_buffer);
@@ -63,6 +65,7 @@ void painter::setup() {
 void painter::setupShaders() {
     fillShader = new FillShader();
     lineShader = new LineShader();
+    outlineShader = new OutlineShader();
 }
 
 void painter::teardown() {
@@ -143,21 +146,19 @@ void painter::render(tile::ptr tile) {
 
     drawClippingMask();
 
-    switchShader(lineShader);
-    glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
-
+    switchShader(outlineShader);
+    glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
 
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
     // glDisable(GL_STENCIL_TEST);
 
     tile->lineVertex.bind();
-    glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    glUniform4f(lineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
-    glLineWidth(1.0f);
+    glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    glUniform4f(outlineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
+    glUniform2f(outlineShader->u_world, transform->width, transform->height);
+    glLineWidth(2.0f);
     glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
-
-
 
 
     if (settings->debug) {
@@ -189,36 +190,47 @@ void painter::viewport() {
 }
 
 // Switches to a different shader program.
-void painter::switchShader(Shader *shader) {
+/**
+ * @return boolean whether the shader was actually switched
+ */
+bool painter::switchShader(Shader *shader) {
     if (currentShader != shader) {
         glUseProgram(shader->program);
 
         // Disable all attributes from the existing shader that aren't used in
         // the new shader. Note: attribute indices are *not* program specific!
         if (currentShader) {
-            // const std::vector<GLuint> &enabled = currentShader->attributes;
-            // const std::vector<GLuint> &required = shader->attributes;
-            // TODO
+            const std::forward_list<uint32_t> &hitherto = currentShader->attributes;
+            const std::forward_list<uint32_t> &henceforth = shader->attributes;
 
-            // for (var i = 0; i < enabled.length; i++) {
-            //     if (required.indexOf(enabled[i]) < 0) {
-            //         gl.disableVertexAttribArray(enabled[i]);
-            //     }
-            // }
+            // Find all attribute indices that are used in the old shader,
+            // but unused in the new one.
+            for (uint32_t i : hitherto) {
+                if (std::find(henceforth.begin(), henceforth.end(), i) == henceforth.end()) {
+                    glDisableVertexAttribArray(i);
+                }
+            }
 
-            // // Enable all attributes for the new shader.
-            // for (var j = 0; j < required.length; j++) {
-            //     if (enabled.indexOf(required[j]) < 0) {
-            //         gl.enableVertexAttribArray(required[j]);
-            //     }
-            // }
+            // Enable all attributes for the new shader that were not already in
+            // use in the old one.
+            for (uint32_t i : henceforth) {
+                if (std::find(hitherto.begin(), hitherto.end(), i) == hitherto.end()) {
+                    glEnableVertexAttribArray(i);
+                }
+            }
+
+            currentShader = shader;
         } else {
-            // Enable all attributes for the new shader.
+            // Enable all attributes for the new shader (== first shader).
             for (GLuint index : shader->attributes) {
                 glEnableVertexAttribArray(index);
             }
         }
-    }
 
-    currentShader = shader;
+        currentShader = shader;
+
+        return true;
+    } else {
+        return false;
+    }
 }

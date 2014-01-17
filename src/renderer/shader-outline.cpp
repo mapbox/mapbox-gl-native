@@ -1,16 +1,16 @@
-#include <llmr/renderer/shader-fill.hpp>
+#include <llmr/renderer/shader-outline.hpp>
 #include <llmr/shader/shaders.h>
 #include <llmr/platform/gl.hpp>
 
 using namespace llmr;
 
-FillShader::FillShader()
+OutlineShader::OutlineShader()
     : Shader(
-        llmr_shaders[FILL_SHADER].vertex,
-        llmr_shaders[FILL_SHADER].fragment
+        llmr_shaders[OUTLINE_SHADER].vertex,
+        llmr_shaders[OUTLINE_SHADER].fragment
     ) {
     if (!valid) {
-        fprintf(stderr, "invalid fill shader\n");
+        fprintf(stderr, "invalid outline shader\n");
         return;
     }
 
@@ -19,4 +19,5 @@ FillShader::FillShader()
 
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_color = glGetUniformLocation(program, "u_color");
+    u_world = glGetUniformLocation(program, "u_world");
 }

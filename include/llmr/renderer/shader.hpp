@@ -1,7 +1,7 @@
 #ifndef LLMR_RENDERER_SHADER
 #define LLMR_RENDERER_SHADER
 
-#include <vector>
+#include <forward_list>
 
 namespace llmr {
 
@@ -11,7 +11,7 @@ public:
     ~Shader();
     bool valid;
     uint32_t program;
-    std::vector<uint32_t> attributes;
+    std::forward_list<uint32_t> attributes;
 
 private:
     bool compileShader(uint32_t *shader, uint32_t type, const char *source);

@@ -16,6 +16,7 @@ typedef struct llmr_shader llmr_shader_t;
 enum {
     FILL_SHADER,
     LINE_SHADER,
+    OUTLINE_SHADER,
     SHADER_COUNT
 };
 
