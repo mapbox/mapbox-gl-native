@@ -5,9 +5,10 @@
 // #include <iostream>
 #include <thread>
 
-#include "pbf.hpp"
+#include <llmr/util/pbf.hpp>
 #include <llmr/util/vec2.hpp>
 #include <llmr/util/string.hpp>
+#include <llmr/geometry/geometry.hpp>
 #include <cmath>
 
 using namespace llmr;
@@ -175,50 +176,15 @@ void tile::parseFeature(const uint8_t *data, uint32_t bytes) {
 }
 
 void tile::loadGeometry(const uint8_t *data, uint32_t bytes) {
-    pbf geometry(data, bytes);
+    geometry geometry(data, bytes);
 
-    uint32_t cmd = 1;
-    uint32_t length = 0;
-    int32_t x = 0, y = 0;
-
-    // var lines = [];
-    // var line = null;
-    int32_t ox = 0, oy = 0;
-
-    while (geometry.data < geometry.end) {
-        if (!length) {
-            uint32_t cmd_length = (uint32_t)geometry.varint();
-            cmd = cmd_length & 0x7;
-            length = cmd_length >> 3;
+    geometry::command cmd;
+    int32_t x, y;
+    while ((cmd = geometry.next(x, y)) != geometry::end) {
+        if (cmd == geometry::move_to) {
+            lineVertex.addDegenerate();
         }
 
-        length--;
-
-        if (cmd == 1 || cmd == 2) {
-            x += geometry.svarint();
-            y += geometry.svarint();
-
-            if (cmd == 1) {
-                // moveTo
-                // fprintf(stderr, "[m %d/%d] ", x, y);
-                // degenerate vertex
-                lineVertex.addDegenerate();
-                ox = x;
-                oy = y;
-            } else {
-                // lineTo
-                // fprintf(stderr, "[l %d/%d] ", x, y);
-            }
-            lineVertex.addCoordinate(x, y);
-        } else if (cmd == 7) {
-            // closePolygon
-            // fprintf(stderr, "[c]\n");
-            lineVertex.addCoordinate(ox, oy);
-        } else {
-            // throw new Error('unknown command ' + cmd);
-            // throw std::runtime_error("unknown command");
-            fprintf(stderr, "unknown command");
-            exit(1);
-        }
+        lineVertex.addCoordinate(x, y);
     }
 }

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LLMR_UTIL_PBF
+#define LLMR_UTIL_PBF
 
 /*
  * Some parts are from upb - a minimalist implementation of protocol buffers.
@@ -23,8 +24,6 @@ namespace llmr {
 
 struct pbf {
 	inline pbf(const unsigned char *data, uint32_t length);
-	inline pbf(const char *data, uint32_t length);
-	// inline pbf(const std::string& buffer);
 
 	inline bool next();
 	template <typename T = uint32_t> inline T varint();
@@ -59,11 +58,6 @@ struct pbf {
 pbf::pbf(const unsigned char *data, uint32_t length)
 	: data(data),
 	  end(data + length)
-{}
-
-pbf::pbf(const char *data, uint32_t length)
-	: data((const unsigned char *)data),
-	  end((const unsigned char *)data + length)
 {}
 
 // pbf::pbf(const std::string& buffer)
@@ -205,4 +199,6 @@ void pbf::skipBytes(uint32_t bytes)
 }
 
 } // end namespace llmr
+
+#endif
 
