@@ -1,5 +1,4 @@
 #include <llmr/map/transform.hpp>
-
 #include <llmr/util/mat4.h>
 #include <llmr/util/math.hpp>
 #include <cmath>
@@ -27,6 +26,16 @@ transform::transform()
     max_scale(pow(2, 20)) {
     setScale(scale);
     setAngle(angle);
+}
+
+bool transform::needsAnimation() const {
+    return !animations.empty();
+}
+
+void transform::updateAnimations() {
+    animations.remove_if([](const util::animation& animation) {
+        return animation.update() == util::animation::complete;
+    });
 }
 
 void transform::moveBy(double dx, double dy) {
@@ -82,10 +91,15 @@ void transform::rotateBy(double anchor_x, double anchor_y, double start_x, doubl
     setAngle(ang);
 }
 
-void transform::setAngle(double new_angle) {
-    angle = new_angle;
-    while (angle > M_PI) angle -= M2PI;
-    while (angle <= -M_PI) angle += M2PI;
+void transform::setAngle(double new_angle, double duration) {
+    while (new_angle > M_PI) new_angle -= M2PI;
+    while (new_angle <= -M_PI) new_angle += M2PI;
+
+    if (duration == 0) {
+        angle = new_angle;
+    } else {
+        animations.emplace_front(angle, new_angle, angle, duration);
+    }
 }
 
 void transform::setScale(double new_scale) {

@@ -255,6 +255,10 @@ void request(void *, tile::ptr tile) {
     }];
 }
 
+double time() {
+    return glfwGetTime();
+}
+
 }
 }
 

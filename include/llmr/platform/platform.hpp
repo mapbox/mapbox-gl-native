@@ -11,6 +11,7 @@ namespace platform {
 
 void restart(void *obj);
 void request(void *obj, std::shared_ptr<tile> tile);
+double time();
 
 }
 

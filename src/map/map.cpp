@@ -65,7 +65,7 @@ void map::rotateBy(double cx, double cy, double sx, double sy, double ex, double
 }
 
 void map::resetNorth() {
-    transform->setAngle(0);
+    transform->setAngle(0, 0.5); // 500 ms
     update();
 
     settings->angle = transform->getAngle();
@@ -261,6 +261,8 @@ void map::updateTiles() {
 }
 
 bool map::render() {
+    transform->updateAnimations();
+
     painter->clear();
 
     for (tile::ptr& tile : tiles) {
@@ -270,7 +272,7 @@ bool map::render() {
         }
     }
 
-    return false;
+    return transform->needsAnimation();
 }
 
 void map::tileLoaded(tile::ptr tile) {

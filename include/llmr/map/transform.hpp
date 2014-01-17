@@ -1,9 +1,12 @@
 #ifndef LLMR_MAP_TRANSFORM
 #define LLMR_MAP_TRANSFORM
 
-#include <cstdint>
 
 #include <llmr/util/vec2.hpp>
+#include <llmr/util/animation.hpp>
+
+#include <cstdint>
+#include <forward_list>
 
 namespace llmr {
 
@@ -15,6 +18,10 @@ class transform {
 public:
     transform();
 
+    // Animations
+    bool needsAnimation() const;
+    void updateAnimations();
+
     // Relative changes
     void moveBy(double dx, double dy);
     void scaleBy(double ds, double cx, double cy);
@@ -22,7 +29,7 @@ public:
 
     // Absolute changes
     void setScale(double scale);
-    void setAngle(double angle);
+    void setAngle(double angle, double duration = 0);
     void setZoom(double zoom);
     void setLonLat(double lon, double lat);
 
@@ -58,6 +65,8 @@ private:
 
     // cache values for spherical mercator math
     double zc, Bc, Cc;
+
+    std::forward_list<util::animation> animations;
 };
 
 }

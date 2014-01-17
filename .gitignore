@@ -1,3 +1,6 @@
 *.o
 /emscripten/main.js
 /emscripten/main.js.map
+/build
+/xcode
+*.sublime-*
