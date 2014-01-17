@@ -16,18 +16,17 @@ public:
 
     void setup();
     void teardown();
-    void viewport();
-
 
     void clear();
-    void render(std::shared_ptr<tile> tile);
+    void render(const std::shared_ptr<tile>& tile);
+    void renderDebug(const std::shared_ptr<tile>& tile);
 
     void drawClippingMask();
-    void switchShader(Shader *shader);
+    bool switchShader(Shader *shader);
 
 private:
     void setupShaders();
-    void changeMatrix(std::shared_ptr<tile> tile);
+    void changeMatrix(const std::shared_ptr<tile>& tile);
 
 public:
 

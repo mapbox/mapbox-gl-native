@@ -126,8 +126,6 @@ bool tile::parse() {
         }
     }
 
-    // fprintf(stderr, "[%p] parsing tile [%d/%d/%d]... done\n", this, z, x, y);
-
     if (state == obsolete) {
         return false;
     } else {

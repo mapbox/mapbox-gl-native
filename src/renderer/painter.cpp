@@ -83,7 +83,7 @@ void painter::teardown() {
 
 }
 
-void painter::changeMatrix(std::shared_ptr<tile> tile) {
+void painter::changeMatrix(const tile::ptr& tile) {
     assert(transform);
 
     // Initialize projection matrix
@@ -137,7 +137,7 @@ void painter::clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void painter::render(tile::ptr tile) {
+void painter::render(const tile::ptr& tile) {
     if (tile->state != tile::ready) {
         return;
     }
@@ -162,31 +162,31 @@ void painter::render(tile::ptr tile) {
 
 
     if (settings->debug) {
-        // draw tile outline
-        switchShader(lineShader);
-        glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
-        glBindBuffer(GL_ARRAY_BUFFER, tile_border_buffer);
-        glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
-        glUniform4f(lineShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
-        glLineWidth(4.0f);
-        glDrawArrays(GL_LINE_STRIP, 0, sizeof(tile_border_vertices));
-
-        // draw debug info
-        switchShader(lineShader);
-        glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
-        tile->debugFontVertex.bind();
-        glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
-        glUniform4f(lineShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
-        glLineWidth(4.0f);
-        glDrawArrays(GL_LINES, 0, tile->debugFontVertex.length());
-        glUniform4f(lineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
-        glLineWidth(2.0f);
-        glDrawArrays(GL_LINES, 0, tile->debugFontVertex.length());
+        renderDebug(tile);
     }
 }
 
-void painter::viewport() {
+void painter::renderDebug(const tile::ptr& tile) {
+    // draw tile outline
+    switchShader(lineShader);
+    glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
+    glBindBuffer(GL_ARRAY_BUFFER, tile_border_buffer);
+    glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+    glUniform4f(lineShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
+    glLineWidth(4.0f);
+    glDrawArrays(GL_LINE_STRIP, 0, sizeof(tile_border_vertices));
 
+    // draw debug info
+    switchShader(lineShader);
+    glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
+    tile->debugFontVertex.bind();
+    glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    glUniform4f(lineShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
+    glLineWidth(4.0f);
+    glDrawArrays(GL_LINES, 0, tile->debugFontVertex.length());
+    glUniform4f(lineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
+    glLineWidth(2.0f);
+    glDrawArrays(GL_LINES, 0, tile->debugFontVertex.length());
 }
 
 // Switches to a different shader program.
