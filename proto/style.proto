@@ -13,6 +13,19 @@ enum join_type {
     bevel = 2;
 }
 
+message value {
+    // Exactly one of these values may be present in a valid message
+    optional string string_value = 1;
+    optional float float_value = 2;
+    optional double double_value = 3;
+    optional int64 int_value = 4;
+    optional uint64 uint_value = 5;
+    optional sint64 sint_value = 6;
+    optional bool bool_value = 7;
+
+    extensions 8 to max;
+}
+
 message bucket {
     required string name = 1;
     required bucket_type type = 2;
@@ -21,24 +34,24 @@ message bucket {
     required string source_name = 3;
     required string source_layer = 4;
     optional string source_field = 5;
-    repeated string source_values = 6;
+    repeated value source_value = 6;
 
     // Specifies how the geometry for this bucket should be created
     optional cap_type cap = 7;
     optional join_type join = 8;
     optional string font = 9;
-    optional float fontSize = 10;
+    optional float font_size = 10;
 }
 
 message structure {
     required string name = 1;
     optional string bucket_name = 2;
-    repeated structure child_layers = 3;
+    repeated structure child_layer = 3;
 }
 
 message width {
     optional string scaling = 1;
-    repeated float values = 2 [ packed = true ];
+    repeated float value = 2 [ packed = true ];
 }
 
 message layer {
@@ -50,12 +63,12 @@ message layer {
 
 message class {
     required string name = 1;
-    repeated layer layers = 2;
+    repeated layer layer = 2;
 }
 
 // root level object
 message style {
-    repeated bucket buckets = 1;
+    repeated bucket bucket = 1;
     repeated structure structure = 2;
-    repeated class classes = 3;
+    repeated class class = 3;
 }

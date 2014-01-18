@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
+'use strict';
+
 var style = require('./style.js');
 var Protobuf = require('./protobuf.js');
 
-var fs = require('fs');
+// var fs = require('fs');
 
 var pbf = new Protobuf();
 
@@ -17,12 +19,29 @@ var bucket_type = {
 // enum
 var cap_type = {
     round: 1,
-}
+};
 
 // enum
 var join_type = {
     butt: 1,
     bevel: 2
+};
+
+
+function createValue(value) {
+    var pbf = new Protobuf();
+
+    if (typeof value === 'string') {
+        pbf.writeTaggedString(1 /* string_value */, value);
+    } else if (typeof value === 'boolean') {
+        pbf.writeTaggedBoolean(7 /* bool_value */, value);
+    } else {
+        // TODO:
+        console.warn('encode value: %s', value);
+        process.exit();
+    }
+
+    return pbf;
 }
 
 function createBucket(bucket, name) {
@@ -36,7 +55,7 @@ function createBucket(bucket, name) {
         pbf.writeTaggedString(5 /* source_field */, bucket.field);
         var values = Array.isArray(bucket.value) ? bucket.value : [bucket.value];
         for (var i = 0; i < values.length; i++) {
-            pbf.writeTaggedString(6 /* source_values */, values[i]);
+            pbf.writeMessage(6 /* source_value */, createValue(values[i]));
         }
     }
     if (bucket.cap) {
@@ -58,7 +77,7 @@ function createStructure(structure) {
         pbf.writeTaggedString(2 /* bucket_name */, structure.bucket);
     } else if (structure.layers) {
         for (var i = 0; i < structure.layers.length; i++) {
-            pbf.writeMessage(3 /* child_layers */, createStructure(structure.layers[i]));
+            pbf.writeMessage(3 /* child_layer */, createStructure(structure.layers[i]));
         }
     }
     return pbf;
@@ -79,7 +98,7 @@ function createWidth(width) {
     } else {
         values.push(width);
     }
-    pbf.writePackedFloats(2 /* values */, values);
+    pbf.writePackedFloats(2 /* value */, values);
 
     return pbf;
 }
@@ -113,7 +132,7 @@ function createClass(klass) {
     var pbf = new Protobuf();
     pbf.writeTaggedString(1 /* name */, klass.name);
     for (var name in klass.layers) {
-        pbf.writeMessage(2 /* layers */, createLayer(klass.layers[name], name));
+        pbf.writeMessage(2 /* layer */, createLayer(klass.layers[name], name));
     }
     return pbf;
 }
@@ -124,7 +143,7 @@ function createClass(klass) {
 
 for (var name in style.buckets) {
     var bucket = style.buckets[name];
-    pbf.writeMessage(1 /* buckets */, createBucket(bucket, name));
+    pbf.writeMessage(1 /* bucket */, createBucket(bucket, name));
 }
 
 for (var i = 0; i < style.structure.length; i++) {
@@ -134,7 +153,7 @@ for (var i = 0; i < style.structure.length; i++) {
 
 for (var i = 0; i < style.classes.length; i++) {
     var klass = style.classes[i];
-    pbf.writeMessage(3 /* classes */, createClass(klass));
+    pbf.writeMessage(3 /* class */, createClass(klass));
 }
 
 process.stdout.write(pbf.finish());
