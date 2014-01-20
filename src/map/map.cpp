@@ -13,7 +13,7 @@ using namespace llmr;
 Map::Map(Settings& settings)
     : settings(settings),
       transform(new class transform()),
-      painter(new class painter(transform, settings)),
+      painter(transform, settings),
       min_zoom(0),
       max_zoom(14) {
 }
@@ -23,7 +23,7 @@ Map::~Map() {
 }
 
 void Map::setup() {
-    painter->setup();
+    painter.setup();
 }
 
 void Map::loadSettings() {
@@ -263,12 +263,12 @@ void Map::updateTiles() {
 bool Map::render() {
     transform->updateAnimations();
 
-    painter->clear();
+    painter.clear();
 
     for (tile::ptr& tile : tiles) {
         assert(tile);
         if (tile->state == tile::ready) {
-            painter->render(tile);
+            painter.render(tile);
         }
     }
 

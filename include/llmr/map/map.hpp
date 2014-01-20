@@ -51,7 +51,7 @@ private:
 private:
     Settings& settings;
     transform *transform;
-    painter *painter;
+    Painter painter;
 
     int32_t min_zoom;
     int32_t max_zoom;

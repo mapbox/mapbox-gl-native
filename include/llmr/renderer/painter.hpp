@@ -11,15 +11,15 @@ namespace llmr {
 class transform;
 class tile;
 
-class painter {
+class Painter {
 public:
-    painter(class transform *transform, Settings& settings);
+    Painter(class transform *transform, Settings& settings);
 
     // Make noncopyable
-    painter(const painter&) = delete;
-    painter(const painter&&) = delete;
-    painter &operator=(const painter&) = delete;
-    painter &operator=(const painter&&) = delete;
+    Painter(const Painter&) = delete;
+    Painter(const Painter&&) = delete;
+    Painter &operator=(const Painter&) = delete;
+    Painter &operator=(const Painter&&) = delete;
 
 
     void setup();

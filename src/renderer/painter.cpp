@@ -27,7 +27,7 @@ GLshort tile_border_vertices[] = {
     0, 0
 };
 
-painter::painter(class transform *transform, Settings& settings)
+Painter::Painter(class transform *transform, Settings& settings)
     : transform(transform),
       settings(settings),
       currentShader(NULL),
@@ -37,7 +37,7 @@ painter::painter(class transform *transform, Settings& settings)
 }
 
 
-void painter::setup() {
+void Painter::setup() {
     setupShaders();
 
     assert(fillShader);
@@ -62,13 +62,13 @@ void painter::setup() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void painter::setupShaders() {
+void Painter::setupShaders() {
     fillShader = new FillShader();
     lineShader = new LineShader();
     outlineShader = new OutlineShader();
 }
 
-void painter::teardown() {
+void Painter::teardown() {
     glDeleteBuffers(1, &tile_stencil_buffer);
 
     if (fillShader) {
@@ -83,7 +83,7 @@ void painter::teardown() {
 
 }
 
-void painter::changeMatrix(const tile::ptr& tile) {
+void Painter::changeMatrix(const tile::ptr& tile) {
     assert(transform);
 
     // Initialize projection matrix
@@ -96,7 +96,7 @@ void painter::changeMatrix(const tile::ptr& tile) {
     mat4::multiply(matrix, projMatrix, mvMatrix);
 }
 
-void painter::drawClippingMask() {
+void Painter::drawClippingMask() {
     switchShader(lineShader);
     glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
 
@@ -130,14 +130,14 @@ void painter::drawClippingMask() {
     glColorMask(true, true, true, true);
 }
 
-void painter::clear() {
+void Painter::clear() {
     glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
     glClearStencil(0x0);
     glStencilMask(0xFF);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void painter::render(const tile::ptr& tile) {
+void Painter::render(const tile::ptr& tile) {
     if (tile->state != tile::ready) {
         return;
     }
@@ -166,7 +166,7 @@ void painter::render(const tile::ptr& tile) {
     }
 }
 
-void painter::renderDebug(const tile::ptr& tile) {
+void Painter::renderDebug(const tile::ptr& tile) {
     // draw tile outline
     switchShader(lineShader);
     glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
@@ -193,7 +193,7 @@ void painter::renderDebug(const tile::ptr& tile) {
 /**
  * @return boolean whether the shader was actually switched
  */
-bool painter::switchShader(Shader *shader) {
+bool Painter::switchShader(Shader *shader) {
     if (currentShader != shader) {
         glUseProgram(shader->program);
 
