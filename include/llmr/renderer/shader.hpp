@@ -9,6 +9,13 @@ class Shader {
 public:
     Shader(const char *vertex, const char *fragment);
     ~Shader();
+
+    // Make noncopyable
+    Shader(const Shader&) = delete;
+    Shader(const Shader&&) = delete;
+    Shader &operator=(const Shader&) = delete;
+    Shader &operator=(const Shader&&) = delete;
+
     bool valid;
     uint32_t program;
     std::forward_list<uint32_t> attributes;

@@ -14,6 +14,13 @@ class painter {
 public:
     painter(class transform *transform, class settings *settings);
 
+    // Make noncopyable
+    painter(const painter&) = delete;
+    painter(const painter&&) = delete;
+    painter &operator=(const painter&) = delete;
+    painter &operator=(const painter&&) = delete;
+
+
     void setup();
     void teardown();
 

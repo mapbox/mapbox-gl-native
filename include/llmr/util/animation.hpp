@@ -12,9 +12,12 @@ public:
     };
 
     animation(double from, double to, double &value, double duration);
-    animation(const animation &) = delete;
-    animation(const animation &&) = delete;
-    animation &operator=(const animation &) = delete;
+
+    // Make noncopyable
+    animation(const animation&) = delete;
+    animation(const animation&&) = delete;
+    animation &operator=(const animation&) = delete;
+    animation &operator=(const animation&&) = delete;
 
     state update() const;
 

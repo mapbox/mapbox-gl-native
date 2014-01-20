@@ -7,6 +7,13 @@ class settings {
 public:
     virtual void save() = 0;
 
+    // Make noncopyable
+    settings() = default;
+    settings(const settings&) = delete;
+    settings(const settings&&) = delete;
+    settings &operator=(const settings&) = delete;
+    settings &operator=(const settings&&) = delete;
+
 public:
     // position
     double longitude = 0;

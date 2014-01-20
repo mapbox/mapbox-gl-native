@@ -27,6 +27,13 @@ public:
     tile(tile_id id);
     ~tile();
 
+    // Make noncopyable
+    tile(const tile&) = delete;
+    tile(const tile&&) = delete;
+    tile &operator=(const tile&) = delete;
+    tile &operator=(const tile&&) = delete;
+
+    // Other functions
     void setData(uint8_t *data, uint32_t bytes);
     bool parse();
     void parseLayer(const uint8_t *data, uint32_t bytes);

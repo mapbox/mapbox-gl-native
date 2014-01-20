@@ -18,6 +18,12 @@ class transform {
 public:
     transform();
 
+    // Make noncopyable
+    transform(const transform&) = delete;
+    transform(const transform&&) = delete;
+    transform &operator=(const transform&) = delete;
+    transform &operator=(const transform&&) = delete;
+
     // Animations
     bool needsAnimation() const;
     void updateAnimations();
