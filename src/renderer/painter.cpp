@@ -27,7 +27,7 @@ GLshort tile_border_vertices[] = {
     0, 0
 };
 
-painter::painter(class transform *transform, class settings *settings)
+painter::painter(class transform *transform, Settings& settings)
     : transform(transform),
       settings(settings),
       currentShader(NULL),
@@ -161,7 +161,7 @@ void painter::render(const tile::ptr& tile) {
     glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
 
 
-    if (settings->debug) {
+    if (settings.debug) {
         renderDebug(tile);
     }
 }

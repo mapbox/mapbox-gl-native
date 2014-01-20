@@ -5,7 +5,7 @@
 
 using namespace llmr;
 
-macosx_settings::macosx_settings() {
+Settings_MacOSX::Settings_MacOSX() {
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
 
         // position
@@ -23,7 +23,7 @@ macosx_settings::macosx_settings() {
     [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
 }
 
-void macosx_settings::load() {
+void Settings_MacOSX::load() {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     // position
@@ -36,7 +36,7 @@ void macosx_settings::load() {
     debug = [defaults boolForKey:@"debug"];
 }
 
-void macosx_settings::save() {
+void Settings_MacOSX::save() {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -57,6 +57,6 @@ void macosx_settings::save() {
     [defaults synchronize];
 }
 
-void macosx_settings::clear() {
+void Settings_MacOSX::clear() {
     // TODO
 }

@@ -5,9 +5,9 @@
 
 namespace llmr {
 
-class macosx_settings : public settings {
+class Settings_MacOSX : public Settings {
 public:
-    macosx_settings();
+    Settings_MacOSX();
     virtual void save();
     virtual void load();
     virtual void clear();

@@ -13,7 +13,7 @@ namespace llmr {
 
 class map {
 public:
-    map(settings *settings);
+    map(Settings& settings);
     ~map();
 
     void setup();
@@ -49,7 +49,7 @@ private:
     void update();
 
 private:
-    settings *settings;
+    Settings& settings;
     transform *transform;
     painter *painter;
 

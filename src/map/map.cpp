@@ -10,7 +10,7 @@
 
 using namespace llmr;
 
-map::map(class settings *settings)
+map::map(Settings& settings)
     : settings(settings),
       transform(new class transform()),
       painter(new class painter(transform, settings)),
@@ -27,9 +27,9 @@ void map::setup() {
 }
 
 void map::loadSettings() {
-    transform->setAngle(settings->angle);
-    transform->setScale(settings->scale);
-    transform->setLonLat(settings->longitude, settings->latitude);
+    transform->setAngle(settings.angle);
+    transform->setScale(settings.scale);
+    transform->setLonLat(settings.longitude, settings.latitude);
     update();
 }
 
@@ -43,33 +43,33 @@ void map::moveBy(double dx, double dy) {
     transform->moveBy(dx, dy);
     update();
 
-    transform->getLonLat(settings->longitude, settings->latitude);
-    settings->save();
+    transform->getLonLat(settings.longitude, settings.latitude);
+    settings.save();
 }
 
 void map::scaleBy(double ds, double cx, double cy) {
     transform->scaleBy(ds, cx, cy);
     update();
 
-    transform->getLonLat(settings->longitude, settings->latitude);
-    settings->scale = transform->getScale();
-    settings->save();
+    transform->getLonLat(settings.longitude, settings.latitude);
+    settings.scale = transform->getScale();
+    settings.save();
 }
 
 void map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey) {
     transform->rotateBy(cx, cy, sx, sy, ex, ey);
     update();
 
-    settings->angle = transform->getAngle();
-    settings->save();
+    settings.angle = transform->getAngle();
+    settings.save();
 }
 
 void map::resetNorth() {
     transform->setAngle(0, 0.5); // 500 ms
     update();
 
-    settings->angle = transform->getAngle();
-    settings->save();
+    settings.angle = transform->getAngle();
+    settings.save();
 }
 
 void map::resetPosition() {
@@ -78,17 +78,17 @@ void map::resetPosition() {
     transform->setZoom(0);
     update();
 
-    transform->getLonLat(settings->longitude, settings->latitude);
-    settings->scale = transform->getScale();
-    settings->angle = transform->getAngle();
-    settings->save();
+    transform->getLonLat(settings.longitude, settings.latitude);
+    settings.scale = transform->getScale();
+    settings.angle = transform->getAngle();
+    settings.save();
 }
 
 void map::toggleDebug() {
-    settings->debug = !settings->debug;
+    settings.debug = !settings.debug;
     update();
 
-    settings->save();
+    settings.save();
 }
 
 void map::update() {

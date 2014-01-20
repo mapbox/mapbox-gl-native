@@ -3,16 +3,16 @@
 
 namespace llmr {
 
-class settings {
+class Settings {
 public:
     virtual void save() = 0;
 
     // Make noncopyable
-    settings() = default;
-    settings(const settings&) = delete;
-    settings(const settings&&) = delete;
-    settings &operator=(const settings&) = delete;
-    settings &operator=(const settings&&) = delete;
+    Settings() = default;
+    Settings(const Settings&) = delete;
+    Settings(const Settings&&) = delete;
+    Settings &operator=(const Settings&) = delete;
+    Settings &operator=(const Settings&&) = delete;
 
 public:
     // position

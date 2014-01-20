@@ -13,8 +13,8 @@ public:
         tracking(false),
         rotating(false),
         last_click(-1),
-        settings(new llmr::macosx_settings()),
-        map(new llmr::map(settings)) {
+        settings(),
+        map(settings) {
         }
 
     void init() {
@@ -35,16 +35,16 @@ public:
 
         glfwMakeContextCurrent(window);
 
-        settings->load();
-        map->setup();
+        settings.load();
+        map.setup();
 
         int width, height;
         glfwGetWindowSize(window, &width, &height);
-        map->resize(width, height);
+        map.resize(width, height);
 
         glfwSwapInterval(1);
 
-        map->loadSettings();
+        map.loadSettings();
 
         glfwSetCursorPosCallback(window, mousemove);
         glfwSetMouseButtonCallback(window, mouseclick);
@@ -70,13 +70,13 @@ public:
                     glfwSetWindowShouldClose(window, true);
                     break;
                 case GLFW_KEY_TAB:
-                    view->map->toggleDebug();
+                    view->map.toggleDebug();
                     break;
                 case GLFW_KEY_R:
-                    if (!mods) view->map->resetPosition();
+                    if (!mods) view->map.resetPosition();
                     break;
                 case GLFW_KEY_N:
-                    if (!mods) view->map->resetNorth();
+                    if (!mods) view->map.resetNorth();
                     break;
             }
         }
@@ -102,12 +102,12 @@ public:
             scale = 1.0 / scale;
         }
 
-        view->map->scaleBy(scale, view->last_x, view->last_y);
+        view->map.scaleBy(scale, view->last_x, view->last_y);
     }
 
     static void resize(GLFWwindow *window, int width, int height) {
         MapView *view = (MapView *)glfwGetWindowUserPointer(window);
-        view->map->resize(width, height);
+        view->map.resize(width, height);
     }
 
     static void mouseclick(GLFWwindow *window, int button, int action, int modifiers) {
@@ -125,7 +125,7 @@ public:
             if (action == GLFW_RELEASE) {
                 double now = glfwGetTime();
                 if (now - view->last_click < 0.4) {
-                    view->map->scaleBy(2.0, view->last_x, view->last_y);
+                    view->map.scaleBy(2.0, view->last_x, view->last_y);
                 }
                 view->last_click = now;
             }
@@ -135,9 +135,9 @@ public:
     static void mousemove(GLFWwindow *window, double x, double y) {
         MapView *view = (MapView *)glfwGetWindowUserPointer(window);
         if (view->tracking) {
-            view->map->moveBy(x - view->last_x, y - view->last_y);
+            view->map.moveBy(x - view->last_x, y - view->last_y);
         } else if (view->rotating) {
-            view->map->rotateBy(view->start_x, view->start_y, view->last_x, view->last_y, x, y);
+            view->map.rotateBy(view->start_x, view->start_y, view->last_x, view->last_y, x, y);
         }
         view->last_x = x;
         view->last_y = y;
@@ -162,7 +162,7 @@ public:
     }
 
     bool render() {
-        return map->render();
+        return map.render();
     }
 
     void fps() {
@@ -180,7 +180,6 @@ public:
     }
 
     ~MapView() {
-        delete map;
         glfwTerminate();
     }
 
@@ -195,8 +194,8 @@ public:
     double last_click;
 
     GLFWwindow *window;
-    llmr::macosx_settings *settings;
-    llmr::map *map;
+    llmr::Settings_MacOSX settings;
+    llmr::map map;
 };
 
 NSOperationQueue *queue = NULL;
@@ -242,7 +241,7 @@ void request(void *, tile::ptr tile) {
                 tile->setData((uint8_t *)[data bytes], [data length]);
                 if (tile->parse()) {
                     dispatch_async(dispatch_get_main_queue(), ^ {
-                        view->map->tileLoaded(tile);
+                        view->map.tileLoaded(tile);
                     });
                     return;
                 }
@@ -250,7 +249,7 @@ void request(void *, tile::ptr tile) {
         }
 
         dispatch_async(dispatch_get_main_queue(), ^ {
-            view->map->tileFailed(tile);
+            view->map.tileFailed(tile);
         });
     }];
 }
