@@ -12,9 +12,9 @@
 
 using namespace llmr;
 
-tile_id tile::parent(const tile_id& id, int32_t z) {
+Tile::ID Tile::parent(const ID& id, int32_t z) {
     assert(z < id.z);
-    tile_id pos(id);
+    ID pos(id);
     while (pos.z > z) {
         pos.z--;
         pos.x = floor(pos.x / 2);
@@ -24,11 +24,11 @@ tile_id tile::parent(const tile_id& id, int32_t z) {
 }
 
 
-std::forward_list<tile_id> tile::children(const tile_id& id, int32_t z) {
+std::forward_list<Tile::ID> Tile::children(const ID& id, int32_t z) {
     assert(z > id.z);
     int32_t factor = pow(2, z - id.z);
 
-    std::forward_list<tile_id> children;
+    std::forward_list<ID> children;
     for (int32_t y = id.y * factor, y_max = (id.y + 1) * factor; y < y_max; y++) {
         for (int32_t x = id.x * factor, x_max = (id.x + 1) * factor; x < x_max; x++) {
             children.emplace_front(x, y, z);
@@ -38,7 +38,7 @@ std::forward_list<tile_id> tile::children(const tile_id& id, int32_t z) {
 }
 
 
-tile::tile(tile_id id)
+Tile::Tile(ID id)
     : id(id),
       state(initial),
       data(0),
@@ -50,25 +50,25 @@ tile::tile(tile_id id)
     debugFontVertex.addText(coord, 50, 200, 5);
 }
 
-tile::~tile() {
+Tile::~Tile() {
     // fprintf(stderr, "[%p] deleting tile %d/%d/%d\n", this, id.z, id.x, id.y);
     if (this->data) {
         free(this->data);
     }
 }
 
-const std::string tile::toString() const {
+const std::string Tile::toString() const {
     return util::sprintf("[tile %d/%d/%d]", id.z, id.x, id.y);
 }
 
 
-void tile::setData(uint8_t *data, uint32_t bytes) {
+void Tile::setData(uint8_t *data, uint32_t bytes) {
     this->data = (uint8_t *)malloc(bytes);
     this->bytes = bytes;
     memcpy(this->data, data, bytes);
 }
 
-void tile::cancel() {
+void Tile::cancel() {
     // TODO: thread safety
     if (state != obsolete) {
         state = obsolete;
@@ -77,7 +77,7 @@ void tile::cancel() {
     }
 }
 
-bool tile::parse() {
+bool Tile::parse() {
     if (state == obsolete) {
         return false;
     }
@@ -112,7 +112,7 @@ bool tile::parse() {
     return true;
 }
 
-void tile::parseLayer(const uint8_t *data, uint32_t bytes) {
+void Tile::parseLayer(const uint8_t *data, uint32_t bytes) {
     pbf layer(data, bytes);
     std::string name;
     while (layer.next()) {
@@ -128,7 +128,7 @@ void tile::parseLayer(const uint8_t *data, uint32_t bytes) {
     }
 }
 
-void tile::parseFeature(const uint8_t *data, uint32_t bytes) {
+void Tile::parseFeature(const uint8_t *data, uint32_t bytes) {
     pbf feature(data, bytes);
     while (feature.next()) {
         if (feature.tag == 1) {
@@ -151,7 +151,7 @@ void tile::parseFeature(const uint8_t *data, uint32_t bytes) {
     }
 }
 
-void tile::loadGeometry(const uint8_t *data, uint32_t bytes) {
+void Tile::loadGeometry(const uint8_t *data, uint32_t bytes) {
     geometry geometry(data, bytes);
 
     geometry::command cmd;

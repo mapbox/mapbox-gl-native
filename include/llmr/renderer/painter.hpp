@@ -1,16 +1,15 @@
 #ifndef LLMR_RENDERER_PAINTER
 #define LLMR_RENDERER_PAINTER
 
-#include "../map/settings.hpp"
-#include "../map/transform.hpp"
 #include "shader-fill.hpp"
 #include "shader-line.hpp"
 #include "shader-outline.hpp"
 
 namespace llmr {
 
-class transform;
-class tile;
+class Settings;
+class Transform;
+class Tile;
 
 class Painter {
 public:
@@ -27,15 +26,15 @@ public:
     void teardown();
 
     void clear();
-    void render(const std::shared_ptr<tile>& tile);
-    void renderDebug(const std::shared_ptr<tile>& tile);
+    void render(const std::shared_ptr<Tile>& tile);
+    void renderDebug(const std::shared_ptr<Tile>& tile);
 
     void drawClippingMask();
     bool switchShader(Shader *shader);
 
 private:
     void setupShaders();
-    void changeMatrix(const std::shared_ptr<tile>& tile);
+    void changeMatrix(const std::shared_ptr<Tile>& tile);
 
 public:
 

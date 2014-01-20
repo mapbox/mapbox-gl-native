@@ -5,12 +5,12 @@
 
 namespace llmr {
 
-class tile;
+class Tile;
 
 namespace platform {
 
 void restart(void *obj);
-void request(void *obj, std::shared_ptr<tile> tile);
+void request(void *obj, std::shared_ptr<Tile> tile);
 double time();
 
 }

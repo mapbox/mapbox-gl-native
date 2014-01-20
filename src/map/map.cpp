@@ -96,22 +96,22 @@ void Map::update() {
 }
 
 
-tile::ptr Map::hasTile(const tile_id& id) {
-    for (tile::ptr& tile : tiles) {
+Tile::Ptr Map::hasTile(const Tile::ID& id) {
+    for (Tile::Ptr& tile : tiles) {
         if (tile->id == id) {
             return tile;
         }
     }
 
-    return tile::ptr();
+    return Tile::Ptr();
 }
 
-tile::ptr Map::addTile(const tile_id& id) {
-    tile::ptr tile = hasTile(id);
+Tile::Ptr Map::addTile(const Tile::ID& id) {
+    Tile::Ptr tile = hasTile(id);
 
     if (!tile.get()) {
         // We couldn't find the tile in the list. Create a new one.
-        tile = std::make_shared<class tile>(id);
+        tile = std::make_shared<Tile>(id);
         assert(tile);
         // std::cerr << "init " << id.z << "/" << id.x << "/" << id.y << std::endl;
         // std::cerr << "add " << tile->toString() << std::endl;
@@ -130,14 +130,14 @@ tile::ptr Map::addTile(const tile_id& id) {
  *
  * @return boolean Whether the children found completely cover the tile.
  */
-bool Map::findLoadedChildren(const tile_id& id, int32_t maxCoveringZoom, std::forward_list<tile_id>& retain) {
+bool Map::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain) {
     bool complete = true;
     int32_t z = id.z;
 
-    auto ids = tile::children(id, z + 1);
-    for (const tile_id& child_id : ids) {
-        const tile::ptr& tile = hasTile(child_id);
-        if (tile && tile->state == tile::ready) {
+    auto ids = Tile::children(id, z + 1);
+    for (const Tile::ID& child_id : ids) {
+        const Tile::Ptr& tile = hasTile(child_id);
+        if (tile && tile->state == Tile::ready) {
             assert(tile);
             retain.emplace_front(tile->id);
         } else {
@@ -160,11 +160,11 @@ bool Map::findLoadedChildren(const tile_id& id, int32_t maxCoveringZoom, std::fo
  *
  * @return boolean Whether a parent was found.
  */
-bool Map::findLoadedParent(const tile_id& id, int32_t minCoveringZoom, std::forward_list<tile_id>& retain) {
+bool Map::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain) {
     for (int32_t z = id.z - 1; z >= minCoveringZoom; z--) {
-        const tile_id parent_id = tile::parent(id, z);
-        const tile::ptr tile = hasTile(parent_id);
-        if (tile && tile->state == tile::ready) {
+        const Tile::ID parent_id = Tile::parent(id, z);
+        const Tile::Ptr tile = hasTile(parent_id);
+        if (tile && tile->state == Tile::ready) {
             assert(tile);
             retain.emplace_front(tile->id);
             return true;
@@ -201,7 +201,7 @@ void Map::updateTiles() {
 
 
     // TODO: Discard tiles that are outside the viewport
-    std::forward_list<tile_id> required;
+    std::forward_list<Tile::ID> required;
     for (int32_t y = tl.y; y < br.y; y++) {
         for (int32_t x = tl.x; x < br.x; x++) {
             required.emplace_front(x, y, zoom);
@@ -211,14 +211,14 @@ void Map::updateTiles() {
     // Retain is a list of tiles that we shouldn't delete, even if they are not
     // the most ideal tile for the current viewport. This may include tiles like
     // parent or child tiles that are *already* loaded.
-    std::forward_list<tile_id> retain(required);
+    std::forward_list<Tile::ID> retain(required);
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
-    for (const tile_id& id : required) {
-        tile::ptr tile = addTile(id);
+    for (const Tile::ID& id : required) {
+        Tile::Ptr tile = addTile(id);
         assert(tile);
 
-        if (tile->state != tile::ready) {
+        if (tile->state != Tile::ready) {
             // The tile we require is not yet loaded. Try to find a parent or
             // child tile that we already have.
 
@@ -233,16 +233,16 @@ void Map::updateTiles() {
             }
         }
 
-        if (tile->state == tile::initial) {
+        if (tile->state == Tile::initial) {
             // If the tile is new, we have to make sure to load it.
-            tile->state = tile::loading;
+            tile->state = Tile::loading;
             platform::request(this, tile);
         }
     }
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
-    tiles.remove_if([&retain](const tile::ptr& tile) {
+    tiles.remove_if([&retain](const Tile::Ptr& tile) {
         assert(tile);
         bool obsolete = std::find(retain.begin(), retain.end(), tile->id) == retain.end();
         if (obsolete) {
@@ -254,7 +254,7 @@ void Map::updateTiles() {
     // Sort tiles by zoom level, front to back.
     // We're painting front-to-back, so we want to draw more detailed tiles first
     // before filling in other parts with lower zoom levels.
-    tiles.sort([](const tile::ptr& a, const tile::ptr& b) {
+    tiles.sort([](const Tile::Ptr& a, const Tile::Ptr& b) {
         return a->id.z > b->id.z;
     });
 }
@@ -264,9 +264,9 @@ bool Map::render() {
 
     painter.clear();
 
-    for (tile::ptr& tile : tiles) {
+    for (Tile::Ptr& tile : tiles) {
         assert(tile);
-        if (tile->state == tile::ready) {
+        if (tile->state == Tile::ready) {
             painter.render(tile);
         }
     }
@@ -274,12 +274,12 @@ bool Map::render() {
     return transform.needsAnimation();
 }
 
-void Map::tileLoaded(tile::ptr tile) {
+void Map::tileLoaded(Tile::Ptr tile) {
     // std::cerr << "loaded " << tile->toString() << std::endl;
     update();
 }
 
-void Map::tileFailed(tile::ptr tile) {
+void Map::tileFailed(Tile::Ptr tile) {
     // fprintf(stderr, "[%8zx] tile failed to load %d/%d/%d\n",
     //         std::hash<std::thread::id>()(std::this_thread::get_id()),
     //         tile->z, tile->x, tile->y);

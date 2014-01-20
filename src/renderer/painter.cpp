@@ -83,7 +83,7 @@ void Painter::teardown() {
 
 }
 
-void Painter::changeMatrix(const tile::ptr& tile) {
+void Painter::changeMatrix(const Tile::Ptr& tile) {
     // Initialize projection matrix
     float projMatrix[16];
     mat4::ortho(projMatrix, 0, transform.width, transform.height, 0, 1, 10);
@@ -135,8 +135,8 @@ void Painter::clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void Painter::render(const tile::ptr& tile) {
-    if (tile->state != tile::ready) {
+void Painter::render(const Tile::Ptr& tile) {
+    if (tile->state != Tile::ready) {
         return;
     }
 
@@ -164,7 +164,7 @@ void Painter::render(const tile::ptr& tile) {
     }
 }
 
-void Painter::renderDebug(const tile::ptr& tile) {
+void Painter::renderDebug(const Tile::Ptr& tile) {
     // draw tile outline
     switchShader(lineShader);
     glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);

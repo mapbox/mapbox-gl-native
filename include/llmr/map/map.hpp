@@ -32,8 +32,8 @@ public:
     void moveBy(double dx, double dy);
     void scaleBy(double ds, double cx, double cy);
     void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey);
-    void tileLoaded(tile::ptr tile);
-    void tileFailed(tile::ptr tile);
+    void tileLoaded(Tile::Ptr tile);
+    void tileFailed(Tile::Ptr tile);
 
     /* position */
     void resetNorth();
@@ -46,11 +46,11 @@ public:
     void toggleDebug();
 
 private:
-    bool findLoadedChildren(const tile_id& id, int32_t maxCoveringZoom, std::forward_list<tile_id>& retain);
-    bool findLoadedParent(const tile_id& id, int32_t minCoveringZoom, std::forward_list<tile_id>& retain);
+    bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
+    bool findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain);
     void updateTiles();
-    tile::ptr addTile(const tile_id& id);
-    tile::ptr hasTile(const tile_id& id);
+    Tile::Ptr addTile(const Tile::ID& id);
+    Tile::Ptr hasTile(const Tile::ID& id);
 
 
     void update();
@@ -63,7 +63,7 @@ private:
     int32_t min_zoom;
     int32_t max_zoom;
 
-    std::forward_list<tile::ptr> tiles;
+    std::forward_list<Tile::Ptr> tiles;
 };
 
 }

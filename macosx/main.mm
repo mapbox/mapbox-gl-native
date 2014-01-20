@@ -208,7 +208,7 @@ void restart(void *) {
     view->dirty = true;
 }
 
-void request(void *, tile::ptr tile) {
+void request(void *, Tile::Ptr tile) {
     assert((bool)tile);
 
     // NSString *urlTemplate = @"http://api.tiles.mapbox.com/v3/mapbox.mapbox-streets-v4/%d/%d/%d.vector.pbf";

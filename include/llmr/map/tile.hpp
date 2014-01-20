@@ -11,11 +11,13 @@
 
 namespace llmr {
 
-typedef vec3<int32_t> tile_id;
 
-class tile {
+class Tile {
 public:
-    typedef std::shared_ptr<tile> ptr;
+    typedef std::shared_ptr<Tile> Ptr;
+
+    typedef vec3<int32_t> ID;
+
     enum state {
         initial,
         loading,
@@ -24,14 +26,14 @@ public:
     };
 
 public:
-    tile(tile_id id);
-    ~tile();
+    Tile(ID id);
+    ~Tile();
 
     // Make noncopyable
-    tile(const tile&) = delete;
-    tile(const tile&&) = delete;
-    tile &operator=(const tile&) = delete;
-    tile &operator=(const tile&&) = delete;
+    Tile(const Tile&) = delete;
+    Tile(const Tile&&) = delete;
+    Tile &operator=(const Tile&) = delete;
+    Tile &operator=(const Tile&&) = delete;
 
     // Other functions
     void setData(uint8_t *data, uint32_t bytes);
@@ -44,11 +46,11 @@ public:
 
     const std::string toString() const;
 
-    static tile_id parent(const tile_id& id, int32_t z);
-    static std::forward_list<tile_id> children(const tile_id& id, int32_t z);
+    static ID parent(const ID& id, int32_t z);
+    static std::forward_list<ID> children(const ID& id, int32_t z);
 
 public:
-    const tile_id id;
+    const ID id;
     state state;
     linevertexbuffer lineVertex;
     debug_font_buffer debugFontVertex;
