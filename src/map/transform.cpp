@@ -14,7 +14,7 @@ const double M2PI = 2 * M_PI;
 const double A = 6378137;
 
 
-transform::transform()
+Transform::Transform()
     :
     width(0),
     height(0),
@@ -28,22 +28,22 @@ transform::transform()
     setAngle(angle);
 }
 
-bool transform::needsAnimation() const {
+bool Transform::needsAnimation() const {
     return !animations.empty();
 }
 
-void transform::updateAnimations() {
+void Transform::updateAnimations() {
     animations.remove_if([](const util::animation& animation) {
         return animation.update() == util::animation::complete;
     });
 }
 
-void transform::moveBy(double dx, double dy) {
+void Transform::moveBy(double dx, double dy) {
     x += cos(angle) * dx + sin(angle) * dy;
     y += cos(angle) * dy + sin(-angle) * dx;
 }
 
-void transform::scaleBy(double ds, double cx, double cy) {
+void Transform::scaleBy(double ds, double cx, double cy) {
     // clamp scale to min/max values
     double new_scale = scale * ds;
     if (new_scale < min_scale) {
@@ -64,7 +64,7 @@ void transform::scaleBy(double ds, double cx, double cy) {
 }
 
 
-void transform::rotateBy(double anchor_x, double anchor_y, double start_x, double start_y, double end_x, double end_y) {
+void Transform::rotateBy(double anchor_x, double anchor_y, double start_x, double start_y, double end_x, double end_y) {
     double center_x = width / 2, center_y = height / 2;
 
     const double begin_center_x = start_x - center_x;
@@ -91,7 +91,7 @@ void transform::rotateBy(double anchor_x, double anchor_y, double start_x, doubl
     setAngle(ang);
 }
 
-void transform::setAngle(double new_angle, double duration) {
+void Transform::setAngle(double new_angle, double duration) {
     while (new_angle > M_PI) new_angle -= M2PI;
     while (new_angle <= -M_PI) new_angle += M2PI;
 
@@ -102,7 +102,7 @@ void transform::setAngle(double new_angle, double duration) {
     }
 }
 
-void transform::setScale(double new_scale) {
+void Transform::setScale(double new_scale) {
     if (new_scale < min_scale) {
         new_scale = min_scale;
     } else if (new_scale > max_scale) {
@@ -120,32 +120,32 @@ void transform::setScale(double new_scale) {
     Cc = s / (2 * M_PI);
 }
 
-void transform::setZoom(double zoom) {
+void Transform::setZoom(double zoom) {
     setScale(pow(2.0, zoom));
 }
 
-void transform::setLonLat(double lon, double lat) {
+void Transform::setLonLat(double lon, double lat) {
     const double f = fmin(fmax(sin(D2R * lat), -0.9999), 0.9999);
     x = -round(lon * Bc);
     y = round(0.5 * Cc * log((1 + f) / (1 - f)));
 }
 
-void transform::getLonLat(double &lon, double &lat) const {
+void Transform::getLonLat(double &lon, double &lat) const {
     lon = -x / Bc;
     lat = R2D * (2 * atan(exp(y / Cc)) - 0.5 * M_PI);
 }
 
-double transform::pixel_x() const {
+double Transform::pixel_x() const {
     const double center = (width - scale * size) / 2;
     return center + x;
 }
 
-double transform::pixel_y() const {
+double Transform::pixel_y() const {
     const double center = (height - scale * size) / 2;
     return center + y;
 }
 
-void transform::matrixFor(float matrix[16], const vec3<int32_t>& id) const {
+void Transform::matrixFor(float matrix[16], const vec3<int32_t>& id) const {
     const double tile_scale = pow(2, id.z);
     const double tile_size = scale * size / tile_scale;
 
@@ -164,19 +164,19 @@ void transform::matrixFor(float matrix[16], const vec3<int32_t>& id) const {
     mat4::translate(matrix, matrix, 0, 0, -1);
 }
 
-int32_t transform::getZoom() const {
+int32_t Transform::getZoom() const {
     return floor(log(scale) / M_LN2);
 }
 
-double transform::getScale() const {
+double Transform::getScale() const {
     return scale;
 }
 
-double transform::getAngle() const {
+double Transform::getAngle() const {
     return angle;
 }
 
-void transform::mapCornersToBox(uint32_t z, box& b) const {
+void Transform::mapCornersToBox(uint32_t z, box& b) const {
     const double ref_scale = pow(2, z);
 
     // Keep the map as upright as possible.

@@ -2,6 +2,7 @@
 #define LLMR_RENDERER_PAINTER
 
 #include "../map/settings.hpp"
+#include "../map/transform.hpp"
 #include "shader-fill.hpp"
 #include "shader-line.hpp"
 #include "shader-outline.hpp"
@@ -13,7 +14,7 @@ class tile;
 
 class Painter {
 public:
-    Painter(class transform *transform, Settings& settings);
+    Painter(Transform& transform, Settings& settings);
 
     // Make noncopyable
     Painter(const Painter&) = delete;
@@ -39,7 +40,7 @@ private:
 public:
 
 private:
-    transform *transform;
+    Transform& transform;
     Settings& settings;
     float matrix[16];
 

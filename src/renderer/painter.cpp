@@ -27,7 +27,7 @@ GLshort tile_border_vertices[] = {
     0, 0
 };
 
-Painter::Painter(class transform *transform, Settings& settings)
+Painter::Painter(Transform& transform, Settings& settings)
     : transform(transform),
       settings(settings),
       currentShader(NULL),
@@ -84,14 +84,12 @@ void Painter::teardown() {
 }
 
 void Painter::changeMatrix(const tile::ptr& tile) {
-    assert(transform);
-
     // Initialize projection matrix
     float projMatrix[16];
-    mat4::ortho(projMatrix, 0, transform->width, transform->height, 0, 1, 10);
+    mat4::ortho(projMatrix, 0, transform.width, transform.height, 0, 1, 10);
 
     float mvMatrix[16];
-    transform->matrixFor(mvMatrix, tile->id);
+    transform.matrixFor(mvMatrix, tile->id);
 
     mat4::multiply(matrix, projMatrix, mvMatrix);
 }
@@ -156,7 +154,7 @@ void Painter::render(const tile::ptr& tile) {
     tile->lineVertex.bind();
     glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
     glUniform4f(outlineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
-    glUniform2f(outlineShader->u_world, transform->width, transform->height);
+    glUniform2f(outlineShader->u_world, transform.width, transform.height);
     glLineWidth(2.0f);
     glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
 

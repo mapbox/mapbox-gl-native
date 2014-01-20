@@ -12,14 +12,13 @@ using namespace llmr;
 
 Map::Map(Settings& settings)
     : settings(settings),
-      transform(new class transform()),
+      transform(),
       painter(transform, settings),
       min_zoom(0),
       max_zoom(14) {
 }
 
 Map::~Map() {
-    delete transform;
 }
 
 void Map::setup() {
@@ -27,60 +26,60 @@ void Map::setup() {
 }
 
 void Map::loadSettings() {
-    transform->setAngle(settings.angle);
-    transform->setScale(settings.scale);
-    transform->setLonLat(settings.longitude, settings.latitude);
+    transform.setAngle(settings.angle);
+    transform.setScale(settings.scale);
+    transform.setLonLat(settings.longitude, settings.latitude);
     update();
 }
 
 void Map::resize(uint32_t width, uint32_t height) {
-    transform->width = width;
-    transform->height = height;
+    transform.width = width;
+    transform.height = height;
     update();
 }
 
 void Map::moveBy(double dx, double dy) {
-    transform->moveBy(dx, dy);
+    transform.moveBy(dx, dy);
     update();
 
-    transform->getLonLat(settings.longitude, settings.latitude);
+    transform.getLonLat(settings.longitude, settings.latitude);
     settings.save();
 }
 
 void Map::scaleBy(double ds, double cx, double cy) {
-    transform->scaleBy(ds, cx, cy);
+    transform.scaleBy(ds, cx, cy);
     update();
 
-    transform->getLonLat(settings.longitude, settings.latitude);
-    settings.scale = transform->getScale();
+    transform.getLonLat(settings.longitude, settings.latitude);
+    settings.scale = transform.getScale();
     settings.save();
 }
 
 void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey) {
-    transform->rotateBy(cx, cy, sx, sy, ex, ey);
+    transform.rotateBy(cx, cy, sx, sy, ex, ey);
     update();
 
-    settings.angle = transform->getAngle();
+    settings.angle = transform.getAngle();
     settings.save();
 }
 
 void Map::resetNorth() {
-    transform->setAngle(0, 0.5); // 500 ms
+    transform.setAngle(0, 0.5); // 500 ms
     update();
 
-    settings.angle = transform->getAngle();
+    settings.angle = transform.getAngle();
     settings.save();
 }
 
 void Map::resetPosition() {
-    transform->setAngle(0);
-    transform->setLonLat(0, 0);
-    transform->setZoom(0);
+    transform.setAngle(0);
+    transform.setLonLat(0, 0);
+    transform.setZoom(0);
     update();
 
-    transform->getLonLat(settings.longitude, settings.latitude);
-    settings.scale = transform->getScale();
-    settings.angle = transform->getAngle();
+    transform.getLonLat(settings.longitude, settings.latitude);
+    settings.scale = transform.getScale();
+    settings.angle = transform.getAngle();
     settings.save();
 }
 
@@ -177,7 +176,7 @@ bool Map::findLoadedParent(const tile_id& id, int32_t minCoveringZoom, std::forw
 
 void Map::updateTiles() {
     // Figure out what tiles we need to load
-    int32_t zoom = transform->getZoom();
+    int32_t zoom = transform.getZoom();
     if (zoom > max_zoom) zoom = max_zoom;
     if (zoom < min_zoom) zoom = min_zoom;
 
@@ -192,7 +191,7 @@ void Map::updateTiles() {
 
     // Map four viewport corners to pixel coordinates
     box box;
-    transform->mapCornersToBox(zoom, box);
+    transform.mapCornersToBox(zoom, box);
 
     vec2<int32_t> tl, br;
     tl.x = fmax(0, floor(fmin(box.tl.x, box.bl.x)));
@@ -261,7 +260,7 @@ void Map::updateTiles() {
 }
 
 bool Map::render() {
-    transform->updateAnimations();
+    transform.updateAnimations();
 
     painter.clear();
 
@@ -272,7 +271,7 @@ bool Map::render() {
         }
     }
 
-    return transform->needsAnimation();
+    return transform.needsAnimation();
 }
 
 void Map::tileLoaded(tile::ptr tile) {

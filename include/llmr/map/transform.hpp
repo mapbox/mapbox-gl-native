@@ -12,17 +12,15 @@ namespace llmr {
 
 struct box;
 
-class tile;
-
-class transform {
+class Transform {
 public:
-    transform();
+    Transform();
 
     // Make noncopyable
-    transform(const transform&) = delete;
-    transform(const transform&&) = delete;
-    transform &operator=(const transform&) = delete;
-    transform &operator=(const transform&&) = delete;
+    Transform(const Transform&) = delete;
+    Transform(const Transform&&) = delete;
+    Transform &operator=(const Transform&) = delete;
+    Transform &operator=(const Transform&&) = delete;
 
     // Animations
     bool needsAnimation() const;
