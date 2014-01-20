@@ -1,13 +1,13 @@
 #include <llmr/renderer/shader-line.hpp>
-#include <llmr/shader/shaders.h>
+#include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 
 using namespace llmr;
 
 LineShader::LineShader()
     : Shader(
-        llmr_shaders[LINE_SHADER].vertex,
-        llmr_shaders[LINE_SHADER].fragment
+        shaders[LINE_SHADER].vertex,
+        shaders[LINE_SHADER].fragment
     ) {
     if (!valid) {
         fprintf(stderr, "invalid line shader\n");

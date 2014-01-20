@@ -1,13 +1,13 @@
 #include <llmr/renderer/shader-fill.hpp>
-#include <llmr/shader/shaders.h>
+#include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 
 using namespace llmr;
 
 FillShader::FillShader()
     : Shader(
-        llmr_shaders[FILL_SHADER].vertex,
-        llmr_shaders[FILL_SHADER].fragment
+        shaders[FILL_SHADER].vertex,
+        shaders[FILL_SHADER].fragment
     ) {
     if (!valid) {
         fprintf(stderr, "invalid fill shader\n");

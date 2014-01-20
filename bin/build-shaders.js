@@ -39,39 +39,36 @@ module.exports = function() {
     header += '#ifndef LLMR_SHADER_SHADERS\n';
     header += '#define LLMR_SHADER_SHADERS\n';
     header += '\n';
-    header += '#ifdef __cplusplus\n';
-    header += 'extern "C" {\n';
-    header += '#endif\n';
+    header += 'namespace llmr {\n';
     header += '\n';
-    header += 'struct llmr_shader {\n';
+    header += 'struct shader_source {\n';
     header += '    const char *vertex;\n';
     header += '    const char *fragment;\n';
     header += '};\n';
-    header += 'typedef struct llmr_shader llmr_shader_t;\n'
     header += '\n';
     header += 'enum {\n';
     consts.push('SHADER_COUNT');
     header += '    ' + consts.join(',\n    ') + '\n';
     header += '};\n';
     header += '\n';
-    header += 'extern const llmr_shader_t llmr_shaders[SHADER_COUNT];\n';
+    header += 'const shader_source shaders[SHADER_COUNT];\n';
     header += '\n';
-    header += '#ifdef __cplusplus\n';
     header += '}\n';
-    header += '#endif\n';
     header += '\n';
     header += '#endif\n';
-    fs.writeFileSync('include/llmr/shader/shaders.h', header);
+    fs.writeFileSync('include/llmr/shader/shaders.hpp', header);
 
 
     var code = '// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.\n';
-    code += '#include <llmr/shader/shaders.h>\n';
+    code += '#include <llmr/shader/shaders.hpp>\n';
     code += '\n';
-    code += 'const llmr_shader_t llmr_shaders[SHADER_COUNT] = {\n';
+    code += 'using namespace llmr;\n';
+    code += '\n';
+    code += 'const shader_source shaders[SHADER_COUNT] = {\n';
     code += lines.join(',\n');
     code += '\n};\n';
 
-    fs.writeFileSync('src/shader/shaders.c', code);
+    fs.writeFileSync('src/shader/shaders.cpp', code);
 };
 
 module.exports();

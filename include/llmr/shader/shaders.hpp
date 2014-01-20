@@ -3,15 +3,12 @@
 #ifndef LLMR_SHADER_SHADERS
 #define LLMR_SHADER_SHADERS
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace llmr {
 
-struct llmr_shader {
+struct shader_source {
     const char *vertex;
     const char *fragment;
 };
-typedef struct llmr_shader llmr_shader_t;
 
 enum {
     FILL_SHADER,
@@ -20,10 +17,8 @@ enum {
     SHADER_COUNT
 };
 
-extern const llmr_shader_t llmr_shaders[SHADER_COUNT];
+extern const shader_source shaders[SHADER_COUNT];
 
-#ifdef __cplusplus
 }
-#endif
 
 #endif

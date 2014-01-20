@@ -9,7 +9,7 @@ SET(llmr_SOURCES
     renderer/shader-line.cpp
     renderer/shader-outline.cpp
     renderer/shader.cpp
-    shader/shaders.c
+    shader/shaders.cpp
     util/animation.cpp
     util/mat4.c
 )
@@ -28,6 +28,7 @@ SET(llmr_HEADERS
     ../include/llmr/renderer/shader-line.hpp
     ../include/llmr/renderer/shader-outline.hpp
     ../include/llmr/renderer/shader.hpp
+    ../include/llmr/shader/shaders.hpp
     ../include/llmr/util/animation.hpp
     ../include/llmr/util/math.hpp
     ../include/llmr/util/vec2.hpp

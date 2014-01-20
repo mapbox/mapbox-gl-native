@@ -1,13 +1,13 @@
 #include <llmr/renderer/shader-outline.hpp>
-#include <llmr/shader/shaders.h>
+#include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 
 using namespace llmr;
 
 OutlineShader::OutlineShader()
     : Shader(
-        llmr_shaders[OUTLINE_SHADER].vertex,
-        llmr_shaders[OUTLINE_SHADER].fragment
+        shaders[OUTLINE_SHADER].vertex,
+        shaders[OUTLINE_SHADER].fragment
     ) {
     if (!valid) {
         fprintf(stderr, "invalid outline shader\n");
