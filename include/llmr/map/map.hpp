@@ -11,10 +11,10 @@
 
 namespace llmr {
 
-class map {
+class Map {
 public:
-    map(Settings& settings);
-    ~map();
+    Map(Settings& settings);
+    ~Map();
 
     void setup();
     void loadSettings();

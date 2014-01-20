@@ -195,7 +195,7 @@ public:
 
     GLFWwindow *window;
     llmr::Settings_MacOSX settings;
-    llmr::map map;
+    llmr::Map map;
 };
 
 NSOperationQueue *queue = NULL;

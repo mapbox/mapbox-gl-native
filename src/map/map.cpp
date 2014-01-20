@@ -10,7 +10,7 @@
 
 using namespace llmr;
 
-map::map(Settings& settings)
+Map::Map(Settings& settings)
     : settings(settings),
       transform(new class transform()),
       painter(new class painter(transform, settings)),
@@ -18,28 +18,28 @@ map::map(Settings& settings)
       max_zoom(14) {
 }
 
-map::~map() {
+Map::~Map() {
     delete transform;
 }
 
-void map::setup() {
+void Map::setup() {
     painter->setup();
 }
 
-void map::loadSettings() {
+void Map::loadSettings() {
     transform->setAngle(settings.angle);
     transform->setScale(settings.scale);
     transform->setLonLat(settings.longitude, settings.latitude);
     update();
 }
 
-void map::resize(uint32_t width, uint32_t height) {
+void Map::resize(uint32_t width, uint32_t height) {
     transform->width = width;
     transform->height = height;
     update();
 }
 
-void map::moveBy(double dx, double dy) {
+void Map::moveBy(double dx, double dy) {
     transform->moveBy(dx, dy);
     update();
 
@@ -47,7 +47,7 @@ void map::moveBy(double dx, double dy) {
     settings.save();
 }
 
-void map::scaleBy(double ds, double cx, double cy) {
+void Map::scaleBy(double ds, double cx, double cy) {
     transform->scaleBy(ds, cx, cy);
     update();
 
@@ -56,7 +56,7 @@ void map::scaleBy(double ds, double cx, double cy) {
     settings.save();
 }
 
-void map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey) {
+void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey) {
     transform->rotateBy(cx, cy, sx, sy, ex, ey);
     update();
 
@@ -64,7 +64,7 @@ void map::rotateBy(double cx, double cy, double sx, double sy, double ex, double
     settings.save();
 }
 
-void map::resetNorth() {
+void Map::resetNorth() {
     transform->setAngle(0, 0.5); // 500 ms
     update();
 
@@ -72,7 +72,7 @@ void map::resetNorth() {
     settings.save();
 }
 
-void map::resetPosition() {
+void Map::resetPosition() {
     transform->setAngle(0);
     transform->setLonLat(0, 0);
     transform->setZoom(0);
@@ -84,20 +84,20 @@ void map::resetPosition() {
     settings.save();
 }
 
-void map::toggleDebug() {
+void Map::toggleDebug() {
     settings.debug = !settings.debug;
     update();
 
     settings.save();
 }
 
-void map::update() {
+void Map::update() {
     updateTiles();
     platform::restart(this);
 }
 
 
-tile::ptr map::hasTile(const tile_id& id) {
+tile::ptr Map::hasTile(const tile_id& id) {
     for (tile::ptr& tile : tiles) {
         if (tile->id == id) {
             return tile;
@@ -107,7 +107,7 @@ tile::ptr map::hasTile(const tile_id& id) {
     return tile::ptr();
 }
 
-tile::ptr map::addTile(const tile_id& id) {
+tile::ptr Map::addTile(const tile_id& id) {
     tile::ptr tile = hasTile(id);
 
     if (!tile.get()) {
@@ -131,7 +131,7 @@ tile::ptr map::addTile(const tile_id& id) {
  *
  * @return boolean Whether the children found completely cover the tile.
  */
-bool map::findLoadedChildren(const tile_id& id, int32_t maxCoveringZoom, std::forward_list<tile_id>& retain) {
+bool Map::findLoadedChildren(const tile_id& id, int32_t maxCoveringZoom, std::forward_list<tile_id>& retain) {
     bool complete = true;
     int32_t z = id.z;
 
@@ -161,7 +161,7 @@ bool map::findLoadedChildren(const tile_id& id, int32_t maxCoveringZoom, std::fo
  *
  * @return boolean Whether a parent was found.
  */
-bool map::findLoadedParent(const tile_id& id, int32_t minCoveringZoom, std::forward_list<tile_id>& retain) {
+bool Map::findLoadedParent(const tile_id& id, int32_t minCoveringZoom, std::forward_list<tile_id>& retain) {
     for (int32_t z = id.z - 1; z >= minCoveringZoom; z--) {
         const tile_id parent_id = tile::parent(id, z);
         const tile::ptr tile = hasTile(parent_id);
@@ -175,7 +175,7 @@ bool map::findLoadedParent(const tile_id& id, int32_t minCoveringZoom, std::forw
 };
 
 
-void map::updateTiles() {
+void Map::updateTiles() {
     // Figure out what tiles we need to load
     int32_t zoom = transform->getZoom();
     if (zoom > max_zoom) zoom = max_zoom;
@@ -260,7 +260,7 @@ void map::updateTiles() {
     });
 }
 
-bool map::render() {
+bool Map::render() {
     transform->updateAnimations();
 
     painter->clear();
@@ -275,12 +275,12 @@ bool map::render() {
     return transform->needsAnimation();
 }
 
-void map::tileLoaded(tile::ptr tile) {
+void Map::tileLoaded(tile::ptr tile) {
     // std::cerr << "loaded " << tile->toString() << std::endl;
     update();
 }
 
-void map::tileFailed(tile::ptr tile) {
+void Map::tileFailed(tile::ptr tile) {
     // fprintf(stderr, "[%8zx] tile failed to load %d/%d/%d\n",
     //         std::hash<std::thread::id>()(std::this_thread::get_id()),
     //         tile->z, tile->x, tile->y);
