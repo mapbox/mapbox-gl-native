@@ -16,6 +16,13 @@ public:
     Map(Settings& settings);
     ~Map();
 
+
+    // Make noncopyable
+    Map(const Map&) = delete;
+    Map(const Map&&) = delete;
+    Map &operator=(const Map&) = delete;
+    Map &operator=(const Map&&) = delete;
+
     void setup();
     void loadSettings();
     void resize(uint32_t width, uint32_t height);
