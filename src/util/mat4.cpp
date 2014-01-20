@@ -20,11 +20,13 @@
 //
 // 3. This notice may not be removed or altered from any source distribution.
 
-#include <llmr/util/mat4.h>
+#include <llmr/util/mat4.hpp>
 
-#include <math.h>
+#include <cmath>
 
-void mat4_identity(float out[16]) {
+using namespace llmr;
+
+void mat4::identity(float out[16]) {
     out[0] = 1.0f;
     out[1] = 0.0f;
     out[2] = 0.0f;
@@ -43,7 +45,7 @@ void mat4_identity(float out[16]) {
     out[15] = 1.0f;
 }
 
-void mat4_ortho(float out[16], float left, float right, float bottom, float top, float near, float far) {
+void mat4::ortho(float out[16], float left, float right, float bottom, float top, float near, float far) {
     float lr = 1.0f / (left - right),
           bt = 1.0f / (bottom - top),
           nf = 1.0f / (near - far);
@@ -65,7 +67,7 @@ void mat4_ortho(float out[16], float left, float right, float bottom, float top,
     out[15] = 1.0f;
 }
 
-void mat4_copy(float out[16], float a[16]) {
+void mat4::copy(float out[16], float a[16]) {
     out[0] = a[0];
     out[1] = a[1];
     out[2] = a[2];
@@ -84,7 +86,7 @@ void mat4_copy(float out[16], float a[16]) {
     out[15] = a[15];
 }
 
-void mat4_translate(float out[16], float a[16], float x, float y, float z) {
+void mat4::translate(float out[16], float a[16], float x, float y, float z) {
     float a00, a01, a02, a03,
           a10, a11, a12, a13,
           a20, a21, a22, a23;
@@ -110,7 +112,7 @@ void mat4_translate(float out[16], float a[16], float x, float y, float z) {
     }
 }
 
-void mat4_rotate_z(float out[16], float a[16], float rad) {
+void mat4::rotate_z(float out[16], float a[16], float rad) {
     float s = sin(rad),
           c = cos(rad),
           a00 = a[0],
@@ -144,7 +146,7 @@ void mat4_rotate_z(float out[16], float a[16], float rad) {
     out[7] = a13 * c - a03 * s;
 }
 
-void mat4_scale(float out[16], float a[16], float x, float y, float z) {
+void mat4::scale(float out[16], float a[16], float x, float y, float z) {
     out[0] = a[0] * x;
     out[1] = a[1] * x;
     out[2] = a[2] * x;
@@ -163,7 +165,7 @@ void mat4_scale(float out[16], float a[16], float x, float y, float z) {
     out[15] = a[15];
 }
 
-void mat4_multiply(float out[16], float a[16], float b[16]) {
+void mat4::multiply(float out[16], float a[16], float b[16]) {
     float a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
           a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
           a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],

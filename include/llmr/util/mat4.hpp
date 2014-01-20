@@ -20,23 +20,21 @@
 //
 // 3. This notice may not be removed or altered from any source distribution.
 
-#ifndef llmr_util_mat4_
-#define llmr_util_mat4_
+#ifndef LLMR_UTIL_MAT4
+#define LLMR_UTIL_MAT4
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace llmr {
+namespace mat4 {
 
-void mat4_identity(float out[16]);
-void mat4_ortho(float out[16], float left, float right, float bottom, float top, float near, float far);
-void mat4_copy(float out[16], float a[16]);
-void mat4_translate(float out[16], float a[16], float x, float y, float z);
-void mat4_rotate_z(float out[16], float a[16], float rad);
-void mat4_scale(float out[16], float a[16], float x, float y, float z);
-void mat4_multiply(float out[16], float a[16], float b[16]);
+void identity(float out[16]);
+void ortho(float out[16], float left, float right, float bottom, float top, float near, float far);
+void copy(float out[16], float a[16]);
+void translate(float out[16], float a[16], float x, float y, float z);
+void rotate_z(float out[16], float a[16], float rad);
+void scale(float out[16], float a[16], float x, float y, float z);
+void multiply(float out[16], float a[16], float b[16]);
 
-#ifdef __cplusplus
 }
-#endif
+}
 
 #endif

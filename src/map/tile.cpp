@@ -6,7 +6,6 @@
 #include <thread>
 
 #include <llmr/util/pbf.hpp>
-#include <llmr/util/vec2.hpp>
 #include <llmr/util/string.hpp>
 #include <llmr/geometry/geometry.hpp>
 #include <cmath>

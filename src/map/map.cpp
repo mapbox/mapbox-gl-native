@@ -1,6 +1,6 @@
 #include <llmr/map/map.hpp>
 #include <llmr/map/tile.hpp>
-#include <llmr/util/vec2.hpp>
+//#include <llmr/util/vec2.hpp>
 
 #include <iostream>
 #include <thread>

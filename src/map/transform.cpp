@@ -1,5 +1,5 @@
 #include <llmr/map/transform.hpp>
-#include <llmr/util/mat4.h>
+#include <llmr/util/mat4.hpp>
 #include <llmr/util/math.hpp>
 #include <cmath>
 #include <cstdio>
@@ -149,19 +149,19 @@ void transform::matrixFor(float matrix[16], const vec3<int32_t>& id) const {
     const double tile_scale = pow(2, id.z);
     const double tile_size = scale * size / tile_scale;
 
-    mat4_identity(matrix);
+    mat4::identity(matrix);
 
-    mat4_translate(matrix, matrix, 0.5f * (float)width, 0.5f * (float)height, 0);
-    mat4_rotate_z(matrix, matrix, angle);
-    mat4_translate(matrix, matrix, -0.5f * (float)width, -0.5f * (float)height, 0);
+    mat4::translate(matrix, matrix, 0.5f * (float)width, 0.5f * (float)height, 0);
+    mat4::rotate_z(matrix, matrix, angle);
+    mat4::translate(matrix, matrix, -0.5f * (float)width, -0.5f * (float)height, 0);
 
-    mat4_translate(matrix, matrix, pixel_x() + id.x * tile_size, pixel_y() + id.y * tile_size, 0);
+    mat4::translate(matrix, matrix, pixel_x() + id.x * tile_size, pixel_y() + id.y * tile_size, 0);
 
     // TODO: Get rid of the 8 (scaling from 4096 to 512 px tile size);
-    mat4_scale(matrix, matrix, scale / tile_scale / 8, scale / tile_scale / 8, 1);
+    mat4::scale(matrix, matrix, scale / tile_scale / 8, scale / tile_scale / 8, 1);
 
     // Clipping plane
-    mat4_translate(matrix, matrix, 0, 0, -1);
+    mat4::translate(matrix, matrix, 0, 0, -1);
 }
 
 int32_t transform::getZoom() const {

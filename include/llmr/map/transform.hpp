@@ -2,7 +2,7 @@
 #define LLMR_MAP_TRANSFORM
 
 
-#include <llmr/util/vec2.hpp>
+#include <llmr/util/vec.hpp>
 #include <llmr/util/animation.hpp>
 
 #include <cstdint>

@@ -11,7 +11,7 @@ SET(llmr_SOURCES
     renderer/shader.cpp
     shader/shaders.cpp
     util/animation.cpp
-    util/mat4.c
+    util/mat4.cpp
 )
 
 SET(llmr_HEADERS
@@ -31,6 +31,7 @@ SET(llmr_HEADERS
     ../include/llmr/shader/shaders.hpp
     ../include/llmr/util/animation.hpp
     ../include/llmr/util/math.hpp
+    ../include/llmr/util/mat4.hpp
     ../include/llmr/util/vec2.hpp
 )
 

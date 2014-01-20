@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <forward_list>
 #include <mutex>
-#include <llmr/util/vec2.hpp>
+#include <llmr/util/vec.hpp>
 
 namespace llmr {
 

@@ -1,7 +1,7 @@
 #include <llmr/renderer/painter.hpp>
 #include <iostream>
 #include <assert.h>
-#include <llmr/util/mat4.h>
+#include <llmr/util/mat4.hpp>
 #include <llmr/platform/platform.hpp>
 #include <llmr/map/transform.hpp>
 #include <llmr/map/tile.hpp>
@@ -88,12 +88,12 @@ void painter::changeMatrix(const tile::ptr& tile) {
 
     // Initialize projection matrix
     float projMatrix[16];
-    mat4_ortho(projMatrix, 0, transform->width, transform->height, 0, 1, 10);
+    mat4::ortho(projMatrix, 0, transform->width, transform->height, 0, 1, 10);
 
     float mvMatrix[16];
     transform->matrixFor(mvMatrix, tile->id);
 
-    mat4_multiply(matrix, projMatrix, mvMatrix);
+    mat4::multiply(matrix, projMatrix, mvMatrix);
 }
 
 void painter::drawClippingMask() {
