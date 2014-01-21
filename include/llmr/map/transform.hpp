@@ -53,9 +53,13 @@ private:
     double pixel_y() const;
 
 public:
+    // logical dimensions
     uint32_t width;
     uint32_t height;
 
+    // physical (framebuffer) dimensions
+    uint32_t fb_width;
+    uint32_t fb_height;
 
 private:
     double x, y; // pixel values of the map center in the current scale

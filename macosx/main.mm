@@ -33,14 +33,13 @@ public:
             exit(1);
         }
 
+        glfwSetWindowUserPointer(window, this);
         glfwMakeContextCurrent(window);
 
         settings.load();
         map.setup();
 
-        int width, height;
-        glfwGetWindowSize(window, &width, &height);
-        map.resize(width, height);
+        resize(window, 0, 0);
 
         glfwSwapInterval(1);
 
@@ -49,11 +48,10 @@ public:
         glfwSetCursorPosCallback(window, mousemove);
         glfwSetMouseButtonCallback(window, mouseclick);
         glfwSetWindowSizeCallback(window, resize);
+        glfwSetFramebufferSizeCallback(window, resize);
         glfwSetScrollCallback(window, scroll);
         glfwSetCharCallback(window, character);
         glfwSetKeyCallback(window, key);
-
-        glfwSetWindowUserPointer(window, this);
     }
 
     static void character(GLFWwindow *window, unsigned int codepoint) {
@@ -105,9 +103,15 @@ public:
         view->map.scaleBy(scale, view->last_x, view->last_y);
     }
 
-    static void resize(GLFWwindow *window, int width, int height) {
+    static void resize(GLFWwindow *window, int, int) {
         MapView *view = (MapView *)glfwGetWindowUserPointer(window);
-        view->map.resize(width, height);
+
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+        int fb_width, fb_height;
+        glfwGetFramebufferSize(window, &fb_width, &fb_height);
+
+        view->map.resize(width, height, fb_width, fb_height);
     }
 
     static void mouseclick(GLFWwindow *window, int button, int action, int modifiers) {

@@ -32,9 +32,11 @@ void Map::loadSettings() {
     update();
 }
 
-void Map::resize(uint32_t width, uint32_t height) {
+void Map::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb_height) {
     transform.width = width;
     transform.height = height;
+    transform.fb_width = fb_width;
+    transform.fb_height = fb_height;
     update();
 }
 

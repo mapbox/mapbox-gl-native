@@ -25,7 +25,7 @@ public:
 
     void setup();
     void loadSettings();
-    void resize(uint32_t width, uint32_t height);
+    void resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb_height);
 
     /* callback */
     bool render();

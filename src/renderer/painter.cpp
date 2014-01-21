@@ -154,7 +154,7 @@ void Painter::render(const Tile::Ptr& tile) {
     tile->lineVertex.bind();
     glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
     glUniform4f(outlineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
-    glUniform2f(outlineShader->u_world, transform.width, transform.height);
+    glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
     glLineWidth(2.0f);
     glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
 
