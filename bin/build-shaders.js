@@ -51,7 +51,7 @@ module.exports = function() {
     header += '    ' + consts.join(',\n    ') + '\n';
     header += '};\n';
     header += '\n';
-    header += 'const shader_source shaders[SHADER_COUNT];\n';
+    header += 'extern const shader_source shaders[SHADER_COUNT];\n';
     header += '\n';
     header += '}\n';
     header += '\n';
@@ -64,7 +64,7 @@ module.exports = function() {
     code += '\n';
     code += 'using namespace llmr;\n';
     code += '\n';
-    code += 'const shader_source shaders[SHADER_COUNT] = {\n';
+    code += 'const shader_source llmr::shaders[SHADER_COUNT] = {\n';
     code += lines.join(',\n');
     code += '\n};\n';
 

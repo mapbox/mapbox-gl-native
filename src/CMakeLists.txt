@@ -32,7 +32,7 @@ SET(llmr_HEADERS
     ../include/llmr/util/animation.hpp
     ../include/llmr/util/math.hpp
     ../include/llmr/util/mat4.hpp
-    ../include/llmr/util/vec2.hpp
+    ../include/llmr/util/vec.hpp
 )
 
 INCLUDE_DIRECTORIES(
