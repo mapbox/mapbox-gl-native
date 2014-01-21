@@ -85,22 +85,20 @@ bool Tile::parse() {
     // fprintf(stderr, "[%p] parsing tile [%d/%d/%d]...\n", this, z, x, y);
 
     pbf tile(data, bytes);
-
-    int code = setjmp(tile.jump_buffer);
-    if (code > 0) {
-        fprintf(stderr, "[%p] parsing tile [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, tile.msg.c_str());
+    try {
+        while (tile.next()) {
+            if (tile.tag == 3) { // layer
+                uint32_t bytes = (uint32_t)tile.varint();
+                parseLayer(tile.data, bytes);
+                tile.skipBytes(bytes);
+            } else {
+                tile.skip();
+            }
+        }
+    } catch(const pbf::exception& ex) {
+        fprintf(stderr, "[%p] parsing tile [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
         cancel();
         return false;
-    }
-
-    while (tile.next()) {
-        if (tile.tag == 3) { // layer
-            uint32_t bytes = (uint32_t)tile.varint();
-            parseLayer(tile.data, bytes);
-            tile.skipBytes(bytes);
-        } else {
-            tile.skip();
-        }
     }
 
     if (state == obsolete) {
