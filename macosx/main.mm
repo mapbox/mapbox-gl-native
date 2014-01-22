@@ -249,8 +249,11 @@ void request(void *, Tile::Ptr tile) {
                     });
                     return;
                 }
+                // fall through to report tileFailed
             }
+            // fall through to report tileFailed
         }
+        // fall through to report tileFailed
 
         dispatch_async(dispatch_get_main_queue(), ^ {
             view->map.tileFailed(tile);

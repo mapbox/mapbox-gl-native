@@ -7,9 +7,9 @@
 
 namespace llmr {
 
-class geometry {
+class Geometry {
 public:
-    inline geometry(const uint8_t *data, uint32_t bytes);
+    inline Geometry(pbf& data);
 
     enum command {
         end = 0,
@@ -21,24 +21,24 @@ public:
     inline command next(int32_t &rx, int32_t &ry);
 
 private:
-    pbf pbf;
+    pbf& data;
     uint32_t cmd;
     uint32_t length;
     int32_t x, y;
     int32_t ox, oy;
 };
 
-geometry::geometry(const uint8_t *data, uint32_t bytes)
-    : pbf(data, bytes),
+Geometry::Geometry(pbf& data)
+    : data(data),
       cmd(1),
       length(0),
       x(0), y(0),
       ox(0), oy(0) {}
 
-geometry::command geometry::next(int32_t &rx, int32_t &ry) {
-    if (pbf.data < pbf.end) {
+Geometry::command Geometry::next(int32_t &rx, int32_t &ry) {
+    if (data.data < data.end) {
         if (!length) {
-            uint32_t cmd_length = (uint32_t)pbf.varint();
+            uint32_t cmd_length = (uint32_t)data.varint();
             cmd = cmd_length & 0x7;
             length = cmd_length >> 3;
         }
@@ -46,8 +46,8 @@ geometry::command geometry::next(int32_t &rx, int32_t &ry) {
         length--;
 
         if (cmd == move_to || cmd == line_to) {
-            rx = (x += pbf.svarint());
-            ry = (y += pbf.svarint());
+            rx = (x += data.svarint());
+            ry = (y += data.svarint());
 
             if (cmd == move_to) {
                 ox = x;

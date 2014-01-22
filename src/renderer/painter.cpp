@@ -8,6 +8,8 @@
 #include <llmr/platform/gl.hpp>
 #include <llmr/map/settings.hpp>
 
+#include <numeric>
+
 using namespace llmr;
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -151,6 +153,7 @@ void Painter::render(const Tile::Ptr& tile) {
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
     // glDisable(GL_STENCIL_TEST);
 
+    // draw lines:
     tile->lineVertex.bind();
     glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
     glUniform4f(outlineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
@@ -158,6 +161,31 @@ void Painter::render(const Tile::Ptr& tile) {
     glLineWidth(2.0f);
     glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
 
+    // draw fills:
+    tile->fillBuffer.bind();
+    float i = 0.0f;
+    for (const Tile::fill_index& index : tile->fillIndices) {
+        if (!index.length) continue;
+
+        glUniform4f(outlineShader->u_color, i, 0.0f, 1.0f, 0.5f);
+        glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
+        glLineWidth(2.0f);
+
+        char *vertex_index = BUFFER_OFFSET(index.vertex_start * 2 * sizeof(uint16_t));
+        char *elements_index = BUFFER_OFFSET(index.elements_start * 3 * sizeof(uint16_t));
+        for (const Tile::fill_index::group& group : index.groups) {
+            glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
+            glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
+            vertex_index += group.vertex_length * 2 * sizeof(uint16_t);
+            elements_index += group.elements_length * 3 * sizeof(uint16_t);
+        }
+
+        vertex_index = BUFFER_OFFSET(index.vertex_start * 2 * sizeof(uint16_t));
+        glUniform4f(outlineShader->u_color, i, 1.0f, 1.0f, 1.0f);
+        glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
+        glDrawArrays(GL_LINE_STRIP, 0, index.length);
+        i += 0.1f;
+    }
 
     if (settings.debug) {
         renderDebug(tile);
@@ -198,8 +226,8 @@ bool Painter::switchShader(Shader *shader) {
         // Disable all attributes from the existing shader that aren't used in
         // the new shader. Note: attribute indices are *not* program specific!
         if (currentShader) {
-            const std::forward_list<uint32_t> &hitherto = currentShader->attributes;
-            const std::forward_list<uint32_t> &henceforth = shader->attributes;
+            const std::forward_list<uint32_t>& hitherto = currentShader->attributes;
+            const std::forward_list<uint32_t>& henceforth = shader->attributes;
 
             // Find all attribute indices that are used in the old shader,
             // but unused in the new one.

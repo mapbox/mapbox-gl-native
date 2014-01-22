@@ -24,6 +24,9 @@ struct pbf {
     struct end_of_buffer_exception : exception {};
 
     inline pbf(const unsigned char *data, uint32_t length);
+    inline pbf();
+
+    inline operator bool() const;
 
     inline bool next();
     template <typename T = uint32_t> inline T varint();
@@ -32,6 +35,8 @@ struct pbf {
     inline float float32();
     inline double float64();
     inline bool boolean();
+
+    inline pbf message();
 
     inline void skip();
     inline void skipValue(uint32_t val);
@@ -46,6 +51,16 @@ struct pbf {
 pbf::pbf(const unsigned char *data, uint32_t length)
     : data(data),
       end(data + length) {
+}
+
+pbf::pbf()
+    : data(NULL),
+      end(NULL) {
+}
+
+
+pbf::operator bool() const {
+    return data < end;
 }
 
 bool pbf::next() {
@@ -110,6 +125,13 @@ bool pbf::boolean() {
     return *(bool *)(data - 1);
 }
 
+pbf pbf::message() {
+    uint32_t bytes = (uint32_t)varint();
+    const uint8_t *pos = data;
+    skipBytes(bytes);
+    return pbf(pos, bytes);
+}
+
 void pbf::skip() {
     skipValue(value);
 }
@@ -134,10 +156,10 @@ void pbf::skipValue(uint32_t val) {
 }
 
 void pbf::skipBytes(uint32_t bytes) {
-    data += bytes;
-    if (data > end) {
+    if (data + bytes > end) {
         throw end_of_buffer_exception();
     }
+    data += bytes;
 }
 
 } // end namespace llmr
