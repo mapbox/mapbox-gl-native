@@ -29,6 +29,8 @@ public:
     void render(const std::shared_ptr<Tile>& tile);
     void renderDebug(const std::shared_ptr<Tile>& tile);
 
+    void renderBackground();
+
     void drawClippingMask();
     bool switchShader(Shader *shader);
 

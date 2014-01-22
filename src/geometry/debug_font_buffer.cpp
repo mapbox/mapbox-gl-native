@@ -15,6 +15,7 @@ debug_font_buffer::debug_font_buffer()
 debug_font_buffer::~debug_font_buffer() {
     if (buffer != 0) {
         glDeleteBuffers(1, &buffer);
+        buffer = 0;
     }
 }
 

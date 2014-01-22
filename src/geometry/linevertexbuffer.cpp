@@ -12,6 +12,7 @@ linevertexbuffer::linevertexbuffer()
 linevertexbuffer::~linevertexbuffer() {
     if (buffer != 0) {
         glDeleteBuffers(1, &buffer);
+        buffer = 0;
     }
 }
 

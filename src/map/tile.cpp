@@ -51,6 +51,8 @@ Tile::Tile(ID id)
 }
 
 Tile::~Tile() {
+    std::lock_guard<std::mutex> lock(mtx);
+
     // fprintf(stderr, "[%p] deleting tile %d/%d/%d\n", this, id.z, id.x, id.y);
     if (this->data) {
         free(this->data);

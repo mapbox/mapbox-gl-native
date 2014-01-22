@@ -8,6 +8,8 @@
 #include <llmr/platform/gl.hpp>
 #include <llmr/map/settings.hpp>
 
+#include <cmath>
+
 #include <numeric>
 
 using namespace llmr;
@@ -59,9 +61,10 @@ void Painter::setup() {
 
     glEnable(GL_STENCIL_TEST);
 
-
+    // We are blending the new pixels *behind* the existing pixels. That way we can
+    // draw front-to-back and use then stencil buffer to cull opaque pixels early.
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
 }
 
 void Painter::setupShaders() {
@@ -131,7 +134,7 @@ void Painter::drawClippingMask() {
 }
 
 void Painter::clear() {
-    glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClearStencil(0x0);
     glStencilMask(0xFF);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -162,37 +165,146 @@ void Painter::render(const Tile::Ptr& tile) {
     glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
 
     // draw fills:
+
+    // TODO: expose this to the stylesheet
+    bool evenodd = false;
+    bool antialiasing = true;
+
+
     tile->fillBuffer.bind();
     float i = 0.0f;
+    fprintf(stderr, "----\n");
     for (const Tile::fill_index& index : tile->fillIndices) {
+        float color[] = { i, i, 1.0f, 1.0f };
+        i = sqrt(i);
         if (!index.length) continue;
+        // if (index.name != "water") continue;
+        fprintf(stderr, "%s: %d\n", index.name.c_str(), index.length);
 
-        glUniform4f(outlineShader->u_color, i, 0.0f, 1.0f, 0.5f);
-        glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
-        glLineWidth(2.0f);
 
-        char *vertex_index = BUFFER_OFFSET(index.vertex_start * 2 * sizeof(uint16_t));
-        char *elements_index = BUFFER_OFFSET(index.elements_start * 3 * sizeof(uint16_t));
-        for (const Tile::fill_index::group& group : index.groups) {
-            glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
-            glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
-            vertex_index += group.vertex_length * 2 * sizeof(uint16_t);
-            elements_index += group.elements_length * 3 * sizeof(uint16_t);
+        glStencilMask(0x0);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glStencilFunc(GL_EQUAL, 0x80, 0x80);
+        glColorMask(true, true, true, true);
+
+        // Draw the stencil mask.
+        {
+            // We're only drawing to the first seven bits (== support a maximum of
+            // 127 overlapping polygons in one place before we get rendering errors).
+            glStencilMask(0x3F);
+            glClear(GL_STENCIL_BUFFER_BIT);
+
+            // Draw front facing triangles. Wherever the 0x80 bit is 1, we are
+            // increasing the lower 7 bits by one if the triangle is a front-facing
+            // triangle. This means that all visible polygons should be in CCW
+            // orientation, while all holes (see below) are in CW orientation.
+            glStencilFunc(GL_NOTEQUAL, 0x80, 0x80);
+
+            if (evenodd) {
+                // When we draw an even/odd winding fill, we just invert all the bits.
+                glStencilOp(GL_INVERT, GL_KEEP, GL_KEEP);
+            } else {
+                // When we do a nonzero fill, we count the number of times a pixel is
+                // covered by a counterclockwise polygon, and subtract the number of
+                // times it is "uncovered" by a clockwise polygon.
+                glStencilOpSeparate(GL_FRONT, GL_INCR_WRAP, GL_KEEP, GL_KEEP);
+                glStencilOpSeparate(GL_BACK, GL_DECR_WRAP, GL_KEEP, GL_KEEP);
+            }
+
+            // When drawing a shape, we first draw all shapes to the stencil buffer
+            // and incrementing all areas where polygons are
+            glColorMask(false, false, false, false);
+
+            // Draw the actual triangle fan into the stencil buffer.
+            switchShader(fillShader);
+            glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
+
+            // Draw all groups
+            char *vertex_index = BUFFER_OFFSET(index.vertex_start * 2 * sizeof(uint16_t));
+            char *elements_index = BUFFER_OFFSET(index.elements_start * 3 * sizeof(uint16_t));
+            for (const Tile::fill_index::group& group : index.groups) {
+                fprintf(stderr, "- vertex: %d, elements: %d, length: %d\n", vertex_index, elements_index, group.elements_length * 3);
+
+                glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
+                glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
+                vertex_index += group.vertex_length * 2 * sizeof(uint16_t);
+                elements_index += group.elements_length * 3 * sizeof(uint16_t);
+            }
+
+            // Now that we have the stencil mask in the stencil buffer, we can start
+            // writing to the color buffer.
+            glColorMask(true, true, true, true);
         }
 
-        vertex_index = BUFFER_OFFSET(index.vertex_start * 2 * sizeof(uint16_t));
-        glUniform4f(outlineShader->u_color, i, 1.0f, 1.0f, 1.0f);
-        glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
-        glDrawArrays(GL_LINE_STRIP, 0, index.length);
-        i += 0.1f;
+        // From now on, we don't want to update the stencil buffer anymore.
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glStencilMask(0x0);
+
+        // // Because we're drawing top-to-bottom, and we update the stencil mask
+        // // below, we have to draw the outline first (!)
+        // if (antialiasing) {
+
+        //     // if (layerStyle.stroke) {
+        //     //     // If we defined a different color for the fill outline, we are
+        //     //     // going to ignore the bits in 0x3F and just care about the global
+        //     //     // clipping mask.
+        //     //     glStencilFunc(GL_EQUAL, 0x80, 0x80);
+        //     // } else {
+        //         // Otherwise, we only want to draw the antialiased parts that are
+        //         // *outside* the current shape. This is important in case the fill
+        //         // or stroke color is translucent. If we wouldn't clip to outside
+        //         // the current shape, some pixels from the outline stroke overlapped
+        //         // the (non-antialiased) fill.
+        //         glStencilFunc(GL_EQUAL, 0x80, 0xBF);
+        //     // }
+
+        //     switchShader(outlineShader);
+        //     glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
+        //     glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
+        //     glUniform4f(outlineShader->u_color, color[0], color[1], color[2], color[3]);
+        //     glLineWidth(2);
+
+        //     // Draw the entire line
+        //     char *vertex_index = BUFFER_OFFSET(index.vertex_start * 2 * sizeof(uint16_t));
+        //     glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
+        //     glLineWidth(2.0f);
+        //     glDrawArrays(GL_LINE_STRIP, 0, index.length);
+        // }
+
+        // Now finally, draw a tile-covering quad that paints the parts of the
+        // image that we marked in the stencil buffer.
+        {
+            // Only draw regions that we marked
+            glStencilFunc(GL_NOTEQUAL, 0x0, 0x3F);
+
+            switchShader(fillShader);
+            glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
+
+            // Draw a rectangle that covers the entire viewport.
+            glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
+            glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+            glUniform4f(fillShader->u_color, color[0], color[1], color[2], color[3]);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, sizeof(tile_stencil_vertices));
+
+            glStencilMask(0x00);
+            glStencilFunc(GL_EQUAL, 0x80, 0x80);
+        }
+
+
+        // break;
     }
 
     if (settings.debug) {
         renderDebug(tile);
     }
+
+    renderBackground();
 }
 
 void Painter::renderDebug(const Tile::Ptr& tile) {
+    // Blend to the front, not the back.
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
     // draw tile outline
     switchShader(lineShader);
     glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
@@ -213,7 +325,22 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
     glUniform4f(lineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
     glLineWidth(2.0f);
     glDrawArrays(GL_LINES, 0, tile->debugFontVertex.length());
+
+    // Revert blending mode to blend to the back.
+    glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
 }
+
+void Painter::renderBackground() {
+    switchShader(fillShader);
+    glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
+
+    // Draw the clipping mask
+    glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
+    glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+    glUniform4f(fillShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, sizeof(tile_stencil_vertices));
+}
+
 
 // Switches to a different shader program.
 /**
