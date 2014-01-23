@@ -14,6 +14,7 @@ Map::Map(Settings& settings)
     : settings(settings),
       transform(),
       painter(transform, settings),
+      style(),
       min_zoom(0),
       max_zoom(14) {
 }
@@ -23,6 +24,11 @@ Map::~Map() {
 
 void Map::setup() {
     painter.setup();
+}
+
+void Map::loadStyle(const uint8_t *data, uint32_t bytes) {
+    style.load(pbf(data, bytes));
+    update();
 }
 
 void Map::loadSettings() {

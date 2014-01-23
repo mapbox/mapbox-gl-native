@@ -91,9 +91,9 @@ void FillBucket::addGeometry(pbf& geom) {
 
 void FillBucket::render(Painter& painter) {
     // TODO: obtain the correct style information for this layer
-    FillStyle style;
-    style.fill_color = {{ 0, 0, 1, 0.5 }};
-    style.stroke_color = style.fill_color;
+    FillProperties properties;
+    properties.fill_color = {{ 0, 0, 1, 0.5 }};
+    properties.stroke_color = properties.fill_color;
 
-    painter.renderFill(*this, style);
+    painter.renderFill(*this, properties);
 }

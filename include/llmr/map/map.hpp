@@ -6,6 +6,7 @@
 #include "transform.hpp"
 #include <llmr/map/tile.hpp>
 #include "settings.hpp"
+#include "../style/style.hpp"
 
 #include <forward_list>
 
@@ -24,6 +25,7 @@ public:
     Map &operator=(const Map&&) = delete;
 
     void setup();
+    void loadStyle(const uint8_t *data, uint32_t bytes);
     void loadSettings();
     void resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb_height);
 
@@ -59,6 +61,7 @@ private:
     Settings& settings;
     Transform transform;
     Painter painter;
+    Style style;
 
     int32_t min_zoom;
     int32_t max_zoom;

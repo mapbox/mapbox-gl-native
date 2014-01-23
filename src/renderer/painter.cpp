@@ -179,7 +179,7 @@ void Painter::render(const Tile::Ptr& tile) {
     renderBackground();
 }
 
-void Painter::renderFill(const FillBucket& bucket, const FillStyle& style) {
+void Painter::renderFill(const FillBucket& bucket, const FillProperties& properties) {
     // Draw the stencil mask.
     {
         // We're only drawing to the first seven bits (== support a maximum of
@@ -193,7 +193,7 @@ void Painter::renderFill(const FillBucket& bucket, const FillStyle& style) {
         // orientation, while all holes (see below) are in CW orientation.
         glStencilFunc(GL_NOTEQUAL, 0x80, 0x80);
 
-        if (style.winding == EvenOdd) {
+        if (properties.winding == EvenOdd) {
             // When we draw an even/odd winding fill, we just invert all the bits.
             glStencilOp(GL_INVERT, GL_KEEP, GL_KEEP);
         } else {
@@ -234,17 +234,17 @@ void Painter::renderFill(const FillBucket& bucket, const FillStyle& style) {
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
-    if (style.antialiasing) {
+    if (properties.antialiasing) {
         switchShader(outlineShader);
         glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
         glLineWidth(2);
 
-        if (style.stroke_color != style.fill_color) {
+        if (properties.stroke_color != properties.fill_color) {
             // If we defined a different color for the fill outline, we are
             // going to ignore the bits in 0x3F and just care about the global
             // clipping mask.
             glStencilFunc(GL_EQUAL, 0x80, 0x80);
-            glUniform4fv(outlineShader->u_color, 1, style.stroke_color.data());
+            glUniform4fv(outlineShader->u_color, 1, properties.stroke_color.data());
         } else {
             // Otherwise, we only want to draw the antialiased parts that are
             // *outside* the current shape. This is important in case the fill
@@ -252,7 +252,7 @@ void Painter::renderFill(const FillBucket& bucket, const FillStyle& style) {
             // the current shape, some pixels from the outline stroke overlapped
             // the (non-antialiased) fill.
             glStencilFunc(GL_EQUAL, 0x80, 0xBF);
-            glUniform4fv(outlineShader->u_color, 1, style.fill_color.data());
+            glUniform4fv(outlineShader->u_color, 1, properties.fill_color.data());
         }
 
         glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
@@ -292,7 +292,7 @@ void Painter::renderFill(const FillBucket& bucket, const FillStyle& style) {
         // Draw filling rectangle.
         switchShader(fillShader);
         glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
-        glUniform4fv(fillShader->u_color, 1, style.fill_color.data());
+        glUniform4fv(fillShader->u_color, 1, properties.fill_color.data());
     }
 
     // Only draw regions that we marked

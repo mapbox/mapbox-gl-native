@@ -13,7 +13,7 @@ class Settings;
 class Transform;
 
 class FillBucket;
-struct FillStyle;
+struct FillProperties;
 
 class Painter {
 public:
@@ -34,7 +34,7 @@ public:
     void renderDebug(const std::shared_ptr<Tile>& tile);
 
     void renderBackground();
-    void renderFill(const FillBucket& bucket, const FillStyle& style);
+    void renderFill(const FillBucket& bucket, const FillProperties& style);
 
 
     void drawClippingMask();

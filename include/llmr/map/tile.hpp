@@ -48,10 +48,6 @@ public:
     void setData(uint8_t *data, uint32_t bytes);
     bool parse();
     void parseLayer(const pbf layer);
-    // void parseFeature(const uint8_t *data, uint32_t bytes);
-
-    // void addLineGeometry(pbf& geom);
-    // void addFillGeometry(pbf& geom);
 
     std::shared_ptr<Bucket> createFillBucket(const pbf data);
 
@@ -71,8 +67,6 @@ public:
     FillBuffer fillBuffer;
 
     std::forward_list<Layer> layers;
-
-    // std::vector<fill_index> fillIndices;
 
 private:
     // Source data
