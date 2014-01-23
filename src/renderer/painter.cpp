@@ -240,36 +240,36 @@ void Painter::render(const Tile::Ptr& tile) {
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         glStencilMask(0x0);
 
-        // // Because we're drawing top-to-bottom, and we update the stencil mask
-        // // below, we have to draw the outline first (!)
-        // if (antialiasing) {
+        // Because we're drawing top-to-bottom, and we update the stencil mask
+        // below, we have to draw the outline first (!)
+        if (antialiasing) {
 
-        //     // if (layerStyle.stroke) {
-        //     //     // If we defined a different color for the fill outline, we are
-        //     //     // going to ignore the bits in 0x3F and just care about the global
-        //     //     // clipping mask.
-        //     //     glStencilFunc(GL_EQUAL, 0x80, 0x80);
-        //     // } else {
-        //         // Otherwise, we only want to draw the antialiased parts that are
-        //         // *outside* the current shape. This is important in case the fill
-        //         // or stroke color is translucent. If we wouldn't clip to outside
-        //         // the current shape, some pixels from the outline stroke overlapped
-        //         // the (non-antialiased) fill.
-        //         glStencilFunc(GL_EQUAL, 0x80, 0xBF);
-        //     // }
+            // if (layerStyle.stroke) {
+            //     // If we defined a different color for the fill outline, we are
+            //     // going to ignore the bits in 0x3F and just care about the global
+            //     // clipping mask.
+            //     glStencilFunc(GL_EQUAL, 0x80, 0x80);
+            // } else {
+                // Otherwise, we only want to draw the antialiased parts that are
+                // *outside* the current shape. This is important in case the fill
+                // or stroke color is translucent. If we wouldn't clip to outside
+                // the current shape, some pixels from the outline stroke overlapped
+                // the (non-antialiased) fill.
+                glStencilFunc(GL_EQUAL, 0x80, 0xBF);
+            // }
 
-        //     switchShader(outlineShader);
-        //     glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
-        //     glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
-        //     glUniform4f(outlineShader->u_color, color[0], color[1], color[2], color[3]);
-        //     glLineWidth(2);
+            switchShader(outlineShader);
+            glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
+            glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
+            glUniform4f(outlineShader->u_color, color[0], color[1], color[2], color[3]);
+            glLineWidth(2);
 
-        //     // Draw the entire line
-        //     char *vertex_index = BUFFER_OFFSET(index.vertex_start * 2 * sizeof(uint16_t));
-        //     glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
-        //     glLineWidth(2.0f);
-        //     glDrawArrays(GL_LINE_STRIP, 0, index.length);
-        // }
+            // Draw the entire line
+            char *vertex_index = BUFFER_OFFSET(index.vertex_start * 2 * sizeof(uint16_t));
+            glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
+            glLineWidth(2.0f);
+            glDrawArrays(GL_LINE_STRIP, 0, index.length);
+        }
 
         // Now finally, draw a tile-covering quad that paints the parts of the
         // image that we marked in the stencil buffer.
