@@ -112,11 +112,6 @@ void FillBucket::drawVertices(int32_t attrib) {
     glDrawArrays(GL_LINE_STRIP, 0, length);
 }
 
-void FillBucket::render(Painter& painter) {
-    // TODO: obtain the correct style information for this layer
-    FillProperties properties;
-    properties.fill_color = {{ 0, 0, 1, 0.5 }};
-    properties.stroke_color = properties.fill_color;
-
-    painter.renderFill(*this, properties);
+void FillBucket::render(Painter& painter, const std::string& layer_name) {
+    painter.renderFill(*this, layer_name);
 }

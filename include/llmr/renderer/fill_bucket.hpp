@@ -15,7 +15,7 @@ class FillBucket : public Bucket {
 public:
     FillBucket(FillBuffer& buffer);
 
-    virtual void render(Painter& painter);
+    virtual void render(Painter& painter, const std::string& layer_name);
 
     void addGeometry(pbf& data);
     void drawElements(int32_t attrib);

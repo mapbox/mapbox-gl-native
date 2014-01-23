@@ -34,7 +34,7 @@ public:
     void renderDebug(const std::shared_ptr<Tile>& tile);
 
     void renderBackground();
-    void renderFill(FillBucket& bucket, const FillProperties& style);
+    void renderFill(FillBucket& bucket, const std::string& layer_name);
 
 
     void drawClippingMask();

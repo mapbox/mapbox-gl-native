@@ -169,7 +169,7 @@ void Painter::render(const Tile::Ptr& tile) {
     // glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
 
     for (Layer& layer : tile->layers) {
-        layer.bucket->render(*this);
+        layer.bucket->render(*this, layer.name);
     }
 
     if (settings.debug) {
@@ -179,7 +179,13 @@ void Painter::render(const Tile::Ptr& tile) {
     renderBackground();
 }
 
-void Painter::renderFill(FillBucket& bucket, const FillProperties& properties) {
+void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
+    // TODO: obtain the correct style information for this layer
+    FillProperties properties;
+    properties.fill_color = {{ 0, 0, 1, 0.5 }};
+    properties.stroke_color = properties.fill_color;
+
+
     // Draw the stencil mask.
     {
         // We're only drawing to the first seven bits (== support a maximum of
