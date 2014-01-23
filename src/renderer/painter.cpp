@@ -179,7 +179,7 @@ void Painter::render(const Tile::Ptr& tile) {
     renderBackground();
 }
 
-void Painter::renderFill(const FillBucket& bucket, const FillProperties& properties) {
+void Painter::renderFill(FillBucket& bucket, const FillProperties& properties) {
     // Draw the stencil mask.
     {
         // We're only drawing to the first seven bits (== support a maximum of
@@ -213,15 +213,7 @@ void Painter::renderFill(const FillBucket& bucket, const FillProperties& propert
         glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
 
         // Draw all groups
-        char *vertex_index = BUFFER_OFFSET(bucket.vertex_start * 2 * sizeof(uint16_t));
-        char *elements_index = BUFFER_OFFSET(bucket.elements_start * 3 * sizeof(uint16_t));
-        bucket.buffer.bind();
-        for (const auto& group : bucket.groups) {
-            glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
-            glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
-            vertex_index += group.vertex_length * 2 * sizeof(uint16_t);
-            elements_index += group.elements_length * 3 * sizeof(uint16_t);
-        }
+        bucket.drawElements(fillShader->a_pos);
 
         // Now that we have the stencil mask in the stencil buffer, we can start
         // writing to the color buffer.
@@ -255,13 +247,10 @@ void Painter::renderFill(const FillBucket& bucket, const FillProperties& propert
             glUniform4fv(outlineShader->u_color, 1, properties.fill_color.data());
         }
 
-        glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
-
         // Draw the entire line
-        char *vertex_index = BUFFER_OFFSET(bucket.vertex_start * 2 * sizeof(uint16_t));
-        glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
+        glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
         glLineWidth(2.0f);
-        glDrawArrays(GL_LINE_STRIP, 0, bucket.length);
+        bucket.drawVertices(outlineShader->a_pos);
     }
 
     // var imagePos = layerStyle.image && imageSprite.getPosition(layerStyle.image, true);

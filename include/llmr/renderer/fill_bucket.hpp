@@ -15,11 +15,13 @@ class FillBucket : public Bucket {
 public:
     FillBucket(FillBuffer& buffer);
 
-    void addGeometry(pbf& data);
-
     virtual void render(Painter& painter);
 
-public:
+    void addGeometry(pbf& data);
+    void drawElements(int32_t attrib);
+    void drawVertices(int32_t attrib);
+
+private:
     FillBuffer& buffer;
 
     struct group {
