@@ -5,11 +5,12 @@
 #include "shader-line.hpp"
 #include "shader-outline.hpp"
 
+#include "../map/tile.hpp"
+
 namespace llmr {
 
 class Settings;
 class Transform;
-class Tile;
 
 class Painter {
 public:
@@ -30,6 +31,8 @@ public:
     void renderDebug(const std::shared_ptr<Tile>& tile);
 
     void renderBackground();
+    void renderFill(const std::shared_ptr<Tile>& tile, const Tile::fill_index& index);
+
 
     void drawClippingMask();
     bool switchShader(Shader *shader);

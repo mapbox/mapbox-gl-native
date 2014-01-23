@@ -167,26 +167,29 @@ void Painter::render(const Tile::Ptr& tile) {
     // draw fills:
 
     // TODO: expose this to the stylesheet
-    bool evenodd = false;
-    bool antialiasing = true;
 
-
-    tile->fillBuffer.bind();
-    float i = 0.0f;
-    fprintf(stderr, "----\n");
     for (const Tile::fill_index& index : tile->fillIndices) {
-        float color[] = { i, i, 1.0f, 1.0f };
-        i = sqrt(i);
-        if (!index.length) continue;
-        // if (index.name != "water") continue;
-        fprintf(stderr, "%s: %d\n", index.name.c_str(), index.length);
+        renderFill(tile, index);
+    }
 
+    if (settings.debug) {
+        renderDebug(tile);
+    }
 
-        glStencilMask(0x0);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        glStencilFunc(GL_EQUAL, 0x80, 0x80);
-        glColorMask(true, true, true, true);
+    renderBackground();
+}
 
+void Painter::renderFill(const std::shared_ptr<Tile>& tile, const Tile::fill_index& index) {
+    float color[4] = { 1.0, 0.0, 0.0, 1.0 };
+    float alpha = color[3];
+
+    // TODO: expose this to the stylesheet.
+    bool evenodd = false;
+    bool background = false;
+    bool antialiasing = true;
+    bool stroke = false;
+
+    if (!background) {
         // Draw the stencil mask.
         {
             // We're only drawing to the first seven bits (== support a maximum of
@@ -222,9 +225,8 @@ void Painter::render(const Tile::Ptr& tile) {
             // Draw all groups
             char *vertex_index = BUFFER_OFFSET(index.vertex_start * 2 * sizeof(uint16_t));
             char *elements_index = BUFFER_OFFSET(index.elements_start * 3 * sizeof(uint16_t));
+            tile->fillBuffer.bind();
             for (const Tile::fill_index::group& group : index.groups) {
-                fprintf(stderr, "- vertex: %d, elements: %d, length: %d\n", vertex_index, elements_index, group.elements_length * 3);
-
                 glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
                 glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
                 vertex_index += group.vertex_length * 2 * sizeof(uint16_t);
@@ -243,26 +245,26 @@ void Painter::render(const Tile::Ptr& tile) {
         // Because we're drawing top-to-bottom, and we update the stencil mask
         // below, we have to draw the outline first (!)
         if (antialiasing) {
+            switchShader(outlineShader);
+            glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
+            glLineWidth(2);
 
-            // if (layerStyle.stroke) {
-            //     // If we defined a different color for the fill outline, we are
-            //     // going to ignore the bits in 0x3F and just care about the global
-            //     // clipping mask.
-            //     glStencilFunc(GL_EQUAL, 0x80, 0x80);
-            // } else {
+            if (stroke) {
+                // If we defined a different color for the fill outline, we are
+                // going to ignore the bits in 0x3F and just care about the global
+                // clipping mask.
+                glStencilFunc(GL_EQUAL, 0x80, 0x80);
+            } else {
                 // Otherwise, we only want to draw the antialiased parts that are
                 // *outside* the current shape. This is important in case the fill
                 // or stroke color is translucent. If we wouldn't clip to outside
                 // the current shape, some pixels from the outline stroke overlapped
                 // the (non-antialiased) fill.
                 glStencilFunc(GL_EQUAL, 0x80, 0xBF);
-            // }
+            }
 
-            switchShader(outlineShader);
-            glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
             glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
             glUniform4f(outlineShader->u_color, color[0], color[1], color[2], color[3]);
-            glLineWidth(2);
 
             // Draw the entire line
             char *vertex_index = BUFFER_OFFSET(index.vertex_start * 2 * sizeof(uint16_t));
@@ -270,35 +272,55 @@ void Painter::render(const Tile::Ptr& tile) {
             glLineWidth(2.0f);
             glDrawArrays(GL_LINE_STRIP, 0, index.length);
         }
-
-        // Now finally, draw a tile-covering quad that paints the parts of the
-        // image that we marked in the stencil buffer.
-        {
-            // Only draw regions that we marked
-            glStencilFunc(GL_NOTEQUAL, 0x0, 0x3F);
-
-            switchShader(fillShader);
-            glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
-
-            // Draw a rectangle that covers the entire viewport.
-            glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
-            glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
-            glUniform4f(fillShader->u_color, color[0], color[1], color[2], color[3]);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, sizeof(tile_stencil_vertices));
-
-            glStencilMask(0x00);
-            glStencilFunc(GL_EQUAL, 0x80, 0x80);
-        }
-
-
-        // break;
     }
 
-    if (settings.debug) {
-        renderDebug(tile);
+
+    // var imagePos = layerStyle.image && imageSprite.getPosition(layerStyle.image, true);
+
+    // if (imagePos) {
+    //     // Draw texture fill
+
+    //     var factor = 8 / Math.pow(2, painter.transform.zoom - params.z);
+    //     var mix = painter.transform.z % 1.0;
+    //     var imageSize = [imagePos.size[0] * factor, imagePos.size[1] * factor];
+
+    //     var offset = [
+    //         (params.x * 4096) % imageSize[0],
+    //         (params.y * 4096) % imageSize[1]
+    //     ];
+
+    //     glSwitchShader(painter.patternShader, painter.posMatrix, painter.exMatrix);
+    //     glUniform1i(painter.patternShader.u_image, 0);
+    //     glUniform2fv(painter.patternShader.u_pattern_size, imageSize);
+    //     glUniform2fv(painter.patternShader.u_offset, offset);
+    //     glUniform2fv(painter.patternShader.u_rotate, [1, 1]);
+    //     glUniform2fv(painter.patternShader.u_pattern_tl, imagePos.tl);
+    //     glUniform2fv(painter.patternShader.u_pattern_br, imagePos.br);
+    //     glUniform4fv(painter.patternShader.u_color, color);
+    //     glUniform1f(painter.patternShader.u_mix, mix);
+    //     imageSprite.bind(gl, true);
+
+    // } else {
+        // Draw filling rectangle.
+        switchShader(fillShader);
+        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
+        glUniform4f(fillShader->u_color, color[0], color[1], color[2], color[3]);
+    // }
+
+    if (background) {
+        glStencilFunc(GL_EQUAL, 0x80, 0x80);
+    } else {
+        // Only draw regions that we marked
+        glStencilFunc(GL_NOTEQUAL, 0x0, 0x3F);
     }
 
-    renderBackground();
+    // Draw a rectangle that covers the entire viewport.
+    glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
+    glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, sizeof(tile_stencil_vertices));
+
+    glStencilMask(0x00);
+    glStencilFunc(GL_EQUAL, 0x80, 0x80);
 }
 
 void Painter::renderDebug(const Tile::Ptr& tile) {
