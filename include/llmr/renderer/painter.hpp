@@ -12,6 +12,9 @@ namespace llmr {
 class Settings;
 class Transform;
 
+class FillBucket;
+struct FillStyle;
+
 class Painter {
 public:
     Painter(Transform& transform, Settings& settings);
@@ -31,7 +34,7 @@ public:
     void renderDebug(const std::shared_ptr<Tile>& tile);
 
     void renderBackground();
-    void renderFill(const std::shared_ptr<Tile>& tile, const Tile::fill_index& index);
+    void renderFill(const FillBucket& bucket, const FillStyle& style);
 
 
     void drawClippingMask();

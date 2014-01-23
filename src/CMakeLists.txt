@@ -10,6 +10,7 @@ SET(llmr_SOURCES
     renderer/shader-line.cpp
     renderer/shader-outline.cpp
     renderer/shader.cpp
+    renderer/fill_bucket.cpp
     shader/shaders.cpp
     util/animation.cpp
     util/mat4.cpp

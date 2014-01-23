@@ -5,13 +5,13 @@
 
 namespace llmr {
 
-class fill_buffer {
+class FillBuffer {
 public:
     typedef int16_t vertex_type;
     const uint8_t components = 2;
 
-    fill_buffer();
-    ~fill_buffer();
+    FillBuffer();
+    ~FillBuffer();
 
     uint32_t vertex_length() const;
     uint32_t elements_length() const;
