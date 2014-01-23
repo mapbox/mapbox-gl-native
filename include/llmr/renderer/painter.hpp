@@ -11,13 +11,14 @@ namespace llmr {
 
 class Settings;
 class Transform;
+class Style;
 
 class FillBucket;
 struct FillProperties;
 
 class Painter {
 public:
-    Painter(Transform& transform, Settings& settings);
+    Painter(Transform& transform, Settings& settings, Style& style);
 
     // Make noncopyable
     Painter(const Painter&) = delete;
@@ -49,6 +50,7 @@ public:
 private:
     Transform& transform;
     Settings& settings;
+    Style& style;
     float matrix[16];
 
     Shader *currentShader;

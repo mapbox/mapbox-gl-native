@@ -39,9 +39,10 @@ GLshort tile_border_vertices[] = {
     0, 0
 };
 
-Painter::Painter(Transform& transform, Settings& settings)
+Painter::Painter(Transform& transform, Settings& settings, Style& style)
     : transform(transform),
       settings(settings),
+      style(style),
       currentShader(NULL),
       fillShader(NULL),
       lineShader(NULL),
@@ -180,11 +181,7 @@ void Painter::render(const Tile::Ptr& tile) {
 }
 
 void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
-    // TODO: obtain the correct style information for this layer
-    FillProperties properties;
-    properties.fill_color = {{ 0, 0, 1, 0.5 }};
-    properties.stroke_color = properties.fill_color;
-
+    const FillProperties& properties = style.computedFills[layer_name];
 
     // Draw the stencil mask.
     {

@@ -13,8 +13,8 @@ using namespace llmr;
 Map::Map(Settings& settings)
     : settings(settings),
       transform(),
-      painter(transform, settings),
       style(),
+      painter(transform, settings, style),
       min_zoom(0),
       max_zoom(14) {
 }

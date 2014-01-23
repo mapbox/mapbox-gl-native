@@ -60,8 +60,8 @@ private:
 private:
     Settings& settings;
     Transform transform;
-    Painter painter;
     Style style;
+    Painter painter;
 
     int32_t min_zoom;
     int32_t max_zoom;

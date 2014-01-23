@@ -2,6 +2,7 @@
 #define LLMR_STYLE_STYLE
 
 #include <array>
+#include <map>
 #include "../util/pbf.hpp"
 
 namespace llmr {
@@ -43,8 +44,9 @@ public:
     void reset();
     void load(pbf data);
 
-    // StrokeStyle strokeStyle(const std::string& layer_name) const;
-    // FillProperties fillStyle(const std::string& layer_name) const;
+public:
+    std::map<std::string, FillProperties> computedFills;
+    std::map<std::string, StrokeProperties> computedStrokes;
 };
 
 }
