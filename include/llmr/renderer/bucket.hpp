@@ -5,12 +5,19 @@
 
 namespace llmr {
 
-class Style;
 class Painter;
 
 class Bucket {
 public:
-    virtual void render(Painter& painter) = 0;
+    Bucket() = default;
+    virtual void render(Painter& painter, const std::string& layer_name) = 0;
+
+private:
+    // Make noncopyable
+    Bucket(const Bucket&) = delete;
+    Bucket(const Bucket&&) = delete;
+    Bucket& operator=(const Bucket&) = delete;
+    Bucket& operator=(const Bucket && ) = delete;
 };
 
 }
