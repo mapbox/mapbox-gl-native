@@ -157,19 +157,16 @@ void Painter::render(const Tile::Ptr& tile) {
 
     drawClippingMask();
 
-    switchShader(outlineShader);
-    glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
+    // switchShader(outlineShader);
+    // glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
 
-    // glStencilFunc(GL_EQUAL, 0x80, 0x80);
-    // glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-
-    // draw lines:
-    tile->lineVertex.bind();
-    glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    glUniform4f(outlineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
-    glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
-    glLineWidth(2.0f);
-    glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
+    // // draw lines:
+    // tile->lineVertex.bind();
+    // glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    // glUniform4f(outlineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
+    // glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
+    // glLineWidth(2.0f);
+    // glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
 
     for (Layer& layer : tile->layers) {
         layer.bucket->render(*this);
@@ -218,7 +215,7 @@ void Painter::renderFill(const FillBucket& bucket, const FillStyle& style) {
         // Draw all groups
         char *vertex_index = BUFFER_OFFSET(bucket.vertex_start * 2 * sizeof(uint16_t));
         char *elements_index = BUFFER_OFFSET(bucket.elements_start * 3 * sizeof(uint16_t));
-        bucket.buffer->bind();
+        bucket.buffer.bind();
         for (const auto& group : bucket.groups) {
             glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
             glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
@@ -247,8 +244,7 @@ void Painter::renderFill(const FillBucket& bucket, const FillStyle& style) {
             // going to ignore the bits in 0x3F and just care about the global
             // clipping mask.
             glStencilFunc(GL_EQUAL, 0x80, 0x80);
-            const Color& color = style.stroke_color;
-            glUniform4f(outlineShader->u_color, color[0], color[1], color[2], color[3]);
+            glUniform4fv(outlineShader->u_color, 1, style.stroke_color.data());
         } else {
             // Otherwise, we only want to draw the antialiased parts that are
             // *outside* the current shape. This is important in case the fill
@@ -256,8 +252,7 @@ void Painter::renderFill(const FillBucket& bucket, const FillStyle& style) {
             // the current shape, some pixels from the outline stroke overlapped
             // the (non-antialiased) fill.
             glStencilFunc(GL_EQUAL, 0x80, 0xBF);
-            const Color& color = style.fill_color;
-            glUniform4f(outlineShader->u_color, color[0], color[1], color[2], color[3]);
+            glUniform4fv(outlineShader->u_color, 1, style.fill_color.data());
         }
 
         glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
@@ -297,7 +292,7 @@ void Painter::renderFill(const FillBucket& bucket, const FillStyle& style) {
         // Draw filling rectangle.
         switchShader(fillShader);
         glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
-        glUniform4f(fillShader->u_color, style.fill_color[0], style.fill_color[1], style.fill_color[2], style.fill_color[3]);
+        glUniform4fv(fillShader->u_color, 1, style.fill_color.data());
     }
 
     // Only draw regions that we marked
@@ -345,10 +340,12 @@ void Painter::renderBackground() {
     switchShader(fillShader);
     glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
 
+    Color white = {{ 1, 1, 1, 1 }};
+
     // Draw the clipping mask
     glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
     glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
-    glUniform4f(fillShader->u_color, 0.5f, 0.5f, 0.5f, 1.0f);
+    glUniform4fv(fillShader->u_color, 1, white.data());
     glDrawArrays(GL_TRIANGLES, 0, sizeof(tile_stencil_vertices));
 }
 

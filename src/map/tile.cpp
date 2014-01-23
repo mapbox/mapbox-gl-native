@@ -42,7 +42,7 @@ std::forward_list<Tile::ID> Tile::children(const ID& id, int32_t z) {
 Tile::Tile(ID id)
     : id(id),
       state(initial),
-      fillBuffer(std::make_shared<FillBuffer>()),
+      fillBuffer(),
       data(0),
       bytes(0) {
 

@@ -11,10 +11,10 @@ struct geometry_too_long_exception : std::exception {};
 
 using namespace llmr;
 
-FillBucket::FillBucket(const std::shared_ptr<FillBuffer>& buffer)
+FillBucket::FillBucket(FillBuffer& buffer)
     : buffer(buffer),
-      vertex_start(buffer->vertex_length()),
-      elements_start(buffer->elements_length()),
+      vertex_start(buffer.vertex_length()),
+      elements_start(buffer.elements_length()),
       length(0) {
 }
 
@@ -41,14 +41,14 @@ void FillBucket::addGeometry(pbf& geom) {
     }
 
     for (const std::vector<std::pair<int16_t, int16_t>>& line : lines) {
-        uint32_t vertex_start = buffer->vertex_length();
+        uint32_t vertex_start = buffer.vertex_length();
 
-        buffer->addDegenerate();
+        buffer.addDegenerate();
         for (const std::pair<int16_t, int16_t>& coord : line) {
-            buffer->addCoordinate(coord.first, coord.second);
+            buffer.addCoordinate(coord.first, coord.second);
         }
 
-        uint32_t vertex_end = buffer->vertex_length();
+        uint32_t vertex_end = buffer.vertex_length();
 
         if (vertex_end - vertex_start > 65535) {
             throw geometry_too_long_exception();
@@ -76,21 +76,17 @@ void FillBucket::addGeometry(pbf& geom) {
 
         assert(firstIndex + vertex_count - 1 < 65536);
 
-        uint32_t elements_start = buffer->elements_length();
+        uint32_t elements_start = buffer.elements_length();
 
         for (uint32_t i = 2; i < vertex_count; i++) {
-            buffer->addElements(firstIndex, firstIndex + i - 1, firstIndex + i);
+            buffer.addElements(firstIndex, firstIndex + i - 1, firstIndex + i);
         }
 
-        uint32_t elements_end = buffer->elements_length();
+        uint32_t elements_end = buffer.elements_length();
         uint32_t elements_count = elements_end - elements_start;
         group.vertex_length += vertex_count;
         group.elements_length += elements_count;
     }
-}
-
-void FillBucket::draw(const Style& style, const std::string& layerName) {
-
 }
 
 void FillBucket::render(Painter& painter) {

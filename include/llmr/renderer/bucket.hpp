@@ -10,7 +10,6 @@ class Painter;
 
 class Bucket {
 public:
-    virtual void draw(const Style& style, const std::string& layerName) = 0;
     virtual void render(Painter& painter) = 0;
 };
 

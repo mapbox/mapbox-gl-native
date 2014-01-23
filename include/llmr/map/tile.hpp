@@ -68,7 +68,7 @@ public:
     linevertexbuffer lineVertex;
     debug_font_buffer debugFontVertex;
 
-    std::shared_ptr<FillBuffer> fillBuffer;
+    FillBuffer fillBuffer;
 
     std::forward_list<Layer> layers;
 

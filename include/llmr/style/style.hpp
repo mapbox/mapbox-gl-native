@@ -34,7 +34,6 @@ struct FillStyle {
     float stroke_width = 1;
 };
 
-
 class Style {
 public:
     StrokeStyle strokeStyle(const std::string& layer_name) const;

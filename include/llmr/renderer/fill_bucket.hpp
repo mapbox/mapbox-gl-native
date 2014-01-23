@@ -13,15 +13,14 @@ struct pbf;
 
 class FillBucket : public Bucket {
 public:
-    FillBucket(const std::shared_ptr<FillBuffer>& buffer);
+    FillBucket(FillBuffer& buffer);
 
     void addGeometry(pbf& data);
 
-    virtual void draw(const Style& style, const std::string& layerName);
     virtual void render(Painter& painter);
 
 public:
-    std::shared_ptr<FillBuffer> buffer;
+    FillBuffer& buffer;
 
     struct group {
         uint32_t vertex_length;
