@@ -31,3 +31,9 @@ bin/convert-style.js | protoc --decode=style proto/style.proto
 ```
 
 You should see a nicely formatted hierarchical output of the converted style.
+
+
+# Usage
+
+- Press 'R' to reset the transform
+- Press 'N' to reset north
