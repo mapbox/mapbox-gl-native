@@ -1,8 +1,15 @@
-
+An OpenGL renderer for [Mapbox vector tiles](https://www.mapbox.com/blog/vector-tiles),
+implemented in C++, targeting iOS & OSX.
 
 # Build instructions
 
 ## Mac OS X
+
+You may need to install [glfw3](http://www.glfw.org/docs/latest/):
+
+```
+brew install homebrew/versions/glfw3
+```
 
 ```
 mkdir xcode
@@ -11,7 +18,6 @@ cmake .. -G Xcode
 ```
 
 Then open the xcode project and build.
-
 
 
 # Style protobuf
