@@ -215,8 +215,7 @@ void restart(void *) {
 void request(void *, Tile::Ptr tile) {
     assert((bool)tile);
 
-    // NSString *urlTemplate = @"http://api.tiles.mapbox.com/v3/mapbox.mapbox-streets-v4/%d/%d/%d.vector.pbf";
-    NSString *urlTemplate = @"http://localhost:3333/gl/tiles/plain/%d-%d-%d.vector.pbf";
+    NSString *urlTemplate = @"http://api.tiles.mapbox.com/v3/mapbox.mapbox-streets-v4/%d/%d/%d.vector.pbf";
     NSString *urlString = [NSString
                            stringWithFormat:urlTemplate,
                            tile->id.z,
