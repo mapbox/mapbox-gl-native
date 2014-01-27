@@ -30,8 +30,16 @@ code += '\n';
 code += 'using namespace llmr;\n';
 code += '\n';
 code += 'const unsigned char resources::' + name + '[] = {\n';
-code += '    ' + Array.prototype.join.call(data, ', ') + '\n';
-code += '};\n';
+
+
+for (var i = 0; i < data.length; i += 16) {
+    if (i > 0) {
+        code += ',\n';
+    }
+    var part = data.slice(i, i + 16);
+    code += '    ' + Array.prototype.join.call(part, ', ');
+}
+code += '\n};\n';
 code += 'const unsigned long resources::' + name + '_size = sizeof(resources::' + name + ');\n';
 
 fs.writeFileSync('src/resources/' + name + '.cpp', code);

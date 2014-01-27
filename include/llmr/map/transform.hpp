@@ -39,7 +39,7 @@ public:
 
     // Getters
     void matrixFor(float matrix[16], const vec3<int32_t>& id) const;
-    int32_t getZoom() const;
+    float getZoom() const;
     double getScale() const;
     double getAngle() const;
     void getLonLat(double& lon, double& lat) const;

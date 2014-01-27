@@ -21,14 +21,16 @@ public:
     void reset();
     void load(const uint8_t *const data, uint32_t bytes);
 
-    void cascade();
+    void cascade(float z);
 
 private:
-    static std::pair<std::string, BucketDescription> loadBucket(pbf data);
-    static LayerDescription loadLayer(pbf data);
-    static std::pair<std::string, ClassDescription> loadClass(pbf data);
-    static std::pair<std::string, LayerStyleDescription> loadLayerStyle(pbf data);
-    static WidthDescription loadWidth(pbf data);
+    static std::pair<std::string, BucketDescription> parseBucket(pbf data);
+    static LayerDescription parseLayer(pbf data);
+    static std::pair<std::string, ClassDescription> parseClass(pbf data);
+    static std::pair<std::string, FillClass> parseFillClass(pbf data);
+    static std::pair<std::string, StrokeClass> parseStrokeClass(pbf data);
+    template <typename T> static FunctionProperty<T> parseProperty(pbf data);
+    static Color parseColor(pbf& data);
 
 public:
     // This is static information parsed from the stylesheet.

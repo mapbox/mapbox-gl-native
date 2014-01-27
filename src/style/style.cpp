@@ -18,20 +18,18 @@ void Style::load(const uint8_t *const data, uint32_t bytes) {
 
     while (style.next()) {
         if (style.tag == 1) { // bucket
-            buckets.insert(loadBucket(style.message()));
+            buckets.insert(parseBucket(style.message()));
         } else if (style.tag == 2) { // structure
-            layers.push_back(loadLayer(style.message()));
+            layers.push_back(parseLayer(style.message()));
         } else if (style.tag == 3) { // class
-            classes.insert(loadClass(style.message()));
+            classes.insert(parseClass(style.message()));
         } else {
             style.skip();
         }
     }
-
-    cascade();
 }
 
-std::pair<std::string, BucketDescription> Style::loadBucket(pbf data) {
+std::pair<std::string, BucketDescription> Style::parseBucket(pbf data) {
     BucketDescription bucket;
     std::string name;
 
@@ -64,7 +62,7 @@ std::pair<std::string, BucketDescription> Style::loadBucket(pbf data) {
     return { name, bucket };
 }
 
-LayerDescription Style::loadLayer(pbf data) {
+LayerDescription Style::parseLayer(pbf data) {
     LayerDescription layer;
 
     while (data.next()) {
@@ -73,7 +71,7 @@ LayerDescription Style::loadLayer(pbf data) {
         } else if (data.tag == 2) { // bucket_name
             layer.bucket_name = data.string();
         } else if (data.tag == 3) { // child_layer
-            layer.child_layer.emplace_back(loadLayer(data.message()));
+            layer.child_layer.emplace_back(parseLayer(data.message()));
         } else {
             data.skip();
         }
@@ -83,15 +81,17 @@ LayerDescription Style::loadLayer(pbf data) {
 }
 
 
-std::pair<std::string, ClassDescription> Style::loadClass(pbf data) {
+std::pair<std::string, ClassDescription> Style::parseClass(pbf data) {
     ClassDescription klass;
     std::string name;
 
     while (data.next()) {
         if (data.tag == 1) { // name
             name = data.string();
-        } else if (data.tag == 2) { // layer_style
-            klass.insert(loadLayerStyle(data.message()));
+        } else if (data.tag == 2) { // fill_style
+            klass.fill.insert(parseFillClass(data.message()));
+        } else if (data.tag == 3) { // stroke_style
+            klass.stroke.insert(parseStrokeClass(data.message()));
         } else {
             data.skip();
         }
@@ -100,55 +100,96 @@ std::pair<std::string, ClassDescription> Style::loadClass(pbf data) {
     return { name, klass };
 }
 
-std::pair<std::string, LayerStyleDescription> Style::loadLayerStyle(pbf data) {
-    LayerStyleDescription layerStyle;
+std::pair<std::string, FillClass> Style::parseFillClass(pbf data) {
+    FillClass fill;
     std::string name;
 
     while (data.next()) {
         if (data.tag == 1) { // name
             name = data.string();
-        } else if (data.tag == 2) { // color
-            uint32_t rgba = data.fixed<uint32_t, 4>();
-            layerStyle.color = {{
-                (float)((rgba >> 24) & 0xFF) / 0xFF,
-                (float)((rgba >> 16) & 0xFF) / 0xFF,
-                (float)((rgba >>  8) & 0xFF) / 0xFF,
-                (float)((rgba >>  0) & 0xFF) / 0xFF
-            }};
-        } else if (data.tag == 3) { // antialias
-            layerStyle.antialias = data.boolean();
-        } else if (data.tag == 4) { // width
-            layerStyle.width = loadWidth(data.message());
+        } else if (data.tag == 2) { // hidden
+            fill.hidden = parseProperty<bool>(data.message());
+        } else if (data.tag == 3) { // winding
+            fill.winding = (Winding)data.varint();
+        } else if (data.tag == 4) { // antialias
+            fill.antialias = parseProperty<bool>(data.message());
+        } else if (data.tag == 5) { // fill_color
+            fill.fill_color = parseColor(data);
+            if (fill.stroke_color[3] == std::numeric_limits<float>::infinity()) {
+                fill.stroke_color = fill.fill_color;
+            }
+        } else if (data.tag == 6) { // stroke_color
+            fill.stroke_color = parseColor(data);
+        } else if (data.tag == 7) { // opacity
+            fill.opacity = parseProperty<float>(data.message());
         } else {
             data.skip();
         }
     }
 
-    return { name, layerStyle };
+    return { name, fill };
 }
 
-WidthDescription Style::loadWidth(pbf data) {
-    WidthDescription width;
+
+std::pair<std::string, StrokeClass> Style::parseStrokeClass(pbf data) {
+    StrokeClass stroke;
+    std::string name;
 
     while (data.next()) {
-        if (data.tag == 1) { // scaling
-            width.scaling = data.string();
+        if (data.tag == 1) { // name
+            name = data.string();
+        } else if (data.tag == 2) { // hidden
+            stroke.hidden = parseProperty<bool>(data.message());
+        } else if (data.tag == 3) { // color
+            stroke.color = parseColor(data);
+        } else if (data.tag == 4) { // width
+            stroke.width = parseProperty<float>(data.message());
+        } else if (data.tag == 5) { // opacity
+            stroke.offset = parseProperty<float>(data.message());
+        } else {
+            data.skip();
+        }
+    }
+
+    return { name, stroke };
+}
+
+
+Color Style::parseColor(pbf& data) {
+    uint32_t rgba = data.fixed<uint32_t, 4>();
+    return {{
+        (float)((rgba >> 24) & 0xFF) / 0xFF,
+        (float)((rgba >> 16) & 0xFF) / 0xFF,
+        (float)((rgba >>  8) & 0xFF) / 0xFF,
+        (float)((rgba >>  0) & 0xFF) / 0xFF
+    }};
+}
+
+template <typename T> FunctionProperty<T> Style::parseProperty(pbf data) {
+    FunctionProperty<T> property;
+
+    while (data.next()) {
+        if (data.tag == 1) { // function
+            switch((Property)data.varint()) {
+                case Property::Null: property.function = &functions::null; break;
+                case Property::Constant: property.function = &functions::constant; break;
+                default: property.function = &functions::null; break;
+            }
         } else if (data.tag == 2) { // value
             // read a packed float32
             pbf floats = data.message();
             while (floats) {
-                width.value.push_back(floats.float32());
+                property.values.push_back(floats.float32());
             }
         } else {
             data.skip();
         }
     }
 
-    return width;
+    return property;
 }
 
-
-void Style::cascade() {
+void Style::cascade(float z) {
     reset();
 
     // Recalculate style
@@ -160,15 +201,30 @@ void Style::cascade() {
         // Not enabled
         if (appliedClasses.find(class_name) == appliedClasses.end()) continue;
 
-        for (const auto& layer_pair : sheetClass) {
-            const std::string& layer_name = layer_pair.first;
-            const LayerStyleDescription& layer = layer_pair.second;
+        // Cascade fill classes
+        for (const auto& fill_pair : sheetClass.fill) {
+            const std::string& layer_name = fill_pair.first;
+            const llmr::FillClass& layer = fill_pair.second;
 
-            // Find out what type this layer style is.
-            computed.fills[layer_name].enabled = true;
-            computed.fills[layer_name].antialiasing = layer.antialias;
-            computed.fills[layer_name].fill_color = layer.color;
-            computed.fills[layer_name].stroke_color = layer.color;
+            llmr::FillProperties& fill = computed.fills[layer_name];
+            fill.hidden = layer.hidden(z);
+            fill.winding = layer.winding;
+            fill.antialias = layer.antialias(z);
+            fill.fill_color = layer.fill_color;
+            fill.stroke_color = layer.stroke_color;
+            fill.opacity = layer.opacity(z);
+        }
+
+        // Cascade line classes
+        for (const auto& stroke_pair : sheetClass.stroke) {
+            const std::string& layer_name = stroke_pair.first;
+            const llmr::StrokeClass& layer = stroke_pair.second;
+
+            llmr::StrokeProperties& stroke = computed.strokes[layer_name];
+            stroke.hidden = layer.hidden(z);
+            stroke.width = layer.width(z);
+            stroke.offset = layer.offset(z);
+            stroke.color = layer.color;
         }
     }
 }

@@ -204,7 +204,13 @@ void Painter::renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<
 void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
     const FillProperties& properties = style.computed.fills[layer_name];
 
-    if (!properties.enabled) return;
+    if (properties.hidden) return;
+
+    Color fill_color = properties.fill_color;
+    fill_color[0] *= properties.opacity;
+    fill_color[1] *= properties.opacity;
+    fill_color[2] *= properties.opacity;
+    fill_color[3] *= properties.opacity;
 
     // Draw the stencil mask.
     {
@@ -219,7 +225,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
         // orientation, while all holes (see below) are in CW orientation.
         glStencilFunc(GL_NOTEQUAL, 0x80, 0x80);
 
-        if (properties.winding == EvenOdd) {
+        if (properties.winding == Winding::EvenOdd) {
             // When we draw an even/odd winding fill, we just invert all the bits.
             glStencilOp(GL_INVERT, GL_KEEP, GL_KEEP);
         } else {
@@ -252,7 +258,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
-    if (properties.antialiasing) {
+    if (properties.antialias) {
         switchShader(outlineShader);
         glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
         glLineWidth(2);
@@ -270,7 +276,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
             // the current shape, some pixels from the outline stroke overlapped
             // the (non-antialiased) fill.
             glStencilFunc(GL_EQUAL, 0x80, 0xBF);
-            glUniform4fv(outlineShader->u_color, 1, properties.fill_color.data());
+            glUniform4fv(outlineShader->u_color, 1, fill_color.data());
         }
 
         // Draw the entire line
@@ -307,7 +313,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
         // Draw filling rectangle.
         switchShader(fillShader);
         glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
-        glUniform4fv(fillShader->u_color, 1, properties.fill_color.data());
+        glUniform4fv(fillShader->u_color, 1, fill_color.data());
     }
 
     // Only draw regions that we marked

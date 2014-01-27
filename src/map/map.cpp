@@ -39,6 +39,7 @@ void Map::loadSettings() {
     transform.setAngle(settings.angle);
     transform.setScale(settings.scale);
     transform.setLonLat(settings.longitude, settings.latitude);
+    style.cascade(transform.getZoom());
     update();
 }
 
@@ -60,6 +61,7 @@ void Map::moveBy(double dx, double dy) {
 
 void Map::scaleBy(double ds, double cx, double cy) {
     transform.scaleBy(ds, cx, cy);
+    style.cascade(transform.getZoom());
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);
@@ -87,6 +89,7 @@ void Map::resetPosition() {
     transform.setAngle(0);
     transform.setLonLat(0, 0);
     transform.setZoom(0);
+    style.cascade(transform.getZoom());
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);

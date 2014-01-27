@@ -8,24 +8,12 @@
 
 namespace llmr {
 
-
-class WidthDescription {
+class ClassDescription {
 public:
-    std::string scaling;
-    std::vector<float> value;
+    std::map<std::string, FillClass> fill;
+    std::map<std::string, StrokeClass> stroke;
 };
 
-
-class LayerStyleDescription {
-public:
-    Color color = {{ 0, 0, 0, 0 }};
-    bool antialias = false;
-    WidthDescription width;
-};
-
-typedef std::map<std::string, LayerStyleDescription> ClassDescription;
-
-std::ostream& operator<<(std::ostream&, const ClassDescription& layer);
 
 }
 

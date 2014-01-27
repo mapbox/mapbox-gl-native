@@ -75,21 +75,27 @@ module.exports = {
             "name": "default",
             "layers": {
                 "background": {
+                    "type": "background",
                     "color": "#FFFFFF"
                 },
                 "park": {
+                    "type": "fill",
                     "color": "#c8df9f",
                     "antialias": true
                 },
                 "wood": {
+                    "type": "fill",
                     "color": "#33AA66",
-                    "antialias": true
+                    "antialias": true,
+                    "opacity": 0.1
                 },
                 "water": {
+                    "type": "fill",
                     "color": "#73b6e6",
                     "antialias": true
                 },
                 "road_limited": {
+                    "type": "line",
                     "color": "#BBBBBB",
                     "width": [
                         "stops",
@@ -98,6 +104,7 @@ module.exports = {
                     ]
                 },
                 "road_regular": {
+                    "type": "line",
                     "color": "#999999",
                     "width": [
                         "stops",
@@ -108,6 +115,7 @@ module.exports = {
                     ],
                 },
                 "road_large": {
+                    "type": "line",
                     "color": "#666666",
                     "width": [
                         "stops",
@@ -119,6 +127,7 @@ module.exports = {
                     ],
                 },
                 "alcohol": {
+                    "type": "marker",
                     "image": "alcohol-shop"
                 }
             }

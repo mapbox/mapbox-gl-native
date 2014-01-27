@@ -17,6 +17,7 @@ SET(llmr_SOURCES
     style/value.cpp
     style/bucket_description.cpp
     style/layer_description.cpp
+    style/properties.cpp
     util/animation.cpp
     util/mat4.cpp
 )

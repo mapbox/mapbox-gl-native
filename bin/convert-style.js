@@ -27,6 +27,13 @@ var join_type = {
     bevel: 2
 };
 
+// enum
+var property_type = {
+    'null': 1,
+    constant: 2,
+    stops: 3
+};
+
 
 function createValue(value) {
     var pbf = new Protobuf();
@@ -83,27 +90,61 @@ function createStructure(structure) {
     return pbf;
 }
 
-function createWidth(width) {
+// function createWidth(width) {
+//     var pbf = new Protobuf();
+//     var values = [];
+//     if (Array.isArray(width)) {
+//         pbf.writeTaggedString(1 /* scaling */, width[0]);
+//         for (var i = 1; i < width.length; i++) {
+//             if (width[0] === 'stops') {
+//                 values.push(width[i].z, width[i].val);
+//             } else {
+//                 values.push(width[i]);
+//             }
+//         }
+//     } else {
+//         values.push(width);
+//     }
+//     pbf.writePackedFloats(2 /* value */, values);
+
+//     return pbf;
+// }
+
+function createProperty(type, values) {
     var pbf = new Protobuf();
-    var values = [];
-    if (Array.isArray(width)) {
-        pbf.writeTaggedString(1 /* scaling */, width[0]);
-        for (var i = 1; i < width.length; i++) {
-            if (width[0] === 'stops') {
-                values.push(width[i].z, width[i].val);
-            } else {
-                values.push(width[i]);
-            }
-        }
-    } else {
-        values.push(width);
-    }
-    pbf.writePackedFloats(2 /* value */, values);
+    pbf.writeTaggedVarint(1 /* function */, property_type[type]);
+    pbf.writePackedFloats(2 /* value */, values.map(function(value) { return +value; }));
 
     return pbf;
 }
 
-function createLayer(layer, name) {
+function createFillClass(layer, name) {
+    var pbf = new Protobuf();
+    pbf.writeTaggedString(1 /* layer_name */, name);
+
+    if ('antialias' in layer) {
+        pbf.writeMessage(4 /* antialias */, createProperty('constant', [layer.antialias]));
+    }
+
+    if ('color' in layer) {
+        var color = layer.color.match(/^#([0-9a-f]{6})$/i);
+        if (!color) {
+            console.warn('invalid color');
+        } else {
+            pbf.writeTaggedUInt32(5 /* fill_color */, parseInt(color[1] + 'ff', 16));
+        }
+    }
+
+    if ('opacity' in layer) {
+        if (typeof layer.opacity == 'number') {
+            pbf.writeMessage(7 /* opacity */, createProperty('constant', [layer.opacity]));
+        }
+    }
+
+    return pbf;
+}
+
+function createLineClass(layer, name) {
     var pbf = new Protobuf();
     pbf.writeTaggedString(1 /* layer_name */, name);
 
@@ -112,16 +153,28 @@ function createLayer(layer, name) {
         if (!color) {
             console.warn('invalid color');
         } else {
-            pbf.writeTaggedUInt32(2 /* color */, parseInt(color[1] + 'ff', 16));
+            pbf.writeTaggedUInt32(3 /* color */, parseInt(color[1] + 'ff', 16));
         }
     }
 
-    if ('antialias' in layer) {
-        pbf.writeTaggedBoolean(3 /* antialias */, layer.antialias);
-    }
-
     if ('width' in layer) {
-        pbf.writeMessage(4 /* width */, createWidth(layer.width));
+        var values = [];
+        var width = layer.width;
+        var type = 'constant';
+        if (Array.isArray(width)) {
+            type = width[0];
+            for (var i = 1; i < width.length; i++) {
+                if (width[0] === 'stops') {
+                    values.push(width[i].z, width[i].val);
+                } else {
+                    values.push(width[i]);
+                }
+            }
+        } else {
+            values.push(width);
+        }
+
+        pbf.writeMessage(4 /* width */, createProperty(type, values));
     }
 
     return pbf;
@@ -132,7 +185,10 @@ function createClass(klass) {
     var pbf = new Protobuf();
     pbf.writeTaggedString(1 /* name */, klass.name);
     for (var name in klass.layers) {
-        pbf.writeMessage(2 /* layer */, createLayer(klass.layers[name], name));
+        switch (klass.layers[name].type) {
+            case 'fill': pbf.writeMessage(2 /* fill */, createFillClass(klass.layers[name], name)); break;
+            case 'line': pbf.writeMessage(3 /* line */, createLineClass(klass.layers[name], name)); break;
+        }
     }
     return pbf;
 }

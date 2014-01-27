@@ -164,8 +164,8 @@ void Transform::matrixFor(float matrix[16], const vec3<int32_t>& id) const {
     mat4::translate(matrix, matrix, 0, 0, -1);
 }
 
-int32_t Transform::getZoom() const {
-    return floor(log(scale) / M_LN2);
+float Transform::getZoom() const {
+    return log(scale) / M_LN2;
 }
 
 double Transform::getScale() const {
