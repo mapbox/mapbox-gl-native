@@ -58,5 +58,4 @@ void Settings_MacOSX::save() {
 }
 
 void Settings_MacOSX::clear() {
-    // TODO
 }
