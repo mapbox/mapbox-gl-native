@@ -43,10 +43,10 @@ message bucket {
     optional float font_size = 10;
 }
 
-message structure {
+message layer {
     required string name = 1;
     optional string bucket_name = 2;
-    repeated structure child_layer = 3;
+    repeated layer child_layer = 3;
 }
 
 message width {
@@ -54,7 +54,7 @@ message width {
     repeated float value = 2 [ packed = true ];
 }
 
-message layer {
+message layer_style {
     required string layer_name = 1;
     optional fixed32 color = 2; // rgba (=> rgb << 8 | 0xFF for opaque!)
     optional bool antialias = 3;
@@ -63,12 +63,12 @@ message layer {
 
 message class {
     required string name = 1;
-    repeated layer layer = 2;
+    repeated layer_style layer = 2;
 }
 
 // root level object
 message style {
     repeated bucket bucket = 1;
-    repeated structure structure = 2;
+    repeated layer layer = 2;
     repeated class class = 3;
 }

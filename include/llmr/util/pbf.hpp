@@ -31,9 +31,12 @@ struct pbf {
     inline bool next();
     template <typename T = uint32_t> inline T varint();
     template <typename T = uint32_t> inline T svarint();
-    inline std::string string();
+
+    template <typename T = uint32_t, int bytes = 4> inline T fixed();
     inline float float32();
     inline double float64();
+
+    inline std::string string();
     inline bool boolean();
 
     inline pbf message();
@@ -99,25 +102,27 @@ T pbf::svarint() {
     return (n >> 1) ^ -(T)(n & 1);
 }
 
+template <typename T, int bytes>
+T pbf::fixed() {
+    skipBytes(bytes);
+    T result;
+    memcpy(&result, data - bytes, bytes);
+    return result;
+}
+
+float pbf::float32() {
+    return fixed<float, 4>();
+}
+
+double pbf::float64() {
+    return fixed<double, 8>();
+}
+
 std::string pbf::string() {
     uint32_t bytes = (uint32_t)varint();
     const char *string = (const char *)data;
     skipBytes(bytes);
     return std::string(string, bytes);
-}
-
-float pbf::float32() {
-    skipBytes(4);
-    float result;
-    memcpy(&result, data - 4, 4);
-    return result;
-}
-
-double pbf::float64() {
-    skipBytes(8);
-    double result;
-    memcpy(&result, data - 8, 8);
-    return result;
 }
 
 bool pbf::boolean() {

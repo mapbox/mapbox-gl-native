@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 project(llmr)
 
+FIND_PACKAGE(Boost)
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "0")

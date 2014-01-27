@@ -169,9 +169,7 @@ void Painter::render(const Tile::Ptr& tile) {
     // glLineWidth(2.0f);
     // glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
 
-    for (Layer& layer : tile->layers) {
-        layer.bucket->render(*this, layer.name);
-    }
+    renderLayers(tile, style.layers);
 
     if (settings.debug) {
         renderDebug(tile);
@@ -180,8 +178,33 @@ void Painter::render(const Tile::Ptr& tile) {
     renderBackground();
 }
 
+void Painter::renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers) {
+    // Render everything top-to-bottom by using reverse iterators
+    typedef std::vector<LayerDescription>::const_reverse_iterator iterator;
+    for (iterator it = layers.rbegin(), end = layers.rend(); it != end; it++) {
+        const LayerDescription& layer_desc = *it;
+
+        if (layer_desc.child_layer.size()) {
+            // This is a layer group.
+            // TODO: create framebuffer
+            renderLayers(tile, layer_desc.child_layer);
+            // TODO: render framebuffer on previous framebuffer
+        } else {
+            // This is a singular layer. Try to find the bucket associated with
+            // this layer and render it.
+            auto bucket_it = tile->buckets.find(layer_desc.bucket_name);
+            if (bucket_it != tile->buckets.end()) {
+                assert(bucket_it->second);
+                bucket_it->second->render(*this, layer_desc.name);
+            }
+        }
+    }
+}
+
 void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
-    const FillProperties& properties = style.computedFills[layer_name];
+    const FillProperties& properties = style.computed.fills[layer_name];
+
+    if (!properties.enabled) return;
 
     // Draw the stencil mask.
     {
@@ -315,14 +338,14 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
     // draw debug info
     switchShader(lineShader);
     glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
-    tile->debugFontVertex.bind();
+    tile->debugFontVertex->bind();
     glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
     glUniform4f(lineShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
     glLineWidth(4.0f);
-    glDrawArrays(GL_LINES, 0, tile->debugFontVertex.length());
+    glDrawArrays(GL_LINES, 0, tile->debugFontVertex->length());
     glUniform4f(lineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
     glLineWidth(2.0f);
-    glDrawArrays(GL_LINES, 0, tile->debugFontVertex.length());
+    glDrawArrays(GL_LINES, 0, tile->debugFontVertex->length());
 
     // Revert blending mode to blend to the back.
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);

@@ -1,54 +1,52 @@
 #ifndef LLMR_STYLE_STYLE
 #define LLMR_STYLE_STYLE
 
-#include <array>
 #include <map>
+#include <vector>
+#include <set>
 #include "../util/pbf.hpp"
 
+#include "value.hpp"
+#include "properties.hpp"
+#include "bucket_description.hpp"
+#include "layer_description.hpp"
+#include "class_description.hpp"
+
 namespace llmr {
-
-typedef std::array<float, 4> Color;
-
-enum Winding {
-    EvenOdd = 1,
-    NonZero = 2
-};
-
-// enum LineCap {
-//     Round = 1
-// };
-
-// enum LineJoin {
-//     Butt = 1,
-//     Bevel = 2
-// };
-
-
-struct StrokeProperties {
-    Color line_color = {{ 0, 0, 0, 1 }};
-    float line_width = 1;
-};
-
-struct FillProperties {
-    Winding winding = NonZero;
-    bool antialiasing = true;
-    Color fill_color = {{ 0, 0, 0, 1 }};
-    Color stroke_color = {{ 0, 0, 0, 1 }};
-    float stroke_width = 1;
-};
 
 class Style {
 public:
     Style();
 
     void reset();
-    void load(pbf data);
+    void load(const uint8_t *const data, uint32_t bytes);
+
+    void cascade();
+
+private:
+    static std::pair<std::string, BucketDescription> loadBucket(pbf data);
+    static LayerDescription loadLayer(pbf data);
+    static std::pair<std::string, ClassDescription> loadClass(pbf data);
+    static std::pair<std::string, LayerStyleDescription> loadLayerStyle(pbf data);
+    static WidthDescription loadWidth(pbf data);
 
 public:
-    std::map<std::string, FillProperties> computedFills;
-    std::map<std::string, StrokeProperties> computedStrokes;
+    // This is static information parsed from the stylesheet.
+    std::map<std::string, BucketDescription> buckets;
+    std::vector<LayerDescription> layers;
+    std::map<std::string, ClassDescription> classes;
+
+
+    // This are applied settings.
+    std::set<std::string> appliedClasses;
+    struct {
+        std::map<std::string, FillProperties> fills;
+        std::map<std::string, StrokeProperties> strokes;
+    } computed;
 };
 
 }
+
+
 
 #endif

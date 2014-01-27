@@ -11,8 +11,12 @@ SET(llmr_SOURCES
     renderer/shader-outline.cpp
     renderer/shader.cpp
     renderer/fill_bucket.cpp
+    resources/style.cpp
     shader/shaders.cpp
     style/style.cpp
+    style/value.cpp
+    style/bucket_description.cpp
+    style/layer_description.cpp
     util/animation.cpp
     util/mat4.cpp
 )
@@ -40,6 +44,7 @@ SET(llmr_HEADERS
 )
 
 INCLUDE_DIRECTORIES(
+    ${Boost_INCLUDE_DIR}
     ../include
 )
 
@@ -52,4 +57,5 @@ LINK_DIRECTORIES(
 )
 
 TARGET_LINK_LIBRARIES(llmr
+    ${Boost_LIBRARIES}
 )

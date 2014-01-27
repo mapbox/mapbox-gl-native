@@ -12,10 +12,15 @@
 #include <mutex>
 #include <llmr/util/vec.hpp>
 #include <string>
+#include <map>
 
 namespace llmr {
 
 struct pbf;
+class Style;
+class Bucket;
+class LayerDescription;
+class BucketDescription;
 
 class Tile {
 public:
@@ -35,7 +40,7 @@ public:
     };
 
 public:
-    Tile(ID id);
+    Tile(ID id, const Style& style);
     ~Tile();
 
     // Make noncopyable
@@ -47,9 +52,13 @@ public:
     // Other functions
     void setData(uint8_t *data, uint32_t bytes);
     bool parse();
-    void parseLayer(const pbf layer);
+    void parseLayers(const pbf& tile, const std::vector<LayerDescription>& layers);
+    std::shared_ptr<Bucket> createBucket(const pbf& tile, const BucketDescription& bucket_desc);
+    // void parseLayer(const pbf layer);
 
-    std::shared_ptr<Bucket> createFillBucket(const pbf data);
+    // void (const std::vector<LayerDescription>& child_layers);
+
+    std::shared_ptr<Bucket> createFillBucket(const pbf data, const BucketDescription& bucket_desc);
 
     void cancel();
 
@@ -61,12 +70,16 @@ public:
 public:
     const ID id;
     state state;
-    linevertexbuffer lineVertex;
-    debug_font_buffer debugFontVertex;
 
-    FillBuffer fillBuffer;
+    // Holds the actual geometries in this tile.
+    std::shared_ptr<linevertexbuffer> lineVertex;
+    std::shared_ptr<debug_font_buffer> debugFontVertex;
+    std::shared_ptr<FillBuffer> fillBuffer;
 
-    std::forward_list<Layer> layers;
+    // Holds the buckets of this tile.
+    // They contain the location offsets in the buffers stored above
+    std::map<std::string, std::shared_ptr<Bucket>> buckets;
+    // std::forward_list<Layer> layers;
 
 private:
     // Source data
@@ -74,6 +87,8 @@ private:
     uint32_t bytes;
 
     std::mutex mtx;
+
+    const Style& style;
 };
 
 }

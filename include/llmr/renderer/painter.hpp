@@ -12,6 +12,7 @@ namespace llmr {
 class Settings;
 class Transform;
 class Style;
+class LayerDescription;
 
 class FillBucket;
 struct FillProperties;
@@ -32,6 +33,7 @@ public:
 
     void clear();
     void render(const std::shared_ptr<Tile>& tile);
+    void renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers);
     void renderDebug(const std::shared_ptr<Tile>& tile);
 
     void renderBackground();

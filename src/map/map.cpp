@@ -2,6 +2,8 @@
 #include <llmr/map/tile.hpp>
 //#include <llmr/util/vec2.hpp>
 
+#include <llmr/resources/style.hpp>
+
 #include <iostream>
 #include <thread>
 
@@ -24,10 +26,12 @@ Map::~Map() {
 
 void Map::setup() {
     painter.setup();
+
+    style.load(resources::style, resources::style_size);
 }
 
-void Map::loadStyle(const uint8_t *data, uint32_t bytes) {
-    style.load(pbf(data, bytes));
+void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
+    style.load(data, bytes);
     update();
 }
 
@@ -119,7 +123,7 @@ Tile::Ptr Map::addTile(const Tile::ID& id) {
 
     if (!tile.get()) {
         // We couldn't find the tile in the list. Create a new one.
-        tile = std::make_shared<Tile>(id);
+        tile = std::make_shared<Tile>(id, style);
         assert(tile);
         // std::cerr << "init " << id.z << "/" << id.x << "/" << id.y << std::endl;
         // std::cerr << "add " << tile->toString() << std::endl;

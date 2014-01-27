@@ -13,7 +13,7 @@ struct pbf;
 
 class FillBucket : public Bucket {
 public:
-    FillBucket(FillBuffer& buffer);
+    FillBucket(const std::shared_ptr<FillBuffer>& buffer);
 
     virtual void render(Painter& painter, const std::string& layer_name);
 
@@ -22,7 +22,7 @@ public:
     void drawVertices(int32_t attrib);
 
 private:
-    FillBuffer& buffer;
+    std::shared_ptr<FillBuffer> buffer;
 
     struct group {
         uint32_t vertex_length;

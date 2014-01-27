@@ -15,10 +15,10 @@ struct geometry_too_long_exception : std::exception {};
 
 using namespace llmr;
 
-FillBucket::FillBucket(FillBuffer& buffer)
+FillBucket::FillBucket(const std::shared_ptr<FillBuffer>& buffer)
     : buffer(buffer),
-      vertex_start(buffer.vertex_length()),
-      elements_start(buffer.elements_length()),
+      vertex_start(buffer->vertex_length()),
+      elements_start(buffer->elements_length()),
       length(0) {
 }
 
@@ -43,6 +43,9 @@ void FillBucket::addGeometry(pbf& geom) {
             lines.push_back(line);
         }
     }
+
+    // Alias this.
+    FillBuffer& buffer = *this->buffer;
 
     for (const std::vector<std::pair<int16_t, int16_t>>& line : lines) {
         uint32_t vertex_start = buffer.vertex_length();
@@ -96,7 +99,7 @@ void FillBucket::addGeometry(pbf& geom) {
 void FillBucket::drawElements(int32_t attrib) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(uint16_t));
     char *elements_index = BUFFER_OFFSET(elements_start * 3 * sizeof(uint16_t));
-    buffer.bind();
+    buffer->bind();
     for (const auto& group : groups) {
         glVertexAttribPointer(attrib, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
