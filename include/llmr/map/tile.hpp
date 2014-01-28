@@ -2,8 +2,8 @@
 #define LLMR_MAP_TILE
 
 #include "../geometry/debug_font_buffer.hpp"
-#include "../geometry/linevertexbuffer.hpp"
 #include "../geometry/fill_buffer.hpp"
+#include "../geometry/line_buffer.hpp"
 
 #include "layer.hpp"
 
@@ -72,9 +72,9 @@ public:
     state state;
 
     // Holds the actual geometries in this tile.
-    std::shared_ptr<linevertexbuffer> lineVertex;
-    std::shared_ptr<debug_font_buffer> debugFontVertex;
+    std::shared_ptr<DebugFontBuffer> debugFontBuffer;
     std::shared_ptr<FillBuffer> fillBuffer;
+    std::shared_ptr<LineBuffer> lineBuffer;
 
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above

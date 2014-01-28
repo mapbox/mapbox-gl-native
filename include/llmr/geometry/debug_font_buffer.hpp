@@ -5,10 +5,10 @@
 
 namespace llmr {
 
-class debug_font_buffer {
+class DebugFontBuffer {
 public:
-    debug_font_buffer();
-    ~debug_font_buffer();
+    DebugFontBuffer();
+    ~DebugFontBuffer();
 
     void addText(const char *text, double left, double baseline, double scale = 1);
     void clear();

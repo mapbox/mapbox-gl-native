@@ -344,14 +344,14 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
     // draw debug info
     switchShader(lineShader);
     glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
-    tile->debugFontVertex->bind();
+    tile->debugFontBuffer->bind();
     glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
     glUniform4f(lineShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
     glLineWidth(4.0f);
-    glDrawArrays(GL_LINES, 0, tile->debugFontVertex->length());
+    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer->length());
     glUniform4f(lineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
     glLineWidth(2.0f);
-    glDrawArrays(GL_LINES, 0, tile->debugFontVertex->length());
+    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer->length());
 
     // Revert blending mode to blend to the back.
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);

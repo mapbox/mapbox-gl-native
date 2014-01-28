@@ -44,9 +44,9 @@ std::forward_list<Tile::ID> Tile::children(const ID& id, int32_t z) {
 Tile::Tile(ID id, const Style& style)
     : id(id),
       state(initial),
-      lineVertex(std::make_shared<linevertexbuffer>()),
-      debugFontVertex(std::make_shared<debug_font_buffer>()),
+      debugFontBuffer(std::make_shared<DebugFontBuffer>()),
       fillBuffer(std::make_shared<FillBuffer>()),
+      lineBuffer(std::make_shared<LineBuffer>()),
       data(0),
       bytes(0),
       style(style) {
@@ -54,7 +54,7 @@ Tile::Tile(ID id, const Style& style)
     // Initialize tile debug coordinates
     char coord[32];
     snprintf(coord, sizeof(coord), "%d/%d/%d", id.z, id.x, id.y);
-    debugFontVertex->addText(coord, 50, 200, 5);
+    debugFontBuffer->addText(coord, 50, 200, 5);
 }
 
 Tile::~Tile() {
