@@ -4,11 +4,6 @@
 
 using namespace llmr;
 
-const Coordinate Coordinate::null(
-    std::numeric_limits<int16_t>::min(),
-    std::numeric_limits<int16_t>::min()
-);
-
 VectorTile::VectorTile() {}
 
 VectorTile::VectorTile(pbf tile) {

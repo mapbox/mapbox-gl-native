@@ -9,6 +9,7 @@
 #include <llmr/map/settings.hpp>
 
 #include <llmr/renderer/fill_bucket.hpp>
+#include <llmr/renderer/line_bucket.hpp>
 #include <llmr/style/style.hpp>
 
 #include <cmath>

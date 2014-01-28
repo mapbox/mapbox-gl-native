@@ -73,9 +73,9 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices, const Buck
     CapType beginCap = cap;
     CapType endCap = closed ? CapType::Butt : cap;
 
-    Coordinate currentVertex = Coordinate::null,
-               prevVertex = Coordinate::null,
-               nextVertex = Coordinate::null;
+    Coordinate currentVertex = Coordinate::null(),
+               prevVertex = Coordinate::null(),
+               nextVertex = Coordinate::null();
     vec2<double> prevNormal = vec2<double>::null(),
                  nextNormal = vec2<double>::null();
 
@@ -102,7 +102,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices, const Buck
         if (i + 1 < vertices.size()) {
             nextVertex = vertices[i + 1];
         } else {
-            nextVertex = Coordinate::null;
+            nextVertex = Coordinate::null();
         }
 
         bool segment = false;
@@ -180,7 +180,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices, const Buck
                 buffer->addDegenerate();
             }
 
-            if (join == JoinType::Round) prevVertex = Coordinate::null;
+            if (join == JoinType::Round) prevVertex = Coordinate::null();
 
             prevNormal = { -nextNormal.x, -nextNormal.y };
             flip = 1;

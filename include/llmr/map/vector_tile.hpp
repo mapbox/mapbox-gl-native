@@ -15,8 +15,11 @@ class VectorTileLayer;
 struct pbf;
 
 struct Coordinate {
+    struct null {};
+
     Coordinate() : x(0), y(0) {}
     Coordinate(int16_t x, int16_t y) : x(x), y(y) {}
+    Coordinate(null) : x(std::numeric_limits<int16_t>::min()), y(std::numeric_limits<int16_t>::min()) {}
     int16_t x;
     int16_t y;
 
@@ -25,10 +28,8 @@ struct Coordinate {
     }
 
     inline operator bool() const {
-        return *this == null;
+        return x != std::numeric_limits<int16_t>::min() && y != std::numeric_limits<int16_t>::min();
     }
-
-    static const Coordinate null;
 };
 
 /*
