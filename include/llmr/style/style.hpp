@@ -28,7 +28,7 @@ private:
     static LayerDescription parseLayer(pbf data);
     static std::pair<std::string, ClassDescription> parseClass(pbf data);
     static std::pair<std::string, FillClass> parseFillClass(pbf data);
-    static std::pair<std::string, StrokeClass> parseStrokeClass(pbf data);
+    static std::pair<std::string, LineClass> parseLineClass(pbf data);
     template <typename T> static FunctionProperty<T> parseProperty(pbf data);
     static Color parseColor(pbf& data);
 
@@ -43,7 +43,7 @@ public:
     std::set<std::string> appliedClasses;
     struct {
         std::map<std::string, FillProperties> fills;
-        std::map<std::string, StrokeProperties> strokes;
+        std::map<std::string, LineProperties> lines;
     } computed;
 };
 

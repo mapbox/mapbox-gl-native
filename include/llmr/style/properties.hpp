@@ -53,16 +53,16 @@ struct FunctionProperty {
 };
 
 
-// StrokeClass is the information we parse from the stylesheet
-struct StrokeClass {
+// LineClass is the information we parse from the stylesheet
+struct LineClass {
     FunctionProperty<bool> hidden;
     FunctionProperty<float> width;
     FunctionProperty<float> offset;
     Color color = {{ 0, 0, 0, 1 }};
 };
 
-// StrokeProperties is the one we resolve this to.
-struct StrokeProperties {
+// LineProperties is the one we resolve this to.
+struct LineProperties {
     bool hidden = false;
     float width = 0;
     float offset = 0;

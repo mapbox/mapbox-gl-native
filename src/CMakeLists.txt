@@ -12,6 +12,7 @@ SET(llmr_SOURCES
     renderer/shader-outline.cpp
     renderer/shader.cpp
     renderer/fill_bucket.cpp
+    renderer/line_bucket.cpp
     resources/style.cpp
     shader/shaders.cpp
     style/style.cpp

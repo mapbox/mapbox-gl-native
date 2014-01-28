@@ -10,7 +10,7 @@ Style::Style() {
 
 void Style::reset() {
     computed.fills.clear();
-    computed.strokes.clear();
+    computed.lines.clear();
 }
 
 void Style::load(const uint8_t *const data, uint32_t bytes) {
@@ -91,7 +91,7 @@ std::pair<std::string, ClassDescription> Style::parseClass(pbf data) {
         } else if (data.tag == 2) { // fill_style
             klass.fill.insert(parseFillClass(data.message()));
         } else if (data.tag == 3) { // stroke_style
-            klass.stroke.insert(parseStrokeClass(data.message()));
+            klass.line.insert(parseLineClass(data.message()));
         } else {
             data.skip();
         }
@@ -131,8 +131,8 @@ std::pair<std::string, FillClass> Style::parseFillClass(pbf data) {
 }
 
 
-std::pair<std::string, StrokeClass> Style::parseStrokeClass(pbf data) {
-    StrokeClass stroke;
+std::pair<std::string, LineClass> Style::parseLineClass(pbf data) {
+    LineClass stroke;
     std::string name;
 
     while (data.next()) {
@@ -216,11 +216,11 @@ void Style::cascade(float z) {
         }
 
         // Cascade line classes
-        for (const auto& stroke_pair : sheetClass.stroke) {
-            const std::string& layer_name = stroke_pair.first;
-            const llmr::StrokeClass& layer = stroke_pair.second;
+        for (const auto& line_pair : sheetClass.line) {
+            const std::string& layer_name = line_pair.first;
+            const llmr::LineClass& layer = line_pair.second;
 
-            llmr::StrokeProperties& stroke = computed.strokes[layer_name];
+            llmr::LineProperties& stroke = computed.lines[layer_name];
             stroke.hidden = layer.hidden(z);
             stroke.width = layer.width(z);
             stroke.offset = layer.offset(z);

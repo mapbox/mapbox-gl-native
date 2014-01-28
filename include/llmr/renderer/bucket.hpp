@@ -1,5 +1,5 @@
-#ifndef LLMR_GEOMETRY_BUCKET
-#define LLMR_GEOMETRY_BUCKET
+#ifndef LLMR_RENDERER_BUCKET
+#define LLMR_RENDERER_BUCKET
 
 #include <string>
 

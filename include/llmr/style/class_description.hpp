@@ -11,7 +11,7 @@ namespace llmr {
 class ClassDescription {
 public:
     std::map<std::string, FillClass> fill;
-    std::map<std::string, StrokeClass> stroke;
+    std::map<std::string, LineClass> line;
 };
 
 

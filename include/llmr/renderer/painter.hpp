@@ -15,7 +15,7 @@ class Style;
 class LayerDescription;
 
 class FillBucket;
-struct FillProperties;
+class LineBucket;
 
 class Painter {
 public:
@@ -38,6 +38,7 @@ public:
 
     void renderBackground();
     void renderFill(FillBucket& bucket, const std::string& layer_name);
+    void renderLine(LineBucket& bucket, const std::string& layer_name);
 
 
     void drawClippingMask();

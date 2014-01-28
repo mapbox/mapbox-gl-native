@@ -328,6 +328,10 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
 }
 
+void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
+    const LineProperties& properties = style.computed.lines[layer_name];
+}
+
 void Painter::renderDebug(const Tile::Ptr& tile) {
     // Blend to the front, not the back.
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);

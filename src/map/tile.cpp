@@ -9,6 +9,7 @@
 #include <llmr/util/string.hpp>
 #include <llmr/geometry/geometry.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
+#include <llmr/renderer/line_bucket.hpp>
 #include <llmr/style/style.hpp>
 #include <cmath>
 
@@ -149,6 +150,8 @@ std::shared_ptr<Bucket> Tile::createBucket(const BucketDescription& bucket_desc)
         const VectorTileLayer& layer = layer_it->second;
         if (bucket_desc.type == BucketType::Fill) {
             return createFillBucket(layer, bucket_desc);
+        } else if (bucket_desc.type == BucketType::Line) {
+            return createLineBucket(layer, bucket_desc);
         } else {
             // TODO: create other bucket types.
         }
@@ -159,13 +162,6 @@ std::shared_ptr<Bucket> Tile::createBucket(const BucketDescription& bucket_desc)
     return NULL;
 }
 
-enum geom_type {
-    Unknown = 0,
-    Point = 1,
-    LineString = 2,
-    Polygon = 3
-};
-
 std::shared_ptr<Bucket> Tile::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(fillBuffer);
 
@@ -173,22 +169,27 @@ std::shared_ptr<Bucket> Tile::createFillBucket(const VectorTileLayer& layer, con
     for (pbf feature : filtered_layer) {
         while (feature.next(4)) { // geometry
             pbf geometry_pbf = feature.message();
-            bucket->addGeometry(geometry_pbf);
+            if (geometry_pbf) {
+                bucket->addGeometry(geometry_pbf);
+            }
         }
     }
 
     return bucket;
 }
 
-// void Tile::addLineGeometry(pbf& geom) {
-//     Geometry geometry(geom);
+std::shared_ptr<Bucket> Tile::createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+    std::shared_ptr<LineBucket> bucket = std::make_shared<LineBucket>(lineBuffer);
 
-//     Geometry::command cmd;
-//     int32_t x, y;
-//     while ((cmd = geometry.next(x, y)) != Geometry::end) {
-//         if (cmd == Geometry::move_to) {
-//             lineVertex.addDegenerate();
-//         }
-//         lineVertex.addCoordinate(x, y);
-//     }
-// }
+    FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
+    for (pbf feature : filtered_layer) {
+        while (feature.next(4)) { // geometry
+            pbf geometry_pbf = feature.message();
+            if (geometry_pbf) {
+                bucket->addGeometry(geometry_pbf);
+            }
+        }
+    }
+
+    return bucket;
+}
