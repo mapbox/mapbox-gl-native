@@ -8,11 +8,14 @@ enum bucket_type {
 
 enum cap_type {
     round = 1;
+    butt = 2;
+    square = 3;
 }
 
 enum join_type {
     butt = 1;
     bevel = 2;
+    round = 3;
 }
 
 enum winding_type {

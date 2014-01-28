@@ -18,12 +18,15 @@ enum class BucketType {
 enum class CapType {
     None = 0,
     Round = 1,
+    Butt = 2,
+    Square = 3
 };
 
 enum class JoinType {
     None = 0,
     Butt = 1,
-    Bevel = 2
+    Bevel = 2,
+    Round = 3
 };
 
 
@@ -42,6 +45,8 @@ public:
     JoinType join = JoinType::None;
     std::string font;
     float font_size = 0.0f;
+    float miter_limit = 2.0f;
+    float round_limit = 1.0f;
 };
 
 std::ostream& operator<<(std::ostream&, const BucketDescription& bucket);

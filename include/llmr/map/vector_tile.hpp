@@ -14,6 +14,28 @@ class VectorTileLayer;
 
 struct pbf;
 
+struct Coordinate {
+    Coordinate() : x(0), y(0) {}
+    Coordinate(int16_t x, int16_t y) : x(x), y(y) {}
+    int16_t x;
+    int16_t y;
+
+    inline bool operator==(const Coordinate& other) const {
+        return x == other.x && y == other.y;
+    }
+
+    inline operator bool() const {
+        return *this == null;
+    }
+
+    static const Coordinate null;
+};
+
+/*
+ * Allows iterating over the features of a VectorTileLayer using a
+ * BucketDescription as filter. Only features matching the descriptions will
+ * be returned (as pbf).
+ */
 class FilteredVectorTileLayer {
 public:
     class iterator {

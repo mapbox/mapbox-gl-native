@@ -4,6 +4,11 @@
 
 using namespace llmr;
 
+const Coordinate Coordinate::null(
+    std::numeric_limits<int16_t>::min(),
+    std::numeric_limits<int16_t>::min()
+);
+
 VectorTile::VectorTile() {}
 
 VectorTile::VectorTile(pbf tile) {
@@ -151,19 +156,3 @@ bool FilteredVectorTileLayer::iterator::operator!=(const iterator& other) const 
 const pbf& FilteredVectorTileLayer::iterator:: operator*() const {
     return feature;
 }
-
-// class FilteredVectorTileLayer {
-// public:
-//     class iterator {
-//     public:
-//         void operator++();
-//         bool operator!=(const iterator& other) const;
-//         const VectorTileFeature& operator*() const;
-
-//     private:
-//         iterator(const pbf& data);
-//         VectorTileFeature feature;
-//         pbf data;
-//     };
-
-// };

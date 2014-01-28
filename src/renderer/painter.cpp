@@ -330,6 +330,8 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
 
 void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
     const LineProperties& properties = style.computed.lines[layer_name];
+
+    // TODO
 }
 
 void Painter::renderDebug(const Tile::Ptr& tile) {

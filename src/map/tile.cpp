@@ -170,7 +170,7 @@ std::shared_ptr<Bucket> Tile::createFillBucket(const VectorTileLayer& layer, con
         while (feature.next(4)) { // geometry
             pbf geometry_pbf = feature.message();
             if (geometry_pbf) {
-                bucket->addGeometry(geometry_pbf);
+                bucket->addGeometry(geometry_pbf, bucket_desc);
             }
         }
     }
@@ -186,7 +186,7 @@ std::shared_ptr<Bucket> Tile::createLineBucket(const VectorTileLayer& layer, con
         while (feature.next(4)) { // geometry
             pbf geometry_pbf = feature.message();
             if (geometry_pbf) {
-                bucket->addGeometry(geometry_pbf);
+                bucket->addGeometry(geometry_pbf, bucket_desc);
             }
         }
     }

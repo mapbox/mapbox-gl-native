@@ -9,6 +9,8 @@ namespace llmr {
 
 class Style;
 class LineBuffer;
+class BucketDescription;
+struct Coordinate;
 struct pbf;
 
 class LineBucket : public Bucket {
@@ -17,11 +19,13 @@ public:
 
     virtual void render(Painter& painter, const std::string& layer_name);
 
-    void addGeometry(pbf& data);
+    void addGeometry(pbf& data, const BucketDescription& bucket_desc);
+    void addGeometry(const std::vector<Coordinate>& line, const BucketDescription& bucket_desc);
 
 private:
     std::shared_ptr<LineBuffer> buffer;
-
+    uint32_t start;
+    uint32_t length;
 };
 
 }

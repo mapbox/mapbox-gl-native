@@ -206,6 +206,8 @@ void Style::cascade(float z) {
             const std::string& layer_name = fill_pair.first;
             const llmr::FillClass& layer = fill_pair.second;
 
+            // TODO: This should be restricted to fill styles that have actual
+            // values so as to not override with default values.
             llmr::FillProperties& fill = computed.fills[layer_name];
             fill.hidden = layer.hidden(z);
             fill.winding = layer.winding;
@@ -220,11 +222,14 @@ void Style::cascade(float z) {
             const std::string& layer_name = line_pair.first;
             const llmr::LineClass& layer = line_pair.second;
 
+            // TODO: This should be restricted to fill styles that have actual
+            // values so as to not override with default values.
             llmr::LineProperties& stroke = computed.lines[layer_name];
             stroke.hidden = layer.hidden(z);
             stroke.width = layer.width(z);
             stroke.offset = layer.offset(z);
             stroke.color = layer.color;
+            stroke.opacity = layer.opacity(z);
         }
     }
 }

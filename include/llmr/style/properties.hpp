@@ -22,7 +22,6 @@ enum class Winding {
 //     Bevel = 2
 // };
 
-
 enum class Property {
     Null = 1,
     Constant = 2,
@@ -59,6 +58,7 @@ struct LineClass {
     FunctionProperty<float> width;
     FunctionProperty<float> offset;
     Color color = {{ 0, 0, 0, 1 }};
+    FunctionProperty<float> opacity = 1;
 };
 
 // LineProperties is the one we resolve this to.
@@ -67,6 +67,7 @@ struct LineProperties {
     float width = 0;
     float offset = 0;
     Color color = {{ 0, 0, 0, 1 }};
+    float opacity = 1.0;
 };
 
 

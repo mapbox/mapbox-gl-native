@@ -1,17 +1,28 @@
 #ifndef llmr_util_vec2_
 #define llmr_util_vec2_
 
+#include <limits>
+
 namespace llmr {
 
 template <typename T = double>
 struct vec2 {
+    struct null {};
+
     T x, y;
 
     inline vec2() {}
+    inline vec2(null) : x(std::numeric_limits<T>::quiet_NaN()), y(std::numeric_limits<T>::quiet_NaN()) {}
+
     inline vec2(const vec2& o) : x(o.x), y(o.y) {}
     inline vec2(T x, T y) : x(x), y(y) {}
     inline bool operator==(const vec2& rhs) const {
         return x == rhs.x && y == rhs.y;
+    }
+
+    template<typename U = T, typename std::enable_if<std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
+    inline operator bool() const {
+        return isnan(x) || isnan(y);
     }
 };
 
