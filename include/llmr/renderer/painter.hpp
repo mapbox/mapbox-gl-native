@@ -4,6 +4,7 @@
 #include "shader-fill.hpp"
 #include "shader-plain.hpp"
 #include "shader-outline.hpp"
+#include "shader-line.hpp"
 
 #include "../map/tile.hpp"
 
@@ -54,12 +55,15 @@ private:
     Transform& transform;
     Settings& settings;
     Style& style;
+
     float matrix[16];
+    float exMatrix[16];
 
     std::shared_ptr<Shader> currentShader;
     std::shared_ptr<FillShader> fillShader;
     std::shared_ptr<PlainShader> plainShader;
     std::shared_ptr<OutlineShader> outlineShader;
+    std::shared_ptr<LineShader> lineShader;
 
     uint32_t tile_stencil_buffer;
     uint32_t tile_border_buffer;

@@ -5,6 +5,7 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/util/animation.hpp>
 
+#include <cmath>
 #include <cstdint>
 #include <forward_list>
 
@@ -40,6 +41,7 @@ public:
     // Getters
     void matrixFor(float matrix[16], const vec3<int32_t>& id) const;
     float getZoom() const;
+    int32_t getIntegerZoom() const;
     double getScale() const;
     double getAngle() const;
     void getLonLat(double& lon, double& lat) const;
@@ -54,19 +56,22 @@ private:
 
 public:
     // logical dimensions
-    uint32_t width;
-    uint32_t height;
+    uint32_t width = 0;
+    uint32_t height = 0;
 
     // physical (framebuffer) dimensions
-    uint32_t fb_width;
-    uint32_t fb_height;
+    uint32_t fb_width = 0;
+    uint32_t fb_height = 0;
+
+    double pixelRatio = 1;
 
 private:
-    double x, y; // pixel values of the map center in the current scale
-    double angle;
-    double scale;
+    double x = 0, y = 0; // pixel values of the map center in the current scale
+    double angle = 0;
+    double scale = 1;
 
-    double min_scale, max_scale;
+    double min_scale = pow(2, 0);
+    double max_scale = pow(2, 20);
 
     // tile size
     const int32_t size = 512;

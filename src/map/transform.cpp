@@ -1,7 +1,6 @@
 #include <llmr/map/transform.hpp>
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/math.hpp>
-#include <cmath>
 #include <cstdio>
 
 using namespace llmr;
@@ -14,16 +13,7 @@ const double M2PI = 2 * M_PI;
 const double A = 6378137;
 
 
-Transform::Transform()
-    :
-    width(0),
-    height(0),
-    x(0),
-    y(0),
-    angle(0.0),
-    scale(1.0),
-    min_scale(pow(2, 0)),
-    max_scale(pow(2, 20)) {
+Transform::Transform() {
     setScale(scale);
     setAngle(angle);
 }
@@ -166,6 +156,10 @@ void Transform::matrixFor(float matrix[16], const vec3<int32_t>& id) const {
 
 float Transform::getZoom() const {
     return log(scale) / M_LN2;
+}
+
+int32_t Transform::getIntegerZoom() const {
+    return floor(log(scale) / M_LN2);
 }
 
 double Transform::getScale() const {

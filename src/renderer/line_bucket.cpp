@@ -23,6 +23,8 @@ LineBucket::LineBucket(const std::shared_ptr<LineBuffer>& buffer)
 }
 
 void LineBucket::addGeometry(pbf& geom, const BucketDescription& bucket_desc) {
+    join = bucket_desc.join;
+
     std::vector<Coordinate> line;
     Geometry::command cmd;
 

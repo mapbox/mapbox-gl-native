@@ -48,6 +48,7 @@ void Map::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb
     transform.height = height;
     transform.fb_width = fb_width;
     transform.fb_height = fb_height;
+    transform.pixelRatio = (double)fb_width / (double)width;
     update();
 }
 

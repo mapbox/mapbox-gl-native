@@ -12,6 +12,7 @@ struct shader_source {
 
 enum {
     FILL_SHADER,
+    LINE_SHADER,
     OUTLINE_SHADER,
     PLAIN_SHADER,
     SHADER_COUNT

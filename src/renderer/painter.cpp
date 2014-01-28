@@ -54,6 +54,7 @@ void Painter::setup() {
     assert(fillShader);
     assert(plainShader);
     assert(outlineShader);
+    assert(lineShader);
 
     // Set up the stencil quad we're using to generate the stencil mask.
     glGenBuffers(1, &tile_stencil_buffer);
@@ -78,6 +79,7 @@ void Painter::setupShaders() {
     fillShader = std::make_shared<FillShader>();
     plainShader = std::make_shared<PlainShader>();
     outlineShader = std::make_shared<OutlineShader>();
+    lineShader = std::make_shared<LineShader>();
 }
 
 void Painter::teardown() {
@@ -89,10 +91,13 @@ void Painter::changeMatrix(const Tile::Ptr& tile) {
     float projMatrix[16];
     mat4::ortho(projMatrix, 0, transform.width, transform.height, 0, 1, 10);
 
-    float mvMatrix[16];
-    transform.matrixFor(mvMatrix, tile->id);
+    // The position matrix.
+    transform.matrixFor(matrix, tile->id);
+    mat4::multiply(matrix, projMatrix, matrix);
 
-    mat4::multiply(matrix, projMatrix, mvMatrix);
+    // The extrusion matrix.
+    mat4::copy(exMatrix, projMatrix);
+    mat4::rotate_z(exMatrix, exMatrix, transform.getAngle());
 }
 
 void Painter::drawClippingMask() {
@@ -318,7 +323,73 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
 void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
     const LineProperties& properties = style.computed.lines[layer_name];
 
-    // TODO
+    double width = properties.width;
+    double offset = (properties.offset || 0) / 2;
+    double inset = fmax(-1, offset - width / 2 - 0.5) + 1;
+    double outset = offset + width / 2 + 0.5;
+
+    // var imagePos = properties.image && imageSprite.getPosition(properties.image);
+    // var shader;
+    bool imagePos = false;
+
+    if (imagePos) {
+        // var factor = 8 / Math.pow(2, painter.transform.zoom - params.z);
+
+        // imageSprite.bind(gl, true);
+
+        // //factor = Math.pow(2, 4 - painter.transform.zoom + params.z);
+        // gl.switchShader(painter.linepatternShader, painter.translatedMatrix || painter.posMatrix, painter.exMatrix);
+        // shader = painter.linepatternShader;
+        // glUniform2fv(painter.linepatternShader.u_pattern_size, [imagePos.size[0] * factor, imagePos.size[1] ]);
+        // glUniform2fv(painter.linepatternShader.u_pattern_tl, imagePos.tl);
+        // glUniform2fv(painter.linepatternShader.u_pattern_br, imagePos.br);
+        // glUniform1f(painter.linepatternShader.u_fade, painter.transform.z % 1.0);
+
+    } else {
+        switchShader(lineShader);
+        glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
+        glUniformMatrix4fv(lineShader->u_exmatrix, 1, GL_FALSE, exMatrix);
+        // glUniform2fv(painter.lineShader.u_dasharray, properties.dasharray || [1, -1]);
+        glUniform2f(lineShader->u_dasharray, 1, -1);
+    }
+
+
+    const double tilePixelRatio = transform.getScale() / (1 << transform.getIntegerZoom()) / 8;
+
+    glUniform2f(lineShader->u_linewidth, outset, inset);
+    glUniform1f(lineShader->u_ratio, tilePixelRatio);
+    glUniform1f(lineShader->u_gamma, transform.pixelRatio);
+
+    // const Color& color = properties.color;
+    // if (!params.antialiasing) {
+    //     color[3] = Infinity;
+    //     glUniform4fv(lineShader->u_color, color);
+    // } else {
+        glUniform4fv(lineShader->u_color, 1, properties.color.data());
+    // }
+
+
+    bucket.buffer->bind();
+
+
+    char *vertex_index = BUFFER_OFFSET(bucket.start * 2 * sizeof(uint16_t));
+    glVertexAttribPointer(lineShader->a_pos, 4, GL_SHORT, false, 8, vertex_index);
+    glVertexAttribPointer(lineShader->a_extrude, 2, GL_BYTE, false, 8, vertex_index + 6);
+    glVertexAttribPointer(lineShader->a_linesofar, 2, GL_SHORT, false, 8, vertex_index + 4);
+
+    uint32_t begin = bucket.start;
+    uint32_t count = bucket.length;
+
+    glUniform1f(lineShader->u_point, 0);
+    glDrawArrays(GL_TRIANGLE_STRIP, begin, count);
+
+    if (bucket.join == JoinType::Round) {
+        glUniform1f(lineShader->u_point, 1);
+        glDrawArrays(GL_POINTS, begin, count);
+    }
+
+    // statistics
+    // stats.lines += count;
 }
 
 void Painter::renderDebug(const Tile::Ptr& tile) {

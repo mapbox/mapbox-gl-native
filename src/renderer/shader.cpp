@@ -119,7 +119,7 @@ bool Shader::compileShader(GLuint *shader, GLenum type, const GLchar *source) {
 
     glCompileShader(*shader);
 
-#if defined(DEBUG)
+// #if defined(DEBUG)
     GLint logLength;
     glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &logLength);
     if (logLength > 0) {
@@ -128,7 +128,7 @@ bool Shader::compileShader(GLuint *shader, GLenum type, const GLchar *source) {
         fprintf(stderr, "Shader compile log:\n%s", log);
         free(log);
     }
-#endif
+// #endif
 
     glGetShaderiv(*shader, GL_COMPILE_STATUS, &status);
     if (status == 0) {
