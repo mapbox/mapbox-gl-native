@@ -5,6 +5,7 @@ SET(llmr_SOURCES
     map/map.cpp
     map/tile.cpp
     map/transform.cpp
+    map/vector_tile.cpp
     renderer/painter.cpp
     renderer/shader-fill.cpp
     renderer/shader-line.cpp
@@ -30,6 +31,7 @@ SET(llmr_HEADERS
     ../include/llmr/map/map.hpp
     ../include/llmr/map/tile.hpp
     ../include/llmr/map/transform.hpp
+    ../include/llmr/map/vector_tile.hpp
     ../include/llmr/platform/gl.hpp
     ../include/llmr/platform/platform.hpp
     ../include/llmr/renderer/painter.hpp

@@ -29,6 +29,7 @@ struct pbf {
     inline operator bool() const;
 
     inline bool next();
+    inline bool next(uint32_t tag);
     template <typename T = uint32_t> inline T varint();
     template <typename T = uint32_t> inline T svarint();
 
@@ -75,6 +76,16 @@ bool pbf::next() {
     return false;
 }
 
+bool pbf::next(uint32_t requested_tag) {
+    while (next()) {
+        if (tag == requested_tag) {
+            return true;
+        } else {
+            skip();
+        }
+    }
+    return false;
+}
 
 template <typename T>
 T pbf::varint() {

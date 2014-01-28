@@ -10,7 +10,6 @@
 #include <llmr/geometry/geometry.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/style/style.hpp>
-#include <llmr/style/value.hpp>
 #include <cmath>
 
 using namespace llmr;
@@ -95,10 +94,8 @@ bool Tile::parse() {
     }
 
     try {
-        pbf tile(data, bytes);
-        // fprintf(stderr, "[%p] parsing tile [%d/%d/%d]...\n", this, z, x, y);
-
-        parseLayers(tile, style.layers);
+        tile = VectorTile(pbf(data, bytes));
+        parseStyleLayers(style.layers);
     } catch (const std::exception& ex) {
         fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
         cancel();
@@ -114,12 +111,12 @@ bool Tile::parse() {
     return true;
 }
 
-void Tile::parseLayers(const pbf& data, const std::vector<LayerDescription>& layers) {
+void Tile::parseStyleLayers(const std::vector<LayerDescription>& layers) {
     for (const LayerDescription& layer_desc : layers) {
         if (layer_desc.child_layer.size()) {
             // This is a layer group.
             // TODO: create framebuffer
-            parseLayers(data, layer_desc.child_layer);
+            parseStyleLayers(layer_desc.child_layer);
             // TODO: render framebuffer on previous framebuffer
         } else {
             // This is a singular layer. Check if this bucket already exists. If not,
@@ -130,7 +127,7 @@ void Tile::parseLayers(const pbf& data, const std::vector<LayerDescription>& lay
                 if (bucket_it != style.buckets.end()) {
                     // Only create the new bucket if we have an actual specification
                     // for it.
-                    std::shared_ptr<Bucket> bucket = createBucket(data, bucket_it->second);
+                    std::shared_ptr<Bucket> bucket = createBucket(bucket_it->second);
                     if (bucket) {
                         // Bucket creation might fail because the data tile may not
                         // contain any data that falls into this bucket.
@@ -146,30 +143,17 @@ void Tile::parseLayers(const pbf& data, const std::vector<LayerDescription>& lay
     }
 }
 
-std::shared_ptr<Bucket> Tile::createBucket(const pbf& data, const BucketDescription& bucket_desc) {
-    pbf tile(data);
-    // TODO: remember data locations in tiles for faster parsing so that we don't
-    // have to go through the entire vector tile all the time.
-    while (tile.next()) {
-        if (tile.tag == 3) { // layer
-            pbf layer = tile.message();
-            while (layer.next()) {
-                if (layer.tag == 1) {
-                    std::string name = layer.string();
-                    if (name == bucket_desc.source_layer) {
-                        if (bucket_desc.type == BucketType::Fill) {
-                            return createFillBucket(layer, bucket_desc);
-                        } else {
-                            // TODO: create other bucket types.
-                        }
-                    }
-                } else {
-                    layer.skip();
-                }
-            }
+std::shared_ptr<Bucket> Tile::createBucket(const BucketDescription& bucket_desc) {
+    auto layer_it = tile.layers.find(bucket_desc.source_layer);
+    if (layer_it != tile.layers.end()) {
+        const VectorTileLayer& layer = layer_it->second;
+        if (bucket_desc.type == BucketType::Fill) {
+            return createFillBucket(layer, bucket_desc);
         } else {
-            tile.skip();
+            // TODO: create other bucket types.
         }
+    } else {
+        // The layer specified in the bucket does not exist. Do nothing.
     }
 
     return NULL;
@@ -182,99 +166,14 @@ enum geom_type {
     Polygon = 3
 };
 
-std::shared_ptr<Bucket> Tile::createFillBucket(const pbf data, const BucketDescription& bucket_desc) {
-    pbf layer;
+std::shared_ptr<Bucket> Tile::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(fillBuffer);
 
-    int32_t key = -1;
-    std::set<uint32_t> values;
-
-    // If we filter further by field/value, parse the key/value indices first
-    // because protobuf doesn't mandate a particular key order.
-    if (bucket_desc.source_field.size()) {
-        uint32_t key_id = 0;
-        uint32_t value_id = 0;
-
-        // Find out what key/value IDs we need.
-        layer = data;
-        while (layer.next()) {
-            if (layer.tag == 3) { // keys
-                if (layer.string() == bucket_desc.source_field) {
-                    // We found the key
-                    key = key_id;
-                }
-                key_id++;
-            } else if (layer.tag == 4) { // values
-                Value value = parseValue(layer.message());
-                if (std::find(bucket_desc.source_value.begin(), bucket_desc.source_value.end(), value) != bucket_desc.source_value.end()) {
-                    values.insert(value_id);
-                }
-                value_id++;
-            } else {
-                layer.skip();
-            }
-        }
-
-        if (key < 0 || values.empty()) {
-            // There are no valid values that we could possibly find. Abort early.
-            return bucket;
-        }
-    }
-
-    // Now parse the features and optionally filter by key/value IDs.
-    layer = data;
-    while (layer.next()) {
-        if (layer.tag == 2) { // feature
-            pbf feature = layer.message();
-            pbf geometry;
-            geom_type type = Unknown;
-            bool skip = false;
-
-            while (!skip && feature.next()) {
-                if (feature.tag == 2) { // tags
-                    if (key < 0) {
-                        // We want to parse the entire layer anyway
-                        feature.skip();
-                    } else {
-                        // We only want to parse some features.
-                        skip = true;
-                        // tags are packed varints. They should have an even length.
-                        pbf tags = feature.message();
-                        while (tags) {
-                            uint32_t tag_key = tags.varint();
-                            if (tags) {
-                                uint32_t tag_val = tags.varint();
-                                // Now check if the tag_key/tag_val pair is included
-                                // in the set of key/values that we are looking for.
-                                if (key == tag_key && values.find(tag_val) != values.end()) {
-                                    skip = false;
-                                    break;
-                                }
-                            } else {
-                                // This should not happen; otherwise the vector tile
-                                // is invalid.
-                                throw std::runtime_error("uneven number of feature tag ids");
-                            }
-                        }
-                    }
-                } else if (feature.tag == 3) { // geometry type
-                    type = (geom_type)feature.varint();
-                    if (type != Polygon) {
-                        skip = true;
-                        break;
-                    }
-                } else if (feature.tag == 4) { // geometry
-                    geometry = feature.message();
-                } else {
-                    feature.skip();
-                }
-            }
-
-            if (!skip && geometry) {
-                bucket->addGeometry(geometry);
-            }
-        } else {
-            layer.skip();
+    FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
+    for (pbf feature : filtered_layer) {
+        while (feature.next(4)) { // geometry
+            pbf geometry_pbf = feature.message();
+            bucket->addGeometry(geometry_pbf);
         }
     }
 

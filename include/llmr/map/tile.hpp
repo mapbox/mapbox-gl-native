@@ -6,6 +6,7 @@
 #include "../geometry/line_buffer.hpp"
 
 #include "layer.hpp"
+#include "vector_tile.hpp"
 
 #include <stdint.h>
 #include <forward_list>
@@ -21,6 +22,8 @@ class Style;
 class Bucket;
 class LayerDescription;
 class BucketDescription;
+
+
 
 class Tile {
 public:
@@ -52,13 +55,9 @@ public:
     // Other functions
     void setData(uint8_t *data, uint32_t bytes);
     bool parse();
-    void parseLayers(const pbf& tile, const std::vector<LayerDescription>& layers);
-    std::shared_ptr<Bucket> createBucket(const pbf& tile, const BucketDescription& bucket_desc);
-    // void parseLayer(const pbf layer);
-
-    // void (const std::vector<LayerDescription>& child_layers);
-
-    std::shared_ptr<Bucket> createFillBucket(const pbf data, const BucketDescription& bucket_desc);
+    void parseStyleLayers(const std::vector<LayerDescription>& layers);
+    std::shared_ptr<Bucket> createBucket(const BucketDescription& bucket_desc);
+    std::shared_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
 
     void cancel();
 
@@ -85,6 +84,7 @@ private:
     // Source data
     uint8_t *data;
     uint32_t bytes;
+    VectorTile tile;
 
     std::mutex mtx;
 
