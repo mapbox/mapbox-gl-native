@@ -8,7 +8,7 @@ namespace llmr {
 class Shader {
 public:
     Shader(const char *vertex, const char *fragment);
-    ~Shader();
+    virtual ~Shader();
 
     // Make noncopyable
     Shader(const Shader&) = delete;

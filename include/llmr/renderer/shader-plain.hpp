@@ -1,13 +1,13 @@
-#ifndef LLMR_RENDERER_SHADER_LINE
-#define LLMR_RENDERER_SHADER_LINE
+#ifndef LLMR_RENDERER_SHADER_PLAIN
+#define LLMR_RENDERER_SHADER_PLAIN
 
 #include "shader.hpp"
 
 namespace llmr {
 
-class LineShader : public Shader {
+class PlainShader : public Shader {
 public:
-    LineShader();
+    PlainShader();
 
     int32_t a_pos;
     int32_t u_matrix;

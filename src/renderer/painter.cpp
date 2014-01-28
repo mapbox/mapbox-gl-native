@@ -44,10 +44,7 @@ Painter::Painter(Transform& transform, Settings& settings, Style& style)
     : transform(transform),
       settings(settings),
       style(style),
-      currentShader(NULL),
-      fillShader(NULL),
-      lineShader(NULL),
-      outlineShader(NULL) {
+      currentShader(NULL) {
 }
 
 
@@ -55,7 +52,7 @@ void Painter::setup() {
     setupShaders();
 
     assert(fillShader);
-    assert(lineShader);
+    assert(plainShader);
     assert(outlineShader);
 
     // Set up the stencil quad we're using to generate the stencil mask.
@@ -78,24 +75,13 @@ void Painter::setup() {
 }
 
 void Painter::setupShaders() {
-    fillShader = new FillShader();
-    lineShader = new LineShader();
-    outlineShader = new OutlineShader();
+    fillShader = std::make_shared<FillShader>();
+    plainShader = std::make_shared<PlainShader>();
+    outlineShader = std::make_shared<OutlineShader>();
 }
 
 void Painter::teardown() {
     glDeleteBuffers(1, &tile_stencil_buffer);
-
-    if (fillShader) {
-        delete fillShader;
-        fillShader = NULL;
-    }
-
-    if (lineShader) {
-        delete lineShader;
-        lineShader = NULL;
-    }
-
 }
 
 void Painter::changeMatrix(const Tile::Ptr& tile) {
@@ -110,8 +96,8 @@ void Painter::changeMatrix(const Tile::Ptr& tile) {
 }
 
 void Painter::drawClippingMask() {
-    switchShader(lineShader);
-    glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
+    switchShader(plainShader);
+    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix);
 
     glColorMask(false, false, false, false);
 
@@ -132,8 +118,8 @@ void Painter::drawClippingMask() {
 
     // Draw the clipping mask
     glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
-    glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
-    glUniform4f(lineShader->u_color, 1.0f, 0.0f, 1.0f, 1.0f);
+    glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+    glUniform4f(plainShader->u_color, 1.0f, 0.0f, 1.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 0, sizeof(tile_stencil_vertices));
 
     // glEnable(GL_STENCIL_TEST);
@@ -340,23 +326,23 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     // draw tile outline
-    switchShader(lineShader);
-    glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
+    switchShader(plainShader);
+    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix);
     glBindBuffer(GL_ARRAY_BUFFER, tile_border_buffer);
-    glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
-    glUniform4f(lineShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
+    glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+    glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
     glLineWidth(4.0f);
     glDrawArrays(GL_LINE_STRIP, 0, sizeof(tile_border_vertices));
 
     // draw debug info
-    switchShader(lineShader);
-    glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
+    switchShader(plainShader);
+    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix);
     tile->debugFontBuffer->bind();
-    glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    glUniform4f(lineShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
+    glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
     glLineWidth(4.0f);
     glDrawArrays(GL_LINES, 0, tile->debugFontBuffer->length());
-    glUniform4f(lineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
+    glUniform4f(plainShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
     glLineWidth(2.0f);
     glDrawArrays(GL_LINES, 0, tile->debugFontBuffer->length());
 
@@ -382,7 +368,7 @@ void Painter::renderBackground() {
 /**
  * @return boolean whether the shader was actually switched
  */
-bool Painter::switchShader(Shader *shader) {
+bool Painter::switchShader(std::shared_ptr<Shader> shader) {
     if (currentShader != shader) {
         glUseProgram(shader->program);
 

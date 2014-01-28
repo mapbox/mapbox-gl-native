@@ -8,7 +8,7 @@ SET(llmr_SOURCES
     map/vector_tile.cpp
     renderer/painter.cpp
     renderer/shader-fill.cpp
-    renderer/shader-line.cpp
+    renderer/shader-plain.cpp
     renderer/shader-outline.cpp
     renderer/shader.cpp
     renderer/fill_bucket.cpp
@@ -37,7 +37,7 @@ SET(llmr_HEADERS
     ../include/llmr/platform/platform.hpp
     ../include/llmr/renderer/painter.hpp
     ../include/llmr/renderer/shader-fill.hpp
-    ../include/llmr/renderer/shader-line.hpp
+    ../include/llmr/renderer/shader-plain.hpp
     ../include/llmr/renderer/shader-outline.hpp
     ../include/llmr/renderer/shader.hpp
     ../include/llmr/shader/shaders.hpp

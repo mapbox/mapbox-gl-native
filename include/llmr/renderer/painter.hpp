@@ -2,7 +2,7 @@
 #define LLMR_RENDERER_PAINTER
 
 #include "shader-fill.hpp"
-#include "shader-line.hpp"
+#include "shader-plain.hpp"
 #include "shader-outline.hpp"
 
 #include "../map/tile.hpp"
@@ -42,7 +42,7 @@ public:
 
 
     void drawClippingMask();
-    bool switchShader(Shader *shader);
+    bool switchShader(std::shared_ptr<Shader> shader);
 
 private:
     void setupShaders();
@@ -56,10 +56,10 @@ private:
     Style& style;
     float matrix[16];
 
-    Shader *currentShader;
-    FillShader *fillShader;
-    LineShader *lineShader;
-    OutlineShader *outlineShader;
+    std::shared_ptr<Shader> currentShader;
+    std::shared_ptr<FillShader> fillShader;
+    std::shared_ptr<PlainShader> plainShader;
+    std::shared_ptr<OutlineShader> outlineShader;
 
     uint32_t tile_stencil_buffer;
     uint32_t tile_border_buffer;

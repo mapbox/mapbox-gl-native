@@ -1,16 +1,16 @@
-#include <llmr/renderer/shader-line.hpp>
+#include <llmr/renderer/shader-plain.hpp>
 #include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 
 using namespace llmr;
 
-LineShader::LineShader()
+PlainShader::PlainShader()
     : Shader(
-        shaders[LINE_SHADER].vertex,
-        shaders[LINE_SHADER].fragment
+        shaders[PLAIN_SHADER].vertex,
+        shaders[PLAIN_SHADER].fragment
     ) {
     if (!valid) {
-        fprintf(stderr, "invalid line shader\n");
+        fprintf(stderr, "invalid plain shader\n");
         return;
     }
 
