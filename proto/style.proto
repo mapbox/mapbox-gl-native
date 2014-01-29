@@ -7,15 +7,15 @@ enum bucket_type {
 }
 
 enum cap_type {
-    round = 1;
-    butt = 2;
-    square = 3;
+    round_cap = 1;
+    butt_cap = 2;
+    square_cap = 3;
 }
 
 enum join_type {
-    butt = 1;
-    bevel = 2;
-    round = 3;
+    butt_join = 1;
+    bevel_join = 2;
+    round_join = 3;
 }
 
 enum winding_type {
@@ -27,6 +27,7 @@ enum property_type {
     null = 1;
     constant = 2;
     stops = 3;
+    linear = 4;
 }
 
 message value {
@@ -87,6 +88,7 @@ message stroke_style {
     optional fixed32 color = 3 [ default = 0x000000FF ]; // rgba (=> rgb << 8 | 0xFF for opaque!)
     optional property width = 4;
     optional property offset = 5;
+    optional property opacity = 6; // values from 0..1
     // line join + line cap are already defined in the
     // TODO: dasharray
     // TODO: image/icon

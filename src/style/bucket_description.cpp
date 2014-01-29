@@ -11,9 +11,9 @@ std::ostream& llmr::operator<<(std::ostream& os, const BucketDescription& bucket
     for (const Value& value : bucket.source_value) {
         os << "  - source_value: " << value << std::endl;
     }
-    os << "  - cap: " << (uint32_t)bucket.cap << std::endl;
-    os << "  - join: " << (uint32_t)bucket.join << std::endl;
-    os << "  - font: " << bucket.font << std::endl;
-    os << "  - font_size: " << bucket.font_size << std::endl;
+    os << "  - cap: " << (uint32_t)bucket.geometry.cap << std::endl;
+    os << "  - join: " << (uint32_t)bucket.geometry.join << std::endl;
+    os << "  - font: " << bucket.geometry.font << std::endl;
+    os << "  - font_size: " << bucket.geometry.font_size << std::endl;
     return os;
 }

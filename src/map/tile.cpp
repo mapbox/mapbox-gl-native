@@ -163,14 +163,14 @@ std::shared_ptr<Bucket> Tile::createBucket(const BucketDescription& bucket_desc)
 }
 
 std::shared_ptr<Bucket> Tile::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
-    std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(fillBuffer);
+    std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(fillBuffer, bucket_desc);
 
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (pbf feature : filtered_layer) {
         while (feature.next(4)) { // geometry
             pbf geometry_pbf = feature.message();
             if (geometry_pbf) {
-                bucket->addGeometry(geometry_pbf, bucket_desc);
+                bucket->addGeometry(geometry_pbf);
             }
         }
     }
@@ -179,14 +179,14 @@ std::shared_ptr<Bucket> Tile::createFillBucket(const VectorTileLayer& layer, con
 }
 
 std::shared_ptr<Bucket> Tile::createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
-    std::shared_ptr<LineBucket> bucket = std::make_shared<LineBucket>(lineBuffer);
+    std::shared_ptr<LineBucket> bucket = std::make_shared<LineBucket>(lineBuffer, bucket_desc);
 
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (pbf feature : filtered_layer) {
         while (feature.next(4)) { // geometry
             pbf geometry_pbf = feature.message();
             if (geometry_pbf) {
-                bucket->addGeometry(geometry_pbf, bucket_desc);
+                bucket->addGeometry(geometry_pbf);
             }
         }
     }

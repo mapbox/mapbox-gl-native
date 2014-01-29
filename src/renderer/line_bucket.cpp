@@ -16,15 +16,14 @@ struct geometry_too_long_exception : std::exception {};
 
 using namespace llmr;
 
-LineBucket::LineBucket(const std::shared_ptr<LineBuffer>& buffer)
-    : buffer(buffer),
+LineBucket::LineBucket(const std::shared_ptr<LineBuffer>& buffer, const BucketDescription& bucket_desc)
+    : geometry(bucket_desc.geometry),
+      buffer(buffer),
       start(buffer->length()),
       length(0) {
 }
 
-void LineBucket::addGeometry(pbf& geom, const BucketDescription& bucket_desc) {
-    join = bucket_desc.join;
-
+void LineBucket::addGeometry(pbf& geom) {
     std::vector<Coordinate> line;
     Geometry::command cmd;
 
@@ -34,22 +33,22 @@ void LineBucket::addGeometry(pbf& geom, const BucketDescription& bucket_desc) {
     while ((cmd = geometry.next(x, y)) != Geometry::end) {
         if (cmd == Geometry::move_to) {
             if (line.size()) {
-                addGeometry(line, bucket_desc);
+                addGeometry(line);
                 line.clear();
             }
         }
         line.emplace_back(x, y);
     }
     if (line.size()) {
-        addGeometry(line, bucket_desc);
+        addGeometry(line);
     }
 }
 
-void LineBucket::addGeometry(const std::vector<Coordinate>& vertices, const BucketDescription& bucket_desc) {
-    JoinType join = bucket_desc.join;
-    CapType cap = bucket_desc.cap;
-    float miterLimit = bucket_desc.miter_limit;
-    float roundLimit = bucket_desc.round_limit;
+void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
+    const JoinType join = geometry.join;
+    const CapType cap = geometry.cap;
+    const float miterLimit = geometry.miter_limit;
+    const float roundLimit = geometry.round_limit;
 
     if (vertices.size() < 1) {
         // alert('a line must have at least one vertex');
@@ -169,13 +168,13 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices, const Buck
         if (roundJoin && prevVertex && nextVertex) {
             // Add first vertex
             buffer->add(currentVertex.x, currentVertex.y, // vertex pos
-                      flip * prevNormal.y, -flip * prevNormal.x, // extrude normal
-                      0, 0, distance); // texture normal
+                        flip * prevNormal.y, -flip * prevNormal.x, // extrude normal
+                        0, 0, distance); // texture normal
 
             // Add second vertex.
             buffer->add(currentVertex.x, currentVertex.y, // vertex pos
-                      -flip * prevNormal.y, flip * prevNormal.x, // extrude normal
-                      0, 1, distance); // texture normal
+                        -flip * prevNormal.y, flip * prevNormal.x, // extrude normal
+                        0, 1, distance); // texture normal
 
             // Degenerate triangle
             if (join == JoinType::Round || join == JoinType::Butt) {
@@ -194,26 +193,26 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices, const Buck
 
             // Add first vertex
             buffer->add(currentVertex.x, currentVertex.y, // vertex pos
-                      flip * (prevNormal.x + prevNormal.y), flip * (-prevNormal.x + prevNormal.y), // extrude normal
-                      tex, 0, distance); // texture normal
+                        flip * (prevNormal.x + prevNormal.y), flip * (-prevNormal.x + prevNormal.y), // extrude normal
+                        tex, 0, distance); // texture normal
 
             // Add second vertex
             buffer->add(currentVertex.x, currentVertex.y, // vertex pos
-                      flip * (prevNormal.x - prevNormal.y), flip * (prevNormal.x + prevNormal.y), // extrude normal
-                      tex, 1, distance); // texture normal
+                        flip * (prevNormal.x - prevNormal.y), flip * (prevNormal.x + prevNormal.y), // extrude normal
+                        tex, 1, distance); // texture normal
         }
 
         if (roundJoin) {
             // ROUND JOIN
             // Add first vertex
             buffer->add(currentVertex.x, currentVertex.y, // vertex pos
-                      -flip * nextNormal.y, flip * nextNormal.x, // extrude normal
-                      0, 0, distance); // texture normal
+                        -flip * nextNormal.y, flip * nextNormal.x, // extrude normal
+                        0, 0, distance); // texture normal
 
             // Add second vertex
             buffer->add(currentVertex.x, currentVertex.y, // vertex pos
-                      flip * nextNormal.y, -flip * nextNormal.x, // extrude normal
-                      0, 1, distance); // texture normal
+                        flip * nextNormal.y, -flip * nextNormal.x, // extrude normal
+                        0, 1, distance); // texture normal
         } else if ((nextVertex || endCap != CapType::Square) && (prevVertex || beginCap != CapType::Square)) {
             // MITER JOIN
             if (fabs(joinAngularity) < 0.01) {
@@ -230,13 +229,13 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices, const Buck
 
             // Add first vertex
             buffer->add(currentVertex.x, currentVertex.y, // vertex pos
-                      flip * joinNormal.x, flip * joinNormal.y, // extrude normal
-                      0, 0, distance); // texture normal
+                        flip * joinNormal.x, flip * joinNormal.y, // extrude normal
+                        0, 0, distance); // texture normal
 
             // Add second vertex
             buffer->add(currentVertex.x, currentVertex.y, // vertex pos
-                      -flip * joinNormal.x, -flip * joinNormal.y, // extrude normal
-                      0, 1, distance); // texture normal
+                        -flip * joinNormal.x, -flip * joinNormal.y, // extrude normal
+                        0, 1, distance); // texture normal
         }
 
         // Add the end cap, but only if this vertex is distinct from the begin
@@ -246,13 +245,13 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices, const Buck
 
             // Add first vertex
             buffer->add(currentVertex.x, currentVertex.y, // vertex pos
-                      nextNormal.x - flip * nextNormal.y, flip * nextNormal.x + nextNormal.y, // extrude normal
-                      capTex, 0, distance); // texture normal
+                        nextNormal.x - flip * nextNormal.y, flip * nextNormal.x + nextNormal.y, // extrude normal
+                        capTex, 0, distance); // texture normal
 
             // Add second vertex
             buffer->add(currentVertex.x, currentVertex.y, // vertex pos
-                      nextNormal.x + flip * nextNormal.y, -flip * nextNormal.x + nextNormal.y, // extrude normal
-                      capTex, 1, distance); // texture normal
+                        nextNormal.x + flip * nextNormal.y, -flip * nextNormal.x + nextNormal.y, // extrude normal
+                        capTex, 1, distance); // texture normal
         }
     }
 
@@ -262,4 +261,16 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices, const Buck
 
 void LineBucket::render(Painter& painter, const std::string& layer_name) {
     painter.renderLine(*this, layer_name);
+}
+
+uint32_t LineBucket::size() const {
+    return length;
+}
+
+void LineBucket::bind() {
+    buffer->bind();
+}
+
+char *LineBucket::vertexOffset() const {
+    return BUFFER_OFFSET(start * 4 * sizeof(int16_t));
 }

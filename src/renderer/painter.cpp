@@ -20,26 +20,6 @@ using namespace llmr;
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-GLshort tile_stencil_vertices[] = {
-    // top left triangle
-    0, 0,
-    4096, 0,
-    0, 4096,
-
-    // bottom right triangle
-    4096, 0,
-    0, 4096,
-    4096, 4096
-};
-
-GLshort tile_border_vertices[] = {
-    0, 0,
-    4096, 0,
-    4096, 4096,
-    0, 4096,
-    0, 0
-};
-
 Painter::Painter(Transform& transform, Settings& settings, Style& style)
     : transform(transform),
       settings(settings),
@@ -56,17 +36,6 @@ void Painter::setup() {
     assert(outlineShader);
     assert(lineShader);
 
-    // Set up the stencil quad we're using to generate the stencil mask.
-    glGenBuffers(1, &tile_stencil_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(tile_stencil_vertices), tile_stencil_vertices, GL_STATIC_DRAW);
-
-    // Set up the tile boundary lines we're using to draw the tile outlines.
-    glGenBuffers(1, &tile_border_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, tile_border_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(tile_border_vertices), tile_border_vertices, GL_STATIC_DRAW);
-
-
     glEnable(GL_STENCIL_TEST);
 
     // We are blending the new pixels *behind* the existing pixels. That way we can
@@ -82,27 +51,30 @@ void Painter::setupShaders() {
     lineShader = std::make_shared<LineShader>();
 }
 
-void Painter::teardown() {
-    glDeleteBuffers(1, &tile_stencil_buffer);
-}
-
 void Painter::changeMatrix(const Tile::Ptr& tile) {
     // Initialize projection matrix
-    float projMatrix[16];
-    mat4::ortho(projMatrix, 0, transform.width, transform.height, 0, 1, 10);
+    mat4 projMatrix;
+    matrix::ortho(projMatrix, 0, transform.width, transform.height, 0, 1, 10);
 
     // The position matrix.
     transform.matrixFor(matrix, tile->id);
-    mat4::multiply(matrix, projMatrix, matrix);
+    matrix::multiply(matrix, projMatrix, matrix);
 
     // The extrusion matrix.
-    mat4::copy(exMatrix, projMatrix);
-    mat4::rotate_z(exMatrix, exMatrix, transform.getAngle());
+    matrix::identity(exMatrix);
+    matrix::multiply(exMatrix, projMatrix, exMatrix);
+    matrix::rotate_z(exMatrix, exMatrix, transform.getAngle());
+
+    // The native matrix is a 1:1 matrix that paints the coordinates at the
+    // same screen position as the vertex specifies.
+    matrix::identity(nativeMatrix);
+    matrix::translate(nativeMatrix, nativeMatrix, 0, 0, -1);
+    matrix::multiply(nativeMatrix, projMatrix, nativeMatrix);
 }
 
 void Painter::drawClippingMask() {
     switchShader(plainShader);
-    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix);
+    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
 
     glColorMask(false, false, false, false);
 
@@ -122,10 +94,10 @@ void Painter::drawClippingMask() {
     glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
 
     // Draw the clipping mask
-    glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
+    tileStencilBuffer.bind();
     glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 0.0f, 1.0f, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 0, sizeof(tile_stencil_vertices));
+    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
 
     // glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
@@ -149,17 +121,6 @@ void Painter::render(const Tile::Ptr& tile) {
     changeMatrix(tile);
 
     drawClippingMask();
-
-    // switchShader(outlineShader);
-    // glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
-
-    // // draw lines:
-    // tile->lineVertex.bind();
-    // glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    // glUniform4f(outlineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
-    // glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
-    // glLineWidth(2.0f);
-    // glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
 
     renderLayers(tile, style.layers);
 
@@ -196,6 +157,8 @@ void Painter::renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<
 void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
     const FillProperties& properties = style.computed.fills[layer_name];
 
+    // Abort early.
+    if (!bucket.size()) return;
     if (properties.hidden) return;
 
     Color fill_color = properties.fill_color;
@@ -234,7 +197,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
 
         // Draw the actual triangle fan into the stencil buffer.
         switchShader(fillShader);
-        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
+        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix.data());
 
         // Draw all groups
         bucket.drawElements(fillShader->a_pos);
@@ -252,7 +215,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
     // below, we have to draw the outline first (!)
     if (properties.antialias) {
         switchShader(outlineShader);
-        glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
+        glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix.data());
         glLineWidth(2);
 
         if (properties.stroke_color != properties.fill_color) {
@@ -304,7 +267,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
     } else {
         // Draw filling rectangle.
         switchShader(fillShader);
-        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
+        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix.data());
         glUniform4fv(fillShader->u_color, 1, fill_color.data());
     }
 
@@ -312,9 +275,9 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
     glStencilFunc(GL_NOTEQUAL, 0x0, 0x3F);
 
     // Draw a rectangle that covers the entire viewport.
-    glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
+    tileStencilBuffer.bind();
     glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
-    glDrawArrays(GL_TRIANGLES, 0, sizeof(tile_stencil_vertices));
+    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
 
     glStencilMask(0x00);
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
@@ -323,10 +286,20 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
 void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
     const LineProperties& properties = style.computed.lines[layer_name];
 
+    // Abort early.
+    if (!bucket.size()) return;
+    if (properties.hidden) return;
+
     double width = properties.width;
     double offset = (properties.offset || 0) / 2;
     double inset = fmax(-1, offset - width / 2 - 0.5) + 1;
     double outset = offset + width / 2 + 0.5;
+
+    Color color = properties.color;
+    color[0] *= properties.opacity;
+    color[1] *= properties.opacity;
+    color[2] *= properties.opacity;
+    color[3] *= properties.opacity;
 
     // var imagePos = properties.image && imageSprite.getPosition(properties.image);
     // var shader;
@@ -347,13 +320,14 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
 
     } else {
         switchShader(lineShader);
-        glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
-        glUniformMatrix4fv(lineShader->u_exmatrix, 1, GL_FALSE, exMatrix);
+        glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix.data());
+        glUniformMatrix4fv(lineShader->u_exmatrix, 1, GL_FALSE, exMatrix.data());
         // glUniform2fv(painter.lineShader.u_dasharray, properties.dasharray || [1, -1]);
         glUniform2f(lineShader->u_dasharray, 1, -1);
     }
 
 
+    // TODO: Move this to transform?
     const double tilePixelRatio = transform.getScale() / (1 << transform.getIntegerZoom()) / 8;
 
     glUniform2f(lineShader->u_linewidth, outset, inset);
@@ -365,27 +339,22 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
     //     color[3] = Infinity;
     //     glUniform4fv(lineShader->u_color, color);
     // } else {
-        glUniform4fv(lineShader->u_color, 1, properties.color.data());
+    glUniform4fv(lineShader->u_color, 1, color.data());
     // }
 
 
-    bucket.buffer->bind();
+    glUniform1f(lineShader->u_point, 0);
 
-
-    char *vertex_index = BUFFER_OFFSET(bucket.start * 2 * sizeof(uint16_t));
+    bucket.bind();
+    char *vertex_index = bucket.vertexOffset();
     glVertexAttribPointer(lineShader->a_pos, 4, GL_SHORT, false, 8, vertex_index);
     glVertexAttribPointer(lineShader->a_extrude, 2, GL_BYTE, false, 8, vertex_index + 6);
     glVertexAttribPointer(lineShader->a_linesofar, 2, GL_SHORT, false, 8, vertex_index + 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, bucket.size());
 
-    uint32_t begin = bucket.start;
-    uint32_t count = bucket.length;
-
-    glUniform1f(lineShader->u_point, 0);
-    glDrawArrays(GL_TRIANGLE_STRIP, begin, count);
-
-    if (bucket.join == JoinType::Round) {
+    if (bucket.geometry.join == JoinType::Round) {
         glUniform1f(lineShader->u_point, 1);
-        glDrawArrays(GL_POINTS, begin, count);
+        glDrawArrays(GL_POINTS, 0, bucket.size());
     }
 
     // statistics
@@ -398,16 +367,16 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
 
     // draw tile outline
     switchShader(plainShader);
-    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix);
-    glBindBuffer(GL_ARRAY_BUFFER, tile_border_buffer);
+    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
+    tileBorderBuffer.bind();
     glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
     glLineWidth(4.0f);
-    glDrawArrays(GL_LINE_STRIP, 0, sizeof(tile_border_vertices));
+    glDrawArrays(GL_LINE_STRIP, 0, tileBorderBuffer.length());
 
     // draw debug info
     switchShader(plainShader);
-    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix);
+    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
     tile->debugFontBuffer->bind();
     glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -421,17 +390,34 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
 }
 
-void Painter::renderBackground() {
+void Painter::renderMatte() {
+    glDisable(GL_STENCIL_TEST);
+
     switchShader(fillShader);
-    glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
+    glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, nativeMatrix.data());
 
     Color white = {{ 1, 1, 1, 1 }};
 
     // Draw the clipping mask
-    glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
+    matteBuffer.bind();
     glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
     glUniform4fv(fillShader->u_color, 1, white.data());
-    glDrawArrays(GL_TRIANGLES, 0, sizeof(tile_stencil_vertices));
+    glDrawArrays(GL_TRIANGLES, 0, matteBuffer.length());
+
+    glEnable(GL_STENCIL_TEST);
+}
+
+void Painter::renderBackground() {
+    switchShader(fillShader);
+    glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix.data());
+
+    Color white = {{ 1, 1, 1, 1 }};
+
+    // Draw the clipping mask
+    tileStencilBuffer.bind();
+    glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+    glUniform4fv(fillShader->u_color, 1, white.data());
+    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
 }
 
 

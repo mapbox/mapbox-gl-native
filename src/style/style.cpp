@@ -47,13 +47,13 @@ std::pair<std::string, BucketDescription> Style::parseBucket(pbf data) {
         } else if (data.tag == 6) { // source_value
             bucket.source_value.emplace_back(parseValue(data.message()));
         } else if (data.tag == 7) { // cap
-            bucket.cap = (CapType)data.varint();
+            bucket.geometry.cap = (CapType)data.varint();
         } else if (data.tag == 8) { // join
-            bucket.join = (JoinType)data.varint();
+            bucket.geometry.join = (JoinType)data.varint();
         } else if (data.tag == 9) { // font
-            bucket.font = data.string();
+            bucket.geometry.font = data.string();
         } else if (data.tag == 10) { // font_size
-            bucket.font_size = data.float32();
+            bucket.geometry.font_size = data.float32();
         } else {
             data.skip();
         }
@@ -144,8 +144,10 @@ std::pair<std::string, LineClass> Style::parseLineClass(pbf data) {
             stroke.color = parseColor(data);
         } else if (data.tag == 4) { // width
             stroke.width = parseProperty<float>(data.message());
-        } else if (data.tag == 5) { // opacity
+        } else if (data.tag == 5) { // offset
             stroke.offset = parseProperty<float>(data.message());
+        } else if (data.tag == 6) { // opacity
+            stroke.opacity = parseProperty<float>(data.message());
         } else {
             data.skip();
         }
@@ -158,11 +160,12 @@ std::pair<std::string, LineClass> Style::parseLineClass(pbf data) {
 Color Style::parseColor(pbf& data) {
     uint32_t rgba = data.fixed<uint32_t, 4>();
     return {{
-        (float)((rgba >> 24) & 0xFF) / 0xFF,
-        (float)((rgba >> 16) & 0xFF) / 0xFF,
-        (float)((rgba >>  8) & 0xFF) / 0xFF,
-        (float)((rgba >>  0) & 0xFF) / 0xFF
-    }};
+            (float)((rgba >> 24) & 0xFF) / 0xFF,
+            (float)((rgba >> 16) & 0xFF) / 0xFF,
+            (float)((rgba >>  8) & 0xFF) / 0xFF,
+            (float)((rgba >>  0) & 0xFF) / 0xFF
+        }
+    };
 }
 
 template <typename T> FunctionProperty<T> Style::parseProperty(pbf data) {
@@ -170,9 +173,11 @@ template <typename T> FunctionProperty<T> Style::parseProperty(pbf data) {
 
     while (data.next()) {
         if (data.tag == 1) { // function
-            switch((Property)data.varint()) {
+            switch ((Property)data.varint()) {
                 case Property::Null: property.function = &functions::null; break;
                 case Property::Constant: property.function = &functions::constant; break;
+                case Property::Stops: property.function = &functions::stops; break;
+                case Property::Linear: property.function = &functions::linear; break;
                 default: property.function = &functions::null; break;
             }
         } else if (data.tag == 2) { // value
@@ -222,7 +227,7 @@ void Style::cascade(float z) {
             const std::string& layer_name = line_pair.first;
             const llmr::LineClass& layer = line_pair.second;
 
-            // TODO: This should be restricted to fill styles that have actual
+            // TODO: This should be restricted to line styles that have actual
             // values so as to not override with default values.
             llmr::LineProperties& stroke = computed.lines[layer_name];
             stroke.hidden = layer.hidden(z);

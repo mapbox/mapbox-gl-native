@@ -1,6 +1,5 @@
 #include <llmr/geometry/line_buffer.hpp>
 #include <llmr/platform/gl.hpp>
-// #include <cmath>
 
 using namespace llmr;
 
@@ -20,10 +19,12 @@ void LineBuffer::add(int16_t x, int16_t y, float ex, float ey, int8_t tx, int8_t
     array.push_back((x * 2) | tx);
     array.push_back((y * 2) | ty);
     array.push_back(linesofar);
-    array.push_back(
-        ((int16_t)round(extrudeScale * ex) << 8) |
-        ((int16_t)round(extrudeScale * ey) & 0xFF)
-    );
+
+    int16_t extrude = 0;
+    *(((int8_t *)&extrude) + 0) = round(extrudeScale * ex);
+    *(((int8_t *)&extrude) + 1) = round(extrudeScale * ey);
+
+    array.push_back(extrude);
     if (!dirty) dirty = true;
 };
 

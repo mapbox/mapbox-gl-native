@@ -15,14 +15,15 @@ struct geometry_too_long_exception : std::exception {};
 
 using namespace llmr;
 
-FillBucket::FillBucket(const std::shared_ptr<FillBuffer>& buffer)
-    : buffer(buffer),
+FillBucket::FillBucket(const std::shared_ptr<FillBuffer>& buffer, const BucketDescription& bucket_desc)
+    : geom_desc(bucket_desc.geometry),
+      buffer(buffer),
       vertex_start(buffer->vertex_length()),
       elements_start(buffer->elements_length()),
       length(0) {
 }
 
-void FillBucket::addGeometry(pbf& geom, const BucketDescription& bucket_desc) {
+void FillBucket::addGeometry(pbf& geom) {
     std::vector<Coordinate> line;
     Geometry::command cmd;
 
@@ -32,18 +33,18 @@ void FillBucket::addGeometry(pbf& geom, const BucketDescription& bucket_desc) {
     while ((cmd = geometry.next(x, y)) != Geometry::end) {
         if (cmd == Geometry::move_to) {
             if (line.size()) {
-                addGeometry(line, bucket_desc);
+                addGeometry(line);
                 line.clear();
             }
         }
         line.emplace_back(x, y);
     }
     if (line.size()) {
-        addGeometry(line, bucket_desc);
+        addGeometry(line);
     }
 }
 
-void FillBucket::addGeometry(const std::vector<Coordinate>& line, const BucketDescription& bucket_desc) {
+void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
     // Alias this.
     FillBuffer& buffer = *this->buffer;
 
@@ -96,8 +97,8 @@ void FillBucket::addGeometry(const std::vector<Coordinate>& line, const BucketDe
 }
 
 void FillBucket::drawElements(int32_t attrib) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(uint16_t));
-    char *elements_index = BUFFER_OFFSET(elements_start * 3 * sizeof(uint16_t));
+    char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(int16_t));
+    char *elements_index = BUFFER_OFFSET(elements_start * 3 * sizeof(int16_t));
     buffer->bind();
     for (const auto& group : groups) {
         glVertexAttribPointer(attrib, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
@@ -109,7 +110,8 @@ void FillBucket::drawElements(int32_t attrib) {
 
 void FillBucket::drawVertices(int32_t attrib) {
     // Draw the entire line
-    char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(uint16_t));
+    char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(int16_t));
+    buffer->bind();
     glVertexAttribPointer(attrib, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
     glDrawArrays(GL_LINE_STRIP, 0, length);
 }
@@ -117,3 +119,8 @@ void FillBucket::drawVertices(int32_t attrib) {
 void FillBucket::render(Painter& painter, const std::string& layer_name) {
     painter.renderFill(*this, layer_name);
 }
+
+uint32_t FillBucket::size() const {
+    return length;
+}
+

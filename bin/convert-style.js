@@ -19,19 +19,23 @@ var bucket_type = {
 // enum
 var cap_type = {
     round: 1,
+    butt: 2,
+    square: 3
 };
 
 // enum
 var join_type = {
     butt: 1,
-    bevel: 2
+    bevel: 2,
+    round: 3
 };
 
 // enum
 var property_type = {
     'null': 1,
     constant: 2,
-    stops: 3
+    stops: 3,
+    linear: 4
 };
 
 
@@ -90,32 +94,29 @@ function createStructure(structure) {
     return pbf;
 }
 
-// function createWidth(width) {
-//     var pbf = new Protobuf();
-//     var values = [];
-//     if (Array.isArray(width)) {
-//         pbf.writeTaggedString(1 /* scaling */, width[0]);
-//         for (var i = 1; i < width.length; i++) {
-//             if (width[0] === 'stops') {
-//                 values.push(width[i].z, width[i].val);
-//             } else {
-//                 values.push(width[i]);
-//             }
-//         }
-//     } else {
-//         values.push(width);
-//     }
-//     pbf.writePackedFloats(2 /* value */, values);
-
-//     return pbf;
-// }
-
 function createProperty(type, values) {
     var pbf = new Protobuf();
     pbf.writeTaggedVarint(1 /* function */, property_type[type]);
-    pbf.writePackedFloats(2 /* value */, values.map(function(value) { return +value; }));
+    pbf.writePackedFloats(2 /* value */, values.map(function(v) { return +v; }));
 
     return pbf;
+}
+
+function convertProperty(orig_values) {
+    if (Array.isArray(orig_values)) {
+        var type = orig_values[0];
+        var values = [];
+        for (var i = 1; i < orig_values.length; i++) {
+            if (orig_values[0] === 'stops') {
+                values.push(orig_values[i].z, orig_values[i].val);
+            } else {
+                values.push(orig_values[i]);
+            }
+        }
+        return createProperty(type, values);
+    } else {
+        return createProperty('constant', [orig_values]);
+    }
 }
 
 function createFillClass(layer, name) {
@@ -136,9 +137,7 @@ function createFillClass(layer, name) {
     }
 
     if ('opacity' in layer) {
-        if (typeof layer.opacity == 'number') {
-            pbf.writeMessage(7 /* opacity */, createProperty('constant', [layer.opacity]));
-        }
+        pbf.writeMessage(7 /* opacity */, convertProperty(layer.opacity));
     }
 
     return pbf;
@@ -158,23 +157,11 @@ function createLineClass(layer, name) {
     }
 
     if ('width' in layer) {
-        var values = [];
-        var width = layer.width;
-        var type = 'constant';
-        if (Array.isArray(width)) {
-            type = width[0];
-            for (var i = 1; i < width.length; i++) {
-                if (width[0] === 'stops') {
-                    values.push(width[i].z, width[i].val);
-                } else {
-                    values.push(width[i]);
-                }
-            }
-        } else {
-            values.push(width);
-        }
+        pbf.writeMessage(4 /* width */, convertProperty(layer.width));
+    }
 
-        pbf.writeMessage(4 /* width */, createProperty(type, values));
+    if ('opacity' in layer) {
+        pbf.writeMessage(6 /* opacity */, convertProperty(layer.opacity));
     }
 
     return pbf;

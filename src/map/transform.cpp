@@ -135,23 +135,23 @@ double Transform::pixel_y() const {
     return center + y;
 }
 
-void Transform::matrixFor(float matrix[16], const vec3<int32_t>& id) const {
+void Transform::matrixFor(mat4& matrix, const vec3<int32_t>& id) const {
     const double tile_scale = pow(2, id.z);
     const double tile_size = scale * size / tile_scale;
 
-    mat4::identity(matrix);
+    matrix::identity(matrix);
 
-    mat4::translate(matrix, matrix, 0.5f * (float)width, 0.5f * (float)height, 0);
-    mat4::rotate_z(matrix, matrix, angle);
-    mat4::translate(matrix, matrix, -0.5f * (float)width, -0.5f * (float)height, 0);
+    matrix::translate(matrix, matrix, 0.5f * (float)width, 0.5f * (float)height, 0);
+    matrix::rotate_z(matrix, matrix, angle);
+    matrix::translate(matrix, matrix, -0.5f * (float)width, -0.5f * (float)height, 0);
 
-    mat4::translate(matrix, matrix, pixel_x() + id.x * tile_size, pixel_y() + id.y * tile_size, 0);
+    matrix::translate(matrix, matrix, pixel_x() + id.x * tile_size, pixel_y() + id.y * tile_size, 0);
 
     // TODO: Get rid of the 8 (scaling from 4096 to 512 px tile size);
-    mat4::scale(matrix, matrix, scale / tile_scale / 8, scale / tile_scale / 8, 1);
+    matrix::scale(matrix, matrix, scale / tile_scale / 8, scale / tile_scale / 8, 1);
 
     // Clipping plane
-    mat4::translate(matrix, matrix, 0, 0, -1);
+    matrix::translate(matrix, matrix, 0, 0, -1);
 }
 
 float Transform::getZoom() const {

@@ -1,6 +1,5 @@
 #include <llmr/geometry/fill_buffer.hpp>
 #include <llmr/platform/gl.hpp>
-// #include <cmath>
 
 using namespace llmr;
 
@@ -51,17 +50,14 @@ void FillBuffer::addElements(uint16_t a, uint16_t b, uint16_t c) {
 void FillBuffer::bind() {
     if (vertex_buffer == 0) {
         glGenBuffers(1, &vertex_buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    } else {
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     }
 
     if (element_buffer == 0) {
         glGenBuffers(1, &element_buffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer);
-    } else {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer);
     }
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer);
 
     if (dirty) {
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(uint16_t), vertices.data(), GL_STATIC_DRAW);
