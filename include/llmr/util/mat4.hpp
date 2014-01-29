@@ -23,16 +23,21 @@
 #ifndef LLMR_UTIL_MAT4
 #define LLMR_UTIL_MAT4
 
-namespace llmr {
-namespace mat4 {
+#include <array>
 
-void identity(float out[16]);
-void ortho(float out[16], float left, float right, float bottom, float top, float near, float far);
-void copy(float out[16], float a[16]);
-void translate(float out[16], float a[16], float x, float y, float z);
-void rotate_z(float out[16], float a[16], float rad);
-void scale(float out[16], float a[16], float x, float y, float z);
-void multiply(float out[16], float a[16], float b[16]);
+namespace llmr {
+
+typedef std::array<float, 16> mat4;
+
+namespace matrix {
+
+void identity(mat4& out);
+void ortho(mat4& out, float left, float right, float bottom, float top, float near, float far);
+void copy(mat4& out, const mat4& a);
+void translate(mat4& out, const mat4& a, float x, float y, float z);
+void rotate_z(mat4& out, const mat4& a, float rad);
+void scale(mat4& out, const mat4& a, float x, float y, float z);
+void multiply(mat4& out, const mat4& a, const mat4& b);
 
 }
 }

@@ -7,6 +7,7 @@
 #include "shader-line.hpp"
 
 #include "../map/tile.hpp"
+#include "../util/mat4.hpp"
 
 namespace llmr {
 
@@ -57,9 +58,9 @@ private:
     Settings& settings;
     Style& style;
 
-    float nativeMatrix[16];
-    float matrix[16];
-    float exMatrix[16];
+    mat4 nativeMatrix;
+    mat4 matrix;
+    mat4 exMatrix;
 
     std::shared_ptr<Shader> currentShader;
     std::shared_ptr<FillShader> fillShader;

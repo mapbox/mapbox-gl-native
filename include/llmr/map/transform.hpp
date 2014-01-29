@@ -3,6 +3,7 @@
 
 
 #include <llmr/util/vec.hpp>
+#include <llmr/util/mat4.hpp>
 #include <llmr/util/animation.hpp>
 
 #include <cmath>
@@ -39,7 +40,7 @@ public:
     void setLonLat(double lon, double lat);
 
     // Getters
-    void matrixFor(float matrix[16], const vec3<int32_t>& id) const;
+    void matrixFor(mat4& matrix, const vec3<int32_t>& id) const;
     float getZoom() const;
     int32_t getIntegerZoom() const;
     double getScale() const;

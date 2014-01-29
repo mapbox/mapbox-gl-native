@@ -107,28 +107,28 @@ void Painter::teardown() {
 
 void Painter::changeMatrix(const Tile::Ptr& tile) {
     // Initialize projection matrix
-    float projMatrix[16];
-    mat4::ortho(projMatrix, 0, transform.width, transform.height, 0, 1, 10);
+    mat4 projMatrix;
+    matrix::ortho(projMatrix, 0, transform.width, transform.height, 0, 1, 10);
 
     // The position matrix.
     transform.matrixFor(matrix, tile->id);
-    mat4::multiply(matrix, projMatrix, matrix);
+    matrix::multiply(matrix, projMatrix, matrix);
 
     // The extrusion matrix.
-    mat4::identity(exMatrix);
-    mat4::multiply(exMatrix, projMatrix, exMatrix);
-    mat4::rotate_z(exMatrix, exMatrix, transform.getAngle());
+    matrix::identity(exMatrix);
+    matrix::multiply(exMatrix, projMatrix, exMatrix);
+    matrix::rotate_z(exMatrix, exMatrix, transform.getAngle());
 
     // The native matrix is a 1:1 matrix that paints the coordinates at the
     // same screen position as the vertex specifies.
-    mat4::identity(nativeMatrix);
-    mat4::translate(nativeMatrix, nativeMatrix, 0, 0, -1);
-    mat4::multiply(nativeMatrix, projMatrix, nativeMatrix);
+    matrix::identity(nativeMatrix);
+    matrix::translate(nativeMatrix, nativeMatrix, 0, 0, -1);
+    matrix::multiply(nativeMatrix, projMatrix, nativeMatrix);
 }
 
 void Painter::drawClippingMask() {
     switchShader(plainShader);
-    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix);
+    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
 
     glColorMask(false, false, false, false);
 
@@ -251,7 +251,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
 
         // Draw the actual triangle fan into the stencil buffer.
         switchShader(fillShader);
-        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
+        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix.data());
 
         // Draw all groups
         bucket.drawElements(fillShader->a_pos);
@@ -269,7 +269,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
     // below, we have to draw the outline first (!)
     if (properties.antialias) {
         switchShader(outlineShader);
-        glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
+        glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix.data());
         glLineWidth(2);
 
         if (properties.stroke_color != properties.fill_color) {
@@ -321,7 +321,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
     } else {
         // Draw filling rectangle.
         switchShader(fillShader);
-        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
+        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix.data());
         glUniform4fv(fillShader->u_color, 1, fill_color.data());
     }
 
@@ -374,8 +374,8 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
 
     } else {
         switchShader(lineShader);
-        glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix);
-        glUniformMatrix4fv(lineShader->u_exmatrix, 1, GL_FALSE, exMatrix);
+        glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix.data());
+        glUniformMatrix4fv(lineShader->u_exmatrix, 1, GL_FALSE, exMatrix.data());
         // glUniform2fv(painter.lineShader.u_dasharray, properties.dasharray || [1, -1]);
         glUniform2f(lineShader->u_dasharray, 1, -1);
     }
@@ -421,7 +421,7 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
 
     // draw tile outline
     switchShader(plainShader);
-    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix);
+    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
     glBindBuffer(GL_ARRAY_BUFFER, tile_border_buffer);
     glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -430,7 +430,7 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
 
     // draw debug info
     switchShader(plainShader);
-    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix);
+    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
     tile->debugFontBuffer->bind();
     glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -448,7 +448,7 @@ void Painter::renderMatte() {
     glDisable(GL_STENCIL_TEST);
 
     switchShader(fillShader);
-    glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, nativeMatrix);
+    glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, nativeMatrix.data());
 
     Color white = {{ 1, 1, 1, 1 }};
 
@@ -463,7 +463,7 @@ void Painter::renderMatte() {
 
 void Painter::renderBackground() {
     switchShader(fillShader);
-    glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix);
+    glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix.data());
 
     Color white = {{ 1, 1, 1, 1 }};
 
