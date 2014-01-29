@@ -1,39 +1,24 @@
-An OpenGL renderer for [Mapbox vector tiles](https://www.mapbox.com/blog/vector-tiles),
-implemented in C++, targeting iOS & OSX.
+iOS
+===
 
-# Build instructions
+1. Make sure you have `xcode/llmr.xcodeproj`, which is a modified version of the OS X CMake-generated version. 
 
-## Mac OS X
+1. Download & unpack Boost into `ios/boost_1_55_0`. 
 
-You may need to install [glfw3](http://www.glfw.org/docs/latest/):
+1. This does some nasty things with exposing `map.transform` and hardcoding the shader preamble, but be not afraid. 
 
-```
-brew install homebrew/versions/glfw3
-```
+1. Open, build, and run on simulator. Does not build for ARM yet. 
 
-```
-mkdir xcode
-cd xcode
-cmake .. -G Xcode
-```
+### Gestures
 
-Then open the xcode project and build.
+ * Pan to move. 
 
+ * Pinch to zoom in or out (currently around map center, not gesture center). 
 
-# Style protobuf
+ * Double-tap to zoom in one level at gesture center. 
 
-We're encoding the styling information as a protocol buffer, according to
-proto/style.proto. The reason for doing so is that we don't have to ship with a
-JSON/yaml parser. To test the conversion script, run
+ * Two-finger single-tap to zoom out one level at gesture center. 
 
-```
-bin/convert-style.js | protoc --decode=style proto/style.proto
-```
+ * Rotate with two fingers to rotate map (currently around map center, not gesture center). 
 
-You should see a nicely formatted hierarchical output of the converted style.
-
-
-# Usage
-
-- Press 'R' to reset the transform
-- Press 'N' to reset north
+ * Long-press to reset north as up. 
