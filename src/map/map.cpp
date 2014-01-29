@@ -298,6 +298,8 @@ bool Map::render() {
         }
     }
 
+    painter.renderMatte();
+
     return transform.needsAnimation();
 }
 

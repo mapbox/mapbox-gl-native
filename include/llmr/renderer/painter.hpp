@@ -37,6 +37,7 @@ public:
     void renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers);
     void renderDebug(const std::shared_ptr<Tile>& tile);
 
+    void renderMatte();
     void renderBackground();
     void renderFill(FillBucket& bucket, const std::string& layer_name);
     void renderLine(LineBucket& bucket, const std::string& layer_name);
@@ -56,6 +57,7 @@ private:
     Settings& settings;
     Style& style;
 
+    float nativeMatrix[16];
     float matrix[16];
     float exMatrix[16];
 
@@ -67,6 +69,7 @@ private:
 
     uint32_t tile_stencil_buffer;
     uint32_t tile_border_buffer;
+    uint32_t matte_buffer;
 };
 
 }

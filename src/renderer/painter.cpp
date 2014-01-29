@@ -40,6 +40,18 @@ GLshort tile_border_vertices[] = {
     0, 0
 };
 
+GLshort matte_vertices[] = {
+    // top left triangle
+    0, 0,
+    16384, 0,
+    0, 16384,
+
+    // bottom right triangle
+    16384, 0,
+    0, 16384,
+    16384, 16384
+};
+
 Painter::Painter(Transform& transform, Settings& settings, Style& style)
     : transform(transform),
       settings(settings),
@@ -66,6 +78,11 @@ void Painter::setup() {
     glBindBuffer(GL_ARRAY_BUFFER, tile_border_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(tile_border_vertices), tile_border_vertices, GL_STATIC_DRAW);
 
+    // Set up the tile boundary lines we're using to draw the tile outlines.
+    glGenBuffers(1, &matte_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, matte_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(matte_vertices), matte_vertices, GL_STATIC_DRAW);
+
 
     glEnable(GL_STENCIL_TEST);
 
@@ -85,6 +102,7 @@ void Painter::setupShaders() {
 void Painter::teardown() {
     glDeleteBuffers(1, &tile_stencil_buffer);
     glDeleteBuffers(1, &tile_border_buffer);
+    glDeleteBuffers(1, &matte_buffer);
 }
 
 void Painter::changeMatrix(const Tile::Ptr& tile) {
@@ -97,10 +115,15 @@ void Painter::changeMatrix(const Tile::Ptr& tile) {
     mat4::multiply(matrix, projMatrix, matrix);
 
     // The extrusion matrix.
-
     mat4::identity(exMatrix);
     mat4::multiply(exMatrix, projMatrix, exMatrix);
     mat4::rotate_z(exMatrix, exMatrix, transform.getAngle());
+
+    // The native matrix is a 1:1 matrix that paints the coordinates at the
+    // same screen position as the vertex specifies.
+    mat4::identity(nativeMatrix);
+    mat4::translate(nativeMatrix, nativeMatrix, 0, 0, -1);
+    mat4::multiply(nativeMatrix, projMatrix, nativeMatrix);
 }
 
 void Painter::drawClippingMask() {
@@ -413,6 +436,23 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
 
     // Revert blending mode to blend to the back.
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+}
+
+void Painter::renderMatte() {
+    glDisable(GL_STENCIL_TEST);
+
+    switchShader(fillShader);
+    glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, nativeMatrix);
+
+    Color white = {{ 1, 1, 1, 1 }};
+
+    // Draw the clipping mask
+    glBindBuffer(GL_ARRAY_BUFFER, matte_buffer);
+    glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+    glUniform4fv(fillShader->u_color, 1, white.data());
+    glDrawArrays(GL_TRIANGLES, 0, sizeof(matte_vertices));
+
+    glEnable(GL_STENCIL_TEST);
 }
 
 void Painter::renderBackground() {
