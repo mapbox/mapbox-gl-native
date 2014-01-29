@@ -14,9 +14,9 @@ SET(llmr_SOURCES
     renderer/shader.cpp
     renderer/fill_bucket.cpp
     renderer/line_bucket.cpp
-    resources/style.cpp
     shader/shaders.cpp
     style/style.cpp
+    style/resources.cpp
     style/value.cpp
     style/bucket_description.cpp
     style/layer_description.cpp
