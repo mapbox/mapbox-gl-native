@@ -47,6 +47,8 @@ public:
 
     void toggleDebug();
 
+    void update();
+
 private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
     bool findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain);
@@ -54,12 +56,11 @@ private:
     Tile::Ptr addTile(const Tile::ID& id);
     Tile::Ptr hasTile(const Tile::ID& id);
 
-
-    void update();
-
-private:
+public:
     Settings& settings;
     Transform transform;
+
+private:
     Style style;
     Painter painter;
 
