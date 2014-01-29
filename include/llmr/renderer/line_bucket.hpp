@@ -15,18 +15,24 @@ struct pbf;
 
 class LineBucket : public Bucket {
 public:
-    LineBucket(const std::shared_ptr<LineBuffer>& buffer);
+    LineBucket(const std::shared_ptr<LineBuffer>& buffer, const BucketDescription& bucket_desc);
 
     virtual void render(Painter& painter, const std::string& layer_name);
 
-    void addGeometry(pbf& data, const BucketDescription& bucket_desc);
-    void addGeometry(const std::vector<Coordinate>& line, const BucketDescription& bucket_desc);
+    void addGeometry(pbf& data);
+    void addGeometry(const std::vector<Coordinate>& line);
+    uint32_t size() const;
+
+    void bind();
+    char *vertexOffset() const;
 
 public:
+    const BucketGeometryDescription geometry;
+
+private:
     std::shared_ptr<LineBuffer> buffer;
     uint32_t start;
     uint32_t length;
-    JoinType join;
 };
 
 }

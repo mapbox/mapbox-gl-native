@@ -96,7 +96,9 @@ void Painter::changeMatrix(const Tile::Ptr& tile) {
     mat4::multiply(matrix, projMatrix, matrix);
 
     // The extrusion matrix.
-    mat4::copy(exMatrix, projMatrix);
+
+    mat4::identity(exMatrix);
+    mat4::multiply(exMatrix, projMatrix, exMatrix);
     mat4::rotate_z(exMatrix, exMatrix, transform.getAngle());
 }
 
@@ -196,6 +198,8 @@ void Painter::renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<
 void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
     const FillProperties& properties = style.computed.fills[layer_name];
 
+    // Abort early.
+    if (!bucket.size()) return;
     if (properties.hidden) return;
 
     Color fill_color = properties.fill_color;
@@ -323,6 +327,10 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
 void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
     const LineProperties& properties = style.computed.lines[layer_name];
 
+    // Abort early.
+    if (!bucket.size()) return;
+    if (properties.hidden) return;
+
     double width = properties.width;
     double offset = (properties.offset || 0) / 2;
     double inset = fmax(-1, offset - width / 2 - 0.5) + 1;
@@ -354,6 +362,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
     }
 
 
+    // TODO: Move this to transform?
     const double tilePixelRatio = transform.getScale() / (1 << transform.getIntegerZoom()) / 8;
 
     glUniform2f(lineShader->u_linewidth, outset, inset);
@@ -369,23 +378,18 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
     // }
 
 
-    bucket.buffer->bind();
+    glUniform1f(lineShader->u_point, 0);
 
-
-    char *vertex_index = BUFFER_OFFSET(bucket.start * 2 * sizeof(uint16_t));
+    bucket.bind();
+    char *vertex_index = bucket.vertexOffset();
     glVertexAttribPointer(lineShader->a_pos, 4, GL_SHORT, false, 8, vertex_index);
     glVertexAttribPointer(lineShader->a_extrude, 2, GL_BYTE, false, 8, vertex_index + 6);
     glVertexAttribPointer(lineShader->a_linesofar, 2, GL_SHORT, false, 8, vertex_index + 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, bucket.size());
 
-    uint32_t begin = bucket.start;
-    uint32_t count = bucket.length;
-
-    glUniform1f(lineShader->u_point, 0);
-    glDrawArrays(GL_TRIANGLE_STRIP, begin, count);
-
-    if (bucket.join == JoinType::Round) {
+    if (bucket.geometry.join == JoinType::Round) {
         glUniform1f(lineShader->u_point, 1);
-        glDrawArrays(GL_POINTS, begin, count);
+        glDrawArrays(GL_POINTS, 0, bucket.size());
     }
 
     // statistics

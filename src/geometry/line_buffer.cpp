@@ -20,10 +20,15 @@ void LineBuffer::add(int16_t x, int16_t y, float ex, float ey, int8_t tx, int8_t
     array.push_back((x * 2) | tx);
     array.push_back((y * 2) | ty);
     array.push_back(linesofar);
-    array.push_back(
-        ((int16_t)round(extrudeScale * ex) << 8) |
-        ((int16_t)round(extrudeScale * ey) & 0xFF)
-    );
+
+
+    int16_t extrude = 0;
+    int8_t *extrude_x = ((int8_t *)&extrude) + 0;
+    int8_t *extrude_y = ((int8_t *)&extrude) + 1;
+    *extrude_x = round(extrudeScale * ex);
+    *extrude_y = round(extrudeScale * ey);
+
+    array.push_back(extrude);
     if (!dirty) dirty = true;
 };
 

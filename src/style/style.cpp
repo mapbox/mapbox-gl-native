@@ -47,13 +47,13 @@ std::pair<std::string, BucketDescription> Style::parseBucket(pbf data) {
         } else if (data.tag == 6) { // source_value
             bucket.source_value.emplace_back(parseValue(data.message()));
         } else if (data.tag == 7) { // cap
-            bucket.cap = (CapType)data.varint();
+            bucket.geometry.cap = (CapType)data.varint();
         } else if (data.tag == 8) { // join
-            bucket.join = (JoinType)data.varint();
+            bucket.geometry.join = (JoinType)data.varint();
         } else if (data.tag == 9) { // font
-            bucket.font = data.string();
+            bucket.geometry.font = data.string();
         } else if (data.tag == 10) { // font_size
-            bucket.font_size = data.float32();
+            bucket.geometry.font_size = data.float32();
         } else {
             data.skip();
         }
@@ -226,7 +226,7 @@ void Style::cascade(float z) {
             // values so as to not override with default values.
             llmr::LineProperties& stroke = computed.lines[layer_name];
             stroke.hidden = layer.hidden(z);
-            stroke.width = layer.width(z);
+            stroke.width = 2; //layer.width(z);
             stroke.offset = layer.offset(z);
             stroke.color = layer.color;
             stroke.opacity = layer.opacity(z);

@@ -30,6 +30,16 @@ enum class JoinType {
 };
 
 
+class BucketGeometryDescription {
+public:
+    CapType cap = CapType::None;
+    JoinType join = JoinType::None;
+    std::string font;
+    float font_size = 0.0f;
+    float miter_limit = 2.0f;
+    float round_limit = 1.0f;
+};
+
 class BucketDescription {
 public:
     BucketType type = BucketType::None;
@@ -41,12 +51,7 @@ public:
     std::vector<Value> source_value;
 
     // Specifies how the geometry for this bucket should be created
-    CapType cap = CapType::None;
-    JoinType join = JoinType::None;
-    std::string font;
-    float font_size = 0.0f;
-    float miter_limit = 2.0f;
-    float round_limit = 1.0f;
+    BucketGeometryDescription geometry;
 };
 
 std::ostream& operator<<(std::ostream&, const BucketDescription& bucket);
