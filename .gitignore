@@ -4,3 +4,4 @@
 /build
 /xcode
 *.sublime-*
+.DS_Store
