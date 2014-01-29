@@ -100,7 +100,7 @@ module.exports = {
                     "width": [
                         "stops",
                         { z: 0, val: 1 },
-                        { z: 20, val: 1 }
+                        { z: 30, val: 1 }
                     ]
                 },
                 "road_regular": {
@@ -111,7 +111,8 @@ module.exports = {
                         { z: 0, val: 0.5 },
                         { z: 13, val: 0.5 },
                         { z: 16, val: 2 },
-                        { z: 20, val: 32 }
+                        { z: 20, val: 32 },
+                        { z: 30, val: 32 }
                     ],
                 },
                 "road_large": {
@@ -123,7 +124,8 @@ module.exports = {
                         { z: 11, val: 0.5 },
                         { z: 13, val: 1 },
                         { z: 16, val: 4 },
-                        { z: 20, val: 64 }
+                        { z: 20, val: 64 },
+                        { z: 30, val: 64 }
                     ],
                 },
                 "alcohol": {
