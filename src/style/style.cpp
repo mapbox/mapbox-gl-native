@@ -144,8 +144,10 @@ std::pair<std::string, LineClass> Style::parseLineClass(pbf data) {
             stroke.color = parseColor(data);
         } else if (data.tag == 4) { // width
             stroke.width = parseProperty<float>(data.message());
-        } else if (data.tag == 5) { // opacity
+        } else if (data.tag == 5) { // offset
             stroke.offset = parseProperty<float>(data.message());
+        } else if (data.tag == 6) { // opacity
+            stroke.opacity = parseProperty<float>(data.message());
         } else {
             data.skip();
         }
@@ -158,11 +160,12 @@ std::pair<std::string, LineClass> Style::parseLineClass(pbf data) {
 Color Style::parseColor(pbf& data) {
     uint32_t rgba = data.fixed<uint32_t, 4>();
     return {{
-        (float)((rgba >> 24) & 0xFF) / 0xFF,
-        (float)((rgba >> 16) & 0xFF) / 0xFF,
-        (float)((rgba >>  8) & 0xFF) / 0xFF,
-        (float)((rgba >>  0) & 0xFF) / 0xFF
-    }};
+            (float)((rgba >> 24) & 0xFF) / 0xFF,
+            (float)((rgba >> 16) & 0xFF) / 0xFF,
+            (float)((rgba >>  8) & 0xFF) / 0xFF,
+            (float)((rgba >>  0) & 0xFF) / 0xFF
+        }
+    };
 }
 
 template <typename T> FunctionProperty<T> Style::parseProperty(pbf data) {
@@ -170,10 +173,11 @@ template <typename T> FunctionProperty<T> Style::parseProperty(pbf data) {
 
     while (data.next()) {
         if (data.tag == 1) { // function
-            switch((Property)data.varint()) {
+            switch ((Property)data.varint()) {
                 case Property::Null: property.function = &functions::null; break;
                 case Property::Constant: property.function = &functions::constant; break;
                 case Property::Stops: property.function = &functions::stops; break;
+                case Property::Linear: property.function = &functions::linear; break;
                 default: property.function = &functions::null; break;
             }
         } else if (data.tag == 2) { // value

@@ -65,6 +65,7 @@ module.exports = {
         { "name": "park", "bucket": "park" },
         { "name": "wood", "bucket": "wood" },
         { "name": "water", "bucket": "water" },
+        { "name": "building", "bucket": "building" },
         { "name": "road_limited", "bucket": "road_limited" },
         { "name": "road_regular", "bucket": "road_regular" },
         { "name": "road_large", "bucket": "road_large" },
@@ -93,6 +94,12 @@ module.exports = {
                     "type": "fill",
                     "color": "#73b6e6",
                     "antialias": true
+                },
+                "building": {
+                    "type": "fill",
+                    "color": "#000000",
+                    "antialias": true,
+                    "opacity": [ "linear", 13, 0, 0.1, 0, 0.1 ]
                 },
                 "road_limited": {
                     "type": "line",

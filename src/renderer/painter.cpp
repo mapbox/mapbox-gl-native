@@ -349,6 +349,12 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
     double inset = fmax(-1, offset - width / 2 - 0.5) + 1;
     double outset = offset + width / 2 + 0.5;
 
+    Color color = properties.color;
+    color[0] *= properties.opacity;
+    color[1] *= properties.opacity;
+    color[2] *= properties.opacity;
+    color[3] *= properties.opacity;
+
     // var imagePos = properties.image && imageSprite.getPosition(properties.image);
     // var shader;
     bool imagePos = false;
@@ -387,7 +393,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
     //     color[3] = Infinity;
     //     glUniform4fv(lineShader->u_color, color);
     // } else {
-    glUniform4fv(lineShader->u_color, 1, properties.color.data());
+    glUniform4fv(lineShader->u_color, 1, color.data());
     // }
 
 

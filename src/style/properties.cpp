@@ -46,10 +46,12 @@ float functions::stops(float z, const std::vector<float>& stops) {
     }
 
     if (smaller && larger) {
+        if (larger_z == smaller_z || larger_val == smaller_val) return smaller_val;
+        float factor = (z - smaller_z) / (larger_z - smaller_z);
+        // Linear interpolation if base is 0
+        if (smaller_val == 0) return factor * larger_val;
         // Exponential interpolation between the values
-        if (larger_z == smaller_z) return smaller_val;
-        float val = smaller_val * pow(larger_val / smaller_val, (z - smaller_z) / (larger_z - smaller_z));
-        return val;
+        return smaller_val * pow(larger_val / smaller_val, factor);
     } else if (larger || smaller) {
         // Do not draw a line.
         return -std::numeric_limits<float>::infinity();
@@ -68,3 +70,21 @@ bool functions::stops(float z, const std::vector<bool>& values) {
     return false;
 }
 
+float functions::linear(float z, const std::vector<float>& values) {
+    if (values.size() != 5) {
+        return 0;
+    }
+
+    const float z_base = values[0];
+    const float val = values[1];
+    const float slope = values[2];
+    const float min = values[3];
+    const float max = values[4];
+
+    return fmin(fmax(min, val + (z - z_base) * slope), max);
+}
+
+bool functions::linear(float z, const std::vector<bool>&) {
+    // TODO
+    return false;
+}

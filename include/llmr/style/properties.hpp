@@ -25,7 +25,8 @@ enum class Winding {
 enum class Property {
     Null = 1,
     Constant = 2,
-    Stops = 3
+    Stops = 3,
+    Linear = 4
 };
 
 namespace functions {
@@ -38,6 +39,9 @@ bool constant(float z, const std::vector<bool>& values);
 
 float stops(float z, const std::vector<float>& values);
 bool stops(float z, const std::vector<bool>& values);
+
+float linear(float z, const std::vector<float>& values);
+bool linear(float z, const std::vector<bool>& values);
 
 }
 
