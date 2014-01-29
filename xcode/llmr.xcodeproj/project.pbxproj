@@ -1,0 +1,1701 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		0017AB291BB546DF95F00DEA /* ZERO_CHECK */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = E90A8100F65F49678F3F0FC5 /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */;
+			buildPhases = (
+				3951011626F043FD9E072F08 /* CMake Rules */,
+			);
+			dependencies = (
+			);
+			name = ZERO_CHECK;
+			productName = ZERO_CHECK;
+		};
+		110D35E224E342B3AC0F2779 /* ALL_BUILD */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 751D1BABDFB5485093AFC182 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */;
+			buildPhases = (
+				19F85622C0034FF79B7360AD /* CMake Rules */,
+			);
+			dependencies = (
+				DBF6EAC72DBE41919FB40D04 /* PBXTargetDependency */,
+				BC77CE62A2744F5B84682150 /* PBXTargetDependency */,
+				3906D7DDE6E047E98DFFE2C1 /* PBXTargetDependency */,
+			);
+			name = ALL_BUILD;
+			productName = ALL_BUILD;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		072B04B90EFB4FF58AC45BCB /* animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6AA0D3939A314FF0B187DAD3 /* animation.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		09849EADD6924B7C98E2930D /* linevertexbuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B75C963498F4259A62CF5CA /* linevertexbuffer.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		2A31BA8A3EF54D6EA5EB8794 /* shader-line.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E73742A7DF294D4B9EB4808F /* shader-line.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		2DE3000528644485BC1FA028 /* debug_font_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E5700448FF14A56B9EB3949 /* debug_font_buffer.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		3E6CEF093BD04DC593FCA023 /* layer_description.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 23A2E9284B3E43D98B927168 /* layer_description.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		4AAC112B6EC04AEBBBD3CEF0 /* bucket_description.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 251006051B7946C2BC0A1760 /* bucket_description.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		4D03E81484DD4678B89D2D18 /* map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D96CA434D4C74280ACB82127 /* map.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		578B2721D8EF4003AA62E9A1 /* Icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = E3ADB1BA9AF4493AB8A2ABD8 /* Icon.icns */; settings = {COMPILER_FLAGS = ""; }; };
+		87836AB486F94DF5ADA7697A /* transform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8DA85C143EB345D99484EA39 /* transform.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		8BE24278C1D64D43A391D5A5 /* fill_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6606044DD7724F6C92497C00 /* fill_buffer.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		8CC89389E89E43FA9B1A0645 /* fill_bucket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08B92D0427D04446B3036E49 /* fill_bucket.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		9542E959B8C545ACB12AE677 /* shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A94966A6910D4496BC04B00E /* shader.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		A967B04521C14BA8ADC3645A /* mat4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A0E485908F2461396D9A263 /* mat4.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		AE73DF5CF7FB48B59691E17A /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F548C41325543569FAAC242 /* style.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		B40FE8AC699844C8B1B5952A /* value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5E64722C269744DC9CA3395C /* value.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		B9A2216A037A49488A61473C /* shader-outline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E6C3045C86342E8994D1C70 /* shader-outline.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		DD2D949B18987F0200682326 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD2D949A18987F0200682326 /* Foundation.framework */; };
+		DD2D949D18987F0200682326 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD2D949C18987F0200682326 /* CoreGraphics.framework */; };
+		DD2D949F18987F0200682326 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD2D949E18987F0200682326 /* UIKit.framework */; };
+		DD2D94DE1898831400682326 /* MBXAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DD2D94D91898831400682326 /* MBXAppDelegate.m */; };
+		DD2D94DF1898831400682326 /* MBXSettings.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD2D94DB1898831400682326 /* MBXSettings.mm */; };
+		DD2D94E01898831400682326 /* MBXViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD2D94DD1898831400682326 /* MBXViewController.mm */; };
+		DD2D94F51898834400682326 /* Icon-60.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94E21898834400682326 /* Icon-60.png */; };
+		DD2D94F61898834400682326 /* Icon-60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94E31898834400682326 /* Icon-60@2x.png */; };
+		DD2D94F71898834400682326 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94E41898834400682326 /* Icon-72.png */; };
+		DD2D94F81898834400682326 /* Icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94E51898834400682326 /* Icon-72@2x.png */; };
+		DD2D94F91898834400682326 /* Icon-76.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94E61898834400682326 /* Icon-76.png */; };
+		DD2D94FA1898834400682326 /* Icon-76@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94E71898834400682326 /* Icon-76@2x.png */; };
+		DD2D94FB1898834400682326 /* Icon-Small-50.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94E81898834400682326 /* Icon-Small-50.png */; };
+		DD2D94FC1898834400682326 /* Icon-Small-50@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94E91898834400682326 /* Icon-Small-50@2x.png */; };
+		DD2D94FD1898834400682326 /* Icon-Small.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94EA1898834400682326 /* Icon-Small.png */; };
+		DD2D94FE1898834400682326 /* Icon-Small@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94EB1898834400682326 /* Icon-Small@2x.png */; };
+		DD2D94FF1898834400682326 /* Icon-Spotlight-40.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94EC1898834400682326 /* Icon-Spotlight-40.png */; };
+		DD2D95001898834400682326 /* Icon-Spotlight-40@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94ED1898834400682326 /* Icon-Spotlight-40@2x.png */; };
+		DD2D95011898834400682326 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94EE1898834400682326 /* Icon.png */; };
+		DD2D95021898834400682326 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94EF1898834400682326 /* Icon@2x.png */; };
+		DD2D95031898834400682326 /* iTunesArtwork@2x in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94F01898834400682326 /* iTunesArtwork@2x */; };
+		DD2D95041898834400682326 /* iTunesArtwork in Resources */ = {isa = PBXBuildFile; fileRef = DD2D94F11898834400682326 /* iTunesArtwork */; };
+		DD2D95051898834400682326 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DD2D94F31898834400682326 /* main.m */; };
+		DD2D950B1898839900682326 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DD2D95091898839900682326 /* InfoPlist.strings */; };
+		DD2D950D189883BC00682326 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD2D950C189883BC00682326 /* OpenGLES.framework */; };
+		DD2D950F189883C000682326 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD2D950E189883C000682326 /* GLKit.framework */; };
+		DE41C135C8FE43B6BD76AF99 /* tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 816BD9EA2C87448693132A33 /* tile.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		E355613AEA834219BE498F8A /* shaders.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5FC9EDB0F595409AAAE92E0D /* shaders.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		E4561752D37047B3A3C1F366 /* shader-fill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAFC802D3C28445AB8FD8639 /* shader-fill.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		E5DFA0813BAB4B1087C5C90D /* properties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F366BF88C46E4EC382A4073E /* properties.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		E70AB0A81489449D8E56C13D /* painter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0F5DF8E170A4F45897A6EE1 /* painter.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		EB012A1A42D9452DB9781E3B /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7C4188B741E34A91820D3ACD /* main.mm */; settings = {COMPILER_FLAGS = ""; }; };
+		EED71DDD4B83422E8E3AB2D6 /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4272176BA8B24A3984D61C40 /* style.cpp */; settings = {COMPILER_FLAGS = ""; }; };
+		F21E18040FA141AFA5FA89DB /* settings.mm in Sources */ = {isa = PBXBuildFile; fileRef = 10E4CD5BDF8F4CC7BDD1BE87 /* settings.mm */; settings = {COMPILER_FLAGS = ""; }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		001BBB4250A94CB6BCF3F33E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5C0925663F5A4A79B76CB5DD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A176389D38045CD958BB1FF;
+			remoteInfo = macosx;
+		};
+		0A43799BDCED42FFA8C44457 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5C0925663F5A4A79B76CB5DD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0017AB291BB546DF95F00DEA;
+			remoteInfo = ZERO_CHECK;
+		};
+		5082411397C54BB493D16943 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5C0925663F5A4A79B76CB5DD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0017AB291BB546DF95F00DEA;
+			remoteInfo = ZERO_CHECK;
+		};
+		51B3020A1FF94F2FB7033F98 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5C0925663F5A4A79B76CB5DD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 56C21E2757C4449D912133E2;
+			remoteInfo = llmr;
+		};
+		66760C52484941F182B97116 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5C0925663F5A4A79B76CB5DD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 56C21E2757C4449D912133E2;
+			remoteInfo = llmr;
+		};
+		8C508E4C18994D3FA63571FE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5C0925663F5A4A79B76CB5DD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0017AB291BB546DF95F00DEA;
+			remoteInfo = ZERO_CHECK;
+		};
+		DD2D94D418987F4800682326 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5C0925663F5A4A79B76CB5DD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0017AB291BB546DF95F00DEA;
+			remoteInfo = ZERO_CHECK;
+		};
+		DD2D94D618987F4800682326 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5C0925663F5A4A79B76CB5DD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 56C21E2757C4449D912133E2;
+			remoteInfo = llmr;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		078634AC798D4C5687027501 /* animation.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = animation.hpp; path = include/llmr/util/animation.hpp; sourceTree = SOURCE_ROOT; };
+		08B92D0427D04446B3036E49 /* fill_bucket.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = fill_bucket.cpp; path = src/renderer/fill_bucket.cpp; sourceTree = SOURCE_ROOT; };
+		10E4CD5BDF8F4CC7BDD1BE87 /* settings.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = settings.mm; path = macosx/settings.mm; sourceTree = SOURCE_ROOT; };
+		19FFDE5D37024E99AB7CA3C8 /* vec.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = vec.hpp; path = include/llmr/util/vec.hpp; sourceTree = SOURCE_ROOT; };
+		1B6F79AB9DE14270A412C54A /* transform.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = transform.hpp; path = include/llmr/map/transform.hpp; sourceTree = SOURCE_ROOT; };
+		1E5700448FF14A56B9EB3949 /* debug_font_buffer.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = debug_font_buffer.cpp; path = src/geometry/debug_font_buffer.cpp; sourceTree = SOURCE_ROOT; };
+		1E6C3045C86342E8994D1C70 /* shader-outline.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = "shader-outline.cpp"; path = "src/renderer/shader-outline.cpp"; sourceTree = SOURCE_ROOT; };
+		22D2093B9FD349E287C61BCA /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		23A2E9284B3E43D98B927168 /* layer_description.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = layer_description.cpp; path = src/style/layer_description.cpp; sourceTree = SOURCE_ROOT; };
+		251006051B7946C2BC0A1760 /* bucket_description.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = bucket_description.cpp; path = src/style/bucket_description.cpp; sourceTree = SOURCE_ROOT; };
+		256DF4688F884A04AB8D2961 /* math.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = math.hpp; path = include/llmr/util/math.hpp; sourceTree = SOURCE_ROOT; };
+		2B75C963498F4259A62CF5CA /* linevertexbuffer.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = linevertexbuffer.cpp; path = src/geometry/linevertexbuffer.cpp; sourceTree = SOURCE_ROOT; };
+		35F07D4EE0E14248AC46255C /* shader-line.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = "shader-line.hpp"; path = "include/llmr/renderer/shader-line.hpp"; sourceTree = SOURCE_ROOT; };
+		390817B2B5AF43A3B6A6E470 /* Info.plist */ = {isa = PBXFileReference; explicitFileType = sourcecode.text.plist; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = xcode/macosx/CMakeFiles/macosx.dir/Info.plist; sourceTree = SOURCE_ROOT; };
+		40565F1B0F39419E84726E57 /* shader.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = shader.hpp; path = include/llmr/renderer/shader.hpp; sourceTree = SOURCE_ROOT; };
+		4272176BA8B24A3984D61C40 /* style.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = style.cpp; path = src/resources/style.cpp; sourceTree = SOURCE_ROOT; };
+		43376A6487334CB5845B7231 /* libllmr.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libllmr.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D42148292404AD490B35CC7 /* debug_font_buffer.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = debug_font_buffer.hpp; path = include/llmr/geometry/debug_font_buffer.hpp; sourceTree = SOURCE_ROOT; };
+		4F548C41325543569FAAC242 /* style.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = style.cpp; path = src/style/style.cpp; sourceTree = SOURCE_ROOT; };
+		56EA1C9138254B79BA3EE939 /* map.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = map.hpp; path = include/llmr/map/map.hpp; sourceTree = SOURCE_ROOT; };
+		5BC9FC1D96364AEEBB20B61D /* gl.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = gl.hpp; path = include/llmr/platform/gl.hpp; sourceTree = SOURCE_ROOT; };
+		5E64722C269744DC9CA3395C /* value.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = value.cpp; path = src/style/value.cpp; sourceTree = SOURCE_ROOT; };
+		5EBE52C3380348D58A2884F3 /* platform.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = platform.hpp; path = include/llmr/platform/platform.hpp; sourceTree = SOURCE_ROOT; };
+		5FC9EDB0F595409AAAE92E0D /* shaders.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = shaders.cpp; path = src/shader/shaders.cpp; sourceTree = SOURCE_ROOT; };
+		6606044DD7724F6C92497C00 /* fill_buffer.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = fill_buffer.cpp; path = src/geometry/fill_buffer.cpp; sourceTree = SOURCE_ROOT; };
+		6AA0D3939A314FF0B187DAD3 /* animation.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = animation.cpp; path = src/util/animation.cpp; sourceTree = SOURCE_ROOT; };
+		7536F29505F44320B67865CA /* shader-outline.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = "shader-outline.hpp"; path = "include/llmr/renderer/shader-outline.hpp"; sourceTree = SOURCE_ROOT; };
+		7C4188B741E34A91820D3ACD /* main.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = main.mm; path = macosx/main.mm; sourceTree = SOURCE_ROOT; };
+		816BD9EA2C87448693132A33 /* tile.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = tile.cpp; path = src/map/tile.cpp; sourceTree = SOURCE_ROOT; };
+		84CE8C3760F8473DB7221B6F /* llmr.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = llmr.hpp; path = include/llmr/llmr.hpp; sourceTree = SOURCE_ROOT; };
+		8DA85C143EB345D99484EA39 /* transform.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = transform.cpp; path = src/map/transform.cpp; sourceTree = SOURCE_ROOT; };
+		8FA2FC9E513E4010ACC87C48 /* tile.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = tile.hpp; path = include/llmr/map/tile.hpp; sourceTree = SOURCE_ROOT; };
+		9A0E485908F2461396D9A263 /* mat4.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = mat4.cpp; path = src/util/mat4.cpp; sourceTree = SOURCE_ROOT; };
+		A34F8BB125AB4599A792B4A9 /* linevertexbuffer.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = linevertexbuffer.hpp; path = include/llmr/geometry/linevertexbuffer.hpp; sourceTree = SOURCE_ROOT; };
+		A94966A6910D4496BC04B00E /* shader.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = shader.cpp; path = src/renderer/shader.cpp; sourceTree = SOURCE_ROOT; };
+		ABD598D8DC3547D3BE2C2B46 /* macosx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = macosx.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5C1D1B8DC034743A8351CE0 /* mat4.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = mat4.hpp; path = include/llmr/util/mat4.hpp; sourceTree = SOURCE_ROOT; };
+		B7D0F0626F8A4281961159D2 /* shader-fill.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = "shader-fill.hpp"; path = "include/llmr/renderer/shader-fill.hpp"; sourceTree = SOURCE_ROOT; };
+		C928BF1304B04393BEE03297 /* shaders.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = shaders.hpp; path = include/llmr/shader/shaders.hpp; sourceTree = SOURCE_ROOT; };
+		CAFC802D3C28445AB8FD8639 /* shader-fill.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = "shader-fill.cpp"; path = "src/renderer/shader-fill.cpp"; sourceTree = SOURCE_ROOT; };
+		CB12849CCDF247A0AE5F7B29 /* fill_buffer.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = fill_buffer.hpp; path = include/llmr/geometry/fill_buffer.hpp; sourceTree = SOURCE_ROOT; };
+		D96CA434D4C74280ACB82127 /* map.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = map.cpp; path = src/map/map.cpp; sourceTree = SOURCE_ROOT; };
+		D9E703CE94B24F539B314BEB /* painter.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = painter.hpp; path = include/llmr/renderer/painter.hpp; sourceTree = SOURCE_ROOT; };
+		DD2D949818987F0200682326 /* ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD2D949A18987F0200682326 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		DD2D949C18987F0200682326 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		DD2D949E18987F0200682326 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		DD2D94D81898831400682326 /* MBXAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBXAppDelegate.h; path = ios/MBXAppDelegate.h; sourceTree = SOURCE_ROOT; };
+		DD2D94D91898831400682326 /* MBXAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBXAppDelegate.m; path = ios/MBXAppDelegate.m; sourceTree = SOURCE_ROOT; };
+		DD2D94DA1898831400682326 /* MBXSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBXSettings.h; path = ios/MBXSettings.h; sourceTree = SOURCE_ROOT; };
+		DD2D94DB1898831400682326 /* MBXSettings.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MBXSettings.mm; path = ios/MBXSettings.mm; sourceTree = SOURCE_ROOT; };
+		DD2D94DC1898831400682326 /* MBXViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBXViewController.h; path = ios/MBXViewController.h; sourceTree = SOURCE_ROOT; };
+		DD2D94DD1898831400682326 /* MBXViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MBXViewController.mm; path = ios/MBXViewController.mm; sourceTree = SOURCE_ROOT; };
+		DD2D94E11898834400682326 /* ios-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "ios-Info.plist"; path = "ios/ios-Info.plist"; sourceTree = SOURCE_ROOT; };
+		DD2D94E21898834400682326 /* Icon-60.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-60.png"; path = "ios/Icon-60.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94E31898834400682326 /* Icon-60@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-60@2x.png"; path = "ios/Icon-60@2x.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94E41898834400682326 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-72.png"; path = "ios/Icon-72.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94E51898834400682326 /* Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-72@2x.png"; path = "ios/Icon-72@2x.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94E61898834400682326 /* Icon-76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-76.png"; path = "ios/Icon-76.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94E71898834400682326 /* Icon-76@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-76@2x.png"; path = "ios/Icon-76@2x.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94E81898834400682326 /* Icon-Small-50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small-50.png"; path = "ios/Icon-Small-50.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94E91898834400682326 /* Icon-Small-50@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small-50@2x.png"; path = "ios/Icon-Small-50@2x.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94EA1898834400682326 /* Icon-Small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small.png"; path = "ios/Icon-Small.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94EB1898834400682326 /* Icon-Small@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Small@2x.png"; path = "ios/Icon-Small@2x.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94EC1898834400682326 /* Icon-Spotlight-40.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Spotlight-40.png"; path = "ios/Icon-Spotlight-40.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94ED1898834400682326 /* Icon-Spotlight-40@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-Spotlight-40@2x.png"; path = "ios/Icon-Spotlight-40@2x.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94EE1898834400682326 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ios/Icon.png; sourceTree = SOURCE_ROOT; };
+		DD2D94EF1898834400682326 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "ios/Icon@2x.png"; sourceTree = SOURCE_ROOT; };
+		DD2D94F01898834400682326 /* iTunesArtwork@2x */ = {isa = PBXFileReference; lastKnownFileType = file; name = "iTunesArtwork@2x"; path = "ios/iTunesArtwork@2x"; sourceTree = SOURCE_ROOT; };
+		DD2D94F11898834400682326 /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = file; name = iTunesArtwork; path = ios/iTunesArtwork; sourceTree = SOURCE_ROOT; };
+		DD2D94F21898834400682326 /* ios-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "ios-Prefix.pch"; path = "ios/ios-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		DD2D94F31898834400682326 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ios/main.m; sourceTree = SOURCE_ROOT; };
+		DD2D950A1898839900682326 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = InfoPlist.strings; sourceTree = "<group>"; };
+		DD2D950C189883BC00682326 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/OpenGLES.framework; sourceTree = DEVELOPER_DIR; };
+		DD2D950E189883C000682326 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/GLKit.framework; sourceTree = DEVELOPER_DIR; };
+		E3ADB1BA9AF4493AB8A2ABD8 /* Icon.icns */ = {isa = PBXFileReference; explicitFileType = sourcecode; fileEncoding = 4; name = Icon.icns; path = macosx/Icon.icns; sourceTree = SOURCE_ROOT; };
+		E73742A7DF294D4B9EB4808F /* shader-line.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = "shader-line.cpp"; path = "src/renderer/shader-line.cpp"; sourceTree = SOURCE_ROOT; };
+		F0F5DF8E170A4F45897A6EE1 /* painter.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = painter.cpp; path = src/renderer/painter.cpp; sourceTree = SOURCE_ROOT; };
+		F366BF88C46E4EC382A4073E /* properties.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = properties.cpp; path = src/style/properties.cpp; sourceTree = SOURCE_ROOT; };
+		F378125741354BF0AC3B9621 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; name = CMakeLists.txt; path = src/CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		F626D6E3555648A3B6B80A71 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; name = CMakeLists.txt; path = macosx/CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DD2D949518987F0200682326 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD2D949D18987F0200682326 /* CoreGraphics.framework in Frameworks */,
+				DD2D949B18987F0200682326 /* Foundation.framework in Frameworks */,
+				DD2D950F189883C000682326 /* GLKit.framework in Frameworks */,
+				DD2D950D189883BC00682326 /* OpenGLES.framework in Frameworks */,
+				DD2D949F18987F0200682326 /* UIKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		00F0A2ADDBDE40CB87EB44BC /* Source Files */ = {
+			isa = PBXGroup;
+			children = (
+				7C4188B741E34A91820D3ACD /* main.mm */,
+				10E4CD5BDF8F4CC7BDD1BE87 /* settings.mm */,
+			);
+			name = "Source Files";
+			sourceTree = "<group>";
+		};
+		132D9F1E3A384EB59ADD62AD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				43376A6487334CB5845B7231 /* libllmr.a */,
+				ABD598D8DC3547D3BE2C2B46 /* macosx.app */,
+				DD2D949818987F0200682326 /* ios.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		28DE9AEE3A6C4F6CBB6F9032 /* Source Files */ = {
+			isa = PBXGroup;
+			children = (
+				1E5700448FF14A56B9EB3949 /* debug_font_buffer.cpp */,
+				6606044DD7724F6C92497C00 /* fill_buffer.cpp */,
+				2B75C963498F4259A62CF5CA /* linevertexbuffer.cpp */,
+				D96CA434D4C74280ACB82127 /* map.cpp */,
+				816BD9EA2C87448693132A33 /* tile.cpp */,
+				8DA85C143EB345D99484EA39 /* transform.cpp */,
+				08B92D0427D04446B3036E49 /* fill_bucket.cpp */,
+				F0F5DF8E170A4F45897A6EE1 /* painter.cpp */,
+				CAFC802D3C28445AB8FD8639 /* shader-fill.cpp */,
+				E73742A7DF294D4B9EB4808F /* shader-line.cpp */,
+				1E6C3045C86342E8994D1C70 /* shader-outline.cpp */,
+				A94966A6910D4496BC04B00E /* shader.cpp */,
+				4272176BA8B24A3984D61C40 /* style.cpp */,
+				5FC9EDB0F595409AAAE92E0D /* shaders.cpp */,
+				251006051B7946C2BC0A1760 /* bucket_description.cpp */,
+				23A2E9284B3E43D98B927168 /* layer_description.cpp */,
+				F366BF88C46E4EC382A4073E /* properties.cpp */,
+				4F548C41325543569FAAC242 /* style.cpp */,
+				5E64722C269744DC9CA3395C /* value.cpp */,
+				6AA0D3939A314FF0B187DAD3 /* animation.cpp */,
+				9A0E485908F2461396D9A263 /* mat4.cpp */,
+			);
+			name = "Source Files";
+			sourceTree = "<group>";
+		};
+		34B09CDB8A044BF389B11B78 = {
+			isa = PBXGroup;
+			children = (
+				968232DC649F49FAB3114BAB /* Sources */,
+				B5AE614077D84C72A97662B0 /* Resources */,
+				DD2D949918987F0200682326 /* Frameworks */,
+				132D9F1E3A384EB59ADD62AD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		69F2D87D272A4D7897A6D1E1 /* macosx */ = {
+			isa = PBXGroup;
+			children = (
+				00F0A2ADDBDE40CB87EB44BC /* Source Files */,
+				DE096B3E9E4C48B7BB037551 /* Resources */,
+				F626D6E3555648A3B6B80A71 /* CMakeLists.txt */,
+				E3ADB1BA9AF4493AB8A2ABD8 /* Icon.icns */,
+			);
+			name = macosx;
+			sourceTree = "<group>";
+		};
+		846E8C8404544777BDF5E534 /* ZERO_CHECK */ = {
+			isa = PBXGroup;
+			children = (
+				999144BF07644267AD186656 /* CMake Rules */,
+				22D2093B9FD349E287C61BCA /* CMakeLists.txt */,
+			);
+			name = ZERO_CHECK;
+			sourceTree = "<group>";
+		};
+		8974D39935464C5798366DB3 /* Header Files */ = {
+			isa = PBXGroup;
+			children = (
+				4D42148292404AD490B35CC7 /* debug_font_buffer.hpp */,
+				CB12849CCDF247A0AE5F7B29 /* fill_buffer.hpp */,
+				A34F8BB125AB4599A792B4A9 /* linevertexbuffer.hpp */,
+				84CE8C3760F8473DB7221B6F /* llmr.hpp */,
+				56EA1C9138254B79BA3EE939 /* map.hpp */,
+				8FA2FC9E513E4010ACC87C48 /* tile.hpp */,
+				1B6F79AB9DE14270A412C54A /* transform.hpp */,
+				5BC9FC1D96364AEEBB20B61D /* gl.hpp */,
+				5EBE52C3380348D58A2884F3 /* platform.hpp */,
+				D9E703CE94B24F539B314BEB /* painter.hpp */,
+				B7D0F0626F8A4281961159D2 /* shader-fill.hpp */,
+				35F07D4EE0E14248AC46255C /* shader-line.hpp */,
+				7536F29505F44320B67865CA /* shader-outline.hpp */,
+				40565F1B0F39419E84726E57 /* shader.hpp */,
+				C928BF1304B04393BEE03297 /* shaders.hpp */,
+				078634AC798D4C5687027501 /* animation.hpp */,
+				B5C1D1B8DC034743A8351CE0 /* mat4.hpp */,
+				256DF4688F884A04AB8D2961 /* math.hpp */,
+				19FFDE5D37024E99AB7CA3C8 /* vec.hpp */,
+			);
+			name = "Header Files";
+			sourceTree = "<group>";
+		};
+		91DDDB9A59044284B150D773 /* llmr */ = {
+			isa = PBXGroup;
+			children = (
+				28DE9AEE3A6C4F6CBB6F9032 /* Source Files */,
+				8974D39935464C5798366DB3 /* Header Files */,
+				F378125741354BF0AC3B9621 /* CMakeLists.txt */,
+			);
+			name = llmr;
+			sourceTree = "<group>";
+		};
+		968232DC649F49FAB3114BAB /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				B484A00921B245549B817614 /* ALL_BUILD */,
+				846E8C8404544777BDF5E534 /* ZERO_CHECK */,
+				91DDDB9A59044284B150D773 /* llmr */,
+				69F2D87D272A4D7897A6D1E1 /* macosx */,
+				DD2D94A018987F0200682326 /* ios */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		999144BF07644267AD186656 /* CMake Rules */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "CMake Rules";
+			sourceTree = "<group>";
+		};
+		B484A00921B245549B817614 /* ALL_BUILD */ = {
+			isa = PBXGroup;
+			children = (
+				DB914328743A45EDA87C196C /* CMake Rules */,
+				22D2093B9FD349E287C61BCA /* CMakeLists.txt */,
+			);
+			name = ALL_BUILD;
+			sourceTree = "<group>";
+		};
+		B5AE614077D84C72A97662B0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				E3ADB1BA9AF4493AB8A2ABD8 /* Icon.icns */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		DB914328743A45EDA87C196C /* CMake Rules */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "CMake Rules";
+			sourceTree = "<group>";
+		};
+		DD2D949918987F0200682326 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DD2D949C18987F0200682326 /* CoreGraphics.framework */,
+				DD2D949A18987F0200682326 /* Foundation.framework */,
+				DD2D950E189883C000682326 /* GLKit.framework */,
+				DD2D950C189883BC00682326 /* OpenGLES.framework */,
+				DD2D949E18987F0200682326 /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DD2D94A018987F0200682326 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				DD2D94D81898831400682326 /* MBXAppDelegate.h */,
+				DD2D94D91898831400682326 /* MBXAppDelegate.m */,
+				DD2D94DC1898831400682326 /* MBXViewController.h */,
+				DD2D94DD1898831400682326 /* MBXViewController.mm */,
+				DD2D94DA1898831400682326 /* MBXSettings.h */,
+				DD2D94DB1898831400682326 /* MBXSettings.mm */,
+				DD2D94A118987F0200682326 /* Supporting Files */,
+			);
+			name = ios;
+			path = xcode/ios;
+			sourceTree = "<group>";
+		};
+		DD2D94A118987F0200682326 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				DD2D94E11898834400682326 /* ios-Info.plist */,
+				DD2D95091898839900682326 /* InfoPlist.strings */,
+				DD2D94F31898834400682326 /* main.m */,
+				DD2D94F21898834400682326 /* ios-Prefix.pch */,
+				DD2D95071898836F00682326 /* Icons */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		DD2D95071898836F00682326 /* Icons */ = {
+			isa = PBXGroup;
+			children = (
+				DD2D94E21898834400682326 /* Icon-60.png */,
+				DD2D94E31898834400682326 /* Icon-60@2x.png */,
+				DD2D94E41898834400682326 /* Icon-72.png */,
+				DD2D94E51898834400682326 /* Icon-72@2x.png */,
+				DD2D94E61898834400682326 /* Icon-76.png */,
+				DD2D94E71898834400682326 /* Icon-76@2x.png */,
+				DD2D94E81898834400682326 /* Icon-Small-50.png */,
+				DD2D94E91898834400682326 /* Icon-Small-50@2x.png */,
+				DD2D94EA1898834400682326 /* Icon-Small.png */,
+				DD2D94EB1898834400682326 /* Icon-Small@2x.png */,
+				DD2D94EC1898834400682326 /* Icon-Spotlight-40.png */,
+				DD2D94ED1898834400682326 /* Icon-Spotlight-40@2x.png */,
+				DD2D94EE1898834400682326 /* Icon.png */,
+				DD2D94EF1898834400682326 /* Icon@2x.png */,
+				DD2D94F01898834400682326 /* iTunesArtwork@2x */,
+				DD2D94F11898834400682326 /* iTunesArtwork */,
+			);
+			name = Icons;
+			sourceTree = "<group>";
+		};
+		DE096B3E9E4C48B7BB037551 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				390817B2B5AF43A3B6A6E470 /* Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		56C21E2757C4449D912133E2 /* llmr */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 79918AFB9B09439F9A44791B /* Build configuration list for PBXNativeTarget "llmr" */;
+			buildPhases = (
+				C9E2A4D36EFC4FC89235E84F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				299D4BE4A4F74A51820FA482 /* PBXTargetDependency */,
+			);
+			name = llmr;
+			productName = llmr;
+			productReference = 43376A6487334CB5845B7231 /* libllmr.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		5A176389D38045CD958BB1FF /* macosx */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B9B7DB8AE0A44D4E8B19FA48 /* Build configuration list for PBXNativeTarget "macosx" */;
+			buildPhases = (
+				53BF22A279C74EF681778CBC /* Resources */,
+				6F1DAA8E6C6E40B6AE55D001 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				81A97CAE0C5949AEB8805B72 /* PBXTargetDependency */,
+				AD4A03B35C67453F88D08FEE /* PBXTargetDependency */,
+			);
+			name = macosx;
+			productName = macosx;
+			productReference = ABD598D8DC3547D3BE2C2B46 /* macosx.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DD2D949718987F0200682326 /* ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DD2D94CA18987F0300682326 /* Build configuration list for PBXNativeTarget "ios" */;
+			buildPhases = (
+				DD2D949418987F0200682326 /* Sources */,
+				DD2D949518987F0200682326 /* Frameworks */,
+				DD2D949618987F0200682326 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DD2D94D718987F4800682326 /* PBXTargetDependency */,
+				DD2D94D518987F4800682326 /* PBXTargetDependency */,
+			);
+			name = ios;
+			productName = ios;
+			productReference = DD2D949818987F0200682326 /* ios.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5C0925663F5A4A79B76CB5DD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+			};
+			buildConfigurationList = 7CEAE743B1724365809BBDFF /* Build configuration list for PBXProject "llmr" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 34B09CDB8A044BF389B11B78;
+			projectDirPath = ..;
+			projectRoot = "";
+			targets = (
+				110D35E224E342B3AC0F2779 /* ALL_BUILD */,
+				0017AB291BB546DF95F00DEA /* ZERO_CHECK */,
+				56C21E2757C4449D912133E2 /* llmr */,
+				5A176389D38045CD958BB1FF /* macosx */,
+				DD2D949718987F0200682326 /* ios */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		53BF22A279C74EF681778CBC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				578B2721D8EF4003AA62E9A1 /* Icon.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DD2D949618987F0200682326 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD2D95001898834400682326 /* Icon-Spotlight-40@2x.png in Resources */,
+				DD2D95021898834400682326 /* Icon@2x.png in Resources */,
+				DD2D94FD1898834400682326 /* Icon-Small.png in Resources */,
+				DD2D94F71898834400682326 /* Icon-72.png in Resources */,
+				DD2D94FC1898834400682326 /* Icon-Small-50@2x.png in Resources */,
+				DD2D95031898834400682326 /* iTunesArtwork@2x in Resources */,
+				DD2D94F81898834400682326 /* Icon-72@2x.png in Resources */,
+				DD2D950B1898839900682326 /* InfoPlist.strings in Resources */,
+				DD2D94FB1898834400682326 /* Icon-Small-50.png in Resources */,
+				DD2D94F91898834400682326 /* Icon-76.png in Resources */,
+				DD2D94F51898834400682326 /* Icon-60.png in Resources */,
+				DD2D94FE1898834400682326 /* Icon-Small@2x.png in Resources */,
+				DD2D95041898834400682326 /* iTunesArtwork in Resources */,
+				DD2D94FA1898834400682326 /* Icon-76@2x.png in Resources */,
+				DD2D95011898834400682326 /* Icon.png in Resources */,
+				DD2D94F61898834400682326 /* Icon-60@2x.png in Resources */,
+				DD2D94FF1898834400682326 /* Icon-Spotlight-40.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		19F85622C0034FF79B7360AD /* CMake Rules */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "CMake Rules";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C /Users/incanus/Documents/Projects/Development\\ Seed/MapBox/vector/llmr.native/xcode -f /Users/incanus/Documents/Projects/Development\\ Seed/MapBox/vector/llmr.native/xcode/CMakeScripts/ALL_BUILD_cmakeRulesBuildPhase.make$CONFIGURATION all";
+			showEnvVarsInLog = 0;
+		};
+		3951011626F043FD9E072F08 /* CMake Rules */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "CMake Rules";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C /Users/incanus/Documents/Projects/Development\\ Seed/MapBox/vector/llmr.native/xcode -f /Users/incanus/Documents/Projects/Development\\ Seed/MapBox/vector/llmr.native/xcode/CMakeScripts/ZERO_CHECK_cmakeRulesBuildPhase.make$CONFIGURATION all";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6F1DAA8E6C6E40B6AE55D001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB012A1A42D9452DB9781E3B /* main.mm in Sources */,
+				F21E18040FA141AFA5FA89DB /* settings.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C9E2A4D36EFC4FC89235E84F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DE3000528644485BC1FA028 /* debug_font_buffer.cpp in Sources */,
+				8BE24278C1D64D43A391D5A5 /* fill_buffer.cpp in Sources */,
+				09849EADD6924B7C98E2930D /* linevertexbuffer.cpp in Sources */,
+				4D03E81484DD4678B89D2D18 /* map.cpp in Sources */,
+				DE41C135C8FE43B6BD76AF99 /* tile.cpp in Sources */,
+				87836AB486F94DF5ADA7697A /* transform.cpp in Sources */,
+				8CC89389E89E43FA9B1A0645 /* fill_bucket.cpp in Sources */,
+				E70AB0A81489449D8E56C13D /* painter.cpp in Sources */,
+				E4561752D37047B3A3C1F366 /* shader-fill.cpp in Sources */,
+				2A31BA8A3EF54D6EA5EB8794 /* shader-line.cpp in Sources */,
+				B9A2216A037A49488A61473C /* shader-outline.cpp in Sources */,
+				9542E959B8C545ACB12AE677 /* shader.cpp in Sources */,
+				EED71DDD4B83422E8E3AB2D6 /* style.cpp in Sources */,
+				E355613AEA834219BE498F8A /* shaders.cpp in Sources */,
+				4AAC112B6EC04AEBBBD3CEF0 /* bucket_description.cpp in Sources */,
+				3E6CEF093BD04DC593FCA023 /* layer_description.cpp in Sources */,
+				E5DFA0813BAB4B1087C5C90D /* properties.cpp in Sources */,
+				AE73DF5CF7FB48B59691E17A /* style.cpp in Sources */,
+				B40FE8AC699844C8B1B5952A /* value.cpp in Sources */,
+				072B04B90EFB4FF58AC45BCB /* animation.cpp in Sources */,
+				A967B04521C14BA8ADC3645A /* mat4.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DD2D949418987F0200682326 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD2D95051898834400682326 /* main.m in Sources */,
+				DD2D94E01898831400682326 /* MBXViewController.mm in Sources */,
+				DD2D94DE1898831400682326 /* MBXAppDelegate.m in Sources */,
+				DD2D94DF1898831400682326 /* MBXSettings.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		299D4BE4A4F74A51820FA482 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0017AB291BB546DF95F00DEA /* ZERO_CHECK */;
+			targetProxy = 8C508E4C18994D3FA63571FE /* PBXContainerItemProxy */;
+		};
+		3906D7DDE6E047E98DFFE2C1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A176389D38045CD958BB1FF /* macosx */;
+			targetProxy = 001BBB4250A94CB6BCF3F33E /* PBXContainerItemProxy */;
+		};
+		81A97CAE0C5949AEB8805B72 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 56C21E2757C4449D912133E2 /* llmr */;
+			targetProxy = 66760C52484941F182B97116 /* PBXContainerItemProxy */;
+		};
+		AD4A03B35C67453F88D08FEE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0017AB291BB546DF95F00DEA /* ZERO_CHECK */;
+			targetProxy = 5082411397C54BB493D16943 /* PBXContainerItemProxy */;
+		};
+		BC77CE62A2744F5B84682150 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0017AB291BB546DF95F00DEA /* ZERO_CHECK */;
+			targetProxy = 0A43799BDCED42FFA8C44457 /* PBXContainerItemProxy */;
+		};
+		DBF6EAC72DBE41919FB40D04 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 56C21E2757C4449D912133E2 /* llmr */;
+			targetProxy = 51B3020A1FF94F2FB7033F98 /* PBXContainerItemProxy */;
+		};
+		DD2D94D518987F4800682326 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0017AB291BB546DF95F00DEA /* ZERO_CHECK */;
+			targetProxy = DD2D94D418987F4800682326 /* PBXContainerItemProxy */;
+		};
+		DD2D94D718987F4800682326 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 56C21E2757C4449D912133E2 /* llmr */;
+			targetProxy = DD2D94D618987F4800682326 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		DD2D95091898839900682326 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DD2D950A1898839900682326 /* en */,
+			);
+			name = InfoPlist.strings;
+			path = ../../ios/en.lproj;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		029C6CC427D04B9BA8BCB0FF /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_SUFFIX = .a;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/src/../include\"",
+				);
+				INSTALL_PATH = "";
+				LIBRARY_STYLE = STATIC;
+				OTHER_CFLAGS = "       -DNDEBUG  ";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-Wall",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-DNDEBUG",
+				);
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = llmr;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/src";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = RelWithDebInfo;
+		};
+		08E60289AD524BF28204A9EF /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/macosx/../include\"",
+					/usr/local/Cellar/glfw3/3.0.3/include,
+					/usr/local/include,
+				);
+				INFOPLIST_FILE = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/macosx/CMakeFiles/macosx.dir/Info.plist";
+				INSTALL_PATH = "";
+				LD_RUNPATH_SEARCH_PATHS = /usr/local/Cellar/glfw3/3.0.3/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"/usr/local/Cellar/glfw3/3.0.3/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
+					/usr/local/Cellar/glfw3/3.0.3/lib,
+				);
+				OTHER_CFLAGS = "    -DNDEBUG  ";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-Wall",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-DNDEBUG",
+				);
+				OTHER_LDFLAGS = (
+					"-stdlib=libc++",
+					"-Wl,-search_paths_first",
+					"-Wl,-headerpad_max_install_names",
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/src/MinSizeRel/libllmr.a\"",
+					"-framework",
+					Cocoa,
+					"-framework",
+					OpenGL,
+					"-framework",
+					IOKit,
+					"-framework",
+					CoreVideo,
+					"-lglfw3",
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = macosx;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/macosx";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = MinSizeRel;
+		};
+		102BB90AD5CB425A815F6348 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_CFLAGS = "  ";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = MinSizeRel;
+		};
+		1F2A2BA806764E18B343B6D6 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_SUFFIX = .a;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/src/../include\"",
+				);
+				INSTALL_PATH = "";
+				LIBRARY_STYLE = STATIC;
+				OTHER_CFLAGS = "    -DNDEBUG  ";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-Wall",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-DNDEBUG",
+				);
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = llmr;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/src";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = MinSizeRel;
+		};
+		29BEB726CFFB4FD38204E540 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_CFLAGS = "  ";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = RelWithDebInfo;
+		};
+		2CEDF1514A6E4C1DA095583B /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/macosx/../include\"",
+					/usr/local/Cellar/glfw3/3.0.3/include,
+					/usr/local/include,
+				);
+				INFOPLIST_FILE = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/macosx/CMakeFiles/macosx.dir/Info.plist";
+				INSTALL_PATH = "";
+				LD_RUNPATH_SEARCH_PATHS = /usr/local/Cellar/glfw3/3.0.3/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"/usr/local/Cellar/glfw3/3.0.3/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
+					/usr/local/Cellar/glfw3/3.0.3/lib,
+				);
+				OTHER_CFLAGS = "       -DNDEBUG  ";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-Wall",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-DNDEBUG",
+				);
+				OTHER_LDFLAGS = (
+					"-stdlib=libc++",
+					"-Wl,-search_paths_first",
+					"-Wl,-headerpad_max_install_names",
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/src/RelWithDebInfo/libllmr.a\"",
+					"-framework",
+					Cocoa,
+					"-framework",
+					OpenGL,
+					"-framework",
+					IOKit,
+					"-framework",
+					CoreVideo,
+					"-lglfw3",
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = macosx;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/macosx";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = RelWithDebInfo;
+		};
+		3F40E0E2CAC849D9AC341884 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_CFLAGS = "  ";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Debug;
+		};
+		453816A8054D4F46973747AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_CFLAGS = "  ";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Release;
+		};
+		46A1696838CA4C8982B06B58 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_CFLAGS = "  ";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = RelWithDebInfo;
+		};
+		5EA81875554748D695801E36 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_CFLAGS = "  ";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Release;
+		};
+		6F07873E2917407E8AA9B973 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/macosx/../include\"",
+					/usr/local/Cellar/glfw3/3.0.3/include,
+					/usr/local/include,
+				);
+				INFOPLIST_FILE = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/macosx/CMakeFiles/macosx.dir/Info.plist";
+				INSTALL_PATH = "";
+				LD_RUNPATH_SEARCH_PATHS = /usr/local/Cellar/glfw3/3.0.3/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"/usr/local/Cellar/glfw3/3.0.3/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
+					/usr/local/Cellar/glfw3/3.0.3/lib,
+				);
+				OTHER_CFLAGS = "    -DNDEBUG  ";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-Wall",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-DNDEBUG",
+				);
+				OTHER_LDFLAGS = (
+					"-stdlib=libc++",
+					"-Wl,-search_paths_first",
+					"-Wl,-headerpad_max_install_names",
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/src/Release/libllmr.a\"",
+					"-framework",
+					Cocoa,
+					"-framework",
+					OpenGL,
+					"-framework",
+					IOKit,
+					"-framework",
+					CoreVideo,
+					"-lglfw3",
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = macosx;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/macosx";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Release;
+		};
+		9F434BAC1E1341CF9F65937F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_SUFFIX = .a;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/src/../include\"",
+				);
+				INSTALL_PATH = "";
+				LIBRARY_STYLE = STATIC;
+				OTHER_CFLAGS = "    ";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-Wall",
+					"-std=c++11",
+					"-stdlib=libc++",
+				);
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = llmr;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/src";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Debug;
+		};
+		B9372C32FB87472C9F000450 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_CFLAGS = "  ";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = MinSizeRel;
+		};
+		CBB3ADE699B442B6B6C4F071 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk;
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/build";
+			};
+			name = Debug;
+		};
+		DD2D94CB18987F0300682326 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "ios/ios-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					include,
+					ios/boost_1_55_0,
+				);
+				INFOPLIST_FILE = "ios/ios-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-Wall",
+					"-std=c++11",
+					"-stdlib=libc++",
+				);
+				OTHER_LDFLAGS = (
+					"-stdlib=libc++",
+					"-Wl,-search_paths_first",
+					"-Wl,-headerpad_max_install_names",
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/src/Debug/libllmr.a\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		DD2D94CC18987F0300682326 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "ios/ios-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					include,
+					ios/boost_1_55_0,
+				);
+				INFOPLIST_FILE = "ios/ios-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				OTHER_CFLAGS = "-DNDEBUG";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-Wall",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-DNDEBUG",
+				);
+				OTHER_LDFLAGS = (
+					"-stdlib=libc++",
+					"-Wl,-search_paths_first",
+					"-Wl,-headerpad_max_install_names",
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/src/Release/libllmr.a\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		DD2D94CD18987F0300682326 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "ios/ios-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					include,
+					ios/boost_1_55_0,
+				);
+				INFOPLIST_FILE = "ios/ios-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				OTHER_CFLAGS = "-DNDEBUG";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-Wall",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-DNDEBUG",
+				);
+				OTHER_LDFLAGS = (
+					"-stdlib=libc++",
+					"-Wl,-search_paths_first",
+					"-Wl,-headerpad_max_install_names",
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/src/MinSizeRel/libllmr.a\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+			};
+			name = MinSizeRel;
+		};
+		DD2D94CE18987F0300682326 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "ios/ios-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					include,
+					ios/boost_1_55_0,
+				);
+				INFOPLIST_FILE = "ios/ios-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				OTHER_CFLAGS = "-DNDEBUG";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-Wall",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-DNDEBUG",
+				);
+				OTHER_LDFLAGS = (
+					"-stdlib=libc++",
+					"-Wl,-search_paths_first",
+					"-Wl,-headerpad_max_install_names",
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/src/RelWithDebInfo/libllmr.a\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+			};
+			name = RelWithDebInfo;
+		};
+		E05E7C6BD27A4440A34EC021 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_CFLAGS = "  ";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Debug;
+		};
+		E2ED21F2939D46EF8CFA1B01 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk;
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/build";
+			};
+			name = Release;
+		};
+		F3B254F1BC7248FBB95F1133 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk;
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/build";
+			};
+			name = MinSizeRel;
+		};
+		F67FB3A179D840DFB15A13A3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/macosx/../include\"",
+					/usr/local/Cellar/glfw3/3.0.3/include,
+					/usr/local/include,
+				);
+				INFOPLIST_FILE = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/macosx/CMakeFiles/macosx.dir/Info.plist";
+				INSTALL_PATH = "";
+				LD_RUNPATH_SEARCH_PATHS = /usr/local/Cellar/glfw3/3.0.3/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"/usr/local/Cellar/glfw3/3.0.3/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
+					/usr/local/Cellar/glfw3/3.0.3/lib,
+				);
+				OTHER_CFLAGS = "    ";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-Wall",
+					"-std=c++11",
+					"-stdlib=libc++",
+				);
+				OTHER_LDFLAGS = (
+					"-stdlib=libc++",
+					"-Wl,-search_paths_first",
+					"-Wl,-headerpad_max_install_names",
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/src/Debug/libllmr.a\"",
+					"-framework",
+					Cocoa,
+					"-framework",
+					OpenGL,
+					"-framework",
+					IOKit,
+					"-framework",
+					CoreVideo,
+					"-lglfw3",
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = macosx;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/macosx";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Debug;
+		};
+		FB07D63B34BA473AA97F012F /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk;
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/build";
+			};
+			name = RelWithDebInfo;
+		};
+		FBADD59CCAA64408B21F9F20 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_SUFFIX = .a;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					"\"/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/src/../include\"",
+				);
+				INSTALL_PATH = "";
+				LIBRARY_STYLE = STATIC;
+				OTHER_CFLAGS = "    -DNDEBUG  ";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-Wall",
+					"-std=c++11",
+					"-stdlib=libc++",
+					"-DNDEBUG",
+				);
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = llmr;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/incanus/Documents/Projects/Development Seed/MapBox/vector/llmr.native/xcode/src";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		751D1BABDFB5485093AFC182 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3F40E0E2CAC849D9AC341884 /* Debug */,
+				453816A8054D4F46973747AC /* Release */,
+				B9372C32FB87472C9F000450 /* MinSizeRel */,
+				46A1696838CA4C8982B06B58 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		79918AFB9B09439F9A44791B /* Build configuration list for PBXNativeTarget "llmr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F434BAC1E1341CF9F65937F /* Debug */,
+				FBADD59CCAA64408B21F9F20 /* Release */,
+				1F2A2BA806764E18B343B6D6 /* MinSizeRel */,
+				029C6CC427D04B9BA8BCB0FF /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7CEAE743B1724365809BBDFF /* Build configuration list for PBXProject "llmr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CBB3ADE699B442B6B6C4F071 /* Debug */,
+				E2ED21F2939D46EF8CFA1B01 /* Release */,
+				F3B254F1BC7248FBB95F1133 /* MinSizeRel */,
+				FB07D63B34BA473AA97F012F /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B9B7DB8AE0A44D4E8B19FA48 /* Build configuration list for PBXNativeTarget "macosx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F67FB3A179D840DFB15A13A3 /* Debug */,
+				6F07873E2917407E8AA9B973 /* Release */,
+				08E60289AD524BF28204A9EF /* MinSizeRel */,
+				2CEDF1514A6E4C1DA095583B /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DD2D94CA18987F0300682326 /* Build configuration list for PBXNativeTarget "ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DD2D94CB18987F0300682326 /* Debug */,
+				DD2D94CC18987F0300682326 /* Release */,
+				DD2D94CD18987F0300682326 /* MinSizeRel */,
+				DD2D94CE18987F0300682326 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E90A8100F65F49678F3F0FC5 /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E05E7C6BD27A4440A34EC021 /* Debug */,
+				5EA81875554748D695801E36 /* Release */,
+				102BB90AD5CB425A815F6348 /* MinSizeRel */,
+				29BEB726CFFB4FD38204E540 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5C0925663F5A4A79B76CB5DD /* Project object */;
+}
