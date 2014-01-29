@@ -33,7 +33,16 @@ bin/convert-style.js | protoc --decode=style proto/style.proto
 You should see a nicely formatted hierarchical output of the converted style.
 
 
+To update the included default style, use
+
+```
+bin/convert-style.js > resources/style.pbf && bin/build-style.js
+```
+
+
 # Usage
 
 - Press 'R' to reset the transform
 - Press 'N' to reset north
+- Press Tab to toggle debug information
+- Press Esc to quit
