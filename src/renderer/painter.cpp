@@ -20,38 +20,6 @@ using namespace llmr;
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-GLshort tile_stencil_vertices[] = {
-    // top left triangle
-    0, 0,
-    4096, 0,
-    0, 4096,
-
-    // bottom right triangle
-    4096, 0,
-    0, 4096,
-    4096, 4096
-};
-
-GLshort tile_border_vertices[] = {
-    0, 0,
-    4096, 0,
-    4096, 4096,
-    0, 4096,
-    0, 0
-};
-
-GLshort matte_vertices[] = {
-    // top left triangle
-    0, 0,
-    16384, 0,
-    0, 16384,
-
-    // bottom right triangle
-    16384, 0,
-    0, 16384,
-    16384, 16384
-};
-
 Painter::Painter(Transform& transform, Settings& settings, Style& style)
     : transform(transform),
       settings(settings),
@@ -68,22 +36,6 @@ void Painter::setup() {
     assert(outlineShader);
     assert(lineShader);
 
-    // Set up the stencil quad we're using to generate the stencil mask.
-    glGenBuffers(1, &tile_stencil_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(tile_stencil_vertices), tile_stencil_vertices, GL_STATIC_DRAW);
-
-    // Set up the tile boundary lines we're using to draw the tile outlines.
-    glGenBuffers(1, &tile_border_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, tile_border_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(tile_border_vertices), tile_border_vertices, GL_STATIC_DRAW);
-
-    // Set up the tile boundary lines we're using to draw the tile outlines.
-    glGenBuffers(1, &matte_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, matte_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(matte_vertices), matte_vertices, GL_STATIC_DRAW);
-
-
     glEnable(GL_STENCIL_TEST);
 
     // We are blending the new pixels *behind* the existing pixels. That way we can
@@ -97,12 +49,6 @@ void Painter::setupShaders() {
     plainShader = std::make_shared<PlainShader>();
     outlineShader = std::make_shared<OutlineShader>();
     lineShader = std::make_shared<LineShader>();
-}
-
-void Painter::teardown() {
-    glDeleteBuffers(1, &tile_stencil_buffer);
-    glDeleteBuffers(1, &tile_border_buffer);
-    glDeleteBuffers(1, &matte_buffer);
 }
 
 void Painter::changeMatrix(const Tile::Ptr& tile) {
@@ -148,10 +94,10 @@ void Painter::drawClippingMask() {
     glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
 
     // Draw the clipping mask
-    glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
+    tileStencilBuffer.bind();
     glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 0.0f, 1.0f, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 0, sizeof(tile_stencil_vertices));
+    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
 
     // glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
@@ -329,9 +275,9 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
     glStencilFunc(GL_NOTEQUAL, 0x0, 0x3F);
 
     // Draw a rectangle that covers the entire viewport.
-    glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
+    tileStencilBuffer.bind();
     glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
-    glDrawArrays(GL_TRIANGLES, 0, sizeof(tile_stencil_vertices));
+    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
 
     glStencilMask(0x00);
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
@@ -422,11 +368,11 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
     // draw tile outline
     switchShader(plainShader);
     glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
-    glBindBuffer(GL_ARRAY_BUFFER, tile_border_buffer);
+    tileBorderBuffer.bind();
     glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
     glLineWidth(4.0f);
-    glDrawArrays(GL_LINE_STRIP, 0, sizeof(tile_border_vertices));
+    glDrawArrays(GL_LINE_STRIP, 0, tileBorderBuffer.length());
 
     // draw debug info
     switchShader(plainShader);
@@ -453,10 +399,10 @@ void Painter::renderMatte() {
     Color white = {{ 1, 1, 1, 1 }};
 
     // Draw the clipping mask
-    glBindBuffer(GL_ARRAY_BUFFER, matte_buffer);
+    matteBuffer.bind();
     glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
     glUniform4fv(fillShader->u_color, 1, white.data());
-    glDrawArrays(GL_TRIANGLES, 0, sizeof(matte_vertices));
+    glDrawArrays(GL_TRIANGLES, 0, matteBuffer.length());
 
     glEnable(GL_STENCIL_TEST);
 }
@@ -468,10 +414,10 @@ void Painter::renderBackground() {
     Color white = {{ 1, 1, 1, 1 }};
 
     // Draw the clipping mask
-    glBindBuffer(GL_ARRAY_BUFFER, tile_stencil_buffer);
+    tileStencilBuffer.bind();
     glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
     glUniform4fv(fillShader->u_color, 1, white.data());
-    glDrawArrays(GL_TRIANGLES, 0, sizeof(tile_stencil_vertices));
+    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
 }
 
 
