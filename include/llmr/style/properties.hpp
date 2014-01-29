@@ -36,6 +36,9 @@ bool null(float z, const std::vector<bool>&);
 float constant(float z, const std::vector<float>& values);
 bool constant(float z, const std::vector<bool>& values);
 
+float stops(float z, const std::vector<float>& values);
+bool stops(float z, const std::vector<bool>& values);
+
 }
 
 

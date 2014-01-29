@@ -132,6 +132,7 @@ Tile::Ptr Map::addTile(const Tile::ID& id) {
         // std::cerr << "init " << id.z << "/" << id.x << "/" << id.y << std::endl;
         // std::cerr << "add " << tile->toString() << std::endl;
         tiles.push_front(tile);
+        historic_tiles.push_front(tile);
     }
 
     return tile;
@@ -272,6 +273,16 @@ void Map::updateTiles() {
     // before filling in other parts with lower zoom levels.
     tiles.sort([](const Tile::Ptr& a, const Tile::Ptr& b) {
         return a->id.z > b->id.z;
+    });
+
+
+    // Remove all tiles that are only in the list of historic tiles. We do this
+    // to make sure that the destructor (triggered by shared_ptr count falling
+    // to 0) is triggered from the main thread.
+    // TODO: Find a better solution by forcing the destructor to run in the
+    // main thread, e.g. with a custom deleter on shared_ptr construction?
+    historic_tiles.remove_if([](const Tile::Ptr& tile) {
+        return tile.unique();
     });
 }
 

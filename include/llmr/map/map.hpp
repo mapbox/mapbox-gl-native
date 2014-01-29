@@ -67,6 +67,7 @@ private:
     int32_t max_zoom;
 
     std::forward_list<Tile::Ptr> tiles;
+    std::forward_list<Tile::Ptr> historic_tiles;
 };
 
 }

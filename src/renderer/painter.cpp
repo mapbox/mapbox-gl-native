@@ -84,6 +84,7 @@ void Painter::setupShaders() {
 
 void Painter::teardown() {
     glDeleteBuffers(1, &tile_stencil_buffer);
+    glDeleteBuffers(1, &tile_border_buffer);
 }
 
 void Painter::changeMatrix(const Tile::Ptr& tile) {
@@ -151,17 +152,6 @@ void Painter::render(const Tile::Ptr& tile) {
     changeMatrix(tile);
 
     drawClippingMask();
-
-    // switchShader(outlineShader);
-    // glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix);
-
-    // // draw lines:
-    // tile->lineVertex.bind();
-    // glVertexAttribPointer(outlineShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    // glUniform4f(outlineShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
-    // glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
-    // glLineWidth(2.0f);
-    // glDrawArrays(GL_LINE_STRIP, 0, tile->lineVertex.length());
 
     renderLayers(tile, style.layers);
 
@@ -374,7 +364,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
     //     color[3] = Infinity;
     //     glUniform4fv(lineShader->u_color, color);
     // } else {
-        glUniform4fv(lineShader->u_color, 1, properties.color.data());
+    glUniform4fv(lineShader->u_color, 1, properties.color.data());
     // }
 
 

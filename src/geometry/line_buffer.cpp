@@ -1,6 +1,5 @@
 #include <llmr/geometry/line_buffer.hpp>
 #include <llmr/platform/gl.hpp>
-// #include <cmath>
 
 using namespace llmr;
 

@@ -173,6 +173,7 @@ template <typename T> FunctionProperty<T> Style::parseProperty(pbf data) {
             switch((Property)data.varint()) {
                 case Property::Null: property.function = &functions::null; break;
                 case Property::Constant: property.function = &functions::constant; break;
+                case Property::Stops: property.function = &functions::stops; break;
                 default: property.function = &functions::null; break;
             }
         } else if (data.tag == 2) { // value
@@ -222,11 +223,11 @@ void Style::cascade(float z) {
             const std::string& layer_name = line_pair.first;
             const llmr::LineClass& layer = line_pair.second;
 
-            // TODO: This should be restricted to fill styles that have actual
+            // TODO: This should be restricted to line styles that have actual
             // values so as to not override with default values.
             llmr::LineProperties& stroke = computed.lines[layer_name];
             stroke.hidden = layer.hidden(z);
-            stroke.width = 2; //layer.width(z);
+            stroke.width = layer.width(z);
             stroke.offset = layer.offset(z);
             stroke.color = layer.color;
             stroke.opacity = layer.opacity(z);
