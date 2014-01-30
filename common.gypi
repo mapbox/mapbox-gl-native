@@ -2,7 +2,7 @@
   'target_defaults': {
     'default_configuration': 'Release',
     'xcode_settings': {
-      'OTHER_CPLUSPLUSFLAGS':['-stdlib=libc++'],
+      'CLANG_CXX_LIBRARY': 'libc++',
       'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
       'MACOSX_DEPLOYMENT_TARGET':'10.8'
     },
