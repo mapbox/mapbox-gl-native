@@ -1,9 +1,9 @@
 An OpenGL renderer for [Mapbox vector tiles](https://www.mapbox.com/blog/vector-tiles),
-implemented in C++, targeting iOS & OSX.
+implemented in C++, targeting iOS & OS X.
 
 # Build instructions
 
-## Mac OS X
+## OS X
 
 Install boost and [glfw3](http://www.glfw.org/docs/latest/):
 
@@ -21,11 +21,11 @@ Options include:
  - --boost=/usr/local
  - --glfw3=/usr/local (by default pkg-config will be used)
 
-Then you can build the Mac OS X app with make:
+Then you can build the OS X app with make:
 
     make app
 
-Or generate an iOS XCode project for libllmr to include as a subproject:
+Or generate an iOS Xcode project for libllmr to include as a subproject:
 
     make ios # then open ios/llmr.xcodeproj
 
