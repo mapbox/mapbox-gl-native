@@ -52,7 +52,6 @@ SET(llmr_HEADERS
 )
 
 INCLUDE_DIRECTORIES(
-    ${Boost_INCLUDE_DIR}
     ../include
 )
 
@@ -62,8 +61,4 @@ ADD_LIBRARY(llmr STATIC
 )
 
 LINK_DIRECTORIES(
-)
-
-TARGET_LINK_LIBRARIES(llmr
-    ${Boost_LIBRARIES}
 )
