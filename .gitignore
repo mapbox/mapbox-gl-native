@@ -4,3 +4,6 @@
 /build
 /xcode
 *.sublime-*
+config.gypi
+config.mk
+.DS_Store
