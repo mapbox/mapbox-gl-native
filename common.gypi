@@ -7,25 +7,6 @@
       'MACOSX_DEPLOYMENT_TARGET':'10.8',
       'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0'
     },
-    'conditions': [
-      ['OS == "mac"', {
-        'xcode_settings': {
-          'ARCHS': [ "x86_64" ],
-          'SDKROOT': 'macosx',
-          'SUPPORTED_PLATFORMS':'iphonesimulator iphoneos macosx',
-        }
-      }],
-      ['OS == "ios"', {
-        'xcode_settings': {
-          'ARCHS': [ "$(ARCHS_STANDARD_INCLUDING_64_BIT)" ],
-          'SDKROOT': 'iphoneos',
-          'SUPPORTED_PLATFORMS':'iphonesimulator iphoneos macosx',
-          'TARGETED_DEVICE_FAMILY': '1,2',
-          'CODE_SIGN_IDENTITY': 'iPhone Developer',
-          'IPHONEOS_DEPLOYMENT_TARGET': '5.0',
-        }
-      }]
-    ],
     'configurations': {
       'Debug': {
         'cflags': [ '-g', '-O0' ],

@@ -25,9 +25,9 @@ Then you can build the Mac OS X app with make:
 
     make app
 
-Or generate an iOS XCode project for libllmr to include as a subproject:
+Or generate a duel iOS/Mac compatible XCode project for libllmr to include as a subproject:
 
-    make ios # then open ios/llmr.xcodeproj
+    make xcode # then open llmr.xcodeproj
 
 
 # Style protobuf
