@@ -15,7 +15,7 @@ public:
         last_click(-1),
         settings(),
         map(settings) {
-        }
+    }
 
     void init() {
         if (!glfwInit()) {
@@ -238,7 +238,7 @@ void request(void *, Tile::Ptr tile) {
                            NSData * data,
     NSError * error) {
         if (error == nil) {
-            NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
             int code = [httpResponse statusCode];
 
             if (code == 200) {
@@ -260,6 +260,44 @@ void request(void *, Tile::Ptr tile) {
         });
     }];
 }
+
+
+void request_http(std::string url, std::function<void(const Response&)> func) {
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest
+                                       requestWithURL:[NSURL
+                                               URLWithString:[NSString
+                                                       stringWithUTF8String:url.c_str()]]];
+
+    if (!queue) {
+        queue = [[NSOperationQueue alloc] init];
+    }
+
+    [NSURLConnection
+     sendAsynchronousRequest:urlRequest
+     queue:queue
+     completionHandler: ^ (NSURLResponse* response, NSData* data, NSError* error) {
+        if (error == nil) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            dispatch_async(dispatch_get_main_queue(), ^ {
+                func({
+                    [httpResponse statusCode],
+                    (const char *)[data bytes],
+                    [data length]
+                });
+            });
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^ {
+                func({
+                    -1,
+                    0,
+                    0
+                });
+            });
+        }
+    }];
+}
+
+
 
 double time() {
     return glfwGetTime();
