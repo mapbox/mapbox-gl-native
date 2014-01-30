@@ -4,7 +4,8 @@
     'xcode_settings': {
       'CLANG_CXX_LIBRARY': 'libc++',
       'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
-      'MACOSX_DEPLOYMENT_TARGET':'10.8'
+      'MACOSX_DEPLOYMENT_TARGET':'10.8',
+      'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0'
     },
     'conditions': [
       ['OS == "mac"', {
