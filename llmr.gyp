@@ -1,7 +1,7 @@
 {
   'includes': [
-    'common.gypi',
-    'config.gypi'
+    './common.gypi',
+    './config.gypi'
   ],
   'targets': [
     {
