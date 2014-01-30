@@ -21,7 +21,7 @@ parser.add_option("--debug",
 
 parser.add_option("--boost",
     action="store",
-    dest="boost",
+    dest="boost_root",
     help="Path to boost (defaults to /usr/local)")
 
 parser.add_option("--glfw3",
@@ -45,8 +45,8 @@ def pkg_config(pkg):
   return (libs, cflags)
 
 def configure_llmr(o):
-  if options.boost:
-      o['variables']['boost'] = options.boost
+  if options.boost_root:
+      o['variables']['boost_root'] = options.boost_root
   else:
       o['variables']['boost_root'] = '/usr/local'
   o['target_defaults']['default_configuration'] = 'Debug' if options.debug else 'Release'
