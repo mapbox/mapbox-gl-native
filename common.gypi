@@ -9,7 +9,7 @@
     'conditions': [
       ['OS == "mac"', {
         'xcode_settings': {
-          'ARCHS': [ "$(ARCHS_STANDARD_32_64_BIT)" ],
+          'ARCHS': [ "x86_64" ],
           'SDKROOT': 'macosx',
           'SUPPORTED_PLATFORMS':'iphonesimulator iphoneos macosx',
         }

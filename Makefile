@@ -21,7 +21,7 @@ app: config.gypi src macosx/llmr-app.gyp
 # build OS X with xcodebuild
 xapp: config.gypi src macosx/llmr-app.gyp
 	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. -Icommon.gypi --generator-output=./ -f xcode
-	xcodebuild -project ./macosx/llmr-app.xcodeproj -arch x86_64
+	xcodebuild -project ./macosx/llmr-app.xcodeproj
 	open macosx/build/Release/llmr.app
 
 ios:
