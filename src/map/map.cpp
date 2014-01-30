@@ -294,6 +294,7 @@ bool Map::render() {
     for (Tile::Ptr& tile : tiles) {
         assert(tile);
         if (tile->state == Tile::ready) {
+            painter.changeMatrix(tile->id);
             painter.render(tile);
         }
     }

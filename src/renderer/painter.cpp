@@ -51,13 +51,13 @@ void Painter::setupShaders() {
     lineShader = std::make_shared<LineShader>();
 }
 
-void Painter::changeMatrix(const Tile::Ptr& tile) {
+void Painter::changeMatrix(const Tile::ID& id) {
     // Initialize projection matrix
     mat4 projMatrix;
     matrix::ortho(projMatrix, 0, transform.width, transform.height, 0, 1, 10);
 
     // The position matrix.
-    transform.matrixFor(matrix, tile->id);
+    transform.matrixFor(matrix, id);
     matrix::multiply(matrix, projMatrix, matrix);
 
     // The extrusion matrix.
@@ -117,8 +117,6 @@ void Painter::render(const Tile::Ptr& tile) {
     if (tile->state != Tile::ready) {
         return;
     }
-
-    changeMatrix(tile);
 
     drawClippingMask();
 
