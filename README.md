@@ -5,19 +5,29 @@ implemented in C++, targeting iOS & OSX.
 
 ## Mac OS X
 
-You may need to install [glfw3](http://www.glfw.org/docs/latest/):
+Install boost and [glfw3](http://www.glfw.org/docs/latest/):
 
 ```
+brew install boost
 brew install homebrew/versions/glfw3
 ```
 
-```
-mkdir xcode
-cd xcode
-cmake .. -G Xcode
-```
+Then configure the project:
 
-Then open the xcode project and build.
+    ./configure
+
+Options include:
+
+ - --boost=/usr/local
+ - --glfw3=/usr/local (by default pkg-config will be used)
+
+Then you can build the Mac OS X app with make:
+
+    make app
+
+Or generate an iOS XCode project for libllmr to include as a subproject:
+
+    make ios # then open ios/llmr.xcodeproj
 
 
 # Style protobuf
