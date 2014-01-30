@@ -2,7 +2,7 @@
 #include <llmr/map/tile.hpp>
 //#include <llmr/util/vec2.hpp>
 
-#include <llmr/resources/style.hpp>
+#include <llmr/style/resources.hpp>
 
 #include <iostream>
 #include <thread>

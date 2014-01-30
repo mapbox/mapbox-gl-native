@@ -1,5 +1,5 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-#include <llmr/resources/style.hpp>
+#include <llmr/style/resources.hpp>
 
 using namespace llmr;
 
