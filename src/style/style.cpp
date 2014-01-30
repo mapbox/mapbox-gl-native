@@ -1,7 +1,5 @@
 #include <llmr/style/style.hpp>
 
-#include <llmr/resources/style.hpp>
-
 using namespace llmr;
 
 Style::Style() {
