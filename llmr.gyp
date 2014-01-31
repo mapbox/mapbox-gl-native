@@ -19,6 +19,7 @@
         'ARCHS': [ "x86_64" ],
         'SDKROOT': 'macosx',
         'SUPPORTED_PLATFORMS':'macosx',
+        'MACOSX_DEPLOYMENT_TARGET':'10.8',
         'PUBLIC_HEADERS_FOLDER_PATH': 'include'
       },
       'conditions': [
