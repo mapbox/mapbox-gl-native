@@ -18,17 +18,14 @@ app: config.gypi src macosx/llmr-app.gyp
 	make -C build/macosx-make
 	open build/macosx-make/out/Release/llmr.app
 
+xcode: config.gypi llmr.gyp config.gypi
+	deps/run_gyp llmr.gyp -Goutput_dir=./out/ --depth=. -Icommon.gypi --generator-output=./ -f xcode
+
 # build OS X with xcodebuild
-xapp: config.gypi src macosx/llmr-app.gyp
+xapp: xcode config.gypi src macosx/llmr-app.gyp
 	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. -Icommon.gypi --generator-output=./ -f xcode
 	xcodebuild -project ./macosx/llmr-app.xcodeproj
 	open macosx/build/Release/llmr.app
-
-ios:
-	deps/run_gyp llmr.gyp -DOS=ios -Goutput_dir=./out/ --depth=. -Icommon.gypi --generator-output=./ios -f xcode
-
-xcode: config.gypi llmr.gyp config.gypi
-	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. -Icommon.gypi --generator-output=./build/macosx-xcode -f xcode
 
 out/Makefile: common.gypi llmr.gyp config.gypi
 
