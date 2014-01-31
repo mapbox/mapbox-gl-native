@@ -16,7 +16,6 @@
         '<!@(find include -name "*.hpp")'
       ],
       'xcode_settings': {
-        'ARCHS': [ "x86_64" ],
         'SDKROOT': 'macosx',
         'SUPPORTED_PLATFORMS':'macosx',
         'MACOSX_DEPLOYMENT_TARGET':'10.8',
@@ -54,7 +53,6 @@
         '<!@(find include -name "*.hpp")'
       ],
       'xcode_settings': {
-        'ARCHS': [ "$(ARCHS_STANDARD_INCLUDING_64_BIT)" ],
         'SDKROOT': 'iphoneos',
         'SUPPORTED_PLATFORMS':'iphonesimulator iphoneos',
         'TARGETED_DEVICE_FAMILY': '1,2',
