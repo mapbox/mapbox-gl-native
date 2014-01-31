@@ -15,12 +15,6 @@ namespace platform {
 // controlling application.
 void restart(void *obj);
 
-// Download a tile. Obtain the z/x/y from the tile shared_ptr.
-// You should perform the download and parsing of the tile in a separate thread!
-// Then, call map.tileLoaded(tile); or map.tileFailed(tile); in the main thread.
-void request(void *obj, std::shared_ptr<Tile> tile);
-
-
 struct Response {
     Response(int16_t code, const char *body, size_t length)
         : code(code),
@@ -32,6 +26,8 @@ struct Response {
 };
 
 void request_http(std::string url, std::function<void(const Response&)> func);
+
+void async(std::function<void()> fn, std::function<void()> cb);
 
 // Returns a relative timestamp in seconds. This value must be monotonic.
 double time();

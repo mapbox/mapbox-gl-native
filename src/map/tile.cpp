@@ -11,6 +11,9 @@
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
 #include <llmr/style/style.hpp>
+#include <llmr/platform/platform.hpp>
+#include <llmr/util/string.hpp>
+
 #include <cmath>
 
 using namespace llmr;
@@ -47,8 +50,6 @@ Tile::Tile(ID id, const Style& style)
       debugFontBuffer(std::make_shared<DebugFontBuffer>()),
       fillBuffer(std::make_shared<FillBuffer>()),
       lineBuffer(std::make_shared<LineBuffer>()),
-      data(0),
-      bytes(0),
       style(style) {
 
     // Initialize tile debug coordinates
@@ -58,24 +59,35 @@ Tile::Tile(ID id, const Style& style)
 }
 
 Tile::~Tile() {
-    std::lock_guard<std::mutex> lock(mtx);
-
-    // fprintf(stderr, "[%p] deleting tile %d/%d/%d\n", this, id.z, id.x, id.y);
-    if (this->data) {
-        free(this->data);
-        this->data = NULL;
-    }
 }
 
 const std::string Tile::toString() const {
     return util::sprintf("[tile %d/%d/%d]", id.z, id.x, id.y);
 }
 
+void Tile::request() {
+    state = Tile::loading;
 
-void Tile::setData(uint8_t *data, uint32_t bytes) {
-    this->data = (uint8_t *)malloc(bytes);
-    this->bytes = bytes;
-    memcpy(this->data, data, bytes);
+    // Create http request
+    std::string url = util::sprintf("http://localhost:3333/gl/tiles/plain/%d-%d-%d.vector.pbf",
+        id.z, id.x, id.y);
+
+    // Note: Somehow this feels slower than the change to request_http()
+    std::shared_ptr<Tile> tile = shared_from_this();
+    platform::request_http(url, [=](const platform::Response& res) {
+        if (res.code == 200) {
+            tile->data.assign(res.body, res.body + res.length);
+
+            platform::async([tile]() {
+                tile->parse();
+            }, []() {
+                // TODO: Make sure this gets passed the correct map ID/pointer.
+                platform::restart(NULL);
+            });
+        } else {
+            fprintf(stderr, "tile loading failed\n");
+        }
+    });
 }
 
 void Tile::cancel() {
@@ -88,14 +100,14 @@ void Tile::cancel() {
 }
 
 bool Tile::parse() {
-    std::lock_guard<std::mutex> lock(mtx);
+    // std::lock_guard<std::mutex> lock(mtx);
 
     if (state == obsolete) {
         return false;
     }
 
     try {
-        tile = VectorTile(pbf(data, bytes));
+        tile = VectorTile(pbf((const uint8_t *)data.data(), data.size()));
         parseStyleLayers(style.layers);
     } catch (const std::exception& ex) {
         fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
