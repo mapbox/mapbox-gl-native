@@ -6,6 +6,7 @@ using namespace llmr;
 
 VectorTile::VectorTile() {}
 
+
 VectorTile::VectorTile(pbf tile) {
     while (tile.next()) {
         if (tile.tag == 3) { // layer

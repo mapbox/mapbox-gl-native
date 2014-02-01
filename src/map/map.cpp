@@ -132,7 +132,6 @@ Tile::Ptr Map::addTile(const Tile::ID& id) {
         // std::cerr << "init " << id.z << "/" << id.x << "/" << id.y << std::endl;
         // std::cerr << "add " << tile->toString() << std::endl;
         tiles.push_front(tile);
-        historic_tiles.push_front(tile);
     }
 
     return tile;
@@ -252,8 +251,7 @@ void Map::updateTiles() {
 
         if (tile->state == Tile::initial) {
             // If the tile is new, we have to make sure to load it.
-            tile->state = Tile::loading;
-            platform::request(this, tile);
+            tile->request();
         }
     }
 
@@ -274,16 +272,6 @@ void Map::updateTiles() {
     tiles.sort([](const Tile::Ptr& a, const Tile::Ptr& b) {
         return a->id.z > b->id.z;
     });
-
-
-    // Remove all tiles that are only in the list of historic tiles. We do this
-    // to make sure that the destructor (triggered by shared_ptr count falling
-    // to 0) is triggered from the main thread.
-    // TODO: Find a better solution by forcing the destructor to run in the
-    // main thread, e.g. with a custom deleter on shared_ptr construction?
-    historic_tiles.remove_if([](const Tile::Ptr& tile) {
-        return tile.unique();
-    });
 }
 
 bool Map::render() {
@@ -294,6 +282,7 @@ bool Map::render() {
     for (Tile::Ptr& tile : tiles) {
         assert(tile);
         if (tile->state == Tile::ready) {
+            painter.changeMatrix(tile->id);
             painter.render(tile);
         }
     }

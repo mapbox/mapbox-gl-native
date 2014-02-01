@@ -33,7 +33,9 @@ public:
 
     void setup();
 
+
     void clear();
+    void changeMatrix(const Tile::ID& id);
     void render(const std::shared_ptr<Tile>& tile);
     void renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers);
     void renderDebug(const std::shared_ptr<Tile>& tile);
@@ -49,7 +51,6 @@ public:
 
 private:
     void setupShaders();
-    void changeMatrix(const std::shared_ptr<Tile>& tile);
 
 public:
 

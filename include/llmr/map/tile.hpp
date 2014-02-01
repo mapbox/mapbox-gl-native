@@ -14,6 +14,7 @@
 #include <llmr/util/vec.hpp>
 #include <string>
 #include <map>
+#include <memory>
 
 namespace llmr {
 
@@ -25,7 +26,7 @@ class BucketDescription;
 
 
 
-class Tile {
+class Tile : public std::enable_shared_from_this<Tile> {
 public:
     struct exception : std::exception {};
     struct geometry_too_long_exception : exception {};
@@ -52,8 +53,10 @@ public:
     Tile& operator=(const Tile&) = delete;
     Tile& operator=(const Tile && ) = delete;
 
+    // Start loading the tile.
+    void request();
+
     // Other functions
-    void setData(uint8_t *data, uint32_t bytes);
     bool parse();
     void parseStyleLayers(const std::vector<LayerDescription>& layers);
     std::shared_ptr<Bucket> createBucket(const BucketDescription& bucket_desc);
@@ -83,11 +86,10 @@ public:
 
 private:
     // Source data
-    uint8_t *data;
-    uint32_t bytes;
+    std::vector<char> data;
     VectorTile tile;
 
-    std::mutex mtx;
+    // std::mutex mtx;
 
     const Style& style;
 };

@@ -3,8 +3,9 @@
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 #include <llmr/platform/platform.hpp>
-#include <llmr/map/tile.hpp>
 #include "settings.hpp"
+
+#include <thread>
 
 class MapView {
 public:
@@ -15,7 +16,7 @@ public:
         last_click(-1),
         settings(),
         map(settings) {
-        }
+    }
 
     void init() {
         if (!glfwInit()) {
@@ -202,7 +203,6 @@ public:
     llmr::Map map;
 };
 
-NSOperationQueue *queue = NULL;
 MapView *view;
 
 namespace llmr {
@@ -212,54 +212,42 @@ void restart(void *) {
     view->dirty = true;
 }
 
-void request(void *, Tile::Ptr tile) {
-    assert((bool)tile);
+void async(std::function<void()> fn, std::function<void()> cb) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        fn();
+        dispatch_async(dispatch_get_main_queue(), ^(void){
+            cb();
+        });
+    });
+}
 
-    NSString *urlTemplate = @"http://api.tiles.mapbox.com/v3/mapbox.mapbox-streets-v4/%d/%d/%d.vector.pbf";
-    //NSString *urlTemplate = @"http://localhost:3333/gl/tiles/plain/%d-%d-%d.vector.pbf";
-    NSString *urlString = [NSString
-                           stringWithFormat:urlTemplate,
-                           tile->id.z,
-                           tile->id.x,
-                           tile->id.y];
-    NSURL *url = [NSURL URLWithString:urlString];
-    // NSLog(@"Requesting %@", urlString);
-
-    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url];
-
-    if (!queue) {
-        queue = [[NSOperationQueue alloc] init];
-    }
+void request_http(std::string url, std::function<void(const Response&)> func) {
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest
+                                       requestWithURL:[NSURL
+                                               URLWithString:[NSString
+                                                       stringWithUTF8String:url.c_str()]]];
 
     [NSURLConnection
      sendAsynchronousRequest:urlRequest
-     queue:queue
-     completionHandler: ^ (NSURLResponse * response,
-                           NSData * data,
-    NSError * error) {
+     queue:[NSOperationQueue mainQueue]
+     completionHandler: ^ (NSURLResponse* response, NSData* data, NSError* error) {
         if (error == nil) {
-            NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
-            int code = [httpResponse statusCode];
-
-            if (code == 200) {
-                tile->setData((uint8_t *)[data bytes], [data length]);
-                if (tile->parse()) {
-                    dispatch_async(dispatch_get_main_queue(), ^ {
-                        view->map.tileLoaded(tile);
-                    });
-                    return;
-                }
-                // fall through to report tileFailed
-            }
-            // fall through to report tileFailed
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            dispatch_async(dispatch_get_main_queue(), ^ {
+                int code = [httpResponse statusCode];
+                const char *body = (const char *)[data bytes];
+                size_t length = [data length];
+                func({ code, body, length });
+            });
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^ {
+                func({ -1, 0, 0 });
+            });
         }
-        // fall through to report tileFailed
-
-        dispatch_async(dispatch_get_main_queue(), ^ {
-            view->map.tileFailed(tile);
-        });
     }];
 }
+
+
 
 double time() {
     return glfwGetTime();
