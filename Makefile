@@ -10,7 +10,7 @@ config.gypi: configure
 	$(PYTHON) ./configure
 
 llmr: config.gypi out/Makefile llmr.gyp
-	$(MAKE) -C out BUILDTYPE=Release V=$(V)
+	$(MAKE) -C out BUILDTYPE=Release V=$(V) llmr-osx
 
 # build OS X app with pure make
 app: config.gypi src macosx/llmr-app.gyp
