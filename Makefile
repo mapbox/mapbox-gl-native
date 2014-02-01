@@ -14,29 +14,27 @@ llmr: config.gypi out/Makefile llmr.gyp
 
 # build OS X app with pure make
 app: config.gypi src macosx/llmr-app.gyp
-	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. -Icommon.gypi --generator-output=./build/macosx-make -f make
+	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./build/macosx-make -f make
 	make -C build/macosx-make
 	open build/macosx-make/out/Release/llmr.app
 
 xcode: config.gypi llmr.gyp config.gypi
-	deps/run_gyp llmr.gyp -Goutput_dir=./out/ --depth=. -Icommon.gypi --generator-output=./ -f xcode
+	deps/run_gyp llmr.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 
 # build OS X with xcodebuild
 xapp: xcode config.gypi src macosx/llmr-app.gyp
-	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. -Icommon.gypi --generator-output=./ -f xcode
+	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 	xcodebuild -project ./macosx/llmr-app.xcodeproj
 	open macosx/build/Release/llmr.app
 
 out/Makefile: common.gypi llmr.gyp config.gypi
 
 clean:
-	-rm -rf out/Makefile
-	-find out/ -name '*.o' -o -name '*.a' | xargs rm -rf
+	-rm -rf out
 	-rm -rf build
 	-rm -rf macosx/build
 
 distclean:
-	-rm -rf out
 	-rm -f config.gypi
 	-rm -f config.mk
 	-rm -rf llmr.xcodeproj
