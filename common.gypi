@@ -9,17 +9,17 @@
     },
     'configurations': {
       'Debug': {
-        'cflags': [ '-g', '-O0' ],
+        'cflags': [ '-g', '-O0', '-I<(boost_root)/include' ],
         'defines': [ 'DEBUG' ],
         'xcode_settings': {
-          'OTHER_CFLAGS': [ '-g', '-O0' ]
+          'OTHER_CFLAGS': [ '-g', '-O0', '-I<(boost_root)/include' ]
         }
       },
       'Release': {
-        'cflags': [ '-O3' ],
+        'cflags': [ '-O3', '-I<(boost_root)/include' ],
         'defines': [ 'NDEBUG' ],
         'xcode_settings': {
-          'OTHER_CFLAGS': [ '-O3' ]
+          'OTHER_CFLAGS': [ '-O3', '-I<(boost_root)/include' ]
         }
       }
     }

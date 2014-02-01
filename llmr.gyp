@@ -28,13 +28,11 @@
         }],
       ],
       'include_dirs':[
-          './include',
-          '<(boost_root)/include'
+          './include'
       ],
       'direct_dependent_settings': {
           'include_dirs':[
-              './include',
-              '<(boost_root)/include'
+              './include'
           ],
       }
     },
@@ -55,13 +53,11 @@
         'PUBLIC_HEADERS_FOLDER_PATH': 'include'
       },
       'include_dirs':[
-          './include',
-          '<(boost_root)/include'
+          './include'
       ],
       'direct_dependent_settings': {
           'include_dirs':[
-              './include',
-              '<(boost_root)/include'
+              './include'
           ],
       }
     }
