@@ -12,14 +12,14 @@
         'cflags': [ '-g', '-O0', '-I<(boost_root)/include' ],
         'defines': [ 'DEBUG' ],
         'xcode_settings': {
-          'OTHER_CFLAGS': [ '-g', '-O0', '-I<(boost_root)/include' ]
+          'OTHER_CPLUSPLUSFLAGS': [ '-g', '-I<(boost_root)/include' ]
         }
       },
       'Release': {
         'cflags': [ '-O3', '-I<(boost_root)/include' ],
         'defines': [ 'NDEBUG' ],
         'xcode_settings': {
-          'OTHER_CFLAGS': [ '-O3', '-I<(boost_root)/include' ]
+          'OTHER_CPLUSPLUSFLAGS': [ '-I<(boost_root)/include' ]
         }
       }
     }
