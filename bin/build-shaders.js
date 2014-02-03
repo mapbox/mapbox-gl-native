@@ -28,9 +28,9 @@ module.exports = function() {
         consts.push(name.toUpperCase() + '_SHADER');
 
         var line = '';
-        line += '   [' + name.toUpperCase() + '_SHADER] = {\n';
-        line += '       .vertex = ' + JSON.stringify(shaders[name].vertex) + ',\n';
-        line += '       .fragment = ' + JSON.stringify(shaders[name].fragment) + ',\n';
+        line += '   {\n';
+        line += '       ' + JSON.stringify(shaders[name].vertex) + ',\n';
+        line += '       ' + JSON.stringify(shaders[name].fragment) + ',\n';
         line += '   }';
         lines.push(line);
     }
