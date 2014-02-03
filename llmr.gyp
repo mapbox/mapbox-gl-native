@@ -12,9 +12,6 @@
         '<!@(find src -name "*.cpp")',
         '<!@(find include -name "*.hpp")'
       ],
-      'libraries': [
-        '<@(png_libraries)',
-      ],
       'xcode_settings': {
         'SDKROOT': 'macosx',
         'SUPPORTED_PLATFORMS':'macosx',
@@ -30,8 +27,19 @@
               './include',
               '<@(png_cflags)'
           ],
-          'libraries': [
-            '<@(png_libraries)',
+          # workaround xcode bug
+          'conditions': [
+            ['OS == "mac"', {
+              'xcode_settings': {
+                'OTHER_LDFLAGS': [
+                    '<@(png_libraries)'
+                ]
+              }
+            }, {
+              'libraries': [
+                '<@(png_libraries)'
+              ]
+            }]
           ]
       }
     },
@@ -42,9 +50,6 @@
       'sources': [
         '<!@(find src -name "*.cpp")',
         '<!@(find include -name "*.hpp")'
-      ],
-      'libraries': [
-        '<@(png_libraries)',
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
@@ -63,8 +68,19 @@
               './include',
               '<@(png_cflags)'
           ],
-          'libraries': [
-            '<@(png_libraries)',
+          # workaround xcode bug
+          'conditions': [
+            ['OS == "mac"', {
+              'xcode_settings': {
+                'OTHER_LDFLAGS': [
+                    '<@(png_libraries)'
+                ]
+              }
+            }, {
+              'libraries': [
+                '<@(png_libraries)'
+              ]
+            }]
           ]
       }
     }
