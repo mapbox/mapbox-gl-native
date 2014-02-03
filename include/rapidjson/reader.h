@@ -20,6 +20,11 @@
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-constant-out-of-range-compare"
+#endif
+
 #ifndef RAPIDJSON_PARSE_ERROR
 #define RAPIDJSON_PARSE_ERROR(msg, offset) \
 	RAPIDJSON_MULTILINEMACRO_BEGIN \
@@ -678,6 +683,10 @@ typedef GenericReader<UTF8<> > Reader;
 
 #ifdef _MSC_VER
 #pragma warning(pop)
+#endif
+
+#ifdef __clang__
+#pragma clang diagnostic pop
 #endif
 
 #endif // RAPIDJSON_READER_H_
