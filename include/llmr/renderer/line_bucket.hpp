@@ -3,7 +3,7 @@
 
 #include "bucket.hpp"
 #include <llmr/style/bucket_description.hpp>
-
+#include <memory>
 #include <vector>
 
 namespace llmr {

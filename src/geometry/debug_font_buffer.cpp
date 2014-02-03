@@ -1,6 +1,7 @@
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/platform/gl.hpp>
 #include <cmath>
+#include <cstring>
 
 #include "debug_font.cpp"
 

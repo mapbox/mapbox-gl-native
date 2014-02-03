@@ -15,6 +15,7 @@
 #include <cmath>
 #include <array>
 #include <numeric>
+#include <algorithm>
 
 using namespace llmr;
 

@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <thread>
-
+#include <algorithm>
 #include <cmath>
 #include <cassert>
 
