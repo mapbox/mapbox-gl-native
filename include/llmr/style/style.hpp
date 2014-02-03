@@ -11,6 +11,7 @@
 #include "bucket_description.hpp"
 #include "layer_description.hpp"
 #include "class_description.hpp"
+#include "sprite.hpp"
 
 namespace llmr {
 
@@ -20,6 +21,10 @@ public:
 
     void reset();
     void load(const uint8_t *const data, uint32_t bytes);
+
+    // This is commented out because it is not fully implemented yet. For now,
+    // we keep using the protobuf stylesheet format
+    // void loadJSON(const std::string& data);
 
     void cascade(float z);
 
@@ -33,6 +38,8 @@ private:
     static Color parseColor(pbf& data);
 
 public:
+    std::shared_ptr<Sprite> sprite;
+
     // This is static information parsed from the stylesheet.
     std::map<std::string, BucketDescription> buckets;
     std::vector<LayerDescription> layers;

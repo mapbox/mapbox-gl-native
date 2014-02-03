@@ -15,6 +15,7 @@
 #include <cmath>
 #include <array>
 #include <numeric>
+#include <algorithm>
 
 using namespace llmr;
 
@@ -35,6 +36,7 @@ void Painter::setup() {
     assert(plainShader);
     assert(outlineShader);
     assert(lineShader);
+    assert(patternShader);
 
     glEnable(GL_STENCIL_TEST);
 
@@ -49,6 +51,7 @@ void Painter::setupShaders() {
     plainShader = std::make_shared<PlainShader>();
     outlineShader = std::make_shared<OutlineShader>();
     lineShader = std::make_shared<LineShader>();
+    patternShader = std::make_shared<PatternShader>();
 }
 
 void Painter::changeMatrix(const Tile::ID& id) {
@@ -146,13 +149,13 @@ void Painter::renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<
             auto bucket_it = tile->buckets.find(layer_desc.bucket_name);
             if (bucket_it != tile->buckets.end()) {
                 assert(bucket_it->second);
-                bucket_it->second->render(*this, layer_desc.name);
+                bucket_it->second->render(*this, layer_desc.name, tile->id);
             }
         }
     }
 }
 
-void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
+void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
     const FillProperties& properties = style.computed.fills[layer_name];
 
     // Abort early.
@@ -238,50 +241,54 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name) {
         bucket.drawVertices(outlineShader->a_pos);
     }
 
-    // var imagePos = layerStyle.image && imageSprite.getPosition(layerStyle.image, true);
-    bool imagePos = false;
-    if (imagePos) {
-        // // Draw texture fill
+    // Only draw regions that we marked
+    glStencilFunc(GL_NOTEQUAL, 0x0, 0x3F);
 
-        // var factor = 8 / Math.pow(2, painter.transform.zoom - params.z);
-        // var mix = painter.transform.z % 1.0;
-        // var imageSize = [imagePos.size[0] * factor, imagePos.size[1] * factor];
+    if (properties.image.size() && style.sprite) {
+        // Draw texture fill
+        ImagePosition imagePos = style.sprite->getPosition(properties.image, true);
 
-        // var offset = [
-        //     (params.x * 4096) % imageSize[0],
-        //     (params.y * 4096) % imageSize[1]
-        // ];
+        double factor = 8.0 / pow(2, transform.getIntegerZoom() - id.z);
+        double mix = fmod(transform.getZoom(), 1.0);
+        vec2<double> imageSize { imagePos.size.x * factor, imagePos.size.y * factor };
 
-        // glSwitchShader(painter.patternShader, painter.posMatrix, painter.exMatrix);
-        // glUniform1i(painter.patternShader.u_image, 0);
-        // glUniform2fv(painter.patternShader.u_pattern_size, imageSize);
-        // glUniform2fv(painter.patternShader.u_offset, offset);
-        // glUniform2fv(painter.patternShader.u_rotate, [1, 1]);
-        // glUniform2fv(painter.patternShader.u_pattern_tl, imagePos.tl);
-        // glUniform2fv(painter.patternShader.u_pattern_br, imagePos.br);
-        // glUniform4fv(painter.patternShader.u_color, color);
-        // glUniform1f(painter.patternShader.u_mix, mix);
-        // imageSprite.bind(gl, true);
+        vec2<double> offset {
+            fmod(id.x * 4096, imageSize.x),
+            fmod(id.y * 4096, imageSize.y)
+        };
+
+        switchShader(patternShader);
+        glUniformMatrix4fv(patternShader->u_matrix, 1, GL_FALSE, matrix.data());
+        glUniform2f(patternShader->u_pattern_size, imageSize.x, imageSize.y);
+        glUniform2f(patternShader->u_offset, offset.x, offset.y);
+        glUniform2f(patternShader->u_pattern_tl, imagePos.tl.x, imagePos.tl.y);
+        glUniform2f(patternShader->u_pattern_br, imagePos.br.x, imagePos.br.y);
+        glUniform4fv(patternShader->u_color, 1, fill_color.data());
+        glUniform1f(patternShader->u_mix, mix);
+        style.sprite->bind(true);
+
+        // Draw a rectangle that covers the entire viewport.
+        tileStencilBuffer.bind();
+        glVertexAttribPointer(patternShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+        glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
+
     } else {
         // Draw filling rectangle.
         switchShader(fillShader);
         glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix.data());
         glUniform4fv(fillShader->u_color, 1, fill_color.data());
+
+        // Draw a rectangle that covers the entire viewport.
+        tileStencilBuffer.bind();
+        glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+        glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
     }
-
-    // Only draw regions that we marked
-    glStencilFunc(GL_NOTEQUAL, 0x0, 0x3F);
-
-    // Draw a rectangle that covers the entire viewport.
-    tileStencilBuffer.bind();
-    glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
-    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
 
     glStencilMask(0x00);
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
 }
 
-void Painter::renderLine(LineBucket& bucket, const std::string& layer_name) {
+void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
     const LineProperties& properties = style.computed.lines[layer_name];
 
     // Abort early.

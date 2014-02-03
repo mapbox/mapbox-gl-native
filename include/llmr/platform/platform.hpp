@@ -16,16 +16,12 @@ namespace platform {
 void restart(void *obj);
 
 struct Response {
-    Response(int16_t code, const char *body, size_t length)
-        : code(code),
-          body(body),
-          length(length) {}
-    int16_t code;
-    const char *body;
-    size_t length;
+    int16_t code = -1;
+    std::string body;
 };
 
-void request_http(std::string url, std::function<void(const Response&)> func);
+void request_http(std::string url, std::function<void(Response&)> func);
+void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb);
 
 void async(std::function<void()> fn, std::function<void()> cb);
 

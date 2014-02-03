@@ -18,7 +18,10 @@
         #error Unsupported Apple platform
     #endif
 #else
-    #error Unsupported platform
+    #define GL_GLEXT_PROTOTYPES
+    #include <GL/gl.h>
+    #include <GL/glu.h>
+    #include <GL/glext.h>
 #endif
 
 #endif

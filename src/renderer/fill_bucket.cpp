@@ -116,8 +116,8 @@ void FillBucket::drawVertices(int32_t attrib) {
     glDrawArrays(GL_LINE_STRIP, 0, length);
 }
 
-void FillBucket::render(Painter& painter, const std::string& layer_name) {
-    painter.renderFill(*this, layer_name);
+void FillBucket::render(Painter& painter, const std::string& layer_name, const Tile::ID& id) {
+    painter.renderFill(*this, layer_name, id);
 }
 
 uint32_t FillBucket::size() const {

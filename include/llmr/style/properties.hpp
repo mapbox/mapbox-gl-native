@@ -3,6 +3,8 @@
 
 #include <array>
 #include <vector>
+#include <string>
+#include <limits>
 
 namespace llmr {
 
@@ -87,6 +89,7 @@ struct FillClass {
     Color fill_color = {{ 0, 0, 0, 1 }};
     Color stroke_color = {{ 0, 0, 0, std::numeric_limits<float>::infinity() }};
     FunctionProperty<float> opacity = 1;
+    std::string image;
 };
 
 struct FillProperties {
@@ -96,6 +99,7 @@ struct FillProperties {
     Color fill_color = {{ 0, 0, 0, 1 }};
     Color stroke_color = {{ 0, 0, 0, 1 }};
     float opacity = 1.0;
+    std::string image;
 };
 
 }

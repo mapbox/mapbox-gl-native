@@ -2,6 +2,7 @@
 #define LLMR_GEOMETRY_FILL_BUFFER
 
 #include <vector>
+#include <cstdint>
 
 namespace llmr {
 

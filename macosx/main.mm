@@ -221,7 +221,7 @@ void async(std::function<void()> fn, std::function<void()> cb) {
     });
 }
 
-void request_http(std::string url, std::function<void(const Response&)> func) {
+void request_http(std::string url, std::function<void(Response&)> func) {
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest
                                        requestWithURL:[NSURL
                                                URLWithString:[NSString
@@ -234,19 +234,43 @@ void request_http(std::string url, std::function<void(const Response&)> func) {
         if (error == nil) {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
             dispatch_async(dispatch_get_main_queue(), ^ {
-                int code = [httpResponse statusCode];
-                const char *body = (const char *)[data bytes];
-                size_t length = [data length];
-                func({ code, body, length });
+                Response res;
+                res.code = [httpResponse statusCode];
+                res.body = { (const char *)[data bytes], [data length] };
+                func(res);
             });
         } else {
             dispatch_async(dispatch_get_main_queue(), ^ {
-                func({ -1, 0, 0 });
+                Response res;
+                func(res);
             });
         }
     }];
 }
 
+void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
+        NSMutableURLRequest *urlRequest = [NSMutableURLRequest
+                                       requestWithURL:[NSURL
+                                               URLWithString:[NSString
+                                                       stringWithUTF8String:url.c_str()]]];
+
+    [NSURLConnection
+     sendAsynchronousRequest:urlRequest
+     queue:[NSOperationQueue mainQueue]
+     completionHandler: ^ (NSURLResponse* response, NSData* data, NSError* error) {
+        Response res;
+        if (error == nil) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            res.code = [httpResponse statusCode];
+            res.body = { (const char *)[data bytes], [data length] };
+        }
+
+        func(res);
+        dispatch_async(dispatch_get_main_queue(), ^ {
+            cb();
+        });
+    }];
+}
 
 
 double time() {

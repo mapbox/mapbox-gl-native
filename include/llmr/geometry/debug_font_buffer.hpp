@@ -2,6 +2,7 @@
 #define LLMR_GEOMETRY_DEBUG_FONT_BUFFER
 
 #include <vector>
+#include <cstdint>
 
 namespace llmr {
 

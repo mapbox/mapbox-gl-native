@@ -79,6 +79,7 @@ message fill_style {
     optional fixed32 fill_color = 5 [ default = 0x000000FF ]; // rgba (=> rgb << 8 | 0xFF for opaque!)
     optional fixed32 stroke_color = 6; // if none is specified, no stroke will be painted
     optional property opacity = 7; // values from 0..1
+    optional string image = 8;
     // TODO: translate x/y
 }
 

@@ -3,10 +3,11 @@
 //#include <llmr/util/vec2.hpp>
 
 #include <llmr/style/resources.hpp>
+#include <llmr/style/sprite.hpp>
 
 #include <iostream>
 #include <thread>
-
+#include <algorithm>
 #include <cmath>
 #include <cassert>
 
@@ -19,6 +20,10 @@ Map::Map(Settings& settings)
       painter(transform, settings, style),
       min_zoom(0),
       max_zoom(14) {
+
+    // TODO: Extract that information from the stylesheet instead of hard coding
+    style.sprite = std::make_shared<Sprite>();
+    style.sprite->load("http://localhost:3333/gl/debug/img/sprite");
 }
 
 Map::~Map() {
@@ -28,6 +33,11 @@ void Map::setup() {
     painter.setup();
 
     style.load(resources::style, resources::style_size);
+    // style.loadJSON((const char *)resources::style, resources::style_size);
+}
+
+void Map::loadSprite(const std::string& url) {
+
 }
 
 void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
