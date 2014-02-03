@@ -26,6 +26,7 @@ public:
 
     void setup();
     void loadStyle(const uint8_t *const data, uint32_t bytes);
+    void loadSprite(const std::string& url);
     void loadSettings();
     void resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb_height);
 

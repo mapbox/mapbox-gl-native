@@ -3,6 +3,7 @@
 //#include <llmr/util/vec2.hpp>
 
 #include <llmr/style/resources.hpp>
+#include <llmr/style/sprite.hpp>
 
 #include <iostream>
 #include <thread>
@@ -19,6 +20,7 @@ Map::Map(Settings& settings)
       painter(transform, settings, style),
       min_zoom(0),
       max_zoom(14) {
+    loadSprite("http://localhost:3333/gl/debug/img/sprite.json");
 }
 
 Map::~Map() {
@@ -28,6 +30,17 @@ void Map::setup() {
     painter.setup();
 
     style.load(resources::style, resources::style_size);
+    // style.loadJSON((const char *)resources::style, resources::style_size);
+}
+
+void Map::loadSprite(const std::string& url) {
+    platform::request_http(url, [](const platform::Response& res) {
+        if (res.code == 200) {
+            createTexture(res.body);
+        } else {
+            fprintf(stderr, "failed to load sprite\n");
+        }
+    });
 }
 
 void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {

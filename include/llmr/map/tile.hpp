@@ -86,7 +86,7 @@ public:
 
 private:
     // Source data
-    std::vector<char> data;
+    std::string data;
     VectorTile tile;
 
     // std::mutex mtx;
