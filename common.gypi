@@ -7,6 +7,7 @@
       'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
       'ONLY_ACTIVE_ARCH': 1
     },
+    'cflags':['-std=c++11'],
     'configurations': {
       'Debug': {
         'cflags': [ '-g', '-O0', '-I<(boost_root)/include' ],
