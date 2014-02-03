@@ -1,5 +1,7 @@
 #include <llmr/style/style.hpp>
 
+// #include <rapidjson/document.h>
+
 
 using namespace llmr;
 
@@ -237,3 +239,281 @@ void Style::cascade(float z) {
         }
     }
 }
+
+/*
+
+void loadBucketsJSON(const rapidjson::Value& value, std::map<std::string, BucketDescription>& buckets);
+BucketDescription loadBucketJSON(const rapidjson::Value& value);
+void loadLayersJSON(const rapidjson::Value& value, std::vector<LayerDescription>& layers);
+LayerDescription loadLayerJSON(const rapidjson::Value& value);
+void loadClassesJSON(const rapidjson::Value& value, std::map<std::string, ClassDescription>& classes);
+std::pair<std::string, ClassDescription> loadClassDescriptionJSON(const rapidjson::Value& value);
+void loadClassJSON(const std::string& name, const rapidjson::Value& value, ClassDescription& class_desc);
+FillClass loadFillClassJSON(const rapidjson::Value& value);
+LineClass loadLineClassJSON(const rapidjson::Value& value);
+Value loadValueJSON(const rapidjson::Value& value);
+
+void Style::loadJSON(const std::string& data) {
+    rapidjson::Document document;
+    document.Parse<0>(data.c_str());
+
+    if (document.IsObject()) {
+        if (document.HasMember("buckets")) {
+            loadBucketsJSON(document["buckets"], buckets);
+        }
+
+        if (document.HasMember("structure")) {
+            loadLayersJSON(document["structure"], layers);
+        }
+
+        if (document.HasMember("classes")) {
+            loadClassesJSON(document["classes"], classes);
+        }
+    } else {
+        fprintf(stderr, "stylesheet root must be an object\n");
+    }
+}
+
+void loadBucketsJSON(const rapidjson::Value& value, std::map<std::string, BucketDescription>& buckets) {
+    if (value.IsObject()) {
+        rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
+        for (; itr != value.MemberEnd(); ++itr) {
+            buckets.emplace(itr->name.GetString(), loadBucketJSON(itr->value));
+        }
+    } else {
+        fprintf(stderr, "buckets must be an object\n");
+    }
+}
+
+BucketDescription loadBucketJSON(const rapidjson::Value& value) {
+    BucketDescription bucket;
+
+    rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
+    for (; itr != value.MemberEnd(); ++itr) {
+        const std::string name(itr->name.GetString(), itr->name.GetStringLength());
+        const rapidjson::Value& value = itr->value;
+
+        if (name == "type") {
+            if (value.IsString()) {
+                bucket.type = bucketType({ value.GetString(), value.GetStringLength() });
+            } else {
+                fprintf(stderr, "bucket type must be a string\n");
+            }
+        } else if (name == "datasource") {
+            if (value.IsString()) {
+                bucket.source_name = { value.GetString(), value.GetStringLength() };
+            } else {
+                fprintf(stderr, "datasource name must be a string\n");
+            }
+        } else if (name == "layer") {
+            if (value.IsString()) {
+                bucket.source_layer = { value.GetString(), value.GetStringLength() };
+            } else {
+                fprintf(stderr, "layer name must be a string\n");
+            }
+        } else if (name == "field") {
+            if (value.IsString()) {
+                bucket.source_field = { value.GetString(), value.GetStringLength() };
+            } else {
+                fprintf(stderr, "field name must be a string\n");
+            }
+        } else if (name == "value") {
+            if (value.IsArray()) {
+                for (rapidjson::SizeType i = 0; i < value.Size(); i++) {
+                    bucket.source_value.push_back(loadValueJSON(value[i]));
+                }
+            } else {
+                bucket.source_value.push_back(loadValueJSON(value));
+            }
+        } else if (name == "cap") {
+            if (value.IsString()) {
+                bucket.geometry.cap = capType({ value.GetString(), value.GetStringLength() });
+            } else {
+                fprintf(stderr, "cap type must be a string\n");
+            }
+        } else if (name == "join") {
+            if (value.IsString()) {
+                bucket.geometry.join = joinType({ value.GetString(), value.GetStringLength() });
+            } else {
+                fprintf(stderr, "join type must be a string\n");
+            }
+        } else if (name == "font") {
+            if (value.IsString()) {
+                bucket.geometry.font = { value.GetString(), value.GetStringLength() };
+            } else {
+                fprintf(stderr, "font stack must be a string\n");
+            }
+        } else if (name == "fontSize") {
+            if (value.IsNumber()) {
+                bucket.geometry.font_size = value.GetDouble();
+            } else {
+                fprintf(stderr, "font size must be a number\n");
+            }
+        }
+    }
+
+    return bucket;
+}
+
+
+void loadLayersJSON(const rapidjson::Value& value, std::vector<LayerDescription>& layers) {
+    if (value.IsArray()) {
+        for (rapidjson::SizeType i = 0; i < value.Size(); i++) {
+            layers.push_back(loadLayerJSON(value[i]));
+        }
+    } else {
+        fprintf(stderr, "structure must be an array\n");
+    }
+
+}
+
+LayerDescription loadLayerJSON(const rapidjson::Value& value) {
+    LayerDescription layer;
+
+    if (value.IsObject()) {
+        if (value.HasMember("name")) {
+            const rapidjson::Value& name = value["name"];
+            if (name.IsString()) {
+                layer.name = { name.GetString(), name.GetStringLength() };
+            } else {
+                fprintf(stderr, "structure element name must be a string\n");
+            }
+        } else {
+            fprintf(stderr, "structure element must have a name\n");
+        }
+
+        if (value.HasMember("bucket")) {
+            const rapidjson::Value& bucket = value["bucket"];
+            if (bucket.IsString()) {
+                layer.bucket_name = { bucket.GetString(), bucket.GetStringLength() };
+            } else {
+                fprintf(stderr, "structure element bucket must be a string\n");
+            }
+        } else if (value.HasMember("layers")) {
+            loadLayersJSON(value["layers"], layer.child_layer);
+        } else {
+            fprintf(stderr, "structure element must have either a bucket name or child layers\n");
+        }
+    } else {
+        fprintf(stderr, "structure element must be an object\n");
+    }
+
+    return layer;
+}
+
+
+void loadClassesJSON(const rapidjson::Value& value, std::map<std::string, ClassDescription>& classes) {
+    if (value.IsArray()) {
+        for (rapidjson::SizeType i = 0; i < value.Size(); i++) {
+            classes.insert(loadClassDescriptionJSON(value[i]));
+        }
+    } else {
+        fprintf(stderr, "classes must be an array\n");
+    }
+}
+
+std::pair<std::string, ClassDescription> loadClassDescriptionJSON(const rapidjson::Value& value) {
+    ClassDescription klass;
+    std::string klass_name;
+
+    if (value.IsObject()) {
+        if (value.HasMember("name")) {
+            const rapidjson::Value& name = value["name"];
+            if (name.IsString()) {
+                klass_name = { name.GetString(), name.GetStringLength() };
+            } else {
+                fprintf(stderr, "class name must be a string\n");
+            }
+        } else {
+            fprintf(stderr, "class must have a name\n");
+        }
+
+        if (value.HasMember("layers")) {
+            const rapidjson::Value& layers = value["layers"];
+
+            if (layers.IsObject()) {
+                rapidjson::Value::ConstMemberIterator itr = layers.MemberBegin();
+                for (; itr != layers.MemberEnd(); ++itr) {
+                    const std::string name {
+                        itr->name.GetString(), itr->name.GetStringLength()
+                    };
+                    loadClassJSON(name, itr->value, klass);
+                }
+            } else {
+                fprintf(stderr, "class layer styles must be an object\n");
+            }
+        } else {
+            fprintf(stderr, "class must have layer styles\n");
+        }
+    }
+
+    return { klass_name, klass };
+}
+
+void loadClassJSON(const std::string& name, const rapidjson::Value& value, ClassDescription& class_desc) {
+    if (value.IsObject()) {
+        if (value.HasMember("type")) {
+            const rapidjson::Value& type = value["type"];
+            if (type.IsString()) {
+                std::string type_name = { type.GetString(), type.GetStringLength() };
+                if (type_name == "fill") {
+                    class_desc.fill.insert({ type_name, loadFillClassJSON(value) });
+                } else if (type_name == "line") {
+                    class_desc.line.insert({ type_name, loadLineClassJSON(value) });
+                } else {
+                    // TODO:
+                }
+            } else {
+                fprintf(stderr, "style class type must be a string\n");
+            }
+        } else {
+            fprintf(stderr, "style class must specify a type\n");
+        }
+    } else {
+        fprintf(stderr, "style class must be an object\n");
+    }
+}
+
+FillClass loadFillClassJSON(const rapidjson::Value& value) {
+    FillClass klass;
+
+    if (value.HasMember("hidden")) {
+        const rapidjson::Value& hidden = value["hidden"];
+        // TODO...
+
+    }
+
+    return klass;
+}
+
+LineClass loadLineClassJSON(const rapidjson::Value& value) {
+    FillClass klass;
+}
+
+
+
+Value loadValueJSON(const rapidjson::Value& value) {
+    switch (value.GetType()) {
+        case rapidjson::kNullType:
+        case rapidjson::kFalseType:
+            return false;
+
+        case rapidjson::kTrueType:
+            return true;
+
+        case rapidjson::kStringType:
+            return std::string { value.GetString(), value.GetStringLength() };
+
+        case rapidjson::kNumberType:
+            if (value.IsUint64()) return value.GetUint64();
+            if (value.IsInt64()) return value.GetInt64();
+            return value.GetDouble();
+
+        case rapidjson::kObjectType:
+        case rapidjson::kArrayType:
+            fprintf(stderr, "value cannot be an object or array\n");
+            return false;
+    }
+}
+
+*/

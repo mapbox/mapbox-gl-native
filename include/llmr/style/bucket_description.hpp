@@ -30,6 +30,28 @@ enum class JoinType {
 };
 
 
+inline BucketType bucketType(const std::string& type) {
+    if (type == "fill") return BucketType::Fill;
+    else if (type == "line") return BucketType::Line;
+    else if (type == "point") return BucketType::Point;
+    else return BucketType::None;
+}
+
+inline CapType capType(const std::string& cap) {
+    if (cap == "round") return CapType::Round;
+    else if (cap == "butt") return CapType::Butt;
+    else if (cap == "square") return CapType::Square;
+    else return CapType::None;
+}
+
+
+inline JoinType joinType(const std::string& join) {
+    if (join == "butt") return JoinType::Butt;
+    else if (join == "bevel") return JoinType::Bevel;
+    else if (join == "round") return JoinType::Round;
+    else return JoinType::None;
+}
+
 class BucketGeometryDescription {
 public:
     CapType cap = CapType::None;
