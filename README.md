@@ -31,18 +31,27 @@ Or generate a dual iOS/OS X-compatible Xcode project for `libllmr` to include as
 
 ## Ubuntu
 
+Ensure you have git and other build essentials:
+
+    sudo apt-get install git cmake make pkg-config
+
 Install a `-std=c++11` capable compiler
 
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+    sudo apt-get update
     sudo apt-get install gcc-4.8 g++-4.8
 
 Install boost (we only need headers):
 
     sudo apt-get install libboost-dev
 
+Install libpng-dev:
+
+    sudo apt-get install libpng-dev
+
 Install glfw3 dependencies:
 
-    sudo apt-get install cmake libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev
+    sudo apt-get install libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev
 
 Install glfw3:
 
@@ -50,7 +59,7 @@ Install glfw3:
     cd glfw
     mkdir build
     cd build
-    cmake ../
+    cmake ../ -DCMAKE_C_COMPILER_ENV_VAR=gcc-4.8
     make
     sudo make install
     cd ../../
