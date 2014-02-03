@@ -2,6 +2,7 @@
 
 #include <string>
 #include <llmr/platform/platform.hpp>
+#include <llmr/platform/gl.hpp>
 
 #include <png.h>
 
@@ -222,4 +223,28 @@ ImagePosition Sprite::getPosition(const std::string& name, bool repeating) {
             (float)(pos.y + pos.height - 2 * offset) / height
         }
     };
+}
+
+void Sprite::bind(bool linear) {
+    if (!width || !height) {
+        fprintf(stderr, "trying to bind texture without dimension\n");
+        return;
+    }
+
+    if (!texture) {
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
+    } else {
+        glBindTexture(GL_TEXTURE_2D, texture);
+    }
+
+    GLuint filter = linear ? GL_LINEAR : GL_NEAREST;
+    if (filter != this->filter) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+        this->filter = filter;
+    }
 }
