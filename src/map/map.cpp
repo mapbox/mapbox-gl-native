@@ -20,7 +20,9 @@ Map::Map(Settings& settings)
       painter(transform, settings, style),
       min_zoom(0),
       max_zoom(14) {
-    loadSprite("http://localhost:3333/gl/debug/img/sprite.json");
+
+    sprite = std::make_shared<Sprite>();
+    sprite->load("http://localhost:3333/gl/debug/img/sprite");
 }
 
 Map::~Map() {
@@ -34,13 +36,7 @@ void Map::setup() {
 }
 
 void Map::loadSprite(const std::string& url) {
-    platform::request_http(url, [](const platform::Response& res) {
-        if (res.code == 200) {
-            createTexture(res.body);
-        } else {
-            fprintf(stderr, "failed to load sprite\n");
-        }
-    });
+
 }
 
 void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {

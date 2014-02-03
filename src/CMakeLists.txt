@@ -1,3 +1,5 @@
+find_package(PNG REQUIRED)
+
 SET(llmr_SOURCES
     geometry/debug_font_buffer.cpp
     geometry/fill_buffer.cpp
@@ -54,6 +56,7 @@ SET(llmr_HEADERS
 
 INCLUDE_DIRECTORIES(
     ${Boost_INCLUDE_DIR}
+    ${PNG_INCLUDE_DIR}
     ../include
 )
 
@@ -67,4 +70,5 @@ LINK_DIRECTORIES(
 
 TARGET_LINK_LIBRARIES(llmr
     ${Boost_LIBRARIES}
+    ${PNG_LIBRARY}
 )
