@@ -5,31 +5,31 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>English</string>
     <key>CFBundleExecutable</key>
-    <string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+    <string>${EXECUTABLE_NAME}</string>
     <key>CFBundleGetInfoString</key>
-    <string>${MACOSX_BUNDLE_INFO_STRING}</string>
+    <string>0.0.1</string>
     <key>CFBundleIconFile</key>
-    <string>${MACOSX_BUNDLE_ICON_FILE}</string>
+    <string>Icon.icns</string>
     <key>CFBundleIdentifier</key>
-    <string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
+    <string>com.mapbox.${PRODUCT_NAME:rfc1034identifier}</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleLongVersionString</key>
-    <string>${MACOSX_BUNDLE_LONG_VERSION_STRING}</string>
+    <string>0.0.1</string>
     <key>CFBundleName</key>
-    <string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
+    <string>${PRODUCT_NAME}</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
+    <string>0.0.1</string>
     <key>CFBundleSignature</key>
     <string>LLMR</string>
     <key>CFBundleVersion</key>
-    <string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
+    <string>0.0.1</string>
     <key>CSResourcesFileMapped</key>
     <true/>
     <key>NSHumanReadableCopyright</key>
-    <string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+    <string>0.0.1</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>
