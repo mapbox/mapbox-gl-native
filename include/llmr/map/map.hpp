@@ -69,8 +69,6 @@ private:
     int32_t min_zoom;
     int32_t max_zoom;
 
-    std::shared_ptr<Sprite> sprite;
-
     std::forward_list<Tile::Ptr> tiles;
     std::forward_list<Tile::Ptr> historic_tiles;
 };

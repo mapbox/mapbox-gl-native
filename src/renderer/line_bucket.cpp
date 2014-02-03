@@ -259,8 +259,8 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     length = buffer->length() - start;
 }
 
-void LineBucket::render(Painter& painter, const std::string& layer_name) {
-    painter.renderLine(*this, layer_name);
+void LineBucket::render(Painter& painter, const std::string& layer_name, const Tile::ID& id) {
+    painter.renderLine(*this, layer_name, id);
 }
 
 uint32_t LineBucket::size() const {

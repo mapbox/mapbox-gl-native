@@ -11,6 +11,7 @@
 #include "bucket_description.hpp"
 #include "layer_description.hpp"
 #include "class_description.hpp"
+#include "sprite.hpp"
 
 namespace llmr {
 
@@ -37,6 +38,8 @@ private:
     static Color parseColor(pbf& data);
 
 public:
+    std::shared_ptr<Sprite> sprite;
+
     // This is static information parsed from the stylesheet.
     std::map<std::string, BucketDescription> buckets;
     std::vector<LayerDescription> layers;

@@ -140,6 +140,10 @@ function createFillClass(layer, name) {
         pbf.writeMessage(7 /* opacity */, convertProperty(layer.opacity));
     }
 
+    if ('image' in layer) {
+        pbf.writeTaggedString(8 /* image */, layer.image);
+    }
+
     return pbf;
 }
 

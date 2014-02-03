@@ -14,6 +14,7 @@ SET(llmr_SOURCES
     renderer/shader-plain.cpp
     renderer/shader-outline.cpp
     renderer/shader-line.cpp
+    renderer/shader-pattern.cpp
     renderer/shader.cpp
     renderer/fill_bucket.cpp
     renderer/line_bucket.cpp
@@ -46,6 +47,7 @@ SET(llmr_HEADERS
     ../include/llmr/renderer/shader-plain.hpp
     ../include/llmr/renderer/shader-outline.hpp
     ../include/llmr/renderer/shader-line.hpp
+    ../include/llmr/renderer/shader-pattern.hpp
     ../include/llmr/renderer/shader.hpp
     ../include/llmr/shader/shaders.hpp
     ../include/llmr/util/animation.hpp

@@ -18,7 +18,7 @@ class FillBucket : public Bucket {
 public:
     FillBucket(const std::shared_ptr<FillBuffer>& buffer, const BucketDescription& bucket_desc);
 
-    virtual void render(Painter& painter, const std::string& layer_name);
+    virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
 
     void addGeometry(pbf& data);
     void addGeometry(const std::vector<Coordinate>& line);

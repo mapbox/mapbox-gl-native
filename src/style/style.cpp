@@ -123,6 +123,8 @@ std::pair<std::string, FillClass> Style::parseFillClass(pbf data) {
             fill.stroke_color = parseColor(data);
         } else if (data.tag == 7) { // opacity
             fill.opacity = parseProperty<float>(data.message());
+        } else if (data.tag == 8) { // image
+            fill.image = data.string();
         } else {
             data.skip();
         }
@@ -221,6 +223,7 @@ void Style::cascade(float z) {
             fill.fill_color = layer.fill_color;
             fill.stroke_color = layer.stroke_color;
             fill.opacity = layer.opacity(z);
+            fill.image = layer.image;
         }
 
         // Cascade line classes

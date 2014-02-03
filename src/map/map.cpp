@@ -21,8 +21,9 @@ Map::Map(Settings& settings)
       min_zoom(0),
       max_zoom(14) {
 
-    sprite = std::make_shared<Sprite>();
-    sprite->load("http://localhost:3333/gl/debug/img/sprite");
+    // TODO: Extract that information from the stylesheet instead of hard coding
+    style.sprite = std::make_shared<Sprite>();
+    style.sprite->load("http://localhost:3333/gl/debug/img/sprite");
 }
 
 Map::~Map() {

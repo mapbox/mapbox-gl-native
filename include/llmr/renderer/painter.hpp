@@ -5,6 +5,7 @@
 #include "shader-plain.hpp"
 #include "shader-outline.hpp"
 #include "shader-line.hpp"
+#include "shader-pattern.hpp"
 
 #include "../map/tile.hpp"
 #include "../geometry/vertex_buffer.hpp"
@@ -42,8 +43,8 @@ public:
 
     void renderMatte();
     void renderBackground();
-    void renderFill(FillBucket& bucket, const std::string& layer_name);
-    void renderLine(LineBucket& bucket, const std::string& layer_name);
+    void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
+    void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
 
 
     void drawClippingMask();
@@ -68,6 +69,7 @@ private:
     std::shared_ptr<PlainShader> plainShader;
     std::shared_ptr<OutlineShader> outlineShader;
     std::shared_ptr<LineShader> lineShader;
+    std::shared_ptr<PatternShader> patternShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     VertexBuffer tileStencilBuffer = {

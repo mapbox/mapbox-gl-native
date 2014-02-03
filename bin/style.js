@@ -82,7 +82,8 @@ module.exports = {
                 "park": {
                     "type": "fill",
                     "color": "#c8df9f",
-                    "antialias": true
+                    "antialias": true,
+                    "image": "park"
                 },
                 "wood": {
                     "type": "fill",

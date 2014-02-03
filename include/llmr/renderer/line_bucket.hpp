@@ -17,7 +17,7 @@ class LineBucket : public Bucket {
 public:
     LineBucket(const std::shared_ptr<LineBuffer>& buffer, const BucketDescription& bucket_desc);
 
-    virtual void render(Painter& painter, const std::string& layer_name);
+    virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
 
     void addGeometry(pbf& data);
     void addGeometry(const std::vector<Coordinate>& line);
