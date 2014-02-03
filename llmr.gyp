@@ -6,11 +6,14 @@
   'targets': [
     {
       'target_name': 'llmr-osx',
-      'product_name': 'libllmr-osx',
+      'product_name': 'llmr-osx',
       'type': 'static_library',
       'sources': [
         '<!@(find src -name "*.cpp")',
         '<!@(find include -name "*.hpp")'
+      ],
+      'libraries': [
+        '<@(png_libraries)',
       ],
       'xcode_settings': {
         'SDKROOT': 'macosx',
@@ -18,31 +21,30 @@
         'MACOSX_DEPLOYMENT_TARGET':'10.8',
         'PUBLIC_HEADERS_FOLDER_PATH': 'include'
       },
-      'conditions': [
-        ['OS == "mac"', {
-          'link_settings': {
-            'libraries': [
-              '$(SDKROOT)/System/Library/Frameworks/OpenGL.framework',
-            ],
-          },
-        }],
-      ],
       'include_dirs':[
-          './include'
+          './include',
+          '<@(png_cflags)'
       ],
       'direct_dependent_settings': {
           'include_dirs':[
-              './include'
+              './include',
+              '<@(png_cflags)'
           ],
+          'libraries': [
+            '<@(png_libraries)',
+          ]
       }
     },
     {
       'target_name': 'llmr-ios',
-      'product_name': 'libllmr-ios',
+      'product_name': 'llmr-ios',
       'type': 'static_library',
       'sources': [
         '<!@(find src -name "*.cpp")',
         '<!@(find include -name "*.hpp")'
+      ],
+      'libraries': [
+        '<@(png_libraries)',
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
@@ -53,12 +55,17 @@
         'PUBLIC_HEADERS_FOLDER_PATH': 'include'
       },
       'include_dirs':[
-          './include'
+          './include',
+          '<@(png_cflags)'
       ],
       'direct_dependent_settings': {
           'include_dirs':[
-              './include'
+              './include',
+              '<@(png_cflags)'
           ],
+          'libraries': [
+            '<@(png_libraries)',
+          ]
       }
     }
   ]
