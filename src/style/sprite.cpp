@@ -124,7 +124,7 @@ void Sprite::loadImage(const std::string& data) {
 
     Buffer buffer(data);
 
-    if (buffer.length < 8 || !png_check_sig((png_const_bytep)buffer.data, 8)) {
+    if (buffer.length < 8 || !png_check_sig((const png_bytep)buffer.data, 8)) {
         fprintf(stderr, "image is not a valid PNG image\n");
         return;
     }
@@ -140,7 +140,7 @@ void Sprite::loadImage(const std::string& data) {
     try {
         png_set_read_fn(png, (png_voidp)&buffer, readCallback);
         png_read_info(png, info);
-        png_get_IHDR(png, info, &width, &height, &depth, &color, &interlace, NULL, NULL);
+        png_get_IHDR(png, info, (png_uint_32*)&width, (png_uint_32*)&height, &depth, &color, &interlace, NULL, NULL);
         bool alpha = (color & PNG_COLOR_MASK_ALPHA) || png_get_valid(png, info, PNG_INFO_tRNS);
 
         // From http://trac.mapnik.org/browser/trunk/src/png_reader.cpp
