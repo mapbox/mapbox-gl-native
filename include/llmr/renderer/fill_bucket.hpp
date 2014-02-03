@@ -5,6 +5,7 @@
 #include <llmr/style/bucket_description.hpp>
 
 #include <vector>
+#include <memory>
 
 namespace llmr {
 

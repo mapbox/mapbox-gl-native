@@ -2,6 +2,7 @@
 #define llmr_util_vec2_
 
 #include <limits>
+#include <type_traits>
 
 namespace llmr {
 

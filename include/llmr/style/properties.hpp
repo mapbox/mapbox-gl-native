@@ -4,6 +4,7 @@
 #include <array>
 #include <vector>
 #include <string>
+#include <limits>
 
 namespace llmr {
 
