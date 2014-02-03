@@ -77,16 +77,13 @@ void Tile::request() {
     platform::request_http(url, [=](platform::Response& res) {
         if (res.code == 200) {
             tile->data.swap(res.body);
-
-            platform::async([tile]() {
-                tile->parse();
-            }, []() {
-                // TODO: Make sure this gets passed the correct map ID/pointer.
-                platform::restart(NULL);
-            });
+            tile->parse();
         } else {
             fprintf(stderr, "tile loading failed\n");
         }
+    }, []() {
+        // TODO: Make sure this gets passed the correct map ID/pointer.
+        platform::restart(NULL);
     });
 }
 

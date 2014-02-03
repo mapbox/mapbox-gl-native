@@ -21,6 +21,7 @@ struct Response {
 };
 
 void request_http(std::string url, std::function<void(Response&)> func);
+void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb);
 
 void async(std::function<void()> fn, std::function<void()> cb);
 

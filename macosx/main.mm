@@ -248,6 +248,29 @@ void request_http(std::string url, std::function<void(Response&)> func) {
     }];
 }
 
+void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
+        NSMutableURLRequest *urlRequest = [NSMutableURLRequest
+                                       requestWithURL:[NSURL
+                                               URLWithString:[NSString
+                                                       stringWithUTF8String:url.c_str()]]];
+
+    [NSURLConnection
+     sendAsynchronousRequest:urlRequest
+     queue:[NSOperationQueue mainQueue]
+     completionHandler: ^ (NSURLResponse* response, NSData* data, NSError* error) {
+        Response res;
+        if (error == nil) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            res.code = [httpResponse statusCode];
+            res.body = { (const char *)[data bytes], [data length] };
+        }
+
+        func(res);
+        dispatch_async(dispatch_get_main_queue(), ^ {
+            cb();
+        });
+    }];
+}
 
 
 double time() {
