@@ -24,15 +24,24 @@ xapp: xcode config.gypi src macosx/llmr-app.gyp
 	xcodebuild -project ./macosx/llmr-app.xcodeproj
 	open macosx/build/Release/llmr.app
 
+# build iOS app with xcodebuild
+iapp: xcode config.gypi src ios/llmr-app.gyp
+	deps/run_gyp ios/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
+	xcodebuild -project ./ios/llmr-app.xcodeproj
+	# launch app with ios-sim? 
+
 clean:
 	-rm -rf out
 	-rm -rf build
 	-rm -rf macosx/build
+	-rm -rf ios/build
 
 distclean:
 	-rm -f config.gypi
 	-rm -f config.mk
 	-rm -rf llmr.xcodeproj
+	-rm -rf macosx/llmr-app.xcodeproj
+	-rm -rf ios/llmr-app.xcodeproj
 
 test: all
 	echo test

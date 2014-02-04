@@ -83,6 +83,32 @@ void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double
     settings.save();
 }
 
+void Map::setScale(double scale) {
+    transform.setScale(scale);
+    style.cascade(transform.getZoom());
+    update();
+
+    transform.getLonLat(settings.longitude, settings.latitude);
+    settings.scale = transform.getScale();
+    settings.save();
+}
+
+void Map::setAngle(double angle) {
+    transform.setAngle(angle);
+    update();
+
+    settings.angle = transform.getAngle();
+    settings.save();
+}
+
+double Map::getScale() const {
+    return transform.getScale();
+}
+
+double Map::getAngle() const {
+    return transform.getAngle();
+}
+
 void Map::resetNorth() {
     transform.setAngle(0, 0.5); // 500 ms
     update();

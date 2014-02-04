@@ -25,6 +25,7 @@ public:
     Map &operator=(const Map&) = delete;
     Map &operator=(const Map&&) = delete;
 
+    /* setup */
     void setup();
     void loadStyle(const uint8_t *const data, uint32_t bytes);
     void loadSprite(const std::string& url);
@@ -33,19 +34,29 @@ public:
 
     /* callback */
     bool render();
-    void moveBy(double dx, double dy);
-    void scaleBy(double ds, double cx, double cy);
-    void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey);
     void tileLoaded(std::shared_ptr<Tile> tile);
     void tileFailed(std::shared_ptr<Tile> tile);
 
     /* position */
-    void resetNorth();
-    void resetPosition();
-    // void setAngle(double angle);
+    void moveBy(double dx, double dy);
     // void setLonLat(double lon, double lat);
+    void resetPosition();
+
+    /* scale */
+    void scaleBy(double ds, double cx, double cy);
+    void setScale(double scale);
+    double getScale() const;
     // void setZoom(double zoom);
     // void setLonLatZoom(double lon, double lat, double zoom);
+    // double getZoom() const;
+    // void getLonLatZoom(double &lon, double &lat, double &zoom) const;
+    // void resetZoom();
+
+    /* rotation */
+    void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey);
+    void setAngle(double angle);
+    double getAngle() const;
+    void resetNorth();
 
     void toggleDebug();
 

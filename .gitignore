@@ -6,3 +6,6 @@
 config.gypi
 config.mk
 .DS_Store
+out
+mapnik-packaging
+*.xcodeproj

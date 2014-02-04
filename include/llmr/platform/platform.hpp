@@ -5,8 +5,8 @@
 #include <functional>
 #include <string>
 
-#define kTileURL   "http://localhost:3333/gl/tiles/plain/%d-%d-%d.vector.pbf"
-#define kSpriteURL "http://localhost:3333/gl/debug/img/sprite"
+#define kTileURL   "http://mapbox:magic@kkaefer.net/gl/tiles/plain/%d-%d-%d.vector.pbf"
+#define kSpriteURL "http://mapbox:magic@kkaefer.net/gl/debug/img/sprite"
 
 namespace llmr {
 
