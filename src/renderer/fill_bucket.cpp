@@ -4,6 +4,7 @@
 
 #include <llmr/renderer/painter.hpp>
 #include <llmr/style/style.hpp>
+#include <llmr/map/vector_tile.hpp>
 
 #include <llmr/platform/gl.hpp>
 

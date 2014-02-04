@@ -13,6 +13,7 @@
 #include <llmr/style/style.hpp>
 #include <llmr/platform/platform.hpp>
 #include <llmr/util/string.hpp>
+#include <llmr/map/vector_tile.hpp>
 
 #include <cmath>
 
@@ -104,8 +105,8 @@ bool Tile::parse() {
     }
 
     try {
-        tile = VectorTile(pbf((const uint8_t *)data.data(), data.size()));
-        parseStyleLayers(style.layers);
+        VectorTile tile(pbf((const uint8_t *)data.data(), data.size()));
+        parseStyleLayers(tile, style.layers);
     } catch (const std::exception& ex) {
         fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
         cancel();
@@ -121,12 +122,12 @@ bool Tile::parse() {
     return true;
 }
 
-void Tile::parseStyleLayers(const std::vector<LayerDescription>& layers) {
+void Tile::parseStyleLayers(const VectorTile& tile, const std::vector<LayerDescription>& layers) {
     for (const LayerDescription& layer_desc : layers) {
         if (layer_desc.child_layer.size()) {
             // This is a layer group.
             // TODO: create framebuffer
-            parseStyleLayers(layer_desc.child_layer);
+            parseStyleLayers(tile, layer_desc.child_layer);
             // TODO: render framebuffer on previous framebuffer
         } else {
             // This is a singular layer. Check if this bucket already exists. If not,
@@ -137,7 +138,7 @@ void Tile::parseStyleLayers(const std::vector<LayerDescription>& layers) {
                 if (bucket_it != style.buckets.end()) {
                     // Only create the new bucket if we have an actual specification
                     // for it.
-                    std::shared_ptr<Bucket> bucket = createBucket(bucket_it->second);
+                    std::shared_ptr<Bucket> bucket = createBucket(tile, bucket_it->second);
                     if (bucket) {
                         // Bucket creation might fail because the data tile may not
                         // contain any data that falls into this bucket.
@@ -153,7 +154,7 @@ void Tile::parseStyleLayers(const std::vector<LayerDescription>& layers) {
     }
 }
 
-std::shared_ptr<Bucket> Tile::createBucket(const BucketDescription& bucket_desc) {
+std::shared_ptr<Bucket> Tile::createBucket(const VectorTile& tile, const BucketDescription& bucket_desc) {
     auto layer_it = tile.layers.find(bucket_desc.source_layer);
     if (layer_it != tile.layers.end()) {
         const VectorTileLayer& layer = layer_it->second;
