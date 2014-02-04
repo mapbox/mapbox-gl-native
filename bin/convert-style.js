@@ -136,6 +136,15 @@ function createFillClass(layer, name) {
         }
     }
 
+    if ('stroke' in layer) {
+        var color = layer.stroke.match(/^#([0-9a-f]{6})$/i);
+        if (!color) {
+            console.warn('invalid color');
+        } else {
+            pbf.writeTaggedUInt32(6 /* stroke_color */, parseInt(color[1] + 'ff', 16));
+        }
+    }
+
     if ('opacity' in layer) {
         pbf.writeMessage(7 /* opacity */, convertProperty(layer.opacity));
     }

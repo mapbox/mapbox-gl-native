@@ -93,8 +93,10 @@ module.exports = {
                 },
                 "water": {
                     "type": "fill",
-                    "color": "#73b6e6",
-                    "antialias": true
+                    "color": "#bae0e9",
+                    "stroke": "#73b6e6",
+                    "antialias": true,
+                    "image": "water_etsy"
                 },
                 "building": {
                     "type": "fill",
