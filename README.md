@@ -5,10 +5,10 @@ implemented in C++, targeting iOS & OS X.
 
 ## OS X
 
-Install boost and [glfw3](http://www.glfw.org/docs/latest/):
+Install boost, libpng, and [glfw3](http://www.glfw.org/docs/latest/):
 
 ```
-brew install boost
+brew install boost libpng
 brew install homebrew/versions/glfw3
 ```
 
