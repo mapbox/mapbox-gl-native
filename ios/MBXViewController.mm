@@ -95,6 +95,14 @@ class MBXMapView
     UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPressGesture:)];
     [self.view addGestureRecognizer:longPress];
 
+    UILongPressGestureRecognizer *twoFingerLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerLongPressGesture:)];
+    twoFingerLongPress.numberOfTouchesRequired = 2;
+    [self.view addGestureRecognizer:twoFingerLongPress];
+
+    UILongPressGestureRecognizer *threeFingerLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleThreeFingerLongPressGesture:)];
+    threeFingerLongPress.numberOfTouchesRequired = 3;
+    [self.view addGestureRecognizer:threeFingerLongPress];
+
     UIPinchGestureRecognizer *pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
     [self.view addGestureRecognizer:pinch];
 
@@ -124,33 +132,56 @@ class MBXMapView
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
     if (pan.state == UIGestureRecognizerStateBegan)
+    {
         self.center = CGPointMake(0, 0);
+    }
+    else if (pan.state == UIGestureRecognizerStateChanged)
+    {
+        CGPoint delta = CGPointMake([pan translationInView:pan.view].x - self.center.x,
+                                    [pan translationInView:pan.view].y - self.center.y);
 
-    CGPoint delta = CGPointMake([pan translationInView:pan.view].x - self.center.x,
-                                [pan translationInView:pan.view].y - self.center.y);
+        mapView->map.moveBy(delta.x, delta.y);
 
-    mapView->map.moveBy(delta.x, delta.y);
-
-    self.center = CGPointMake(self.center.x + delta.x, self.center.y + delta.y);
+        self.center = CGPointMake(self.center.x + delta.x, self.center.y + delta.y);
+    }
 }
 
-- (void)handleDoubleTapGesture:(UIPanGestureRecognizer *)doubleTap
+- (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
-    CGPoint gesturePoint = [doubleTap locationInView:doubleTap.view];
+    if (doubleTap.state == UIGestureRecognizerStateEnded)
+    {
+        CGPoint gesturePoint = [doubleTap locationInView:doubleTap.view];
 
-    mapView->map.scaleBy(2, gesturePoint.x, gesturePoint.y);
+        mapView->map.scaleBy(2, gesturePoint.x, gesturePoint.y);
+    }
 }
 
-- (void)handleTwoFingerTapGesture:(UIPanGestureRecognizer *)twoFingerTap
+- (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
-    CGPoint gesturePoint = [twoFingerTap locationInView:twoFingerTap.view];
+    if (twoFingerTap.state == UIGestureRecognizerStateEnded)
+    {
+        CGPoint gesturePoint = [twoFingerTap locationInView:twoFingerTap.view];
 
-    mapView->map.scaleBy(0.5, gesturePoint.x, gesturePoint.y);
+        mapView->map.scaleBy(0.5, gesturePoint.x, gesturePoint.y);
+    }
 }
 
 - (void)handleLongPressGesture:(UILongPressGestureRecognizer *)longPress
 {
-    mapView->map.resetNorth();
+    if (longPress.state == UIGestureRecognizerStateBegan)
+        mapView->map.resetNorth();
+}
+
+- (void)handleTwoFingerLongPressGesture:(UILongPressGestureRecognizer *)twoFingerLongPress
+{
+    if (twoFingerLongPress.state == UIGestureRecognizerStateBegan)
+        mapView->map.resetPosition();
+}
+
+- (void)handleThreeFingerLongPressGesture:(UILongPressGestureRecognizer *)threeFingerLongPress
+{
+    if (threeFingerLongPress.state == UIGestureRecognizerStateBegan)
+        mapView->map.toggleDebug();
 }
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
@@ -158,19 +189,29 @@ class MBXMapView
     CGFloat scale = mapView->map.getScale();
 
     if (pinch.state == UIGestureRecognizerStateBegan)
-         self.zoom = log2f(scale);
+    {
+        self.zoom = log2f(scale);
+    }
+    else if (pinch.state == UIGestureRecognizerStateChanged)
+    {
+        CGFloat tolerance = 3;
 
-    CGFloat newZoom = self.zoom + (pinch.scale > 1 ? ((pinch.scale / 10) * 1) : (((1 - pinch.scale) / 0.9) * -1));
+        CGFloat newZoom = self.zoom + (pinch.scale > 1 ? (pinch.scale / tolerance) : ((1 - pinch.scale) * -tolerance));
 
-    mapView->map.setScale(powf(2, newZoom));
+        mapView->map.setScale(powf(2, newZoom));
+    }
 }
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
     if (rotate.state == UIGestureRecognizerStateBegan)
-         self.angle = mapView->map.getAngle();
-
-    mapView->map.setAngle(self.angle + rotate.rotation);
+    {
+        self.angle = mapView->map.getAngle();
+    }
+    else if (rotate.state == UIGestureRecognizerStateChanged)
+    {
+        mapView->map.setAngle(self.angle + rotate.rotation);
+    }
 }
 
 CADisplayLink *displayLink;

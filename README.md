@@ -125,3 +125,5 @@ bin/convert-style.js > resources/style.pbf && bin/build-style.js
 - Double-tap to zoom in one level
 - Two-finger single-tap to zoom out one level
 - Long-press to reset north
+- Two-finger long press to reset the transform
+- Three-finger long press to toggle debug information
