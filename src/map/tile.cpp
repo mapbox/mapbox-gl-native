@@ -65,7 +65,7 @@ void Tile::request() {
     state = Tile::loading;
 
     // Create http request
-    std::string url = util::sprintf("http://localhost:3333/gl/tiles/plain/%d-%d-%d.vector.pbf",
+    std::string url = util::sprintf(kTileURL,
         id.z, id.x, id.y);
 
     // Note: Somehow this feels slower than the change to request_http()

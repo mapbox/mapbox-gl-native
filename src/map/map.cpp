@@ -18,7 +18,7 @@ Map::Map(Settings& settings)
 
     // TODO: Extract that information from the stylesheet instead of hard coding
     style.sprite = std::make_shared<Sprite>();
-    style.sprite->load("http://localhost:3333/gl/debug/img/sprite");
+    style.sprite->load(kSpriteURL);
 }
 
 Map::~Map() {
