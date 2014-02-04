@@ -31,7 +31,11 @@ Or generate a dual iOS/OS X-compatible Xcode project for `libllmr` to include as
 
 ## iOS
 
-Because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version yourself. Run `./ios/setup_libpng.sh`, which is derived from Mapnik's cross-architecture build scripts. 
+Install boost: 
+
+    brew install boost
+
+Because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version yourself. Run `./ios/setup_libpng.sh`, which is derived from Mapnik's cross-architecture build scripts. This will also run `./configure`. 
 
 Then you can build the iOS app with make: 
 
@@ -117,6 +121,7 @@ bin/convert-style.js > resources/style.pbf && bin/build-style.js
 
 - Pan to move
 - Pinch to zoom
+- Use two fingers to rotate
 - Double-tap to zoom in one level
 - Two-finger single-tap to zoom out one level
 - Long-press to reset north
