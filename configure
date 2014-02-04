@@ -99,7 +99,7 @@ def configure_png(o):
       elif options.png:
         incpath = os.path.join(options.png,'include')
       if incpath and os.path.exists(incpath):
-          o['variables']['png_cflags'] = '-I'+incpath
+          o['variables']['png_cflags'] = ['-I'+incpath]
   else:
       ret = pkg_config('libpng')
       if not ret:
