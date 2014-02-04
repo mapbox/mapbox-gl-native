@@ -45,7 +45,8 @@
           'CLANG_CXX_LIBRARY': 'libc++',
           'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
           'MACOSX_DEPLOYMENT_TARGET':'10.8',
-          'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0'
+          'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
+          'CLANG_ENABLE_OBJC_ARC': 'YES'
         },
         "dependencies": [
             "../llmr.gyp:llmr-osx"
