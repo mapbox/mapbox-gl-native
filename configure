@@ -92,7 +92,7 @@ def configure_png(o):
         libpath = os.path.join(options.png,'lib')
       if libpath and os.path.exists(libpath):
           o['variables']['png_libraries'] = ['-L'+libpath]
-      o['variables']['png_libraries'] += ['-lpng']
+      o['variables']['png_libraries'] += ['-lpng','-lz']
       incpath = None
       if options.png_includes:
         incpath = options.png_includes
