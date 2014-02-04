@@ -4,6 +4,8 @@
 #include <llmr/style/resources.hpp>
 #include <llmr/style/sprite.hpp>
 
+#include <algorithm>
+
 using namespace llmr;
 
 Map::Map(Settings& settings)
