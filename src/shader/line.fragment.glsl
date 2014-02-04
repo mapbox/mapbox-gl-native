@@ -1,5 +1,3 @@
-#version 120
-
 // shared
 uniform float u_debug;
 uniform vec2 u_linewidth;

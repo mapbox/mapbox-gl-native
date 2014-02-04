@@ -105,17 +105,18 @@ bool Shader::compileShader(GLuint *shader, GLenum type, const GLchar *source) {
     *shader = glCreateShader(type);
 
 #ifdef EMSCRIPTEN
-    // Add WebGL GSLSL precision premable
-    const char *preamble = "precision mediump float;\n\n";
-    int preamble_length = strlen(preamble);
-    int source_length = strlen(source);
-    char *modified_source = (char *)malloc(preamble_length + source_length);
-    strncpy(&modified_source[0], preamble, preamble_length);
-    strncpy(&modified_source[preamble_length], source, source_length);
-    glShaderSource(*shader, 1, (const GLchar **)(&modified_source), NULL);
+    // Add WebGL GLSL precision premable
+    const GLchar *preamble = "precision mediump float;\n\n";
 #else
-    glShaderSource(*shader, 1, &source, NULL);
+    // Desktop GLSL
+    const GLchar *preamble = "#version 120\n\n";
 #endif
+
+    const GLchar *strings[] = { preamble, source };
+    const GLint lengths[] = { (GLint)strlen(preamble), (GLint)strlen(source) };
+
+
+    glShaderSource(*shader, 2, strings, lengths);
 
     glCompileShader(*shader);
 
