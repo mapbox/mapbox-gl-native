@@ -29,6 +29,27 @@ Or generate a dual iOS/OS X-compatible Xcode project for `libllmr` to include as
 
     make xcode # then open llmr.xcodeproj
 
+## iOS
+
+For iOS you'll likely need `armv7` and `armv7s` libs for targeting devices and `i386` libs for the simulator. The best way to handle this is to build for all those architectures and then combine the libs into a single universal lib. We'll do this with the scripts from [mapnik-packaging](https://github.com/mapnik/mapnik-packaging.git)
+
+From within the `llmr-native` directory:
+
+    git clone --depth=0 https://github.com/mapnik/mapnik-packaging.git
+    cd mapnik-packaging/osx/
+    export CXX11=true
+    (source iPhoneSimulator.sh; ./scripts/build_png.sh; \
+      source MacOSX.sh; ./scripts/build_png.sh; \
+      source iPhoneOS.sh; ./scripts/build_png.sh; \
+      source iPhoneOSs.sh;  ./scripts/build_png.sh; \
+      ./scripts/make_universal.sh)
+    export UNIVERSAL_LIBS=`pwd`/out/build-cpp11-libcpp-universal/
+    export PNG_INCLUDES=`pwd`/out/build-cpp11-libcpp-i386/
+    cd ../../
+    ./configure --png-libpath=${UNIVERSAL_LIBS} --png-includes=${PNG_INCLUDES}
+
+
+
 ## Ubuntu
 
 Ensure you have git and other build essentials:
