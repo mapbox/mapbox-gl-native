@@ -56,15 +56,15 @@ public:
                 // +--+---+
                 // |__|___|  <-- b1
                 // +------+  <-- b2
-                if (rect.w > width) free.emplace_back({ rect.x + width, rect.y, rect.w - width, height });
-                if (rect.h > height) free.emplace_back({ rect.x, rect.y + height, rect.w, rect.h - height });
+                if (rect.w > width) free.emplace_back(rect.x + width, rect.y, rect.w - width, height);
+                if (rect.h > height) free.emplace_back(rect.x, rect.y + height, rect.w, rect.h - height);
             } else {
                 // split vertically
                 // +--+---+
                 // |__|   | <-- b1
                 // +--|---+ <-- b2
-                if (rect.w > width) free.emplace_back({ rect.x + width, rect.y, rect.w - width, rect.h });
-                if (rect.h > height) free.emplace_back({ rect.x, rect.y + height, width, rect.h - height });
+                if (rect.w > width) free.emplace_back(rect.x + width, rect.y, rect.w - width, rect.h);
+                if (rect.h > height) free.emplace_back(rect.x, rect.y + height, width, rect.h - height);
             }
 
             return { rect.x, rect.y, width, height };
