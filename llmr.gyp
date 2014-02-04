@@ -84,19 +84,6 @@
             '<@(png_cflags)'
         ]
       },
-      'conditions': [
-        ['OS == "mac"', {
-          'xcode_settings': {
-            'OTHER_LDFLAGS': [
-                '<@(png_libraries)'
-            ]
-          }
-        }, {
-          'libraries': [
-            '<@(png_libraries)'
-          ]
-        }]
-      ],
       'direct_dependent_settings': {
           'include_dirs':[
               './include'
