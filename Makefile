@@ -31,6 +31,12 @@ iapp: config.gypi src ios/llmr-app.gyp
 	xcodebuild -project ./ios/llmr-app.xcodeproj
 	# launch app with ios-sim? 
 
+isim: config.gypi src ios/llmr-app.gyp
+	deps/run_gyp ios/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
+	xcodebuild -project ./ios/llmr-app.xcodeproj -arch i386 -sdk iphonesimulator
+	# does not work
+	#"/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator" -SimulateApplication ios/build/Release-iphonesimulator/llmr.app/llmr
+
 clean:
 	-rm -rf out
 	-rm -rf build
