@@ -58,9 +58,13 @@ def configure_llmr(o):
 
 def configure_glfw3(o):
   if options.glfw3:
-      o['variables']['glfw3_libraries'] = '-L'+os.path.join(options.glfw3,'lib')
-      o['variables']['glfw3_libraries'] += '-lglfw3'
-      o['variables']['glfw3_cflags'] += '-I'+os.path.join(options.glfw3,'lib')
+      libpath = os.path.join(options.glfw3,'lib')
+      if os.path.exists(libpath):
+          o['variables']['glfw3_libraries'] = '-L'+libpath
+      o['variables']['glfw3_libraries'] += ' -lglfw3'
+      incpath = os.path.join(options.glfw3,'include')
+      if os.path.exists(incpath):
+          o['variables']['glfw3_cflags'] = '-I'+include
   else:
       ret = pkg_config('glfw3')
       if not ret:
@@ -71,9 +75,13 @@ def configure_glfw3(o):
 
 def configure_png(o):
   if options.glfw3:
-      o['variables']['png_libraries'] = '-L'+os.path.join(options.png,'lib')
-      o['variables']['png_libraries'] += '-lpng'
-      o['variables']['png_cflags'] += '-I'+os.path.join(options.png,'lib')
+      libpath = os.path.join(options.glfw3,'lib')
+      if os.path.exists(libpath):
+          o['variables']['png_libraries'] = '-L'+libpath
+      o['variables']['png_libraries'] += ' -lpng -lz'
+      incpath = os.path.join(options.glfw3,'include')
+      if os.path.exists(incpath):
+          o['variables']['png_cflags'] = '-I'+include
   else:
       ret = pkg_config('libpng')
       if not ret:
