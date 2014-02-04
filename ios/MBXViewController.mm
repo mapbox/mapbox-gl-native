@@ -210,7 +210,7 @@ class MBXMapView
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
-        mapView->map.setAngle(self.angle + rotate.rotation);
+        mapView->map.setAngle(self.angle + rotate.rotation, [rotate locationInView:rotate.view].x, [rotate locationInView:rotate.view].y);
     }
 }
 

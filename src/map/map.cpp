@@ -93,10 +93,24 @@ void Map::setScale(double scale) {
     settings.save();
 }
 
-void Map::setAngle(double angle) {
+void Map::setAngle(double angle, double x, double y) {
+    double dx, dy;
+
+    if (x >= 0 && y >= 0) {
+        dx = (transform.width  / 2) - x;
+        dy = (transform.height / 2) - y;
+        transform.moveBy(dx, dy);
+    }
+
     transform.setAngle(angle);
+
+    if (x >= 0 && y >= 0) {
+        transform.moveBy(-dx, -dy);
+    }
+
     update();
 
+    transform.getLonLat(settings.longitude, settings.latitude);
     settings.angle = transform.getAngle();
     settings.save();
 }
