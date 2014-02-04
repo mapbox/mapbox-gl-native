@@ -5,7 +5,6 @@
       'CLANG_CXX_LIBRARY': 'libc++',
       'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
       'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
-      'ONLY_ACTIVE_ARCH': 1
     },
     'cflags':['-std=c++11'],
     'configurations': {
