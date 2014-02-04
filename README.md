@@ -31,24 +31,13 @@ Or generate a dual iOS/OS X-compatible Xcode project for `libllmr` to include as
 
 ## iOS
 
-For iOS you'll likely need `armv7` and `armv7s` libs for targeting devices and `i386` libs for the simulator. The best way to handle this is to build for all those architectures and then combine the libs into a single universal lib. We'll do this with the scripts from [mapnik-packaging](https://github.com/mapnik/mapnik-packaging.git)
+Because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version yourself. Run `./ios/setup_libpng.sh`, which is derived from Mapnik's cross-architecture build scripts. 
 
-From within the `llmr-native` directory:
+Then you can build the iOS app with make: 
 
-    git clone --depth=0 https://github.com/mapnik/mapnik-packaging.git
-    cd mapnik-packaging/osx/
-    export CXX11=true
-    (source iPhoneSimulator.sh; ./scripts/build_png.sh; \
-      source MacOSX.sh; ./scripts/build_png.sh; \
-      source iPhoneOS.sh; ./scripts/build_png.sh; \
-      source iPhoneOSs.sh;  ./scripts/build_png.sh; \
-      ./scripts/make_universal.sh)
-    export UNIVERSAL_LIBS=`pwd`/out/build-cpp11-libcpp-universal/
-    export PNG_INCLUDES=`pwd`/out/build-cpp11-libcpp-i386/
-    cd ../../
-    ./configure --png-libpath=${UNIVERSAL_LIBS} --png-includes=${PNG_INCLUDES}
+    make iapp
 
-
+Consider `sudo npm install -g ios-sim` for auto-launching the simulator, but it can be tricky and it's better to run on an ARM-based device anyway. To do this, open `./ios/llmr-app.xcodeproj` in Xcode, then build and run on the simulator or a device yourself. 
 
 ## Ubuntu
 
@@ -117,7 +106,17 @@ bin/convert-style.js > resources/style.pbf && bin/build-style.js
 
 # Usage
 
+## Desktop
+
 - Press 'R' to reset the transform
 - Press 'N' to reset north
 - Press Tab to toggle debug information
 - Press Esc to quit
+
+## Mobile
+
+- Pan to move
+- Pinch to zoom
+- Double-tap to zoom in one level
+- Two-finger single-tap to zoom out one level
+- Long-press to reset north

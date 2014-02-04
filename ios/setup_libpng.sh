@@ -1,6 +1,5 @@
 #!/bin/sh
 
-cd ../
 if [ ! -d 'mapnik-packaging' ]; then
   git clone --depth=0 https://github.com/mapnik/mapnik-packaging.git
 fi
