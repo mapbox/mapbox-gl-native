@@ -74,12 +74,12 @@ def configure_glfw3(o):
       o['variables']['glfw3_cflags'] = ret[1].split()
 
 def configure_png(o):
-  if options.glfw3:
-      libpath = os.path.join(options.glfw3,'lib')
+  if options.png:
+      libpath = os.path.join(options.png,'lib')
       if os.path.exists(libpath):
           o['variables']['png_libraries'] = '-L'+libpath
       o['variables']['png_libraries'] += ' -lpng -lz'
-      incpath = os.path.join(options.glfw3,'include')
+      incpath = os.path.join(options.png,'include')
       if os.path.exists(incpath):
           o['variables']['png_cflags'] = '-I'+include
   else:
