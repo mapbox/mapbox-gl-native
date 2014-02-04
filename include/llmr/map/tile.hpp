@@ -1,31 +1,26 @@
 #ifndef LLMR_MAP_TILE
 #define LLMR_MAP_TILE
 
-#include "../geometry/debug_font_buffer.hpp"
-#include "../geometry/fill_buffer.hpp"
-#include "../geometry/line_buffer.hpp"
-
-#include "layer.hpp"
-
-#include <stdint.h>
-#include <forward_list>
-#include <mutex>
 #include <llmr/util/vec.hpp>
+
+#include <cstdint>
+#include <forward_list>
 #include <string>
+#include <vector>
 #include <map>
 #include <memory>
 
 namespace llmr {
 
-struct pbf;
 class Style;
 class Bucket;
 class LayerDescription;
 class BucketDescription;
 class VectorTile;
 class VectorTileLayer;
-
-
+class DebugFontBuffer;
+class FillBuffer;
+class LineBuffer;
 
 class Tile : public std::enable_shared_from_this<Tile> {
 public:
@@ -83,13 +78,10 @@ public:
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above
     std::map<std::string, std::shared_ptr<Bucket>> buckets;
-    // std::forward_list<Layer> layers;
 
 private:
     // Source data
     std::string data;
-
-    // std::mutex mtx;
 
     const Style& style;
 };

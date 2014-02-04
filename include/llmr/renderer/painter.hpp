@@ -1,22 +1,24 @@
 #ifndef LLMR_RENDERER_PAINTER
 #define LLMR_RENDERER_PAINTER
 
-#include "shader-fill.hpp"
-#include "shader-plain.hpp"
-#include "shader-outline.hpp"
-#include "shader-line.hpp"
-#include "shader-pattern.hpp"
-
-#include "../map/tile.hpp"
-#include "../geometry/vertex_buffer.hpp"
-#include "../util/mat4.hpp"
+#include <llmr/map/tile.hpp>
+#include <llmr/geometry/vertex_buffer.hpp>
+#include <llmr/util/mat4.hpp>
 
 namespace llmr {
 
-class Settings;
 class Transform;
+class Settings;
 class Style;
-class LayerDescription;
+class Tile;
+// class LayerDescription;
+
+class Shader;
+class PlainShader;
+class OutlineShader;
+class FillShader;
+class LineShader;
+class PatternShader;
 
 class FillBucket;
 class LineBucket;

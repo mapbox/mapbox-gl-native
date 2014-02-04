@@ -1,21 +1,16 @@
 #include <llmr/map/tile.hpp>
 
-#include <stdint.h>
-#include <cassert>
-// #include <iostream>
-#include <thread>
-
-#include <llmr/util/pbf.hpp>
-#include <llmr/util/string.hpp>
-#include <llmr/geometry/geometry.hpp>
+#include <llmr/style/style.hpp>
+#include <llmr/map/vector_tile.hpp>
+#include <llmr/geometry/debug_font_buffer.hpp>
+#include <llmr/geometry/fill_buffer.hpp>
+#include <llmr/geometry/line_buffer.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
-#include <llmr/style/style.hpp>
 #include <llmr/platform/platform.hpp>
+#include <llmr/util/pbf.hpp>
 #include <llmr/util/string.hpp>
-#include <llmr/map/vector_tile.hpp>
 
-#include <cmath>
 
 using namespace llmr;
 

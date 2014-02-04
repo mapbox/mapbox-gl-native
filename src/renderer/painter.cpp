@@ -1,21 +1,21 @@
-#include <llmr/renderer/painter.hpp>
-#include <iostream>
-#include <assert.h>
-#include <llmr/util/mat4.hpp>
-#include <llmr/platform/platform.hpp>
-#include <llmr/map/transform.hpp>
-#include <llmr/map/tile.hpp>
-#include <llmr/platform/gl.hpp>
-#include <llmr/map/settings.hpp>
+#include <cassert>
+#include <algorithm>
 
+#include <llmr/renderer/painter.hpp>
+
+#include <llmr/renderer/shader-plain.hpp>
+#include <llmr/renderer/shader-fill.hpp>
+#include <llmr/renderer/shader-outline.hpp>
+#include <llmr/renderer/shader-pattern.hpp>
+#include <llmr/renderer/shader-line.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
+#include <llmr/map/transform.hpp>
+#include <llmr/map/settings.hpp>
+#include <llmr/geometry/debug_font_buffer.hpp>
+#include <llmr/platform/gl.hpp>
 #include <llmr/style/style.hpp>
-
-#include <cmath>
-#include <array>
-#include <numeric>
-#include <algorithm>
+#include <llmr/style/sprite.hpp>
 
 using namespace llmr;
 

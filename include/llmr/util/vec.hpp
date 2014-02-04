@@ -1,8 +1,9 @@
-#ifndef llmr_util_vec2_
-#define llmr_util_vec2_
+#ifndef LLMR_UTIL_VEC
+#define LLMR_UTIL_VEC
 
 #include <limits>
 #include <type_traits>
+#include <cmath>
 
 namespace llmr {
 

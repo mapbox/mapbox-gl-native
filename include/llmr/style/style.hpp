@@ -1,19 +1,20 @@
 #ifndef LLMR_STYLE_STYLE
 #define LLMR_STYLE_STYLE
 
+#include <cstdint>
+
+#include <llmr/util/pbf.hpp>
+#include <llmr/style/bucket_description.hpp>
+#include <llmr/style/layer_description.hpp>
+#include <llmr/style/class_description.hpp>
+
 #include <map>
 #include <vector>
 #include <set>
-#include "../util/pbf.hpp"
-
-#include "value.hpp"
-#include "properties.hpp"
-#include "bucket_description.hpp"
-#include "layer_description.hpp"
-#include "class_description.hpp"
-#include "sprite.hpp"
 
 namespace llmr {
+
+class Sprite;
 
 class Style {
 public:

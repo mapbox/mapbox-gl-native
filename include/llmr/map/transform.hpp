@@ -1,13 +1,10 @@
 #ifndef LLMR_MAP_TRANSFORM
 #define LLMR_MAP_TRANSFORM
 
-
 #include <llmr/util/vec.hpp>
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/animation.hpp>
 
-#include <cmath>
-#include <cstdint>
 #include <forward_list>
 
 namespace llmr {

@@ -1,18 +1,17 @@
 #ifndef LLMR_MAP_MAP
 #define LLMR_MAP_MAP
 
-#include "../platform/platform.hpp"
-#include "../renderer/painter.hpp"
-#include "transform.hpp"
 #include <llmr/map/tile.hpp>
-#include "settings.hpp"
-#include "../style/style.hpp"
+#include <llmr/map/transform.hpp>
+#include <llmr/style/style.hpp>
+#include <llmr/renderer/painter.hpp>
 
-#include <forward_list>
+#include <cstdint>
+#include <string>
 
 namespace llmr {
 
-class Sprite;
+class Settings;
 
 class Map {
 public:
@@ -37,8 +36,8 @@ public:
     void moveBy(double dx, double dy);
     void scaleBy(double ds, double cx, double cy);
     void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey);
-    void tileLoaded(Tile::Ptr tile);
-    void tileFailed(Tile::Ptr tile);
+    void tileLoaded(std::shared_ptr<Tile> tile);
+    void tileFailed(std::shared_ptr<Tile> tile);
 
     /* position */
     void resetNorth();
@@ -54,8 +53,8 @@ private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
     bool findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain);
     void updateTiles();
-    Tile::Ptr addTile(const Tile::ID& id);
-    Tile::Ptr hasTile(const Tile::ID& id);
+    std::shared_ptr<Tile> addTile(const Tile::ID& id);
+    std::shared_ptr<Tile> hasTile(const Tile::ID& id);
 
 
     void update();
@@ -69,8 +68,8 @@ private:
     int32_t min_zoom;
     int32_t max_zoom;
 
-    std::forward_list<Tile::Ptr> tiles;
-    std::forward_list<Tile::Ptr> historic_tiles;
+    std::forward_list<std::shared_ptr<Tile>> tiles;
+    std::forward_list<std::shared_ptr<Tile>> historic_tiles;
 };
 
 }
