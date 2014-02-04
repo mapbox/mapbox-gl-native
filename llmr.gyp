@@ -79,11 +79,12 @@
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
-        'SUPPORTED_PLATFORMS':'iphonesimulator iphoneos',
+        'SUPPORTED_PLATFORMS':['iphonesimulator','iphoneos'],
         'TARGETED_DEVICE_FAMILY': '1,2',
         'CODE_SIGN_IDENTITY': 'iPhone Developer',
         'IPHONEOS_DEPLOYMENT_TARGET': '5.0',
-        'PUBLIC_HEADERS_FOLDER_PATH': 'include'
+        'PUBLIC_HEADERS_FOLDER_PATH': 'include',
+        'GCC_INPUT_FILETYPE':'sourcecode.cpp.cpp'
       },
       'include_dirs':[
           './include'
