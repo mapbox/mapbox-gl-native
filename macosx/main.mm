@@ -233,17 +233,13 @@ void request_http(std::string url, std::function<void(Response&)> func) {
      completionHandler: ^ (NSURLResponse* response, NSData* data, NSError* error) {
         if (error == nil) {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-            dispatch_async(dispatch_get_main_queue(), ^ {
-                Response res;
-                res.code = [httpResponse statusCode];
-                res.body = { (const char *)[data bytes], [data length] };
-                func(res);
-            });
+            Response res;
+            res.code = [httpResponse statusCode];
+            res.body = { (const char *)[data bytes], [data length] };
+            func(res);
         } else {
-            dispatch_async(dispatch_get_main_queue(), ^ {
-                Response res;
-                func(res);
-            });
+            Response res;
+            func(res);
         }
     }];
 }
@@ -266,9 +262,7 @@ void request_http(std::string url, std::function<void(Response&)> func, std::fun
         }
 
         func(res);
-        dispatch_async(dispatch_get_main_queue(), ^ {
-            cb();
-        });
+        cb();
     }];
 }
 
