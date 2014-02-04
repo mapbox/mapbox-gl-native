@@ -33,9 +33,6 @@
           'OTHER_CPLUSPLUSFLAGS':[
             '<@(glfw3_cflags)'
           ],
-          'OTHER_CFLAGS':[
-            '<@(glfw3_cflags)'
-          ],
           'OTHER_LDFLAGS': [
             '-stdlib=libc++',
             '<@(glfw3_libraries)',
