@@ -19,15 +19,41 @@
         'PUBLIC_HEADERS_FOLDER_PATH': 'include'
       },
       'include_dirs':[
-          './include',
+          './include'
+      ],
+      'cflags': [
           '<@(png_cflags)'
+      ],
+      'xcode_settings': {
+        'OTHER_CPLUSPLUSFLAGS':[
+            '<@(png_cflags)'
+        ]
+      },
+      'conditions': [
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'OTHER_LDFLAGS': [
+                '<@(png_libraries)'
+            ]
+          }
+        }, {
+          'libraries': [
+            '<@(png_libraries)'
+          ]
+        }]
       ],
       'direct_dependent_settings': {
           'include_dirs':[
-              './include',
+              './include'
+          ],
+          'cflags': [
               '<@(png_cflags)'
           ],
-          # workaround xcode bug
+          'xcode_settings': {
+            'OTHER_CPLUSPLUSFLAGS':[
+                '<@(png_cflags)'
+            ]
+          },
           'conditions': [
             ['OS == "mac"', {
               'xcode_settings': {
@@ -60,15 +86,41 @@
         'PUBLIC_HEADERS_FOLDER_PATH': 'include'
       },
       'include_dirs':[
-          './include',
+          './include'
+      ],
+      'cflags': [
           '<@(png_cflags)'
+      ],
+      'xcode_settings': {
+        'OTHER_CPLUSPLUSFLAGS':[
+            '<@(png_cflags)'
+        ]
+      },
+      'conditions': [
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'OTHER_LDFLAGS': [
+                '<@(png_libraries)'
+            ]
+          }
+        }, {
+          'libraries': [
+            '<@(png_libraries)'
+          ]
+        }]
       ],
       'direct_dependent_settings': {
           'include_dirs':[
-              './include',
+              './include'
+          ],
+          'cflags': [
               '<@(png_cflags)'
           ],
-          # workaround xcode bug
+          'xcode_settings': {
+            'OTHER_CPLUSPLUSFLAGS':[
+                '<@(png_cflags)'
+            ]
+          },
           'conditions': [
             ['OS == "mac"', {
               'xcode_settings': {
