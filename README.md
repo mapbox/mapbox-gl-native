@@ -16,10 +16,24 @@ Then configure the project:
 
     ./configure
 
-Options include:
+See all the options by calling `./configure --help`
 
- - --boost=/usr/local
- - --glfw3=/usr/local (by default pkg-config will be used)
+```sh
+$ ./configure --help
+Usage: configure [options]
+
+Options:
+  -h, --help            show this help message and exit
+  --debug               Also build debug build
+  --boost=BOOST_ROOT    Path to boost (defaults to /usr/local)
+  --glfw3=GLFW3         Path to gflw3 (defaults to using pkg-config)
+  --png=PNG             Path to png (defaults to using pkg-config)
+  --png-includes=PNG_INCLUDES
+                        Path to png includes
+  --png-libpath=PNG_LIBPATH
+                        Path to png libs
+```
+
 
 Then you can build the OS X app with make:
 
