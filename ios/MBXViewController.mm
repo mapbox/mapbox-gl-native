@@ -199,7 +199,9 @@ class MBXMapView
 
         CGFloat newZoom = self.zoom + (pinch.scale > 1 ? (pinch.scale / tolerance) : ((1 - pinch.scale) * -tolerance));
 
-        mapView->map.setScale(powf(2, newZoom));
+        double scale = mapView->map.getScale();
+        double new_scale = powf(2, newZoom);
+        mapView->map.scaleBy(new_scale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
     }
 }
 
