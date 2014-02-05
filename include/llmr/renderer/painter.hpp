@@ -7,7 +7,6 @@
 #include <llmr/util/mat4.hpp>
 
 #include <llmr/renderer/shader-plain.hpp>
-#include <llmr/renderer/shader-fill.hpp>
 #include <llmr/renderer/shader-outline.hpp>
 #include <llmr/renderer/shader-pattern.hpp>
 #include <llmr/renderer/shader-line.hpp>
@@ -58,7 +57,6 @@ private:
     mat4 matrix;
     mat4 exMatrix;
 
-    std::unique_ptr<FillShader> fillShader;
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;
     std::unique_ptr<LineShader> lineShader;
@@ -77,7 +75,8 @@ private:
         4096, 4096
     };
 
-    VertexArrayObject tileStencilArray;
+    VertexArrayObject<PlainShader> coveringPlainArray;
+    VertexArrayObject<PatternShader> coveringPatternArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
     VertexBuffer tileBorderBuffer = {
@@ -88,7 +87,7 @@ private:
         0, 0
     };
 
-    VertexArrayObject tileBorderArray;
+    VertexArrayObject<PlainShader> tileBorderArray;
 
     // Set up the matte buffer we're using to draw the filling background.
     VertexBuffer matteBuffer = {
@@ -103,7 +102,7 @@ private:
         16384, 16384
     };
 
-    VertexArrayObject matteArray;
+    VertexArrayObject<PlainShader> matteArray;
 };
 
 }

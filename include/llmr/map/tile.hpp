@@ -22,6 +22,7 @@ class VectorTile;
 class VectorTileLayer;
 class FillBuffer;
 class LineBuffer;
+class PlainShader;
 
 class Tile : public std::enable_shared_from_this<Tile> {
 public:
@@ -73,7 +74,7 @@ public:
 
     // Holds the actual geometries in this tile.
     DebugFontBuffer debugFontBuffer;
-    VertexArrayObject debugFontArray;
+    VertexArrayObject<PlainShader> debugFontArray;
 
     std::shared_ptr<FillBuffer> fillBuffer;
     std::shared_ptr<LineBuffer> lineBuffer;

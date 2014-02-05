@@ -31,7 +31,7 @@ LineShader::LineShader()
     u_gamma = glGetUniformLocation(program, "u_gamma");
 }
 
-void LineShader::bind_vertex(char *offset) {
+void LineShader::bind(char *offset) {
     glEnableVertexAttribArray(a_pos);
     glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 8, offset);
 

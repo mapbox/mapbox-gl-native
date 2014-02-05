@@ -103,3 +103,24 @@ uint32_t FillBucket::size() const {
     return length;
 }
 
+
+
+void FillBucket::drawElements(PlainShader& shader) {
+    char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(int16_t));
+    char *elements_index = BUFFER_OFFSET(elements_start * 3 * sizeof(int16_t));
+    for (group& group : groups) {
+        group.array.bind(shader, *buffer, vertex_index);
+        glDrawElements(GL_TRIANGLES, group.elements_length * 3 - 3, GL_UNSIGNED_SHORT, elements_index);
+        vertex_index += group.vertex_length * 2 * sizeof(uint16_t);
+        elements_index += group.elements_length * 3 * sizeof(uint16_t);
+    }
+}
+
+void FillBucket::drawVertices(OutlineShader& shader) {
+    // Draw the entire line
+    char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(int16_t));
+    array.bind(shader, *buffer, vertex_index);
+    glDrawArrays(GL_LINE_STRIP, 0, length);
+}
+
+

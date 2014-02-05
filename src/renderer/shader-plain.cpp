@@ -22,7 +22,7 @@ PlainShader::PlainShader()
     u_color = glGetUniformLocation(program, "u_color");
 }
 
-void PlainShader::bind_vertex(char *offset) {
+void PlainShader::bind(char *offset) {
     glEnableVertexAttribArray(a_pos);
     glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
 }

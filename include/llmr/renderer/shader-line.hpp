@@ -9,7 +9,7 @@ class LineShader : public Shader {
 public:
     LineShader();
 
-    void bind_vertex(char *offset);
+    void bind(char *offset);
 
     int32_t a_pos;
     int32_t a_extrude;

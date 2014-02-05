@@ -23,7 +23,7 @@ OutlineShader::OutlineShader()
     u_world = glGetUniformLocation(program, "u_world");
 }
 
-void OutlineShader::bind_vertex(char *offset) {
+void OutlineShader::bind(char *offset) {
     glEnableVertexAttribArray(a_pos);
     glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
 }

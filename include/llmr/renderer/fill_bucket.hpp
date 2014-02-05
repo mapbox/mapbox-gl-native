@@ -18,6 +18,8 @@ namespace llmr {
 class Style;
 class FillBuffer;
 class BucketDescription;
+class OutlineShader;
+class PlainShader;
 struct Coordinate;
 struct pbf;
 
@@ -31,8 +33,8 @@ public:
     void addGeometry(const std::vector<Coordinate>& line);
     uint32_t size() const;
 
-    template <typename Shader> void drawElements(Shader& shader);
-    template <typename Shader> void drawVertices(Shader& shader);
+    void drawElements(PlainShader& shader);
+    void drawVertices(OutlineShader& shader);
 
 public:
     const BucketGeometryDescription geom_desc;
@@ -41,7 +43,7 @@ private:
     std::shared_ptr<FillBuffer> buffer;
 
     struct group {
-        VertexArrayObject array;
+        VertexArrayObject<PlainShader> array;
         uint32_t vertex_length;
         uint32_t elements_length;
 
@@ -56,31 +58,9 @@ private:
     uint32_t vertex_start;
     uint32_t elements_start;
     uint32_t length;
-    VertexArrayObject array;
+    VertexArrayObject<OutlineShader> array;
     std::vector<group> groups;
 };
-
-
-template <typename Shader>
-void FillBucket::drawElements(Shader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(int16_t));
-    char *elements_index = BUFFER_OFFSET(elements_start * 3 * sizeof(int16_t));
-    for (group& group : groups) {
-        group.array.bind(shader, *buffer, vertex_index);
-        glDrawElements(GL_TRIANGLES, group.elements_length * 3 - 3, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group.vertex_length * 2 * sizeof(uint16_t);
-        elements_index += group.elements_length * 3 * sizeof(uint16_t);
-    }
-}
-
-template <typename Shader>
-void FillBucket::drawVertices(Shader& shader) {
-    // Draw the entire line
-    char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(int16_t));
-    array.bind(shader, *buffer, vertex_index);
-    glDrawArrays(GL_LINE_STRIP, 0, length);
-}
-
 
 }
 

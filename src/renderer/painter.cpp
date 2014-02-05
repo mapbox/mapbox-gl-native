@@ -29,7 +29,6 @@ Painter::Painter(Transform& transform, Settings& settings, Style& style)
 void Painter::setup() {
     setupShaders();
 
-    assert(fillShader);
     assert(plainShader);
     assert(outlineShader);
     assert(lineShader);
@@ -44,7 +43,6 @@ void Painter::setup() {
 }
 
 void Painter::setupShaders() {
-    fillShader = std::make_unique<FillShader>();
     plainShader = std::make_unique<PlainShader>();
     outlineShader = std::make_unique<OutlineShader>();
     lineShader = std::make_unique<LineShader>();
@@ -94,7 +92,7 @@ void Painter::drawClippingMask() {
     glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
 
 
-    tileStencilArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 
     // Draw the clipping mask
     glUniform4f(plainShader->u_color, 1.0f, 0.0f, 1.0f, 1.0f);
@@ -195,11 +193,11 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         glColorMask(false, false, false, false);
 
         // Draw the actual triangle fan into the stencil buffer.
-        glUseProgram(fillShader->program);
-        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix.data());
+        glUseProgram(plainShader->program);
+        glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
 
         // Draw all groups
-        bucket.drawElements(*fillShader);
+        bucket.drawElements(*plainShader);
 
         // Now that we have the stencil mask in the stencil buffer, we can start
         // writing to the color buffer.
@@ -243,42 +241,40 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     glStencilFunc(GL_NOTEQUAL, 0x0, 0x3F);
 
     if (properties.image.size() && style.sprite) {
-        // TODO:
-        // // Draw texture fill
-        // ImagePosition imagePos = style.sprite->getPosition(properties.image, true);
+        // Draw texture fill
+        ImagePosition imagePos = style.sprite->getPosition(properties.image, true);
 
-        // double factor = 8.0 / pow(2, transform.getIntegerZoom() - id.z);
-        // double mix = fmod(transform.getZoom(), 1.0);
-        // vec2<double> imageSize { imagePos.size.x * factor, imagePos.size.y * factor };
+        double factor = 8.0 / pow(2, transform.getIntegerZoom() - id.z);
+        double mix = fmod(transform.getZoom(), 1.0);
+        vec2<double> imageSize { imagePos.size.x * factor, imagePos.size.y * factor };
 
-        // vec2<double> offset {
-        //     fmod(id.x * 4096, imageSize.x),
-        //     fmod(id.y * 4096, imageSize.y)
-        // };
+        vec2<double> offset {
+            fmod(id.x * 4096, imageSize.x),
+            fmod(id.y * 4096, imageSize.y)
+        };
 
-        // switchShader(patternShader);
-        // glUniformMatrix4fv(patternShader->u_matrix, 1, GL_FALSE, matrix.data());
-        // glUniform2f(patternShader->u_pattern_size, imageSize.x, imageSize.y);
-        // glUniform2f(patternShader->u_offset, offset.x, offset.y);
-        // glUniform2f(patternShader->u_pattern_tl, imagePos.tl.x, imagePos.tl.y);
-        // glUniform2f(patternShader->u_pattern_br, imagePos.br.x, imagePos.br.y);
-        // glUniform4fv(patternShader->u_color, 1, fill_color.data());
-        // glUniform1f(patternShader->u_mix, mix);
-        // style.sprite->bind(true);
+        glUseProgram(patternShader->program);
+        glUniformMatrix4fv(patternShader->u_matrix, 1, GL_FALSE, matrix.data());
+        glUniform2f(patternShader->u_pattern_size, imageSize.x, imageSize.y);
+        glUniform2f(patternShader->u_offset, offset.x, offset.y);
+        glUniform2f(patternShader->u_pattern_tl, imagePos.tl.x, imagePos.tl.y);
+        glUniform2f(patternShader->u_pattern_br, imagePos.br.x, imagePos.br.y);
+        glUniform4fv(patternShader->u_color, 1, fill_color.data());
+        glUniform1f(patternShader->u_mix, mix);
+        style.sprite->bind(true);
 
-        // // Draw a rectangle that covers the entire viewport.
-        // tileStencilBuffer.bind();
-        // glVertexAttribPointer(patternShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
-        // glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
+        // Draw a rectangle that covers the entire viewport.
+        coveringPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0));
+        glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
 
     } else {
         // Draw filling rectangle.
-        glUseProgram(fillShader->program);
-        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix.data());
-        glUniform4fv(fillShader->u_color, 1, fill_color.data());
+        glUseProgram(plainShader->program);
+        glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
+        glUniform4fv(plainShader->u_color, 1, fill_color.data());
 
         // Draw a rectangle that covers the entire viewport.
-        tileStencilArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
+        coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
     }
 
@@ -407,7 +403,7 @@ void Painter::renderBackground() {
     glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
 
     // Draw the clipping mask
-    tileStencilArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glUniform4fv(plainShader->u_color, 1, white.data());
     glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
 }

@@ -7,28 +7,26 @@
 
 namespace llmr {
 
+template <typename Shader>
 class VertexArrayObject {
 public:
-    template <typename Shader, typename VertexBuffer>
-    void bind(Shader& shader, VertexBuffer& vertex_buffer, char *vertex_offset) {
+    template <typename Buffer>
+    void bind(Shader& shader, Buffer& buffer, char *offset) {
         if (!vao) {
             glGenVertexArrays(1, &vao);
             glBindVertexArray(vao);
 
-            vertex_buffer.bind();
-            shader.bind_vertex(vertex_offset);
+            buffer.bind();
+            shader.bind(offset);
 
-            program = shader.program;
-            buffer = &vertex_buffer;
-            offset = vertex_offset;
-        } else if (program != shader.program) {
-            throw std::runtime_error("trying to bind VAO to different program");
-        } else if (buffer != &vertex_buffer) {
+            buffer_ptr = &buffer;
+            offset_ptr = offset;
+        } else if (buffer_ptr != &buffer) {
             throw std::runtime_error("trying to bind VAO to another buffer");
-        } else if (offset != vertex_offset) {
+        } else if (offset_ptr != offset) {
             throw std::runtime_error("trying to bind VAO to another offset");
         } else {
-            // This is the correct program for this VAO.
+            // We have been given the correct information.
             glBindVertexArray(vao);
         }
     }
@@ -44,9 +42,8 @@ private:
 
     // For debug reasons, we're storing the bind information so that we can
     // detect errors and report
-    GLuint program = 0;
-    void *buffer = NULL;
-    char *offset = 0;
+    void *buffer_ptr = NULL;
+    char *offset_ptr = 0;
 };
 
 }

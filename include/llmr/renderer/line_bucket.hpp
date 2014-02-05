@@ -37,7 +37,7 @@ private:
     std::shared_ptr<LineBuffer> buffer;
     uint32_t start;
     uint32_t length;
-    VertexArrayObject array;
+    VertexArrayObject<LineShader> array;
 };
 
 }
