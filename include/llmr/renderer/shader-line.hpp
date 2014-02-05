@@ -9,6 +9,8 @@ class LineShader : public Shader {
 public:
     LineShader();
 
+    void bind(char *offset);
+
     int32_t a_pos;
     int32_t a_extrude;
     int32_t a_linesofar;

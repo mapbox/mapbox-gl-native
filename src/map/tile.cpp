@@ -2,7 +2,6 @@
 
 #include <llmr/style/style.hpp>
 #include <llmr/map/vector_tile.hpp>
-#include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/geometry/fill_buffer.hpp>
 #include <llmr/geometry/line_buffer.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
@@ -43,7 +42,6 @@ std::forward_list<Tile::ID> Tile::children(const ID& id, int32_t z) {
 Tile::Tile(ID id, const Style& style)
     : id(id),
       state(initial),
-      debugFontBuffer(std::make_shared<DebugFontBuffer>()),
       fillBuffer(std::make_shared<FillBuffer>()),
       lineBuffer(std::make_shared<LineBuffer>()),
       style(style) {
@@ -51,7 +49,7 @@ Tile::Tile(ID id, const Style& style)
     // Initialize tile debug coordinates
     char coord[32];
     snprintf(coord, sizeof(coord), "%d/%d/%d", id.z, id.x, id.y);
-    debugFontBuffer->addText(coord, 50, 200, 5);
+    debugFontBuffer.addText(coord, 50, 200, 5);
 }
 
 Tile::~Tile() {

@@ -3,15 +3,23 @@
 
 #include "bucket.hpp"
 #include <llmr/style/bucket_description.hpp>
+#include <llmr/geometry/vao.hpp>
+#include <llmr/geometry/fill_buffer.hpp>
 
 #include <vector>
 #include <memory>
+
+#ifndef BUFFER_OFFSET
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+#endif
 
 namespace llmr {
 
 class Style;
 class FillBuffer;
 class BucketDescription;
+class OutlineShader;
+class PlainShader;
 struct Coordinate;
 struct pbf;
 
@@ -24,8 +32,9 @@ public:
     void addGeometry(pbf& data);
     void addGeometry(const std::vector<Coordinate>& line);
     uint32_t size() const;
-    void drawElements(int32_t attrib);
-    void drawVertices(int32_t attrib);
+
+    void drawElements(PlainShader& shader);
+    void drawVertices(OutlineShader& shader);
 
 public:
     const BucketGeometryDescription geom_desc;
@@ -34,6 +43,7 @@ private:
     std::shared_ptr<FillBuffer> buffer;
 
     struct group {
+        VertexArrayObject<PlainShader> array;
         uint32_t vertex_length;
         uint32_t elements_length;
 
@@ -48,6 +58,7 @@ private:
     uint32_t vertex_start;
     uint32_t elements_start;
     uint32_t length;
+    VertexArrayObject<OutlineShader> array;
     std::vector<group> groups;
 };
 

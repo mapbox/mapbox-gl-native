@@ -2,6 +2,8 @@
 #include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 
+#include <cstdio>
+
 using namespace llmr;
 
 PlainShader::PlainShader()
@@ -15,8 +17,12 @@ PlainShader::PlainShader()
     }
 
     a_pos = glGetAttribLocation(program, "a_pos");
-    attributes.emplace_front(a_pos);
 
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_color = glGetUniformLocation(program, "u_color");
+}
+
+void PlainShader::bind(char *offset) {
+    glEnableVertexAttribArray(a_pos);
+    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
 }

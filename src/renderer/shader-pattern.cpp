@@ -2,6 +2,8 @@
 #include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 
+#include <cstdio>
+
 using namespace llmr;
 
 PatternShader::PatternShader()
@@ -15,7 +17,6 @@ PatternShader::PatternShader()
     }
 
     a_pos = glGetAttribLocation(program, "a_pos");
-    attributes.emplace_front(a_pos);
 
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_color = glGetUniformLocation(program, "u_color");
@@ -24,4 +25,9 @@ PatternShader::PatternShader()
     u_pattern_tl = glGetUniformLocation(program, "u_pattern_tl");
     u_pattern_br = glGetUniformLocation(program, "u_pattern_br");
     u_mix = glGetUniformLocation(program, "u_mix");
+}
+
+void PatternShader::bind(char *offset) {
+    glEnableVertexAttribArray(a_pos);
+    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
 }

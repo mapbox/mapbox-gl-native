@@ -3,6 +3,7 @@
 
 #include "bucket.hpp"
 #include <llmr/style/bucket_description.hpp>
+#include <llmr/geometry/vao.hpp>
 #include <memory>
 #include <vector>
 
@@ -10,6 +11,7 @@ namespace llmr {
 
 class Style;
 class LineBuffer;
+class LineShader;
 struct Coordinate;
 struct pbf;
 
@@ -21,10 +23,12 @@ public:
 
     void addGeometry(pbf& data);
     void addGeometry(const std::vector<Coordinate>& line);
-    uint32_t size() const;
 
-    void bind();
-    char *vertexOffset() const;
+    size_t size() const;
+
+    void bind(LineShader& shader);
+    void drawLines();
+    void drawPoints();
 
 public:
     const BucketGeometryDescription geometry;
@@ -33,6 +37,7 @@ private:
     std::shared_ptr<LineBuffer> buffer;
     uint32_t start;
     uint32_t length;
+    VertexArrayObject<LineShader> array;
 };
 
 }

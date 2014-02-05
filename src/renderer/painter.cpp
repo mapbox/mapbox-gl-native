@@ -1,15 +1,13 @@
 #include <cassert>
 #include <algorithm>
 
-#include <llmr/renderer/painter.hpp>
 
-#include <llmr/renderer/shader-plain.hpp>
-#include <llmr/renderer/shader-fill.hpp>
-#include <llmr/renderer/shader-outline.hpp>
-#include <llmr/renderer/shader-pattern.hpp>
-#include <llmr/renderer/shader-line.hpp>
+#include <llmr/renderer/painter.hpp>
+#include <llmr/util/std.hpp>
+
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
+
 #include <llmr/map/transform.hpp>
 #include <llmr/map/settings.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
@@ -24,15 +22,13 @@ using namespace llmr;
 Painter::Painter(Transform& transform, Settings& settings, Style& style)
     : transform(transform),
       settings(settings),
-      style(style),
-      currentShader(NULL) {
+      style(style) {
 }
 
 
 void Painter::setup() {
     setupShaders();
 
-    assert(fillShader);
     assert(plainShader);
     assert(outlineShader);
     assert(lineShader);
@@ -47,11 +43,10 @@ void Painter::setup() {
 }
 
 void Painter::setupShaders() {
-    fillShader = std::make_shared<FillShader>();
-    plainShader = std::make_shared<PlainShader>();
-    outlineShader = std::make_shared<OutlineShader>();
-    lineShader = std::make_shared<LineShader>();
-    patternShader = std::make_shared<PatternShader>();
+    plainShader = std::make_unique<PlainShader>();
+    outlineShader = std::make_unique<OutlineShader>();
+    lineShader = std::make_unique<LineShader>();
+    patternShader = std::make_unique<PatternShader>();
 }
 
 void Painter::changeMatrix(const Tile::ID& id) {
@@ -76,7 +71,7 @@ void Painter::changeMatrix(const Tile::ID& id) {
 }
 
 void Painter::drawClippingMask() {
-    switchShader(plainShader);
+    glUseProgram(plainShader->program);
     glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
 
     glColorMask(false, false, false, false);
@@ -96,9 +91,10 @@ void Painter::drawClippingMask() {
     glStencilMask(0xC0);
     glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
 
+
+    coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
+
     // Draw the clipping mask
-    tileStencilBuffer.bind();
-    glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 0.0f, 1.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
 
@@ -197,11 +193,11 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         glColorMask(false, false, false, false);
 
         // Draw the actual triangle fan into the stencil buffer.
-        switchShader(fillShader);
-        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix.data());
+        glUseProgram(plainShader->program);
+        glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
 
         // Draw all groups
-        bucket.drawElements(fillShader->a_pos);
+        bucket.drawElements(*plainShader);
 
         // Now that we have the stencil mask in the stencil buffer, we can start
         // writing to the color buffer.
@@ -215,7 +211,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (properties.antialias) {
-        switchShader(outlineShader);
+        glUseProgram(outlineShader->program);
         glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix.data());
         glLineWidth(2);
 
@@ -238,7 +234,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         // Draw the entire line
         glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
         glLineWidth(2.0f);
-        bucket.drawVertices(outlineShader->a_pos);
+        bucket.drawVertices(*outlineShader);
     }
 
     // Only draw regions that we marked
@@ -257,7 +253,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             fmod(id.y * 4096, imageSize.y)
         };
 
-        switchShader(patternShader);
+        glUseProgram(patternShader->program);
         glUniformMatrix4fv(patternShader->u_matrix, 1, GL_FALSE, matrix.data());
         glUniform2f(patternShader->u_pattern_size, imageSize.x, imageSize.y);
         glUniform2f(patternShader->u_offset, offset.x, offset.y);
@@ -268,19 +264,17 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         style.sprite->bind(true);
 
         // Draw a rectangle that covers the entire viewport.
-        tileStencilBuffer.bind();
-        glVertexAttribPointer(patternShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+        coveringPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
 
     } else {
         // Draw filling rectangle.
-        switchShader(fillShader);
-        glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix.data());
-        glUniform4fv(fillShader->u_color, 1, fill_color.data());
+        glUseProgram(plainShader->program);
+        glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
+        glUniform4fv(plainShader->u_color, 1, fill_color.data());
 
         // Draw a rectangle that covers the entire viewport.
-        tileStencilBuffer.bind();
-        glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
+        coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
     }
 
@@ -324,42 +318,37 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         // glUniform1f(painter.linepatternShader.u_fade, painter.transform.z % 1.0);
 
     } else {
-        switchShader(lineShader);
+        glUseProgram(lineShader->program);
         glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix.data());
         glUniformMatrix4fv(lineShader->u_exmatrix, 1, GL_FALSE, exMatrix.data());
         // glUniform2fv(painter.lineShader.u_dasharray, properties.dasharray || [1, -1]);
         glUniform2f(lineShader->u_dasharray, 1, -1);
-    }
 
 
-    // TODO: Move this to transform?
-    const double tilePixelRatio = transform.getScale() / (1 << transform.getIntegerZoom()) / 8;
+        // TODO: Move this to transform?
+        const double tilePixelRatio = transform.getScale() / (1 << transform.getIntegerZoom()) / 8;
 
-    glUniform2f(lineShader->u_linewidth, outset, inset);
-    glUniform1f(lineShader->u_ratio, tilePixelRatio);
-    glUniform1f(lineShader->u_gamma, transform.pixelRatio);
+        glUniform2f(lineShader->u_linewidth, outset, inset);
+        glUniform1f(lineShader->u_ratio, tilePixelRatio);
+        glUniform1f(lineShader->u_gamma, transform.pixelRatio);
 
-    // const Color& color = properties.color;
-    // if (!params.antialiasing) {
-    //     color[3] = Infinity;
-    //     glUniform4fv(lineShader->u_color, color);
-    // } else {
-    glUniform4fv(lineShader->u_color, 1, color.data());
-    // }
+        // const Color& color = properties.color;
+        // if (!params.antialiasing) {
+        //     color[3] = Infinity;
+        //     glUniform4fv(lineShader->u_color, color);
+        // } else {
+        glUniform4fv(lineShader->u_color, 1, color.data());
+        // }
 
 
-    glUniform1f(lineShader->u_point, 0);
+        glUniform1f(lineShader->u_point, 0);
+        bucket.bind(*lineShader);
+        bucket.drawLines();
 
-    bucket.bind();
-    char *vertex_index = bucket.vertexOffset();
-    glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, false, 8, vertex_index);
-    glVertexAttribPointer(lineShader->a_extrude, 2, GL_BYTE, false, 8, vertex_index + 6);
-    glVertexAttribPointer(lineShader->a_linesofar, 1, GL_SHORT, false, 8, vertex_index + 4);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, bucket.size());
-
-    if (bucket.geometry.join == JoinType::Round) {
-        glUniform1f(lineShader->u_point, 1);
-        glDrawArrays(GL_POINTS, 0, bucket.size());
+        if (bucket.geometry.join == JoinType::Round) {
+            glUniform1f(lineShader->u_point, 1);
+            bucket.drawPoints();
+        }
     }
 
     // statistics
@@ -369,27 +358,23 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 void Painter::renderDebug(const Tile::Ptr& tile) {
     // Blend to the front, not the back.
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glUseProgram(plainShader->program);
+    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
 
     // draw tile outline
-    switchShader(plainShader);
-    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
-    tileBorderBuffer.bind();
-    glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
-    glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
+    tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
+    glUniform4f(plainShader->u_color, 1.0f, 0.0f, 0.0f, 1.0f);
     glLineWidth(4.0f);
     glDrawArrays(GL_LINE_STRIP, 0, tileBorderBuffer.length());
 
     // draw debug info
-    switchShader(plainShader);
-    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
-    tile->debugFontBuffer->bind();
-    glVertexAttribPointer(plainShader->a_pos, 2, GL_SHORT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    tile->debugFontArray.bind(*plainShader, tile->debugFontBuffer, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
     glLineWidth(4.0f);
-    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer->length());
+    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.length());
     glUniform4f(plainShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
     glLineWidth(2.0f);
-    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer->length());
+    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.length());
 
     // Revert blending mode to blend to the back.
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
@@ -398,76 +383,27 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
 void Painter::renderMatte() {
     glDisable(GL_STENCIL_TEST);
 
-    switchShader(fillShader);
-    glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, nativeMatrix.data());
+    Color white = {{ 0.9, 0.9, 0.9, 1 }};
 
-    Color white = {{ 1, 1, 1, 1 }};
+    glUseProgram(plainShader->program);
+    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, nativeMatrix.data());
 
     // Draw the clipping mask
-    matteBuffer.bind();
-    glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
-    glUniform4fv(fillShader->u_color, 1, white.data());
+    matteArray.bind(*plainShader, matteBuffer, BUFFER_OFFSET(0));
+    glUniform4fv(plainShader->u_color, 1, white.data());
     glDrawArrays(GL_TRIANGLES, 0, matteBuffer.length());
 
     glEnable(GL_STENCIL_TEST);
 }
 
 void Painter::renderBackground() {
-    switchShader(fillShader);
-    glUniformMatrix4fv(fillShader->u_matrix, 1, GL_FALSE, matrix.data());
-
     Color white = {{ 1, 1, 1, 1 }};
 
+    glUseProgram(plainShader->program);
+    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
+
     // Draw the clipping mask
-    tileStencilBuffer.bind();
-    glVertexAttribPointer(fillShader->a_pos, 2, GL_SHORT, false, 0, BUFFER_OFFSET(0));
-    glUniform4fv(fillShader->u_color, 1, white.data());
+    coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    glUniform4fv(plainShader->u_color, 1, white.data());
     glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
-}
-
-
-// Switches to a different shader program.
-/**
- * @return boolean whether the shader was actually switched
- */
-bool Painter::switchShader(std::shared_ptr<Shader> shader) {
-    if (currentShader != shader) {
-        glUseProgram(shader->program);
-
-        // Disable all attributes from the existing shader that aren't used in
-        // the new shader. Note: attribute indices are *not* program specific!
-        if (currentShader) {
-            const std::forward_list<uint32_t>& hitherto = currentShader->attributes;
-            const std::forward_list<uint32_t>& henceforth = shader->attributes;
-
-            // Find all attribute indices that are used in the old shader,
-            // but unused in the new one.
-            for (uint32_t i : hitherto) {
-                if (std::find(henceforth.begin(), henceforth.end(), i) == henceforth.end()) {
-                    glDisableVertexAttribArray(i);
-                }
-            }
-
-            // Enable all attributes for the new shader that were not already in
-            // use in the old one.
-            for (uint32_t i : henceforth) {
-                if (std::find(hitherto.begin(), hitherto.end(), i) == hitherto.end()) {
-                    glEnableVertexAttribArray(i);
-                }
-            }
-
-            currentShader = shader;
-        } else {
-            // Enable all attributes for the new shader (== first shader).
-            for (GLuint index : shader->attributes) {
-                glEnableVertexAttribArray(index);
-            }
-        }
-
-        currentShader = shader;
-
-        return true;
-    } else {
-        return false;
-    }
 }

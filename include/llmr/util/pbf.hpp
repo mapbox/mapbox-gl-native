@@ -46,20 +46,24 @@ struct pbf {
     inline void skipValue(uint32_t val);
     inline void skipBytes(uint32_t bytes);
 
-    const uint8_t *data;
-    const uint8_t *end;
-    uint32_t value;
-    uint32_t tag;
+    const uint8_t *data = NULL;
+    const uint8_t *end = NULL;
+    uint32_t value = 0;
+    uint32_t tag = 0;
 };
 
 pbf::pbf(const unsigned char *data, uint32_t length)
     : data(data),
-      end(data + length) {
+      end(data + length),
+      value(0),
+      tag(0) {
 }
 
 pbf::pbf()
     : data(NULL),
-      end(NULL) {
+      end(NULL),
+      value(0),
+      tag(0) {
 }
 
 

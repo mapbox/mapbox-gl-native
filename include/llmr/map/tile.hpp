@@ -2,6 +2,8 @@
 #define LLMR_MAP_TILE
 
 #include <llmr/util/vec.hpp>
+#include <llmr/geometry/debug_font_buffer.hpp>
+#include <llmr/geometry/vao.hpp>
 
 #include <cstdint>
 #include <forward_list>
@@ -18,9 +20,9 @@ class LayerDescription;
 class BucketDescription;
 class VectorTile;
 class VectorTileLayer;
-class DebugFontBuffer;
 class FillBuffer;
 class LineBuffer;
+class PlainShader;
 
 class Tile : public std::enable_shared_from_this<Tile> {
 public:
@@ -71,7 +73,9 @@ public:
     state state;
 
     // Holds the actual geometries in this tile.
-    std::shared_ptr<DebugFontBuffer> debugFontBuffer;
+    DebugFontBuffer debugFontBuffer;
+    VertexArrayObject<PlainShader> debugFontArray;
+
     std::shared_ptr<FillBuffer> fillBuffer;
     std::shared_ptr<LineBuffer> lineBuffer;
 
