@@ -16,7 +16,7 @@
 #include <llmr/llmr.hpp>
 #include <llmr/platform/platform.hpp>
 
-@interface MBXViewController ()
+@interface MBXViewController () <UIGestureRecognizerDelegate>
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) CGPoint center;
@@ -83,6 +83,7 @@ class MBXMapView
     mapView->init();
 
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
+    pan.delegate = self;
     [self.view addGestureRecognizer:pan];
 
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
@@ -105,9 +106,11 @@ class MBXMapView
     [self.view addGestureRecognizer:threeFingerLongPress];
 
     UIPinchGestureRecognizer *pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
+    pinch.delegate = self;
     [self.view addGestureRecognizer:pinch];
 
     UIRotationGestureRecognizer *rotate = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotateGesture:)];
+    rotate.delegate = self;
     [self.view addGestureRecognizer:rotate];
 }
 
@@ -207,6 +210,11 @@ class MBXMapView
     {
         mapView->map.setAngle(self.angle + rotate.rotation, [rotate locationInView:rotate.view].x, [rotate locationInView:rotate.view].y);
     }
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return YES;
 }
 
 CADisplayLink *displayLink;
