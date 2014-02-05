@@ -14,6 +14,9 @@
     #elif TARGET_OS_MAC
         #include <OpenGL/OpenGL.h>
         #include <OpenGL/gl.h>
+        #define glGenVertexArrays glGenVertexArraysAPPLE
+        #define glBindVertexArray glBindVertexArrayAPPLE
+        #define glDeleteVertexArrays glDeleteVertexArraysAPPLE
     #else
         #error Unsupported Apple platform
     #endif
