@@ -187,7 +187,7 @@ class MBXMapView
     }
     else if (pinch.state == UIGestureRecognizerStateChanged)
     {
-        CGFloat tolerance = 3;
+        CGFloat tolerance = 2;
 
         CGFloat newZoom = self.zoom + (pinch.scale > 1 ? (pinch.scale / tolerance) : ((1 - pinch.scale) * -tolerance));
 
