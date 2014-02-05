@@ -37,7 +37,7 @@
           'INFOPLIST_FILE': 'Info.plist',
           'CLANG_CXX_LIBRARY': 'libc++',
           'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
-          'IPHONEOS_DEPLOYMENT_TARGET':'5.0',
+          'IPHONEOS_DEPLOYMENT_TARGET':'6.0',
           'TARGETED_DEVICE_FAMILY': '1,2',
           'CODE_SIGN_IDENTITY': 'iPhone Developer',
           'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
