@@ -270,12 +270,8 @@ size_t LineBucket::size() const {
 }
 
 void LineBucket::bind(LineShader& shader) {
-    if (!array) {
-        char *vertex_index = BUFFER_OFFSET(start * 4 * sizeof(int16_t));
-        array.setup(shader, *buffer, vertex_index);
-    } else {
-        array.bind();
-    }
+    char *vertex_index = BUFFER_OFFSET(start * 4 * sizeof(int16_t));
+    array.bind(shader, *buffer, vertex_index);
 }
 
 void LineBucket::drawLines() {

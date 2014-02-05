@@ -93,11 +93,8 @@ void Painter::drawClippingMask() {
     glStencilMask(0xC0);
     glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
 
-    if (!tileStencilArray) {
-        tileStencilArray.setup(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-    } else {
-        tileStencilArray.bind();
-    }
+
+    tileStencilArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 
     // Draw the clipping mask
     glUniform4f(plainShader->u_color, 1.0f, 0.0f, 1.0f, 1.0f);
@@ -281,11 +278,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         glUniform4fv(fillShader->u_color, 1, fill_color.data());
 
         // Draw a rectangle that covers the entire viewport.
-        if (!tileStencilArray) {
-            tileStencilArray.setup(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-        } else {
-            tileStencilArray.bind();
-        }
+        tileStencilArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
     }
 
@@ -373,21 +366,13 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
     glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
 
     // draw tile outline
-    if (!tileBorderArray) {
-        tileBorderArray.setup(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
-    } else {
-        tileBorderArray.bind();
-    }
+    tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 0.0f, 0.0f, 1.0f);
     glLineWidth(4.0f);
     glDrawArrays(GL_LINE_STRIP, 0, tileBorderBuffer.length());
 
     // draw debug info
-    if (!tile->debugFontArray) {
-        tile->debugFontArray.setup(*plainShader, tile->debugFontBuffer, BUFFER_OFFSET(0));
-    } else {
-        tile->debugFontArray.bind();
-    }
+    tile->debugFontArray.bind(*plainShader, tile->debugFontBuffer, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
     glLineWidth(4.0f);
     glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.length());
@@ -407,13 +392,8 @@ void Painter::renderMatte() {
     glUseProgram(plainShader->program);
     glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, nativeMatrix.data());
 
-    if (!matteArray) {
-        matteArray.setup(*plainShader, matteBuffer, BUFFER_OFFSET(0));
-    } else {
-        matteArray.bind();
-    }
-
     // Draw the clipping mask
+    matteArray.bind(*plainShader, matteBuffer, BUFFER_OFFSET(0));
     glUniform4fv(plainShader->u_color, 1, white.data());
     glDrawArrays(GL_TRIANGLES, 0, matteBuffer.length());
 
@@ -427,11 +407,7 @@ void Painter::renderBackground() {
     glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
 
     // Draw the clipping mask
-    if (!tileStencilArray) {
-        tileStencilArray.setup(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-    } else {
-        tileStencilArray.bind();
-    }
+    tileStencilArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glUniform4fv(plainShader->u_color, 1, white.data());
     glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
 }
