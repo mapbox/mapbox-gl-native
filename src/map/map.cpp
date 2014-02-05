@@ -94,7 +94,7 @@ void Map::setScale(double scale) {
 }
 
 void Map::setAngle(double angle, double x, double y) {
-    double dx, dy;
+    double dx = 0, dy = 0;
 
     if (x >= 0 && y >= 0) {
         dx = (transform.width  / 2) - x;
