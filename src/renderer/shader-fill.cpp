@@ -20,3 +20,8 @@ FillShader::FillShader()
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_color = glGetUniformLocation(program, "u_color");
 }
+
+void FillShader::bind_vertex(char *offset) {
+    glEnableVertexAttribArray(a_pos);
+    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
+}

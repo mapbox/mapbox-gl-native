@@ -20,3 +20,8 @@ PlainShader::PlainShader()
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_color = glGetUniformLocation(program, "u_color");
 }
+
+void PlainShader::bind_vertex(char *offset) {
+    glEnableVertexAttribArray(a_pos);
+    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
+}

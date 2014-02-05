@@ -83,7 +83,7 @@ module.exports = {
                     "type": "fill",
                     "color": "#c8df9f",
                     "antialias": true,
-                    "image": "park"
+                    // "image": "park"
                 },
                 "wood": {
                     "type": "fill",
@@ -96,7 +96,7 @@ module.exports = {
                     "color": "#bae0e9",
                     "stroke": "#73b6e6",
                     "antialias": true,
-                    "image": "water_etsy"
+                    // "image": "water_etsy"
                 },
                 "building": {
                     "type": "fill",

@@ -3,6 +3,7 @@
 #include <llmr/geometry/geometry.hpp>
 
 #include <llmr/renderer/painter.hpp>
+#include <llmr/renderer/shader-line.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/map/vector_tile.hpp>
 
@@ -264,14 +265,23 @@ void LineBucket::render(Painter& painter, const std::string& layer_name, const T
     painter.renderLine(*this, layer_name, id);
 }
 
-uint32_t LineBucket::size() const {
+size_t LineBucket::size() const {
     return length;
 }
 
-void LineBucket::bind() {
-    buffer->bind();
+void LineBucket::bind(LineShader& shader) {
+    if (!array) {
+        char *vertex_index = BUFFER_OFFSET(start * 4 * sizeof(int16_t));
+        array.setup(shader, *buffer, vertex_index);
+    } else {
+        array.bind();
+    }
 }
 
-char *LineBucket::vertexOffset() const {
-    return BUFFER_OFFSET(start * 4 * sizeof(int16_t));
+void LineBucket::drawLines() {
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, length);
+}
+
+void LineBucket::drawPoints() {
+    glDrawArrays(GL_POINTS, 0, length);
 }

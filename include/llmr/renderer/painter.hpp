@@ -2,6 +2,7 @@
 #define LLMR_RENDERER_PAINTER
 
 #include <llmr/map/tile.hpp>
+#include <llmr/geometry/vao.hpp>
 #include <llmr/geometry/vertex_buffer.hpp>
 #include <llmr/util/mat4.hpp>
 
@@ -86,6 +87,8 @@ private:
         4096, 4096
     };
 
+    VertexArrayObject tileStencilArray;
+
     // Set up the tile boundary lines we're using to draw the tile outlines.
     VertexBuffer tileBorderBuffer = {
         0, 0,
@@ -94,6 +97,8 @@ private:
         0, 4096,
         0, 0
     };
+
+    VertexArrayObject tileBorderArray;
 
     // Set up the matte buffer we're using to draw the filling background.
     VertexBuffer matteBuffer = {
@@ -108,6 +113,7 @@ private:
         16384, 16384
     };
 
+    VertexArrayObject matteArray;
 };
 
 }

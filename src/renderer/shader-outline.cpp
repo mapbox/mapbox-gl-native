@@ -21,3 +21,8 @@ OutlineShader::OutlineShader()
     u_color = glGetUniformLocation(program, "u_color");
     u_world = glGetUniformLocation(program, "u_world");
 }
+
+void OutlineShader::bind_vertex(char *offset) {
+    glEnableVertexAttribArray(a_pos);
+    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
+}

@@ -9,7 +9,6 @@ VertexBuffer::VertexBuffer(std::initializer_list<int16_t> init) : array(init) {}
 VertexBuffer::~VertexBuffer() {
     if (buffer != 0) {
         glDeleteBuffers(1, &buffer);
-        buffer = 0;
     }
 }
 
@@ -26,5 +25,4 @@ void VertexBuffer::bind() {
     } else {
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
     }
-
 }

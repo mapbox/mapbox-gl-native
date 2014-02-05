@@ -8,8 +8,6 @@
 
 #include <llmr/platform/gl.hpp>
 
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
 #include <cassert>
 
 struct geometry_too_long_exception : std::exception {};
@@ -95,26 +93,6 @@ void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
     group.vertex_length += vertex_count;
     group.elements_length += elements_count;
 
-}
-
-void FillBucket::drawElements(int32_t attrib) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(int16_t));
-    char *elements_index = BUFFER_OFFSET(elements_start * 3 * sizeof(int16_t));
-    buffer->bind();
-    for (const auto& group : groups) {
-        glVertexAttribPointer(attrib, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
-        glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group.vertex_length * 2 * sizeof(uint16_t);
-        elements_index += group.elements_length * 3 * sizeof(uint16_t);
-    }
-}
-
-void FillBucket::drawVertices(int32_t attrib) {
-    // Draw the entire line
-    char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(int16_t));
-    buffer->bind();
-    glVertexAttribPointer(attrib, 2, GL_SHORT, GL_FALSE, 0, vertex_index);
-    glDrawArrays(GL_LINE_STRIP, 0, length);
 }
 
 void FillBucket::render(Painter& painter, const std::string& layer_name, const Tile::ID& id) {

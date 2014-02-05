@@ -8,6 +8,9 @@
     #if TARGET_OS_IPHONE
         #include <OpenGLES/ES2/gl.h>
         #include <OpenGLES/ES2/glext.h>
+        #define glGenVertexArrays glGenVertexArraysOES
+        #define glBindVertexArray glBindVertexArrayOES
+        #define glDeleteVertexArrays glDeleteVertexArraysOES
     #elif TARGET_IPHONE_SIMULATOR
         #include <OpenGLES/ES2/gl.h>
         #include <OpenGLES/ES2/glext.h>
