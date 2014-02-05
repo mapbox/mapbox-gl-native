@@ -28,12 +28,12 @@
           ],
         },
         'xcode_settings': {
-          'ARCHS': [ "armv7", "armv7s", "arm64" ],
-          'SUPPORTED_PLATFORMS': [ 'iphoneos', 'iphonesimulator' ],
+          'SDKROOT': 'iphoneos',
+          'SUPPORTED_PLATFORMS':['iphonesimulator','iphoneos'],
+          'ARCHS': [ "armv7", "armv7s", "arm64", "i386" ],
           'OTHER_LDFLAGS': [
             '-stdlib=libc++'
           ],
-          'SDKROOT': 'iphoneos',
           'INFOPLIST_FILE': 'Info.plist',
           'CLANG_CXX_LIBRARY': 'libc++',
           'CLANG_CXX_LANGUAGE_STANDARD':'c++11',

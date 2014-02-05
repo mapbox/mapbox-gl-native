@@ -15,20 +15,27 @@ app: config.gypi src macosx/llmr-app.gyp
 	make -C build/macosx-make V=$(V)
 	open build/macosx-make/out/Release/llmr.app
 
+# build just xcode project for libllmr
 xcode: config.gypi llmr.gyp
 	deps/run_gyp llmr.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 
-# build OS X with xcodebuild
-xapp: xcode config.gypi src macosx/llmr-app.gyp
+# build OS X app with xcodebuild
+xapp: config.gypi src macosx/llmr-app.gyp
 	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 	xcodebuild -project ./macosx/llmr-app.xcodeproj
 	open macosx/build/Release/llmr.app
 
 # build iOS app with xcodebuild
-iapp: xcode config.gypi src ios/llmr-app.gyp
+iapp: config.gypi src ios/llmr-app.gyp
 	deps/run_gyp ios/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 	xcodebuild -project ./ios/llmr-app.xcodeproj
 	# launch app with ios-sim? 
+
+isim: config.gypi src ios/llmr-app.gyp
+	deps/run_gyp ios/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
+	xcodebuild -project ./ios/llmr-app.xcodeproj -arch i386 -sdk iphonesimulator
+	# does not work
+	#"/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator" -SimulateApplication ios/build/Release-iphonesimulator/llmr.app/llmr
 
 clean:
 	-rm -rf out

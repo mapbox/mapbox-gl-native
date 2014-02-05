@@ -14,9 +14,12 @@
       ],
       'xcode_settings': {
         'SDKROOT': 'macosx',
-        'SUPPORTED_PLATFORMS':'macosx',
+        'SUPPORTED_PLATFORMS':['macosx'],
         'MACOSX_DEPLOYMENT_TARGET':'10.8',
-        'PUBLIC_HEADERS_FOLDER_PATH': 'include'
+        'PUBLIC_HEADERS_FOLDER_PATH': 'include',
+        'OTHER_CPLUSPLUSFLAGS':[
+            '<@(png_cflags)'
+        ]
       },
       'include_dirs':[
           './include'
@@ -24,11 +27,6 @@
       'cflags': [
           '<@(png_cflags)'
       ],
-      'xcode_settings': {
-        'OTHER_CPLUSPLUSFLAGS':[
-            '<@(png_cflags)'
-        ]
-      },
       'direct_dependent_settings': {
           'include_dirs':[
               './include'
@@ -66,12 +64,16 @@
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
-        'SUPPORTED_PLATFORMS':['iphonesimulator','iphoneos'],
+        'SUPPORTED_PLATFORMS':['iphonesimulator','iphoneos',],
+        'ARCHS': [ "armv7", "armv7s", "arm64", "i386" ],
         'TARGETED_DEVICE_FAMILY': '1,2',
         'CODE_SIGN_IDENTITY': 'iPhone Developer',
         'IPHONEOS_DEPLOYMENT_TARGET': '5.0',
         'PUBLIC_HEADERS_FOLDER_PATH': 'include',
-        'GCC_INPUT_FILETYPE':'sourcecode.cpp.cpp'
+        'GCC_INPUT_FILETYPE':'sourcecode.cpp.cpp',
+        'OTHER_CPLUSPLUSFLAGS':[
+            '<@(png_cflags)'
+        ]
       },
       'include_dirs':[
           './include'
@@ -79,11 +81,6 @@
       'cflags': [
           '<@(png_cflags)'
       ],
-      'xcode_settings': {
-        'OTHER_CPLUSPLUSFLAGS':[
-            '<@(png_cflags)'
-        ]
-      },
       'direct_dependent_settings': {
           'include_dirs':[
               './include'
