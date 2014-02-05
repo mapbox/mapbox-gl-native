@@ -352,9 +352,9 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 
     bucket.bind();
     char *vertex_index = bucket.vertexOffset();
-    glVertexAttribPointer(lineShader->a_pos, 4, GL_SHORT, false, 8, vertex_index);
+    glVertexAttribPointer(lineShader->a_pos, 2, GL_SHORT, false, 8, vertex_index);
     glVertexAttribPointer(lineShader->a_extrude, 2, GL_BYTE, false, 8, vertex_index + 6);
-    glVertexAttribPointer(lineShader->a_linesofar, 2, GL_SHORT, false, 8, vertex_index + 4);
+    glVertexAttribPointer(lineShader->a_linesofar, 1, GL_SHORT, false, 8, vertex_index + 4);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, bucket.size());
 
     if (bucket.geometry.join == JoinType::Round) {
