@@ -14,7 +14,7 @@ brew install homebrew/versions/glfw3
 
 Then configure the project:
 
-    ./configure
+    ./configure --boost=`brew --prefix` --glfw3=`brew --prefix` --png=`brew --prefix`
 
 See all the options by calling `./configure --help`
 
