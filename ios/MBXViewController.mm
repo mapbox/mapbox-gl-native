@@ -150,21 +150,13 @@ class MBXMapView
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
     if (doubleTap.state == UIGestureRecognizerStateEnded)
-    {
-        CGPoint gesturePoint = [doubleTap locationInView:doubleTap.view];
-
-        mapView->map.scaleBy(2, gesturePoint.x, gesturePoint.y);
-    }
+        mapView->map.scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.5);
 }
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
     if (twoFingerTap.state == UIGestureRecognizerStateEnded)
-    {
-        CGPoint gesturePoint = [twoFingerTap locationInView:twoFingerTap.view];
-
-        mapView->map.scaleBy(0.5, gesturePoint.x, gesturePoint.y);
-    }
+        mapView->map.scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
 }
 
 - (void)handleLongPressGesture:(UILongPressGestureRecognizer *)longPress
