@@ -30,7 +30,7 @@
         'xcode_settings': {
           'SDKROOT': 'iphoneos',
           'SUPPORTED_PLATFORMS':['iphonesimulator','iphoneos'],
-          'ARCHS': [ "armv7", "armv7s", "arm64" ],
+          'ARCHS': [ "armv7", "armv7s", "arm64", "i386" ],
           'OTHER_LDFLAGS': [
             '-stdlib=libc++'
           ],

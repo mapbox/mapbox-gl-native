@@ -64,8 +64,8 @@
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
-        'SUPPORTED_PLATFORMS':['iphonesimulator','iphoneos'],
-        'ARCHS': [ "armv7", "armv7s", "arm64" ],
+        'SUPPORTED_PLATFORMS':['iphonesimulator','iphoneos',],
+        'ARCHS': [ "armv7", "armv7s", "arm64", "i386" ],
         'TARGETED_DEVICE_FAMILY': '1,2',
         'CODE_SIGN_IDENTITY': 'iPhone Developer',
         'IPHONEOS_DEPLOYMENT_TARGET': '5.0',
