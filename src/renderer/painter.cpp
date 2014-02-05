@@ -1,16 +1,13 @@
 #include <cassert>
 #include <algorithm>
 
-#include <llmr/util/std.hpp>
-#include <llmr/renderer/painter.hpp>
 
-#include <llmr/renderer/shader-plain.hpp>
-#include <llmr/renderer/shader-fill.hpp>
-#include <llmr/renderer/shader-outline.hpp>
-#include <llmr/renderer/shader-pattern.hpp>
-#include <llmr/renderer/shader-line.hpp>
+#include <llmr/renderer/painter.hpp>
+#include <llmr/util/std.hpp>
+
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
+
 #include <llmr/map/transform.hpp>
 #include <llmr/map/settings.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
@@ -25,8 +22,7 @@ using namespace llmr;
 Painter::Painter(Transform& transform, Settings& settings, Style& style)
     : transform(transform),
       settings(settings),
-      style(style),
-      currentShader(NULL) {
+      style(style) {
 }
 
 
@@ -48,11 +44,11 @@ void Painter::setup() {
 }
 
 void Painter::setupShaders() {
-    fillShader = std::make_shared<FillShader>();
-    plainShader = std::make_shared<PlainShader>();
-    outlineShader = std::make_shared<OutlineShader>();
-    lineShader = std::make_shared<LineShader>();
-    patternShader = std::make_shared<PatternShader>();
+    fillShader = std::make_unique<FillShader>();
+    plainShader = std::make_unique<PlainShader>();
+    outlineShader = std::make_unique<OutlineShader>();
+    lineShader = std::make_unique<LineShader>();
+    patternShader = std::make_unique<PatternShader>();
 }
 
 void Painter::changeMatrix(const Tile::ID& id) {
@@ -438,52 +434,4 @@ void Painter::renderBackground() {
     }
     glUniform4fv(plainShader->u_color, 1, white.data());
     glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
-}
-
-
-// Switches to a different shader program.
-/**
- * @return boolean whether the shader was actually switched
- */
-bool Painter::switchShader(std::shared_ptr<Shader> shader) {
-    assert(false);
-    if (currentShader != shader) {
-        glUseProgram(shader->program);
-
-        // Disable all attributes from the existing shader that aren't used in
-        // the new shader. Note: attribute indices are *not* program specific!
-        if (currentShader) {
-            const std::forward_list<uint32_t>& hitherto = currentShader->attributes;
-            const std::forward_list<uint32_t>& henceforth = shader->attributes;
-
-            // Find all attribute indices that are used in the old shader,
-            // but unused in the new one.
-            for (uint32_t i : hitherto) {
-                if (std::find(henceforth.begin(), henceforth.end(), i) == henceforth.end()) {
-                    glDisableVertexAttribArray(i);
-                }
-            }
-
-            // Enable all attributes for the new shader that were not already in
-            // use in the old one.
-            for (uint32_t i : henceforth) {
-                if (std::find(hitherto.begin(), hitherto.end(), i) == hitherto.end()) {
-                    glEnableVertexAttribArray(i);
-                }
-            }
-
-            currentShader = shader;
-        } else {
-            // Enable all attributes for the new shader (== first shader).
-            for (GLuint index : shader->attributes) {
-                glEnableVertexAttribArray(index);
-            }
-        }
-
-        currentShader = shader;
-
-        return true;
-    } else {
-        return false;
-    }
 }

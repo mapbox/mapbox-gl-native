@@ -2,6 +2,8 @@
 #include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 
+#include <cstdio>
+
 using namespace llmr;
 
 LineShader::LineShader()
@@ -15,11 +17,8 @@ LineShader::LineShader()
     }
 
     a_pos = glGetAttribLocation(program, "a_pos");
-    attributes.emplace_front(a_pos);
     a_extrude = glGetAttribLocation(program, "a_extrude");
-    attributes.emplace_front(a_extrude);
     a_linesofar = glGetAttribLocation(program, "a_linesofar");
-    attributes.emplace_front(a_linesofar);
 
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_exmatrix = glGetUniformLocation(program, "u_exmatrix");

@@ -2,6 +2,8 @@
 #include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 
+#include <cstdio>
+
 using namespace llmr;
 
 FillShader::FillShader()
@@ -15,7 +17,6 @@ FillShader::FillShader()
     }
 
     a_pos = glGetAttribLocation(program, "a_pos");
-    attributes.emplace_front(a_pos);
 
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_color = glGetUniformLocation(program, "u_color");

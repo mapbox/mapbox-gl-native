@@ -6,20 +6,19 @@
 #include <llmr/geometry/vertex_buffer.hpp>
 #include <llmr/util/mat4.hpp>
 
+#include <llmr/renderer/shader-plain.hpp>
+#include <llmr/renderer/shader-fill.hpp>
+#include <llmr/renderer/shader-outline.hpp>
+#include <llmr/renderer/shader-pattern.hpp>
+#include <llmr/renderer/shader-line.hpp>
+
+
 namespace llmr {
 
 class Transform;
 class Settings;
 class Style;
 class Tile;
-// class LayerDescription;
-
-class Shader;
-class PlainShader;
-class OutlineShader;
-class FillShader;
-class LineShader;
-class PatternShader;
 
 class FillBucket;
 class LineBucket;
@@ -34,29 +33,21 @@ public:
     Painter& operator=(const Painter&) = delete;
     Painter& operator=(const Painter && ) = delete;
 
-
     void setup();
-
 
     void clear();
     void changeMatrix(const Tile::ID& id);
     void render(const std::shared_ptr<Tile>& tile);
-    void renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers);
-    void renderDebug(const std::shared_ptr<Tile>& tile);
-
     void renderMatte();
     void renderBackground();
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
 
-
-    void drawClippingMask();
-    bool switchShader(std::shared_ptr<Shader> shader);
-
 private:
     void setupShaders();
-
-public:
+    void drawClippingMask();
+    void renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers);
+    void renderDebug(const std::shared_ptr<Tile>& tile);
 
 private:
     Transform& transform;
@@ -67,12 +58,11 @@ private:
     mat4 matrix;
     mat4 exMatrix;
 
-    std::shared_ptr<Shader> currentShader;
-    std::shared_ptr<FillShader> fillShader;
-    std::shared_ptr<PlainShader> plainShader;
-    std::shared_ptr<OutlineShader> outlineShader;
-    std::shared_ptr<LineShader> lineShader;
-    std::shared_ptr<PatternShader> patternShader;
+    std::unique_ptr<FillShader> fillShader;
+    std::unique_ptr<PlainShader> plainShader;
+    std::unique_ptr<OutlineShader> outlineShader;
+    std::unique_ptr<LineShader> lineShader;
+    std::unique_ptr<PatternShader> patternShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     VertexBuffer tileStencilBuffer = {
