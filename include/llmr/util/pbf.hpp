@@ -8,11 +8,7 @@
  * Author: Josh Haberman <jhaberman@gmail.com>
  */
 
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
 #include <string>
-
 
 namespace llmr {
 
@@ -73,7 +69,7 @@ pbf::operator bool() const {
 
 bool pbf::next() {
     if (data < end) {
-        value = (uint32_t)varint();
+        value = static_cast<uint32_t>(varint());
         tag = value >> 3;
         return true;
     }
@@ -134,8 +130,8 @@ double pbf::float64() {
 }
 
 std::string pbf::string() {
-    uint32_t bytes = (uint32_t)varint();
-    const char *string = (const char *)data;
+    uint32_t bytes = static_cast<uint32_t>(varint());
+    const char *string = reinterpret_cast<const char*>(data);
     skipBytes(bytes);
     return std::string(string, bytes);
 }
@@ -146,7 +142,7 @@ bool pbf::boolean() {
 }
 
 pbf pbf::message() {
-    uint32_t bytes = (uint32_t)varint();
+    uint32_t bytes = static_cast<uint32_t>(varint());
     const uint8_t *pos = data;
     skipBytes(bytes);
     return pbf(pos, bytes);
@@ -165,7 +161,7 @@ void pbf::skipValue(uint32_t val) {
             skipBytes(8);
             break;
         case 2: // string/message
-            skipBytes((uint32_t)varint());
+            skipBytes(static_cast<uint32_t>(varint()));
             break;
         case 5: // 32 bit
             skipBytes(4);
