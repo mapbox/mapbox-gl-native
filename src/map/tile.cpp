@@ -77,7 +77,7 @@ void Tile::request() {
         }
     }, []() {
         // TODO: Make sure this gets passed the correct map ID/pointer.
-        platform::restart(NULL);
+        platform::restart(nullptr);
     });
 }
 
@@ -162,7 +162,7 @@ std::shared_ptr<Bucket> Tile::createBucket(const VectorTile& tile, const BucketD
         // The layer specified in the bucket does not exist. Do nothing.
     }
 
-    return NULL;
+    return nullptr;
 }
 
 std::shared_ptr<Bucket> Tile::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {

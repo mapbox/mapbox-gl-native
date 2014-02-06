@@ -17,7 +17,7 @@
 
 using namespace llmr;
 
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
 Painter::Painter(Transform& transform, Settings& settings, Style& style)
     : transform(transform),

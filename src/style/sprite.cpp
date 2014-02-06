@@ -129,7 +129,7 @@ void Sprite::loadImage(const std::string& data) {
         return;
     }
 
-    png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, errorHandler, warningHandler);
+    png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, errorHandler, warningHandler);
     assert(png);
 
     png_infop info = png_create_info_struct(png);
@@ -140,7 +140,7 @@ void Sprite::loadImage(const std::string& data) {
     try {
         png_set_read_fn(png, (png_voidp)&buffer, readCallback);
         png_read_info(png, info);
-        png_get_IHDR(png, info, (png_uint_32*)&width, (png_uint_32*)&height, &depth, &color, &interlace, NULL, NULL);
+        png_get_IHDR(png, info, (png_uint_32*)&width, (png_uint_32*)&height, &depth, &color, &interlace, nullptr, nullptr);
         bool alpha = (color & PNG_COLOR_MASK_ALPHA) || png_get_valid(png, info, PNG_INFO_tRNS);
 
         // From http://trac.mapnik.org/browser/trunk/src/png_reader.cpp
@@ -187,10 +187,10 @@ void Sprite::loadImage(const std::string& data) {
         // Read image data
         png_read_image(png, row_pointers);
 
-        png_read_end(png, NULL);
+        png_read_end(png, nullptr);
     } catch (std::exception& e) {
         fprintf(stderr, "loading PNG failed: %s\n", e.what());
-        png_destroy_read_struct(&png, &info, NULL);
+        png_destroy_read_struct(&png, &info, nullptr);
         img.clear();
         width = 0;
         height = 0;
