@@ -180,7 +180,7 @@ void Sprite::loadImage(const std::string& data) {
         assert(surface);
 
         png_bytep row_pointers[height];
-        for (unsigned i = 0; i < height; i++) {
+        for (unsigned i = 0; i < height; ++i) {
             row_pointers[i] = (png_bytep)(surface + (i * rowbytes));
         }
 

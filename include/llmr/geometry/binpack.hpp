@@ -69,7 +69,7 @@ public:
         // Simple algorithm to recursively merge the newly released cell with its
         // neighbor. This doesn't merge more than two cells at a time, and fails
         // for complicated merges.
-        for (auto it = free.begin(); it != free.end(); it++) {
+        for (auto it = free.begin(); it != free.end(); ++it) {
             Rect<T> ref = *it;
             if (ref.y == rect.y && ref.h == rect.h && ref.x + ref.w == rect.x) {
                 ref.w += rect.w;

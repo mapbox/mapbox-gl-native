@@ -84,7 +84,7 @@ void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
 
     uint32_t elements_start = buffer.elements_length();
 
-    for (uint32_t i = 2; i < vertex_count; i++) {
+    for (uint32_t i = 2; i < vertex_count; ++i) {
         buffer.addElements(firstIndex, firstIndex + i - 1, firstIndex + i);
     }
 
@@ -122,5 +122,3 @@ void FillBucket::drawVertices(OutlineShader& shader) {
     array.bind(shader, *buffer, vertex_index);
     glDrawArrays(GL_LINE_STRIP, 0, length);
 }
-
-

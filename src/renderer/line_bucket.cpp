@@ -93,7 +93,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     // Start all lines with a degenerate vertex
     buffer->addDegenerate();
 
-    for (size_t i = 0; i < vertices.size(); i++) {
+    for (size_t i = 0; i < vertices.size(); ++i) {
         if (nextNormal) prevNormal = { -nextNormal.x, -nextNormal.y };
         if (currentVertex) prevVertex = currentVertex;
 

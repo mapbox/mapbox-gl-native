@@ -131,7 +131,7 @@ void Painter::render(const Tile::Ptr& tile) {
 void Painter::renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers) {
     // Render everything top-to-bottom by using reverse iterators
     typedef std::vector<LayerDescription>::const_reverse_iterator iterator;
-    for (iterator it = layers.rbegin(), end = layers.rend(); it != end; it++) {
+    for (iterator it = layers.rbegin(), end = layers.rend(); it != end; ++it) {
         const LayerDescription& layer_desc = *it;
 
         if (layer_desc.child_layer.size()) {
