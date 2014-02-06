@@ -26,7 +26,13 @@ void DebugFontBuffer::addText(const char *text, double left, double baseline, do
         if (text[i] < 32 || text[i] > 127) {
             continue;
         }
-        glyph& glyph = simplex[(int)text[i]];
+
+        auto it = simplex.find((int)text[i]);
+        if (it == simplex.end()) {
+            continue;
+        }
+
+        const glyph& glyph = it->second;
         if (!glyph.width) {
             continue;
         }
