@@ -148,6 +148,15 @@ class MBXMapView
 
         self.center = CGPointMake(self.center.x + delta.x, self.center.y + delta.y);
     }
+    else if (pan.state == UIGestureRecognizerStateEnded)
+    {
+        CGPoint finalCenter = CGPointMake(self.center.x + (0.1 * [pan velocityInView:pan.view].x),
+                                          self.center.y + (0.1 * [pan velocityInView:pan.view].y));
+
+        CGFloat duration = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 0.3 : 0.5);
+
+        mapView->map.moveBy(finalCenter.x - self.center.x, finalCenter.y - self.center.y, duration);
+    }
 }
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
