@@ -44,17 +44,13 @@ void FillBucket::addGeometry(pbf& geom) {
 }
 
 void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
-    // Alias this.
-    FillBuffer& buffer = *this->buffer;
-
-    uint32_t vertex_start = buffer.vertex_length();
-
-    buffer.addDegenerate();
+    uint32_t vertex_start = buffer->vertex_length();
+    buffer->addDegenerate();
     for (const Coordinate& coord : line) {
-        buffer.addCoordinate(coord.x, coord.y);
+        buffer->addCoordinate(coord.x, coord.y);
     }
 
-    uint32_t vertex_end = buffer.vertex_length();
+    uint32_t vertex_end = buffer->vertex_length();
 
     if (vertex_end - vertex_start > 65535) {
         throw geometry_too_long_exception();
@@ -82,13 +78,13 @@ void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
 
     assert(firstIndex + vertex_count - 1 < 65536);
 
-    uint32_t elements_start = buffer.elements_length();
+    uint32_t elements_start = buffer->elements_length();
 
     for (uint32_t i = 2; i < vertex_count; ++i) {
-        buffer.addElements(firstIndex, firstIndex + i - 1, firstIndex + i);
+        buffer->addElements(firstIndex, firstIndex + i - 1, firstIndex + i);
     }
 
-    uint32_t elements_end = buffer.elements_length();
+    uint32_t elements_end = buffer->elements_length();
     uint32_t elements_count = elements_end - elements_start;
     group.vertex_length += vertex_count;
     group.elements_length += elements_count;
