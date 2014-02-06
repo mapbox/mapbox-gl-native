@@ -150,6 +150,9 @@ class MBXMapView
     }
     else if (pan.state == UIGestureRecognizerStateEnded)
     {
+        if ([pan velocityInView:pan.view].x < 50 && [pan velocityInView:pan.view].y < 50)
+            return;
+
         CGPoint finalCenter = CGPointMake(self.center.x + (0.1 * [pan velocityInView:pan.view].x),
                                           self.center.y + (0.1 * [pan velocityInView:pan.view].y));
 
