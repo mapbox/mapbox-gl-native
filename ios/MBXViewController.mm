@@ -86,6 +86,14 @@ class MBXMapView
     pan.delegate = self;
     [self.view addGestureRecognizer:pan];
 
+    UIPinchGestureRecognizer *pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
+    pinch.delegate = self;
+    [self.view addGestureRecognizer:pinch];
+
+    UIRotationGestureRecognizer *rotate = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotateGesture:)];
+    rotate.delegate = self;
+    [self.view addGestureRecognizer:rotate];
+
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     doubleTap.numberOfTapsRequired = 2;
     [self.view addGestureRecognizer:doubleTap];
@@ -104,14 +112,6 @@ class MBXMapView
     UILongPressGestureRecognizer *threeFingerLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleThreeFingerLongPressGesture:)];
     threeFingerLongPress.numberOfTouchesRequired = 3;
     [self.view addGestureRecognizer:threeFingerLongPress];
-
-    UIPinchGestureRecognizer *pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
-    pinch.delegate = self;
-    [self.view addGestureRecognizer:pinch];
-
-    UIRotationGestureRecognizer *rotate = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotateGesture:)];
-    rotate.delegate = self;
-    [self.view addGestureRecognizer:rotate];
 }
 
 - (void)render:(id)sender
@@ -150,36 +150,6 @@ class MBXMapView
     }
 }
 
-- (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
-{
-    if (doubleTap.state == UIGestureRecognizerStateEnded)
-        mapView->map.scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.5);
-}
-
-- (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
-{
-    if (twoFingerTap.state == UIGestureRecognizerStateEnded)
-        mapView->map.scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
-}
-
-- (void)handleLongPressGesture:(UILongPressGestureRecognizer *)longPress
-{
-    if (longPress.state == UIGestureRecognizerStateBegan)
-        mapView->map.resetNorth();
-}
-
-- (void)handleTwoFingerLongPressGesture:(UILongPressGestureRecognizer *)twoFingerLongPress
-{
-    if (twoFingerLongPress.state == UIGestureRecognizerStateBegan)
-        mapView->map.resetPosition();
-}
-
-- (void)handleThreeFingerLongPressGesture:(UILongPressGestureRecognizer *)threeFingerLongPress
-{
-    if (threeFingerLongPress.state == UIGestureRecognizerStateBegan)
-        mapView->map.toggleDebug();
-}
-
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
     CGFloat scale = mapView->map.getScale();
@@ -210,6 +180,36 @@ class MBXMapView
     {
         mapView->map.setAngle(self.angle + rotate.rotation, [rotate locationInView:rotate.view].x, [rotate locationInView:rotate.view].y);
     }
+}
+
+- (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
+{
+    if (doubleTap.state == UIGestureRecognizerStateEnded)
+        mapView->map.scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.5);
+}
+
+- (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
+{
+    if (twoFingerTap.state == UIGestureRecognizerStateEnded)
+        mapView->map.scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
+}
+
+- (void)handleLongPressGesture:(UILongPressGestureRecognizer *)longPress
+{
+    if (longPress.state == UIGestureRecognizerStateBegan)
+        mapView->map.resetNorth();
+}
+
+- (void)handleTwoFingerLongPressGesture:(UILongPressGestureRecognizer *)twoFingerLongPress
+{
+    if (twoFingerLongPress.state == UIGestureRecognizerStateBegan)
+        mapView->map.resetPosition();
+}
+
+- (void)handleThreeFingerLongPressGesture:(UILongPressGestureRecognizer *)threeFingerLongPress
+{
+    if (threeFingerLongPress.state == UIGestureRecognizerStateBegan)
+        mapView->map.toggleDebug();
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
