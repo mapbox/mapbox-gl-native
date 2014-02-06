@@ -34,7 +34,7 @@ void LineBucket::addGeometry(pbf& geom) {
     int32_t x, y;
     while ((cmd = geometry.next(x, y)) != Geometry::end) {
         if (cmd == Geometry::move_to) {
-            if (line.size()) {
+            if (!line.empty()) {
                 addGeometry(line);
                 line.clear();
             }
