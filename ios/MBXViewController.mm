@@ -22,6 +22,7 @@
 @property (nonatomic) CGPoint center;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
+@property (nonatomic) BOOL debug;
 
 @end
 
@@ -127,7 +128,9 @@ class MBXMapView
 
     if (current - elapsed >= 1)
     {
-        NSLog(@"FPS: %f", frames / (current - elapsed));
+        if (self.debug)
+            NSLog(@"FPS: %f", frames / (current - elapsed));
+
         elapsed = current;
         frames = 0;
     }
@@ -227,7 +230,11 @@ class MBXMapView
 - (void)handleThreeFingerLongPressGesture:(UILongPressGestureRecognizer *)threeFingerLongPress
 {
     if (threeFingerLongPress.state == UIGestureRecognizerStateBegan)
+    {
         mapView->map.toggleDebug();
+
+        self.debug = ! self.debug;
+    }
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
