@@ -3,22 +3,16 @@
 
 #include <string>
 #include <llmr/map/tile.hpp>
+#include <llmr/util/noncopyable.hpp>
 
 namespace llmr {
 
 class Painter;
 
-class Bucket {
+class Bucket : private util::noncopyable {
 public:
-    Bucket() = default;
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id) = 0;
-
-private:
-    // Make noncopyable
-    Bucket(const Bucket&) = delete;
-    Bucket(const Bucket&&) = delete;
-    Bucket& operator=(const Bucket&) = delete;
-    Bucket& operator=(const Bucket && ) = delete;
+    virtual ~Bucket() {}
 };
 
 }

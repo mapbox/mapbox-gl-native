@@ -5,6 +5,7 @@
 #include <llmr/map/transform.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/renderer/painter.hpp>
+#include <llmr/util/noncopyable.hpp>
 
 #include <cstdint>
 #include <string>
@@ -13,17 +14,10 @@ namespace llmr {
 
 class Settings;
 
-class Map {
+class Map : private util::noncopyable {
 public:
-    Map(Settings& settings);
+    explicit Map(Settings& settings);
     ~Map();
-
-
-    // Make noncopyable
-    Map(const Map&) = delete;
-    Map(const Map&&) = delete;
-    Map &operator=(const Map&) = delete;
-    Map &operator=(const Map&&) = delete;
 
     /* setup */
     void setup();

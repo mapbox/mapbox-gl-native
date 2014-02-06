@@ -1,19 +1,14 @@
 #ifndef LLMR_MAP_SETTINGS
 #define LLMR_MAP_SETTINGS
 
+#include <llmr/util/noncopyable.hpp>
+
 namespace llmr {
 
-class Settings {
+class Settings : private util::noncopyable {
 public:
     virtual void save() = 0;
-
-    // Make noncopyable
-    Settings() = default;
-    Settings(const Settings&) = delete;
-    Settings(const Settings&&) = delete;
-    Settings &operator=(const Settings&) = delete;
-    Settings &operator=(const Settings&&) = delete;
-
+    virtual ~Settings() {}
 public:
     // position
     double longitude = 0;

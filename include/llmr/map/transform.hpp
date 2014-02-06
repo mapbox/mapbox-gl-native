@@ -4,6 +4,7 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/animation.hpp>
+#include <llmr/util/noncopyable.hpp>
 
 #include <forward_list>
 
@@ -11,15 +12,9 @@ namespace llmr {
 
 struct box;
 
-class Transform {
+    class Transform : private util::noncopyable {
 public:
     Transform();
-
-    // Make noncopyable
-    Transform(const Transform&) = delete;
-    Transform(const Transform&&) = delete;
-    Transform &operator=(const Transform&) = delete;
-    Transform &operator=(const Transform&&) = delete;
 
     // Animations
     bool needsAnimation() const;

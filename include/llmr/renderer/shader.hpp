@@ -2,20 +2,14 @@
 #define LLMR_RENDERER_SHADER
 
 #include <cstdint>
+#include <llmr/util/noncopyable.hpp>
 
 namespace llmr {
 
-class Shader {
+class Shader : private util::noncopyable {
 public:
     Shader(const char *vertex, const char *fragment);
-    virtual ~Shader();
-
-    // Make noncopyable
-    Shader(const Shader&) = delete;
-    Shader(const Shader&&) = delete;
-    Shader &operator=(const Shader&) = delete;
-    Shader &operator=(const Shader&&) = delete;
-
+    ~Shader();
     bool valid;
     uint32_t program;
 

@@ -5,6 +5,7 @@
 #include <llmr/geometry/vao.hpp>
 #include <llmr/geometry/vertex_buffer.hpp>
 #include <llmr/util/mat4.hpp>
+#include <llmr/util/noncopyable.hpp>
 
 #include <llmr/renderer/shader-plain.hpp>
 #include <llmr/renderer/shader-outline.hpp>
@@ -22,18 +23,11 @@ class Tile;
 class FillBucket;
 class LineBucket;
 
-class Painter {
+class Painter : private util::noncopyable {
 public:
     Painter(Transform& transform, Settings& settings, Style& style);
 
-    // Make noncopyable
-    Painter(const Painter&) = delete;
-    Painter(const Painter&&) = delete;
-    Painter& operator=(const Painter&) = delete;
-    Painter& operator=(const Painter && ) = delete;
-
     void setup();
-
     void clear();
     void changeMatrix(const Tile::ID& id);
     void render(const std::shared_ptr<Tile>& tile);

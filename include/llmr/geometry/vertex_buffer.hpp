@@ -9,7 +9,8 @@ namespace llmr {
 
 class VertexBuffer {
 public:
-    VertexBuffer(std::initializer_list<int16_t> init);
+    typedef int16_t vertex_type;
+    VertexBuffer(std::initializer_list<vertex_type> init);
     ~VertexBuffer();
 
     /*
@@ -24,7 +25,7 @@ public:
     void bind();
 
 private:
-    const std::vector<int16_t> array;
+    const std::vector<vertex_type> array;
     uint32_t buffer = 0;
 };
 

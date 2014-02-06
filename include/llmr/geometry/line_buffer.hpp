@@ -9,6 +9,8 @@ namespace llmr {
 
 class LineBuffer {
 public:
+    typedef int16_t vertex_type;
+    
     ~LineBuffer();
 
     /*
@@ -30,7 +32,7 @@ public:
      * @param {number} tx texture normal
      * @param {number} ty texture normal
      */
-    void add(int16_t x, int16_t y, float ex, float ey, int8_t tx, int8_t ty, int32_t linesofar = 0);
+    void add(vertex_type x, vertex_type y, float ex, float ey, int8_t tx, int8_t ty, int32_t linesofar = 0);
 
     /*
      * Add a degenerate triangle to the buffer
@@ -56,7 +58,7 @@ public:
 
 private:
     bool dirty = true;
-    std::vector<int16_t> array;
+    std::vector<vertex_type> array;
     uint32_t buffer = 0;
 };
 
