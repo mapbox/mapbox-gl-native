@@ -15,7 +15,7 @@ uint32_t LineBuffer::length() const {
     return array.size() / 4;
 }
 
-void LineBuffer::add(int16_t x, int16_t y, float ex, float ey, int8_t tx, int8_t ty, int32_t linesofar) {
+void LineBuffer::add(vertex_type x, vertex_type y, float ex, float ey, int8_t tx, int8_t ty, int32_t linesofar) {
     array.push_back((x * 2) | tx);
     array.push_back((y * 2) | ty);
     array.push_back(linesofar);
@@ -40,7 +40,7 @@ void LineBuffer::bind() {
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
 
     if (dirty) {
-        glBufferData(GL_ARRAY_BUFFER, array.size() * sizeof(int16_t), array.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, array.size() * sizeof(vertex_type), array.data(), GL_STATIC_DRAW);
         dirty = false;
     }
 }

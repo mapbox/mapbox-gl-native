@@ -2,6 +2,7 @@
 #define LLMR_MAP_TILE
 
 #include <llmr/util/vec.hpp>
+#include <llmr/util/noncopyable.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/geometry/vao.hpp>
 
@@ -24,7 +25,8 @@ class FillBuffer;
 class LineBuffer;
 class PlainShader;
 
-class Tile : public std::enable_shared_from_this<Tile> {
+class Tile : public std::enable_shared_from_this<Tile>,
+             private util::noncopyable {
 public:
     struct exception : std::exception {};
     struct geometry_too_long_exception : exception {};
@@ -44,12 +46,6 @@ public:
 public:
     Tile(ID id, const Style& style);
     ~Tile();
-
-    // Make noncopyable
-    Tile(const Tile&) = delete;
-    Tile(const Tile&&) = delete;
-    Tile& operator=(const Tile&) = delete;
-    Tile& operator=(const Tile && ) = delete;
 
     // Start loading the tile.
     void request();

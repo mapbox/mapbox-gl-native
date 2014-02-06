@@ -1,6 +1,7 @@
 #ifndef LLMR_GEOMETRY_BINPACK
 #define LLMR_GEOMETRY_BINPACK
 
+#include <llmr/util/noncopyable.hpp>
 #include <cstdint>
 #include <list>
 
@@ -14,23 +15,15 @@ struct Rect {
 };
 
 template <typename T>
-class BinPack {
+class BinPack : private noncopyable {
 public:
     BinPack(T width, T height)
         : free(1, { 0, 0, width, height }) {}
-
-private:
-    // Make noncopyable
-    BinPack(const BinPack&) = delete;
-    BinPack(const BinPack&&) = delete;
-    BinPack& operator=(const BinPack&) = delete;
-    BinPack& operator=(const BinPack && ) = delete;
-
 public:
     Rect<T> allocate(T width, T height) {
         // Find the smallest free rect angle
         auto smallest = free.end();
-        for (auto it = free.begin(); it != free.end(); it++) {
+        for (auto it = free.begin(); it != free.end(); ++it) {
             const Rect<T>& ref = *it;
             const Rect<T>& rect = *smallest;
             if (width <= ref.w && height <= ref.h) {
@@ -76,7 +69,7 @@ public:
         // Simple algorithm to recursively merge the newly released cell with its
         // neighbor. This doesn't merge more than two cells at a time, and fails
         // for complicated merges.
-        for (auto it = free.begin(); it != free.end(); it++) {
+        for (auto it = free.begin(); it != free.end(); ++it) {
             Rect<T> ref = *it;
             if (ref.y == rect.y && ref.h == rect.h && ref.x + ref.w == rect.x) {
                 ref.w += rect.w;

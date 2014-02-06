@@ -28,7 +28,7 @@ public:
         }
 
         int width, height;
-        emscripten_get_canvas_size(&width, &height, NULL);
+        emscripten_get_canvas_size(&width, &height, nullptr);
 
         glfwSetMousePosCallback(mousemove);
         glfwSetMouseButtonCallback(mouseclick);

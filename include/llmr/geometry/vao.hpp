@@ -42,7 +42,7 @@ private:
 
     // For debug reasons, we're storing the bind information so that we can
     // detect errors and report
-    void *buffer_ptr = NULL;
+    void *buffer_ptr = nullptr;
     char *offset_ptr = 0;
 };
 

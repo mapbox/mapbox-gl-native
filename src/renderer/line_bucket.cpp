@@ -10,7 +10,7 @@
 #include <llmr/util/math.hpp>
 #include <llmr/platform/gl.hpp>
 
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+#define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
 #include <cassert>
 
@@ -34,7 +34,7 @@ void LineBucket::addGeometry(pbf& geom) {
     int32_t x, y;
     while ((cmd = geometry.next(x, y)) != Geometry::end) {
         if (cmd == Geometry::move_to) {
-            if (line.size()) {
+            if (!line.empty()) {
                 addGeometry(line);
                 line.clear();
             }
@@ -93,7 +93,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     // Start all lines with a degenerate vertex
     buffer->addDegenerate();
 
-    for (size_t i = 0; i < vertices.size(); i++) {
+    for (size_t i = 0; i < vertices.size(); ++i) {
         if (nextNormal) prevNormal = { -nextNormal.x, -nextNormal.y };
         if (currentVertex) prevVertex = currentVertex;
 

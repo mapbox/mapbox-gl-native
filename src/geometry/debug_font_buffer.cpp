@@ -22,7 +22,7 @@ DebugFontBuffer::~DebugFontBuffer() {
 
 void DebugFontBuffer::addText(const char *text, double left, double baseline, double scale) {
     int32_t length = strlen(text);
-    for (int32_t i = 0; i < length; i++) {
+    for (int32_t i = 0; i < length; ++i) {
         if (text[i] < 32 || text[i] > 127) {
             continue;
         }

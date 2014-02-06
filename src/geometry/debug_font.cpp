@@ -97,7 +97,7 @@ const int8_t simplex_93[] = { 5, 25, 7, 24, 8, 23, 9, 21, 9, 19, 8, 17, 7, 16, 6
 const int8_t simplex_94[] = { 3, 6, 3, 8, 4, 11, 6, 12, 8, 12, 10, 11, 14, 8, 16, 7, 18, 7, 20, 8, 21, 10, -1, -1, 3, 8, 4, 10, 6, 11, 8, 11, 10, 10, 14, 7, 16, 6, 18, 6, 20, 7, 21, 10, 21, 12 };
 
 struct glyph {
-    glyph() : width(0), length(0), data(NULL) { }
+    glyph() : width(0), length(0), data(nullptr) { }
     glyph(uint8_t width, uint8_t length, const int8_t *data)
         : width(width),
           length(length),
@@ -110,7 +110,7 @@ struct glyph {
 // Font data From Hershey Simplex Font
 // http://paulbourke.net/dataformats/hershey/
 const std::map<char, glyph> simplex = {
-    { ' ', { 16, 0, NULL } },
+    { ' ', { 16, 0, nullptr } },
     { '!', { 10, sizeof(simplex_1), simplex_1 } },
     { '"', { 16, sizeof(simplex_2), simplex_2 } },
     { '#', { 21, sizeof(simplex_3), simplex_3 } },

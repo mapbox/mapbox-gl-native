@@ -8,11 +8,7 @@
  * Author: Josh Haberman <jhaberman@gmail.com>
  */
 
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
 #include <string>
-
 
 namespace llmr {
 
@@ -46,8 +42,8 @@ struct pbf {
     inline void skipValue(uint32_t val);
     inline void skipBytes(uint32_t bytes);
 
-    const uint8_t *data = NULL;
-    const uint8_t *end = NULL;
+    const uint8_t *data = nullptr;
+    const uint8_t *end = nullptr;
     uint32_t value = 0;
     uint32_t tag = 0;
 };
@@ -60,8 +56,8 @@ pbf::pbf(const unsigned char *data, uint32_t length)
 }
 
 pbf::pbf()
-    : data(NULL),
-      end(NULL),
+    : data(nullptr),
+      end(nullptr),
       value(0),
       tag(0) {
 }
@@ -73,7 +69,7 @@ pbf::operator bool() const {
 
 bool pbf::next() {
     if (data < end) {
-        value = (uint32_t)varint();
+        value = static_cast<uint32_t>(varint());
         tag = value >> 3;
         return true;
     }
@@ -134,8 +130,8 @@ double pbf::float64() {
 }
 
 std::string pbf::string() {
-    uint32_t bytes = (uint32_t)varint();
-    const char *string = (const char *)data;
+    uint32_t bytes = static_cast<uint32_t>(varint());
+    const char *string = reinterpret_cast<const char*>(data);
     skipBytes(bytes);
     return std::string(string, bytes);
 }
@@ -146,7 +142,7 @@ bool pbf::boolean() {
 }
 
 pbf pbf::message() {
-    uint32_t bytes = (uint32_t)varint();
+    uint32_t bytes = static_cast<uint32_t>(varint());
     const uint8_t *pos = data;
     skipBytes(bytes);
     return pbf(pos, bytes);
@@ -165,7 +161,7 @@ void pbf::skipValue(uint32_t val) {
             skipBytes(8);
             break;
         case 2: // string/message
-            skipBytes((uint32_t)varint());
+            skipBytes(static_cast<uint32_t>(varint()));
             break;
         case 5: // 32 bit
             skipBytes(4);
@@ -185,4 +181,3 @@ void pbf::skipBytes(uint32_t bytes) {
 } // end namespace llmr
 
 #endif
-

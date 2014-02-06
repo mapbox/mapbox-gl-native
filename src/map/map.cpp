@@ -222,7 +222,7 @@ bool Map::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::f
  * @return boolean Whether a parent was found.
  */
 bool Map::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain) {
-    for (int32_t z = id.z - 1; z >= minCoveringZoom; z--) {
+    for (int32_t z = id.z - 1; z >= minCoveringZoom; --z) {
         const Tile::ID parent_id = Tile::parent(id, z);
         const Tile::Ptr tile = hasTile(parent_id);
         if (tile && tile->state == Tile::ready) {
@@ -263,8 +263,8 @@ void Map::updateTiles() {
 
     // TODO: Discard tiles that are outside the viewport
     std::forward_list<Tile::ID> required;
-    for (int32_t y = tl.y; y < br.y; y++) {
-        for (int32_t x = tl.x; x < br.x; x++) {
+    for (int32_t y = tl.y; y < br.y; ++y) {
+        for (int32_t x = tl.x; x < br.x; ++x) {
             required.emplace_front(x, y, zoom);
         }
     }

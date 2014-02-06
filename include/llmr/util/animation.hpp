@@ -1,10 +1,12 @@
 #ifndef LLMR_UTIL_ANIMATION
 #define LLMR_UTIL_ANIMATION
 
+#include <llmr/util/noncopyable.hpp>
+
 namespace llmr {
 namespace util {
 
-class animation {
+class animation : private noncopyable {
 public:
     enum state {
         running,
@@ -12,13 +14,6 @@ public:
     };
 
     animation(double from, double to, double &value, double duration);
-
-    // Make noncopyable
-    animation(const animation&) = delete;
-    animation(const animation&&) = delete;
-    animation &operator=(const animation&) = delete;
-    animation &operator=(const animation&&) = delete;
-
     state update() const;
 
 private:

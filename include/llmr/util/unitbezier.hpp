@@ -66,7 +66,7 @@ struct UnitBezier {
         int i;
 
         // First try a few iterations of Newton's method -- normally very fast.
-        for (t2 = x, i = 0; i < 8; i++) {
+        for (t2 = x, i = 0; i < 8; ++i) {
             x2 = sampleCurveX(t2) - x;
             if (fabs (x2) < epsilon)
                 return t2;

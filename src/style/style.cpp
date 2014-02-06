@@ -322,7 +322,7 @@ BucketDescription loadBucketJSON(const rapidjson::Value& value) {
             }
         } else if (name == "value") {
             if (value.IsArray()) {
-                for (rapidjson::SizeType i = 0; i < value.Size(); i++) {
+                for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
                     bucket.source_value.push_back(loadValueJSON(value[i]));
                 }
             } else {
@@ -361,7 +361,7 @@ BucketDescription loadBucketJSON(const rapidjson::Value& value) {
 
 void loadLayersJSON(const rapidjson::Value& value, std::vector<LayerDescription>& layers) {
     if (value.IsArray()) {
-        for (rapidjson::SizeType i = 0; i < value.Size(); i++) {
+        for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
             layers.push_back(loadLayerJSON(value[i]));
         }
     } else {
@@ -407,7 +407,7 @@ LayerDescription loadLayerJSON(const rapidjson::Value& value) {
 
 void loadClassesJSON(const rapidjson::Value& value, std::map<std::string, ClassDescription>& classes) {
     if (value.IsArray()) {
-        for (rapidjson::SizeType i = 0; i < value.Size(); i++) {
+        for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
             classes.insert(loadClassDescriptionJSON(value[i]));
         }
     } else {
