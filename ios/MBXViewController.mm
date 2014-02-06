@@ -20,7 +20,7 @@
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) CGPoint center;
-@property (nonatomic) CGFloat zoom;
+@property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
 
 @end
@@ -152,21 +152,27 @@ class MBXMapView
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
-    CGFloat scale = mapView->map.getScale();
-
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
-        self.zoom = log2f(scale);
+        self.scale = mapView->map.getScale();
     }
     else if (pinch.state == UIGestureRecognizerStateChanged)
     {
-        CGFloat tolerance = 2;
+        CGFloat tolerance  = 2.5;
+        CGFloat adjustment = 0;
 
-        CGFloat newZoom = self.zoom + (pinch.scale > 1 ? (pinch.scale / tolerance) : ((1 - pinch.scale) * -tolerance));
+        if (pinch.scale > 1)
+        {
+            adjustment = (pinch.scale / tolerance) - (1 / tolerance);
+        }
+        else
+        {
+            adjustment = (-1 / pinch.scale) / tolerance + (1 / tolerance);
+        }
 
-        double scale = mapView->map.getScale();
-        double new_scale = powf(2, newZoom);
-        mapView->map.scaleBy(new_scale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
+        CGFloat newZoom = log2f(self.scale) + adjustment;
+
+        mapView->map.scaleBy(powf(2, newZoom) / mapView->map.getScale(), [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
     }
 }
 
