@@ -16,7 +16,7 @@
 #include <llmr/llmr.hpp>
 #include <llmr/platform/platform.hpp>
 
-@interface MBXViewController ()
+@interface MBXViewController () <UIGestureRecognizerDelegate>
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) CGPoint center;
@@ -83,6 +83,7 @@ class MBXMapView
     mapView->init();
 
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
+    pan.delegate = self;
     [self.view addGestureRecognizer:pan];
 
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
@@ -105,9 +106,11 @@ class MBXMapView
     [self.view addGestureRecognizer:threeFingerLongPress];
 
     UIPinchGestureRecognizer *pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
+    pinch.delegate = self;
     [self.view addGestureRecognizer:pinch];
 
     UIRotationGestureRecognizer *rotate = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotateGesture:)];
+    rotate.delegate = self;
     [self.view addGestureRecognizer:rotate];
 }
 
@@ -150,21 +153,13 @@ class MBXMapView
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
     if (doubleTap.state == UIGestureRecognizerStateEnded)
-    {
-        CGPoint gesturePoint = [doubleTap locationInView:doubleTap.view];
-
-        mapView->map.scaleBy(2, gesturePoint.x, gesturePoint.y);
-    }
+        mapView->map.scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.5);
 }
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
     if (twoFingerTap.state == UIGestureRecognizerStateEnded)
-    {
-        CGPoint gesturePoint = [twoFingerTap locationInView:twoFingerTap.view];
-
-        mapView->map.scaleBy(0.5, gesturePoint.x, gesturePoint.y);
-    }
+        mapView->map.scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
 }
 
 - (void)handleLongPressGesture:(UILongPressGestureRecognizer *)longPress
@@ -195,11 +190,13 @@ class MBXMapView
     }
     else if (pinch.state == UIGestureRecognizerStateChanged)
     {
-        CGFloat tolerance = 3;
+        CGFloat tolerance = 2;
 
         CGFloat newZoom = self.zoom + (pinch.scale > 1 ? (pinch.scale / tolerance) : ((1 - pinch.scale) * -tolerance));
 
-        mapView->map.setScale(powf(2, newZoom));
+        double scale = mapView->map.getScale();
+        double new_scale = powf(2, newZoom);
+        mapView->map.scaleBy(new_scale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
     }
 }
 
@@ -213,6 +210,11 @@ class MBXMapView
     {
         mapView->map.setAngle(self.angle + rotate.rotation, [rotate locationInView:rotate.view].x, [rotate locationInView:rotate.view].y);
     }
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return YES;
 }
 
 CADisplayLink *displayLink;
