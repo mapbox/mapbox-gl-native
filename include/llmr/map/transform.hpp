@@ -22,11 +22,11 @@ public:
 
     // Relative changes
     void moveBy(double dx, double dy);
-    void scaleBy(double ds, double cx, double cy);
+    void scaleBy(double ds, double cx = -1, double cy = -1, double duration = 0);
     void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey);
 
     // Absolute changes
-    void setScale(double scale);
+    void setScale(double scale, double cx = -1, double cy = -1, double duration = 0);
     void setAngle(double angle, double duration = 0);
     void setZoom(double zoom);
     void setLonLat(double lon, double lat);
