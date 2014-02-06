@@ -34,7 +34,7 @@ uint32_t FillBuffer::elements_length() const {
 }
 
 void FillBuffer::addDegenerate() {
-    vertices.push_back(std::numeric_limits<vertex_type>::max());
+    vertices.push_back(32767);
     vertices.push_back(0);
 }
 

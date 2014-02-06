@@ -36,6 +36,7 @@ void Sprite::load(const std::string& base_url) {
         std::lock_guard<std::mutex> lock(sprite->mtx);
         if (sprite->img.size() && sprite->pos.size()) {
             sprite->loaded = true;
+            platform::restart(NULL);
             fprintf(stderr, "sprite loaded\n");
         }
     };

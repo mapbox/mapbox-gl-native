@@ -45,7 +45,7 @@ void main() {
     // If the x coordinate is the maximum integer, we move the z coordinates out
     // of the view plane so that the triangle gets clipped. This makes it easier
     // for us to create degenerate triangle strips.
-    float z = step(32767.0, a_pos.x);
+    float z = step(32767.0, a_pos.x) * 2.0;
 
     // When drawing points, skip every other vertex
     z += u_point * step(1.0, v_normal.y);
