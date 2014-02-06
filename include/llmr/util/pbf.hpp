@@ -9,6 +9,7 @@
  */
 
 #include <string>
+#include <cstring>
 
 namespace llmr {
 
