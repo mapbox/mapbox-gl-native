@@ -57,7 +57,7 @@ public:
 private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
     bool findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain);
-    void updateTiles();
+    bool updateTiles();
     std::shared_ptr<Tile> addTile(const Tile::ID& id);
     std::shared_ptr<Tile> hasTile(const Tile::ID& id);
 

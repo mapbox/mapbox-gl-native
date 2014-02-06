@@ -152,8 +152,9 @@ void Map::toggleDebug() {
 }
 
 void Map::update() {
-    updateTiles();
-    platform::restart(this);
+    if (updateTiles()) {
+        platform::restart(this);
+    }
 }
 
 
@@ -235,7 +236,9 @@ bool Map::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::for
 };
 
 
-void Map::updateTiles() {
+bool Map::updateTiles() {
+    bool changed = false;
+
     // Figure out what tiles we need to load
     int32_t zoom = transform.getZoom();
     if (zoom > max_zoom) zoom = max_zoom;
@@ -297,16 +300,18 @@ void Map::updateTiles() {
         if (tile->state == Tile::initial) {
             // If the tile is new, we have to make sure to load it.
             tile->request();
+            changed = true;
         }
     }
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
-    tiles.remove_if([&retain](const Tile::Ptr& tile) {
+    tiles.remove_if([&retain, &changed](const Tile::Ptr& tile) {
         assert(tile);
         bool obsolete = std::find(retain.begin(), retain.end(), tile->id) == retain.end();
         if (obsolete) {
             tile->cancel();
+            changed = true;
         }
         return obsolete;
     });
@@ -317,10 +322,16 @@ void Map::updateTiles() {
     tiles.sort([](const Tile::Ptr& a, const Tile::Ptr& b) {
         return a->id.z > b->id.z;
     });
+
+    return changed;
 }
 
 bool Map::render() {
-    transform.updateAnimations();
+    bool changed = false;
+    if (transform.needsAnimation()) {
+        transform.updateAnimations();
+        changed = updateTiles();
+    }
 
     painter.clear();
 
@@ -334,7 +345,7 @@ bool Map::render() {
 
     painter.renderMatte();
 
-    return transform.needsAnimation();
+    return changed || transform.needsAnimation();
 }
 
 void Map::tileLoaded(Tile::Ptr tile) {
