@@ -65,8 +65,8 @@ void Map::moveBy(double dx, double dy) {
     settings.save();
 }
 
-void Map::scaleBy(double ds, double cx, double cy) {
-    transform.scaleBy(ds, cx, cy);
+void Map::scaleBy(double ds, double cx, double cy, double duration) {
+    transform.scaleBy(ds, cx, cy, duration);
     style.cascade(transform.getZoom());
     update();
 
@@ -83,8 +83,8 @@ void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double
     settings.save();
 }
 
-void Map::setScale(double scale) {
-    transform.setScale(scale);
+void Map::setScale(double scale, double cx, double cy, double duration) {
+    transform.setScale(scale, cx, cy, duration);
     style.cascade(transform.getZoom());
     update();
 

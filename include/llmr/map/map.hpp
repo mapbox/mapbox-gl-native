@@ -37,8 +37,8 @@ public:
     void resetPosition();
 
     /* scale */
-    void scaleBy(double ds, double cx, double cy);
-    void setScale(double scale);
+    void scaleBy(double ds, double cx = -1, double cy = -1, double duration = 0);
+    void setScale(double scale, double cx = -1, double cy = -1, double duration = 0);
     double getScale() const;
     // void setZoom(double zoom);
     // void setLonLatZoom(double lon, double lat, double zoom);

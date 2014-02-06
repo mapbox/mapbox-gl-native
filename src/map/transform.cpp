@@ -33,7 +33,7 @@ void Transform::moveBy(double dx, double dy) {
     y += cos(angle) * dy + sin(-angle) * dx;
 }
 
-void Transform::scaleBy(double ds, double cx, double cy) {
+void Transform::scaleBy(double ds, double cx, double cy, double duration) {
     // clamp scale to min/max values
     double new_scale = scale * ds;
     if (new_scale < min_scale) {
@@ -44,13 +44,7 @@ void Transform::scaleBy(double ds, double cx, double cy) {
         new_scale = max_scale;
     }
 
-    setScale(new_scale);
-
-    // Correct for non-center scaling location.
-    const double dx = (cx - width / 2) * (1.0 - ds);
-    const double dy = (cy - height / 2) * (1.0 - ds);
-    x += cos(angle) * dx + sin(angle) * dy;
-    y += cos(angle) * dy + sin(-angle) * dx;
+    setScale(new_scale, cx, cy, duration);
 }
 
 
@@ -92,7 +86,7 @@ void Transform::setAngle(double new_angle, double duration) {
     }
 }
 
-void Transform::setScale(double new_scale) {
+void Transform::setScale(double new_scale, double cx, double cy, double duration) {
     if (new_scale < min_scale) {
         new_scale = min_scale;
     } else if (new_scale > max_scale) {
@@ -100,9 +94,18 @@ void Transform::setScale(double new_scale) {
     }
 
     const double factor = new_scale / scale;
-    x *= factor;
-    y *= factor;
-    scale = new_scale;
+    const double dx = (cx - width / 2) * (1.0 - factor);
+    const double dy = (cy - height / 2) * (1.0 - factor);
+
+    if (duration == 0) {
+        x = x * factor + dx;
+        y = y * factor + dy;
+        scale = new_scale;
+    } else {
+        animations.emplace_front(x, x * factor + dx, x, duration);
+        animations.emplace_front(y, y * factor + dy, y, duration);
+        animations.emplace_front(scale, new_scale, scale, duration);
+    }
 
     const double s = scale * size;
     zc = s / 2;
