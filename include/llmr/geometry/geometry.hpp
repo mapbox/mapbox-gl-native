@@ -13,7 +13,7 @@ class Geometry : private util::noncopyable {
 public:
     inline explicit Geometry(pbf& data);
   
-    enum command {
+    enum command : uint8_t {
         end = 0,
         move_to = 1,
         line_to = 2,
@@ -24,7 +24,7 @@ public:
 
 private:
     pbf& data;
-    uint32_t cmd;
+    uint8_t cmd;
     uint32_t length;
     int32_t x, y;
     int32_t ox, oy;
