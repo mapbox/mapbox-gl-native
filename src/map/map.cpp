@@ -57,8 +57,8 @@ void Map::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb
     update();
 }
 
-void Map::moveBy(double dx, double dy) {
-    transform.moveBy(dx, dy);
+void Map::moveBy(double dx, double dy, double duration) {
+    transform.moveBy(dx, dy, duration);
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);

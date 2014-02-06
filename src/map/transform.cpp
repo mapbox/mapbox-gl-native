@@ -28,9 +28,14 @@ void Transform::updateAnimations() {
     });
 }
 
-void Transform::moveBy(double dx, double dy) {
-    x += cos(angle) * dx + sin(angle) * dy;
-    y += cos(angle) * dy + sin(-angle) * dx;
+void Transform::moveBy(double dx, double dy, double duration) {
+    if (duration == 0) {
+        x += cos(angle) * dx + sin(angle) * dy;
+        y += cos(angle) * dy + sin(-angle) * dx;
+    } else {
+        animations.emplace_front(x, x + cos(angle) * dx + sin(angle) * dy, x, duration);
+        animations.emplace_front(y, y + cos(angle) * dy + sin(-angle) * dx, y, duration);
+    }
 }
 
 void Transform::scaleBy(double ds, double cx, double cy, double duration) {
