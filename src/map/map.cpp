@@ -152,9 +152,8 @@ void Map::toggleDebug() {
 }
 
 void Map::update() {
-    if (updateTiles()) {
-        platform::restart(this);
-    }
+    updateTiles();
+    platform::restart(this);
 }
 
 
