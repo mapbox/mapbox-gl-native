@@ -28,6 +28,10 @@ void Transform::updateAnimations() {
     });
 }
 
+void Transform::cancelAnimations() {
+    animations.clear();
+}
+
 void Transform::moveBy(double dx, double dy) {
     x += cos(angle) * dx + sin(angle) * dy;
     y += cos(angle) * dy + sin(-angle) * dx;

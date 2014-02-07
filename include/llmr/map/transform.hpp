@@ -19,6 +19,7 @@ public:
     // Animations
     bool needsAnimation() const;
     void updateAnimations();
+    void cancelAnimations();
 
     // Relative changes
     void moveBy(double dx, double dy);
