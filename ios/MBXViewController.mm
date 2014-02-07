@@ -222,7 +222,7 @@ class MBXMapView
         double scale = mapView->map.getScale();
         double new_scale = powf(2, finalZoom);
 
-        CGFloat duration = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 0.5 : 0.5);
+        CGFloat duration = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 0.3 : 0.5);
 
         mapView->map.scaleBy(new_scale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y, duration);
     }
