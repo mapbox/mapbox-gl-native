@@ -6,7 +6,7 @@
 #include <string>
 
 #define kTileURL "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf"
-#define kSpriteURL "http://mapbox:magic@kkaefer.net/gl/debug/img/sprite"
+#define kSpriteURL "http://mapbox-kkaefer.s3.amazonaws.com/static/sprite"
 
 namespace llmr {
 
