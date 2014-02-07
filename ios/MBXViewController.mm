@@ -212,6 +212,20 @@ class MBXMapView
 
         mapView->map.scaleBy(powf(2, newZoom) / mapView->map.getScale(), [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
     }
+    else if (pinch.state == UIGestureRecognizerStateEnded)
+    {
+        if (fabsf(pinch.velocity) < 20)
+            return;
+
+        CGFloat finalZoom = log2f(mapView->map.getScale()) + (0.01 * pinch.velocity);
+
+        double scale = mapView->map.getScale();
+        double new_scale = powf(2, finalZoom);
+
+        CGFloat duration = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 0.5 : 0.5);
+
+        mapView->map.scaleBy(new_scale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y, duration);
+    }
 
     [self startRender];
 }
