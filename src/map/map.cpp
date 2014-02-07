@@ -151,6 +151,10 @@ void Map::toggleDebug() {
     settings.save();
 }
 
+void Map::cancelAnimations() {
+    transform.cancelAnimations();
+}
+
 void Map::update() {
     updateTiles();
     platform::restart(this);
