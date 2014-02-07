@@ -39,9 +39,20 @@
           'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
           'IPHONEOS_DEPLOYMENT_TARGET':'6.0',
           'TARGETED_DEVICE_FAMILY': '1,2',
-          'CODE_SIGN_IDENTITY': 'iPhone Developer',
           'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
           'CLANG_ENABLE_OBJC_ARC': 'YES'
+        },
+        'configurations': {
+          'Debug': {
+            'xcode_settings': {
+              'CODE_SIGN_IDENTITY': 'iPhone Developer',
+            }
+          },
+          'Release': {
+            'xcode_settings': {
+              'CODE_SIGN_IDENTITY': 'iPhone Distribution',
+            }
+          }
         },
         "dependencies": [
             "../llmr.gyp:llmr-ios"
