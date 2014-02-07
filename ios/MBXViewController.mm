@@ -309,25 +309,25 @@ namespace llmr
             [NSURLConnection sendAsynchronousRequest:urlRequest
                                                queue:[NSOperationQueue mainQueue]
                                    completionHandler: ^(NSURLResponse *response, NSData *data, NSError *error)
-             {
-                 if ( ! error)
-                 {
-                     Response res;
+            {
+                if ( ! error)
+                {
+                    Response res;
 
-                     res.code = [(NSHTTPURLResponse *)response statusCode];
-                     res.body = { (const char *)[data bytes], [data length] };
+                    res.code = [(NSHTTPURLResponse *)response statusCode];
+                    res.body = { (const char *)[data bytes], [data length] };
 
-                     func(res);
-                 }
-                 else
-                 {
-                     Response res;
+                    func(res);
+                }
+                else
+                {
+                    Response res;
 
-                     func(res);
-                 }
+                    func(res);
+                }
 
-                 [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
-             }];
+                [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
+            }];
         }
 
         void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb)
@@ -351,7 +351,7 @@ namespace llmr
                 cb();
 
                 [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
-                }];
+            }];
         }
 
         double time()
