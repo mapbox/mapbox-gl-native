@@ -16,6 +16,8 @@
 #include <llmr/llmr.hpp>
 #include <llmr/platform/platform.hpp>
 
+NSString *const MBXNeedsRenderNotification = @"MBXNeedsRenderNotification";
+
 @interface MBXViewController () <UIGestureRecognizerDelegate>
 
 @property (nonatomic) EAGLContext *context;
@@ -73,13 +75,9 @@ class MBXMapView
     GLKView *view = (GLKView *)self.view;
     view.context = self.context;
     view.drawableStencilFormat = GLKViewDrawableStencilFormat8;
-    self.preferredFramesPerSecond = 60;
     [view bindDrawable];
 
     [EAGLContext setCurrentContext:self.context];
-
-    displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(render:)];
-    [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
 
     mapView->init();
 
@@ -113,6 +111,25 @@ class MBXMapView
     UILongPressGestureRecognizer *threeFingerLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleThreeFingerLongPressGesture:)];
     threeFingerLongPress.numberOfTouchesRequired = 3;
     [self.view addGestureRecognizer:threeFingerLongPress];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startRender) name:MBXNeedsRenderNotification object:nil];
+
+    displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(render:)];
+    [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+}
+
+- (void)startRender
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+
+    displayLink.paused = NO;
+
+    [self performSelector:@selector(stopRender) withObject:nil afterDelay:3.0];
+}
+
+- (void)stopRender
+{
+    displayLink.paused = YES;
 }
 
 - (void)render:(id)sender
@@ -163,6 +180,8 @@ class MBXMapView
 
         mapView->map.moveBy(finalCenter.x - self.center.x, finalCenter.y - self.center.y, duration);
     }
+
+    [self startRender];
 }
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
@@ -189,6 +208,8 @@ class MBXMapView
 
         mapView->map.scaleBy(powf(2, newZoom) / mapView->map.getScale(), [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
     }
+
+    [self startRender];
 }
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
@@ -201,30 +222,40 @@ class MBXMapView
     {
         mapView->map.setAngle(self.angle + rotate.rotation, [rotate locationInView:rotate.view].x, [rotate locationInView:rotate.view].y);
     }
+
+    [self startRender];
 }
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
     if (doubleTap.state == UIGestureRecognizerStateEnded)
         mapView->map.scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.5);
+
+    [self startRender];
 }
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
     if (twoFingerTap.state == UIGestureRecognizerStateEnded)
         mapView->map.scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
+
+    [self startRender];
 }
 
 - (void)handleLongPressGesture:(UILongPressGestureRecognizer *)longPress
 {
     if (longPress.state == UIGestureRecognizerStateBegan)
         mapView->map.resetNorth();
+
+    [self startRender];
 }
 
 - (void)handleTwoFingerLongPressGesture:(UILongPressGestureRecognizer *)twoFingerLongPress
 {
     if (twoFingerLongPress.state == UIGestureRecognizerStateBegan)
         mapView->map.resetPosition();
+
+    [self startRender];
 }
 
 - (void)handleThreeFingerLongPressGesture:(UILongPressGestureRecognizer *)threeFingerLongPress
@@ -235,6 +266,8 @@ class MBXMapView
 
         self.debug = ! self.debug;
     }
+
+    [self startRender];
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
@@ -276,22 +309,24 @@ namespace llmr
             [NSURLConnection sendAsynchronousRequest:urlRequest
                                                queue:[NSOperationQueue mainQueue]
                                    completionHandler: ^(NSURLResponse *response, NSData *data, NSError *error)
-             {
-                 if ( ! error)
-                 {
-                     Response res;
+            {
+                if ( ! error)
+                {
+                    Response res;
 
-                     res.code = [(NSHTTPURLResponse *)response statusCode];
-                     res.body = { (const char *)[data bytes], [data length] };
+                    res.code = [(NSHTTPURLResponse *)response statusCode];
+                    res.body = { (const char *)[data bytes], [data length] };
 
-                     func(res);
-                 }
-                 else
-                 {
-                     Response res;
+                    func(res);
+                }
+                else
+                {
+                    Response res;
 
-                     func(res);
-                 }
+                    func(res);
+                }
+
+                [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
             }];
         }
 
@@ -303,18 +338,20 @@ namespace llmr
                                                queue:[NSOperationQueue mainQueue]
                                    completionHandler:^(NSURLResponse *response, NSData *data, NSError *error)
             {
-                 Response res;
+                Response res;
 
-                 if (error == nil)
-                 {
-                     res.code = [(NSHTTPURLResponse *)response statusCode];
-                     res.body = { (const char *)[data bytes], [data length] };
-                 }
+                if (error == nil)
+                {
+                    res.code = [(NSHTTPURLResponse *)response statusCode];
+                    res.body = { (const char *)[data bytes], [data length] };
+                }
                  
-                 func(res);
+                func(res);
 
-                 cb();
-             }];
+                cb();
+
+                [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
+            }];
         }
 
         double time()

@@ -7,6 +7,8 @@
 
 #include <thread>
 
+NSString *const MBXNeedsRenderNotification = @"MBXNeedsRenderNotification";
+
 class MapView {
 public:
     MapView() :
@@ -53,6 +55,14 @@ public:
         glfwSetScrollCallback(window, scroll);
         glfwSetCharCallback(window, character);
         glfwSetKeyCallback(window, key);
+
+        [[NSNotificationCenter defaultCenter] addObserverForName:MBXNeedsRenderNotification
+                                                          object:nil
+                                                           queue:[NSOperationQueue mainQueue]
+                                                      usingBlock:^(NSNotification *notification)
+                                                      {
+                                                          dirty = true;
+                                                      }];
     }
 
     static void character(GLFWwindow *window, unsigned int codepoint) {
@@ -241,6 +251,7 @@ void request_http(std::string url, std::function<void(Response&)> func) {
             Response res;
             func(res);
         }
+        [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
     }];
 }
 
@@ -263,6 +274,7 @@ void request_http(std::string url, std::function<void(Response&)> func, std::fun
 
         func(res);
         cb();
+        [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
     }];
 }
 
