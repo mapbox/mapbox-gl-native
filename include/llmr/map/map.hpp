@@ -32,7 +32,7 @@ public:
     void tileFailed(std::shared_ptr<Tile> tile);
 
     /* position */
-    void moveBy(double dx, double dy);
+    void moveBy(double dx, double dy, double duration = 0);
     // void setLonLat(double lon, double lat);
     void resetPosition();
 

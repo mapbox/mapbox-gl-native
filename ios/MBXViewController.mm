@@ -22,6 +22,7 @@
 @property (nonatomic) CGPoint center;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
+@property (nonatomic) BOOL debug;
 
 @end
 
@@ -127,7 +128,9 @@ class MBXMapView
 
     if (current - elapsed >= 1)
     {
-        NSLog(@"FPS: %f", frames / (current - elapsed));
+        if (self.debug)
+            NSLog(@"FPS: %f", frames / (current - elapsed));
+
         elapsed = current;
         frames = 0;
     }
@@ -147,6 +150,18 @@ class MBXMapView
         mapView->map.moveBy(delta.x, delta.y);
 
         self.center = CGPointMake(self.center.x + delta.x, self.center.y + delta.y);
+    }
+    else if (pan.state == UIGestureRecognizerStateEnded)
+    {
+        if ([pan velocityInView:pan.view].x < 50 && [pan velocityInView:pan.view].y < 50)
+            return;
+
+        CGPoint finalCenter = CGPointMake(self.center.x + (0.1 * [pan velocityInView:pan.view].x),
+                                          self.center.y + (0.1 * [pan velocityInView:pan.view].y));
+
+        CGFloat duration = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 0.3 : 0.5);
+
+        mapView->map.moveBy(finalCenter.x - self.center.x, finalCenter.y - self.center.y, duration);
     }
 }
 
@@ -215,7 +230,11 @@ class MBXMapView
 - (void)handleThreeFingerLongPressGesture:(UILongPressGestureRecognizer *)threeFingerLongPress
 {
     if (threeFingerLongPress.state == UIGestureRecognizerStateBegan)
+    {
         mapView->map.toggleDebug();
+
+        self.debug = ! self.debug;
+    }
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
