@@ -155,6 +155,8 @@ class MBXMapView
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
+    mapView->map.cancelAnimations();
+
     if (pan.state == UIGestureRecognizerStateBegan)
     {
         self.center = CGPointMake(0, 0);
@@ -186,6 +188,8 @@ class MBXMapView
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
+    mapView->map.cancelAnimations();
+
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
         self.scale = mapView->map.getScale();
@@ -214,6 +218,8 @@ class MBXMapView
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
+    mapView->map.cancelAnimations();
+
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
         self.angle = mapView->map.getAngle();
@@ -228,6 +234,8 @@ class MBXMapView
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
+    mapView->map.cancelAnimations();
+
     if (doubleTap.state == UIGestureRecognizerStateEnded)
         mapView->map.scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.5);
 
@@ -236,6 +244,8 @@ class MBXMapView
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
+    mapView->map.cancelAnimations();
+
     if (twoFingerTap.state == UIGestureRecognizerStateEnded)
         mapView->map.scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
 
@@ -244,6 +254,8 @@ class MBXMapView
 
 - (void)handleLongPressGesture:(UILongPressGestureRecognizer *)longPress
 {
+    mapView->map.cancelAnimations();
+
     if (longPress.state == UIGestureRecognizerStateBegan)
         mapView->map.resetNorth();
 
@@ -252,6 +264,8 @@ class MBXMapView
 
 - (void)handleTwoFingerLongPressGesture:(UILongPressGestureRecognizer *)twoFingerLongPress
 {
+    mapView->map.cancelAnimations();
+
     if (twoFingerLongPress.state == UIGestureRecognizerStateBegan)
         mapView->map.resetPosition();
 
@@ -260,6 +274,8 @@ class MBXMapView
 
 - (void)handleThreeFingerLongPressGesture:(UILongPressGestureRecognizer *)threeFingerLongPress
 {
+    mapView->map.cancelAnimations();
+
     if (threeFingerLongPress.state == UIGestureRecognizerStateBegan)
     {
         mapView->map.toggleDebug();
