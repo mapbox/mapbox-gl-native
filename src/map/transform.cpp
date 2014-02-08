@@ -127,14 +127,22 @@ void Transform::setScale(double new_scale, double cx, double cy, double duration
     Cc = s / (2 * M_PI);
 }
 
-void Transform::setZoom(double zoom) {
-    setScale(pow(2.0, zoom));
+void Transform::setZoom(double zoom, double duration) {
+    setScale(pow(2.0, zoom), duration);
 }
 
-void Transform::setLonLat(double lon, double lat) {
+void Transform::setLonLat(double lon, double lat, double duration) {
     const double f = fmin(fmax(sin(D2R * lat), -0.9999), 0.9999);
-    x = -round(lon * Bc);
-    y = round(0.5 * Cc * log((1 + f) / (1 - f)));
+    double xn = -round(lon * Bc);
+    double yn = round(0.5 * Cc * log((1 + f) / (1 - f)));
+
+    if (duration == 0) {
+        x = xn;
+        y = yn;
+    } else {
+        animations.emplace_front(x, xn, x, duration);
+        animations.emplace_front(y, yn, y, duration);
+    }
 }
 
 void Transform::getLonLat(double &lon, double &lat) const {

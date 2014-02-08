@@ -83,6 +83,32 @@ void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double
     settings.save();
 }
 
+void Map::setLonLat(double lon, double lat, double duration) {
+    transform.setLonLat(lon, lat, duration);
+    update();
+
+    transform.getLonLat(settings.longitude, settings.latitude);
+    settings.save();
+}
+
+void Map::getLonLat(double &lon, double &lat) const {
+    transform.getLonLat(lon, lat);
+}
+
+void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
+    transform.setLonLat(lon, lat, duration);
+    transform.setZoom(zoom, duration);
+
+    transform.getLonLat(settings.longitude, settings.latitude);
+    settings.scale = transform.getScale();
+    settings.save();
+}
+
+void Map::getLonLatZoom(double &lon, double &lat, double &zoom) const {
+    transform.getLonLat(lon, lat);
+    zoom = transform.getZoom();
+}
+
 void Map::setScale(double scale, double cx, double cy, double duration) {
     transform.setScale(scale, cx, cy, duration);
     style.cascade(transform.getZoom());
@@ -91,6 +117,20 @@ void Map::setScale(double scale, double cx, double cy, double duration) {
     transform.getLonLat(settings.longitude, settings.latitude);
     settings.scale = transform.getScale();
     settings.save();
+}
+
+void Map::setZoom(double zoom, double duration) {
+    transform.setZoom(zoom, duration);
+    style.cascade(transform.getZoom());
+    update();
+
+    transform.getLonLat(settings.longitude, settings.latitude);
+    settings.scale = transform.getScale();
+    settings.save();
+}
+
+double Map::getZoom() const {
+    return transform.getZoom();
 }
 
 void Map::setAngle(double angle, double x, double y) {
@@ -142,6 +182,10 @@ void Map::resetPosition() {
     settings.scale = transform.getScale();
     settings.angle = transform.getAngle();
     settings.save();
+}
+
+void Map::resetZoom() {
+    setZoom(0);
 }
 
 void Map::toggleDebug() {

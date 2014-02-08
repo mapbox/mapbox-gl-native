@@ -29,8 +29,8 @@ public:
     // Absolute changes
     void setScale(double scale, double cx = -1, double cy = -1, double duration = 0);
     void setAngle(double angle, double duration = 0);
-    void setZoom(double zoom);
-    void setLonLat(double lon, double lat);
+    void setZoom(double zoom, double duration = 0);
+    void setLonLat(double lon, double lat, double duration = 0);
 
     // Getters
     void matrixFor(mat4& matrix, const vec3<int32_t>& id) const;
