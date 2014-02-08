@@ -133,19 +133,19 @@ double Map::getZoom() const {
     return transform.getZoom();
 }
 
-void Map::setAngle(double angle, double x, double y) {
+void Map::setAngle(double angle, double x, double y, double duration) {
     double dx = 0, dy = 0;
 
     if (x >= 0 && y >= 0) {
         dx = (transform.width  / 2) - x;
         dy = (transform.height / 2) - y;
-        transform.moveBy(dx, dy);
+        transform.moveBy(dx, dy, duration);
     }
 
-    transform.setAngle(angle);
+    transform.setAngle(angle, duration);
 
     if (x >= 0 && y >= 0) {
-        transform.moveBy(-dx, -dy);
+        transform.moveBy(-dx, -dy, duration);
     }
 
     update();
@@ -164,7 +164,7 @@ double Map::getAngle() const {
 }
 
 void Map::resetNorth() {
-    transform.setAngle(0, 0.5); // 500 ms
+    transform.setAngle(0, 0.5);
     update();
 
     settings.angle = transform.getAngle();

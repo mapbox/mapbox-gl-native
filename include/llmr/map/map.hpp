@@ -50,7 +50,7 @@ public:
 
     /* rotation */
     void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey);
-    void setAngle(double angle, double cx = -1, double cy = -1);
+    void setAngle(double angle, double cx = -1, double cy = -1, double duration = 0);
     double getAngle() const;
     void resetNorth();
 
