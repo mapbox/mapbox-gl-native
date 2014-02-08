@@ -33,12 +33,14 @@ void Transform::cancelAnimations() {
 }
 
 void Transform::moveBy(double dx, double dy, double duration) {
+    double xn = x + cos(angle) * dx + sin(angle) * dy;
+    double yn = y + cos(angle) * dy + sin(-angle) * dx;
     if (duration == 0) {
-        x += cos(angle) * dx + sin(angle) * dy;
-        y += cos(angle) * dy + sin(-angle) * dx;
+        x = xn;
+        y = yn;
     } else {
-        animations.emplace_front(x, x + cos(angle) * dx + sin(angle) * dy, x, duration);
-        animations.emplace_front(y, y + cos(angle) * dy + sin(-angle) * dx, y, duration);
+        animations.emplace_front(x, xn, x, duration);
+        animations.emplace_front(y, yn, y, duration);
     }
 }
 
@@ -106,13 +108,16 @@ void Transform::setScale(double new_scale, double cx, double cy, double duration
     const double dx = (cx - width / 2) * (1.0 - factor);
     const double dy = (cy - height / 2) * (1.0 - factor);
 
+    double xn = x * factor + dx;
+    double yn = y * factor + dy;
+
     if (duration == 0) {
-        x = x * factor + dx;
-        y = y * factor + dy;
+        x = xn;
+        y = yn;
         scale = new_scale;
     } else {
-        animations.emplace_front(x, x * factor + dx, x, duration);
-        animations.emplace_front(y, y * factor + dy, y, duration);
+        animations.emplace_front(x, xn, x, duration);
+        animations.emplace_front(y, yn, y, duration);
         animations.emplace_front(scale, new_scale, scale, duration);
     }
 
