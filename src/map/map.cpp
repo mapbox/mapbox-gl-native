@@ -75,8 +75,8 @@ void Map::scaleBy(double ds, double cx, double cy, double duration) {
     settings.save();
 }
 
-void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey) {
-    transform.rotateBy(cx, cy, sx, sy, ex, ey);
+void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey, double duration) {
+    transform.rotateBy(cx, cy, sx, sy, ex, ey, duration);
     update();
 
     settings.angle = transform.getAngle();

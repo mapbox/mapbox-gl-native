@@ -59,7 +59,7 @@ void Transform::scaleBy(double ds, double cx, double cy, double duration) {
 }
 
 
-void Transform::rotateBy(double anchor_x, double anchor_y, double start_x, double start_y, double end_x, double end_y) {
+void Transform::rotateBy(double anchor_x, double anchor_y, double start_x, double start_y, double end_x, double end_y, double duration) {
     double center_x = width / 2, center_y = height / 2;
 
     const double begin_center_x = start_x - center_x;
@@ -83,7 +83,7 @@ void Transform::rotateBy(double anchor_x, double anchor_y, double start_x, doubl
 
     const double ang = angle + util::angle_between(first_x, first_y, second_x, second_y);
 
-    setAngle(ang);
+    setAngle(ang, duration);
 }
 
 void Transform::setAngle(double new_angle, double duration) {
