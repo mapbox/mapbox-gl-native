@@ -24,6 +24,7 @@ NSString *const MBXNeedsRenderNotification = @"MBXNeedsRenderNotification";
 @property (nonatomic) CGPoint center;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
+@property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic) BOOL debug;
 
 @end
@@ -111,6 +112,14 @@ class MBXMapView
     UILongPressGestureRecognizer *threeFingerLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleThreeFingerLongPressGesture:)];
     threeFingerLongPress.numberOfTouchesRequired = 3;
     [self.view addGestureRecognizer:threeFingerLongPress];
+
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+    {
+        UILongPressGestureRecognizer *quickZoom = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleQuickZoomGesture:)];
+        quickZoom.numberOfTapsRequired = 1;
+        quickZoom.minimumPressDuration = 0.25;
+        [self.view addGestureRecognizer:quickZoom];
+    }
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startRender) name:MBXNeedsRenderNotification object:nil];
 
@@ -295,6 +304,28 @@ class MBXMapView
         mapView->map.toggleDebug();
 
         self.debug = ! self.debug;
+    }
+
+    [self startRender];
+}
+
+- (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
+{
+    mapView->map.cancelAnimations();
+
+    if (quickZoom.state == UIGestureRecognizerStateBegan)
+    {
+        self.scale = mapView->map.getScale();
+
+        self.quickZoomStart = [quickZoom locationInView:quickZoom.view].y;
+    }
+    else if (quickZoom.state == UIGestureRecognizerStateChanged)
+    {
+        CGFloat distance = self.quickZoomStart - [quickZoom locationInView:quickZoom.view].y;
+
+        CGFloat newZoom = log2f(self.scale) + (distance / 100);
+
+        mapView->map.scaleBy(powf(2, newZoom) / mapView->map.getScale(), self.view.bounds.size.width / 2, self.view.bounds.size.height / 2);
     }
 
     [self startRender];
