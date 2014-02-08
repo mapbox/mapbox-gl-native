@@ -6,9 +6,8 @@
 //
 //
 
-#import <GLKit/GLKit.h>
 #import <UIKit/UIKit.h>
 
-@interface MBXViewController : GLKViewController
+@interface MBXViewController : UIViewController
 
 @end

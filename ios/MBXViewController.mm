@@ -10,6 +10,7 @@
 
 #import "MBXSettings.h"
 
+#import <GLKit/GLKit.h>
 #import <OpenGLES/EAGL.h>
 #import <QuartzCore/QuartzCore.h>
 
@@ -59,9 +60,9 @@ class MBXMapView
         llmr::Map map;
 };
 
-- (void)viewDidLoad
+- (void)loadView
 {
-    [super viewDidLoad];
+    [super loadView];
 
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
@@ -71,14 +72,22 @@ class MBXMapView
         return;
     }
 
-    mapView = new MBXMapView();
+    GLKView *view = [[GLKView alloc] initWithFrame:[[UIScreen mainScreen] bounds] context:self.context];
 
-    GLKView *view = (GLKView *)self.view;
-    view.context = self.context;
+    view.enableSetNeedsDisplay = NO;
     view.drawableStencilFormat = GLKViewDrawableStencilFormat8;
     [view bindDrawable];
 
     [EAGLContext setCurrentContext:self.context];
+
+    self.view = view;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+
+    mapView = new MBXMapView();
 
     mapView->init();
 
@@ -160,6 +169,8 @@ class MBXMapView
         elapsed = current;
         frames = 0;
     }
+
+    [(GLKView *)self.view display];
 }
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
