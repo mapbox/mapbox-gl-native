@@ -25,10 +25,13 @@ public:
         }
     }
 
+    // Returns the number of elements in this buffer. This is not the number of
+    // bytes, but rather the number of coordinates with associated information.
     inline size_t index() const {
         return pos / itemSize;
     }
 
+    // Transfers this buffer to the GPU and binds the buffer to the GL context.
     void bind() {
         if (buffer == 0) {
             glGenBuffers(1, &buffer);
