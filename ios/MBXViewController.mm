@@ -130,10 +130,15 @@ class MBXMapView
         [self.view addGestureRecognizer:quickZoom];
     }
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startRender) name:MBXNeedsRenderNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startRender:) name:MBXNeedsRenderNotification object:nil];
 
     displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(render:)];
     [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+}
+
+- (void)startRender:(NSNotification *)notification
+{
+    [self startRender];
 }
 
 - (void)startRender
