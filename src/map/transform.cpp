@@ -104,6 +104,11 @@ void Transform::setScale(double new_scale, double cx, double cy, double duration
         new_scale = max_scale;
     }
 
+    if (cx < 0 || cy < 0) {
+        cx = width / 2;
+        cy = height / 2;
+    }
+
     const double factor = new_scale / scale;
     const double dx = (cx - width / 2) * (1.0 - factor);
     const double dy = (cy - height / 2) * (1.0 - factor);
