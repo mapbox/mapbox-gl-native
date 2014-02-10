@@ -150,6 +150,11 @@ void Transform::getLonLat(double &lon, double &lat) const {
     lat = R2D * (2 * atan(exp(y / Cc)) - 0.5 * M_PI);
 }
 
+void Transform::getLonLatZoom(double& lon, double& lat, double& zoom) const {
+    getLonLat(lon, lat);
+    zoom = getZoom();
+}
+
 double Transform::pixel_x() const {
     const double center = (width - scale * size) / 2;
     return center + x;

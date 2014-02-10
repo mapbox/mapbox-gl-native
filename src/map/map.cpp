@@ -105,8 +105,7 @@ void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
 }
 
 void Map::getLonLatZoom(double &lon, double &lat, double &zoom) const {
-    transform.getLonLat(lon, lat);
-    zoom = transform.getZoom();
+    transform.getLonLatZoom(lon, lat, zoom);
 }
 
 void Map::setScale(double scale, double cx, double cy, double duration) {
