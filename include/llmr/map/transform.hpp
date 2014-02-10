@@ -39,7 +39,7 @@ public:
     double getScale() const;
     double getAngle() const;
     void getLonLat(double& lon, double& lat) const;
-
+    void getLonLatZoom(double& lon, double& lat, double& zoom) const;
 
     // Temporary
     void mapCornersToBox(uint32_t z, box& b) const;
