@@ -42,7 +42,8 @@ std::forward_list<Tile::ID> Tile::children(const ID& id, int32_t z) {
 Tile::Tile(ID id, const Style& style)
     : id(id),
       state(initial),
-      fillBuffer(std::make_shared<FillBuffer>()),
+      fillVertexBuffer(std::make_shared<FillVertexBuffer>()),
+      fillElementsBuffer(std::make_shared<FillElementsBuffer>()),
       lineBuffer(std::make_shared<LineBuffer>()),
       style(style) {
 
@@ -166,7 +167,7 @@ std::shared_ptr<Bucket> Tile::createBucket(const VectorTile& tile, const BucketD
 }
 
 std::shared_ptr<Bucket> Tile::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
-    std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(fillBuffer, bucket_desc);
+    std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(fillVertexBuffer, fillElementsBuffer, bucket_desc);
 
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (pbf feature : filtered_layer) {

@@ -21,7 +21,8 @@ class LayerDescription;
 class BucketDescription;
 class VectorTile;
 class VectorTileLayer;
-class FillBuffer;
+class FillVertexBuffer;
+class FillElementsBuffer;
 class LineBuffer;
 class PlainShader;
 
@@ -72,7 +73,8 @@ public:
     DebugFontBuffer debugFontBuffer;
     VertexArrayObject<PlainShader> debugFontArray;
 
-    std::shared_ptr<FillBuffer> fillBuffer;
+    std::shared_ptr<FillVertexBuffer> fillVertexBuffer;
+    std::shared_ptr<FillElementsBuffer> fillElementsBuffer;
     std::shared_ptr<LineBuffer> lineBuffer;
 
     // Holds the buckets of this tile.

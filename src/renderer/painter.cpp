@@ -96,7 +96,7 @@ void Painter::drawClippingMask() {
 
     // Draw the clipping mask
     glUniform4f(plainShader->u_color, 1.0f, 0.0f, 1.0f, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
+    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
 
     // glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
@@ -265,7 +265,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         // Draw a rectangle that covers the entire viewport.
         coveringPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0));
-        glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
+        glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
 
     } else {
         // Draw filling rectangle.
@@ -275,7 +275,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         // Draw a rectangle that covers the entire viewport.
         coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-        glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
+        glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
     }
 
     glStencilMask(0x00);
@@ -365,16 +365,16 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 0.0f, 0.0f, 1.0f);
     glLineWidth(4.0f);
-    glDrawArrays(GL_LINE_STRIP, 0, tileBorderBuffer.length());
+    glDrawArrays(GL_LINE_STRIP, 0, tileBorderBuffer.index());
 
     // draw debug info
     tile->debugFontArray.bind(*plainShader, tile->debugFontBuffer, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
     glLineWidth(4.0f);
-    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.length());
+    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.index());
     glUniform4f(plainShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
     glLineWidth(2.0f);
-    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.length());
+    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.index());
 
     // Revert blending mode to blend to the back.
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
@@ -391,7 +391,7 @@ void Painter::renderMatte() {
     // Draw the clipping mask
     matteArray.bind(*plainShader, matteBuffer, BUFFER_OFFSET(0));
     glUniform4fv(plainShader->u_color, 1, white.data());
-    glDrawArrays(GL_TRIANGLES, 0, matteBuffer.length());
+    glDrawArrays(GL_TRIANGLES, 0, matteBuffer.index());
 
     glEnable(GL_STENCIL_TEST);
 }
@@ -405,5 +405,5 @@ void Painter::renderBackground() {
     // Draw the clipping mask
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glUniform4fv(plainShader->u_color, 1, white.data());
-    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.length());
+    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
 }
