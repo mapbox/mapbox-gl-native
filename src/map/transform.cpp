@@ -133,7 +133,7 @@ void Transform::setScale(double new_scale, double cx, double cy, double duration
 }
 
 void Transform::setZoom(double zoom, double duration) {
-    setScale(pow(2.0, zoom), duration);
+    setScale(pow(2.0, zoom), -1, -1, duration);
 }
 
 void Transform::setLonLat(double lon, double lat, double duration) {
