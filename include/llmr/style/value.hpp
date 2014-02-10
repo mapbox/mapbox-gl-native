@@ -6,7 +6,7 @@
 
 namespace llmr {
 
-typedef boost::variant<std::string, double, int64_t, uint64_t, bool> Value;
+typedef boost::variant<bool, int64_t, uint64_t, double, std::string> Value;
 
 Value parseValue(pbf data);
 
