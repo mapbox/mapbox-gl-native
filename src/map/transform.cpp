@@ -97,6 +97,23 @@ void Transform::setAngle(double new_angle, double duration) {
     }
 }
 
+void Transform::setScaleXY(double new_scale, double xn, double yn, double duration) {
+    if (duration == 0) {
+        scale = new_scale;
+        x = xn;
+        y = yn;
+    } else {
+        animations.emplace_front(scale, new_scale, scale, duration);
+        animations.emplace_front(x, xn, x, duration);
+        animations.emplace_front(y, yn, y, duration);
+    }
+
+    const double s = scale * size;
+    zc = s / 2;
+    Bc = s / 360;
+    Cc = s / (2 * M_PI);
+}
+
 void Transform::setScale(double new_scale, double cx, double cy, double duration) {
     if (new_scale < min_scale) {
         new_scale = min_scale;
@@ -116,20 +133,7 @@ void Transform::setScale(double new_scale, double cx, double cy, double duration
     double xn = x * factor + dx;
     double yn = y * factor + dy;
 
-    if (duration == 0) {
-        x = xn;
-        y = yn;
-        scale = new_scale;
-    } else {
-        animations.emplace_front(x, xn, x, duration);
-        animations.emplace_front(y, yn, y, duration);
-        animations.emplace_front(scale, new_scale, scale, duration);
-    }
-
-    const double s = scale * size;
-    zc = s / 2;
-    Bc = s / 360;
-    Cc = s / (2 * M_PI);
+    setScaleXY(new_scale, xn, yn, duration);
 }
 
 void Transform::setZoom(double zoom, double duration) {
@@ -141,13 +145,22 @@ void Transform::setLonLat(double lon, double lat, double duration) {
     double xn = -round(lon * Bc);
     double yn = round(0.5 * Cc * log((1 + f) / (1 - f)));
 
-    if (duration == 0) {
-        x = xn;
-        y = yn;
-    } else {
-        animations.emplace_front(x, xn, x, duration);
-        animations.emplace_front(y, yn, y, duration);
-    }
+    setScaleXY(scale, xn, yn, duration);
+}
+
+void Transform::setLonLatZoom(double lon, double lat, double zoom, double duration) {
+    double new_scale = pow(2.0, zoom);
+
+    const double s = new_scale * size;
+    zc = s / 2;
+    Bc = s / 360;
+    Cc = s / (2 * M_PI);
+
+    const double f = fmin(fmax(sin(D2R * lat), -0.9999), 0.9999);
+    double xn = -round(lon * Bc);
+    double yn = round(0.5 * Cc * log((1 + f) / (1 - f)));
+
+    setScaleXY(new_scale, xn, yn, duration);
 }
 
 void Transform::getLonLat(double &lon, double &lat) const {

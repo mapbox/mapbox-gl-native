@@ -96,8 +96,9 @@ void Map::getLonLat(double &lon, double &lat) const {
 }
 
 void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
-    transform.setLonLat(lon, lat, duration);
-    transform.setZoom(zoom, duration);
+    transform.setLonLatZoom(lon, lat, zoom, duration);
+    style.cascade(transform.getZoom());
+    update();
 
     transform.getLonLat(settings.longitude, settings.latitude);
     settings.scale = transform.getScale();

@@ -31,6 +31,7 @@ public:
     void setAngle(double angle, double duration = 0);
     void setZoom(double zoom, double duration = 0);
     void setLonLat(double lon, double lat, double duration = 0);
+    void setLonLatZoom(double lon, double lat, double zoom, double duration = 0);
 
     // Getters
     void matrixFor(mat4& matrix, const vec3<int32_t>& id) const;
@@ -45,6 +46,7 @@ public:
     void mapCornersToBox(uint32_t z, box& b) const;
 
 private:
+    void setScaleXY(double new_scale, double xn, double yn, double duration = 0);
     double pixel_x() const;
     double pixel_y() const;
 
