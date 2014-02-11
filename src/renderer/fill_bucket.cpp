@@ -73,7 +73,7 @@ void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
         index.groups.emplace_back();
     }
 
-    group& group = index.groups.back();
+    group_type& group = index.groups.back();
 
     // We're generating triangle fans, so we always start with the first
     // coordinate in this polygon.
@@ -106,7 +106,7 @@ uint32_t FillBucket::size() const {
 void FillBucket::drawElements(PlainShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer->itemSize);
     char *elements_index = BUFFER_OFFSET(elements_start * elementsBuffer->itemSize);
-    for (group& group : groups) {
+    for (group_type& group : groups) {
         group.array.bind(shader, *vertexBuffer, *elementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3 - 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * 2 * sizeof(uint16_t);

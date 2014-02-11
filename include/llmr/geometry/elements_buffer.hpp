@@ -1,9 +1,25 @@
 #ifndef LLMR_GEOMETRY_TRIANGLE_ELEMENTS_BUFFER
 #define LLMR_GEOMETRY_TRIANGLE_ELEMENTS_BUFFER
 
-#include "buffer.hpp"
+#include <llmr/geometry/buffer.hpp>
 
 namespace llmr {
+
+template <typename Shader>
+class VertexArrayObject;
+
+template <typename Shader>
+struct ElementGroup {
+    VertexArrayObject<Shader> array;
+    uint32_t vertex_length;
+    uint32_t elements_length;
+
+    ElementGroup() : vertex_length(0), elements_length(0) {}
+    ElementGroup(uint32_t vertex_length, uint32_t elements_length)
+        : vertex_length(vertex_length),
+          elements_length(elements_length) {
+    }
+};
 
 class TriangleElementsBuffer : public Buffer<
     6, // bytes per triangle (3 * unsigned short == 6 bytes)
