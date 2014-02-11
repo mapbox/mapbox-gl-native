@@ -19,6 +19,11 @@ app: config.gypi src macosx/llmr-app.gyp
 xcode: config.gypi llmr.gyp
 	deps/run_gyp llmr.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 
+# build OS X app with Xcode
+xproj: config.gypi src macosx/llmr-app.gyp
+	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
+	open ./macosx/llmr-app.xcodeproj
+
 # build OS X app with xcodebuild
 xapp: config.gypi src macosx/llmr-app.gyp
 	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode

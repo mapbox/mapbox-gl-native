@@ -17,7 +17,7 @@ namespace llmr {
 
 class Style;
 class FillVertexBuffer;
-class FillElementsBuffer;
+class TriangleElementsBuffer;
 class BucketDescription;
 class OutlineShader;
 class PlainShader;
@@ -27,7 +27,7 @@ struct pbf;
 class FillBucket : public Bucket {
 public:
     FillBucket(const std::shared_ptr<FillVertexBuffer>& vertexBuffer,
-               const std::shared_ptr<FillElementsBuffer>& elementsBuffer,
+               const std::shared_ptr<TriangleElementsBuffer>& elementsBuffer,
                const BucketDescription& bucket_desc);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
@@ -44,7 +44,7 @@ public:
 
 private:
     std::shared_ptr<FillVertexBuffer> vertexBuffer;
-    std::shared_ptr<FillElementsBuffer> elementsBuffer;
+    std::shared_ptr<TriangleElementsBuffer> elementsBuffer;
 
     struct group {
         VertexArrayObject<PlainShader> array;

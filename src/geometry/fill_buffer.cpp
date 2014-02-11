@@ -16,10 +16,3 @@ void FillVertexBuffer::add(vertex_type x, vertex_type y) {
     vertices[0] = x;
     vertices[1] = y;
 }
-
-void FillElementsBuffer::add(element_type a, element_type b, element_type c) {
-    element_type *elements = static_cast<element_type *>(addElement());
-    elements[0] = a;
-    elements[1] = b;
-    elements[2] = c;
-}

@@ -32,6 +32,7 @@ void Painter::setup() {
     assert(plainShader);
     assert(outlineShader);
     assert(lineShader);
+    assert(linejoinShader);
     assert(patternShader);
 
     glEnable(GL_STENCIL_TEST);
@@ -46,6 +47,7 @@ void Painter::setupShaders() {
     plainShader = std::make_unique<PlainShader>();
     outlineShader = std::make_unique<OutlineShader>();
     lineShader = std::make_unique<LineShader>();
+    linejoinShader = std::make_unique<LinejoinShader>();
     patternShader = std::make_unique<PatternShader>();
 }
 
@@ -213,7 +215,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     if (properties.antialias) {
         glUseProgram(outlineShader->program);
         glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix.data());
-        glLineWidth(2);
+        glLineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
         if (properties.stroke_color != properties.fill_color) {
             // If we defined a different color for the fill outline, we are
@@ -233,7 +235,6 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         // Draw the entire line
         glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
-        glLineWidth(2.0f);
         bucket.drawVertices(*outlineShader);
     }
 
@@ -286,13 +287,16 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     const LineProperties& properties = style.computed.lines[layer_name];
 
     // Abort early.
-    if (!bucket.size()) return;
+    if (bucket.empty()) return;
     if (properties.hidden) return;
 
     double width = properties.width;
-    double offset = (properties.offset || 0) / 2;
-    double inset = fmax(-1, offset - width / 2 - 0.5) + 1;
-    double outset = offset + width / 2 + 0.5;
+    double offset = properties.offset / 2;
+
+    // These are the radii of the line. We are limiting it to 16, which will result
+    // in a point size of 64 on retina.
+    double inset = fmin((fmax(-1, offset - width / 2 - 0.5) + 1), 16.0f);
+    double outset = fmin(offset + width / 2 + 0.5, 16.0f);
 
     Color color = properties.color;
     color[0] *= properties.opacity;
@@ -300,10 +304,19 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    // var imagePos = properties.image && imageSprite.getPosition(properties.image);
-    // var shader;
-    bool imagePos = false;
+    // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
+    if (bucket.hasPoints() && outset > 1.0f) {
+        glUseProgram(linejoinShader->program);
+        glUniformMatrix4fv(linejoinShader->u_matrix, 1, GL_FALSE, matrix.data());
+        glUniform4fv(linejoinShader->u_color, 1, color.data());
+        glUniform2f(linejoinShader->u_world, transform.fb_width / 2, transform.fb_height / 2);
+        glUniform2f(linejoinShader->u_linewidth, (outset - 0.25) * transform.pixelRatio, (inset - 0.25) * transform.pixelRatio);
+        glPointSize(ceil(transform.pixelRatio * outset * 2.0));
+        bucket.drawPoints(*linejoinShader);
+    }
 
+    // var imagePos = properties.image && imageSprite.getPosition(properties.image);
+    bool imagePos = false;
     if (imagePos) {
         // var factor = 8 / Math.pow(2, painter.transform.zoom - params.z);
 
@@ -321,38 +334,17 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         glUseProgram(lineShader->program);
         glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix.data());
         glUniformMatrix4fv(lineShader->u_exmatrix, 1, GL_FALSE, exMatrix.data());
-        // glUniform2fv(painter.lineShader.u_dasharray, properties.dasharray || [1, -1]);
-        glUniform2f(lineShader->u_dasharray, 1, -1);
-
 
         // TODO: Move this to transform?
         const double tilePixelRatio = transform.getScale() / (1 << transform.getIntegerZoom()) / 8;
 
+        glUniform2f(lineShader->u_dasharray, 1, -1);
         glUniform2f(lineShader->u_linewidth, outset, inset);
         glUniform1f(lineShader->u_ratio, tilePixelRatio);
-        glUniform1f(lineShader->u_gamma, transform.pixelRatio);
-
-        // const Color& color = properties.color;
-        // if (!params.antialiasing) {
-        //     color[3] = Infinity;
-        //     glUniform4fv(lineShader->u_color, color);
-        // } else {
         glUniform4fv(lineShader->u_color, 1, color.data());
-        // }
-
-
-        glUniform1f(lineShader->u_point, 0);
-        bucket.bind(*lineShader);
-        bucket.drawLines();
-
-        if (bucket.geometry.join == JoinType::Round) {
-            glUniform1f(lineShader->u_point, 1);
-            bucket.drawPoints();
-        }
+        glUniform1f(lineShader->u_debug, 0);
+        bucket.drawLines(*lineShader);
     }
-
-    // statistics
-    // stats.lines += count;
 }
 
 void Painter::renderDebug(const Tile::Ptr& tile) {
@@ -364,16 +356,16 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
     // draw tile outline
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 0.0f, 0.0f, 1.0f);
-    glLineWidth(4.0f);
+    glLineWidth(4.0f * transform.pixelRatio);
     glDrawArrays(GL_LINE_STRIP, 0, tileBorderBuffer.index());
 
     // draw debug info
     tile->debugFontArray.bind(*plainShader, tile->debugFontBuffer, BUFFER_OFFSET(0));
     glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
-    glLineWidth(4.0f);
+    glLineWidth(4.0f * transform.pixelRatio);
     glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.index());
     glUniform4f(plainShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
-    glLineWidth(2.0f);
+    glLineWidth(2.0f * transform.pixelRatio);
     glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.index());
 
     // Revert blending mode to blend to the back.

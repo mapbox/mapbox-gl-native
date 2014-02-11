@@ -25,7 +25,7 @@ var cap_type = {
 
 // enum
 var join_type = {
-    butt: 1,
+    miter: 1,
     bevel: 2,
     round: 3
 };

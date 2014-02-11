@@ -5,8 +5,7 @@
 
 namespace llmr {
 
-
-class LineBuffer : public Buffer<
+class LineVertexBuffer : public Buffer<
     8 // 2 coordinates per vertex + 1 linesofar + 1 extrude coord pair == 4 (== 8 bytes)
 > {
 public:
@@ -31,19 +30,9 @@ public:
      * @param {number} tx texture normal
      * @param {number} ty texture normal
      */
-    void add(vertex_type x, vertex_type y, float ex, float ey, int8_t tx, int8_t ty, int32_t linesofar = 0);
-
-    /*
-     * Add a degenerate triangle to the buffer
-     *
-     * > So we need a way to get from the end of one triangle strip
-     * to the beginning of the next strip without actually filling triangles
-     * on the way. We can do this with "degenerate" triangles: We simply
-     * repeat the last coordinate of the first triangle strip and the first
-     * coordinate of the next triangle strip.
-     */
-    void addDegenerate();
+    size_t add(vertex_type x, vertex_type y, float ex, float ey, int8_t tx, int8_t ty, int32_t linesofar = 0);
 };
+
 
 }
 

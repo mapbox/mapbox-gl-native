@@ -161,7 +161,11 @@ public:
     int run() {
         while (!glfwWindowShouldClose(window)) {
             if (dirty) {
-                dirty = render();
+                try {
+                    dirty = render();
+                } catch(std::exception& ex) {
+                    fprintf(stderr, "exception: %s\n", ex.what());
+                }
                 glfwSwapBuffers(window);
                 fps();
             }
