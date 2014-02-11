@@ -18,10 +18,12 @@
 #include <llmr/platform/platform.hpp>
 
 NSString *const MBXNeedsRenderNotification = @"MBXNeedsRenderNotification";
+NSString *const MBXUpdateActivityNotification = @"MBXUpdateActivityNotification";
 
 @interface MBXViewController () <UIGestureRecognizerDelegate>
 
 @property (nonatomic) EAGLContext *context;
+@property (nonatomic) NSUInteger activityCount;
 @property (nonatomic) CGPoint center;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
@@ -87,10 +89,6 @@ class MBXMapView
 {
     [super viewDidLoad];
 
-    mapView = new MBXMapView();
-
-    mapView->init();
-
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
     pan.delegate = self;
     [self.view addGestureRecognizer:pan];
@@ -130,10 +128,29 @@ class MBXMapView
         [self.view addGestureRecognizer:quickZoom];
     }
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startRender) name:MBXNeedsRenderNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startRender:) name:MBXNeedsRenderNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateNetworkActivity:) name:MBXUpdateActivityNotification object:nil];
+
+    mapView = new MBXMapView();
+
+    mapView->init();
 
     displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(render:)];
     [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+}
+
+- (void)startRender:(NSNotification *)notification
+{
+    [self startRender];
+}
+
+- (void)updateNetworkActivity:(NSNotification *)notification
+{
+    NSInteger input = [[notification userInfo][@"count"] integerValue];
+
+    self.activityCount += input;
+
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:(self.activityCount > 0)];
 }
 
 - (void)startRender
@@ -376,6 +393,8 @@ namespace llmr
 
         void request_http(std::string url, std::function<void(Response&)> func)
         {
+            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@1 forKey:@"count"]];
+
             NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithUTF8String:url.c_str()]]];
 
             [NSURLConnection sendAsynchronousRequest:urlRequest
@@ -398,12 +417,15 @@ namespace llmr
                     func(res);
                 }
 
+                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@(-1) forKey:@"count"]];
                 [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
             }];
         }
 
         void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb)
         {
+            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@1 forKey:@"count"]];
+
             NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithUTF8String:url.c_str()]]];
 
             [NSURLConnection sendAsynchronousRequest:urlRequest
@@ -422,6 +444,7 @@ namespace llmr
 
                 cb();
 
+                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@(-1) forKey:@"count"]];
                 [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
             }];
         }
