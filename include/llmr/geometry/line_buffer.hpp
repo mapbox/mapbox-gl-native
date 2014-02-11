@@ -18,7 +18,7 @@ public:
      * normal array, while the extrude normal actually moves the vertex to create
      * the acute/bevelled line join.
      */
-    const int8_t extrudeScale = 63;
+    static const int8_t extrudeScale = 63;
 
     /*
      * Add a vertex to this buffer

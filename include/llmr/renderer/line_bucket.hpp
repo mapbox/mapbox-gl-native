@@ -4,6 +4,7 @@
 #include "bucket.hpp"
 #include <llmr/style/bucket_description.hpp>
 #include <llmr/geometry/vao.hpp>
+#include <llmr/geometry/elements_buffer.hpp>
 #include <memory>
 #include <vector>
 
@@ -18,6 +19,8 @@ struct Coordinate;
 struct pbf;
 
 class LineBucket : public Bucket {
+    typedef ElementGroup<LineShader> line_group_type;
+    typedef ElementGroup<LinejoinShader> point_group_type;
 public:
     LineBucket(const std::shared_ptr<LineVertexBuffer>& vertexBuffer,
                const std::shared_ptr<TriangleElementsBuffer>& triangleElementsBuffer,
@@ -33,27 +36,23 @@ public:
     bool hasPoints() const;
 
     void drawLines(LineShader& shader);
-    void drawDebugLines(LineShader& shader);
     void drawPoints(LinejoinShader& shader);
 
 public:
     const BucketGeometryDescription geometry;
 
 private:
+
     std::shared_ptr<LineVertexBuffer> vertexBuffer;
-    const uint32_t vertex_start;
-    uint32_t vertex_length;
-
     std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
-    const uint32_t triangle_elements_start;
-    uint32_t triangle_length;
-
     std::shared_ptr<PointElementsBuffer> pointElementsBuffer;
-    const uint32_t point_elements_start;
-    uint32_t point_length;
 
-    VertexArrayObject<LineShader> lineArray;
-    VertexArrayObject<LinejoinShader> pointArray;
+    const uint32_t vertex_start;
+    const uint32_t triangle_elements_start;
+    const uint32_t point_elements_start;
+
+    std::vector<line_group_type> lineGroups;
+    std::vector<point_group_type> pointGroups;
 };
 
 }

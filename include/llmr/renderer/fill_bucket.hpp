@@ -48,11 +48,11 @@ private:
     std::shared_ptr<TriangleElementsBuffer> elementsBuffer;
 
     // hold information on where the vertices are located in the FillBuffer
-    uint32_t vertex_start;
-    uint32_t elements_start;
+    const uint32_t vertex_start;
+    const uint32_t elements_start;
     uint32_t length;
     VertexArrayObject<OutlineShader> array;
-    std::vector<ElementGroup<PlainShader>> groups;
+    std::vector<group_type> groups;
 };
 
 }

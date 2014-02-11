@@ -59,7 +59,7 @@ protected:
     }
 
 public:
-    const size_t itemSize = item_size;
+    static const size_t itemSize = item_size;
 
 private:
     // CPU buffer
