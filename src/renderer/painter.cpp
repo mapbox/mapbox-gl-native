@@ -311,7 +311,13 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         glUniform4fv(linejoinShader->u_color, 1, color.data());
         glUniform2f(linejoinShader->u_world, transform.fb_width / 2, transform.fb_height / 2);
         glUniform2f(linejoinShader->u_linewidth, (outset - 0.25) * transform.pixelRatio, (inset - 0.25) * transform.pixelRatio);
+
+    #if defined(GL_ES_VERSION_2_0)
+        glUniform1f(linejoinShader->u_size, ceil(transform.pixelRatio * outset * 2.0));
+    #else
         glPointSize(ceil(transform.pixelRatio * outset * 2.0));
+    #endif
+
         bucket.drawPoints(*linejoinShader);
     }
 

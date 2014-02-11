@@ -17,6 +17,7 @@ public:
     int32_t u_world;
     int32_t u_linewidth;
     int32_t u_color;
+    int32_t u_size;
 };
 
 }
