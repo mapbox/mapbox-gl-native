@@ -25,11 +25,16 @@ xapp: config.gypi src macosx/llmr-app.gyp
 	xcodebuild -project ./macosx/llmr-app.xcodeproj
 	open macosx/build/Release/llmr.app
 
+# build iOS app with Xcode
+iproj: config.gypi src ios/llmr-app.gyp
+	deps/run_gyp ios/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
+	open ./ios/llmr-app.xcodeproj
+
 # build iOS app with xcodebuild
 iapp: config.gypi src ios/llmr-app.gyp
 	deps/run_gyp ios/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 	xcodebuild -project ./ios/llmr-app.xcodeproj
-	# launch app with ios-sim? 
+	# launch app with ios-sim?
 
 isim: config.gypi src ios/llmr-app.gyp
 	deps/run_gyp ios/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
