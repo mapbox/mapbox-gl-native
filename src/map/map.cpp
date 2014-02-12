@@ -75,12 +75,38 @@ void Map::scaleBy(double ds, double cx, double cy, double duration) {
     settings.save();
 }
 
-void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey) {
-    transform.rotateBy(cx, cy, sx, sy, ex, ey);
+void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey, double duration) {
+    transform.rotateBy(cx, cy, sx, sy, ex, ey, duration);
     update();
 
     settings.angle = transform.getAngle();
     settings.save();
+}
+
+void Map::setLonLat(double lon, double lat, double duration) {
+    transform.setLonLat(lon, lat, duration);
+    update();
+
+    transform.getLonLat(settings.longitude, settings.latitude);
+    settings.save();
+}
+
+void Map::getLonLat(double &lon, double &lat) const {
+    transform.getLonLat(lon, lat);
+}
+
+void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
+    transform.setLonLatZoom(lon, lat, zoom, duration);
+    style.cascade(transform.getZoom());
+    update();
+
+    transform.getLonLat(settings.longitude, settings.latitude);
+    settings.scale = transform.getScale();
+    settings.save();
+}
+
+void Map::getLonLatZoom(double &lon, double &lat, double &zoom) const {
+    transform.getLonLatZoom(lon, lat, zoom);
 }
 
 void Map::setScale(double scale, double cx, double cy, double duration) {
@@ -93,19 +119,33 @@ void Map::setScale(double scale, double cx, double cy, double duration) {
     settings.save();
 }
 
-void Map::setAngle(double angle, double x, double y) {
+void Map::setZoom(double zoom, double duration) {
+    transform.setZoom(zoom, duration);
+    style.cascade(transform.getZoom());
+    update();
+
+    transform.getLonLat(settings.longitude, settings.latitude);
+    settings.scale = transform.getScale();
+    settings.save();
+}
+
+double Map::getZoom() const {
+    return transform.getZoom();
+}
+
+void Map::setAngle(double angle, double x, double y, double duration) {
     double dx = 0, dy = 0;
 
     if (x >= 0 && y >= 0) {
         dx = (transform.width  / 2) - x;
         dy = (transform.height / 2) - y;
-        transform.moveBy(dx, dy);
+        transform.moveBy(dx, dy, duration);
     }
 
-    transform.setAngle(angle);
+    transform.setAngle(angle, duration);
 
     if (x >= 0 && y >= 0) {
-        transform.moveBy(-dx, -dy);
+        transform.moveBy(-dx, -dy, duration);
     }
 
     update();
@@ -124,7 +164,7 @@ double Map::getAngle() const {
 }
 
 void Map::resetNorth() {
-    transform.setAngle(0, 0.5); // 500 ms
+    transform.setAngle(0, 0.5);
     update();
 
     settings.angle = transform.getAngle();
@@ -142,6 +182,10 @@ void Map::resetPosition() {
     settings.scale = transform.getScale();
     settings.angle = transform.getAngle();
     settings.save();
+}
+
+void Map::resetZoom() {
+    setZoom(0);
 }
 
 void Map::toggleDebug() {
