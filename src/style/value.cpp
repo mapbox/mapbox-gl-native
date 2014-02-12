@@ -8,7 +8,7 @@ llmr::Value llmr::parseValue(pbf data) {
         case 1: // string_value
             return data.string();
         case 2: // float_value
-            return data.float32();
+            return static_cast<double>(data.float32());
         case 3: // double_value
             return data.float64();
         case 4: // int_value

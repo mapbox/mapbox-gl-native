@@ -60,7 +60,7 @@ std::pair<std::string, BucketDescription> Style::parseBucket(pbf data) {
         }
     }
 
-    return { name, bucket };
+    return { name, std::forward<BucketDescription>(bucket) };
 }
 
 LayerDescription Style::parseLayer(pbf data) {
