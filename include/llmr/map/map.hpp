@@ -34,22 +34,23 @@ public:
 
     /* position */
     void moveBy(double dx, double dy, double duration = 0);
-    // void setLonLat(double lon, double lat);
+    void setLonLat(double lon, double lat, double duration = 0);
+    void getLonLat(double &lon, double &lat) const;
     void resetPosition();
 
     /* scale */
     void scaleBy(double ds, double cx = -1, double cy = -1, double duration = 0);
     void setScale(double scale, double cx = -1, double cy = -1, double duration = 0);
     double getScale() const;
-    // void setZoom(double zoom);
-    // void setLonLatZoom(double lon, double lat, double zoom);
-    // double getZoom() const;
-    // void getLonLatZoom(double &lon, double &lat, double &zoom) const;
-    // void resetZoom();
+    void setZoom(double zoom, double duration = 0);
+    double getZoom() const;
+    void setLonLatZoom(double lon, double lat, double zoom, double duration = 0);
+    void getLonLatZoom(double &lon, double &lat, double &zoom) const;
+    void resetZoom();
 
     /* rotation */
-    void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey);
-    void setAngle(double angle, double cx = -1, double cy = -1);
+    void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey, double duration = 0);
+    void setAngle(double angle, double cx = -1, double cy = -1, double duration = 0);
     double getAngle() const;
     void resetNorth();
 
