@@ -8,7 +8,7 @@
 namespace llmr {
 
 template <
-    size_t itemSize,
+    size_t item_size,
     int bufferType = GL_ARRAY_BUFFER,
     size_t defaultLength = 8192
 >
@@ -44,6 +44,7 @@ public:
         }
     }
 
+
 protected:
     // increase the buffer size by at least /required/ bytes.
     void *addElement() {
@@ -56,6 +57,9 @@ protected:
         pos += itemSize;
         return static_cast<char *>(array) + (pos - itemSize);
     }
+
+public:
+    static const size_t itemSize = item_size;
 
 private:
     // CPU buffer

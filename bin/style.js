@@ -10,17 +10,17 @@ module.exports = {
         "road_large": {
             "datasource": "streets",
             "layer": "road", "field": "class", "value": ["motorway", "main"],
-            "type": "line", "cap": "round", "join": "bevel"
+            "type": "line", "cap": "round", "join": "round"
         },
         "road_regular": {
             "datasource": "streets",
             "layer": "road", "field": "class", "value": "street",
-            "type": "line", "cap": "round", "join": "bevel"
+            "type": "line", "cap": "round", "join": "round"
         },
         "road_limited": {
             "datasource": "streets",
             "layer": "road", "field": "class", "value": "street_limited",
-            "type": "line", "cap": "round", "join": "bevel"
+            "type": "line", "cap": "round", "join": "round"
         },
         "park": {
             "datasource": "streets",

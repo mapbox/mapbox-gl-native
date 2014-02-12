@@ -1,5 +1,6 @@
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/geometry/fill_buffer.hpp>
+#include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/geometry/geometry.hpp>
 
 #include <llmr/renderer/painter.hpp>
@@ -15,7 +16,7 @@ struct geometry_too_long_exception : std::exception {};
 using namespace llmr;
 
 FillBucket::FillBucket(const std::shared_ptr<FillVertexBuffer>& vertexBuffer,
-                       const std::shared_ptr<FillElementsBuffer>& elementsBuffer,
+                       const std::shared_ptr<TriangleElementsBuffer>& elementsBuffer,
                        const BucketDescription& bucket_desc)
     : geom_desc(bucket_desc.geometry),
       vertexBuffer(vertexBuffer),
@@ -72,7 +73,7 @@ void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
         index.groups.emplace_back();
     }
 
-    group& group = index.groups.back();
+    group_type& group = index.groups.back();
 
     // We're generating triangle fans, so we always start with the first
     // coordinate in this polygon.
@@ -102,14 +103,11 @@ uint32_t FillBucket::size() const {
     return length;
 }
 
-
-
 void FillBucket::drawElements(PlainShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(int16_t));
-    char *elements_index = BUFFER_OFFSET(elements_start * 3 * sizeof(int16_t));
-    for (group& group : groups) {
-        group.array.bind(shader, *vertexBuffer, vertex_index);
-        elementsBuffer->bind();
+    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer->itemSize);
+    char *elements_index = BUFFER_OFFSET(elements_start * elementsBuffer->itemSize);
+    for (group_type& group : groups) {
+        group.array.bind(shader, *vertexBuffer, *elementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3 - 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * 2 * sizeof(uint16_t);
         elements_index += group.elements_length * 3 * sizeof(uint16_t);
