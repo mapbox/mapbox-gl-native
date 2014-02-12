@@ -24,13 +24,14 @@ public:
     // Relative changes
     void moveBy(double dx, double dy, double duration = 0);
     void scaleBy(double ds, double cx = -1, double cy = -1, double duration = 0);
-    void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey);
+    void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey, double duration = 0);
 
     // Absolute changes
     void setScale(double scale, double cx = -1, double cy = -1, double duration = 0);
     void setAngle(double angle, double duration = 0);
-    void setZoom(double zoom);
-    void setLonLat(double lon, double lat);
+    void setZoom(double zoom, double duration = 0);
+    void setLonLat(double lon, double lat, double duration = 0);
+    void setLonLatZoom(double lon, double lat, double zoom, double duration = 0);
 
     // Getters
     void matrixFor(mat4& matrix, const vec3<int32_t>& id) const;
@@ -39,12 +40,13 @@ public:
     double getScale() const;
     double getAngle() const;
     void getLonLat(double& lon, double& lat) const;
-
+    void getLonLatZoom(double& lon, double& lat, double& zoom) const;
 
     // Temporary
     void mapCornersToBox(uint32_t z, box& b) const;
 
 private:
+    void setScaleXY(double new_scale, double xn, double yn, double duration = 0);
     double pixel_x() const;
     double pixel_y() const;
 
