@@ -21,7 +21,7 @@ using namespace llmr;
 LineBucket::LineBucket(const std::shared_ptr<LineBuffer>& buffer, const BucketDescription& bucket_desc)
     : geometry(bucket_desc.geometry),
       buffer(buffer),
-      start(buffer->length()),
+      start(buffer->index()),
       length(0) {
 }
 
@@ -258,7 +258,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     }
 
     // Update the length.
-    length = buffer->length() - start;
+    length = buffer->index() - start;
 }
 
 void LineBucket::render(Painter& painter, const std::string& layer_name, const Tile::ID& id) {

@@ -14,11 +14,14 @@ struct geometry_too_long_exception : std::exception {};
 
 using namespace llmr;
 
-FillBucket::FillBucket(const std::shared_ptr<FillBuffer>& buffer, const BucketDescription& bucket_desc)
+FillBucket::FillBucket(const std::shared_ptr<FillVertexBuffer>& vertexBuffer,
+                       const std::shared_ptr<FillElementsBuffer>& elementsBuffer,
+                       const BucketDescription& bucket_desc)
     : geom_desc(bucket_desc.geometry),
-      buffer(buffer),
-      vertex_start(buffer->vertex_length()),
-      elements_start(buffer->elements_length()),
+      vertexBuffer(vertexBuffer),
+      elementsBuffer(elementsBuffer),
+      vertex_start(vertexBuffer->index()),
+      elements_start(elementsBuffer->index()),
       length(0) {
 }
 
@@ -44,13 +47,13 @@ void FillBucket::addGeometry(pbf& geom) {
 }
 
 void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
-    uint32_t vertex_start = buffer->vertex_length();
-    buffer->addDegenerate();
+    uint32_t vertex_start = vertexBuffer->index();
+    vertexBuffer->addDegenerate();
     for (const Coordinate& coord : line) {
-        buffer->addCoordinate(coord.x, coord.y);
+        vertexBuffer->add(coord.x, coord.y);
     }
 
-    uint32_t vertex_end = buffer->vertex_length();
+    uint32_t vertex_end = vertexBuffer->index();
 
     if (vertex_end - vertex_start > 65535) {
         throw geometry_too_long_exception();
@@ -78,13 +81,13 @@ void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
 
     assert(firstIndex + vertex_count - 1 < 65536);
 
-    uint32_t elements_start = buffer->elements_length();
+    uint32_t elements_start = elementsBuffer->index();
 
     for (uint32_t i = 2; i < vertex_count; ++i) {
-        buffer->addElements(firstIndex, firstIndex + i - 1, firstIndex + i);
+        elementsBuffer->add(firstIndex, firstIndex + i - 1, firstIndex + i);
     }
 
-    uint32_t elements_end = buffer->elements_length();
+    uint32_t elements_end = elementsBuffer->index();
     uint32_t elements_count = elements_end - elements_start;
     group.vertex_length += vertex_count;
     group.elements_length += elements_count;
@@ -105,7 +108,8 @@ void FillBucket::drawElements(PlainShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(int16_t));
     char *elements_index = BUFFER_OFFSET(elements_start * 3 * sizeof(int16_t));
     for (group& group : groups) {
-        group.array.bind(shader, *buffer, vertex_index);
+        group.array.bind(shader, *vertexBuffer, vertex_index);
+        elementsBuffer->bind();
         glDrawElements(GL_TRIANGLES, group.elements_length * 3 - 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * 2 * sizeof(uint16_t);
         elements_index += group.elements_length * 3 * sizeof(uint16_t);
@@ -115,6 +119,6 @@ void FillBucket::drawElements(PlainShader& shader) {
 void FillBucket::drawVertices(OutlineShader& shader) {
     // Draw the entire line
     char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(int16_t));
-    array.bind(shader, *buffer, vertex_index);
+    array.bind(shader, *vertexBuffer, vertex_index);
     glDrawArrays(GL_LINE_STRIP, 0, length);
 }

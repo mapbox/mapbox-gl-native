@@ -7,20 +7,9 @@
 
 using namespace llmr;
 
-DebugFontBuffer::DebugFontBuffer()
-    : buffer(0),
-      dirty(true) {
-
-}
-
-DebugFontBuffer::~DebugFontBuffer() {
-    if (buffer != 0) {
-        glDeleteBuffers(1, &buffer);
-        buffer = 0;
-    }
-}
-
 void DebugFontBuffer::addText(const char *text, double left, double baseline, double scale) {
+    uint16_t *coords = nullptr;
+
     int32_t length = strlen(text);
     for (int32_t i = 0; i < length; ++i) {
         if (text[i] < 32 || text[i] > 127) {
@@ -45,39 +34,17 @@ void DebugFontBuffer::addText(const char *text, double left, double baseline, do
                 int16_t x = round(left + glyph.data[j] * scale);
                 int16_t y = round(baseline - glyph.data[j + 1] * scale);
                 if (prev) {
-                    array.push_back(prev_x);
-                    array.push_back(prev_y);
-                    array.push_back(x);
-                    array.push_back(y);
+                    coords = static_cast<uint16_t *>(addElement());
+                    coords[0] = prev_x;
+                    coords[1] = prev_y;
+
+                    coords = static_cast<uint16_t *>(addElement());
+                    coords[0] = x;
+                    coords[1] = y;
                 }
                 prev_x = x; prev_y = y; prev = true;
             }
         }
         left += glyph.width * scale;
-    }
-
-    dirty = true;
-}
-
-void DebugFontBuffer::clear() {
-    array.clear();
-    dirty = true;
-}
-
-uint32_t DebugFontBuffer::length() {
-    // We store 2 coordinates per vertex
-    return array.size() / 2;
-}
-
-void DebugFontBuffer::bind() {
-    if (buffer == 0) {
-        glGenBuffers(1, &buffer);
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-
-    if (dirty) {
-        glBufferData(GL_ARRAY_BUFFER, array.size() * sizeof(uint16_t), array.data(), GL_STATIC_DRAW);
-        dirty = false;
     }
 }
