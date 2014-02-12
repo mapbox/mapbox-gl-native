@@ -13,7 +13,7 @@ enum cap_type {
 }
 
 enum join_type {
-    butt_join = 1;
+    miter_join = 1;
     bevel_join = 2;
     round_join = 3;
 }

@@ -21,8 +21,10 @@ class LayerDescription;
 class BucketDescription;
 class VectorTile;
 class VectorTileLayer;
-class FillBuffer;
-class LineBuffer;
+class FillVertexBuffer;
+class LineVertexBuffer;
+class TriangleElementsBuffer;
+class PointElementsBuffer;
 class PlainShader;
 
 class Tile : public std::enable_shared_from_this<Tile>,
@@ -72,8 +74,10 @@ public:
     DebugFontBuffer debugFontBuffer;
     VertexArrayObject<PlainShader> debugFontArray;
 
-    std::shared_ptr<FillBuffer> fillBuffer;
-    std::shared_ptr<LineBuffer> lineBuffer;
+    std::shared_ptr<FillVertexBuffer> fillVertexBuffer;
+    std::shared_ptr<LineVertexBuffer> lineVertexBuffer;
+    std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
+    std::shared_ptr<PointElementsBuffer> pointElementsBuffer;
 
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above

@@ -1,17 +1,15 @@
 #ifndef LLMR_GEOMETRY_LINE_BUFFER
 #define LLMR_GEOMETRY_LINE_BUFFER
 
-#include <vector>
-#include <cstdint>
-#include <cmath>
+#include "buffer.hpp"
 
 namespace llmr {
 
-class LineBuffer {
+class LineVertexBuffer : public Buffer<
+    8 // 2 coordinates per vertex + 1 linesofar + 1 extrude coord pair == 4 (== 8 bytes)
+> {
 public:
     typedef int16_t vertex_type;
-    
-    ~LineBuffer();
 
     /*
      * Scale the extrusion vector so that the normal length is this value.
@@ -20,7 +18,7 @@ public:
      * normal array, while the extrude normal actually moves the vertex to create
      * the acute/bevelled line join.
      */
-    const int8_t extrudeScale = 63;
+    static const int8_t extrudeScale = 63;
 
     /*
      * Add a vertex to this buffer
@@ -32,35 +30,9 @@ public:
      * @param {number} tx texture normal
      * @param {number} ty texture normal
      */
-    void add(vertex_type x, vertex_type y, float ex, float ey, int8_t tx, int8_t ty, int32_t linesofar = 0);
-
-    /*
-     * Add a degenerate triangle to the buffer
-     *
-     * > So we need a way to get from the end of one triangle strip
-     * to the beginning of the next strip without actually filling triangles
-     * on the way. We can do this with "degenerate" triangles: We simply
-     * repeat the last coordinate of the first triangle strip and the first
-     * coordinate of the next triangle strip.
-     */
-    void addDegenerate();
-
-    /*
-     * Returns the number of elements in this buffer. This is not the number of
-     * bytes, but rather the number of coordinates with associated information.
-     */
-    uint32_t length() const;
-
-    /*
-     * Transfers this buffer to the GPU and binds the buffer to the GL context.
-     */
-    void bind();
-
-private:
-    bool dirty = true;
-    std::vector<vertex_type> array;
-    uint32_t buffer = 0;
+    size_t add(vertex_type x, vertex_type y, float ex, float ey, int8_t tx, int8_t ty, int32_t linesofar = 0);
 };
+
 
 }
 

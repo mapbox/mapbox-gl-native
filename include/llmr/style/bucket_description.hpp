@@ -24,7 +24,7 @@ enum class CapType {
 
 enum class JoinType {
     None = 0,
-    Butt = 1,
+    Miter = 1,
     Bevel = 2,
     Round = 3
 };
@@ -46,7 +46,7 @@ inline CapType capType(const std::string& cap) {
 
 
 inline JoinType joinType(const std::string& join) {
-    if (join == "butt") return JoinType::Butt;
+    if (join == "miter") return JoinType::Miter;
     else if (join == "bevel") return JoinType::Bevel;
     else if (join == "round") return JoinType::Round;
     else return JoinType::None;

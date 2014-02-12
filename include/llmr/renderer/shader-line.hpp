@@ -19,11 +19,9 @@ public:
     int32_t u_exmatrix;
     int32_t u_linewidth;
     int32_t u_color;
-    int32_t u_debug;
     int32_t u_ratio;
     int32_t u_dasharray;
-    int32_t u_point;
-    int32_t u_gamma;
+    int32_t u_debug;
 };
 
 }

@@ -11,6 +11,7 @@
 #include <llmr/renderer/shader-outline.hpp>
 #include <llmr/renderer/shader-pattern.hpp>
 #include <llmr/renderer/shader-line.hpp>
+#include <llmr/renderer/shader-linejoin.hpp>
 
 
 namespace llmr {
@@ -54,6 +55,7 @@ private:
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;
     std::unique_ptr<LineShader> lineShader;
+    std::unique_ptr<LinejoinShader> linejoinShader;
     std::unique_ptr<PatternShader> patternShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
