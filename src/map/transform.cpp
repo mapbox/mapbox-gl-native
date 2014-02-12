@@ -59,7 +59,7 @@ void Transform::scaleBy(double ds, double cx, double cy, double duration) {
 }
 
 
-void Transform::rotateBy(double anchor_x, double anchor_y, double start_x, double start_y, double end_x, double end_y) {
+void Transform::rotateBy(double anchor_x, double anchor_y, double start_x, double start_y, double end_x, double end_y, double duration) {
     double center_x = width / 2, center_y = height / 2;
 
     const double begin_center_x = start_x - center_x;
@@ -83,7 +83,7 @@ void Transform::rotateBy(double anchor_x, double anchor_y, double start_x, doubl
 
     const double ang = angle + util::angle_between(first_x, first_y, second_x, second_y);
 
-    setAngle(ang);
+    setAngle(ang, duration);
 }
 
 void Transform::setAngle(double new_angle, double duration) {
@@ -97,11 +97,33 @@ void Transform::setAngle(double new_angle, double duration) {
     }
 }
 
+void Transform::setScaleXY(double new_scale, double xn, double yn, double duration) {
+    if (duration == 0) {
+        scale = new_scale;
+        x = xn;
+        y = yn;
+    } else {
+        animations.emplace_front(scale, new_scale, scale, duration);
+        animations.emplace_front(x, xn, x, duration);
+        animations.emplace_front(y, yn, y, duration);
+    }
+
+    const double s = scale * size;
+    zc = s / 2;
+    Bc = s / 360;
+    Cc = s / (2 * M_PI);
+}
+
 void Transform::setScale(double new_scale, double cx, double cy, double duration) {
     if (new_scale < min_scale) {
         new_scale = min_scale;
     } else if (new_scale > max_scale) {
         new_scale = max_scale;
+    }
+
+    if (cx < 0 || cy < 0) {
+        cx = width / 2;
+        cy = height / 2;
     }
 
     const double factor = new_scale / scale;
@@ -111,35 +133,44 @@ void Transform::setScale(double new_scale, double cx, double cy, double duration
     double xn = x * factor + dx;
     double yn = y * factor + dy;
 
-    if (duration == 0) {
-        x = xn;
-        y = yn;
-        scale = new_scale;
-    } else {
-        animations.emplace_front(x, xn, x, duration);
-        animations.emplace_front(y, yn, y, duration);
-        animations.emplace_front(scale, new_scale, scale, duration);
-    }
+    setScaleXY(new_scale, xn, yn, duration);
+}
 
-    const double s = scale * size;
+void Transform::setZoom(double zoom, double duration) {
+    setScale(pow(2.0, zoom), -1, -1, duration);
+}
+
+void Transform::setLonLat(double lon, double lat, double duration) {
+    const double f = fmin(fmax(sin(D2R * lat), -0.9999), 0.9999);
+    double xn = -round(lon * Bc);
+    double yn = round(0.5 * Cc * log((1 + f) / (1 - f)));
+
+    setScaleXY(scale, xn, yn, duration);
+}
+
+void Transform::setLonLatZoom(double lon, double lat, double zoom, double duration) {
+    double new_scale = pow(2.0, zoom);
+
+    const double s = new_scale * size;
     zc = s / 2;
     Bc = s / 360;
     Cc = s / (2 * M_PI);
-}
 
-void Transform::setZoom(double zoom) {
-    setScale(pow(2.0, zoom));
-}
-
-void Transform::setLonLat(double lon, double lat) {
     const double f = fmin(fmax(sin(D2R * lat), -0.9999), 0.9999);
-    x = -round(lon * Bc);
-    y = round(0.5 * Cc * log((1 + f) / (1 - f)));
+    double xn = -round(lon * Bc);
+    double yn = round(0.5 * Cc * log((1 + f) / (1 - f)));
+
+    setScaleXY(new_scale, xn, yn, duration);
 }
 
 void Transform::getLonLat(double &lon, double &lat) const {
     lon = -x / Bc;
     lat = R2D * (2 * atan(exp(y / Cc)) - 0.5 * M_PI);
+}
+
+void Transform::getLonLatZoom(double& lon, double& lat, double& zoom) const {
+    getLonLat(lon, lat);
+    zoom = getZoom();
 }
 
 double Transform::pixel_x() const {
