@@ -13,6 +13,14 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find src -name "*.glsl")'
       ],
+      'actions': [
+        {
+          'action_name': 'Build Shaders',
+          'inputs': [],
+          'outputs': [],
+          'action': ['bin/build-shaders.js'],
+        },
+      ],
       'xcode_settings': {
         'SDKROOT': 'macosx',
         'SUPPORTED_PLATFORMS':['macosx'],
@@ -63,6 +71,14 @@
         '<!@(find src -name "*.cpp")',
         '<!@(find include -name "*.hpp")',
         '<!@(find src -name "*.glsl")'
+      ],
+      'actions': [
+        {
+          'action_name': 'Build Shaders',
+          'inputs': [],
+          'outputs': [],
+          'action': ['bin/build-shaders.js'],
+        },
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
