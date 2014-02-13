@@ -57,6 +57,8 @@ Then you can build the iOS app with make:
 
 Consider `sudo npm install -g ios-sim` for auto-launching the simulator, but it can be tricky and it's better to run on an ARM-based device anyway. To do this, open `./ios/llmr-app.xcodeproj` in Xcode, then build and run on the simulator or a device yourself. 
 
+Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina). 
+
 ## Ubuntu
 
 Ensure you have git and other build essentials:
