@@ -8,7 +8,7 @@
 namespace llmr {
 namespace util {
 
-static const float tileSize = 256.0f;
+static const float tileSize = 512.0f;
 
 }
 }
