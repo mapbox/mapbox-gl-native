@@ -10,7 +10,8 @@
       'type': 'static_library',
       'sources': [
         '<!@(find src -name "*.cpp")',
-        '<!@(find include -name "*.hpp")'
+        '<!@(find include -name "*.hpp")',
+        '<!@(find src -name "*.glsl")'
       ],
       'xcode_settings': {
         'SDKROOT': 'macosx',
@@ -60,7 +61,8 @@
       'type': 'static_library',
       'sources': [
         '<!@(find src -name "*.cpp")',
-        '<!@(find include -name "*.hpp")'
+        '<!@(find include -name "*.hpp")',
+        '<!@(find src -name "*.glsl")'
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
