@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/util/mat4.hpp>
 
 namespace llmr {
 
@@ -13,8 +14,14 @@ public:
     bool valid;
     uint32_t program;
 
+    void setMatrix(const mat4& matrix);
+
 private:
     bool compileShader(uint32_t *shader, uint32_t type, const char *source);
+
+protected:
+    int32_t u_matrix;
+    mat4 matrix;
 };
 
 }

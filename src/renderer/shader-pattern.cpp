@@ -25,6 +25,15 @@ PatternShader::PatternShader()
     u_pattern_tl = glGetUniformLocation(program, "u_pattern_tl");
     u_pattern_br = glGetUniformLocation(program, "u_pattern_br");
     u_mix = glGetUniformLocation(program, "u_mix");
+
+    // fprintf(stderr, "PatternShader:\n");
+    // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
+    // fprintf(stderr, "    - u_color: %d\n", u_color);
+    // fprintf(stderr, "    - u_offset: %d\n", u_offset);
+    // fprintf(stderr, "    - u_pattern_size: %d\n", u_pattern_size);
+    // fprintf(stderr, "    - u_pattern_tl: %d\n", u_pattern_tl);
+    // fprintf(stderr, "    - u_pattern_br: %d\n", u_pattern_br);
+    // fprintf(stderr, "    - u_mix: %d\n", u_mix);
 }
 
 void PatternShader::bind(char *offset) {

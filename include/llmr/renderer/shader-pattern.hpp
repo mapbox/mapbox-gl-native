@@ -12,7 +12,6 @@ public:
     void bind(char *offset);
 
     int32_t a_pos;
-    int32_t u_matrix;
     int32_t u_color;
     int32_t u_offset;
     int32_t u_pattern_size;

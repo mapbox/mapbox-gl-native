@@ -13,9 +13,8 @@ public:
 
     int32_t a_pos;
     int32_t a_extrude;
-    int32_t a_linesofar;
+    // int32_t a_linesofar;
 
-    int32_t u_matrix;
     int32_t u_exmatrix;
     int32_t u_linewidth;
     int32_t u_color;

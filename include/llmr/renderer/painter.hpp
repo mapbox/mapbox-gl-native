@@ -43,6 +43,9 @@ private:
     void renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers);
     void renderDebug(const std::shared_ptr<Tile>& tile);
 
+    void useProgram(uint32_t program);
+    void lineWidth(float lineWidth);
+
 private:
     Transform& transform;
     Settings& settings;
@@ -51,6 +54,9 @@ private:
     mat4 nativeMatrix;
     mat4 matrix;
     mat4 exMatrix;
+
+    uint32_t gl_program = 0;
+    float gl_lineWidth = 0;
 
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;

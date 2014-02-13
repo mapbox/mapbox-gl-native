@@ -23,6 +23,13 @@ LinejoinShader::LinejoinShader()
     u_linewidth = glGetUniformLocation(program, "u_linewidth");
     u_color = glGetUniformLocation(program, "u_color");
     u_size = glGetUniformLocation(program, "u_size");
+
+    // fprintf(stderr, "LinejoinShader:\n");
+    // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
+    // fprintf(stderr, "    - u_world: %d\n", u_world);
+    // fprintf(stderr, "    - u_linewidth: %d\n", u_linewidth);
+    // fprintf(stderr, "    - u_color: %d\n", u_color);
+    // fprintf(stderr, "    - u_size: %d\n", u_size);
 }
 
 void LinejoinShader::bind(char *offset) {

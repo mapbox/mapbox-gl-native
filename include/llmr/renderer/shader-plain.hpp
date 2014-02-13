@@ -11,8 +11,13 @@ public:
 
     void bind(char *offset);
 
+    void setColor(float r, float g, float b, float a);
+    void setColor(const std::array<float, 4>& color);
+
+private:
     int32_t a_pos;
-    int32_t u_matrix;
+
+    std::array<float, 4> color;
     int32_t u_color;
 };
 

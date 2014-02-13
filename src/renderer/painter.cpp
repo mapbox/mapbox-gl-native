@@ -41,6 +41,9 @@ void Painter::setup() {
     // draw front-to-back and use then stencil buffer to cull opaque pixels early.
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearStencil(0x0);
 }
 
 void Painter::setupShaders() {
@@ -49,6 +52,20 @@ void Painter::setupShaders() {
     lineShader = std::make_unique<LineShader>();
     linejoinShader = std::make_unique<LinejoinShader>();
     patternShader = std::make_unique<PatternShader>();
+}
+
+void Painter::useProgram(uint32_t program) {
+    if (gl_program != program) {
+        glUseProgram(program);
+        gl_program = program;
+    }
+}
+
+void Painter::lineWidth(float lineWidth) {
+    if (gl_lineWidth != lineWidth) {
+        glLineWidth(lineWidth);
+        gl_lineWidth = lineWidth;
+    }
 }
 
 void Painter::changeMatrix(const Tile::ID& id) {
@@ -73,15 +90,14 @@ void Painter::changeMatrix(const Tile::ID& id) {
 }
 
 void Painter::drawClippingMask() {
-    glUseProgram(plainShader->program);
-    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
+    useProgram(plainShader->program);
+    plainShader->setMatrix(matrix);
 
     glColorMask(false, false, false, false);
 
     // Clear the entire stencil buffer, except for the 7th bit, which stores
     // the global clipping mask that allows us to avoid drawing in regions of
     // tiles we've already painted in.
-    glClearStencil(0x0);
     glStencilMask(0xBF);
     glClear(GL_STENCIL_BUFFER_BIT);
 
@@ -97,7 +113,7 @@ void Painter::drawClippingMask() {
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 
     // Draw the clipping mask
-    glUniform4f(plainShader->u_color, 1.0f, 0.0f, 1.0f, 1.0f);
+    plainShader->setColor(1.0f, 0.0f, 1.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
 
     // glEnable(GL_STENCIL_TEST);
@@ -108,8 +124,6 @@ void Painter::drawClippingMask() {
 }
 
 void Painter::clear() {
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClearStencil(0x0);
     glStencilMask(0xFF);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
@@ -195,8 +209,8 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         glColorMask(false, false, false, false);
 
         // Draw the actual triangle fan into the stencil buffer.
-        glUseProgram(plainShader->program);
-        glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
+        useProgram(plainShader->program);
+        plainShader->setMatrix(matrix);
 
         // Draw all groups
         bucket.drawElements(*plainShader);
@@ -213,16 +227,16 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (properties.antialias) {
-        glUseProgram(outlineShader->program);
-        glUniformMatrix4fv(outlineShader->u_matrix, 1, GL_FALSE, matrix.data());
-        glLineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
+        useProgram(outlineShader->program);
+        outlineShader->setMatrix(matrix);
+        lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
         if (properties.stroke_color != properties.fill_color) {
             // If we defined a different color for the fill outline, we are
             // going to ignore the bits in 0x3F and just care about the global
             // clipping mask.
             glStencilFunc(GL_EQUAL, 0x80, 0x80);
-            glUniform4fv(outlineShader->u_color, 1, properties.stroke_color.data());
+            outlineShader->setColor(properties.stroke_color);
         } else {
             // Otherwise, we only want to draw the antialiased parts that are
             // *outside* the current shape. This is important in case the fill
@@ -230,18 +244,18 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             // the current shape, some pixels from the outline stroke overlapped
             // the (non-antialiased) fill.
             glStencilFunc(GL_EQUAL, 0x80, 0xBF);
-            glUniform4fv(outlineShader->u_color, 1, fill_color.data());
+            outlineShader->setColor(fill_color);
         }
 
         // Draw the entire line
-        glUniform2f(outlineShader->u_world, transform.fb_width, transform.fb_height);
+        outlineShader->setWorld({{ (float)transform.fb_width, (float)transform.fb_height }});
         bucket.drawVertices(*outlineShader);
     }
 
     // Only draw regions that we marked
     glStencilFunc(GL_NOTEQUAL, 0x0, 0x3F);
 
-    if (properties.image.size() && style.sprite) {
+    if (properties.image.size() && *style.sprite) {
         // Draw texture fill
         ImagePosition imagePos = style.sprite->getPosition(properties.image, true);
 
@@ -254,8 +268,8 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             fmod(id.y * 4096, imageSize.y)
         };
 
-        glUseProgram(patternShader->program);
-        glUniformMatrix4fv(patternShader->u_matrix, 1, GL_FALSE, matrix.data());
+        useProgram(patternShader->program);
+        patternShader->setMatrix(matrix);
         glUniform2f(patternShader->u_pattern_size, imageSize.x, imageSize.y);
         glUniform2f(patternShader->u_offset, offset.x, offset.y);
         glUniform2f(patternShader->u_pattern_tl, imagePos.tl.x, imagePos.tl.y);
@@ -270,16 +284,15 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
     } else {
         // Draw filling rectangle.
-        glUseProgram(plainShader->program);
-        glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
-        glUniform4fv(plainShader->u_color, 1, fill_color.data());
+        useProgram(plainShader->program);
+        plainShader->setMatrix(matrix);
+        plainShader->setColor(fill_color);
 
         // Draw a rectangle that covers the entire viewport.
         coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
     }
 
-    glStencilMask(0x00);
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
 }
 
@@ -306,8 +319,8 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 
     // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
     if (bucket.hasPoints() && outset > 1.0f) {
-        glUseProgram(linejoinShader->program);
-        glUniformMatrix4fv(linejoinShader->u_matrix, 1, GL_FALSE, matrix.data());
+        useProgram(linejoinShader->program);
+        linejoinShader->setMatrix(matrix);
         glUniform4fv(linejoinShader->u_color, 1, color.data());
         glUniform2f(linejoinShader->u_world, transform.fb_width / 2, transform.fb_height / 2);
         glUniform2f(linejoinShader->u_linewidth, (outset - 0.25) * transform.pixelRatio, (inset - 0.25) * transform.pixelRatio);
@@ -337,8 +350,8 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         // glUniform1f(painter.linepatternShader.u_fade, painter.transform.z % 1.0);
 
     } else {
-        glUseProgram(lineShader->program);
-        glUniformMatrix4fv(lineShader->u_matrix, 1, GL_FALSE, matrix.data());
+        useProgram(lineShader->program);
+        lineShader->setMatrix(matrix);
         glUniformMatrix4fv(lineShader->u_exmatrix, 1, GL_FALSE, exMatrix.data());
 
         // TODO: Move this to transform?
@@ -356,22 +369,22 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 void Painter::renderDebug(const Tile::Ptr& tile) {
     // Blend to the front, not the back.
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glUseProgram(plainShader->program);
-    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
+    useProgram(plainShader->program);
+    plainShader->setMatrix(matrix);
 
     // draw tile outline
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
-    glUniform4f(plainShader->u_color, 1.0f, 0.0f, 0.0f, 1.0f);
-    glLineWidth(4.0f * transform.pixelRatio);
+    plainShader->setColor(1.0f, 0.0f, 0.0f, 1.0f);
+    lineWidth(4.0f * transform.pixelRatio);
     glDrawArrays(GL_LINE_STRIP, 0, tileBorderBuffer.index());
 
     // draw debug info
     tile->debugFontArray.bind(*plainShader, tile->debugFontBuffer, BUFFER_OFFSET(0));
-    glUniform4f(plainShader->u_color, 1.0f, 1.0f, 1.0f, 1.0f);
-    glLineWidth(4.0f * transform.pixelRatio);
+    plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
+    lineWidth(4.0f * transform.pixelRatio);
     glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.index());
-    glUniform4f(plainShader->u_color, 0.0f, 0.0f, 0.0f, 1.0f);
-    glLineWidth(2.0f * transform.pixelRatio);
+    plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
+    lineWidth(2.0f * transform.pixelRatio);
     glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.index());
 
     // Revert blending mode to blend to the back.
@@ -383,12 +396,12 @@ void Painter::renderMatte() {
 
     Color white = {{ 0.9, 0.9, 0.9, 1 }};
 
-    glUseProgram(plainShader->program);
-    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, nativeMatrix.data());
+    useProgram(plainShader->program);
+    plainShader->setMatrix(nativeMatrix);
 
     // Draw the clipping mask
     matteArray.bind(*plainShader, matteBuffer, BUFFER_OFFSET(0));
-    glUniform4fv(plainShader->u_color, 1, white.data());
+    plainShader->setColor(white);
     glDrawArrays(GL_TRIANGLES, 0, matteBuffer.index());
 
     glEnable(GL_STENCIL_TEST);
@@ -397,11 +410,11 @@ void Painter::renderMatte() {
 void Painter::renderBackground() {
     Color white = {{ 1, 1, 1, 1 }};
 
-    glUseProgram(plainShader->program);
-    glUniformMatrix4fv(plainShader->u_matrix, 1, GL_FALSE, matrix.data());
+    useProgram(plainShader->program);
+    plainShader->setMatrix(matrix);
 
     // Draw the clipping mask
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-    glUniform4fv(plainShader->u_color, 1, white.data());
+    plainShader->setColor(white);
     glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
 }

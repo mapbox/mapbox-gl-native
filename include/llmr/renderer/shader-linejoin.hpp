@@ -13,7 +13,6 @@ public:
 
     int32_t a_pos;
 
-    int32_t u_matrix;
     int32_t u_world;
     int32_t u_linewidth;
     int32_t u_color;

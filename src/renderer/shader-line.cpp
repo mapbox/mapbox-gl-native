@@ -18,7 +18,7 @@ LineShader::LineShader()
 
     a_pos = glGetAttribLocation(program, "a_pos");
     a_extrude = glGetAttribLocation(program, "a_extrude");
-    a_linesofar = glGetAttribLocation(program, "a_linesofar");
+    // a_linesofar = glGetAttribLocation(program, "a_linesofar");
 
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_exmatrix = glGetUniformLocation(program, "u_exmatrix");
@@ -27,15 +27,24 @@ LineShader::LineShader()
     u_ratio = glGetUniformLocation(program, "u_ratio");
     u_dasharray = glGetUniformLocation(program, "u_dasharray");
     u_debug = glGetUniformLocation(program, "u_debug");
+
+    // fprintf(stderr, "LineShader:\n");
+    // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
+    // fprintf(stderr, "    - u_exmatrix: %d\n", u_exmatrix);
+    // fprintf(stderr, "    - u_linewidth: %d\n", u_linewidth);
+    // fprintf(stderr, "    - u_color: %d\n", u_color);
+    // fprintf(stderr, "    - u_ratio: %d\n", u_ratio);
+    // fprintf(stderr, "    - u_dasharray: %d\n", u_dasharray);
+    // fprintf(stderr, "    - u_debug: %d\n", u_debug);
 }
 
 void LineShader::bind(char *offset) {
     glEnableVertexAttribArray(a_pos);
     glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 8, offset);
 
-    glEnableVertexAttribArray(a_linesofar);
-    glVertexAttribPointer(a_linesofar, 1, GL_SHORT, false, 8, offset + 4);
+    // glEnableVertexAttribArray(a_linesofar);
+    // glVertexAttribPointer(a_linesofar, 1, GL_SHORT, false, 8, offset + 6);
 
     glEnableVertexAttribArray(a_extrude);
-    glVertexAttribPointer(a_extrude, 2, GL_BYTE, false, 8, offset + 6);
+    glVertexAttribPointer(a_extrude, 2, GL_BYTE, false, 8, offset + 4);
 }

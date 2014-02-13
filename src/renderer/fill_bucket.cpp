@@ -109,14 +109,14 @@ void FillBucket::drawElements(PlainShader& shader) {
     for (group_type& group : groups) {
         group.array.bind(shader, *vertexBuffer, *elementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3 - 3, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group.vertex_length * 2 * sizeof(uint16_t);
-        elements_index += group.elements_length * 3 * sizeof(uint16_t);
+        vertex_index += group.vertex_length * vertexBuffer->itemSize;
+        elements_index += group.elements_length * elementsBuffer->itemSize;
     }
 }
 
 void FillBucket::drawVertices(OutlineShader& shader) {
     // Draw the entire line
-    char *vertex_index = BUFFER_OFFSET(vertex_start * 2 * sizeof(int16_t));
+    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer->itemSize);
     array.bind(shader, *vertexBuffer, vertex_index);
     glDrawArrays(GL_LINE_STRIP, 0, length);
 }

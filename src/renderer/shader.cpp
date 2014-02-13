@@ -142,6 +142,15 @@ bool Shader::compileShader(GLuint *shader, GLenum type, const GLchar *source) {
     return true;
 }
 
+
+void Shader::setMatrix(const mat4& newMatrix) {
+    if (matrix != newMatrix) {
+        glUniformMatrix4fv(u_matrix, 1, GL_FALSE, newMatrix.data());
+        matrix = newMatrix;
+    }
+}
+
+
 Shader::~Shader() {
     if (program) {
         glDeleteProgram(program);
