@@ -368,7 +368,7 @@ class MBXMapView
 
 CADisplayLink *displayLink;
 MBXMapView *mapView;
-NSOperationQueue *queue;
+NSOperationQueue *queue = NULL;
 
 namespace llmr
 {
@@ -378,58 +378,18 @@ namespace llmr
         {
         }
 
-        void async(std::function<void()> fn, std::function<void()> cb)
-        {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
-            {
-                fn();
-
-                dispatch_async(dispatch_get_main_queue(), ^(void)
-                {
-                    cb();
-                });
-            });
-        }
-
-        void request_http(std::string url, std::function<void(Response&)> func)
-        {
-            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@1 forKey:@"count"]];
-
-            NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithUTF8String:url.c_str()]]];
-
-            [NSURLConnection sendAsynchronousRequest:urlRequest
-                                               queue:[NSOperationQueue mainQueue]
-                                   completionHandler: ^(NSURLResponse *response, NSData *data, NSError *error)
-            {
-                if ( ! error)
-                {
-                    Response res;
-
-                    res.code = [(NSHTTPURLResponse *)response statusCode];
-                    res.body = { (const char *)[data bytes], [data length] };
-
-                    func(res);
-                }
-                else
-                {
-                    Response res;
-
-                    func(res);
-                }
-
-                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@(-1) forKey:@"count"]];
-                [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
-            }];
-        }
-
         void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb)
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@1 forKey:@"count"]];
 
+            if (!queue) {
+                queue = [[NSOperationQueue alloc] init];
+            }
+
             NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithUTF8String:url.c_str()]]];
 
             [NSURLConnection sendAsynchronousRequest:urlRequest
-                                               queue:[NSOperationQueue mainQueue]
+                                               queue:queue
                                    completionHandler:^(NSURLResponse *response, NSData *data, NSError *error)
             {
                 Response res;
@@ -439,10 +399,12 @@ namespace llmr
                     res.code = [(NSHTTPURLResponse *)response statusCode];
                     res.body = { (const char *)[data bytes], [data length] };
                 }
-                 
+
                 func(res);
 
-                cb();
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                   cb();
+                });
 
                 [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@(-1) forKey:@"count"]];
                 [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];

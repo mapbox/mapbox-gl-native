@@ -57,12 +57,11 @@ public:
         glfwSetKeyCallback(window, key);
 
         [[NSNotificationCenter defaultCenter] addObserverForName:MBXNeedsRenderNotification
-                                                          object:nil
-                                                           queue:[NSOperationQueue mainQueue]
-                                                      usingBlock:^(NSNotification *notification)
-                                                      {
-                                                          dirty = true;
-                                                      }];
+         object:nil
+         queue:[NSOperationQueue mainQueue]
+        usingBlock: ^ (NSNotification * notification) {
+            dirty = true;
+        }];
     }
 
     static void character(GLFWwindow *window, unsigned int codepoint) {
@@ -163,7 +162,7 @@ public:
             if (dirty) {
                 try {
                     dirty = render();
-                } catch(std::exception& ex) {
+                } catch (std::exception& ex) {
                     fprintf(stderr, "exception: %s\n", ex.what());
                 }
                 glfwSwapBuffers(window);
@@ -218,6 +217,7 @@ public:
 };
 
 MapView *view;
+NSOperationQueue *queue = NULL;
 
 namespace llmr {
 namespace platform {
@@ -226,16 +226,11 @@ void restart(void *) {
     view->dirty = true;
 }
 
-void async(std::function<void()> fn, std::function<void()> cb) {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        fn();
-        dispatch_async(dispatch_get_main_queue(), ^(void){
-            cb();
-        });
-    });
-}
+void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
+    if (!queue) {
+        queue = [[NSOperationQueue alloc] init];
+    }
 
-void request_http(std::string url, std::function<void(Response&)> func) {
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest
                                        requestWithURL:[NSURL
                                                URLWithString:[NSString
@@ -244,31 +239,7 @@ void request_http(std::string url, std::function<void(Response&)> func) {
     [NSURLConnection
      sendAsynchronousRequest:urlRequest
      queue:[NSOperationQueue mainQueue]
-     completionHandler: ^ (NSURLResponse* response, NSData* data, NSError* error) {
-        if (error == nil) {
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-            Response res;
-            res.code = [httpResponse statusCode];
-            res.body = { (const char *)[data bytes], [data length] };
-            func(res);
-        } else {
-            Response res;
-            func(res);
-        }
-        [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
-    }];
-}
-
-void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
-        NSMutableURLRequest *urlRequest = [NSMutableURLRequest
-                                       requestWithURL:[NSURL
-                                               URLWithString:[NSString
-                                                       stringWithUTF8String:url.c_str()]]];
-
-    [NSURLConnection
-     sendAsynchronousRequest:urlRequest
-     queue:[NSOperationQueue mainQueue]
-     completionHandler: ^ (NSURLResponse* response, NSData* data, NSError* error) {
+     completionHandler: ^(NSURLResponse * response, NSData * data, NSError * error) {
         Response res;
         if (error == nil) {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
@@ -277,7 +248,9 @@ void request_http(std::string url, std::function<void(Response&)> func, std::fun
         }
 
         func(res);
-        cb();
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            cb();
+        });
         [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
     }];
 }
