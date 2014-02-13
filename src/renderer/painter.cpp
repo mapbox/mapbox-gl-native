@@ -248,7 +248,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         }
 
         // Draw the entire line
-        outlineShader->setWorld({{ (float)transform.fb_width, (float)transform.fb_height }});
+        outlineShader->setWorld({{ transform.fb_width, transform.fb_height }});
         bucket.drawVertices(*outlineShader);
     }
 
@@ -259,23 +259,27 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         // Draw texture fill
         ImagePosition imagePos = style.sprite->getPosition(properties.image, true);
 
-        double factor = 8.0 / pow(2, transform.getIntegerZoom() - id.z);
-        double mix = fmod(transform.getZoom(), 1.0);
-        vec2<double> imageSize { imagePos.size.x * factor, imagePos.size.y * factor };
+        float factor = 8.0 / pow(2, transform.getIntegerZoom() - id.z);
+        float mix = fmod(transform.getZoom(), 1.0);
 
-        vec2<double> offset {
-            fmod(id.x * 4096, imageSize.x),
-            fmod(id.y * 4096, imageSize.y)
-        };
+        std::array<float, 2> imageSize = {{
+            imagePos.size.x * factor,
+            imagePos.size.y * factor
+        }};
+
+        std::array<float, 2> offset = {{
+            (float)fmod(id.x * 4096, imageSize[0]),
+            (float)fmod(id.y * 4096, imageSize[1])
+        }};
 
         useProgram(patternShader->program);
         patternShader->setMatrix(matrix);
-        glUniform2f(patternShader->u_pattern_size, imageSize.x, imageSize.y);
-        glUniform2f(patternShader->u_offset, offset.x, offset.y);
-        glUniform2f(patternShader->u_pattern_tl, imagePos.tl.x, imagePos.tl.y);
-        glUniform2f(patternShader->u_pattern_br, imagePos.br.x, imagePos.br.y);
-        glUniform4fv(patternShader->u_color, 1, fill_color.data());
-        glUniform1f(patternShader->u_mix, mix);
+        patternShader->setOffset(offset);
+        patternShader->setPatternSize(imageSize);
+        patternShader->setPatternTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
+        patternShader->setPatternBottomRight({{ imagePos.br.x, imagePos.br.y }});
+        patternShader->setColor(fill_color);
+        patternShader->setMix(mix);
         style.sprite->bind(true);
 
         // Draw a rectangle that covers the entire viewport.
@@ -303,13 +307,13 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     if (bucket.empty()) return;
     if (properties.hidden) return;
 
-    double width = properties.width;
-    double offset = properties.offset / 2;
+    float width = properties.width;
+    float offset = properties.offset / 2;
 
     // These are the radii of the line. We are limiting it to 16, which will result
     // in a point size of 64 on retina.
-    double inset = fmin((fmax(-1, offset - width / 2 - 0.5) + 1), 16.0f);
-    double outset = fmin(offset + width / 2 + 0.5, 16.0f);
+    float inset = fmin((fmax(-1, offset - width / 2 - 0.5) + 1), 16.0f);
+    float outset = fmin(offset + width / 2 + 0.5, 16.0f);
 
     Color color = properties.color;
     color[0] *= properties.opacity;
@@ -321,14 +325,21 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     if (bucket.hasPoints() && outset > 1.0f) {
         useProgram(linejoinShader->program);
         linejoinShader->setMatrix(matrix);
-        glUniform4fv(linejoinShader->u_color, 1, color.data());
-        glUniform2f(linejoinShader->u_world, transform.fb_width / 2, transform.fb_height / 2);
-        glUniform2f(linejoinShader->u_linewidth, (outset - 0.25) * transform.pixelRatio, (inset - 0.25) * transform.pixelRatio);
+        linejoinShader->setColor(color);
+        linejoinShader->setWorld({{
+            transform.fb_width * 0.5f,
+            transform.fb_height * 0.5f
+        }});
+        linejoinShader->setLineWidth({{
+            ((outset - 0.25f) * transform.pixelRatio),
+            ((inset - 0.25f) * transform.pixelRatio)
+        }});
 
+        float pointSize = ceil(transform.pixelRatio * outset * 2.0);
     #if defined(GL_ES_VERSION_2_0)
-        glUniform1f(linejoinShader->u_size, ceil(transform.pixelRatio * outset * 2.0));
+        linejoinShader->setSize(pointSize);
     #else
-        glPointSize(ceil(transform.pixelRatio * outset * 2.0));
+        glPointSize(pointSize);
     #endif
 
         bucket.drawPoints(*linejoinShader);
@@ -352,16 +363,16 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     } else {
         useProgram(lineShader->program);
         lineShader->setMatrix(matrix);
-        glUniformMatrix4fv(lineShader->u_exmatrix, 1, GL_FALSE, exMatrix.data());
+        lineShader->setExtrudeMatrix(exMatrix);
 
         // TODO: Move this to transform?
-        const double tilePixelRatio = transform.getScale() / (1 << transform.getIntegerZoom()) / 8;
+        const float tilePixelRatio = transform.getScale() / (1 << transform.getIntegerZoom()) / 8;
 
-        glUniform2f(lineShader->u_dasharray, 1, -1);
-        glUniform2f(lineShader->u_linewidth, outset, inset);
-        glUniform1f(lineShader->u_ratio, tilePixelRatio);
-        glUniform4fv(lineShader->u_color, 1, color.data());
-        glUniform1f(lineShader->u_debug, 0);
+        lineShader->setDashArray({{ 1, -1 }});
+        lineShader->setLineWidth({{ outset, inset }});
+        lineShader->setRatio(tilePixelRatio);
+        lineShader->setColor(color);
+        lineShader->setDebug(0);
         bucket.drawLines(*lineShader);
     }
 }

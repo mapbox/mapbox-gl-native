@@ -15,10 +15,10 @@ public:
     void setColor(const std::array<float, 4>& color);
 
 private:
-    int32_t a_pos;
+    int32_t a_pos = -1;
 
-    std::array<float, 4> color;
-    int32_t u_color;
+    std::array<float, 4> color = {};
+    int32_t u_color = -1;
 };
 
 }

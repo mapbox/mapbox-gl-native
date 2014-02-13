@@ -37,3 +37,31 @@ void LinejoinShader::bind(char *offset) {
     // Note: We're referring to the vertices in a line array, which are 8 bytes long!
     glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 8, offset);
 }
+
+void LinejoinShader::setColor(const std::array<float, 4>& new_color) {
+    if (color != new_color) {
+        glUniform4fv(u_color, 1, new_color.data());
+        color = new_color;
+    }
+}
+
+void LinejoinShader::setWorld(const std::array<float, 2>& new_world) {
+    if (world != new_world) {
+        glUniform2fv(u_world, 1, new_world.data());
+        world = new_world;
+    }
+}
+
+void LinejoinShader::setLineWidth(const std::array<float, 2>& new_linewidth) {
+    if (linewidth != new_linewidth) {
+        glUniform2fv(u_linewidth, 1, new_linewidth.data());
+        linewidth = new_linewidth;
+    }
+}
+
+void LinejoinShader::setSize(float new_size) {
+    if (size != new_size) {
+        glUniform1f(u_size, new_size);
+        size = new_size;
+    }
+}

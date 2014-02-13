@@ -11,17 +11,37 @@ public:
 
     void bind(char *offset);
 
-    int32_t a_pos;
-    int32_t a_extrude;
-    // int32_t a_linesofar;
+    void setExtrudeMatrix(const std::array<float, 16>& exmatrix);
+    void setColor(const std::array<float, 4>& color);
+    void setLineWidth(const std::array<float, 2>& linewidth);
+    void setRatio(float ratio);
+    void setDashArray(const std::array<float, 2>& dasharray);
+    void setDebug(float debug);
 
-    int32_t u_exmatrix;
-    int32_t u_linewidth;
-    int32_t u_color;
-    int32_t u_ratio;
-    int32_t u_dasharray;
-    int32_t u_debug;
+private:
+    int32_t a_pos = -1;
+    int32_t a_extrude = -1;
+    // int32_t a_linesofar = -1;
+
+    std::array<float, 16> exmatrix = {};
+    int32_t u_exmatrix = -1;
+
+    std::array<float, 4> color = {};
+    int32_t u_color = -1;
+
+    std::array<float, 2> linewidth = {};
+    int32_t u_linewidth = -1;
+
+    float ratio = 0;
+    int32_t u_ratio = -1;
+
+    std::array<float, 2> dasharray = {};
+    int32_t u_dasharray = -1;
+
+    float debug = 0;
+    int32_t u_debug = -1;
 };
+
 
 }
 

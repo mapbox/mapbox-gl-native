@@ -143,7 +143,7 @@ bool Shader::compileShader(GLuint *shader, GLenum type, const GLchar *source) {
 }
 
 
-void Shader::setMatrix(const mat4& newMatrix) {
+void Shader::setMatrix(const std::array<float, 16>& newMatrix) {
     if (matrix != newMatrix) {
         glUniformMatrix4fv(u_matrix, 1, GL_FALSE, newMatrix.data());
         matrix = newMatrix;

@@ -11,12 +11,25 @@ public:
 
     void bind(char *offset);
 
-    int32_t a_pos;
+    void setColor(const std::array<float, 4>& color);
+    void setWorld(const std::array<float, 2>& world);
+    void setLineWidth(const std::array<float, 2>& linewidth);
+    void setSize(float size);
 
-    int32_t u_world;
-    int32_t u_linewidth;
-    int32_t u_color;
-    int32_t u_size;
+private:
+    int32_t a_pos = -1;
+
+    std::array<float, 4> color = {};
+    int32_t u_color = -1;
+
+    std::array<float, 2> world = {};
+    int32_t u_world = -1;
+
+    std::array<float, 2> linewidth = {};
+    int32_t u_linewidth = -1;
+
+    float size = 0;
+    int32_t u_size = -1;
 };
 
 }

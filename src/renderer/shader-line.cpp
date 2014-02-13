@@ -48,3 +48,45 @@ void LineShader::bind(char *offset) {
     glEnableVertexAttribArray(a_extrude);
     glVertexAttribPointer(a_extrude, 2, GL_BYTE, false, 8, offset + 4);
 }
+
+void LineShader::setExtrudeMatrix(const std::array<float, 16>& new_exmatrix) {
+    if (exmatrix != new_exmatrix) {
+        glUniformMatrix4fv(u_exmatrix, 1, GL_FALSE, new_exmatrix.data());
+        exmatrix = new_exmatrix;
+    }
+}
+
+void LineShader::setColor(const std::array<float, 4>& new_color) {
+    if (color != new_color) {
+        glUniform4fv(u_color, 1, new_color.data());
+        color = new_color;
+    }
+}
+
+void LineShader::setLineWidth(const std::array<float, 2>& new_linewidth) {
+    if (linewidth != new_linewidth) {
+        glUniform2fv(u_linewidth, 1, new_linewidth.data());
+        linewidth = new_linewidth;
+    }
+}
+
+void LineShader::setRatio(float new_ratio) {
+    if (ratio != new_ratio) {
+        glUniform1f(u_ratio, new_ratio);
+        ratio = new_ratio;
+    }
+}
+
+void LineShader::setDashArray(const std::array<float, 2>& new_dasharray) {
+    if (dasharray != new_dasharray) {
+        glUniform2fv(u_dasharray, 1, new_dasharray.data());
+        dasharray = new_dasharray;
+    }
+}
+
+void LineShader::setDebug(float new_debug) {
+    if (debug != new_debug) {
+        glUniform1f(u_debug, new_debug);
+        debug = new_debug;
+    }
+}

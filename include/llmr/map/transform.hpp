@@ -56,10 +56,10 @@ public:
     uint32_t height = 0;
 
     // physical (framebuffer) dimensions
-    uint32_t fb_width = 0;
-    uint32_t fb_height = 0;
+    float fb_width = 0;
+    float fb_height = 0;
 
-    double pixelRatio = 1;
+    float pixelRatio = 1;
 
 private:
     double x = 0, y = 0; // pixel values of the map center in the current scale

@@ -40,3 +40,46 @@ void PatternShader::bind(char *offset) {
     glEnableVertexAttribArray(a_pos);
     glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
 }
+
+void PatternShader::setColor(const std::array<float, 4>& new_color) {
+    if (color != new_color) {
+        glUniform4fv(u_color, 1, new_color.data());
+        color = new_color;
+    }
+}
+
+void PatternShader::setOffset(const std::array<float, 2>& new_offset) {
+    if (offset != new_offset) {
+        glUniform2fv(u_offset, 1, new_offset.data());
+        offset = new_offset;
+    }
+}
+
+void PatternShader::setPatternSize(const std::array<float, 2>& new_pattern_size) {
+    if (pattern_size != new_pattern_size) {
+        glUniform2fv(u_pattern_size, 1, new_pattern_size.data());
+        pattern_size = new_pattern_size;
+    }
+}
+
+void PatternShader::setPatternTopLeft(const std::array<float, 2>& new_pattern_tl) {
+    if (pattern_tl != new_pattern_tl) {
+        glUniform2fv(u_pattern_tl, 1, new_pattern_tl.data());
+        pattern_tl = new_pattern_tl;
+    }
+}
+
+void PatternShader::setPatternBottomRight(const std::array<float, 2>& new_pattern_br) {
+    if (pattern_br != new_pattern_br) {
+        glUniform2fv(u_pattern_br, 1, new_pattern_br.data());
+        pattern_br = new_pattern_br;
+    }
+}
+
+void PatternShader::setMix(float new_mix) {
+    if (mix != new_mix) {
+        glUniform1f(u_mix, new_mix);
+        mix = new_mix;
+    }
+}
+
