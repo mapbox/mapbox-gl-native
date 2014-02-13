@@ -24,6 +24,7 @@ class VectorTileLayer;
 class FillVertexBuffer;
 class LineVertexBuffer;
 class TriangleElementsBuffer;
+class LineElementsBuffer;
 class PointElementsBuffer;
 class PlainShader;
 
@@ -76,7 +77,9 @@ public:
 
     std::shared_ptr<FillVertexBuffer> fillVertexBuffer;
     std::shared_ptr<LineVertexBuffer> lineVertexBuffer;
+
     std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
+    std::shared_ptr<LineElementsBuffer> lineElementsBuffer;
     std::shared_ptr<PointElementsBuffer> pointElementsBuffer;
 
     // Holds the buckets of this tile.

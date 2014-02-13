@@ -16,14 +16,16 @@ struct geometry_too_long_exception : std::exception {};
 using namespace llmr;
 
 FillBucket::FillBucket(const std::shared_ptr<FillVertexBuffer>& vertexBuffer,
-                       const std::shared_ptr<TriangleElementsBuffer>& elementsBuffer,
+                       const std::shared_ptr<TriangleElementsBuffer>& triangleElementsBuffer,
+                       const std::shared_ptr<LineElementsBuffer>& lineElementsBuffer,
                        const BucketDescription& bucket_desc)
     : geom_desc(bucket_desc.geometry),
       vertexBuffer(vertexBuffer),
-      elementsBuffer(elementsBuffer),
+      triangleElementsBuffer(triangleElementsBuffer),
+      lineElementsBuffer(lineElementsBuffer),
       vertex_start(vertexBuffer->index()),
-      elements_start(elementsBuffer->index()),
-      length(0) {
+      triangle_elements_start(triangleElementsBuffer->index()),
+      line_elements_start(lineElementsBuffer->index()) {
 }
 
 void FillBucket::addGeometry(pbf& geom) {
@@ -49,74 +51,81 @@ void FillBucket::addGeometry(pbf& geom) {
 
 void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
     uint32_t vertex_start = vertexBuffer->index();
-    vertexBuffer->addDegenerate();
+    // vertexBuffer->addDegenerate();
     for (const Coordinate& coord : line) {
         vertexBuffer->add(coord.x, coord.y);
     }
 
-    uint32_t vertex_end = vertexBuffer->index();
+    size_t vertex_end = vertexBuffer->index();
 
-    if (vertex_end - vertex_start > 65535) {
+    size_t vertex_count = vertex_end - vertex_start;
+    if (vertex_count > 65536) {
         throw geometry_too_long_exception();
     }
 
-    FillBucket& index = *this;
-    if (!index.groups.size()) {
-        index.groups.emplace_back();
+    {
+        if (!triangleGroups.size() || (triangleGroups.back().vertex_length + vertex_count > 65535)) {
+            // Move to a new group because the old one can't hold the geometry.
+            triangleGroups.emplace_back();
+        }
+
+        // We're generating triangle fans, so we always start with the first
+        // coordinate in this polygon.
+        triangle_group_type& group = triangleGroups.back();
+        uint32_t index = group.vertex_length;
+        for (size_t i = 2; i < vertex_count; ++i) {
+            triangleElementsBuffer->add(index, index + i - 1, index + i);
+        }
+
+        group.vertex_length += vertex_count;
+        group.elements_length += (vertex_count - 2);
     }
 
-    uint32_t vertex_count = vertex_end - vertex_start;
-    index.length += vertex_count;
+    {
+        if (!lineGroups.size() || (lineGroups.back().vertex_length + vertex_count > 65535)) {
+            // Move to a new group because the old one can't hold the geometry.
+            lineGroups.emplace_back();
+        }
 
-    if (index.groups.back().vertex_length + vertex_count > 65535) {
-        // Move to a new group because the old one can't hold the geometry.
-        index.groups.emplace_back();
+        // We're generating triangle fans, so we always start with the first
+        // coordinate in this polygon.
+        line_group_type& group = lineGroups.back();
+        uint32_t index = group.vertex_length;
+        for (size_t i = 1; i < vertex_count; ++i) {
+            lineElementsBuffer->add(index + i - 1, index + i);
+        }
+
+        group.vertex_length += vertex_count;
+        group.elements_length += (vertex_count - 1);
     }
-
-    group_type& group = index.groups.back();
-
-    // We're generating triangle fans, so we always start with the first
-    // coordinate in this polygon.
-    // The first valid index that is not a degenerate.
-    uint16_t firstIndex = group.vertex_length + 1;
-
-    assert(firstIndex + vertex_count - 1 < 65536);
-
-    uint32_t elements_start = elementsBuffer->index();
-
-    for (uint32_t i = 2; i < vertex_count; ++i) {
-        elementsBuffer->add(firstIndex, firstIndex + i - 1, firstIndex + i);
-    }
-
-    uint32_t elements_end = elementsBuffer->index();
-    uint32_t elements_count = elements_end - elements_start;
-    group.vertex_length += vertex_count;
-    group.elements_length += elements_count;
-
 }
 
 void FillBucket::render(Painter& painter, const std::string& layer_name, const Tile::ID& id) {
     painter.renderFill(*this, layer_name, id);
 }
 
-uint32_t FillBucket::size() const {
-    return length;
+bool FillBucket::empty() const {
+    return triangleGroups.empty();
 }
 
 void FillBucket::drawElements(PlainShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer->itemSize);
-    char *elements_index = BUFFER_OFFSET(elements_start * elementsBuffer->itemSize);
-    for (group_type& group : groups) {
-        group.array.bind(shader, *vertexBuffer, *elementsBuffer, vertex_index);
-        glDrawElements(GL_TRIANGLES, group.elements_length * 3 - 3, GL_UNSIGNED_SHORT, elements_index);
+    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer->itemSize);
+    for (triangle_group_type& group : triangleGroups) {
+        group.array.bind(shader, *vertexBuffer, *triangleElementsBuffer, vertex_index);
+        glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * vertexBuffer->itemSize;
-        elements_index += group.elements_length * elementsBuffer->itemSize;
+        elements_index += group.elements_length * triangleElementsBuffer->itemSize;
     }
 }
 
 void FillBucket::drawVertices(OutlineShader& shader) {
-    // Draw the entire line
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer->itemSize);
-    array.bind(shader, *vertexBuffer, vertex_index);
-    glDrawArrays(GL_LINE_STRIP, 0, length);
+    char *elements_index = BUFFER_OFFSET(line_elements_start * lineElementsBuffer->itemSize);
+    for (line_group_type& group : lineGroups) {
+        group.array.bind(shader, *vertexBuffer, *lineElementsBuffer, vertex_index);
+        glDrawElements(GL_LINES, group.elements_length * 2, GL_UNSIGNED_SHORT, elements_index);
+        vertex_index += group.vertex_length * vertexBuffer->itemSize;
+        elements_index += group.elements_length * lineElementsBuffer->itemSize;
+    }
 }

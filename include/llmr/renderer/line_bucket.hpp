@@ -19,7 +19,7 @@ struct Coordinate;
 struct pbf;
 
 class LineBucket : public Bucket {
-    typedef ElementGroup<LineShader> line_group_type;
+    typedef ElementGroup<LineShader> triangle_group_type;
     typedef ElementGroup<LinejoinShader> point_group_type;
 public:
     LineBucket(const std::shared_ptr<LineVertexBuffer>& vertexBuffer,
@@ -51,7 +51,7 @@ private:
     const uint32_t triangle_elements_start;
     const uint32_t point_elements_start;
 
-    std::vector<line_group_type> lineGroups;
+    std::vector<triangle_group_type> triangleGroups;
     std::vector<point_group_type> pointGroups;
 };
 

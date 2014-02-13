@@ -171,7 +171,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     const FillProperties& properties = style.computed.fills[layer_name];
 
     // Abort early.
-    if (!bucket.size()) return;
+    if (bucket.empty()) return;
     if (properties.hidden) return;
 
     Color fill_color = properties.fill_color;

@@ -311,12 +311,12 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
     // Store the triangle/line groups.
     {
-        if (!lineGroups.size() || (lineGroups.back().vertex_length + vertex_count > 65535)) {
+        if (!triangleGroups.size() || (triangleGroups.back().vertex_length + vertex_count > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            lineGroups.emplace_back();
+            triangleGroups.emplace_back();
         }
 
-        line_group_type& group = lineGroups.back();
+        triangle_group_type& group = triangleGroups.back();
         for (const TriangleElement& triangle : triangle_store) {
             triangleElementsBuffer->add(
                 group.vertex_length + triangle.a,
@@ -351,7 +351,7 @@ void LineBucket::render(Painter& painter, const std::string& layer_name, const T
 }
 
 bool LineBucket::empty() const {
-    return lineGroups.empty();
+    return triangleGroups.empty();
 }
 
 bool LineBucket::hasPoints() const {
@@ -361,7 +361,7 @@ bool LineBucket::hasPoints() const {
 void LineBucket::drawLines(LineShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer->itemSize);
     char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer->itemSize);
-    for (line_group_type& group : lineGroups) {
+    for (triangle_group_type& group : triangleGroups) {
         group.array.bind(shader, *vertexBuffer, *triangleElementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * vertexBuffer->itemSize;

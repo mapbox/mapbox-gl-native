@@ -46,6 +46,7 @@ Tile::Tile(ID id, const Style& style)
       fillVertexBuffer(std::make_shared<FillVertexBuffer>()),
       lineVertexBuffer(std::make_shared<LineVertexBuffer>()),
       triangleElementsBuffer(std::make_shared<TriangleElementsBuffer>()),
+      lineElementsBuffer(std::make_shared<LineElementsBuffer>()),
       pointElementsBuffer(std::make_shared<PointElementsBuffer>()),
       style(style) {
 
@@ -169,7 +170,7 @@ std::shared_ptr<Bucket> Tile::createBucket(const VectorTile& tile, const BucketD
 }
 
 std::shared_ptr<Bucket> Tile::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
-    std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(fillVertexBuffer, triangleElementsBuffer, bucket_desc);
+    std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(fillVertexBuffer, triangleElementsBuffer, lineElementsBuffer, bucket_desc);
 
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (pbf feature : filtered_layer) {

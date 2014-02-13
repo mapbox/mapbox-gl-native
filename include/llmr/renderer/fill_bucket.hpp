@@ -18,6 +18,7 @@ namespace llmr {
 class Style;
 class FillVertexBuffer;
 class TriangleElementsBuffer;
+class LineElementsBuffer;
 class BucketDescription;
 class OutlineShader;
 class PlainShader;
@@ -25,17 +26,19 @@ struct Coordinate;
 struct pbf;
 
 class FillBucket : public Bucket {
-    typedef ElementGroup<PlainShader> group_type;
+    typedef ElementGroup<PlainShader> triangle_group_type;
+    typedef ElementGroup<OutlineShader> line_group_type;
 public:
     FillBucket(const std::shared_ptr<FillVertexBuffer>& vertexBuffer,
-               const std::shared_ptr<TriangleElementsBuffer>& elementsBuffer,
+               const std::shared_ptr<TriangleElementsBuffer>& triangleElementsBuffer,
+               const std::shared_ptr<LineElementsBuffer>& lineElementsBuffer,
                const BucketDescription& bucket_desc);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
 
     void addGeometry(pbf& data);
     void addGeometry(const std::vector<Coordinate>& line);
-    uint32_t size() const;
+    bool empty() const;
 
     void drawElements(PlainShader& shader);
     void drawVertices(OutlineShader& shader);
@@ -45,14 +48,16 @@ public:
 
 private:
     std::shared_ptr<FillVertexBuffer> vertexBuffer;
-    std::shared_ptr<TriangleElementsBuffer> elementsBuffer;
+    std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
+    std::shared_ptr<LineElementsBuffer> lineElementsBuffer;
 
     // hold information on where the vertices are located in the FillBuffer
     const uint32_t vertex_start;
-    const uint32_t elements_start;
-    uint32_t length;
+    const uint32_t triangle_elements_start;
+    const uint32_t line_elements_start;
     VertexArrayObject<OutlineShader> array;
-    std::vector<group_type> groups;
+    std::vector<triangle_group_type> triangleGroups;
+    std::vector<line_group_type> lineGroups;
 };
 
 }
