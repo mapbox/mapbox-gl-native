@@ -1,4 +1,5 @@
 #include <llmr/map/transform.hpp>
+#include <llmr/util/constants.hpp>
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/math.hpp>
 #include <cstdio>
@@ -108,7 +109,7 @@ void Transform::setScaleXY(double new_scale, double xn, double yn, double durati
         animations.emplace_front(y, yn, y, duration);
     }
 
-    const double s = scale * size;
+    const double s = scale * util::tileSize;
     zc = s / 2;
     Bc = s / 360;
     Cc = s / (2 * M_PI);
@@ -151,7 +152,7 @@ void Transform::setLonLat(double lon, double lat, double duration) {
 void Transform::setLonLatZoom(double lon, double lat, double zoom, double duration) {
     double new_scale = pow(2.0, zoom);
 
-    const double s = new_scale * size;
+    const double s = new_scale * util::tileSize;
     zc = s / 2;
     Bc = s / 360;
     Cc = s / (2 * M_PI);
@@ -174,18 +175,18 @@ void Transform::getLonLatZoom(double& lon, double& lat, double& zoom) const {
 }
 
 double Transform::pixel_x() const {
-    const double center = (width - scale * size) / 2;
+    const double center = (width - scale * util::tileSize) / 2;
     return center + x;
 }
 
 double Transform::pixel_y() const {
-    const double center = (height - scale * size) / 2;
+    const double center = (height - scale * util::tileSize) / 2;
     return center + y;
 }
 
 void Transform::matrixFor(mat4& matrix, const vec3<int32_t>& id) const {
     const double tile_scale = pow(2, id.z);
-    const double tile_size = scale * size / tile_scale;
+    const double tile_size = scale * util::tileSize / tile_scale;
 
     matrix::identity(matrix);
 
@@ -195,8 +196,9 @@ void Transform::matrixFor(mat4& matrix, const vec3<int32_t>& id) const {
 
     matrix::translate(matrix, matrix, pixel_x() + id.x * tile_size, pixel_y() + id.y * tile_size, 0);
 
-    // TODO: Get rid of the 8 (scaling from 4096 to 512 px tile size);
-    matrix::scale(matrix, matrix, scale / tile_scale / 8, scale / tile_scale / 8, 1);
+    // TODO: Get rid of the 8 (scaling from 4096 to tile size);
+    float factor = scale / tile_scale / (4096.0f / util::tileSize);
+    matrix::scale(matrix, matrix, factor, factor, 1);
 
     // Clipping plane
     matrix::translate(matrix, matrix, 0, 0, -1);
@@ -231,8 +233,8 @@ void Transform::mapCornersToBox(uint32_t z, box& b) const {
 
     const double w_2 = width / 2;
     const double h_2 = height / 2;
-    const double ss_1 = ref_scale / (scale * size);
-    const double ss_2 = (scale * size) / 2;
+    const double ss_1 = ref_scale / (scale * util::tileSize);
+    const double ss_2 = (scale * util::tileSize) / 2;
 
     // Calculate the corners of the map view. The resulting coordinates will be
     // in fractional tile coordinates.

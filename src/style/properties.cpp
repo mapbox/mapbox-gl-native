@@ -1,4 +1,5 @@
 #include <llmr/style/properties.hpp>
+#include <llmr/util/constants.hpp>
 
 
 #include <cassert>
@@ -30,8 +31,8 @@ float functions::stops(float z, const std::vector<float>& stops) {
     // We need an even number of stop values.
     if (stops.size() % 2 != 0) return 0;
 
-    // Accounts for us rendering tiles at 512x512, so our zoom levels are shifted by 1.
-    z += 1;
+    // Accounts for us rendering tiles at another size, so our zoom levels are shifted appropriately.
+    z += util::tileSize / 256.0f;
 
     bool smaller = false;
     float smaller_z, smaller_val;

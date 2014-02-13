@@ -69,9 +69,6 @@ private:
     double min_scale = pow(2, 0);
     double max_scale = pow(2, 20);
 
-    // tile size
-    const int32_t size = 512;
-
     // cache values for spherical mercator math
     double zc, Bc, Cc;
 
