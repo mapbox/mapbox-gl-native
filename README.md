@@ -5,16 +5,16 @@ implemented in C++, targeting iOS & OS X.
 
 ## OS X
 
-Install boost, libpng, and [glfw3](http://www.glfw.org/docs/latest/):
+Install libpng and [glfw3](http://www.glfw.org/docs/latest/):
 
 ```
-brew install boost libpng
+brew install libpng
 brew install homebrew/versions/glfw3
 ```
 
 Then configure the project:
 
-    ./configure --boost=`brew --prefix` --glfw3=`brew --prefix` --png=`brew --prefix`
+    ./configure --glfw3=`brew --prefix` --png=`brew --prefix`
 
 See all the options by calling `./configure --help`
 
@@ -25,7 +25,6 @@ Usage: configure [options]
 Options:
   -h, --help            show this help message and exit
   --debug               Also build debug build
-  --boost=BOOST_ROOT    Path to boost (defaults to /usr/local)
   --glfw3=GLFW3         Path to gflw3 (defaults to using pkg-config)
   --png=PNG             Path to png (defaults to using pkg-config)
   --png-includes=PNG_INCLUDES
@@ -44,10 +43,6 @@ Or generate a dual iOS/OS X-compatible Xcode project for `libllmr` to include as
     make xcode # then open llmr.xcodeproj
 
 ## iOS
-
-Install boost: 
-
-    brew install boost
 
 Because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version yourself. Run `./ios/setup_libpng.sh`, which is derived from Mapnik's cross-architecture build scripts. This will also run `./configure`. 
 
@@ -68,10 +63,6 @@ Install a `-std=c++11` capable compiler
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get update
     sudo apt-get install gcc-4.8 g++-4.8
-
-Install boost (we only need headers):
-
-    sudo apt-get install libboost-dev
 
 Install libpng-dev:
 
