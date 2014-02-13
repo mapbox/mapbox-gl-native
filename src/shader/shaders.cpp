@@ -13,7 +13,7 @@ const shader_source llmr::shaders[SHADER_COUNT] = {
        "uniform vec4 u_color;\nuniform vec2 u_linewidth;\n\nvarying vec2 v_pos;\n\nvoid main() {\n    float dist = length(v_pos - gl_FragCoord.xy);\n\n    // Calculate the antialiasing fade factor. This is either when fading in\n    // the line in case of an offset line (v_linewidth.t) or when fading out\n    // (v_linewidth.s)\n    float alpha = clamp(min(dist - (u_linewidth.t - 1.0), u_linewidth.s - dist), 0.0, 1.0);\n    gl_FragColor = u_color * alpha;\n}\n",
    },
    {
-       "attribute vec2 a_pos;\nuniform mat4 u_matrix;\nuniform vec2 u_world;\n\nvarying vec2 v_pos;\n\nvoid main() {\n    // If the x coordinate is the maximum integer, we move the z coordinates out\n    // of the view plane so that the triangle gets clipped. This makes it easier\n    // for us to create degenerate triangle strips.\n    gl_Position = u_matrix * vec4(a_pos, 0, 1);\n\n    v_pos = (gl_Position.xy + 1.0) / 2.0 * u_world;\n}\n",
+       "attribute vec2 a_pos;\nuniform mat4 u_matrix;\nuniform vec2 u_world;\n\nvarying vec2 v_pos;\n\nvoid main() {\n    gl_Position = u_matrix * vec4(a_pos, 0, 1);\n    v_pos = (gl_Position.xy + 1.0) / 2.0 * u_world;\n}\n",
        "uniform vec4 u_color;\n\nvarying vec2 v_pos;\n\nvoid main() {\n    float dist = length(v_pos - gl_FragCoord.xy);\n    float alpha = smoothstep(1.0, 0.0, dist);\n    gl_FragColor = u_color * alpha;\n}\n",
    },
    {

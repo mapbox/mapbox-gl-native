@@ -51,11 +51,9 @@ void FillBucket::addGeometry(pbf& geom) {
 
 void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
     uint32_t vertex_start = vertexBuffer->index();
-    // vertexBuffer->addDegenerate();
     for (const Coordinate& coord : line) {
         vertexBuffer->add(coord.x, coord.y);
     }
-
     size_t vertex_end = vertexBuffer->index();
 
     size_t vertex_count = vertex_end - vertex_start;
