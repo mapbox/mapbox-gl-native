@@ -13,7 +13,6 @@ class FillVertexBuffer : public Buffer<
 public:
     typedef int16_t vertex_type;
 
-    void addDegenerate();
     void add(vertex_type x, vertex_type y);
 };
 
