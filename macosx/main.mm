@@ -267,6 +267,7 @@ int main() {
     mapView = new MapView();
     mapView->init();
     int ret = mapView->run();
+    mapView->settings.sync();
     delete mapView;
     return ret;
 }

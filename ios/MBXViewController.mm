@@ -139,6 +139,11 @@ class MBXMapView
     [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
+- (void)dealloc
+{
+    mapView->settings.sync();
+}
+
 - (void)updateRender:(NSNotification *)notification
 {
     [self updateRender];
@@ -165,6 +170,8 @@ class MBXMapView
 - (void)pauseRender
 {
     displayLink.paused = YES;
+
+    mapView->settings.sync();
 }
 
 - (void)render:(id)sender

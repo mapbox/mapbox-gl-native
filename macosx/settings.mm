@@ -2,60 +2,43 @@
 
 #include "settings.hpp"
 
-
 using namespace llmr;
 
-Settings_MacOSX::Settings_MacOSX() {
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-
-        // position
-        [NSNumber numberWithDouble:longitude], @"longitude",
-        [NSNumber numberWithDouble:latitude], @"latitude",
-        [NSNumber numberWithDouble:scale], @"scale",
-        [NSNumber numberWithDouble:angle], @"angle",
-
-        // debug
-        [NSNumber numberWithBool:debug], @"debug",
-
-        nil
-    ];
-
-    [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
+Settings_MacOSX::Settings_MacOSX()
+{
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"longitude" : @(longitude),
+                                                               @"latitude"  : @(latitude),
+                                                               @"scale"     : @(scale),
+                                                               @"angle"     : @(angle),
+                                                               @"debug"     : @(debug) }];
 }
 
-void Settings_MacOSX::load() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+void Settings_MacOSX::load()
+{
+    NSDictionary *settings = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
 
-    // position
-    longitude = [defaults doubleForKey:@"longitude"];
-    latitude = [defaults doubleForKey:@"latitude"];
-    scale = [defaults doubleForKey:@"scale"];
-    angle = [defaults doubleForKey:@"angle"];
-
-    // debug
-    debug = [defaults boolForKey:@"debug"];
+    longitude = [settings[@"longitude"] doubleValue];
+    latitude  = [settings[@"latitude"]  doubleValue];
+    scale     = [settings[@"scale"]     doubleValue];
+    angle     = [settings[@"angle"]     doubleValue];
+    debug     = [settings[@"debug"]     boolValue];
 }
 
-void Settings_MacOSX::save() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-
-        // position
-        [NSNumber numberWithDouble:longitude], @"longitude",
-        [NSNumber numberWithDouble:latitude], @"latitude",
-        [NSNumber numberWithDouble:scale], @"scale",
-        [NSNumber numberWithDouble:angle], @"angle",
-
-        // debug
-        [NSNumber numberWithBool:debug], @"debug",
-
-        nil
-    ];
-    [defaults setPersistentDomain:appDefaults forName:[[NSBundle mainBundle] bundleIdentifier]];
-
-    [defaults synchronize];
+void Settings_MacOSX::persist()
+{
+    [[NSUserDefaults standardUserDefaults] setValuesForKeysWithDictionary:@{ @"longitude" : @(longitude),
+                                                                             @"latitude"  : @(latitude),
+                                                                             @"scale"     : @(scale),
+                                                                             @"angle"     : @(angle),
+                                                                             @"debug"     : @(debug) }];
 }
 
-void Settings_MacOSX::clear() {
+void Settings_MacOSX::sync()
+{
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+void Settings_MacOSX::clear()
+{
+    [NSUserDefaults resetStandardUserDefaults];
 }

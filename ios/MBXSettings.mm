@@ -12,57 +12,41 @@
 
 using namespace llmr;
 
-Settings_iOS::Settings_iOS() {
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-
-                                 // position
-                                 [NSNumber numberWithDouble:longitude], @"longitude",
-                                 [NSNumber numberWithDouble:latitude], @"latitude",
-                                 [NSNumber numberWithDouble:scale], @"scale",
-                                 [NSNumber numberWithDouble:angle], @"angle",
-
-                                 // debug
-                                 [NSNumber numberWithBool:debug], @"debug",
-
-                                 nil
-                                 ];
-
-    [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
+Settings_iOS::Settings_iOS()
+{
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"longitude" : @(longitude),
+                                                               @"latitude"  : @(latitude),
+                                                               @"scale"     : @(scale),
+                                                               @"angle"     : @(angle),
+                                                               @"debug"     : @(debug) }];
 }
 
-void Settings_iOS::load() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+void Settings_iOS::load()
+{
+    NSDictionary *settings = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
 
-    // position
-    longitude = [defaults doubleForKey:@"longitude"];
-    latitude = [defaults doubleForKey:@"latitude"];
-    scale = [defaults doubleForKey:@"scale"];
-    angle = [defaults doubleForKey:@"angle"];
-
-    // debug
-    debug = [defaults boolForKey:@"debug"];
+    longitude = [settings[@"longitude"] doubleValue];
+    latitude  = [settings[@"latitude"]  doubleValue];
+    scale     = [settings[@"scale"]     doubleValue];
+    angle     = [settings[@"angle"]     doubleValue];
+    debug     = [settings[@"debug"]     boolValue];
 }
 
-void Settings_iOS::save() {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-
-                                 // position
-                                 [NSNumber numberWithDouble:longitude], @"longitude",
-                                 [NSNumber numberWithDouble:latitude], @"latitude",
-                                 [NSNumber numberWithDouble:scale], @"scale",
-                                 [NSNumber numberWithDouble:angle], @"angle",
-                                 
-                                 // debug
-                                 [NSNumber numberWithBool:debug], @"debug",
-                                 
-                                 nil
-                                 ];
-//    [defaults setPersistentDomain:appDefaults forName:[[NSBundle mainBundle] bundleIdentifier]];
-
-//    [defaults synchronize];
+void Settings_iOS::persist()
+{
+    [[NSUserDefaults standardUserDefaults] setValuesForKeysWithDictionary:@{ @"longitude" : @(longitude),
+                                                                             @"latitude"  : @(latitude),
+                                                                             @"scale"     : @(scale),
+                                                                             @"angle"     : @(angle),
+                                                                             @"debug"     : @(debug) }];
 }
 
-void Settings_iOS::clear() {
+void Settings_iOS::sync()
+{
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+void Settings_iOS::clear()
+{
+    [NSUserDefaults resetStandardUserDefaults];
 }
