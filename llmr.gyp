@@ -16,8 +16,8 @@
       'actions': [
         {
           'action_name': 'Build Shaders',
-          'inputs': [],
-          'outputs': [],
+          'inputs': ['<!@(find src -name "*.glsl")'],
+          'outputs': ['include/llmr/shader/shaders.hpp', 'src/shader/shaders.cpp'],
           'action': ['bin/build-shaders.js'],
         },
       ],
@@ -75,8 +75,8 @@
       'actions': [
         {
           'action_name': 'Build Shaders',
-          'inputs': [],
-          'outputs': [],
+          'inputs': ['<!@(find src -name "*.glsl")'],
+          'outputs': ['include/llmr/shader/shaders.hpp', 'src/shader/shaders.cpp'],
           'action': ['bin/build-shaders.js'],
         },
       ],
