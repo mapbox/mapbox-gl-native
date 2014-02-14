@@ -11,7 +11,8 @@
       'sources': [
         '<!@(find src -name "*.cpp")',
         '<!@(find include -name "*.hpp")',
-        '<!@(find src -name "*.glsl")'
+        '<!@(find src -name "*.glsl")',
+        'bin/style.js'
       ],
       'actions': [
         {
@@ -25,6 +26,27 @@
           ],
           'action': ['bin/build-shaders.js'],
         },
+        {
+          'action_name': 'Convert Style to Protobuf',
+          'inputs': [
+            'bin/style.js'
+          ],
+          'outputs': [
+            'resources/style.pbf'
+          ],
+          'action': ['bin/convert-style.js'],
+        },
+        {
+          'action_name': 'Update Style Resources',
+          'inputs': [
+            'resources/style.pbf'
+          ],
+          'outputs': [
+            'include/llmr/style/resources.hpp',
+            'src/style/resources.cpp'
+          ],
+          'action': ['bin/build-style.js']
+        }
       ],
       'xcode_settings': {
         'SDKROOT': 'macosx',
@@ -75,7 +97,8 @@
       'sources': [
         '<!@(find src -name "*.cpp")',
         '<!@(find include -name "*.hpp")',
-        '<!@(find src -name "*.glsl")'
+        '<!@(find src -name "*.glsl")',
+        'bin/style.js'
       ],
       'actions': [
         {
@@ -89,6 +112,27 @@
           ],
           'action': ['bin/build-shaders.js'],
         },
+        {
+          'action_name': 'Convert Style to Protobuf',
+          'inputs': [
+            'bin/style.js'
+          ],
+          'outputs': [
+            'resources/style.pbf'
+          ],
+          'action': ['bin/convert-style.js'],
+        },
+        {
+          'action_name': 'Update Style Resources',
+          'inputs': [
+            'resources/style.pbf'
+          ],
+          'outputs': [
+            'include/llmr/style/resources.hpp',
+            'src/style/resources.cpp'
+          ],
+          'action': ['bin/build-style.js']
+        }
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',

@@ -111,7 +111,7 @@ proto/style.proto. The reason for doing so is that we don't have to ship with a
 JSON/yaml parser. To test the conversion script, run
 
 ```
-bin/convert-style.js | protoc --decode=style proto/style.proto
+bin/convert-style.js && cat resources/style.pbf | protoc --decode=style proto/style.proto
 ```
 
 You should see a nicely formatted hierarchical output of the converted style.
@@ -120,9 +120,10 @@ You should see a nicely formatted hierarchical output of the converted style.
 To update the included default style, use
 
 ```
-bin/convert-style.js > resources/style.pbf && bin/build-style.js
+bin/convert-style.js && bin/build-style.js
 ```
 
+This is automatically taken care of as a build phase if you are using the Xcode projects. 
 
 # Usage
 

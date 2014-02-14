@@ -4,6 +4,7 @@
 
 var style = require('./style.js');
 var Protobuf = require('./protobuf.js');
+var fs = require('fs');
 
 // var fs = require('fs');
 
@@ -212,4 +213,4 @@ for (var i = 0; i < style.classes.length; i++) {
     pbf.writeMessage(3 /* class */, createClass(klass));
 }
 
-process.stdout.write(pbf.finish());
+fs.writeFileSync('resources/style.pbf', pbf.finish());
