@@ -8,8 +8,9 @@ namespace llmr {
 class Settings_MacOSX : public Settings {
 public:
     Settings_MacOSX();
-    virtual void save();
     virtual void load();
+    virtual void persist();
+    virtual void sync();
     virtual void clear();
 };
 

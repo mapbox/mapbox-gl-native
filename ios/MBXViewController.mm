@@ -128,7 +128,7 @@ class MBXMapView
         [self.view addGestureRecognizer:quickZoom];
     }
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startRender:) name:MBXNeedsRenderNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateRender:) name:MBXNeedsRenderNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateNetworkActivity:) name:MBXUpdateActivityNotification object:nil];
 
     mapView = new MBXMapView();
@@ -139,9 +139,14 @@ class MBXMapView
     [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
-- (void)startRender:(NSNotification *)notification
+- (void)dealloc
 {
-    [self startRender];
+    mapView->settings.sync();
+}
+
+- (void)updateRender:(NSNotification *)notification
+{
+    [self updateRender];
 }
 
 - (void)updateNetworkActivity:(NSNotification *)notification
@@ -153,18 +158,20 @@ class MBXMapView
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:(self.activityCount > 0)];
 }
 
-- (void)startRender
+- (void)updateRender
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 
     displayLink.paused = NO;
 
-    [self performSelector:@selector(stopRender) withObject:nil afterDelay:3.0];
+    [self performSelector:@selector(pauseRender) withObject:nil afterDelay:3.0];
 }
 
-- (void)stopRender
+- (void)pauseRender
 {
     displayLink.paused = YES;
+
+    mapView->settings.sync();
 }
 
 - (void)render:(id)sender
@@ -220,7 +227,7 @@ class MBXMapView
         mapView->map.moveBy(finalCenter.x - self.center.x, finalCenter.y - self.center.y, duration);
     }
 
-    [self startRender];
+    [self updateRender];
 }
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
@@ -264,7 +271,7 @@ class MBXMapView
         mapView->map.scaleBy(new_scale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y, duration);
     }
 
-    [self startRender];
+    [self updateRender];
 }
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
@@ -280,7 +287,7 @@ class MBXMapView
         mapView->map.setAngle(self.angle + rotate.rotation, [rotate locationInView:rotate.view].x, [rotate locationInView:rotate.view].y);
     }
 
-    [self startRender];
+    [self updateRender];
 }
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
@@ -290,7 +297,7 @@ class MBXMapView
     if (doubleTap.state == UIGestureRecognizerStateEnded)
         mapView->map.scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.5);
 
-    [self startRender];
+    [self updateRender];
 }
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
@@ -300,7 +307,7 @@ class MBXMapView
     if (twoFingerTap.state == UIGestureRecognizerStateEnded)
         mapView->map.scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
 
-    [self startRender];
+    [self updateRender];
 }
 
 - (void)handleLongPressGesture:(UILongPressGestureRecognizer *)longPress
@@ -310,7 +317,7 @@ class MBXMapView
     if (longPress.state == UIGestureRecognizerStateBegan)
         mapView->map.resetNorth();
 
-    [self startRender];
+    [self updateRender];
 }
 
 - (void)handleTwoFingerLongPressGesture:(UILongPressGestureRecognizer *)twoFingerLongPress
@@ -320,7 +327,7 @@ class MBXMapView
     if (twoFingerLongPress.state == UIGestureRecognizerStateBegan)
         mapView->map.resetPosition();
 
-    [self startRender];
+    [self updateRender];
 }
 
 - (void)handleThreeFingerLongPressGesture:(UILongPressGestureRecognizer *)threeFingerLongPress
@@ -334,7 +341,7 @@ class MBXMapView
         self.debug = ! self.debug;
     }
 
-    [self startRender];
+    [self updateRender];
 }
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
@@ -356,7 +363,7 @@ class MBXMapView
         mapView->map.scaleBy(powf(2, newZoom) / mapView->map.getScale(), self.view.bounds.size.width / 2, self.view.bounds.size.height / 2);
     }
 
-    [self startRender];
+    [self updateRender];
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer

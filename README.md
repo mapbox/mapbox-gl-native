@@ -57,6 +57,8 @@ Then you can build the iOS app with make:
 
 Consider `sudo npm install -g ios-sim` for auto-launching the simulator, but it can be tricky and it's better to run on an ARM-based device anyway. To do this, open `./ios/llmr-app.xcodeproj` in Xcode, then build and run on the simulator or a device yourself. 
 
+Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina). 
+
 ## Ubuntu
 
 Ensure you have git and other build essentials:
@@ -109,7 +111,7 @@ proto/style.proto. The reason for doing so is that we don't have to ship with a
 JSON/yaml parser. To test the conversion script, run
 
 ```
-bin/convert-style.js | protoc --decode=style proto/style.proto
+bin/convert-style.js && cat resources/style.pbf | protoc --decode=style proto/style.proto
 ```
 
 You should see a nicely formatted hierarchical output of the converted style.
@@ -118,9 +120,10 @@ You should see a nicely formatted hierarchical output of the converted style.
 To update the included default style, use
 
 ```
-bin/convert-style.js > resources/style.pbf && bin/build-style.js
+bin/convert-style.js && bin/build-style.js
 ```
 
+This is automatically taken care of as a build phase if you are using the Xcode projects. 
 
 # Usage
 

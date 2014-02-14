@@ -7,16 +7,17 @@ namespace llmr {
 
 class Settings : private util::noncopyable {
 public:
-    virtual void save() = 0;
+    virtual void load() = 0;    // load into memory
+    virtual void persist() = 0; // persist in memory (then call sync() if platform-appropriate)
+    virtual void sync() = 0;    // save to disk
+    virtual void clear() = 0;   // clear from memory and disk
     virtual ~Settings() {}
 public:
-    // position
     double longitude = 0;
     double latitude = 0;
     double scale = 0;
     double angle = 0;
 
-    // debug
     bool debug = false;
 };
 

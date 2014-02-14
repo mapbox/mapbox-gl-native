@@ -70,7 +70,7 @@ public:
 
 
     static void key(GLFWwindow *window, int key, int scancode, int action, int mods) {
-        MapView *view = (MapView *)glfwGetWindowUserPointer(window);
+        MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
 
         if (action == GLFW_RELEASE) {
             switch (key) {
@@ -78,13 +78,13 @@ public:
                     glfwSetWindowShouldClose(window, true);
                     break;
                 case GLFW_KEY_TAB:
-                    view->map.toggleDebug();
+                    mapView->map.toggleDebug();
                     break;
                 case GLFW_KEY_R:
-                    if (!mods) view->map.resetPosition();
+                    if (!mods) mapView->map.resetPosition();
                     break;
                 case GLFW_KEY_N:
-                    if (!mods) view->map.resetNorth();
+                    if (!mods) mapView->map.resetNorth();
                     break;
             }
         }
@@ -92,7 +92,7 @@ public:
 
 
     static void scroll(GLFWwindow *window, double xoffset, double yoffset) {
-        MapView *view = (MapView *)glfwGetWindowUserPointer(window);
+        MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
         double delta = yoffset * 40;
 
         bool is_wheel = delta != 0 && fmod(delta, 4.000244140625) == 0;
@@ -110,51 +110,51 @@ public:
             scale = 1.0 / scale;
         }
 
-        view->map.scaleBy(scale, view->last_x, view->last_y);
+        mapView->map.scaleBy(scale, mapView->last_x, mapView->last_y);
     }
 
     static void resize(GLFWwindow *window, int, int) {
-        MapView *view = (MapView *)glfwGetWindowUserPointer(window);
+        MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
 
         int width, height;
         glfwGetWindowSize(window, &width, &height);
         int fb_width, fb_height;
         glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
-        view->map.resize(width, height, fb_width, fb_height);
+        mapView->map.resize(width, height, fb_width, fb_height);
     }
 
     static void mouseclick(GLFWwindow *window, int button, int action, int modifiers) {
-        MapView *view = (MapView *)glfwGetWindowUserPointer(window);
+        MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
 
         if (button == GLFW_MOUSE_BUTTON_RIGHT || (button == GLFW_MOUSE_BUTTON_LEFT && modifiers & GLFW_MOD_CONTROL)) {
-            view->rotating = action == GLFW_PRESS;
-            if (view->rotating) {
-                view->start_x = view->last_x;
-                view->start_y = view->last_y;
+            mapView->rotating = action == GLFW_PRESS;
+            if (mapView->rotating) {
+                mapView->start_x = mapView->last_x;
+                mapView->start_y = mapView->last_y;
             }
         } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
-            view->tracking = action == GLFW_PRESS;
+            mapView->tracking = action == GLFW_PRESS;
 
             if (action == GLFW_RELEASE) {
                 double now = glfwGetTime();
-                if (now - view->last_click < 0.4) {
-                    view->map.scaleBy(2.0, view->last_x, view->last_y);
+                if (now - mapView->last_click < 0.4) {
+                    mapView->map.scaleBy(2.0, mapView->last_x, mapView->last_y);
                 }
-                view->last_click = now;
+                mapView->last_click = now;
             }
         }
     }
 
     static void mousemove(GLFWwindow *window, double x, double y) {
-        MapView *view = (MapView *)glfwGetWindowUserPointer(window);
-        if (view->tracking) {
-            view->map.moveBy(x - view->last_x, y - view->last_y);
-        } else if (view->rotating) {
-            view->map.rotateBy(view->start_x, view->start_y, view->last_x, view->last_y, x, y);
+        MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
+        if (mapView->tracking) {
+            mapView->map.moveBy(x - mapView->last_x, y - mapView->last_y);
+        } else if (mapView->rotating) {
+            mapView->map.rotateBy(mapView->start_x, mapView->start_y, mapView->last_x, mapView->last_y, x, y);
         }
-        view->last_x = x;
-        view->last_y = y;
+        mapView->last_x = x;
+        mapView->last_y = y;
     }
 
     int run() {
@@ -216,14 +216,14 @@ public:
     llmr::Map map;
 };
 
-MapView *view;
+MapView *mapView;
 NSOperationQueue *queue = NULL;
 
 namespace llmr {
 namespace platform {
 
 void restart(void *) {
-    view->dirty = true;
+    mapView->dirty = true;
 }
 
 void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
@@ -264,9 +264,10 @@ double time() {
 }
 
 int main() {
-    view = new MapView();
-    view->init();
-    int ret = view->run();
-    delete view;
+    mapView = new MapView();
+    mapView->init();
+    int ret = mapView->run();
+    mapView->settings.sync();
+    delete mapView;
     return ret;
 }

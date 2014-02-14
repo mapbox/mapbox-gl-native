@@ -14,8 +14,9 @@ namespace llmr
     {
         public:
             Settings_iOS();
-            virtual void save();
             virtual void load();
+            virtual void persist();
+            virtual void sync();
             virtual void clear();
     };
 }
