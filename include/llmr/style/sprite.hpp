@@ -34,7 +34,7 @@ public:
 
 class Sprite : public std::enable_shared_from_this<Sprite> {
 public:
-    void load(const std::string& base_url);
+    void load(const std::string& base_url, float pixelRatio = 1);
     void bind(bool linear = false);
 
     ImagePosition getPosition(const std::string& name, bool repeating = false);

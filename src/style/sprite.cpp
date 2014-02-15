@@ -29,7 +29,7 @@ Sprite::operator bool() const {
     return loaded;
 }
 
-void Sprite::load(const std::string& base_url) {
+void Sprite::load(const std::string& base_url, float pixelRatio) {
     std::shared_ptr<Sprite> sprite = shared_from_this();
 
     auto complete = [sprite]() {
@@ -41,7 +41,9 @@ void Sprite::load(const std::string& base_url) {
         }
     };
 
-    platform::request_http(base_url + ".json", [sprite](const platform::Response & res) {
+    std::string suffix = (pixelRatio > 1 ? "@2x" : "");
+
+    platform::request_http(base_url + suffix + ".json", [sprite](const platform::Response & res) {
         if (res.code == 200) {
             sprite->parseJSON(res.body);
         } else {
@@ -49,7 +51,7 @@ void Sprite::load(const std::string& base_url) {
         }
     }, complete);
 
-    platform::request_http(base_url + ".png", [sprite](const platform::Response & res) {
+    platform::request_http(base_url + suffix + ".png", [sprite](const platform::Response & res) {
         if (res.code == 200) {
             sprite->loadImage(res.body);
         } else {

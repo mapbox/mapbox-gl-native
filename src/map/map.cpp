@@ -15,18 +15,19 @@ Map::Map(Settings& settings)
       painter(transform, settings, style),
       min_zoom(0),
       max_zoom(14) {
-
-    // TODO: Extract that information from the stylesheet instead of hard coding
-    style.sprite = std::make_shared<Sprite>();
-    style.sprite->load(kSpriteURL);
 }
 
 Map::~Map() {
     settings.sync();
 }
 
-void Map::setup() {
+void Map::setup(float pixelRatio) {
     painter.setup();
+
+    pixel_ratio = pixelRatio;
+
+    style.sprite = std::make_shared<Sprite>();
+    style.sprite->load(kSpriteURL, pixel_ratio);
 
     style.load(resources::style, resources::style_size);
     // style.loadJSON((const char *)resources::style, resources::style_size);
@@ -54,7 +55,7 @@ void Map::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb
     transform.height = height;
     transform.fb_width = fb_width;
     transform.fb_height = fb_height;
-    transform.pixelRatio = (double)fb_width / (double)width;
+    transform.pixelRatio = pixel_ratio;
     update();
 }
 

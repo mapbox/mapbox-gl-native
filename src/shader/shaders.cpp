@@ -23,5 +23,9 @@ const shader_source llmr::shaders[SHADER_COUNT] = {
    {
        "attribute vec2 a_pos;\n\nuniform mat4 u_matrix;\n\nvoid main() {\n    gl_Position = u_matrix * vec4(a_pos, 0, 1);\n}\n",
        "uniform vec4 u_color;\n\nvoid main() {\n    gl_FragColor = u_color;\n}\n",
+   },
+   {
+       "attribute vec2 a_pos;\n\nuniform mat4 u_matrix;\nuniform float u_size;\n\nvoid main() {\n    float z = step(32767.0, a_pos.x) * 2.0;\n    gl_Position = u_matrix * vec4(a_pos, z, 1);\n    gl_PointSize = u_size;\n}\n",
+       "#define root2 1.42\n\nuniform sampler2D u_image;\nuniform vec2 u_tl;\nuniform vec2 u_br;\nuniform vec4 u_color;\n\nuniform vec2 pos;\nuniform float inbounds;\nuniform vec4 color;\n\nvoid main() {\n    vec2 pos = (gl_PointCoord * 2.0 - 1.0) * root2 / 2.0 + 0.5;\n\n    float inbounds = step(0.0, pos.x) * step(0.0, pos.y) *\n        (1.0 - step(1.0, pos.x)) * (1.0 - step(1.0, pos.y));\n\n    vec4 color = texture2D(u_image, mix(u_tl, u_br, pos)) * inbounds;\n\n    if (u_color.a > 0.0) {\n        gl_FragColor = u_color * color.a;\n    } else {\n        gl_FragColor = vec4(color.rgb * color.a, color.a);\n    }\n}\n",
    }
 };

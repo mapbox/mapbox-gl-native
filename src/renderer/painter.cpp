@@ -7,6 +7,7 @@
 
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
+#include <llmr/renderer/point_bucket.hpp>
 
 #include <llmr/map/transform.hpp>
 #include <llmr/map/settings.hpp>
@@ -29,6 +30,7 @@ Painter::Painter(Transform& transform, Settings& settings, Style& style)
 void Painter::setup() {
     setupShaders();
 
+    assert(pointShader);
     assert(plainShader);
     assert(outlineShader);
     assert(lineShader);
@@ -52,6 +54,7 @@ void Painter::setupShaders() {
     lineShader = std::make_unique<LineShader>();
     linejoinShader = std::make_unique<LinejoinShader>();
     patternShader = std::make_unique<PatternShader>();
+    pointShader = std::make_unique<PointShader>();
 }
 
 void Painter::useProgram(uint32_t program) {
@@ -375,6 +378,36 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         lineShader->setDebug(0);
         bucket.drawLines(*lineShader);
     }
+}
+
+void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+    const PointProperties& properties = style.computed.points[layer_name];
+
+    // Abort early.
+    if (!bucket.hasPoints()) return;
+    if (properties.hidden) return;
+
+    Color color = properties.color;
+    color[0] *= properties.opacity;
+    color[1] *= properties.opacity;
+    color[2] *= properties.opacity;
+    color[3] *= properties.opacity;
+
+    std::string sized_image = properties.image;
+    sized_image.append("-");
+    sized_image.append(std::to_string(static_cast<int>(std::round(properties.size))));
+
+    ImagePosition imagePos = style.sprite->getPosition(sized_image, false);
+
+    useProgram(pointShader->program);
+    pointShader->setMatrix(matrix);
+    pointShader->setColor(color);
+    pointShader->setSize(properties.size * transform.pixelRatio);
+    pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
+    pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
+    style.sprite->bind(true);
+
+    bucket.drawPoints(*pointShader);
 }
 
 void Painter::renderDebug(const Tile::Ptr& tile) {

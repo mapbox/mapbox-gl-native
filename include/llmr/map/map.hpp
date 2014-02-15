@@ -20,7 +20,7 @@ public:
     ~Map();
 
     /* setup */
-    void setup();
+    void setup(float pixelRatio = 1);
     void loadStyle(const uint8_t *const data, uint32_t bytes);
     void loadSprite(const std::string& url);
     void loadSettings();
@@ -74,6 +74,8 @@ private:
 
     int32_t min_zoom;
     int32_t max_zoom;
+
+    float pixel_ratio;
 
     std::forward_list<std::shared_ptr<Tile>> tiles;
     std::forward_list<std::shared_ptr<Tile>> historic_tiles;

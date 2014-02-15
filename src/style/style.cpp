@@ -12,6 +12,7 @@ Style::Style() {
 void Style::reset() {
     computed.fills.clear();
     computed.lines.clear();
+    computed.points.clear();
 }
 
 void Style::load(const uint8_t *const data, uint32_t bytes) {
@@ -89,10 +90,12 @@ std::pair<std::string, ClassDescription> Style::parseClass(pbf data) {
     while (data.next()) {
         if (data.tag == 1) { // name
             name = data.string();
-        } else if (data.tag == 2) { // fill_style
+        } else if (data.tag == 2) { // fill style
             klass.fill.insert(parseFillClass(data.message()));
-        } else if (data.tag == 3) { // stroke_style
+        } else if (data.tag == 3) { // line style
             klass.line.insert(parseLineClass(data.message()));
+        } else if (data.tag == 4) { // point style
+            klass.point.insert(parsePointClass(data.message()));
         } else {
             data.skip();
         }
@@ -159,6 +162,30 @@ std::pair<std::string, LineClass> Style::parseLineClass(pbf data) {
     return { name, stroke };
 }
 
+std::pair<std::string, PointClass> Style::parsePointClass(pbf data) {
+    PointClass point;
+    std::string name;
+
+    while (data.next()) {
+        if (data.tag == 1) { // name
+            name = data.string();
+        } else if (data.tag == 2) { // hidden
+            point.hidden = parseProperty<bool>(data.message());
+        } else if (data.tag == 3) { // color
+            point.color = parseColor(data);
+        } else if (data.tag == 4) { // size
+            point.size = parseProperty<float>(data.message());
+        } else if (data.tag == 6) { // opacity
+            point.opacity = parseProperty<float>(data.message());
+        } else if (data.tag == 8) { // image
+            point.image = data.string();
+        } else {
+            data.skip();
+        }
+    }
+
+    return { name, point };
+}
 
 Color Style::parseColor(pbf& data) {
     uint32_t rgba = data.fixed<uint32_t, 4>();
@@ -239,6 +266,21 @@ void Style::cascade(float z) {
             stroke.offset = layer.offset(z);
             stroke.color = layer.color;
             stroke.opacity = layer.opacity(z);
+        }
+
+        // Cascade point classes
+        for (const auto& point_pair : sheetClass.point) {
+            const std::string& layer_name = point_pair.first;
+            const llmr::PointClass& layer = point_pair.second;
+
+            // TODO: This should be restricted to point styles that have actual
+            // values so as to not override with default values.
+            llmr::PointProperties& point = computed.points[layer_name];
+            point.hidden = layer.hidden(z);
+            point.color = layer.color;
+            point.size = layer.size(z);
+            point.opacity = layer.opacity(z);
+            point.image = layer.image;
         }
     }
 }

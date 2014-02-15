@@ -49,7 +49,7 @@ class MBXMapView
         {
             settings.load();
 
-            map.setup();
+            map.setup([[UIScreen mainScreen] scale]);
 
             CGRect frame = [[UIScreen mainScreen] bounds];
             map.resize(frame.size.width, frame.size.height, frame.size.width, frame.size.height);
