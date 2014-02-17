@@ -121,6 +121,7 @@ void warningHandler(png_structp png, png_const_charp error_msg) {
 }
 
 void Sprite::loadImage(const std::string& data) {
+    return;
     std::lock_guard<std::mutex> lock(mtx);
 
     Buffer buffer(data);
