@@ -6,7 +6,7 @@
       'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
       'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
     },
-    'cxxflags':['-std=c++11'],
+    'cflags_cc': ['-std=c++11'],
     'configurations': {
       'Debug': {
         'cflags': [ '-g', '-O0', '-I<(boost_root)/include' ],
