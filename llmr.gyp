@@ -10,7 +10,10 @@
       'type': 'static_library',
       'sources': [
         '<!@(find src -name "*.cpp")',
+        '<!@(find src -name "*.c")',
+        '<!@(find src -name "*.h")',
         '<!@(find include -name "*.hpp")',
+        '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
         'bin/style.js'
       ],
@@ -96,7 +99,10 @@
       'type': 'static_library',
       'sources': [
         '<!@(find src -name "*.cpp")',
+        '<!@(find src -name "*.c")',
+        '<!@(find src -name "*.h")',
         '<!@(find include -name "*.hpp")',
+        '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
         'bin/style.js'
       ],

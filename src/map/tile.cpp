@@ -11,6 +11,7 @@
 #include <llmr/util/pbf.hpp>
 #include <llmr/util/string.hpp>
 
+#include <chrono>
 
 using namespace llmr;
 
@@ -172,6 +173,8 @@ std::shared_ptr<Bucket> Tile::createBucket(const VectorTile& tile, const BucketD
 std::shared_ptr<Bucket> Tile::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(fillVertexBuffer, triangleElementsBuffer, lineElementsBuffer, bucket_desc);
 
+    auto init_start = std::chrono::high_resolution_clock::now();
+
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (pbf feature : filtered_layer) {
         while (feature.next(4)) { // geometry
@@ -181,6 +184,16 @@ std::shared_ptr<Bucket> Tile::createFillBucket(const VectorTileLayer& layer, con
             }
         }
     }
+    auto init_end = std::chrono::high_resolution_clock::now();
+    auto init = (double)std::chrono::duration_cast<std::chrono::microseconds>(init_end - init_start).count() / 1000.0;
+
+    auto tess_start = std::chrono::high_resolution_clock::now();
+    bucket->tessellate();
+    auto tess_end = std::chrono::high_resolution_clock::now();
+    auto tess = (double)std::chrono::duration_cast<std::chrono::microseconds>(tess_end - tess_start).count() / 1000.0;
+
+
+    // fprintf(stderr, "%s/%s   init: %f   tess: %f\n", bucket_desc.source_layer.c_str(), bucket_desc.source_field.c_str(), init, tess);
 
     return bucket;
 }

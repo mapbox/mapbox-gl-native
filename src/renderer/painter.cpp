@@ -255,7 +255,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     // Only draw regions that we marked
     glStencilFunc(GL_NOTEQUAL, 0x0, 0x3F);
 
-    if (properties.image.size() && *style.sprite) {
+    if (false && properties.image.size() && *style.sprite) {
         // Draw texture fill
         ImagePosition imagePos = style.sprite->getPosition(properties.image, true);
 

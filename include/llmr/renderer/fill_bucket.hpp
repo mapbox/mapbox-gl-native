@@ -6,6 +6,8 @@
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/geometry/fill_buffer.hpp>
 
+#include <libtess2/tesselator.h>
+
 #include <vector>
 #include <memory>
 
@@ -33,12 +35,15 @@ public:
                const std::shared_ptr<TriangleElementsBuffer>& triangleElementsBuffer,
                const std::shared_ptr<LineElementsBuffer>& lineElementsBuffer,
                const BucketDescription& bucket_desc);
+    ~FillBucket();
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
 
     void addGeometry(pbf& data);
     void addGeometry(const std::vector<Coordinate>& line);
+    void addGeometry(const std::vector<std::vector<TESSreal>>& lines);
     bool empty() const;
+    void tessellate();
 
     void drawElements(PlainShader& shader);
     void drawVertices(OutlineShader& shader);
@@ -47,6 +52,8 @@ public:
     const BucketGeometryDescription geom_desc;
 
 private:
+    TESStesselator *tesselator;
+
     std::shared_ptr<FillVertexBuffer> vertexBuffer;
     std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
     std::shared_ptr<LineElementsBuffer> lineElementsBuffer;
@@ -58,6 +65,12 @@ private:
     VertexArrayObject<OutlineShader> array;
     std::vector<triangle_group_type> triangleGroups;
     std::vector<line_group_type> lineGroups;
+
+    bool hasVertices = false;
+
+    static const int vertexSize = 2;
+    static const int stride = sizeof(TESSreal) * vertexSize;
+    static const int vertices_per_group = 3;
 };
 
 }
