@@ -207,13 +207,15 @@ public:
     llmr::Map map;
 };
 
-MapView *mapView;
+MapView *mapView = nullptr;
 
 namespace llmr {
 namespace platform {
 
 void restart(void *) {
-    mapView->dirty = true;
+    if (mapView) {
+        mapView->dirty = true;
+    }
 }
 
 

@@ -68,4 +68,4 @@ distclean:
 test: all
 	echo test
 
-.PHONY: test
+.PHONY: test linux
