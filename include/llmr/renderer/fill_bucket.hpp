@@ -28,6 +28,12 @@ struct Coordinate;
 struct pbf;
 
 class FillBucket : public Bucket {
+
+    static void *alloc(void *data, unsigned int size);
+    static void *realloc(void *data, void *ptr, unsigned int size);
+    static void free(void *userData, void *ptr);
+
+
     typedef ElementGroup<PlainShader> triangle_group_type;
     typedef ElementGroup<OutlineShader> line_group_type;
 public:
@@ -52,6 +58,7 @@ public:
     const BucketGeometryDescription geom_desc;
 
 private:
+    TESSalloc *allocator;
     TESStesselator *tesselator;
 
     std::shared_ptr<FillVertexBuffer> vertexBuffer;
@@ -66,10 +73,11 @@ private:
     std::vector<triangle_group_type> triangleGroups;
     std::vector<line_group_type> lineGroups;
 
+    std::vector<TESSreal> line;
     bool hasVertices = false;
 
     static const int vertexSize = 2;
-    static const int stride = sizeof(TESSreal) * vertexSize;
+    static const int stride = sizeof(TESSreal) *vertexSize;
     static const int vertices_per_group = 3;
 };
 

@@ -10,48 +10,44 @@
 #include <llmr/platform/gl.hpp>
 
 
-
-void *customHeapAlloc(void *userData, unsigned int size) {
-    // fprintf(stderr, "malloc %d\n", size);
-    return malloc(size);
-}
-
-void *customHeapRealloc(void *userData, void *ptr, unsigned int size) {
-    // fprintf(stderr, "realloc %p %d\n", ptr, size);
-    return realloc(ptr, size);
-}
-
-void customHeapFree(void *userData, void *ptr) {
-    // fprintf(stderr, "free %p\n", ptr);
-    free(ptr);
-}
-
-static TESSalloc defaultAlloc = {
-    &customHeapAlloc,
-    &customHeapRealloc,
-    &customHeapFree,
-    nullptr, // userData
-    512, // meshEdgeBucketSize
-    512, // meshVertexBucketSize
-    256, // meshFaceBucketSize
-    512, // dictNodeBucketSize
-    256, // regionBucketSize
-    128, // extraVertices allocated for the priority queue.
-};
-
-
 #include <cassert>
 
 struct geometry_too_long_exception : std::exception {};
 
 using namespace llmr;
 
+
+
+void *FillBucket::alloc(void *, unsigned int size) {
+    return ::malloc(size);
+}
+
+void *FillBucket::realloc(void *, void *ptr, unsigned int size) {
+    return ::realloc(ptr, size);
+}
+
+void FillBucket::free(void *, void *ptr) {
+    ::free(ptr);
+}
+
 FillBucket::FillBucket(const std::shared_ptr<FillVertexBuffer>& vertexBuffer,
                        const std::shared_ptr<TriangleElementsBuffer>& triangleElementsBuffer,
                        const std::shared_ptr<LineElementsBuffer>& lineElementsBuffer,
                        const BucketDescription& bucket_desc)
     : geom_desc(bucket_desc.geometry),
-      tesselator(tessNewTess(&defaultAlloc)),
+      allocator(new TESSalloc {
+          &alloc,
+          &realloc,
+          &free,
+          nullptr, // userData
+          64, // meshEdgeBucketSize
+          64, // meshVertexBucketSize
+          32, // meshFaceBucketSize
+          64, // dictNodeBucketSize
+          8, // regionBucketSize
+          128, // extraVertices allocated for the priority queue.
+      }),
+      tesselator(tessNewTess(allocator)),
       vertexBuffer(vertexBuffer),
       triangleElementsBuffer(triangleElementsBuffer),
       lineElementsBuffer(lineElementsBuffer),
@@ -65,13 +61,13 @@ FillBucket::~FillBucket() {
     if (tesselator) {
         tessDeleteTess(tesselator);
     }
+    if (allocator) {
+        delete allocator;
+    }
 }
 
 void FillBucket::addGeometry(pbf& geom) {
-    std::vector<Coordinate> line;
     Geometry::command cmd;
-
-    std::vector<TESSreal> line2;
 
     Coordinate coord;
     Geometry geometry(geom);
@@ -79,24 +75,18 @@ void FillBucket::addGeometry(pbf& geom) {
     while ((cmd = geometry.next(x, y)) != Geometry::end) {
         if (cmd == Geometry::move_to) {
             if (line.size()) {
-                // addGeometry(line);
+                tessAddContour(tesselator, vertexSize, line.data(), stride, line.size() / vertexSize);
                 line.clear();
-            }
-            if (line2.size()) {
-                tessAddContour(tesselator, vertexSize, line2.data(), stride, line2.size() / vertexSize);
-                line2.clear();
                 hasVertices = true;
             }
         }
-        line.emplace_back(x, y);
-        line2.push_back(x);
-        line2.push_back(y);
+        line.push_back(x);
+        line.push_back(y);
     }
+
     if (line.size()) {
-        // addGeometry(line);
-    }
-    if (line2.size()) {
-        tessAddContour(tesselator, vertexSize, line2.data(), stride, line2.size() / vertexSize);
+        tessAddContour(tesselator, vertexSize, line.data(), stride, line.size() / vertexSize);
+        line.clear();
         hasVertices = true;
     }
 }
@@ -135,9 +125,9 @@ void FillBucket::tessellate() {
             }
 
             // Add vertices and create reverse index mapping for drawing the outline.
-            std::map<TESSindex, int> contour_vertices;
+            // std::map<TESSindex, int> contour_vertices;
             for (int i = 0; i < vertex_count; ++i) {
-                contour_vertices[vertex_indices[i]] = i;
+                // contour_vertices[vertex_indices[i]] = i;
                 vertexBuffer->add(vertices[i * 2], vertices[i * 2 + 1]);
             }
 
