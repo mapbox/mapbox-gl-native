@@ -23,6 +23,11 @@ ImagePosition::ImagePosition(const vec2<uint16_t>& size, vec2<float> tl, vec2<fl
       br(br) {}
 
 
+Sprite::~Sprite() {
+    if (img) {
+        free(img);
+    }
+}
 
 Sprite::operator bool() const {
     std::lock_guard<std::mutex> lock(mtx);
@@ -34,7 +39,7 @@ void Sprite::load(const std::string& base_url) {
 
     auto complete = [sprite]() {
         std::lock_guard<std::mutex> lock(sprite->mtx);
-        if (sprite->img.size() && sprite->pos.size()) {
+        if (sprite->img && sprite->pos.size()) {
             sprite->loaded = true;
             platform::restart(NULL);
             fprintf(stderr, "sprite loaded\n");
@@ -176,8 +181,8 @@ void Sprite::loadImage(const std::string& data) {
         unsigned int rowbytes = png_get_rowbytes(png, info);
         assert(width * 4 == rowbytes);
 
-        img.resize(width * height * 4);
-        char *surface = const_cast<char *>(img.data());
+        img = (char *)malloc(width * height * 4);
+        char *surface = img;
         assert(surface);
 
         png_bytep row_pointers[height];
@@ -192,7 +197,10 @@ void Sprite::loadImage(const std::string& data) {
     } catch (std::exception& e) {
         fprintf(stderr, "loading PNG failed: %s\n", e.what());
         png_destroy_read_struct(&png, &info, nullptr);
-        img.clear();
+        if (img) {
+            free(img);
+            img = nullptr;
+        }
         width = 0;
         height = 0;
     }
@@ -237,7 +245,7 @@ void Sprite::bind(bool linear) {
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
     } else {
         glBindTexture(GL_TEXTURE_2D, texture);
     }
