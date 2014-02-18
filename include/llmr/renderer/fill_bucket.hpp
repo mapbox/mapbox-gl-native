@@ -24,6 +24,7 @@ class LineElementsBuffer;
 class BucketDescription;
 class OutlineShader;
 class PlainShader;
+class PatternShader;
 struct Coordinate;
 struct pbf;
 
@@ -34,8 +35,8 @@ class FillBucket : public Bucket {
     static void free(void *userData, void *ptr);
 
 
-    typedef ElementGroup<PlainShader> triangle_group_type;
-    typedef ElementGroup<OutlineShader> line_group_type;
+    typedef ElementGroup triangle_group_type;
+    typedef ElementGroup line_group_type;
 public:
     FillBucket(const std::shared_ptr<FillVertexBuffer>& vertexBuffer,
                const std::shared_ptr<TriangleElementsBuffer>& triangleElementsBuffer,
@@ -52,6 +53,7 @@ public:
     void tessellate();
 
     void drawElements(PlainShader& shader);
+    void drawElements(PatternShader& shader);
     void drawVertices(OutlineShader& shader);
 
 public:
@@ -69,7 +71,7 @@ private:
     const uint32_t vertex_start;
     const uint32_t triangle_elements_start;
     const uint32_t line_elements_start;
-    VertexArrayObject<OutlineShader> array;
+    VertexArrayObject array;
     std::vector<triangle_group_type> triangleGroups;
     std::vector<line_group_type> lineGroups;
 

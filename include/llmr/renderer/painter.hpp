@@ -77,8 +77,8 @@ private:
         4096, 4096
     };
 
-    VertexArrayObject<PlainShader> coveringPlainArray;
-    VertexArrayObject<PatternShader> coveringPatternArray;
+    VertexArrayObject coveringPlainArray;
+    VertexArrayObject coveringPatternArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
     VertexBuffer tileBorderBuffer = {
@@ -89,7 +89,7 @@ private:
         0, 0
     };
 
-    VertexArrayObject<PlainShader> tileBorderArray;
+    VertexArrayObject tileBorderArray;
 
     // Set up the matte buffer we're using to draw the filling background.
     VertexBuffer matteBuffer = {
@@ -104,7 +104,7 @@ private:
         16384, 16384
     };
 
-    VertexArrayObject<PlainShader> matteArray;
+    VertexArrayObject matteArray;
 };
 
 }

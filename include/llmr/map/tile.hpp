@@ -73,7 +73,7 @@ public:
 
     // Holds the actual geometries in this tile.
     DebugFontBuffer debugFontBuffer;
-    VertexArrayObject<PlainShader> debugFontArray;
+    VertexArrayObject debugFontArray;
 
     std::shared_ptr<FillVertexBuffer> fillVertexBuffer;
     std::shared_ptr<LineVertexBuffer> lineVertexBuffer;

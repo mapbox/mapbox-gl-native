@@ -213,7 +213,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         glStencilOp(GL_KEEP, GL_KEEP, GL_INCR_WRAP);
     }
 
-    if (false && properties.image.size() && *style.sprite) {
+    if (properties.image.size() && *style.sprite) {
         // Draw texture fill
         ImagePosition imagePos = style.sprite->getPosition(properties.image, true);
 
@@ -242,16 +242,15 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         patternShader->setMix(mix);
         style.sprite->bind(true);
 
-        // Draw a rectangle that covers the entire viewport.
-        coveringPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0));
-        glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
+        // Draw the actual triangles into the color & stencil buffer.
+        bucket.drawElements(*patternShader);
     } else {
         // Draw filling rectangle.
         useProgram(plainShader->program);
         plainShader->setMatrix(matrix);
         plainShader->setColor(fill_color);
 
-        // Draw the actual triangle fan into the stencil buffer.
+        // Draw the actual triangles into the color & stencil buffer.
         bucket.drawElements(*plainShader);
     }
 
