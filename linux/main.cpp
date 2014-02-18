@@ -3,8 +3,17 @@
 #include <curl/curl.h>
 #include <llmr/platform/platform.hpp>
 #include "settings.hpp"
+#include <future>
+#include <list>
+#include <chrono>
 
 #include <thread>
+
+std::list<std::future<void>> futures;
+std::list<std::future<void>>::iterator f_it;
+std::list<std::function<void()>> callbacks;
+std::list<std::function<void()>>::iterator c_it;
+std::chrono::milliseconds zero (0);
 
 class MapView {
 public:
@@ -150,6 +159,22 @@ public:
 
     int run() {
         while (!glfwWindowShouldClose(window)) {
+
+            f_it = futures.begin();
+            c_it = callbacks.begin();
+
+            while (f_it != futures.end()) {
+                if (f_it->wait_for(zero) == std::future_status::ready) {
+                    std::function<void()> cb = *c_it;
+                    futures.erase(f_it++);
+                    callbacks.erase(c_it++);
+                    cb();
+                } else {
+                    f_it++;
+                    c_it++;
+                }
+            }
+
             if (dirty) {
                 try {
                     dirty = render();
@@ -160,7 +185,7 @@ public:
                 fps();
             }
 
-            if (dirty) {
+            if (dirty || futures.size()) {
                 glfwPollEvents();
             } else {
                 glfwWaitEvents();
@@ -225,7 +250,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
     return size * nmemb;
 }
 
-void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
+void request_http_async(std::string url, std::function<void(Response&)> func) {
 
     Response res;
 
@@ -244,7 +269,11 @@ void request_http(std::string url, std::function<void(Response&)> func, std::fun
     }
 
     func(res);
-    cb();
+}
+
+void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
+    futures.emplace_back(std::async(std::launch::async, request_http_async, url, func));
+    callbacks.push_back(cb);
 }
 
 
