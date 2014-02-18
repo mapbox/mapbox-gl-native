@@ -1,52 +1,55 @@
 #include "settings.hpp"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/filestream.h"
+#include "rapidjson/document.h"
+#include <stdio.h>
 
 using namespace llmr;
 
 Settings_MacOSX::Settings_MacOSX()
 {
-    /*
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"longitude" : @(longitude),
-                                                               @"latitude"  : @(latitude),
-                                                               @"scale"     : @(scale),
-                                                               @"angle"     : @(angle),
-                                                               @"debug"     : @(debug) }];
-                                                               */
 }
 
 void Settings_MacOSX::load()
 {
-    /*
-    NSDictionary *settings = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
-
-    longitude = [settings[@"longitude"] doubleValue];
-    latitude  = [settings[@"latitude"]  doubleValue];
-    scale     = [settings[@"scale"]     doubleValue];
-    angle     = [settings[@"angle"]     doubleValue];
-    debug     = [settings[@"debug"]     boolValue];
-    */
+    FILE *settingsFile = fopen("/tmp/llmr-native.json", "r");
+    if (settingsFile != NULL) {
+        rapidjson::FileStream is(settingsFile);
+        rapidjson::Document document;
+        document.ParseStream<0>(is);
+        if (document.IsArray()) {
+            latitude = document[rapidjson::SizeType(0)].GetDouble();
+            latitude = document[1].GetDouble();
+            scale = document[2].GetDouble();
+            angle = document[3].GetDouble();
+            debug = document[4].GetBool();
+        }
+    }
 }
 
 void Settings_MacOSX::persist()
 {
-    /*
-    [[NSUserDefaults standardUserDefaults] setValuesForKeysWithDictionary:@{ @"longitude" : @(longitude),
-                                                                             @"latitude"  : @(latitude),
-                                                                             @"scale"     : @(scale),
-                                                                             @"angle"     : @(angle),
-                                                                             @"debug"     : @(debug) }];
-                                                                             */
 }
 
 void Settings_MacOSX::sync()
 {
-    /*
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    */
+
+    rapidjson::FileStream s(fopen("/tmp/llmr-native.json", "w"));
+    rapidjson::PrettyWriter<rapidjson::FileStream> writer(s);
+    writer.StartArray();
+    writer.Double(longitude);
+    writer.Double(latitude);
+    writer.Double(scale);
+    writer.Double(angle);
+    writer.Bool(debug);
+    writer.EndArray();
 }
 
 void Settings_MacOSX::clear()
 {
-    /*
-    [NSUserDefaults resetStandardUserDefaults];
-    */
+    longitude = 0;
+    latitude = 0;
+    scale = 0;
+    angle = 0;
+    debug = false;
 }

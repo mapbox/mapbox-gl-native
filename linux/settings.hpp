@@ -12,10 +12,6 @@ public:
     virtual void persist();
     virtual void sync();
     virtual void clear();
-    double angle;
-    double longitude;
-    double latitude;
-    double scale;
 };
 
 }
