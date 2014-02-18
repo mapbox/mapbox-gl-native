@@ -165,10 +165,21 @@ void FillBucket::tessellate() {
 
             for (int i = 0; i < element_count; ++i) {
                 const TESSindex *element_group = &elements[i * vertices_per_group];
-                const TESSindex a = vertex_indices[element_group[0]];
-                const TESSindex b = vertex_indices[element_group[1]];
-                const TESSindex c = vertex_indices[element_group[2]];
-                triangleElementsBuffer->add(index + a, index + b, index + c);
+
+                if (element_group[0] != TESS_UNDEF && element_group[1] != TESS_UNDEF && element_group[2] != TESS_UNDEF) {
+                    const TESSindex a = vertex_indices[element_group[0]];
+                    const TESSindex b = vertex_indices[element_group[1]];
+                    const TESSindex c = vertex_indices[element_group[2]];
+
+                    if (a != TESS_UNDEF && b != TESS_UNDEF && c != TESS_UNDEF) {
+                        triangleElementsBuffer->add(index + a, index + b, index + c);
+                    } else {
+                        // TODO: We're missing a vertex that was not part of the line.
+                        fprintf(stderr, "undefined element buffer\n");
+                    }
+                } else {
+                    fprintf(stderr, "undefined element buffer\n");
+                }
             }
 
             group.vertex_length += vertex_count;
