@@ -35,25 +35,25 @@ FillBucket::FillBucket(const std::shared_ptr<FillVertexBuffer>& vertexBuffer,
                        const std::shared_ptr<LineElementsBuffer>& lineElementsBuffer,
                        const BucketDescription& bucket_desc)
     : geom_desc(bucket_desc.geometry),
-      allocator(new TESSalloc {
-          &alloc,
-          &realloc,
-          &free,
-          nullptr, // userData
-          64, // meshEdgeBucketSize
-          64, // meshVertexBucketSize
-          32, // meshFaceBucketSize
-          64, // dictNodeBucketSize
-          8, // regionBucketSize
-          128, // extraVertices allocated for the priority queue.
-      }),
-      tesselator(tessNewTess(allocator)),
-      vertexBuffer(vertexBuffer),
-      triangleElementsBuffer(triangleElementsBuffer),
-      lineElementsBuffer(lineElementsBuffer),
-      vertex_start(vertexBuffer->index()),
-      triangle_elements_start(triangleElementsBuffer->index()),
-      line_elements_start(lineElementsBuffer->index()) {
+    allocator(new TESSalloc {
+    &alloc,
+    &realloc,
+    &free,
+    nullptr, // userData
+    64, // meshEdgeBucketSize
+    64, // meshVertexBucketSize
+    32, // meshFaceBucketSize
+    64, // dictNodeBucketSize
+    8, // regionBucketSize
+    128, // extraVertices allocated for the priority queue.
+}),
+tesselator(tessNewTess(allocator)),
+vertexBuffer(vertexBuffer),
+triangleElementsBuffer(triangleElementsBuffer),
+lineElementsBuffer(lineElementsBuffer),
+vertex_start(vertexBuffer->index()),
+triangle_elements_start(triangleElementsBuffer->index()),
+line_elements_start(lineElementsBuffer->index()) {
     assert(tesselator);
 }
 
@@ -101,65 +101,78 @@ void FillBucket::tessellate() {
     // First combine contours and then triangulate, this removes unnecessary inner vertices.
     if (tessTesselate(tesselator, TESS_WINDING_POSITIVE, TESS_BOUNDARY_CONTOURS, 0, 0, 0)) {
         const TESSreal *vertices = tessGetVertices(tesselator);
-        const int contour_element_count = tessGetElementCount(tesselator);
-        const TESSindex *contour_elements_p = tessGetElements(tesselator);
-        std::vector<TESSindex> contour_elements = { contour_elements_p, contour_elements_p + contour_element_count * 2 };
+        const int vertex_count = tessGetVertexCount(tesselator);
+        const int element_count = tessGetElementCount(tesselator);
+        const TESSindex *elements = tessGetElements(tesselator);
 
-        for (int i = 0; i < contour_element_count; ++i) {
-            const TESSindex group_start = contour_elements[i * 2];
-            const TESSindex group_count = contour_elements[i * 2 + 1];
+        if (vertex_count > 65536) {
+            throw geometry_too_long_exception();
+        }
+
+        for (int i = 0; i < vertex_count; ++i) {
+            vertexBuffer->add(vertices[i * 2], vertices[i * 2 + 1]);
+        }
+
+
+        if (!lineGroups.size() || (lineGroups.back().vertex_length + vertex_count > 65535)) {
+            // Move to a new group because the old one can't hold the geometry.
+            lineGroups.emplace_back();
+        }
+
+        // We're generating triangle fans, so we always start with the first
+        // coordinate in this polygon.
+        line_group_type& group = lineGroups.back();
+        uint32_t index = group.vertex_length;
+
+
+        for (int i = 0; i < element_count; ++i) {
+            const TESSindex group_start = elements[i * 2];
+            const TESSindex group_end = group_start + elements[i * 2 + 1];
+
+            for (int i = group_start; i < group_end; ++i) {
+                const TESSindex prevI = (i == group_start ? group_end : i) - 1;
+                lineElementsBuffer->add(index + prevI, index + i);
+            }
+        }
+
+        // Add a line from the last vertex to the first vertex.
+        // lineElementsBuffer->add(index + vertex_count - 1, index);
+
+        group.vertex_length += vertex_count;
+        group.elements_length += vertex_count;
+
+        for (int i = 0; i < element_count; ++i) {
+            const TESSindex group_start = elements[i * 2];
+            const TESSindex group_count = elements[i * 2 + 1];
             const TESSreal *group_vertices = &vertices[group_start * 2];
             tessAddContour(tesselator, 2, group_vertices, stride, group_count);
         }
 
         if (tessTesselate(tesselator, TESS_WINDING_POSITIVE, TESS_POLYGONS, vertices_per_group, 2, 0)) {
-            const TESSreal *vertices = tessGetVertices(tesselator);
             const TESSindex *vertex_indices = tessGetVertexIndices(tesselator);
-            const int vertex_count = tessGetVertexCount(tesselator);
             const TESSindex *elements = tessGetElements(tesselator);
             const int element_count = tessGetElementCount(tesselator);
 
-
-            if (vertex_count > 65536) {
-                throw geometry_too_long_exception();
+            if (!triangleGroups.size() || (triangleGroups.back().vertex_length + vertex_count > 65535)) {
+                // Move to a new group because the old one can't hold the geometry.
+                triangleGroups.emplace_back();
             }
 
-            // Add vertices and create reverse index mapping for drawing the outline.
-            // std::map<TESSindex, int> contour_vertices;
-            for (int i = 0; i < vertex_count; ++i) {
-                // contour_vertices[vertex_indices[i]] = i;
-                vertexBuffer->add(vertices[i * 2], vertices[i * 2 + 1]);
+            // We're generating triangle fans, so we always start with the first
+            // coordinate in this polygon.
+            triangle_group_type& group = triangleGroups.back();
+            uint32_t index = group.vertex_length;
+
+            for (int i = 0; i < element_count; ++i) {
+                const TESSindex *element_group = &elements[i * vertices_per_group];
+                const TESSindex a = vertex_indices[element_group[0]];
+                const TESSindex b = vertex_indices[element_group[1]];
+                const TESSindex c = vertex_indices[element_group[2]];
+                triangleElementsBuffer->add(index + a, index + b, index + c);
             }
 
-            {
-                if (!triangleGroups.size() || (triangleGroups.back().vertex_length + vertex_count > 65535)) {
-                    // Move to a new group because the old one can't hold the geometry.
-                    triangleGroups.emplace_back();
-                }
-
-                // We're generating triangle fans, so we always start with the first
-                // coordinate in this polygon.
-                triangle_group_type& group = triangleGroups.back();
-                uint32_t index = group.vertex_length;
-
-
-                for (int i = 0; i < element_count; ++i) {
-                    const TESSindex *element_group = &elements[i * vertices_per_group];
-
-                    if (element_group[0] == TESS_UNDEF || element_group[1] == TESS_UNDEF || element_group[2] == TESS_UNDEF) {
-                        throw std::runtime_error("element group is not a triangle");
-                    }
-
-                    triangleElementsBuffer->add(
-                        index + element_group[0],
-                        index + element_group[1],
-                        index + element_group[2]
-                    );
-                }
-
-                group.vertex_length += vertex_count;
-                group.elements_length += element_count;
-            }
+            group.vertex_length += vertex_count;
+            group.elements_length += element_count;
 
         } else {
             assert(false && "tesselation failed");

@@ -180,50 +180,6 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     fill_color[2] *= properties.opacity;
     fill_color[3] *= properties.opacity;
 
-    // // Draw the stencil mask.
-    // {
-    //     // We're only drawing to the first seven bits (== support a maximum of
-    //     // 127 overlapping polygons in one place before we get rendering errors).
-    //     glStencilMask(0x3F);
-    //     glClear(GL_STENCIL_BUFFER_BIT);
-
-    //     // Draw front facing triangles. Wherever the 0x80 bit is 1, we are
-    //     // increasing the lower 7 bits by one if the triangle is a front-facing
-    //     // triangle. This means that all visible polygons should be in CCW
-    //     // orientation, while all holes (see below) are in CW orientation.
-    //     glStencilFunc(GL_NOTEQUAL, 0x80, 0x80);
-
-    //     if (properties.winding == Winding::EvenOdd) {
-    //         // When we draw an even/odd winding fill, we just invert all the bits.
-    //         glStencilOp(GL_INVERT, GL_KEEP, GL_KEEP);
-    //     } else {
-    //         // When we do a nonzero fill, we count the number of times a pixel is
-    //         // covered by a counterclockwise polygon, and subtract the number of
-    //         // times it is "uncovered" by a clockwise polygon.
-    //         glStencilOpSeparate(GL_FRONT, GL_INCR_WRAP, GL_KEEP, GL_KEEP);
-    //         glStencilOpSeparate(GL_BACK, GL_DECR_WRAP, GL_KEEP, GL_KEEP);
-    //     }
-
-    //     // When drawing a shape, we first draw all shapes to the stencil buffer
-    //     // and incrementing all areas where polygons are
-    //     glColorMask(false, false, false, false);
-
-    //     // Draw the actual triangle fan into the stencil buffer.
-    //     useProgram(plainShader->program);
-    //     plainShader->setMatrix(matrix);
-
-    //     // Draw all groups
-    //     bucket.drawElements(*plainShader);
-
-    //     // Now that we have the stencil mask in the stencil buffer, we can start
-    //     // writing to the color buffer.
-    //     glColorMask(true, true, true, true);
-    // }
-
-    // From now on, we don't want to update the stencil buffer anymore.
-    // glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-    // glStencilMask(0x0);
-
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (properties.antialias) {
@@ -251,9 +207,6 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         outlineShader->setWorld({{ transform.fb_width, transform.fb_height }});
         bucket.drawVertices(*outlineShader);
     }
-
-    // // Only draw regions that we marked
-    // glStencilFunc(GL_NOTEQUAL, 0x0, 0x3F);
 
     if (false && properties.image.size() && *style.sprite) {
         // Draw texture fill
@@ -285,7 +238,6 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         // Draw a rectangle that covers the entire viewport.
         coveringPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
-
     } else {
         // Draw filling rectangle.
         useProgram(plainShader->program);
@@ -294,13 +246,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         // Draw the actual triangle fan into the stencil buffer.
         bucket.drawElements(*plainShader);
-
-        // Draw a rectangle that covers the entire viewport.
-        // coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-        // glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
     }
-
-    // glStencilFunc(GL_EQUAL, 0x80, 0x80);
 }
 
 void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
