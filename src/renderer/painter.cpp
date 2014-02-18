@@ -180,32 +180,37 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     fill_color[2] *= properties.opacity;
     fill_color[3] *= properties.opacity;
 
+    bool outline = properties.antialias && properties.stroke_color != properties.fill_color;
+    bool fringeline = properties.antialias && properties.stroke_color == properties.fill_color;
+
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
-    if (properties.antialias) {
+    if (outline) {
         useProgram(outlineShader->program);
         outlineShader->setMatrix(matrix);
         lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
-        if (properties.stroke_color != properties.fill_color) {
-            // If we defined a different color for the fill outline, we are
-            // going to ignore the bits in 0x3F and just care about the global
-            // clipping mask.
-            glStencilFunc(GL_EQUAL, 0x80, 0x80);
-            outlineShader->setColor(properties.stroke_color);
-        } else {
-            // Otherwise, we only want to draw the antialiased parts that are
-            // *outside* the current shape. This is important in case the fill
-            // or stroke color is translucent. If we wouldn't clip to outside
-            // the current shape, some pixels from the outline stroke overlapped
-            // the (non-antialiased) fill.
-            glStencilFunc(GL_EQUAL, 0x80, 0xBF);
-            outlineShader->setColor(fill_color);
-        }
+        outlineShader->setColor(properties.stroke_color);
 
         // Draw the entire line
         outlineShader->setWorld({{ transform.fb_width, transform.fb_height }});
         bucket.drawVertices(*outlineShader);
+    } else if (fringeline) {
+        // We're only drawing to the first seven bits (== support a maximum of
+        // 127 overlapping polygons in one place before we get rendering errors).
+        glStencilMask(0x3F);
+        glClear(GL_STENCIL_BUFFER_BIT);
+
+        // Draw front facing triangles. Wherever the 0x80 bit is 1, we are
+        // increasing the lower 7 bits by one if the triangle is a front-facing
+        // triangle. This means that all visible polygons should be in CCW
+        // orientation, while all holes (see below) are in CW orientation.
+        glStencilFunc(GL_EQUAL, 0x80, 0x80);
+
+        // When we do a nonzero fill, we count the number of times a pixel is
+        // covered by a counterclockwise polygon, and subtract the number of
+        // times it is "uncovered" by a clockwise polygon.
+        glStencilOp(GL_KEEP, GL_KEEP, GL_INCR_WRAP);
     }
 
     if (false && properties.image.size() && *style.sprite) {
@@ -216,14 +221,16 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         float mix = fmod(transform.getZoom(), 1.0);
 
         std::array<float, 2> imageSize = {{
-            imagePos.size.x * factor,
-            imagePos.size.y * factor
-        }};
+                imagePos.size.x * factor,
+                imagePos.size.y *factor
+            }
+        };
 
         std::array<float, 2> offset = {{
-            (float)fmod(id.x * 4096, imageSize[0]),
-            (float)fmod(id.y * 4096, imageSize[1])
-        }};
+                (float)fmod(id.x * 4096, imageSize[0]),
+                (float)fmod(id.y * 4096, imageSize[1])
+            }
+        };
 
         useProgram(patternShader->program);
         patternShader->setMatrix(matrix);
@@ -246,6 +253,32 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         // Draw the actual triangle fan into the stencil buffer.
         bucket.drawElements(*plainShader);
+    }
+
+    // Because we're drawing top-to-bottom, and we update the stencil mask
+    // below, we have to draw the outline first (!)
+    if (fringeline) {
+        useProgram(outlineShader->program);
+        outlineShader->setMatrix(matrix);
+        lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
+
+        // From now on, we don't want to update the stencil buffer anymore.
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glStencilMask(0x0);
+
+        // Otherwise, we only want to draw the antialiased parts that are
+        // *outside* the current shape. This is important in case the fill
+        // or stroke color is translucent. If we wouldn't clip to outside
+        // the current shape, some pixels from the outline stroke overlapped
+        // the (non-antialiased) fill.
+        glStencilFunc(GL_EQUAL, 0x80, 0xBF);
+        outlineShader->setColor(fill_color);
+
+        // Draw the entire line
+        outlineShader->setWorld({{ transform.fb_width, transform.fb_height }});
+        bucket.drawVertices(*outlineShader);
+
+        glStencilFunc(GL_EQUAL, 0x80, 0x80);
     }
 }
 
@@ -276,20 +309,22 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         linejoinShader->setMatrix(matrix);
         linejoinShader->setColor(color);
         linejoinShader->setWorld({{
-            transform.fb_width * 0.5f,
-            transform.fb_height * 0.5f
-        }});
+                transform.fb_width * 0.5f,
+                transform.fb_height * 0.5f
+            }
+        });
         linejoinShader->setLineWidth({{
-            ((outset - 0.25f) * transform.pixelRatio),
-            ((inset - 0.25f) * transform.pixelRatio)
-        }});
+                ((outset - 0.25f) * transform.pixelRatio),
+                ((inset - 0.25f) * transform.pixelRatio)
+            }
+        });
 
         float pointSize = ceil(transform.pixelRatio * outset * 2.0);
-    #if defined(GL_ES_VERSION_2_0)
+#if defined(GL_ES_VERSION_2_0)
         linejoinShader->setSize(pointSize);
-    #else
+#else
         glPointSize(pointSize);
-    #endif
+#endif
 
         bucket.drawPoints(*linejoinShader);
     }
