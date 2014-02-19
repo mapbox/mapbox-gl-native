@@ -402,7 +402,12 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     useProgram(pointShader->program);
     pointShader->setMatrix(matrix);
     pointShader->setColor(color);
-    pointShader->setSize(properties.size * transform.pixelRatio);
+    const float pointSize = ceil(properties.size);
+    #if defined(GL_ES_VERSION_2_0)
+        pointShader->setSize(pointSize);
+    #else
+        glPointSize(pointSize);
+    #endif
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
     style.sprite->bind(true);
