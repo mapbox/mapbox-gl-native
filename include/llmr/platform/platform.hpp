@@ -23,7 +23,7 @@ struct Response {
     std::string body;
 };
 
-void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb);
+void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback);
 
 // Returns a relative timestamp in seconds. This value must be monotonic.
 double time();
