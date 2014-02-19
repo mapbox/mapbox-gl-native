@@ -37,6 +37,13 @@ void PointShader::bind(char *offset) {
     glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
 }
 
+void PointShader::setImage(int32_t new_image) {
+    if (image != new_image) {
+        glUniform1i(u_image, new_image);
+        image = new_image;
+    }
+}
+
 void PointShader::setColor(const std::array<float, 4>& new_color) {
     if (color != new_color) {
         glUniform4fv(u_color, 1, new_color.data());

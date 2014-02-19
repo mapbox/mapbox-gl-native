@@ -399,9 +399,11 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
 
     ImagePosition imagePos = style.sprite->getPosition(sized_image, false);
 
+    // fprintf(stderr, "%f/%f => %f/%f\n", imagePos.tl.x, imagePos.tl.y, imagePos.br.x, imagePos.br.y);
+
     useProgram(pointShader->program);
-    style.sprite->bind(transform.rotating || transform.scaling);
     pointShader->setMatrix(matrix);
+    pointShader->setImage(0);
     pointShader->setColor(color);
     const float pointSize = properties.size * 1.4142135623730951;
     #if defined(GL_ES_VERSION_2_0)
@@ -411,7 +413,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     #endif
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
-
+    style.sprite->bind(transform.rotating || transform.scaling);
     bucket.drawPoints(*pointShader);
 }
 
