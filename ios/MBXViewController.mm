@@ -141,6 +141,8 @@ class MBXMapView
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
     mapView->settings.sync();
 }
 

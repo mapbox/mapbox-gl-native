@@ -56,7 +56,7 @@ public:
         glfwSetCharCallback(window, character);
         glfwSetKeyCallback(window, key);
 
-        [[NSNotificationCenter defaultCenter] addObserverForName:MBXNeedsRenderNotification
+        renderObserver = [[NSNotificationCenter defaultCenter] addObserverForName:MBXNeedsRenderNotification
          object:nil
          queue:[NSOperationQueue mainQueue]
         usingBlock: ^ (NSNotification * notification) {
@@ -198,6 +198,7 @@ public:
     }
 
     ~MapView() {
+        [[NSNotificationCenter defaultCenter] removeObserver:renderObserver];
         glfwTerminate();
     }
 
@@ -214,6 +215,8 @@ public:
     GLFWwindow *window;
     llmr::Settings_MacOSX settings;
     llmr::Map map;
+
+    id renderObserver;
 };
 
 MapView *mapView;
