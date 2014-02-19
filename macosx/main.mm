@@ -217,7 +217,7 @@ public:
 };
 
 MapView *mapView;
-NSOperationQueue *queue = NULL;
+NSOperationQueue *queue;
 
 namespace llmr {
 namespace platform {
@@ -228,13 +228,12 @@ void restart(void *) {
 
 void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
     if (!queue) {
-        queue = [[NSOperationQueue alloc] init];
+        queue = [NSOperationQueue new];
     }
 
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest
                                        requestWithURL:[NSURL
-                                               URLWithString:[NSString
-                                                       stringWithUTF8String:url.c_str()]]];
+                                               URLWithString:@(url.c_str())]];
 
     [NSURLConnection
      sendAsynchronousRequest:urlRequest
