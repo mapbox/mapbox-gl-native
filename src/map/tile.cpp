@@ -207,7 +207,7 @@ std::shared_ptr<Bucket> Tile::createLineBucket(const VectorTileLayer& layer, con
 }
 
 std::shared_ptr<Bucket> Tile::createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
-    std::shared_ptr<PointBucket> bucket = std::make_shared<PointBucket>(pointVertexBuffer, pointElementsBuffer, bucket_desc);
+    std::shared_ptr<PointBucket> bucket = std::make_shared<PointBucket>(pointVertexBuffer, bucket_desc);
 
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (pbf feature : filtered_layer) {

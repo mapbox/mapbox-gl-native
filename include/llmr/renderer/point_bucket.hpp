@@ -23,16 +23,13 @@ struct Coordinate;
 struct pbf;
 
 class PointBucket : public Bucket {
-    typedef ElementGroup<PointShader> group_type;
 public:
     PointBucket(const std::shared_ptr<PointVertexBuffer>& vertexBuffer,
-                const std::shared_ptr<PointElementsBuffer>& elementsBuffer,
                 const BucketDescription& bucket_desc);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
 
     void addGeometry(pbf& data);
-    void addGeometry(Coordinate& point);
 
     bool hasPoints() const;
 
@@ -43,12 +40,10 @@ public:
 
 private:
     std::shared_ptr<PointVertexBuffer> vertexBuffer;
-    std::shared_ptr<PointElementsBuffer> elementsBuffer;
+    VertexArrayObject<PointShader> array;
 
     const uint32_t vertex_start;
-    const uint32_t elements_start;
-
-    std::vector<group_type> groups;
+    uint32_t vertex_end = 0;
 };
 
 }
