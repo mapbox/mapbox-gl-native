@@ -385,7 +385,7 @@ namespace llmr
         {
         }
 
-        void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb)
+        void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@1 forKey:@"count"]];
 
@@ -407,10 +407,11 @@ namespace llmr
                     res.body = { (const char *)[data bytes], [data length] };
                 }
 
-                func(res);
+                background_function(res);
 
-                dispatch_async(dispatch_get_main_queue(), ^(void) {
-                   cb();
+                dispatch_async(dispatch_get_main_queue(), ^(void)
+                {
+                   foreground_callback();
                 });
 
                 [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@(-1) forKey:@"count"]];
