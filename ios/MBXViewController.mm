@@ -383,6 +383,7 @@ namespace llmr
     {
         void restart(void *)
         {
+            [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
         }
 
         void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
