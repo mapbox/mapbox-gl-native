@@ -47,12 +47,16 @@ public:
     void setLonLatZoom(double lon, double lat, double zoom, double duration = 0);
     void getLonLatZoom(double &lon, double &lat, double &zoom) const;
     void resetZoom();
+    void startScaling();
+    void stopScaling();
 
     /* rotation */
     void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey, double duration = 0);
     void setAngle(double angle, double cx = -1, double cy = -1, double duration = 0);
     double getAngle() const;
     void resetNorth();
+    void startRotating();
+    void stopRotating();
 
     void toggleDebug();
 

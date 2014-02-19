@@ -77,12 +77,29 @@ void Map::scaleBy(double ds, double cx, double cy, double duration) {
     settings.persist();
 }
 
+void Map::startScaling() {
+    transform.scaling = true;
+}
+
+void Map::stopScaling() {
+    transform.scaling = false;
+
+}
+
 void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey, double duration) {
     transform.rotateBy(cx, cy, sx, sy, ex, ey, duration);
     update();
 
     settings.angle = transform.getAngle();
     settings.persist();
+}
+
+void Map::startRotating() {
+    transform.rotating = true;
+}
+
+void Map::stopRotating() {
+    transform.rotating = false;
 }
 
 void Map::setLonLat(double lon, double lat, double duration) {
@@ -93,7 +110,7 @@ void Map::setLonLat(double lon, double lat, double duration) {
     settings.persist();
 }
 
-void Map::getLonLat(double &lon, double &lat) const {
+void Map::getLonLat(double& lon, double& lat) const {
     transform.getLonLat(lon, lat);
 }
 
@@ -107,7 +124,7 @@ void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
     settings.persist();
 }
 
-void Map::getLonLatZoom(double &lon, double &lat, double &zoom) const {
+void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
     transform.getLonLatZoom(lon, lat, zoom);
 }
 

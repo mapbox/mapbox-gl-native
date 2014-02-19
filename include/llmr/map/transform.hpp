@@ -61,6 +61,9 @@ public:
 
     float pixelRatio = 1;
 
+    bool rotating = false;
+    bool scaling = false;
+
 private:
     double x = 0, y = 0; // pixel values of the map center in the current scale
     double angle = 0;
