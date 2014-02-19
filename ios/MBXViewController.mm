@@ -373,9 +373,9 @@ class MBXMapView
     return ([validSimultaneousGestures containsObject:[gestureRecognizer class]] && [validSimultaneousGestures containsObject:[otherGestureRecognizer class]]);
 }
 
-CADisplayLink *displayLink;
 MBXMapView *mapView;
-NSOperationQueue *queue = NULL;
+CADisplayLink *displayLink;
+NSOperationQueue *queue;
 
 namespace llmr
 {
@@ -389,11 +389,10 @@ namespace llmr
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@1 forKey:@"count"]];
 
-            if (!queue) {
-                queue = [[NSOperationQueue alloc] init];
-            }
+            if (!queue)
+                queue = [NSOperationQueue new];
 
-            NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithUTF8String:url.c_str()]]];
+            NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@(url.c_str())]];
 
             [NSURLConnection sendAsynchronousRequest:urlRequest
                                                queue:queue
