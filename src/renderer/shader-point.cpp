@@ -34,7 +34,7 @@ PointShader::PointShader()
 
 void PointShader::bind(char *offset) {
     glEnableVertexAttribArray(a_pos);
-    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 8, offset);
+    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
 }
 
 void PointShader::setColor(const std::array<float, 4>& new_color) {
