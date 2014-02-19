@@ -226,7 +226,7 @@ void restart(void *) {
     mapView->dirty = true;
 }
 
-void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
+void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback) {
     if (!queue) {
         queue = [NSOperationQueue new];
     }
@@ -246,9 +246,9 @@ void request_http(std::string url, std::function<void(Response&)> func, std::fun
             res.body = { (const char *)[data bytes], [data length] };
         }
 
-        func(res);
+        background_function(res);
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            cb();
+            foreground_callback();
         });
         [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
     }];
