@@ -410,6 +410,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
         pointShader->setSize(pointSize);
     #else
         glPointSize(pointSize);
+        glEnable(GL_POINT_SPRITE);
     #endif
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
