@@ -420,14 +420,10 @@ namespace llmr
             [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
             {
                 for (NSURLSessionDownloadTask *task in downloadTasks)
-                {
                     if (task.taskDescription && ! [task.taskDescription isEqualToString:latestZoom])
-                    {
                         [task cancel];
 
-                        [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
-                    }
-                }
+                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
             }];
 
             NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
