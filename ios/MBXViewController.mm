@@ -450,10 +450,10 @@ namespace llmr
                 dispatch_async(dispatch_get_main_queue(), ^(void)
                 {
                     foreground_callback();
-
-                    [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
                 });
 
+                if ( ! error)
+                    [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
             }];
 
             task.taskDescription = [@(tile_object->id.z) stringValue];
