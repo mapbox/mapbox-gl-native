@@ -14,8 +14,7 @@ class Tile;
 
 namespace platform {
 
-// Restarts painting. This could for example trigger the event loop of the
-// controlling application.
+// Restarts painting. This could for example trigger the event loop of the controlling application.
 void restart(void *obj);
 
 struct Response {
@@ -23,6 +22,7 @@ struct Response {
     std::string body;
 };
 
+// Makes an HTTP request of a URL on a background thread, calls a function with the results on the same thread, and finally calls a callback function on the main thread.
 void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback);
 
 // Returns a relative timestamp in seconds. This value must be monotonic.
