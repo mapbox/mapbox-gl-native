@@ -3,6 +3,7 @@
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 #include <llmr/platform/platform.hpp>
+#include <llmr/map/tile.hpp>
 #include "settings.hpp"
 
 #include <thread>
@@ -229,34 +230,68 @@ void restart(void *) {
     mapView->dirty = true;
 }
 
-void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback) {
-    if (!queue) {
-        queue = [NSOperationQueue new];
-    }
-
-    NSMutableURLRequest *urlRequest = [NSMutableURLRequest
-                                       requestWithURL:[NSURL
-                                               URLWithString:@(url.c_str())]];
-
-    [NSURLConnection
-     sendAsynchronousRequest:urlRequest
-     queue:[NSOperationQueue mainQueue]
-     completionHandler: ^(NSURLResponse * response, NSData * data, NSError * error) {
+void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
+{
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+    {
         Response res;
-        if (error == nil) {
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-            res.code = [httpResponse statusCode];
+
+        if ( ! error)
+        {
+            res.code = [(NSHTTPURLResponse *)response statusCode];
             res.body = { (const char *)[data bytes], [data length] };
         }
 
         background_function(res);
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
+
+        dispatch_async(dispatch_get_main_queue(), ^(void)
+        {
             foreground_callback();
         });
-        [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
     }];
+
+    [task resume];
 }
 
+void request_http_tile(std::string url, tile_ptr tile_object, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
+{
+    NSString *latestZoom = [@(tile_object->id.z) stringValue];
+
+    [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
+    {
+        for (NSURLSessionDownloadTask *task in downloadTasks)
+            if (task.taskDescription && ! [task.taskDescription isEqualToString:latestZoom])
+                [task cancel];
+    }];
+
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+    {
+        if (error && [[error domain] isEqualToString:NSURLErrorDomain] && [error code] == NSURLErrorCancelled)
+            return;
+
+        Response res;
+
+        if ( ! error)
+        {
+            res.code = [(NSHTTPURLResponse *)response statusCode];
+            res.body = { (const char *)[data bytes], [data length] };
+        }
+
+        background_function(res);
+
+        dispatch_async(dispatch_get_main_queue(), ^(void)
+        {
+            foreground_callback();
+        });
+
+        if ( ! error)
+            [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
+    }];
+
+    task.taskDescription = [@(tile_object->id.z) stringValue];
+
+    [task resume];
+}
 
 double time() {
     return glfwGetTime();
