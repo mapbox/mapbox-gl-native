@@ -16,6 +16,7 @@
 
 #include <llmr/llmr.hpp>
 #include <llmr/platform/platform.hpp>
+#include <llmr/map/tile.hpp>
 
 NSString *const MBXNeedsRenderNotification = @"MBXNeedsRenderNotification";
 NSString *const MBXUpdateActivityNotification = @"MBXUpdateActivityNotification";
@@ -23,7 +24,6 @@ NSString *const MBXUpdateActivityNotification = @"MBXUpdateActivityNotification"
 @interface MBXViewController () <UIGestureRecognizerDelegate>
 
 @property (nonatomic) EAGLContext *context;
-@property (nonatomic) NSUInteger activityCount;
 @property (nonatomic) CGPoint center;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
@@ -153,11 +153,14 @@ class MBXMapView
 
 - (void)updateNetworkActivity:(NSNotification *)notification
 {
-    NSInteger input = [[notification userInfo][@"count"] integerValue];
+    [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
+    {
+        for (NSURLSessionDownloadTask *task in downloadTasks)
+            if (task.taskDescription)
+                return [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
-    self.activityCount += input;
-
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:(self.activityCount > 0)];
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    }];
 }
 
 - (void)updateRender
@@ -391,7 +394,48 @@ namespace llmr
         {
             NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
             {
-                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@(-1) forKey:@"count"]];
+                Response res;
+
+                if ( ! error)
+                {
+                    res.code = [(NSHTTPURLResponse *)response statusCode];
+                    res.body = { (const char *)[data bytes], [data length] };
+                }
+
+                background_function(res);
+
+                dispatch_async(dispatch_get_main_queue(), ^(void)
+                {
+                    foreground_callback();
+                });
+            }];
+
+            [task resume];
+        }
+
+        void request_http_tile(std::string url, tile_ptr tile_object, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
+        {
+            NSString *latestZoom = [@(tile_object->id.z) stringValue];
+
+            [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
+            {
+                for (NSURLSessionDownloadTask *task in downloadTasks)
+                {
+                    if (task.taskDescription && ! [task.taskDescription isEqualToString:latestZoom])
+                    {
+                        [task cancel];
+
+                        [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+                    }
+                }
+            }];
+
+            NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+            {
+                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+
+                if (error && [[error domain] isEqualToString:NSURLErrorDomain] && [error code] == NSURLErrorCancelled)
+                    return;
 
                 Response res;
 
@@ -409,9 +453,12 @@ namespace llmr
 
                     [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
                 });
+
             }];
 
-            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@1 forKey:@"count"]];
+            task.taskDescription = [@(tile_object->id.z) stringValue];
+
+            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
 
             [task resume];
         }

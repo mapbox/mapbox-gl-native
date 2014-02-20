@@ -72,7 +72,7 @@ void Tile::request() {
 
     // Note: Somehow this feels slower than the change to request_http()
     std::shared_ptr<Tile> tile = shared_from_this();
-    platform::request_http(url, [=](platform::Response& res) {
+    platform::request_http_tile(url, tile, [=](platform::Response& res) {
         if (res.code == 200) {
             tile->data.swap(res.body);
             tile->parse();
