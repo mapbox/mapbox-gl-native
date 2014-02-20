@@ -30,6 +30,7 @@ PointShader::PointShader()
     // fprintf(stderr, "    - u_size: %d\n", u_size);
     // fprintf(stderr, "    - u_point_tl: %d\n", u_point_tl);
     // fprintf(stderr, "    - u_point_br: %d\n", u_point_br);
+    // fprintf(stderr, "    - u_image: %d\n", u_image);
 }
 
 void PointShader::bind(char *offset) {
