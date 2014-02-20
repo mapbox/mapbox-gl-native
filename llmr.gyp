@@ -140,7 +140,7 @@
         'ARCHS': [ "armv7", "armv7s", "arm64", "i386" ],
         'TARGETED_DEVICE_FAMILY': '1,2',
         'CODE_SIGN_IDENTITY': 'iPhone Developer',
-        'IPHONEOS_DEPLOYMENT_TARGET': '5.0',
+        'IPHONEOS_DEPLOYMENT_TARGET': '7.0',
         'PUBLIC_HEADERS_FOLDER_PATH': 'include',
         'GCC_INPUT_FILETYPE':'sourcecode.cpp.cpp',
         'OTHER_CPLUSPLUSFLAGS':[

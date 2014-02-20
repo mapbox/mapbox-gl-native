@@ -377,7 +377,6 @@ class MBXMapView
 
 MBXMapView *mapView;
 CADisplayLink *displayLink;
-NSOperationQueue *queue;
 
 namespace llmr
 {
@@ -390,20 +389,13 @@ namespace llmr
 
         void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
         {
-            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@1 forKey:@"count"]];
-
-            if (!queue)
-                queue = [NSOperationQueue new];
-
-            NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@(url.c_str())]];
-
-            [NSURLConnection sendAsynchronousRequest:urlRequest
-                                               queue:queue
-                                   completionHandler:^(NSURLResponse *response, NSData *data, NSError *error)
+            NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
             {
+                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@(-1) forKey:@"count"]];
+
                 Response res;
 
-                if (error == nil)
+                if ( ! error)
                 {
                     res.code = [(NSHTTPURLResponse *)response statusCode];
                     res.body = { (const char *)[data bytes], [data length] };
@@ -413,12 +405,15 @@ namespace llmr
 
                 dispatch_async(dispatch_get_main_queue(), ^(void)
                 {
-                   foreground_callback();
-                });
+                    foreground_callback();
 
-                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@(-1) forKey:@"count"]];
-                [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
+                });
             }];
+
+            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@1 forKey:@"count"]];
+
+            [task resume];
         }
 
         double time()
