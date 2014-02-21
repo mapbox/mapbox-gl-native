@@ -375,11 +375,11 @@ bool Map::updateTiles() {
 }
 
 bool Map::render() {
-    bool changed = false;
     if (transform.needsAnimation()) {
         transform.updateAnimations();
-        changed = updateTiles();
     }
+
+    bool changed = updateTiles();
 
     painter.clear();
 
@@ -394,15 +394,4 @@ bool Map::render() {
     painter.renderMatte();
 
     return changed || transform.needsAnimation();
-}
-
-void Map::tileLoaded(Tile::Ptr tile) {
-    // std::cerr << "loaded " << tile->toString() << std::endl;
-    update();
-}
-
-void Map::tileFailed(Tile::Ptr tile) {
-    // fprintf(stderr, "[%8zx] tile failed to load %d/%d/%d\n",
-    //         std::hash<std::thread::id>()(std::this_thread::get_id()),
-    //         tile->z, tile->x, tile->y);
 }

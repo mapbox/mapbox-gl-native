@@ -29,8 +29,6 @@ public:
     /* callback */
     bool render();
     void cancelAnimations();
-    void tileLoaded(std::shared_ptr<Tile> tile);
-    void tileFailed(std::shared_ptr<Tile> tile);
 
     /* position */
     void moveBy(double dx, double dy, double duration = 0);

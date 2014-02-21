@@ -227,6 +227,9 @@ namespace platform {
 
 void restart(void *) {
     mapView->dirty = true;
+    CGEventRef event = CGEventCreate(NULL);
+    CGEventSetType(event, kCGEventMouseMoved);
+    [[NSApplication sharedApplication] postEvent: [NSEvent eventWithCGEvent:event] atStart:NO];
 }
 
 void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback) {
