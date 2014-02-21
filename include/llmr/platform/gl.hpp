@@ -1,9 +1,7 @@
 #ifndef LLMR_RENDERER_GL
 #define LLMR_RENDERER_GL
 
-#ifdef EMSCRIPTEN
-    #include <GLES2/gl2.h>
-#elif __APPLE__
+#if __APPLE__
     #include "TargetConditionals.h"
     #if TARGET_OS_IPHONE
         #include <OpenGLES/ES2/gl.h>

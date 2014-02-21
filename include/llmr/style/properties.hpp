@@ -60,8 +60,22 @@ struct FunctionProperty {
     inline T operator()(float z) const { return function(z, values); }
 };
 
+struct PointClass {
+    FunctionProperty<bool> hidden;
+    FunctionProperty<float> size;
+    Color color = {{ 0, 0, 0, 1 }};
+    FunctionProperty<float> opacity = 1;
+    std::string image;
+};
 
-// LineClass is the information we parse from the stylesheet
+struct PointProperties {
+    bool hidden = false;
+    float size = 0;
+    Color color = {{ 0, 0, 0, 1 }};
+    float opacity = 1.0;
+    std::string image;
+};
+
 struct LineClass {
     FunctionProperty<bool> hidden;
     FunctionProperty<float> width;
@@ -70,7 +84,6 @@ struct LineClass {
     FunctionProperty<float> opacity = 1;
 };
 
-// LineProperties is the one we resolve this to.
 struct LineProperties {
     bool hidden = false;
     float width = 0;
@@ -78,9 +91,6 @@ struct LineProperties {
     Color color = {{ 0, 0, 0, 1 }};
     float opacity = 1.0;
 };
-
-
-
 
 struct FillClass {
     FunctionProperty<bool> hidden;

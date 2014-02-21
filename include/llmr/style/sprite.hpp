@@ -34,7 +34,9 @@ public:
 
 class Sprite : public std::enable_shared_from_this<Sprite> {
 public:
-    void load(const std::string& base_url);
+    ~Sprite();
+
+    void load(const std::string& base_url, float pixelRatio = 1);
     void bind(bool linear = false);
 
     ImagePosition getPosition(const std::string& name, bool repeating = false);
@@ -52,7 +54,7 @@ private:
     uint32_t texture = 0;
     std::map<std::string, SpritePosition> pos;
     uint32_t width = 0, height = 0;
-    std::string img;
+    char *img = nullptr;
 };
 
 }

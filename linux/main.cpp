@@ -1,14 +1,19 @@
 #include <llmr/llmr.hpp>
 #include <GLFW/glfw3.h>
-#import <Foundation/Foundation.h>
-#import <AppKit/AppKit.h>
+#include <curl/curl.h>
 #include <llmr/platform/platform.hpp>
-#include <llmr/map/tile.hpp>
 #include "settings.hpp"
-
-#include <cstdio>
+#include <future>
+#include <list>
+#include <chrono>
 
 #include <thread>
+
+std::list<std::future<void>> futures;
+std::list<std::future<void>>::iterator f_it;
+std::list<std::function<void()>> callbacks;
+std::list<std::function<void()>>::iterator c_it;
+std::chrono::milliseconds zero (0);
 
 class MapView {
 public:
@@ -40,14 +45,8 @@ public:
         glfwSetWindowUserPointer(window, this);
         glfwMakeContextCurrent(window);
 
-
-        int width, height;
-        glfwGetWindowSize(window, &width, &height);
-        int fb_width, fb_height;
-        glfwGetFramebufferSize(window, &fb_width, &fb_height);
-
         settings.load();
-        map.setup((double)fb_width / width);
+        map.setup();
 
         resize(window, 0, 0);
 
@@ -62,8 +61,8 @@ public:
         glfwSetScrollCallback(window, scroll);
         glfwSetCharCallback(window, character);
         glfwSetKeyCallback(window, key);
-    }
 
+    }
 
     static void character(GLFWwindow *window, unsigned int codepoint) {
 
@@ -111,7 +110,6 @@ public:
             scale = 1.0 / scale;
         }
 
-        mapView->map.startScaling();
         mapView->map.scaleBy(scale, mapView->last_x, mapView->last_y);
     }
 
@@ -134,14 +132,11 @@ public:
             if (mapView->rotating) {
                 mapView->start_x = mapView->last_x;
                 mapView->start_y = mapView->last_y;
-            } else {
-                mapView->map.stopRotating();
             }
         } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
             mapView->tracking = action == GLFW_PRESS;
 
             if (action == GLFW_RELEASE) {
-                mapView->map.stopPanning();
                 double now = glfwGetTime();
                 if (now - mapView->last_click < 0.4) {
                     mapView->map.scaleBy(2.0, mapView->last_x, mapView->last_y);
@@ -154,14 +149,8 @@ public:
     static void mousemove(GLFWwindow *window, double x, double y) {
         MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
         if (mapView->tracking) {
-            double dx = x - mapView->last_x;
-            double dy = y - mapView->last_y;
-            if (dx || dy) {
-                mapView->map.startPanning();
-                mapView->map.moveBy(dx, dy);
-            }
+            mapView->map.moveBy(x - mapView->last_x, y - mapView->last_y);
         } else if (mapView->rotating) {
-            mapView->map.startRotating();
             mapView->map.rotateBy(mapView->start_x, mapView->start_y, mapView->last_x, mapView->last_y, x, y);
         }
         mapView->last_x = x;
@@ -170,6 +159,22 @@ public:
 
     int run() {
         while (!glfwWindowShouldClose(window)) {
+
+            f_it = futures.begin();
+            c_it = callbacks.begin();
+
+            while (f_it != futures.end()) {
+                if (f_it->wait_for(zero) == std::future_status::ready) {
+                    std::function<void()> cb = *c_it;
+                    futures.erase(f_it++);
+                    callbacks.erase(c_it++);
+                    cb();
+                } else {
+                    f_it++;
+                    c_it++;
+                }
+            }
+
             if (dirty) {
                 try {
                     dirty = render();
@@ -180,7 +185,7 @@ public:
                 fps();
             }
 
-            if (dirty) {
+            if (dirty || futures.size()) {
                 glfwPollEvents();
             } else {
                 glfwWaitEvents();
@@ -227,81 +232,50 @@ public:
     llmr::Map map;
 };
 
-MapView *mapView;
-NSOperationQueue *queue;
+MapView *mapView = nullptr;
 
 namespace llmr {
 namespace platform {
 
-void restart() {
-    mapView->dirty = true;
-    CGEventRef event = CGEventCreate(NULL);
-    CGEventSetType(event, kCGEventMouseMoved);
-    [[NSApplication sharedApplication] postEvent: [NSEvent eventWithCGEvent:event] atStart:NO];
+void restart(void *) {
+    if (mapView) {
+        mapView->dirty = true;
+    }
 }
 
-void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
-{
-    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
-    {
-        Response res;
 
-        if ( ! error)
-        {
-            res.code = [(NSHTTPURLResponse *)response statusCode];
-            res.body = { (const char *)[data bytes], [data length] };
-        }
 
-        background_function(res);
-
-        dispatch_async(dispatch_get_main_queue(), ^(void)
-        {
-            foreground_callback();
-        });
-    }];
-
-    [task resume];
+static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
+    ((std::string*)userp)->append((char*)contents, size *nmemb);
+    return size * nmemb;
 }
 
-void request_http_tile(std::string url, tile_ptr tile_object, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
-{
-    NSString *latestZoom = [@(tile_object->id.z) stringValue];
+void request_http_async(std::string url, std::function<void(Response&)> func) {
 
-    [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
-    {
-        for (NSURLSessionDownloadTask *task in downloadTasks)
-            if (task.taskDescription && ! [task.taskDescription isEqualToString:latestZoom])
-                [task cancel];
-    }];
+    Response res;
 
-    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
-    {
-        if (error && [[error domain] isEqualToString:NSURLErrorDomain] && [error code] == NSURLErrorCancelled)
-            return;
+    CURL *curl;
+    CURLcode code;
+    curl = curl_easy_init();
 
-        Response res;
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res.body);
+        curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "deflate");
+        code = curl_easy_perform(curl);
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &res.code);
+        curl_easy_cleanup(curl);
+    }
 
-        if ( ! error)
-        {
-            res.code = [(NSHTTPURLResponse *)response statusCode];
-            res.body = { (const char *)[data bytes], [data length] };
-        }
-
-        background_function(res);
-
-        dispatch_async(dispatch_get_main_queue(), ^(void)
-        {
-            foreground_callback();
-        });
-
-        if ( ! error)
-            [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
-    }];
-
-    task.taskDescription = [@(tile_object->id.z) stringValue];
-
-    [task resume];
+    func(res);
 }
+
+void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
+    futures.emplace_back(std::async(std::launch::async, request_http_async, url, func));
+    callbacks.push_back(cb);
+}
+
 
 double time() {
     return glfwGetTime();

@@ -7,6 +7,7 @@
 
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
+#include <llmr/renderer/point_bucket.hpp>
 
 #include <llmr/map/transform.hpp>
 #include <llmr/map/settings.hpp>
@@ -29,6 +30,7 @@ Painter::Painter(Transform& transform, Settings& settings, Style& style)
 void Painter::setup() {
     setupShaders();
 
+    assert(pointShader);
     assert(plainShader);
     assert(outlineShader);
     assert(lineShader);
@@ -52,6 +54,7 @@ void Painter::setupShaders() {
     lineShader = std::make_unique<LineShader>();
     linejoinShader = std::make_unique<LinejoinShader>();
     patternShader = std::make_unique<PatternShader>();
+    pointShader = std::make_unique<PointShader>();
 }
 
 void Painter::useProgram(uint32_t program) {
@@ -114,7 +117,7 @@ void Painter::drawClippingMask() {
 
     // Draw the clipping mask
     plainShader->setColor(1.0f, 0.0f, 1.0f, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 
     // glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
@@ -284,7 +287,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         // Draw a rectangle that covers the entire viewport.
         coveringPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0));
-        glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
+        glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 
     } else {
         // Draw filling rectangle.
@@ -294,7 +297,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         // Draw a rectangle that covers the entire viewport.
         coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-        glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
+        glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
     }
 
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
@@ -377,6 +380,44 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     }
 }
 
+void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+    const PointProperties& properties = style.computed.points[layer_name];
+
+    // Abort early.
+    if (!bucket.hasPoints()) return;
+    if (properties.hidden) return;
+
+    Color color = properties.color;
+    color[0] *= properties.opacity;
+    color[1] *= properties.opacity;
+    color[2] *= properties.opacity;
+    color[3] *= properties.opacity;
+
+    std::string sized_image = properties.image;
+    sized_image.append("-");
+    sized_image.append(std::to_string(static_cast<int>(std::round(properties.size))));
+
+    ImagePosition imagePos = style.sprite->getPosition(sized_image, false);
+
+    // fprintf(stderr, "%f/%f => %f/%f\n", imagePos.tl.x, imagePos.tl.y, imagePos.br.x, imagePos.br.y);
+
+    useProgram(pointShader->program);
+    pointShader->setMatrix(matrix);
+    pointShader->setImage(0);
+    pointShader->setColor(color);
+    const float pointSize = properties.size * 1.4142135623730951;
+    #if defined(GL_ES_VERSION_2_0)
+        pointShader->setSize(pointSize);
+    #else
+        glPointSize(pointSize);
+        glEnable(GL_POINT_SPRITE);
+    #endif
+    pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
+    pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
+    style.sprite->bind(transform.rotating || transform.scaling || transform.panning);
+    bucket.drawPoints(*pointShader);
+}
+
 void Painter::renderDebug(const Tile::Ptr& tile) {
     // Blend to the front, not the back.
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -387,16 +428,16 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(1.0f, 0.0f, 0.0f, 1.0f);
     lineWidth(4.0f * transform.pixelRatio);
-    glDrawArrays(GL_LINE_STRIP, 0, tileBorderBuffer.index());
+    glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index());
 
     // draw debug info
     tile->debugFontArray.bind(*plainShader, tile->debugFontBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
     lineWidth(4.0f * transform.pixelRatio);
-    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.index());
+    glDrawArrays(GL_LINES, 0, (GLsizei)tile->debugFontBuffer.index());
     plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
     lineWidth(2.0f * transform.pixelRatio);
-    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.index());
+    glDrawArrays(GL_LINES, 0, (GLsizei)tile->debugFontBuffer.index());
 
     // Revert blending mode to blend to the back.
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
@@ -413,7 +454,7 @@ void Painter::renderMatte() {
     // Draw the clipping mask
     matteArray.bind(*plainShader, matteBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(white);
-    glDrawArrays(GL_TRIANGLES, 0, matteBuffer.index());
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)matteBuffer.index());
 
     glEnable(GL_STENCIL_TEST);
 }
@@ -427,5 +468,5 @@ void Painter::renderBackground() {
     // Draw the clipping mask
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(white);
-    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }

@@ -2,6 +2,7 @@
 #define LLMR_GEOMETRY_VERTEX_BUFFER
 
 #include <vector>
+#include <cstddef>
 #include <cstdint>
 #include <cmath>
 
@@ -17,7 +18,7 @@ public:
      * Returns the number of elements in this buffer. This is not the number of
      * bytes, but rather the number of coordinates with associated information.
      */
-    uint32_t index() const;
+    size_t index() const;
 
     /*
      * Transfers this buffer to the GPU and binds the buffer to the GL context.

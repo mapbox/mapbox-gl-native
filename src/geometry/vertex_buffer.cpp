@@ -12,7 +12,7 @@ VertexBuffer::~VertexBuffer() {
     }
 }
 
-uint32_t VertexBuffer::index() const {
+size_t VertexBuffer::index() const {
     // We store 2 coordinates per vertex + 1 linesofar + 1 extrude coord pair == 4 (== 8 bytes)
     return array.size() / 2;
 }

@@ -6,7 +6,7 @@
 #include <string>
 
 #define kTileURL "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf"
-#define kSpriteURL "http://mapbox-kkaefer.s3.amazonaws.com/static/sprite"
+#define kSpriteURL "https://dl.dropboxusercontent.com/u/575564/sprite"
 
 namespace llmr {
 
@@ -17,7 +17,7 @@ typedef std::shared_ptr<Tile> tile_ptr;
 namespace platform {
 
 // Restarts painting. This could for example trigger the event loop of the controlling application.
-void restart(void *obj);
+void restart();
 
 struct Response {
     int16_t code = -1;

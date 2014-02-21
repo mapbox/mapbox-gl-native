@@ -50,7 +50,7 @@ void FillBucket::addGeometry(pbf& geom) {
 }
 
 void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
-    uint32_t vertex_start = vertexBuffer->index();
+    size_t vertex_start = vertexBuffer->index();
 
     size_t length = line.size();
 

@@ -12,6 +12,7 @@
 #include <llmr/renderer/shader-pattern.hpp>
 #include <llmr/renderer/shader-line.hpp>
 #include <llmr/renderer/shader-linejoin.hpp>
+#include <llmr/renderer/shader-point.hpp>
 
 
 namespace llmr {
@@ -23,6 +24,7 @@ class Tile;
 
 class FillBucket;
 class LineBucket;
+class PointBucket;
 
 class Painter : private util::noncopyable {
 public:
@@ -36,6 +38,7 @@ public:
     void renderBackground();
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
+    void renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id);
 
 private:
     void setupShaders();
@@ -63,6 +66,7 @@ private:
     std::unique_ptr<LineShader> lineShader;
     std::unique_ptr<LinejoinShader> linejoinShader;
     std::unique_ptr<PatternShader> patternShader;
+    std::unique_ptr<PointShader> pointShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     VertexBuffer tileStencilBuffer = {

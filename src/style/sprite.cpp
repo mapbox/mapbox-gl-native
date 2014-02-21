@@ -23,25 +23,32 @@ ImagePosition::ImagePosition(const vec2<uint16_t>& size, vec2<float> tl, vec2<fl
       br(br) {}
 
 
+Sprite::~Sprite() {
+    if (img) {
+        free(img);
+    }
+}
 
 Sprite::operator bool() const {
     std::lock_guard<std::mutex> lock(mtx);
     return loaded;
 }
 
-void Sprite::load(const std::string& base_url) {
+void Sprite::load(const std::string& base_url, float pixelRatio) {
     std::shared_ptr<Sprite> sprite = shared_from_this();
 
     auto complete = [sprite]() {
         std::lock_guard<std::mutex> lock(sprite->mtx);
-        if (sprite->img.size() && sprite->pos.size()) {
+        if (sprite->img && sprite->pos.size()) {
             sprite->loaded = true;
-            platform::restart(NULL);
+            platform::restart();
             fprintf(stderr, "sprite loaded\n");
         }
     };
 
-    platform::request_http(base_url + ".json", [sprite](const platform::Response & res) {
+    std::string suffix = (pixelRatio > 1 ? "@2x" : "");
+
+    platform::request_http(base_url + suffix + ".json", [sprite](const platform::Response & res) {
         if (res.code == 200) {
             sprite->parseJSON(res.body);
         } else {
@@ -49,7 +56,7 @@ void Sprite::load(const std::string& base_url) {
         }
     }, complete);
 
-    platform::request_http(base_url + ".png", [sprite](const platform::Response & res) {
+    platform::request_http(base_url + suffix + ".png", [sprite](const platform::Response & res) {
         if (res.code == 200) {
             sprite->loadImage(res.body);
         } else {
@@ -173,11 +180,11 @@ void Sprite::loadImage(const std::string& data) {
 
         png_read_update_info(png, info);
 
-        unsigned int rowbytes = png_get_rowbytes(png, info);
+        png_size_t rowbytes = png_get_rowbytes(png, info);
         assert(width * 4 == rowbytes);
 
-        img.resize(width * height * 4);
-        char *surface = const_cast<char *>(img.data());
+        img = (char *)malloc(width * height * 4);
+        char *surface = img;
         assert(surface);
 
         png_bytep row_pointers[height];
@@ -192,7 +199,10 @@ void Sprite::loadImage(const std::string& data) {
     } catch (std::exception& e) {
         fprintf(stderr, "loading PNG failed: %s\n", e.what());
         png_destroy_read_struct(&png, &info, nullptr);
-        img.clear();
+        if (img) {
+            free(img);
+            img = nullptr;
+        }
         width = 0;
         height = 0;
     }
@@ -234,11 +244,13 @@ void Sprite::bind(bool linear) {
 
     if (!texture) {
         glGenTextures(1, &texture);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
     } else {
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 

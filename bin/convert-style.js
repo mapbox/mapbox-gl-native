@@ -6,8 +6,6 @@ var style = require('./style.js');
 var Protobuf = require('./protobuf.js');
 var fs = require('fs');
 
-// var fs = require('fs');
-
 var pbf = new Protobuf();
 
 // enum
@@ -181,22 +179,46 @@ function createLineClass(layer, name) {
     return pbf;
 }
 
+function createMarkerClass(layer, name) {
+    var pbf = new Protobuf();
+    pbf.writeTaggedString(1 /* layer_name */, name);
+
+    if ('color' in layer) {
+        var color = layer.color.match(/^#([0-9a-f]{6})$/i);
+        if (!color) {
+            console.warn('invalid color');
+        } else {
+            pbf.writeTaggedUInt32(3 /* color */, parseInt(color[1] + 'ff', 16));
+        }
+    }
+
+    if ('size' in layer) {
+        pbf.writeMessage(4 /* size */, convertProperty(layer.size));
+    }
+
+    if ('opacity' in layer) {
+        pbf.writeMessage(6 /* opacity */, convertProperty(layer.opacity));
+    }
+
+    if ('image' in layer) {
+        pbf.writeTaggedString(8 /* image */, layer.image);
+    }
+
+    return pbf;
+}
 
 function createClass(klass) {
     var pbf = new Protobuf();
     pbf.writeTaggedString(1 /* name */, klass.name);
     for (var name in klass.layers) {
         switch (klass.layers[name].type) {
-            case 'fill': pbf.writeMessage(2 /* fill */, createFillClass(klass.layers[name], name)); break;
-            case 'line': pbf.writeMessage(3 /* line */, createLineClass(klass.layers[name], name)); break;
+            case 'fill':   pbf.writeMessage(2 /* fill */,   createFillClass(klass.layers[name], name)); break;
+            case 'line':   pbf.writeMessage(3 /* line */,   createLineClass(klass.layers[name], name)); break;
+            case 'marker': pbf.writeMessage(4 /* marker */, createMarkerClass(klass.layers[name], name)); break;
         }
     }
     return pbf;
 }
-
-
-
-
 
 for (var name in style.buckets) {
     var bucket = style.buckets[name];
