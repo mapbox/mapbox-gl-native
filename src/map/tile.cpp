@@ -83,8 +83,7 @@ void Tile::request() {
             fprintf(stderr, "tile loading failed\n");
         }
     }, []() {
-        // TODO: Make sure this gets passed the correct map ID/pointer.
-        platform::restart(nullptr);
+        platform::restart();
     });
 }
 

@@ -9,8 +9,6 @@
 
 #include <thread>
 
-NSString *const MBXNeedsRenderNotification = @"MBXNeedsRenderNotification";
-
 class MapView {
 public:
     MapView() :
@@ -63,14 +61,8 @@ public:
         glfwSetScrollCallback(window, scroll);
         glfwSetCharCallback(window, character);
         glfwSetKeyCallback(window, key);
-
-        renderObserver = [[NSNotificationCenter defaultCenter] addObserverForName:MBXNeedsRenderNotification
-         object:nil
-         queue:[NSOperationQueue mainQueue]
-        usingBlock: ^ (NSNotification * notification) {
-            dirty = true;
-        }];
     }
+
 
     static void character(GLFWwindow *window, unsigned int codepoint) {
 
@@ -216,7 +208,6 @@ public:
     }
 
     ~MapView() {
-        [[NSNotificationCenter defaultCenter] removeObserver:renderObserver];
         glfwTerminate();
     }
 
@@ -233,8 +224,6 @@ public:
     GLFWwindow *window;
     llmr::Settings_MacOSX settings;
     llmr::Map map;
-
-    id renderObserver;
 };
 
 MapView *mapView;
@@ -243,7 +232,7 @@ NSOperationQueue *queue;
 namespace llmr {
 namespace platform {
 
-void restart(void *) {
+void restart() {
     mapView->dirty = true;
     CGEventRef event = CGEventCreate(NULL);
     CGEventSetType(event, kCGEventMouseMoved);
@@ -274,7 +263,6 @@ void request_http(std::string url, std::function<void(Response&)> background_fun
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             foreground_callback();
         });
-        [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
     }];
 }
 

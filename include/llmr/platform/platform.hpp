@@ -15,7 +15,7 @@ class Tile;
 namespace platform {
 
 // Restarts painting. This could for example trigger the event loop of the controlling application.
-void restart(void *obj);
+void restart();
 
 struct Response {
     int16_t code = -1;

@@ -397,7 +397,7 @@ namespace llmr
 {
     namespace platform
     {
-        void restart(void *)
+        void restart()
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
         }

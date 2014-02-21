@@ -69,12 +69,12 @@ void Map::moveBy(double dx, double dy, double duration) {
 
 void Map::startPanning() {
     transform.startPanning();
-    platform::restart(this);
+    platform::restart();
 }
 
 void Map::stopPanning() {
     transform.stopPanning();
-    platform::restart(this);
+    platform::restart();
 }
 
 void Map::scaleBy(double ds, double cx, double cy, double duration) {
@@ -89,12 +89,12 @@ void Map::scaleBy(double ds, double cx, double cy, double duration) {
 
 void Map::startScaling() {
     transform.startScaling();
-    platform::restart(this);
+    platform::restart();
 }
 
 void Map::stopScaling() {
     transform.stopScaling();
-    platform::restart(this);
+    platform::restart();
 }
 
 void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey, double duration) {
@@ -107,12 +107,12 @@ void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double
 
 void Map::startRotating() {
     transform.startRotating();
-    platform::restart(this);
+    platform::restart();
 }
 
 void Map::stopRotating() {
     transform.stopRotating();
-    platform::restart(this);
+    platform::restart();
 }
 
 void Map::setLonLat(double lon, double lat, double duration) {
@@ -233,7 +233,7 @@ void Map::cancelAnimations() {
 
 void Map::update() {
     updateTiles();
-    platform::restart(this);
+    platform::restart();
 }
 
 
