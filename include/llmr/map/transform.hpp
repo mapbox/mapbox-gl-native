@@ -42,6 +42,14 @@ public:
     void getLonLat(double& lon, double& lat) const;
     void getLonLatZoom(double& lon, double& lat, double& zoom) const;
 
+    // Animations
+    void startPanning();
+    void stopPanning();
+    void startRotating();
+    void stopRotating();
+    void startScaling();
+    void stopScaling();
+
     // Temporary
     void mapCornersToBox(uint32_t z, box& b) const;
 
@@ -61,6 +69,10 @@ public:
 
     float pixelRatio = 1;
 
+    bool rotating = false;
+    bool scaling = false;
+    bool panning = false;
+
 private:
     double x = 0, y = 0; // pixel values of the map center in the current scale
     double angle = 0;
@@ -72,7 +84,10 @@ private:
     // cache values for spherical mercator math
     double zc, Bc, Cc;
 
-    std::forward_list<util::animation> animations;
+    std::forward_list<std::shared_ptr<util::animation>> animations;
+    std::shared_ptr<util::animation> scale_timeout;
+    std::shared_ptr<util::animation> rotate_timeout;
+    std::shared_ptr<util::animation> pan_timeout;
 };
 
 }

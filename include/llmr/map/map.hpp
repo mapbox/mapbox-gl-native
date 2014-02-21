@@ -20,7 +20,7 @@ public:
     ~Map();
 
     /* setup */
-    void setup();
+    void setup(float pixelRatio = 1);
     void loadStyle(const uint8_t *const data, uint32_t bytes);
     void loadSprite(const std::string& url);
     void loadSettings();
@@ -34,6 +34,8 @@ public:
     void moveBy(double dx, double dy, double duration = 0);
     void setLonLat(double lon, double lat, double duration = 0);
     void getLonLat(double &lon, double &lat) const;
+    void startPanning();
+    void stopPanning();
     void resetPosition();
 
     /* scale */
@@ -45,12 +47,16 @@ public:
     void setLonLatZoom(double lon, double lat, double zoom, double duration = 0);
     void getLonLatZoom(double &lon, double &lat, double &zoom) const;
     void resetZoom();
+    void startScaling();
+    void stopScaling();
 
     /* rotation */
     void rotateBy(double cx, double cy, double sx, double sy, double ex, double ey, double duration = 0);
     void setAngle(double angle, double cx = -1, double cy = -1, double duration = 0);
     double getAngle() const;
     void resetNorth();
+    void startRotating();
+    void stopRotating();
 
     void toggleDebug();
 
@@ -72,6 +78,8 @@ private:
 
     int32_t min_zoom;
     int32_t max_zoom;
+
+    float pixel_ratio;
 
     std::forward_list<std::shared_ptr<Tile>> tiles;
     std::forward_list<std::shared_ptr<Tile>> historic_tiles;

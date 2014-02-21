@@ -29,7 +29,7 @@ Sprite::operator bool() const {
     return loaded;
 }
 
-void Sprite::load(const std::string& base_url) {
+void Sprite::load(const std::string& base_url, float pixelRatio) {
     std::shared_ptr<Sprite> sprite = shared_from_this();
 
     auto complete = [sprite]() {
@@ -41,7 +41,9 @@ void Sprite::load(const std::string& base_url) {
         }
     };
 
-    platform::request_http(base_url + ".json", [sprite](const platform::Response & res) {
+    std::string suffix = (pixelRatio > 1 ? "@2x" : "");
+
+    platform::request_http(base_url + suffix + ".json", [sprite](const platform::Response & res) {
         if (res.code == 200) {
             sprite->parseJSON(res.body);
         } else {
@@ -49,7 +51,7 @@ void Sprite::load(const std::string& base_url) {
         }
     }, complete);
 
-    platform::request_http(base_url + ".png", [sprite](const platform::Response & res) {
+    platform::request_http(base_url + suffix + ".png", [sprite](const platform::Response & res) {
         if (res.code == 200) {
             sprite->loadImage(res.body);
         } else {
@@ -234,11 +236,13 @@ void Sprite::bind(bool linear) {
 
     if (!texture) {
         glGenTextures(1, &texture);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
     } else {
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 

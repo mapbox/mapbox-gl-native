@@ -49,7 +49,7 @@ class MBXMapView
         {
             settings.load();
 
-            map.setup();
+            map.setup([[UIScreen mainScreen] scale]);
 
             CGRect frame = [[UIScreen mainScreen] bounds];
             map.resize(frame.size.width, frame.size.height, frame.size.width, frame.size.height);
@@ -238,6 +238,8 @@ class MBXMapView
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
+        mapView->map.startScaling();
+
         self.scale = mapView->map.getScale();
     }
     else if (pinch.state == UIGestureRecognizerStateChanged)
@@ -260,6 +262,8 @@ class MBXMapView
     }
     else if (pinch.state == UIGestureRecognizerStateEnded)
     {
+        mapView->map.stopScaling();
+
         if (fabsf(pinch.velocity) < 20)
             return;
 
@@ -272,6 +276,10 @@ class MBXMapView
 
         mapView->map.scaleBy(new_scale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y, duration);
     }
+    else if (pinch.state == UIGestureRecognizerStateCancelled)
+    {
+        mapView->map.stopScaling();
+    }
 
     [self updateRender];
 }
@@ -282,11 +290,17 @@ class MBXMapView
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
+        mapView->map.startRotating();
+
         self.angle = mapView->map.getAngle();
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
         mapView->map.setAngle(self.angle + rotate.rotation, [rotate locationInView:rotate.view].x, [rotate locationInView:rotate.view].y);
+    }
+    else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
+    {
+        mapView->map.stopRotating();
     }
 
     [self updateRender];

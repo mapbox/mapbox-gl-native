@@ -15,18 +15,19 @@ Map::Map(Settings& settings)
       painter(transform, settings, style),
       min_zoom(0),
       max_zoom(14) {
-
-    // TODO: Extract that information from the stylesheet instead of hard coding
-    style.sprite = std::make_shared<Sprite>();
-    style.sprite->load(kSpriteURL);
 }
 
 Map::~Map() {
     settings.sync();
 }
 
-void Map::setup() {
+void Map::setup(float pixelRatio) {
     painter.setup();
+
+    pixel_ratio = pixelRatio;
+
+    style.sprite = std::make_shared<Sprite>();
+    style.sprite->load(kSpriteURL, pixel_ratio);
 
     style.load(resources::style, resources::style_size);
     // style.loadJSON((const char *)resources::style, resources::style_size);
@@ -54,7 +55,7 @@ void Map::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb
     transform.height = height;
     transform.fb_width = fb_width;
     transform.fb_height = fb_height;
-    transform.pixelRatio = (double)fb_width / (double)width;
+    transform.pixelRatio = pixel_ratio;
     update();
 }
 
@@ -64,6 +65,16 @@ void Map::moveBy(double dx, double dy, double duration) {
 
     transform.getLonLat(settings.longitude, settings.latitude);
     settings.persist();
+}
+
+void Map::startPanning() {
+    transform.startPanning();
+    platform::restart(this);
+}
+
+void Map::stopPanning() {
+    transform.stopPanning();
+    platform::restart(this);
 }
 
 void Map::scaleBy(double ds, double cx, double cy, double duration) {
@@ -76,12 +87,32 @@ void Map::scaleBy(double ds, double cx, double cy, double duration) {
     settings.persist();
 }
 
+void Map::startScaling() {
+    transform.startScaling();
+    platform::restart(this);
+}
+
+void Map::stopScaling() {
+    transform.stopScaling();
+    platform::restart(this);
+}
+
 void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey, double duration) {
     transform.rotateBy(cx, cy, sx, sy, ex, ey, duration);
     update();
 
     settings.angle = transform.getAngle();
     settings.persist();
+}
+
+void Map::startRotating() {
+    transform.startRotating();
+    platform::restart(this);
+}
+
+void Map::stopRotating() {
+    transform.stopRotating();
+    platform::restart(this);
 }
 
 void Map::setLonLat(double lon, double lat, double duration) {
@@ -92,7 +123,7 @@ void Map::setLonLat(double lon, double lat, double duration) {
     settings.persist();
 }
 
-void Map::getLonLat(double &lon, double &lat) const {
+void Map::getLonLat(double& lon, double& lat) const {
     transform.getLonLat(lon, lat);
 }
 
@@ -106,7 +137,7 @@ void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
     settings.persist();
 }
 
-void Map::getLonLatZoom(double &lon, double &lat, double &zoom) const {
+void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
     transform.getLonLatZoom(lon, lat, zoom);
 }
 
