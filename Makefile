@@ -7,7 +7,7 @@ V ?= 1
 all: llmr
 
 llmr: config.gypi src llmr.gyp
-	$(MAKE) -C out BUILDTYPE=Release V=$(V) llmr-osx
+	$(MAKE) -C out BUILDTYPE=Release V=$(V) llmr-x86
 
 # build OS X app with pure make
 app: config.gypi src macosx/llmr-app.gyp

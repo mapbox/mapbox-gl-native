@@ -25,7 +25,7 @@
             '<@(glfw3_cflags)'
         ],
         "dependencies": [
-            "../llmr.gyp:llmr-osx"
+            "../llmr.gyp:llmr-x86"
         ]
     }
   ]
