@@ -15,18 +15,19 @@ Map::Map(Settings& settings)
       painter(transform, settings, style),
       min_zoom(0),
       max_zoom(14) {
-
-    // TODO: Extract that information from the stylesheet instead of hard coding
-    style.sprite = std::make_shared<Sprite>();
-    style.sprite->load(kSpriteURL);
 }
 
 Map::~Map() {
     settings.sync();
 }
 
-void Map::setup() {
+void Map::setup(float pixelRatio) {
     painter.setup();
+
+    pixel_ratio = pixelRatio;
+
+    style.sprite = std::make_shared<Sprite>();
+    style.sprite->load(kSpriteURL, pixel_ratio);
 
     style.load(resources::style, resources::style_size);
     // style.loadJSON((const char *)resources::style, resources::style_size);
@@ -54,7 +55,7 @@ void Map::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb
     transform.height = height;
     transform.fb_width = fb_width;
     transform.fb_height = fb_height;
-    transform.pixelRatio = (double)fb_width / (double)width;
+    transform.pixelRatio = pixel_ratio;
     update();
 }
 
@@ -64,6 +65,16 @@ void Map::moveBy(double dx, double dy, double duration) {
 
     transform.getLonLat(settings.longitude, settings.latitude);
     settings.persist();
+}
+
+void Map::startPanning() {
+    transform.startPanning();
+    platform::restart();
+}
+
+void Map::stopPanning() {
+    transform.stopPanning();
+    platform::restart();
 }
 
 void Map::scaleBy(double ds, double cx, double cy, double duration) {
@@ -76,12 +87,32 @@ void Map::scaleBy(double ds, double cx, double cy, double duration) {
     settings.persist();
 }
 
+void Map::startScaling() {
+    transform.startScaling();
+    platform::restart();
+}
+
+void Map::stopScaling() {
+    transform.stopScaling();
+    platform::restart();
+}
+
 void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey, double duration) {
     transform.rotateBy(cx, cy, sx, sy, ex, ey, duration);
     update();
 
     settings.angle = transform.getAngle();
     settings.persist();
+}
+
+void Map::startRotating() {
+    transform.startRotating();
+    platform::restart();
+}
+
+void Map::stopRotating() {
+    transform.stopRotating();
+    platform::restart();
 }
 
 void Map::setLonLat(double lon, double lat, double duration) {
@@ -92,7 +123,7 @@ void Map::setLonLat(double lon, double lat, double duration) {
     settings.persist();
 }
 
-void Map::getLonLat(double &lon, double &lat) const {
+void Map::getLonLat(double& lon, double& lat) const {
     transform.getLonLat(lon, lat);
 }
 
@@ -106,7 +137,7 @@ void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
     settings.persist();
 }
 
-void Map::getLonLatZoom(double &lon, double &lat, double &zoom) const {
+void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
     transform.getLonLatZoom(lon, lat, zoom);
 }
 
@@ -202,7 +233,7 @@ void Map::cancelAnimations() {
 
 void Map::update() {
     updateTiles();
-    platform::restart(this);
+    platform::restart();
 }
 
 
@@ -375,11 +406,11 @@ bool Map::updateTiles() {
 }
 
 bool Map::render() {
-    bool changed = false;
     if (transform.needsAnimation()) {
         transform.updateAnimations();
-        changed = updateTiles();
     }
+
+    bool changed = updateTiles();
 
     painter.clear();
 
@@ -394,15 +425,4 @@ bool Map::render() {
     painter.renderMatte();
 
     return changed || transform.needsAnimation();
-}
-
-void Map::tileLoaded(Tile::Ptr tile) {
-    // std::cerr << "loaded " << tile->toString() << std::endl;
-    update();
-}
-
-void Map::tileFailed(Tile::Ptr tile) {
-    // fprintf(stderr, "[%8zx] tile failed to load %d/%d/%d\n",
-    //         std::hash<std::thread::id>()(std::this_thread::get_id()),
-    //         tile->z, tile->x, tile->y);
 }

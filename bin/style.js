@@ -140,6 +140,8 @@ module.exports = {
                 },
                 "alcohol": {
                     "type": "marker",
+                    "color": "#999999",
+                    "size": 24,
                     "image": "alcohol-shop"
                 }
             }

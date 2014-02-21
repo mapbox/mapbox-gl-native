@@ -36,6 +36,7 @@ private:
     static std::pair<std::string, ClassDescription> parseClass(pbf data);
     static std::pair<std::string, FillClass> parseFillClass(pbf data);
     static std::pair<std::string, LineClass> parseLineClass(pbf data);
+    static std::pair<std::string, PointClass> parsePointClass(pbf data);
     template <typename T> static FunctionProperty<T> parseProperty(pbf data);
     static Color parseColor(pbf& data);
 
@@ -53,6 +54,7 @@ public:
     struct {
         std::map<std::string, FillProperties> fills;
         std::map<std::string, LineProperties> lines;
+        std::map<std::string, PointProperties> points;
     } computed;
 };
 

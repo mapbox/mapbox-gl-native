@@ -5,9 +5,9 @@
 #include <llmr/platform/platform.hpp>
 #include "settings.hpp"
 
-#include <thread>
+#include <cstdio>
 
-NSString *const MBXNeedsRenderNotification = @"MBXNeedsRenderNotification";
+#include <thread>
 
 class MapView {
 public:
@@ -39,8 +39,14 @@ public:
         glfwSetWindowUserPointer(window, this);
         glfwMakeContextCurrent(window);
 
+
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+        int fb_width, fb_height;
+        glfwGetFramebufferSize(window, &fb_width, &fb_height);
+
         settings.load();
-        map.setup();
+        map.setup((double)fb_width / width);
 
         resize(window, 0, 0);
 
@@ -55,14 +61,8 @@ public:
         glfwSetScrollCallback(window, scroll);
         glfwSetCharCallback(window, character);
         glfwSetKeyCallback(window, key);
-
-        [[NSNotificationCenter defaultCenter] addObserverForName:MBXNeedsRenderNotification
-         object:nil
-         queue:[NSOperationQueue mainQueue]
-        usingBlock: ^ (NSNotification * notification) {
-            dirty = true;
-        }];
     }
+
 
     static void character(GLFWwindow *window, unsigned int codepoint) {
 
@@ -110,6 +110,7 @@ public:
             scale = 1.0 / scale;
         }
 
+        mapView->map.startScaling();
         mapView->map.scaleBy(scale, mapView->last_x, mapView->last_y);
     }
 
@@ -132,11 +133,14 @@ public:
             if (mapView->rotating) {
                 mapView->start_x = mapView->last_x;
                 mapView->start_y = mapView->last_y;
+            } else {
+                mapView->map.stopRotating();
             }
         } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
             mapView->tracking = action == GLFW_PRESS;
 
             if (action == GLFW_RELEASE) {
+                mapView->map.stopPanning();
                 double now = glfwGetTime();
                 if (now - mapView->last_click < 0.4) {
                     mapView->map.scaleBy(2.0, mapView->last_x, mapView->last_y);
@@ -149,8 +153,14 @@ public:
     static void mousemove(GLFWwindow *window, double x, double y) {
         MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
         if (mapView->tracking) {
-            mapView->map.moveBy(x - mapView->last_x, y - mapView->last_y);
+            double dx = x - mapView->last_x;
+            double dy = y - mapView->last_y;
+            if (dx || dy) {
+                mapView->map.startPanning();
+                mapView->map.moveBy(dx, dy);
+            }
         } else if (mapView->rotating) {
+            mapView->map.startRotating();
             mapView->map.rotateBy(mapView->start_x, mapView->start_y, mapView->last_x, mapView->last_y, x, y);
         }
         mapView->last_x = x;
@@ -217,24 +227,26 @@ public:
 };
 
 MapView *mapView;
-NSOperationQueue *queue = NULL;
+NSOperationQueue *queue;
 
 namespace llmr {
 namespace platform {
 
-void restart(void *) {
+void restart() {
     mapView->dirty = true;
+    CGEventRef event = CGEventCreate(NULL);
+    CGEventSetType(event, kCGEventMouseMoved);
+    [[NSApplication sharedApplication] postEvent: [NSEvent eventWithCGEvent:event] atStart:NO];
 }
 
-void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
+void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback) {
     if (!queue) {
-        queue = [[NSOperationQueue alloc] init];
+        queue = [NSOperationQueue new];
     }
 
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest
                                        requestWithURL:[NSURL
-                                               URLWithString:[NSString
-                                                       stringWithUTF8String:url.c_str()]]];
+                                               URLWithString:@(url.c_str())]];
 
     [NSURLConnection
      sendAsynchronousRequest:urlRequest
@@ -247,11 +259,10 @@ void request_http(std::string url, std::function<void(Response&)> func, std::fun
             res.body = { (const char *)[data bytes], [data length] };
         }
 
-        func(res);
+        background_function(res);
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            cb();
+            foreground_callback();
         });
-        [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
     }];
 }
 

@@ -4,9 +4,11 @@
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/geometry/fill_buffer.hpp>
 #include <llmr/geometry/line_buffer.hpp>
+#include <llmr/geometry/point_buffer.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
+#include <llmr/renderer/point_bucket.hpp>
 #include <llmr/platform/platform.hpp>
 #include <llmr/util/pbf.hpp>
 #include <llmr/util/string.hpp>
@@ -45,6 +47,7 @@ Tile::Tile(ID id, const Style& style)
       state(initial),
       fillVertexBuffer(std::make_shared<FillVertexBuffer>()),
       lineVertexBuffer(std::make_shared<LineVertexBuffer>()),
+      pointVertexBuffer(std::make_shared<PointVertexBuffer>()),
       triangleElementsBuffer(std::make_shared<TriangleElementsBuffer>()),
       lineElementsBuffer(std::make_shared<LineElementsBuffer>()),
       pointElementsBuffer(std::make_shared<PointElementsBuffer>()),
@@ -80,8 +83,7 @@ void Tile::request() {
             fprintf(stderr, "tile loading failed\n");
         }
     }, []() {
-        // TODO: Make sure this gets passed the correct map ID/pointer.
-        platform::restart(nullptr);
+        platform::restart();
     });
 }
 
@@ -159,6 +161,8 @@ std::shared_ptr<Bucket> Tile::createBucket(const VectorTile& tile, const BucketD
             return createFillBucket(layer, bucket_desc);
         } else if (bucket_desc.type == BucketType::Line) {
             return createLineBucket(layer, bucket_desc);
+        } else if (bucket_desc.type == BucketType::Point) {
+            return createPointBucket(layer, bucket_desc);
         } else {
             // TODO: create other bucket types.
         }
@@ -187,6 +191,22 @@ std::shared_ptr<Bucket> Tile::createFillBucket(const VectorTileLayer& layer, con
 
 std::shared_ptr<Bucket> Tile::createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::shared_ptr<LineBucket> bucket = std::make_shared<LineBucket>(lineVertexBuffer, triangleElementsBuffer, pointElementsBuffer, bucket_desc);
+
+    FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
+    for (pbf feature : filtered_layer) {
+        while (feature.next(4)) { // geometry
+            pbf geometry_pbf = feature.message();
+            if (geometry_pbf) {
+                bucket->addGeometry(geometry_pbf);
+            }
+        }
+    }
+
+    return bucket;
+}
+
+std::shared_ptr<Bucket> Tile::createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+    std::shared_ptr<PointBucket> bucket = std::make_shared<PointBucket>(pointVertexBuffer, bucket_desc);
 
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (pbf feature : filtered_layer) {
