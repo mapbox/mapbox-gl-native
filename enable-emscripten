@@ -1,2 +1,0 @@
-#!/bin/sh
-export PATH="`emsdk active_path`:$PATH"
