@@ -414,7 +414,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     #endif
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
-    style.sprite->bind(transform.rotating || transform.scaling);
+    style.sprite->bind(transform.rotating || transform.scaling || transform.panning);
     bucket.drawPoints(*pointShader);
 }
 

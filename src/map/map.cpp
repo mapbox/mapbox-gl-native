@@ -67,6 +67,16 @@ void Map::moveBy(double dx, double dy, double duration) {
     settings.persist();
 }
 
+void Map::startPanning() {
+    transform.startPanning();
+    platform::restart(this);
+}
+
+void Map::stopPanning() {
+    transform.stopPanning();
+    platform::restart(this);
+}
+
 void Map::scaleBy(double ds, double cx, double cy, double duration) {
     transform.scaleBy(ds, cx, cy, duration);
     style.cascade(transform.getZoom());
@@ -78,12 +88,13 @@ void Map::scaleBy(double ds, double cx, double cy, double duration) {
 }
 
 void Map::startScaling() {
-    transform.scaling = true;
+    transform.startScaling();
+    platform::restart(this);
 }
 
 void Map::stopScaling() {
-    transform.scaling = false;
-
+    transform.stopScaling();
+    platform::restart(this);
 }
 
 void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey, double duration) {
@@ -95,11 +106,13 @@ void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double
 }
 
 void Map::startRotating() {
-    transform.rotating = true;
+    transform.startRotating();
+    platform::restart(this);
 }
 
 void Map::stopRotating() {
-    transform.rotating = false;
+    transform.stopRotating();
+    platform::restart(this);
 }
 
 void Map::setLonLat(double lon, double lat, double duration) {

@@ -1,6 +1,7 @@
 #include <llmr/map/transform.hpp>
 #include <llmr/util/constants.hpp>
 #include <llmr/util/mat4.hpp>
+#include <llmr/util/std.hpp>
 #include <llmr/util/math.hpp>
 #include <cstdio>
 
@@ -24,8 +25,8 @@ bool Transform::needsAnimation() const {
 }
 
 void Transform::updateAnimations() {
-    animations.remove_if([](const util::animation& animation) {
-        return animation.update() == util::animation::complete;
+    animations.remove_if([](const std::shared_ptr<util::animation>& animation) {
+        return animation->update() == util::animation::complete;
     });
 }
 
@@ -40,8 +41,25 @@ void Transform::moveBy(double dx, double dy, double duration) {
         x = xn;
         y = yn;
     } else {
-        animations.emplace_front(x, xn, x, duration);
-        animations.emplace_front(y, yn, y, duration);
+        animations.emplace_front(std::make_shared<util::ease_animation>(x, xn, x, duration));
+        animations.emplace_front(std::make_shared<util::ease_animation>(y, yn, y, duration));
+    }
+}
+
+void Transform::startPanning() {
+    stopPanning();
+
+    // Add a 200ms timeout for resetting this to false
+    panning = true;
+    pan_timeout = std::make_shared<util::timeout<bool>>(false, panning, 0.2);
+    animations.emplace_front(pan_timeout);
+}
+
+void Transform::stopPanning() {
+    panning = false;
+    if (pan_timeout) {
+        animations.remove(pan_timeout);
+        pan_timeout.reset();
     }
 }
 
@@ -59,6 +77,22 @@ void Transform::scaleBy(double ds, double cx, double cy, double duration) {
     setScale(new_scale, cx, cy, duration);
 }
 
+void Transform::startScaling() {
+    stopScaling();
+
+    // Add a 200ms timeout for resetting this to false
+    scaling = true;
+    scale_timeout = std::make_shared<util::timeout<bool>>(false, scaling, 0.2);
+    animations.emplace_front(scale_timeout);
+}
+
+void Transform::stopScaling() {
+    scaling = false;
+    if (scale_timeout) {
+        animations.remove(scale_timeout);
+        scale_timeout.reset();
+    }
+}
 
 void Transform::rotateBy(double anchor_x, double anchor_y, double start_x, double start_y, double end_x, double end_y, double duration) {
     double center_x = width / 2, center_y = height / 2;
@@ -94,7 +128,24 @@ void Transform::setAngle(double new_angle, double duration) {
     if (duration == 0) {
         angle = new_angle;
     } else {
-        animations.emplace_front(angle, new_angle, angle, duration);
+        animations.emplace_front(std::make_shared<util::ease_animation>(angle, new_angle, angle, duration));
+    }
+}
+
+void Transform::startRotating() {
+    stopRotating();
+
+    // Add a 200ms timeout for resetting this to false
+    rotating = true;
+    rotate_timeout = std::make_shared<util::timeout<bool>>(false, rotating, 0.2);
+    animations.emplace_front(rotate_timeout);
+}
+
+void Transform::stopRotating() {
+    rotating = false;
+    if (rotate_timeout) {
+        animations.remove(rotate_timeout);
+        rotate_timeout.reset();
     }
 }
 
@@ -104,9 +155,9 @@ void Transform::setScaleXY(double new_scale, double xn, double yn, double durati
         x = xn;
         y = yn;
     } else {
-        animations.emplace_front(scale, new_scale, scale, duration);
-        animations.emplace_front(x, xn, x, duration);
-        animations.emplace_front(y, yn, y, duration);
+        animations.emplace_front(std::make_shared<util::ease_animation>(scale, new_scale, scale, duration));
+        animations.emplace_front(std::make_shared<util::ease_animation>(x, xn, x, duration));
+        animations.emplace_front(std::make_shared<util::ease_animation>(y, yn, y, duration));
     }
 
     const double s = scale * util::tileSize;

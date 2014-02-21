@@ -36,6 +36,8 @@ public:
     void moveBy(double dx, double dy, double duration = 0);
     void setLonLat(double lon, double lat, double duration = 0);
     void getLonLat(double &lon, double &lat) const;
+    void startPanning();
+    void stopPanning();
     void resetPosition();
 
     /* scale */
