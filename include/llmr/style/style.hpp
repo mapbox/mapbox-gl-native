@@ -22,7 +22,7 @@ public:
     Style();
 
     void reset();
-    void load(const uint8_t *const data, uint32_t bytes);
+    void load(const uint8_t *const data, size_t bytes);
 
     // This is commented out because it is not fully implemented yet. For now,
     // we keep using the protobuf stylesheet format

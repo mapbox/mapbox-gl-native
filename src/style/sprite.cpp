@@ -180,7 +180,7 @@ void Sprite::loadImage(const std::string& data) {
 
         png_read_update_info(png, info);
 
-        unsigned int rowbytes = png_get_rowbytes(png, info);
+        png_size_t rowbytes = png_get_rowbytes(png, info);
         assert(width * 4 == rowbytes);
 
         img = (char *)malloc(width * height * 4);

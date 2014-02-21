@@ -15,7 +15,7 @@ void Style::reset() {
     computed.points.clear();
 }
 
-void Style::load(const uint8_t *const data, uint32_t bytes) {
+void Style::load(const uint8_t *const data, size_t bytes) {
     pbf style(data, bytes);
 
     while (style.next()) {

@@ -20,7 +20,7 @@ struct pbf {
     struct unknown_field_type_exception : exception {};
     struct end_of_buffer_exception : exception {};
 
-    inline pbf(const unsigned char *data, uint32_t length);
+    inline pbf(const unsigned char *data, size_t length);
     inline pbf();
 
     inline operator bool() const;
@@ -49,7 +49,7 @@ struct pbf {
     uint32_t tag = 0;
 };
 
-pbf::pbf(const unsigned char *data, uint32_t length)
+pbf::pbf(const unsigned char *data, size_t length)
     : data(data),
       end(data + length),
       value(0),

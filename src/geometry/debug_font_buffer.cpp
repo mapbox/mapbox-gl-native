@@ -10,8 +10,8 @@ using namespace llmr;
 void DebugFontBuffer::addText(const char *text, double left, double baseline, double scale) {
     uint16_t *coords = nullptr;
 
-    int32_t length = strlen(text);
-    for (int32_t i = 0; i < length; ++i) {
+    size_t length = strlen(text);
+    for (size_t i = 0; i < length; ++i) {
         if (text[i] < 32 || text[i] > 127) {
             continue;
         }

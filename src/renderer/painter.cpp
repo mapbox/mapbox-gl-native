@@ -117,7 +117,7 @@ void Painter::drawClippingMask() {
 
     // Draw the clipping mask
     plainShader->setColor(1.0f, 0.0f, 1.0f, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 
     // glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
@@ -287,7 +287,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         // Draw a rectangle that covers the entire viewport.
         coveringPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0));
-        glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
+        glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 
     } else {
         // Draw filling rectangle.
@@ -297,7 +297,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         // Draw a rectangle that covers the entire viewport.
         coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-        glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
+        glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
     }
 
     glStencilFunc(GL_EQUAL, 0x80, 0x80);
@@ -428,16 +428,16 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(1.0f, 0.0f, 0.0f, 1.0f);
     lineWidth(4.0f * transform.pixelRatio);
-    glDrawArrays(GL_LINE_STRIP, 0, tileBorderBuffer.index());
+    glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index());
 
     // draw debug info
     tile->debugFontArray.bind(*plainShader, tile->debugFontBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
     lineWidth(4.0f * transform.pixelRatio);
-    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.index());
+    glDrawArrays(GL_LINES, 0, (GLsizei)tile->debugFontBuffer.index());
     plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
     lineWidth(2.0f * transform.pixelRatio);
-    glDrawArrays(GL_LINES, 0, tile->debugFontBuffer.index());
+    glDrawArrays(GL_LINES, 0, (GLsizei)tile->debugFontBuffer.index());
 
     // Revert blending mode to blend to the back.
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
@@ -454,7 +454,7 @@ void Painter::renderMatte() {
     // Draw the clipping mask
     matteArray.bind(*plainShader, matteBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(white);
-    glDrawArrays(GL_TRIANGLES, 0, matteBuffer.index());
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)matteBuffer.index());
 
     glEnable(GL_STENCIL_TEST);
 }
@@ -468,5 +468,5 @@ void Painter::renderBackground() {
     // Draw the clipping mask
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(white);
-    glDrawArrays(GL_TRIANGLES, 0, tileStencilBuffer.index());
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }

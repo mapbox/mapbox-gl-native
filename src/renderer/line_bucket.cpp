@@ -103,7 +103,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         nextNormal = util::normal<double>(currentVertex, lastVertex);
     }
 
-    size_t start_vertex = vertexBuffer->index();
+    int32_t start_vertex = (int32_t)vertexBuffer->index();
 
     std::vector<TriangleElement> triangle_store;
     std::vector<PointElement> point_store;
@@ -174,7 +174,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         // Add offset square begin cap.
         if (!prevVertex && beginCap == CapType::Square) {
             // Add first vertex
-            e3 = vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
                                    flip * (prevNormal.x + prevNormal.y), flip * (-prevNormal.x + prevNormal.y), // extrude normal
                                    0, 0, distance) - start_vertex; // texture normal
 
@@ -182,7 +182,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             e1 = e2; e2 = e3;
 
             // Add second vertex
-            e3 = vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
                                    flip * (prevNormal.x - prevNormal.y), flip * (prevNormal.x + prevNormal.y), // extrude normal
                                    0, 1, distance) - start_vertex; // texture normal
 
@@ -193,7 +193,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         // Add offset square end cap.
         else if (!nextVertex && endCap == CapType::Square) {
             // Add first vertex
-            e3 = vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
                                    nextNormal.x - flip * nextNormal.y, flip * nextNormal.x + nextNormal.y, // extrude normal
                                    0, 0, distance) - start_vertex; // texture normal
 
@@ -201,7 +201,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             e1 = e2; e2 = e3;
 
             // Add second vertex
-            e3 = vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
                                    nextNormal.x + flip * nextNormal.y, -flip * nextNormal.x + nextNormal.y, // extrude normal
                                    0, 1, distance) - start_vertex; // texture normal
 
@@ -227,7 +227,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             }
 
             // Add first vertex
-            e3 = vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
                                    flip * joinNormal.x, flip * joinNormal.y, // extrude normal
                                    0, 0, distance) - start_vertex; // texture normal
 
@@ -235,7 +235,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             e1 = e2; e2 = e3;
 
             // Add second vertex
-            e3 = vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
                                    -flip * joinNormal.x, -flip * joinNormal.y, // extrude normal
                                    0, 1, distance) - start_vertex; // texture normal
 
@@ -251,7 +251,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         else {
             // Close up the previous line
             // Add first vertex
-            e3 = vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
                                    flip * prevNormal.y, -flip * prevNormal.x, // extrude normal
                                    0, 0, distance) - start_vertex; // texture normal
 
@@ -259,7 +259,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             e1 = e2; e2 = e3;
 
             // Add second vertex.
-            e3 = vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
                                    -flip * prevNormal.y, flip * prevNormal.x, // extrude normal
                                    0, 1, distance) - start_vertex; // texture normal
 
@@ -289,7 +289,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
             // Start the new quad.
             // Add first vertex
-            e3 = vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
                                    -flip * nextNormal.y, flip * nextNormal.x, // extrude normal
                                    0, 0, distance) - start_vertex; // texture normal
 
@@ -297,7 +297,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             e1 = e2; e2 = e3;
 
             // Add second vertex
-            e3 = vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
                                    flip * nextNormal.y, -flip * nextNormal.x, // extrude normal
                                    0, 1, distance) - start_vertex; // texture normal
 
