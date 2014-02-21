@@ -2,6 +2,7 @@
 #define LLMR_GEOMETRY_VERTEX_BUFFER
 
 #include <vector>
+#include <cstddef>
 #include <cstdint>
 #include <cmath>
 
