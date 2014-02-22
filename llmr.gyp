@@ -51,7 +51,7 @@
       'xcode_settings': {
         'SDKROOT': 'macosx',
         'SUPPORTED_PLATFORMS':['macosx'],
-        'MACOSX_DEPLOYMENT_TARGET':'10.8',
+        'MACOSX_DEPLOYMENT_TARGET':'10.9',
         'PUBLIC_HEADERS_FOLDER_PATH': 'include',
         'OTHER_CPLUSPLUSFLAGS':[
             '<@(png_cflags)'
