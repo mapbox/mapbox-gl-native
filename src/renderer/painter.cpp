@@ -405,7 +405,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     pointShader->setMatrix(matrix);
     pointShader->setImage(0);
     pointShader->setColor(color);
-    const float pointSize = properties.size * 1.4142135623730951;
+    const float pointSize = properties.size * 1.4142135623730951 * transform.pixelRatio;
     #if defined(GL_ES_VERSION_2_0)
         pointShader->setSize(pointSize);
     #else
