@@ -175,35 +175,35 @@ module.exports = {
                     "color": "#cccccc",
                     "size": 18,
                     "image": "alcohol-shop",
-                    "opacity": 0.75
+                    "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "cafe_poi": {
                     "type": "marker",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "cafe",
-                    "opacity": 0.75
+                    "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "embassy_poi": {
                     "type": "marker",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "embassy",
-                    "opacity": 0.75
+                    "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "park_poi": {
                     "type": "marker",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "park",
-                    "opacity": 0.75
+                    "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "restaurant_poi": {
                     "type": "marker",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "restaurant",
-                    "opacity": 0.75
+                    "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
             }
         }
