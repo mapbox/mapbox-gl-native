@@ -115,7 +115,7 @@ bool Tile::parse() {
     if (state == obsolete) {
         return false;
     } else {
-        state = ready;
+        state = parsed;
     }
 
     return true;
