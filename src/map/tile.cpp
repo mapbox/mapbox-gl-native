@@ -76,7 +76,8 @@ void Tile::request() {
     // Note: Somehow this feels slower than the change to request_http()
     std::shared_ptr<Tile> tile = shared_from_this();
     platform::request_http_tile(url, tile, [=](platform::Response& res) {
-        if (res.code == 200) {
+        if (res.code == 200 && tile->state != obsolete) {
+            tile->state = Tile::loaded;
             tile->data.swap(res.body);
             tile->parse();
         } else {
@@ -99,7 +100,7 @@ void Tile::cancel() {
 bool Tile::parse() {
     // std::lock_guard<std::mutex> lock(mtx);
 
-    if (state == obsolete) {
+    if (state != loaded) {
         return false;
     }
 

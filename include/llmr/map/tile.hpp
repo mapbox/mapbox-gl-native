@@ -43,6 +43,7 @@ public:
     enum state {
         initial,
         loading,
+        loaded,
         parsed,
         obsolete
     };
