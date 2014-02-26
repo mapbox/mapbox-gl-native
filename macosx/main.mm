@@ -246,7 +246,7 @@ Request request_http(std::string url, std::function<void(Response&)> background_
     {
         Response res;
 
-        if ( ! error)
+        if ( ! error && [response isKindOfClass:[NSHTTPURLResponse class]])
         {
             res.code = [(NSHTTPURLResponse *)response statusCode];
             res.body = { (const char *)[data bytes], [data length] };
