@@ -79,7 +79,7 @@ void Tile::request() {
             tile->state = Tile::loaded;
             tile->data.swap(res.body);
             tile->parse();
-        } else {
+        } else if (tile->state != obsolete) {
             fprintf(stderr, "tile loading failed\n");
         }
     }, []() {
