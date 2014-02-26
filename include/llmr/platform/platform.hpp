@@ -19,16 +19,21 @@ namespace platform {
 // Restarts painting. This could for example trigger the event loop of the controlling application.
 void restart();
 
+struct Request {
+    int16_t identifier = -1;
+    std::string original_url;
+};
+
 struct Response {
     int16_t code = -1;
     std::string body;
 };
 
-// Makes an HTTP request of a URL on a background thread, calls a function with the results on the same thread, and finally calls a callback function on the main thread.
-void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback);
+// Makes an HTTP request of a URL on a background thread, calls a function with the results on the same thread, and finally calls a callback function on the main thread. Returns a cancellable request.
+Request request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback);
 
-// Makes a tile-specific HTTP request of a URL on a background thread, calls a function with the results on the same thread, and finally calls a callback function on the main thread. Access to the tile object is provided via a shared pointer.
-void request_http_tile(std::string tile_template_url, tile_ptr tile_object, std::function<void(Response&)> background_function, std::function<void()> foreground_callback);
+// Cancels an HTTP request.
+void cancel_request_http(Request request);
 
 // Returns a relative timestamp in seconds. This value must be monotonic.
 double time();

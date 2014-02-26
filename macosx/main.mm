@@ -240,7 +240,7 @@ void restart() {
     [[NSApplication sharedApplication] postEvent: [NSEvent eventWithCGEvent:event] atStart:NO];
 }
 
-void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
+Request request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
 {
     NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
     {
@@ -261,46 +261,23 @@ void request_http(std::string url, std::function<void(Response&)> background_fun
     }];
 
     [task resume];
+
+    Request req;
+
+    req.identifier = task.taskIdentifier;
+    req.original_url = url;
+
+    return req;
 }
 
-void request_http_tile(std::string url, tile_ptr tile_object, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
+void cancel_request_http(Request request)
 {
-    NSString *latestZoom = [@(tile_object->id.z) stringValue];
-
     [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
     {
         for (NSURLSessionDownloadTask *task in downloadTasks)
-            if (task.taskDescription && ! [task.taskDescription isEqualToString:latestZoom])
-                [task cancel];
+            if (task.taskIdentifier == request.identifier)
+                return [task cancel];
     }];
-
-    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
-    {
-        if (error && [[error domain] isEqualToString:NSURLErrorDomain] && [error code] == NSURLErrorCancelled)
-            return;
-
-        Response res;
-
-        if ( ! error)
-        {
-            res.code = [(NSHTTPURLResponse *)response statusCode];
-            res.body = { (const char *)[data bytes], [data length] };
-        }
-
-        background_function(res);
-
-        dispatch_async(dispatch_get_main_queue(), ^(void)
-        {
-            foreground_callback();
-        });
-
-        if ( ! error)
-            [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
-    }];
-
-    task.taskDescription = [@(tile_object->id.z) stringValue];
-
-    [task resume];
 }
 
 double time() {
