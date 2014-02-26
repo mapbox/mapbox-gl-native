@@ -2,6 +2,7 @@
 #define LLMR_MAP_TILE
 
 #include <llmr/util/vec.hpp>
+#include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/geometry/vao.hpp>
@@ -71,6 +72,7 @@ public:
 
 public:
     const ID id;
+    uint8_t clip_id;
     state state;
 
     // Holds the actual geometries in this tile.
@@ -89,6 +91,7 @@ public:
     // They contain the location offsets in the buffers stored above
     std::map<std::string, std::shared_ptr<Bucket>> buckets;
 
+    mat4 matrix;
 private:
     // Source data
     std::string data;

@@ -414,10 +414,26 @@ bool Map::render() {
 
     painter.clear();
 
+    painter.changeMatrix();
+
+    // First, update all tile matrices with the new transform and render into
+    // the stencil buffer.
+    uint8_t i = 1;
+    painter.prepareClippingMask();
     for (Tile::Ptr& tile : tiles) {
         assert(tile);
         if (tile->state == Tile::ready) {
-            painter.changeMatrix(tile->id);
+            // The position matrix.
+            transform.matrixFor(tile->matrix, tile->id);
+            matrix::multiply(tile->matrix, painter.projMatrix, tile->matrix);
+            tile->clip_id = i++;
+            painter.drawClippingMask(tile->matrix, tile->clip_id);
+        }
+    }
+    painter.finishClippingMask();
+
+    for (Tile::Ptr& tile : tiles) {
+        if (tile->state == Tile::ready) {
             painter.render(tile);
         }
     }
