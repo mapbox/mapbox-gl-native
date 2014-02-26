@@ -10,10 +10,6 @@
 
 namespace llmr {
 
-class Tile;
-
-typedef std::shared_ptr<Tile> tile_ptr;
-
 namespace platform {
 
 // Restarts painting. This could for example trigger the event loop of the controlling application.
