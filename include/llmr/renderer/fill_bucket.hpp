@@ -6,6 +6,7 @@
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/geometry/fill_buffer.hpp>
 
+#include <clipper/clipper.hpp>
 #include <libtess2/tesselator.h>
 
 #include <vector>
@@ -47,8 +48,6 @@ public:
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
 
     void addGeometry(pbf& data);
-    void addGeometry(const std::vector<Coordinate>& line);
-    void addGeometry(const std::vector<std::vector<TESSreal>>& lines);
     bool empty() const;
     void tessellate();
 
@@ -62,6 +61,7 @@ public:
 private:
     TESSalloc *allocator;
     TESStesselator *tesselator;
+    ClipperLib::Clipper clipper;
 
     std::shared_ptr<FillVertexBuffer> vertexBuffer;
     std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
@@ -75,11 +75,11 @@ private:
     std::vector<triangle_group_type> triangleGroups;
     std::vector<line_group_type> lineGroups;
 
-    std::vector<TESSreal> line;
+    std::vector<ClipperLib::IntPoint> line;
     bool hasVertices = false;
 
     static const int vertexSize = 2;
-    static const int stride = sizeof(TESSreal) *vertexSize;
+    static const int stride = sizeof(TESSreal) * vertexSize;
     static const int vertices_per_group = 3;
 };
 

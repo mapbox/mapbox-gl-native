@@ -75,17 +75,16 @@ void FillBucket::addGeometry(pbf& geom) {
     while ((cmd = geometry.next(x, y)) != Geometry::end) {
         if (cmd == Geometry::move_to) {
             if (line.size()) {
-                tessAddContour(tesselator, vertexSize, line.data(), stride, line.size() / vertexSize);
+                clipper.AddPath(line, ClipperLib::ptSubject, true);
                 line.clear();
                 hasVertices = true;
             }
         }
-        line.push_back(x);
-        line.push_back(y);
+        line.emplace_back(x, y);
     }
 
     if (line.size()) {
-        tessAddContour(tesselator, vertexSize, line.data(), stride, line.size() / vertexSize);
+        clipper.AddPath(line, ClipperLib::ptSubject, true);
         line.clear();
         hasVertices = true;
     }
@@ -95,162 +94,107 @@ void FillBucket::tessellate() {
     if (!hasVertices) {
         return;
     }
-
     hasVertices = false;
 
-    // First combine contours and then triangulate, this removes unnecessary inner vertices.
-    if (tessTesselate(tesselator, TESS_WINDING_POSITIVE, TESS_BOUNDARY_CONTOURS, 0, 0, 0)) {
-        const TESSreal *vertices = tessGetVertices(tesselator);
-        const int vertex_count = tessGetVertexCount(tesselator);
-        const int element_count = tessGetElementCount(tesselator);
-        const TESSindex *elements = tessGetElements(tesselator);
 
-        if (vertex_count > 65536) {
-            throw geometry_too_long_exception();
-        }
+    std::vector<std::vector<ClipperLib::IntPoint>> polygons;
+    clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftPositive);
+    clipper.Clear();
 
-        for (int i = 0; i < vertex_count; ++i) {
-            vertexBuffer->add(vertices[i * 2], vertices[i * 2 + 1]);
-        }
-
-
-        if (!lineGroups.size() || (lineGroups.back().vertex_length + vertex_count > 65535)) {
-            // Move to a new group because the old one can't hold the geometry.
-            lineGroups.emplace_back();
-        }
-
-        // We're generating triangle fans, so we always start with the first
-        // coordinate in this polygon.
-        line_group_type& group = lineGroups.back();
-        uint32_t index = group.vertex_length;
-
-
-        for (int i = 0; i < element_count; ++i) {
-            const TESSindex group_start = elements[i * 2];
-            const TESSindex group_end = group_start + elements[i * 2 + 1];
-
-            for (int i = group_start; i < group_end; ++i) {
-                const TESSindex prevI = (i == group_start ? group_end : i) - 1;
-                lineElementsBuffer->add(index + prevI, index + i);
-            }
-        }
-
-        // Add a line from the last vertex to the first vertex.
-        // lineElementsBuffer->add(index + vertex_count - 1, index);
-
-        group.vertex_length += vertex_count;
-        group.elements_length += vertex_count;
-
-        for (int i = 0; i < element_count; ++i) {
-            const TESSindex group_start = elements[i * 2];
-            const TESSindex group_count = elements[i * 2 + 1];
-            const TESSreal *group_vertices = &vertices[group_start * 2];
-            tessAddContour(tesselator, 2, group_vertices, stride, group_count);
-        }
-
-        if (tessTesselate(tesselator, TESS_WINDING_POSITIVE, TESS_POLYGONS, vertices_per_group, 2, 0)) {
-            const TESSindex *vertex_indices = tessGetVertexIndices(tesselator);
-            const TESSindex *elements = tessGetElements(tesselator);
-            const int element_count = tessGetElementCount(tesselator);
-
-            if (!triangleGroups.size() || (triangleGroups.back().vertex_length + vertex_count > 65535)) {
-                // Move to a new group because the old one can't hold the geometry.
-                triangleGroups.emplace_back();
-            }
-
-            // We're generating triangle fans, so we always start with the first
-            // coordinate in this polygon.
-            triangle_group_type& group = triangleGroups.back();
-            uint32_t index = group.vertex_length;
-
-            for (int i = 0; i < element_count; ++i) {
-                const TESSindex *element_group = &elements[i * vertices_per_group];
-
-                if (element_group[0] != TESS_UNDEF && element_group[1] != TESS_UNDEF && element_group[2] != TESS_UNDEF) {
-                    const TESSindex a = vertex_indices[element_group[0]];
-                    const TESSindex b = vertex_indices[element_group[1]];
-                    const TESSindex c = vertex_indices[element_group[2]];
-
-                    if (a != TESS_UNDEF && b != TESS_UNDEF && c != TESS_UNDEF) {
-                        triangleElementsBuffer->add(index + a, index + b, index + c);
-                    } else {
-                        // TODO: We're missing a vertex that was not part of the line.
-                        fprintf(stderr, "undefined element buffer\n");
-                    }
-                } else {
-                    fprintf(stderr, "undefined element buffer\n");
-                }
-            }
-
-            group.vertex_length += vertex_count;
-            group.elements_length += element_count;
-
-        } else {
-            assert(false && "tesselation failed");
-        }
-    } else {
-        assert(false && "tesselation failed");
-    }
-}
-
-void FillBucket::addGeometry(const std::vector<Coordinate>& line) {
-    uint32_t vertex_start = vertexBuffer->index();
-
-    size_t length = line.size();
-
-    // Don't add the first vertex twice.
-    if (line.front() == line.back()) --length;
-
-    for (size_t i = 0; i < length; i++) {
-        const Coordinate& coord = line[i];
-        vertexBuffer->add(coord.x, coord.y);
+    if (polygons.size() == 0) {
+        return;
     }
 
-    size_t vertex_end = vertexBuffer->index();
+    size_t total_vertex_count = 0;
+    for (const std::vector<ClipperLib::IntPoint>& polygon : polygons) {
+        total_vertex_count += polygon.size();
+    }
 
-    size_t vertex_count = vertex_end - vertex_start;
-    if (vertex_count > 65536) {
+    if (total_vertex_count > 65536) {
         throw geometry_too_long_exception();
     }
 
-    {
-        if (!triangleGroups.size() || (triangleGroups.back().vertex_length + vertex_count > 65535)) {
+    if (!lineGroups.size() || (lineGroups.back().vertex_length + total_vertex_count > 65535)) {
+        // Move to a new group because the old one can't hold the geometry.
+        lineGroups.emplace_back();
+    }
+
+    line_group_type& lineGroup = lineGroups.back();
+    uint32_t lineIndex = lineGroup.vertex_length;
+
+    for (const std::vector<ClipperLib::IntPoint>& polygon : polygons) {
+        const size_t group_count = polygon.size();
+        assert(group_count >= 3);
+
+        std::vector<TESSreal> line;
+        for (const ClipperLib::IntPoint& pt : polygon) {
+            line.push_back(pt.X);
+            line.push_back(pt.Y);
+            vertexBuffer->add(pt.X, pt.Y);
+        }
+
+        for (size_t i = 0; i < group_count; i++) {
+            const size_t prev_i = (i == 0 ? group_count : i) - 1;
+            lineElementsBuffer->add(lineIndex + prev_i, lineIndex + i);
+        }
+
+        lineIndex += group_count;
+
+        tessAddContour(tesselator, vertexSize, line.data(), stride, line.size() / vertexSize);
+    }
+
+    if (tessTesselate(tesselator, TESS_WINDING_POSITIVE, TESS_POLYGONS, vertices_per_group, vertexSize, 0)) {
+        const TESSreal *vertices = tessGetVertices(tesselator);
+        const size_t vertex_count = tessGetVertexCount(tesselator);
+        TESSindex *vertex_indices = const_cast<TESSindex *>(tessGetVertexIndices(tesselator));
+        const TESSindex *elements = tessGetElements(tesselator);
+        const int triangle_count = tessGetElementCount(tesselator);
+
+        for (size_t i = 0; i < vertex_count; ++i) {
+            if (vertex_indices[i] == TESS_UNDEF) {
+                vertexBuffer->add(round(vertices[i * 2]), round(vertices[i * 2 + 1]));
+                vertex_indices[i] = total_vertex_count;
+                total_vertex_count++;
+            }
+        }
+
+        if (!triangleGroups.size() || (triangleGroups.back().vertex_length + total_vertex_count > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
             triangleGroups.emplace_back();
         }
 
         // We're generating triangle fans, so we always start with the first
         // coordinate in this polygon.
-        triangle_group_type& group = triangleGroups.back();
-        uint32_t index = group.vertex_length;
-        for (size_t i = 2; i < vertex_count; ++i) {
-            triangleElementsBuffer->add(index, index + i - 1, index + i);
+        triangle_group_type& triangleGroup = triangleGroups.back();
+        uint32_t triangleIndex = triangleGroup.vertex_length;
+
+        for (int i = 0; i < triangle_count; ++i) {
+            const TESSindex *element_group = &elements[i * vertices_per_group];
+
+            if (element_group[0] != TESS_UNDEF && element_group[1] != TESS_UNDEF && element_group[2] != TESS_UNDEF) {
+                const TESSindex a = vertex_indices[element_group[0]];
+                const TESSindex b = vertex_indices[element_group[1]];
+                const TESSindex c = vertex_indices[element_group[2]];
+
+                if (a != TESS_UNDEF && b != TESS_UNDEF && c != TESS_UNDEF) {
+                    triangleElementsBuffer->add(triangleIndex + a, triangleIndex + b, triangleIndex + c);
+                } else {
+                    // TODO: We're missing a vertex that was not part of the line.
+                    fprintf(stderr, "undefined element buffer\n");
+                }
+            } else {
+                fprintf(stderr, "undefined element buffer\n");
+            }
         }
 
-        group.vertex_length += vertex_count;
-        group.elements_length += (vertex_count - 2);
+        triangleGroup.vertex_length += total_vertex_count;
+        triangleGroup.elements_length += triangle_count;
+    } else {
+        fprintf(stderr, "tessellation failed\n");
     }
 
-    {
-        if (!lineGroups.size() || (lineGroups.back().vertex_length + vertex_count > 65535)) {
-            // Move to a new group because the old one can't hold the geometry.
-            lineGroups.emplace_back();
-        }
-
-        // We're generating triangle fans, so we always start with the first
-        // coordinate in this polygon.
-        line_group_type& group = lineGroups.back();
-        uint32_t index = group.vertex_length;
-        for (size_t i = 1; i < vertex_count; ++i) {
-            lineElementsBuffer->add(index + i - 1, index + i);
-        }
-
-        // Add a line from the last vertex to the first vertex.
-        lineElementsBuffer->add(index + vertex_count - 1, index);
-
-        group.vertex_length += vertex_count;
-        group.elements_length += vertex_count;
-    }
+    lineGroup.vertex_length += total_vertex_count;
+    lineGroup.elements_length += total_vertex_count;
 }
 
 void FillBucket::render(Painter& painter, const std::string& layer_name, const Tile::ID& id) {
@@ -258,7 +202,7 @@ void FillBucket::render(Painter& painter, const std::string& layer_name, const T
 }
 
 bool FillBucket::empty() const {
-    return triangleGroups.empty();
+    return triangleGroups.empty() && lineGroups.empty();
 }
 
 void FillBucket::drawElements(PlainShader& shader) {
