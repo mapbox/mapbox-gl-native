@@ -110,8 +110,7 @@ void Painter::finishClippingMask() {
 }
 
 void Painter::clear() {
-    glStencilMask(0xFF);
-    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void Painter::render(const Tile::Ptr& tile) {
