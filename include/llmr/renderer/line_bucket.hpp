@@ -47,9 +47,9 @@ private:
     std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
     std::shared_ptr<PointElementsBuffer> pointElementsBuffer;
 
-    const uint32_t vertex_start;
-    const uint32_t triangle_elements_start;
-    const uint32_t point_elements_start;
+    const size_t vertex_start;
+    const size_t triangle_elements_start;
+    const size_t point_elements_start;
 
     std::vector<triangle_group_type> triangleGroups;
     std::vector<point_group_type> pointGroups;

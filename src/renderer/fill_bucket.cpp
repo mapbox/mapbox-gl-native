@@ -96,7 +96,6 @@ void FillBucket::tessellate() {
     }
     hasVertices = false;
 
-
     std::vector<std::vector<ClipperLib::IntPoint>> polygons;
     clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftPositive);
     clipper.Clear();

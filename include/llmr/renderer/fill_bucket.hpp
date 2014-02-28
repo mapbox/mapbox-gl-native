@@ -68,10 +68,11 @@ private:
     std::shared_ptr<LineElementsBuffer> lineElementsBuffer;
 
     // hold information on where the vertices are located in the FillBuffer
-    const uint32_t vertex_start;
-    const uint32_t triangle_elements_start;
-    const uint32_t line_elements_start;
+    const size_t vertex_start;
+    const size_t triangle_elements_start;
+    const size_t line_elements_start;
     VertexArrayObject array;
+
     std::vector<triangle_group_type> triangleGroups;
     std::vector<line_group_type> lineGroups;
 

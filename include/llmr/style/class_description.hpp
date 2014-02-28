@@ -12,6 +12,7 @@ class ClassDescription {
 public:
     std::map<std::string, FillClass> fill;
     std::map<std::string, LineClass> line;
+    std::map<std::string, PointClass> point;
 };
 
 

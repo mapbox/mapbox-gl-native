@@ -105,8 +105,8 @@ bool Shader::compileShader(GLuint *shader, GLenum type, const GLchar *source) {
 
     *shader = glCreateShader(type);
 
-#if defined(EMSCRIPTEN) || defined(GL_ES_VERSION_2_0)
-    // Add WebGL GLSL / OpenGL ES precision premable
+#if defined(GL_ES_VERSION_2_0)
+    // Add OpenGL ES precision premable
     const GLchar *preamble = "precision highp float;\n\n";
 #else
     // Desktop GLSL

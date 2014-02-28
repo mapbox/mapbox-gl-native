@@ -49,7 +49,7 @@ class MBXMapView
         {
             settings.load();
 
-            map.setup();
+            map.setup([[UIScreen mainScreen] scale]);
 
             CGRect frame = [[UIScreen mainScreen] bounds];
             map.resize(frame.size.width, frame.size.height, frame.size.width, frame.size.height);
@@ -141,6 +141,8 @@ class MBXMapView
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
     mapView->settings.sync();
 }
 
@@ -236,6 +238,8 @@ class MBXMapView
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
+        mapView->map.startScaling();
+
         self.scale = mapView->map.getScale();
     }
     else if (pinch.state == UIGestureRecognizerStateChanged)
@@ -258,6 +262,8 @@ class MBXMapView
     }
     else if (pinch.state == UIGestureRecognizerStateEnded)
     {
+        mapView->map.stopScaling();
+
         if (fabsf(pinch.velocity) < 20)
             return;
 
@@ -270,6 +276,10 @@ class MBXMapView
 
         mapView->map.scaleBy(new_scale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y, duration);
     }
+    else if (pinch.state == UIGestureRecognizerStateCancelled)
+    {
+        mapView->map.stopScaling();
+    }
 
     [self updateRender];
 }
@@ -280,11 +290,17 @@ class MBXMapView
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
+        mapView->map.startRotating();
+
         self.angle = mapView->map.getAngle();
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
         mapView->map.setAngle(self.angle + rotate.rotation, [rotate locationInView:rotate.view].x, [rotate locationInView:rotate.view].y);
+    }
+    else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
+    {
+        mapView->map.stopRotating();
     }
 
     [self updateRender];
@@ -373,27 +389,27 @@ class MBXMapView
     return ([validSimultaneousGestures containsObject:[gestureRecognizer class]] && [validSimultaneousGestures containsObject:[otherGestureRecognizer class]]);
 }
 
-CADisplayLink *displayLink;
 MBXMapView *mapView;
-NSOperationQueue *queue = NULL;
+CADisplayLink *displayLink;
+NSOperationQueue *queue;
 
 namespace llmr
 {
     namespace platform
     {
-        void restart(void *)
+        void restart()
         {
+            [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
         }
 
-        void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb)
+        void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@1 forKey:@"count"]];
 
-            if (!queue) {
-                queue = [[NSOperationQueue alloc] init];
-            }
+            if (!queue)
+                queue = [NSOperationQueue new];
 
-            NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithUTF8String:url.c_str()]]];
+            NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@(url.c_str())]];
 
             [NSURLConnection sendAsynchronousRequest:urlRequest
                                                queue:queue
@@ -407,10 +423,11 @@ namespace llmr
                     res.body = { (const char *)[data bytes], [data length] };
                 }
 
-                func(res);
+                background_function(res);
 
-                dispatch_async(dispatch_get_main_queue(), ^(void) {
-                   cb();
+                dispatch_async(dispatch_get_main_queue(), ^(void)
+                {
+                   foreground_callback();
                 });
 
                 [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@(-1) forKey:@"count"]];

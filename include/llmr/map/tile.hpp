@@ -23,6 +23,7 @@ class VectorTile;
 class VectorTileLayer;
 class FillVertexBuffer;
 class LineVertexBuffer;
+class PointVertexBuffer;
 class TriangleElementsBuffer;
 class LineElementsBuffer;
 class PointElementsBuffer;
@@ -59,6 +60,7 @@ public:
     std::shared_ptr<Bucket> createBucket(const VectorTile& tile, const BucketDescription& bucket_desc);
     std::shared_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
     std::shared_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
+    std::shared_ptr<Bucket> createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
 
     void cancel();
 
@@ -77,6 +79,7 @@ public:
 
     std::shared_ptr<FillVertexBuffer> fillVertexBuffer;
     std::shared_ptr<LineVertexBuffer> lineVertexBuffer;
+    std::shared_ptr<PointVertexBuffer> pointVertexBuffer;
 
     std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
     std::shared_ptr<LineElementsBuffer> lineElementsBuffer;

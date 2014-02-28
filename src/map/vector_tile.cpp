@@ -52,13 +52,13 @@ FilteredVectorTileLayer::FilteredVectorTileLayer(const VectorTileLayer& layer, c
         // Find out what key/value IDs we need.
         auto key_it = std::find(layer.keys.begin(), layer.keys.end(), bucket_desc.source_field);
         if (key_it != layer.keys.end()) {
-            key = key_it - layer.keys.begin();
+            key = (int32_t)(key_it - layer.keys.begin());
         }
 
         for (const Value& source_value : bucket_desc.source_value) {
             auto value_it = std::find(layer.values.begin(), layer.values.end(), source_value);
             if (value_it != layer.values.end()) {
-                values.insert(value_it - layer.values.begin());
+                values.insert((uint32_t)(value_it - layer.values.begin()));
             }
         }
     }
