@@ -41,10 +41,10 @@ std::forward_list<Tile::ID> Tile::children(const ID& id, int32_t z) {
 }
 
 
-Tile::Tile(ID id, const Style& style)
+Tile::Tile(ID id, const Style& style, bool use_raster)
     : id(id),
       state(initial),
-      is_raster(true),
+      use_raster(use_raster),
       raster(),
       fillVertexBuffer(std::make_shared<FillVertexBuffer>()),
       lineVertexBuffer(std::make_shared<LineVertexBuffer>()),
@@ -71,7 +71,7 @@ void Tile::request() {
     state = Tile::loading;
 
     // Create http request
-    std::string url = util::sprintf(kTileURL,
+    std::string url = util::sprintf((use_raster ? kTileRasterURL : kTileVectorURL),
         id.z, id.x, id.y);
 
     // Note: Somehow this feels slower than the change to request_http()
@@ -100,7 +100,7 @@ void Tile::cancel() {
 bool Tile::parse() {
     // std::lock_guard<std::mutex> lock(mtx);
 
-    if (is_raster) {
+    if (use_raster) {
         raster = std::make_shared<util::Raster>();
         raster->load(data);
         state = ready;

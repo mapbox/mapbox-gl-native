@@ -59,6 +59,12 @@ void Map::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb
     update();
 }
 
+void Map::toggleRaster() {
+    use_raster = ! use_raster;
+    tiles.clear();
+    update();
+}
+
 void Map::moveBy(double dx, double dy, double duration) {
     transform.moveBy(dx, dy, duration);
     update();
@@ -252,7 +258,7 @@ Tile::Ptr Map::addTile(const Tile::ID& id) {
 
     if (!tile.get()) {
         // We couldn't find the tile in the list. Create a new one.
-        tile = std::make_shared<Tile>(id, style);
+        tile = std::make_shared<Tile>(id, style, use_raster);
         assert(tile);
         // std::cerr << "init " << id.z << "/" << id.x << "/" << id.y << std::endl;
         // std::cerr << "add " << tile->toString() << std::endl;

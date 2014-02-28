@@ -49,7 +49,7 @@ public:
     };
 
 public:
-    Tile(ID id, const Style& style);
+    Tile(ID id, const Style& style, bool use_raster = false);
     ~Tile();
 
     // Start loading the tile.
@@ -73,7 +73,7 @@ public:
 public:
     const ID id;
     state state;
-    const bool is_raster;
+    const bool use_raster;
     std::shared_ptr<util::Raster> raster;
 
     // Holds the actual geometries in this tile.

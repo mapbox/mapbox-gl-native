@@ -141,7 +141,7 @@ void Painter::render(const Tile::Ptr& tile) {
 
     drawClippingMask();
 
-    if (tile->is_raster)
+    if (tile->use_raster)
         renderRaster(tile);
     else
         renderLayers(tile, style.layers);

@@ -25,6 +25,7 @@ public:
     void loadSprite(const std::string& url);
     void loadSettings();
     void resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb_height);
+    void toggleRaster();
 
     /* callback */
     bool render();
@@ -80,6 +81,8 @@ private:
     int32_t max_zoom;
 
     float pixel_ratio;
+
+    bool use_raster = false;
 
     std::forward_list<std::shared_ptr<Tile>> tiles;
     std::forward_list<std::shared_ptr<Tile>> historic_tiles;
