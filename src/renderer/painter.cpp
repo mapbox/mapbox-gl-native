@@ -157,7 +157,7 @@ void Painter::renderRaster(const std::shared_ptr<Tile>& tile) {
     useProgram(rasterShader->program);
     rasterShader->setMatrix(matrix);
     rasterShader->setImage(0);
-    tile->raster->bind(transform.rotating || transform.scaling || transform.panning);
+    tile->raster->bind(true);
 
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
