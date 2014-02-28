@@ -80,12 +80,14 @@ public:
                 case GLFW_KEY_TAB:
                     mapView->map.toggleDebug();
                     break;
-                case GLFW_KEY_R:
+                case GLFW_KEY_X:
                     if (!mods) mapView->map.resetPosition();
                     break;
                 case GLFW_KEY_N:
                     if (!mods) mapView->map.resetNorth();
                     break;
+                case GLFW_KEY_R:
+                    if (!mods) mapView->map.toggleRaster();
             }
         }
     }
