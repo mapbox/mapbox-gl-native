@@ -9,7 +9,6 @@
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
 #include <llmr/renderer/point_bucket.hpp>
-#include <llmr/platform/platform.hpp>
 #include <llmr/util/pbf.hpp>
 #include <llmr/util/string.hpp>
 
@@ -76,22 +75,25 @@ void Tile::request() {
 
     // Note: Somehow this feels slower than the change to request_http()
     std::shared_ptr<Tile> tile = shared_from_this();
-    platform::request_http(url, [=](platform::Response& res) {
-        if (res.code == 200) {
+    platform::Request request = platform::request_http(url, [=](platform::Response& res) {
+        if (res.code == 200 && tile->state != obsolete) {
+            tile->state = Tile::loaded;
             tile->data.swap(res.body);
             tile->parse();
-        } else {
+        } else if (tile->state != obsolete) {
             fprintf(stderr, "tile loading failed\n");
         }
     }, []() {
         platform::restart();
     });
+    req = request;
 }
 
 void Tile::cancel() {
     // TODO: thread safety
     if (state != obsolete) {
         state = obsolete;
+        platform::cancel_request_http(req);
     } else {
         assert((!"logic error? multiple cancelleations"));
     }
@@ -103,11 +105,11 @@ bool Tile::parse() {
     if (use_raster) {
         raster = std::make_shared<util::Raster>();
         raster->load(data);
-        state = ready;
+        state = parsed;
         return true;
     }
 
-    if (state == obsolete) {
+    if (state != loaded) {
         return false;
     }
 
@@ -123,7 +125,7 @@ bool Tile::parse() {
     if (state == obsolete) {
         return false;
     } else {
-        state = ready;
+        state = parsed;
     }
 
     return true;

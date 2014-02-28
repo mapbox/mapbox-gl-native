@@ -135,7 +135,7 @@ void Painter::clear() {
 }
 
 void Painter::render(const Tile::Ptr& tile) {
-    if (tile->state != Tile::ready) {
+    if (tile->state != Tile::parsed) {
         return;
     }
 
