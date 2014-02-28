@@ -16,6 +16,7 @@
 
 #include <llmr/llmr.hpp>
 #include <llmr/platform/platform.hpp>
+#include <llmr/map/tile.hpp>
 
 NSString *const MBXNeedsRenderNotification = @"MBXNeedsRenderNotification";
 NSString *const MBXUpdateActivityNotification = @"MBXUpdateActivityNotification";
@@ -23,7 +24,6 @@ NSString *const MBXUpdateActivityNotification = @"MBXUpdateActivityNotification"
 @interface MBXViewController () <UIGestureRecognizerDelegate>
 
 @property (nonatomic) EAGLContext *context;
-@property (nonatomic) NSUInteger activityCount;
 @property (nonatomic) CGPoint center;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
@@ -153,11 +153,10 @@ class MBXMapView
 
 - (void)updateNetworkActivity:(NSNotification *)notification
 {
-    NSInteger input = [[notification userInfo][@"count"] integerValue];
-
-    self.activityCount += input;
-
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:(self.activityCount > 0)];
+    [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
+    {
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:([downloadTasks count] > 0)];
+    }];
 }
 
 - (void)updateRender
@@ -391,7 +390,6 @@ class MBXMapView
 
 MBXMapView *mapView;
 CADisplayLink *displayLink;
-NSOperationQueue *queue;
 
 namespace llmr
 {
@@ -402,22 +400,15 @@ namespace llmr
             [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
         }
 
-        void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
+        Request request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
         {
-            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@1 forKey:@"count"]];
-
-            if (!queue)
-                queue = [NSOperationQueue new];
-
-            NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@(url.c_str())]];
-
-            [NSURLConnection sendAsynchronousRequest:urlRequest
-                                               queue:queue
-                                   completionHandler:^(NSURLResponse *response, NSData *data, NSError *error)
+            NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
             {
+                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+
                 Response res;
 
-                if (error == nil)
+                if ( ! error && [response isKindOfClass:[NSHTTPURLResponse class]])
                 {
                     res.code = [(NSHTTPURLResponse *)response statusCode];
                     res.body = { (const char *)[data bytes], [data length] };
@@ -427,11 +418,29 @@ namespace llmr
 
                 dispatch_async(dispatch_get_main_queue(), ^(void)
                 {
-                   foreground_callback();
+                    foreground_callback();
                 });
+            }];
 
-                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil userInfo:[NSDictionary dictionaryWithObject:@(-1) forKey:@"count"]];
-                [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
+            [task resume];
+
+            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+
+            Request req;
+
+            req.identifier = task.taskIdentifier;
+            req.original_url = url;
+
+            return req;
+        }
+
+        void cancel_request_http(Request request)
+        {
+            [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
+            {
+                for (NSURLSessionDownloadTask *task in downloadTasks)
+                    if (task.taskIdentifier == request.identifier)
+                        return [task cancel];
             }];
         }
 

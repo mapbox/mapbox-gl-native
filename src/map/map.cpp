@@ -278,7 +278,7 @@ bool Map::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::f
     auto ids = Tile::children(id, z + 1);
     for (const Tile::ID& child_id : ids) {
         const Tile::Ptr& tile = hasTile(child_id);
-        if (tile && tile->state == Tile::ready) {
+        if (tile && tile->state == Tile::parsed) {
             assert(tile);
             retain.emplace_front(tile->id);
         } else {
@@ -305,7 +305,7 @@ bool Map::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::for
     for (int32_t z = id.z - 1; z >= minCoveringZoom; --z) {
         const Tile::ID parent_id = Tile::parent(id, z);
         const Tile::Ptr tile = hasTile(parent_id);
-        if (tile && tile->state == Tile::ready) {
+        if (tile && tile->state == Tile::parsed) {
             assert(tile);
             retain.emplace_front(tile->id);
             return true;
@@ -361,7 +361,7 @@ bool Map::updateTiles() {
         Tile::Ptr tile = addTile(id);
         assert(tile);
 
-        if (tile->state != Tile::ready) {
+        if (tile->state != Tile::parsed) {
             // The tile we require is not yet loaded. Try to find a parent or
             // child tile that we already have.
 
@@ -416,7 +416,7 @@ bool Map::render() {
 
     for (Tile::Ptr& tile : tiles) {
         assert(tile);
-        if (tile->state == Tile::ready) {
+        if (tile->state == Tile::parsed) {
             painter.changeMatrix(tile->id);
             painter.render(tile);
         }

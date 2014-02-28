@@ -5,6 +5,7 @@
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/geometry/vao.hpp>
+#include <llmr/platform/platform.hpp>
 
 #include <cstdint>
 #include <forward_list>
@@ -43,7 +44,8 @@ public:
     enum state {
         initial,
         loading,
-        ready,
+        loaded,
+        parsed,
         obsolete
     };
 
@@ -92,8 +94,8 @@ public:
 private:
     // Source data
     std::string data;
-
     const Style& style;
+    platform::Request req;
 };
 
 }

@@ -3,6 +3,7 @@
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 #include <llmr/platform/platform.hpp>
+#include <llmr/map/tile.hpp>
 #include "settings.hpp"
 
 #include <cstdio>
@@ -239,33 +240,45 @@ void restart() {
     [[NSApplication sharedApplication] postEvent: [NSEvent eventWithCGEvent:event] atStart:NO];
 }
 
-void request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback) {
-    if (!queue) {
-        queue = [NSOperationQueue new];
-    }
-
-    NSMutableURLRequest *urlRequest = [NSMutableURLRequest
-                                       requestWithURL:[NSURL
-                                               URLWithString:@(url.c_str())]];
-
-    [NSURLConnection
-     sendAsynchronousRequest:urlRequest
-     queue:[NSOperationQueue mainQueue]
-     completionHandler: ^(NSURLResponse * response, NSData * data, NSError * error) {
+Request request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
+{
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+    {
         Response res;
-        if (error == nil) {
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-            res.code = [httpResponse statusCode];
+
+        if ( ! error && [response isKindOfClass:[NSHTTPURLResponse class]])
+        {
+            res.code = [(NSHTTPURLResponse *)response statusCode];
             res.body = { (const char *)[data bytes], [data length] };
         }
 
         background_function(res);
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
+
+        dispatch_async(dispatch_get_main_queue(), ^(void)
+        {
             foreground_callback();
         });
     }];
+
+    [task resume];
+
+    Request req;
+
+    req.identifier = task.taskIdentifier;
+    req.original_url = url;
+
+    return req;
 }
 
+void cancel_request_http(Request request)
+{
+    [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
+    {
+        for (NSURLSessionDownloadTask *task in downloadTasks)
+            if (task.taskIdentifier == request.identifier)
+                return [task cancel];
+    }];
+}
 
 double time() {
     return glfwGetTime();
