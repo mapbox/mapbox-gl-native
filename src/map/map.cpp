@@ -14,7 +14,7 @@ Map::Map(Settings& settings)
       style(),
       painter(transform, settings, style),
       min_zoom(0),
-      max_zoom(14) {
+      max_zoom((use_raster ? 19 : 14)) {
 }
 
 Map::~Map() {
@@ -61,6 +61,7 @@ void Map::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb
 
 void Map::toggleRaster() {
     use_raster = ! use_raster;
+    max_zoom = (use_raster ? 19 : 14);
     tiles.clear();
     update();
 }
