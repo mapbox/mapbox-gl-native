@@ -283,7 +283,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         patternShader->setPatternBottomRight({{ imagePos.br.x, imagePos.br.y }});
         patternShader->setColor(fill_color);
         patternShader->setMix(mix);
-        style.sprite->bind(true);
+        style.sprite->raster->bind(true);
 
         // Draw a rectangle that covers the entire viewport.
         coveringPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0));
@@ -414,7 +414,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     #endif
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
-    style.sprite->bind(transform.rotating || transform.scaling || transform.panning);
+    style.sprite->raster->bind(transform.rotating || transform.scaling || transform.panning);
     bucket.drawPoints(*pointShader);
 }
 
