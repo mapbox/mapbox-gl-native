@@ -29,7 +29,7 @@ const shader_source llmr::shaders[SHADER_COUNT] = {
        "#define root2 1.4142135623730951\n\nuniform sampler2D u_image;\nuniform vec2 u_tl;\nuniform vec2 u_br;\nuniform vec4 u_color;\n\nuniform vec2 pos;\nuniform float inbounds;\nuniform vec4 color;\n\nvoid main() {\n    vec2 pos = (gl_PointCoord * 2.0 - 1.0) * root2 / 2.0 + 0.5;\n\n    float inbounds = step(0.0, pos.x) * step(0.0, pos.y) *\n        (1.0 - step(1.0, pos.x)) * (1.0 - step(1.0, pos.y));\n\n    vec4 color = texture2D(u_image, mix(u_tl, u_br, pos)) * inbounds;\n\n    gl_FragColor = color * u_color;\n}\n",
    },
    {
-       "uniform mat4 u_matrix;\n\nattribute vec2 a_pos;\nattribute vec2 texCoord;\n\nvarying vec2 texCoordVar;\n\nvoid main() {\n    gl_Position = u_matrix * vec4(a_pos, 0, 1);\n    gl_PointSize = 10.0;\n    texCoordVar = texCoord;\n}\n",
-       "uniform sampler2D u_image;\n\nvarying vec2 texCoordVar;\n\nvoid main() {\n    vec4 color = vec4(gl_PointCoord.s, gl_PointCoord.t, 0, 1);\n\n    gl_FragColor = color; //texture2D(u_image, texCoordVar);\n}\n",
+       "uniform mat4 u_matrix;\n\nattribute vec2 a_pos;\n\nvarying vec2 v_pos;\n\nvoid main() {\n    gl_Position = u_matrix * vec4(a_pos, 0, 1);\n    v_pos = a_pos / 4096.0;\n}\n",
+       "uniform sampler2D u_image;\n\nvarying vec2 v_pos;\n\nvoid main() {\n    gl_FragColor = texture2D(u_image, v_pos);\n}\n",
    }
 };
