@@ -102,15 +102,15 @@ void Tile::cancel() {
 bool Tile::parse() {
     // std::lock_guard<std::mutex> lock(mtx);
 
+    if (state != loaded) {
+        return false;
+    }
+
     if (use_raster) {
         raster = std::make_shared<util::Raster>();
         raster->load(data);
         state = parsed;
         return true;
-    }
-
-    if (state != loaded) {
-        return false;
     }
 
     try {
