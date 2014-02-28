@@ -13,7 +13,7 @@
 #include <llmr/renderer/shader-line.hpp>
 #include <llmr/renderer/shader-linejoin.hpp>
 #include <llmr/renderer/shader-point.hpp>
-
+#include <llmr/renderer/shader-raster.hpp>
 
 namespace llmr {
 
@@ -43,6 +43,7 @@ public:
 private:
     void setupShaders();
     void drawClippingMask();
+    void renderRaster(const std::shared_ptr<Tile>& tile);
     void renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers);
     void renderDebug(const std::shared_ptr<Tile>& tile);
 
@@ -67,6 +68,7 @@ private:
     std::unique_ptr<LinejoinShader> linejoinShader;
     std::unique_ptr<PatternShader> patternShader;
     std::unique_ptr<PointShader> pointShader;
+    std::unique_ptr<RasterShader> rasterShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     VertexBuffer tileStencilBuffer = {
@@ -83,6 +85,7 @@ private:
 
     VertexArrayObject<PlainShader> coveringPlainArray;
     VertexArrayObject<PatternShader> coveringPatternArray;
+    VertexArrayObject<RasterShader> coveringRasterArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
     VertexBuffer tileBorderBuffer = {

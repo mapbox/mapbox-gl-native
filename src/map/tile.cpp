@@ -13,7 +13,6 @@
 #include <llmr/util/pbf.hpp>
 #include <llmr/util/string.hpp>
 
-
 using namespace llmr;
 
 Tile::ID Tile::parent(const ID& id, int32_t z) {
@@ -45,6 +44,8 @@ std::forward_list<Tile::ID> Tile::children(const ID& id, int32_t z) {
 Tile::Tile(ID id, const Style& style)
     : id(id),
       state(initial),
+      is_raster(true),
+      raster(),
       fillVertexBuffer(std::make_shared<FillVertexBuffer>()),
       lineVertexBuffer(std::make_shared<LineVertexBuffer>()),
       pointVertexBuffer(std::make_shared<PointVertexBuffer>()),
@@ -98,6 +99,13 @@ void Tile::cancel() {
 
 bool Tile::parse() {
     // std::lock_guard<std::mutex> lock(mtx);
+
+    if (is_raster) {
+        raster = std::make_shared<util::Raster>();
+        raster->load(data);
+        state = ready;
+        return true;
+    }
 
     if (state == obsolete) {
         return false;

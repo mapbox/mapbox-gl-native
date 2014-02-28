@@ -3,6 +3,7 @@
 
 #include <llmr/util/vec.hpp>
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/util/raster.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/geometry/vao.hpp>
 
@@ -72,6 +73,8 @@ public:
 public:
     const ID id;
     state state;
+    const bool is_raster;
+    std::shared_ptr<util::Raster> raster;
 
     // Holds the actual geometries in this tile.
     DebugFontBuffer debugFontBuffer;

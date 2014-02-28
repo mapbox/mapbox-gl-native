@@ -15,6 +15,7 @@
 #include <llmr/platform/gl.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/style/sprite.hpp>
+#include <llmr/util/raster.hpp>
 
 using namespace llmr;
 
@@ -36,6 +37,7 @@ void Painter::setup() {
     assert(lineShader);
     assert(linejoinShader);
     assert(patternShader);
+    assert(rasterShader);
 
     glEnable(GL_STENCIL_TEST);
 
@@ -55,6 +57,7 @@ void Painter::setupShaders() {
     linejoinShader = std::make_unique<LinejoinShader>();
     patternShader = std::make_unique<PatternShader>();
     pointShader = std::make_unique<PointShader>();
+    rasterShader = std::make_unique<RasterShader>();
 }
 
 void Painter::useProgram(uint32_t program) {
@@ -138,13 +141,26 @@ void Painter::render(const Tile::Ptr& tile) {
 
     drawClippingMask();
 
-    renderLayers(tile, style.layers);
+    if (tile->is_raster)
+        renderRaster(tile);
+    else
+        renderLayers(tile, style.layers);
 
     if (settings.debug) {
         renderDebug(tile);
     }
 
     renderBackground();
+}
+
+void Painter::renderRaster(const std::shared_ptr<Tile>& tile) {
+    useProgram(rasterShader->program);
+    rasterShader->setMatrix(matrix);
+    rasterShader->setImage(0);
+    tile->raster->bind(transform.rotating || transform.scaling || transform.panning);
+
+    coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
 
 void Painter::renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers) {

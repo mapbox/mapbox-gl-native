@@ -28,7 +28,7 @@ void Raster::load(const std::string& data) {
     std::lock_guard<std::mutex> lock(raster->mtx);
     if (raster->img) {
         raster->loaded = true;
-        fprintf(stderr, "raster loaded\n");
+//        fprintf(stderr, "raster loaded\n");
     }
 }
 
