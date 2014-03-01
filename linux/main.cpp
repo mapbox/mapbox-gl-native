@@ -7,6 +7,7 @@
 #include <list>
 #include <forward_list>
 #include <chrono>
+#include <atomic>
 
 #include <pthread.h>
 
@@ -15,10 +16,9 @@ namespace platform {
 
 struct Request {
     pthread_t thread;
-    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     std::string url;
-    bool done = false;
-    bool cancel = false;
+    std::atomic<bool> done;
+    std::atomic<bool> cancel;
     std::function<void(Response&)> background_function;
     std::function<void()> foreground_callback;
 };
@@ -185,17 +185,13 @@ public:
         while (!glfwWindowShouldClose(window)) {
             bool& dirty = this->dirty;
             requests.remove_if([&dirty](llmr::platform::Request * req) {
-                pthread_mutex_lock(&req->mutex);
                 if (req->done) {
-                    pthread_mutex_unlock(&req->mutex);
                     req->foreground_callback();
                     pthread_join(req->thread, nullptr);
-                    pthread_mutex_destroy(&req->mutex);
                     delete req;
                     dirty = true;
                     return true;
                 } else {
-                    pthread_mutex_unlock(&req->mutex);
                     return false;
                 }
             });
@@ -276,12 +272,7 @@ static size_t curl_write_callback(void *contents, size_t size, size_t nmemb, voi
 
 static int curl_progress_callback(void *ptr, double dltotal, double dlnow, double ultotal, double ulnow) {
     Request *req = static_cast<Request *>(ptr);
-
-    pthread_mutex_lock(&req->mutex);
-    bool cancel = req->cancel;
-    pthread_mutex_unlock(&req->mutex);
-
-    return cancel;
+    return req->cancel;
 }
 
 void *request_http(void *ptr) {
@@ -312,9 +303,7 @@ void *request_http(void *ptr) {
         }
     }
 
-    pthread_mutex_lock(&req->mutex);
     req->done = true;
-    pthread_mutex_unlock(&req->mutex);
 
     pthread_exit(nullptr);
 }
@@ -338,9 +327,7 @@ void cancel_request_http(Request *request) {
     auto it = std::find(requests.begin(), requests.end(), request);
     if (it != requests.end()) {
         Request *req = *it;
-        pthread_mutex_lock(&req->mutex);
         req->cancel = true;
-        pthread_mutex_unlock(&req->mutex);
     }
 }
 
