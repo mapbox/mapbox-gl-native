@@ -95,7 +95,7 @@ private:
     // Source data
     std::string data;
     const Style& style;
-    platform::Request req;
+    platform::Request *req = nullptr;
 };
 
 }

@@ -5,15 +5,28 @@
 #include "settings.hpp"
 #include <future>
 #include <list>
+#include <forward_list>
 #include <chrono>
 
-#include <thread>
+#include <pthread.h>
 
-std::list<std::future<void>> futures;
-std::list<std::future<void>>::iterator f_it;
-std::list<std::function<void()>> callbacks;
-std::list<std::function<void()>>::iterator c_it;
-std::chrono::milliseconds zero (0);
+namespace llmr {
+namespace platform {
+
+struct Request {
+    pthread_t thread;
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    std::string url;
+    bool done = false;
+    std::function<void(Response&)> background_function;
+    std::function<void()> foreground_callback;
+};
+
+}
+}
+
+std::forward_list<llmr::platform::Request *> requests;
+
 
 class MapView {
 public:
@@ -159,21 +172,22 @@ public:
 
     int run() {
         while (!glfwWindowShouldClose(window)) {
-
-            f_it = futures.begin();
-            c_it = callbacks.begin();
-
-            while (f_it != futures.end()) {
-                if (f_it->wait_for(zero) == std::future_status::ready) {
-                    std::function<void()> cb = *c_it;
-                    futures.erase(f_it++);
-                    callbacks.erase(c_it++);
-                    cb();
+            bool& dirty = this->dirty;
+            requests.remove_if([&dirty](llmr::platform::Request *req) {
+                pthread_mutex_lock(&req->mutex);
+                if (req->done) {
+                    pthread_mutex_unlock(&req->mutex);
+                    req->foreground_callback();
+                    pthread_join(req->thread, nullptr);
+                    pthread_mutex_destroy(&req->mutex);
+                    delete req;
+                    dirty = true;
+                    return true;
                 } else {
-                    f_it++;
-                    c_it++;
+                    pthread_mutex_unlock(&req->mutex);
+                    return false;
                 }
-            }
+            });
 
             if (dirty) {
                 try {
@@ -185,7 +199,7 @@ public:
                 fps();
             }
 
-            if (dirty || futures.size()) {
+            if (!requests.empty() || dirty) {
                 glfwPollEvents();
             } else {
                 glfwWaitEvents();
@@ -237,29 +251,29 @@ MapView *mapView = nullptr;
 namespace llmr {
 namespace platform {
 
-void restart(void *) {
+void restart() {
     if (mapView) {
         mapView->dirty = true;
     }
 }
 
-
-
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
-    ((std::string*)userp)->append((char*)contents, size *nmemb);
+    ((std::string *)userp)->append((char *)contents, size * nmemb);
     return size * nmemb;
 }
 
-void request_http_async(std::string url, std::function<void(Response&)> func) {
-
+void *request_http(void *ptr) {
+    Request *req = static_cast<Request *>(ptr);
     Response res;
+
+    // TODO: use curl multi to be able to cancel
 
     CURL *curl;
     CURLcode code;
     curl = curl_easy_init();
 
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, req->url.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res.body);
         curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "deflate");
@@ -268,14 +282,33 @@ void request_http_async(std::string url, std::function<void(Response&)> func) {
         curl_easy_cleanup(curl);
     }
 
-    func(res);
+    req->background_function(res);
+
+    pthread_mutex_lock(&req->mutex);
+    req->done = true;
+    pthread_mutex_unlock(&req->mutex);
+
+    pthread_exit(nullptr);
 }
 
-void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
-    futures.emplace_back(std::async(std::launch::async, request_http_async, url, func));
-    callbacks.push_back(cb);
+Request *request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback) {
+    Request *req = new Request();
+    req->url = url;
+    req->background_function = background_function;
+    req->foreground_callback = foreground_callback;
+    requests.push_front(req);
+    int rc = pthread_create(&req->thread, nullptr, request_http, (void *)req);
+    if (rc) {
+        fprintf(stderr, "http request failed\n");
+        return nullptr;
+    }
+
+    return req;
 }
 
+void cancel_request_http(Request *request) {
+    fprintf(stderr, "cancel %p\n", request);
+}
 
 double time() {
     return glfwGetTime();
@@ -285,10 +318,13 @@ double time() {
 }
 
 int main() {
+    curl_global_init(CURL_GLOBAL_ALL);
+
     mapView = new MapView();
     mapView->init();
     int ret = mapView->run();
     mapView->settings.sync();
     delete mapView;
+    pthread_exit(NULL);
     return ret;
 }
