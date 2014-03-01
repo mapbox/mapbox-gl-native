@@ -18,6 +18,7 @@ struct Request {
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     std::string url;
     bool done = false;
+    bool cancel = false;
     std::function<void(Response&)> background_function;
     std::function<void()> foreground_callback;
 };
@@ -25,8 +26,18 @@ struct Request {
 }
 }
 
+pthread_mutex_t curl_share_mutex = PTHREAD_MUTEX_INITIALIZER;
+CURLSH *curl_share;
 std::forward_list<llmr::platform::Request *> requests;
 
+
+void curl_share_lock(CURL *, curl_lock_data, curl_lock_access, void *) {
+    pthread_mutex_lock(&curl_share_mutex);
+}
+
+void curl_share_unlock(CURL *, curl_lock_data, void *) {
+    pthread_mutex_unlock(&curl_share_mutex);
+}
 
 class MapView {
 public:
@@ -173,7 +184,7 @@ public:
     int run() {
         while (!glfwWindowShouldClose(window)) {
             bool& dirty = this->dirty;
-            requests.remove_if([&dirty](llmr::platform::Request *req) {
+            requests.remove_if([&dirty](llmr::platform::Request * req) {
                 pthread_mutex_lock(&req->mutex);
                 if (req->done) {
                     pthread_mutex_unlock(&req->mutex);
@@ -257,9 +268,20 @@ void restart() {
     }
 }
 
-static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
+static size_t curl_write_callback(void *contents, size_t size, size_t nmemb, void *userp) {
     ((std::string *)userp)->append((char *)contents, size * nmemb);
     return size * nmemb;
+}
+
+
+static int curl_progress_callback(void *ptr, double dltotal, double dlnow, double ultotal, double ulnow) {
+    Request *req = static_cast<Request *>(ptr);
+
+    pthread_mutex_lock(&req->mutex);
+    bool cancel = req->cancel;
+    pthread_mutex_unlock(&req->mutex);
+
+    return cancel;
 }
 
 void *request_http(void *ptr) {
@@ -274,15 +296,21 @@ void *request_http(void *ptr) {
 
     if (curl) {
         curl_easy_setopt(curl, CURLOPT_URL, req->url.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_callback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res.body);
+        curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, curl_progress_callback);
+        curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, req);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
         curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "deflate");
+        curl_easy_setopt(curl, CURLOPT_SHARE, curl_share);
         code = curl_easy_perform(curl);
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &res.code);
         curl_easy_cleanup(curl);
-    }
 
-    req->background_function(res);
+        if (code != CURLE_ABORTED_BY_CALLBACK) {
+            req->background_function(res);
+        }
+    }
 
     pthread_mutex_lock(&req->mutex);
     req->done = true;
@@ -307,7 +335,13 @@ Request *request_http(std::string url, std::function<void(Response&)> background
 }
 
 void cancel_request_http(Request *request) {
-    fprintf(stderr, "cancel %p\n", request);
+    auto it = std::find(requests.begin(), requests.end(), request);
+    if (it != requests.end()) {
+        Request *req = *it;
+        pthread_mutex_lock(&req->mutex);
+        req->cancel = true;
+        pthread_mutex_unlock(&req->mutex);
+    }
 }
 
 double time() {
@@ -317,14 +351,20 @@ double time() {
 }
 }
 
+
 int main() {
     curl_global_init(CURL_GLOBAL_ALL);
+    curl_share = curl_share_init();
+    curl_share_setopt(curl_share, CURLSHOPT_LOCKFUNC, curl_share_lock);
+    curl_share_setopt(curl_share, CURLSHOPT_UNLOCKFUNC, curl_share_unlock);
 
     mapView = new MapView();
     mapView->init();
     int ret = mapView->run();
     mapView->settings.sync();
     delete mapView;
+
+    curl_share_cleanup(curl_share);
     pthread_exit(NULL);
     return ret;
 }
