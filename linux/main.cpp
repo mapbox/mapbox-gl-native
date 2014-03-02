@@ -1,43 +1,13 @@
 #include <llmr/llmr.hpp>
 #include <GLFW/glfw3.h>
-#include <curl/curl.h>
 #include <llmr/platform/platform.hpp>
-#include "settings.hpp"
 #include <future>
 #include <list>
-#include <forward_list>
-#include <chrono>
-#include <atomic>
 
-#include <pthread.h>
+#include "settings.hpp"
+#include "request.hpp"
 
-namespace llmr {
-namespace platform {
-
-struct Request {
-    pthread_t thread;
-    std::string url;
-    std::atomic<bool> done;
-    std::atomic<bool> cancel;
-    std::function<void(Response&)> background_function;
-    std::function<void()> foreground_callback;
-};
-
-}
-}
-
-pthread_mutex_t curl_share_mutex = PTHREAD_MUTEX_INITIALIZER;
-CURLSH *curl_share;
 std::forward_list<llmr::platform::Request *> requests;
-
-
-void curl_share_lock(CURL *, curl_lock_data, curl_lock_access, void *) {
-    pthread_mutex_lock(&curl_share_mutex);
-}
-
-void curl_share_unlock(CURL *, curl_lock_data, void *) {
-    pthread_mutex_unlock(&curl_share_mutex);
-}
 
 class MapView {
 public:
@@ -187,7 +157,6 @@ public:
             requests.remove_if([&dirty](llmr::platform::Request * req) {
                 if (req->done) {
                     req->foreground_callback();
-                    pthread_join(req->thread, nullptr);
                     delete req;
                     dirty = true;
                     return true;
@@ -264,70 +233,17 @@ void restart() {
     }
 }
 
-static size_t curl_write_callback(void *contents, size_t size, size_t nmemb, void *userp) {
-    ((std::string *)userp)->append((char *)contents, size * nmemb);
-    return size * nmemb;
-}
-
-
-static int curl_progress_callback(void *ptr, double dltotal, double dlnow, double ultotal, double ulnow) {
-    Request *req = static_cast<Request *>(ptr);
-    return req->cancel;
-}
-
-void *request_http(void *ptr) {
-    Request *req = static_cast<Request *>(ptr);
-    Response res;
-
-    // TODO: use curl multi to be able to cancel
-
-    CURL *curl;
-    CURLcode code;
-    curl = curl_easy_init();
-
-    if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, req->url.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_callback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res.body);
-        curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, curl_progress_callback);
-        curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, req);
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
-        curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "deflate");
-        curl_easy_setopt(curl, CURLOPT_SHARE, curl_share);
-        code = curl_easy_perform(curl);
-        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &res.code);
-        curl_easy_cleanup(curl);
-
-        if (code != CURLE_ABORTED_BY_CALLBACK) {
-            req->background_function(res);
-        }
-    }
-
-    req->done = true;
-
-    pthread_exit(nullptr);
-}
-
 Request *request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback) {
-    Request *req = new Request();
-    req->url = url;
-    req->background_function = background_function;
-    req->foreground_callback = foreground_callback;
+    Request *req = new Request(url, background_function, foreground_callback);
     requests.push_front(req);
-    int rc = pthread_create(&req->thread, nullptr, request_http, (void *)req);
-    if (rc) {
-        fprintf(stderr, "http request failed\n");
-        return nullptr;
-    }
-
     return req;
 }
 
 void cancel_request_http(Request *request) {
-    auto it = std::find(requests.begin(), requests.end(), request);
-    if (it != requests.end()) {
-        Request *req = *it;
-        req->cancel = true;
+    for (Request *req : requests) {
+        if (req == request) {
+            req->cancel();
+        }
     }
 }
 
@@ -341,9 +257,6 @@ double time() {
 
 int main() {
     curl_global_init(CURL_GLOBAL_ALL);
-    curl_share = curl_share_init();
-    curl_share_setopt(curl_share, CURLSHOPT_LOCKFUNC, curl_share_lock);
-    curl_share_setopt(curl_share, CURLSHOPT_UNLOCKFUNC, curl_share_unlock);
 
     mapView = new MapView();
     mapView->init();
@@ -351,7 +264,6 @@ int main() {
     mapView->settings.sync();
     delete mapView;
 
-    curl_share_cleanup(curl_share);
     pthread_exit(NULL);
     return ret;
 }

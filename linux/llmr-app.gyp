@@ -11,7 +11,9 @@
         "sources": [
             "./main.cpp",
             "./settings.cpp",
-            "./settings.hpp"
+            "./settings.hpp",
+            "./request.cpp",
+            "./request.hpp"
         ],
         'conditions': [
             ['OS == "mac"', {
