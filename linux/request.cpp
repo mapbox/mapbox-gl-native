@@ -39,6 +39,7 @@ void Request::initialize() {
 }
 
 void Request::finish() {
+    pthread_key_delete(key);
     curl_share_cleanup(curl_share);
 }
 
@@ -50,7 +51,6 @@ Request::Request(std::string url, std::function<void(platform::Response&)> bg, s
       foreground_callback(fg) {
     llmr::util::threadpool->add(request, this);
 }
-
 
 pthread_key_t Request::key;
 pthread_once_t Request::key_once = PTHREAD_ONCE_INIT;
