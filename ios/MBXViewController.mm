@@ -395,17 +395,22 @@ namespace llmr
 {
     namespace platform
     {
+
+        class Request {
+        public:
+            int16_t identifier;
+            std::string original_url;
+        };
+
         void restart()
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
         }
 
-        Request request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
+        Request *request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
         {
             NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
             {
-                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
-
                 Response res;
 
                 if ( ! error && [response isKindOfClass:[NSHTTPURLResponse class]])
@@ -424,22 +429,20 @@ namespace llmr
 
             [task resume];
 
-            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+            Request *req = new Request();
 
-            Request req;
-
-            req.identifier = task.taskIdentifier;
-            req.original_url = url;
+            req->identifier = task.taskIdentifier;
+            req->original_url = url;
 
             return req;
         }
 
-        void cancel_request_http(Request request)
+        void cancel_request_http(Request *request)
         {
             [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
             {
                 for (NSURLSessionDownloadTask *task in downloadTasks)
-                    if (task.taskIdentifier == request.identifier)
+                    if (task.taskIdentifier == request->identifier)
                         return [task cancel];
             }];
         }
