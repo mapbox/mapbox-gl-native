@@ -18,7 +18,7 @@ void Settings_MacOSX::load()
         rapidjson::Document document;
         document.ParseStream<0>(is);
         if (document.IsArray()) {
-            latitude = document[rapidjson::SizeType(0)].GetDouble();
+            longitude = document[rapidjson::SizeType(0)].GetDouble();
             latitude = document[1].GetDouble();
             scale = document[2].GetDouble();
             angle = document[3].GetDouble();
