@@ -20,6 +20,12 @@ linux: config.gypi src linux/llmr-app.gyp
 	make -C build/linux-make V=$(V)
 	./build/linux-make/out/Release/llmr.app
 
+
+# build OS X app with Xcode
+lproj: config.gypi src linux/llmr-app.gyp
+	deps/run_gyp linux/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
+	open ./linux/llmr-app.xcodeproj
+
 # build just xcode project for libllmr
 xcode: config.gypi llmr.gyp
 	deps/run_gyp llmr.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode

@@ -32,7 +32,7 @@ public:
 
     void setup();
     void clear();
-    void changeMatrix(const Tile::ID& id);
+    void changeMatrix();
     void render(const std::shared_ptr<Tile>& tile);
     void renderMatte();
     void renderBackground();
@@ -40,9 +40,11 @@ public:
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id);
 
+    void prepareClippingMask();
+    void drawClippingMask(const mat4& matrix, uint8_t clip_id);
+    void finishClippingMask();
 private:
     void setupShaders();
-    void drawClippingMask();
     void renderRaster(const std::shared_ptr<Tile>& tile);
     void renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers);
     void renderDebug(const std::shared_ptr<Tile>& tile);
@@ -50,14 +52,16 @@ private:
     void useProgram(uint32_t program);
     void lineWidth(float lineWidth);
 
+public:
+    mat4 matrix;
+    mat4 projMatrix;
+    mat4 nativeMatrix;
+    mat4 extrudeMatrix;
+
 private:
     Transform& transform;
     Settings& settings;
     Style& style;
-
-    mat4 nativeMatrix;
-    mat4 matrix;
-    mat4 exMatrix;
 
     uint32_t gl_program = 0;
     float gl_lineWidth = 0;
@@ -83,9 +87,9 @@ private:
         4096, 4096
     };
 
-    VertexArrayObject<PlainShader> coveringPlainArray;
-    VertexArrayObject<PatternShader> coveringPatternArray;
-    VertexArrayObject<RasterShader> coveringRasterArray;
+    VertexArrayObject coveringPlainArray;
+    VertexArrayObject coveringPatternArray;
+    VertexArrayObject coveringRasterArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
     VertexBuffer tileBorderBuffer = {
@@ -96,7 +100,7 @@ private:
         0, 0
     };
 
-    VertexArrayObject<PlainShader> tileBorderArray;
+    VertexArrayObject tileBorderArray;
 
     // Set up the matte buffer we're using to draw the filling background.
     VertexBuffer matteBuffer = {
@@ -111,7 +115,7 @@ private:
         16384, 16384
     };
 
-    VertexArrayObject<PlainShader> matteArray;
+    VertexArrayObject matteArray;
 };
 
 }

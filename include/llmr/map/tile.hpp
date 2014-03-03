@@ -2,6 +2,7 @@
 #define LLMR_MAP_TILE
 
 #include <llmr/util/vec.hpp>
+#include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/raster.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
@@ -14,6 +15,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <atomic>
 
 namespace llmr {
 
@@ -74,13 +76,14 @@ public:
 
 public:
     const ID id;
-    state state;
+    uint8_t clip_id;
+    std::atomic<state> state;
     const bool use_raster;
     std::shared_ptr<util::Raster> raster;
 
     // Holds the actual geometries in this tile.
     DebugFontBuffer debugFontBuffer;
-    VertexArrayObject<PlainShader> debugFontArray;
+    VertexArrayObject debugFontArray;
 
     std::shared_ptr<FillVertexBuffer> fillVertexBuffer;
     std::shared_ptr<LineVertexBuffer> lineVertexBuffer;
@@ -94,11 +97,12 @@ public:
     // They contain the location offsets in the buffers stored above
     std::map<std::string, std::shared_ptr<Bucket>> buckets;
 
+    mat4 matrix;
 private:
     // Source data
     std::string data;
     const Style& style;
-    platform::Request req;
+    platform::Request *req = nullptr;
 };
 
 }

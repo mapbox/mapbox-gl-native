@@ -230,7 +230,6 @@ public:
 };
 
 MapView *mapView;
-NSOperationQueue *queue;
 
 namespace llmr {
 namespace platform {
@@ -242,7 +241,13 @@ void restart() {
     [[NSApplication sharedApplication] postEvent: [NSEvent eventWithCGEvent:event] atStart:NO];
 }
 
-Request request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
+class Request {
+public:
+    int16_t identifier;
+    std::string original_url;
+};
+
+Request *request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
 {
     NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
     {
@@ -264,20 +269,20 @@ Request request_http(std::string url, std::function<void(Response&)> background_
 
     [task resume];
 
-    Request req;
+    Request *req = new Request();
 
-    req.identifier = task.taskIdentifier;
-    req.original_url = url;
+    req->identifier = task.taskIdentifier;
+    req->original_url = url;
 
     return req;
 }
 
-void cancel_request_http(Request request)
+void cancel_request_http(Request *request)
 {
     [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
     {
         for (NSURLSessionDownloadTask *task in downloadTasks)
-            if (task.taskIdentifier == request.identifier)
+            if (task.taskIdentifier == request->identifier)
                 return [task cancel];
     }];
 }
