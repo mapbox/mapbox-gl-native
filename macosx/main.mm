@@ -228,7 +228,6 @@ public:
 };
 
 MapView *mapView;
-NSOperationQueue *queue;
 
 namespace llmr {
 namespace platform {
@@ -240,7 +239,8 @@ void restart() {
     [[NSApplication sharedApplication] postEvent: [NSEvent eventWithCGEvent:event] atStart:NO];
 }
 
-struct Request {
+class Request {
+public:
     int16_t identifier;
     std::string original_url;
 };
