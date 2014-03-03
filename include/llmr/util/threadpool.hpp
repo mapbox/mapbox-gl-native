@@ -4,8 +4,6 @@
 #include <pthread.h>
 #include <forward_list>
 #include <queue>
-#include <string>
-#include "std.hpp"
 
 namespace llmr {
 namespace util {
@@ -14,13 +12,12 @@ class Threadpool {
 private:
     class Worker {
     public:
-        Worker(Threadpool& pool, const std::string name);
+        Worker(Threadpool& pool);
         ~Worker();
         static void *loop(void *ptr);
 
     private:
         Threadpool& pool;
-        const std::string name;
         pthread_t thread;
     };
 

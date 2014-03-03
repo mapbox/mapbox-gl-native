@@ -1,4 +1,5 @@
 #include <llmr/util/threadpool.hpp>
+#include <llmr/util/std.hpp>
 #include <thread>
 
 using namespace llmr::util;
@@ -12,7 +13,7 @@ Threadpool::Threadpool(int max_workers)
 void Threadpool::add(Callback callback, void *data) {
     if (worker_count < max_workers) {
         worker_count++;
-        workers.emplace_front(*this, std::string("worker ") + std::to_string(worker_count));
+        workers.emplace_front(*this);
     }
 
     pthread_mutex_lock(&mutex);
@@ -21,9 +22,8 @@ void Threadpool::add(Callback callback, void *data) {
     pthread_cond_signal(&condition);
 }
 
-Threadpool::Worker::Worker(Threadpool& pool, const std::string name)
-    : pool(pool),
-      name(name) {
+Threadpool::Worker::Worker(Threadpool& pool)
+    : pool(pool) {
     pthread_create(&thread, nullptr, loop, (void *)this);
 }
 
@@ -36,7 +36,6 @@ void *Threadpool::Worker::loop(void *ptr) {
     Worker *worker = static_cast<Worker *>(ptr);
     Threadpool& pool = worker->pool;
 
-    pthread_setname_np(worker->name.c_str());
     pthread_mutex_lock(&pool.mutex);
     while (true) {
         if (pool.tasks.size()) {
