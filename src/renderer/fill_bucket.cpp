@@ -142,6 +142,8 @@ void FillBucket::tessellate() {
         tessAddContour(tesselator, vertexSize, line.data(), stride, line.size() / vertexSize);
     }
 
+    lineGroup.elements_length += total_vertex_count;
+
     if (tessTesselate(tesselator, TESS_WINDING_POSITIVE, TESS_POLYGONS, vertices_per_group, vertexSize, 0)) {
         const TESSreal *vertices = tessGetVertices(tesselator);
         const size_t vertex_count = tessGetVertexCount(tesselator);
@@ -192,8 +194,10 @@ void FillBucket::tessellate() {
         fprintf(stderr, "tessellation failed\n");
     }
 
+    // We're adding the total vertex count *after* we added additional vertices
+    // in the tessellation step. They won't be part of the actual lines, but
+    // we need to skip over them anyway if we draw the next group.
     lineGroup.vertex_length += total_vertex_count;
-    lineGroup.elements_length += total_vertex_count;
 }
 
 void FillBucket::render(Painter& painter, const std::string& layer_name, const Tile::ID& id) {
