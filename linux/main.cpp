@@ -1,19 +1,13 @@
 #include <llmr/llmr.hpp>
 #include <GLFW/glfw3.h>
-#include <curl/curl.h>
 #include <llmr/platform/platform.hpp>
-#include "settings.hpp"
 #include <future>
 #include <list>
-#include <chrono>
 
-#include <thread>
+#include "settings.hpp"
+#include "request.hpp"
 
-std::list<std::future<void>> futures;
-std::list<std::future<void>>::iterator f_it;
-std::list<std::function<void()>> callbacks;
-std::list<std::function<void()>>::iterator c_it;
-std::chrono::milliseconds zero (0);
+std::forward_list<llmr::platform::Request *> requests;
 
 class MapView {
 public:
@@ -45,8 +39,13 @@ public:
         glfwSetWindowUserPointer(window, this);
         glfwMakeContextCurrent(window);
 
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+        int fb_width, fb_height;
+        glfwGetFramebufferSize(window, &fb_width, &fb_height);
+
         settings.load();
-        map.setup();
+        map.setup((double)fb_width / width);
 
         resize(window, 0, 0);
 
@@ -159,21 +158,17 @@ public:
 
     int run() {
         while (!glfwWindowShouldClose(window)) {
-
-            f_it = futures.begin();
-            c_it = callbacks.begin();
-
-            while (f_it != futures.end()) {
-                if (f_it->wait_for(zero) == std::future_status::ready) {
-                    std::function<void()> cb = *c_it;
-                    futures.erase(f_it++);
-                    callbacks.erase(c_it++);
-                    cb();
+            bool& dirty = this->dirty;
+            requests.remove_if([&dirty](llmr::platform::Request * req) {
+                if (req->done) {
+                    req->foreground_callback();
+                    delete req;
+                    dirty = true;
+                    return true;
                 } else {
-                    f_it++;
-                    c_it++;
+                    return false;
                 }
-            }
+            });
 
             if (dirty) {
                 try {
@@ -185,7 +180,7 @@ public:
                 fps();
             }
 
-            if (dirty || futures.size()) {
+            if (!requests.empty() || dirty) {
                 glfwPollEvents();
             } else {
                 glfwWaitEvents();
@@ -237,45 +232,25 @@ MapView *mapView = nullptr;
 namespace llmr {
 namespace platform {
 
-void restart(void *) {
+void restart() {
     if (mapView) {
         mapView->dirty = true;
     }
 }
 
-
-
-static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
-    ((std::string*)userp)->append((char*)contents, size *nmemb);
-    return size * nmemb;
+Request *request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback) {
+    Request *req = new Request(url, background_function, foreground_callback);
+    requests.push_front(req);
+    return req;
 }
 
-void request_http_async(std::string url, std::function<void(Response&)> func) {
-
-    Response res;
-
-    CURL *curl;
-    CURLcode code;
-    curl = curl_easy_init();
-
-    if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res.body);
-        curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "deflate");
-        code = curl_easy_perform(curl);
-        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &res.code);
-        curl_easy_cleanup(curl);
+void cancel_request_http(Request *request) {
+    for (Request *req : requests) {
+        if (req == request) {
+            req->cancel();
+        }
     }
-
-    func(res);
 }
-
-void request_http(std::string url, std::function<void(Response&)> func, std::function<void()> cb) {
-    futures.emplace_back(std::async(std::launch::async, request_http_async, url, func));
-    callbacks.push_back(cb);
-}
-
 
 double time() {
     return glfwGetTime();
@@ -284,11 +259,21 @@ double time() {
 }
 }
 
+
 int main() {
+    curl_global_init(CURL_GLOBAL_ALL);
+
+    llmr::platform::Request::initialize();
+
     mapView = new MapView();
     mapView->init();
     int ret = mapView->run();
     mapView->settings.sync();
     delete mapView;
+
+
+    llmr::platform::Request::finish();
+
+    curl_global_cleanup();
     return ret;
 }

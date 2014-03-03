@@ -74,7 +74,7 @@ void Tile::request() {
 
     // Note: Somehow this feels slower than the change to request_http()
     std::shared_ptr<Tile> tile = shared_from_this();
-    platform::Request request = platform::request_http(url, [=](platform::Response& res) {
+    platform::Request *request = platform::request_http(url, [=](platform::Response& res) {
         if (res.code == 200 && tile->state != obsolete) {
             tile->state = Tile::loaded;
             tile->data.swap(res.body);
