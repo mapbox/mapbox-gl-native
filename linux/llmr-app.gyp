@@ -18,8 +18,9 @@
         'conditions': [
             ['OS == "mac"', {
                 'product_extension': 'app',
+                'mac_bundle': 1,
                 'mac_bundle_resources': [
-                  'Icon.icns',
+                  '../macosx/Icon.icns',
                 ],
                 'link_settings': {
                     'libraries': [
@@ -42,7 +43,7 @@
                         '-lcurl',
                     ],
                     'SDKROOT': 'macosx',
-                    'INFOPLIST_FILE': 'Info.plist',
+                    'INFOPLIST_FILE': '../macosx/Info.plist',
                     'CLANG_CXX_LIBRARY': 'libc++',
                     'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
                     'MACOSX_DEPLOYMENT_TARGET':'10.9',

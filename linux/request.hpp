@@ -5,7 +5,13 @@
 #include <functional>
 #include <curl/curl.h>
 
+
 namespace llmr {
+
+namespace util {
+class Threadpool;
+}
+
 namespace platform {
 
 struct Response;
@@ -14,10 +20,17 @@ class Request {
 public:
     Request(std::string url, std::function<void(platform::Response&)> bg, std::function<void()> fg);
 
-    static void request(void *);
-    static size_t write_callback(void *, size_t, size_t, void *);
-    static int progress_callback(void *, double, double, double, double);
+    static void initialize();
+    static void finish();
+
     void cancel();
+
+private:
+    static void request(void *);
+    static size_t curl_write_callback(void *, size_t, size_t, void *);
+    static int curl_progress_callback(void *, double, double, double, double);
+    static void curl_share_lock(CURL *, curl_lock_data, curl_lock_access, void *);
+    static void curl_share_unlock(CURL *, curl_lock_data, void *);
 
 public:
     std::atomic<bool> done;
@@ -25,6 +38,11 @@ public:
     const std::string url;
     const std::function<void(platform::Response&)> background_function;
     const std::function<void()> foreground_callback;
+
+private:
+    static util::Threadpool* pool;
+    static CURLSH *curl_share;
+    static pthread_mutex_t curl_share_mutex;
 };
 
 }

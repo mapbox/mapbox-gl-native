@@ -258,12 +258,17 @@ double time() {
 int main() {
     curl_global_init(CURL_GLOBAL_ALL);
 
+    llmr::platform::Request::initialize();
+
     mapView = new MapView();
     mapView->init();
     int ret = mapView->run();
     mapView->settings.sync();
     delete mapView;
 
-    pthread_exit(NULL);
+
+    llmr::platform::Request::finish();
+
+    curl_global_cleanup();
     return ret;
 }
