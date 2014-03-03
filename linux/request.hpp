@@ -21,6 +21,8 @@ public:
     void cancel();
 
 private:
+    static void create_key();
+    static void delete_key(void *ptr);
     static void request(void *);
     static size_t curl_write_callback(void *, size_t, size_t, void *);
     static int curl_progress_callback(void *, double, double, double, double);
@@ -28,6 +30,8 @@ private:
     static void curl_share_unlock(CURL *, curl_lock_data, void *);
 
 public:
+    static pthread_key_t key;
+    static pthread_once_t key_once;
     std::atomic<bool> done;
     std::atomic<bool> cancelled;
     const std::string url;

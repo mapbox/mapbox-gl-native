@@ -51,15 +51,37 @@ Request::Request(std::string url, std::function<void(platform::Response&)> bg, s
     llmr::util::threadpool->add(request, this);
 }
 
+
+pthread_key_t Request::key;
+pthread_once_t Request::key_once = PTHREAD_ONCE_INIT;
+
+void Request::create_key() {
+    pthread_key_create(&key, delete_key);
+}
+
+void Request::delete_key(void *ptr) {
+    if (ptr != nullptr) {
+        curl_easy_cleanup(ptr);
+    }
+}
+
 void Request::request(void *ptr) {
     assert(curl_share);
 
     Request *req = static_cast<Request *>(ptr);
     Response res;
 
+    pthread_once(&key_once, create_key);
     // TODO: use curl multi to be able to cancel, or to
 
-    CURL *curl = curl_easy_init();
+    CURL *curl = nullptr;
+    if ((curl = pthread_getspecific(key)) == nullptr) {
+        curl = curl_easy_init();
+        pthread_setspecific(key, curl);
+    }
+
+    curl_easy_reset(curl);
+
     CURLcode code;
 
     curl_easy_setopt(curl, CURLOPT_URL, req->url.c_str());
@@ -72,7 +94,6 @@ void Request::request(void *ptr) {
     curl_easy_setopt(curl, CURLOPT_SHARE, curl_share);
     code = curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &res.code);
-    curl_easy_cleanup(curl);
 
     if (code != CURLE_ABORTED_BY_CALLBACK) {
         req->background_function(res);
