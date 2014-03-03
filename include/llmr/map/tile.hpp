@@ -14,6 +14,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <atomic>
 
 namespace llmr {
 
@@ -75,7 +76,7 @@ public:
 public:
     const ID id;
     uint8_t clip_id;
-    state state;
+    std::atomic<state> state;
 
     // Holds the actual geometries in this tile.
     DebugFontBuffer debugFontBuffer;
