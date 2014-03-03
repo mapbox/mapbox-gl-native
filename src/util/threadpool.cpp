@@ -2,19 +2,18 @@
 
 using namespace llmr::util;
 
-Threadpool::Threadpool(Callback callback, int max_workers)
-    : max_workers(max_workers),
-      callback(callback) {
+Threadpool::Threadpool(int max_workers)
+    : max_workers(max_workers) {
 }
 
-void Threadpool::add(void *data) {
+void Threadpool::add(Callback callback, void *data) {
     if (worker_count < max_workers) {
         workers.emplace_front(*this);
         worker_count++;
     }
 
     pthread_mutex_lock(&mutex);
-    tasks.push(data);
+    tasks.push(std::make_pair(callback, data));
     pthread_mutex_unlock(&mutex);
     pthread_cond_signal(&condition);
 }
@@ -37,10 +36,10 @@ void *Threadpool::Worker::loop(void *ptr) {
     pthread_mutex_lock(&pool.mutex);
     while (true) {
         if (pool.tasks.size()) {
-            void *task = pool.tasks.front();
+            Threadpool::Task task = pool.tasks.front();
             pool.tasks.pop();
             pthread_mutex_unlock(&pool.mutex);
-            pool.callback(task);
+            task.first(task.second);
             pthread_mutex_lock(&pool.mutex);
         } else {
             pthread_cond_wait(&pool.condition, &pool.mutex);

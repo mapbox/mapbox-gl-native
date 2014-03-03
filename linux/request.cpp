@@ -36,7 +36,7 @@ int Request::curl_progress_callback(void *ptr, double dltotal, double dlnow, dou
 }
 
 void Request::initialize() {
-    pool = new llmr::util::Threadpool(Request::request);
+    pool = new llmr::util::Threadpool();
 
     // curl init
     curl_global_init(CURL_GLOBAL_ALL);
@@ -57,7 +57,7 @@ Request::Request(std::string url, std::function<void(platform::Response&)> bg, s
       background_function(bg),
       foreground_callback(fg) {
     assert(pool);
-    pool->add(this);
+    pool->add(request, this);
 }
 
 void Request::request(void *ptr) {

@@ -22,9 +22,10 @@ class Threadpool {
 
 public:
     typedef void (*Callback)(void *);
-    Threadpool(Callback callback, int max_workers = 4);
+    typedef std::pair<Callback, void *> Task;
+    Threadpool(int max_workers = 4);
 
-    void add(void *data);
+    void add(Callback callback, void *data);
 
 private:
     const int max_workers;
@@ -32,8 +33,7 @@ private:
     pthread_cond_t condition = PTHREAD_COND_INITIALIZER;
     std::forward_list<Worker> workers;
     int worker_count = 0;
-    Callback callback;
-    std::queue<void *> tasks;
+    std::queue<Task> tasks;
 };
 
 }
