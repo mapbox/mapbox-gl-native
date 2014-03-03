@@ -2,15 +2,12 @@
 #define LLMR_GEOMETRY_TRIANGLE_ELEMENTS_BUFFER
 
 #include <llmr/geometry/buffer.hpp>
+#include <llmr/geometry/vao.hpp>
 
 namespace llmr {
 
-template <typename Shader>
-class VertexArrayObject;
-
-template <typename Shader>
 struct ElementGroup {
-    VertexArrayObject<Shader> array;
+    VertexArrayObject array;
     uint32_t vertex_length;
     uint32_t elements_length;
 

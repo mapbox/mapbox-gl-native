@@ -40,7 +40,7 @@ public:
 
 private:
     std::shared_ptr<PointVertexBuffer> vertexBuffer;
-    VertexArrayObject<PointShader> array;
+    VertexArrayObject array;
 
     const size_t vertex_start;
     size_t vertex_end = 0;
