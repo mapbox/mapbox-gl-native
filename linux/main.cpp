@@ -39,8 +39,13 @@ public:
         glfwSetWindowUserPointer(window, this);
         glfwMakeContextCurrent(window);
 
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+        int fb_width, fb_height;
+        glfwGetFramebufferSize(window, &fb_width, &fb_height);
+
         settings.load();
-        map.setup();
+        map.setup((double)fb_width / width);
 
         resize(window, 0, 0);
 

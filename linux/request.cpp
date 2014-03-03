@@ -9,7 +9,6 @@
 using namespace llmr::platform;
 
 
-llmr::util::Threadpool *Request::pool = nullptr;
 CURLSH *Request::curl_share = nullptr;
 pthread_mutex_t Request::curl_share_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -28,16 +27,10 @@ size_t Request::curl_write_callback(void *contents, size_t size, size_t nmemb, v
 
 int Request::curl_progress_callback(void *ptr, double dltotal, double dlnow, double ultotal, double ulnow) {
     Request *req = static_cast<Request *>(ptr);
-    bool cancel = req->cancelled;
-    if (cancel) {
-        fprintf(stderr, "cancel download %s\n", req->url.c_str());
-    }
-    return cancel;
+    return req->cancelled;
 }
 
 void Request::initialize() {
-    pool = new llmr::util::Threadpool();
-
     // curl init
     curl_global_init(CURL_GLOBAL_ALL);
     curl_share = curl_share_init();
@@ -46,7 +39,6 @@ void Request::initialize() {
 }
 
 void Request::finish() {
-    delete pool;
     curl_share_cleanup(curl_share);
 }
 
@@ -56,8 +48,7 @@ Request::Request(std::string url, std::function<void(platform::Response&)> bg, s
       url(url),
       background_function(bg),
       foreground_callback(fg) {
-    assert(pool);
-    pool->add(request, this);
+    llmr::util::threadpool->add(request, this);
 }
 
 void Request::request(void *ptr) {

@@ -7,11 +7,6 @@
 
 
 namespace llmr {
-
-namespace util {
-class Threadpool;
-}
-
 namespace platform {
 
 struct Response;
@@ -40,7 +35,6 @@ public:
     const std::function<void()> foreground_callback;
 
 private:
-    static util::Threadpool* pool;
     static CURLSH *curl_share;
     static pthread_mutex_t curl_share_mutex;
 };
