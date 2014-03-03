@@ -10,10 +10,17 @@ namespace util {
 class Raster : public std::enable_shared_from_this<Raster> {
 
 public:
+    enum filter {
+        FilterNearest = 0,
+        FilterLinear  = 1,
+        FilterMipMap  = 2
+    };
+
+public:
     ~Raster();
 
     void load(const std::string& data);
-    void bind(bool linear = false);
+    void bind(const filter filter);
 
     operator bool() const;
 
@@ -26,7 +33,7 @@ private:
 private:
     mutable std::mutex mtx;
     bool loaded = false;
-    uint32_t filter = 0;
+    filter filter = FilterNearest;
     uint32_t texture = 0;
     char *img = nullptr;
 };
