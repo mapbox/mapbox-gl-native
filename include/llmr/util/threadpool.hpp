@@ -29,7 +29,7 @@ public:
 private:
     typedef std::pair<Callback, void *> Task;
     const int max_workers;
-    pthread_mutex_t mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     pthread_cond_t condition = PTHREAD_COND_INITIALIZER;
     std::forward_list<Worker> workers;
     int worker_count = 0;
