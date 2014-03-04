@@ -9,6 +9,7 @@
         #define glGenVertexArrays glGenVertexArraysOES
         #define glBindVertexArray glBindVertexArrayOES
         #define glDeleteVertexArrays glDeleteVertexArraysOES
+        #define glClearDepth glClearDepthf
     #elif TARGET_IPHONE_SIMULATOR
         #include <OpenGLES/ES2/gl.h>
         #include <OpenGLES/ES2/glext.h>
