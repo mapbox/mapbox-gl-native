@@ -3,6 +3,7 @@
 #include <llmr/platform/platform.hpp>
 #include <llmr/style/resources.hpp>
 #include <llmr/style/sprite.hpp>
+#include <llmr/map/coverage.hpp>
 
 #include <algorithm>
 
@@ -329,27 +330,12 @@ bool Map::updateTiles() {
     int32_t min_covering_zoom = zoom - 10;
     if (min_covering_zoom < min_zoom) min_covering_zoom = min_zoom;
 
-
-    int32_t max_dim = pow(2, zoom);
-
     // Map four viewport corners to pixel coordinates
-    box box;
-    transform.mapCornersToBox(zoom, box);
+    box box = transform.mapCornersToBox(zoom);
 
-    vec2<int32_t> tl, br;
-    tl.x = fmax(0, floor(fmin(box.tl.x, box.bl.x)));
-    tl.y = fmax(0, floor(fmin(box.tl.y, box.tr.y)));
-    br.x = fmin(max_dim, ceil(fmax(box.tr.x, box.br.x)));
-    br.y = fmin(max_dim, ceil(fmax(box.bl.y, box.br.y)));
-
-
-    // TODO: Discard tiles that are outside the viewport
-    std::forward_list<Tile::ID> required;
-    for (int32_t y = tl.y; y < br.y; ++y) {
-        for (int32_t x = tl.x; x < br.x; ++x) {
-            required.emplace_front(x, y, zoom);
-        }
-    }
+    // Performs a scanline algorithm search that covers the rectangle of the box
+    // and sorts them by proximity to the center.
+    std::forward_list<Tile::ID> required = llmr::covering_tiles(zoom, box);
 
     // Retain is a list of tiles that we shouldn't delete, even if they are not
     // the most ideal tile for the current viewport. This may include tiles like

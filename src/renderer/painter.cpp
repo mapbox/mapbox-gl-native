@@ -119,7 +119,6 @@ void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id) {
 
 void Painter::finishClippingMask() {
     glColorMask(true, true, true, true);
-    glEnable(GL_STENCIL_TEST);
     glEnable(GL_DEPTH_TEST);
     glStencilMask(0x0);
 }

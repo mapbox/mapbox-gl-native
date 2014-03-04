@@ -271,33 +271,37 @@ double Transform::getAngle() const {
     return angle;
 }
 
-void Transform::mapCornersToBox(uint32_t z, box& b) const {
+box Transform::mapCornersToBox(uint32_t z) const {
     const double ref_scale = pow(2, z);
 
-    // Keep the map as upright as possible.
-    double local_angle = angle;
-    if (local_angle >= M_PI_2) local_angle -= M_PI;
-    if (local_angle < -M_PI_2) local_angle += M_PI;
-
-    const double angle_sin = sin(-local_angle);
-    const double angle_cos = cos(-local_angle);
+    const double angle_sin = sin(-angle);
+    const double angle_cos = cos(-angle);
 
     const double w_2 = width / 2;
     const double h_2 = height / 2;
-    const double ss_1 = ref_scale / (scale * util::tileSize);
-    const double ss_2 = (scale * util::tileSize) / 2;
+    const double ss_0 = scale * util::tileSize;
+    const double ss_1 = ref_scale / ss_0;
+    const double ss_2 = ss_0 / 2.0;
 
     // Calculate the corners of the map view. The resulting coordinates will be
     // in fractional tile coordinates.
+    box b;
+
     b.tl.x = ((-w_2) * angle_cos - (-h_2) * angle_sin + ss_2 - x) * ss_1;
     b.tl.y = ((-w_2) * angle_sin + (-h_2) * angle_cos + ss_2 - y) * ss_1;
+
     b.tr.x = ((+w_2) * angle_cos - (-h_2) * angle_sin + ss_2 - x) * ss_1;
     b.tr.y = ((+w_2) * angle_sin + (-h_2) * angle_cos + ss_2 - y) * ss_1;
+
     b.bl.x = ((-w_2) * angle_cos - (+h_2) * angle_sin + ss_2 - x) * ss_1;
     b.bl.y = ((-w_2) * angle_sin + (+h_2) * angle_cos + ss_2 - y) * ss_1;
+
     b.br.x = ((+w_2) * angle_cos - (+h_2) * angle_sin + ss_2 - x) * ss_1;
     b.br.y = ((+w_2) * angle_sin + (+h_2) * angle_cos + ss_2 - y) * ss_1;
 
-    // Quick hack: use the entire non-rotated bounding box.
+    b.center.x = (ss_2 - x) * ss_1;
+    b.center.y = (ss_2 - y) * ss_1;
+
+    return b;
 }
 
