@@ -348,7 +348,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 #else
         glPointSize(pointSize);
 #endif
-
+        depthMask(false);
         bucket.drawPoints(*linejoinShader);
     }
 
