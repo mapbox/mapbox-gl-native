@@ -1,7 +1,7 @@
 #ifndef LLMR_RENDERER_PAINTER
 #define LLMR_RENDERER_PAINTER
 
-#include <llmr/map/tile.hpp>
+#include <llmr/map/tile_data.hpp>
 #include <llmr/geometry/vao.hpp>
 #include <llmr/geometry/vertex_buffer.hpp>
 #include <llmr/util/mat4.hpp>
@@ -33,7 +33,7 @@ public:
     void setup();
     void clear();
     void changeMatrix();
-    void render(const std::shared_ptr<Tile>& tile);
+    void render(const std::shared_ptr<TileData>& tile);
     void renderMatte();
     void renderBackground();
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
@@ -45,8 +45,8 @@ public:
     void finishClippingMask();
 private:
     void setupShaders();
-    void renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers);
-    void renderDebug(const std::shared_ptr<Tile>& tile);
+    void renderLayers(const std::shared_ptr<TileData>& tile, const std::vector<LayerDescription>& layers);
+    void renderDebug(const std::shared_ptr<TileData>& tile);
 
     void useProgram(uint32_t program);
     void lineWidth(float lineWidth);

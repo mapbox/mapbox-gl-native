@@ -130,8 +130,8 @@ void Painter::clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Painter::render(const Tile::Ptr& tile) {
-    if (tile->state != Tile::parsed) {
+void Painter::render(const TileData::Ptr& tile) {
+    if (tile->state != TileData::parsed) {
         return;
     }
 
@@ -147,7 +147,7 @@ void Painter::render(const Tile::Ptr& tile) {
     renderBackground();
 }
 
-void Painter::renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers) {
+void Painter::renderLayers(const std::shared_ptr<TileData>& tile, const std::vector<LayerDescription>& layers) {
     // Render everything top-to-bottom by using reverse iterators
     typedef std::vector<LayerDescription>::const_reverse_iterator iterator;
     for (iterator it = layers.rbegin(), end = layers.rend(); it != end; ++it) {
@@ -423,7 +423,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     bucket.drawPoints(*pointShader);
 }
 
-void Painter::renderDebug(const Tile::Ptr& tile) {
+void Painter::renderDebug(const TileData::Ptr& tile) {
     // Disable depth test and don't count this towards the depth buffer,
     // but *don't* disable stencil test, as we want to clip the red tile border
     // to the tile viewport.

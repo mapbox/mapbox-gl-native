@@ -238,22 +238,22 @@ void Map::update() {
 }
 
 
-Tile::Ptr Map::hasTile(const Tile::ID& id) {
-    for (Tile::Ptr& tile : tiles) {
+TileData::Ptr Map::hasTile(const Tile::ID& id) {
+    for (TileData::Ptr& tile : tiles) {
         if (tile->id == id) {
             return tile;
         }
     }
 
-    return Tile::Ptr();
+    return TileData::Ptr();
 }
 
-Tile::Ptr Map::addTile(const Tile::ID& id) {
-    Tile::Ptr tile = hasTile(id);
+TileData::Ptr Map::addTile(const Tile::ID& id) {
+    TileData::Ptr tile = hasTile(id);
 
     if (!tile.get()) {
         // We couldn't find the tile in the list. Create a new one.
-        tile = std::make_shared<Tile>(id, style);
+        tile = std::make_shared<TileData>(id, style);
         assert(tile);
         // std::cerr << "init " << id.z << "/" << id.x << "/" << id.y << std::endl;
         // std::cerr << "add " << tile->toString() << std::endl;
@@ -278,8 +278,8 @@ bool Map::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::f
 
     auto ids = Tile::children(id, z + 1);
     for (const Tile::ID& child_id : ids) {
-        const Tile::Ptr& tile = hasTile(child_id);
-        if (tile && tile->state == Tile::parsed) {
+        const TileData::Ptr& tile = hasTile(child_id);
+        if (tile && tile->state == TileData::parsed) {
             assert(tile);
             retain.emplace_front(tile->id);
         } else {
@@ -305,8 +305,8 @@ bool Map::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::f
 bool Map::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain) {
     for (int32_t z = id.z - 1; z >= minCoveringZoom; --z) {
         const Tile::ID parent_id = Tile::parent(id, z);
-        const Tile::Ptr tile = hasTile(parent_id);
-        if (tile && tile->state == Tile::parsed) {
+        const TileData::Ptr tile = hasTile(parent_id);
+        if (tile && tile->state == TileData::parsed) {
             assert(tile);
             retain.emplace_front(tile->id);
             return true;
@@ -344,10 +344,10 @@ bool Map::updateTiles() {
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
     for (const Tile::ID& id : required) {
-        Tile::Ptr tile = addTile(id);
+        TileData::Ptr tile = addTile(id);
         assert(tile);
 
-        if (tile->state != Tile::parsed) {
+        if (tile->state != TileData::parsed) {
             // The tile we require is not yet loaded. Try to find a parent or
             // child tile that we already have.
 
@@ -362,7 +362,7 @@ bool Map::updateTiles() {
             }
         }
 
-        if (tile->state == Tile::initial) {
+        if (tile->state == TileData::initial) {
             // If the tile is new, we have to make sure to load it.
             tile->request();
             changed = true;
@@ -371,7 +371,7 @@ bool Map::updateTiles() {
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
-    tiles.remove_if([&retain, &changed](const Tile::Ptr& tile) {
+    tiles.remove_if([&retain, &changed](const TileData::Ptr& tile) {
         assert(tile);
         bool obsolete = std::find(retain.begin(), retain.end(), tile->id) == retain.end();
         if (obsolete) {
@@ -384,7 +384,7 @@ bool Map::updateTiles() {
     // Sort tiles by zoom level, front to back.
     // We're painting front-to-back, so we want to draw more detailed tiles first
     // before filling in other parts with lower zoom levels.
-    tiles.sort([](const Tile::Ptr& a, const Tile::Ptr& b) {
+    tiles.sort([](const TileData::Ptr& a, const TileData::Ptr& b) {
         return a->id.z > b->id.z;
     });
 
@@ -406,9 +406,9 @@ bool Map::render() {
     // the stencil buffer.
     uint8_t i = 1;
     painter.prepareClippingMask();
-    for (Tile::Ptr& tile : tiles) {
+    for (TileData::Ptr& tile : tiles) {
         assert(tile);
-        if (tile->state == Tile::parsed) {
+        if (tile->state == TileData::parsed) {
             // The position matrix.
             transform.matrixFor(tile->matrix, tile->id);
             matrix::multiply(tile->matrix, painter.projMatrix, tile->matrix);
@@ -418,8 +418,8 @@ bool Map::render() {
     }
     painter.finishClippingMask();
 
-    for (Tile::Ptr& tile : tiles) {
-        if (tile->state == Tile::parsed) {
+    for (TileData::Ptr& tile : tiles) {
+        if (tile->state == TileData::parsed) {
             painter.render(tile);
         }
     }
