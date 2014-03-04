@@ -50,6 +50,7 @@ private:
 
     void useProgram(uint32_t program);
     void lineWidth(float lineWidth);
+    void depthMask(bool value);
 
 public:
     mat4 matrix;
@@ -64,6 +65,7 @@ private:
 
     uint32_t gl_program = 0;
     float gl_lineWidth = 0;
+    bool gl_depthMask = true;
 
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;

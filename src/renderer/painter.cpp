@@ -37,15 +37,21 @@ void Painter::setup() {
     assert(linejoinShader);
     assert(patternShader);
 
-    glEnable(GL_STENCIL_TEST);
 
+    // Blending
     // We are blending the new pixels *behind* the existing pixels. That way we can
     // draw front-to-back and use then stencil buffer to cull opaque pixels early.
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
 
+    // Set clear values
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearDepth(1.0f);
     glClearStencil(0x0);
+
+    // Stencil test
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 }
 
 void Painter::setupShaders() {
@@ -71,6 +77,13 @@ void Painter::lineWidth(float lineWidth) {
     }
 }
 
+void Painter::depthMask(bool value) {
+    if (gl_depthMask != value) {
+        glDepthMask(value ? GL_TRUE : GL_FALSE);
+        gl_depthMask = value;
+    }
+}
+
 void Painter::changeMatrix() {
     // Initialize projection matrix
     matrix::ortho(projMatrix, 0, transform.width, transform.height, 0, 1, 10);
@@ -89,10 +102,11 @@ void Painter::changeMatrix() {
 
 void Painter::prepareClippingMask() {
     useProgram(plainShader->program);
+    glDisable(GL_DEPTH_TEST);
 
     glColorMask(false, false, false, false);
-    glStencilMask(0xFF);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    // This has been set by the call to Painter::clear()
+    // glStencilMask(0xFF);
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 }
@@ -106,11 +120,15 @@ void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id) {
 void Painter::finishClippingMask() {
     glColorMask(true, true, true, true);
     glEnable(GL_STENCIL_TEST);
+    glEnable(GL_DEPTH_TEST);
     glStencilMask(0x0);
 }
 
 void Painter::clear() {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glStencilMask(0xFF);
+    depthMask(true);
+    // glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Painter::render(const Tile::Ptr& tile) {
@@ -187,6 +205,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
         outlineShader->setColor(stroke_color);
+        depthMask(false);
 
         // Draw the entire line
         outlineShader->setWorld({{ transform.fb_width, transform.fb_height }});
@@ -238,6 +257,11 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         patternShader->setMix(mix);
         style.sprite->bind(true);
 
+        // TODO: Find out if the texture is completely opaque. If it is, we can
+        // set the mask to GL_TRUE so that we won't draw any further fragments
+        // after this one.
+        depthMask(false);
+
         // Draw the actual triangles into the color & stencil buffer.
         bucket.drawElements(*patternShader);
     } else {
@@ -245,6 +269,10 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         useProgram(plainShader->program);
         plainShader->setMatrix(matrix);
         plainShader->setColor(fill_color);
+
+        // Only update the depth buffer if the color we're drawing is completely
+        // opaque.
+        depthMask(fill_color[3] >= 1.0f);
 
         // Draw the actual triangles into the color & stencil buffer.
         bucket.drawElements(*plainShader);
@@ -352,6 +380,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         lineShader->setRatio(tilePixelRatio);
         lineShader->setColor(color);
         lineShader->setDebug(0);
+        depthMask(false);
         bucket.drawLines(*lineShader);
     }
 }
@@ -391,10 +420,17 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
     style.sprite->bind(transform.rotating || transform.scaling || transform.panning);
+    depthMask(false);
     bucket.drawPoints(*pointShader);
 }
 
 void Painter::renderDebug(const Tile::Ptr& tile) {
+    // Disable depth test and don't count this towards the depth buffer,
+    // but *don't* disable stencil test, as we want to clip the red tile border
+    // to the tile viewport.
+    glDisable(GL_DEPTH_TEST);
+    depthMask(false);
+
     // Blend to the front, not the back.
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     useProgram(plainShader->program);
@@ -417,10 +453,11 @@ void Painter::renderDebug(const Tile::Ptr& tile) {
 
     // Revert blending mode to blend to the back.
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void Painter::renderMatte() {
-    glDisable(GL_STENCIL_TEST);
+    glStencilFunc(GL_EQUAL, 0x0, 0xFF);
 
     Color white = {{ 0.9, 0.9, 0.9, 1 }};
 
@@ -431,18 +468,17 @@ void Painter::renderMatte() {
     matteArray.bind(*plainShader, matteBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(white);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)matteBuffer.index());
-
-    glEnable(GL_STENCIL_TEST);
 }
 
 void Painter::renderBackground() {
-    Color white = {{ 1, 1, 1, 1 }};
+    Color fill_color = {{ 1, 1, 1, 1 }};
 
     useProgram(plainShader->program);
     plainShader->setMatrix(matrix);
 
     // Draw the clipping mask
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-    plainShader->setColor(white);
+    plainShader->setColor(fill_color);
+    depthMask(fill_color[3] >= 1.0f);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
