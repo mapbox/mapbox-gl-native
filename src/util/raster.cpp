@@ -141,7 +141,7 @@ void Raster::loadImage(const std::string& data) {
     }
 }
 
-void Raster::bind(const enum filter filter) {
+void Raster::bind(enum filter filter) {
     if (!width || !height) {
         fprintf(stderr, "trying to bind texture without dimension\n");
         return;

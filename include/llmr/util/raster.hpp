@@ -20,7 +20,7 @@ public:
     ~Raster();
 
     void load(const std::string& data);
-    void bind(const filter filter);
+    void bind(filter filter);
 
     operator bool() const;
 
