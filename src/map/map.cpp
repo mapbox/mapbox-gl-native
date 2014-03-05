@@ -381,10 +381,13 @@ bool Map::updateTiles() {
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
-    tiles.remove_if([&retain, &changed](const Tile & tile) {
+    std::forward_list<Tile::ID> retain_data;
+    tiles.remove_if([&retain, &retain_data, &changed](const Tile & tile) {
         bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
         if (obsolete) {
             changed = true;
+        } else {
+            retain_data.push_front(tile.data->id);
         }
         return obsolete;
     });
@@ -397,8 +400,18 @@ bool Map::updateTiles() {
     });
 
     // Remove all the expired pointers from the list.
-    tile_data.remove_if([](const std::weak_ptr<TileData>& tile_data) {
-        return tile_data.expired();
+    tile_data.remove_if([&retain_data](const std::weak_ptr<TileData>& tile_data) {
+        const std::shared_ptr<TileData> tile = tile_data.lock();
+        if (!tile) {
+            return true;
+        }
+        bool obsolete = std::find(retain_data.begin(), retain_data.end(), tile->id) == retain_data.end();
+        if (obsolete) {
+            tile->cancel();
+            return true;
+        } else {
+            return false;
+        }
     });
 
     return changed;

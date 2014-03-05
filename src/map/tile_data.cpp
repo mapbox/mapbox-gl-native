@@ -34,6 +34,7 @@ TileData::TileData(Tile::ID id, const Style& style)
 }
 
 TileData::~TileData() {
+    cancel();
 }
 
 const std::string TileData::toString() const {
@@ -48,13 +49,17 @@ void TileData::request() {
         id.z, id.x, id.y);
 
     // Note: Somehow this feels slower than the change to request_http()
-    std::shared_ptr<TileData> tile = shared_from_this();
+    std::weak_ptr<TileData> weak_tile = shared_from_this();
     platform::Request *request = platform::request_http(url, [=](platform::Response& res) {
-        if (res.code == 200 && tile->state != State::obsolete) {
+        std::shared_ptr<TileData> tile = weak_tile.lock();
+        if (!tile || tile->state == State::obsolete) {
+            // noop. Tile is obsolete and we're now just waiting for the refcount
+            // to drop to zero for destruction.
+        } else if (res.code == 200) {
             tile->state = State::loaded;
             tile->data.swap(res.body);
             tile->parse();
-        } else if (tile->state != State::obsolete) {
+        } else {
             fprintf(stderr, "tile loading failed\n");
         }
     }, []() {
@@ -67,8 +72,6 @@ void TileData::cancel() {
     if (state != State::obsolete) {
         state = State::obsolete;
         platform::cancel_request_http(req);
-    } else {
-        assert((!"logic error? multiple cancelleations"));
     }
 }
 

@@ -40,7 +40,7 @@ void Painter::setup() {
 
     // Blending
     // We are blending the new pixels *behind* the existing pixels. That way we can
-    // draw front-to-back and use then stencil buffer to cull opaque pixels early.
+    // draw front-to-back and use the depth buffer to cull opaque pixels early.
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
 
@@ -126,7 +126,7 @@ void Painter::finishClippingMask() {
 void Painter::clear() {
     glStencilMask(0xFF);
     depthMask(true);
-    // glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
