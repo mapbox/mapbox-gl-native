@@ -71,7 +71,6 @@ public:
 
 public:
     const Tile::ID id;
-    uint8_t clip_id;
     std::atomic<state> state;
 
     // Holds the actual geometries in this tile.
@@ -89,8 +88,6 @@ public:
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above
     std::map<std::string, std::shared_ptr<Bucket>> buckets;
-
-    mat4 matrix;
 private:
     // Source data
     std::string data;

@@ -238,29 +238,42 @@ void Map::update() {
 }
 
 
-TileData::Ptr Map::hasTile(const Tile::ID& id) {
-    for (TileData::Ptr& tile : tiles) {
-        if (tile->id == id) {
-            return tile;
+const Tile *Map::hasTile(const Tile::ID& id) {
+    for (const Tile& tile : tiles) {
+        if (tile.id == id) {
+            return &tile;
         }
     }
 
-    return TileData::Ptr();
+    return nullptr;
 }
 
-TileData::Ptr Map::addTile(const Tile::ID& id) {
-    TileData::Ptr tile = hasTile(id);
+const Tile *Map::addTile(const Tile::ID& id) {
+    const Tile *tile = hasTile(id);
 
-    if (!tile.get()) {
-        // We couldn't find the tile in the list. Create a new one.
-        tile = std::make_shared<TileData>(id, style);
-        assert(tile);
-        // std::cerr << "init " << id.z << "/" << id.x << "/" << id.y << std::endl;
-        // std::cerr << "add " << tile->toString() << std::endl;
-        tiles.push_front(tile);
+    if (tile) {
+        return tile;
     }
 
-    return tile;
+    tiles.emplace_front(id);
+    Tile& new_tile = tiles.front();
+
+    // We couldn't find the tile in the list. Create a new one.
+    // Try to find the associated TileData object.
+    const Tile::ID normalized_id = Tile::normalize(id);
+
+    auto it = std::find_if(tile_data.begin(), tile_data.end(), [&normalized_id](const std::weak_ptr<TileData>& tile_data) {
+        return !tile_data.expired() && tile_data.lock()->id == normalized_id;
+    });
+    if (it != tile_data.end() && !it->expired()) {
+        // There is already a tile data object and it's not yet expired, so we're
+        // going to reuse it.
+        new_tile.data = it->lock();
+    } else {
+        new_tile.data = std::make_shared<TileData>(normalized_id, style);
+        tile_data.push_front(new_tile.data);
+    }
+    return &new_tile;
 }
 
 /**
@@ -278,9 +291,8 @@ bool Map::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::f
 
     auto ids = Tile::children(id, z + 1);
     for (const Tile::ID& child_id : ids) {
-        const TileData::Ptr& tile = hasTile(child_id);
-        if (tile && tile->state == TileData::parsed) {
-            assert(tile);
+        const Tile *tile = hasTile(child_id);
+        if (tile && tile->data && tile->data->state == TileData::parsed) {
             retain.emplace_front(tile->id);
         } else {
             complete = false;
@@ -305,9 +317,8 @@ bool Map::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::f
 bool Map::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain) {
     for (int32_t z = id.z - 1; z >= minCoveringZoom; --z) {
         const Tile::ID parent_id = Tile::parent(id, z);
-        const TileData::Ptr tile = hasTile(parent_id);
-        if (tile && tile->state == TileData::parsed) {
-            assert(tile);
+        const Tile *tile = hasTile(parent_id);
+        if (tile && tile->data && tile->data->state == TileData::parsed) {
             retain.emplace_front(tile->id);
             return true;
         }
@@ -344,10 +355,10 @@ bool Map::updateTiles() {
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
     for (const Tile::ID& id : required) {
-        TileData::Ptr tile = addTile(id);
+        const Tile *tile = addTile(id);
         assert(tile);
 
-        if (tile->state != TileData::parsed) {
+        if (tile && tile->data && tile->data->state != TileData::parsed) {
             // The tile we require is not yet loaded. Try to find a parent or
             // child tile that we already have.
 
@@ -362,20 +373,18 @@ bool Map::updateTiles() {
             }
         }
 
-        if (tile->state == TileData::initial) {
+        if (tile && tile->data && tile->data->state == TileData::initial) {
             // If the tile is new, we have to make sure to load it.
-            tile->request();
+            tile->data->request();
             changed = true;
         }
     }
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
-    tiles.remove_if([&retain, &changed](const TileData::Ptr& tile) {
-        assert(tile);
-        bool obsolete = std::find(retain.begin(), retain.end(), tile->id) == retain.end();
+    tiles.remove_if([&retain, &changed](const Tile & tile) {
+        bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
         if (obsolete) {
-            tile->cancel();
             changed = true;
         }
         return obsolete;
@@ -384,8 +393,13 @@ bool Map::updateTiles() {
     // Sort tiles by zoom level, front to back.
     // We're painting front-to-back, so we want to draw more detailed tiles first
     // before filling in other parts with lower zoom levels.
-    tiles.sort([](const TileData::Ptr& a, const TileData::Ptr& b) {
-        return a->id.z > b->id.z;
+    tiles.sort([](const Tile & a, const Tile & b) {
+        return a.id.z > b.id.z;
+    });
+
+    // Remove all the expired pointers from the list.
+    tile_data.remove_if([](const std::weak_ptr<TileData>& tile_data) {
+        return tile_data.expired();
     });
 
     return changed;
@@ -406,20 +420,19 @@ bool Map::render() {
     // the stencil buffer.
     uint8_t i = 1;
     painter.prepareClippingMask();
-    for (TileData::Ptr& tile : tiles) {
-        assert(tile);
-        if (tile->state == TileData::parsed) {
+    for (Tile& tile : tiles) {
+        if (tile.data && tile.data->state == TileData::parsed) {
             // The position matrix.
-            transform.matrixFor(tile->matrix, tile->id);
-            matrix::multiply(tile->matrix, painter.projMatrix, tile->matrix);
-            tile->clip_id = i++;
-            painter.drawClippingMask(tile->matrix, tile->clip_id);
+            transform.matrixFor(tile.matrix, tile.id);
+            matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
+            tile.clip_id = i++;
+            painter.drawClippingMask(tile.matrix, tile.clip_id);
         }
     }
     painter.finishClippingMask();
 
-    for (TileData::Ptr& tile : tiles) {
-        if (tile->state == TileData::parsed) {
+    for (const Tile& tile : tiles) {
+        if (tile.data && tile.data->state == TileData::parsed) {
             painter.render(tile);
         }
     }

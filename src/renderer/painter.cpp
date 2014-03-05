@@ -130,24 +130,25 @@ void Painter::clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Painter::render(const TileData::Ptr& tile) {
-    if (tile->state != TileData::parsed) {
+void Painter::render(const Tile& tile) {
+    assert(tile.data);
+    if (tile.data->state != TileData::parsed) {
         return;
     }
 
-    matrix = tile->matrix;
-    glStencilFunc(GL_EQUAL, tile->clip_id, 0xFF);
+    matrix = tile.matrix;
+    glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
 
-    renderLayers(tile, style.layers);
+    renderLayers(tile.data, style.layers);
 
     if (settings.debug) {
-        renderDebug(tile);
+        renderDebug(tile.data);
     }
 
     renderBackground();
 }
 
-void Painter::renderLayers(const std::shared_ptr<TileData>& tile, const std::vector<LayerDescription>& layers) {
+void Painter::renderLayers(const std::shared_ptr<TileData>& tile_data, const std::vector<LayerDescription>& layers) {
     // Render everything top-to-bottom by using reverse iterators
     typedef std::vector<LayerDescription>::const_reverse_iterator iterator;
     for (iterator it = layers.rbegin(), end = layers.rend(); it != end; ++it) {
@@ -156,15 +157,15 @@ void Painter::renderLayers(const std::shared_ptr<TileData>& tile, const std::vec
         if (layer_desc.child_layer.size()) {
             // This is a layer group.
             // TODO: create framebuffer
-            renderLayers(tile, layer_desc.child_layer);
+            renderLayers(tile_data, layer_desc.child_layer);
             // TODO: render framebuffer on previous framebuffer
         } else {
             // This is a singular layer. Try to find the bucket associated with
             // this layer and render it.
-            auto bucket_it = tile->buckets.find(layer_desc.bucket_name);
-            if (bucket_it != tile->buckets.end()) {
+            auto bucket_it = tile_data->buckets.find(layer_desc.bucket_name);
+            if (bucket_it != tile_data->buckets.end()) {
                 assert(bucket_it->second);
-                bucket_it->second->render(*this, layer_desc.name, tile->id);
+                bucket_it->second->render(*this, layer_desc.name, tile_data->id);
             }
         }
     }
@@ -423,7 +424,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     bucket.drawPoints(*pointShader);
 }
 
-void Painter::renderDebug(const TileData::Ptr& tile) {
+void Painter::renderDebug(const TileData::Ptr& tile_data) {
     // Disable depth test and don't count this towards the depth buffer,
     // but *don't* disable stencil test, as we want to clip the red tile border
     // to the tile viewport.
@@ -442,13 +443,13 @@ void Painter::renderDebug(const TileData::Ptr& tile) {
     glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index());
 
     // draw debug info
-    tile->debugFontArray.bind(*plainShader, tile->debugFontBuffer, BUFFER_OFFSET(0));
+    tile_data->debugFontArray.bind(*plainShader, tile_data->debugFontBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
     lineWidth(4.0f * transform.pixelRatio);
-    glDrawArrays(GL_LINES, 0, (GLsizei)tile->debugFontBuffer.index());
+    glDrawArrays(GL_LINES, 0, (GLsizei)tile_data->debugFontBuffer.index());
     plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
     lineWidth(2.0f * transform.pixelRatio);
-    glDrawArrays(GL_LINES, 0, (GLsizei)tile->debugFontBuffer.index());
+    glDrawArrays(GL_LINES, 0, (GLsizei)tile_data->debugFontBuffer.index());
 
     // Revert blending mode to blend to the back.
     glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);

@@ -4,6 +4,10 @@
 
 using namespace llmr;
 
+Tile::Tile(const ID& id)
+    : id(id) {
+}
+
 Tile::ID Tile::parent(const ID& id, int32_t z) {
     assert(z < id.z);
     ID pos(id);
@@ -29,3 +33,11 @@ std::forward_list<Tile::ID> Tile::children(const ID& id, int32_t z) {
     return children;
 }
 
+
+Tile::ID Tile::normalize(const ID& id) {
+    ID pos(id);
+    int32_t dim = pow(2, id.z);
+    while (pos.x < 0) pos.x += dim;
+    while (pos.x >= dim) pos.x -= dim;
+    return pos;
+}

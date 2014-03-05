@@ -83,9 +83,9 @@ bool TileData::parse() {
         parseStyleLayers(tile, style.layers);
         double parse_time = (platform::time() - parse_time_start) * 1000.0;
         if (state == obsolete) {
-            fprintf(stderr, "[%p] parsing [%d/%d/%d] cancelled after %8.3fms\n", this, id.z, id.x, id.y, parse_time);
+            // fprintf(stderr, "[%p] parsing [%d/%d/%d] cancelled after %8.3fms\n", this, id.z, id.x, id.y, parse_time);
         } else {
-            fprintf(stderr, "[%p] parsing [%d/%d/%d] took %8.3fms\n", this, id.z, id.x, id.y, parse_time);
+            // fprintf(stderr, "[%p] parsing [%d/%d/%d] took %8.3fms\n", this, id.z, id.x, id.y, parse_time);
         }
     } catch (const std::exception& ex) {
         fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());

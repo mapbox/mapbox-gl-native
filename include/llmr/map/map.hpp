@@ -65,8 +65,8 @@ private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
     bool findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain);
     bool updateTiles();
-    std::shared_ptr<TileData> addTile(const Tile::ID& id);
-    std::shared_ptr<TileData> hasTile(const Tile::ID& id);
+    const Tile *addTile(const Tile::ID& id);
+    const Tile *hasTile(const Tile::ID& id);
 
 
     void update();
@@ -82,8 +82,8 @@ private:
 
     float pixel_ratio;
 
-    std::forward_list<std::shared_ptr<TileData>> tiles;
-    std::forward_list<std::shared_ptr<TileData>> historic_tiles;
+    std::forward_list<Tile> tiles;
+    std::forward_list<std::weak_ptr<TileData>> tile_data;
 };
 
 }

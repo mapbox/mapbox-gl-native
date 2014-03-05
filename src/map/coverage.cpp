@@ -69,11 +69,10 @@ std::forward_list<llmr::vec3<int32_t>> llmr::covering_tiles(int32_t zoom, const 
     std::forward_list<vec3<int32_t>> tiles;
 
     auto scanLine = [&tiles, zoom](int32_t x0, int32_t x1, int32_t y, int32_t ymax) {
-        int32_t x, wx;
+        int32_t x;
         if (y >= 0 && y <= ymax) {
             for (x = x0; x < x1; x++) {
-                wx = (x + ymax) % ymax;
-                tiles.emplace_front(wx, y, zoom);
+                tiles.emplace_front(x, y, zoom);
             }
         }
     };

@@ -33,7 +33,7 @@ public:
     void setup();
     void clear();
     void changeMatrix();
-    void render(const std::shared_ptr<TileData>& tile);
+    void render(const Tile& tile);
     void renderMatte();
     void renderBackground();
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
