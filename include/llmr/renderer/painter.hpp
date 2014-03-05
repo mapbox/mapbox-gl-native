@@ -40,6 +40,8 @@ public:
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id);
 
+    void resize(int width, int height);
+
     void prepareClippingMask();
     void drawClippingMask(const mat4& matrix, uint8_t clip_id);
     void finishClippingMask();

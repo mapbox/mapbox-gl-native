@@ -63,6 +63,10 @@ void Painter::setupShaders() {
     pointShader = std::make_unique<PointShader>();
 }
 
+void Painter::resize(int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
 void Painter::useProgram(uint32_t program) {
     if (gl_program != program) {
         glUseProgram(program);

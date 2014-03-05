@@ -1,8 +1,6 @@
 #include <llmr/llmr.hpp>
 #include <GLFW/glfw3.h>
 #include <llmr/platform/platform.hpp>
-#include <future>
-#include <list>
 
 #include "settings.hpp"
 #include "request.hpp"
@@ -26,10 +24,24 @@ public:
             exit(1);
         }
 
+        GLFWmonitor *monitor = nullptr;
+
+#ifdef GL_ES_VERSION_2_0
+        monitor = glfwGetPrimaryMonitor();
+
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+#endif
+
+        glfwWindowHint(GLFW_RED_BITS, 8);
+        glfwWindowHint(GLFW_GREEN_BITS, 8);
+        glfwWindowHint(GLFW_BLUE_BITS, 8);
+        glfwWindowHint(GLFW_ALPHA_BITS, 8);
         glfwWindowHint(GLFW_STENCIL_BITS, 8);
         glfwWindowHint(GLFW_DEPTH_BITS, 16);
 
-        window = glfwCreateWindow(1024, 768, "llmr", NULL, NULL);
+        window = glfwCreateWindow(1024, 768, "llmr", monitor, NULL);
         if (!window) {
             glfwTerminate();
             fprintf(stderr, "Failed to initialize window\n");
@@ -47,9 +59,9 @@ public:
         settings.load();
         map.setup((double)fb_width / width);
 
-        resize(window, 0, 0);
+        settings.load();
 
-        glfwSwapInterval(1);
+        resize(window, 0, 0);
 
         map.loadSettings();
 
@@ -60,7 +72,6 @@ public:
         glfwSetScrollCallback(window, scroll);
         glfwSetCharCallback(window, character);
         glfwSetKeyCallback(window, key);
-
     }
 
     static void character(GLFWwindow *window, unsigned int codepoint) {
