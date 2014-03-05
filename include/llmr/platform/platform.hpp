@@ -5,10 +5,10 @@
 #include <functional>
 #include <string>
 
-#define kTileURL "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf"
-#define kSpriteURL "https://dl.dropboxusercontent.com/u/575564/sprite"
-
 namespace llmr {
+
+extern const char *kTileURL;
+extern const char *kSpriteURL;
 
 namespace platform {
 
