@@ -42,7 +42,8 @@ public:
 public:
     typedef std::shared_ptr<TileData> Ptr;
 
-    enum state {
+    enum class State {
+        invalid,
         initial,
         loading,
         loaded,
@@ -71,7 +72,7 @@ public:
 
 public:
     const Tile::ID id;
-    std::atomic<state> state;
+    std::atomic<State> state;
 
     // Holds the actual geometries in this tile.
     DebugFontBuffer debugFontBuffer;

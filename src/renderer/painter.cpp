@@ -132,7 +132,7 @@ void Painter::clear() {
 
 void Painter::render(const Tile& tile) {
     assert(tile.data);
-    if (tile.data->state != TileData::parsed) {
+    if (tile.data->state != TileData::State::parsed) {
         return;
     }
 

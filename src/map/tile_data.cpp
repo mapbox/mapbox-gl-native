@@ -18,7 +18,7 @@ using namespace llmr;
 
 TileData::TileData(Tile::ID id, const Style& style)
     : id(id),
-      state(initial),
+      state(State::initial),
       fillVertexBuffer(std::make_shared<FillVertexBuffer>()),
       lineVertexBuffer(std::make_shared<LineVertexBuffer>()),
       pointVertexBuffer(std::make_shared<PointVertexBuffer>()),
@@ -41,7 +41,7 @@ const std::string TileData::toString() const {
 }
 
 void TileData::request() {
-    state = loading;
+    state = State::loading;
 
     // Create http request
     std::string url = util::sprintf(kTileURL,
@@ -50,11 +50,11 @@ void TileData::request() {
     // Note: Somehow this feels slower than the change to request_http()
     std::shared_ptr<TileData> tile = shared_from_this();
     platform::Request *request = platform::request_http(url, [=](platform::Response& res) {
-        if (res.code == 200 && tile->state != obsolete) {
-            tile->state = loaded;
+        if (res.code == 200 && tile->state != State::obsolete) {
+            tile->state = State::loaded;
             tile->data.swap(res.body);
             tile->parse();
-        } else if (tile->state != obsolete) {
+        } else if (tile->state != State::obsolete) {
             fprintf(stderr, "tile loading failed\n");
         }
     }, []() {
@@ -64,8 +64,8 @@ void TileData::request() {
 }
 
 void TileData::cancel() {
-    if (state != obsolete) {
-        state = obsolete;
+    if (state != State::obsolete) {
+        state = State::obsolete;
         platform::cancel_request_http(req);
     } else {
         assert((!"logic error? multiple cancelleations"));
@@ -73,7 +73,7 @@ void TileData::cancel() {
 }
 
 bool TileData::parse() {
-    if (state != loaded) {
+    if (state != State::loaded) {
         return false;
     }
 
@@ -82,7 +82,7 @@ bool TileData::parse() {
         VectorTile tile(pbf((const uint8_t *)data.data(), data.size()));
         parseStyleLayers(tile, style.layers);
         double parse_time = (platform::time() - parse_time_start) * 1000.0;
-        if (state == obsolete) {
+        if (state == State::obsolete) {
             // fprintf(stderr, "[%p] parsing [%d/%d/%d] cancelled after %8.3fms\n", this, id.z, id.x, id.y, parse_time);
         } else {
             // fprintf(stderr, "[%p] parsing [%d/%d/%d] took %8.3fms\n", this, id.z, id.x, id.y, parse_time);
@@ -93,10 +93,10 @@ bool TileData::parse() {
         return false;
     }
 
-    if (state == obsolete) {
+    if (state == State::obsolete) {
         return false;
     } else {
-        state = parsed;
+        state = State::parsed;
     }
 
     return true;
@@ -105,7 +105,7 @@ bool TileData::parse() {
 void TileData::parseStyleLayers(const VectorTile& tile, const std::vector<LayerDescription>& layers) {
     for (const LayerDescription& layer_desc : layers) {
         // Cancel early when parsing.
-        if (state == obsolete) {
+        if (state == State::obsolete) {
             return;
         }
 
@@ -164,7 +164,7 @@ std::shared_ptr<Bucket> TileData::createFillBucket(const VectorTileLayer& layer,
 
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (pbf feature : filtered_layer) {
-        if (state == obsolete) return nullptr;
+        if (state == State::obsolete) return nullptr;
 
         while (feature.next(4)) { // geometry
             pbf geometry_pbf = feature.message();
@@ -183,7 +183,7 @@ std::shared_ptr<Bucket> TileData::createLineBucket(const VectorTileLayer& layer,
 
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (pbf feature : filtered_layer) {
-        if (state == obsolete) return nullptr;
+        if (state == State::obsolete) return nullptr;
 
         while (feature.next(4)) { // geometry
             pbf geometry_pbf = feature.message();
@@ -201,7 +201,7 @@ std::shared_ptr<Bucket> TileData::createPointBucket(const VectorTileLayer& layer
 
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (pbf feature : filtered_layer) {
-        if (state == obsolete) return nullptr;
+        if (state == State::obsolete) return nullptr;
 
         while (feature.next(4)) { // geometry
             pbf geometry_pbf = feature.message();

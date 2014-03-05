@@ -65,8 +65,8 @@ private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
     bool findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain);
     bool updateTiles();
-    const Tile *addTile(const Tile::ID& id);
-    const Tile *hasTile(const Tile::ID& id);
+    TileData::State addTile(const Tile::ID& id);
+    TileData::State hasTile(const Tile::ID& id);
 
 
     void update();
