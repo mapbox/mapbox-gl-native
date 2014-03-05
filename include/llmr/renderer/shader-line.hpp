@@ -23,19 +23,19 @@ private:
     int32_t a_extrude = -1;
     // int32_t a_linesofar = -1;
 
-    std::array<float, 16> exmatrix = {};
+    std::array<float, 16> exmatrix = {{}};
     int32_t u_exmatrix = -1;
 
-    std::array<float, 4> color = {};
+    std::array<float, 4> color = {{}};
     int32_t u_color = -1;
 
-    std::array<float, 2> linewidth = {};
+    std::array<float, 2> linewidth = {{}};
     int32_t u_linewidth = -1;
 
     float ratio = 0;
     int32_t u_ratio = -1;
 
-    std::array<float, 2> dasharray = {};
+    std::array<float, 2> dasharray = {{}};
     int32_t u_dasharray = -1;
 
     float debug = 0;
