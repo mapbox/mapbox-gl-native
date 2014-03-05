@@ -2,6 +2,8 @@
 #include <GLFW/glfw3.h>
 #include <llmr/platform/platform.hpp>
 
+#include <signal.h>
+
 #include "settings.hpp"
 #include "request.hpp"
 
@@ -270,12 +272,32 @@ double time() {
 }
 }
 
+void quit_handler(int s) {
+    if (mapView) {
+        fprintf(stderr, "waiting for quit...\n");
+        glfwSetWindowShouldClose(mapView->window, true);
+        llmr::platform::restart();
+    } else {
+        exit(0);
+    }
+}
 
 int main() {
+    // sigint handling
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = quit_handler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+    sigaction(SIGINT, &sigIntHandler, NULL);
+
+
+    // curl init
     curl_global_init(CURL_GLOBAL_ALL);
 
     llmr::platform::Request::initialize();
 
+
+    // main loop
     mapView = new MapView();
     mapView->init();
     int ret = mapView->run();
