@@ -94,8 +94,6 @@ Shader::Shader(const GLchar *vertSource, const GLchar *fragSource)
     glDetachShader(program, fragShader);
     glDeleteShader(fragShader);
 
-
-    fprintf(stderr, "successfully compiled shader\n");
     valid = true;
 }
 
