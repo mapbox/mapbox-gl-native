@@ -78,6 +78,11 @@ void Request::request(void *ptr) {
     CURL *curl = nullptr;
     if ((curl = pthread_getspecific(key)) == nullptr) {
         curl = curl_easy_init();
+
+        // stopgap to avoid libcurl crashes:
+        // see https://stackoverflow.com/q/9191668
+        curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+
         pthread_setspecific(key, curl);
     }
 
