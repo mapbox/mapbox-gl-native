@@ -26,7 +26,6 @@ LineShader::LineShader()
     u_color = glGetUniformLocation(program, "u_color");
     u_ratio = glGetUniformLocation(program, "u_ratio");
     u_dasharray = glGetUniformLocation(program, "u_dasharray");
-    u_debug = glGetUniformLocation(program, "u_debug");
 
     // fprintf(stderr, "LineShader:\n");
     // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
@@ -35,7 +34,6 @@ LineShader::LineShader()
     // fprintf(stderr, "    - u_color: %d\n", u_color);
     // fprintf(stderr, "    - u_ratio: %d\n", u_ratio);
     // fprintf(stderr, "    - u_dasharray: %d\n", u_dasharray);
-    // fprintf(stderr, "    - u_debug: %d\n", u_debug);
 }
 
 void LineShader::bind(char *offset) {
@@ -81,12 +79,5 @@ void LineShader::setDashArray(const std::array<float, 2>& new_dasharray) {
     if (dasharray != new_dasharray) {
         glUniform2fv(u_dasharray, 1, new_dasharray.data());
         dasharray = new_dasharray;
-    }
-}
-
-void LineShader::setDebug(float new_debug) {
-    if (debug != new_debug) {
-        glUniform1f(u_debug, new_debug);
-        debug = new_debug;
     }
 }

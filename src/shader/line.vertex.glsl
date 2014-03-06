@@ -15,8 +15,6 @@ attribute vec2 a_extrude;
 uniform mat4 u_matrix;
 uniform mat4 u_exmatrix;
 
-uniform float u_debug;
-
 // shared
 uniform float u_ratio;
 uniform vec2 u_linewidth;
@@ -44,10 +42,4 @@ void main() {
     // tile's zoom level.
     gl_Position = u_matrix * vec4(floor(a_pos * 0.5), 0.0, 1.0) + u_exmatrix * dist;
     // v_linesofar = a_linesofar * u_ratio;
-
-    gl_PointSize = 8.0;
-
-    if (u_debug > 1.5) {
-        gl_Position = u_matrix * vec4(floor(a_pos * 0.5), 0.0, 1.0);
-    }
 }

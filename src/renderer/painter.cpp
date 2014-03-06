@@ -383,7 +383,6 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         lineShader->setLineWidth({{ outset, inset }});
         lineShader->setRatio(tilePixelRatio);
         lineShader->setColor(color);
-        lineShader->setDebug(0);
         depthMask(false);
         bucket.drawLines(*lineShader);
     }

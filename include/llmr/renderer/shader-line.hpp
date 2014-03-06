@@ -37,9 +37,6 @@ private:
 
     std::array<float, 2> dasharray = {{}};
     int32_t u_dasharray = -1;
-
-    float debug = 0;
-    int32_t u_debug = -1;
 };
 
 
