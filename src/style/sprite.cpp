@@ -90,8 +90,6 @@ void Sprite::parseJSON(const std::string& data) {
                 if (value.HasMember("height")) height = value["height"].GetInt();
                 if (value.HasMember("pixelRatio")) pixelRatio = value["height"].GetInt();
 
-                fprintf(stderr, "");
-
                 pos.insert({ name, { x, y, width, height, pixelRatio } });
             }
         }
@@ -238,7 +236,7 @@ ImagePosition Sprite::getPosition(const std::string& name, bool repeating) {
 
 void Sprite::bind(bool linear) {
     if (!width || !height) {
-        fprintf(stderr, "trying to bind texture without dimension\n");
+        // fprintf(stderr, "trying to bind texture without dimension\n");
         return;
     }
 

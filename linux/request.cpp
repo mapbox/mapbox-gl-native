@@ -33,6 +33,7 @@ int Request::curl_progress_callback(void *ptr, double dltotal, double dlnow, dou
 void Request::initialize() {
     // curl init
     curl_global_init(CURL_GLOBAL_ALL);
+
     curl_share = curl_share_init();
     curl_share_setopt(curl_share, CURLSHOPT_LOCKFUNC, curl_share_lock);
     curl_share_setopt(curl_share, CURLSHOPT_UNLOCKFUNC, curl_share_unlock);
