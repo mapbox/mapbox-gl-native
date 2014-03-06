@@ -112,13 +112,13 @@ private:
     VertexBuffer matteBuffer = {
         // top left triangle
         0, 0,
-        16384, 0,
-        0, 16384,
+        1920, 0,
+        0, 1080,
 
         // bottom right triangle
-        16384, 0,
-        0, 16384,
-        16384, 16384
+        1920, 0,
+        0, 1080,
+        1920, 1080
     };
 
     VertexArrayObject matteArray;
