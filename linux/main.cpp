@@ -3,11 +3,14 @@
 #include <llmr/platform/platform.hpp>
 
 #include <signal.h>
+#include <getopt.h>
 
 #include "settings.hpp"
 #include "request.hpp"
 
 std::forward_list<llmr::platform::Request *> requests;
+
+static int fullscreen_flag = 0;
 
 class MapView {
 public:
@@ -29,7 +32,9 @@ public:
         GLFWmonitor *monitor = nullptr;
 
 #ifdef GL_ES_VERSION_2_0
-        monitor = glfwGetPrimaryMonitor();
+        if (fullscreen_flag) {
+            monitor = glfwGetPrimaryMonitor();
+        }
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
@@ -59,9 +64,8 @@ public:
         glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
         settings.load();
-        map.setup((double)fb_width / width);
 
-        settings.load();
+        map.setup((double)fb_width / width);
 
         resize(window, 0, 0);
 
@@ -132,6 +136,8 @@ public:
         glfwGetWindowSize(window, &width, &height);
         int fb_width, fb_height;
         glfwGetFramebufferSize(window, &fb_width, &fb_height);
+
+        fprintf(stderr, "window size: %d/%d\n", width, height);
 
         mapView->map.resize(width, height, fb_width, fb_height);
     }
@@ -282,13 +288,26 @@ void quit_handler(int s) {
     }
 }
 
-int main() {
-    // sigint handling
-    struct sigaction sigIntHandler;
-    sigIntHandler.sa_handler = quit_handler;
-    sigemptyset(&sigIntHandler.sa_mask);
-    sigIntHandler.sa_flags = 0;
-    sigaction(SIGINT, &sigIntHandler, NULL);
+
+
+static struct option long_options[] = {
+    {"fullscreen", no_argument, &fullscreen_flag, 1},
+    {0, 0, 0, 0}
+};
+
+int main(int argc, char *argv[]) {
+    while (true) {
+        int option_index = 0;
+        int c = getopt_long(argc, argv, "f", long_options, &option_index);
+        if (c == -1) break;
+    }
+
+    // // sigint handling
+    // struct sigaction sigIntHandler;
+    // sigIntHandler.sa_handler = quit_handler;
+    // sigemptyset(&sigIntHandler.sa_mask);
+    // sigIntHandler.sa_flags = 0;
+    // sigaction(SIGINT, &sigIntHandler, NULL);
 
 
     // curl init
