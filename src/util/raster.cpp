@@ -10,6 +10,9 @@
 using namespace llmr::util;
 
 Raster::~Raster() {
+    if (texture) {
+        glDeleteTextures(1, &texture);
+    }
     if (img) {
         free(img);
     }
