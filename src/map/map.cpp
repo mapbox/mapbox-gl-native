@@ -266,11 +266,19 @@ TileData::State Map::addTile(const Tile::ID& id) {
     auto it = std::find_if(tile_data.begin(), tile_data.end(), [&normalized_id](const std::weak_ptr<TileData>& tile_data) {
         return !tile_data.expired() && tile_data.lock()->id == normalized_id;
     });
-    if (it != tile_data.end() && !it->expired()) {
-        // There is already a tile data object and it's not yet expired, so we're
-        // going to reuse it.
+
+    if (it != tile_data.end()) {
+        // Create a shared_ptr handle. Note that this might be empty!
         new_tile.data = it->lock();
-    } else {
+    }
+
+    if (new_tile.data && new_tile.data->state == TileData::State::obsolete) {
+        // Do not consider the tile if it's already obsolete.
+        new_tile.data.reset();
+    }
+
+    if (!new_tile.data) {
+        // If we don't find working tile data, we're just going to load it.
         new_tile.data = std::make_shared<TileData>(normalized_id, style);
         new_tile.data->request();
         tile_data.push_front(new_tile.data);
