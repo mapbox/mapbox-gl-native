@@ -141,24 +141,10 @@ void Raster::loadImage(const std::string& data) {
     }
 }
 
-void Raster::bind(enum filter filter) {
+void Raster::bind(bool linear) {
     if (!width || !height) {
         fprintf(stderr, "trying to bind texture without dimension\n");
         return;
-    }
-
-    GLint min_filter;
-    GLint mag_filter;
-
-    if (filter == FilterNearest) {
-        min_filter = GL_NEAREST;
-        mag_filter = GL_NEAREST;
-    } else if (filter == FilterLinear) {
-        min_filter = GL_LINEAR;
-        mag_filter = GL_LINEAR;
-    } else if (filter == FilterMipMap) {
-        min_filter = GL_LINEAR_MIPMAP_NEAREST;
-        mag_filter = GL_LINEAR;
     }
 
     if (!texture) {
@@ -173,11 +159,10 @@ void Raster::bind(enum filter filter) {
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 
+    GLuint filter = linear ? GL_LINEAR : GL_NEAREST;
     if (filter != this->filter) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
-        if (filter == FilterMipMap)
-            glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
         this->filter = filter;
     }
 }

@@ -140,7 +140,7 @@ void Painter::renderRaster(const std::shared_ptr<Tile>& tile) {
     useProgram(rasterShader->program);
     rasterShader->setMatrix(matrix);
     rasterShader->setImage(0);
-    tile->raster->bind(util::Raster::FilterLinear);
+    tile->raster->bind(true);
 
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
@@ -252,7 +252,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         patternShader->setPatternBottomRight({{ imagePos.br.x, imagePos.br.y }});
         patternShader->setColor(fill_color);
         patternShader->setMix(mix);
-        style.sprite->raster->bind(util::Raster::FilterLinear);
+        style.sprite->raster->bind(true);
 
         // Draw the actual triangles into the color & stencil buffer.
         bucket.drawElements(*patternShader);
@@ -406,9 +406,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     #endif
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
-    style.sprite->raster->bind((transform.rotating || transform.scaling || transform.panning) ?
-                                    util::Raster::FilterLinear :
-                                    util::Raster::FilterNearest);
+    style.sprite->raster->bind(transform.rotating || transform.scaling || transform.panning);
     bucket.drawPoints(*pointShader);
 }
 
