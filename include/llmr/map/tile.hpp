@@ -53,7 +53,7 @@ public:
     };
 
 public:
-    Tile(ID id, const Style& style, bool use_raster = false);
+    Tile(ID id, const Style& style, bool use_raster = false, bool use_retina = false);
     ~Tile();
 
     // Start loading the tile.
@@ -79,6 +79,7 @@ public:
     uint8_t clip_id;
     std::atomic<state> state;
     const bool use_raster;
+    const bool use_retina;
     std::shared_ptr<util::Raster> raster;
 
     // Holds the actual geometries in this tile.

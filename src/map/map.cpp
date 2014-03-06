@@ -14,7 +14,7 @@ Map::Map(Settings& settings)
       style(),
       painter(transform, settings, style),
       min_zoom(0),
-      max_zoom((use_raster ? 19 : 14)) {
+      max_zoom((use_raster ? kTileRasterMaxZoom : kTileVectorMaxZoom)) {
 }
 
 Map::~Map() {
@@ -61,7 +61,7 @@ void Map::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb
 
 void Map::toggleRaster() {
     use_raster = ! use_raster;
-    max_zoom = (use_raster ? 19 : 14);
+    max_zoom = (use_raster ? kTileRasterMaxZoom : kTileVectorMaxZoom);
     tiles.clear();
     update();
 }
@@ -259,7 +259,7 @@ Tile::Ptr Map::addTile(const Tile::ID& id) {
 
     if (!tile.get()) {
         // We couldn't find the tile in the list. Create a new one.
-        tile = std::make_shared<Tile>(id, style, use_raster);
+        tile = std::make_shared<Tile>(id, style, use_raster, (pixel_ratio > 1.0));
         assert(tile);
         // std::cerr << "init " << id.z << "/" << id.x << "/" << id.y << std::endl;
         // std::cerr << "add " << tile->toString() << std::endl;
@@ -336,7 +336,6 @@ bool Map::updateTiles() {
     int32_t min_covering_zoom = zoom - 10;
     if (min_covering_zoom < min_zoom) min_covering_zoom = min_zoom;
 
-
     int32_t max_dim = pow(2, zoom);
 
     // Map four viewport corners to pixel coordinates
@@ -349,12 +348,17 @@ bool Map::updateTiles() {
     br.x = fmin(max_dim, ceil(fmax(box.tr.x, box.br.x)));
     br.y = fmin(max_dim, ceil(fmax(box.bl.y, box.br.y)));
 
-
     // TODO: Discard tiles that are outside the viewport
     std::forward_list<Tile::ID> required;
     for (int32_t y = tl.y; y < br.y; ++y) {
         for (int32_t x = tl.x; x < br.x; ++x) {
-            required.emplace_front(x, y, zoom);
+            if (use_raster) {
+                for (const Tile::ID& id : Tile::children({ x, y, zoom }, (zoom + (pixel_ratio > 1.0 ? 2 : 1)))) {
+                    required.emplace_front(id.x, id.y, id.z);
+                }
+            } else {
+                required.emplace_front(x, y, zoom);
+            }
         }
     }
 

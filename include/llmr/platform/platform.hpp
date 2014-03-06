@@ -6,8 +6,11 @@
 #include <string>
 
 #define kTileVectorURL "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf"
-#define kTileRasterURL "https://a.tiles.mapbox.com/v3/justin.map-84o69j8c/%d/%d/%d.png256"
+#define kTileRasterURL "https://a.tiles.mapbox.com/v3/justin.map-pgygbwdm/%d/%d/%d%s.png256"
 #define kSpriteURL "https://dl.dropboxusercontent.com/u/575564/sprite"
+
+#define kTileVectorMaxZoom 14.0f
+#define kTileRasterMaxZoom 21.0f
 
 namespace llmr {
 
