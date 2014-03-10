@@ -35,6 +35,7 @@
 
 #ifdef GL_ES_VERSION_2_0
     #define glClearDepth glClearDepthf
+    #define glDepthRange glDepthRangef
 #endif
 
 void _CHECK_GL_ERROR(const char *cmd, const char *file, int line);

@@ -250,9 +250,6 @@ void Transform::matrixFor(mat4& matrix, const vec3<int32_t>& id) const {
     // TODO: Get rid of the 8 (scaling from 4096 to tile size);
     float factor = scale / tile_scale / (4096.0f / util::tileSize);
     matrix::scale(matrix, matrix, factor, factor, 1);
-
-    // Clipping plane
-    matrix::translate(matrix, matrix, 0, 0, -1);
 }
 
 float Transform::getZoom() const {

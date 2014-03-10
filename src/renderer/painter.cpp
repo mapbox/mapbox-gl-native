@@ -39,10 +39,11 @@ void Painter::setup() {
 
 
     // Blending
-    // We are blending the new pixels *behind* the existing pixels. That way we can
-    // draw front-to-back and use the depth buffer to cull opaque pixels early.
+    // We are blending new pixels on top of old pixels. Since we have depth testing
+    // and are drawing opaque fragments first front-to-back, then translucent
+    // fragments back-to-front, this shades the fewest fragments possible.
     glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     // Set clear values
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -90,7 +91,7 @@ void Painter::depthMask(bool value) {
 
 void Painter::changeMatrix() {
     // Initialize projection matrix
-    matrix::ortho(projMatrix, 0, transform.width, transform.height, 0, 1, 10);
+    matrix::ortho(projMatrix, 0, transform.width, transform.height, 0, 0, 1);
 
     // The extrusion matrix.
     matrix::identity(extrudeMatrix);
@@ -100,38 +101,44 @@ void Painter::changeMatrix() {
     // The native matrix is a 1:1 matrix that paints the coordinates at the
     // same screen position as the vertex specifies.
     matrix::identity(nativeMatrix);
-    matrix::translate(nativeMatrix, nativeMatrix, 0, 0, -1);
     matrix::multiply(nativeMatrix, projMatrix, nativeMatrix);
 }
 
 void Painter::prepareClippingMask() {
     useProgram(plainShader->program);
     glDisable(GL_DEPTH_TEST);
-
-    glColorMask(false, false, false, false);
-    // This has been set by the call to Painter::clear()
-    // glStencilMask(0xFF);
+    depthMask(false);
+    glDepthRange(1.0f, 1.0f);
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 }
 
 void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id) {
+    Color fill_color = {{ 1, 1, 1, 1 }};
+
     plainShader->setMatrix(matrix);
+    plainShader->setColor(fill_color);
+
     glStencilFunc(GL_ALWAYS, clip_id, 0xFF);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
 
 void Painter::finishClippingMask() {
-    glColorMask(true, true, true, true);
     glEnable(GL_DEPTH_TEST);
+    depthMask(true);
     glStencilMask(0x0);
 }
 
 void Painter::clear() {
     glStencilMask(0xFF);
     depthMask(true);
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+#ifdef NVIDIA
+    // We're painting in a way that allows us to skip clearing the color buffer.
+    // On Tegra hardware, this is faster.
+    glClear(GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#else
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#endif
 }
 
 void Painter::render(const Tile& tile) {
@@ -148,38 +155,62 @@ void Painter::render(const Tile& tile) {
     if (settings.debug) {
         renderDebug(tile.data);
     }
-
-    renderBackground();
 }
 
 void Painter::renderLayers(const std::shared_ptr<TileData>& tile_data, const std::vector<LayerDescription>& layers) {
-    // Render everything top-to-bottom by using reverse iterators
-    typedef std::vector<LayerDescription>::const_reverse_iterator iterator;
-    for (iterator it = layers.rbegin(), end = layers.rend(); it != end; ++it) {
-        const LayerDescription& layer_desc = *it;
+    float strata_thickness = 1.0f / (layers.size() + 1);
 
-        if (layer_desc.child_layer.size()) {
-            // This is a layer group.
-            // TODO: create framebuffer
-            renderLayers(tile_data, layer_desc.child_layer);
-            // TODO: render framebuffer on previous framebuffer
-        } else {
-            // This is a singular layer. Try to find the bucket associated with
-            // this layer and render it.
-            auto bucket_it = tile_data->buckets.find(layer_desc.bucket_name);
-            if (bucket_it != tile_data->buckets.end()) {
-                assert(bucket_it->second);
-                bucket_it->second->render(*this, layer_desc.name, tile_data->id);
-            }
+    // - FIRST PASS ------------------------------------------------------------
+    // Render everything top-to-bottom by using reverse iterators. Render opaque
+    // objects first.
+    pass = Opaque;
+    glDisable(GL_BLEND);
+    depthMask(true);
+
+    typedef std::vector<LayerDescription>::const_reverse_iterator riterator;
+    int i = 0;
+    for (riterator it = layers.rbegin(), end = layers.rend(); it != end; ++it, ++i) {
+        strata = i * strata_thickness;
+        renderLayer(tile_data, *it);
+    }
+
+    // - SECOND PASS -----------------------------------------------------------
+    // Make a second pass, rendering translucent objects. This time, we render
+    // bottom-to-top.
+    pass = Translucent;
+    glEnable(GL_BLEND);
+    depthMask(false);
+
+    typedef std::vector<LayerDescription>::const_iterator iterator;
+    --i;
+    for (iterator it = layers.begin(), end = layers.end(); it != end; ++it, --i) {
+        strata = i * strata_thickness;
+        renderLayer(tile_data, *it);
+    }
+}
+
+void Painter::renderLayer(const std::shared_ptr<TileData>& tile_data, const LayerDescription& layer_desc) {
+    if (layer_desc.child_layer.size()) {
+        // This is a layer group.
+        // TODO: create framebuffer
+        renderLayers(tile_data, layer_desc.child_layer);
+        // TODO: render framebuffer on previous framebuffer
+    } else {
+        // This is a singular layer. Try to find the bucket associated with
+        // this layer and render it.
+        auto bucket_it = tile_data->buckets.find(layer_desc.bucket_name);
+        if (bucket_it != tile_data->buckets.end()) {
+            assert(bucket_it->second);
+            bucket_it->second->render(*this, layer_desc.name, tile_data->id);
         }
     }
 }
 
 void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
-    const FillProperties& properties = style.computed.fills[layer_name];
-
     // Abort early.
     if (bucket.empty()) return;
+
+    const FillProperties& properties = style.computed.fills[layer_name];
     if (properties.hidden) return;
 
     Color fill_color = properties.fill_color;
@@ -203,16 +234,16 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
-    if (outline) {
+    if (outline && pass == Translucent) {
         useProgram(outlineShader->program);
         outlineShader->setMatrix(matrix);
         lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
         outlineShader->setColor(stroke_color);
-        depthMask(false);
 
         // Draw the entire line
         outlineShader->setWorld({{ transform.fb_width, transform.fb_height }});
+        glDepthRange(strata, 1.0f);
         bucket.drawVertices(*outlineShader);
     } else if (fringeline) {
         // // We're only drawing to the first seven bits (== support a maximum of
@@ -232,88 +263,81 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         // glStencilOp(GL_KEEP, GL_KEEP, GL_INCR_WRAP);
     }
 
-    if (properties.image.size() && *style.sprite) {
-        // Draw texture fill
-        ImagePosition imagePos = style.sprite->getPosition(properties.image, true);
+    if ((fill_color[3] >= 1.0f) == (pass == Opaque)) {
+        if (properties.image.size() && *style.sprite) {
+            // Draw texture fill
+            ImagePosition imagePos = style.sprite->getPosition(properties.image, true);
 
-        float factor = 8.0 / pow(2, transform.getIntegerZoom() - id.z);
-        float mix = fmod(transform.getZoom(), 1.0);
+            float factor = 8.0 / pow(2, transform.getIntegerZoom() - id.z);
+            float mix = fmod(transform.getZoom(), 1.0);
 
-        std::array<float, 2> imageSize = {{
-                imagePos.size.x * factor,
-                imagePos.size.y *factor
-            }
-        };
+            std::array<float, 2> imageSize = {{
+                    imagePos.size.x * factor,
+                    imagePos.size.y *factor
+                }
+            };
 
-        std::array<float, 2> offset = {{
-                (float)fmod(id.x * 4096, imageSize[0]),
-                (float)fmod(id.y * 4096, imageSize[1])
-            }
-        };
+            std::array<float, 2> offset = {{
+                    (float)fmod(id.x * 4096, imageSize[0]),
+                    (float)fmod(id.y * 4096, imageSize[1])
+                }
+            };
 
-        useProgram(patternShader->program);
-        patternShader->setMatrix(matrix);
-        patternShader->setOffset(offset);
-        patternShader->setPatternSize(imageSize);
-        patternShader->setPatternTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
-        patternShader->setPatternBottomRight({{ imagePos.br.x, imagePos.br.y }});
-        patternShader->setColor(fill_color);
-        patternShader->setMix(mix);
-        style.sprite->bind(true);
+            useProgram(patternShader->program);
+            patternShader->setMatrix(matrix);
+            patternShader->setOffset(offset);
+            patternShader->setPatternSize(imageSize);
+            patternShader->setPatternTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
+            patternShader->setPatternBottomRight({{ imagePos.br.x, imagePos.br.y }});
+            patternShader->setColor(fill_color);
+            patternShader->setMix(mix);
+            style.sprite->bind(true);
 
-        // TODO: Find out if the texture is completely opaque. If it is, we can
-        // set the mask to GL_TRUE so that we won't draw any further fragments
-        // after this one.
-        depthMask(false);
+            // Draw the actual triangles into the color & stencil buffer.
+            glDepthRange(strata + strata_epsilon, 1.0f);
+            bucket.drawElements(*patternShader);
+        } else {
+            // Only draw the fill when it's either opaque and we're drawing opaque
+            // fragments or when it's translucent and we're drawing translucent
+            // fragments
+            // Draw filling rectangle.
+            useProgram(plainShader->program);
+            plainShader->setMatrix(matrix);
+            plainShader->setColor(fill_color);
 
-        // Draw the actual triangles into the color & stencil buffer.
-        bucket.drawElements(*patternShader);
-    } else {
-        // Draw filling rectangle.
-        useProgram(plainShader->program);
-        plainShader->setMatrix(matrix);
-        plainShader->setColor(fill_color);
-
-        // Only update the depth buffer if the color we're drawing is completely
-        // opaque.
-        depthMask(fill_color[3] >= 1.0f);
-
-        // Draw the actual triangles into the color & stencil buffer.
-        bucket.drawElements(*plainShader);
+            // Draw the actual triangles into the color & stencil buffer.
+            glDepthRange(strata + strata_epsilon, 1.0f);
+            bucket.drawElements(*plainShader);
+        }
     }
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
-    if (fringeline) {
-        // useProgram(outlineShader->program);
-        // outlineShader->setMatrix(matrix);
-        // lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
+    if (fringeline && pass == Translucent) {
+        useProgram(outlineShader->program);
+        outlineShader->setMatrix(matrix);
+        lineWidth(3.0f); // This is always fixed and does not depend on the pixelRatio!
 
-        // // From now on, we don't want to update the stencil buffer anymore.
-        // glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        // glStencilMask(0x0);
+        outlineShader->setColor(fill_color);
 
-        // // Otherwise, we only want to draw the antialiased parts that are
-        // // *outside* the current shape. This is important in case the fill
-        // // or stroke color is translucent. If we wouldn't clip to outside
-        // // the current shape, some pixels from the outline stroke overlapped
-        // // the (non-antialiased) fill.
-        // glStencilFunc(GL_EQUAL, 0x80, 0xBF);
-        // outlineShader->setColor(fill_color);
+        // Draw the entire line
+        outlineShader->setWorld({{
+                transform.fb_width,
+                transform.fb_height
+            }
+        });
 
-        // // Draw the entire line
-        // outlineShader->setWorld({{ transform.fb_width, transform.fb_height }});
-        // bucket.drawVertices(*outlineShader);
-
-        // glStencilFunc(GL_EQUAL, 0x80, 0x80);
+        glDepthRange(strata + strata_epsilon, 1.0f);
+        bucket.drawVertices(*outlineShader);
     }
 }
 
 void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
-    const LineProperties& properties = style.computed.lines[layer_name];
-
     // Abort early.
+    if (pass == Opaque) return;
     if (bucket.empty()) return;
+
+    const LineProperties& properties = style.computed.lines[layer_name];
     if (properties.hidden) return;
 
     float width = properties.width;
@@ -329,6 +353,9 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     color[1] *= properties.opacity;
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
+
+
+    glDepthRange(strata, 1.0f);
 
     // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
     if (bucket.hasPoints() && outset > 1.0f) {
@@ -352,7 +379,6 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 #else
         glPointSize(pointSize);
 #endif
-        depthMask(false);
         bucket.drawPoints(*linejoinShader);
     }
 
@@ -383,16 +409,16 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         lineShader->setLineWidth({{ outset, inset }});
         lineShader->setRatio(tilePixelRatio);
         lineShader->setColor(color);
-        depthMask(false);
         bucket.drawLines(*lineShader);
     }
 }
 
 void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
-    const PointProperties& properties = style.computed.points[layer_name];
-
     // Abort early.
     if (!bucket.hasPoints()) return;
+    if (pass == Opaque) return;
+
+    const PointProperties& properties = style.computed.points[layer_name];
     if (properties.hidden) return;
 
     Color color = properties.color;
@@ -414,16 +440,16 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     pointShader->setImage(0);
     pointShader->setColor(color);
     const float pointSize = properties.size * 1.4142135623730951 * transform.pixelRatio;
-    #if defined(GL_ES_VERSION_2_0)
-        pointShader->setSize(pointSize);
-    #else
-        glPointSize(pointSize);
-        glEnable(GL_POINT_SPRITE);
-    #endif
+#if defined(GL_ES_VERSION_2_0)
+    pointShader->setSize(pointSize);
+#else
+    glPointSize(pointSize);
+    glEnable(GL_POINT_SPRITE);
+#endif
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
     style.sprite->bind(transform.rotating || transform.scaling || transform.panning);
-    depthMask(false);
+    glDepthRange(strata, 1.0f);
     bucket.drawPoints(*pointShader);
 }
 
@@ -432,10 +458,7 @@ void Painter::renderDebug(const TileData::Ptr& tile_data) {
     // but *don't* disable stencil test, as we want to clip the red tile border
     // to the tile viewport.
     glDisable(GL_DEPTH_TEST);
-    depthMask(false);
 
-    // Blend to the front, not the back.
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     useProgram(plainShader->program);
     plainShader->setMatrix(matrix);
 
@@ -454,12 +477,11 @@ void Painter::renderDebug(const TileData::Ptr& tile_data) {
     lineWidth(2.0f * transform.pixelRatio);
     glDrawArrays(GL_LINES, 0, (GLsizei)tile_data->debugFontBuffer.index());
 
-    // Revert blending mode to blend to the back.
-    glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
     glEnable(GL_DEPTH_TEST);
 }
 
 void Painter::renderMatte() {
+    glDisable(GL_DEPTH_TEST);
     glStencilFunc(GL_EQUAL, 0x0, 0xFF);
 
     Color white = {{ 0.9, 0.9, 0.9, 1 }};
@@ -471,17 +493,6 @@ void Painter::renderMatte() {
     matteArray.bind(*plainShader, matteBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(white);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)matteBuffer.index());
-}
 
-void Painter::renderBackground() {
-    Color fill_color = {{ 1, 1, 1, 1 }};
-
-    useProgram(plainShader->program);
-    plainShader->setMatrix(matrix);
-
-    // Draw the clipping mask
-    coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-    plainShader->setColor(fill_color);
-    depthMask(fill_color[3] >= 1.0f);
-    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
+    glEnable(GL_DEPTH_TEST);
 }

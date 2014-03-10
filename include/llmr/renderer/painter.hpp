@@ -35,7 +35,6 @@ public:
     void changeMatrix();
     void render(const Tile& tile);
     void renderMatte();
-    void renderBackground();
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id);
@@ -48,6 +47,7 @@ public:
 private:
     void setupShaders();
     void renderLayers(const std::shared_ptr<TileData>& tile, const std::vector<LayerDescription>& layers);
+    void renderLayer(const std::shared_ptr<TileData>& tile_data, const LayerDescription& layer_desc);
     void renderDebug(const std::shared_ptr<TileData>& tile);
 
     void useProgram(uint32_t program);
@@ -65,9 +65,14 @@ private:
     Settings& settings;
     Style& style;
 
+
+
     uint32_t gl_program = 0;
     float gl_lineWidth = 0;
     bool gl_depthMask = true;
+    float strata = 0;
+    const float strata_epsilon = 1.0f / (1 << 16);
+    enum { Opaque, Translucent } pass = Opaque;
 
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;
