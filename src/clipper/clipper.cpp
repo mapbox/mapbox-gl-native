@@ -437,7 +437,7 @@ Int128 Int128Mul (cInt lhs, cInt rhs)
   if (tmp.lo < b) tmp.hi++;
   if (negate) tmp = -tmp;
   return tmp;
-};
+}
 #endif
 
 //------------------------------------------------------------------------------

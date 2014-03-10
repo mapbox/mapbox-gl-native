@@ -26,7 +26,7 @@ inline T dist(const S1& a, const S2& b) {
     T dy = b.y - a.y;
     T c = sqrt(dx * dx + dy * dy);
     return c;
-};
+}
 
 }
 }

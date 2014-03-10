@@ -306,7 +306,7 @@ bool Map::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::f
         }
     }
     return complete;
-};
+}
 
 /**
  * Find a loaded parent of the given tile.
@@ -327,7 +327,7 @@ bool Map::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::for
         }
     }
     return false;
-};
+}
 
 
 bool Map::updateTiles() {
