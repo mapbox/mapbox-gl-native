@@ -15,6 +15,10 @@ app: config.gypi src macosx/llmr-app.gyp
 	make -C build/macosx-make V=$(V)
 	open build/macosx-make/out/Release/llmr.app
 
+android: config.gypi src android/android-library.gyp
+	deps/run_gyp android/android-library.gyp -Goutput_dir=./out/ --depth=. --generator-output=./build/android-make -f make
+	make -C build/android-make V=$(V)
+
 # build just xcode project for libllmr
 xcode: config.gypi llmr.gyp
 	deps/run_gyp llmr.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
