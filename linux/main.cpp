@@ -312,12 +312,12 @@ int main(int argc, char *argv[]) {
         if (c == -1) break;
     }
 
-    // // sigint handling
-    // struct sigaction sigIntHandler;
-    // sigIntHandler.sa_handler = quit_handler;
-    // sigemptyset(&sigIntHandler.sa_mask);
-    // sigIntHandler.sa_flags = 0;
-    // sigaction(SIGINT, &sigIntHandler, NULL);
+    // sigint handling
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = quit_handler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+    sigaction(SIGINT, &sigIntHandler, NULL);
 
 
     // curl init
