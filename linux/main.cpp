@@ -126,6 +126,7 @@ public:
             scale = 1.0 / scale;
         }
 
+        mapView->map.startScaling();
         mapView->map.scaleBy(scale, mapView->last_x, mapView->last_y);
     }
 
@@ -150,11 +151,14 @@ public:
             if (mapView->rotating) {
                 mapView->start_x = mapView->last_x;
                 mapView->start_y = mapView->last_y;
+            } else {
+                mapView->map.stopRotating();
             }
         } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
             mapView->tracking = action == GLFW_PRESS;
 
             if (action == GLFW_RELEASE) {
+                mapView->map.stopPanning();
                 double now = glfwGetTime();
                 if (now - mapView->last_click < 0.4) {
                     mapView->map.scaleBy(2.0, mapView->last_x, mapView->last_y);
@@ -167,8 +171,14 @@ public:
     static void mousemove(GLFWwindow *window, double x, double y) {
         MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
         if (mapView->tracking) {
-            mapView->map.moveBy(x - mapView->last_x, y - mapView->last_y);
+            double dx = x - mapView->last_x;
+            double dy = y - mapView->last_y;
+            if (dx || dy) {
+                mapView->map.startPanning();
+                mapView->map.moveBy(dx, dy);
+            }
         } else if (mapView->rotating) {
+            mapView->map.startRotating();
             mapView->map.rotateBy(mapView->start_x, mapView->start_y, mapView->last_x, mapView->last_y, x, y);
         }
         mapView->last_x = x;
