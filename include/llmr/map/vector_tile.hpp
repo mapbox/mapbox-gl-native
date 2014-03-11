@@ -78,6 +78,37 @@ public:
     std::vector<Value> values;
 };
 
+class VectorTileGlyph {
+public:
+    VectorTileGlyph(pbf data);
+
+    uint32_t id = 0;
+
+    // A signed distance field of the glyph with a border of 3 pixels.
+    std::string bitmap;
+
+    // Glyph metrics.
+    uint32_t width = 0;
+    uint32_t height = 0;
+    int32_t left = 0;
+    int32_t top = 0;
+    uint32_t advance = 0;
+};
+
+std::ostream& operator<<(std::ostream&, const VectorTileGlyph& glyph);
+
+class VectorTileFace {
+public:
+    VectorTileFace(pbf data);
+
+    std::string name;
+    std::string family;
+    std::string style;
+    std::vector<VectorTileGlyph> glyphs;
+};
+
+std::ostream& operator<<(std::ostream&, const VectorTileFace& face);
+
 class VectorTile {
 public:
     VectorTile();
@@ -85,7 +116,10 @@ public:
     VectorTile& operator=(VectorTile&& other);
 
     std::map<std::string, const VectorTileLayer> layers;
+    std::map<std::string, const VectorTileFace> faces;
 };
+
+
 
 }
 

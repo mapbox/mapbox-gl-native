@@ -2,6 +2,7 @@
 #include <llmr/style/bucket_description.hpp>
 
 #include <algorithm>
+#include <iostream>
 
 using namespace llmr;
 
@@ -13,6 +14,9 @@ VectorTile::VectorTile(pbf tile) {
         if (tile.tag == 3) { // layer
             VectorTileLayer layer(tile.message());
             layers.emplace(layer.name, std::forward<VectorTileLayer>(layer));
+        } else if (tile.tag == 4) { // face
+            VectorTileFace face(tile.message());
+            faces.emplace(face.name, std::forward<VectorTileFace>(face));
         } else {
             tile.skip();
         }
@@ -26,6 +30,58 @@ VectorTile& VectorTile::operator=(VectorTile && other) {
     return *this;
 }
 
+VectorTileFace::VectorTileFace(pbf face) {
+    while (face.next()) {
+        if (face.tag == 1) { // family
+            family = face.string();
+        } else if (face.tag == 2) { // style
+            style = face.string();
+        } else if (face.tag == 5) { // glyphs
+            glyphs.emplace_back(face.message());
+        } else {
+            face.skip();
+        }
+    }
+    name = family + " " + style;
+}
+
+
+std::ostream& llmr::operator<<(std::ostream& os, const VectorTileFace& face) {
+    os << "Face: " << face.name << std::endl;
+    for (const VectorTileGlyph& glyph : face.glyphs) {
+        os << "  - " << glyph;
+    }
+    return os;
+}
+
+
+VectorTileGlyph::VectorTileGlyph(pbf glyph) {
+    while (glyph.next()) {
+        if (glyph.tag == 1) { // id
+            id = glyph.varint();
+        } else if (glyph.tag == 2) { // bitmap
+            bitmap = glyph.string();
+        } else if (glyph.tag == 3) { // width
+            width = glyph.varint();
+        } else if (glyph.tag == 4) { // height
+            height = glyph.varint();
+        } else if (glyph.tag == 5) { // left
+            left = glyph.svarint();
+        } else if (glyph.tag == 6) { // top
+            top = glyph.svarint();
+        } else if (glyph.tag == 7) { // advance
+            advance = glyph.varint();
+        } else {
+            glyph.skip();
+        }
+    }
+}
+
+std::ostream& llmr::operator<<(std::ostream& os, const VectorTileGlyph& glyph) {
+    os << "Glyph " << glyph.id << ": " << glyph.width << "x" << glyph.height <<
+          " (" << glyph.left << "/" << glyph.top << ") +" << glyph.advance << std::endl;
+    return os;
+}
 
 VectorTileLayer::VectorTileLayer(pbf layer) : data(layer) {
     while (layer.next()) {
@@ -37,6 +93,12 @@ VectorTileLayer::VectorTileLayer(pbf layer) : data(layer) {
             values.emplace_back(std::move(parseValue(layer.message())));
         } else if (layer.tag == 5) { // extent
             extent = layer.varint();
+        } else if (layer.tag == 7) { // faces
+            std::string face = layer.string();
+        } else if (layer.tag == 8) { // labels
+            layer.skip();
+        } else if (layer.tag == 9) { // stacks
+            std::string stack = layer.string();
         } else {
             layer.skip();
         }
