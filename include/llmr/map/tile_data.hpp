@@ -65,10 +65,10 @@ public:
     void parseStyleLayers(const VectorTile& tile, const std::vector<LayerDescription>& layers);
     std::shared_ptr<Bucket> createBucket(const VectorTile& tile, const BucketDescription& bucket_desc);
     template <class Bucket> void addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createTextBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
+    std::shared_ptr<Bucket> createFillBucket(const VectorTile& tile, const VectorTileLayer& layer, const BucketDescription& bucket_desc);
+    std::shared_ptr<Bucket> createLineBucket(const VectorTile& tile, const VectorTileLayer& layer, const BucketDescription& bucket_desc);
+    std::shared_ptr<Bucket> createPointBucket(const VectorTile& tile, const VectorTileLayer& layer, const BucketDescription& bucket_desc);
+    std::shared_ptr<Bucket> createTextBucket(const VectorTile& tile, const VectorTileLayer& layer, const BucketDescription& bucket_desc);
 
     void cancel();
 

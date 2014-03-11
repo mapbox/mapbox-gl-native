@@ -12,7 +12,8 @@ enum class BucketType {
     None = 0,
     Fill = 1,
     Line = 2,
-    Point = 3
+    Point = 3,
+    Text = 4
 };
 
 enum class CapType {

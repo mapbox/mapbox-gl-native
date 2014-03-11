@@ -6,6 +6,68 @@
 
 using namespace llmr;
 
+
+std::ostream& llmr::operator<<(std::ostream& os, const FeatureType& type) {
+    switch (type) {
+        case FeatureType::Unknown: return os << "Unknown";
+        case FeatureType::Point: return os << "Point";
+        case FeatureType::LineString: return os << "LineString";
+        case FeatureType::Polygon: return os << "Polygon";
+        default: return os << "Invalid";
+    }
+}
+
+VectorTileFeature::VectorTileFeature(pbf feature, const VectorTileLayer& layer) {
+    while (feature.next()) {
+        if (feature.tag == 1) { // id
+            id = feature.varint<uint64_t>();
+        } else if (feature.tag == 2) { // tags
+            // tags are packed varints. They should have an even length.
+            pbf tags = feature.message();
+            while (tags) {
+                uint32_t tag_key = tags.varint();
+
+                if (layer.keys.size() <= tag_key) {
+                    // TODO: Throw correct exception
+                    fprintf(stderr, "feature referenced out of range key\n");
+                    break;
+                }
+
+                if (tags) {
+                    uint32_t tag_val = tags.varint();
+                    if (layer.values.size() <= tag_val) {
+                        // TODO: Throw correct exception
+                        fprintf(stderr, "feature referenced out of range value\n");
+                        break;
+                    }
+
+                    properties.emplace(layer.keys[tag_key], layer.values[tag_val]);
+                } else {
+                    // TODO: Throw correct exception
+                    fprintf(stderr, "uneven number of feature tag ids\n");
+                    break;
+                }
+            }
+        } else if (feature.tag == 3) { // type
+            type = (FeatureType)feature.varint();
+        } else if (feature.tag == 4) { // geometry
+            geometry = feature.message();
+        } else {
+            feature.skip();
+        }
+    }
+}
+
+
+std::ostream& llmr::operator<<(std::ostream& os, const VectorTileFeature& feature) {
+    os << "Feature(" << feature.id << "): " << feature.type << std::endl;
+    for (const auto& prop : feature.properties) {
+        os << "  - " << prop.first << ": " << prop.second << std::endl;
+    }
+    return os;
+}
+
+
 VectorTile::VectorTile() {}
 
 

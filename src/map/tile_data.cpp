@@ -14,6 +14,7 @@
 #include <llmr/util/string.hpp>
 
 #include <chrono>
+#include <iostream>
 
 using namespace llmr;
 
@@ -85,7 +86,7 @@ bool TileData::parse() {
         double parse_time_start = platform::time();
         VectorTile tile(pbf((const uint8_t *)data.data(), data.size()));
         parseStyleLayers(tile, style.layers);
-        double parse_time = (platform::time() - parse_time_start) * 1000.0;
+        // double parse_time = (platform::time() - parse_time_start) * 1000.0;
         if (state == State::obsolete) {
             // fprintf(stderr, "[%p] parsing [%d/%d/%d] cancelled after %8.3fms\n", this, id.z, id.x, id.y, parse_time);
         } else {
@@ -148,11 +149,13 @@ std::shared_ptr<Bucket> TileData::createBucket(const VectorTile& tile, const Buc
     if (layer_it != tile.layers.end()) {
         const VectorTileLayer& layer = layer_it->second;
         if (bucket_desc.type == BucketType::Fill) {
-            return createFillBucket(layer, bucket_desc);
+            return createFillBucket(tile, layer, bucket_desc);
         } else if (bucket_desc.type == BucketType::Line) {
-            return createLineBucket(layer, bucket_desc);
+            return createLineBucket(tile, layer, bucket_desc);
         } else if (bucket_desc.type == BucketType::Point) {
-            return createPointBucket(layer, bucket_desc);
+            return createPointBucket(tile, layer, bucket_desc);
+        } else if (bucket_desc.type == BucketType::Text) {
+            return createTextBucket(tile, layer, bucket_desc);
         } else {
             // TODO: create other bucket types.
         }
@@ -178,26 +181,52 @@ void TileData::addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, c
     }
 }
 
-std::shared_ptr<Bucket> TileData::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+std::shared_ptr<Bucket> TileData::createFillBucket(const VectorTile& tile, const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(fillVertexBuffer, triangleElementsBuffer, lineElementsBuffer, bucket_desc);
     addBucketFeatures(bucket, layer, bucket_desc);
     return state == State::obsolete ? nullptr : bucket;
 }
 
-std::shared_ptr<Bucket> TileData::createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+std::shared_ptr<Bucket> TileData::createLineBucket(const VectorTile& tile, const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::shared_ptr<LineBucket> bucket = std::make_shared<LineBucket>(lineVertexBuffer, triangleElementsBuffer, pointElementsBuffer, bucket_desc);
     addBucketFeatures(bucket, layer, bucket_desc);
     return state == State::obsolete ? nullptr : bucket;
 }
 
-std::shared_ptr<Bucket> TileData::createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+std::shared_ptr<Bucket> TileData::createPointBucket(const VectorTile& tile, const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::shared_ptr<PointBucket> bucket = std::make_shared<PointBucket>(pointVertexBuffer, bucket_desc);
     addBucketFeatures(bucket, layer, bucket_desc);
     return state == State::obsolete ? nullptr : bucket;
 }
 
-std::shared_ptr<Bucket> TileData::createTextBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+std::shared_ptr<Bucket> TileData::createTextBucket(const VectorTile& tile, const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+    // Determine the correct text stack.
+    if (!layer.shaping.size()) {
+        return nullptr;
+    }
+
+    // TODO: currently hardcoded to use the first font stack.
+    const std::map<Value, std::vector<VectorTilePlacement>>& stack = layer.shaping.begin()->second;
+
+    std::vector<const VectorTileFace *> faces;
+    for (const std::string& face : layer.faces) {
+        auto it = tile.faces.find(face);
+        if (it == tile.faces.end()) {
+            // This layer references an unknown face.
+            return nullptr;
+        }
+        faces.push_back(&it->second);
+    }
+
     std::shared_ptr<TextBucket> bucket = std::make_shared<TextBucket>(textVertexBuffer, triangleElementsBuffer, bucket_desc);
-    addBucketFeatures(bucket, layer, bucket_desc);
-    return state == State::obsolete ? nullptr : bucket;
+
+    FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
+    for (pbf feature_pbf : filtered_layer) {
+        if (state == State::obsolete) return nullptr;
+
+        const VectorTileFeature feature(feature_pbf, layer);
+        std::cerr << feature;
+    }
+
+    return bucket;
 }

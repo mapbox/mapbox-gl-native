@@ -33,6 +33,27 @@ struct Coordinate {
     }
 };
 
+enum class FeatureType {
+    Unknown = 0,
+    Point = 1,
+    LineString = 2,
+    Polygon = 3
+};
+
+std::ostream& operator<<(std::ostream&, const FeatureType& type);
+
+class VectorTileFeature {
+public:
+    VectorTileFeature(pbf feature, const VectorTileLayer& layer);
+
+    uint64_t id = 0;
+    FeatureType type = FeatureType::Unknown;
+    std::map<std::string, Value> properties;
+    pbf geometry;
+};
+
+std::ostream& operator<<(std::ostream&, const VectorTileFeature& feature);
+
 /*
  * Allows iterating over the features of a VectorTileLayer using a
  * BucketDescription as filter. Only features matching the descriptions will
