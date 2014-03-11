@@ -9,6 +9,7 @@
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
 #include <llmr/renderer/point_bucket.hpp>
+#include <llmr/renderer/text_bucket.hpp>
 #include <llmr/util/pbf.hpp>
 #include <llmr/util/string.hpp>
 
@@ -191,6 +192,12 @@ std::shared_ptr<Bucket> TileData::createLineBucket(const VectorTileLayer& layer,
 
 std::shared_ptr<Bucket> TileData::createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::shared_ptr<PointBucket> bucket = std::make_shared<PointBucket>(pointVertexBuffer, bucket_desc);
+    addBucketFeatures(bucket, layer, bucket_desc);
+    return state == State::obsolete ? nullptr : bucket;
+}
+
+std::shared_ptr<Bucket> TileData::createTextBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+    std::shared_ptr<TextBucket> bucket = std::make_shared<TextBucket>(textVertexBuffer, triangleElementsBuffer, bucket_desc);
     addBucketFeatures(bucket, layer, bucket_desc);
     return state == State::obsolete ? nullptr : bucket;
 }

@@ -28,9 +28,11 @@ class VectorTileLayer;
 class FillVertexBuffer;
 class LineVertexBuffer;
 class PointVertexBuffer;
+class TextVertexBuffer;
 class TriangleElementsBuffer;
 class LineElementsBuffer;
 class PointElementsBuffer;
+class TextElementsBuffer;
 class PlainShader;
 
 class TileData : public std::enable_shared_from_this<TileData>,
@@ -66,6 +68,7 @@ public:
     std::shared_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
     std::shared_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
     std::shared_ptr<Bucket> createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
+    std::shared_ptr<Bucket> createTextBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
 
     void cancel();
 
@@ -82,10 +85,12 @@ public:
     std::shared_ptr<FillVertexBuffer> fillVertexBuffer;
     std::shared_ptr<LineVertexBuffer> lineVertexBuffer;
     std::shared_ptr<PointVertexBuffer> pointVertexBuffer;
+    std::shared_ptr<TextVertexBuffer> textVertexBuffer;
 
     std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
     std::shared_ptr<LineElementsBuffer> lineElementsBuffer;
     std::shared_ptr<PointElementsBuffer> pointElementsBuffer;
+    std::shared_ptr<TextElementsBuffer> textElementsBuffer;
 
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above

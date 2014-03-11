@@ -17,6 +17,7 @@ enum {
     PATTERN_SHADER,
     PLAIN_SHADER,
     POINT_SHADER,
+    TEXT_SHADER,
     SHADER_COUNT
 };
 

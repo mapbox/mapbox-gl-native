@@ -25,6 +25,7 @@ class Tile;
 class FillBucket;
 class LineBucket;
 class PointBucket;
+class TextBucket;
 
 class Painter : private util::noncopyable {
 public:
@@ -38,6 +39,7 @@ public:
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id);
+    void renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id);
 
     void resize(int width, int height);
 

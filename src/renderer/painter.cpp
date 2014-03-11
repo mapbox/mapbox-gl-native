@@ -8,6 +8,7 @@
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
 #include <llmr/renderer/point_bucket.hpp>
+#include <llmr/renderer/text_bucket.hpp>
 
 #include <llmr/map/transform.hpp>
 #include <llmr/map/settings.hpp>
@@ -449,6 +450,10 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     style.sprite->bind(transform.rotating || transform.scaling || transform.panning);
     glDepthRange(strata, 1.0f);
     bucket.drawPoints(*pointShader);
+}
+
+void Painter::renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+    // noop
 }
 
 void Painter::renderDebug(const TileData::Ptr& tile_data) {
