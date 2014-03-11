@@ -15,7 +15,7 @@ struct Rect {
 };
 
 template <typename T>
-class BinPack : private noncopyable {
+class BinPack : private util::noncopyable {
 public:
     BinPack(T width, T height)
         : free(1, { 0, 0, width, height }) {}
