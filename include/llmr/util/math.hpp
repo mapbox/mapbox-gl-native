@@ -8,6 +8,16 @@
 namespace llmr {
 namespace util {
 
+template <typename T>
+inline T max(T a, T b) {
+    return b > a ? b : a;
+}
+
+template <typename T>
+inline T min(T a, T b) {
+    return b < a ? b : a;
+}
+
 inline double angle_between(double ax, double ay, double bx, double by) {
     return atan2((ax * by - ay * bx), ax * bx + ay * by);
 }
