@@ -67,6 +67,19 @@ private:
     std::set<uint32_t> values;
 };
 
+class VectorTilePlacement {
+public:
+    VectorTilePlacement(uint32_t face, uint32_t glyph, uint32_t x, uint32_t y);
+
+    uint32_t face = 0;
+    uint32_t glyph = 0;
+    uint32_t x = 0;
+    uint32_t y = 0;
+};
+
+std::ostream& operator<<(std::ostream&, const VectorTilePlacement& placement);
+
+
 class VectorTileLayer {
 public:
     VectorTileLayer(pbf data);
@@ -76,6 +89,8 @@ public:
     uint32_t extent = 4096;
     std::vector<std::string> keys;
     std::vector<Value> values;
+    std::vector<std::string> faces;
+    std::map<std::string, std::map<Value, std::vector<VectorTilePlacement>>> shaping;
 };
 
 class VectorTileGlyph {
