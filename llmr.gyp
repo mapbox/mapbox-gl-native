@@ -5,18 +5,8 @@
   ],
   'targets': [
     {
-      'target_name': 'llmr-x86',
-      'product_name': 'llmr-x86',
-      'type': 'static_library',
-      'sources': [
-        '<!@(find src -name "*.cpp")',
-        '<!@(find src -name "*.c")',
-        '<!@(find src -name "*.h")',
-        '<!@(find include -name "*.hpp")',
-        '<!@(find include -name "*.h")',
-        '<!@(find src -name "*.glsl")',
-        'bin/style.js'
-      ],
+      'target_name': 'before_build_actions',
+      'type':'none',
       'actions': [
         {
           'action_name': 'Build Shaders',
@@ -50,6 +40,23 @@
           ],
           'action': ['bin/build-style.js']
         }
+      ],
+    },
+    {
+      'target_name': 'llmr-x86',
+      'product_name': 'llmr-x86',
+      'type': 'static_library',
+      'dependencies': [
+          'before_build_actions'
+      ],
+      'sources': [
+        '<!@(find src -name "*.cpp")',
+        '<!@(find src -name "*.c")',
+        '<!@(find src -name "*.h")',
+        '<!@(find include -name "*.hpp")',
+        '<!@(find include -name "*.h")',
+        '<!@(find src -name "*.glsl")',
+        'bin/style.js'
       ],
       'xcode_settings': {
         'SDKROOT': 'macosx',
@@ -97,6 +104,9 @@
       'target_name': 'llmr-ios',
       'product_name': 'llmr-ios',
       'type': 'static_library',
+      'dependencies': [
+          'before_build_actions'
+      ],
       'sources': [
         '<!@(find src -name "*.cpp")',
         '<!@(find src -name "*.c")',
@@ -105,40 +115,6 @@
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
         'bin/style.js'
-      ],
-      'actions': [
-        {
-          'action_name': 'Build Shaders',
-          'inputs': [
-            '<!@(find src -name "*.glsl")'
-          ],
-          'outputs': [
-            'include/llmr/shader/shaders.hpp',
-            'src/shader/shaders.cpp'
-          ],
-          'action': ['bin/build-shaders.js'],
-        },
-        {
-          'action_name': 'Convert Style to Protobuf',
-          'inputs': [
-            'bin/style.js'
-          ],
-          'outputs': [
-            'resources/style.pbf'
-          ],
-          'action': ['bin/convert-style.js'],
-        },
-        {
-          'action_name': 'Update Style Resources',
-          'inputs': [
-            'resources/style.pbf'
-          ],
-          'outputs': [
-            'include/llmr/style/resources.hpp',
-            'src/style/resources.cpp'
-          ],
-          'action': ['bin/build-style.js']
-        }
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
