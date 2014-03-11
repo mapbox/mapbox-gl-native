@@ -13,6 +13,7 @@
         #define glGenVertexArrays glGenVertexArraysOES
         #define glBindVertexArray glBindVertexArrayOES
         #define glDeleteVertexArrays glDeleteVertexArraysOES
+        #define GL_ARB_vertex_array_object 1
     #elif TARGET_IPHONE_SIMULATOR
         #include <OpenGLES/ES2/gl.h>
         #include <OpenGLES/ES2/glext.h>
