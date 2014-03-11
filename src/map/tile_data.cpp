@@ -162,57 +162,35 @@ std::shared_ptr<Bucket> TileData::createBucket(const VectorTile& tile, const Buc
     return nullptr;
 }
 
-std::shared_ptr<Bucket> TileData::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
-    std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(fillVertexBuffer, triangleElementsBuffer, lineElementsBuffer, bucket_desc);
-
+template <class Bucket>
+void TileData::addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (pbf feature : filtered_layer) {
-        if (state == State::obsolete) return nullptr;
+        if (state == State::obsolete) return;
 
         while (feature.next(4)) { // geometry
             pbf geometry_pbf = feature.message();
             if (geometry_pbf) {
                 bucket->addGeometry(geometry_pbf);
-                bucket->tessellate();
             }
         }
     }
+}
 
-    return bucket;
+std::shared_ptr<Bucket> TileData::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+    std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(fillVertexBuffer, triangleElementsBuffer, lineElementsBuffer, bucket_desc);
+    addBucketFeatures(bucket, layer, bucket_desc);
+    return state == State::obsolete ? nullptr : bucket;
 }
 
 std::shared_ptr<Bucket> TileData::createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::shared_ptr<LineBucket> bucket = std::make_shared<LineBucket>(lineVertexBuffer, triangleElementsBuffer, pointElementsBuffer, bucket_desc);
-
-    FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
-    for (pbf feature : filtered_layer) {
-        if (state == State::obsolete) return nullptr;
-
-        while (feature.next(4)) { // geometry
-            pbf geometry_pbf = feature.message();
-            if (geometry_pbf) {
-                bucket->addGeometry(geometry_pbf);
-            }
-        }
-    }
-
-    return bucket;
+    addBucketFeatures(bucket, layer, bucket_desc);
+    return state == State::obsolete ? nullptr : bucket;
 }
 
 std::shared_ptr<Bucket> TileData::createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::shared_ptr<PointBucket> bucket = std::make_shared<PointBucket>(pointVertexBuffer, bucket_desc);
-
-    FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
-    for (pbf feature : filtered_layer) {
-        if (state == State::obsolete) return nullptr;
-
-        while (feature.next(4)) { // geometry
-            pbf geometry_pbf = feature.message();
-            if (geometry_pbf) {
-                bucket->addGeometry(geometry_pbf);
-            }
-        }
-    }
-
-    return bucket;
+    addBucketFeatures(bucket, layer, bucket_desc);
+    return state == State::obsolete ? nullptr : bucket;
 }

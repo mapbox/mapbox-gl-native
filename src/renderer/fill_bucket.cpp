@@ -88,6 +88,8 @@ void FillBucket::addGeometry(pbf& geom) {
         line.clear();
         hasVertices = true;
     }
+
+    tessellate();
 }
 
 void FillBucket::tessellate() {
