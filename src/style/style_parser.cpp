@@ -31,6 +31,12 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("bucket type must be a string");
             }
+        } else if (name == "feature_type") {
+            if (value.IsString()) {
+                bucket.feature_type = bucketType({ value.GetString(), value.GetStringLength() });
+            } else {
+                throw Style::exception("feature type must be a string");
+            }
         } else if (name == "source") {
             if (value.IsString()) {
                 bucket.source_name = { value.GetString(), value.GetStringLength() };
@@ -81,6 +87,12 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("font size must be a number");
             }
+        } else if (name == "text_field") {
+            if (value.IsString()) {
+                bucket.geometry.text_field = { value.GetString(), value.GetStringLength() };
+            } else {
+                throw Style::exception("text field must be a string");
+            }
         } else if (name == "miterLimit") {
             if (value.IsNumber()) {
                 bucket.geometry.miter_limit = value.GetDouble();
@@ -94,6 +106,10 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
                 throw Style::exception("round limit must be a number");
             }
         }
+    }
+
+    if (bucket.feature_type == BucketType::None) {
+        bucket.feature_type = bucket.type;
     }
 
     return bucket;

@@ -316,7 +316,7 @@ void FilteredVectorTileLayer::iterator::operator++() {
                     default:                 type = BucketType::None; break;
                 }
 
-                if (type != filter.bucket_desc.type) {
+                if (type != filter.bucket_desc.feature_type) {
                     break; // feature_pbf loop early
                 }
             } else {
@@ -324,7 +324,7 @@ void FilteredVectorTileLayer::iterator::operator++() {
             }
         }
 
-        if (!skip && type == filter.bucket_desc.type) {
+        if (!skip && type == filter.bucket_desc.feature_type) {
             valid = true;
             return; // data loop
         } else {
