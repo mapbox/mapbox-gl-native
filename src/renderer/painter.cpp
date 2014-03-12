@@ -114,10 +114,8 @@ void Painter::prepareClippingMask() {
 }
 
 void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id) {
-    Color fill_color = {{ 1, 1, 1, 1 }};
-
     plainShader->setMatrix(matrix);
-    plainShader->setColor(fill_color);
+    plainShader->setColor(style.computed.background.color);
 
     glStencilFunc(GL_ALWAYS, clip_id, 0xFF);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());

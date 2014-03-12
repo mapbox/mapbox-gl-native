@@ -113,8 +113,14 @@ struct FillProperties {
 };
 
 struct BackgroundClass {
-    Color fill_color = {{ 0, 0, 0, 0 }};
+    Color color = {{ 1, 1, 1, 1 }};
 };
+
+
+struct BackgroundProperties {
+    Color color = {{ 1, 1, 1, 1 }};
+};
+
 
 }
 

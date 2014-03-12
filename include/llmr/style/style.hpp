@@ -52,6 +52,7 @@ public:
     // This are applied settings.
     std::set<std::string> appliedClasses;
     struct {
+        BackgroundProperties background;
         std::map<std::string, FillProperties> fills;
         std::map<std::string, LineProperties> lines;
         std::map<std::string, PointProperties> points;

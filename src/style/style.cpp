@@ -74,6 +74,9 @@ void Style::cascade(float z) {
             point.opacity = layer.opacity(z);
             point.image = layer.image;
         }
+
+        // Cascade background
+        computed.background.color = sheetClass.background.color;
     }
 }
 
@@ -562,7 +565,7 @@ BackgroundClass loadBackgroundClassJSON(const rapidjson::Value& value) {
     BackgroundClass klass;
 
     if (value.HasMember("color")) {
-        klass.fill_color = parseColor(value["color"]);
+        klass.color = parseColor(value["color"]);
     }
 
     return klass;
