@@ -1,7 +1,7 @@
-#ifndef LLMR_RENDERER_SHADER_OUTLINE
-#define LLMR_RENDERER_SHADER_OUTLINE
+#ifndef LLMR_SHADER_SHADER_OUTLINE
+#define LLMR_SHADER_SHADER_OUTLINE
 
-#include "shader.hpp"
+#include <llmr/shader/shader.hpp>
 
 namespace llmr {
 

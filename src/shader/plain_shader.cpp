@@ -1,4 +1,4 @@
-#include <llmr/renderer/shader-plain.hpp>
+#include <llmr/shader/plain_shader.hpp>
 #include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 

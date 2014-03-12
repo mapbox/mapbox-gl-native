@@ -1,7 +1,7 @@
-#ifndef LLMR_RENDERER_SHADER_POINT
-#define LLMR_RENDERER_SHADER_POINT
+#ifndef LLMR_SHADER_SHADER_POINT
+#define LLMR_SHADER_SHADER_POINT
 
-#include "shader.hpp"
+#include <llmr/shader/shader.hpp>
 
 namespace llmr {
 

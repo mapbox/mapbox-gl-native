@@ -1,7 +1,7 @@
-#ifndef LLMR_RENDERER_SHADER_PLAIN
-#define LLMR_RENDERER_SHADER_PLAIN
+#ifndef LLMR_SHADER_SHADER_PLAIN
+#define LLMR_SHADER_SHADER_PLAIN
 
-#include "shader.hpp"
+#include <llmr/shader/shader.hpp>
 
 namespace llmr {
 

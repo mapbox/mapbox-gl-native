@@ -4,8 +4,6 @@
 #include <llmr/geometry/geometry.hpp>
 
 #include <llmr/renderer/painter.hpp>
-#include <llmr/renderer/shader-line.hpp>
-#include <llmr/renderer/shader-linejoin.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/map/vector_tile.hpp>
 

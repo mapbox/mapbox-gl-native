@@ -1,4 +1,4 @@
-#include <llmr/renderer/shader.hpp>
+#include <llmr/shader/shader.hpp>
 #include <llmr/platform/gl.hpp>
 
 #include <cstdlib>

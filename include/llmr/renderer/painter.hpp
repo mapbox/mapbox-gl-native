@@ -7,12 +7,12 @@
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
 
-#include <llmr/renderer/shader-plain.hpp>
-#include <llmr/renderer/shader-outline.hpp>
-#include <llmr/renderer/shader-pattern.hpp>
-#include <llmr/renderer/shader-line.hpp>
-#include <llmr/renderer/shader-linejoin.hpp>
-#include <llmr/renderer/shader-point.hpp>
+#include <llmr/shader/plain_shader.hpp>
+#include <llmr/shader/outline_shader.hpp>
+#include <llmr/shader/pattern_shader.hpp>
+#include <llmr/shader/line_shader.hpp>
+#include <llmr/shader/linejoin_shader.hpp>
+#include <llmr/shader/point_shader.hpp>
 
 
 namespace llmr {

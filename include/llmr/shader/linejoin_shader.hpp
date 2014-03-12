@@ -1,7 +1,7 @@
-#ifndef LLMR_RENDERER_SHADER_LINEJOIN
-#define LLMR_RENDERER_SHADER_LINEJOIN
+#ifndef LLMR_SHADER_SHADER_LINEJOIN
+#define LLMR_SHADER_SHADER_LINEJOIN
 
-#include "shader.hpp"
+#include <llmr/shader/shader.hpp>
 
 namespace llmr {
 
