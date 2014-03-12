@@ -273,12 +273,12 @@ public:
     }
 
     template<typename T>
-    VARIANT_INLINE void is() const
+    VARIANT_INLINE bool is() const
     {
         return (type_id == detail::type_traits<T, Types...>::id);
     }
 
-    VARIANT_INLINE void valid() const
+    VARIANT_INLINE bool valid() const
     {
         return (type_id != detail::invalid_value);
     }
