@@ -19,14 +19,14 @@ class Sprite;
 
 class Style {
 public:
+    struct exception : std::runtime_error { exception(const char *msg) : std::runtime_error(msg) {} };
+
+public:
     Style();
 
     void reset();
-    void load(const uint8_t *const data, size_t bytes);
 
-    // This is commented out because it is not fully implemented yet. For now,
-    // we keep using the protobuf stylesheet format
-    // void loadJSON(const std::string& data);
+    void loadJSON(const uint8_t *const data, size_t bytes);
 
     void cascade(float z);
 

@@ -112,6 +112,10 @@ struct FillProperties {
     std::string image;
 };
 
+struct BackgroundClass {
+    Color fill_color = {{ 0, 0, 0, 0 }};
+};
+
 }
 
 #endif

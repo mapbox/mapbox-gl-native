@@ -171,35 +171,35 @@ module.exports = {
                     ],
                 },
                 "alcohol_poi": {
-                    "type": "marker",
+                    "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "alcohol-shop",
                     "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "cafe_poi": {
-                    "type": "marker",
+                    "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "cafe",
                     "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "embassy_poi": {
-                    "type": "marker",
+                    "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "embassy",
                     "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "park_poi": {
-                    "type": "marker",
+                    "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "park",
                     "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "restaurant_poi": {
-                    "type": "marker",
+                    "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "restaurant",

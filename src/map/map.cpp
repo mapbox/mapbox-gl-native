@@ -30,8 +30,7 @@ void Map::setup(float pixelRatio) {
     style.sprite = std::make_shared<Sprite>();
     style.sprite->load(kSpriteURL, pixel_ratio);
 
-    style.load(resources::style, resources::style_size);
-    // style.loadJSON((const char *)resources::style, resources::style_size);
+    style.loadJSON(resources::style, resources::style_size);
 }
 
 void Map::loadSprite(const std::string& url) {
@@ -39,7 +38,7 @@ void Map::loadSprite(const std::string& url) {
 }
 
 void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
-    style.load(data, bytes);
+    style.loadJSON(data, bytes);
     update();
 }
 
