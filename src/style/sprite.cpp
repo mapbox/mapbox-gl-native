@@ -21,7 +21,7 @@ ImagePosition::ImagePosition(const vec2<uint16_t>& size, vec2<float> tl, vec2<fl
       br(br) {}
 
 Sprite::Sprite() {
-    raster = std::make_shared<util::Raster>();
+    raster = std::make_shared<Raster>();
 }
 
 void Sprite::load(const std::string& base_url, float pixelRatio) {

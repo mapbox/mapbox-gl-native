@@ -27,7 +27,6 @@ Painter::Painter(Transform& transform, Settings& settings, Style& style)
       style(style) {
 }
 
-
 void Painter::setup() {
     setupShaders();
 

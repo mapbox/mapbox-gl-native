@@ -5,6 +5,7 @@
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/raster.hpp>
+#include <llmr/util/texturer.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/geometry/vao.hpp>
 #include <llmr/platform/platform.hpp>
@@ -80,7 +81,8 @@ public:
     std::atomic<state> state;
     const bool use_raster;
     const bool use_retina;
-    std::shared_ptr<util::Raster> raster;
+    std::shared_ptr<Raster> raster;
+    std::shared_ptr<Texturer> texturer;
 
     // Holds the actual geometries in this tile.
     DebugFontBuffer debugFontBuffer;

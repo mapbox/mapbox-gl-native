@@ -7,13 +7,10 @@
 
 #include <png.h>
 
-using namespace llmr::util;
+using namespace llmr;
 
 Raster::~Raster() {
-    if (texture) {
-        glDeleteTextures(1, &texture);
-    }
-    if (img) {
+    if (img && !textured) {
         free(img);
     }
 }
@@ -31,7 +28,6 @@ void Raster::load(const std::string& data) {
     std::lock_guard<std::mutex> lock(raster->mtx);
     if (raster->img) {
         raster->loaded = true;
-//        fprintf(stderr, "raster loaded\n");
     }
 }
 
@@ -150,15 +146,15 @@ void Raster::bind(bool linear) {
         return;
     }
 
-    if (!texture) {
-        glGenTextures(1, &texture);
-        glActiveTexture(GL_TEXTURE0);
+    if (img && !textured) {
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
+        free(img);
+        img = nullptr;
+        textured = true;
     } else {
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 

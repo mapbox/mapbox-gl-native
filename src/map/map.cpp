@@ -13,6 +13,7 @@ Map::Map(Settings& settings)
       transform(),
       style(),
       painter(transform, settings, style),
+      texturer(),
       min_zoom(0),
       max_zoom((use_raster ? kTileRasterMaxZoom : kTileVectorMaxZoom)) {
 }
@@ -22,6 +23,7 @@ Map::~Map() {
 }
 
 void Map::setup(float pixelRatio) {
+
     painter.setup();
 
     pixel_ratio = pixelRatio;
@@ -373,6 +375,8 @@ bool Map::updateTiles() {
         assert(tile);
 
         if (tile->state != Tile::parsed) {
+            if (tile->use_raster && (transform.rotating || transform.scaling || transform.panning))
+                break;
             // The tile we require is not yet loaded. Try to find a parent or
             // child tile that we already have.
 
@@ -396,15 +400,24 @@ bool Map::updateTiles() {
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
-    tiles.remove_if([&retain, &changed](const Tile::Ptr& tile) {
+    std::forward_list<std::shared_ptr<Tile>> old;
+    tiles.remove_if([&retain, &changed, &old](const Tile::Ptr& tile) {
         assert(tile);
         bool obsolete = std::find(retain.begin(), retain.end(), tile->id) == retain.end();
         if (obsolete) {
             tile->cancel();
+            old.emplace_front(tile);
             changed = true;
         }
         return obsolete;
     });
+
+    // Clean up any old raster textures.
+    for (Tile::Ptr& old_tile : old) {
+        if (old_tile->use_raster && old_tile->raster && old_tile->raster->textured) {
+            texturer.removeTextureID(old_tile->raster->texture);
+        }
+    }
 
     // Sort tiles by zoom level, front to back.
     // We're painting front-to-back, so we want to draw more detailed tiles first
@@ -445,6 +458,10 @@ bool Map::render() {
 
     for (Tile::Ptr& tile : tiles) {
         if (tile->state == Tile::parsed) {
+            if (tile->use_raster && !tile->raster->textured) {
+                tile->raster->texture = texturer.getTextureID();
+            }
+
             painter.render(tile);
         }
     }

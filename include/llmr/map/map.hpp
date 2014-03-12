@@ -6,6 +6,7 @@
 #include <llmr/style/style.hpp>
 #include <llmr/renderer/painter.hpp>
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/util/texturer.hpp>
 
 #include <cstdint>
 #include <string>
@@ -68,7 +69,6 @@ private:
     std::shared_ptr<Tile> addTile(const Tile::ID& id);
     std::shared_ptr<Tile> hasTile(const Tile::ID& id);
 
-
     void update();
 
 private:
@@ -76,6 +76,7 @@ private:
     Transform transform;
     Style style;
     Painter painter;
+    Texturer texturer;
 
     int32_t min_zoom;
     int32_t max_zoom;

@@ -404,6 +404,7 @@ class MBXMapView
 
 MBXMapView *mapView;
 CADisplayLink *displayLink;
+NSData *placeholderData;
 
 namespace llmr
 {
@@ -423,6 +424,40 @@ namespace llmr
 
         Request *request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
         {
+            //
+            // temporarily provide a static image
+            //
+            if ([@(url.c_str()) hasSuffix:@".png256"])
+            {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
+                {
+                    if ( ! placeholderData)
+                        placeholderData = UIImagePNGRepresentation([UIImage imageNamed:@"placeholder.png"]);
+
+                    Response res;
+
+                    res.code = 200;
+                    res.body = { (const char *)[placeholderData bytes], [placeholderData length] };
+
+                    background_function(res);
+
+                    dispatch_async(dispatch_get_main_queue(), ^(void)
+                    {
+                        foreground_callback();
+                    });
+                });
+
+                Request *req = new Request();
+
+                req->identifier = -1;
+                req->original_url = url;
+
+                return req;
+            }
+            //
+            // end temp
+            //
+
             NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
             {
                 Response res;

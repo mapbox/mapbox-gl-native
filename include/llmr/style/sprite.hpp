@@ -41,7 +41,7 @@ public:
     operator bool() const;
 
 public:
-    std::shared_ptr<util::Raster> raster;
+    std::shared_ptr<Raster> raster;
 
 private:
     void parseJSON(const std::string& data);

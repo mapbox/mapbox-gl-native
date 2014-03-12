@@ -113,7 +113,7 @@ bool Tile::parse() {
     }
 
     if (use_raster) {
-        raster = std::make_shared<util::Raster>();
+        raster = std::make_shared<Raster>();
         raster->load(data);
         state = parsed;
         return true;
