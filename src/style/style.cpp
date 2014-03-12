@@ -1,6 +1,7 @@
 #include <llmr/style/style.hpp>
+#include <llmr/util/color.hpp>
 
-// #include <rapidjson/document.h>
+#include <rapidjson/document.h>
 
 
 using namespace llmr;
@@ -13,215 +14,6 @@ void Style::reset() {
     computed.fills.clear();
     computed.lines.clear();
     computed.points.clear();
-}
-
-void Style::load(const uint8_t *const data, size_t bytes) {
-    pbf style(data, bytes);
-
-    while (style.next()) {
-        if (style.tag == 1) { // bucket
-            buckets.insert(parseBucket(style.message()));
-        } else if (style.tag == 2) { // structure
-            layers.push_back(parseLayer(style.message()));
-        } else if (style.tag == 3) { // class
-            classes.insert(parseClass(style.message()));
-        } else {
-            style.skip();
-        }
-    }
-}
-
-std::pair<std::string, BucketDescription> Style::parseBucket(pbf data) {
-    BucketDescription bucket;
-    std::string name;
-
-    while (data.next()) {
-        if (data.tag == 1) { // name
-            name = data.string();
-        } else if (data.tag == 2) { // type
-            bucket.type = (BucketType)data.varint();
-        } else if (data.tag == 3) { // source_name
-            bucket.source_name = data.string();
-        } else if (data.tag == 4) { // source_layer
-            bucket.source_layer = data.string();
-        } else if (data.tag == 5) { // source_field
-            bucket.source_field = data.string();
-        } else if (data.tag == 6) { // source_value
-            bucket.source_value.emplace_back(parseValue(data.message()));
-        } else if (data.tag == 7) { // cap
-            bucket.geometry.cap = (CapType)data.varint();
-        } else if (data.tag == 8) { // join
-            bucket.geometry.join = (JoinType)data.varint();
-        } else if (data.tag == 9) { // font
-            bucket.geometry.font = data.string();
-        } else if (data.tag == 10) { // font_size
-            bucket.geometry.font_size = data.float32();
-        } else {
-            data.skip();
-        }
-    }
-
-    return { name, std::forward<BucketDescription>(bucket) };
-}
-
-LayerDescription Style::parseLayer(pbf data) {
-    LayerDescription layer;
-
-    while (data.next()) {
-        if (data.tag == 1) { // name
-            layer.name = data.string();
-        } else if (data.tag == 2) { // bucket_name
-            layer.bucket_name = data.string();
-        } else if (data.tag == 3) { // child_layer
-            layer.child_layer.emplace_back(parseLayer(data.message()));
-        } else {
-            data.skip();
-        }
-    }
-
-    return layer;
-}
-
-
-std::pair<std::string, ClassDescription> Style::parseClass(pbf data) {
-    ClassDescription klass;
-    std::string name;
-
-    while (data.next()) {
-        if (data.tag == 1) { // name
-            name = data.string();
-        } else if (data.tag == 2) { // fill style
-            klass.fill.insert(parseFillClass(data.message()));
-        } else if (data.tag == 3) { // line style
-            klass.line.insert(parseLineClass(data.message()));
-        } else if (data.tag == 4) { // point style
-            klass.point.insert(parsePointClass(data.message()));
-        } else {
-            data.skip();
-        }
-    }
-
-    return { name, klass };
-}
-
-std::pair<std::string, FillClass> Style::parseFillClass(pbf data) {
-    FillClass fill;
-    std::string name;
-
-    while (data.next()) {
-        if (data.tag == 1) { // name
-            name = data.string();
-        } else if (data.tag == 2) { // hidden
-            fill.hidden = parseProperty<bool>(data.message());
-        } else if (data.tag == 3) { // winding
-            fill.winding = (Winding)data.varint();
-        } else if (data.tag == 4) { // antialias
-            fill.antialias = parseProperty<bool>(data.message());
-        } else if (data.tag == 5) { // fill_color
-            fill.fill_color = parseColor(data);
-            if (fill.stroke_color[3] == std::numeric_limits<float>::infinity()) {
-                fill.stroke_color = fill.fill_color;
-            }
-        } else if (data.tag == 6) { // stroke_color
-            fill.stroke_color = parseColor(data);
-        } else if (data.tag == 7) { // opacity
-            fill.opacity = parseProperty<float>(data.message());
-        } else if (data.tag == 8) { // image
-            fill.image = data.string();
-        } else {
-            data.skip();
-        }
-    }
-
-    return { name, fill };
-}
-
-
-std::pair<std::string, LineClass> Style::parseLineClass(pbf data) {
-    LineClass stroke;
-    std::string name;
-
-    while (data.next()) {
-        if (data.tag == 1) { // name
-            name = data.string();
-        } else if (data.tag == 2) { // hidden
-            stroke.hidden = parseProperty<bool>(data.message());
-        } else if (data.tag == 3) { // color
-            stroke.color = parseColor(data);
-        } else if (data.tag == 4) { // width
-            stroke.width = parseProperty<float>(data.message());
-        } else if (data.tag == 5) { // offset
-            stroke.offset = parseProperty<float>(data.message());
-        } else if (data.tag == 6) { // opacity
-            stroke.opacity = parseProperty<float>(data.message());
-        } else {
-            data.skip();
-        }
-    }
-
-    return { name, stroke };
-}
-
-std::pair<std::string, PointClass> Style::parsePointClass(pbf data) {
-    PointClass point;
-    std::string name;
-
-    while (data.next()) {
-        if (data.tag == 1) { // name
-            name = data.string();
-        } else if (data.tag == 2) { // hidden
-            point.hidden = parseProperty<bool>(data.message());
-        } else if (data.tag == 3) { // color
-            point.color = parseColor(data);
-        } else if (data.tag == 4) { // size
-            point.size = parseProperty<float>(data.message());
-        } else if (data.tag == 6) { // opacity
-            point.opacity = parseProperty<float>(data.message());
-        } else if (data.tag == 8) { // image
-            point.image = data.string();
-        } else {
-            data.skip();
-        }
-    }
-
-    return { name, point };
-}
-
-Color Style::parseColor(pbf& data) {
-    uint32_t rgba = data.fixed<uint32_t, 4>();
-    return {{
-            (float)((rgba >> 24) & 0xFF) / 0xFF,
-            (float)((rgba >> 16) & 0xFF) / 0xFF,
-            (float)((rgba >>  8) & 0xFF) / 0xFF,
-            (float)((rgba >>  0) & 0xFF) / 0xFF
-        }
-    };
-}
-
-template <typename T> FunctionProperty<T> Style::parseProperty(pbf data) {
-    FunctionProperty<T> property;
-
-    while (data.next()) {
-        if (data.tag == 1) { // function
-            switch ((Property)data.varint()) {
-                case Property::Null: property.function = &functions::null; break;
-                case Property::Constant: property.function = &functions::constant; break;
-                case Property::Stops: property.function = &functions::stops; break;
-                case Property::Linear: property.function = &functions::linear; break;
-                default: property.function = &functions::null; break;
-            }
-        } else if (data.tag == 2) { // value
-            // read a packed float32
-            pbf floats = data.message();
-            while (floats) {
-                property.values.push_back(floats.float32());
-            }
-        } else {
-            data.skip();
-        }
-    }
-
-    return property;
 }
 
 void Style::cascade(float z) {
@@ -285,7 +77,7 @@ void Style::cascade(float z) {
     }
 }
 
-/*
+
 
 void loadBucketsJSON(const rapidjson::Value& value, std::map<std::string, BucketDescription>& buckets);
 BucketDescription loadBucketJSON(const rapidjson::Value& value);
@@ -296,11 +88,26 @@ std::pair<std::string, ClassDescription> loadClassDescriptionJSON(const rapidjso
 void loadClassJSON(const std::string& name, const rapidjson::Value& value, ClassDescription& class_desc);
 FillClass loadFillClassJSON(const rapidjson::Value& value);
 LineClass loadLineClassJSON(const rapidjson::Value& value);
+PointClass loadPointClassJSON(const rapidjson::Value& value);
+BackgroundClass loadBackgroundClassJSON(const rapidjson::Value& value);
 Value loadValueJSON(const rapidjson::Value& value);
 
-void Style::loadJSON(const std::string& data) {
+void Style::loadJSON(const uint8_t *const data, size_t bytes) {
     rapidjson::Document document;
-    document.Parse<0>(data.c_str());
+
+    if (bytes <= 0) {
+        return;
+    }
+
+    if (data[bytes - 1] != 0) {
+        throw exception("style JSON string is not 0-terminated");
+    }
+
+    document.Parse<0>((const char *const)data);
+
+    buckets.clear();
+    layers.clear();
+    classes.clear();
 
     if (document.IsObject()) {
         if (document.HasMember("buckets")) {
@@ -315,7 +122,7 @@ void Style::loadJSON(const std::string& data) {
             loadClassesJSON(document["classes"], classes);
         }
     } else {
-        fprintf(stderr, "stylesheet root must be an object\n");
+        throw Style::exception("stylesheet root must be an object");
     }
 }
 
@@ -323,10 +130,10 @@ void loadBucketsJSON(const rapidjson::Value& value, std::map<std::string, Bucket
     if (value.IsObject()) {
         rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
         for (; itr != value.MemberEnd(); ++itr) {
-            buckets.emplace(itr->name.GetString(), loadBucketJSON(itr->value));
+            buckets.emplace(itr->name.GetString(), std::forward<BucketDescription>(loadBucketJSON(itr->value)));
         }
     } else {
-        fprintf(stderr, "buckets must be an object\n");
+        throw Style::exception("buckets must be an object");
     }
 }
 
@@ -342,25 +149,25 @@ BucketDescription loadBucketJSON(const rapidjson::Value& value) {
             if (value.IsString()) {
                 bucket.type = bucketType({ value.GetString(), value.GetStringLength() });
             } else {
-                fprintf(stderr, "bucket type must be a string\n");
+                throw Style::exception("bucket type must be a string");
             }
         } else if (name == "datasource") {
             if (value.IsString()) {
                 bucket.source_name = { value.GetString(), value.GetStringLength() };
             } else {
-                fprintf(stderr, "datasource name must be a string\n");
+                throw Style::exception("datasource name must be a string");
             }
         } else if (name == "layer") {
             if (value.IsString()) {
                 bucket.source_layer = { value.GetString(), value.GetStringLength() };
             } else {
-                fprintf(stderr, "layer name must be a string\n");
+                throw Style::exception("layer name must be a string");
             }
         } else if (name == "field") {
             if (value.IsString()) {
                 bucket.source_field = { value.GetString(), value.GetStringLength() };
             } else {
-                fprintf(stderr, "field name must be a string\n");
+                throw Style::exception("field name must be a string");
             }
         } else if (name == "value") {
             if (value.IsArray()) {
@@ -374,25 +181,37 @@ BucketDescription loadBucketJSON(const rapidjson::Value& value) {
             if (value.IsString()) {
                 bucket.geometry.cap = capType({ value.GetString(), value.GetStringLength() });
             } else {
-                fprintf(stderr, "cap type must be a string\n");
+                throw Style::exception("cap type must be a string");
             }
         } else if (name == "join") {
             if (value.IsString()) {
                 bucket.geometry.join = joinType({ value.GetString(), value.GetStringLength() });
             } else {
-                fprintf(stderr, "join type must be a string\n");
+                throw Style::exception("join type must be a string");
             }
         } else if (name == "font") {
             if (value.IsString()) {
                 bucket.geometry.font = { value.GetString(), value.GetStringLength() };
             } else {
-                fprintf(stderr, "font stack must be a string\n");
+                throw Style::exception("font stack must be a string");
             }
         } else if (name == "fontSize") {
             if (value.IsNumber()) {
                 bucket.geometry.font_size = value.GetDouble();
             } else {
-                fprintf(stderr, "font size must be a number\n");
+                throw Style::exception("font size must be a number");
+            }
+        } else if (name == "miterLimit") {
+            if (value.IsNumber()) {
+                bucket.geometry.miter_limit = value.GetDouble();
+            } else {
+                throw Style::exception("miter limit must be a number");
+            }
+        } else if (name == "roundLimit") {
+            if (value.IsNumber()) {
+                bucket.geometry.round_limit = value.GetDouble();
+            } else {
+                throw Style::exception("round limit must be a number");
             }
         }
     }
@@ -400,16 +219,14 @@ BucketDescription loadBucketJSON(const rapidjson::Value& value) {
     return bucket;
 }
 
-
 void loadLayersJSON(const rapidjson::Value& value, std::vector<LayerDescription>& layers) {
     if (value.IsArray()) {
         for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
             layers.push_back(loadLayerJSON(value[i]));
         }
     } else {
-        fprintf(stderr, "structure must be an array\n");
+        throw Style::exception("structure must be an array");
     }
-
 }
 
 LayerDescription loadLayerJSON(const rapidjson::Value& value) {
@@ -421,10 +238,10 @@ LayerDescription loadLayerJSON(const rapidjson::Value& value) {
             if (name.IsString()) {
                 layer.name = { name.GetString(), name.GetStringLength() };
             } else {
-                fprintf(stderr, "structure element name must be a string\n");
+                throw Style::exception("structure element name must be a string");
             }
         } else {
-            fprintf(stderr, "structure element must have a name\n");
+            throw Style::exception("structure element must have a name");
         }
 
         if (value.HasMember("bucket")) {
@@ -432,28 +249,27 @@ LayerDescription loadLayerJSON(const rapidjson::Value& value) {
             if (bucket.IsString()) {
                 layer.bucket_name = { bucket.GetString(), bucket.GetStringLength() };
             } else {
-                fprintf(stderr, "structure element bucket must be a string\n");
+                throw Style::exception("structure element bucket must be a string");
             }
         } else if (value.HasMember("layers")) {
             loadLayersJSON(value["layers"], layer.child_layer);
         } else {
-            fprintf(stderr, "structure element must have either a bucket name or child layers\n");
+            throw Style::exception("structure element must have either a bucket name or child layers");
         }
     } else {
-        fprintf(stderr, "structure element must be an object\n");
+        throw Style::exception("structure element must be an object");
     }
 
     return layer;
 }
 
-
 void loadClassesJSON(const rapidjson::Value& value, std::map<std::string, ClassDescription>& classes) {
     if (value.IsArray()) {
         for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-            classes.insert(loadClassDescriptionJSON(value[i]));
+            classes.insert(std::forward<std::pair<std::string, ClassDescription>>(loadClassDescriptionJSON(value[i])));
         }
     } else {
-        fprintf(stderr, "classes must be an array\n");
+        throw Style::exception("classes must be an array");
     }
 }
 
@@ -467,10 +283,10 @@ std::pair<std::string, ClassDescription> loadClassDescriptionJSON(const rapidjso
             if (name.IsString()) {
                 klass_name = { name.GetString(), name.GetStringLength() };
             } else {
-                fprintf(stderr, "class name must be a string\n");
+                throw Style::exception("class name must be a string");
             }
         } else {
-            fprintf(stderr, "class must have a name\n");
+            throw Style::exception("class must have a name");
         }
 
         if (value.HasMember("layers")) {
@@ -485,14 +301,14 @@ std::pair<std::string, ClassDescription> loadClassDescriptionJSON(const rapidjso
                     loadClassJSON(name, itr->value, klass);
                 }
             } else {
-                fprintf(stderr, "class layer styles must be an object\n");
+                throw Style::exception("class layer styles must be an object");
             }
         } else {
-            fprintf(stderr, "class must have layer styles\n");
+            throw Style::exception("class must have layer styles");
         }
     }
 
-    return { klass_name, klass };
+    return { klass_name, std::forward<ClassDescription>(klass) };
 }
 
 void loadClassJSON(const std::string& name, const rapidjson::Value& value, ClassDescription& class_desc) {
@@ -502,40 +318,255 @@ void loadClassJSON(const std::string& name, const rapidjson::Value& value, Class
             if (type.IsString()) {
                 std::string type_name = { type.GetString(), type.GetStringLength() };
                 if (type_name == "fill") {
-                    class_desc.fill.insert({ type_name, loadFillClassJSON(value) });
+                    class_desc.fill.insert({ name, std::forward<FillClass>(loadFillClassJSON(value)) });
                 } else if (type_name == "line") {
-                    class_desc.line.insert({ type_name, loadLineClassJSON(value) });
+                    class_desc.line.insert({ name, std::forward<LineClass>(loadLineClassJSON(value)) });
+                } else if (type_name == "point") {
+                    class_desc.point.insert({ name, std::forward<PointClass>(loadPointClassJSON(value)) });
+                } else if (type_name == "background") {
+                    class_desc.background = loadBackgroundClassJSON(value);
                 } else {
-                    // TODO:
+                    throw Style::exception("unkonwn class type name");
                 }
             } else {
-                fprintf(stderr, "style class type must be a string\n");
+                throw Style::exception("style class type must be a string");
             }
         } else {
-            fprintf(stderr, "style class must specify a type\n");
+            throw Style::exception("style class must specify a type");
         }
     } else {
-        fprintf(stderr, "style class must be an object\n");
+        throw Style::exception("style class must be an object");
     }
+}
+
+bool parseBoolean(const rapidjson::Value& value) {
+    if (!value.IsBool()) {
+        throw Style::exception("boolean value must be a boolean");
+    }
+
+    return value.GetBool();
+}
+
+std::string parseString(const rapidjson::Value& value) {
+    if (!value.IsString()) {
+        throw Style::exception("string value must be a string");
+    }
+
+    return { value.GetString(), value.GetStringLength() };
+}
+
+Color parseColor(const rapidjson::Value& value) {
+    if (!value.IsString()) {
+        throw Style::exception("color value must be a string");
+    }
+
+    llmr::util::CSSColor css_color = llmr::util::parseCSSColor({
+        value.GetString(),
+        value.GetStringLength()
+    });
+
+    return {{
+            (float)css_color.r / 255,
+            (float)css_color.g / 255,
+            (float)css_color.b / 255,
+            css_color.a
+        }
+    };
+}
+
+template <typename T>
+typename FunctionProperty<T>::fn parseFunctionType(const rapidjson::Value& type) {
+    if (type.IsString()) {
+        std::string t { type.GetString(), type.GetStringLength() };
+        if (t == "constant") {
+            return &functions::constant;
+        } else if (t == "linear") {
+            return &functions::linear;
+        } else if (t == "stops") {
+            return &functions::stops;
+        } else {
+            throw Style::exception("unknown function type");
+        }
+    } else {
+        throw Style::exception("function type must be a string");
+    }
+}
+
+FunctionProperty<float> parseFloatFunction(const rapidjson::Value& value) {
+    FunctionProperty<float> property;
+
+    if (value.IsArray()) {
+        if (value.Size() < 1) {
+            throw Style::exception("value function does not have arguments");
+        }
+
+        property.function = parseFunctionType<float>(value[(rapidjson::SizeType)0]);
+        for (rapidjson::SizeType i = 1; i < value.Size(); ++i) {
+            const rapidjson::Value& stop = value[i];
+            if (stop.IsObject()) {
+                if (!stop.HasMember("z")) {
+                    throw Style::exception("stop must have zoom level specification");
+                }
+                const rapidjson::Value& z = stop["z"];
+                if (!z.IsNumber()) {
+                    throw Style::exception("zoom level in stops must be a number");
+                }
+                property.values.push_back(z.GetDouble());
+
+                if (!stop.HasMember("val")) {
+                    throw Style::exception("stop must have value specification");
+                }
+                const rapidjson::Value& val = stop["val"];
+                if (!val.IsNumber()) {
+                    throw Style::exception("value in stops must be a number");
+                }
+                property.values.push_back(val.GetDouble());
+            } else if (stop.IsNumber()) {
+                property.values.push_back(stop.GetDouble());
+            } else {
+                throw Style::exception("stop must be a number");
+            }
+        }
+    } else if (value.IsNumber()) {
+        property.function = &functions::constant;
+        property.values.push_back(value.GetDouble());
+    }
+
+    return property;
+}
+
+FunctionProperty<bool> parseBoolFunction(const rapidjson::Value& value) {
+    FunctionProperty<bool> property;
+
+    if (value.IsArray()) {
+        if (value.Size() < 1) {
+            throw Style::exception("value function does not have arguments");
+        }
+
+        property.function = parseFunctionType<bool>(value[(rapidjson::SizeType)0]);
+        for (rapidjson::SizeType i = 1; i < value.Size(); ++i) {
+            const rapidjson::Value& stop = value[i];
+            if (stop.IsObject()) {
+                if (!stop.HasMember("z")) {
+                    throw Style::exception("stop must have zoom level specification");
+                }
+                const rapidjson::Value& z = stop["z"];
+                if (!z.IsBool()) {
+                    throw Style::exception("zoom level in stops must be a number");
+                }
+                property.values.push_back(z.GetBool());
+
+                if (!stop.HasMember("val")) {
+                    throw Style::exception("stop must have value specification");
+                }
+                const rapidjson::Value& val = stop["val"];
+                if (!val.IsBool()) {
+                    throw Style::exception("value in stops must be a number");
+                }
+                property.values.push_back(val.GetBool());
+            } else if (stop.IsBool()) {
+                property.values.push_back(stop.GetBool());
+            } else {
+                throw Style::exception("stop must be a number");
+            }
+        }
+    } else if (value.IsBool()) {
+        property.function = &functions::constant;
+        property.values.push_back(value.GetBool());
+    }
+
+    return property;
 }
 
 FillClass loadFillClassJSON(const rapidjson::Value& value) {
     FillClass klass;
 
     if (value.HasMember("hidden")) {
-        const rapidjson::Value& hidden = value["hidden"];
-        // TODO...
+        klass.hidden = parseBoolFunction(value["hidden"]);
+    }
 
+    if (value.HasMember("color")) {
+        klass.fill_color = parseColor(value["color"]);
+    }
+
+    if (value.HasMember("stroke")) {
+        klass.stroke_color = parseColor(value["stroke"]);
+    } else {
+        klass.stroke_color = klass.fill_color;
+    }
+
+    if (value.HasMember("antialias")) {
+        klass.antialias = parseBoolean(value["antialias"]);
+    }
+
+    if (value.HasMember("image")) {
+        klass.image = parseString(value["image"]);
+    }
+
+    if (value.HasMember("opacity")) {
+        klass.opacity = parseFloatFunction(value["opacity"]);
     }
 
     return klass;
 }
 
 LineClass loadLineClassJSON(const rapidjson::Value& value) {
-    FillClass klass;
+    LineClass klass;
+
+    if (value.HasMember("hidden")) {
+        klass.hidden = parseBoolFunction(value["hidden"]);
+    }
+
+    if (value.HasMember("color")) {
+        klass.color = parseColor(value["color"]);
+    }
+
+    if (value.HasMember("width")) {
+        klass.width = parseFloatFunction(value["width"]);
+    }
+
+    if (value.HasMember("opacity")) {
+        klass.opacity = parseFloatFunction(value["opacity"]);
+    }
+
+    return klass;
 }
 
+PointClass loadPointClassJSON(const rapidjson::Value& value) {
+    PointClass klass;
 
+    if (value.HasMember("hidden")) {
+        klass.hidden = parseBoolFunction(value["hidden"]);
+    }
+
+    if (value.HasMember("color")) {
+        klass.color = parseColor(value["color"]);
+    }
+
+    if (value.HasMember("opacity")) {
+        klass.opacity = parseFloatFunction(value["opacity"]);
+    }
+
+    if (value.HasMember("image")) {
+        klass.image = parseString(value["image"]);
+    }
+
+    if (value.HasMember("size")) {
+        klass.size = parseFloatFunction(value["size"]);
+    }
+
+    return klass;
+}
+
+BackgroundClass loadBackgroundClassJSON(const rapidjson::Value& value) {
+    BackgroundClass klass;
+
+    if (value.HasMember("color")) {
+        klass.fill_color = parseColor(value["color"]);
+    }
+
+    return klass;
+}
 
 Value loadValueJSON(const rapidjson::Value& value) {
     switch (value.GetType()) {
@@ -556,9 +587,7 @@ Value loadValueJSON(const rapidjson::Value& value) {
 
         case rapidjson::kObjectType:
         case rapidjson::kArrayType:
-            fprintf(stderr, "value cannot be an object or array\n");
+            throw Style::exception("value cannot be an object or array");
             return false;
     }
 }
-
-*/

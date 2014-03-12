@@ -20,19 +20,9 @@
           'action': ['bin/build-shaders.js'],
         },
         {
-          'action_name': 'Convert Style to Protobuf',
+          'action_name': 'Build Stylesheet',
           'inputs': [
             'bin/style.js'
-          ],
-          'outputs': [
-            'resources/style.pbf'
-          ],
-          'action': ['bin/convert-style.js'],
-        },
-        {
-          'action_name': 'Update Style Resources',
-          'inputs': [
-            'resources/style.pbf'
           ],
           'outputs': [
             'include/llmr/style/resources.hpp',

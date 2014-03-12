@@ -4,7 +4,7 @@
 var fs = require('fs');
 
 var name = 'style';
-var data = fs.readFileSync('resources/style.pbf');
+var data = JSON.stringify(require('./style'));
 
 var length = data.length;
 
@@ -29,17 +29,7 @@ code += '#include <llmr/style/resources.hpp>\n';
 code += '\n';
 code += 'using namespace llmr;\n';
 code += '\n';
-code += 'const unsigned char resources::' + name + '[] = {\n';
-
-
-for (var i = 0; i < data.length; i += 16) {
-    if (i > 0) {
-        code += ',\n';
-    }
-    var part = data.slice(i, i + 16);
-    code += '    ' + Array.prototype.join.call(part, ', ');
-}
-code += '\n};\n';
+code += 'const unsigned char resources::' + name + '[] = R"JSON(' + data + ')JSON";\n';
 code += 'const unsigned long resources::' + name + '_size = sizeof(resources::' + name + ');\n';
 
 fs.writeFileSync('src/style/resources.cpp', code);
