@@ -19,7 +19,7 @@
 
 using namespace llmr;
 
-TileData::TileData(Tile::ID id, const Style& style)
+TileData::TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas)
     : id(id),
       state(State::initial),
       fillVertexBuffer(std::make_shared<FillVertexBuffer>()),
@@ -29,7 +29,8 @@ TileData::TileData(Tile::ID id, const Style& style)
       triangleElementsBuffer(std::make_shared<TriangleElementsBuffer>()),
       lineElementsBuffer(std::make_shared<LineElementsBuffer>()),
       pointElementsBuffer(std::make_shared<PointElementsBuffer>()),
-      style(style) {
+      style(style),
+      glyphAtlas(glyphAtlas) {
 
     // Initialize tile debug coordinates
     char coord[32];
@@ -87,6 +88,7 @@ bool TileData::parse() {
     try {
         double parse_time_start = platform::time();
         VectorTile tile(pbf((const uint8_t *)data.data(), data.size()));
+        loadGlyphs(tile.faces);
         parseStyleLayers(tile, style.layers);
         // double parse_time = (platform::time() - parse_time_start) * 1000.0;
         if (state == State::obsolete) {
@@ -107,6 +109,21 @@ bool TileData::parse() {
     }
 
     return true;
+}
+
+
+void TileData::loadGlyphs(const std::map<std::string, const VectorTileFace>& faces) {
+    std::map<std::string, std::map<uint32_t, Rect<uint16_t>>> rects;
+    for (const std::pair<std::string, const VectorTileFace> pair : faces) {
+        const std::string& name = pair.first;
+        const VectorTileFace& face = pair.second;
+
+        std::map<uint32_t, Rect<uint16_t>>& rect = rects[name];
+
+        for (const VectorTileGlyph& glyph : face.glyphs) {
+            rect.emplace({ glyph.id, glyphAtlas.addGlyph((uint64_t)id, name, glyph) });
+        }
+    }
 }
 
 void TileData::parseStyleLayers(const VectorTile& tile, const std::vector<LayerDescription>& layers) {

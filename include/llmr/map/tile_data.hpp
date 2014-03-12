@@ -5,6 +5,7 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/geometry/vao.hpp>
 #include <llmr/platform/platform.hpp>
@@ -25,6 +26,7 @@ class LayerDescription;
 class BucketDescription;
 class VectorTile;
 class VectorTileLayer;
+class VectorTileFace;
 class FillVertexBuffer;
 class LineVertexBuffer;
 class PointVertexBuffer;
@@ -54,7 +56,7 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, const Style& style);
+    TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas);
     ~TileData();
 
     // Start loading the tile.
@@ -73,6 +75,9 @@ public:
     void cancel();
 
     const std::string toString() const;
+
+private:
+    void loadGlyphs(const std::map<std::string, const VectorTileFace>& faces);
 
 public:
     const Tile::ID id;
@@ -94,10 +99,12 @@ public:
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above
     std::map<std::string, std::shared_ptr<Bucket>> buckets;
+
 private:
     // Source data
     std::string data;
     const Style& style;
+    GlyphAtlas& glyphAtlas;
     platform::Request *req = nullptr;
 };
 

@@ -1,4 +1,5 @@
 #include <llmr/geometry/glyph_atlas.hpp>
+#include <llmr/map/vector_tile.hpp>
 #include <llmr/platform/gl.hpp>
 
 #include <cassert>
@@ -11,7 +12,8 @@ GlyphAtlas::GlyphAtlas(uint16_t width, uint16_t height)
     : width(width),
       height(height),
       bin(width, height),
-      data(new char[width *height]) {
+      data(new char[width *height]),
+      dirty(true) {
 }
 
 GlyphAtlas::~GlyphAtlas() {
@@ -19,7 +21,11 @@ GlyphAtlas::~GlyphAtlas() {
 }
 
 Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tile_id, const std::string& face_name,
-                                    const Glyph& glyph, uint8_t buffer) {
+                                    const VectorTileGlyph& glyph) {
+    std::lock_guard<std::mutex> lock(mtx);
+
+    // Use constant value for now.
+    const uint8_t buffer = 3;
 
     std::map<uint32_t, GlyphValue>& face = index[face_name];
     std::map<uint32_t, GlyphValue>::iterator it = face.find(glyph.id);
@@ -77,6 +83,8 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tile_id, const std::string& face_na
 }
 
 void GlyphAtlas::removeGlyphs(uint64_t tile_id) {
+    std::lock_guard<std::mutex> lock(mtx);
+
     for (auto& faces : index) {
         std::map<uint32_t, GlyphValue>& face = faces.second;
         for (auto it = face.begin(); it != face.end(); /* we advance in the body */) {
@@ -124,6 +132,7 @@ void GlyphAtlas::bind() {
     }
 
     if (dirty) {
+        std::lock_guard<std::mutex> lock(mtx);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
         dirty = false;
     }

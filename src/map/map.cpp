@@ -14,6 +14,7 @@ Map::Map(Settings& settings)
       transform(),
       style(),
       painter(transform, settings, style),
+      glyphAtlas(1024, 1024),
       min_zoom(0),
       max_zoom(14) {
 }
@@ -278,7 +279,7 @@ TileData::State Map::addTile(const Tile::ID& id) {
 
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
-        new_tile.data = std::make_shared<TileData>(normalized_id, style);
+        new_tile.data = std::make_shared<TileData>(normalized_id, style, glyphAtlas);
         new_tile.data->request();
         tile_data.push_front(new_tile.data);
     }

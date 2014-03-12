@@ -6,16 +6,12 @@
 #include <string>
 #include <set>
 #include <map>
+#include <mutex>
+#include <atomic>
 
 namespace llmr {
 
-class Glyph {
-public:
-    uint32_t id = 0;
-    std::string bitmap;
-    uint16_t width = 0;
-    uint16_t height = 0;
-};
+class VectorTileGlyph;
 
 class GlyphAtlas {
 public:
@@ -34,17 +30,18 @@ public:
 
 
     Rect<uint16_t> addGlyph(uint64_t tile_id, const std::string& face_name,
-                            const Glyph& glyph, uint8_t buffer);
+                            const VectorTileGlyph& glyph);
     void removeGlyphs(uint64_t tile_id);
     void bind();
 
 private:
+    std::mutex mtx;
     const uint16_t width = 0;
     const uint16_t height = 0;
     BinPack<uint16_t> bin;
     std::map<std::string, std::map<uint32_t, GlyphValue>> index;
-    char *const data = NULL;
-    bool dirty = true;
+    char *const data = nullptr;
+    std::atomic<bool> dirty;
     uint32_t texture = 0;
 };
 
