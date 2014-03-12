@@ -181,6 +181,9 @@ CSSColor llmr::util::parseCSSColor(std::string str) {
     // Remove all whitespace, not compliant, but should just be more accepting.
     str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
 
+    // Convert to lowercase.
+    // std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+
     // Color keywords (and transparent) lookup.
     auto it = kCSSColorTable.find(str);
     if (it != kCSSColorTable.end()) {
