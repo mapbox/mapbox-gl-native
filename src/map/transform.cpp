@@ -235,7 +235,7 @@ double Transform::pixel_y() const {
     return center + y;
 }
 
-void Transform::matrixFor(mat4& matrix, const vec3<int32_t>& id) const {
+void Transform::matrixFor(mat4& matrix, const Tile::ID& id) const {
     const double tile_scale = pow(2, id.z);
     const double tile_size = scale * util::tileSize / tile_scale;
 

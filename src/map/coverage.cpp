@@ -64,15 +64,15 @@ void _scanTriangle(const llmr::vec2<double> a, const llmr::vec2<double> b, const
     if (bc.dy) _scanSpans(ca, bc, ymin, ymax, scanLine);
 }
 
-std::forward_list<llmr::vec3<int32_t>> llmr::covering_tiles(int32_t zoom, const box& points) {
+std::forward_list<llmr::Tile::ID> llmr::covering_tiles(int32_t zoom, const box& points) {
     int32_t dim = pow(2, zoom);
-    std::forward_list<vec3<int32_t>> tiles;
+    std::forward_list<llmr::Tile::ID> tiles;
 
     auto scanLine = [&tiles, zoom](int32_t x0, int32_t x1, int32_t y, int32_t ymax) {
         int32_t x;
         if (y >= 0 && y <= ymax) {
             for (x = x0; x < x1; x++) {
-                tiles.emplace_front(x, y, zoom);
+                tiles.emplace_front(zoom, x, y);
             }
         }
     };
@@ -85,7 +85,7 @@ std::forward_list<llmr::vec3<int32_t>> llmr::covering_tiles(int32_t zoom, const 
     _scanTriangle(points.br, points.bl, points.tl, 0, dim, scanLine);
 
     const vec2<double>& center = points.center;
-    tiles.sort([&center](const vec3<int32_t>& a, const vec3<int32_t>& b) {
+    tiles.sort([&center](const Tile::ID& a, const Tile::ID& b) {
         // Sorts by distance from the box center
         return fabs(a.x - center.x) + fabs(a.y - center.y) <
                fabs(b.x - center.x) + fabs(b.y - center.y);

@@ -260,7 +260,7 @@ TileData::State Map::addTile(const Tile::ID& id) {
 
     // We couldn't find the tile in the list. Create a new one.
     // Try to find the associated TileData object.
-    const Tile::ID normalized_id = Tile::normalize(id);
+    const Tile::ID normalized_id = id.normalized();
 
     auto it = std::find_if(tile_data.begin(), tile_data.end(), [&normalized_id](const std::weak_ptr<TileData>& tile_data) {
         return !tile_data.expired() && tile_data.lock()->id == normalized_id;
@@ -299,7 +299,8 @@ bool Map::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::f
     bool complete = true;
     int32_t z = id.z;
 
-    auto ids = Tile::children(id, z + 1);
+
+    auto ids = id.children(z + 1);
     for (const Tile::ID& child_id : ids) {
         const TileData::State state = hasTile(child_id);
         if (state == TileData::State::parsed) {
@@ -326,7 +327,7 @@ bool Map::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::f
  */
 bool Map::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain) {
     for (int32_t z = id.z - 1; z >= minCoveringZoom; --z) {
-        const Tile::ID parent_id = Tile::parent(id, z);
+        const Tile::ID parent_id = id.parent(z);
         const TileData::State state = hasTile(parent_id);
         if (state == TileData::State::parsed) {
             retain.emplace_front(parent_id);
