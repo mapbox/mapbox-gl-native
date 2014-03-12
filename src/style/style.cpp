@@ -1,5 +1,5 @@
 #include <llmr/style/style.hpp>
-#include <llmr/util/color.hpp>
+#include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
 
@@ -363,7 +363,7 @@ Color parseColor(const rapidjson::Value& value) {
         throw Style::exception("color value must be a string");
     }
 
-    llmr::util::CSSColor css_color = llmr::util::parseCSSColor({
+    CSSColorParser::Color css_color = CSSColorParser::parse({
         value.GetString(),
         value.GetStringLength()
     });

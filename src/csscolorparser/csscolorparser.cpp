@@ -1,7 +1,8 @@
 // (c) Dean McNamee <dean@gmail.com>, 2012.
-// C++ port by Konstantin Käfer <mail@kkaefer.com, 2014.
+// C++ port by Konstantin Käfer <mail@kkaefer.com>, 2014.
 //
 // https://github.com/deanm/css-color-parser-js
+// https://github.com/kkaefer/css-color-parser-cpp
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -21,7 +22,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include <llmr/util/color.hpp>
+#include <csscolorparser/csscolorparser.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -29,11 +30,10 @@
 #include <cmath>
 #include <map>
 
-using namespace llmr::util;
-
+using namespace CSSColorParser;
 
 // http://www.w3.org/TR/css3-color/
-const std::map<std::string, CSSColor> kCSSColorTable = {
+const std::map<std::string, Color> kCSSColorTable = {
     { "transparent", { 0, 0, 0, 0 } }, { "aliceblue", { 240, 248, 255, 1 } },
     { "antiquewhite", { 250, 235, 215, 1 } }, { "aqua", { 0, 255, 255, 1 } },
     { "aquamarine", { 127, 255, 212, 1 } }, { "azure", { 240, 255, 255, 1 } },
@@ -132,7 +132,7 @@ int64_t parseInt(const std::string& str, uint8_t base = 10) {
 
 uint8_t parse_css_int(const std::string& str) {  // int or percentage.
     if (str.length() && str.back() == '%') {
-        return clamp_css_byte(parseFloat(str) / 100 * 255);
+        return clamp_css_byte(parseFloat(str) / 100.0f * 255.0f);
     } else {
         return clamp_css_byte(parseInt(str));
     }
@@ -140,27 +140,27 @@ uint8_t parse_css_int(const std::string& str) {  // int or percentage.
 
 float parse_css_float(const std::string& str) {  // float or percentage.
     if (str.length() && str.back() == '%') {
-        return clamp_css_float(parseFloat(str) / 100);
+        return clamp_css_float(parseFloat(str) / 100.0f);
     } else {
         return clamp_css_float(parseFloat(str));
     }
 }
 
-uint8_t css_hue_to_rgb(uint8_t m1, uint8_t m2, uint8_t h) {
-    if (h < 0) {
-        h += 1;
-    } else if (h > 1) {
-        h -= 1;
+float css_hue_to_rgb(float m1, float m2, float h) {
+    if (h < 0.0f) {
+        h += 1.0f;
+    } else if (h > 1.0f) {
+        h -= 1.0f;
     }
 
-    if (h * 6 < 1) {
-        return m1 + (m2 - m1) * h * 6;
+    if (h * 6.0f < 1.0f) {
+        return m1 + (m2 - m1) * h * 6.0f;
     }
-    if (h * 2 < 1) {
+    if (h * 2.0f < 1.0f) {
         return m2;
     }
-    if (h * 3 < 2) {
-        return m1 + (m2 - m1) * (2 / 3 - h) * 6;
+    if (h * 3.0f < 2.0f) {
+        return m1 + (m2 - m1) * (2.0 / 3.0 - h) * 6.0f;
     }
     return m1;
 }
@@ -177,12 +177,14 @@ std::vector<std::string> split(const std::string& s, char delim) {
     return elems;
 }
 
-CSSColor llmr::util::parseCSSColor(std::string str) {
+Color CSSColorParser::parse(const std::string& css_str) {
+    std::string str = css_str;
+
     // Remove all whitespace, not compliant, but should just be more accepting.
     str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
 
     // Convert to lowercase.
-    // std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 
     // Color keywords (and transparent) lookup.
     auto it = kCSSColorTable.find(str);
@@ -222,10 +224,11 @@ CSSColor llmr::util::parseCSSColor(std::string str) {
     }
 
     size_t op = str.find_first_of('('), ep = str.find_first_of(')');
-    if (op != -1 && ep + 1 == str.length()) {
+    if (op != std::string::npos && ep + 1 == str.length()) {
         const std::string fname = str.substr(0, op);
         const std::vector<std::string> params = split(str.substr(op + 1, ep - (op + 1)), ',');
-        float alpha = 1.0f;  // To allow case fallthrough.
+
+        float alpha = 1.0f;
 
         if (fname == "rgba" || fname == "rgb") {
             if (fname == "rgba") {
@@ -258,20 +261,22 @@ CSSColor llmr::util::parseCSSColor(std::string str) {
                 }
             }
 
-            float h = parseFloat(params[0]) / 360;
-            while (h < 0) h++;
-            while (h > 1) h--;
+            float h = parseFloat(params[0]) / 360.0f;
+            while (h < 0.0f) h++;
+            while (h > 1.0f) h--;
 
             // NOTE(deanm): According to the CSS spec s/l should only be
             // percentages, but we don't bother and let float or percentage.
             float s = parse_css_float(params[1]);
             float l = parse_css_float(params[2]);
-            float m2 = l <= 0.5 ? l * (s + 1) : l + s - l * s;
-            float m1 = l * 2 - m2;
+
+            float m2 = l <= 0.5f ? l * (s + 1.0f) : l + s - l * s;
+            float m1 = l * 2.0f - m2;
+
             return {
-                clamp_css_byte(css_hue_to_rgb(m1, m2, h + 1 / 3) * 255),
-                clamp_css_byte(css_hue_to_rgb(m1, m2, h) * 255),
-                clamp_css_byte(css_hue_to_rgb(m1, m2, h - 1 / 3) * 255),
+                clamp_css_byte(css_hue_to_rgb(m1, m2, h + 1.0f / 3.0f) * 255.0f),
+                clamp_css_byte(css_hue_to_rgb(m1, m2, h) * 255.0f),
+                clamp_css_byte(css_hue_to_rgb(m1, m2, h - 1.0f / 3.0f) * 255.0f),
                 alpha
             };
         }
