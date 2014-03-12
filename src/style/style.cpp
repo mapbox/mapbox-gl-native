@@ -154,11 +154,11 @@ BucketDescription loadBucketJSON(const rapidjson::Value& value) {
             } else {
                 throw Style::exception("bucket type must be a string");
             }
-        } else if (name == "datasource") {
+        } else if (name == "source") {
             if (value.IsString()) {
                 bucket.source_name = { value.GetString(), value.GetStringLength() };
             } else {
-                throw Style::exception("datasource name must be a string");
+                throw Style::exception("source name must be a string");
             }
         } else if (name == "layer") {
             if (value.IsString()) {
