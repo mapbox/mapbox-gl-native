@@ -5,6 +5,7 @@
 #include <llmr/geometry/fill_buffer.hpp>
 #include <llmr/geometry/line_buffer.hpp>
 #include <llmr/geometry/point_buffer.hpp>
+#include <llmr/geometry/text_buffer.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
@@ -24,6 +25,7 @@ TileData::TileData(Tile::ID id, const Style& style)
       fillVertexBuffer(std::make_shared<FillVertexBuffer>()),
       lineVertexBuffer(std::make_shared<LineVertexBuffer>()),
       pointVertexBuffer(std::make_shared<PointVertexBuffer>()),
+      textVertexBuffer(std::make_shared<TextVertexBuffer>()),
       triangleElementsBuffer(std::make_shared<TriangleElementsBuffer>()),
       lineElementsBuffer(std::make_shared<LineElementsBuffer>()),
       pointElementsBuffer(std::make_shared<PointElementsBuffer>()),
@@ -157,7 +159,7 @@ std::shared_ptr<Bucket> TileData::createBucket(const VectorTile& tile, const Buc
         } else if (bucket_desc.type == BucketType::Text) {
             return createTextBucket(tile, layer, bucket_desc);
         } else {
-            // TODO: create other bucket types.
+            throw std::runtime_error("unknown bucket type");
         }
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
@@ -206,7 +208,7 @@ std::shared_ptr<Bucket> TileData::createTextBucket(const VectorTile& tile, const
     }
 
     // TODO: currently hardcoded to use the first font stack.
-    const std::map<Value, std::vector<VectorTilePlacement>>& stack = layer.shaping.begin()->second;
+    const std::map<Value, std::vector<VectorTilePlacement>>& shaping = layer.shaping.begin()->second;
 
     std::vector<const VectorTileFace *> faces;
     for (const std::string& face : layer.faces) {
@@ -221,11 +223,9 @@ std::shared_ptr<Bucket> TileData::createTextBucket(const VectorTile& tile, const
     std::shared_ptr<TextBucket> bucket = std::make_shared<TextBucket>(textVertexBuffer, triangleElementsBuffer, bucket_desc);
 
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
-    for (pbf feature_pbf : filtered_layer) {
+    for (const pbf& feature_pbf : filtered_layer) {
         if (state == State::obsolete) return nullptr;
-
-        const VectorTileFeature feature(feature_pbf, layer);
-        std::cerr << feature;
+        bucket->addFeature({ feature_pbf, layer }, faces, shaping);
     }
 
     return bucket;

@@ -35,6 +35,7 @@ inline BucketType bucketType(const std::string& type) {
     if (type == "fill") return BucketType::Fill;
     else if (type == "line") return BucketType::Line;
     else if (type == "point") return BucketType::Point;
+    else if (type == "text") return BucketType::Text;
     else return BucketType::None;
 }
 
@@ -58,6 +59,7 @@ public:
     CapType cap = CapType::None;
     JoinType join = JoinType::None;
     std::string font;
+    std::string text_field;
     float font_size = 0.0f;
     float miter_limit = 2.0f;
     float round_limit = 1.0f;
@@ -65,6 +67,7 @@ public:
 
 class BucketDescription {
 public:
+    BucketType feature_type = BucketType::None;
     BucketType type = BucketType::None;
 
     // Specify what data to pull into this bucket

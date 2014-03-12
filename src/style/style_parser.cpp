@@ -233,6 +233,8 @@ void StyleParser::parseClass(const std::string& name, JSVal value, ClassDescript
                     class_desc.line.insert({ name, std::forward<LineClass>(parseLineClass(value)) });
                 } else if (type_name == "point") {
                     class_desc.point.insert({ name, std::forward<PointClass>(parsePointClass(value)) });
+                } else if (type_name == "text") {
+                    class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
                 } else if (type_name == "background") {
                     class_desc.background = parseBackgroundClass(value);
                 } else {
@@ -466,6 +468,17 @@ PointClass StyleParser::parsePointClass(JSVal value) {
 
     if (value.HasMember("size")) {
         klass.size = parseFloatFunction(value["size"]);
+    }
+
+    return klass;
+}
+
+
+TextClass StyleParser::parseTextClass(JSVal value) {
+    TextClass klass;
+
+    if (value.HasMember("color")) {
+        klass.color = parseColor(value["color"]);
     }
 
     return klass;

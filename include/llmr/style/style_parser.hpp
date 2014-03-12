@@ -23,6 +23,7 @@ private:
     FillClass parseFillClass(JSVal value);
     LineClass parseLineClass(JSVal value);
     PointClass parsePointClass(JSVal value);
+    TextClass parseTextClass(JSVal value);
     BackgroundClass parseBackgroundClass(JSVal value);
 
     bool parseBoolean(JSVal value);

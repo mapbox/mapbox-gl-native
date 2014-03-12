@@ -222,6 +222,7 @@ module.exports = {
                     "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "country_label": {
+                    "type": "text",
                     "stroke": [ 1, 1, 1, 0.7 ],
                     "color": "text"
                 },

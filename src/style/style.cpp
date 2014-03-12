@@ -76,6 +76,16 @@ void Style::cascade(float z) {
             point.image = layer.image;
         }
 
+        for (const auto& text_pair : sheetClass.text) {
+            const std::string& layer_name = text_pair.first;
+            const llmr::TextClass& layer = text_pair.second;
+
+            // TODO: This should be restricted to point styles that have actual
+            // values so as to not override with default values.
+            llmr::TextProperties& text = computed.texts[layer_name];
+            text.color = layer.color;
+        }
+
         // Cascade background
         computed.background.color = sheetClass.background.color;
     }

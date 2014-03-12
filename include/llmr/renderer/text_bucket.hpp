@@ -6,6 +6,7 @@
 #include <llmr/geometry/vao.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
 #include <memory>
+#include <map>
 #include <vector>
 
 namespace llmr {
@@ -14,6 +15,9 @@ class Style;
 class TextVertexBuffer;
 class TriangleElementsBuffer;
 class TextShader;
+class VectorTileFeature;
+class VectorTileFace;
+class VectorTilePlacement;
 struct Coordinate;
 struct pbf;
 
@@ -26,7 +30,13 @@ public:
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
 
-    void addGeometry(pbf& data);
+    void addFeature(const VectorTileFeature& feature,
+                    const std::vector<const VectorTileFace *>& faces,
+                    const std::map<Value, std::vector<VectorTilePlacement>>& shaping);
+
+    void addLabel(const std::vector<Coordinate>& line,
+                  const std::vector<const VectorTileFace *>& faces,
+                  const std::vector<VectorTilePlacement>& placements);
 
     bool empty() const;
 

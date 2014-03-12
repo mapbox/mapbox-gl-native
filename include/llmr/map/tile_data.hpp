@@ -90,7 +90,6 @@ public:
     std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
     std::shared_ptr<LineElementsBuffer> lineElementsBuffer;
     std::shared_ptr<PointElementsBuffer> pointElementsBuffer;
-    std::shared_ptr<TextElementsBuffer> textElementsBuffer;
 
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above
