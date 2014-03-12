@@ -89,6 +89,9 @@ module.exports = {
         },
     },
     "sprite": "img/maki-sprite",
+    "constants": {
+        "park": "#c8df9f",
+    },
     "structure": [
         { "name": "park", "bucket": "park" },
         { "name": "wood", "bucket": "wood" },
@@ -113,7 +116,7 @@ module.exports = {
                 },
                 "park": {
                     "type": "fill",
-                    "color": "#c8df9f",
+                    "color": "park",
                     "antialias": true,
                     "image": "park"
                 },
