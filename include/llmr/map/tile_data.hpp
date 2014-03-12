@@ -8,6 +8,7 @@
 #include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/geometry/vao.hpp>
+#include <llmr/map/vector_tile.hpp>
 #include <llmr/platform/platform.hpp>
 
 #include <cstdint>
@@ -24,9 +25,6 @@ class Style;
 class Bucket;
 class LayerDescription;
 class BucketDescription;
-class VectorTile;
-class VectorTileLayer;
-class VectorTileFace;
 class FillVertexBuffer;
 class LineVertexBuffer;
 class PointVertexBuffer;
@@ -59,25 +57,11 @@ public:
     TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas);
     ~TileData();
 
-    // Start loading the tile.
     void request();
-
-    // Other functions
     bool parse();
-    void parseStyleLayers(const VectorTile& tile, const std::vector<LayerDescription>& layers);
-    std::shared_ptr<Bucket> createBucket(const VectorTile& tile, const BucketDescription& bucket_desc);
-    template <class Bucket> void addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createFillBucket(const VectorTile& tile, const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createLineBucket(const VectorTile& tile, const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createPointBucket(const VectorTile& tile, const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createTextBucket(const VectorTile& tile, const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-
     void cancel();
 
     const std::string toString() const;
-
-private:
-    void loadGlyphs(const std::map<std::string, const VectorTileFace>& faces);
 
 public:
     const Tile::ID id;
