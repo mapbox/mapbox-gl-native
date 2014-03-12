@@ -1,5 +1,6 @@
 #include <llmr/style/style.hpp>
 #include <llmr/style/style_parser.hpp>
+#include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
 
