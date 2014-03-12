@@ -87,10 +87,22 @@ module.exports = {
             "value": ["Restaurant"],
             "type": "point"
         },
+        "country_label": {
+            "source": "streets",
+            "type": "text",
+            "layer": "country_label",
+            "feature_type": "point",
+            "padding": 10,
+            "text_field": "name",
+            "path": "horizontal",
+            "font": "Open Sans, Jomolhari, Siyam Rupali, Alef, Arial Unicode MS",
+            "fontSize": 16
+        },
     },
     "sprite": "img/maki-sprite",
     "constants": {
         "park": "#c8df9f",
+        "text": "#000000",
     },
     "structure": [
         { "name": "park", "bucket": "park" },
@@ -105,6 +117,7 @@ module.exports = {
         { "name": "embassy_poi", "bucket": "embassy_poi" },
         { "name": "park_poi", "bucket": "park_poi" },
         { "name": "restaurant_poi", "bucket": "restaurant_poi" },
+        { "name": "country_label", "bucket": "country_label" },
     ],
     "classes": [
         {
@@ -207,6 +220,10 @@ module.exports = {
                     "size": 18,
                     "image": "restaurant",
                     "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
+                },
+                "country_label": {
+                    "stroke": [ 1, 1, 1, 0.7 ],
+                    "color": "text"
                 },
             }
         }
