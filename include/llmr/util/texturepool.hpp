@@ -1,5 +1,5 @@
-#ifndef LLMR_UTIL_TEXTURER
-#define LLMR_UTIL_TEXTURER
+#ifndef LLMR_UTIL_TEXTUREPOOL
+#define LLMR_UTIL_TEXTUREPOOL
 
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/platform/gl.hpp>
@@ -9,7 +9,7 @@
 
 namespace llmr {
 
-class Texturer : private util::noncopyable {
+class Texturepool : private util::noncopyable {
 
 public:
     GLuint getTextureID();

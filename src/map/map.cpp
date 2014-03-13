@@ -14,7 +14,7 @@ Map::Map(Settings& settings)
       transform(),
       style(),
       painter(transform, settings, style),
-      texturer(),
+      texturepool(),
       min_zoom(0),
       max_zoom((use_raster ? kTileRasterMaxZoom : kTileVectorMaxZoom)) {
 }
@@ -428,7 +428,7 @@ bool Map::updateTiles() {
         if (obsolete) {
             tile->cancel();
             if (tile->use_raster && tile->raster && tile->raster->textured) {
-                map->texturer.removeTextureID(tile->raster->texture);
+                map->texturepool.removeTextureID(tile->raster->texture);
             }
             return true;
         } else {
@@ -445,7 +445,7 @@ bool Map::render() {
     }
 
     if (*style.sprite->raster && !style.sprite->raster->textured)
-        style.sprite->raster->texture = texturer.getTextureID();
+        style.sprite->raster->texture = texturepool.getTextureID();
 
     bool changed = updateTiles();
 
@@ -471,7 +471,7 @@ bool Map::render() {
     for (const Tile& tile : tiles) {
         if (tile.data && tile.data->state == TileData::State::parsed) {
             if (tile.data->use_raster && tile.data->raster && !tile.data->raster->textured) {
-                tile.data->raster->texture = texturer.getTextureID();
+                tile.data->raster->texture = texturepool.getTextureID();
             }
             painter.render(tile);
         }

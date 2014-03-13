@@ -7,7 +7,7 @@
 #include <llmr/style/style.hpp>
 #include <llmr/renderer/painter.hpp>
 #include <llmr/util/noncopyable.hpp>
-#include <llmr/util/texturer.hpp>
+#include <llmr/util/texturepool.hpp>
 
 #include <cstdint>
 #include <string>
@@ -76,7 +76,7 @@ private:
     Transform transform;
     Style style;
     Painter painter;
-    Texturer texturer;
+    Texturepool texturepool;
 
     int32_t min_zoom;
     int32_t max_zoom;

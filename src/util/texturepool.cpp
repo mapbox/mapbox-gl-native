@@ -1,4 +1,4 @@
-#include <llmr/util/texturer.hpp>
+#include <llmr/util/texturepool.hpp>
 
 #include <vector>
 
@@ -6,7 +6,7 @@
 
 using namespace llmr;
 
-GLuint Texturer::getTextureID() {
+GLuint Texturepool::getTextureID() {
 //    std::lock_guard<std::mutex> lock(mtx);
 
     if (texture_ids.empty())
@@ -29,7 +29,7 @@ GLuint Texturer::getTextureID() {
     return id;
 }
 
-void Texturer::removeTextureID(GLuint texture_id) {
+void Texturepool::removeTextureID(GLuint texture_id) {
     //    std::lock_guard<std::mutex> lock(mtx);
 
     bool needs_clear = false;
@@ -43,10 +43,13 @@ void Texturer::removeTextureID(GLuint texture_id) {
         needs_clear = true;
 
     if (needs_clear)
+        fprintf(stderr, "clearing textures because %d > %d\n", texture_ids.size(), TextureMax);
+
+    if (needs_clear)
         clearTextureIDs();
 }
 
-void Texturer::clearTextureIDs() {
+void Texturepool::clearTextureIDs() {
 //    std::lock_guard<std::mutex> lock(mtx);
 
     std::vector<GLuint> ids_to_remove;
