@@ -471,7 +471,7 @@ bool Map::render() {
 
     for (const Tile& tile : tiles) {
         if (tile.data && tile.data->state == TileData::State::parsed) {
-            if (tile.data->use_raster && !tile.data->raster->textured) {
+            if (tile.data->use_raster && tile.data->raster && !tile.data->raster->textured) {
                 tile.data->raster->texture = texturer.getTextureID();
             }
             painter.render(tile);
