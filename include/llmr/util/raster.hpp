@@ -24,10 +24,10 @@ public:
     // loaded image dimensions
     uint32_t width = 0, height = 0;
 
-    // uploaded to texture
+    // has been uploaded to texture
     bool textured = false;
 
-    // uploaded texture
+    // the uploaded texture
     uint32_t texture = 0;
 
 private:
@@ -37,13 +37,13 @@ private:
 private:
     mutable std::mutex mtx;
 
-    // raw pixels loaded
+    // raw pixels have been loaded
     bool loaded = false;
 
     // min/mag filter
     uint32_t filter = 0;
 
-    // raw pixels
+    // the raw pixels
     char *img = nullptr;
 };
 
