@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#define TextureMax 32
+#define TextureMax 64
 
 using namespace llmr;
 
@@ -41,9 +41,6 @@ void Texturepool::removeTextureID(GLuint texture_id) {
 
     if (texture_ids.size() > TextureMax)
         needs_clear = true;
-
-    if (needs_clear)
-        fprintf(stderr, "clearing textures because %d > %d\n", texture_ids.size(), TextureMax);
 
     if (needs_clear)
         clearTextureIDs();
