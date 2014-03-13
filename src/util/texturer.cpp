@@ -56,7 +56,7 @@ void Texturer::clearTextureIDs() {
         ids_to_remove.push_back(*id_iterator);
 
     if (!ids_to_remove.empty())
-        glDeleteTextures(ids_to_remove.size(), &ids_to_remove[0]);
+        glDeleteTextures((GLsizei)ids_to_remove.size(), &ids_to_remove[0]);
 
     texture_ids.clear();
 }
