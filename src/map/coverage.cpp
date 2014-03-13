@@ -1,4 +1,6 @@
 #include <llmr/map/coverage.hpp>
+#include <llmr/util/vec.hpp>
+
 #include <functional>
 #include <cmath>
 

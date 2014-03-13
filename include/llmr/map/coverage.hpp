@@ -2,7 +2,7 @@
 #define LLMR_MAP_COVERAGE
 
 #include <llmr/map/tile.hpp>
-#include <llmr/util/vec.hpp>
+
 #include <forward_list>
 
 namespace llmr {
