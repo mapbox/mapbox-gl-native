@@ -444,6 +444,9 @@ bool Map::render() {
         transform.updateAnimations();
     }
 
+    if (*style.sprite->raster && !style.sprite->raster->textured)
+        style.sprite->raster->texture = texturer.getTextureID();
+
     bool changed = updateTiles();
 
     painter.clear();
