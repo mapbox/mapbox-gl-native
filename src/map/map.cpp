@@ -427,9 +427,6 @@ bool Map::updateTiles() {
         bool obsolete = std::find(retain_data.begin(), retain_data.end(), tile->id) == retain_data.end();
         if (obsolete) {
             tile->cancel();
-            if (tile->use_raster && tile->raster && tile->raster->textured) {
-                map->texturepool.removeTextureID(tile->raster->texture);
-            }
             return true;
         } else {
             return false;
@@ -444,8 +441,9 @@ bool Map::render() {
         transform.updateAnimations();
     }
 
-    if (*style.sprite->raster && !style.sprite->raster->textured)
-        style.sprite->raster->texture = texturepool.getTextureID();
+    if (*style.sprite->raster && !style.sprite->raster->textured) {
+        style.sprite->raster->setTexturepool(&texturepool);
+    }
 
     bool changed = updateTiles();
 
@@ -470,8 +468,8 @@ bool Map::render() {
 
     for (const Tile& tile : tiles) {
         if (tile.data && tile.data->state == TileData::State::parsed) {
-            if (tile.data->use_raster && tile.data->raster && !tile.data->raster->textured) {
-                tile.data->raster->texture = texturepool.getTextureID();
+            if (tile.data->use_raster && *tile.data->raster && !tile.data->raster->textured) {
+                tile.data->raster->setTexturepool(&texturepool);
             }
             painter.render(tile);
         }

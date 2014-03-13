@@ -1,6 +1,8 @@
 #ifndef LLMR_UTIL_RASTER
 #define LLMR_UTIL_RASTER
 
+#include <llmr/util/texturepool.hpp>
+
 #include <string>
 #include <mutex>
 
@@ -13,6 +15,9 @@ public:
 
     // load image data
     void load(const std::string& data);
+
+    // set shared texture pool
+    void setTexturepool(Texturepool* texturepool);
 
     // bind current texture
     void bind(bool linear = false);
@@ -39,6 +44,9 @@ private:
 
     // raw pixels have been loaded
     bool loaded = false;
+
+    // shared texture pool
+    Texturepool* texturepool = nullptr;
 
     // min/mag filter
     uint32_t filter = 0;

@@ -12,6 +12,8 @@ using namespace llmr;
 Raster::~Raster() {
     if (img && !textured) {
         free(img);
+    } else if (textured) {
+        texturepool->removeTextureID(texture);
     }
 }
 
@@ -140,6 +142,10 @@ void Raster::loadImage(const std::string& data) {
     }
 }
 
+void Raster::setTexturepool(Texturepool* new_texturepool) {
+    texturepool = new_texturepool;
+}
+
 void Raster::bind(bool linear) {
     if (!width || !height) {
         fprintf(stderr, "trying to bind texture without dimension\n");
@@ -147,6 +153,11 @@ void Raster::bind(bool linear) {
     }
 
     if (img && !textured) {
+        if (!texturepool) {
+            fprintf(stderr, "no available texture pool\n");
+            return;
+        }
+        texture = texturepool->getTextureID();
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
