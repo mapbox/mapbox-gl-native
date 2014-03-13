@@ -35,10 +35,6 @@ void Map::setup(float pixelRatio) {
     style.loadJSON(resources::style, resources::style_size);
 }
 
-void Map::loadSprite(const std::string& url) {
-
-}
-
 void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
     style.loadJSON(data, bytes);
     update();
