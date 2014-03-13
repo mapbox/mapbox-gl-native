@@ -1,4 +1,5 @@
 #include <llmr/map/coverage.hpp>
+#include <llmr/util/constants.hpp>
 #include <llmr/util/vec.hpp>
 
 #include <functional>
@@ -75,7 +76,12 @@ std::forward_list<llmr::Tile::ID> llmr::covering_tiles(int32_t zoom, const box& 
         if (y >= 0 && y <= ymax) {
             for (x = x0; x < x1; x++) {
                 if (use_raster) {
-                    for (const Tile::ID& id : Tile::children({ x, y, zoom }, (zoom + (use_retina ? 2 : 1)))) {
+                    uint32_t search_zoom = zoom;
+                    search_zoom += (uint32_t)((llmr::util::tileSize / 256.0f) - 1.0f);
+                    if (use_retina) {
+                        search_zoom += 1;
+                    }
+                    for (const Tile::ID& id : Tile::children({ x, y, zoom }, search_zoom)) {
                         tiles.emplace_front(id.x, id.y, id.z);
                     }
                 } else {
