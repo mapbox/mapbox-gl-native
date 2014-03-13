@@ -51,7 +51,7 @@ public:
     void stopScaling();
 
     // Temporary
-    void mapCornersToBox(uint32_t z, box& b) const;
+    box mapCornersToBox(uint32_t z) const;
 
 private:
     void setScaleXY(double new_scale, double xn, double yn, double duration = 0);

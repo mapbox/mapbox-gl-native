@@ -1,4 +1,4 @@
-#include <llmr/renderer/shader-pattern.hpp>
+#include <llmr/shader/pattern_shader.hpp>
 #include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 

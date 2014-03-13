@@ -1,7 +1,7 @@
-#ifndef LLMR_RENDERER_SHADER_PLAIN
-#define LLMR_RENDERER_SHADER_PLAIN
+#ifndef LLMR_SHADER_SHADER_PLAIN
+#define LLMR_SHADER_SHADER_PLAIN
 
-#include "shader.hpp"
+#include <llmr/shader/shader.hpp>
 
 namespace llmr {
 
@@ -17,7 +17,7 @@ public:
 private:
     int32_t a_pos = -1;
 
-    std::array<float, 4> color = {};
+    std::array<float, 4> color = {{}};
     int32_t u_color = -1;
 };
 

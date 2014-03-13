@@ -1,4 +1,4 @@
-#include <llmr/renderer/shader-raster.hpp>
+#include <llmr/shader/raster_shader.hpp>
 #include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 

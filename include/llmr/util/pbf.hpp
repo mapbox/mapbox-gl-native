@@ -14,11 +14,11 @@
 namespace llmr {
 
 struct pbf {
-    struct exception : std::exception {};
-    struct unterminated_varint_exception : exception {};
-    struct varint_too_long_exception : exception {};
-    struct unknown_field_type_exception : exception {};
-    struct end_of_buffer_exception : exception {};
+    struct exception : std::exception { const char *what() const noexcept { return "pbf exception"; } };
+    struct unterminated_varint_exception : exception { const char *what() const noexcept { return "pbf unterminated varint exception"; } };
+    struct varint_too_long_exception : exception { const char *what() const noexcept { return "pbf varint too long exception"; } };
+    struct unknown_field_type_exception : exception { const char *what() const noexcept { return "pbf unknown field type exception"; } };
+    struct end_of_buffer_exception : exception { const char *what() const noexcept { return "pbf end of buffer exception"; } };
 
     inline pbf(const unsigned char *data, size_t length);
     inline pbf();

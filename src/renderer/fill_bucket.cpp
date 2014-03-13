@@ -139,7 +139,7 @@ void FillBucket::tessellate() {
 
         lineIndex += group_count;
 
-        tessAddContour(tesselator, vertexSize, line.data(), stride, line.size() / vertexSize);
+        tessAddContour(tesselator, vertexSize, line.data(), stride, (int)line.size() / vertexSize);
     }
 
     lineGroup.elements_length += total_vertex_count;
@@ -154,7 +154,7 @@ void FillBucket::tessellate() {
         for (size_t i = 0; i < vertex_count; ++i) {
             if (vertex_indices[i] == TESS_UNDEF) {
                 vertexBuffer->add(round(vertices[i * 2]), round(vertices[i * 2 + 1]));
-                vertex_indices[i] = total_vertex_count;
+                vertex_indices[i] = (TESSindex)total_vertex_count;
                 total_vertex_count++;
             }
         }

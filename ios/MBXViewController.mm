@@ -78,6 +78,7 @@ class MBXMapView
 
     view.enableSetNeedsDisplay = NO;
     view.drawableStencilFormat = GLKViewDrawableStencilFormat8;
+    view.drawableDepthFormat = GLKViewDrawableDepthFormat16;
     [view bindDrawable];
 
     [EAGLContext setCurrentContext:self.context];

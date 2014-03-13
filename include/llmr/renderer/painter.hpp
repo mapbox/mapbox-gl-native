@@ -1,19 +1,19 @@
 #ifndef LLMR_RENDERER_PAINTER
 #define LLMR_RENDERER_PAINTER
 
-#include <llmr/map/tile.hpp>
+#include <llmr/map/tile_data.hpp>
 #include <llmr/geometry/vao.hpp>
 #include <llmr/geometry/vertex_buffer.hpp>
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
 
-#include <llmr/renderer/shader-plain.hpp>
-#include <llmr/renderer/shader-outline.hpp>
-#include <llmr/renderer/shader-pattern.hpp>
-#include <llmr/renderer/shader-line.hpp>
-#include <llmr/renderer/shader-linejoin.hpp>
-#include <llmr/renderer/shader-point.hpp>
-#include <llmr/renderer/shader-raster.hpp>
+#include <llmr/shader/plain_shader.hpp>
+#include <llmr/shader/outline_shader.hpp>
+#include <llmr/shader/pattern_shader.hpp>
+#include <llmr/shader/line_shader.hpp>
+#include <llmr/shader/linejoin_shader.hpp>
+#include <llmr/shader/point_shader.hpp>
+#include <llmr/shader/raster_shader.hpp>
 
 namespace llmr {
 
@@ -33,24 +33,27 @@ public:
     void setup();
     void clear();
     void changeMatrix();
-    void render(const std::shared_ptr<Tile>& tile);
+    void render(const Tile& tile);
     void renderMatte();
-    void renderBackground();
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id);
+
+    void resize(int width, int height);
 
     void prepareClippingMask();
     void drawClippingMask(const mat4& matrix, uint8_t clip_id);
     void finishClippingMask();
 private:
     void setupShaders();
-    void renderRaster(const std::shared_ptr<Tile>& tile);
-    void renderLayers(const std::shared_ptr<Tile>& tile, const std::vector<LayerDescription>& layers);
-    void renderDebug(const std::shared_ptr<Tile>& tile);
+    void renderRaster(const std::shared_ptr<TileData>& tile);
+    void renderLayers(const std::shared_ptr<TileData>& tile, const std::vector<LayerDescription>& layers);
+    void renderLayer(const std::shared_ptr<TileData>& tile_data, const LayerDescription& layer_desc);
+    void renderDebug(const std::shared_ptr<TileData>& tile);
 
     void useProgram(uint32_t program);
     void lineWidth(float lineWidth);
+    void depthMask(bool value);
 
 public:
     mat4 matrix;
@@ -63,8 +66,14 @@ private:
     Settings& settings;
     Style& style;
 
+
+
     uint32_t gl_program = 0;
     float gl_lineWidth = 0;
+    bool gl_depthMask = true;
+    float strata = 0;
+    const float strata_epsilon = 1.0f / (1 << 16);
+    enum { Opaque, Translucent } pass = Opaque;
 
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;
@@ -106,13 +115,13 @@ private:
     VertexBuffer matteBuffer = {
         // top left triangle
         0, 0,
-        16384, 0,
-        0, 16384,
+        1920, 0,
+        0, 1080,
 
         // bottom right triangle
-        16384, 0,
-        0, 16384,
-        16384, 16384
+        1920, 0,
+        0, 1080,
+        1920, 1080
     };
 
     VertexArrayObject matteArray;

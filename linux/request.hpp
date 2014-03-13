@@ -3,6 +3,7 @@
 
 #include <string>
 #include <functional>
+#include <atomic>
 #include <curl/curl.h>
 
 

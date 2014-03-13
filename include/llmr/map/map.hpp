@@ -2,6 +2,7 @@
 #define LLMR_MAP_MAP
 
 #include <llmr/map/tile.hpp>
+#include <llmr/map/tile_data.hpp>
 #include <llmr/map/transform.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/renderer/painter.hpp>
@@ -66,8 +67,8 @@ private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
     bool findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain);
     bool updateTiles();
-    std::shared_ptr<Tile> addTile(const Tile::ID& id);
-    std::shared_ptr<Tile> hasTile(const Tile::ID& id);
+    TileData::State addTile(const Tile::ID& id);
+    TileData::State hasTile(const Tile::ID& id);
 
     void update();
 
@@ -85,8 +86,8 @@ private:
 
     bool use_raster = false;
 
-    std::forward_list<std::shared_ptr<Tile>> tiles;
-    std::forward_list<std::shared_ptr<Tile>> historic_tiles;
+    std::forward_list<Tile> tiles;
+    std::forward_list<std::weak_ptr<TileData>> tile_data;
 };
 
 }

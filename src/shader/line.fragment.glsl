@@ -1,4 +1,3 @@
-uniform float u_debug;
 uniform vec2 u_linewidth;
 uniform vec4 u_color;
 
@@ -21,9 +20,5 @@ void main() {
     // float pos = mod(v_linesofar, u_dasharray.x + u_dasharray.y);
     // alpha *= max(step(0.0, -u_dasharray.y), clamp(min(pos, u_dasharray.x - pos), 0.0, 1.0));
 
-    if (u_debug > 0.0) {
-        gl_FragColor = u_color;
-    } else {
-        gl_FragColor = u_color * alpha;
-    }
+    gl_FragColor = u_color * alpha;
 }

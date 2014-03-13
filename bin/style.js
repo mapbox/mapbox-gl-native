@@ -3,85 +3,85 @@
 module.exports = {
     "buckets": {
         "water": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "water",
             "type": "fill"
         },
         "road_large": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "road", "field": "class", "value": ["motorway", "main"],
             "type": "line", "cap": "round", "join": "round"
         },
         "road_regular": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "road", "field": "class", "value": "street",
             "type": "line", "cap": "round", "join": "round"
         },
         "road_limited": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "road", "field": "class", "value": "street_limited",
             "type": "line", "cap": "round", "join": "round"
         },
         "park": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "landuse", "field": "class", "value": "park",
             "type": "fill"
         },
         "wood": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "landuse", "field": "class", "value": "wood",
             "type": "fill"
         },
         "school": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "landuse", "field": "class", "value": "school",
             "type": "fill"
         },
         "cemetery": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "landuse", "field": "class", "value": "cemetery",
             "type": "fill"
         },
         "industrial": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "landuse", "field": "class", "value": "industrial",
             "type": "fill"
         },
         "building": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "building",
             "type": "fill"
         },
         "alcohol_poi": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "poi_label",
             "field": "type",
             "value": ["Alcohol"],
             "type": "point"
         },
         "cafe_poi": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "poi_label",
             "field": "type",
             "value": ["Cafe"],
             "type": "point"
         },
         "embassy_poi": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "poi_label",
             "field": "type",
             "value": ["Embassy"],
             "type": "point"
         },
         "park_poi": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "poi_label",
             "field": "type",
             "value": ["Park"],
             "type": "point"
         },
         "restaurant_poi": {
-            "datasource": "streets",
+            "source": "streets",
             "layer": "poi_label",
             "field": "type",
             "value": ["Restaurant"],
@@ -89,6 +89,9 @@ module.exports = {
         },
     },
     "sprite": "img/maki-sprite",
+    "constants": {
+        "park": "#c8df9f",
+    },
     "structure": [
         { "name": "park", "bucket": "park" },
         { "name": "wood", "bucket": "wood" },
@@ -113,7 +116,7 @@ module.exports = {
                 },
                 "park": {
                     "type": "fill",
-                    "color": "#c8df9f",
+                    "color": "park",
                     "antialias": true,
                     "image": "park"
                 },
@@ -171,35 +174,35 @@ module.exports = {
                     ],
                 },
                 "alcohol_poi": {
-                    "type": "marker",
+                    "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "alcohol-shop",
                     "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "cafe_poi": {
-                    "type": "marker",
+                    "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "cafe",
                     "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "embassy_poi": {
-                    "type": "marker",
+                    "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "embassy",
                     "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "park_poi": {
-                    "type": "marker",
+                    "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "park",
                     "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "restaurant_poi": {
-                    "type": "marker",
+                    "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "restaurant",

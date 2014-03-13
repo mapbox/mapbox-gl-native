@@ -1,4 +1,4 @@
-#include <llmr/renderer/shader-linejoin.hpp>
+#include <llmr/shader/linejoin_shader.hpp>
 #include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 

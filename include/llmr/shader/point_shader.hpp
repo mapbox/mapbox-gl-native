@@ -1,7 +1,7 @@
-#ifndef LLMR_RENDERER_SHADER_POINT
-#define LLMR_RENDERER_SHADER_POINT
+#ifndef LLMR_SHADER_SHADER_POINT
+#define LLMR_SHADER_SHADER_POINT
 
-#include "shader.hpp"
+#include <llmr/shader/shader.hpp>
 
 namespace llmr {
 
@@ -23,13 +23,13 @@ private:
     int32_t image = -1;
     int32_t u_image = -1;
 
-    std::array<float, 4> color = {};
+    std::array<float, 4> color = {{}};
     int32_t u_color = -1;
 
-    std::array<float, 2> point_tl = {};
+    std::array<float, 2> point_tl = {{}};
     int32_t u_point_tl = -1;
 
-    std::array<float, 2> point_br = {};
+    std::array<float, 2> point_br = {{}};
     int32_t u_point_br = -1;
 
     float size = 0;

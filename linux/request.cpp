@@ -33,6 +33,7 @@ int Request::curl_progress_callback(void *ptr, double dltotal, double dlnow, dou
 void Request::initialize() {
     // curl init
     curl_global_init(CURL_GLOBAL_ALL);
+
     curl_share = curl_share_init();
     curl_share_setopt(curl_share, CURLSHOPT_LOCKFUNC, curl_share_lock);
     curl_share_setopt(curl_share, CURLSHOPT_UNLOCKFUNC, curl_share_unlock);
@@ -77,6 +78,11 @@ void Request::request(void *ptr) {
     CURL *curl = nullptr;
     if ((curl = pthread_getspecific(key)) == nullptr) {
         curl = curl_easy_init();
+
+        // stopgap to avoid libcurl crashes:
+        // see https://stackoverflow.com/q/9191668
+        curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+
         pthread_setspecific(key, curl);
     }
 

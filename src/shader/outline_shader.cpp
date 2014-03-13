@@ -1,4 +1,4 @@
-#include <llmr/renderer/shader-outline.hpp>
+#include <llmr/shader/outline_shader.hpp>
 #include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 

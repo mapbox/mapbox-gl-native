@@ -112,6 +112,16 @@ struct FillProperties {
     std::string image;
 };
 
+struct BackgroundClass {
+    Color color = {{ 1, 1, 1, 1 }};
+};
+
+
+struct BackgroundProperties {
+    Color color = {{ 1, 1, 1, 1 }};
+};
+
+
 }
 
 #endif

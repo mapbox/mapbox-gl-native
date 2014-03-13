@@ -1,4 +1,4 @@
-#include <llmr/renderer/shader-point.hpp>
+#include <llmr/shader/point_shader.hpp>
 #include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 

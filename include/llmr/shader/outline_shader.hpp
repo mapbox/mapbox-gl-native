@@ -1,7 +1,7 @@
-#ifndef LLMR_RENDERER_SHADER_OUTLINE
-#define LLMR_RENDERER_SHADER_OUTLINE
+#ifndef LLMR_SHADER_SHADER_OUTLINE
+#define LLMR_SHADER_SHADER_OUTLINE
 
-#include "shader.hpp"
+#include <llmr/shader/shader.hpp>
 
 namespace llmr {
 
@@ -17,10 +17,10 @@ public:
 private:
     int32_t a_pos = -1;
 
-    std::array<float, 4> color = {};
+    std::array<float, 4> color = {{}};
     int32_t u_color = -1;
 
-    std::array<float, 2> world = {};
+    std::array<float, 2> world = {{}};
     int32_t u_world = -1;
 };
 

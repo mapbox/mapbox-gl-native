@@ -12,7 +12,7 @@ VectorTile::VectorTile(pbf tile) {
     while (tile.next()) {
         if (tile.tag == 3) { // layer
             VectorTileLayer layer(tile.message());
-            layers.emplace(layer.name, layer);
+            layers.emplace(layer.name, std::forward<VectorTileLayer>(layer));
         } else {
             tile.skip();
         }
@@ -34,7 +34,7 @@ VectorTileLayer::VectorTileLayer(pbf layer) : data(layer) {
         } else if (layer.tag == 3) { // keys
             keys.emplace_back(layer.string());
         } else if (layer.tag == 4) { // values
-            values.emplace_back(parseValue(layer.message()));
+            values.emplace_back(std::move(parseValue(layer.message())));
         } else if (layer.tag == 5) { // extent
             extent = layer.varint();
         } else {

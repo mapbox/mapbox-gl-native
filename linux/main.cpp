@@ -1,13 +1,16 @@
 #include <llmr/llmr.hpp>
 #include <GLFW/glfw3.h>
 #include <llmr/platform/platform.hpp>
-#include <future>
-#include <list>
+
+#include <signal.h>
+#include <getopt.h>
 
 #include "settings.hpp"
 #include "request.hpp"
 
 std::forward_list<llmr::platform::Request *> requests;
+
+static int fullscreen_flag = 0;
 
 class MapView {
 public:
@@ -26,10 +29,26 @@ public:
             exit(1);
         }
 
+        GLFWmonitor *monitor = nullptr;
+
+#ifdef GL_ES_VERSION_2_0
+        if (fullscreen_flag) {
+            monitor = glfwGetPrimaryMonitor();
+        }
+
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+#endif
+
+        glfwWindowHint(GLFW_RED_BITS, 8);
+        glfwWindowHint(GLFW_GREEN_BITS, 8);
+        glfwWindowHint(GLFW_BLUE_BITS, 8);
+        glfwWindowHint(GLFW_ALPHA_BITS, 8);
         glfwWindowHint(GLFW_STENCIL_BITS, 8);
         glfwWindowHint(GLFW_DEPTH_BITS, 16);
 
-        window = glfwCreateWindow(1024, 768, "llmr", NULL, NULL);
+        window = glfwCreateWindow(1024, 768, "llmr", monitor, NULL);
         if (!window) {
             glfwTerminate();
             fprintf(stderr, "Failed to initialize window\n");
@@ -45,11 +64,10 @@ public:
         glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
         settings.load();
+
         map.setup((double)fb_width / width);
 
         resize(window, 0, 0);
-
-        glfwSwapInterval(1);
 
         map.loadSettings();
 
@@ -60,7 +78,6 @@ public:
         glfwSetScrollCallback(window, scroll);
         glfwSetCharCallback(window, character);
         glfwSetKeyCallback(window, key);
-
     }
 
     static void character(GLFWwindow *window, unsigned int codepoint) {
@@ -109,6 +126,7 @@ public:
             scale = 1.0 / scale;
         }
 
+        mapView->map.startScaling();
         mapView->map.scaleBy(scale, mapView->last_x, mapView->last_y);
     }
 
@@ -119,6 +137,8 @@ public:
         glfwGetWindowSize(window, &width, &height);
         int fb_width, fb_height;
         glfwGetFramebufferSize(window, &fb_width, &fb_height);
+
+        fprintf(stderr, "window size: %d/%d\n", width, height);
 
         mapView->map.resize(width, height, fb_width, fb_height);
     }
@@ -131,11 +151,14 @@ public:
             if (mapView->rotating) {
                 mapView->start_x = mapView->last_x;
                 mapView->start_y = mapView->last_y;
+            } else {
+                mapView->map.stopRotating();
             }
         } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
             mapView->tracking = action == GLFW_PRESS;
 
             if (action == GLFW_RELEASE) {
+                mapView->map.stopPanning();
                 double now = glfwGetTime();
                 if (now - mapView->last_click < 0.4) {
                     mapView->map.scaleBy(2.0, mapView->last_x, mapView->last_y);
@@ -148,8 +171,14 @@ public:
     static void mousemove(GLFWwindow *window, double x, double y) {
         MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
         if (mapView->tracking) {
-            mapView->map.moveBy(x - mapView->last_x, y - mapView->last_y);
+            double dx = x - mapView->last_x;
+            double dy = y - mapView->last_y;
+            if (dx || dy) {
+                mapView->map.startPanning();
+                mapView->map.moveBy(dx, dy);
+            }
         } else if (mapView->rotating) {
+            mapView->map.startRotating();
             mapView->map.rotateBy(mapView->start_x, mapView->start_y, mapView->last_x, mapView->last_y, x, y);
         }
         mapView->last_x = x;
@@ -259,12 +288,45 @@ double time() {
 }
 }
 
+void quit_handler(int s) {
+    if (mapView) {
+        fprintf(stderr, "waiting for quit...\n");
+        glfwSetWindowShouldClose(mapView->window, true);
+        llmr::platform::restart();
+    } else {
+        exit(0);
+    }
+}
 
-int main() {
+
+
+static struct option long_options[] = {
+    {"fullscreen", no_argument, &fullscreen_flag, 1},
+    {0, 0, 0, 0}
+};
+
+int main(int argc, char *argv[]) {
+    while (true) {
+        int option_index = 0;
+        int c = getopt_long(argc, argv, "f", long_options, &option_index);
+        if (c == -1) break;
+    }
+
+    // sigint handling
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = quit_handler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+    sigaction(SIGINT, &sigIntHandler, NULL);
+
+
+    // curl init
     curl_global_init(CURL_GLOBAL_ALL);
 
     llmr::platform::Request::initialize();
 
+
+    // main loop
     mapView = new MapView();
     mapView->init();
     int ret = mapView->run();
