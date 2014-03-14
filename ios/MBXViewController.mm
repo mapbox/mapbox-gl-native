@@ -541,8 +541,7 @@ namespace llmr
 
             CGContextRelease(context);
 
-            info.img = pixels;
-
+            info.pixels = pixels;
             info.width  = (uint32_t)width;
             info.height = (uint32_t)height;
 

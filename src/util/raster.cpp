@@ -26,8 +26,8 @@ void Raster::load(const std::string& data) {
 
     platform::RasterInfo raster_info = platform::load_raster_image(data);
 
-    if (raster_info.img) {
-        raster->img = raster_info.img;
+    if (raster_info.pixels) {
+        raster->img = raster_info.pixels;
         raster->width = raster_info.width;
         raster->height = raster_info.height;
     }

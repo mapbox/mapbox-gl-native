@@ -26,7 +26,7 @@ struct Response {
 };
 
 struct RasterInfo {
-    char *img = nullptr;
+    char *pixels = nullptr;
     uint32_t width = 0;
     uint32_t height = 0;
 };
