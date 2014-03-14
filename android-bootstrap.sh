@@ -20,15 +20,39 @@ export API_LEVEL="android-19"
 export ANDROID_CROSS_COMPILER="arm-linux-androideabi-clang3.3"
 export PLATFORM_PREFIX="${NDK_PATH}/platforms/android-19/"
 
-# NOTE: make-standalone-toolchain.sh --help for options
-${NDK_PATH}/build/tools/make-standalone-toolchain.sh  \
-  --toolchain=${ANDROID_CROSS_COMPILER} \
-  --install-dir="${PLATFORM_PREFIX}" \
-  --stl=gnustl \
-  --arch=arm \
-  --platform="${API_LEVEL}"
+if [[ ! -d "${PLATFORM_PREFIX}" ]]; then
+    # NOTE: make-standalone-toolchain.sh --help for options
+    ${NDK_PATH}/build/tools/make-standalone-toolchain.sh  \
+      --toolchain=${ANDROID_CROSS_COMPILER} \
+      --install-dir="${PLATFORM_PREFIX}" \
+      --stl=gnustl \
+      --arch=arm \
+      --platform="${API_LEVEL}"
+fi
 
 ADT_BUNDLE="$(pwd)/adt-bundle-mac-x86_64-20131030"
 PATH="${NDK_PATH}:${ADT_BUNDLE}/sdk/tools:${ADT_BUNDLE}/sdk/platform-tools":${PATH}
 export PATH
 echo $PATH
+
+cd libpngtmp
+
+if [[ ! -f libpng-1.6.9.tar.gz ]]; then
+    curl -O http://mapnik.s3.amazonaws.com/deps/libpng-1.6.9.tar.gz
+fi
+
+rm -rf libpng-1.6.9
+tar xzf libpng-1.6.9.tar.gz
+cd libpng-1.6.9
+./configure \
+    --host=arm-linux-androideabi \
+    CC=arm-linux-androideabi-clang3.3 \
+    STRIP=arm-linux-androideabi-strip \
+    --prefix=$PLATFORM_PREFIX \
+    AR=arm-linux-androideabi-ar \
+    RANLIB=arm-linux-androideabi-ranlib
+make
+make install
+cd ../../
+cp ./android-ndk-r9c/platforms/android-19/lib/libpng* jni
+
