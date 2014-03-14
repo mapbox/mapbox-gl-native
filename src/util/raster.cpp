@@ -130,6 +130,8 @@ void Raster::loadImage(const std::string& data) {
         png_read_image(png, row_pointers);
 
         png_read_end(png, nullptr);
+
+        png_destroy_read_struct(&png, &info, nullptr);
     } catch (std::exception& e) {
         fprintf(stderr, "loading PNG failed: %s\n", e.what());
         png_destroy_read_struct(&png, &info, nullptr);
