@@ -24,9 +24,11 @@
 
 #include <csscolorparser/csscolorparser.hpp>
 
+#include <stdlib.h>
 #include <cstdint>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 #include <cmath>
 #include <map>
 

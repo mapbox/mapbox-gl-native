@@ -1,0 +1,6 @@
+APP_STL      = gnustl_static
+APP_CFLAGS += -DU_HAVE_STD_STRING -v
+APP_CPPFLAGS += -DU_HAVE_STD_STRING -fexceptions -std=gnu++11
+NDK_TOOLCHAIN_VERSION=clang3.3
+APP_PLATFORM = android-19
+LOCAL_LDFLAGS += -DLINKER_DEBUG=1 -v
