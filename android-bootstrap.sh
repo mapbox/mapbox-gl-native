@@ -1,15 +1,17 @@
 
-if [[ ! -f android-ndk-r9c-darwin-x86_64.tar.bz2 ]]; then
-    curl -O http://dl.google.com/android/ndk/android-ndk-r9c-darwin-x86_64.tar.bz2
+export NDK_VERSION=android-ndk-r9c
+
+if [[ ! -f ${NDK_VERSION}-darwin-x86_64.tar.bz2 ]]; then
+    curl -O http://dl.google.com/android/ndk/${NDK_VERSION}-darwin-x86_64.tar.bz2
 fi
 
-export NDK_PATH=$(pwd)/android-ndk-r9c
+export NDK_PATH=$(pwd)/${NDK_VERSION}
 
 if [[ ! -d "${NDK_PATH}" ]]; then
-    tar -xf android-ndk-r9c-darwin-x86_64.tar.bz2
+    tar -xf ${NDK_VERSION}-darwin-x86_64.tar.bz2
 fi
 
-export ANDROID_PATH=$(pwd)/android-ndk-r9c
+export ANDROID_PATH=${NDK_PATH}
 export NDK_PROJECT_PATH=$(pwd)
 export APP_BUILD_SCRIPT=$(pwd)Android.mk
 
@@ -17,7 +19,8 @@ export APP_BUILD_SCRIPT=$(pwd)Android.mk
 export API_LEVEL="android-19"
 
 # see all compiler options at $NDK_PATH/toolchains/
-export ANDROID_CROSS_COMPILER="arm-linux-androideabi-clang3.3"
+export ANDROID_CROSS_COMPILER="arm-linux-androideabi-4.8"
+
 export PLATFORM_PREFIX="${NDK_PATH}/platforms/active-platform/"
 
 if [[ ! -d "${PLATFORM_PREFIX}" ]]; then
@@ -46,7 +49,7 @@ tar xzf libpng-1.6.9.tar.gz
 cd libpng-1.6.9
 ./configure \
     --host=arm-linux-androideabi \
-    CC=arm-linux-androideabi-clang \
+    CC=arm-linux-androideabi-gcc \
     STRIP=arm-linux-androideabi-strip \
     --prefix=${PLATFORM_PREFIX} \
     AR=arm-linux-androideabi-ar \
@@ -58,3 +61,5 @@ cd ../../
 cp ${PLATFORM_PREFIX}/lib/libpng* jni/
 mkdir -p jni/include
 cp -r ${PLATFORM_PREFIX}/include/*png* jni/include/
+cp -r src jni/
+ndk-build
