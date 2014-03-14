@@ -1,7 +1,14 @@
-curl -O http://dl.google.com/android/ndk/android-ndk-r9c-darwin-x86_64.tar.bz2
-tar -xf android-ndk-r9c-darwin-x86_64.tar.bz2
+
+if [[ ! -f android-ndk-r9c-darwin-x86_64.tar.bz2 ]]; then
+    curl -O http://dl.google.com/android/ndk/android-ndk-r9c-darwin-x86_64.tar.bz2
+fi
 
 export NDK_PATH=$(pwd)/android-ndk-r9c
+
+if [[ ! -d "${NDK_PATH}" ]]; then
+    tar -xf android-ndk-r9c-darwin-x86_64.tar.bz2
+fi
+
 export ANDROID_PATH=$(pwd)/android-ndk-r9c
 export NDK_PROJECT_PATH=$(pwd)
 export APP_BUILD_SCRIPT=$(pwd)Android.mk
