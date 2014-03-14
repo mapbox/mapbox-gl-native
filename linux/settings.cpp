@@ -6,11 +6,11 @@
 
 using namespace llmr;
 
-Settings_MacOSX::Settings_MacOSX()
+Settings_JSON::Settings_JSON()
 {
 }
 
-void Settings_MacOSX::load()
+void Settings_JSON::load()
 {
     FILE *settingsFile = fopen("/tmp/llmr-native.json", "r");
     if (settingsFile != NULL) {
@@ -27,11 +27,11 @@ void Settings_MacOSX::load()
     }
 }
 
-void Settings_MacOSX::persist()
+void Settings_JSON::persist()
 {
 }
 
-void Settings_MacOSX::sync()
+void Settings_JSON::sync()
 {
 
     rapidjson::FileStream s(fopen("/tmp/llmr-native.json", "w"));
@@ -45,7 +45,7 @@ void Settings_MacOSX::sync()
     writer.EndArray();
 }
 
-void Settings_MacOSX::clear()
+void Settings_JSON::clear()
 {
     longitude = 0;
     latitude = 0;

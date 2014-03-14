@@ -31,6 +31,9 @@ void cancel_request_http(Request *request);
 // Returns a relative timestamp in seconds. This value must be monotonic.
 double time();
 
+// Performs routine cleanup operation and is called on every loop iteration.
+void cleanup();
+
 }
 
 }
