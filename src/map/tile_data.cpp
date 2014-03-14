@@ -30,6 +30,7 @@ TileData::TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas)
 }
 
 TileData::~TileData() {
+    glyphAtlas.removeGlyphs((uint64_t)id);
     cancel();
 }
 
