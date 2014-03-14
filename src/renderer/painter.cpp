@@ -1,6 +1,7 @@
 #include <cassert>
+#include <cmath>
+#include <string>
 #include <algorithm>
-
 
 #include <llmr/renderer/painter.hpp>
 #include <llmr/util/std.hpp>
@@ -16,9 +17,15 @@
 #include <llmr/style/style.hpp>
 #include <llmr/style/sprite.hpp>
 
+#include <sstream>
+
 using namespace llmr;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
+
+
+#define SSTR( x ) dynamic_cast< std::ostringstream & >( \
+        ( std::ostringstream() << std::dec << x ) ).str()
 
 Painter::Painter(Transform& transform, Settings& settings, Style& style)
     : transform(transform),
@@ -427,7 +434,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
 
     std::string sized_image = properties.image;
     sized_image.append("-");
-    sized_image.append(std::to_string(static_cast<int>(std::round(properties.size))));
+    sized_image.append(SSTR(static_cast<int>(round(properties.size))));
 
     ImagePosition imagePos = style.sprite->getPosition(sized_image, false);
 

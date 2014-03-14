@@ -18,6 +18,9 @@ void _CHECK_GL_ERROR(const char *cmd, const char *file, int line) {
         }
 
         std::cerr << "GL_" << error.c_str() << " - " << file << ":" << line << std::endl;
+
+        #ifndef __ANDROID__
         exit(1);
+        #endif
     }
 }
