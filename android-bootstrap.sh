@@ -31,7 +31,7 @@ if [[ ! -d "${PLATFORM_PREFIX}" ]]; then
 fi
 
 ADT_BUNDLE="$(pwd)/adt-bundle-mac-x86_64-20131030"
-PATH="${NDK_PATH}:${ADT_BUNDLE}/sdk/tools:${ADT_BUNDLE}/sdk/platform-tools":${PATH}
+PATH="${PLATFORM_PREFIX}/bin:${NDK_PATH}:${ADT_BUNDLE}/sdk/tools:${ADT_BUNDLE}/sdk/platform-tools":${PATH}
 export PATH
 echo $PATH
 
@@ -46,13 +46,13 @@ tar xzf libpng-1.6.9.tar.gz
 cd libpng-1.6.9
 ./configure \
     --host=arm-linux-androideabi \
-    CC=arm-linux-androideabi-clang3.3 \
+    CC=arm-linux-androideabi-clang \
     STRIP=arm-linux-androideabi-strip \
-    --prefix=$PLATFORM_PREFIX \
+    --prefix=${PLATFORM_PREFIX} \
     AR=arm-linux-androideabi-ar \
     RANLIB=arm-linux-androideabi-ranlib
 make
 make install
 cd ../../
-cp ./android-ndk-r9c/platforms/android-19/lib/libpng* jni
+cp ${PLATFORM_PREFIX}/lib/libpng* jni/
 
