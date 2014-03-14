@@ -55,4 +55,5 @@ make
 make install
 cd ../../
 cp ${PLATFORM_PREFIX}/lib/libpng* jni/
-
+mkdir jni/include
+cp -r ${PLATFORM_PREFIX}/include/*png* jni/include/

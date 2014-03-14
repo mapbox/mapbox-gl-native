@@ -15,7 +15,7 @@ LOCAL_C_INCLUDES += -I include
 
 LOCAL_CPP_FEATURES := rtti exceptions
 CXXFLAGS = -v -Wall -Wextra -std=c++11 -Wno-unused-parameter -latomic
-LOCAL_LDLIBS := -llog -lGLESv2 -latomic
+LOCAL_LDLIBS := -llog -lGLESv2 -latomic -lz
 LOCAL_LDFLAGS += -DLINKER_DEBUG=1 -v
 
 LOCAL_STATIC_LIBRARIES := libpng
