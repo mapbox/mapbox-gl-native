@@ -18,7 +18,7 @@ export API_LEVEL="android-19"
 
 # see all compiler options at $NDK_PATH/toolchains/
 export ANDROID_CROSS_COMPILER="arm-linux-androideabi-clang3.3"
-export PLATFORM_PREFIX="${NDK_PATH}/platforms/android-19/"
+export PLATFORM_PREFIX="${NDK_PATH}/platforms/active-platform/"
 
 if [[ ! -d "${PLATFORM_PREFIX}" ]]; then
     # NOTE: make-standalone-toolchain.sh --help for options
