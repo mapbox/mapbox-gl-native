@@ -52,41 +52,14 @@
         'SDKROOT': 'macosx',
         'SUPPORTED_PLATFORMS':['macosx'],
         'MACOSX_DEPLOYMENT_TARGET':'10.9',
-        'PUBLIC_HEADERS_FOLDER_PATH': 'include',
-        'OTHER_CPLUSPLUSFLAGS':[
-            '<@(png_cflags)'
-        ]
+        'PUBLIC_HEADERS_FOLDER_PATH': 'include'
       },
       'include_dirs':[
           './include'
       ],
-      'cflags': [
-          '<@(png_cflags)'
-      ],
       'direct_dependent_settings': {
           'include_dirs':[
               './include'
-          ],
-          'cflags': [
-              '<@(png_cflags)'
-          ],
-          'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS':[
-                '<@(png_cflags)'
-            ]
-          },
-          'conditions': [
-            ['OS == "mac"', {
-              'xcode_settings': {
-                'OTHER_LDFLAGS': [
-                    '<@(png_libraries)'
-                ]
-              }
-            }, {
-              'libraries': [
-                '<@(png_libraries)'
-              ]
-            }]
           ]
       }
     },
@@ -114,41 +87,14 @@
         'CODE_SIGN_IDENTITY': 'iPhone Developer',
         'IPHONEOS_DEPLOYMENT_TARGET': '7.0',
         'PUBLIC_HEADERS_FOLDER_PATH': 'include',
-        'GCC_INPUT_FILETYPE':'sourcecode.cpp.cpp',
-        'OTHER_CPLUSPLUSFLAGS':[
-            '<@(png_cflags)'
-        ]
+        'GCC_INPUT_FILETYPE':'sourcecode.cpp.cpp'
       },
       'include_dirs':[
           './include'
       ],
-      'cflags': [
-          '<@(png_cflags)'
-      ],
       'direct_dependent_settings': {
           'include_dirs':[
               './include'
-          ],
-          'cflags': [
-              '<@(png_cflags)'
-          ],
-          'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS':[
-                '<@(png_cflags)'
-            ]
-          },
-          'conditions': [
-            ['OS == "mac"', {
-              'xcode_settings': {
-                'OTHER_LDFLAGS': [
-                    '<@(png_libraries)'
-                ]
-              }
-            }, {
-              'libraries': [
-                '<@(png_libraries)'
-              ]
-            }]
           ]
       }
     }

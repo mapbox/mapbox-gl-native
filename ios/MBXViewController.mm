@@ -497,6 +497,92 @@ namespace llmr
             }];
         }
 
+        RasterInfo load_raster_image(const std::string& data)
+        {
+            RasterInfo info;
+
+            NSData *imageData = [NSData dataWithBytes:data.data() length:data.size()];
+
+            UIImage *image = [UIImage imageWithData:imageData];
+
+            if ( ! image)
+            {
+                NSLog(@"error processing image data");
+                return info;
+            }
+
+            CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+
+            if ( ! colorSpace)
+            {
+                NSLog(@"error creating RGB color space");
+                return info;
+            }
+
+            size_t bitsPerPixel = 32;
+            size_t bitsPerComponent = 8;
+            size_t bytesPerPixel = bitsPerPixel / bitsPerComponent;
+            size_t width = CGImageGetWidth(image.CGImage);
+            size_t height = CGImageGetHeight(image.CGImage);
+            size_t bytesPerRow = width * bytesPerPixel;
+            size_t bufferLength = bytesPerRow * height;
+
+            char *bitmapData = (char *)malloc(bufferLength);
+
+            if ( ! bitmapData)
+            {
+                NSLog(@"error allocating memory for bitmap");
+                CGColorSpaceRelease(colorSpace);
+                return info;
+            }
+
+            CGContextRef context = CGBitmapContextCreate(bitmapData,
+                                                         width,
+                                                         height,
+                                                         bitsPerComponent,
+                                                         bytesPerRow,
+                                                         colorSpace,
+                                                         kCGImageAlphaPremultipliedLast);
+
+            CGColorSpaceRelease(colorSpace);
+
+            if ( ! context)
+            {
+                free(bitmapData);
+                NSLog(@"error creating bitmap context");
+                return info;
+            }
+
+            CGContextDrawImage(context, CGRectMake(0, 0, width, height), image.CGImage);
+
+            bitmapData = (char *)CGBitmapContextGetData(context);
+
+            char *pixels;
+            size_t pixelsSize = sizeof(char) * bytesPerRow * height;
+            pixels = (char *)malloc(pixelsSize);
+
+            if (pixels)
+            {
+                memcpy(pixels, bitmapData, pixelsSize);
+                free(bitmapData);
+            }
+            else
+            {
+                NSLog(@"error getting bitmap pixel data");
+                free(bitmapData);
+                return info;
+            }
+
+            CGContextRelease(context);
+
+            info.img = pixels;
+
+            info.width  = (uint32_t)width;
+            info.height = (uint32_t)height;
+
+            return info;
+        }
+
         double time()
         {
             return [displayLink timestamp];

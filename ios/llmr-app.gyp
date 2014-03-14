@@ -24,7 +24,8 @@
             '$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
             '$(SDKROOT)/System/Library/Frameworks/OpenGLES.framework',
             '$(SDKROOT)/System/Library/Frameworks/GLKit.framework',
-            '$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework'
+            '$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework',
+            '$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework'
           ],
         },
         'xcode_settings': {
