@@ -6,7 +6,6 @@ implemented in C++11, targeting iOS & OS X.
  - Modern C++ compiler that supports `-std=c++11`
  - libpng
  - glfw3
- - Boost (headers only)
  - Python (for build only)
  - Node.js (for build only)
 
