@@ -1,6 +1,7 @@
 #include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/platform/gl.hpp>
+#include <llmr/platform/platform.hpp>
 
 #include <cassert>
 #include <algorithm>
@@ -135,5 +136,7 @@ void GlyphAtlas::bind() {
         std::lock_guard<std::mutex> lock(mtx);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
         dirty = false;
+
+        platform::show_debug_image("Glyph Atlas", data, width, height);
     }
 };

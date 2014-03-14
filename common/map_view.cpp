@@ -68,11 +68,9 @@ public:
         glfwSetKeyCallback(window, key);
     }
 
-
     static void character(GLFWwindow *window, unsigned int codepoint) {
 
     }
-
 
     static void key(GLFWwindow *window, int key, int scancode, int action, int mods) {
         MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
@@ -94,7 +92,6 @@ public:
             }
         }
     }
-
 
     static void scroll(GLFWwindow *window, double xoffset, double yoffset) {
         MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
@@ -234,3 +231,38 @@ public:
     llmr::Settings& settings;
     llmr::Map map;
 };
+
+namespace llmr {
+namespace platform {
+
+double time() {
+    return glfwGetTime();
+}
+
+
+void show_debug_image(std::string name, const char *data, size_t width, size_t height) {
+    static GLFWwindow *debug_window = nullptr;
+    if (!debug_window) {
+        debug_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+        if (!debug_window) {
+            glfwTerminate();
+            fprintf(stderr, "Failed to initialize window\n");
+            exit(1);
+        }
+    }
+
+    GLFWwindow *current_window = glfwGetCurrentContext();
+
+    glfwSetWindowSize(debug_window, width, height);
+    glfwMakeContextCurrent(debug_window);
+
+    glPixelZoom(1.0, -1.0);
+    glRasterPos2f(-1.0f, 1.0f);
+    glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
+    glfwSwapBuffers(debug_window);
+
+    glfwMakeContextCurrent(current_window);
+}
+
+}
+}

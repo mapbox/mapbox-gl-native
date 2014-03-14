@@ -432,6 +432,8 @@ bool Map::render() {
         transform.updateAnimations();
     }
 
+    glyphAtlas.bind();
+
     bool changed = updateTiles();
 
     painter.clear();
