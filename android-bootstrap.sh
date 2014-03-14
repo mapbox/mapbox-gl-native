@@ -1,7 +1,7 @@
 
 set -u
 
-export NDK_VERSION=android-ndk-r9c
+export NDK_VERSION=android-ndk-r9d
 export NDK_PATH=$(pwd)/${NDK_VERSION}
 export ANDROID_PATH=${NDK_PATH}
 export API_LEVEL="android-19"
