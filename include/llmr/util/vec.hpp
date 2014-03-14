@@ -10,6 +10,7 @@ namespace llmr {
 template <typename T = double>
 struct vec2 {
     struct null {};
+    typedef T Type;
 
     T x, y;
 
