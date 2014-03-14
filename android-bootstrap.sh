@@ -50,10 +50,11 @@ cd libpng-1.6.9
     STRIP=arm-linux-androideabi-strip \
     --prefix=${PLATFORM_PREFIX} \
     AR=arm-linux-androideabi-ar \
+    LD=arm-linux-androideabi-ld \
     RANLIB=arm-linux-androideabi-ranlib
 make
 make install
 cd ../../
 cp ${PLATFORM_PREFIX}/lib/libpng* jni/
-mkdir jni/include
+mkdir -p jni/include
 cp -r ${PLATFORM_PREFIX}/include/*png* jni/include/
