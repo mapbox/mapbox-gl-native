@@ -52,15 +52,15 @@ Or generate a dual iOS/OS X-compatible Xcode project for `libllmr` to include as
 
 ## iOS
 
-Because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version yourself. Run `./ios/setup_libpng.sh`, which is derived from Mapnik's cross-architecture build scripts. This will also run `./configure`. 
+Because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version yourself. Run `./ios/setup_libpng.sh`, which is derived from Mapnik's cross-architecture build scripts. This will also run `./configure`.
 
-Then you can build the iOS app with make: 
+Then you can build the iOS app with make:
 
     make iapp
 
-Consider `sudo npm install -g ios-sim` for auto-launching the simulator, but it can be tricky and it's better to run on an ARM-based device anyway. To do this, open `./ios/llmr-app.xcodeproj` in Xcode, then build and run on the simulator or a device yourself. 
+Consider `sudo npm install -g ios-sim` for auto-launching the simulator, but it can be tricky and it's better to run on an ARM-based device anyway. To do this, open `./ios/llmr-app.xcodeproj` in Xcode, then build and run on the simulator or a device yourself.
 
-Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina). 
+Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina).
 
 ## Ubuntu
 
@@ -101,26 +101,16 @@ Build `libllmr`:
     ./configure
     make
 
-# Style protobuf
+# Style
 
-We're encoding the styling information as a protocol buffer, according to
-proto/style.proto. The reason for doing so is to avoid needing to ship with a
-JSON/yaml parser. To test the conversion script, run
-
-```
-bin/convert-style.js && cat resources/style.pbf | protoc --decode=style proto/style.proto
-```
-
-You should see a nicely formatted hierarchical output of the converted style.
-
-
-To update the included default style, use
+We're currently embedding the stylesheet JSON in the binary. To create the C++
+file and the associated header, run
 
 ```
-bin/convert-style.js && bin/build-style.js
+bin/build-style.js
 ```
 
-This is automatically taken care of as a build phase if you are using the Xcode projects. 
+This is automatically taken care of as a build phase if you are using the Xcode projects.
 
 # Usage
 
