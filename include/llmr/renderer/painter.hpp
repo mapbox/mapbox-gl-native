@@ -42,7 +42,7 @@ public:
     void resize(int width, int height);
 
     void prepareClippingMask();
-    void drawClippingMask(const mat4& matrix, uint8_t clip_id);
+    void drawClippingMask(const mat4& matrix, uint8_t clip_id, bool opaque = true);
     void finishClippingMask();
 private:
     void setupShaders();

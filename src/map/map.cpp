@@ -4,6 +4,7 @@
 #include <llmr/style/resources.hpp>
 #include <llmr/style/sprite.hpp>
 #include <llmr/map/coverage.hpp>
+#include <llmr/util/animation.hpp>
 
 #include <algorithm>
 
@@ -461,7 +462,7 @@ bool Map::render() {
             transform.matrixFor(tile.matrix, tile.id);
             matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
             tile.clip_id = i++;
-            painter.drawClippingMask(tile.matrix, tile.clip_id);
+            painter.drawClippingMask(tile.matrix, tile.clip_id, !tile.data->use_raster);
         }
     }
     painter.finishClippingMask();
@@ -470,6 +471,10 @@ bool Map::render() {
         if (tile.data && tile.data->state == TileData::State::parsed) {
             if (tile.data->use_raster && *tile.data->raster && !tile.data->raster->textured) {
                 tile.data->raster->setTexturepool(&texturepool);
+                tile.data->raster->beginFadeInAnimation();
+            }
+            if (tile.data->use_raster && tile.data->raster->needsAnimation()) {
+                tile.data->raster->updateAnimations();
             }
             painter.render(tile);
         }

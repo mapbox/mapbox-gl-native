@@ -115,9 +115,11 @@ void Painter::prepareClippingMask() {
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 }
 
-void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id) {
+void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id, bool opaque) {
     plainShader->setMatrix(matrix);
-    plainShader->setColor(style.computed.background.color);
+    if (opaque) {
+        plainShader->setColor(style.computed.background.color);
+    }
 
     glStencilFunc(GL_ALWAYS, clip_id, 0xFF);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
@@ -164,6 +166,7 @@ void Painter::renderRaster(const std::shared_ptr<TileData>& tile_data) {
     useProgram(rasterShader->program);
     rasterShader->setMatrix(matrix);
     rasterShader->setImage(0);
+    rasterShader->setOpacity(tile_data->raster->opacity);
     tile_data->raster->bind(true);
 
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));

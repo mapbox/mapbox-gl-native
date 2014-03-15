@@ -30,6 +30,6 @@ const shader_source llmr::shaders[SHADER_COUNT] = {
    },
    {
        "uniform mat4 u_matrix;\n\nattribute vec2 a_pos;\n\nvarying vec2 v_pos;\n\nvoid main() {\n    gl_Position = u_matrix * vec4(a_pos, 0, 1);\n    v_pos = a_pos / 4096.0;\n}\n",
-       "uniform sampler2D u_image;\n\nvarying vec2 v_pos;\n\nvoid main() {\n    gl_FragColor = texture2D(u_image, v_pos);\n}\n",
+       "uniform sampler2D u_image;\nuniform float u_opacity;\n\nvarying vec2 v_pos;\n\nvoid main() {\n    gl_FragColor = texture2D(u_image, v_pos) * u_opacity;\n}\n",
    }
 };

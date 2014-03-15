@@ -12,12 +12,15 @@ public:
     void bind(char *offset);
 
     void setImage(int32_t image);
+    void setOpacity(float opacity);
 
 private:
     int32_t a_pos = -1;
 
     int32_t image = -1;
     int32_t u_image = -1;
+    float opacity = 0.0f;
+    float u_opacity = 0.0f;
 };
 
 }

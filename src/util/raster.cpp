@@ -178,3 +178,18 @@ void Raster::bind(bool linear) {
         this->filter = filter;
     }
 }
+
+void Raster::beginFadeInAnimation() {
+    fade_animation = std::make_shared<util::ease_animation>(opacity, 1.0, opacity, 0.25);
+}
+
+bool Raster::needsAnimation() const {
+    return fade_animation != nullptr;
+}
+
+void Raster::updateAnimations() {
+    if (fade_animation->update() == util::animation::complete) {
+        fade_animation = nullptr;
+    }
+}
+

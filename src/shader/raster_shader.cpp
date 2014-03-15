@@ -19,6 +19,7 @@ RasterShader::RasterShader()
     a_pos = glGetAttribLocation(program, "a_pos");
 
     u_matrix = glGetUniformLocation(program, "u_matrix");
+    u_opacity = glGetUniformLocation(program, "u_opacity");
 
     // fprintf(stderr, "RasterShader:\n");
     // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
@@ -34,5 +35,12 @@ void RasterShader::setImage(int32_t new_image) {
     if (image != new_image) {
         glUniform1i(u_image, new_image);
         image = new_image;
+    }
+}
+
+void RasterShader::setOpacity(float new_opacity) {
+    if (opacity != new_opacity) {
+        glUniform1f(u_opacity, new_opacity);
+        opacity = new_opacity;
     }
 }

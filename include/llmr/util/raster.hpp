@@ -1,6 +1,7 @@
 #ifndef LLMR_UTIL_RASTER
 #define LLMR_UTIL_RASTER
 
+#include <llmr/util/animation.hpp>
 #include <llmr/util/texturepool.hpp>
 
 #include <string>
@@ -25,6 +26,11 @@ public:
     // loaded status
     operator bool() const;
 
+    // animations
+    void beginFadeInAnimation();
+    bool needsAnimation() const;
+    void updateAnimations();
+
 public:
     // loaded image dimensions
     uint32_t width = 0, height = 0;
@@ -34,6 +40,9 @@ public:
 
     // the uploaded texture
     uint32_t texture = 0;
+
+    // texture opacity
+    double opacity = 0;
 
 private:
     // load raw pixels
@@ -53,6 +62,9 @@ private:
 
     // the raw pixels
     char *img = nullptr;
+
+    // fade in animation
+    std::shared_ptr<util::animation> fade_animation = nullptr;
 };
 
 }
