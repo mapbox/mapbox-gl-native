@@ -1,5 +1,5 @@
-#ifndef LLMR_RENDERER_SHADER_TEXT
-#define LLMR_RENDERER_SHADER_TEXT
+#ifndef LLMR_SHADER_TEXT_SHADER
+#define LLMR_SHADER_TEXT_SHADER
 
 #include "shader.hpp"
 

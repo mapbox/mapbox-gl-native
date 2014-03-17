@@ -1,4 +1,4 @@
-#include <llmr/renderer/shader-text.hpp>
+#include <llmr/shader/text_shader.hpp>
 #include <llmr/shader/shaders.hpp>
 #include <llmr/platform/gl.hpp>
 
