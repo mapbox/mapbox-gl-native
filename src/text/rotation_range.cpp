@@ -233,8 +233,8 @@ CollisionRange rotationRange(const CollisionBox &inserting,
     const CollisionBox &b = blocker;
 
     // Instead of scaling the boxes, we move the anchors
-    CollisionAnchor relativeAnchor{(b.anchor.x - a.anchor.x) * scale,
-                                   (b.anchor.y - a.anchor.y) * scale};
+    CollisionAnchor relativeAnchor{static_cast<float>((b.anchor.x - a.anchor.x) * scale),
+                                   static_cast<float>((b.anchor.y - a.anchor.y) * scale)};
 
     // Generate a list of collision interval
     if (a.rotate && b.rotate) {

@@ -10,7 +10,7 @@
 
 namespace llmr {
 
-typedef vec2<int16_t> CollisionPoint;
+typedef vec2<float> CollisionPoint;
 typedef vec2<float> CollisionAnchor;
 
 typedef std::array<float, 2> PlacementRange;
