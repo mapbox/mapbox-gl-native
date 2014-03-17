@@ -9,15 +9,18 @@
     'cflags_cc': ['-std=c++11'],
     'configurations': {
       'Debug': {
-        'cflags': [ '-g', '-O0' ],
+        'cflags': [ '-g', '-O0', '-I<(boost_root)/include' ],
         'defines': [ 'DEBUG' ],
         'xcode_settings': {
-          'OTHER_CPLUSPLUSFLAGS': [ '-g']
+          'OTHER_CPLUSPLUSFLAGS': [ '-g', '-I<(boost_root)/include' ]
         }
       },
       'Release': {
-        'cflags': [ '-O3'],
-        'defines': [ 'NDEBUG' ]
+        'cflags': [ '-O3', '-I<(boost_root)/include' ],
+        'defines': [ 'NDEBUG' ],
+        'xcode_settings': {
+          'OTHER_CPLUSPLUSFLAGS': [ '-I<(boost_root)/include' ]
+        }
       }
     }
   }

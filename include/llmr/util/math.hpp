@@ -16,8 +16,28 @@ inline T max(T a, T b) {
 }
 
 template <typename T>
+inline T max(T a, T b, T c) {
+    return max(max(a, b), c);
+}
+
+template <typename T>
+inline T max(T a, T b, T c, T d) {
+    return max(max(a, b), max(c, d));
+}
+
+template <typename T>
 inline T min(T a, T b) {
     return b < a ? b : a;
+}
+
+template <typename T>
+inline T min(T a, T b, T c) {
+    return min(min(a, b), c);
+}
+
+template <typename T>
+inline T min(T a, T b, T c, T d) {
+    return min(min(a, b), min(c, d));
 }
 
 // Find the angle of the two vectors, solving the formula for the cross product

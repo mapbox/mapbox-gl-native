@@ -2,7 +2,6 @@
   'includes': [
     './common.gypi',
     './config.gypi',
-    './deps/gtest/gtest.gyp',
   ],
   'targets': [
     {

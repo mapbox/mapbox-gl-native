@@ -31,13 +31,6 @@ struct CollisionRect {
         : tl(tl), br(br) {}
 };
 
-struct CollisionBox {
-    CollisionRect box;
-    CollisionPoint anchor;
-    bool rotate = false;
-    PlacementRange placementRange;
-};
-
 /*
  * Combine an array of collision ranges to form a continuous
  * range that includes 0. Collisions within the ignoreRange are ignored
@@ -76,8 +69,9 @@ CollisionList rotatingFixedCollisions(const CollisionRect &rotating,
 /*
  * Calculate the range a box conflicts with a second box
  */
-CollisionRange rotationRange(const CollisionBox &inserting,
-                             const CollisionBox &blocker, double scale);
+template <typename InsertingBox, typename BlockingBox>
+CollisionRange rotationRange(const InsertingBox &inserting,
+                             const BlockingBox &blocker, float scale);
 }
 
 #endif

@@ -225,16 +225,18 @@ CollisionList rotatingFixedCollisions(const CollisionRect &rotating,
 /*
  * Calculate the range a box conflicts with a second box
  */
-CollisionRange rotationRange(const CollisionBox &inserting,
-                             const CollisionBox &blocker, double scale) {
+template <typename InsertingBox, typename BlockingBox>
+CollisionRange rotationRange(const InsertingBox &inserting,
+                             const BlockingBox &blocker, float scale) {
     CollisionList collisions;
 
-    const CollisionBox &a = inserting;
-    const CollisionBox &b = blocker;
+    const InsertingBox &a = inserting;
+    const BlockingBox &b = blocker;
 
     // Instead of scaling the boxes, we move the anchors
-    CollisionAnchor relativeAnchor{static_cast<float>((b.anchor.x - a.anchor.x) * scale),
-                                   static_cast<float>((b.anchor.y - a.anchor.y) * scale)};
+    CollisionAnchor relativeAnchor{
+        static_cast<float>((b.anchor.x - a.anchor.x) * scale),
+        static_cast<float>((b.anchor.y - a.anchor.y) * scale)};
 
     // Generate a list of collision interval
     if (a.rotate && b.rotate) {

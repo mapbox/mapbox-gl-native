@@ -13,7 +13,7 @@
             "./rotation_range.cpp",
         ],
         "dependencies": [
-            "../llmr.gyp:gtest",
+            "../deps/gtest/gtest.gyp:gtest",
             "../llmr.gyp:llmr-x86"
         ]
     },
