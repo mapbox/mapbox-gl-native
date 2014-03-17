@@ -9,6 +9,10 @@ all: llmr
 llmr: config.gypi src llmr.gyp
 	@if [ ! -f out ]; then echo 'please run ./configure first'; else $(MAKE) -C out BUILDTYPE=Release V=$(V) llmr-x86; fi;
 
+gtest: config.gypi src llmr.gyp
+	deps/run_gyp llmr.gyp -Goutput_dir=./out/ --depth=. --generator-output=./build/gtest -f make
+	make -C build/gtest gtest V=$(V)
+
 # build OS X app with pure make
 app: config.gypi src macosx/llmr-app.gyp
 	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./build/macosx-make -f make
@@ -58,6 +62,13 @@ isim: config.gypi src ios/llmr-app.gyp
 	# does not work
 	#"/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator" -SimulateApplication ios/build/Release-iphonesimulator/llmr.app/llmr
 
+test: config.gypi src test/test.gyp
+	deps/run_gyp test/test.gyp -Goutput_dir=. --depth=. --generator-output=./build/test -f make
+	make -C build/test V=$(V)
+	@for FILE in build/test/Release/test_*; do \
+		$${FILE}; \
+	done
+
 clean:
 	-rm -rf out
 	-rm -rf build
@@ -70,8 +81,5 @@ distclean:
 	-rm -rf llmr.xcodeproj
 	-rm -rf macosx/llmr-app.xcodeproj
 	-rm -rf ios/llmr-app.xcodeproj
-
-test: all
-	echo test
 
 .PHONY: test linux
