@@ -22,13 +22,19 @@ inline T min(T a, T b) {
 
 // Find the angle of the two vectors, solving the formula for the cross product
 // a x b = |a||b|sin(θ) for θ.
-inline double angle_between(double ax, double ay, double bx, double by) {
+template <typename T = double, typename S>
+inline T angle_between(S ax, S ay, S bx, S by) {
     return atan2((ax * by - ay * bx), ax * bx + ay * by);
 }
 
 template <typename T = double, typename S>
-inline double angle_between(const vec2<S>& a, const vec2<S>& b) {
+inline T angle_between(const vec2<S>& a, const vec2<S>& b) {
     return angle_between(a.x, a.y, b.x, b.y);
+}
+
+template <typename T = double, typename S>
+inline T angle_to(const vec2<S>& a, const vec2<S>& b) {
+    return atan2(a.y - b.y, a.x - b.x);
 }
 
 template <typename T, typename S1, typename S2>
