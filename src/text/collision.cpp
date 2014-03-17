@@ -92,8 +92,9 @@ Placement Collision::place(const GlyphBoxes &boxes,
         getPlacementScale(boxes, minPlacementScale, maxPlacementScale, padding);
 
     // Return if the label can never be placed without collision
-    if (scale < 0)
+    if (scale < 0) {
         return Placement{};
+    }
 
     // Calculate the range it is safe to rotate all glyphs
     PlacementRange rotationRange = getPlacementRange(glyphs, scale);
