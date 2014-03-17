@@ -12,9 +12,9 @@ namespace llmr {
 
 // These are the glyph boxes that we want to have placed.
 struct GlyphBox {
-    GlyphBox() {}
-    GlyphBox(const CollisionRect &bbox, const CollisionRect &box,
-             float minScale)
+    explicit GlyphBox() {}
+    explicit GlyphBox(const CollisionRect &bbox, const CollisionRect &box,
+                      float minScale)
         : bbox(bbox), box(box), minScale(minScale) {}
 
     CollisionAnchor anchor;
@@ -40,8 +40,8 @@ struct PlacementBox {
 };
 
 struct Placement {
-    Placement() {}
-    Placement(float zoom, const PlacementRange &rotationRange)
+    explicit Placement() {}
+    explicit Placement(float zoom, const PlacementRange &rotationRange)
         : zoom(zoom), rotationRange(rotationRange) {}
 
     float zoom = -1.0f;
@@ -56,7 +56,7 @@ class Collision {
     typedef boost::geometry::index::rtree<
         PlacementValue, boost::geometry::index::quadratic<16>> Tree;
 
-  public:
+public:
     Collision();
 
     Placement place(const GlyphBoxes &boxes, const CollisionAnchor &anchor,
@@ -70,7 +70,7 @@ class Collision {
                 float placementScale, const PlacementRange &placementRange,
                 bool horizontal, float padding);
 
-  private:
+private:
     Tree tree;
 };
 }

@@ -23,11 +23,14 @@ typedef std::array<CollisionPoint, 4> CollisionCorners;
 struct CollisionRect {
     CollisionPoint tl;
     CollisionPoint br;
-    inline CollisionRect() {}
-    inline CollisionRect(CollisionPoint::Type ax, CollisionPoint::Type ay,
-                         CollisionPoint::Type bx, CollisionPoint::Type by)
+    inline explicit CollisionRect() {}
+    inline explicit CollisionRect(CollisionPoint::Type ax,
+                                  CollisionPoint::Type ay,
+                                  CollisionPoint::Type bx,
+                                  CollisionPoint::Type by)
         : tl(ax, ay), br(bx, by) {}
-    inline CollisionRect(const CollisionPoint &tl, const CollisionPoint &br)
+    inline explicit CollisionRect(const CollisionPoint &tl,
+                                  const CollisionPoint &br)
         : tl(tl), br(br) {}
 };
 
