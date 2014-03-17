@@ -60,8 +60,8 @@ class Collision {
     Collision();
 
     Placement place(const GlyphBoxes &boxes, const CollisionAnchor &anchor,
-               float minPlacementScale, float maxPlacementScale, float padding,
-               bool horizontal);
+                    float minPlacementScale, float maxPlacementScale,
+                    float padding, bool horizontal);
     float getPlacementScale(const GlyphBoxes &glyphs, float minPlacementScale,
                             float maxPlacementScale, float pad);
     PlacementRange getPlacementRange(const GlyphBoxes &glyphs,
