@@ -419,8 +419,7 @@ bool Map::updateTiles() {
     });
 
     // Remove all the expired pointers from the list.
-    Map *map = this;
-    tile_data.remove_if([&retain_data, &map](const std::weak_ptr<TileData>& tile_data) {
+    tile_data.remove_if([&retain_data](const std::weak_ptr<TileData>& tile_data) {
         const std::shared_ptr<TileData> tile = tile_data.lock();
         if (!tile) {
             return true;
