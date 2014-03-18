@@ -152,10 +152,11 @@ void Painter::render(const Tile& tile) {
     matrix = tile.matrix;
     glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
 
-    if (tile.data->use_raster)
+    if (tile.data->use_raster) {
         renderRaster(tile.data);
-    else
+    } else {
         renderLayers(tile.data, style.layers);
+    }
 
     if (settings.debug) {
         renderDebug(tile.data);
