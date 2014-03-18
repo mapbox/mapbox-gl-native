@@ -74,9 +74,9 @@ private:
 private:
     Settings& settings;
     Transform transform;
+    Texturepool texturepool;
     Style style;
     Painter painter;
-    Texturepool texturepool;
 
     int32_t min_zoom;
     int32_t max_zoom;
