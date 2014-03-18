@@ -5,6 +5,7 @@
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/animation.hpp>
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/map/tile.hpp>
 
 #include <forward_list>
 
@@ -34,7 +35,7 @@ public:
     void setLonLatZoom(double lon, double lat, double zoom, double duration = 0);
 
     // Getters
-    void matrixFor(mat4& matrix, const vec3<int32_t>& id) const;
+    void matrixFor(mat4& matrix, const Tile::ID& id) const;
     float getZoom() const;
     int32_t getIntegerZoom() const;
     double getScale() const;

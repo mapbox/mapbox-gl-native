@@ -81,11 +81,13 @@ std::forward_list<llmr::Tile::ID> llmr::covering_tiles(int32_t zoom, const box& 
                     if (use_retina) {
                         search_zoom += 1;
                     }
-                    for (const Tile::ID& id : Tile::children({ x, y, zoom }, search_zoom)) {
-                        tiles.emplace_front(id.x, id.y, id.z);
+                    Tile::ID id = Tile::ID(zoom, x, y);
+                    auto ids = id.children(search_zoom);
+                    for (const Tile::ID& child_id : ids) {
+                        tiles.emplace_front(child_id.z, child_id.x, child_id.y);
                     }
                 } else {
-                    tiles.emplace_front(x, y, zoom);
+                    tiles.emplace_front(zoom, x, y);
                 }
             }
         }
@@ -99,7 +101,7 @@ std::forward_list<llmr::Tile::ID> llmr::covering_tiles(int32_t zoom, const box& 
     _scanTriangle(points.br, points.bl, points.tl, 0, dim, scanLine);
 
     const vec2<double>& center = points.center;
-    tiles.sort([&center](const llmr::Tile::ID& a, const llmr::Tile::ID& b) {
+    tiles.sort([&center](const Tile::ID& a, const Tile::ID& b) {
         // Sorts by distance from the box center
         return fabs(a.x - center.x) + fabs(a.y - center.y) <
                fabs(b.x - center.x) + fabs(b.y - center.y);

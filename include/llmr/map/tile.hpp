@@ -14,15 +14,31 @@ class TileData;
 
 class Tile : private util::noncopyable {
 public:
-    typedef vec3<int32_t> ID;
+    struct ID {
+        int8_t z = 0;
+        int32_t x = 0, y = 0;
+
+        inline ID(uint8_t z, uint32_t x, uint32_t y)
+            : z(z), x(x), y(y) {
+        }
+
+        inline operator uint64_t() const {
+            uint32_t dim = 1 << z;
+            return ((dim * y + x) * 32) + z;
+        }
+
+        inline bool operator==(const ID& rhs) const {
+            return z == rhs.z && x == rhs.x && y == rhs.y;
+        }
+
+        ID parent(int32_t z) const;
+        void normalize();
+        ID normalized() const;
+        std::forward_list<ID> children(int32_t z) const;
+    };
 
 public:
     Tile(const ID& id);
-
-    static ID parent(const ID& id, int32_t z);
-    static ID normalize(const ID& id);
-    static std::forward_list<ID> children(const ID& id, int32_t z);
-
 
 public:
     const Tile::ID id;

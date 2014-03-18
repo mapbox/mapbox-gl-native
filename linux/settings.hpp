@@ -1,13 +1,13 @@
-#ifndef LLMR_MACOSX_SETTINGS
-#define LLMR_MACOSX_SETTINGS
+#ifndef LLMR_JSON_SETTINGS
+#define LLMR_JSON_SETTINGS
 
 #include <llmr/map/settings.hpp>
 
 namespace llmr {
 
-class Settings_MacOSX : public Settings {
+class Settings_JSON : public Settings {
 public:
-    Settings_MacOSX();
+    Settings_JSON();
     virtual void load();
     virtual void persist();
     virtual void sync();
