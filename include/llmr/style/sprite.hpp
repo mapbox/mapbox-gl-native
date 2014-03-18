@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <mutex>
+#include <memory>
 
 #include <llmr/util/raster.hpp>
 #include <llmr/util/vec.hpp>
