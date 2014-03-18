@@ -405,7 +405,6 @@ class MBXMapView
 
 MBXMapView *mapView;
 CADisplayLink *displayLink;
-NSData *placeholderData;
 
 namespace llmr
 {
