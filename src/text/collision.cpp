@@ -50,10 +50,11 @@ GlyphBox getMergedGlyphs(const GlyphBoxes &glyphs, bool horizontal,
     return mergedGlyphs;
 }
 
-Placement Collision::place(const GlyphBoxes &boxes,
-                           const CollisionAnchor &anchor,
-                           float minPlacementScale, float maxPlacementScale,
-                           float padding, bool horizontal) {
+PlacementProperty Collision::place(const GlyphBoxes &boxes,
+                                   const CollisionAnchor &anchor,
+                                   float minPlacementScale,
+                                   float maxPlacementScale, float padding,
+                                   bool horizontal) {
 
     float minScale = std::numeric_limits<float>::infinity();
     for (const GlyphBox &box : boxes) {
@@ -93,7 +94,7 @@ Placement Collision::place(const GlyphBoxes &boxes,
 
     // Return if the label can never be placed without collision
     if (scale < 0) {
-        return Placement{};
+        return PlacementProperty{};
     }
 
     // Calculate the range it is safe to rotate all glyphs
@@ -102,7 +103,7 @@ Placement Collision::place(const GlyphBoxes &boxes,
 
     float zoom = log(scale) / log(2);
 
-    return Placement{zoom, rotationRange};
+    return PlacementProperty{zoom, rotationRange};
 }
 
 float Collision::getPlacementScale(const GlyphBoxes &glyphs,

@@ -39,9 +39,9 @@ struct PlacementBox {
     float padding = 0.0f;
 };
 
-struct Placement {
-    explicit Placement() {}
-    explicit Placement(float zoom, const PlacementRange &rotationRange)
+struct PlacementProperty {
+    explicit PlacementProperty() {}
+    explicit PlacementProperty(float zoom, const PlacementRange &rotationRange)
         : zoom(zoom), rotationRange(rotationRange) {}
 
     float zoom = -1.0f;
@@ -59,9 +59,10 @@ class Collision {
 public:
     Collision();
 
-    Placement place(const GlyphBoxes &boxes, const CollisionAnchor &anchor,
-                    float minPlacementScale, float maxPlacementScale,
-                    float padding, bool horizontal);
+    PlacementProperty place(const GlyphBoxes &boxes,
+                            const CollisionAnchor &anchor,
+                            float minPlacementScale, float maxPlacementScale,
+                            float padding, bool horizontal);
     float getPlacementScale(const GlyphBoxes &glyphs, float minPlacementScale,
                             float maxPlacementScale, float pad);
     PlacementRange getPlacementRange(const GlyphBoxes &glyphs,

@@ -12,9 +12,9 @@ struct Anchor {
     float scale = 0.0f;
     int segment = -1;
 
-    Anchor(float x, float y, float angle, float scale)
+    explicit Anchor(float x, float y, float angle, float scale)
         : x(x), y(y), angle(angle), scale(scale) {}
-    Anchor(float x, float y, float angle, float scale, int segment)
+    explicit Anchor(float x, float y, float angle, float scale, int segment)
         : x(x), y(y), angle(angle), scale(scale), segment(segment) {}
 };
 
