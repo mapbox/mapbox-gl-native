@@ -7,8 +7,6 @@
 using namespace llmr;
 
 GLuint Texturepool::getTextureID() {
-//    std::lock_guard<std::mutex> lock(mtx);
-
     if (texture_ids.empty())
     {
         GLuint new_texture_ids[TextureMax];
@@ -30,8 +28,6 @@ GLuint Texturepool::getTextureID() {
 }
 
 void Texturepool::removeTextureID(GLuint texture_id) {
-    //    std::lock_guard<std::mutex> lock(mtx);
-
     bool needs_clear = false;
 
     glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -47,8 +43,6 @@ void Texturepool::removeTextureID(GLuint texture_id) {
 }
 
 void Texturepool::clearTextureIDs() {
-//    std::lock_guard<std::mutex> lock(mtx);
-
     std::vector<GLuint> ids_to_remove;
     ids_to_remove.reserve(texture_ids.size());
 

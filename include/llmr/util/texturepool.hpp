@@ -18,7 +18,6 @@ public:
 
 private:
     std::set<GLuint> texture_ids;
-//    mutable std::mutex mtx;
 };
 
 }
