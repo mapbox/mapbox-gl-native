@@ -26,7 +26,6 @@ class BucketDescription;
 class OutlineShader;
 class PlainShader;
 class PatternShader;
-struct Coordinate;
 struct pbf;
 
 class FillBucket : public Bucket {

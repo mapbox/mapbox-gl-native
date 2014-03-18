@@ -2,6 +2,7 @@
 #define LLMR_MAP_VECTOR_TILE
 
 #include <llmr/util/pbf.hpp>
+#include <llmr/util/vec.hpp>
 #include <llmr/style/value.hpp>
 #include <vector>
 #include <map>
@@ -14,24 +15,6 @@ class BucketDescription;
 class VectorTileLayer;
 
 struct pbf;
-
-struct Coordinate {
-    struct null {};
-
-    Coordinate() : x(0), y(0) {}
-    Coordinate(int16_t x, int16_t y) : x(x), y(y) {}
-    Coordinate(null) : x(std::numeric_limits<int16_t>::min()), y(std::numeric_limits<int16_t>::min()) {}
-    int16_t x;
-    int16_t y;
-
-    inline bool operator==(const Coordinate& other) const {
-        return x == other.x && y == other.y;
-    }
-
-    inline operator bool() const {
-        return x != std::numeric_limits<int16_t>::min() && y != std::numeric_limits<int16_t>::min();
-    }
-};
 
 enum class FeatureType {
     Unknown = 0,

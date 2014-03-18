@@ -15,7 +15,6 @@ class LineVertexBuffer;
 class TriangleElementsBuffer;
 class LineShader;
 class LinejoinShader;
-struct Coordinate;
 struct pbf;
 
 class LineBucket : public Bucket {

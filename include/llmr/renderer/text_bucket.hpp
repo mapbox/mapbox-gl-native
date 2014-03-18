@@ -18,7 +18,6 @@ class TextShader;
 class VectorTileFeature;
 class VectorTileFace;
 class VectorTilePlacement;
-struct Coordinate;
 struct pbf;
 
 class TextBucket : public Bucket {
