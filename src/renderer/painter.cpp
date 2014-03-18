@@ -466,8 +466,9 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
 #endif
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
-    if (*style.sprite->raster)
+    if (*style.sprite->raster) {
         style.sprite->raster->bind(transform.rotating || transform.scaling || transform.panning);
+    }
     glDepthRange(strata, 1.0f);
     bucket.drawPoints(*pointShader);
 }
