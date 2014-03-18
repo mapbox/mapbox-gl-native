@@ -24,6 +24,7 @@ RasterShader::RasterShader()
     // fprintf(stderr, "RasterShader:\n");
     // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
     // fprintf(stderr, "    - u_image: %d\n", u_image);
+    // fprintf(stderr, "    - u_opacity: %f\n", u_opacity);
 }
 
 void RasterShader::bind(char *offset) {
