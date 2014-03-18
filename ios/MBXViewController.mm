@@ -121,6 +121,10 @@ class MBXMapView
     threeFingerLongPress.numberOfTouchesRequired = 3;
     [self.view addGestureRecognizer:threeFingerLongPress];
 
+    UILongPressGestureRecognizer *fourFingerLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleFourFingerLongPressGesture:)];
+    fourFingerLongPress.numberOfTouchesRequired = 4;
+    [self.view addGestureRecognizer:fourFingerLongPress];
+
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
     {
         UILongPressGestureRecognizer *quickZoom = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleQuickZoomGesture:)];
@@ -356,6 +360,16 @@ class MBXMapView
 
         self.debug = ! self.debug;
     }
+
+    [self updateRender];
+}
+
+- (void)handleFourFingerLongPressGesture:(UILongPressGestureRecognizer *)fourFingerLongPress
+{
+    mapView->map.cancelAnimations();
+
+    if (fourFingerLongPress.state == UIGestureRecognizerStateBegan)
+        mapView->map.toggleRaster();
 
     [self updateRender];
 }

@@ -1,13 +1,12 @@
 #ifndef LLMR_STYLE_SPRITE
 #define LLMR_STYLE_SPRITE
 
-
-#include <cstdint>
 #include <map>
 #include <string>
 #include <mutex>
 #include <memory>
 
+#include <llmr/util/raster.hpp>
 #include <llmr/util/vec.hpp>
 
 namespace llmr {
@@ -34,27 +33,24 @@ public:
 
 class Sprite : public std::enable_shared_from_this<Sprite> {
 public:
-    ~Sprite();
+    Sprite();
 
     void load(const std::string& base_url, float pixelRatio = 1);
-    void bind(bool linear = false);
 
     ImagePosition getPosition(const std::string& name, bool repeating = false);
 
     operator bool() const;
 
+public:
+    std::shared_ptr<Raster> raster;
+
 private:
     void parseJSON(const std::string& data);
-    void loadImage(const std::string& data);
 
 private:
     mutable std::mutex mtx;
     bool loaded = false;
-    uint32_t filter = 0;
-    uint32_t texture = 0;
     std::map<std::string, SpritePosition> pos;
-    uint32_t width = 0, height = 0;
-    char *img = nullptr;
 };
 
 }

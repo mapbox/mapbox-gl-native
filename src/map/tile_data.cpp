@@ -10,15 +10,19 @@
 #include <llmr/renderer/line_bucket.hpp>
 #include <llmr/renderer/point_bucket.hpp>
 #include <llmr/util/pbf.hpp>
+#include <llmr/util/raster.hpp>
 #include <llmr/util/string.hpp>
 
 #include <chrono>
 
 using namespace llmr;
 
-TileData::TileData(Tile::ID id, const Style& style)
+TileData::TileData(Tile::ID id, const Style& style, const bool use_raster, const bool use_retina)
     : id(id),
       state(State::initial),
+      use_raster(use_raster),
+      use_retina(use_retina),
+      raster(),
       fillVertexBuffer(std::make_shared<FillVertexBuffer>()),
       lineVertexBuffer(std::make_shared<LineVertexBuffer>()),
       pointVertexBuffer(std::make_shared<PointVertexBuffer>()),
@@ -44,9 +48,13 @@ const std::string TileData::toString() const {
 void TileData::request() {
     state = State::loading;
 
-    // Create http request
-    std::string url = util::sprintf(kTileURL,
-        id.z, id.x, id.y);
+    std::string url;
+
+    if (use_raster) {
+        url = util::sprintf(kTileRasterURL, id.z, id.x, id.y, (use_retina ? "@2x" : ""));
+    } else {
+        url = util::sprintf(kTileVectorURL, id.z, id.x, id.y);
+    }
 
     // Note: Somehow this feels slower than the change to request_http()
     std::weak_ptr<TileData> weak_tile = shared_from_this();
@@ -78,6 +86,13 @@ void TileData::cancel() {
 bool TileData::parse() {
     if (state != State::loaded) {
         return false;
+    }
+
+    if (use_raster) {
+        raster = std::make_shared<Raster>();
+        raster->load(data);
+        state = State::parsed;
+        return true;
     }
 
     try {
