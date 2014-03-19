@@ -163,7 +163,7 @@ void Raster::bind(bool linear) {
         free(img);
         img = nullptr;
         textured = true;
-    } else {
+    } else if (textured) {
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 
