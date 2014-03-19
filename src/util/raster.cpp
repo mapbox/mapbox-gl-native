@@ -154,11 +154,7 @@ void Raster::bind(bool linear) {
         return;
     }
 
-    if (img && !textured) {
-        if (!texturepool) {
-            fprintf(stderr, "no available texture pool\n");
-            return;
-        }
+    if (img && !textured && texturepool) {
         texture = texturepool->getTextureID();
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
