@@ -47,7 +47,7 @@ public:
 
 protected:
     // increase the buffer size by at least /required/ bytes.
-    void *addElement() {
+    inline void *addElement() {
         assert("Buffer is already bound to GPU" && buffer == 0);
         if (length < pos + itemSize) {
             while (length < pos + itemSize) length += defaultLength;

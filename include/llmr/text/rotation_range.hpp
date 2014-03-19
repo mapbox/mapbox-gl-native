@@ -1,38 +1,13 @@
 #ifndef LLMR_TEXT_ROTATION_RANGE
 #define LLMR_TEXT_ROTATION_RANGE
 
-#include <llmr/util/vec.hpp>
 #include <llmr/util/math.hpp>
+#include <llmr/text/types.hpp>
 
-#include <array>
 #include <vector>
 #include <cassert>
 
 namespace llmr {
-
-typedef vec2<float> CollisionPoint;
-typedef vec2<float> CollisionAnchor;
-
-typedef std::array<float, 2> PlacementRange;
-typedef float CollisionAngle;
-typedef std::vector<CollisionAngle> CollisionAngles;
-typedef std::array<CollisionAngle, 2> CollisionRange;
-typedef std::vector<CollisionRange> CollisionList;
-typedef std::array<CollisionPoint, 4> CollisionCorners;
-
-struct CollisionRect {
-    CollisionPoint tl;
-    CollisionPoint br;
-    inline explicit CollisionRect() {}
-    inline explicit CollisionRect(CollisionPoint::Type ax,
-                                  CollisionPoint::Type ay,
-                                  CollisionPoint::Type bx,
-                                  CollisionPoint::Type by)
-        : tl(ax, ay), br(bx, by) {}
-    inline explicit CollisionRect(const CollisionPoint &tl,
-                                  const CollisionPoint &br)
-        : tl(tl), br(br) {}
-};
 
 /*
  * Combine an array of collision ranges to form a continuous
@@ -72,9 +47,8 @@ CollisionList rotatingFixedCollisions(const CollisionRect &rotating,
 /*
  * Calculate the range a box conflicts with a second box
  */
-template <typename InsertingBox, typename BlockingBox>
-CollisionRange rotationRange(const InsertingBox &inserting,
-                             const BlockingBox &blocker, float scale);
+CollisionRange rotationRange(const GlyphBox &inserting,
+                             const PlacementBox &blocker, float scale);
 }
 
 #endif

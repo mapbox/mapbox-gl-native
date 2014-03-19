@@ -16,6 +16,8 @@
  #define VARIANT_INLINE __attribute__((noinline))
 #endif
 
+namespace llmr {
+
 namespace util {
 
 namespace detail {
@@ -373,6 +375,8 @@ operator<< (std::basic_ostream<charT,traits>& out, Variant const& rhs)
     detail::printer<std::basic_ostream<charT,traits> > visitor(out);
     apply_visitor(rhs, visitor);
     return out;
+}
+
 }
 
 }

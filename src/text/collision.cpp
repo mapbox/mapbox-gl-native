@@ -1,9 +1,29 @@
 #include <llmr/text/collision.hpp>
+#include <llmr/text/rotation_range.hpp>
 #include <llmr/util/math.hpp>
+
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point.hpp>
+#include <boost/geometry/geometries/box.hpp>
+#include <boost/geometry/index/rtree.hpp>
+
+namespace llmr {
+namespace bg = boost::geometry;
+namespace bgm = bg::model;
+namespace bgi = bg::index;
+typedef bgm::point<float, 2, bg::cs::cartesian> Point;
+typedef bgm::box<Point> Box;
+typedef std::pair<Box, PlacementBox> PlacementValue;
+typedef bgi::rtree<PlacementValue, bgi::quadratic<16>> Tree;
+}
 
 using namespace llmr;
 
-Collision::Collision() {
+Collision::~Collision() {
+    delete ((Tree *)tree);
+}
+
+Collision::Collision() : tree(new Tree()) {
     const float m = 4096;
 
     // Hack to prevent cross-tile labels
@@ -28,7 +48,7 @@ Collision::Collision() {
            CollisionAnchor{m, m}, 1, {{M_PI * 2, 0}}, false, 2);
 }
 
-GlyphBox getMergedGlyphs(const GlyphBoxes &glyphs, bool horizontal,
+GlyphBox getMergedGlyphs(const PlacedGlyphs &placed_glyphs, bool horizontal,
                          const CollisionAnchor &anchor) {
     GlyphBox mergedGlyphs;
     const float inf = std::numeric_limits<float>::infinity();
@@ -37,28 +57,28 @@ GlyphBox getMergedGlyphs(const GlyphBoxes &glyphs, bool horizontal,
     mergedGlyphs.anchor = anchor;
 
     CollisionRect &box = mergedGlyphs.box;
-    for (const GlyphBox &glyph : glyphs) {
-        const CollisionRect &gbox = glyph.box;
+    for (const PlacedGlyph &placed_glyph : placed_glyphs) {
+        const CollisionRect &gbox = placed_glyph.glyphBox.box;
         box.tl.x = util::min(box.tl.x, gbox.tl.x);
         box.tl.y = util::min(box.tl.y, gbox.tl.y);
         box.br.x = util::max(box.br.x, gbox.br.x);
         box.br.y = util::max(box.br.y, gbox.br.y);
         mergedGlyphs.minScale =
-            util::max(mergedGlyphs.minScale, glyph.minScale);
+            util::max(mergedGlyphs.minScale, placed_glyph.glyphBox.minScale);
     }
 
     return mergedGlyphs;
 }
 
-PlacementProperty Collision::place(const GlyphBoxes &boxes,
+PlacementProperty Collision::place(const PlacedGlyphs &placed_glyphs,
                                    const CollisionAnchor &anchor,
                                    float minPlacementScale,
                                    float maxPlacementScale, float padding,
                                    bool horizontal) {
 
     float minScale = std::numeric_limits<float>::infinity();
-    for (const GlyphBox &box : boxes) {
-        minScale = util::min(minScale, box.minScale);
+    for (const PlacedGlyph &placed_glyph : placed_glyphs) {
+        minScale = util::min(minScale, placed_glyph.glyphBox.minScale);
     }
     minPlacementScale = util::max(minPlacementScale, minScale);
 
@@ -67,9 +87,11 @@ PlacementProperty Collision::place(const GlyphBoxes &boxes,
     // for horizontal labels.
     GlyphBoxes glyphs;
     if (horizontal) {
-        glyphs.push_back(getMergedGlyphs(boxes, horizontal, anchor));
+        glyphs.push_back(getMergedGlyphs(placed_glyphs, horizontal, anchor));
     } else {
-        glyphs = boxes;
+        for (const PlacedGlyph &placed_glyph : placed_glyphs) {
+            glyphs.push_back(placed_glyph.glyphBox);
+        }
     }
 
     // Calculate bboxes for all the glyphs
@@ -89,11 +111,11 @@ PlacementProperty Collision::place(const GlyphBoxes &boxes,
 
     // Calculate the minimum scale the entire label can be shown without
     // collisions
-    float scale =
-        getPlacementScale(boxes, minPlacementScale, maxPlacementScale, padding);
+    float scale = getPlacementScale(glyphs, minPlacementScale,
+                                    maxPlacementScale, padding);
 
     // Return if the label can never be placed without collision
-    if (scale < 0) {
+    if (scale < 0 || scale == std::numeric_limits<float>::infinity()) {
         return PlacementProperty{};
     }
 
@@ -137,8 +159,8 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs,
                       Point{maxPlacedX, maxPlacedY}};
 
         std::vector<PlacementValue> blocking;
-        tree.query(boost::geometry::index::intersects(query_box),
-                   std::back_inserter(blocking));
+        ((Tree *)tree)
+            ->query(bgi::intersects(query_box), std::back_inserter(blocking));
 
         if (blocking.size()) {
             const CollisionAnchor &na = anchor; // new anchor
@@ -218,8 +240,8 @@ PlacementRange Collision::getPlacementRange(const GlyphBoxes &glyphs,
                       Point{maxPlacedX, maxPlacedY}};
 
         std::vector<PlacementValue> blocking;
-        tree.query(boost::geometry::index::intersects(query_box),
-                   std::back_inserter(blocking));
+        ((Tree *)tree)
+            ->query(bgi::intersects(query_box), std::back_inserter(blocking));
 
         for (const PlacementValue &value : blocking) {
             const Box &s = value.first;
@@ -267,6 +289,8 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
                        float placementScale,
                        const PlacementRange &placementRange, bool horizontal,
                        float padding) {
+    assert(placementScale != std::numeric_limits<float>::infinity());
+
     for (const GlyphBox &glyph : glyphs) {
         const CollisionRect &bbox = glyph.bbox;
         const CollisionRect &box = glyph.box;
@@ -288,6 +312,9 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
         placement.maxScale = glyph.maxScale;
         placement.padding = padding;
 
-        tree.insert({bounds, placement});
+        assert(!isnan(bounds.min_corner().get<0>()) && !isnan(bounds.min_corner().get<1>()));
+        assert(!isnan(bounds.max_corner().get<0>()) && !isnan(bounds.max_corner().get<1>()));
+
+        ((Tree *)tree)->insert({bounds, placement});
     }
 }

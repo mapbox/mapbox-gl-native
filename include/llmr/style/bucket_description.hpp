@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include "value.hpp"
 
@@ -30,6 +31,11 @@ enum class JoinType {
     Round = 3
 };
 
+enum class TextPathType {
+    Horizontal = 0,
+    Curve = 1
+};
+
 
 inline BucketType bucketType(const std::string& type) {
     if (type == "fill") return BucketType::Fill;
@@ -54,6 +60,12 @@ inline JoinType joinType(const std::string& join) {
     else return JoinType::None;
 }
 
+inline TextPathType textPathType(const std::string& path) {
+    if (path == "horizontal") return TextPathType::Horizontal;
+    else if (path == "curve") return TextPathType::Curve;
+    else return TextPathType::Horizontal;
+};
+
 class BucketGeometryDescription {
 public:
     CapType cap = CapType::None;
@@ -63,6 +75,12 @@ public:
     float font_size = 0.0f;
     float miter_limit = 2.0f;
     float round_limit = 1.0f;
+    TextPathType path = TextPathType::Horizontal;
+    float padding = 2.0f;
+    float textMinDistance = 250.0f;
+    float rotate = 0.0f; // what is this?
+    float maxAngleDelta = M_PI;
+    bool alwaysVisible = false;
 };
 
 class BucketDescription {

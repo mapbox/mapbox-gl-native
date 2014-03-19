@@ -2,20 +2,9 @@
 #define LLMR_GEOMETRY_TEXT_BUFFER
 
 #include "buffer.hpp"
+#include <array>
 
 namespace llmr {
-
-class GlyphPosition {
-public:
-    int16_t x = 0, y = 0;
-    float ox = 0.0f, oy = 0.0f;
-    uint16_t tx = 0, ty = 0;
-    float angle = 0.0f;
-    float minzoom = 0.0f;
-    float rangefrom = 0.0f, rangeto = 0.0f;
-    float maxzoom = 25.0f;
-    float labelminzoom = 0.0f;
-};
 
 class TextVertexBuffer : public Buffer <
     16,
@@ -27,7 +16,7 @@ public:
 
     static const double angleFactor;
 
-    size_t add(const GlyphPosition& pos);
+    size_t add(int16_t x, int16_t y, float ox, float oy, uint16_t tx, uint16_t ty, float angle, float minzoom, std::array<float, 2> range, float maxzoom, float labelminzoom);
 };
 
 

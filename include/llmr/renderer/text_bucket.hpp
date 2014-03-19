@@ -5,6 +5,8 @@
 #include <llmr/style/bucket_description.hpp>
 #include <llmr/geometry/vao.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
+#include <llmr/map/vector_tile.hpp>
+#include <llmr/text/types.hpp>
 #include <memory>
 #include <map>
 #include <vector>
@@ -15,46 +17,45 @@ class Style;
 class TextVertexBuffer;
 class TriangleElementsBuffer;
 class TextShader;
-class VectorTileFeature;
-class VectorTileFace;
-class VectorTilePlacement;
+class Placement;
 struct pbf;
 
 class TextBucket : public Bucket {
     typedef ElementGroup triangle_group_type;
+
 public:
-    TextBucket(const std::shared_ptr<TextVertexBuffer>& vertexBuffer,
-               const std::shared_ptr<TriangleElementsBuffer>& triangleElementsBuffer,
-               const BucketDescription& bucket_desc);
+    TextBucket(
+        const std::shared_ptr<TextVertexBuffer> &vertexBuffer,
+        const std::shared_ptr<TriangleElementsBuffer> &triangleElementsBuffer,
+        const BucketDescription &bucket_desc, Placement &placement);
 
-    virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
+    virtual void render(Painter &painter, const std::string &layer_name,
+                        const Tile::ID &id);
 
-    void addFeature(const VectorTileFeature& feature,
-                    const std::vector<const VectorTileFace *>& faces,
-                    const std::map<Value, std::vector<VectorTilePlacement>>& shaping);
+    void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
+                   PlacementRange placementRange, float zoom);
 
-    void addLabel(const std::vector<Coordinate>& line,
-                  const std::vector<const VectorTileFace *>& faces,
-                  const std::vector<VectorTilePlacement>& placements);
+    void addFeature(const VectorTileFeature &feature,
+                    const IndexedFaceGlyphPositions &faces,
+                    const std::map<Value, Shaping> &shapings);
 
     bool empty() const;
 
-    void drawGlyphs(TextShader& shader);
+    void drawGlyphs(TextShader &shader);
 
 public:
-    const BucketGeometryDescription geometry;
+    const BucketGeometryDescription &geom_desc;
 
 private:
-
     std::shared_ptr<TextVertexBuffer> vertexBuffer;
     std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
+    Placement &placement;
 
     const size_t vertex_start;
     const size_t triangle_elements_start;
 
     std::vector<triangle_group_type> triangleGroups;
 };
-
 }
 
 #endif

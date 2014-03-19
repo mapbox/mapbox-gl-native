@@ -2,11 +2,9 @@
 #define LLMR_MAP_TILE_PARSER
 
 #include <llmr/map/tile_data.hpp>
+#include <llmr/text/placement.hpp>
 
 namespace llmr {
-
-typedef std::map<uint32_t, Rect<uint16_t>> GlyphPositions;
-typedef std::map<std::string, GlyphPositions> FaceGlyphPositions;
 
 class TileParser {
 public:
@@ -28,7 +26,8 @@ private:
     TileData& tile;
     const Style& style;
     GlyphAtlas& glyphAtlas;
-    FaceGlyphPositions rects;
+    FaceGlyphPositions faces;
+    Placement placement;
 };
 
 }

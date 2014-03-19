@@ -4,6 +4,7 @@
 #include <llmr/util/pbf.hpp>
 #include <llmr/util/vec.hpp>
 #include <llmr/style/value.hpp>
+#include <llmr/text/glyph.hpp>
 #include <vector>
 #include <map>
 #include <set>
@@ -71,18 +72,7 @@ private:
     std::set<uint32_t> values;
 };
 
-class VectorTilePlacement {
-public:
-    VectorTilePlacement(uint32_t face, uint32_t glyph, uint32_t x, uint32_t y);
-
-    uint32_t face = 0;
-    uint32_t glyph = 0;
-    uint32_t x = 0;
-    uint32_t y = 0;
-};
-
-std::ostream& operator<<(std::ostream&, const VectorTilePlacement& placement);
-
+std::ostream& operator<<(std::ostream&, const GlyphPlacement& placement);
 
 class VectorTileLayer {
 public:
@@ -94,11 +84,12 @@ public:
     std::vector<std::string> keys;
     std::vector<Value> values;
     std::vector<std::string> faces;
-    std::map<std::string, std::map<Value, std::vector<VectorTilePlacement>>> shaping;
+    std::map<std::string, std::map<Value, Shaping>> shaping;
 };
 
 class VectorTileGlyph {
 public:
+    VectorTileGlyph();
     VectorTileGlyph(pbf data);
 
     uint32_t id = 0;
@@ -106,12 +97,8 @@ public:
     // A signed distance field of the glyph with a border of 3 pixels.
     std::string bitmap;
 
-    // Glyph metrics.
-    uint32_t width = 0;
-    uint32_t height = 0;
-    int32_t left = 0;
-    int32_t top = 0;
-    uint32_t advance = 0;
+    // Glyph metrics
+    GlyphMetrics metrics;
 };
 
 std::ostream& operator<<(std::ostream&, const VectorTileGlyph& glyph);

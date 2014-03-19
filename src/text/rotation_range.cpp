@@ -225,13 +225,12 @@ CollisionList rotatingFixedCollisions(const CollisionRect &rotating,
 /*
  * Calculate the range a box conflicts with a second box
  */
-template <typename InsertingBox, typename BlockingBox>
-CollisionRange rotationRange(const InsertingBox &inserting,
-                             const BlockingBox &blocker, float scale) {
+CollisionRange rotationRange(const GlyphBox &inserting,
+                             const PlacementBox &blocker, float scale) {
     CollisionList collisions;
 
-    const InsertingBox &a = inserting;
-    const BlockingBox &b = blocker;
+    const GlyphBox &a = inserting;
+    const PlacementBox &b = blocker;
 
     // Instead of scaling the boxes, we move the anchors
     CollisionAnchor relativeAnchor{
@@ -242,12 +241,12 @@ CollisionRange rotationRange(const InsertingBox &inserting,
     if (a.rotate && b.rotate) {
         collisions = rotatingRotatingCollisions(a.box, b.box, relativeAnchor);
     } else if (a.rotate) {
-        const CollisionRect box = {
+        const CollisionRect box {
             b.box.tl.x + relativeAnchor.x, b.box.tl.y + relativeAnchor.y,
             b.box.br.x + relativeAnchor.x, b.box.br.y + relativeAnchor.y};
         collisions = rotatingFixedCollisions(a.box, box);
     } else if (b.rotate) {
-        const CollisionRect box = {
+        const CollisionRect box {
             a.box.tl.x - relativeAnchor.x, a.box.tl.y - relativeAnchor.y,
             a.box.br.x - relativeAnchor.x, a.box.br.y - relativeAnchor.y};
         collisions = rotatingFixedCollisions(b.box, box);

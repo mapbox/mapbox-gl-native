@@ -6,7 +6,7 @@
 
 namespace llmr {
 
-typedef ::util::variant<bool, int64_t, uint64_t, double, std::string> Value;
+typedef util::variant<bool, int64_t, uint64_t, double, std::string> Value;
 
 Value parseValue(pbf data);
 

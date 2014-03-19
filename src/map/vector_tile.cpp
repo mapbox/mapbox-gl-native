@@ -117,6 +117,9 @@ std::ostream& llmr::operator<<(std::ostream& os, const VectorTileFace& face) {
 }
 
 
+// -1 overflows to maximum value
+VectorTileGlyph::VectorTileGlyph() {}
+
 VectorTileGlyph::VectorTileGlyph(pbf glyph) {
     while (glyph.next()) {
         if (glyph.tag == 1) { // id
@@ -124,15 +127,15 @@ VectorTileGlyph::VectorTileGlyph(pbf glyph) {
         } else if (glyph.tag == 2) { // bitmap
             bitmap = glyph.string();
         } else if (glyph.tag == 3) { // width
-            width = glyph.varint();
+            metrics.width = glyph.varint();
         } else if (glyph.tag == 4) { // height
-            height = glyph.varint();
+            metrics.height = glyph.varint();
         } else if (glyph.tag == 5) { // left
-            left = glyph.svarint();
+            metrics.left = glyph.svarint();
         } else if (glyph.tag == 6) { // top
-            top = glyph.svarint();
+            metrics.top = glyph.svarint();
         } else if (glyph.tag == 7) { // advance
-            advance = glyph.varint();
+            metrics.advance = glyph.varint();
         } else {
             glyph.skip();
         }
@@ -140,8 +143,8 @@ VectorTileGlyph::VectorTileGlyph(pbf glyph) {
 }
 
 std::ostream& llmr::operator<<(std::ostream& os, const VectorTileGlyph& glyph) {
-    os << "Glyph " << glyph.id << ": " << glyph.width << "x" << glyph.height <<
-       " (" << glyph.left << "/" << glyph.top << ") +" << glyph.advance << std::endl;
+    os << "Glyph " << glyph.id << ": " << glyph.metrics.width << "x" << glyph.metrics.height <<
+       " (" << glyph.metrics.left << "/" << glyph.metrics.top << ") +" << glyph.metrics.advance << std::endl;
     return os;
 }
 
@@ -151,7 +154,7 @@ public:
 
     uint32_t text = 0;
     uint32_t stack = 0;
-    std::vector<VectorTilePlacement> placements;
+    std::vector<GlyphPlacement> placements;
 };
 
 VectorTileLabel::VectorTileLabel(pbf label) {
@@ -218,14 +221,7 @@ VectorTileLayer::VectorTileLayer(pbf layer) : data(layer) {
     }
 }
 
-VectorTilePlacement::VectorTilePlacement(uint32_t face, uint32_t glyph, uint32_t x, uint32_t y)
-    : face(face),
-      glyph(glyph),
-      x(x),
-      y(y) {
-}
-
-std::ostream& llmr::operator<<(std::ostream& os, const VectorTilePlacement& placement) {
+std::ostream& llmr::operator<<(std::ostream& os, const GlyphPlacement& placement) {
     os << "Glyph " << placement.face << "/" << placement.glyph << ": " << placement.x << "/" << placement.y << std::endl;
     return os;
 }

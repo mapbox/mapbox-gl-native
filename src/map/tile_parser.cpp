@@ -13,7 +13,8 @@ TileParser::TileParser(const std::string& data, TileData& tile, const Style& sty
     : data(pbf((const uint8_t *)data.data(), data.size())),
       tile(tile),
       style(style),
-      glyphAtlas(glyphAtlas) {
+      glyphAtlas(glyphAtlas),
+      placement(tile.id.z) {
     parseGlyphs();
     parseStyleLayers(style.layers);
 }
@@ -24,13 +25,14 @@ bool TileParser::obsolete() const {
 
 void TileParser::parseGlyphs() {
     for (const std::pair<std::string, const VectorTileFace> pair : data.faces) {
-        const std::string& name = pair.first;
-        const VectorTileFace& face = pair.second;
+        const std::string &name = pair.first;
+        const VectorTileFace &face = pair.second;
 
-        GlyphPositions& rect = rects[name];
-
-        for (const VectorTileGlyph& glyph : face.glyphs) {
-            rect.emplace(glyph.id, glyphAtlas.addGlyph((uint64_t)tile.id, name, glyph));
+        GlyphPositions &glyphs = faces[name];
+        for (const VectorTileGlyph &glyph : face.glyphs) {
+            const Rect<uint16_t> rect =
+                glyphAtlas.addGlyph((uint64_t)tile.id, name, glyph);
+            glyphs.emplace_back(Glyph{rect, glyph.metrics});
         }
     }
 }
@@ -137,12 +139,14 @@ std::shared_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
     }
 
     // TODO: currently hardcoded to use the first font stack.
-    const std::map<Value, std::vector<VectorTilePlacement>>& shaping = layer.shaping.begin()->second;
+    const std::map<Value, Shaping>& shaping = layer.shaping.begin()->second;
 
-    std::vector<const VectorTileFace *> faces;
+    const FaceGlyphPositions& const_faces = faces;
+
+    IndexedFaceGlyphPositions faces;
     for (const std::string& face : layer.faces) {
-        auto it = data.faces.find(face);
-        if (it == data.faces.end()) {
+        auto it = const_faces.find(face);
+        if (it == const_faces.end()) {
             // This layer references an unknown face.
             return nullptr;
         }
@@ -150,7 +154,7 @@ std::shared_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
     }
 
     std::shared_ptr<TextBucket> bucket = std::make_shared<TextBucket>(
-        tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc);
+        tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
 
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (const pbf& feature_pbf : filtered_layer) {
