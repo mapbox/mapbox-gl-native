@@ -4,6 +4,7 @@
 #include <llmr/style/resources.hpp>
 #include <llmr/style/sprite.hpp>
 #include <llmr/map/coverage.hpp>
+#include <llmr/util/animation.hpp>
 
 #include <algorithm>
 
@@ -12,11 +13,12 @@ using namespace llmr;
 Map::Map(Settings& settings)
     : settings(settings),
       transform(),
+      texturepool(),
       style(),
       painter(transform, settings, style),
       glyphAtlas(1024, 1024),
       min_zoom(0),
-      max_zoom(14) {
+      max_zoom((use_raster ? kTileRasterMaxZoom : kTileVectorMaxZoom)) {
 }
 
 Map::~Map() {
@@ -24,6 +26,7 @@ Map::~Map() {
 }
 
 void Map::setup(float pixelRatio) {
+
     painter.setup();
 
     pixel_ratio = pixelRatio;
@@ -32,10 +35,6 @@ void Map::setup(float pixelRatio) {
     style.sprite->load(kSpriteURL, pixel_ratio);
 
     style.loadJSON(resources::style, resources::style_size);
-}
-
-void Map::loadSprite(const std::string& url) {
-
 }
 
 void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
@@ -58,6 +57,13 @@ void Map::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb
     transform.fb_height = fb_height;
     transform.pixelRatio = pixel_ratio;
     painter.resize(fb_width, fb_height);
+    update();
+}
+
+void Map::toggleRaster() {
+    use_raster = ! use_raster;
+    max_zoom = (use_raster ? kTileRasterMaxZoom : kTileVectorMaxZoom);
+    tiles.clear();
     update();
 }
 
@@ -279,7 +285,7 @@ TileData::State Map::addTile(const Tile::ID& id) {
 
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
-        new_tile.data = std::make_shared<TileData>(normalized_id, style, glyphAtlas);
+        new_tile.data = std::make_shared<TileData>(normalized_id, style, glyphAtlas, use_raster, (pixel_ratio > 1.0));
         new_tile.data->request();
         tile_data.push_front(new_tile.data);
     }
@@ -353,12 +359,14 @@ bool Map::updateTiles() {
     int32_t min_covering_zoom = zoom - 10;
     if (min_covering_zoom < min_zoom) min_covering_zoom = min_zoom;
 
+    int32_t max_dim = pow(2, zoom);
+
     // Map four viewport corners to pixel coordinates
     box box = transform.mapCornersToBox(zoom);
 
     // Performs a scanline algorithm search that covers the rectangle of the box
     // and sorts them by proximity to the center.
-    std::forward_list<Tile::ID> required = llmr::covering_tiles(zoom, box);
+    std::forward_list<Tile::ID> required = llmr::covering_tiles(zoom, box, use_raster, (pixel_ratio > 1.0));
 
     // Retain is a list of tiles that we shouldn't delete, even if they are not
     // the most ideal tile for the current viewport. This may include tiles like
@@ -370,6 +378,9 @@ bool Map::updateTiles() {
         const TileData::State state = addTile(id);
 
         if (state != TileData::State::parsed) {
+            if (use_raster && (transform.rotating || transform.scaling || transform.panning))
+                break;
+
             // The tile we require is not yet loaded. Try to find a parent or
             // child tile that we already have.
 
@@ -434,6 +445,10 @@ bool Map::render() {
 
     glyphAtlas.bind();
 
+    if (*style.sprite->raster && !style.sprite->raster->textured) {
+        style.sprite->raster->setTexturepool(&texturepool);
+    }
+
     bool changed = updateTiles();
 
     painter.clear();
@@ -450,13 +465,20 @@ bool Map::render() {
             transform.matrixFor(tile.matrix, tile.id);
             matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
             tile.clip_id = i++;
-            painter.drawClippingMask(tile.matrix, tile.clip_id);
+            painter.drawClippingMask(tile.matrix, tile.clip_id, !tile.data->use_raster);
         }
     }
     painter.finishClippingMask();
 
     for (const Tile& tile : tiles) {
         if (tile.data && tile.data->state == TileData::State::parsed) {
+            if (tile.data->use_raster && *tile.data->raster && !tile.data->raster->textured) {
+                tile.data->raster->setTexturepool(&texturepool);
+                tile.data->raster->beginFadeInAnimation();
+            }
+            if (tile.data->use_raster && tile.data->raster->needsAnimation()) {
+                tile.data->raster->updateAnimations();
+            }
             painter.render(tile);
         }
     }

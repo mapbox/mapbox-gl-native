@@ -13,7 +13,7 @@
 #include <llmr/shader/line_shader.hpp>
 #include <llmr/shader/linejoin_shader.hpp>
 #include <llmr/shader/point_shader.hpp>
-
+#include <llmr/shader/raster_shader.hpp>
 
 namespace llmr {
 
@@ -44,10 +44,11 @@ public:
     void resize(int width, int height);
 
     void prepareClippingMask();
-    void drawClippingMask(const mat4& matrix, uint8_t clip_id);
+    void drawClippingMask(const mat4& matrix, uint8_t clip_id, bool opaque = true);
     void finishClippingMask();
 private:
     void setupShaders();
+    void renderRaster(const std::shared_ptr<TileData>& tile);
     void renderLayers(const std::shared_ptr<TileData>& tile, const std::vector<LayerDescription>& layers);
     void renderLayer(const std::shared_ptr<TileData>& tile_data, const LayerDescription& layer_desc);
     void renderDebug(const std::shared_ptr<TileData>& tile);
@@ -82,6 +83,7 @@ private:
     std::unique_ptr<LinejoinShader> linejoinShader;
     std::unique_ptr<PatternShader> patternShader;
     std::unique_ptr<PointShader> pointShader;
+    std::unique_ptr<RasterShader> rasterShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     VertexBuffer tileStencilBuffer = {
@@ -98,6 +100,7 @@ private:
 
     VertexArrayObject coveringPlainArray;
     VertexArrayObject coveringPatternArray;
+    VertexArrayObject coveringRasterArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
     VertexBuffer tileBorderBuffer = {

@@ -115,8 +115,9 @@ This is automatically taken care of as a build phase if you are using the Xcode 
 
 ## Desktop
 
-- Press 'R' to reset the transform
+- Press 'X' to reset the transform
 - Press 'N' to reset north
+- Press 'R' to toggle raster
 - Press Tab to toggle debug information
 - Press Esc to quit
 
@@ -130,3 +131,4 @@ This is automatically taken care of as a build phase if you are using the Xcode 
 - Long-press to reset north
 - Two-finger long press to reset the transform
 - Three-finger long press to toggle debug information
+- Four-finger long press to toggle raster

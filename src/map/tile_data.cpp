@@ -6,13 +6,17 @@
 #include <llmr/geometry/point_buffer.hpp>
 #include <llmr/geometry/text_buffer.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
+#include <llmr/util/raster.hpp>
 #include <llmr/util/string.hpp>
 
 using namespace llmr;
 
-TileData::TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas)
+TileData::TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const bool use_raster, const bool use_retina)
     : id(id),
+      use_raster(use_raster),
+      use_retina(use_retina),
       state(State::initial),
+      raster(),
       fillVertexBuffer(std::make_shared<FillVertexBuffer>()),
       lineVertexBuffer(std::make_shared<LineVertexBuffer>()),
       pointVertexBuffer(std::make_shared<PointVertexBuffer>()),
@@ -41,9 +45,13 @@ const std::string TileData::toString() const {
 void TileData::request() {
     state = State::loading;
 
-    // Create http request
-    std::string url = util::sprintf(kTileURL,
-        id.z, id.x, id.y);
+    std::string url;
+
+    if (use_raster) {
+        url = util::sprintf(kTileRasterURL, id.z, id.x, id.y, (use_retina ? "@2x" : ""));
+    } else {
+        url = util::sprintf(kTileVectorURL, id.z, id.x, id.y);
+    }
 
     // Note: Somehow this feels slower than the change to request_http()
     std::weak_ptr<TileData> weak_tile = shared_from_this();
@@ -75,6 +83,13 @@ void TileData::cancel() {
 bool TileData::parse() {
     if (state != State::loaded) {
         return false;
+    }
+
+    if (use_raster) {
+        raster = std::make_shared<Raster>();
+        raster->load(data);
+        state = State::parsed;
+        return true;
     }
 
     try {

@@ -1,4 +1,7 @@
 #include <llmr/map/coverage.hpp>
+#include <llmr/util/constants.hpp>
+#include <llmr/util/vec.hpp>
+
 #include <functional>
 #include <cmath>
 
@@ -64,15 +67,28 @@ void _scanTriangle(const llmr::vec2<double> a, const llmr::vec2<double> b, const
     if (bc.dy) _scanSpans(ca, bc, ymin, ymax, scanLine);
 }
 
-std::forward_list<llmr::Tile::ID> llmr::covering_tiles(int32_t zoom, const box& points) {
+std::forward_list<llmr::Tile::ID> llmr::covering_tiles(int32_t zoom, const box& points, const bool use_raster, const bool use_retina) {
     int32_t dim = pow(2, zoom);
     std::forward_list<llmr::Tile::ID> tiles;
 
-    auto scanLine = [&tiles, zoom](int32_t x0, int32_t x1, int32_t y, int32_t ymax) {
+    auto scanLine = [&tiles, zoom, use_raster, use_retina](int32_t x0, int32_t x1, int32_t y, int32_t ymax) {
         int32_t x;
         if (y >= 0 && y <= ymax) {
             for (x = x0; x < x1; x++) {
-                tiles.emplace_front(zoom, x, y);
+                if (use_raster) {
+                    uint32_t search_zoom = zoom;
+                    search_zoom += (uint32_t)((llmr::util::tileSize / 256.0f) - 1.0f);
+                    if (use_retina) {
+                        search_zoom += 1;
+                    }
+                    Tile::ID id = Tile::ID(zoom, x, y);
+                    auto ids = id.children(search_zoom);
+                    for (const Tile::ID& child_id : ids) {
+                        tiles.emplace_front(child_id.z, child_id.x, child_id.y);
+                    }
+                } else {
+                    tiles.emplace_front(zoom, x, y);
+                }
             }
         }
     };

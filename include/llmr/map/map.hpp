@@ -9,6 +9,7 @@
 #include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/renderer/painter.hpp>
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/util/texturepool.hpp>
 
 #include <cstdint>
 #include <string>
@@ -25,9 +26,9 @@ public:
     /* setup */
     void setup(float pixelRatio = 1);
     void loadStyle(const uint8_t *const data, uint32_t bytes);
-    void loadSprite(const std::string& url);
     void loadSettings();
     void resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb_height);
+    void toggleRaster();
 
     /* callback */
     bool render();
@@ -70,12 +71,12 @@ private:
     TileData::State addTile(const Tile::ID& id);
     TileData::State hasTile(const Tile::ID& id);
 
-
     void update();
 
 private:
     Settings& settings;
     Transform transform;
+    Texturepool texturepool;
     Style style;
     Painter painter;
     GlyphAtlas glyphAtlas;
@@ -84,6 +85,8 @@ private:
     int32_t max_zoom;
 
     float pixel_ratio;
+
+    bool use_raster = false;
 
     std::forward_list<Tile> tiles;
     std::forward_list<std::weak_ptr<TileData>> tile_data;

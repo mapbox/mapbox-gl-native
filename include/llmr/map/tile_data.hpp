@@ -22,6 +22,7 @@
 namespace llmr {
 
 class Style;
+class Raster;
 class Bucket;
 class LayerDescription;
 class BucketDescription;
@@ -54,7 +55,7 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas);
+    TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const bool use_raster = false, const bool use_retina = false);
     ~TileData();
 
     void request();
@@ -65,7 +66,10 @@ public:
 
 public:
     const Tile::ID id;
+    const bool use_raster;
+    const bool use_retina;
     std::atomic<State> state;
+    std::shared_ptr<Raster> raster;
 
     // Holds the actual geometries in this tile.
     DebugFontBuffer debugFontBuffer;

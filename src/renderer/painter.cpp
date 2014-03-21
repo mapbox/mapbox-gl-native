@@ -16,6 +16,7 @@
 #include <llmr/platform/gl.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/style/sprite.hpp>
+#include <llmr/util/raster.hpp>
 
 using namespace llmr;
 
@@ -27,7 +28,6 @@ Painter::Painter(Transform& transform, Settings& settings, Style& style)
       style(style) {
 }
 
-
 void Painter::setup() {
     setupShaders();
 
@@ -37,6 +37,7 @@ void Painter::setup() {
     assert(lineShader);
     assert(linejoinShader);
     assert(patternShader);
+    assert(rasterShader);
 
 
     // Blending
@@ -63,6 +64,7 @@ void Painter::setupShaders() {
     linejoinShader = std::make_unique<LinejoinShader>();
     patternShader = std::make_unique<PatternShader>();
     pointShader = std::make_unique<PointShader>();
+    rasterShader = std::make_unique<RasterShader>();
 }
 
 void Painter::resize(int width, int height) {
@@ -114,9 +116,11 @@ void Painter::prepareClippingMask() {
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 }
 
-void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id) {
+void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id, bool opaque) {
     plainShader->setMatrix(matrix);
-    plainShader->setColor(style.computed.background.color);
+    if (opaque) {
+        plainShader->setColor(style.computed.background.color);
+    }
 
     glStencilFunc(GL_ALWAYS, clip_id, 0xFF);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
@@ -149,11 +153,27 @@ void Painter::render(const Tile& tile) {
     matrix = tile.matrix;
     glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
 
-    renderLayers(tile.data, style.layers);
+    if (tile.data->use_raster) {
+        renderRaster(tile.data);
+    } else {
+        renderLayers(tile.data, style.layers);
+    }
 
     if (settings.debug) {
         renderDebug(tile.data);
     }
+}
+
+void Painter::renderRaster(const std::shared_ptr<TileData>& tile_data) {
+    useProgram(rasterShader->program);
+    rasterShader->setMatrix(matrix);
+    rasterShader->setImage(0);
+    rasterShader->setOpacity(tile_data->raster->opacity);
+    tile_data->raster->bind(true);
+
+    coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    glDepthRange(strata, 1.0f);
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
 
 void Painter::renderLayers(const std::shared_ptr<TileData>& tile_data, const std::vector<LayerDescription>& layers) {
@@ -290,7 +310,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             patternShader->setPatternBottomRight({{ imagePos.br.x, imagePos.br.y }});
             patternShader->setColor(fill_color);
             patternShader->setMix(mix);
-            style.sprite->bind(true);
+            style.sprite->raster->bind(true);
 
             // Draw the actual triangles into the color & stencil buffer.
             glDepthRange(strata + strata_epsilon, 1.0f);
@@ -447,7 +467,9 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
 #endif
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
-    style.sprite->bind(transform.rotating || transform.scaling || transform.panning);
+    if (*style.sprite->raster) {
+        style.sprite->raster->bind(transform.rotating || transform.scaling || transform.panning);
+    }
     glDepthRange(strata, 1.0f);
     bucket.drawPoints(*pointShader);
 }
