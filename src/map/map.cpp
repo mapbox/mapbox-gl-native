@@ -15,8 +15,8 @@ Map::Map(Settings& settings)
       transform(),
       texturepool(),
       style(),
-      painter(transform, settings, style),
       glyphAtlas(1024, 1024),
+      painter(transform, settings, style, glyphAtlas),
       min_zoom(0),
       max_zoom((use_raster ? kTileRasterMaxZoom : kTileVectorMaxZoom)) {
 }
@@ -442,8 +442,6 @@ bool Map::render() {
     if (transform.needsAnimation()) {
         transform.updateAnimations();
     }
-
-    glyphAtlas.bind();
 
     if (*style.sprite->raster && !style.sprite->raster->textured) {
         style.sprite->raster->setTexturepool(&texturepool);

@@ -83,7 +83,11 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to point styles that have actual
             // values so as to not override with default values.
             llmr::TextProperties& text = computed.texts[layer_name];
+            text.hidden = layer.hidden(z);
             text.color = layer.color;
+            text.size = layer.size(z);
+            text.halo = layer.halo;
+            text.haloRadius = layer.haloRadius(z);
         }
 
         // Cascade background

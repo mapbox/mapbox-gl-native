@@ -6,6 +6,7 @@
 #include <llmr/geometry/vertex_buffer.hpp>
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/renderer/frame_history.hpp>
 
 #include <llmr/shader/plain_shader.hpp>
 #include <llmr/shader/outline_shader.hpp>
@@ -30,7 +31,7 @@ class TextBucket;
 
 class Painter : private util::noncopyable {
 public:
-    Painter(Transform& transform, Settings& settings, Style& style);
+    Painter(Transform& transform, Settings& settings, Style& style, GlyphAtlas& glyphAtlas);
 
     void setup();
     void clear();
@@ -68,8 +69,9 @@ private:
     Transform& transform;
     Settings& settings;
     Style& style;
+    GlyphAtlas& glyphAtlas;
 
-
+    FrameHistory frameHistory;
 
     uint32_t gl_program = 0;
     float gl_lineWidth = 0;

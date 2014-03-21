@@ -78,8 +78,8 @@ private:
     Transform transform;
     Texturepool texturepool;
     Style style;
-    Painter painter;
     GlyphAtlas glyphAtlas;
+    Painter painter;
 
     int32_t min_zoom;
     int32_t max_zoom;

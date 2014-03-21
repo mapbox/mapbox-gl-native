@@ -22,10 +22,11 @@ using namespace llmr;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(Transform& transform, Settings& settings, Style& style)
+Painter::Painter(Transform& transform, Settings& settings, Style& style, GlyphAtlas& glyphAtlas)
     : transform(transform),
       settings(settings),
-      style(style) {
+      style(style),
+      glyphAtlas(glyphAtlas) {
 }
 
 void Painter::setup() {
@@ -151,6 +152,8 @@ void Painter::render(const Tile& tile) {
     if (tile.data->state != TileData::State::parsed) {
         return;
     }
+
+    frameHistory.record(transform.getZoom());
 
     matrix = tile.matrix;
     glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
@@ -477,9 +480,116 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
 }
 
 void Painter::renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
-    // noop
+    // Abort early.
+    if (pass == Opaque) return;
+    if (bucket.empty()) return;
+
+    const TextProperties& properties = style.computed.texts[layer_name];
+    if (properties.hidden) return;
+
+    mat4 exMatrix;
+    matrix::copy(exMatrix, projMatrix);
+    if (bucket.geom_desc.path == TextPathType::Curve) {
+        matrix::rotate_z(exMatrix, exMatrix, transform.getAngle());
+    }
+
+    // var rotate = layerStyle.rotate || 0;
+    float rotate = 0.0f;
+    if (rotate != 0.0f) {
+        matrix::rotate_z(exMatrix, exMatrix, rotate);
+    }
+
+    // If layerStyle.size > bucket.info.fontSize then labels may collide
+    float fontSize = fmin(properties.size, bucket.geom_desc.font_size);
+    matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
+
     useProgram(textShader->program);
     textShader->setMatrix(matrix);
+    textShader->setExtrudeMatrix(exMatrix);
+
+    glyphAtlas.bind();
+    textShader->setTextureSize({{ static_cast<float>(glyphAtlas.width), static_cast<float>(glyphAtlas.height) }});
+
+    // bucket.geometry.glyphVertex.bind(gl);
+
+    // var ubyte = gl.UNSIGNED_BYTE;
+
+    // gl.vertexAttribPointer(shader.a_pos,          2, gl.SHORT, false, 16, 0);
+    // gl.vertexAttribPointer(shader.a_offset,       2, gl.SHORT, false, 16, 4);
+    // gl.vertexAttribPointer(shader.a_tex,          2, ubyte,    false, 16, 8);
+    // gl.vertexAttribPointer(shader.a_labelminzoom, 1, ubyte,    false, 16, 10);
+    // gl.vertexAttribPointer(shader.a_minzoom,      1, ubyte,    false, 16, 11);
+    // gl.vertexAttribPointer(shader.a_maxzoom,      1, ubyte,    false, 16, 12);
+    // gl.vertexAttribPointer(shader.a_angle,        1, ubyte,    false, 16, 13);
+    // gl.vertexAttribPointer(shader.a_rangeend,     1, ubyte,    false, 16, 14);
+    // gl.vertexAttribPointer(shader.a_rangestart,   1, ubyte,    false, 16, 15);
+
+    textShader->setGamma(2.5f / fontSize / transform.pixelRatio);
+
+    // Convert the -pi..pi to an int8 range.
+    float angle = round((transform.getAngle() + rotate) / M_PI * 128);
+
+    // adjust min/max zooms for variable font sies
+    float zoomAdjust = log(fontSize / bucket.geom_desc.font_size) / log(2);
+
+    textShader->setAngle((int32_t)(angle + 256) % 256);
+    textShader->setFlip(bucket.geom_desc.path == TextPathType::Curve ? 1 : 0);
+    textShader->setZoom((transform.getZoom() - zoomAdjust) * 10); // current zoom level
+
+    // Label fading
+    const float duration = 300.0f;
+    const float currentTime = platform::time() * 1000;
+
+    std::deque<FrameSnapshot> &history = frameHistory.history;
+
+    // Remove frames until only one is outside the duration, or until there are only three
+    while (history.size() > 3 && history[1].time + duration < currentTime) {
+        history.pop_front();
+    }
+
+    if (history[1].time + duration < currentTime) {
+        history[0].z = history[1].z;
+    }
+
+    size_t frameLen = history.size();
+    assert("there should never be less than three frames in the history" && frameLen >= 3);
+
+    // Find the range of zoom levels we want to fade between
+    float startingZ = history.front().z;
+    const FrameSnapshot lastFrame = history.back();
+    float endingZ = lastFrame.z;
+    float lowZ = fmin(startingZ, endingZ);
+    float highZ = fmax(startingZ, endingZ);
+
+    // Calculate the speed of zooming, and how far it would zoom in terms of zoom levels in one duration
+    float zoomDiff = endingZ - history[1].z,
+        timeDiff = lastFrame.time - history[1].time;
+    if (timeDiff > duration) timeDiff = 1;
+    float fadedist = zoomDiff / (timeDiff / duration);
+
+    if (isnan(fadedist)) fprintf(stderr, "fadedist should never be NaN");
+
+    // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
+    // bump is how much farther it would have been if it had continued zooming at the same rate
+    float bump = (currentTime - lastFrame.time) / duration * fadedist;
+
+    textShader->setFadeDist(fadedist * 10);
+    textShader->setMinFadeZoom(floor(lowZ * 10));
+    textShader->setMaxFadeZoom(floor(highZ * 10));
+    textShader->setFadeZoom((transform.getZoom() + bump) * 10);
+
+    // We're drawing in the translucent pass which is bottom-to-top, so we need
+    // to draw the halo first.
+    if (properties.halo[3] > 0.0f) {
+        textShader->setColor(properties.halo);
+        textShader->setBuffer(properties.haloRadius);
+        bucket.drawGlyphs(*textShader);
+    }
+
+    // Then, we draw the text over the halo
+    textShader->setColor(properties.color);
+    textShader->setBuffer((256.0f - 64.0f) / 256.0f);
+    bucket.drawGlyphs(*textShader);
 }
 
 void Painter::renderDebug(const TileData::Ptr& tile_data) {

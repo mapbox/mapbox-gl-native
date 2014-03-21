@@ -34,10 +34,12 @@ public:
     void removeGlyphs(uint64_t tile_id);
     void bind();
 
-private:
-    std::mutex mtx;
+public:
     const uint16_t width = 0;
     const uint16_t height = 0;
+
+private:
+    std::mutex mtx;
     BinPack<uint16_t> bin;
     std::map<std::string, std::map<uint32_t, GlyphValue>> index;
     char *const data = nullptr;

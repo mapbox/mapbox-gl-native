@@ -65,6 +65,8 @@ TextShader::TextShader()
 }
 
 void TextShader::bind(char *offset) {
+    fprintf(stderr, "bind textshader\n");
+
     glEnableVertexAttribArray(a_pos);
     glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 16, offset + 0);
 
@@ -123,7 +125,7 @@ void TextShader::setGamma(float new_gamma) {
     }
 }
 
-void TextShader::setExmatrix(const std::array<float, 16> &new_exmatrix) {
+void TextShader::setExtrudeMatrix(const std::array<float, 16> &new_exmatrix) {
     if (exmatrix != new_exmatrix) {
         glUniformMatrix4fv(u_exmatrix, 1, GL_FALSE, new_exmatrix.data());
         exmatrix = new_exmatrix;
@@ -151,35 +153,35 @@ void TextShader::setFlip(float new_flip) {
     }
 }
 
-void TextShader::setFadedist(float new_fadedist) {
+void TextShader::setFadeDist(float new_fadedist) {
     if (fadedist != new_fadedist) {
         glUniform1f(u_fadedist, new_fadedist);
         fadedist = new_fadedist;
     }
 }
 
-void TextShader::setMinfadezoom(float new_minfadezoom) {
+void TextShader::setMinFadeZoom(float new_minfadezoom) {
     if (minfadezoom != new_minfadezoom) {
         glUniform1f(u_minfadezoom, new_minfadezoom);
         minfadezoom = new_minfadezoom;
     }
 }
 
-void TextShader::setMaxfadezoom(float new_maxfadezoom) {
+void TextShader::setMaxFadeZoom(float new_maxfadezoom) {
     if (maxfadezoom != new_maxfadezoom) {
         glUniform1f(u_maxfadezoom, new_maxfadezoom);
         maxfadezoom = new_maxfadezoom;
     }
 }
 
-void TextShader::setFadezoom(float new_fadezoom) {
+void TextShader::setFadeZoom(float new_fadezoom) {
     if (fadezoom != new_fadezoom) {
         glUniform1f(u_fadezoom, new_fadezoom);
         fadezoom = new_fadezoom;
     }
 }
 
-void TextShader::setTexsize(const std::array<float, 2> &new_texsize) {
+void TextShader::setTextureSize(const std::array<float, 2> &new_texsize) {
     if (texsize != new_texsize) {
         glUniform2fv(u_texsize, 1, new_texsize.data());
         texsize = new_texsize;

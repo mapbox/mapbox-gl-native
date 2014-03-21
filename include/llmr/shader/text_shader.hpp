@@ -15,15 +15,15 @@ public:
     void setColor(const std::array<float, 4> &color);
     void setBuffer(float buffer);
     void setGamma(float gamma);
-    void setExmatrix(const std::array<float, 16> &exmatrix);
+    void setExtrudeMatrix(const std::array<float, 16> &exmatrix);
     void setAngle(float angle);
     void setZoom(float zoom);
     void setFlip(float flip);
-    void setFadedist(float fadedist);
-    void setMinfadezoom(float minfadezoom);
-    void setMaxfadezoom(float maxfadezoom);
-    void setFadezoom(float fadezoom);
-    void setTexsize(const std::array<float, 2> &texsize);
+    void setFadeDist(float fadedist);
+    void setMinFadeZoom(float minfadezoom);
+    void setMaxFadeZoom(float maxfadezoom);
+    void setFadeZoom(float fadezoom);
+    void setTextureSize(const std::array<float, 2> &texsize);
 
 private:
     int32_t a_pos = -1;

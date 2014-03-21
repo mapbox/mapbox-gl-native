@@ -113,11 +113,19 @@ struct FillProperties {
 };
 
 struct TextClass {
-    Color color = {{ 1, 1, 1, 1 }};
+    FunctionProperty<bool> hidden;
+    Color color = {{ 0, 0, 0, 1 }};
+    Color halo = {{ 1, 1, 1, 0.75 }};
+    FunctionProperty<float> haloRadius = 0.25f;
+    FunctionProperty<float> size = 12.0f;
 };
 
 struct TextProperties {
-    Color color = {{ 1, 1, 1, 1 }};
+    bool hidden = false;
+    Color color = {{ 0, 0, 0, 1 }};
+    Color halo = {{ 1, 1, 1, 0.75 }};
+    float haloRadius = 0.25f;
+    float size = 12.0f;
 };
 
 struct BackgroundClass {

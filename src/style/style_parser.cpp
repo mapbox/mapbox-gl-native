@@ -268,24 +268,35 @@ std::string StyleParser::parseString(JSVal value) {
 }
 
 Color StyleParser::parseColor(JSVal value) {
-    if (!value.IsString()) {
+    if (value.IsArray()) {
+        // [ r, g, b, a] array
+        if (value.Size() != 4) {
+            throw Style::exception("color array must have four elements");
+        }
+
+        JSVal r = value[(rapidjson::SizeType)0], g = value[1], b = value[2], a = value[3];
+        if (!r.IsNumber() || !g.IsNumber() || !b.IsNumber() || !a.IsNumber()) {
+            throw Style::exception("color values must be numbers");
+        }
+
+        return {{static_cast<float>(r.GetDouble() / 255),
+                 static_cast<float>(g.GetDouble() / 255),
+                 static_cast<float>(b.GetDouble() / 255),
+                 static_cast<float>(a.GetDouble())}};
+
+    } else if (!value.IsString()) {
         throw Style::exception("color value must be a string");
     }
 
-    const std::string str { value.GetString(), value.GetStringLength() };
+    const std::string str{value.GetString(), value.GetStringLength()};
 
     auto it = constants.find(str);
     if (it != constants.end()) {
         return parseColor(*it->second);
     } else {
         CSSColorParser::Color css_color = CSSColorParser::parse(str);
-        return {{
-                (float)css_color.r / 255,
-                (float)css_color.g / 255,
-                (float)css_color.b / 255,
-                css_color.a
-            }
-        };
+        return {{(float)css_color.r / 255, (float)css_color.g / 255,
+                 (float)css_color.b / 255, css_color.a}};
     }
 }
 
@@ -477,8 +488,24 @@ PointClass StyleParser::parsePointClass(JSVal value) {
 TextClass StyleParser::parseTextClass(JSVal value) {
     TextClass klass;
 
+    if (value.HasMember("hidden")) {
+        klass.hidden = parseBoolFunction(value["hidden"]);
+    }
+
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
+    }
+
+    if (value.HasMember("stroke")) {
+        klass.halo = parseColor(value["stroke"]);
+    }
+
+    if (value.HasMember("strokeWidth")) {
+        klass.haloRadius = parseFloatFunction(value["strokeWidth"]);
+    }
+
+    if (value.HasMember("size")) {
+        klass.size = parseFloatFunction(value["size"]);
     }
 
     return klass;
