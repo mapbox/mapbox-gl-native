@@ -12,9 +12,9 @@ Tile::ID Tile::ID::parent(int8_t parent_z) const {
     assert(parent_z < z);
     int32_t dim = pow(2, z - parent_z);
     return Tile::ID{
-        static_cast<int8_t>(parent_z),
-        static_cast<int32_t>(floor((float)x / dim)),
-        static_cast<int32_t>(y / dim)
+        parent_z,
+        (x >= 0 ? x : x - dim + 1) / dim,
+        y / dim
     };
 }
 
