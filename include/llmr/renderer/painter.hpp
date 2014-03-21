@@ -14,6 +14,7 @@
 #include <llmr/shader/linejoin_shader.hpp>
 #include <llmr/shader/point_shader.hpp>
 #include <llmr/shader/raster_shader.hpp>
+#include <llmr/shader/text_shader.hpp>
 
 namespace llmr {
 
@@ -84,6 +85,7 @@ private:
     std::unique_ptr<PatternShader> patternShader;
     std::unique_ptr<PointShader> pointShader;
     std::unique_ptr<RasterShader> rasterShader;
+    std::unique_ptr<TextShader> textShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     VertexBuffer tileStencilBuffer = {

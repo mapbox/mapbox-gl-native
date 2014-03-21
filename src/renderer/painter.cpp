@@ -38,6 +38,7 @@ void Painter::setup() {
     assert(linejoinShader);
     assert(patternShader);
     assert(rasterShader);
+    assert(textShader);
 
 
     // Blending
@@ -65,6 +66,7 @@ void Painter::setupShaders() {
     patternShader = std::make_unique<PatternShader>();
     pointShader = std::make_unique<PointShader>();
     rasterShader = std::make_unique<RasterShader>();
+    textShader = std::make_unique<TextShader>();
 }
 
 void Painter::resize(int width, int height) {
@@ -476,6 +478,8 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
 
 void Painter::renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
     // noop
+    useProgram(textShader->program);
+    textShader->setMatrix(matrix);
 }
 
 void Painter::renderDebug(const TileData::Ptr& tile_data) {
