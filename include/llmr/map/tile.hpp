@@ -18,7 +18,7 @@ public:
         int8_t z = 0;
         int32_t x = 0, y = 0;
 
-        inline ID(uint8_t z, uint32_t x, uint32_t y)
+        inline ID(int8_t z, int32_t x, int32_t y)
             : z(z), x(x), y(y) {
         }
 
@@ -31,7 +31,7 @@ public:
             return z == rhs.z && x == rhs.x && y == rhs.y;
         }
 
-        ID parent(int32_t z) const;
+        ID parent(int8_t z) const;
         void normalize();
         ID normalized() const;
         std::forward_list<ID> children(int32_t z) const;

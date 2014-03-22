@@ -8,15 +8,14 @@ Tile::Tile(const ID& id)
     : id(id) {
 }
 
-Tile::ID Tile::ID::parent(int32_t parent_z) const {
+Tile::ID Tile::ID::parent(int8_t parent_z) const {
     assert(parent_z < z);
-    ID pos(z, x, y);
-    while (pos.z > parent_z) {
-        --pos.z;
-        pos.x = floor(pos.x / 2);
-        pos.y = floor(pos.y / 2);
-    }
-    return pos;
+    int32_t dim = pow(2, z - parent_z);
+    return Tile::ID{
+        parent_z,
+        (x >= 0 ? x : x - dim + 1) / dim,
+        y / dim
+    };
 }
 
 std::forward_list<Tile::ID> Tile::ID::children(int32_t child_z) const {
