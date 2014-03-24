@@ -30,7 +30,7 @@ struct Glyph {
         : rect(rect), metrics(metrics) {}
 
     operator bool() const {
-        return !metrics;
+        return !metrics && !rect;
     }
 
     const Rect<uint16_t> rect;

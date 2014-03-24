@@ -9,7 +9,7 @@ struct Rect {
     T x = 0, y = 0;
     T w = 0, h = 0;
 
-    operator bool() const { return w == 0 && h == 0; }
+    operator bool() const { return w == 0 || h == 0; }
 };
 }
 

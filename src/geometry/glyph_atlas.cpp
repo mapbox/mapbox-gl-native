@@ -39,7 +39,7 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tile_id, const std::string& face_na
     }
 
     // The glyph bitmap has zero width.
-    if (!glyph.metrics.width) {
+    if (!glyph.bitmap.size()) {
         return Rect<uint16_t>{ 0, 0, 0, 0 };
     }
 
