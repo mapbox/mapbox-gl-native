@@ -583,12 +583,14 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     if (properties.halo[3] > 0.0f) {
         textShader->setColor(properties.halo);
         textShader->setBuffer(properties.haloRadius);
+        glDepthRange(strata, 1.0f);
         bucket.drawGlyphs(*textShader);
     }
 
     // Then, we draw the text over the halo
     textShader->setColor(properties.color);
     textShader->setBuffer((256.0f - 64.0f) / 256.0f);
+    glDepthRange(strata + strata_epsilon, 1.0f);
     bucket.drawGlyphs(*textShader);
 }
 
