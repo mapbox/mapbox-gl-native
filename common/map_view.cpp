@@ -256,7 +256,11 @@ void show_debug_image(std::string name, const char *data, size_t width, size_t h
     glfwSetWindowSize(debug_window, width, height);
     glfwMakeContextCurrent(debug_window);
 
-    glPixelZoom(1.0, -1.0);
+    int fb_width, fb_height;
+    glfwGetFramebufferSize(debug_window, &fb_width, &fb_height);
+    float scale = (float)fb_width / (float)width;
+
+    glPixelZoom(scale, -scale);
     glRasterPos2f(-1.0f, 1.0f);
     glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
     glfwSwapBuffers(debug_window);
