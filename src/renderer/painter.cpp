@@ -509,20 +509,6 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     glyphAtlas.bind();
     textShader->setTextureSize({{ static_cast<float>(glyphAtlas.width), static_cast<float>(glyphAtlas.height) }});
 
-    // bucket.geometry.glyphVertex.bind(gl);
-
-    // var ubyte = gl.UNSIGNED_BYTE;
-
-    // gl.vertexAttribPointer(shader.a_pos,          2, gl.SHORT, false, 16, 0);
-    // gl.vertexAttribPointer(shader.a_offset,       2, gl.SHORT, false, 16, 4);
-    // gl.vertexAttribPointer(shader.a_tex,          2, ubyte,    false, 16, 8);
-    // gl.vertexAttribPointer(shader.a_labelminzoom, 1, ubyte,    false, 16, 10);
-    // gl.vertexAttribPointer(shader.a_minzoom,      1, ubyte,    false, 16, 11);
-    // gl.vertexAttribPointer(shader.a_maxzoom,      1, ubyte,    false, 16, 12);
-    // gl.vertexAttribPointer(shader.a_angle,        1, ubyte,    false, 16, 13);
-    // gl.vertexAttribPointer(shader.a_rangeend,     1, ubyte,    false, 16, 14);
-    // gl.vertexAttribPointer(shader.a_rangestart,   1, ubyte,    false, 16, 15);
-
     textShader->setGamma(2.5f / fontSize / transform.pixelRatio);
 
     // Convert the -pi..pi to an int8 range.
