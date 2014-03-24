@@ -305,10 +305,9 @@ void Placement::addFeature(TextBucket& bucket,
         PlacementProperty place =
             collision.place(glyphs, anchor, anchor.scale, maxPlacementScale,
                             padding, horizontal);
-
-        if (place.zoom >= 0.0f) {
+        if (place) {
             bucket.addGlyphs(glyphs, place.zoom, place.rotationRange,
-                               zoom - zOffset);
+                             zoom - zOffset);
         }
     }
 }
