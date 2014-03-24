@@ -45,6 +45,9 @@ bool stops(float z, const std::vector<bool>& values);
 float linear(float z, const std::vector<float>& values);
 bool linear(float z, const std::vector<bool>& values);
 
+float exponential(float z, const std::vector<float>& values);
+bool exponential(float z, const std::vector<bool>& values);
+
 }
 
 

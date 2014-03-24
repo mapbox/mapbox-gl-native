@@ -310,6 +310,8 @@ typename FunctionProperty<T>::fn StyleParser::parseFunctionType(JSVal type) {
             return &functions::linear;
         } else if (t == "stops") {
             return &functions::stops;
+        } else if (t == "exponential") {
+            return &functions::exponential;
         } else {
             throw Style::exception("unknown function type");
         }
