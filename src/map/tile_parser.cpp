@@ -32,7 +32,7 @@ void TileParser::parseGlyphs() {
         for (const VectorTileGlyph &glyph : face.glyphs) {
             const Rect<uint16_t> rect =
                 glyphAtlas.addGlyph((uint64_t)tile.id, name, glyph);
-            glyphs.emplace_back(Glyph{rect, glyph.metrics});
+            glyphs.emplace(glyph.id, Glyph{rect, glyph.metrics});
         }
     }
 }
@@ -141,9 +141,9 @@ std::shared_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
     // TODO: currently hardcoded to use the first font stack.
     const std::map<Value, Shaping>& shaping = layer.shaping.begin()->second;
 
-    const FaceGlyphPositions& const_faces = faces;
+    const Faces& const_faces = faces;
 
-    IndexedFaceGlyphPositions faces;
+    IndexedFaces faces;
     for (const std::string& face : layer.faces) {
         auto it = const_faces.find(face);
         if (it == const_faces.end()) {

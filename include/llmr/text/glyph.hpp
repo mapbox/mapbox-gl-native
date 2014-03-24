@@ -37,9 +37,9 @@ struct Glyph {
     const GlyphMetrics metrics;
 };
 
-typedef std::vector<Glyph> GlyphPositions;
-typedef std::map<std::string, GlyphPositions> FaceGlyphPositions;
-typedef std::vector<const GlyphPositions *> IndexedFaceGlyphPositions;
+typedef std::map<uint32_t, Glyph> GlyphPositions;
+typedef std::map<std::string, GlyphPositions> Faces;
+typedef std::vector<const GlyphPositions *> IndexedFaces;
 
 class GlyphPlacement {
 public:

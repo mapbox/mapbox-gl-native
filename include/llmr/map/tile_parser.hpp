@@ -26,7 +26,7 @@ private:
     TileData& tile;
     const Style& style;
     GlyphAtlas& glyphAtlas;
-    FaceGlyphPositions faces;
+    Faces faces;
     Placement placement;
 };
 

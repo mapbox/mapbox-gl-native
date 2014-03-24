@@ -36,7 +36,7 @@ public:
                    PlacementRange placementRange, float zoom);
 
     void addFeature(const VectorTileFeature &feature,
-                    const IndexedFaceGlyphPositions &faces,
+                    const IndexedFaces &faces,
                     const std::map<Value, Shaping> &shapings);
 
     bool empty() const;

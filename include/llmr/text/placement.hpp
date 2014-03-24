@@ -18,9 +18,9 @@ public:
 
     void addFeature(TextBucket &bucket, const std::vector<Coordinate> &line,
                     const BucketGeometryDescription &info,
-                    const IndexedFaceGlyphPositions &faces,
+                    const IndexedFaces &faces,
                     const Shaping &shaping);
-    float measureText(const IndexedFaceGlyphPositions &faces,
+    float measureText(const IndexedFaces &faces,
                       const Shaping &shaping);
 
 private:

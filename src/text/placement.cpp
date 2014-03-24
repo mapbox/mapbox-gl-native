@@ -33,14 +33,21 @@ bool byScale(const Anchor &a, const Anchor &b) { return a.scale < b.scale; }
 static const Glyph null_glyph;
 
 inline const Glyph &getGlyph(const GlyphPlacement &placed,
-                             const IndexedFaceGlyphPositions &faces) {
+                             const IndexedFaces &faces) {
     if (placed.face < faces.size()) {
         const GlyphPositions &face = *faces[placed.face];
         if (&face) {
-            if (placed.glyph < face.size()) {
-                return face[placed.glyph];
+            auto it = face.find(placed.glyph);
+            if (it != face.end()) {
+                return it->second;
+            } else {
+                fprintf(stderr, "glyph %d does not exist\n", placed.glyph);
             }
+        } else {
+            fprintf(stderr, "face pointer is null\n");
         }
+    } else {
+        fprintf(stderr, "face does not exist\n");
     }
 
     return null_glyph;
@@ -137,7 +144,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
 }
 
 PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
-                       const IndexedFaceGlyphPositions &faces, float fontScale,
+                       const IndexedFaces &faces, float fontScale,
                        bool horizontal, const std::vector<Coordinate> &line,
                        float maxAngleDelta, float rotate) {
     // The total text advance is the width of this label.
@@ -260,7 +267,7 @@ PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
 void Placement::addFeature(TextBucket& bucket,
                            const std::vector<Coordinate> &line,
                            const BucketGeometryDescription &info,
-                           const IndexedFaceGlyphPositions &faces,
+                           const IndexedFaces &faces,
                            const Shaping &shaping) {
 
     const bool horizontal = info.path == TextPathType::Horizontal;
@@ -306,7 +313,7 @@ void Placement::addFeature(TextBucket& bucket,
     }
 }
 
-float Placement::measureText(const IndexedFaceGlyphPositions &faces,
+float Placement::measureText(const IndexedFaces &faces,
                              const Shaping &shaping) {
     float advance = 0;
 
