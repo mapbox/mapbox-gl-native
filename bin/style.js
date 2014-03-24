@@ -248,7 +248,8 @@ module.exports = {
                 "country_label": {
                     "type": "text",
                     "stroke": [ 1, 1, 1, 0.7 ],
-                    "color": "text"
+                    "color": "text",
+                    "size": 16
                 },
                 "place_label": {
                     "type": "text",
