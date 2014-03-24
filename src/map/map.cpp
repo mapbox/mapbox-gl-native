@@ -46,7 +46,7 @@ void Map::loadSettings() {
     transform.setAngle(settings.angle);
     transform.setScale(settings.scale);
     transform.setLonLat(settings.longitude, settings.latitude);
-    style.cascade(transform.getZoom());
+    style.cascade(transform.getNormalizedZoom());
     update();
 }
 
@@ -87,7 +87,7 @@ void Map::stopPanning() {
 
 void Map::scaleBy(double ds, double cx, double cy, double duration) {
     transform.scaleBy(ds, cx, cy, duration);
-    style.cascade(transform.getZoom());
+    style.cascade(transform.getNormalizedZoom());
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);
@@ -137,7 +137,7 @@ void Map::getLonLat(double& lon, double& lat) const {
 
 void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
     transform.setLonLatZoom(lon, lat, zoom, duration);
-    style.cascade(transform.getZoom());
+    style.cascade(transform.getNormalizedZoom());
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);
@@ -151,7 +151,7 @@ void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
 
 void Map::setScale(double scale, double cx, double cy, double duration) {
     transform.setScale(scale, cx, cy, duration);
-    style.cascade(transform.getZoom());
+    style.cascade(transform.getNormalizedZoom());
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);
@@ -161,7 +161,7 @@ void Map::setScale(double scale, double cx, double cy, double duration) {
 
 void Map::setZoom(double zoom, double duration) {
     transform.setZoom(zoom, duration);
-    style.cascade(transform.getZoom());
+    style.cascade(transform.getNormalizedZoom());
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);
@@ -215,7 +215,7 @@ void Map::resetPosition() {
     transform.setAngle(0);
     transform.setLonLat(0, 0);
     transform.setZoom(0);
-    style.cascade(transform.getZoom());
+    style.cascade(transform.getNormalizedZoom());
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);

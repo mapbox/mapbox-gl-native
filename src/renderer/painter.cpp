@@ -153,7 +153,7 @@ void Painter::render(const Tile& tile) {
         return;
     }
 
-    frameHistory.record(transform.getZoom());
+    frameHistory.record(transform.getNormalizedZoom());
 
     matrix = tile.matrix;
     glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
@@ -534,7 +534,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 
     textShader->setAngle((int32_t)(angle + 256) % 256);
     textShader->setFlip(bucket.geom_desc.path == TextPathType::Curve ? 1 : 0);
-    textShader->setZoom((transform.getZoom() - zoomAdjust) * 10); // current zoom level
+    textShader->setZoom((transform.getNormalizedZoom() - zoomAdjust) * 10); // current zoom level
 
     // Label fading
     const float duration = 300.0f;
