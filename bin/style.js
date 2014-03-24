@@ -106,7 +106,8 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "font": "Open Sans, Jomolhari, Siyam Rupali, Alef, Arial Unicode MS",
-            "fontSize": 18
+            "fontSize": 18,
+            "alwaysVisible": true
         },
         "road_label": {
             "source": "streets",

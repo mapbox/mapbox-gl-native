@@ -493,8 +493,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
         matrix::rotate_z(exMatrix, exMatrix, transform.getAngle());
     }
 
-    // var rotate = layerStyle.rotate || 0;
-    float rotate = 0.0f;
+    const float rotate = properties.rotate;
     if (rotate != 0.0f) {
         matrix::rotate_z(exMatrix, exMatrix, rotate);
     }

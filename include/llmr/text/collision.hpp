@@ -14,7 +14,7 @@ public:
     PlacementProperty place(const PlacedGlyphs &boxes,
                             const CollisionAnchor &anchor,
                             float minPlacementScale, float maxPlacementScale,
-                            float padding, bool horizontal);
+                            float padding, bool horizontal, bool alwaysVisible);
     float getPlacementScale(const GlyphBoxes &glyphs, float minPlacementScale,
                             float maxPlacementScale, float pad);
     PlacementRange getPlacementRange(const GlyphBoxes &glyphs,

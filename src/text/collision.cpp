@@ -74,7 +74,7 @@ PlacementProperty Collision::place(const PlacedGlyphs &placed_glyphs,
                                    const CollisionAnchor &anchor,
                                    float minPlacementScale,
                                    float maxPlacementScale, float padding,
-                                   bool horizontal) {
+                                   bool horizontal, bool alwaysVisible) {
 
     float minScale = std::numeric_limits<float>::infinity();
     for (const PlacedGlyph &placed_glyph : placed_glyphs) {
@@ -111,8 +111,9 @@ PlacementProperty Collision::place(const PlacedGlyphs &placed_glyphs,
 
     // Calculate the minimum scale the entire label can be shown without
     // collisions
-    float scale = getPlacementScale(glyphs, minPlacementScale,
-                                    maxPlacementScale, padding);
+    float scale = alwaysVisible ? minPlacementScale
+                                : getPlacementScale(glyphs, minPlacementScale,
+                                                    maxPlacementScale, padding);
 
     // Return if the label can never be placed without collision
     if (scale < 0 || scale == std::numeric_limits<float>::infinity()) {

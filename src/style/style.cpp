@@ -88,6 +88,8 @@ void Style::cascade(float z) {
             text.size = layer.size(z);
             text.halo = layer.halo;
             text.haloRadius = layer.haloRadius(z);
+            text.rotate = layer.rotate(z);
+            text.alwaysVisible = layer.alwaysVisible(z);
         }
 
         // Cascade background

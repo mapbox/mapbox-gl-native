@@ -529,6 +529,14 @@ TextClass StyleParser::parseTextClass(JSVal value) {
         klass.size = parseFloatFunction(value["size"]);
     }
 
+    if (value.HasMember("rotate")) {
+        klass.rotate = parseFloatFunction(value["rotate"]);
+    }
+
+    if (value.HasMember("alwaysVisible")) {
+        klass.alwaysVisible = parseBoolFunction(value["alwaysVisible"]);
+    }
+
     return klass;
 }
 
