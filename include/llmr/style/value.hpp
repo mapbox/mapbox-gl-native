@@ -8,6 +8,8 @@ namespace llmr {
 
 typedef util::variant<bool, int64_t, uint64_t, double, std::string> Value;
 
+std::string toString(const Value& value);
+
 Value parseValue(pbf data);
 
 }
