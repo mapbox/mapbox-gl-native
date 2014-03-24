@@ -93,6 +93,12 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("text field must be a string");
             }
+        } else if (name == "path") {
+            if (value.IsString()) {
+                bucket.geometry.path = textPathType({ value.GetString(), value.GetStringLength() });
+            } else {
+                throw Style::exception("curve must be a string");
+            }
         } else if (name == "miterLimit") {
             if (value.IsNumber()) {
                 bucket.geometry.miter_limit = value.GetDouble();
@@ -105,7 +111,20 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("round limit must be a number");
             }
+        } else if (name == "textMinDistance") {
+            if (value.IsNumber()) {
+                bucket.geometry.textMinDistance = value.GetDouble();
+            } else {
+                throw Style::exception("text min distance must be a number");
+            }
+        } else if (name == "maxAngleDelta") {
+            if (value.IsNumber()) {
+                bucket.geometry.maxAngleDelta = value.GetDouble();
+            } else {
+                throw Style::exception("max angle delta must be a number");
+            }
         }
+
     }
 
     if (bucket.feature_type == BucketType::None) {
