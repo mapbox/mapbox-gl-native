@@ -279,9 +279,9 @@ Color StyleParser::parseColor(JSVal value) {
             throw Style::exception("color values must be numbers");
         }
 
-        return {{static_cast<float>(r.GetDouble() / 255),
-                 static_cast<float>(g.GetDouble() / 255),
-                 static_cast<float>(b.GetDouble() / 255),
+        return {{static_cast<float>(r.GetDouble()),
+                 static_cast<float>(g.GetDouble()),
+                 static_cast<float>(b.GetDouble()),
                  static_cast<float>(a.GetDouble())}};
 
     } else if (!value.IsString()) {

@@ -65,8 +65,6 @@ TextShader::TextShader()
 }
 
 void TextShader::bind(char *offset) {
-    fprintf(stderr, "bind textshader\n");
-
     glEnableVertexAttribArray(a_pos);
     glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 16, offset + 0);
 

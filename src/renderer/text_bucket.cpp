@@ -93,11 +93,12 @@ void TextBucket::addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
         // add the two triangles, referencing the four coordinates we just
         // inserted.
         triangleElementsBuffer->add(triangleIndex + 0, triangleIndex + 1,
-                                    triangleIndex + 1);
+                                    triangleIndex + 2);
         triangleElementsBuffer->add(triangleIndex + 1, triangleIndex + 2,
                                     triangleIndex + 3);
 
         triangleGroup.vertex_length += glyph_vertex_length;
+        triangleGroup.elements_length += 2;
     }
 };
 
