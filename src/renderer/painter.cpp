@@ -29,6 +29,10 @@ Painter::Painter(Transform& transform, Settings& settings, Style& style, GlyphAt
       glyphAtlas(glyphAtlas) {
 }
 
+bool Painter::needsAnimation() const {
+    return frameHistory.needsAnimation(300);
+}
+
 void Painter::setup() {
     setupShaders();
 

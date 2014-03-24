@@ -48,6 +48,8 @@ public:
     void prepareClippingMask();
     void drawClippingMask(const mat4& matrix, uint8_t clip_id, bool opaque = true);
     void finishClippingMask();
+
+    bool needsAnimation() const;
 private:
     void setupShaders();
     void renderRaster(const std::shared_ptr<TileData>& tile);

@@ -20,6 +20,8 @@ public:
     // Record frame history that will be used to calculate fading params
     void record(float zoom);
 
+    bool needsAnimation(float duration) const;
+
 public:
     std::deque<FrameSnapshot> history;
 };

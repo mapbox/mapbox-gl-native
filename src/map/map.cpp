@@ -483,5 +483,5 @@ bool Map::render() {
 
     painter.renderMatte();
 
-    return changed || transform.needsAnimation();
+    return changed || transform.needsAnimation() || painter.needsAnimation();
 }
