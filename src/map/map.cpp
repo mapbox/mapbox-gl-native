@@ -243,11 +243,27 @@ void Map::update() {
     platform::restart();
 }
 
+void Map::logTileKeys() {
+    fprintf(stderr, "tile keys: ");
+    for (const auto& tile_pair : tiles) {
+        const uint8_t& zoom = tile_pair.first;
+        fprintf(stderr, "%d ", zoom);
+    }
+    fprintf(stderr, "\n");
+}
 
 TileData::State Map::hasTile(const Tile::ID& id) {
-    for (const Tile& tile : tiles) {
-        if (tile.id == id && tile.data) {
-            return tile.data->state;
+    for (const auto& tile_pair : tiles) {
+        const uint8_t& zoom = tile_pair.first;
+        const std::forward_list<Tile>& zoom_tiles = tile_pair.second;
+        if (zoom == id.z) {
+            auto tile_it = std::find_if(zoom_tiles.begin(), zoom_tiles.end(), [&id](const Tile& tile) {
+                return tile.id == id && tile.data;
+            });
+            if (tile_it != zoom_tiles.end()) {
+                return tile_it->data->state;
+            }
+            break;
         }
     }
 
@@ -261,8 +277,26 @@ TileData::State Map::addTile(const Tile::ID& id) {
         return state;
     }
 
-    tiles.emplace_front(id);
-    Tile& new_tile = tiles.front();
+    bool zoom_mapped = false;
+
+    for (auto& tile_pair : tiles) {
+        const uint8_t& zoom = tile_pair.first;
+        std::forward_list<Tile>& zoom_tiles = tile_pair.second;
+        if (zoom == id.z) {
+            zoom_tiles.emplace_front(id);
+            zoom_mapped = true;
+            break;
+        }
+    }
+
+    if (!zoom_mapped) {
+        tiles.emplace(std::make_pair(id.z, std::forward_list<Tile> ()));
+        auto zoom_tiles_it = tiles.find(id.z);
+        zoom_tiles_it->second.emplace_front(id);
+    }
+
+    auto zoom_tiles_it = tiles.find(id.z);
+    Tile& new_tile = zoom_tiles_it->second.front();
 
     // We couldn't find the tile in the list. Create a new one.
     // Try to find the associated TileData object.
@@ -343,7 +377,6 @@ bool Map::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::for
     return false;
 }
 
-
 bool Map::updateTiles() {
     bool changed = false;
 
@@ -372,14 +405,13 @@ bool Map::updateTiles() {
     // parent or child tiles that are *already* loaded.
     std::forward_list<Tile::ID> retain(required);
 
-    // Add existing child/parent tiles if the actual tile is not yet loaded
+    // Add existing child/parent tiles if the actual tile is not yet loaded.
+    // Tiles are auto-sorted in the map by highest zoom front to back so that
+    // we draw more detailed tiles first.
     for (const Tile::ID& id : required) {
         const TileData::State state = addTile(id);
 
         if (state != TileData::State::parsed) {
-            if (use_raster && (transform.rotating || transform.scaling || transform.panning))
-                break;
-
             // The tile we require is not yet loaded. Try to find a parent or
             // child tile that we already have.
 
@@ -402,22 +434,19 @@ bool Map::updateTiles() {
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
     std::forward_list<Tile::ID> retain_data;
-    tiles.remove_if([&retain, &retain_data, &changed](const Tile & tile) {
-        bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
-        if (obsolete) {
-            changed = true;
-        } else {
-            retain_data.push_front(tile.data->id);
-        }
-        return obsolete;
-    });
 
-    // Sort tiles by zoom level, front to back.
-    // We're painting front-to-back, so we want to draw more detailed tiles first
-    // before filling in other parts with lower zoom levels.
-    tiles.sort([](const Tile & a, const Tile & b) {
-        return a.id.z > b.id.z;
-    });
+    for (auto& tile_pair : tiles) {
+        std::forward_list<Tile>& zoom_tiles = tile_pair.second;
+        zoom_tiles.remove_if([&retain, &retain_data, &changed](const Tile& tile) {
+            bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
+            if (obsolete) {
+                changed = true;
+            } else {
+                retain_data.push_front(tile.data->id);
+            }
+            return obsolete;
+        });
+    }
 
     // Remove all the expired pointers from the list.
     tile_data.remove_if([&retain_data](const std::weak_ptr<TileData>& tile_data) {
@@ -456,27 +485,34 @@ bool Map::render() {
     // the stencil buffer.
     uint8_t i = 1;
     painter.prepareClippingMask();
-    for (Tile& tile : tiles) {
-        if (tile.data && tile.data->state == TileData::State::parsed) {
-            // The position matrix.
-            transform.matrixFor(tile.matrix, tile.id);
-            matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
-            tile.clip_id = i++;
-            painter.drawClippingMask(tile.matrix, tile.clip_id, !tile.data->use_raster);
+
+    for (auto& tile_pair : tiles) {
+        std::forward_list<Tile>& zoom_tiles = tile_pair.second;
+        for (Tile& tile : zoom_tiles) {
+            if (tile.data && tile.data->state == TileData::State::parsed) {
+                // The position matrix.
+                transform.matrixFor(tile.matrix, tile.id);
+                matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
+                tile.clip_id = i++;
+                painter.drawClippingMask(tile.matrix, tile.clip_id, !tile.data->use_raster);
+            }
         }
     }
     painter.finishClippingMask();
 
-    for (const Tile& tile : tiles) {
-        if (tile.data && tile.data->state == TileData::State::parsed) {
-            if (tile.data->use_raster && *tile.data->raster && !tile.data->raster->textured) {
-                tile.data->raster->setTexturepool(&texturepool);
-                tile.data->raster->beginFadeInAnimation();
+    for (auto& tile_pair : tiles) {
+        std::forward_list<Tile>& zoom_tiles = tile_pair.second;
+        for (Tile& tile : zoom_tiles) {
+            if (tile.data && tile.data->state == TileData::State::parsed) {
+                if (tile.data->use_raster && *tile.data->raster && !tile.data->raster->textured) {
+                    tile.data->raster->setTexturepool(&texturepool);
+                    tile.data->raster->beginFadeInAnimation();
+                }
+                if (tile.data->use_raster && tile.data->raster->needsAnimation()) {
+                    tile.data->raster->updateAnimations();
+                }
+                painter.render(tile);
             }
-            if (tile.data->use_raster && tile.data->raster->needsAnimation()) {
-                tile.data->raster->updateAnimations();
-            }
-            painter.render(tile);
         }
     }
 
