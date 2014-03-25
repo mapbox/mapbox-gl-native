@@ -239,7 +239,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     if (bucket.empty()) return;
 
     const FillProperties& properties = style.computed.fills[layer_name];
-    if (properties.hidden) return;
+    if (!properties.enabled) return;
 
     Color fill_color = properties.fill_color;
     fill_color[0] *= properties.opacity;
