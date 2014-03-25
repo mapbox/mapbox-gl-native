@@ -4,12 +4,17 @@
 var fs = require('fs');
 var path = require('path');
 
+var glsl;
+try { glsl = require('glsl-optimizer'); } catch(err) {}
+
 module.exports = function() {
     var name;
     var shaders = {};
 
     var shaderFiles = fs.readdirSync('src/shader');
 
+
+    // Load shaders
     for (var i = 0; i < shaderFiles.length; i++) {
         var parts = shaderFiles[i].match(/^(.+)\.(vertex|fragment)\.glsl$/);
         if (parts) {
@@ -22,6 +27,36 @@ module.exports = function() {
         }
     }
 
+
+    // Optimize shader
+    if (glsl) {
+        var compiler = new glsl.Compiler(glsl.TARGET_OPENGLES20);
+        for (name in shaders) {
+            var vertex_shader = new glsl.Shader(compiler, glsl.VERTEX_SHADER, shaders[name].vertex);
+            if (vertex_shader.compiled()) {
+                shaders[name].vertex = vertex_shader.output();
+            } else {
+                console.warn('failed to optimize %s vertex shader', name);
+                process.exit(1);
+            }
+            vertex_shader.dispose();
+
+            var fragment_shader = new glsl.Shader(compiler, glsl.FRAGMENT_SHADER, shaders[name].fragment);
+            if (fragment_shader.compiled()) {
+                shaders[name].fragment = fragment_shader.output();
+            } else {
+                console.warn('failed to optimize %s fragment shader', name);
+                process.exit(1);
+            }
+            fragment_shader.dispose();
+        }
+        compiler.dispose();
+    } else {
+        console.warn('Not optimizing shaders');
+    }
+
+
+    // Save to file
     var lines = [];
     var consts = [];
     for (var name in shaders) {
@@ -69,6 +104,7 @@ module.exports = function() {
     code += '\n};\n';
 
     fs.writeFileSync('src/shader/shaders.cpp', code);
+
 };
 
 module.exports();

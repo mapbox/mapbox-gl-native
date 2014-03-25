@@ -5,8 +5,10 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/geometry/vao.hpp>
+#include <llmr/map/vector_tile.hpp>
 #include <llmr/platform/platform.hpp>
 
 #include <cstdint>
@@ -24,14 +26,14 @@ class Raster;
 class Bucket;
 class LayerDescription;
 class BucketDescription;
-class VectorTile;
-class VectorTileLayer;
 class FillVertexBuffer;
 class LineVertexBuffer;
 class PointVertexBuffer;
+class TextVertexBuffer;
 class TriangleElementsBuffer;
 class LineElementsBuffer;
 class PointElementsBuffer;
+class TextElementsBuffer;
 class PlainShader;
 
 class TileData : public std::enable_shared_from_this<TileData>,
@@ -53,20 +55,11 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, const Style& style, const bool use_raster = false, const bool use_retina = false);
+    TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const bool use_raster = false, const bool use_retina = false);
     ~TileData();
 
-    // Start loading the tile.
     void request();
-
-    // Other functions
     bool parse();
-    void parseStyleLayers(const VectorTile& tile, const std::vector<LayerDescription>& layers);
-    std::shared_ptr<Bucket> createBucket(const VectorTile& tile, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-
     void cancel();
 
     const std::string toString() const;
@@ -85,6 +78,7 @@ public:
     std::shared_ptr<FillVertexBuffer> fillVertexBuffer;
     std::shared_ptr<LineVertexBuffer> lineVertexBuffer;
     std::shared_ptr<PointVertexBuffer> pointVertexBuffer;
+    std::shared_ptr<TextVertexBuffer> textVertexBuffer;
 
     std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
     std::shared_ptr<LineElementsBuffer> lineElementsBuffer;
@@ -93,10 +87,12 @@ public:
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above
     std::map<std::string, std::shared_ptr<Bucket>> buckets;
+
 private:
     // Source data
     std::string data;
     const Style& style;
+    GlyphAtlas& glyphAtlas;
     platform::Request *req = nullptr;
 };
 

@@ -5,6 +5,8 @@
 #include <llmr/map/tile_data.hpp>
 #include <llmr/map/transform.hpp>
 #include <llmr/style/style.hpp>
+#include <llmr/style/style.hpp>
+#include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/renderer/painter.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/texturepool.hpp>
@@ -76,6 +78,7 @@ private:
     Transform transform;
     Texturepool texturepool;
     Style style;
+    GlyphAtlas glyphAtlas;
     Painter painter;
 
     int32_t min_zoom;

@@ -31,6 +31,12 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("bucket type must be a string");
             }
+        } else if (name == "feature_type") {
+            if (value.IsString()) {
+                bucket.feature_type = bucketType({ value.GetString(), value.GetStringLength() });
+            } else {
+                throw Style::exception("feature type must be a string");
+            }
         } else if (name == "source") {
             if (value.IsString()) {
                 bucket.source_name = { value.GetString(), value.GetStringLength() };
@@ -81,6 +87,18 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("font size must be a number");
             }
+        } else if (name == "text_field") {
+            if (value.IsString()) {
+                bucket.geometry.text_field = { value.GetString(), value.GetStringLength() };
+            } else {
+                throw Style::exception("text field must be a string");
+            }
+        } else if (name == "path") {
+            if (value.IsString()) {
+                bucket.geometry.path = textPathType({ value.GetString(), value.GetStringLength() });
+            } else {
+                throw Style::exception("curve must be a string");
+            }
         } else if (name == "miterLimit") {
             if (value.IsNumber()) {
                 bucket.geometry.miter_limit = value.GetDouble();
@@ -93,7 +111,24 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("round limit must be a number");
             }
+        } else if (name == "textMinDistance") {
+            if (value.IsNumber()) {
+                bucket.geometry.textMinDistance = value.GetDouble();
+            } else {
+                throw Style::exception("text min distance must be a number");
+            }
+        } else if (name == "maxAngleDelta") {
+            if (value.IsNumber()) {
+                bucket.geometry.maxAngleDelta = value.GetDouble();
+            } else {
+                throw Style::exception("max angle delta must be a number");
+            }
         }
+
+    }
+
+    if (bucket.feature_type == BucketType::None) {
+        bucket.feature_type = bucket.type;
     }
 
     return bucket;
@@ -217,6 +252,8 @@ void StyleParser::parseClass(const std::string& name, JSVal value, ClassDescript
                     class_desc.line.insert({ name, std::forward<LineClass>(parseLineClass(value)) });
                 } else if (type_name == "point") {
                     class_desc.point.insert({ name, std::forward<PointClass>(parsePointClass(value)) });
+                } else if (type_name == "text") {
+                    class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
                 } else if (type_name == "background") {
                     class_desc.background = parseBackgroundClass(value);
                 } else {
@@ -250,24 +287,35 @@ std::string StyleParser::parseString(JSVal value) {
 }
 
 Color StyleParser::parseColor(JSVal value) {
-    if (!value.IsString()) {
+    if (value.IsArray()) {
+        // [ r, g, b, a] array
+        if (value.Size() != 4) {
+            throw Style::exception("color array must have four elements");
+        }
+
+        JSVal r = value[(rapidjson::SizeType)0], g = value[1], b = value[2], a = value[3];
+        if (!r.IsNumber() || !g.IsNumber() || !b.IsNumber() || !a.IsNumber()) {
+            throw Style::exception("color values must be numbers");
+        }
+
+        return {{static_cast<float>(r.GetDouble()),
+                 static_cast<float>(g.GetDouble()),
+                 static_cast<float>(b.GetDouble()),
+                 static_cast<float>(a.GetDouble())}};
+
+    } else if (!value.IsString()) {
         throw Style::exception("color value must be a string");
     }
 
-    const std::string str { value.GetString(), value.GetStringLength() };
+    const std::string str{value.GetString(), value.GetStringLength()};
 
     auto it = constants.find(str);
     if (it != constants.end()) {
         return parseColor(*it->second);
     } else {
         CSSColorParser::Color css_color = CSSColorParser::parse(str);
-        return {{
-                (float)css_color.r / 255,
-                (float)css_color.g / 255,
-                (float)css_color.b / 255,
-                css_color.a
-            }
-        };
+        return {{(float)css_color.r / 255, (float)css_color.g / 255,
+                 (float)css_color.b / 255, css_color.a}};
     }
 }
 
@@ -281,6 +329,8 @@ typename FunctionProperty<T>::fn StyleParser::parseFunctionType(JSVal type) {
             return &functions::linear;
         } else if (t == "stops") {
             return &functions::stops;
+        } else if (t == "exponential") {
+            return &functions::exponential;
         } else {
             throw Style::exception("unknown function type");
         }
@@ -450,6 +500,41 @@ PointClass StyleParser::parsePointClass(JSVal value) {
 
     if (value.HasMember("size")) {
         klass.size = parseFloatFunction(value["size"]);
+    }
+
+    return klass;
+}
+
+
+TextClass StyleParser::parseTextClass(JSVal value) {
+    TextClass klass;
+
+    if (value.HasMember("hidden")) {
+        klass.hidden = parseBoolFunction(value["hidden"]);
+    }
+
+    if (value.HasMember("color")) {
+        klass.color = parseColor(value["color"]);
+    }
+
+    if (value.HasMember("stroke")) {
+        klass.halo = parseColor(value["stroke"]);
+    }
+
+    if (value.HasMember("strokeWidth")) {
+        klass.haloRadius = parseFloatFunction(value["strokeWidth"]);
+    }
+
+    if (value.HasMember("size")) {
+        klass.size = parseFloatFunction(value["size"]);
+    }
+
+    if (value.HasMember("rotate")) {
+        klass.rotate = parseFloatFunction(value["rotate"]);
+    }
+
+    if (value.HasMember("alwaysVisible")) {
+        klass.alwaysVisible = parseBoolFunction(value["alwaysVisible"]);
     }
 
     return klass;

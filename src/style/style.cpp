@@ -1,5 +1,6 @@
 #include <llmr/style/style.hpp>
 #include <llmr/style/style_parser.hpp>
+#include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
 
@@ -73,6 +74,22 @@ void Style::cascade(float z) {
             point.size = layer.size(z);
             point.opacity = layer.opacity(z);
             point.image = layer.image;
+        }
+
+        for (const auto& text_pair : sheetClass.text) {
+            const std::string& layer_name = text_pair.first;
+            const llmr::TextClass& layer = text_pair.second;
+
+            // TODO: This should be restricted to point styles that have actual
+            // values so as to not override with default values.
+            llmr::TextProperties& text = computed.texts[layer_name];
+            text.hidden = layer.hidden(z);
+            text.color = layer.color;
+            text.size = layer.size(z);
+            text.halo = layer.halo;
+            text.haloRadius = layer.haloRadius(z);
+            text.rotate = layer.rotate(z);
+            text.alwaysVisible = layer.alwaysVisible(z);
         }
 
         // Cascade background

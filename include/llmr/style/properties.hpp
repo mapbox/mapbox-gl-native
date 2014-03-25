@@ -45,6 +45,9 @@ bool stops(float z, const std::vector<bool>& values);
 float linear(float z, const std::vector<float>& values);
 bool linear(float z, const std::vector<bool>& values);
 
+float exponential(float z, const std::vector<float>& values);
+bool exponential(float z, const std::vector<bool>& values);
+
 }
 
 
@@ -110,6 +113,26 @@ struct FillProperties {
     Color stroke_color = {{ 0, 0, 0, 1 }};
     float opacity = 1.0;
     std::string image;
+};
+
+struct TextClass {
+    FunctionProperty<bool> hidden;
+    Color color = {{ 0, 0, 0, 1 }};
+    Color halo = {{ 1, 1, 1, 0.75 }};
+    FunctionProperty<float> haloRadius = 0.25f;
+    FunctionProperty<float> size = 12.0f;
+    FunctionProperty<float> rotate = 0.0f;
+    FunctionProperty<bool> alwaysVisible = false;
+};
+
+struct TextProperties {
+    bool hidden = false;
+    Color color = {{ 0, 0, 0, 1 }};
+    Color halo = {{ 1, 1, 1, 0.75 }};
+    float haloRadius = 0.25f;
+    float size = 12.0f;
+    float rotate = 0.0f;
+    bool alwaysVisible = false;
 };
 
 struct BackgroundClass {

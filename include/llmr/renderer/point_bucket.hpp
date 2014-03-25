@@ -19,7 +19,6 @@ class Style;
 class PointVertexBuffer;
 class BucketDescription;
 class PointShader;
-struct Coordinate;
 struct pbf;
 
 class PointBucket : public Bucket {

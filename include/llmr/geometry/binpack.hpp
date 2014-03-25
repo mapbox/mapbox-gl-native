@@ -2,23 +2,17 @@
 #define LLMR_GEOMETRY_BINPACK
 
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/util/rect.hpp>
 #include <cstdint>
 #include <list>
 
 namespace llmr {
 
 template <typename T>
-struct Rect {
-    Rect(T x, T y, T w, T h) : x(x), y(y), w(w), h(h) {}
-    T x = 0, y = 0;
-    T w = 0, h = 0;
-};
-
-template <typename T>
-class BinPack : private noncopyable {
+class BinPack : private util::noncopyable {
 public:
     BinPack(T width, T height)
-        : free(1, { 0, 0, width, height }) {}
+        : free(1, Rect<uint16_t>{ 0, 0, width, height }) {}
 public:
     Rect<T> allocate(T width, T height) {
         // Find the smallest free rect angle
@@ -35,7 +29,7 @@ public:
 
         if (smallest == free.end()) {
             // There's no space left for this char.
-            return { 0, 0, 0, 0 };
+            return Rect<uint16_t>{ 0, 0, 0, 0 };
         } else {
             Rect<T> rect = *smallest;
             free.erase(smallest);
@@ -60,7 +54,7 @@ public:
                 if (rect.h > height) free.emplace_back(rect.x, rect.y + height, width, rect.h - height);
             }
 
-            return { rect.x, rect.y, width, height };
+            return Rect<uint16_t>{ rect.x, rect.y, width, height };
         }
     }
 

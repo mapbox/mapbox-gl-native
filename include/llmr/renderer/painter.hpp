@@ -6,6 +6,7 @@
 #include <llmr/geometry/vertex_buffer.hpp>
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/renderer/frame_history.hpp>
 
 #include <llmr/shader/plain_shader.hpp>
 #include <llmr/shader/outline_shader.hpp>
@@ -14,6 +15,7 @@
 #include <llmr/shader/linejoin_shader.hpp>
 #include <llmr/shader/point_shader.hpp>
 #include <llmr/shader/raster_shader.hpp>
+#include <llmr/shader/text_shader.hpp>
 
 namespace llmr {
 
@@ -25,10 +27,11 @@ class Tile;
 class FillBucket;
 class LineBucket;
 class PointBucket;
+class TextBucket;
 
 class Painter : private util::noncopyable {
 public:
-    Painter(Transform& transform, Settings& settings, Style& style);
+    Painter(Transform& transform, Settings& settings, Style& style, GlyphAtlas& glyphAtlas);
 
     void setup();
     void clear();
@@ -38,12 +41,15 @@ public:
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id);
+    void renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id);
 
     void resize(int width, int height);
 
     void prepareClippingMask();
     void drawClippingMask(const mat4& matrix, uint8_t clip_id, bool opaque = true);
     void finishClippingMask();
+
+    bool needsAnimation() const;
 private:
     void setupShaders();
     void renderRaster(const std::shared_ptr<TileData>& tile);
@@ -65,8 +71,9 @@ private:
     Transform& transform;
     Settings& settings;
     Style& style;
+    GlyphAtlas& glyphAtlas;
 
-
+    FrameHistory frameHistory;
 
     uint32_t gl_program = 0;
     float gl_lineWidth = 0;
@@ -82,6 +89,7 @@ private:
     std::unique_ptr<PatternShader> patternShader;
     std::unique_ptr<PointShader> pointShader;
     std::unique_ptr<RasterShader> rasterShader;
+    std::unique_ptr<TextShader> textShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     VertexBuffer tileStencilBuffer = {
