@@ -37,6 +37,7 @@ public:
     // Getters
     void matrixFor(mat4& matrix, const Tile::ID& id) const;
     float getZoom() const;
+    float getNormalizedZoom() const;
     int32_t getIntegerZoom() const;
     double getScale() const;
     double getAngle() const;

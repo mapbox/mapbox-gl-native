@@ -2,8 +2,71 @@
 #include <llmr/style/bucket_description.hpp>
 
 #include <algorithm>
+#include <iostream>
 
 using namespace llmr;
+
+
+std::ostream& llmr::operator<<(std::ostream& os, const FeatureType& type) {
+    switch (type) {
+        case FeatureType::Unknown: return os << "Unknown";
+        case FeatureType::Point: return os << "Point";
+        case FeatureType::LineString: return os << "LineString";
+        case FeatureType::Polygon: return os << "Polygon";
+        default: return os << "Invalid";
+    }
+}
+
+VectorTileFeature::VectorTileFeature(pbf feature, const VectorTileLayer& layer) {
+    while (feature.next()) {
+        if (feature.tag == 1) { // id
+            id = feature.varint<uint64_t>();
+        } else if (feature.tag == 2) { // tags
+            // tags are packed varints. They should have an even length.
+            pbf tags = feature.message();
+            while (tags) {
+                uint32_t tag_key = tags.varint();
+
+                if (layer.keys.size() <= tag_key) {
+                    // TODO: Throw correct exception
+                    fprintf(stderr, "feature referenced out of range key\n");
+                    break;
+                }
+
+                if (tags) {
+                    uint32_t tag_val = tags.varint();
+                    if (layer.values.size() <= tag_val) {
+                        // TODO: Throw correct exception
+                        fprintf(stderr, "feature referenced out of range value\n");
+                        break;
+                    }
+
+                    properties.emplace(layer.keys[tag_key], layer.values[tag_val]);
+                } else {
+                    // TODO: Throw correct exception
+                    fprintf(stderr, "uneven number of feature tag ids\n");
+                    break;
+                }
+            }
+        } else if (feature.tag == 3) { // type
+            type = (FeatureType)feature.varint();
+        } else if (feature.tag == 4) { // geometry
+            geometry = feature.message();
+        } else {
+            feature.skip();
+        }
+    }
+}
+
+
+std::ostream& llmr::operator<<(std::ostream& os, const VectorTileFeature& feature) {
+    os << "Feature(" << feature.id << "): " << feature.type << std::endl;
+    for (const auto& prop : feature.properties) {
+        os << "  - " << prop.first << ": " << prop.second << std::endl;
+    }
+    return os;
+}
+
 
 VectorTile::VectorTile() {}
 
@@ -13,6 +76,9 @@ VectorTile::VectorTile(pbf tile) {
         if (tile.tag == 3) { // layer
             VectorTileLayer layer(tile.message());
             layers.emplace(layer.name, std::forward<VectorTileLayer>(layer));
+        } else if (tile.tag == 4) { // face
+            VectorTileFace face(tile.message());
+            faces.emplace(face.name, std::forward<VectorTileFace>(face));
         } else {
             tile.skip();
         }
@@ -26,8 +92,101 @@ VectorTile& VectorTile::operator=(VectorTile && other) {
     return *this;
 }
 
+VectorTileFace::VectorTileFace(pbf face) {
+    while (face.next()) {
+        if (face.tag == 1) { // family
+            family = face.string();
+        } else if (face.tag == 2) { // style
+            style = face.string();
+        } else if (face.tag == 5) { // glyphs
+            glyphs.emplace_back(face.message());
+        } else {
+            face.skip();
+        }
+    }
+    name = family + " " + style;
+}
+
+
+std::ostream& llmr::operator<<(std::ostream& os, const VectorTileFace& face) {
+    os << "Face: " << face.name << std::endl;
+    for (const VectorTileGlyph& glyph : face.glyphs) {
+        os << "  - " << glyph;
+    }
+    return os;
+}
+
+
+// -1 overflows to maximum value
+VectorTileGlyph::VectorTileGlyph() {}
+
+VectorTileGlyph::VectorTileGlyph(pbf glyph) {
+    while (glyph.next()) {
+        if (glyph.tag == 1) { // id
+            id = glyph.varint();
+        } else if (glyph.tag == 2) { // bitmap
+            bitmap = glyph.string();
+        } else if (glyph.tag == 3) { // width
+            metrics.width = glyph.varint();
+        } else if (glyph.tag == 4) { // height
+            metrics.height = glyph.varint();
+        } else if (glyph.tag == 5) { // left
+            metrics.left = glyph.svarint();
+        } else if (glyph.tag == 6) { // top
+            metrics.top = glyph.svarint();
+        } else if (glyph.tag == 7) { // advance
+            metrics.advance = glyph.varint();
+        } else {
+            glyph.skip();
+        }
+    }
+}
+
+std::ostream& llmr::operator<<(std::ostream& os, const VectorTileGlyph& glyph) {
+    os << "Glyph " << glyph.id << ": " << glyph.metrics.width << "x" << glyph.metrics.height <<
+       " (" << glyph.metrics.left << "/" << glyph.metrics.top << ") +" << glyph.metrics.advance << std::endl;
+    return os;
+}
+
+class VectorTileLabel {
+public:
+    VectorTileLabel(pbf data);
+
+    uint32_t text = 0;
+    uint32_t stack = 0;
+    std::vector<GlyphPlacement> placements;
+};
+
+VectorTileLabel::VectorTileLabel(pbf label) {
+    pbf faces, glyphs, x, y;
+
+    while (label.next()) {
+        if (label.tag == 1) { // text
+            text = label.varint();
+        } else if (label.tag == 2) { // stack
+            stack = label.varint();
+        } else if (label.tag == 3) { // faces
+            faces = label.message();
+        } else if (label.tag == 4) { // glyphs
+            glyphs = label.message();
+        } else if (label.tag == 5) { // x
+            x = label.message();
+        } else if (label.tag == 6) { // y
+            y = label.message();
+        } else {
+            label.skip();
+        }
+    }
+
+    while (faces && glyphs && x && y) {
+        placements.emplace_back(faces.varint(), glyphs.varint(), x.varint(), y.varint());
+    }
+}
 
 VectorTileLayer::VectorTileLayer(pbf layer) : data(layer) {
+    std::vector<std::string> stacks;
+    std::vector<VectorTileLabel> labels;
+
     while (layer.next()) {
         if (layer.tag == 1) { // name
             name = layer.string();
@@ -37,10 +196,34 @@ VectorTileLayer::VectorTileLayer(pbf layer) : data(layer) {
             values.emplace_back(std::move(parseValue(layer.message())));
         } else if (layer.tag == 5) { // extent
             extent = layer.varint();
+        } else if (layer.tag == 7) { // faces
+            faces.emplace_back(layer.string());
+        } else if (layer.tag == 8) { // labels
+            labels.emplace_back(layer.message());
+        } else if (layer.tag == 9) { // stacks
+            stacks.emplace_back(layer.string());
         } else {
             layer.skip();
         }
     }
+
+    // Build index of [stack][text] => shaping information
+    for (VectorTileLabel& label : labels) {
+        if (values.size() <= label.text || stacks.size() <= label.stack) {
+            // The indices are out of range. Skip this label.
+            continue;
+        }
+
+        const Value& text = values[label.text];
+        const std::string& stack = stacks[label.stack];
+
+        shaping[stack][text].swap(label.placements);
+    }
+}
+
+std::ostream& llmr::operator<<(std::ostream& os, const GlyphPlacement& placement) {
+    os << "Glyph " << placement.face << "/" << placement.glyph << ": " << placement.x << "/" << placement.y << std::endl;
+    return os;
 }
 
 FilteredVectorTileLayer::FilteredVectorTileLayer(const VectorTileLayer& layer, const BucketDescription& bucket_desc)
@@ -129,7 +312,7 @@ void FilteredVectorTileLayer::iterator::operator++() {
                     default:                 type = BucketType::None; break;
                 }
 
-                if (type != filter.bucket_desc.type) {
+                if (type != filter.bucket_desc.feature_type) {
                     break; // feature_pbf loop early
                 }
             } else {
@@ -137,7 +320,7 @@ void FilteredVectorTileLayer::iterator::operator++() {
             }
         }
 
-        if (!skip && type == filter.bucket_desc.type) {
+        if (!skip && type == filter.bucket_desc.feature_type) {
             valid = true;
             return; // data loop
         } else {

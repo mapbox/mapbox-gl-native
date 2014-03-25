@@ -84,9 +84,5 @@ void cancel_request_http(Request *request)
     }];
 }
 
-double time() {
-    return glfwGetTime();
-}
-
 }
 }

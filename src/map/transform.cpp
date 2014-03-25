@@ -256,6 +256,10 @@ float Transform::getZoom() const {
     return log(scale) / M_LN2;
 }
 
+float Transform::getNormalizedZoom() const {
+    return log(scale * util::tileSize / 256.0f) / M_LN2;
+}
+
 int32_t Transform::getIntegerZoom() const {
     return floor(log(scale) / M_LN2);
 }

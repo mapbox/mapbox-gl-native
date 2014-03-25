@@ -89,3 +89,23 @@ bool functions::linear(float z, const std::vector<bool>&) {
     // TODO
     return false;
 }
+
+float functions::exponential(float z, const std::vector<float>& values) {
+    if (values.size() != 5) {
+        return 0;
+    }
+
+    const float z_base = values[0];
+    const float val = values[1];
+    const float slope = values[2];
+    const float min = values[3];
+    const float max = values[4];
+
+    return fmin(fmax(min, val + pow(1.75, (z - z_base)) * slope), max);
+    // return fmin(fmax(min, val + (z - z_base) * slope), max);
+}
+
+bool functions::exponential(float z, const std::vector<bool>&) {
+    // TODO
+    return false;
+}

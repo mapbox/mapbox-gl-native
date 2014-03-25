@@ -1,5 +1,4 @@
 #include <llmr/renderer/line_bucket.hpp>
-#include <llmr/geometry/line_buffer.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/geometry/geometry.hpp>
 
@@ -18,17 +17,17 @@ struct geometry_too_long_exception : std::exception {};
 
 using namespace llmr;
 
-LineBucket::LineBucket(const std::shared_ptr<LineVertexBuffer>& vertexBuffer,
-                       const std::shared_ptr<TriangleElementsBuffer>& triangleElementsBuffer,
-                       const std::shared_ptr<PointElementsBuffer>& pointElementsBuffer,
+LineBucket::LineBucket(LineVertexBuffer& vertexBuffer,
+                       TriangleElementsBuffer& triangleElementsBuffer,
+                       PointElementsBuffer& pointElementsBuffer,
                        const BucketDescription& bucket_desc)
     : geometry(bucket_desc.geometry),
       vertexBuffer(vertexBuffer),
       triangleElementsBuffer(triangleElementsBuffer),
       pointElementsBuffer(pointElementsBuffer),
-      vertex_start(vertexBuffer->index()),
-      triangle_elements_start(triangleElementsBuffer->index()),
-      point_elements_start(pointElementsBuffer->index())
+      vertex_start(vertexBuffer.index()),
+      triangle_elements_start(triangleElementsBuffer.index()),
+      point_elements_start(pointElementsBuffer.index())
 {
 }
 
@@ -101,7 +100,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         nextNormal = util::normal<double>(currentVertex, lastVertex);
     }
 
-    int32_t start_vertex = (int32_t)vertexBuffer->index();
+    int32_t start_vertex = (int32_t)vertexBuffer.index();
 
     std::vector<TriangleElement> triangle_store;
     std::vector<PointElement> point_store;
@@ -172,7 +171,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         // Add offset square begin cap.
         if (!prevVertex && beginCap == CapType::Square) {
             // Add first vertex
-            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
                                    flip * (prevNormal.x + prevNormal.y), flip * (-prevNormal.x + prevNormal.y), // extrude normal
                                    0, 0, distance) - start_vertex; // texture normal
 
@@ -180,7 +179,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             e1 = e2; e2 = e3;
 
             // Add second vertex
-            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
                                    flip * (prevNormal.x - prevNormal.y), flip * (prevNormal.x + prevNormal.y), // extrude normal
                                    0, 1, distance) - start_vertex; // texture normal
 
@@ -191,7 +190,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         // Add offset square end cap.
         else if (!nextVertex && endCap == CapType::Square) {
             // Add first vertex
-            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
                                    nextNormal.x - flip * nextNormal.y, flip * nextNormal.x + nextNormal.y, // extrude normal
                                    0, 0, distance) - start_vertex; // texture normal
 
@@ -199,7 +198,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             e1 = e2; e2 = e3;
 
             // Add second vertex
-            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
                                    nextNormal.x + flip * nextNormal.y, -flip * nextNormal.x + nextNormal.y, // extrude normal
                                    0, 1, distance) - start_vertex; // texture normal
 
@@ -225,7 +224,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             }
 
             // Add first vertex
-            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
                                    flip * joinNormal.x, flip * joinNormal.y, // extrude normal
                                    0, 0, distance) - start_vertex; // texture normal
 
@@ -233,7 +232,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             e1 = e2; e2 = e3;
 
             // Add second vertex
-            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
                                    -flip * joinNormal.x, -flip * joinNormal.y, // extrude normal
                                    0, 1, distance) - start_vertex; // texture normal
 
@@ -249,7 +248,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         else {
             // Close up the previous line
             // Add first vertex
-            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
                                    flip * prevNormal.y, -flip * prevNormal.x, // extrude normal
                                    0, 0, distance) - start_vertex; // texture normal
 
@@ -257,7 +256,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             e1 = e2; e2 = e3;
 
             // Add second vertex.
-            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
                                    -flip * prevNormal.y, flip * prevNormal.x, // extrude normal
                                    0, 1, distance) - start_vertex; // texture normal
 
@@ -287,7 +286,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
             // Start the new quad.
             // Add first vertex
-            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
                                    -flip * nextNormal.y, flip * nextNormal.x, // extrude normal
                                    0, 0, distance) - start_vertex; // texture normal
 
@@ -295,7 +294,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             e1 = e2; e2 = e3;
 
             // Add second vertex
-            e3 = (int32_t)vertexBuffer->add(currentVertex.x, currentVertex.y, // vertex pos
+            e3 = (int32_t)vertexBuffer.add(currentVertex.x, currentVertex.y, // vertex pos
                                    flip * nextNormal.y, -flip * nextNormal.x, // extrude normal
                                    0, 1, distance) - start_vertex; // texture normal
 
@@ -304,7 +303,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         }
     }
 
-    size_t end_vertex = vertexBuffer->index();
+    size_t end_vertex = vertexBuffer.index();
     size_t vertex_count = end_vertex - start_vertex;
 
     // Store the triangle/line groups.
@@ -316,7 +315,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
         triangle_group_type& group = triangleGroups.back();
         for (const TriangleElement& triangle : triangle_store) {
-            triangleElementsBuffer->add(
+            triangleElementsBuffer.add(
                 group.vertex_length + triangle.a,
                 group.vertex_length + triangle.b,
                 group.vertex_length + triangle.c
@@ -336,7 +335,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
         point_group_type& group = pointGroups.back();
         for (PointElement point : point_store) {
-            pointElementsBuffer->add(group.vertex_length + point);
+            pointElementsBuffer.add(group.vertex_length + point);
         }
 
         group.vertex_length += vertex_count;
@@ -357,23 +356,23 @@ bool LineBucket::hasPoints() const {
 }
 
 void LineBucket::drawLines(LineShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer->itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer->itemSize);
+    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (triangle_group_type& group : triangleGroups) {
-        group.array.bind(shader, *vertexBuffer, *triangleElementsBuffer, vertex_index);
+        group.array.bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group.vertex_length * vertexBuffer->itemSize;
-        elements_index += group.elements_length * triangleElementsBuffer->itemSize;
+        vertex_index += group.vertex_length * vertexBuffer.itemSize;
+        elements_index += group.elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
 void LineBucket::drawPoints(LinejoinShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer->itemSize);
-    char *elements_index = BUFFER_OFFSET(point_elements_start * pointElementsBuffer->itemSize);
+    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    char *elements_index = BUFFER_OFFSET(point_elements_start * pointElementsBuffer.itemSize);
     for (point_group_type& group : pointGroups) {
-        group.array.bind(shader, *vertexBuffer, *pointElementsBuffer, vertex_index);
+        group.array.bind(shader, vertexBuffer, pointElementsBuffer, vertex_index);
         glDrawElements(GL_POINTS, group.elements_length, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group.vertex_length * vertexBuffer->itemSize;
-        elements_index += group.elements_length * pointElementsBuffer->itemSize;
+        vertex_index += group.vertex_length * vertexBuffer.itemSize;
+        elements_index += group.elements_length * pointElementsBuffer.itemSize;
     }
 }

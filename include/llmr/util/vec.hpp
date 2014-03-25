@@ -4,27 +4,74 @@
 #include <limits>
 #include <type_traits>
 #include <cmath>
+#include <cstdint>
 
 namespace llmr {
 
 template <typename T = double>
 struct vec2 {
     struct null {};
+    typedef T Type;
 
     T x, y;
 
     inline vec2() {}
+
+    template<typename U = T, typename std::enable_if<std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
     inline vec2(null) : x(std::numeric_limits<T>::quiet_NaN()), y(std::numeric_limits<T>::quiet_NaN()) {}
 
+    template<typename U = T, typename std::enable_if<!std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
+    inline vec2(null) : x(std::numeric_limits<T>::min()), y(std::numeric_limits<T>::min()) {}
+
     inline vec2(const vec2& o) : x(o.x), y(o.y) {}
+
+    template<typename U>
+    inline vec2(const U& u) : x(u.x), y(u.y) {}
+
     inline vec2(T x, T y) : x(x), y(y) {}
+
     inline bool operator==(const vec2& rhs) const {
         return x == rhs.x && y == rhs.y;
+    }
+
+    template <typename O>
+    inline typename std::enable_if<std::is_arithmetic<O>::value, vec2>::type
+    operator*(O o) const {
+        return {x * o, y * o};
+    }
+
+    template <typename O>
+    inline typename std::enable_if<std::is_arithmetic<O>::value, vec2>::type &
+    operator*=(O o) {
+        x *= o;
+        y *= o;
+    }
+
+    template <typename O>
+    inline typename std::enable_if<std::is_arithmetic<O>::value, vec2>::type
+    operator-(O o) const {
+        return {x - o, y - o};
+    }
+
+    template <typename O>
+    inline typename std::enable_if<!std::is_arithmetic<O>::value, vec2>::type
+    operator-(const O &o) const {
+        return {x - o.x, y - o.y};
+    }
+
+    template <typename M>
+    inline vec2 matMul(const M &m) const {
+        return {m[0] * x + m[1] * y, m[2] * x + m[3] * y};
     }
 
     template<typename U = T, typename std::enable_if<std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
     inline operator bool() const {
         return !isnan(x) && !isnan(y);
+    }
+
+    template<typename U = T, typename std::enable_if<!std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
+    inline operator bool() const {
+        return x != std::numeric_limits<T>::min() && y != std::numeric_limits<T>::min();
     }
 };
 
@@ -57,6 +104,8 @@ struct box {
     vec2<double> tl, tr, bl, br;
     vec2<double> center;
 };
+
+typedef vec2<int16_t> Coordinate;
 
 }
 

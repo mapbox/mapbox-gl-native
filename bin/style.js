@@ -87,10 +87,45 @@ module.exports = {
             "value": ["Restaurant"],
             "type": "point"
         },
+        "country_label": {
+            "source": "streets",
+            "type": "text",
+            "layer": "country_label",
+            "feature_type": "point",
+            "padding": 10,
+            "text_field": "name",
+            "path": "horizontal",
+            "font": "Open Sans, Jomolhari, Siyam Rupali, Alef, Arial Unicode MS",
+            "fontSize": 16
+        },
+        "place_label": {
+            "source": "streets",
+            "type": "text",
+            "layer": "place_label",
+            "feature_type": "point",
+            "text_field": "name",
+            "path": "horizontal",
+            "font": "Open Sans, Jomolhari, Siyam Rupali, Alef, Arial Unicode MS",
+            "fontSize": 18,
+            "alwaysVisible": true
+        },
+        "road_label": {
+            "source": "streets",
+            "type": "text",
+            "layer": "road_label",
+            "feature_type": "line",
+            "text_field": "name",
+            "path": "curve",
+            "font": "Open Sans, Jomolhari, Siyam Rupali, Alef, Arial Unicode MS",
+            "fontSize": 12,
+            "textMinDistance": 250,
+            "maxAngleDelta": 1.04, // radians
+        },
     },
     "sprite": "img/maki-sprite",
     "constants": {
         "park": "#c8df9f",
+        "text": "#000000",
     },
     "structure": [
         { "name": "park", "bucket": "park" },
@@ -105,6 +140,9 @@ module.exports = {
         { "name": "embassy_poi", "bucket": "embassy_poi" },
         { "name": "park_poi", "bucket": "park_poi" },
         { "name": "restaurant_poi", "bucket": "restaurant_poi" },
+        { "name": "country_label", "bucket": "country_label" },
+        { "name": "place_label", "bucket": "place_label" },
+        { "name": "road_label", "bucket": "road_label" },
     ],
     "classes": [
         {
@@ -156,8 +194,8 @@ module.exports = {
                         { z: 0, val: 0.5 },
                         { z: 13, val: 0.5 },
                         { z: 16, val: 2 },
-                        { z: 20, val: 32 },
-                        { z: 30, val: 32 }
+                        { z: 20, val: 16 },
+                        { z: 30, val: 16 }
                     ],
                 },
                 "road_large": {
@@ -169,8 +207,8 @@ module.exports = {
                         { z: 11, val: 0.5 },
                         { z: 13, val: 1 },
                         { z: 16, val: 4 },
-                        { z: 20, val: 64 },
-                        { z: 30, val: 64 }
+                        { z: 20, val: 32 },
+                        { z: 30, val: 32 }
                     ],
                 },
                 "alcohol_poi": {
@@ -207,6 +245,24 @@ module.exports = {
                     "size": 18,
                     "image": "restaurant",
                     "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
+                },
+                "country_label": {
+                    "type": "text",
+                    "stroke": [ 1, 1, 1, 0.7 ],
+                    "color": "text",
+                    "size": 16
+                },
+                "place_label": {
+                    "type": "text",
+                    "stroke": [1,1,1,0.7],
+                    "color": "text",
+                    "size": 18
+                },
+                "road_label": {
+                    "type": "text",
+                    "color": "text",
+                    "stroke": [1,1,1,0.7],
+                    "size": ["exponential", 14, 8, 1, 8, 12]
                 },
             }
         }

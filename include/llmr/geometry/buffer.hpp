@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <llmr/platform/gl.hpp>
+#include <llmr/util/noncopyable.hpp>
 
 namespace llmr {
 
@@ -12,7 +13,7 @@ template <
     int bufferType = GL_ARRAY_BUFFER,
     size_t defaultLength = 8192
 >
-class Buffer {
+class Buffer : private util::noncopyable {
 public:
     ~Buffer() {
         if (array) {
@@ -47,7 +48,7 @@ public:
 
 protected:
     // increase the buffer size by at least /required/ bytes.
-    void *addElement() {
+    inline void *addElement() {
         assert("Buffer is already bound to GPU" && buffer == 0);
         if (length < pos + itemSize) {
             while (length < pos + itemSize) length += defaultLength;

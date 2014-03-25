@@ -8,6 +8,7 @@
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
 #include <llmr/renderer/point_bucket.hpp>
+#include <llmr/renderer/text_bucket.hpp>
 
 #include <llmr/map/transform.hpp>
 #include <llmr/map/settings.hpp>
@@ -21,10 +22,15 @@ using namespace llmr;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(Transform& transform, Settings& settings, Style& style)
+Painter::Painter(Transform& transform, Settings& settings, Style& style, GlyphAtlas& glyphAtlas)
     : transform(transform),
       settings(settings),
-      style(style) {
+      style(style),
+      glyphAtlas(glyphAtlas) {
+}
+
+bool Painter::needsAnimation() const {
+    return frameHistory.needsAnimation(300);
 }
 
 void Painter::setup() {
@@ -37,6 +43,7 @@ void Painter::setup() {
     assert(linejoinShader);
     assert(patternShader);
     assert(rasterShader);
+    assert(textShader);
 
 
     // Blending
@@ -64,6 +71,7 @@ void Painter::setupShaders() {
     patternShader = std::make_unique<PatternShader>();
     pointShader = std::make_unique<PointShader>();
     rasterShader = std::make_unique<RasterShader>();
+    textShader = std::make_unique<TextShader>();
 }
 
 void Painter::resize(int width, int height) {
@@ -149,6 +157,8 @@ void Painter::render(const Tile& tile) {
         return;
     }
 
+    frameHistory.record(transform.getNormalizedZoom());
+
     matrix = tile.matrix;
     glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
 
@@ -229,7 +239,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     if (bucket.empty()) return;
 
     const FillProperties& properties = style.computed.fills[layer_name];
-    if (properties.hidden) return;
+    if (!properties.enabled) return;
 
     Color fill_color = properties.fill_color;
     fill_color[0] *= properties.opacity;
@@ -356,7 +366,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     if (bucket.empty()) return;
 
     const LineProperties& properties = style.computed.lines[layer_name];
-    if (properties.hidden) return;
+    if (!properties.enabled) return;
 
     float width = properties.width;
     float offset = properties.offset / 2;
@@ -437,7 +447,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     if (pass == Opaque) return;
 
     const PointProperties& properties = style.computed.points[layer_name];
-    if (properties.hidden) return;
+    if (!properties.enabled) return;
 
     Color color = properties.color;
     color[0] *= properties.opacity;
@@ -471,6 +481,106 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     }
     glDepthRange(strata, 1.0f);
     bucket.drawPoints(*pointShader);
+}
+
+void Painter::renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+    // Abort early.
+    if (pass == Opaque) return;
+    if (bucket.empty()) return;
+
+    const TextProperties& properties = style.computed.texts[layer_name];
+    if (!properties.enabled) return;
+
+    mat4 exMatrix;
+    matrix::copy(exMatrix, projMatrix);
+    if (bucket.geom_desc.path == TextPathType::Curve) {
+        matrix::rotate_z(exMatrix, exMatrix, transform.getAngle());
+    }
+
+    const float rotate = properties.rotate;
+    if (rotate != 0.0f) {
+        matrix::rotate_z(exMatrix, exMatrix, rotate);
+    }
+
+    // If layerStyle.size > bucket.info.fontSize then labels may collide
+    float fontSize = fmin(properties.size, bucket.geom_desc.font_size);
+    matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
+
+    useProgram(textShader->program);
+    textShader->setMatrix(matrix);
+    textShader->setExtrudeMatrix(exMatrix);
+
+    glyphAtlas.bind();
+    textShader->setTextureSize({{ static_cast<float>(glyphAtlas.width), static_cast<float>(glyphAtlas.height) }});
+
+    textShader->setGamma(2.5f / fontSize / transform.pixelRatio);
+
+    // Convert the -pi..pi to an int8 range.
+    float angle = round((transform.getAngle() + rotate) / M_PI * 128);
+
+    // adjust min/max zooms for variable font sies
+    float zoomAdjust = log(fontSize / bucket.geom_desc.font_size) / log(2);
+
+    textShader->setAngle((int32_t)(angle + 256) % 256);
+    textShader->setFlip(bucket.geom_desc.path == TextPathType::Curve ? 1 : 0);
+    textShader->setZoom((transform.getNormalizedZoom() - zoomAdjust) * 10); // current zoom level
+
+    // Label fading
+    const float duration = 300.0f;
+    const float currentTime = platform::time() * 1000;
+
+    std::deque<FrameSnapshot> &history = frameHistory.history;
+
+    // Remove frames until only one is outside the duration, or until there are only three
+    while (history.size() > 3 && history[1].time + duration < currentTime) {
+        history.pop_front();
+    }
+
+    if (history[1].time + duration < currentTime) {
+        history[0].z = history[1].z;
+    }
+
+    size_t frameLen = history.size();
+    assert("there should never be less than three frames in the history" && frameLen >= 3);
+
+    // Find the range of zoom levels we want to fade between
+    float startingZ = history.front().z;
+    const FrameSnapshot lastFrame = history.back();
+    float endingZ = lastFrame.z;
+    float lowZ = fmin(startingZ, endingZ);
+    float highZ = fmax(startingZ, endingZ);
+
+    // Calculate the speed of zooming, and how far it would zoom in terms of zoom levels in one duration
+    float zoomDiff = endingZ - history[1].z,
+        timeDiff = lastFrame.time - history[1].time;
+    if (timeDiff > duration) timeDiff = 1;
+    float fadedist = zoomDiff / (timeDiff / duration);
+
+    if (isnan(fadedist)) fprintf(stderr, "fadedist should never be NaN");
+
+    // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
+    // bump is how much farther it would have been if it had continued zooming at the same rate
+    float bump = (currentTime - lastFrame.time) / duration * fadedist;
+
+    textShader->setFadeDist(fadedist * 10);
+    textShader->setMinFadeZoom(floor(lowZ * 10));
+    textShader->setMaxFadeZoom(floor(highZ * 10));
+    textShader->setFadeZoom((transform.getZoom() + bump) * 10);
+
+    // We're drawing in the translucent pass which is bottom-to-top, so we need
+    // to draw the halo first.
+    if (properties.halo[3] > 0.0f) {
+        textShader->setColor(properties.halo);
+        textShader->setBuffer(properties.haloRadius);
+        glDepthRange(strata, 1.0f);
+        bucket.drawGlyphs(*textShader);
+    }
+
+    // Then, we draw the text over the halo
+    textShader->setColor(properties.color);
+    textShader->setBuffer((256.0f - 64.0f) / 256.0f);
+    glDepthRange(strata + strata_epsilon, 1.0f);
+    bucket.drawGlyphs(*textShader);
 }
 
 void Painter::renderDebug(const TileData::Ptr& tile_data) {

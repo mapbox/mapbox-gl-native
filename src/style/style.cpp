@@ -1,5 +1,6 @@
 #include <llmr/style/style.hpp>
 #include <llmr/style/style_parser.hpp>
+#include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
 
@@ -36,7 +37,7 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to fill styles that have actual
             // values so as to not override with default values.
             llmr::FillProperties& fill = computed.fills[layer_name];
-            fill.hidden = layer.hidden(z);
+            fill.enabled = layer.enabled(z);
             fill.winding = layer.winding;
             fill.antialias = layer.antialias(z);
             fill.fill_color = layer.fill_color;
@@ -53,7 +54,7 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to line styles that have actual
             // values so as to not override with default values.
             llmr::LineProperties& stroke = computed.lines[layer_name];
-            stroke.hidden = layer.hidden(z);
+            stroke.enabled = layer.enabled(z);
             stroke.width = layer.width(z);
             stroke.offset = layer.offset(z);
             stroke.color = layer.color;
@@ -68,11 +69,27 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to point styles that have actual
             // values so as to not override with default values.
             llmr::PointProperties& point = computed.points[layer_name];
-            point.hidden = layer.hidden(z);
+            point.enabled = layer.enabled(z);
             point.color = layer.color;
             point.size = layer.size(z);
             point.opacity = layer.opacity(z);
             point.image = layer.image;
+        }
+
+        for (const auto& text_pair : sheetClass.text) {
+            const std::string& layer_name = text_pair.first;
+            const llmr::TextClass& layer = text_pair.second;
+
+            // TODO: This should be restricted to point styles that have actual
+            // values so as to not override with default values.
+            llmr::TextProperties& text = computed.texts[layer_name];
+            text.enabled = layer.enabled(z);
+            text.color = layer.color;
+            text.size = layer.size(z);
+            text.halo = layer.halo;
+            text.haloRadius = layer.haloRadius(z);
+            text.rotate = layer.rotate(z);
+            text.alwaysVisible = layer.alwaysVisible(z);
         }
 
         // Cascade background

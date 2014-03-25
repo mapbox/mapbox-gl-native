@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include "value.hpp"
 
@@ -12,7 +13,8 @@ enum class BucketType {
     None = 0,
     Fill = 1,
     Line = 2,
-    Point = 3
+    Point = 3,
+    Text = 4
 };
 
 enum class CapType {
@@ -29,11 +31,17 @@ enum class JoinType {
     Round = 3
 };
 
+enum class TextPathType {
+    Horizontal = 0,
+    Curve = 1
+};
+
 
 inline BucketType bucketType(const std::string& type) {
     if (type == "fill") return BucketType::Fill;
     else if (type == "line") return BucketType::Line;
     else if (type == "point") return BucketType::Point;
+    else if (type == "text") return BucketType::Text;
     else return BucketType::None;
 }
 
@@ -52,18 +60,32 @@ inline JoinType joinType(const std::string& join) {
     else return JoinType::None;
 }
 
+inline TextPathType textPathType(const std::string& path) {
+    if (path == "horizontal") return TextPathType::Horizontal;
+    else if (path == "curve") return TextPathType::Curve;
+    else return TextPathType::Horizontal;
+};
+
 class BucketGeometryDescription {
 public:
     CapType cap = CapType::None;
     JoinType join = JoinType::None;
     std::string font;
+    std::string text_field;
     float font_size = 0.0f;
     float miter_limit = 2.0f;
     float round_limit = 1.0f;
+    TextPathType path = TextPathType::Horizontal;
+    float padding = 2.0f;
+    float textMinDistance = 250.0f;
+    float rotate = 0.0f; // what is this?
+    float maxAngleDelta = M_PI;
+    bool alwaysVisible = false;
 };
 
 class BucketDescription {
 public:
+    BucketType feature_type = BucketType::None;
     BucketType type = BucketType::None;
 
     // Specify what data to pull into this bucket
