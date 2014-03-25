@@ -1,12 +1,7 @@
 attribute vec2 a_pos;
 attribute vec2 a_offset;
-attribute vec2 a_tex;
-attribute float a_angle;
-attribute float a_minzoom;
-attribute float a_maxzoom;
-attribute float a_rangeend;
-attribute float a_rangestart;
-attribute float a_labelminzoom;
+attribute vec4 a_data1;
+attribute vec4 a_data2;
 
 
 // posmatrix is for the vertex position, exmatrix is for rotating and projecting
@@ -27,8 +22,14 @@ varying vec2 v_tex;
 varying float v_alpha;
 
 void main() {
+    vec2 a_tex = a_data1.xy;
+    float a_labelminzoom = a_data1[2];
+    float a_minzoom = a_data1[3];
+    float a_maxzoom = a_data2[0];
+    float a_angle = a_data2[1];
+    float a_rangeend = a_data2[2];
+    float a_rangestart = a_data2[3];
 
-    float a_fadedist = 10.0;
     float rev = 0.0;
 
     // u_angle is angle of the map, -128..128 representing 0..2PI
