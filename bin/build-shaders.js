@@ -7,7 +7,7 @@ var path = require('path');
 var glsl;
 try { glsl = require('glsl-optimizer'); } catch(err) {}
 
-module.exports = function() {
+module.exports = function(param) {
     var name;
     var shaders = {};
 
@@ -30,9 +30,21 @@ module.exports = function() {
 
     // Optimize shader
     if (glsl) {
-        var compiler = new glsl.Compiler(glsl.TARGET_OPENGLES20);
+        var preamble = '';
+        var target = glsl.TARGET_OPENGL;
+        if (param == 'gles2') {
+            target = glsl.TARGET_OPENGLES20;
+            preamble = 'precision highp float;';
+        } else if (param == 'gles3') {
+            target = glsl.TARGET_OPENGLES30;
+            preamble = 'precision highp float;';
+        } else {
+            preamble = '#version 120';
+        }
+
+        var compiler = new glsl.Compiler(target);
         for (name in shaders) {
-            var vertex_shader = new glsl.Shader(compiler, glsl.VERTEX_SHADER, shaders[name].vertex);
+            var vertex_shader = new glsl.Shader(compiler, glsl.VERTEX_SHADER, preamble + '\n' + shaders[name].vertex);
             if (vertex_shader.compiled()) {
                 shaders[name].vertex = vertex_shader.output();
             } else {
@@ -41,7 +53,7 @@ module.exports = function() {
             }
             vertex_shader.dispose();
 
-            var fragment_shader = new glsl.Shader(compiler, glsl.FRAGMENT_SHADER, shaders[name].fragment);
+            var fragment_shader = new glsl.Shader(compiler, glsl.FRAGMENT_SHADER, preamble + '\n' + shaders[name].fragment);
             if (fragment_shader.compiled()) {
                 shaders[name].fragment = fragment_shader.output();
             } else {
@@ -107,4 +119,4 @@ module.exports = function() {
 
 };
 
-module.exports();
+module.exports(process.argv[2]);

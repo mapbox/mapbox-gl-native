@@ -9,3 +9,5 @@
 /config.mk
 /build
 /node_modules
+/include/llmr/shader/shaders.hpp
+/src/shader/shaders.cpp

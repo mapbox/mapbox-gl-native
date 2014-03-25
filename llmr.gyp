@@ -9,17 +9,6 @@
       'type':'none',
       'actions': [
         {
-          'action_name': 'Build Shaders',
-          'inputs': [
-            '<!@(find src -name "*.glsl")'
-          ],
-          'outputs': [
-            'include/llmr/shader/shaders.hpp',
-            'src/shader/shaders.cpp'
-          ],
-          'action': ['bin/build-shaders.js'],
-        },
-        {
           'action_name': 'Build Stylesheet',
           'inputs': [
             'bin/style.js'
@@ -36,6 +25,19 @@
       'target_name': 'llmr-x86',
       'product_name': 'llmr-x86',
       'type': 'static_library',
+      'actions': [
+        {
+          'action_name': 'Build Shaders',
+          'inputs': [
+            '<!@(find src -name "*.glsl")'
+          ],
+          'outputs': [
+            'include/llmr/shader/shaders.hpp',
+            'src/shader/shaders.cpp'
+          ],
+          'action': ['bin/build-shaders.js gl'],
+        }
+      ],
       'dependencies': [
           'before_build_actions'
       ],
@@ -94,6 +96,19 @@
       'target_name': 'llmr-ios',
       'product_name': 'llmr-ios',
       'type': 'static_library',
+      'actions': [
+        {
+          'action_name': 'Build Shaders',
+          'inputs': [
+            '<!@(find src -name "*.glsl")'
+          ],
+          'outputs': [
+            'include/llmr/shader/shaders.hpp',
+            'src/shader/shaders.cpp'
+          ],
+          'action': ['bin/build-shaders.js gles2'],
+        }
+      ],
       'dependencies': [
           'before_build_actions'
       ],
