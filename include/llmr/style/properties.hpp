@@ -64,7 +64,7 @@ struct FunctionProperty {
 };
 
 struct PointClass {
-    FunctionProperty<bool> hidden;
+    FunctionProperty<bool> enabled = true;
     FunctionProperty<float> size;
     Color color = {{ 0, 0, 0, 1 }};
     FunctionProperty<float> opacity = 1;
@@ -72,7 +72,7 @@ struct PointClass {
 };
 
 struct PointProperties {
-    bool hidden = false;
+    bool enabled = true;
     float size = 0;
     Color color = {{ 0, 0, 0, 1 }};
     float opacity = 1.0;
@@ -80,7 +80,7 @@ struct PointProperties {
 };
 
 struct LineClass {
-    FunctionProperty<bool> hidden;
+    FunctionProperty<bool> enabled = true;
     FunctionProperty<float> width;
     FunctionProperty<float> offset;
     Color color = {{ 0, 0, 0, 1 }};
@@ -88,7 +88,7 @@ struct LineClass {
 };
 
 struct LineProperties {
-    bool hidden = false;
+    bool enabled = true;
     float width = 0;
     float offset = 0;
     Color color = {{ 0, 0, 0, 1 }};
@@ -96,7 +96,7 @@ struct LineProperties {
 };
 
 struct FillClass {
-    FunctionProperty<bool> hidden;
+    FunctionProperty<bool> enabled = true;
     Winding winding = Winding::NonZero;
     FunctionProperty<bool> antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
@@ -106,7 +106,7 @@ struct FillClass {
 };
 
 struct FillProperties {
-    bool hidden = false;
+    bool enabled = true;
     Winding winding = Winding::NonZero;
     bool antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
@@ -116,7 +116,7 @@ struct FillProperties {
 };
 
 struct TextClass {
-    FunctionProperty<bool> hidden;
+    FunctionProperty<bool> enabled = true;
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     FunctionProperty<float> haloRadius = 0.25f;
@@ -126,7 +126,7 @@ struct TextClass {
 };
 
 struct TextProperties {
-    bool hidden = false;
+    bool enabled = true;
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     float haloRadius = 0.25f;

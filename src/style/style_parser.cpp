@@ -428,8 +428,8 @@ FunctionProperty<bool> StyleParser::parseBoolFunction(JSVal value) {
 FillClass StyleParser::parseFillClass(JSVal value) {
     FillClass klass;
 
-    if (value.HasMember("hidden")) {
-        klass.hidden = parseBoolFunction(value["hidden"]);
+    if (value.HasMember("enabled")) {
+        klass.enabled = parseBoolFunction(value["enabled"]);
     }
 
     if (value.HasMember("color")) {
@@ -460,8 +460,8 @@ FillClass StyleParser::parseFillClass(JSVal value) {
 LineClass StyleParser::parseLineClass(JSVal value) {
     LineClass klass;
 
-    if (value.HasMember("hidden")) {
-        klass.hidden = parseBoolFunction(value["hidden"]);
+    if (value.HasMember("enabled")) {
+        klass.enabled = parseBoolFunction(value["enabled"]);
     }
 
     if (value.HasMember("color")) {
@@ -482,8 +482,8 @@ LineClass StyleParser::parseLineClass(JSVal value) {
 PointClass StyleParser::parsePointClass(JSVal value) {
     PointClass klass;
 
-    if (value.HasMember("hidden")) {
-        klass.hidden = parseBoolFunction(value["hidden"]);
+    if (value.HasMember("enabled")) {
+        klass.enabled = parseBoolFunction(value["enabled"]);
     }
 
     if (value.HasMember("color")) {
@@ -509,8 +509,8 @@ PointClass StyleParser::parsePointClass(JSVal value) {
 TextClass StyleParser::parseTextClass(JSVal value) {
     TextClass klass;
 
-    if (value.HasMember("hidden")) {
-        klass.hidden = parseBoolFunction(value["hidden"]);
+    if (value.HasMember("enabled")) {
+        klass.enabled = parseBoolFunction(value["enabled"]);
     }
 
     if (value.HasMember("color")) {

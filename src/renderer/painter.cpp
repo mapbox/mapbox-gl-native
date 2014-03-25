@@ -366,7 +366,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     if (bucket.empty()) return;
 
     const LineProperties& properties = style.computed.lines[layer_name];
-    if (properties.hidden) return;
+    if (!properties.enabled) return;
 
     float width = properties.width;
     float offset = properties.offset / 2;
@@ -447,7 +447,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     if (pass == Opaque) return;
 
     const PointProperties& properties = style.computed.points[layer_name];
-    if (properties.hidden) return;
+    if (!properties.enabled) return;
 
     Color color = properties.color;
     color[0] *= properties.opacity;
@@ -489,7 +489,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     if (bucket.empty()) return;
 
     const TextProperties& properties = style.computed.texts[layer_name];
-    if (properties.hidden) return;
+    if (!properties.enabled) return;
 
     mat4 exMatrix;
     matrix::copy(exMatrix, projMatrix);
