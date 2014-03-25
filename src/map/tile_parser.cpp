@@ -6,6 +6,8 @@
 #include <llmr/renderer/point_bucket.hpp>
 #include <llmr/renderer/text_bucket.hpp>
 
+#include <llmr/util/std.hpp>
+
 using namespace llmr;
 
 
@@ -58,11 +60,11 @@ void TileParser::parseStyleLayers(const std::vector<LayerDescription>& layers) {
                 if (bucket_it != style.buckets.end()) {
                     // Only create the new bucket if we have an actual specification
                     // for it.
-                    std::shared_ptr<Bucket> bucket = createBucket(bucket_it->second);
+                    std::unique_ptr<Bucket> bucket = createBucket(bucket_it->second);
                     if (bucket) {
                         // Bucket creation might fail because the data tile may not
                         // contain any data that falls into this bucket.
-                        tile.buckets[layer_desc.bucket_name] = bucket;
+                        tile.buckets[layer_desc.bucket_name] = std::move(bucket);
                     }
                 } else {
                     // There is no proper specification for this bucket, even though
@@ -74,7 +76,7 @@ void TileParser::parseStyleLayers(const std::vector<LayerDescription>& layers) {
     }
 }
 
-std::shared_ptr<Bucket> TileParser::createBucket(const BucketDescription& bucket_desc) {
+std::unique_ptr<Bucket> TileParser::createBucket(const BucketDescription& bucket_desc) {
     auto layer_it = data.layers.find(bucket_desc.source_layer);
     if (layer_it != data.layers.end()) {
         const VectorTileLayer& layer = layer_it->second;
@@ -111,28 +113,28 @@ void TileParser::addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer,
     }
 }
 
-std::shared_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
-    std::shared_ptr<FillBucket> bucket = std::make_shared<FillBucket>(
+std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+    std::unique_ptr<FillBucket> bucket = std::make_unique<FillBucket>(
         tile.fillVertexBuffer, tile.triangleElementsBuffer, tile.lineElementsBuffer, bucket_desc);
     addBucketFeatures(bucket, layer, bucket_desc);
-    return obsolete() ? nullptr : bucket;
+    return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::shared_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
-    std::shared_ptr<LineBucket> bucket = std::make_shared<LineBucket>(
+std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+    std::unique_ptr<LineBucket> bucket = std::make_unique<LineBucket>(
         tile.lineVertexBuffer, tile.triangleElementsBuffer, tile.pointElementsBuffer, bucket_desc);
     addBucketFeatures(bucket, layer, bucket_desc);
-    return obsolete() ? nullptr : bucket;
+    return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::shared_ptr<Bucket> TileParser::createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
-    std::shared_ptr<PointBucket> bucket = std::make_shared<PointBucket>(
+std::unique_ptr<Bucket> TileParser::createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+    std::unique_ptr<PointBucket> bucket = std::make_unique<PointBucket>(
         tile.pointVertexBuffer, bucket_desc);
     addBucketFeatures(bucket, layer, bucket_desc);
-    return obsolete() ? nullptr : bucket;
+    return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::shared_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     // Determine the correct text stack.
     if (!layer.shaping.size()) {
         return nullptr;
@@ -153,7 +155,7 @@ std::shared_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
         faces.push_back(&it->second);
     }
 
-    std::shared_ptr<TextBucket> bucket = std::make_shared<TextBucket>(
+    std::unique_ptr<TextBucket> bucket = std::make_unique<TextBucket>(
         tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
 
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
@@ -162,5 +164,5 @@ std::shared_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
         bucket->addFeature({ feature_pbf, layer }, faces, shaping);
     }
 
-    return bucket;
+    return std::move(bucket);
 }

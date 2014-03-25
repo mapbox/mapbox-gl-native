@@ -11,6 +11,8 @@
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/platform/platform.hpp>
 
+#include <llmr/renderer/bucket.hpp>
+
 #include <llmr/geometry/vertex_buffer.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/geometry/fill_buffer.hpp>
@@ -30,7 +32,6 @@ namespace llmr {
 
 class Style;
 class Raster;
-class Bucket;
 class LayerDescription;
 class BucketDescription;
 
@@ -87,7 +88,7 @@ public:
 
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above
-    std::map<std::string, std::shared_ptr<Bucket>> buckets;
+    std::map<std::string, std::unique_ptr<Bucket>> buckets;
 
 private:
     // Source data
