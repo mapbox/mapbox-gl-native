@@ -17,13 +17,6 @@ TileData::TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, cons
       use_retina(use_retina),
       state(State::initial),
       raster(),
-      fillVertexBuffer(std::make_shared<FillVertexBuffer>()),
-      lineVertexBuffer(std::make_shared<LineVertexBuffer>()),
-      pointVertexBuffer(std::make_shared<PointVertexBuffer>()),
-      textVertexBuffer(std::make_shared<TextVertexBuffer>()),
-      triangleElementsBuffer(std::make_shared<TriangleElementsBuffer>()),
-      lineElementsBuffer(std::make_shared<LineElementsBuffer>()),
-      pointElementsBuffer(std::make_shared<PointElementsBuffer>()),
       style(style),
       glyphAtlas(glyphAtlas) {
 

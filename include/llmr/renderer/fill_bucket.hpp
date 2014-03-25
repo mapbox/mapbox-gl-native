@@ -38,9 +38,9 @@ class FillBucket : public Bucket {
     typedef ElementGroup triangle_group_type;
     typedef ElementGroup line_group_type;
 public:
-    FillBucket(const std::shared_ptr<FillVertexBuffer>& vertexBuffer,
-               const std::shared_ptr<TriangleElementsBuffer>& triangleElementsBuffer,
-               const std::shared_ptr<LineElementsBuffer>& lineElementsBuffer,
+    FillBucket(FillVertexBuffer& vertexBuffer,
+               TriangleElementsBuffer& triangleElementsBuffer,
+               LineElementsBuffer& lineElementsBuffer,
                const BucketDescription& bucket_desc);
     ~FillBucket();
 
@@ -62,9 +62,9 @@ private:
     TESStesselator *tesselator;
     ClipperLib::Clipper clipper;
 
-    std::shared_ptr<FillVertexBuffer> vertexBuffer;
-    std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
-    std::shared_ptr<LineElementsBuffer> lineElementsBuffer;
+    FillVertexBuffer& vertexBuffer;
+    TriangleElementsBuffer& triangleElementsBuffer;
+    LineElementsBuffer& lineElementsBuffer;
 
     // hold information on where the vertices are located in the FillBuffer
     const size_t vertex_start;

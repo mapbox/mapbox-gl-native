@@ -11,6 +11,13 @@
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/platform/platform.hpp>
 
+#include <llmr/geometry/vertex_buffer.hpp>
+#include <llmr/geometry/elements_buffer.hpp>
+#include <llmr/geometry/fill_buffer.hpp>
+#include <llmr/geometry/line_buffer.hpp>
+#include <llmr/geometry/point_buffer.hpp>
+#include <llmr/geometry/text_buffer.hpp>
+
 #include <cstdint>
 #include <forward_list>
 #include <string>
@@ -26,14 +33,8 @@ class Raster;
 class Bucket;
 class LayerDescription;
 class BucketDescription;
-class FillVertexBuffer;
-class LineVertexBuffer;
-class PointVertexBuffer;
-class TextVertexBuffer;
-class TriangleElementsBuffer;
-class LineElementsBuffer;
-class PointElementsBuffer;
-class TextElementsBuffer;
+
+
 class PlainShader;
 
 class TileData : public std::enable_shared_from_this<TileData>,
@@ -75,14 +76,14 @@ public:
     DebugFontBuffer debugFontBuffer;
     VertexArrayObject debugFontArray;
 
-    std::shared_ptr<FillVertexBuffer> fillVertexBuffer;
-    std::shared_ptr<LineVertexBuffer> lineVertexBuffer;
-    std::shared_ptr<PointVertexBuffer> pointVertexBuffer;
-    std::shared_ptr<TextVertexBuffer> textVertexBuffer;
+    FillVertexBuffer fillVertexBuffer;
+    LineVertexBuffer lineVertexBuffer;
+    PointVertexBuffer pointVertexBuffer;
+    TextVertexBuffer textVertexBuffer;
 
-    std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
-    std::shared_ptr<LineElementsBuffer> lineElementsBuffer;
-    std::shared_ptr<PointElementsBuffer> pointElementsBuffer;
+    TriangleElementsBuffer triangleElementsBuffer;
+    LineElementsBuffer lineElementsBuffer;
+    PointElementsBuffer pointElementsBuffer;
 
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above

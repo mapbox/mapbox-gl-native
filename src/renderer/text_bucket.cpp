@@ -21,15 +21,15 @@
 using namespace llmr;
 
 TextBucket::TextBucket(
-    const std::shared_ptr<TextVertexBuffer> &vertexBuffer,
-    const std::shared_ptr<TriangleElementsBuffer> &triangleElementsBuffer,
+    TextVertexBuffer &vertexBuffer,
+    TriangleElementsBuffer &triangleElementsBuffer,
     const BucketDescription &bucket_desc, Placement &placement)
     : geom_desc(bucket_desc.geometry),
       vertexBuffer(vertexBuffer),
       triangleElementsBuffer(triangleElementsBuffer),
       placement(placement),
-      vertex_start(vertexBuffer->index()),
-      triangle_elements_start(triangleElementsBuffer->index()) {}
+      vertex_start(vertexBuffer.index()),
+      triangle_elements_start(triangleElementsBuffer.index()) {}
 
 void TextBucket::addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
                            PlacementRange placementRange, float zoom) {
@@ -77,24 +77,24 @@ void TextBucket::addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
         uint32_t triangleIndex = triangleGroup.vertex_length;
 
         // coordinates (2 triangles)
-        vertexBuffer->add(glyphAnchor.x, glyphAnchor.y, tl.x, tl.y, tex.x,
+        vertexBuffer.add(glyphAnchor.x, glyphAnchor.y, tl.x, tl.y, tex.x,
                           tex.y, angle, minZoom, placementRange, maxZoom,
                           placementZoom);
-        vertexBuffer->add(glyphAnchor.x, glyphAnchor.y, tr.x, tr.y,
+        vertexBuffer.add(glyphAnchor.x, glyphAnchor.y, tr.x, tr.y,
                           tex.x + width, tex.y, angle, minZoom, placementRange,
                           maxZoom, placementZoom);
-        vertexBuffer->add(glyphAnchor.x, glyphAnchor.y, bl.x, bl.y, tex.x,
+        vertexBuffer.add(glyphAnchor.x, glyphAnchor.y, bl.x, bl.y, tex.x,
                           tex.y + height, angle, minZoom, placementRange,
                           maxZoom, placementZoom);
-        vertexBuffer->add(glyphAnchor.x, glyphAnchor.y, br.x, br.y,
+        vertexBuffer.add(glyphAnchor.x, glyphAnchor.y, br.x, br.y,
                           tex.x + width, tex.y + height, angle, minZoom,
                           placementRange, maxZoom, placementZoom);
 
         // add the two triangles, referencing the four coordinates we just
         // inserted.
-        triangleElementsBuffer->add(triangleIndex + 0, triangleIndex + 1,
+        triangleElementsBuffer.add(triangleIndex + 0, triangleIndex + 1,
                                     triangleIndex + 2);
-        triangleElementsBuffer->add(triangleIndex + 1, triangleIndex + 2,
+        triangleElementsBuffer.add(triangleIndex + 1, triangleIndex + 2,
                                     triangleIndex + 3);
 
         triangleGroup.vertex_length += glyph_vertex_length;
@@ -151,13 +151,13 @@ void TextBucket::render(Painter &painter, const std::string &layer_name,
 bool TextBucket::empty() const { return triangleGroups.empty(); }
 
 void TextBucket::drawGlyphs(TextShader &shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer->itemSize);
+    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
     char *elements_index =
-        BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer->itemSize);
+        BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (triangle_group_type &group : triangleGroups) {
-        group.array.bind(shader, *vertexBuffer, *triangleElementsBuffer, vertex_index);
+        group.array.bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group.vertex_length * vertexBuffer->itemSize;
-        elements_index += group.elements_length * triangleElementsBuffer->itemSize;
+        vertex_index += group.vertex_length * vertexBuffer.itemSize;
+        elements_index += group.elements_length * triangleElementsBuffer.itemSize;
     }
 }

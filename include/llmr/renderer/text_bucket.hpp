@@ -25,8 +25,8 @@ class TextBucket : public Bucket {
 
 public:
     TextBucket(
-        const std::shared_ptr<TextVertexBuffer> &vertexBuffer,
-        const std::shared_ptr<TriangleElementsBuffer> &triangleElementsBuffer,
+        TextVertexBuffer &vertexBuffer,
+        TriangleElementsBuffer &triangleElementsBuffer,
         const BucketDescription &bucket_desc, Placement &placement);
 
     virtual void render(Painter &painter, const std::string &layer_name,
@@ -47,8 +47,8 @@ public:
     const BucketGeometryDescription &geom_desc;
 
 private:
-    std::shared_ptr<TextVertexBuffer> vertexBuffer;
-    std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
+    TextVertexBuffer& vertexBuffer;
+    TriangleElementsBuffer& triangleElementsBuffer;
     Placement &placement;
 
     const size_t vertex_start;

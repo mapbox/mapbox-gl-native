@@ -5,6 +5,7 @@
 #include <llmr/style/bucket_description.hpp>
 #include <llmr/geometry/vao.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
+#include <llmr/geometry/line_buffer.hpp>
 #include <memory>
 #include <vector>
 
@@ -21,9 +22,9 @@ class LineBucket : public Bucket {
     typedef ElementGroup triangle_group_type;
     typedef ElementGroup point_group_type;
 public:
-    LineBucket(const std::shared_ptr<LineVertexBuffer>& vertexBuffer,
-               const std::shared_ptr<TriangleElementsBuffer>& triangleElementsBuffer,
-               const std::shared_ptr<PointElementsBuffer>& pointElementsBuffer,
+    LineBucket(LineVertexBuffer& vertexBuffer,
+               TriangleElementsBuffer& triangleElementsBuffer,
+               PointElementsBuffer& pointElementsBuffer,
                const BucketDescription& bucket_desc);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
@@ -42,9 +43,9 @@ public:
 
 private:
 
-    std::shared_ptr<LineVertexBuffer> vertexBuffer;
-    std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
-    std::shared_ptr<PointElementsBuffer> pointElementsBuffer;
+    LineVertexBuffer& vertexBuffer;
+    TriangleElementsBuffer& triangleElementsBuffer;
+    PointElementsBuffer& pointElementsBuffer;
 
     const size_t vertex_start;
     const size_t triangle_elements_start;

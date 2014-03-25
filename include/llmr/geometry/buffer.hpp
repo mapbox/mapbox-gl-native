@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <llmr/platform/gl.hpp>
+#include <llmr/util/noncopyable.hpp>
 
 namespace llmr {
 
@@ -12,7 +13,7 @@ template <
     int bufferType = GL_ARRAY_BUFFER,
     size_t defaultLength = 8192
 >
-class Buffer {
+class Buffer : private util::noncopyable {
 public:
     ~Buffer() {
         if (array) {
