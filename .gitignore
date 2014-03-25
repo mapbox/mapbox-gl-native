@@ -8,3 +8,4 @@
 /config.gypi
 /config.mk
 /build
+/node_modules

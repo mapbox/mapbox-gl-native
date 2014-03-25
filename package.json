@@ -1,0 +1,7 @@
+{
+    "name": "llmr-native",
+    "version": "0.0.1",
+    "dependencies": {
+        "glsl-optimizer": "https://github.com/kkaefer/glsl-optimizer/archive/amalgamation.zip"
+    }
+}
