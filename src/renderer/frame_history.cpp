@@ -10,13 +10,13 @@ void FrameHistory::record(float zoom) {
         history.emplace_back(FrameSnapshot{0.0f, zoom});
     }
 
-    if (history.size() == 2 || history.back().z != zoom) {
+    if (history.size() > 0 || history.back().z != zoom) {
         history.emplace_back(FrameSnapshot{static_cast<float>(platform::time() * 1000), zoom});
     }
 }
 
 bool FrameHistory::needsAnimation(const float duration) const {
-    if (!history.size()) return true;
+    if (!history.size()) return false;
 
     // If we have a value that is older than duration and whose z value is the
     // same as the most current z value, and if all values inbetween have the
