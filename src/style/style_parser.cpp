@@ -31,6 +31,12 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("bucket type must be a string");
             }
+        } else if (name == "feature_type") {
+            if (value.IsString()) {
+                bucket.feature_type = bucketType({ value.GetString(), value.GetStringLength() });
+            } else {
+                throw Style::exception("feature type must be a string");
+            }
         } else if (name == "source") {
             if (value.IsString()) {
                 bucket.source_name = { value.GetString(), value.GetStringLength() };
@@ -81,6 +87,18 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("font size must be a number");
             }
+        } else if (name == "text_field") {
+            if (value.IsString()) {
+                bucket.geometry.text_field = { value.GetString(), value.GetStringLength() };
+            } else {
+                throw Style::exception("text field must be a string");
+            }
+        } else if (name == "path") {
+            if (value.IsString()) {
+                bucket.geometry.path = textPathType({ value.GetString(), value.GetStringLength() });
+            } else {
+                throw Style::exception("curve must be a string");
+            }
         } else if (name == "miterLimit") {
             if (value.IsNumber()) {
                 bucket.geometry.miter_limit = value.GetDouble();
@@ -93,7 +111,24 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("round limit must be a number");
             }
+        } else if (name == "textMinDistance") {
+            if (value.IsNumber()) {
+                bucket.geometry.textMinDistance = value.GetDouble();
+            } else {
+                throw Style::exception("text min distance must be a number");
+            }
+        } else if (name == "maxAngleDelta") {
+            if (value.IsNumber()) {
+                bucket.geometry.maxAngleDelta = value.GetDouble();
+            } else {
+                throw Style::exception("max angle delta must be a number");
+            }
         }
+
+    }
+
+    if (bucket.feature_type == BucketType::None) {
+        bucket.feature_type = bucket.type;
     }
 
     return bucket;
@@ -217,6 +252,8 @@ void StyleParser::parseClass(const std::string& name, JSVal value, ClassDescript
                     class_desc.line.insert({ name, std::forward<LineClass>(parseLineClass(value)) });
                 } else if (type_name == "point") {
                     class_desc.point.insert({ name, std::forward<PointClass>(parsePointClass(value)) });
+                } else if (type_name == "text") {
+                    class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
                 } else if (type_name == "background") {
                     class_desc.background = parseBackgroundClass(value);
                 } else {
@@ -250,29 +287,39 @@ std::string StyleParser::parseString(JSVal value) {
 }
 
 Color StyleParser::parseColor(JSVal value) {
-    if (!value.IsString()) {
+    if (value.IsArray()) {
+        // [ r, g, b, a] array
+        if (value.Size() != 4) {
+            throw Style::exception("color array must have four elements");
+        }
+
+        JSVal r = value[(rapidjson::SizeType)0], g = value[1], b = value[2], a = value[3];
+        if (!r.IsNumber() || !g.IsNumber() || !b.IsNumber() || !a.IsNumber()) {
+            throw Style::exception("color values must be numbers");
+        }
+
+        return {{static_cast<float>(r.GetDouble()),
+                 static_cast<float>(g.GetDouble()),
+                 static_cast<float>(b.GetDouble()),
+                 static_cast<float>(a.GetDouble())}};
+
+    } else if (!value.IsString()) {
         throw Style::exception("color value must be a string");
     }
 
-    const std::string str { value.GetString(), value.GetStringLength() };
+    const std::string str{value.GetString(), value.GetStringLength()};
 
     auto it = constants.find(str);
     if (it != constants.end()) {
         return parseColor(*it->second);
     } else {
         CSSColorParser::Color css_color = CSSColorParser::parse(str);
-        return {{
-                (float)css_color.r / 255,
-                (float)css_color.g / 255,
-                (float)css_color.b / 255,
-                css_color.a
-            }
-        };
+        return {{(float)css_color.r / 255, (float)css_color.g / 255,
+                 (float)css_color.b / 255, css_color.a}};
     }
 }
 
-template <typename T>
-typename FunctionProperty<T>::fn StyleParser::parseFunctionType(JSVal type) {
+FunctionProperty::fn StyleParser::parseFunctionType(JSVal type) {
     if (type.IsString()) {
         std::string t { type.GetString(), type.GetStringLength() };
         if (t == "constant") {
@@ -281,6 +328,12 @@ typename FunctionProperty<T>::fn StyleParser::parseFunctionType(JSVal type) {
             return &functions::linear;
         } else if (t == "stops") {
             return &functions::stops;
+        } else if (t == "exponential") {
+            return &functions::exponential;
+        } else if (t == "min") {
+            return &functions::min;
+        } else if (t == "max") {
+            return &functions::max;
         } else {
             throw Style::exception("unknown function type");
         }
@@ -289,15 +342,15 @@ typename FunctionProperty<T>::fn StyleParser::parseFunctionType(JSVal type) {
     }
 }
 
-FunctionProperty<float> StyleParser::parseFloatFunction(JSVal value) {
-    FunctionProperty<float> property;
+FunctionProperty StyleParser::parseFunction(JSVal value) {
+    FunctionProperty property;
 
     if (value.IsArray()) {
         if (value.Size() < 1) {
             throw Style::exception("value function does not have arguments");
         }
 
-        property.function = parseFunctionType<float>(value[(rapidjson::SizeType)0]);
+        property.function = parseFunctionType(value[(rapidjson::SizeType)0]);
         for (rapidjson::SizeType i = 1; i < value.Size(); ++i) {
             JSVal stop = value[i];
             if (stop.IsObject()) {
@@ -320,8 +373,10 @@ FunctionProperty<float> StyleParser::parseFloatFunction(JSVal value) {
                 property.values.push_back(val.GetDouble());
             } else if (stop.IsNumber()) {
                 property.values.push_back(stop.GetDouble());
+            } else if (stop.IsBool()) {
+                property.values.push_back(stop.GetBool());
             } else {
-                throw Style::exception("stop must be a number");
+                throw Style::exception("function argument must be a numeric value");
             }
         }
     } else if (value.IsNumber()) {
@@ -332,54 +387,11 @@ FunctionProperty<float> StyleParser::parseFloatFunction(JSVal value) {
     return property;
 }
 
-FunctionProperty<bool> StyleParser::parseBoolFunction(JSVal value) {
-    FunctionProperty<bool> property;
-
-    if (value.IsArray()) {
-        if (value.Size() < 1) {
-            throw Style::exception("value function does not have arguments");
-        }
-
-        property.function = parseFunctionType<bool>(value[(rapidjson::SizeType)0]);
-        for (rapidjson::SizeType i = 1; i < value.Size(); ++i) {
-            JSVal stop = value[i];
-            if (stop.IsObject()) {
-                if (!stop.HasMember("z")) {
-                    throw Style::exception("stop must have zoom level specification");
-                }
-                JSVal z = stop["z"];
-                if (!z.IsBool()) {
-                    throw Style::exception("zoom level in stops must be a number");
-                }
-                property.values.push_back(z.GetBool());
-
-                if (!stop.HasMember("val")) {
-                    throw Style::exception("stop must have value specification");
-                }
-                JSVal val = stop["val"];
-                if (!val.IsBool()) {
-                    throw Style::exception("value in stops must be a number");
-                }
-                property.values.push_back(val.GetBool());
-            } else if (stop.IsBool()) {
-                property.values.push_back(stop.GetBool());
-            } else {
-                throw Style::exception("stop must be a number");
-            }
-        }
-    } else if (value.IsBool()) {
-        property.function = &functions::constant;
-        property.values.push_back(value.GetBool());
-    }
-
-    return property;
-}
-
 FillClass StyleParser::parseFillClass(JSVal value) {
     FillClass klass;
 
-    if (value.HasMember("hidden")) {
-        klass.hidden = parseBoolFunction(value["hidden"]);
+    if (value.HasMember("enabled")) {
+        klass.enabled = parseFunction(value["enabled"]);
     }
 
     if (value.HasMember("color")) {
@@ -401,7 +413,7 @@ FillClass StyleParser::parseFillClass(JSVal value) {
     }
 
     if (value.HasMember("opacity")) {
-        klass.opacity = parseFloatFunction(value["opacity"]);
+        klass.opacity = parseFunction(value["opacity"]);
     }
 
     return klass;
@@ -410,8 +422,8 @@ FillClass StyleParser::parseFillClass(JSVal value) {
 LineClass StyleParser::parseLineClass(JSVal value) {
     LineClass klass;
 
-    if (value.HasMember("hidden")) {
-        klass.hidden = parseBoolFunction(value["hidden"]);
+    if (value.HasMember("enabled")) {
+        klass.enabled = parseFunction(value["enabled"]);
     }
 
     if (value.HasMember("color")) {
@@ -419,11 +431,11 @@ LineClass StyleParser::parseLineClass(JSVal value) {
     }
 
     if (value.HasMember("width")) {
-        klass.width = parseFloatFunction(value["width"]);
+        klass.width = parseFunction(value["width"]);
     }
 
     if (value.HasMember("opacity")) {
-        klass.opacity = parseFloatFunction(value["opacity"]);
+        klass.opacity = parseFunction(value["opacity"]);
     }
 
     return klass;
@@ -432,8 +444,8 @@ LineClass StyleParser::parseLineClass(JSVal value) {
 PointClass StyleParser::parsePointClass(JSVal value) {
     PointClass klass;
 
-    if (value.HasMember("hidden")) {
-        klass.hidden = parseBoolFunction(value["hidden"]);
+    if (value.HasMember("enabled")) {
+        klass.enabled = parseFunction(value["enabled"]);
     }
 
     if (value.HasMember("color")) {
@@ -441,7 +453,7 @@ PointClass StyleParser::parsePointClass(JSVal value) {
     }
 
     if (value.HasMember("opacity")) {
-        klass.opacity = parseFloatFunction(value["opacity"]);
+        klass.opacity = parseFunction(value["opacity"]);
     }
 
     if (value.HasMember("image")) {
@@ -449,7 +461,42 @@ PointClass StyleParser::parsePointClass(JSVal value) {
     }
 
     if (value.HasMember("size")) {
-        klass.size = parseFloatFunction(value["size"]);
+        klass.size = parseFunction(value["size"]);
+    }
+
+    return klass;
+}
+
+
+TextClass StyleParser::parseTextClass(JSVal value) {
+    TextClass klass;
+
+    if (value.HasMember("enabled")) {
+        klass.enabled = parseFunction(value["enabled"]);
+    }
+
+    if (value.HasMember("color")) {
+        klass.color = parseColor(value["color"]);
+    }
+
+    if (value.HasMember("stroke")) {
+        klass.halo = parseColor(value["stroke"]);
+    }
+
+    if (value.HasMember("strokeWidth")) {
+        klass.haloRadius = parseFunction(value["strokeWidth"]);
+    }
+
+    if (value.HasMember("size")) {
+        klass.size = parseFunction(value["size"]);
+    }
+
+    if (value.HasMember("rotate")) {
+        klass.rotate = parseFunction(value["rotate"]);
+    }
+
+    if (value.HasMember("alwaysVisible")) {
+        klass.alwaysVisible = parseFunction(value["alwaysVisible"]);
     }
 
     return klass;

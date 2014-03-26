@@ -30,9 +30,9 @@ void FillBucket::free(void *, void *ptr) {
     ::free(ptr);
 }
 
-FillBucket::FillBucket(const std::shared_ptr<FillVertexBuffer>& vertexBuffer,
-                       const std::shared_ptr<TriangleElementsBuffer>& triangleElementsBuffer,
-                       const std::shared_ptr<LineElementsBuffer>& lineElementsBuffer,
+FillBucket::FillBucket(FillVertexBuffer& vertexBuffer,
+                       TriangleElementsBuffer& triangleElementsBuffer,
+                       LineElementsBuffer& lineElementsBuffer,
                        const BucketDescription& bucket_desc)
     : geom_desc(bucket_desc.geometry),
     allocator(new TESSalloc {
@@ -51,9 +51,9 @@ tesselator(tessNewTess(allocator)),
 vertexBuffer(vertexBuffer),
 triangleElementsBuffer(triangleElementsBuffer),
 lineElementsBuffer(lineElementsBuffer),
-vertex_start(vertexBuffer->index()),
-triangle_elements_start(triangleElementsBuffer->index()),
-line_elements_start(lineElementsBuffer->index()) {
+vertex_start(vertexBuffer.index()),
+triangle_elements_start(triangleElementsBuffer.index()),
+line_elements_start(lineElementsBuffer.index()) {
     assert(tesselator);
 }
 
@@ -88,6 +88,8 @@ void FillBucket::addGeometry(pbf& geom) {
         line.clear();
         hasVertices = true;
     }
+
+    tessellate();
 }
 
 void FillBucket::tessellate() {
@@ -129,12 +131,12 @@ void FillBucket::tessellate() {
         for (const ClipperLib::IntPoint& pt : polygon) {
             line.push_back(pt.X);
             line.push_back(pt.Y);
-            vertexBuffer->add(pt.X, pt.Y);
+            vertexBuffer.add(pt.X, pt.Y);
         }
 
         for (size_t i = 0; i < group_count; i++) {
             const size_t prev_i = (i == 0 ? group_count : i) - 1;
-            lineElementsBuffer->add(lineIndex + prev_i, lineIndex + i);
+            lineElementsBuffer.add(lineIndex + prev_i, lineIndex + i);
         }
 
         lineIndex += group_count;
@@ -153,7 +155,7 @@ void FillBucket::tessellate() {
 
         for (size_t i = 0; i < vertex_count; ++i) {
             if (vertex_indices[i] == TESS_UNDEF) {
-                vertexBuffer->add(round(vertices[i * 2]), round(vertices[i * 2 + 1]));
+                vertexBuffer.add(round(vertices[i * 2]), round(vertices[i * 2 + 1]));
                 vertex_indices[i] = (TESSindex)total_vertex_count;
                 total_vertex_count++;
             }
@@ -178,7 +180,7 @@ void FillBucket::tessellate() {
                 const TESSindex c = vertex_indices[element_group[2]];
 
                 if (a != TESS_UNDEF && b != TESS_UNDEF && c != TESS_UNDEF) {
-                    triangleElementsBuffer->add(triangleIndex + a, triangleIndex + b, triangleIndex + c);
+                    triangleElementsBuffer.add(triangleIndex + a, triangleIndex + b, triangleIndex + c);
                 } else {
                     // TODO: We're missing a vertex that was not part of the line.
                     fprintf(stderr, "undefined element buffer\n");
@@ -209,34 +211,34 @@ bool FillBucket::empty() const {
 }
 
 void FillBucket::drawElements(PlainShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer->itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer->itemSize);
+    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (triangle_group_type& group : triangleGroups) {
-        group.array.bind(shader, *vertexBuffer, *triangleElementsBuffer, vertex_index);
+        group.array.bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group.vertex_length * vertexBuffer->itemSize;
-        elements_index += group.elements_length * triangleElementsBuffer->itemSize;
+        vertex_index += group.vertex_length * vertexBuffer.itemSize;
+        elements_index += group.elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
 void FillBucket::drawElements(PatternShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer->itemSize);
-    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer->itemSize);
+    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (triangle_group_type& group : triangleGroups) {
-        group.array.bind(shader, *vertexBuffer, *triangleElementsBuffer, vertex_index);
+        group.array.bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group.vertex_length * vertexBuffer->itemSize;
-        elements_index += group.elements_length * triangleElementsBuffer->itemSize;
+        vertex_index += group.vertex_length * vertexBuffer.itemSize;
+        elements_index += group.elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
 void FillBucket::drawVertices(OutlineShader& shader) {
-    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer->itemSize);
-    char *elements_index = BUFFER_OFFSET(line_elements_start * lineElementsBuffer->itemSize);
+    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    char *elements_index = BUFFER_OFFSET(line_elements_start * lineElementsBuffer.itemSize);
     for (line_group_type& group : lineGroups) {
-        group.array.bind(shader, *vertexBuffer, *lineElementsBuffer, vertex_index);
+        group.array.bind(shader, vertexBuffer, lineElementsBuffer, vertex_index);
         glDrawElements(GL_LINES, group.elements_length * 2, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group.vertex_length * vertexBuffer->itemSize;
-        elements_index += group.elements_length * lineElementsBuffer->itemSize;
+        vertex_index += group.vertex_length * vertexBuffer.itemSize;
+        elements_index += group.elements_length * lineElementsBuffer.itemSize;
     }
 }

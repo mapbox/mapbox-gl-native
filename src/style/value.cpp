@@ -26,3 +26,12 @@ llmr::Value llmr::parseValue(pbf data) {
     }
     return false;
 }
+
+std::string llmr::toString(const llmr::Value& value) {
+    if (value.is<std::string>()) return value.get<std::string>();
+    else if (value.is<bool>()) return value.get<bool>() ? "true" : "false";
+    else if (value.is<int64_t>()) return std::to_string(value.get<int64_t>());
+    else if (value.is<uint64_t>()) return std::to_string(value.get<uint64_t>());
+    else if (value.is<double>()) return std::to_string(value.get<double>());
+    else return "null";
+}

@@ -37,6 +37,9 @@ double time();
 // Performs routine cleanup operation and is called on every loop iteration.
 void cleanup();
 
+// Shows an RGBA image with the specified dimensions in a named window.
+void show_debug_image(std::string name, const char *data, size_t width, size_t height);
+
 }
 
 }

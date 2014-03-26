@@ -19,12 +19,11 @@ class Style;
 class PointVertexBuffer;
 class BucketDescription;
 class PointShader;
-struct Coordinate;
 struct pbf;
 
 class PointBucket : public Bucket {
 public:
-    PointBucket(const std::shared_ptr<PointVertexBuffer>& vertexBuffer,
+    PointBucket(PointVertexBuffer& vertexBuffer,
                 const BucketDescription& bucket_desc);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
@@ -39,7 +38,8 @@ public:
     const BucketGeometryDescription geometry;
 
 private:
-    std::shared_ptr<PointVertexBuffer> vertexBuffer;
+
+    PointVertexBuffer& vertexBuffer;
     VertexArrayObject array;
 
     const size_t vertex_start;

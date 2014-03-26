@@ -6,6 +6,7 @@ implemented in C++11, targeting iOS & OS X.
  - Modern C++ compiler that supports `-std=c++11`
  - libpng
  - glfw3
+ - Boost (for Rtree support)
  - Python (for build only)
  - Node.js (for build only)
 
@@ -18,6 +19,7 @@ Install libpng and [glfw3](http://www.glfw.org/docs/latest/):
 ```
 brew install libpng
 brew install homebrew/versions/glfw3
+brew install boost
 ```
 
 Then configure the project:

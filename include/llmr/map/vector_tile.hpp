@@ -2,7 +2,9 @@
 #define LLMR_MAP_VECTOR_TILE
 
 #include <llmr/util/pbf.hpp>
+#include <llmr/util/vec.hpp>
 #include <llmr/style/value.hpp>
+#include <llmr/text/glyph.hpp>
 #include <vector>
 #include <map>
 #include <set>
@@ -15,23 +17,26 @@ class VectorTileLayer;
 
 struct pbf;
 
-struct Coordinate {
-    struct null {};
-
-    Coordinate() : x(0), y(0) {}
-    Coordinate(int16_t x, int16_t y) : x(x), y(y) {}
-    Coordinate(null) : x(std::numeric_limits<int16_t>::min()), y(std::numeric_limits<int16_t>::min()) {}
-    int16_t x;
-    int16_t y;
-
-    inline bool operator==(const Coordinate& other) const {
-        return x == other.x && y == other.y;
-    }
-
-    inline operator bool() const {
-        return x != std::numeric_limits<int16_t>::min() && y != std::numeric_limits<int16_t>::min();
-    }
+enum class FeatureType {
+    Unknown = 0,
+    Point = 1,
+    LineString = 2,
+    Polygon = 3
 };
+
+std::ostream& operator<<(std::ostream&, const FeatureType& type);
+
+class VectorTileFeature {
+public:
+    VectorTileFeature(pbf feature, const VectorTileLayer& layer);
+
+    uint64_t id = 0;
+    FeatureType type = FeatureType::Unknown;
+    std::map<std::string, Value> properties;
+    pbf geometry;
+};
+
+std::ostream& operator<<(std::ostream&, const VectorTileFeature& feature);
 
 /*
  * Allows iterating over the features of a VectorTileLayer using a
@@ -67,6 +72,8 @@ private:
     std::set<uint32_t> values;
 };
 
+std::ostream& operator<<(std::ostream&, const GlyphPlacement& placement);
+
 class VectorTileLayer {
 public:
     VectorTileLayer(pbf data);
@@ -76,7 +83,37 @@ public:
     uint32_t extent = 4096;
     std::vector<std::string> keys;
     std::vector<Value> values;
+    std::vector<std::string> faces;
+    std::map<std::string, std::map<Value, Shaping>> shaping;
 };
+
+class VectorTileGlyph {
+public:
+    VectorTileGlyph();
+    VectorTileGlyph(pbf data);
+
+    uint32_t id = 0;
+
+    // A signed distance field of the glyph with a border of 3 pixels.
+    std::string bitmap;
+
+    // Glyph metrics
+    GlyphMetrics metrics;
+};
+
+std::ostream& operator<<(std::ostream&, const VectorTileGlyph& glyph);
+
+class VectorTileFace {
+public:
+    VectorTileFace(pbf data);
+
+    std::string name;
+    std::string family;
+    std::string style;
+    std::vector<VectorTileGlyph> glyphs;
+};
+
+std::ostream& operator<<(std::ostream&, const VectorTileFace& face);
 
 class VectorTile {
 public:
@@ -85,7 +122,10 @@ public:
     VectorTile& operator=(VectorTile&& other);
 
     std::map<std::string, const VectorTileLayer> layers;
+    std::map<std::string, const VectorTileFace> faces;
 };
+
+
 
 }
 

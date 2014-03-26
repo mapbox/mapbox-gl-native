@@ -23,15 +23,15 @@ private:
     FillClass parseFillClass(JSVal value);
     LineClass parseLineClass(JSVal value);
     PointClass parsePointClass(JSVal value);
+    TextClass parseTextClass(JSVal value);
     BackgroundClass parseBackgroundClass(JSVal value);
 
     bool parseBoolean(JSVal value);
     std::string parseString(JSVal value);
     Color parseColor(JSVal value);
     Value parseValue(JSVal value);
-    template <typename T> typename FunctionProperty<T>::fn parseFunctionType(JSVal type);
-    FunctionProperty<float> parseFloatFunction(JSVal value);
-    FunctionProperty<bool> parseBoolFunction(JSVal value);
+    FunctionProperty::fn parseFunctionType(JSVal type);
+    FunctionProperty parseFunction(JSVal value);
 
 private:
     std::map<std::string, const rapidjson::Value *> constants;

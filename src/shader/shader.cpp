@@ -102,20 +102,9 @@ bool Shader::compileShader(GLuint *shader, GLenum type, const GLchar *source) {
     GLint status;
 
     *shader = glCreateShader(type);
-
-#if defined(GL_ES_VERSION_2_0)
-    // Add OpenGL ES precision premable
-    const GLchar *preamble = "precision highp float;\n\n";
-#else
-    // Desktop GLSL
-    const GLchar *preamble = "#version 120\n\n";
-#endif
-
-    const GLchar *strings[] = { preamble, source };
-    const GLint lengths[] = { (GLint)strlen(preamble), (GLint)strlen(source) };
-
-
-    glShaderSource(*shader, 2, strings, lengths);
+    const GLchar *strings[] = { source };
+    const GLint lengths[] = { (GLint)strlen(source) };
+    glShaderSource(*shader, 1, strings, lengths);
 
     glCompileShader(*shader);
 

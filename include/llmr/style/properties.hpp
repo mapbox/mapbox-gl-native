@@ -34,42 +34,36 @@ enum class Property {
 namespace functions {
 
 float null(float z, const std::vector<float>&);
-bool null(float z, const std::vector<bool>&);
-
 float constant(float z, const std::vector<float>& values);
-bool constant(float z, const std::vector<bool>& values);
-
+float min(float z, const std::vector<float>& values);
+float max(float z, const std::vector<float>& values);
 float stops(float z, const std::vector<float>& values);
-bool stops(float z, const std::vector<bool>& values);
-
 float linear(float z, const std::vector<float>& values);
-bool linear(float z, const std::vector<bool>& values);
+float exponential(float z, const std::vector<float>& values);
 
 }
 
-
-template <typename T>
 struct FunctionProperty {
-    typedef T (*fn)(float z, const std::vector<T>& values);
+    typedef float (*fn)(float z, const std::vector<float>& values);
 
     fn function;
-    std::vector<T> values;
+    std::vector<float> values;
 
     inline FunctionProperty() : function(&functions::null) {}
-    inline FunctionProperty(T value) : function(&functions::constant), values(1, value) {}
-    inline T operator()(float z) const { return function(z, values); }
+    inline FunctionProperty(float value) : function(&functions::constant), values(1, value) {}
+    template <typename T> inline T evaluate(float z) const { return function(z, values); }
 };
 
 struct PointClass {
-    FunctionProperty<bool> hidden;
-    FunctionProperty<float> size;
+    FunctionProperty enabled = true;
+    FunctionProperty size;
     Color color = {{ 0, 0, 0, 1 }};
-    FunctionProperty<float> opacity = 1;
+    FunctionProperty opacity = 1;
     std::string image;
 };
 
 struct PointProperties {
-    bool hidden = false;
+    bool enabled = true;
     float size = 0;
     Color color = {{ 0, 0, 0, 1 }};
     float opacity = 1.0;
@@ -77,15 +71,15 @@ struct PointProperties {
 };
 
 struct LineClass {
-    FunctionProperty<bool> hidden;
-    FunctionProperty<float> width;
-    FunctionProperty<float> offset;
+    FunctionProperty enabled = true;
+    FunctionProperty width;
+    FunctionProperty offset;
     Color color = {{ 0, 0, 0, 1 }};
-    FunctionProperty<float> opacity = 1;
+    FunctionProperty opacity = 1;
 };
 
 struct LineProperties {
-    bool hidden = false;
+    bool enabled = true;
     float width = 0;
     float offset = 0;
     Color color = {{ 0, 0, 0, 1 }};
@@ -93,23 +87,43 @@ struct LineProperties {
 };
 
 struct FillClass {
-    FunctionProperty<bool> hidden;
+    FunctionProperty enabled = true;
     Winding winding = Winding::NonZero;
-    FunctionProperty<bool> antialias = true;
+    FunctionProperty antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
     Color stroke_color = {{ 0, 0, 0, std::numeric_limits<float>::infinity() }};
-    FunctionProperty<float> opacity = 1;
+    FunctionProperty opacity = 1;
     std::string image;
 };
 
 struct FillProperties {
-    bool hidden = false;
+    bool enabled = true;
     Winding winding = Winding::NonZero;
     bool antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
     Color stroke_color = {{ 0, 0, 0, 1 }};
     float opacity = 1.0;
     std::string image;
+};
+
+struct TextClass {
+    FunctionProperty enabled = true;
+    Color color = {{ 0, 0, 0, 1 }};
+    Color halo = {{ 1, 1, 1, 0.75 }};
+    FunctionProperty haloRadius = 0.25f;
+    FunctionProperty size = 12.0f;
+    FunctionProperty rotate = 0.0f;
+    FunctionProperty alwaysVisible = false;
+};
+
+struct TextProperties {
+    bool enabled = true;
+    Color color = {{ 0, 0, 0, 1 }};
+    Color halo = {{ 1, 1, 1, 0.75 }};
+    float haloRadius = 0.25f;
+    float size = 12.0f;
+    float rotate = 0.0f;
+    bool alwaysVisible = false;
 };
 
 struct BackgroundClass {

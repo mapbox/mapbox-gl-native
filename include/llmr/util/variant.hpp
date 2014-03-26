@@ -16,6 +16,8 @@
  #define VARIANT_INLINE __attribute__((noinline))
 #endif
 
+namespace llmr {
+
 namespace util {
 
 namespace detail {
@@ -273,12 +275,12 @@ public:
     }
 
     template<typename T>
-    VARIANT_INLINE void is() const
+    VARIANT_INLINE bool is() const
     {
         return (type_id == detail::type_traits<T, Types...>::id);
     }
 
-    VARIANT_INLINE void valid() const
+    VARIANT_INLINE bool valid() const
     {
         return (type_id != detail::invalid_value);
     }
@@ -373,6 +375,8 @@ operator<< (std::basic_ostream<charT,traits>& out, Variant const& rhs)
     detail::printer<std::basic_ostream<charT,traits> > visitor(out);
     apply_visitor(rhs, visitor);
     return out;
+}
+
 }
 
 }

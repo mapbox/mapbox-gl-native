@@ -30,16 +30,6 @@ public:
 
     void cascade(float z);
 
-private:
-    static std::pair<std::string, BucketDescription> parseBucket(pbf data);
-    static LayerDescription parseLayer(pbf data);
-    static std::pair<std::string, ClassDescription> parseClass(pbf data);
-    static std::pair<std::string, FillClass> parseFillClass(pbf data);
-    static std::pair<std::string, LineClass> parseLineClass(pbf data);
-    static std::pair<std::string, PointClass> parsePointClass(pbf data);
-    template <typename T> static FunctionProperty<T> parseProperty(pbf data);
-    static Color parseColor(pbf& data);
-
 public:
     std::shared_ptr<Sprite> sprite;
 
@@ -56,6 +46,7 @@ public:
         std::map<std::string, FillProperties> fills;
         std::map<std::string, LineProperties> lines;
         std::map<std::string, PointProperties> points;
+        std::map<std::string, TextProperties> texts;
     } computed;
 };
 

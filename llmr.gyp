@@ -1,12 +1,12 @@
 {
   'includes': [
     './common.gypi',
-    './config.gypi'
+    './config.gypi',
   ],
   'targets': [
     {
-      'target_name': 'before_build_actions',
-      'type':'none',
+      'target_name': 'shaders_gl',
+      'type': 'none',
       'actions': [
         {
           'action_name': 'Build Shaders',
@@ -17,8 +17,31 @@
             'include/llmr/shader/shaders.hpp',
             'src/shader/shaders.cpp'
           ],
-          'action': ['bin/build-shaders.js'],
-        },
+          'action': ['bin/build-shaders.js', 'gl'],
+        }
+      ]
+    },
+    {
+      'target_name': 'shaders_gles2',
+      'type': 'none',
+      'actions': [
+        {
+          'action_name': 'Build Shaders',
+          'inputs': [
+            '<!@(find src -name "*.glsl")'
+          ],
+          'outputs': [
+            'include/llmr/shader/shaders.hpp',
+            'src/shader/shaders.cpp'
+          ],
+          'action': ['bin/build-shaders.js', 'gles2'],
+        }
+      ]
+    },
+    {
+      'target_name': 'build_stylesheet',
+      'type': 'none',
+      'actions': [
         {
           'action_name': 'Build Stylesheet',
           'inputs': [
@@ -37,7 +60,8 @@
       'product_name': 'llmr-x86',
       'type': 'static_library',
       'dependencies': [
-          'before_build_actions'
+          'build_stylesheet',
+          'shaders_gl',
       ],
       'sources': [
         '<!@(find src -name "*.cpp")',
@@ -95,7 +119,8 @@
       'product_name': 'llmr-ios',
       'type': 'static_library',
       'dependencies': [
-          'before_build_actions'
+          'build_stylesheet',
+          'shaders_gles2',
       ],
       'sources': [
         '<!@(find src -name "*.cpp")',

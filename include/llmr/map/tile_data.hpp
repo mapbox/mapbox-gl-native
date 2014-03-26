@@ -5,9 +5,20 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/geometry/vao.hpp>
+#include <llmr/map/vector_tile.hpp>
 #include <llmr/platform/platform.hpp>
+
+#include <llmr/renderer/bucket.hpp>
+
+#include <llmr/geometry/vertex_buffer.hpp>
+#include <llmr/geometry/elements_buffer.hpp>
+#include <llmr/geometry/fill_buffer.hpp>
+#include <llmr/geometry/line_buffer.hpp>
+#include <llmr/geometry/point_buffer.hpp>
+#include <llmr/geometry/text_buffer.hpp>
 
 #include <cstdint>
 #include <forward_list>
@@ -21,17 +32,10 @@ namespace llmr {
 
 class Style;
 class Raster;
-class Bucket;
 class LayerDescription;
 class BucketDescription;
-class VectorTile;
-class VectorTileLayer;
-class FillVertexBuffer;
-class LineVertexBuffer;
-class PointVertexBuffer;
-class TriangleElementsBuffer;
-class LineElementsBuffer;
-class PointElementsBuffer;
+
+
 class PlainShader;
 
 class TileData : public std::enable_shared_from_this<TileData>,
@@ -53,20 +57,11 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, const Style& style, const bool use_raster = false, const bool use_retina = false);
+    TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const bool use_raster = false, const bool use_retina = false);
     ~TileData();
 
-    // Start loading the tile.
     void request();
-
-    // Other functions
     bool parse();
-    void parseStyleLayers(const VectorTile& tile, const std::vector<LayerDescription>& layers);
-    std::shared_ptr<Bucket> createBucket(const VectorTile& tile, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-    std::shared_ptr<Bucket> createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
-
     void cancel();
 
     const std::string toString() const;
@@ -82,21 +77,24 @@ public:
     DebugFontBuffer debugFontBuffer;
     VertexArrayObject debugFontArray;
 
-    std::shared_ptr<FillVertexBuffer> fillVertexBuffer;
-    std::shared_ptr<LineVertexBuffer> lineVertexBuffer;
-    std::shared_ptr<PointVertexBuffer> pointVertexBuffer;
+    FillVertexBuffer fillVertexBuffer;
+    LineVertexBuffer lineVertexBuffer;
+    PointVertexBuffer pointVertexBuffer;
+    TextVertexBuffer textVertexBuffer;
 
-    std::shared_ptr<TriangleElementsBuffer> triangleElementsBuffer;
-    std::shared_ptr<LineElementsBuffer> lineElementsBuffer;
-    std::shared_ptr<PointElementsBuffer> pointElementsBuffer;
+    TriangleElementsBuffer triangleElementsBuffer;
+    LineElementsBuffer lineElementsBuffer;
+    PointElementsBuffer pointElementsBuffer;
 
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above
-    std::map<std::string, std::shared_ptr<Bucket>> buckets;
+    std::map<std::string, std::unique_ptr<Bucket>> buckets;
+
 private:
     // Source data
     std::string data;
     const Style& style;
+    GlyphAtlas& glyphAtlas;
     platform::Request *req = nullptr;
 };
 

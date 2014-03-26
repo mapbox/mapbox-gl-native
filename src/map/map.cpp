@@ -14,9 +14,10 @@ using namespace llmr;
 Map::Map(Settings& settings)
     : settings(settings),
       transform(),
-      style(),
-      painter(transform, settings, style),
       texturepool(),
+      style(),
+      glyphAtlas(1024, 1024),
+      painter(transform, settings, style, glyphAtlas),
       min_zoom(0),
       max_zoom((use_raster ? kTileRasterMaxZoom : kTileVectorMaxZoom)) {
 }
@@ -46,7 +47,7 @@ void Map::loadSettings() {
     transform.setAngle(settings.angle);
     transform.setScale(settings.scale);
     transform.setLonLat(settings.longitude, settings.latitude);
-    style.cascade(transform.getZoom());
+    style.cascade(transform.getNormalizedZoom());
     update();
 }
 
@@ -87,7 +88,7 @@ void Map::stopPanning() {
 
 void Map::scaleBy(double ds, double cx, double cy, double duration) {
     transform.scaleBy(ds, cx, cy, duration);
-    style.cascade(transform.getZoom());
+    style.cascade(transform.getNormalizedZoom());
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);
@@ -137,7 +138,7 @@ void Map::getLonLat(double& lon, double& lat) const {
 
 void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
     transform.setLonLatZoom(lon, lat, zoom, duration);
-    style.cascade(transform.getZoom());
+    style.cascade(transform.getNormalizedZoom());
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);
@@ -151,7 +152,7 @@ void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
 
 void Map::setScale(double scale, double cx, double cy, double duration) {
     transform.setScale(scale, cx, cy, duration);
-    style.cascade(transform.getZoom());
+    style.cascade(transform.getNormalizedZoom());
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);
@@ -161,7 +162,7 @@ void Map::setScale(double scale, double cx, double cy, double duration) {
 
 void Map::setZoom(double zoom, double duration) {
     transform.setZoom(zoom, duration);
-    style.cascade(transform.getZoom());
+    style.cascade(transform.getNormalizedZoom());
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);
@@ -215,7 +216,7 @@ void Map::resetPosition() {
     transform.setAngle(0);
     transform.setLonLat(0, 0);
     transform.setZoom(0);
-    style.cascade(transform.getZoom());
+    style.cascade(transform.getNormalizedZoom());
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);
@@ -319,7 +320,7 @@ TileData::State Map::addTile(const Tile::ID& id) {
 
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
-        new_tile.data = std::make_shared<TileData>(normalized_id, style, use_raster, (pixel_ratio > 1.0));
+        new_tile.data = std::make_shared<TileData>(normalized_id, style, glyphAtlas, use_raster, (pixel_ratio > 1.0));
         new_tile.data->request();
         tile_data.push_front(new_tile.data);
     }
@@ -542,5 +543,5 @@ bool Map::render() {
 
     painter.renderMatte();
 
-    return changed || transform.needsAnimation();
+    return changed || transform.needsAnimation() || painter.needsAnimation();
 }
