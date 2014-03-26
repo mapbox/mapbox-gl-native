@@ -1,6 +1,7 @@
 #include <llmr/map/map.hpp>
 #include <llmr/map/settings.hpp>
 #include <llmr/platform/platform.hpp>
+#include <llmr/util/constants.hpp>
 #include <llmr/style/resources.hpp>
 #include <llmr/style/sprite.hpp>
 #include <llmr/map/coverage.hpp>
@@ -506,7 +507,21 @@ bool Map::render() {
             if (tile.data && tile.data->state == TileData::State::parsed) {
                 if (tile.data->use_raster && *tile.data->raster && !tile.data->raster->textured) {
                     tile.data->raster->setTexturepool(&texturepool);
-                    tile.data->raster->beginFadeInAnimation();
+
+                    // determine effective raster/retina zoom
+                    int32_t adjustedZoom = transform.getIntegerZoom();
+                    adjustedZoom += (uint32_t)((llmr::util::tileSize / 256.0f) - 1.0f);
+                    if (pixel_ratio > 1.0) {
+                        adjustedZoom++;
+                    }
+
+                    // don't fade parent/child tiles
+                    if (tile.id.z != adjustedZoom) {
+                        tile.data->raster->opacity = 1.0;
+                    }
+                    else {
+                        tile.data->raster->beginFadeInAnimation();
+                    }
                 }
                 if (tile.data->use_raster && tile.data->raster->needsAnimation()) {
                     tile.data->raster->updateAnimations();
