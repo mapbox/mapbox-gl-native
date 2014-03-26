@@ -216,36 +216,35 @@ module.exports = {
                     "color": "#cccccc",
                     "size": 18,
                     "image": "alcohol-shop",
-                    "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
+                    "enabled": [ "min", 17 ]
                 },
                 "cafe_poi": {
                     "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "cafe",
-                    "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
+                    "enabled": [ "min", 17 ]
                 },
                 "embassy_poi": {
                     "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "embassy",
-                    "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
+                    "enabled": [ "min", 17 ]
                 },
                 "park_poi": {
                     "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "park",
-                    "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
+                    "enabled": [ "min", 17 ]
                 },
                 "restaurant_poi": {
-                    "enabled": [ "min", 18 ],
                     "type": "point",
                     "color": "#cccccc",
                     "size": 18,
                     "image": "restaurant",
-                    "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
+                    "enabled": [ "min", 17 ]
                 },
                 "country_label": {
                     "type": "text",
