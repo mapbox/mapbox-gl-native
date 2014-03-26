@@ -501,22 +501,30 @@ bool Map::render() {
     }
     painter.finishClippingMask();
 
+    // reuse clip_id for raster depth
+    uint8_t raster_tile_count = i;
+    bool raster_pass = false;
+
+    int32_t adjusted_zoom;
+
     for (auto& tile_pair : tiles) {
         std::forward_list<Tile>& zoom_tiles = tile_pair.second;
         for (Tile& tile : zoom_tiles) {
             if (tile.data && tile.data->state == TileData::State::parsed) {
                 if (tile.data->use_raster && *tile.data->raster && !tile.data->raster->textured) {
+                    raster_pass = true;
+
                     tile.data->raster->setTexturepool(&texturepool);
 
                     // determine effective raster/retina zoom
-                    int32_t adjustedZoom = transform.getIntegerZoom();
-                    adjustedZoom += (uint32_t)((llmr::util::tileSize / 256.0f) - 1.0f);
+                    adjusted_zoom = transform.getIntegerZoom();
+                    adjusted_zoom += (uint32_t)((llmr::util::tileSize / 256.0f) - 1.0f);
                     if (pixel_ratio > 1.0) {
-                        adjustedZoom++;
+                        adjusted_zoom++;
                     }
 
                     // don't fade parent/child tiles
-                    if (tile.id.z != adjustedZoom) {
+                    if (tile.id.z != adjusted_zoom) {
                         tile.data->raster->opacity = 1.0;
                     }
                     else {
@@ -526,7 +534,8 @@ bool Map::render() {
                 if (tile.data->use_raster && tile.data->raster->needsAnimation()) {
                     tile.data->raster->updateAnimations();
                 }
-                painter.render(tile);
+
+                painter.render(tile, (raster_pass ? raster_tile_count : 0));
             }
         }
     }

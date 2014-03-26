@@ -33,7 +33,7 @@ public:
     void setup();
     void clear();
     void changeMatrix();
-    void render(const Tile& tile);
+    void render(const Tile& tile, const uint8_t raster_tile_count = 0);
     void renderMatte();
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
