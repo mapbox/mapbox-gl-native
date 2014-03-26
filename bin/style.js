@@ -240,6 +240,7 @@ module.exports = {
                     "opacity": [ "linear", 15, 0, 1.0, 0, 0.75 ]
                 },
                 "restaurant_poi": {
+                    "enabled": [ "min", 18 ],
                     "type": "point",
                     "color": "#cccccc",
                     "size": 18,

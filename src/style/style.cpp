@@ -37,12 +37,12 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to fill styles that have actual
             // values so as to not override with default values.
             llmr::FillProperties& fill = computed.fills[layer_name];
-            fill.enabled = layer.enabled(z);
+            fill.enabled = layer.enabled.evaluate<bool>(z);
             fill.winding = layer.winding;
-            fill.antialias = layer.antialias(z);
+            fill.antialias = layer.antialias.evaluate<bool>(z);
             fill.fill_color = layer.fill_color;
             fill.stroke_color = layer.stroke_color;
-            fill.opacity = layer.opacity(z);
+            fill.opacity = layer.opacity.evaluate<float>(z);
             fill.image = layer.image;
         }
 
@@ -54,11 +54,11 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to line styles that have actual
             // values so as to not override with default values.
             llmr::LineProperties& stroke = computed.lines[layer_name];
-            stroke.enabled = layer.enabled(z);
-            stroke.width = layer.width(z);
-            stroke.offset = layer.offset(z);
+            stroke.enabled = layer.enabled.evaluate<bool>(z);
+            stroke.width = layer.width.evaluate<float>(z);
+            stroke.offset = layer.offset.evaluate<float>(z);
             stroke.color = layer.color;
-            stroke.opacity = layer.opacity(z);
+            stroke.opacity = layer.opacity.evaluate<float>(z);
         }
 
         // Cascade point classes
@@ -69,10 +69,10 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to point styles that have actual
             // values so as to not override with default values.
             llmr::PointProperties& point = computed.points[layer_name];
-            point.enabled = layer.enabled(z);
+            point.enabled = layer.enabled.evaluate<bool>(z);
             point.color = layer.color;
-            point.size = layer.size(z);
-            point.opacity = layer.opacity(z);
+            point.size = layer.size.evaluate<float>(z);
+            point.opacity = layer.opacity.evaluate<float>(z);
             point.image = layer.image;
         }
 
@@ -83,13 +83,13 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to point styles that have actual
             // values so as to not override with default values.
             llmr::TextProperties& text = computed.texts[layer_name];
-            text.enabled = layer.enabled(z);
+            text.enabled = layer.enabled.evaluate<bool>(z);
             text.color = layer.color;
-            text.size = layer.size(z);
+            text.size = layer.size.evaluate<float>(z);
             text.halo = layer.halo;
-            text.haloRadius = layer.haloRadius(z);
-            text.rotate = layer.rotate(z);
-            text.alwaysVisible = layer.alwaysVisible(z);
+            text.haloRadius = layer.haloRadius.evaluate<float>(z);
+            text.rotate = layer.rotate.evaluate<float>(z);
+            text.alwaysVisible = layer.alwaysVisible.evaluate<bool>(z);
         }
 
         // Cascade background
