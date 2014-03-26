@@ -71,10 +71,10 @@ test: deps config.gypi src test/test.gyp
 		$${FILE}; \
 	done
 
-glsl-optimizer: node_modules/glsl-optimizer/build/Release/glslOptimizer.node
+glsl-optimizer: bin/node_modules/glsl-optimizer/build/Release/glslOptimizer.node
 
-node_modules/glsl-optimizer/build/Release/glslOptimizer.node:
-	npm install
+bin/node_modules/glsl-optimizer/build/Release/glslOptimizer.node:
+	cd bin && npm install
 
 clean:
 	-rm -rf out
