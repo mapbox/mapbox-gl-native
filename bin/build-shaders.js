@@ -3,9 +3,7 @@
 
 var fs = require('fs');
 var path = require('path');
-
-var glsl;
-try { glsl = require('glsl-optimizer'); } catch(err) {}
+var glsl = require('glsl-optimizer');
 
 module.exports = function(param) {
     var name;
