@@ -433,11 +433,11 @@ namespace llmr
 {
     namespace platform
     {
-
-        class Request {
-        public:
-            int16_t identifier;
-            std::string original_url;
+        class Request
+        {
+            public:
+                int16_t identifier;
+                std::string original_url;
         };
 
         void restart()
