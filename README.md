@@ -130,7 +130,5 @@ This is automatically taken care of as a build phase if you are using the Xcode 
 - Use two fingers to rotate
 - Double-tap to zoom in one level
 - Two-finger single-tap to zoom out one level
-- Long-press to reset north
-- Two-finger long press to reset the transform
-- Three-finger long press to toggle debug information
-- Four-finger long press to toggle raster
+- Single-tap to toggle the command palette visibility for resetting north & the transform, toggling debug, and toggling raster
+- Double-tap, long-pressing the second, then pan up and down to "quick zoom" (iPhone only, meant for one-handed use)
