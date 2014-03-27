@@ -502,10 +502,8 @@ bool Map::render() {
     }
     painter.finishClippingMask();
 
-    // reuse clip_id for raster depth
+    // reuse clip_id/count for raster depth
     uint8_t raster_tile_count = i;
-    bool raster_pass = false;
-
     int32_t adjusted_zoom;
 
     for (auto& tile_pair : tiles) {
@@ -513,8 +511,6 @@ bool Map::render() {
         for (Tile& tile : zoom_tiles) {
             if (tile.data && tile.data->state == TileData::State::parsed) {
                 if (tile.data->use_raster && *tile.data->raster && !tile.data->raster->textured) {
-                    raster_pass = true;
-
                     tile.data->raster->setTexturepool(&texturepool);
 
                     // determine effective raster/retina zoom
@@ -536,7 +532,7 @@ bool Map::render() {
                     tile.data->raster->updateAnimations();
                 }
 
-                painter.render(tile, (raster_pass ? raster_tile_count : 0));
+                painter.render(tile, (use_raster ? raster_tile_count : 0));
             }
         }
     }
