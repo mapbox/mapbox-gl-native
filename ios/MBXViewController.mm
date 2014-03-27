@@ -449,6 +449,8 @@ namespace llmr
         {
             NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
             {
+                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+
                 Response res;
 
                 if ( ! error && [response isKindOfClass:[NSHTTPURLResponse class]])
@@ -467,6 +469,8 @@ namespace llmr
 
             [task resume];
 
+            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+
             Request *req = new Request();
 
             req->identifier = task.taskIdentifier;
@@ -480,8 +484,16 @@ namespace llmr
             [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
             {
                 for (NSURLSessionDownloadTask *task in downloadTasks)
+                {
                     if (task.taskIdentifier == request->identifier)
-                        return [task cancel];
+                    {
+                        [task cancel];
+
+                        [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+
+                        return;
+                    }
+                }
             }];
         }
 
