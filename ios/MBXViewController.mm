@@ -29,6 +29,7 @@ NSString *const MBXUpdateActivityNotification = @"MBXUpdateActivityNotification"
 @property (nonatomic) CGFloat angle;
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic) BOOL debug;
+@property (nonatomic) UIView *palette;
 
 @end
 
@@ -102,28 +103,19 @@ class MBXMapView
     rotate.delegate = self;
     [self.view addGestureRecognizer:rotate];
 
+    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTapGesture:)];
+    singleTap.numberOfTapsRequired = 1;
+    [self.view addGestureRecognizer:singleTap];
+
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     doubleTap.numberOfTapsRequired = 2;
     [self.view addGestureRecognizer:doubleTap];
 
+    [singleTap requireGestureRecognizerToFail:doubleTap];
+
     UITapGestureRecognizer *twoFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerTapGesture:)];
     twoFingerTap.numberOfTouchesRequired = 2;
     [self.view addGestureRecognizer:twoFingerTap];
-
-    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPressGesture:)];
-    [self.view addGestureRecognizer:longPress];
-
-    UILongPressGestureRecognizer *twoFingerLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerLongPressGesture:)];
-    twoFingerLongPress.numberOfTouchesRequired = 2;
-    [self.view addGestureRecognizer:twoFingerLongPress];
-
-    UILongPressGestureRecognizer *threeFingerLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleThreeFingerLongPressGesture:)];
-    threeFingerLongPress.numberOfTouchesRequired = 3;
-    [self.view addGestureRecognizer:threeFingerLongPress];
-
-    UILongPressGestureRecognizer *fourFingerLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleFourFingerLongPressGesture:)];
-    fourFingerLongPress.numberOfTouchesRequired = 4;
-    [self.view addGestureRecognizer:fourFingerLongPress];
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
     {
@@ -142,6 +134,76 @@ class MBXMapView
 
     displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(render:)];
     [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+
+    NSArray *selectorNames = @[ @"unrotate", @"resetPosition", @"toggleDebug", @"toggleRaster" ];
+    CGFloat buttonSize  = 40;
+    CGFloat bufferSize  = 20;
+    CGFloat alpha       = 0.75;
+    CGFloat paletteWidth  = buttonSize + (2 * bufferSize);
+    CGFloat paletteHeight = [selectorNames count] * (buttonSize + bufferSize) + bufferSize;
+    self.palette = [[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width - paletteWidth,
+                                                            (self.view.bounds.size.height - paletteHeight) / 2,
+                                                            paletteWidth,
+                                                            paletteHeight)];
+    self.palette.backgroundColor = [UIColor colorWithWhite:0 alpha:alpha];
+    self.palette.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+    self.palette.layer.cornerRadius = bufferSize;
+    [self.view addSubview:self.palette];
+    for (NSString *selectorName in selectorNames)
+    {
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+        button.frame = CGRectMake(bufferSize,
+                                  ([selectorNames indexOfObject:selectorName] * (buttonSize + bufferSize)) + bufferSize,
+                                  buttonSize,
+                                  buttonSize);
+        [button setImage:[UIImage imageNamed:[selectorName stringByAppendingString:@".png"]] forState:UIControlStateNormal];
+        [button addTarget:self action:NSSelectorFromString(selectorName) forControlEvents:UIControlEventTouchUpInside];
+        [self.palette addSubview:button];
+    }
+}
+
+- (void)togglePalette
+{
+    if (self.palette.alpha < 1)
+    {
+        self.palette.userInteractionEnabled = YES;
+
+        [UIView animateWithDuration:0.25 animations:^(void)
+        {
+            self.palette.alpha = 1;
+        }];
+    }
+    else
+    {
+        self.palette.userInteractionEnabled = NO;
+
+        [UIView animateWithDuration:0.25 animations:^(void)
+        {
+            self.palette.alpha = 0;
+        }];
+    }
+}
+
+- (void)unrotate
+{
+    mapView->map.resetNorth();
+}
+
+- (void)resetPosition
+{
+    mapView->map.resetPosition();
+}
+
+- (void)toggleDebug
+{
+    mapView->map.toggleDebug();
+
+    self.debug = ! self.debug;
+}
+
+- (void)toggleRaster
+{
+    mapView->map.toggleRaster();
 }
 
 - (void)dealloc
@@ -310,6 +372,11 @@ class MBXMapView
     [self updateRender];
 }
 
+- (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
+{
+    [self togglePalette];
+}
+
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
     mapView->map.cancelAnimations();
@@ -326,50 +393,6 @@ class MBXMapView
 
     if (twoFingerTap.state == UIGestureRecognizerStateEnded)
         mapView->map.scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
-
-    [self updateRender];
-}
-
-- (void)handleLongPressGesture:(UILongPressGestureRecognizer *)longPress
-{
-    mapView->map.cancelAnimations();
-
-    if (longPress.state == UIGestureRecognizerStateBegan)
-        mapView->map.resetNorth();
-
-    [self updateRender];
-}
-
-- (void)handleTwoFingerLongPressGesture:(UILongPressGestureRecognizer *)twoFingerLongPress
-{
-    mapView->map.cancelAnimations();
-
-    if (twoFingerLongPress.state == UIGestureRecognizerStateBegan)
-        mapView->map.resetPosition();
-
-    [self updateRender];
-}
-
-- (void)handleThreeFingerLongPressGesture:(UILongPressGestureRecognizer *)threeFingerLongPress
-{
-    mapView->map.cancelAnimations();
-
-    if (threeFingerLongPress.state == UIGestureRecognizerStateBegan)
-    {
-        mapView->map.toggleDebug();
-
-        self.debug = ! self.debug;
-    }
-
-    [self updateRender];
-}
-
-- (void)handleFourFingerLongPressGesture:(UILongPressGestureRecognizer *)fourFingerLongPress
-{
-    mapView->map.cancelAnimations();
-
-    if (fourFingerLongPress.state == UIGestureRecognizerStateBegan)
-        mapView->map.toggleRaster();
 
     [self updateRender];
 }
