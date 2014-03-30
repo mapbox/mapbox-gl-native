@@ -28,29 +28,27 @@ GLuint Texturepool::getTextureID() {
 }
 
 void Texturepool::removeTextureID(GLuint texture_id) {
-    bool needs_clear = false;
-
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
     texture_ids.insert(texture_id);
 
-    if (texture_ids.size() > TextureMax)
-        needs_clear = true;
-
-    if (needs_clear)
+    if (texture_ids.size() > TextureMax) {
         clearTextureIDs();
+    }
 }
 
 void Texturepool::clearTextureIDs() {
     std::vector<GLuint> ids_to_remove;
     ids_to_remove.reserve(texture_ids.size());
 
-    for (std::set<GLuint>::iterator id_iterator = texture_ids.begin(); id_iterator != texture_ids.end(); ++id_iterator)
+    for (std::set<GLuint>::iterator id_iterator = texture_ids.begin(); id_iterator != texture_ids.end(); ++id_iterator) {
         ids_to_remove.push_back(*id_iterator);
+    }
 
-    if (!ids_to_remove.empty())
+    if (!ids_to_remove.empty()) {
         glDeleteTextures((GLsizei)ids_to_remove.size(), &ids_to_remove[0]);
+    }
 
     texture_ids.clear();
 }

@@ -13,6 +13,8 @@
 
 #include <cstdint>
 #include <string>
+#include <map>
+#include <functional>
 
 namespace llmr {
 
@@ -63,6 +65,7 @@ public:
     void stopRotating();
 
     void toggleDebug();
+    void logTileKeys();
 
 private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
@@ -88,7 +91,7 @@ private:
 
     bool use_raster = false;
 
-    std::forward_list<Tile> tiles;
+    std::map<uint8_t, std::forward_list<Tile>, std::greater<uint8_t>> tiles;
     std::forward_list<std::weak_ptr<TileData>> tile_data;
 };
 

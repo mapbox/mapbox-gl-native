@@ -151,7 +151,7 @@ void Painter::clear() {
 #endif
 }
 
-void Painter::render(const Tile& tile) {
+void Painter::render(const Tile& tile, const uint8_t raster_tile_count) {
     assert(tile.data);
     if (tile.data->state != TileData::State::parsed) {
         return;
@@ -163,6 +163,9 @@ void Painter::render(const Tile& tile) {
     glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
 
     if (tile.data->use_raster) {
+        assert(raster_tile_count);
+        float strata_thickness = 1.0f / (raster_tile_count + 1);
+        strata = tile.clip_id * strata_thickness;
         renderRaster(tile.data);
     } else {
         renderLayers(tile.data, style.layers);
