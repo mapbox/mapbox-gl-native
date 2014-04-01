@@ -1,0 +1,3 @@
+[submodule "libuv"]
+	path = deps/libuv
+	url = https://github.com/joyent/libuv.git
