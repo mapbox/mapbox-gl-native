@@ -42,6 +42,8 @@ private:
 
     void renderTile(const Tile::ID& id);
 
+    double getZoom() const;
+
 private:
     Map& map;
     Transform& transform;

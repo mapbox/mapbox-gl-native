@@ -336,24 +336,23 @@ void _scanTriangle(const llmr::vec2<double> a, const llmr::vec2<double> b, const
     if (bc.dy) _scanSpans(ca, bc, ymin, ymax, scanLine);
 }
 
+double Source::getZoom() const {
+    double offset = log(util::tileSize / tile_size) / log(2);
+    offset += (pixel_ratio > 1.0 ? 1 :0);
+    return map.getZoom() + offset;
+}
+
 std::forward_list<llmr::Tile::ID> Source::covering_tiles(int32_t zoom, const box& points) {
     int32_t dim = pow(2, zoom);
     std::forward_list<llmr::Tile::ID> tiles;
-    Type source_type = type;
-    uint32_t source_tile_size = tile_size;
-    double map_zoom = map.getZoom();
-    float pixel_ratio = map.getPixelRatio();
+    bool is_raster = (type == Type::raster);
+    double search_zoom = getZoom();
 
-    auto scanLine = [&tiles, zoom, source_type, source_tile_size, map_zoom, pixel_ratio](int32_t x0, int32_t x1, int32_t y, int32_t ymax) {
+    auto scanLine = [&tiles, zoom, is_raster, search_zoom](int32_t x0, int32_t x1, int32_t y, int32_t ymax) {
         int32_t x;
         if (y >= 0 && y <= ymax) {
             for (x = x0; x < x1; x++) {
-                if (source_type == Type::raster) {
-                    uint32_t offset = (util::tileSize / source_tile_size) - 1;
-                    if (pixel_ratio > 1.0) {
-                        offset++;
-                    }
-                    int32_t search_zoom = map_zoom + offset;
+                if (is_raster) {
                     Tile::ID id = Tile::ID(zoom, x, y);
                     auto ids = id.children(search_zoom);
                     for (const Tile::ID& child_id : ids) {
