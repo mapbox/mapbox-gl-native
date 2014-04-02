@@ -1,4 +1,5 @@
 -include config.mk
+-include deps/glfw.mk
 
 BUILDTYPE ?= Release
 PYTHON ?= python
@@ -28,21 +29,21 @@ linux: deps config.gypi src linux/llmr-app.gyp
 
 
 # build OS X app with Xcode
-lproj: deps config.gypi src linux/llmr-app.gyp
+lproj: deps config.gypi src linux/llmr-app.gyp glfw
 	deps/run_gyp linux/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 	open ./linux/llmr-app.xcodeproj
 
 # build just xcode project for libllmr
-xcode: deps config.gypi llmr.gyp
+xcode: deps config.gypi llmr.gyp glfw
 	deps/run_gyp llmr.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 
 # build OS X app with Xcode
-xproj: deps config.gypi src macosx/llmr-app.gyp
+xproj: deps config.gypi src macosx/llmr-app.gyp glfw
 	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 	open ./macosx/llmr-app.xcodeproj
 
 # build OS X app with xcodebuild
-xapp: deps config.gypi src macosx/llmr-app.gyp
+xapp: deps config.gypi src macosx/llmr-app.gyp glfw
 	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 	xcodebuild -project ./macosx/llmr-app.xcodeproj
 	open macosx/build/Release/llmr.app

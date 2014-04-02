@@ -1,3 +1,6 @@
 [submodule "libuv"]
 	path = deps/libuv
 	url = https://github.com/joyent/libuv.git
+[submodule "glfw"]
+	path = deps/glfw
+	url = https://github.com/glfw/glfw.git
