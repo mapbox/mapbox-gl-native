@@ -15,7 +15,6 @@ class Map;
 class Transform;
 class Painter;
 class Texturepool;
-class TileData;
 
 class Source : public std::enable_shared_from_this<Source> {
 public:
@@ -24,13 +23,14 @@ public:
         raster
     };
 
-    bool enabled;
-
 public:
     Source(Map& map, Transform& transform, Painter& painter, Texturepool& texturepool, const char *url = "", float pixel_ratio = 1.0, Type type = Type::vector, std::list<uint32_t> zooms = {0}, uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 14, bool enabled = true);
 
     bool update();
     void render();
+
+public:
+    bool enabled;
 
 private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
