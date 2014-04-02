@@ -162,7 +162,7 @@ void Painter::render(const Tile& tile) {
     matrix = tile.matrix;
     glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
 
-    if (tile.data->use_raster) {
+    if (tile.data->raster) {
         renderRaster(tile.data);
     } else {
         renderLayers(tile.data, style.layers);

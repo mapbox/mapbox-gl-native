@@ -5,7 +5,6 @@
 #include <llmr/map/tile_data.hpp>
 #include <llmr/map/transform.hpp>
 #include <llmr/style/style.hpp>
-#include <llmr/style/style.hpp>
 #include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/renderer/painter.hpp>
 #include <llmr/util/noncopyable.hpp>
@@ -13,10 +12,12 @@
 
 #include <cstdint>
 #include <string>
+#include <map>
 
 namespace llmr {
 
 class Settings;
+class Source;
 
 class Map : private util::noncopyable {
 public:
@@ -28,7 +29,6 @@ public:
     void loadStyle(const uint8_t *const data, uint32_t bytes);
     void loadSettings();
     void resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb_height);
-    void toggleRaster();
 
     /* callback */
     bool render();
@@ -64,13 +64,13 @@ public:
 
     void toggleDebug();
 
-private:
-    bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
-    bool findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain);
-    bool updateTiles();
-    TileData::State addTile(const Tile::ID& id);
-    TileData::State hasTile(const Tile::ID& id);
+    box cornersToBox(uint32_t z) const;
+    float getPixelRatio() const;
+    Style& getStyle();
+    GlyphAtlas& getGlyphAtlas();
 
+private:
+    bool updateTiles();
     void update();
 
 private:
@@ -81,15 +81,12 @@ private:
     GlyphAtlas glyphAtlas;
     Painter painter;
 
+    std::map<std::string, Source> sources;
+
     int32_t min_zoom;
     int32_t max_zoom;
 
     float pixel_ratio;
-
-    bool use_raster = false;
-
-    std::forward_list<Tile> tiles;
-    std::forward_list<std::weak_ptr<TileData>> tile_data;
 };
 
 }
