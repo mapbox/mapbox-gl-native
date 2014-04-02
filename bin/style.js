@@ -3,92 +3,92 @@
 module.exports = {
     "buckets": {
         "water": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "water",
             "type": "fill"
         },
         "road_large": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "road", "field": "class", "value": ["motorway", "main"],
             "type": "line", "cap": "round", "join": "round"
         },
         "road_regular": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "road", "field": "class", "value": "street",
             "type": "line", "cap": "round", "join": "round"
         },
         "road_limited": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "road", "field": "class", "value": "street_limited",
             "type": "line", "cap": "round", "join": "round"
         },
         "park": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "landuse", "field": "class", "value": "park",
             "type": "fill"
         },
         "wood": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "landuse", "field": "class", "value": "wood",
             "type": "fill"
         },
         "school": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "landuse", "field": "class", "value": "school",
             "type": "fill"
         },
         "cemetery": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "landuse", "field": "class", "value": "cemetery",
             "type": "fill"
         },
         "industrial": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "landuse", "field": "class", "value": "industrial",
             "type": "fill"
         },
         "building": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "building",
             "type": "fill"
         },
         "alcohol_poi": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "poi_label",
             "field": "type",
             "value": ["Alcohol"],
             "type": "point"
         },
         "cafe_poi": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "poi_label",
             "field": "type",
             "value": ["Cafe"],
             "type": "point"
         },
         "embassy_poi": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "poi_label",
             "field": "type",
             "value": ["Embassy"],
             "type": "point"
         },
         "park_poi": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "poi_label",
             "field": "type",
             "value": ["Park"],
             "type": "point"
         },
         "restaurant_poi": {
-            "source": "streets",
+            "source": "mapbox streets",
             "layer": "poi_label",
             "field": "type",
             "value": ["Restaurant"],
             "type": "point"
         },
         "country_label": {
-            "source": "streets",
+            "source": "mapbox streets",
             "type": "text",
             "layer": "country_label",
             "feature_type": "point",
@@ -99,7 +99,7 @@ module.exports = {
             "fontSize": 16
         },
         "place_label": {
-            "source": "streets",
+            "source": "mapbox streets",
             "type": "text",
             "layer": "place_label",
             "feature_type": "point",
@@ -110,7 +110,7 @@ module.exports = {
             "alwaysVisible": true
         },
         "road_label": {
-            "source": "streets",
+            "source": "mapbox streets",
             "type": "text",
             "layer": "road_label",
             "feature_type": "line",

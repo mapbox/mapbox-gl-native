@@ -37,7 +37,7 @@ void Map::setup(float pixelRatio) {
 
     style.loadJSON(resources::style, resources::style_size);
 
-    sources.emplace("streets", Source(*this, transform, painter, texturepool, "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf", pixelRatio, Source::Type::vector, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}, 512, 0, 14, true));
+    sources.emplace("mapbox streets", Source(*this, transform, painter, texturepool, "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf", pixelRatio, Source::Type::vector, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}, 512, 0, 14, true));
 
     sources.emplace("raster", Source(*this, transform, painter, texturepool, "https://a.tiles.mapbox.com/v3/justin.map-pgygbwdm/%d/%d/%d%s.png256", pixelRatio, Source::Type::raster, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21}, 256, 0, 21, false));
 }
