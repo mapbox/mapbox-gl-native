@@ -48,7 +48,6 @@ void PlainShader::setColor(float r, float g, float b, float a) {
 void PlainShader::setOpacity(float new_opacity) {
     if (opacity != new_opacity) {
         glUniform1f(u_opacity, new_opacity);
-        fprintf(stderr, "opacity: %f\n", new_opacity);
         opacity = new_opacity;
     }
 }
