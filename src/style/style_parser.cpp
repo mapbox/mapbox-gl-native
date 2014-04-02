@@ -509,6 +509,10 @@ BackgroundClass StyleParser::parseBackgroundClass(JSVal value) {
         klass.color = parseColor(value["color"]);
     }
 
+    if (value.HasMember("opacity")) {
+        klass.opacity = parseFunction(value["opacity"]);
+    }
+
     return klass;
 }
 

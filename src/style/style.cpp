@@ -94,6 +94,7 @@ void Style::cascade(float z) {
 
         // Cascade background
         computed.background.color = sheetClass.background.color;
+        computed.background.opacity = sheetClass.background.opacity.evaluate<float>(z);
     }
 }
 

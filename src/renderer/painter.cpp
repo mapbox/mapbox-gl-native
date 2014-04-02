@@ -125,9 +125,9 @@ void Painter::prepareClippingMask() {
 
 void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id, bool opaque) {
     plainShader->setMatrix(matrix);
-    if (opaque) {
-        plainShader->setColor(style.computed.background.color);
-    }
+
+    plainShader->setColor(style.computed.background.color);
+    plainShader->setOpacity(style.computed.background.opacity);
 
     glStencilFunc(GL_ALWAYS, clip_id, 0xFF);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
