@@ -257,7 +257,7 @@ void StyleParser::parseClass(const std::string& name, JSVal value, ClassDescript
                 } else if (type_name == "background") {
                     class_desc.background = parseBackgroundClass(value);
                 } else {
-                    throw Style::exception("unkonwn class type name");
+                    throw Style::exception("unknown class type name");
                 }
             } else {
                 throw Style::exception("style class type must be a string");
