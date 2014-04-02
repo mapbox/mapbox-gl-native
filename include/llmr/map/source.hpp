@@ -24,6 +24,8 @@ public:
         raster
     };
 
+    bool enabled;
+
 public:
     Source(Map& map, Transform& transform, Painter& painter, Texturepool& texturepool, const char *url = "", float pixel_ratio = 1.0, Type type = Type::vector, std::list<uint32_t> zooms = {0}, uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 14, bool enabled = true);
 
@@ -56,7 +58,6 @@ private:
     uint32_t tile_size;
     uint32_t min_zoom;
     uint32_t max_zoom;
-    bool enabled;
 
     float pixel_ratio;
 

@@ -203,7 +203,7 @@ class MBXMapView
 
 - (void)toggleRaster
 {
-//    mapView->map.toggleRaster();
+    mapView->map.toggleRaster();
 }
 
 - (void)dealloc

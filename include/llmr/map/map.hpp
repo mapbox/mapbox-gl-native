@@ -63,6 +63,7 @@ public:
     void stopRotating();
 
     void toggleDebug();
+    void toggleRaster();
 
     box cornersToBox(uint32_t z) const;
     float getPixelRatio() const;

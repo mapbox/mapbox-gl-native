@@ -39,7 +39,7 @@ void Map::setup(float pixelRatio) {
 
     sources.emplace("streets", Source(*this, transform, painter, texturepool, "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf", pixelRatio, Source::Type::vector, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}, 512, 0, 14, true));
 
-//    sources.emplace("raster", Source(*this, transform, painter, texturepool, "https://a.tiles.mapbox.com/v3/justin.map-pgygbwdm/%d/%d/%d%s.png256", pixelRatio, Source::Type::raster, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21}, 256, 0, 21, true));
+    sources.emplace("raster", Source(*this, transform, painter, texturepool, "https://a.tiles.mapbox.com/v3/justin.map-pgygbwdm/%d/%d/%d%s.png256", pixelRatio, Source::Type::raster, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21}, 256, 0, 21, false));
 }
 
 void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
@@ -249,6 +249,15 @@ void Map::toggleDebug() {
     settings.persist();
 }
 
+void Map::toggleRaster() {
+    for (std::pair<std::string, Source&> pair : sources) {
+        Source& source = pair.second;
+        source.enabled = !source.enabled;
+    }
+
+    update();
+}
+
 void Map::cancelAnimations() {
     transform.cancelAnimations();
 }
@@ -263,7 +272,9 @@ bool Map::updateTiles() {
 
     for (std::pair<std::string, Source&> pair : sources) {
         Source& source = pair.second;
-        changed = source.update() || changed;
+        if (source.enabled) {
+            changed = source.update() || changed;
+        }
     }
 
     return changed;
