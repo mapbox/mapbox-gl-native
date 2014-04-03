@@ -150,6 +150,7 @@ if __name__ == '__main__':
 
   gyp_args = []
   gyp_args.extend(['-f', 'make'])
+  gyp_args.extend(['-I', 'common.gypi'])
   gyp_args.append(os.path.join(os.path.abspath(root_dir), 'llmr.gyp'))
   gyp_args.append('--depth=' + root_dir)
   output_dir = os.path.join(os.path.abspath(root_dir), 'out')
