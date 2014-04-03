@@ -48,7 +48,7 @@ void Transform::operator()(const TransformScaleByCommand &cmd, float duration) {
         new_scale = max_scale;
     }
 
-    operator()(TransformScaleCommand{ new_scale, cmd.center_x, cmd.center_x }, duration);
+    operator()(TransformScaleCommand{ new_scale, cmd.center_x, cmd.center_y }, duration);
 }
 
 void Transform::operator()(const TransformRotateByCommand &cmd, float duration) {
