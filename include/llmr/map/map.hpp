@@ -58,6 +58,8 @@ public:
     void rotateBy(int16_t cx, int16_t cy, int16_t sx, int16_t sy, int16_t ex, int16_t ey, float duration = 0);
     void resetNorth();
 
+    void toggleDebug();
+
 private:
     // Thread safe. Schedules a rerender.
     void rerender();
@@ -121,8 +123,6 @@ private:
     // void startRotating();
     // void stopRotating();
 
-    // void toggleDebug();
-
 private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
     bool findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain);
@@ -160,7 +160,9 @@ private:
     const int32_t min_zoom;
     const int32_t max_zoom;
 
-    float pixel_ratio;
+    // float pixel_ratio;
+
+    std::atomic<uint8_t> debug;
 
     bool use_raster = false;
 

@@ -14,7 +14,8 @@ Map::Map(Settings& settings)
       glyphAtlas(1024, 1024),
       painter(transform, style, glyphAtlas),
       min_zoom(0),
-      max_zoom(kTileVectorMaxZoom)
+      max_zoom(kTileVectorMaxZoom),
+      debug(0)
 {
     render_loop = uv_loop_new();
 
@@ -95,6 +96,11 @@ void Map::resetNorth() {
     uv_async_send(&async_transform);
 }
 
+void Map::toggleDebug() {
+    debug ^= 0xFF;
+    scheduleTransform({});
+    uv_async_send(&async_transform);
+}
 
 // void Map::setup(float pixelRatio) {
 
@@ -297,13 +303,6 @@ void Map::resetNorth() {
 
 // void Map::resetZoom() {
 //     setZoom(0);
-// }
-
-// void Map::toggleDebug() {
-//     settings.debug = !settings.debug;
-//     update();
-
-//     settings.persist();
 // }
 
 // void Map::cancelAnimations() {

@@ -23,7 +23,7 @@ void Map::setup() {
     painter.setup();
 
     style.sprite = std::make_shared<Sprite>();
-    style.sprite->load(kSpriteURL, pixel_ratio);
+    style.sprite->load(kSpriteURL, transform.getPixelRatio());
 
     style.loadJSON(resources::style, resources::style_size);
 }
@@ -67,13 +67,17 @@ void Map::processTransforms() {
     while (!transform_commands.empty()) {
         const TransformCommand &cmd = transform_commands.front();
         switch (cmd.type) {
+            case TransformCommand::Null: /* null */ break;
             case TransformCommand::MoveBy: transform(cmd.moveBy, cmd.duration); break;
             case TransformCommand::ScaleBy: transform(cmd.scaleBy, cmd.duration); break;
             case TransformCommand::RotateBy: transform(cmd.rotateBy, cmd.duration); break;
             case TransformCommand::LonLat: transform(cmd.lonLat, cmd.duration); break;
             case TransformCommand::Scale: transform(cmd.scale, cmd.duration); break;
             case TransformCommand::Angle: transform(cmd.angle, cmd.duration); break;
-            case TransformCommand::Resize: transform(cmd.resize); break;
+            case TransformCommand::Resize:
+                transform(cmd.resize);
+                painter.resize(cmd.resize.fb_width, cmd.resize.fb_height);
+                break;
             default: fprintf(stderr, "unhandled transform type\n"); break;
         }
         transform_commands.pop();
@@ -93,6 +97,8 @@ void Map::render() {
     painter.clear();
 
     painter.changeMatrix();
+
+    painter.setDebug(debug);
 
     // First, update all tile matrices with the new transform and render into
     // the stencil buffer.
@@ -145,7 +151,7 @@ bool Map::updateTiles() {
 
     // Performs a scanline algorithm search that covers the rectangle of the box
     // and sorts them by proximity to the center.
-    std::forward_list<Tile::ID> required = llmr::covering_tiles(zoom, box, use_raster, (pixel_ratio > 1.0));
+    std::forward_list<Tile::ID> required = llmr::covering_tiles(zoom, box, use_raster, (transform.getPixelRatio() > 1.0));
 
     // Retain is a list of tiles that we shouldn't delete, even if they are not
     // the most ideal tile for the current viewport. This may include tiles like
@@ -257,7 +263,7 @@ TileData::State Map::addTile(const Tile::ID& id) {
 
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
-        new_tile.data = std::make_shared<TileData>(normalized_id, style, glyphAtlas, use_raster, (pixel_ratio > 1.0));
+        new_tile.data = std::make_shared<TileData>(normalized_id, style, glyphAtlas, use_raster, (transform.getPixelRatio() > 1.0));
         new_tile.data->request([this](){
             this->dirty = true;
             this->rerender();

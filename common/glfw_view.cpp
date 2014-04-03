@@ -92,7 +92,7 @@ void GLFWView::key(GLFWwindow *window, int key, int scancode, int action, int mo
                 glfwSetWindowShouldClose(window, true);
                 break;
             case GLFW_KEY_TAB:
-                // view->map.toggleDebug();
+                view->map.toggleDebug();
                 break;
             case GLFW_KEY_X:
                 if (!mods) view->map.resetPosition();

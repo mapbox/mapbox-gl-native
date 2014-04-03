@@ -72,6 +72,10 @@ void Painter::setupShaders() {
     textShader = std::make_unique<TextShader>();
 }
 
+void Painter::setDebug(bool value) {
+    debug = value;
+}
+
 void Painter::resize(int width, int height) {
     glViewport(0, 0, width, height);
 }
@@ -166,7 +170,9 @@ void Painter::render(const Tile& tile) {
         renderLayers(tile.data, style.layers);
     }
 
-    renderDebug(tile.data);
+    if (debug) {
+        renderDebug(tile.data);
+    }
 }
 
 void Painter::renderRaster(const std::shared_ptr<TileData>& tile_data) {
