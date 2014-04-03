@@ -1,8 +1,4 @@
 {
-  'includes': [
-    './common.gypi',
-    './config.gypi',
-  ],
   'targets': [
     {
       'target_name': 'shaders_gl',
@@ -58,10 +54,11 @@
     {
       'target_name': 'llmr-x86',
       'product_name': 'llmr-x86',
-      'type': 'static_library',
+      'type': '<(library)',
       'dependencies': [
           'build_stylesheet',
           'shaders_gl',
+          'deps/libuv/uv.gyp:libuv',
       ],
       'sources': [
         '<!@(find src -name "*.cpp")',
@@ -88,7 +85,7 @@
           '<@(png_cflags)'
       ],
       'direct_dependent_settings': {
-          'include_dirs':[
+          'include_dirs': [
               './include'
           ],
           'cflags': [

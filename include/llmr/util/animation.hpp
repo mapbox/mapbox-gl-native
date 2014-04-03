@@ -3,6 +3,7 @@
 
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/platform/platform.hpp>
+#include <llmr/util/time.hpp>
 
 namespace llmr {
 namespace util {
@@ -14,11 +15,11 @@ public:
         complete
     };
     animation(double duration)
-        : start(platform::time()),
+        : start(util::time()),
           duration(duration) {}
 
     double progress() const {
-        return (platform::time() - start) / duration;
+        return (util::time() - start) / duration;
     }
 
     virtual state update() const = 0;

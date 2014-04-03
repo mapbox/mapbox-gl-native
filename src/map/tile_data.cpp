@@ -35,7 +35,7 @@ const std::string TileData::toString() const {
     return util::sprintf("[tile %d/%d/%d]", id.z, id.x, id.y);
 }
 
-void TileData::request() {
+void TileData::request(std::function<void()> callback) {
     state = State::loading;
 
     std::string url;
@@ -60,9 +60,7 @@ void TileData::request() {
         } else {
             fprintf(stderr, "tile loading failed\n");
         }
-    }, []() {
-        platform::restart();
-    });
+    }, callback);
     req = request;
 }
 

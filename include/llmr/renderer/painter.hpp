@@ -20,7 +20,6 @@
 namespace llmr {
 
 class Transform;
-class Settings;
 class Style;
 class Tile;
 
@@ -31,7 +30,7 @@ class TextBucket;
 
 class Painter : private util::noncopyable {
 public:
-    Painter(Transform& transform, Settings& settings, Style& style, GlyphAtlas& glyphAtlas);
+    Painter(Transform& transform, Style& style, GlyphAtlas& glyphAtlas);
 
     void setup();
     void clear();
@@ -69,7 +68,6 @@ public:
 
 private:
     Transform& transform;
-    Settings& settings;
     Style& style;
     GlyphAtlas& glyphAtlas;
 

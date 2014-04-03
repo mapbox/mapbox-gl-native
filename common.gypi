@@ -1,4 +1,10 @@
 {
+  'includes': [
+    './config.gypi',
+  ],
+  'variables': {
+    'library': 'static_library',
+  },
   'target_defaults': {
     'default_configuration': 'Release',
     'xcode_settings': {

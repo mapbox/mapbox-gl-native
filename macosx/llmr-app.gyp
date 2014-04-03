@@ -1,8 +1,4 @@
 {
-  'includes': [
-    '../common.gypi',
-    '../config.gypi'
-  ],
   'targets': [
     {
         "target_name": "osxapp",
@@ -11,7 +7,9 @@
         "sources": [
             "./main.mm",
             "./settings.mm",
-            "./settings.hpp"
+            "./settings.hpp",
+            "../common/glfw_view.hpp",
+            "../common/glfw_view.cpp",
         ],
         'product_extension': 'app',
         'mac_bundle': 1,
@@ -46,6 +44,7 @@
           'CLANG_ENABLE_OBJC_ARC': 'YES'
         },
         "dependencies": [
+            "../deps/libuv/uv.gyp:libuv",
             "../llmr.gyp:llmr-x86"
         ]
     }

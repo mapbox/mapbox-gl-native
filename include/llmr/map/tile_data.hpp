@@ -60,7 +60,7 @@ public:
     TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const bool use_raster = false, const bool use_retina = false);
     ~TileData();
 
-    void request();
+    void request(std::function<void()> callback);
     bool parse();
     void cancel();
 

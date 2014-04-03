@@ -11,7 +11,6 @@
 #include <llmr/renderer/text_bucket.hpp>
 
 #include <llmr/map/transform.hpp>
-#include <llmr/map/settings.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/platform/gl.hpp>
 #include <llmr/style/style.hpp>
@@ -22,9 +21,8 @@ using namespace llmr;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(Transform& transform, Settings& settings, Style& style, GlyphAtlas& glyphAtlas)
+Painter::Painter(Transform& transform, Style& style, GlyphAtlas& glyphAtlas)
     : transform(transform),
-      settings(settings),
       style(style),
       glyphAtlas(glyphAtlas) {
 }
@@ -101,7 +99,7 @@ void Painter::depthMask(bool value) {
 
 void Painter::changeMatrix() {
     // Initialize projection matrix
-    matrix::ortho(projMatrix, 0, transform.width, transform.height, 0, 0, 1);
+    matrix::ortho(projMatrix, 0, transform.getWidth(), transform.getHeight(), 0, 0, 1);
 
     // The extrusion matrix.
     matrix::identity(extrudeMatrix);
@@ -168,9 +166,7 @@ void Painter::render(const Tile& tile) {
         renderLayers(tile.data, style.layers);
     }
 
-    if (settings.debug) {
-        renderDebug(tile.data);
-    }
+    renderDebug(tile.data);
 }
 
 void Painter::renderRaster(const std::shared_ptr<TileData>& tile_data) {
@@ -270,7 +266,10 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         outlineShader->setColor(stroke_color);
 
         // Draw the entire line
-        outlineShader->setWorld({{ transform.fb_width, transform.fb_height }});
+        outlineShader->setWorld({{
+            static_cast<float>(transform.getFramebufferWidth()),
+            static_cast<float>(transform.getFramebufferHeight())
+        }});
         glDepthRange(strata, 1.0f);
         bucket.drawVertices(*outlineShader);
     } else if (fringeline) {
@@ -350,10 +349,9 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         // Draw the entire line
         outlineShader->setWorld({{
-                transform.fb_width,
-                transform.fb_height
-            }
-        });
+            static_cast<float>(transform.getFramebufferWidth()),
+            static_cast<float>(transform.getFramebufferHeight())
+        }});
 
         glDepthRange(strata + strata_epsilon, 1.0f);
         bucket.drawVertices(*outlineShader);
@@ -391,17 +389,16 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         linejoinShader->setMatrix(matrix);
         linejoinShader->setColor(color);
         linejoinShader->setWorld({{
-                transform.fb_width * 0.5f,
-                transform.fb_height * 0.5f
-            }
-        });
+            static_cast<float>(transform.getFramebufferWidth()) * 0.5f,
+            static_cast<float>(transform.getFramebufferHeight()) * 0.5f
+        }});
         linejoinShader->setLineWidth({{
-                ((outset - 0.25f) * transform.pixelRatio),
-                ((inset - 0.25f) * transform.pixelRatio)
+                ((outset - 0.25f) * transform.getPixelRatio()),
+                ((inset - 0.25f) * transform.getPixelRatio())
             }
         });
 
-        float pointSize = ceil(transform.pixelRatio * outset * 2.0);
+        float pointSize = ceil(transform.getPixelRatio() * outset * 2.0);
 #if defined(GL_ES_VERSION_2_0)
         linejoinShader->setSize(pointSize);
 #else
@@ -467,7 +464,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     pointShader->setMatrix(matrix);
     pointShader->setImage(0);
     pointShader->setColor(color);
-    const float pointSize = properties.size * 1.4142135623730951 * transform.pixelRatio;
+    const float pointSize = properties.size * 1.4142135623730951 * transform.getPixelRatio();
 #if defined(GL_ES_VERSION_2_0)
     pointShader->setSize(pointSize);
 #else
@@ -477,7 +474,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
     if (*style.sprite->raster) {
-        style.sprite->raster->bind(transform.rotating || transform.scaling || transform.panning);
+        style.sprite->raster->bind(transform.isAnimating());
     }
     glDepthRange(strata, 1.0f);
     bucket.drawPoints(*pointShader);
@@ -513,7 +510,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     glyphAtlas.bind();
     textShader->setTextureSize({{ static_cast<float>(glyphAtlas.width), static_cast<float>(glyphAtlas.height) }});
 
-    textShader->setGamma(2.5f / fontSize / transform.pixelRatio);
+    textShader->setGamma(2.5f / fontSize / transform.getPixelRatio());
 
     // Convert the -pi..pi to an int8 range.
     float angle = round((transform.getAngle() + rotate) / M_PI * 128);
@@ -527,7 +524,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 
     // Label fading
     const float duration = 300.0f;
-    const float currentTime = platform::time() * 1000;
+    const float currentTime = util::time() * 1000;
 
     std::deque<FrameSnapshot> &history = frameHistory.history;
 
@@ -595,16 +592,16 @@ void Painter::renderDebug(const TileData::Ptr& tile_data) {
     // draw tile outline
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(1.0f, 0.0f, 0.0f, 1.0f);
-    lineWidth(4.0f * transform.pixelRatio);
+    lineWidth(4.0f * transform.getPixelRatio());
     glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index());
 
     // draw debug info
     tile_data->debugFontArray.bind(*plainShader, tile_data->debugFontBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
-    lineWidth(4.0f * transform.pixelRatio);
+    lineWidth(4.0f * transform.getPixelRatio());
     glDrawArrays(GL_LINES, 0, (GLsizei)tile_data->debugFontBuffer.index());
     plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
-    lineWidth(2.0f * transform.pixelRatio);
+    lineWidth(2.0f * transform.getPixelRatio());
     glDrawArrays(GL_LINES, 0, (GLsizei)tile_data->debugFontBuffer.index());
 
     glEnable(GL_DEPTH_TEST);
