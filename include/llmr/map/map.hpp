@@ -15,6 +15,7 @@
 #include <llmr/renderer/painter.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/texturepool.hpp>
+#include <llmr/util/loop.hpp>
 
 #include <cstdint>
 #include <string>
@@ -143,7 +144,7 @@ private:
 
     // Thread management
     uv_thread_t render_thread;
-    uv_loop_t *render_loop = nullptr;
+    uv::loop render_loop;
 
     std::mutex transform_commands_lock;
     std::queue<TransformCommand> transform_commands;

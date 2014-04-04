@@ -16,7 +16,7 @@ void Map::loop(void *ptr) {
     map->context->make_active();
     map->setup();
     map->rerender();
-    uv_run(map->render_loop, UV_RUN_DEFAULT);
+    map->render_loop.run();
 }
 
 void Map::setup() {
@@ -70,7 +70,7 @@ void Map::async_render_cb(uv_async_t *async, int status) {
 
 void Map::async_terminate_cb(uv_async_t *async, int status) {
     Map *map = static_cast<Map *>(async->data);
-    uv_stop(map->render_loop);
+    map->render_loop.stop();
 }
 
 void Map::processTransforms() {
@@ -278,7 +278,7 @@ TileData::State Map::addTile(const Tile::ID& id) {
 
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
-        new_tile.data = std::make_shared<TileData>(normalized_id, style, glyphAtlas, use_raster, (transform.getPixelRatio() > 1.0));
+        new_tile.data = std::make_shared<TileData>(normalized_id, render_loop, style, glyphAtlas, use_raster, (transform.getPixelRatio() > 1.0));
         new_tile.data->request([this](){
             this->dirty = true;
             this->rerender();

@@ -28,6 +28,10 @@
 #include <memory>
 #include <atomic>
 
+namespace uv {
+class loop;
+}
+
 namespace llmr {
 
 class Style;
@@ -57,11 +61,12 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const bool use_raster = false, const bool use_retina = false);
+    TileData(Tile::ID id, uv::loop &loop, const Style& style, GlyphAtlas& glyphAtlas, const bool use_raster = false, const bool use_retina = false);
     ~TileData();
 
     void request(std::function<void()> callback);
-    bool parse();
+    void reparse(std::function<void()> callback);
+    void parse();
     void cancel();
 
     const std::string toString() const;
@@ -91,6 +96,9 @@ public:
     std::map<std::string, std::unique_ptr<Bucket>> buckets;
 
 private:
+    // Event loop
+    uv::loop &loop;
+
     // Source data
     std::string data;
     const Style& style;

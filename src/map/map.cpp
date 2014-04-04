@@ -17,15 +17,13 @@ Map::Map(Settings& settings)
       max_zoom(kTileVectorMaxZoom),
       debug(0)
 {
-    render_loop = uv_loop_new();
-
-    uv_async_init(render_loop, &async_transform, async_transform_cb);
+    uv_async_init(*render_loop, &async_transform, async_transform_cb);
     async_transform.data = this;
 
-    uv_async_init(render_loop, &async_render, async_render_cb);
+    uv_async_init(*render_loop, &async_render, async_render_cb);
     async_render.data = this;
 
-    uv_async_init(render_loop, &async_terminate, async_terminate_cb);
+    uv_async_init(*render_loop, &async_terminate, async_terminate_cb);
     async_terminate.data = this;
 }
 

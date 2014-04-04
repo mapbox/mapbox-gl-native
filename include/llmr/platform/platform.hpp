@@ -22,8 +22,9 @@ struct Response {
     std::string body;
 };
 
-// Makes an HTTP request of a URL on a background thread, calls a function with the results on the same thread, and finally calls a callback function on the main thread. Returns a cancellable request.
-Request *request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback);
+// Makes an HTTP request of a URL on a background thread, calls a function with
+// the results in the original threda. Returns a cancellable request.
+Request *request_http(std::string url, std::function<void(Response *)> fn);
 
 // Cancels an HTTP request.
 void cancel_request_http(Request *request);
