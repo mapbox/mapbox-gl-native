@@ -557,9 +557,13 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     float zoomDiff = endingZ - history[1].z,
         timeDiff = lastFrame.time - history[1].time;
     if (timeDiff > duration) timeDiff = 1;
+    if (timeDiff <= 0) timeDiff = 1;
     float fadedist = zoomDiff / (timeDiff / duration);
 
-    if (isnan(fadedist)) fprintf(stderr, "fadedist should never be NaN");
+    if (isnan(fadedist)) {
+        fprintf(stderr, "fadedist should never be NaN\n");
+        fprintf(stderr, "zoomDiff: %f, timeDiff: %f, duration: %f\n", zoomDiff, timeDiff, duration);
+    }
 
     // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
     // bump is how much farther it would have been if it had continued zooming at the same rate
