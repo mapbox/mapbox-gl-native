@@ -28,9 +28,9 @@ public:
     void operator()(const TransformResizeCommand &cmd);
 
     // // Animations
-    // bool needsAnimation() const;
-    // void updateAnimations();
-    // void cancelAnimations();
+    bool needsAnimation() const;
+    void updateAnimations();
+    void cancelAnimations();
 
     // Getters
     void matrixFor(mat4& matrix, const Tile::ID& id) const;
@@ -94,7 +94,7 @@ private:
     // cache values for spherical mercator math
     double zc, Bc, Cc;
 
-    // std::forward_list<std::shared_ptr<util::animation>> animations;
+    std::forward_list<std::unique_ptr<util::animation>> animations;
     // std::shared_ptr<util::animation> scale_timeout;
     // std::shared_ptr<util::animation> rotate_timeout;
     // std::shared_ptr<util::animation> pan_timeout;

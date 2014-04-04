@@ -12,7 +12,7 @@ void FrameHistory::record(float zoom) {
     }
 
     if (history.size() > 0 || history.back().z != zoom) {
-        history.emplace_back(FrameSnapshot{static_cast<float>(util::time() * 1000), zoom});
+        history.emplace_back(FrameSnapshot{static_cast<float>(util::time()), zoom});
     }
 }
 

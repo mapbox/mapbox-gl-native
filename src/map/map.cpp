@@ -92,7 +92,7 @@ void Map::rotateBy(int16_t cx, int16_t cy, int16_t sx, int16_t sy, int16_t ex, i
 }
 
 void Map::resetNorth() {
-    scheduleTransform({ TransformAngleCommand { 0 }, 500 });
+    scheduleTransform({ TransformAngleCommand { 0 }, 500_milliseconds });
     uv_async_send(&async_transform);
 }
 

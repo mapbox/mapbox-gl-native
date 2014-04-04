@@ -42,6 +42,10 @@ void Map::async_render_cb(uv_async_t *async, int status) {
         map->dirty = true;
     }
 
+    if (map->transform.needsAnimation()) {
+        map->dirty = true;
+    }
+
     if (map->dirty == true) {
         if (map->swap == false) {
             // The framebuffer has been swapped previously, so we're good to paint
@@ -53,6 +57,10 @@ void Map::async_render_cb(uv_async_t *async, int status) {
         } else {
             map->rerender();
         }
+    }
+
+    if (map->transform.needsAnimation()) {
+        map->rerender();
     }
 }
 
@@ -90,6 +98,8 @@ void Map::cascadeStyle() {
 }
 
 void Map::render() {
+    transform.updateAnimations();
+
     if (*style.sprite->raster && !style.sprite->raster->textured) {
         style.sprite->raster->setTexturepool(&texturepool);
     }

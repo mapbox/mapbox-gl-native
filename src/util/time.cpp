@@ -5,8 +5,8 @@
 namespace llmr {
 namespace util {
 
-double time() {
-    return (double)uv_hrtime() / 1e9;
+float time() {
+    return (double)uv_hrtime() / 1e6;
 }
 
 }

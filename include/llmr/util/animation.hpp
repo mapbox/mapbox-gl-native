@@ -14,11 +14,11 @@ public:
         running,
         complete
     };
-    animation(double duration)
+    animation(float duration)
         : start(util::time()),
           duration(duration) {}
 
-    double progress() const {
+    float progress() const {
         return (util::time() - start) / duration;
     }
 
@@ -26,12 +26,13 @@ public:
     virtual ~animation();
 
 protected:
-    const double start, duration;
+    const double start;
+    const float duration; // in milliseconds
 };
 
 class ease_animation : public animation {
 public:
-    ease_animation(double from, double to, double& value, double duration);
+    ease_animation(double from, double to, double& value, float duration);
     state update() const;
 
 private:
@@ -42,7 +43,7 @@ private:
 template <typename T>
 class timeout : public animation {
 public:
-    timeout(T final_value, T& value, double duration)
+    timeout(T final_value, T& value, float duration)
         : animation(duration),
           final_value(final_value),
           value(value) {}

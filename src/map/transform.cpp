@@ -16,8 +16,20 @@ const double A = 6378137;
 
 
 Transform::Transform() {
-    // setScale(scale);
-    // setAngle(angle);
+}
+
+bool Transform::needsAnimation() const {
+    return !animations.empty();
+}
+
+void Transform::updateAnimations() {
+    animations.remove_if([](const std::unique_ptr<util::animation>& animation) {
+        return animation->update() == util::animation::complete;
+    });
+}
+
+void Transform::cancelAnimations() {
+    animations.clear();
 }
 
 void Transform::operator()(const TransformResizeCommand &resize) {
@@ -35,8 +47,8 @@ void Transform::operator()(const TransformMoveByCommand &cmd, float duration) {
         x = xn;
         y = yn;
     } else {
-        // TODO
-        fprintf(stderr, "TODO: animations not yet supported\n");
+        animations.emplace_front(std::make_unique<util::ease_animation>(x, xn, x, duration));
+        animations.emplace_front(std::make_unique<util::ease_animation>(y, yn, y, duration));
     }
 }
 
@@ -119,8 +131,7 @@ void Transform::operator()(const TransformAngleCommand &cmd, float duration) {
     if (duration == 0) {
         angle = new_angle;
     } else {
-        fprintf(stderr, "TODO: animating setAngle\n");
-        // animations.emplace_front(std::make_shared<util::ease_animation>(angle, new_angle, angle, duration));
+        animations.emplace_front(std::make_unique<util::ease_animation>(angle, new_angle, angle, duration));
     }
 }
 
@@ -131,11 +142,9 @@ void Transform::setScaleXY(double new_scale, double xn, double yn, float duratio
         x = xn;
         y = yn;
     } else {
-        // TODO:
-        fprintf(stderr, "TODO: animating setScaleXY\n");
-        // animations.emplace_front(std::make_shared<util::ease_animation>(scale, new_scale, scale, duration));
-        // animations.emplace_front(std::make_shared<util::ease_animation>(x, xn, x, duration));
-        // animations.emplace_front(std::make_shared<util::ease_animation>(y, yn, y, duration));
+        animations.emplace_front(std::make_unique<util::ease_animation>(scale, new_scale, scale, duration));
+        animations.emplace_front(std::make_unique<util::ease_animation>(x, xn, x, duration));
+        animations.emplace_front(std::make_unique<util::ease_animation>(y, yn, y, duration));
     }
 
     const double s = scale * util::tileSize;
@@ -143,20 +152,6 @@ void Transform::setScaleXY(double new_scale, double xn, double yn, float duratio
     Bc = s / 360;
     Cc = s / (2 * M_PI);
 }
-
-// bool Transform::needsAnimation() const {
-//     return !animations.empty();
-// }
-
-// void Transform::updateAnimations() {
-//     animations.remove_if([](const std::shared_ptr<util::animation>& animation) {
-//         return animation->update() == util::animation::complete;
-//     });
-// }
-
-// void Transform::cancelAnimations() {
-//     animations.clear();
-// }
 
 // void Transform::moveBy(double dx, double dy, double duration) {
 //     double xn = x + cos(angle) * dx + sin(angle) * dy;
