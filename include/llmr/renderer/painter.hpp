@@ -46,13 +46,13 @@ public:
     void resize(int width, int height);
 
     void prepareClippingMask();
-    void drawClippingMask(const mat4& matrix, uint8_t clip_id, bool opaque = true);
+    void drawClippingMask(const mat4& matrix, uint8_t clip_id);
     void finishClippingMask();
 
     bool needsAnimation() const;
 private:
     void setupShaders();
-    void renderRaster(const std::shared_ptr<TileData>& tile);
+    void renderRaster(const std::string& layer_name, const std::shared_ptr<TileData>& tile_data);
     void renderLayers(const std::shared_ptr<TileData>& tile, const std::vector<LayerDescription>& layers);
     void renderLayer(const std::shared_ptr<TileData>& tile_data, const LayerDescription& layer_desc);
     void renderDebug(const std::shared_ptr<TileData>& tile);

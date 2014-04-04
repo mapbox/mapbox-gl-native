@@ -47,6 +47,7 @@ public:
         std::map<std::string, LineProperties> lines;
         std::map<std::string, PointProperties> points;
         std::map<std::string, TextProperties> texts;
+        std::map<std::string, RasterProperties> rasters;
     } computed;
 };
 

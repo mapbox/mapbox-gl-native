@@ -2,6 +2,10 @@
 
 module.exports = {
     "buckets": {
+        "satellite": {
+            "source": "satellite",
+            "type": "raster"
+        },
         "water": {
             "source": "mapbox streets",
             "layer": "water",
@@ -128,6 +132,7 @@ module.exports = {
         "text": "#000000",
     },
     "structure": [
+        { "name": "satellite", "bucket": "satellite" },
         { "name": "park", "bucket": "park" },
         { "name": "wood", "bucket": "wood" },
         { "name": "water", "bucket": "water" },
@@ -263,6 +268,123 @@ module.exports = {
                     "color": "text",
                     "stroke": [1,1,1,0.7],
                     "size": ["exponential", 14, 8, 1, 8, 12]
+                },
+            }
+        },
+        {
+            "name": "satellite",
+            "layers": {
+                "background": {
+                    "type": "background",
+                    "color": "#333333",
+                    "opacity": 1.0
+                },
+                "park": {
+                    "type": "fill",
+                    "opacity": 0,
+                },
+                "wood": {
+                    "type": "fill",
+                    "opacity": 0,
+                },
+                "water": {
+                    "type": "fill",
+                    "opacity": 0,
+                },
+                "building": {
+                    "type": "fill",
+                    "opacity": 0,
+                },
+                "road_limited": {
+                    "type": "line",
+                    "color": "#BBBBBB",
+                    "width": [
+                        "stops",
+                        { z: 0, val: 1 },
+                        { z: 30, val: 1 }
+                    ]
+                },
+                "road_regular": {
+                    "type": "line",
+                    "color": "#999999",
+                    "width": [
+                        "stops",
+                        { z: 0, val: 0.5 },
+                        { z: 13, val: 0.5 },
+                        { z: 16, val: 2 },
+                        { z: 20, val: 16 },
+                        { z: 30, val: 16 }
+                    ],
+                },
+                "road_large": {
+                    "type": "line",
+                    "color": "#666666",
+                    "width": [
+                        "stops",
+                        { z: 0, val: 0.5 },
+                        { z: 11, val: 0.5 },
+                        { z: 13, val: 1 },
+                        { z: 16, val: 4 },
+                        { z: 20, val: 32 },
+                        { z: 30, val: 32 }
+                    ],
+                },
+                "alcohol_poi": {
+                    "type": "point",
+                    "color": "#cccccc",
+                    "size": 18,
+                    "image": "alcohol-shop",
+                    "enabled": [ "min", 17 ]
+                },
+                "cafe_poi": {
+                    "type": "point",
+                    "color": "#cccccc",
+                    "size": 18,
+                    "image": "cafe",
+                    "enabled": [ "min", 17 ]
+                },
+                "embassy_poi": {
+                    "type": "point",
+                    "color": "#cccccc",
+                    "size": 18,
+                    "image": "embassy",
+                    "enabled": [ "min", 17 ]
+                },
+                "park_poi": {
+                    "type": "point",
+                    "color": "#cccccc",
+                    "size": 18,
+                    "image": "park",
+                    "enabled": [ "min", 17 ]
+                },
+                "restaurant_poi": {
+                    "type": "point",
+                    "color": "#cccccc",
+                    "size": 18,
+                    "image": "restaurant",
+                    "enabled": [ "min", 17 ]
+                },
+                "country_label": {
+                    "type": "text",
+                    "stroke": [ 1, 1, 1, 0.7 ],
+                    "color": "text",
+                    "size": 16
+                },
+                "place_label": {
+                    "type": "text",
+                    "stroke": [1,1,1,0.7],
+                    "color": "text",
+                    "size": 18
+                },
+                "road_label": {
+                    "type": "text",
+                    "color": "text",
+                    "stroke": [1,1,1,0.7],
+                    "size": ["exponential", 14, 8, 1, 8, 12]
+                },
+                "satellite": {
+                    "type": "raster",
+                    "opacity": 0.25
                 },
             }
         }

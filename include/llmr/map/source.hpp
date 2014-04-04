@@ -27,7 +27,8 @@ public:
     Source(Map& map, Transform& transform, Painter& painter, Texturepool& texturepool, const char *url = "", float pixel_ratio = 1.0, Type type = Type::vector, std::list<uint32_t> zooms = {0}, uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 14, bool enabled = true);
 
     bool update();
-    void render();
+    void prepare_render(bool is_baselayer = false);
+    void render(bool is_baselayer = false);
 
 public:
     bool enabled;

@@ -30,24 +30,25 @@ bool Source::update() {
     return updateTiles();
 }
 
-void Source::render() {
-    if (!enabled) {
-        return;
-    }
+void Source::prepare_render(bool is_baselayer) {
+    if (!enabled) return;
 
     uint8_t i = 1;
 
     for (Tile& tile : tiles) {
         if (tile.data && tile.data->state == TileData::State::parsed) {
-            // The position matrix.
             transform.matrixFor(tile.matrix, tile.id);
             matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
             tile.clip_id = i++;
-            painter.drawClippingMask(tile.matrix, tile.clip_id, (type != Type::raster));
+            if (is_baselayer) {
+                painter.drawClippingMask(tile.matrix, tile.clip_id);
+            }
         }
     }
+}
 
-    painter.finishClippingMask();
+void Source::render(bool is_baselayer) {
+    if (!enabled) return;
 
     for (const Tile& tile : tiles) {
         if (tile.data && tile.data->state == TileData::State::parsed) {

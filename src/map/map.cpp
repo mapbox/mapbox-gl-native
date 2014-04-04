@@ -37,9 +37,33 @@ void Map::setup(float pixelRatio) {
 
     style.loadJSON(resources::style, resources::style_size);
 
-    sources.emplace("mapbox streets", Source(*this, transform, painter, texturepool, "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf", pixelRatio, Source::Type::vector, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}, 512, 0, 14, true));
+    sources.emplace("mapbox streets",
+                    Source(*this,
+                           transform,
+                           painter,
+                           texturepool,
+                           "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf",
+                           pixelRatio,
+                           Source::Type::vector,
+                           {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14},
+                           512,
+                           0,
+                           14,
+                           true));
 
-    sources.emplace("satellite", Source(*this, transform, painter, texturepool, "https://a.tiles.mapbox.com/v3/justin.hh0gkdfm/%d/%d/%d%s.png256", pixelRatio, Source::Type::raster, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21}, 256, 0, 21, false));
+    sources.emplace("satellite",
+                    Source(*this,
+                           transform,
+                           painter,
+                           texturepool,
+                           "https://a.tiles.mapbox.com/v3/justin.hh0gkdfm/%d/%d/%d%s.png256",
+                           pixelRatio,
+                           Source::Type::raster,
+                           {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21},
+                           256,
+                           0,
+                           21,
+                           false));
 }
 
 void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
@@ -295,41 +319,32 @@ bool Map::render() {
 
     painter.changeMatrix();
 
-    // First, update all tile matrices with the new transform and render into
-    // the stencil buffer.
-//    uint8_t i = 1;
-    
+    // First, update the sources' tile matrices with the new
+    // transform and render into the stencil buffer, including
+    // drawing the background.
+
     painter.prepareClippingMask();
 
-//    for (Tile& tile : tiles) {
-//        if (tile.data && tile.data->state == TileData::State::parsed) {
-//            // The position matrix.
-//            transform.matrixFor(tile.matrix, tile.id);
-//            matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
-//            tile.clip_id = i++;
-//            painter.drawClippingMask(tile.matrix, tile.clip_id, !tile.data->use_raster);
-//        }
-//    }
+    bool is_baselayer = true;
 
     for (std::pair<std::string, Source&> pair : sources) {
         Source& source = pair.second;
-        source.render();
+        source.prepare_render(is_baselayer);
+        is_baselayer =  source.enabled ? false : (true && is_baselayer);
     }
 
-//    painter.finishClippingMask();
+    painter.finishClippingMask();
 
-//    for (const Tile& tile : tiles) {
-//        if (tile.data && tile.data->state == TileData::State::parsed) {
-//            if (tile.data->use_raster && *tile.data->raster && !tile.data->raster->textured) {
-//                tile.data->raster->setTexturepool(&texturepool);
-//                tile.data->raster->beginFadeInAnimation();
-//            }
-//            if (tile.data->use_raster && tile.data->raster->needsAnimation()) {
-//                tile.data->raster->updateAnimations();
-//            }
-//            painter.render(tile);
-//        }
-//    }
+    // Then, render each source's tiles. TODO: handle more than one
+    // vector source.
+
+    is_baselayer = true;
+
+    for (std::pair<std::string, Source&> pair : sources) {
+        Source& source = pair.second;
+        source.render(is_baselayer);
+        is_baselayer =  source.enabled ? false : (true && is_baselayer);
+    }
 
     painter.renderMatte();
 

@@ -136,6 +136,15 @@ struct BackgroundProperties {
     float opacity = 1.0;
 };
 
+struct RasterClass {
+    FunctionProperty enabled = true;
+    FunctionProperty opacity = 1;
+};
+
+struct RasterProperties {
+    bool enabled = true;
+    float opacity = 1.0;
+};
 
 }
 
