@@ -274,10 +274,19 @@ void Map::toggleDebug() {
 }
 
 void Map::toggleRaster() {
-    for (std::pair<std::string, Source&> pair : sources) {
-        Source& source = pair.second;
-        source.enabled = !source.enabled;
+    auto it = sources.find("satellite");
+    std::pair<std::string, Source&> pair = *it;
+    Source& satellite_source = pair.second;
+
+    if (satellite_source.enabled) {
+        satellite_source.enabled = false;
+        style.appliedClasses.erase(style.appliedClasses.find("satellite"));
+    } else {
+        satellite_source.enabled = true;
+        style.appliedClasses.insert("satellite");
     }
+
+    style.cascade(transform.getNormalizedZoom());
 
     update();
 }
