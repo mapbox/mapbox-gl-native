@@ -24,15 +24,15 @@ Sprite::Sprite() {
     raster = std::make_shared<Raster>();
 }
 
-void Sprite::load(const std::string& base_url, float pixelRatio) {
+void Sprite::load(const std::string& base_url, float pixelRatio, std::function<void()> callback) {
     std::shared_ptr<Sprite> sprite = shared_from_this();
 
-    auto complete = [sprite]() {
+    auto complete = [sprite, callback]() {
         std::lock_guard<std::mutex> lock(sprite->mtx);
         if (*sprite->raster && sprite->pos.size()) {
             sprite->loaded = true;
-//            platform::restart();
             fprintf(stderr, "sprite loaded\n");
+            callback();
         }
     };
 

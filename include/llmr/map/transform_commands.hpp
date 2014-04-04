@@ -41,8 +41,12 @@ struct TransformResizeCommand {
     uint16_t fb_width, fb_height;
 };
 
+struct TransformTransformCommand {
+    bool value;
+};
+
 struct TransformCommand {
-    enum Type : uint8_t { Null, MoveBy, ScaleBy, RotateBy, LonLat, Scale, Angle, Resize } type;
+    enum Type : uint8_t { Null, MoveBy, ScaleBy, RotateBy, LonLat, Scale, Angle, Resize, Transform } type;
     float duration; // milliseconds
     union {
         TransformMoveByCommand moveBy;
@@ -52,6 +56,7 @@ struct TransformCommand {
         TransformScaleCommand scale;
         TransformAngleCommand angle;
         TransformResizeCommand resize;
+        TransformTransformCommand transform;
     };
 
     inline TransformCommand()
@@ -70,6 +75,8 @@ struct TransformCommand {
         type(Angle), duration(duration), angle(angle) {}
     inline TransformCommand(const TransformResizeCommand& resize, float duration = 0) :
         type(Resize), duration(duration), resize(resize) {}
+    inline TransformCommand(const TransformTransformCommand& transform, float duration = 0) :
+        type(Transform), duration(duration), transform(transform) {}
 };
 
 }

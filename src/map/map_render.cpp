@@ -23,7 +23,11 @@ void Map::setup() {
     painter.setup();
 
     style.sprite = std::make_shared<Sprite>();
-    style.sprite->load(kSpriteURL, transform.getPixelRatio());
+    style.sprite->load(kSpriteURL, transform.getPixelRatio(), [this]() {
+        this->dirty = true;
+        this->rerender();
+        fprintf(stderr, "triggering rerender\n");
+    });
 
     style.loadJSON(resources::style, resources::style_size);
 }
@@ -42,7 +46,7 @@ void Map::async_render_cb(uv_async_t *async, int status) {
         map->dirty = true;
     }
 
-    if (map->transform.needsAnimation()) {
+    if (map->transform.needsTransitions()) {
         map->dirty = true;
     }
 
@@ -59,7 +63,7 @@ void Map::async_render_cb(uv_async_t *async, int status) {
         }
     }
 
-    if (map->transform.needsAnimation()) {
+    if (map->transform.needsTransitions()) {
         map->rerender();
     }
 }
@@ -86,6 +90,7 @@ void Map::processTransforms() {
                 transform(cmd.resize);
                 painter.resize(cmd.resize.fb_width, cmd.resize.fb_height);
                 break;
+            case TransformCommand::Transform: transform(cmd.transform, cmd.duration); break;
             default: fprintf(stderr, "unhandled transform type\n"); break;
         }
         transform_commands.pop();
@@ -98,7 +103,7 @@ void Map::cascadeStyle() {
 }
 
 void Map::render() {
-    transform.updateAnimations();
+    transform.updateTransitions();
 
     if (*style.sprite->raster && !style.sprite->raster->textured) {
         style.sprite->raster->setTexturepool(&texturepool);

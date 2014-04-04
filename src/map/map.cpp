@@ -102,6 +102,11 @@ void Map::toggleDebug() {
     uv_async_send(&async_transform);
 }
 
+void Map::setTransforming(bool value) {
+    scheduleTransform({ TransformTransformCommand { value }, 200_milliseconds });
+    uv_async_send(&async_transform);
+}
+
 // void Map::setup(float pixelRatio) {
 
 //     painter.setup();

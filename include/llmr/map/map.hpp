@@ -58,6 +58,9 @@ public:
     void rotateBy(int16_t cx, int16_t cy, int16_t sx, int16_t sy, int16_t ex, int16_t ey, float duration = 0);
     void resetNorth();
 
+    // Enable/disable transforming mode.
+    void setTransforming(bool value);
+
     void toggleDebug();
 
 private:

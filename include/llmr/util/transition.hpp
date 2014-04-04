@@ -1,5 +1,5 @@
-#ifndef LLMR_UTIL_ANIMATION
-#define LLMR_UTIL_ANIMATION
+#ifndef LLMR_UTIL_TRANSITION
+#define LLMR_UTIL_TRANSITION
 
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/platform/platform.hpp>
@@ -8,13 +8,13 @@
 namespace llmr {
 namespace util {
 
-class animation : private noncopyable {
+class transition : private noncopyable {
 public:
     enum state {
         running,
         complete
     };
-    animation(float duration)
+    transition(float duration)
         : start(util::time()),
           duration(duration) {}
 
@@ -23,16 +23,16 @@ public:
     }
 
     virtual state update() const = 0;
-    virtual ~animation();
+    virtual ~transition();
 
 protected:
     const double start;
     const float duration; // in milliseconds
 };
 
-class ease_animation : public animation {
+class ease_transition : public transition {
 public:
-    ease_animation(double from, double to, double& value, float duration);
+    ease_transition(double from, double to, double& value, float duration);
     state update() const;
 
 private:
@@ -41,10 +41,10 @@ private:
 };
 
 template <typename T>
-class timeout : public animation {
+class timeout : public transition {
 public:
     timeout(T final_value, T& value, float duration)
-        : animation(duration),
+        : transition(duration),
           final_value(final_value),
           value(value) {}
 

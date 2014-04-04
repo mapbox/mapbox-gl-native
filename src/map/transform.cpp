@@ -18,18 +18,22 @@ const double A = 6378137;
 Transform::Transform() {
 }
 
-bool Transform::needsAnimation() const {
-    return !animations.empty();
+bool Transform::isAnimating() const {
+    return transforming || needsTransitions();
 }
 
-void Transform::updateAnimations() {
-    animations.remove_if([](const std::unique_ptr<util::animation>& animation) {
-        return animation->update() == util::animation::complete;
+bool Transform::needsTransitions() const {
+    return !transitions.empty();
+}
+
+void Transform::updateTransitions() {
+    transitions.remove_if([](const std::shared_ptr<util::transition>& transition) {
+        return transition->update() == util::transition::complete;
     });
 }
 
-void Transform::cancelAnimations() {
-    animations.clear();
+void Transform::cancelTransitions() {
+    transitions.clear();
 }
 
 void Transform::operator()(const TransformResizeCommand &resize) {
@@ -47,8 +51,8 @@ void Transform::operator()(const TransformMoveByCommand &cmd, float duration) {
         x = xn;
         y = yn;
     } else {
-        animations.emplace_front(std::make_unique<util::ease_animation>(x, xn, x, duration));
-        animations.emplace_front(std::make_unique<util::ease_animation>(y, yn, y, duration));
+        transitions.emplace_front(std::make_shared<util::ease_transition>(x, xn, x, duration));
+        transitions.emplace_front(std::make_shared<util::ease_transition>(y, yn, y, duration));
     }
 }
 
@@ -131,10 +135,25 @@ void Transform::operator()(const TransformAngleCommand &cmd, float duration) {
     if (duration == 0) {
         angle = new_angle;
     } else {
-        animations.emplace_front(std::make_unique<util::ease_animation>(angle, new_angle, angle, duration));
+        transitions.emplace_front(std::make_shared<util::ease_transition>(angle, new_angle, angle, duration));
     }
 }
 
+void Transform::operator()(const TransformTransformCommand &cmd, float duration) {
+    if (cmd.value) {
+        // Add a 200ms timeout for resetting this to false
+        transform_timeout = std::make_shared<util::timeout<bool>>(false, transforming, 200_milliseconds);
+        // Treat the transform as a transition.
+        transitions.emplace_front(transform_timeout);
+        transforming = true;
+    } else {
+        if (transform_timeout) {
+            transitions.remove(transform_timeout);
+            transform_timeout.reset();
+        }
+        transforming = false;
+    }
+}
 
 void Transform::setScaleXY(double new_scale, double xn, double yn, float duration) {
     if (duration == 0) {
@@ -142,9 +161,9 @@ void Transform::setScaleXY(double new_scale, double xn, double yn, float duratio
         x = xn;
         y = yn;
     } else {
-        animations.emplace_front(std::make_unique<util::ease_animation>(scale, new_scale, scale, duration));
-        animations.emplace_front(std::make_unique<util::ease_animation>(x, xn, x, duration));
-        animations.emplace_front(std::make_unique<util::ease_animation>(y, yn, y, duration));
+        transitions.emplace_front(std::make_shared<util::ease_transition>(scale, new_scale, scale, duration));
+        transitions.emplace_front(std::make_shared<util::ease_transition>(x, xn, x, duration));
+        transitions.emplace_front(std::make_shared<util::ease_transition>(y, yn, y, duration));
     }
 
     const double s = scale * util::tileSize;
@@ -152,96 +171,6 @@ void Transform::setScaleXY(double new_scale, double xn, double yn, float duratio
     Bc = s / 360;
     Cc = s / (2 * M_PI);
 }
-
-// void Transform::moveBy(double dx, double dy, double duration) {
-//     double xn = x + cos(angle) * dx + sin(angle) * dy;
-//     double yn = y + cos(angle) * dy + sin(-angle) * dx;
-//     if (duration == 0) {
-//         x = xn;
-//         y = yn;
-//     } else {
-//         animations.emplace_front(std::make_shared<util::ease_animation>(x, xn, x, duration));
-//         animations.emplace_front(std::make_shared<util::ease_animation>(y, yn, y, duration));
-//     }
-// }
-
-// void Transform::startPanning() {
-//     stopPanning();
-
-//     // Add a 200ms timeout for resetting this to false
-//     panning = true;
-//     pan_timeout = std::make_shared<util::timeout<bool>>(false, panning, 0.2);
-//     animations.emplace_front(pan_timeout);
-// }
-
-// void Transform::stopPanning() {
-//     panning = false;
-//     if (pan_timeout) {
-//         animations.remove(pan_timeout);
-//         pan_timeout.reset();
-//     }
-// }
-
-// void Transform::startScaling() {
-//     stopScaling();
-
-//     // Add a 200ms timeout for resetting this to false
-//     scaling = true;
-//     scale_timeout = std::make_shared<util::timeout<bool>>(false, scaling, 0.2);
-//     animations.emplace_front(scale_timeout);
-// }
-
-// void Transform::stopScaling() {
-//     scaling = false;
-//     if (scale_timeout) {
-//         animations.remove(scale_timeout);
-//         scale_timeout.reset();
-//     }
-// }
-
-// void Transform::startRotating() {
-//     stopRotating();
-
-//     // Add a 200ms timeout for resetting this to false
-//     rotating = true;
-//     rotate_timeout = std::make_shared<util::timeout<bool>>(false, rotating, 0.2);
-//     animations.emplace_front(rotate_timeout);
-// }
-
-// void Transform::stopRotating() {
-//     rotating = false;
-//     if (rotate_timeout) {
-//         animations.remove(rotate_timeout);
-//         rotate_timeout.reset();
-//     }
-// }
-
-// void Transform::setZoom(double zoom, double duration) {
-//     setScale(pow(2.0, zoom), -1, -1, duration);
-// }
-
-// void Transform::setLonLat(double lon, double lat, double duration) {
-//     const double f = fmin(fmax(sin(D2R * lat), -0.9999), 0.9999);
-//     double xn = -round(lon * Bc);
-//     double yn = round(0.5 * Cc * log((1 + f) / (1 - f)));
-
-//     setScaleXY(scale, xn, yn, duration);
-// }
-
-// void Transform::setLonLatZoom(double lon, double lat, double zoom, double duration) {
-//     double new_scale = pow(2.0, zoom);
-
-//     const double s = new_scale * util::tileSize;
-//     zc = s / 2;
-//     Bc = s / 360;
-//     Cc = s / (2 * M_PI);
-
-//     const double f = fmin(fmax(sin(D2R * lat), -0.9999), 0.9999);
-//     double xn = -round(lon * Bc);
-//     double yn = round(0.5 * Cc * log((1 + f) / (1 - f)));
-
-//     setScaleXY(new_scale, xn, yn, duration);
-// }
 
 void Transform::getLonLat(double &lon, double &lat) const {
     lon = -x / Bc;

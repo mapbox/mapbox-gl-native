@@ -3,7 +3,7 @@
 
 #include <llmr/util/vec.hpp>
 #include <llmr/util/mat4.hpp>
-#include <llmr/util/animation.hpp>
+#include <llmr/util/transition.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/map/tile.hpp>
 
@@ -19,18 +19,20 @@ struct box;
 public:
     Transform();
 
+    void operator()(const TransformResizeCommand &cmd);
     void operator()(const TransformMoveByCommand &cmd, float duration);
     void operator()(const TransformScaleByCommand &cmd, float duration);
     void operator()(const TransformRotateByCommand &cmd, float duration);
     void operator()(const TransformLonLatCommand &cmd, float duration);
     void operator()(const TransformScaleCommand &cmd, float duration);
     void operator()(const TransformAngleCommand &cmd, float duration);
-    void operator()(const TransformResizeCommand &cmd);
+    void operator()(const TransformTransformCommand &cmd, float duration);
 
-    // // Animations
-    bool needsAnimation() const;
-    void updateAnimations();
-    void cancelAnimations();
+    // Animations
+    bool isAnimating() const;
+    bool needsTransitions() const;
+    void updateTransitions();
+    void cancelTransitions();
 
     // Getters
     void matrixFor(mat4& matrix, const Tile::ID& id) const;
@@ -47,18 +49,6 @@ public:
     inline uint16_t getFramebufferWidth() const { return fb_width; }
     inline uint16_t getFramebufferHeight() const { return fb_height; }
     inline float getPixelRatio() const { return pixelRatio; }
-
-    inline bool isAnimating() const {
-        return rotating || scaling || panning;
-    }
-
-    // // Animations
-    // void startPanning();
-    // void stopPanning();
-    // void startRotating();
-    // void stopRotating();
-    // void startScaling();
-    // void stopScaling();
 
     // Temporary
     box mapCornersToBox(uint32_t z) const;
@@ -77,27 +67,28 @@ private:
     uint16_t fb_width = 0;
     uint16_t fb_height = 0;
 
+    // Ratio of physical pixels to logical pixels.
     float pixelRatio = 1;
 
-    bool rotating = false;
-    bool scaling = false;
-    bool panning = false;
-
-private:
+    // position/orientation
     double x = 0, y = 0; // pixel values of the map center in the current scale
     double angle = 0;
     double scale = 1;
 
-    double min_scale = pow(2, 0);
-    double max_scale = pow(2, 20);
+    const double min_scale = pow(2, 0);
+    const double max_scale = pow(2, 20);
 
     // cache values for spherical mercator math
     double zc, Bc, Cc;
 
-    std::forward_list<std::unique_ptr<util::animation>> animations;
-    // std::shared_ptr<util::animation> scale_timeout;
-    // std::shared_ptr<util::animation> rotate_timeout;
-    // std::shared_ptr<util::animation> pan_timeout;
+    // Animations
+    std::forward_list<std::shared_ptr<util::transition>> transitions;
+    std::shared_ptr<util::transition> transform_timeout;
+
+    // This is true while the user is transforming the map (e.g. panning,
+    // zooming, rotating). Once the user stops, or a timeout occurs, this will
+    // be reset to false.
+    bool transforming = false;
 };
 
 }

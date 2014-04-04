@@ -126,7 +126,7 @@ void GLFWView::scroll(GLFWwindow *window, double xoffset, double yoffset) {
         scale = 1.0 / scale;
     }
 
-    // view->map.startScaling();
+    view->map.setTransforming(true);
     view->map.scaleBy(scale, view->last_x, view->last_y);
 }
 
@@ -150,13 +150,13 @@ void GLFWView::mouseclick(GLFWwindow *window, int button, int action, int modifi
             view->start_x = view->last_x;
             view->start_y = view->last_y;
         } else {
-            // view->map.stopRotating();
+            view->map.setTransforming(false);
         }
     } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
         view->tracking = action == GLFW_PRESS;
 
         if (action == GLFW_RELEASE) {
-            // view->map.stopPanning();
+            view->map.setTransforming(false);
             double now = glfwGetTime();
             if (now - view->last_click < 0.4) {
                 view->map.scaleBy(2.0, view->last_x, view->last_y);
@@ -172,11 +172,11 @@ void GLFWView::mousemove(GLFWwindow *window, double x, double y) {
         double dx = x - view->last_x;
         double dy = y - view->last_y;
         if (dx || dy) {
-            // view->map.startPanning();
+            view->map.setTransforming(true);
             view->map.moveBy(dx, dy);
         }
     } else if (view->rotating) {
-        // view->map.startRotating();
+        view->map.setTransforming(true);
         view->map.rotateBy(view->start_x, view->start_y, view->last_x, view->last_y, x, y);
     }
     view->last_x = x;
