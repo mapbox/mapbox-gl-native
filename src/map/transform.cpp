@@ -18,6 +18,10 @@ const double A = 6378137;
 Transform::Transform() {
 }
 
+Configuration Transform::getConfiguration() const {
+    return config;
+}
+
 bool Transform::isAnimating() const {
     return transforming || needsTransitions();
 }
@@ -54,6 +58,10 @@ void Transform::operator()(const TransformMoveByCommand &cmd, float duration) {
         transitions.emplace_front(std::make_shared<util::ease_transition>(x, xn, x, duration));
         transitions.emplace_front(std::make_shared<util::ease_transition>(y, yn, y, duration));
     }
+
+    // Use the final animation value.
+    config.longitude = -xn / Bc;
+    config.latitude = R2D * (2 * atan(exp(yn / Cc)) - 0.5 * M_PI);
 }
 
 void Transform::operator()(const TransformScaleByCommand &cmd, float duration) {
@@ -137,6 +145,9 @@ void Transform::operator()(const TransformAngleCommand &cmd, float duration) {
     } else {
         transitions.emplace_front(std::make_shared<util::ease_transition>(angle, new_angle, angle, duration));
     }
+
+    // Use the final animation value.
+    config.angle = new_angle;
 }
 
 void Transform::operator()(const TransformTransformCommand &cmd, float duration) {
@@ -166,10 +177,14 @@ void Transform::setScaleXY(double new_scale, double xn, double yn, float duratio
         transitions.emplace_front(std::make_shared<util::ease_transition>(y, yn, y, duration));
     }
 
-    const double s = scale * util::tileSize;
+    const double s = new_scale * util::tileSize;
     zc = s / 2;
     Bc = s / 360;
     Cc = s / (2 * M_PI);
+
+    config.scale = new_scale;
+    config.longitude = -xn / Bc;
+    config.latitude = R2D * (2 * atan(exp(yn / Cc)) - 0.5 * M_PI);
 }
 
 void Transform::getLonLat(double &lon, double &lat) const {

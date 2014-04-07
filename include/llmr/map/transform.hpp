@@ -6,6 +6,7 @@
 #include <llmr/util/transition.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/map/tile.hpp>
+#include <llmr/map/configuration.hpp>
 
 #include <llmr/map/transform_commands.hpp>
 
@@ -35,6 +36,7 @@ public:
     void cancelTransitions();
 
     // Getters
+    Configuration getConfiguration() const;
     void matrixFor(mat4& matrix, const Tile::ID& id) const;
     float getZoom() const;
     float getNormalizedZoom() const;
@@ -84,6 +86,11 @@ private:
     // Animations
     std::forward_list<std::shared_ptr<util::transition>> transitions;
     std::shared_ptr<util::transition> transform_timeout;
+
+    // This is a configuration that can only be read externally, but never
+    // written into. It stores the final transformation values (without any
+    // intermediary animation states).
+    Configuration config;
 
     // This is true while the user is transforming the map (e.g. panning,
     // zooming, rotating). Once the user stops, or a timeout occurs, this will

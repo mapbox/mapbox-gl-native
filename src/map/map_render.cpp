@@ -96,6 +96,8 @@ void Map::processTransforms() {
         transform_commands.pop();
         dirty = true;
     }
+
+    config = transform.getConfiguration();
 }
 
 void Map::cascadeStyle() {

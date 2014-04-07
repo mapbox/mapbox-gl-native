@@ -5,6 +5,7 @@
 #include <uv.h>
 
 #include <llmr/platform/view.hpp>
+#include <llmr/map/configuration.hpp>
 #include <llmr/map/tile.hpp>
 #include <llmr/map/tile_data.hpp>
 #include <llmr/map/transform.hpp>
@@ -97,7 +98,7 @@ private:
     // /* setup */
     // void setup(float pixelRatio = 1);
     // void loadStyle(const uint8_t *const data, uint32_t bytes);
-    // void loadSettings();
+    void loadSettings();
     // void toggleRaster();
 
     // /* callback */
@@ -154,8 +155,8 @@ private:
     uv_async_t async_terminate;
 
 private:
-    Settings& settings;
     Transform transform;
+    Settings &settings;
     Texturepool texturepool;
     Style style;
     GlyphAtlas glyphAtlas;
@@ -167,6 +168,10 @@ private:
     // float pixel_ratio;
 
     std::atomic<uint8_t> debug;
+
+    // This is read-only on the main thread and will be updated by the render
+    // thread on all transformation changes.
+    std::atomic<Configuration> config;
 
     bool use_raster = false;
 

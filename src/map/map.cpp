@@ -1,4 +1,5 @@
 #include <llmr/map/map.hpp>
+#include <llmr/map/settings.hpp>
 
 #include <algorithm>
 
@@ -7,8 +8,8 @@ using namespace llmr;
 Map::Map(Settings& settings)
     : dirty(true),
       swap(false),
-      settings(settings),
       transform(),
+      settings(settings),
       texturepool(),
       style(),
       glyphAtlas(1024, 1024),
@@ -31,6 +32,8 @@ void Map::start(ViewContext *ctx) {
     assert(context == nullptr);
     context = ctx;
     uv_thread_create(&render_thread, loop, this);
+
+    loadSettings();
 }
 
 void Map::stop() {
@@ -46,6 +49,7 @@ bool Map::can_swap() const {
 
 void Map::swapped() {
     swap = false;
+    settings.persist(config);
     rerender();
 }
 
@@ -122,13 +126,16 @@ void Map::setTransforming(bool value) {
 //     update();
 // }
 
-// void Map::loadSettings() {
-//     transform.setAngle(settings.angle);
-//     transform.setScale(settings.scale);
-//     transform.setLonLat(settings.longitude, settings.latitude);
-//     style.cascade(transform.getNormalizedZoom());
-//     update();
-// }
+void Map::loadSettings() {
+    Configuration config = settings.load();
+    {
+        std::lock_guard<std::mutex> lock(transform_commands_lock);
+        transform_commands.push(TransformAngleCommand{ config.angle });
+        transform_commands.push(TransformScaleCommand{ config.scale });
+        transform_commands.push(TransformLonLatCommand{ config.longitude, config.latitude });
+    }
+    uv_async_send(&async_transform);
+}
 
 // void Map::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb_height) {
 //     transform.width = width;

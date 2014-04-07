@@ -8,10 +8,10 @@ namespace llmr {
 class Settings_JSON : public Settings {
 public:
     Settings_JSON();
-    virtual void load();
-    virtual void persist();
-    virtual void sync();
-    virtual void clear();
+    virtual Configuration load() = 0;
+    virtual void persist(const Configuration &config) = 0;
+    virtual void sync(const Configuration &config) = 0;
+    virtual void clear() = 0;
 };
 
 }

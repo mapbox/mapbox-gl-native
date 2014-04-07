@@ -33,7 +33,6 @@ void Settings_JSON::persist()
 
 void Settings_JSON::sync()
 {
-
     rapidjson::FileStream s(fopen("/tmp/llmr-native.json", "w"));
     rapidjson::PrettyWriter<rapidjson::FileStream> writer(s);
     writer.StartArray();
