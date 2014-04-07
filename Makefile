@@ -1,11 +1,11 @@
+all: llmr
+
 -include config.mk
 -include deps/glfw.mk
 
 BUILDTYPE ?= Release
 PYTHON ?= python
 V ?= 1
-
-all: llmr
 
 deps: glsl-optimizer
 
