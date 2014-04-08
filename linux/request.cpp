@@ -33,6 +33,10 @@ uv_thread_t Request::thread;
 uv_timer_t Request::timeout;
 uv_async_t Request::async_add;
 CURLM *Request::curl_handle = nullptr;
+
+uv_mutex_t Request::curl_share_mutex;
+CURLSH *Request::curl_share = nullptr;
+
 std::mutex Request::request_mutex;
 std::queue<Request *> Request::requests;
 
@@ -185,6 +189,12 @@ void Request::start_timeout(CURLM *multi, long timeout_ms, void *userp)
 void Request::init_thread_run(void *ptr) {
     uv_timer_init(*loop, &timeout);
 
+    uv_mutex_init(&curl_share_mutex);
+
+    curl_share = curl_share_init();
+    curl_share_setopt(curl_share, CURLSHOPT_LOCKFUNC, curl_share_lock);
+    curl_share_setopt(curl_share, CURLSHOPT_UNLOCKFUNC, curl_share_unlock);
+
     curl_handle = curl_multi_init();
     curl_multi_setopt(curl_handle, CURLMOPT_SOCKETFUNCTION, handle_socket);
     curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout);
@@ -205,7 +215,16 @@ void Request::async_add_cb(uv_async_t *async, int status) {
         curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
         curl_easy_setopt(handle, CURLOPT_WRITEDATA, &req->res->body);
         curl_easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "deflate");
+        curl_easy_setopt(handle, CURLOPT_SHARE, curl_share);
         curl_multi_add_handle(curl_handle, handle);
         requests.pop();
     }
+}
+
+void Request::curl_share_lock(CURL *, curl_lock_data, curl_lock_access, void *) {
+    uv_mutex_lock(&curl_share_mutex);
+}
+
+void Request::curl_share_unlock(CURL *, curl_lock_data, void *) {
+    uv_mutex_unlock(&curl_share_mutex);
 }

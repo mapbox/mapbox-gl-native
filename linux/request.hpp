@@ -32,6 +32,9 @@ private:
     static void on_timeout(uv_timer_t *req, int status);
     static void start_timeout(CURLM *multi, long timeout_ms, void *userp);
 
+    static void curl_share_lock(CURL *, curl_lock_data, curl_lock_access, void *);
+    static void curl_share_unlock(CURL *, curl_lock_data, void *);
+
 
 private:
     const std::string url;
@@ -45,6 +48,9 @@ private:
     static uv_timer_t timeout;
     static uv_async_t async_add;
     static CURLM *curl_handle;
+
+    static uv_mutex_t curl_share_mutex;
+    static CURLSH *curl_share;
 
     static std::mutex request_mutex;
     static std::queue<Request *> requests;
