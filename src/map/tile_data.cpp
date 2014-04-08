@@ -52,7 +52,7 @@ void TileData::request(std::function<void()> callback) {
     }
 
     std::weak_ptr<TileData> weak_tile = shared_from_this();
-    platform::Request *request = platform::request_http(url, [weak_tile, callback](platform::Response *res) {
+    req = platform::request_http(url, [weak_tile, callback](platform::Response *res) {
         // This callback function can be called in any thread.
 
         std::shared_ptr<TileData> tile = weak_tile.lock();
@@ -68,7 +68,6 @@ void TileData::request(std::function<void()> callback) {
             fprintf(stderr, "tile loading failed\n");
         }
     });
-    req = request;
 }
 
 void TileData::cancel() {

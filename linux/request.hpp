@@ -3,12 +3,10 @@
 
 #include <string>
 #include <functional>
-// #include <atomic>
+#include <forward_list>
 #include <curl/curl.h>
 #include <uv.h>
 #include <llmr/util/loop.hpp>
-
-
 
 namespace llmr {
 namespace platform {
@@ -35,7 +33,6 @@ private:
     static void curl_share_lock(CURL *, curl_lock_data, curl_lock_access, void *);
     static void curl_share_unlock(CURL *, curl_lock_data, void *);
 
-
 private:
     const std::string url;
     const std::function<void(Response *)> fn;
@@ -54,8 +51,9 @@ private:
 
     static std::mutex request_mutex;
     static std::queue<Request *> requests;
-};
 
+    static std::queue<CURL *> curl_handles;
+};
 }
 }
 

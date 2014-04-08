@@ -10,10 +10,7 @@
 
 #include <curl/curl.h>
 
-
-
 GLFWView *mapView = nullptr;
-
 
 void quit_handler(int s) {
     if (mapView) {
@@ -24,20 +21,17 @@ void quit_handler(int s) {
     }
 }
 
-
-
 int main(int argc, char *argv[]) {
     int fullscreen_flag = 0;
 
-    const struct option long_options[] = {
-        {"fullscreen", no_argument, &fullscreen_flag, 1},
-        {0, 0, 0, 0}
-    };
+    const struct option long_options[] = {{"fullscreen", no_argument, &fullscreen_flag, 1},
+                                          {0, 0, 0, 0}};
 
     while (true) {
         int option_index = 0;
         int c = getopt_long(argc, argv, "f", long_options, &option_index);
-        if (c == -1) break;
+        if (c == -1)
+            break;
     }
 
     // sigint handling
@@ -46,7 +40,6 @@ int main(int argc, char *argv[]) {
     sigemptyset(&sigIntHandler.sa_mask);
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, NULL);
-
 
     // curl init
     curl_global_init(CURL_GLOBAL_ALL);
@@ -66,8 +59,6 @@ int main(int argc, char *argv[]) {
 namespace llmr {
 namespace platform {
 
-
-
 // the results in the original thread. Returns a cancellable request.
 Request *request_http(std::string url, std::function<void(Response *)> fn) {
     // This is called from the render thread. Make sure downloads happen in
@@ -76,10 +67,6 @@ Request *request_http(std::string url, std::function<void(Response *)> fn) {
 }
 
 // Cancels an HTTP request.
-void cancel_request_http(Request *request) {
-
-}
-
-
+void cancel_request_http(Request *request) {}
 }
 }
