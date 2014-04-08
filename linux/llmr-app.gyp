@@ -64,6 +64,7 @@
             }]
         ],
         "dependencies": [
+            "../deps/libuv/uv.gyp:libuv",
             "../llmr.gyp:llmr-x86"
         ]
     }

@@ -11,6 +11,8 @@
 
 #include <llmr/util/loop.hpp>
 
+#include <uv.h>
+
 using namespace llmr;
 
 TileData::TileData(Tile::ID id, uv::loop &loop, const Style& style, GlyphAtlas& glyphAtlas, const bool use_raster, const bool use_retina)
@@ -51,6 +53,8 @@ void TileData::request(std::function<void()> callback) {
 
     std::weak_ptr<TileData> weak_tile = shared_from_this();
     platform::Request *request = platform::request_http(url, [weak_tile, callback](platform::Response *res) {
+        // This callback function can be called in any thread.
+
         std::shared_ptr<TileData> tile = weak_tile.lock();
         if (!tile || tile->state == State::obsolete) {
             // noop. Tile is obsolete and we're now just waiting for the refcount
@@ -79,6 +83,8 @@ void TileData::reparse(std::function<void()> callback) {
     // destroyed at any point between now and when the work callback is called.
     std::weak_ptr<TileData> weak_tile = shared_from_this();
     loop.work([weak_tile]() {
+        // This callback function will be called in the map render loop thread.
+
         // Once we're here, we try to retain the object and only continue with
         // parsing if the object is still alive and well.
         std::shared_ptr<TileData> tile = weak_tile.lock();

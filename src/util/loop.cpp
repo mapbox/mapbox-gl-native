@@ -5,11 +5,15 @@
 using namespace uv;
 
 loop::loop()
-    : l(uv_loop_new()) {
+    : l(uv_loop_new()),
+      a(new uv_async_t) {
+    uv_async_init(l, a, async_cb);
+    a->data = this;
 }
 
 loop::~loop() {
     uv_loop_delete(l);
+    delete a;
 }
 
 uv_loop_t *loop::operator*() {
@@ -45,3 +49,31 @@ void loop::after_work_cb(uv_work_t* req, int status) {
     delete t;
     delete req;
 }
+
+void loop::schedule(callback cb) {
+    {
+        std::lock_guard<std::mutex> lock(async_mtx);
+        async_fns.push(cb);
+    }
+    uv_async_send(a);
+}
+
+void loop::async_cb(uv_async_t* async, int status) {
+    loop *l = static_cast<loop *>(async->data);
+    for(;;) {
+        callback cb;
+        l->async_mtx.lock();
+        if (l->async_fns.size()) {
+            cb = l->async_fns.front();
+            l->async_fns.pop();
+        }
+        l->async_mtx.unlock();
+        if (cb) {
+            cb();
+        } else {
+            return;
+        }
+    }
+}
+
+

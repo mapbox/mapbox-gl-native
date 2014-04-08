@@ -29,6 +29,7 @@ public:
 };
 
 Request *request_http(std::string url, std::function<void(Response *)> fn) {
+    fprintf(stderr, "[request_http request thread: %lx]\n", uv_thread_self());
     NSURLSessionDataTask *task = [[NSURLSession sharedSession]
                                   dataTaskWithURL:[NSURL URLWithString:@(url.c_str())]
                                   completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {

@@ -18,6 +18,7 @@ public:
 
     // public API
     void show();
+    void close();
     void fps();
 
 private:

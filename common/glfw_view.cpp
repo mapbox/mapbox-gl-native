@@ -79,6 +79,11 @@ void GLFWView::show() {
     map.stop();
 }
 
+void GLFWView::close() {
+    glfwSetWindowShouldClose(window, true);
+    glfwPostEmptyEvent();
+}
+
 void GLFWView::character(GLFWwindow *window, unsigned int codepoint) {
 
 }
