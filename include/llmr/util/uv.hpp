@@ -2,6 +2,7 @@
 #define LLMR_UTIL_UV
 
 #include <uv.h>
+#include <functional>
 #include <cassert>
 
 namespace uv {
@@ -26,6 +27,17 @@ public:
 private:
     mutex &mtx;
 };
+
+class once {
+public:
+    void operator()(void (*callback)(void)) {
+        uv_once(&o, callback);
+    }
+
+private:
+    uv_once_t o = UV_ONCE_INIT;
+};
+
 }
 
 #endif
