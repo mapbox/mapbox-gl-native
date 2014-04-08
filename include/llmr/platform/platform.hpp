@@ -24,10 +24,10 @@ struct Response {
 
 // Makes an HTTP request of a URL on a background thread, calls a function with
 // the results in the original threda. Returns a cancellable request.
-Request *request_http(std::string url, std::function<void(Response *)> fn);
+std::shared_ptr<Request> request_http(const std::string &url, std::function<void(Response *)> fn);
 
 // Cancels an HTTP request.
-void cancel_request_http(Request *request);
+void cancel_request_http(const std::shared_ptr<Request> &req);
 
 // Shows an RGBA image with the specified dimensions in a named window.
 void show_debug_image(std::string name, const char *data, size_t width, size_t height);

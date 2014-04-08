@@ -55,18 +55,3 @@ int main(int argc, char *argv[]) {
     curl_global_cleanup();
     return 0;
 }
-
-namespace llmr {
-namespace platform {
-
-// the results in the original thread. Returns a cancellable request.
-Request *request_http(std::string url, std::function<void(Response *)> fn) {
-    // This is called from the render thread. Make sure downloads happen in
-    // another thread.
-    return new Request(url, fn);
-}
-
-// Cancels an HTTP request.
-void cancel_request_http(Request *request) {}
-}
-}

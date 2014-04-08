@@ -73,7 +73,7 @@ void TileData::request(std::function<void()> callback) {
 void TileData::cancel() {
     if (state != State::obsolete) {
         state = State::obsolete;
-        platform::cancel_request_http(req);
+        platform::cancel_request_http(req.lock());
     }
 }
 
