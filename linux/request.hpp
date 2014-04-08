@@ -7,6 +7,7 @@
 #include <curl/curl.h>
 #include <uv.h>
 #include <llmr/util/loop.hpp>
+#include <llmr/util/uv.hpp>
 
 namespace llmr {
 namespace platform {
@@ -46,10 +47,10 @@ private:
     static uv_async_t async_add;
     static CURLM *curl_handle;
 
-    static uv_mutex_t curl_share_mutex;
+    static uv::mutex curl_share_mutex;
     static CURLSH *curl_share;
 
-    static std::mutex request_mutex;
+    static uv::mutex request_mutex;
     static std::queue<Request *> requests;
 
     static std::queue<CURL *> curl_handles;

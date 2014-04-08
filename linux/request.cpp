@@ -32,10 +32,10 @@ uv_timer_t Request::timeout;
 uv_async_t Request::async_add;
 CURLM *Request::curl_handle = nullptr;
 
-uv_mutex_t Request::curl_share_mutex;
+uv::mutex Request::curl_share_mutex;
 CURLSH *Request::curl_share = nullptr;
 
-std::mutex Request::request_mutex;
+uv::mutex Request::request_mutex;
 std::queue<Request *> Request::requests;
 
 std::queue<CURL *> Request::curl_handles;
@@ -44,7 +44,7 @@ Request::Request(std::string url, std::function<void(Response *)> fn) : url(url)
     uv_once(&init_thread, init_thread_cb);
 
     {
-        std::lock_guard<std::mutex> lock(request_mutex);
+        uv::lock lock(request_mutex);
         requests.push(this);
     }
 
@@ -182,8 +182,6 @@ void Request::start_timeout(CURLM *multi, long timeout_ms, void *userp) {
 void Request::init_thread_run(void *ptr) {
     uv_timer_init(*loop, &timeout);
 
-    uv_mutex_init(&curl_share_mutex);
-
     CURLSHcode share_error;
     curl_share = curl_share_init();
 
@@ -210,8 +208,6 @@ void Request::init_thread_run(void *ptr) {
         curl_easy_cleanup(curl_handles.front());
         curl_handles.pop();
     }
-
-    uv_mutex_destroy(&curl_share_mutex);
 }
 
 void Request::async_add_cb(uv_async_t *async, int status) {
@@ -248,9 +244,9 @@ void Request::async_add_cb(uv_async_t *async, int status) {
 }
 
 void Request::curl_share_lock(CURL *, curl_lock_data, curl_lock_access, void *) {
-    uv_mutex_lock(&curl_share_mutex);
+    curl_share_mutex.lock();
 }
 
 void Request::curl_share_unlock(CURL *, curl_lock_data, void *) {
-    uv_mutex_unlock(&curl_share_mutex);
+    curl_share_mutex.unlock();
 }
