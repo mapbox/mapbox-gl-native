@@ -6,6 +6,10 @@
 #include <llmr/platform/gl.hpp>
 #include <llmr/util/noncopyable.hpp>
 
+#include <cstdio>
+
+#include <uv.h>
+
 namespace llmr {
 
 template <
@@ -15,7 +19,11 @@ template <
 >
 class Buffer : private util::noncopyable {
 public:
+    Buffer() {
+        fprintf(stderr, "[%lx] create buffer\n", uv_thread_self());
+    }
     ~Buffer() {
+        fprintf(stderr, "[%lx] delete buffer %d\n", uv_thread_self(), buffer);
         if (array) {
             free(array);
             array = nullptr;

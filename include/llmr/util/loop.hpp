@@ -28,7 +28,7 @@ public:
     void schedule(callback cb);
 
 private:
-    static void async_cb(uv_async_t* async, int status);
+    static void async_cb(uv_async_t* async);
     static void work_cb(uv_work_t* req);
     static void after_work_cb(uv_work_t* req, int status);
 

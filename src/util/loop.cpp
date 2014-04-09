@@ -58,7 +58,7 @@ void loop::schedule(callback cb) {
     uv_async_send(a);
 }
 
-void loop::async_cb(uv_async_t* async, int status) {
+void loop::async_cb(uv_async_t* async) {
     loop *l = static_cast<loop *>(async->data);
     for(;;) {
         callback cb;

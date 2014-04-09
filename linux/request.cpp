@@ -201,7 +201,7 @@ int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, void *so
     return 0;
 }
 
-void on_timeout(uv_timer_t *req, int status) {
+void on_timeout(uv_timer_t *req) {
     int running_handles;
     CURLMcode error =
         curl_multi_socket_action(curl_multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
@@ -212,7 +212,7 @@ void on_timeout(uv_timer_t *req, int status) {
 
 void start_timeout(CURLM *multi, long timeout_ms, void *userp) {
     if (timeout_ms <= 0) {
-        on_timeout(&timeout, 0);
+        on_timeout(&timeout);
     } else {
         uv_timer_start(&timeout, on_timeout, timeout_ms, 0);
     }
@@ -274,7 +274,7 @@ size_t curl_write_cb(void *contents, size_t size, size_t nmemb, void *userp) {
 // This callback is called in the request event loop (on the request thread).
 // It initializes newly queued up download requests and adds them to the CURL
 // multi handle.
-void async_add_cb(uv_async_t *async, int status) {
+void async_add_cb(uv_async_t *async) {
     std::shared_ptr<Request> *req = nullptr;
     while (add_queue.pop(req)) {
         // Make sure that we're not starting requests that have been cancelled
@@ -307,7 +307,7 @@ void async_add_cb(uv_async_t *async, int status) {
     }
 }
 
-void async_cancel_cb(uv_async_t *async, int status) {
+void async_cancel_cb(uv_async_t *async) {
     std::shared_ptr<Request> *req = nullptr;
     while (cancel_queue.pop(req)) {
         // It is possible that the request has not yet been started, but that it already has been

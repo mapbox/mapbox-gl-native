@@ -54,7 +54,7 @@ GLFWView::~GLFWView() {
 }
 
 void GLFWView::swap() {
-    glfwPostEmptyEvent();
+   glfwSwapBuffers(window);
 }
 
 void GLFWView::make_active() {
@@ -67,12 +67,6 @@ void GLFWView::show() {
     map.start(this);
 
     while (!glfwWindowShouldClose(window)) {
-        if (map.can_swap()) {
-            glfwSwapBuffers(window);
-            map.swapped();
-            fps();
-        }
-
         glfwWaitEvents();
     }
 

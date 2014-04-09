@@ -16,6 +16,7 @@
 
 #include <llmr/llmr.hpp>
 #include <llmr/platform/platform.hpp>
+#include <llmr/platform/view.hpp>
 #include <llmr/map/tile.hpp>
 
 NSString *const MBXNeedsRenderNotification = @"MBXNeedsRenderNotification";
@@ -35,32 +36,32 @@ NSString *const MBXUpdateActivityNotification = @"MBXUpdateActivityNotification"
 
 @implementation MBXViewController
 
-class MBXMapView
-{
-    public:
-        MBXMapView() : settings(), map(settings)
-        {
-        }
+class MBXMapView : llmr::ViewContext {
+public:
+    MBXMapView(MBXViewController *view) : view(view), settings(), map(settings) {}
 
-        ~MBXMapView()
-        {
-        }
+    // ViewContext implementation
+    void swap() {
+        // fprintf(stderr, "context: %p (self: %p)\n", [EAGLContext currentContext], view.context);
+        // [view performSelectorOnMainThread:@selector(updateRender) withObject:nil waitUntilDone:NO];
+    }
 
-        void init()
-        {
-            settings.load();
+    void make_active() {
+        [EAGLContext setCurrentContext: view.context];
+    }
 
-            map.setup([[UIScreen mainScreen] scale]);
-
-            CGRect frame = [[UIScreen mainScreen] bounds];
-            map.resize(frame.size.width, frame.size.height, frame.size.width, frame.size.height);
-
-            map.loadSettings();
-        }
-
-    public:
-        llmr::Settings_iOS settings;
-        llmr::Map map;
+    // Starts the render thread.
+    void init() {
+        CGRect frame = [[UIScreen mainScreen] bounds];
+        map.resize(frame.size.width, frame.size.height, frame.size.width, frame.size.height);
+        
+        map.start(this);
+    }
+    
+public:
+    llmr::Settings_iOS settings;
+    llmr::Map map;
+    MBXViewController *view;
 };
 
 - (void)loadView
@@ -128,7 +129,7 @@ class MBXMapView
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateRender:) name:MBXNeedsRenderNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateNetworkActivity:) name:MBXUpdateActivityNotification object:nil];
 
-    mapView = new MBXMapView();
+    mapView = new MBXMapView(self);
 
     mapView->init();
 
@@ -203,7 +204,7 @@ class MBXMapView
 
 - (void)toggleRaster
 {
-    mapView->map.toggleRaster();
+//    mapView->map.toggleRaster();
 }
 
 - (void)dealloc
@@ -211,6 +212,7 @@ class MBXMapView
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     mapView->settings.sync();
+    [super dealloc];
 }
 
 - (void)updateRender:(NSNotification *)notification
@@ -244,30 +246,19 @@ class MBXMapView
 
 - (void)render:(id)sender
 {
-    mapView->map.render();
-
-    static double frames  = 0;
-    static double elapsed = 0;
-
-    frames++;
-
-    double current = [[NSDate date] timeIntervalSince1970];
-
-    if (current - elapsed >= 1)
-    {
-        if (self.debug)
-            NSLog(@"FPS: %f", frames / (current - elapsed));
-
-        elapsed = current;
-        frames = 0;
+    if (mapView->map.can_swap()) {
+        [(GLKView *)self.view display];
+        mapView->map.swapped();
+        displayLink.paused = YES;
+    } else {
+        // fprintf(stderr, "cannot swap\n");
     }
 
-    [(GLKView *)self.view display];
 }
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
-    mapView->map.cancelAnimations();
+//    mapView->map.cancelAnimations();
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
@@ -300,13 +291,13 @@ class MBXMapView
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
-    mapView->map.cancelAnimations();
+//    mapView->map.cancelAnimations();
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
-        mapView->map.startScaling();
+//        mapView->map.startScaling();
 
-        self.scale = mapView->map.getScale();
+//        self.scale = mapView->map.getScale();
     }
     else if (pinch.state == UIGestureRecognizerStateChanged)
     {
@@ -324,27 +315,27 @@ class MBXMapView
 
         CGFloat newZoom = log2f(self.scale) + adjustment;
 
-        mapView->map.scaleBy(powf(2, newZoom) / mapView->map.getScale(), [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
+//        mapView->map.scaleBy(powf(2, newZoom) / mapView->map.getScale(), [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
     }
     else if (pinch.state == UIGestureRecognizerStateEnded)
     {
-        mapView->map.stopScaling();
+//        mapView->map.stopScaling();
 
         if (fabsf(pinch.velocity) < 20)
             return;
 
-        CGFloat finalZoom = log2f(mapView->map.getScale()) + (0.01 * pinch.velocity);
+//        CGFloat finalZoom = log2f(mapView->map.getScale()) + (0.01 * pinch.velocity);
 
-        double scale = mapView->map.getScale();
-        double new_scale = powf(2, finalZoom);
+//        double scale = mapView->map.getScale();
+//        double new_scale = powf(2, finalZoom);
 
         CGFloat duration = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 0.3 : 0.5);
 
-        mapView->map.scaleBy(new_scale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y, duration);
+//        mapView->map.scaleBy(new_scale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y, duration);
     }
     else if (pinch.state == UIGestureRecognizerStateCancelled)
     {
-        mapView->map.stopScaling();
+//        mapView->map.stopTransforming();
     }
 
     [self updateRender];
@@ -352,21 +343,21 @@ class MBXMapView
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
-    mapView->map.cancelAnimations();
+//    mapView->map.cancelAnimations();
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
-        mapView->map.startRotating();
+//        mapView->map.startTransforming();
 
-        self.angle = mapView->map.getAngle();
+//        self.angle = mapView->map.getAngle();
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
-        mapView->map.setAngle(self.angle + rotate.rotation, [rotate locationInView:rotate.view].x, [rotate locationInView:rotate.view].y);
+//        mapView->map.setAngle(self.angle + rotate.rotation, [rotate locationInView:rotate.view].x, [rotate locationInView:rotate.view].y);
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
-        mapView->map.stopRotating();
+//        mapView->map.stopRotating();
     }
 
     [self updateRender];
@@ -379,31 +370,31 @@ class MBXMapView
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
-    mapView->map.cancelAnimations();
+//    mapView->map.cancelAnimations();
 
     if (doubleTap.state == UIGestureRecognizerStateEnded)
-        mapView->map.scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.5);
+        mapView->map.scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 500);
 
     [self updateRender];
 }
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
-    mapView->map.cancelAnimations();
+//    mapView->map.cancelAnimations();
 
     if (twoFingerTap.state == UIGestureRecognizerStateEnded)
-        mapView->map.scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
+        mapView->map.scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 500);
 
     [self updateRender];
 }
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
-    mapView->map.cancelAnimations();
+//    mapView->map.cancelAnimations();
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
-        self.scale = mapView->map.getScale();
+//        self.scale = mapView->map.getScale();
 
         self.quickZoomStart = [quickZoom locationInView:quickZoom.view].y;
     }
@@ -413,7 +404,7 @@ class MBXMapView
 
         CGFloat newZoom = log2f(self.scale) + (distance / 100);
 
-        mapView->map.scaleBy(powf(2, newZoom) / mapView->map.getScale(), self.view.bounds.size.width / 2, self.view.bounds.size.height / 2);
+//        mapView->map.scaleBy(powf(2, newZoom) / mapView->map.getScale(), self.view.bounds.size.width / 2, self.view.bounds.size.height / 2);
     }
 
     [self updateRender];
@@ -428,80 +419,5 @@ class MBXMapView
 
 MBXMapView *mapView;
 CADisplayLink *displayLink;
-
-namespace llmr
-{
-    namespace platform
-    {
-        class Request
-        {
-            public:
-                int16_t identifier;
-                std::string original_url;
-        };
-
-        void restart()
-        {
-            [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
-        }
-
-        Request *request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
-        {
-            NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
-            {
-                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
-
-                Response res;
-
-                if ( ! error && [response isKindOfClass:[NSHTTPURLResponse class]])
-                {
-                    res.code = [(NSHTTPURLResponse *)response statusCode];
-                    res.body = { (const char *)[data bytes], [data length] };
-                }
-
-                background_function(res);
-
-                dispatch_async(dispatch_get_main_queue(), ^(void)
-                {
-                    foreground_callback();
-                });
-            }];
-
-            [task resume];
-
-            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
-
-            Request *req = new Request();
-
-            req->identifier = task.taskIdentifier;
-            req->original_url = url;
-
-            return req;
-        }
-
-        void cancel_request_http(Request *request)
-        {
-            [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
-            {
-                for (NSURLSessionDownloadTask *task in downloadTasks)
-                {
-                    if (task.taskIdentifier == request->identifier)
-                    {
-                        [task cancel];
-
-                        [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
-
-                        return;
-                    }
-                }
-            }];
-        }
-
-        double time()
-        {
-            return [displayLink timestamp];
-        }
-    }
-}
 
 @end

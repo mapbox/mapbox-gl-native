@@ -14,6 +14,5 @@ SpacesInParentheses: false
 BreakBeforeBraces: Attach
 ColumnLimit: 100
 Cpp11BracedListStyle: true
-SpaceBeforeParens: ControlStatements
 SpacesBeforeTrailingComments: 1
 SpacesInContainerLiterals: true

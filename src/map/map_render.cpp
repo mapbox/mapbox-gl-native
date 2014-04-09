@@ -32,14 +32,14 @@ void Map::setup() {
     style.loadJSON(resources::style, resources::style_size);
 }
 
-void Map::async_transform_cb(uv_async_t *async, int status) {
+void Map::async_transform_cb(uv_async_t *async) {
     Map *map = static_cast<Map *>(async->data);
     map->processTransforms();
     map->cascadeStyle();
     map->rerender();
 }
 
-void Map::async_render_cb(uv_async_t *async, int status) {
+void Map::async_render_cb(uv_async_t *async) {
     Map *map = static_cast<Map *>(async->data);
 
     if (map->updateTiles()) {
@@ -51,16 +51,11 @@ void Map::async_render_cb(uv_async_t *async, int status) {
     }
 
     if (map->dirty == true) {
-        if (map->swap == false) {
-            // The framebuffer has been swapped previously, so we're good to paint
-            // on the new framebuffer if we need to.
-            map->dirty = false;
-            map->render();
-            map->swap = true;
-            map->context->swap();
-        } else {
-            map->rerender();
-        }
+        // The framebuffer has been swapped previously, so we're good to paint
+        // on the new framebuffer if we need to.
+        map->dirty = false;
+        map->render();
+        map->context->swap();
     }
 
     if (map->transform.needsTransitions()) {
@@ -68,7 +63,7 @@ void Map::async_render_cb(uv_async_t *async, int status) {
     }
 }
 
-void Map::async_terminate_cb(uv_async_t *async, int status) {
+void Map::async_terminate_cb(uv_async_t *async) {
     Map *map = static_cast<Map *>(async->data);
     map->render_loop.stop();
 }

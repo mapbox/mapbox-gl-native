@@ -38,14 +38,6 @@ public:
     void start(ViewContext *context);
     void stop();
 
-    // Returns true if a new frame has been successfully rendered and is
-    // available for being displayed.
-    bool can_swap() const;
-
-    // Tells the map that the buffer has been swapped and that it
-    // could start rendering the next frame if necessary
-    void swapped();
-
     // Changes the viewport and framebuffer dimensions.
     void resize(uint16_t width, uint16_t height, uint16_t fb_width, uint16_t fb_height);
 
@@ -81,13 +73,13 @@ private:
     static void loop(void *ptr);
 
     // This is called when new transform commands were added to the queue.
-    static void async_transform_cb(uv_async_t *async, int status);
+    static void async_transform_cb(uv_async_t *async);
 
     // This is invoked when we need to rerender.
-    static void async_render_cb(uv_async_t *async, int status);
+    static void async_render_cb(uv_async_t *async);
 
     // This is called when the map loop should be terminated.
-    static void async_terminate_cb(uv_async_t *async, int status);
+    static void async_terminate_cb(uv_async_t *async);
 
 
     void setup();
@@ -141,7 +133,6 @@ private:
     ViewContext *context = nullptr;
 
     std::atomic<bool> dirty;
-    std::atomic<bool> swap;
 
     // Thread management
     uv_thread_t render_thread;

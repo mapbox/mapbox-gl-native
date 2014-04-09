@@ -7,7 +7,6 @@ using namespace llmr;
 
 Map::Map(Settings& settings)
     : dirty(true),
-      swap(false),
       transform(),
       settings(settings),
       texturepool(),
@@ -41,16 +40,6 @@ void Map::stop() {
     uv_async_send(&async_terminate);
     uv_thread_join(&render_thread);
     context = nullptr;
-}
-
-bool Map::can_swap() const {
-    return swap;
-}
-
-void Map::swapped() {
-    swap = false;
-    settings.persist(config);
-    rerender();
 }
 
 // Thread safe. Schedules a rerender.
