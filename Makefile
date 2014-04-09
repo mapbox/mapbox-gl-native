@@ -9,7 +9,8 @@ V ?= 1
 deps: glsl-optimizer
 
 llmr: deps config.gypi src llmr.gyp
-	@if [ ! -f out ]; then echo 'please run ./configure first'; else $(MAKE) -C out BUILDTYPE=Release V=$(V) llmr-x86; fi;
+	deps/run_gyp llmr.gyp -Icommon.gypi -Ilinux/platform.gypi -Goutput_dir=./out/ --depth=. --generator-output=./out/ -f make
+	make -j8 -C out BUILDTYPE=Release V=$(V) llmr
 
 gtest: deps config.gypi src llmr.gyp
 	deps/run_gyp llmr.gyp -Icommon.gypi -Goutput_dir=./out/ --depth=. --generator-output=./build/gtest -f make
