@@ -31,7 +31,8 @@ parser.add_option("--boost",
 
 def pkg_config(pkg, pkgconfig_root):
   env = os.environ.copy()
-  env["PKG_CONFIG_PATH"] = pkgconfig_root
+  if pkgconfig_root:
+    env["PKG_CONFIG_PATH"] = pkgconfig_root
   cmd = subprocess.Popen(['pkg-config', '--static', '--libs', pkg], stdout=subprocess.PIPE, env=env)
   libs, ret = cmd.communicate()
   if (ret): return None
