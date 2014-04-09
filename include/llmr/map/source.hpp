@@ -24,7 +24,7 @@ public:
     };
 
 public:
-    Source(Map& map, Transform& transform, Painter& painter, Texturepool& texturepool, const char *url = "", float pixel_ratio = 1.0, Type type = Type::vector, std::list<uint32_t> zooms = {0}, uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 14, bool enabled = true);
+    Source(Map& map, Transform& transform, Painter& painter, Texturepool& texturepool, const char *url = "", Type type = Type::vector, std::list<uint32_t> zooms = {0}, uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 14, bool enabled = true);
 
     bool update();
     void prepare_render(bool is_baselayer = false);
@@ -43,8 +43,6 @@ private:
     TileData::State addTile(const Tile::ID& id);
     TileData::State hasTile(const Tile::ID& id);
 
-    void renderTile(const Tile::ID& id);
-
     double getZoom() const;
 
 private:
@@ -59,8 +57,6 @@ private:
     uint32_t tile_size;
     uint32_t min_zoom;
     uint32_t max_zoom;
-
-    float pixel_ratio;
 
     std::forward_list<Tile> tiles;
     std::forward_list<std::weak_ptr<TileData>> tile_data;

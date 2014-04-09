@@ -11,13 +11,12 @@
 
 using namespace llmr;
 
-Source::Source(Map& map, Transform& transform, Painter& painter, Texturepool& texturepool, const char *url, float pixel_ratio, Source::Type type, std::list<uint32_t> zooms, uint32_t tile_size, uint32_t min_zoom, uint32_t max_zoom, bool enabled)
+Source::Source(Map& map, Transform& transform, Painter& painter, Texturepool& texturepool, const char *url, Source::Type type, std::list<uint32_t> zooms, uint32_t tile_size, uint32_t min_zoom, uint32_t max_zoom, bool enabled)
     : map(map),
       transform(transform),
       painter(painter),
       texturepool(texturepool),
       url(url),
-      pixel_ratio(pixel_ratio),
       type(type),
       zooms(zooms),
       tile_size(tile_size),
@@ -115,7 +114,7 @@ TileData::State Source::addTile(const Tile::ID& id) {
         if (type == Source::Type::vector) {
             formed_url = util::sprintf(url, id.z, id.x, id.y);
         } else {
-            formed_url = util::sprintf(url, id.z, id.x, id.y, (pixel_ratio > 1.0 ? "@2x" : ""));
+            formed_url = util::sprintf(url, id.z, id.x, id.y, (map.getPixelRatio() > 1.0 ? "@2x" : ""));
         }
 
         new_tile.data = std::make_shared<TileData>(normalized_id, map.getStyle(), map.getGlyphAtlas(), formed_url, (type == Source::Type::raster));
@@ -271,13 +270,6 @@ bool Source::updateTiles() {
     return changed;
 }
 
-void Source::renderTile(const Tile::ID& id) {
-
-//    painter.render(tile);
-
-    return;
-}
-
 // Taken from polymaps src/Layer.js
 // https://github.com/simplegeo/polymaps/blob/master/src/Layer.js#L333-L383
 
@@ -342,7 +334,7 @@ void _scanTriangle(const llmr::vec2<double> a, const llmr::vec2<double> b, const
 
 double Source::getZoom() const {
     double offset = log(util::tileSize / tile_size) / log(2);
-    offset += (pixel_ratio > 1.0 ? 1 :0);
+    offset += (map.getPixelRatio() > 1.0 ? 1 :0);
     return map.getZoom() + offset;
 }
 
