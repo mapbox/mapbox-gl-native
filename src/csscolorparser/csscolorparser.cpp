@@ -28,6 +28,7 @@
 #include <vector>
 #include <sstream>
 #include <cmath>
+#include <algorithm>
 #include <map>
 
 using namespace CSSColorParser;
