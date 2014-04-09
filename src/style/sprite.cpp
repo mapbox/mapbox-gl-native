@@ -24,35 +24,37 @@ Sprite::Sprite() {
     raster = std::make_shared<Raster>();
 }
 
-void Sprite::load(const std::string& base_url, float pixelRatio) {
+void Sprite::load(const std::string& base_url, float pixelRatio, std::function<void()> callback) {
     std::shared_ptr<Sprite> sprite = shared_from_this();
 
-    auto complete = [sprite]() {
+    auto complete = [sprite, callback]() {
         std::lock_guard<std::mutex> lock(sprite->mtx);
         if (*sprite->raster && sprite->pos.size()) {
             sprite->loaded = true;
-            platform::restart();
             fprintf(stderr, "sprite loaded\n");
+            callback();
         }
     };
 
     std::string suffix = (pixelRatio > 1 ? "@2x" : "");
 
-    platform::request_http(base_url + suffix + ".json", [sprite](const platform::Response & res) {
-        if (res.code == 200) {
-            sprite->parseJSON(res.body);
+    platform::request_http(base_url + suffix + ".json", [sprite, complete](const platform::Response *res) {
+        if (res->code == 200) {
+            sprite->parseJSON(res->body);
         } else {
             fprintf(stderr, "failed to load sprite\n");
         }
-    }, complete);
+        complete();
+    });
 
-    platform::request_http(base_url + suffix + ".png", [sprite](const platform::Response & res) {
-        if (res.code == 200) {
-            sprite->raster->load(res.body);
+    platform::request_http(base_url + suffix + ".png", [sprite, complete](const platform::Response *res) {
+        if (res->code == 200) {
+            sprite->raster->load(res->body);
         } else {
             fprintf(stderr, "failed to load sprite image\n");
         }
-    }, complete);
+        complete();
+    });
 }
 
 Sprite::operator bool() const {

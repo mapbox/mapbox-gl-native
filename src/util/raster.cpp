@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <llmr/platform/gl.hpp>
+#include <llmr/util/std.hpp>
 
 #include <png.h>
 
@@ -176,7 +177,7 @@ void Raster::bind(bool linear) {
 }
 
 void Raster::beginFadeInAnimation() {
-    fade_animation = std::make_shared<util::ease_animation>(opacity, 1.0, opacity, 0.25);
+    fade_animation = std::make_unique<util::ease_transition>(opacity, 1.0, opacity, 0.25);
 }
 
 bool Raster::needsAnimation() const {
@@ -184,7 +185,7 @@ bool Raster::needsAnimation() const {
 }
 
 void Raster::updateAnimations() {
-    if (fade_animation->update() == util::animation::complete) {
+    if (fade_animation->update() == util::transition::complete) {
         fade_animation = nullptr;
     }
 }

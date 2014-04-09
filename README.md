@@ -5,8 +5,9 @@ implemented in C++11, targeting iOS & OS X.
 
  - Modern C++ compiler that supports `-std=c++11`
  - libpng
- - glfw3
- - Boost (for Rtree support)
+ - glfw3 (for Mac OS X/Linux app)
+ - libuv (for event loop)
+ - Boost (for Rtree support, lockfree queue)
  - Python (for build only)
  - Node.js (for build only)
 

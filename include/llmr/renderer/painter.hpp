@@ -20,7 +20,6 @@
 namespace llmr {
 
 class Transform;
-class Settings;
 class Style;
 class Tile;
 
@@ -31,7 +30,7 @@ class TextBucket;
 
 class Painter : private util::noncopyable {
 public:
-    Painter(Transform& transform, Settings& settings, Style& style, GlyphAtlas& glyphAtlas);
+    Painter(Transform& transform, Style& style, GlyphAtlas& glyphAtlas);
 
     void setup();
     void clear();
@@ -43,6 +42,7 @@ public:
     void renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id);
 
+    void setDebug(bool value);
     void resize(int width, int height);
 
     void prepareClippingMask();
@@ -69,7 +69,6 @@ public:
 
 private:
     Transform& transform;
-    Settings& settings;
     Style& style;
     GlyphAtlas& glyphAtlas;
 
@@ -80,6 +79,7 @@ private:
     bool gl_depthMask = true;
     float strata = 0;
     const float strata_epsilon = 1.0f / (1 << 16);
+    bool debug = false;
     enum { Opaque, Translucent } pass = Opaque;
 
     std::unique_ptr<PlainShader> plainShader;

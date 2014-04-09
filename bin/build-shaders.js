@@ -101,7 +101,7 @@ module.exports = function(param) {
     header += '}\n';
     header += '\n';
     header += '#endif\n';
-    fs.writeFileSync('include/llmr/shader/shaders.hpp', header);
+    fs.writeFileSync(path.join(process.argv[3], 'include/llmr/shader/shaders.hpp'), header);
 
 
     var code = '// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.\n';
@@ -113,7 +113,7 @@ module.exports = function(param) {
     code += lines.join(',\n');
     code += '\n};\n';
 
-    fs.writeFileSync('src/shader/shaders.cpp', code);
+    fs.writeFileSync(path.join(process.argv[3], 'src/shader/shaders.cpp'), code);
 
 };
 

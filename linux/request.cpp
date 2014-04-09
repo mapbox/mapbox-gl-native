@@ -1,113 +1,371 @@
 #include "request.hpp"
 
-#include <atomic>
-#include <cassert>
-
-#include <llmr/util/threadpool.hpp>
 #include <llmr/platform/platform.hpp>
+#include <llmr/util/uv.hpp>
+#include <llmr/util/loop.hpp>
+#include <llmr/util/std.hpp>
 
-using namespace llmr::platform;
+#include <boost/lockfree/queue.hpp>
 
+#include <curl/curl.h>
 
-CURLSH *Request::curl_share = nullptr;
-pthread_mutex_t Request::curl_share_mutex = PTHREAD_MUTEX_INITIALIZER;
+// This file contains code from http://curl.haxx.se/libcurl/c/multi-uv.html:
 
-void Request::curl_share_lock(CURL *, curl_lock_data, curl_lock_access, void *) {
-    pthread_mutex_lock(&curl_share_mutex);
+/***************************************************************************
+ *                                  _   _ ____  _
+ *  Project                     ___| | | |  _ \| |
+ *                             / __| | | | |_) | |
+ *                            | (__| |_| |  _ <| |___
+ *                             \___|\___/|_| \_\_____|
+ *
+ * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+ *
+ * This software is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution. The terms
+ * are also available at http://curl.haxx.se/docs/copyright.html.
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ***************************************************************************/
+
+/* Example application code using the multi socket interface to download
+   multiple files at once, but instead of using curl_multi_perform and
+   curl_multi_wait, which uses select(), we use libuv.
+   It supports epoll, kqueue, etc. on unixes and fast IO completion ports on
+   Windows, which means, it should be very fast on all platforms..
+
+   Written by Clemens Gruber, based on an outdated example from uvbook and
+   some tests from libuv.
+
+   Requires libuv and (of course) libcurl.
+
+   See http://nikhilm.github.com/uvbook/ for more information on libuv.
+*/
+
+namespace llmr {
+namespace platform {
+namespace request {
+
+struct curl_context {
+    uv_poll_t poll_handle;
+    curl_socket_t sockfd;
+};
+
+// Handles the request thread + messaging to the thread.
+static uv_thread_t thread;
+static uv::loop loop;
+static uv::once init_thread;
+static uv_async_t async_add;
+static uv_async_t async_cancel;
+
+// Stores pointers (!) to shared_ptrs. We use shared_ptrs so that request objects don't get
+// auto-destructed while they're in progress. The TileData object retains a weak_ptr to this
+// request, so we have to use a shared_ptr here to ensure that this object stays alive.
+static boost::lockfree::queue<std::shared_ptr<llmr::platform::Request> *> add_queue(8);
+static boost::lockfree::queue<std::shared_ptr<llmr::platform::Request> *> cancel_queue(8);
+
+// Used as the CURL timer function to periodically check for socket updates.
+static uv_timer_t timeout;
+
+// CURL multi handle that we use to request multiple URLs at the same time, without having to block
+// and spawn threads.
+static CURLM *curl_multi = nullptr;
+
+// CURL share handles are used for sharing session state (e.g.)
+static uv::mutex curl_share_mutex;
+static CURLSH *curl_share = nullptr;
+
+// A queue that we use for storing resuable CURL easy handles to avoid creating and destroying them
+// all the time.
+static std::queue<CURL *> curl_handle_cache;
+
+// Implementation starts here.
+
+// Locks the CURL share handle
+void curl_share_lock(CURL *, curl_lock_data, curl_lock_access, void *) { curl_share_mutex.lock(); }
+
+// Unlocks the CURL share handle
+void curl_share_unlock(CURL *, curl_lock_data, void *) { curl_share_mutex.unlock(); }
+
+curl_context *create_curl_context(curl_socket_t sockfd) {
+    curl_context *context = new curl_context;
+    context->sockfd = sockfd;
+
+    uv_poll_init_socket(*loop, &context->poll_handle, sockfd);
+    context->poll_handle.data = context;
+
+    return context;
 }
 
-void Request::curl_share_unlock(CURL *, curl_lock_data, void *) {
-    pthread_mutex_unlock(&curl_share_mutex);
+void curl_close_cb(uv_handle_t *handle) {
+    curl_context *context = (curl_context *)handle->data;
+    free(context);
 }
 
-size_t Request::curl_write_callback(void *contents, size_t size, size_t nmemb, void *userp) {
+void destroy_curl_context(curl_context *context) {
+    uv_close((uv_handle_t *)&context->poll_handle, curl_close_cb);
+}
+
+void remove_curl_handle(CURL *handle) {
+    CURLMcode error = curl_multi_remove_handle(curl_multi, handle);
+    if (error != CURLM_OK) {
+        throw std::runtime_error(std::string("CURL multi error: ") + curl_multi_strerror(error));
+    }
+
+    curl_easy_reset(handle);
+    curl_handle_cache.push(handle);
+}
+
+void curl_perform(uv_poll_t *req, int status, int events) {
+    int running_handles;
+    int flags = 0;
+    curl_context *context;
+    CURLMsg *message;
+    int pending;
+
+    uv_timer_stop(&timeout);
+
+    if (events & UV_READABLE)
+        flags |= CURL_CSELECT_IN;
+    if (events & UV_WRITABLE)
+        flags |= CURL_CSELECT_OUT;
+
+    context = (curl_context *)req;
+
+    curl_multi_socket_action(curl_multi, context->sockfd, flags, &running_handles);
+
+    while ((message = curl_multi_info_read(curl_multi, &pending))) {
+        switch (message->msg) {
+        case CURLMSG_DONE: {
+            long code;
+            std::shared_ptr<Request> *req = nullptr;
+            curl_easy_getinfo(message->easy_handle, CURLINFO_RESPONSE_CODE, &code);
+            curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&req);
+
+            (*req)->res->code = code;
+            (*req)->fn((*req)->res.get());
+
+            // Deleting the shared_ptr likely makes the refcount drop to zero and
+            // deletes the Request object as well as the Response object.
+            CURL *handle = message->easy_handle;
+            remove_curl_handle(handle);
+            // We're setting this to NULL because there might still be shared_ptrs around that could
+            // be cancelled.
+            (*req)->curl = nullptr;
+
+            delete req;
+            break;
+        }
+
+        default:
+            // This should never happen, because there are no other message types.
+            throw std::runtime_error("CURLMSG returned unknown message type");
+        }
+    }
+}
+
+int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp) {
+    curl_context *context;
+    if (action == CURL_POLL_IN || action == CURL_POLL_OUT) {
+        if (socketp) {
+            context = (curl_context *)socketp;
+        } else {
+            context = create_curl_context(s);
+        }
+        curl_multi_assign(curl_multi, s, (void *)context);
+    }
+
+    switch (action) {
+    case CURL_POLL_IN:
+        uv_poll_start(&context->poll_handle, UV_READABLE, curl_perform);
+        break;
+    case CURL_POLL_OUT:
+        uv_poll_start(&context->poll_handle, UV_WRITABLE, curl_perform);
+        break;
+    case CURL_POLL_REMOVE:
+        if (socketp) {
+            uv_poll_stop(&((curl_context *)socketp)->poll_handle);
+            destroy_curl_context((curl_context *)socketp);
+            curl_multi_assign(curl_multi, s, NULL);
+        }
+        break;
+    default:
+        abort();
+    }
+
+    return 0;
+}
+
+void on_timeout(uv_timer_t *req) {
+    int running_handles;
+    CURLMcode error =
+        curl_multi_socket_action(curl_multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
+    if (error != CURLM_OK) {
+        throw std::runtime_error(std::string("CURL multi error: ") + curl_multi_strerror(error));
+    }
+}
+
+void start_timeout(CURLM *multi, long timeout_ms, void *userp) {
+    if (timeout_ms <= 0) {
+        on_timeout(&timeout);
+    } else {
+        uv_timer_start(&timeout, on_timeout, timeout_ms, 0);
+    }
+}
+
+// This function is the first function called in the request thread. It sets up the CURL share/multi
+// handles and runs the thread loop.
+void thread_init(void *ptr) {
+    uv_timer_init(*loop, &timeout);
+
+    CURLSHcode share_error;
+    curl_share = curl_share_init();
+
+    share_error = curl_share_setopt(curl_share, CURLSHOPT_LOCKFUNC, curl_share_lock);
+    if (share_error != CURLSHE_OK) {
+        throw std::runtime_error(std::string("CURL share error: ") + curl_share_strerror(share_error));
+    }
+
+    share_error = curl_share_setopt(curl_share, CURLSHOPT_UNLOCKFUNC, curl_share_unlock);
+    if (share_error != CURLSHE_OK) {
+        throw std::runtime_error(std::string("CURL share error: ") + curl_share_strerror(share_error));
+    }
+
+    CURLMcode multi_error;
+    curl_multi = curl_multi_init();
+
+    multi_error = curl_multi_setopt(curl_multi, CURLMOPT_SOCKETFUNCTION, handle_socket);
+    if (multi_error != CURLM_OK) {
+        throw std::runtime_error(std::string("CURL multi error: ") + curl_multi_strerror(multi_error));
+    }
+    multi_error = curl_multi_setopt(curl_multi, CURLMOPT_TIMERFUNCTION, start_timeout);
+    if (multi_error != CURLM_OK) {
+        throw std::runtime_error(std::string("CURL multi error: ") + curl_multi_strerror(multi_error));
+
+    }
+
+    // Main event loop. This will not return until the request loop is terminated.
+    loop.run();
+
+    curl_multi_cleanup(curl_multi);
+    curl_multi = nullptr;
+    curl_share_cleanup(curl_share);
+    curl_share = nullptr;
+
+    // Clean up all the CURL easy handles that we kept around for potential future reuse.
+    while (!curl_handle_cache.empty()) {
+        curl_easy_cleanup(curl_handle_cache.front());
+        curl_handle_cache.pop();
+    }
+}
+
+// This function is called when we have new data for a request. We just append it to the string
+// containing the previous data.
+size_t curl_write_cb(void *contents, size_t size, size_t nmemb, void *userp) {
     ((std::string *)userp)->append((char *)contents, size * nmemb);
     return size * nmemb;
 }
 
-int Request::curl_progress_callback(void *ptr, double dltotal, double dlnow, double ultotal, double ulnow) {
-    Request *req = static_cast<Request *>(ptr);
-    return req->cancelled;
-}
+// This callback is called in the request event loop (on the request thread).
+// It initializes newly queued up download requests and adds them to the CURL
+// multi handle.
+void async_add_cb(uv_async_t *async) {
+    std::shared_ptr<Request> *req = nullptr;
+    while (add_queue.pop(req)) {
+        // Make sure that we're not starting requests that have been cancelled
+        // already by async_cancel_cb.
+        if ((*req)->cancelled) {
+            delete req;
+            continue;
+        }
 
-void Request::initialize() {
-    // curl init
-    curl_global_init(CURL_GLOBAL_ALL);
+        (*req)->res = std::make_unique<Response>();
 
-    curl_share = curl_share_init();
-    curl_share_setopt(curl_share, CURLSHOPT_LOCKFUNC, curl_share_lock);
-    curl_share_setopt(curl_share, CURLSHOPT_UNLOCKFUNC, curl_share_unlock);
-}
+        // Obtain a curl handle (and try to reuse existing handles before creating new ones).
+        CURL *handle = nullptr;
+        if (!curl_handle_cache.empty()) {
+            handle = curl_handle_cache.front();
+            curl_handle_cache.pop();
+        } else {
+            handle = curl_easy_init();
+        }
 
-void Request::finish() {
-    pthread_key_delete(key);
-    curl_share_cleanup(curl_share);
-}
+        (*req)->curl = handle;
 
-Request::Request(std::string url, std::function<void(platform::Response&)> bg, std::function<void()> fg)
-    : done(false),
-      cancelled(false),
-      url(url),
-      background_function(bg),
-      foreground_callback(fg) {
-    llmr::util::threadpool->add(request, this);
-}
-
-pthread_key_t Request::key;
-pthread_once_t Request::key_once = PTHREAD_ONCE_INIT;
-
-void Request::create_key() {
-    pthread_key_create(&key, delete_key);
-}
-
-void Request::delete_key(void *ptr) {
-    if (ptr != nullptr) {
-        curl_easy_cleanup(ptr);
+        curl_easy_setopt(handle, CURLOPT_PRIVATE, req);
+        curl_easy_setopt(handle, CURLOPT_URL, (*req)->url.c_str());
+        curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
+        curl_easy_setopt(handle, CURLOPT_WRITEDATA, &(*req)->res->body);
+        curl_easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "deflate");
+        curl_easy_setopt(handle, CURLOPT_SHARE, curl_share);
+        curl_multi_add_handle(curl_multi, handle);
     }
 }
 
-void Request::request(void *ptr) {
-    assert(curl_share);
+void async_cancel_cb(uv_async_t *async) {
+    std::shared_ptr<Request> *req = nullptr;
+    while (cancel_queue.pop(req)) {
+        // It is possible that the request has not yet been started, but that it already has been
+        // added to the queue for scheduling new requests. In this case, the CURL handle is invalid
+        // and we manually mark the Request as cancelled.
+        CURL *handle = (*req)->curl;
+        if (handle && !(*req)->cancelled) {
+            remove_curl_handle(handle);
+            (*req)->curl = nullptr;
+        }
+        (*req)->cancelled = true;
 
-    Request *req = static_cast<Request *>(ptr);
-    Response res;
-
-    pthread_once(&key_once, create_key);
-    // TODO: use curl multi to be able to cancel, or to
-
-    CURL *curl = nullptr;
-    if ((curl = pthread_getspecific(key)) == nullptr) {
-        curl = curl_easy_init();
-
-        // stopgap to avoid libcurl crashes:
-        // see https://stackoverflow.com/q/9191668
-        curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
-
-        pthread_setspecific(key, curl);
+        delete req;
+        req = nullptr;
     }
-
-    curl_easy_reset(curl);
-
-    CURLcode code;
-
-    curl_easy_setopt(curl, CURLOPT_URL, req->url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_callback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res.body);
-    curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, curl_progress_callback);
-    curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, req);
-    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
-    curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "deflate");
-    curl_easy_setopt(curl, CURLOPT_SHARE, curl_share);
-    code = curl_easy_perform(curl);
-    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &res.code);
-
-    if (code != CURLE_ABORTED_BY_CALLBACK) {
-        req->background_function(res);
-    }
-
-    req->done = true;
 }
 
-void Request::cancel() {
-    cancelled = true;
+void thread_init_cb() {
+    uv_async_init(*loop, &async_add, async_add_cb);
+    uv_async_init(*loop, &async_cancel, async_cancel_cb);
+    uv_thread_create(&thread, thread_init, nullptr);
+}
+} // end namespace request
+} // end namespace platform
+} // end namespace llmr
+
+using namespace llmr::platform;
+
+Request::Request(std::string url, std::function<void(Response *)> fn) : url(url), fn(fn) {}
+
+namespace llmr {
+
+std::shared_ptr<Request> platform::request_http(const std::string &url,
+                                                std::function<void(Response *)> fn) {
+    using namespace request;
+
+    init_thread(thread_init_cb);
+    std::shared_ptr<Request> req = std::make_shared<Request>(url, fn);
+
+    // Note that we are creating a new shared_ptr pointer(!) because the lockless queue can't store
+    // objects with nontrivial destructors. We have to make absolutely shure that we manually delete
+    // the shared_ptr when we pop it from the queue.
+    add_queue.push(new std::shared_ptr<Request>(req));
+    uv_async_send(&async_add);
+
+    return req;
+}
+
+// Cancels an HTTP request.
+void platform::cancel_request_http(const std::shared_ptr<Request> &req) {
+    if (req) {
+        using namespace request;
+
+        // Note that we are creating a new shared_ptr pointer(!) because the lockless queue can't
+        // store objects with nontrivial destructors. We have to make absolutely shure that we
+        // manually delete the shared_ptr when we pop it from the queue.
+        cancel_queue.push(new std::shared_ptr<Request>(req));
+        uv_async_send(&async_cancel);
+    }
+}
 }

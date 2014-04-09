@@ -1,7 +1,7 @@
 #ifndef LLMR_UTIL_RASTER
 #define LLMR_UTIL_RASTER
 
-#include <llmr/util/animation.hpp>
+#include <llmr/util/transition.hpp>
 #include <llmr/util/texturepool.hpp>
 
 #include <string>
@@ -64,7 +64,7 @@ private:
     char *img = nullptr;
 
     // fade in animation
-    std::shared_ptr<util::animation> fade_animation = nullptr;
+    std::unique_ptr<util::transition> fade_animation = nullptr;
 };
 
 }

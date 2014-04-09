@@ -1,4 +1,10 @@
 {
+  'includes': [
+    './config.gypi',
+  ],
+  'variables': {
+    'library': 'static_library',
+  },
   'target_defaults': {
     'default_configuration': 'Release',
     'xcode_settings': {
@@ -9,18 +15,15 @@
     'cflags_cc': ['-std=c++11'],
     'configurations': {
       'Debug': {
-        'cflags': [ '-g', '-O0', '-I<(boost_root)/include' ],
+        'cflags': [ '-g', '-O0' ],
         'defines': [ 'DEBUG' ],
         'xcode_settings': {
-          'OTHER_CPLUSPLUSFLAGS': [ '-g', '-I<(boost_root)/include' ]
+          'OTHER_CPLUSPLUSFLAGS': [ '-g' ],
         }
       },
       'Release': {
-        'cflags': [ '-O3', '-I<(boost_root)/include' ],
+        'cflags': [ '-O3' ],
         'defines': [ 'NDEBUG' ],
-        'xcode_settings': {
-          'OTHER_CPLUSPLUSFLAGS': [ '-I<(boost_root)/include' ]
-        }
       }
     }
   }
