@@ -6,6 +6,8 @@
 #include <llmr/util/math.hpp>
 #include <llmr/util/constants.hpp>
 
+#include <algorithm>
+
 using namespace llmr;
 
 const int Placement::tileExtent = 4096;

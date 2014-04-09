@@ -1,6 +1,7 @@
 #include <llmr/text/rotation_range.hpp>
 
 #include <cassert>
+#include <algorithm>
 
 namespace llmr {
 
