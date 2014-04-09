@@ -5,7 +5,7 @@ var fs = require('fs');
 var path = require('path');
 var glsl = require('glsl-optimizer');
 
-module.exports = function(param) {
+module.exports = function(shader_type, root) {
     var name;
     var shaders = {};
 
@@ -30,10 +30,10 @@ module.exports = function(param) {
     if (glsl) {
         var preamble = '';
         var target = glsl.TARGET_OPENGL;
-        if (param == 'gles2') {
+        if (shader_type == 'gles2') {
             target = glsl.TARGET_OPENGLES20;
             preamble = 'precision highp float;';
-        } else if (param == 'gles3') {
+        } else if (shader_type == 'gles3') {
             target = glsl.TARGET_OPENGLES30;
             preamble = 'precision highp float;';
         } else {
@@ -113,8 +113,10 @@ module.exports = function(param) {
     code += lines.join(',\n');
     code += '\n};\n';
 
-    fs.writeFileSync('src/shader/shaders.cpp', code);
+    fs.writeFileSync(path.join(root, 'src/shader/shaders_' + shader_type + '.cpp'), code);
 
 };
 
-module.exports(process.argv[2]);
+var root = path.resolve(process.argv[2] || '.');
+module.exports('gl', root);
+module.exports('gles2', root);

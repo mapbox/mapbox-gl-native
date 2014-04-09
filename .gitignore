@@ -11,5 +11,4 @@
 /bin/node_modules
 /include/llmr/shader/shaders.hpp
 /include/llmr/style/resources.hpp
-/src/shader/shaders.cpp
 /src/style/resources.cpp

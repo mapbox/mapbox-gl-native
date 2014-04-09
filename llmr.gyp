@@ -5,7 +5,7 @@
   ],
   'targets': [
     {
-      'target_name': 'shaders_gl',
+      'target_name': 'shaders',
       'type': 'none',
       'actions': [
         {
@@ -15,26 +15,10 @@
           ],
           'outputs': [
             'include/llmr/shader/shaders.hpp',
-            'src/shader/shaders.cpp'
+            '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gl.cpp',
+            '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gles2.cpp',
           ],
-          'action': ['bin/build-shaders.js', 'gl'],
-        }
-      ]
-    },
-    {
-      'target_name': 'shaders_gles2',
-      'type': 'none',
-      'actions': [
-        {
-          'action_name': 'Build Shaders',
-          'inputs': [
-            '<!@(find src -name "*.glsl")'
-          ],
-          'outputs': [
-            'include/llmr/shader/shaders.hpp',
-            'src/shader/shaders.cpp'
-          ],
-          'action': ['bin/build-shaders.js', 'gles2'],
+          'action': ['bin/build-shaders.js', '<(SHARED_INTERMEDIATE_DIR)'],
         }
       ]
     },
@@ -61,7 +45,7 @@
       'type': 'static_library',
       'dependencies': [
           'build_stylesheet',
-          'shaders_gl',
+          'shaders',
       ],
       'sources': [
         '<!@(find src -name "*.cpp")',
@@ -70,6 +54,8 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
+        'include/llmr/shader/shaders.hpp',
+        '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gl.cpp',
         'bin/style.js'
       ],
       'xcode_settings': {
@@ -120,7 +106,7 @@
       'type': 'static_library',
       'dependencies': [
           'build_stylesheet',
-          'shaders_gles2',
+          'shaders',
       ],
       'sources': [
         '<!@(find src -name "*.cpp")',
@@ -129,6 +115,8 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
+        'include/llmr/shader/shaders.hpp',
+        '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gles2.cpp',
         'bin/style.js'
       ],
       'xcode_settings': {

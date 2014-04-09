@@ -36,11 +36,12 @@
                     'SUPPORTED_PLATFORMS':'macosx',
                     'OTHER_CPLUSPLUSFLAGS':[
                         '<@(glfw3_cflags)'
+                        '<@(curl_cflags)'
                     ],
                     'OTHER_LDFLAGS': [
                         '-stdlib=libc++',
                         '<@(glfw3_libraries)',
-                        '-lcurl',
+                        '<@(curl_libraries)',
                     ],
                     'SDKROOT': 'macosx',
                     'INFOPLIST_FILE': '../macosx/Info.plist',
@@ -54,12 +55,12 @@
                 'link_settings': {
                     'libraries': [
                         '<@(glfw3_libraries)',
-                        '-lcurl'
+                        '<@(curl_libraries)',
                     ],
                 },
                 'cflags': [
-                    '<@(png_cflags)',
-                    '<@(glfw3_cflags)'
+                    '<@(glfw3_cflags)',
+                    '<@(curl_cflags)'
                 ],
             }]
         ],
