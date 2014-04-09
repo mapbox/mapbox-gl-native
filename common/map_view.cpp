@@ -178,7 +178,7 @@ public:
 
             if (dirty) {
                 try {
-                    dirty = render();
+                    dirty = map.render();
                 } catch (std::exception& ex) {
                     fprintf(stderr, "exception: %s\n", ex.what());
                 }
@@ -194,10 +194,6 @@ public:
         }
 
         return 0;
-    }
-
-    bool render() {
-        return map.render();
     }
 
     void fps() {
