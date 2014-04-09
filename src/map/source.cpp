@@ -52,12 +52,15 @@ void Source::render(bool is_baselayer) {
 
     for (const Tile& tile : tiles) {
         if (tile.data && tile.data->state == TileData::State::parsed) {
-            if (type == Type::raster && *tile.data->raster && !tile.data->raster->textured) {
-                tile.data->raster->setTexturepool(&texturepool);
-                tile.data->raster->beginFadeInAnimation();
-            }
-            if (type == Type::raster && tile.data->raster->needsAnimation()) {
-                tile.data->raster->updateAnimations();
+            if (type == Type::raster) {
+                std::shared_ptr<Raster> raster = tile.data->raster;
+                if (raster && !raster->textured) {
+                    raster->setTexturepool(&texturepool);
+                    raster->beginFadeInAnimation();
+                }
+                if (raster && raster->needsAnimation()) {
+                    raster->updateAnimations();
+                }
             }
             painter.render(tile);
         }

@@ -9,6 +9,7 @@
 #include <llmr/renderer/line_bucket.hpp>
 #include <llmr/renderer/point_bucket.hpp>
 #include <llmr/renderer/text_bucket.hpp>
+#include <llmr/renderer/raster_bucket.hpp>
 
 #include <llmr/map/transform.hpp>
 #include <llmr/map/settings.hpp>
@@ -209,8 +210,10 @@ void Painter::renderLayer(const std::shared_ptr<TileData>& tile_data, const Laye
     } else {
         // This is a singular layer. Try to find the bucket associated with
         // this layer and render it.
-        if (layer_desc.name == "satellite" && tile_data && tile_data->raster) { // FIXME
-            renderRaster(layer_desc.name, tile_data);
+        if (style.buckets[layer_desc.bucket_name].type == BucketType::Raster) {
+            if (tile_data && tile_data->raster) {
+                renderRaster(layer_desc.name, tile_data);
+            }
         } else {
             auto bucket_it = tile_data->buckets.find(layer_desc.bucket_name);
             if (bucket_it != tile_data->buckets.end()) {

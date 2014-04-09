@@ -70,19 +70,11 @@ bool TileData::parse() {
         return false;
     }
 
-    if (is_raster) {
-        // raster tiles don't need parsed, just decoded
-        raster = std::make_shared<Raster>();
-        raster->load(data);
-        state = State::parsed;
-        return true;
-    }
-
     try {
         // Parsing creates state that is encapsulated in TileParser. While parsing,
         // the TileParser object writes results into this objects. All other state
         // is going to be discarded afterwards.
-        TileParser parser(data, *this, style, glyphAtlas);
+        TileParser parser(data, *this, style, glyphAtlas, is_raster);
     } catch (const std::exception& ex) {
         fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
         cancel();
