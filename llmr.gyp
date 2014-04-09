@@ -64,7 +64,8 @@
         'MACOSX_DEPLOYMENT_TARGET':'10.9',
         'PUBLIC_HEADERS_FOLDER_PATH': 'include',
         'OTHER_CPLUSPLUSFLAGS':[
-            '<@(png_cflags)'
+          '<@(png_cflags)',
+          '-I<(boost_root)/include',
         ]
       },
       'include_dirs':[
@@ -72,17 +73,18 @@
       ],
       'cflags': [
           '<@(png_cflags)'
+          '-I<(boost_root)/include',
       ],
       'direct_dependent_settings': {
           'include_dirs':[
               './include'
           ],
           'cflags': [
-              '<@(png_cflags)'
+              '<@(png_cflags)',
           ],
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS':[
-                '<@(png_cflags)'
+                '<@(png_cflags)',
             ]
           },
           'conditions': [
@@ -129,7 +131,8 @@
         'PUBLIC_HEADERS_FOLDER_PATH': 'include',
         'GCC_INPUT_FILETYPE':'sourcecode.cpp.cpp',
         'OTHER_CPLUSPLUSFLAGS':[
-            '<@(png_cflags)'
+          '<@(png_cflags)',
+          '-I<(boost_root)/include',
         ]
       },
       'include_dirs':[
@@ -137,6 +140,7 @@
       ],
       'cflags': [
           '<@(png_cflags)'
+          '-I<(boost_root)/include',
       ],
       'direct_dependent_settings': {
           'include_dirs':[
