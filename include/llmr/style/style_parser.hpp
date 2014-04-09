@@ -25,6 +25,7 @@ private:
     PointClass parsePointClass(JSVal value);
     TextClass parseTextClass(JSVal value);
     BackgroundClass parseBackgroundClass(JSVal value);
+    RasterClass parseRasterClass(JSVal value);
 
     bool parseBoolean(JSVal value);
     std::string parseString(JSVal value);

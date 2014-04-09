@@ -14,7 +14,8 @@ enum class BucketType {
     Fill = 1,
     Line = 2,
     Point = 3,
-    Text = 4
+    Text = 4,
+    Raster = 5
 };
 
 enum class CapType {
@@ -42,6 +43,7 @@ inline BucketType bucketType(const std::string& type) {
     else if (type == "line") return BucketType::Line;
     else if (type == "point") return BucketType::Point;
     else if (type == "text") return BucketType::Text;
+    else if (type == "raster") return BucketType::Raster;
     else return BucketType::None;
 }
 

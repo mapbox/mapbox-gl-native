@@ -35,7 +35,6 @@ class Raster;
 class LayerDescription;
 class BucketDescription;
 
-
 class PlainShader;
 
 class TileData : public std::enable_shared_from_this<TileData>,
@@ -57,7 +56,7 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const bool use_raster = false, const bool use_retina = false);
+    TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const std::string url, const bool is_raster);
     ~TileData();
 
     void request();
@@ -68,8 +67,6 @@ public:
 
 public:
     const Tile::ID id;
-    const bool use_raster;
-    const bool use_retina;
     std::atomic<State> state;
     std::shared_ptr<Raster> raster;
 
@@ -91,7 +88,8 @@ public:
     std::map<std::string, std::unique_ptr<Bucket>> buckets;
 
 private:
-    // Source data
+    std::string url;
+    bool is_raster = false;
     std::string data;
     const Style& style;
     GlyphAtlas& glyphAtlas;

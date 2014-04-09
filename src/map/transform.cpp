@@ -272,7 +272,7 @@ double Transform::getAngle() const {
     return angle;
 }
 
-box Transform::mapCornersToBox(uint32_t z) const {
+box Transform::cornersToBox(uint32_t z) const {
     const double ref_scale = pow(2, z);
 
     const double angle_sin = sin(-angle);

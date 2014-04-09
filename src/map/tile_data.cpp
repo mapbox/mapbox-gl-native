@@ -11,11 +11,11 @@
 
 using namespace llmr;
 
-TileData::TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const bool use_raster, const bool use_retina)
+TileData::TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const std::string url,  const bool is_raster)
     : id(id),
-      use_raster(use_raster),
-      use_retina(use_retina),
+      url(url),
       state(State::initial),
+      is_raster(is_raster),
       raster(),
       style(style),
       glyphAtlas(glyphAtlas) {
@@ -37,14 +37,6 @@ const std::string TileData::toString() const {
 
 void TileData::request() {
     state = State::loading;
-
-    std::string url;
-
-    if (use_raster) {
-        url = util::sprintf(kTileRasterURL, id.z, id.x, id.y, (use_retina ? "@2x" : ""));
-    } else {
-        url = util::sprintf(kTileVectorURL, id.z, id.x, id.y);
-    }
 
     // Note: Somehow this feels slower than the change to request_http()
     std::weak_ptr<TileData> weak_tile = shared_from_this();
@@ -78,18 +70,11 @@ bool TileData::parse() {
         return false;
     }
 
-    if (use_raster) {
-        raster = std::make_shared<Raster>();
-        raster->load(data);
-        state = State::parsed;
-        return true;
-    }
-
     try {
         // Parsing creates state that is encapsulated in TileParser. While parsing,
         // the TileParser object writes results into this objects. All other state
         // is going to be discarded afterwards.
-        TileParser parser(data, *this, style, glyphAtlas);
+        TileParser parser(data, *this, style, glyphAtlas, is_raster);
     } catch (const std::exception& ex) {
         fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
         cancel();

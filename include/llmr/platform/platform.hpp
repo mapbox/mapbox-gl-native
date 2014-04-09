@@ -7,11 +7,7 @@
 
 namespace llmr {
 
-extern const char *kTileVectorURL;
-extern const char *kTileRasterURL;
 extern const char *kSpriteURL;
-extern const int32_t kTileVectorMaxZoom;
-extern const int32_t kTileRasterMaxZoom;
 
 namespace platform {
 
