@@ -473,6 +473,8 @@ namespace llmr
                 {
                     res.code = [(NSHTTPURLResponse *)response statusCode];
                     res.body = { (const char *)[data bytes], [data length] };
+                } else {
+                    NSLog(@"http error (%s): %@", url.c_str(), [error localizedDescription]);
                 }
 
                 background_function(res);
