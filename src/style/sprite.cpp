@@ -20,11 +20,9 @@ ImagePosition::ImagePosition(const vec2<uint16_t>& size, vec2<float> tl, vec2<fl
       tl(tl),
       br(br) {}
 
-Sprite::Sprite() {
-    raster = std::make_shared<Raster>();
-}
+Sprite::Sprite(float pixelRatio) : pixelRatio(pixelRatio), raster(std::make_shared<Raster>()) {}
 
-void Sprite::load(const std::string& base_url, float pixelRatio) {
+void Sprite::load(const std::string& base_url) {
     std::shared_ptr<Sprite> sprite = shared_from_this();
 
     auto complete = [sprite]() {

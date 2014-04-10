@@ -34,6 +34,14 @@ void Transform::cancelAnimations() {
     animations.clear();
 }
 
+void Transform::resize(uint16_t w, uint16_t h, uint16_t fb_w, uint16_t fb_h) {
+    width = w;
+    height = h;
+    fb_width = fb_w;
+    fb_height = fb_h;
+    pixelRatio = (float)fb_w / (float)w;
+}
+
 void Transform::moveBy(double dx, double dy, double duration) {
     double xn = x + cos(angle) * dx + sin(angle) * dy;
     double yn = y + cos(angle) * dy + sin(-angle) * dx;

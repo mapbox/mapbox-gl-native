@@ -33,15 +33,16 @@ public:
 
 class Sprite : public std::enable_shared_from_this<Sprite> {
 public:
-    Sprite();
+    Sprite(float pixelRatio = 1);
 
-    void load(const std::string& base_url, float pixelRatio = 1);
+    void load(const std::string& base_url);
 
     ImagePosition getPosition(const std::string& name, bool repeating = false);
 
     operator bool() const;
 
 public:
+    const float pixelRatio;
     std::shared_ptr<Raster> raster;
 
 private:

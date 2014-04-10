@@ -25,14 +25,8 @@ Map::~Map() {
     settings.sync();
 }
 
-void Map::setup(float pixelRatio) {
-
+void Map::setup() {
     painter.setup();
-
-    pixel_ratio = pixelRatio;
-
-    style.sprite = std::make_shared<Sprite>();
-    style.sprite->load(kSpriteURL, pixel_ratio);
 
     style.loadJSON(resources::style, resources::style_size);
 }
@@ -50,13 +44,15 @@ void Map::loadSettings() {
     update();
 }
 
-void Map::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb_height) {
-    transform.width = width;
-    transform.height = height;
-    transform.fb_width = fb_width;
-    transform.fb_height = fb_height;
-    transform.pixelRatio = pixel_ratio;
+void Map::resize(uint16_t width, uint16_t height, uint16_t fb_width, uint16_t fb_height) {
+    transform.resize(width, height, fb_width, fb_height);
     painter.resize(fb_width, fb_height);
+
+    if (!style.sprite || style.sprite->pixelRatio) {
+        style.sprite = std::make_shared<Sprite>(transform.getPixelRatio());
+        style.sprite->load(kSpriteURL);
+    }
+
     update();
 }
 
@@ -177,8 +173,8 @@ void Map::setAngle(double angle, double x, double y, double duration) {
     double dx = 0, dy = 0;
 
     if (x >= 0 && y >= 0) {
-        dx = (transform.width  / 2) - x;
-        dy = (transform.height / 2) - y;
+        dx = (transform.getWidth() / 2) - x;
+        dy = (transform.getWidth() / 2) - y;
         transform.moveBy(dx, dy, duration);
     }
 

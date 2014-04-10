@@ -50,10 +50,7 @@ class MBXMapView
         {
             settings.load();
 
-            map.setup([[UIScreen mainScreen] scale]);
-
-            CGRect frame = [[UIScreen mainScreen] bounds];
-            map.resize(frame.size.width, frame.size.height, frame.size.width, frame.size.height);
+            map.setup();
 
             map.loadSettings();
         }
@@ -128,9 +125,12 @@ class MBXMapView
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateRender:) name:MBXNeedsRenderNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateNetworkActivity:) name:MBXUpdateActivityNotification object:nil];
 
-    mapView = new MBXMapView();
+    GLKView *view = (GLKView *)self.view;
+    CGRect rect = [view frame];
 
+    mapView = new MBXMapView();
     mapView->init();
+    mapView->map.resize(rect.size.width, rect.size.height, [view drawableWidth], [view drawableHeight]);
 
     displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(render:)];
     [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];

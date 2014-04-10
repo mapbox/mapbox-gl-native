@@ -24,10 +24,10 @@ public:
     ~Map();
 
     /* setup */
-    void setup(float pixelRatio = 1);
+    void setup();
     void loadStyle(const uint8_t *const data, uint32_t bytes);
     void loadSettings();
-    void resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb_height);
+    void resize(uint16_t width, uint16_t height, uint16_t fb_width, uint16_t fb_height);
     void toggleRaster();
 
     /* callback */

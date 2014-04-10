@@ -22,6 +22,8 @@ public:
     void updateAnimations();
     void cancelAnimations();
 
+    void resize(uint16_t width, uint16_t height, uint16_t fb_width, uint16_t fb_height);
+
     // Relative changes
     void moveBy(double dx, double dy, double duration = 0);
     void scaleBy(double ds, double cx = -1, double cy = -1, double duration = 0);
@@ -55,22 +57,30 @@ public:
     // Temporary
     box mapCornersToBox(uint32_t z) const;
 
+    // More getters
+    inline uint16_t getWidth() const { return width; }
+    inline uint16_t getHeight() const { return height; }
+    inline uint16_t getFramebufferWidth() const { return fb_width; }
+    inline uint16_t getFramebufferHeight() const { return fb_height; }
+    inline float getPixelRatio() const { return pixelRatio; }
+
 private:
     void setScaleXY(double new_scale, double xn, double yn, double duration = 0);
     double pixel_x() const;
     double pixel_y() const;
 
-public:
+private:
     // logical dimensions
-    uint32_t width = 0;
-    uint32_t height = 0;
+    uint16_t width = 0;
+    uint16_t height = 0;
 
     // physical (framebuffer) dimensions
-    float fb_width = 0;
-    float fb_height = 0;
+    uint16_t fb_width = 0;
+    uint16_t fb_height = 0;
 
     float pixelRatio = 1;
 
+public:
     bool rotating = false;
     bool scaling = false;
     bool panning = false;
