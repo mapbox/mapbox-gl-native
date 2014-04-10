@@ -162,12 +162,9 @@ class MBXMapView
     }
 }
 
-- (BOOL)shouldAutorotate {
-    return YES;
-}
-
-- (NSUInteger)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskAll;
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskAllButUpsideDown);
 }
 
 -(void)viewWillLayoutSubviews {
