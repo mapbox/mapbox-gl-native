@@ -347,7 +347,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     if (fringeline && pass == Translucent) {
         useProgram(outlineShader->program);
         outlineShader->setMatrix(matrix);
-        lineWidth(3.0f); // This is always fixed and does not depend on the pixelRatio!
+        lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
         outlineShader->setColor(fill_color);
 
