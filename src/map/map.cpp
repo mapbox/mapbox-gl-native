@@ -46,9 +46,9 @@ void Map::loadSettings() {
 
 void Map::resize(uint16_t width, uint16_t height, uint16_t fb_width, uint16_t fb_height) {
     transform.resize(width, height, fb_width, fb_height);
-    painter.resize(fb_width, fb_height);
+    painter.resize();
 
-    if (!style.sprite || style.sprite->pixelRatio) {
+    if (!style.sprite || style.sprite->pixelRatio != transform.getPixelRatio()) {
         style.sprite = std::make_shared<Sprite>(transform.getPixelRatio());
         style.sprite->load(kSpriteURL);
     }

@@ -162,6 +162,22 @@ class MBXMapView
     }
 }
 
+- (BOOL)shouldAutorotate {
+    return YES;
+}
+
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskAll;
+}
+
+-(void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+
+    GLKView *view = (GLKView *)self.view;
+    CGRect rect = [view bounds];
+    mapView->map.resize(rect.size.width, rect.size.height, [view drawableWidth], [view drawableHeight]);
+}
+
 - (void)togglePalette
 {
     if (self.palette.alpha < 1)

@@ -74,8 +74,8 @@ void Painter::setupShaders() {
     textShader = std::make_unique<TextShader>();
 }
 
-void Painter::resize(int width, int height) {
-    glViewport(0, 0, width, height);
+void Painter::resize() {
+    glViewport(0, 0, transform.getFramebufferWidth(), transform.getFramebufferHeight());
 }
 
 void Painter::useProgram(uint32_t program) {
