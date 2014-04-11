@@ -37,7 +37,7 @@ source MacOSX.sh
     ./scripts/build_glfw.sh
     ./scripts/build_openssl.sh
     ./scripts/build_curl.sh
-    ./scripts/build_boost.sh `pwd`/../../src/
+    ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../linux/
 
 ./scripts/make_universal.sh
 
