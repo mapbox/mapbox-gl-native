@@ -8,25 +8,28 @@ V ?= 1
 
 deps: glsl-optimizer
 
-llmr: deps config.gypi src llmr.gyp
+node:
+	@if [ ! `which node` ]; then echo 'error: depends on node.js. please make sure node is on your PATH';exit 1; fi;
+
+llmr: deps config.gypi src llmr.gyp node
 	deps/run_gyp llmr.gyp -Icommon.gypi -Ilinux/platform.gypi -Goutput_dir=./out/ --depth=. --generator-output=./out/ -f make
 	make -j8 -C out BUILDTYPE=Release V=$(V) llmr
 
-gtest: deps config.gypi src llmr.gyp
+gtest: deps config.gypi src llmr.gyp node
 	deps/run_gyp llmr.gyp -Icommon.gypi -Goutput_dir=./out/ --depth=. --generator-output=./build/gtest -f make
 	make -C build/gtest gtest V=$(V)
 
-lproj: deps config.gypi src linux/llmr-app.gyp
+lproj: deps config.gypi src linux/llmr-app.gyp node
 	deps/run_gyp linux/llmr-app.gyp -Icommon.gypi -Imacosx/platform.gypi -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 	open ./linux/llmr-app.xcodeproj
 
 # build OS X app with Xcode
-xproj: deps config.gypi src macosx/llmr-app.gyp
+xproj: deps config.gypi src macosx/llmr-app.gyp node
 	deps/run_gyp macosx/llmr-app.gyp -Icommon.gypi -Imacosx/platform.gypi -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 	open ./macosx/llmr-app.xcodeproj
 
 # build iOS app with Xcode
-iproj: deps config.gypi src ios/llmr-app.gyp
+iproj: deps config.gypi src ios/llmr-app.gyp node
 	deps/run_gyp ios/llmr-app.gyp -Icommon.gypi -Iios/platform.gypi -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
 	open ./ios/llmr-app.xcodeproj
 
@@ -54,5 +57,9 @@ distclean:
 	-rm -rf llmr.xcodeproj
 	-rm -rf macosx/llmr-app.xcodeproj
 	-rm -rf ios/llmr-app.xcodeproj
+	-rm -rf linux/llmr-app.xcodeproj
+
+clean-excode:
+	-rm -rf ~/Library/Developer/Xcode/DerivedData/
 
 .PHONY: test linux
