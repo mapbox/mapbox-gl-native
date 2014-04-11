@@ -7,7 +7,7 @@ var lazy_update = require('./lazy-update');
 
 try { var glsl = require('glsl-optimizer'); } catch(err) {}
 
-module.exports = function(shader_type) {
+module.exports = function(shader_type, prefix, suffix) {
     var name;
     var shaders = {};
 
@@ -105,6 +105,8 @@ module.exports = function(shader_type) {
 
 
     var code = '// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.\n';
+    code += '#include <llmr/platform/gl.hpp>\n';
+    code += prefix + '\n';
     code += '#include <llmr/shader/shaders.hpp>\n';
     code += '\n';
     code += 'using namespace llmr;\n';
@@ -112,10 +114,12 @@ module.exports = function(shader_type) {
     code += 'const shader_source llmr::shaders[SHADER_COUNT] = {\n';
     code += lines.join(',\n');
     code += '\n};\n';
+    code += suffix + '\n';
+
 
     lazy_update('include/llmr/shader/shaders.hpp', header);
     lazy_update('src/shader/shaders_' + shader_type + '.cpp', code);
 };
 
-module.exports('gl');
-module.exports('gles2');
+module.exports('gl', '#ifndef GL_ES_VERSION_2_0', '#endif');
+module.exports('gles2', '#ifdef GL_ES_VERSION_2_0', '#endif');

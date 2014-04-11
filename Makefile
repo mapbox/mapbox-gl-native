@@ -33,18 +33,35 @@ linux: config.gypi linux/llmr-app.gyp
 	deps/run_gyp linux/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
 	make -C build/linux V=$(V) linuxapp
 
-# Executes the linux binary
+# Executes the Linux binary
 run-linux: linux
 	build/Release/llmr
 
+
+##### Xcode projects ###########################################################
+
+# build Mac OS X project for Xcode
+xproj: config.gypi macosx/llmr-app.gyp
+	deps/run_gyp macosx/llmr-app.gyp --depth=. --generator-output=./build -f xcode
+	open ./build/macosx/llmr-app.xcodeproj
+
+# build iOS project for Xcode
+iproj: config.gypi ios/llmr-app.gyp
+	deps/run_gyp ios/llmr-app.gyp --depth=. --generator-output=./build -f xcode
+	open ./build/ios/llmr-app.xcodeproj
+
+# build Linux project for Xcode (Runs on Mac OS X too, but without platform-specific code)
+lproj: config.gypi linux/llmr-app.gyp
+	deps/run_gyp linux/llmr-app.gyp --depth=. --generator-output=./build -f xcode
+	open ./build/linux/llmr-app.xcodeproj
 
 
 ##### Maintenace operations ####################################################
 
 clean:
-	-rm -rf build/Release
+	-rm -rf ./build/Release
 
-distclean:
-	-rm -rf build
+distclean: clean
+	-rm -rf ./build
 
 .PHONY: llmr test linux

@@ -1,4 +1,6 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+#include <llmr/platform/gl.hpp>
+#ifdef GL_ES_VERSION_2_0
 #include <llmr/shader/shaders.hpp>
 
 using namespace llmr;
@@ -37,3 +39,4 @@ const shader_source llmr::shaders[SHADER_COUNT] = {
        "precision highp float;\nuniform sampler2D u_texture;\nuniform vec4 u_color;\nuniform float u_buffer;\nuniform float u_gamma;\nvarying vec2 v_tex;\nvarying float v_alpha;\nvoid main ()\n{\n  float edge0_1;\n  edge0_1 = (u_buffer - u_gamma);\n  lowp float tmpvar_2;\n  tmpvar_2 = clamp (((texture2D (u_texture, v_tex).w - edge0_1) / (\n    (u_buffer + u_gamma)\n   - edge0_1)), 0.0, 1.0);\n  lowp vec4 tmpvar_3;\n  tmpvar_3 = (u_color * ((tmpvar_2 * \n    (tmpvar_2 * (3.0 - (2.0 * tmpvar_2)))\n  ) * v_alpha));\n  gl_FragColor = tmpvar_3;\n}\n\n",
    }
 };
+#endif

@@ -59,12 +59,17 @@ def configure_llmr(o):
       o['variables']['node'] = 'node'
   o['target_defaults']['default_configuration'] = 'Debug' if options.debug else 'Release'
 
+
+def fix_frameworks(libs):
+  # don't split "-framework Foo"
+  return re.split('(?<!-framework)\s+', libs.strip())
+
 def configure_glfw3(o):
   ret = pkg_config('glfw3', options.pkgconfig_root)
   if not ret:
       sys.stderr.write('could not find glfw3 with pkg-config')
       sys.exit(-1)
-  o['variables']['glfw3_libraries'] = ret[0].split()
+  o['variables']['glfw3_libraries'] = fix_frameworks(ret[0])
   o['variables']['glfw3_cflags'] = ret[1].split()
 
 def configure_uv(o):

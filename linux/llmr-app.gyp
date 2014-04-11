@@ -1,72 +1,55 @@
 {
   'includes': [
     '../common.gypi',
-    '../config.gypi'
+    '../config.gypi',
   ],
   'targets': [
     {
-        "target_name": "linuxapp",
-        "product_name": "llmr",
-        "type": "executable",
-        "sources": [
-            "./main.cpp",
-            "./settings.cpp",
-            "./settings.hpp",
-            "./request.cpp",
-            "./request.hpp"
-        ],
-        'conditions': [
-            ['OS == "mac"', {
-                'product_extension': 'app',
-                'mac_bundle': 1,
-                'mac_bundle_resources': [
-                  '../macosx/Icon.icns',
-                ],
-                'link_settings': {
-                    'libraries': [
-                        '$(SDKROOT)/System/Library/Frameworks/Cocoa.framework',
-                        '$(SDKROOT)/System/Library/Frameworks/IOKit.framework',
-                        '$(SDKROOT)/System/Library/Frameworks/OpenGL.framework',
-                        '$(SDKROOT)/System/Library/Frameworks/CoreVideo.framework',
-                    ],
-                },
-                'xcode_settings': {
-                    'ARCHS': [ "x86_64" ],
-                    'SDKROOT': 'macosx',
-                    'SUPPORTED_PLATFORMS':'macosx',
-                    'OTHER_CPLUSPLUSFLAGS':[
-                        '<@(glfw3_cflags)'
-                        '<@(curl_cflags)'
-                    ],
-                    'OTHER_LDFLAGS': [
-                        '-stdlib=libc++',
-                        '<@(glfw3_libraries)',
-                        '<@(curl_libraries)',
-                    ],
-                    'SDKROOT': 'macosx',
-                    'INFOPLIST_FILE': '../macosx/Info.plist',
-                    'CLANG_CXX_LIBRARY': 'libc++',
-                    'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
-                    'MACOSX_DEPLOYMENT_TARGET':'10.9',
-                    'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
-                    'CLANG_ENABLE_OBJC_ARC': 'YES'
-                },
-            }, {
-                'link_settings': {
-                    'libraries': [
-                        '<@(glfw3_libraries)',
-                        '<@(curl_libraries)',
-                    ],
-                },
-                'cflags': [
-                    '<@(glfw3_cflags)',
-                    '<@(curl_cflags)'
-                ],
-            }]
-        ],
-        "dependencies": [
-            "../llmr.gyp:llmr-x86"
-        ]
-    }
-  ]
+      'target_name': 'linuxapp',
+      'product_name': 'llmr',
+      'type': 'executable',
+      'sources': [
+        './main.cpp',
+        './settings.cpp',
+        './settings.hpp',
+        './request.cpp',
+        './request.hpp',
+      ],
+
+      'conditions': [
+        ['OS == "mac"',
+
+        # Mac OS X
+        {
+          'xcode_settings': {
+            'OTHER_CPLUSPLUSFLAGS':[
+              '<@(glfw3_cflags)',
+              '<@(curl_cflags)',
+            ],
+            'OTHER_LDFLAGS': [
+              '<@(glfw3_libraries)',
+              '<@(curl_libraries)',
+            ],
+          }
+        },
+
+        # Non-Mac OS X
+        {
+          'cflags': [
+            '<@(glfw3_cflags)',
+            '<@(curl_cflags)',
+          ],
+          'link_settings': {
+            'libraries': [
+              '<@(glfw3_libraries)',
+              '<@(curl_libraries)',
+            ],
+          },
+        }],
+      ],
+      'dependencies': [
+        '../llmr.gyp:llmr-x86',
+      ],
+    },
+  ],
 }
