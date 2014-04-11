@@ -17,6 +17,11 @@ parser.add_option("--debug",
     dest="debug",
     help="Also build debug build")
 
+parser.add_option("--node",
+    action="store",
+    dest="node",
+    help="Name of the node executable (defaults to node)")
+
 parser.add_option("--pkg-config-root",
     action="store",
     dest="pkgconfig_root",
@@ -48,6 +53,10 @@ def configure_llmr(o):
       o['variables']['boost_root'] = options.boost_root
   else:
       o['variables']['boost_root'] = '/usr/local'
+  if options.node:
+      o['variables']['node'] = options.node
+  else:
+      o['variables']['node'] = 'node'
   o['target_defaults']['default_configuration'] = 'Debug' if options.debug else 'Release'
 
 def configure_glfw3(o):

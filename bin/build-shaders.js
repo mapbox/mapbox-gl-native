@@ -3,14 +3,14 @@
 
 var fs = require('fs');
 var path = require('path');
-var glsl = require('glsl-optimizer');
+
+try { var glsl = require('glsl-optimizer'); } catch(err) {}
 
 module.exports = function(shader_type, root) {
     var name;
     var shaders = {};
 
     var shaderFiles = fs.readdirSync('src/shader');
-
 
     // Load shaders
     for (var i = 0; i < shaderFiles.length; i++) {

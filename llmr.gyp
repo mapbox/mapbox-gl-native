@@ -18,7 +18,7 @@
             'src/shader/shaders_gl.cpp',
             'src/shader/shaders_gles2.cpp',
           ],
-          'action': ['bin/build-shaders.js'],
+          'action': ['<@(node)', 'bin/build-shaders.js'],
         }
       ]
     },
@@ -35,7 +35,7 @@
             'include/llmr/style/resources.hpp',
             'src/style/resources.cpp'
           ],
-          'action': ['bin/build-style.js']
+          'action': ['<@(node)', 'bin/build-style.js']
         }
       ],
     },
