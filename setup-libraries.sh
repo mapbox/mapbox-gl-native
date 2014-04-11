@@ -6,7 +6,7 @@ if [ ! -d 'mapnik-packaging' ]; then
 fi
 
 cd mapnik-packaging/osx/
-# git pull
+git pull
 
 export CXX11=true
 
