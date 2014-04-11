@@ -51,7 +51,7 @@ public:
         glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
         settings.load();
-        map.setup((double)fb_width / width);
+        map.setup();
 
         resize(window, 0, 0);
 
