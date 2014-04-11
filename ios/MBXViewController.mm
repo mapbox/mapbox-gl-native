@@ -146,7 +146,7 @@ class MBXMapView
                                                             paletteWidth,
                                                             paletteHeight)];
     self.palette.backgroundColor = [UIColor colorWithWhite:0 alpha:alpha];
-    self.palette.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+    self.palette.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
     self.palette.layer.cornerRadius = bufferSize;
     [self.view addSubview:self.palette];
     for (NSString *selectorName in selectorNames)
@@ -162,12 +162,9 @@ class MBXMapView
     }
 }
 
-- (BOOL)shouldAutorotate {
-    return YES;
-}
-
-- (NSUInteger)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskAll;
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskAllButUpsideDown);
 }
 
 -(void)viewWillLayoutSubviews {
