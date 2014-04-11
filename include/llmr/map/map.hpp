@@ -81,12 +81,13 @@ private:
     GlyphAtlas glyphAtlas;
     Painter painter;
 
+    bool use_raster = false;
+
     int32_t min_zoom;
     int32_t max_zoom;
 
     float pixel_ratio;
 
-    bool use_raster = false;
 
     std::forward_list<Tile> tiles;
     std::forward_list<std::weak_ptr<TileData>> tile_data;
