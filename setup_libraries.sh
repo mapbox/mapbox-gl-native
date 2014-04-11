@@ -42,4 +42,6 @@ source MacOSX.sh
 ./scripts/make_universal.sh
 
 cd ../../
-./configure --pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal/lib/pkgconfig
+./configure \
+--pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal/lib/pkgconfig \
+--boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal/
