@@ -15,10 +15,10 @@
           ],
           'outputs': [
             'include/llmr/shader/shaders.hpp',
-            '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gl.cpp',
-            '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gles2.cpp',
+            'src/shader/shaders_gl.cpp',
+            'src/shader/shaders_gles2.cpp',
           ],
-          'action': ['bin/build-shaders.js', '<(SHARED_INTERMEDIATE_DIR)'],
+          'action': ['bin/build-shaders.js'],
         }
       ]
     },
@@ -54,8 +54,6 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
-        'include/llmr/shader/shaders.hpp',
-        '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gl.cpp',
         'bin/style.js'
       ],
       'xcode_settings': {
@@ -117,8 +115,6 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
-        'include/llmr/shader/shaders.hpp',
-        '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gles2.cpp',
         'bin/style.js'
       ],
       'xcode_settings': {
