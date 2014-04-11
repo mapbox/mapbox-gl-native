@@ -1,8 +1,13 @@
 #!/bin/sh
 set -e -u
 
+if [ ! `which aclocal` ] || [ ! `which automake` ] || [ ! `which autoconf` ] || [ ! `which glibtool` ]; then
+    echo 'autotools commands not found: run "brew install autoconf automake libtool" before continuing'
+    exit 1
+fi
+
 if [ ! -d 'mapnik-packaging' ]; then
-  git clone --depth=0 https://github.com/mapnik/mapnik-packaging.git
+  git clone --depth=1 https://github.com/mapnik/mapnik-packaging.git
 fi
 
 cd mapnik-packaging/osx/
