@@ -6,81 +6,45 @@ V ?= 1
 
 all: llmr
 
-llmr: config.gypi src llmr.gyp
-	deps/run_gyp llmr.gyp -Goutput_dir=./out/ --depth=. --generator-output=./out -f make
-	make -j8 -C out BUILDTYPE=Release V=$(V) llmr-x86
-
-gtest: config.gypi src llmr.gyp
-	deps/run_gyp llmr.gyp -Goutput_dir=./out/ --depth=. --generator-output=./build/gtest -f make
-	make -C build/gtest gtest V=$(V)
-
-# build OS X app with pure make
-app: config.gypi src macosx/llmr-app.gyp
-	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./build/macosx-make -f make
-	make -C build/macosx-make V=$(V)
-	open build/macosx-make/out/Release/llmr.app
-
-linux: config.gypi src linux/llmr-app.gyp
-	deps/run_gyp linux/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./build/linux-make -f make
-	make -C build/linux-make V=$(V)
-	./build/linux-make/out/Release/llmr.app
+# Builds the regular library
+llmr: config.gypi llmr.gyp
+	deps/run_gyp llmr.gyp --depth=. -Goutput_dir=.. --generator-output=./build/llmr -f make
+	make -C build/llmr V=$(V) llmr-x86
 
 
-# build OS X app with Xcode
-lproj: config.gypi src linux/llmr-app.gyp
-	deps/run_gyp linux/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
-	open ./linux/llmr-app.xcodeproj
+##### Test cases ###############################################################
 
-# build just xcode project for libllmr
-xcode: config.gypi llmr.gyp
-	deps/run_gyp llmr.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
+# Runs the test cases
+test: config.gypi test/test.gyp
+	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
+	make -C build/test V=$(V) test
 
-# build OS X app with Xcode
-xproj: config.gypi src macosx/llmr-app.gyp
-	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
-	open ./macosx/llmr-app.xcodeproj
-
-# build OS X app with xcodebuild
-xapp: config.gypi src macosx/llmr-app.gyp
-	deps/run_gyp macosx/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
-	xcodebuild -project ./macosx/llmr-app.xcodeproj
-	open macosx/build/Release/llmr.app
-
-# build iOS app with Xcode
-iproj: config.gypi src ios/llmr-app.gyp
-	deps/run_gyp ios/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
-	open ./ios/llmr-app.xcodeproj
-
-# build iOS app with xcodebuild
-iapp: config.gypi src ios/llmr-app.gyp
-	deps/run_gyp ios/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
-	xcodebuild -project ./ios/llmr-app.xcodeproj
-	# launch app with ios-sim?
-
-isim: config.gypi src ios/llmr-app.gyp
-	deps/run_gyp ios/llmr-app.gyp -Goutput_dir=./out/ --depth=. --generator-output=./ -f xcode
-	xcodebuild -project ./ios/llmr-app.xcodeproj -arch i386 -sdk iphonesimulator
-	# does not work
-	#"/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone Simulator.app/Contents/MacOS/iPhone Simulator" -SimulateApplication ios/build/Release-iphonesimulator/llmr.app/llmr
-
-test: config.gypi src test/test.gyp
-	deps/run_gyp test/test.gyp -Goutput_dir=. --depth=. --generator-output=./build/test -f make
-	make -C build/test V=$(V)
-	@for FILE in build/test/Release/test_*; do \
+run-tests: test
+	@for FILE in build/Release/test_*; do \
 		$${FILE}; \
 	done
 
+
+##### Makefile builds ##########################################################
+
+
+# Builds the linux app with make. This is also used by Travis CI
+linux: config.gypi linux/llmr-app.gyp
+	deps/run_gyp linux/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
+	make -C build/linux V=$(V) linuxapp
+
+# Executes the linux binary
+run-linux: linux
+	build/Release/llmr
+
+
+
+##### Maintenace operations ####################################################
+
 clean:
-	-rm -rf out
-	-rm -rf build
-	-rm -rf macosx/build
-	-rm -rf ios/build
+	-rm -rf build/Release
 
 distclean:
-	-rm -f config.gypi
-	-rm -f config.mk
-	-rm -rf llmr.xcodeproj
-	-rm -rf macosx/llmr-app.xcodeproj
-	-rm -rf ios/llmr-app.xcodeproj
+	-rm -rf build
 
-.PHONY: test linux
+.PHONY: llmr test linux

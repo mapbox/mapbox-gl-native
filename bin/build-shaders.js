@@ -3,10 +3,11 @@
 
 var fs = require('fs');
 var path = require('path');
+var lazy_update = require('./lazy-update');
 
 try { var glsl = require('glsl-optimizer'); } catch(err) {}
 
-module.exports = function(shader_type, root) {
+module.exports = function(shader_type) {
     var name;
     var shaders = {};
 
@@ -101,7 +102,6 @@ module.exports = function(shader_type, root) {
     header += '}\n';
     header += '\n';
     header += '#endif\n';
-    fs.writeFileSync('include/llmr/shader/shaders.hpp', header);
 
 
     var code = '// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.\n';
@@ -113,10 +113,9 @@ module.exports = function(shader_type, root) {
     code += lines.join(',\n');
     code += '\n};\n';
 
-    fs.writeFileSync(path.join(root, 'src/shader/shaders_' + shader_type + '.cpp'), code);
-
+    lazy_update('include/llmr/shader/shaders.hpp', header);
+    lazy_update('src/shader/shaders_' + shader_type + '.cpp', code);
 };
 
-var root = path.resolve(process.argv[2] || '.');
-module.exports('gl', root);
-module.exports('gles2', root);
+module.exports('gl');
+module.exports('gles2');

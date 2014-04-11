@@ -1,6 +1,8 @@
 #include <iostream>
 #include "gtest/gtest.h"
 
+#include <algorithm>
+
 #include <llmr/text/rotation_range.hpp>
 
 using namespace llmr;

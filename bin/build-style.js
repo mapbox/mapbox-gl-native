@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-var fs = require('fs');
+var lazy_update = require('./lazy-update');
 
 var name = 'style';
 var data = JSON.stringify(require('./style'));
@@ -22,7 +22,8 @@ header += '}\n';
 header += '}\n';
 header += '\n';
 header += '#endif\n';
-fs.writeFileSync('include/llmr/style/resources.hpp', header);
+
+lazy_update('include/llmr/style/resources.hpp', header);
 
 var code = '// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.\n';
 code += '#include <llmr/style/resources.hpp>\n';
@@ -32,5 +33,5 @@ code += '\n';
 code += 'const unsigned char resources::' + name + '[] = R"JSON(' + data + ')JSON";\n';
 code += 'const unsigned long resources::' + name + '_size = sizeof(resources::' + name + ');\n';
 
-fs.writeFileSync('src/style/resources.cpp', code);
+lazy_update('src/style/resources.cpp', code);
 
