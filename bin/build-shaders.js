@@ -26,24 +26,25 @@ module.exports = function(shader_type, prefix, suffix) {
         }
     }
 
+    var preamble = '';
+    if (shader_type == 'gles2' || shader_type == 'gles3') {
+        preamble = 'precision highp float;';
+    } else {
+        preamble = '#version 120';
+    }
+
+    for (var name in shaders) {
+        shaders[name].vertex = preamble + '\n' + shaders[name].vertex;
+        shaders[name].fragment = preamble + '\n' + shaders[name].fragment;
+    }
 
     // Optimize shader
     if (glsl) {
-        var preamble = '';
-        var target = glsl.TARGET_OPENGL;
-        if (shader_type == 'gles2') {
-            target = glsl.TARGET_OPENGLES20;
-            preamble = 'precision highp float;';
-        } else if (shader_type == 'gles3') {
-            target = glsl.TARGET_OPENGLES30;
-            preamble = 'precision highp float;';
-        } else {
-            preamble = '#version 120';
-        }
+        var target = shader_type == 'gles2' ? glsl.TARGET_OPENGLES20 : (shader_type == 'gles3' ? glsl.TARGET_OPENGLES30 : glsl.TARGET_OPENGL);
 
         var compiler = new glsl.Compiler(target);
         for (name in shaders) {
-            var vertex_shader = new glsl.Shader(compiler, glsl.VERTEX_SHADER, preamble + '\n' + shaders[name].vertex);
+            var vertex_shader = new glsl.Shader(compiler, glsl.VERTEX_SHADER, shaders[name].vertex);
             if (vertex_shader.compiled()) {
                 shaders[name].vertex = vertex_shader.output();
             } else {
@@ -52,7 +53,7 @@ module.exports = function(shader_type, prefix, suffix) {
             }
             vertex_shader.dispose();
 
-            var fragment_shader = new glsl.Shader(compiler, glsl.FRAGMENT_SHADER, preamble + '\n' + shaders[name].fragment);
+            var fragment_shader = new glsl.Shader(compiler, glsl.FRAGMENT_SHADER, shaders[name].fragment);
             if (fragment_shader.compiled()) {
                 shaders[name].fragment = fragment_shader.output();
             } else {
