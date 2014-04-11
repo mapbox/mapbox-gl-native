@@ -30,4 +30,4 @@ before_script:
 
 script:
 - ./configure
-- make
+- make llmr linux test
