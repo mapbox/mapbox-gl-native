@@ -64,6 +64,15 @@ class MBXMapView
 {
     [super loadView];
 
+    queue = dispatch_queue_create(NULL, DISPATCH_QUEUE_CONCURRENT);
+
+    NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+    sessionConfig.timeoutIntervalForResource = 6;
+    sessionConfig.HTTPMaximumConnectionsPerHost = 8;
+    sessionConfig.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
+
+    session = [NSURLSession sessionWithConfiguration:sessionConfig];
+
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
     if ( ! self.context)
@@ -439,8 +448,11 @@ class MBXMapView
     return ([validSimultaneousGestures containsObject:[gestureRecognizer class]] && [validSimultaneousGestures containsObject:[otherGestureRecognizer class]]);
 }
 
-MBXMapView *mapView;
-CADisplayLink *displayLink;
+MBXMapView *mapView = nullptr;
+CADisplayLink *displayLink = nullptr;
+dispatch_queue_t queue = nullptr;
+NSURLSession *session = nullptr;
+
 
 namespace llmr
 {
@@ -460,25 +472,30 @@ namespace llmr
 
         Request *request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
         {
-            NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+            if (!session) {
+                session = [[NSURLSession alloc] init];
+            }
+            NSURLSessionDataTask *task = [session dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
             {
-                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+                dispatch_async(queue, ^(){
+                    [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+                    Response res;
 
-                Response res;
+                    if ( ! error && [response isKindOfClass:[NSHTTPURLResponse class]])
+                    {
+                        res.code = [(NSHTTPURLResponse *)response statusCode];
+                        res.body = { (const char *)[data bytes], [data length] };
+                    } else {
+                        NSLog(@"http error (%s): %@", url.c_str(), [error localizedDescription]);
+                    }
 
-                if ( ! error && [response isKindOfClass:[NSHTTPURLResponse class]])
-                {
-                    res.code = [(NSHTTPURLResponse *)response statusCode];
-                    res.body = { (const char *)[data bytes], [data length] };
-                } else {
-                    NSLog(@"http error (%s): %@", url.c_str(), [error localizedDescription]);
-                }
+                    background_function(res);
 
-                background_function(res);
+                    dispatch_async(dispatch_get_main_queue(), ^(void)
+                                   {
+                                       foreground_callback();
+                                   });
 
-                dispatch_async(dispatch_get_main_queue(), ^(void)
-                {
-                    foreground_callback();
                 });
             }];
 
@@ -496,7 +513,7 @@ namespace llmr
 
         void cancel_request_http(Request *request)
         {
-            [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
+            [session getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
             {
                 for (NSURLSessionDownloadTask *task in downloadTasks)
                 {
