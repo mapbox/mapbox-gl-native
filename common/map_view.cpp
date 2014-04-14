@@ -234,7 +234,7 @@ public:
 namespace llmr {
 namespace platform {
 
-double time() {
+double elapsed() {
     return glfwGetTime();
 }
 

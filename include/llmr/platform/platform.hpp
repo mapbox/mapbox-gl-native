@@ -40,7 +40,7 @@ std::shared_ptr<Request> request_http(const std::string &url,
 void cancel_request_http(const std::shared_ptr<Request> &req);
 
 // Returns a relative timestamp in seconds. This value must be monotonic.
-double time();
+double elapsed();
 
 // Performs routine cleanup operation and is called on every loop iteration.
 void cleanup();

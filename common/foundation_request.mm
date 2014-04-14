@@ -1,4 +1,5 @@
-#import <Foundation/Foundation.h>
+#import "foundation_request.h"
+
 #include <memory>
 #include <string>
 #include <functional>
@@ -29,6 +30,7 @@ platform::request_http(const std::string &url, std::function<void(Response *)> b
 
         if ([error code] == NSURLErrorCancelled) {
             // We intentionally cancelled this request. Do nothing.
+            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
             return;
         }
 
@@ -46,11 +48,14 @@ platform::request_http(const std::string &url, std::function<void(Response *)> b
 
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             foreground_callback();
+
+            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
         });
     }];
 
     req = std::make_shared<Request>(task, url);
     [task resume];
+    [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
     return req;
 }
 

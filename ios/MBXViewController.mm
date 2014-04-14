@@ -1,14 +1,8 @@
-//
-//  MBXViewController.m
-//  ios
-//
-//  Created by Justin R. Miller on 1/27/14.
-//
-//
-
 #import "MBXViewController.h"
 
 #import "MBXSettings.h"
+
+#import "../common/foundation_request.h"
 
 #import <GLKit/GLKit.h>
 #import <OpenGLES/EAGL.h>
@@ -17,9 +11,6 @@
 #include <llmr/llmr.hpp>
 #include <llmr/platform/platform.hpp>
 #include <llmr/map/tile.hpp>
-
-NSString *const MBXNeedsRenderNotification = @"MBXNeedsRenderNotification";
-NSString *const MBXUpdateActivityNotification = @"MBXUpdateActivityNotification";
 
 @interface MBXViewController () <UIGestureRecognizerDelegate>
 
@@ -30,73 +21,64 @@ NSString *const MBXUpdateActivityNotification = @"MBXUpdateActivityNotification"
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic) BOOL debug;
 @property (nonatomic) UIView *palette;
+@property (nonatomic) NSTimeInterval elapsed;
 
 @end
 
 @implementation MBXViewController
 
-class MBXMapView
-{
-    public:
-        MBXMapView() : settings(), map(settings)
-        {
-        }
+llmr::Map *map = nullptr;
+llmr::Settings_iOS *settings = nullptr;
+MBXViewController *view = nullptr;
 
-        ~MBXMapView()
-        {
-        }
-
-        void init()
-        {
-            settings.load();
-
-            map.setup();
-
-            map.loadSettings();
-        }
-
-    public:
-        llmr::Settings_iOS settings;
-        llmr::Map map;
-};
-
-- (void)loadView
-{
-    [super loadView];
-
-    queue = dispatch_queue_create(NULL, DISPATCH_QUEUE_CONCURRENT);
-
-    NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
-    sessionConfig.timeoutIntervalForResource = 6;
-    sessionConfig.HTTPMaximumConnectionsPerHost = 8;
-    sessionConfig.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
-
-    session = [NSURLSession sessionWithConfiguration:sessionConfig];
-
-    self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-
-    if ( ! self.context)
-    {
-        NSLog(@"Failed to initialize OpenGL ES context");
-        return;
-    }
-
-    GLKView *view = [[GLKView alloc] initWithFrame:[[UIScreen mainScreen] bounds] context:self.context];
-
-    view.enableSetNeedsDisplay = NO;
-    view.drawableStencilFormat = GLKViewDrawableStencilFormat8;
-    view.drawableDepthFormat = GLKViewDrawableDepthFormat16;
-    [view bindDrawable];
-
-    [EAGLContext setCurrentContext:self.context];
-
-    self.view = view;
-}
+#pragma mark - Setup
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
+    view = self;
+
+    self.preferredFramesPerSecond = 60;
+
+    self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+
+    if (!self.context) {
+        NSLog(@"Failed to create OpenGL ES context");
+    }
+
+    GLKView *view = (GLKView *)self.view;
+
+    view.context = self.context;
+    view.drawableStencilFormat = GLKViewDrawableStencilFormat8;
+    view.drawableDepthFormat = GLKViewDrawableDepthFormat16;
+
+    [view bindDrawable];
+
+    [self setupMap];
+    [self setupInteraction];
+    [self setupDebugUI];
+}
+
+- (void)setupMap
+{
+    [EAGLContext setCurrentContext:self.context];
+    fprintf(stderr, "setupmap\n");
+
+    settings = new llmr::Settings_iOS();
+    settings->load();
+
+    map = new llmr::Map(*settings);
+    map->setup();
+    map->loadSettings();
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateRender:) name:MBXNeedsRenderNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateNetworkActivity:) name:MBXUpdateActivityNotification object:nil];
+}
+
+
+- (void)setupInteraction
+{
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
     pan.delegate = self;
     [self.view addGestureRecognizer:pan];
@@ -130,20 +112,10 @@ class MBXMapView
         quickZoom.minimumPressDuration = 0.25;
         [self.view addGestureRecognizer:quickZoom];
     }
+}
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateRender:) name:MBXNeedsRenderNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateNetworkActivity:) name:MBXUpdateActivityNotification object:nil];
-
-    GLKView *view = (GLKView *)self.view;
-    CGRect rect = [view frame];
-
-    mapView = new MBXMapView();
-    mapView->init();
-    mapView->map.resize(rect.size.width, rect.size.height, [view drawableWidth], [view drawableHeight]);
-
-    displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(render:)];
-    [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-
+- (void)setupDebugUI
+{
     NSArray *selectorNames = @[ @"unrotate", @"resetPosition", @"toggleDebug", @"toggleRaster" ];
     CGFloat buttonSize  = 40;
     CGFloat bufferSize  = 20;
@@ -173,16 +145,57 @@ class MBXMapView
 
 - (NSUInteger)supportedInterfaceOrientations
 {
-    return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskAllButUpsideDown);
+    // We support everything; it's up to the embedding application to limit the orientations.
+    return UIInterfaceOrientationMaskAll;
 }
 
--(void)viewWillLayoutSubviews {
+#pragma mark - NotificationCenter callbacks
+
+- (void)updateRender:(NSNotification *)notification
+{
+    [self updateRender];
+}
+
+- (void)updateRender
+{
+    self.paused = NO;
+}
+
+- (void)updateNetworkActivity:(NSNotification *)notification
+{
+    [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
+     {
+         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:([downloadTasks count] > 0)];
+     }];
+}
+
+#pragma mark - Rendering delegates
+
+- (void)viewWillLayoutSubviews
+{
+    // This callback is called whenever the view dimensions change. We trigger an update to have a fresh render to display
+    // while the view change is transitioned.
     [super viewWillLayoutSubviews];
 
-    GLKView *view = (GLKView *)self.view;
-    CGRect rect = [view bounds];
-    mapView->map.resize(rect.size.width, rect.size.height, [view drawableWidth], [view drawableHeight]);
+    // TODO: Pause all current animations during animation. We don't want other events to fire while the view is rotated.
+
+    [self updateRender];
 }
+
+- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
+{
+    self.elapsed = CACurrentMediaTime();
+
+    // Render the map
+    map->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
+
+    if (map->render() == false) {
+        self.paused = YES;
+        settings->sync();
+    }
+}
+
+#pragma mark - Debugging UI
 
 - (void)togglePalette
 {
@@ -208,88 +221,52 @@ class MBXMapView
 
 - (void)unrotate
 {
-    mapView->map.resetNorth();
+    map->resetNorth();
 }
 
 - (void)resetPosition
 {
-    mapView->map.resetPosition();
+    map->resetPosition();
 }
 
 - (void)toggleDebug
 {
-    mapView->map.toggleDebug();
+    map->toggleDebug();
 
     self.debug = ! self.debug;
 }
 
 - (void)toggleRaster
 {
-    mapView->map.toggleRaster();
+    map->toggleRaster();
 }
+
+#pragma mark - Destruction
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-
-    mapView->settings.sync();
-}
-
-- (void)updateRender:(NSNotification *)notification
-{
-    [self updateRender];
-}
-
-- (void)updateNetworkActivity:(NSNotification *)notification
-{
-    [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
-    {
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:([downloadTasks count] > 0)];
-    }];
-}
-
-- (void)updateRender
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-
-    displayLink.paused = NO;
-
-    [self performSelector:@selector(pauseRender) withObject:nil afterDelay:3.0];
-}
-
-- (void)pauseRender
-{
-    displayLink.paused = YES;
-
-    mapView->settings.sync();
-}
-
-- (void)render:(id)sender
-{
-    mapView->map.render();
-
-    static double frames  = 0;
-    static double elapsed = 0;
-
-    frames++;
-
-    double current = [[NSDate date] timeIntervalSince1970];
-
-    if (current - elapsed >= 1)
-    {
-        if (self.debug)
-            NSLog(@"FPS: %f", frames / (current - elapsed));
-
-        elapsed = current;
-        frames = 0;
+    if (map) {
+        delete map;
+        map = nullptr;
+    }
+    if (settings) {
+        settings->sync();
+        delete settings;
+        settings = nullptr;
     }
 
-    [(GLKView *)self.view display];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+    if ([EAGLContext currentContext] == self.context) {
+        [EAGLContext setCurrentContext:nil];
+    }
 }
+
+#pragma mark - UI gestures
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
-    mapView->map.cancelAnimations();
+    map->cancelAnimations();
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
@@ -300,21 +277,22 @@ class MBXMapView
         CGPoint delta = CGPointMake([pan translationInView:pan.view].x - self.center.x,
                                     [pan translationInView:pan.view].y - self.center.y);
 
-        mapView->map.moveBy(delta.x, delta.y);
+        map->moveBy(delta.x, delta.y);
 
         self.center = CGPointMake(self.center.x + delta.x, self.center.y + delta.y);
     }
     else if (pan.state == UIGestureRecognizerStateEnded)
     {
-        if ([pan velocityInView:pan.view].x < 50 && [pan velocityInView:pan.view].y < 50)
+        if ([pan velocityInView:pan.view].x < 50 && [pan velocityInView:pan.view].y < 50) {
             return;
+        }
 
         CGPoint finalCenter = CGPointMake(self.center.x + (0.1 * [pan velocityInView:pan.view].x),
                                           self.center.y + (0.1 * [pan velocityInView:pan.view].y));
 
         CGFloat duration = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 0.3 : 0.5);
 
-        mapView->map.moveBy(finalCenter.x - self.center.x, finalCenter.y - self.center.y, duration);
+        map->moveBy(finalCenter.x - self.center.x, finalCenter.y - self.center.y, duration);
     }
 
     [self updateRender];
@@ -322,13 +300,15 @@ class MBXMapView
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
-    mapView->map.cancelAnimations();
+    self.elapsed = CACurrentMediaTime();
+
+    map->cancelAnimations();
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
-        mapView->map.startScaling();
+        map->startScaling();
 
-        self.scale = mapView->map.getScale();
+        self.scale = map->getScale();
     }
     else if (pinch.state == UIGestureRecognizerStateChanged)
     {
@@ -346,27 +326,30 @@ class MBXMapView
 
         CGFloat newZoom = log2f(self.scale) + adjustment;
 
-        mapView->map.scaleBy(powf(2, newZoom) / mapView->map.getScale(), [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
+        CGPoint pt = [pinch locationInView:pinch.view];
+        map->scaleBy(powf(2, newZoom) / map->getScale(), pt.x, pt.y);
     }
     else if (pinch.state == UIGestureRecognizerStateEnded)
     {
-        mapView->map.stopScaling();
+       map->stopScaling();
 
-        if (fabsf(pinch.velocity) < 20)
+        if (fabsf(pinch.velocity) < 20) {
             return;
+        }
 
-        CGFloat finalZoom = log2f(mapView->map.getScale()) + (0.01 * pinch.velocity);
+        CGFloat finalZoom = log2f(map->getScale()) + (0.01 * pinch.velocity);
 
-        double scale = mapView->map.getScale();
+        double scale = map->getScale();
         double new_scale = powf(2, finalZoom);
 
         CGFloat duration = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 0.3 : 0.5);
 
-        mapView->map.scaleBy(new_scale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y, duration);
+        CGPoint pt = [pinch locationInView:pinch.view];
+        map->scaleBy(new_scale / scale, pt.x, pt.y, duration);
     }
     else if (pinch.state == UIGestureRecognizerStateCancelled)
     {
-        mapView->map.stopScaling();
+        map->stopScaling();
     }
 
     [self updateRender];
@@ -374,21 +357,24 @@ class MBXMapView
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
-    mapView->map.cancelAnimations();
+    self.elapsed = CACurrentMediaTime();
+
+    map->cancelAnimations();
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
-        mapView->map.startRotating();
+        map->startRotating();
 
-        self.angle = mapView->map.getAngle();
+        self.angle = map->getAngle();
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
-        mapView->map.setAngle(self.angle + rotate.rotation, [rotate locationInView:rotate.view].x, [rotate locationInView:rotate.view].y);
+        CGPoint pt = [rotate locationInView:rotate.view];
+        map->setAngle(self.angle + rotate.rotation, pt.x, pt.y);
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
-        mapView->map.stopRotating();
+        map->stopRotating();
     }
 
     [self updateRender];
@@ -396,36 +382,48 @@ class MBXMapView
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
+    self.elapsed = CACurrentMediaTime();
+
     [self togglePalette];
 }
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
-    mapView->map.cancelAnimations();
+    self.elapsed = CACurrentMediaTime();
 
-    if (doubleTap.state == UIGestureRecognizerStateEnded)
-        mapView->map.scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.5);
+    map->cancelAnimations();
+
+    if (doubleTap.state == UIGestureRecognizerStateEnded) {
+        CGPoint pt = [doubleTap locationInView:doubleTap.view];
+        map->scaleBy(2, pt.x, pt.y, 0.5);
+    }
 
     [self updateRender];
 }
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
-    mapView->map.cancelAnimations();
+    self.elapsed = CACurrentMediaTime();
 
-    if (twoFingerTap.state == UIGestureRecognizerStateEnded)
-        mapView->map.scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
+    map->cancelAnimations();
+
+    if (twoFingerTap.state == UIGestureRecognizerStateEnded) {
+        CGPoint pt = [twoFingerTap locationInView:twoFingerTap.view];
+        map->scaleBy(0.5, pt.x, pt.y, 0.5);
+    }
 
     [self updateRender];
 }
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
-    mapView->map.cancelAnimations();
+    self.elapsed = CACurrentMediaTime();
+
+    map->cancelAnimations();
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
-        self.scale = mapView->map.getScale();
+        self.scale = map->getScale();
 
         self.quickZoomStart = [quickZoom locationInView:quickZoom.view].y;
     }
@@ -435,7 +433,7 @@ class MBXMapView
 
         CGFloat newZoom = log2f(self.scale) + (distance / 100);
 
-        mapView->map.scaleBy(powf(2, newZoom) / mapView->map.getScale(), self.view.bounds.size.width / 2, self.view.bounds.size.height / 2);
+        map->scaleBy(powf(2, newZoom) / map->getScale(), self.view.bounds.size.width / 2, self.view.bounds.size.height / 2);
     }
 
     [self updateRender];
@@ -448,33 +446,29 @@ class MBXMapView
     return ([validSimultaneousGestures containsObject:[gestureRecognizer class]] && [validSimultaneousGestures containsObject:[otherGestureRecognizer class]]);
 }
 
-MBXMapView *mapView = nullptr;
-CADisplayLink *displayLink = nullptr;
-dispatch_queue_t queue = nullptr;
-NSURLSession *session = nullptr;
 
+namespace llmr {
+    namespace platform {
 
-namespace llmr
-{
-    namespace platform
-    {
-        class Request
-        {
-            public:
-                int16_t identifier;
-                std::string original_url;
+        class Request {
+        public:
+            int16_t identifier;
+            std::string original_url;
         };
 
-        void restart()
-        {
+        void restart() {
             [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
         }
 
-        double time()
-        {
-            return [displayLink timestamp];
+        double time() {
+            return [view timeSinceFirstResume];
+        }
+
+        double elapsed() {
+            return view.elapsed;
         }
     }
 }
 
 @end
+

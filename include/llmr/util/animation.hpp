@@ -14,11 +14,11 @@ public:
         complete
     };
     animation(double duration)
-        : start(platform::time()),
+        : start(platform::elapsed()),
           duration(duration) {}
 
     double progress() const {
-        return (platform::time() - start) / duration;
+        return (platform::elapsed() - start) / duration;
     }
 
     virtual state update() const = 0;

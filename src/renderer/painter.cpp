@@ -529,7 +529,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 
     // Label fading
     const float duration = 300.0f;
-    const float currentTime = platform::time() * 1000;
+    const float currentTime = platform::elapsed() * 1000;
 
     std::deque<FrameSnapshot> &history = frameHistory.history;
 
@@ -558,7 +558,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     if (timeDiff > duration) timeDiff = 1;
     float fadedist = zoomDiff / (timeDiff / duration);
 
-    if (isnan(fadedist)) fprintf(stderr, "fadedist should never be NaN");
+    if (isnan(fadedist)) fprintf(stderr, "fadedist should never be NaN\n");
 
     // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
     // bump is how much farther it would have been if it had continued zooming at the same rate

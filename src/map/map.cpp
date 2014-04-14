@@ -44,16 +44,14 @@ void Map::loadSettings() {
     update();
 }
 
-void Map::resize(uint16_t width, uint16_t height, uint16_t fb_width, uint16_t fb_height) {
-    transform.resize(width, height, fb_width, fb_height);
+void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height) {
+    transform.resize(width, height, ratio, fb_width, fb_height);
     painter.resize();
 
     if (!style.sprite || style.sprite->pixelRatio != transform.getPixelRatio()) {
         style.sprite = std::make_shared<Sprite>(transform.getPixelRatio());
         style.sprite->load(kSpriteURL);
     }
-
-    update();
 }
 
 void Map::toggleRaster() {
@@ -479,5 +477,9 @@ bool Map::render() {
 
     painter.renderMatte();
 
-    return changed || transform.needsAnimation() || painter.needsAnimation();
+
+    bool transition = transform.needsAnimation();
+    bool animation = painter.needsAnimation();
+
+    return changed || transition || animation;
 }

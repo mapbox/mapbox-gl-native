@@ -22,7 +22,9 @@ public:
     void updateAnimations();
     void cancelAnimations();
 
-    void resize(uint16_t width, uint16_t height, uint16_t fb_width, uint16_t fb_height);
+    // Map view changes.
+    // Note: width * ratio does not necessarily equal fb_width
+    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
 
     // Relative changes
     void moveBy(double dx, double dy, double duration = 0);
