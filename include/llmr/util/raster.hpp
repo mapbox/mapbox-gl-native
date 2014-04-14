@@ -6,6 +6,7 @@
 
 #include <string>
 #include <mutex>
+#include <memory>
 
 namespace llmr {
 
