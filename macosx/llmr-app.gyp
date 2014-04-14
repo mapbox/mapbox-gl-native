@@ -11,7 +11,8 @@
       'sources': [
         './main.mm',
         './settings.mm',
-        './settings.hpp'
+        './settings.hpp',
+        '../common/foundation_request.mm'
       ],
       'product_extension': 'app',
       'mac_bundle': 1,

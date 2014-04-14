@@ -36,17 +36,17 @@ void Sprite::load(const std::string& base_url) {
 
     std::string suffix = (pixelRatio > 1 ? "@2x" : "");
 
-    platform::request_http(base_url + suffix + ".json", [sprite](const platform::Response & res) {
-        if (res.code == 200) {
-            sprite->parseJSON(res.body);
+    platform::request_http(base_url + suffix + ".json", [sprite](const platform::Response *res) {
+        if (res->code == 200) {
+            sprite->parseJSON(res->body);
         } else {
             fprintf(stderr, "failed to load sprite\n");
         }
     }, complete);
 
-    platform::request_http(base_url + suffix + ".png", [sprite](const platform::Response & res) {
-        if (res.code == 200) {
-            sprite->raster->load(res.body);
+    platform::request_http(base_url + suffix + ".png", [sprite](const platform::Response *res) {
+        if (res->code == 200) {
+            sprite->raster->load(res->body);
         } else {
             fprintf(stderr, "failed to load sprite image\n");
         }

@@ -23,13 +23,12 @@ int main() {
 
 
 namespace llmr {
-namespace platform {
 
-void cleanup() {
+void platform::cleanup() {
     // noop
 }
 
-void restart() {
+void platform::restart() {
     if (mapView) {
         mapView->dirty = true;
         CGEventRef event = CGEventCreate(NULL);
@@ -38,58 +37,4 @@ void restart() {
     }
 }
 
-class Request {
-public:
-    int16_t identifier;
-    std::string original_url;
-};
-
-Request *request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback)
-{
-    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
-    {
-        if ([error code] == NSURLErrorCancelled) {
-            // We intentionally cancelled this request. Do nothing.
-            return;
-        }
-
-        Response res;
-
-        if ( ! error && [response isKindOfClass:[NSHTTPURLResponse class]])
-        {
-            res.code = [(NSHTTPURLResponse *)response statusCode];
-            res.body = { (const char *)[data bytes], [data length] };
-        } else {
-            NSLog(@"http error (%s): %@", url.c_str(), [error localizedDescription]);
-        }
-
-        background_function(res);
-
-        dispatch_async(dispatch_get_main_queue(), ^(void)
-        {
-            foreground_callback();
-        });
-    }];
-
-    [task resume];
-
-    Request *req = new Request();
-
-    req->identifier = task.taskIdentifier;
-    req->original_url = url;
-
-    return req;
-}
-
-void cancel_request_http(Request *request)
-{
-    [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
-    {
-        for (NSURLSessionDownloadTask *task in downloadTasks)
-            if (task.taskIdentifier == request->identifier)
-                return [task cancel];
-    }];
-}
-
-}
 }

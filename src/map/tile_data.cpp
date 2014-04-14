@@ -48,28 +48,27 @@ void TileData::request() {
 
     // Note: Somehow this feels slower than the change to request_http()
     std::weak_ptr<TileData> weak_tile = shared_from_this();
-    platform::Request *request = platform::request_http(url, [=](platform::Response& res) {
+    req = platform::request_http(url, [weak_tile, url](platform::Response *res) {
         std::shared_ptr<TileData> tile = weak_tile.lock();
         if (!tile || tile->state == State::obsolete) {
             // noop. Tile is obsolete and we're now just waiting for the refcount
             // to drop to zero for destruction.
-        } else if (res.code == 200) {
+        } else if (res->code == 200) {
             tile->state = State::loaded;
-            tile->data.swap(res.body);
+            tile->data.swap(res->body);
             tile->parse();
         } else {
-            fprintf(stderr, "tile loading failed (%s): %d\n", url.c_str(), res.code);
+            fprintf(stderr, "tile loading failed (%s): %d\n", url.c_str(), res->code);
         }
     }, []() {
         platform::restart();
     });
-    req = request;
 }
 
 void TileData::cancel() {
     if (state != State::obsolete) {
         state = State::obsolete;
-        platform::cancel_request_http(req);
+        platform::cancel_request_http(req.lock());
     }
 }
 

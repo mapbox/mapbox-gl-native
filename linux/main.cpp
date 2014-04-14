@@ -11,7 +11,7 @@
 
 
 MapView *mapView = nullptr;
-std::forward_list<llmr::platform::Request *> requests;
+std::forward_list<std::shared_ptr<llmr::platform::Request>> requests;
 
 
 
@@ -74,14 +74,12 @@ int main(int argc, char *argv[]) {
 }
 
 namespace llmr {
-namespace platform {
 
-void cleanup() {
+void platform::cleanup() {
     bool& dirty = mapView->dirty;
-    requests.remove_if([&dirty](llmr::platform::Request * req) {
+    requests.remove_if([&dirty](std::shared_ptr<llmr::platform::Request> &req) {
         if (req->done) {
             req->foreground_callback();
-            delete req;
             dirty = true;
             return true;
         } else {
@@ -90,25 +88,27 @@ void cleanup() {
     });
 }
 
-void restart() {
+void platform::restart() {
     if (mapView) {
         mapView->dirty = true;
     }
 }
 
-Request *request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback) {
-    Request *req = new Request(url, background_function, foreground_callback);
+std::shared_ptr<platform::Request>
+platform::request_http(const std::string &url, std::function<void(Response *)> background_function,
+                       std::function<void()> foreground_callback) {
+    std::shared_ptr<Request> req =
+        std::make_shared<Request>(url, background_function, foreground_callback);
     requests.push_front(req);
     return req;
 }
 
-void cancel_request_http(Request *request) {
-    for (Request *req : requests) {
-        if (req == request) {
-            req->cancel();
-        }
+// Cancels an HTTP request.
+void platform::cancel_request_http(const std::shared_ptr<Request> &req) {
+    if (req) {
+        req->cancel();
     }
 }
 
-}
+
 }

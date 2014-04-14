@@ -95,7 +95,9 @@ private:
     std::string data;
     const Style& style;
     GlyphAtlas& glyphAtlas;
-    platform::Request *req = nullptr;
+
+    // Stores a request that is in progress.
+    std::weak_ptr<platform::Request> req;
 };
 
 }

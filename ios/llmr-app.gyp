@@ -12,7 +12,8 @@
             "./main.m",
             "./MBXAppDelegate.m",
             "./MBXSettings.mm",
-            "./MBXViewController.mm"
+            "./MBXViewController.mm",
+            "../common/foundation_request.mm",
         ],
         'product_extension': 'app',
         'mac_bundle': 1,

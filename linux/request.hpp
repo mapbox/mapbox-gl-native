@@ -14,7 +14,7 @@ struct Response;
 
 class Request {
 public:
-    Request(std::string url, std::function<void(platform::Response&)> bg, std::function<void()> fg);
+    Request(std::string url, std::function<void(platform::Response *)> bg, std::function<void()> fg);
 
     static void initialize();
     static void finish();
@@ -36,7 +36,7 @@ public:
     std::atomic<bool> done;
     std::atomic<bool> cancelled;
     const std::string url;
-    const std::function<void(platform::Response&)> background_function;
+    const std::function<void(platform::Response *)> background_function;
     const std::function<void()> foreground_callback;
 
 private:

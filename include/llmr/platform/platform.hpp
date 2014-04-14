@@ -20,16 +20,24 @@ void restart();
 
 class Request;
 
+
 struct Response {
+
     int16_t code = -1;
     std::string body;
+
+    std::string error_message;
 };
 
-// Makes an HTTP request of a URL on a background thread, calls a function with the results on the same thread, and finally calls a callback function on the main thread. Returns a cancellable request.
-Request *request_http(std::string url, std::function<void(Response&)> background_function, std::function<void()> foreground_callback);
+// Makes an HTTP request of a URL on a background thread, calls a function with the results in
+// another thread, then calls the foreground callback in the original main thread.
+// Returns a cancellable request.
+std::shared_ptr<Request> request_http(const std::string &url,
+                                      std::function<void(Response *)> background_function,
+                                      std::function<void()> foreground_callback);
 
 // Cancels an HTTP request.
-void cancel_request_http(Request *request);
+void cancel_request_http(const std::shared_ptr<Request> &req);
 
 // Returns a relative timestamp in seconds. This value must be monotonic.
 double time();

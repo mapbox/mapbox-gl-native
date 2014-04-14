@@ -44,7 +44,7 @@ void Request::finish() {
     curl_share_cleanup(curl_share);
 }
 
-Request::Request(std::string url, std::function<void(platform::Response&)> bg, std::function<void()> fg)
+Request::Request(std::string url, std::function<void(platform::Response *)> bg, std::function<void()> fg)
     : done(false),
       cancelled(false),
       url(url),
@@ -102,7 +102,7 @@ void Request::request(void *ptr) {
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &res.code);
 
     if (code != CURLE_ABORTED_BY_CALLBACK) {
-        req->background_function(res);
+        req->background_function(&res);
     }
 
     req->done = true;
