@@ -479,6 +479,11 @@ namespace llmr
             {
                 dispatch_async(queue, ^(){
                     [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+                    if ([error code] == NSURLErrorCancelled) {
+                        // We intentionally cancelled this request. Do nothing.
+                        return;
+                    }
+
                     Response res;
 
                     if ( ! error && [response isKindOfClass:[NSHTTPURLResponse class]])

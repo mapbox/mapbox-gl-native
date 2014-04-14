@@ -48,12 +48,19 @@ Request *request_http(std::string url, std::function<void(Response&)> background
 {
     NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@(url.c_str())] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
     {
+        if ([error code] == NSURLErrorCancelled) {
+            // We intentionally cancelled this request. Do nothing.
+            return;
+        }
+
         Response res;
 
         if ( ! error && [response isKindOfClass:[NSHTTPURLResponse class]])
         {
             res.code = [(NSHTTPURLResponse *)response statusCode];
             res.body = { (const char *)[data bytes], [data length] };
+        } else {
+            NSLog(@"http error (%s): %@", url.c_str(), [error localizedDescription]);
         }
 
         background_function(res);
