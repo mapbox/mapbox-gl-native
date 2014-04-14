@@ -29,7 +29,7 @@ public:
     // animations
     void beginFadeInAnimation();
     bool needsAnimation() const;
-    void updateAnimations();
+    void updateAnimations(double time);
 
 public:
     // loaded image dimensions

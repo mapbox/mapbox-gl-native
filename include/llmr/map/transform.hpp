@@ -19,7 +19,7 @@ public:
 
     // Animations
     bool needsAnimation() const;
-    void updateAnimations();
+    void updateAnimations(double time);
     void cancelAnimations();
 
     // Map view changes.

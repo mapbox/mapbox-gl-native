@@ -3,6 +3,7 @@
 #include <memory>
 #include <cassert>
 
+#include <llmr/platform/platform.hpp>
 #include <llmr/platform/gl.hpp>
 
 #include <png.h>
@@ -176,15 +177,16 @@ void Raster::bind(bool linear) {
 }
 
 void Raster::beginFadeInAnimation() {
-    fade_animation = std::make_shared<util::ease_animation>(opacity, 1.0, opacity, 0.25);
+    double start = platform::elapsed();
+    fade_animation = std::make_shared<util::ease_animation>(opacity, 1.0, opacity, start, 0.25);
 }
 
 bool Raster::needsAnimation() const {
     return fade_animation != nullptr;
 }
 
-void Raster::updateAnimations() {
-    if (fade_animation->update() == util::animation::complete) {
+void Raster::updateAnimations(double time) {
+    if (fade_animation->update(time) == util::animation::complete) {
         fade_animation = nullptr;
     }
 }

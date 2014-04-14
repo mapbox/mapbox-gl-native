@@ -3,6 +3,7 @@
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/std.hpp>
 #include <llmr/util/math.hpp>
+#include <llmr/platform/platform.hpp>
 #include <cstdio>
 
 using namespace llmr;
@@ -24,9 +25,9 @@ bool Transform::needsAnimation() const {
     return !animations.empty();
 }
 
-void Transform::updateAnimations() {
-    animations.remove_if([](const std::shared_ptr<util::animation>& animation) {
-        return animation->update() == util::animation::complete;
+void Transform::updateAnimations(double time) {
+    animations.remove_if([time](const std::shared_ptr<util::animation>& animation) {
+        return animation->update(time) == util::animation::complete;
     });
 }
 
@@ -49,8 +50,10 @@ void Transform::moveBy(double dx, double dy, double duration) {
         x = xn;
         y = yn;
     } else {
-        animations.emplace_front(std::make_shared<util::ease_animation>(x, xn, x, duration));
-        animations.emplace_front(std::make_shared<util::ease_animation>(y, yn, y, duration));
+        // Use a common start time for all of the animations to avoid divergent animations.
+        double start = platform::elapsed();
+        animations.emplace_front(std::make_shared<util::ease_animation>(x, xn, x, start, duration));
+        animations.emplace_front(std::make_shared<util::ease_animation>(y, yn, y, start, duration));
     }
 }
 
@@ -59,7 +62,8 @@ void Transform::startPanning() {
 
     // Add a 200ms timeout for resetting this to false
     panning = true;
-    pan_timeout = std::make_shared<util::timeout<bool>>(false, panning, 0.2);
+    double start = platform::elapsed();
+    pan_timeout = std::make_shared<util::timeout<bool>>(false, panning, start, 0.2);
     animations.emplace_front(pan_timeout);
 }
 
@@ -90,7 +94,8 @@ void Transform::startScaling() {
 
     // Add a 200ms timeout for resetting this to false
     scaling = true;
-    scale_timeout = std::make_shared<util::timeout<bool>>(false, scaling, 0.2);
+    double start = platform::elapsed();
+    scale_timeout = std::make_shared<util::timeout<bool>>(false, scaling, start, 0.2);
     animations.emplace_front(scale_timeout);
 }
 
@@ -136,7 +141,8 @@ void Transform::setAngle(double new_angle, double duration) {
     if (duration == 0) {
         angle = new_angle;
     } else {
-        animations.emplace_front(std::make_shared<util::ease_animation>(angle, new_angle, angle, duration));
+        double start = platform::elapsed();
+        animations.emplace_front(std::make_shared<util::ease_animation>(angle, new_angle, angle, start, duration));
     }
 }
 
@@ -145,7 +151,8 @@ void Transform::startRotating() {
 
     // Add a 200ms timeout for resetting this to false
     rotating = true;
-    rotate_timeout = std::make_shared<util::timeout<bool>>(false, rotating, 0.2);
+    double start = platform::elapsed();
+    rotate_timeout = std::make_shared<util::timeout<bool>>(false, rotating, start, 0.2);
     animations.emplace_front(rotate_timeout);
 }
 
@@ -163,9 +170,11 @@ void Transform::setScaleXY(double new_scale, double xn, double yn, double durati
         x = xn;
         y = yn;
     } else {
-        animations.emplace_front(std::make_shared<util::ease_animation>(scale, new_scale, scale, duration));
-        animations.emplace_front(std::make_shared<util::ease_animation>(x, xn, x, duration));
-        animations.emplace_front(std::make_shared<util::ease_animation>(y, yn, y, duration));
+        // Use a common start time for all of the animations to avoid divergent animations.
+        double start = platform::elapsed();
+        animations.emplace_front(std::make_shared<util::ease_animation>(scale, new_scale, scale, start, duration));
+        animations.emplace_front(std::make_shared<util::ease_animation>(x, xn, x, start, duration));
+        animations.emplace_front(std::make_shared<util::ease_animation>(y, yn, y, start, duration));
     }
 
     const double s = scale * util::tileSize;

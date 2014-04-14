@@ -21,7 +21,6 @@
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic) BOOL debug;
 @property (nonatomic) UIView *palette;
-@property (nonatomic) NSTimeInterval elapsed;
 
 @end
 
@@ -183,8 +182,6 @@ MBXViewController *view = nullptr;
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    self.elapsed = CACurrentMediaTime();
-
     // Render the map
     map->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
 
@@ -220,7 +217,6 @@ MBXViewController *view = nullptr;
 
 - (void)unrotate
 {
-    self.elapsed = CACurrentMediaTime();
     map->resetNorth();
 }
 
@@ -300,8 +296,6 @@ MBXViewController *view = nullptr;
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
-    self.elapsed = CACurrentMediaTime();
-
     map->cancelAnimations();
 
     if (pinch.state == UIGestureRecognizerStateBegan)
@@ -357,8 +351,6 @@ MBXViewController *view = nullptr;
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
-    self.elapsed = CACurrentMediaTime();
-
     map->cancelAnimations();
 
     if (rotate.state == UIGestureRecognizerStateBegan)
@@ -382,15 +374,11 @@ MBXViewController *view = nullptr;
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
-    self.elapsed = CACurrentMediaTime();
-
     [self togglePalette];
 }
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
-    self.elapsed = CACurrentMediaTime();
-
     map->cancelAnimations();
 
     if (doubleTap.state == UIGestureRecognizerStateEnded) {
@@ -403,8 +391,6 @@ MBXViewController *view = nullptr;
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
-    self.elapsed = CACurrentMediaTime();
-
     map->cancelAnimations();
 
     if (twoFingerTap.state == UIGestureRecognizerStateEnded) {
@@ -417,8 +403,6 @@ MBXViewController *view = nullptr;
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
-    self.elapsed = CACurrentMediaTime();
-
     map->cancelAnimations();
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
@@ -446,6 +430,8 @@ MBXViewController *view = nullptr;
     return ([validSimultaneousGestures containsObject:[gestureRecognizer class]] && [validSimultaneousGestures containsObject:[otherGestureRecognizer class]]);
 }
 
+@end
+
 
 namespace llmr {
     namespace platform {
@@ -465,10 +451,7 @@ namespace llmr {
         }
 
         double elapsed() {
-            return view.elapsed;
+            return CACurrentMediaTime();
         }
     }
 }
-
-@end
-

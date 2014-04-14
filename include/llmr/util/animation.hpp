@@ -2,7 +2,6 @@
 #define LLMR_UTIL_ANIMATION
 
 #include <llmr/util/noncopyable.hpp>
-#include <llmr/platform/platform.hpp>
 
 namespace llmr {
 namespace util {
@@ -13,15 +12,15 @@ public:
         running,
         complete
     };
-    animation(double duration)
-        : start(platform::elapsed()),
+    animation(double start, double duration)
+        : start(start),
           duration(duration) {}
 
-    double progress() const {
-        return (platform::elapsed() - start) / duration;
+    double progress(double time) const {
+        return (time - start) / duration;
     }
 
-    virtual state update() const = 0;
+    virtual state update(double time) const = 0;
     virtual ~animation();
 
 protected:
@@ -30,8 +29,8 @@ protected:
 
 class ease_animation : public animation {
 public:
-    ease_animation(double from, double to, double& value, double duration);
-    state update() const;
+    ease_animation(double from, double to, double& value, double start, double duration);
+    state update(double time) const;
 
 private:
     const double from, to;
@@ -41,13 +40,13 @@ private:
 template <typename T>
 class timeout : public animation {
 public:
-    timeout(T final_value, T& value, double duration)
-        : animation(duration),
+    timeout(T final_value, T& value, double start, double duration)
+        : animation(start, duration),
           final_value(final_value),
           value(value) {}
 
-    state update() const {
-        if (progress() >= 1) {
+    state update(double time) const {
+        if (progress(time) >= 1) {
             value = final_value;
             return complete;
         } else {

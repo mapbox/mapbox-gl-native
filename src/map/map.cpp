@@ -433,8 +433,10 @@ bool Map::updateTiles() {
 }
 
 bool Map::render() {
+    double animationTime = platform::elapsed();
+
     if (transform.needsAnimation()) {
-        transform.updateAnimations();
+        transform.updateAnimations(animationTime);
     }
 
     if (*style.sprite->raster && !style.sprite->raster->textured) {
@@ -469,7 +471,7 @@ bool Map::render() {
                 tile.data->raster->beginFadeInAnimation();
             }
             if (tile.data->use_raster && tile.data->raster->needsAnimation()) {
-                tile.data->raster->updateAnimations();
+                tile.data->raster->updateAnimations(animationTime);
             }
             painter.render(tile);
         }
