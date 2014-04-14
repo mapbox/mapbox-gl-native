@@ -63,7 +63,6 @@ MBXViewController *view = nullptr;
 - (void)setupMap
 {
     [EAGLContext setCurrentContext:self.context];
-    fprintf(stderr, "setupmap\n");
 
     settings = new llmr::Settings_iOS();
     settings->load();
