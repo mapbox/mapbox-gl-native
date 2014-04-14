@@ -220,6 +220,7 @@ MBXViewController *view = nullptr;
 
 - (void)unrotate
 {
+    self.elapsed = CACurrentMediaTime();
     map->resetNorth();
 }
 
