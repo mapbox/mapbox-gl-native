@@ -147,8 +147,8 @@ public:
             if (action == GLFW_RELEASE) {
                 mapView->map.stopPanning();
                 double now = glfwGetTime();
-                if (now - mapView->last_click < 0.4) {
-                    mapView->map.scaleBy(2.0, mapView->last_x, mapView->last_y);
+                if (now - mapView->last_click < 0.4 /* ms */) {
+                    mapView->map.scaleBy(2.0, mapView->last_x, mapView->last_y, 0.5);
                 }
                 mapView->last_click = now;
             }
