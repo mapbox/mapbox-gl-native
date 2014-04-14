@@ -184,23 +184,32 @@ void Transform::setScaleXY(double new_scale, double xn, double yn, double durati
 }
 
 void Transform::setScale(double new_scale, double cx, double cy, double duration) {
+    // Ensure that we don't zoom in further than the maximum allowed.
     if (new_scale < min_scale) {
         new_scale = min_scale;
     } else if (new_scale > max_scale) {
         new_scale = max_scale;
     }
 
+    // Zoom in on the center if we don't have click anchor coordinates.
     if (cx < 0 || cy < 0) {
         cx = width / 2;
         cy = height / 2;
     }
 
+    // Account for the x/y offset from the center (= where the user clicked)
     const double factor = new_scale / scale;
     const double dx = (cx - width / 2) * (1.0 - factor);
     const double dy = (cy - height / 2) * (1.0 - factor);
 
-    double xn = x * factor + dx;
-    double yn = y * factor + dy;
+    // Account for angle
+    const double angle_sin = sin(-angle);
+    const double angle_cos = cos(-angle);
+    const double ax = angle_cos * dx - angle_sin * dy;
+    const double ay = angle_sin * dx + angle_cos * dy;
+
+    const double xn = x * factor + ax;
+    const double yn = y * factor + ay;
 
     setScaleXY(new_scale, xn, yn, duration);
 }
