@@ -128,6 +128,7 @@ public:
         glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
         mapView->map.resize(width, height, (float)fb_width / (float)width, fb_width, fb_height);
+        mapView->map.update();
     }
 
     static void mouseclick(GLFWwindow *window, int button, int action, int modifiers) {

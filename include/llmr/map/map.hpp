@@ -31,6 +31,7 @@ public:
     void toggleRaster();
 
     /* callback */
+    void update();
     bool render();
     void cancelAnimations();
 
@@ -71,7 +72,6 @@ private:
     TileData::State addTile(const Tile::ID& id);
     TileData::State hasTile(const Tile::ID& id);
 
-    void update();
 
 private:
     Settings& settings;
