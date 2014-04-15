@@ -77,6 +77,7 @@ void Painter::setupShaders() {
 }
 
 void Painter::resize() {
+    assert(transform.getFramebufferWidth() > 0 && transform.getFramebufferHeight() > 0);
     glViewport(0, 0, transform.getFramebufferWidth(), transform.getFramebufferHeight());
 }
 
