@@ -32,30 +32,30 @@ void Map::setup() {
     style.loadJSON(resources::style, resources::style_size);
 
     sources.emplace("mapbox streets",
-                    Source(*this,
+                    std::unique_ptr<Source>(new Source(*this,
                            transform,
                            painter,
                            texturepool,
                            "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf",
                            Source::Type::vector,
-                           {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14},
+                           {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }},
                            512,
                            0,
                            14,
-                           true));
+                           true)));
 
     sources.emplace("satellite",
-                    Source(*this,
+                    std::unique_ptr<Source>(new Source(*this,
                            transform,
                            painter,
                            texturepool,
                            "https://a.tiles.mapbox.com/v3/justin.hh0gkdfm/%d/%d/%d%s.png256",
                            Source::Type::raster,
-                           {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21},
+                           {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }},
                            256,
                            0,
                            21,
-                           false));
+                           false)));
 }
 
 void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
@@ -261,20 +261,21 @@ void Map::toggleDebug() {
 
 void Map::toggleRaster() {
     auto it = sources.find("satellite");
-    std::pair<std::string, Source&> pair = *it;
-    Source& satellite_source = pair.second;
+    if (it != sources.end()) {
+        Source &satellite_source = *it->second;
 
-    if (satellite_source.enabled) {
-        satellite_source.enabled = false;
-        style.appliedClasses.erase(style.appliedClasses.find("satellite"));
-    } else {
-        satellite_source.enabled = true;
-        style.appliedClasses.insert("satellite");
+        if (satellite_source.enabled) {
+            satellite_source.enabled = false;
+            style.appliedClasses.erase(style.appliedClasses.find("satellite"));
+        } else {
+            satellite_source.enabled = true;
+            style.appliedClasses.insert("satellite");
+        }
+
+        style.cascade(transform.getNormalizedZoom());
+
+        update();
     }
-
-    style.cascade(transform.getNormalizedZoom());
-
-    update();
 }
 
 void Map::cancelAnimations() {
@@ -295,8 +296,8 @@ void Map::update() {
 bool Map::updateTiles() {
     bool changed = false;
 
-    for (std::pair<std::string, Source&> pair : sources) {
-        Source& source = pair.second;
+    for (auto &pair : sources) {
+        Source &source = *pair.second;
         if (source.enabled) {
             changed = source.update() || changed;
         }
@@ -333,10 +334,10 @@ bool Map::render() {
 
     bool is_baselayer = true;
 
-    for (std::pair<std::string, Source&> pair : sources) {
-        Source& source = pair.second;
+    for (auto &pair : sources) {
+        Source &source = *pair.second;
         source.prepare_render(is_baselayer);
-        is_baselayer =  source.enabled ? false : (true && is_baselayer);
+        is_baselayer = source.enabled ? false : (true && is_baselayer);
     }
 
     painter.finishClippingMask();
@@ -346,10 +347,10 @@ bool Map::render() {
 
     is_baselayer = true;
 
-    for (std::pair<std::string, Source&> pair : sources) {
-        Source& source = pair.second;
+    for (auto &pair : sources) {
+        Source &source = *pair.second;
         source.render(animationTime, is_baselayer);
-        is_baselayer =  source.enabled ? false : (true && is_baselayer);
+        is_baselayer = source.enabled ? false : (true && is_baselayer);
     }
 
     painter.renderMatte();

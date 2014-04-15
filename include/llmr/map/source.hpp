@@ -3,10 +3,11 @@
 
 #include <llmr/map/tile.hpp>
 #include <llmr/map/tile_data.hpp>
+#include <llmr/util/noncopyable.hpp>
 
 #include <forward_list>
 #include <memory>
-#include <list>
+#include <vector>
 #include <string>
 
 namespace llmr {
@@ -16,7 +17,7 @@ class Transform;
 class Painter;
 class Texturepool;
 
-class Source : public std::enable_shared_from_this<Source> {
+class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:
     enum class Type {
         vector,
@@ -24,7 +25,10 @@ public:
     };
 
 public:
-    Source(Map& map, Transform& transform, Painter& painter, Texturepool& texturepool, const char *url = "", Type type = Type::vector, std::list<uint32_t> zooms = {0}, uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 14, bool enabled = true);
+    Source(Map &map, Transform &transform, Painter &painter, Texturepool &texturepool,
+           const char *url = "", Type type = Type::vector, std::vector<uint32_t> zooms = {{0}},
+           uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 14,
+           bool enabled = true);
 
     bool update();
     void prepare_render(bool is_baselayer = false);
@@ -51,12 +55,12 @@ private:
     Painter& painter;
     Texturepool& texturepool;
 
-    Type type;
-    std::list<uint32_t> zooms;
+    const Type type;
+    const std::vector<uint32_t> zooms;
     const std::string url;
-    uint32_t tile_size;
-    uint32_t min_zoom;
-    uint32_t max_zoom;
+    const uint32_t tile_size;
+    const uint32_t min_zoom;
+    const uint32_t max_zoom;
 
     std::forward_list<Tile> tiles;
     std::forward_list<std::weak_ptr<TileData>> tile_data;
