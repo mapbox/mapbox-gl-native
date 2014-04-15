@@ -101,6 +101,12 @@ void Request::request(void *ptr) {
     code = curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &res.code);
 
+    // Add human-readable error code
+    if (code != CURLE_OK) {
+        res.error_message = curl_easy_strerror(code);
+        res.code = -1;
+    }
+
     if (code != CURLE_ABORTED_BY_CALLBACK) {
         req->background_function(&res);
     }

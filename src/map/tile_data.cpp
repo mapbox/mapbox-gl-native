@@ -58,7 +58,7 @@ void TileData::request() {
             tile->data.swap(res->body);
             tile->parse();
         } else {
-            fprintf(stderr, "tile loading failed (%s): %d\n", url.c_str(), res->code);
+            fprintf(stderr, "[%s] tile loading failed: %d, %s\n", url.c_str(), res->code, res->error_message.c_str());
         }
     }, []() {
         platform::restart();
