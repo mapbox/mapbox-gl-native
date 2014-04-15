@@ -11,7 +11,9 @@
 
 using namespace llmr;
 
-Source::Source(Map& map, Transform& transform, Painter& painter, Texturepool& texturepool, const char *url, Source::Type type, std::list<uint32_t> zooms, uint32_t tile_size, uint32_t min_zoom, uint32_t max_zoom, bool enabled)
+Source::Source(Map &map, Transform &transform, Painter &painter, Texturepool &texturepool,
+               const char *url, Source::Type type, std::vector<uint32_t> zooms, uint32_t tile_size,
+               uint32_t min_zoom, uint32_t max_zoom, bool enabled)
     : enabled(enabled),
       map(map),
       transform(transform),
@@ -22,8 +24,7 @@ Source::Source(Map& map, Transform& transform, Painter& painter, Texturepool& te
       url(url),
       tile_size(tile_size),
       min_zoom(min_zoom),
-      max_zoom(max_zoom) {
-}
+      max_zoom(max_zoom) {}
 
 bool Source::update() {
     return updateTiles();

@@ -83,7 +83,7 @@ private:
     GlyphAtlas glyphAtlas;
     Painter painter;
 
-    std::map<std::string, Source> sources;
+    std::map<std::string, const std::unique_ptr<Source>> sources;
 
     int32_t min_zoom;
     int32_t max_zoom;
