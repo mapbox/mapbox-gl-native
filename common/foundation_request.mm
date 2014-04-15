@@ -1,5 +1,11 @@
 #import "foundation_request.h"
 
+#include "TargetConditionals.h"
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#include <atomic>
+#endif
+
 #include <memory>
 #include <string>
 #include <functional>
@@ -12,6 +18,10 @@ dispatch_queue_t queue = nullptr;
 NSURLSession *session = nullptr;
 
 
+#if TARGET_OS_IPHONE
+std::atomic<int> active_tasks;
+#endif
+
 void request_initialize_cb() {
     queue = dispatch_queue_create("Parsing", DISPATCH_QUEUE_CONCURRENT);
 
@@ -21,6 +31,10 @@ void request_initialize_cb() {
     sessionConfig.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
 
     session = [NSURLSession sessionWithConfiguration:sessionConfig];
+
+#if TARGET_OS_IPHONE
+    active_tasks = 0;
+#endif
 }
 
 namespace llmr {
@@ -28,7 +42,20 @@ namespace llmr {
 class platform::Request {
 public:
     Request(NSURLSessionDataTask *task, const std::string &original_url)
-        : task(task), original_url(original_url) {}
+        : task(task), original_url(original_url) {
+        #if TARGET_OS_IPHONE
+            active_tasks++;
+            [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:active_tasks];
+        #endif
+    }
+
+#if TARGET_OS_IPHONE
+    ~Request() {
+        active_tasks--;
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:active_tasks];
+    }
+#endif
+
     NSURLSessionDataTask *task;
     std::string original_url;
 };
@@ -43,14 +70,13 @@ platform::request_http(const std::string &url, std::function<void(Response *)> b
     NSURLSessionDataTask *task = [session
                                   dataTaskWithURL:[NSURL URLWithString:@(url.c_str())]
                                   completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        // Make sure we clear the shared_ptr to resolve the circular reference. We're referencing
-        // this shared_ptr by value so that the object stays around until this completion handler is
-        // invoked.
-        req.reset();
-
         if ([error code] == NSURLErrorCancelled) {
-            // We intentionally cancelled this request. Do nothing.
-            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+            // We intentionally cancelled this request.
+            // Make sure we clear the shared_ptr to resolve the circular reference. We're referencing
+            // this shared_ptr by value so that the object stays around until this completion handler is
+            // invoked.
+            req.reset();
+
             return;
         }
 
@@ -68,16 +94,18 @@ platform::request_http(const std::string &url, std::function<void(Response *)> b
             background_function(&res);
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {
-                foreground_callback();
+                // Make sure we clear the shared_ptr to resolve the circular reference. We're referencing
+                // this shared_ptr by value so that the object stays around until this completion handler is
+                // invoked.
+                req.reset();
 
-                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+                foreground_callback();
             });
         });
     }];
 
     req = std::make_shared<Request>(task, url);
     [task resume];
-    [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
     return req;
 }
 

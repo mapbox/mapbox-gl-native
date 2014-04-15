@@ -133,6 +133,7 @@
         'GCC_INPUT_FILETYPE':'sourcecode.cpp.cpp',
         'OTHER_CPLUSPLUSFLAGS':[
           '<@(png_cflags)',
+          '<@(uv_cflags)',
           '-I<(boost_root)/include',
         ]
       },
@@ -140,7 +141,8 @@
           './include'
       ],
       'cflags': [
-          '<@(png_cflags)'
+          '<@(png_cflags)',
+          '<@(uv_cflags)',
           '-I<(boost_root)/include',
       ],
       'direct_dependent_settings': {
@@ -148,23 +150,27 @@
               './include'
           ],
           'cflags': [
-              '<@(png_cflags)'
+              '<@(png_cflags)',
+              '<@(uv_cflags)',
           ],
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS':[
-                '<@(png_cflags)'
+                '<@(png_cflags)',
+                '<@(uv_cflags)',
             ]
           },
           'conditions': [
             ['OS == "mac"', {
               'xcode_settings': {
                 'OTHER_LDFLAGS': [
-                    '<@(png_libraries)'
+                    '<@(png_libraries)',
+                    '<@(uv_libraries)',
                 ]
               }
             }, {
               'libraries': [
-                '<@(png_libraries)'
+                '<@(png_libraries)',
+                '<@(uv_libraries)',
               ]
             }]
           ]

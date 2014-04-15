@@ -71,7 +71,6 @@ MBXViewController *view = nullptr;
     map->loadSettings();
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateRender:) name:MBXNeedsRenderNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateNetworkActivity:) name:MBXUpdateActivityNotification object:nil];
 }
 
 
@@ -157,14 +156,6 @@ MBXViewController *view = nullptr;
 - (void)updateRender
 {
     self.paused = NO;
-}
-
-- (void)updateNetworkActivity:(NSNotification *)notification
-{
-    [[NSURLSession sharedSession] getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks)
-     {
-         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:([downloadTasks count] > 0)];
-     }];
 }
 
 #pragma mark - Rendering delegates
