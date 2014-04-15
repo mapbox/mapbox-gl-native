@@ -188,8 +188,6 @@ bool Source::updateTiles() {
     int32_t min_covering_zoom = zoom - 10;
     if (min_covering_zoom < min_zoom) min_covering_zoom = min_zoom;
 
-    int32_t max_dim = pow(2, zoom);
-
     // Map four viewport corners to pixel coordinates
     box box = map.cornersToBox(zoom);
 
