@@ -130,7 +130,7 @@ void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id) {
     plainShader->setColor(style.computed.background.color);
     plainShader->setOpacity(style.computed.background.opacity);
 
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilFunc(GL_ALWAYS, clip_id, 0xFF);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
 
@@ -161,6 +161,7 @@ void Painter::render(const Tile& tile) {
     frameHistory.record(transform.getNormalizedZoom());
 
     matrix = tile.matrix;
+    glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
 
     renderLayers(tile.data, style.layers);
 
