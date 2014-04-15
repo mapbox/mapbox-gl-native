@@ -14,15 +14,22 @@ llmr: config.gypi llmr.gyp
 
 ##### Test cases ###############################################################
 
-# Runs the test cases
-test: config.gypi test/test.gyp
+build/test/Makefile: config.gypi test/test.gyp
 	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
+
+test: build/test/Makefile
 	make -C build/test V=$(V) test
 
+# Runs all test cases
 run-tests: test
 	@for FILE in build/Release/test_*; do \
 		$${FILE}; \
 	done
+
+# Only runs headless test case
+run-headless-test: build/test/Makefile
+	make -C build/test BUILDTYPE=Debug V=$(V) headless
+	build/Debug/test_headless
 
 
 ##### Makefile builds ##########################################################
@@ -60,8 +67,9 @@ lproj: config.gypi linux/llmr-app.gyp
 
 clean:
 	-rm -rf ./build/Release
+	-rm -rf ./build/Debug
 
 distclean: clean
 	-rm -rf ./build
 
-.PHONY: llmr test linux
+.PHONY: llmr test linux build/test/Makefile
