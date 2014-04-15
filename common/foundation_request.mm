@@ -4,7 +4,24 @@
 #include <string>
 #include <functional>
 #include <llmr/platform/platform.hpp>
+#include <uv.h>
 
+
+uv_once_t request_initialize = UV_ONCE_INIT;
+dispatch_queue_t queue = nullptr;
+NSURLSession *session = nullptr;
+
+
+void request_initialize_cb() {
+    queue = dispatch_queue_create("Parsing", DISPATCH_QUEUE_CONCURRENT);
+
+    NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+    sessionConfig.timeoutIntervalForResource = 6;
+    sessionConfig.HTTPMaximumConnectionsPerHost = 8;
+    sessionConfig.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
+
+    session = [NSURLSession sessionWithConfiguration:sessionConfig];
+}
 
 namespace llmr {
 
@@ -19,8 +36,11 @@ public:
 std::shared_ptr<platform::Request>
 platform::request_http(const std::string &url, std::function<void(Response *)> background_function,
                        std::function<void()> foreground_callback) {
+
+    uv_once(&request_initialize, request_initialize_cb);
+
     __block std::shared_ptr<Request> req;
-    NSURLSessionDataTask *task = [[NSURLSession sharedSession]
+    NSURLSessionDataTask *task = [session
                                   dataTaskWithURL:[NSURL URLWithString:@(url.c_str())]
                                   completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         // Make sure we clear the shared_ptr to resolve the circular reference. We're referencing
@@ -34,22 +54,24 @@ platform::request_http(const std::string &url, std::function<void(Response *)> b
             return;
         }
 
-        Response res;
+        dispatch_async(queue, ^(){
+            Response res;
 
-        if (!error && [response isKindOfClass:[NSHTTPURLResponse class]]) {
-            res.code = [(NSHTTPURLResponse *)response statusCode];
-            res.body = {(const char *)[data bytes], [data length]};
-        } else {
-            res.code = -1;
-            res.error_message = [[error localizedDescription] UTF8String];
-        }
+            if (!error && [response isKindOfClass:[NSHTTPURLResponse class]]) {
+                res.code = [(NSHTTPURLResponse *)response statusCode];
+                res.body = {(const char *)[data bytes], [data length]};
+            } else {
+                res.code = -1;
+                res.error_message = [[error localizedDescription] UTF8String];
+            }
 
-        background_function(&res);
+            background_function(&res);
 
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
-            foreground_callback();
+            dispatch_async(dispatch_get_main_queue(), ^(void) {
+                foreground_callback();
 
-            [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:MBXUpdateActivityNotification object:nil];
+            });
         });
     }];
 
