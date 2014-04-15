@@ -12,17 +12,17 @@
 using namespace llmr;
 
 Source::Source(Map& map, Transform& transform, Painter& painter, Texturepool& texturepool, const char *url, Source::Type type, std::list<uint32_t> zooms, uint32_t tile_size, uint32_t min_zoom, uint32_t max_zoom, bool enabled)
-    : map(map),
+    : enabled(enabled),
+      map(map),
       transform(transform),
       painter(painter),
       texturepool(texturepool),
-      url(url),
       type(type),
       zooms(zooms),
+      url(url),
       tile_size(tile_size),
       min_zoom(min_zoom),
-      max_zoom(max_zoom),
-      enabled(enabled) {
+      max_zoom(max_zoom) {
 }
 
 bool Source::update() {
