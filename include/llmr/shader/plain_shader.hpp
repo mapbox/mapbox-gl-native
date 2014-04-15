@@ -13,15 +13,12 @@ public:
 
     void setColor(float r, float g, float b, float a);
     void setColor(const std::array<float, 4>& color);
-    void setOpacity(float opacity);
 
 private:
     int32_t a_pos = -1;
 
     std::array<float, 4> color = {{}};
     int32_t u_color = -1;
-    float opacity = 0.0f;
-    float u_opacity = 0.0f;
 };
 
 }

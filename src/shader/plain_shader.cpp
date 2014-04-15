@@ -20,13 +20,11 @@ PlainShader::PlainShader()
 
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_color = glGetUniformLocation(program, "u_color");
-    u_opacity = glGetUniformLocation(program, "u_opacity");
 
     // fprintf(stderr, "PlainShader:\n");
     // fprintf(stderr, "    - a_pos: %d\n", a_pos);
     // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
     // fprintf(stderr, "    - u_color: %d\n", u_color);
-    // fprintf(stderr, "    - u_opacity: %f\n", u_opacity);
 }
 
 void PlainShader::bind(char *offset) {
@@ -43,11 +41,4 @@ void PlainShader::setColor(const std::array<float, 4>& new_color) {
 
 void PlainShader::setColor(float r, float g, float b, float a) {
     setColor({{ r, g, b, a }});
-}
-
-void PlainShader::setOpacity(float new_opacity) {
-    if (opacity != new_opacity) {
-        glUniform1f(u_opacity, new_opacity);
-        opacity = new_opacity;
-    }
 }
