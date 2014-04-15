@@ -128,13 +128,23 @@ struct TextProperties {
 
 struct BackgroundClass {
     Color color = {{ 1, 1, 1, 1 }};
+    FunctionProperty opacity = 1;
 };
-
 
 struct BackgroundProperties {
     Color color = {{ 1, 1, 1, 1 }};
+    float opacity = 1.0;
 };
 
+struct RasterClass {
+    FunctionProperty enabled = true;
+    FunctionProperty opacity = 1;
+};
+
+struct RasterProperties {
+    bool enabled = true;
+    float opacity = 1.0;
+};
 
 }
 

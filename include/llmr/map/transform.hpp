@@ -56,8 +56,7 @@ public:
     void startScaling();
     void stopScaling();
 
-    // Temporary
-    box mapCornersToBox(uint32_t z) const;
+    box cornersToBox(uint32_t z) const;
 
     // More getters
     inline uint16_t getWidth() const { return width; }

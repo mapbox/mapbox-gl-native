@@ -76,11 +76,12 @@ void Style::cascade(float z) {
             point.image = layer.image;
         }
 
+        // Cascade text classes
         for (const auto& text_pair : sheetClass.text) {
             const std::string& layer_name = text_pair.first;
             const llmr::TextClass& layer = text_pair.second;
 
-            // TODO: This should be restricted to point styles that have actual
+            // TODO: This should be restricted to text styles that have actual
             // values so as to not override with default values.
             llmr::TextProperties& text = computed.texts[layer_name];
             text.enabled = layer.enabled.evaluate<bool>(z);
@@ -92,8 +93,21 @@ void Style::cascade(float z) {
             text.alwaysVisible = layer.alwaysVisible.evaluate<bool>(z);
         }
 
+        // Cascade raster classes
+        for (const auto& raster_pair : sheetClass.raster) {
+            const std::string& layer_name = raster_pair.first;
+            const llmr::RasterClass& layer = raster_pair.second;
+
+            // TODO: This should be restricted to raster styles that have actual
+            // values so as to not override with default values.
+            llmr::RasterProperties& raster = computed.rasters[layer_name];
+            raster.enabled = layer.enabled.evaluate<bool>(z);
+            raster.opacity = layer.opacity.evaluate<float>(z);
+        }
+
         // Cascade background
         computed.background.color = sheetClass.background.color;
+        computed.background.opacity = sheetClass.background.opacity.evaluate<float>(z);
     }
 }
 

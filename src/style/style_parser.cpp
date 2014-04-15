@@ -254,10 +254,12 @@ void StyleParser::parseClass(const std::string& name, JSVal value, ClassDescript
                     class_desc.point.insert({ name, std::forward<PointClass>(parsePointClass(value)) });
                 } else if (type_name == "text") {
                     class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
+                } else if (type_name == "raster") {
+                    class_desc.raster.insert({ name, std::forward<RasterClass>(parseRasterClass(value)) });
                 } else if (type_name == "background") {
                     class_desc.background = parseBackgroundClass(value);
                 } else {
-                    throw Style::exception("unkonwn class type name");
+                    throw Style::exception("unknown class type name");
                 }
             } else {
                 throw Style::exception("style class type must be a string");
@@ -502,11 +504,29 @@ TextClass StyleParser::parseTextClass(JSVal value) {
     return klass;
 }
 
+RasterClass StyleParser::parseRasterClass(JSVal value) {
+    RasterClass klass;
+
+    if (value.HasMember("enabled")) {
+        klass.enabled = parseFunction(value["enabled"]);
+    }
+
+    if (value.HasMember("opacity")) {
+        klass.opacity = parseFunction(value["opacity"]);
+    }
+
+    return klass;
+}
+
 BackgroundClass StyleParser::parseBackgroundClass(JSVal value) {
     BackgroundClass klass;
 
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
+    }
+
+    if (value.HasMember("opacity")) {
+        klass.opacity = parseFunction(value["opacity"]);
     }
 
     return klass;

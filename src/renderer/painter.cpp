@@ -9,6 +9,7 @@
 #include <llmr/renderer/line_bucket.hpp>
 #include <llmr/renderer/point_bucket.hpp>
 #include <llmr/renderer/text_bucket.hpp>
+#include <llmr/renderer/raster_bucket.hpp>
 
 #include <llmr/map/transform.hpp>
 #include <llmr/map/settings.hpp>
@@ -123,13 +124,13 @@ void Painter::prepareClippingMask() {
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 }
 
-void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id, bool opaque) {
+void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id) {
     plainShader->setMatrix(matrix);
-    if (opaque) {
-        plainShader->setColor(style.computed.background.color);
-    }
 
-    glStencilFunc(GL_ALWAYS, clip_id, 0xFF);
+    plainShader->setColor(style.computed.background.color);
+    plainShader->setOpacity(style.computed.background.opacity);
+
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
 
@@ -160,29 +161,12 @@ void Painter::render(const Tile& tile) {
     frameHistory.record(transform.getNormalizedZoom());
 
     matrix = tile.matrix;
-    glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
 
-    if (tile.data->use_raster) {
-        renderRaster(tile.data);
-    } else {
-        renderLayers(tile.data, style.layers);
-    }
+    renderLayers(tile.data, style.layers);
 
     if (settings.debug) {
         renderDebug(tile.data);
     }
-}
-
-void Painter::renderRaster(const std::shared_ptr<TileData>& tile_data) {
-    useProgram(rasterShader->program);
-    rasterShader->setMatrix(matrix);
-    rasterShader->setImage(0);
-    rasterShader->setOpacity(tile_data->raster->opacity);
-    tile_data->raster->bind(true);
-
-    coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
-    glDepthRange(strata, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
 
 void Painter::renderLayers(const std::shared_ptr<TileData>& tile_data, const std::vector<LayerDescription>& layers) {
@@ -226,12 +210,35 @@ void Painter::renderLayer(const std::shared_ptr<TileData>& tile_data, const Laye
     } else {
         // This is a singular layer. Try to find the bucket associated with
         // this layer and render it.
-        auto bucket_it = tile_data->buckets.find(layer_desc.bucket_name);
-        if (bucket_it != tile_data->buckets.end()) {
-            assert(bucket_it->second);
-            bucket_it->second->render(*this, layer_desc.name, tile_data->id);
+        if (style.buckets[layer_desc.bucket_name].type == BucketType::Raster) {
+            if (tile_data && tile_data->raster) {
+                renderRaster(layer_desc.name, tile_data);
+            }
+        } else {
+            auto bucket_it = tile_data->buckets.find(layer_desc.bucket_name);
+            if (bucket_it != tile_data->buckets.end()) {
+                assert(bucket_it->second);
+                bucket_it->second->render(*this, layer_desc.name, tile_data->id);
+            }
         }
     }
+}
+
+void Painter::renderRaster(const std::string& layer_name, const std::shared_ptr<TileData>& tile_data) {
+    if (pass == Opaque) return;
+
+    const RasterProperties& properties = style.computed.rasters[layer_name];
+    if (!properties.enabled) return;
+
+    useProgram(rasterShader->program);
+    rasterShader->setMatrix(matrix);
+    rasterShader->setImage(0);
+    rasterShader->setOpacity(properties.opacity * tile_data->raster->opacity);
+    tile_data->raster->bind(true);
+
+    coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    glDepthRange(strata, 1.0f);
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
 
 void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id) {

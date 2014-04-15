@@ -24,7 +24,7 @@ const shader_source llmr::shaders[SHADER_COUNT] = {
    },
    {
        "#version 120\nattribute vec2 a_pos;\nuniform mat4 u_matrix;\nvoid main ()\n{\n  vec4 tmpvar_1;\n  tmpvar_1.zw = vec2(0.0, 1.0);\n  tmpvar_1.xy = a_pos;\n  gl_Position = (u_matrix * tmpvar_1);\n}\n\n",
-       "#version 120\nuniform vec4 u_color;\nvoid main ()\n{\n  gl_FragColor = u_color;\n}\n\n",
+       "#version 120\nuniform vec4 u_color;\nuniform float u_opacity;\nvoid main ()\n{\n  gl_FragColor = (u_color * u_opacity);\n}\n\n",
    },
    {
        "#version 120\nattribute vec2 a_pos;\nuniform mat4 u_matrix;\nuniform float u_size;\nvoid main ()\n{\n  vec4 tmpvar_1;\n  tmpvar_1.zw = vec2(0.0, 1.0);\n  tmpvar_1.xy = a_pos;\n  gl_Position = (u_matrix * tmpvar_1);\n  gl_PointSize = u_size;\n}\n\n",
