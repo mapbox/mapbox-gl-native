@@ -53,7 +53,7 @@ private:
 
     Type type;
     std::list<uint32_t> zooms;
-    const char *url;
+    const std::string url;
     uint32_t tile_size;
     uint32_t min_zoom;
     uint32_t max_zoom;

@@ -13,17 +13,16 @@ using namespace llmr;
 
 TileData::TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const std::string url,  const bool is_raster)
     : id(id),
-      url(url),
       state(State::initial),
-      is_raster(is_raster),
       raster(),
+      url(url),
+      is_raster(is_raster),
       style(style),
       glyphAtlas(glyphAtlas) {
 
     // Initialize tile debug coordinates
-    char coord[32];
-    snprintf(coord, sizeof(coord), "%d/%d/%d", id.z, id.x, id.y);
-    debugFontBuffer.addText(coord, 50, 200, 5);
+    const std::string str = util::sprintf<32>("%d/%d/%d", id.z, id.x, id.y);
+    debugFontBuffer.addText(str.c_str(), 50, 200, 5);
 }
 
 TileData::~TileData() {
@@ -32,7 +31,7 @@ TileData::~TileData() {
 }
 
 const std::string TileData::toString() const {
-    return util::sprintf("[tile %d/%d/%d]", id.z, id.x, id.y);
+    return util::sprintf<32>("[tile %d/%d/%d]", id.z, id.x, id.y);
 }
 
 void TileData::request() {

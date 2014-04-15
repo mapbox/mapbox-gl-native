@@ -1,6 +1,8 @@
 #ifndef LLMR_RENDERER_GL
 #define LLMR_RENDERER_GL
 
+#include <string>
+
 #ifdef NVIDIA
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>
@@ -32,6 +34,28 @@
     #include <GL/glu.h>
     #include <GL/glext.h>
 #endif
+
+namespace llmr {
+namespace gl {
+// Debug group markers, useful for debuggin on iOS
+inline void start_group(const std::string &str) {
+#if GL_EXT_debug_marker
+    glPushGroupMarkerEXT(0, str.c_str());
+#endif
+}
+
+inline void end_group() {
+#if GL_EXT_debug_marker
+    glPopGroupMarkerEXT();
+#endif
+}
+
+struct group {
+    inline group(const std::string &str) { start_group(str); }
+    ~group() { end_group(); };
+};
+}
+}
 
 #ifdef GL_ES_VERSION_2_0
     #define glClearDepth glClearDepthf

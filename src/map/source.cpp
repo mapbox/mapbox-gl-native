@@ -110,9 +110,9 @@ TileData::State Source::addTile(const Tile::ID& id) {
         std::string formed_url;
 
         if (type == Source::Type::vector) {
-            formed_url = util::sprintf(url, normalized_id.z, normalized_id.x, normalized_id.y);
+            formed_url = util::sprintf<256>(url, normalized_id.z, normalized_id.x, normalized_id.y);
         } else {
-            formed_url = util::sprintf(url, normalized_id.z, normalized_id.x, normalized_id.y, (map.getPixelRatio() > 1.0 ? "@2x" : ""));
+            formed_url = util::sprintf<256>(url, normalized_id.z, normalized_id.x, normalized_id.y, (map.getPixelRatio() > 1.0 ? "@2x" : ""));
         }
 
         new_tile.data = std::make_shared<TileData>(normalized_id, map.getStyle(), map.getGlyphAtlas(), formed_url, (type == Source::Type::raster));

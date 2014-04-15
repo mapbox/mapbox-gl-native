@@ -18,6 +18,7 @@
 #include <llmr/style/style.hpp>
 #include <llmr/style/sprite.hpp>
 #include <llmr/util/raster.hpp>
+#include <llmr/util/string.hpp>
 
 using namespace llmr;
 
@@ -116,6 +117,7 @@ void Painter::changeMatrix() {
 }
 
 void Painter::prepareClippingMask() {
+    gl::start_group("clipping masks");
     useProgram(plainShader->program);
     glDisable(GL_DEPTH_TEST);
     depthMask(false);
@@ -125,6 +127,7 @@ void Painter::prepareClippingMask() {
 }
 
 void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id) {
+    gl::group group("mask");
     plainShader->setMatrix(matrix);
 
     plainShader->setColor(style.computed.background.color);
@@ -138,9 +141,11 @@ void Painter::finishClippingMask() {
     glEnable(GL_DEPTH_TEST);
     depthMask(true);
     glStencilMask(0x0);
+    gl::end_group();
 }
 
 void Painter::clear() {
+    gl::group group("clear");
     glStencilMask(0xFF);
     depthMask(true);
 #ifdef NVIDIA
@@ -153,6 +158,8 @@ void Painter::clear() {
 }
 
 void Painter::render(const Tile& tile) {
+    gl::group group(util::sprintf<32>("render %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
+
     assert(tile.data);
     if (tile.data->state != TileData::State::parsed) {
         return;
@@ -176,6 +183,7 @@ void Painter::renderLayers(const std::shared_ptr<TileData>& tile_data, const std
     // - FIRST PASS ------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque
     // objects first.
+    gl::start_group("opaque pass");
     pass = Opaque;
     glDisable(GL_BLEND);
     depthMask(true);
@@ -186,10 +194,12 @@ void Painter::renderLayers(const std::shared_ptr<TileData>& tile_data, const std
         strata = i * strata_thickness;
         renderLayer(tile_data, *it);
     }
+    gl::end_group();
 
     // - SECOND PASS -----------------------------------------------------------
     // Make a second pass, rendering translucent objects. This time, we render
     // bottom-to-top.
+    gl::start_group("translucent pass");
     pass = Translucent;
     glEnable(GL_BLEND);
     depthMask(false);
@@ -200,6 +210,7 @@ void Painter::renderLayers(const std::shared_ptr<TileData>& tile_data, const std
         strata = i * strata_thickness;
         renderLayer(tile_data, *it);
     }
+    gl::end_group();
 }
 
 void Painter::renderLayer(const std::shared_ptr<TileData>& tile_data, const LayerDescription& layer_desc) {
@@ -230,6 +241,8 @@ void Painter::renderRaster(const std::string& layer_name, const std::shared_ptr<
 
     const RasterProperties& properties = style.computed.rasters[layer_name];
     if (!properties.enabled) return;
+
+    gl::group group(layer_name + " (raster)");
 
     useProgram(rasterShader->program);
     rasterShader->setMatrix(matrix);
@@ -268,6 +281,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         stroke_color = fill_color;
     }
 
+    gl::group group(layer_name + " (fill)");
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (outline && pass == Translucent) {
@@ -393,6 +407,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     color[3] *= properties.opacity;
 
 
+    gl::group group(layer_name + " (line)");
     glDepthRange(strata, 1.0f);
 
     // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
@@ -459,6 +474,8 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     const PointProperties& properties = style.computed.points[layer_name];
     if (!properties.enabled) return;
 
+    gl::group group(layer_name + " (point)");
+
     Color color = properties.color;
     color[0] *= properties.opacity;
     color[1] *= properties.opacity;
@@ -500,6 +517,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 
     const TextProperties& properties = style.computed.texts[layer_name];
     if (!properties.enabled) return;
+
+    gl::group group(layer_name + " (text)");
 
     mat4 exMatrix;
     matrix::copy(exMatrix, projMatrix);
@@ -594,6 +613,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 }
 
 void Painter::renderDebug(const TileData::Ptr& tile_data) {
+    gl::group group("debug");
+
     // Disable depth test and don't count this towards the depth buffer,
     // but *don't* disable stencil test, as we want to clip the red tile border
     // to the tile viewport.
@@ -621,6 +642,7 @@ void Painter::renderDebug(const TileData::Ptr& tile_data) {
 }
 
 void Painter::renderMatte() {
+    gl::group group("matte");
     glDisable(GL_DEPTH_TEST);
     glStencilFunc(GL_EQUAL, 0x0, 0xFF);
 
