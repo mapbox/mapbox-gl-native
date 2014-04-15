@@ -70,6 +70,10 @@ void Map::loadSettings() {
     update();
 }
 
+void Map::resize(uint16_t width, uint16_t height, float ratio) {
+    resize(width, height, ratio, width * ratio, height * ratio);
+}
+
 void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height) {
     transform.resize(width, height, ratio, fb_width, fb_height);
     painter.resize();
