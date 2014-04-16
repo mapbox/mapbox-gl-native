@@ -46,10 +46,6 @@ TEST(Headless, initialize) {
         kCGLPFAOpenGLProfile,
         (CGLPixelFormatAttribute) kCGLOGLPVersion_Legacy,
         kCGLPFAAccelerated,
-        kCGLPFAColorSize, (CGLPixelFormatAttribute)24,
-        kCGLPFAAlphaSize, (CGLPixelFormatAttribute)8,
-        kCGLPFAStencilSize, (CGLPixelFormatAttribute)8,
-        kCGLPFADepthSize, (CGLPixelFormatAttribute)24,
         (CGLPixelFormatAttribute) 0
     };
 
@@ -83,25 +79,24 @@ TEST(Headless, initialize) {
     glGenRenderbuffersEXT(1, &fbo_depth_stencil);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo_depth_stencil);
     glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, width, height);
-    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER_EXT, fbo_depth_stencil);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 
     GLuint fbo_color = 0;
     glGenRenderbuffersEXT(1, &fbo_color);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo_color);
     glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_RGBA8, width, height);
-    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, fbo_color);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
-
 
     GLuint fbo = 0;
     glGenFramebuffersEXT(1, &fbo);
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 
     glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, fbo_color);
-    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo_depth_stencil);
+    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER_EXT, fbo_depth_stencil);
 
     GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+
+
 
     if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
         fprintf(stderr, "Couldn't create framebuffer: ");
