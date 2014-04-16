@@ -12,7 +12,6 @@
 #include <llmr/renderer/raster_bucket.hpp>
 
 #include <llmr/map/transform.hpp>
-#include <llmr/map/settings.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/platform/gl.hpp>
 #include <llmr/style/style.hpp>
@@ -24,9 +23,8 @@ using namespace llmr;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(Transform& transform, Settings& settings, Style& style, GlyphAtlas& glyphAtlas)
+Painter::Painter(Transform& transform, Style& style, GlyphAtlas& glyphAtlas)
     : transform(transform),
-      settings(settings),
       style(style),
       glyphAtlas(glyphAtlas) {
 }
@@ -79,6 +77,10 @@ void Painter::setupShaders() {
 void Painter::resize() {
     assert(transform.getFramebufferWidth() > 0 && transform.getFramebufferHeight() > 0);
     glViewport(0, 0, transform.getFramebufferWidth(), transform.getFramebufferHeight());
+}
+
+void Painter::setDebug(bool enabled) {
+    debug = enabled;
 }
 
 void Painter::useProgram(uint32_t program) {
@@ -178,7 +180,7 @@ void Painter::render(const Tile& tile) {
 
     renderLayers(tile.data, style.layers);
 
-    if (settings.debug) {
+    if (debug) {
         renderDebug(tile.data);
     }
 }

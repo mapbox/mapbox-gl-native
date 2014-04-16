@@ -17,7 +17,7 @@ Map::Map(Settings& settings)
       texturepool(),
       style(),
       glyphAtlas(1024, 1024),
-      painter(transform, settings, style, glyphAtlas) {
+      painter(transform, style, glyphAtlas) {
 }
 
 Map::~Map() {
@@ -65,6 +65,7 @@ void Map::loadSettings() {
     transform.setAngle(settings.angle);
     transform.setScale(settings.scale);
     transform.setLonLat(settings.longitude, settings.latitude);
+    painter.setDebug(settings.debug);
     update();
 }
 
@@ -256,6 +257,7 @@ void Map::resetZoom() {
 
 void Map::toggleDebug() {
     settings.debug = !settings.debug;
+    painter.setDebug(settings.debug);
     update();
 
     settings.persist();

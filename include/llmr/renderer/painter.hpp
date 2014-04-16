@@ -20,7 +20,6 @@
 namespace llmr {
 
 class Transform;
-class Settings;
 class Style;
 class Tile;
 
@@ -32,7 +31,7 @@ class RasterBucket;
 
 class Painter : private util::noncopyable {
 public:
-    Painter(Transform& transform, Settings& settings, Style& style, GlyphAtlas& glyphAtlas);
+    Painter(Transform& transform, Style& style, GlyphAtlas& glyphAtlas);
 
     void setup();
     void clear();
@@ -46,6 +45,9 @@ public:
     void renderRaster(const std::string& layer_name, const std::shared_ptr<TileData>& tile_data);
 
     void resize();
+
+    // Changes whether debug information is drawn onto the map
+    void setDebug(bool enabled);
 
     void prepareClippingMask();
     void drawClippingMask(const mat4& matrix, uint8_t clip_id);
@@ -70,11 +72,12 @@ public:
 
 private:
     Transform& transform;
-    Settings& settings;
     Style& style;
     GlyphAtlas& glyphAtlas;
 
     FrameHistory frameHistory;
+
+    bool debug = false;
 
     uint32_t gl_program = 0;
     float gl_lineWidth = 0;
