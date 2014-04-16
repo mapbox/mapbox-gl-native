@@ -2,10 +2,14 @@
 #include <llmr/text/rotation_range.hpp>
 #include <llmr/util/math.hpp>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wdeprecated-register"
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/geometry/index/rtree.hpp>
+#pragma clang diagnostic pop
 
 namespace llmr {
 namespace bg = boost::geometry;
