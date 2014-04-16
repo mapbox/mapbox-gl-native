@@ -39,12 +39,16 @@ namespace llmr {
 namespace gl {
 // Debug group markers, useful for debuggin on iOS
 #if GL_EXT_debug_marker
+// static int indent = 0;
 inline void start_group(const std::string &str) {
     glPushGroupMarkerEXT(0, str.c_str());
+    // fprintf(stderr, "%s%s\n", std::string(indent * 4, ' ').c_str(), str.c_str());
+    // indent++;
 }
 
 inline void end_group() {
     glPopGroupMarkerEXT();
+    // indent--;
 }
 #else
 inline void start_group(const std::string &) {}
