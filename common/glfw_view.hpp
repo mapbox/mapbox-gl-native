@@ -1,8 +1,8 @@
 #ifndef LLMR_COMMON_GLFW_VIEW
 #define LLMR_COMMON_GLFW_VIEW
 
-#include <GLFW/glfw3.h>
 #include <llmr/llmr.hpp>
+#include <GLFW/glfw3.h>
 
 class MapView {
 public:
