@@ -84,11 +84,6 @@ private:
     Painter painter;
 
     std::map<std::string, const std::unique_ptr<Source>> sources;
-
-    int32_t min_zoom;
-    int32_t max_zoom;
-
-    // float pixel_ratio;
 };
 
 }

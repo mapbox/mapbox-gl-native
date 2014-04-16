@@ -79,10 +79,8 @@ void Transform::scaleBy(double ds, double cx, double cy, double duration) {
     // clamp scale to min/max values
     double new_scale = scale * ds;
     if (new_scale < min_scale) {
-        ds = min_scale / scale;
         new_scale = min_scale;
     } else if (new_scale > max_scale) {
-        ds = max_scale / scale;
         new_scale = max_scale;
     }
 

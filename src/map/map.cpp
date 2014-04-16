@@ -17,9 +17,7 @@ Map::Map(Settings& settings)
       texturepool(),
       style(),
       glyphAtlas(1024, 1024),
-      painter(transform, settings, style, glyphAtlas),
-      min_zoom(0),
-      max_zoom(21) {
+      painter(transform, settings, style, glyphAtlas) {
 }
 
 Map::~Map() {

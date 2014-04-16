@@ -3,10 +3,10 @@
 
 using namespace llmr;
 
-RasterBucket::RasterBucket(const BucketDescription& bucket_desc) {
+RasterBucket::RasterBucket(const BucketDescription &bucket_desc) {
 }
 
-void RasterBucket::render(Painter& painter, const std::string& layer_name, const Tile::ID& id) {
+void RasterBucket::render(Painter &, const std::string &, const Tile::ID &) {
     // The painter renders rasters directly. This function is a no-op
     // and exists just to satisfy the abstract superclass requirements.
     // That way, we can avoid having raster buckets pass around

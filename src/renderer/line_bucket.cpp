@@ -63,7 +63,8 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     const JoinType join = geometry.join;
     const CapType cap = geometry.cap;
     const float miterLimit = geometry.miter_limit;
-    const float roundLimit = geometry.round_limit;
+    // TODO: use roundLimit
+    // const float roundLimit = geometry.round_limit;
 
     if (vertices.size() < 2) {
         // fprintf(stderr, "a line must have at least two vertices\n");

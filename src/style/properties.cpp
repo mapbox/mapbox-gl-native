@@ -8,11 +8,11 @@
 using namespace llmr;
 
 
-float functions::null(float z, const std::vector<float>&) {
+float functions::null(float, const std::vector<float>&) {
     return 0;
 }
 
-float functions::constant(float z, const std::vector<float>& values) {
+float functions::constant(float, const std::vector<float>& values) {
     assert(values.size() == 1);
     return values.front();
 }
