@@ -22,6 +22,33 @@
         },
     },
     {
+        'target_name': 'link_curl',
+        'type': 'none',
+        'direct_dependent_settings': {
+            'conditions': [
+                ['OS == "mac"', {
+                    'xcode_settings': {
+                        'OTHER_CPLUSPLUSFLAGS':[
+                            '<@(curl_cflags)',
+                        ],
+                        'OTHER_LDFLAGS': [
+                            '<@(curl_libraries)',
+                        ],
+                    },
+                }, {
+                    'cflags': [
+                        '<@(curl_cflags)',
+                    ],
+                    'link_settings': {
+                        'libraries': [
+                            '<@(curl_libraries)',
+                        ],
+                    },
+                }],
+            ],
+        },
+    },
+    {
         "target_name": "rotation_range",
         "product_name": "test_rotation_range",
         "type": "executable",
@@ -47,11 +74,14 @@
         "sources": [
             "./main.cpp",
             "./headless.cpp",
+            "../common/curl_request.hpp",
+            "../common/curl_request.cpp",
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
             "../llmr.gyp:llmr-x86",
             "link_gl",
+            "link_curl",
         ]
     },
     {

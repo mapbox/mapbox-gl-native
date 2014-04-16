@@ -8,28 +8,15 @@
 #include <llmr/util/image.hpp>
 #include <llmr/util/io.hpp>
 
+#include <uv.h>
+
 double llmr::platform::elapsed() {
     return 0;
 }
 
 void llmr::platform::restart() {
-    // TODO
+    // noop
 }
-
-std::shared_ptr<llmr::platform::Request>
-llmr::platform::request_http(const std::string &url, std::function<void(Response *)> background_function,
-                       std::function<void()> foreground_callback) {
-    // TODO
-    return nullptr;
-}
-
-void llmr::platform::cancel_request_http(const std::shared_ptr<Request> &req) {
-    // TODO
-}
-
-
-
-
 
 TEST(Headless, initialize) {
     llmr::Settings settings;
@@ -110,11 +97,16 @@ TEST(Headless, initialize) {
         return;
     }
 
+
     map.setup();
     map.resize(width, height);
     map.loadSettings();
 
     map.update();
+
+    // Run the loop. It will terminate when we don't have any further listeners.
+    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+
     map.render();
 
 
