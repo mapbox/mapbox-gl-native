@@ -64,15 +64,10 @@ public:
         glfwSetWindowSizeCallback(window, resize);
         glfwSetFramebufferSizeCallback(window, resize);
         glfwSetScrollCallback(window, scroll);
-        glfwSetCharCallback(window, character);
         glfwSetKeyCallback(window, key);
     }
 
-    static void character(GLFWwindow *window, unsigned int codepoint) {
-
-    }
-
-    static void key(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    static void key(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
         MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
 
         if (action == GLFW_RELEASE) {
@@ -96,7 +91,7 @@ public:
         }
     }
 
-    static void scroll(GLFWwindow *window, double xoffset, double yoffset) {
+    static void scroll(GLFWwindow *window, double /*xoffset*/, double yoffset) {
         MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
         double delta = yoffset * 40;
 

@@ -347,12 +347,9 @@ bool Map::render() {
     // Then, render each source's tiles. TODO: handle more than one
     // vector source.
 
-    is_baselayer = true;
-
     for (auto &pair : sources) {
         Source &source = *pair.second;
-        source.render(animationTime, is_baselayer);
-        is_baselayer = source.enabled ? false : (true && is_baselayer);
+        source.render(animationTime);
     }
 
     painter.renderMatte();

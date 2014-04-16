@@ -390,7 +390,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     }
 }
 
-void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
     // Abort early.
     if (pass == Opaque) return;
     if (bucket.empty()) return;
@@ -472,7 +472,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     }
 }
 
-void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& /*id&*/) {
     // Abort early.
     if (!bucket.hasPoints()) return;
     if (pass == Opaque) return;
@@ -516,7 +516,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     bucket.drawPoints(*pointShader);
 }
 
-void Painter::renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+void Painter::renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
     // Abort early.
     if (pass == Opaque) return;
     if (bucket.empty()) return;

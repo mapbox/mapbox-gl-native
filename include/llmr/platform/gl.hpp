@@ -38,17 +38,19 @@
 namespace llmr {
 namespace gl {
 // Debug group markers, useful for debuggin on iOS
-inline void start_group(const std::string &str) {
 #if GL_EXT_debug_marker
+inline void start_group(const std::string &str) {
     glPushGroupMarkerEXT(0, str.c_str());
-#endif
 }
 
 inline void end_group() {
-#if GL_EXT_debug_marker
     glPopGroupMarkerEXT();
-#endif
 }
+#else
+inline void start_group(const std::string &) {}
+inline void end_group() {}
+#endif
+
 
 struct group {
     inline group(const std::string &str) { start_group(str); }

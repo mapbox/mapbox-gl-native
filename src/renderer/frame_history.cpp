@@ -24,7 +24,7 @@ bool FrameHistory::needsAnimation(const float duration) const {
     const FrameSnapshot &pivot = history.back();
 
     int i = -1;
-    while (history.size() > i + 1 &&
+    while ((int)history.size() > i + 1 &&
            history[i + 1].time + duration < pivot.time) {
         i++;
     }
@@ -37,7 +37,7 @@ bool FrameHistory::needsAnimation(const float duration) const {
 
     // Make sure that all subsequent snapshots have the same zoom as the last
     // pivot element.
-    for (; history.size() > i; i++) {
+    for (; (int)history.size() > i; i++) {
         if (history[i].z != pivot.z) {
             return true;
         }

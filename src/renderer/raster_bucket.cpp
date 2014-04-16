@@ -3,7 +3,7 @@
 
 using namespace llmr;
 
-RasterBucket::RasterBucket(const BucketDescription &bucket_desc) {
+RasterBucket::RasterBucket(const BucketDescription &) {
 }
 
 void RasterBucket::render(Painter &, const std::string &, const Tile::ID &) {

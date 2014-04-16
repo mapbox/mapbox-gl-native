@@ -88,7 +88,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
 
     vec2<float> newAnchor = anchor;
 
-    if (line.size() <= segment) {
+    if ((int)line.size() <= segment) {
         return;
     }
     vec2<float> end = line[segment];
@@ -130,7 +130,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
         // skip duplicate nodes
         while (newAnchor == end) {
             segment += direction;
-            if (line.size() <= segment) {
+            if ((int)line.size() <= segment) {
                 anchor.scale = scale;
                 return;
             }

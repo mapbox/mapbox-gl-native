@@ -9,11 +9,9 @@
 using namespace llmr;
 
 
-const double MAXEXTENT = 20037508.34;
 const double D2R = M_PI / 180.0;
 const double R2D = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
-const double A = 6378137;
 
 
 Transform::Transform() {

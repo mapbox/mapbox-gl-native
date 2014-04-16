@@ -288,7 +288,7 @@ void FilteredVectorTileLayer::iterator::operator++() {
                     // tags are packed varints. They should have an even length.
                     pbf tags_pbf = feature_pbf.message();
                     while (tags_pbf) {
-                        uint32_t tag_key = tags_pbf.varint();
+                        int32_t tag_key = tags_pbf.varint();
                         if (tags_pbf) {
                             uint32_t tag_val = tags_pbf.varint();
                             // Now check if the tag_key/tag_val pair is included

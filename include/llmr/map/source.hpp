@@ -32,7 +32,7 @@ public:
 
     bool update();
     void prepare_render(bool is_baselayer = false);
-    void render(double animationTime, bool is_baselayer = false);
+    void render(double animationTime);
 
 public:
     bool enabled;
@@ -59,8 +59,8 @@ private:
     const std::vector<uint32_t> zooms;
     const std::string url;
     const uint32_t tile_size;
-    const uint32_t min_zoom;
-    const uint32_t max_zoom;
+    const int32_t min_zoom;
+    const int32_t max_zoom;
 
     std::forward_list<Tile> tiles;
     std::forward_list<std::weak_ptr<TileData>> tile_data;
