@@ -54,11 +54,11 @@ void readCallback(png_structp png, png_bytep data, png_size_t length) {
     }
 }
 
-void errorHandler(png_structp png, png_const_charp error_msg) {
+void errorHandler(png_structp, png_const_charp error_msg) {
     throw std::runtime_error(error_msg);
 }
 
-void warningHandler(png_structp png, png_const_charp error_msg) {
+void warningHandler(png_structp, png_const_charp error_msg) {
     fprintf(stderr, "PNG: %s\n", error_msg);
 }
 
@@ -122,13 +122,17 @@ void Raster::loadImage(const std::string& data) {
         char *surface = img;
         assert(surface);
 
-        png_bytep row_pointers[height];
+        struct ptrs {
+            ptrs(size_t count) : rows(new png_bytep[count]) {}
+            ~ptrs() { delete[] rows; }
+            png_bytep *rows = nullptr;
+        } pointers(height);
         for (unsigned i = 0; i < height; ++i) {
-            row_pointers[i] = (png_bytep)(surface + (i * rowbytes));
+            pointers.rows[i] = (png_bytep)(surface + (i * rowbytes));
         }
 
         // Read image data
-        png_read_image(png, row_pointers);
+        png_read_image(png, pointers.rows);
 
         png_read_end(png, nullptr);
 
