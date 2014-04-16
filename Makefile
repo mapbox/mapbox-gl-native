@@ -14,7 +14,7 @@ llmr: config.gypi llmr.gyp
 
 ##### Test cases ###############################################################
 
-build/test/Makefile: config.gypi test/test.gyp
+build/test/Makefile: src common config.gypi test/test.gyp
 	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
 
 test: build/test/Makefile
@@ -72,4 +72,4 @@ clean:
 distclean: clean
 	-rm -rf ./build
 
-.PHONY: llmr test linux build/test/Makefile
+.PHONY: llmr test linux

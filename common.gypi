@@ -12,12 +12,15 @@
         'cflags': [ '-g', '-O0' ],
         'defines': [ 'DEBUG' ],
         'xcode_settings': {
-          'OTHER_CPLUSPLUSFLAGS': [ '-g' ]
+          'OTHER_CPLUSPLUSFLAGS': [ '-Wall', '-Wextra', '-pedantic', '-g', '-O0' ]
         }
       },
       'Release': {
         'cflags': [ '-O3' ],
         'defines': [ 'NDEBUG' ],
+        'xcode_settings': {
+          'OTHER_CPLUSPLUSFLAGS': [ '-Wall', '-Wextra', '-pedantic', '-O3' ]
+        }
       }
     }
   }
