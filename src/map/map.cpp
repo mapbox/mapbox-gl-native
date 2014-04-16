@@ -137,8 +137,8 @@ void Map::stopScaling() {
     platform::restart();
 }
 
-void Map::rotateBy(double cx, double cy, double sx, double sy, double ex, double ey, double duration) {
-    transform.rotateBy(cx, cy, sx, sy, ex, ey, duration);
+void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) {
+    transform.rotateBy(sx, sy, ex, ey, duration);
     update();
 
     settings.angle = transform.getAngle();

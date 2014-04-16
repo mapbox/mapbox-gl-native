@@ -136,10 +136,7 @@ public:
 
         if (button == GLFW_MOUSE_BUTTON_RIGHT || (button == GLFW_MOUSE_BUTTON_LEFT && modifiers & GLFW_MOD_CONTROL)) {
             mapView->rotating = action == GLFW_PRESS;
-            if (mapView->rotating) {
-                mapView->start_x = mapView->last_x;
-                mapView->start_y = mapView->last_y;
-            } else {
+            if (!mapView->rotating) {
                 mapView->map.stopRotating();
             }
         } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -167,7 +164,7 @@ public:
             }
         } else if (mapView->rotating) {
             mapView->map.startRotating();
-            mapView->map.rotateBy(mapView->start_x, mapView->start_y, mapView->last_x, mapView->last_y, x, y);
+            mapView->map.rotateBy(mapView->last_x, mapView->last_y, x, y);
         }
         mapView->last_x = x;
         mapView->last_y = y;
@@ -222,7 +219,6 @@ public:
     double last_x = 0, last_y = 0;
     bool tracking = false;
 
-    double start_x = 0, start_y = 0;
     bool rotating = false;
 
     double last_click = -1;

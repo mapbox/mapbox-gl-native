@@ -107,7 +107,7 @@ void Transform::stopScaling() {
     }
 }
 
-void Transform::rotateBy(double anchor_x, double anchor_y, double start_x, double start_y, double end_x, double end_y, double duration) {
+void Transform::rotateBy(double start_x, double start_y, double end_x, double end_y, double duration) {
     double center_x = width / 2, center_y = height / 2;
 
     const double begin_center_x = start_x - center_x;
