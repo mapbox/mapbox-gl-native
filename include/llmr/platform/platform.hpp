@@ -1,5 +1,5 @@
-#ifndef LLMR_PLATFORM_IOS
-#define LLMR_PLATFORM_IOS
+#ifndef LLMR_PLATFORM_PLATFORM
+#define LLMR_PLATFORM_PLATFORM
 
 #include <memory>
 #include <functional>
