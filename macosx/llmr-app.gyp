@@ -12,7 +12,10 @@
         './main.mm',
         './settings.mm',
         './settings.hpp',
-        '../common/foundation_request.mm'
+        '../common/glfw_view.hpp',
+        '../common/glfw_view.cpp',
+        '../common/foundation_request.h',
+        '../common/foundation_request.mm',
       ],
       'product_extension': 'app',
       'mac_bundle': 1,

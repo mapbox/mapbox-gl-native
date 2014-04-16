@@ -2,7 +2,7 @@
 #import <AppKit/AppKit.h>
 
 #include "settings.hpp"
-#include "../common/map_view.cpp"
+#include "../common/glfw_view.hpp"
 
 #include <cstdio>
 

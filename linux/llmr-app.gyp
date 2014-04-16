@@ -14,6 +14,8 @@
         './settings.hpp',
         './request.cpp',
         './request.hpp',
+        '../common/glfw_view.hpp',
+        '../common/glfw_view.cpp',
       ],
 
       'conditions': [

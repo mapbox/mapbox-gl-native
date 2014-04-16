@@ -4,8 +4,8 @@
 #include <signal.h>
 #include <getopt.h>
 
-#include "../common/map_view.cpp"
 #include "settings.hpp"
+#include "../common/glfw_view.hpp"
 #include "request.hpp"
 
 
