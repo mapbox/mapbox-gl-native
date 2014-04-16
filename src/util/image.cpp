@@ -2,7 +2,7 @@
 #include <png.h>
 
 
-std::string llmr::util::compress_png(int width, int height, void *rgba) {
+std::string llmr::util::compress_png(int width, int height, void *rgba, bool flip) {
     png_voidp error_ptr = 0;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, NULL, NULL);
     if (!png_ptr) {
@@ -39,7 +39,7 @@ std::string llmr::util::compress_png(int width, int height, void *rgba) {
     } pointers(height);
 
     for (int i = 0; i < height; i++) {
-        pointers.rows[i] = (png_bytep)((png_bytep)rgba + width * 4 * i);
+        pointers.rows[flip ? height - 1 - i : i] = (png_bytep)((png_bytep)rgba + width * 4 * i);
     }
 
     png_set_rows(png_ptr, info_ptr, pointers.rows);

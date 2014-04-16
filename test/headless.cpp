@@ -127,7 +127,7 @@ TEST(Headless, initialize) {
 
     glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
-    std::string result = llmr::util::compress_png(width, height, pixels);
+    std::string result = llmr::util::compress_png(width, height, pixels, true);
     llmr::util::write_file("out.png", result);
 
     delete[] pixels;

@@ -6,7 +6,7 @@
 namespace llmr {
 namespace util {
 
-std::string compress_png(int width, int height, void *rgba);
+std::string compress_png(int width, int height, void *rgba, bool flip = false);
 
 }
 }
