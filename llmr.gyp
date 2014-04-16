@@ -71,12 +71,12 @@
           './include'
       ],
       'cflags': [
-          '<@(png_cflags)'
+          '<@(png_cflags)',
           '-I<(boost_root)/include',
       ],
       'direct_dependent_settings': {
           'include_dirs':[
-              './include'
+              './include',
           ],
           'cflags': [
               '<@(png_cflags)',
