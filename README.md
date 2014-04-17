@@ -5,6 +5,8 @@ implemented in C++11, targeting iOS & OS X.
 
  - Modern C++ compiler that supports `-std=c++11`
  - libpng
+ - libuv
+ - libcurl (depends on OpenSSL)
  - glfw3
  - Boost (for Rtree support)
  - Python (for build only)
@@ -12,54 +14,28 @@ implemented in C++11, targeting iOS & OS X.
 
 # Build instructions
 
+We use [mapnik-packaging](https://github.com/mapnik/mapnik-packaging) to build static libraries of
+dependencies.
+
 ## OS X
 
-Install libpng and [glfw3](http://www.glfw.org/docs/latest/):
+Run `./setup_libraries.sh`
 
-```
-brew install libpng
-brew install homebrew/versions/glfw3
-brew install boost
-```
+This downloads all required dependencies, builds them and creates universal libraries that can be
+used on both OS X and iOS.
 
-Then configure the project:
-
-    ./configure --glfw3=`brew --prefix` --png=`brew --prefix`
-
-See all the options by calling `./configure --help`
-
-```sh
-$ ./configure --help
-Usage: configure [options]
-
-Options:
-  -h, --help            show this help message and exit
-  --debug               Also build debug build
-  --glfw3=GLFW3         Path to gflw3 (defaults to using pkg-config)
-  --png=PNG             Path to png (defaults to using pkg-config)
-  --png-includes=PNG_INCLUDES
-                        Path to png includes
-  --png-libpath=PNG_LIBPATH
-                        Path to png libs
-```
-
-Then you can build the OS X app with make:
-
-    make app
-
-Or generate a dual iOS/OS X-compatible Xcode project for `libllmr` to include as a subproject:
-
-    make xcode # then open llmr.xcodeproj
+To create projects, you can run:
+- `make xproj`: Creates an Xcode project with OS X-specific handlers for HTTP downloads and
+  settings storage. It uses GLFW for window handling
+- `make lproj`: Creates an Xcode project with platform-independent handlers for downloads
+  and settings storage. This is what is also being built on Linux
+- `make linux`: Builds the Linux GLFW application with make
 
 ## iOS
 
-Because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version yourself. Run `./ios/setup_libpng.sh`, which is derived from Mapnik's cross-architecture build scripts. This will also run `./configure`.
-
-Then you can build the iOS app with make:
-
-    make iapp
-
-Consider `sudo npm install -g ios-sim` for auto-launching the simulator, but it can be tricky and it's better to run on an ARM-based device anyway. To do this, open `./ios/llmr-app.xcodeproj` in Xcode, then build and run on the simulator or a device yourself.
+Because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version
+yourself. Run `./setup_libraries.sh`, which is derived from Mapnik's cross-architecture build
+scripts. This will also run `./configure`.
 
 Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina).
 
@@ -67,7 +43,8 @@ Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, m
 
 Ensure you have git and other build essentials:
 
-    sudo apt-get install git cmake make pkg-config
+    sudo apt-get update
+    sudo apt-get install git cmake make pkg-config curl automake libtool xutils-dev
 
 Install a `-std=c++11` capable compiler
 
@@ -75,32 +52,17 @@ Install a `-std=c++11` capable compiler
     sudo apt-get update
     sudo apt-get install gcc-4.8 g++-4.8
 
-Install libpng-dev:
-
-    sudo apt-get install libpng-dev
-
 Install glfw3 dependencies:
 
-    sudo apt-get install libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev
+    sudo apt-get install libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev
 
-Install glfw3:
+Build static dependencies:
 
-    git clone https://github.com/glfw/glfw.git
-    cd glfw
-    mkdir build
-    cd build
-    cmake ../ -DCMAKE_C_COMPILER_ENV_VAR=gcc-4.8
-    make
-    sudo make install
-    cd ../../
+    ./setup_libraries.sh
 
-Build `libllmr`:
+This will automatically run configure for you and set the correct paths.
 
-    git clone git@github.com:mapbox/llmr-native.git
-    cd llmr-native
-    export CXX="g++-4.8"
-    ./configure
-    make
+You can then proceed to build the library, tests or a GLFW app itself.
 
 # Style
 
@@ -111,7 +73,7 @@ file and the associated header, run
 bin/build-style.js
 ```
 
-This is automatically taken care of as a build phase if you are using the Xcode projects.
+This is automatically taken care of as a build phase.
 
 # Usage
 
