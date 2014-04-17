@@ -15,7 +15,7 @@ elif [ ${UNAME} = 'Linux' ]; then
     fi
 fi
 
-if [ ! -d 'mapnik-packaging' ]; then
+if [ ! -d 'mapnik-packaging/.git' ]; then
   git clone --depth=1 https://github.com/mapnik/mapnik-packaging.git
 fi
 
@@ -54,6 +54,8 @@ source MacOSX.sh
     if [ ! -d out/build-cpp11-libcpp-x86_64/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
     echo '     ...done'
 
+rm -rf out/packages
+
 ./scripts/make_universal.sh
 
 cd ../../
@@ -70,6 +72,8 @@ source Linux.sh
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -d out/build-cpp11-libstdcpp-gcc-x86_64/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
+
+rm -rf out/packages
 
 cd ../../
 ./configure \

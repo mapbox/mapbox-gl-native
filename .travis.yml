@@ -5,8 +5,9 @@ compiler:
  - clang
 
 cache:
-    directories:
-    - mapnik-packaging
+- apt
+- directories:
+  - mapnik-packaging
 
 before_install:
 - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
