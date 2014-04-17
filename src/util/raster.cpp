@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <cassert>
+#include <cstring>
 
 #include <llmr/platform/platform.hpp>
 #include <llmr/platform/gl.hpp>
