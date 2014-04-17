@@ -38,12 +38,14 @@ def pkg_config(pkg, pkgconfig_root):
   env = os.environ.copy()
   if pkgconfig_root:
     env["PKG_CONFIG_PATH"] = pkgconfig_root
+  env["PKG_CONFIG_ALLOW_SYSTEM_CFLAGS"] = "1"
+  env["PKG_CONFIG_ALLOW_SYSTEM_LIBS"] = "1"
   cmd = subprocess.Popen(['pkg-config', '--static', '--libs', pkg], stdout=subprocess.PIPE, env=env)
   libs, ret = cmd.communicate()
   if (ret): return None
 
-  cmd = subprocess.Popen(['pkg-config', '--cflags', pkg], stdout=subprocess.PIPE, env=env)
-  cflags, red = cmd.communicate()
+  cmd = subprocess.Popen(['pkg-config', '--static', '--cflags', pkg], stdout=subprocess.PIPE, env=env)
+  cflags, ret = cmd.communicate()
   if (ret): return None
 
   return (libs, cflags)

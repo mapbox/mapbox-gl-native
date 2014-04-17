@@ -61,7 +61,7 @@ rm -rf out/packages
 cd ../../
 ./configure \
 --pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal/lib/pkgconfig \
---boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal/
+--boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal
 
 elif [ ${UNAME} = 'Linux' ]; then
 
@@ -78,6 +78,6 @@ rm -rf out/packages
 cd ../../
 ./configure \
 --pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64/lib/pkgconfig \
---boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64/
+--boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64
 
 fi
