@@ -23,7 +23,9 @@ std::atomic<int> active_tasks;
 #endif
 
 void request_initialize_cb() {
-    queue = dispatch_queue_create("Parsing", DISPATCH_QUEUE_CONCURRENT);
+    NSString *queueName = [[[NSBundle mainBundle] bundleIdentifier] stringByAppendingString:@".parsing"];
+
+    queue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
 
     NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
     sessionConfig.timeoutIntervalForResource = 6;
