@@ -27,7 +27,7 @@
 
 llmr::Map *map = nullptr;
 llmr::Settings_iOS *settings = nullptr;
-MBXViewController *view = nullptr;
+MBXViewController *viewController = nullptr;
 
 #pragma mark - Setup
 
@@ -35,7 +35,7 @@ MBXViewController *view = nullptr;
 {
     [super viewDidLoad];
 
-    view = self;
+    viewController = self;
 
     self.preferredFramesPerSecond = 60;
 
@@ -437,7 +437,7 @@ namespace llmr {
         }
 
         double time() {
-            return [view timeSinceFirstResume];
+            return [viewController timeSinceFirstResume];
         }
 
         double elapsed() {
