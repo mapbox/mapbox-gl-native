@@ -1,3 +1,5 @@
+![Travis](https://api.travis-ci.com/mapbox/llmr-native.svg?token=yZ9zvfZwYkJNWivRLoyX)
+
 An OpenGL renderer for [Mapbox vector tiles](https://www.mapbox.com/blog/vector-tiles),
 implemented in C++11, targeting iOS & OS X.
 
