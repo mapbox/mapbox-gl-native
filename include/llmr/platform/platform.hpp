@@ -38,9 +38,6 @@ void cancel_request_http(const std::shared_ptr<Request> &req);
 // Returns a relative timestamp in seconds. This value must be monotonic.
 double elapsed();
 
-// Performs routine cleanup operation and is called on every loop iteration.
-void cleanup();
-
 // Shows an RGBA image with the specified dimensions in a named window.
 void show_debug_image(std::string name, const char *data, size_t width, size_t height);
 

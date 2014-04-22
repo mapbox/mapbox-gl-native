@@ -3,6 +3,7 @@
 
 #include <llmr/llmr.hpp>
 #include <GLFW/glfw3.h>
+#include <uv.h>
 
 class MapView {
 public:
@@ -17,13 +18,14 @@ public:
     static void mouseclick(GLFWwindow *window, int button, int action, int modifiers);
     static void mousemove(GLFWwindow *window, double x, double y);
 
+    static void eventloop(void *arg);
+
     int run();
     void fps();
 
 public:
     bool fullscreen = false;
 
-    bool dirty = true;
     double last_x = 0, last_y = 0;
     bool tracking = false;
 
@@ -34,6 +36,9 @@ public:
     GLFWwindow *window = nullptr;
     llmr::Settings &settings;
     llmr::Map map;
+
+    uv_sem_t event_listener;
+    std::atomic<bool> stop_event_listener;
 };
 
 #endif

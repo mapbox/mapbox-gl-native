@@ -1,40 +1,14 @@
-#import <Foundation/Foundation.h>
-#import <AppKit/AppKit.h>
+// #import <Foundation/Foundation.h>
+// #import <AppKit/AppKit.h>
 
 #include "settings.hpp"
 #include "../common/glfw_view.hpp"
 
-#include <cstdio>
-
-#include <thread>
-
-MapView *mapView = nullptr;
-
 int main() {
     llmr::Settings_MacOSX settings;
-    mapView = new MapView(settings);
-    mapView->init();
-    int ret = mapView->run();
-    mapView->settings.sync();
-    delete mapView;
+    MapView view(settings);
+    view.init();
+    int ret = view.run();
+    settings.sync();
     return ret;
-}
-
-
-
-namespace llmr {
-
-void platform::cleanup() {
-    // noop
-}
-
-void platform::restart() {
-    if (mapView) {
-        mapView->dirty = true;
-        CGEventRef event = CGEventCreate(NULL);
-        CGEventSetType(event, kCGEventMouseMoved);
-        [[NSApplication sharedApplication] postEvent: [NSEvent eventWithCGEvent:event] atStart:NO];
-    }
-}
-
 }

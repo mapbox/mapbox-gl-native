@@ -341,6 +341,8 @@ void async_cancel_cb(uv_async_t * /*async*/) {
 }
 
 void thread_init_cb() {
+    curl_global_init(CURL_GLOBAL_ALL);
+
     loop = uv_loop_new();
     uv_async_init(loop, &async_add, async_add_cb);
     uv_async_init(loop, &async_cancel, async_cancel_cb);
