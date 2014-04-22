@@ -41,7 +41,8 @@ MBXViewController *viewController = nullptr;
 
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
-    if (!self.context) {
+    if (!self.context)
+    {
         NSLog(@"Failed to create OpenGL ES context");
     }
 
@@ -160,7 +161,8 @@ MBXViewController *viewController = nullptr;
     // Render the map
     map->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
 
-    if (map->render() == false) {
+    if (map->render() == false)
+    {
         self.paused = YES;
         settings->sync();
     }
@@ -216,17 +218,21 @@ MBXViewController *viewController = nullptr;
 
 - (void)dealloc
 {
-    if (map) {
+    if (map)
+    {
         delete map;
         map = nullptr;
     }
-    if (settings) {
+
+    if (settings)
+    {
         settings->sync();
         delete settings;
         settings = nullptr;
     }
 
-    if ([EAGLContext currentContext] == self.context) {
+    if ([[EAGLContext currentContext] isEqual:self.context])
+    {
         [EAGLContext setCurrentContext:nil];
     }
 }
@@ -252,7 +258,8 @@ MBXViewController *viewController = nullptr;
     }
     else if (pan.state == UIGestureRecognizerStateEnded)
     {
-        if ([pan velocityInView:pan.view].x < 50 && [pan velocityInView:pan.view].y < 50) {
+        if ([pan velocityInView:pan.view].x < 50 && [pan velocityInView:pan.view].y < 50)
+        {
             return;
         }
 
@@ -293,14 +300,14 @@ MBXViewController *viewController = nullptr;
 
         CGFloat newZoom = log2f(self.scale) + adjustment;
 
-        CGPoint pt = [pinch locationInView:pinch.view];
-        map->scaleBy(powf(2, newZoom) / map->getScale(), pt.x, pt.y);
+        map->scaleBy(powf(2, newZoom) / map->getScale(), [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y);
     }
     else if (pinch.state == UIGestureRecognizerStateEnded)
     {
        map->stopScaling();
 
-        if (fabsf(pinch.velocity) < 20) {
+        if (fabsf(pinch.velocity) < 20)
+        {
             return;
         }
 
@@ -311,8 +318,7 @@ MBXViewController *viewController = nullptr;
 
         CGFloat duration = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 0.3 : 0.5);
 
-        CGPoint pt = [pinch locationInView:pinch.view];
-        map->scaleBy(new_scale / scale, pt.x, pt.y, duration);
+        map->scaleBy(new_scale / scale, [pinch locationInView:pinch.view].x, [pinch locationInView:pinch.view].y, duration);
     }
     else if (pinch.state == UIGestureRecognizerStateCancelled)
     {
@@ -334,29 +340,31 @@ MBXViewController *viewController = nullptr;
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
-        CGPoint pt = [rotate locationInView:rotate.view];
-        map->setAngle(self.angle + rotate.rotation, pt.x, pt.y);
+        map->setAngle(self.angle + rotate.rotation, [rotate locationInView:rotate.view].x, [rotate locationInView:rotate.view].y);
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
         map->stopRotating();
     }
 
-    [self updateRender];
+    self.paused = NO;
 }
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
-    [self togglePalette];
+    if (singleTap.state == UIGestureRecognizerStateEnded)
+    {
+        [self togglePalette];
+    }
 }
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
     map->cancelAnimations();
 
-    if (doubleTap.state == UIGestureRecognizerStateEnded) {
-        CGPoint pt = [doubleTap locationInView:doubleTap.view];
-        map->scaleBy(2, pt.x, pt.y, 0.5);
+    if (doubleTap.state == UIGestureRecognizerStateEnded)
+    {
+        map->scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.5);
     }
 
     self.paused = NO;
@@ -366,9 +374,9 @@ MBXViewController *viewController = nullptr;
 {
     map->cancelAnimations();
 
-    if (twoFingerTap.state == UIGestureRecognizerStateEnded) {
-        CGPoint pt = [twoFingerTap locationInView:twoFingerTap.view];
-        map->scaleBy(0.5, pt.x, pt.y, 0.5);
+    if (twoFingerTap.state == UIGestureRecognizerStateEnded)
+    {
+        map->scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
     }
 
     self.paused = NO;
@@ -406,13 +414,15 @@ MBXViewController *viewController = nullptr;
 @end
 
 
-namespace llmr {
-    namespace platform {
-
-        class Request {
-        public:
-            int16_t identifier;
-            std::string original_url;
+namespace llmr
+{
+    namespace platform
+    {
+        class Request
+        {
+            public:
+                int16_t identifier;
+                std::string original_url;
         };
 
         void restart()
@@ -420,11 +430,13 @@ namespace llmr {
             viewController.paused = NO;
         }
 
-        double time() {
+        double time()
+        {
             return [viewController timeSinceFirstResume];
         }
 
-        double elapsed() {
+        double elapsed()
+        {
             return CACurrentMediaTime();
         }
     }
