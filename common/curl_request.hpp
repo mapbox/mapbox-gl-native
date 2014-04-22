@@ -3,6 +3,7 @@
 
 #include <string>
 #include <functional>
+#include <memory>
 
 #include <llmr/util/noncopyable.hpp>
 
