@@ -97,7 +97,7 @@
                 ]
               }
             }, {
-              'libraries': [
+              'ldflags': [
                 '<@(png_libraries)',
                 '<@(uv_libraries)',
               ]
@@ -167,7 +167,7 @@
                 ]
               }
             }, {
-              'libraries': [
+              'ldflags': [
                 '<@(png_libraries)',
                 '<@(uv_libraries)',
               ]
