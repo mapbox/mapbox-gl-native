@@ -42,7 +42,7 @@
             '<@(curl_cflags)',
           ],
           'link_settings': {
-            'ldflags': [
+            'libraries': [
               '<@(glfw3_libraries)',
               '<@(curl_libraries)',
             ],
