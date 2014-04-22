@@ -68,8 +68,6 @@ MBXViewController *viewController = nullptr;
     map = new llmr::Map(*settings);
     map->setup();
     map->loadSettings();
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateRender:) name:MBXNeedsRenderNotification object:nil];
 }
 
 
@@ -145,18 +143,6 @@ MBXViewController *viewController = nullptr;
     return UIInterfaceOrientationMaskAll;
 }
 
-#pragma mark - NotificationCenter callbacks
-
-- (void)updateRender:(NSNotification *)notification
-{
-    [self updateRender];
-}
-
-- (void)updateRender
-{
-    self.paused = NO;
-}
-
 #pragma mark - Rendering delegates
 
 - (void)viewWillLayoutSubviews
@@ -166,8 +152,7 @@ MBXViewController *viewController = nullptr;
     [super viewWillLayoutSubviews];
 
     // TODO: Pause all current animations during animation. We don't want other events to fire while the view is rotated.
-
-    [self updateRender];
+    self.paused = NO;
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
@@ -241,8 +226,6 @@ MBXViewController *viewController = nullptr;
         settings = nullptr;
     }
 
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-
     if ([EAGLContext currentContext] == self.context) {
         [EAGLContext setCurrentContext:nil];
     }
@@ -281,7 +264,7 @@ MBXViewController *viewController = nullptr;
         map->moveBy(finalCenter.x - self.center.x, finalCenter.y - self.center.y, duration);
     }
 
-    [self updateRender];
+    self.paused = NO;
 }
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
@@ -336,7 +319,7 @@ MBXViewController *viewController = nullptr;
         map->stopScaling();
     }
 
-    [self updateRender];
+    self.paused = NO;
 }
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
@@ -376,7 +359,7 @@ MBXViewController *viewController = nullptr;
         map->scaleBy(2, pt.x, pt.y, 0.5);
     }
 
-    [self updateRender];
+    self.paused = NO;
 }
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
@@ -388,7 +371,7 @@ MBXViewController *viewController = nullptr;
         map->scaleBy(0.5, pt.x, pt.y, 0.5);
     }
 
-    [self updateRender];
+    self.paused = NO;
 }
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
@@ -410,7 +393,7 @@ MBXViewController *viewController = nullptr;
         map->scaleBy(powf(2, newZoom) / map->getScale(), self.view.bounds.size.width / 2, self.view.bounds.size.height / 2);
     }
 
-    [self updateRender];
+    self.paused = NO;
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
@@ -432,8 +415,9 @@ namespace llmr {
             std::string original_url;
         };
 
-        void restart() {
-            [[NSNotificationCenter defaultCenter] postNotificationName:MBXNeedsRenderNotification object:nil];
+        void restart()
+        {
+            viewController.paused = NO;
         }
 
         double time() {
