@@ -47,14 +47,14 @@ public:
         : task(task), original_url(original_url) {
         #if TARGET_OS_IPHONE
             active_tasks++;
-            [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:active_tasks];
+            [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:(active_tasks > 0)];
         #endif
     }
 
 #if TARGET_OS_IPHONE
     ~Request() {
         active_tasks--;
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:active_tasks];
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:(active_tasks > 0)];
     }
 #endif
 
