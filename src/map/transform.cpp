@@ -187,13 +187,13 @@ void Transform::setScale(double new_scale, double cx, double cy, double duration
         new_scale = max_scale;
     }
 
-    // Zoom in on the center if we don't have click anchor coordinates.
+    // Zoom in on the center if we don't have click or gesture anchor coordinates.
     if (cx < 0 || cy < 0) {
         cx = width / 2;
         cy = height / 2;
     }
 
-    // Account for the x/y offset from the center (= where the user clicked)
+    // Account for the x/y offset from the center (= where the user clicked or pinched)
     const double factor = new_scale / scale;
     const double dx = (cx - width / 2) * (1.0 - factor);
     const double dy = (cy - height / 2) * (1.0 - factor);
