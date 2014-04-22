@@ -4,7 +4,6 @@
 
 #import "../common/foundation_request.h"
 
-#import <GLKit/GLKit.h>
 #import <OpenGLES/EAGL.h>
 #import <QuartzCore/QuartzCore.h>
 
