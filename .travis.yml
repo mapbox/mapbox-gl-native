@@ -20,7 +20,7 @@ install:
 - ./setup-libraries.sh
 
 before_script:
-- export CXX="g++-4.8"
+- if [ ${CXX} = "g++" ]; then export CXX="g++-4.8" ; fi
 
 script:
 - make llmr
