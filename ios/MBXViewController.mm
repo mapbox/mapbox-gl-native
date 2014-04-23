@@ -427,7 +427,14 @@ namespace llmr
 
         void restart()
         {
-            viewController.paused = NO;
+            if ([NSThread isMainThread])
+            {
+                viewController.paused = NO;
+            }
+            else
+            {
+                [viewController performSelectorOnMainThread:@selector(setPaused:) withObject:@(NO) waitUntilDone:NO];
+            }
         }
 
         double time()
