@@ -660,9 +660,9 @@ void Painter::renderMatte() {
     plainShader->setMatrix(nativeMatrix);
 
     // Draw the clipping mask
-    matteArray.bind(*plainShader, matteBuffer, BUFFER_OFFSET(0));
+    matteArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(white);
-    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)matteBuffer.index());
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 
     glEnable(GL_DEPTH_TEST);
 }

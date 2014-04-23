@@ -111,6 +111,7 @@ private:
     VertexArrayObject coveringPlainArray;
     VertexArrayObject coveringPatternArray;
     VertexArrayObject coveringRasterArray;
+    VertexArrayObject matteArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
     VertexBuffer tileBorderBuffer = {
@@ -123,20 +124,6 @@ private:
 
     VertexArrayObject tileBorderArray;
 
-    // Set up the matte buffer we're using to draw the filling background.
-    VertexBuffer matteBuffer = {
-        // top left triangle
-        0, 0,
-        1920, 0,
-        0, 1080,
-
-        // bottom right triangle
-        1920, 0,
-        0, 1080,
-        1920, 1080
-    };
-
-    VertexArrayObject matteArray;
 };
 
 }
