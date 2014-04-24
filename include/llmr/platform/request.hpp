@@ -1,5 +1,5 @@
-#ifndef LLMR_COMMON_CURL_REQUEST
-#define LLMR_COMMON_CURL_REQUEST
+#ifndef LLMR_PLATFORM_REQUEST
+#define LLMR_PLATFORM_REQUEST
 
 #include <string>
 #include <functional>
@@ -8,7 +8,6 @@
 #include <llmr/util/noncopyable.hpp>
 
 // Forward definition.
-typedef void CURL;
 typedef struct uv_work_s uv_work_t;
 typedef struct uv_check_s uv_check_t;
 
@@ -25,18 +24,17 @@ public:
     ~Request();
 
 public:
-    static void work_cb(uv_work_t *work);
-    static void after_work_cb(uv_work_t *work, int status);
-
+    static void work_callback(uv_work_t *work);
+    static void after_work_callback(uv_work_t *work, int status);
 
 public:
     const std::string url;
     const std::function<void(Response *)> background_function;
     const std::function<void()> foreground_callback;
     std::unique_ptr<Response> res;
-    CURL *curl = nullptr;
     bool cancelled = false;
 
+private:
     uv_check_t *check = nullptr;
 };
 }
