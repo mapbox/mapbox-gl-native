@@ -146,7 +146,7 @@ void Style::loadJSON(const uint8_t *const data, size_t bytes) {
         }
 
         if (document.HasMember("classes")) {
-            parser.parseClasses(document["classes"], classes);
+            parser.parseClasses(document["classes"], classes, buckets, layers);
         }
     } else {
         throw Style::exception("stylesheet root must be an object");

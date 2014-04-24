@@ -192,17 +192,17 @@ void StyleParser::parseConstants(JSVal value) {
     }
 }
 
-void StyleParser::parseClasses(JSVal value, std::map<std::string, ClassDescription>& classes) {
+void StyleParser::parseClasses(JSVal value, std::map<std::string, ClassDescription>& classes, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& layers) {
     if (value.IsArray()) {
         for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-            classes.insert(std::forward<std::pair<std::string, ClassDescription>>(parseClassDescription(value[i])));
+            classes.insert(std::forward<std::pair<std::string, ClassDescription>>(parseClassDescription(value[i], buckets, layers)));
         }
     } else {
         throw Style::exception("classes must be an array");
     }
 }
 
-std::pair<std::string, ClassDescription> StyleParser::parseClassDescription(JSVal value) {
+std::pair<std::string, ClassDescription> StyleParser::parseClassDescription(JSVal value, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& style_layers) {
     ClassDescription klass;
     std::string klass_name;
 
@@ -227,7 +227,7 @@ std::pair<std::string, ClassDescription> StyleParser::parseClassDescription(JSVa
                     const std::string name {
                         itr->name.GetString(), itr->name.GetStringLength()
                     };
-                    parseClass(name, itr->value, klass);
+                    parseClass(name, itr->value, klass, buckets, style_layers);
                 }
             } else {
                 throw Style::exception("class layer styles must be an object");
@@ -240,32 +240,31 @@ std::pair<std::string, ClassDescription> StyleParser::parseClassDescription(JSVa
     return { klass_name, std::forward<ClassDescription>(klass) };
 }
 
-void StyleParser::parseClass(const std::string& name, JSVal value, ClassDescription& class_desc) {
+void StyleParser::parseClass(const std::string& name, JSVal value, ClassDescription& class_desc, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& layers) {
     if (value.IsObject()) {
-        if (value.HasMember("type")) {
-            JSVal type = value["type"];
-            if (type.IsString()) {
-                std::string type_name = { type.GetString(), type.GetStringLength() };
-                if (type_name == "fill") {
-                    class_desc.fill.insert({ name, std::forward<FillClass>(parseFillClass(value)) });
-                } else if (type_name == "line") {
-                    class_desc.line.insert({ name, std::forward<LineClass>(parseLineClass(value)) });
-                } else if (type_name == "point") {
-                    class_desc.point.insert({ name, std::forward<PointClass>(parsePointClass(value)) });
-                } else if (type_name == "text") {
-                    class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
-                } else if (type_name == "raster") {
-                    class_desc.raster.insert({ name, std::forward<RasterClass>(parseRasterClass(value)) });
-                } else if (type_name == "background") {
+        for (const auto& layer : layers) {
+            if (name == layer.name) {
+                if (layer.bucket_name == "background") {
+                    // background buckets are fake
                     class_desc.background = parseBackgroundClass(value);
                 } else {
-                    throw Style::exception("unknown class type name");
+                    auto bucket_it = buckets.find(layer.bucket_name);
+                    BucketType type = bucket_it->second.type;
+                    if (type == BucketType::Fill) {
+                        class_desc.fill.insert({ name, std::forward<FillClass>(parseFillClass(value)) });
+                    } else if (type == BucketType::Line) {
+                        class_desc.line.insert({ name, std::forward<LineClass>(parseLineClass(value)) });
+                    } else if (type == BucketType::Point) {
+                        class_desc.point.insert({ name, std::forward<PointClass>(parsePointClass(value)) });
+                    } else if (type == BucketType::Text) {
+                        class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
+                    } else if (type == BucketType::Raster) {
+                        class_desc.raster.insert({ name, std::forward<RasterClass>(parseRasterClass(value)) });
+                    } else {
+                        throw Style::exception("unknown class type name");
+                    }
                 }
-            } else {
-                throw Style::exception("style class type must be a string");
             }
-        } else {
-            throw Style::exception("style class must specify a type");
         }
     } else {
         throw Style::exception("style class must be an object");
