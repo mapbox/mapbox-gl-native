@@ -414,6 +414,8 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
+    float dash_length = properties.dash_array[0];
+    float dash_gap = properties.dash_array[1];
 
     gl::group group(layer_name + " (line)");
     glDepthRange(strata, 1.0f);
@@ -462,13 +464,9 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         useProgram(lineShader->program);
         lineShader->setMatrix(matrix);
         lineShader->setExtrudeMatrix(extrudeMatrix);
-
-        // TODO: Move this to transform?
-        const float tilePixelRatio = transform.getScale() / (1 << transform.getIntegerZoom()) / 8;
-
-        lineShader->setDashArray({{ 1, -1 }});
+        lineShader->setDashArray({{ dash_length, dash_gap }});
         lineShader->setLineWidth({{ outset, inset }});
-        lineShader->setRatio(tilePixelRatio);
+        lineShader->setRatio(transform.getPixelRatio());
         lineShader->setColor(color);
         bucket.drawLines(*lineShader);
     }
