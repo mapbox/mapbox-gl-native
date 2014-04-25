@@ -1,28 +1,32 @@
 #ifndef LLMR_UTIL_TIMER
 #define LLMR_UTIL_TIMER
 
-#include <iostream>
 #include <string>
-#include <chrono>
 
 namespace llmr {
 namespace util {
 
+#ifndef DISABLE_TIMER
 class timer {
-    using hr = std::chrono::high_resolution_clock;
 public:
-    explicit timer(const std::string &name) : name(name), start(hr::now()) {}
-    ~timer() {
-        using namespace std::chrono;
-        std::cerr << name << ": "
-                  << (double)duration_cast<microseconds>(hr::now() - start).count() / 1000
-                  << "ms" << std::endl;
-    }
+    timer();
+    timer(const std::string &name);
+    void report(const std::string &name);
+    ~timer();
 
 private:
     const std::string name;
-    const hr::time_point start;
+    uint64_t start;
 };
+#else
+class timer {
+    inline timer() {}
+    inline timer(const std::string &name) {}
+    inline void report (const std::string &name) {}
+    inline ~timer() {}
+};
+#endif
+
 }
 }
 

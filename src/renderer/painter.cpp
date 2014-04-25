@@ -19,6 +19,7 @@
 #include <llmr/style/sprite.hpp>
 #include <llmr/util/raster.hpp>
 #include <llmr/util/string.hpp>
+#include <llmr/util/timer.hpp>
 
 using namespace llmr;
 
@@ -35,6 +36,8 @@ bool Painter::needsAnimation() const {
 }
 
 void Painter::setup() {
+    util::timer timer("painter setup");
+
     setupShaders();
 
     assert(pointShader);
