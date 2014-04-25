@@ -105,7 +105,7 @@ TEST(Headless, initialize) {
     map.update();
 
     // Run the loop. It will terminate when we don't have any further listeners.
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    map.run();
 
     map.render();
 

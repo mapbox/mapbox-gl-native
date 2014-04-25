@@ -45,8 +45,11 @@ void Map::stop() {
 
 void Map::eventloop(void *arg) {
     Map *map = static_cast<Map *>(arg);
+    map->run();
+}
 
-    uv_run(map->loop, UV_RUN_DEFAULT);
+void Map::run() {
+    uv_run(loop, UV_RUN_DEFAULT);
 }
 
 void Map::setup() {

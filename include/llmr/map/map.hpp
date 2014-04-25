@@ -27,6 +27,7 @@ public:
     ~Map();
 
     void start();
+    void run();
     void stop();
 
     /* setup */
