@@ -289,6 +289,10 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         stroke_color = fill_color;
     }
 
+    if (properties.translate[0] && properties.translate[1]) {
+        matrix::translate(matrix, matrix, properties.translate[0] / transform.getPixelRatio(), properties.translate[1] / transform.getPixelRatio(), 0);
+    }
+
     gl::group group(layer_name + " (fill)");
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
@@ -389,6 +393,10 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         glDepthRange(strata + strata_epsilon, 1.0f);
         bucket.drawVertices(*outlineShader);
+    }
+
+    if (properties.translate[0] && properties.translate[1]) {
+        matrix::translate(matrix, matrix, -properties.translate[0] / transform.getPixelRatio(), -properties.translate[1] / transform.getPixelRatio(), 0);
     }
 }
 

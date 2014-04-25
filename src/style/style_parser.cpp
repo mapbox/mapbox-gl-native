@@ -422,6 +422,11 @@ FillClass StyleParser::parseFillClass(JSVal value) {
         klass.enabled = parseFunction(value["enabled"]);
     }
 
+    if (value.HasMember("translate")) {
+        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
+        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+    }
+
     if (value.HasMember("color")) {
         klass.fill_color = parseColor(value["color"]);
     }
@@ -454,6 +459,11 @@ LineClass StyleParser::parseLineClass(JSVal value) {
         klass.enabled = parseFunction(value["enabled"]);
     }
 
+    if (value.HasMember("translate")) {
+        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
+        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+    }
+
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
     }
@@ -481,6 +491,11 @@ PointClass StyleParser::parsePointClass(JSVal value) {
         klass.enabled = parseFunction(value["enabled"]);
     }
 
+    if (value.HasMember("translate")) {
+        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
+        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+    }
+
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
     }
@@ -506,6 +521,11 @@ TextClass StyleParser::parseTextClass(JSVal value) {
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);
+    }
+
+    if (value.HasMember("translate")) {
+        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
+        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
     }
 
     if (value.HasMember("color")) {

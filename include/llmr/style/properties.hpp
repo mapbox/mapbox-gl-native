@@ -56,6 +56,7 @@ struct FunctionProperty {
 
 struct PointClass {
     FunctionProperty enabled = true;
+    std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
     FunctionProperty size;
     Color color = {{ 0, 0, 0, 1 }};
     FunctionProperty opacity = 1;
@@ -64,6 +65,7 @@ struct PointClass {
 
 struct PointProperties {
     bool enabled = true;
+    std::array<float, 2> translate = {{ 0, 0 }};
     float size = 0;
     Color color = {{ 0, 0, 0, 1 }};
     float opacity = 1.0;
@@ -72,6 +74,7 @@ struct PointProperties {
 
 struct LineClass {
     FunctionProperty enabled = true;
+    std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
     FunctionProperty width;
     FunctionProperty offset;
     Color color = {{ 0, 0, 0, 1 }};
@@ -81,6 +84,7 @@ struct LineClass {
 
 struct LineProperties {
     bool enabled = true;
+    std::array<float, 2> translate = {{ 0, 0 }};
     float width = 0;
     float offset = 0;
     Color color = {{ 0, 0, 0, 1 }};
@@ -90,6 +94,7 @@ struct LineProperties {
 
 struct FillClass {
     FunctionProperty enabled = true;
+    std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
     Winding winding = Winding::NonZero;
     FunctionProperty antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
@@ -100,6 +105,7 @@ struct FillClass {
 
 struct FillProperties {
     bool enabled = true;
+    std::array<float, 2> translate = {{ 0, 0 }};
     Winding winding = Winding::NonZero;
     bool antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
@@ -110,6 +116,7 @@ struct FillProperties {
 
 struct TextClass {
     FunctionProperty enabled = true;
+    std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     FunctionProperty haloRadius = 0.25f;
@@ -120,6 +127,7 @@ struct TextClass {
 
 struct TextProperties {
     bool enabled = true;
+    std::array<float, 2> translate = {{ 0, 0 }};
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     float haloRadius = 0.25f;
@@ -140,11 +148,13 @@ struct BackgroundProperties {
 
 struct RasterClass {
     FunctionProperty enabled = true;
+    std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
     FunctionProperty opacity = 1;
 };
 
 struct RasterProperties {
     bool enabled = true;
+    std::array<float, 2> translate = {{ 0, 0 }};
     float opacity = 1.0;
 };
 
