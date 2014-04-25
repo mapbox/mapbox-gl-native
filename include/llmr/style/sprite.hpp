@@ -11,6 +11,8 @@
 
 namespace llmr {
 
+class Map;
+
 class SpritePosition {
 public:
     SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t pixelRatio = 1);
@@ -33,7 +35,7 @@ public:
 
 class Sprite : public std::enable_shared_from_this<Sprite> {
 public:
-    Sprite(float pixelRatio = 1);
+    Sprite(Map &map, float pixelRatio = 1);
 
     void load(const std::string& base_url);
 
@@ -49,6 +51,7 @@ private:
     void parseJSON(const std::string& data);
 
 private:
+    Map &map;
     mutable std::mutex mtx;
     bool loaded = false;
     std::map<std::string, SpritePosition> pos;

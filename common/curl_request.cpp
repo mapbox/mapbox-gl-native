@@ -88,9 +88,10 @@ static std::queue<CURL *> curl_handle_cache;
 class CURLRequest : public llmr::platform::Request {
 public:
     CURLRequest(const std::string &url,
-                      std::function<void(llmr::platform::Response *)> background_function,
-                      std::function<void()> foreground_callback)
-        : Request(url, background_function, foreground_callback) {}
+                std::function<void(llmr::platform::Response *)> background_function,
+                std::function<void()> foreground_callback,
+                uv_loop_t *loop)
+        : Request(url, background_function, foreground_callback, loop) {}
 
     CURL *curl = nullptr;
 };
@@ -177,7 +178,7 @@ void curl_perform(uv_poll_t *req, int /*status*/, int events) {
 
             // Executes the background_function in a libuv thread pool, and the after_work_cb back
             // in the *main* event loop.
-            uv_queue_work(uv_default_loop(), work, Request::work_callback, Request::after_work_callback);
+            uv_queue_work((*req)->loop, work, Request::work_callback, Request::after_work_callback);
 
             CURL *handle = message->easy_handle;
             remove_curl_handle(handle);
@@ -367,10 +368,11 @@ void thread_init_cb() {
 std::shared_ptr<platform::Request>
 platform::request_http(const std::string &url,
                        std::function<void(Response *)> background_function,
-                       std::function<void()> foreground_callback) {
+                       std::function<void()> foreground_callback,
+                       uv_loop_t *loop) {
     using namespace request;
     init_thread_once(thread_init_cb);
-    std::shared_ptr<CURLRequest> req = std::make_shared<CURLRequest>(url, background_function, foreground_callback);
+    std::shared_ptr<CURLRequest> req = std::make_shared<CURLRequest>(url, background_function, foreground_callback, loop);
 
     // Note that we are creating a new shared_ptr pointer(!) because the lockless queue can't store
     // objects with nontrivial destructors. We have to make absolutely sure that we manually delete

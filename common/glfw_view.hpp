@@ -37,8 +37,7 @@ public:
     llmr::Settings &settings;
     llmr::Map map;
 
-    uv_sem_t event_listener;
-    std::atomic<bool> stop_event_listener;
+    uv_loop_t *loop = nullptr;
 };
 
 #endif

@@ -33,8 +33,7 @@
 
 
 MapView::MapView(llmr::Settings &settings, bool fullscreen)
-    : fullscreen(fullscreen), settings(settings), map(settings),
-    stop_event_listener(false) {}
+    : fullscreen(fullscreen), settings(settings), map(settings) {}
 
 MapView::~MapView() { glfwTerminate(); }
 
@@ -196,69 +195,27 @@ void MapView::mousemove(GLFWwindow *window, double x, double y) {
     mapView->last_y = y;
 }
 
-void MapView::eventloop(void *arg) {
-    MapView *view = static_cast<MapView *>(arg);
-    int r = 0;
-    int fd = 0;
-    int timeout;
-
-    while (!view->stop_event_listener) {
-        fd = uv_backend_fd(uv_default_loop());
-        timeout = uv_backend_timeout(uv_default_loop());
-
-        do {
-#if defined(HAVE_KQUEUE)
-            struct timespec ts;
-            ts.tv_sec = timeout / 1000;
-            ts.tv_nsec = (timeout % 1000) * 1000000;
-            r = kevent(fd, NULL, 0, NULL, 0, &ts);
-#elif defined(HAVE_EPOLL)
-            {
-                struct epoll_event ev;
-                r = epoll_wait(fd, &ev, 1, timeout);
-            }
-#endif
-        } while (r == -1 && errno == EINTR);
-        glfwPostEmptyEvent();
-        uv_sem_wait(&view->event_listener);
-    }
-}
-
 int MapView::run() {
-    uv_thread_t embed_thread;
-
-    uv_run(uv_default_loop(), UV_RUN_NOWAIT);
-
-    /* Start worker that will interrupt external loop */
-    stop_event_listener = false;
-    uv_sem_init(&event_listener, 0);
-    uv_thread_create(&embed_thread, eventloop, this);
+    map.start();
 
     while (!glfwWindowShouldClose(window)) {
-
-        bool dirty = false;
-        try {
-            dirty = map.render();
-        }
-        catch (std::exception &ex) {
-            fprintf(stderr, "exception: %s\n", ex.what());
-        }
-        glfwSwapBuffers(window);
-        fps();
-
-        if (dirty) {
-            glfwPollEvents();
-        } else {
-            glfwWaitEvents();
+        if (map.clean.test_and_set() == false) {
+            // This branch is executed when the previous value of the "clean"
+            // flag is false (i.e. it is unclean == dirty).
+            try {
+                map.render();
+            }
+            catch (std::exception &ex) {
+                fprintf(stderr, "exception: %s\n", ex.what());
+            }
+            glfwSwapBuffers(window);
+            fps();
         }
 
-        uv_run(uv_default_loop(), UV_RUN_NOWAIT);
-        uv_sem_post(&event_listener);
+        glfwWaitEvents();
     }
 
-    stop_event_listener = true;
-
-    uv_thread_join(&embed_thread);
+    map.stop();
 
     return 0;
 }

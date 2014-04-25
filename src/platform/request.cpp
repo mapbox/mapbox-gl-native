@@ -6,10 +6,12 @@ using namespace llmr::platform;
 
 Request::Request(const std::string &url,
                  std::function<void(Response *)> background_function,
-                 std::function<void()> foreground_callback)
+                 std::function<void()> foreground_callback,
+                 uv_loop_t *loop)
     : url(url),
       background_function(background_function),
-      foreground_callback(foreground_callback) {
+      foreground_callback(foreground_callback),
+      loop(loop) {
 
     // Add a check handle without a callback to keep the default loop running.
     // We don't have a real handler attached to the default loop right from the
@@ -17,7 +19,7 @@ Request::Request(const std::string &url,
     // request in the request thread. Only after the request is complete, we
     // create an actual work request that is attached to the default loop.
     check = new uv_check_t();
-    uv_check_init(uv_default_loop(), check);
+    uv_check_init(loop, check);
     uv_check_start(check, [](uv_check_t *) {});
 }
 

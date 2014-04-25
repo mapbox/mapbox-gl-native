@@ -1,5 +1,6 @@
 #include <llmr/map/tile_data.hpp>
 #include <llmr/map/tile_parser.hpp>
+#include <llmr/map/map.hpp>
 
 #include <llmr/geometry/fill_buffer.hpp>
 #include <llmr/geometry/line_buffer.hpp>
@@ -9,24 +10,24 @@
 #include <llmr/util/raster.hpp>
 #include <llmr/util/string.hpp>
 
+#include <uv.h>
+
 using namespace llmr;
 
-TileData::TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const std::string url,  const bool is_raster)
+TileData::TileData(Tile::ID id, Map &map, const std::string url,  const bool is_raster)
     : id(id),
       state(State::initial),
       raster(),
       url(url),
       is_raster(is_raster),
-      style(style),
-      glyphAtlas(glyphAtlas) {
-
+      map(map) {
     // Initialize tile debug coordinates
     const std::string str = util::sprintf<32>("%d/%d/%d", id.z, id.x, id.y);
     debugFontBuffer.addText(str.c_str(), 50, 200, 5);
 }
 
 TileData::~TileData() {
-    glyphAtlas.removeGlyphs((uint64_t)id);
+    map.getGlyphAtlas().removeGlyphs((uint64_t)id);
     cancel();
 }
 
@@ -51,9 +52,12 @@ void TileData::request() {
         } else {
             fprintf(stderr, "[%s] tile loading failed: %d, %s\n", tile->url.c_str(), res->code, res->error_message.c_str());
         }
-    }, []() {
-        platform::restart();
-    });
+    }, [weak_tile]() {
+        std::shared_ptr<TileData> tile = weak_tile.lock();
+        if (tile) {
+            tile->map.redraw();
+        }
+    }, map.getLoop());
 }
 
 void TileData::cancel() {
@@ -72,7 +76,7 @@ bool TileData::parse() {
         // Parsing creates state that is encapsulated in TileParser. While parsing,
         // the TileParser object writes results into this objects. All other state
         // is going to be discarded afterwards.
-        TileParser parser(data, *this, style, glyphAtlas, is_raster);
+        TileParser parser(data, *this, map.getStyle(), map.getGlyphAtlas(), is_raster);
     } catch (const std::exception& ex) {
         fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
         cancel();

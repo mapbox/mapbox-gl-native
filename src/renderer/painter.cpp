@@ -13,6 +13,7 @@
 
 #include <llmr/map/transform.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
+#include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/platform/gl.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/style/sprite.hpp>

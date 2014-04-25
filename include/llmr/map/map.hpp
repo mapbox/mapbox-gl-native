@@ -1,6 +1,8 @@
 #ifndef LLMR_MAP_MAP
 #define LLMR_MAP_MAP
 
+#include <uv.h>
+
 #include <llmr/map/tile.hpp>
 #include <llmr/map/tile_data.hpp>
 #include <llmr/map/transform.hpp>
@@ -24,6 +26,9 @@ public:
     explicit Map(Settings& settings);
     ~Map();
 
+    void start();
+    void stop();
+
     /* setup */
     void setup();
     void loadStyle(const uint8_t *const data, uint32_t bytes);
@@ -33,7 +38,7 @@ public:
 
     /* callback */
     void update();
-    bool render();
+    void render();
     void cancelAnimations();
 
     /* position */
@@ -64,16 +69,27 @@ public:
     void startRotating();
     void stopRotating();
 
+
+    void redraw();
+
     void toggleDebug();
     void toggleRaster();
 
     box cornersToBox(uint32_t z) const;
+
+
+public: // Getters
     float getPixelRatio() const;
     Style& getStyle();
     GlyphAtlas& getGlyphAtlas();
+    uv_loop_t *getLoop();
 
 private:
     bool updateTiles();
+    static void eventloop(void *arg);
+
+public:
+    std::atomic_flag clean = ATOMIC_FLAG_INIT;
 
 private:
     Settings& settings;
@@ -84,6 +100,11 @@ private:
     Painter painter;
 
     std::map<std::string, const std::unique_ptr<Source>> sources;
+
+private:
+    uv_loop_t *loop = nullptr;
+    uv_thread_t thread;
+    uv_async_t async_terminate;
 };
 
 }

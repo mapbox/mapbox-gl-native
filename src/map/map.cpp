@@ -17,11 +17,36 @@ Map::Map(Settings& settings)
       texturepool(),
       style(),
       glyphAtlas(1024, 1024),
-      painter(transform, style, glyphAtlas) {
+      painter(transform, style, glyphAtlas),
+      loop(uv_loop_new()) {
+    clean.clear();
 }
 
 Map::~Map() {
     settings.sync();
+}
+
+void Map::start() {
+    uv_async_init(loop, &async_terminate, [](uv_async_t *async) {
+        uv_stop(static_cast<uv_loop_t *>(async->data));
+    });
+    async_terminate.data = loop;
+
+    uv_thread_create(&thread, eventloop, this);
+}
+
+void Map::stop() {
+    uv_async_send(&async_terminate);
+    uv_thread_join(&thread);
+
+    uv_loop_delete(loop);
+    loop = nullptr;
+}
+
+void Map::eventloop(void *arg) {
+    Map *map = static_cast<Map *>(arg);
+
+    uv_run(map->loop, UV_RUN_DEFAULT);
 }
 
 void Map::setup() {
@@ -78,7 +103,7 @@ void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width
     painter.resize();
 
     if (!style.sprite || style.sprite->pixelRatio != transform.getPixelRatio()) {
-        style.sprite = std::make_shared<Sprite>(transform.getPixelRatio());
+        style.sprite = std::make_shared<Sprite>(*this, transform.getPixelRatio());
         style.sprite->load(kSpriteURL);
     }
 }
@@ -99,8 +124,13 @@ GlyphAtlas& Map::getGlyphAtlas() {
     return glyphAtlas;
 }
 
+uv_loop_t *Map::getLoop() {
+    return loop;
+}
+
 void Map::moveBy(double dx, double dy, double duration) {
     transform.moveBy(dx, dy, duration);
+
     update();
 
     transform.getLonLat(settings.longitude, settings.latitude);
@@ -109,12 +139,12 @@ void Map::moveBy(double dx, double dy, double duration) {
 
 void Map::startPanning() {
     transform.startPanning();
-    platform::restart();
+    redraw();
 }
 
 void Map::stopPanning() {
     transform.stopPanning();
-    platform::restart();
+    redraw();
 }
 
 void Map::scaleBy(double ds, double cx, double cy, double duration) {
@@ -128,12 +158,12 @@ void Map::scaleBy(double ds, double cx, double cy, double duration) {
 
 void Map::startScaling() {
     transform.startScaling();
-    platform::restart();
+    redraw();
 }
 
 void Map::stopScaling() {
     transform.stopScaling();
-    platform::restart();
+    redraw();
 }
 
 void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) {
@@ -146,13 +176,14 @@ void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) 
 
 void Map::startRotating() {
     transform.startRotating();
-    platform::restart();
+    redraw();
 }
 
 void Map::stopRotating() {
     transform.stopRotating();
-    platform::restart();
+    redraw();
 }
+
 
 void Map::setLonLat(double lon, double lat, double duration) {
     transform.setLonLat(lon, lat, duration);
@@ -294,6 +325,11 @@ void Map::update() {
     style.cascade(transform.getNormalizedZoom());
 
     // Schedules a repaint
+    redraw();
+}
+
+void Map::redraw() {
+    clean.clear();
     platform::restart();
 }
 
@@ -310,7 +346,7 @@ bool Map::updateTiles() {
     return changed;
 }
 
-bool Map::render() {
+void Map::render() {
     double animationTime = platform::elapsed();
 
     if (transform.needsAnimation()) {
@@ -360,5 +396,7 @@ bool Map::render() {
     bool transition = transform.needsAnimation();
     bool animation = painter.needsAnimation();
 
-    return changed || transition || animation;
+    if (changed || transition || animation) {
+        redraw();
+    }
 }

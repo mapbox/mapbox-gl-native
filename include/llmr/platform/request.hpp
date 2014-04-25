@@ -10,6 +10,7 @@
 // Forward definition.
 typedef struct uv_work_s uv_work_t;
 typedef struct uv_check_s uv_check_t;
+typedef struct uv_loop_s uv_loop_t;
 
 namespace llmr {
 namespace platform {
@@ -20,7 +21,8 @@ class Request : public std::enable_shared_from_this<Request>, private util::nonc
 public:
     Request(const std::string &url,
             std::function<void(Response *)> background_function,
-            std::function<void()> foreground_callback);
+            std::function<void()> foreground_callback,
+            uv_loop_t *loop);
     ~Request();
 
 public:
@@ -34,8 +36,9 @@ public:
     std::unique_ptr<Response> res;
     bool cancelled = false;
 
-private:
+public:
     uv_check_t *check = nullptr;
+    uv_loop_t *loop = nullptr;
 };
 }
 }

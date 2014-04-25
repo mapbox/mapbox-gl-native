@@ -22,6 +22,7 @@ namespace llmr {
 class Transform;
 class Style;
 class Tile;
+class GlyphAtlas;
 
 class FillBucket;
 class LineBucket;

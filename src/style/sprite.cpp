@@ -1,4 +1,5 @@
 #include <llmr/style/sprite.hpp>
+#include <llmr/map/map.hpp>
 #include <llmr/util/raster.hpp>
 
 #include <string>
@@ -20,7 +21,7 @@ ImagePosition::ImagePosition(const vec2<uint16_t>& size, vec2<float> tl, vec2<fl
       tl(tl),
       br(br) {}
 
-Sprite::Sprite(float pixelRatio) : pixelRatio(pixelRatio), raster(std::make_shared<Raster>()) {}
+Sprite::Sprite(Map &map, float pixelRatio) : pixelRatio(pixelRatio), raster(std::make_shared<Raster>()), map(map) {}
 
 void Sprite::load(const std::string& base_url) {
     std::shared_ptr<Sprite> sprite = shared_from_this();
@@ -29,7 +30,7 @@ void Sprite::load(const std::string& base_url) {
         std::lock_guard<std::mutex> lock(sprite->mtx);
         if (*sprite->raster && sprite->pos.size()) {
             sprite->loaded = true;
-            platform::restart();
+            sprite->map.redraw();
             fprintf(stderr, "sprite loaded\n");
         }
     };
@@ -42,7 +43,7 @@ void Sprite::load(const std::string& base_url) {
         } else {
             fprintf(stderr, "failed to load sprite\n");
         }
-    }, complete);
+    }, complete, map.getLoop());
 
     platform::request_http(base_url + suffix + ".png", [sprite](const platform::Response *res) {
         if (res->code == 200) {
@@ -50,7 +51,7 @@ void Sprite::load(const std::string& base_url) {
         } else {
             fprintf(stderr, "failed to load sprite image\n");
         }
-    }, complete);
+    }, complete, map.getLoop());
 }
 
 Sprite::operator bool() const {

@@ -7,6 +7,7 @@
 #include <llmr/renderer/text_bucket.hpp>
 #include <llmr/renderer/raster_bucket.hpp>
 #include <llmr/util/raster.hpp>
+#include <llmr/geometry/glyph_atlas.hpp>
 
 #include <llmr/util/std.hpp>
 
