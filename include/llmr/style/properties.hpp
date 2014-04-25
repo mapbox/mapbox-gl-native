@@ -75,6 +75,7 @@ struct LineClass {
     FunctionProperty width;
     FunctionProperty offset;
     Color color = {{ 0, 0, 0, 1 }};
+    std::array<FunctionProperty, 2> dash_array = {{ 1, -1 }};
     FunctionProperty opacity = 1;
 };
 
@@ -83,6 +84,7 @@ struct LineProperties {
     float width = 0;
     float offset = 0;
     Color color = {{ 0, 0, 0, 1 }};
+    std::array<float, 2> dash_array = {{ 1, -1 }};
     float opacity = 1.0;
 };
 

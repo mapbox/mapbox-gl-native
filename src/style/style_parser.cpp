@@ -3,6 +3,8 @@
 
 using namespace llmr;
 
+using JSVal = const rapidjson::Value&;
+
 void StyleParser::parseBuckets(JSVal value, std::map<std::string, BucketDescription>& buckets) {
     if (value.IsObject()) {
         rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
@@ -287,6 +289,24 @@ std::string StyleParser::parseString(JSVal value) {
     return { value.GetString(), value.GetStringLength() };
 }
 
+std::vector<FunctionProperty> StyleParser::parseFunctionArray(JSVal value, uint16_t expected_count) {
+    if (!value.IsArray()) {
+        throw Style::exception("array value must be an array");
+    }
+
+    if (value.IsArray() && value.Size() != expected_count) {
+        throw Style::exception("array value has unexpected number of elements");
+    }
+
+    std::vector<FunctionProperty> values;
+    values.reserve(expected_count);
+    for (uint16_t i = 0; i < expected_count; i++) {
+        values.push_back(parseFunction(value[(rapidjson::SizeType)i]));
+    }
+
+    return values;
+}
+
 Color StyleParser::parseColor(JSVal value) {
     if (value.IsArray()) {
         // [ r, g, b, a] array
@@ -437,6 +457,11 @@ LineClass StyleParser::parseLineClass(JSVal value) {
 
     if (value.HasMember("opacity")) {
         klass.opacity = parseFunction(value["opacity"]);
+    }
+
+    if (value.HasMember("dasharray")) {
+        std::vector<FunctionProperty> values = parseFunctionArray(value["dasharray"], 2);
+        klass.dash_array = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
     }
 
     return klass;

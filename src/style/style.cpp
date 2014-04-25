@@ -58,6 +58,7 @@ void Style::cascade(float z) {
             stroke.width = layer.width.evaluate<float>(z);
             stroke.offset = layer.offset.evaluate<float>(z);
             stroke.color = layer.color;
+            stroke.dash_array = {{ layer.dash_array[0].evaluate<float>(z), layer.dash_array[1].evaluate<float>(z) }};
             stroke.opacity = layer.opacity.evaluate<float>(z);
         }
 
