@@ -289,32 +289,46 @@ std::string StyleParser::parseString(JSVal value) {
     return { value.GetString(), value.GetStringLength() };
 }
 
-std::vector<FunctionProperty> StyleParser::parseFunctionArray(JSVal value, uint16_t expected_count) {
-    if (!value.IsArray()) {
+const JSVal& StyleParser::replaceConstant(const JSVal& value) {
+    if (value.IsString()) {
+        const std::string string_value { value.GetString(), value.GetStringLength() };
+        auto it = constants.find(string_value);
+        if (it != constants.end()) {
+            return *it->second;
+        }
+    }
+
+    return value;
+}
+
+std::vector<FunctionProperty> StyleParser::parseArray(JSVal value, uint16_t expected_count) {
+    JSVal rvalue = replaceConstant(value);
+    if (!rvalue.IsArray()) {
         throw Style::exception("array value must be an array");
     }
 
-    if (value.IsArray() && value.Size() != expected_count) {
+    if (rvalue.IsArray() && rvalue.Size() != expected_count) {
         throw Style::exception("array value has unexpected number of elements");
     }
 
     std::vector<FunctionProperty> values;
     values.reserve(expected_count);
     for (uint16_t i = 0; i < expected_count; i++) {
-        values.push_back(parseFunction(value[(rapidjson::SizeType)i]));
+        values.push_back(parseFunction(rvalue[(rapidjson::SizeType)i]));
     }
 
     return values;
 }
 
 Color StyleParser::parseColor(JSVal value) {
-    if (value.IsArray()) {
+    JSVal rvalue = replaceConstant(value);
+    if (rvalue.IsArray()) {
         // [ r, g, b, a] array
-        if (value.Size() != 4) {
+        if (rvalue.Size() != 4) {
             throw Style::exception("color array must have four elements");
         }
 
-        JSVal r = value[(rapidjson::SizeType)0], g = value[1], b = value[2], a = value[3];
+        JSVal r = rvalue[(rapidjson::SizeType)0], g = rvalue[1], b = rvalue[2], a = rvalue[3];
         if (!r.IsNumber() || !g.IsNumber() || !b.IsNumber() || !a.IsNumber()) {
             throw Style::exception("color values must be numbers");
         }
@@ -324,20 +338,13 @@ Color StyleParser::parseColor(JSVal value) {
                  static_cast<float>(b.GetDouble()),
                  static_cast<float>(a.GetDouble())}};
 
-    } else if (!value.IsString()) {
+    } else if (!rvalue.IsString()) {
         throw Style::exception("color value must be a string");
     }
 
-    const std::string str{value.GetString(), value.GetStringLength()};
-
-    auto it = constants.find(str);
-    if (it != constants.end()) {
-        return parseColor(*it->second);
-    } else {
-        CSSColorParser::Color css_color = CSSColorParser::parse(str);
-        return {{(float)css_color.r / 255, (float)css_color.g / 255,
-                 (float)css_color.b / 255, css_color.a}};
-    }
+    CSSColorParser::Color css_color = CSSColorParser::parse({ rvalue.GetString(), rvalue.GetStringLength() });
+    return {{(float)css_color.r / 255, (float)css_color.g / 255,
+             (float)css_color.b / 255, css_color.a}};
 }
 
 FunctionProperty::fn StyleParser::parseFunctionType(JSVal type) {
@@ -460,7 +467,7 @@ LineClass StyleParser::parseLineClass(JSVal value) {
     }
 
     if (value.HasMember("dasharray")) {
-        std::vector<FunctionProperty> values = parseFunctionArray(value["dasharray"], 2);
+        std::vector<FunctionProperty> values = parseArray(value["dasharray"], 2);
         klass.dash_array = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
     }
 
