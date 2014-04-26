@@ -497,9 +497,10 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     color[3] *= properties.opacity;
 
     std::string sized_image = properties.image;
-    sized_image.append("-");
-    sized_image.append(std::to_string(static_cast<int>(std::round(properties.size))));
-
+    if (properties.size) {
+        sized_image.append("-");
+        sized_image.append(std::to_string(static_cast<int>(std::round(properties.size))));
+    }
     ImagePosition imagePos = style.sprite->getPosition(sized_image, false);
 
     // fprintf(stderr, "%f/%f => %f/%f\n", imagePos.tl.x, imagePos.tl.y, imagePos.br.x, imagePos.br.y);
@@ -508,7 +509,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     pointShader->setMatrix(matrix);
     pointShader->setImage(0);
     pointShader->setColor(color);
-    const float pointSize = properties.size * 1.4142135623730951 * transform.getPixelRatio();
+    const float pointSize = (properties.size ? properties.size : (imagePos.size.x / transform.getPixelRatio())) * 1.4142135623730951 * transform.getPixelRatio();
 #if defined(GL_ES_VERSION_2_0)
     pointShader->setSize(pointSize);
 #else
