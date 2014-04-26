@@ -244,6 +244,20 @@ void Painter::renderLayer(const std::shared_ptr<TileData>& tile_data, const Laye
     }
 }
 
+void Painter::translateLayer(std::array<float, 2> translation, bool reverse) {
+    if (translation[0] || translation[1]) {
+        if (reverse) {
+            translation[0] *= -1;
+            translation[1] *= -1;
+        }
+        matrix::translate(matrix,
+                          matrix,
+                          translation[0] / transform.getPixelRatio(),
+                          translation[1] / transform.getPixelRatio(),
+                          0);
+    }
+}
+
 void Painter::renderRaster(const std::string& layer_name, const std::shared_ptr<TileData>& tile_data) {
     if (pass == Opaque) return;
 
@@ -289,9 +303,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         stroke_color = fill_color;
     }
 
-    if (properties.translate[0] && properties.translate[1]) {
-        matrix::translate(matrix, matrix, properties.translate[0] / transform.getPixelRatio(), properties.translate[1] / transform.getPixelRatio(), 0);
-    }
+    translateLayer(properties.translate);
 
     gl::group group(layer_name + " (fill)");
     // Because we're drawing top-to-bottom, and we update the stencil mask
@@ -395,9 +407,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         bucket.drawVertices(*outlineShader);
     }
 
-    if (properties.translate[0] && properties.translate[1]) {
-        matrix::translate(matrix, matrix, -properties.translate[0] / transform.getPixelRatio(), -properties.translate[1] / transform.getPixelRatio(), 0);
-    }
+    translateLayer(properties.translate, true);
 }
 
 void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
@@ -424,6 +434,8 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 
     float dash_length = properties.dash_array[0];
     float dash_gap = properties.dash_array[1];
+
+    translateLayer(properties.translate);
 
     gl::group group(layer_name + " (line)");
     glDepthRange(strata, 1.0f);
@@ -478,6 +490,8 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         lineShader->setColor(color);
         bucket.drawLines(*lineShader);
     }
+
+    translateLayer(properties.translate, true);
 }
 
 void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& /*id&*/) {
@@ -487,6 +501,8 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
 
     const PointProperties& properties = style.computed.points[layer_name];
     if (!properties.enabled) return;
+
+    translateLayer(properties.translate);
 
     gl::group group(layer_name + " (point)");
 
@@ -523,6 +539,8 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     }
     glDepthRange(strata, 1.0f);
     bucket.drawPoints(*pointShader);
+
+    translateLayer(properties.translate, true);
 }
 
 void Painter::renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
@@ -532,6 +550,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 
     const TextProperties& properties = style.computed.texts[layer_name];
     if (!properties.enabled) return;
+
+    translateLayer(properties.translate);
 
     gl::group group(layer_name + " (text)");
 
@@ -625,6 +645,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     textShader->setBuffer((256.0f - 64.0f) / 256.0f);
     glDepthRange(strata + strata_epsilon, 1.0f);
     bucket.drawGlyphs(*textShader);
+
+    translateLayer(properties.translate, true);
 }
 
 void Painter::renderDebug(const TileData::Ptr& tile_data) {

@@ -58,6 +58,7 @@ private:
     void setupShaders();
     void renderLayers(const std::shared_ptr<TileData>& tile, const std::vector<LayerDescription>& layers);
     void renderLayer(const std::shared_ptr<TileData>& tile_data, const LayerDescription& layer_desc);
+    void translateLayer(std::array<float, 2> translation, bool reverse = false);
     void renderDebug(const std::shared_ptr<TileData>& tile);
 
     void useProgram(uint32_t program);
