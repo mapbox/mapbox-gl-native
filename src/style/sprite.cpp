@@ -80,7 +80,7 @@ void Sprite::parseJSON(const std::string& data) {
                 if (value.HasMember("y")) y = value["y"].GetInt();
                 if (value.HasMember("width")) width = value["width"].GetInt();
                 if (value.HasMember("height")) height = value["height"].GetInt();
-                if (value.HasMember("pixelRatio")) pixelRatio = value["height"].GetInt();
+                if (value.HasMember("pixelRatio")) pixelRatio = value["pixelRatio"].GetInt();
 
                 pos.insert({ name, { x, y, width, height, pixelRatio } });
             }
