@@ -49,8 +49,10 @@ public:
 
 private:
     void asyncParseJSON();
+    void asyncParseImage();
 
     static void parseJSON(std::shared_ptr<Sprite> &sprite);
+    static void parseImage(std::shared_ptr<Sprite> &sprite);
     static void complete(std::shared_ptr<Sprite> &sprite);
 
 private:

@@ -40,9 +40,8 @@ void Sprite::load(const std::string& base_url) {
 
    platform::request_http(base_url + suffix + ".png", [sprite](platform::Response *res) {
        if (res->code == 200) {
-            // TODO: move raster loading to other thread
-            // TODO: call complete handler
-            sprite->raster->load(res->body);
+            sprite->raster->setData(res->body);
+            sprite->asyncParseImage();
        } else {
            fprintf(stderr, "failed to load sprite image\n");
        }
@@ -51,7 +50,7 @@ void Sprite::load(const std::string& base_url) {
 
 void Sprite::complete(std::shared_ptr<Sprite> &sprite) {
    std::lock_guard<std::mutex> lock(sprite->mtx);
-   if (*sprite->raster && sprite->pos.size()) {
+   if (sprite->raster && sprite->raster->isLoaded() && sprite->pos.size()) {
        sprite->loaded = true;
        sprite->map.update();
        fprintf(stderr, "sprite loaded\n");
@@ -63,11 +62,16 @@ bool Sprite::isLoaded() const {
     return loaded;
 }
 
+void Sprite::asyncParseImage() {
+    new uv::work<std::shared_ptr<Sprite>>(map.getLoop(), parseImage, complete, shared_from_this());
+}
+
 void Sprite::asyncParseJSON() {
-   new uv::work<std::shared_ptr<Sprite>>(map.getLoop(),
-                     parseJSON,
-                     complete,
-                     shared_from_this());
+    new uv::work<std::shared_ptr<Sprite>>(map.getLoop(), parseJSON, complete, shared_from_this());
+}
+
+void Sprite::parseImage(std::shared_ptr<Sprite> &sprite) {
+  sprite->raster->load();
 }
 
 void Sprite::parseJSON(std::shared_ptr<Sprite> &sprite) {
@@ -101,7 +105,7 @@ void Sprite::parseJSON(std::shared_ptr<Sprite> &sprite) {
 }
 
 ImagePosition Sprite::getPosition(const std::string& name, bool repeating) {
-    if (!*this->raster) return {};
+    if (!this->raster || !this->raster->isLoaded()) return {};
 
     // `repeating` indicates that the image will be used in a repeating pattern
     // repeating pattern images are assumed to have a 1px padding that mirrors the opposite edge

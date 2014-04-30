@@ -542,7 +542,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
 #endif
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
-    if (*sprite->raster) {
+    if (sprite->raster->isLoaded()) {
         sprite->raster->bind(map.getState().isChanging());
     }
     glDepthRange(strata, 1.0f);

@@ -8,6 +8,8 @@
 #include <mutex>
 #include <memory>
 
+typedef struct uv_loop_s uv_loop_t;
+
 namespace llmr {
 
 class Raster : public std::enable_shared_from_this<Raster> {
@@ -16,7 +18,7 @@ public:
     ~Raster();
 
     // load image data
-    void load(const std::string& data);
+    void load();
 
     // set shared texture pool
     void setTexturepool(Texturepool* texturepool);
@@ -25,12 +27,14 @@ public:
     void bind(bool linear = false);
 
     // loaded status
-    operator bool() const;
+    bool isLoaded() const;
 
     // animations
     void beginFadeInAnimation();
     bool needsAnimation() const;
     void updateAnimations(double time);
+
+    inline void setData(const std::string &img) { data = img; }
 
 public:
     // loaded image dimensions
@@ -60,6 +64,9 @@ private:
 
     // min/mag filter
     uint32_t filter = 0;
+
+    // the encoded image data.
+    std::string data;
 
     // the raw pixels
     char *img = nullptr;
