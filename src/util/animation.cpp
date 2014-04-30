@@ -8,15 +8,15 @@ UnitBezier ease(0.25, 0.1, 0.25, 1);
 
 animation::~animation() {}
 
-ease_animation::ease_animation(double from, double to, double &value, double start, double duration)
+ease_animation::ease_animation(double from, double to, double &value, time start, time duration)
     : animation(start, duration),
       from(from),
       to(to),
       value(value) {
 }
 
-animation::state ease_animation::update(double time) const {
-    double t = progress(time);
+animation::state ease_animation::update(time now) const {
+    float t = progress(now);
     if (t >= 1) {
         value = to;
         return complete;

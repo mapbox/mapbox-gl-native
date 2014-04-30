@@ -135,7 +135,7 @@ private:
     std::map<std::string, const std::unique_ptr<Source>> sources;
 
     bool debug = false;
-    double animationTime = 0;
+    time animationTime = 0;
 
 private:
     bool async = false;

@@ -40,13 +40,13 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
 
 #pragma mark - Position
 
-void Transform::moveBy(const double dx, const double dy, const double duration) {
+void Transform::moveBy(const double dx, const double dy, const time duration) {
     uv::writelock lock(mtx);
 
     _moveBy(dx, dy, duration);
 }
 
-void Transform::_moveBy(const double dx, const double dy, const double duration) {
+void Transform::_moveBy(const double dx, const double dy, const time duration) {
     // This is only called internally, so we don't need a lock here.
 
     final.x = current.x + cos(current.angle) * dx + sin(current.angle) * dy;
@@ -57,7 +57,7 @@ void Transform::_moveBy(const double dx, const double dy, const double duration)
         current.y = final.y;
     } else {
         // Use a common start time for all of the animations to avoid divergent animations.
-        double start = (double)util::now() / 1_second;
+        time start = util::now();
         animations.emplace_front(
             std::make_shared<util::ease_animation>(current.x, final.x, current.x, start, duration));
         animations.emplace_front(
@@ -65,7 +65,7 @@ void Transform::_moveBy(const double dx, const double dy, const double duration)
     }
 }
 
-void Transform::setLonLat(const double lon, const double lat, const double duration) {
+void Transform::setLonLat(const double lon, const double lat, const time duration) {
     uv::writelock lock(mtx);
 
     const double f = fmin(fmax(sin(D2R * lat), -0.9999), 0.9999);
@@ -76,7 +76,7 @@ void Transform::setLonLat(const double lon, const double lat, const double durat
 }
 
 void Transform::setLonLatZoom(const double lon, const double lat, const double zoom,
-                              const double duration) {
+                              const time duration) {
     uv::writelock lock(mtx);
 
     double new_scale = pow(2.0, zoom);
@@ -114,8 +114,8 @@ void Transform::startPanning() {
 
     // Add a 200ms timeout for resetting this to false
     current.panning = true;
-    double start = (double)util::now() / 1_second;
-    pan_timeout = std::make_shared<util::timeout<bool>>(false, current.panning, start, 0.2);
+    time start = util::now();
+    pan_timeout = std::make_shared<util::timeout<bool>>(false, current.panning, start, 200_milliseconds);
     animations.emplace_front(pan_timeout);
 }
 
@@ -135,7 +135,7 @@ void Transform::_clearPanning() {
 
 #pragma mark - Zoom
 
-void Transform::scaleBy(const double ds, const double cx, const double cy, const double duration) {
+void Transform::scaleBy(const double ds, const double cx, const double cy, const time duration) {
     uv::writelock lock(mtx);
 
     // clamp scale to min/max values
@@ -150,13 +150,13 @@ void Transform::scaleBy(const double ds, const double cx, const double cy, const
 }
 
 void Transform::setScale(const double scale, const double cx, const double cy,
-                         const double duration) {
+                         const time duration) {
     uv::writelock lock(mtx);
 
     _setScale(scale, cx, cy, duration);
 }
 
-void Transform::setZoom(const double zoom, const double duration) {
+void Transform::setZoom(const double zoom, const time duration) {
     uv::writelock lock(mtx);
 
     _setScale(pow(2.0, zoom), -1, -1, duration);
@@ -181,8 +181,8 @@ void Transform::startScaling() {
 
     // Add a 200ms timeout for resetting this to false
     current.scaling = true;
-    double start = (double)util::now() / 1_second;
-    scale_timeout = std::make_shared<util::timeout<bool>>(false, current.scaling, start, 0.2);
+    time start = util::now();
+    scale_timeout = std::make_shared<util::timeout<bool>>(false, current.scaling, start, 200_milliseconds);
     animations.emplace_front(scale_timeout);
 }
 
@@ -202,7 +202,7 @@ void Transform::_clearScaling() {
     }
 }
 
-void Transform::_setScale(double new_scale, double cx, double cy, const double duration) {
+void Transform::_setScale(double new_scale, double cx, double cy, const time duration) {
     // This is only called internally, so we don't need a lock here.
 
     // Ensure that we don't zoom in further than the maximum allowed.
@@ -236,7 +236,7 @@ void Transform::_setScale(double new_scale, double cx, double cy, const double d
 }
 
 void Transform::_setScaleXY(const double new_scale, const double xn, const double yn,
-                            const double duration) {
+                            const time duration) {
     // This is only called internally, so we don't need a lock here.
 
     final.scale = new_scale;
@@ -249,7 +249,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
         current.y = final.y;
     } else {
         // Use a common start time for all of the animations to avoid divergent animations.
-        double start = (double)util::now() / 1_second;
+        time start = util::now();
         animations.emplace_front(std::make_shared<util::ease_animation>(
             current.scale, final.scale, current.scale, start, duration));
         animations.emplace_front(
@@ -267,7 +267,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
 #pragma mark - Angle
 
 void Transform::rotateBy(const double start_x, const double start_y, const double end_x,
-                         const double end_y, const double duration) {
+                         const double end_y, const time duration) {
     uv::writelock lock(mtx);
 
     double center_x = current.width / 2, center_y = current.height / 2;
@@ -297,7 +297,7 @@ void Transform::rotateBy(const double start_x, const double start_y, const doubl
     _setAngle(ang, duration);
 }
 
-void Transform::setAngle(const double new_angle, const double duration) {
+void Transform::setAngle(const double new_angle, const time duration) {
     uv::writelock lock(mtx);
 
     _setAngle(new_angle, duration);
@@ -321,7 +321,7 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
     }
 }
 
-void Transform::_setAngle(double new_angle, const double duration) {
+void Transform::_setAngle(double new_angle, const time duration) {
     // This is only called internally, so we don't need a lock here.
 
     while (new_angle > M_PI)
@@ -334,7 +334,7 @@ void Transform::_setAngle(double new_angle, const double duration) {
     if (duration == 0) {
         current.angle = final.angle;
     } else {
-        double start = (double)util::now() / 1_second;
+        time start = util::now();
         animations.emplace_front(std::make_shared<util::ease_animation>(
             current.angle, final.angle, current.angle, start, duration));
     }
@@ -353,8 +353,8 @@ void Transform::startRotating() {
 
     // Add a 200ms timeout for resetting this to false
     current.rotating = true;
-    double start = (double)util::now() / 1_second;
-    rotate_timeout = std::make_shared<util::timeout<bool>>(false, current.rotating, start, 0.2);
+    time start = util::now();
+    rotate_timeout = std::make_shared<util::timeout<bool>>(false, current.rotating, start, 200_milliseconds);
     animations.emplace_front(rotate_timeout);
 }
 
@@ -382,11 +382,11 @@ bool Transform::needsAnimation() const {
     return !animations.empty();
 }
 
-void Transform::updateAnimations(const double time) {
+void Transform::updateAnimations(const time now) {
     uv::writelock lock(mtx);
 
-    animations.remove_if([time](const std::shared_ptr<util::animation> &animation) {
-        return animation->update(time) == util::animation::complete;
+    animations.remove_if([now](const std::shared_ptr<util::animation> &animation) {
+        return animation->update(now) == util::animation::complete;
     });
 }
 

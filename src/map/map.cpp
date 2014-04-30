@@ -288,7 +288,7 @@ double Map::getAngle() const {
 }
 
 void Map::resetNorth() {
-    transform.setAngle(0, 0.5);
+    transform.setAngle(0, 500_milliseconds);
     update();
 }
 
@@ -349,7 +349,7 @@ void Map::prepare() {
     view.make_active();
 
     // Update animations
-    animationTime = (double)util::now() / 1e9;
+    animationTime = util::now();
     bool animating = transform.needsAnimation();
     if (animating) {
         transform.updateAnimations(animationTime);

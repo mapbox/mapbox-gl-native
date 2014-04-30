@@ -4,6 +4,7 @@
 #include <llmr/map/tile.hpp>
 #include <llmr/map/tile_data.hpp>
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/util/time.hpp>
 
 #include <forward_list>
 #include <memory>
@@ -34,7 +35,7 @@ public:
 
     bool update();
     void prepare_render(const TransformState &transform, bool is_baselayer = false);
-    void render(double animationTime);
+    void render(time animationTime);
 
 
 public:

@@ -32,7 +32,7 @@ public:
     // animations
     void beginFadeInAnimation();
     bool needsAnimation() const;
-    void updateAnimations(double time);
+    void updateAnimations(time now);
 
     inline void setData(const std::string &img) { data = img; }
 

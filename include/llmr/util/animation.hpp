@@ -2,6 +2,7 @@
 #define LLMR_UTIL_ANIMATION
 
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/util/time.hpp>
 
 namespace llmr {
 namespace util {
@@ -12,25 +13,31 @@ public:
         running,
         complete
     };
-    animation(double start, double duration)
+
+    inline animation(time start, time duration)
         : start(start),
           duration(duration) {}
 
-    double progress(double time) const {
-        return (time - start) / duration;
+    inline float progress(time now) const {
+        return (float)(now - start) / duration;
     }
 
-    virtual state update(double time) const = 0;
+    virtual state update(time now) const = 0;
     virtual ~animation();
 
 protected:
-    const double start, duration;
+    const time start, duration;
 };
 
 class ease_animation : public animation {
 public:
-    ease_animation(double from, double to, double& value, double start, double duration);
-    state update(double time) const;
+    // Disable automatic casts.
+    template <typename T1, typename T2>
+    inline ease_animation(double from, double to, double& value, T1 start, T2 duration) = delete;
+
+    // Actual constructor.
+    ease_animation(double from, double to, double& value, time start, time duration);
+    state update(time now) const;
 
 private:
     const double from, to;
@@ -40,13 +47,18 @@ private:
 template <typename T>
 class timeout : public animation {
 public:
-    timeout(T final_value, T& value, double start, double duration)
+    // Disable automatic casts.
+    template <typename T1, typename T2>
+    inline timeout(T final_value, T& value, T1 start, T2 duration) = delete;
+
+    // Actual constructor.
+    timeout(T final_value, T& value, time start, time duration)
         : animation(start, duration),
           final_value(final_value),
           value(value) {}
 
-    state update(double time) const {
-        if (progress(time) >= 1) {
+    state update(time now) const {
+        if (progress(now) >= 1) {
             value = final_value;
             return complete;
         } else {

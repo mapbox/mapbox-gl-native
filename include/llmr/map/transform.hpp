@@ -23,26 +23,26 @@ public:
                 uint16_t fb_width, uint16_t fb_height);
 
     // Position
-    void moveBy(double dx, double dy, double duration = 0);
-    void setLonLat(double lon, double lat, double duration = 0);
-    void setLonLatZoom(double lon, double lat, double zoom, double duration = 0);
+    void moveBy(double dx, double dy, time duration = 0);
+    void setLonLat(double lon, double lat, time duration = 0);
+    void setLonLatZoom(double lon, double lat, double zoom, time duration = 0);
     void getLonLat(double& lon, double& lat) const;
     void getLonLatZoom(double& lon, double& lat, double& zoom) const;
     void startPanning();
     void stopPanning();
 
     // Zoom
-    void scaleBy(double ds, double cx = -1, double cy = -1, double duration = 0);
-    void setScale(double scale, double cx = -1, double cy = -1, double duration = 0);
-    void setZoom(double zoom, double duration = 0);
+    void scaleBy(double ds, double cx = -1, double cy = -1, time duration = 0);
+    void setScale(double scale, double cx = -1, double cy = -1, time duration = 0);
+    void setZoom(double zoom, time duration = 0);
     double getZoom() const;
     double getScale() const;
     void startRotating();
     void stopRotating();
 
     // Angle
-    void rotateBy(double sx, double sy, double ex, double ey, double duration = 0);
-    void setAngle(double angle, double duration = 0);
+    void rotateBy(double sx, double sy, double ex, double ey, time duration = 0);
+    void setAngle(double angle, time duration = 0);
     void setAngle(double angle, double cx, double cy);
     double getAngle() const;
     void startScaling();
@@ -50,7 +50,7 @@ public:
 
     // Animations
     bool needsAnimation() const;
-    void updateAnimations(double time);
+    void updateAnimations(time now);
     void cancelAnimations();
 
     // Transform state
@@ -60,10 +60,10 @@ public:
 private:
     // Functions prefixed with underscores will *not* perform any locks. It is the caller's
     // responsibility to lock this object.
-    void _moveBy(double dx, double dy, double duration = 0);
-    void _setScale(double scale, double cx, double cy, double duration = 0);
-    void _setScaleXY(double new_scale, double xn, double yn, double duration = 0);
-    void _setAngle(double angle, double duration = 0);
+    void _moveBy(double dx, double dy, time duration = 0);
+    void _setScale(double scale, double cx, double cy, time duration = 0);
+    void _setScaleXY(double new_scale, double xn, double yn, time duration = 0);
+    void _setAngle(double angle, time duration = 0);
     void _clearPanning();
     void _clearRotating();
     void _clearScaling();

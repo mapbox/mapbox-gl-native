@@ -46,7 +46,7 @@ void Source::prepare_render(const TransformState &transform, bool is_baselayer) 
     }
 }
 
-void Source::render(double animationTime) {
+void Source::render(time animationTime) {
     if (!enabled) return;
 
     for (const Tile& tile : tiles) {

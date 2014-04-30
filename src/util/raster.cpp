@@ -186,16 +186,16 @@ void Raster::bind(bool linear) {
 }
 
 void Raster::beginFadeInAnimation() {
-    double start = (double)util::now() / 1_second;
-    fade_animation = std::make_shared<util::ease_animation>(opacity, 1.0, opacity, start, 0.25);
+    time start = util::now();
+    fade_animation = std::make_shared<util::ease_animation>(opacity, 1.0, opacity, start, 250_milliseconds);
 }
 
 bool Raster::needsAnimation() const {
     return fade_animation != nullptr;
 }
 
-void Raster::updateAnimations(double time) {
-    if (fade_animation->update(time) == util::animation::complete) {
+void Raster::updateAnimations(time now) {
+    if (fade_animation->update(now) == util::animation::complete) {
         fade_animation = nullptr;
     }
 }
