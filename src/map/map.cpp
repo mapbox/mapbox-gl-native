@@ -360,6 +360,10 @@ void Map::prepare() {
         style.sprite->load(kSpriteURL);
     }
 
+    if (style.sprite && style.sprite->raster->isLoaded() && !style.sprite->raster->textured) {
+        style.sprite->raster->setTexturepool(&texturepool);
+    }
+
     updateTiles();
 }
 
