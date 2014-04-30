@@ -88,10 +88,9 @@ static std::queue<CURL *> curl_handle_cache;
 class CURLRequest : public llmr::platform::Request {
 public:
     CURLRequest(const std::string &url,
-                std::function<void(llmr::platform::Response *)> background_function,
-                std::function<void()> foreground_callback,
+                std::function<void(llmr::platform::Response *)> callback,
                 uv_loop_t *loop)
-        : Request(url, background_function, foreground_callback, loop) {}
+        : Request(url, callback, loop) {}
 
     CURL *curl = nullptr;
 };
@@ -169,16 +168,7 @@ void curl_perform(uv_poll_t *req, int /*status*/, int events) {
             // We're currently in the CURL request thread. We're going to schedule a uv_work request
             // that executes the background function in a threadpool, and tell it to call the
             // after callback back in the main uv loop.
-
-            uv_work_t *work = new uv_work_t();
-
-            // We're passing on the pointer we created to the work structure.
-            // It is going to be deleted in the after_work_cb;
-            work->data = req;
-
-            // Executes the background_function in a libuv thread pool, and the after_work_cb back
-            // in the *main* event loop.
-            uv_queue_work((*req)->loop, work, Request::work_callback, Request::after_work_callback);
+            (*req)->complete();
 
             CURL *handle = message->easy_handle;
             remove_curl_handle(handle);
@@ -187,6 +177,8 @@ void curl_perform(uv_poll_t *req, int /*status*/, int events) {
             // be cancelled.
             ((CURLRequest *)req->get())->curl = nullptr;
 
+            // Delete the shared_ptr pointer we created earlier.
+            delete req;
             break;
         }
 
@@ -312,8 +304,6 @@ void async_add_cb(uv_async_t * /*async*/) {
             continue;
         }
 
-        (*req)->res = std::make_unique<Response>();
-
         // Obtain a curl handle (and try to reuse existing handles before creating new ones).
         CURL *handle = nullptr;
         if (!curl_handle_cache.empty()) {
@@ -367,12 +357,11 @@ void thread_init_cb() {
 
 std::shared_ptr<platform::Request>
 platform::request_http(const std::string &url,
-                       std::function<void(Response *)> background_function,
-                       std::function<void()> foreground_callback,
+                       std::function<void(Response *)> callback,
                        uv_loop_t *loop) {
     using namespace request;
     init_thread_once(thread_init_cb);
-    std::shared_ptr<CURLRequest> req = std::make_shared<CURLRequest>(url, background_function, foreground_callback, loop);
+    std::shared_ptr<CURLRequest> req = std::make_shared<CURLRequest>(url, callback, loop);
 
     // Note that we are creating a new shared_ptr pointer(!) because the lockless queue can't store
     // objects with nontrivial destructors. We have to make absolutely sure that we manually delete

@@ -5,12 +5,15 @@
 #include <GLFW/glfw3.h>
 #include <uv.h>
 
-class MapView {
+class MapView : public llmr::View {
 public:
     MapView(llmr::Settings &settings, bool fullscreen = false);
     ~MapView();
 
     void init();
+
+    void swap();
+    void make_active();
 
     static void key(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void scroll(GLFWwindow *window, double xoffset, double yoffset);

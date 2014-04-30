@@ -1,39 +1,7 @@
 #include "glfw_view.hpp"
 
-
-#ifndef HAVE_KQUEUE
-# if defined(__APPLE__) ||                                                    \
-     defined(__DragonFly__) ||                                                \
-     defined(__FreeBSD__) ||                                                  \
-     defined(__OpenBSD__) ||                                                  \
-     defined(__NetBSD__)
-#  define HAVE_KQUEUE 1
-# endif
-#endif
-
-#ifndef HAVE_EPOLL
-# if defined(__linux__)
-#  define HAVE_EPOLL 1
-# endif
-#endif
-
-#if defined(HAVE_KQUEUE) || defined(HAVE_EPOLL)
-
-#if defined(HAVE_KQUEUE)
-# include <sys/types.h>
-# include <sys/event.h>
-# include <sys/time.h>
-#endif
-
-#if defined(HAVE_EPOLL)
-# include <sys/epoll.h>
-#endif
-
-#endif
-
-
 MapView::MapView(llmr::Settings &settings, bool fullscreen)
-    : fullscreen(fullscreen), settings(settings), map(settings) {}
+    : fullscreen(fullscreen), settings(settings), map(*this) {}
 
 MapView::~MapView() { glfwTerminate(); }
 
@@ -77,13 +45,8 @@ void MapView::init() {
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
     settings.load();
-    map.setup();
 
     resize(window, 0, 0);
-
-    glfwSwapInterval(1);
-
-    map.loadSettings();
 
     glfwSetCursorPosCallback(window, mousemove);
     glfwSetMouseButtonCallback(window, mouseclick);
@@ -91,6 +54,8 @@ void MapView::init() {
     glfwSetFramebufferSizeCallback(window, resize);
     glfwSetScrollCallback(window, scroll);
     glfwSetKeyCallback(window, key);
+
+    glfwMakeContextCurrent(nullptr);
 }
 
 void MapView::key(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
@@ -152,7 +117,6 @@ void MapView::resize(GLFWwindow *window, int, int) {
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
     mapView->map.resize(width, height, (float)fb_width / (float)width, fb_width, fb_height);
-    mapView->map.update();
 }
 
 void MapView::mouseclick(GLFWwindow *window, int button, int action, int modifiers) {
@@ -199,17 +163,11 @@ int MapView::run() {
     map.start();
 
     while (!glfwWindowShouldClose(window)) {
-        if (map.clean.test_and_set() == false) {
-            // This branch is executed when the previous value of the "clean"
-            // flag is false (i.e. it is unclean == dirty).
-            try {
-                map.render();
-            }
-            catch (std::exception &ex) {
-                fprintf(stderr, "exception: %s\n", ex.what());
-            }
+        if (map.swapped.test_and_set() == false) {
             glfwSwapBuffers(window);
+            map.rendered.clear();
             fps();
+            map.rerender();
         }
 
         glfwWaitEvents();
@@ -218,6 +176,14 @@ int MapView::run() {
     map.stop();
 
     return 0;
+}
+
+void MapView::make_active() {
+    glfwMakeContextCurrent(window);
+}
+
+void MapView::swap() {
+    glfwPostEmptyEvent();
 }
 
 void MapView::fps() {
@@ -265,10 +231,6 @@ void show_debug_image(std::string name, const char *data, size_t width, size_t h
     glfwSwapBuffers(debug_window);
 
     glfwMakeContextCurrent(current_window);
-}
-
-void restart() {
-    glfwPostEmptyEvent();
 }
 
 }

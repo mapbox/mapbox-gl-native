@@ -1,4 +1,5 @@
 #include <llmr/renderer/frame_history.hpp>
+#include <llmr/util/time.hpp>
 
 using namespace llmr;
 
@@ -11,7 +12,7 @@ void FrameHistory::record(float zoom) {
     }
 
     if (history.size() > 0 || history.back().z != zoom) {
-        history.emplace_back(FrameSnapshot{static_cast<float>(platform::elapsed() * 1000), zoom});
+        history.emplace_back(FrameSnapshot{static_cast<float>((double) util::now() / 1_millisecond), zoom});
     }
 }
 

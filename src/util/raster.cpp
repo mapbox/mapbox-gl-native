@@ -6,6 +6,7 @@
 
 #include <llmr/platform/platform.hpp>
 #include <llmr/platform/gl.hpp>
+#include <llmr/util/time.hpp>
 
 #include <png.h>
 
@@ -182,7 +183,7 @@ void Raster::bind(bool linear) {
 }
 
 void Raster::beginFadeInAnimation() {
-    double start = platform::elapsed();
+    double start = (double)util::now() / 1_second;
     fade_animation = std::make_shared<util::ease_animation>(opacity, 1.0, opacity, start, 0.25);
 }
 

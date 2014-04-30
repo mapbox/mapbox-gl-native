@@ -9,11 +9,11 @@
 
 MapView *mapView = nullptr;
 
-void quit_handler(int s) {
+void quit_handler(int) {
     if (mapView) {
         fprintf(stderr, "waiting for quit...\n");
         glfwSetWindowShouldClose(mapView->window, true);
-        llmr::platform::restart();
+        glfwPostEmptyEvent();
     } else {
         exit(0);
     }

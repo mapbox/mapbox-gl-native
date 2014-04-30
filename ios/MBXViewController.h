@@ -1,6 +1,5 @@
 #import <UIKit/UIKit.h>
-#import <GLKit/GLKit.h>
 
-@interface MBXViewController : GLKViewController
+@interface MBXViewController : UIViewController
 
 @end

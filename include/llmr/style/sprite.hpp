@@ -41,18 +41,22 @@ public:
 
     ImagePosition getPosition(const std::string& name, bool repeating = false);
 
-    operator bool() const;
+    bool isLoaded() const;
 
 public:
     const float pixelRatio;
     std::shared_ptr<Raster> raster;
 
 private:
-    void parseJSON(const std::string& data);
+    void asyncParseJSON();
+
+    static void parseJSON(std::shared_ptr<Sprite> &sprite);
+    static void complete(std::shared_ptr<Sprite> &sprite);
 
 private:
     Map &map;
     mutable std::mutex mtx;
+    std::string body;
     bool loaded = false;
     std::map<std::string, SpritePosition> pos;
 };

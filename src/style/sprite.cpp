@@ -4,6 +4,7 @@
 
 #include <string>
 #include <llmr/platform/platform.hpp>
+#include <llmr/util/uv.hpp>
 
 #include <rapidjson/document.h>
 
@@ -24,46 +25,56 @@ ImagePosition::ImagePosition(const vec2<uint16_t>& size, vec2<float> tl, vec2<fl
 Sprite::Sprite(Map &map, float pixelRatio) : pixelRatio(pixelRatio), raster(std::make_shared<Raster>()), map(map) {}
 
 void Sprite::load(const std::string& base_url) {
-    std::shared_ptr<Sprite> sprite = shared_from_this();
+   std::shared_ptr<Sprite> sprite = shared_from_this();
 
-    auto complete = [sprite]() {
-        std::lock_guard<std::mutex> lock(sprite->mtx);
-        if (*sprite->raster && sprite->pos.size()) {
-            sprite->loaded = true;
-            sprite->map.redraw();
-            fprintf(stderr, "sprite loaded\n");
-        }
-    };
+   std::string suffix = (pixelRatio > 1 ? "@2x" : "");
 
-    std::string suffix = (pixelRatio > 1 ? "@2x" : "");
+   platform::request_http(base_url + suffix + ".json", [sprite](platform::Response *res) {
+       if (res->code == 200) {
+           sprite->body.swap(res->body);
+           sprite->asyncParseJSON();
+       } else {
+           fprintf(stderr, "failed to load sprite\n");
+       }
+   }, map.getLoop());
 
-    platform::request_http(base_url + suffix + ".json", [sprite](const platform::Response *res) {
-        if (res->code == 200) {
-            sprite->parseJSON(res->body);
-        } else {
-            fprintf(stderr, "failed to load sprite\n");
-        }
-    }, complete, map.getLoop());
-
-    platform::request_http(base_url + suffix + ".png", [sprite](const platform::Response *res) {
-        if (res->code == 200) {
+   platform::request_http(base_url + suffix + ".png", [sprite](platform::Response *res) {
+       if (res->code == 200) {
+            // TODO: move raster loading to other thread
+            // TODO: call complete handler
             sprite->raster->load(res->body);
-        } else {
-            fprintf(stderr, "failed to load sprite image\n");
-        }
-    }, complete, map.getLoop());
+       } else {
+           fprintf(stderr, "failed to load sprite image\n");
+       }
+   }, map.getLoop());
 }
 
-Sprite::operator bool() const {
+void Sprite::complete(std::shared_ptr<Sprite> &sprite) {
+   std::lock_guard<std::mutex> lock(sprite->mtx);
+   if (*sprite->raster && sprite->pos.size()) {
+       sprite->loaded = true;
+       sprite->map.update();
+       fprintf(stderr, "sprite loaded\n");
+   }
+}
+
+bool Sprite::isLoaded() const {
     std::lock_guard<std::mutex> lock(mtx);
     return loaded;
 }
 
-void Sprite::parseJSON(const std::string& data) {
-    std::lock_guard<std::mutex> lock(mtx);
+void Sprite::asyncParseJSON() {
+   new uv::work<std::shared_ptr<Sprite>>(map.getLoop(),
+                     parseJSON,
+                     complete,
+                     shared_from_this());
+}
+
+void Sprite::parseJSON(std::shared_ptr<Sprite> &sprite) {
+    std::lock_guard<std::mutex> lock(sprite->mtx);
 
     rapidjson::Document d;
-    d.Parse<0>(data.c_str());
+    d.Parse<0>(sprite->body.c_str());
 
     if (d.IsObject()) {
         for (rapidjson::Value::ConstMemberIterator itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr) {
@@ -83,7 +94,7 @@ void Sprite::parseJSON(const std::string& data) {
                 if (value.HasMember("height")) height = value["height"].GetInt();
                 if (value.HasMember("pixelRatio")) pixelRatio = value["height"].GetInt();
 
-                pos.insert({ name, { x, y, width, height, pixelRatio } });
+                sprite->pos.insert({ name, { x, y, width, height, pixelRatio } });
             }
         }
     }

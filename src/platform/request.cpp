@@ -1,46 +1,46 @@
 #include <llmr/platform/request.hpp>
 #include <llmr/platform/platform.hpp>
+#include <llmr/util/std.hpp>
 #include <uv.h>
 
 using namespace llmr::platform;
 
 Request::Request(const std::string &url,
-                 std::function<void(Response *)> background_function,
-                 std::function<void()> foreground_callback,
+                 std::function<void(Response *)> callback,
                  uv_loop_t *loop)
     : url(url),
-      background_function(background_function),
-      foreground_callback(foreground_callback),
+      res(std::make_unique<Response>(callback)),
+      cancelled(false),
       loop(loop) {
-
     // Add a check handle without a callback to keep the default loop running.
     // We don't have a real handler attached to the default loop right from the
     // beginning, because we're using asynchronous messaging to perform the actual
     // request in the request thread. Only after the request is complete, we
     // create an actual work request that is attached to the default loop.
-    check = new uv_check_t();
-    uv_check_init(loop, check);
-    uv_check_start(check, [](uv_check_t *) {});
+    async = new uv_async_t();
+    async->data = new std::unique_ptr<Response>();
+    uv_async_init(loop, async, complete);
 }
 
 Request::~Request() {
-    // We need to remove our no-op handle again to allow the main event loop to exit.
-    uv_check_stop(check);
 }
 
-void Request::work_callback(uv_work_t *work) {
-    std::shared_ptr<Request> *req = static_cast<std::shared_ptr<Request> *>(work->data);
-    (*req)->background_function((*req)->res.get());
+void Request::complete() {
+    // We're scheduling the response callback to be invoked in the event loop.
+    // Since the Request object will be deleted before the callback is invoked,
+    // we move over the Response object to be owned by the async handle.
+    ((std::unique_ptr<Response> *)async->data)->swap(res);
+    uv_async_send(async);
 }
 
-// This callback is executed in the main loop.
-void Request::after_work_callback(uv_work_t *work, int /*status*/) {
-    std::shared_ptr<Request> *req = static_cast<std::shared_ptr<Request> *>(work->data);
+void Request::complete(uv_async_t *async) {
+    Response *res = static_cast<std::unique_ptr<Response> *>(async->data)->get();
 
-    (*req)->foreground_callback();
+    res->callback(res);
 
-    // This finally deletes the *pointer* to the shared pointer we've been holding on since we
-    // pushed it on the add_queue on request creation.
-    delete req;
-    delete work;
+    // We need to remove our async handle again to allow the main event loop to exit.
+    uv_close((uv_handle_t *)async, [](uv_handle_t *handle) {
+        delete static_cast<std::unique_ptr<Response> *>(handle->data);
+        delete (uv_async_t *)handle;
+    });
 }

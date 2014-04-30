@@ -59,7 +59,8 @@ public:
     ~TileData();
 
     void request();
-    bool parse();
+    void scheduleParsing();
+    void parse();
     void cancel();
 
     const std::string toString() const;

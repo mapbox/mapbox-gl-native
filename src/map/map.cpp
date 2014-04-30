@@ -1,65 +1,130 @@
 #include <llmr/map/map.hpp>
-#include <llmr/map/settings.hpp>
 #include <llmr/map/source.hpp>
 #include <llmr/platform/platform.hpp>
 #include <llmr/style/resources.hpp>
 #include <llmr/style/sprite.hpp>
 #include <llmr/util/animation.hpp>
+#include <llmr/util/time.hpp>
 
 #include <algorithm>
 #include <memory>
 
 using namespace llmr;
 
-Map::Map(Settings& settings)
-    : settings(settings),
+Map::Map(View& view)
+    : view(view),
       transform(),
       texturepool(),
       style(),
       glyphAtlas(1024, 1024),
-      painter(transform, style, glyphAtlas),
+      painter(*this),
       loop(uv_loop_new()) {
+
+    // Make sure that we're doing an initial drawing in all cases.
     clean.clear();
+    rendered.clear();
+    swapped.test_and_set();
 }
 
 Map::~Map() {
-    settings.sync();
-}
-
-void Map::start() {
-    uv_async_init(loop, &async_terminate, [](uv_async_t *async) {
-        uv_stop(static_cast<uv_loop_t *>(async->data));
-    });
-    async_terminate.data = loop;
-
-    uv_thread_create(&thread, eventloop, this);
-}
-
-void Map::stop() {
-    uv_async_send(&async_terminate);
-    uv_thread_join(&thread);
-
     uv_loop_delete(loop);
     loop = nullptr;
 }
 
-void Map::eventloop(void *arg) {
-    Map *map = static_cast<Map *>(arg);
-    map->run();
+void Map::start() {
+    // When starting map rendering in another thread, we perform async/continuously
+    // updated rendering. Only in these cases, we attach the async handlers.
+    async = true;
+
+    // Setup async notifications
+    async_terminate = new uv_async_t();
+    uv_async_init(loop, async_terminate, terminate);
+    async_terminate->data = loop;
+
+    async_render = new uv_async_t();
+    uv_async_init(loop, async_render, render);
+    async_render->data = this;
+
+    uv_thread_create(&thread, [](void *arg) {
+        Map *map = static_cast<Map *>(arg);
+        map->run();
+    }, this);
+}
+
+void Map::stop() {
+    uv_async_send(async_terminate);
+    uv_thread_join(&thread);
+
+    uv_close((uv_handle_t *)async_terminate, delete_async);
+    async_terminate = nullptr;
+    uv_close((uv_handle_t *)async_render, delete_async);
+    async_render = nullptr;
+
+    // Run the event loop once to make sure our async delete handlers are called.
+    uv_run(loop, UV_RUN_ONCE);
+
+    async = false;
+}
+
+void Map::delete_async(uv_handle_t *handle) {
+    delete (uv_async_t *)handle;
 }
 
 void Map::run() {
+    setup();
+    prepareRender();
     uv_run(loop, UV_RUN_DEFAULT);
+
+    // If the map rendering wasn't started asynchronously, we perform one render
+    // *after* all events have been processed.
+    if (!async) {
+        render();
+    }
 }
 
-void Map::setup() {
-    painter.setup();
+void Map::rerender() {
+    // We only send render events if we want to continuously update the map
+    // (== async rendering).
+    if (async) {
+        uv_async_send(async_render);
+    }
+}
 
-    style.loadJSON(resources::style, resources::style_size);
+void Map::update() {
+    clean.clear();
+    rerender();
+}
+
+void Map::render(uv_async_t *async) {
+    Map *map = static_cast<Map *>(async->data);
+
+    map->prepare();
+
+    if (map->rendered.test_and_set() == false) {
+        if (map->clean.test_and_set() == false) {
+            map->swapped.clear();
+            map->view.swap();
+        } else {
+            // We set the rendered flag in the test above, so we have to reset it
+            // now that we're not actually rendering because the map is clean.
+            map->rendered.clear();
+        }
+    }
+}
+
+void Map::terminate(uv_async_t *async) {
+    uv_stop(static_cast<uv_loop_t *>(async->data));
+}
+
+#pragma mark - Setup
+
+void Map::setup() {
+    view.make_active();
+
+    painter.setup();
 
     sources.emplace("mapbox streets",
                     std::unique_ptr<Source>(new Source(*this,
-                           transform,
                            painter,
                            texturepool,
                            "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf",
@@ -72,7 +137,6 @@ void Map::setup() {
 
     sources.emplace("satellite",
                     std::unique_ptr<Source>(new Source(*this,
-                           transform,
                            painter,
                            texturepool,
                            "https://a.tiles.mapbox.com/v3/justin.hh0gkdfm/%d/%d/%d%s.png256",
@@ -82,6 +146,8 @@ void Map::setup() {
                            0,
                            21,
                            false)));
+
+    loadStyle(resources::style, resources::style_size);
 }
 
 void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
@@ -89,176 +155,120 @@ void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
     update();
 }
 
-void Map::loadSettings() {
-    transform.setAngle(settings.angle);
-    transform.setScale(settings.scale);
-    transform.setLonLat(settings.longitude, settings.latitude);
-    painter.setDebug(settings.debug);
-    update();
-}
+#pragma mark - Size
 
 void Map::resize(uint16_t width, uint16_t height, float ratio) {
     resize(width, height, ratio, width * ratio, height * ratio);
 }
 
 void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height) {
-    transform.resize(width, height, ratio, fb_width, fb_height);
-    painter.resize();
-
-    if (!style.sprite || style.sprite->pixelRatio != transform.getPixelRatio()) {
-        style.sprite = std::make_shared<Sprite>(*this, transform.getPixelRatio());
-        style.sprite->load(kSpriteURL);
+    if (transform.resize(width, height, ratio, fb_width, fb_height)) {
+        update();
     }
 }
 
-box Map::cornersToBox(uint32_t z) const {
-    return transform.cornersToBox(z);
+#pragma mark - Animations
+
+void Map::cancelAnimations() {
+    transform.cancelAnimations();
+
+    update();
 }
 
-float Map::getPixelRatio() const {
-    return transform.getPixelRatio();
-}
 
-Style& Map::getStyle() {
-    return style;
-}
-
-GlyphAtlas& Map::getGlyphAtlas() {
-    return glyphAtlas;
-}
-
-uv_loop_t *Map::getLoop() {
-    return loop;
-}
+#pragma mark - Position
 
 void Map::moveBy(double dx, double dy, double duration) {
     transform.moveBy(dx, dy, duration);
-
     update();
-
-    transform.getLonLat(settings.longitude, settings.latitude);
-    settings.persist();
 }
-
-void Map::startPanning() {
-    transform.startPanning();
-    redraw();
-}
-
-void Map::stopPanning() {
-    transform.stopPanning();
-    redraw();
-}
-
-void Map::scaleBy(double ds, double cx, double cy, double duration) {
-    transform.scaleBy(ds, cx, cy, duration);
-    update();
-
-    transform.getLonLat(settings.longitude, settings.latitude);
-    settings.scale = transform.getScale();
-    settings.persist();
-}
-
-void Map::startScaling() {
-    transform.startScaling();
-    redraw();
-}
-
-void Map::stopScaling() {
-    transform.stopScaling();
-    redraw();
-}
-
-void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) {
-    transform.rotateBy(sx, sy, ex, ey, duration);
-    update();
-
-    settings.angle = transform.getAngle();
-    settings.persist();
-}
-
-void Map::startRotating() {
-    transform.startRotating();
-    redraw();
-}
-
-void Map::stopRotating() {
-    transform.stopRotating();
-    redraw();
-}
-
 
 void Map::setLonLat(double lon, double lat, double duration) {
     transform.setLonLat(lon, lat, duration);
     update();
-
-    transform.getLonLat(settings.longitude, settings.latitude);
-    settings.persist();
 }
 
 void Map::getLonLat(double& lon, double& lat) const {
     transform.getLonLat(lon, lat);
 }
 
-void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
-    transform.setLonLatZoom(lon, lat, zoom, duration);
+void Map::startPanning() {
+    transform.startPanning();
     update();
-
-    transform.getLonLat(settings.longitude, settings.latitude);
-    settings.scale = transform.getScale();
-    settings.persist();
 }
 
-void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
-    transform.getLonLatZoom(lon, lat, zoom);
+void Map::stopPanning() {
+    transform.stopPanning();
+    update();
+}
+
+void Map::resetPosition() {
+    transform.setAngle(0);
+    transform.setLonLat(0, 0);
+    transform.setZoom(0);
+    update();
+}
+
+
+#pragma mark - Scale
+
+void Map::scaleBy(double ds, double cx, double cy, double duration) {
+    transform.scaleBy(ds, cx, cy, duration);
+    update();
 }
 
 void Map::setScale(double scale, double cx, double cy, double duration) {
     transform.setScale(scale, cx, cy, duration);
     update();
+}
 
-    transform.getLonLat(settings.longitude, settings.latitude);
-    settings.scale = transform.getScale();
-    settings.persist();
+double Map::getScale() const {
+    return transform.getScale();
 }
 
 void Map::setZoom(double zoom, double duration) {
     transform.setZoom(zoom, duration);
     update();
-
-    transform.getLonLat(settings.longitude, settings.latitude);
-    settings.scale = transform.getScale();
-    settings.persist();
 }
 
 double Map::getZoom() const {
     return transform.getZoom();
 }
 
-void Map::setAngle(double angle, double x, double y, double duration) {
-    double dx = 0, dy = 0;
-
-    if (x >= 0 && y >= 0) {
-        dx = (transform.getWidth() / 2) - x;
-        dy = (transform.getWidth() / 2) - y;
-        transform.moveBy(dx, dy, duration);
-    }
-
-    transform.setAngle(angle, duration);
-
-    if (x >= 0 && y >= 0) {
-        transform.moveBy(-dx, -dy, duration);
-    }
-
+void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
+    transform.setLonLatZoom(lon, lat, zoom, duration);
     update();
-
-    transform.getLonLat(settings.longitude, settings.latitude);
-    settings.angle = transform.getAngle();
-    settings.persist();
 }
 
-double Map::getScale() const {
-    return transform.getScale();
+void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
+    transform.getLonLatZoom(lon, lat, zoom);
+}
+
+void Map::resetZoom() {
+    setZoom(0);
+}
+
+void Map::startScaling() {
+    transform.startScaling();
+    update();
+}
+
+void Map::stopScaling() {
+    transform.stopScaling();
+    update();
+}
+
+
+#pragma mark - Rotation
+
+void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) {
+    transform.rotateBy(sx, sy, ex, ey, duration);
+    update();
+}
+
+void Map::setAngle(double angle, double cx, double cy) {
+    transform.setAngle(angle, cx, cy);
+    update();
 }
 
 double Map::getAngle() const {
@@ -268,33 +278,33 @@ double Map::getAngle() const {
 void Map::resetNorth() {
     transform.setAngle(0, 0.5);
     update();
-
-    settings.angle = transform.getAngle();
-    settings.persist();
 }
 
-void Map::resetPosition() {
-    transform.setAngle(0);
-    transform.setLonLat(0, 0);
-    transform.setZoom(0);
+void Map::startRotating() {
+    transform.startRotating();
     update();
-
-    transform.getLonLat(settings.longitude, settings.latitude);
-    settings.scale = transform.getScale();
-    settings.angle = transform.getAngle();
-    settings.persist();
 }
 
-void Map::resetZoom() {
-    setZoom(0);
+void Map::stopRotating() {
+    transform.stopRotating();
+    update();
+}
+
+
+#pragma mark - Toggles
+
+void Map::setDebug(bool value) {
+    debug = value;
+    painter.setDebug(debug);
+    update();
 }
 
 void Map::toggleDebug() {
-    settings.debug = !settings.debug;
-    painter.setDebug(settings.debug);
-    update();
+    setDebug(!debug);
+}
 
-    settings.persist();
+bool Map::getDebug() const {
+    return debug;
 }
 
 void Map::toggleRaster() {
@@ -309,63 +319,44 @@ void Map::toggleRaster() {
             satellite_source.enabled = true;
             style.appliedClasses.insert("satellite");
         }
-
-        style.cascade(transform.getNormalizedZoom());
-
-        update();
     }
+
+    update();
 }
 
-void Map::cancelAnimations() {
-    transform.cancelAnimations();
-}
-
-void Map::update() {
-    // Loads new tiles and removes old ones.
-    updateTiles();
-
-    // Updates the stylesheet to the new zoom level
-    style.cascade(transform.getNormalizedZoom());
-
-    // Schedules a repaint
-    redraw();
-}
-
-void Map::redraw() {
-    clean.clear();
-    platform::restart();
-}
-
-bool Map::updateTiles() {
-    bool changed = false;
-
+void Map::updateTiles() {
     for (auto &pair : sources) {
-        Source &source = *pair.second;
-        if (source.enabled) {
-            changed = source.update() || changed;
+        const std::unique_ptr<Source> &source = pair.second;
+        if (source->enabled) {
+            source->update();
         }
     }
+}
 
-    return changed;
+void Map::prepare() {
+    view.make_active();
+
+    // Update animations
+    animationTime = (double)util::now() / 1e9;
+    bool animating = transform.needsAnimation();
+    if (animating) {
+        transform.updateAnimations(animationTime);
+    }
+
+    state = transform.currentState();
+    style.cascade(state.getNormalizedZoom());
+    if (!style.sprite || style.sprite->pixelRatio != state.getPixelRatio()) {
+        style.sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
+        style.sprite->load(kSpriteURL);
+    }
+
+    updateTiles();
 }
 
 void Map::render() {
-    double animationTime = platform::elapsed();
-
-    if (transform.needsAnimation()) {
-        transform.updateAnimations(animationTime);
-
-        // Animations change the transform which affects the stylesheet.
-        style.cascade(transform.getNormalizedZoom());
-    }
-
-    if (*style.sprite->raster && !style.sprite->raster->textured) {
-        style.sprite->raster->setTexturepool(&texturepool);
-    }
-
-    bool changed = updateTiles();
-
     painter.clear();
+
+    painter.resize();
 
     painter.changeMatrix();
 
@@ -379,7 +370,7 @@ void Map::render() {
 
     for (auto &pair : sources) {
         Source &source = *pair.second;
-        source.prepare_render(is_baselayer);
+        source.prepare_render(state, is_baselayer);
         is_baselayer = source.enabled ? false : (true && is_baselayer);
     }
 
@@ -395,11 +386,8 @@ void Map::render() {
 
     painter.renderMatte();
 
-
-    bool transition = transform.needsAnimation();
-    bool animation = painter.needsAnimation();
-
-    if (changed || transition || animation) {
-        redraw();
+    // Schedule another rerender when we definitely need a next frame.
+    if (transform.needsAnimation()) {
+        update();
     }
 }
