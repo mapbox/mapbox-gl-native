@@ -48,8 +48,8 @@ public:
     void resize(uint16_t width, uint16_t height, float ratio = 1);
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
 
-    // Animations
-    void cancelAnimations();
+    // Transition
+    void cancelTransitions();
 
     // Position
     void moveBy(double dx, double dy, double duration = 0);

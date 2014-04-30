@@ -185,18 +185,18 @@ void Raster::bind(bool linear) {
     }
 }
 
-void Raster::beginFadeInAnimation() {
+void Raster::beginFadeInTransition() {
     time start = util::now();
-    fade_animation = std::make_shared<util::ease_animation>(opacity, 1.0, opacity, start, 250_milliseconds);
+    fade_transition = std::make_shared<util::ease_transition>(opacity, 1.0, opacity, start, 250_milliseconds);
 }
 
-bool Raster::needsAnimation() const {
-    return fade_animation != nullptr;
+bool Raster::needsTransition() const {
+    return fade_transition != nullptr;
 }
 
-void Raster::updateAnimations(time now) {
-    if (fade_animation->update(now) == util::animation::complete) {
-        fade_animation = nullptr;
+void Raster::updateTransitions(time now) {
+    if (fade_transition->update(now) == util::transition::complete) {
+        fade_transition = nullptr;
     }
 }
 

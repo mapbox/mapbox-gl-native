@@ -55,10 +55,10 @@ void Source::render(time animationTime) {
                 std::shared_ptr<Raster> raster = tile.data->raster;
                 if (raster && !raster->textured) {
                     raster->setTexturepool(&texturepool);
-                    raster->beginFadeInAnimation();
+                    raster->beginFadeInTransition();
                 }
-                if (raster && raster->needsAnimation()) {
-                    raster->updateAnimations(animationTime);
+                if (raster && raster->needsTransition()) {
+                    raster->updateTransitions(animationTime);
                 }
             }
             painter.render(tile);

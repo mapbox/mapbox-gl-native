@@ -1,7 +1,7 @@
 #ifndef LLMR_MAP_TRANSFORM
 #define LLMR_MAP_TRANSFORM
 
-#include <llmr/util/animation.hpp>
+#include <llmr/util/transition.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/uv.hpp>
 
@@ -48,10 +48,10 @@ public:
     void startScaling();
     void stopScaling();
 
-    // Animations
-    bool needsAnimation() const;
-    void updateAnimations(time now);
-    void cancelAnimations();
+    // Transitions
+    bool needsTransition() const;
+    void updateTransitions(time now);
+    void cancelTransitions();
 
     // Transform state
     const TransformState currentState() const;
@@ -76,7 +76,7 @@ private:
     // you render a new frame.
     TransformState current;
 
-    // This reflects the final position of the transform, after all possible animations took place.
+    // This reflects the final position of the transform, after all possible transition took place.
     TransformState final;
 
     // Limit the amount of zooming possible on the map.
@@ -87,10 +87,10 @@ private:
     // cache values for spherical mercator math
     double zc, Bc, Cc;
 
-    std::forward_list<std::shared_ptr<util::animation>> animations;
-    std::shared_ptr<util::animation> scale_timeout;
-    std::shared_ptr<util::animation> rotate_timeout;
-    std::shared_ptr<util::animation> pan_timeout;
+    std::forward_list<std::shared_ptr<util::transition>> transitions;
+    std::shared_ptr<util::transition> scale_timeout;
+    std::shared_ptr<util::transition> rotate_timeout;
+    std::shared_ptr<util::transition> pan_timeout;
 };
 
 }

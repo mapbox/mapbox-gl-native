@@ -3,7 +3,7 @@
 #include <llmr/platform/platform.hpp>
 #include <llmr/style/resources.hpp>
 #include <llmr/style/sprite.hpp>
-#include <llmr/util/animation.hpp>
+#include <llmr/util/transition.hpp>
 #include <llmr/util/time.hpp>
 
 #include <algorithm>
@@ -179,10 +179,10 @@ void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width
     }
 }
 
-#pragma mark - Animations
+#pragma mark - Transitions
 
-void Map::cancelAnimations() {
-    transform.cancelAnimations();
+void Map::cancelTransitions() {
+    transform.cancelTransitions();
 
     update();
 }
@@ -348,11 +348,10 @@ void Map::updateTiles() {
 void Map::prepare() {
     view.make_active();
 
-    // Update animations
+    // Update transitions
     animationTime = util::now();
-    bool animating = transform.needsAnimation();
-    if (animating) {
-        transform.updateAnimations(animationTime);
+    if (transform.needsTransition()) {
+        transform.updateTransitions(animationTime);
     }
 
     state = transform.currentState();
@@ -403,7 +402,7 @@ void Map::render() {
     painter.renderMatte();
 
     // Schedule another rerender when we definitely need a next frame.
-    if (transform.needsAnimation()) {
+    if (transform.needsTransition()) {
         update();
     }
 }

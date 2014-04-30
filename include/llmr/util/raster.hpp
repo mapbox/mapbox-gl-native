@@ -1,7 +1,7 @@
 #ifndef LLMR_UTIL_RASTER
 #define LLMR_UTIL_RASTER
 
-#include <llmr/util/animation.hpp>
+#include <llmr/util/transition.hpp>
 #include <llmr/util/texturepool.hpp>
 
 #include <string>
@@ -29,10 +29,10 @@ public:
     // loaded status
     bool isLoaded() const;
 
-    // animations
-    void beginFadeInAnimation();
-    bool needsAnimation() const;
-    void updateAnimations(time now);
+    // transitions
+    void beginFadeInTransition();
+    bool needsTransition() const;
+    void updateTransitions(time now);
 
     inline void setData(const std::string &img) { data = img; }
 
@@ -71,8 +71,8 @@ private:
     // the raw pixels
     char *img = nullptr;
 
-    // fade in animation
-    std::shared_ptr<util::animation> fade_animation = nullptr;
+    // fade in transition
+    std::shared_ptr<util::transition> fade_transition = nullptr;
 };
 
 }

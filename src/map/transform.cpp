@@ -56,12 +56,12 @@ void Transform::_moveBy(const double dx, const double dy, const time duration) {
         current.x = final.x;
         current.y = final.y;
     } else {
-        // Use a common start time for all of the animations to avoid divergent animations.
+        // Use a common start time for all of the transitions to avoid divergent transitions.
         time start = util::now();
-        animations.emplace_front(
-            std::make_shared<util::ease_animation>(current.x, final.x, current.x, start, duration));
-        animations.emplace_front(
-            std::make_shared<util::ease_animation>(current.y, final.y, current.y, start, duration));
+        transitions.emplace_front(
+            std::make_shared<util::ease_transition>(current.x, final.x, current.x, start, duration));
+        transitions.emplace_front(
+            std::make_shared<util::ease_transition>(current.y, final.y, current.y, start, duration));
     }
 }
 
@@ -116,7 +116,7 @@ void Transform::startPanning() {
     current.panning = true;
     time start = util::now();
     pan_timeout = std::make_shared<util::timeout<bool>>(false, current.panning, start, 200_milliseconds);
-    animations.emplace_front(pan_timeout);
+    transitions.emplace_front(pan_timeout);
 }
 
 void Transform::stopPanning() {
@@ -128,7 +128,7 @@ void Transform::stopPanning() {
 void Transform::_clearPanning() {
     current.panning = false;
     if (pan_timeout) {
-        animations.remove(pan_timeout);
+        transitions.remove(pan_timeout);
         pan_timeout.reset();
     }
 }
@@ -183,7 +183,7 @@ void Transform::startScaling() {
     current.scaling = true;
     time start = util::now();
     scale_timeout = std::make_shared<util::timeout<bool>>(false, current.scaling, start, 200_milliseconds);
-    animations.emplace_front(scale_timeout);
+    transitions.emplace_front(scale_timeout);
 }
 
 void Transform::stopScaling() {
@@ -197,7 +197,7 @@ void Transform::_clearScaling() {
 
     current.scaling = false;
     if (scale_timeout) {
-        animations.remove(scale_timeout);
+        transitions.remove(scale_timeout);
         scale_timeout.reset();
     }
 }
@@ -248,14 +248,14 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
         current.x = final.x;
         current.y = final.y;
     } else {
-        // Use a common start time for all of the animations to avoid divergent animations.
+        // Use a common start time for all of the transitions to avoid divergent transitions.
         time start = util::now();
-        animations.emplace_front(std::make_shared<util::ease_animation>(
+        transitions.emplace_front(std::make_shared<util::ease_transition>(
             current.scale, final.scale, current.scale, start, duration));
-        animations.emplace_front(
-            std::make_shared<util::ease_animation>(current.x, final.x, current.x, start, duration));
-        animations.emplace_front(
-            std::make_shared<util::ease_animation>(current.y, final.y, current.y, start, duration));
+        transitions.emplace_front(
+            std::make_shared<util::ease_transition>(current.x, final.x, current.x, start, duration));
+        transitions.emplace_front(
+            std::make_shared<util::ease_transition>(current.y, final.y, current.y, start, duration));
     }
 
     const double s = final.scale * util::tileSize;
@@ -335,7 +335,7 @@ void Transform::_setAngle(double new_angle, const time duration) {
         current.angle = final.angle;
     } else {
         time start = util::now();
-        animations.emplace_front(std::make_shared<util::ease_animation>(
+        transitions.emplace_front(std::make_shared<util::ease_transition>(
             current.angle, final.angle, current.angle, start, duration));
     }
 }
@@ -355,7 +355,7 @@ void Transform::startRotating() {
     current.rotating = true;
     time start = util::now();
     rotate_timeout = std::make_shared<util::timeout<bool>>(false, current.rotating, start, 200_milliseconds);
-    animations.emplace_front(rotate_timeout);
+    transitions.emplace_front(rotate_timeout);
 }
 
 void Transform::stopRotating() {
@@ -369,31 +369,31 @@ void Transform::_clearRotating() {
 
     current.rotating = false;
     if (rotate_timeout) {
-        animations.remove(rotate_timeout);
+        transitions.remove(rotate_timeout);
         rotate_timeout.reset();
     }
 }
 
-#pragma mark - Animation
+#pragma mark - Transition
 
-bool Transform::needsAnimation() const {
+bool Transform::needsTransition() const {
     uv::readlock lock(mtx);
 
-    return !animations.empty();
+    return !transitions.empty();
 }
 
-void Transform::updateAnimations(const time now) {
+void Transform::updateTransitions(const time now) {
     uv::writelock lock(mtx);
 
-    animations.remove_if([now](const std::shared_ptr<util::animation> &animation) {
-        return animation->update(now) == util::animation::complete;
+    transitions.remove_if([now](const std::shared_ptr<util::transition> &transition) {
+        return transition->update(now) == util::transition::complete;
     });
 }
 
-void Transform::cancelAnimations() {
+void Transform::cancelTransitions() {
     uv::writelock lock(mtx);
 
-    animations.clear();
+    transitions.clear();
 }
 
 #pragma mark - Transform state

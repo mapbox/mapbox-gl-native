@@ -1,5 +1,5 @@
-#ifndef LLMR_UTIL_ANIMATION
-#define LLMR_UTIL_ANIMATION
+#ifndef LLMR_UTIL_TRANSITION
+#define LLMR_UTIL_TRANSITION
 
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/time.hpp>
@@ -7,14 +7,14 @@
 namespace llmr {
 namespace util {
 
-class animation : private noncopyable {
+class transition : private noncopyable {
 public:
     enum state {
         running,
         complete
     };
 
-    inline animation(time start, time duration)
+    inline transition(time start, time duration)
         : start(start),
           duration(duration) {}
 
@@ -23,20 +23,20 @@ public:
     }
 
     virtual state update(time now) const = 0;
-    virtual ~animation();
+    virtual ~transition();
 
 protected:
     const time start, duration;
 };
 
-class ease_animation : public animation {
+class ease_transition : public transition {
 public:
     // Disable automatic casts.
     template <typename T1, typename T2>
-    inline ease_animation(double from, double to, double& value, T1 start, T2 duration) = delete;
+    inline ease_transition(double from, double to, double& value, T1 start, T2 duration) = delete;
 
     // Actual constructor.
-    ease_animation(double from, double to, double& value, time start, time duration);
+    ease_transition(double from, double to, double& value, time start, time duration);
     state update(time now) const;
 
 private:
@@ -45,7 +45,7 @@ private:
 };
 
 template <typename T>
-class timeout : public animation {
+class timeout : public transition {
 public:
     // Disable automatic casts.
     template <typename T1, typename T2>
@@ -53,7 +53,7 @@ public:
 
     // Actual constructor.
     timeout(T final_value, T& value, time start, time duration)
-        : animation(start, duration),
+        : transition(start, duration),
           final_value(final_value),
           value(value) {}
 
