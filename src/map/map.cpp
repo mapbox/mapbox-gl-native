@@ -21,9 +21,9 @@ Map::Map(View& view)
       loop(uv_loop_new()) {
 
     // Make sure that we're doing an initial drawing in all cases.
-    clean.clear();
-    rendered.clear();
-    swapped.test_and_set();
+    is_clean.clear();
+    is_rendered.clear();
+    is_swapped.test_and_set();
 }
 
 Map::~Map() {
@@ -91,7 +91,16 @@ void Map::rerender() {
 }
 
 void Map::update() {
-    clean.clear();
+    is_clean.clear();
+    rerender();
+}
+
+bool Map::needsSwap() {
+    return is_swapped.test_and_set() == false;
+}
+
+void Map::swapped() {
+    is_rendered.clear();
     rerender();
 }
 
@@ -100,15 +109,15 @@ void Map::render(uv_async_t *async) {
 
     map->prepare();
 
-    if (map->rendered.test_and_set() == false) {
-        if (map->clean.test_and_set() == false) {
+    if (map->is_rendered.test_and_set() == false) {
+        if (map->is_clean.test_and_set() == false) {
             map->render();
-            map->swapped.clear();
+            map->is_swapped.clear();
             map->view.swap();
         } else {
             // We set the rendered flag in the test above, so we have to reset it
             // now that we're not actually rendering because the map is clean.
-            map->rendered.clear();
+            map->is_rendered.clear();
         }
     }
 }

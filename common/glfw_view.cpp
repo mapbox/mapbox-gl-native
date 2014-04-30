@@ -163,11 +163,10 @@ int MapView::run() {
     map.start();
 
     while (!glfwWindowShouldClose(window)) {
-        if (map.swapped.test_and_set() == false) {
+        if (map.needsSwap()) {
             glfwSwapBuffers(window);
-            map.rendered.clear();
+            map.swapped();
             fps();
-            map.rerender();
         }
 
         glfwWaitEvents();

@@ -153,11 +153,10 @@ MBXViewController *viewController = nullptr;
 
 - (void)swap
 {
-    if (map->swapped.test_and_set() == false)
+    if (map->needsSwap())
     {
         [(GLKView *)self.view display];
-        map->rendered.clear();
-        map->rerender();
+        map->swapped();
     }
 }
 

@@ -39,6 +39,10 @@ public:
     // Forces a map update: always triggers a rerender.
     void update();
 
+    // Controls buffer swapping.
+    bool needsSwap();
+    void swapped();
+
     // Size
     void resize(uint16_t width, uint16_t height, float ratio = 1);
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
@@ -105,18 +109,18 @@ private:
     // Unconditionally performs a render with the current map state.
     void render();
 
-public:
+private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
     // render the map.
-    std::atomic_flag clean = ATOMIC_FLAG_INIT;
+    std::atomic_flag is_clean = ATOMIC_FLAG_INIT;
 
     // If this flag is cleared, the current back buffer is ready for being swapped with the front
     // buffer (i.e. it has rendered data).
-    std::atomic_flag swapped = ATOMIC_FLAG_INIT;
+    std::atomic_flag is_swapped = ATOMIC_FLAG_INIT;
 
     // This is cleared once the current front buffer has been presented and the back buffer is
     // ready for rendering.
-    std::atomic_flag rendered = ATOMIC_FLAG_INIT;
+    std::atomic_flag is_rendered = ATOMIC_FLAG_INIT;
 
 private:
     View &view;
