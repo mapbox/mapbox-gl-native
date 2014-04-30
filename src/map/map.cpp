@@ -72,7 +72,7 @@ void Map::delete_async(uv_handle_t *handle) {
 
 void Map::run() {
     setup();
-    prepareRender();
+    prepare();
     uv_run(loop, UV_RUN_DEFAULT);
 
     // If the map rendering wasn't started asynchronously, we perform one render
@@ -102,6 +102,7 @@ void Map::render(uv_async_t *async) {
 
     if (map->rendered.test_and_set() == false) {
         if (map->clean.test_and_set() == false) {
+            map->render();
             map->swapped.clear();
             map->view.swap();
         } else {
