@@ -1,23 +1,24 @@
 #include <llmr/renderer/frame_history.hpp>
-#include <llmr/util/time.hpp>
 
 using namespace llmr;
 
 // Record frame history that will be used to calculate fading params
-void FrameHistory::record(float zoom) {
+void FrameHistory::record(time now, float zoom) {
     // first frame ever
     if (!history.size()) {
-        history.emplace_back(FrameSnapshot{0.0f, zoom});
-        history.emplace_back(FrameSnapshot{0.0f, zoom});
+        history.emplace_back(FrameSnapshot{0, zoom});
+        history.emplace_back(FrameSnapshot{0, zoom});
     }
 
     if (history.size() > 0 || history.back().z != zoom) {
-        history.emplace_back(FrameSnapshot{static_cast<float>((double) util::now() / 1_millisecond), zoom});
+        history.emplace_back(FrameSnapshot{now, zoom});
     }
 }
 
-bool FrameHistory::needsAnimation(const float duration) const {
-    if (!history.size()) return false;
+bool FrameHistory::needsAnimation(const time duration) const {
+    if (!history.size()) {
+        return false;
+    }
 
     // If we have a value that is older than duration and whose z value is the
     // same as the most current z value, and if all values inbetween have the
@@ -25,8 +26,7 @@ bool FrameHistory::needsAnimation(const float duration) const {
     const FrameSnapshot &pivot = history.back();
 
     int i = -1;
-    while ((int)history.size() > i + 1 &&
-           history[i + 1].time + duration < pivot.time) {
+    while ((int)history.size() > i + 1 && history[i + 1].timestamp + duration < pivot.timestamp) {
         i++;
     }
 

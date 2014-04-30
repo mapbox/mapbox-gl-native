@@ -6,21 +6,22 @@
 #include <cmath>
 
 #include <llmr/platform/platform.hpp>
+#include <llmr/util/time.hpp>
 
 namespace llmr {
 
 struct FrameSnapshot {
-    explicit inline FrameSnapshot(float time, float z) : time(time), z(z) {}
-    float time;
+    explicit inline FrameSnapshot(time timestamp, float z) : timestamp(timestamp), z(z) {}
+    float timestamp;
     float z;
 };
 
 class FrameHistory {
 public:
     // Record frame history that will be used to calculate fading params
-    void record(float zoom);
+    void record(time now, float zoom);
 
-    bool needsAnimation(float duration) const;
+    bool needsAnimation(time duration) const;
 
 public:
     std::deque<FrameSnapshot> history;

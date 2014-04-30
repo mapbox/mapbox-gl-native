@@ -1,3 +1,4 @@
+
 #ifndef LLMR_MAP_MAP
 #define LLMR_MAP_MAP
 
@@ -89,6 +90,7 @@ public:
     inline const Style &getStyle() const { return style; }
     inline GlyphAtlas &getGlyphAtlas() { return glyphAtlas; }
     inline uv_loop_t *getLoop() { return loop; }
+    inline time getAnimationTime() const { return animationTime; }
 
 private:
     // uv async callbacks

@@ -181,7 +181,7 @@ void Painter::render(const Tile& tile) {
         return;
     }
 
-    frameHistory.record(map.getState().getNormalizedZoom());
+    frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
 
     matrix = tile.matrix;
     glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
@@ -599,17 +599,17 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     textShader->setZoom((map.getState().getNormalizedZoom() - zoomAdjust) * 10); // current zoom level
 
     // Label fading
-    const float duration = 300.0f;
-    const float currentTime = util::now() / 1_millisecond;
+    const time duration = 300_milliseconds;
+    const time currentTime = util::now();
 
     std::deque<FrameSnapshot> &history = frameHistory.history;
 
     // Remove frames until only one is outside the duration, or until there are only three
-    while (history.size() > 3 && history[1].time + duration < currentTime) {
+    while (history.size() > 3 && history[1].timestamp + duration < currentTime) {
         history.pop_front();
     }
 
-    if (history[1].time + duration < currentTime) {
+    if (history[1].timestamp + duration < currentTime) {
         history[0].z = history[1].z;
     }
 
@@ -625,7 +625,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 
     // Calculate the speed of zooming, and how far it would zoom in terms of zoom levels in one duration
     float zoomDiff = endingZ - history[1].z,
-        timeDiff = lastFrame.time - history[1].time;
+        timeDiff = lastFrame.timestamp - history[1].timestamp;
     if (timeDiff > duration) timeDiff = 1;
     float fadedist = zoomDiff / (timeDiff / duration);
 
@@ -633,7 +633,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 
     // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
     // bump is how much farther it would have been if it had continued zooming at the same rate
-    float bump = (currentTime - lastFrame.time) / duration * fadedist;
+    float bump = (currentTime - lastFrame.timestamp) / duration * fadedist;
 
     textShader->setFadeDist(fadedist * 10);
     textShader->setMinFadeZoom(floor(lowZ * 10));
