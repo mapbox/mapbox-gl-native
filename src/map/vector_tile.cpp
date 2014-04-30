@@ -232,14 +232,18 @@ FilteredVectorTileLayer::FilteredVectorTileLayer(const VectorTileLayer& layer, c
     // If we filter further by field/value, parse the key/value indices first
     // because protobuf doesn't mandate a particular key order.
     if (bucket_desc.source_field.size()) {
-        // Find out what key/value IDs we need.
+        // Get the ID of the desired layer key.
         auto key_it = std::find(layer.keys.begin(), layer.keys.end(), bucket_desc.source_field);
         if (key_it != layer.keys.end()) {
             key = (int32_t)(key_it - layer.keys.begin());
         }
-
+        // Get the ID of the desired layer value(s), comparing as strings in
+        // order to avoid numeric type mismatches between the layer and the
+        // style definition.
         for (const Value& source_value : bucket_desc.source_value) {
-            auto value_it = std::find(layer.values.begin(), layer.values.end(), source_value);
+            auto value_it = std::find_if(layer.values.begin(), layer.values.end(), [&source_value](const Value& layer_value) {
+                return (toString(layer_value) == toString(source_value));
+            });
             if (value_it != layer.values.end()) {
                 values.insert((uint32_t)(value_it - layer.values.begin()));
             }
