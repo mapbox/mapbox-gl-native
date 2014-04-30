@@ -1,7 +1,6 @@
 #import "MBXViewController.h"
 
-#import "MBXSettings.h"
-
+#import "../common/settings_nsuserdefaults.hpp"
 #import "../common/foundation_request.h"
 
 #import <OpenGLES/EAGL.h>
@@ -30,7 +29,7 @@ class View;
 
 llmr::Map *map = nullptr;
 View *viewObj = nullptr;
-llmr::Settings_iOS *settings = nullptr;
+llmr::Settings_NSUserDefaults *settings = nullptr;
 MBXViewController *viewController = nullptr;
 
 #pragma mark - Setup
@@ -68,12 +67,14 @@ MBXViewController *viewController = nullptr;
 
 - (void)setupMap
 {
-    settings = new llmr::Settings_iOS();
-    settings->load();
-
     viewObj = new View(self);
-
     map = new llmr::Map(*viewObj);
+
+    // Load settings
+    settings = new llmr::Settings_NSUserDefaults();
+    map->setLonLatZoom(settings->longitude, settings->latitude, settings->zoom);
+    map->setAngle(settings->angle);
+    map->setDebug(settings->debug);
 }
 
 
@@ -219,6 +220,20 @@ MBXViewController *viewController = nullptr;
 
 - (void)dealloc
 {
+    if (settings)
+    {
+        // Save settings
+        if (map)
+        {
+            map->getLonLatZoom(settings->longitude, settings->latitude, settings->zoom);
+            settings->angle = map->getAngle();
+            settings->debug = map->getDebug();
+            settings->save();
+        }
+        delete settings;
+        settings = nullptr;
+    }
+
     if (map)
     {
         delete map;
@@ -229,13 +244,6 @@ MBXViewController *viewController = nullptr;
     {
         delete viewObj;
         viewObj = nullptr;
-    }
-
-    if (settings)
-    {
-        settings->sync();
-        delete settings;
-        settings = nullptr;
     }
 
     if ([[EAGLContext currentContext] isEqual:self.context])

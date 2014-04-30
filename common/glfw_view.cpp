@@ -1,11 +1,12 @@
 #include "glfw_view.hpp"
 
-MapView::MapView(llmr::Settings &settings, bool fullscreen)
-    : fullscreen(fullscreen), settings(settings), map(*this) {}
+GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {}
 
-MapView::~MapView() { glfwTerminate(); }
+GLFWView::~GLFWView() { glfwTerminate(); }
 
-void MapView::init() {
+void GLFWView::initialize(llmr::Map *map) {
+    View::initialize(map);
+
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize glfw\n");
         exit(1);
@@ -44,8 +45,6 @@ void MapView::init() {
     int fb_width, fb_height;
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
-    settings.load();
-
     resize(window, 0, 0);
 
     glfwSetCursorPosCallback(window, mousemove);
@@ -58,8 +57,8 @@ void MapView::init() {
     glfwMakeContextCurrent(nullptr);
 }
 
-void MapView::key(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
-    MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
+void GLFWView::key(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
+    GLFWView *view = (GLFWView *)glfwGetWindowUserPointer(window);
 
     if (action == GLFW_RELEASE) {
         switch (key) {
@@ -67,26 +66,26 @@ void MapView::key(GLFWwindow *window, int key, int /*scancode*/, int action, int
             glfwSetWindowShouldClose(window, true);
             break;
         case GLFW_KEY_TAB:
-            mapView->map.toggleDebug();
+            view->map->toggleDebug();
             break;
         case GLFW_KEY_X:
             if (!mods)
-                mapView->map.resetPosition();
+                view->map->resetPosition();
             break;
         case GLFW_KEY_R:
             if (!mods)
-                mapView->map.toggleRaster();
+                view->map->toggleRaster();
             break;
         case GLFW_KEY_N:
             if (!mods)
-                mapView->map.resetNorth();
+                view->map->resetNorth();
             break;
         }
     }
 }
 
-void MapView::scroll(GLFWwindow *window, double /*xoffset*/, double yoffset) {
-    MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
+void GLFWView::scroll(GLFWwindow *window, double /*xoffset*/, double yoffset) {
+    GLFWView *view = (GLFWView *)glfwGetWindowUserPointer(window);
     double delta = yoffset * 40;
 
     bool is_wheel = delta != 0 && fmod(delta, 4.000244140625) == 0;
@@ -104,88 +103,88 @@ void MapView::scroll(GLFWwindow *window, double /*xoffset*/, double yoffset) {
         scale = 1.0 / scale;
     }
 
-    mapView->map.startScaling();
-    mapView->map.scaleBy(scale, mapView->last_x, mapView->last_y);
+    view->map->startScaling();
+    view->map->scaleBy(scale, view->last_x, view->last_y);
 }
 
-void MapView::resize(GLFWwindow *window, int, int) {
-    MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
+void GLFWView::resize(GLFWwindow *window, int, int) {
+    GLFWView *view = (GLFWView *)glfwGetWindowUserPointer(window);
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
     int fb_width, fb_height;
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
-    mapView->map.resize(width, height, (float)fb_width / (float)width, fb_width, fb_height);
+    view->map->resize(width, height, (float)fb_width / (float)width, fb_width, fb_height);
 }
 
-void MapView::mouseclick(GLFWwindow *window, int button, int action, int modifiers) {
-    MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
+void GLFWView::mouseclick(GLFWwindow *window, int button, int action, int modifiers) {
+    GLFWView *view = (GLFWView *)glfwGetWindowUserPointer(window);
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT ||
         (button == GLFW_MOUSE_BUTTON_LEFT && modifiers & GLFW_MOD_CONTROL)) {
-        mapView->rotating = action == GLFW_PRESS;
-        if (!mapView->rotating) {
-            mapView->map.stopRotating();
+        view->rotating = action == GLFW_PRESS;
+        if (!view->rotating) {
+            view->map->stopRotating();
         }
     } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
-        mapView->tracking = action == GLFW_PRESS;
+        view->tracking = action == GLFW_PRESS;
 
         if (action == GLFW_RELEASE) {
-            mapView->map.stopPanning();
+            view->map->stopPanning();
             double now = glfwGetTime();
-            if (now - mapView->last_click < 0.4 /* ms */) {
-                mapView->map.scaleBy(2.0, mapView->last_x, mapView->last_y, 0.5);
+            if (now - view->last_click < 0.4 /* ms */) {
+                view->map->scaleBy(2.0, view->last_x, view->last_y, 0.5);
             }
-            mapView->last_click = now;
+            view->last_click = now;
         }
     }
 }
 
-void MapView::mousemove(GLFWwindow *window, double x, double y) {
-    MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
-    if (mapView->tracking) {
-        double dx = x - mapView->last_x;
-        double dy = y - mapView->last_y;
+void GLFWView::mousemove(GLFWwindow *window, double x, double y) {
+    GLFWView *view = (GLFWView *)glfwGetWindowUserPointer(window);
+    if (view->tracking) {
+        double dx = x - view->last_x;
+        double dy = y - view->last_y;
         if (dx || dy) {
-            mapView->map.startPanning();
-            mapView->map.moveBy(dx, dy);
+            view->map->startPanning();
+            view->map->moveBy(dx, dy);
         }
-    } else if (mapView->rotating) {
-        mapView->map.startRotating();
-        mapView->map.rotateBy(mapView->last_x, mapView->last_y, x, y);
+    } else if (view->rotating) {
+        view->map->startRotating();
+        view->map->rotateBy(view->last_x, view->last_y, x, y);
     }
-    mapView->last_x = x;
-    mapView->last_y = y;
+    view->last_x = x;
+    view->last_y = y;
 }
 
-int MapView::run() {
-    map.start();
+int GLFWView::run() {
+    map->start();
 
     while (!glfwWindowShouldClose(window)) {
-        if (map.needsSwap()) {
+        if (map->needsSwap()) {
             glfwSwapBuffers(window);
-            map.swapped();
+            map->swapped();
             fps();
         }
 
         glfwWaitEvents();
     }
 
-    map.stop();
+    map->stop();
 
     return 0;
 }
 
-void MapView::make_active() {
+void GLFWView::make_active() {
     glfwMakeContextCurrent(window);
 }
 
-void MapView::swap() {
+void GLFWView::swap() {
     glfwPostEmptyEvent();
 }
 
-void MapView::fps() {
+void GLFWView::fps() {
     static int frames = 0;
     static double time_elapsed = 0;
 

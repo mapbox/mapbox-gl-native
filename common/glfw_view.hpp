@@ -5,13 +5,12 @@
 #include <GLFW/glfw3.h>
 #include <uv.h>
 
-class MapView : public llmr::View {
+class GLFWView : public llmr::View {
 public:
-    MapView(llmr::Settings &settings, bool fullscreen = false);
-    ~MapView();
+    GLFWView(bool fullscreen = false);
+    ~GLFWView();
 
-    void init();
-
+    void initialize(llmr::Map *map);
     void swap();
     void make_active();
 
@@ -37,8 +36,6 @@ public:
     double last_click = -1;
 
     GLFWwindow *window = nullptr;
-    llmr::Settings &settings;
-    llmr::Map map;
 
     uv_loop_t *loop = nullptr;
 };

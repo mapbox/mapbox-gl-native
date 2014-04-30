@@ -20,6 +20,8 @@ Map::Map(View& view)
       painter(*this),
       loop(uv_loop_new()) {
 
+    view.initialize(this);
+
     // Make sure that we're doing an initial drawing in all cases.
     is_clean.clear();
     is_rendered.clear();

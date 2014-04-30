@@ -11,8 +11,10 @@
         "sources": [
             "./main.m",
             "./MBXAppDelegate.m",
-            "./MBXSettings.mm",
             "./MBXViewController.mm",
+            "../common/settings_nsuserdefaults.hpp",
+            "../common/settings_nsuserdefaults.mm",
+            "../common/foundation_request.h",
             "../common/foundation_request.mm",
         ],
         'product_extension': 'app',

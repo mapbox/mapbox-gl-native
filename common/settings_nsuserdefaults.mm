@@ -1,52 +1,41 @@
-//
-//  MBXSettings.cpp
-//  llmr
-//
-//  Created by Justin R. Miller on 1/27/14.
-//
-//
-
-#import "MBXSettings.h"
-
 #import <Foundation/Foundation.h>
+
+#include "settings_nsuserdefaults.hpp"
 
 using namespace llmr;
 
-Settings_iOS::Settings_iOS()
+Settings_NSUserDefaults::Settings_NSUserDefaults()
 {
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"longitude" : @(longitude),
                                                                @"latitude"  : @(latitude),
-                                                               @"scale"     : @(scale),
+                                                               @"zoom"      : @(zoom),
                                                                @"angle"     : @(angle),
                                                                @"debug"     : @(debug) }];
+    load();
 }
 
-void Settings_iOS::load()
+void Settings_NSUserDefaults::load()
 {
     NSDictionary *settings = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
 
     longitude = [settings[@"longitude"] doubleValue];
     latitude  = [settings[@"latitude"]  doubleValue];
-    scale     = [settings[@"scale"]     doubleValue];
+    zoom      = [settings[@"zoom"]      doubleValue];
     angle     = [settings[@"angle"]     doubleValue];
     debug     = [settings[@"debug"]     boolValue];
 }
 
-void Settings_iOS::persist()
+void Settings_NSUserDefaults::save()
 {
     [[NSUserDefaults standardUserDefaults] setValuesForKeysWithDictionary:@{ @"longitude" : @(longitude),
                                                                              @"latitude"  : @(latitude),
-                                                                             @"scale"     : @(scale),
+                                                                             @"zoom"     : @(zoom),
                                                                              @"angle"     : @(angle),
                                                                              @"debug"     : @(debug) }];
-}
-
-void Settings_iOS::sync()
-{
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-void Settings_iOS::clear()
+void Settings_NSUserDefaults::clear()
 {
     [NSUserDefaults resetStandardUserDefaults];
 }
