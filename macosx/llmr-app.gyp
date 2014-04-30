@@ -10,8 +10,8 @@
       'type': 'executable',
       'sources': [
         './main.mm',
-        './settings.mm',
-        './settings.hpp',
+        '../common/settings_nsuserdefaults.hpp',
+        '../common/settings_nsuserdefaults.mm',
         '../common/glfw_view.hpp',
         '../common/glfw_view.cpp',
         '../common/foundation_request.h',

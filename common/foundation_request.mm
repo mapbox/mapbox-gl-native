@@ -40,9 +40,9 @@ void request_initialize_cb() {
 class FoundationRequest : public llmr::platform::Request {
 public:
     FoundationRequest(const std::string &url,
-                      std::function<void(llmr::platform::Response *)> background_function,
-                      std::function<void()> foreground_callback)
-        : Request(url, background_function, foreground_callback) {
+                      std::function<void(llmr::platform::Response *)> callback,
+                      uv_loop_t *loop)
+        : Request(url, callback, loop) {
 #if TARGET_OS_IPHONE
         active_tasks++;
         dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -67,12 +67,12 @@ public:
 
 std::shared_ptr<llmr::platform::Request>
 llmr::platform::request_http(const std::string &url,
-                             std::function<void(Response *)> background_function,
-                             std::function<void()> foreground_callback) {
+                             std::function<void(Response *)> callback,
+                             uv_loop_t *loop) {
     uv_once(&request_initialize, request_initialize_cb);
 
     std::shared_ptr<FoundationRequest> req =
-        std::make_shared<FoundationRequest>(url, background_function, foreground_callback);
+        std::make_shared<FoundationRequest>(url, callback, loop);
 
     // Note that we are creating a new shared_ptr pointer(!) to make sure there is at least one
     // shared_ptr in existence while the NSURLSession is loading our data. We are making sure in the
@@ -91,28 +91,16 @@ llmr::platform::request_http(const std::string &url,
             return;
         }
 
-        req->res = std::make_unique<Response>();
-
         if (!error && [response isKindOfClass:[NSHTTPURLResponse class]]) {
-            req->res->code = [(NSHTTPURLResponse *)response statusCode];
-            req->res->body = {(const char *)[data bytes], [data length]};
+            (*req_ptr)->res->code = [(NSHTTPURLResponse *)response statusCode];
+            (*req_ptr)->res->body = {(const char *)[data bytes], [data length]};
         } else {
-            req->res->error_message = [[error localizedDescription] UTF8String];
+            (*req_ptr)->res->error_message = [[error localizedDescription] UTF8String];
         }
 
-        // We're currently in the request thread. We're going to schedule a uv_work request that
-        // executes the background function in a threadpool, and tell it to call the after callback
-        // back in the main uv loop.
-        uv_work_t *work = new uv_work_t();
-
-        // We're passing on the pointer we created to the work structure. It is going to be deleted
-        // in the after_work_cb;
-        work->data = req_ptr;
-
-        // Executes the background_function in a libuv thread pool, and the after_work_cb back in
-        // the *main* event loop.
-        uv_queue_work(uv_default_loop(), work, Request::work_callback,
-                      Request::after_work_callback);
+        (*req_ptr)->complete();
+                                      
+        delete req_ptr;
     }];
 
     req->task = task;

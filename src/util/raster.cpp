@@ -6,6 +6,8 @@
 
 #include <llmr/platform/platform.hpp>
 #include <llmr/platform/gl.hpp>
+#include <llmr/util/time.hpp>
+#include <llmr/util/uv.hpp>
 
 #include <png.h>
 
@@ -19,20 +21,22 @@ Raster::~Raster() {
     }
 }
 
-Raster::operator bool() const {
+bool Raster::isLoaded() const {
     std::lock_guard<std::mutex> lock(mtx);
     return loaded;
 }
 
-void Raster::load(const std::string& data) {
-    std::shared_ptr<Raster> raster = shared_from_this();
+void Raster::load() {
+    loadImage(data);
 
-    raster->loadImage(data);
-
-    std::lock_guard<std::mutex> lock(raster->mtx);
-    if (raster->img) {
-        raster->loaded = true;
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        if (img) {
+            loaded = true;
+        }
     }
+
+    data.clear();
 }
 
 struct Buffer {
@@ -182,7 +186,7 @@ void Raster::bind(bool linear) {
 }
 
 void Raster::beginFadeInAnimation() {
-    double start = platform::elapsed();
+    double start = (double)util::now() / 1_second;
     fade_animation = std::make_shared<util::ease_animation>(opacity, 1.0, opacity, start, 0.25);
 }
 

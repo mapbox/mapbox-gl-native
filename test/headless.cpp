@@ -7,25 +7,28 @@
 #include <llmr/llmr.hpp>
 #include <llmr/util/image.hpp>
 #include <llmr/util/io.hpp>
+#include <llmr/util/timer.hpp>
 
 #include <uv.h>
 
-double llmr::platform::elapsed() {
-    return 0;
-}
+class View : public llmr::View {
+public:
+    void make_active() {
+        CGLError error = CGLSetCurrentContext(gl_context);
+        if (error) {
+            fprintf(stderr, "Switching OpenGL context failed\n");
+        }
+    }
+    void swap() {}
 
-void llmr::platform::restart() {
-    // noop
-}
+CGLContextObj gl_context;
+};
 
 TEST(Headless, initialize) {
-    llmr::Settings settings;
-
-    llmr::Map map(settings);
-
+    llmr::util::timer timer;
 
     // Setup OpenGL
-    CGLContextObj gl_context;
+    View view;
 
     // TODO: test if OpenGL 4.1 with GL_ARB_ES2_compatibility is supported
     // If it is, use kCGLOGLPVersion_3_2_Core and enable that extension.
@@ -44,18 +47,16 @@ TEST(Headless, initialize) {
         return;
     }
 
-    error = CGLCreateContext(pixelFormat, NULL, &gl_context);
+    error = CGLCreateContext(pixelFormat, NULL, &view.gl_context);
     CGLDestroyPixelFormat(pixelFormat);
     if (error) {
         fprintf(stderr, "Error creating GL context object\n");
         return;
     }
 
-    error = CGLSetCurrentContext(gl_context);
-    if (error) {
-        fprintf(stderr, "Switching OpenGL context failed\n");
-        return;
-    }
+    view.make_active();
+
+    timer.report("gl setup");
 
 
     int width = 1024;
@@ -84,7 +85,6 @@ TEST(Headless, initialize) {
     GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 
 
-
     if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
         fprintf(stderr, "Couldn't create framebuffer: ");
         switch (status) {
@@ -97,25 +97,34 @@ TEST(Headless, initialize) {
         return;
     }
 
+    timer.report("gl framebuffer");
 
-    map.setup();
+
+    llmr::Map map(view);
+
     map.resize(width, height);
-    map.loadSettings();
 
-    map.update();
+    timer.report("map resize");
 
     // Run the loop. It will terminate when we don't have any further listeners.
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    map.run();
 
-    map.render();
-
+    timer.report("map loop");
 
     uint32_t *pixels = new uint32_t[width * height];
 
     glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
+    timer.report("gl readpixels");
+
     std::string result = llmr::util::compress_png(width, height, pixels, true);
+
+    timer.report("compress png");
+
     llmr::util::write_file("out.png", result);
+
+    timer.report("save file");
+
 
     delete[] pixels;
 
@@ -124,5 +133,7 @@ TEST(Headless, initialize) {
     glDeleteTextures(1, &fbo_color);
     glDeleteRenderbuffersEXT(1, &fbo_depth_stencil);
 
-    CGLDestroyContext(gl_context);
+    CGLDestroyContext(view.gl_context);
+
+    timer.report("destruct");
 }

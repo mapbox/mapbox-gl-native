@@ -6,6 +6,9 @@
 
 namespace llmr {
 
+class Style;
+class GlyphAtlas;
+
 class TileParser {
 public:
     TileParser(const std::string& data, TileData& tile, const Style& style, GlyphAtlas& glyphAtlas, bool is_raster = false);

@@ -11,22 +11,24 @@
 #include <llmr/renderer/text_bucket.hpp>
 #include <llmr/renderer/raster_bucket.hpp>
 
+#include <llmr/map/map.hpp>
 #include <llmr/map/transform.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
+#include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/platform/gl.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/style/sprite.hpp>
 #include <llmr/util/raster.hpp>
 #include <llmr/util/string.hpp>
+#include <llmr/util/timer.hpp>
+#include <llmr/util/time.hpp>
 
 using namespace llmr;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(Transform& transform, Style& style, GlyphAtlas& glyphAtlas)
-    : transform(transform),
-      style(style),
-      glyphAtlas(glyphAtlas) {
+Painter::Painter(Map &map)
+    : map(map) {
 }
 
 bool Painter::needsAnimation() const {
@@ -34,6 +36,8 @@ bool Painter::needsAnimation() const {
 }
 
 void Painter::setup() {
+    util::timer timer("painter setup");
+
     setupShaders();
 
     assert(pointShader);
@@ -75,8 +79,12 @@ void Painter::setupShaders() {
 }
 
 void Painter::resize() {
-    assert(transform.getFramebufferWidth() > 0 && transform.getFramebufferHeight() > 0);
-    glViewport(0, 0, transform.getFramebufferWidth(), transform.getFramebufferHeight());
+    const TransformState &state = map.getState();
+    if (gl_viewport != state.getFramebufferDimensions()) {
+        gl_viewport = state.getFramebufferDimensions();
+        assert(gl_viewport[0] > 0 && gl_viewport[1] > 0);
+        glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
+    }
 }
 
 void Painter::setDebug(bool enabled) {
@@ -106,12 +114,12 @@ void Painter::depthMask(bool value) {
 
 void Painter::changeMatrix() {
     // Initialize projection matrix
-    matrix::ortho(projMatrix, 0, transform.getWidth(), transform.getHeight(), 0, 0, 1);
+    matrix::ortho(projMatrix, 0, map.getState().getWidth(), map.getState().getHeight(), 0, 0, 1);
 
     // The extrusion matrix.
     matrix::identity(extrudeMatrix);
     matrix::multiply(extrudeMatrix, projMatrix, extrudeMatrix);
-    matrix::rotate_z(extrudeMatrix, extrudeMatrix, transform.getAngle());
+    matrix::rotate_z(extrudeMatrix, extrudeMatrix, map.getState().getAngle());
 
     // The native matrix is a 1:1 matrix that paints the coordinates at the
     // same screen position as the vertex specifies.
@@ -133,11 +141,11 @@ void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id) {
     gl::group group("mask");
     plainShader->setMatrix(matrix);
 
-    Color background = style.computed.background.color;
-    background[0] *= style.computed.background.opacity;
-    background[1] *= style.computed.background.opacity;
-    background[2] *= style.computed.background.opacity;
-    background[3] *= style.computed.background.opacity;
+    Color background = map.getStyle().computed.background.color;
+    background[0] *= map.getStyle().computed.background.opacity;
+    background[1] *= map.getStyle().computed.background.opacity;
+    background[2] *= map.getStyle().computed.background.opacity;
+    background[3] *= map.getStyle().computed.background.opacity;
 
     plainShader->setColor(background);
 
@@ -173,12 +181,12 @@ void Painter::render(const Tile& tile) {
         return;
     }
 
-    frameHistory.record(transform.getNormalizedZoom());
+    frameHistory.record(map.getState().getNormalizedZoom());
 
     matrix = tile.matrix;
     glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
 
-    renderLayers(tile.data, style.layers);
+    renderLayers(tile.data, map.getStyle().layers);
 
     if (debug) {
         renderDebug(tile.data);
@@ -230,15 +238,18 @@ void Painter::renderLayer(const std::shared_ptr<TileData>& tile_data, const Laye
     } else {
         // This is a singular layer. Try to find the bucket associated with
         // this layer and render it.
-        if (style.buckets[layer_desc.bucket_name].type == BucketType::Raster) {
-            if (tile_data && tile_data->raster) {
-                renderRaster(layer_desc.name, tile_data);
-            }
-        } else {
-            auto bucket_it = tile_data->buckets.find(layer_desc.bucket_name);
-            if (bucket_it != tile_data->buckets.end()) {
-                assert(bucket_it->second);
-                bucket_it->second->render(*this, layer_desc.name, tile_data->id);
+        auto bucket_it = map.getStyle().buckets.find(layer_desc.bucket_name);
+        if (bucket_it != map.getStyle().buckets.end()) {
+            if (bucket_it->second.type == BucketType::Raster) {
+                if (tile_data && tile_data->raster) {
+                    renderRaster(layer_desc.name, tile_data);
+                }
+            } else {
+                auto databucket_it = tile_data->buckets.find(layer_desc.bucket_name);
+                if (databucket_it != tile_data->buckets.end()) {
+                    assert(databucket_it->second);
+                    databucket_it->second->render(*this, layer_desc.name, tile_data->id);
+                }
             }
         }
     }
@@ -247,7 +258,11 @@ void Painter::renderLayer(const std::shared_ptr<TileData>& tile_data, const Laye
 void Painter::renderRaster(const std::string& layer_name, const std::shared_ptr<TileData>& tile_data) {
     if (pass == Opaque) return;
 
-    const RasterProperties& properties = style.computed.rasters[layer_name];
+    auto raster_properties = map.getStyle().computed.rasters;
+    auto raster_properties_it = raster_properties.find(layer_name);
+    if (raster_properties_it == raster_properties.end()) return;
+
+    const RasterProperties& properties = raster_properties_it->second;
     if (!properties.enabled) return;
 
     gl::group group(layer_name + " (raster)");
@@ -267,7 +282,11 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     // Abort early.
     if (bucket.empty()) return;
 
-    const FillProperties& properties = style.computed.fills[layer_name];
+    auto fill_properties = map.getStyle().computed.fills;
+    auto fill_properties_it = fill_properties.find(layer_name);
+    if (fill_properties_it == fill_properties.end()) return;
+
+    const FillProperties& properties = fill_properties_it->second;
     if (!properties.enabled) return;
 
     Color fill_color = properties.fill_color;
@@ -301,8 +320,8 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         // Draw the entire line
         outlineShader->setWorld({{
-            static_cast<float>(transform.getFramebufferWidth()),
-            static_cast<float>(transform.getFramebufferHeight())
+            static_cast<float>(map.getState().getFramebufferWidth()),
+            static_cast<float>(map.getState().getFramebufferHeight())
         }});
         glDepthRange(strata, 1.0f);
         bucket.drawVertices(*outlineShader);
@@ -325,12 +344,13 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     }
 
     if ((fill_color[3] >= 1.0f) == (pass == Opaque)) {
-        if (properties.image.size() && *style.sprite) {
+        auto &sprite = map.getStyle().sprite;
+        if (properties.image.size() && sprite && sprite->isLoaded()) {
             // Draw texture fill
-            ImagePosition imagePos = style.sprite->getPosition(properties.image, true);
+            ImagePosition imagePos = sprite->getPosition(properties.image, true);
 
-            float factor = 8.0 / pow(2, transform.getIntegerZoom() - id.z);
-            float mix = fmod(transform.getZoom(), 1.0);
+            float factor = 8.0 / pow(2, map.getState().getIntegerZoom() - id.z);
+            float mix = fmod(map.getState().getZoom(), 1.0);
 
             std::array<float, 2> imageSize = {{
                     imagePos.size.x * factor,
@@ -352,7 +372,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             patternShader->setPatternBottomRight({{ imagePos.br.x, imagePos.br.y }});
             patternShader->setColor(fill_color);
             patternShader->setMix(mix);
-            style.sprite->raster->bind(true);
+            sprite->raster->bind(true);
 
             // Draw the actual triangles into the color & stencil buffer.
             glDepthRange(strata + strata_epsilon, 1.0f);
@@ -383,8 +403,8 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         // Draw the entire line
         outlineShader->setWorld({{
-            static_cast<float>(transform.getFramebufferWidth()),
-            static_cast<float>(transform.getFramebufferHeight())
+            static_cast<float>(map.getState().getFramebufferWidth()),
+            static_cast<float>(map.getState().getFramebufferHeight())
         }});
 
         glDepthRange(strata + strata_epsilon, 1.0f);
@@ -397,7 +417,11 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     if (pass == Opaque) return;
     if (bucket.empty()) return;
 
-    const LineProperties& properties = style.computed.lines[layer_name];
+    auto line_properties = map.getStyle().computed.lines;
+    auto line_properties_it = line_properties.find(layer_name);
+    if (line_properties_it == line_properties.end()) return;
+
+    const LineProperties& properties = line_properties_it->second;
     if (!properties.enabled) return;
 
     float width = properties.width;
@@ -424,17 +448,17 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         linejoinShader->setMatrix(matrix);
         linejoinShader->setColor(color);
         linejoinShader->setWorld({{
-                transform.getFramebufferWidth() * 0.5f,
-                transform.getFramebufferHeight() * 0.5f
+                map.getState().getFramebufferWidth() * 0.5f,
+                map.getState().getFramebufferHeight() * 0.5f
             }
         });
         linejoinShader->setLineWidth({{
-                ((outset - 0.25f) * transform.getPixelRatio()),
-                ((inset - 0.25f) * transform.getPixelRatio())
+                ((outset - 0.25f) * map.getState().getPixelRatio()),
+                ((inset - 0.25f) * map.getState().getPixelRatio())
             }
         });
 
-        float pointSize = ceil(transform.getPixelRatio() * outset * 2.0);
+        float pointSize = ceil(map.getState().getPixelRatio() * outset * 2.0);
 #if defined(GL_ES_VERSION_2_0)
         linejoinShader->setSize(pointSize);
 #else
@@ -464,7 +488,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         lineShader->setExtrudeMatrix(extrudeMatrix);
 
         // TODO: Move this to transform?
-        const float tilePixelRatio = transform.getScale() / (1 << transform.getIntegerZoom()) / 8;
+        const float tilePixelRatio = map.getState().getScale() / (1 << map.getState().getIntegerZoom()) / 8;
 
         lineShader->setDashArray({{ 1, -1 }});
         lineShader->setLineWidth({{ outset, inset }});
@@ -479,8 +503,15 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     if (!bucket.hasPoints()) return;
     if (pass == Opaque) return;
 
-    const PointProperties& properties = style.computed.points[layer_name];
+    auto point_properties = map.getStyle().computed.points;
+    auto point_properties_it = point_properties.find(layer_name);
+    if (point_properties_it == point_properties.end()) return;
+
+    const PointProperties& properties = point_properties_it->second;
     if (!properties.enabled) return;
+
+    auto &sprite = map.getStyle().sprite;
+    if (!sprite || !sprite->isLoaded()) return;
 
     gl::group group(layer_name + " (point)");
 
@@ -494,7 +525,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     sized_image.append("-");
     sized_image.append(std::to_string(static_cast<int>(std::round(properties.size))));
 
-    ImagePosition imagePos = style.sprite->getPosition(sized_image, false);
+    ImagePosition imagePos = sprite->getPosition(sized_image, false);
 
     // fprintf(stderr, "%f/%f => %f/%f\n", imagePos.tl.x, imagePos.tl.y, imagePos.br.x, imagePos.br.y);
 
@@ -502,7 +533,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     pointShader->setMatrix(matrix);
     pointShader->setImage(0);
     pointShader->setColor(color);
-    const float pointSize = properties.size * 1.4142135623730951 * transform.getPixelRatio();
+    const float pointSize = properties.size * 1.4142135623730951 * map.getState().getPixelRatio();
 #if defined(GL_ES_VERSION_2_0)
     pointShader->setSize(pointSize);
 #else
@@ -511,8 +542,8 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
 #endif
     pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
     pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
-    if (*style.sprite->raster) {
-        style.sprite->raster->bind(transform.rotating || transform.scaling || transform.panning);
+    if (sprite->raster->isLoaded()) {
+        sprite->raster->bind(map.getState().isChanging());
     }
     glDepthRange(strata, 1.0f);
     bucket.drawPoints(*pointShader);
@@ -523,7 +554,11 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     if (pass == Opaque) return;
     if (bucket.empty()) return;
 
-    const TextProperties& properties = style.computed.texts[layer_name];
+    auto text_properties = map.getStyle().computed.texts;
+    auto text_properties_it = text_properties.find(layer_name);
+    if (text_properties_it == text_properties.end()) return;
+
+    const TextProperties& properties = text_properties_it->second;
     if (!properties.enabled) return;
 
     gl::group group(layer_name + " (text)");
@@ -531,7 +566,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     mat4 exMatrix;
     matrix::copy(exMatrix, projMatrix);
     if (bucket.geom_desc.path == TextPathType::Curve) {
-        matrix::rotate_z(exMatrix, exMatrix, transform.getAngle());
+        matrix::rotate_z(exMatrix, exMatrix, map.getState().getAngle());
     }
 
     const float rotate = properties.rotate;
@@ -547,24 +582,25 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     textShader->setMatrix(matrix);
     textShader->setExtrudeMatrix(exMatrix);
 
-    glyphAtlas.bind();
-    textShader->setTextureSize({{ static_cast<float>(glyphAtlas.width), static_cast<float>(glyphAtlas.height) }});
+    map.getGlyphAtlas().bind();
+    textShader->setTextureSize({{static_cast<float>(map.getGlyphAtlas().width),
+                                 static_cast<float>(map.getGlyphAtlas().height)}});
 
-    textShader->setGamma(2.5f / fontSize / transform.getPixelRatio());
+    textShader->setGamma(2.5f / fontSize / map.getState().getPixelRatio());
 
     // Convert the -pi..pi to an int8 range.
-    float angle = round((transform.getAngle() + rotate) / M_PI * 128);
+    float angle = round((map.getState().getAngle() + rotate) / M_PI * 128);
 
     // adjust min/max zooms for variable font sies
     float zoomAdjust = log(fontSize / bucket.geom_desc.font_size) / log(2);
 
     textShader->setAngle((int32_t)(angle + 256) % 256);
     textShader->setFlip(bucket.geom_desc.path == TextPathType::Curve ? 1 : 0);
-    textShader->setZoom((transform.getNormalizedZoom() - zoomAdjust) * 10); // current zoom level
+    textShader->setZoom((map.getState().getNormalizedZoom() - zoomAdjust) * 10); // current zoom level
 
     // Label fading
     const float duration = 300.0f;
-    const float currentTime = platform::elapsed() * 1000;
+    const float currentTime = util::now() / 1_millisecond;
 
     std::deque<FrameSnapshot> &history = frameHistory.history;
 
@@ -602,7 +638,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     textShader->setFadeDist(fadedist * 10);
     textShader->setMinFadeZoom(floor(lowZ * 10));
     textShader->setMaxFadeZoom(floor(highZ * 10));
-    textShader->setFadeZoom((transform.getZoom() + bump) * 10);
+    textShader->setFadeZoom((map.getState().getZoom() + bump) * 10);
 
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
@@ -634,16 +670,16 @@ void Painter::renderDebug(const TileData::Ptr& tile_data) {
     // draw tile outline
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(1.0f, 0.0f, 0.0f, 1.0f);
-    lineWidth(4.0f * transform.getPixelRatio());
+    lineWidth(4.0f * map.getState().getPixelRatio());
     glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index());
 
     // draw debug info
     tile_data->debugFontArray.bind(*plainShader, tile_data->debugFontBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
-    lineWidth(4.0f * transform.getPixelRatio());
+    lineWidth(4.0f * map.getState().getPixelRatio());
     glDrawArrays(GL_LINES, 0, (GLsizei)tile_data->debugFontBuffer.index());
     plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
-    lineWidth(2.0f * transform.getPixelRatio());
+    lineWidth(2.0f * map.getState().getPixelRatio());
     glDrawArrays(GL_LINES, 0, (GLsizei)tile_data->debugFontBuffer.index());
 
     glEnable(GL_DEPTH_TEST);

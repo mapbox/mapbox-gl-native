@@ -1,44 +1,12 @@
 #include "glfw_view.hpp"
 
+GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {}
 
-#ifndef HAVE_KQUEUE
-# if defined(__APPLE__) ||                                                    \
-     defined(__DragonFly__) ||                                                \
-     defined(__FreeBSD__) ||                                                  \
-     defined(__OpenBSD__) ||                                                  \
-     defined(__NetBSD__)
-#  define HAVE_KQUEUE 1
-# endif
-#endif
+GLFWView::~GLFWView() { glfwTerminate(); }
 
-#ifndef HAVE_EPOLL
-# if defined(__linux__)
-#  define HAVE_EPOLL 1
-# endif
-#endif
+void GLFWView::initialize(llmr::Map *map) {
+    View::initialize(map);
 
-#if defined(HAVE_KQUEUE) || defined(HAVE_EPOLL)
-
-#if defined(HAVE_KQUEUE)
-# include <sys/types.h>
-# include <sys/event.h>
-# include <sys/time.h>
-#endif
-
-#if defined(HAVE_EPOLL)
-# include <sys/epoll.h>
-#endif
-
-#endif
-
-
-MapView::MapView(llmr::Settings &settings, bool fullscreen)
-    : fullscreen(fullscreen), settings(settings), map(settings),
-    stop_event_listener(false) {}
-
-MapView::~MapView() { glfwTerminate(); }
-
-void MapView::init() {
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize glfw\n");
         exit(1);
@@ -77,14 +45,7 @@ void MapView::init() {
     int fb_width, fb_height;
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
-    settings.load();
-    map.setup();
-
     resize(window, 0, 0);
-
-    glfwSwapInterval(1);
-
-    map.loadSettings();
 
     glfwSetCursorPosCallback(window, mousemove);
     glfwSetMouseButtonCallback(window, mouseclick);
@@ -92,10 +53,12 @@ void MapView::init() {
     glfwSetFramebufferSizeCallback(window, resize);
     glfwSetScrollCallback(window, scroll);
     glfwSetKeyCallback(window, key);
+
+    glfwMakeContextCurrent(nullptr);
 }
 
-void MapView::key(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
-    MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
+void GLFWView::key(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
+    GLFWView *view = (GLFWView *)glfwGetWindowUserPointer(window);
 
     if (action == GLFW_RELEASE) {
         switch (key) {
@@ -103,26 +66,26 @@ void MapView::key(GLFWwindow *window, int key, int /*scancode*/, int action, int
             glfwSetWindowShouldClose(window, true);
             break;
         case GLFW_KEY_TAB:
-            mapView->map.toggleDebug();
+            view->map->toggleDebug();
             break;
         case GLFW_KEY_X:
             if (!mods)
-                mapView->map.resetPosition();
+                view->map->resetPosition();
             break;
         case GLFW_KEY_R:
             if (!mods)
-                mapView->map.toggleRaster();
+                view->map->toggleRaster();
             break;
         case GLFW_KEY_N:
             if (!mods)
-                mapView->map.resetNorth();
+                view->map->resetNorth();
             break;
         }
     }
 }
 
-void MapView::scroll(GLFWwindow *window, double /*xoffset*/, double yoffset) {
-    MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
+void GLFWView::scroll(GLFWwindow *window, double /*xoffset*/, double yoffset) {
+    GLFWView *view = (GLFWView *)glfwGetWindowUserPointer(window);
     double delta = yoffset * 40;
 
     bool is_wheel = delta != 0 && fmod(delta, 4.000244140625) == 0;
@@ -140,130 +103,88 @@ void MapView::scroll(GLFWwindow *window, double /*xoffset*/, double yoffset) {
         scale = 1.0 / scale;
     }
 
-    mapView->map.startScaling();
-    mapView->map.scaleBy(scale, mapView->last_x, mapView->last_y);
+    view->map->startScaling();
+    view->map->scaleBy(scale, view->last_x, view->last_y);
 }
 
-void MapView::resize(GLFWwindow *window, int, int) {
-    MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
+void GLFWView::resize(GLFWwindow *window, int, int) {
+    GLFWView *view = (GLFWView *)glfwGetWindowUserPointer(window);
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
     int fb_width, fb_height;
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
-    mapView->map.resize(width, height, (float)fb_width / (float)width, fb_width, fb_height);
-    mapView->map.update();
+    view->map->resize(width, height, (float)fb_width / (float)width, fb_width, fb_height);
 }
 
-void MapView::mouseclick(GLFWwindow *window, int button, int action, int modifiers) {
-    MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
+void GLFWView::mouseclick(GLFWwindow *window, int button, int action, int modifiers) {
+    GLFWView *view = (GLFWView *)glfwGetWindowUserPointer(window);
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT ||
         (button == GLFW_MOUSE_BUTTON_LEFT && modifiers & GLFW_MOD_CONTROL)) {
-        mapView->rotating = action == GLFW_PRESS;
-        if (!mapView->rotating) {
-            mapView->map.stopRotating();
+        view->rotating = action == GLFW_PRESS;
+        if (!view->rotating) {
+            view->map->stopRotating();
         }
     } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
-        mapView->tracking = action == GLFW_PRESS;
+        view->tracking = action == GLFW_PRESS;
 
         if (action == GLFW_RELEASE) {
-            mapView->map.stopPanning();
+            view->map->stopPanning();
             double now = glfwGetTime();
-            if (now - mapView->last_click < 0.4 /* ms */) {
-                mapView->map.scaleBy(2.0, mapView->last_x, mapView->last_y, 0.5);
+            if (now - view->last_click < 0.4 /* ms */) {
+                view->map->scaleBy(2.0, view->last_x, view->last_y, 0.5);
             }
-            mapView->last_click = now;
+            view->last_click = now;
         }
     }
 }
 
-void MapView::mousemove(GLFWwindow *window, double x, double y) {
-    MapView *mapView = (MapView *)glfwGetWindowUserPointer(window);
-    if (mapView->tracking) {
-        double dx = x - mapView->last_x;
-        double dy = y - mapView->last_y;
+void GLFWView::mousemove(GLFWwindow *window, double x, double y) {
+    GLFWView *view = (GLFWView *)glfwGetWindowUserPointer(window);
+    if (view->tracking) {
+        double dx = x - view->last_x;
+        double dy = y - view->last_y;
         if (dx || dy) {
-            mapView->map.startPanning();
-            mapView->map.moveBy(dx, dy);
+            view->map->startPanning();
+            view->map->moveBy(dx, dy);
         }
-    } else if (mapView->rotating) {
-        mapView->map.startRotating();
-        mapView->map.rotateBy(mapView->last_x, mapView->last_y, x, y);
+    } else if (view->rotating) {
+        view->map->startRotating();
+        view->map->rotateBy(view->last_x, view->last_y, x, y);
     }
-    mapView->last_x = x;
-    mapView->last_y = y;
+    view->last_x = x;
+    view->last_y = y;
 }
 
-void MapView::eventloop(void *arg) {
-    MapView *view = static_cast<MapView *>(arg);
-    int r = 0;
-    int fd = 0;
-    int timeout;
-
-    while (!view->stop_event_listener) {
-        fd = uv_backend_fd(uv_default_loop());
-        timeout = uv_backend_timeout(uv_default_loop());
-
-        do {
-#if defined(HAVE_KQUEUE)
-            struct timespec ts;
-            ts.tv_sec = timeout / 1000;
-            ts.tv_nsec = (timeout % 1000) * 1000000;
-            r = kevent(fd, NULL, 0, NULL, 0, &ts);
-#elif defined(HAVE_EPOLL)
-            {
-                struct epoll_event ev;
-                r = epoll_wait(fd, &ev, 1, timeout);
-            }
-#endif
-        } while (r == -1 && errno == EINTR);
-        glfwPostEmptyEvent();
-        uv_sem_wait(&view->event_listener);
-    }
-}
-
-int MapView::run() {
-    uv_thread_t embed_thread;
-
-    uv_run(uv_default_loop(), UV_RUN_NOWAIT);
-
-    /* Start worker that will interrupt external loop */
-    stop_event_listener = false;
-    uv_sem_init(&event_listener, 0);
-    uv_thread_create(&embed_thread, eventloop, this);
+int GLFWView::run() {
+    map->start();
 
     while (!glfwWindowShouldClose(window)) {
-
-        bool dirty = false;
-        try {
-            dirty = map.render();
-        }
-        catch (std::exception &ex) {
-            fprintf(stderr, "exception: %s\n", ex.what());
-        }
-        glfwSwapBuffers(window);
-        fps();
-
-        if (dirty) {
-            glfwPollEvents();
-        } else {
-            glfwWaitEvents();
+        if (map->needsSwap()) {
+            glfwSwapBuffers(window);
+            map->swapped();
+            fps();
         }
 
-        uv_run(uv_default_loop(), UV_RUN_NOWAIT);
-        uv_sem_post(&event_listener);
+        glfwWaitEvents();
     }
 
-    stop_event_listener = true;
-
-    uv_thread_join(&embed_thread);
+    map->stop();
 
     return 0;
 }
 
-void MapView::fps() {
+void GLFWView::make_active() {
+    glfwMakeContextCurrent(window);
+}
+
+void GLFWView::swap() {
+    glfwPostEmptyEvent();
+}
+
+void GLFWView::fps() {
     static int frames = 0;
     static double time_elapsed = 0;
 
@@ -308,10 +229,6 @@ void show_debug_image(std::string name, const char *data, size_t width, size_t h
     glfwSwapBuffers(debug_window);
 
     glfwMakeContextCurrent(current_window);
-}
-
-void restart() {
-    glfwPostEmptyEvent();
 }
 
 }

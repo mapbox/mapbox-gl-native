@@ -1,11 +1,11 @@
 #import "MBXViewController.h"
 
-#import "MBXSettings.h"
-
+#import "../common/settings_nsuserdefaults.hpp"
 #import "../common/foundation_request.h"
 
 #import <OpenGLES/EAGL.h>
 #import <QuartzCore/QuartzCore.h>
+#import <GLKit/GLKit.h>
 
 #include <llmr/llmr.hpp>
 #include <llmr/platform/platform.hpp>
@@ -25,19 +25,18 @@
 
 @implementation MBXViewController
 
+class View;
+
 llmr::Map *map = nullptr;
-llmr::Settings_iOS *settings = nullptr;
+View *viewObj = nullptr;
+llmr::Settings_NSUserDefaults *settings = nullptr;
 MBXViewController *viewController = nullptr;
 
 #pragma mark - Setup
 
-- (void)viewDidLoad
+- (void)loadView
 {
-    [super viewDidLoad];
-
-    viewController = self;
-
-    self.preferredFramesPerSecond = 60;
+    [super loadView];
 
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
@@ -46,29 +45,36 @@ MBXViewController *viewController = nullptr;
         NSLog(@"Failed to create OpenGL ES context");
     }
 
-    GLKView *view = (GLKView *)self.view;
-
-    view.context = self.context;
+    GLKView *view = [[GLKView alloc] initWithFrame:[[UIScreen mainScreen] bounds] context:self.context];
+    view.enableSetNeedsDisplay = NO;
     view.drawableStencilFormat = GLKViewDrawableStencilFormat8;
     view.drawableDepthFormat = GLKViewDrawableDepthFormat16;
-
     [view bindDrawable];
+
+    self.view = view;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
 
     [self setupMap];
     [self setupInteraction];
     [self setupDebugUI];
+
+    map->start();
 }
 
 - (void)setupMap
 {
-    [EAGLContext setCurrentContext:self.context];
+    viewObj = new View(self);
+    map = new llmr::Map(*viewObj);
 
-    settings = new llmr::Settings_iOS();
-    settings->load();
-
-    map = new llmr::Map(*settings);
-    map->setup();
-    map->loadSettings();
+    // Load settings
+    settings = new llmr::Settings_NSUserDefaults();
+    map->setLonLatZoom(settings->longitude, settings->latitude, settings->zoom);
+    map->setAngle(settings->angle);
+    map->setDebug(settings->debug);
 }
 
 
@@ -146,26 +152,22 @@ MBXViewController *viewController = nullptr;
 
 #pragma mark - Rendering delegates
 
-- (void)viewWillLayoutSubviews
+- (void)swap
 {
-    // This callback is called whenever the view dimensions change. We trigger an update to have a fresh render to display
-    // while the view change is transitioned.
-    [super viewWillLayoutSubviews];
-
-    // TODO: Pause all current animations during animation. We don't want other events to fire while the view is rotated.
-    self.paused = NO;
+    if (map->needsSwap())
+    {
+        [(GLKView *)self.view display];
+        map->swapped();
+    }
 }
 
-- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
+- (void)viewWillLayoutSubviews
 {
-    // Render the map
-    map->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
+    [super viewWillLayoutSubviews];
 
-    if (map->render() == false)
-    {
-        self.paused = YES;
-        settings->sync();
-    }
+    GLKView *view = (GLKView *)self.view;
+    CGRect rect = [view bounds];
+    map->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
 }
 
 #pragma mark - Debugging UI
@@ -211,24 +213,37 @@ MBXViewController *viewController = nullptr;
 
 - (void)toggleRaster
 {
-    map->toggleRaster();
+   map->toggleRaster();
 }
 
 #pragma mark - Destruction
 
 - (void)dealloc
 {
+    if (settings)
+    {
+        // Save settings
+        if (map)
+        {
+            map->getLonLatZoom(settings->longitude, settings->latitude, settings->zoom);
+            settings->angle = map->getAngle();
+            settings->debug = map->getDebug();
+            settings->save();
+        }
+        delete settings;
+        settings = nullptr;
+    }
+
     if (map)
     {
         delete map;
         map = nullptr;
     }
 
-    if (settings)
+    if (viewObj)
     {
-        settings->sync();
-        delete settings;
-        settings = nullptr;
+        delete viewObj;
+        viewObj = nullptr;
     }
 
     if ([[EAGLContext currentContext] isEqual:self.context])
@@ -270,8 +285,6 @@ MBXViewController *viewController = nullptr;
 
         map->moveBy(finalCenter.x - self.center.x, finalCenter.y - self.center.y, duration);
     }
-
-    self.paused = NO;
 }
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
@@ -324,8 +337,6 @@ MBXViewController *viewController = nullptr;
     {
         map->stopScaling();
     }
-
-    self.paused = NO;
 }
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
@@ -346,8 +357,6 @@ MBXViewController *viewController = nullptr;
     {
         map->stopRotating();
     }
-
-    self.paused = NO;
 }
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
@@ -366,8 +375,6 @@ MBXViewController *viewController = nullptr;
     {
         map->scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.5);
     }
-
-    self.paused = NO;
 }
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
@@ -378,8 +385,6 @@ MBXViewController *viewController = nullptr;
     {
         map->scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
     }
-
-    self.paused = NO;
 }
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
@@ -400,8 +405,6 @@ MBXViewController *viewController = nullptr;
 
         map->scaleBy(powf(2, newZoom) / map->getScale(), self.view.bounds.size.width / 2, self.view.bounds.size.height / 2);
     }
-
-    self.paused = NO;
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
@@ -411,40 +414,21 @@ MBXViewController *viewController = nullptr;
     return ([validSimultaneousGestures containsObject:[gestureRecognizer class]] && [validSimultaneousGestures containsObject:[otherGestureRecognizer class]]);
 }
 
-@end
+class View : public llmr::View {
+public:
+    View(MBXViewController *controller) : controller(controller) {}
+    virtual ~View() {}
 
-
-namespace llmr
-{
-    namespace platform
-    {
-        class Request
-        {
-            public:
-                int16_t identifier;
-                std::string original_url;
-        };
-
-        void restart()
-        {
-            if ([NSThread isMainThread])
-            {
-                viewController.paused = NO;
-            }
-            else
-            {
-                [viewController performSelectorOnMainThread:@selector(setPaused:) withObject:@(NO) waitUntilDone:NO];
-            }
-        }
-
-        double time()
-        {
-            return [viewController timeSinceFirstResume];
-        }
-
-        double elapsed()
-        {
-            return CACurrentMediaTime();
-        }
+    void make_active() {
+        [EAGLContext setCurrentContext:controller.context];
     }
-}
+
+    void swap() {
+        [controller performSelectorOnMainThread:@selector(swap) withObject:nil waitUntilDone:NO];
+    }
+
+private:
+    MBXViewController *controller = nullptr;
+};
+
+@end

@@ -17,11 +17,14 @@
 #include <llmr/shader/raster_shader.hpp>
 #include <llmr/shader/text_shader.hpp>
 
+#include <llmr/map/transform_state.hpp>
+
 namespace llmr {
 
 class Transform;
 class Style;
 class Tile;
+class GlyphAtlas;
 
 class FillBucket;
 class LineBucket;
@@ -31,7 +34,8 @@ class RasterBucket;
 
 class Painter : private util::noncopyable {
 public:
-    Painter(Transform& transform, Style& style, GlyphAtlas& glyphAtlas);
+    Painter(Map &map);
+
 
     void setup();
     void clear();
@@ -71,9 +75,7 @@ public:
     mat4 extrudeMatrix;
 
 private:
-    Transform& transform;
-    Style& style;
-    GlyphAtlas& glyphAtlas;
+    Map& map;
 
     FrameHistory frameHistory;
 
@@ -82,6 +84,7 @@ private:
     uint32_t gl_program = 0;
     float gl_lineWidth = 0;
     bool gl_depthMask = true;
+    std::array<uint16_t, 2> gl_viewport = {{ 0, 0 }};
     float strata = 0;
     const float strata_epsilon = 1.0f / (1 << 16);
     enum { Opaque, Translucent } pass = Opaque;

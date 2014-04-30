@@ -1,8 +1,10 @@
 #include <llmr/style/sprite.hpp>
+#include <llmr/map/map.hpp>
 #include <llmr/util/raster.hpp>
 
 #include <string>
 #include <llmr/platform/platform.hpp>
+#include <llmr/util/uv.hpp>
 
 #include <rapidjson/document.h>
 
@@ -20,49 +22,63 @@ ImagePosition::ImagePosition(const vec2<uint16_t>& size, vec2<float> tl, vec2<fl
       tl(tl),
       br(br) {}
 
-Sprite::Sprite(float pixelRatio) : pixelRatio(pixelRatio), raster(std::make_shared<Raster>()) {}
+Sprite::Sprite(Map &map, float pixelRatio) : pixelRatio(pixelRatio), raster(std::make_shared<Raster>()), map(map) {}
 
 void Sprite::load(const std::string& base_url) {
-    std::shared_ptr<Sprite> sprite = shared_from_this();
+   std::shared_ptr<Sprite> sprite = shared_from_this();
 
-    auto complete = [sprite]() {
-        std::lock_guard<std::mutex> lock(sprite->mtx);
-        if (*sprite->raster && sprite->pos.size()) {
-            sprite->loaded = true;
-            platform::restart();
-            fprintf(stderr, "sprite loaded\n");
-        }
-    };
+   std::string suffix = (pixelRatio > 1 ? "@2x" : "");
 
-    std::string suffix = (pixelRatio > 1 ? "@2x" : "");
+   platform::request_http(base_url + suffix + ".json", [sprite](platform::Response *res) {
+       if (res->code == 200) {
+           sprite->body.swap(res->body);
+           sprite->asyncParseJSON();
+       } else {
+           fprintf(stderr, "failed to load sprite\n");
+       }
+   }, map.getLoop());
 
-    platform::request_http(base_url + suffix + ".json", [sprite](const platform::Response *res) {
-        if (res->code == 200) {
-            sprite->parseJSON(res->body);
-        } else {
-            fprintf(stderr, "failed to load sprite\n");
-        }
-    }, complete);
-
-    platform::request_http(base_url + suffix + ".png", [sprite](const platform::Response *res) {
-        if (res->code == 200) {
-            sprite->raster->load(res->body);
-        } else {
-            fprintf(stderr, "failed to load sprite image\n");
-        }
-    }, complete);
+   platform::request_http(base_url + suffix + ".png", [sprite](platform::Response *res) {
+       if (res->code == 200) {
+            sprite->raster->setData(res->body);
+            sprite->asyncParseImage();
+       } else {
+           fprintf(stderr, "failed to load sprite image\n");
+       }
+   }, map.getLoop());
 }
 
-Sprite::operator bool() const {
+void Sprite::complete(std::shared_ptr<Sprite> &sprite) {
+   std::lock_guard<std::mutex> lock(sprite->mtx);
+   if (sprite->raster && sprite->raster->isLoaded() && sprite->pos.size()) {
+       sprite->loaded = true;
+       sprite->map.update();
+       fprintf(stderr, "sprite loaded\n");
+   }
+}
+
+bool Sprite::isLoaded() const {
     std::lock_guard<std::mutex> lock(mtx);
     return loaded;
 }
 
-void Sprite::parseJSON(const std::string& data) {
-    std::lock_guard<std::mutex> lock(mtx);
+void Sprite::asyncParseImage() {
+    new uv::work<std::shared_ptr<Sprite>>(map.getLoop(), parseImage, complete, shared_from_this());
+}
+
+void Sprite::asyncParseJSON() {
+    new uv::work<std::shared_ptr<Sprite>>(map.getLoop(), parseJSON, complete, shared_from_this());
+}
+
+void Sprite::parseImage(std::shared_ptr<Sprite> &sprite) {
+  sprite->raster->load();
+}
+
+void Sprite::parseJSON(std::shared_ptr<Sprite> &sprite) {
+    std::lock_guard<std::mutex> lock(sprite->mtx);
 
     rapidjson::Document d;
-    d.Parse<0>(data.c_str());
+    d.Parse<0>(sprite->body.c_str());
 
     if (d.IsObject()) {
         for (rapidjson::Value::ConstMemberIterator itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr) {
@@ -82,14 +98,14 @@ void Sprite::parseJSON(const std::string& data) {
                 if (value.HasMember("height")) height = value["height"].GetInt();
                 if (value.HasMember("pixelRatio")) pixelRatio = value["height"].GetInt();
 
-                pos.insert({ name, { x, y, width, height, pixelRatio } });
+                sprite->pos.insert({ name, { x, y, width, height, pixelRatio } });
             }
         }
     }
 }
 
 ImagePosition Sprite::getPosition(const std::string& name, bool repeating) {
-    if (!*this->raster) return {};
+    if (!this->raster || !this->raster->isLoaded()) return {};
 
     // `repeating` indicates that the image will be used in a repeating pattern
     // repeating pattern images are assumed to have a 1px padding that mirrors the opposite edge

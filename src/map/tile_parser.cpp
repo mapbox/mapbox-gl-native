@@ -7,6 +7,7 @@
 #include <llmr/renderer/text_bucket.hpp>
 #include <llmr/renderer/raster_bucket.hpp>
 #include <llmr/util/raster.hpp>
+#include <llmr/geometry/glyph_atlas.hpp>
 
 #include <llmr/util/std.hpp>
 
@@ -83,7 +84,8 @@ std::unique_ptr<Bucket> TileParser::createBucket(const BucketDescription& bucket
     if (bucket_desc.type == BucketType::Raster) {
         if (raster_data.length()) {
             tile.raster = std::make_shared<Raster>();
-            tile.raster->load(raster_data);
+            tile.raster->setData(raster_data);
+            tile.raster->load();
         }
         return createRasterBucket(bucket_desc);
     } else {

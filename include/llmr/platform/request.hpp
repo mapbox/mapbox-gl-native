@@ -4,12 +4,13 @@
 #include <string>
 #include <functional>
 #include <memory>
+#include <atomic>
 
 #include <llmr/util/noncopyable.hpp>
 
 // Forward definition.
-typedef struct uv_work_s uv_work_t;
-typedef struct uv_check_s uv_check_t;
+typedef struct uv_loop_s uv_loop_t;
+typedef struct uv_async_s uv_async_t;
 
 namespace llmr {
 namespace platform {
@@ -19,23 +20,23 @@ struct Response;
 class Request : public std::enable_shared_from_this<Request>, private util::noncopyable {
 public:
     Request(const std::string &url,
-            std::function<void(Response *)> background_function,
-            std::function<void()> foreground_callback);
+            std::function<void(Response *)> callback,
+            uv_loop_t *loop);
     ~Request();
 
-public:
-    static void work_callback(uv_work_t *work);
-    static void after_work_callback(uv_work_t *work, int status);
+    void complete();
+
+private:
+    static void complete(uv_async_t *async);
 
 public:
     const std::string url;
-    const std::function<void(Response *)> background_function;
-    const std::function<void()> foreground_callback;
     std::unique_ptr<Response> res;
-    bool cancelled = false;
+    std::atomic<bool> cancelled;
 
-private:
-    uv_check_t *check = nullptr;
+public:
+    uv_async_t *async = nullptr;
+    uv_loop_t *loop = nullptr;
 };
 }
 }

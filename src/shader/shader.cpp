@@ -1,5 +1,6 @@
 #include <llmr/shader/shader.hpp>
 #include <llmr/platform/gl.hpp>
+#include <llmr/util/timer.hpp>
 
 #include <cstdlib>
 #include <cstdio>
@@ -10,6 +11,8 @@ using namespace llmr;
 Shader::Shader(const GLchar *vertSource, const GLchar *fragSource)
     : valid(false),
       program(0) {
+    util::timer timer("shader compilation");
+
 
     GLuint vertShader;
     if (!compileShader(&vertShader, GL_VERTEX_SHADER, vertSource)) {
