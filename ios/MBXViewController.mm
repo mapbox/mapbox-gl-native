@@ -373,7 +373,7 @@ MBXViewController *viewController = nullptr;
 
     if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
-        map->scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.5);
+        map->scaleBy(2, [doubleTap locationInView:doubleTap.view].x, [doubleTap locationInView:doubleTap.view].y, 0.3);
     }
 }
 
@@ -383,7 +383,7 @@ MBXViewController *viewController = nullptr;
 
     if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
-        map->scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.5);
+        map->scaleBy(0.5, [twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y, 0.3);
     }
 }
 

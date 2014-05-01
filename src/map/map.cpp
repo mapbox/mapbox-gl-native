@@ -191,12 +191,12 @@ void Map::cancelTransitions() {
 #pragma mark - Position
 
 void Map::moveBy(double dx, double dy, double duration) {
-    transform.moveBy(dx, dy, duration);
+    transform.moveBy(dx, dy, duration * 1_second);
     update();
 }
 
 void Map::setLonLat(double lon, double lat, double duration) {
-    transform.setLonLat(lon, lat, duration);
+    transform.setLonLat(lon, lat, duration * 1_second);
     update();
 }
 
@@ -225,12 +225,12 @@ void Map::resetPosition() {
 #pragma mark - Scale
 
 void Map::scaleBy(double ds, double cx, double cy, double duration) {
-    transform.scaleBy(ds, cx, cy, duration);
+    transform.scaleBy(ds, cx, cy, duration * 1_second);
     update();
 }
 
 void Map::setScale(double scale, double cx, double cy, double duration) {
-    transform.setScale(scale, cx, cy, duration);
+    transform.setScale(scale, cx, cy, duration * 1_second);
     update();
 }
 
@@ -239,7 +239,7 @@ double Map::getScale() const {
 }
 
 void Map::setZoom(double zoom, double duration) {
-    transform.setZoom(zoom, duration);
+    transform.setZoom(zoom, duration * 1_second);
     update();
 }
 
@@ -248,7 +248,7 @@ double Map::getZoom() const {
 }
 
 void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
-    transform.setLonLatZoom(lon, lat, zoom, duration);
+    transform.setLonLatZoom(lon, lat, zoom, duration * 1_second);
     update();
 }
 
@@ -274,7 +274,7 @@ void Map::stopScaling() {
 #pragma mark - Rotation
 
 void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) {
-    transform.rotateBy(sx, sy, ex, ey, duration);
+    transform.rotateBy(sx, sy, ex, ey, duration * 1_second);
     update();
 }
 
