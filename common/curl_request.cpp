@@ -1,6 +1,6 @@
-#include "curl_request.hpp"
 
 #include <llmr/platform/platform.hpp>
+#include <llmr/platform/request.hpp>
 #include <llmr/util/uv.hpp>
 #include <llmr/util/std.hpp>
 
@@ -84,6 +84,18 @@ static CURLSH *curl_share = nullptr;
 // all the time.
 static std::queue<CURL *> curl_handle_cache;
 
+
+class CURLRequest : public llmr::platform::Request {
+public:
+    CURLRequest(const std::string &url,
+                std::function<void(llmr::platform::Response *)> callback,
+                uv_loop_t *loop)
+        : Request(url, callback, loop) {}
+
+    CURL *curl = nullptr;
+};
+
+
 // Implementation starts here.
 
 // Locks the CURL share handle
@@ -156,24 +168,17 @@ void curl_perform(uv_poll_t *req, int /*status*/, int events) {
             // We're currently in the CURL request thread. We're going to schedule a uv_work request
             // that executes the background function in a threadpool, and tell it to call the
             // after callback back in the main uv loop.
-
-            uv_work_t *work = new uv_work_t();
-
-            // We're passing on the pointer we created to the work structure.
-            // It is going to be deleted in the after_work_cb;
-            work->data = req;
-
-            // Executes the background_function in a libuv thread pool, and the after_work_cb back
-            // in the *main* event loop.
-            uv_queue_work(uv_default_loop(), work, Request::work_cb, Request::after_work_cb);
+            (*req)->complete();
 
             CURL *handle = message->easy_handle;
             remove_curl_handle(handle);
 
             // We're setting this to NULL because there might still be shared_ptrs around that could
             // be cancelled.
-            (*req)->curl = nullptr;
+            ((CURLRequest *)req->get())->curl = nullptr;
 
+            // Delete the shared_ptr pointer we created earlier.
+            delete req;
             break;
         }
 
@@ -299,8 +304,6 @@ void async_add_cb(uv_async_t * /*async*/) {
             continue;
         }
 
-        (*req)->res = std::make_unique<Response>();
-
         // Obtain a curl handle (and try to reuse existing handles before creating new ones).
         CURL *handle = nullptr;
         if (!curl_handle_cache.empty()) {
@@ -310,7 +313,7 @@ void async_add_cb(uv_async_t * /*async*/) {
             handle = curl_easy_init();
         }
 
-        (*req)->curl = handle;
+        ((CURLRequest *)req->get())->curl = handle;
 
         curl_easy_setopt(handle, CURLOPT_PRIVATE, req);
         curl_easy_setopt(handle, CURLOPT_URL, (*req)->url.c_str());
@@ -328,10 +331,10 @@ void async_cancel_cb(uv_async_t * /*async*/) {
         // It is possible that the request has not yet been started, but that it already has been
         // added to the queue for scheduling new requests. In this case, the CURL handle is invalid
         // and we manually mark the Request as cancelled.
-        CURL *handle = (*req)->curl;
+        CURL *handle = ((CURLRequest *)req->get())->curl;
         if (handle && !(*req)->cancelled) {
             remove_curl_handle(handle);
-            (*req)->curl = nullptr;
+            ((CURLRequest *)req->get())->curl = nullptr;
         }
         (*req)->cancelled = true;
 
@@ -350,61 +353,15 @@ void thread_init_cb() {
 }
 } // end namespace request
 } // end namespace platform
-} // end namespace llmr
 
-using namespace llmr::platform;
-
-Request::Request(const std::string &url,
-                 std::function<void(Response *)> background_function,
-                 std::function<void()> foreground_callback)
-    : url(url),
-      background_function(background_function),
-      foreground_callback(foreground_callback) {
-
-    // Add a check handle without a callback to keep the default loop running.
-    // We don't have a real handler attached to the default loop right from the
-    // beginning, because we're using asynchronous messaging to perform the actual
-    // CURL request in the request thread. Only after the request is complete, we
-    // create an actual work request that is attached to the default loop.
-    check = new uv_check_t();
-    uv_check_init(uv_default_loop(), check);
-    uv_check_start(check, [](uv_check_t *) {});
-}
-
-Request::~Request() {
-    // We need to remove our no-op handle again to allow the main event loop to exit.
-    uv_check_stop(check);
-}
-
-void Request::work_cb(uv_work_t *work) {
-    std::shared_ptr<Request> &req = *static_cast<std::shared_ptr<Request> *>(work->data);
-    req->background_function(req->res.get());
-}
-
-// This callback is executed in the main loop.
-void Request::after_work_cb(uv_work_t *work, int /*status*/) {
-    std::shared_ptr<Request> &req = *static_cast<std::shared_ptr<Request> *>(work->data);
-
-    req->foreground_callback();
-
-    // This finally deletes the *pointer* to the shared pointer we've been holding on since we
-    // pushed it on the add_queue on request creation.
-    delete static_cast<std::shared_ptr<Request> *>(work->data);
-}
-
-
-
-
-
-namespace llmr {
 
 std::shared_ptr<platform::Request>
 platform::request_http(const std::string &url,
-                       std::function<void(Response *)> background_function,
-                       std::function<void()> foreground_callback) {
+                       std::function<void(Response *)> callback,
+                       uv_loop_t *loop) {
     using namespace request;
     init_thread_once(thread_init_cb);
-    std::shared_ptr<Request> req = std::make_shared<Request>(url, background_function, foreground_callback);
+    std::shared_ptr<CURLRequest> req = std::make_shared<CURLRequest>(url, callback, loop);
 
     // Note that we are creating a new shared_ptr pointer(!) because the lockless queue can't store
     // objects with nontrivial destructors. We have to make absolutely sure that we manually delete
@@ -427,4 +384,4 @@ void platform::cancel_request_http(const std::shared_ptr<Request> &req) {
         uv_async_send(&async_cancel);
     }
 }
-}
+} // end namespace llmr

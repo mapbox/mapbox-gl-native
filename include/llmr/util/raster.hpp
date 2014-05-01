@@ -1,12 +1,14 @@
 #ifndef LLMR_UTIL_RASTER
 #define LLMR_UTIL_RASTER
 
-#include <llmr/util/animation.hpp>
+#include <llmr/util/transition.hpp>
 #include <llmr/util/texturepool.hpp>
 
 #include <string>
 #include <mutex>
 #include <memory>
+
+typedef struct uv_loop_s uv_loop_t;
 
 namespace llmr {
 
@@ -16,7 +18,7 @@ public:
     ~Raster();
 
     // load image data
-    void load(const std::string& data);
+    void load();
 
     // set shared texture pool
     void setTexturepool(Texturepool* texturepool);
@@ -25,12 +27,14 @@ public:
     void bind(bool linear = false);
 
     // loaded status
-    operator bool() const;
+    bool isLoaded() const;
 
-    // animations
-    void beginFadeInAnimation();
-    bool needsAnimation() const;
-    void updateAnimations(double time);
+    // transitions
+    void beginFadeInTransition();
+    bool needsTransition() const;
+    void updateTransitions(time now);
+
+    inline void setData(const std::string &img) { data = img; }
 
 public:
     // loaded image dimensions
@@ -61,11 +65,14 @@ private:
     // min/mag filter
     uint32_t filter = 0;
 
+    // the encoded image data.
+    std::string data;
+
     // the raw pixels
     char *img = nullptr;
 
-    // fade in animation
-    std::shared_ptr<util::animation> fade_animation = nullptr;
+    // fade in transition
+    std::shared_ptr<util::transition> fade_transition = nullptr;
 };
 
 }

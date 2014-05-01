@@ -5,7 +5,6 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
-#include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/geometry/debug_font_buffer.hpp>
 #include <llmr/geometry/vao.hpp>
 #include <llmr/map/vector_tile.hpp>
@@ -30,7 +29,7 @@
 
 namespace llmr {
 
-class Style;
+class Map;
 class Raster;
 class LayerDescription;
 class BucketDescription;
@@ -56,11 +55,12 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, const Style& style, GlyphAtlas& glyphAtlas, const std::string url, const bool is_raster);
+    TileData(Tile::ID id, Map &map, const std::string url, const bool is_raster);
     ~TileData();
 
     void request();
-    bool parse();
+    void scheduleParsing();
+    void parse();
     void cancel();
 
     const std::string toString() const;
@@ -91,8 +91,8 @@ private:
     const std::string url;
     const bool is_raster = false;
     std::string data;
-    const Style& style;
-    GlyphAtlas& glyphAtlas;
+
+    Map &map;
 
     // Stores a request that is in progress.
     std::weak_ptr<platform::Request> req;

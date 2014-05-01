@@ -10,11 +10,10 @@
       'type': 'executable',
       'sources': [
         './main.cpp',
-        './settings.cpp',
-        './settings.hpp',
+        '../common/settings_json.cpp',
+        '../common/settings_json.hpp',
         '../common/glfw_view.hpp',
         '../common/glfw_view.cpp',
-        '../common/curl_request.hpp',
         '../common/curl_request.cpp',
       ],
 

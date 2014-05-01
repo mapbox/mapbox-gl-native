@@ -11,12 +11,11 @@
 
 using namespace llmr;
 
-Source::Source(Map &map, Transform &transform, Painter &painter, Texturepool &texturepool,
+Source::Source(Map &map, Painter &painter, Texturepool &texturepool,
                const char *url, Source::Type type, std::vector<uint32_t> zooms, uint32_t tile_size,
                uint32_t min_zoom, uint32_t max_zoom, bool enabled)
     : enabled(enabled),
       map(map),
-      transform(transform),
       painter(painter),
       texturepool(texturepool),
       type(type),
@@ -30,7 +29,7 @@ bool Source::update() {
     return updateTiles();
 }
 
-void Source::prepare_render(bool is_baselayer) {
+void Source::prepare_render(const TransformState &transform, bool is_baselayer) {
     if (!enabled) return;
 
     uint8_t i = 1;
@@ -47,7 +46,7 @@ void Source::prepare_render(bool is_baselayer) {
     }
 }
 
-void Source::render(double animationTime) {
+void Source::render(time animationTime) {
     if (!enabled) return;
 
     for (const Tile& tile : tiles) {
@@ -56,10 +55,10 @@ void Source::render(double animationTime) {
                 std::shared_ptr<Raster> raster = tile.data->raster;
                 if (raster && !raster->textured) {
                     raster->setTexturepool(&texturepool);
-                    raster->beginFadeInAnimation();
+                    raster->beginFadeInTransition();
                 }
-                if (raster && raster->needsAnimation()) {
-                    raster->updateAnimations(animationTime);
+                if (raster && raster->needsTransition()) {
+                    raster->updateTransitions(animationTime);
                 }
             }
             painter.render(tile);
@@ -113,10 +112,10 @@ TileData::State Source::addTile(const Tile::ID& id) {
         if (type == Source::Type::vector) {
             formed_url = util::sprintf<256>(url, normalized_id.z, normalized_id.x, normalized_id.y);
         } else {
-            formed_url = util::sprintf<256>(url, normalized_id.z, normalized_id.x, normalized_id.y, (map.getPixelRatio() > 1.0 ? "@2x" : ""));
+            formed_url = util::sprintf<256>(url, normalized_id.z, normalized_id.x, normalized_id.y, (map.getState().getPixelRatio() > 1.0 ? "@2x" : ""));
         }
 
-        new_tile.data = std::make_shared<TileData>(normalized_id, map.getStyle(), map.getGlyphAtlas(), formed_url, (type == Source::Type::raster));
+        new_tile.data = std::make_shared<TileData>(normalized_id, map, formed_url, (type == Source::Type::raster));
         new_tile.data->request();
         tile_data.push_front(new_tile.data);
     }
@@ -179,7 +178,7 @@ bool Source::updateTiles() {
     bool changed = false;
 
     // Figure out what tiles we need to load
-    int32_t zoom = map.getZoom();
+    int32_t zoom = map.getState().getIntegerZoom();
     if (zoom > max_zoom) zoom = max_zoom;
     if (zoom < min_zoom) zoom = min_zoom;
 
@@ -190,7 +189,7 @@ bool Source::updateTiles() {
     if (min_covering_zoom < min_zoom) min_covering_zoom = min_zoom;
 
     // Map four viewport corners to pixel coordinates
-    box box = map.cornersToBox(zoom);
+    box box = map.getState().cornersToBox(zoom);
 
     // Performs a scanline algorithm search that covers the rectangle of the box
     // and sorts them by proximity to the center.
@@ -263,7 +262,7 @@ bool Source::updateTiles() {
             return false;
         }
     });
-    
+
     return changed;
 }
 
@@ -331,8 +330,8 @@ void _scanTriangle(const llmr::vec2<double> a, const llmr::vec2<double> b, const
 
 double Source::getZoom() const {
     double offset = log(util::tileSize / tile_size) / log(2);
-    offset += (map.getPixelRatio() > 1.0 ? 1 :0);
-    return map.getZoom() + offset;
+    offset += (map.getState().getPixelRatio() > 1.0 ? 1 :0);
+    return map.getState().getZoom() + offset;
 }
 
 std::forward_list<llmr::Tile::ID> Source::covering_tiles(int32_t zoom, const box& points) {

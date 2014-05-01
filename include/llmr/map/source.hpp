@@ -4,6 +4,7 @@
 #include <llmr/map/tile.hpp>
 #include <llmr/map/tile_data.hpp>
 #include <llmr/util/noncopyable.hpp>
+#include <llmr/util/time.hpp>
 
 #include <forward_list>
 #include <memory>
@@ -13,7 +14,7 @@
 namespace llmr {
 
 class Map;
-class Transform;
+class TransformState;
 class Painter;
 class Texturepool;
 
@@ -25,14 +26,17 @@ public:
     };
 
 public:
-    Source(Map &map, Transform &transform, Painter &painter, Texturepool &texturepool,
+    Source(Map &map, Painter &painter, Texturepool &texturepool,
            const char *url = "", Type type = Type::vector, std::vector<uint32_t> zooms = {0},
            uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 14,
            bool enabled = true);
 
+
+
     bool update();
-    void prepare_render(bool is_baselayer = false);
-    void render(double animationTime);
+    void prepare_render(const TransformState &transform, bool is_baselayer = false);
+    void render(time animationTime);
+
 
 public:
     bool enabled;
@@ -51,7 +55,6 @@ private:
 
 private:
     Map& map;
-    Transform& transform;
     Painter& painter;
     Texturepool& texturepool;
 

@@ -4,16 +4,16 @@
 #include <signal.h>
 #include <getopt.h>
 
-#include "settings.hpp"
+#include "../common/settings_json.hpp"
 #include "../common/glfw_view.hpp"
 
-MapView *mapView = nullptr;
+GLFWView *view = nullptr;
 
-void quit_handler(int s) {
-    if (mapView) {
+void quit_handler(int) {
+    if (view) {
         fprintf(stderr, "waiting for quit...\n");
-        glfwSetWindowShouldClose(mapView->window, true);
-        llmr::platform::restart();
+        glfwSetWindowShouldClose(view->window, true);
+        glfwPostEmptyEvent();
     } else {
         exit(0);
     }
@@ -40,13 +40,22 @@ int main(int argc, char *argv[]) {
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, NULL);
 
-    // main loop
+    view = new GLFWView();
+    llmr::Map map(*view);
+
+    // Load settings
     llmr::Settings_JSON settings;
-    mapView = new MapView(settings, fullscreen_flag);
-    mapView->init();
-    int ret = mapView->run();
-    mapView->settings.sync();
-    delete mapView;
+    map.setLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
+    map.setAngle(settings.angle);
+    map.setDebug(settings.debug);
+
+    int ret = view->run();
+
+    // Save settings
+    map.getLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
+    settings.angle = map.getAngle();
+    settings.debug = map.getDebug();
+    settings.save();
 
     return ret;
 }

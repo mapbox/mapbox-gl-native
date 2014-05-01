@@ -1,11 +1,11 @@
 #ifndef LLMR_MAP_TRANSFORM
 #define LLMR_MAP_TRANSFORM
 
-#include <llmr/util/vec.hpp>
-#include <llmr/util/mat4.hpp>
-#include <llmr/util/animation.hpp>
+#include <llmr/util/transition.hpp>
 #include <llmr/util/noncopyable.hpp>
-#include <llmr/map/tile.hpp>
+#include <llmr/util/uv.hpp>
+
+#include "transform_state.hpp"
 
 #include <forward_list>
 
@@ -17,90 +17,80 @@ struct box;
 public:
     Transform();
 
-    // Animations
-    bool needsAnimation() const;
-    void updateAnimations(double time);
-    void cancelAnimations();
-
-    // Map view changes.
+    // Map view
     // Note: width * ratio does not necessarily equal fb_width
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
+    bool resize(uint16_t width, uint16_t height, float ratio,
+                uint16_t fb_width, uint16_t fb_height);
 
-    // Relative changes
-    void moveBy(double dx, double dy, double duration = 0);
-    void scaleBy(double ds, double cx = -1, double cy = -1, double duration = 0);
-    void rotateBy(double sx, double sy, double ex, double ey, double duration = 0);
-
-    // Absolute changes
-    void setScale(double scale, double cx = -1, double cy = -1, double duration = 0);
-    void setAngle(double angle, double duration = 0);
-    void setZoom(double zoom, double duration = 0);
-    void setLonLat(double lon, double lat, double duration = 0);
-    void setLonLatZoom(double lon, double lat, double zoom, double duration = 0);
-
-    // Getters
-    void matrixFor(mat4& matrix, const Tile::ID& id) const;
-    float getZoom() const;
-    float getNormalizedZoom() const;
-    int32_t getIntegerZoom() const;
-    double getScale() const;
-    double getAngle() const;
+    // Position
+    void moveBy(double dx, double dy, time duration = 0);
+    void setLonLat(double lon, double lat, time duration = 0);
+    void setLonLatZoom(double lon, double lat, double zoom, time duration = 0);
     void getLonLat(double& lon, double& lat) const;
     void getLonLatZoom(double& lon, double& lat, double& zoom) const;
-
-    // Animations
     void startPanning();
     void stopPanning();
+
+    // Zoom
+    void scaleBy(double ds, double cx = -1, double cy = -1, time duration = 0);
+    void setScale(double scale, double cx = -1, double cy = -1, time duration = 0);
+    void setZoom(double zoom, time duration = 0);
+    double getZoom() const;
+    double getScale() const;
     void startRotating();
     void stopRotating();
+
+    // Angle
+    void rotateBy(double sx, double sy, double ex, double ey, time duration = 0);
+    void setAngle(double angle, time duration = 0);
+    void setAngle(double angle, double cx, double cy);
+    double getAngle() const;
     void startScaling();
     void stopScaling();
 
-    box cornersToBox(uint32_t z) const;
+    // Transitions
+    bool needsTransition() const;
+    void updateTransitions(time now);
+    void cancelTransitions();
 
-    // More getters
-    inline uint16_t getWidth() const { return width; }
-    inline uint16_t getHeight() const { return height; }
-    inline uint16_t getFramebufferWidth() const { return fb_width; }
-    inline uint16_t getFramebufferHeight() const { return fb_height; }
-    inline float getPixelRatio() const { return pixelRatio; }
-
-private:
-    void setScaleXY(double new_scale, double xn, double yn, double duration = 0);
-    double pixel_x() const;
-    double pixel_y() const;
+    // Transform state
+    const TransformState currentState() const;
+    const TransformState finalState() const;
 
 private:
-    // logical dimensions
-    uint16_t width = 0;
-    uint16_t height = 0;
-
-    // physical (framebuffer) dimensions
-    uint16_t fb_width = 0;
-    uint16_t fb_height = 0;
-
-    float pixelRatio = 1;
-
-public:
-    bool rotating = false;
-    bool scaling = false;
-    bool panning = false;
+    // Functions prefixed with underscores will *not* perform any locks. It is the caller's
+    // responsibility to lock this object.
+    void _moveBy(double dx, double dy, time duration = 0);
+    void _setScale(double scale, double cx, double cy, time duration = 0);
+    void _setScaleXY(double new_scale, double xn, double yn, time duration = 0);
+    void _setAngle(double angle, time duration = 0);
+    void _clearPanning();
+    void _clearRotating();
+    void _clearScaling();
 
 private:
-    double x = 0, y = 0; // pixel values of the map center in the current scale
-    double angle = 0;
-    double scale = 1;
+    mutable uv::rwlock mtx;
 
-    double min_scale = pow(2, 0);
-    double max_scale = pow(2, 20);
+    // This reflects the current state of the transform, representing the actual position of the
+    // map. After calling a transform function with a timer, this will likely remain the same until
+    // you render a new frame.
+    TransformState current;
+
+    // This reflects the final position of the transform, after all possible transition took place.
+    TransformState final;
+
+    // Limit the amount of zooming possible on the map.
+    // TODO: make these modifiable from outside.
+    const double min_scale = pow(2, 0);
+    const double max_scale = pow(2, 20);
 
     // cache values for spherical mercator math
     double zc, Bc, Cc;
 
-    std::forward_list<std::shared_ptr<util::animation>> animations;
-    std::shared_ptr<util::animation> scale_timeout;
-    std::shared_ptr<util::animation> rotate_timeout;
-    std::shared_ptr<util::animation> pan_timeout;
+    std::forward_list<std::shared_ptr<util::transition>> transitions;
+    std::shared_ptr<util::transition> scale_timeout;
+    std::shared_ptr<util::transition> rotate_timeout;
+    std::shared_ptr<util::transition> pan_timeout;
 };
 
 }
