@@ -256,7 +256,7 @@ MBXViewController *viewController = nullptr;
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
-    map->cancelAnimations();
+    map->cancelTransitions();
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
@@ -289,7 +289,7 @@ MBXViewController *viewController = nullptr;
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
-    map->cancelAnimations();
+    map->cancelTransitions();
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
@@ -341,7 +341,7 @@ MBXViewController *viewController = nullptr;
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
-    map->cancelAnimations();
+    map->cancelTransitions();
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
@@ -369,7 +369,7 @@ MBXViewController *viewController = nullptr;
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
-    map->cancelAnimations();
+    map->cancelTransitions();
 
     if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
@@ -379,7 +379,7 @@ MBXViewController *viewController = nullptr;
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
-    map->cancelAnimations();
+    map->cancelTransitions();
 
     if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
@@ -389,7 +389,7 @@ MBXViewController *viewController = nullptr;
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
-    map->cancelAnimations();
+    map->cancelTransitions();
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
