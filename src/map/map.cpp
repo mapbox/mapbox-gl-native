@@ -278,6 +278,11 @@ void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) 
     update();
 }
 
+void Map::setAngle(double angle, double duration) {
+    transform.setAngle(angle, duration * 1_second);
+    update();
+}
+
 void Map::setAngle(double angle, double cx, double cy) {
     transform.setAngle(angle, cx, cy);
     update();
