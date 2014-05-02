@@ -18,13 +18,17 @@ build/test/Makefile: src common config.gypi test/test.gyp
 	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
 
 test: build/test/Makefile
-	make -C build/test V=$(V) test
+	make -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
 
 # Runs all test cases
 run-tests: test
-	@for FILE in build/Release/test_*; do \
+	@for FILE in build/$(BUILDTYPE)/test_*; do \
 		$${FILE}; \
 	done
+
+test/%:
+	make -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
+	build/$(BUILDTYPE)/test_$*
 
 # Only runs headless test case
 run-headless-test: build/test/Makefile

@@ -65,6 +65,22 @@
         ]
     },
     {
+        "target_name": "variant",
+        "product_name": "test_variant",
+        "type": "executable",
+        "libraries": [
+            "-lpthread",
+        ],
+        "sources": [
+            "./main.cpp",
+            "./variant.cpp",
+        ],
+        "dependencies": [
+            "../deps/gtest/gtest.gyp:gtest",
+            "../llmr.gyp:llmr-x86"
+        ]
+    },
+    {
         "target_name": "headless",
         "product_name": "test_headless",
         "type": "executable",
@@ -88,7 +104,8 @@
         "target_name": "test",
         "type": "none",
         "dependencies": [
-          "rotation_range"
+          "rotation_range",
+          "variant",
         ],
     }
   ]
