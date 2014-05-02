@@ -30,9 +30,6 @@ GLuint Texturepool::getTextureID() {
 void Texturepool::removeTextureID(GLuint texture_id) {
     bool needs_clear = false;
 
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-
     texture_ids.insert(texture_id);
 
     if (texture_ids.size() > TextureMax)
