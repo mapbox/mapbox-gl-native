@@ -1,5 +1,7 @@
 #include <llmr/style/value.hpp>
 
+#include <boost/lexical_cast.hpp>
+
 llmr::Value llmr::parseValue(pbf data) {
     while (data.next())
     {
@@ -32,6 +34,6 @@ std::string llmr::toString(const llmr::Value& value) {
     else if (value.is<bool>()) return value.get<bool>() ? "true" : "false";
     else if (value.is<int64_t>()) return std::to_string(value.get<int64_t>());
     else if (value.is<uint64_t>()) return std::to_string(value.get<uint64_t>());
-    else if (value.is<double>()) return std::to_string(value.get<double>());
+    else if (value.is<double>()) return boost::lexical_cast<std::string>(value.get<double>());
     else return "null";
 }

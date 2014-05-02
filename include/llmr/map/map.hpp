@@ -73,16 +73,19 @@ public:
 
     // Rotation
     void rotateBy(double sx, double sy, double ex, double ey, double duration = 0);
-    void setAngle(double angle, double cx = -1, double cy = -1);
+    void setAngle(double angle, double duration = 0);
+    void setAngle(double angle, double cx, double cy);
     double getAngle() const;
     void resetNorth();
     void startRotating();
     void stopRotating();
 
-    // Toggles
+    // Debug
     void setDebug(bool value);
     void toggleDebug();
     bool getDebug() const;
+
+    // TEMPORARY DEBUG API
     void toggleRaster();
 
 public:
