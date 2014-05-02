@@ -79,10 +79,12 @@ public:
     void startRotating();
     void stopRotating();
 
-    // Toggles
+    // Debug
     void setDebug(bool value);
     void toggleDebug();
     bool getDebug() const;
+
+    // TEMPORARY DEBUG API
     void toggleRaster();
 
 public:

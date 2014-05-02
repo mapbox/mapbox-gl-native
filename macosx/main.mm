@@ -10,6 +10,7 @@ int main() {
     map.setLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
     map.setAngle(settings.angle);
     map.setDebug(settings.debug);
+    map.toggleRaster();
 
     // fprintf(stderr, "lon: %f, lat: %f, zoom: %f, angle: %f, debug: %d\n", settings.l)
 
