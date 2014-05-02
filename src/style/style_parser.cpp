@@ -512,6 +512,14 @@ PointClass StyleParser::parsePointClass(JSVal value) {
         klass.size = parseFunction(value["size"]);
     }
 
+    if (value.HasMember("radius")) {
+        klass.radius = parseFunction(value["radius"]);
+    }
+
+    if (value.HasMember("blur")) {
+        klass.blur = parseFunction(value["blur"]);
+    }
+
     return klass;
 }
 

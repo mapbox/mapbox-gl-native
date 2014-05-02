@@ -48,6 +48,7 @@ void Painter::setup() {
     assert(patternShader);
     assert(rasterShader);
     assert(textShader);
+    assert(dotShader);
 
 
     // Blending
@@ -76,6 +77,7 @@ void Painter::setupShaders() {
     pointShader = std::make_unique<PointShader>();
     rasterShader = std::make_unique<RasterShader>();
     textShader = std::make_unique<TextShader>();
+    dotShader = std::make_unique<DotShader>();
 }
 
 void Painter::resize() {
@@ -530,9 +532,6 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     const PointProperties& properties = point_properties_it->second;
     if (!properties.enabled) return;
 
-    auto &sprite = map.getStyle().sprite;
-    if (!sprite || !sprite->isLoaded()) return;
-
     translateLayer(properties.translate);
 
     gl::group group(layer_name + " (point)");
@@ -543,33 +542,56 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    std::string sized_image = properties.image;
-    if (properties.size) {
-        sized_image.append("-");
-        sized_image.append(std::to_string(static_cast<int>(std::round(properties.size))));
+    auto &sprite = map.getStyle().sprite;
+    ImagePosition imagePos;
+
+    if (properties.image.length() && sprite && sprite->isLoaded()) {
+        std::string sized_image = properties.image;
+        if (properties.size) {
+            sized_image.append("-");
+            sized_image.append(std::to_string(static_cast<int>(std::round(properties.size))));
+        }
+        imagePos = sprite->getPosition(sized_image, false);
     }
-    ImagePosition imagePos = sprite->getPosition(sized_image, false);
 
-    // fprintf(stderr, "%f/%f => %f/%f\n", imagePos.tl.x, imagePos.tl.y, imagePos.br.x, imagePos.br.y);
+    if (!imagePos.size) {
+        useProgram(dotShader->program);
+        dotShader->setMatrix(matrix);
+        dotShader->setColor(color);
 
-    useProgram(pointShader->program);
-    pointShader->setMatrix(matrix);
-    pointShader->setImage(0);
-    pointShader->setColor(color);
-    const float pointSize = (properties.size ? properties.size : (imagePos.size.x / map.getState().getPixelRatio())) * 1.4142135623730951 * map.getState().getPixelRatio();
+        const float pointSize = (properties.radius ? properties.radius * 2 : 8) * map.getState().getPixelRatio();
 #if defined(GL_ES_VERSION_2_0)
-    pointShader->setSize(pointSize);
+            dotShader->setSize(pointSize);
 #else
-    glPointSize(pointSize);
-    glEnable(GL_POINT_SPRITE);
+            glPointSize(pointSize);
+            glEnable(GL_POINT_SPRITE);
 #endif
-    pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
-    pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
-    if (sprite->raster->isLoaded()) {
+        dotShader->setBlur((properties.blur ? properties.blur : 1.5) / pointSize);
+
+        glDepthRange(strata, 1.0f);
+        bucket.drawPoints(*dotShader);
+    } else {
+        useProgram(pointShader->program);
+        pointShader->setMatrix(matrix);
+        pointShader->setColor(color);
+
+        pointShader->setImage(0);
+        pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
+        pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
+
         sprite->raster->bind(map.getState().isChanging());
+
+        const float pointSize = (properties.size ? properties.size : (imagePos.size.x / map.getState().getPixelRatio())) * 1.4142135623730951 * map.getState().getPixelRatio();
+#if defined(GL_ES_VERSION_2_0)
+            pointShader->setSize(pointSize);
+#else
+            glPointSize(pointSize);
+            glEnable(GL_POINT_SPRITE);
+#endif
+
+        glDepthRange(strata, 1.0f);
+        bucket.drawPoints(*pointShader);
     }
-    glDepthRange(strata, 1.0f);
-    bucket.drawPoints(*pointShader);
 
     translateLayer(properties.translate, true);
 }

@@ -61,6 +61,8 @@ struct PointClass {
     Color color = {{ 0, 0, 0, 1 }};
     FunctionProperty opacity = 1;
     std::string image;
+    FunctionProperty radius = 0;
+    FunctionProperty blur = 0;
 };
 
 struct PointProperties {
@@ -70,6 +72,8 @@ struct PointProperties {
     Color color = {{ 0, 0, 0, 1 }};
     float opacity = 1.0;
     std::string image;
+    float radius = 0;
+    float blur = 0;
 };
 
 struct LineClass {

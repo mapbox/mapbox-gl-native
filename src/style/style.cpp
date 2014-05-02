@@ -82,6 +82,8 @@ void Style::cascade(float z) {
             point.size = layer.size.evaluate<float>(z);
             point.opacity = layer.opacity.evaluate<float>(z);
             point.image = layer.image;
+            point.radius = layer.radius.evaluate<float>(z);
+            point.blur = layer.blur.evaluate<float>(z);
         }
 
         // Cascade text classes

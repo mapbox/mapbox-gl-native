@@ -50,3 +50,9 @@ void PointBucket::drawPoints(PointShader& shader) {
     array.bind(shader, vertexBuffer, vertex_index);
     glDrawArrays(GL_POINTS, 0, (GLsizei)(vertex_end - vertex_start));
 }
+
+void PointBucket::drawPoints(DotShader& shader) {
+    char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
+    array.bind(shader, vertexBuffer, vertex_index);
+    glDrawArrays(GL_POINTS, 0, (GLsizei)(vertex_end - vertex_start));
+}
