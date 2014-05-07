@@ -38,6 +38,8 @@ void Style::cascade(float z) {
             // values so as to not override with default values.
             llmr::FillProperties& fill = computed.fills[layer_name];
             fill.enabled = layer.enabled.evaluate<bool>(z);
+            fill.translate = {{ layer.translate[0].evaluate<float>(z),
+                                layer.translate[1].evaluate<float>(z) }};
             fill.winding = layer.winding;
             fill.antialias = layer.antialias.evaluate<bool>(z);
             fill.fill_color = layer.fill_color;
@@ -55,9 +57,13 @@ void Style::cascade(float z) {
             // values so as to not override with default values.
             llmr::LineProperties& stroke = computed.lines[layer_name];
             stroke.enabled = layer.enabled.evaluate<bool>(z);
+            stroke.translate = {{ layer.translate[0].evaluate<float>(z),
+                                  layer.translate[1].evaluate<float>(z) }};
             stroke.width = layer.width.evaluate<float>(z);
             stroke.offset = layer.offset.evaluate<float>(z);
             stroke.color = layer.color;
+            stroke.dash_array = {{ layer.dash_array[0].evaluate<float>(z),
+                                   layer.dash_array[1].evaluate<float>(z) }};
             stroke.opacity = layer.opacity.evaluate<float>(z);
         }
 
@@ -70,10 +76,14 @@ void Style::cascade(float z) {
             // values so as to not override with default values.
             llmr::PointProperties& point = computed.points[layer_name];
             point.enabled = layer.enabled.evaluate<bool>(z);
+            point.translate = {{ layer.translate[0].evaluate<float>(z),
+                                 layer.translate[1].evaluate<float>(z) }};
             point.color = layer.color;
             point.size = layer.size.evaluate<float>(z);
             point.opacity = layer.opacity.evaluate<float>(z);
             point.image = layer.image;
+            point.radius = layer.radius.evaluate<float>(z);
+            point.blur = layer.blur.evaluate<float>(z);
         }
 
         // Cascade text classes
@@ -85,6 +95,8 @@ void Style::cascade(float z) {
             // values so as to not override with default values.
             llmr::TextProperties& text = computed.texts[layer_name];
             text.enabled = layer.enabled.evaluate<bool>(z);
+            text.translate = {{ layer.translate[0].evaluate<float>(z),
+                                layer.translate[1].evaluate<float>(z) }};
             text.color = layer.color;
             text.size = layer.size.evaluate<float>(z);
             text.halo = layer.halo;
@@ -146,7 +158,7 @@ void Style::loadJSON(const uint8_t *const data, size_t bytes) {
         }
 
         if (document.HasMember("classes")) {
-            parser.parseClasses(document["classes"], classes);
+            parser.parseClasses(document["classes"], classes, buckets, layers);
         }
     } else {
         throw Style::exception("stylesheet root must be an object");

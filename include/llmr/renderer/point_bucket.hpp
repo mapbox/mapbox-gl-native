@@ -19,6 +19,7 @@ class Style;
 class PointVertexBuffer;
 class BucketDescription;
 class PointShader;
+class DotShader;
 struct pbf;
 
 class PointBucket : public Bucket {
@@ -33,6 +34,7 @@ public:
     bool hasPoints() const;
 
     void drawPoints(PointShader& shader);
+    void drawPoints(DotShader& shader);
 
 public:
     const BucketGeometryDescription geometry;

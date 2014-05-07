@@ -3,6 +3,8 @@
 
 using namespace llmr;
 
+using JSVal = const rapidjson::Value&;
+
 void StyleParser::parseBuckets(JSVal value, std::map<std::string, BucketDescription>& buckets) {
     if (value.IsObject()) {
         rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
@@ -192,17 +194,17 @@ void StyleParser::parseConstants(JSVal value) {
     }
 }
 
-void StyleParser::parseClasses(JSVal value, std::map<std::string, ClassDescription>& classes) {
+void StyleParser::parseClasses(JSVal value, std::map<std::string, ClassDescription>& classes, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& layers) {
     if (value.IsArray()) {
         for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-            classes.insert(std::forward<std::pair<std::string, ClassDescription>>(parseClassDescription(value[i])));
+            classes.insert(std::forward<std::pair<std::string, ClassDescription>>(parseClassDescription(value[i], buckets, layers)));
         }
     } else {
         throw Style::exception("classes must be an array");
     }
 }
 
-std::pair<std::string, ClassDescription> StyleParser::parseClassDescription(JSVal value) {
+std::pair<std::string, ClassDescription> StyleParser::parseClassDescription(JSVal value, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& style_layers) {
     ClassDescription klass;
     std::string klass_name;
 
@@ -227,7 +229,7 @@ std::pair<std::string, ClassDescription> StyleParser::parseClassDescription(JSVa
                     const std::string name {
                         itr->name.GetString(), itr->name.GetStringLength()
                     };
-                    parseClass(name, itr->value, klass);
+                    parseClass(name, itr->value, klass, buckets, style_layers);
                 }
             } else {
                 throw Style::exception("class layer styles must be an object");
@@ -240,32 +242,31 @@ std::pair<std::string, ClassDescription> StyleParser::parseClassDescription(JSVa
     return { klass_name, std::forward<ClassDescription>(klass) };
 }
 
-void StyleParser::parseClass(const std::string& name, JSVal value, ClassDescription& class_desc) {
+void StyleParser::parseClass(const std::string& name, JSVal value, ClassDescription& class_desc, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& layers) {
     if (value.IsObject()) {
-        if (value.HasMember("type")) {
-            JSVal type = value["type"];
-            if (type.IsString()) {
-                std::string type_name = { type.GetString(), type.GetStringLength() };
-                if (type_name == "fill") {
-                    class_desc.fill.insert({ name, std::forward<FillClass>(parseFillClass(value)) });
-                } else if (type_name == "line") {
-                    class_desc.line.insert({ name, std::forward<LineClass>(parseLineClass(value)) });
-                } else if (type_name == "point") {
-                    class_desc.point.insert({ name, std::forward<PointClass>(parsePointClass(value)) });
-                } else if (type_name == "text") {
-                    class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
-                } else if (type_name == "raster") {
-                    class_desc.raster.insert({ name, std::forward<RasterClass>(parseRasterClass(value)) });
-                } else if (type_name == "background") {
+        for (const auto& layer : layers) {
+            if (name == layer.name) {
+                if (layer.bucket_name == "background") {
+                    // background buckets are fake
                     class_desc.background = parseBackgroundClass(value);
                 } else {
-                    throw Style::exception("unknown class type name");
+                    auto bucket_it = buckets.find(layer.bucket_name);
+                    BucketType type = bucket_it->second.type;
+                    if (type == BucketType::Fill) {
+                        class_desc.fill.insert({ name, std::forward<FillClass>(parseFillClass(value)) });
+                    } else if (type == BucketType::Line) {
+                        class_desc.line.insert({ name, std::forward<LineClass>(parseLineClass(value)) });
+                    } else if (type == BucketType::Point) {
+                        class_desc.point.insert({ name, std::forward<PointClass>(parsePointClass(value)) });
+                    } else if (type == BucketType::Text) {
+                        class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
+                    } else if (type == BucketType::Raster) {
+                        class_desc.raster.insert({ name, std::forward<RasterClass>(parseRasterClass(value)) });
+                    } else {
+                        throw Style::exception("unknown class type name");
+                    }
                 }
-            } else {
-                throw Style::exception("style class type must be a string");
             }
-        } else {
-            throw Style::exception("style class must specify a type");
         }
     } else {
         throw Style::exception("style class must be an object");
@@ -288,14 +289,46 @@ std::string StyleParser::parseString(JSVal value) {
     return { value.GetString(), value.GetStringLength() };
 }
 
+const JSVal& StyleParser::replaceConstant(const JSVal& value) {
+    if (value.IsString()) {
+        const std::string string_value { value.GetString(), value.GetStringLength() };
+        auto it = constants.find(string_value);
+        if (it != constants.end()) {
+            return *it->second;
+        }
+    }
+
+    return value;
+}
+
+std::vector<FunctionProperty> StyleParser::parseArray(JSVal value, uint16_t expected_count) {
+    JSVal rvalue = replaceConstant(value);
+    if (!rvalue.IsArray()) {
+        throw Style::exception("array value must be an array");
+    }
+
+    if (rvalue.IsArray() && rvalue.Size() != expected_count) {
+        throw Style::exception("array value has unexpected number of elements");
+    }
+
+    std::vector<FunctionProperty> values;
+    values.reserve(expected_count);
+    for (uint16_t i = 0; i < expected_count; i++) {
+        values.push_back(parseFunction(rvalue[(rapidjson::SizeType)i]));
+    }
+
+    return values;
+}
+
 Color StyleParser::parseColor(JSVal value) {
-    if (value.IsArray()) {
+    JSVal rvalue = replaceConstant(value);
+    if (rvalue.IsArray()) {
         // [ r, g, b, a] array
-        if (value.Size() != 4) {
+        if (rvalue.Size() != 4) {
             throw Style::exception("color array must have four elements");
         }
 
-        JSVal r = value[(rapidjson::SizeType)0], g = value[1], b = value[2], a = value[3];
+        JSVal r = rvalue[(rapidjson::SizeType)0], g = rvalue[1], b = rvalue[2], a = rvalue[3];
         if (!r.IsNumber() || !g.IsNumber() || !b.IsNumber() || !a.IsNumber()) {
             throw Style::exception("color values must be numbers");
         }
@@ -305,20 +338,13 @@ Color StyleParser::parseColor(JSVal value) {
                  static_cast<float>(b.GetDouble()),
                  static_cast<float>(a.GetDouble())}};
 
-    } else if (!value.IsString()) {
+    } else if (!rvalue.IsString()) {
         throw Style::exception("color value must be a string");
     }
 
-    const std::string str{value.GetString(), value.GetStringLength()};
-
-    auto it = constants.find(str);
-    if (it != constants.end()) {
-        return parseColor(*it->second);
-    } else {
-        CSSColorParser::Color css_color = CSSColorParser::parse(str);
-        return {{(float)css_color.r / 255, (float)css_color.g / 255,
-                 (float)css_color.b / 255, css_color.a}};
-    }
+    CSSColorParser::Color css_color = CSSColorParser::parse({ rvalue.GetString(), rvalue.GetStringLength() });
+    return {{(float)css_color.r / 255, (float)css_color.g / 255,
+             (float)css_color.b / 255, css_color.a}};
 }
 
 FunctionProperty::fn StyleParser::parseFunctionType(JSVal type) {
@@ -396,6 +422,11 @@ FillClass StyleParser::parseFillClass(JSVal value) {
         klass.enabled = parseFunction(value["enabled"]);
     }
 
+    if (value.HasMember("translate")) {
+        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
+        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+    }
+
     if (value.HasMember("color")) {
         klass.fill_color = parseColor(value["color"]);
     }
@@ -428,6 +459,11 @@ LineClass StyleParser::parseLineClass(JSVal value) {
         klass.enabled = parseFunction(value["enabled"]);
     }
 
+    if (value.HasMember("translate")) {
+        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
+        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+    }
+
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
     }
@@ -440,6 +476,11 @@ LineClass StyleParser::parseLineClass(JSVal value) {
         klass.opacity = parseFunction(value["opacity"]);
     }
 
+    if (value.HasMember("dasharray")) {
+        std::vector<FunctionProperty> values = parseArray(value["dasharray"], 2);
+        klass.dash_array = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+    }
+
     return klass;
 }
 
@@ -448,6 +489,11 @@ PointClass StyleParser::parsePointClass(JSVal value) {
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);
+    }
+
+    if (value.HasMember("translate")) {
+        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
+        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
     }
 
     if (value.HasMember("color")) {
@@ -466,6 +512,14 @@ PointClass StyleParser::parsePointClass(JSVal value) {
         klass.size = parseFunction(value["size"]);
     }
 
+    if (value.HasMember("radius")) {
+        klass.radius = parseFunction(value["radius"]);
+    }
+
+    if (value.HasMember("blur")) {
+        klass.blur = parseFunction(value["blur"]);
+    }
+
     return klass;
 }
 
@@ -475,6 +529,11 @@ TextClass StyleParser::parseTextClass(JSVal value) {
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);
+    }
+
+    if (value.HasMember("translate")) {
+        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
+        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
     }
 
     if (value.HasMember("color")) {

@@ -18,7 +18,7 @@ LineShader::LineShader()
 
     a_pos = glGetAttribLocation(program, "a_pos");
     a_extrude = glGetAttribLocation(program, "a_extrude");
-    // a_linesofar = glGetAttribLocation(program, "a_linesofar");
+    a_linesofar = glGetAttribLocation(program, "a_linesofar");
 
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_exmatrix = glGetUniformLocation(program, "u_exmatrix");
@@ -38,13 +38,13 @@ LineShader::LineShader()
 
 void LineShader::bind(char *offset) {
     glEnableVertexAttribArray(a_pos);
-    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 8, offset);
-
-    // glEnableVertexAttribArray(a_linesofar);
-    // glVertexAttribPointer(a_linesofar, 1, GL_SHORT, false, 8, offset + 6);
+    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 8, offset + 0);
 
     glEnableVertexAttribArray(a_extrude);
     glVertexAttribPointer(a_extrude, 2, GL_BYTE, false, 8, offset + 4);
+
+    glEnableVertexAttribArray(a_linesofar);
+    glVertexAttribPointer(a_linesofar, 1, GL_SHORT, false, 8, offset + 6);
 }
 
 void LineShader::setExtrudeMatrix(const std::array<float, 16>& new_exmatrix) {

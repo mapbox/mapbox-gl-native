@@ -28,24 +28,18 @@ VectorTileFeature::VectorTileFeature(pbf feature, const VectorTileLayer& layer) 
                 uint32_t tag_key = tags.varint();
 
                 if (layer.keys.size() <= tag_key) {
-                    // TODO: Throw correct exception
-                    fprintf(stderr, "feature referenced out of range key\n");
-                    break;
+                    throw std::runtime_error("feature referenced out of range key");
                 }
 
                 if (tags) {
                     uint32_t tag_val = tags.varint();
                     if (layer.values.size() <= tag_val) {
-                        // TODO: Throw correct exception
-                        fprintf(stderr, "feature referenced out of range value\n");
-                        break;
+                        throw std::runtime_error("feature referenced out of range value");
                     }
 
                     properties.emplace(layer.keys[tag_key], layer.values[tag_val]);
                 } else {
-                    // TODO: Throw correct exception
-                    fprintf(stderr, "uneven number of feature tag ids\n");
-                    break;
+                    throw std::runtime_error("uneven number of feature tag ids");
                 }
             }
         } else if (feature.tag == 3) { // type

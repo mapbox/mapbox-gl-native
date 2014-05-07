@@ -21,7 +21,7 @@ public:
 private:
     int32_t a_pos = -1;
     int32_t a_extrude = -1;
-    // int32_t a_linesofar = -1;
+    int32_t a_linesofar = -1;
 
     std::array<float, 16> exmatrix = {{}};
     int32_t u_exmatrix = -1;

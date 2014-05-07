@@ -16,6 +16,7 @@
 #include <llmr/shader/point_shader.hpp>
 #include <llmr/shader/raster_shader.hpp>
 #include <llmr/shader/text_shader.hpp>
+#include <llmr/shader/dot_shader.hpp>
 
 #include <llmr/map/transform_state.hpp>
 
@@ -62,6 +63,7 @@ private:
     void setupShaders();
     void renderLayers(const std::shared_ptr<TileData>& tile, const std::vector<LayerDescription>& layers);
     void renderLayer(const std::shared_ptr<TileData>& tile_data, const LayerDescription& layer_desc);
+    void translateLayer(std::array<float, 2> translation, bool reverse = false);
     void renderDebug(const std::shared_ptr<TileData>& tile);
 
     void useProgram(uint32_t program);
@@ -97,6 +99,7 @@ private:
     std::unique_ptr<PointShader> pointShader;
     std::unique_ptr<RasterShader> rasterShader;
     std::unique_ptr<TextShader> textShader;
+    std::unique_ptr<DotShader> dotShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     VertexBuffer tileStencilBuffer = {

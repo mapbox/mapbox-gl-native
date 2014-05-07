@@ -48,6 +48,7 @@ void Painter::setup() {
     assert(patternShader);
     assert(rasterShader);
     assert(textShader);
+    assert(dotShader);
 
 
     // Blending
@@ -76,6 +77,7 @@ void Painter::setupShaders() {
     pointShader = std::make_unique<PointShader>();
     rasterShader = std::make_unique<RasterShader>();
     textShader = std::make_unique<TextShader>();
+    dotShader = std::make_unique<DotShader>();
 }
 
 void Painter::resize() {
@@ -255,6 +257,20 @@ void Painter::renderLayer(const std::shared_ptr<TileData>& tile_data, const Laye
     }
 }
 
+void Painter::translateLayer(std::array<float, 2> translation, bool reverse) {
+    if (translation[0] || translation[1]) {
+        if (reverse) {
+            translation[0] *= -1;
+            translation[1] *= -1;
+        }
+        matrix::translate(matrix,
+                          matrix,
+                          translation[0] / map.getState().getPixelRatio(),
+                          translation[1] / map.getState().getPixelRatio(),
+                          0);
+    }
+}
+
 void Painter::renderRaster(const std::string& layer_name, const std::shared_ptr<TileData>& tile_data) {
     if (pass == Opaque) return;
 
@@ -307,6 +323,8 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         outline = true;
         stroke_color = fill_color;
     }
+
+    translateLayer(properties.translate);
 
     gl::group group(layer_name + " (fill)");
     // Because we're drawing top-to-bottom, and we update the stencil mask
@@ -410,6 +428,8 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         glDepthRange(strata + strata_epsilon, 1.0f);
         bucket.drawVertices(*outlineShader);
     }
+
+    translateLayer(properties.translate, true);
 }
 
 void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
@@ -438,6 +458,10 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
+    float dash_length = properties.dash_array[0];
+    float dash_gap = properties.dash_array[1];
+
+    translateLayer(properties.translate);
 
     gl::group group(layer_name + " (line)");
     glDepthRange(strata, 1.0f);
@@ -486,16 +510,14 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         useProgram(lineShader->program);
         lineShader->setMatrix(matrix);
         lineShader->setExtrudeMatrix(extrudeMatrix);
-
-        // TODO: Move this to transform?
-        const float tilePixelRatio = map.getState().getScale() / (1 << map.getState().getIntegerZoom()) / 8;
-
-        lineShader->setDashArray({{ 1, -1 }});
+        lineShader->setDashArray({{ dash_length, dash_gap }});
         lineShader->setLineWidth({{ outset, inset }});
-        lineShader->setRatio(tilePixelRatio);
+        lineShader->setRatio(map.getState().getPixelRatio());
         lineShader->setColor(color);
         bucket.drawLines(*lineShader);
     }
+
+    translateLayer(properties.translate, true);
 }
 
 void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& /*id&*/) {
@@ -510,8 +532,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     const PointProperties& properties = point_properties_it->second;
     if (!properties.enabled) return;
 
-    auto &sprite = map.getStyle().sprite;
-    if (!sprite || !sprite->isLoaded()) return;
+    translateLayer(properties.translate);
 
     gl::group group(layer_name + " (point)");
 
@@ -521,32 +542,58 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    std::string sized_image = properties.image;
-    sized_image.append("-");
-    sized_image.append(std::to_string(static_cast<int>(std::round(properties.size))));
+    auto &sprite = map.getStyle().sprite;
+    ImagePosition imagePos;
 
-    ImagePosition imagePos = sprite->getPosition(sized_image, false);
-
-    // fprintf(stderr, "%f/%f => %f/%f\n", imagePos.tl.x, imagePos.tl.y, imagePos.br.x, imagePos.br.y);
-
-    useProgram(pointShader->program);
-    pointShader->setMatrix(matrix);
-    pointShader->setImage(0);
-    pointShader->setColor(color);
-    const float pointSize = properties.size * 1.4142135623730951 * map.getState().getPixelRatio();
-#if defined(GL_ES_VERSION_2_0)
-    pointShader->setSize(pointSize);
-#else
-    glPointSize(pointSize);
-    glEnable(GL_POINT_SPRITE);
-#endif
-    pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
-    pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
-    if (sprite->raster->isLoaded()) {
-        sprite->raster->bind(map.getState().isChanging());
+    if (properties.image.length() && sprite && sprite->isLoaded()) {
+        std::string sized_image = properties.image;
+        if (properties.size) {
+            sized_image.append("-");
+            sized_image.append(std::to_string(static_cast<int>(std::round(properties.size))));
+        }
+        imagePos = sprite->getPosition(sized_image, false);
     }
-    glDepthRange(strata, 1.0f);
-    bucket.drawPoints(*pointShader);
+
+    if (!imagePos.size) {
+        useProgram(dotShader->program);
+        dotShader->setMatrix(matrix);
+        dotShader->setColor(color);
+
+        const float pointSize = (properties.radius ? properties.radius * 2 : 8) * map.getState().getPixelRatio();
+#if defined(GL_ES_VERSION_2_0)
+            dotShader->setSize(pointSize);
+#else
+            glPointSize(pointSize);
+            glEnable(GL_POINT_SPRITE);
+#endif
+        dotShader->setBlur((properties.blur ? properties.blur : 1.5) / pointSize);
+
+        glDepthRange(strata, 1.0f);
+        bucket.drawPoints(*dotShader);
+    } else {
+        useProgram(pointShader->program);
+        pointShader->setMatrix(matrix);
+        pointShader->setColor(color);
+
+        pointShader->setImage(0);
+        pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
+        pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
+
+        sprite->raster->bind(map.getState().isChanging());
+
+        const float pointSize = (properties.size ? properties.size : (imagePos.size.x / map.getState().getPixelRatio())) * 1.4142135623730951 * map.getState().getPixelRatio();
+#if defined(GL_ES_VERSION_2_0)
+            pointShader->setSize(pointSize);
+#else
+            glPointSize(pointSize);
+            glEnable(GL_POINT_SPRITE);
+#endif
+
+        glDepthRange(strata, 1.0f);
+        bucket.drawPoints(*pointShader);
+    }
+
+    translateLayer(properties.translate, true);
 }
 
 void Painter::renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
@@ -560,6 +607,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 
     const TextProperties& properties = text_properties_it->second;
     if (!properties.enabled) return;
+
+    translateLayer(properties.translate);
 
     gl::group group(layer_name + " (text)");
 
@@ -654,6 +703,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     textShader->setBuffer((256.0f - 64.0f) / 256.0f);
     glDepthRange(strata + strata_epsilon, 1.0f);
     bucket.drawGlyphs(*textShader);
+
+    translateLayer(properties.translate, true);
 }
 
 void Painter::renderDebug(const TileData::Ptr& tile_data) {
