@@ -5,8 +5,6 @@
 #include <uv.h>
 
 #include <llmr/map/view.hpp>
-// #include <llmr/map/tile.hpp>
-// #include <llmr/map/tile_data.hpp>
 #include <llmr/map/transform.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/geometry/glyph_atlas.hpp>

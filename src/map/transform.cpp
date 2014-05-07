@@ -409,3 +409,25 @@ const TransformState Transform::finalState() const {
 
     return final;
 }
+
+#pragma mark - Conversions
+
+const Transform::location_coordinate Transform::getLocationCoordinate(double lon, double lat) const {
+    double tile_zoom = floor(getZoom());
+    double world_size = util::tileSize * getScale();
+
+    double k = pow(2, tile_zoom) / world_size;
+
+    double lngx = (180 + lon) * world_size / 360;
+
+    double y = R2D * log(tan(M_PI / 4 + lat * M_PI / 360));
+    double latx = (180 - y) * world_size / 360;
+
+    Transform::location_coordinate l;
+
+    l.column = lngx * k;
+    l.row = latx * k;
+    l.zoom = tile_zoom;
+
+    return l;
+}

@@ -11,9 +11,14 @@
 
 namespace llmr {
 
-struct box;
+class Transform : private util::noncopyable {
+public:
+    struct location_coordinate {
+        double column = 0;
+        double row = 0;
+        double zoom = 0;
+    };
 
-    class Transform : private util::noncopyable {
 public:
     Transform();
 
@@ -56,6 +61,9 @@ public:
     // Transform state
     const TransformState currentState() const;
     const TransformState finalState() const;
+
+    // Conversions
+    const Transform::location_coordinate getLocationCoordinate(double lon, double lat) const;
 
 private:
     // Functions prefixed with underscores will *not* perform any locks. It is the caller's

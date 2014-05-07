@@ -1,5 +1,6 @@
 #include <llmr/map/map.hpp>
 #include <llmr/map/source.hpp>
+#include <llmr/map/geojson_source.hpp>
 #include <llmr/platform/platform.hpp>
 #include <llmr/style/resources.hpp>
 #include <llmr/style/sprite.hpp>
@@ -145,6 +146,17 @@ void Map::setup() {
                            512,
                            0,
                            14,
+                           true)));
+
+    sources.emplace("geojson",
+                    std::unique_ptr<GeoJSONSource>(new GeoJSONSource(*this,
+                           painter,
+                           texturepool,
+                           "http://mapbox-kkaefer.s3.amazonaws.com/static/route-min.js",
+                           { 13 },
+                           512,
+                           1,
+                           13,
                            true)));
 
     sources.emplace("satellite",
@@ -344,7 +356,7 @@ void Map::toggleRaster() {
 void Map::updateTiles() {
     for (auto &pair : sources) {
         const std::unique_ptr<Source> &source = pair.second;
-        if (source->enabled) {
+        if (source->enabled && source->getType() != Source::Type::geojson) {
             source->update();
         }
     }

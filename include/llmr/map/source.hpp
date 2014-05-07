@@ -22,7 +22,8 @@ class Source : public std::enable_shared_from_this<Source>, private util::noncop
 public:
     enum class Type {
         vector,
-        raster
+        raster,
+        geojson
     };
 
 public:
@@ -31,12 +32,11 @@ public:
            uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 14,
            bool enabled = true);
 
-
+    Source::Type getType() const;
 
     bool update();
     void prepare_render(const TransformState &transform, bool is_baselayer = false);
     void render(time animationTime);
-
 
 public:
     bool enabled;
@@ -53,7 +53,7 @@ private:
 
     double getZoom() const;
 
-private:
+protected:
     Map& map;
     Painter& painter;
     Texturepool& texturepool;

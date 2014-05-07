@@ -2,6 +2,10 @@
 
 module.exports = {
     "buckets": {
+        "route": {
+            "source": "geojson",
+            "type": "line"
+        },
         "admin_maritime": {
             "source": "mapbox streets",
             "layer": "admin",
@@ -756,6 +760,9 @@ module.exports = {
         "name": "bridge_major_rail_hatching",
         "bucket": "bridge_major_rail"
     }, {
+        "name": "route",
+        "bucket": "route"
+    }, {
         "name": "admin_level_3",
         "bucket": "admin_level_3"
     }, {
@@ -839,6 +846,11 @@ module.exports = {
         "layers": {
             "background": {
                 "color": "land",
+            },
+            "route": {
+                "color": "#EC8D8D",
+                "width": 3,
+                "opacity": 0.5,
             },
             "admin_maritime": {
                 "color": "#cfe0fa",

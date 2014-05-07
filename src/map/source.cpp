@@ -25,6 +25,10 @@ Source::Source(Map &map, Painter &painter, Texturepool &texturepool,
       min_zoom(min_zoom),
       max_zoom(max_zoom) {}
 
+Source::Type Source::getType() const {
+    return type;
+}
+
 bool Source::update() {
     return updateTiles();
 }
