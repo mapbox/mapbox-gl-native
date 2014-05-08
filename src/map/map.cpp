@@ -139,7 +139,7 @@ void Map::setup() {
                     std::unique_ptr<Source>(new Source(*this,
                            painter,
                            texturepool,
-                           "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf",
+                           "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v42-dev/%d/%d/%d.gl.pbf",
                            Source::Type::vector,
                            {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }},
                            512,
