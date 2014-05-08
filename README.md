@@ -21,7 +21,7 @@ dependencies.
 
 ## OS X
 
-Run `./setup_libraries.sh`
+Run `./setup-libraries.sh`
 
 This downloads all required dependencies, builds them and creates universal libraries that can be
 used on both OS X and iOS.
@@ -36,7 +36,7 @@ To create projects, you can run:
 ## iOS
 
 Because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version
-yourself. Run `./setup_libraries.sh`, which is derived from Mapnik's cross-architecture build
+yourself. Run `./setup-libraries.sh`, which is derived from Mapnik's cross-architecture build
 scripts. This will also run `./configure`.
 
 Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina).
@@ -60,7 +60,7 @@ Install glfw3 dependencies:
 
 Build static dependencies:
 
-    ./setup_libraries.sh
+    ./setup-libraries.sh
 
 This will automatically run configure for you and set the correct paths.
 
