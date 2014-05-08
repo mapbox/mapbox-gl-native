@@ -235,8 +235,16 @@ FilteredVectorTileLayer::FilteredVectorTileLayer(const VectorTileLayer& layer, c
         // order to avoid numeric type mismatches between the layer and the
         // style definition.
         for (const Value& source_value : bucket_desc.source_value) {
+            // auto value_it = std::find_if(layer.values.begin(), layer.values.end(), util::relaxed_equal(source_value));
+
             auto value_it = std::find_if(layer.values.begin(), layer.values.end(), [&source_value](const Value& layer_value) {
-                return (toString(layer_value) == toString(source_value));
+                bool value1 = util::relaxed_equal(layer_value)(source_value);
+                bool value2 = (toString(layer_value) == toString(source_value));
+                if (value1 != value2) {
+                    std::cout << layer_value << " == " << source_value << ": " << value1 << " vs " << value2 << "\n";
+                }
+                return value2;
+                // return (toString(layer_value) == toString(source_value));
             });
             if (value_it != layer.values.end()) {
                 values.insert((uint32_t)(value_it - layer.values.begin()));
