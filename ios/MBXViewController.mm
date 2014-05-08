@@ -6,12 +6,13 @@
 #import <OpenGLES/EAGL.h>
 #import <QuartzCore/QuartzCore.h>
 #import <GLKit/GLKit.h>
+#import <CoreLocation/CoreLocation.h>
 
 #include <llmr/llmr.hpp>
 #include <llmr/platform/platform.hpp>
 #include <llmr/map/tile.hpp>
 
-@interface MBXViewController () <UIGestureRecognizerDelegate>
+@interface MBXViewController () <UIGestureRecognizerDelegate, CLLocationManagerDelegate>
 
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) CGPoint center;
@@ -20,6 +21,7 @@
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic) BOOL debug;
 @property (nonatomic) UIView *palette;
+@property (nonatomic) CLLocationManager *locationManager;
 
 @end
 
@@ -61,6 +63,9 @@ MBXViewController *viewController = nullptr;
     [self setupMap];
     [self setupInteraction];
     [self setupDebugUI];
+
+    self.locationManager = [CLLocationManager new];
+    self.locationManager.delegate = self;
 
     map->start();
 }
@@ -117,7 +122,7 @@ MBXViewController *viewController = nullptr;
 
 - (void)setupDebugUI
 {
-    NSArray *selectorNames = @[ @"unrotate", @"resetPosition", @"toggleDebug", @"toggleRaster" ];
+    NSArray *selectorNames = @[ @"unrotate", @"resetPosition", @"toggleDebug", @"toggleRaster", @"locateUser" ];
     CGFloat buttonSize  = 40;
     CGFloat bufferSize  = 20;
     CGFloat alpha       = 0.75;
@@ -216,6 +221,15 @@ MBXViewController *viewController = nullptr;
    map->toggleRaster();
 }
 
+- (void)locateUser
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self.locationManager selector:@selector(stopUpdatingLocation) object:nil];
+
+    [self.locationManager startUpdatingLocation];
+
+    [self.locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:5.0];
+}
+
 #pragma mark - Destruction
 
 - (void)dealloc
@@ -254,9 +268,16 @@ MBXViewController *viewController = nullptr;
 
 #pragma mark - UI gestures
 
-- (void)handlePanGesture:(UIPanGestureRecognizer *)pan
+- (void)cancelPreviousActions
 {
     map->cancelTransitions();
+
+    [self.locationManager stopUpdatingLocation];
+}
+
+- (void)handlePanGesture:(UIPanGestureRecognizer *)pan
+{
+    [self cancelPreviousActions];
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
@@ -289,7 +310,7 @@ MBXViewController *viewController = nullptr;
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch
 {
-    map->cancelTransitions();
+    [self cancelPreviousActions];
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
@@ -341,7 +362,7 @@ MBXViewController *viewController = nullptr;
 
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate
 {
-    map->cancelTransitions();
+    [self cancelPreviousActions];
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
@@ -369,7 +390,7 @@ MBXViewController *viewController = nullptr;
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
-    map->cancelTransitions();
+    [self cancelPreviousActions];
 
     if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
@@ -379,7 +400,7 @@ MBXViewController *viewController = nullptr;
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
-    map->cancelTransitions();
+    [self cancelPreviousActions];
 
     if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
@@ -389,7 +410,7 @@ MBXViewController *viewController = nullptr;
 
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
-    map->cancelTransitions();
+    [self cancelPreviousActions];
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
@@ -412,6 +433,15 @@ MBXViewController *viewController = nullptr;
     NSArray *validSimultaneousGestures = @[ [UIPanGestureRecognizer class], [UIPinchGestureRecognizer class], [UIRotationGestureRecognizer class] ];
 
     return ([validSimultaneousGestures containsObject:[gestureRecognizer class]] && [validSimultaneousGestures containsObject:[otherGestureRecognizer class]]);
+}
+
+#pragma mark - User location
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    CLLocation *latestLocation = locations.lastObject;
+
+    map->setLonLatZoom(latestLocation.coordinate.longitude, latestLocation.coordinate.latitude, 17, 0.3);
 }
 
 class View : public llmr::View {
