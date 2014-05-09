@@ -52,7 +52,7 @@ run-linux: linux
 ##### Xcode projects ###########################################################
 
 clear_xcode_cache:
-	@if [[ -d ~/Library/Developer/Xcode/DerivedData/ ]]; then echo 'clearing files in xcode cache older than one day'; find ~/Library/Developer/Xcode/DerivedData/* -mtime +1 | xargs rm -rf; fi
+	@if [[ -d ~/Library/Developer/Xcode/DerivedData/ ]]; then echo 'clearing files in ~/Library/Developer/Xcode/DerivedData/ older than one day'; find ~/Library/Developer/Xcode/DerivedData/llmr-app-* -mtime +1 | xargs rm -rf; fi
 
 # build Mac OS X project for Xcode
 xproj: config.gypi macosx/llmr-app.gyp clear_xcode_cache
