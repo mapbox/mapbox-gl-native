@@ -135,7 +135,7 @@ void Map::setup() {
 
     painter.setup();
 
-    sources.emplace("mapbox streets",
+    sources.emplace("outdoors",
                     std::unique_ptr<Source>(new Source(*this,
                            painter,
                            texturepool,

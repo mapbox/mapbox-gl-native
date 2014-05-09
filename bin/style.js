@@ -3,16 +3,16 @@
 module.exports = {
     "buckets": {
         "admin_maritime": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "admin",
             "field": "maritime",
-            "value": "1",
+            "value": 1,
             "join": "round",
             "cap": "round",
             "type": "line"
         },
         "admin_level_2": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "admin",
             "field": "admin_level",
             "value": 2,
@@ -21,55 +21,59 @@ module.exports = {
             "type": "line"
         },
         "admin_level_3": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "admin",
             "field": "admin_level",
-            "value": [3, 4, 5],
+            "value": [
+                      3,
+                      4,
+                      5
+                      ],
             "join": "round",
             "type": "line"
         },
         "landcover_wood": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landcover",
             "field": "class",
             "value": "wood",
             "type": "fill"
         },
         "landcover_scrub": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landcover",
             "field": "class",
             "value": "scrub",
             "type": "fill"
         },
         "landcover_grass": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landcover",
             "field": "class",
             "value": "grass",
             "type": "fill"
         },
         "landcover_crop": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landcover",
             "field": "class",
             "value": "crop",
             "type": "fill"
         },
         "landcover_snow": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landcover",
             "field": "class",
             "value": "snow",
             "type": "fill"
         },
         "water": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "water",
             "type": "fill"
         },
         "waterway_other": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "waterway",
             "field": "type",
             "value": [
@@ -80,7 +84,7 @@ module.exports = {
             "type": "line"
         },
         "waterway_river_canal": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "waterway",
             "field": "type",
             "value": [
@@ -91,7 +95,7 @@ module.exports = {
             "type": "line"
         },
         "waterway_stream": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "waterway",
             "field": "type",
             "value": "stream",
@@ -99,63 +103,63 @@ module.exports = {
             "type": "line"
         },
         "landuse_park": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landuse",
             "field": "class",
             "value": "park",
             "type": "fill"
         },
         "landuse_pitch": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landuse",
             "field": "class",
             "value": "pitch",
             "type": "fill"
         },
         "landuse_cemetary": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landuse",
             "field": "class",
             "value": "cemetary",
             "type": "fill"
         },
         "landuse_hospital": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landuse",
             "field": "class",
             "value": "hospital",
             "type": "fill"
         },
         "landuse_industrial": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landuse",
             "field": "class",
             "value": "industrial",
             "type": "fill"
         },
         "landuse_school": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landuse",
             "field": "class",
             "value": "school",
             "type": "fill"
         },
         "overlay_wetland": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landuse_overlay",
             "field": "class",
             "value": "wetland",
             "type": "fill"
         },
         "overlay_wetland_noveg": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landuse_overlay",
             "field": "class",
             "value": "wetland_noveg",
             "type": "fill"
         },
         "overlay_breakwater_pier": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "landuse_overlay",
             "field": "class",
             "value": [
@@ -165,98 +169,104 @@ module.exports = {
             "type": "fill"
         },
         "hillshade_full_shadow": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "hillshade",
             "field": "class",
             "value": "full_shadow",
             "type": "fill"
         },
         "hillshade_medium_shadow": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "hillshade",
             "field": "class",
             "value": "medium_shadow",
             "type": "fill"
         },
         "hillshade_medium_highlight": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "hillshade",
             "field": "class",
             "value": "medium_highlight",
             "type": "fill"
         },
         "hillshade_full_highlight": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "hillshade",
             "field": "class",
             "value": "full_highlight",
             "type": "fill"
         },
         "contour_line_10": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "contour",
             "field": "index",
             "value": 10,
             "type": "line"
         },
         "contour_line_other": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "contour",
             "type": "line"
         },
         "contour_label": {
-            "source": "mapbox streets",
-            "layer": "label",
-            "type": "label"
+            "source": "outdoors",
+            "layer": "contour",
+            "field": "index",
+            "value": 10,
+            "path": "curve",
+            "text_field": "ele",
+            "fontSize": 10,
+            "feature_type": "line",
+            "type": "text"
         },
         "building": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "building",
             "type": "fill"
         },
         "barrier_line_gate": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "barrier_line",
             "field": "class",
             "value": "gate",
             "type": "line"
         },
         "barrier_line_fence": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "barrier_line",
             "field": "class",
             "value": "fence",
             "type": "line"
         },
         "barrier_line_hedge": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "barrier_line",
             "field": "class",
             "value": "hedge",
             "type": "line"
         },
         "barrier_line_land": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "barrier_line",
             "field": "class",
             "value": "land",
             "type": "line"
         },
         "barrier_line_cliff": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "barrier_line",
             "field": "class",
             "value": "cliff",
             "type": "line"
         },
         "aeroway_fill": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "aeroway",
             "type": "fill",
             "enabled": 12
         },
         "aeroway_runway": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "aeroway",
             "field": "type",
             "value": "runway",
@@ -264,7 +274,7 @@ module.exports = {
             "enabled": 12
         },
         "aeroway_taxiway": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "aeroway",
             "field": "type",
             "value": "taxiway",
@@ -272,7 +282,7 @@ module.exports = {
             "enabled": 12
         },
         "motorway": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "class",
             "value": "motorway",
@@ -281,7 +291,7 @@ module.exports = {
             "type": "line"
         },
         "motorway_link": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "class",
             "value": "motorway_link",
@@ -290,7 +300,7 @@ module.exports = {
             "type": "line"
         },
         "main": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "class",
             "value": "main",
@@ -299,7 +309,7 @@ module.exports = {
             "type": "line"
         },
         "street": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "class",
             "value": [
@@ -312,7 +322,7 @@ module.exports = {
             "enabled": 12
         },
         "service": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "class",
             "value": "service",
@@ -322,84 +332,84 @@ module.exports = {
             "enabled": 15
         },
         "path": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "class",
             "value": "path",
             "type": "line"
         },
         "path_footway": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "type",
             "value": "footway",
             "type": "line"
         },
         "path_path": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "type",
             "value": "path",
             "type": "line"
         },
         "path_cycleway": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "type",
             "value": "cycleway",
             "type": "line"
         },
         "path_mtb": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "type",
             "value": "mtb",
             "type": "line"
         },
         "path_steps": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "type",
             "value": "steps",
             "type": "line"
         },
         "path_piste": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "type",
             "value": "piste",
             "type": "line"
         },
         "major_rail": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road",
             "field": "class",
             "value": "major_rail",
             "type": "line"
         },
         "tunnel_motorway": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "class",
             "value": "motorway",
             "type": "line"
         },
         "tunnel_motorway_link": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "class",
             "value": "motorway_link",
             "type": "line"
         },
         "tunnel_main": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "class",
             "value": "main",
             "type": "line"
         },
         "tunnel_street": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "class",
             "value": [
@@ -410,7 +420,7 @@ module.exports = {
             "enabled": 12
         },
         "tunnel_service": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "class",
             "value": "service",
@@ -418,84 +428,84 @@ module.exports = {
             "enabled": 15
         },
         "tunnel_path": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "class",
             "value": "path",
             "type": "line"
         },
         "tunnel_path_footway": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "type",
             "value": "footway",
             "type": "line"
         },
         "tunnel_path_path": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "type",
             "value": "path",
             "type": "line"
         },
         "tunnel_path_cycleway": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "type",
             "value": "cycleway",
             "type": "line"
         },
         "tunnel_path_mtb": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "type",
             "value": "mtb",
             "type": "line"
         },
         "tunnel_path_steps": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "type",
             "value": "steps",
             "type": "line"
         },
         "tunnel_path_piste": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "type",
             "value": "piste",
             "type": "line"
         },
         "tunnel_major_rail": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "tunnel",
             "field": "class",
             "value": "major_rail",
             "type": "line"
         },
         "bridge_motorway": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "class",
             "value": "motorway",
             "type": "line"
         },
         "bridge_motorway_link": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "class",
             "value": "motorway_link",
             "type": "line"
         },
         "bridge_main": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "class",
             "value": "main",
             "type": "line"
         },
         "bridge_street": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "class",
             "value": [
@@ -506,7 +516,7 @@ module.exports = {
             "enabled": 12
         },
         "bridge_service": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "class",
             "value": "service",
@@ -514,68 +524,68 @@ module.exports = {
             "enabled": 15
         },
         "bridge_path": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "type": "line"
         },
         "bridge_path_footway": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "type",
             "value": "footway",
             "type": "line"
         },
         "bridge_path_path": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "type",
             "value": "path",
             "type": "line"
         },
         "bridge_path_cycleway": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "type",
             "value": "cycleway",
             "type": "line"
         },
         "bridge_path_mtb": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "type",
             "value": "mtb",
             "type": "line"
         },
         "bridge_path_steps": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "type",
             "value": "steps",
             "type": "line"
         },
         "bridge_path_piste": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "type",
             "value": "piste",
             "type": "line"
         },
         "bridge_major_rail": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "class",
             "value": "major_rail",
             "type": "line"
         },
         "bridge_aerialway": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "bridge",
             "field": "class",
             "value": "aerialway",
             "type": "line"
         },
         "country_label": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "country_label",
             "text_field": "name",
             "path": "horizontal",
@@ -585,13 +595,13 @@ module.exports = {
             "enabled": 3
         },
         "country_label_line": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "country_label_line",
             "type": "line",
             "enabled": 3
         },
         "marine_label_1": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "marine_label",
             "field": "labelrank",
             "value": 1,
@@ -602,7 +612,7 @@ module.exports = {
             "fontSize": 22
         },
         "marine_label_2": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "marine_label",
             "field": "labelrank",
             "value": 2,
@@ -613,7 +623,7 @@ module.exports = {
             "fontSize": 16
         },
         "marine_label_3": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "marine_label",
             "field": "labelrank",
             "value": 3,
@@ -623,26 +633,36 @@ module.exports = {
             "path": "curve",
             "fontSize": 14
         },
+        "state_label": {
+            "source": "outdoors",
+            "layer": "state_label",
+            "text_field": "name",
+            "path": "horizontal",
+            "fontSize": 16,
+            "feature_type": "point",
+            "type": "text",
+            "enabled": 4
+        },
         "place_label_city_point": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "place_label",
             "field": "type",
             "value": "city",
             "type": "point"
         },
         "place_label_city": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "place_label",
             "field": "type",
             "value": "city",
             "text_field": "name",
             "path": "horizontal",
-            "fontSize": 24,
+            "fontSize": 20,
             "feature_type": "point",
             "type": "text"
         },
         "place_label_town": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "place_label",
             "field": "type",
             "value": "town",
@@ -653,7 +673,7 @@ module.exports = {
             "type": "text"
         },
         "place_label_village": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "place_label",
             "field": "type",
             "value": "village",
@@ -664,7 +684,7 @@ module.exports = {
             "type": "text"
         },
         "place_label_other": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "place_label",
             "field": "type",
             "value": [
@@ -678,18 +698,8 @@ module.exports = {
             "feature_type": "point",
             "type": "text"
         },
-        "poi_label": {
-            "source": "mapbox streets",
-            "layer": "poi_label",
-            "text_field": "name",
-            "path": "horizontal",
-            "padding": 2,
-            "fontSize": 12,
-            "feature_type": "point",
-            "type": "text"
-        },
         "road_label": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "road_label",
             "text_field": "name",
             "path": "curve",
@@ -699,7 +709,7 @@ module.exports = {
             "type": "text"
         },
         "water_label": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "water_label",
             "text_field": "name",
             "path": "horizontal",
@@ -707,8 +717,18 @@ module.exports = {
             "feature_type": "point",
             "type": "text"
         },
+        "waterway_label": {
+            "source": "outdoors",
+            "layer": "waterway_label",
+            "text_field": "name",
+            "path": "curve",
+            "fontSize": 12,
+            "textMinDistance": 10,
+            "feature_type": "line",
+            "type": "text"
+        },
         "poi_airport": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "poi_label",
             "field": "maki",
             "value": "airport",
@@ -718,8 +738,19 @@ module.exports = {
             },
             "type": "point"
         },
+        "poi_rail": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "field": "maki",
+            "value": "rail",
+            "size": {
+                "x": 12,
+                "y": 12
+            },
+            "type": "point"
+        },
         "poi_park": {
-            "source": "mapbox streets",
+            "source": "outdoors",
             "layer": "poi_label",
             "field": "maki",
             "value": "park",
@@ -727,7 +758,60 @@ module.exports = {
                 "x": 12,
                 "y": 12
             },
-            "type": "point"
+            "type": "point",
+            "alwaysVisible": true
+        },
+        "poi_golf": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "field": "maki",
+            "value": "golf",
+            "size": {
+                "x": 12,
+                "y": 12
+            },
+            "type": "point",
+            "alwaysVisible": true
+        },
+        "poi_hospital": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "field": "maki",
+            "value": "hospital",
+            "size": {
+                "x": 12,
+                "y": 12
+            },
+            "type": "point",
+            "alwaysVisible": true
+        },
+        "poi_college": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "field": "maki",
+            "value": "college",
+            "size": {
+                "x": 12,
+                "y": 12
+            },
+            "type": "point",
+            "alwaysVisible": true
+        },
+        "poi_label_1": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "field": "scalerank",
+            "value": [
+                      1,
+                      2
+                      ],
+            "text_field": "name",
+            "path": "horizontal",
+            "padding": 2,
+            "fontSize": 12,
+            "feature_type": "point",
+            "type": "text",
+            "alwaysVisible": true
         }
     },
     "constants": {
@@ -752,16 +836,15 @@ module.exports = {
         "motorway": "#d7a8a8",
         "main": "#ddc0b9",
         "street": "#fff",
-        "text": "#666"
+        "text": "#666",
+        "country_text": "#323330",
+        "marine_text": "#a0bdc0",
+        "water_text": "#185869"
     },
     "structure": [
                   {
                   "name": "background",
                   "bucket": "background"
-                  },
-                  {
-                  "name": "waterway_other",
-                  "bucket": "waterway_other"
                   },
                   {
                   "name": "waterway_river_canal",
@@ -850,10 +933,6 @@ module.exports = {
                   {
                   "name": "contour_line_other",
                   "bucket": "contour_line_other"
-                  },
-                  {
-                  "name": "contour_label",
-                  "bucket": "contour_label"
                   },
                   {
                   "name": "barrier_line_gate",
@@ -1144,8 +1223,100 @@ module.exports = {
                   "bucket": "admin_level_2"
                   },
                   {
+                  "name": "admin_maritime_cover",
+                  "bucket": "admin_maritime"
+                  },
+                  {
                   "name": "admin_maritime",
                   "bucket": "admin_maritime"
+                  },
+                  {
+                  "name": "country_label_line",
+                  "bucket": "country_label_line"
+                  },
+                  {
+                  "name": "country_label",
+                  "bucket": "country_label"
+                  },
+                  {
+                  "name": "marine_label_1",
+                  "bucket": "marine_label_1"
+                  },
+                  {
+                  "name": "marine_label_2",
+                  "bucket": "marine_label_2"
+                  },
+                  {
+                  "name": "marine_label_3",
+                  "bucket": "marine_label_3"
+                  },
+                  {
+                  "name": "state_label",
+                  "bucket": "state_label"
+                  },
+                  {
+                  "name": "place_label_city_point",
+                  "bucket": "place_label_city_point"
+                  },
+                  {
+                  "name": "place_label_city",
+                  "bucket": "place_label_city"
+                  },
+                  {
+                  "name": "place_label_town",
+                  "bucket": "place_label_town"
+                  },
+                  {
+                  "name": "place_label_village",
+                  "bucket": "place_label_village"
+                  },
+                  {
+                  "name": "place_label_other",
+                  "bucket": "place_label_other"
+                  },
+                  {
+                  "name": "poi_label_1",
+                  "bucket": "poi_label_1"
+                  },
+                  {
+                  "name": "road_label",
+                  "bucket": "road_label"
+                  },
+                  {
+                  "name": "contour_label",
+                  "bucket": "contour_label"
+                  },
+                  {
+                  "name": "water_label",
+                  "bucket": "water_label"
+                  },
+                  {
+                  "name": "waterway_label",
+                  "bucket": "waterway_label"
+                  },
+                  {
+                  "name": "poi_airport",
+                  "bucket": "poi_airport"
+                  },
+                  {
+                  "name": "poi_rail",
+                  "bucket": "poi_rail"
+                  },
+                  {
+                  "name": "poi_golf",
+                  "bucket": "poi_golf"
+                  },
+                  {
+                  "name": "poi_park",
+                  "bucket": "poi_park"
+                  },
+                  {
+                  "name": "poi_hospital",
+                  "bucket": "poi_hospital"
+                  },
+                  {
+                  "name": "poi_college",
+                  "bucket": "poi_college"
                   }
                   ],
     "classes": [
@@ -1155,9 +1326,35 @@ module.exports = {
                 "background": {
                 "color": "land"
                 },
+                "admin_maritime_cover": {
+                "color": "water",
+                "width": 5
+                },
                 "admin_maritime": {
                 "color": "#c0d6d6",
-                "width": 4.5
+                "width": [
+                          "stops",
+                          {
+                          "z": 0,
+                          "val": 0.4
+                          },
+                          {
+                          "z": 6,
+                          "val": 1
+                          },
+                          {
+                          "z": 8,
+                          "val": 2
+                          },
+                          {
+                          "z": 12,
+                          "val": 3
+                          },
+                          {
+                          "z": 22,
+                          "val": 3
+                          }
+                          ]
                 },
                 "admin_level_2": {
                 "color": "#88a",
@@ -1321,6 +1518,17 @@ module.exports = {
                 "landuse_pitch": {
                 "color": "rgba(255,255,255,0.5)",
                 "stroke": "pitch"
+                },
+                "overlay_wetland": {
+                "color": "#e1e9d3",
+                "image": "wetland_64"
+                },
+                "overlay_wetland_noveg": {
+                "color": "#e1e9d3",
+                "image": "wetland_noveg_64"
+                },
+                "overlay_breakwater_pier": {
+                "color": "land"
                 },
                 "hillshade_full_shadow": {
                 "color": "#103",
@@ -2431,6 +2639,27 @@ module.exports = {
                           }
                           ]
                 },
+                "road_street_casing_group": {
+                "opacity": [
+                            "stops",
+                            {
+                            "z": 0,
+                            "val": 0
+                            },
+                            {
+                            "z": 12.5,
+                            "val": 0
+                            },
+                            {
+                            "z": 13.5,
+                            "val": 0.6
+                            },
+                            {
+                            "z": 22,
+                            "val": 0.6
+                            }
+                            ]
+                },
                 "road_street_casing": {
                 "color": "#d9d5c6",
                 "width": [
@@ -2471,29 +2700,9 @@ module.exports = {
                           "z": 22,
                           "val": 11
                           }
-                          ],
-                "opacity": [
-                            "stops",
-                            {
-                            "z": 0,
-                            "val": 0
-                            },
-                            {
-                            "z": 12.5,
-                            "val": 0
-                            },
-                            {
-                            "z": 13.5,
-                            "val": 0.6
-                            },
-                            {
-                            "z": 22,
-                            "val": 0.6
-                            }
-                            ]
+                          ]
                 },
-                "road_street": {
-                "color": "street",
+                "road_street_group": {
                 "opacity": [
                             "stops",
                             {
@@ -2512,7 +2721,10 @@ module.exports = {
                             "z": 22,
                             "val": 1
                             }
-                            ],
+                            ]
+                },
+                "road_street": {
+                "color": "street",
                 "width": [
                           "stops",
                           {
@@ -3083,8 +3295,7 @@ module.exports = {
                           }
                           ]
                 },
-                "bridge_street_casing": {
-                "color": "#d9d5c6",
+                "bridge_street_casing_group": {
                 "opacity": [
                             "stops",
                             {
@@ -3103,7 +3314,10 @@ module.exports = {
                             "z": 22,
                             "val": 0.6
                             }
-                            ],
+                            ]
+                },
+                "bridge_street_casing": {
+                "color": "#d9d5c6",
                 "width": [
                           "stops",
                           {
@@ -3144,8 +3358,7 @@ module.exports = {
                           }
                           ]
                 },
-                "bridge_street": {
-                "color": "street",
+                "bridge_street_group": {
                 "opacity": [
                             "stops",
                             {
@@ -3164,7 +3377,10 @@ module.exports = {
                             "z": 22,
                             "val": 1
                             }
-                            ],
+                            ]
+                },
+                "bridge_street": {
+                "color": "street",
                 "width": [
                           "stops",
                           {
@@ -3323,21 +3539,21 @@ module.exports = {
                           ]
                 },
                 "country_label": {
-                "color": "text",
+                "color": "country_text",
                 "stroke": [
                            1,
                            1,
                            1,
-                           0.8
+                           0.5
                            ]
                 },
                 "country_label_line": {
-                "color": "text",
+                "color": "country_text",
                 "width": 0.5,
                 "opacity": 0.5
                 },
                 "marine_label_1": {
-                "color": "text",
+                "color": "marine_text",
                 "stroke": [
                            1,
                            1,
@@ -3346,7 +3562,7 @@ module.exports = {
                            ]
                 },
                 "marine_label_2": {
-                "color": "text",
+                "color": "marine_text",
                 "stroke": [
                            1,
                            1,
@@ -3355,7 +3571,7 @@ module.exports = {
                            ]
                 },
                 "marine_label_3": {
-                "color": "text",
+                "color": "marine_text",
                 "stroke": [
                            1,
                            1,
@@ -3363,12 +3579,9 @@ module.exports = {
                            0.8
                            ]
                 },
-                "place_label_city_point": {
-                "color": "#333",
-                "radius": 2
-                },
-                "place_label_city": {
-                "color": "#333",
+                "state_label": {
+                "color": "#666",
+                "strokeWidth": 0.4,
                 "stroke": [
                            1,
                            1,
@@ -3379,24 +3592,123 @@ module.exports = {
                          "stops",
                          {
                          "z": 0,
+                         "val": 0
+                         },
+                         {
+                         "z": 3.99,
+                         "val": 0
+                         },
+                         {
+                         "z": 4,
                          "val": 10
                          },
                          {
-                         "z": 10,
-                         "val": 18
+                         "z": 9.99,
+                         "val": 16
                          },
                          {
-                         "z": 12,
-                         "val": 24
+                         "z": 10,
+                         "val": 0
+                         },
+                         {
+                         "z": 22,
+                         "val": 0
+                         }
+                         ]
+                },
+                "place_label_city_point": {
+                "color": "#4a4032",
+                "radius": 3,
+                "opacity": [
+                            "stops",
+                            {
+                            "z": 0,
+                            "val": 1
+                            },
+                            {
+                            "z": 5.99,
+                            "val": 1
+                            },
+                            {
+                            "z": 6,
+                            "val": 0
+                            },
+                            {
+                            "z": 22,
+                            "val": 0
+                            }
+                            ]
+                },
+                "place_label_city": {
+                "color": "#4a4032",
+                "strokeWidth": 0.4,
+                "stroke": [
+                           1,
+                           1,
+                           1,
+                           0.8
+                           ],
+                "size": [
+                         "stops",
+                         {
+                         "z": 0,
+                         "val": 0
+                         },
+                         {
+                         "z": 3.99,
+                         "val": 0
+                         },
+                         {
+                         "z": 4,
+                         "val": 10
+                         },
+                         {
+                         "z": 7,
+                         "val": 14
+                         },
+                         {
+                         "z": 14.99,
+                         "val": 20
+                         },
+                         {
+                         "z": 15,
+                         "val": 0
+                         },
+                         {
+                         "z": 22,
+                         "val": 0
                          }
                          ],
                 "translate": [
                               0,
-                              30
+                              [
+                               "stops",
+                               {
+                               "z": 0,
+                               "val": 10
+                               },
+                               {
+                               "z": 4,
+                               "val": 10
+                               },
+                               {
+                               "z": 6,
+                               "val": 30
+                               },
+                               {
+                               "z": 7,
+                               "val": 0
+                               },
+                               {
+                               "z": 22,
+                               "val": 0
+                               }
+                               ]
                               ]
                 },
                 "place_label_town": {
-                "color": "#333",
+                "color": "#635644",
+                "strokeWidth": 0.4,
                 "stroke": [
                            1,
                            1,
@@ -3424,7 +3736,8 @@ module.exports = {
                          ]
                 },
                 "place_label_village": {
-                "color": "#333",
+                "color": "#635644",
+                "strokeWidth": 0.4,
                 "stroke": [
                            1,
                            1,
@@ -3452,7 +3765,7 @@ module.exports = {
                          ]
                 },
                 "place_label_other": {
-                "color": "#633",
+                "color": "#7d6c55",
                 "stroke": [
                            1,
                            1,
@@ -3479,15 +3792,6 @@ module.exports = {
                          }
                          ]
                 },
-                "poi_label": {
-                "color": "#666",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.5
-                           ]
-                },
                 "road_label": {
                 "color": "#765",
                 "stroke": [
@@ -3513,7 +3817,16 @@ module.exports = {
                          ]
                 },
                 "water_label": {
-                "color": "text",
+                "color": "water_text",
+                "stroke": [
+                           1,
+                           1,
+                           1,
+                           0.75
+                           ]
+                },
+                "waterway_label": {
+                "color": "water_text",
                 "stroke": [
                            1,
                            1,
@@ -3522,23 +3835,144 @@ module.exports = {
                            ]
                 },
                 "poi_airport": {
-                "color": "text",
-                "image": "airport-12",
+                "color": "#666",
+                "image": "airport-12"
+                },
+                "poi_label_1": {
+                "color": "#444",
+                "stroke": [
+                           1,
+                           1,
+                           1,
+                           0.5
+                           ],
                 "translate": [
                               0,
-                              1
+                              24
                               ]
                 },
+                "poi_rail": {
+                "color": "#666",
+                "image": "rail-12",
+                "opacity": [
+                            "stops",
+                            {
+                            "z": 0,
+                            "val": 0
+                            },
+                            {
+                            "z": 16.75,
+                            "val": 0
+                            },
+                            {
+                            "z": 17,
+                            "val": 1
+                            },
+                            {
+                            "z": 22,
+                            "val": 1
+                            }
+                            ]
+                },
                 "poi_park": {
-                "color": "text",
+                "color": "#666",
                 "image": "park-12",
-                "translate": [
-                              0,
-                              1
-                              ]
+                "opacity": [
+                            "stops",
+                            {
+                            "z": 0,
+                            "val": 0
+                            },
+                            {
+                            "z": 15.75,
+                            "val": 0
+                            },
+                            {
+                            "z": 16,
+                            "val": 1
+                            },
+                            {
+                            "z": 22,
+                            "val": 1
+                            }
+                            ]
+                },
+                "poi_golf": {
+                "color": "#666",
+                "image": "golf-12",
+                "opacity": [
+                            "stops",
+                            {
+                            "z": 0,
+                            "val": 0
+                            },
+                            {
+                            "z": 15.75,
+                            "val": 0
+                            },
+                            {
+                            "z": 16,
+                            "val": 1
+                            },
+                            {
+                            "z": 22,
+                            "val": 1
+                            }
+                            ]
+                },
+                "poi_hospital": {
+                "color": "#666",
+                "image": "hospital-12",
+                "opacity": [
+                            "stops",
+                            {
+                            "z": 0,
+                            "val": 0
+                            },
+                            {
+                            "z": 16.75,
+                            "val": 0
+                            },
+                            {
+                            "z": 17,
+                            "val": 1
+                            },
+                            {
+                            "z": 22,
+                            "val": 1
+                            }
+                            ]
+                },
+                "poi_college": {
+                "color": "#666",
+                "image": "college-12",
+                "opacity": [
+                            "stops",
+                            {
+                            "z": 0,
+                            "val": 0
+                            },
+                            {
+                            "z": 16.75,
+                            "val": 0
+                            },
+                            {
+                            "z": 17,
+                            "val": 1
+                            },
+                            {
+                            "z": 22,
+                            "val": 1
+                            }
+                            ]
+                },
+                "contour_label": {
+                "color": "text",
+                "stroke": "#fff",
+                "size": 10
                 }
                 }
                 }
                 ],
-    "sprite": "/img/maki-sprite"
+    "sprite": "img/maki-sprite"
 };
