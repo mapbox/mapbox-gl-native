@@ -13,11 +13,15 @@
 
 using namespace llmr;
 
+Raster::Raster(Texturepool &texturepool)
+    : texturepool(texturepool)
+{}
+
 Raster::~Raster() {
     if (img && !textured) {
         free(img);
     } else if (textured) {
-        texturepool->removeTextureID(texture);
+        texturepool.removeTextureID(texture);
     }
 }
 
@@ -26,17 +30,14 @@ bool Raster::isLoaded() const {
     return loaded;
 }
 
-void Raster::load() {
+bool Raster::load(const std::string &data) {
     loadImage(data);
 
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        if (img) {
-            loaded = true;
-        }
+    std::lock_guard<std::mutex> lock(mtx);
+    if (img) {
+        loaded = true;
     }
-
-    data.clear();
+    return loaded;
 }
 
 struct Buffer {
@@ -154,9 +155,6 @@ void Raster::loadImage(const std::string& data) {
     }
 }
 
-void Raster::setTexturepool(Texturepool* new_texturepool) {
-    texturepool = new_texturepool;
-}
 
 void Raster::bind(bool linear) {
     if (!width || !height) {
@@ -164,8 +162,8 @@ void Raster::bind(bool linear) {
         return;
     }
 
-    if (img && !textured && texturepool) {
-        texture = texturepool->getTextureID();
+    if (img && !textured) {
+        texture = texturepool.getTextureID();
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

@@ -9,15 +9,18 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/geometry/glyph_atlas.hpp>
 
+
+#include <llmr/map/vector_tile_data.hpp>
+#include <llmr/map/raster_tile_data.hpp>
+
 using namespace llmr;
 
-Source::Source(Map &map, Painter &painter, Texturepool &texturepool,
+Source::Source(Map &map, Painter &painter,
                const char *url, Source::Type type, std::vector<uint32_t> zooms, uint32_t tile_size,
                uint32_t min_zoom, uint32_t max_zoom, bool enabled)
     : enabled(enabled),
       map(map),
       painter(painter),
-      texturepool(texturepool),
       type(type),
       zooms(zooms),
       url(url),
@@ -29,41 +32,47 @@ bool Source::update() {
     return updateTiles();
 }
 
-void Source::prepare_render(const TransformState &transform, bool is_baselayer) {
-    if (!enabled) return;
-
-    uint8_t i = 1;
-
-    for (Tile& tile : tiles) {
-        if (tile.data && tile.data->state == TileData::State::parsed) {
-            transform.matrixFor(tile.matrix, tile.id);
-            matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
-            tile.clip_id = i++;
-            if (is_baselayer) {
-                painter.drawClippingMask(tile.matrix, tile.clip_id);
-            }
+void Source::updateClipIDs(const std::map<Tile::ID, ClipID> &mapping) {
+    std::for_each(tiles.begin(), tiles.end(), [&mapping](Tile &tile) {
+        auto it = mapping.find(tile.id);
+        if (it != mapping.end()) {
+            tile.clip = it->second;
+        } else {
+            tile.clip = ClipID {};
         }
-    }
+    });
 }
 
-void Source::render(time animationTime) {
+size_t Source::prepareRender(const TransformState &transform) {
+    if (!enabled) return 0;
+
+    size_t masks = 0;
+    for (Tile& tile : tiles) {
+        transform.matrixFor(tile.matrix, tile.id);
+        matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
+        painter.drawClippingMask(tile.matrix, tile.clip);
+        masks++;
+    }
+
+    return masks;
+}
+
+void Source::render() {
     if (!enabled) return;
 
     for (const Tile& tile : tiles) {
         if (tile.data && tile.data->state == TileData::State::parsed) {
-            if (type == Type::raster) {
-                std::shared_ptr<Raster> raster = tile.data->raster;
-                if (raster && !raster->textured) {
-                    raster->setTexturepool(&texturepool);
-                    raster->beginFadeInTransition();
-                }
-                if (raster && raster->needsTransition()) {
-                    raster->updateTransitions(animationTime);
-                }
-            }
             painter.render(tile);
         }
     }
+}
+
+std::forward_list<Tile::ID> Source::getIDs() const {
+    std::forward_list<Tile::ID> ptrs;
+    std::transform(tiles.begin(), tiles.end(), std::front_inserter(ptrs), [](const Tile &tile) {
+        return tile.id;
+    });
+    return ptrs;
 }
 
 TileData::State Source::hasTile(const Tile::ID& id) {
@@ -111,11 +120,12 @@ TileData::State Source::addTile(const Tile::ID& id) {
 
         if (type == Source::Type::vector) {
             formed_url = util::sprintf<256>(url, normalized_id.z, normalized_id.x, normalized_id.y);
+            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, formed_url);
         } else {
             formed_url = util::sprintf<256>(url, normalized_id.z, normalized_id.x, normalized_id.y, (map.getState().getPixelRatio() > 1.0 ? "@2x" : ""));
+            new_tile.data = std::make_shared<RasterTileData>(normalized_id, map, formed_url);
         }
 
-        new_tile.data = std::make_shared<TileData>(normalized_id, map, formed_url, (type == Source::Type::raster));
         new_tile.data->request();
         tile_data.push_front(new_tile.data);
     }
@@ -245,7 +255,7 @@ bool Source::updateTiles() {
     // We're painting front-to-back, so we want to draw more detailed tiles first
     // before filling in other parts with lower zoom levels.
     tiles.sort([](const Tile & a, const Tile & b) {
-        return a.id.z > b.id.z;
+        return a.id.z < b.id.z;
     });
 
     // Remove all the expired pointers from the list.
