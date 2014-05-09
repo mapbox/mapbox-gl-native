@@ -22,6 +22,7 @@
 #include <llmr/util/string.hpp>
 #include <llmr/util/timer.hpp>
 #include <llmr/util/time.hpp>
+#include <llmr/util/clip_ids.hpp>
 
 using namespace llmr;
 
@@ -139,9 +140,14 @@ void Painter::prepareClippingMask() {
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 }
 
-void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id) {
+void Painter::drawClippingMask(const mat4& matrix, const ClipID &clip) {
     gl::group group("mask");
     plainShader->setMatrix(matrix);
+
+    GLint id = clip.mask.to_ulong();
+    GLuint mask = clipMask[clip.length];
+    glStencilFunc(GL_ALWAYS, id, mask);
+    glStencilMask(0xFF);
 
     Color background = map.getStyle().computed.background.color;
     background[0] *= map.getStyle().computed.background.opacity;
@@ -151,7 +157,6 @@ void Painter::drawClippingMask(const mat4& matrix, uint8_t clip_id) {
 
     plainShader->setColor(background);
 
-    glStencilFunc(GL_ALWAYS, clip_id, 0xFF);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
 
@@ -161,6 +166,11 @@ void Painter::finishClippingMask() {
     glStencilMask(0x0);
     gl::end_group();
 }
+
+void Painter::setCurrentSourceName(const std::string &name) {
+    currentSourceName = name;
+}
+
 
 void Painter::clear() {
     gl::group group("clear");
@@ -179,19 +189,23 @@ void Painter::render(const Tile& tile) {
     gl::group group(util::sprintf<32>("render %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
 
     assert(tile.data);
-    if (tile.data->state != TileData::State::parsed) {
-        return;
+    if (tile.data->state == TileData::State::parsed) {
+        matrix = tile.matrix;
+        GLint id = tile.clip.mask.to_ulong();
+        GLuint mask = clipMask[tile.clip.length];
+
+        glStencilFunc(GL_EQUAL, id, mask);
+
+        renderLayers(tile.data, map.getStyle().layers);
+    } else {
+        fprintf(stderr, "tile not parsed yet\n");
     }
 
     frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
 
-    matrix = tile.matrix;
-    glStencilFunc(GL_EQUAL, tile.clip_id, 0xFF);
-
-    renderLayers(tile.data, map.getStyle().layers);
-
     if (debug) {
-        renderDebug(tile.data);
+        renderDebugText(tile.data->debugBucket);
+        renderDebugFrame();
     }
 }
 
@@ -242,16 +256,10 @@ void Painter::renderLayer(const std::shared_ptr<TileData>& tile_data, const Laye
         // this layer and render it.
         auto bucket_it = map.getStyle().buckets.find(layer_desc.bucket_name);
         if (bucket_it != map.getStyle().buckets.end()) {
-            if (bucket_it->second.type == BucketType::Raster) {
-                if (tile_data && tile_data->raster) {
-                    renderRaster(layer_desc.name, tile_data);
-                }
-            } else {
-                auto databucket_it = tile_data->buckets.find(layer_desc.bucket_name);
-                if (databucket_it != tile_data->buckets.end()) {
-                    assert(databucket_it->second);
-                    databucket_it->second->render(*this, layer_desc.name, tile_data->id);
-                }
+            const BucketDescription &bucket = bucket_it->second;
+            // Only try to render the bucket if it draws data from the current source.
+            if (bucket.source_name == currentSourceName) {
+                tile_data->render(*this, layer_desc);
             }
         }
     }
@@ -271,8 +279,8 @@ void Painter::translateLayer(std::array<float, 2> translation, bool reverse) {
     }
 }
 
-void Painter::renderRaster(const std::string& layer_name, const std::shared_ptr<TileData>& tile_data) {
-    if (pass == Opaque) return;
+void Painter::renderRaster(RasterBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
+    if (pass == Translucent) return;
 
     auto raster_properties = map.getStyle().computed.rasters;
     auto raster_properties_it = raster_properties.find(layer_name);
@@ -283,15 +291,17 @@ void Painter::renderRaster(const std::string& layer_name, const std::shared_ptr<
 
     gl::group group(layer_name + " (raster)");
 
+    depthMask(false);
+
     useProgram(rasterShader->program);
     rasterShader->setMatrix(matrix);
-    rasterShader->setImage(0);
-    rasterShader->setOpacity(properties.opacity * tile_data->raster->opacity);
-    tile_data->raster->bind(true);
+    rasterShader->setOpacity(1);
+    // rasterShader->setOpacity(properties.opacity * tile_data->raster->opacity);
 
-    coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
-    glDepthRange(strata, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
+    glDepthRange(strata + strata_epsilon, 1.0f);
+    bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
+
+    depthMask(true);
 }
 
 void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
@@ -390,7 +400,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             patternShader->setPatternBottomRight({{ imagePos.br.x, imagePos.br.y }});
             patternShader->setColor(fill_color);
             patternShader->setMix(mix);
-            sprite->raster->bind(true);
+            sprite->raster.bind(true);
 
             // Draw the actual triangles into the color & stencil buffer.
             glDepthRange(strata + strata_epsilon, 1.0f);
@@ -579,7 +589,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
         pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
         pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
 
-        sprite->raster->bind(map.getState().isChanging());
+        sprite->raster.bind(map.getState().isChanging());
 
         const float pointSize = (properties.size ? properties.size : (imagePos.size.x / map.getState().getPixelRatio())) * 1.4142135623730951 * map.getState().getPixelRatio();
 #if defined(GL_ES_VERSION_2_0)
@@ -707,8 +717,35 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     translateLayer(properties.translate, true);
 }
 
-void Painter::renderDebug(const TileData::Ptr& tile_data) {
-    gl::group group("debug");
+void Painter::renderDebugText(DebugBucket& bucket) {
+    gl::group group("debug text");
+
+    glDisable(GL_DEPTH_TEST);
+
+    useProgram(plainShader->program);
+    plainShader->setMatrix(matrix);
+
+    // Draw white outline
+    plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
+    lineWidth(4.0f * map.getState().getPixelRatio());
+    bucket.drawLines(*plainShader);
+
+#ifndef GL_ES_VERSION_2_0
+    // Draw line "end caps"
+    glPointSize(2);
+    bucket.drawPoints(*plainShader);
+#endif
+
+    // Draw black text.
+    plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
+    lineWidth(2.0f * map.getState().getPixelRatio());
+    bucket.drawLines(*plainShader);
+
+    glEnable(GL_DEPTH_TEST);
+}
+
+void Painter::renderDebugFrame() {
+    gl::group group("debug frame");
 
     // Disable depth test and don't count this towards the depth buffer,
     // but *don't* disable stencil test, as we want to clip the red tile border
@@ -724,15 +761,6 @@ void Painter::renderDebug(const TileData::Ptr& tile_data) {
     lineWidth(4.0f * map.getState().getPixelRatio());
     glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index());
 
-    // draw debug info
-    tile_data->debugFontArray.bind(*plainShader, tile_data->debugFontBuffer, BUFFER_OFFSET(0));
-    plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
-    lineWidth(4.0f * map.getState().getPixelRatio());
-    glDrawArrays(GL_LINES, 0, (GLsizei)tile_data->debugFontBuffer.index());
-    plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
-    lineWidth(2.0f * map.getState().getPixelRatio());
-    glDrawArrays(GL_LINES, 0, (GLsizei)tile_data->debugFontBuffer.index());
-
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -741,7 +769,8 @@ void Painter::renderMatte() {
     glDisable(GL_DEPTH_TEST);
     glStencilFunc(GL_EQUAL, 0x0, 0xFF);
 
-    Color white = {{ 0.9, 0.9, 0.9, 1 }};
+    // Color white = {{ 0.9, 0.9, 0.9, 1 }};
+    Color white = {{ 1, 1, 0, 1 }};
 
     useProgram(plainShader->program);
     plainShader->setMatrix(nativeMatrix);
@@ -750,6 +779,41 @@ void Painter::renderMatte() {
     matteArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(white);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
+
+    glEnable(GL_DEPTH_TEST);
+}
+
+
+void Painter::renderDebugText(const std::vector<std::string> &strings) {
+    gl::group group("debug text");
+
+    glDisable(GL_DEPTH_TEST);
+    glStencilFunc(GL_ALWAYS, 0xFF, 0xFF);
+
+    useProgram(plainShader->program);
+    plainShader->setMatrix(nativeMatrix);
+
+    DebugFontBuffer debugFontBuffer;
+    int line = 25;
+    for (const std::string &str : strings) {
+        debugFontBuffer.addText(str.c_str(), 10, line, 0.75);
+        line += 20;
+    }
+
+    // draw debug info
+    VertexArrayObject debugFontArray;
+    debugFontArray.bind(*plainShader, debugFontBuffer, BUFFER_OFFSET(0));
+    plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
+    lineWidth(4.0f * map.getState().getPixelRatio());
+    glDrawArrays(GL_LINES, 0, (GLsizei)debugFontBuffer.index());
+#ifndef GL_ES_VERSION_2_0
+    glPointSize(2);
+    glDrawArrays(GL_POINTS, 0, (GLsizei)debugFontBuffer.index());
+#endif
+    plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
+    lineWidth(2.0f * map.getState().getPixelRatio());
+    glDrawArrays(GL_LINES, 0, (GLsizei)debugFontBuffer.index());
+
 
     glEnable(GL_DEPTH_TEST);
 }

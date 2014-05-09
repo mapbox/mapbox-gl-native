@@ -2,39 +2,21 @@
 #define LLMR_MAP_TILE_DATA
 
 #include <llmr/map/tile.hpp>
-#include <llmr/util/vec.hpp>
-#include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
-#include <llmr/geometry/debug_font_buffer.hpp>
-#include <llmr/geometry/vao.hpp>
-#include <llmr/map/vector_tile.hpp>
 #include <llmr/platform/platform.hpp>
-
-#include <llmr/renderer/bucket.hpp>
-
-#include <llmr/geometry/vertex_buffer.hpp>
-#include <llmr/geometry/elements_buffer.hpp>
-#include <llmr/geometry/fill_buffer.hpp>
-#include <llmr/geometry/line_buffer.hpp>
-#include <llmr/geometry/point_buffer.hpp>
-#include <llmr/geometry/text_buffer.hpp>
+#include <llmr/geometry/vao.hpp>
+#include <llmr/renderer/debug_bucket.hpp>
 
 #include <cstdint>
-#include <forward_list>
 #include <string>
-#include <vector>
-#include <map>
 #include <memory>
 #include <atomic>
 
 namespace llmr {
 
 class Map;
-class Raster;
+class Painter;
 class LayerDescription;
-class BucketDescription;
-
-class PlainShader;
 
 class TileData : public std::enable_shared_from_this<TileData>,
              private util::noncopyable {
@@ -55,47 +37,36 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, Map &map, const std::string url, const bool is_raster);
+    TileData(Tile::ID id, Map &map, const std::string url);
     ~TileData();
 
     void request();
-    void scheduleParsing();
-    void parse();
     void cancel();
-
+    void reparse();
     const std::string toString() const;
+
+    // Override this in the child class.
+    virtual void parse() = 0;
+    virtual void render(Painter &painter, const LayerDescription& layer_desc) = 0;
+
 
 public:
     const Tile::ID id;
     std::atomic<State> state;
-    std::shared_ptr<Raster> raster;
 
-    // Holds the actual geometries in this tile.
-    DebugFontBuffer debugFontBuffer;
-    VertexArrayObject debugFontArray;
-
-    FillVertexBuffer fillVertexBuffer;
-    LineVertexBuffer lineVertexBuffer;
-    PointVertexBuffer pointVertexBuffer;
-    TextVertexBuffer textVertexBuffer;
-
-    TriangleElementsBuffer triangleElementsBuffer;
-    LineElementsBuffer lineElementsBuffer;
-    PointElementsBuffer pointElementsBuffer;
-
-    // Holds the buckets of this tile.
-    // They contain the location offsets in the buffers stored above
-    std::map<std::string, std::unique_ptr<Bucket>> buckets;
-
-private:
-    const std::string url;
-    const bool is_raster = false;
-    std::string data;
-
+protected:
     Map &map;
 
-    // Stores a request that is in progress.
+    // Request-related information.
+    const std::string url;
     std::weak_ptr<platform::Request> req;
+    std::string data;
+
+    // Contains the tile ID string for painting debug information.
+    DebugFontBuffer debugFontBuffer;
+
+public:
+    DebugBucket debugBucket;
 };
 
 }

@@ -33,6 +33,9 @@ class PointBucket;
 class TextBucket;
 class RasterBucket;
 
+class LayerDescription;
+class RasterTileData;
+
 class Painter : private util::noncopyable {
 public:
     Painter(Map &map);
@@ -43,11 +46,15 @@ public:
     void changeMatrix();
     void render(const Tile& tile);
     void renderMatte();
+
+    void renderDebugFrame();
+    void renderDebugText(DebugBucket& bucket);
+    void renderDebugText(const std::vector<std::string> &strings);
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id);
-    void renderRaster(const std::string& layer_name, const std::shared_ptr<TileData>& tile_data);
+    void renderRaster(RasterBucket& bucket, const std::string& layer_name, const Tile::ID& id);
 
     void resize();
 
@@ -55,8 +62,10 @@ public:
     void setDebug(bool enabled);
 
     void prepareClippingMask();
-    void drawClippingMask(const mat4& matrix, uint8_t clip_id);
+    void drawClippingMask(const mat4& matrix, const ClipID& clip);
     void finishClippingMask();
+
+    void setCurrentSourceName(const std::string &name);
 
     bool needsAnimation() const;
 private:
@@ -64,7 +73,6 @@ private:
     void renderLayers(const std::shared_ptr<TileData>& tile, const std::vector<LayerDescription>& layers);
     void renderLayer(const std::shared_ptr<TileData>& tile_data, const LayerDescription& layer_desc);
     void translateLayer(std::array<float, 2> translation, bool reverse = false);
-    void renderDebug(const std::shared_ptr<TileData>& tile);
 
     void useProgram(uint32_t program);
     void lineWidth(float lineWidth);
@@ -90,6 +98,7 @@ private:
     float strata = 0;
     const float strata_epsilon = 1.0f / (1 << 16);
     enum { Opaque, Translucent } pass = Opaque;
+    std::string currentSourceName;
 
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;

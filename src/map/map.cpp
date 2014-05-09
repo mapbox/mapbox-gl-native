@@ -5,6 +5,9 @@
 #include <llmr/style/sprite.hpp>
 #include <llmr/util/transition.hpp>
 #include <llmr/util/time.hpp>
+#include <llmr/util/math.hpp>
+#include <llmr/util/clip_ids.hpp>
+#include <llmr/util/string.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -138,7 +141,6 @@ void Map::setup() {
     sources.emplace("mapbox streets",
                     std::unique_ptr<Source>(new Source(*this,
                            painter,
-                           texturepool,
                            "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf",
                            Source::Type::vector,
                            {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }},
@@ -150,7 +152,6 @@ void Map::setup() {
     sources.emplace("satellite",
                     std::unique_ptr<Source>(new Source(*this,
                            painter,
-                           texturepool,
                            "https://a.tiles.mapbox.com/v3/justin.hh0gkdfm/%d/%d/%d%s.png256",
                            Source::Type::raster,
                            {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }},
@@ -331,7 +332,11 @@ void Map::toggleRaster() {
 
         if (satellite_source.enabled) {
             satellite_source.enabled = false;
-            style.appliedClasses.erase(style.appliedClasses.find("satellite"));
+
+            auto style_class = style.appliedClasses.find("satellite");
+            if (style_class != style.appliedClasses.end()) {
+                style.appliedClasses.erase(style_class);
+            }
         } else {
             satellite_source.enabled = true;
             style.appliedClasses.insert("satellite");
@@ -346,6 +351,28 @@ void Map::updateTiles() {
         const std::unique_ptr<Source> &source = pair.second;
         if (source->enabled) {
             source->update();
+        }
+    }
+}
+
+
+
+void Map::updateClippingIDs() {
+    std::forward_list<Tile::ID> ids;
+
+    for (auto &pair : sources) {
+        const std::unique_ptr<Source> &source = pair.second;
+        if (source->enabled) {
+            ids.splice_after(ids.before_begin(), source->getIDs());
+        }
+    }
+
+    const std::map<Tile::ID, ClipID> clipIDs = computeClipIDs(ids);
+
+    for (auto &pair : sources) {
+        const std::unique_ptr<Source> &source = pair.second;
+        if (source->enabled) {
+            source->updateClipIDs(clipIDs);
         }
     }
 }
@@ -366,14 +393,14 @@ void Map::prepare() {
         style.sprite->load(kSpriteURL);
     }
 
-    if (style.sprite && style.sprite->raster->isLoaded() && !style.sprite->raster->textured) {
-        style.sprite->raster->setTexturepool(&texturepool);
-    }
-
     updateTiles();
+
+    updateClippingIDs();
 }
 
 void Map::render() {
+    std::vector<std::string> debug;
+
     painter.clear();
 
     painter.resize();
@@ -386,25 +413,29 @@ void Map::render() {
 
     painter.prepareClippingMask();
 
-    bool is_baselayer = true;
-
+    size_t source_id = 0;
     for (auto &pair : sources) {
         Source &source = *pair.second;
-        source.prepare_render(state, is_baselayer);
-        is_baselayer = source.enabled ? false : (true && is_baselayer);
+        size_t count = source.prepareRender(state);
+        debug.emplace_back(util::sprintf<100>("source %d: %d\n", source_id, count));
+        source_id++;
     }
 
     painter.finishClippingMask();
+
 
     // Then, render each source's tiles. TODO: handle more than one
     // vector source.
 
     for (auto &pair : sources) {
         Source &source = *pair.second;
-        source.render(animationTime);
+        painter.setCurrentSourceName(pair.first);
+        source.render();
     }
 
     painter.renderMatte();
+
+    painter.renderDebugText(debug);
 
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition()) {

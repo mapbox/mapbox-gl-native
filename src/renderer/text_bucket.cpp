@@ -14,8 +14,6 @@
 
 #include <iostream>
 
-#define BUFFER_OFFSET(i) ((char *) nullptr + (i))
-
 #include <cassert>
 
 using namespace llmr;

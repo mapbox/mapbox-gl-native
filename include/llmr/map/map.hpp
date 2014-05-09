@@ -94,6 +94,7 @@ public:
     inline GlyphAtlas &getGlyphAtlas() { return glyphAtlas; }
     inline uv_loop_t *getLoop() { return loop; }
     inline time getAnimationTime() const { return animationTime; }
+    inline Texturepool &getTexturepool() { return texturepool; }
 
 private:
     // uv async callbacks
@@ -106,6 +107,7 @@ private:
     void loadStyle(const uint8_t *const data, uint32_t bytes);
 
     void updateTiles();
+    void updateClippingIDs();
 
     // Prepares a map render by updating the tiles we need for the current view, as well as updating
     // the stylesheet.

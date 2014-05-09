@@ -3,16 +3,33 @@ set -e -u
 
 UNAME=$(uname -s);
 
+MISSING_DEPS=false
+
+function ensure_dep {
+    if [[ ! `which $1` ]]; then
+        MISSING_DEPS="$MISSING_DEPS $1"
+    fi
+}
+
+ensure_dep aclocal
+ensure_dep cmake
+ensure_dep automake
+ensure_dep autoconf
 if [ ${UNAME} = 'Darwin' ]; then
-    if [ ! `which aclocal` ] || [ ! `which automake` ] || [ ! `which autoconf` ] || [ ! `which glibtool` ]; then
-        echo 'autotools commands not found: run "brew install autoconf automake libtool" before continuing'
-        exit 1
-    fi
+    ensure_dep makedepend
+    ensure_dep glibtool
 elif [ ${UNAME} = 'Linux' ]; then
-    if [ ! `which aclocal` ] || [ ! `which automake` ] || [ ! `which autoconf` ] || [ ! `which libtool` ]; then
-        echo 'autotools commands not found: run "sudo apt-get install automake libtool xutils-dev" before continuing'
-        exit 1
+    ensure_dep libtool
+    ensure_dep gccmakedep
+fi
+
+if [[ $MISSING_DEPS != false ]]; then
+    if [ ${UNAME} = 'Darwin' ]; then
+        echo 'Please run "brew install autoconf automake libtool makedependc cmake" and then re-run ./setup-libraries.sh'
+    elif [ ${UNAME} = 'Linux' ]; then
+        echo 'Please run "sudo apt-get install automake libtool xutils-dev cmake" and then re-run ./setup-libraries.sh'
     fi
+    exit 1
 fi
 
 if [ ! -d 'mapnik-packaging/.git' ]; then

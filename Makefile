@@ -75,6 +75,10 @@ lproj: config.gypi linux/llmr-app.gyp clear_xcode_cache
 clean:
 	-rm -rf ./build/Release
 	-rm -rf ./build/Debug
+	-rm -f include/llmr/shader/shaders.hpp
+	-rm -f include/llmr/style/resources.hpp
+	-rm -f src/style/resources.cpp
+	-rm -rf ~/Library/Developer/Xcode/DerivedData/llmr*
 
 distclean: clean
 	-rm -rf ./build
