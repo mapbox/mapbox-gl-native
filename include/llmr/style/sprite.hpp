@@ -5,6 +5,7 @@
 #include <string>
 #include <mutex>
 #include <memory>
+#include <atomic>
 
 #include <llmr/util/raster.hpp>
 #include <llmr/util/vec.hpp>
