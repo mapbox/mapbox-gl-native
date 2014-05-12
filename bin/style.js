@@ -133,9 +133,9 @@ module.exports = {
         "landuse_industrial": {
             "source": "outdoors",
             "layer": "landuse",
+            "type": "fill",
             "field": "class",
-            "value": "industrial",
-            "type": "fill"
+            "value": "industrial"
         },
         "landuse_school": {
             "source": "outdoors",
@@ -892,7 +892,7 @@ module.exports = {
                   },
                   {
                   "name": "landuse_industrial",
-                  "bucket": "landuse_indusrial"
+                  "bucket": "landuse_industrial"
                   },
                   {
                   "name": "landuse_school",
@@ -1518,6 +1518,9 @@ module.exports = {
                 "landuse_pitch": {
                 "color": "rgba(255,255,255,0.5)",
                 "stroke": "pitch"
+                },
+                "landuse_industrial": {
+                "color": "builtup"
                 },
                 "overlay_wetland": {
                 "color": "#e1e9d3",
