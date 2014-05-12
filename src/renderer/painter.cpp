@@ -210,17 +210,13 @@ void Painter::prepareTile(const Tile& tile) {
 }
 
 void Painter::renderTileLayer(const Tile& tile, const LayerDescription &layer_desc) {
-    gl::group group(util::sprintf<32>("render %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
-
     assert(tile.data);
-    if (tile.data->state == TileData::State::parsed) {
+    if (tile.data->hasData(layer_desc)) {
+        gl::group group(util::sprintf<32>("render %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
         prepareTile(tile);
         tile.data->render(*this, layer_desc);
-    } else {
-        fprintf(stderr, "tile not parsed yet\n");
+        frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
     }
-
-    frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
 }
 
 void Painter::renderTileDebug(const Tile& tile) {
@@ -272,7 +268,7 @@ void Painter::renderRaster(RasterBucket& bucket, const std::string& layer_name, 
 
 void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
     // Abort early.
-    if (bucket.empty()) return;
+    if (!bucket.hasData()) return;
 
     auto fill_properties = map.getStyle().computed.fills;
     auto fill_properties_it = fill_properties.find(layer_name);
@@ -410,7 +406,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
     // Abort early.
     if (pass == Opaque) return;
-    if (bucket.empty()) return;
+    if (!bucket.hasData()) return;
 
     auto line_properties = map.getStyle().computed.lines;
     auto line_properties_it = line_properties.find(layer_name);
@@ -496,7 +492,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 
 void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& /*id&*/) {
     // Abort early.
-    if (!bucket.hasPoints()) return;
+    if (!bucket.hasData()) return;
     if (pass == Opaque) return;
 
     auto point_properties = map.getStyle().computed.points;
@@ -571,7 +567,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
 void Painter::renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
     // Abort early.
     if (pass == Opaque) return;
-    if (bucket.empty()) return;
+    if (!bucket.hasData()) return;
 
     auto text_properties = map.getStyle().computed.texts;
     auto text_properties_it = text_properties.find(layer_name);

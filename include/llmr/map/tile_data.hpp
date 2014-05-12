@@ -48,6 +48,7 @@ public:
     // Override this in the child class.
     virtual void parse() = 0;
     virtual void render(Painter &painter, const LayerDescription& layer_desc) = 0;
+    virtual bool hasData(const LayerDescription& layer_desc) const = 0;
 
 
 public:

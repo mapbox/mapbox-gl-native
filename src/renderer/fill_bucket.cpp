@@ -206,8 +206,8 @@ void FillBucket::render(Painter& painter, const std::string& layer_name, const T
     painter.renderFill(*this, layer_name, id);
 }
 
-bool FillBucket::empty() const {
-    return triangleGroups.empty() && lineGroups.empty();
+bool FillBucket::hasData() const {
+    return !triangleGroups.empty() || !lineGroups.empty();
 }
 
 void FillBucket::drawElements(PlainShader& shader) {

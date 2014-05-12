@@ -41,3 +41,15 @@ void VectorTileData::render(Painter &painter, const LayerDescription& layer_desc
         databucket_it->second->render(painter, layer_desc.name, id);
     }
 }
+
+bool VectorTileData::hasData(const LayerDescription& layer_desc) const {
+    if (state != State::parsed) return false;
+
+    auto databucket_it = buckets.find(layer_desc.bucket_name);
+    if (databucket_it != buckets.end()) {
+        assert(databucket_it->second);
+        return databucket_it->second->hasData();
+    } else {
+        return false;
+    }
+}

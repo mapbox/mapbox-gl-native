@@ -28,3 +28,7 @@ void RasterTileData::parse() {
 void RasterTileData::render(Painter &painter, const LayerDescription& layer_desc) {
     bucket.render(painter, layer_desc.name, id);
 }
+
+bool RasterTileData::hasData(const LayerDescription& layer_desc) const {
+    return bucket.hasData();
+}

@@ -348,8 +348,8 @@ void LineBucket::render(Painter& painter, const std::string& layer_name, const T
     painter.renderLine(*this, layer_name, id);
 }
 
-bool LineBucket::empty() const {
-    return triangleGroups.empty();
+bool LineBucket::hasData() const {
+    return !triangleGroups.empty() || !pointGroups.empty();
 }
 
 bool LineBucket::hasPoints() const {

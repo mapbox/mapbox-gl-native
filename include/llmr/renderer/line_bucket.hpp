@@ -28,11 +28,11 @@ public:
                const BucketDescription& bucket_desc);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
+    virtual bool hasData() const;
 
     void addGeometry(pbf& data);
     void addGeometry(const std::vector<Coordinate>& line);
 
-    bool empty() const;
     bool hasPoints() const;
 
     void drawLines(LineShader& shader);
