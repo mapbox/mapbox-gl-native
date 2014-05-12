@@ -189,6 +189,13 @@ module.exports = {
             "value": "full_highlight",
             "type": "fill"
         },
+        "contour_line_5": {
+            "source": "outdoors",
+            "layer": "contour",
+            "field": "index",
+            "value": 5,
+            "type": "line"
+        },
         "contour_line_10": {
             "source": "outdoors",
             "layer": "contour",
@@ -896,6 +903,10 @@ module.exports = {
                   "bucket": "contour_line_10"
                   },
                   {
+                  "name": "contour_line_5",
+                  "bucket": "contour_line_5"
+                  },
+                  {
                   "name": "contour_line_other",
                   "bucket": "contour_line_other"
                   },
@@ -1358,8 +1369,8 @@ module.exports = {
                 "admin_level_3": {
                 "color": "#88a",
                 "dasharray": [
-                              30,
-                              5
+                              60,
+                              20
                               ],
                 "width": [
                           "stops",
@@ -1594,26 +1605,49 @@ module.exports = {
                             }
                             ]
                 },
-                "contour_line_10": {
+                "contour_line_5": {
                 "color": "#008",
-                "width": 1.2,
+                "width": 0.9,
                 "opacity": [
                             "stops",
                             {
                             "z": 0,
-                            "val": 0.06
+                            "val": 0.05
                             },
                             {
                             "z": 12,
-                            "val": 0.06
+                            "val": 0.05
                             },
                             {
                             "z": 13,
-                            "val": 0.12
+                            "val": 0.11
                             },
                             {
                             "z": 22,
-                            "val": 0.12
+                            "val": 0.11
+                            }
+                            ]
+                },
+                "contour_line_10": {
+                "color": "#008",
+                "width": 0.9,
+                "opacity": [
+                            "stops",
+                            {
+                            "z": 0,
+                            "val": 0.05
+                            },
+                            {
+                            "z": 12,
+                            "val": 0.05
+                            },
+                            {
+                            "z": 13,
+                            "val": 0.11
+                            },
+                            {
+                            "z": 22,
+                            "val": 0.11
                             }
                             ]
                 },
@@ -1624,19 +1658,19 @@ module.exports = {
                             "stops",
                             {
                             "z": 0,
-                            "val": 0.06
+                            "val": 0.05
                             },
                             {
                             "z": 12,
-                            "val": 0.06
+                            "val": 0.05
                             },
                             {
                             "z": 13,
-                            "val": 0.12
+                            "val": 0.11
                             },
                             {
                             "z": 22,
-                            "val": 0.12
+                            "val": 0.11
                             }
                             ]
                 },
@@ -2794,8 +2828,8 @@ module.exports = {
                 "road_path_footway": {
                 "color": "#bba",
                 "dasharray": [
-                              4,
-                              2
+                              10,
+                              4
                               ],
                 "width": [
                           "stops",
@@ -2820,8 +2854,8 @@ module.exports = {
                 "road_path_path": {
                 "color": "#987",
                 "dasharray": [
-                              6,
-                              2
+                              10,
+                              4
                               ],
                 "opacity": 0.8,
                 "width": [
@@ -2847,8 +2881,8 @@ module.exports = {
                 "road_path_cycleway": {
                 "color": "#488",
                 "dasharray": [
-                              4,
-                              2
+                              10,
+                              4
                               ],
                 "width": [
                           "stops",
@@ -2925,8 +2959,8 @@ module.exports = {
                 "road_path_steps": {
                 "color": "#bba",
                 "dasharray": [
-                              4,
-                              2
+                              10,
+                              4
                               ],
                 "width": 4
                 },
