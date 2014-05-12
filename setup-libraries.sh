@@ -3,7 +3,7 @@ set -e -u
 
 UNAME=$(uname -s);
 
-MISSING_DEPS=false
+MISSING_DEPS=""
 
 function ensure_dep {
     if [[ ! `which $1` ]]; then
@@ -15,6 +15,7 @@ ensure_dep aclocal
 ensure_dep cmake
 ensure_dep automake
 ensure_dep autoconf
+ensure_dep pkg-config
 if [ ${UNAME} = 'Darwin' ]; then
     ensure_dep makedepend
     ensure_dep glibtool
@@ -23,11 +24,13 @@ elif [ ${UNAME} = 'Linux' ]; then
     ensure_dep gccmakedep
 fi
 
-if [[ $MISSING_DEPS != false ]]; then
+if [[ $MISSING_DEPS != "" ]]; then
     if [ ${UNAME} = 'Darwin' ]; then
-        echo 'Please run "brew install autoconf automake libtool makedepend cmake" and then re-run ./setup-libraries.sh'
+        echo "Missing build deps: ${MISSING_DEPS}"
+        echo 'Please run "brew install autoconf automake libtool makedepend cmake pkg-config" and then re-run ./setup-libraries.sh'
     elif [ ${UNAME} = 'Linux' ]; then
-        echo 'Please run "sudo apt-get install automake libtool xutils-dev cmake" and then re-run ./setup-libraries.sh'
+        echo "Missing build deps: ${MISSING_DEPS}"
+        echo 'Please run "sudo apt-get install automake libtool xutils-dev cmake pkg-config" and then re-run ./setup-libraries.sh'
     fi
     exit 1
 fi
