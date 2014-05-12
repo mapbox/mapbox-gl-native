@@ -151,13 +151,6 @@ module.exports = {
             "value": "wetland",
             "type": "fill"
         },
-        "overlay_wetland_noveg": {
-            "source": "outdoors",
-            "layer": "landuse_overlay",
-            "field": "class",
-            "value": "wetland_noveg",
-            "type": "fill"
-        },
         "overlay_breakwater_pier": {
             "source": "outdoors",
             "layer": "landuse_overlay",
@@ -195,6 +188,13 @@ module.exports = {
             "field": "class",
             "value": "full_highlight",
             "type": "fill"
+        },
+        "contour_line_5": {
+            "source": "outdoors",
+            "layer": "contour",
+            "field": "index",
+            "value": 5,
+            "type": "line"
         },
         "contour_line_10": {
             "source": "outdoors",
@@ -600,38 +600,14 @@ module.exports = {
             "type": "line",
             "enabled": 3
         },
-        "marine_label_1": {
+        "marine_label": {
             "source": "outdoors",
             "layer": "marine_label",
-            "field": "labelrank",
-            "value": 1,
-            "feature_type": "line",
-            "type": "text",
-            "text_field": "name",
-            "path": "curve",
-            "fontSize": 22
-        },
-        "marine_label_2": {
-            "source": "outdoors",
-            "layer": "marine_label",
-            "field": "labelrank",
-            "value": 2,
             "feature_type": "line",
             "type": "text",
             "text_field": "name",
             "path": "curve",
             "fontSize": 16
-        },
-        "marine_label_3": {
-            "source": "outdoors",
-            "layer": "marine_label",
-            "field": "labelrank",
-            "value": 3,
-            "feature_type": "line",
-            "type": "text",
-            "text_field": "name",
-            "path": "curve",
-            "fontSize": 14
         },
         "state_label": {
             "source": "outdoors",
@@ -903,10 +879,6 @@ module.exports = {
                   "bucket": "overlay_wetland"
                   },
                   {
-                  "name": "overlay_wetland_noveg",
-                  "bucket": "overlay_wetland_noveg"
-                  },
-                  {
                   "name": "overlay_breakwater_pier",
                   "bucket": "overlay_breakwater_pier"
                   },
@@ -929,6 +901,10 @@ module.exports = {
                   {
                   "name": "contour_line_10",
                   "bucket": "contour_line_10"
+                  },
+                  {
+                  "name": "contour_line_5",
+                  "bucket": "contour_line_5"
                   },
                   {
                   "name": "contour_line_other",
@@ -1239,16 +1215,8 @@ module.exports = {
                   "bucket": "country_label"
                   },
                   {
-                  "name": "marine_label_1",
-                  "bucket": "marine_label_1"
-                  },
-                  {
-                  "name": "marine_label_2",
-                  "bucket": "marine_label_2"
-                  },
-                  {
-                  "name": "marine_label_3",
-                  "bucket": "marine_label_3"
+                  "name": "marine_label",
+                  "bucket": "marine_label"
                   },
                   {
                   "name": "state_label",
@@ -1401,8 +1369,8 @@ module.exports = {
                 "admin_level_3": {
                 "color": "#88a",
                 "dasharray": [
-                              30,
-                              5
+                              60,
+                              20
                               ],
                 "width": [
                           "stops",
@@ -1524,10 +1492,6 @@ module.exports = {
                 },
                 "overlay_wetland": {
                 "color": "#e1e9d3",
-                "image": "wetland_64"
-                },
-                "overlay_wetland_noveg": {
-                "color": "#e1e9d3",
                 "image": "wetland_noveg_64"
                 },
                 "overlay_breakwater_pier": {
@@ -1641,26 +1605,49 @@ module.exports = {
                             }
                             ]
                 },
-                "contour_line_10": {
+                "contour_line_5": {
                 "color": "#008",
-                "width": 1.2,
+                "width": 0.9,
                 "opacity": [
                             "stops",
                             {
                             "z": 0,
-                            "val": 0.06
+                            "val": 0.05
                             },
                             {
                             "z": 12,
-                            "val": 0.06
+                            "val": 0.05
                             },
                             {
                             "z": 13,
-                            "val": 0.12
+                            "val": 0.11
                             },
                             {
                             "z": 22,
-                            "val": 0.12
+                            "val": 0.11
+                            }
+                            ]
+                },
+                "contour_line_10": {
+                "color": "#008",
+                "width": 0.9,
+                "opacity": [
+                            "stops",
+                            {
+                            "z": 0,
+                            "val": 0.05
+                            },
+                            {
+                            "z": 12,
+                            "val": 0.05
+                            },
+                            {
+                            "z": 13,
+                            "val": 0.11
+                            },
+                            {
+                            "z": 22,
+                            "val": 0.11
                             }
                             ]
                 },
@@ -1671,19 +1658,19 @@ module.exports = {
                             "stops",
                             {
                             "z": 0,
-                            "val": 0.06
+                            "val": 0.05
                             },
                             {
                             "z": 12,
-                            "val": 0.06
+                            "val": 0.05
                             },
                             {
                             "z": 13,
-                            "val": 0.12
+                            "val": 0.11
                             },
                             {
                             "z": 22,
-                            "val": 0.12
+                            "val": 0.11
                             }
                             ]
                 },
@@ -2841,8 +2828,8 @@ module.exports = {
                 "road_path_footway": {
                 "color": "#bba",
                 "dasharray": [
-                              4,
-                              2
+                              10,
+                              4
                               ],
                 "width": [
                           "stops",
@@ -2867,8 +2854,8 @@ module.exports = {
                 "road_path_path": {
                 "color": "#987",
                 "dasharray": [
-                              6,
-                              2
+                              10,
+                              4
                               ],
                 "opacity": 0.8,
                 "width": [
@@ -2894,8 +2881,8 @@ module.exports = {
                 "road_path_cycleway": {
                 "color": "#488",
                 "dasharray": [
-                              4,
-                              2
+                              10,
+                              4
                               ],
                 "width": [
                           "stops",
@@ -2972,8 +2959,8 @@ module.exports = {
                 "road_path_steps": {
                 "color": "#bba",
                 "dasharray": [
-                              4,
-                              2
+                              10,
+                              4
                               ],
                 "width": 4
                 },
@@ -3559,32 +3546,9 @@ module.exports = {
                 "width": 0.5,
                 "opacity": 0.5
                 },
-                "marine_label_1": {
+                "marine_label": {
                 "color": "marine_text",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.8
-                           ]
-                },
-                "marine_label_2": {
-                "color": "marine_text",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.8
-                           ]
-                },
-                "marine_label_3": {
-                "color": "marine_text",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.8
-                           ]
+                "stroke": "water"
                 },
                 "state_label": {
                 "color": "#666",
