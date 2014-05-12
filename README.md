@@ -39,6 +39,8 @@ Because `libpng` isn't included in the iOS SDK, you will need to build a cross-a
 yourself. Run `./setup-libraries.sh`, which is derived from Mapnik's cross-architecture build
 scripts. This will also run `./configure`.
 
+Then, `make iproj` to create and open an Xcode project with an iOS-specific view controller housing and basic gesture support. 
+
 Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina).
 
 ## Ubuntu
