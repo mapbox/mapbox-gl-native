@@ -2067,6 +2067,19 @@ module.exports = {
                 "opacity": 0.25
             },
         }
+    }, {
+        "name": "satellite",
+        "layers": {
+            "building": {
+                "enabled": false,
+            },
+            "building_wall": {
+                "enabled": false,
+            },
+            "building_shadow": {
+                "enabled": false,
+            },
+        }
     }],
     "sprite": "/img/maki-sprite"
 };

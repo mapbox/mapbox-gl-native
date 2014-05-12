@@ -17,6 +17,7 @@ public:
 
     virtual void parse();
     virtual void render(Painter &painter, const LayerDescription& layer_desc);
+    virtual bool hasData(const LayerDescription& layer_desc) const;
 
 protected:
     RasterBucket bucket;

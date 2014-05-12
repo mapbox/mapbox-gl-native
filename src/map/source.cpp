@@ -48,6 +48,7 @@ size_t Source::prepareRender(const TransformState &transform) {
 
     size_t masks = 0;
     for (Tile& tile : tiles) {
+        gl::group group(util::sprintf<32>("mask %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
         transform.matrixFor(tile.matrix, tile.id);
         matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
         painter.drawClippingMask(tile.matrix, tile.clip);
@@ -57,15 +58,24 @@ size_t Source::prepareRender(const TransformState &transform) {
     return masks;
 }
 
-void Source::render() {
+void Source::render(const LayerDescription& layer_desc, const BucketDescription &bucket_desc) {
     if (!enabled) return;
 
     for (const Tile& tile : tiles) {
         if (tile.data && tile.data->state == TileData::State::parsed) {
-            painter.render(tile);
+            painter.renderTileLayer(tile, layer_desc);
         }
     }
 }
+
+void Source::finishRender() {
+    if (!enabled) return;
+
+    for (const Tile& tile : tiles) {
+        painter.renderTileDebug(tile);
+    }
+}
+
 
 std::forward_list<Tile::ID> Source::getIDs() const {
     std::forward_list<Tile::ID> ptrs;

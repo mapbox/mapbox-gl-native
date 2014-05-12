@@ -27,6 +27,7 @@ public:
 
     virtual void parse();
     virtual void render(Painter &painter, const LayerDescription& layer_desc);
+    virtual bool hasData(const LayerDescription& layer_desc) const;
 
 protected:
     // Holds the actual geometries in this tile.

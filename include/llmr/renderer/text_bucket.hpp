@@ -29,8 +29,8 @@ public:
         TriangleElementsBuffer &triangleElementsBuffer,
         const BucketDescription &bucket_desc, Placement &placement);
 
-    virtual void render(Painter &painter, const std::string &layer_name,
-                        const Tile::ID &id);
+    virtual void render(Painter &painter, const std::string &layer_name, const Tile::ID &id);
+    virtual bool hasData() const;
 
     void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
                    PlacementRange placementRange, float zoom);
@@ -38,8 +38,6 @@ public:
     void addFeature(const VectorTileFeature &feature,
                     const IndexedFaces &faces,
                     const std::map<Value, Shaping> &shapings);
-
-    bool empty() const;
 
     void drawGlyphs(TextShader &shader);
 

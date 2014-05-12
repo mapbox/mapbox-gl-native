@@ -115,6 +115,8 @@ private:
 
     // Unconditionally performs a render with the current map state.
     void render();
+    void renderLayers(const std::vector<LayerDescription>& layers);
+    void renderLayer(const LayerDescription& layer_desc);
 
 private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*

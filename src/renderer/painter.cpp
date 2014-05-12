@@ -141,7 +141,6 @@ void Painter::prepareClippingMask() {
 }
 
 void Painter::drawClippingMask(const mat4& matrix, const ClipID &clip) {
-    gl::group group("mask");
     plainShader->setMatrix(matrix);
 
     GLint id = clip.mask.to_ulong();
@@ -167,11 +166,6 @@ void Painter::finishClippingMask() {
     gl::end_group();
 }
 
-void Painter::setCurrentSourceName(const std::string &name) {
-    currentSourceName = name;
-}
-
-
 void Painter::clear() {
     gl::group group("clear");
     glStencilMask(0xFF);
@@ -185,83 +179,53 @@ void Painter::clear() {
 #endif
 }
 
-void Painter::render(const Tile& tile) {
-    gl::group group(util::sprintf<32>("render %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
-
-    assert(tile.data);
-    if (tile.data->state == TileData::State::parsed) {
-        matrix = tile.matrix;
-        GLint id = tile.clip.mask.to_ulong();
-        GLuint mask = clipMask[tile.clip.length];
-
-        glStencilFunc(GL_EQUAL, id, mask);
-
-        renderLayers(tile.data, map.getStyle().layers);
-    } else {
-        fprintf(stderr, "tile not parsed yet\n");
-    }
-
-    frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
-
-    if (debug) {
-        renderDebugText(tile.data->debugBucket);
-        renderDebugFrame();
-    }
-}
-
-void Painter::renderLayers(const std::shared_ptr<TileData>& tile_data, const std::vector<LayerDescription>& layers) {
-    float strata_thickness = 1.0f / (layers.size() + 1);
-
-    // - FIRST PASS ------------------------------------------------------------
-    // Render everything top-to-bottom by using reverse iterators. Render opaque
-    // objects first.
+void Painter::startOpaquePass() {
     gl::start_group("opaque pass");
     pass = Opaque;
     glDisable(GL_BLEND);
     depthMask(true);
+}
 
-    typedef std::vector<LayerDescription>::const_reverse_iterator riterator;
-    int i = 0;
-    for (riterator it = layers.rbegin(), end = layers.rend(); it != end; ++it, ++i) {
-        strata = i * strata_thickness;
-        renderLayer(tile_data, *it);
-    }
-    gl::end_group();
-
-    // - SECOND PASS -----------------------------------------------------------
-    // Make a second pass, rendering translucent objects. This time, we render
-    // bottom-to-top.
+void Painter::startTranslucentPass() {
     gl::start_group("translucent pass");
     pass = Translucent;
     glEnable(GL_BLEND);
     depthMask(false);
+}
 
-    typedef std::vector<LayerDescription>::const_iterator iterator;
-    --i;
-    for (iterator it = layers.begin(), end = layers.end(); it != end; ++it, --i) {
-        strata = i * strata_thickness;
-        renderLayer(tile_data, *it);
-    }
+void Painter::endPass() {
     gl::end_group();
 }
 
-void Painter::renderLayer(const std::shared_ptr<TileData>& tile_data, const LayerDescription& layer_desc) {
-    if (layer_desc.child_layer.size()) {
-        // This is a layer group.
-        // TODO: create framebuffer
-        renderLayers(tile_data, layer_desc.child_layer);
-        // TODO: render framebuffer on previous framebuffer
-    } else {
-        // This is a singular layer. Try to find the bucket associated with
-        // this layer and render it.
-        auto bucket_it = map.getStyle().buckets.find(layer_desc.bucket_name);
-        if (bucket_it != map.getStyle().buckets.end()) {
-            const BucketDescription &bucket = bucket_it->second;
-            // Only try to render the bucket if it draws data from the current source.
-            if (bucket.source_name == currentSourceName) {
-                tile_data->render(*this, layer_desc);
-            }
-        }
+void Painter::setStrata(float value) {
+    strata = value;
+}
+
+void Painter::prepareTile(const Tile& tile) {
+    matrix = tile.matrix;
+
+    GLint id = (GLint)tile.clip.mask.to_ulong();
+    GLuint mask = clipMask[tile.clip.length];
+    glStencilFunc(GL_EQUAL, id, mask);
+}
+
+void Painter::renderTileLayer(const Tile& tile, const LayerDescription &layer_desc) {
+    assert(tile.data);
+    if (tile.data->hasData(layer_desc)) {
+        gl::group group(util::sprintf<32>("render %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
+        prepareTile(tile);
+        tile.data->render(*this, layer_desc);
+        frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
+    }
+}
+
+void Painter::renderTileDebug(const Tile& tile) {
+    gl::group group(util::sprintf<32>("debug %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
+    assert(tile.data);
+    if (debug) {
+        prepareTile(tile);
+        renderDebugText(tile.data->debugBucket);
+        renderDebugFrame();
     }
 }
 
@@ -289,8 +253,6 @@ void Painter::renderRaster(RasterBucket& bucket, const std::string& layer_name, 
     const RasterProperties& properties = raster_properties_it->second;
     if (!properties.enabled) return;
 
-    gl::group group(layer_name + " (raster)");
-
     depthMask(false);
 
     useProgram(rasterShader->program);
@@ -306,7 +268,7 @@ void Painter::renderRaster(RasterBucket& bucket, const std::string& layer_name, 
 
 void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
     // Abort early.
-    if (bucket.empty()) return;
+    if (!bucket.hasData()) return;
 
     auto fill_properties = map.getStyle().computed.fills;
     auto fill_properties_it = fill_properties.find(layer_name);
@@ -336,7 +298,6 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
     translateLayer(properties.translate);
 
-    gl::group group(layer_name + " (fill)");
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (outline && pass == Translucent) {
@@ -445,7 +406,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
     // Abort early.
     if (pass == Opaque) return;
-    if (bucket.empty()) return;
+    if (!bucket.hasData()) return;
 
     auto line_properties = map.getStyle().computed.lines;
     auto line_properties_it = line_properties.find(layer_name);
@@ -473,7 +434,6 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 
     translateLayer(properties.translate);
 
-    gl::group group(layer_name + " (line)");
     glDepthRange(strata, 1.0f);
 
     // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
@@ -532,7 +492,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 
 void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& /*id&*/) {
     // Abort early.
-    if (!bucket.hasPoints()) return;
+    if (!bucket.hasData()) return;
     if (pass == Opaque) return;
 
     auto point_properties = map.getStyle().computed.points;
@@ -543,8 +503,6 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     if (!properties.enabled) return;
 
     translateLayer(properties.translate);
-
-    gl::group group(layer_name + " (point)");
 
     Color color = properties.color;
     color[0] *= properties.opacity;
@@ -609,7 +567,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
 void Painter::renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
     // Abort early.
     if (pass == Opaque) return;
-    if (bucket.empty()) return;
+    if (!bucket.hasData()) return;
 
     auto text_properties = map.getStyle().computed.texts;
     auto text_properties_it = text_properties.find(layer_name);
@@ -619,8 +577,6 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     if (!properties.enabled) return;
 
     translateLayer(properties.translate);
-
-    gl::group group(layer_name + " (text)");
 
     mat4 exMatrix;
     matrix::copy(exMatrix, projMatrix);

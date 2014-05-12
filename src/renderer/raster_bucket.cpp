@@ -21,3 +21,7 @@ void RasterBucket::drawRaster(RasterShader& shader, VertexBuffer &vertices, Vert
     array.bind(shader, vertices, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index());
 }
+
+bool RasterBucket::hasData() const {
+    return raster.isLoaded();
+}

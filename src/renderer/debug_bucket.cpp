@@ -18,6 +18,10 @@ void DebugBucket::render(Painter& painter, const std::string& /*layer_name*/, co
     painter.renderDebugText(*this);
 }
 
+bool DebugBucket::hasData() const {
+    return fontBuffer.index() > 0;
+}
+
 void DebugBucket::drawLines(PlainShader& shader) {
     array.bind(shader, fontBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_LINES, 0, (GLsizei)(fontBuffer.index()));

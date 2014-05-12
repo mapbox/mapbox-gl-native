@@ -146,7 +146,9 @@ void TextBucket::render(Painter &painter, const std::string &layer_name,
     painter.renderText(*this, layer_name, id);
 }
 
-bool TextBucket::empty() const { return triangleGroups.empty(); }
+bool TextBucket::hasData() const {
+    return !triangleGroups.empty();
+}
 
 void TextBucket::drawGlyphs(TextShader &shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);

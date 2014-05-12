@@ -22,6 +22,7 @@ public:
     DebugBucket(DebugFontBuffer& fontBuffer);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
+    virtual bool hasData() const;
 
     void drawLines(PlainShader& shader);
     void drawPoints(PlainShader& shader);

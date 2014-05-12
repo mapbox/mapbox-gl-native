@@ -423,14 +423,18 @@ void Map::render() {
 
     painter.finishClippingMask();
 
+    // Render per layer in the stylesheet.
+    renderLayers(style.layers);
 
-    // Then, render each source's tiles. TODO: handle more than one
-    // vector source.
-
+    // Finalize the rendering, e.g. by calling debug render calls per tile.
+    // This guarantees that we have at least one function per tile called.
+    // When only rendering layers via the stylesheet, it's possible that we don't
+    // ever visit a tile during rendering.
     for (auto &pair : sources) {
         Source &source = *pair.second;
-        painter.setCurrentSourceName(pair.first);
-        source.render();
+        const std::string &name = pair.first;
+        gl::group group(std::string("debug ") + name);
+        source.finishRender();
     }
 
     painter.renderMatte();
@@ -440,5 +444,59 @@ void Map::render() {
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition()) {
         update();
+    }
+}
+
+void Map::renderLayers(const std::vector<LayerDescription>& layers) {
+    // TODO: Correctly compute the number of layers recursively beforehand.
+    float strata_thickness = 1.0f / (layers.size() + 1);
+
+    // - FIRST PASS ------------------------------------------------------------
+    // Render everything top-to-bottom by using reverse iterators. Render opaque
+    // objects first.
+    painter.startOpaquePass();
+    typedef std::vector<LayerDescription>::const_reverse_iterator riterator;
+    int i = 0;
+    for (riterator it = layers.rbegin(), end = layers.rend(); it != end; ++it, ++i) {
+        painter.setStrata(i * strata_thickness);
+        renderLayer(*it);
+    }
+    painter.endPass();
+
+    // - SECOND PASS -----------------------------------------------------------
+    // Make a second pass, rendering translucent objects. This time, we render
+    // bottom-to-top.
+    painter.startTranslucentPass();
+    typedef std::vector<LayerDescription>::const_iterator iterator;
+    --i;
+    for (iterator it = layers.begin(), end = layers.end(); it != end; ++it, --i) {
+        painter.setStrata(i * strata_thickness);
+        renderLayer(*it);
+    }
+    painter.endPass();
+}
+
+void Map::renderLayer(const LayerDescription& layer_desc) {
+    gl::group group(std::string("layer: ") + layer_desc.name);
+
+    if (layer_desc.child_layer.size()) {
+        // This is a layer group.
+        // TODO: create framebuffer
+        renderLayers(layer_desc.child_layer);
+        // TODO: render framebuffer on previous framebuffer
+    } else {
+        // This is a singular layer. Try to find the bucket associated with
+        // this layer and render it.
+        auto bucket_it = style.buckets.find(layer_desc.bucket_name);
+        if (bucket_it != style.buckets.end()) {
+            const BucketDescription &bucket_desc = bucket_it->second;
+
+            // Find the source and render all tiles in it.
+            auto source_it = sources.find(bucket_desc.source_name);
+            if (source_it != sources.end()) {
+                const std::unique_ptr<Source> &source = source_it->second;
+                source->render(layer_desc, bucket_desc);
+            }
+        }
     }
 }

@@ -41,7 +41,7 @@ void PointBucket::render(Painter& painter, const std::string& layer_name, const 
     painter.renderPoint(*this, layer_name, id);
 }
 
-bool PointBucket::hasPoints() const {
+bool PointBucket::hasData() const {
     return vertex_end > 0;
 }
 
