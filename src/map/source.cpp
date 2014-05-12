@@ -61,6 +61,7 @@ size_t Source::prepareRender(const TransformState &transform) {
 void Source::render(const LayerDescription& layer_desc, const BucketDescription &bucket_desc) {
     if (!enabled) return;
 
+    gl::group group(std::string("layer: ") + layer_desc.name);
     for (const Tile& tile : tiles) {
         if (tile.data && tile.data->state == TileData::State::parsed) {
             painter.renderTileLayer(tile, layer_desc);
