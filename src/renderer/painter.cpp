@@ -141,7 +141,6 @@ void Painter::prepareClippingMask() {
 }
 
 void Painter::drawClippingMask(const mat4& matrix, const ClipID &clip) {
-    gl::group group("mask");
     plainShader->setMatrix(matrix);
 
     GLint id = clip.mask.to_ulong();
@@ -205,7 +204,7 @@ void Painter::setStrata(float value) {
 void Painter::prepareTile(const Tile& tile) {
     matrix = tile.matrix;
 
-    GLint id = tile.clip.mask.to_ulong();
+    GLint id = (GLint)tile.clip.mask.to_ulong();
     GLuint mask = clipMask[tile.clip.length];
     glStencilFunc(GL_EQUAL, id, mask);
 }
@@ -225,6 +224,7 @@ void Painter::renderTileLayer(const Tile& tile, const LayerDescription &layer_de
 }
 
 void Painter::renderTileDebug(const Tile& tile) {
+    gl::group group(util::sprintf<32>("debug %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
     assert(tile.data);
     if (debug) {
         prepareTile(tile);
@@ -256,8 +256,6 @@ void Painter::renderRaster(RasterBucket& bucket, const std::string& layer_name, 
 
     const RasterProperties& properties = raster_properties_it->second;
     if (!properties.enabled) return;
-
-    gl::group group(layer_name + " (raster)");
 
     depthMask(false);
 
@@ -304,7 +302,6 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
     translateLayer(properties.translate);
 
-    gl::group group(layer_name + " (fill)");
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (outline && pass == Translucent) {
@@ -441,7 +438,6 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 
     translateLayer(properties.translate);
 
-    gl::group group(layer_name + " (line)");
     glDepthRange(strata, 1.0f);
 
     // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
@@ -511,8 +507,6 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     if (!properties.enabled) return;
 
     translateLayer(properties.translate);
-
-    gl::group group(layer_name + " (point)");
 
     Color color = properties.color;
     color[0] *= properties.opacity;
@@ -587,8 +581,6 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     if (!properties.enabled) return;
 
     translateLayer(properties.translate);
-
-    gl::group group(layer_name + " (text)");
 
     mat4 exMatrix;
     matrix::copy(exMatrix, projMatrix);

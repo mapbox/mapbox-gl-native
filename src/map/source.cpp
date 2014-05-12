@@ -48,6 +48,7 @@ size_t Source::prepareRender(const TransformState &transform) {
 
     size_t masks = 0;
     for (Tile& tile : tiles) {
+        gl::group group(util::sprintf<32>("mask %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
         transform.matrixFor(tile.matrix, tile.id);
         matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
         painter.drawClippingMask(tile.matrix, tile.clip);

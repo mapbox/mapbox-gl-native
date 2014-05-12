@@ -432,6 +432,8 @@ void Map::render() {
     // ever visit a tile during rendering.
     for (auto &pair : sources) {
         Source &source = *pair.second;
+        const std::string &name = pair.first;
+        gl::group group(std::string("debug ") + name);
         source.finishRender();
     }
 
@@ -475,6 +477,8 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers) {
 }
 
 void Map::renderLayer(const LayerDescription& layer_desc) {
+    gl::group group(std::string("layer: ") + layer_desc.name);
+
     if (layer_desc.child_layer.size()) {
         // This is a layer group.
         // TODO: create framebuffer
