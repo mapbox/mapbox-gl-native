@@ -151,13 +151,6 @@ module.exports = {
             "value": "wetland",
             "type": "fill"
         },
-        "overlay_wetland_noveg": {
-            "source": "outdoors",
-            "layer": "landuse_overlay",
-            "field": "class",
-            "value": "wetland_noveg",
-            "type": "fill"
-        },
         "overlay_breakwater_pier": {
             "source": "outdoors",
             "layer": "landuse_overlay",
@@ -600,38 +593,14 @@ module.exports = {
             "type": "line",
             "enabled": 3
         },
-        "marine_label_1": {
+        "marine_label": {
             "source": "outdoors",
             "layer": "marine_label",
-            "field": "labelrank",
-            "value": 1,
-            "feature_type": "line",
-            "type": "text",
-            "text_field": "name",
-            "path": "curve",
-            "fontSize": 22
-        },
-        "marine_label_2": {
-            "source": "outdoors",
-            "layer": "marine_label",
-            "field": "labelrank",
-            "value": 2,
             "feature_type": "line",
             "type": "text",
             "text_field": "name",
             "path": "curve",
             "fontSize": 16
-        },
-        "marine_label_3": {
-            "source": "outdoors",
-            "layer": "marine_label",
-            "field": "labelrank",
-            "value": 3,
-            "feature_type": "line",
-            "type": "text",
-            "text_field": "name",
-            "path": "curve",
-            "fontSize": 14
         },
         "state_label": {
             "source": "outdoors",
@@ -901,10 +870,6 @@ module.exports = {
                   {
                   "name": "overlay_wetland",
                   "bucket": "overlay_wetland"
-                  },
-                  {
-                  "name": "overlay_wetland_noveg",
-                  "bucket": "overlay_wetland_noveg"
                   },
                   {
                   "name": "overlay_breakwater_pier",
@@ -1239,16 +1204,8 @@ module.exports = {
                   "bucket": "country_label"
                   },
                   {
-                  "name": "marine_label_1",
-                  "bucket": "marine_label_1"
-                  },
-                  {
-                  "name": "marine_label_2",
-                  "bucket": "marine_label_2"
-                  },
-                  {
-                  "name": "marine_label_3",
-                  "bucket": "marine_label_3"
+                  "name": "marine_label",
+                  "bucket": "marine_label"
                   },
                   {
                   "name": "state_label",
@@ -1523,10 +1480,6 @@ module.exports = {
                 "color": "builtup"
                 },
                 "overlay_wetland": {
-                "color": "#e1e9d3",
-                "image": "wetland_64"
-                },
-                "overlay_wetland_noveg": {
                 "color": "#e1e9d3",
                 "image": "wetland_noveg_64"
                 },
@@ -3559,32 +3512,9 @@ module.exports = {
                 "width": 0.5,
                 "opacity": 0.5
                 },
-                "marine_label_1": {
+                "marine_label": {
                 "color": "marine_text",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.8
-                           ]
-                },
-                "marine_label_2": {
-                "color": "marine_text",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.8
-                           ]
-                },
-                "marine_label_3": {
-                "color": "marine_text",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.8
-                           ]
+                "stroke": "water"
                 },
                 "state_label": {
                 "color": "#666",
