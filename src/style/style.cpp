@@ -123,6 +123,14 @@ void Style::cascade(float z) {
     }
 }
 
+size_t Style::layerCount() const {
+    size_t count = 0;
+    for (const LayerDescription &layer : layers) {
+        count += layer.size();
+    }
+    return count;
+}
+
 void Style::loadJSON(const uint8_t *const data, size_t bytes) {
     rapidjson::Document doc;
 

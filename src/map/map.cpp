@@ -423,8 +423,27 @@ void Map::render() {
 
     painter.finishClippingMask();
 
+
+
     // Render per layer in the stylesheet.
-    renderLayers(style.layers);
+    strata_thickness = 1.0f / (style.layerCount() + 1);
+    strata = 0;
+
+    // - FIRST PASS ------------------------------------------------------------
+    // Render everything top-to-bottom by using reverse iterators. Render opaque
+    // objects first.
+    painter.startOpaquePass();
+    renderLayers(style.layers, Opaque);
+    painter.endPass();
+
+    // - SECOND PASS -----------------------------------------------------------
+    // Make a second pass, rendering translucent objects. This time, we render
+    // bottom-to-top.
+    --strata;
+    painter.startTranslucentPass();
+    renderLayers(style.layers, Translucent);
+    painter.endPass();
+
 
     // Finalize the rendering, e.g. by calling debug render calls per tile.
     // This guarantees that we have at least one function per tile called.
@@ -447,42 +466,30 @@ void Map::render() {
     }
 }
 
-void Map::renderLayers(const std::vector<LayerDescription>& layers) {
-    // TODO: Correctly compute the number of layers recursively beforehand.
-    float strata_thickness = 1.0f / (layers.size() + 1);
-
-    // - FIRST PASS ------------------------------------------------------------
-    // Render everything top-to-bottom by using reverse iterators. Render opaque
-    // objects first.
-    painter.startOpaquePass();
-    typedef std::vector<LayerDescription>::const_reverse_iterator riterator;
-    int i = 0;
-    for (riterator it = layers.rbegin(), end = layers.rend(); it != end; ++it, ++i) {
-        painter.setStrata(i * strata_thickness);
-        renderLayer(*it);
+void Map::renderLayers(const std::vector<LayerDescription>& layers, RenderPass pass) {
+    if (pass == Opaque) {
+        typedef std::vector<LayerDescription>::const_reverse_iterator riterator;
+        for (riterator it = layers.rbegin(), end = layers.rend(); it != end; ++it, ++strata) {
+            painter.setStrata(strata * strata_thickness);
+            renderLayer(*it, pass);
+        }
+    } else if (pass == Translucent) {
+        typedef std::vector<LayerDescription>::const_iterator iterator;
+        for (iterator it = layers.begin(), end = layers.end(); it != end; ++it, --strata) {
+            painter.setStrata(strata * strata_thickness);
+            renderLayer(*it, pass);
+        }
+    } else {
+        throw std::runtime_error("unknown render pass");
     }
-    painter.endPass();
-
-    // - SECOND PASS -----------------------------------------------------------
-    // Make a second pass, rendering translucent objects. This time, we render
-    // bottom-to-top.
-    painter.startTranslucentPass();
-    typedef std::vector<LayerDescription>::const_iterator iterator;
-    --i;
-    for (iterator it = layers.begin(), end = layers.end(); it != end; ++it, --i) {
-        painter.setStrata(i * strata_thickness);
-        renderLayer(*it);
-    }
-    painter.endPass();
 }
 
-void Map::renderLayer(const LayerDescription& layer_desc) {
-    gl::group group(std::string("layer: ") + layer_desc.name);
-
+void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
     if (layer_desc.child_layer.size()) {
+        gl::group group(std::string("group: ") + layer_desc.name);
         // This is a layer group.
         // TODO: create framebuffer
-        renderLayers(layer_desc.child_layer);
+        renderLayers(layer_desc.child_layer, pass);
         // TODO: render framebuffer on previous framebuffer
     } else {
         // This is a singular layer. Try to find the bucket associated with
@@ -490,6 +497,20 @@ void Map::renderLayer(const LayerDescription& layer_desc) {
         auto bucket_it = style.buckets.find(layer_desc.bucket_name);
         if (bucket_it != style.buckets.end()) {
             const BucketDescription &bucket_desc = bucket_it->second;
+
+            // Abort early if we can already deduce from the bucket type that
+            // we're not going to render anything anyway during this pass.
+            switch (bucket_desc.type) {
+                case BucketType::Line:
+                case BucketType::Point:
+                case BucketType::Text:
+                    if (pass == Opaque) return;
+                    break;
+                case BucketType::Raster:
+                    if (pass == Translucent) return;
+                default:
+                    break;
+            }
 
             // Find the source and render all tiles in it.
             auto source_it = sources.find(bucket_desc.source_name);

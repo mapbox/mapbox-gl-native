@@ -109,14 +109,18 @@ private:
     void updateTiles();
     void updateClippingIDs();
 
+    size_t countLayers(const std::vector<LayerDescription>& layers);
+
     // Prepares a map render by updating the tiles we need for the current view, as well as updating
     // the stylesheet.
     void prepare();
 
+    enum RenderPass { Opaque, Translucent };
+
     // Unconditionally performs a render with the current map state.
     void render();
-    void renderLayers(const std::vector<LayerDescription>& layers);
-    void renderLayer(const LayerDescription& layer_desc);
+    void renderLayers(const std::vector<LayerDescription>& layers, RenderPass pass);
+    void renderLayer(const LayerDescription& layer_desc, RenderPass pass);
 
 private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
@@ -145,6 +149,8 @@ private:
 
     bool debug = false;
     time animationTime = 0;
+    float strata_thickness = 0.0f;
+    int strata = 0;
 
 private:
     bool async = false;
