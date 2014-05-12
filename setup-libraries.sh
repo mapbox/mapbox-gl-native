@@ -25,7 +25,7 @@ fi
 
 if [[ $MISSING_DEPS != false ]]; then
     if [ ${UNAME} = 'Darwin' ]; then
-        echo 'Please run "brew install autoconf automake libtool makedependc cmake" and then re-run ./setup-libraries.sh'
+        echo 'Please run "brew install autoconf automake libtool makedepend cmake" and then re-run ./setup-libraries.sh'
     elif [ ${UNAME} = 'Linux' ]; then
         echo 'Please run "sudo apt-get install automake libtool xutils-dev cmake" and then re-run ./setup-libraries.sh'
     fi
