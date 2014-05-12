@@ -167,11 +167,6 @@ void Painter::finishClippingMask() {
     gl::end_group();
 }
 
-void Painter::setCurrentSourceName(const std::string &name) {
-    currentSourceName = name;
-}
-
-
 void Painter::clear() {
     gl::group group("clear");
     glStencilMask(0xFF);
@@ -185,83 +180,56 @@ void Painter::clear() {
 #endif
 }
 
-void Painter::render(const Tile& tile) {
+void Painter::startOpaquePass() {
+    gl::start_group("opaque pass");
+    pass = Opaque;
+    glDisable(GL_BLEND);
+    depthMask(true);
+}
+
+void Painter::startTranslucentPass() {
+    gl::start_group("translucent pass");
+    pass = Translucent;
+    glEnable(GL_BLEND);
+    depthMask(false);
+}
+
+void Painter::endPass() {
+    gl::end_group();
+}
+
+void Painter::setStrata(float value) {
+    strata = value;
+}
+
+void Painter::prepareTile(const Tile& tile) {
+    matrix = tile.matrix;
+
+    GLint id = tile.clip.mask.to_ulong();
+    GLuint mask = clipMask[tile.clip.length];
+    glStencilFunc(GL_EQUAL, id, mask);
+}
+
+void Painter::renderTileLayer(const Tile& tile, const LayerDescription &layer_desc) {
     gl::group group(util::sprintf<32>("render %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
 
     assert(tile.data);
     if (tile.data->state == TileData::State::parsed) {
-        matrix = tile.matrix;
-        GLint id = tile.clip.mask.to_ulong();
-        GLuint mask = clipMask[tile.clip.length];
-
-        glStencilFunc(GL_EQUAL, id, mask);
-
-        renderLayers(tile.data, map.getStyle().layers);
+        prepareTile(tile);
+        tile.data->render(*this, layer_desc);
     } else {
         fprintf(stderr, "tile not parsed yet\n");
     }
 
     frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
+}
 
+void Painter::renderTileDebug(const Tile& tile) {
+    assert(tile.data);
     if (debug) {
+        prepareTile(tile);
         renderDebugText(tile.data->debugBucket);
         renderDebugFrame();
-    }
-}
-
-void Painter::renderLayers(const std::shared_ptr<TileData>& tile_data, const std::vector<LayerDescription>& layers) {
-    float strata_thickness = 1.0f / (layers.size() + 1);
-
-    // - FIRST PASS ------------------------------------------------------------
-    // Render everything top-to-bottom by using reverse iterators. Render opaque
-    // objects first.
-    gl::start_group("opaque pass");
-    pass = Opaque;
-    glDisable(GL_BLEND);
-    depthMask(true);
-
-    typedef std::vector<LayerDescription>::const_reverse_iterator riterator;
-    int i = 0;
-    for (riterator it = layers.rbegin(), end = layers.rend(); it != end; ++it, ++i) {
-        strata = i * strata_thickness;
-        renderLayer(tile_data, *it);
-    }
-    gl::end_group();
-
-    // - SECOND PASS -----------------------------------------------------------
-    // Make a second pass, rendering translucent objects. This time, we render
-    // bottom-to-top.
-    gl::start_group("translucent pass");
-    pass = Translucent;
-    glEnable(GL_BLEND);
-    depthMask(false);
-
-    typedef std::vector<LayerDescription>::const_iterator iterator;
-    --i;
-    for (iterator it = layers.begin(), end = layers.end(); it != end; ++it, --i) {
-        strata = i * strata_thickness;
-        renderLayer(tile_data, *it);
-    }
-    gl::end_group();
-}
-
-void Painter::renderLayer(const std::shared_ptr<TileData>& tile_data, const LayerDescription& layer_desc) {
-    if (layer_desc.child_layer.size()) {
-        // This is a layer group.
-        // TODO: create framebuffer
-        renderLayers(tile_data, layer_desc.child_layer);
-        // TODO: render framebuffer on previous framebuffer
-    } else {
-        // This is a singular layer. Try to find the bucket associated with
-        // this layer and render it.
-        auto bucket_it = map.getStyle().buckets.find(layer_desc.bucket_name);
-        if (bucket_it != map.getStyle().buckets.end()) {
-            const BucketDescription &bucket = bucket_it->second;
-            // Only try to render the bucket if it draws data from the current source.
-            if (bucket.source_name == currentSourceName) {
-                tile_data->render(*this, layer_desc);
-            }
-        }
     }
 }
 

@@ -36,7 +36,8 @@ public:
 
     bool update();
     size_t prepareRender(const TransformState &transform);
-    void render();
+    void render(const LayerDescription& layer_desc, const BucketDescription &bucket_desc);
+    void finishRender();
 
     std::forward_list<Tile::ID> getIDs() const;
     void updateClipIDs(const std::map<Tile::ID, ClipID> &mapping);

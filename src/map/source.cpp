@@ -57,15 +57,24 @@ size_t Source::prepareRender(const TransformState &transform) {
     return masks;
 }
 
-void Source::render() {
+void Source::render(const LayerDescription& layer_desc, const BucketDescription &bucket_desc) {
     if (!enabled) return;
 
     for (const Tile& tile : tiles) {
         if (tile.data && tile.data->state == TileData::State::parsed) {
-            painter.render(tile);
+            painter.renderTileLayer(tile, layer_desc);
         }
     }
 }
+
+void Source::finishRender() {
+    if (!enabled) return;
+
+    for (const Tile& tile : tiles) {
+        painter.renderTileDebug(tile);
+    }
+}
+
 
 std::forward_list<Tile::ID> Source::getIDs() const {
     std::forward_list<Tile::ID> ptrs;
