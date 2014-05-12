@@ -1532,6 +1532,7 @@ module.exports = {
                 },
                 "hillshade_full_shadow": {
                 "color": "#103",
+                "stroke": "rgba(0,0,0,0)",
                 "opacity": [
                             "stops",
                             {
@@ -1558,6 +1559,7 @@ module.exports = {
                 },
                 "hillshade_medium_shadow": {
                 "color": "#206",
+                "stroke": "rgba(0,0,0,0)",
                 "opacity": [
                             "stops",
                             {
@@ -1584,6 +1586,7 @@ module.exports = {
                 },
                 "hillshade_full_highlight": {
                 "color": "#ffd",
+                "stroke": "rgba(0,0,0,0)",
                 "opacity": [
                             "stops",
                             {
@@ -1610,6 +1613,7 @@ module.exports = {
                 },
                 "hillshade_medium_highlight": {
                 "color": "#ffb",
+                "stroke": "rgba(0,0,0,0)",
                 "opacity": [
                             "stops",
                             {
