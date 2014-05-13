@@ -97,6 +97,7 @@ void Style::cascade(float z) {
             text.enabled = layer.enabled.evaluate<bool>(z);
             text.translate = {{ layer.translate[0].evaluate<float>(z),
                                 layer.translate[1].evaluate<float>(z) }};
+            text.translateAnchor = layer.translateAnchor;
             text.color = layer.color;
             text.size = layer.size.evaluate<float>(z);
             text.halo = layer.halo;

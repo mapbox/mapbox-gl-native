@@ -523,6 +523,18 @@ PointClass StyleParser::parsePointClass(JSVal value) {
     return klass;
 }
 
+TranslateAnchor parseTranslateAnchor(JSVal anchor) {
+    if (anchor.IsString()) {
+        std::string a { anchor.GetString(), anchor.GetStringLength() };
+        if (a == "viewport") {
+            return TranslateAnchor::Viewport;
+        } else {
+            return TranslateAnchor::Map;
+        }
+    } else {
+        throw Style::exception("translate anchor must be a string");
+    }
+}
 
 TextClass StyleParser::parseTextClass(JSVal value) {
     TextClass klass;
@@ -534,6 +546,10 @@ TextClass StyleParser::parseTextClass(JSVal value) {
     if (value.HasMember("translate")) {
         std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+    }
+
+    if (value.HasMember("translate-anchor")) {
+        klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
     }
 
     if (value.HasMember("color")) {

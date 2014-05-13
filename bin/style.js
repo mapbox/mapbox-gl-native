@@ -3831,7 +3831,8 @@ module.exports = {
                 "translate": [
                               0,
                               24
-                              ]
+                              ],
+                "translate-anchor": "viewport"
                 },
                 "poi_rail": {
                 "color": "#666",
