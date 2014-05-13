@@ -69,7 +69,7 @@ private:
     const int32_t min_zoom;
     const int32_t max_zoom;
 
-    std::forward_list<Tile> tiles;
+    std::map<Tile::ID, std::unique_ptr<Tile>> tiles;
     std::map<Tile::ID, std::weak_ptr<TileData>> tile_data;
 };
 
