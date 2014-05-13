@@ -1462,19 +1462,24 @@ module.exports = {
                           ]
                 },
                 "landcover_wood": {
-                "color": "wood"
+                "color": "wood",
+                "opacity": 0.8
                 },
                 "landcover_scrub": {
-                "color": "scrub"
+                "color": "scrub",
+                "opacity": 0.8
                 },
                 "landcover_grass": {
-                "color": "grass"
+                "color": "grass",
+                "opacity": 0.8
                 },
                 "landcover_crop": {
-                "color": "crop"
+                "color": "crop",
+                "opacity": 0.8
                 },
                 "landcover_snow": {
-                "color": "snow"
+                "color": "snow",
+                "opacity": 0.8
                 },
                 "landuse_park": {
                 "color": "park"
