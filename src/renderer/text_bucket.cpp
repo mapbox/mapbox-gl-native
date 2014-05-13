@@ -4,7 +4,6 @@
 #include <llmr/geometry/geometry.hpp>
 
 #include <llmr/renderer/painter.hpp>
-#include <llmr/shader/text_shader.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/text/placement.hpp>

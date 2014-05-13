@@ -36,6 +36,19 @@ MBXViewController *viewController = nullptr;
 
 #pragma mark - Setup
 
+- (id)init
+{
+    self = [super init];
+
+    if (self)
+    {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState) name:UIApplicationWillEnterForegroundNotification object:nil];
+    }
+
+    return self;
+}
+
 - (void)loadView
 {
     [super loadView];
@@ -77,11 +90,29 @@ MBXViewController *viewController = nullptr;
 
     // Load settings
     settings = new llmr::Settings_NSUserDefaults();
-    map->setLonLatZoom(settings->longitude, settings->latitude, settings->zoom);
-    map->setAngle(settings->angle);
-    map->setDebug(settings->debug);
+    [self restoreState];
 }
 
+- (void)saveState
+{
+    if (map && settings)
+    {
+        map->getLonLatZoom(settings->longitude, settings->latitude, settings->zoom);
+        settings->angle = map->getAngle();
+        settings->debug = map->getDebug();
+        settings->save();
+    }
+}
+
+- (void)restoreState
+{
+    if (map && settings) {
+        settings->load();
+        map->setLonLatZoom(settings->longitude, settings->latitude, settings->zoom);
+        map->setAngle(settings->angle);
+        map->setDebug(settings->debug);
+    }
+}
 
 - (void)setupInteraction
 {
@@ -234,16 +265,12 @@ MBXViewController *viewController = nullptr;
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
     if (settings)
     {
         // Save settings
-        if (map)
-        {
-            map->getLonLatZoom(settings->longitude, settings->latitude, settings->zoom);
-            settings->angle = map->getAngle();
-            settings->debug = map->getDebug();
-            settings->save();
-        }
+        [self saveState];
         delete settings;
         settings = nullptr;
     }

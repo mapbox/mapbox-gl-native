@@ -7,6 +7,7 @@
 #include <llmr/util/string.hpp>
 #include <llmr/util/texturepool.hpp>
 #include <llmr/util/vec.hpp>
+#include <llmr/util/std.hpp>
 #include <llmr/geometry/glyph_atlas.hpp>
 
 
@@ -33,7 +34,8 @@ bool Source::update() {
 }
 
 void Source::updateClipIDs(const std::map<Tile::ID, ClipID> &mapping) {
-    std::for_each(tiles.begin(), tiles.end(), [&mapping](Tile &tile) {
+    std::for_each(tiles.begin(), tiles.end(), [&mapping](std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
+        Tile &tile = *pair.second;
         auto it = mapping.find(tile.id);
         if (it != mapping.end()) {
             tile.clip = it->second;
@@ -47,7 +49,8 @@ size_t Source::prepareRender(const TransformState &transform) {
     if (!enabled) return 0;
 
     size_t masks = 0;
-    for (Tile& tile : tiles) {
+    for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
+        Tile &tile = *pair.second;
         gl::group group(util::sprintf<32>("mask %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
         transform.matrixFor(tile.matrix, tile.id);
         matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
@@ -62,7 +65,8 @@ void Source::render(const LayerDescription& layer_desc, const BucketDescription 
     if (!enabled) return;
 
     gl::group group(std::string("layer: ") + layer_desc.name);
-    for (const Tile& tile : tiles) {
+    for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
+        Tile &tile = *pair.second;
         if (tile.data && tile.data->state == TileData::State::parsed) {
             painter.renderTileLayer(tile, layer_desc);
         }
@@ -72,7 +76,8 @@ void Source::render(const LayerDescription& layer_desc, const BucketDescription 
 void Source::finishRender() {
     if (!enabled) return;
 
-    for (const Tile& tile : tiles) {
+    for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
+        Tile &tile = *pair.second;
         painter.renderTileDebug(tile);
     }
 }
@@ -80,14 +85,18 @@ void Source::finishRender() {
 
 std::forward_list<Tile::ID> Source::getIDs() const {
     std::forward_list<Tile::ID> ptrs;
-    std::transform(tiles.begin(), tiles.end(), std::front_inserter(ptrs), [](const Tile &tile) {
+
+    std::transform(tiles.begin(), tiles.end(), std::front_inserter(ptrs), [](const std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
+        Tile &tile = *pair.second;
         return tile.id;
     });
     return ptrs;
 }
 
 TileData::State Source::hasTile(const Tile::ID& id) {
-    for (const Tile& tile : tiles) {
+    auto it = tiles.find(id);
+    if (it != tiles.end()) {
+        Tile &tile = *it->second;
         if (tile.id == id && tile.data) {
             return tile.data->state;
         }
@@ -103,20 +112,17 @@ TileData::State Source::addTile(const Tile::ID& id) {
         return state;
     }
 
-    tiles.emplace_front(id);
-    Tile& new_tile = tiles.front();
+    auto pos = tiles.emplace(id, std::make_unique<Tile>(id));
+    Tile& new_tile = *pos.first->second;
 
     // We couldn't find the tile in the list. Create a new one.
     // Try to find the associated TileData object.
     const Tile::ID normalized_id = id.normalized();
 
-    auto it = std::find_if(tile_data.begin(), tile_data.end(), [normalized_id](const std::weak_ptr<TileData>& tile_data) {
-        return !tile_data.expired() && tile_data.lock()->id == normalized_id;
-    });
-
+    auto it = tile_data.find(normalized_id);
     if (it != tile_data.end()) {
         // Create a shared_ptr handle. Note that this might be empty!
-        new_tile.data = it->lock();
+        new_tile.data = it->second.lock();
     }
 
     if (new_tile.data && new_tile.data->state == TileData::State::obsolete) {
@@ -138,7 +144,7 @@ TileData::State Source::addTile(const Tile::ID& id) {
         }
 
         new_tile.data->request();
-        tile_data.push_front(new_tile.data);
+        tile_data.emplace(new_tile.data->id, new_tile.data);
     }
 
     return new_tile.data->state;
@@ -251,31 +257,26 @@ bool Source::updateTiles() {
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
-    std::forward_list<Tile::ID> retain_data;
-    tiles.remove_if([&retain, &retain_data, &changed](const Tile & tile) {
+    std::set<Tile::ID> retain_data;
+    std::erase_if(tiles, [&retain, &retain_data, &changed](std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
+        Tile &tile = *pair.second;
         bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
         if (obsolete) {
             changed = true;
         } else {
-            retain_data.push_front(tile.data->id);
+            retain_data.insert(tile.data->id);
         }
         return obsolete;
     });
 
-    // Sort tiles by zoom level, front to back.
-    // We're painting front-to-back, so we want to draw more detailed tiles first
-    // before filling in other parts with lower zoom levels.
-    tiles.sort([](const Tile & a, const Tile & b) {
-        return a.id.z < b.id.z;
-    });
-
-    // Remove all the expired pointers from the list.
-    tile_data.remove_if([&retain_data](const std::weak_ptr<TileData>& tile_data) {
-        const std::shared_ptr<TileData> tile = tile_data.lock();
+    // Remove all the expired pointers from the set.
+    std::erase_if(tile_data, [&retain_data](std::pair<const Tile::ID, std::weak_ptr<TileData>> &pair) {
+        const std::shared_ptr<TileData> tile = pair.second.lock();
         if (!tile) {
             return true;
         }
-        bool obsolete = std::find(retain_data.begin(), retain_data.end(), tile->id) == retain_data.end();
+
+        bool obsolete = retain_data.find(tile->id) == retain_data.end();
         if (obsolete) {
             tile->cancel();
             return true;
