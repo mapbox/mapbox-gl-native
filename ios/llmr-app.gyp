@@ -10,7 +10,9 @@
         "type": "executable",
         "sources": [
             "./main.m",
+            "./MBXAppDelegate.h",
             "./MBXAppDelegate.m",
+            "./MBXViewController.h",
             "./MBXViewController.mm",
             "../common/settings_nsuserdefaults.hpp",
             "../common/settings_nsuserdefaults.mm",

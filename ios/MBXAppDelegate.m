@@ -21,4 +21,15 @@
     return YES;
 }
 
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    [(MBXViewController *)self.window.rootViewController saveState];
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    [(MBXViewController *)self.window.rootViewController restoreState];
+}
+
+
 @end
