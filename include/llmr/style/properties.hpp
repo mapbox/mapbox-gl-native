@@ -31,6 +31,11 @@ enum class Property {
     Linear = 4
 };
 
+enum class TranslateAnchor : uint8_t {
+    Map = 1,
+    Viewport = 2
+};
+
 namespace functions {
 
 float null(float z, const std::vector<float>&);
@@ -121,6 +126,7 @@ struct FillProperties {
 struct TextClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     FunctionProperty haloRadius = 0.25f;
@@ -133,6 +139,7 @@ struct TextClass {
 struct TextProperties {
     bool enabled = true;
     std::array<float, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     float haloRadius = 0.25f;
