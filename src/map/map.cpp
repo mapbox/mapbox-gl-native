@@ -528,7 +528,7 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
                     break;
                 case BucketType::Raster:
                     if (pass == Translucent) return;
-                    if (is_invisible(style.computed.lines, layer_desc)) return;
+                    if (is_invisible(style.computed.rasters, layer_desc)) return;
                     break;
                 default:
                     break;
