@@ -64,9 +64,6 @@ clear_xcode_cache:
         find ~/Library/Developer/Xcode/DerivedData/llmr-app-* -mtime +1 | xargs rm -rf; \
     fi
 
-clear_xcode_cache:
-	@if [[ -d ~/Library/Developer/Xcode/DerivedData/ ]]; then echo 'clearing files in ~/Library/Developer/Xcode/DerivedData/ older than one day'; find ~/Library/Developer/Xcode/DerivedData/llmr-app-* -mtime +1 | xargs rm -rf; fi
-
 # build Mac OS X project for Xcode
 xproj: config.gypi macosx/llmr-app.gyp clear_xcode_cache node
 	deps/run_gyp macosx/llmr-app.gyp --depth=. --generator-output=./build -f xcode
