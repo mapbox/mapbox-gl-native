@@ -7,6 +7,7 @@
 #include <llmr/util/string.hpp>
 #include <llmr/util/texturepool.hpp>
 #include <llmr/util/vec.hpp>
+#include <llmr/util/std.hpp>
 #include <llmr/geometry/glyph_atlas.hpp>
 
 
@@ -110,13 +111,10 @@ TileData::State Source::addTile(const Tile::ID& id) {
     // Try to find the associated TileData object.
     const Tile::ID normalized_id = id.normalized();
 
-    auto it = std::find_if(tile_data.begin(), tile_data.end(), [normalized_id](const std::weak_ptr<TileData>& tile_data) {
-        return !tile_data.expired() && tile_data.lock()->id == normalized_id;
-    });
-
+    auto it = tile_data.find(normalized_id);
     if (it != tile_data.end()) {
         // Create a shared_ptr handle. Note that this might be empty!
-        new_tile.data = it->lock();
+        new_tile.data = it->second.lock();
     }
 
     if (new_tile.data && new_tile.data->state == TileData::State::obsolete) {
@@ -138,7 +136,7 @@ TileData::State Source::addTile(const Tile::ID& id) {
         }
 
         new_tile.data->request();
-        tile_data.push_front(new_tile.data);
+        tile_data.emplace(new_tile.data->id, new_tile.data);
     }
 
     return new_tile.data->state;
@@ -269,9 +267,9 @@ bool Source::updateTiles() {
         return a.id.z < b.id.z;
     });
 
-    // Remove all the expired pointers from the list.
-    tile_data.remove_if([&retain_data](const std::weak_ptr<TileData>& tile_data) {
-        const std::shared_ptr<TileData> tile = tile_data.lock();
+    // Remove all the expired pointers from the set.
+    std::erase_if(tile_data, [&retain_data](const std::pair<Tile::ID, std::weak_ptr<TileData>>& pair) {
+        const std::shared_ptr<TileData> tile = pair.second.lock();
         if (!tile) {
             return true;
         }

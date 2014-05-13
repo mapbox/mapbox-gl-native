@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <set>
 
 namespace llmr {
 
@@ -69,7 +70,7 @@ private:
     const int32_t max_zoom;
 
     std::forward_list<Tile> tiles;
-    std::forward_list<std::weak_ptr<TileData>> tile_data;
+    std::map<Tile::ID, std::weak_ptr<TileData>> tile_data;
 };
 
 }
