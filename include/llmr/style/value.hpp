@@ -34,51 +34,21 @@ template <> struct string_to_number<bool> {
 template <> struct string_to_number<double> {
     double operator()(std::string const &str) const {
         int val = string_to_bool(str);
-        if (val < 0) {
-            try {
-                double b = std::stod(str);
-                return b;
-            } catch (std::invalid_argument const& ex) {
-                return false;
-            }
-        } else {
-            return val;
-        }
-        return false;
+        return val < 0 ? std::stod(str) : val;
     }
 };
 
 template <> struct string_to_number<int64_t> {
     int64_t operator()(std::string const &str) const {
         int val = string_to_bool(str);
-        if (val < 0) {
-            try {
-                long long b = std::stoll(str);
-                return b;
-            } catch (std::invalid_argument const& ex) {
-                return false;
-            }
-        } else {
-            return val;
-        }
-        return false;
+        return val < 0 ? std::stoll(str) : val;
     }
 };
 
 template <> struct string_to_number<uint64_t> {
     uint64_t operator()(std::string const &str) const {
         int val = string_to_bool(str);
-        if (val < 0) {
-            try {
-                unsigned long long b = std::stoull(str);
-                return b;
-            } catch (std::invalid_argument const& ex) {
-                return false;
-            }
-        } else {
-            return val;
-        }
-        return false;
+        return val < 0 ? std::stoull(str) : val;
     }
 };
 
