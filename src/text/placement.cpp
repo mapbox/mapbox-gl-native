@@ -109,7 +109,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
 
         // Don't place around sharp corners
         float angleDiff = fmod((angle - prevAngle), (2.0f * M_PI));
-        if (prevAngle && fabs(angleDiff) > maxAngleDelta) {
+        if (prevAngle && std::fabs(angleDiff) > maxAngleDelta) {
             anchor.scale = prevscale;
             break;
         }
