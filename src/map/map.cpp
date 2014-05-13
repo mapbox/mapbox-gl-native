@@ -484,6 +484,16 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers, RenderPass p
     }
 }
 
+template <typename Styles>
+bool is_invisible(const Styles &styles, const LayerDescription &layer_desc) {
+    auto it = styles.find(layer_desc.name);
+    if (it == styles.end()) return true;
+    const auto &properties = it->second;
+    if (!properties.enabled) return true;
+    if (properties.opacity <= 0) return true;
+    return false;
+}
+
 void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
     if (layer_desc.child_layer.size()) {
         gl::group group(std::string("group: ") + layer_desc.name);
@@ -501,13 +511,25 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
             // Abort early if we can already deduce from the bucket type that
             // we're not going to render anything anyway during this pass.
             switch (bucket_desc.type) {
+                case BucketType::Fill:
+                    if (is_invisible(style.computed.fills, layer_desc)) return;
+                    break;
                 case BucketType::Line:
+                    if (pass == Opaque) return;
+                    if (is_invisible(style.computed.lines, layer_desc)) return;
+                    break;
                 case BucketType::Point:
+                    if (pass == Opaque) return;
+                    if (is_invisible(style.computed.points, layer_desc)) return;
+                    break;
                 case BucketType::Text:
                     if (pass == Opaque) return;
+                    if (is_invisible(style.computed.texts, layer_desc)) return;
                     break;
                 case BucketType::Raster:
                     if (pass == Translucent) return;
+                    if (is_invisible(style.computed.lines, layer_desc)) return;
+                    break;
                 default:
                     break;
             }
