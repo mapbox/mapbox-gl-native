@@ -28,10 +28,9 @@ public:
                 const BucketDescription& bucket_desc);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
+    virtual bool hasData() const;
 
     void addGeometry(pbf& data);
-
-    bool hasPoints() const;
 
     void drawPoints(PointShader& shader);
     void drawPoints(DotShader& shader);

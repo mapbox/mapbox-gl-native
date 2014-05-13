@@ -45,9 +45,9 @@ public:
     ~FillBucket();
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
+    virtual bool hasData() const;
 
     void addGeometry(pbf& data);
-    bool empty() const;
     void tessellate();
 
     void drawElements(PlainShader& shader);

@@ -7,6 +7,7 @@
     {
       'target_name': 'shaders',
       'type': 'none',
+      'hard_dependency': 1,
       'actions': [
         {
           'action_name': 'Build Shaders',
@@ -25,6 +26,7 @@
     {
       'target_name': 'build_stylesheet',
       'type': 'none',
+      'hard_dependency': 1,
       'actions': [
         {
           'action_name': 'Build Stylesheet',
@@ -38,6 +40,11 @@
           'action': ['<@(node)', 'bin/build-style.js']
         }
       ],
+      'direct_dependent_settings': {
+        'sources': [
+          'src/style/resources.cpp'
+        ]
+      }
     },
     {
       'target_name': 'llmr-x86',

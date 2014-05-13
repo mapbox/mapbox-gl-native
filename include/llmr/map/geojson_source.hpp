@@ -18,7 +18,7 @@ class Transform;
 
 class GeoJSONSource : public Source, private util::noncopyable {
 public:
-    GeoJSONSource(Map &map, Painter &painter, Texturepool &texturepool, const char *url = "",
+    GeoJSONSource(Map &map, Painter &painter, const char *url = "",
                   std::vector<uint32_t> zooms = {{ 1, 5, 9, 13 }}, uint32_t tile_size = 512,
                   uint32_t min_zoom = 1, uint32_t max_zoom = 13, bool enabled = true);
 

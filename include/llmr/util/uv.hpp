@@ -4,7 +4,11 @@
 #include <uv.h>
 #include <functional>
 #include <cassert>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
 #include <boost/lockfree/queue.hpp>
+#pragma clang diagnostic pop
 
 namespace uv {
 

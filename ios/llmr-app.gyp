@@ -10,7 +10,9 @@
         "type": "executable",
         "sources": [
             "./main.m",
+            "./MBXAppDelegate.h",
             "./MBXAppDelegate.m",
+            "./MBXViewController.h",
             "./MBXViewController.mm",
             "../common/settings_nsuserdefaults.hpp",
             "../common/settings_nsuserdefaults.mm",
@@ -27,7 +29,8 @@
             '$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
             '$(SDKROOT)/System/Library/Frameworks/OpenGLES.framework',
             '$(SDKROOT)/System/Library/Frameworks/GLKit.framework',
-            '$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework'
+            '$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework',
+            '$(SDKROOT)/System/Library/Frameworks/CoreLocation.framework'
           ],
         },
         'xcode_settings': {

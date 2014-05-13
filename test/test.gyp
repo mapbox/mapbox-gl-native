@@ -65,6 +65,22 @@
         ]
     },
     {
+        "target_name": "clip_ids",
+        "product_name": "test_clip_ids",
+        "type": "executable",
+        "libraries": [
+            "-lpthread",
+        ],
+        "sources": [
+            "./main.cpp",
+            "./clip_ids.cpp",
+        ],
+        "dependencies": [
+            "../deps/gtest/gtest.gyp:gtest",
+            "../llmr.gyp:llmr-x86"
+        ]
+    },
+    {
         "target_name": "variant",
         "product_name": "test_variant",
         "type": "executable",
@@ -74,6 +90,22 @@
         "sources": [
             "./main.cpp",
             "./variant.cpp",
+        ],
+        "dependencies": [
+            "../deps/gtest/gtest.gyp:gtest",
+            "../llmr.gyp:llmr-x86"
+        ]
+    },
+    {
+        "target_name": "tile",
+        "product_name": "test_tile",
+        "type": "executable",
+        "libraries": [
+            "-lpthread",
+        ],
+        "sources": [
+            "./main.cpp",
+            "./tile.cpp",
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
@@ -105,7 +137,9 @@
         "type": "none",
         "dependencies": [
           "rotation_range",
+          "clip_ids",
           "variant",
+          "tile",
         ],
     }
   ]

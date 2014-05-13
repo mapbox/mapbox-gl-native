@@ -5,6 +5,7 @@
 #include <string>
 #include <mutex>
 #include <memory>
+#include <atomic>
 
 #include <llmr/util/raster.hpp>
 #include <llmr/util/vec.hpp>
@@ -45,7 +46,7 @@ public:
 
 public:
     const float pixelRatio;
-    std::shared_ptr<Raster> raster;
+    Raster raster;
 
 private:
     void asyncParseJSON();
@@ -57,9 +58,9 @@ private:
 
 private:
     Map &map;
-    mutable std::mutex mtx;
     std::string body;
-    bool loaded = false;
+    std::string image;
+    std::atomic<bool> loaded;
     std::map<std::string, SpritePosition> pos;
 };
 

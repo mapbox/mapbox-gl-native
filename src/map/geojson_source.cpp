@@ -1,6 +1,7 @@
 #include <llmr/map/geojson_source.hpp>
 #include <llmr/map/map.hpp>
 #include <llmr/map/transform.hpp>
+#include <llmr/map/vector_tile_data.hpp>
 #include <llmr/renderer/line_bucket.hpp>
 #include <llmr/util/std.hpp>
 #include <llmr/util/string.hpp>
@@ -10,11 +11,10 @@
 
 using namespace llmr;
 
-GeoJSONSource::GeoJSONSource(Map &map, Painter &painter, Texturepool &texturepool,
-                             const char *url, std::vector<uint32_t> zooms, uint32_t tile_size,
+GeoJSONSource::GeoJSONSource(Map &map, Painter &painter, const char *url,
+                             std::vector<uint32_t> zooms, uint32_t tile_size,
                              uint32_t min_zoom, uint32_t max_zoom, bool enabled) :
-    Source(map, painter, texturepool, url, Type::geojson,
-           zooms, tile_size, min_zoom, max_zoom, enabled),
+    Source(map, painter, url, Type::geojson, zooms, tile_size, min_zoom, max_zoom, enabled),
     all_tiles(),
     transforms() {
     platform::request_http(url, [zooms, tile_size, &map, this](platform::Response *res) {
@@ -79,18 +79,19 @@ void GeoJSONSource::tile_GeoJSON(JSVal& geojson) {
         Tile::ID id = it->first;
         GeoJSONTile feature_tile = it->second;
 
-        tiles.emplace_front(id);
-        Tile& new_tile = tiles.front();
+        auto pos = tiles.emplace(id, std::make_unique<Tile>(id));
+        Tile& new_tile = *pos.first->second;
 
         const Tile::ID normalized_id = id.normalized();
 
-        new_tile.data = std::make_shared<TileData>(normalized_id, map, "", false);
+        std::shared_ptr<VectorTileData> new_tile_data = std::make_shared<VectorTileData>(normalized_id, map, "");
+        new_tile.data = new_tile_data;
 
         // 1. assume route bucket (for now)
         const BucketDescription& bucket_desc = map.getStyle().buckets.find("route")->second;
 
         // 2. create line bucket
-        std::unique_ptr<LineBucket> bucket = std::make_unique<LineBucket>(new_tile.data->lineVertexBuffer, new_tile.data->triangleElementsBuffer, new_tile.data->pointElementsBuffer, bucket_desc);
+        std::unique_ptr<LineBucket> bucket = std::make_unique<LineBucket>(new_tile_data->lineVertexBuffer, new_tile_data->triangleElementsBuffer, new_tile_data->pointElementsBuffer, bucket_desc);
 
         // 3. add bucket features
         for (Segment segment : feature_tile) {
@@ -98,9 +99,9 @@ void GeoJSONSource::tile_GeoJSON(JSVal& geojson) {
         }
 
         // 4. add to parsed tiles
-        new_tile.data->buckets["route"] = std::move(bucket);
-        tile_data.push_front(new_tile.data);
-        new_tile.data->state = TileData::State::parsed;
+        new_tile_data->buckets["route"] = std::move(bucket);
+        tile_data.emplace(id, new_tile_data);
+        new_tile_data->state = TileData::State::parsed;
     }
 
     all_tiles.clear();
