@@ -7,6 +7,7 @@
 #include <llmr/util/timer.hpp>
 #include <llmr/util/time.hpp>
 #include <llmr/util/clip_ids.hpp>
+#include <llmr/util/constants.hpp>
 
 #include <cassert>
 #include <algorithm>
@@ -170,17 +171,13 @@ void Painter::renderTileLayer(const Tile& tile, const LayerDescription &layer_de
     }
 }
 
-void Painter::translateLayer(std::array<float, 2> translation, bool reverse) {
+void Painter::translateLayer(const std::array<float, 2> translation, const Tile::ID &id, bool reverse) {
     if (translation[0] || translation[1]) {
-        if (reverse) {
-            translation[0] *= -1;
-            translation[1] *= -1;
-        }
-        matrix::translate(matrix,
-                          matrix,
-                          translation[0] / map.getState().getPixelRatio(),
-                          translation[1] / map.getState().getPixelRatio(),
-                          0);
+        const int direction = reverse ? -1 : 1;
+        // TODO: Get rid of the 8 (scaling from 4096 to tile size)
+        const double factor = direction * ((double)(1 << id.z)) / map.getState().getScale() /
+                              map.getState().getPixelRatio() * (4096.0 / util::tileSize);
+        matrix::translate(matrix, matrix, translation[0] * factor, translation[1] * factor, 0);
     }
 }
 

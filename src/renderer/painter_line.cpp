@@ -4,7 +4,7 @@
 
 using namespace llmr;
 
-void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
+void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
     // Abort early.
     if (pass == Opaque) return;
     if (!bucket.hasData()) return;
@@ -33,7 +33,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     float dash_length = properties.dash_array[0];
     float dash_gap = properties.dash_array[1];
 
-    translateLayer(properties.translate);
+    translateLayer(properties.translate, id);
 
     glDepthRange(strata, 1.0f);
 
@@ -88,5 +88,5 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         bucket.drawLines(*lineShader);
     }
 
-    translateLayer(properties.translate, true);
+    translateLayer(properties.translate, id, true);
 }

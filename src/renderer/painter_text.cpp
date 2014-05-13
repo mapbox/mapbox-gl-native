@@ -4,7 +4,7 @@
 
 using namespace llmr;
 
-void Painter::renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& /*id*/) {
+void Painter::renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
     // Abort early.
     if (pass == Opaque) return;
     if (!bucket.hasData()) return;
@@ -16,7 +16,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     const TextProperties& properties = text_properties_it->second;
     if (!properties.enabled) return;
 
-    translateLayer(properties.translate);
+    translateLayer(properties.translate, id);
 
     mat4 exMatrix;
     matrix::copy(exMatrix, projMatrix);
@@ -110,5 +110,5 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     glDepthRange(strata + strata_epsilon, 1.0f);
     bucket.drawGlyphs(*textShader);
 
-    translateLayer(properties.translate, true);
+    translateLayer(properties.translate, id, true);
 }
