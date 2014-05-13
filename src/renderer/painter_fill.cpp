@@ -35,7 +35,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         stroke_color = fill_color;
     }
 
-    translateLayer(properties.translate);
+    translateLayer(properties.translate, id);
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
@@ -139,5 +139,5 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         bucket.drawVertices(*outlineShader);
     }
 
-    translateLayer(properties.translate, true);
+    translateLayer(properties.translate, id, true);
 }

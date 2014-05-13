@@ -5,7 +5,7 @@
 
 using namespace llmr;
 
-void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& /*id&*/) {
+void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
     // Abort early.
     if (!bucket.hasData()) return;
     if (pass == Opaque) return;
@@ -17,7 +17,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     const PointProperties& properties = point_properties_it->second;
     if (!properties.enabled) return;
 
-    translateLayer(properties.translate);
+    translateLayer(properties.translate, id);
 
     Color color = properties.color;
     color[0] *= properties.opacity;
@@ -76,5 +76,5 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
         bucket.drawPoints(*pointShader);
     }
 
-    translateLayer(properties.translate, true);
+    translateLayer(properties.translate, id, true);
 }

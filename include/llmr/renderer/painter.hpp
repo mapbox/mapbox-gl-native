@@ -88,7 +88,7 @@ public:
     bool needsAnimation() const;
 private:
     void setupShaders();
-    void translateLayer(std::array<float, 2> translation, bool reverse = false);
+    void translateLayer(std::array<float, 2> translation, const Tile::ID &id, bool reverse = false);
 
     void prepareTile(const Tile& tile);
     void useProgram(uint32_t program);
