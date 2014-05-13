@@ -25,7 +25,7 @@ GLuint Texturepool::getTextureID() {
 
     return id;
 }
-
+ 
 void Texturepool::removeTextureID(GLuint texture_id) {
     bool needs_clear = false;
 
@@ -36,7 +36,8 @@ void Texturepool::removeTextureID(GLuint texture_id) {
     }
 
     if (needs_clear) {
-        clearTextureIDs();
+    // TODO: We need to find a better way to deal with texture pool cleanup
+//        clearTextureIDs();
     }
 }
 

@@ -2,4 +2,7 @@
 
 @interface MBXViewController : UIViewController
 
+- (void)saveState;
+- (void)restoreState;
+
 @end

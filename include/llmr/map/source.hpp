@@ -6,10 +6,13 @@
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/time.hpp>
 
+#include <list>
 #include <forward_list>
 #include <memory>
 #include <vector>
 #include <string>
+#include <map>
+#include <set>
 
 namespace llmr {
 
@@ -26,17 +29,19 @@ public:
     };
 
 public:
-    Source(Map &map, Painter &painter, Texturepool &texturepool,
+    Source(Map &map, Painter &painter,
            const char *url = "", Type type = Type::vector, std::vector<uint32_t> zooms = {0},
            uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 14,
            bool enabled = true);
 
 
-
     bool update();
-    void prepare_render(const TransformState &transform, bool is_baselayer = false);
-    void render(time animationTime);
+    size_t prepareRender(const TransformState &transform);
+    void render(const LayerDescription& layer_desc, const BucketDescription &bucket_desc);
+    void finishRender();
 
+    std::forward_list<Tile::ID> getIDs() const;
+    void updateClipIDs(const std::map<Tile::ID, ClipID> &mapping);
 
 public:
     bool enabled;
@@ -56,7 +61,6 @@ private:
 private:
     Map& map;
     Painter& painter;
-    Texturepool& texturepool;
 
     const Type type;
     const std::vector<uint32_t> zooms;
@@ -65,8 +69,8 @@ private:
     const int32_t min_zoom;
     const int32_t max_zoom;
 
-    std::forward_list<Tile> tiles;
-    std::forward_list<std::weak_ptr<TileData>> tile_data;
+    std::map<Tile::ID, std::unique_ptr<Tile>> tiles;
+    std::map<Tile::ID, std::weak_ptr<TileData>> tile_data;
 };
 
 }

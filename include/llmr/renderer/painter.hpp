@@ -33,6 +33,9 @@ class PointBucket;
 class TextBucket;
 class RasterBucket;
 
+class LayerDescription;
+class RasterTileData;
+
 class Painter : private util::noncopyable {
 public:
     Painter(Map &map);
@@ -40,32 +43,54 @@ public:
 
     void setup();
     void clear();
+
+    // Updates the default matrices to the current viewport dimensions.
     void changeMatrix();
-    void render(const Tile& tile);
+
+    // Renders a particular layer from a tile.
+    void renderTileLayer(const Tile& tile, const LayerDescription &layer_desc);
+
+    // Renders debug information for a tile.
+    void renderTileDebug(const Tile& tile);
+
+    // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
+    // tiles whatsoever.
     void renderMatte();
+
+    // Renders the red debug frame around a tile, visualizing its perimeter.
+    void renderDebugFrame();
+
+    void renderDebugText(DebugBucket& bucket);
+    void renderDebugText(const std::vector<std::string> &strings);
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id);
-    void renderRaster(const std::string& layer_name, const std::shared_ptr<TileData>& tile_data);
+    void renderRaster(RasterBucket& bucket, const std::string& layer_name, const Tile::ID& id);
 
     void resize();
 
     // Changes whether debug information is drawn onto the map
     void setDebug(bool enabled);
 
+    // Opaque/Translucent pass setting
+    void startOpaquePass();
+    void startTranslucentPass();
+    void endPass();
+
+    // Configures the painter strata that is used for early z-culling of fragments.
+    void setStrata(float strata);
+
     void prepareClippingMask();
-    void drawClippingMask(const mat4& matrix, uint8_t clip_id);
+    void drawClippingMask(const mat4& matrix, const ClipID& clip);
     void finishClippingMask();
 
     bool needsAnimation() const;
 private:
     void setupShaders();
-    void renderLayers(const std::shared_ptr<TileData>& tile, const std::vector<LayerDescription>& layers);
-    void renderLayer(const std::shared_ptr<TileData>& tile_data, const LayerDescription& layer_desc);
     void translateLayer(std::array<float, 2> translation, bool reverse = false);
-    void renderDebug(const std::shared_ptr<TileData>& tile);
 
+    void prepareTile(const Tile& tile);
     void useProgram(uint32_t program);
     void lineWidth(float lineWidth);
     void depthMask(bool value);
@@ -88,8 +113,8 @@ private:
     bool gl_depthMask = true;
     std::array<uint16_t, 2> gl_viewport = {{ 0, 0 }};
     float strata = 0;
-    const float strata_epsilon = 1.0f / (1 << 16);
     enum { Opaque, Translucent } pass = Opaque;
+    const float strata_epsilon = 1.0f / (1 << 16);
 
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;

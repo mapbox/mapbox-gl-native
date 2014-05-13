@@ -77,11 +77,29 @@ MBXViewController *viewController = nullptr;
 
     // Load settings
     settings = new llmr::Settings_NSUserDefaults();
-    map->setLonLatZoom(settings->longitude, settings->latitude, settings->zoom);
-    map->setAngle(settings->angle);
-    map->setDebug(settings->debug);
+    [self restoreState];
 }
 
+- (void)saveState
+{
+    if (map && settings)
+    {
+        map->getLonLatZoom(settings->longitude, settings->latitude, settings->zoom);
+        settings->angle = map->getAngle();
+        settings->debug = map->getDebug();
+        settings->save();
+    }
+}
+
+- (void)restoreState
+{
+    if (map && settings) {
+        settings->load();
+        map->setLonLatZoom(settings->longitude, settings->latitude, settings->zoom);
+        map->setAngle(settings->angle);
+        map->setDebug(settings->debug);
+    }
+}
 
 - (void)setupInteraction
 {
@@ -237,13 +255,7 @@ MBXViewController *viewController = nullptr;
     if (settings)
     {
         // Save settings
-        if (map)
-        {
-            map->getLonLatZoom(settings->longitude, settings->latitude, settings->zoom);
-            settings->angle = map->getAngle();
-            settings->debug = map->getDebug();
-            settings->save();
-        }
+        [self saveState];
         delete settings;
         settings = nullptr;
     }

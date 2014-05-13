@@ -14,14 +14,13 @@
 using namespace llmr;
 
 
-TileParser::TileParser(const std::string& data, TileData& tile, const Style& style, GlyphAtlas& glyphAtlas, bool is_raster)
-    : vector_data(is_raster ? pbf(0, 0) : pbf((const uint8_t *)data.data(), data.size())),
-      raster_data(is_raster ? data : ""),
+TileParser::TileParser(const std::string& data, VectorTileData& tile, const Style& style, GlyphAtlas& glyphAtlas)
+    : vector_data(pbf((const uint8_t *)data.data(), data.size())),
       tile(tile),
       style(style),
       glyphAtlas(glyphAtlas),
-      placement(is_raster ? 0 : tile.id.z) {
-    if (!is_raster) parseGlyphs();
+      placement(tile.id.z) {
+    parseGlyphs();
     parseStyleLayers(style.layers);
 }
 
@@ -37,7 +36,7 @@ void TileParser::parseGlyphs() {
         GlyphPositions &glyphs = faces[name];
         for (const VectorTileGlyph &glyph : face.glyphs) {
             const Rect<uint16_t> rect =
-                glyphAtlas.addGlyph((uint64_t)tile.id, name, glyph);
+                glyphAtlas.addGlyph(tile.id.to_uint64(), name, glyph);
             glyphs.emplace(glyph.id, Glyph{rect, glyph.metrics});
         }
     }
@@ -85,31 +84,22 @@ void TileParser::parseStyleLayers(const std::vector<LayerDescription>& layers) {
 }
 
 std::unique_ptr<Bucket> TileParser::createBucket(const BucketDescription& bucket_desc) {
-    if (bucket_desc.type == BucketType::Raster) {
-        if (raster_data.length()) {
-            tile.raster = std::make_shared<Raster>();
-            tile.raster->setData(raster_data);
-            tile.raster->load();
-        }
-        return createRasterBucket(bucket_desc);
-    } else {
-        auto layer_it = vector_data.layers.find(bucket_desc.source_layer);
-        if (layer_it != vector_data.layers.end()) {
-            const VectorTileLayer& layer = layer_it->second;
-            if (bucket_desc.type == BucketType::Fill) {
-                return createFillBucket(layer, bucket_desc);
-            } else if (bucket_desc.type == BucketType::Line) {
-                return createLineBucket(layer, bucket_desc);
-            } else if (bucket_desc.type == BucketType::Point) {
-                return createPointBucket(layer, bucket_desc);
-            } else if (bucket_desc.type == BucketType::Text) {
-                return createTextBucket(layer, bucket_desc);
-            } else {
-                throw std::runtime_error("unknown bucket type");
-            }
+    auto layer_it = vector_data.layers.find(bucket_desc.source_layer);
+    if (layer_it != vector_data.layers.end()) {
+        const VectorTileLayer& layer = layer_it->second;
+        if (bucket_desc.type == BucketType::Fill) {
+            return createFillBucket(layer, bucket_desc);
+        } else if (bucket_desc.type == BucketType::Line) {
+            return createLineBucket(layer, bucket_desc);
+        } else if (bucket_desc.type == BucketType::Point) {
+            return createPointBucket(layer, bucket_desc);
+        } else if (bucket_desc.type == BucketType::Text) {
+            return createTextBucket(layer, bucket_desc);
         } else {
-            // The layer specified in the bucket does not exist. Do nothing.
+            throw std::runtime_error("unknown bucket type");
         }
+    } else {
+        // The layer specified in the bucket does not exist. Do nothing.
     }
 
     return nullptr;
@@ -182,11 +172,4 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
     }
 
     return std::move(bucket);
-}
-
-std::unique_ptr<Bucket> TileParser::createRasterBucket(const BucketDescription& bucket_desc) {
-    std::unique_ptr<RasterBucket> bucket = std::make_unique<RasterBucket>(bucket_desc);
-    // Raster buckets are just empty dummies so that they behave
-    // similarly to vector buckets in styling configurations.
-    return obsolete() ? nullptr : std::move(bucket);
 }

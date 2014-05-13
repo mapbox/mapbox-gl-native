@@ -5,6 +5,9 @@
 #include <llmr/style/sprite.hpp>
 #include <llmr/util/transition.hpp>
 #include <llmr/util/time.hpp>
+#include <llmr/util/math.hpp>
+#include <llmr/util/clip_ids.hpp>
+#include <llmr/util/string.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -138,7 +141,6 @@ void Map::setup() {
     sources.emplace("outdoors",
                     std::unique_ptr<Source>(new Source(*this,
                            painter,
-                           texturepool,
                            "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v42-dev/%d/%d/%d.gl.pbf",
                            Source::Type::vector,
                            {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }},
@@ -150,7 +152,6 @@ void Map::setup() {
     sources.emplace("satellite",
                     std::unique_ptr<Source>(new Source(*this,
                            painter,
-                           texturepool,
                            "https://a.tiles.mapbox.com/v3/justin.hh0gkdfm/%d/%d/%d%s.png256",
                            Source::Type::raster,
                            {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }},
@@ -331,7 +332,11 @@ void Map::toggleRaster() {
 
         if (satellite_source.enabled) {
             satellite_source.enabled = false;
-            style.appliedClasses.erase(style.appliedClasses.find("satellite"));
+
+            auto style_class = style.appliedClasses.find("satellite");
+            if (style_class != style.appliedClasses.end()) {
+                style.appliedClasses.erase(style_class);
+            }
         } else {
             satellite_source.enabled = true;
             style.appliedClasses.insert("satellite");
@@ -346,6 +351,28 @@ void Map::updateTiles() {
         const std::unique_ptr<Source> &source = pair.second;
         if (source->enabled) {
             source->update();
+        }
+    }
+}
+
+
+
+void Map::updateClippingIDs() {
+    std::forward_list<Tile::ID> ids;
+
+    for (auto &pair : sources) {
+        const std::unique_ptr<Source> &source = pair.second;
+        if (source->enabled) {
+            ids.splice_after(ids.before_begin(), source->getIDs());
+        }
+    }
+
+    const std::map<Tile::ID, ClipID> clipIDs = computeClipIDs(ids);
+
+    for (auto &pair : sources) {
+        const std::unique_ptr<Source> &source = pair.second;
+        if (source->enabled) {
+            source->updateClipIDs(clipIDs);
         }
     }
 }
@@ -366,14 +393,14 @@ void Map::prepare() {
         style.sprite->load(kSpriteURL);
     }
 
-    if (style.sprite && style.sprite->raster->isLoaded() && !style.sprite->raster->textured) {
-        style.sprite->raster->setTexturepool(&texturepool);
-    }
-
     updateTiles();
+
+    updateClippingIDs();
 }
 
 void Map::render() {
+    std::vector<std::string> debug;
+
     painter.clear();
 
     painter.resize();
@@ -386,28 +413,133 @@ void Map::render() {
 
     painter.prepareClippingMask();
 
-    bool is_baselayer = true;
-
+    size_t source_id = 0;
     for (auto &pair : sources) {
         Source &source = *pair.second;
-        source.prepare_render(state, is_baselayer);
-        is_baselayer = source.enabled ? false : (true && is_baselayer);
+        size_t count = source.prepareRender(state);
+        debug.emplace_back(util::sprintf<100>("source %d: %d\n", source_id, count));
+        source_id++;
     }
 
     painter.finishClippingMask();
 
-    // Then, render each source's tiles. TODO: handle more than one
-    // vector source.
 
+
+    // Render per layer in the stylesheet.
+    strata_thickness = 1.0f / (style.layerCount() + 1);
+    strata = 0;
+
+    // - FIRST PASS ------------------------------------------------------------
+    // Render everything top-to-bottom by using reverse iterators. Render opaque
+    // objects first.
+    painter.startOpaquePass();
+    renderLayers(style.layers, Opaque);
+    painter.endPass();
+
+    // - SECOND PASS -----------------------------------------------------------
+    // Make a second pass, rendering translucent objects. This time, we render
+    // bottom-to-top.
+    --strata;
+    painter.startTranslucentPass();
+    renderLayers(style.layers, Translucent);
+    painter.endPass();
+
+
+    // Finalize the rendering, e.g. by calling debug render calls per tile.
+    // This guarantees that we have at least one function per tile called.
+    // When only rendering layers via the stylesheet, it's possible that we don't
+    // ever visit a tile during rendering.
     for (auto &pair : sources) {
         Source &source = *pair.second;
-        source.render(animationTime);
+        const std::string &name = pair.first;
+        gl::group group(std::string("debug ") + name);
+        source.finishRender();
     }
 
     painter.renderMatte();
 
+    painter.renderDebugText(debug);
+
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition()) {
         update();
+    }
+}
+
+void Map::renderLayers(const std::vector<LayerDescription>& layers, RenderPass pass) {
+    if (pass == Opaque) {
+        typedef std::vector<LayerDescription>::const_reverse_iterator riterator;
+        for (riterator it = layers.rbegin(), end = layers.rend(); it != end; ++it, ++strata) {
+            painter.setStrata(strata * strata_thickness);
+            renderLayer(*it, pass);
+        }
+    } else if (pass == Translucent) {
+        typedef std::vector<LayerDescription>::const_iterator iterator;
+        for (iterator it = layers.begin(), end = layers.end(); it != end; ++it, --strata) {
+            painter.setStrata(strata * strata_thickness);
+            renderLayer(*it, pass);
+        }
+    } else {
+        throw std::runtime_error("unknown render pass");
+    }
+}
+
+template <typename Styles>
+bool is_invisible(const Styles &styles, const LayerDescription &layer_desc) {
+    auto it = styles.find(layer_desc.name);
+    if (it == styles.end()) return true;
+    const auto &properties = it->second;
+    if (!properties.enabled) return true;
+    if (properties.opacity <= 0) return true;
+    return false;
+}
+
+void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
+    if (layer_desc.child_layer.size()) {
+        gl::group group(std::string("group: ") + layer_desc.name);
+        // This is a layer group.
+        // TODO: create framebuffer
+        renderLayers(layer_desc.child_layer, pass);
+        // TODO: render framebuffer on previous framebuffer
+    } else {
+        // This is a singular layer. Try to find the bucket associated with
+        // this layer and render it.
+        auto bucket_it = style.buckets.find(layer_desc.bucket_name);
+        if (bucket_it != style.buckets.end()) {
+            const BucketDescription &bucket_desc = bucket_it->second;
+
+            // Abort early if we can already deduce from the bucket type that
+            // we're not going to render anything anyway during this pass.
+            switch (bucket_desc.type) {
+                case BucketType::Fill:
+                    if (is_invisible(style.computed.fills, layer_desc)) return;
+                    break;
+                case BucketType::Line:
+                    if (pass == Opaque) return;
+                    if (is_invisible(style.computed.lines, layer_desc)) return;
+                    break;
+                case BucketType::Point:
+                    if (pass == Opaque) return;
+                    if (is_invisible(style.computed.points, layer_desc)) return;
+                    break;
+                case BucketType::Text:
+                    if (pass == Opaque) return;
+                    if (is_invisible(style.computed.texts, layer_desc)) return;
+                    break;
+                case BucketType::Raster:
+                    if (pass == Translucent) return;
+                    if (is_invisible(style.computed.lines, layer_desc)) return;
+                    break;
+                default:
+                    break;
+            }
+
+            // Find the source and render all tiles in it.
+            auto source_it = sources.find(bucket_desc.source_name);
+            if (source_it != sources.end()) {
+                const std::unique_ptr<Source> &source = source_it->second;
+                source->render(layer_desc, bucket_desc);
+            }
+        }
     }
 }

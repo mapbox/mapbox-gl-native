@@ -28,6 +28,7 @@ public:
 
     void loadJSON(const uint8_t *const data, size_t bytes);
 
+    size_t layerCount() const;
     void cascade(float z);
 
 public:

@@ -2,6 +2,10 @@
 
 module.exports = {
     "buckets": {
+        "satellite": {
+            "source": "satellite",
+            "type": "raster"
+        },
         "admin_maritime": {
             "source": "outdoors",
             "layer": "admin",

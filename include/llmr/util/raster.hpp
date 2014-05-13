@@ -15,13 +15,11 @@ namespace llmr {
 class Raster : public std::enable_shared_from_this<Raster> {
 
 public:
+    Raster(Texturepool &texturepool);
     ~Raster();
 
     // load image data
-    void load();
-
-    // set shared texture pool
-    void setTexturepool(Texturepool* texturepool);
+    bool load(const std::string &img);
 
     // bind current texture
     void bind(bool linear = false);
@@ -33,8 +31,6 @@ public:
     void beginFadeInTransition();
     bool needsTransition() const;
     void updateTransitions(time now);
-
-    inline void setData(const std::string &img) { data = img; }
 
 public:
     // loaded image dimensions
@@ -60,13 +56,10 @@ private:
     bool loaded = false;
 
     // shared texture pool
-    Texturepool* texturepool = nullptr;
+    Texturepool &texturepool;
 
     // min/mag filter
     uint32_t filter = 0;
-
-    // the encoded image data.
-    std::string data;
 
     // the raw pixels
     char *img = nullptr;

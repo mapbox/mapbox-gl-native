@@ -127,6 +127,7 @@ struct TextClass {
     FunctionProperty size = 12.0f;
     FunctionProperty rotate = 0.0f;
     FunctionProperty alwaysVisible = false;
+    FunctionProperty opacity = 1;
 };
 
 struct TextProperties {
@@ -138,6 +139,7 @@ struct TextProperties {
     float size = 12.0f;
     float rotate = 0.0f;
     bool alwaysVisible = false;
+    float opacity = 1.0;
 };
 
 struct BackgroundClass {

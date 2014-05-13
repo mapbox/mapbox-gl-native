@@ -4,7 +4,6 @@
 #include <llmr/geometry/geometry.hpp>
 
 #include <llmr/renderer/painter.hpp>
-#include <llmr/shader/text_shader.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/text/placement.hpp>
@@ -13,8 +12,6 @@
 #include <llmr/platform/gl.hpp>
 
 #include <iostream>
-
-#define BUFFER_OFFSET(i) ((char *) nullptr + (i))
 
 #include <cassert>
 
@@ -148,7 +145,9 @@ void TextBucket::render(Painter &painter, const std::string &layer_name,
     painter.renderText(*this, layer_name, id);
 }
 
-bool TextBucket::empty() const { return triangleGroups.empty(); }
+bool TextBucket::hasData() const {
+    return !triangleGroups.empty();
+}
 
 void TextBucket::drawGlyphs(TextShader &shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);

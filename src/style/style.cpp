@@ -103,6 +103,7 @@ void Style::cascade(float z) {
             text.haloRadius = layer.haloRadius.evaluate<float>(z);
             text.rotate = layer.rotate.evaluate<float>(z);
             text.alwaysVisible = layer.alwaysVisible.evaluate<bool>(z);
+            text.opacity = layer.opacity.evaluate<float>(z);
         }
 
         // Cascade raster classes
@@ -121,6 +122,14 @@ void Style::cascade(float z) {
         computed.background.color = sheetClass.background.color;
         computed.background.opacity = sheetClass.background.opacity.evaluate<float>(z);
     }
+}
+
+size_t Style::layerCount() const {
+    size_t count = 0;
+    for (const LayerDescription &layer : layers) {
+        count += layer.size();
+    }
+    return count;
 }
 
 void Style::loadJSON(const uint8_t *const data, size_t bytes) {
