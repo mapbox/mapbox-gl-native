@@ -686,7 +686,8 @@ module.exports = {
             "padding": 2,
             "fontSize": 13,
             "feature_type": "line",
-            "type": "text"
+            "type": "text",
+            "maxAngleDelta": 0.5
         },
         "water_label": {
             "source": "outdoors",
