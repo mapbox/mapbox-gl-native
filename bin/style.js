@@ -3315,7 +3315,7 @@ module.exports = {
                             ]
                 },
                 "place_label_city": {
-                "color": "#4a4032",
+                "color": "#444",
                 "strokeWidth": 0.4,
                 "stroke": [
                            1,
@@ -3472,12 +3472,7 @@ module.exports = {
                 },
                 "road_label": {
                 "color": "#765",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.5
-                           ],
+                "stroke": "land",
                 "size": [
                          "stops",
                          {
@@ -3500,12 +3495,7 @@ module.exports = {
                 },
                 "water_label": {
                 "color": "water_text",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.75
-                           ]
+                "stroke": "water"
                 },
                 "waterway_label": {
                 "color": "water_text",
@@ -3518,16 +3508,11 @@ module.exports = {
                 },
                 "poi_airport": {
                 "color": "#666",
-                "image": "airport-12"
+                "image": "airport-24"
                 },
                 "poi_label_1": {
                 "color": "#444",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.5
-                           ],
+                "stroke": "land",
                 "translate": [
                               0,
                               24
