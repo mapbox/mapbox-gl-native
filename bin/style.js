@@ -1562,7 +1562,7 @@ module.exports = {
                             ]
                 },
                 "hillshade_full_highlight": {
-                "color": "#ffd",
+                "color": "#fffff3",
                 "antialias": false,
                 "opacity": [
                             "stops",
@@ -1589,7 +1589,7 @@ module.exports = {
                             ]
                 },
                 "hillshade_medium_highlight": {
-                "color": "#ffb",
+                "color": "#ffd",
                 "antialias": false,
                 "opacity": [
                             "stops",
