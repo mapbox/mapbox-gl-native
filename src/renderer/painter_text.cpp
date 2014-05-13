@@ -16,8 +16,6 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     const TextProperties& properties = text_properties_it->second;
     if (!properties.enabled) return;
 
-    translateLayer(properties.translate, id);
-
     mat4 exMatrix;
     matrix::copy(exMatrix, projMatrix);
     if (bucket.geom_desc.path == TextPathType::Curve) {
@@ -33,8 +31,10 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     float fontSize = fmin(properties.size, bucket.geom_desc.font_size);
     matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
 
+    const mat4 vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
+
     useProgram(textShader->program);
-    textShader->setMatrix(matrix);
+    textShader->setMatrix(vtxMatrix);
     textShader->setExtrudeMatrix(exMatrix);
 
     map.getGlyphAtlas().bind();
@@ -109,6 +109,4 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     textShader->setBuffer((256.0f - 64.0f) / 256.0f);
     glDepthRange(strata + strata_epsilon, 1.0f);
     bucket.drawGlyphs(*textShader);
-
-    translateLayer(properties.translate, id, true);
 }
