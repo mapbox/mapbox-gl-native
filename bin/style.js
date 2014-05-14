@@ -1809,8 +1809,8 @@ module.exports = {
                 "color": "#d5d1c6",
                 "stroke": "#d5d1c6",
                 "translate": [
-                              2,
-                              2
+                              1,
+                              1
                               ],
                 "opacity": [
                             "stops",
@@ -3521,7 +3521,7 @@ module.exports = {
                 "stroke": "land",
                 "translate": [
                               0,
-                              24
+                              14
                               ],
                 "translate-anchor": "viewport"
                 },
