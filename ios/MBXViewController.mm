@@ -51,6 +51,9 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
     self.locationManager.delegate = self;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+
 - (void)saveState:(NSNotification *)notification
 {
     if (self.mapView && settings)
@@ -73,6 +76,8 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
         [self.mapView setDebugActive:settings->debug];
     }
 }
+
+#pragma clang diagnostic pop
 
 - (void)setupDebugUI
 {
@@ -191,11 +196,16 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
 
 #pragma mark - User location
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
     CLLocation *latestLocation = locations.lastObject;
 
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(latestLocation.coordinate.latitude, latestLocation.coordinate.longitude) zoomLevel:17 animated:YES];
 }
+
+#pragma clang diagnostic pop
 
 @end
