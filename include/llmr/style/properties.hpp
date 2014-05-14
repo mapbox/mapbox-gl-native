@@ -8,6 +8,7 @@
 
 namespace llmr {
 
+// Stores a premultiplied color, with all four channels ranging from 0..1
 typedef std::array<float, 4> Color;
 
 enum class Winding {
@@ -29,6 +30,11 @@ enum class Property {
     Constant = 2,
     Stops = 3,
     Linear = 4
+};
+
+enum class TranslateAnchor : uint8_t {
+    Map = 1,
+    Viewport = 2
 };
 
 namespace functions {
@@ -57,6 +63,7 @@ struct FunctionProperty {
 struct PointClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     FunctionProperty size;
     Color color = {{ 0, 0, 0, 1 }};
     FunctionProperty opacity = 1;
@@ -68,6 +75,7 @@ struct PointClass {
 struct PointProperties {
     bool enabled = true;
     std::array<float, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     float size = 0;
     Color color = {{ 0, 0, 0, 1 }};
     float opacity = 1.0;
@@ -79,6 +87,7 @@ struct PointProperties {
 struct LineClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     FunctionProperty width;
     FunctionProperty offset;
     Color color = {{ 0, 0, 0, 1 }};
@@ -89,6 +98,7 @@ struct LineClass {
 struct LineProperties {
     bool enabled = true;
     std::array<float, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     float width = 0;
     float offset = 0;
     Color color = {{ 0, 0, 0, 1 }};
@@ -99,6 +109,7 @@ struct LineProperties {
 struct FillClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     Winding winding = Winding::NonZero;
     FunctionProperty antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
@@ -110,6 +121,7 @@ struct FillClass {
 struct FillProperties {
     bool enabled = true;
     std::array<float, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     Winding winding = Winding::NonZero;
     bool antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
@@ -121,6 +133,7 @@ struct FillProperties {
 struct TextClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     FunctionProperty haloRadius = 0.25f;
@@ -133,6 +146,7 @@ struct TextClass {
 struct TextProperties {
     bool enabled = true;
     std::array<float, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     float haloRadius = 0.25f;

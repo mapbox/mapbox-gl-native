@@ -7,6 +7,7 @@
 #include <llmr/util/timer.hpp>
 #include <llmr/util/time.hpp>
 #include <llmr/util/clip_ids.hpp>
+#include <llmr/util/constants.hpp>
 
 #include <cassert>
 #include <algorithm>
@@ -170,17 +171,28 @@ void Painter::renderTileLayer(const Tile& tile, const LayerDescription &layer_de
     }
 }
 
-void Painter::translateLayer(std::array<float, 2> translation, bool reverse) {
-    if (translation[0] || translation[1]) {
-        if (reverse) {
-            translation[0] *= -1;
-            translation[1] *= -1;
+const mat4 &Painter::translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchor anchor) {
+    if (translation[0] == 0 && translation[1] == 0) {
+        return matrix;
+    } else {
+        // TODO: Get rid of the 8 (scaling from 4096 to tile size)
+        const double factor = ((double)(1 << id.z)) / map.getState().getScale() * (4096.0 / util::tileSize);
+
+        if (anchor == TranslateAnchor::Viewport) {
+            const double sin_a = std::sin(-map.getState().getAngle());
+            const double cos_a = std::cos(-map.getState().getAngle());
+            matrix::translate(vtxMatrix, matrix,
+                    factor * (translation[0] * cos_a - translation[1] * sin_a),
+                    factor * (translation[0] * sin_a + translation[1] * cos_a),
+                    0);
+        } else {
+            matrix::translate(vtxMatrix, matrix,
+                    factor * translation[0],
+                    factor * translation[1],
+                    0);
         }
-        matrix::translate(matrix,
-                          matrix,
-                          translation[0] / map.getState().getPixelRatio(),
-                          translation[1] / map.getState().getPixelRatio(),
-                          0);
+
+        return vtxMatrix;
     }
 }
 

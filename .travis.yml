@@ -26,3 +26,6 @@ script:
 - make llmr
 - make linux
 - make run-tests
+
+notifications:
+- hipchat: WB52YkcbCGMbNcStsGeaoRO7cyBSK4wX2ZHo2Y4b@GL

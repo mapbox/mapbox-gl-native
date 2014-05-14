@@ -44,7 +44,7 @@ inline T min(T a, T b, T c, T d) {
 // a x b = |a||b|sin(θ) for θ.
 template <typename T = double, typename S>
 inline T angle_between(S ax, S ay, S bx, S by) {
-    return atan2((ax * by - ay * bx), ax * bx + ay * by);
+    return std::atan2((ax * by - ay * bx), ax * bx + ay * by);
 }
 
 template <typename T = double, typename S>
@@ -54,7 +54,7 @@ inline T angle_between(const vec2<S>& a, const vec2<S>& b) {
 
 template <typename T = double, typename S>
 inline T angle_to(const vec2<S>& a, const vec2<S>& b) {
-    return atan2(a.y - b.y, a.x - b.x);
+    return std::atan2(a.y - b.y, a.x - b.x);
 }
 
 template <typename T, typename S1, typename S2>
@@ -75,7 +75,7 @@ template <typename T, typename S1, typename S2>
 inline vec2<T> normal(const S1& a, const S2& b) {
     T dx = b.x - a.x;
     T dy = b.y - a.y;
-    T c = sqrt(dx * dx + dy * dy);
+    T c = std::sqrt(dx * dx + dy * dy);
     return { dx / c, dy / c };
 }
 
@@ -83,14 +83,14 @@ template <typename T, typename S1, typename S2>
 inline T dist(const S1& a, const S2& b) {
     T dx = b.x - a.x;
     T dy = b.y - a.y;
-    T c = sqrt(dx * dx + dy * dy);
+    T c = std::sqrt(dx * dx + dy * dy);
     return c;
 }
 
 // Take the magnitude of vector a.
 template <typename T = double, typename S>
 inline T mag(const S& a) {
-    return sqrt(a.x * a.x + a.y * a.y);
+    return std::sqrt(a.x * a.x + a.y * a.y);
 }
 
 }

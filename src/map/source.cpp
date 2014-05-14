@@ -312,8 +312,8 @@ edge _edge(const llmr::vec2<double> a, const llmr::vec2<double> b) {
 
 // scan-line conversion
 void _scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine scanLine) {
-    double y0 = fmax(ymin, floor(e1.y0)),
-    y1 = fmin(ymax, ceil(e1.y1));
+    double y0 = std::fmax(ymin, std::floor(e1.y0)),
+    y1 = std::fmin(ymax, std::ceil(e1.y1));
 
     // sort edges by x-coordinate
     if ((e0.x0 == e1.x0 && e0.y0 == e1.y0) ?
@@ -328,9 +328,9 @@ void _scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine scanLine)
     d0 = e0.dx > 0, // use y + 1 to compute x0
     d1 = e1.dx < 0; // use y + 1 to compute x1
     for (int32_t y = y0; y < y1; y++) {
-        double x0 = m0 * fmax(0, fmin(e0.dy, y + d0 - e0.y0)) + e0.x0,
-        x1 = m1 * fmax(0, fmin(e1.dy, y + d1 - e1.y0)) + e1.x0;
-        scanLine(floor(x1), ceil(x0), y, ymax);
+        double x0 = m0 * std::fmax(0, std::fmin(e0.dy, y + d0 - e0.y0)) + e0.x0,
+        x1 = m1 * std::fmax(0, std::fmin(e1.dy, y + d1 - e1.y0)) + e1.x0;
+        scanLine(std::floor(x1), std::ceil(x0), y, ymax);
     }
 }
 
@@ -357,7 +357,7 @@ double Source::getZoom() const {
 }
 
 std::forward_list<llmr::Tile::ID> Source::covering_tiles(int32_t zoom, const box& points) {
-    int32_t dim = pow(2, zoom);
+    int32_t dim = std::pow(2, zoom);
     std::forward_list<llmr::Tile::ID> tiles;
     bool is_raster = (type == Type::raster);
     double search_zoom = getZoom();
@@ -389,8 +389,8 @@ std::forward_list<llmr::Tile::ID> Source::covering_tiles(int32_t zoom, const box
     const vec2<double>& center = points.center;
     tiles.sort([&center](const Tile::ID& a, const Tile::ID& b) {
         // Sorts by distance from the box center
-        return fabs(a.x - center.x) + fabs(a.y - center.y) <
-        fabs(b.x - center.x) + fabs(b.y - center.y);
+        return std::fabs(a.x - center.x) + std::fabs(a.y - center.y) <
+        std::fabs(b.x - center.x) + std::fabs(b.y - center.y);
     });
 
     tiles.unique();

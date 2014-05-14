@@ -87,16 +87,16 @@ void matrix::copy(mat4& out, const mat4& a) {
 }
 
 void matrix::translate(mat4& out, const mat4& a, float x, float y, float z) {
-    float a00, a01, a02, a03,
-          a10, a11, a12, a13,
-          a20, a21, a22, a23;
-
     if (a == out) {
         out[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
         out[13] = a[1] * x + a[5] * y + a[9] * z + a[13];
         out[14] = a[2] * x + a[6] * y + a[10] * z + a[14];
         out[15] = a[3] * x + a[7] * y + a[11] * z + a[15];
     } else {
+        float a00, a01, a02, a03,
+              a10, a11, a12, a13,
+              a20, a21, a22, a23;
+
         a00 = a[0]; a01 = a[1]; a02 = a[2]; a03 = a[3];
         a10 = a[4]; a11 = a[5]; a12 = a[6]; a13 = a[7];
         a20 = a[8]; a21 = a[9]; a22 = a[10]; a23 = a[11];
@@ -113,8 +113,8 @@ void matrix::translate(mat4& out, const mat4& a, float x, float y, float z) {
 }
 
 void matrix::rotate_z(mat4& out, const mat4& a, float rad) {
-    float s = sin(rad),
-          c = cos(rad),
+    float s = std::sin(rad),
+          c = std::cos(rad),
           a00 = a[0],
           a01 = a[1],
           a02 = a[2],

@@ -88,10 +88,10 @@ void GLFWView::scroll(GLFWwindow *window, double /*xoffset*/, double yoffset) {
     GLFWView *view = (GLFWView *)glfwGetWindowUserPointer(window);
     double delta = yoffset * 40;
 
-    bool is_wheel = delta != 0 && fmod(delta, 4.000244140625) == 0;
+    bool is_wheel = delta != 0 && std::fmod(delta, 4.000244140625) == 0;
 
     double absdelta = delta < 0 ? -delta : delta;
-    double scale = 2.0 / (1.0 + exp(-absdelta / 100.0));
+    double scale = 2.0 / (1.0 + std::exp(-absdelta / 100.0));
 
     // Make the scroll wheel a bit slower.
     if (!is_wheel) {

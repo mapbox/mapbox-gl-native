@@ -7,6 +7,7 @@
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/renderer/frame_history.hpp>
+#include <llmr/style/properties.hpp>
 
 #include <llmr/shader/plain_shader.hpp>
 #include <llmr/shader/outline_shader.hpp>
@@ -88,7 +89,7 @@ public:
     bool needsAnimation() const;
 private:
     void setupShaders();
-    void translateLayer(std::array<float, 2> translation, bool reverse = false);
+    const mat4 &translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchor anchor = TranslateAnchor::Map);
 
     void prepareTile(const Tile& tile);
     void useProgram(uint32_t program);
@@ -97,6 +98,7 @@ private:
 
 public:
     mat4 matrix;
+    mat4 vtxMatrix;
     mat4 projMatrix;
     mat4 nativeMatrix;
     mat4 extrudeMatrix;

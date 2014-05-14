@@ -77,11 +77,11 @@ module.exports = {
             "value": "park",
             "type": "fill"
         },
-        "landuse_cemetary": {
+        "landuse_cemetery": {
             "source": "mapbox streets",
             "layer": "landuse",
             "field": "class",
-            "value": "cemetary",
+            "value": "cemetery",
             "type": "fill"
         },
         "landuse_hospital": {
@@ -567,7 +567,7 @@ module.exports = {
         "land": "#f8f4f0",
         "water": "#a0c8f0",
         "park": "#d8e8c8",
-        "cemetary": "#e0e4dd",
+        "cemetery": "#e0e4dd",
         "hospital": "#fde",
         "school": "#f0e8f8",
         "wood": "#6a4",
@@ -610,8 +610,8 @@ module.exports = {
         "name": "landuse_park",
         "bucket": "landuse_park"
     }, {
-        "name": "landuse_cemetary",
-        "bucket": "landuse_cemetary"
+        "name": "landuse_cemetery",
+        "bucket": "landuse_cemetery"
     }, {
         "name": "landuse_hospital",
         "bucket": "landuse_hospital"
@@ -943,8 +943,8 @@ module.exports = {
             "landuse_park": {
                 "color": "park",
             },
-            "landuse_cemetary": {
-                "color": "cemetary",
+            "landuse_cemetery": {
+                "color": "cemetery",
             },
             "landuse_hospital": {
                 "color": "hospital",
@@ -1005,9 +1005,10 @@ module.exports = {
             "building_shadow": {
                 "color": "building_shadow",
                 "translate": [
-                    2,
-                    2
+                    1,
+                    1
                 ],
+                "translate-anchor": "viewport",
                 "opacity": [
                     "stops", {
                         "z": 0,
