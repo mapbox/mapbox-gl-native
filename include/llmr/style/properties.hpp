@@ -8,6 +8,7 @@
 
 namespace llmr {
 
+// Stores a premultiplied color, with all four channels ranging from 0..1
 typedef std::array<float, 4> Color;
 
 enum class Winding {

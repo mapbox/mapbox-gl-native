@@ -333,18 +333,25 @@ Color StyleParser::parseColor(JSVal value) {
             throw Style::exception("color values must be numbers");
         }
 
-        return {{static_cast<float>(r.GetDouble()),
-                 static_cast<float>(g.GetDouble()),
-                 static_cast<float>(b.GetDouble()),
-                 static_cast<float>(a.GetDouble())}};
+        // Premultiply the color.
+        const double alpha = a.GetDouble();
+        return {{static_cast<float>(alpha * r.GetDouble()),
+                 static_cast<float>(alpha * g.GetDouble()),
+                 static_cast<float>(alpha * b.GetDouble()),
+                 static_cast<float>(alpha)}};
 
     } else if (!rvalue.IsString()) {
         throw Style::exception("color value must be a string");
     }
 
     CSSColorParser::Color css_color = CSSColorParser::parse({ rvalue.GetString(), rvalue.GetStringLength() });
-    return {{(float)css_color.r / 255, (float)css_color.g / 255,
-             (float)css_color.b / 255, css_color.a}};
+
+    // Premultiply the color.
+    const float factor = css_color.a / 255;
+    return {{(float)css_color.r * factor,
+             (float)css_color.g * factor,
+             (float)css_color.b * factor,
+             css_color.a}};
 }
 
 FunctionProperty::fn StyleParser::parseFunctionType(JSVal type) {
