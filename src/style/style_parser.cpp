@@ -488,6 +488,10 @@ LineClass StyleParser::parseLineClass(JSVal value) {
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
     }
 
+    if (value.HasMember("translate-anchor")) {
+        klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
+    }
+
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
     }
@@ -518,6 +522,10 @@ PointClass StyleParser::parsePointClass(JSVal value) {
     if (value.HasMember("translate")) {
         std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+    }
+
+    if (value.HasMember("translate-anchor")) {
+        klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
     }
 
     if (value.HasMember("color")) {

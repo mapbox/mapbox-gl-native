@@ -89,7 +89,6 @@ public:
     bool needsAnimation() const;
 private:
     void setupShaders();
-    void translateLayer(const std::array<float, 2> &translation, const Tile::ID &id, bool reverse = false);
     mat4 translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchor anchor = TranslateAnchor::Map);
 
     void prepareTile(const Tile& tile);

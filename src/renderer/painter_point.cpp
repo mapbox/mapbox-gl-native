@@ -17,8 +17,6 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
     const PointProperties& properties = point_properties_it->second;
     if (!properties.enabled) return;
 
-    translateLayer(properties.translate, id);
-
     Color color = properties.color;
     color[0] *= properties.opacity;
     color[1] *= properties.opacity;
@@ -37,9 +35,11 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
         imagePos = sprite->getPosition(sized_image, false);
     }
 
+    const mat4 vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
+
     if (!imagePos.size) {
         useProgram(dotShader->program);
-        dotShader->setMatrix(matrix);
+        dotShader->setMatrix(vtxMatrix);
         dotShader->setColor(color);
 
         const float pointSize = (properties.radius ? properties.radius * 2 : 8) * map.getState().getPixelRatio();
@@ -55,7 +55,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
         bucket.drawPoints(*dotShader);
     } else {
         useProgram(pointShader->program);
-        pointShader->setMatrix(matrix);
+        pointShader->setMatrix(vtxMatrix);
         pointShader->setColor(color);
 
         pointShader->setImage(0);
@@ -75,6 +75,4 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
         glDepthRange(strata, 1.0f);
         bucket.drawPoints(*pointShader);
     }
-
-    translateLayer(properties.translate, id, true);
 }

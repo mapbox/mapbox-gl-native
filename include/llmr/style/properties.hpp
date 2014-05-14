@@ -63,6 +63,7 @@ struct FunctionProperty {
 struct PointClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     FunctionProperty size;
     Color color = {{ 0, 0, 0, 1 }};
     FunctionProperty opacity = 1;
@@ -74,6 +75,7 @@ struct PointClass {
 struct PointProperties {
     bool enabled = true;
     std::array<float, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     float size = 0;
     Color color = {{ 0, 0, 0, 1 }};
     float opacity = 1.0;
@@ -85,6 +87,7 @@ struct PointProperties {
 struct LineClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     FunctionProperty width;
     FunctionProperty offset;
     Color color = {{ 0, 0, 0, 1 }};
@@ -95,6 +98,7 @@ struct LineClass {
 struct LineProperties {
     bool enabled = true;
     std::array<float, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     float width = 0;
     float offset = 0;
     Color color = {{ 0, 0, 0, 1 }};

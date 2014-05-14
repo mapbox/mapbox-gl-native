@@ -171,15 +171,6 @@ void Painter::renderTileLayer(const Tile& tile, const LayerDescription &layer_de
     }
 }
 
-void Painter::translateLayer(const std::array<float, 2> &translation, const Tile::ID &id, bool reverse) {
-    if (translation[0] || translation[1]) {
-        const int direction = reverse ? -1 : 1;
-        // TODO: Get rid of the 8 (scaling from 4096 to tile size)
-        const double factor = direction * ((double)(1 << id.z)) / map.getState().getScale() * (4096.0 / util::tileSize);
-        matrix::translate(matrix, matrix, translation[0] * factor, translation[1] * factor, 0);
-    }
-}
-
 mat4 Painter::translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchor anchor) {
     if (translation[0] == 0 && translation[1] == 0) {
         return matrix;

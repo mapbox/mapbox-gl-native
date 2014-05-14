@@ -33,14 +33,14 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     float dash_length = properties.dash_array[0];
     float dash_gap = properties.dash_array[1];
 
-    translateLayer(properties.translate, id);
+    const mat4 vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     glDepthRange(strata, 1.0f);
 
     // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
     if (bucket.hasPoints() && outset > 1.0f) {
         useProgram(linejoinShader->program);
-        linejoinShader->setMatrix(matrix);
+        linejoinShader->setMatrix(vtxMatrix);
         linejoinShader->setColor(color);
         linejoinShader->setWorld({{
                 map.getState().getFramebufferWidth() * 0.5f,
@@ -79,7 +79,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 
     } else {
         useProgram(lineShader->program);
-        lineShader->setMatrix(matrix);
+        lineShader->setMatrix(vtxMatrix);
         lineShader->setExtrudeMatrix(extrudeMatrix);
         lineShader->setDashArray({{ dash_length, dash_gap }});
         lineShader->setLineWidth({{ outset, inset }});
@@ -87,6 +87,4 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         lineShader->setColor(color);
         bucket.drawLines(*lineShader);
     }
-
-    translateLayer(properties.translate, id, true);
 }
