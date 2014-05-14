@@ -3478,7 +3478,9 @@ module.exports = {
                 },
                 "road_label": {
                 "color": "#765",
-                "stroke": "land",
+                "stroke": "#FFF",
+                "strokeWidth": 0.6,
+                "strokeBlur": 3,
                 "size": [
                          "stops",
                          {
