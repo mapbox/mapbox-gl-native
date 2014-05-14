@@ -21,8 +21,8 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 
     // These are the radii of the line. We are limiting it to 16, which will result
     // in a point size of 64 on retina.
-    float inset = fmin((fmax(-1, offset - width / 2 - 0.5) + 1), 16.0f);
-    float outset = fmin(offset + width / 2 + 0.5, 16.0f);
+    float inset = std::fmin((std::fmax(-1, offset - width / 2 - 0.5) + 1), 16.0f);
+    float outset = std::fmin(offset + width / 2 + 0.5, 16.0f);
 
     Color color = properties.color;
     color[0] *= properties.opacity;
@@ -33,14 +33,14 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     float dash_length = properties.dash_array[0];
     float dash_gap = properties.dash_array[1];
 
-    translateLayer(properties.translate, id);
+    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     glDepthRange(strata, 1.0f);
 
     // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
     if (bucket.hasPoints() && outset > 1.0f) {
         useProgram(linejoinShader->program);
-        linejoinShader->setMatrix(matrix);
+        linejoinShader->setMatrix(vtxMatrix);
         linejoinShader->setColor(color);
         linejoinShader->setWorld({{
                 map.getState().getFramebufferWidth() * 0.5f,
@@ -53,7 +53,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
             }
         });
 
-        float pointSize = ceil(map.getState().getPixelRatio() * outset * 2.0);
+        float pointSize = std::ceil(map.getState().getPixelRatio() * outset * 2.0);
 #if defined(GL_ES_VERSION_2_0)
         linejoinShader->setSize(pointSize);
 #else
@@ -79,7 +79,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 
     } else {
         useProgram(lineShader->program);
-        lineShader->setMatrix(matrix);
+        lineShader->setMatrix(vtxMatrix);
         lineShader->setExtrudeMatrix(extrudeMatrix);
         lineShader->setDashArray({{ dash_length, dash_gap }});
         lineShader->setLineWidth({{ outset, inset }});
@@ -87,6 +87,4 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
         lineShader->setColor(color);
         bucket.drawLines(*lineShader);
     }
-
-    translateLayer(properties.translate, id, true);
 }

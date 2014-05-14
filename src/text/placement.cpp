@@ -28,7 +28,7 @@ Placement::Placement(int8_t zoom)
       // glyphs be placed, slowing down collision checking. Only place labels if
       // they will show up within the intended zoom range of the tile.
       // TODO make this not hardcoded to 3
-      maxPlacementScale(exp(log(2) * util::min((25.5 - zoom), 3.0))) {}
+      maxPlacementScale(std::exp(log(2) * util::min((25.5 - zoom), 3.0))) {}
 
 bool byScale(const Anchor &a, const Anchor &b) { return a.scale < b.scale; }
 
@@ -95,20 +95,20 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
     float prevscale = std::numeric_limits<float>::infinity();
     float prevAngle = 0.0f;
 
-    offset = fabs(offset);
+    offset = std::fabs(offset);
 
     const float placementScale = anchor.scale;
 
     while (true) {
         const float dist = util::dist<float>(newAnchor, end);
         const float scale = offset / dist;
-        float angle = -atan2(end.x - newAnchor.x, end.y - newAnchor.y) +
+        float angle = -std::atan2(end.x - newAnchor.x, end.y - newAnchor.y) +
                       direction * M_PI / 2.0f;
         if (upsideDown)
             angle += M_PI;
 
         // Don't place around sharp corners
-        float angleDiff = fmod((angle - prevAngle), (2.0f * M_PI));
+        float angleDiff = std::fmod((angle - prevAngle), (2.0f * M_PI));
         if (prevAngle && std::fabs(angleDiff) > maxAngleDelta) {
             anchor.scale = prevscale;
             break;
@@ -120,7 +120,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
             /* minScale */ scale,
             /* maxScale */ prevscale,
             /* angle */ static_cast<float>(
-                fmod((angle + 2.0 * M_PI), (2.0 * M_PI)))};
+                std::fmod((angle + 2.0 * M_PI), (2.0 * M_PI)))};
 
         if (scale <= placementScale)
             break;
@@ -228,8 +228,8 @@ PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
 
             if (angle) {
                 // Compute the transformation matrix.
-                float angle_sin = sin(angle);
-                float angle_cos = cos(angle);
+                float angle_sin = std::sin(angle);
+                float angle_cos = std::cos(angle);
                 std::array<float, 4> matrix = {
                     {angle_cos, -angle_sin, angle_sin, angle_cos}};
 
@@ -251,7 +251,7 @@ PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
             glyphs.emplace_back(PlacedGlyph{
                 tl, tr, bl, br, glyph.rect, width, height,
                 static_cast<float>(
-                    fmod((anchor.angle + rotate + instance.offset + 2 * M_PI),
+                    std::fmod((anchor.angle + rotate + instance.offset + 2 * M_PI),
                          (2 * M_PI))),
                 GlyphBox{box,             instance.minScale, instance.maxScale,
                          instance.anchor, horizontal}});

@@ -40,6 +40,7 @@ void Style::cascade(float z) {
             fill.enabled = layer.enabled.evaluate<bool>(z);
             fill.translate = {{ layer.translate[0].evaluate<float>(z),
                                 layer.translate[1].evaluate<float>(z) }};
+            fill.translateAnchor = layer.translateAnchor;
             fill.winding = layer.winding;
             fill.antialias = layer.antialias.evaluate<bool>(z);
             fill.fill_color = layer.fill_color;
@@ -59,6 +60,7 @@ void Style::cascade(float z) {
             stroke.enabled = layer.enabled.evaluate<bool>(z);
             stroke.translate = {{ layer.translate[0].evaluate<float>(z),
                                   layer.translate[1].evaluate<float>(z) }};
+            stroke.translateAnchor = layer.translateAnchor;
             stroke.width = layer.width.evaluate<float>(z);
             stroke.offset = layer.offset.evaluate<float>(z);
             stroke.color = layer.color;
@@ -78,6 +80,7 @@ void Style::cascade(float z) {
             point.enabled = layer.enabled.evaluate<bool>(z);
             point.translate = {{ layer.translate[0].evaluate<float>(z),
                                  layer.translate[1].evaluate<float>(z) }};
+            point.translateAnchor = layer.translateAnchor;
             point.color = layer.color;
             point.size = layer.size.evaluate<float>(z);
             point.opacity = layer.opacity.evaluate<float>(z);

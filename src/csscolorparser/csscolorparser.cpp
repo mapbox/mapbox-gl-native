@@ -114,7 +114,7 @@ const std::map<std::string, Color> kCSSColorTable = {
 
 template <typename T>
 uint8_t clamp_css_byte(T i) {  // Clamp to integer 0 .. 255.
-    i = round(i);  // Seems to be what Chrome does (vs truncation).
+    i = std::round(i);  // Seems to be what Chrome does (vs truncation).
     return i < 0 ? 0 : i > 255 ? 255 : i;
 }
 

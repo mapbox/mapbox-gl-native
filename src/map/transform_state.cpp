@@ -6,7 +6,7 @@ using namespace llmr;
 #pragma mark - Matrix
 
 void TransformState::matrixFor(mat4& matrix, const Tile::ID& id) const {
-    const double tile_scale = pow(2, id.z);
+    const double tile_scale = std::pow(2, id.z);
     const double tile_size = scale * util::tileSize / tile_scale;
 
     matrix::identity(matrix);
@@ -23,10 +23,10 @@ void TransformState::matrixFor(mat4& matrix, const Tile::ID& id) const {
 }
 
 box TransformState::cornersToBox(uint32_t z) const {
-    const double ref_scale = pow(2, z);
+    const double ref_scale = std::pow(2, z);
 
-    const double angle_sin = sin(-angle);
-    const double angle_cos = cos(-angle);
+    const double angle_sin = std::sin(-angle);
+    const double angle_cos = std::cos(-angle);
 
     const double w_2 = width / 2;
     const double h_2 = height / 2;
@@ -88,15 +88,15 @@ float TransformState::getPixelRatio() const {
 #pragma mark - Zoom
 
 float TransformState::getNormalizedZoom() const {
-    return log(scale * util::tileSize / 256.0f) / M_LN2;
+    return std::log(scale * util::tileSize / 256.0f) / M_LN2;
 }
 
 int32_t TransformState::getIntegerZoom() const {
-    return floor(getZoom());
+    return std::floor(getZoom());
 }
 
 double TransformState::getZoom() const {
-    return log(scale) / M_LN2;
+    return std::log(scale) / M_LN2;
 }
 
 double TransformState::getScale() const {

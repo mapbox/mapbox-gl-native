@@ -49,8 +49,8 @@ void Transform::moveBy(const double dx, const double dy, const time duration) {
 void Transform::_moveBy(const double dx, const double dy, const time duration) {
     // This is only called internally, so we don't need a lock here.
 
-    final.x = current.x + cos(current.angle) * dx + sin(current.angle) * dy;
-    final.y = current.y + cos(current.angle) * dy + sin(-current.angle) * dx;
+    final.x = current.x + std::cos(current.angle) * dx + std::sin(current.angle) * dy;
+    final.y = current.y + std::cos(current.angle) * dy + std::sin(-current.angle) * dx;
 
     if (duration == 0) {
         current.x = final.x;
@@ -68,9 +68,9 @@ void Transform::_moveBy(const double dx, const double dy, const time duration) {
 void Transform::setLonLat(const double lon, const double lat, const time duration) {
     uv::writelock lock(mtx);
 
-    const double f = fmin(fmax(sin(D2R * lat), -0.9999), 0.9999);
-    double xn = -round(lon * Bc);
-    double yn = round(0.5 * Cc * log((1 + f) / (1 - f)));
+    const double f = std::fmin(std::fmax(std::sin(D2R * lat), -0.9999), 0.9999);
+    double xn = -std::round(lon * Bc);
+    double yn = std::round(0.5 * Cc * std::log((1 + f) / (1 - f)));
 
     _setScaleXY(current.scale, xn, yn, duration);
 }
@@ -79,16 +79,16 @@ void Transform::setLonLatZoom(const double lon, const double lat, const double z
                               const time duration) {
     uv::writelock lock(mtx);
 
-    double new_scale = pow(2.0, zoom);
+    double new_scale = std::pow(2.0, zoom);
 
     const double s = new_scale * util::tileSize;
     zc = s / 2;
     Bc = s / 360;
     Cc = s / (2 * M_PI);
 
-    const double f = fmin(fmax(sin(D2R * lat), -0.9999), 0.9999);
-    double xn = -round(lon * Bc);
-    double yn = round(0.5 * Cc * log((1 + f) / (1 - f)));
+    const double f = std::fmin(std::fmax(std::sin(D2R * lat), -0.9999), 0.9999);
+    double xn = -std::round(lon * Bc);
+    double yn = std::round(0.5 * Cc * log((1 + f) / (1 - f)));
 
     _setScaleXY(new_scale, xn, yn, duration);
 }
@@ -97,7 +97,7 @@ void Transform::getLonLat(double &lon, double &lat) const {
     uv::readlock lock(mtx);
 
     lon = -final.x / Bc;
-    lat = R2D * (2 * atan(exp(final.y / Cc)) - 0.5 * M_PI);
+    lat = R2D * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
 }
 
 void Transform::getLonLatZoom(double &lon, double &lat, double &zoom) const {
@@ -159,7 +159,7 @@ void Transform::setScale(const double scale, const double cx, const double cy,
 void Transform::setZoom(const double zoom, const time duration) {
     uv::writelock lock(mtx);
 
-    _setScale(pow(2.0, zoom), -1, -1, duration);
+    _setScale(std::pow(2.0, zoom), -1, -1, duration);
 }
 
 double Transform::getZoom() const {
@@ -224,8 +224,8 @@ void Transform::_setScale(double new_scale, double cx, double cy, const time dur
     const double dy = (cy - current.height / 2) * (1.0 - factor);
 
     // Account for angle
-    const double angle_sin = sin(-current.angle);
-    const double angle_cos = cos(-current.angle);
+    const double angle_sin = std::sin(-current.angle);
+    const double angle_cos = std::cos(-current.angle);
     const double ax = angle_cos * dx - angle_sin * dy;
     const double ay = angle_sin * dx + angle_cos * dy;
 
@@ -276,15 +276,15 @@ void Transform::rotateBy(const double start_x, const double start_y, const doubl
     const double begin_center_y = start_y - center_y;
 
     const double beginning_center_dist =
-        sqrt(begin_center_x * begin_center_x + begin_center_y * begin_center_y);
+        std::sqrt(begin_center_x * begin_center_x + begin_center_y * begin_center_y);
 
     // If the first click was too close to the center, move the center of rotation by 200 pixels
     // in the direction of the click.
     if (beginning_center_dist < 200) {
         const double offset_x = -200, offset_y = 0;
-        const double rotate_angle = atan2(begin_center_y, begin_center_x);
-        const double rotate_angle_sin = sin(rotate_angle);
-        const double rotate_angle_cos = cos(rotate_angle);
+        const double rotate_angle = std::atan2(begin_center_y, begin_center_x);
+        const double rotate_angle_sin = std::sin(rotate_angle);
+        const double rotate_angle_cos = std::cos(rotate_angle);
         center_x = start_x + rotate_angle_cos * offset_x - rotate_angle_sin * offset_y;
         center_y = start_y + rotate_angle_sin * offset_x + rotate_angle_cos * offset_y;
     }

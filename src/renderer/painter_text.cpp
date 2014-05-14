@@ -28,10 +28,10 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     }
 
     // If layerStyle.size > bucket.info.fontSize then labels may collide
-    float fontSize = fmin(properties.size, bucket.geom_desc.font_size);
+    float fontSize = std::fmin(properties.size, bucket.geom_desc.font_size);
     matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
 
-    const mat4 vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
+    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     useProgram(textShader->program);
     textShader->setMatrix(vtxMatrix);
@@ -42,7 +42,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
                                  static_cast<float>(map.getGlyphAtlas().height)}});
 
     // Convert the -pi..pi to an int8 range.
-    float angle = round((map.getState().getAngle() + rotate) / M_PI * 128);
+    float angle = std::round((map.getState().getAngle() + rotate) / M_PI * 128);
 
     // adjust min/max zooms for variable font sies
     float zoomAdjust = log(fontSize / bucket.geom_desc.font_size) / log(2);
@@ -73,8 +73,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     float startingZ = history.front().z;
     const FrameSnapshot lastFrame = history.back();
     float endingZ = lastFrame.z;
-    float lowZ = fmin(startingZ, endingZ);
-    float highZ = fmax(startingZ, endingZ);
+    float lowZ = std::fmin(startingZ, endingZ);
+    float highZ = std::fmax(startingZ, endingZ);
 
     // Calculate the speed of zooming, and how far it would zoom in terms of zoom levels in one duration
     float zoomDiff = endingZ - history[1].z,
@@ -89,8 +89,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     float bump = (currentTime - lastFrame.timestamp) / duration * fadedist;
 
     textShader->setFadeDist(fadedist * 10);
-    textShader->setMinFadeZoom(floor(lowZ * 10));
-    textShader->setMaxFadeZoom(floor(highZ * 10));
+    textShader->setMinFadeZoom(std::floor(lowZ * 10));
+    textShader->setMaxFadeZoom(std::floor(highZ * 10));
     textShader->setFadeZoom((map.getState().getZoom() + bump) * 10);
 
     // We're drawing in the translucent pass which is bottom-to-top, so we need

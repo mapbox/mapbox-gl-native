@@ -52,7 +52,7 @@ float functions::stops(float z, const std::vector<float>& stops) {
         // Linear interpolation if base is 0
         if (smaller_val == 0) return factor * larger_val;
         // Exponential interpolation between the values
-        return smaller_val * pow(larger_val / smaller_val, factor);
+        return smaller_val * std::pow(larger_val / smaller_val, factor);
     } else if (larger || smaller) {
         // Do not draw a line.
         return -std::numeric_limits<float>::infinity();
@@ -77,7 +77,7 @@ float functions::linear(float z, const std::vector<float>& values) {
     const float min = values[3];
     const float max = values[4];
 
-    return fmin(fmax(min, val + (z - z_base) * slope), max);
+    return std::fmin(std::fmax(min, val + (z - z_base) * slope), max);
 }
 
 float functions::exponential(float z, const std::vector<float>& values) {
@@ -91,5 +91,5 @@ float functions::exponential(float z, const std::vector<float>& values) {
     const float min = values[3];
     const float max = values[4];
 
-    return fmin(fmax(min, val + pow(1.75, (z - z_base)) * slope), max);
+    return std::fmin(std::fmax(min, val + std::pow(1.75, (z - z_base)) * slope), max);
 }

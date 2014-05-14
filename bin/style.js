@@ -120,11 +120,11 @@ module.exports = {
             "value": "pitch",
             "type": "fill"
         },
-        "landuse_cemetary": {
+        "landuse_cemetery": {
             "source": "outdoors",
             "layer": "landuse",
             "field": "class",
-            "value": "cemetary",
+            "value": "cemetery",
             "type": "fill"
         },
         "landuse_hospital": {
@@ -806,7 +806,7 @@ module.exports = {
         "snow": "#f4f8ff",
         "rock": "#ddd",
         "sand": "#ffd",
-        "cemetary": "#edf4ed",
+        "cemetery": "#edf4ed",
         "pitch": "#fff",
         "park": "#d4e4bc",
         "piste": "blue",
@@ -864,8 +864,8 @@ module.exports = {
                   "bucket": "landuse_pitch"
                   },
                   {
-                  "name": "landuse_cemetary",
-                  "bucket": "landuse_cemetary"
+                  "name": "landuse_cemetery",
+                  "bucket": "landuse_cemetery"
                   },
                   {
                   "name": "landuse_hospital",
@@ -1484,8 +1484,8 @@ module.exports = {
                 "landuse_park": {
                 "color": "park"
                 },
-                "landuse_cemetary": {
-                "color": "cemetary"
+                "landuse_cemetery": {
+                "color": "cemetery"
                 },
                 "landuse_hospital": {
                 "color": "hospital"

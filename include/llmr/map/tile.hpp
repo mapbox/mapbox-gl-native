@@ -33,7 +33,7 @@ public:
             : w((x < 0 ? x - (1 << z) + 1 : x) / (1 << z)), z(z), x(x), y(y) {}
 
         inline uint64_t to_uint64() const {
-            return ((pow(2, z) * y + x) * 32) + z;
+            return ((std::pow(2, z) * y + x) * 32) + z;
         }
 
         inline operator std::string() const {
