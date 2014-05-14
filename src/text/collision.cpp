@@ -17,8 +17,8 @@ namespace bgm = bg::model;
 namespace bgi = bg::index;
 typedef bgm::point<float, 2, bg::cs::cartesian> Point;
 typedef bgm::box<Point> Box;
-typedef std::pair<Box, PlacementBox> PlacementValue;
-typedef bgi::rtree<PlacementValue, bgi::quadratic<16>> Tree;
+typedef std::tuple<Box, PlacementBox> PlacementValue;
+typedef bgi::rtree<PlacementValue, bgi::rstar<16>> Tree;
 }
 
 using namespace llmr;
@@ -172,7 +172,7 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs,
             const CollisionRect &nb = box;      // new box
 
             for (const PlacementValue &value : blocking) {
-                const PlacementBox &placement = value.second;
+                const PlacementBox &placement = std::get<1>(value);
                 const CollisionAnchor &oa = placement.anchor; // old anchor
                 const CollisionRect &ob = placement.box;      // old box
 
@@ -249,8 +249,8 @@ PlacementRange Collision::getPlacementRange(const GlyphBoxes &glyphs,
             ->query(bgi::intersects(query_box), std::back_inserter(blocking));
 
         for (const PlacementValue &value : blocking) {
-            const Box &s = value.first;
-            const PlacementBox &b = value.second;
+            const Box &s = std::get<0>(value);
+            const PlacementBox &b = std::get<1>(value);
 
             float x1, x2, y1, y2, intersectX, intersectY;
 
@@ -296,6 +296,9 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
                        float padding) {
     assert(placementScale != std::numeric_limits<float>::infinity());
 
+    std::vector<PlacementValue> result;
+    result.reserve(glyphs.size());
+
     for (const GlyphBox &glyph : glyphs) {
         const CollisionRect &bbox = glyph.bbox;
         const CollisionRect &box = glyph.box;
@@ -320,6 +323,9 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
         assert(!isnan(bounds.min_corner().get<0>()) && !isnan(bounds.min_corner().get<1>()));
         assert(!isnan(bounds.max_corner().get<0>()) && !isnan(bounds.max_corner().get<1>()));
 
-        ((Tree *)tree)->insert({bounds, placement});
+        result.emplace_back(bounds, placement);
     }
+
+    // Bulk-insert all glyph boxes
+    ((Tree *)tree)->insert(result.begin(), result.end());
 }
