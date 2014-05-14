@@ -14,6 +14,8 @@
             "./MBXAppDelegate.m",
             "./MBXViewController.h",
             "./MBXViewController.mm",
+            "./MVKMapKit/MVKMapKit/MVKMapView.h",
+            "./MVKMapKit/MVKMapKit/MVKMapView.mm",
             "../common/settings_nsuserdefaults.hpp",
             "../common/settings_nsuserdefaults.mm",
             "../common/foundation_request.h",
