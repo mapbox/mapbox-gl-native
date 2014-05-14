@@ -36,6 +36,19 @@ MBXViewController *viewController = nullptr;
 
 #pragma mark - Setup
 
+- (id)init
+{
+    self = [super init];
+
+    if (self)
+    {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState) name:UIApplicationWillEnterForegroundNotification object:nil];
+    }
+
+    return self;
+}
+
 - (void)loadView
 {
     [super loadView];
@@ -252,6 +265,8 @@ MBXViewController *viewController = nullptr;
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
     if (settings)
     {
         // Save settings

@@ -53,31 +53,41 @@ run-linux: linux
 
 ##### Xcode projects ###########################################################
 
+clear_xcode_cache:
+    @CUSTOM_DD=`defaults read com.apple.dt.Xcode IDECustomDerivedDataLocation 2>/dev/null`; \
+    if [[ $$CUSTOM_DD ]]; then \
+        echo clearing files in $$CUSTOM_DD older than one day; \
+        find $$CUSTOM_DD/llmr-app-* -mtime +1 | xargs rm -rf; \
+    fi; \
+    if [[ -d ~/Library/Developer/Xcode/DerivedData/ ]] && [[ ! $$CUSTOM_DD ]]; then \
+        echo 'clearing files in ~/Library/Developer/Xcode/DerivedData/llmr-app-* older than one day'; \
+        find ~/Library/Developer/Xcode/DerivedData/llmr-app-* -mtime +1 | xargs rm -rf; \
+    fi
+
 # build Mac OS X project for Xcode
-xproj: config.gypi macosx/llmr-app.gyp node
+xproj: config.gypi macosx/llmr-app.gyp clear_xcode_cache node
 	deps/run_gyp macosx/llmr-app.gyp --depth=. --generator-output=./build -f xcode
 	open ./build/macosx/llmr-app.xcodeproj
 
 # build iOS project for Xcode
-iproj: config.gypi ios/llmr-app.gyp node
+iproj: config.gypi ios/llmr-app.gyp clear_xcode_cache node
 	deps/run_gyp ios/llmr-app.gyp --depth=. --generator-output=./build -f xcode
 	open ./build/ios/llmr-app.xcodeproj
 
 # build Linux project for Xcode (Runs on Mac OS X too, but without platform-specific code)
-lproj: config.gypi linux/llmr-app.gyp node
+lproj: config.gypi linux/llmr-app.gyp clear_xcode_cache node
 	deps/run_gyp linux/llmr-app.gyp --depth=. --generator-output=./build -f xcode
 	open ./build/linux/llmr-app.xcodeproj
 
 
 ##### Maintenace operations ####################################################
 
-clean:
+clean: clear_xcode_cache
 	-rm -rf ./build/Release
 	-rm -rf ./build/Debug
 	-rm -f include/llmr/shader/shaders.hpp
 	-rm -f include/llmr/style/resources.hpp
 	-rm -f src/style/resources.cpp
-	-rm -rf ~/Library/Developer/Xcode/DerivedData/llmr*
 
 distclean: clean
 	-rm -rf ./build
