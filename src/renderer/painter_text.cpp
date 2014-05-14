@@ -41,8 +41,6 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     textShader->setTextureSize({{static_cast<float>(map.getGlyphAtlas().width),
                                  static_cast<float>(map.getGlyphAtlas().height)}});
 
-    textShader->setGamma(2.5f / fontSize / map.getState().getPixelRatio());
-
     // Convert the -pi..pi to an int8 range.
     float angle = round((map.getState().getAngle() + rotate) / M_PI * 128);
 
@@ -98,15 +96,19 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
     if (properties.halo[3] > 0.0f) {
+        textShader->setGamma(properties.haloBlur * 2.4f / fontSize / map.getState().getPixelRatio());
         textShader->setColor(properties.halo);
         textShader->setBuffer(properties.haloRadius);
         glDepthRange(strata, 1.0f);
         bucket.drawGlyphs(*textShader);
     }
 
-    // Then, we draw the text over the halo
-    textShader->setColor(properties.color);
-    textShader->setBuffer((256.0f - 64.0f) / 256.0f);
-    glDepthRange(strata + strata_epsilon, 1.0f);
-    bucket.drawGlyphs(*textShader);
+    if (properties.color[3] > 0.0f) {
+        // Then, we draw the text over the halo
+        textShader->setGamma(2.4f / fontSize / map.getState().getPixelRatio());
+        textShader->setColor(properties.color);
+        textShader->setBuffer((256.0f - 64.0f) / 256.0f);
+        glDepthRange(strata + strata_epsilon, 1.0f);
+        bucket.drawGlyphs(*textShader);
+    }
 }
