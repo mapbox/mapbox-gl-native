@@ -89,7 +89,7 @@ public:
     bool needsAnimation() const;
 private:
     void setupShaders();
-    mat4 translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchor anchor = TranslateAnchor::Map);
+    const mat4 &translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchor anchor = TranslateAnchor::Map);
 
     void prepareTile(const Tile& tile);
     void useProgram(uint32_t program);
@@ -98,6 +98,7 @@ private:
 
 public:
     mat4 matrix;
+    mat4 vtxMatrix;
     mat4 projMatrix;
     mat4 nativeMatrix;
     mat4 extrudeMatrix;

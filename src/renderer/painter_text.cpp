@@ -31,7 +31,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     float fontSize = std::fmin(properties.size, bucket.geom_desc.font_size);
     matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
 
-    const mat4 vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
+    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     useProgram(textShader->program);
     textShader->setMatrix(vtxMatrix);

@@ -35,7 +35,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         stroke_color = fill_color;
     }
 
-    const mat4 vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
+    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)

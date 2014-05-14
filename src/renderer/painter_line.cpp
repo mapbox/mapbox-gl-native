@@ -33,7 +33,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     float dash_length = properties.dash_array[0];
     float dash_gap = properties.dash_array[1];
 
-    const mat4 vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
+    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     glDepthRange(strata, 1.0f);
 

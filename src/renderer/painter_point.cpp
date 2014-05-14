@@ -35,7 +35,7 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
         imagePos = sprite->getPosition(sized_image, false);
     }
 
-    const mat4 vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
+    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     if (!imagePos.size) {
         useProgram(dotShader->program);
