@@ -593,7 +593,7 @@ module.exports = {
             "layer": "country_label",
             "text_field": "name",
             "path": "horizontal",
-            "fontSize": 13,
+            "fontSize": 16,
             "feature_type": "point",
             "type": "text",
             "enabled": 3
@@ -796,7 +796,7 @@ module.exports = {
         }
     },
     "constants": {
-        "land": "#f4efe1",
+        "land": "rgb(244,239,225)",
         "water": "#cdd",
         "water_dark": "#185869",
         "crop": "#eeeed4",
@@ -818,7 +818,7 @@ module.exports = {
         "main": "#ddc0b9",
         "street": "#fff",
         "text": "#666",
-        "country_text": "#323330",
+        "country_text": "#333",
         "marine_text": "#a0bdc0",
         "water_text": "#185869"
     },
@@ -2161,11 +2161,9 @@ module.exports = {
                 "color": "#d9d5c6",
                 "width": [
                           "stops",
-                          {"z": 10, "val": 0.5},
-                          {"z": 12.5, "val": 0.6},
-                          {"z": 13, "val": 0.6},
-                          {"z": 14, "val": 0.6},
-                          {"z": 15, "val": 2},
+                          {"z": 10, "val": 0.4},
+                          {"z": 14, "val": 0.4},
+                          {"z": 15, "val": 1},
                           {"z": 16, "val": 2.5},
                           {"z": 17, "val": 4},
                           {"z": 18, "val": 10},
@@ -2548,11 +2546,9 @@ module.exports = {
                 "color": "#d9d5c6",
                 "width": [
                           "stops",
-                          {"z": 10, "val": 0.5},
-                          {"z": 12.5, "val": 0.6},
-                          {"z": 13, "val": 0.6},
-                          {"z": 14, "val": 0.6},
-                          {"z": 15, "val": 2},
+                          {"z": 10, "val": 0.4},
+                          {"z": 14, "val": 0.4},
+                          {"z": 15, "val": 1},
                           {"z": 16, "val": 2.5},
                           {"z": 17, "val": 4},
                           {"z": 18, "val": 10},
@@ -3102,11 +3098,9 @@ module.exports = {
                 "color": "#d9d5c6",
                 "width": [
                           "stops",
-                          {"z": 10, "val": 0.5},
-                          {"z": 12.5, "val": 0.6},
-                          {"z": 13, "val": 0.6},
-                          {"z": 14, "val": 0.6},
-                          {"z": 15, "val": 2},
+                          {"z": 10, "val": 0.4},
+                          {"z": 14, "val": 0.4},
+                          {"z": 15, "val": 1},
                           {"z": 16, "val": 2.5},
                           {"z": 17, "val": 4},
                           {"z": 18, "val": 10},
@@ -3244,12 +3238,7 @@ module.exports = {
                 },
                 "country_label": {
                 "color": "country_text",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.5
-                           ]
+                "stroke": "rgba(255,255,255,0.5)"
                 },
                 "country_label_line": {
                 "color": "country_text",
@@ -3261,14 +3250,10 @@ module.exports = {
                 "stroke": "water"
                 },
                 "state_label": {
-                "color": "#666",
+                "color": "#333",
                 "strokeWidth": 0.4,
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.8
-                           ],
+                "strokeBlur": 1,
+                "stroke": "rgba(244,239,225,0.8)",
                 "size": [
                          "stops",
                          {
@@ -3323,12 +3308,7 @@ module.exports = {
                 "place_label_city": {
                 "color": "#444",
                 "strokeWidth": 0.4,
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.8
-                           ],
+                "stroke": "rgba(255,255,255,0.8)",
                 "size": [
                          "stops",
                          {
@@ -3390,12 +3370,7 @@ module.exports = {
                 "place_label_town": {
                 "color": "#635644",
                 "strokeWidth": 0.4,
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.8
-                           ],
+                "stroke": "rgba(255,255,255,0.8)",
                 "size": [
                          "stops",
                          {
@@ -3419,12 +3394,7 @@ module.exports = {
                 "place_label_village": {
                 "color": "#635644",
                 "strokeWidth": 0.4,
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.8
-                           ],
+                "stroke": "rgba(255,255,255,0.8)",
                 "size": [
                          "stops",
                          {
@@ -3447,12 +3417,7 @@ module.exports = {
                 },
                 "place_label_other": {
                 "color": "#7d6c55",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.8
-                           ],
+                "stroke": "rgba(255,255,255,0.8)",
                 "size": [
                          "stops",
                          {
@@ -3477,10 +3442,10 @@ module.exports = {
                          ]
                 },
                 "road_label": {
-                "color": "#765",
+                "color": "#585042",
                 "stroke": "#FFF",
                 "strokeWidth": 0.6,
-                "strokeBlur": 3,
+                "strokeBlur": 2,
                 "size": [
                          "stops",
                          {
@@ -3507,12 +3472,7 @@ module.exports = {
                 },
                 "waterway_label": {
                 "color": "water_text",
-                "stroke": [
-                           1,
-                           1,
-                           1,
-                           0.75
-                           ]
+                "stroke": "rgba(255,255,255,0.75)"
                 },
                 "poi_airport": {
                 "color": "#666",
