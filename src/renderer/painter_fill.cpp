@@ -35,13 +35,13 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         stroke_color = fill_color;
     }
 
-    translateLayer(properties.translate, id);
+    const mat4 vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (outline && pass == Translucent) {
         useProgram(outlineShader->program);
-        outlineShader->setMatrix(matrix);
+        outlineShader->setMatrix(vtxMatrix);
         lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
         outlineShader->setColor(stroke_color);
@@ -93,7 +93,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             };
 
             useProgram(patternShader->program);
-            patternShader->setMatrix(matrix);
+            patternShader->setMatrix(vtxMatrix);
             patternShader->setOffset(offset);
             patternShader->setPatternSize(imageSize);
             patternShader->setPatternTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
@@ -111,7 +111,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             // fragments
             // Draw filling rectangle.
             useProgram(plainShader->program);
-            plainShader->setMatrix(matrix);
+            plainShader->setMatrix(vtxMatrix);
             plainShader->setColor(fill_color);
 
             // Draw the actual triangles into the color & stencil buffer.
@@ -124,7 +124,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     // below, we have to draw the outline first (!)
     if (fringeline && pass == Translucent) {
         useProgram(outlineShader->program);
-        outlineShader->setMatrix(matrix);
+        outlineShader->setMatrix(vtxMatrix);
         lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
         outlineShader->setColor(fill_color);
@@ -138,6 +138,4 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         glDepthRange(strata + strata_epsilon, 1.0f);
         bucket.drawVertices(*outlineShader);
     }
-
-    translateLayer(properties.translate, id, true);
 }

@@ -40,6 +40,7 @@ void Style::cascade(float z) {
             fill.enabled = layer.enabled.evaluate<bool>(z);
             fill.translate = {{ layer.translate[0].evaluate<float>(z),
                                 layer.translate[1].evaluate<float>(z) }};
+            fill.translateAnchor = layer.translateAnchor;
             fill.winding = layer.winding;
             fill.antialias = layer.antialias.evaluate<bool>(z);
             fill.fill_color = layer.fill_color;

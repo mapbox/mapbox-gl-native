@@ -105,6 +105,7 @@ struct LineProperties {
 struct FillClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     Winding winding = Winding::NonZero;
     FunctionProperty antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
@@ -116,6 +117,7 @@ struct FillClass {
 struct FillProperties {
     bool enabled = true;
     std::array<float, 2> translate = {{ 0, 0 }};
+    TranslateAnchor translateAnchor = TranslateAnchor::Map;
     Winding winding = Winding::NonZero;
     bool antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};

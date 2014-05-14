@@ -194,6 +194,19 @@ void StyleParser::parseConstants(JSVal value) {
     }
 }
 
+TranslateAnchor parseTranslateAnchor(JSVal anchor) {
+    if (anchor.IsString()) {
+        std::string a { anchor.GetString(), anchor.GetStringLength() };
+        if (a == "viewport") {
+            return TranslateAnchor::Viewport;
+        } else {
+            return TranslateAnchor::Map;
+        }
+    } else {
+        throw Style::exception("translate anchor must be a string");
+    }
+}
+
 void StyleParser::parseClasses(JSVal value, std::map<std::string, ClassDescription>& classes, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& layers) {
     if (value.IsArray()) {
         for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
@@ -434,6 +447,10 @@ FillClass StyleParser::parseFillClass(JSVal value) {
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
     }
 
+    if (value.HasMember("translate-anchor")) {
+        klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
+    }
+
     if (value.HasMember("color")) {
         klass.fill_color = parseColor(value["color"]);
     }
@@ -528,19 +545,6 @@ PointClass StyleParser::parsePointClass(JSVal value) {
     }
 
     return klass;
-}
-
-TranslateAnchor parseTranslateAnchor(JSVal anchor) {
-    if (anchor.IsString()) {
-        std::string a { anchor.GetString(), anchor.GetStringLength() };
-        if (a == "viewport") {
-            return TranslateAnchor::Viewport;
-        } else {
-            return TranslateAnchor::Map;
-        }
-    } else {
-        throw Style::exception("translate anchor must be a string");
-    }
 }
 
 TextClass StyleParser::parseTextClass(JSVal value) {
