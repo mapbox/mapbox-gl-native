@@ -1005,9 +1005,10 @@ module.exports = {
             "building_shadow": {
                 "color": "building_shadow",
                 "translate": [
-                    2,
-                    2
+                    1,
+                    1
                 ],
+                "translate-anchor": "viewport",
                 "opacity": [
                     "stops", {
                         "z": 0,
