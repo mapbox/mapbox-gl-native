@@ -189,8 +189,8 @@ mat4 Painter::translatedMatrix(const std::array<float, 2> &translation, const Ti
 
         mat4 result;
         if (anchor == TranslateAnchor::Viewport) {
-            const double sin_a = sin(-map.getState().getAngle());
-            const double cos_a = cos(-map.getState().getAngle());
+            const double sin_a = std::sin(-map.getState().getAngle());
+            const double cos_a = std::cos(-map.getState().getAngle());
             matrix::translate(result, matrix,
                     factor * (translation[0] * cos_a - translation[1] * sin_a),
                     factor * (translation[0] * sin_a + translation[1] * cos_a),

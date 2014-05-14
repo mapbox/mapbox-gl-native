@@ -77,8 +77,8 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             // Draw texture fill
             ImagePosition imagePos = sprite->getPosition(properties.image, true);
 
-            float factor = 8.0 / pow(2, map.getState().getIntegerZoom() - id.z);
-            float mix = fmod(map.getState().getZoom(), 1.0);
+            float factor = 8.0 / std::pow(2, map.getState().getIntegerZoom() - id.z);
+            float mix = std::fmod(map.getState().getZoom(), 1.0);
 
             std::array<float, 2> imageSize = {{
                     imagePos.size.x * factor,
@@ -87,8 +87,8 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             };
 
             std::array<float, 2> offset = {{
-                    (float)fmod(id.x * 4096, imageSize[0]),
-                    (float)fmod(id.y * 4096, imageSize[1])
+                    (float)std::fmod(id.x * 4096, imageSize[0]),
+                    (float)std::fmod(id.y * 4096, imageSize[1])
                 }
             };
 

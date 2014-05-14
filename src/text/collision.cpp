@@ -104,7 +104,7 @@ PlacementProperty Collision::place(const PlacedGlyphs &placed_glyphs,
             const CollisionRect &box = glyph.box;
             float x12 = box.tl.x * box.tl.x, y12 = box.tl.y * box.tl.y,
                   x22 = box.br.x * box.br.x, y22 = box.br.y * box.br.y,
-                  diag = sqrt(
+                  diag = std::sqrt(
                       util::max(x12 + y12, x12 + y22, x22 + y12, x22 + y22));
 
             glyph.bbox = CollisionRect{{-diag, -diag}, {diag, diag}};
@@ -147,7 +147,7 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs,
             return -1;
         }
 
-        float minScale = fmax(minPlacementScale, glyph.minScale);
+        float minScale = std::fmax(minPlacementScale, glyph.minScale);
         float maxScale = glyph.maxScale;
 
         if (minScale >= maxScale) {
@@ -184,7 +184,7 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs,
                 }
 
                 // todo: unhardcode the 8 = tileExtent/tileSize
-                float padding = fmax(pad, placement.padding) * 8.0f;
+                float padding = std::fmax(pad, placement.padding) * 8.0f;
 
                 // Original algorithm:
                 float s1 = (ob.tl.x - nb.br.x - padding) /
@@ -207,7 +207,7 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs,
                     s3 = s4 = 1;
                 }
 
-                float collisionFreeScale = fmin(fmax(s1, s2), fmax(s3, s4));
+                float collisionFreeScale = std::fmin(std::fmax(s1, s2), std::fmax(s3, s4));
 
                 // Only update label's min scale if the glyph was
                 // restricted by a collision
@@ -278,12 +278,12 @@ PlacementRange Collision::getPlacementRange(const GlyphBoxes &glyphs,
             if (!(intersectX && intersectY))
                 continue;
 
-            float scale = fmax(placementScale, b.placementScale);
+            float scale = std::fmax(placementScale, b.placementScale);
             // TODO? glyph.box or glyph.bbox?
             CollisionRange range = rotationRange(glyph, b, scale);
 
-            placementRange[0] = fmin(placementRange[0], range[0]);
-            placementRange[1] = fmax(placementRange[1], range[1]);
+            placementRange[0] = std::fmin(placementRange[0], range[0]);
+            placementRange[1] = std::fmax(placementRange[1], range[1]);
         }
     }
 
@@ -300,7 +300,7 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
         const CollisionRect &bbox = glyph.bbox;
         const CollisionRect &box = glyph.box;
 
-        float minScale = fmax(placementScale, glyph.minScale);
+        float minScale = std::fmax(placementScale, glyph.minScale);
 
         Box bounds{Point{anchor.x + bbox.tl.x / minScale,
                          anchor.y + bbox.tl.y / minScale},

@@ -113,8 +113,8 @@ void matrix::translate(mat4& out, const mat4& a, float x, float y, float z) {
 }
 
 void matrix::rotate_z(mat4& out, const mat4& a, float rad) {
-    float s = sin(rad),
-          c = cos(rad),
+    float s = std::sin(rad),
+          c = std::cos(rad),
           a00 = a[0],
           a01 = a[1],
           a02 = a[2],

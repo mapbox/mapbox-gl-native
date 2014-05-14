@@ -159,12 +159,12 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         double joinAngularity = nextNormal.x * joinNormal.y - nextNormal.y * joinNormal.x;
         joinNormal.x /= joinAngularity;
         joinNormal.y /= joinAngularity;
-        double roundness = fmax(abs(joinNormal.x), abs(joinNormal.y));
+        double roundness = std::fmax(std::abs(joinNormal.x), std::abs(joinNormal.y));
 
 
         // Switch to miter joins if the angle is very low.
         if (currentJoin != JoinType::Miter) {
-            if (fabs(joinAngularity) < 0.5 && roundness < miterLimit) {
+            if (std::fabs(joinAngularity) < 0.5 && roundness < miterLimit) {
                 currentJoin = JoinType::Miter;
             }
         }
@@ -209,7 +209,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
         else if (currentJoin == JoinType::Miter) {
             // MITER JOIN
-            if (fabs(joinAngularity) < 0.01) {
+            if (std::fabs(joinAngularity) < 0.01) {
                 // The two normals are almost parallel.
                 joinNormal.x = -nextNormal.y;
                 joinNormal.y = nextNormal.x;

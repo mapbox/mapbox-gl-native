@@ -54,19 +54,19 @@ rotatingRotatingCollisions(const CollisionRect &a, const CollisionRect &b,
     // Calculate angles at which collisions may occur
     const std::array<float, 8> c = {{
         // top/bottom
-        /*[0]*/ static_cast<float>(asin((float)(a.br.y - b.tl.y) / d)),
-        /*[1]*/ static_cast<float>(asin((float)(a.br.y - b.tl.y) / d) + M_PI),
+        /*[0]*/ static_cast<float>(std::asin((float)(a.br.y - b.tl.y) / d)),
+        /*[1]*/ static_cast<float>(std::asin((float)(a.br.y - b.tl.y) / d) + M_PI),
         /*[2]*/ static_cast<float>(2 * M_PI -
-                                   asin((float)(-a.tl.y + b.br.y) / d)),
-        /*[3]*/ static_cast<float>(M_PI - asin((float)(-a.tl.y + b.br.y) / d)),
+                                   std::asin((float)(-a.tl.y + b.br.y) / d)),
+        /*[3]*/ static_cast<float>(M_PI - std::asin((float)(-a.tl.y + b.br.y) / d)),
 
         // left/right
         /*[4]*/ static_cast<float>(2 * M_PI -
-                                   acos((float)(a.br.x - b.tl.x) / d)),
-        /*[5]*/ static_cast<float>(acos((float)(a.br.x - b.tl.x) / d)),
-        /*[6]*/ static_cast<float>(M_PI - acos((float)(-a.tl.x + b.br.x) / d)),
+                                   std::acos((float)(a.br.x - b.tl.x) / d)),
+        /*[5]*/ static_cast<float>(std::acos((float)(a.br.x - b.tl.x) / d)),
+        /*[6]*/ static_cast<float>(M_PI - std::acos((float)(-a.tl.x + b.br.x) / d)),
         /*[7]*/ static_cast<float>(M_PI +
-                                   acos((float)(-a.tl.x + b.br.x) / d))}};
+                                   std::acos((float)(-a.tl.x + b.br.x) / d))}};
 
     const float rl = a.br.x - b.tl.x;
     const float lr = -a.tl.x + b.br.x;
@@ -98,7 +98,7 @@ rotatingRotatingCollisions(const CollisionRect &a, const CollisionRect &b,
             // between anchors.
             // Convert the angles to angles from north.
             f.push_back(
-                fmod((c[i] + angleBetweenAnchors + 2 * M_PI), (2 * M_PI)));
+                std::fmod((c[i] + angleBetweenAnchors + 2 * M_PI), (2 * M_PI)));
         }
     }
 
@@ -117,7 +117,7 @@ rotatingRotatingCollisions(const CollisionRect &a, const CollisionRect &b,
 
 double getAngle(const CollisionPoint &p1, const CollisionPoint &p2,
                 CollisionAngle d, const CollisionPoint &corner) {
-    return fmod(util::angle_between(util::interp(p1.x, p2.x, d),
+    return std::fmod(util::angle_between(util::interp(p1.x, p2.x, d),
                                     util::interp(p1.y, p2.y, d), corner.x,
                                     corner.y) +
                     2 * M_PI,
@@ -141,8 +141,8 @@ void circleEdgeCollisions(std::back_insert_iterator<CollisionAngles> angles,
 
     // a collision exists only if line intersects circle at two points
     if (discriminant > 0) {
-        CollisionAngle x1 = (-b - sqrt(discriminant)) / (2 * a);
-        CollisionAngle x2 = (-b + sqrt(discriminant)) / (2 * a);
+        CollisionAngle x1 = (-b - std::sqrt(discriminant)) / (2 * a);
+        CollisionAngle x2 = (-b + std::sqrt(discriminant)) / (2 * a);
 
         // only add points if within line segment
         // hack to handle floating point representations of 0 and 1

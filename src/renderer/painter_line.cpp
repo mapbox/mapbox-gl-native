@@ -21,8 +21,8 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 
     // These are the radii of the line. We are limiting it to 16, which will result
     // in a point size of 64 on retina.
-    float inset = fmin((fmax(-1, offset - width / 2 - 0.5) + 1), 16.0f);
-    float outset = fmin(offset + width / 2 + 0.5, 16.0f);
+    float inset = std::fmin((std::fmax(-1, offset - width / 2 - 0.5) + 1), 16.0f);
+    float outset = std::fmin(offset + width / 2 + 0.5, 16.0f);
 
     Color color = properties.color;
     color[0] *= properties.opacity;
@@ -53,7 +53,7 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
             }
         });
 
-        float pointSize = ceil(map.getState().getPixelRatio() * outset * 2.0);
+        float pointSize = std::ceil(map.getState().getPixelRatio() * outset * 2.0);
 #if defined(GL_ES_VERSION_2_0)
         linejoinShader->setSize(pointSize);
 #else

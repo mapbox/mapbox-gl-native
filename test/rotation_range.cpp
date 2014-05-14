@@ -49,8 +49,8 @@ TEST(RotationRange, rotatingFixedCollisions) {
         CollisionRect{CollisionPoint{1.4142, -10}, CollisionPoint{10, 10}});
 
     EXPECT_EQ(1, collisions.size());
-    EXPECT_EQ(135, round(deg(collisions.front()[0])));
-    EXPECT_EQ(135, round(deg(collisions.front()[1])));
+    EXPECT_EQ(135, std::round(deg(collisions.front()[0])));
+    EXPECT_EQ(135, std::round(deg(collisions.front()[1])));
 }
 
 TEST(RotationRange, cornerBoxCollisions) {
@@ -122,10 +122,10 @@ TEST(RotationRange, rotatingRotatingCollisions) {
             CollisionAnchor{1, 1});
 
         EXPECT_EQ(2, c.size());
-        EXPECT_EQ(135, round(deg(c[0][0])));
-        EXPECT_EQ(135, round(deg(c[0][1])));
-        EXPECT_EQ(315, round(deg(c[1][0])));
-        EXPECT_EQ(315, round(deg(c[1][1])));
+        EXPECT_EQ(135, std::round(deg(c[0][0])));
+        EXPECT_EQ(135, std::round(deg(c[0][1])));
+        EXPECT_EQ(315, std::round(deg(c[1][0])));
+        EXPECT_EQ(315, std::round(deg(c[1][1])));
     }
 
     {
