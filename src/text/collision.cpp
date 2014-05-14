@@ -11,6 +11,8 @@
 #include <boost/geometry/index/rtree.hpp>
 #pragma clang diagnostic pop
 
+#include <tuple>
+
 namespace llmr {
 namespace bg = boost::geometry;
 namespace bgm = bg::model;
