@@ -15,7 +15,11 @@ namespace uv {
 
 class mutex {
 public:
-    inline mutex() { assert(uv_mutex_init(&mtx) == 0); }
+    inline mutex() {
+        if (uv_mutex_init(&mtx) != 0) {
+            throw std::runtime_error("failed to initialize mutex");
+        }
+    }
     inline ~mutex() { uv_mutex_destroy(&mtx); }
     inline void lock() { uv_mutex_lock(&mtx); }
     inline void unlock() { uv_mutex_unlock(&mtx); }
@@ -35,7 +39,11 @@ private:
 
 class rwlock {
 public:
-    inline rwlock() { assert(uv_rwlock_init(&mtx) == 0); }
+    inline rwlock() {
+        if (uv_rwlock_init(&mtx) != 0) {
+            throw std::runtime_error("failed to initialize read-write lock");
+        }
+    }
     inline ~rwlock() { uv_rwlock_destroy(&mtx); }
     inline void rdlock() { uv_rwlock_rdlock(&mtx); }
     inline void wrlock() { uv_rwlock_wrlock(&mtx); }
