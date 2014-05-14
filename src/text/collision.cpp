@@ -11,15 +11,13 @@
 #include <boost/geometry/index/rtree.hpp>
 #pragma clang diagnostic pop
 
-#include <tuple>
-
 namespace llmr {
 namespace bg = boost::geometry;
 namespace bgm = bg::model;
 namespace bgi = bg::index;
 typedef bgm::point<float, 2, bg::cs::cartesian> Point;
 typedef bgm::box<Point> Box;
-typedef std::tuple<Box, PlacementBox> PlacementValue;
+typedef std::pair<Box, PlacementBox> PlacementValue;
 typedef bgi::rtree<PlacementValue, bgi::rstar<16>> Tree;
 }
 
