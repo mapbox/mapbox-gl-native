@@ -27,8 +27,8 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
 
     if (self)
     {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState) name:UIApplicationDidEnterBackgroundNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState:) name:UIApplicationWillEnterForegroundNotification object:nil];
     }
 
     return self;
@@ -43,7 +43,7 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
     [self.view addSubview:self.mapView];
 
     settings = new llmr::Settings_NSUserDefaults();
-    [self restoreState];
+    [self restoreState:nil];
 
     [self setupDebugUI];
 
@@ -51,7 +51,7 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
     self.locationManager.delegate = self;
 }
 
-- (void)saveState
+- (void)saveState:(NSNotification *)notification
 {
     if (self.mapView && settings)
     {
@@ -64,7 +64,7 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
     }
 }
 
-- (void)restoreState
+- (void)restoreState:(NSNotification *)notification
 {
     if (self.mapView && settings) {
         settings->load();
@@ -183,7 +183,7 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
 
     if (settings)
     {
-        [self saveState];
+        [self saveState:nil];
         delete settings;
         settings = nullptr;
     }
