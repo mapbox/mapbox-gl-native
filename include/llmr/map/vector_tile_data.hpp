@@ -10,7 +10,7 @@
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/geometry/fill_buffer.hpp>
 #include <llmr/geometry/line_buffer.hpp>
-#include <llmr/geometry/point_buffer.hpp>
+#include <llmr/geometry/icon_buffer.hpp>
 #include <llmr/geometry/text_buffer.hpp>
 
 #include <map>
@@ -33,7 +33,7 @@ protected:
     // Holds the actual geometries in this tile.
     FillVertexBuffer fillVertexBuffer;
     LineVertexBuffer lineVertexBuffer;
-    PointVertexBuffer pointVertexBuffer;
+    IconVertexBuffer iconVertexBuffer;
     TextVertexBuffer textVertexBuffer;
 
     TriangleElementsBuffer triangleElementsBuffer;

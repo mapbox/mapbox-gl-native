@@ -3,7 +3,7 @@
 #include <llmr/style/style.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
-#include <llmr/renderer/point_bucket.hpp>
+#include <llmr/renderer/icon_bucket.hpp>
 #include <llmr/renderer/text_bucket.hpp>
 #include <llmr/renderer/raster_bucket.hpp>
 #include <llmr/util/raster.hpp>
@@ -91,8 +91,8 @@ std::unique_ptr<Bucket> TileParser::createBucket(const BucketDescription& bucket
             return createFillBucket(layer, bucket_desc);
         } else if (bucket_desc.type == BucketType::Line) {
             return createLineBucket(layer, bucket_desc);
-        } else if (bucket_desc.type == BucketType::Point) {
-            return createPointBucket(layer, bucket_desc);
+        } else if (bucket_desc.type == BucketType::Icon) {
+            return createIconBucket(layer, bucket_desc);
         } else if (bucket_desc.type == BucketType::Text) {
             return createTextBucket(layer, bucket_desc);
         } else {
@@ -134,9 +134,9 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& laye
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createPointBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
-    std::unique_ptr<PointBucket> bucket = std::make_unique<PointBucket>(
-        tile.pointVertexBuffer, bucket_desc);
+std::unique_ptr<Bucket> TileParser::createIconBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+    std::unique_ptr<IconBucket> bucket = std::make_unique<IconBucket>(
+        tile.iconVertexBuffer, bucket_desc);
     addBucketFeatures(bucket, layer, bucket_desc);
     return obsolete() ? nullptr : std::move(bucket);
 }

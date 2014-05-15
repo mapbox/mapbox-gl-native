@@ -60,7 +60,7 @@ struct FunctionProperty {
     template <typename T> inline T evaluate(float z) const { return function(z, values); }
 };
 
-struct PointClass {
+struct IconClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
@@ -72,7 +72,7 @@ struct PointClass {
     FunctionProperty blur = 0;
 };
 
-struct PointProperties {
+struct IconProperties {
     bool enabled = true;
     std::array<float, 2> translate = {{ 0, 0 }};
     TranslateAnchor translateAnchor = TranslateAnchor::Map;

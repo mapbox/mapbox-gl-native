@@ -1,11 +1,11 @@
-#ifndef LLMR_GEOMETRY_POINT_BUFFER
-#define LLMR_GEOMETRY_POINT_BUFFER
+#ifndef LLMR_GEOMETRY_ICON_BUFFER
+#define LLMR_GEOMETRY_ICON_BUFFER
 
 #include "buffer.hpp"
 
 namespace llmr {
 
-    class PointVertexBuffer : public Buffer<
+    class IconVertexBuffer : public Buffer<
     4 // 2 coordinates per vertex (== 4 bytes)
     > {
     public:

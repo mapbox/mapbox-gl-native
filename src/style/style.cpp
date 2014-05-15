@@ -14,7 +14,7 @@ Style::Style() {
 void Style::reset() {
     computed.fills.clear();
     computed.lines.clear();
-    computed.points.clear();
+    computed.icons.clear();
 }
 
 void Style::cascade(float z) {
@@ -69,24 +69,24 @@ void Style::cascade(float z) {
             stroke.opacity = layer.opacity.evaluate<float>(z);
         }
 
-        // Cascade point classes
-        for (const auto& point_pair : sheetClass.point) {
-            const std::string& layer_name = point_pair.first;
-            const llmr::PointClass& layer = point_pair.second;
+        // Cascade icon classes
+        for (const auto& icon_pair : sheetClass.icon) {
+            const std::string& layer_name = icon_pair.first;
+            const llmr::IconClass& layer = icon_pair.second;
 
-            // TODO: This should be restricted to point styles that have actual
+            // TODO: This should be restricted to icon styles that have actual
             // values so as to not override with default values.
-            llmr::PointProperties& point = computed.points[layer_name];
-            point.enabled = layer.enabled.evaluate<bool>(z);
-            point.translate = {{ layer.translate[0].evaluate<float>(z),
+            llmr::IconProperties& icon = computed.icons[layer_name];
+            icon.enabled = layer.enabled.evaluate<bool>(z);
+            icon.translate = {{ layer.translate[0].evaluate<float>(z),
                                  layer.translate[1].evaluate<float>(z) }};
-            point.translateAnchor = layer.translateAnchor;
-            point.color = layer.color;
-            point.size = layer.size.evaluate<float>(z);
-            point.opacity = layer.opacity.evaluate<float>(z);
-            point.image = layer.image;
-            point.radius = layer.radius.evaluate<float>(z);
-            point.blur = layer.blur.evaluate<float>(z);
+            icon.translateAnchor = layer.translateAnchor;
+            icon.color = layer.color;
+            icon.size = layer.size.evaluate<float>(z);
+            icon.opacity = layer.opacity.evaluate<float>(z);
+            icon.image = layer.image;
+            icon.radius = layer.radius.evaluate<float>(z);
+            icon.blur = layer.blur.evaluate<float>(z);
         }
 
         // Cascade text classes

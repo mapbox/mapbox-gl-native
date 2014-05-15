@@ -13,7 +13,7 @@ enum class BucketType {
     None = 0,
     Fill = 1,
     Line = 2,
-    Point = 3,
+    Icon = 3,
     Text = 4,
     Raster = 5
 };
@@ -41,7 +41,7 @@ enum class TextPathType {
 inline BucketType bucketType(const std::string& type) {
     if (type == "fill") return BucketType::Fill;
     else if (type == "line") return BucketType::Line;
-    else if (type == "point") return BucketType::Point;
+    else if (type == "point") return BucketType::Icon;
     else if (type == "text") return BucketType::Text;
     else if (type == "raster") return BucketType::Raster;
     else return BucketType::None;

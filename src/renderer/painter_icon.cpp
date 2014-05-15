@@ -1,21 +1,21 @@
 #include <llmr/renderer/painter.hpp>
-#include <llmr/renderer/point_bucket.hpp>
+#include <llmr/renderer/icon_bucket.hpp>
 #include <llmr/map/map.hpp>
 #include <llmr/style/sprite.hpp>
 #include <llmr/util/math.hpp>
 
 using namespace llmr;
 
-void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+void Painter::renderIcon(IconBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
     // Abort early.
     if (!bucket.hasData()) return;
     if (pass == Opaque) return;
 
-    auto point_properties = map.getStyle().computed.points;
-    auto point_properties_it = point_properties.find(layer_name);
-    if (point_properties_it == point_properties.end()) return;
+    auto icon_properties = map.getStyle().computed.icons;
+    auto icon_properties_it = icon_properties.find(layer_name);
+    if (icon_properties_it == icon_properties.end()) return;
 
-    const PointProperties& properties = point_properties_it->second;
+    const IconProperties& properties = icon_properties_it->second;
     if (!properties.enabled) return;
 
     Color color = properties.color;
@@ -43,41 +43,41 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
         dotShader->setMatrix(vtxMatrix);
         dotShader->setColor(color);
 
-        const float pointSize = (properties.radius ? properties.radius * 2 : 8) * map.getState().getPixelRatio();
-        dotShader->setSize(pointSize);
+        const float iconSize = (properties.radius ? properties.radius * 2 : 8) * map.getState().getPixelRatio();
+        dotShader->setSize(iconSize);
 #ifndef GL_ES_VERSION_2_0
-            glPointSize(pointSize);
+            glPointSize(iconSize);
             glEnable(GL_POINT_SPRITE);
 #endif
-        dotShader->setBlur((properties.blur ? properties.blur : 1.5) / pointSize);
+        dotShader->setBlur((properties.blur ? properties.blur : 1.5) / iconSize);
 
         glDepthRange(strata, 1.0f);
-        bucket.drawPoints(*dotShader);
+        bucket.drawIcons(*dotShader);
     } else {
-        useProgram(pointShader->program);
-        pointShader->setMatrix(vtxMatrix);
-        pointShader->setColor(color);
-        pointShader->setImage(0);
-        pointShader->setPosition({{
+        useProgram(iconShader->program);
+        iconShader->setMatrix(vtxMatrix);
+        iconShader->setColor(color);
+        iconShader->setImage(0);
+        iconShader->setPosition({{
             0.5f * (imagePos.tl.x + imagePos.br.x),
             0.5f * (imagePos.tl.y + imagePos.br.y),
         }});
 
-        pointShader->setDimension({{
+        iconShader->setDimension({{
             static_cast<float>(sprite->raster.width),
             static_cast<float>(sprite->raster.height)
         }});
 
         sprite->raster.bind(map.getState().isChanging());
 
-        const float pointSize = util::max(imagePos.size.x, imagePos.size.y) + 2;
-        pointShader->setSize(pointSize);
+        const float iconSize = util::max(imagePos.size.x, imagePos.size.y) + 2;
+        iconShader->setSize(iconSize);
 #ifndef GL_ES_VERSION_2_0
-        glPointSize(pointSize);
+        glPointSize(iconSize);
         glEnable(GL_POINT_SPRITE);
 #endif
 
         glDepthRange(strata, 1.0f);
-        bucket.drawPoints(*pointShader);
+        bucket.drawIcons(*iconShader);
     }
 }

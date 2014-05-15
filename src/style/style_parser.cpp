@@ -269,8 +269,8 @@ void StyleParser::parseClass(const std::string& name, JSVal value, ClassDescript
                         class_desc.fill.insert({ name, std::forward<FillClass>(parseFillClass(value)) });
                     } else if (type == BucketType::Line) {
                         class_desc.line.insert({ name, std::forward<LineClass>(parseLineClass(value)) });
-                    } else if (type == BucketType::Point) {
-                        class_desc.point.insert({ name, std::forward<PointClass>(parsePointClass(value)) });
+                    } else if (type == BucketType::Icon) {
+                        class_desc.icon.insert({ name, std::forward<IconClass>(parseIconClass(value)) });
                     } else if (type == BucketType::Text) {
                         class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
                     } else if (type == BucketType::Raster) {
@@ -512,8 +512,8 @@ LineClass StyleParser::parseLineClass(JSVal value) {
     return klass;
 }
 
-PointClass StyleParser::parsePointClass(JSVal value) {
-    PointClass klass;
+IconClass StyleParser::parseIconClass(JSVal value) {
+    IconClass klass;
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);

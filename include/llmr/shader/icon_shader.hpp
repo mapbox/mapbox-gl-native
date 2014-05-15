@@ -1,13 +1,13 @@
-#ifndef LLMR_SHADER_SHADER_POINT
-#define LLMR_SHADER_SHADER_POINT
+#ifndef LLMR_SHADER_SHADER_ICON
+#define LLMR_SHADER_SHADER_ICON
 
 #include <llmr/shader/shader.hpp>
 
 namespace llmr {
 
-class PointShader : public Shader {
+class IconShader : public Shader {
 public:
-    PointShader();
+    IconShader();
 
     void bind(char *offset);
 

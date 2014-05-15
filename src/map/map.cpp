@@ -518,9 +518,9 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
                     if (pass == Opaque) return;
                     if (is_invisible(style.computed.lines, layer_desc)) return;
                     break;
-                case BucketType::Point:
+                case BucketType::Icon:
                     if (pass == Opaque) return;
-                    if (is_invisible(style.computed.points, layer_desc)) return;
+                    if (is_invisible(style.computed.icons, layer_desc)) return;
                     break;
                 case BucketType::Text:
                     if (pass == Opaque) return;
