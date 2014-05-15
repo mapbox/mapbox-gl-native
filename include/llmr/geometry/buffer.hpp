@@ -1,10 +1,12 @@
 #ifndef LLMR_GEOMETRY_BUFFER
 #define LLMR_GEOMETRY_BUFFER
 
-#include <cstdlib>
-#include <cassert>
 #include <llmr/platform/gl.hpp>
 #include <llmr/util/noncopyable.hpp>
+
+#include <cstdlib>
+#include <cassert>
+#include <stdexcept>
 
 namespace llmr {
 
