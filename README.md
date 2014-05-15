@@ -6,10 +6,10 @@ implemented in C++11, targeting iOS & OS X.
 # Depends
 
  - Modern C++ compiler that supports `-std=c++11`
- - libpng
- - libuv
- - libcurl (depends on OpenSSL)
- - glfw3
+ - `libpng`
+ - `libuv`
+ - `libcurl` (depends on OpenSSL)
+ - `glfw3`
  - Boost (for Rtree support)
  - Python (for build only)
  - Node.js (for build only)
@@ -28,10 +28,10 @@ used on both OS X and iOS.
 
 To create projects, you can run:
 - `make xproj`: Creates an Xcode project with OS X-specific handlers for HTTP downloads and
-  settings storage. It uses GLFW for window handling
+  settings storage. It uses GLFW for window handling.
 - `make lproj`: Creates an Xcode project with platform-independent handlers for downloads
-  and settings storage. This is what is also being built on Linux
-- `make linux`: Builds the Linux GLFW application with make
+  and settings storage. This is what is also being built on Linux.
+- `make linux`: Builds the Linux GLFW application with `make`.
 
 ## iOS
 
@@ -66,7 +66,7 @@ Build static dependencies:
 
 This will automatically run configure for you and set the correct paths.
 
-You can then proceed to build the library, tests or a GLFW app itself.
+You can then proceed to build the library, tests, or a GLFW app itself.
 
 # Style
 
