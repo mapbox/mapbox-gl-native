@@ -35,11 +35,19 @@ To create projects, you can run:
 
 ## iOS
 
-Because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version
+iOS makes use of a Cocoa-specific API currently housed in [MVKMapKit](https://github.com/mapbox/MVKMapKit), 
+which is included as a submodule and provides a `UIView` interface to the map view. 
+
+First, pull down the submodule(s): 
+
+    git submodule init
+    git submodule update
+
+Then, because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version
 yourself. Run `./setup-libraries.sh`, which is derived from Mapnik's cross-architecture build
 scripts. This will also run `./configure`.
 
-Then, `make iproj` to create and open an Xcode project with an iOS-specific view controller housing and basic gesture support. 
+Lastly, `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. 
 
 Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina).
 
