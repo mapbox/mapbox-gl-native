@@ -15,6 +15,8 @@ void Style::reset() {
     computed.fills.clear();
     computed.lines.clear();
     computed.icons.clear();
+    computed.texts.clear();
+    computed.rasters.clear();
 }
 
 void Style::cascade(float z) {
