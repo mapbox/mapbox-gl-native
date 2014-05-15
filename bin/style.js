@@ -586,10 +586,7 @@ module.exports = {
         "rail": "#bbb",
         "text": "#334",
         "marine_text": "#8dbeed",
-        "maki": "#666",
-        "point_translate": [
-            0, -30
-        ]
+        "maki": "#666"
     },
     "structure": [{
         "name": "background",
@@ -2016,52 +2013,42 @@ module.exports = {
             "poi_airport": {
                 "color": "maki",
                 "image": "airport-12",
-                "translate": "point_translate",
             },
             "poi_restaurant": {
                 "color": "maki",
                 "image": "restaurant-12",
-                "translate": "point_translate",
             },
             "poi_bus": {
                 "color": "maki",
                 "image": "bus-12",
-                "translate": "point_translate",
             },
             "poi_rail": {
                 "color": "maki",
                 "image": "rail-12",
-                "translate": "point_translate",
             },
             "poi_fire_station": {
                 "color": "maki",
                 "image": "fire-station-12",
-                "translate": "point_translate",
             },
             "poi_park": {
                 "color": "maki",
                 "image": "park-12",
-                "translate": "point_translate",
             },
             "poi_hospital": {
                 "color": "maki",
                 "image": "hospital-12",
-                "translate": "point_translate",
             },
             "poi_playground": {
                 "color": "maki",
                 "image": "playground-12",
-                "translate": "point_translate",
             },
             "poi_cafe": {
                 "color": "maki",
                 "image": "cafe-12",
-                "translate": "point_translate",
             },
             "poi_beer": {
                 "color": "maki",
                 "image": "beer-12",
-                "translate": "point_translate",
             },
             "satellite": {
                 "type": "raster",
