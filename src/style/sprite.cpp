@@ -107,7 +107,7 @@ void Sprite::parseJSON(std::shared_ptr<Sprite> &sprite) {
     }
 }
 
-ImagePosition Sprite::getPosition(const std::string& name, bool repeating) {
+ImagePosition Sprite::getPosition(const std::string& name, bool repeating) const {
     if (!isLoaded()) return ImagePosition {};
 
     // `repeating` indicates that the image will be used in a repeating pattern
@@ -118,7 +118,7 @@ ImagePosition Sprite::getPosition(const std::string& name, bool repeating) {
     auto it = pos.find(name);
     if (it == pos.end()) return ImagePosition {};
 
-    SpritePosition& pos = it->second;
+    const SpritePosition& pos = it->second;
     return ImagePosition {
         {
             pos.width,
@@ -133,4 +133,10 @@ ImagePosition Sprite::getPosition(const std::string& name, bool repeating) {
             (float)(pos.y + pos.height - 2 * offset) / raster.height
         }
     };
+}
+
+const SpritePosition &Sprite::getSpritePosition(const std::string& name) const {
+    if (!isLoaded()) return empty;
+    auto it = pos.find(name);
+    return it == pos.end() ? empty : it->second;
 }

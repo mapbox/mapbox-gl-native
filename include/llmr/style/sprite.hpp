@@ -16,6 +16,7 @@ class Map;
 
 class SpritePosition {
 public:
+    explicit SpritePosition() {}
     explicit SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t pixelRatio = 1);
 
     uint16_t x = 0, y = 0;
@@ -40,7 +41,8 @@ public:
 
     void load(const std::string& base_url);
 
-    ImagePosition getPosition(const std::string& name, bool repeating = false);
+    ImagePosition getPosition(const std::string& name, bool repeating = false) const;
+    const SpritePosition &getSpritePosition(const std::string& name) const;
 
     bool isLoaded() const;
 
@@ -62,6 +64,7 @@ private:
     std::string image;
     std::atomic<bool> loaded;
     std::map<std::string, SpritePosition> pos;
+    const SpritePosition empty;
 };
 
 }
