@@ -120,6 +120,15 @@ void TileParser::addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer,
     }
 }
 
+template <class Bucket, typename... Args>
+void TileParser::addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const BucketDescription& bucket_desc, Args... args) {
+    FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
+    for (const pbf& feature_pbf : filtered_layer) {
+        if (obsolete()) return;
+        bucket->addFeature({ feature_pbf, layer }, args...);
+    }
+}
+
 std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::unique_ptr<FillBucket> bucket = std::make_unique<FillBucket>(
         tile.fillVertexBuffer, tile.triangleElementsBuffer, tile.lineElementsBuffer, bucket_desc);
@@ -137,7 +146,7 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& laye
 std::unique_ptr<Bucket> TileParser::createIconBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::unique_ptr<IconBucket> bucket = std::make_unique<IconBucket>(
         tile.iconVertexBuffer, bucket_desc);
-    addBucketFeatures(bucket, layer, bucket_desc);
+    addBucketFeatures(bucket, layer, bucket_desc, style.sprite);
     return obsolete() ? nullptr : std::move(bucket);
 }
 
@@ -166,12 +175,6 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
 
     std::unique_ptr<TextBucket> bucket = std::make_unique<TextBucket>(
         tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
-
-    FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
-    for (const pbf& feature_pbf : filtered_layer) {
-        if (obsolete()) return nullptr;
-        bucket->addFeature({ feature_pbf, layer }, faces, shaping);
-    }
-
+    addBucketFeatures(bucket, layer, bucket_desc, faces, shaping);
     return std::move(bucket);
 }

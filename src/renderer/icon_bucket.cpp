@@ -5,6 +5,7 @@
 
 #include <llmr/renderer/painter.hpp>
 #include <llmr/style/style.hpp>
+#include <llmr/style/sprite.hpp>
 #include <llmr/map/vector_tile.hpp>
 
 #include <llmr/platform/gl.hpp>
@@ -22,13 +23,35 @@ IconBucket::IconBucket(IconVertexBuffer& vertexBuffer,
       vertex_start(vertexBuffer.index()) {
 }
 
-void IconBucket::addGeometry(pbf& geom) {
+void IconBucket::addFeature(const VectorTileFeature &feature, const std::shared_ptr<Sprite> &sprite) {
+    // TODO: We somehow need to reparse the stylesheet, or maintain a mapping of id => sprite name
+    // For now, we're just not showing points if the sprite was not yet loaded at *parse time* of
+    // the tile.
+    if (!sprite || !sprite->isLoaded()) return;
+
+    auto field_it = feature.properties.find(geometry.field);
+    if (field_it == feature.properties.end()) {
+        fprintf(stderr, "feature doesn't contain field '%s'\n", geometry.field.c_str());
+        return;
+    }
+
+    std::string field = toString(field_it->second);
+    if (geometry.size) {
+        field.append("-");
+        field.append(std::to_string(static_cast<int>(std::round(geometry.size))));
+    }
+
+    const SpritePosition &pos = sprite->getSpritePosition(field);
+    const uint16_t tx = pos.x + pos.width / 2;
+    const uint16_t ty = pos.y + pos.height / 2;
+
     Geometry::command cmd;
+    pbf geom = feature.geometry;
     Geometry geometry(geom);
     int32_t x, y;
     while ((cmd = geometry.next(x, y)) != Geometry::end) {
         if (cmd == Geometry::move_to) {
-            vertexBuffer.add(x, y);
+            vertexBuffer.add(x, y, tx, ty);
         } else {
             fprintf(stderr, "other command than move_to in icon geometry\n");
         }

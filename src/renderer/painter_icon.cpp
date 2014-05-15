@@ -24,21 +24,11 @@ void Painter::renderIcon(IconBucket& bucket, const std::string& layer_name, cons
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    auto &sprite = map.getStyle().sprite;
-    SpritePosition spritePos;
-
-    if (properties.image.length() && sprite && sprite->isLoaded()) {
-        std::string sized_image = properties.image;
-        if (properties.size) {
-            sized_image.append("-");
-            sized_image.append(std::to_string(static_cast<int>(std::round(properties.size))));
-        }
-        spritePos = sprite->getSpritePosition(sized_image);
-    }
-
     const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
-    if (!spritePos.width || !spritePos.height) {
+    const std::shared_ptr<Sprite> &sprite = map.getStyle().sprite;
+
+    if (!sprite || !sprite->isLoaded()) {
         useProgram(dotShader->program);
         dotShader->setMatrix(vtxMatrix);
         dotShader->setColor(color);
@@ -58,10 +48,6 @@ void Painter::renderIcon(IconBucket& bucket, const std::string& layer_name, cons
         iconShader->setMatrix(vtxMatrix);
         iconShader->setColor(color);
         iconShader->setImage(0);
-        iconShader->setPosition({{
-            spritePos.x + (float)spritePos.width / 2.0f,
-            spritePos.y + (float)spritePos.height / 2.0f,
-        }});
 
         iconShader->setDimension({{
             static_cast<float>(sprite->raster.width),
@@ -70,7 +56,7 @@ void Painter::renderIcon(IconBucket& bucket, const std::string& layer_name, cons
 
         sprite->raster.bind(map.getState().isChanging());
 
-        const float iconSize = util::max(spritePos.width, spritePos.height) + 2;
+        const float iconSize = bucket.geometry.size * map.getState().getPixelRatio();
         iconShader->setSize(iconSize);
 #ifndef GL_ES_VERSION_2_0
         glPointSize(iconSize);

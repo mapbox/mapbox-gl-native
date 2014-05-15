@@ -27,6 +27,7 @@ private:
     std::unique_ptr<Bucket> createIconBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
     std::unique_ptr<Bucket> createTextBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
     template <class Bucket> void addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const BucketDescription& bucket_desc);
+    template <class Bucket, typename... Args> void addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const BucketDescription& bucket_desc, Args... args);
 
 private:
     const VectorTile vector_data;

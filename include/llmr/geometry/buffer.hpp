@@ -11,15 +11,13 @@ namespace llmr {
 template <
     size_t item_size,
     int bufferType = GL_ARRAY_BUFFER,
-    size_t defaultLength = 8192
+    size_t defaultLength = 8192,
+    bool retainAfterUpload = false
 >
 class Buffer : private util::noncopyable {
 public:
     ~Buffer() {
-        if (array) {
-            free(array);
-            array = nullptr;
-        }
+        cleanup();
         if (buffer != 0) {
             glDeleteBuffers(1, &buffer);
             buffer = 0;
@@ -33,18 +31,27 @@ public:
     }
 
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
-    void bind() {
+    void bind(bool force = false) {
         if (buffer == 0) {
             glGenBuffers(1, &buffer);
-            glBindBuffer(bufferType, buffer);
+            force = true;
+        }
+        glBindBuffer(bufferType, buffer);
+        if (force) {
+            assert("Buffer was already deleted" && array != nullptr);
             glBufferData(bufferType, pos, array, GL_STATIC_DRAW);
-            free(array);
-            array = nullptr;
-        } else {
-            glBindBuffer(bufferType, buffer);
+            if (!retainAfterUpload) {
+                cleanup();
+            }
         }
     }
 
+    void cleanup() {
+        if (array) {
+            free(array);
+            array = nullptr;
+        }
+    }
 
 protected:
     // increase the buffer size by at least /required/ bytes.
@@ -57,6 +64,17 @@ protected:
         }
         pos += itemSize;
         return static_cast<char *>(array) + (pos - itemSize);
+    }
+
+    // Get a pointer to the item at a given index.
+    inline void *getElement(size_t index) {
+        assert("Buffer was deleted" && array != nullptr);
+
+        if (index * itemSize >= pos) {
+            throw new std::runtime_error("Can't get element after array bounds");
+        } else {
+            return static_cast<char *>(array) + (index * itemSize);
+        }
     }
 
 public:
