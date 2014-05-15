@@ -16,7 +16,7 @@ class Map;
 
 class SpritePosition {
 public:
-    SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t pixelRatio = 1);
+    explicit SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t pixelRatio = 1);
 
     uint16_t x = 0, y = 0;
     uint16_t width = 0, height = 0;
@@ -25,8 +25,8 @@ public:
 
 class ImagePosition {
 public:
-    ImagePosition() {}
-    ImagePosition(const vec2<uint16_t>& size, vec2<float> tl, vec2<float> br);
+    explicit ImagePosition() {}
+    explicit ImagePosition(const vec2<uint16_t>& size, vec2<float> tl, vec2<float> br);
 
     vec2<uint16_t> size = { 0, 0 };
     vec2<float> tl = { 0, 0 };

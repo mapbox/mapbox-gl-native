@@ -101,15 +101,14 @@ void Sprite::parseJSON(std::shared_ptr<Sprite> &sprite) {
                 if (value.HasMember("width")) width = value["width"].GetInt();
                 if (value.HasMember("height")) height = value["height"].GetInt();
                 if (value.HasMember("pixelRatio")) pixelRatio = value["pixelRatio"].GetInt();
-
-                sprite->pos.insert({ name, { x, y, width, height, pixelRatio } });
+                sprite->pos.emplace(name, SpritePosition { x, y, width, height, pixelRatio });
             }
         }
     }
 }
 
 ImagePosition Sprite::getPosition(const std::string& name, bool repeating) {
-    if (!isLoaded()) return {};
+    if (!isLoaded()) return ImagePosition {};
 
     // `repeating` indicates that the image will be used in a repeating pattern
     // repeating pattern images are assumed to have a 1px padding that mirrors the opposite edge
@@ -117,10 +116,10 @@ ImagePosition Sprite::getPosition(const std::string& name, bool repeating) {
     int8_t offset = repeating ? 1 : 0;
 
     auto it = pos.find(name);
-    if (it == pos.end()) return {};
+    if (it == pos.end()) return ImagePosition {};
 
     SpritePosition& pos = it->second;
-    return {
+    return ImagePosition {
         {
             pos.width,
             pos.height
