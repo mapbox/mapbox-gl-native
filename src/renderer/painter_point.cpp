@@ -2,6 +2,7 @@
 #include <llmr/renderer/point_bucket.hpp>
 #include <llmr/map/map.hpp>
 #include <llmr/style/sprite.hpp>
+#include <llmr/util/math.hpp>
 
 using namespace llmr;
 
@@ -43,9 +44,8 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
         dotShader->setColor(color);
 
         const float pointSize = (properties.radius ? properties.radius * 2 : 8) * map.getState().getPixelRatio();
-#if defined(GL_ES_VERSION_2_0)
-            dotShader->setSize(pointSize);
-#else
+        dotShader->setSize(pointSize);
+#ifndef GL_ES_VERSION_2_0
             glPointSize(pointSize);
             glEnable(GL_POINT_SPRITE);
 #endif
@@ -57,19 +57,24 @@ void Painter::renderPoint(PointBucket& bucket, const std::string& layer_name, co
         useProgram(pointShader->program);
         pointShader->setMatrix(vtxMatrix);
         pointShader->setColor(color);
-
         pointShader->setImage(0);
-        pointShader->setPointTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
-        pointShader->setPointBottomRight({{ imagePos.br.x, imagePos.br.y }});
+        pointShader->setPosition({{
+            0.5f * (imagePos.tl.x + imagePos.br.x),
+            0.5f * (imagePos.tl.y + imagePos.br.y),
+        }});
+
+        pointShader->setDimension({{
+            static_cast<float>(sprite->raster.width),
+            static_cast<float>(sprite->raster.height)
+        }});
 
         sprite->raster.bind(map.getState().isChanging());
 
-        const float pointSize = (properties.size ? properties.size : (imagePos.size.x / map.getState().getPixelRatio())) * 1.4142135623730951 * map.getState().getPixelRatio();
-#if defined(GL_ES_VERSION_2_0)
-            pointShader->setSize(pointSize);
-#else
-            glPointSize(pointSize);
-            glEnable(GL_POINT_SPRITE);
+        const float pointSize = util::max(imagePos.size.x, imagePos.size.y) + 2;
+        pointShader->setSize(pointSize);
+#ifndef GL_ES_VERSION_2_0
+        glPointSize(pointSize);
+        glEnable(GL_POINT_SPRITE);
 #endif
 
         glDepthRange(strata, 1.0f);

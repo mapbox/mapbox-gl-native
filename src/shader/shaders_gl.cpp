@@ -32,7 +32,7 @@ const shader_source llmr::shaders[SHADER_COUNT] = {
    },
    {
        "#version 120\nattribute vec2 a_pos;\nuniform mat4 u_matrix;\nuniform float u_size;\nvoid main ()\n{\n  vec4 tmpvar_1;\n  tmpvar_1.zw = vec2(0.0, 1.0);\n  tmpvar_1.xy = a_pos;\n  gl_Position = (u_matrix * tmpvar_1);\n  gl_PointSize = u_size;\n}\n\n",
-       "#version 120\nuniform sampler2D u_image;\nuniform vec2 u_tl;\nuniform vec2 u_br;\nuniform vec4 u_color;\nvoid main ()\n{\n  vec2 tmpvar_1;\n  tmpvar_1 = (((\n    ((gl_PointCoord * 2.0) - 1.0)\n   * 1.41421) / 2.0) + 0.5);\n  gl_FragColor = ((texture2D (u_image, mix (u_tl, u_br, tmpvar_1)) * (\n    ((float((tmpvar_1.x >= 0.0)) * float((tmpvar_1.y >= 0.0))) * (1.0 - float((tmpvar_1.x >= 1.0))))\n   * \n    (1.0 - float((tmpvar_1.y >= 1.0)))\n  )) * u_color);\n}\n\n",
+       "#version 120\nuniform sampler2D u_image;\nuniform vec2 u_pos;\nuniform vec2 u_dimension;\nuniform vec4 u_color;\nuniform float u_size;\nvoid main ()\n{\n  gl_FragColor = (texture2D (u_image, (u_pos + (\n    ((gl_PointCoord - 0.5) * u_size)\n   / u_dimension))) * u_color);\n}\n\n",
    },
    {
        "#version 120\nuniform mat4 u_matrix;\nattribute vec2 a_pos;\nvarying vec2 v_pos;\nvoid main ()\n{\n  vec4 tmpvar_1;\n  tmpvar_1.zw = vec2(0.0, 1.0);\n  tmpvar_1.xy = a_pos;\n  gl_Position = (u_matrix * tmpvar_1);\n  v_pos = (a_pos / 4096.0);\n}\n\n",

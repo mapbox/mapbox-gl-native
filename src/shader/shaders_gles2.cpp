@@ -32,7 +32,7 @@ const shader_source llmr::shaders[SHADER_COUNT] = {
    },
    {
        "precision highp float;\nattribute vec2 a_pos;\nuniform mat4 u_matrix;\nuniform float u_size;\nvoid main ()\n{\n  vec4 tmpvar_1;\n  tmpvar_1.zw = vec2(0.0, 1.0);\n  tmpvar_1.xy = a_pos;\n  gl_Position = (u_matrix * tmpvar_1);\n  gl_PointSize = u_size;\n}\n\n",
-       "precision highp float;\nuniform sampler2D u_image;\nuniform vec2 u_tl;\nuniform vec2 u_br;\nuniform vec4 u_color;\nvoid main ()\n{\n  mediump vec2 tmpvar_1;\n  tmpvar_1 = (((\n    ((gl_PointCoord * 2.0) - 1.0)\n   * 1.41421) / 2.0) + 0.5);\n  mediump vec2 tmpvar_2;\n  tmpvar_2 = mix (u_tl, u_br, tmpvar_1);\n  lowp vec4 tmpvar_3;\n  tmpvar_3 = texture2D (u_image, tmpvar_2);\n  gl_FragColor = ((tmpvar_3 * (\n    ((float((tmpvar_1.x >= 0.0)) * float((tmpvar_1.y >= 0.0))) * (1.0 - float((tmpvar_1.x >= 1.0))))\n   * \n    (1.0 - float((tmpvar_1.y >= 1.0)))\n  )) * u_color);\n}\n\n",
+       "precision highp float;\nuniform sampler2D u_image;\nuniform vec2 u_pos;\nuniform vec2 u_dimension;\nuniform vec4 u_color;\nuniform float u_size;\nvoid main ()\n{\n  mediump vec2 tmpvar_1;\n  tmpvar_1 = (u_pos + ((\n    (gl_PointCoord - 0.5)\n   * u_size) / u_dimension));\n  lowp vec4 tmpvar_2;\n  tmpvar_2 = (texture2D (u_image, tmpvar_1) * u_color);\n  gl_FragColor = tmpvar_2;\n}\n\n",
    },
    {
        "precision highp float;\nuniform mat4 u_matrix;\nattribute vec2 a_pos;\nvarying vec2 v_pos;\nvoid main ()\n{\n  vec4 tmpvar_1;\n  tmpvar_1.zw = vec2(0.0, 1.0);\n  tmpvar_1.xy = a_pos;\n  gl_Position = (u_matrix * tmpvar_1);\n  v_pos = (a_pos / 4096.0);\n}\n\n",

@@ -21,15 +21,15 @@ PointShader::PointShader()
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_color = glGetUniformLocation(program, "u_color");
     u_size = glGetUniformLocation(program, "u_size");
-    u_point_tl = glGetUniformLocation(program, "u_tl");
-    u_point_br = glGetUniformLocation(program, "u_br");
+    u_pos = glGetUniformLocation(program, "u_pos");
+    u_dimension = glGetUniformLocation(program, "u_dimension");
 
     // fprintf(stderr, "PointShader:\n");
     // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
     // fprintf(stderr, "    - u_color: %d\n", u_color);
     // fprintf(stderr, "    - u_size: %d\n", u_size);
-    // fprintf(stderr, "    - u_point_tl: %d\n", u_point_tl);
-    // fprintf(stderr, "    - u_point_br: %d\n", u_point_br);
+    // fprintf(stderr, "    - u_pos: %d\n", u_pos);
+    // fprintf(stderr, "    - u_dimension: %d\n", u_dimension);
     // fprintf(stderr, "    - u_image: %d\n", u_image);
 }
 
@@ -59,16 +59,16 @@ void PointShader::setSize(float new_size) {
     }
 }
 
-void PointShader::setPointTopLeft(const std::array<float, 2>& new_point_tl) {
-    if (point_tl != new_point_tl) {
-        glUniform2fv(u_point_tl, 1, new_point_tl.data());
-        point_tl = new_point_tl;
+void PointShader::setPosition(const std::array<float, 2>& new_pos) {
+    if (pos != new_pos) {
+        glUniform2fv(u_pos, 1, new_pos.data());
+        pos = new_pos;
     }
 }
 
-void PointShader::setPointBottomRight(const std::array<float, 2>& new_point_br) {
-    if (point_br != new_point_br) {
-        glUniform2fv(u_point_br, 1, new_point_br.data());
-        point_br = new_point_br;
+void PointShader::setDimension(const std::array<float, 2>& new_dimension) {
+    if (dimension != new_dimension) {
+        glUniform2fv(u_dimension, 1, new_dimension.data());
+        dimension = new_dimension;
     }
 }
