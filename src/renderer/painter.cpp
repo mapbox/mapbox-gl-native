@@ -29,7 +29,7 @@ void Painter::setup() {
 
     setupShaders();
 
-    assert(pointShader);
+    assert(iconShader);
     assert(plainShader);
     assert(outlineShader);
     assert(lineShader);

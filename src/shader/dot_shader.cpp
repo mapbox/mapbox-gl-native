@@ -23,7 +23,7 @@ DotShader::DotShader()
     u_size = glGetUniformLocation(program, "u_size");
     u_blur = glGetUniformLocation(program, "u_blur");
 
-    // fprintf(stderr, "PointShader:\n");
+    // fprintf(stderr, "DotShader:\n");
     // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
     // fprintf(stderr, "    - u_color: %d\n", u_color);
     // fprintf(stderr, "    - u_size: %d\n", u_size);
