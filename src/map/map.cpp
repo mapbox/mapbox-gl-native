@@ -464,6 +464,8 @@ void Map::render() {
     if (transform.needsTransition()) {
         update();
     }
+
+    glFlush();
 }
 
 void Map::renderLayers(const std::vector<LayerDescription>& layers, RenderPass pass) {
