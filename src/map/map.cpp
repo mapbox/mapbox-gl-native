@@ -482,6 +482,8 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers, RenderPass p
     } else {
         throw std::runtime_error("unknown render pass");
     }
+
+    glFlush();
 }
 
 template <typename Styles>
