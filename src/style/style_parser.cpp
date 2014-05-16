@@ -580,7 +580,7 @@ TextClass StyleParser::parseTextClass(JSVal value) {
     }
 
     if (value.HasMember("strokeWidth")) {
-        klass.haloRadius = parseFunction(value["strokeWidth"]);
+        klass.halo_radius = parseFunction(value["strokeWidth"]);
     }
 
     if (value.HasMember("size")) {
@@ -592,7 +592,7 @@ TextClass StyleParser::parseTextClass(JSVal value) {
     }
 
     if (value.HasMember("alwaysVisible")) {
-        klass.alwaysVisible = parseFunction(value["alwaysVisible"]);
+        klass.always_visible = parseFunction(value["alwaysVisible"]);
     }
 
     return klass;

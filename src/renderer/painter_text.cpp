@@ -99,7 +99,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     // to draw the halo first.
     if (properties.halo[3] > 0.0f) {
         textShader->setColor(properties.halo);
-        textShader->setBuffer(properties.haloRadius);
+        textShader->setBuffer(properties.halo_radius);
         glDepthRange(strata, 1.0f);
         bucket.drawGlyphs(*textShader);
     }

@@ -136,10 +136,10 @@ struct TextClass {
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
-    FunctionProperty haloRadius = 0.25f;
+    FunctionProperty halo_radius = 0.25f;
     FunctionProperty size = 12.0f;
     FunctionProperty rotate = 0.0f;
-    FunctionProperty alwaysVisible = false;
+    FunctionProperty always_visible = false;
     FunctionProperty opacity = 1;
 };
 
@@ -149,10 +149,10 @@ struct TextProperties {
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
-    float haloRadius = 0.25f;
+    float halo_radius = 0.25f;
     float size = 12.0f;
     float rotate = 0.0f;
-    bool alwaysVisible = false;
+    bool always_visible = false;
     float opacity = 1.0;
 };
 

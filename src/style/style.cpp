@@ -104,9 +104,9 @@ void Style::cascade(float z) {
             text.color = layer.color;
             text.size = layer.size.evaluate<float>(z);
             text.halo = layer.halo;
-            text.haloRadius = layer.haloRadius.evaluate<float>(z);
+            text.halo_radius = layer.halo_radius.evaluate<float>(z);
             text.rotate = layer.rotate.evaluate<float>(z);
-            text.alwaysVisible = layer.alwaysVisible.evaluate<bool>(z);
+            text.always_visible = layer.always_visible.evaluate<bool>(z);
             text.opacity = layer.opacity.evaluate<float>(z);
         }
 
