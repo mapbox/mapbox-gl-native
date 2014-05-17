@@ -24,10 +24,11 @@ typedef bgi::rtree<PlacementValue, bgi::rstar<16>> Tree;
 using namespace llmr;
 
 Collision::~Collision() {
-    delete ((Tree *)tree);
+    delete ((Tree *)cTree);
+    delete ((Tree *)hTree);
 }
 
-Collision::Collision() : tree(new Tree()) {
+Collision::Collision() : cTree(new Tree()), hTree(new Tree()) {
     const float m = 4096;
 
     // Hack to prevent cross-tile labels
@@ -125,7 +126,7 @@ PlacementProperty Collision::place(const PlacedGlyphs &placed_glyphs,
     }
 
     // Calculate the range it is safe to rotate all glyphs
-    PlacementRange rotationRange = getPlacementRange(glyphs, scale);
+    PlacementRange rotationRange = getPlacementRange(glyphs, scale, horizontal);
     insert(glyphs, anchor, scale, rotationRange, horizontal, padding);
 
     float zoom = log(scale) / log(2);
@@ -164,7 +165,9 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs,
                       Point{maxPlacedX, maxPlacedY}};
 
         std::vector<PlacementValue> blocking;
-        ((Tree *)tree)
+        ((Tree *)cTree)
+            ->query(bgi::intersects(query_box), std::back_inserter(blocking));
+        ((Tree *)hTree)
             ->query(bgi::intersects(query_box), std::back_inserter(blocking));
 
         if (blocking.size()) {
@@ -229,7 +232,8 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs,
 }
 
 PlacementRange Collision::getPlacementRange(const GlyphBoxes &glyphs,
-                                            float placementScale) {
+                                            float placementScale,
+                                            bool horizontal) {
     PlacementRange placementRange = {{2.0f * M_PI, 0}};
 
     for (const GlyphBox &glyph : glyphs) {
@@ -245,8 +249,13 @@ PlacementRange Collision::getPlacementRange(const GlyphBoxes &glyphs,
                       Point{maxPlacedX, maxPlacedY}};
 
         std::vector<PlacementValue> blocking;
-        ((Tree *)tree)
+        ((Tree *)hTree)
             ->query(bgi::intersects(query_box), std::back_inserter(blocking));
+
+        if (horizontal) {
+            ((Tree *)cTree)
+                ->query(bgi::intersects(query_box), std::back_inserter(blocking));
+        }
 
         for (const PlacementValue &value : blocking) {
             const Box &s = std::get<0>(value);
@@ -327,5 +336,9 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
     }
 
     // Bulk-insert all glyph boxes
-    ((Tree *)tree)->insert(result.begin(), result.end());
+    if (horizontal) {
+        ((Tree *)hTree)->insert(result.begin(), result.end());
+    } else {
+        ((Tree *)cTree)->insert(result.begin(), result.end());
+    }
 }
