@@ -593,16 +593,14 @@ module.exports = {
             "layer": "country_label",
             "text_field": "name",
             "path": "horizontal",
-            "fontSize": 16,
+            "fontSize": 24,
             "feature_type": "point",
-            "type": "text",
-            "enabled": 3
+            "type": "text"
         },
         "country_label_line": {
             "source": "outdoors",
             "layer": "country_label_line",
-            "type": "line",
-            "enabled": 3
+            "type": "line"
         },
         "marine_label": {
             "source": "outdoors",
@@ -3245,7 +3243,13 @@ module.exports = {
                 },
                 "country_label": {
                 "color": "country_text",
-                "stroke": "rgba(255,255,255,0.5)"
+                "stroke": "rgba(255,255,255,0.5)",
+                "size": ["stops",
+                         {"z": 0, "val": 14},
+                         {"z": 6, "val": 14},
+                         {"z": 12, "val": 24},
+                         {"z": 22, "val": 24}
+                ]
                 },
                 "country_label_line": {
                 "color": "country_text",
