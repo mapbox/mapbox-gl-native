@@ -7,6 +7,7 @@
 #include <llmr/style/bucket_description.hpp>
 #include <llmr/style/layer_description.hpp>
 #include <llmr/style/class_description.hpp>
+#include <llmr/geometry/sprite_atlas.hpp>
 
 #include <map>
 #include <vector>

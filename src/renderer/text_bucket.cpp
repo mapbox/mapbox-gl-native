@@ -102,7 +102,7 @@ void TextBucket::addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
 void TextBucket::addFeature(const VectorTileFeature &feature,
                             const IndexedFaces &faces,
                             const std::map<Value, Shaping> &shapings) {
-    auto it_prop = feature.properties.find(geom_desc.text_field);
+    auto it_prop = feature.properties.find(geom_desc.field);
     if (it_prop == feature.properties.end()) {
         // feature does not have the correct property
         return;

@@ -2,6 +2,7 @@
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/map/map.hpp>
 #include <llmr/style/sprite.hpp>
+#include <llmr/geometry/sprite_atlas.hpp>
 
 using namespace llmr;
 
@@ -73,16 +74,17 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
     if ((fill_color[3] >= 1.0f) == (pass == Opaque)) {
         auto &sprite = map.getStyle().sprite;
-        if (properties.image.size() && sprite && sprite->isLoaded()) {
-            // Draw texture fill
-            ImagePosition imagePos = sprite->getPosition(properties.image, true);
+        if (properties.image.size() && sprite) {
+            auto &spriteAtlas = map.getSpriteAtlas();
+            Rect<uint16_t> imagePos = spriteAtlas.getImage(properties.image, *sprite);
+
 
             float factor = 8.0 / std::pow(2, map.getState().getIntegerZoom() - id.z);
             float mix = std::fmod(map.getState().getZoom(), 1.0);
 
             std::array<float, 2> imageSize = {{
-                    imagePos.size.x * factor,
-                    imagePos.size.y *factor
+                    imagePos.w * factor,
+                    imagePos.h * factor
                 }
             };
 
@@ -96,11 +98,17 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             patternShader->setMatrix(vtxMatrix);
             patternShader->setOffset(offset);
             patternShader->setPatternSize(imageSize);
-            patternShader->setPatternTopLeft({{ imagePos.tl.x, imagePos.tl.y }});
-            patternShader->setPatternBottomRight({{ imagePos.br.x, imagePos.br.y }});
+            patternShader->setPatternTopLeft({{
+                float(imagePos.x) / spriteAtlas.getWidth(),
+                float(imagePos.y) / spriteAtlas.getHeight(),
+            }});
+            patternShader->setPatternBottomRight({{
+                float(imagePos.x + imagePos.w) / spriteAtlas.getWidth(),
+                float(imagePos.y + imagePos.h) / spriteAtlas.getHeight(),
+            }});
             patternShader->setColor(fill_color);
             patternShader->setMix(mix);
-            sprite->raster.bind(true);
+            spriteAtlas.bind(true);
 
             // Draw the actual triangles into the color & stencil buffer.
             glDepthRange(strata + strata_epsilon, 1.0f);

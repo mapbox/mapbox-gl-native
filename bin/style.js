@@ -373,7 +373,8 @@ module.exports = {
             "layer": "place_label",
             "field": "type",
             "value": "city",
-            "type": "point"
+            "type": "point",
+            "size": 4
         },
         "place_label_city": {
             "source": "mapbox streets",
@@ -452,116 +453,13 @@ module.exports = {
             "feature_type": "point",
             "type": "text"
         },
-        "poi_airport": {
+        "poi": {
             "source": "mapbox streets",
             "layer": "poi_label",
-            "field": "maki",
-            "value": "airport",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
+            "icon": "maki",
+            "size": 12,
             "type": "point"
         },
-        "poi_rail": {
-            "source": "mapbox streets",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "rail",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point"
-        },
-        "poi_fire_station": {
-            "source": "mapbox streets",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "fire-station",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point"
-        },
-        "poi_bus": {
-            "source": "mapbox streets",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "bus",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point"
-        },
-        "poi_restaurant": {
-            "source": "mapbox streets",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "restaurant",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point"
-        },
-        "poi_park": {
-            "source": "mapbox streets",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "park",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point"
-        },
-        "poi_playground": {
-            "source": "mapbox streets",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "playground",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point"
-        },
-        "poi_hospital": {
-            "source": "mapbox streets",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "hospital",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point"
-        },
-        "poi_cafe": {
-            "source": "mapbox streets",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "cafe",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point"
-        },
-        "poi_beer": {
-            "source": "mapbox streets",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "beer",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point"
-        }
     },
     "constants": {
         "land": "#f8f4f0",
@@ -802,41 +700,11 @@ module.exports = {
         "name": "road_label",
         "bucket": "road_label"
     }, {
-        "name": "poi_label",
-        "bucket": "poi_label"
-    }, {
         "name": "water_label",
         "bucket": "water_label"
     }, {
-        "name": "poi_airport",
-        "bucket": "poi_airport"
-    }, {
-        "name": "poi_rail",
-        "bucket": "poi_rail"
-    }, {
-        "name": "poi_bus",
-        "bucket": "poi_bus"
-    }, {
-        "name": "poi_fire_station",
-        "bucket": "poi_fire_station"
-    }, {
-        "name": "poi_restaurant",
-        "bucket": "poi_restaurant"
-    }, {
-        "name": "poi_park",
-        "bucket": "poi_park"
-    }, {
-        "name": "poi_hospital",
-        "bucket": "poi_hospital"
-    }, {
-        "name": "poi_playground",
-        "bucket": "poi_playground"
-    }, {
-        "name": "poi_cafe",
-        "bucket": "poi_cafe"
-    }, {
-        "name": "poi_beer",
-        "bucket": "poi_beer"
+        "name": "poi",
+        "bucket": "poi"
     }],
     "classes": [{
         "name": "default",
@@ -2010,45 +1878,7 @@ module.exports = {
                     0.75
                 ],
             },
-            "poi_airport": {
-                "color": "maki",
-                "image": "airport-12",
-            },
-            "poi_restaurant": {
-                "color": "maki",
-                "image": "restaurant-12",
-            },
-            "poi_bus": {
-                "color": "maki",
-                "image": "bus-12",
-            },
-            "poi_rail": {
-                "color": "maki",
-                "image": "rail-12",
-            },
-            "poi_fire_station": {
-                "color": "maki",
-                "image": "fire-station-12",
-            },
-            "poi_park": {
-                "color": "maki",
-                "image": "park-12",
-            },
-            "poi_hospital": {
-                "color": "maki",
-                "image": "hospital-12",
-            },
-            "poi_playground": {
-                "color": "maki",
-                "image": "playground-12",
-            },
-            "poi_cafe": {
-                "color": "maki",
-                "image": "cafe-12",
-            },
-            "poi_beer": {
-                "color": "maki",
-                "image": "beer-12",
+            "poi": {
             },
             "satellite": {
                 "type": "raster",

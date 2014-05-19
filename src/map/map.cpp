@@ -20,6 +20,7 @@ Map::Map(View& view)
       texturepool(),
       style(),
       glyphAtlas(1024, 1024),
+      spriteAtlas(512, 512),
       painter(*this),
       loop(uv_loop_new()) {
 
@@ -175,7 +176,16 @@ void Map::resize(uint16_t width, uint16_t height, float ratio) {
 }
 
 void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height) {
+    bool changed = false;
+
     if (transform.resize(width, height, ratio, fb_width, fb_height)) {
+        changed = true;
+    }
+    if (spriteAtlas.resize(ratio)) {
+        changed = true;
+    }
+
+    if (changed) {
         update();
     }
 }
@@ -391,6 +401,11 @@ void Map::prepare() {
     if (!style.sprite || style.sprite->pixelRatio != state.getPixelRatio()) {
         style.sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
         style.sprite->load(kSpriteURL);
+    }
+
+    // Allow the sprite atlas to potentially pull new sprite images if needed.
+    if (style.sprite && style.sprite->isLoaded()) {
+        spriteAtlas.update(*style.sprite);
     }
 
     updateTiles();

@@ -83,15 +83,15 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("font stack must be a string");
             }
-        } else if (name == "fontSize") {
+        } else if (name == "fontSize" || name == "size") {
             if (value.IsNumber()) {
-                bucket.geometry.font_size = value.GetDouble();
+                bucket.geometry.size = value.GetDouble();
             } else {
                 throw Style::exception("font size must be a number");
             }
-        } else if (name == "text_field") {
+        } else if (name == "text_field" || name == "icon") {
             if (value.IsString()) {
-                bucket.geometry.text_field = { value.GetString(), value.GetStringLength() };
+                bucket.geometry.field = { value.GetString(), value.GetStringLength() };
             } else {
                 throw Style::exception("text field must be a string");
             }

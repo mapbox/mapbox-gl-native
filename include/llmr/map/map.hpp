@@ -92,6 +92,7 @@ public:
     inline const TransformState &getState() const { return state; }
     inline const Style &getStyle() const { return style; }
     inline GlyphAtlas &getGlyphAtlas() { return glyphAtlas; }
+    inline SpriteAtlas &getSpriteAtlas() { return spriteAtlas; }
     inline uv_loop_t *getLoop() { return loop; }
     inline time getAnimationTime() const { return animationTime; }
     inline Texturepool &getTexturepool() { return texturepool; }
@@ -143,6 +144,7 @@ private:
     Texturepool texturepool;
     Style style;
     GlyphAtlas glyphAtlas;
+    SpriteAtlas spriteAtlas;
     Painter painter;
 
     std::map<std::string, const std::unique_ptr<Source>> sources;
