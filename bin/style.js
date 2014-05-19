@@ -3526,7 +3526,8 @@ module.exports = {
                         {"z": 9, "val": 10},
                         {"z": 12, "val": 13},
                         {"z": 14, "val": 17},
-                        {"z": 16, "val": 22}
+                        {"z": 16, "val": 22},
+                        {"z": 22, "val": 22}
                     ]
                 },
                 "place_label_village": {
@@ -3563,18 +3564,10 @@ module.exports = {
                     "strokeBlur": 2,
                     "size": [
                         "stops",
-                        {
-                            "z": 0,
-                            "val": 12
-                        },
-                        {
-                            "z": 14,
-                            "val": 12
-                        },
-                        {
-                            "z": 15,
-                            "val": 13
-                        }
+                        {"z": 0, "val": 12},
+                        {"z": 14, "val": 12},
+                        {"z": 15, "val": 13},
+                        {"z": 22, "val": 13}
                     ]
                 },
                 "water_label": {
@@ -3589,6 +3582,11 @@ module.exports = {
                 "poi": {
                     "color": "rgba(50,50,50,0.9)",
                     "antialias": false
+                },
+                "poi_label": {
+                    "color": "#444",
+                    "size": 11,
+                    "translate": [0, 26]
                 },
                 "poi_aerodrome": {
                     "antialias": false

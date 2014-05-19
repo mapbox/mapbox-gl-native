@@ -152,6 +152,7 @@ std::unique_ptr<Bucket> TileParser::createIconBucket(const VectorTileLayer& laye
 }
 
 std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+
     // Determine the correct text stack.
     if (!layer.shaping.size()) {
         return nullptr;
