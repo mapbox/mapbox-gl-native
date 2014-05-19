@@ -2,6 +2,8 @@
 #define LLMR_UTIL_IMAGE
 
 #include <string>
+#include <cstring>
+#include <stdexcept>
 
 namespace llmr {
 namespace util {
