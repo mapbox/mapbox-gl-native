@@ -720,6 +720,8 @@ module.exports = {
             "source": "outdoors",
             "layer": "poi_label",
             "icon": "maki",
+            "field": "scalerank",
+            "value": [1, 2, 3],
             "size": 12,
             "type": "point"
         },
@@ -3543,7 +3545,9 @@ module.exports = {
                         0.75
                     ]
                 },
-                "poi": {},
+                "poi": {
+                    "antialias": false
+                },
                 "satellite": {
                     "type": "raster",
                     "opacity": 0.25
