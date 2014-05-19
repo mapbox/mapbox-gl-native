@@ -602,13 +602,22 @@ module.exports = {
             "layer": "country_label_line",
             "type": "line"
         },
-        "marine_label": {
+        "marine_label_line": {
             "source": "outdoors",
             "layer": "marine_label",
             "feature_type": "line",
             "type": "text",
             "text_field": "name",
             "path": "curve",
+            "fontSize": 16
+        },
+        "marine_label_point": {
+            "source": "outdoors",
+            "layer": "marine_label",
+            "feature_type": "point",
+            "type": "text",
+            "text_field": "name",
+            "path": "horizontal",
             "fontSize": 16
         },
         "state_label": {
@@ -1156,8 +1165,12 @@ module.exports = {
                   "bucket": "country_label"
                   },
                   {
-                  "name": "marine_label",
-                  "bucket": "marine_label"
+                  "name": "marine_label_line",
+                  "bucket": "marine_label_line"
+                  },
+                  {
+                  "name": "marine_label_point",
+                  "bucket": "marine_label_point"
                   },
                   {
                   "name": "state_label",
@@ -3167,14 +3180,18 @@ module.exports = {
                          {"z": 6, "val": 14},
                          {"z": 12, "val": 24},
                          {"z": 22, "val": 24}
-                ]
+                         ]
                 },
                 "country_label_line": {
                 "color": "country_text",
                 "width": 0.5,
                 "opacity": 0.5
                 },
-                "marine_label": {
+                "marine_label_line": {
+                "color": "marine_text",
+                "stroke": "water"
+                },
+                "marine_label_point": {
                 "color": "marine_text",
                 "stroke": "water"
                 },
@@ -3356,47 +3373,47 @@ module.exports = {
                 "strokeWidth": 0.6,
                 "strokeBlur": 2,
                 "size": [
-                    "stops", {
-                        "z": 0,
-                        "val": 12
-                    }, {
-                        "z": 14,
-                        "val": 12
-                    }, {
-                        "z": 15,
-                        "val": 13
-                    }
-                ],
-            },
-            "water_label": {
+                         "stops", {
+                         "z": 0,
+                         "val": 12
+                         }, {
+                         "z": 14,
+                         "val": 12
+                         }, {
+                         "z": 15,
+                         "val": 13
+                         }
+                         ],
+                },
+                "water_label": {
                 "color": "marine_text",
                 "stroke": [
-                    1,
-                    1,
-                    1,
-                    0.75
-                ],
-            },
-            "poi": {
-            },
-            "satellite": {
+                           1,
+                           1,
+                           1,
+                           0.75
+                           ],
+                },
+                "poi": {
+                },
+                "satellite": {
                 "type": "raster",
                 "opacity": 0.25
-            },
-        }
-    }, {
-        "name": "satellite",
-        "layers": {
-            "building": {
+                },
+                }
+                }, {
+                "name": "satellite",
+                "layers": {
+                "building": {
                 "enabled": false,
-            },
-            "building_wall": {
+                },
+                "building_wall": {
                 "enabled": false,
-            },
-            "building_shadow": {
+                },
+                "building_shadow": {
                 "enabled": false,
-            },
-        }
-    }],
+                },
+                }
+                }],
     "sprite": "/img/maki-sprite"
 };
