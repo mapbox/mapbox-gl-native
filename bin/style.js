@@ -1496,7 +1496,7 @@ module.exports = {
                     "color": "builtup"
                 },
                 "overlay_wetland": {
-                    "color": "#e1e9d3",
+                    "color": "rgba(210,225,225,0.2)",
                     "image": "wetland_noveg_64"
                 },
                 "overlay_breakwater_pier": {
