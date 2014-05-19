@@ -725,6 +725,15 @@ module.exports = {
             "size": 12,
             "type": "point"
         },
+        "poi_aerodrome": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "icon": "maki",
+            "field": "maki",
+            "value": "airport",
+            "size": 24,
+            "type": "point"
+        },
         "poi_label_1": {
             "source": "outdoors",
             "layer": "poi_label",
@@ -1221,6 +1230,10 @@ module.exports = {
         {
             "name": "poi",
             "bucket": "poi"
+        },
+        {
+            "name": "poi_aerodrome",
+            "bucket": "poi_aerodrome"
         }
     ],
     "classes": [
@@ -3546,6 +3559,9 @@ module.exports = {
                     ]
                 },
                 "poi": {
+                    "antialias": false
+                },
+                "poi_aerodrome": {
                     "antialias": false
                 },
                 "satellite": {
