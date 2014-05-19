@@ -7,5 +7,5 @@ varying vec2 v_tex;
 
 void main() {
     vec2 pos = (v_tex + (gl_PointCoord - 0.5) * u_size) / u_dimension;
-    gl_FragColor = texture2D(u_image, pos);
+    gl_FragColor = u_color * texture2D(u_image, pos);
 }

@@ -626,7 +626,8 @@ module.exports = {
             "layer": "place_label",
             "field": "type",
             "value": "city",
-            "type": "point"
+            "type": "point",
+            "size": 4
         },
         "place_label_city": {
             "source": "outdoors",
@@ -3212,26 +3213,6 @@ module.exports = {
                 },
                 "place_label_city_point": {
                 "color": "#4a4032",
-                "radius": 3,
-                "opacity": [
-                            "stops",
-                            {
-                            "z": 0,
-                            "val": 1
-                            },
-                            {
-                            "z": 5.99,
-                            "val": 1
-                            },
-                            {
-                            "z": 6,
-                            "val": 0
-                            },
-                            {
-                            "z": 22,
-                            "val": 0
-                            }
-                            ]
                 },
                 "place_label_city": {
                 "color": "#444",
@@ -3397,7 +3378,6 @@ module.exports = {
                 ],
             },
             "poi": {
-                "color": "maki",
             },
             "satellite": {
                 "type": "raster",

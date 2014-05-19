@@ -24,13 +24,19 @@ IconBucket::IconBucket(IconVertexBuffer& vertexBuffer,
 }
 
 void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprite_atlas) {
-    auto field_it = feature.properties.find(geometry.field);
-    if (field_it == feature.properties.end()) {
-        // fprintf(stderr, "feature doesn't contain field '%s'\n", geometry.field.c_str());
-        return;
-    }
+    std::string field;
 
-    std::string field = toString(field_it->second);
+    if (geometry.field.size()) {
+        auto field_it = feature.properties.find(geometry.field);
+        if (field_it == feature.properties.end()) {
+            fprintf(stderr, "feature doesn't contain field '%s'\n", geometry.field.c_str());
+            return;
+        }
+
+        field = toString(field_it->second);
+    } else {
+        field = "<circle>";
+    }
 
     const Rect<uint16_t> rect = sprite_atlas.getIcon(geometry.size, field);
     const uint16_t tx = rect.x + rect.w / 2;
