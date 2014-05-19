@@ -24,60 +24,29 @@ void Painter::renderIcon(IconBucket& bucket, const std::string& layer_name, cons
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    auto &sprite = map.getStyle().sprite;
-    SpritePosition spritePos;
-
-    if (properties.image.length() && sprite && sprite->isLoaded()) {
-        std::string sized_image = properties.image;
-        if (properties.size) {
-            sized_image.append("-");
-            sized_image.append(std::to_string(static_cast<int>(std::round(properties.size))));
-        }
-        spritePos = sprite->getSpritePosition(sized_image);
-    }
-
     const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
-    if (!spritePos.width || !spritePos.height) {
-        useProgram(dotShader->program);
-        dotShader->setMatrix(vtxMatrix);
-        dotShader->setColor(color);
+    SpriteAtlas &spriteAtlas = map.getSpriteAtlas();
 
-        const float iconSize = (properties.radius ? properties.radius * 2 : 8) * map.getState().getPixelRatio();
-        dotShader->setSize(iconSize);
+    useProgram(iconShader->program);
+    iconShader->setMatrix(vtxMatrix);
+    iconShader->setColor(color);
+    iconShader->setImage(0);
+    iconShader->setRatio(map.getState().getPixelRatio());
+    iconShader->setDimension({{
+        spriteAtlas.getTextureWidth(),
+        spriteAtlas.getTextureHeight(),
+    }});
+
+    spriteAtlas.bind(map.getState().isChanging());
+
+    const float iconSize = bucket.geometry.size * map.getState().getPixelRatio();
+    iconShader->setSize(iconSize);
 #ifndef GL_ES_VERSION_2_0
-            glPointSize(iconSize);
-            glEnable(GL_POINT_SPRITE);
-#endif
-        dotShader->setBlur((properties.blur ? properties.blur : 1.5) / iconSize);
-
-        glDepthRange(strata, 1.0f);
-        bucket.drawIcons(*dotShader);
-    } else {
-        useProgram(iconShader->program);
-        iconShader->setMatrix(vtxMatrix);
-        iconShader->setColor(color);
-        iconShader->setImage(0);
-        iconShader->setPosition({{
-            spritePos.x + (float)spritePos.width / 2.0f,
-            spritePos.y + (float)spritePos.height / 2.0f,
-        }});
-
-        iconShader->setDimension({{
-            static_cast<float>(sprite->raster.width),
-            static_cast<float>(sprite->raster.height)
-        }});
-
-        sprite->raster.bind(map.getState().isChanging());
-
-        const float iconSize = util::max(spritePos.width, spritePos.height) + 2;
-        iconShader->setSize(iconSize);
-#ifndef GL_ES_VERSION_2_0
-        glPointSize(iconSize);
-        glEnable(GL_POINT_SPRITE);
+    glPointSize(iconSize);
+    glEnable(GL_POINT_SPRITE);
 #endif
 
-        glDepthRange(strata, 1.0f);
-        bucket.drawIcons(*iconShader);
-    }
+    glDepthRange(strata, 1.0f);
+    bucket.drawIcons(*iconShader);
 }

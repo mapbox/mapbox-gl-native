@@ -9,6 +9,11 @@ struct Rect {
     T x = 0, y = 0;
     T w = 0, h = 0;
 
+    template <typename Number>
+    Rect operator *(Number value) const {
+        return Rect(x * value, y * value, w * value, h * value);
+    }
+
     operator bool() const { return w == 0 || h == 0; }
 };
 }

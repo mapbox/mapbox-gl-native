@@ -73,8 +73,9 @@ public:
     CapType cap = CapType::None;
     JoinType join = JoinType::None;
     std::string font;
-    std::string text_field;
-    float font_size = 0.0f;
+    std::string field;
+    std::string icon;
+    float size = 0.0f;
     float miter_limit = 2.0f;
     float round_limit = 1.0f;
     TextPathType path = TextPathType::Horizontal;
