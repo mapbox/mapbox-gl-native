@@ -770,7 +770,7 @@ module.exports = {
         "hospital": "#f8eee0",
         "builtup": "#f6faff",
         "case": "#fff",
-        "motorway": "#d7a8a8",
+        "motorway": "#cda0a0",
         "main": "#ddc0b9",
         "street": "#fff",
         "text": "#666",
