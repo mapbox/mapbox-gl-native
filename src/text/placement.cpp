@@ -278,7 +278,7 @@ void Placement::addFeature(TextBucket& bucket,
     const float textMinDistance = info.textMinDistance;
     const float rotate = info.rotate;
     const float fontScale =
-        (tileExtent / util::tileSize) / (glyphSize / info.font_size);
+        (tileExtent / util::tileSize) / (glyphSize / info.size);
 
     const float advance = measureText(faces, shaping);
     Anchors anchors;

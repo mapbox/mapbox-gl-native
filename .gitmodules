@@ -1,0 +1,3 @@
+[submodule "ios/MVKMapKit"]
+	path = ios/MVKMapKit
+	url = git@github.com:mapbox/MVKMapKit.git

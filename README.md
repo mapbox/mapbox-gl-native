@@ -6,10 +6,10 @@ implemented in C++11, targeting iOS & OS X.
 # Depends
 
  - Modern C++ compiler that supports `-std=c++11`
- - libpng
- - libuv
- - libcurl (depends on OpenSSL)
- - glfw3
+ - `libpng`
+ - `libuv`
+ - `libcurl` (depends on OpenSSL)
+ - `glfw3`
  - Boost (for Rtree support)
  - Python (for build only)
  - Node.js (for build only)
@@ -28,18 +28,26 @@ used on both OS X and iOS.
 
 To create projects, you can run:
 - `make xproj`: Creates an Xcode project with OS X-specific handlers for HTTP downloads and
-  settings storage. It uses GLFW for window handling
+  settings storage. It uses GLFW for window handling.
 - `make lproj`: Creates an Xcode project with platform-independent handlers for downloads
-  and settings storage. This is what is also being built on Linux
-- `make linux`: Builds the Linux GLFW application with make
+  and settings storage. This is what is also being built on Linux.
+- `make linux`: Builds the Linux GLFW application with `make`.
 
 ## iOS
 
-Because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version
+iOS makes use of a Cocoa-specific API currently housed in [MVKMapKit](https://github.com/mapbox/MVKMapKit), 
+which is included as a submodule and provides a `UIView` interface to the map view. 
+
+First, pull down the submodule(s): 
+
+    git submodule init
+    git submodule update
+
+Then, because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version
 yourself. Run `./setup-libraries.sh`, which is derived from Mapnik's cross-architecture build
 scripts. This will also run `./configure`.
 
-Then, `make iproj` to create and open an Xcode project with an iOS-specific view controller housing and basic gesture support. 
+Lastly, `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. 
 
 Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina).
 
@@ -66,7 +74,7 @@ Build static dependencies:
 
 This will automatically run configure for you and set the correct paths.
 
-You can then proceed to build the library, tests or a GLFW app itself.
+You can then proceed to build the library, tests, or a GLFW app itself.
 
 # Style
 

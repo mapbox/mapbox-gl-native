@@ -14,6 +14,8 @@
             "./MBXAppDelegate.m",
             "./MBXViewController.h",
             "./MBXViewController.mm",
+            "./MVKMapKit/MVKMapKit/MVKMapView.h",
+            "./MVKMapKit/MVKMapKit/MVKMapView.mm",
             "../common/settings_nsuserdefaults.hpp",
             "../common/settings_nsuserdefaults.mm",
             "../common/foundation_request.h",
@@ -29,7 +31,6 @@
             '$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
             '$(SDKROOT)/System/Library/Frameworks/OpenGLES.framework',
             '$(SDKROOT)/System/Library/Frameworks/GLKit.framework',
-            '$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework',
             '$(SDKROOT)/System/Library/Frameworks/CoreLocation.framework'
           ],
         },

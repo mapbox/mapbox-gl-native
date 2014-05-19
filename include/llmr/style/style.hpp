@@ -7,6 +7,7 @@
 #include <llmr/style/bucket_description.hpp>
 #include <llmr/style/layer_description.hpp>
 #include <llmr/style/class_description.hpp>
+#include <llmr/geometry/sprite_atlas.hpp>
 
 #include <map>
 #include <vector>
@@ -46,7 +47,7 @@ public:
         BackgroundProperties background;
         std::map<std::string, FillProperties> fills;
         std::map<std::string, LineProperties> lines;
-        std::map<std::string, PointProperties> points;
+        std::map<std::string, IconProperties> icons;
         std::map<std::string, TextProperties> texts;
         std::map<std::string, RasterProperties> rasters;
     } computed;

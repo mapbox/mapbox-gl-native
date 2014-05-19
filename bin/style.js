@@ -706,75 +706,12 @@ module.exports = {
             "feature_type": "line",
             "type": "text"
         },
-        "poi_airport": {
+        "poi": {
             "source": "outdoors",
             "layer": "poi_label",
-            "field": "maki",
-            "value": "airport",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
+            "icon": "maki",
+            "size": 12,
             "type": "point"
-        },
-        "poi_rail": {
-            "source": "outdoors",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "rail",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point"
-        },
-        "poi_park": {
-            "source": "outdoors",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "park",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point",
-            "alwaysVisible": true
-        },
-        "poi_golf": {
-            "source": "outdoors",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "golf",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point",
-            "alwaysVisible": true
-        },
-        "poi_hospital": {
-            "source": "outdoors",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "hospital",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point",
-            "alwaysVisible": true
-        },
-        "poi_college": {
-            "source": "outdoors",
-            "layer": "poi_label",
-            "field": "maki",
-            "value": "college",
-            "size": {
-                "x": 12,
-                "y": 12
-            },
-            "type": "point",
-            "alwaysVisible": true
         },
         "poi_label_1": {
             "source": "outdoors",
@@ -1266,28 +1203,8 @@ module.exports = {
                   "bucket": "waterway_label"
                   },
                   {
-                  "name": "poi_airport",
-                  "bucket": "poi_airport"
-                  },
-                  {
-                  "name": "poi_rail",
-                  "bucket": "poi_rail"
-                  },
-                  {
-                  "name": "poi_golf",
-                  "bucket": "poi_golf"
-                  },
-                  {
-                  "name": "poi_park",
-                  "bucket": "poi_park"
-                  },
-                  {
-                  "name": "poi_hospital",
-                  "bucket": "poi_hospital"
-                  },
-                  {
-                  "name": "poi_college",
-                  "bucket": "poi_college"
+                  "name": "poi",
+                  "bucket": "poi"
                   }
                   ],
     "classes": [
@@ -3458,167 +3375,48 @@ module.exports = {
                 "strokeWidth": 0.6,
                 "strokeBlur": 2,
                 "size": [
-                         "stops",
-                         {
-                         "z": 0,
-                         "val": 12
-                         },
-                         {
-                         "z": 14,
-                         "val": 12
-                         },
-                         {
-                         "z": 15,
-                         "val": 13
-                         },
-                         {
-                         "z": 22,
-                         "val": 13
-                         }
-                         ]
-                },
-                "water_label": {
-                "color": "water_text",
-                "stroke": "water"
-                },
-                "waterway_label": {
-                "color": "water_text",
-                "stroke": "rgba(255,255,255,0.75)"
-                },
-                "poi_airport": {
-                "color": "#666",
-                "image": "airport-24"
-                },
-                "poi_label_1": {
-                "color": "#444",
-                "stroke": "land",
-                "translate": [
-                              0,
-                              14
-                              ],
-                "translate-anchor": "viewport"
-                },
-                "poi_rail": {
-                "color": "#666",
-                "image": "rail-12",
-                "opacity": [
-                            "stops",
-                            {
-                            "z": 0,
-                            "val": 0
-                            },
-                            {
-                            "z": 16.75,
-                            "val": 0
-                            },
-                            {
-                            "z": 17,
-                            "val": 1
-                            },
-                            {
-                            "z": 22,
-                            "val": 1
-                            }
-                            ]
-                },
-                "poi_park": {
-                "color": "#666",
-                "image": "park-12",
-                "opacity": [
-                            "stops",
-                            {
-                            "z": 0,
-                            "val": 0
-                            },
-                            {
-                            "z": 15.75,
-                            "val": 0
-                            },
-                            {
-                            "z": 16,
-                            "val": 1
-                            },
-                            {
-                            "z": 22,
-                            "val": 1
-                            }
-                            ]
-                },
-                "poi_golf": {
-                "color": "#666",
-                "image": "golf-12",
-                "opacity": [
-                            "stops",
-                            {
-                            "z": 0,
-                            "val": 0
-                            },
-                            {
-                            "z": 15.75,
-                            "val": 0
-                            },
-                            {
-                            "z": 16,
-                            "val": 1
-                            },
-                            {
-                            "z": 22,
-                            "val": 1
-                            }
-                            ]
-                },
-                "poi_hospital": {
-                "color": "#666",
-                "image": "hospital-12",
-                "opacity": [
-                            "stops",
-                            {
-                            "z": 0,
-                            "val": 0
-                            },
-                            {
-                            "z": 16.75,
-                            "val": 0
-                            },
-                            {
-                            "z": 17,
-                            "val": 1
-                            },
-                            {
-                            "z": 22,
-                            "val": 1
-                            }
-                            ]
-                },
-                "poi_college": {
-                "color": "#666",
-                "image": "college-12",
-                "opacity": [
-                            "stops",
-                            {
-                            "z": 0,
-                            "val": 0
-                            },
-                            {
-                            "z": 16.75,
-                            "val": 0
-                            },
-                            {
-                            "z": 17,
-                            "val": 1
-                            },
-                            {
-                            "z": 22,
-                            "val": 1
-                            }
-                            ]
-                },
-                "contour_label": {
-                "color": "text",
-                "stroke": "#fff",
-                "size": 10
-                }
-                }
-                }
-                ]
+                    "stops", {
+                        "z": 0,
+                        "val": 12
+                    }, {
+                        "z": 14,
+                        "val": 12
+                    }, {
+                        "z": 15,
+                        "val": 13
+                    }
+                ],
+            },
+            "water_label": {
+                "color": "marine_text",
+                "stroke": [
+                    1,
+                    1,
+                    1,
+                    0.75
+                ],
+            },
+            "poi": {
+                "color": "maki",
+            },
+            "satellite": {
+                "type": "raster",
+                "opacity": 0.25
+            },
+        }
+    }, {
+        "name": "satellite",
+        "layers": {
+            "building": {
+                "enabled": false,
+            },
+            "building_wall": {
+                "enabled": false,
+            },
+            "building_shadow": {
+                "enabled": false,
+            },
+        }
+    }],
+    "sprite": "/img/maki-sprite"
 };

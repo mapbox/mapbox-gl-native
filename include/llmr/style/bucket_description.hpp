@@ -13,7 +13,7 @@ enum class BucketType {
     None = 0,
     Fill = 1,
     Line = 2,
-    Point = 3,
+    Icon = 3,
     Text = 4,
     Raster = 5
 };
@@ -41,7 +41,7 @@ enum class TextPathType {
 inline BucketType bucketType(const std::string& type) {
     if (type == "fill") return BucketType::Fill;
     else if (type == "line") return BucketType::Line;
-    else if (type == "point") return BucketType::Point;
+    else if (type == "point") return BucketType::Icon;
     else if (type == "text") return BucketType::Text;
     else if (type == "raster") return BucketType::Raster;
     else return BucketType::None;
@@ -73,8 +73,9 @@ public:
     CapType cap = CapType::None;
     JoinType join = JoinType::None;
     std::string font;
-    std::string text_field;
-    float font_size = 0.0f;
+    std::string field;
+    std::string icon;
+    float size = 0.0f;
     float miter_limit = 2.0f;
     float round_limit = 1.0f;
     TextPathType path = TextPathType::Horizontal;

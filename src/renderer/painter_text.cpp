@@ -28,7 +28,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     }
 
     // If layerStyle.size > bucket.info.fontSize then labels may collide
-    float fontSize = std::fmin(properties.size, bucket.geom_desc.font_size);
+    float fontSize = std::fmin(properties.size, bucket.geom_desc.size);
     matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
 
     const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
@@ -45,7 +45,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     float angle = std::round((map.getState().getAngle() + rotate) / M_PI * 128);
 
     // adjust min/max zooms for variable font sies
-    float zoomAdjust = log(fontSize / bucket.geom_desc.font_size) / log(2);
+    float zoomAdjust = log(fontSize / bucket.geom_desc.size) / log(2);
 
     textShader->setAngle((int32_t)(angle + 256) % 256);
     textShader->setFlip(bucket.geom_desc.path == TextPathType::Curve ? 1 : 0);

@@ -302,7 +302,7 @@ void FilteredVectorTileLayer::iterator::operator++() {
                 }
             } else if (feature_pbf.tag == 3) { // geometry type
                 switch (feature_pbf.varint()) {
-                    case 1 /* Point */:      type = BucketType::Point; break;
+                    case 1 /* Point */:      type = BucketType::Icon; break;
                     case 2 /* LineString */: type = BucketType::Line; break;
                     case 3 /* Polygon */:    type = BucketType::Fill; break;
                     default:                 type = BucketType::None; break;

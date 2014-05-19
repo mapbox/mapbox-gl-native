@@ -22,7 +22,7 @@ void VectorTileData::parse() {
         // Parsing creates state that is encapsulated in TileParser. While parsing,
         // the TileParser object writes results into this objects. All other state
         // is going to be discarded afterwards.
-        TileParser parser(data, *this, map.getStyle(), map.getGlyphAtlas());
+        TileParser parser(data, *this, map.getStyle(), map.getGlyphAtlas(), map.getSpriteAtlas());
     } catch (const std::exception& ex) {
         fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
         cancel();

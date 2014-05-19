@@ -83,15 +83,15 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("font stack must be a string");
             }
-        } else if (name == "fontSize") {
+        } else if (name == "fontSize" || name == "size") {
             if (value.IsNumber()) {
-                bucket.geometry.font_size = value.GetDouble();
+                bucket.geometry.size = value.GetDouble();
             } else {
                 throw Style::exception("font size must be a number");
             }
-        } else if (name == "text_field") {
+        } else if (name == "text_field" || name == "icon") {
             if (value.IsString()) {
-                bucket.geometry.text_field = { value.GetString(), value.GetStringLength() };
+                bucket.geometry.field = { value.GetString(), value.GetStringLength() };
             } else {
                 throw Style::exception("text field must be a string");
             }
@@ -269,8 +269,8 @@ void StyleParser::parseClass(const std::string& name, JSVal value, ClassDescript
                         class_desc.fill.insert({ name, std::forward<FillClass>(parseFillClass(value)) });
                     } else if (type == BucketType::Line) {
                         class_desc.line.insert({ name, std::forward<LineClass>(parseLineClass(value)) });
-                    } else if (type == BucketType::Point) {
-                        class_desc.point.insert({ name, std::forward<PointClass>(parsePointClass(value)) });
+                    } else if (type == BucketType::Icon) {
+                        class_desc.icon.insert({ name, std::forward<IconClass>(parseIconClass(value)) });
                     } else if (type == BucketType::Text) {
                         class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
                     } else if (type == BucketType::Raster) {
@@ -512,8 +512,8 @@ LineClass StyleParser::parseLineClass(JSVal value) {
     return klass;
 }
 
-PointClass StyleParser::parsePointClass(JSVal value) {
-    PointClass klass;
+IconClass StyleParser::parseIconClass(JSVal value) {
+    IconClass klass;
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);

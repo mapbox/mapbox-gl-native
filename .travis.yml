@@ -29,3 +29,6 @@ script:
 
 notifications:
 - hipchat: WB52YkcbCGMbNcStsGeaoRO7cyBSK4wX2ZHo2Y4b@GL
+
+git:
+  submodules: false
