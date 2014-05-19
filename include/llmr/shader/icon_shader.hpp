@@ -15,6 +15,7 @@ public:
     void setColor(const std::array<float, 4>& color);
     void setDimension(const std::array<float, 2>& dimension);
     void setSize(float size);
+    void setRatio(float ratio);
 
 private:
     int32_t a_pos = -1;
@@ -31,6 +32,9 @@ private:
 
     float size = 0;
     int32_t u_size = -1;
+
+    float ratio = 0;
+    int32_t u_ratio = -1;
 };
 
 }

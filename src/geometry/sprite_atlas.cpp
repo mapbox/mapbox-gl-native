@@ -83,7 +83,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getIcon(const int size, const std::str
     const int img_offset_y = (rect.y + buffer) * pixelRatio;
 
     uint32_t *sprite_img = reinterpret_cast<uint32_t *>(data);
-    const float blur = 1.5f / size;
+    const float blur = 1.0f / size / pixelRatio;
 
     const uint8_t r = 0x7F;
     const uint8_t g = 0x7F;
@@ -220,7 +220,7 @@ void SpriteAtlas::bind(bool linear) {
             data // const GLvoid * data
         );
 
-        platform::show_color_debug_image("Sprite Atlas", data, width * pixelRatio, height * pixelRatio);
+        platform::show_color_debug_image("Sprite Atlas", data, width, height, width * pixelRatio, height * pixelRatio);
 
         dirty = false;
     }

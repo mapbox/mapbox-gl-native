@@ -32,7 +32,7 @@ void Painter::renderIcon(IconBucket& bucket, const std::string& layer_name, cons
     iconShader->setMatrix(vtxMatrix);
     iconShader->setColor(color);
     iconShader->setImage(0);
-
+    iconShader->setRatio(map.getState().getPixelRatio());
     iconShader->setDimension({{
         spriteAtlas.getTextureWidth(),
         spriteAtlas.getTextureHeight(),
