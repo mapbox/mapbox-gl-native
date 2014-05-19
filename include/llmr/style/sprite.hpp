@@ -24,31 +24,19 @@ public:
     uint8_t pixelRatio = 1;
 };
 
-class ImagePosition {
-public:
-    explicit ImagePosition() {}
-    explicit ImagePosition(const vec2<uint16_t>& size, vec2<float> tl, vec2<float> br);
-
-    vec2<uint16_t> size = { 0, 0 };
-    vec2<float> tl = { 0, 0 };
-    vec2<float> br = { 0, 0 };
-};
-
-
 class Sprite : public std::enable_shared_from_this<Sprite> {
 public:
     Sprite(Map &map, float pixelRatio = 1);
 
     void load(const std::string& base_url);
 
-    ImagePosition getPosition(const std::string& name, bool repeating = false) const;
     const SpritePosition &getSpritePosition(const std::string& name) const;
 
     bool isLoaded() const;
 
 public:
     const float pixelRatio;
-    Raster raster;
+    std::unique_ptr<util::Image> raster;
 
 private:
     void asyncParseJSON();

@@ -12,6 +12,7 @@
 namespace llmr {
 
 class Sprite;
+class SpritePosition;
 
 class SpriteAtlas {
 public:
@@ -28,23 +29,28 @@ public:
     // Update uninitialized sprites in this atlas from the given sprite.
     void update(const Sprite &sprite);
 
-    // Returns the coordinates of the icon. The getter also *creates* new icons in the atlas
-    // if they don't exist, but they'll be default-initialized with a a black circle.
+    // Returns the coordinates of a square icon. The getter also *creates* new square icons in the
+    // atlas if they don't exist, but they'll be default-initialized with a a black circle.
     Rect<dimension> getIcon(int size, const std::string &name);
 
-    // Updates or creates an icon with a given size and name. The data must be a
-    // a (pixelRatio * size)^2 * 4 byte long RGBA image buffer.
-    Rect<dimension> setIcon(int size, const std::string &name, const std::string &icon);
+    // Returns the coordinates of an image that is sourced from the sprite image.
+    // This getter does not create images, as the dimension of the texture us unknown if the
+    // sprite is not yet loaded. Instead, it returns a 0/0/0/0 rect.
+    Rect<dimension> getImage(const std::string &name, const Sprite &sprite);
 
     // Binds the image buffer of this sprite atlas to the GPU, and uploads data if it is out
     // of date.
     void bind(bool linear = false);
 
+    inline float getWidth() const { return width; }
+    inline float getHeight() const { return height; }
     inline float getTextureWidth() const { return width * pixelRatio; }
     inline float getTextureHeight() const { return height * pixelRatio; }
 
 private:
     void allocate();
+    Rect<SpriteAtlas::dimension> allocateImage(size_t width, size_t height);
+    void copy(const Rect<dimension> &dst, const SpritePosition &src, const Sprite &sprite);
 
 public:
     const dimension width = 0;
@@ -54,8 +60,8 @@ private:
     std::mutex mtx;
     float pixelRatio = 1.0f;
     BinPack<dimension> bin;
-    std::map<int, std::map<std::string, Rect<dimension>>> index;
-    std::set<std::pair<int, std::string>> uninitialized;
+    std::map<std::string, Rect<dimension>> images;
+    std::set<std::string> uninitialized;
     char *data = nullptr;
     std::atomic<bool> dirty;
     uint32_t texture = 0;

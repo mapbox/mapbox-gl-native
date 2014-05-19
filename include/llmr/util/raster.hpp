@@ -3,6 +3,7 @@
 
 #include <llmr/util/transition.hpp>
 #include <llmr/util/texturepool.hpp>
+#include <llmr/util/image.hpp>
 
 #include <string>
 #include <mutex>
@@ -32,8 +33,6 @@ public:
     bool needsTransition() const;
     void updateTransitions(time now);
 
-    inline const char *getData() const { return img; }
-
 public:
     // loaded image dimensions
     uint32_t width = 0, height = 0;
@@ -48,10 +47,6 @@ public:
     double opacity = 0;
 
 private:
-    // load raw pixels
-    void loadImage(const std::string& data);
-
-private:
     mutable std::mutex mtx;
 
     // raw pixels have been loaded
@@ -64,7 +59,7 @@ private:
     uint32_t filter = 0;
 
     // the raw pixels
-    char *img = nullptr;
+    std::unique_ptr<util::Image> img;
 
     // fade in transition
     std::shared_ptr<util::transition> fade_transition = nullptr;

@@ -52,49 +52,26 @@ bool SpriteAtlas::resize(const float newRatio) {
     return dirty;
 }
 
-Rect<SpriteAtlas::dimension> SpriteAtlas::getIcon(const int size, const std::string &name) {
-    std::lock_guard<std::mutex> lock(mtx);
-
-    std::map<std::string, Rect<dimension>> &size_index = index[size];
-
-    auto rect_it = size_index.find(name);
-    if (rect_it != size_index.end()) {
-        return rect_it->second;
+void copy_bitmap(const uint32_t *src, const int src_stride, const int src_x, const int src_y,
+                uint32_t *dst, const int dst_stride, const int dst_x, const int dst_y,
+                const int width, const int height) {
+    const int stride = width * sizeof(uint32_t);
+    src += src_y * src_stride + src_x;
+    dst += dst_y * dst_stride + dst_x;
+    for (int y = 0; y < height; y++, src += src_stride, dst += dst_stride) {
+        memcpy(dst, src, stride);
     }
+}
 
-    // We have to allocate a new area in the bin, and store an empty image in it.
-    // Add a 1px border around every image.
-    const dimension pack_size = size + 2 * buffer;
-
-    Rect<dimension> rect = bin.allocate(pack_size, pack_size);
-    if (rect.w == 0) {
-        fprintf(stderr, "sprite atlas bitmap overflow");
-        return rect;
-    }
-
-    size_index.emplace(name, rect);
-
-    allocate();
-
-
-    // Draw an antialiased circle.
-    const int img_size = size * pixelRatio;
-    const int img_offset_x = (rect.x + buffer) * pixelRatio;
-    const int img_offset_y = (rect.y + buffer) * pixelRatio;
-
-    uint32_t *sprite_img = reinterpret_cast<uint32_t *>(data);
-    const float blur = 1.0f / size / pixelRatio;
-
-    const uint8_t r = 0x7F;
-    const uint8_t g = 0x7F;
-    const uint8_t b = 0x7F;
-
-    const int sprite_stride = width * pixelRatio;
-    for (int y = 0; y < img_size; y++) {
-        const int img_y = (img_offset_y + y) * sprite_stride + img_offset_x;
-        for (int x = 0; x < img_size; x++) {
-
-            const float dist = util::length(float(x) / img_size - 0.5f, float(y) / img_size - 0.5f);
+void draw_circle(uint32_t *dst, const int dst_stride, const int dst_x, const int dst_y,
+                const int width, const int height, const float blur,
+                const uint8_t r = 0xFF, const uint8_t g = 0xFF, const uint8_t b = 0xFF) {
+    const int sprite_stride = dst_stride;
+    const int radius = util::min(width, height);
+    for (int y = 0; y < height; y++) {
+        const int img_y = (dst_y + y) * sprite_stride + dst_x;
+        for (int x = 0; x < height; x++) {
+            const float dist = util::length(float(x) / radius - 0.5f, float(y) / radius - 0.5f);
             const float t = util::smoothstep(0.5f, 0.5f - blur, dist);
             const uint8_t alpha = t * 255;
 
@@ -102,11 +79,87 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getIcon(const int size, const std::str
                              (uint32_t(g * t) << 8) |
                              (uint32_t(b * t) << 16) |
                              (uint32_t(alpha) << 24);
-            sprite_img[img_y + x] = color;
+            dst[img_y + x] = color;
         }
     }
+}
 
-    uninitialized.emplace(size, name);
+Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t width, size_t height) {
+    // We have to allocate a new area in the bin, and store an empty image in it.
+    // Add a 1px border around every image.
+    Rect<dimension> rect = bin.allocate(width + 2 * buffer, height + 2 * buffer);
+    if (rect.w == 0) {
+        return rect;
+    }
+
+    rect.x += buffer;
+    rect.y += buffer;
+    rect.w -= 2 * buffer;
+    rect.h -= 2 * buffer;
+
+    return rect;
+}
+
+Rect<SpriteAtlas::dimension> SpriteAtlas::getIcon(const int size, const std::string &name) {
+    std::lock_guard<std::mutex> lock(mtx);
+
+    const std::string id = name + "-" + std::to_string(size);
+
+    auto rect_it = images.find(id);
+    if (rect_it != images.end()) {
+        return rect_it->second;
+    }
+
+    Rect<dimension> rect = allocateImage(size, size);
+    if (rect.w == 0) {
+        fprintf(stderr, "sprite atlas bitmap overflow\n");
+        return rect;
+    }
+
+    images.emplace(id, rect);
+
+    allocate();
+
+    // Draw an antialiased circle.
+    draw_circle(
+        reinterpret_cast<uint32_t *>(data),
+        width * pixelRatio,
+        rect.x * pixelRatio,
+        rect.y * pixelRatio,
+        size * pixelRatio,
+        size * pixelRatio,
+        1.0f / size / pixelRatio
+    );
+
+    uninitialized.emplace(id);
+
+    dirty = true;
+
+    return rect;
+}
+
+Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string &name, const Sprite &sprite) {
+    std::lock_guard<std::mutex> lock(mtx);
+
+    auto rect_it = images.find(name);
+    if (rect_it != images.end()) {
+        return rect_it->second;
+    }
+
+    const SpritePosition &pos = sprite.getSpritePosition(name);
+    if (!pos.width || !pos.height) {
+        return Rect<dimension> { 0, 0, 0, 0 };
+    }
+
+    Rect<dimension> rect = allocateImage(pos.width / pos.pixelRatio, pos.height / pos.pixelRatio);
+    if (rect.w == 0) {
+        fprintf(stderr, "sprite atlas bitmap overflow\n");
+        return rect;
+    }
+
+    images.emplace(name, rect);
+
+    copy(rect, pos, sprite);
 
     dirty = true;
 
@@ -121,68 +174,39 @@ void SpriteAtlas::allocate() {
     }
 }
 
-Rect<SpriteAtlas::dimension> SpriteAtlas::setIcon(const int size, const std::string &name, const std::string &icon) {
-    Rect<dimension> rect = getIcon(size, name);
+void SpriteAtlas::copy(const Rect<dimension> &dst, const SpritePosition &src, const Sprite &sprite) {
+    if (!sprite.raster) return;
+    const uint32_t *src_img = reinterpret_cast<const uint32_t *>(sprite.raster->getData());
+    allocate();
+    uint32_t *dst_img = reinterpret_cast<uint32_t *>(data);
 
-    // Copy the bitmap
-    const int img_size = size * pixelRatio;
-    const int img_offset_x = (rect.x + buffer) * pixelRatio;
-    const int img_offset_y = (rect.y + buffer) * pixelRatio;
-
-    if (std::pow(size * pixelRatio, 2) * 4 /* rgba */ != icon.size()) { fprintf(stderr, "mismatched icon buffer size!"); }
-
-    const uint32_t *icon_img = reinterpret_cast<const uint32_t *>(icon.data());
-    uint32_t *sprite_img = reinterpret_cast<uint32_t *>(data);
-
-    const int sprite_stride = width * pixelRatio;
-    const int icon_stride = size * pixelRatio;
-    for (size_t y = 0; y < img_size; y++) {
-        const int img_y = (img_offset_y + y) * sprite_stride + img_offset_x;
-        const int icon_y = y * icon_stride;
-        for (size_t x = 0; x < img_size; x++) {
-            sprite_img[img_y + x] = icon_img[icon_y + x];
-        }
-    }
-
-    dirty = true;
-
-    return rect;
+    copy_bitmap(
+        /* source buffer */  src_img,
+        /* source stride */  sprite.raster->getWidth(),
+        /* source x */       src.x,
+        /* source y */       src.y,
+        /* dest buffer */    dst_img,
+        /* dest stride */    width * pixelRatio,
+        /* dest x */         dst.x * pixelRatio,
+        /* dest y */         dst.y * pixelRatio,
+        /* icon dimension */ src.width,
+        /* icon dimension */ src.height
+    );
 }
+
 
 void SpriteAtlas::update(const Sprite &sprite) {
     if (!sprite.isLoaded()) return;
 
     SpriteAtlas &atlas = *this;
-    std::erase_if(uninitialized, [&sprite, &atlas](const std::pair<int, std::string> &pair) {
-        const int &size = pair.first;
-        const std::string &name = pair.second;
-        const SpritePosition &src = sprite.getSpritePosition(name + "-" + std::to_string(size));
-        if (src.width == size && src.height == size && src.pixelRatio == atlas.pixelRatio) {
-            const uint32_t *src_img = reinterpret_cast<const uint32_t *>(sprite.raster.getData());
-
-            uint32_t *dst_img = reinterpret_cast<uint32_t *>(atlas.data);
-            Rect<dimension> dst = atlas.getIcon(size, name);
-            dst.x = (dst.x + buffer) * atlas.pixelRatio;
-            dst.y = (dst.y + buffer) * atlas.pixelRatio;
-            dst.w = (dst.w - 2 * buffer) * atlas.pixelRatio;
-            dst.h = (dst.h - 2 * buffer) * atlas.pixelRatio;
-
-
-            const int src_image_stride = sprite.raster.width;
-            const int dst_image_stride = atlas.width * atlas.pixelRatio;
-            const int src_stride = src.width * src.pixelRatio;
-
-            for (int y = 0; y < dst.h; y++) {
-                const int src_pos = (src.y * src.pixelRatio + y) * src_image_stride + src.x * src.pixelRatio;
-                const int dst_pos = (dst.y + y) * dst_image_stride + dst.x;
-
-                // TODO: this is crashing
-                // memcpy(dst_img + dst_pos, src_img + src_pos, src_stride * sizeof(uint32_t));
-            }
-
-
+    std::erase_if(uninitialized, [&sprite, &atlas](const std::string &name) {
+        Rect<dimension> dst = atlas.getImage(name, sprite);
+        const SpritePosition &src = sprite.getSpritePosition(name);
+        if (src.width == dst.w * atlas.pixelRatio && src.height == dst.h * atlas.pixelRatio && src.pixelRatio == atlas.pixelRatio) {
+            // atlas.copy(dst, src, sprite);
             return true;
         } else {
+            fprintf(stderr, "sprite icon dimension mismatch\n");
             return false;
         }
     });
