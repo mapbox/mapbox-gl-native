@@ -161,8 +161,6 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string &name, cons
 
     copy(rect, pos, sprite);
 
-    dirty = true;
-
     return rect;
 }
 
@@ -192,6 +190,8 @@ void SpriteAtlas::copy(const Rect<dimension> &dst, const SpritePosition &src, co
         /* icon dimension */ src.width,
         /* icon dimension */ src.height
     );
+
+    dirty = true;
 }
 
 
@@ -202,6 +202,10 @@ void SpriteAtlas::update(const Sprite &sprite) {
     std::erase_if(uninitialized, [&sprite, &atlas](const std::string &name) {
         Rect<dimension> dst = atlas.getImage(name, sprite);
         const SpritePosition &src = sprite.getSpritePosition(name);
+        if (!src) {
+            return true;
+        }
+
         if (src.width == dst.w * atlas.pixelRatio && src.height == dst.h * atlas.pixelRatio && src.pixelRatio == atlas.pixelRatio) {
             atlas.copy(dst, src, sprite);
             return true;

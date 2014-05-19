@@ -373,7 +373,8 @@ module.exports = {
             "layer": "place_label",
             "field": "type",
             "value": "city",
-            "type": "point"
+            "type": "point",
+            "size": 4
         },
         "place_label_city": {
             "source": "mapbox streets",
@@ -1878,7 +1879,6 @@ module.exports = {
                 ],
             },
             "poi": {
-                "color": "maki",
             },
             "satellite": {
                 "type": "raster",
