@@ -31,35 +31,35 @@ Sprite::Sprite(Map &map, float pixelRatio)
 }
 
 void Sprite::load(const std::string& base_url) {
-   std::shared_ptr<Sprite> sprite = shared_from_this();
+    std::shared_ptr<Sprite> sprite = shared_from_this();
 
-   std::string suffix = (pixelRatio > 1 ? "@2x" : "");
+    std::string suffix = (pixelRatio > 1 ? "@2x" : "");
 
-   platform::request_http(base_url + suffix + ".json", [sprite](platform::Response *res) {
-       if (res->code == 200) {
-           sprite->body.swap(res->body);
-           sprite->asyncParseJSON();
-       } else {
-           fprintf(stderr, "failed to load sprite\n");
-       }
-   }, map.getLoop());
+    platform::request_http(base_url + suffix + ".json", [sprite](platform::Response *res) {
+        if (res->code == 200) {
+            sprite->body.swap(res->body);
+            sprite->asyncParseJSON();
+        } else {
+            fprintf(stderr, "failed to load sprite\n");
+        }
+    }, map.getLoop());
 
-   platform::request_http(base_url + suffix + ".png", [sprite](platform::Response *res) {
-       if (res->code == 200) {
-            sprite->image.swap(res->body);
-            sprite->asyncParseImage();
-       } else {
-           fprintf(stderr, "failed to load sprite image\n");
-       }
-   }, map.getLoop());
+    platform::request_http(base_url + suffix + ".png", [sprite](platform::Response *res) {
+        if (res->code == 200) {
+             sprite->image.swap(res->body);
+             sprite->asyncParseImage();
+        } else {
+            fprintf(stderr, "failed to load sprite image\n");
+        }
+    }, map.getLoop());
 }
 
 void Sprite::complete(std::shared_ptr<Sprite> &sprite) {
-   if (sprite->raster.isLoaded() && sprite->pos.size()) {
-       sprite->loaded = true;
-       sprite->map.update();
-       fprintf(stderr, "sprite loaded\n");
-   }
+    if (sprite->raster.isLoaded() && sprite->pos.size()) {
+        sprite->loaded = true;
+        sprite->map.update();
+        fprintf(stderr, "sprite loaded\n");
+    }
 }
 
 bool Sprite::isLoaded() const {

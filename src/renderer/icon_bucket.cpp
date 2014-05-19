@@ -23,27 +23,18 @@ IconBucket::IconBucket(IconVertexBuffer& vertexBuffer,
       vertex_start(vertexBuffer.index()) {
 }
 
-void IconBucket::addFeature(const VectorTileFeature &feature, const std::shared_ptr<Sprite> &sprite) {
-    // TODO: We somehow need to reparse the stylesheet, or maintain a mapping of id => sprite name
-    // For now, we're just not showing points if the sprite was not yet loaded at *parse time* of
-    // the tile.
-    if (!sprite || !sprite->isLoaded()) return;
-
+void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprite_atlas) {
     auto field_it = feature.properties.find(geometry.field);
     if (field_it == feature.properties.end()) {
-        fprintf(stderr, "feature doesn't contain field '%s'\n", geometry.field.c_str());
+        // fprintf(stderr, "feature doesn't contain field '%s'\n", geometry.field.c_str());
         return;
     }
 
     std::string field = toString(field_it->second);
-    if (geometry.size) {
-        field.append("-");
-        field.append(std::to_string(static_cast<int>(std::round(geometry.size))));
-    }
 
-    const SpritePosition &pos = sprite->getSpritePosition(field);
-    const uint16_t tx = pos.x + pos.width / 2;
-    const uint16_t ty = pos.y + pos.height / 2;
+    const Rect<uint16_t> rect = sprite_atlas.getIcon(geometry.size, field);
+    const uint16_t tx = rect.x + rect.w / 2;
+    const uint16_t ty = rect.y + rect.h / 2;
 
     Geometry::command cmd;
     pbf geom = feature.geometry;

@@ -231,5 +231,34 @@ void show_debug_image(std::string name, const char *data, size_t width, size_t h
     glfwMakeContextCurrent(current_window);
 }
 
+
+void show_color_debug_image(std::string name, const char *data, size_t width, size_t height) {
+    static GLFWwindow *debug_window = nullptr;
+    if (!debug_window) {
+        debug_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+        if (!debug_window) {
+            glfwTerminate();
+            fprintf(stderr, "Failed to initialize window\n");
+            exit(1);
+        }
+    }
+
+    GLFWwindow *current_window = glfwGetCurrentContext();
+
+    glfwSetWindowSize(debug_window, width, height);
+    glfwMakeContextCurrent(debug_window);
+
+    int fb_width, fb_height;
+    glfwGetFramebufferSize(debug_window, &fb_width, &fb_height);
+    float scale = (float)fb_width / (float)width;
+
+    glPixelZoom(scale, -scale);
+    glRasterPos2f(-1.0f, 1.0f);
+    glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
+    glfwSwapBuffers(debug_window);
+
+    glfwMakeContextCurrent(current_window);
+}
+
 }
 }

@@ -20,7 +20,7 @@ class IconVertexBuffer;
 class BucketDescription;
 class IconShader;
 class DotShader;
-class Sprite;
+class SpriteAtlas;
 class VectorTileFeature;
 
 class IconBucket : public Bucket {
@@ -31,7 +31,7 @@ public:
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
     virtual bool hasData() const;
 
-    void addFeature(const VectorTileFeature &feature, const std::shared_ptr<Sprite> &sprite);
+    void addFeature(const VectorTileFeature &feature, SpriteAtlas &sprite_atlas);
 
     void drawIcons(IconShader& shader);
     void drawIcons(DotShader& shader);

@@ -14,11 +14,12 @@
 using namespace llmr;
 
 
-TileParser::TileParser(const std::string& data, VectorTileData& tile, const Style& style, GlyphAtlas& glyphAtlas)
+TileParser::TileParser(const std::string& data, VectorTileData& tile, const Style& style, GlyphAtlas& glyphAtlas, SpriteAtlas &spriteAtlas)
     : vector_data(pbf((const uint8_t *)data.data(), data.size())),
       tile(tile),
       style(style),
       glyphAtlas(glyphAtlas),
+      spriteAtlas(spriteAtlas),
       placement(tile.id.z) {
     parseGlyphs();
     parseStyleLayers(style.layers);
@@ -120,12 +121,12 @@ void TileParser::addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer,
     }
 }
 
-template <class Bucket, typename... Args>
-void TileParser::addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const BucketDescription& bucket_desc, Args... args) {
+template <class Bucket, typename ...Args>
+void TileParser::addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const BucketDescription& bucket_desc, Args&& ...args) {
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (const pbf& feature_pbf : filtered_layer) {
         if (obsolete()) return;
-        bucket->addFeature({ feature_pbf, layer }, args...);
+        bucket->addFeature({ feature_pbf, layer }, std::forward<Args>(args)...);
     }
 }
 
@@ -146,7 +147,7 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& laye
 std::unique_ptr<Bucket> TileParser::createIconBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::unique_ptr<IconBucket> bucket = std::make_unique<IconBucket>(
         tile.iconVertexBuffer, bucket_desc);
-    addBucketFeatures(bucket, layer, bucket_desc, style.sprite);
+    addBucketFeatures(bucket, layer, bucket_desc, spriteAtlas);
     return obsolete() ? nullptr : std::move(bucket);
 }
 

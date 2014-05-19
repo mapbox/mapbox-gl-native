@@ -32,6 +32,8 @@ public:
     bool needsTransition() const;
     void updateTransitions(time now);
 
+    inline const char *getData() const { return img; }
+
 public:
     // loaded image dimensions
     uint32_t width = 0, height = 0;

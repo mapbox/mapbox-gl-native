@@ -32,8 +32,11 @@ std::shared_ptr<Request> request_http(const std::string &url,
 // Cancels an HTTP request.
 void cancel_request_http(const std::shared_ptr<Request> &req);
 
-// Shows an RGBA image with the specified dimensions in a named window.
+// Shows an alpha image with the specified dimensions in a named window.
 void show_debug_image(std::string name, const char *data, size_t width, size_t height);
+
+// Shows an alpha image with the specified dimensions in a named window.
+void show_color_debug_image(std::string name, const char *data, size_t width, size_t height);
 }
 }
 
