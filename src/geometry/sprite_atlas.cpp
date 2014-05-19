@@ -203,7 +203,7 @@ void SpriteAtlas::update(const Sprite &sprite) {
         Rect<dimension> dst = atlas.getImage(name, sprite);
         const SpritePosition &src = sprite.getSpritePosition(name);
         if (src.width == dst.w * atlas.pixelRatio && src.height == dst.h * atlas.pixelRatio && src.pixelRatio == atlas.pixelRatio) {
-            // atlas.copy(dst, src, sprite);
+            atlas.copy(dst, src, sprite);
             return true;
         } else {
             fprintf(stderr, "sprite icon dimension mismatch\n");

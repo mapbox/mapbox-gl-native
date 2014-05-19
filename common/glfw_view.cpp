@@ -204,6 +204,8 @@ namespace platform {
 double elapsed() { return glfwGetTime(); }
 
 void show_debug_image(std::string name, const char *data, size_t width, size_t height) {
+    glfwInit();
+
     static GLFWwindow *debug_window = nullptr;
     if (!debug_window) {
         debug_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
@@ -233,6 +235,8 @@ void show_debug_image(std::string name, const char *data, size_t width, size_t h
 
 
 void show_color_debug_image(std::string name, const char *data, size_t logical_width, size_t logical_height, size_t width, size_t height) {
+    glfwInit();
+
     static GLFWwindow *debug_window = nullptr;
     if (!debug_window) {
         debug_window = glfwCreateWindow(logical_width, logical_height, name.c_str(), nullptr, nullptr);
