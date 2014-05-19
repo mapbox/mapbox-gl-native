@@ -3454,40 +3454,31 @@ module.exports = {
                     ]
                 },
                 "place_label_town": {
-                    "color": "#635644",
-                    "strokeWidth": 0.4,
+                    "color": "#716656",
+                    "strokeWidth": 0.5,
                     "stroke": "rgba(255,255,255,0.8)",
                     "size": [
                         "stops",
                         {"z": 0, "val": 10},
                         {"z": 9, "val": 10},
-                        {"z": 12, "val": 14},
-                        {"z": 14, "val": 18},
+                        {"z": 12, "val": 13},
+                        {"z": 14, "val": 17},
                         {"z": 16, "val": 22}
                     ]
                 },
                 "place_label_village": {
                     "color": "#635644",
-                    "strokeWidth": 0.4,
+                    "strokeWidth": 0.5,
                     "stroke": "rgba(255,255,255,0.8)",
                     "size": [
                         "stops",
-                        {
-                            "z": 0,
-                            "val": 12
-                        },
-                        {
-                            "z": 12,
-                            "val": 14
-                        },
-                        {
-                            "z": 14,
-                            "val": 28
-                        },
-                        {
-                            "z": 16,
-                            "val": 22
-                        }
+                        {"z": 0, "val": 8},
+                        {"z": 9, "val": 8},
+                        {"z": 12, "val": 10},
+                        {"z": 14, "val": 14},
+                        {"z": 16, "val": 16},
+                        {"z": 17, "val": 20},
+                        {"z": 22, "val": 20}
                     ]
                 },
                 "place_label_other": {
@@ -3495,26 +3486,11 @@ module.exports = {
                     "stroke": "rgba(255,255,255,0.8)",
                     "size": [
                         "stops",
-                        {
-                            "z": 0,
-                            "val": 10
-                        },
-                        {
-                            "z": 14,
-                            "val": 11
-                        },
-                        {
-                            "z": 15,
-                            "val": 12
-                        },
-                        {
-                            "z": 16,
-                            "val": 14
-                        },
-                        {
-                            "z": 22,
-                            "val": 14
-                        }
+                        {"z": 0, "val": 10},
+                        {"z": 14, "val": 11},
+                        {"z": 15, "val": 12},
+                        {"z": 16, "val": 14},
+                        {"z": 22, "val": 14}
                     ]
                 },
                 "road_label": {
