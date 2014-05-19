@@ -142,7 +142,7 @@ void Map::setup() {
     sources.emplace("outdoors",
                     std::unique_ptr<Source>(new Source(*this,
                            painter,
-                           "http://api-maps-gl.tilestream.net/v3/mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v42-dev/%d/%d/%d.gl.pbf",
+                           "http://api-maps-gl.tilestream.net/v3/mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5/%d/%d/%d.gl.pbf",
                            Source::Type::vector,
                            {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }},
                            512,
