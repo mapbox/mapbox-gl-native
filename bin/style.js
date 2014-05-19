@@ -736,7 +736,7 @@ module.exports = {
             "text_field": "name",
             "path": "curve",
             "fontSize": 12,
-            "textMinDistance": 10,
+            "textMinDistance": 15,
             "feature_type": "line",
             "type": "text"
         },
@@ -1493,7 +1493,7 @@ module.exports = {
                     "stroke": "pitch"
                 },
                 "landuse_industrial": {
-                    "color": "builtup"
+                    "color": "rgba(246,250,255,0.5)"
                 },
                 "overlay_wetland": {
                     "color": "rgba(210,225,225,0.2)",
@@ -3571,13 +3571,14 @@ module.exports = {
                     ]
                 },
                 "water_label": {
-                    "color": "marine_text",
-                    "stroke": [
-                        1,
-                        1,
-                        1,
-                        0.75
-                    ]
+                    "color": "water_dark",
+                    "stroke": "rgba(255,255,255,0.75)"
+                },
+                "waterway_label": {
+                    "color": "water_dark",
+                    "strokeWidth": 0.4,
+                    "strokeBlur": 2,
+                    "stroke": "rgba(255,255,255,0.8)"
                 },
                 "poi": {
                     "color": "rgba(50,50,50,0.9)",
