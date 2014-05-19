@@ -758,7 +758,7 @@ module.exports = {
             "size": 24,
             "type": "point"
         },
-        "poi_label_1": {
+        "poi_label": {
             "source": "outdoors",
             "layer": "poi_label",
             "field": "scalerank",
@@ -1240,8 +1240,8 @@ module.exports = {
             "bucket": "place_label_other"
         },
         {
-            "name": "poi_label_1",
-            "bucket": "poi_label_1"
+            "name": "poi_label",
+            "bucket": "poi_label"
         },
         {
             "name": "road_label",
@@ -3559,7 +3559,7 @@ module.exports = {
                 },
                 "road_label": {
                     "color": "#585042",
-                    "stroke": "#FFF",
+                    "stroke": "land",
                     "strokeWidth": 0.6,
                     "strokeBlur": 2,
                     "size": [
@@ -3585,8 +3585,11 @@ module.exports = {
                 },
                 "poi_label": {
                     "color": "#444",
-                    "size": 11,
-                    "translate": [0, 26]
+                    "size": 10,
+                    "stroke": "land",
+                    "strokeWidth": 0.6,
+                    "strokeBlur": 2,
+                    "translate": [0, 14]
                 },
                 "poi_aerodrome": {
                     "antialias": false
