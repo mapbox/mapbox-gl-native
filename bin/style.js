@@ -3459,22 +3459,11 @@ module.exports = {
                     "stroke": "rgba(255,255,255,0.8)",
                     "size": [
                         "stops",
-                        {
-                            "z": 0,
-                            "val": 14
-                        },
-                        {
-                            "z": 12,
-                            "val": 16
-                        },
-                        {
-                            "z": 14,
-                            "val": 20
-                        },
-                        {
-                            "z": 16,
-                            "val": 24
-                        }
+                        {"z": 0, "val": 10},
+                        {"z": 9, "val": 10},
+                        {"z": 12, "val": 14},
+                        {"z": 14, "val": 18},
+                        {"z": 16, "val": 22}
                     ]
                 },
                 "place_label_village": {
@@ -3559,6 +3548,7 @@ module.exports = {
                     ]
                 },
                 "poi": {
+                    "color": "rgba(50,50,50,0.9)",
                     "antialias": false
                 },
                 "poi_aerodrome": {
