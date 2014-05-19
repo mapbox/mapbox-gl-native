@@ -21,18 +21,25 @@ void StyleParser::parseBuckets(JSVal value, std::map<std::string, BucketDescript
 
 BucketDescription StyleParser::parseBucket(JSVal value) {
     BucketDescription bucket;
+    bucket.type = BucketType::None;
 
     rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
     for (; itr != value.MemberEnd(); ++itr) {
         const std::string name(itr->name.GetString(), itr->name.GetStringLength());
         JSVal value = itr->value;
 
-        if (name == "type") {
-            if (value.IsString()) {
-                bucket.type = bucketType({ value.GetString(), value.GetStringLength() });
-            } else {
-                throw Style::exception("bucket type must be a string");
-            }
+        if (name == "text") {
+            bucket.type = BucketType::Text;
+
+        } else if (name == "point") {
+            bucket.type = BucketType::Icon;
+
+        } else if (name == "line") {
+            bucket.type = BucketType::Line;
+
+        } else if (name == "fill") {
+            bucket.type = BucketType::Fill;
+            
         } else if (name == "feature_type") {
             if (value.IsString()) {
                 bucket.feature_type = bucketType({ value.GetString(), value.GetStringLength() });

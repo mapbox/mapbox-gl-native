@@ -37,7 +37,12 @@ enum class TextPathType {
     Curve = 1
 };
 
-
+/*
+ * For style v1, this is for parsing values for bucket.*.feature.feature_type, in which case the
+ * type refers to data which is being filtered out of a data source. For style v0, this also used
+ * to also be for parsing bucket.type, in which case the type refered to the type of the bucket,
+ * but now the syntax has changed.
+ */
 inline BucketType bucketType(const std::string& type) {
     if (type == "fill") return BucketType::Fill;
     else if (type == "line") return BucketType::Line;
@@ -87,7 +92,10 @@ public:
 
 class BucketDescription {
 public:
+    // This is the type of the source for the filter
     BucketType feature_type = BucketType::None;
+
+    // This is type of the bucket itself for rendering purposes
     BucketType type = BucketType::None;
 
     // Specify what data to pull into this bucket
