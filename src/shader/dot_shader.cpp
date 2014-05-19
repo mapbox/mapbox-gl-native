@@ -32,7 +32,7 @@ DotShader::DotShader()
 
 void DotShader::bind(char *offset) {
     glEnableVertexAttribArray(a_pos);
-    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
+    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 8, offset);
 }
 
 void DotShader::setColor(const std::array<float, 4>& new_color) {

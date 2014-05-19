@@ -5,6 +5,7 @@
 
 #include <llmr/renderer/painter.hpp>
 #include <llmr/style/style.hpp>
+#include <llmr/style/sprite.hpp>
 #include <llmr/map/vector_tile.hpp>
 
 #include <llmr/platform/gl.hpp>
@@ -22,13 +23,32 @@ IconBucket::IconBucket(IconVertexBuffer& vertexBuffer,
       vertex_start(vertexBuffer.index()) {
 }
 
-void IconBucket::addGeometry(pbf& geom) {
+void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprite_atlas) {
+    std::string field;
+
+    if (geometry.field.size()) {
+        auto field_it = feature.properties.find(geometry.field);
+        if (field_it == feature.properties.end()) {
+            fprintf(stderr, "feature doesn't contain field '%s'\n", geometry.field.c_str());
+            return;
+        }
+
+        field = toString(field_it->second);
+    } else {
+        field = "<circle>";
+    }
+
+    const Rect<uint16_t> rect = sprite_atlas.getIcon(geometry.size, field);
+    const uint16_t tx = rect.x + rect.w / 2;
+    const uint16_t ty = rect.y + rect.h / 2;
+
     Geometry::command cmd;
+    pbf geom = feature.geometry;
     Geometry geometry(geom);
     int32_t x, y;
     while ((cmd = geometry.next(x, y)) != Geometry::end) {
         if (cmd == Geometry::move_to) {
-            vertexBuffer.add(x, y);
+            vertexBuffer.add(x, y, tx, ty);
         } else {
             fprintf(stderr, "other command than move_to in icon geometry\n");
         }

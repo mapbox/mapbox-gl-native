@@ -87,10 +87,26 @@ inline T dist(const S1& a, const S2& b) {
     return c;
 }
 
+template <typename T>
+inline T length(T a, T b) {
+    return std::sqrt(a * a + b * b);
+}
+
 // Take the magnitude of vector a.
 template <typename T = double, typename S>
 inline T mag(const S& a) {
     return std::sqrt(a.x * a.x + a.y * a.y);
+}
+
+template <typename T>
+T clamp(T value, T min, T max) {
+    return value < min ? min : (value > max ? max : value);
+}
+
+template <typename T>
+T smoothstep(T edge0, T edge1, T x) {
+    T t = clamp((x - edge0) / (edge1 - edge0), T(0), T(1));
+    return t * t * (T(3) - T(2) * t);
 }
 
 }

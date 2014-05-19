@@ -65,7 +65,7 @@ struct IconClass {
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     FunctionProperty size;
-    Color color = {{ 0, 0, 0, 1 }};
+    Color color = {{ 1, 1, 1, 1 }};
     FunctionProperty opacity = 1;
     std::string image;
     FunctionProperty radius = 0;
@@ -77,7 +77,7 @@ struct IconProperties {
     std::array<float, 2> translate = {{ 0, 0 }};
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     float size = 0;
-    Color color = {{ 0, 0, 0, 1 }};
+    Color color = {{ 1, 1, 1, 1 }};
     float opacity = 1.0;
     std::string image;
     float radius = 0;
