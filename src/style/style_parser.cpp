@@ -580,11 +580,11 @@ TextClass StyleParser::parseTextClass(JSVal value) {
     }
 
     if (value.HasMember("strokeWidth")) {
-        klass.haloRadius = parseFunction(value["strokeWidth"]);
+        klass.halo_radius = parseFunction(value["strokeWidth"]);
     }
 
     if (value.HasMember("strokeBlur")) {
-        klass.haloBlur = parseFunction(value["strokeBlur"]);
+        klass.halo_blur = parseFunction(value["strokeBlur"]);
     }
 
     if (value.HasMember("size")) {

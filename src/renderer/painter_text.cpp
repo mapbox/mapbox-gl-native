@@ -96,9 +96,9 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
     if (properties.halo[3] > 0.0f) {
-        textShader->setGamma(properties.haloBlur * 2.4f / fontSize / map.getState().getPixelRatio());
+        textShader->setGamma(properties.halo_blur * 2.4f / fontSize / map.getState().getPixelRatio());
         textShader->setColor(properties.halo);
-        textShader->setBuffer(properties.haloRadius);
+        textShader->setBuffer(properties.halo_radius);
         glDepthRange(strata, 1.0f);
         bucket.drawGlyphs(*textShader);
     }
