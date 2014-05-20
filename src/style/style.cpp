@@ -23,6 +23,11 @@ void Style::cascade(float z) {
     time start = util::now();
 
     previous.fills = computed.fills;
+    previous.lines = computed.lines;
+    previous.points = computed.points;
+    previous.texts = computed.texts;
+    previous.rasters = computed.rasters;
+
     reset();
 
     // Recalculate style
@@ -158,16 +163,151 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to line styles that have actual
             // values so as to not override with default values.
             llmr::LineProperties& stroke = computed.lines[layer_name];
+
+            // enabled
             stroke.enabled = layer.enabled.evaluate<bool>(z);
-            stroke.translate = {{ layer.translate[0].evaluate<float>(z),
-                                  layer.translate[1].evaluate<float>(z) }};
+
+            // translate (transitionable)
+            if (layer.translate_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::Translate) &&
+                (layer.translate[0].evaluate<float>(z) != previous.lines[layer_name].translate[0] ||
+                 layer.translate[1].evaluate<float>(z) != previous.lines[layer_name].translate[1])) {
+
+                transitioning.lines[layer_name].translate = {{ previous.lines[layer_name].translate[0],
+                                                               previous.lines[layer_name].translate[1] }};
+
+                std::vector<float> from, to, transitioning_ref;
+                from.push_back(previous.lines[layer_name].translate[0]);
+                from.push_back(previous.lines[layer_name].translate[1]);
+                to.push_back(layer.translate[0].evaluate<float>(z));
+                to.push_back(layer.translate[1].evaluate<float>(z));
+                transitioning_ref.push_back(transitioning.lines[layer_name].translate[0]);
+                transitioning_ref.push_back(transitioning.lines[layer_name].translate[1]);
+                transitions[layer_name][PropertyKey::Translate] = std::make_shared<util::ease_transition<std::vector<float>>>(
+                                                                      from,
+                                                                      to,
+                                                                      transitioning_ref,
+                                                                      start,
+                                                                      layer.translate_transition.duration * 1_millisecond
+                                                                  );
+            } else if (transitions[layer_name].count(PropertyKey::Translate)) {
+                stroke.translate = transitioning.lines[layer_name].translate;
+            } else {
+                stroke.translate = {{ layer.translate[0].evaluate<float>(z), layer.translate[1].evaluate<float>(z) }};
+            }
+
+            // translate anchor
             stroke.translateAnchor = layer.translateAnchor;
-            stroke.width = layer.width.evaluate<float>(z);
-            stroke.offset = layer.offset.evaluate<float>(z);
-            stroke.color = layer.color;
-            stroke.dash_array = {{ layer.dash_array[0].evaluate<float>(z),
-                                   layer.dash_array[1].evaluate<float>(z) }};
-            stroke.opacity = layer.opacity.evaluate<float>(z);
+
+            // width (transitionable)
+            if (layer.width_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::Width) &&
+                layer.width.evaluate<float>(z) != previous.lines[layer_name].width) {
+
+                transitioning.lines[layer_name].width = previous.lines[layer_name].width;
+
+                transitions[layer_name][PropertyKey::Width] = std::make_shared<util::ease_transition<float>> (
+                                                                  previous.lines[layer_name].width,
+                                                                  layer.width.evaluate<float>(z),
+                                                                  transitioning.lines[layer_name].width,
+                                                                  start,
+                                                                  layer.width_transition.duration * 1_millisecond
+                                                              );
+            } else if (transitions[layer_name].count(PropertyKey::Width)) {
+                stroke.width = transitioning.lines[layer_name].width;
+            } else {
+                stroke.width = layer.width.evaluate<float>(z);
+            }
+
+            // offset (transitionable)
+            if (layer.offset_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::Offset) &&
+                layer.offset.evaluate<float>(z) != previous.lines[layer_name].offset) {
+
+                transitioning.lines[layer_name].offset = previous.lines[layer_name].offset;
+
+                transitions[layer_name][PropertyKey::Offset] = std::make_shared<util::ease_transition<float>> (
+                                                                   previous.lines[layer_name].offset,
+                                                                   layer.offset.evaluate<float>(z),
+                                                                   transitioning.lines[layer_name].offset,
+                                                                   start,
+                                                                   layer.offset_transition.duration * 1_millisecond
+                                                               );
+            } else if (transitions[layer_name].count(PropertyKey::Offset)) {
+                stroke.offset = transitioning.lines[layer_name].offset;
+            } else {
+                stroke.offset = layer.offset.evaluate<float>(z);
+            }
+
+            // color (transitionable)
+            if (layer.color_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::Color) &&
+                layer.color != previous.lines[layer_name].color) {
+
+                transitioning.lines[layer_name].color = previous.lines[layer_name].color;
+
+                transitions[layer_name][PropertyKey::Color] = std::make_shared<util::ease_transition<Color>>(
+                                                                  previous.lines[layer_name].color,
+                                                                  layer.color,
+                                                                  transitioning.lines[layer_name].color,
+                                                                  start,
+                                                                  layer.color_transition.duration * 1_millisecond
+                                                              );
+            } else if (transitions[layer_name].count(PropertyKey::Color)) {
+                stroke.color = transitioning.lines[layer_name].color;
+            }
+            else {
+                stroke.color = layer.color;
+            }
+
+            // dash array (transitionable)
+            if (layer.dash_array_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::DashArray) &&
+                (layer.dash_array[0].evaluate<float>(z) != previous.lines[layer_name].dash_array[0] ||
+                 layer.dash_array[1].evaluate<float>(z) != previous.lines[layer_name].dash_array[1])) {
+
+                transitioning.lines[layer_name].dash_array = {{ previous.lines[layer_name].dash_array[0],
+                                                                previous.lines[layer_name].dash_array[1] }};
+
+                std::vector<float> from, to, transitioning_ref;
+                from.push_back(previous.lines[layer_name].dash_array[0]);
+                from.push_back(previous.lines[layer_name].dash_array[1]);
+                to.push_back(layer.dash_array[0].evaluate<float>(z));
+                to.push_back(layer.dash_array[1].evaluate<float>(z));
+                transitioning_ref.push_back(transitioning.lines[layer_name].dash_array[0]);
+                transitioning_ref.push_back(transitioning.lines[layer_name].dash_array[1]);
+                transitions[layer_name][PropertyKey::DashArray] = std::make_shared<util::ease_transition<std::vector<float>>>(
+                                                                      from,
+                                                                      to,
+                                                                      transitioning_ref,
+                                                                      start,
+                                                                      layer.translate_transition.duration * 1_millisecond
+                                                                  );
+            } else if (transitions[layer_name].count(PropertyKey::DashArray)) {
+                stroke.dash_array = transitioning.lines[layer_name].dash_array;
+            } else {
+                stroke.dash_array = {{ layer.dash_array[0].evaluate<float>(z), layer.dash_array[1].evaluate<float>(z) }};
+            }
+
+            // opacity (transitionable)
+            if (layer.opacity_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::Opacity) &&
+                layer.opacity.evaluate<float>(z) != previous.lines[layer_name].opacity) {
+
+                transitioning.lines[layer_name].opacity = previous.lines[layer_name].opacity;
+
+                transitions[layer_name][PropertyKey::Opacity] = std::make_shared<util::ease_transition<float>>(
+                                                                    previous.lines[layer_name].opacity,
+                                                                    layer.opacity.evaluate<float>(z),
+                                                                    transitioning.lines[layer_name].opacity,
+                                                                    start,
+                                                                    layer.opacity_transition.duration * 1_millisecond
+                                                                );
+            } else if (transitions[layer_name].count(PropertyKey::Opacity)) {
+                stroke.opacity = transitioning.lines[layer_name].opacity;
+            } else {
+                stroke.opacity = layer.opacity.evaluate<float>(z);
+            }
         }
 
         // Cascade point classes
