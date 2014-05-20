@@ -170,8 +170,8 @@ void Style::loadJSON(const uint8_t *const data, size_t bytes) {
             parser.parseBuckets(document["buckets"], buckets);
         }
 
-        if (document.HasMember("structure")) {
-            parser.parseLayers(document["structure"], layers);
+        if (document.HasMember("layers")) {
+            parser.parseLayers(document["layers"], layers);
         }
 
         if (document.HasMember("constants")) {

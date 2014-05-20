@@ -72,17 +72,17 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 bucket.source_value.push_back(parseValue(value));
             }
-        } else if (name == "cap") {
+        } else if (name == "line-cap") {
             if (value.IsString()) {
                 bucket.geometry.cap = capType({ value.GetString(), value.GetStringLength() });
             } else {
-                throw Style::exception("cap type must be a string");
+                throw Style::exception("line-cap type must be a string");
             }
-        } else if (name == "join") {
+        } else if (name == "line-join") {
             if (value.IsString()) {
                 bucket.geometry.join = joinType({ value.GetString(), value.GetStringLength() });
             } else {
-                throw Style::exception("join type must be a string");
+                throw Style::exception("line-join type must be a string");
             }
         } else if (name == "font") {
             if (value.IsString()) {
@@ -108,17 +108,17 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("curve must be a string");
             }
-        } else if (name == "miterLimit") {
+        } else if (name == "line-miter-limit") {
             if (value.IsNumber()) {
                 bucket.geometry.miter_limit = value.GetDouble();
             } else {
-                throw Style::exception("miter limit must be a number");
+                throw Style::exception("line miter limit must be a number");
             }
-        } else if (name == "roundLimit") {
+        } else if (name == "line-round-limit") {
             if (value.IsNumber()) {
                 bucket.geometry.round_limit = value.GetDouble();
             } else {
-                throw Style::exception("round limit must be a number");
+                throw Style::exception("line round limit must be a number");
             }
         } else if (name == "textMinDistance") {
             if (value.IsNumber()) {
@@ -157,10 +157,14 @@ LayerDescription StyleParser::parseLayer(JSVal value) {
     LayerDescription layer;
 
     if (value.IsObject()) {
+        bool layerIsBackground = false;
         if (value.HasMember("id")) {
             JSVal name = value["id"];
             if (name.IsString()) {
                 layer.name = { name.GetString(), name.GetStringLength() };
+                if(layer.name == "background") {
+                    layerIsBackground = true;
+                }
             } else {
                 throw Style::exception("structure element id must be a string");
             }
@@ -177,11 +181,13 @@ LayerDescription StyleParser::parseLayer(JSVal value) {
             }
         } else if (value.HasMember("layers")) {
             parseLayers(value["layers"], layer.child_layer);
+        } else if (layerIsBackground) {
+            layer.bucket_name = "background";
         } else {
-            throw Style::exception("structure element must have either a bucket name or child layers");
+            throw Style::exception("layer element must be the background, have a bucket name, or have child layers");
         }
     } else {
-        throw Style::exception("structure element must be an object");
+        throw Style::exception("layer element must be an object");
     }
 
     return layer;
