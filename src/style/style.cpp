@@ -538,8 +538,28 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to raster styles that have actual
             // values so as to not override with default values.
             llmr::RasterProperties& raster = computed.rasters[layer_name];
+
+            // enabled
             raster.enabled = layer.enabled.evaluate<bool>(z);
-            raster.opacity = layer.opacity.evaluate<float>(z);
+
+            // opacity (transitionable)
+            if (layer.opacity_transition.duration &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
+                layer.opacity.evaluate<float>(z) != previous.rasters[layer_name].opacity) {
+
+                transitioning.rasters[layer_name].opacity = previous.rasters[layer_name].opacity;
+
+                transitions[layer_name][TransitionablePropertyKey::Opacity] =
+                    std::make_shared<util::ease_transition<float>>(previous.rasters[layer_name].opacity,
+                                                                   layer.opacity.evaluate<float>(z),
+                                                                   transitioning.rasters[layer_name].opacity,
+                                                                   start,
+                                                                   layer.opacity_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Opacity)) {
+                raster.opacity = transitioning.rasters[layer_name].opacity;
+            } else {
+                raster.opacity = layer.opacity.evaluate<float>(z);
+            }
         }
 
         // Cascade background
