@@ -53,7 +53,7 @@ void Style::cascade(float z) {
 
             // translate (transitionable)
             if (layer.translate_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::Translate) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
                 (layer.translate[0].evaluate<float>(z) != previous.fills[layer_name].translate[0] ||
                  layer.translate[1].evaluate<float>(z) != previous.fills[layer_name].translate[1])) {
 
@@ -67,17 +67,17 @@ void Style::cascade(float z) {
                 to.push_back(layer.translate[1].evaluate<float>(z));
                 transitioning_ref.push_back(transitioning.fills[layer_name].translate[0]);
                 transitioning_ref.push_back(transitioning.fills[layer_name].translate[1]);
-                transitions[layer_name][PropertyKey::Translate] = std::make_shared<util::ease_transition<std::vector<float>>>(
-                                                                      from,
-                                                                      to,
-                                                                      transitioning_ref,
-                                                                      start,
-                                                                      layer.translate_transition.duration * 1_millisecond
-                                                                  );
-            } else if (transitions[layer_name].count(PropertyKey::Translate)) {
+                transitions[layer_name][TransitionablePropertyKey::Translate] =
+                    std::make_shared<util::ease_transition<std::vector<float>>>(from,
+                                                                                to,
+                                                                                transitioning_ref,
+                                                                                start,
+                                                                                layer.translate_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Translate)) {
                 fill.translate = transitioning.fills[layer_name].translate;
             } else {
-                fill.translate = {{ layer.translate[0].evaluate<float>(z), layer.translate[1].evaluate<float>(z) }};
+                fill.translate = {{ layer.translate[0].evaluate<float>(z),
+                                    layer.translate[1].evaluate<float>(z) }};
             }
 
             // translate anchor
@@ -91,19 +91,18 @@ void Style::cascade(float z) {
 
             // fill color (transitionable)
             if (layer.fill_color_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::FillColor) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::FillColor) &&
                 layer.fill_color != previous.fills[layer_name].fill_color) {
 
                 transitioning.fills[layer_name].fill_color = previous.fills[layer_name].fill_color;
 
-                transitions[layer_name][PropertyKey::FillColor] = std::make_shared<util::ease_transition<Color>>(
-                                                                      previous.fills[layer_name].fill_color,
-                                                                      layer.fill_color,
-                                                                      transitioning.fills[layer_name].fill_color,
-                                                                      start,
-                                                                      layer.fill_color_transition.duration * 1_millisecond
-                                                                  );
-            } else if (transitions[layer_name].count(PropertyKey::FillColor)) {
+                transitions[layer_name][TransitionablePropertyKey::FillColor] =
+                    std::make_shared<util::ease_transition<Color>>(previous.fills[layer_name].fill_color,
+                                                                   layer.fill_color,
+                                                                   transitioning.fills[layer_name].fill_color,
+                                                                   start,
+                                                                   layer.fill_color_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::FillColor)) {
                 fill.fill_color = transitioning.fills[layer_name].fill_color;
             }
             else {
@@ -112,19 +111,18 @@ void Style::cascade(float z) {
 
             // stroke color (transitionable)
             if (layer.stroke_color_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::StrokeColor) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::StrokeColor) &&
                 layer.stroke_color != previous.fills[layer_name].stroke_color) {
 
                 transitioning.fills[layer_name].stroke_color = previous.fills[layer_name].stroke_color;
 
-                transitions[layer_name][PropertyKey::StrokeColor] = std::make_shared<util::ease_transition<Color>>(
-                                                                        previous.fills[layer_name].stroke_color,
-                                                                        layer.stroke_color,
-                                                                        transitioning.fills[layer_name].stroke_color,
-                                                                        start,
-                                                                        layer.stroke_color_transition.duration * 1_millisecond
-                                                                    );
-            } else if (transitions[layer_name].count(PropertyKey::StrokeColor)) {
+                transitions[layer_name][TransitionablePropertyKey::StrokeColor] =
+                    std::make_shared<util::ease_transition<Color>>(previous.fills[layer_name].stroke_color,
+                                                                   layer.stroke_color,
+                                                                   transitioning.fills[layer_name].stroke_color,
+                                                                   start,
+                                                                   layer.stroke_color_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::StrokeColor)) {
                 fill.stroke_color = transitioning.fills[layer_name].stroke_color;
             }
             else {
@@ -133,19 +131,18 @@ void Style::cascade(float z) {
 
             // opacity (transitionable)
             if (layer.opacity_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::Opacity) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
                 layer.opacity.evaluate<float>(z) != previous.fills[layer_name].opacity) {
 
                 transitioning.fills[layer_name].opacity = previous.fills[layer_name].opacity;
 
-                transitions[layer_name][PropertyKey::Opacity] = std::make_shared<util::ease_transition<float>>(
-                                                                    previous.fills[layer_name].opacity,
-                                                                    layer.opacity.evaluate<float>(z),
-                                                                    transitioning.fills[layer_name].opacity,
-                                                                    start,
-                                                                    layer.opacity_transition.duration * 1_millisecond
-                                                                );
-            } else if (transitions[layer_name].count(PropertyKey::Opacity)) {
+                transitions[layer_name][TransitionablePropertyKey::Opacity] =
+                    std::make_shared<util::ease_transition<float>>(previous.fills[layer_name].opacity,
+                                                                   layer.opacity.evaluate<float>(z),
+                                                                   transitioning.fills[layer_name].opacity,
+                                                                   start,
+                                                                   layer.opacity_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Opacity)) {
                 fill.opacity = transitioning.fills[layer_name].opacity;
             } else {
                 fill.opacity = layer.opacity.evaluate<float>(z);
@@ -169,7 +166,7 @@ void Style::cascade(float z) {
 
             // translate (transitionable)
             if (layer.translate_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::Translate) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
                 (layer.translate[0].evaluate<float>(z) != previous.lines[layer_name].translate[0] ||
                  layer.translate[1].evaluate<float>(z) != previous.lines[layer_name].translate[1])) {
 
@@ -183,17 +180,17 @@ void Style::cascade(float z) {
                 to.push_back(layer.translate[1].evaluate<float>(z));
                 transitioning_ref.push_back(transitioning.lines[layer_name].translate[0]);
                 transitioning_ref.push_back(transitioning.lines[layer_name].translate[1]);
-                transitions[layer_name][PropertyKey::Translate] = std::make_shared<util::ease_transition<std::vector<float>>>(
-                                                                      from,
-                                                                      to,
-                                                                      transitioning_ref,
-                                                                      start,
-                                                                      layer.translate_transition.duration * 1_millisecond
-                                                                  );
-            } else if (transitions[layer_name].count(PropertyKey::Translate)) {
+                transitions[layer_name][TransitionablePropertyKey::Translate] =
+                    std::make_shared<util::ease_transition<std::vector<float>>>(from,
+                                                                                to,
+                                                                                transitioning_ref,
+                                                                                start,
+                                                                                layer.translate_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Translate)) {
                 stroke.translate = transitioning.lines[layer_name].translate;
             } else {
-                stroke.translate = {{ layer.translate[0].evaluate<float>(z), layer.translate[1].evaluate<float>(z) }};
+                stroke.translate = {{ layer.translate[0].evaluate<float>(z),
+                                      layer.translate[1].evaluate<float>(z) }};
             }
 
             // translate anchor
@@ -201,19 +198,18 @@ void Style::cascade(float z) {
 
             // width (transitionable)
             if (layer.width_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::Width) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Width) &&
                 layer.width.evaluate<float>(z) != previous.lines[layer_name].width) {
 
                 transitioning.lines[layer_name].width = previous.lines[layer_name].width;
 
-                transitions[layer_name][PropertyKey::Width] = std::make_shared<util::ease_transition<float>> (
-                                                                  previous.lines[layer_name].width,
-                                                                  layer.width.evaluate<float>(z),
-                                                                  transitioning.lines[layer_name].width,
-                                                                  start,
-                                                                  layer.width_transition.duration * 1_millisecond
-                                                              );
-            } else if (transitions[layer_name].count(PropertyKey::Width)) {
+                transitions[layer_name][TransitionablePropertyKey::Width] =
+                    std::make_shared<util::ease_transition<float>> (previous.lines[layer_name].width,
+                                                                    layer.width.evaluate<float>(z),
+                                                                    transitioning.lines[layer_name].width,
+                                                                    start,
+                                                                    layer.width_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Width)) {
                 stroke.width = transitioning.lines[layer_name].width;
             } else {
                 stroke.width = layer.width.evaluate<float>(z);
@@ -221,19 +217,18 @@ void Style::cascade(float z) {
 
             // offset (transitionable)
             if (layer.offset_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::Offset) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Offset) &&
                 layer.offset.evaluate<float>(z) != previous.lines[layer_name].offset) {
 
                 transitioning.lines[layer_name].offset = previous.lines[layer_name].offset;
 
-                transitions[layer_name][PropertyKey::Offset] = std::make_shared<util::ease_transition<float>> (
-                                                                   previous.lines[layer_name].offset,
-                                                                   layer.offset.evaluate<float>(z),
-                                                                   transitioning.lines[layer_name].offset,
-                                                                   start,
-                                                                   layer.offset_transition.duration * 1_millisecond
-                                                               );
-            } else if (transitions[layer_name].count(PropertyKey::Offset)) {
+                transitions[layer_name][TransitionablePropertyKey::Offset] =
+                    std::make_shared<util::ease_transition<float>> (previous.lines[layer_name].offset,
+                                                                    layer.offset.evaluate<float>(z),
+                                                                    transitioning.lines[layer_name].offset,
+                                                                    start,
+                                                                    layer.offset_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Offset)) {
                 stroke.offset = transitioning.lines[layer_name].offset;
             } else {
                 stroke.offset = layer.offset.evaluate<float>(z);
@@ -241,19 +236,18 @@ void Style::cascade(float z) {
 
             // color (transitionable)
             if (layer.color_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::Color) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Color) &&
                 layer.color != previous.lines[layer_name].color) {
 
                 transitioning.lines[layer_name].color = previous.lines[layer_name].color;
 
-                transitions[layer_name][PropertyKey::Color] = std::make_shared<util::ease_transition<Color>>(
-                                                                  previous.lines[layer_name].color,
-                                                                  layer.color,
-                                                                  transitioning.lines[layer_name].color,
-                                                                  start,
-                                                                  layer.color_transition.duration * 1_millisecond
-                                                              );
-            } else if (transitions[layer_name].count(PropertyKey::Color)) {
+                transitions[layer_name][TransitionablePropertyKey::Color] =
+                    std::make_shared<util::ease_transition<Color>>(previous.lines[layer_name].color,
+                                                                   layer.color,
+                                                                   transitioning.lines[layer_name].color,
+                                                                   start,
+                                                                   layer.color_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Color)) {
                 stroke.color = transitioning.lines[layer_name].color;
             }
             else {
@@ -262,7 +256,7 @@ void Style::cascade(float z) {
 
             // dash array (transitionable)
             if (layer.dash_array_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::DashArray) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::DashArray) &&
                 (layer.dash_array[0].evaluate<float>(z) != previous.lines[layer_name].dash_array[0] ||
                  layer.dash_array[1].evaluate<float>(z) != previous.lines[layer_name].dash_array[1])) {
 
@@ -276,34 +270,33 @@ void Style::cascade(float z) {
                 to.push_back(layer.dash_array[1].evaluate<float>(z));
                 transitioning_ref.push_back(transitioning.lines[layer_name].dash_array[0]);
                 transitioning_ref.push_back(transitioning.lines[layer_name].dash_array[1]);
-                transitions[layer_name][PropertyKey::DashArray] = std::make_shared<util::ease_transition<std::vector<float>>>(
-                                                                      from,
-                                                                      to,
-                                                                      transitioning_ref,
-                                                                      start,
-                                                                      layer.translate_transition.duration * 1_millisecond
-                                                                  );
-            } else if (transitions[layer_name].count(PropertyKey::DashArray)) {
+                transitions[layer_name][TransitionablePropertyKey::DashArray] =
+                    std::make_shared<util::ease_transition<std::vector<float>>>(from,
+                                                                                to,
+                                                                                transitioning_ref,
+                                                                                start,
+                                                                                layer.translate_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::DashArray)) {
                 stroke.dash_array = transitioning.lines[layer_name].dash_array;
             } else {
-                stroke.dash_array = {{ layer.dash_array[0].evaluate<float>(z), layer.dash_array[1].evaluate<float>(z) }};
+                stroke.dash_array = {{ layer.dash_array[0].evaluate<float>(z),
+                                       layer.dash_array[1].evaluate<float>(z) }};
             }
 
             // opacity (transitionable)
             if (layer.opacity_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::Opacity) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
                 layer.opacity.evaluate<float>(z) != previous.lines[layer_name].opacity) {
 
                 transitioning.lines[layer_name].opacity = previous.lines[layer_name].opacity;
 
-                transitions[layer_name][PropertyKey::Opacity] = std::make_shared<util::ease_transition<float>>(
-                                                                    previous.lines[layer_name].opacity,
-                                                                    layer.opacity.evaluate<float>(z),
-                                                                    transitioning.lines[layer_name].opacity,
-                                                                    start,
-                                                                    layer.opacity_transition.duration * 1_millisecond
-                                                                );
-            } else if (transitions[layer_name].count(PropertyKey::Opacity)) {
+                transitions[layer_name][TransitionablePropertyKey::Opacity] =
+                    std::make_shared<util::ease_transition<float>>(previous.lines[layer_name].opacity,
+                                                                   layer.opacity.evaluate<float>(z),
+                                                                   transitioning.lines[layer_name].opacity,
+                                                                   start,
+                                                                   layer.opacity_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Opacity)) {
                 stroke.opacity = transitioning.lines[layer_name].opacity;
             } else {
                 stroke.opacity = layer.opacity.evaluate<float>(z);
@@ -324,7 +317,7 @@ void Style::cascade(float z) {
 
             // translate (transitionable)
             if (layer.translate_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::Translate) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
                 (layer.translate[0].evaluate<float>(z) != previous.points[layer_name].translate[0] ||
                  layer.translate[1].evaluate<float>(z) != previous.points[layer_name].translate[1])) {
 
@@ -338,17 +331,17 @@ void Style::cascade(float z) {
                 to.push_back(layer.translate[1].evaluate<float>(z));
                 transitioning_ref.push_back(transitioning.points[layer_name].translate[0]);
                 transitioning_ref.push_back(transitioning.points[layer_name].translate[1]);
-                transitions[layer_name][PropertyKey::Translate] = std::make_shared<util::ease_transition<std::vector<float>>>(
-                                                                      from,
-                                                                      to,
-                                                                      transitioning_ref,
-                                                                      start,
-                                                                      layer.translate_transition.duration * 1_millisecond
-                                                                  );
-            } else if (transitions[layer_name].count(PropertyKey::Translate)) {
+                transitions[layer_name][TransitionablePropertyKey::Translate] =
+                    std::make_shared<util::ease_transition<std::vector<float>>>(from,
+                                                                                to,
+                                                                                transitioning_ref,
+                                                                                start,
+                                                                                layer.translate_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Translate)) {
                 point.translate = transitioning.points[layer_name].translate;
             } else {
-                point.translate = {{ layer.translate[0].evaluate<float>(z), layer.translate[1].evaluate<float>(z) }};
+                point.translate = {{ layer.translate[0].evaluate<float>(z),
+                                     layer.translate[1].evaluate<float>(z) }};
             }
 
             // translate anchor
@@ -356,19 +349,18 @@ void Style::cascade(float z) {
 
             // color (transitionable)
             if (layer.color_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::Color) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Color) &&
                 layer.color != previous.points[layer_name].color) {
 
                 transitioning.points[layer_name].color = previous.points[layer_name].color;
 
-                transitions[layer_name][PropertyKey::Color] = std::make_shared<util::ease_transition<Color>>(
-                                                                  previous.points[layer_name].color,
-                                                                  layer.color,
-                                                                  transitioning.points[layer_name].color,
-                                                                  start,
-                                                                  layer.color_transition.duration * 1_millisecond
-                                                              );
-            } else if (transitions[layer_name].count(PropertyKey::Color)) {
+                transitions[layer_name][TransitionablePropertyKey::Color] =
+                    std::make_shared<util::ease_transition<Color>>(previous.points[layer_name].color,
+                                                                   layer.color,
+                                                                   transitioning.points[layer_name].color,
+                                                                   start,
+                                                                   layer.color_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Color)) {
                 point.color = transitioning.points[layer_name].color;
             }
             else {
@@ -380,19 +372,18 @@ void Style::cascade(float z) {
 
             // opacity (transitionable)
             if (layer.opacity_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::Opacity) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
                 layer.opacity.evaluate<float>(z) != previous.points[layer_name].opacity) {
 
                 transitioning.points[layer_name].opacity = previous.points[layer_name].opacity;
 
-                transitions[layer_name][PropertyKey::Opacity] = std::make_shared<util::ease_transition<float>>(
-                                                                    previous.points[layer_name].opacity,
-                                                                    layer.opacity.evaluate<float>(z),
-                                                                    transitioning.points[layer_name].opacity,
-                                                                    start,
-                                                                    layer.opacity_transition.duration * 1_millisecond
-                                                                );
-            } else if (transitions[layer_name].count(PropertyKey::Opacity)) {
+                transitions[layer_name][TransitionablePropertyKey::Opacity] =
+                    std::make_shared<util::ease_transition<float>>(previous.points[layer_name].opacity,
+                                                                   layer.opacity.evaluate<float>(z),
+                                                                   transitioning.points[layer_name].opacity,
+                                                                   start,
+                                                                   layer.opacity_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Opacity)) {
                 point.opacity = transitioning.points[layer_name].opacity;
             } else {
                 point.opacity = layer.opacity.evaluate<float>(z);
@@ -403,19 +394,18 @@ void Style::cascade(float z) {
 
             // radius (transitionable)
             if (layer.radius_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::Radius) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Radius) &&
                 layer.radius.evaluate<float>(z) != previous.points[layer_name].radius) {
 
                 transitioning.points[layer_name].radius = previous.points[layer_name].radius;
 
-                transitions[layer_name][PropertyKey::Radius] = std::make_shared<util::ease_transition<float>>(
-                                                                   previous.points[layer_name].radius,
+                transitions[layer_name][TransitionablePropertyKey::Radius] =
+                    std::make_shared<util::ease_transition<float>>(previous.points[layer_name].radius,
                                                                    layer.radius.evaluate<float>(z),
                                                                    transitioning.points[layer_name].radius,
                                                                    start,
-                                                                   layer.radius_transition.duration * 1_millisecond
-                                                               );
-            } else if (transitions[layer_name].count(PropertyKey::Radius)) {
+                                                                   layer.radius_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Radius)) {
                 point.radius = transitioning.points[layer_name].radius;
             } else {
                 point.radius = layer.radius.evaluate<float>(z);
@@ -423,19 +413,18 @@ void Style::cascade(float z) {
 
             // blur (transitionable)
             if (layer.blur_transition.duration &&
-                !transitions[layer_name].count(PropertyKey::Blur) &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Blur) &&
                 layer.blur.evaluate<float>(z) != previous.points[layer_name].blur) {
 
                 transitioning.points[layer_name].blur = previous.points[layer_name].blur;
 
-                transitions[layer_name][PropertyKey::Blur] = std::make_shared<util::ease_transition<float>>(
-                                                                 previous.points[layer_name].blur,
-                                                                 layer.blur.evaluate<float>(z),
-                                                                 transitioning.points[layer_name].blur,
-                                                                 start,
-                                                                 layer.blur_transition.duration * 1_millisecond
-                                                             );
-            } else if (transitions[layer_name].count(PropertyKey::Blur)) {
+                transitions[layer_name][TransitionablePropertyKey::Blur] =
+                    std::make_shared<util::ease_transition<float>>(previous.points[layer_name].blur,
+                                                                   layer.blur.evaluate<float>(z),
+                                                                   transitioning.points[layer_name].blur,
+                                                                   start,
+                                                                   layer.blur_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Blur)) {
                 point.blur = transitioning.points[layer_name].blur;
             } else {
                 point.blur = layer.blur.evaluate<float>(z);
@@ -450,17 +439,95 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to text styles that have actual
             // values so as to not override with default values.
             llmr::TextProperties& text = computed.texts[layer_name];
+
+            // enabled
             text.enabled = layer.enabled.evaluate<bool>(z);
-            text.translate = {{ layer.translate[0].evaluate<float>(z),
-                                layer.translate[1].evaluate<float>(z) }};
+
+            // translate (transitionable)
+            if (layer.translate_transition.duration &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
+                (layer.translate[0].evaluate<float>(z) != previous.texts[layer_name].translate[0] ||
+                 layer.translate[1].evaluate<float>(z) != previous.texts[layer_name].translate[1])) {
+
+                transitioning.texts[layer_name].translate = {{ previous.texts[layer_name].translate[0],
+                                                               previous.texts[layer_name].translate[1] }};
+
+                std::vector<float> from, to, transitioning_ref;
+                from.push_back(previous.texts[layer_name].translate[0]);
+                from.push_back(previous.texts[layer_name].translate[1]);
+                to.push_back(layer.translate[0].evaluate<float>(z));
+                to.push_back(layer.translate[1].evaluate<float>(z));
+                transitioning_ref.push_back(transitioning.texts[layer_name].translate[0]);
+                transitioning_ref.push_back(transitioning.texts[layer_name].translate[1]);
+                transitions[layer_name][TransitionablePropertyKey::Translate] =
+                    std::make_shared<util::ease_transition<std::vector<float>>>(from,
+                                                                                to,
+                                                                                transitioning_ref,
+                                                                                start,
+                                                                                layer.translate_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Translate)) {
+                text.translate = transitioning.texts[layer_name].translate;
+            } else {
+                text.translate = {{ layer.translate[0].evaluate<float>(z),
+                                    layer.translate[1].evaluate<float>(z) }};
+            }
+
+            // translate anchor
             text.translateAnchor = layer.translateAnchor;
-            text.color = layer.color;
+
+            // color (transitionable)
+            if (layer.color_transition.duration &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Color) &&
+                layer.color != previous.texts[layer_name].color) {
+
+                transitioning.lines[layer_name].color = previous.texts[layer_name].color;
+
+                transitions[layer_name][TransitionablePropertyKey::Color] =
+                    std::make_shared<util::ease_transition<Color>>(previous.texts[layer_name].color,
+                                                                   layer.color,
+                                                                   transitioning.texts[layer_name].color,
+                                                                   start,
+                                                                   layer.color_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Color)) {
+                text.color = transitioning.texts[layer_name].color;
+            }
+            else {
+                text.color = layer.color;
+            }
+
+            // size
             text.size = layer.size.evaluate<float>(z);
+
+            // halo
             text.halo = layer.halo;
+
+            // halo radius
             text.halo_radius = layer.halo_radius.evaluate<float>(z);
+
+            // rotate
             text.rotate = layer.rotate.evaluate<float>(z);
+
+            // always visible
             text.always_visible = layer.always_visible.evaluate<bool>(z);
-            text.opacity = layer.opacity.evaluate<float>(z);
+
+            // opacity (transitionable)
+            if (layer.opacity_transition.duration &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
+                layer.opacity.evaluate<float>(z) != previous.texts[layer_name].opacity) {
+
+                transitioning.lines[layer_name].opacity = previous.texts[layer_name].opacity;
+
+                transitions[layer_name][TransitionablePropertyKey::Opacity] =
+                    std::make_shared<util::ease_transition<float>>(previous.texts[layer_name].opacity,
+                                                                   layer.opacity.evaluate<float>(z),
+                                                                   transitioning.texts[layer_name].opacity,
+                                                                   start,
+                                                                   layer.opacity_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Opacity)) {
+                text.opacity = transitioning.texts[layer_name].opacity;
+            } else {
+                text.opacity = layer.opacity.evaluate<float>(z);
+            }
         }
 
         // Cascade raster classes

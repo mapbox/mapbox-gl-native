@@ -16,25 +16,17 @@ struct PropertyTransition {
     uint16_t delay = 0;
 };
 
-enum class PropertyKey {
-    Enabled = 1,
-    Translate = 2,
-    TranslateAnchor = 3,
-    Winding = 4,
-    Antialias = 5,
-    FillColor = 6,
-    StrokeColor = 7,
-    Opacity = 8,
-    Image = 9,
-    Width = 10,
-    Offset = 11,
-    Color = 12,
-    DashArray = 13,
-    Radius = 14,
-    Blur = 15,
-    Halo = 16,
-    HaloRadius = 17,
-    AlwaysVisible = 18,
+enum class TransitionablePropertyKey {
+    Translate = 1,
+    FillColor = 2,
+    StrokeColor = 3,
+    Opacity = 4,
+    Width = 5,
+    Offset = 6,
+    Color = 7,
+    DashArray = 8,
+    Radius = 9,
+    Blur = 10,
 };
 
 enum class Winding {
