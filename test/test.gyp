@@ -113,6 +113,22 @@
         ]
     },
     {
+        "target_name": "functions",
+        "product_name": "test_functions",
+        "type": "executable",
+        "libraries": [
+            "-lpthread",
+        ],
+        "sources": [
+            "./main.cpp",
+            "./functions.cpp",
+        ],
+        "dependencies": [
+            "../deps/gtest/gtest.gyp:gtest",
+            "../llmr.gyp:llmr-x86"
+        ]
+    },
+    {
         "target_name": "headless",
         "product_name": "test_headless",
         "type": "executable",
@@ -140,6 +156,7 @@
           "clip_ids",
           "variant",
           "tile",
+          "functions",
         ],
     }
   ]

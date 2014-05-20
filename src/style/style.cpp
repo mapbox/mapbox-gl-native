@@ -1,5 +1,6 @@
 #include <llmr/style/style.hpp>
 #include <llmr/style/style_parser.hpp>
+#include <llmr/util/constants.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
@@ -21,6 +22,10 @@ void Style::reset() {
 
 void Style::cascade(float z) {
     reset();
+
+    // Accomodate for different tile size.
+    // TODO: Make this per-layer once individual layers have a specific tile size.
+    z += std::log(util::tileSize / 256.0f) / M_LN2;
 
     // Recalculate style
     // Basic cascading
@@ -106,7 +111,8 @@ void Style::cascade(float z) {
             text.color = layer.color;
             text.size = layer.size.evaluate<float>(z);
             text.halo = layer.halo;
-            text.haloRadius = layer.haloRadius.evaluate<float>(z);
+            text.halo_radius = layer.halo_radius.evaluate<float>(z);
+            text.halo_blur = layer.halo_blur.evaluate<float>(z);
             text.rotate = layer.rotate.evaluate<float>(z);
             text.alwaysVisible = layer.alwaysVisible.evaluate<bool>(z);
             text.opacity = layer.opacity.evaluate<float>(z);
