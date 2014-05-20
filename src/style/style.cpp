@@ -318,16 +318,128 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to point styles that have actual
             // values so as to not override with default values.
             llmr::PointProperties& point = computed.points[layer_name];
+
+            // enabled
             point.enabled = layer.enabled.evaluate<bool>(z);
-            point.translate = {{ layer.translate[0].evaluate<float>(z),
-                                 layer.translate[1].evaluate<float>(z) }};
+
+            // translate (transitionable)
+            if (layer.translate_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::Translate) &&
+                (layer.translate[0].evaluate<float>(z) != previous.points[layer_name].translate[0] ||
+                 layer.translate[1].evaluate<float>(z) != previous.points[layer_name].translate[1])) {
+
+                transitioning.points[layer_name].translate = {{ previous.points[layer_name].translate[0],
+                                                                previous.points[layer_name].translate[1] }};
+
+                std::vector<float> from, to, transitioning_ref;
+                from.push_back(previous.points[layer_name].translate[0]);
+                from.push_back(previous.points[layer_name].translate[1]);
+                to.push_back(layer.translate[0].evaluate<float>(z));
+                to.push_back(layer.translate[1].evaluate<float>(z));
+                transitioning_ref.push_back(transitioning.points[layer_name].translate[0]);
+                transitioning_ref.push_back(transitioning.points[layer_name].translate[1]);
+                transitions[layer_name][PropertyKey::Translate] = std::make_shared<util::ease_transition<std::vector<float>>>(
+                                                                      from,
+                                                                      to,
+                                                                      transitioning_ref,
+                                                                      start,
+                                                                      layer.translate_transition.duration * 1_millisecond
+                                                                  );
+            } else if (transitions[layer_name].count(PropertyKey::Translate)) {
+                point.translate = transitioning.points[layer_name].translate;
+            } else {
+                point.translate = {{ layer.translate[0].evaluate<float>(z), layer.translate[1].evaluate<float>(z) }};
+            }
+
+            // translate anchor
             point.translateAnchor = layer.translateAnchor;
-            point.color = layer.color;
+
+            // color (transitionable)
+            if (layer.color_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::Color) &&
+                layer.color != previous.points[layer_name].color) {
+
+                transitioning.points[layer_name].color = previous.points[layer_name].color;
+
+                transitions[layer_name][PropertyKey::Color] = std::make_shared<util::ease_transition<Color>>(
+                                                                  previous.points[layer_name].color,
+                                                                  layer.color,
+                                                                  transitioning.points[layer_name].color,
+                                                                  start,
+                                                                  layer.color_transition.duration * 1_millisecond
+                                                              );
+            } else if (transitions[layer_name].count(PropertyKey::Color)) {
+                point.color = transitioning.points[layer_name].color;
+            }
+            else {
+                point.color = layer.color;
+            }
+
+            // size
             point.size = layer.size.evaluate<float>(z);
-            point.opacity = layer.opacity.evaluate<float>(z);
+
+            // opacity (transitionable)
+            if (layer.opacity_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::Opacity) &&
+                layer.opacity.evaluate<float>(z) != previous.points[layer_name].opacity) {
+
+                transitioning.points[layer_name].opacity = previous.points[layer_name].opacity;
+
+                transitions[layer_name][PropertyKey::Opacity] = std::make_shared<util::ease_transition<float>>(
+                                                                    previous.points[layer_name].opacity,
+                                                                    layer.opacity.evaluate<float>(z),
+                                                                    transitioning.points[layer_name].opacity,
+                                                                    start,
+                                                                    layer.opacity_transition.duration * 1_millisecond
+                                                                );
+            } else if (transitions[layer_name].count(PropertyKey::Opacity)) {
+                point.opacity = transitioning.points[layer_name].opacity;
+            } else {
+                point.opacity = layer.opacity.evaluate<float>(z);
+            }
+
+            // image
             point.image = layer.image;
-            point.radius = layer.radius.evaluate<float>(z);
-            point.blur = layer.blur.evaluate<float>(z);
+
+            // radius (transitionable)
+            if (layer.radius_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::Radius) &&
+                layer.radius.evaluate<float>(z) != previous.points[layer_name].radius) {
+
+                transitioning.points[layer_name].radius = previous.points[layer_name].radius;
+
+                transitions[layer_name][PropertyKey::Radius] = std::make_shared<util::ease_transition<float>>(
+                                                                   previous.points[layer_name].radius,
+                                                                   layer.radius.evaluate<float>(z),
+                                                                   transitioning.points[layer_name].radius,
+                                                                   start,
+                                                                   layer.radius_transition.duration * 1_millisecond
+                                                               );
+            } else if (transitions[layer_name].count(PropertyKey::Radius)) {
+                point.radius = transitioning.points[layer_name].radius;
+            } else {
+                point.radius = layer.radius.evaluate<float>(z);
+            }
+
+            // blur (transitionable)
+            if (layer.blur_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::Blur) &&
+                layer.blur.evaluate<float>(z) != previous.points[layer_name].blur) {
+
+                transitioning.points[layer_name].blur = previous.points[layer_name].blur;
+
+                transitions[layer_name][PropertyKey::Blur] = std::make_shared<util::ease_transition<float>>(
+                                                                 previous.points[layer_name].blur,
+                                                                 layer.blur.evaluate<float>(z),
+                                                                 transitioning.points[layer_name].blur,
+                                                                 start,
+                                                                 layer.blur_transition.duration * 1_millisecond
+                                                             );
+            } else if (transitions[layer_name].count(PropertyKey::Blur)) {
+                point.blur = transitioning.points[layer_name].blur;
+            } else {
+                point.blur = layer.blur.evaluate<float>(z);
+            }
         }
 
         // Cascade text classes
