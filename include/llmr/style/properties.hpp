@@ -27,6 +27,8 @@ enum class TransitionablePropertyKey {
     DashArray = 8,
     Radius = 9,
     Blur = 10,
+    Halo = 11,
+    HaloRadius = 12,
 };
 
 enum class Winding {

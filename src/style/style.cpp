@@ -498,11 +498,44 @@ void Style::cascade(float z) {
             // size
             text.size = layer.size.evaluate<float>(z);
 
-            // halo
-            text.halo = layer.halo;
+            // halo color (transitionable)
+            if (layer.halo_transition.duration &&
+                !transitions[layer_name].count(TransitionablePropertyKey::Halo) &&
+                layer.halo != previous.texts[layer_name].halo) {
 
-            // halo radius
-            text.halo_radius = layer.halo_radius.evaluate<float>(z);
+                transitioning.texts[layer_name].halo = previous.texts[layer_name].halo;
+
+                transitions[layer_name][TransitionablePropertyKey::Halo] =
+                std::make_shared<util::ease_transition<Color>>(previous.texts[layer_name].halo,
+                                                               layer.halo,
+                                                               transitioning.texts[layer_name].halo,
+                                                               start,
+                                                               layer.halo_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::Halo)) {
+                text.halo = transitioning.texts[layer_name].halo;
+            }
+            else {
+                text.halo = layer.halo;
+            }
+
+            // halo radius (transitionable)
+            if (layer.halo_radius_transition.duration &&
+                !transitions[layer_name].count(TransitionablePropertyKey::HaloRadius) &&
+                layer.halo_radius.evaluate<float>(z) != previous.texts[layer_name].halo_radius) {
+
+                transitioning.texts[layer_name].halo_radius = previous.texts[layer_name].halo_radius;
+
+                transitions[layer_name][TransitionablePropertyKey::HaloRadius] =
+                    std::make_shared<util::ease_transition<float>> (previous.texts[layer_name].halo_radius,
+                                                                    layer.halo_radius.evaluate<float>(z),
+                                                                    transitioning.texts[layer_name].halo_radius,
+                                                                    start,
+                                                                    layer.halo_radius_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::HaloRadius)) {
+                text.halo_radius = transitioning.texts[layer_name].halo_radius;
+            } else {
+                text.halo_radius = layer.halo_radius.evaluate<float>(z);
+            }
 
             // rotate
             text.rotate = layer.rotate.evaluate<float>(z);
