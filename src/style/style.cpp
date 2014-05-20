@@ -543,8 +543,7 @@ void Style::cascade(float z) {
                 text.halo_radius = layer.halo_radius.evaluate<float>(z);
             }
 
-            // halo blur
-            text.haloBlur = layer.haloBlur.evaluate<float>(z);
+            text.halo_blur = layer.halo_blur.evaluate<float>(z);
 
             // rotate
             text.rotate = layer.rotate.evaluate<float>(z);

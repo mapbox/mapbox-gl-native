@@ -176,7 +176,7 @@ struct TextClass {
     PropertyTransition halo_transition;
     FunctionProperty halo_radius = 0.25f;
     PropertyTransition halo_radius_transition;
-    FunctionProperty haloBlur = 1.0f;
+    FunctionProperty halo_blur = 1.0f;
     FunctionProperty size = 12.0f;
     FunctionProperty rotate = 0.0f;
     FunctionProperty always_visible = false;
@@ -191,7 +191,7 @@ struct TextProperties {
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     float halo_radius = 0.25f;
-    float haloBlur = 1.0f;
+    float halo_blur = 1.0f;
     float size = 12.0f;
     float rotate = 0.0f;
     bool always_visible = false;
