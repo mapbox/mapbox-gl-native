@@ -197,6 +197,7 @@ module.exports = {
             "source": "outdoors",
             "layer": "contour",
             "field": "index",
+            "join": "round",
             "value": 5,
             "type": "line"
         },
@@ -204,12 +205,14 @@ module.exports = {
             "source": "outdoors",
             "layer": "contour",
             "field": "index",
+            "join": "round",
             "value": 10,
             "type": "line"
         },
         "contour_line_other": {
             "source": "outdoors",
             "layer": "contour",
+            "join": "round",
             "type": "line"
         },
         "contour_label": {
@@ -884,15 +887,15 @@ module.exports = {
             "bucket": "hillshade_full_highlight"
         },
         {
-            "name": "contour_line_10",
+            "name": "contour_line_loud",
             "bucket": "contour_line_10"
         },
         {
-            "name": "contour_line_5",
+            "name": "contour_line_loud",
             "bucket": "contour_line_5"
         },
         {
-            "name": "contour_line_other",
+            "name": "contour_line_regular",
             "bucket": "contour_line_other"
         },
         {
@@ -1610,73 +1613,22 @@ module.exports = {
                         }
                     ]
                 },
-                "contour_line_5": {
+                "contour_line_loud": {
                     "color": "#008",
                     "width": 0.9,
                     "opacity": [
                         "stops",
-                        {
-                            "z": 0,
-                            "val": 0.05
-                        },
-                        {
-                            "z": 12,
-                            "val": 0.05
-                        },
-                        {
-                            "z": 13,
-                            "val": 0.11
-                        },
-                        {
-                            "z": 22,
-                            "val": 0.11
-                        }
+                        {"z": 12, "val": 0.05},
+                        {"z": 13, "val": 0.11}
                     ]
                 },
-                "contour_line_10": {
-                    "color": "#008",
-                    "width": 0.9,
-                    "opacity": [
-                        "stops",
-                        {
-                            "z": 0,
-                            "val": 0.05
-                        },
-                        {
-                            "z": 12,
-                            "val": 0.05
-                        },
-                        {
-                            "z": 13,
-                            "val": 0.11
-                        },
-                        {
-                            "z": 22,
-                            "val": 0.11
-                        }
-                    ]
-                },
-                "contour_line_other": {
+                "contour_line_regular": {
                     "color": "#008",
                     "width": 0.5,
                     "opacity": [
                         "stops",
-                        {
-                            "z": 0,
-                            "val": 0.05
-                        },
-                        {
-                            "z": 12,
-                            "val": 0.05
-                        },
-                        {
-                            "z": 13,
-                            "val": 0.11
-                        },
-                        {
-                            "z": 22,
-                            "val": 0.11
-                        }
+                        {"z": 12, "val": 0.05},
+                        {"z": 13, "val": 0.11}
                     ]
                 },
                 "water": {
