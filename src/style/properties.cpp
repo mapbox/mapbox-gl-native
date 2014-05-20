@@ -13,26 +13,20 @@ float functions::null(float, const std::vector<float>&) {
 }
 
 float functions::constant(float, const std::vector<float>& values) {
-    assert(values.size() == 1);
-    return values.front();
+    return values.size() >= 1 ? values.front() : 0.0f;
 }
 
 float functions::min(float z, const std::vector<float>& values) {
-    assert(values.size() == 1);
-    return z >= values.front();
+    return values.size() >= 1 && z >= values.front();
 }
 
 float functions::max(float z, const std::vector<float>& values) {
-    assert(values.size() == 1);
-    return z <= values.front();
+    return values.size() >= 1 && z <= values.front();
 }
 
 float functions::stops(float z, const std::vector<float>& stops) {
     // We need an even number of stop values.
     if (stops.size() % 2 != 0) return 0;
-
-    // Accounts for us rendering tiles at another size, so our zoom levels are shifted appropriately.
-    z += util::tileSize / 256.0f;
 
     bool smaller = false;
     float smaller_z, smaller_val;
@@ -53,13 +47,10 @@ float functions::stops(float z, const std::vector<float>& stops) {
         if (smaller_val == 0) return factor * larger_val;
         // Exponential interpolation between the values
         return smaller_val * std::pow(larger_val / smaller_val, factor);
-    } else if (larger || smaller) {
-        // Do not draw a line.
-        return -std::numeric_limits<float>::infinity();
-
-        // Exponential extrapolation of the smaller or larger value
-        //var edge = larger || smaller;
-        //return Math.pow(2, z) * (edge.val / Math.pow(2, edge.z));
+    } else if (larger) {
+        return larger_val;
+    } else if (smaller) {
+        return smaller_val;
     } else {
         // No stop defined.
         return 1;
