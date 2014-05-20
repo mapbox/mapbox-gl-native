@@ -134,7 +134,11 @@ void GLFWView::mouseclick(GLFWwindow *window, int button, int action, int modifi
             view->map->stopPanning();
             double now = glfwGetTime();
             if (now - view->last_click < 0.4 /* ms */) {
-                view->map->scaleBy(2.0, view->last_x, view->last_y, 0.5);
+                if (modifiers & GLFW_MOD_SHIFT) {
+                    view->map->scaleBy(0.5, view->last_x, view->last_y, 0.5);
+                } else {
+                    view->map->scaleBy(2.0, view->last_x, view->last_y, 0.5);
+                }
             }
             view->last_click = now;
         }
