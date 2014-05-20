@@ -8,9 +8,11 @@
 #include <llmr/util/math.hpp>
 #include <llmr/util/clip_ids.hpp>
 #include <llmr/util/string.hpp>
+#include <llmr/util/constants.hpp>
 
 #include <algorithm>
 #include <memory>
+#include <iostream>
 
 using namespace llmr;
 
@@ -438,27 +440,10 @@ void Map::render() {
 
     painter.finishClippingMask();
 
-
-
-    // Render per layer in the stylesheet.
-    strata_thickness = 1.0f / (style.layerCount() + 1);
-    strata = 0;
-
-    // - FIRST PASS ------------------------------------------------------------
-    // Render everything top-to-bottom by using reverse iterators. Render opaque
-    // objects first.
-    painter.startOpaquePass();
-    renderLayers(style.layers, Opaque);
-    painter.endPass();
-
-    // - SECOND PASS -----------------------------------------------------------
-    // Make a second pass, rendering translucent objects. This time, we render
-    // bottom-to-top.
-    --strata;
-    painter.startTranslucentPass();
-    renderLayers(style.layers, Translucent);
-    painter.endPass();
-
+    // Actually render the layers
+    if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
+    renderLayers(style.layers);
+    if (debug::renderTree) { std::cout << "}" << std::endl; indent--; }
 
     // Finalize the rendering, e.g. by calling debug render calls per tile.
     // This guarantees that we have at least one function per tile called.
@@ -483,21 +468,45 @@ void Map::render() {
     glFlush();
 }
 
-void Map::renderLayers(const std::vector<LayerDescription>& layers, RenderPass pass) {
-    if (pass == Opaque) {
-        typedef std::vector<LayerDescription>::const_reverse_iterator riterator;
-        for (riterator it = layers.rbegin(), end = layers.rend(); it != end; ++it, ++strata) {
-            painter.setStrata(strata * strata_thickness);
-            renderLayer(*it, pass);
-        }
-    } else if (pass == Translucent) {
-        typedef std::vector<LayerDescription>::const_iterator iterator;
-        for (iterator it = layers.begin(), end = layers.end(); it != end; ++it, --strata) {
-            painter.setStrata(strata * strata_thickness);
-            renderLayer(*it, pass);
-        }
-    } else {
-        throw std::runtime_error("unknown render pass");
+void Map::renderLayers(const std::vector<LayerDescription>& layers) {
+    // TODO: Correctly compute the number of layers recursively beforehand.
+    float strata_thickness = 1.0f / (layers.size() + 1);
+
+    // - FIRST PASS ------------------------------------------------------------
+    // Render everything top-to-bottom by using reverse iterators. Render opaque
+    // objects first.
+
+    if (debug::renderTree) {
+        std::cout << std::string(indent++ * 4, ' ') << "OPAQUE {" << std::endl;
+    }
+    painter.startOpaquePass();
+    typedef std::vector<LayerDescription>::const_reverse_iterator riterator;
+    int i = 0;
+    for (riterator it = layers.rbegin(), end = layers.rend(); it != end; ++it, ++i) {
+        painter.setStrata(i * strata_thickness);
+        renderLayer(*it, Opaque);
+    }
+    painter.endPass();
+    if (debug::renderTree) {
+        std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
+    }
+
+    // - SECOND PASS -----------------------------------------------------------
+    // Make a second pass, rendering translucent objects. This time, we render
+    // bottom-to-top.
+    if (debug::renderTree) {
+        std::cout << std::string(indent++ * 4, ' ') << "TRANSLUCENT {" << std::endl;
+    }
+    painter.startTranslucentPass();
+    typedef std::vector<LayerDescription>::const_iterator iterator;
+    --i;
+    for (iterator it = layers.begin(), end = layers.end(); it != end; ++it, --i) {
+        painter.setStrata(i * strata_thickness);
+        renderLayer(*it, Translucent);
+    }
+    painter.endPass();
+    if (debug::renderTree) {
+        std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
     }
 
     glFlush();
@@ -506,23 +515,44 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers, RenderPass p
 template <typename Styles>
 bool is_invisible(const Styles &styles, const LayerDescription &layer_desc) {
     auto it = styles.find(layer_desc.name);
-    if (it == styles.end()) return true;
+    if (it == styles.end()) {
+        if (debug::renderWarnings) {
+            fprintf(stderr, "[WARNING] can't find class named '%s' in style\n",
+                    layer_desc.name.c_str());
+        }
+        return true;
+    }
     const auto &properties = it->second;
-    if (!properties.enabled) return true;
-    if (properties.opacity <= 0) return true;
+    if (!properties.enabled) { return true; }
+    if (properties.opacity <= 0) { return true; }
     return false;
 }
 
 void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
     if (layer_desc.child_layer.size()) {
-        gl::group group(std::string("group: ") + layer_desc.name);
-        // This is a layer group.
-        // TODO: create framebuffer
-        renderLayers(layer_desc.child_layer, pass);
-        // TODO: render framebuffer on previous framebuffer
+        // This is a layer group. We render them during our translucent render pass.
+        if (pass == Translucent) {
+            gl::group group(std::string("group: ") + layer_desc.name);
+
+            if (debug::renderTree) {
+                std::cout << std::string(indent++ * 4, ' ') << "+ " << layer_desc.name
+                          << " (Composite) {" << std::endl;
+            }
+
+            // TODO: create framebuffer
+            renderLayers(layer_desc.child_layer);
+            // TODO: render framebuffer on previous framebuffer
+
+            if (debug::renderTree) {
+                std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
+            }
+        }
+    } else if (layer_desc.bucket_name == "background") {
+        // This layer defines the background color.
     } else {
         // This is a singular layer. Try to find the bucket associated with
         // this layer and render it.
+
         auto bucket_it = style.buckets.find(layer_desc.bucket_name);
         if (bucket_it != style.buckets.end()) {
             const BucketDescription &bucket_desc = bucket_it->second;
@@ -556,8 +586,23 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
             // Find the source and render all tiles in it.
             auto source_it = sources.find(bucket_desc.source_name);
             if (source_it != sources.end()) {
+                if (debug::renderTree) {
+                    std::cout << std::string(indent * 4, ' ') << "- " << layer_desc.name << " ("
+                              << bucket_desc.type << ")" << std::endl;
+                }
+
                 const std::unique_ptr<Source> &source = source_it->second;
                 source->render(layer_desc, bucket_desc);
+            } else {
+                if (debug::renderWarnings) {
+                    fprintf(stderr, "[WARNING] can't find source '%s' required for bucket '%s'\n",
+                            bucket_desc.source_name.c_str(), layer_desc.bucket_name.c_str());
+                }
+            }
+        } else {
+            if (debug::renderWarnings) {
+                fprintf(stderr, "[WARNING] can't find bucket '%s' required for layer '%s'\n",
+                        layer_desc.bucket_name.c_str(), layer_desc.name.c_str());
             }
         }
     }

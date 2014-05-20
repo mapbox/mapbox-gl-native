@@ -120,7 +120,7 @@ private:
 
     // Unconditionally performs a render with the current map state.
     void render();
-    void renderLayers(const std::vector<LayerDescription>& layers, RenderPass pass);
+    void renderLayers(const std::vector<LayerDescription>& layers);
     void renderLayer(const LayerDescription& layer_desc, RenderPass pass);
 
 private:
@@ -151,8 +151,8 @@ private:
 
     bool debug = false;
     time animationTime = 0;
-    float strata_thickness = 0.0f;
-    int strata = 0;
+
+    int indent = 0;
 
 private:
     bool async = false;
