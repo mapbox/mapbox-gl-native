@@ -830,24 +830,48 @@ module.exports = {
             "bucket": "waterway_stream"
         },
         {
-            "name": "landcover_wood",
-            "bucket": "landcover_wood"
+            "name": "landcover_snow",
+            "bucket": "landcover_snow"
         },
         {
-            "name": "landcover_scrub",
-            "bucket": "landcover_scrub"
+            "name": "landcover_crop",
+            "bucket": "landcover_crop"
         },
         {
             "name": "landcover_grass",
             "bucket": "landcover_grass"
         },
         {
-            "name": "landcover_snow",
-            "bucket": "landcover_snow"
+            "name": "landcover_scrub",
+            "bucket": "landcover_scrub"
+        },
+        {
+            "name": "landcover_wood",
+            "bucket": "landcover_wood"
         },
         {
             "name": "landuse_wood",
             "bucket": "landuse_wood"
+        },
+        {
+            "name": "landuse_school",
+            "bucket": "landuse_school"
+        },
+        {
+            "name": "landuse_sand",
+            "bucket": "landuse_sand"
+        },
+        {
+            "name": "landuse_pitch",
+            "bucket": "landuse_pitch"
+        },
+        {
+            "name": "landuse_park",
+            "bucket": "landuse_park"
+        },
+        {
+            "name": "landuse_industrial",
+            "bucket": "landuse_industrial"
         },
         {
             "name": "landuse_scrub",
@@ -858,44 +882,20 @@ module.exports = {
             "bucket": "landuse_grass"
         },
         {
-            "name": "landcover_crop",
-            "bucket": "landcover_crop"
-        },
-        {
             "name": "landuse_crop",
             "bucket": "landuse_crop"
-        },
-        {
-            "name": "landuse_sand",
-            "bucket": "landuse_sand"
         },
         {
             "name": "landuse_rock",
             "bucket": "landuse_rock"
         },
         {
-            "name": "landuse_park",
-            "bucket": "landuse_park"
-        },
-        {
-            "name": "landuse_pitch",
-            "bucket": "landuse_pitch"
-        },
-        {
-            "name": "landuse_cemetery",
-            "bucket": "landuse_cemetery"
-        },
-        {
             "name": "landuse_hospital",
             "bucket": "landuse_hospital"
         },
         {
-            "name": "landuse_industrial",
-            "bucket": "landuse_industrial"
-        },
-        {
-            "name": "landuse_school",
-            "bucket": "landuse_school"
+            "name": "landuse_cemetery",
+            "bucket": "landuse_cemetery"
         },
         {
             "name": "overlay_wetland",
@@ -906,20 +906,20 @@ module.exports = {
             "bucket": "overlay_breakwater_pier"
         },
         {
-            "name": "hillshade_full_shadow",
-            "bucket": "hillshade_full_shadow"
-        },
-        {
-            "name": "hillshade_medium_shadow",
-            "bucket": "hillshade_medium_shadow"
+            "name": "hillshade_full_highlight",
+            "bucket": "hillshade_full_highlight"
         },
         {
             "name": "hillshade_medium_highlight",
             "bucket": "hillshade_medium_highlight"
         },
         {
-            "name": "hillshade_full_highlight",
-            "bucket": "hillshade_full_highlight"
+            "name": "hillshade_medium_shadow",
+            "bucket": "hillshade_medium_shadow"
+        },
+        {
+            "name": "hillshade_full_shadow",
+            "bucket": "hillshade_full_shadow"
         },
         {
             "name": "contour_line_loud",
@@ -1438,23 +1438,36 @@ module.exports = {
                 },
                 "landcover_wood": {
                     "color": "wood",
-                    "opacity": 0.8
+                    "opacity": [
+                        "stops",
+                        {"z": 13, "val": 1},
+                        {"z": 14, "val": 0.8},
+                        {"z": 17, "val": 0.2}
+                    ]
                 },
                 "landcover_scrub": {
                     "color": "scrub",
-                    "opacity": 0.8
+                    "opacity": [
+                        "stops",
+                        {"z": 13, "val": 1},
+                        {"z": 14, "val": 0.8},
+                        {"z": 17, "val": 0.2}
+                    ]
                 },
                 "landcover_grass": {
                     "color": "grass",
-                    "opacity": 0.8
+                    "opacity": [
+                        "stops",
+                        {"z": 13, "val": 1},
+                        {"z": 14, "val": 0.8},
+                        {"z": 17, "val": 0.2}
+                    ]
                 },
                 "landcover_crop": {
-                    "color": "crop",
-                    "opacity": 0.8
+                    "color": "crop"
                 },
                 "landcover_snow": {
-                    "color": "snow",
-                    "opacity": 0.8
+                    "color": "snow"
                 },
                 "landuse_wood": {
                     "color": "wood",
@@ -2428,23 +2441,36 @@ module.exports = {
                 },
                 "landcover_wood": {
                     "color": "wood_night",
-                    "opacity": 0.8
+                    "opacity": [
+                        "stops",
+                        {"z": 13, "val": 1},
+                        {"z": 14, "val": 0.8},
+                        {"z": 17, "val": 0.2}
+                    ]
                 },
                 "landcover_scrub": {
                     "color": "scrub_night",
-                    "opacity": 0.8
+                    "opacity": [
+                        "stops",
+                        {"z": 13, "val": 1},
+                        {"z": 14, "val": 0.8},
+                        {"z": 17, "val": 0.2}
+                    ]
                 },
                 "landcover_grass": {
                     "color": "grass_night",
-                    "opacity": 0.8
+                    "opacity": [
+                        "stops",
+                        {"z": 13, "val": 1},
+                        {"z": 14, "val": 0.8},
+                        {"z": 17, "val": 0.2}
+                    ]
                 },
                 "landcover_crop": {
-                    "color": "crop_night",
-                    "opacity": 0.8
+                    "color": "crop_night"
                 },
                 "landcover_snow": {
-                    "color": "snow_night",
-                    "opacity": 0.8
+                    "color": "snow_night"
                 },
                 "landuse_wood": {
                     "color": "wood_night",
