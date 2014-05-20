@@ -29,6 +29,7 @@ enum class TransitionablePropertyKey {
     Blur = 10,
     Halo = 11,
     HaloRadius = 12,
+    HaloBlur = 13,
 };
 
 enum class Winding {
@@ -177,6 +178,7 @@ struct TextClass {
     FunctionProperty halo_radius = 0.25f;
     PropertyTransition halo_radius_transition;
     FunctionProperty halo_blur = 1.0f;
+    PropertyTransition halo_blur_transition;
     FunctionProperty size = 12.0f;
     FunctionProperty rotate = 0.0f;
     FunctionProperty always_visible = false;

@@ -543,7 +543,24 @@ void Style::cascade(float z) {
                 text.halo_radius = layer.halo_radius.evaluate<float>(z);
             }
 
-            text.halo_blur = layer.halo_blur.evaluate<float>(z);
+            // halo blur (transitionable)
+            if (layer.halo_blur_transition.duration &&
+                !transitions[layer_name].count(TransitionablePropertyKey::HaloBlur) &&
+                layer.halo_blur.evaluate<float>(z) != previous.texts[layer_name].halo_blur) {
+
+                transitioning.texts[layer_name].halo_blur = previous.texts[layer_name].halo_blur;
+
+                transitions[layer_name][TransitionablePropertyKey::HaloBlur] =
+                    std::make_shared<util::ease_transition<float>> (previous.texts[layer_name].halo_blur,
+                                                                    layer.halo_blur.evaluate<float>(z),
+                                                                    transitioning.texts[layer_name].halo_blur,
+                                                                    start,
+                                                                    layer.halo_blur_transition.duration * 1_millisecond);
+            } else if (transitions[layer_name].count(TransitionablePropertyKey::HaloBlur)) {
+                text.halo_blur = transitioning.texts[layer_name].halo_blur;
+            } else {
+                text.halo_blur = layer.halo_blur.evaluate<float>(z);
+            }
 
             // rotate
             text.rotate = layer.rotate.evaluate<float>(z);

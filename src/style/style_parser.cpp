@@ -626,6 +626,7 @@ TextClass StyleParser::parseTextClass(JSVal value) {
 
     if (value.HasMember("strokeBlur")) {
         klass.halo_blur = parseFunction(value["strokeBlur"]);
+        klass.halo_blur_transition = parseTransition(value, "strokeBlur");
     }
 
     if (value.HasMember("size")) {
