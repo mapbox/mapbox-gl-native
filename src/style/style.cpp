@@ -18,9 +18,13 @@ void Style::reset() {
     computed.icons.clear();
     computed.texts.clear();
     computed.rasters.clear();
+    computed.background.color = {{ 1, 1, 1, 1 }};
+    computed.background.opacity = 1.0;
 }
 
 void Style::cascade(float z) {
+    uv::writelock lock(mtx);
+
     time start = util::now();
 
     previous.fills = computed.fills;
@@ -31,6 +35,8 @@ void Style::cascade(float z) {
     previous.background = computed.background;
 
     reset();
+
+    std::set<std::string> currentPassAppliedClasses;
 
     // Accomodate for different tile size.
     // TODO: Make this per-layer once individual layers have a specific tile size.
@@ -44,6 +50,7 @@ void Style::cascade(float z) {
 
         // Not enabled
         if (appliedClasses.find(class_name) == appliedClasses.end()) continue;
+        currentPassAppliedClasses.insert(class_name);
 
         // Cascade fill classes
         for (const auto& fill_pair : sheetClass.fill) {
@@ -61,7 +68,8 @@ void Style::cascade(float z) {
             if (layer.translate_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
                 (layer.translate[0].evaluate<float>(z) != previous.fills[layer_name].translate[0] ||
-                 layer.translate[1].evaluate<float>(z) != previous.fills[layer_name].translate[1])) {
+                 layer.translate[1].evaluate<float>(z) != previous.fills[layer_name].translate[1]) &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.fills[layer_name].translate = {{ previous.fills[layer_name].translate[0],
                                                                previous.fills[layer_name].translate[1] }};
@@ -98,7 +106,8 @@ void Style::cascade(float z) {
             // fill color (transitionable)
             if (layer.fill_color_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::FillColor) &&
-                layer.fill_color != previous.fills[layer_name].fill_color) {
+                layer.fill_color != previous.fills[layer_name].fill_color &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.fills[layer_name].fill_color = previous.fills[layer_name].fill_color;
 
@@ -118,7 +127,8 @@ void Style::cascade(float z) {
             // stroke color (transitionable)
             if (layer.stroke_color_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::StrokeColor) &&
-                layer.stroke_color != previous.fills[layer_name].stroke_color) {
+                layer.stroke_color != previous.fills[layer_name].stroke_color &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.fills[layer_name].stroke_color = previous.fills[layer_name].stroke_color;
 
@@ -138,7 +148,8 @@ void Style::cascade(float z) {
             // opacity (transitionable)
             if (layer.opacity_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
-                layer.opacity.evaluate<float>(z) != previous.fills[layer_name].opacity) {
+                layer.opacity.evaluate<float>(z) != previous.fills[layer_name].opacity &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.fills[layer_name].opacity = previous.fills[layer_name].opacity;
 
@@ -174,7 +185,8 @@ void Style::cascade(float z) {
             if (layer.translate_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
                 (layer.translate[0].evaluate<float>(z) != previous.lines[layer_name].translate[0] ||
-                 layer.translate[1].evaluate<float>(z) != previous.lines[layer_name].translate[1])) {
+                 layer.translate[1].evaluate<float>(z) != previous.lines[layer_name].translate[1]) &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.lines[layer_name].translate = {{ previous.lines[layer_name].translate[0],
                                                                previous.lines[layer_name].translate[1] }};
@@ -205,7 +217,8 @@ void Style::cascade(float z) {
             // width (transitionable)
             if (layer.width_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Width) &&
-                layer.width.evaluate<float>(z) != previous.lines[layer_name].width) {
+                layer.width.evaluate<float>(z) != previous.lines[layer_name].width &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.lines[layer_name].width = previous.lines[layer_name].width;
 
@@ -224,7 +237,8 @@ void Style::cascade(float z) {
             // offset (transitionable)
             if (layer.offset_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Offset) &&
-                layer.offset.evaluate<float>(z) != previous.lines[layer_name].offset) {
+                layer.offset.evaluate<float>(z) != previous.lines[layer_name].offset &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.lines[layer_name].offset = previous.lines[layer_name].offset;
 
@@ -243,7 +257,8 @@ void Style::cascade(float z) {
             // color (transitionable)
             if (layer.color_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Color) &&
-                layer.color != previous.lines[layer_name].color) {
+                layer.color != previous.lines[layer_name].color &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.lines[layer_name].color = previous.lines[layer_name].color;
 
@@ -264,7 +279,8 @@ void Style::cascade(float z) {
             if (layer.dash_array_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::DashArray) &&
                 (layer.dash_array[0].evaluate<float>(z) != previous.lines[layer_name].dash_array[0] ||
-                 layer.dash_array[1].evaluate<float>(z) != previous.lines[layer_name].dash_array[1])) {
+                 layer.dash_array[1].evaluate<float>(z) != previous.lines[layer_name].dash_array[1]) &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.lines[layer_name].dash_array = {{ previous.lines[layer_name].dash_array[0],
                                                                 previous.lines[layer_name].dash_array[1] }};
@@ -292,7 +308,8 @@ void Style::cascade(float z) {
             // opacity (transitionable)
             if (layer.opacity_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
-                layer.opacity.evaluate<float>(z) != previous.lines[layer_name].opacity) {
+                layer.opacity.evaluate<float>(z) != previous.lines[layer_name].opacity &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.lines[layer_name].opacity = previous.lines[layer_name].opacity;
 
@@ -325,7 +342,8 @@ void Style::cascade(float z) {
             if (layer.translate_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
                 (layer.translate[0].evaluate<float>(z) != previous.icons[layer_name].translate[0] ||
-                 layer.translate[1].evaluate<float>(z) != previous.icons[layer_name].translate[1])) {
+                 layer.translate[1].evaluate<float>(z) != previous.icons[layer_name].translate[1]) &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.icons[layer_name].translate = {{ previous.icons[layer_name].translate[0],
                                                                previous.icons[layer_name].translate[1] }};
@@ -356,7 +374,8 @@ void Style::cascade(float z) {
             // color (transitionable)
             if (layer.color_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Color) &&
-                layer.color != previous.icons[layer_name].color) {
+                layer.color != previous.icons[layer_name].color &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.icons[layer_name].color = previous.icons[layer_name].color;
 
@@ -379,7 +398,8 @@ void Style::cascade(float z) {
             // opacity (transitionable)
             if (layer.opacity_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
-                layer.opacity.evaluate<float>(z) != previous.icons[layer_name].opacity) {
+                layer.opacity.evaluate<float>(z) != previous.icons[layer_name].opacity &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.icons[layer_name].opacity = previous.icons[layer_name].opacity;
 
@@ -401,7 +421,8 @@ void Style::cascade(float z) {
             // radius (transitionable)
             if (layer.radius_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Radius) &&
-                layer.radius.evaluate<float>(z) != previous.icons[layer_name].radius) {
+                layer.radius.evaluate<float>(z) != previous.icons[layer_name].radius &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.icons[layer_name].radius = previous.icons[layer_name].radius;
 
@@ -420,7 +441,8 @@ void Style::cascade(float z) {
             // blur (transitionable)
             if (layer.blur_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Blur) &&
-                layer.blur.evaluate<float>(z) != previous.icons[layer_name].blur) {
+                layer.blur.evaluate<float>(z) != previous.icons[layer_name].blur &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.icons[layer_name].blur = previous.icons[layer_name].blur;
 
@@ -453,7 +475,8 @@ void Style::cascade(float z) {
             if (layer.translate_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
                 (layer.translate[0].evaluate<float>(z) != previous.texts[layer_name].translate[0] ||
-                 layer.translate[1].evaluate<float>(z) != previous.texts[layer_name].translate[1])) {
+                 layer.translate[1].evaluate<float>(z) != previous.texts[layer_name].translate[1]) &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.texts[layer_name].translate = {{ previous.texts[layer_name].translate[0],
                                                                previous.texts[layer_name].translate[1] }};
@@ -484,7 +507,8 @@ void Style::cascade(float z) {
             // color (transitionable)
             if (layer.color_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Color) &&
-                layer.color != previous.texts[layer_name].color) {
+                layer.color != previous.texts[layer_name].color &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.lines[layer_name].color = previous.texts[layer_name].color;
 
@@ -507,7 +531,8 @@ void Style::cascade(float z) {
             // halo color (transitionable)
             if (layer.halo_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Halo) &&
-                layer.halo != previous.texts[layer_name].halo) {
+                layer.halo != previous.texts[layer_name].halo &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.texts[layer_name].halo = previous.texts[layer_name].halo;
 
@@ -527,7 +552,8 @@ void Style::cascade(float z) {
             // halo radius (transitionable)
             if (layer.halo_radius_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::HaloRadius) &&
-                layer.halo_radius.evaluate<float>(z) != previous.texts[layer_name].halo_radius) {
+                layer.halo_radius.evaluate<float>(z) != previous.texts[layer_name].halo_radius &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.texts[layer_name].halo_radius = previous.texts[layer_name].halo_radius;
 
@@ -546,7 +572,8 @@ void Style::cascade(float z) {
             // halo blur (transitionable)
             if (layer.halo_blur_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::HaloBlur) &&
-                layer.halo_blur.evaluate<float>(z) != previous.texts[layer_name].halo_blur) {
+                layer.halo_blur.evaluate<float>(z) != previous.texts[layer_name].halo_blur &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.texts[layer_name].halo_blur = previous.texts[layer_name].halo_blur;
 
@@ -571,7 +598,8 @@ void Style::cascade(float z) {
             // opacity (transitionable)
             if (layer.opacity_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
-                layer.opacity.evaluate<float>(z) != previous.texts[layer_name].opacity) {
+                layer.opacity.evaluate<float>(z) != previous.texts[layer_name].opacity &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.lines[layer_name].opacity = previous.texts[layer_name].opacity;
 
@@ -603,7 +631,8 @@ void Style::cascade(float z) {
             // opacity (transitionable)
             if (layer.opacity_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
-                layer.opacity.evaluate<float>(z) != previous.rasters[layer_name].opacity) {
+                layer.opacity.evaluate<float>(z) != previous.rasters[layer_name].opacity &&
+                !previouslyAppliedClasses.count(class_name)) {
 
                 transitioning.rasters[layer_name].opacity = previous.rasters[layer_name].opacity;
 
@@ -625,7 +654,8 @@ void Style::cascade(float z) {
         // color (transitionable)
         if (sheetClass.background.color_transition.duration &&
             !transitions["background"].count(TransitionablePropertyKey::Color) &&
-            sheetClass.background.color != previous.background.color) {
+            sheetClass.background.color != previous.background.color &&
+            !previouslyAppliedClasses.count(class_name)) {
 
             transitioning.background.color = previous.background.color;
 
@@ -644,7 +674,8 @@ void Style::cascade(float z) {
         // opacity (transitionable)
         if (sheetClass.background.opacity_transition.duration &&
             !transitions["background"].count(TransitionablePropertyKey::Opacity) &&
-            sheetClass.background.opacity.evaluate<float>(z) != previous.background.opacity) {
+            sheetClass.background.opacity.evaluate<float>(z) != previous.background.opacity &&
+            !previouslyAppliedClasses.count(class_name)) {
 
             transitioning.background.opacity = previous.background.opacity;
 
@@ -660,16 +691,17 @@ void Style::cascade(float z) {
             computed.background.opacity = sheetClass.background.opacity.evaluate<float>(z);
         }
     }
+
+    previouslyAppliedClasses.swap(currentPassAppliedClasses);
 }
 
 bool Style::needsTransition() const {
     uv::readlock lock(mtx);
 
     for (auto layer_it = transitions.begin(); layer_it != transitions.end(); layer_it++) {
-        for (auto prop_it = layer_it->second.begin(); prop_it != layer_it->second.end(); prop_it++) {
-            if (prop_it->second) {
-                return true;
-            }
+        auto& layer_transitions = layer_it->second;
+        if (layer_transitions.size()) {
+            return true;
         }
     }
 
@@ -680,10 +712,11 @@ void Style::updateTransitions(time now) {
     uv::writelock lock(mtx);
 
     for (auto layer_it = transitions.begin(); layer_it != transitions.end(); layer_it++) {
-        for (auto prop_it = layer_it->second.begin(); prop_it != layer_it->second.end();/**/) {
-            std::shared_ptr<util::transition>& transition = prop_it->second;
+        auto& layer_transitions = layer_it->second;
+        for (auto prop_it = layer_transitions.begin(); prop_it != layer_transitions.end();/**/) {
+            auto& transition = prop_it->second;
             if (transition->update(now) == util::transition::complete) {
-                prop_it = transitions[layer_it->first].erase(prop_it);
+                prop_it = layer_transitions.erase(prop_it);
             } else {
                 prop_it++;
             }

@@ -78,6 +78,7 @@ public:
         std::map<std::string, RasterProperties> rasters;
     } transitioning;
 
+    std::set<std::string> previouslyAppliedClasses;
     std::map<std::string, std::map<TransitionablePropertyKey, std::shared_ptr<util::transition>>> transitions;
 
 private:
