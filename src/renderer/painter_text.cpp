@@ -28,7 +28,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     }
 
     // If layerStyle.size > bucket.info.fontSize then labels may collide
-    float fontSize = std::fmin(properties.size, bucket.geom_desc.font_size);
+    float fontSize = std::fmin(properties.size, bucket.geom_desc.size);
     matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
 
     const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
@@ -41,13 +41,11 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     textShader->setTextureSize({{static_cast<float>(map.getGlyphAtlas().width),
                                  static_cast<float>(map.getGlyphAtlas().height)}});
 
-    textShader->setGamma(2.5f / fontSize / map.getState().getPixelRatio());
-
     // Convert the -pi..pi to an int8 range.
     float angle = std::round((map.getState().getAngle() + rotate) / M_PI * 128);
 
     // adjust min/max zooms for variable font sies
-    float zoomAdjust = log(fontSize / bucket.geom_desc.font_size) / log(2);
+    float zoomAdjust = log(fontSize / bucket.geom_desc.size) / log(2);
 
     textShader->setAngle((int32_t)(angle + 256) % 256);
     textShader->setFlip(bucket.geom_desc.path == TextPathType::Curve ? 1 : 0);
@@ -98,15 +96,19 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
     if (properties.halo[3] > 0.0f) {
+        textShader->setGamma(properties.haloBlur * 2.4f / fontSize / map.getState().getPixelRatio());
         textShader->setColor(properties.halo);
         textShader->setBuffer(properties.halo_radius);
         glDepthRange(strata, 1.0f);
         bucket.drawGlyphs(*textShader);
     }
 
-    // Then, we draw the text over the halo
-    textShader->setColor(properties.color);
-    textShader->setBuffer((256.0f - 64.0f) / 256.0f);
-    glDepthRange(strata + strata_epsilon, 1.0f);
-    bucket.drawGlyphs(*textShader);
+    if (properties.color[3] > 0.0f) {
+        // Then, we draw the text over the halo
+        textShader->setGamma(2.4f / fontSize / map.getState().getPixelRatio());
+        textShader->setColor(properties.color);
+        textShader->setBuffer((256.0f - 64.0f) / 256.0f);
+        glDepthRange(strata + strata_epsilon, 1.0f);
+        bucket.drawGlyphs(*textShader);
+    }
 }

@@ -204,6 +204,8 @@ namespace platform {
 double elapsed() { return glfwGetTime(); }
 
 void show_debug_image(std::string name, const char *data, size_t width, size_t height) {
+    glfwInit();
+
     static GLFWwindow *debug_window = nullptr;
     if (!debug_window) {
         debug_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
@@ -226,6 +228,38 @@ void show_debug_image(std::string name, const char *data, size_t width, size_t h
     glPixelZoom(scale, -scale);
     glRasterPos2f(-1.0f, 1.0f);
     glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
+    glfwSwapBuffers(debug_window);
+
+    glfwMakeContextCurrent(current_window);
+}
+
+
+void show_color_debug_image(std::string name, const char *data, size_t logical_width, size_t logical_height, size_t width, size_t height) {
+    glfwInit();
+
+    static GLFWwindow *debug_window = nullptr;
+    if (!debug_window) {
+        debug_window = glfwCreateWindow(logical_width, logical_height, name.c_str(), nullptr, nullptr);
+        if (!debug_window) {
+            glfwTerminate();
+            fprintf(stderr, "Failed to initialize window\n");
+            exit(1);
+        }
+    }
+
+    GLFWwindow *current_window = glfwGetCurrentContext();
+
+    glfwSetWindowSize(debug_window, logical_width, logical_height);
+    glfwMakeContextCurrent(debug_window);
+
+    int fb_width, fb_height;
+    glfwGetFramebufferSize(debug_window, &fb_width, &fb_height);
+    float x_scale = (float)fb_width / (float)width;
+    float y_scale = (float)fb_height / (float)height;
+
+    glPixelZoom(x_scale, -y_scale);
+    glRasterPos2f(-1.0f, 1.0f);
+    glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
     glfwSwapBuffers(debug_window);
 
     glfwMakeContextCurrent(current_window);

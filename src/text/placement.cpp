@@ -109,7 +109,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
 
         // Don't place around sharp corners
         float angleDiff = std::fmod((angle - prevAngle), (2.0f * M_PI));
-        if (prevAngle && angleDiff > maxAngleDelta) {
+        if (prevAngle && std::fabs(angleDiff) > maxAngleDelta) {
             anchor.scale = prevscale;
             break;
         }
@@ -278,7 +278,7 @@ void Placement::addFeature(TextBucket& bucket,
     const float textMinDistance = info.textMinDistance;
     const float rotate = info.rotate;
     const float fontScale =
-        (tileExtent / util::tileSize) / (glyphSize / info.font_size);
+        (tileExtent / util::tileSize) / (glyphSize / info.size);
 
     const float advance = measureText(faces, shaping);
     Anchors anchors;

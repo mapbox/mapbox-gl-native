@@ -29,7 +29,7 @@ void Painter::setup() {
 
     setupShaders();
 
-    assert(pointShader);
+    assert(iconShader);
     assert(plainShader);
     assert(outlineShader);
     assert(lineShader);
@@ -63,7 +63,7 @@ void Painter::setupShaders() {
     lineShader = std::make_unique<LineShader>();
     linejoinShader = std::make_unique<LinejoinShader>();
     patternShader = std::make_unique<PatternShader>();
-    pointShader = std::make_unique<PointShader>();
+    iconShader = std::make_unique<IconShader>();
     rasterShader = std::make_unique<RasterShader>();
     textShader = std::make_unique<TextShader>();
     dotShader = std::make_unique<DotShader>();
@@ -170,6 +170,7 @@ void Painter::renderTileLayer(const Tile& tile, const LayerDescription &layer_de
         frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
     }
 }
+
 
 const mat4 &Painter::translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchor anchor) {
     if (translation[0] == 0 && translation[1] == 0) {

@@ -20,6 +20,7 @@ Map::Map(View& view)
       texturepool(),
       style(),
       glyphAtlas(1024, 1024),
+      spriteAtlas(512, 512),
       painter(*this),
       loop(uv_loop_new()) {
 
@@ -138,10 +139,10 @@ void Map::setup() {
 
     painter.setup();
 
-    sources.emplace("mapbox streets",
+    sources.emplace("outdoors",
                     std::unique_ptr<Source>(new Source(*this,
                            painter,
-                           "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf",
+                           "http://api-maps-gl.tilestream.net/v3/mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5/%d/%d/%d.gl.pbf",
                            Source::Type::vector,
                            {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }},
                            512,
@@ -175,7 +176,16 @@ void Map::resize(uint16_t width, uint16_t height, float ratio) {
 }
 
 void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height) {
+    bool changed = false;
+
     if (transform.resize(width, height, ratio, fb_width, fb_height)) {
+        changed = true;
+    }
+    if (spriteAtlas.resize(ratio)) {
+        changed = true;
+    }
+
+    if (changed) {
         update();
     }
 }
@@ -398,6 +408,11 @@ void Map::prepare() {
         style.sprite->load(kSpriteURL);
     }
 
+    // Allow the sprite atlas to potentially pull new sprite images if needed.
+    if (style.sprite && style.sprite->isLoaded()) {
+        spriteAtlas.update(*style.sprite);
+    }
+
     updateTiles();
 
     updateClippingIDs();
@@ -469,6 +484,8 @@ void Map::render() {
     if (transform.needsTransition()) {
         update();
     }
+
+    glFlush();
 }
 
 void Map::renderLayers(const std::vector<LayerDescription>& layers, RenderPass pass) {
@@ -487,6 +504,8 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers, RenderPass p
     } else {
         throw std::runtime_error("unknown render pass");
     }
+
+    glFlush();
 }
 
 template <typename Styles>
@@ -523,9 +542,9 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
                     if (pass == Opaque) return;
                     if (is_invisible(style.computed.lines, layer_desc)) return;
                     break;
-                case BucketType::Point:
+                case BucketType::Icon:
                     if (pass == Opaque) return;
-                    if (is_invisible(style.computed.points, layer_desc)) return;
+                    if (is_invisible(style.computed.icons, layer_desc)) return;
                     break;
                 case BucketType::Text:
                     if (pass == Opaque) return;

@@ -80,13 +80,13 @@ struct FunctionProperty {
     template <typename T> inline T evaluate(float z) const { return function(z, values); }
 };
 
-struct PointClass {
+struct IconClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
     PropertyTransition translate_transition;
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     FunctionProperty size;
-    Color color = {{ 0, 0, 0, 1 }};
+    Color color = {{ 1, 1, 1, 1 }};
     PropertyTransition color_transition;
     FunctionProperty opacity = 1;
     PropertyTransition opacity_transition;
@@ -97,12 +97,12 @@ struct PointClass {
     PropertyTransition blur_transition;
 };
 
-struct PointProperties {
+struct IconProperties {
     bool enabled = true;
     std::array<float, 2> translate = {{ 0, 0 }};
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     float size = 0;
-    Color color = {{ 0, 0, 0, 1 }};
+    Color color = {{ 1, 1, 1, 1 }};
     float opacity = 1.0;
     std::string image;
     float radius = 0;
@@ -176,6 +176,7 @@ struct TextClass {
     PropertyTransition halo_transition;
     FunctionProperty halo_radius = 0.25f;
     PropertyTransition halo_radius_transition;
+    FunctionProperty haloBlur = 1.0f;
     FunctionProperty size = 12.0f;
     FunctionProperty rotate = 0.0f;
     FunctionProperty always_visible = false;
@@ -190,6 +191,7 @@ struct TextProperties {
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     float halo_radius = 0.25f;
+    float haloBlur = 1.0f;
     float size = 12.0f;
     float rotate = 0.0f;
     bool always_visible = false;

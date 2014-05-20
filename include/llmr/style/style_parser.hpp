@@ -22,7 +22,7 @@ private:
     void parseClass(const std::string& name, JSVal value, ClassDescription& class_desc, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& layers);
     FillClass parseFillClass(JSVal value);
     LineClass parseLineClass(JSVal value);
-    PointClass parsePointClass(JSVal value);
+    IconClass parseIconClass(JSVal value);
     TextClass parseTextClass(JSVal value);
     BackgroundClass parseBackgroundClass(JSVal value);
     RasterClass parseRasterClass(JSVal value);

@@ -14,7 +14,7 @@
 #include <llmr/shader/pattern_shader.hpp>
 #include <llmr/shader/line_shader.hpp>
 #include <llmr/shader/linejoin_shader.hpp>
-#include <llmr/shader/point_shader.hpp>
+#include <llmr/shader/icon_shader.hpp>
 #include <llmr/shader/raster_shader.hpp>
 #include <llmr/shader/text_shader.hpp>
 #include <llmr/shader/dot_shader.hpp>
@@ -30,7 +30,7 @@ class GlyphAtlas;
 
 class FillBucket;
 class LineBucket;
-class PointBucket;
+class IconBucket;
 class TextBucket;
 class RasterBucket;
 
@@ -65,7 +65,7 @@ public:
     void renderDebugText(const std::vector<std::string> &strings);
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
-    void renderPoint(PointBucket& bucket, const std::string& layer_name, const Tile::ID& id);
+    void renderIcon(IconBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderRaster(RasterBucket& bucket, const std::string& layer_name, const Tile::ID& id);
 
@@ -123,7 +123,7 @@ private:
     std::unique_ptr<LineShader> lineShader;
     std::unique_ptr<LinejoinShader> linejoinShader;
     std::unique_ptr<PatternShader> patternShader;
-    std::unique_ptr<PointShader> pointShader;
+    std::unique_ptr<IconShader> iconShader;
     std::unique_ptr<RasterShader> rasterShader;
     std::unique_ptr<TextShader> textShader;
     std::unique_ptr<DotShader> dotShader;

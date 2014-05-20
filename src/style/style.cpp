@@ -14,7 +14,7 @@ Style::Style() {
 void Style::reset() {
     computed.fills.clear();
     computed.lines.clear();
-    computed.points.clear();
+    computed.icons.clear();
     computed.texts.clear();
     computed.rasters.clear();
 }
@@ -24,7 +24,7 @@ void Style::cascade(float z) {
 
     previous.fills = computed.fills;
     previous.lines = computed.lines;
-    previous.points = computed.points;
+    previous.icons = computed.icons;
     previous.texts = computed.texts;
     previous.rasters = computed.rasters;
     previous.background = computed.background;
@@ -304,34 +304,34 @@ void Style::cascade(float z) {
             }
         }
 
-        // Cascade point classes
-        for (const auto& point_pair : sheetClass.point) {
-            const std::string& layer_name = point_pair.first;
-            const llmr::PointClass& layer = point_pair.second;
+        // Cascade icon classes
+        for (const auto& icon_pair : sheetClass.icon) {
+            const std::string& layer_name = icon_pair.first;
+            const llmr::IconClass& layer = icon_pair.second;
 
-            // TODO: This should be restricted to point styles that have actual
+            // TODO: This should be restricted to icon styles that have actual
             // values so as to not override with default values.
-            llmr::PointProperties& point = computed.points[layer_name];
+            llmr::IconProperties& icon = computed.icons[layer_name];
 
             // enabled
-            point.enabled = layer.enabled.evaluate<bool>(z);
+            icon.enabled = layer.enabled.evaluate<bool>(z);
 
             // translate (transitionable)
             if (layer.translate_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
-                (layer.translate[0].evaluate<float>(z) != previous.points[layer_name].translate[0] ||
-                 layer.translate[1].evaluate<float>(z) != previous.points[layer_name].translate[1])) {
+                (layer.translate[0].evaluate<float>(z) != previous.icons[layer_name].translate[0] ||
+                 layer.translate[1].evaluate<float>(z) != previous.icons[layer_name].translate[1])) {
 
-                transitioning.points[layer_name].translate = {{ previous.points[layer_name].translate[0],
-                                                                previous.points[layer_name].translate[1] }};
+                transitioning.icons[layer_name].translate = {{ previous.icons[layer_name].translate[0],
+                                                               previous.icons[layer_name].translate[1] }};
 
                 std::vector<float> from, to, transitioning_ref;
-                from.push_back(previous.points[layer_name].translate[0]);
-                from.push_back(previous.points[layer_name].translate[1]);
+                from.push_back(previous.icons[layer_name].translate[0]);
+                from.push_back(previous.icons[layer_name].translate[1]);
                 to.push_back(layer.translate[0].evaluate<float>(z));
                 to.push_back(layer.translate[1].evaluate<float>(z));
-                transitioning_ref.push_back(transitioning.points[layer_name].translate[0]);
-                transitioning_ref.push_back(transitioning.points[layer_name].translate[1]);
+                transitioning_ref.push_back(transitioning.icons[layer_name].translate[0]);
+                transitioning_ref.push_back(transitioning.icons[layer_name].translate[1]);
                 transitions[layer_name][TransitionablePropertyKey::Translate] =
                     std::make_shared<util::ease_transition<std::vector<float>>>(from,
                                                                                 to,
@@ -339,96 +339,96 @@ void Style::cascade(float z) {
                                                                                 start,
                                                                                 layer.translate_transition.duration * 1_millisecond);
             } else if (transitions[layer_name].count(TransitionablePropertyKey::Translate)) {
-                point.translate = transitioning.points[layer_name].translate;
+                icon.translate = transitioning.icons[layer_name].translate;
             } else {
-                point.translate = {{ layer.translate[0].evaluate<float>(z),
-                                     layer.translate[1].evaluate<float>(z) }};
+                icon.translate = {{ layer.translate[0].evaluate<float>(z),
+                                    layer.translate[1].evaluate<float>(z) }};
             }
 
             // translate anchor
-            point.translateAnchor = layer.translateAnchor;
+            icon.translateAnchor = layer.translateAnchor;
 
             // color (transitionable)
             if (layer.color_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Color) &&
-                layer.color != previous.points[layer_name].color) {
+                layer.color != previous.icons[layer_name].color) {
 
-                transitioning.points[layer_name].color = previous.points[layer_name].color;
+                transitioning.icons[layer_name].color = previous.icons[layer_name].color;
 
                 transitions[layer_name][TransitionablePropertyKey::Color] =
-                    std::make_shared<util::ease_transition<Color>>(previous.points[layer_name].color,
+                    std::make_shared<util::ease_transition<Color>>(previous.icons[layer_name].color,
                                                                    layer.color,
-                                                                   transitioning.points[layer_name].color,
+                                                                   transitioning.icons[layer_name].color,
                                                                    start,
                                                                    layer.color_transition.duration * 1_millisecond);
             } else if (transitions[layer_name].count(TransitionablePropertyKey::Color)) {
-                point.color = transitioning.points[layer_name].color;
+                icon.color = transitioning.icons[layer_name].color;
             }
             else {
-                point.color = layer.color;
+                icon.color = layer.color;
             }
 
             // size
-            point.size = layer.size.evaluate<float>(z);
+            icon.size = layer.size.evaluate<float>(z);
 
             // opacity (transitionable)
             if (layer.opacity_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
-                layer.opacity.evaluate<float>(z) != previous.points[layer_name].opacity) {
+                layer.opacity.evaluate<float>(z) != previous.icons[layer_name].opacity) {
 
-                transitioning.points[layer_name].opacity = previous.points[layer_name].opacity;
+                transitioning.icons[layer_name].opacity = previous.icons[layer_name].opacity;
 
                 transitions[layer_name][TransitionablePropertyKey::Opacity] =
-                    std::make_shared<util::ease_transition<float>>(previous.points[layer_name].opacity,
+                    std::make_shared<util::ease_transition<float>>(previous.icons[layer_name].opacity,
                                                                    layer.opacity.evaluate<float>(z),
-                                                                   transitioning.points[layer_name].opacity,
+                                                                   transitioning.icons[layer_name].opacity,
                                                                    start,
                                                                    layer.opacity_transition.duration * 1_millisecond);
             } else if (transitions[layer_name].count(TransitionablePropertyKey::Opacity)) {
-                point.opacity = transitioning.points[layer_name].opacity;
+                icon.opacity = transitioning.icons[layer_name].opacity;
             } else {
-                point.opacity = layer.opacity.evaluate<float>(z);
+                icon.opacity = layer.opacity.evaluate<float>(z);
             }
 
             // image
-            point.image = layer.image;
+            icon.image = layer.image;
 
             // radius (transitionable)
             if (layer.radius_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Radius) &&
-                layer.radius.evaluate<float>(z) != previous.points[layer_name].radius) {
+                layer.radius.evaluate<float>(z) != previous.icons[layer_name].radius) {
 
-                transitioning.points[layer_name].radius = previous.points[layer_name].radius;
+                transitioning.icons[layer_name].radius = previous.icons[layer_name].radius;
 
                 transitions[layer_name][TransitionablePropertyKey::Radius] =
-                    std::make_shared<util::ease_transition<float>>(previous.points[layer_name].radius,
+                    std::make_shared<util::ease_transition<float>>(previous.icons[layer_name].radius,
                                                                    layer.radius.evaluate<float>(z),
-                                                                   transitioning.points[layer_name].radius,
+                                                                   transitioning.icons[layer_name].radius,
                                                                    start,
                                                                    layer.radius_transition.duration * 1_millisecond);
             } else if (transitions[layer_name].count(TransitionablePropertyKey::Radius)) {
-                point.radius = transitioning.points[layer_name].radius;
+                icon.radius = transitioning.icons[layer_name].radius;
             } else {
-                point.radius = layer.radius.evaluate<float>(z);
+                icon.radius = layer.radius.evaluate<float>(z);
             }
 
             // blur (transitionable)
             if (layer.blur_transition.duration &&
                 !transitions[layer_name].count(TransitionablePropertyKey::Blur) &&
-                layer.blur.evaluate<float>(z) != previous.points[layer_name].blur) {
+                layer.blur.evaluate<float>(z) != previous.icons[layer_name].blur) {
 
-                transitioning.points[layer_name].blur = previous.points[layer_name].blur;
+                transitioning.icons[layer_name].blur = previous.icons[layer_name].blur;
 
                 transitions[layer_name][TransitionablePropertyKey::Blur] =
-                    std::make_shared<util::ease_transition<float>>(previous.points[layer_name].blur,
+                    std::make_shared<util::ease_transition<float>>(previous.icons[layer_name].blur,
                                                                    layer.blur.evaluate<float>(z),
-                                                                   transitioning.points[layer_name].blur,
+                                                                   transitioning.icons[layer_name].blur,
                                                                    start,
                                                                    layer.blur_transition.duration * 1_millisecond);
             } else if (transitions[layer_name].count(TransitionablePropertyKey::Blur)) {
-                point.blur = transitioning.points[layer_name].blur;
+                icon.blur = transitioning.icons[layer_name].blur;
             } else {
-                point.blur = layer.blur.evaluate<float>(z);
+                icon.blur = layer.blur.evaluate<float>(z);
             }
         }
 
@@ -537,6 +537,9 @@ void Style::cascade(float z) {
             } else {
                 text.halo_radius = layer.halo_radius.evaluate<float>(z);
             }
+
+            // halo blur
+            text.haloBlur = layer.haloBlur.evaluate<float>(z);
 
             // rotate
             text.rotate = layer.rotate.evaluate<float>(z);

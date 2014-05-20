@@ -1,10 +1,10 @@
-#ifndef LLMR_RENDERER_POINTBUCKET
-#define LLMR_RENDERER_POINTBUCKET
+#ifndef LLMR_RENDERER_ICONBUCKET
+#define LLMR_RENDERER_ICONBUCKET
 
 #include <llmr/renderer/bucket.hpp>
 #include <llmr/style/bucket_description.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
-#include <llmr/geometry/point_buffer.hpp>
+#include <llmr/geometry/icon_buffer.hpp>
 
 #include <vector>
 #include <memory>
@@ -16,31 +16,32 @@
 namespace llmr {
 
 class Style;
-class PointVertexBuffer;
+class IconVertexBuffer;
 class BucketDescription;
-class PointShader;
+class IconShader;
 class DotShader;
-struct pbf;
+class SpriteAtlas;
+class VectorTileFeature;
 
-class PointBucket : public Bucket {
+class IconBucket : public Bucket {
 public:
-    PointBucket(PointVertexBuffer& vertexBuffer,
+    IconBucket(IconVertexBuffer& vertexBuffer,
                 const BucketDescription& bucket_desc);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
     virtual bool hasData() const;
 
-    void addGeometry(pbf& data);
+    void addFeature(const VectorTileFeature &feature, SpriteAtlas &sprite_atlas);
 
-    void drawPoints(PointShader& shader);
-    void drawPoints(DotShader& shader);
+    void drawIcons(IconShader& shader);
+    void drawIcons(DotShader& shader);
 
 public:
     const BucketGeometryDescription geometry;
 
 private:
 
-    PointVertexBuffer& vertexBuffer;
+    IconVertexBuffer& vertexBuffer;
     VertexArrayObject array;
 
     const size_t vertex_start;
