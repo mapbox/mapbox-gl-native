@@ -157,15 +157,15 @@ LayerDescription StyleParser::parseLayer(JSVal value) {
     LayerDescription layer;
 
     if (value.IsObject()) {
-        if (value.HasMember("name")) {
-            JSVal name = value["name"];
+        if (value.HasMember("id")) {
+            JSVal name = value["id"];
             if (name.IsString()) {
                 layer.name = { name.GetString(), name.GetStringLength() };
             } else {
-                throw Style::exception("structure element name must be a string");
+                throw Style::exception("structure element id must be a string");
             }
         } else {
-            throw Style::exception("structure element must have a name");
+            throw Style::exception("structure element must have an id");
         }
 
         if (value.HasMember("bucket")) {
@@ -229,15 +229,15 @@ std::pair<std::string, ClassDescription> StyleParser::parseClassDescription(JSVa
     std::string klass_name;
 
     if (value.IsObject()) {
-        if (value.HasMember("name")) {
-            JSVal name = value["name"];
+        if (value.HasMember("id")) {
+            JSVal name = value["id"];
             if (name.IsString()) {
                 klass_name = { name.GetString(), name.GetStringLength() };
             } else {
-                throw Style::exception("class name must be a string");
+                throw Style::exception("class id must be a string");
             }
         } else {
-            throw Style::exception("class must have a name");
+            throw Style::exception("class must have an id");
         }
 
         if (value.HasMember("layers")) {
@@ -458,12 +458,12 @@ FillClass StyleParser::parseFillClass(JSVal value) {
         klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
     }
 
-    if (value.HasMember("color")) {
-        klass.fill_color = parseColor(value["color"]);
+    if (value.HasMember("fill-color")) {
+        klass.fill_color = parseColor(value["fill-color"]);
     }
 
-    if (value.HasMember("stroke")) {
-        klass.stroke_color = parseColor(value["stroke"]);
+    if (value.HasMember("stroke-color")) {
+        klass.stroke_color = parseColor(value["stroke-color"]);
     } else {
         klass.stroke_color = klass.fill_color;
     }
@@ -499,12 +499,12 @@ LineClass StyleParser::parseLineClass(JSVal value) {
         klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
     }
 
-    if (value.HasMember("color")) {
-        klass.color = parseColor(value["color"]);
+    if (value.HasMember("line-color")) {
+        klass.color = parseColor(value["line-color"]);
     }
 
-    if (value.HasMember("width")) {
-        klass.width = parseFunction(value["width"]);
+    if (value.HasMember("line-width")) {
+        klass.width = parseFunction(value["line-width"]);
     }
 
     if (value.HasMember("opacity")) {
@@ -535,24 +535,24 @@ IconClass StyleParser::parseIconClass(JSVal value) {
         klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
     }
 
-    if (value.HasMember("color")) {
-        klass.color = parseColor(value["color"]);
+    if (value.HasMember("point-color")) {
+        klass.color = parseColor(value["point-color"]);
     }
 
     if (value.HasMember("opacity")) {
         klass.opacity = parseFunction(value["opacity"]);
     }
 
-    if (value.HasMember("image")) {
-        klass.image = parseString(value["image"]);
+    if (value.HasMember("point-image")) {
+        klass.image = parseString(value["point-image"]);
     }
 
     if (value.HasMember("size")) {
         klass.size = parseFunction(value["size"]);
     }
 
-    if (value.HasMember("radius")) {
-        klass.radius = parseFunction(value["radius"]);
+    if (value.HasMember("point-radius")) {
+        klass.radius = parseFunction(value["point-radius"]);
     }
 
     if (value.HasMember("blur")) {
@@ -578,12 +578,12 @@ TextClass StyleParser::parseTextClass(JSVal value) {
         klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
     }
 
-    if (value.HasMember("color")) {
-        klass.color = parseColor(value["color"]);
+    if (value.HasMember("text-color")) {
+        klass.color = parseColor(value["text-color"]);
     }
 
-    if (value.HasMember("stroke")) {
-        klass.halo = parseColor(value["stroke"]);
+    if (value.HasMember("text-halo-color")) {
+        klass.halo = parseColor(value["text-halo-color"]);
     }
 
     if (value.HasMember("strokeWidth")) {
@@ -594,12 +594,12 @@ TextClass StyleParser::parseTextClass(JSVal value) {
         klass.halo_blur = parseFunction(value["strokeBlur"]);
     }
 
-    if (value.HasMember("size")) {
-        klass.size = parseFunction(value["size"]);
+    if (value.HasMember("text-size")) {
+        klass.size = parseFunction(value["text-size"]);
     }
 
-    if (value.HasMember("rotate")) {
-        klass.rotate = parseFunction(value["rotate"]);
+    if (value.HasMember("text-rotate")) {
+        klass.rotate = parseFunction(value["text-rotate"]);
     }
 
     if (value.HasMember("alwaysVisible")) {
