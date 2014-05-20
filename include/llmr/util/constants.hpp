@@ -11,6 +11,13 @@ namespace util {
 extern const float tileSize;
 
 }
+
+namespace debug {
+
+extern const bool styleParseWarnings;
+
+}
+
 }
 
 #endif

@@ -1,4 +1,5 @@
 #include <llmr/style/style_parser.hpp>
+#include <llmr/util/constants.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
 using namespace llmr;
@@ -286,7 +287,9 @@ void StyleParser::parseClass(const std::string &name, JSVal value, ClassDescript
 
     auto layer_bucket_it = layerBuckets.find(name);
     if (layer_bucket_it == layerBuckets.end()) {
-        fprintf(stderr, "there is no layer associated with style '%s'\n", name.c_str());
+        if (debug::styleParseWarnings) {
+            fprintf(stderr, "[WARNING] there is no layer associated with '%s'\n", name.c_str());
+        }
         return;
     }
 
@@ -297,6 +300,9 @@ void StyleParser::parseClass(const std::string &name, JSVal value, ClassDescript
     } else {
         auto bucket_it = buckets.find(bucket_name);
         if (bucket_it == buckets.end()) {
+            if (debug::styleParseWarnings) {
+                fprintf(stderr, "[WARNING] there is no bucket named '%s'\n", bucket_name.c_str());
+            }
             return;
         }
 
