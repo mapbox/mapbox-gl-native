@@ -13,18 +13,15 @@ float functions::null(float, const std::vector<float>&) {
 }
 
 float functions::constant(float, const std::vector<float>& values) {
-    assert(values.size() == 1);
-    return values.front();
+    return values.size() >= 1 ? values.front() : 0.0f;
 }
 
 float functions::min(float z, const std::vector<float>& values) {
-    assert(values.size() == 1);
-    return z >= values.front();
+    return values.size() >= 1 && z >= values.front();
 }
 
 float functions::max(float z, const std::vector<float>& values) {
-    assert(values.size() == 1);
-    return z <= values.front();
+    return values.size() >= 1 && z <= values.front();
 }
 
 float functions::stops(float z, const std::vector<float>& stops) {
