@@ -47,13 +47,10 @@ float functions::stops(float z, const std::vector<float>& stops) {
         if (smaller_val == 0) return factor * larger_val;
         // Exponential interpolation between the values
         return smaller_val * std::pow(larger_val / smaller_val, factor);
-    } else if (larger || smaller) {
-        // Do not draw a line.
-        return -std::numeric_limits<float>::infinity();
-
-        // Exponential extrapolation of the smaller or larger value
-        //var edge = larger || smaller;
-        //return Math.pow(2, z) * (edge.val / Math.pow(2, edge.z));
+    } else if (larger) {
+        return larger_val;
+    } else if (smaller) {
+        return smaller_val;
     } else {
         // No stop defined.
         return 1;
