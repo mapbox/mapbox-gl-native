@@ -27,6 +27,7 @@ void Style::cascade(float z) {
     previous.points = computed.points;
     previous.texts = computed.texts;
     previous.rasters = computed.rasters;
+    previous.background = computed.background;
 
     reset();
 
@@ -596,8 +597,44 @@ void Style::cascade(float z) {
         }
 
         // Cascade background
-        computed.background.color = sheetClass.background.color;
-        computed.background.opacity = sheetClass.background.opacity.evaluate<float>(z);
+
+        // color (transitionable)
+        if (sheetClass.background.color_transition.duration &&
+            !transitions["background"].count(TransitionablePropertyKey::Color) &&
+            sheetClass.background.color != previous.background.color) {
+
+            transitioning.background.color = previous.background.color;
+
+            transitions["background"][TransitionablePropertyKey::Color] =
+                std::make_shared<util::ease_transition<Color>>(previous.background.color,
+                                                               sheetClass.background.color,
+                                                               transitioning.background.color,
+                                                               start,
+                                                               sheetClass.background.color_transition.duration * 1_millisecond);
+        } else if (transitions["background"].count(TransitionablePropertyKey::Color)) {
+            computed.background.color = transitioning.background.color;
+        } else {
+            computed.background.color = sheetClass.background.color;
+        }
+
+        // opacity (transitionable)
+        if (sheetClass.background.opacity_transition.duration &&
+            !transitions["background"].count(TransitionablePropertyKey::Opacity) &&
+            sheetClass.background.opacity.evaluate<float>(z) != previous.background.opacity) {
+
+            transitioning.background.opacity = previous.background.opacity;
+
+            transitions["background"][TransitionablePropertyKey::Opacity] =
+                std::make_shared<util::ease_transition<float>>(previous.background.opacity,
+                                                               sheetClass.background.opacity.evaluate<float>(z),
+                                                               transitioning.background.opacity,
+                                                               start,
+                                                               sheetClass.background.opacity_transition.duration * 1_millisecond);
+        } else if (transitions["background"].count(TransitionablePropertyKey::Opacity)) {
+            computed.background.opacity = transitioning.background.opacity;
+        } else {
+            computed.background.opacity = sheetClass.background.opacity.evaluate<float>(z);
+        }
     }
 }
 
