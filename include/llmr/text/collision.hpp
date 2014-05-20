@@ -18,13 +18,14 @@ public:
     float getPlacementScale(const GlyphBoxes &glyphs, float minPlacementScale,
                             float maxPlacementScale, float pad);
     PlacementRange getPlacementRange(const GlyphBoxes &glyphs,
-                                     float placementScale);
+                                     float placementScale, bool horizontal);
     void insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
                 float placementScale, const PlacementRange &placementRange,
                 bool horizontal, float padding);
 
 private:
-    void *tree;
+    void *cTree;
+    void *hTree;
 };
 }
 

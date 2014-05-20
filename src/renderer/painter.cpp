@@ -171,6 +171,7 @@ void Painter::renderTileLayer(const Tile& tile, const LayerDescription &layer_de
     }
 }
 
+
 const mat4 &Painter::translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchor anchor) {
     if (translation[0] == 0 && translation[1] == 0) {
         return matrix;

@@ -139,10 +139,10 @@ void Map::setup() {
 
     painter.setup();
 
-    sources.emplace("mapbox streets",
+    sources.emplace("outdoors",
                     std::unique_ptr<Source>(new Source(*this,
                            painter,
-                           "http://a.gl-api-us-east-1.tilestream.net/v3/mapbox.mapbox-streets-v4/%d/%d/%d.gl.pbf",
+                           "http://api-maps-gl.tilestream.net/v3/mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5/%d/%d/%d.gl.pbf",
                            Source::Type::vector,
                            {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }},
                            512,
@@ -499,6 +499,8 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers, RenderPass p
     } else {
         throw std::runtime_error("unknown render pass");
     }
+
+    glFlush();
 }
 
 template <typename Styles>
