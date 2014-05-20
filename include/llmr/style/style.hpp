@@ -7,6 +7,8 @@
 #include <llmr/style/bucket_description.hpp>
 #include <llmr/style/layer_description.hpp>
 #include <llmr/style/class_description.hpp>
+#include <llmr/util/transition.hpp>
+#include <llmr/util/uv.hpp>
 
 #include <map>
 #include <vector>
@@ -31,6 +33,10 @@ public:
     size_t layerCount() const;
     void cascade(float z);
 
+    bool needsTransition() const;
+    void updateTransitions(time now);
+    void cancelTransitions();
+
 public:
     std::shared_ptr<Sprite> sprite;
 
@@ -50,6 +56,32 @@ public:
         std::map<std::string, TextProperties> texts;
         std::map<std::string, RasterProperties> rasters;
     } computed;
+
+    // These are the last applied settings for comparison.
+    struct {
+        BackgroundProperties background;
+        std::map<std::string, FillProperties> fills;
+        std::map<std::string, LineProperties> lines;
+        std::map<std::string, PointProperties> points;
+        std::map<std::string, TextProperties> texts;
+        std::map<std::string, RasterProperties> rasters;
+    } previous;
+
+    // These are settings values currently being transitioned.
+    struct {
+        BackgroundProperties background;
+        std::map<std::string, FillProperties> fills;
+        std::map<std::string, LineProperties> lines;
+        std::map<std::string, PointProperties> points;
+        std::map<std::string, TextProperties> texts;
+        std::map<std::string, RasterProperties> rasters;
+    } transitioning;
+
+    std::map<std::string, std::map<PropertyKey, std::shared_ptr<util::transition>>> transitions;
+
+private:
+    mutable uv::rwlock mtx;
+
 };
 
 }

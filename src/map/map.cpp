@@ -388,6 +388,11 @@ void Map::prepare() {
 
     state = transform.currentState();
     style.cascade(state.getNormalizedZoom());
+    animationTime = util::now();
+    if (style.needsTransition()) {
+        style.updateTransitions(animationTime);
+        update();
+    }
     if (!style.sprite || style.sprite->pixelRatio != state.getPixelRatio()) {
         style.sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
         style.sprite->load(kSpriteURL);

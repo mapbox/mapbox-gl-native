@@ -571,7 +571,7 @@ module.exports = {
         "hospital": "#fde",
         "school": "#f0e8f8",
         "wood": "#6a4",
-        "building": "#f2eae2",
+        "building": "#ffffff",
         "building_shadow": "#dfdbd7",
         "aeroway": "#f0ede9",
         "motorway": "#fc8",
@@ -2072,7 +2072,8 @@ module.exports = {
         "name": "satellite",
         "layers": {
             "building": {
-                "enabled": false,
+                "color": "#f00",
+                "transition-color": { "duration": 3000, "delay": 0 },
             },
             "building_wall": {
                 "enabled": false,
@@ -2080,6 +2081,9 @@ module.exports = {
             "building_shadow": {
                 "enabled": false,
             },
+            "satellite": {
+                "enabled": false,
+            }
         }
     }],
     "sprite": "/img/maki-sprite"

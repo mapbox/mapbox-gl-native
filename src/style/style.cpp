@@ -20,6 +20,9 @@ void Style::reset() {
 }
 
 void Style::cascade(float z) {
+    time start = util::now();
+
+    previous.fills = computed.fills;
     reset();
 
     // Recalculate style
@@ -39,15 +42,111 @@ void Style::cascade(float z) {
             // TODO: This should be restricted to fill styles that have actual
             // values so as to not override with default values.
             llmr::FillProperties& fill = computed.fills[layer_name];
+
+            // enabled
             fill.enabled = layer.enabled.evaluate<bool>(z);
-            fill.translate = {{ layer.translate[0].evaluate<float>(z),
-                                layer.translate[1].evaluate<float>(z) }};
+
+            // translate (transitionable)
+            if (layer.translate_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::Translate) &&
+                (layer.translate[0].evaluate<float>(z) != previous.fills[layer_name].translate[0] ||
+                 layer.translate[1].evaluate<float>(z) != previous.fills[layer_name].translate[1])) {
+
+                transitioning.fills[layer_name].translate = {{ previous.fills[layer_name].translate[0],
+                                                               previous.fills[layer_name].translate[1] }};
+
+                std::vector<float> from, to, transitioning_ref;
+                from.push_back(previous.fills[layer_name].translate[0]);
+                from.push_back(previous.fills[layer_name].translate[1]);
+                to.push_back(layer.translate[0].evaluate<float>(z));
+                to.push_back(layer.translate[1].evaluate<float>(z));
+                transitioning_ref.push_back(transitioning.fills[layer_name].translate[0]);
+                transitioning_ref.push_back(transitioning.fills[layer_name].translate[1]);
+                transitions[layer_name][PropertyKey::Translate] = std::make_shared<util::ease_transition<std::vector<float>>>(
+                                                                      from,
+                                                                      to,
+                                                                      transitioning_ref,
+                                                                      start,
+                                                                      layer.translate_transition.duration * 1_millisecond
+                                                                  );
+            } else if (transitions[layer_name].count(PropertyKey::Translate)) {
+                fill.translate = transitioning.fills[layer_name].translate;
+            } else {
+                fill.translate = {{ layer.translate[0].evaluate<float>(z), layer.translate[1].evaluate<float>(z) }};
+            }
+
+            // translate anchor
             fill.translateAnchor = layer.translateAnchor;
+
+            // winding
             fill.winding = layer.winding;
+
+            // antialias
             fill.antialias = layer.antialias.evaluate<bool>(z);
-            fill.fill_color = layer.fill_color;
-            fill.stroke_color = layer.stroke_color;
-            fill.opacity = layer.opacity.evaluate<float>(z);
+
+            // fill color (transitionable)
+            if (layer.fill_color_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::FillColor) &&
+                layer.fill_color != previous.fills[layer_name].fill_color) {
+
+                transitioning.fills[layer_name].fill_color = previous.fills[layer_name].fill_color;
+
+                transitions[layer_name][PropertyKey::FillColor] = std::make_shared<util::ease_transition<Color>>(
+                                                                      previous.fills[layer_name].fill_color,
+                                                                      layer.fill_color,
+                                                                      transitioning.fills[layer_name].fill_color,
+                                                                      start,
+                                                                      layer.fill_color_transition.duration * 1_millisecond
+                                                                  );
+            } else if (transitions[layer_name].count(PropertyKey::FillColor)) {
+                fill.fill_color = transitioning.fills[layer_name].fill_color;
+            }
+            else {
+                fill.fill_color = layer.fill_color;
+            }
+
+            // stroke color (transitionable)
+            if (layer.stroke_color_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::StrokeColor) &&
+                layer.stroke_color != previous.fills[layer_name].stroke_color) {
+
+                transitioning.fills[layer_name].stroke_color = previous.fills[layer_name].stroke_color;
+
+                transitions[layer_name][PropertyKey::StrokeColor] = std::make_shared<util::ease_transition<Color>>(
+                                                                        previous.fills[layer_name].stroke_color,
+                                                                        layer.stroke_color,
+                                                                        transitioning.fills[layer_name].stroke_color,
+                                                                        start,
+                                                                        layer.stroke_color_transition.duration * 1_millisecond
+                                                                    );
+            } else if (transitions[layer_name].count(PropertyKey::StrokeColor)) {
+                fill.stroke_color = transitioning.fills[layer_name].stroke_color;
+            }
+            else {
+                fill.stroke_color = layer.stroke_color;
+            }
+
+            // opacity (transitionable)
+            if (layer.opacity_transition.duration &&
+                !transitions[layer_name].count(PropertyKey::Opacity) &&
+                layer.opacity.evaluate<float>(z) != previous.fills[layer_name].opacity) {
+
+                transitioning.fills[layer_name].opacity = previous.fills[layer_name].opacity;
+
+                transitions[layer_name][PropertyKey::Opacity] = std::make_shared<util::ease_transition<float>>(
+                                                                    previous.fills[layer_name].opacity,
+                                                                    layer.opacity.evaluate<float>(z),
+                                                                    transitioning.fills[layer_name].opacity,
+                                                                    start,
+                                                                    layer.opacity_transition.duration * 1_millisecond
+                                                                );
+            } else if (transitions[layer_name].count(PropertyKey::Opacity)) {
+                fill.opacity = transitioning.fills[layer_name].opacity;
+            } else {
+                fill.opacity = layer.opacity.evaluate<float>(z);
+            }
+
+            // image
             fill.image = layer.image;
         }
 
@@ -128,6 +227,41 @@ void Style::cascade(float z) {
         computed.background.color = sheetClass.background.color;
         computed.background.opacity = sheetClass.background.opacity.evaluate<float>(z);
     }
+}
+
+bool Style::needsTransition() const {
+    uv::readlock lock(mtx);
+
+    for (auto layer_it = transitions.begin(); layer_it != transitions.end(); layer_it++) {
+        for (auto prop_it = layer_it->second.begin(); prop_it != layer_it->second.end(); prop_it++) {
+            if (prop_it->second) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void Style::updateTransitions(time now) {
+    uv::writelock lock(mtx);
+
+    for (auto layer_it = transitions.begin(); layer_it != transitions.end(); layer_it++) {
+        for (auto prop_it = layer_it->second.begin(); prop_it != layer_it->second.end();/**/) {
+            std::shared_ptr<util::transition>& transition = prop_it->second;
+            if (transition->update(now) == util::transition::complete) {
+                prop_it = transitions[layer_it->first].erase(prop_it);
+            } else {
+                prop_it++;
+            }
+        }
+    }
+}
+
+void Style::cancelTransitions() {
+    uv::writelock lock(mtx);
+
+    transitions.clear();
 }
 
 size_t Style::layerCount() const {

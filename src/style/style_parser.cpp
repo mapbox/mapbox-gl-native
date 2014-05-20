@@ -435,6 +435,29 @@ FunctionProperty StyleParser::parseFunction(JSVal value) {
     return property;
 }
 
+PropertyTransition StyleParser::parseTransition(JSVal value, std::string property_name) {
+    uint16_t duration = 0, delay = 0;
+    std::string transition_property = std::string("transition-").append(property_name);
+    if (value.HasMember(transition_property.c_str())) {
+        JSVal elements = value[transition_property.c_str()];
+        if (elements.IsObject()) {
+            if (elements.HasMember("duration") && elements["duration"].IsNumber()) {
+                duration = elements["duration"].GetUint();
+            }
+            if (elements.HasMember("delay") && elements["delay"].IsNumber()) {
+                delay = elements["delay"].GetUint();
+            }
+        }
+    }
+
+    PropertyTransition transition;
+
+    transition.duration = duration;
+    transition.delay = delay;
+
+    return transition;
+}
+
 FillClass StyleParser::parseFillClass(JSVal value) {
     FillClass klass;
 
@@ -445,6 +468,7 @@ FillClass StyleParser::parseFillClass(JSVal value) {
     if (value.HasMember("translate")) {
         std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+        klass.translate_transition = parseTransition(value, "translate");
     }
 
     if (value.HasMember("translate-anchor")) {
@@ -453,10 +477,12 @@ FillClass StyleParser::parseFillClass(JSVal value) {
 
     if (value.HasMember("color")) {
         klass.fill_color = parseColor(value["color"]);
+        klass.fill_color_transition = parseTransition(value, "color");
     }
 
     if (value.HasMember("stroke")) {
         klass.stroke_color = parseColor(value["stroke"]);
+        klass.stroke_color_transition = parseTransition(value, "stroke");
     } else {
         klass.stroke_color = klass.fill_color;
     }
@@ -471,6 +497,7 @@ FillClass StyleParser::parseFillClass(JSVal value) {
 
     if (value.HasMember("opacity")) {
         klass.opacity = parseFunction(value["opacity"]);
+        klass.opacity_transition = parseTransition(value, "opacity");
     }
 
     return klass;
@@ -486,6 +513,7 @@ LineClass StyleParser::parseLineClass(JSVal value) {
     if (value.HasMember("translate")) {
         std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+        klass.translate_transition = parseTransition(value, "translate");
     }
 
     if (value.HasMember("translate-anchor")) {
@@ -494,19 +522,23 @@ LineClass StyleParser::parseLineClass(JSVal value) {
 
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
+        klass.color_transition = parseTransition(value, "color");
     }
 
     if (value.HasMember("width")) {
         klass.width = parseFunction(value["width"]);
+        klass.width_transition = parseTransition(value, "width");
     }
 
     if (value.HasMember("opacity")) {
         klass.opacity = parseFunction(value["opacity"]);
+        klass.opacity_transition = parseTransition(value, "opacity");
     }
 
     if (value.HasMember("dasharray")) {
         std::vector<FunctionProperty> values = parseArray(value["dasharray"], 2);
         klass.dash_array = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+        klass.dash_array_transition = parseTransition(value, "dasharray");
     }
 
     return klass;
@@ -522,6 +554,7 @@ PointClass StyleParser::parsePointClass(JSVal value) {
     if (value.HasMember("translate")) {
         std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+        klass.translate_transition = parseTransition(value, "translate");
     }
 
     if (value.HasMember("translate-anchor")) {
@@ -530,10 +563,12 @@ PointClass StyleParser::parsePointClass(JSVal value) {
 
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
+        klass.color_transition = parseTransition(value, "color");
     }
 
     if (value.HasMember("opacity")) {
         klass.opacity = parseFunction(value["opacity"]);
+        klass.opacity_transition = parseTransition(value, "opacity");
     }
 
     if (value.HasMember("image")) {
@@ -546,10 +581,12 @@ PointClass StyleParser::parsePointClass(JSVal value) {
 
     if (value.HasMember("radius")) {
         klass.radius = parseFunction(value["radius"]);
+        klass.radius_transition = parseTransition(value, "radius");
     }
 
     if (value.HasMember("blur")) {
         klass.blur = parseFunction(value["blur"]);
+        klass.blur_transition = parseTransition(value, "blur");
     }
 
     return klass;
@@ -565,6 +602,7 @@ TextClass StyleParser::parseTextClass(JSVal value) {
     if (value.HasMember("translate")) {
         std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+        klass.translate_transition = parseTransition(value, "translate");
     }
 
     if (value.HasMember("translate-anchor")) {
@@ -573,14 +611,17 @@ TextClass StyleParser::parseTextClass(JSVal value) {
 
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
+        klass.color_transition = parseTransition(value, "color");
     }
 
     if (value.HasMember("stroke")) {
         klass.halo = parseColor(value["stroke"]);
+        klass.halo_transition = parseTransition(value, "stroke");
     }
 
     if (value.HasMember("strokeWidth")) {
         klass.halo_radius = parseFunction(value["strokeWidth"]);
+        klass.halo_radius_transition = parseTransition(value, "strokeWidth");
     }
 
     if (value.HasMember("size")) {
@@ -607,6 +648,7 @@ RasterClass StyleParser::parseRasterClass(JSVal value) {
 
     if (value.HasMember("opacity")) {
         klass.opacity = parseFunction(value["opacity"]);
+        klass.opacity_transition = parseTransition(value, "opacity");
     }
 
     return klass;
@@ -617,10 +659,12 @@ BackgroundClass StyleParser::parseBackgroundClass(JSVal value) {
 
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
+        klass.color_transition = parseTransition(value, "color");
     }
 
     if (value.HasMember("opacity")) {
         klass.opacity = parseFunction(value["opacity"]);
+        klass.opacity_transition = parseTransition(value, "opacity");
     }
 
     return klass;
