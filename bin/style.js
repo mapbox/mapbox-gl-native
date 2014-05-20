@@ -2,10 +2,10 @@
 
 module.exports = {
     "buckets": {
-        "satellite": {
-            "source": "satellite",
-            "type": "raster"
-        },
+        // "satellite": {
+        //     "source": "satellite",
+        //     "type": "raster"
+        // },
         "admin_maritime": {
             "source": "outdoors",
             "layer": "admin",
@@ -146,6 +146,48 @@ module.exports = {
             "layer": "landuse",
             "field": "class",
             "value": "school",
+            "type": "fill"
+        },
+        "landuse_wood": {
+            "source": "outdoors",
+            "layer": "landuse",
+            "field": "class",
+            "value": "wood",
+            "type": "fill"
+        },
+        "landuse_scrub": {
+            "source": "outdoors",
+            "layer": "landuse",
+            "field": "class",
+            "value": "scrub",
+            "type": "fill"
+        },
+        "landuse_grass": {
+            "source": "outdoors",
+            "layer": "landuse",
+            "field": "class",
+            "value": "grass",
+            "type": "fill"
+        },
+        "landuse_crop": {
+            "source": "outdoors",
+            "layer": "landuse",
+            "field": "class",
+            "value": "crop",
+            "type": "fill"
+        },
+        "landuse_sand": {
+            "source": "outdoors",
+            "layer": "landuse",
+            "field": "class",
+            "value": "sand",
+            "type": "fill"
+        },
+        "landuse_rock": {
+            "source": "outdoors",
+            "layer": "landuse",
+            "field": "class",
+            "value": "rock",
             "type": "fill"
         },
         "overlay_wetland": {
@@ -839,6 +881,30 @@ module.exports = {
             "bucket": "landcover_snow"
         },
         {
+            "name": "landuse_wood",
+            "bucket": "landuse_wood"
+        },
+        {
+            "name": "landuse_scrub",
+            "bucket": "landuse_scrub"
+        },
+        {
+            "name": "landuse_grass",
+            "bucket": "landuse_grass"
+        },
+        {
+            "name": "landuse_crop",
+            "bucket": "landuse_crop"
+        },
+        {
+            "name": "landuse_sand",
+            "bucket": "landuse_sand"
+        },
+        {
+            "name": "landuse_rock",
+            "bucket": "landuse_rock"
+        },
+        {
             "name": "landuse_park",
             "bucket": "landuse_park"
         },
@@ -1363,6 +1429,34 @@ module.exports = {
                 },
                 "landcover_snow": {
                     "color": "snow",
+                    "opacity": 0.8
+                },
+                "landuse_wood": {
+                    "color": "wood",
+                    "opacity": 0.8
+                },
+                "landuse_scrub": {
+                    "color": "scrub",
+                    "opacity": 0.8
+                },
+                "landuse_grass": {
+                    "color": "grass",
+                    "opacity": 0.8
+                },
+                "landuse_crop": {
+                    "color": "crop",
+                    "opacity": 0.8
+                },
+                "landuse_snow": {
+                    "color": "snow",
+                    "opacity": 0.8
+                },
+                "landuse_rock": {
+                    "color": "rock",
+                    "opacity": 0.8
+                },
+                "landuse_sand": {
+                    "color": "sand",
                     "opacity": 0.8
                 },
                 "landuse_park": {
@@ -2229,23 +2323,39 @@ module.exports = {
                 "poi_aerodrome": {
                     "antialias": false
                 },
-                "satellite": {
-                    "type": "raster",
-                    "opacity": 0.25
-                }
+                // "satellite": {
+                //     "type": "raster",
+                //     "opacity": 0.25
+                // }
             }
         },
         {
             "name": "satellite",
             "layers": {
-                "building": {
-                    "enabled": false
+                "background": {
+                    "color": "#017293"
                 },
-                "building_wall": {
-                    "enabled": false
+                "water": {
+                    "color": "#103",
+                    "stroke": "#003366"
                 },
-                "building_shadow": {
-                    "enabled": false
+                "landcover_crop": {
+                    "color": "#178d96"
+                },
+                "landcover_grass": {
+                    "color": "#23948a"
+                },
+                "landcover_scrub": {
+                    "color": "#31a186"
+                },
+                "landcover_wood": {
+                    "color": "#45b581"
+                },
+                "admin_maritime_cover": {
+                    "color": "#103"
+                },
+                "admin_maritime": {
+                    "color": "#003366"
                 }
             }
         }
