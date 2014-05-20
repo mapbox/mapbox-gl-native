@@ -18,6 +18,7 @@ void Style::reset() {
     computed.icons.clear();
     computed.texts.clear();
     computed.rasters.clear();
+    computed.composites.clear();
 }
 
 void Style::cascade(float z) {
@@ -129,6 +130,19 @@ void Style::cascade(float z) {
             raster.enabled = layer.enabled.evaluate<bool>(z);
             raster.opacity = layer.opacity.evaluate<float>(z);
         }
+
+        // Cascade composite classes
+        for (const auto& composite_pair : sheetClass.composite) {
+            const std::string& layer_name = composite_pair.first;
+            const llmr::CompositeClass& layer = composite_pair.second;
+
+            // TODO: This should be restricted to composite styles that have actual
+            // values so as to not override with default values.
+            llmr::CompositeProperties& composite = computed.composites[layer_name];
+            composite.enabled = layer.enabled.evaluate<bool>(z);
+            composite.opacity = layer.opacity.evaluate<float>(z);
+        }
+
 
         // Cascade background
         computed.background.color = sheetClass.background.color;

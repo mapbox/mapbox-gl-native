@@ -14,9 +14,9 @@ extern const float tileSize;
 
 namespace debug {
 
-const bool styleParseWarnings = true;
-const bool renderWarnings = true;
-const bool renderTree = true;
+extern const bool styleParseWarnings;
+extern const bool renderWarnings;
+extern const bool renderTree;
 
 }
 

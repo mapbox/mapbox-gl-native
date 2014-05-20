@@ -1,13 +1,13 @@
-#ifndef LLMR_RENDERER_SHADER_RASTER
-#define LLMR_RENDERER_SHADER_RASTER
+#ifndef LLMR_SHADER_COMPOSITE_SHADER
+#define LLMR_SHADER_COMPOSITE_SHADER
 
 #include <llmr/shader/shader.hpp>
 
 namespace llmr {
 
-class RasterShader : public Shader {
+class CompositeShader : public Shader {
 public:
-    RasterShader();
+    CompositeShader();
 
     void bind(char *offset);
 

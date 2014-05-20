@@ -297,6 +297,9 @@ void StyleParser::parseClass(const std::string &name, JSVal value, ClassDescript
     if (bucket_name == "background") {
         // background buckets are fake
         class_desc.background = parseBackgroundClass(value);
+    } else if (bucket_name.length() == 0) {
+        // no bucket name == composite bucket.
+        class_desc.composite.insert({ name, std::forward<CompositeClass>(parseCompositeClass(value)) });
     } else {
         auto bucket_it = buckets.find(bucket_name);
         if (bucket_it == buckets.end()) {
@@ -643,6 +646,20 @@ TextClass StyleParser::parseTextClass(JSVal value) {
 
 RasterClass StyleParser::parseRasterClass(JSVal value) {
     RasterClass klass;
+
+    if (value.HasMember("enabled")) {
+        klass.enabled = parseFunction(value["enabled"]);
+    }
+
+    if (value.HasMember("opacity")) {
+        klass.opacity = parseFunction(value["opacity"]);
+    }
+
+    return klass;
+}
+
+CompositeClass StyleParser::parseCompositeClass(JSVal value) {
+    CompositeClass klass;
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);

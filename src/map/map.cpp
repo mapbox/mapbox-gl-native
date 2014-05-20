@@ -35,6 +35,8 @@ Map::Map(View& view)
 }
 
 Map::~Map() {
+    clearFramebuffers();
+
     uv_loop_delete(loop);
     loop = nullptr;
 }
@@ -513,38 +515,59 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers) {
 }
 
 template <typename Styles>
-bool is_invisible(const Styles &styles, const LayerDescription &layer_desc) {
+typename Styles::const_iterator find_style(const Styles &styles, const LayerDescription &layer_desc) {
     auto it = styles.find(layer_desc.name);
     if (it == styles.end()) {
         if (debug::renderWarnings) {
             fprintf(stderr, "[WARNING] can't find class named '%s' in style\n",
                     layer_desc.name.c_str());
         }
-        return true;
     }
-    const auto &properties = it->second;
+    return it;
+}
+
+template <typename Properties>
+bool is_invisible(const Properties &properties) {
     if (!properties.enabled) { return true; }
     if (properties.opacity <= 0) { return true; }
     return false;
+}
+
+template <typename Styles>
+bool is_invisible(const Styles &styles, const LayerDescription &layer_desc) {
+    auto it = find_style(styles, layer_desc);
+    if (it == styles.end()) { return true; }
+    return is_invisible(it->second);
 }
 
 void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
     if (layer_desc.child_layer.size()) {
         // This is a layer group. We render them during our translucent render pass.
         if (pass == Translucent) {
-            gl::group group(std::string("group: ") + layer_desc.name);
+            auto it = find_style(style.computed.composites, layer_desc);
+            if (it != style.computed.composites.end() && !is_invisible(it->second)) {
+                const CompositeProperties &properties = it->second;
+                gl::group group(std::string("group: ") + layer_desc.name);
 
-            if (debug::renderTree) {
-                std::cout << std::string(indent++ * 4, ' ') << "+ " << layer_desc.name
-                          << " (Composite) {" << std::endl;
-            }
+                if (debug::renderTree) {
+                    std::cout << std::string(indent++ * 4, ' ') << "+ " << layer_desc.name
+                              << " (Composite) {" << std::endl;
+                }
 
-            // TODO: create framebuffer
-            renderLayers(layer_desc.child_layer);
-            // TODO: render framebuffer on previous framebuffer
+                pushFramebuffer();
 
-            if (debug::renderTree) {
-                std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
+                glClear(GL_COLOR_BUFFER_BIT);
+
+                renderLayers(layer_desc.child_layer);
+
+                GLuint texture = popFramebuffer();
+
+                // Render the previous texture onto the screen.
+                painter.drawComposite(texture, properties);
+
+                if (debug::renderTree) {
+                    std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
+                }
             }
         }
     } else if (layer_desc.bucket_name == "background") {
@@ -606,4 +629,74 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
             }
         }
     }
+}
+
+void Map::clearFramebuffers() {
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+    // Delete any framebuffers that we might have allocated
+    glDeleteTextures(fbos_color.size(), fbos.data());
+    fbos_color.clear();
+
+    glDeleteFramebuffersEXT(fbos.size(), fbos.data());
+    fbos.clear();
+}
+
+void Map::bindFramebuffer() {
+    if (fbo_level < 0) {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    } else if (fbos.size() > (size_t)fbo_level) {
+        GLuint fbo = fbos[fbo_level];
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+    } else {
+        // TODO: Convert this to textures so we can composite them and use them in blend operations
+
+        GLuint fbo_color;
+        glGenTextures(1, &fbo_color);
+        glBindTexture(GL_TEXTURE_2D, fbo_color);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, state.getFramebufferWidth(), state.getFramebufferHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        fbos_color.emplace_back(fbo_color);
+
+        // TODO: Stencil/Depth buffer
+
+        // Allocate new framebuffer
+        GLuint fbo = 0;
+        glGenFramebuffersEXT(1, &fbo);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+        fbos.emplace_back(fbo);
+
+        // Assemble the FBO
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_color, 0);
+        // TODO: Stencil/Depth buffer
+
+        GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+        if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+            fprintf(stderr, "Couldn't create framebuffer: ");
+            switch (status) {
+                case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT: fprintf(stderr, "incomplete attachment\n"); break;
+                case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT: fprintf(stderr, "incomplete missing attachment\n"); break;
+                case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: fprintf(stderr, "incomplete draw buffer\n"); break;
+                case GL_FRAMEBUFFER_UNSUPPORTED: fprintf(stderr, "unsupported\n"); break;
+                default: fprintf(stderr, "other\n"); break;
+            }
+            return;
+        }
+    }
+}
+
+void Map::pushFramebuffer() {
+    fbo_level++;
+    bindFramebuffer();
+}
+
+GLuint Map::popFramebuffer() {
+    GLuint texture = fbos_color[fbo_level];
+    fbo_level--;
+    bindFramebuffer();
+    return texture;
 }

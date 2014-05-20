@@ -18,6 +18,7 @@
 #include <llmr/shader/raster_shader.hpp>
 #include <llmr/shader/text_shader.hpp>
 #include <llmr/shader/dot_shader.hpp>
+#include <llmr/shader/composite_shader.hpp>
 
 #include <llmr/map/transform_state.hpp>
 
@@ -86,6 +87,8 @@ public:
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
     void finishClippingMask();
 
+    void drawComposite(GLuint texture, const CompositeProperties &properties);
+
     bool needsAnimation() const;
 private:
     void setupShaders();
@@ -127,6 +130,7 @@ private:
     std::unique_ptr<RasterShader> rasterShader;
     std::unique_ptr<TextShader> textShader;
     std::unique_ptr<DotShader> dotShader;
+    std::unique_ptr<CompositeShader> compositeShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     VertexBuffer tileStencilBuffer = {
@@ -144,6 +148,8 @@ private:
     VertexArrayObject coveringPlainArray;
     VertexArrayObject coveringPatternArray;
     VertexArrayObject coveringRasterArray;
+
+    VertexArrayObject compositeArray;
     VertexArrayObject matteArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.

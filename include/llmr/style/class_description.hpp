@@ -16,6 +16,7 @@ public:
     std::map<std::string, IconClass> icon;
     std::map<std::string, TextClass> text;
     std::map<std::string, RasterClass> raster;
+    std::map<std::string, CompositeClass> composite;
 };
 
 

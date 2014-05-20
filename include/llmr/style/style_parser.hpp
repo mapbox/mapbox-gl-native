@@ -36,6 +36,7 @@ private:
     TextClass parseTextClass(JSVal value);
     BackgroundClass parseBackgroundClass(JSVal value);
     RasterClass parseRasterClass(JSVal value);
+    CompositeClass parseCompositeClass(JSVal value);
 
     bool parseBoolean(JSVal value);
     std::string parseString(JSVal value);

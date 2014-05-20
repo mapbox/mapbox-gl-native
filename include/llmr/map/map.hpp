@@ -123,6 +123,11 @@ private:
     void renderLayers(const std::vector<LayerDescription>& layers);
     void renderLayer(const LayerDescription& layer_desc, RenderPass pass);
 
+    void clearFramebuffers();
+    void bindFramebuffer();
+    void pushFramebuffer();
+    GLuint popFramebuffer();
+
 private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
     // render the map.
@@ -153,6 +158,10 @@ private:
     time animationTime = 0;
 
     int indent = 0;
+
+    std::vector<GLuint> fbos;
+    std::vector<GLuint> fbos_color;
+    int fbo_level = -1;
 
 private:
     bool async = false;

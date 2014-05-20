@@ -50,6 +50,7 @@ public:
         std::map<std::string, IconProperties> icons;
         std::map<std::string, TextProperties> texts;
         std::map<std::string, RasterProperties> rasters;
+        std::map<std::string, CompositeProperties> composites;
     } computed;
 };
 

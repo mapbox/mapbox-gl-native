@@ -38,6 +38,7 @@ void Painter::setup() {
     assert(rasterShader);
     assert(textShader);
     assert(dotShader);
+    assert(compositeShader);
 
 
     // Blending
@@ -67,6 +68,7 @@ void Painter::setupShaders() {
     rasterShader = std::make_unique<RasterShader>();
     textShader = std::make_unique<TextShader>();
     dotShader = std::make_unique<DotShader>();
+    compositeShader = std::make_unique<CompositeShader>();
 }
 
 void Painter::resize() {
