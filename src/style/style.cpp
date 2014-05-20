@@ -1,5 +1,6 @@
 #include <llmr/style/style.hpp>
 #include <llmr/style/style_parser.hpp>
+#include <llmr/util/constants.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
@@ -21,6 +22,10 @@ void Style::reset() {
 
 void Style::cascade(float z) {
     reset();
+
+    // Accomodate for different tile size.
+    // TODO: Make this per-layer once individual layers have a specific tile size.
+    z += std::log(util::tileSize / 256.0f) / M_LN2;
 
     // Recalculate style
     // Basic cascading
