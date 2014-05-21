@@ -496,6 +496,7 @@ FillClass StyleParser::parseFillClass(JSVal value) {
         klass.specifiers.insert("stroke");
     } else {
         klass.stroke_color = klass.fill_color;
+        klass.specifiers.insert("stroke");
     }
 
     if (value.HasMember("antialias")) {
