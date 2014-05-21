@@ -90,7 +90,7 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("font stack must be a string");
             }
-        } else if (name == "fontSize" || name == "size") {
+        } else if (name == "text-max-size" || name == "size") {
             if (value.IsNumber()) {
                 bucket.geometry.size = value.GetDouble();
             } else {
@@ -102,11 +102,11 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("text field must be a string");
             }
-        } else if (name == "path") {
+        } else if (name == "text-path") {
             if (value.IsString()) {
                 bucket.geometry.path = textPathType({ value.GetString(), value.GetStringLength() });
             } else {
-                throw Style::exception("curve must be a string");
+                throw Style::exception("text-path must be a string");
             }
         } else if (name == "line-miter-limit") {
             if (value.IsNumber()) {
@@ -120,17 +120,17 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("line round limit must be a number");
             }
-        } else if (name == "textMinDistance") {
+        } else if (name == "text-min-distance") {
             if (value.IsNumber()) {
                 bucket.geometry.textMinDistance = value.GetDouble();
             } else {
                 throw Style::exception("text min distance must be a number");
             }
-        } else if (name == "maxAngleDelta") {
+        } else if (name == "text-max-angle") {
             if (value.IsNumber()) {
                 bucket.geometry.maxAngleDelta = value.GetDouble();
             } else {
-                throw Style::exception("max angle delta must be a number");
+                throw Style::exception("text max angle delta must be a number");
             }
         }
 
@@ -610,8 +610,8 @@ TextClass StyleParser::parseTextClass(JSVal value) {
         klass.rotate = parseFunction(value["text-rotate"]);
     }
 
-    if (value.HasMember("alwaysVisible")) {
-        klass.alwaysVisible = parseFunction(value["alwaysVisible"]);
+    if (value.HasMember("text-always-visible")) {
+        klass.alwaysVisible = parseFunction(value["text-always-visible"]);
     }
 
     return klass;
