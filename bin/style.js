@@ -1352,7 +1352,7 @@ module.exports = {
         "grass_night": "#23948a",
         "scrub_night": "#31a186",
         "wood_night": "#45b581",
-        "park_night": "#6ad0a1",
+        "park_night": "#51bd8b",
         "snow_night": "#5ad9fe",
         "rock_night": "#999",
         "sand_night": "#437162",
@@ -1362,14 +1362,15 @@ module.exports = {
         "hospital_night": "#015e7a",
         "builtup_night": "#014b60",
 
+        "admin_night": "#ffb680",
         "text_night": "#fff",
         "text_stroke_night": "#103",
 
-        "case_night": "#026986",
-        "street_case_night": "#056585",
+        "case_night": "#015e7a",
+        "street_case_night": "#015b76",
         "motorway_night": "#eee",
-        "main_night": "#95ccdb",
-        "street_night": "#0291b5",
+        "main_night": "#64b2c9",
+        "street_night": "#0186ac",
         "contour_night": "#ffff80",
 
         "river_canal_width": [
@@ -2387,12 +2388,12 @@ module.exports = {
                 },
                 "admin_maritime_cover": {
                     "transition-color": {"duration": 300},
-                    "color": "water_night",
+                    "color": "#0a1347",
                     "width": 5
                 },
                 "admin_maritime": {
                     "transition-color": {"duration": 300},
-                    "color": "water_night",
+                    "color": "#0a1347",
                     "width": [
                         "stops",
                         {"z": 6, "val": 1},
@@ -2402,12 +2403,12 @@ module.exports = {
                 },
                 "admin_l2": {
                     "transition-color": {"duration": 300},
-                    "color": "#ccc",
+                    "color": "admin_night",
                     "width": "admin_l2_width"
                 },
                 "admin_l3": {
                     "transition-color": {"duration": 300},
-                    "color": "#ccc",
+                    "color": "admin_night",
                     "dasharray": [
                         60,
                         20
@@ -2431,14 +2432,14 @@ module.exports = {
                 },
                 "barrier_line_gate": {
                     "width": 2.5,
-                    "color": "#aab"
+                    "color": "#59596f"
                 },
                 "barrier_line_fence": {
-                    "color": "#024e64",
+                    "color": "#014b61",
                     "width": "fence_width"
                 },
                 "barrier_line_hedge": {
-                    "color": "#3aab79",
+                    "color": "#2e7a57",
                     "width": "hedge_width"
                 },
                 "barrier_line_land": {
@@ -2591,23 +2592,22 @@ module.exports = {
                     "antialias": false,
                     "opacity": [
                         "stops",
-                        {"z": 0, "val": 0.7},
-                        {"z": 15, "val": 0.5},
-                        {"z": 17, "val": 0.3},
+                        {"z": 14, "val": 0.4},
+                        {"z": 15, "val": 0.3},
+                        {"z": 17, "val": 0.2},
                         {"z": 18, "val": 0.1}
                     ]
                 },
                 "hillshade_medium_highlight": {
                     "transition-color": {"duration": 300},
                     "transition-opacity": {"duration": 300},
-                    "color": "#ffb680",
+                    "color": "#ffe1b7",
                     "antialias": false,
                     "opacity": [
                         "stops",
-                        {"z": 0, "val": 0.6},
-                        {"z": 15, "val": 0.5},
-                        {"z": 17, "val": 0.3},
-                        {"z": 18, "val": 0.1}
+                        {"z": 15, "val": 0.3},
+                        {"z": 17, "val": 0.2},
+                        {"z": 18, "val": 0.15}
                     ]
                 },
                 "contour_line_loud": {
@@ -2618,7 +2618,7 @@ module.exports = {
                     "opacity": [
                         "stops",
                         {"z": 12, "val": 0.1},
-                        {"z": 13, "val": 0.4}
+                        {"z": 13, "val": 0.2}
                     ]
                 },
                 "contour_line_regular": {
@@ -2640,16 +2640,16 @@ module.exports = {
                 },
                 "aeroway_fill": {
                     "transition-color": {"duration": 300},
-                    "color": "#ddd"
+                    "color": "#367"
                 },
                 "aeroway_runway": {
                     "transition-color": {"duration": 300},
-                    "color": "#ddd",
+                    "color": "#367",
                     "width": "runway_width"
                 },
                 "aeroway_taxiway": {
                     "transition-color": {"duration": 300},
-                    "color": "#ddd",
+                    "color": "#367",
                     "width": "taxiway_width"
                 },
                 "building": {
@@ -2696,7 +2696,7 @@ module.exports = {
                 },
                 "tunnel_motorway": {
                     "transition-color": {"duration": 300},
-                    "color": "#83b9c8",
+                    "color": "#78b0c1",
                     "width": "motorway_width",
                     "opacity": [
                         "stops",
@@ -2719,7 +2719,7 @@ module.exports = {
                 },
                 "tunnel_main": {
                     "transition-color": {"duration": 300},
-                    "color": "#e6cec7",
+                    "color": "#78b0c1",
                     "width": "main_width",
                     "opacity": [
                         "stops",
@@ -2738,7 +2738,7 @@ module.exports = {
                 },
                 "tunnel_motorway_link": {
                     "transition-color": {"duration": 300},
-                    "color": "#e6cec7",
+                    "color": "#78b0c1",
                     "width": "motorway_link_width"
                 },
                 "tunnel_street_casing": {
@@ -2748,7 +2748,7 @@ module.exports = {
                 },
                 "tunnel_street": {
                     "transition-color": {"duration": 300},
-                    "color": "street_case_night",
+                    "color": "street_night",
                     "width": "street_width"
                 },
                 "tunnel_service_casing": {
@@ -2763,7 +2763,7 @@ module.exports = {
                 },
                 "tunnel_service": {
                     "transition-color": {"duration": 300},
-                    "color": "#e6cec7",
+                    "color": "#017ca0",
                     "width": 2
                 },
                 "road_motorway_casing": {
@@ -2838,7 +2838,9 @@ module.exports = {
                 },
                 "road_path_case": {
                     "transition-opacity": {"duration": 300},
-                    "opacity": 0
+                    "transition-color": {"duration": 300},
+                    "color": "land_night",
+                    "opacity": 0.2
                 },
                 "road_path_footway": {
                     "transition-color": {"duration": 300},
@@ -2866,7 +2868,7 @@ module.exports = {
                 },
                 "road_path_cycleway": {
                     "transition-color": {"duration": 300},
-                    "color": "#fff",
+                    "color": "#94e6ff",
                     "dasharray": [
                         10,
                         4
@@ -2875,7 +2877,7 @@ module.exports = {
                 },
                 "road_path_mtb": {
                     "transition-color": {"duration": 300},
-                    "color": "#fff",
+                    "color": "#94e6ff",
                     "dasharray": [
                         12,
                         4
@@ -2884,7 +2886,7 @@ module.exports = {
                 },
                 "road_path_piste": {
                     "transition-color": {"duration": 300},
-                    "color": "#fff",
+                    "color": "#715dae",
                     "dasharray": [
                         8,
                         4
@@ -2893,12 +2895,14 @@ module.exports = {
                 },
                 "road_path_steps": {
                     "transition-color": {"duration": 300},
-                    "color": "#fff",
+                    "transition-opacity": {"duration": 300},
+                    "color": "#016684",
                     "dasharray": [
                         10,
                         4
                     ],
-                    "width": 4
+                    "opacity": 0.3,
+                    "width": 6
                 },
                 "road_major_rail": {
                     "transition-color": {"duration": 300},
