@@ -3549,6 +3549,8 @@ module.exports = {
                     "transition-stroke": {"duration": 300},
                     "color": "text_night",
                     "stroke": "text_stroke_night",
+                    "strokeWidth": 0.5,
+                    "strokeBlur": 3,
                     "size": [
                         "stops",
                         {"z": 0, "val": 10},
@@ -3562,8 +3564,8 @@ module.exports = {
                     "transition-stroke": {"duration": 300},
                     "color": "text_night",
                     "stroke": "text_stroke_night",
-                    "strokeWidth": 0.6,
-                    "strokeBlur": 2,
+                    "strokeWidth": 0.5,
+                    "strokeBlur": 3,
                     "size": [
                         "stops",
                         {"z": 0, "val": 12},
@@ -3584,21 +3586,21 @@ module.exports = {
                     "color": "water_dark_night",
                     "strokeWidth": 0.4,
                     "strokeBlur": 2,
-                    "stroke": "text_stroke_night"
+                    "stroke": "water_night"
                 },
                 "poi": {
                     "transition-color": {"duration": 300},
-                    "color": "rgba(210,210,210,0.9)",
+                    "color": "white",
                     "antialias": false
                 },
                 "poi_label": {
                     "transition-color": {"duration": 300},
                     "transition-stroke": {"duration": 300},
-                    "color": "#ddd",
-                    "size": 10,
+                    "color": "#fff",
+                    "size": 11,
                     "stroke": "land_night",
-                    "strokeWidth": 0.6,
-                    "strokeBlur": 2,
+                    "strokeWidth": 0.4,
+                    "strokeBlur": 0.2,
                     "translate": [0, 14]
                 },
                 "poi_aerodrome": {
