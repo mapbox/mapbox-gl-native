@@ -48,7 +48,7 @@ linux: config.gypi linux/llmr-app.gyp node
 
 # Executes the Linux binary
 run-linux: linux
-	build/Release/llmr
+	build/$(BUILDTYPE)/llmr
 
 
 
@@ -59,7 +59,7 @@ osx: config.gypi macosx/llmr-app.gyp node
 
 # Executes the OS X binary
 run-osx: osx
-	build/Release/llmr.app/Contents/MacOS/llmr
+	build/$(BUILDTYPE)/llmr.app/Contents/MacOS/llmr
 
 ##### Xcode projects ###########################################################
 
