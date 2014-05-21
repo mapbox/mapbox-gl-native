@@ -79,7 +79,6 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     // Calculate the speed of zooming, and how far it would zoom in terms of zoom levels in one duration
     float zoomDiff = endingZ - history[1].z,
         timeDiff = lastFrame.timestamp - history[1].timestamp;
-    if (timeDiff > duration) timeDiff = 1;
     float fadedist = zoomDiff / (timeDiff / duration);
 
     if (isnan(fadedist)) fprintf(stderr, "fadedist should never be NaN\n");
