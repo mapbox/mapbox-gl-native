@@ -7,8 +7,8 @@ using namespace llmr;
 
 const shader_source llmr::shaders[SHADER_COUNT] = {
    {
-       "precision highp float;\nattribute vec2 a_pos;\nuniform mat4 u_matrix;\nvarying highp vec2 v_pos;\nvoid main ()\n{\n  vec4 tmpvar_1;\n  tmpvar_1.zw = vec2(0.0, 1.0);\n  tmpvar_1.xy = a_pos;\n  vec4 tmpvar_2;\n  tmpvar_2 = (u_matrix * tmpvar_1);\n  gl_Position = tmpvar_2;\n  v_pos = tmpvar_2.xy;\n}\n\n",
-       "precision highp float;\nuniform sampler2D u_image;\nuniform float u_opacity;\nvarying vec2 v_pos;\nvoid main ()\n{\n  lowp vec4 tmpvar_1;\n  tmpvar_1 = (texture2D (u_image, ((v_pos / 2.0) + 0.5)) * u_opacity);\n  gl_FragColor = tmpvar_1;\n}\n\n",
+       "precision highp float;\nattribute vec2 a_pos;\nuniform mat4 u_matrix;\nvarying highp vec2 v_pos;\nvoid main ()\n{\n  vec4 tmpvar_1;\n  tmpvar_1.zw = vec2(0.0, 1.0);\n  tmpvar_1.xy = a_pos;\n  vec4 tmpvar_2;\n  tmpvar_2 = (u_matrix * tmpvar_1);\n  gl_Position = tmpvar_2;\n  v_pos = ((tmpvar_2.xy + 1.0) / 2.0);\n}\n\n",
+       "precision highp float;\nuniform sampler2D u_image;\nuniform float u_opacity;\nvarying vec2 v_pos;\nvoid main ()\n{\n  lowp vec4 tmpvar_1;\n  tmpvar_1 = (texture2D (u_image, v_pos) * u_opacity);\n  gl_FragColor = tmpvar_1;\n}\n\n",
    },
    {
        "precision highp float;\nattribute vec2 a_pos;\nuniform mat4 u_matrix;\nuniform float u_size;\nvoid main ()\n{\n  vec4 tmpvar_1;\n  tmpvar_1.zw = vec2(0.0, 1.0);\n  tmpvar_1.xy = a_pos;\n  gl_Position = (u_matrix * tmpvar_1);\n  gl_PointSize = u_size;\n}\n\n",

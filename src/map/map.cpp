@@ -35,8 +35,6 @@ Map::Map(View& view)
 }
 
 Map::~Map() {
-    clearFramebuffers();
-
     uv_loop_delete(loop);
     loop = nullptr;
 }
@@ -185,9 +183,14 @@ void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width
     if (transform.resize(width, height, ratio, fb_width, fb_height)) {
         changed = true;
     }
+
+    // TODO: Make sure we're not currently rendering anything
     if (spriteAtlas.resize(ratio)) {
         changed = true;
     }
+
+    // TODO: Make sure we're not currently rendering anything
+    painter.clearFramebuffers();
 
     if (changed) {
         update();
@@ -369,24 +372,23 @@ void Map::updateTiles() {
     }
 }
 
-
-
-void Map::updateClippingIDs() {
+void Map::updateRenderState() {
     std::forward_list<Tile::ID> ids;
 
-    for (auto &pair : sources) {
-        const std::unique_ptr<Source> &source = pair.second;
-        if (source->enabled) {
-            ids.splice_after(ids.before_begin(), source->getIDs());
+    for (const auto &pair : sources) {
+        Source &source = *pair.second;
+        if (source.enabled) {
+            ids.splice_after(ids.before_begin(), source.getIDs());
+            source.updateMatrices(state);
         }
     }
 
     const std::map<Tile::ID, ClipID> clipIDs = computeClipIDs(ids);
 
-    for (auto &pair : sources) {
-        const std::unique_ptr<Source> &source = pair.second;
-        if (source->enabled) {
-            source->updateClipIDs(clipIDs);
+    for (const auto &pair : sources) {
+        Source &source = *pair.second;
+        if (source.enabled) {
+            source.updateClipIDs(clipIDs);
         }
     }
 }
@@ -413,8 +415,6 @@ void Map::prepare() {
     }
 
     updateTiles();
-
-    updateClippingIDs();
 }
 
 void Map::render() {
@@ -422,25 +422,24 @@ void Map::render() {
 
     painter.clear();
 
+    painter.resetFramebuffer();
+
     painter.resize();
 
     painter.changeMatrix();
 
-    // First, update the sources' tile matrices with the new
-    // transform and render into the stencil buffer, including
-    // drawing the background.
+    updateRenderState();
 
-    painter.prepareClippingMask();
+    painter.drawClippingMasks(sources);
 
+    // Generate debug information
     size_t source_id = 0;
-    for (auto &pair : sources) {
-        Source &source = *pair.second;
-        size_t count = source.prepareRender(state);
+    for (const auto &pair : sources) {
+        const Source &source = *pair.second;
+        size_t count = source.getTileCount();
         debug.emplace_back(util::sprintf<100>("source %d: %d\n", source_id, count));
         source_id++;
     }
-
-    painter.finishClippingMask();
 
     // Actually render the layers
     if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
@@ -451,7 +450,7 @@ void Map::render() {
     // This guarantees that we have at least one function per tile called.
     // When only rendering layers via the stylesheet, it's possible that we don't
     // ever visit a tile during rendering.
-    for (auto &pair : sources) {
+    for (const auto &pair : sources) {
         Source &source = *pair.second;
         const std::string &name = pair.first;
         gl::group group(std::string("debug ") + name);
@@ -481,14 +480,14 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers) {
     if (debug::renderTree) {
         std::cout << std::string(indent++ * 4, ' ') << "OPAQUE {" << std::endl;
     }
-    painter.startOpaquePass();
     typedef std::vector<LayerDescription>::const_reverse_iterator riterator;
     int i = 0;
     for (riterator it = layers.rbegin(), end = layers.rend(); it != end; ++it, ++i) {
+        painter.setOpaque();
         painter.setStrata(i * strata_thickness);
         renderLayer(*it, Opaque);
     }
-    painter.endPass();
+    // painter.endPass();
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
     }
@@ -499,14 +498,14 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers) {
     if (debug::renderTree) {
         std::cout << std::string(indent++ * 4, ' ') << "TRANSLUCENT {" << std::endl;
     }
-    painter.startTranslucentPass();
     typedef std::vector<LayerDescription>::const_iterator iterator;
     --i;
     for (iterator it = layers.begin(), end = layers.end(); it != end; ++it, --i) {
+        painter.setTranslucent();
         painter.setStrata(i * strata_thickness);
         renderLayer(*it, Translucent);
     }
-    painter.endPass();
+    // painter.endPass();
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
     }
@@ -554,13 +553,11 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
                               << " (Composite) {" << std::endl;
                 }
 
-                pushFramebuffer();
-
-                glClear(GL_COLOR_BUFFER_BIT);
+                painter.pushFramebuffer();
 
                 renderLayers(layer_desc.child_layer);
 
-                GLuint texture = popFramebuffer();
+                GLuint texture = painter.popFramebuffer();
 
                 // Render the previous texture onto the screen.
                 painter.drawComposite(texture, properties);
@@ -629,74 +626,4 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
             }
         }
     }
-}
-
-void Map::clearFramebuffers() {
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-    // Delete any framebuffers that we might have allocated
-    glDeleteTextures(fbos_color.size(), fbos.data());
-    fbos_color.clear();
-
-    glDeleteFramebuffersEXT(fbos.size(), fbos.data());
-    fbos.clear();
-}
-
-void Map::bindFramebuffer() {
-    if (fbo_level < 0) {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    } else if (fbos.size() > (size_t)fbo_level) {
-        GLuint fbo = fbos[fbo_level];
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-    } else {
-        // TODO: Convert this to textures so we can composite them and use them in blend operations
-
-        GLuint fbo_color;
-        glGenTextures(1, &fbo_color);
-        glBindTexture(GL_TEXTURE_2D, fbo_color);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, state.getFramebufferWidth(), state.getFramebufferHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        fbos_color.emplace_back(fbo_color);
-
-        // TODO: Stencil/Depth buffer
-
-        // Allocate new framebuffer
-        GLuint fbo = 0;
-        glGenFramebuffersEXT(1, &fbo);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-        fbos.emplace_back(fbo);
-
-        // Assemble the FBO
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_color, 0);
-        // TODO: Stencil/Depth buffer
-
-        GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-        if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-            fprintf(stderr, "Couldn't create framebuffer: ");
-            switch (status) {
-                case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT: fprintf(stderr, "incomplete attachment\n"); break;
-                case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT: fprintf(stderr, "incomplete missing attachment\n"); break;
-                case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: fprintf(stderr, "incomplete draw buffer\n"); break;
-                case GL_FRAMEBUFFER_UNSUPPORTED: fprintf(stderr, "unsupported\n"); break;
-                default: fprintf(stderr, "other\n"); break;
-            }
-            return;
-        }
-    }
-}
-
-void Map::pushFramebuffer() {
-    fbo_level++;
-    bindFramebuffer();
-}
-
-GLuint Map::popFramebuffer() {
-    GLuint texture = fbos_color[fbo_level];
-    fbo_level--;
-    bindFramebuffer();
-    return texture;
 }

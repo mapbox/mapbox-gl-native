@@ -22,6 +22,8 @@ namespace llmr {
 
 class Source;
 
+typedef std::map<std::string, const std::unique_ptr<Source>> Sources;
+
 class Map : private util::noncopyable {
 public:
     explicit Map(View &view);
@@ -96,6 +98,7 @@ public:
     inline uv_loop_t *getLoop() { return loop; }
     inline time getAnimationTime() const { return animationTime; }
     inline Texturepool &getTexturepool() { return texturepool; }
+    inline const Sources &getSources() { return sources; }
 
 private:
     // uv async callbacks
@@ -108,7 +111,7 @@ private:
     void loadStyle(const uint8_t *const data, uint32_t bytes);
 
     void updateTiles();
-    void updateClippingIDs();
+    void updateRenderState();
 
     size_t countLayers(const std::vector<LayerDescription>& layers);
 
@@ -122,11 +125,6 @@ private:
     void render();
     void renderLayers(const std::vector<LayerDescription>& layers);
     void renderLayer(const LayerDescription& layer_desc, RenderPass pass);
-
-    void clearFramebuffers();
-    void bindFramebuffer();
-    void pushFramebuffer();
-    GLuint popFramebuffer();
 
 private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
@@ -152,16 +150,12 @@ private:
     SpriteAtlas spriteAtlas;
     Painter painter;
 
-    std::map<std::string, const std::unique_ptr<Source>> sources;
+    Sources sources;
 
     bool debug = false;
     time animationTime = 0;
 
     int indent = 0;
-
-    std::vector<GLuint> fbos;
-    std::vector<GLuint> fbos_color;
-    int fbo_level = -1;
 
 private:
     bool async = false;

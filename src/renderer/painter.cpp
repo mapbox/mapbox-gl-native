@@ -20,6 +20,10 @@ Painter::Painter(Map &map)
     : map(map) {
 }
 
+Painter::~Painter() {
+    clearFramebuffers();
+}
+
 bool Painter::needsAnimation() const {
     return frameHistory.needsAnimation(300);
 }
@@ -133,22 +137,16 @@ void Painter::clear() {
 #endif
 }
 
-void Painter::startOpaquePass() {
-    gl::start_group("opaque pass");
+void Painter::setOpaque() {
     pass = Opaque;
     glDisable(GL_BLEND);
     depthMask(true);
 }
 
-void Painter::startTranslucentPass() {
-    gl::start_group("translucent pass");
+void Painter::setTranslucent() {
     pass = Translucent;
     glEnable(GL_BLEND);
     depthMask(false);
-}
-
-void Painter::endPass() {
-    gl::end_group();
 }
 
 void Painter::setStrata(float value) {

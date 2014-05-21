@@ -261,6 +261,10 @@ void show_color_debug_image(std::string name, const char *data, size_t logical_w
     float x_scale = (float)fb_width / (float)width;
     float y_scale = (float)fb_height / (float)height;
 
+    glClear(GL_COLOR_BUFFER_BIT);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glPixelZoom(x_scale, -y_scale);
     glRasterPos2f(-1.0f, 1.0f);
     glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data);

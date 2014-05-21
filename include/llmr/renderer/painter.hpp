@@ -22,12 +22,15 @@
 
 #include <llmr/map/transform_state.hpp>
 
+#include <map>
+
 namespace llmr {
 
 class Transform;
 class Style;
 class Tile;
 class GlyphAtlas;
+class Source;
 
 class FillBucket;
 class LineBucket;
@@ -38,9 +41,12 @@ class RasterBucket;
 class LayerDescription;
 class RasterTileData;
 
+typedef std::map<std::string, const std::unique_ptr<Source>> Sources;
+
 class Painter : private util::noncopyable {
 public:
     Painter(Map &map);
+    ~Painter();
 
 
     void setup();
@@ -76,17 +82,20 @@ public:
     void setDebug(bool enabled);
 
     // Opaque/Translucent pass setting
-    void startOpaquePass();
-    void startTranslucentPass();
-    void endPass();
+    void setOpaque();
+    void setTranslucent();
 
     // Configures the painter strata that is used for early z-culling of fragments.
     void setStrata(float strata);
 
-    void prepareClippingMask();
+    void drawClippingMasks(const Sources &sources);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
-    void finishClippingMask();
 
+    void clearFramebuffers();
+    void resetFramebuffer();
+    void bindFramebuffer();
+    void pushFramebuffer();
+    GLuint popFramebuffer();
     void drawComposite(GLuint texture, const CompositeProperties &properties);
 
     bool needsAnimation() const;
@@ -162,6 +171,13 @@ private:
     };
 
     VertexArrayObject tileBorderArray;
+
+    // Framebuffer management
+    std::vector<GLuint> fbos;
+    std::vector<GLuint> fbos_color;
+    GLuint fbo_depth_stencil;
+    int fbo_level = -1;
+    bool fbo_depth_stencil_valid = false;
 
 };
 
