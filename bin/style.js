@@ -1574,16 +1574,13 @@ module.exports = {
             "name": "default",
             "layers": {
                 "background": {
-                    "transition-color": {"duration": 300},
                     "color": "land"
                 },
                 "admin_maritime_cover": {
-                    "transition-color": {"duration": 300},
                     "color": "water",
                     "width": 5
                 },
                 "admin_maritime": {
-                    "transition-color": {"duration": 300},
                     "color": "#c0d6d6",
                     "width": [
                         "stops",
@@ -1593,12 +1590,10 @@ module.exports = {
                     ]
                 },
                 "admin_l2": {
-                    "transition-color": {"duration": 300},
                     "color": "#88a",
                     "width": "admin_l2_width"
                 },
                 "admin_l3": {
-                    "transition-color": {"duration": 300},
                     "color": "#88a",
                     "dasharray": [
                         60,
@@ -1612,12 +1607,10 @@ module.exports = {
                     "width": "admin_l3_width"
                 },
                 "waterway_river_canal": {
-                    "transition-color": {"duration": 300},
                     "color": "#87abaf",
                     "width": "river_canal_width"
                 },
                 "waterway_stream": {
-                    "transition-color": {"duration": 300},
                     "color": "#87abaf",
                     "width": "stream_width"
                 },
@@ -1645,7 +1638,6 @@ module.exports = {
                     "width": 4
                 },
                 "landcover_wood": {
-                    "transition-color": {"duration": 300},
                     "color": "wood",
                     "opacity": [
                         "stops",
@@ -1655,7 +1647,6 @@ module.exports = {
                     ]
                 },
                 "landcover_scrub": {
-                    "transition-color": {"duration": 300},
                     "color": "scrub",
                     "opacity": [
                         "stops",
@@ -1665,7 +1656,6 @@ module.exports = {
                     ]
                 },
                 "landcover_grass": {
-                    "transition-color": {"duration": 300},
                     "color": "grass",
                     "opacity": [
                         "stops",
@@ -1675,78 +1665,59 @@ module.exports = {
                     ]
                 },
                 "landcover_crop": {
-                    "transition-color": {"duration": 300},
                     "color": "crop"
                 },
                 "landcover_snow": {
-                    "transition-color": {"duration": 300},
                     "color": "snow"
                 },
                 "landuse_wood": {
-                    "transition-color": {"duration": 300},
                     "color": "wood"
                 },
                 "landuse_scrub": {
-                    "transition-color": {"duration": 300},
                     "color": "scrub"
                 },
                 "landuse_grass": {
-                    "transition-color": {"duration": 300},
                     "color": "grass"
                 },
                 "landuse_crop": {
-                    "transition-color": {"duration": 300},
                     "color": "crop"
                 },
                 "landuse_snow": {
-                    "transition-color": {"duration": 300},
                     "color": "snow"
                 },
                 "landuse_rock": {
-                    "transition-color": {"duration": 300},
                     "color": "rock"
                 },
                 "landuse_sand": {
-                    "transition-color": {"duration": 300},
                     "color": "sand"
                 },
                 "landuse_park": {
-                    "transition-color": {"duration": 300},
                     "color": "park"
                 },
                 "landuse_cemetery": {
-                    "transition-color": {"duration": 300},
                     "color": "cemetery"
                 },
                 "landuse_hospital": {
-                    "transition-color": {"duration": 300},
                     "color": "hospital"
                 },
                 "landuse_school": {
-                    "transition-color": {"duration": 300},
                     "color": "school"
                 },
                 "landuse_pitch": {
-                    "transition-color": {"duration": 300},
                     "color": "rgba(255,255,255,0.5)",
                     "stroke": "pitch"
                 },
                 "landuse_industrial": {
-                    "transition-color": {"duration": 300},
                     "color": "rgba(246,250,255,0.5)"
                 },
                 "overlay_wetland": {
-                    "transition-color": {"duration": 300},
                     "color": "rgba(210,225,225,0.2)",
                     "image": "wetland_noveg_64"
                 },
                 "overlay_breakwater_pier": {
-                    "transition-color": {"duration": 300},
                     "color": "land"
                 },
                 "hillshade_full_shadow": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "#103",
                     "antialias": false,
                     "opacity": [
@@ -1757,8 +1728,6 @@ module.exports = {
                     ]
                 },
                 "hillshade_medium_shadow": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "#206",
                     "antialias": false,
                     "opacity": [
@@ -1769,8 +1738,6 @@ module.exports = {
                     ]
                 },
                 "hillshade_full_highlight": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "#fffff3",
                     "antialias": false,
                     "opacity": [
@@ -1781,8 +1748,6 @@ module.exports = {
                     ]
                 },
                 "hillshade_medium_highlight": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "#ffd",
                     "antialias": false,
                     "opacity": [
@@ -1793,8 +1758,6 @@ module.exports = {
                     ]
                 },
                 "contour_line_loud": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "#008",
                     "width": 0.9,
                     "opacity": [
@@ -1804,8 +1767,6 @@ module.exports = {
                     ]
                 },
                 "contour_line_regular": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "#008",
                     "width": 0.5,
                     "opacity": [
@@ -1815,32 +1776,24 @@ module.exports = {
                     ]
                 },
                 "water": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "water",
                     "stroke": "#a2bdc0"
                 },
                 "aeroway_fill": {
-                    "transition-color": {"duration": 300},
                     "color": "#ddd"
                 },
                 "aeroway_runway": {
-                    "transition-color": {"duration": 300},
                     "color": "#ddd",
                     "width": "runway_width"
                 },
                 "aeroway_taxiway": {
-                    "transition-color": {"duration": 300},
                     "color": "#ddd",
                     "width": "taxiway_width"
                 },
                 "building": {
-                    "transition-color": {"duration": 300},
                     "color": "#ebe7db"
                 },
                 "building_wall": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#ebe7db",
                     "stroke": "#d5d1c6",
                     "opacity": [
@@ -1850,8 +1803,6 @@ module.exports = {
                     ]
                 },
                 "building_shadow": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#d5d1c6",
                     "stroke": "#d5d1c6",
                     "translate": [
@@ -1865,7 +1816,6 @@ module.exports = {
                     ]
                 },
                 "tunnel_motorway_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case",
                     "dasharray": [
                         6,
@@ -1879,7 +1829,6 @@ module.exports = {
                     ]
                 },
                 "tunnel_motorway": {
-                    "transition-color": {"duration": 300},
                     "color": "#e6cec7",
                     "width": "motorway_width",
                     "opacity": [
@@ -1889,7 +1838,6 @@ module.exports = {
                     ]
                 },
                 "tunnel_main_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case",
                     "dasharray": [
                         6,
@@ -1902,7 +1850,6 @@ module.exports = {
                     ]
                 },
                 "tunnel_main": {
-                    "transition-color": {"duration": 300},
                     "color": "#e6cec7",
                     "width": "main_width",
                     "opacity": [
@@ -1912,7 +1859,6 @@ module.exports = {
                     ]
                 },
                 "tunnel_motorway_link_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case",
                     "dasharray": [
                         6,
@@ -1921,22 +1867,18 @@ module.exports = {
                     "width": "motorway_link_casing_width"
                 },
                 "tunnel_motorway_link": {
-                    "transition-color": {"duration": 300},
                     "color": "#e6cec7",
                     "width": "motorway_link_width"
                 },
                 "tunnel_street_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "#d9d5c6",
                     "width": "street_casing_width"
                 },
                 "tunnel_street": {
-                    "transition-color": {"duration": 300},
                     "color": "#d9d5c6",
                     "width": "street_width"
                 },
                 "tunnel_service_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "#000",
                     "opacity": 0.04,
                     "dasharray": [
@@ -1946,12 +1888,10 @@ module.exports = {
                     "width": "service_casing_width"
                 },
                 "tunnel_service": {
-                    "transition-color": {"duration": 300},
                     "color": "#e6cec7",
                     "width": 2
                 },
                 "road_motorway_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case",
                     "width": "motorway_casing_width",
                     "opacity": [
@@ -1961,7 +1901,6 @@ module.exports = {
                     ]
                 },
                 "road_motorway": {
-                    "transition-color": {"duration": 300},
                     "color": "motorway",
                     "width": "motorway_width",
                     "opacity": [
@@ -1971,7 +1910,6 @@ module.exports = {
                     ]
                 },
                 "road_main_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case",
                     "width": "main_casing_width",
                     "opacity": ["stops",
@@ -1980,7 +1918,6 @@ module.exports = {
                     ]
                 },
                 "road_main": {
-                    "transition-color": {"duration": 300},
                     "color": "main",
                     "width": "main_width",
                     "opacity": [
@@ -1990,39 +1927,31 @@ module.exports = {
                     ]
                 },
                 "road_motorway_link_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case",
                     "width": "motorway_link_casing_width"
                 },
                 "road_motorway_link": {
-                    "transition-color": {"duration": 300},
                     "color": "motorway",
                     "width": "motorway_link_width"
                 },
                 "road_street_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "#d9d5c6",
                     "width": "street_casing_width"
                 },
                 "road_street": {
-                    "transition-color": {"duration": 300},
                     "color": "street",
                     "width": "street_width"
                 },
                 "road_service_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "#000",
                     "opacity": 0.04,
                     "width": "service_casing_width"
                 },
                 "road_service": {
-                    "transition-color": {"duration": 300},
                     "color": "street",
                     "width": 2
                 },
                 "road_path_case": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "#ffd",
                     "opacity": 0.4,
                     "width": [
@@ -2032,7 +1961,6 @@ module.exports = {
                     ]
                 },
                 "road_path_footway": {
-                    "transition-color": {"duration": 300},
                     "color": "#bba",
                     "dasharray": [
                         10,
@@ -2041,7 +1969,6 @@ module.exports = {
                     "width": "path_width"
                 },
                 "road_path_path": {
-                    "transition-color": {"duration": 300},
                     "color": "#987",
                     "dasharray": [
                         10,
@@ -2056,7 +1983,6 @@ module.exports = {
                     ]
                 },
                 "road_path_cycleway": {
-                    "transition-color": {"duration": 300},
                     "color": "#488",
                     "dasharray": [
                         10,
@@ -2065,7 +1991,6 @@ module.exports = {
                     "width": "path_width"
                 },
                 "road_path_mtb": {
-                    "transition-color": {"duration": 300},
                     "color": "#488",
                     "dasharray": [
                         12,
@@ -2074,7 +1999,6 @@ module.exports = {
                     "width": "path_width"
                 },
                 "road_path_piste": {
-                    "transition-color": {"duration": 300},
                     "color": "#87b",
                     "dasharray": [
                         8,
@@ -2083,7 +2007,6 @@ module.exports = {
                     "width": "path_width"
                 },
                 "road_path_steps": {
-                    "transition-color": {"duration": 300},
                     "color": "#bba",
                     "dasharray": [
                         10,
@@ -2092,12 +2015,10 @@ module.exports = {
                     "width": 4
                 },
                 "road_major_rail": {
-                    "transition-color": {"duration": 300},
                     "color": "#c8c4c0",
                     "width": 0.8
                 },
                 "road_major_rail_hatching": {
-                    "transition-color": {"duration": 300},
                     "color": "#c8c4c0",
                     "dasharray": [
                         2,
@@ -2106,7 +2027,6 @@ module.exports = {
                     "width": 5
                 },
                 "bridge_motorway_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case",
                     "width": "motorway_casing_width",
                     "opacity": [
@@ -2116,7 +2036,6 @@ module.exports = {
                     ]
                 },
                 "bridge_motorway": {
-                    "transition-color": {"duration": 300},
                     "color": "motorway",
                     "width": "motorway_width",
                     "opacity": [
@@ -2126,7 +2045,6 @@ module.exports = {
                     ]
                 },
                 "bridge_main_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case",
                     "width": "main_casing_width",
                     "opacity": ["stops",
@@ -2135,7 +2053,6 @@ module.exports = {
                     ]
                 },
                 "bridge_main": {
-                    "transition-color": {"duration": 300},
                     "color": "main",
                     "width": "main_width",
                     "opacity": [
@@ -2145,51 +2062,41 @@ module.exports = {
                     ]
                 },
                 "bridge_motorway_link_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case",
                     "width": "motorway_link_casing_width"
                 },
                 "bridge_motorway_link": {
-                    "transition-color": {"duration": 300},
                     "color": "motorway",
                     "width": "motorway_link_width"
                 },
                 "bridge_street_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "#d9d5c6",
                     "width": "street_casing_width"
                 },
                 "bridge_street": {
-                    "transition-color": {"duration": 300},
                     "color": "street",
                     "width": "street_width"
                 },
                 "bridge_service_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "#000",
                     "opacity": 0.04,
                     "width": "service_casing_width"
                 },
                 "bridge_service": {
-                    "transition-color": {"duration": 300},
                     "color": "street",
                     "width": 2
                 },
                 "bridge_aerialway_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "white",
                     "opacity": 0.5,
                     "width": "aerialway_casing_width"
                 },
                 "bridge_aerialway": {
-                    "transition-color": {"duration": 300},
                     "color": "#876",
                     "opacity": 0.5,
                     "width": "aerialway_width"
                 },
                 "country_label": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "country_text",
                     "stroke": "rgba(255,255,255,0.5)",
                     "size": [
@@ -2199,20 +2106,15 @@ module.exports = {
                     ]
                 },
                 "country_label_line": {
-                    "transition-color": {"duration": 300},
                     "color": "country_text",
                     "width": 0.5,
                     "opacity": 0.5
                 },
                 "marine_label_line": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "marine_text",
                     "stroke": "water"
                 },
                 "marine_label_point_1": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#a9c4c7",
                     "size": ["stops",
                         {"z": 0, "val": 20},
@@ -2224,8 +2126,6 @@ module.exports = {
                     "stroke": "water"
                 },
                 "marine_label_point_2": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#a9c4c7",
                     "size": ["stops",
                         {"z": 0, "val": 13},
@@ -2238,8 +2138,6 @@ module.exports = {
                     "stroke": "water"
                 },
                 "marine_label_point_other": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#a9c4c7",
                     "size": ["stops",
                         {"z": 0, "val": 12},
@@ -2252,8 +2150,6 @@ module.exports = {
                     "stroke": "water"
                 },
                 "state_label": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#333",
                     "strokeWidth": 0.4,
                     "strokeBlur": 1,
@@ -2267,12 +2163,9 @@ module.exports = {
                     ]
                 },
                 "place_label_city_point": {
-                    "transition-color": {"duration": 300},
                     "color": "#4a4032"
                 },
                 "place_label_city": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#444",
                     "strokeWidth": 0.4,
                     "stroke": "text_stroke",
@@ -2295,8 +2188,6 @@ module.exports = {
                     ]
                 },
                 "place_label_town": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#716656",
                     "strokeWidth": 0.5,
                     "stroke": "text_stroke",
@@ -2309,8 +2200,6 @@ module.exports = {
                     ]
                 },
                 "place_label_village": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#635644",
                     "strokeWidth": 0.5,
                     "stroke": "text_stroke",
@@ -2324,8 +2213,6 @@ module.exports = {
                     ]
                 },
                 "place_label_other": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#7d6c55",
                     "stroke": "text_stroke",
                     "size": [
@@ -2337,8 +2224,6 @@ module.exports = {
                     ]
                 },
                 "road_label": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#585042",
                     "stroke": "land",
                     "strokeWidth": 0.6,
@@ -2346,27 +2231,20 @@ module.exports = {
                     "size": "road_label_size"
                 },
                 "water_label": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "water_dark",
                     "stroke": "rgba(255,255,255,0.75)"
                 },
                 "waterway_label": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "water_dark",
                     "strokeWidth": 0.4,
                     "strokeBlur": 2,
                     "stroke": "text_stroke"
                 },
                 "poi": {
-                    "transition-color": {"duration": 300},
                     "color": "rgba(50,50,50,0.9)",
                     "antialias": false
                 },
                 "poi_label": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#444",
                     "size": 10,
                     "stroke": "land",
@@ -2383,16 +2261,13 @@ module.exports = {
             "name": "satellite",
             "layers": {
                 "background": {
-                    "transition-color": {"duration": 300},
                     "color": "land_night"
                 },
                 "admin_maritime_cover": {
-                    "transition-color": {"duration": 300},
                     "color": "#0a1347",
                     "width": 5
                 },
                 "admin_maritime": {
-                    "transition-color": {"duration": 300},
                     "color": "#0a1347",
                     "width": [
                         "stops",
@@ -2402,12 +2277,10 @@ module.exports = {
                     ]
                 },
                 "admin_l2": {
-                    "transition-color": {"duration": 300},
                     "color": "admin_night",
                     "width": "admin_l2_width"
                 },
                 "admin_l3": {
-                    "transition-color": {"duration": 300},
                     "color": "admin_night",
                     "dasharray": [
                         60,
@@ -2421,12 +2294,10 @@ module.exports = {
                     "width": "admin_l3_width"
                 },
                 "waterway_river_canal": {
-                    "transition-color": {"duration": 300},
                     "color": "rgb(10,20,71)",
                     "width": "river_canal_width"
                 },
                 "waterway_stream": {
-                    "transition-color": {"duration": 300},
                     "color": "rgb(10,20,71)",
                     "width": "stream_width"
                 },
@@ -2454,7 +2325,6 @@ module.exports = {
                     "width": 4
                 },
                 "landcover_wood": {
-                    "transition-color": {"duration": 300},
                     "color": "wood_night",
                     "opacity": [
                         "stops",
@@ -2464,7 +2334,6 @@ module.exports = {
                     ]
                 },
                 "landcover_scrub": {
-                    "transition-color": {"duration": 300},
                     "color": "scrub_night",
                     "opacity": [
                         "stops",
@@ -2474,7 +2343,6 @@ module.exports = {
                     ]
                 },
                 "landcover_grass": {
-                    "transition-color": {"duration": 300},
                     "color": "grass_night",
                     "opacity": [
                         "stops",
@@ -2484,86 +2352,66 @@ module.exports = {
                     ]
                 },
                 "landcover_crop": {
-                    "transition-color": {"duration": 300},
                     "color": "crop_night"
                 },
                 "landcover_snow": {
-                    "transition-color": {"duration": 300},
                     "color": "snow_night"
                 },
                 "landuse_wood": {
-                    "transition-color": {"duration": 300},
                     "color": "wood_night",
                     "opacity": 0.8
                 },
                 "landuse_scrub": {
-                    "transition-color": {"duration": 300},
                     "color": "scrub_night",
                     "opacity": 0.8
                 },
                 "landuse_grass": {
-                    "transition-color": {"duration": 300},
                     "color": "grass_night",
                     "opacity": 0.8
                 },
                 "landuse_crop": {
-                    "transition-color": {"duration": 300},
                     "color": "crop_night",
                     "opacity": 0.8
                 },
                 "landuse_snow": {
-                    "transition-color": {"duration": 300},
                     "color": "snow_night",
                     "opacity": 0.8
                 },
                 "landuse_rock": {
-                    "transition-color": {"duration": 300},
                     "color": "rock_night",
                     "opacity": 0.8
                 },
                 "landuse_sand": {
-                    "transition-color": {"duration": 300},
                     "color": "sand_night",
                     "opacity": 0.8
                 },
                 "landuse_park": {
-                    "transition-color": {"duration": 300},
                     "color": "park_night"
                 },
                 "landuse_cemetery": {
-                    "transition-color": {"duration": 300},
                     "color": "cemetery_night"
                 },
                 "landuse_hospital": {
-                    "transition-color": {"duration": 300},
                     "color": "hospital_night"
                 },
                 "landuse_school": {
-                    "transition-color": {"duration": 300},
                     "color": "school_night"
                 },
                 "landuse_pitch": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "pitch_night",
                     "stroke": "pitch"
                 },
                 "landuse_industrial": {
-                    "transition-color": {"duration": 300},
                     "color": "builtup_night"
                 },
                 "overlay_wetland": {
-                    "transition-color": {"duration": 300},
                     "color": "rgba(210,225,225,0.2)",
                     "image": "wetland_noveg_64"
                 },
                 "overlay_breakwater_pier": {
-                    "transition-color": {"duration": 300},
                     "color": "land_night"
                 },
                 "hillshade_full_shadow": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "#103",
                     "antialias": false,
                     "opacity": [
@@ -2574,8 +2422,6 @@ module.exports = {
                     ]
                 },
                 "hillshade_medium_shadow": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "#206",
                     "antialias": false,
                     "opacity": [
@@ -2586,8 +2432,6 @@ module.exports = {
                     ]
                 },
                 "hillshade_full_highlight": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "#fdfdad",
                     "antialias": false,
                     "opacity": [
@@ -2599,8 +2443,6 @@ module.exports = {
                     ]
                 },
                 "hillshade_medium_highlight": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "#ffe1b7",
                     "antialias": false,
                     "opacity": [
@@ -2611,8 +2453,6 @@ module.exports = {
                     ]
                 },
                 "contour_line_loud": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "contour_night",
                     "width": 0.9,
                     "opacity": [
@@ -2622,8 +2462,6 @@ module.exports = {
                     ]
                 },
                 "contour_line_regular": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "contour_night",
                     "width": 0.5,
                     "opacity": [
@@ -2633,31 +2471,24 @@ module.exports = {
                     ]
                 },
                 "water": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "water_night",
                     "stroke": "water_dark_night"
                 },
                 "aeroway_fill": {
-                    "transition-color": {"duration": 300},
                     "color": "#367"
                 },
                 "aeroway_runway": {
-                    "transition-color": {"duration": 300},
                     "color": "#367",
                     "width": "runway_width"
                 },
                 "aeroway_taxiway": {
-                    "transition-color": {"duration": 300},
                     "color": "#367",
                     "width": "taxiway_width"
                 },
                 "building": {
-                    "transition-color": {"duration": 300},
                     "color": "#027797"
                 },
                 "building_wall": {
-                    "transition-color": {"duration": 300},
                     "color": "#027797",
                     "stroke": "#026688",
                     "opacity": [
@@ -2667,7 +2498,6 @@ module.exports = {
                     ]
                 },
                 "building_shadow": {
-                    "transition-color": {"duration": 300},
                     "color": "#026688",
                     "stroke": "#026688",
                     "translate": [
@@ -2681,7 +2511,6 @@ module.exports = {
                     ]
                 },
                 "tunnel_motorway_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case_night",
                     "dasharray": [
                         6,
@@ -2695,7 +2524,6 @@ module.exports = {
                     ]
                 },
                 "tunnel_motorway": {
-                    "transition-color": {"duration": 300},
                     "color": "#78b0c1",
                     "width": "motorway_width",
                     "opacity": [
@@ -2705,7 +2533,6 @@ module.exports = {
                     ]
                 },
                 "tunnel_main_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case_night",
                     "dasharray": [
                         6,
@@ -2718,7 +2545,6 @@ module.exports = {
                     ]
                 },
                 "tunnel_main": {
-                    "transition-color": {"duration": 300},
                     "color": "#78b0c1",
                     "width": "main_width",
                     "opacity": [
@@ -2728,7 +2554,6 @@ module.exports = {
                     ]
                 },
                 "tunnel_motorway_link_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case_night",
                     "dasharray": [
                         6,
@@ -2737,22 +2562,18 @@ module.exports = {
                     "width": "motorway_link_casing_width"
                 },
                 "tunnel_motorway_link": {
-                    "transition-color": {"duration": 300},
                     "color": "#78b0c1",
                     "width": "motorway_link_width"
                 },
                 "tunnel_street_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "street_case_night",
                     "width": "street_casing_width"
                 },
                 "tunnel_street": {
-                    "transition-color": {"duration": 300},
                     "color": "street_night",
                     "width": "street_width"
                 },
                 "tunnel_service_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "#000",
                     "opacity": 0.04,
                     "dasharray": [
@@ -2762,12 +2583,10 @@ module.exports = {
                     "width": "service_casing_width"
                 },
                 "tunnel_service": {
-                    "transition-color": {"duration": 300},
                     "color": "#017ca0",
                     "width": 2
                 },
                 "road_motorway_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case_night",
                     "width": "motorway_casing_width",
                     "opacity": [
@@ -2777,7 +2596,6 @@ module.exports = {
                     ]
                 },
                 "road_motorway": {
-                    "transition-color": {"duration": 300},
                     "color": "motorway_night",
                     "width": "motorway_width",
                     "opacity": [
@@ -2787,7 +2605,6 @@ module.exports = {
                     ]
                 },
                 "road_main_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case_night",
                     "width": "main_casing_width",
                     "opacity": ["stops",
@@ -2796,7 +2613,6 @@ module.exports = {
                     ]
                 },
                 "road_main": {
-                    "transition-color": {"duration": 300},
                     "color": "main_night",
                     "width": "main_width",
                     "opacity": [
@@ -2806,44 +2622,35 @@ module.exports = {
                     ]
                 },
                 "road_motorway_link_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case_night",
                     "width": "motorway_link_casing_width"
                 },
                 "road_motorway_link": {
-                    "transition-color": {"duration": 300},
                     "color": "motorway_night",
                     "width": "motorway_link_width"
                 },
                 "road_street_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "street_case_night",
                     "width": "street_casing_width"
                 },
                 "road_street": {
-                    "transition-color": {"duration": 300},
                     "color": "street_night",
                     "width": "street_width"
                 },
                 "road_service_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "#000",
                     "opacity": 0.04,
                     "width": "service_casing_width"
                 },
                 "road_service": {
-                    "transition-color": {"duration": 300},
                     "color": "street_night",
                     "width": 2
                 },
                 "road_path_case": {
-                    "transition-opacity": {"duration": 300},
-                    "transition-color": {"duration": 300},
                     "color": "land_night",
                     "opacity": 0.2
                 },
                 "road_path_footway": {
-                    "transition-color": {"duration": 300},
                     "color": "#fff",
                     "dasharray": [
                         10,
@@ -2852,7 +2659,6 @@ module.exports = {
                     "width": "path_width"
                 },
                 "road_path_path": {
-                    "transition-color": {"duration": 300},
                     "color": "#fff",
                     "dasharray": [
                         10,
@@ -2867,7 +2673,6 @@ module.exports = {
                     ]
                 },
                 "road_path_cycleway": {
-                    "transition-color": {"duration": 300},
                     "color": "#94e6ff",
                     "dasharray": [
                         10,
@@ -2876,7 +2681,6 @@ module.exports = {
                     "width": "path_width"
                 },
                 "road_path_mtb": {
-                    "transition-color": {"duration": 300},
                     "color": "#94e6ff",
                     "dasharray": [
                         12,
@@ -2885,7 +2689,6 @@ module.exports = {
                     "width": "path_width"
                 },
                 "road_path_piste": {
-                    "transition-color": {"duration": 300},
                     "color": "#715dae",
                     "dasharray": [
                         8,
@@ -2894,8 +2697,6 @@ module.exports = {
                     "width": "path_width"
                 },
                 "road_path_steps": {
-                    "transition-color": {"duration": 300},
-                    "transition-opacity": {"duration": 300},
                     "color": "#016684",
                     "dasharray": [
                         10,
@@ -2905,12 +2706,10 @@ module.exports = {
                     "width": 6
                 },
                 "road_major_rail": {
-                    "transition-color": {"duration": 300},
                     "color": "#c8c4c0",
                     "width": 0.8
                 },
                 "road_major_rail_hatching": {
-                    "transition-color": {"duration": 300},
                     "color": "#c8c4c0",
                     "dasharray": [
                         2,
@@ -2919,7 +2718,6 @@ module.exports = {
                     "width": 5
                 },
                 "bridge_motorway_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case_night",
                     "width": "motorway_casing_width",
                     "opacity": [
@@ -2929,7 +2727,6 @@ module.exports = {
                     ]
                 },
                 "bridge_motorway": {
-                    "transition-color": {"duration": 300},
                     "color": "motorway_night",
                     "width": "motorway_width",
                     "opacity": [
@@ -2939,7 +2736,6 @@ module.exports = {
                     ]
                 },
                 "bridge_main_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case_night",
                     "width": "main_casing_width",
                     "opacity": ["stops",
@@ -2948,7 +2744,6 @@ module.exports = {
                     ]
                 },
                 "bridge_main": {
-                    "transition-color": {"duration": 300},
                     "color": "main_night",
                     "width": "main_width",
                     "opacity": [
@@ -2958,51 +2753,41 @@ module.exports = {
                     ]
                 },
                 "bridge_motorway_link_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "case_night",
                     "width": "motorway_link_casing_width"
                 },
                 "bridge_motorway_link": {
-                    "transition-color": {"duration": 300},
                     "color": "motorway_night",
                     "width": "motorway_link_width"
                 },
                 "bridge_street_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "street_case_night",
                     "width": "street_casing_width"
                 },
                 "bridge_street": {
-                    "transition-color": {"duration": 300},
                     "color": "street_night",
                     "width": "street_width"
                 },
                 "bridge_service_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "#000",
                     "opacity": 0.04,
                     "width": "service_casing_width"
                 },
                 "bridge_service": {
-                    "transition-color": {"duration": 300},
                     "color": "street_night",
                     "width": 2
                 },
                 "bridge_aerialway_casing": {
-                    "transition-color": {"duration": 300},
                     "color": "white",
                     "opacity": 0.5,
                     "width": "aerialway_casing_width"
                 },
                 "bridge_aerialway": {
-                    "transition-color": {"duration": 300},
                     "color": "#876",
                     "opacity": 0.5,
                     "width": "aerialway_width"
                 },
                 "country_label": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "text_night",
                     "stroke": "text_stroke_night",
                     "size": [
@@ -3012,20 +2797,15 @@ module.exports = {
                     ]
                 },
                 "country_label_line": {
-                    "transition-color": {"duration": 300},
                     "color": "text_night",
                     "width": 0.5,
                     "opacity": 0.5
                 },
                 "marine_label_line": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "water_dark_night",
                     "stroke": "water_night"
                 },
                 "marine_label_point_1": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "water_dark_night",
                     "size": ["stops",
                         {"z": 0, "val": 20},
@@ -3037,8 +2817,6 @@ module.exports = {
                     "stroke": "water_night"
                 },
                 "marine_label_point_2": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "water_dark_night",
                     "size": ["stops",
                         {"z": 0, "val": 13},
@@ -3051,8 +2829,6 @@ module.exports = {
                     "stroke": "water_night"
                 },
                 "marine_label_point_other": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#a9c4c7",
                     "size": ["stops",
                         {"z": 0, "val": 12},
@@ -3065,8 +2841,6 @@ module.exports = {
                     "stroke": "water_night"
                 },
                 "state_label": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#fff",
                     "strokeWidth": 0.4,
                     "strokeBlur": 1,
@@ -3080,12 +2854,9 @@ module.exports = {
                     ]
                 },
                 "place_label_city_point": {
-                    "transition-color": {"duration": 300},
                     "color": "#ddd"
                 },
                 "place_label_city": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#fff",
                     "strokeWidth": 0.4,
                     "stroke": "text_stroke_night",
@@ -3108,8 +2879,6 @@ module.exports = {
                     ]
                 },
                 "place_label_town": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "text_night",
                     "strokeWidth": 0.5,
                     "stroke": "text_stroke_night",
@@ -3122,8 +2891,6 @@ module.exports = {
                     ]
                 },
                 "place_label_village": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "text_night",
                     "strokeWidth": 0.5,
                     "stroke": "text_stroke_night",
@@ -3137,8 +2904,6 @@ module.exports = {
                     ]
                 },
                 "place_label_other": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "text_night",
                     "stroke": "text_stroke_night",
                     "strokeWidth": 0.5,
@@ -3152,8 +2917,6 @@ module.exports = {
                     ]
                 },
                 "road_label": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "text_night",
                     "stroke": "text_stroke_night",
                     "strokeWidth": 0.5,
@@ -3161,28 +2924,21 @@ module.exports = {
                     "size": "road_label_size"
                 },
                 "water_label": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "water_dark_night",
                     "stroke": "text_stroke_night"
                 },
                 "waterway_label": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "land_night",
                     "strokeWidth": 0.8,
                     "stroke": "water_night"
                 },
                 "poi": {
-                    "transition-color": {"duration": 300},
                     "color": "white",
                     "antialias": false
                 },
                 "poi_label": {
-                    "transition-color": {"duration": 300},
-                    "transition-stroke": {"duration": 300},
                     "color": "#fff",
-                    "size": 11,
+                    "size": 10,
                     "stroke": "land_night",
                     "strokeWidth": 0.4,
                     "strokeBlur": 0.2,
