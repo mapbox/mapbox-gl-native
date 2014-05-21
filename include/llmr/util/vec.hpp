@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <cmath>
 #include <cstdint>
+#include <array>
 
 namespace llmr {
 
@@ -45,6 +46,10 @@ struct vec2 {
     operator*=(O o) {
         x *= o;
         y *= o;
+    }
+
+    inline vec2<T> operator *(const std::array<float, 16>& matrix) {
+        return { x * matrix[0] + y * matrix[4] + matrix[12], x * matrix[1] + y * matrix[5] + matrix[13] };
     }
 
     template <typename O>
