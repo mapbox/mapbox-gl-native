@@ -2499,7 +2499,7 @@ module.exports = {
                     "antialias": false,
                     "opacity": [
                         "stops",
-                        {"z": 15, "val": 0.3},
+                        {"z": 0, "val": 0.3},
                         {"z": 17, "val": 0.2},
                         {"z": 18, "val": 0.1}
                     ]
@@ -2511,7 +2511,7 @@ module.exports = {
                     "antialias": false,
                     "opacity": [
                         "stops",
-                        {"z": 15, "val": 0.3},
+                        {"z": 0, "val": 0.3},
                         {"z": 17, "val": 0.2},
                         {"z": 18, "val": 0.1}
                     ]
@@ -2523,6 +2523,7 @@ module.exports = {
                     "antialias": false,
                     "opacity": [
                         "stops",
+                        {"z": 0, "val": 0.7},
                         {"z": 15, "val": 0.5},
                         {"z": 17, "val": 0.3},
                         {"z": 18, "val": 0.1}
@@ -2531,10 +2532,11 @@ module.exports = {
                 "hillshade_medium_highlight": {
                     "transition-color": {"duration": 300},
                     "transition-opacity": {"duration": 300},
-                    "color": "#ff9280",
+                    "color": "#ffb680",
                     "antialias": false,
                     "opacity": [
                         "stops",
+                        {"z": 0, "val": 0.6},
                         {"z": 15, "val": 0.5},
                         {"z": 17, "val": 0.3},
                         {"z": 18, "val": 0.1}
