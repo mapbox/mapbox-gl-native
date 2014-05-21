@@ -2402,12 +2402,12 @@ module.exports = {
                 },
                 "admin_l2": {
                     "transition-color": {"duration": 300},
-                    "color": "#88a",
+                    "color": "#ccc",
                     "width": "admin_l2_width"
                 },
                 "admin_l3": {
                     "transition-color": {"duration": 300},
-                    "color": "#88a",
+                    "color": "#ccc",
                     "dasharray": [
                         60,
                         20
