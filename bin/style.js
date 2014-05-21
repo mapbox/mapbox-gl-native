@@ -3169,9 +3169,8 @@ module.exports = {
                 "waterway_label": {
                     "transition-color": {"duration": 300},
                     "transition-stroke": {"duration": 300},
-                    "color": "water_dark_night",
-                    "strokeWidth": 0.4,
-                    "strokeBlur": 2,
+                    "color": "land_night",
+                    "strokeWidth": 0.8,
                     "stroke": "water_night"
                 },
                 "poi": {
