@@ -567,12 +567,104 @@ void Style::cascade(float z) {
     }
 
     // Icons
+    for (const auto& icon_pair : computed.icons) {
+        const std::string& layer_name = icon_pair.first;
 
-    // translate
-    // color
-    // opacity
-    // radius
-    // blur
+        // translate
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Translate)) {
+
+            computed.icons[layer_name].translate = transitioning.icons[layer_name].translate;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Translate)) {
+
+            transitioning.icons[layer_name].translate = previous.icons[layer_name].translate;
+
+            transitions[layer_name][TransitionablePropertyKey::Translate] =
+                std::make_shared<util::ease_transition<std::array<float, 2>>>(previous.icons[layer_name].translate,
+                                                                              computed.icons[layer_name].translate,
+                                                                              transitioning.icons[layer_name].translate,
+                                                                              start,
+                                                                              transitionDuration(layer_name, TransitionablePropertyKey::Translate));
+
+            computed.icons[layer_name].translate = transitioning.icons[layer_name].translate;
+        }
+
+        // color
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Color)) {
+
+            computed.icons[layer_name].color = transitioning.icons[layer_name].color;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Color)) {
+
+            transitioning.icons[layer_name].color = previous.icons[layer_name].color;
+
+            transitions[layer_name][TransitionablePropertyKey::Color] =
+                std::make_shared<util::ease_transition<Color>>(previous.icons[layer_name].color,
+                                                               computed.icons[layer_name].color,
+                                                               transitioning.icons[layer_name].color,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Color));
+
+            computed.icons[layer_name].color = transitioning.icons[layer_name].color;
+        }
+
+        // opacity
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity)) {
+
+            computed.icons[layer_name].opacity = transitioning.icons[layer_name].opacity;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Opacity)) {
+
+            transitioning.icons[layer_name].opacity = previous.icons[layer_name].opacity;
+
+            transitions[layer_name][TransitionablePropertyKey::Opacity] =
+                std::make_shared<util::ease_transition<float>>(previous.icons[layer_name].opacity,
+                                                               computed.icons[layer_name].opacity,
+                                                               transitioning.icons[layer_name].opacity,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Opacity));
+
+            computed.icons[layer_name].opacity = transitioning.icons[layer_name].opacity;
+        }
+
+        // radius
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Radius)) {
+
+            computed.icons[layer_name].radius = transitioning.icons[layer_name].radius;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Radius)) {
+
+            transitioning.icons[layer_name].radius = previous.icons[layer_name].radius;
+
+            transitions[layer_name][TransitionablePropertyKey::Radius] =
+                std::make_shared<util::ease_transition<float>>(previous.icons[layer_name].radius,
+                                                               computed.icons[layer_name].radius,
+                                                               transitioning.icons[layer_name].radius,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Radius));
+
+            computed.icons[layer_name].radius = transitioning.icons[layer_name].radius;
+        }
+
+        // blur
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Blur)) {
+
+            computed.icons[layer_name].blur = transitioning.icons[layer_name].blur;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Blur)) {
+
+            transitioning.icons[layer_name].blur = previous.icons[layer_name].blur;
+
+            transitions[layer_name][TransitionablePropertyKey::Blur] =
+                std::make_shared<util::ease_transition<float>>(previous.icons[layer_name].blur,
+                                                               computed.icons[layer_name].blur,
+                                                               transitioning.icons[layer_name].blur,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Blur));
+
+            computed.icons[layer_name].blur = transitioning.icons[layer_name].blur;
+        }
+    }
 
     // Text
 
