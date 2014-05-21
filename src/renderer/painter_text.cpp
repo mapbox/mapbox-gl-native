@@ -90,7 +90,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     textShader->setFadeDist(fadedist * 10);
     textShader->setMinFadeZoom(std::floor(lowZ * 10));
     textShader->setMaxFadeZoom(std::floor(highZ * 10));
-    textShader->setFadeZoom((map.getState().getZoom() + bump) * 10);
+    textShader->setFadeZoom((map.getState().getNormalizedZoom() + bump) * 10);
 
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
