@@ -478,6 +478,10 @@ FillClass StyleParser::parseFillClass(JSVal value) {
         klass.specifiers.insert("translate-anchor");
     }
 
+    if (value.HasMember("winding")) {
+        throw std::runtime_error("winding in stylesheets not yet supported");
+    }
+
     if (value.HasMember("color")) {
         klass.fill_color = parseColor(value["color"]);
         klass.fill_color_transition = parseTransition(value, "color");
@@ -673,6 +677,12 @@ TextClass StyleParser::parseTextClass(JSVal value) {
     if (value.HasMember("alwaysVisible")) {
         klass.always_visible = parseFunction(value["alwaysVisible"]);
         klass.specifiers.insert("alwaysVisible");
+    }
+
+    if (value.HasMember("opacity")) {
+        klass.opacity = parseFunction(value["opacity"]);
+        klass.opacity_transition = parseTransition(value, "opacity");
+        klass.specifiers.insert("opacity");
     }
 
     return klass;
