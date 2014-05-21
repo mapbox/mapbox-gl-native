@@ -456,13 +456,139 @@ void Style::cascade(float z) {
     }
 
     // Lines
+    for (const auto& line_pair : computed.lines) {
+        const std::string& layer_name = line_pair.first;
 
-    // translate
-    // width
-    // offset
-    // color
-    // dasharray
-    // opacity
+        // translate
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Translate)) {
+
+            computed.lines[layer_name].translate = transitioning.lines[layer_name].translate;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Translate)) {
+
+            transitioning.lines[layer_name].translate = previous.lines[layer_name].translate;
+
+            std::vector<float> from, to, transitioning_ref;
+            from.push_back(previous.lines[layer_name].translate[0]);
+            from.push_back(previous.lines[layer_name].translate[1]);
+            to.push_back(computed.lines[layer_name].translate[0]);
+            to.push_back(computed.lines[layer_name].translate[1]);
+            transitioning_ref.push_back(transitioning.lines[layer_name].translate[0]);
+            transitioning_ref.push_back(transitioning.lines[layer_name].translate[1]);
+
+            transitions[layer_name][TransitionablePropertyKey::Translate] =
+                std::make_shared<util::ease_transition<std::vector<float>>>(from,
+                                                                            to,
+                                                                            transitioning_ref,
+                                                                            start,
+                                                                            transitionDuration(layer_name, TransitionablePropertyKey::Translate));
+
+            computed.lines[layer_name].translate = transitioning.lines[layer_name].translate;
+        }
+
+        // width
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Width)) {
+
+            computed.lines[layer_name].width = transitioning.lines[layer_name].width;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Width)) {
+
+            transitioning.lines[layer_name].width = previous.lines[layer_name].width;
+
+            transitions[layer_name][TransitionablePropertyKey::Width] =
+                std::make_shared<util::ease_transition<float>>(previous.lines[layer_name].width,
+                                                               computed.lines[layer_name].width,
+                                                               transitioning.lines[layer_name].width,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Width));
+
+            computed.lines[layer_name].width = transitioning.lines[layer_name].width;
+        }
+
+        // offset
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Offset)) {
+
+            computed.lines[layer_name].offset = transitioning.lines[layer_name].offset;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Offset)) {
+
+            transitioning.lines[layer_name].offset = previous.lines[layer_name].offset;
+
+            transitions[layer_name][TransitionablePropertyKey::Offset] =
+                std::make_shared<util::ease_transition<float>>(previous.lines[layer_name].offset,
+                                                               computed.lines[layer_name].offset,
+                                                               transitioning.lines[layer_name].offset,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Offset));
+
+            computed.lines[layer_name].offset = transitioning.lines[layer_name].offset;
+        }
+
+        // color
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Color)) {
+
+            computed.lines[layer_name].color = transitioning.lines[layer_name].color;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Color)) {
+
+            transitioning.lines[layer_name].color = previous.lines[layer_name].color;
+
+            transitions[layer_name][TransitionablePropertyKey::Color] =
+                std::make_shared<util::ease_transition<Color>>(previous.lines[layer_name].color,
+                                                               computed.lines[layer_name].color,
+                                                               transitioning.lines[layer_name].color,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Color));
+
+            computed.lines[layer_name].color = transitioning.lines[layer_name].color;
+        }
+
+        // dasharray
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::DashArray)) {
+
+            computed.lines[layer_name].dash_array = transitioning.lines[layer_name].dash_array;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::DashArray)) {
+
+            transitioning.lines[layer_name].dash_array = previous.lines[layer_name].dash_array;
+
+            std::vector<float> from, to, transitioning_ref;
+            from.push_back(previous.lines[layer_name].dash_array[0]);
+            from.push_back(previous.lines[layer_name].dash_array[1]);
+            to.push_back(computed.lines[layer_name].dash_array[0]);
+            to.push_back(computed.lines[layer_name].dash_array[1]);
+            transitioning_ref.push_back(transitioning.lines[layer_name].dash_array[0]);
+            transitioning_ref.push_back(transitioning.lines[layer_name].dash_array[1]);
+
+            transitions[layer_name][TransitionablePropertyKey::DashArray] =
+                std::make_shared<util::ease_transition<std::vector<float>>>(from,
+                                                                            to,
+                                                                            transitioning_ref,
+                                                                            start,
+                                                                            transitionDuration(layer_name, TransitionablePropertyKey::DashArray));
+
+            computed.lines[layer_name].dash_array = transitioning.lines[layer_name].dash_array;
+        }
+
+        // opacity
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity)) {
+
+            computed.lines[layer_name].opacity = transitioning.lines[layer_name].opacity;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Opacity)) {
+
+            transitioning.lines[layer_name].opacity = previous.lines[layer_name].opacity;
+
+            transitions[layer_name][TransitionablePropertyKey::Opacity] =
+                std::make_shared<util::ease_transition<float>>(previous.lines[layer_name].opacity,
+                                                               computed.lines[layer_name].opacity,
+                                                               transitioning.lines[layer_name].opacity,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Opacity));
+
+            computed.lines[layer_name].opacity = transitioning.lines[layer_name].opacity;
+        }
+    }
 
     // Icons
 
