@@ -463,41 +463,49 @@ FillClass StyleParser::parseFillClass(JSVal value) {
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);
+        klass.specifiers.insert("enabled");
     }
 
     if (value.HasMember("translate")) {
         std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
         klass.translate_transition = parseTransition(value, "translate");
+        klass.specifiers.insert("translate");
     }
 
     if (value.HasMember("translate-anchor")) {
         klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
+        klass.specifiers.insert("translate-anchor");
     }
 
     if (value.HasMember("color")) {
         klass.fill_color = parseColor(value["color"]);
         klass.fill_color_transition = parseTransition(value, "color");
+        klass.specifiers.insert("color");
     }
 
     if (value.HasMember("stroke")) {
         klass.stroke_color = parseColor(value["stroke"]);
         klass.stroke_color_transition = parseTransition(value, "stroke");
+        klass.specifiers.insert("stroke");
     } else {
         klass.stroke_color = klass.fill_color;
     }
 
     if (value.HasMember("antialias")) {
         klass.antialias = parseBoolean(value["antialias"]);
+        klass.specifiers.insert("antialias");
     }
 
     if (value.HasMember("image")) {
         klass.image = parseString(value["image"]);
+        klass.specifiers.insert("image");
     }
 
     if (value.HasMember("opacity")) {
         klass.opacity = parseFunction(value["opacity"]);
         klass.opacity_transition = parseTransition(value, "opacity");
+        klass.specifiers.insert("opacity");
     }
 
     return klass;
@@ -508,37 +516,44 @@ LineClass StyleParser::parseLineClass(JSVal value) {
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);
+        klass.specifiers.insert("enabled");
     }
 
     if (value.HasMember("translate")) {
         std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
         klass.translate_transition = parseTransition(value, "translate");
+        klass.specifiers.insert("translate");
     }
 
     if (value.HasMember("translate-anchor")) {
         klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
+        klass.specifiers.insert("translate-anchor");
     }
 
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
         klass.color_transition = parseTransition(value, "color");
+        klass.specifiers.insert("color");
     }
 
     if (value.HasMember("width")) {
         klass.width = parseFunction(value["width"]);
         klass.width_transition = parseTransition(value, "width");
+        klass.specifiers.insert("width");
     }
 
     if (value.HasMember("opacity")) {
         klass.opacity = parseFunction(value["opacity"]);
         klass.opacity_transition = parseTransition(value, "opacity");
+        klass.specifiers.insert("opacity");
     }
 
     if (value.HasMember("dasharray")) {
         std::vector<FunctionProperty> values = parseArray(value["dasharray"], 2);
         klass.dash_array = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
         klass.dash_array_transition = parseTransition(value, "dasharray");
+        klass.specifiers.insert("dasharray");
     }
 
     return klass;
@@ -549,44 +564,53 @@ IconClass StyleParser::parseIconClass(JSVal value) {
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);
+        klass.specifiers.insert("enabled");
     }
 
     if (value.HasMember("translate")) {
         std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
         klass.translate_transition = parseTransition(value, "translate");
+        klass.specifiers.insert("translate");
     }
 
     if (value.HasMember("translate-anchor")) {
         klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
+        klass.specifiers.insert("translate-anchor");
     }
 
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
         klass.color_transition = parseTransition(value, "color");
+        klass.specifiers.insert("color");
     }
 
     if (value.HasMember("opacity")) {
         klass.opacity = parseFunction(value["opacity"]);
         klass.opacity_transition = parseTransition(value, "opacity");
+        klass.specifiers.insert("opacity");
     }
 
     if (value.HasMember("image")) {
         klass.image = parseString(value["image"]);
+        klass.specifiers.insert("image");
     }
 
     if (value.HasMember("size")) {
         klass.size = parseFunction(value["size"]);
+        klass.specifiers.insert("size");
     }
 
     if (value.HasMember("radius")) {
         klass.radius = parseFunction(value["radius"]);
         klass.radius_transition = parseTransition(value, "radius");
+        klass.specifiers.insert("radius");
     }
 
     if (value.HasMember("blur")) {
         klass.blur = parseFunction(value["blur"]);
         klass.blur_transition = parseTransition(value, "blur");
+        klass.specifiers.insert("blur");
     }
 
     return klass;
@@ -597,48 +621,58 @@ TextClass StyleParser::parseTextClass(JSVal value) {
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);
+        klass.specifiers.insert("enabled");
     }
 
     if (value.HasMember("translate")) {
         std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
         klass.translate_transition = parseTransition(value, "translate");
+        klass.specifiers.insert("translate");
     }
 
     if (value.HasMember("translate-anchor")) {
         klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
+        klass.specifiers.insert("translate-anchor");
     }
 
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
         klass.color_transition = parseTransition(value, "color");
+        klass.specifiers.insert("color");
     }
 
     if (value.HasMember("stroke")) {
         klass.halo = parseColor(value["stroke"]);
         klass.halo_transition = parseTransition(value, "stroke");
+        klass.specifiers.insert("stroke");
     }
 
     if (value.HasMember("strokeWidth")) {
         klass.halo_radius = parseFunction(value["strokeWidth"]);
         klass.halo_radius_transition = parseTransition(value, "strokeWidth");
+        klass.specifiers.insert("strokeWidth");
     }
 
     if (value.HasMember("strokeBlur")) {
         klass.halo_blur = parseFunction(value["strokeBlur"]);
         klass.halo_blur_transition = parseTransition(value, "strokeBlur");
+        klass.specifiers.insert("strokeBlur");
     }
 
     if (value.HasMember("size")) {
         klass.size = parseFunction(value["size"]);
+        klass.specifiers.insert("size");
     }
 
     if (value.HasMember("rotate")) {
         klass.rotate = parseFunction(value["rotate"]);
+        klass.specifiers.insert("rotate");
     }
 
     if (value.HasMember("alwaysVisible")) {
         klass.always_visible = parseFunction(value["alwaysVisible"]);
+        klass.specifiers.insert("alwaysVisible");
     }
 
     return klass;
@@ -649,11 +683,13 @@ RasterClass StyleParser::parseRasterClass(JSVal value) {
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);
+        klass.specifiers.insert("enabled");
     }
 
     if (value.HasMember("opacity")) {
         klass.opacity = parseFunction(value["opacity"]);
         klass.opacity_transition = parseTransition(value, "opacity");
+        klass.specifiers.insert("opacity");
     }
 
     return klass;
@@ -665,11 +701,13 @@ BackgroundClass StyleParser::parseBackgroundClass(JSVal value) {
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
         klass.color_transition = parseTransition(value, "color");
+        klass.specifiers.insert("color");
     }
 
     if (value.HasMember("opacity")) {
         klass.opacity = parseFunction(value["opacity"]);
         klass.opacity_transition = parseTransition(value, "opacity");
+        klass.specifiers.insert("opacity");
     }
 
     return klass;

@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <limits>
+#include <set>
 
 namespace llmr {
 
@@ -96,6 +97,7 @@ struct IconClass {
     PropertyTransition radius_transition;
     FunctionProperty blur = 0;
     PropertyTransition blur_transition;
+    std::set<std::string> specifiers;
 };
 
 struct IconProperties {
@@ -125,6 +127,7 @@ struct LineClass {
     PropertyTransition dash_array_transition;
     FunctionProperty opacity = 1;
     PropertyTransition opacity_transition;
+    std::set<std::string> specifiers;
 };
 
 struct LineProperties {
@@ -152,6 +155,7 @@ struct FillClass {
     FunctionProperty opacity = 1;
     PropertyTransition opacity_transition;
     std::string image;
+    std::set<std::string> specifiers;
 };
 
 struct FillProperties {
@@ -184,6 +188,7 @@ struct TextClass {
     FunctionProperty always_visible = false;
     FunctionProperty opacity = 1;
     PropertyTransition opacity_transition;
+    std::set<std::string> specifiers;
 };
 
 struct TextProperties {
@@ -205,6 +210,7 @@ struct BackgroundClass {
     PropertyTransition color_transition;
     FunctionProperty opacity = 1;
     PropertyTransition opacity_transition;
+    std::set<std::string> specifiers;
 };
 
 struct BackgroundProperties {
@@ -218,6 +224,7 @@ struct RasterClass {
     PropertyTransition translate_transition;
     FunctionProperty opacity = 1;
     PropertyTransition opacity_transition;
+    std::set<std::string> specifiers;
 };
 
 struct RasterProperties {
