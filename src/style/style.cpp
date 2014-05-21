@@ -20,6 +20,8 @@ void Style::reset() {
     computed.rasters.clear();
     computed.background.color = {{ 1, 1, 1, 1 }};
     computed.background.opacity = 1.0;
+
+    properties_to_transition.clear();
 }
 
 void Style::cascade(float z) {
@@ -34,735 +36,482 @@ void Style::cascade(float z) {
     previous.rasters = computed.rasters;
     previous.background = computed.background;
 
-    reset();
+    previous.effective_classes = computed.effective_classes;
 
-    std::set<std::string> currentPassAppliedClasses;
+    reset();
 
     // Accomodate for different tile size.
     // TODO: Make this per-layer once individual layers have a specific tile size.
     z += std::log(util::tileSize / 256.0f) / M_LN2;
 
-    // Recalculate style
-    // Basic cascading
+    // Recalculate style with basic cascading. Also store the last applied class
+    // for each property to assist in determining transitions.
     for (const auto& class_pair : classes) {
         const std::string& class_name = class_pair.first;
         const ClassDescription& sheetClass = class_pair.second;
 
-        // Not enabled
+        // Skip if not enabled.
         if (appliedClasses.find(class_name) == appliedClasses.end()) continue;
-        currentPassAppliedClasses.insert(class_name);
 
-        // Cascade fill classes
+        // Cascade fill classes.
         for (const auto& fill_pair : sheetClass.fill) {
             const std::string& layer_name = fill_pair.first;
             const llmr::FillClass& layer = fill_pair.second;
 
             llmr::FillProperties& fill = computed.fills[layer_name];
 
-            // enabled
             if (layer.specifiers.count("enabled")) {
                 fill.enabled = layer.enabled.evaluate<bool>(z);
             }
 
-            // translate (transitionable)
             if (layer.specifiers.count("translate")) {
-                if (layer.translate_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
-                    (layer.translate[0].evaluate<float>(z) != previous.fills[layer_name].translate[0] ||
-                     layer.translate[1].evaluate<float>(z) != previous.fills[layer_name].translate[1]) &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.fills[layer_name].translate = {{ previous.fills[layer_name].translate[0],
-                                                                   previous.fills[layer_name].translate[1] }};
-
-                    std::vector<float> from, to, transitioning_ref;
-                    from.push_back(previous.fills[layer_name].translate[0]);
-                    from.push_back(previous.fills[layer_name].translate[1]);
-                    to.push_back(layer.translate[0].evaluate<float>(z));
-                    to.push_back(layer.translate[1].evaluate<float>(z));
-                    transitioning_ref.push_back(transitioning.fills[layer_name].translate[0]);
-                    transitioning_ref.push_back(transitioning.fills[layer_name].translate[1]);
-                    transitions[layer_name][TransitionablePropertyKey::Translate] =
-                        std::make_shared<util::ease_transition<std::vector<float>>>(from,
-                                                                                    to,
-                                                                                    transitioning_ref,
-                                                                                    start,
-                                                                                    layer.translate_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Translate)) {
-                    fill.translate = transitioning.fills[layer_name].translate;
-                } else {
-                    fill.translate = {{ layer.translate[0].evaluate<float>(z),
-                                        layer.translate[1].evaluate<float>(z) }};
+                fill.translate = {{ layer.translate[0].evaluate<float>(z),
+                                    layer.translate[1].evaluate<float>(z) }};
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Translate] = class_name;
+                if (layer.translate_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Translate] = layer.translate_transition;
                 }
             }
 
-            // translate anchor
             if (layer.specifiers.count("translate-anchor")) {
                 fill.translateAnchor = layer.translateAnchor;
             }
 
-            // winding
-            fill.winding = layer.winding;
+            if (layer.specifiers.count("winding")) {
+                fill.winding = layer.winding;
+            }
 
-            // antialias
             if (layer.specifiers.count("antialias")) {
                 fill.antialias = layer.antialias.evaluate<bool>(z);
             }
 
-            // fill color (transitionable)
             if (layer.specifiers.count("color")) {
-                if (layer.fill_color_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::FillColor) &&
-                    layer.fill_color != previous.fills[layer_name].fill_color &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.fills[layer_name].fill_color = previous.fills[layer_name].fill_color;
-
-                    transitions[layer_name][TransitionablePropertyKey::FillColor] =
-                        std::make_shared<util::ease_transition<Color>>(previous.fills[layer_name].fill_color,
-                                                                       layer.fill_color,
-                                                                       transitioning.fills[layer_name].fill_color,
-                                                                       start,
-                                                                       layer.fill_color_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::FillColor)) {
-                    fill.fill_color = transitioning.fills[layer_name].fill_color;
-                }
-                else {
-                    fill.fill_color = layer.fill_color;
+                fill.fill_color = layer.fill_color;
+                computed.effective_classes[layer_name][TransitionablePropertyKey::FillColor] = class_name;
+                if (layer.fill_color_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::FillColor] = layer.fill_color_transition;
                 }
             }
 
-            // stroke color (transitionable)
             if (layer.specifiers.count("stroke")) {
-                if (layer.stroke_color_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::StrokeColor) &&
-                    layer.stroke_color != previous.fills[layer_name].stroke_color &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.fills[layer_name].stroke_color = previous.fills[layer_name].stroke_color;
-
-                    transitions[layer_name][TransitionablePropertyKey::StrokeColor] =
-                        std::make_shared<util::ease_transition<Color>>(previous.fills[layer_name].stroke_color,
-                                                                       layer.stroke_color,
-                                                                       transitioning.fills[layer_name].stroke_color,
-                                                                       start,
-                                                                       layer.stroke_color_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::StrokeColor)) {
-                    fill.stroke_color = transitioning.fills[layer_name].stroke_color;
-                }
-                else {
-                    fill.stroke_color = layer.stroke_color;
+                fill.stroke_color = layer.stroke_color;
+                computed.effective_classes[layer_name][TransitionablePropertyKey::StrokeColor] = class_name;
+                if (layer.stroke_color_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::StrokeColor] = layer.stroke_color_transition;
                 }
             }
 
-            // opacity (transitionable)
             if (layer.specifiers.count("opacity")) {
-                if (layer.opacity_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
-                    layer.opacity.evaluate<float>(z) != previous.fills[layer_name].opacity &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.fills[layer_name].opacity = previous.fills[layer_name].opacity;
-
-                    transitions[layer_name][TransitionablePropertyKey::Opacity] =
-                        std::make_shared<util::ease_transition<float>>(previous.fills[layer_name].opacity,
-                                                                       layer.opacity.evaluate<float>(z),
-                                                                       transitioning.fills[layer_name].opacity,
-                                                                       start,
-                                                                       layer.opacity_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Opacity)) {
-                    fill.opacity = transitioning.fills[layer_name].opacity;
-                } else {
-                    fill.opacity = layer.opacity.evaluate<float>(z);
+                fill.opacity = layer.opacity.evaluate<float>(z);
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
+                if (layer.opacity_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = layer.opacity_transition;
                 }
             }
 
-            // image
             if (layer.specifiers.count("image")) {
                 fill.image = layer.image;
             }
         }
 
-        // Cascade line classes
+        // Cascade line classes.
         for (const auto& line_pair : sheetClass.line) {
             const std::string& layer_name = line_pair.first;
             const llmr::LineClass& layer = line_pair.second;
 
             llmr::LineProperties& stroke = computed.lines[layer_name];
 
-            // enabled
             if (layer.specifiers.count("enabled")) {
                 stroke.enabled = layer.enabled.evaluate<bool>(z);
             }
 
-            // translate (transitionable)
             if (layer.specifiers.count("translate")) {
-                if (layer.translate_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
-                    (layer.translate[0].evaluate<float>(z) != previous.lines[layer_name].translate[0] ||
-                     layer.translate[1].evaluate<float>(z) != previous.lines[layer_name].translate[1]) &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.lines[layer_name].translate = {{ previous.lines[layer_name].translate[0],
-                                                                   previous.lines[layer_name].translate[1] }};
-
-                    std::vector<float> from, to, transitioning_ref;
-                    from.push_back(previous.lines[layer_name].translate[0]);
-                    from.push_back(previous.lines[layer_name].translate[1]);
-                    to.push_back(layer.translate[0].evaluate<float>(z));
-                    to.push_back(layer.translate[1].evaluate<float>(z));
-                    transitioning_ref.push_back(transitioning.lines[layer_name].translate[0]);
-                    transitioning_ref.push_back(transitioning.lines[layer_name].translate[1]);
-                    transitions[layer_name][TransitionablePropertyKey::Translate] =
-                        std::make_shared<util::ease_transition<std::vector<float>>>(from,
-                                                                                    to,
-                                                                                    transitioning_ref,
-                                                                                    start,
-                                                                                    layer.translate_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Translate)) {
-                    stroke.translate = transitioning.lines[layer_name].translate;
-                } else {
-                    stroke.translate = {{ layer.translate[0].evaluate<float>(z),
-                                          layer.translate[1].evaluate<float>(z) }};
+                stroke.translate = {{ layer.translate[0].evaluate<float>(z),
+                                      layer.translate[1].evaluate<float>(z) }};
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Translate] = class_name;
+                if (layer.translate_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Translate] = layer.translate_transition;
                 }
             }
 
-            // translate anchor
             if (layer.specifiers.count("translate-anchor")) {
                 stroke.translateAnchor = layer.translateAnchor;
             }
 
-            // width (transitionable)
             if (layer.specifiers.count("width")) {
-                if (layer.width_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Width) &&
-                    layer.width.evaluate<float>(z) != previous.lines[layer_name].width &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.lines[layer_name].width = previous.lines[layer_name].width;
-
-                    transitions[layer_name][TransitionablePropertyKey::Width] =
-                        std::make_shared<util::ease_transition<float>> (previous.lines[layer_name].width,
-                                                                        layer.width.evaluate<float>(z),
-                                                                        transitioning.lines[layer_name].width,
-                                                                        start,
-                                                                        layer.width_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Width)) {
-                    stroke.width = transitioning.lines[layer_name].width;
-                } else {
-                    stroke.width = layer.width.evaluate<float>(z);
+                stroke.width = layer.width.evaluate<float>(z);
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Width] = class_name;
+                if (layer.width_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Width] = layer.width_transition;
                 }
+
             }
 
-            // offset (transitionable)
             if (layer.specifiers.count("offset")) {
-                if (layer.offset_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Offset) &&
-                    layer.offset.evaluate<float>(z) != previous.lines[layer_name].offset &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.lines[layer_name].offset = previous.lines[layer_name].offset;
-
-                    transitions[layer_name][TransitionablePropertyKey::Offset] =
-                        std::make_shared<util::ease_transition<float>> (previous.lines[layer_name].offset,
-                                                                        layer.offset.evaluate<float>(z),
-                                                                        transitioning.lines[layer_name].offset,
-                                                                        start,
-                                                                        layer.offset_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Offset)) {
-                    stroke.offset = transitioning.lines[layer_name].offset;
-                } else {
-                    stroke.offset = layer.offset.evaluate<float>(z);
+                stroke.offset = layer.offset.evaluate<float>(z);
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Offset] = class_name;
+                if (layer.offset_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Offset] = layer.offset_transition;
                 }
             }
 
-            // color (transitionable)
             if (layer.specifiers.count("color")) {
-                if (layer.color_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Color) &&
-                    layer.color != previous.lines[layer_name].color &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.lines[layer_name].color = previous.lines[layer_name].color;
-
-                    transitions[layer_name][TransitionablePropertyKey::Color] =
-                        std::make_shared<util::ease_transition<Color>>(previous.lines[layer_name].color,
-                                                                       layer.color,
-                                                                       transitioning.lines[layer_name].color,
-                                                                       start,
-                                                                       layer.color_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Color)) {
-                    stroke.color = transitioning.lines[layer_name].color;
-                }
-                else {
-                    stroke.color = layer.color;
+                stroke.color = layer.color;
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
+                if (layer.color_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Color] = layer.color_transition;
                 }
             }
 
-            // dash array (transitionable)
             if (layer.specifiers.count("dasharray")) {
-                if (layer.dash_array_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::DashArray) &&
-                    (layer.dash_array[0].evaluate<float>(z) != previous.lines[layer_name].dash_array[0] ||
-                     layer.dash_array[1].evaluate<float>(z) != previous.lines[layer_name].dash_array[1]) &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.lines[layer_name].dash_array = {{ previous.lines[layer_name].dash_array[0],
-                                                                    previous.lines[layer_name].dash_array[1] }};
-
-                    std::vector<float> from, to, transitioning_ref;
-                    from.push_back(previous.lines[layer_name].dash_array[0]);
-                    from.push_back(previous.lines[layer_name].dash_array[1]);
-                    to.push_back(layer.dash_array[0].evaluate<float>(z));
-                    to.push_back(layer.dash_array[1].evaluate<float>(z));
-                    transitioning_ref.push_back(transitioning.lines[layer_name].dash_array[0]);
-                    transitioning_ref.push_back(transitioning.lines[layer_name].dash_array[1]);
-                    transitions[layer_name][TransitionablePropertyKey::DashArray] =
-                        std::make_shared<util::ease_transition<std::vector<float>>>(from,
-                                                                                    to,
-                                                                                    transitioning_ref,
-                                                                                    start,
-                                                                                    layer.translate_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::DashArray)) {
-                    stroke.dash_array = transitioning.lines[layer_name].dash_array;
-                } else {
-                    stroke.dash_array = {{ layer.dash_array[0].evaluate<float>(z),
-                                           layer.dash_array[1].evaluate<float>(z) }};
+                stroke.dash_array = {{ layer.dash_array[0].evaluate<float>(z),
+                                       layer.dash_array[1].evaluate<float>(z) }};
+                computed.effective_classes[layer_name][TransitionablePropertyKey::DashArray] = class_name;
+                if (layer.dash_array_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::DashArray] = layer.dash_array_transition;
                 }
             }
 
-            // opacity (transitionable)
             if (layer.specifiers.count("opacity")) {
-                if (layer.opacity_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
-                    layer.opacity.evaluate<float>(z) != previous.lines[layer_name].opacity &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.lines[layer_name].opacity = previous.lines[layer_name].opacity;
-
-                    transitions[layer_name][TransitionablePropertyKey::Opacity] =
-                        std::make_shared<util::ease_transition<float>>(previous.lines[layer_name].opacity,
-                                                                       layer.opacity.evaluate<float>(z),
-                                                                       transitioning.lines[layer_name].opacity,
-                                                                       start,
-                                                                       layer.opacity_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Opacity)) {
-                    stroke.opacity = transitioning.lines[layer_name].opacity;
-                } else {
-                    stroke.opacity = layer.opacity.evaluate<float>(z);
+                stroke.opacity = layer.opacity.evaluate<float>(z);
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
+                if (layer.opacity_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = layer.opacity_transition;
                 }
             }
         }
 
-        // Cascade icon classes
+        // Cascade icon classes.
         for (const auto& icon_pair : sheetClass.icon) {
             const std::string& layer_name = icon_pair.first;
             const llmr::IconClass& layer = icon_pair.second;
 
             llmr::IconProperties& icon = computed.icons[layer_name];
 
-            // enabled
             if (layer.specifiers.count("enabled")) {
                 icon.enabled = layer.enabled.evaluate<bool>(z);
             }
 
-            // translate (transitionable)
             if (layer.specifiers.count("translate")) {
-                if (layer.translate_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
-                    (layer.translate[0].evaluate<float>(z) != previous.icons[layer_name].translate[0] ||
-                     layer.translate[1].evaluate<float>(z) != previous.icons[layer_name].translate[1]) &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.icons[layer_name].translate = {{ previous.icons[layer_name].translate[0],
-                                                                   previous.icons[layer_name].translate[1] }};
-
-                    std::vector<float> from, to, transitioning_ref;
-                    from.push_back(previous.icons[layer_name].translate[0]);
-                    from.push_back(previous.icons[layer_name].translate[1]);
-                    to.push_back(layer.translate[0].evaluate<float>(z));
-                    to.push_back(layer.translate[1].evaluate<float>(z));
-                    transitioning_ref.push_back(transitioning.icons[layer_name].translate[0]);
-                    transitioning_ref.push_back(transitioning.icons[layer_name].translate[1]);
-                    transitions[layer_name][TransitionablePropertyKey::Translate] =
-                        std::make_shared<util::ease_transition<std::vector<float>>>(from,
-                                                                                    to,
-                                                                                    transitioning_ref,
-                                                                                    start,
-                                                                                    layer.translate_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Translate)) {
-                    icon.translate = transitioning.icons[layer_name].translate;
-                } else {
-                    icon.translate = {{ layer.translate[0].evaluate<float>(z),
-                                        layer.translate[1].evaluate<float>(z) }};
+                icon.translate = {{ layer.translate[0].evaluate<float>(z),
+                                    layer.translate[1].evaluate<float>(z) }};
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Translate] = class_name;
+                if (layer.translate_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Translate] = layer.translate_transition;
                 }
             }
 
-            // translate anchor
             if (layer.specifiers.count("translate-anchor")) {
                 icon.translateAnchor = layer.translateAnchor;
             }
 
-            // color (transitionable)
             if (layer.specifiers.count("color")) {
-                if (layer.color_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Color) &&
-                    layer.color != previous.icons[layer_name].color &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.icons[layer_name].color = previous.icons[layer_name].color;
-
-                    transitions[layer_name][TransitionablePropertyKey::Color] =
-                        std::make_shared<util::ease_transition<Color>>(previous.icons[layer_name].color,
-                                                                       layer.color,
-                                                                       transitioning.icons[layer_name].color,
-                                                                       start,
-                                                                       layer.color_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Color)) {
-                    icon.color = transitioning.icons[layer_name].color;
-                }
-                else {
-                    icon.color = layer.color;
+                icon.color = layer.color;
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
+                if (layer.color_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Color] = layer.color_transition;
                 }
             }
 
-            // size
             if (layer.specifiers.count("size")) {
                 icon.size = layer.size.evaluate<float>(z);
             }
 
-            // opacity (transitionable)
             if (layer.specifiers.count("opacity")) {
-                if (layer.opacity_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
-                    layer.opacity.evaluate<float>(z) != previous.icons[layer_name].opacity &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.icons[layer_name].opacity = previous.icons[layer_name].opacity;
-
-                    transitions[layer_name][TransitionablePropertyKey::Opacity] =
-                        std::make_shared<util::ease_transition<float>>(previous.icons[layer_name].opacity,
-                                                                       layer.opacity.evaluate<float>(z),
-                                                                       transitioning.icons[layer_name].opacity,
-                                                                       start,
-                                                                       layer.opacity_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Opacity)) {
-                    icon.opacity = transitioning.icons[layer_name].opacity;
-                } else {
-                    icon.opacity = layer.opacity.evaluate<float>(z);
+                icon.opacity = layer.opacity.evaluate<float>(z);
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
+                if (layer.opacity_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = layer.opacity_transition;
                 }
             }
 
-            // image
             if (layer.specifiers.count("image")) {
                 icon.image = layer.image;
             }
 
-            // radius (transitionable)
             if (layer.specifiers.count("radius")) {
-                if (layer.radius_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Radius) &&
-                    layer.radius.evaluate<float>(z) != previous.icons[layer_name].radius &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.icons[layer_name].radius = previous.icons[layer_name].radius;
-
-                    transitions[layer_name][TransitionablePropertyKey::Radius] =
-                        std::make_shared<util::ease_transition<float>>(previous.icons[layer_name].radius,
-                                                                       layer.radius.evaluate<float>(z),
-                                                                       transitioning.icons[layer_name].radius,
-                                                                       start,
-                                                                       layer.radius_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Radius)) {
-                    icon.radius = transitioning.icons[layer_name].radius;
-                } else {
-                    icon.radius = layer.radius.evaluate<float>(z);
+                icon.radius = layer.radius.evaluate<float>(z);
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Radius] = class_name;
+                if (layer.radius_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Radius] = layer.radius_transition;
                 }
             }
 
-            // blur (transitionable)
             if (layer.specifiers.count("blur")) {
-                if (layer.blur_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Blur) &&
-                    layer.blur.evaluate<float>(z) != previous.icons[layer_name].blur &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.icons[layer_name].blur = previous.icons[layer_name].blur;
-
-                    transitions[layer_name][TransitionablePropertyKey::Blur] =
-                        std::make_shared<util::ease_transition<float>>(previous.icons[layer_name].blur,
-                                                                       layer.blur.evaluate<float>(z),
-                                                                       transitioning.icons[layer_name].blur,
-                                                                       start,
-                                                                       layer.blur_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Blur)) {
-                    icon.blur = transitioning.icons[layer_name].blur;
-                } else {
-                    icon.blur = layer.blur.evaluate<float>(z);
+                icon.blur = layer.blur.evaluate<float>(z);
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Blur] = class_name;
+                if (layer.blur_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Blur] = layer.blur_transition;
                 }
             }
         }
 
-        // Cascade text classes
+        // Cascade text classes.
         for (const auto& text_pair : sheetClass.text) {
             const std::string& layer_name = text_pair.first;
             const llmr::TextClass& layer = text_pair.second;
 
             llmr::TextProperties& text = computed.texts[layer_name];
 
-            // enabled
             if (layer.specifiers.count("enabled")) {
                 text.enabled = layer.enabled.evaluate<bool>(z);
             }
 
-            // translate (transitionable)
             if (layer.specifiers.count("translate")) {
-                if (layer.translate_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Translate) &&
-                    (layer.translate[0].evaluate<float>(z) != previous.texts[layer_name].translate[0] ||
-                     layer.translate[1].evaluate<float>(z) != previous.texts[layer_name].translate[1]) &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.texts[layer_name].translate = {{ previous.texts[layer_name].translate[0],
-                                                                   previous.texts[layer_name].translate[1] }};
-
-                    std::vector<float> from, to, transitioning_ref;
-                    from.push_back(previous.texts[layer_name].translate[0]);
-                    from.push_back(previous.texts[layer_name].translate[1]);
-                    to.push_back(layer.translate[0].evaluate<float>(z));
-                    to.push_back(layer.translate[1].evaluate<float>(z));
-                    transitioning_ref.push_back(transitioning.texts[layer_name].translate[0]);
-                    transitioning_ref.push_back(transitioning.texts[layer_name].translate[1]);
-                    transitions[layer_name][TransitionablePropertyKey::Translate] =
-                        std::make_shared<util::ease_transition<std::vector<float>>>(from,
-                                                                                    to,
-                                                                                    transitioning_ref,
-                                                                                    start,
-                                                                                    layer.translate_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Translate)) {
-                    text.translate = transitioning.texts[layer_name].translate;
-                } else {
-                    text.translate = {{ layer.translate[0].evaluate<float>(z),
-                                        layer.translate[1].evaluate<float>(z) }};
+                text.translate = {{ layer.translate[0].evaluate<float>(z),
+                                    layer.translate[1].evaluate<float>(z) }};
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Translate] = class_name;
+                if (layer.translate_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Translate] = layer.translate_transition;
                 }
             }
 
-            // translate anchor
             if (layer.specifiers.count("translate-anchor")) {
                 text.translateAnchor = layer.translateAnchor;
             }
 
-            // color (transitionable)
             if (layer.specifiers.count("color")) {
-                if (layer.color_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Color) &&
-                    layer.color != previous.texts[layer_name].color &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.lines[layer_name].color = previous.texts[layer_name].color;
-
-                    transitions[layer_name][TransitionablePropertyKey::Color] =
-                        std::make_shared<util::ease_transition<Color>>(previous.texts[layer_name].color,
-                                                                       layer.color,
-                                                                       transitioning.texts[layer_name].color,
-                                                                       start,
-                                                                       layer.color_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Color)) {
-                    text.color = transitioning.texts[layer_name].color;
-                }
-                else {
-                    text.color = layer.color;
+                text.color = layer.color;
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
+                if (layer.color_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Color] = layer.color_transition;
                 }
             }
 
-            // size
             if (layer.specifiers.count("size")) {
                 text.size = layer.size.evaluate<float>(z);
             }
 
-            // halo color (transitionable)
             if (layer.specifiers.count("stroke")) {
-                if (layer.halo_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Halo) &&
-                    layer.halo != previous.texts[layer_name].halo &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.texts[layer_name].halo = previous.texts[layer_name].halo;
-
-                    transitions[layer_name][TransitionablePropertyKey::Halo] =
-                    std::make_shared<util::ease_transition<Color>>(previous.texts[layer_name].halo,
-                                                                   layer.halo,
-                                                                   transitioning.texts[layer_name].halo,
-                                                                   start,
-                                                                   layer.halo_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Halo)) {
-                    text.halo = transitioning.texts[layer_name].halo;
-                }
-                else {
-                    text.halo = layer.halo;
+                text.halo = layer.halo;
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Halo] = class_name;
+                if (layer.halo_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Halo] = layer.halo_transition;
                 }
             }
 
-            // halo radius (transitionable)
             if (layer.specifiers.count("strokeWidth")) {
-                if (layer.halo_radius_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::HaloRadius) &&
-                    layer.halo_radius.evaluate<float>(z) != previous.texts[layer_name].halo_radius &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.texts[layer_name].halo_radius = previous.texts[layer_name].halo_radius;
-
-                    transitions[layer_name][TransitionablePropertyKey::HaloRadius] =
-                        std::make_shared<util::ease_transition<float>> (previous.texts[layer_name].halo_radius,
-                                                                        layer.halo_radius.evaluate<float>(z),
-                                                                        transitioning.texts[layer_name].halo_radius,
-                                                                        start,
-                                                                        layer.halo_radius_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::HaloRadius)) {
-                    text.halo_radius = transitioning.texts[layer_name].halo_radius;
-                } else {
-                    text.halo_radius = layer.halo_radius.evaluate<float>(z);
+                text.halo_radius = layer.halo_radius.evaluate<float>(z);
+                computed.effective_classes[layer_name][TransitionablePropertyKey::HaloRadius] = class_name;
+                if (layer.halo_radius_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::HaloRadius] = layer.halo_radius_transition;
                 }
             }
 
-            // halo blur (transitionable)
             if (layer.specifiers.count("strokeBlur")) {
-                if (layer.halo_blur_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::HaloBlur) &&
-                    layer.halo_blur.evaluate<float>(z) != previous.texts[layer_name].halo_blur &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.texts[layer_name].halo_blur = previous.texts[layer_name].halo_blur;
-
-                    transitions[layer_name][TransitionablePropertyKey::HaloBlur] =
-                        std::make_shared<util::ease_transition<float>> (previous.texts[layer_name].halo_blur,
-                                                                        layer.halo_blur.evaluate<float>(z),
-                                                                        transitioning.texts[layer_name].halo_blur,
-                                                                        start,
-                                                                        layer.halo_blur_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::HaloBlur)) {
-                    text.halo_blur = transitioning.texts[layer_name].halo_blur;
-                } else {
-                    text.halo_blur = layer.halo_blur.evaluate<float>(z);
+                text.halo_blur = layer.halo_blur.evaluate<float>(z);
+                computed.effective_classes[layer_name][TransitionablePropertyKey::HaloBlur] = class_name;
+                if (layer.halo_blur_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::HaloBlur] = layer.halo_blur_transition;
                 }
             }
 
-            // rotate
             if (layer.specifiers.count("rotate")) {
                 text.rotate = layer.rotate.evaluate<float>(z);
             }
 
-            // always visible
             if (layer.specifiers.count("alwaysVisible")) {
                 text.always_visible = layer.always_visible.evaluate<bool>(z);
             }
 
-            // opacity (transitionable)
             if (layer.specifiers.count("opacity")) {
-                if (layer.opacity_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
-                    layer.opacity.evaluate<float>(z) != previous.texts[layer_name].opacity &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.lines[layer_name].opacity = previous.texts[layer_name].opacity;
-
-                    transitions[layer_name][TransitionablePropertyKey::Opacity] =
-                        std::make_shared<util::ease_transition<float>>(previous.texts[layer_name].opacity,
-                                                                       layer.opacity.evaluate<float>(z),
-                                                                       transitioning.texts[layer_name].opacity,
-                                                                       start,
-                                                                       layer.opacity_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Opacity)) {
-                    text.opacity = transitioning.texts[layer_name].opacity;
-                } else {
-                    text.opacity = layer.opacity.evaluate<float>(z);
+                text.opacity = layer.opacity.evaluate<float>(z);
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
+                if (layer.opacity_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = layer.opacity_transition;
                 }
             }
         }
 
-        // Cascade raster classes
+        // Cascade raster classes.
         for (const auto& raster_pair : sheetClass.raster) {
             const std::string& layer_name = raster_pair.first;
             const llmr::RasterClass& layer = raster_pair.second;
 
             llmr::RasterProperties& raster = computed.rasters[layer_name];
 
-            // enabled
             if (layer.specifiers.count("enabled")) {
                 raster.enabled = layer.enabled.evaluate<bool>(z);
             }
 
-            // opacity (transitionable)
             if (layer.specifiers.count("opacity")) {
-                if (layer.opacity_transition.duration &&
-                    !transitions[layer_name].count(TransitionablePropertyKey::Opacity) &&
-                    layer.opacity.evaluate<float>(z) != previous.rasters[layer_name].opacity &&
-                    !previouslyAppliedClasses.count(class_name)) {
-
-                    transitioning.rasters[layer_name].opacity = previous.rasters[layer_name].opacity;
-
-                    transitions[layer_name][TransitionablePropertyKey::Opacity] =
-                        std::make_shared<util::ease_transition<float>>(previous.rasters[layer_name].opacity,
-                                                                       layer.opacity.evaluate<float>(z),
-                                                                       transitioning.rasters[layer_name].opacity,
-                                                                       start,
-                                                                       layer.opacity_transition.duration * 1_millisecond);
-                } else if (transitions[layer_name].count(TransitionablePropertyKey::Opacity)) {
-                    raster.opacity = transitioning.rasters[layer_name].opacity;
-                } else {
-                    raster.opacity = layer.opacity.evaluate<float>(z);
+                raster.opacity = layer.opacity.evaluate<float>(z);
+                computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
+                if (layer.opacity_transition.duration) {
+                    properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = layer.opacity_transition;
                 }
             }
         }
 
-        // Cascade background
-
-        // color (transitionable)
+        // Cascade background.
         if (sheetClass.background.specifiers.count("color")) {
-            if (sheetClass.background.color_transition.duration &&
-                !transitions["background"].count(TransitionablePropertyKey::Color) &&
-                sheetClass.background.color != previous.background.color &&
-                !previouslyAppliedClasses.count(class_name)) {
-
-                transitioning.background.color = previous.background.color;
-
-                transitions["background"][TransitionablePropertyKey::Color] =
-                    std::make_shared<util::ease_transition<Color>>(previous.background.color,
-                                                                   sheetClass.background.color,
-                                                                   transitioning.background.color,
-                                                                   start,
-                                                                   sheetClass.background.color_transition.duration * 1_millisecond);
-            } else if (transitions["background"].count(TransitionablePropertyKey::Color)) {
-                computed.background.color = transitioning.background.color;
-            } else {
-                computed.background.color = sheetClass.background.color;
+            computed.background.color = sheetClass.background.color;
+            computed.effective_classes["background"][TransitionablePropertyKey::Color] = class_name;
+            if (sheetClass.background.color_transition.duration) {
+                properties_to_transition["background"][TransitionablePropertyKey::Color] = sheetClass.background.color_transition;
             }
         }
-
-        // opacity (transitionable)
         if (sheetClass.background.specifiers.count("opacity")) {
-            if (sheetClass.background.opacity_transition.duration &&
-                !transitions["background"].count(TransitionablePropertyKey::Opacity) &&
-                sheetClass.background.opacity.evaluate<float>(z) != previous.background.opacity &&
-                !previouslyAppliedClasses.count(class_name)) {
-
-                transitioning.background.opacity = previous.background.opacity;
-
-                transitions["background"][TransitionablePropertyKey::Opacity] =
-                    std::make_shared<util::ease_transition<float>>(previous.background.opacity,
-                                                                   sheetClass.background.opacity.evaluate<float>(z),
-                                                                   transitioning.background.opacity,
-                                                                   start,
-                                                                   sheetClass.background.opacity_transition.duration * 1_millisecond);
-            } else if (transitions["background"].count(TransitionablePropertyKey::Opacity)) {
-                computed.background.opacity = transitioning.background.opacity;
-            } else {
-                computed.background.opacity = sheetClass.background.opacity.evaluate<float>(z);
+            computed.background.opacity = sheetClass.background.opacity.evaluate<float>(z);
+            computed.effective_classes["background"][TransitionablePropertyKey::Opacity] = class_name;
+            if (sheetClass.background.opacity_transition.duration) {
+                properties_to_transition["background"][TransitionablePropertyKey::Opacity] = sheetClass.background.opacity_transition;
             }
         }
     }
 
-    previouslyAppliedClasses.swap(currentPassAppliedClasses);
+    // Apply transitions after the first time.
+    if (!initial_render_complete) {
+        initial_render_complete = true;
+        return;
+    }
+
+    // Fills
+    for (const auto& fill_pair : computed.fills) {
+        const std::string& layer_name = fill_pair.first;
+
+        // translate
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Translate)) {
+
+            computed.fills[layer_name].translate = transitioning.fills[layer_name].translate;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Translate)) {
+
+            transitioning.fills[layer_name].translate = previous.fills[layer_name].translate;
+
+            std::vector<float> from, to, transitioning_ref;
+            from.push_back(previous.fills[layer_name].translate[0]);
+            from.push_back(previous.fills[layer_name].translate[1]);
+            to.push_back(computed.fills[layer_name].translate[0]);
+            to.push_back(computed.fills[layer_name].translate[1]);
+            transitioning_ref.push_back(transitioning.fills[layer_name].translate[0]);
+            transitioning_ref.push_back(transitioning.fills[layer_name].translate[1]);
+
+            transitions[layer_name][TransitionablePropertyKey::Translate] =
+                std::make_shared<util::ease_transition<std::vector<float>>>(from,
+                                                                            to,
+                                                                            transitioning_ref,
+                                                                            start,
+                                                                            transitionDuration(layer_name, TransitionablePropertyKey::Translate));
+
+            computed.fills[layer_name].translate = transitioning.fills[layer_name].translate;
+        }
+
+        // fill color
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::FillColor)) {
+
+            computed.fills[layer_name].fill_color = transitioning.fills[layer_name].fill_color;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::FillColor)) {
+
+            transitioning.fills[layer_name].fill_color = previous.fills[layer_name].fill_color;
+
+            transitions[layer_name][TransitionablePropertyKey::FillColor] =
+                std::make_shared<util::ease_transition<Color>>(previous.fills[layer_name].fill_color,
+                                                               computed.fills[layer_name].fill_color,
+                                                               transitioning.fills[layer_name].fill_color,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::FillColor));
+
+            computed.fills[layer_name].fill_color = transitioning.fills[layer_name].fill_color;
+        }
+
+        // stroke color
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::StrokeColor)) {
+
+            computed.fills[layer_name].stroke_color = transitioning.fills[layer_name].stroke_color;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::StrokeColor)) {
+
+            transitioning.fills[layer_name].stroke_color = previous.fills[layer_name].stroke_color;
+
+            transitions[layer_name][TransitionablePropertyKey::StrokeColor] =
+                std::make_shared<util::ease_transition<Color>>(previous.fills[layer_name].stroke_color,
+                                                               computed.fills[layer_name].stroke_color,
+                                                               transitioning.fills[layer_name].stroke_color,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::StrokeColor));
+
+            computed.fills[layer_name].stroke_color = transitioning.fills[layer_name].stroke_color;
+        }
+
+        // opacity
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity)) {
+
+            computed.fills[layer_name].opacity = transitioning.fills[layer_name].opacity;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Opacity)) {
+
+            transitioning.fills[layer_name].opacity = previous.fills[layer_name].opacity;
+
+            transitions[layer_name][TransitionablePropertyKey::Opacity] =
+                std::make_shared<util::ease_transition<float>>(previous.fills[layer_name].opacity,
+                                                               computed.fills[layer_name].opacity,
+                                                               transitioning.fills[layer_name].opacity,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Opacity));
+
+            computed.fills[layer_name].opacity = transitioning.fills[layer_name].opacity;
+        }
+    }
+
+    // Lines
+
+    // translate
+    // width
+    // offset
+    // color
+    // dasharray
+    // opacity
+
+    // Icons
+
+    // translate
+    // color
+    // opacity
+    // radius
+    // blur
+
+    // Text
+
+    // translate
+    // color
+    // halo
+    // haloradius
+    // haloblur
+    // opacity
+
+    // Rasters
+
+    // opacity
+
+    // Background
+
+    // color
+    // opacity
+}
+
+bool Style::transitionInProgress(std::string layer_name, TransitionablePropertyKey key) {
+    if (!transitionExists(layer_name, key)) return false;
+
+    return (transitions[layer_name].find(key)->second->update(util::now()) != util::transition::complete);
+}
+
+bool Style::transitionExists(std::string layer_name, TransitionablePropertyKey key) {
+    return (transitions[layer_name].count(key) != 0);
+}
+
+bool Style::inNeedOfTransition(std::string layer_name, TransitionablePropertyKey key) {
+    if (!transitionDuration(layer_name, key)) return false;
+    if (transitionExists(layer_name, key)) return false;
+
+    return (computed.effective_classes[layer_name][key] != previous.effective_classes[layer_name][key]);
+}
+
+uint64_t Style::transitionDuration(std::string layer_name, TransitionablePropertyKey key) {
+    return (properties_to_transition[layer_name].count(key) ?
+                properties_to_transition[layer_name][key].duration :
+                default_transition_duration) * 1_millisecond;
 }
 
 bool Style::needsTransition() const {

@@ -48,8 +48,7 @@ public:
     std::vector<LayerDescription> layers;
     std::map<std::string, ClassDescription> classes;
 
-
-    // This are applied settings.
+    // Currently applied settings.
     std::set<std::string> appliedClasses;
     struct {
         BackgroundProperties background;
@@ -58,10 +57,17 @@ public:
         std::map<std::string, IconProperties> icons;
         std::map<std::string, TextProperties> texts;
         std::map<std::string, RasterProperties> rasters;
+        std::map<std::string, std::map<TransitionablePropertyKey, std::string>> effective_classes;
     } computed;
 
 private:
-    // These are the last applied settings for comparison.
+    bool transitionInProgress(std::string layer_name, TransitionablePropertyKey key);
+    bool transitionExists(std::string layer_name, TransitionablePropertyKey key);
+    bool inNeedOfTransition(std::string layer_name, TransitionablePropertyKey key);
+    uint64_t transitionDuration(std::string layer_name, TransitionablePropertyKey key);
+
+private:
+    // Last applied settings.
     struct {
         BackgroundProperties background;
         std::map<std::string, FillProperties> fills;
@@ -69,9 +75,10 @@ private:
         std::map<std::string, IconProperties> icons;
         std::map<std::string, TextProperties> texts;
         std::map<std::string, RasterProperties> rasters;
+        std::map<std::string, std::map<TransitionablePropertyKey, std::string>> effective_classes;
     } previous;
 
-    // These are settings values currently being transitioned.
+    // Settings values currently being transitioned.
     struct {
         BackgroundProperties background;
         std::map<std::string, FillProperties> fills;
@@ -81,11 +88,11 @@ private:
         std::map<std::string, RasterProperties> rasters;
     } transitioning;
 
-    std::set<std::string> previouslyAppliedClasses;
+    std::map<std::string, std::map<TransitionablePropertyKey, PropertyTransition>> properties_to_transition;
     std::map<std::string, std::map<TransitionablePropertyKey, std::shared_ptr<util::transition>>> transitions;
     uint64_t default_transition_duration = 0;
+    bool initial_render_complete = false;
 
-private:
     mutable uv::rwlock mtx;
 
 };
