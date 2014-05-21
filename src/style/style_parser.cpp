@@ -404,16 +404,18 @@ FunctionProperty::fn StyleParser::parseFunctionType(JSVal type) {
 }
 
 FunctionProperty StyleParser::parseFunction(JSVal value) {
+    JSVal rvalue = replaceConstant(value);
+
     FunctionProperty property;
 
-    if (value.IsArray()) {
-        if (value.Size() < 1) {
+    if (rvalue.IsArray()) {
+        if (rvalue.Size() < 1) {
             throw Style::exception("value function does not have arguments");
         }
 
-        property.function = parseFunctionType(value[(rapidjson::SizeType)0]);
-        for (rapidjson::SizeType i = 1; i < value.Size(); ++i) {
-            JSVal stop = value[i];
+        property.function = parseFunctionType(rvalue[(rapidjson::SizeType)0]);
+        for (rapidjson::SizeType i = 1; i < rvalue.Size(); ++i) {
+            JSVal stop = rvalue[i];
             if (stop.IsObject()) {
                 if (!stop.HasMember("z")) {
                     throw Style::exception("stop must have zoom level specification");
@@ -440,9 +442,9 @@ FunctionProperty StyleParser::parseFunction(JSVal value) {
                 throw Style::exception("function argument must be a numeric value");
             }
         }
-    } else if (value.IsNumber()) {
+    } else if (rvalue.IsNumber()) {
         property.function = &functions::constant;
-        property.values.push_back(value.GetDouble());
+        property.values.push_back(rvalue.GetDouble());
     }
 
     return property;

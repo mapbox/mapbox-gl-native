@@ -48,8 +48,18 @@ linux: config.gypi linux/llmr-app.gyp node
 
 # Executes the Linux binary
 run-linux: linux
-	build/Release/llmr
+	build/$(BUILDTYPE)/llmr
 
+
+
+# Builds the OS X app with make.
+osx: config.gypi macosx/llmr-app.gyp node
+	deps/run_gyp macosx/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/macosx -f make
+	make -C build/macosx V=$(V) osxapp
+
+# Executes the OS X binary
+run-osx: osx
+	build/$(BUILDTYPE)/llmr.app/Contents/MacOS/llmr
 
 ##### Xcode projects ###########################################################
 
