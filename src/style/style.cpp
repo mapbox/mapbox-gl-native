@@ -379,20 +379,12 @@ void Style::cascade(float z) {
 
             transitioning.fills[layer_name].translate = previous.fills[layer_name].translate;
 
-            std::vector<float> from, to, transitioning_ref;
-            from.push_back(previous.fills[layer_name].translate[0]);
-            from.push_back(previous.fills[layer_name].translate[1]);
-            to.push_back(computed.fills[layer_name].translate[0]);
-            to.push_back(computed.fills[layer_name].translate[1]);
-            transitioning_ref.push_back(transitioning.fills[layer_name].translate[0]);
-            transitioning_ref.push_back(transitioning.fills[layer_name].translate[1]);
-
             transitions[layer_name][TransitionablePropertyKey::Translate] =
-                std::make_shared<util::ease_transition<std::vector<float>>>(from,
-                                                                            to,
-                                                                            transitioning_ref,
-                                                                            start,
-                                                                            transitionDuration(layer_name, TransitionablePropertyKey::Translate));
+                std::make_shared<util::ease_transition<std::array<float, 2>>>(previous.fills[layer_name].translate,
+                                                                              computed.fills[layer_name].translate,
+                                                                              transitioning.fills[layer_name].translate,
+                                                                              start,
+                                                                              transitionDuration(layer_name, TransitionablePropertyKey::Translate));
 
             computed.fills[layer_name].translate = transitioning.fills[layer_name].translate;
         }
@@ -468,20 +460,12 @@ void Style::cascade(float z) {
 
             transitioning.lines[layer_name].translate = previous.lines[layer_name].translate;
 
-            std::vector<float> from, to, transitioning_ref;
-            from.push_back(previous.lines[layer_name].translate[0]);
-            from.push_back(previous.lines[layer_name].translate[1]);
-            to.push_back(computed.lines[layer_name].translate[0]);
-            to.push_back(computed.lines[layer_name].translate[1]);
-            transitioning_ref.push_back(transitioning.lines[layer_name].translate[0]);
-            transitioning_ref.push_back(transitioning.lines[layer_name].translate[1]);
-
             transitions[layer_name][TransitionablePropertyKey::Translate] =
-                std::make_shared<util::ease_transition<std::vector<float>>>(from,
-                                                                            to,
-                                                                            transitioning_ref,
-                                                                            start,
-                                                                            transitionDuration(layer_name, TransitionablePropertyKey::Translate));
+                std::make_shared<util::ease_transition<std::array<float, 2>>>(previous.lines[layer_name].translate,
+                                                                              computed.lines[layer_name].translate,
+                                                                              transitioning.lines[layer_name].translate,
+                                                                              start,
+                                                                              transitionDuration(layer_name, TransitionablePropertyKey::Translate));
 
             computed.lines[layer_name].translate = transitioning.lines[layer_name].translate;
         }
@@ -552,20 +536,12 @@ void Style::cascade(float z) {
 
             transitioning.lines[layer_name].dash_array = previous.lines[layer_name].dash_array;
 
-            std::vector<float> from, to, transitioning_ref;
-            from.push_back(previous.lines[layer_name].dash_array[0]);
-            from.push_back(previous.lines[layer_name].dash_array[1]);
-            to.push_back(computed.lines[layer_name].dash_array[0]);
-            to.push_back(computed.lines[layer_name].dash_array[1]);
-            transitioning_ref.push_back(transitioning.lines[layer_name].dash_array[0]);
-            transitioning_ref.push_back(transitioning.lines[layer_name].dash_array[1]);
-
             transitions[layer_name][TransitionablePropertyKey::DashArray] =
-                std::make_shared<util::ease_transition<std::vector<float>>>(from,
-                                                                            to,
-                                                                            transitioning_ref,
-                                                                            start,
-                                                                            transitionDuration(layer_name, TransitionablePropertyKey::DashArray));
+                std::make_shared<util::ease_transition<std::array<float, 2>>>(previous.lines[layer_name].dash_array, // from,
+                                                                              computed.lines[layer_name].dash_array, // to,
+                                                                              transitioning.lines[layer_name].dash_array, // transitioning_ref,
+                                                                              start,
+                                                                              transitionDuration(layer_name, TransitionablePropertyKey::DashArray));
 
             computed.lines[layer_name].dash_array = transitioning.lines[layer_name].dash_array;
         }
