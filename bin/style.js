@@ -297,6 +297,13 @@ module.exports = {
             "value": "land",
             "type": "line"
         },
+        "barrier_line_land_fill": {
+            "source": "outdoors",
+            "layer": "barrier_line",
+            "field": "class",
+            "value": "land",
+            "type": "fill"
+        },
         "barrier_line_cliff": {
             "source": "outdoors",
             "layer": "barrier_line",
@@ -950,6 +957,10 @@ module.exports = {
             "bucket": "barrier_line_land"
         },
         {
+            "name": "barrier_line_land_fill",
+            "bucket": "barrier_line_land_fill"
+        },
+        {
             "name": "barrier_line_cliff",
             "bucket": "barrier_line_cliff"
         },
@@ -1533,8 +1544,29 @@ module.exports = {
             {"z": 14, "val": 12},
             {"z": 15, "val": 13},
             {"z": 22, "val": 13}
+        ],
+        "fence_width": [
+            "stops",
+            {"z": 17, "val": 0.6},
+            {"z": 19, "val": 1}
+        ],
+        "hedge_width": [
+            "stops",
+            {"z": 16, "val": 0.6},
+            {"z": 17, "val": 1.2},
+            {"z": 19, "val": 1.6}
+        ],
+        "barrier_line_land_width": [
+            "stops",
+            {"z": 14, "val": 0.4},
+            {"z": 15, "val": 0.75},
+            {"z": 16, "val": 1.5},
+            {"z": 17, "val": 3},
+            {"z": 18, "val": 6},
+            {"z": 19, "val": 12},
+            {"z": 20, "val": 24},
+            {"z": 21, "val": 48}
         ]
-
     },
     "classes": [
         {
@@ -1587,6 +1619,29 @@ module.exports = {
                     "transition-color": {"duration": 300},
                     "color": "#87abaf",
                     "width": "stream_width"
+                },
+                "barrier_line_gate": {
+                    "width": 2.5,
+                    "color": "#aab"
+                },
+                "barrier_line_fence": {
+                    "color": "#aeada3",
+                    "width": "fence_width"
+                },
+                "barrier_line_hedge": {
+                    "color": "#8de99b",
+                    "width": "hedge_width"
+                },
+                "barrier_line_land": {
+                    "color": "land",
+                    "width": "barrier_line_land_width"
+                },
+                "barrier_line_land_fill": {
+                    "color": "land"
+                },
+                "barrier_line_cliff": {
+                    "color": "#987",
+                    "width": 4
                 },
                 "landcover_wood": {
                     "transition-color": {"duration": 300},
@@ -2373,6 +2428,29 @@ module.exports = {
                     "transition-color": {"duration": 300},
                     "color": "rgb(10,20,71)",
                     "width": "stream_width"
+                },
+                "barrier_line_gate": {
+                    "width": 2.5,
+                    "color": "#aab"
+                },
+                "barrier_line_fence": {
+                    "color": "#024e64",
+                    "width": "fence_width"
+                },
+                "barrier_line_hedge": {
+                    "color": "#3aab79",
+                    "width": "hedge_width"
+                },
+                "barrier_line_land": {
+                    "color": "land_night",
+                    "width": "barrier_line_land_width"
+                },
+                "barrier_line_land_fill": {
+                    "color": "land_night"
+                },
+                "barrier_line_cliff": {
+                    "color": "#63574b",
+                    "width": 4
                 },
                 "landcover_wood": {
                     "transition-color": {"duration": 300},
