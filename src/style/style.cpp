@@ -808,6 +808,10 @@ size_t Style::layerCount() const {
     return count;
 }
 
+void Style::setDefaultTransitionDuration(uint64_t duration) {
+    default_transition_duration = duration;
+}
+
 void Style::loadJSON(const uint8_t *const data, size_t bytes) {
     rapidjson::Document doc;
 

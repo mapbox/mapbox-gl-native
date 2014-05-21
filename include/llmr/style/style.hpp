@@ -38,6 +38,8 @@ public:
     void updateTransitions(time now);
     void cancelTransitions();
 
+    void setDefaultTransitionDuration(uint64_t duration = 0);
+
 public:
     std::shared_ptr<Sprite> sprite;
 
@@ -58,6 +60,7 @@ public:
         std::map<std::string, RasterProperties> rasters;
     } computed;
 
+private:
     // These are the last applied settings for comparison.
     struct {
         BackgroundProperties background;
@@ -80,6 +83,7 @@ public:
 
     std::set<std::string> previouslyAppliedClasses;
     std::map<std::string, std::map<TransitionablePropertyKey, std::shared_ptr<util::transition>>> transitions;
+    uint64_t default_transition_duration = 0;
 
 private:
     mutable uv::rwlock mtx;
