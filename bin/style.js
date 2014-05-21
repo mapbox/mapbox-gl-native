@@ -1361,6 +1361,20 @@ module.exports = {
         "street_night": "#0291b5",
         "contour_night": "#ffff80",
 
+        "river_canal_width": [
+            "stops",
+            {"z": 11, "val": 0.5},
+            {"z": 12, "val": 1},
+            {"z": 14, "val": 2},
+            {"z": 16, "val": 3}
+        ],
+        "stream_width": [
+            "stops",
+            {"z": 13, "val": 0.25},
+            {"z": 14, "val": 0.5},
+            {"z": 16, "val": 1.5},
+            {"z": 18, "val": 2}
+        ],
         "motorway_width": [
             "stops",
             {"z": 5, "val": 0},
@@ -1567,24 +1581,12 @@ module.exports = {
                 "waterway_river_canal": {
                     "transition-color": {"duration": 300},
                     "color": "#87abaf",
-                    "width": [
-                        "stops",
-                        {"z": 11, "val": 0.5},
-                        {"z": 12, "val": 1},
-                        {"z": 14, "val": 2},
-                        {"z": 16, "val": 3}
-                    ]
+                    "width": "river_canal_width"
                 },
                 "waterway_stream": {
                     "transition-color": {"duration": 300},
                     "color": "#87abaf",
-                    "width": [
-                        "stops",
-                        {"z": 13, "val": 0.25},
-                        {"z": 14, "val": 0.5},
-                        {"z": 16, "val": 1.5},
-                        {"z": 18, "val": 2}
-                    ]
+                    "width": "stream_width"
                 },
                 "landcover_wood": {
                     "transition-color": {"duration": 300},
@@ -2365,24 +2367,12 @@ module.exports = {
                 "waterway_river_canal": {
                     "transition-color": {"duration": 300},
                     "color": "rgb(10,20,71)",
-                    "width": [
-                        "stops",
-                        {"z": 11, "val": 0.5},
-                        {"z": 12, "val": 1},
-                        {"z": 14, "val": 2},
-                        {"z": 16, "val": 3}
-                    ]
+                    "width": "river_canal_width"
                 },
                 "waterway_stream": {
                     "transition-color": {"duration": 300},
                     "color": "rgb(10,20,71)",
-                    "width": [
-                        "stops",
-                        {"z": 13, "val": 0.25},
-                        {"z": 14, "val": 0.5},
-                        {"z": 16, "val": 1.5},
-                        {"z": 18, "val": 2}
-                    ]
+                    "width": "stream_width"
                 },
                 "landcover_wood": {
                     "transition-color": {"duration": 300},
