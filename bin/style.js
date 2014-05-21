@@ -822,14 +822,6 @@ module.exports = {
             "bucket": "background"
         },
         {
-            "name": "waterway_river_canal",
-            "bucket": "waterway_river_canal"
-        },
-        {
-            "name": "waterway_stream",
-            "bucket": "waterway_stream"
-        },
-        {
             "name": "landcover_snow",
             "bucket": "landcover_snow"
         },
@@ -904,6 +896,14 @@ module.exports = {
         {
             "name": "overlay_breakwater_pier",
             "bucket": "overlay_breakwater_pier"
+        },
+        {
+            "name": "waterway_river_canal",
+            "bucket": "waterway_river_canal"
+        },
+        {
+            "name": "waterway_stream",
+            "bucket": "waterway_stream"
         },
         {
             "name": "hillshade_full_highlight",
@@ -1417,16 +1417,12 @@ module.exports = {
                         {"z": 12, "val": 2}
                     ]
                 },
-                "waterway_other": {
-                    "transition-color": {"duration": 300},
-                    "color": "water",
-                    "width": 0.5
-                },
                 "waterway_river_canal": {
                     "transition-color": {"duration": 300},
                     "color": "#87abaf",
                     "width": [
                         "stops",
+                        {"z": 11, "val": 0.5},
                         {"z": 12, "val": 1},
                         {"z": 14, "val": 2},
                         {"z": 16, "val": 3}
@@ -1483,38 +1479,31 @@ module.exports = {
                 },
                 "landuse_wood": {
                     "transition-color": {"duration": 300},
-                    "color": "wood",
-                    "opacity": 0.8
+                    "color": "wood"
                 },
                 "landuse_scrub": {
                     "transition-color": {"duration": 300},
-                    "color": "scrub",
-                    "opacity": 0.8
+                    "color": "scrub"
                 },
                 "landuse_grass": {
                     "transition-color": {"duration": 300},
-                    "color": "grass",
-                    "opacity": 0.8
+                    "color": "grass"
                 },
                 "landuse_crop": {
                     "transition-color": {"duration": 300},
-                    "color": "crop",
-                    "opacity": 0.8
+                    "color": "crop"
                 },
                 "landuse_snow": {
                     "transition-color": {"duration": 300},
-                    "color": "snow",
-                    "opacity": 0.8
+                    "color": "snow"
                 },
                 "landuse_rock": {
                     "transition-color": {"duration": 300},
-                    "color": "rock",
-                    "opacity": 0.8
+                    "color": "rock"
                 },
                 "landuse_sand": {
                     "transition-color": {"duration": 300},
-                    "color": "sand",
-                    "opacity": 0.8
+                    "color": "sand"
                 },
                 "landuse_park": {
                     "transition-color": {"duration": 300},
@@ -2543,16 +2532,12 @@ module.exports = {
                         {"z": 12, "val": 2}
                     ]
                 },
-                "waterway_other": {
-                    "transition-color": {"duration": 300},
-                    "color": "water_night",
-                    "width": 0.5
-                },
                 "waterway_river_canal": {
                     "transition-color": {"duration": 300},
-                    "color": "#87abaf",
+                    "color": "rgb(10,20,71)",
                     "width": [
                         "stops",
+                        {"z": 11, "val": 0.5},
                         {"z": 12, "val": 1},
                         {"z": 14, "val": 2},
                         {"z": 16, "val": 3}
@@ -2560,7 +2545,7 @@ module.exports = {
                 },
                 "waterway_stream": {
                     "transition-color": {"duration": 300},
-                    "color": "#87abaf",
+                    "color": "rgb(10,20,71)",
                     "width": [
                         "stops",
                         {"z": 13, "val": 0.25},
