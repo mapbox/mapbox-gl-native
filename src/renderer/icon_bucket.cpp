@@ -9,6 +9,7 @@
 #include <llmr/map/vector_tile.hpp>
 
 #include <llmr/platform/gl.hpp>
+#include <llmr/util/constants.hpp>
 
 #include <cassert>
 
@@ -29,7 +30,9 @@ void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprit
     if (geometry.field.size()) {
         auto field_it = feature.properties.find(geometry.field);
         if (field_it == feature.properties.end()) {
-            fprintf(stderr, "feature doesn't contain field '%s'\n", geometry.field.c_str());
+            if (debug::tileParseWarnings) {
+                fprintf(stderr, "[WARNING] feature doesn't contain field '%s'\n", geometry.field.c_str());
+            }
             return;
         }
 
@@ -50,7 +53,9 @@ void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprit
         if (cmd == Geometry::move_to) {
             vertexBuffer.add(x, y, tx, ty);
         } else {
-            fprintf(stderr, "other command than move_to in icon geometry\n");
+            if (debug::tileParseWarnings) {
+                fprintf(stderr, "[WARNING] other command than move_to in icon geometry\n");
+            }
         }
     }
 
