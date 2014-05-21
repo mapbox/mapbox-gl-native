@@ -13,7 +13,7 @@ using namespace llmr;
 const int Placement::tileExtent = 4096;
 const int Placement::glyphSize =
     24; // size in pixels of this glyphs in the tile
-const float Placement::minScale = 0.125; // underscale by 3 zoom levels
+const float Placement::minScale = 0.5; // underscale by 1 zoom level
 
 Placement::Placement(int8_t zoom)
     : zoom(zoom),
