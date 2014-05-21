@@ -344,18 +344,20 @@ void Style::cascade(float z) {
         }
 
         // Cascade background.
-        if (sheetClass.background.specifiers.count("color")) {
-            computed.background.color = sheetClass.background.color;
-            computed.effective_classes["background"][TransitionablePropertyKey::Color] = class_name;
-            if (sheetClass.background.color_transition.duration) {
-                properties_to_transition["background"][TransitionablePropertyKey::Color] = sheetClass.background.color_transition;
+        {
+            if (sheetClass.background.specifiers.count("color")) {
+                computed.background.color = sheetClass.background.color;
+                computed.effective_classes["background"][TransitionablePropertyKey::Color] = class_name;
+                if (sheetClass.background.color_transition.duration) {
+                    properties_to_transition["background"][TransitionablePropertyKey::Color] = sheetClass.background.color_transition;
+                }
             }
-        }
-        if (sheetClass.background.specifiers.count("opacity")) {
-            computed.background.opacity = sheetClass.background.opacity.evaluate<float>(z);
-            computed.effective_classes["background"][TransitionablePropertyKey::Opacity] = class_name;
-            if (sheetClass.background.opacity_transition.duration) {
-                properties_to_transition["background"][TransitionablePropertyKey::Opacity] = sheetClass.background.opacity_transition;
+            if (sheetClass.background.specifiers.count("opacity")) {
+                computed.background.opacity = sheetClass.background.opacity.evaluate<float>(z);
+                computed.effective_classes["background"][TransitionablePropertyKey::Opacity] = class_name;
+                if (sheetClass.background.opacity_transition.duration) {
+                    properties_to_transition["background"][TransitionablePropertyKey::Opacity] = sheetClass.background.opacity_transition;
+                }
             }
         }
     }
