@@ -51,6 +51,16 @@ run-linux: linux
 	build/Release/llmr
 
 
+
+# Builds the OS X app with make.
+osx: config.gypi macosx/llmr-app.gyp node
+	deps/run_gyp macosx/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/macosx -f make
+	make -C build/macosx V=$(V) osxapp
+
+# Executes the OS X binary
+run-osx: osx
+	build/Release/llmr.app/Contents/MacOS/llmr
+
 ##### Xcode projects ###########################################################
 
 clear_xcode_cache:
