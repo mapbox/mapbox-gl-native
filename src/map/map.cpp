@@ -336,7 +336,7 @@ bool Map::getDebug() const {
 }
 
 void Map::toggleRaster() {
-    style.setDefaultTransitionDuration(3000);
+    style.setDefaultTransitionDuration(300);
     style.cancelTransitions();
 
     auto it = sources.find("satellite");
