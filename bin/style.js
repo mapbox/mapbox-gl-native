@@ -11,7 +11,7 @@ module.exports = {
             "cap": "round",
             "type": "line"
         },
-        "admin_level_2": {
+        "admin_l2": {
             "source": "outdoors",
             "layer": "admin",
             "field": "admin_level",
@@ -20,7 +20,7 @@ module.exports = {
             "cap": "round",
             "type": "line"
         },
-        "admin_level_3": {
+        "admin_l3": {
             "source": "outdoors",
             "layer": "admin",
             "field": "admin_level",
@@ -1214,12 +1214,12 @@ module.exports = {
             "bucket": "bridge_major_rail"
         },
         {
-            "name": "admin_level_3",
-            "bucket": "admin_level_3"
+            "name": "admin_l3",
+            "bucket": "admin_l3"
         },
         {
-            "name": "admin_level_2",
-            "bucket": "admin_level_2"
+            "name": "admin_l2",
+            "bucket": "admin_l2"
         },
         {
             "name": "admin_maritime_cover",
@@ -1361,7 +1361,50 @@ module.exports = {
         "street_night": "#0291b5",
         "contour_night": "#ffff80",
 
-        "road_main_width": [
+        "motorway_width": [
+            "stops",
+            {"z": 5, "val": 0},
+            {"z": 6, "val": 0.5},
+            {"z": 8, "val": 0.8},
+            {"z": 10, "val": 1},
+            {"z": 11, "val": 1.2},
+            {"z": 12, "val": 2},
+            {"z": 13, "val": 3},
+            {"z": 14, "val": 4},
+            {"z": 15, "val": 6},
+            {"z": 16, "val": 9},
+            {"z": 17, "val": 12},
+            {"z": 18, "val": 14}
+        ],
+        "motorway_casing_width": [
+            "stops",
+            {"z": 7.5, "val": 0.6},
+            {"z": 8, "val": 0.8},
+            {"z": 10, "val": 2.8},
+            {"z": 11, "val": 3},
+            {"z": 12, "val": 4},
+            {"z": 13, "val": 5},
+            {"z": 14, "val": 6.5},
+            {"z": 15, "val": 9},
+            {"z": 16, "val": 12},
+            {"z": 17, "val": 15},
+            {"z": 18, "val": 17}
+        ],
+        "motorway_link_width": [
+            "stops",
+            {"z": 12, "val": 1.2},
+            {"z": 14, "val": 2},
+            {"z": 16, "val": 3},
+            {"z": 18, "val": 4}
+        ],
+        "motorway_link_casing_width": [
+            "stops",
+            {"z": 12, "val": 2.8},
+            {"z": 14, "val": 3.5},
+            {"z": 16, "val": 5},
+            {"z": 18, "val": 6}
+        ],
+        "main_width": [
             "stops",
             {"z": 5, "val": 1},
             {"z": 12, "val": 1},
@@ -1371,7 +1414,113 @@ module.exports = {
             {"z": 16, "val": 6},
             {"z": 17, "val": 10},
             {"z": 18, "val": 12}
+        ],
+        "main_casing_width": [
+            "stops",
+            {"z": 9, "val": 2.9},
+            {"z": 12, "val": 2.9},
+            {"z": 13, "val": 3.5},
+            {"z": 14, "val": 4},
+            {"z": 15, "val": 5.5},
+            {"z": 16, "val": 9},
+            {"z": 17, "val": 12},
+            {"z": 18, "val": 14}
+        ],
+        "street_width": [
+            "stops",
+            {"z": 14.5, "val": 0},
+            {"z": 15, "val": 1.5},
+            {"z": 16, "val": 3},
+            {"z": 17, "val": 8}
+        ],
+        "street_casing_width": [
+            "stops",
+            {"z": 13,"val": 0.4},
+            {"z": 14, "val": 1},
+            {"z": 15, "val": 2.5},
+            {"z": 16, "val": 4},
+            {"z": 17, "val": 10}
+        ],
+        "service_casing_width": [
+            "stops",
+            {"z": 14, "val": 0.5},
+            {"z": 15, "val": 3},
+            {"z": 16, "val": 3.5},
+            {"z": 17, "val": 4},
+            {"z": 18, "val": 5},
+            {"z": 19, "val": 6}
+        ],
+        "runway_width": [
+            "stops",
+            {"z": 10, "val": 1},
+            {"z": 11, "val": 2},
+            {"z": 12, "val": 3},
+            {"z": 13, "val": 5},
+            {"z": 14, "val": 7},
+            {"z": 15, "val": 11},
+            {"z": 16, "val": 15},
+            {"z": 17, "val": 19},
+            {"z": 18, "val": 23}
+        ],
+        "taxiway_width": [
+            "stops",
+            {"z": 10, "val": 0.2},
+            {"z": 12, "val": 0.2},
+            {"z": 13, "val": 1},
+            {"z": 14, "val": 1.5},
+            {"z": 15, "val": 2},
+            {"z": 16, "val": 3},
+            {"z": 17, "val": 4},
+            {"z": 18,"val": 5}
+        ],
+        "aerialway_width": [
+            "stops",
+            {"z": 13.5, "val": 0.8},
+            {"z": 14, "val": 1.4},
+            {"z": 15, "val": 1.6},
+            {"z": 16, "val": 2},
+            {"z": 17, "val": 2.4},
+            {"z": 18, "val": 3}
+        ],
+        "aerialway_casing_width": [
+            "stops",
+            {"z": 13.5, "val": 2},
+            {"z": 14, "val": 2.5},
+            {"z": 15, "val": 3},
+            {"z": 16, "val": 3.5},
+            {"z": 17, "val": 4},
+            {"z": 22, "val": 5}
+        ],
+        "path_width": [
+            "stops",
+            {"z": 14, "val": 1.2},
+            {"z": 15, "val": 1.5},
+            {"z": 16, "val": 1.8}
+        ],
+        "admin_l2_width": [
+            "stops",
+            {"z": 2, "val": 0.5},
+            {"z": 3, "val": 0.7},
+            {"z": 4, "val": 0.7},
+            {"z": 5, "val": 0.8},
+            {"z": 6, "val": 1},
+            {"z": 8, "val": 2},
+            {"z": 10, "val": 3}
+        ],
+        "admin_l3_width": [
+            "stops",
+            {"z": 6, "val": 0.6},
+            {"z": 8, "val": 1},
+            {"z": 12, "val": 2}
+        ],
+        "road_label_size": [
+            "stops",
+            {"z": 0, "val": 12},
+            {"z": 14, "val": 12},
+            {"z": 15, "val": 13},
+            {"z": 22, "val": 13}
         ]
+
     },
     "classes": [
         {
@@ -1396,21 +1545,12 @@ module.exports = {
                         {"z": 12, "val": 3}
                     ]
                 },
-                "admin_level_2": {
+                "admin_l2": {
                     "transition-color": {"duration": 300},
                     "color": "#88a",
-                    "width": [
-                        "stops",
-                        {"z": 2, "val": 0.5},
-                        {"z": 3, "val": 0.7},
-                        {"z": 4, "val": 0.7},
-                        {"z": 5, "val": 0.8},
-                        {"z": 6, "val": 1},
-                        {"z": 8, "val": 2},
-                        {"z": 10, "val": 3}
-                    ]
+                    "width": "admin_l2_width"
                 },
-                "admin_level_3": {
+                "admin_l3": {
                     "transition-color": {"duration": 300},
                     "color": "#88a",
                     "dasharray": [
@@ -1422,12 +1562,7 @@ module.exports = {
                         {"z": 4, "val": 0},
                         {"z": 6, "val": 1}
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 6, "val": 0.6},
-                        {"z": 8, "val": 1},
-                        {"z": 12, "val": 2}
-                    ]
+                    "width": "admin_l3_width"
                 },
                 "waterway_river_canal": {
                     "transition-color": {"duration": 300},
@@ -1634,33 +1769,12 @@ module.exports = {
                 "aeroway_runway": {
                     "transition-color": {"duration": 300},
                     "color": "#ddd",
-                    "width": [
-                        "stops",
-                        {"z": 10, "val": 1},
-                        {"z": 11, "val": 2},
-                        {"z": 12, "val": 3},
-                        {"z": 13, "val": 5},
-                        {"z": 14, "val": 7},
-                        {"z": 15, "val": 11},
-                        {"z": 16, "val": 15},
-                        {"z": 17, "val": 19},
-                        {"z": 18, "val": 23}
-                    ]
+                    "width": "runway_width"
                 },
                 "aeroway_taxiway": {
                     "transition-color": {"duration": 300},
                     "color": "#ddd",
-                    "width": [
-                        "stops",
-                        {"z": 10, "val": 0.2},
-                        {"z": 12, "val": 0.2},
-                        {"z": 13, "val": 1},
-                        {"z": 14, "val": 1.5},
-                        {"z": 15, "val": 2},
-                        {"z": 16, "val": 3},
-                        {"z": 17, "val": 4},
-                        {"z": 18,"val": 5}
-                    ]
+                    "width": "taxiway_width"
                 },
                 "building": {
                     "transition-color": {"duration": 300},
@@ -1699,20 +1813,7 @@ module.exports = {
                         6,
                         6
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 7.5, "val": 0.6},
-                        {"z": 8, "val": 0.8},
-                        {"z": 10, "val": 2.8},
-                        {"z": 11, "val": 3},
-                        {"z": 12, "val": 4},
-                        {"z": 13, "val": 5},
-                        {"z": 14, "val": 6.5},
-                        {"z": 15, "val": 9},
-                        {"z": 16, "val": 12},
-                        {"z": 17, "val": 15},
-                        {"z": 18, "val": 17}
-                    ],
+                    "width": "motorway_casing_width",
                     "opacity": [
                         "stops",
                         {"z": 9.5, "val": 0},
@@ -1722,21 +1823,7 @@ module.exports = {
                 "tunnel_motorway": {
                     "transition-color": {"duration": 300},
                     "color": "#e6cec7",
-                    "width": [
-                        "stops",
-                        {"z": 5, "val": 0},
-                        {"z": 6, "val": 0.5},
-                        {"z": 8, "val": 0.8},
-                        {"z": 10, "val": 1},
-                        {"z": 11, "val": 1.2},
-                        {"z": 12, "val": 2},
-                        {"z": 13, "val": 3},
-                        {"z": 14, "val": 4},
-                        {"z": 15, "val": 6},
-                        {"z": 16, "val": 9},
-                        {"z": 17, "val": 12},
-                        {"z": 18, "val": 14}
-                    ],
+                    "width": "motorway_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
@@ -1750,17 +1837,7 @@ module.exports = {
                         6,
                         6
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 9, "val": 2.9},
-                        {"z": 12, "val": 2.9},
-                        {"z": 13, "val": 3.5},
-                        {"z": 14, "val": 4},
-                        {"z": 15, "val": 5.5},
-                        {"z": 16, "val": 9},
-                        {"z": 17, "val": 12},
-                        {"z": 18, "val": 14}
-                    ],
+                    "width": "main_casing_width",
                     "opacity": ["stops",
                         {"z": 9, "val": 0},
                         {"z": 10, "val": 1}
@@ -1769,17 +1846,7 @@ module.exports = {
                 "tunnel_main": {
                     "transition-color": {"duration": 300},
                     "color": "#e6cec7",
-                    "width": [
-                        "stops",
-                        {"z": 5, "val": 1},
-                        {"z": 12, "val": 1},
-                        {"z": 13, "val": 1.5},
-                        {"z": 14, "val": 2},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 6},
-                        {"z": 17, "val": 10},
-                        {"z": 18, "val": 12}
-                    ],
+                    "width": "main_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
@@ -1793,47 +1860,22 @@ module.exports = {
                         6,
                         6
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 12, "val": 2.8},
-                        {"z": 14, "val": 3.5},
-                        {"z": 16, "val": 5},
-                        {"z": 18, "val": 6}
-                    ]
+                    "width": "motorway_link_casing_width"
                 },
                 "tunnel_motorway_link": {
                     "transition-color": {"duration": 300},
                     "color": "#e6cec7",
-                    "width": [
-                        "stops",
-                        {"z": 12, "val": 1.2},
-                        {"z": 14, "val": 2},
-                        {"z": 16, "val": 3},
-                        {"z": 18, "val": 4}
-                    ]
+                    "width": "motorway_link_width"
                 },
                 "tunnel_street_casing": {
                     "transition-color": {"duration": 300},
                     "color": "#d9d5c6",
-                    "width": [
-                        "stops",
-                        {"z": 13,"val": 0.4},
-                        {"z": 14, "val": 1},
-                        {"z": 15, "val": 2.5},
-                        {"z": 16, "val": 4},
-                        {"z": 17, "val": 10}
-                    ]
+                    "width": "street_casing_width"
                 },
                 "tunnel_street": {
                     "transition-color": {"duration": 300},
                     "color": "#d9d5c6",
-                    "width": [
-                        "stops",
-                        {"z": 14.5, "val": 0},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 3},
-                        {"z": 17, "val": 8}
-                    ]
+                    "width": "street_width"
                 },
                 "tunnel_service_casing": {
                     "transition-color": {"duration": 300},
@@ -1843,15 +1885,7 @@ module.exports = {
                         6,
                         6
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 0.5},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 3.5},
-                        {"z": 17, "val": 4},
-                        {"z": 18, "val": 5},
-                        {"z": 19, "val": 6}
-                    ]
+                    "width": "service_casing_width"
                 },
                 "tunnel_service": {
                     "transition-color": {"duration": 300},
@@ -1861,20 +1895,7 @@ module.exports = {
                 "road_motorway_casing": {
                     "transition-color": {"duration": 300},
                     "color": "case",
-                    "width": [
-                        "stops",
-                        {"z": 7.5, "val": 0.6},
-                        {"z": 8, "val": 0.8},
-                        {"z": 10, "val": 2.8},
-                        {"z": 11, "val": 3},
-                        {"z": 12, "val": 4},
-                        {"z": 13, "val": 5},
-                        {"z": 14, "val": 6.5},
-                        {"z": 15, "val": 9},
-                        {"z": 16, "val": 12},
-                        {"z": 17, "val": 15},
-                        {"z": 18, "val": 17}
-                    ],
+                    "width": "motorway_casing_width",
                     "opacity": [
                         "stops",
                         {"z": 9.5, "val": 0},
@@ -1884,21 +1905,7 @@ module.exports = {
                 "road_motorway": {
                     "transition-color": {"duration": 300},
                     "color": "motorway",
-                    "width": [
-                        "stops",
-                        {"z": 5, "val": 0},
-                        {"z": 6, "val": 0.5},
-                        {"z": 8, "val": 0.8},
-                        {"z": 10, "val": 1},
-                        {"z": 11, "val": 1.2},
-                        {"z": 12, "val": 2},
-                        {"z": 13, "val": 3},
-                        {"z": 14, "val": 4},
-                        {"z": 15, "val": 6},
-                        {"z": 16, "val": 9},
-                        {"z": 17, "val": 12},
-                        {"z": 18, "val": 14}
-                    ],
+                    "width": "motorway_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
@@ -1908,17 +1915,7 @@ module.exports = {
                 "road_main_casing": {
                     "transition-color": {"duration": 300},
                     "color": "case",
-                    "width": [
-                        "stops",
-                        {"z": 9, "val": 2.9},
-                        {"z": 12, "val": 2.9},
-                        {"z": 13, "val": 3.5},
-                        {"z": 14, "val": 4},
-                        {"z": 15, "val": 5.5},
-                        {"z": 16, "val": 9},
-                        {"z": 17, "val": 12},
-                        {"z": 18, "val": 14}
-                    ],
+                    "width": "main_casing_width",
                     "opacity": ["stops",
                         {"z": 9, "val": 0},
                         {"z": 10, "val": 1}
@@ -1927,7 +1924,7 @@ module.exports = {
                 "road_main": {
                     "transition-color": {"duration": 300},
                     "color": "main",
-                    "width": "road_main_width",
+                    "width": "main_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
@@ -1937,61 +1934,28 @@ module.exports = {
                 "road_motorway_link_casing": {
                     "transition-color": {"duration": 300},
                     "color": "case",
-                    "width": [
-                        "stops",
-                        {"z": 12, "val": 2.8},
-                        {"z": 14, "val": 3.5},
-                        {"z": 16, "val": 5},
-                        {"z": 18, "val": 6}
-                    ]
+                    "width": "motorway_link_casing_width"
                 },
                 "road_motorway_link": {
                     "transition-color": {"duration": 300},
                     "color": "motorway",
-                    "width": [
-                        "stops",
-                        {"z": 12, "val": 1.2},
-                        {"z": 14, "val": 2},
-                        {"z": 16, "val": 3},
-                        {"z": 18, "val": 4}
-                    ]
+                    "width": "motorway_link_width"
                 },
                 "road_street_casing": {
                     "transition-color": {"duration": 300},
                     "color": "#d9d5c6",
-                    "width": [
-                        "stops",
-                        {"z": 13,"val": 0.4},
-                        {"z": 14, "val": 1},
-                        {"z": 15, "val": 2.5},
-                        {"z": 16, "val": 4},
-                        {"z": 17, "val": 10}
-                    ]
+                    "width": "street_casing_width"
                 },
                 "road_street": {
                     "transition-color": {"duration": 300},
                     "color": "street",
-                    "width": [
-                        "stops",
-                        {"z": 14.5, "val": 0},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 3},
-                        {"z": 17, "val": 8}
-                    ]
+                    "width": "street_width"
                 },
                 "road_service_casing": {
                     "transition-color": {"duration": 300},
                     "color": "#000",
                     "opacity": 0.04,
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 0.5},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 3.5},
-                        {"z": 17, "val": 4},
-                        {"z": 18, "val": 5},
-                        {"z": 19, "val": 6}
-                    ]
+                    "width": "service_casing_width"
                 },
                 "road_service": {
                     "transition-color": {"duration": 300},
@@ -2016,12 +1980,7 @@ module.exports = {
                         10,
                         4
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 1.2},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 1.8}
-                    ]
+                    "width": "path_width"
                 },
                 "road_path_path": {
                     "transition-color": {"duration": 300},
@@ -2045,12 +2004,7 @@ module.exports = {
                         10,
                         4
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 1.2},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 1.8}
-                    ]
+                    "width": "path_width"
                 },
                 "road_path_mtb": {
                     "transition-color": {"duration": 300},
@@ -2059,12 +2013,7 @@ module.exports = {
                         12,
                         4
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 1.2},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 1.8}
-                    ]
+                    "width": "path_width"
                 },
                 "road_path_piste": {
                     "transition-color": {"duration": 300},
@@ -2073,12 +2022,7 @@ module.exports = {
                         8,
                         4
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 1.2},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 1.8}
-                    ]
+                    "width": "path_width"
                 },
                 "road_path_steps": {
                     "transition-color": {"duration": 300},
@@ -2106,20 +2050,7 @@ module.exports = {
                 "bridge_motorway_casing": {
                     "transition-color": {"duration": 300},
                     "color": "case",
-                    "width": [
-                        "stops",
-                        {"z": 7.5, "val": 0.6},
-                        {"z": 8, "val": 0.8},
-                        {"z": 10, "val": 2.8},
-                        {"z": 11, "val": 3},
-                        {"z": 12, "val": 4},
-                        {"z": 13, "val": 5},
-                        {"z": 14, "val": 6.5},
-                        {"z": 15, "val": 9},
-                        {"z": 16, "val": 12},
-                        {"z": 17, "val": 15},
-                        {"z": 18, "val": 17}
-                    ],
+                    "width": "motorway_casing_width",
                     "opacity": [
                         "stops",
                         {"z": 9.5, "val": 0},
@@ -2129,21 +2060,7 @@ module.exports = {
                 "bridge_motorway": {
                     "transition-color": {"duration": 300},
                     "color": "motorway",
-                    "width": [
-                        "stops",
-                        {"z": 5, "val": 0},
-                        {"z": 6, "val": 0.5},
-                        {"z": 8, "val": 0.8},
-                        {"z": 10, "val": 1},
-                        {"z": 11, "val": 1.2},
-                        {"z": 12, "val": 2},
-                        {"z": 13, "val": 3},
-                        {"z": 14, "val": 4},
-                        {"z": 15, "val": 6},
-                        {"z": 16, "val": 9},
-                        {"z": 17, "val": 12},
-                        {"z": 18, "val": 14}
-                    ],
+                    "width": "motorway_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
@@ -2153,17 +2070,7 @@ module.exports = {
                 "bridge_main_casing": {
                     "transition-color": {"duration": 300},
                     "color": "case",
-                    "width": [
-                        "stops",
-                        {"z": 9, "val": 2.9},
-                        {"z": 12, "val": 2.9},
-                        {"z": 13, "val": 3.5},
-                        {"z": 14, "val": 4},
-                        {"z": 15, "val": 5.5},
-                        {"z": 16, "val": 9},
-                        {"z": 17, "val": 12},
-                        {"z": 18, "val": 14}
-                    ],
+                    "width": "main_casing_width",
                     "opacity": ["stops",
                         {"z": 9, "val": 0},
                         {"z": 10, "val": 1}
@@ -2172,17 +2079,7 @@ module.exports = {
                 "bridge_main": {
                     "transition-color": {"duration": 300},
                     "color": "main",
-                    "width": [
-                        "stops",
-                        {"z": 5, "val": 1},
-                        {"z": 12, "val": 1},
-                        {"z": 13, "val": 1.5},
-                        {"z": 14, "val": 2},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 6},
-                        {"z": 17, "val": 10},
-                        {"z": 18, "val": 12}
-                    ],
+                    "width": "main_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
@@ -2192,61 +2089,28 @@ module.exports = {
                 "bridge_motorway_link_casing": {
                     "transition-color": {"duration": 300},
                     "color": "case",
-                    "width": [
-                        "stops",
-                        {"z": 12, "val": 2.8},
-                        {"z": 14, "val": 3.5},
-                        {"z": 16, "val": 5},
-                        {"z": 18, "val": 6}
-                    ]
+                    "width": "motorway_link_casing_width"
                 },
                 "bridge_motorway_link": {
                     "transition-color": {"duration": 300},
                     "color": "motorway",
-                    "width": [
-                        "stops",
-                        {"z": 12, "val": 1.2},
-                        {"z": 14, "val": 2},
-                        {"z": 16, "val": 3},
-                        {"z": 18, "val": 4}
-                    ]
+                    "width": "motorway_link_width"
                 },
                 "bridge_street_casing": {
                     "transition-color": {"duration": 300},
                     "color": "#d9d5c6",
-                    "width": [
-                        "stops",
-                        {"z": 13,"val": 0.4},
-                        {"z": 14, "val": 1},
-                        {"z": 15, "val": 2.5},
-                        {"z": 16, "val": 4},
-                        {"z": 17, "val": 10}
-                    ]
+                    "width": "street_casing_width"
                 },
                 "bridge_street": {
                     "transition-color": {"duration": 300},
                     "color": "street",
-                    "width": [
-                        "stops",
-                        {"z": 14.5, "val": 0},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 3},
-                        {"z": 17, "val": 8}
-                    ]
+                    "width": "street_width"
                 },
                 "bridge_service_casing": {
                     "transition-color": {"duration": 300},
                     "color": "#000",
                     "opacity": 0.04,
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 0.5},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 3.5},
-                        {"z": 17, "val": 4},
-                        {"z": 18, "val": 5},
-                        {"z": 19, "val": 6}
-                    ]
+                    "width": "service_casing_width"
                 },
                 "bridge_service": {
                     "transition-color": {"duration": 300},
@@ -2257,29 +2121,13 @@ module.exports = {
                     "transition-color": {"duration": 300},
                     "color": "white",
                     "opacity": 0.5,
-                    "width": [
-                        "stops",
-                        {"z": 13.5, "val": 2},
-                        {"z": 14, "val": 2.5},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 3.5},
-                        {"z": 17, "val": 4},
-                        {"z": 22, "val": 5}
-                    ]
+                    "width": "aerialway_casing_width"
                 },
                 "bridge_aerialway": {
                     "transition-color": {"duration": 300},
                     "color": "#876",
                     "opacity": 0.5,
-                    "width": [
-                        "stops",
-                        {"z": 13.5, "val": 0.8},
-                        {"z": 14, "val": 1.4},
-                        {"z": 15, "val": 1.6},
-                        {"z": 16, "val": 2},
-                        {"z": 17, "val": 2.4},
-                        {"z": 18, "val": 3}
-                    ]
+                    "width": "aerialway_width"
                 },
                 "country_label": {
                     "transition-color": {"duration": 300},
@@ -2437,13 +2285,7 @@ module.exports = {
                     "stroke": "land",
                     "strokeWidth": 0.6,
                     "strokeBlur": 2,
-                    "size": [
-                        "stops",
-                        {"z": 0, "val": 12},
-                        {"z": 14, "val": 12},
-                        {"z": 15, "val": 13},
-                        {"z": 22, "val": 13}
-                    ]
+                    "size": "road_label_size"
                 },
                 "water_label": {
                     "transition-color": {"duration": 300},
@@ -2501,21 +2343,12 @@ module.exports = {
                         {"z": 12, "val": 3}
                     ]
                 },
-                "admin_level_2": {
+                "admin_l2": {
                     "transition-color": {"duration": 300},
                     "color": "#88a",
-                    "width": [
-                        "stops",
-                        {"z": 2, "val": 0.5},
-                        {"z": 3, "val": 0.7},
-                        {"z": 4, "val": 0.7},
-                        {"z": 5, "val": 0.8},
-                        {"z": 6, "val": 1},
-                        {"z": 8, "val": 2},
-                        {"z": 10, "val": 3}
-                    ]
+                    "width": "admin_l2_width"
                 },
-                "admin_level_3": {
+                "admin_l3": {
                     "transition-color": {"duration": 300},
                     "color": "#88a",
                     "dasharray": [
@@ -2527,12 +2360,7 @@ module.exports = {
                         {"z": 4, "val": 0},
                         {"z": 6, "val": 1}
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 6, "val": 0.6},
-                        {"z": 8, "val": 1},
-                        {"z": 12, "val": 2}
-                    ]
+                    "width": "admin_l3_width"
                 },
                 "waterway_river_canal": {
                     "transition-color": {"duration": 300},
@@ -2747,33 +2575,12 @@ module.exports = {
                 "aeroway_runway": {
                     "transition-color": {"duration": 300},
                     "color": "#ddd",
-                    "width": [
-                        "stops",
-                        {"z": 10, "val": 1},
-                        {"z": 11, "val": 2},
-                        {"z": 12, "val": 3},
-                        {"z": 13, "val": 5},
-                        {"z": 14, "val": 7},
-                        {"z": 15, "val": 11},
-                        {"z": 16, "val": 15},
-                        {"z": 17, "val": 19},
-                        {"z": 18, "val": 23}
-                    ]
+                    "width": "runway_width"
                 },
                 "aeroway_taxiway": {
                     "transition-color": {"duration": 300},
                     "color": "#ddd",
-                    "width": [
-                        "stops",
-                        {"z": 10, "val": 0.2},
-                        {"z": 12, "val": 0.2},
-                        {"z": 13, "val": 1},
-                        {"z": 14, "val": 1.5},
-                        {"z": 15, "val": 2},
-                        {"z": 16, "val": 3},
-                        {"z": 17, "val": 4},
-                        {"z": 18,"val": 5}
-                    ]
+                    "width": "taxiway_width"
                 },
                 "building": {
                     "transition-color": {"duration": 300},
@@ -2810,20 +2617,7 @@ module.exports = {
                         6,
                         6
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 7.5, "val": 0.6},
-                        {"z": 8, "val": 0.8},
-                        {"z": 10, "val": 2.8},
-                        {"z": 11, "val": 3},
-                        {"z": 12, "val": 4},
-                        {"z": 13, "val": 5},
-                        {"z": 14, "val": 6.5},
-                        {"z": 15, "val": 9},
-                        {"z": 16, "val": 12},
-                        {"z": 17, "val": 15},
-                        {"z": 18, "val": 17}
-                    ],
+                    "width": "motorway_casing_width",
                     "opacity": [
                         "stops",
                         {"z": 9.5, "val": 0},
@@ -2833,21 +2627,7 @@ module.exports = {
                 "tunnel_motorway": {
                     "transition-color": {"duration": 300},
                     "color": "#83b9c8",
-                    "width": [
-                        "stops",
-                        {"z": 5, "val": 0},
-                        {"z": 6, "val": 0.5},
-                        {"z": 8, "val": 0.8},
-                        {"z": 10, "val": 1},
-                        {"z": 11, "val": 1.2},
-                        {"z": 12, "val": 2},
-                        {"z": 13, "val": 3},
-                        {"z": 14, "val": 4},
-                        {"z": 15, "val": 6},
-                        {"z": 16, "val": 9},
-                        {"z": 17, "val": 12},
-                        {"z": 18, "val": 14}
-                    ],
+                    "width": "motorway_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
@@ -2861,17 +2641,7 @@ module.exports = {
                         6,
                         6
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 9, "val": 2.9},
-                        {"z": 12, "val": 2.9},
-                        {"z": 13, "val": 3.5},
-                        {"z": 14, "val": 4},
-                        {"z": 15, "val": 5.5},
-                        {"z": 16, "val": 9},
-                        {"z": 17, "val": 12},
-                        {"z": 18, "val": 14}
-                    ],
+                    "width": "main_casing_width",
                     "opacity": ["stops",
                         {"z": 9, "val": 0},
                         {"z": 10, "val": 1}
@@ -2880,17 +2650,7 @@ module.exports = {
                 "tunnel_main": {
                     "transition-color": {"duration": 300},
                     "color": "#e6cec7",
-                    "width": [
-                        "stops",
-                        {"z": 5, "val": 1},
-                        {"z": 12, "val": 1},
-                        {"z": 13, "val": 1.5},
-                        {"z": 14, "val": 2},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 6},
-                        {"z": 17, "val": 10},
-                        {"z": 18, "val": 12}
-                    ],
+                    "width": "main_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
@@ -2904,47 +2664,22 @@ module.exports = {
                         6,
                         6
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 12, "val": 2.8},
-                        {"z": 14, "val": 3.5},
-                        {"z": 16, "val": 5},
-                        {"z": 18, "val": 6}
-                    ]
+                    "width": "motorway_link_casing_width"
                 },
                 "tunnel_motorway_link": {
                     "transition-color": {"duration": 300},
                     "color": "#e6cec7",
-                    "width": [
-                        "stops",
-                        {"z": 12, "val": 1.2},
-                        {"z": 14, "val": 2},
-                        {"z": 16, "val": 3},
-                        {"z": 18, "val": 4}
-                    ]
+                    "width": "motorway_link_width"
                 },
                 "tunnel_street_casing": {
                     "transition-color": {"duration": 300},
                     "color": "street_case_night",
-                    "width": [
-                        "stops",
-                        {"z": 13,"val": 0.4},
-                        {"z": 14, "val": 1},
-                        {"z": 15, "val": 2.5},
-                        {"z": 16, "val": 4},
-                        {"z": 17, "val": 10}
-                    ]
+                    "width": "street_casing_width"
                 },
                 "tunnel_street": {
                     "transition-color": {"duration": 300},
                     "color": "street_case_night",
-                    "width": [
-                        "stops",
-                        {"z": 14.5, "val": 0},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 3},
-                        {"z": 17, "val": 8}
-                    ]
+                    "width": "street_width"
                 },
                 "tunnel_service_casing": {
                     "transition-color": {"duration": 300},
@@ -2954,15 +2689,7 @@ module.exports = {
                         6,
                         6
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 0.5},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 3.5},
-                        {"z": 17, "val": 4},
-                        {"z": 18, "val": 5},
-                        {"z": 19, "val": 6}
-                    ]
+                    "width": "service_casing_width"
                 },
                 "tunnel_service": {
                     "transition-color": {"duration": 300},
@@ -2972,20 +2699,7 @@ module.exports = {
                 "road_motorway_casing": {
                     "transition-color": {"duration": 300},
                     "color": "case_night",
-                    "width": [
-                        "stops",
-                        {"z": 7.5, "val": 0.6},
-                        {"z": 8, "val": 0.8},
-                        {"z": 10, "val": 2.8},
-                        {"z": 11, "val": 3},
-                        {"z": 12, "val": 4},
-                        {"z": 13, "val": 5},
-                        {"z": 14, "val": 6.5},
-                        {"z": 15, "val": 9},
-                        {"z": 16, "val": 12},
-                        {"z": 17, "val": 15},
-                        {"z": 18, "val": 17}
-                    ],
+                    "width": "motorway_casing_width",
                     "opacity": [
                         "stops",
                         {"z": 9.5, "val": 0},
@@ -2995,21 +2709,7 @@ module.exports = {
                 "road_motorway": {
                     "transition-color": {"duration": 300},
                     "color": "motorway_night",
-                    "width": [
-                        "stops",
-                        {"z": 5, "val": 0},
-                        {"z": 6, "val": 0.5},
-                        {"z": 8, "val": 0.8},
-                        {"z": 10, "val": 1},
-                        {"z": 11, "val": 1.2},
-                        {"z": 12, "val": 2},
-                        {"z": 13, "val": 3},
-                        {"z": 14, "val": 4},
-                        {"z": 15, "val": 6},
-                        {"z": 16, "val": 9},
-                        {"z": 17, "val": 12},
-                        {"z": 18, "val": 14}
-                    ],
+                    "width": "motorway_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
@@ -3019,17 +2719,7 @@ module.exports = {
                 "road_main_casing": {
                     "transition-color": {"duration": 300},
                     "color": "case_night",
-                    "width": [
-                        "stops",
-                        {"z": 9, "val": 2.9},
-                        {"z": 12, "val": 2.9},
-                        {"z": 13, "val": 3.5},
-                        {"z": 14, "val": 4},
-                        {"z": 15, "val": 5.5},
-                        {"z": 16, "val": 9},
-                        {"z": 17, "val": 12},
-                        {"z": 18, "val": 14}
-                    ],
+                    "width": "main_casing_width",
                     "opacity": ["stops",
                         {"z": 9, "val": 0},
                         {"z": 10, "val": 1}
@@ -3038,17 +2728,7 @@ module.exports = {
                 "road_main": {
                     "transition-color": {"duration": 300},
                     "color": "main_night",
-                    "width": [
-                        "stops",
-                        {"z": 5, "val": 1},
-                        {"z": 12, "val": 1},
-                        {"z": 13, "val": 1.5},
-                        {"z": 14, "val": 2},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 6},
-                        {"z": 17, "val": 10},
-                        {"z": 18, "val": 12}
-                    ],
+                    "width": "main_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
@@ -3058,61 +2738,28 @@ module.exports = {
                 "road_motorway_link_casing": {
                     "transition-color": {"duration": 300},
                     "color": "case_night",
-                    "width": [
-                        "stops",
-                        {"z": 12, "val": 2.8},
-                        {"z": 14, "val": 3.5},
-                        {"z": 16, "val": 5},
-                        {"z": 18, "val": 6}
-                    ]
+                    "width": "motorway_link_casing_width"
                 },
                 "road_motorway_link": {
                     "transition-color": {"duration": 300},
                     "color": "motorway_night",
-                    "width": [
-                        "stops",
-                        {"z": 12, "val": 1.2},
-                        {"z": 14, "val": 2},
-                        {"z": 16, "val": 3},
-                        {"z": 18, "val": 4}
-                    ]
+                    "width": "motorway_link_width"
                 },
                 "road_street_casing": {
                     "transition-color": {"duration": 300},
                     "color": "street_case_night",
-                    "width": [
-                        "stops",
-                        {"z": 13,"val": 0.4},
-                        {"z": 14, "val": 1},
-                        {"z": 15, "val": 2.5},
-                        {"z": 16, "val": 4},
-                        {"z": 17, "val": 10}
-                    ]
+                    "width": "street_casing_width"
                 },
                 "road_street": {
                     "transition-color": {"duration": 300},
                     "color": "street_night",
-                    "width": [
-                        "stops",
-                        {"z": 14.5, "val": 0},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 3},
-                        {"z": 17, "val": 8}
-                    ]
+                    "width": "street_width"
                 },
                 "road_service_casing": {
                     "transition-color": {"duration": 300},
                     "color": "#000",
                     "opacity": 0.04,
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 0.5},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 3.5},
-                        {"z": 17, "val": 4},
-                        {"z": 18, "val": 5},
-                        {"z": 19, "val": 6}
-                    ]
+                    "width": "service_casing_width"
                 },
                 "road_service": {
                     "transition-color": {"duration": 300},
@@ -3130,12 +2777,7 @@ module.exports = {
                         10,
                         4
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 1.2},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 1.8}
-                    ]
+                    "width": "path_width"
                 },
                 "road_path_path": {
                     "transition-color": {"duration": 300},
@@ -3159,12 +2801,7 @@ module.exports = {
                         10,
                         4
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 1.2},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 1.8}
-                    ]
+                    "width": "path_width"
                 },
                 "road_path_mtb": {
                     "transition-color": {"duration": 300},
@@ -3173,12 +2810,7 @@ module.exports = {
                         12,
                         4
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 1.2},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 1.8}
-                    ]
+                    "width": "path_width"
                 },
                 "road_path_piste": {
                     "transition-color": {"duration": 300},
@@ -3187,12 +2819,7 @@ module.exports = {
                         8,
                         4
                     ],
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 1.2},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 1.8}
-                    ]
+                    "width": "path_width"
                 },
                 "road_path_steps": {
                     "transition-color": {"duration": 300},
@@ -3220,20 +2847,7 @@ module.exports = {
                 "bridge_motorway_casing": {
                     "transition-color": {"duration": 300},
                     "color": "case_night",
-                    "width": [
-                        "stops",
-                        {"z": 7.5, "val": 0.6},
-                        {"z": 8, "val": 0.8},
-                        {"z": 10, "val": 2.8},
-                        {"z": 11, "val": 3},
-                        {"z": 12, "val": 4},
-                        {"z": 13, "val": 5},
-                        {"z": 14, "val": 6.5},
-                        {"z": 15, "val": 9},
-                        {"z": 16, "val": 12},
-                        {"z": 17, "val": 15},
-                        {"z": 18, "val": 17}
-                    ],
+                    "width": "motorway_casing_width",
                     "opacity": [
                         "stops",
                         {"z": 9.5, "val": 0},
@@ -3243,21 +2857,7 @@ module.exports = {
                 "bridge_motorway": {
                     "transition-color": {"duration": 300},
                     "color": "motorway_night",
-                    "width": [
-                        "stops",
-                        {"z": 5, "val": 0},
-                        {"z": 6, "val": 0.5},
-                        {"z": 8, "val": 0.8},
-                        {"z": 10, "val": 1},
-                        {"z": 11, "val": 1.2},
-                        {"z": 12, "val": 2},
-                        {"z": 13, "val": 3},
-                        {"z": 14, "val": 4},
-                        {"z": 15, "val": 6},
-                        {"z": 16, "val": 9},
-                        {"z": 17, "val": 12},
-                        {"z": 18, "val": 14}
-                    ],
+                    "width": "motorway_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
@@ -3267,17 +2867,7 @@ module.exports = {
                 "bridge_main_casing": {
                     "transition-color": {"duration": 300},
                     "color": "case_night",
-                    "width": [
-                        "stops",
-                        {"z": 9, "val": 2.9},
-                        {"z": 12, "val": 2.9},
-                        {"z": 13, "val": 3.5},
-                        {"z": 14, "val": 4},
-                        {"z": 15, "val": 5.5},
-                        {"z": 16, "val": 9},
-                        {"z": 17, "val": 12},
-                        {"z": 18, "val": 14}
-                    ],
+                    "width": "main_casing_width",
                     "opacity": ["stops",
                         {"z": 9, "val": 0},
                         {"z": 10, "val": 1}
@@ -3286,17 +2876,7 @@ module.exports = {
                 "bridge_main": {
                     "transition-color": {"duration": 300},
                     "color": "main_night",
-                    "width": [
-                        "stops",
-                        {"z": 5, "val": 1},
-                        {"z": 12, "val": 1},
-                        {"z": 13, "val": 1.5},
-                        {"z": 14, "val": 2},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 6},
-                        {"z": 17, "val": 10},
-                        {"z": 18, "val": 12}
-                    ],
+                    "width": "main_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
@@ -3306,61 +2886,28 @@ module.exports = {
                 "bridge_motorway_link_casing": {
                     "transition-color": {"duration": 300},
                     "color": "case_night",
-                    "width": [
-                        "stops",
-                        {"z": 12, "val": 2.8},
-                        {"z": 14, "val": 3.5},
-                        {"z": 16, "val": 5},
-                        {"z": 18, "val": 6}
-                    ]
+                    "width": "motorway_link_casing_width"
                 },
                 "bridge_motorway_link": {
                     "transition-color": {"duration": 300},
                     "color": "motorway_night",
-                    "width": [
-                        "stops",
-                        {"z": 12, "val": 1.2},
-                        {"z": 14, "val": 2},
-                        {"z": 16, "val": 3},
-                        {"z": 18, "val": 4}
-                    ]
+                    "width": "motorway_link_width"
                 },
                 "bridge_street_casing": {
                     "transition-color": {"duration": 300},
                     "color": "street_case_night",
-                    "width": [
-                        "stops",
-                        {"z": 13,"val": 0.4},
-                        {"z": 14, "val": 1},
-                        {"z": 15, "val": 2.5},
-                        {"z": 16, "val": 4},
-                        {"z": 17, "val": 10}
-                    ]
+                    "width": "street_casing_width"
                 },
                 "bridge_street": {
                     "transition-color": {"duration": 300},
                     "color": "street_night",
-                    "width": [
-                        "stops",
-                        {"z": 14.5, "val": 0},
-                        {"z": 15, "val": 1.5},
-                        {"z": 16, "val": 3},
-                        {"z": 17, "val": 8}
-                    ]
+                    "width": "street_width"
                 },
                 "bridge_service_casing": {
                     "transition-color": {"duration": 300},
                     "color": "#000",
                     "opacity": 0.04,
-                    "width": [
-                        "stops",
-                        {"z": 14, "val": 0.5},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 3.5},
-                        {"z": 17, "val": 4},
-                        {"z": 18, "val": 5},
-                        {"z": 19, "val": 6}
-                    ]
+                    "width": "service_casing_width"
                 },
                 "bridge_service": {
                     "transition-color": {"duration": 300},
@@ -3371,29 +2918,13 @@ module.exports = {
                     "transition-color": {"duration": 300},
                     "color": "white",
                     "opacity": 0.5,
-                    "width": [
-                        "stops",
-                        {"z": 13.5, "val": 2},
-                        {"z": 14, "val": 2.5},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 3.5},
-                        {"z": 17, "val": 4},
-                        {"z": 22, "val": 5}
-                    ]
+                    "width": "aerialway_casing_width"
                 },
                 "bridge_aerialway": {
                     "transition-color": {"duration": 300},
                     "color": "#876",
                     "opacity": 0.5,
-                    "width": [
-                        "stops",
-                        {"z": 13.5, "val": 0.8},
-                        {"z": 14, "val": 1.4},
-                        {"z": 15, "val": 1.6},
-                        {"z": 16, "val": 2},
-                        {"z": 17, "val": 2.4},
-                        {"z": 18, "val": 3}
-                    ]
+                    "width": "aerialway_width"
                 },
                 "country_label": {
                     "transition-color": {"duration": 300},
@@ -3553,13 +3084,7 @@ module.exports = {
                     "stroke": "text_stroke_night",
                     "strokeWidth": 0.5,
                     "strokeBlur": 3,
-                    "size": [
-                        "stops",
-                        {"z": 0, "val": 12},
-                        {"z": 14, "val": 12},
-                        {"z": 15, "val": 13},
-                        {"z": 22, "val": 13}
-                    ]
+                    "size": "road_label_size"
                 },
                 "water_label": {
                     "transition-color": {"duration": 300},
