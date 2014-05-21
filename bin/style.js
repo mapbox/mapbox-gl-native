@@ -1359,7 +1359,19 @@ module.exports = {
         "motorway_night": "#eee",
         "main_night": "#95ccdb",
         "street_night": "#0291b5",
-        "contour_night": "#ffff80"
+        "contour_night": "#ffff80",
+
+        "road_main_width": [
+            "stops",
+            {"z": 5, "val": 1},
+            {"z": 12, "val": 1},
+            {"z": 13, "val": 1.5},
+            {"z": 14, "val": 2},
+            {"z": 15, "val": 3},
+            {"z": 16, "val": 6},
+            {"z": 17, "val": 10},
+            {"z": 18, "val": 12}
+        ]
     },
     "classes": [
         {
@@ -1915,17 +1927,7 @@ module.exports = {
                 "road_main": {
                     "transition-color": {"duration": 300},
                     "color": "main",
-                    "width": [
-                        "stops",
-                        {"z": 5, "val": 1},
-                        {"z": 12, "val": 1},
-                        {"z": 13, "val": 1.5},
-                        {"z": 14, "val": 2},
-                        {"z": 15, "val": 3},
-                        {"z": 16, "val": 6},
-                        {"z": 17, "val": 10},
-                        {"z": 18, "val": 12}
-                    ],
+                    "width": "road_main_width",
                     "opacity": [
                         "stops",
                         {"z": 6.5, "val": 0},
