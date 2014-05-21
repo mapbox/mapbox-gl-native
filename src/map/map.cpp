@@ -336,17 +336,15 @@ bool Map::getDebug() const {
 }
 
 void Map::toggleRaster() {
+    style.setDefaultTransitionDuration(300);
+    style.cancelTransitions();
+
     auto it = sources.find("satellite");
     if (it != sources.end()) {
         Source &satellite_source = *it->second;
-
         if (satellite_source.enabled) {
             satellite_source.enabled = false;
-
-            auto style_class = style.appliedClasses.find("satellite");
-            if (style_class != style.appliedClasses.end()) {
-                style.appliedClasses.erase(style_class);
-            }
+            style.appliedClasses.erase("satellite");
         } else {
             satellite_source.enabled = true;
             style.appliedClasses.insert("satellite");
@@ -398,6 +396,11 @@ void Map::prepare() {
 
     state = transform.currentState();
     style.cascade(state.getNormalizedZoom());
+    animationTime = util::now();
+    if (style.needsTransition()) {
+        style.updateTransitions(animationTime);
+        update();
+    }
     if (!style.sprite || style.sprite->pixelRatio != state.getPixelRatio()) {
         style.sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
         style.sprite->load(kSpriteURL);

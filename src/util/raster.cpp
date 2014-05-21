@@ -70,7 +70,7 @@ void Raster::bind(bool linear) {
 
 void Raster::beginFadeInTransition() {
     time start = util::now();
-    fade_transition = std::make_shared<util::ease_transition>(opacity, 1.0, opacity, start, 250_milliseconds);
+    fade_transition = std::make_shared<util::ease_transition<double>>(opacity, 1.0, opacity, start, 250_milliseconds);
 }
 
 bool Raster::needsTransition() const {
