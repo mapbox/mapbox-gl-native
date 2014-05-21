@@ -545,8 +545,8 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
         // This is a layer group. We render them during our translucent render pass.
         if (pass == Translucent) {
             auto it = find_style(style.computed.composites, layer_desc);
-            if (it != style.computed.composites.end() && !is_invisible(it->second)) {
-                const CompositeProperties &properties = it->second;
+            const CompositeProperties &properties = (it != style.computed.composites.end()) ? it->second : defaultCompositeProperties;
+            if (!is_invisible(properties)) {
                 gl::group group(std::string("group: ") + layer_desc.name);
 
                 if (debug::renderTree) {

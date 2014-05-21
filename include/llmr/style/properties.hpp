@@ -186,9 +186,13 @@ struct CompositeClass {
 };
 
 struct CompositeProperties {
+    inline CompositeProperties() {}
     bool enabled = true;
     float opacity = 1.0;
 };
+
+
+const CompositeProperties defaultCompositeProperties;
 
 }
 
