@@ -669,22 +669,188 @@ void Style::cascade(float z) {
     }
 
     // Text
+    for (const auto& text_pair : computed.texts) {
+        const std::string& layer_name = text_pair.first;
 
-    // translate
-    // color
-    // halo
-    // haloradius
-    // haloblur
-    // opacity
+        // translate
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Translate)) {
+
+            computed.texts[layer_name].translate = transitioning.texts[layer_name].translate;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Translate)) {
+
+            transitioning.texts[layer_name].translate = previous.texts[layer_name].translate;
+
+            transitions[layer_name][TransitionablePropertyKey::Translate] =
+                std::make_shared<util::ease_transition<std::array<float, 2>>>(previous.texts[layer_name].translate,
+                                                                              computed.texts[layer_name].translate,
+                                                                              transitioning.texts[layer_name].translate,
+                                                                              start,
+                                                                              transitionDuration(layer_name, TransitionablePropertyKey::Translate));
+
+            computed.texts[layer_name].translate = transitioning.texts[layer_name].translate;
+        }
+
+        // color
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Color)) {
+
+            computed.texts[layer_name].color = transitioning.texts[layer_name].color;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Color)) {
+
+            transitioning.texts[layer_name].color = previous.texts[layer_name].color;
+
+            transitions[layer_name][TransitionablePropertyKey::Color] =
+                std::make_shared<util::ease_transition<Color>>(previous.texts[layer_name].color,
+                                                               computed.texts[layer_name].color,
+                                                               transitioning.texts[layer_name].color,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Color));
+
+            computed.texts[layer_name].color = transitioning.texts[layer_name].color;
+        }
+
+        // halo
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Halo)) {
+
+            computed.texts[layer_name].halo = transitioning.texts[layer_name].halo;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Halo)) {
+
+            transitioning.texts[layer_name].halo = previous.texts[layer_name].halo;
+
+            transitions[layer_name][TransitionablePropertyKey::Halo] =
+                std::make_shared<util::ease_transition<Color>>(previous.texts[layer_name].halo,
+                                                               computed.texts[layer_name].halo,
+                                                               transitioning.texts[layer_name].halo,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Halo));
+
+            computed.texts[layer_name].halo = transitioning.texts[layer_name].halo;
+        }
+
+        // halo radius
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::HaloRadius)) {
+
+            computed.texts[layer_name].halo_radius = transitioning.texts[layer_name].halo_radius;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::HaloRadius)) {
+
+            transitioning.texts[layer_name].halo_radius = previous.texts[layer_name].halo_radius;
+
+            transitions[layer_name][TransitionablePropertyKey::HaloRadius] =
+                std::make_shared<util::ease_transition<float>>(previous.texts[layer_name].halo_radius,
+                                                               computed.texts[layer_name].halo_radius,
+                                                               transitioning.texts[layer_name].halo_radius,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::HaloRadius));
+
+            computed.texts[layer_name].halo_radius = transitioning.texts[layer_name].halo_radius;
+        }
+
+        // halo blur
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::HaloBlur)) {
+
+            computed.texts[layer_name].halo_blur = transitioning.texts[layer_name].halo_blur;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::HaloBlur)) {
+
+            transitioning.texts[layer_name].halo_blur = previous.texts[layer_name].halo_blur;
+
+            transitions[layer_name][TransitionablePropertyKey::HaloBlur] =
+                std::make_shared<util::ease_transition<float>>(previous.texts[layer_name].halo_blur,
+                                                               computed.texts[layer_name].halo_blur,
+                                                               transitioning.texts[layer_name].halo_blur,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::HaloBlur));
+
+            computed.texts[layer_name].halo_blur = transitioning.texts[layer_name].halo_blur;
+        }
+
+        // opacity
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity)) {
+
+            computed.texts[layer_name].opacity = transitioning.texts[layer_name].opacity;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Opacity)) {
+
+            transitioning.texts[layer_name].opacity = previous.texts[layer_name].opacity;
+
+            transitions[layer_name][TransitionablePropertyKey::Opacity] =
+                std::make_shared<util::ease_transition<float>>(previous.texts[layer_name].opacity,
+                                                               computed.texts[layer_name].opacity,
+                                                               transitioning.texts[layer_name].opacity,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Opacity));
+
+            computed.texts[layer_name].opacity = transitioning.texts[layer_name].opacity;
+        }
+    }
 
     // Rasters
+    for (const auto& raster_pair : computed.rasters) {
+        const std::string& layer_name = raster_pair.first;
 
-    // opacity
+        // opacity
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity)) {
+
+            computed.rasters[layer_name].opacity = transitioning.rasters[layer_name].opacity;
+
+        } else if (inNeedOfTransition(layer_name, TransitionablePropertyKey::Opacity)) {
+
+            transitioning.rasters[layer_name].opacity = previous.rasters[layer_name].opacity;
+
+            transitions[layer_name][TransitionablePropertyKey::Opacity] =
+                std::make_shared<util::ease_transition<float>>(previous.rasters[layer_name].opacity,
+                                                               computed.rasters[layer_name].opacity,
+                                                               transitioning.rasters[layer_name].opacity,
+                                                               start,
+                                                               transitionDuration(layer_name, TransitionablePropertyKey::Opacity));
+
+            computed.rasters[layer_name].opacity = transitioning.rasters[layer_name].opacity;
+        }
+    }
 
     // Background
+    {
+        // color
+        if (transitionInProgress("background", TransitionablePropertyKey::Color)) {
 
-    // color
-    // opacity
+            computed.background.color = transitioning.background.color;
+
+        } else if (inNeedOfTransition("background", TransitionablePropertyKey::Color)) {
+
+            transitioning.background.color = previous.background.color;
+
+            transitions["background"][TransitionablePropertyKey::Color] =
+                std::make_shared<util::ease_transition<Color>>(previous.background.color,
+                                                               computed.background.color,
+                                                               transitioning.background.color,
+                                                               start,
+                                                               transitionDuration("background", TransitionablePropertyKey::Color));
+
+            computed.background.color = transitioning.background.color;
+        }
+
+        // opacity
+        if (transitionInProgress("background", TransitionablePropertyKey::Opacity)) {
+
+            computed.background.opacity = transitioning.background.opacity;
+
+        } else if (inNeedOfTransition("background", TransitionablePropertyKey::Opacity)) {
+
+            transitioning.background.opacity = previous.background.opacity;
+
+            transitions["background"][TransitionablePropertyKey::Opacity] =
+                std::make_shared<util::ease_transition<float>>(previous.background.opacity,
+                                                               computed.background.opacity,
+                                                               transitioning.background.opacity,
+                                                               start,
+                                                               transitionDuration("background", TransitionablePropertyKey::Opacity));
+
+            computed.background.opacity = transitioning.background.opacity;
+        }
+    }
 }
 
 bool Style::transitionInProgress(std::string layer_name, TransitionablePropertyKey key) {
