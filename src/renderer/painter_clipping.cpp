@@ -39,7 +39,7 @@ void Painter::drawClippingMasks(const Sources &sources) {
 void Painter::drawClippingMask(const mat4& matrix, const ClipID &clip) {
     plainShader->setMatrix(matrix);
 
-    GLint id = clip.mask.to_ulong();
+    GLint id = static_cast<GLint>(clip.mask.to_ulong());
     GLuint mask = clipMask[clip.length];
     glStencilFunc(GL_ALWAYS, id, mask);
 

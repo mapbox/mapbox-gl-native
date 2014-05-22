@@ -7,27 +7,27 @@ using namespace llmr;
 
 
 void Painter::clearFramebuffers() {
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Delete any framebuffers that we might have allocated
-    glDeleteTextures(fbos_color.size(), fbos.data());
+    glDeleteTextures((int)fbos_color.size(), fbos.data());
     fbos_color.clear();
 
     if (fbo_depth_stencil != 0) {
-        glDeleteRenderbuffersEXT(1, &fbo_depth_stencil);
+        glDeleteRenderbuffers(1, &fbo_depth_stencil);
         fbo_depth_stencil = 0;
     }
 
-    glDeleteFramebuffersEXT(fbos.size(), fbos.data());
+    glDeleteFramebuffers((int)fbos.size(), fbos.data());
     fbos.clear();
 }
 
 void Painter::bindFramebuffer() {
     if (fbo_level < 0) {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     } else if (fbos.size() > (size_t)fbo_level) {
         GLuint fbo = fbos[fbo_level];
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     } else {
         // TODO: Convert this to textures so we can composite them and use them in blend operations
 
@@ -38,36 +38,44 @@ void Painter::bindFramebuffer() {
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, map.getState().getFramebufferWidth(), map.getState().getFramebufferHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, map.getState().getFramebufferWidth(), map.getState().getFramebufferHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
         fbos_color.emplace_back(fbo_color);
 
         // Use a shared depth/stencil buffer for all framebuffer objects
         if (fbo_depth_stencil == 0) {
             // Create depth/stencil buffer
-            glGenRenderbuffersEXT(1, &fbo_depth_stencil);
-            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo_depth_stencil);
-            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, map.getState().getFramebufferWidth(), map.getState().getFramebufferHeight());
-            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+            glGenRenderbuffers(1, &fbo_depth_stencil);
+            glBindRenderbuffer(GL_RENDERBUFFER, fbo_depth_stencil);
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, map.getState().getFramebufferWidth(), map.getState().getFramebufferHeight());
+            glBindRenderbuffer(GL_RENDERBUFFER, 0);
         }
 
         // Allocate new framebuffer
         GLuint fbo = 0;
-        glGenFramebuffersEXT(1, &fbo);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+        glGenFramebuffers(1, &fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
         fbos.emplace_back(fbo);
 
         // Assemble the FBO
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_color, 0);
-        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER_EXT, fbo_depth_stencil);
-
-        GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-        if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+#ifdef GL_ES_VERSION_2_0
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo_depth_stencil);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_depth_stencil);
+#else
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_depth_stencil);
+#endif
+        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (status != GL_FRAMEBUFFER_COMPLETE) {
             fprintf(stderr, "Couldn't create framebuffer: ");
             switch (status) {
-                case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT: fprintf(stderr, "incomplete attachment\n"); break;
-                case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT: fprintf(stderr, "incomplete missing attachment\n"); break;
-                case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: fprintf(stderr, "incomplete draw buffer\n"); break;
+                case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: fprintf(stderr, "incomplete attachment\n"); break;
+                case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: fprintf(stderr, "incomplete missing attachment\n"); break;
+#ifdef GL_ES_VERSION_2_0
+                case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS: fprintf(stderr, "incomplete dimensions\n"); break;
+#else
+                case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER: fprintf(stderr, "incomplete draw buffer\n"); break;
+#endif
                 case GL_FRAMEBUFFER_UNSUPPORTED: fprintf(stderr, "unsupported\n"); break;
                 default: fprintf(stderr, "other\n"); break;
             }

@@ -16,6 +16,7 @@
         #define glBindVertexArray glBindVertexArrayOES
         #define glDeleteVertexArrays glDeleteVertexArraysOES
         #define GL_ARB_vertex_array_object 1
+        #define GL_DEPTH24_STENCIL8 GL_DEPTH24_STENCIL8_OES
     #elif TARGET_IPHONE_SIMULATOR
         #include <OpenGLES/ES2/gl.h>
         #include <OpenGLES/ES2/glext.h>
