@@ -438,7 +438,6 @@ void Map::prepare() {
     bool pixelRatioChanged = oldState.getPixelRatio() != state.getPixelRatio();
     bool dimensionsChanged = oldState.getFramebufferWidth() != state.getFramebufferWidth() ||
                              oldState.getFramebufferHeight() != state.getFramebufferHeight();
-    bool zoomChanged = oldState.getNormalizedZoom() != state.getNormalizedZoom();
 
     if (pixelRatioChanged) {
         // We have a pixelratio change
@@ -452,9 +451,7 @@ void Map::prepare() {
         painter.clearFramebuffers();
     }
 
-    if (zoomChanged) {
-        style.cascade(state.getNormalizedZoom());
-    }
+    style.cascade(state.getNormalizedZoom());
 
     animationTime = util::now();
     if (style.needsTransition()) {
