@@ -7,7 +7,11 @@ using namespace llmr;
 
 
 void Painter::clearFramebuffers() {
+#ifdef TARGET_OS_IPHONE
+    glBindFramebuffer(GL_FRAMEBUFFER, 1);
+#else
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 
     // Delete any framebuffers that we might have allocated
     glDeleteTextures((int)fbos_color.size(), fbos.data());
@@ -24,10 +28,18 @@ void Painter::clearFramebuffers() {
 
 void Painter::bindFramebuffer() {
     if (fbo_level < 0) {
+#ifdef TARGET_OS_IPHONE
+        glBindFramebuffer(GL_FRAMEBUFFER, 1);
+#else
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    } else if (fbos.size() > (size_t)fbo_level) {
+#endif
+    } else if (fbos.size() > (size_t) fbo_level) {
         GLuint fbo = fbos[fbo_level];
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+#if GL_EXT_discard_framebuffer
+        const GLenum discards[] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT };
+        glDiscardFramebufferEXT(GL_FRAMEBUFFER, 3, discards);
+#endif
     } else {
         // TODO: Convert this to textures so we can composite them and use them in blend operations
 

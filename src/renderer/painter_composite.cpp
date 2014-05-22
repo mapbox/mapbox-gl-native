@@ -11,7 +11,7 @@ void Painter::drawComposite(GLuint texture, const CompositeProperties &propertie
     // Normally, we're using premultiplied alpha, but the resulting image we've
     // just drawn is non-premultiplied. That means when blending, we have to make
     // sure that we account for that.
-    glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     useProgram(compositeShader->program);
     compositeShader->setMatrix(nativeMatrix);

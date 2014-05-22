@@ -19,6 +19,7 @@ public:
     box cornersToBox(uint32_t z) const;
 
     // Dimensions
+    bool hasSize() const;
     uint16_t getWidth() const;
     uint16_t getHeight() const;
     uint16_t getFramebufferWidth() const;

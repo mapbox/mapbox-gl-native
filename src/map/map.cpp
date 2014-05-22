@@ -134,15 +134,17 @@ void Map::render(uv_async_t *async) {
 
     map->prepare();
 
-    if (map->is_rendered.test_and_set() == false) {
-        if (map->is_clean.test_and_set() == false) {
-            map->render();
-            map->is_swapped.clear();
-            map->view.swap();
-        } else {
-            // We set the rendered flag in the test above, so we have to reset it
-            // now that we're not actually rendering because the map is clean.
-            map->is_rendered.clear();
+    if (map->state.hasSize()) {
+        if (map->is_rendered.test_and_set() == false) {
+            if (map->is_clean.test_and_set() == false) {
+                map->render();
+                map->is_swapped.clear();
+                map->view.swap();
+            } else {
+                // We set the rendered flag in the test above, so we have to reset it
+                // now that we're not actually rendering because the map is clean.
+                map->is_rendered.clear();
+            }
         }
     }
 }
@@ -556,8 +558,6 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers) {
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
     }
-
-    glFlush();
 }
 
 template <typename Styles>

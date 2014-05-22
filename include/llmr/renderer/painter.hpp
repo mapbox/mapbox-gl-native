@@ -103,6 +103,7 @@ public:
     void bindFramebuffer();
     void pushFramebuffer();
     GLuint popFramebuffer();
+    void discardFramebuffers();
     void drawComposite(GLuint texture, const CompositeProperties &properties);
 
     bool needsAnimation() const;
