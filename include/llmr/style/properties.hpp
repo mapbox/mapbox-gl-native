@@ -5,11 +5,33 @@
 #include <vector>
 #include <string>
 #include <limits>
+#include <set>
 
 namespace llmr {
 
 // Stores a premultiplied color, with all four channels ranging from 0..1
 typedef std::array<float, 4> Color;
+
+struct PropertyTransition {
+    uint16_t duration = 0;
+    uint16_t delay = 0;
+};
+
+enum class TransitionablePropertyKey {
+    Translate = 1,
+    FillColor = 2,
+    StrokeColor = 3,
+    Opacity = 4,
+    Width = 5,
+    Offset = 6,
+    Color = 7,
+    DashArray = 8,
+    Radius = 9,
+    Blur = 10,
+    Halo = 11,
+    HaloRadius = 12,
+    HaloBlur = 13,
+};
 
 enum class Winding {
     EvenOdd = 1,
@@ -63,13 +85,19 @@ struct FunctionProperty {
 struct IconClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    PropertyTransition translate_transition;
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     FunctionProperty size;
     Color color = {{ 1, 1, 1, 1 }};
+    PropertyTransition color_transition;
     FunctionProperty opacity = 1;
+    PropertyTransition opacity_transition;
     std::string image;
     FunctionProperty radius = 0;
+    PropertyTransition radius_transition;
     FunctionProperty blur = 0;
+    PropertyTransition blur_transition;
+    std::set<std::string> specifiers;
 };
 
 struct IconProperties {
@@ -87,12 +115,19 @@ struct IconProperties {
 struct LineClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    PropertyTransition translate_transition;
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     FunctionProperty width;
+    PropertyTransition width_transition;
     FunctionProperty offset;
+    PropertyTransition offset_transition;
     Color color = {{ 0, 0, 0, 1 }};
+    PropertyTransition color_transition;
     std::array<FunctionProperty, 2> dash_array = {{ 1, -1 }};
+    PropertyTransition dash_array_transition;
     FunctionProperty opacity = 1;
+    PropertyTransition opacity_transition;
+    std::set<std::string> specifiers;
 };
 
 struct LineProperties {
@@ -109,13 +144,18 @@ struct LineProperties {
 struct FillClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    PropertyTransition translate_transition;
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     Winding winding = Winding::NonZero;
     FunctionProperty antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
+    PropertyTransition fill_color_transition;
     Color stroke_color = {{ 0, 0, 0, std::numeric_limits<float>::infinity() }};
+    PropertyTransition stroke_color_transition;
     FunctionProperty opacity = 1;
+    PropertyTransition opacity_transition;
     std::string image;
+    std::set<std::string> specifiers;
 };
 
 struct FillProperties {
@@ -133,15 +173,22 @@ struct FillProperties {
 struct TextClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    PropertyTransition translate_transition;
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     Color color = {{ 0, 0, 0, 1 }};
+    PropertyTransition color_transition;
     Color halo = {{ 1, 1, 1, 0.75 }};
+    PropertyTransition halo_transition;
     FunctionProperty halo_radius = 0.25f;
+    PropertyTransition halo_radius_transition;
     FunctionProperty halo_blur = 1.0f;
+    PropertyTransition halo_blur_transition;
     FunctionProperty size = 12.0f;
     FunctionProperty rotate = 0.0f;
-    FunctionProperty alwaysVisible = false;
+    FunctionProperty always_visible = false;
     FunctionProperty opacity = 1;
+    PropertyTransition opacity_transition;
+    std::set<std::string> specifiers;
 };
 
 struct TextProperties {
@@ -154,13 +201,16 @@ struct TextProperties {
     float halo_blur = 1.0f;
     float size = 12.0f;
     float rotate = 0.0f;
-    bool alwaysVisible = false;
+    bool always_visible = false;
     float opacity = 1.0;
 };
 
 struct BackgroundClass {
     Color color = {{ 1, 1, 1, 1 }};
+    PropertyTransition color_transition;
     FunctionProperty opacity = 1;
+    PropertyTransition opacity_transition;
+    std::set<std::string> specifiers;
 };
 
 struct BackgroundProperties {
@@ -171,7 +221,10 @@ struct BackgroundProperties {
 struct RasterClass {
     FunctionProperty enabled = true;
     std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
+    PropertyTransition translate_transition;
     FunctionProperty opacity = 1;
+    PropertyTransition opacity_transition;
+    std::set<std::string> specifiers;
 };
 
 struct RasterProperties {
@@ -183,6 +236,8 @@ struct RasterProperties {
 struct CompositeClass {
     FunctionProperty enabled = true;
     FunctionProperty opacity = 1;
+    PropertyTransition opacity_transition;
+    std::set<std::string> specifiers;
 };
 
 struct CompositeProperties {
