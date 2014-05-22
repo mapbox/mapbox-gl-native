@@ -3,6 +3,7 @@
 #include <llmr/platform/platform.hpp>
 #include <llmr/util/math.hpp>
 #include <llmr/util/std.hpp>
+#include <llmr/util/constants.hpp>
 
 #include <llmr/style/sprite.hpp>
 
@@ -124,7 +125,9 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getIcon(const int size, const std::str
 
     Rect<dimension> rect = allocateImage(size, size);
     if (rect.w == 0) {
-        fprintf(stderr, "sprite atlas bitmap overflow\n");
+        if (debug::spriteWarnings) {
+            fprintf(stderr, "[WARNING] sprite atlas bitmap overflow\n");
+        }
         return rect;
     }
 
@@ -165,7 +168,9 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string &name, cons
 
     Rect<dimension> rect = allocateImage(pos.width / pos.pixelRatio, pos.height / pos.pixelRatio);
     if (rect.w == 0) {
-        fprintf(stderr, "sprite atlas bitmap overflow\n");
+        if (debug::spriteWarnings) {
+            fprintf(stderr, "[WARNING] sprite atlas bitmap overflow\n");
+        }
         return rect;
     }
 
@@ -215,6 +220,9 @@ void SpriteAtlas::update(const Sprite &sprite) {
         Rect<dimension> dst = atlas.getImage(name, sprite);
         const SpritePosition &src = sprite.getSpritePosition(name);
         if (!src) {
+            if (debug::spriteWarnings) {
+                fprintf(stderr, "[WARNING] sprite doesn't have image with name '%s'\n", name.c_str());
+            }
             return true;
         }
 
@@ -222,7 +230,9 @@ void SpriteAtlas::update(const Sprite &sprite) {
             atlas.copy(dst, src, sprite);
             return true;
         } else {
-            fprintf(stderr, "sprite icon dimension mismatch\n");
+            if (debug::spriteWarnings) {
+                fprintf(stderr, "[WARNING] sprite icon dimension mismatch\n");
+            }
             return false;
         }
     });

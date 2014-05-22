@@ -106,8 +106,9 @@ std::unique_ptr<Bucket> TileParser::createBucket(const BucketDescription& bucket
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
         if (debug::tileParseWarnings) {
-            fprintf(stderr, "[WARNING] layer '%s' does not exist in source '%s'\n",
-                    bucket_desc.source_layer.c_str(), bucket_desc.source_name.c_str());
+            fprintf(stderr, "[WARNING] layer '%s' does not exist in tile %d/%d/%d of source '%s'\n",
+                    bucket_desc.source_layer.c_str(), tile.id.z, tile.id.x, tile.id.y,
+                    bucket_desc.source_name.c_str());
         }
     }
 
