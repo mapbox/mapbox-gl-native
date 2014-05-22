@@ -35,6 +35,7 @@ void Style::cascade(float z) {
     previous.icons = computed.icons;
     previous.texts = computed.texts;
     previous.rasters = computed.rasters;
+    previous.composites = computed.composites;
     previous.background = computed.background;
 
     previous.effective_classes = computed.effective_classes;
