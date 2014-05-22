@@ -32,6 +32,7 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         current.pixelRatio = final.pixelRatio = ratio;
         current.framebuffer[0] = final.framebuffer[0] = fb_w;
         current.framebuffer[1] = final.framebuffer[1] = fb_h;
+        constrain(current.scale, current.y);
         return true;
     } else {
         return false;
@@ -51,6 +52,8 @@ void Transform::_moveBy(const double dx, const double dy, const time duration) {
 
     final.x = current.x + std::cos(current.angle) * dx + std::sin(current.angle) * dy;
     final.y = current.y + std::cos(current.angle) * dy + std::sin(-current.angle) * dx;
+
+    constrain(final.scale, final.y);
 
     if (duration == 0) {
         current.x = final.x;
@@ -243,6 +246,8 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     final.x = xn;
     final.y = yn;
 
+    constrain(final.scale, final.y);
+
     if (duration == 0) {
         current.scale = final.scale;
         current.x = final.x;
@@ -262,6 +267,19 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     zc = s / 2;
     Bc = s / 360;
     Cc = s / (2 * M_PI);
+}
+
+#pragma mark - Constraints
+
+void Transform::constrain(double& scale, double& y) {
+    // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.
+    if (scale < (current.height / util::tileSize)) scale = (current.height / util::tileSize);
+
+    // Constrain min/max vertical pan to avoid showing off-world areas.
+    double max_y = ((scale * util::tileSize) - current.height) / 2;
+
+    if (y > max_y) y = max_y;
+    if (y < -max_y) y = -max_y;
 }
 
 #pragma mark - Angle
