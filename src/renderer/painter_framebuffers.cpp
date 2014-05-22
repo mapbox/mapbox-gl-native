@@ -7,7 +7,7 @@ using namespace llmr;
 
 
 void Painter::clearFramebuffers() {
-#ifdef TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
     glBindFramebuffer(GL_FRAMEBUFFER, 1);
 #else
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -28,7 +28,7 @@ void Painter::clearFramebuffers() {
 
 void Painter::bindFramebuffer() {
     if (fbo_level < 0) {
-#ifdef TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
         glBindFramebuffer(GL_FRAMEBUFFER, 1);
 #else
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
