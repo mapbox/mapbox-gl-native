@@ -186,6 +186,13 @@ module.exports = {
             "value": "rock",
             "type": "fill"
         },
+        "landuse_snow": {
+            "source": "outdoors",
+            "layer": "landuse",
+            "field": "class",
+            "value": "snow",
+            "type": "fill"
+        },
         "overlay_wetland": {
             "source": "outdoors",
             "layer": "landuse_overlay",
