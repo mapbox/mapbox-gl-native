@@ -896,6 +896,10 @@ module.exports = {
             "bucket": "landuse_rock"
         },
         {
+            "name": "landuse_snow",
+            "bucket": "landuse_snow"
+        },
+        {
             "name": "landuse_hospital",
             "bucket": "landuse_hospital"
         },
