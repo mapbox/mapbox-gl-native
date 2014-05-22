@@ -425,12 +425,11 @@ void Map::updateRenderState() {
 void Map::prepare() {
     view.make_active();
 
-    // Update transitions
+    // Update transform transitions.
     animationTime = util::now();
     if (transform.needsTransition()) {
         transform.updateTransitions(animationTime);
     }
-
 
     const TransformState oldState = state;
     state = transform.currentState();
@@ -440,7 +439,6 @@ void Map::prepare() {
                              oldState.getFramebufferHeight() != state.getFramebufferHeight();
 
     if (pixelRatioChanged) {
-        // We have a pixelratio change
         style.sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
         style.sprite->load(kSpriteURL);
 
@@ -453,6 +451,7 @@ void Map::prepare() {
 
     style.cascade(state.getNormalizedZoom());
 
+    // Update style transitions.
     animationTime = util::now();
     if (style.needsTransition()) {
         style.updateTransitions(animationTime);
