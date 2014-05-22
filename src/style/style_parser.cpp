@@ -39,39 +39,61 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
 
         } else if (name == "fill") {
             bucket.type = BucketType::Fill;
-            
-        } else if (name == "feature_type") {
-            if (value.IsString()) {
-                bucket.feature_type = bucketType({ value.GetString(), value.GetStringLength() });
-            } else {
-                throw Style::exception("feature type must be a string");
-            }
-        } else if (name == "source") {
-            if (value.IsString()) {
-                bucket.source_name = { value.GetString(), value.GetStringLength() };
-            } else {
-                throw Style::exception("source name must be a string");
-            }
-        } else if (name == "layer") {
-            if (value.IsString()) {
-                bucket.source_layer = { value.GetString(), value.GetStringLength() };
-            } else {
-                throw Style::exception("layer name must be a string");
-            }
-        } else if (name == "field") {
-            if (value.IsString()) {
-                bucket.source_field = { value.GetString(), value.GetStringLength() };
-            } else {
-                throw Style::exception("field name must be a string");
-            }
-        } else if (name == "value") {
-            if (value.IsArray()) {
-                for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-                    bucket.source_value.push_back(parseValue(value[i]));
+
+        } else if (name == "filter") {
+            if (value.IsObject()) {
+                rapidjson::Value::ConstMemberIterator itr2 = value.MemberBegin();
+                for (; itr2 != value.MemberEnd(); ++itr2) {
+                    const std::string name2(itr2->name.GetString(), itr2->name.GetStringLength());
+                    JSVal value2 = itr2->value;
+
+                    if (name2 == "feature_type") {
+                        if (value2.IsString()) {
+                            bucket.feature_type = bucketType({ value2.GetString(), value2.GetStringLength() });
+                        } else {
+                            throw Style::exception("feature type must be a string");
+                        }
+
+                    } else if (name2 == "source") {
+                        if (value2.IsString()) {
+                            bucket.source_name = { value2.GetString(), value2.GetStringLength() };
+                        } else {
+                            throw Style::exception("source name must be a string");
+                        }
+
+                    } else if (name2 == "layer") {
+                        if (value2.IsString()) {
+                            bucket.source_layer = { value2.GetString(), value2.GetStringLength() };
+                        } else {
+                            throw Style::exception("layer name must be a string");
+                        }
+
+                    } else {
+                        // This catches "type", "class", "maki", "index", etc
+                        if (value2.IsString() || value2.IsNumber() || value2.IsBool()) {
+                            bucket.source_field = name2;
+                            bucket.source_value.push_back(parseValue(value2));
+                        } else if (value2.IsArray()) {
+                            rapidjson::Value::ConstValueIterator itr3 = value2.Begin();
+                            for (; itr3 != value2.End(); ++itr3) {
+                                if (itr3->IsString() || itr3->IsNumber() || itr3->IsBool()) {
+                                    bucket.source_field = name2;
+                                    bucket.source_value.push_back(parseValue(itr3));
+                                } else {
+                                    printf("filter %s makes me confused\n", name2.c_str());
+                                    throw Style::exception("Unexpected type for a filter array element value");
+                                }
+                            }
+                        } else {
+                            printf("filter %s makes me confused\n", name2.c_str());
+                            throw Style::exception("Unexpected type for a filter value");
+                        }
+                    }
                 }
             } else {
-                bucket.source_value.push_back(parseValue(value));
+                throw Style::exception("filter type must be a object");
             }
+
         } else if (name == "line-cap") {
             if (value.IsString()) {
                 bucket.geometry.cap = capType({ value.GetString(), value.GetStringLength() });
@@ -149,7 +171,7 @@ void StyleParser::parseLayers(JSVal value, std::vector<LayerDescription>& layers
             layers.push_back(parseLayer(value[i]));
         }
     } else {
-        throw Style::exception("structure must be an array");
+        throw Style::exception("layers must be an array");
     }
 }
 
@@ -166,10 +188,10 @@ LayerDescription StyleParser::parseLayer(JSVal value) {
                     layerIsBackground = true;
                 }
             } else {
-                throw Style::exception("structure element id must be a string");
+                throw Style::exception("layers element id must be a string");
             }
         } else {
-            throw Style::exception("structure element must have an id");
+            throw Style::exception("layers element must have an id");
         }
 
         if (value.HasMember("bucket")) {
@@ -177,14 +199,14 @@ LayerDescription StyleParser::parseLayer(JSVal value) {
             if (bucket.IsString()) {
                 layer.bucket_name = { bucket.GetString(), bucket.GetStringLength() };
             } else {
-                throw Style::exception("structure element bucket must be a string");
+                throw Style::exception("layers element bucket must be a string");
             }
         } else if (value.HasMember("layers")) {
             parseLayers(value["layers"], layer.child_layer);
         } else if (layerIsBackground) {
             layer.bucket_name = "background";
         } else {
-            throw Style::exception("layer element must be the background, have a bucket name, or have child layers");
+            throw Style::exception("layers element must be the background, have a bucket name, or have child layers");
         }
     } else {
         throw Style::exception("layer element must be an object");
