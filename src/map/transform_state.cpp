@@ -59,6 +59,10 @@ box TransformState::cornersToBox(uint32_t z) const {
 
 #pragma mark - Dimensions
 
+bool TransformState::hasSize() const {
+    return width && height;
+}
+
 uint16_t TransformState::getWidth() const {
     return width;
 }

@@ -45,27 +45,31 @@ void Source::updateClipIDs(const std::map<Tile::ID, ClipID> &mapping) {
     });
 }
 
-size_t Source::prepareRender(const TransformState &transform) {
-    if (!enabled) return 0;
+void Source::updateMatrices(const TransformState &transform) {
+    for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
+        Tile &tile = *pair.second;
+        transform.matrixFor(tile.matrix, tile.id);
+        matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
+    }
+}
 
-    size_t masks = 0;
+size_t Source::getTileCount() const {
+    return tiles.size();
+}
+
+void Source::drawClippingMasks() {
     for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
         Tile &tile = *pair.second;
         gl::group group(util::sprintf<32>("mask %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
-        transform.matrixFor(tile.matrix, tile.id);
-        matrix::multiply(tile.matrix, painter.projMatrix, tile.matrix);
         painter.drawClippingMask(tile.matrix, tile.clip);
-        masks++;
     }
-
-    return masks;
 }
 
 void Source::render(const LayerDescription& layer_desc, const BucketDescription &bucket_desc) {
     if (!enabled) return;
 
     gl::group group(std::string("layer: ") + layer_desc.name);
-    for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
+    for (const std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
         Tile &tile = *pair.second;
         if (tile.data && tile.data->state == TileData::State::parsed) {
             painter.renderTileLayer(tile, layer_desc);

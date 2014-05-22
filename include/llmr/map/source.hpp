@@ -36,7 +36,9 @@ public:
 
 
     bool update();
-    size_t prepareRender(const TransformState &transform);
+    void updateMatrices(const TransformState &transform);
+    void drawClippingMasks();
+    size_t getTileCount() const;
     void render(const LayerDescription& layer_desc, const BucketDescription &bucket_desc);
     void finishRender();
 

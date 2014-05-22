@@ -18,8 +18,11 @@
 #include <llmr/shader/raster_shader.hpp>
 #include <llmr/shader/text_shader.hpp>
 #include <llmr/shader/dot_shader.hpp>
+#include <llmr/shader/composite_shader.hpp>
 
 #include <llmr/map/transform_state.hpp>
+
+#include <map>
 
 namespace llmr {
 
@@ -27,6 +30,7 @@ class Transform;
 class Style;
 class Tile;
 class GlyphAtlas;
+class Source;
 
 class FillBucket;
 class LineBucket;
@@ -37,12 +41,22 @@ class RasterBucket;
 class LayerDescription;
 class RasterTileData;
 
+typedef std::map<std::string, const std::unique_ptr<Source>> Sources;
+
 class Painter : private util::noncopyable {
 public:
     Painter(Map &map);
+    ~Painter();
 
 
     void setup();
+
+    // Perform cleanup tasks that prepare shutting down the app. This doesn't mean that the
+    // app will be shut down. That means all operations must be automatically be reversed (e.g. through
+    // lazy initialization) in case rendering continues.
+    void cleanup();
+
+
     void clear();
 
     // Updates the default matrices to the current viewport dimensions.
@@ -75,16 +89,22 @@ public:
     void setDebug(bool enabled);
 
     // Opaque/Translucent pass setting
-    void startOpaquePass();
-    void startTranslucentPass();
-    void endPass();
+    void setOpaque();
+    void setTranslucent();
 
     // Configures the painter strata that is used for early z-culling of fragments.
     void setStrata(float strata);
 
-    void prepareClippingMask();
+    void drawClippingMasks(const Sources &sources);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
-    void finishClippingMask();
+
+    void clearFramebuffers();
+    void resetFramebuffer();
+    void bindFramebuffer();
+    void pushFramebuffer();
+    GLuint popFramebuffer();
+    void discardFramebuffers();
+    void drawComposite(GLuint texture, const CompositeProperties &properties);
 
     bool needsAnimation() const;
 private:
@@ -127,6 +147,7 @@ private:
     std::unique_ptr<RasterShader> rasterShader;
     std::unique_ptr<TextShader> textShader;
     std::unique_ptr<DotShader> dotShader;
+    std::unique_ptr<CompositeShader> compositeShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     VertexBuffer tileStencilBuffer = {
@@ -144,6 +165,8 @@ private:
     VertexArrayObject coveringPlainArray;
     VertexArrayObject coveringPatternArray;
     VertexArrayObject coveringRasterArray;
+
+    VertexArrayObject compositeArray;
     VertexArrayObject matteArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
@@ -156,6 +179,13 @@ private:
     };
 
     VertexArrayObject tileBorderArray;
+
+    // Framebuffer management
+    std::vector<GLuint> fbos;
+    std::vector<GLuint> fbos_color;
+    GLuint fbo_depth_stencil;
+    int fbo_level = -1;
+    bool fbo_depth_stencil_valid = false;
 
 };
 

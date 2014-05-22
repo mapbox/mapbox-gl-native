@@ -40,7 +40,10 @@ public:
         }
         glBindBuffer(bufferType, buffer);
         if (force) {
-            assert("Buffer was already deleted" && array != nullptr);
+            if (array == nullptr) {
+                throw std::runtime_error("Buffer was already deleted or doesn't contain elements");
+            }
+
             glBufferData(bufferType, pos, array, GL_STATIC_DRAW);
             if (!retainAfterUpload) {
                 cleanup();
@@ -58,11 +61,15 @@ public:
 protected:
     // increase the buffer size by at least /required/ bytes.
     inline void *addElement() {
-        assert("Buffer is already bound to GPU" && buffer == 0);
+        if (buffer != 0) {
+            throw std::runtime_error("Can't add elements after buffer was bound to GPU");
+        }
         if (length < pos + itemSize) {
             while (length < pos + itemSize) length += defaultLength;
             array = realloc(array, length);
-            assert("Buffer reallocation failed" && array != nullptr);
+            if (array == nullptr) {
+                throw std::runtime_error("Buffer reallocation failed¯");
+            }
         }
         pos += itemSize;
         return static_cast<char *>(array) + (pos - itemSize);
@@ -70,7 +77,9 @@ protected:
 
     // Get a pointer to the item at a given index.
     inline void *getElement(size_t index) {
-        assert("Buffer was deleted" && array != nullptr);
+        if (array == nullptr) {
+            throw std::runtime_error("Buffer was already deleted or doesn't contain elements");
+        }
 
         if (index * itemSize >= pos) {
             throw new std::runtime_error("Can't get element after array bounds");

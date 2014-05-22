@@ -7,6 +7,7 @@
 #include <llmr/renderer/text_bucket.hpp>
 #include <llmr/renderer/raster_bucket.hpp>
 #include <llmr/util/raster.hpp>
+#include <llmr/util/constants.hpp>
 #include <llmr/geometry/glyph_atlas.hpp>
 
 #include <llmr/util/std.hpp>
@@ -77,7 +78,10 @@ void TileParser::parseStyleLayers(const std::vector<LayerDescription>& layers) {
                 } else {
                     // There is no proper specification for this bucket, even though
                     // it is referenced in the stylesheet.
-                    fprintf(stderr, "Stylesheet specifies bucket %s, but it is not defined\n", layer_desc.bucket_name.c_str());
+                    if (debug::tileParseWarnings) {
+                        fprintf(stderr, "Stylesheet specifies bucket %s, but it is not defined\n",
+                                layer_desc.bucket_name.c_str());
+                    }
                 }
             }
         }
@@ -101,6 +105,10 @@ std::unique_ptr<Bucket> TileParser::createBucket(const BucketDescription& bucket
         }
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
+        if (debug::tileParseWarnings) {
+            fprintf(stderr, "[WARNING] layer '%s' does not exist in source '%s'\n",
+                    bucket_desc.source_layer.c_str(), bucket_desc.source_name.c_str());
+        }
     }
 
     return nullptr;
@@ -116,6 +124,8 @@ void TileParser::addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer,
             pbf geometry_pbf = feature.message();
             if (geometry_pbf) {
                 bucket->addGeometry(geometry_pbf);
+            } else if (debug::tileParseWarnings) {
+                fprintf(stderr, "[WARNING] geometry is empty\n");
             }
         }
     }

@@ -55,11 +55,23 @@ bool SpriteAtlas::resize(const float newRatio) {
 void copy_bitmap(const uint32_t *src, const int src_stride, const int src_x, const int src_y,
                 uint32_t *dst, const int dst_stride, const int dst_x, const int dst_y,
                 const int width, const int height) {
-    const int stride = width * sizeof(uint32_t);
     src += src_y * src_stride + src_x;
     dst += dst_y * dst_stride + dst_x;
     for (int y = 0; y < height; y++, src += src_stride, dst += dst_stride) {
-        memcpy(dst, src, stride);
+        for (int x = 0; x < width; x++) {
+            const uint8_t *s = reinterpret_cast<const uint8_t *>(src + x);
+            uint8_t *d = reinterpret_cast<uint8_t *>(dst + x);
+
+            // Premultiply the bitmap.
+            // Note: We don't need to clamp the component values to 0..255, since
+            // the source value is already 0..255 and the operation means they will
+            // stay within the range of 0..255 and won't overflow.
+            const uint8_t a = s[3];
+            d[0] = s[0] * a / 255;
+            d[1] = s[1] * a / 255;
+            d[2] = s[2] * a / 255;
+            d[3] = a;
+        }
     }
 }
 

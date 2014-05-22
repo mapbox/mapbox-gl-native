@@ -102,6 +102,7 @@ public:
 };
 
 std::ostream& operator<<(std::ostream&, const BucketDescription& bucket);
+std::ostream& operator<<(std::ostream&, BucketType type);
 
 }
 
