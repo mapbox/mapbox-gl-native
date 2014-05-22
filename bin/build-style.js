@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 'use strict';
 
+var path = require('path');
+
 var lazy_update = require('./lazy-update');
 
 var name = 'style';
-var data = JSON.stringify(require('./style'));
+var data = JSON.stringify(require(path.join(process.cwd(), process.argv[2])));
+
 
 var length = data.length;
 
