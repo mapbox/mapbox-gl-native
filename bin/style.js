@@ -639,7 +639,7 @@ module.exports = {
         "country_label": {
             "source": "outdoors",
             "layer": "country_label",
-            "text_field": "name",
+            "text_field": "name_en",
             "path": "horizontal",
             "fontSize": 24,
             "feature_type": "point",
@@ -1365,6 +1365,7 @@ module.exports = {
         "admin_night": "#ffb680",
         "text_night": "#fff",
         "text_stroke_night": "#103",
+        "text2_stroke_night": "rgba(1,69,89,0.8)",
 
         "case_night": "#015e7a",
         "street_case_night": "#015b76",
@@ -2241,8 +2242,11 @@ module.exports = {
                     "stroke": "text_stroke"
                 },
                 "poi": {
-                    "color": "rgba(50,50,50,0.9)",
+                    //"color": "rgba(50,50,50,0.9)",
                     "antialias": false
+                //"stroke": #000,
+                //"strokeWidth": 0.4,
+                //"strokeBlur": 2
                 },
                 "poi_label": {
                     "color": "#444",
@@ -2918,7 +2922,7 @@ module.exports = {
                 },
                 "road_label": {
                     "color": "text_night",
-                    "stroke": "text_stroke_night",
+                    "stroke": "text2_stroke_night",
                     "strokeWidth": 0.5,
                     "strokeBlur": 3,
                     "size": "road_label_size"
@@ -2939,7 +2943,7 @@ module.exports = {
                 "poi_label": {
                     "color": "#fff",
                     "size": 10,
-                    "stroke": "land_night",
+                    "stroke": "rgba(1,114,147,0.3)",
                     "strokeWidth": 0.4,
                     "strokeBlur": 0.2,
                     "translate": [0, 14]
