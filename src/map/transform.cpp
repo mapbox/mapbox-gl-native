@@ -12,6 +12,7 @@ using namespace llmr;
 const double D2R = M_PI / 180.0;
 const double R2D = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
+const double MIN_ROTATE_SCALE = 8;
 
 Transform::Transform() {
     setScale(current.scale);
@@ -248,6 +249,9 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
 
     constrain(final.scale, final.y);
 
+    // Undo rotation at low zooms.
+    if (final.scale < MIN_ROTATE_SCALE && current.angle) _setAngle(0, 500_milliseconds);
+
     if (duration == 0) {
         current.scale = final.scale;
         current.x = final.x;
@@ -348,6 +352,9 @@ void Transform::_setAngle(double new_angle, const time duration) {
         new_angle += M2PI;
 
     final.angle = new_angle;
+
+    // Prevent rotation at low zooms.
+    if (final.scale < MIN_ROTATE_SCALE) final.angle = 0;
 
     if (duration == 0) {
         current.angle = final.angle;
