@@ -178,8 +178,8 @@ void Style::loadJSON(const uint8_t *const data, size_t bytes) {
             parser.parseConstants(document["constants"]);
         }
 
-        if (document.HasMember("classes")) {
-            parser.parseClasses(document["classes"], classes, buckets, layers);
+        if (document.HasMember("styles")) {
+            parser.parseClasses(document["styles"], classes, buckets, layers);
         }
     } else {
         throw Style::exception("stylesheet root must be an object");

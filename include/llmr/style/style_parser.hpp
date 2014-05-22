@@ -18,7 +18,7 @@ public:
 private:
     LayerDescription parseLayer(JSVal value);
     BucketDescription parseBucket(JSVal value);
-    std::pair<std::string, ClassDescription> parseClassDescription(JSVal value, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& layers);
+    std::pair<std::string, ClassDescription> parseClassDescription(std::string styleName, JSVal value, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& layers);
     void parseClass(const std::string& name, JSVal value, ClassDescription& class_desc, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& layers);
     FillClass parseFillClass(JSVal value);
     LineClass parseLineClass(JSVal value);
