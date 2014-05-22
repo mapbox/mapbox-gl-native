@@ -53,6 +53,10 @@ void Map::start() {
     uv_async_init(loop, async_render, render);
     async_render->data = this;
 
+    async_cleanup = new uv_async_t();
+    uv_async_init(loop, async_cleanup, cleanup);
+    async_cleanup->data = this;
+
     uv_thread_create(&thread, [](void *arg) {
         Map *map = static_cast<Map *>(arg);
         map->run();
@@ -67,6 +71,8 @@ void Map::stop() {
     async_terminate = nullptr;
     uv_close((uv_handle_t *)async_render, delete_async);
     async_render = nullptr;
+    uv_close((uv_handle_t *)async_cleanup, delete_async);
+    async_cleanup = nullptr;
 
     // Run the event loop once to make sure our async delete handlers are called.
     uv_run(loop, UV_RUN_ONCE);
@@ -110,6 +116,17 @@ bool Map::needsSwap() {
 void Map::swapped() {
     is_rendered.clear();
     rerender();
+}
+
+void Map::cleanup() {
+    uv_async_send(async_cleanup);
+}
+
+void Map::cleanup(uv_async_t *async) {
+    Map *map = static_cast<Map *>(async->data);
+
+    map->view.make_active();
+    map->painter.cleanup();
 }
 
 void Map::render(uv_async_t *async) {

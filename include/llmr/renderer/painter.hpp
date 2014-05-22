@@ -50,6 +50,13 @@ public:
 
 
     void setup();
+
+    // Perform cleanup tasks that prepare shutting down the app. This doesn't mean that the
+    // app will be shut down. That means all operations must be automatically be reversed (e.g. through
+    // lazy initialization) in case rendering continues.
+    void cleanup();
+
+
     void clear();
 
     // Updates the default matrices to the current viewport dimensions.

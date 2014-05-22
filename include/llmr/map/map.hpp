@@ -42,6 +42,9 @@ public:
     // Forces a map update: always triggers a rerender.
     void update();
 
+    // Triggers a cleanup that releases resources.
+    void cleanup();
+
     // Controls buffer swapping.
     bool needsSwap();
     void swapped();
@@ -104,6 +107,7 @@ private:
     // uv async callbacks
     static void render(uv_async_t *async);
     static void terminate(uv_async_t *async);
+    static void cleanup(uv_async_t *async);
     static void delete_async(uv_handle_t *handle);
 
     // Setup
@@ -163,6 +167,7 @@ private:
     uv_thread_t thread;
     uv_async_t *async_terminate = nullptr;
     uv_async_t *async_render = nullptr;
+    uv_async_t *async_cleanup = nullptr;
 };
 
 }

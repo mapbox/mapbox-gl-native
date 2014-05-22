@@ -21,7 +21,7 @@ Painter::Painter(Map &map)
 }
 
 Painter::~Painter() {
-    clearFramebuffers();
+    cleanup();
 }
 
 bool Painter::needsAnimation() const {
@@ -73,6 +73,10 @@ void Painter::setupShaders() {
     textShader = std::make_unique<TextShader>();
     dotShader = std::make_unique<DotShader>();
     compositeShader = std::make_unique<CompositeShader>();
+}
+
+void Painter::cleanup() {
+    clearFramebuffers();
 }
 
 void Painter::resize() {
