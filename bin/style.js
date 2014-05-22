@@ -2264,6 +2264,10 @@ module.exports = {
                     "translate": [0, 14]
                 },
                 "poi_aerodrome": {
+                    "opacity": ["stops",
+                        {"z": 13, "val": 0},
+                        {"z": 13.25, "val": 1}
+                    ],
                     "antialias": false
                 }
             }
@@ -2956,6 +2960,10 @@ module.exports = {
                     "translate": [0, 14]
                 },
                 "poi_aerodrome": {
+                    "opacity": ["stops",
+                        {"z": 13, "val": 0},
+                        {"z": 13.25, "val": 1}
+                    ],
                     "antialias": false
                 }
             }
