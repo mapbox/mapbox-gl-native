@@ -65,6 +65,7 @@ private:
     bool transitionExists(std::string layer_name, TransitionablePropertyKey key);
     bool inNeedOfTransition(std::string layer_name, TransitionablePropertyKey key);
     uint64_t transitionDuration(std::string layer_name, TransitionablePropertyKey key);
+    uint64_t transitionDelay(std::string layer_name, TransitionablePropertyKey key);
 
 private:
     // Last applied settings.

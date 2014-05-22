@@ -385,7 +385,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<std::array<float, 2>>>(previous.fills[layer_name].translate,
                                                                               computed.fills[layer_name].translate,
                                                                               transitioning.fills[layer_name].translate,
-                                                                              start,
+                                                                              start + transitionDelay(layer_name, TransitionablePropertyKey::Translate),
                                                                               transitionDuration(layer_name, TransitionablePropertyKey::Translate));
 
             computed.fills[layer_name].translate = transitioning.fills[layer_name].translate;
@@ -404,7 +404,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<Color>>(previous.fills[layer_name].fill_color,
                                                                computed.fills[layer_name].fill_color,
                                                                transitioning.fills[layer_name].fill_color,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::FillColor),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::FillColor));
 
             computed.fills[layer_name].fill_color = transitioning.fills[layer_name].fill_color;
@@ -423,7 +423,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<Color>>(previous.fills[layer_name].stroke_color,
                                                                computed.fills[layer_name].stroke_color,
                                                                transitioning.fills[layer_name].stroke_color,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::StrokeColor),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::StrokeColor));
 
             computed.fills[layer_name].stroke_color = transitioning.fills[layer_name].stroke_color;
@@ -442,7 +442,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<float>>(previous.fills[layer_name].opacity,
                                                                computed.fills[layer_name].opacity,
                                                                transitioning.fills[layer_name].opacity,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Opacity),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Opacity));
 
             computed.fills[layer_name].opacity = transitioning.fills[layer_name].opacity;
@@ -466,7 +466,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<std::array<float, 2>>>(previous.lines[layer_name].translate,
                                                                               computed.lines[layer_name].translate,
                                                                               transitioning.lines[layer_name].translate,
-                                                                              start,
+                                                                              start + transitionDelay(layer_name, TransitionablePropertyKey::Translate),
                                                                               transitionDuration(layer_name, TransitionablePropertyKey::Translate));
 
             computed.lines[layer_name].translate = transitioning.lines[layer_name].translate;
@@ -485,7 +485,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<float>>(previous.lines[layer_name].width,
                                                                computed.lines[layer_name].width,
                                                                transitioning.lines[layer_name].width,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Width),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Width));
 
             computed.lines[layer_name].width = transitioning.lines[layer_name].width;
@@ -504,7 +504,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<float>>(previous.lines[layer_name].offset,
                                                                computed.lines[layer_name].offset,
                                                                transitioning.lines[layer_name].offset,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Offset),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Offset));
 
             computed.lines[layer_name].offset = transitioning.lines[layer_name].offset;
@@ -523,7 +523,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<Color>>(previous.lines[layer_name].color,
                                                                computed.lines[layer_name].color,
                                                                transitioning.lines[layer_name].color,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Color),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Color));
 
             computed.lines[layer_name].color = transitioning.lines[layer_name].color;
@@ -539,10 +539,10 @@ void Style::cascade(float z) {
             transitioning.lines[layer_name].dash_array = previous.lines[layer_name].dash_array;
 
             transitions[layer_name][TransitionablePropertyKey::DashArray] =
-                std::make_shared<util::ease_transition<std::array<float, 2>>>(previous.lines[layer_name].dash_array, // from,
-                                                                              computed.lines[layer_name].dash_array, // to,
-                                                                              transitioning.lines[layer_name].dash_array, // transitioning_ref,
-                                                                              start,
+                std::make_shared<util::ease_transition<std::array<float, 2>>>(previous.lines[layer_name].dash_array,
+                                                                              computed.lines[layer_name].dash_array,
+                                                                              transitioning.lines[layer_name].dash_array,
+                                                                              start + transitionDelay(layer_name, TransitionablePropertyKey::DashArray),
                                                                               transitionDuration(layer_name, TransitionablePropertyKey::DashArray));
 
             computed.lines[layer_name].dash_array = transitioning.lines[layer_name].dash_array;
@@ -561,7 +561,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<float>>(previous.lines[layer_name].opacity,
                                                                computed.lines[layer_name].opacity,
                                                                transitioning.lines[layer_name].opacity,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Opacity),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Opacity));
 
             computed.lines[layer_name].opacity = transitioning.lines[layer_name].opacity;
@@ -585,7 +585,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<std::array<float, 2>>>(previous.icons[layer_name].translate,
                                                                               computed.icons[layer_name].translate,
                                                                               transitioning.icons[layer_name].translate,
-                                                                              start,
+                                                                              start + transitionDelay(layer_name, TransitionablePropertyKey::Translate),
                                                                               transitionDuration(layer_name, TransitionablePropertyKey::Translate));
 
             computed.icons[layer_name].translate = transitioning.icons[layer_name].translate;
@@ -604,7 +604,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<Color>>(previous.icons[layer_name].color,
                                                                computed.icons[layer_name].color,
                                                                transitioning.icons[layer_name].color,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Color),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Color));
 
             computed.icons[layer_name].color = transitioning.icons[layer_name].color;
@@ -623,7 +623,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<float>>(previous.icons[layer_name].opacity,
                                                                computed.icons[layer_name].opacity,
                                                                transitioning.icons[layer_name].opacity,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Opacity),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Opacity));
 
             computed.icons[layer_name].opacity = transitioning.icons[layer_name].opacity;
@@ -642,7 +642,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<float>>(previous.icons[layer_name].radius,
                                                                computed.icons[layer_name].radius,
                                                                transitioning.icons[layer_name].radius,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Radius),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Radius));
 
             computed.icons[layer_name].radius = transitioning.icons[layer_name].radius;
@@ -661,7 +661,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<float>>(previous.icons[layer_name].blur,
                                                                computed.icons[layer_name].blur,
                                                                transitioning.icons[layer_name].blur,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Blur),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Blur));
 
             computed.icons[layer_name].blur = transitioning.icons[layer_name].blur;
@@ -685,7 +685,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<std::array<float, 2>>>(previous.texts[layer_name].translate,
                                                                               computed.texts[layer_name].translate,
                                                                               transitioning.texts[layer_name].translate,
-                                                                              start,
+                                                                              start + transitionDelay(layer_name, TransitionablePropertyKey::Translate),
                                                                               transitionDuration(layer_name, TransitionablePropertyKey::Translate));
 
             computed.texts[layer_name].translate = transitioning.texts[layer_name].translate;
@@ -704,7 +704,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<Color>>(previous.texts[layer_name].color,
                                                                computed.texts[layer_name].color,
                                                                transitioning.texts[layer_name].color,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Color),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Color));
 
             computed.texts[layer_name].color = transitioning.texts[layer_name].color;
@@ -723,7 +723,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<Color>>(previous.texts[layer_name].halo,
                                                                computed.texts[layer_name].halo,
                                                                transitioning.texts[layer_name].halo,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Halo),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Halo));
 
             computed.texts[layer_name].halo = transitioning.texts[layer_name].halo;
@@ -742,7 +742,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<float>>(previous.texts[layer_name].halo_radius,
                                                                computed.texts[layer_name].halo_radius,
                                                                transitioning.texts[layer_name].halo_radius,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::HaloRadius),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::HaloRadius));
 
             computed.texts[layer_name].halo_radius = transitioning.texts[layer_name].halo_radius;
@@ -761,7 +761,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<float>>(previous.texts[layer_name].halo_blur,
                                                                computed.texts[layer_name].halo_blur,
                                                                transitioning.texts[layer_name].halo_blur,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::HaloBlur),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::HaloBlur));
 
             computed.texts[layer_name].halo_blur = transitioning.texts[layer_name].halo_blur;
@@ -780,7 +780,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<float>>(previous.texts[layer_name].opacity,
                                                                computed.texts[layer_name].opacity,
                                                                transitioning.texts[layer_name].opacity,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Opacity),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Opacity));
 
             computed.texts[layer_name].opacity = transitioning.texts[layer_name].opacity;
@@ -804,7 +804,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<float>>(previous.rasters[layer_name].opacity,
                                                                computed.rasters[layer_name].opacity,
                                                                transitioning.rasters[layer_name].opacity,
-                                                               start,
+                                                               start + transitionDelay(layer_name, TransitionablePropertyKey::Opacity),
                                                                transitionDuration(layer_name, TransitionablePropertyKey::Opacity));
 
             computed.rasters[layer_name].opacity = transitioning.rasters[layer_name].opacity;
@@ -826,7 +826,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<Color>>(previous.background.color,
                                                                computed.background.color,
                                                                transitioning.background.color,
-                                                               start,
+                                                               start + transitionDelay("background", TransitionablePropertyKey::Color),
                                                                transitionDuration("background", TransitionablePropertyKey::Color));
 
             computed.background.color = transitioning.background.color;
@@ -845,7 +845,7 @@ void Style::cascade(float z) {
                 std::make_shared<util::ease_transition<float>>(previous.background.opacity,
                                                                computed.background.opacity,
                                                                transitioning.background.opacity,
-                                                               start,
+                                                               start + transitionDelay("background", TransitionablePropertyKey::Opacity),
                                                                transitionDuration("background", TransitionablePropertyKey::Opacity));
 
             computed.background.opacity = transitioning.background.opacity;
@@ -874,6 +874,10 @@ uint64_t Style::transitionDuration(std::string layer_name, TransitionablePropert
     return (properties_to_transition[layer_name].count(key) ?
                 properties_to_transition[layer_name][key].duration :
                 default_transition_duration) * 1_millisecond;
+}
+
+uint64_t Style::transitionDelay(std::string layer_name, TransitionablePropertyKey key) {
+    return (properties_to_transition[layer_name][key].delay * 1_millisecond);
 }
 
 bool Style::needsTransition() const {

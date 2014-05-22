@@ -20,6 +20,9 @@ public:
           duration(duration) {}
 
     inline float progress(time now) const {
+        if (duration == 0) return 1;
+        if (start > now) return 0;
+
         return (float)(now - start) / duration;
     }
 
