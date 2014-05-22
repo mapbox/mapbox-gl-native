@@ -34,6 +34,7 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         current.framebuffer[0] = final.framebuffer[0] = fb_w;
         current.framebuffer[1] = final.framebuffer[1] = fb_h;
         constrain(current.scale, current.y);
+        if (current.scale < MIN_ROTATE_SCALE && current.angle) _setAngle(0, 0);
         return true;
     } else {
         return false;
