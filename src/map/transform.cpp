@@ -59,9 +59,9 @@ void Transform::_moveBy(const double dx, const double dy, const time duration) {
         // Use a common start time for all of the transitions to avoid divergent transitions.
         time start = util::now();
         transitions.emplace_front(
-            std::make_shared<util::ease_transition>(current.x, final.x, current.x, start, duration));
+            std::make_shared<util::ease_transition<double>>(current.x, final.x, current.x, start, duration));
         transitions.emplace_front(
-            std::make_shared<util::ease_transition>(current.y, final.y, current.y, start, duration));
+            std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
     }
 }
 
@@ -250,12 +250,12 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     } else {
         // Use a common start time for all of the transitions to avoid divergent transitions.
         time start = util::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition>(
+        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
             current.scale, final.scale, current.scale, start, duration));
         transitions.emplace_front(
-            std::make_shared<util::ease_transition>(current.x, final.x, current.x, start, duration));
+            std::make_shared<util::ease_transition<double>>(current.x, final.x, current.x, start, duration));
         transitions.emplace_front(
-            std::make_shared<util::ease_transition>(current.y, final.y, current.y, start, duration));
+            std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
     }
 
     const double s = final.scale * util::tileSize;
@@ -335,7 +335,7 @@ void Transform::_setAngle(double new_angle, const time duration) {
         current.angle = final.angle;
     } else {
         time start = util::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition>(
+        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
             current.angle, final.angle, current.angle, start, duration));
     }
 }

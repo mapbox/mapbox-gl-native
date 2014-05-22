@@ -46,6 +46,7 @@ private:
     Value parseValue(JSVal value);
     FunctionProperty::fn parseFunctionType(JSVal type);
     FunctionProperty parseFunction(JSVal value);
+    PropertyTransition parseTransition(JSVal value, std::string property_name);
 
 private:
     std::map<std::string, const rapidjson::Value *> constants;
