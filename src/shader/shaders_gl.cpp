@@ -7,6 +7,10 @@ using namespace llmr;
 
 const shader_source llmr::shaders[SHADER_COUNT] = {
    {
+       "#version 120\nattribute vec2 a_pos;\n\nuniform mat4 u_matrix;\nvarying vec2 v_pos;\n\nvoid main() {\n    gl_Position = u_matrix * vec4(a_pos, 0, 1);\n    v_pos = (gl_Position.xy + 1.0) / 2.0;\n}\n",
+       "#version 120\nuniform sampler2D u_image;\nuniform float u_opacity;\n\nvarying vec2 v_pos;\n\nvoid main() {\n    vec4 color = texture2D(u_image, v_pos);\n    gl_FragColor = color * u_opacity;\n}\n",
+   },
+   {
        "#version 120\nattribute vec2 a_pos;\n\nuniform mat4 u_matrix;\nuniform float u_size;\n\nvoid main(void) {\n    gl_Position = u_matrix * vec4(a_pos, 0, 1);\n    gl_PointSize = u_size;\n}\n",
        "#version 120\nuniform vec4 u_color;\nuniform float u_blur;\n\nvoid main() {\n\tfloat dist = length(gl_PointCoord - 0.5);\n\tfloat t = smoothstep(0.5, 0.5 - u_blur, dist);\n\n    gl_FragColor = u_color * t;\n}\n",
    },

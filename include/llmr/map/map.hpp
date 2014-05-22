@@ -22,6 +22,8 @@ namespace llmr {
 
 class Source;
 
+typedef std::map<std::string, const std::unique_ptr<Source>> Sources;
+
 class Map : private util::noncopyable {
 public:
     explicit Map(View &view);
@@ -39,6 +41,9 @@ public:
 
     // Forces a map update: always triggers a rerender.
     void update();
+
+    // Triggers a cleanup that releases resources.
+    void cleanup();
 
     // Controls buffer swapping.
     bool needsSwap();
@@ -96,11 +101,13 @@ public:
     inline uv_loop_t *getLoop() { return loop; }
     inline time getAnimationTime() const { return animationTime; }
     inline Texturepool &getTexturepool() { return texturepool; }
+    inline const Sources &getSources() { return sources; }
 
 private:
     // uv async callbacks
     static void render(uv_async_t *async);
     static void terminate(uv_async_t *async);
+    static void cleanup(uv_async_t *async);
     static void delete_async(uv_handle_t *handle);
 
     // Setup
@@ -108,7 +115,7 @@ private:
     void loadStyle(const uint8_t *const data, uint32_t bytes);
 
     void updateTiles();
-    void updateClippingIDs();
+    void updateRenderState();
 
     size_t countLayers(const std::vector<LayerDescription>& layers);
 
@@ -120,7 +127,7 @@ private:
 
     // Unconditionally performs a render with the current map state.
     void render();
-    void renderLayers(const std::vector<LayerDescription>& layers, RenderPass pass);
+    void renderLayers(const std::vector<LayerDescription>& layers);
     void renderLayer(const LayerDescription& layer_desc, RenderPass pass);
 
 private:
@@ -147,12 +154,12 @@ private:
     SpriteAtlas spriteAtlas;
     Painter painter;
 
-    std::map<std::string, const std::unique_ptr<Source>> sources;
+    Sources sources;
 
     bool debug = false;
     time animationTime = 0;
-    float strata_thickness = 0.0f;
-    int strata = 0;
+
+    int indent = 0;
 
 private:
     bool async = false;
@@ -160,6 +167,7 @@ private:
     uv_thread_t thread;
     uv_async_t *async_terminate = nullptr;
     uv_async_t *async_render = nullptr;
+    uv_async_t *async_cleanup = nullptr;
 };
 
 }

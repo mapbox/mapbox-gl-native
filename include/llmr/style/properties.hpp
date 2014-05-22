@@ -180,6 +180,20 @@ struct RasterProperties {
     float opacity = 1.0;
 };
 
+struct CompositeClass {
+    FunctionProperty enabled = true;
+    FunctionProperty opacity = 1;
+};
+
+struct CompositeProperties {
+    inline CompositeProperties() {}
+    bool enabled = true;
+    float opacity = 1.0;
+};
+
+
+const CompositeProperties defaultCompositeProperties;
+
 }
 
 #endif

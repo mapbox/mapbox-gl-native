@@ -1,4 +1,5 @@
 #include <llmr/style/style_parser.hpp>
+#include <llmr/util/constants.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
 using namespace llmr;
@@ -242,20 +243,42 @@ TranslateAnchor parseTranslateAnchor(JSVal anchor) {
     }
 }
 
-void StyleParser::parseClasses(JSVal value, std::map<std::string, ClassDescription>& classes, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& layers) {
+
+void collectLayerBuckets(std::map<std::string, std::string> &layerBuckets,
+                         const std::vector<LayerDescription> &layers) {
+    for (const auto& layer : layers) {
+        layerBuckets.emplace(layer.name, layer.bucket_name);
+        if (layer.child_layer.size()) {
+            collectLayerBuckets(layerBuckets, layer.child_layer);
+        }
+    }
+}
+
+void StyleParser::parseClasses(JSVal value,
+                               std::map<std::string, ClassDescription> &classes,
+                               const std::map<std::string, BucketDescription> &buckets,
+                               const std::vector<LayerDescription> &layers) {
+
+    // Build a non-recursive mapping of layer => bucket.
+    std::map<std::string, std::string> layerBuckets;
+    collectLayerBuckets(layerBuckets, layers);
+
     if (value.IsObject()) {
         rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
         std::string styleName;
         for (; itr != value.MemberEnd(); ++itr) {
             styleName = { itr->name.GetString(), itr->name.GetStringLength() };
-            classes.insert(std::forward<std::pair<std::string, ClassDescription>>(parseClassDescription(styleName, itr->value, buckets, layers)));
+            classes.insert(std::forward<std::pair<std::string, ClassDescription>>(parseClassDescription(styleName, itr->value, buckets, layerBuckets)));
         }
     } else {
         throw Style::exception("styles must be an object");
     }
 }
 
-std::pair<std::string, ClassDescription> StyleParser::parseClassDescription(std::string styleName, JSVal value, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& style_layers) {
+std::pair<std::string, ClassDescription>
+StyleParser::parseClassDescription(std::string styleName, JSVal value,
+                                   const std::map<std::string, BucketDescription> &buckets,
+                                   const std::map<std::string, std::string> &layerBuckets) {
     ClassDescription klass;
 
     if (value.IsObject()) {
@@ -264,43 +287,58 @@ std::pair<std::string, ClassDescription> StyleParser::parseClassDescription(std:
             const std::string name {
                 itr->name.GetString(), itr->name.GetStringLength()
             };
-            parseClass(name, itr->value, klass, buckets, style_layers);
+            parseClass(name, itr->value, klass, buckets, layerBuckets);
         }
     }
 
     return { styleName, std::forward<ClassDescription>(klass) };
 }
 
-void StyleParser::parseClass(const std::string& name, JSVal value, ClassDescription& class_desc, std::map<std::string, BucketDescription>& buckets, std::vector<LayerDescription>& layers) {
-    if (value.IsObject()) {
-        for (const auto& layer : layers) {
-            if (name == layer.name) {
-                if (layer.bucket_name == "background") {
-                    // background buckets are fake
-                    class_desc.background = parseBackgroundClass(value);
-                } else {
-                    std::string bucket_name = layer.bucket_name;
-                    auto bucket_it = buckets.find(bucket_name);
-                    BucketType type = bucket_it->second.type;
-                    if (type == BucketType::Fill) {
-                        class_desc.fill.insert({ name, std::forward<FillClass>(parseFillClass(value)) });
-                    } else if (type == BucketType::Line) {
-                        class_desc.line.insert({ name, std::forward<LineClass>(parseLineClass(value)) });
-                    } else if (type == BucketType::Icon) {
-                        class_desc.icon.insert({ name, std::forward<IconClass>(parseIconClass(value)) });
-                    } else if (type == BucketType::Text) {
-                        class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
-                    } else if (type == BucketType::Raster) {
-                        class_desc.raster.insert({ name, std::forward<RasterClass>(parseRasterClass(value)) });
-                    } else {
-                        printf("WARNING: Unable to determine bucket type for style '%s'. It might be using nested layers (un-implemented).\n",name.c_str());
-                        //throw Style::exception("unknown class type name");
-                    }
-                }
-            }
-        }
-    } else {
+void StyleParser::parseClass(const std::string &name, JSVal value, ClassDescription &class_desc,
+                             const std::map<std::string, BucketDescription> &buckets,
+                             const std::map<std::string, std::string> &layerBuckets) {
+    if (!value.IsObject()) {
         throw Style::exception("style class must be an object");
+    }
+
+    auto layer_bucket_it = layerBuckets.find(name);
+    if (layer_bucket_it == layerBuckets.end()) {
+        if (debug::styleParseWarnings) {
+            fprintf(stderr, "[WARNING] there is no layer associated with '%s'\n", name.c_str());
+        }
+        return;
+    }
+
+    const std::string &bucket_name = layer_bucket_it->second;
+    if (bucket_name == "background") {
+        // background buckets are fake
+        class_desc.background = parseBackgroundClass(value);
+    } else if (bucket_name.length() == 0) {
+        // no bucket name == composite bucket.
+        class_desc.composite.insert({ name, std::forward<CompositeClass>(parseCompositeClass(value)) });
+    } else {
+        auto bucket_it = buckets.find(bucket_name);
+        if (bucket_it == buckets.end()) {
+            if (debug::styleParseWarnings) {
+                fprintf(stderr, "[WARNING] there is no bucket named '%s'\n", bucket_name.c_str());
+            }
+            return;
+        }
+
+        BucketType type = bucket_it->second.type;
+        if (type == BucketType::Fill) {
+            class_desc.fill.insert({ name, std::forward<FillClass>(parseFillClass(value)) });
+        } else if (type == BucketType::Line) {
+            class_desc.line.insert({ name, std::forward<LineClass>(parseLineClass(value)) });
+        } else if (type == BucketType::Icon) {
+            class_desc.icon.insert({ name, std::forward<IconClass>(parseIconClass(value)) });
+        } else if (type == BucketType::Text) {
+            class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
+        } else if (type == BucketType::Raster) {
+            class_desc.raster.insert({ name, std::forward<RasterClass>(parseRasterClass(value)) });
+        } else {
+            throw Style::exception("unknown class type name");
+        }
     }
 }
 
@@ -624,6 +662,20 @@ TextClass StyleParser::parseTextClass(JSVal value) {
 
 RasterClass StyleParser::parseRasterClass(JSVal value) {
     RasterClass klass;
+
+    if (value.HasMember("enabled")) {
+        klass.enabled = parseFunction(value["enabled"]);
+    }
+
+    if (value.HasMember("opacity")) {
+        klass.opacity = parseFunction(value["opacity"]);
+    }
+
+    return klass;
+}
+
+CompositeClass StyleParser::parseCompositeClass(JSVal value) {
+    CompositeClass klass;
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);

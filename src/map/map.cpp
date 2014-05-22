@@ -8,9 +8,11 @@
 #include <llmr/util/math.hpp>
 #include <llmr/util/clip_ids.hpp>
 #include <llmr/util/string.hpp>
+#include <llmr/util/constants.hpp>
 
 #include <algorithm>
 #include <memory>
+#include <iostream>
 
 using namespace llmr;
 
@@ -51,6 +53,10 @@ void Map::start() {
     uv_async_init(loop, async_render, render);
     async_render->data = this;
 
+    async_cleanup = new uv_async_t();
+    uv_async_init(loop, async_cleanup, cleanup);
+    async_cleanup->data = this;
+
     uv_thread_create(&thread, [](void *arg) {
         Map *map = static_cast<Map *>(arg);
         map->run();
@@ -65,6 +71,8 @@ void Map::stop() {
     async_terminate = nullptr;
     uv_close((uv_handle_t *)async_render, delete_async);
     async_render = nullptr;
+    uv_close((uv_handle_t *)async_cleanup, delete_async);
+    async_cleanup = nullptr;
 
     // Run the event loop once to make sure our async delete handlers are called.
     uv_run(loop, UV_RUN_ONCE);
@@ -110,20 +118,33 @@ void Map::swapped() {
     rerender();
 }
 
+void Map::cleanup() {
+    uv_async_send(async_cleanup);
+}
+
+void Map::cleanup(uv_async_t *async) {
+    Map *map = static_cast<Map *>(async->data);
+
+    map->view.make_active();
+    map->painter.cleanup();
+}
+
 void Map::render(uv_async_t *async) {
     Map *map = static_cast<Map *>(async->data);
 
     map->prepare();
 
-    if (map->is_rendered.test_and_set() == false) {
-        if (map->is_clean.test_and_set() == false) {
-            map->render();
-            map->is_swapped.clear();
-            map->view.swap();
-        } else {
-            // We set the rendered flag in the test above, so we have to reset it
-            // now that we're not actually rendering because the map is clean.
-            map->is_rendered.clear();
+    if (map->state.hasSize()) {
+        if (map->is_rendered.test_and_set() == false) {
+            if (map->is_clean.test_and_set() == false) {
+                map->render();
+                map->is_swapped.clear();
+                map->view.swap();
+            } else {
+                // We set the rendered flag in the test above, so we have to reset it
+                // now that we're not actually rendering because the map is clean.
+                map->is_rendered.clear();
+            }
         }
     }
 }
@@ -171,27 +192,21 @@ void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
 
 #pragma mark - Size
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resize(uint16_t width, uint16_t height, float ratio) {
     resize(width, height, ratio, width * ratio, height * ratio);
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height) {
-    bool changed = false;
-
     if (transform.resize(width, height, ratio, fb_width, fb_height)) {
-        changed = true;
-    }
-    if (spriteAtlas.resize(ratio)) {
-        changed = true;
-    }
-
-    if (changed) {
         update();
     }
 }
 
 #pragma mark - Transitions
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::cancelTransitions() {
     transform.cancelTransitions();
 
@@ -201,30 +216,36 @@ void Map::cancelTransitions() {
 
 #pragma mark - Position
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::moveBy(double dx, double dy, double duration) {
     transform.moveBy(dx, dy, duration * 1_second);
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setLonLat(double lon, double lat, double duration) {
     transform.setLonLat(lon, lat, duration * 1_second);
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::getLonLat(double& lon, double& lat) const {
     transform.getLonLat(lon, lat);
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::startPanning() {
     transform.startPanning();
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::stopPanning() {
     transform.stopPanning();
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resetPosition() {
     transform.setAngle(0);
     transform.setLonLat(0, 0);
@@ -235,47 +256,57 @@ void Map::resetPosition() {
 
 #pragma mark - Scale
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::scaleBy(double ds, double cx, double cy, double duration) {
     transform.scaleBy(ds, cx, cy, duration * 1_second);
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setScale(double scale, double cx, double cy, double duration) {
     transform.setScale(scale, cx, cy, duration * 1_second);
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 double Map::getScale() const {
     return transform.getScale();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setZoom(double zoom, double duration) {
     transform.setZoom(zoom, duration * 1_second);
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 double Map::getZoom() const {
     return transform.getZoom();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
     transform.setLonLatZoom(lon, lat, zoom, duration * 1_second);
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
     transform.getLonLatZoom(lon, lat, zoom);
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resetZoom() {
     setZoom(0);
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::startScaling() {
     transform.startScaling();
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::stopScaling() {
     transform.stopScaling();
     update();
@@ -284,35 +315,42 @@ void Map::stopScaling() {
 
 #pragma mark - Rotation
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) {
     transform.rotateBy(sx, sy, ex, ey, duration * 1_second);
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setAngle(double angle, double duration) {
     transform.setAngle(angle, duration * 1_second);
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setAngle(double angle, double cx, double cy) {
     transform.setAngle(angle, cx, cy);
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 double Map::getAngle() const {
     return transform.getAngle();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resetNorth() {
     transform.setAngle(0, 500_milliseconds);
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::startRotating() {
     transform.startRotating();
     update();
 }
 
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::stopRotating() {
     transform.stopRotating();
     update();
@@ -365,24 +403,23 @@ void Map::updateTiles() {
     }
 }
 
-
-
-void Map::updateClippingIDs() {
+void Map::updateRenderState() {
     std::forward_list<Tile::ID> ids;
 
-    for (auto &pair : sources) {
-        const std::unique_ptr<Source> &source = pair.second;
-        if (source->enabled) {
-            ids.splice_after(ids.before_begin(), source->getIDs());
+    for (const auto &pair : sources) {
+        Source &source = *pair.second;
+        if (source.enabled) {
+            ids.splice_after(ids.before_begin(), source.getIDs());
+            source.updateMatrices(state);
         }
     }
 
     const std::map<Tile::ID, ClipID> clipIDs = computeClipIDs(ids);
 
-    for (auto &pair : sources) {
-        const std::unique_ptr<Source> &source = pair.second;
-        if (source->enabled) {
-            source->updateClipIDs(clipIDs);
+    for (const auto &pair : sources) {
+        Source &source = *pair.second;
+        if (source.enabled) {
+            source.updateClipIDs(clipIDs);
         }
     }
 }
@@ -396,11 +433,29 @@ void Map::prepare() {
         transform.updateTransitions(animationTime);
     }
 
+
+    const TransformState oldState = state;
     state = transform.currentState();
-    style.cascade(state.getNormalizedZoom());
-    if (!style.sprite || style.sprite->pixelRatio != state.getPixelRatio()) {
+
+    bool pixelRatioChanged = oldState.getPixelRatio() != state.getPixelRatio();
+    bool dimensionsChanged = oldState.getFramebufferWidth() != state.getFramebufferWidth() ||
+                             oldState.getFramebufferHeight() != state.getFramebufferHeight();
+    bool zoomChanged = oldState.getNormalizedZoom() != state.getNormalizedZoom();
+
+    if (pixelRatioChanged) {
+        // We have a pixelratio change
         style.sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
         style.sprite->load(kSpriteURL);
+
+        spriteAtlas.resize(state.getPixelRatio());
+    }
+
+    if (pixelRatioChanged || dimensionsChanged) {
+        painter.clearFramebuffers();
+    }
+
+    if (zoomChanged) {
+        style.cascade(state.getNormalizedZoom());
     }
 
     // Allow the sprite atlas to potentially pull new sprite images if needed.
@@ -409,8 +464,6 @@ void Map::prepare() {
     }
 
     updateTiles();
-
-    updateClippingIDs();
 }
 
 void Map::render() {
@@ -418,53 +471,35 @@ void Map::render() {
 
     painter.clear();
 
+    painter.resetFramebuffer();
+
     painter.resize();
 
     painter.changeMatrix();
 
-    // First, update the sources' tile matrices with the new
-    // transform and render into the stencil buffer, including
-    // drawing the background.
+    updateRenderState();
 
-    painter.prepareClippingMask();
+    painter.drawClippingMasks(sources);
 
+    // Generate debug information
     size_t source_id = 0;
-    for (auto &pair : sources) {
-        Source &source = *pair.second;
-        size_t count = source.prepareRender(state);
+    for (const auto &pair : sources) {
+        const Source &source = *pair.second;
+        size_t count = source.getTileCount();
         debug.emplace_back(util::sprintf<100>("source %d: %d\n", source_id, count));
         source_id++;
     }
 
-    painter.finishClippingMask();
-
-
-
-    // Render per layer in the stylesheet.
-    strata_thickness = 1.0f / (style.layerCount() + 1);
-    strata = 0;
-
-    // - FIRST PASS ------------------------------------------------------------
-    // Render everything top-to-bottom by using reverse iterators. Render opaque
-    // objects first.
-    painter.startOpaquePass();
-    renderLayers(style.layers, Opaque);
-    painter.endPass();
-
-    // - SECOND PASS -----------------------------------------------------------
-    // Make a second pass, rendering translucent objects. This time, we render
-    // bottom-to-top.
-    --strata;
-    painter.startTranslucentPass();
-    renderLayers(style.layers, Translucent);
-    painter.endPass();
-
+    // Actually render the layers
+    if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
+    renderLayers(style.layers);
+    if (debug::renderTree) { std::cout << "}" << std::endl; indent--; }
 
     // Finalize the rendering, e.g. by calling debug render calls per tile.
     // This guarantees that we have at least one function per tile called.
     // When only rendering layers via the stylesheet, it's possible that we don't
     // ever visit a tile during rendering.
-    for (auto &pair : sources) {
+    for (const auto &pair : sources) {
         Source &source = *pair.second;
         const std::string &name = pair.first;
         gl::group group(std::string("debug ") + name);
@@ -483,46 +518,108 @@ void Map::render() {
     glFlush();
 }
 
-void Map::renderLayers(const std::vector<LayerDescription>& layers, RenderPass pass) {
-    if (pass == Opaque) {
-        typedef std::vector<LayerDescription>::const_reverse_iterator riterator;
-        for (riterator it = layers.rbegin(), end = layers.rend(); it != end; ++it, ++strata) {
-            painter.setStrata(strata * strata_thickness);
-            renderLayer(*it, pass);
-        }
-    } else if (pass == Translucent) {
-        typedef std::vector<LayerDescription>::const_iterator iterator;
-        for (iterator it = layers.begin(), end = layers.end(); it != end; ++it, --strata) {
-            painter.setStrata(strata * strata_thickness);
-            renderLayer(*it, pass);
-        }
-    } else {
-        throw std::runtime_error("unknown render pass");
+void Map::renderLayers(const std::vector<LayerDescription>& layers) {
+    // TODO: Correctly compute the number of layers recursively beforehand.
+    float strata_thickness = 1.0f / (layers.size() + 1);
+
+    // - FIRST PASS ------------------------------------------------------------
+    // Render everything top-to-bottom by using reverse iterators. Render opaque
+    // objects first.
+
+    if (debug::renderTree) {
+        std::cout << std::string(indent++ * 4, ' ') << "OPAQUE {" << std::endl;
+    }
+    typedef std::vector<LayerDescription>::const_reverse_iterator riterator;
+    int i = 0;
+    for (riterator it = layers.rbegin(), end = layers.rend(); it != end; ++it, ++i) {
+        painter.setOpaque();
+        painter.setStrata(i * strata_thickness);
+        renderLayer(*it, Opaque);
+    }
+    // painter.endPass();
+    if (debug::renderTree) {
+        std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
     }
 
-    glFlush();
+    // - SECOND PASS -----------------------------------------------------------
+    // Make a second pass, rendering translucent objects. This time, we render
+    // bottom-to-top.
+    if (debug::renderTree) {
+        std::cout << std::string(indent++ * 4, ' ') << "TRANSLUCENT {" << std::endl;
+    }
+    typedef std::vector<LayerDescription>::const_iterator iterator;
+    --i;
+    for (iterator it = layers.begin(), end = layers.end(); it != end; ++it, --i) {
+        painter.setTranslucent();
+        painter.setStrata(i * strata_thickness);
+        renderLayer(*it, Translucent);
+    }
+    // painter.endPass();
+    if (debug::renderTree) {
+        std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
+    }
+}
+
+template <typename Styles>
+typename Styles::const_iterator find_style(const Styles &styles, const LayerDescription &layer_desc) {
+    auto it = styles.find(layer_desc.name);
+    if (it == styles.end()) {
+        if (debug::renderWarnings) {
+            fprintf(stderr, "[WARNING] can't find class named '%s' in style\n",
+                    layer_desc.name.c_str());
+        }
+    }
+    return it;
+}
+
+template <typename Properties>
+bool is_invisible(const Properties &properties) {
+    if (!properties.enabled) { return true; }
+    if (properties.opacity <= 0) { return true; }
+    return false;
 }
 
 template <typename Styles>
 bool is_invisible(const Styles &styles, const LayerDescription &layer_desc) {
-    auto it = styles.find(layer_desc.name);
-    if (it == styles.end()) return true;
-    const auto &properties = it->second;
-    if (!properties.enabled) return true;
-    if (properties.opacity <= 0) return true;
-    return false;
+    auto it = find_style(styles, layer_desc);
+    if (it == styles.end()) { return true; }
+    return is_invisible(it->second);
 }
 
 void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
     if (layer_desc.child_layer.size()) {
-        gl::group group(std::string("group: ") + layer_desc.name);
-        // This is a layer group.
-        // TODO: create framebuffer
-        renderLayers(layer_desc.child_layer, pass);
-        // TODO: render framebuffer on previous framebuffer
+        // This is a layer group. We render them during our translucent render pass.
+        if (pass == Translucent) {
+            auto it = find_style(style.computed.composites, layer_desc);
+            const CompositeProperties &properties = (it != style.computed.composites.end()) ? it->second : defaultCompositeProperties;
+            if (!is_invisible(properties)) {
+                gl::group group(std::string("group: ") + layer_desc.name);
+
+                if (debug::renderTree) {
+                    std::cout << std::string(indent++ * 4, ' ') << "+ " << layer_desc.name
+                              << " (Composite) {" << std::endl;
+                }
+
+                painter.pushFramebuffer();
+
+                renderLayers(layer_desc.child_layer);
+
+                GLuint texture = painter.popFramebuffer();
+
+                // Render the previous texture onto the screen.
+                painter.drawComposite(texture, properties);
+
+                if (debug::renderTree) {
+                    std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
+                }
+            }
+        }
+    } else if (layer_desc.bucket_name == "background") {
+        // This layer defines the background color.
     } else {
         // This is a singular layer. Try to find the bucket associated with
         // this layer and render it.
+
         auto bucket_it = style.buckets.find(layer_desc.bucket_name);
         if (bucket_it != style.buckets.end()) {
             const BucketDescription &bucket_desc = bucket_it->second;
@@ -556,8 +653,23 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
             // Find the source and render all tiles in it.
             auto source_it = sources.find(bucket_desc.source_name);
             if (source_it != sources.end()) {
+                if (debug::renderTree) {
+                    std::cout << std::string(indent * 4, ' ') << "- " << layer_desc.name << " ("
+                              << bucket_desc.type << ")" << std::endl;
+                }
+
                 const std::unique_ptr<Source> &source = source_it->second;
                 source->render(layer_desc, bucket_desc);
+            } else {
+                if (debug::renderWarnings) {
+                    fprintf(stderr, "[WARNING] can't find source '%s' required for bucket '%s'\n",
+                            bucket_desc.source_name.c_str(), layer_desc.bucket_name.c_str());
+                }
+            }
+        } else {
+            if (debug::renderWarnings) {
+                fprintf(stderr, "[WARNING] can't find bucket '%s' required for layer '%s'\n",
+                        layer_desc.bucket_name.c_str(), layer_desc.name.c_str());
             }
         }
     }
