@@ -197,7 +197,7 @@ module.exports = {
             "source": "outdoors",
             "layer": "landuse_overlay",
             "field": "class",
-            "value": "wetland",
+            "value": ["wetland", "wetland_noveg"],
             "type": "fill"
         },
         "overlay_breakwater_pier": {
