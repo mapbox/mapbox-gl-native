@@ -31,13 +31,13 @@
         {
           'action_name': 'Build Stylesheet',
           'inputs': [
-            'bin/style.js'
+            'bin/style.js',
           ],
           'outputs': [
             'include/llmr/style/resources.hpp',
             'src/style/resources.cpp'
           ],
-          'action': ['<@(node)', 'bin/build-style.js']
+          'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)']
         }
       ],
       'direct_dependent_settings': {
