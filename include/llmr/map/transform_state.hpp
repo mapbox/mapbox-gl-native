@@ -60,7 +60,7 @@ private:
     // map position
     double x = 0, y = 0;
     double angle = 0;
-    double scale = 1;
+    double scale = std::numeric_limits<double>::infinity();
 };
 
 }
