@@ -646,7 +646,7 @@ module.exports = {
         "country_label": {
             "source": "outdoors",
             "layer": "country_label",
-            "text_field": "name_en",
+            "text_field": "name",
             "path": "horizontal",
             "fontSize": 24,
             "feature_type": "point",
