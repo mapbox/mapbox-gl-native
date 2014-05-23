@@ -155,6 +155,8 @@ struct FillClass {
     boost::optional<FunctionProperty> opacity;
     boost::optional<PropertyTransition> opacity_transition;
     boost::optional<std::string> image;
+    boost::optional<FunctionProperty> prerendered;
+    boost::optional<FunctionProperty> blur;
 };
 
 struct FillProperties {
@@ -166,6 +168,8 @@ struct FillProperties {
     Color fill_color = {{ 0, 0, 0, 1 }};
     Color stroke_color = {{ 0, 0, 0, 1 }};
     float opacity = 1.0;
+    bool prerendered = false;
+    float blur = 0.0f;
     std::string image;
 };
 

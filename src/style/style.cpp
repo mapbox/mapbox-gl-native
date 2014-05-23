@@ -114,6 +114,14 @@ void Style::cascade(float z) {
             if (layer.image) {
                 fill.image = layer.image.get();
             }
+
+            if (layer.prerendered) {
+                fill.prerendered = layer.prerendered.get().evaluate<bool>(z);
+            }
+
+            if (layer.blur) {
+                fill.blur = layer.blur.get().evaluate<float>(z);
+            }
         }
 
         // Cascade line classes.

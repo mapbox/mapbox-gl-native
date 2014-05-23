@@ -537,6 +537,14 @@ FillClass StyleParser::parseFillClass(JSVal value) {
         klass.antialias = parseBoolean(value["antialias"]);
     }
 
+    if (value.HasMember("prerendered")) {
+        klass.prerendered = parseBoolean(value["prerendered"]);
+    }
+
+    if (value.HasMember("blur")) {
+        klass.blur = parseFunction(value["blur"]);
+    }
+
     if (value.HasMember("image")) {
         klass.image = parseString(value["image"]);
     }
