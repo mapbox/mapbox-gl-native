@@ -517,13 +517,13 @@ FunctionProperty StyleParser::parseFunction(JSVal value) {
         // Handle the v1 object syntax for the stops function
         if (rvalue.HasMember("fn") && rvalue["fn"].IsString() && rvalue["fn"].GetString() == std::string("stops")) {
             if ( rvalue.HasMember("stops") && rvalue["stops"].IsArray()) {
-                for (rapidjson::SizeType i = 1; i < rvalue["stops"].Size(); ++i) {
+                for (rapidjson::SizeType i = 0; i < rvalue["stops"].Size(); ++i) {
                     JSVal stop = rvalue["stops"][i];
                     rapidjson::SizeType z = 0;
                     rapidjson::SizeType v = 1;
                     if (stop.IsArray() && stop.Size() == 2 && stop[z].IsNumber() && stop[v].IsNumber()) {
-                        double zoomStop    = stop[z].GetDouble();
-                        double valueAtZoom = stop[v].GetDouble();
+                        float zoomStop    = stop[z].GetDouble();
+                        float valueAtZoom = stop[v].GetDouble();
                         property.values.push_back(zoomStop);
                         property.values.push_back(valueAtZoom);
                     } else {
@@ -605,7 +605,7 @@ LineClass StyleParser::parseLineClass(JSVal value) {
     }
 
     if (value.HasMember("line-opacity")) {
-        //klass.opacity = parseFunction(value["line-opacity"]);
+        klass.opacity = parseFunction(value["line-opacity"]);
     }
 
     if (value.HasMember("line-dasharray")) {
