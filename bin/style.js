@@ -48,7 +48,8 @@ module.exports = {
             "fill": true
         },
         "landuse_industrial": {
-            "filter": {"source": "outdoors", "layer": "landuse", "class": "industrial"}
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "industrial"},
+            "fill": true
         },
         "landuse_school": {
             "filter": {"source": "outdoors", "layer": "landuse", "class": "school"},
@@ -91,19 +92,24 @@ module.exports = {
             "line": true
         },
         "barrier_line_gate": {
-            "filter": {"source": "outdoors", "layer": "barrier_line", "class": "gate"}
+            "filter": {"source": "outdoors", "layer": "barrier_line", "class": "gate"},
+            "line": true
         },
         "barrier_line_fence": {
-            "filter": {"source": "outdoors", "layer": "barrier_line", "class": "fence"}
+            "filter": {"source": "outdoors", "layer": "barrier_line", "class": "fence"},
+            "line": true
         },
         "barrier_line_hedge": {
-            "filter": {"source": "outdoors", "layer": "barrier_line", "class": "hedge"}
+            "filter": {"source": "outdoors", "layer": "barrier_line", "class": "hedge"},
+            "line": true
         },
         "barrier_line_land": {
-            "filter": {"source": "outdoors", "layer": "barrier_line", "class": "land"}
+            "filter": {"source": "outdoors", "layer": "barrier_line", "class": "land"},
+            "line": true
         },
         "barrier_line_cliff": {
-            "filter": {"source": "outdoors", "layer": "barrier_line", "class": "cliff"}
+            "filter": {"source": "outdoors", "layer": "barrier_line", "class": "cliff"},
+            "line": true
         },
         "water": {
             "filter": {"source": "outdoors", "layer": "water"},

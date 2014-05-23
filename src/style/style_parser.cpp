@@ -12,7 +12,7 @@ void StyleParser::parseBuckets(JSVal value, std::map<std::string, BucketDescript
         for (; itr != value.MemberEnd(); ++itr) {
             buckets.emplace(
                 std::forward<std::string>({ itr->name.GetString(), itr->name.GetStringLength() }),
-                std::forward<BucketDescription>(parseBucket(itr->value))
+                std::forward<BucketDescription>(parseBucket(itr->name, itr->value))
             );
         }
     } else {
@@ -20,42 +20,57 @@ void StyleParser::parseBuckets(JSVal value, std::map<std::string, BucketDescript
     }
 }
 
-BucketDescription StyleParser::parseBucket(JSVal value) {
+BucketDescription StyleParser::parseBucket(JSVal bucketName, JSVal value) {
     BucketDescription bucket;
     bucket.type = BucketType::None;
 
     rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
+    std::string name;
+
+    // Start by figuring out the bucket type
+    if (value.HasMember("text")) {
+        bucket.type = BucketType::Text;
+
+    } else if (value.HasMember("point")) {
+        bucket.type = BucketType::Icon;
+
+    } else if (value.HasMember("line")) {
+        bucket.type = BucketType::Line;
+
+    } else if (value.HasMember("fill")) {
+        bucket.type = BucketType::Fill;
+
+    } else {
+        printf("Missing {text|point|line|fill} for bucket '%s'\n", bucketName.GetString());
+    }
+
+    // Parse the rest of the bucket
     for (; itr != value.MemberEnd(); ++itr) {
-        const std::string name(itr->name.GetString(), itr->name.GetStringLength());
+        name = {itr->name.GetString(), itr->name.GetStringLength() };
         JSVal value = itr->value;
 
-        if (name == "text") {
-            bucket.type = BucketType::Text;
-
-        } else if (name == "point") {
-            bucket.type = BucketType::Icon;
-
-        } else if (name == "line") {
-            bucket.type = BucketType::Line;
-
-        } else if (name == "fill") {
-            bucket.type = BucketType::Fill;
-
-        } else if (name == "filter") {
+        if (name == "filter") {
             if (value.IsObject()) {
+
+                // Determine the feature_type, using bucket.type if nothing else is specified in the filter
+                if (value.HasMember("feature_type")) {
+                    JSVal featureTypeValue = value["feature_type"];
+                    if (featureTypeValue.IsString()) {
+                        bucket.feature_type = bucketType({ featureTypeValue.GetString(), featureTypeValue.GetStringLength() });
+                    } else {
+                        throw Style::exception("feature type must be a string");
+                    }
+                } else {
+                    bucket.feature_type = bucket.type;
+                }
+
+                // Parse the rest of the filter object
                 rapidjson::Value::ConstMemberIterator itr2 = value.MemberBegin();
                 for (; itr2 != value.MemberEnd(); ++itr2) {
                     const std::string name2(itr2->name.GetString(), itr2->name.GetStringLength());
                     JSVal value2 = itr2->value;
 
-                    if (name2 == "feature_type") {
-                        if (value2.IsString()) {
-                            bucket.feature_type = bucketType({ value2.GetString(), value2.GetStringLength() });
-                        } else {
-                            throw Style::exception("feature type must be a string");
-                        }
-
-                    } else if (name2 == "source") {
+                    if (name2 == "source") {
                         if (value2.IsString()) {
                             bucket.source_name = { value2.GetString(), value2.GetStringLength() };
                         } else {
@@ -156,10 +171,10 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
                 throw Style::exception("text max angle delta must be a number");
             }
         }
-
     }
 
     if (bucket.feature_type == BucketType::None) {
+        printf("No feature_type detected for %s\n",bucketName.GetString());
         bucket.feature_type = bucket.type;
     }
 

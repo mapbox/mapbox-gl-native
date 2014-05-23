@@ -19,7 +19,7 @@ public:
 
 private:
     LayerDescription parseLayer(JSVal value);
-    BucketDescription parseBucket(JSVal value);
+    BucketDescription parseBucket(JSVal bucketName, JSVal value);
 
     std::pair<std::string, ClassDescription>
     parseClassDescription(std::string styleName, JSVal value,
