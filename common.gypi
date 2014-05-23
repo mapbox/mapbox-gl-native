@@ -12,14 +12,20 @@
         'cflags': [ '-g', '-O0' ],
         'defines': [ 'DEBUG' ],
         'xcode_settings': {
-          'OTHER_CPLUSPLUSFLAGS': [ '-Wall', '-Wextra', '-pedantic', '-g', '-O0' ]
+          'GCC_OPTIMIZATION_LEVEL': '0',
+          'GCC_GENERATE_DEBUGGING_SYMBOLS': 'YES',
+          'OTHER_CPLUSPLUSFLAGS': [ '-Wall', '-Wextra', '-pedantic' ]
         }
       },
       'Release': {
         'cflags': [ '-O3' ],
         'defines': [ 'NDEBUG' ],
         'xcode_settings': {
-          'OTHER_CPLUSPLUSFLAGS': [ '-Wall', '-Wextra', '-pedantic', '-O3' ]
+          'GCC_OPTIMIZATION_LEVEL': '3',
+          'GCC_GENERATE_DEBUGGING_SYMBOLS': 'NO',
+          'DEAD_CODE_STRIPPING': 'YES',
+          'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
+          'OTHER_CPLUSPLUSFLAGS': [ '-Wall', '-Wextra', '-pedantic' ]
         }
       }
     }
