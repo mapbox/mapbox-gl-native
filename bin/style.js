@@ -1380,7 +1380,7 @@ module.exports = {
 
         "case_night": "#015e7a",
         "street_case_night": "#015b76",
-        "motorway_night": "#eee",
+        "motorway_night": "#bbdde7",
         "main_night": "#64b2c9",
         "street_night": "#0186ac",
         "contour_night": "#ffff80",
@@ -2958,9 +2958,9 @@ module.exports = {
                 "poi_label": {
                     "color": "#fff",
                     "size": 10,
-                    "stroke": "rgba(1,114,147,0.3)",
-                    "strokeWidth": 0.4,
-                    "strokeBlur": 0.2,
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 2,
                     "translate": [0, 14]
                 },
                 "poi_aerodrome": {
