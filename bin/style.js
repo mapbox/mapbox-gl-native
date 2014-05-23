@@ -1,6 +1,86 @@
 module.exports = {
     "version": "1",
     "buckets": {
+        "landcover_snow": {
+            "filter": {"source": "outdoors", "layer": "landcover", "class": "snow"},
+            "fill": true
+        },
+        "landcover_crop": {
+            "filter": {"source": "outdoors", "layer": "landcover", "class": "crop"},
+            "fill": true
+        },
+        "landcover_grass": {
+            "filter": {"source": "outdoors", "layer": "landcover", "class": "grass"},
+            "fill": true
+        },
+        "landcover_scrub": {
+            "filter": {"source": "outdoors", "layer": "landcover", "class": "scrub"},
+            "fill": true
+        },
+        "landcover_wood": {
+            "filter": {"source": "outdoors", "layer": "landcover", "class": "wood"},
+            "fill": true
+        },
+        "landuse_wood": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "wood"},
+            "fill": true
+        },
+        "landuse_school": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "school"},
+            "fill": true
+        },
+        "landuse_sand": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "sand"},
+            "fill": true
+        },
+        "landuse_pitch": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "pitch"},
+            "fill": true
+        },
+        "landuse_park": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "park"},
+            "fill": true
+        },
+        "landuse_industrial": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "industrial"},
+            "fill": true
+        },
+        "landuse_scrub": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "scrub"},
+            "fill": true
+        },
+        "landuse_grass": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "grass"},
+            "fill": true
+        },
+        "landuse_crop": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "crop"},
+            "fill": true
+        },
+        "landuse_rock": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "rock"},
+            "fill": true
+        },
+        "landuse_snow": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "snow"},
+            "fill": true
+        },
+        "landuse_hospital": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "hospital"},
+            "fill": true
+        },
+        "landuse_cemetery": {
+            "filter": {"source": "outdoors", "layer": "landuse", "class": "cemetery"},
+            "fill": true
+        },
+        "overlay_wetland": {
+            "filter": {"source": "outdoors", "layer": "landuse_overlay", "class": ["wetland", "wetland_noveg"]},
+            "fill": true
+        },
+        "overlay_breakwater_pier": {
+            "filter": {"source": "outdoors", "layer": "landuse_overlay", "class": ["breakwater", "pier"]},
+            "fill": true
+        },
         "waterway_river_canal": {
             "filter": {"source": "outdoors", "layer": "waterway", "type": ["river", "canal"]},
             "line": true,
@@ -11,85 +91,31 @@ module.exports = {
             "line": true,
             "line-cap": "round"
         },
-        "landcover_wood": {
-            "filter": {"source": "outdoors", "layer": "landcover", "class": "wood"},
-            "fill": true
-        },
-        "landcover_scrub": {
-            "filter": {"source": "outdoors", "layer": "landcover", "class": "scrub"},
-            "fill": true
-        },
-        "landcover_grass": {
-            "filter": {"source": "outdoors", "layer": "landcover", "class": "grass"},
-            "fill": true
-        },
-        "landcover_crop": {
-            "filter": {"source": "outdoors", "layer": "landcover", "class": "crop"},
-            "fill": true
-        },
-        "landcover_snow": {
-            "filter": {"source": "outdoors", "layer": "landcover", "class": "snow"},
-            "fill": true
-        },
-        "landuse_park": {
-            "filter": {"source": "outdoors", "layer": "landuse", "class": "park"},
-            "fill": true
-        },
-        "landuse_pitch": {
-            "filter": {"source": "outdoors", "layer": "landuse", "class": "pitch"},
-            "fill": true
-        },
-        "landuse_cemetary": {
-            "filter": {"source": "outdoors", "layer": "landuse", "class": "cemetary"},
-            "fill": true
-        },
-        "landuse_hospital": {
-            "filter": {"source": "outdoors", "layer": "landuse", "class": "hospital"},
-            "fill": true
-        },
-        "landuse_industrial": {
-            "filter": {"source": "outdoors", "layer": "landuse", "class": "industrial"},
-            "fill": true
-        },
-        "landuse_school": {
-            "filter": {"source": "outdoors", "layer": "landuse", "class": "school"},
-            "fill": true
-        },
-        "overlay_wetland": {
-            "filter": {"source": "outdoors", "layer": "landuse_overlay", "class": "wetland"},
-            "fill": true
-        },
-        "overlay_wetland_noveg": {
-            "filter": {"source": "outdoors", "layer": "landuse_overlay", "class": "wetland_noveg"},
-            "fill": true
-        },
-        "overlay_breakwater_pier": {
-            "filter": {"source": "outdoors", "layer": "landuse_overlay", "class": ["breakwater", "pier"]},
-            "fill": true
-        },
-        "hillshade_full_shadow": {
-            "filter": {"source": "outdoors", "layer": "hillshade", "class": "full_shadow"},
-            "fill": true
-        },
-        "hillshade_medium_shadow": {
-            "filter": {"source": "outdoors", "layer": "hillshade", "class": "medium_shadow"},
+        "hillshade_full_highlight": {
+            "filter": {"source": "outdoors", "layer": "hillshade", "class": "full_highlight"},
             "fill": true
         },
         "hillshade_medium_highlight": {
             "filter": {"source": "outdoors", "layer": "hillshade", "class": "medium_highlight"},
             "fill": true
         },
-        "hillshade_full_highlight": {
-            "filter": {"source": "outdoors", "layer": "hillshade", "class": "full_highlight"},
+        "hillshade_medium_shadow": {
+            "filter": {"source": "outdoors", "layer": "hillshade", "class": "medium_shadow"},
             "fill": true
         },
-        "contour_line_10": {
-            "filter": {"source": "outdoors", "layer": "contour", "index": 10},
-            "line": true
+        "hillshade_full_shadow": {
+            "filter": {"source": "outdoors", "layer": "hillshade", "class": "full_shadow"},
+            "fill": true
         },
-        "contour_line_other": {
+        "contour_line_loud": {
+            "filter": {"source": "outdoors", "layer": "contour", "index": 5},
+            "line": true,
+            "line-join": "round"
+        },
+        "contour_line_regular": {
             "filter": {"source": "outdoors", "layer": "contour"},
-            "line": true
+            "line": true,
+            "line-join": "round"
         },
         "barrier_line_gate": {
             "filter": {"source": "outdoors", "layer": "barrier_line", "class": "gate"},
@@ -105,7 +131,7 @@ module.exports = {
         },
         "barrier_line_land": {
             "filter": {"source": "outdoors", "layer": "barrier_line", "class": "land"},
-            "line": true
+            "fill": true
         },
         "barrier_line_cliff": {
             "filter": {"source": "outdoors", "layer": "barrier_line", "class": "cliff"},
@@ -246,12 +272,12 @@ module.exports = {
             "filter": {"source": "outdoors", "layer": "bridge", "class": "aerialway"},
             "line": true
         },
-        "admin_level_3": {
+        "admin_l3": {
             "filter": {"source": "outdoors", "layer": "admin", "admin_level": [3, 4, 5]},
             "line": true,
             "line-join": "round"
         },
-        "admin_level_2": {
+        "admin_l2": {
             "filter": {"source": "outdoors", "layer": "admin", "admin_level": 2},
             "line": true,
             "line-cap": "round",
@@ -265,23 +291,14 @@ module.exports = {
         },
         "country_label_line": {
             "filter": {"source": "outdoors", "layer": "country_label_line"},
-            "line": true,
-            "min-zoom": 3
+            "line": true
         },
         "country_label": {
             "filter": {"source": "outdoors", "layer": "country_label", "feature_type": "point"},
             "text": true,
-            "min-zoom": 3,
             "text-field": "name",
-            "text-max-size": 13,
+            "text-max-size": 24,
             "text-path": "horizontal"
-        },
-        "marine_label_point": {
-            "filter": {"source": "outdoors", "layer": "marine_label", "feature_type": "point"},
-            "text": true,
-            "text-field": "name",
-            "text-max-size": 16,
-            "text-path": "curve"
         },
         "marine_label_line": {
             "filter": {"source": "outdoors", "layer": "marine_label", "feature_type": "line"},
@@ -289,6 +306,32 @@ module.exports = {
             "text-field": "name",
             "text-max-size": 16,
             "text-path": "curve"
+        },
+        "marine_label_point_1": {
+            "filter": {"source": "outdoors", "layer": "marine_label", "labelrank": 1, "feature_type": "point"},
+            "text": true,
+            "text-field": "name",
+            "text-max-size": 30,
+            "text-path": "horizontal"
+        },
+        "marine_label_point_2": {
+            "filter": {"source": "outdoors", "layer": "marine_label", "labelrank": 2, "feature_type": "point"},
+            "text": true,
+            "text-field": "name",
+            "text-max-size": 24,
+            "text-path": "horizontal"
+        },
+        "marine_label_point_other": {
+            "filter": {
+                "source": "outdoors",
+                "layer": "marine_label",
+                "labelrank": [3, 4, 5, 6],
+                "feature_type": "point"
+            },
+            "text": true,
+            "text-field": "name",
+            "text-max-size": 18,
+            "text-path": "horizontal"
         },
         "state_label": {
             "filter": {"source": "outdoors", "layer": "state_label", "feature_type": "point"},
@@ -300,7 +343,8 @@ module.exports = {
         },
         "place_label_city_point": {
             "filter": {"source": "outdoors", "layer": "place_label", "type": "city"},
-            "point": true
+            "point": true,
+            "point-size": [null, null]
         },
         "place_label_city": {
             "filter": {"source": "outdoors", "layer": "place_label", "type": "city", "feature_type": "point"},
@@ -340,7 +384,7 @@ module.exports = {
             "text-max-size": 14,
             "text-path": "horizontal"
         },
-        "poi_label_1": {
+        "poi_label": {
             "filter": {
                 "source": "outdoors",
                 "layer": "poi_label",
@@ -365,10 +409,7 @@ module.exports = {
         },
         "contour_label": {
             "filter": {"source": "outdoors", "layer": "contour", "index": 10, "feature_type": "line"},
-            "text": true,
-            "text-field": "ele",
-            "text-max-size": 10,
-            "text-path": "curve"
+            "line": true
         },
         "water_label": {
             "filter": {"source": "outdoors", "layer": "water_label", "feature_type": "point"},
@@ -383,49 +424,81 @@ module.exports = {
             "text-field": "name",
             "text-max-size": 12,
             "text-path": "curve",
-            "text-min-dist": 10
+            "text-min-dist": 15
         },
-        "poi_airport": {
+        "poi": {
+            "filter": {"source": "outdoors", "layer": "poi_label", "scalerank": [1, 2, 3]},
+            "point": true,
+            "point-size": [null, null]
+        },
+        "poi_aerodrome": {
             "filter": {"source": "outdoors", "layer": "poi_label", "maki": "airport"},
             "point": true,
-            "point-size": [12, 12]
-        },
-        "poi_rail": {
-            "filter": {"source": "outdoors", "layer": "poi_label", "maki": "rail"},
-            "point": true,
-            "point-size": [12, 12]
-        },
-        "poi_golf": {
-            "filter": {"source": "outdoors", "layer": "poi_label", "maki": "golf"},
-            "point": true,
-            "point-size": [12, 12],
-            "text": true,
-            "text-always-visible": true
-        },
-        "poi_park": {
-            "filter": {"source": "outdoors", "layer": "poi_label", "maki": "park"},
-            "point": true,
-            "point-size": [12, 12],
-            "text": true,
-            "text-always-visible": true
-        },
-        "poi_hospital": {
-            "filter": {"source": "outdoors", "layer": "poi_label", "maki": "hospital"},
-            "point": true,
-            "point-size": [12, 12],
-            "text": true,
-            "text-always-visible": true
-        },
-        "poi_college": {
-            "filter": {"source": "outdoors", "layer": "poi_label", "maki": "college"},
-            "point": true,
-            "point-size": [12, 12],
-            "text": true,
-            "text-always-visible": true
+            "point-size": [null, null]
         }
     },
     "layers": [{
                "id": "background"
+               }, {
+               "id": "landcover_snow",
+               "bucket": "landcover_snow"
+               }, {
+               "id": "landcover_crop",
+               "bucket": "landcover_crop"
+               }, {
+               "id": "landcover_grass",
+               "bucket": "landcover_grass"
+               }, {
+               "id": "landcover_scrub",
+               "bucket": "landcover_scrub"
+               }, {
+               "id": "landcover_wood",
+               "bucket": "landcover_wood"
+               }, {
+               "id": "landuse_wood",
+               "bucket": "landuse_wood"
+               }, {
+               "id": "landuse_school",
+               "bucket": "landuse_school"
+               }, {
+               "id": "landuse_sand",
+               "bucket": "landuse_sand"
+               }, {
+               "id": "landuse_pitch",
+               "bucket": "landuse_pitch"
+               }, {
+               "id": "landuse_park",
+               "bucket": "landuse_park"
+               }, {
+               "id": "landuse_industrial",
+               "bucket": "landuse_industrial"
+               }, {
+               "id": "landuse_scrub",
+               "bucket": "landuse_scrub"
+               }, {
+               "id": "landuse_grass",
+               "bucket": "landuse_grass"
+               }, {
+               "id": "landuse_crop",
+               "bucket": "landuse_crop"
+               }, {
+               "id": "landuse_rock",
+               "bucket": "landuse_rock"
+               }, {
+               "id": "landuse_snow",
+               "bucket": "landuse_snow"
+               }, {
+               "id": "landuse_hospital",
+               "bucket": "landuse_hospital"
+               }, {
+               "id": "landuse_cemetery",
+               "bucket": "landuse_cemetery"
+               }, {
+               "id": "overlay_wetland",
+               "bucket": "overlay_wetland"
+               }, {
+               "id": "overlay_breakwater_pier",
+               "bucket": "overlay_breakwater_pier"
                }, {
                "id": "waterway_river_canal",
                "bucket": "waterway_river_canal"
@@ -433,65 +506,26 @@ module.exports = {
                "id": "waterway_stream",
                "bucket": "waterway_stream"
                }, {
-               "id": "landcover_wood",
-               "bucket": "landcover_wood"
-               }, {
-               "id": "landcover_scrub",
-               "bucket": "landcover_scrub"
-               }, {
-               "id": "landcover_grass",
-               "bucket": "landcover_grass"
-               }, {
-               "id": "landcover_crop",
-               "bucket": "landcover_crop"
-               }, {
-               "id": "landcover_snow",
-               "bucket": "landcover_snow"
-               }, {
-               "id": "landuse_park",
-               "bucket": "landuse_park"
-               }, {
-               "id": "landuse_pitch",
-               "bucket": "landuse_pitch"
-               }, {
-               "id": "landuse_cemetary",
-               "bucket": "landuse_cemetary"
-               }, {
-               "id": "landuse_hospital",
-               "bucket": "landuse_hospital"
-               }, {
-               "id": "landuse_industrial",
-               "bucket": "landuse_industrial"
-               }, {
-               "id": "landuse_school",
-               "bucket": "landuse_school"
-               }, {
-               "id": "overlay_wetland",
-               "bucket": "overlay_wetland"
-               }, {
-               "id": "overlay_wetland_noveg",
-               "bucket": "overlay_wetland_noveg"
-               }, {
-               "id": "overlay_breakwater_pier",
-               "bucket": "overlay_breakwater_pier"
-               }, {
-               "id": "hillshade_full_shadow",
-               "bucket": "hillshade_full_shadow"
-               }, {
-               "id": "hillshade_medium_shadow",
-               "bucket": "hillshade_medium_shadow"
+               "id": "hillshade_full_highlight",
+               "bucket": "hillshade_full_highlight"
                }, {
                "id": "hillshade_medium_highlight",
                "bucket": "hillshade_medium_highlight"
                }, {
-               "id": "hillshade_full_highlight",
-               "bucket": "hillshade_full_highlight"
+               "id": "hillshade_medium_shadow",
+               "bucket": "hillshade_medium_shadow"
                }, {
-               "id": "contour_line_10",
-               "bucket": "contour_line_10"
+               "id": "hillshade_full_shadow",
+               "bucket": "hillshade_full_shadow"
                }, {
-               "id": "contour_line_other",
-               "bucket": "contour_line_other"
+               "id": "contour_line_loud",
+               "bucket": "contour_line_loud"
+               }, {
+               "id": "contour_line_loud",
+               "bucket": "contour_line_loud"
+               }, {
+               "id": "contour_line_regular",
+               "bucket": "contour_line_regular"
                }, {
                "id": "barrier_line_gate",
                "bucket": "barrier_line_gate"
@@ -503,6 +537,9 @@ module.exports = {
                "bucket": "barrier_line_hedge"
                }, {
                "id": "barrier_line_land",
+               "bucket": "barrier_line_land"
+               }, {
+               "id": "barrier_line_land_fill",
                "bucket": "barrier_line_land"
                }, {
                "id": "barrier_line_cliff",
@@ -538,11 +575,8 @@ module.exports = {
                "id": "tunnel_main_casing",
                "bucket": "tunnel_main"
                }, {
-               "id": "tunnel_street_casing_group",
-               "layers": [{
-                          "id": "tunnel_street_casing",
-                          "bucket": "tunnel_street"
-                          }]
+               "id": "tunnel_street_casing",
+               "bucket": "tunnel_street"
                }, {
                "id": "tunnel_motorway_link",
                "bucket": "tunnel_motorway_link"
@@ -550,11 +584,8 @@ module.exports = {
                "id": "tunnel_service",
                "bucket": "tunnel_service"
                }, {
-               "id": "tunnel_street_group",
-               "layers": [{
-                          "id": "tunnel_street",
-                          "bucket": "tunnel_street"
-                          }]
+               "id": "tunnel_street",
+               "bucket": "tunnel_street"
                }, {
                "id": "tunnel_main",
                "bucket": "tunnel_main"
@@ -601,11 +632,8 @@ module.exports = {
                "id": "road_main_casing",
                "bucket": "road_main"
                }, {
-               "id": "road_street_casing_group",
-               "layers": [{
-                          "id": "road_street_casing",
-                          "bucket": "road_street"
-                          }]
+               "id": "road_street_casing",
+               "bucket": "road_street"
                }, {
                "id": "road_motorway_link",
                "bucket": "road_motorway_link"
@@ -613,11 +641,8 @@ module.exports = {
                "id": "road_service",
                "bucket": "road_service"
                }, {
-               "id": "road_street_group",
-               "layers": [{
-                          "id": "road_street",
-                          "bucket": "road_street"
-                          }]
+               "id": "road_street",
+               "bucket": "road_street"
                }, {
                "id": "road_main",
                "bucket": "road_main"
@@ -664,11 +689,8 @@ module.exports = {
                "id": "bridge_main_casing",
                "bucket": "bridge_main"
                }, {
-               "id": "bridge_street_casing_group",
-               "layers": [{
-                          "id": "bridge_street_casing",
-                          "bucket": "bridge_street"
-                          }]
+               "id": "bridge_street_casing",
+               "bucket": "bridge_street"
                }, {
                "id": "bridge_motorway_link",
                "bucket": "bridge_motorway_link"
@@ -676,11 +698,8 @@ module.exports = {
                "id": "bridge_service",
                "bucket": "bridge_service"
                }, {
-               "id": "bridge_street_group",
-               "layers": [{
-                          "id": "bridge_street",
-                          "bucket": "bridge_street"
-                          }]
+               "id": "bridge_street",
+               "bucket": "bridge_street"
                }, {
                "id": "bridge_main",
                "bucket": "bridge_main"
@@ -721,11 +740,11 @@ module.exports = {
                "id": "road_major_rail_hatching",
                "bucket": "road_major_rail"
                }, {
-               "id": "admin_level_3",
-               "bucket": "admin_level_3"
+               "id": "admin_l3",
+               "bucket": "admin_l3"
                }, {
-               "id": "admin_level_2",
-               "bucket": "admin_level_2"
+               "id": "admin_l2",
+               "bucket": "admin_l2"
                }, {
                "id": "admin_maritime_cover",
                "bucket": "admin_maritime"
@@ -739,11 +758,17 @@ module.exports = {
                "id": "country_label",
                "bucket": "country_label"
                }, {
-               "id": "marine_label_point",
-               "bucket": "marine_label_point"
-               }, {
                "id": "marine_label_line",
                "bucket": "marine_label_line"
+               }, {
+               "id": "marine_label_point_1",
+               "bucket": "marine_label_point_1"
+               }, {
+               "id": "marine_label_point_2",
+               "bucket": "marine_label_point_2"
+               }, {
+               "id": "marine_label_point_other",
+               "bucket": "marine_label_point_other"
                }, {
                "id": "state_label",
                "bucket": "state_label"
@@ -763,8 +788,8 @@ module.exports = {
                "id": "place_label_other",
                "bucket": "place_label_other"
                }, {
-               "id": "poi_label_1",
-               "bucket": "poi_label_1"
+               "id": "poi_label",
+               "bucket": "poi_label"
                }, {
                "id": "road_label",
                "bucket": "road_label"
@@ -778,36 +803,24 @@ module.exports = {
                "id": "waterway_label",
                "bucket": "waterway_label"
                }, {
-               "id": "poi_airport",
-               "bucket": "poi_airport"
+               "id": "poi",
+               "bucket": "poi"
                }, {
-               "id": "poi_rail",
-               "bucket": "poi_rail"
-               }, {
-               "id": "poi_golf",
-               "bucket": "poi_golf"
-               }, {
-               "id": "poi_park",
-               "bucket": "poi_park"
-               }, {
-               "id": "poi_hospital",
-               "bucket": "poi_hospital"
-               }, {
-               "id": "poi_college",
-               "bucket": "poi_college"
+               "id": "poi_aerodrome",
+               "bucket": "poi_aerodrome"
                }],
     "constants": {
-        "land": "#f4efe1",
+        "land": "rgb(244,239,225)",
         "water": "#cdd",
         "water_dark": "#185869",
         "crop": "#eeeed4",
-        "grass": "#e7ebd1",
-        "scrub": "#e0e8cd",
-        "wood": "#d4e2c6",
+        "grass": "#e6e6cc",
+        "scrub": "#dfe5c8",
+        "wood": "#cee2bd",
         "snow": "#f4f8ff",
         "rock": "#ddd",
         "sand": "#ffd",
-        "cemetary": "#edf4ed",
+        "cemetery": "#edf4ed",
         "pitch": "#fff",
         "park": "#d4e4bc",
         "piste": "blue",
@@ -815,13 +828,448 @@ module.exports = {
         "hospital": "#f8eee0",
         "builtup": "#f6faff",
         "case": "#fff",
-        "motorway": "#d7a8a8",
+        "motorway": "#cda0a0",
         "main": "#ddc0b9",
         "street": "#fff",
         "text": "#666",
-        "country_text": "#323330",
+        "text_stroke": "rgba(255,255,255,0.8)",
+        "country_text": "#333",
         "marine_text": "#a0bdc0",
-        "water_text": "#185869"
+        "water_text": "#185869",
+        "land_night": "#017293",
+        "water_night": "#103",
+        "water_dark_night": "#003366",
+        "crop_night": "#178d96",
+        "grass_night": "#23948a",
+        "scrub_night": "#31a186",
+        "wood_night": "#45b581",
+        "park_night": "#51bd8b",
+        "snow_night": "#5ad9fe",
+        "rock_night": "#999",
+        "sand_night": "#437162",
+        "cemetery_night": "#218c96",
+        "pitch_night": "rgba(255,255,255,0.2)",
+        "school_night": "#01536a",
+        "hospital_night": "#015e7a",
+        "builtup_night": "#014b60",
+        "admin_night": "#ffb680",
+        "text_night": "#fff",
+        "text_stroke_night": "#103",
+        "case_night": "#015e7a",
+        "street_case_night": "#015b76",
+        "motorway_night": "#eee",
+        "main_night": "#64b2c9",
+        "street_night": "#0186ac",
+        "contour_night": "#ffff80",
+        "river_canal_width": ["stops", {
+                              "z": 11,
+                              "val": 0.5
+                              }, {
+                              "z": 12,
+                              "val": 1
+                              }, {
+                              "z": 14,
+                              "val": 2
+                              }, {
+                              "z": 16,
+                              "val": 3
+                              }],
+        "stream_width": ["stops", {
+                         "z": 13,
+                         "val": 0.25
+                         }, {
+                         "z": 14,
+                         "val": 0.5
+                         }, {
+                         "z": 16,
+                         "val": 1.5
+                         }, {
+                         "z": 18,
+                         "val": 2
+                         }],
+        "motorway_width": ["stops", {
+                           "z": 5,
+                           "val": 0
+                           }, {
+                           "z": 6,
+                           "val": 0.5
+                           }, {
+                           "z": 8,
+                           "val": 0.8
+                           }, {
+                           "z": 10,
+                           "val": 1
+                           }, {
+                           "z": 11,
+                           "val": 1.2
+                           }, {
+                           "z": 12,
+                           "val": 2
+                           }, {
+                           "z": 13,
+                           "val": 3
+                           }, {
+                           "z": 14,
+                           "val": 4
+                           }, {
+                           "z": 15,
+                           "val": 6
+                           }, {
+                           "z": 16,
+                           "val": 9
+                           }, {
+                           "z": 17,
+                           "val": 12
+                           }, {
+                           "z": 18,
+                           "val": 14
+                           }],
+        "motorway_casing_width": ["stops", {
+                                  "z": 7.5,
+                                  "val": 0.6
+                                  }, {
+                                  "z": 8,
+                                  "val": 0.8
+                                  }, {
+                                  "z": 10,
+                                  "val": 2.8
+                                  }, {
+                                  "z": 11,
+                                  "val": 3
+                                  }, {
+                                  "z": 12,
+                                  "val": 4
+                                  }, {
+                                  "z": 13,
+                                  "val": 5
+                                  }, {
+                                  "z": 14,
+                                  "val": 6.5
+                                  }, {
+                                  "z": 15,
+                                  "val": 9
+                                  }, {
+                                  "z": 16,
+                                  "val": 12
+                                  }, {
+                                  "z": 17,
+                                  "val": 15
+                                  }, {
+                                  "z": 18,
+                                  "val": 17
+                                  }],
+        "motorway_link_width": ["stops", {
+                                "z": 12,
+                                "val": 1.2
+                                }, {
+                                "z": 14,
+                                "val": 2
+                                }, {
+                                "z": 16,
+                                "val": 3
+                                }, {
+                                "z": 18,
+                                "val": 4
+                                }],
+        "motorway_link_casing_width": ["stops", {
+                                       "z": 12,
+                                       "val": 2.8
+                                       }, {
+                                       "z": 14,
+                                       "val": 3.5
+                                       }, {
+                                       "z": 16,
+                                       "val": 5
+                                       }, {
+                                       "z": 18,
+                                       "val": 6
+                                       }],
+        "main_width": ["stops", {
+                       "z": 5,
+                       "val": 1
+                       }, {
+                       "z": 12,
+                       "val": 1
+                       }, {
+                       "z": 13,
+                       "val": 1.5
+                       }, {
+                       "z": 14,
+                       "val": 2
+                       }, {
+                       "z": 15,
+                       "val": 3
+                       }, {
+                       "z": 16,
+                       "val": 6
+                       }, {
+                       "z": 17,
+                       "val": 10
+                       }, {
+                       "z": 18,
+                       "val": 12
+                       }],
+        "main_casing_width": ["stops", {
+                              "z": 9,
+                              "val": 2.9
+                              }, {
+                              "z": 12,
+                              "val": 2.9
+                              }, {
+                              "z": 13,
+                              "val": 3.5
+                              }, {
+                              "z": 14,
+                              "val": 4
+                              }, {
+                              "z": 15,
+                              "val": 5.5
+                              }, {
+                              "z": 16,
+                              "val": 9
+                              }, {
+                              "z": 17,
+                              "val": 12
+                              }, {
+                              "z": 18,
+                              "val": 14
+                              }],
+        "street_width": ["stops", {
+                         "z": 14.5,
+                         "val": 0
+                         }, {
+                         "z": 15,
+                         "val": 1.5
+                         }, {
+                         "z": 16,
+                         "val": 3
+                         }, {
+                         "z": 17,
+                         "val": 8
+                         }],
+        "street_casing_width": ["stops", {
+                                "z": 13,
+                                "val": 0.4
+                                }, {
+                                "z": 14,
+                                "val": 1
+                                }, {
+                                "z": 15,
+                                "val": 2.5
+                                }, {
+                                "z": 16,
+                                "val": 4
+                                }, {
+                                "z": 17,
+                                "val": 10
+                                }],
+        "service_casing_width": ["stops", {
+                                 "z": 14,
+                                 "val": 0.5
+                                 }, {
+                                 "z": 15,
+                                 "val": 3
+                                 }, {
+                                 "z": 16,
+                                 "val": 3.5
+                                 }, {
+                                 "z": 17,
+                                 "val": 4
+                                 }, {
+                                 "z": 18,
+                                 "val": 5
+                                 }, {
+                                 "z": 19,
+                                 "val": 6
+                                 }],
+        "runway_width": ["stops", {
+                         "z": 10,
+                         "val": 1
+                         }, {
+                         "z": 11,
+                         "val": 2
+                         }, {
+                         "z": 12,
+                         "val": 3
+                         }, {
+                         "z": 13,
+                         "val": 5
+                         }, {
+                         "z": 14,
+                         "val": 7
+                         }, {
+                         "z": 15,
+                         "val": 11
+                         }, {
+                         "z": 16,
+                         "val": 15
+                         }, {
+                         "z": 17,
+                         "val": 19
+                         }, {
+                         "z": 18,
+                         "val": 23
+                         }],
+        "taxiway_width": ["stops", {
+                          "z": 10,
+                          "val": 0.2
+                          }, {
+                          "z": 12,
+                          "val": 0.2
+                          }, {
+                          "z": 13,
+                          "val": 1
+                          }, {
+                          "z": 14,
+                          "val": 1.5
+                          }, {
+                          "z": 15,
+                          "val": 2
+                          }, {
+                          "z": 16,
+                          "val": 3
+                          }, {
+                          "z": 17,
+                          "val": 4
+                          }, {
+                          "z": 18,
+                          "val": 5
+                          }],
+        "aerialway_width": ["stops", {
+                            "z": 13.5,
+                            "val": 0.8
+                            }, {
+                            "z": 14,
+                            "val": 1.4
+                            }, {
+                            "z": 15,
+                            "val": 1.6
+                            }, {
+                            "z": 16,
+                            "val": 2
+                            }, {
+                            "z": 17,
+                            "val": 2.4
+                            }, {
+                            "z": 18,
+                            "val": 3
+                            }],
+        "aerialway_casing_width": ["stops", {
+                                   "z": 13.5,
+                                   "val": 2
+                                   }, {
+                                   "z": 14,
+                                   "val": 2.5
+                                   }, {
+                                   "z": 15,
+                                   "val": 3
+                                   }, {
+                                   "z": 16,
+                                   "val": 3.5
+                                   }, {
+                                   "z": 17,
+                                   "val": 4
+                                   }, {
+                                   "z": 22,
+                                   "val": 5
+                                   }],
+        "path_width": ["stops", {
+                       "z": 14,
+                       "val": 1.2
+                       }, {
+                       "z": 15,
+                       "val": 1.5
+                       }, {
+                       "z": 16,
+                       "val": 1.8
+                       }],
+        "admin_l2_width": ["stops", {
+                           "z": 2,
+                           "val": 0.5
+                           }, {
+                           "z": 3,
+                           "val": 0.7
+                           }, {
+                           "z": 4,
+                           "val": 0.7
+                           }, {
+                           "z": 5,
+                           "val": 0.8
+                           }, {
+                           "z": 6,
+                           "val": 1
+                           }, {
+                           "z": 8,
+                           "val": 2
+                           }, {
+                           "z": 10,
+                           "val": 3
+                           }],
+        "admin_l3_width": ["stops", {
+                           "z": 6,
+                           "val": 0.6
+                           }, {
+                           "z": 8,
+                           "val": 1
+                           }, {
+                           "z": 12,
+                           "val": 2
+                           }],
+        "road_label_size": ["stops", {
+                            "z": 0,
+                            "val": 12
+                            }, {
+                            "z": 14,
+                            "val": 12
+                            }, {
+                            "z": 15,
+                            "val": 13
+                            }, {
+                            "z": 22,
+                            "val": 13
+                            }],
+        "fence_width": ["stops", {
+                        "z": 17,
+                        "val": 0.6
+                        }, {
+                        "z": 19,
+                        "val": 1
+                        }],
+        "hedge_width": ["stops", {
+                        "z": 16,
+                        "val": 0.6
+                        }, {
+                        "z": 17,
+                        "val": 1.2
+                        }, {
+                        "z": 19,
+                        "val": 1.6
+                        }],
+        "barrier_line_land_width": ["stops", {
+                                    "z": 14,
+                                    "val": 0.4
+                                    }, {
+                                    "z": 15,
+                                    "val": 0.75
+                                    }, {
+                                    "z": 16,
+                                    "val": 1.5
+                                    }, {
+                                    "z": 17,
+                                    "val": 3
+                                    }, {
+                                    "z": 18,
+                                    "val": 6
+                                    }, {
+                                    "z": 19,
+                                    "val": 12
+                                    }, {
+                                    "z": 20,
+                                    "val": 24
+                                    }, {
+                                    "z": 21,
+                                    "val": 48
+                                    }]
     },
     "styles": {
         "default": {
@@ -836,63 +1284,106 @@ module.exports = {
                 "line-color": "#c0d6d6",
                 "line-width": {
                     "fn": "stops",
-                    "stops": [[0, 0.4], [6, 1], [8, 2], [12, 3], [22, 3]]
+                    "stops": [[6, 1], [8, 2], [12, 3]]
                 }
             },
-            "admin_level_2": {
+            "admin_l2": {
                 "line-color": "#88a",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0.4], [2, 0.4], [3, 0.8], [4, 1], [5, 1.5], [6, 2], [8, 3], [10, 4], [22, 4]]
-                }
+                "line-width": "admin_l2_width"
             },
-            "admin_level_3": {
+            "admin_l3": {
                 "line-color": "#88a",
-                "line-dasharray": [30, 5],
-                "line-width": {
+                "line-dasharray": [60, 20],
+                "line-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0.4], [6, 1], [8, 2], [12, 3], [22, 3]]
-                }
+                    "stops": [[4, 0], [6, 1]]
+                },
+                "line-width": "admin_l3_width"
             },
             "waterway_river_canal": {
                 "line-color": "#87abaf",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0.5], [12, 1], [14, 2], [16, 3], [22, 3]]
-                }
+                "line-width": "river_canal_width"
             },
             "waterway_stream": {
                 "line-color": "#87abaf",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0.25], [13, 0.25], [14, 0.5], [16, 1.5], [18, 2], [22, 2]]
-                }
+                "line-width": "stream_width"
+            },
+            "barrier_line_gate": {
+                "line-width": 2.5,
+                "line-color": "#aab"
+            },
+            "barrier_line_fence": {
+                "line-color": "#aeada3",
+                "line-width": "fence_width"
+            },
+            "barrier_line_hedge": {
+                "line-color": "#8de99b",
+                "line-width": "hedge_width"
+            },
+            "barrier_line_land": {
+                "line-color": "land",
+                "line-width": "barrier_line_land_width"
+            },
+            "barrier_line_land_fill": {
+                "fill-color": "land"
+            },
+            "barrier_line_cliff": {
+                "line-color": "#987",
+                "line-width": 4
             },
             "landcover_wood": {
                 "fill-color": "wood",
-                "fill-opacity": 0.8
+                "fill-opacity": {
+                    "fn": "stops",
+                    "stops": [[13, 1], [14, 0.8], [17, 0.2]]
+                }
             },
             "landcover_scrub": {
                 "fill-color": "scrub",
-                "fill-opacity": 0.8
+                "fill-opacity": {
+                    "fn": "stops",
+                    "stops": [[13, 1], [14, 0.8], [17, 0.2]]
+                }
             },
             "landcover_grass": {
                 "fill-color": "grass",
-                "fill-opacity": 0.8
+                "fill-opacity": {
+                    "fn": "stops",
+                    "stops": [[13, 1], [14, 0.8], [17, 0.2]]
+                }
             },
             "landcover_crop": {
-                "fill-color": "crop",
-                "fill-opacity": 0.8
+                "fill-color": "crop"
             },
             "landcover_snow": {
-                "fill-color": "snow",
-                "fill-opacity": 0.8
+                "fill-color": "snow"
+            },
+            "landuse_wood": {
+                "fill-color": "wood"
+            },
+            "landuse_scrub": {
+                "fill-color": "scrub"
+            },
+            "landuse_grass": {
+                "fill-color": "grass"
+            },
+            "landuse_crop": {
+                "fill-color": "crop"
+            },
+            "landuse_snow": {
+                "fill-color": "snow"
+            },
+            "landuse_rock": {
+                "fill-color": "rock"
+            },
+            "landuse_sand": {
+                "fill-color": "sand"
             },
             "landuse_park": {
                 "fill-color": "park"
             },
-            "landuse_cemetary": {
-                "fill-color": "cemetary"
+            "landuse_cemetery": {
+                "fill-color": "cemetery"
             },
             "landuse_hospital": {
                 "fill-color": "hospital"
@@ -904,12 +1395,11 @@ module.exports = {
                 "fill-color": "rgba(255,255,255,0.5)",
                 "stroke-color": "pitch"
             },
-            "overlay_wetland": {
-                "fill-color": "#e1e9d3",
-                "fill-image": "wetland_noveg_64"
+            "landuse_industrial": {
+                "fill-color": "rgba(246,250,255,0.5)"
             },
-            "overlay_wetland_noveg": {
-                "fill-color": "#e1e9d3",
+            "overlay_wetland": {
+                "fill-color": "rgba(210,225,225,0.2)",
                 "fill-image": "wetland_noveg_64"
             },
             "overlay_breakwater_pier": {
@@ -917,46 +1407,50 @@ module.exports = {
             },
             "hillshade_full_shadow": {
                 "fill-color": "#103",
+                "fill-antialias": false,
                 "fill-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0.08], [15, 0.075], [17, 0.05], [18, 0.025], [22, 0.025]]
+                    "stops": [[15, 0.075], [17, 0.05], [18, 0.025]]
                 }
             },
             "hillshade_medium_shadow": {
                 "fill-color": "#206",
+                "fill-antialias": false,
                 "fill-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0.08], [15, 0.075], [17, 0.05], [18, 0.025], [22, 0.025]]
+                    "stops": [[15, 0.075], [17, 0.05], [18, 0.025]]
                 }
             },
             "hillshade_full_highlight": {
                 "fill-color": "#fffff3",
+                "fill-antialias": false,
                 "fill-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0.25], [15, 0.3], [17, 0.2], [18, 0.1], [22, 0.1]]
+                    "stops": [[15, 0.3], [17, 0.2], [18, 0.1]]
                 }
             },
             "hillshade_medium_highlight": {
                 "fill-color": "#ffd",
+                "fill-antialias": false,
                 "fill-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0.2], [15, 0.3], [17, 0.2], [18, 0.1], [22, 0.1]]
+                    "stops": [[15, 0.3], [17, 0.2], [18, 0.1]]
                 }
             },
-            "contour_line_10": {
+            "contour_line_loud": {
                 "line-color": "#008",
-                "line-width": 1.2,
+                "line-width": 0.9,
                 "line-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0.06], [12, 0.06], [13, 0.12], [22, 0.12]]
+                    "stops": [[12, 0.05], [13, 0.11]]
                 }
             },
-            "contour_line_other": {
+            "contour_line_regular": {
                 "line-color": "#008",
                 "line-width": 0.5,
                 "line-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0.06], [12, 0.06], [13, 0.12], [22, 0.12]]
+                    "stops": [[12, 0.05], [13, 0.11]]
                 }
             },
             "water": {
@@ -968,17 +1462,11 @@ module.exports = {
             },
             "aeroway_runway": {
                 "line-color": "#ddd",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[10, 1], [11, 2], [12, 3], [13, 5], [14, 7], [15, 11], [16, 15], [17, 19], [18, 23], [22, 23]]
-                }
+                "line-width": "runway_width"
             },
             "aeroway_taxiway": {
                 "line-color": "#ddd",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[10, 0.2], [12, 0.2], [13, 1], [14, 1.5], [15, 2], [16, 3], [17, 4], [18, 5], [22, 5]]
-                }
+                "line-width": "taxiway_width"
             },
             "building": {
                 "fill-color": "#ebe7db"
@@ -987,110 +1475,75 @@ module.exports = {
                 "fill-color": "#ebe7db",
                 "fill-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [16.5, 0], [17, 0.7], [22, 0.7]]
+                    "stops": [[16.5, 0], [17, 0.7]]
                 },
                 "stroke-color": "#d5d1c6"
             },
             "building_shadow": {
                 "fill-color": "#d5d1c6",
-                "fill-translate": [2, 2],
+                "fill-translate": [1, 1],
                 "fill-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [16.5, 0], [17, 1], [22, 1]]
+                    "stops": [[16.5, 0], [17, 1]]
                 },
                 "stroke-color": "#d5d1c6"
             },
             "tunnel_motorway_casing": {
                 "line-color": "case",
                 "line-dasharray": [6, 6],
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0.6], [7.5, 0.6], [8, 0.8], [10, 2.8], [11, 3], [12, 4], [13, 5], [14, 6.5], [15, 9], [16, 12], [17, 15], [18, 17], [22, 17]]
-                },
+                "line-width": "motorway_casing_width",
                 "line-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [9.5, 0], [10, 1], [22, 1]]
+                    "stops": [[9.5, 0], [10, 1]]
                 }
             },
             "tunnel_motorway": {
                 "line-color": "#e6cec7",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0], [5, 0], [6, 0.5], [8, 0.8], [10, 1], [11, 1.2], [12, 2], [13, 3], [14, 4], [15, 6], [16, 9], [17, 12], [18, 14], [22, 14]]
-                },
+                "line-width": "motorway_width",
                 "line-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [6.5, 0], [7, 1], [22, 1]]
+                    "stops": [[6.5, 0], [7, 1]]
                 }
             },
             "tunnel_main_casing": {
                 "line-color": "case",
                 "line-dasharray": [6, 6],
-                "line-width": {
+                "line-width": "main_casing_width",
+                "line-opacity": {
                     "fn": "stops",
-                    "stops": [[10, 2.9], [13, 2.9], [14, 3.5], [15, 4], [16, 5.5], [17, 9], [18, 15], [22, 15]]
+                    "stops": [[9, 0], [10, 1]]
                 }
             },
             "tunnel_main": {
                 "line-color": "#e6cec7",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[6, 1], [12, 1], [13, 1], [14, 1.5], [15, 2], [16, 3], [17, 6], [18, 10], [19, 12], [22, 12]]
-                },
+                "line-width": "main_width",
                 "line-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [6.5, 0], [7, 1], [22, 1]]
+                    "stops": [[6.5, 0], [7, 1]]
                 }
             },
             "tunnel_motorway_link_casing": {
                 "line-color": "case",
                 "line-dasharray": [6, 6],
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[12, 2.8], [14, 3.5], [16, 5], [18, 6], [22, 6]]
-                }
+                "line-width": "motorway_link_casing_width"
             },
             "tunnel_motorway_link": {
                 "line-color": "#e6cec7",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[12, 1.2], [14, 2], [16, 3], [18, 4], [22, 4]]
-                }
-            },
-            "tunnel_street_casing_group": {
-                "opacity": {
-                    "fn": "stops",
-                    "stops": [[0, 0], [12.5, 0], [13.5, 0.6], [22, 0.6]]
-                }
+                "line-width": "motorway_link_width"
             },
             "tunnel_street_casing": {
                 "line-color": "#d9d5c6",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[10, 0.5], [12.5, 0.5], [13, 0.5], [14, 2.25], [15, 5], [16, 7], [17, 9], [18, 11], [22, 11]]
-                }
-            },
-            "tunnel_street_group": {
-                "opacity": {
-                    "fn": "stops",
-                    "stops": [[0, 0], [13.5, 0], [14.25, 1], [22, 1]]
-                }
+                "line-width": "street_casing_width"
             },
             "tunnel_street": {
                 "line-color": "#d9d5c6",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[11, 0], [12.5, 0], [13, 0.6], [14, 1.2], [15, 1.8], [16, 3], [17, 5], [18, 8], [22, 8]]
-                }
+                "line-width": "street_width"
             },
             "tunnel_service_casing": {
                 "line-color": "#000",
                 "line-opacity": 0.04,
                 "line-dasharray": [6, 6],
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0.5], [14, 0.5], [15, 3], [16, 3.5], [17, 4], [18, 5], [19, 6], [22, 6]]
-                }
+                "line-width": "service_casing_width"
             },
             "tunnel_service": {
                 "line-color": "#e6cec7",
@@ -1098,91 +1551,56 @@ module.exports = {
             },
             "road_motorway_casing": {
                 "line-color": "case",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0.6], [7.5, 0.6], [8, 0.8], [10, 2.8], [11, 3], [12, 4], [13, 5], [14, 6.5], [15, 9], [16, 12], [17, 15], [18, 17], [22, 17]]
-                },
+                "line-width": "motorway_casing_width",
                 "line-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [9.5, 0], [10, 1], [22, 1]]
+                    "stops": [[9.5, 0], [10, 1]]
                 }
             },
             "road_motorway": {
                 "line-color": "motorway",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0], [5, 0], [6, 0.5], [8, 0.8], [10, 1], [11, 1.2], [12, 2], [13, 3], [14, 4], [15, 6], [16, 9], [17, 12], [18, 14], [22, 14]]
-                },
+                "line-width": "motorway_width",
                 "line-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [6.5, 0], [7, 1], [22, 1]]
+                    "stops": [[6.5, 0], [7, 1]]
                 }
             },
             "road_main_casing": {
                 "line-color": "case",
-                "line-width": {
+                "line-width": "main_casing_width",
+                "line-opacity": {
                     "fn": "stops",
-                    "stops": [[10, 2.9], [13, 2.9], [14, 3.5], [15, 4], [16, 5.5], [17, 9], [18, 15], [22, 15]]
+                    "stops": [[9, 0], [10, 1]]
                 }
             },
             "road_main": {
                 "line-color": "main",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[6, 1], [12, 1], [13, 1], [14, 1.5], [15, 2], [16, 3], [17, 6], [18, 10], [19, 12], [22, 12]]
-                },
+                "line-width": "main_width",
                 "line-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [6.5, 0], [7, 1], [22, 1]]
+                    "stops": [[6.5, 0], [7, 1]]
                 }
             },
             "road_motorway_link_casing": {
                 "line-color": "case",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[12, 2.8], [14, 3.5], [16, 5], [18, 6], [22, 6]]
-                }
+                "line-width": "motorway_link_casing_width"
             },
             "road_motorway_link": {
                 "line-color": "motorway",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[12, 1.2], [14, 2], [16, 3], [18, 4], [22, 4]]
-                }
-            },
-            "road_street_casing_group": {
-                "opacity": {
-                    "fn": "stops",
-                    "stops": [[0, 0], [12.5, 0], [13.5, 0.6], [22, 0.6]]
-                }
+                "line-width": "motorway_link_width"
             },
             "road_street_casing": {
                 "line-color": "#d9d5c6",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[10, 0.5], [12.5, 0.5], [13, 0.5], [14, 2.25], [15, 5], [16, 7], [17, 9], [18, 11], [22, 11]]
-                }
-            },
-            "road_street_group": {
-                "opacity": {
-                    "fn": "stops",
-                    "stops": [[0, 0], [13.5, 0], [14.25, 1], [22, 1]]
-                }
+                "line-width": "street_casing_width"
             },
             "road_street": {
                 "line-color": "street",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[11, 0], [12.5, 0], [13, 0.6], [14, 1.2], [15, 1.8], [16, 3], [17, 5], [18, 8], [22, 8]]
-                }
+                "line-width": "street_width"
             },
             "road_service_casing": {
                 "line-color": "#000",
                 "line-opacity": 0.04,
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0.5], [14, 0.5], [15, 3], [16, 3.5], [17, 4], [18, 5], [19, 6], [22, 6]]
-                }
+                "line-width": "service_casing_width"
             },
             "road_service": {
                 "line-color": "street",
@@ -1193,53 +1611,41 @@ module.exports = {
                 "line-opacity": 0.4,
                 "line-width": {
                     "fn": "stops",
-                    "stops": [[10, 3], [16, 3], [17, 4], [22, 4]]
+                    "stops": [[15, 3], [16, 4]]
                 }
             },
             "road_path_footway": {
                 "line-color": "#bba",
-                "line-dasharray": [4, 2],
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[15, 1.2], [16, 1.5], [17, 1.8], [22, 1.8]]
-                }
+                "line-dasharray": [10, 4],
+                "line-width": "path_width"
             },
             "road_path_path": {
                 "line-color": "#987",
-                "line-dasharray": [6, 2],
+                "line-dasharray": [10, 4],
                 "line-opacity": 0.8,
                 "line-width": {
                     "fn": "stops",
-                    "stops": [[15, 0.8], [16, 0.9], [17, 1.2], [22, 1.2]]
+                    "stops": [[14, 0.8], [15, 0.9], [16, 1.2]]
                 }
             },
             "road_path_cycleway": {
                 "line-color": "#488",
-                "line-dasharray": [4, 2],
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[15, 1.2], [16, 1.5], [17, 1.8], [22, 1.8]]
-                }
+                "line-dasharray": [10, 4],
+                "line-width": "path_width"
             },
             "road_path_mtb": {
                 "line-color": "#488",
                 "line-dasharray": [12, 4],
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[15, 1.2], [16, 1.5], [17, 1.8], [22, 1.8]]
-                }
+                "line-width": "path_width"
             },
             "road_path_piste": {
                 "line-color": "#87b",
                 "line-dasharray": [8, 4],
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[15, 1.2], [16, 1.5], [17, 1.8], [22, 1.8]]
-                }
+                "line-width": "path_width"
             },
             "road_path_steps": {
                 "line-color": "#bba",
-                "line-dasharray": [4, 2],
+                "line-dasharray": [10, 4],
                 "line-width": 4
             },
             "road_major_rail": {
@@ -1253,91 +1659,56 @@ module.exports = {
             },
             "bridge_motorway_casing": {
                 "line-color": "case",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0.6], [7.5, 0.6], [8, 0.8], [10, 2.8], [11, 3], [12, 4], [13, 5], [14, 6.5], [15, 9], [16, 12], [17, 15], [18, 17], [22, 17]]
-                },
+                "line-width": "motorway_casing_width",
                 "line-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [9.5, 0], [10, 1], [22, 1]]
+                    "stops": [[9.5, 0], [10, 1]]
                 }
             },
             "bridge_motorway": {
                 "line-color": "motorway",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0], [5, 0], [6, 0.5], [8, 0.8], [10, 1], [11, 1.2], [12, 2], [13, 3], [14, 4], [15, 6], [16, 9], [17, 12], [18, 14], [22, 14]]
-                },
+                "line-width": "motorway_width",
                 "line-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [6.5, 0], [7, 1], [22, 1]]
+                    "stops": [[6.5, 0], [7, 1]]
                 }
             },
             "bridge_main_casing": {
                 "line-color": "case",
-                "line-width": {
+                "line-width": "main_casing_width",
+                "line-opacity": {
                     "fn": "stops",
-                    "stops": [[10, 2.9], [13, 2.9], [14, 3.5], [15, 4], [16, 5.5], [17, 9], [18, 15], [22, 15]]
+                    "stops": [[9, 0], [10, 1]]
                 }
             },
             "bridge_main": {
                 "line-color": "main",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[6, 1], [12, 1], [13, 1], [14, 1.5], [15, 2], [16, 3], [17, 6], [18, 10], [19, 12], [22, 12]]
-                },
+                "line-width": "main_width",
                 "line-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [6.5, 0], [7, 1], [22, 1]]
+                    "stops": [[6.5, 0], [7, 1]]
                 }
             },
             "bridge_motorway_link_casing": {
                 "line-color": "case",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[12, 2.8], [14, 3.5], [16, 5], [18, 6], [22, 6]]
-                }
+                "line-width": "motorway_link_casing_width"
             },
             "bridge_motorway_link": {
                 "line-color": "motorway",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[12, 1.2], [14, 2], [16, 3], [18, 4], [22, 4]]
-                }
-            },
-            "bridge_street_casing_group": {
-                "opacity": {
-                    "fn": "stops",
-                    "stops": [[0, 0], [12.5, 0], [13.5, 0.6], [22, 0.6]]
-                }
+                "line-width": "motorway_link_width"
             },
             "bridge_street_casing": {
                 "line-color": "#d9d5c6",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[10, 0.5], [12.5, 0.5], [13, 0.5], [14, 2.25], [15, 5], [16, 7], [17, 9], [18, 11], [22, 11]]
-                }
-            },
-            "bridge_street_group": {
-                "opacity": {
-                    "fn": "stops",
-                    "stops": [[0, 0], [13.5, 0], [14.25, 1], [22, 1]]
-                }
+                "line-width": "street_casing_width"
             },
             "bridge_street": {
                 "line-color": "street",
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[11, 0], [12.5, 0], [13, 0.6], [14, 1.2], [15, 1.8], [16, 3], [17, 5], [18, 8], [22, 8]]
-                }
+                "line-width": "street_width"
             },
             "bridge_service_casing": {
                 "line-color": "#000",
                 "line-opacity": 0.04,
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0.5], [14, 0.5], [15, 3], [16, 3.5], [17, 4], [18, 5], [19, 6], [22, 6]]
-                }
+                "line-width": "service_casing_width"
             },
             "bridge_service": {
                 "line-color": "street",
@@ -1346,63 +1717,75 @@ module.exports = {
             "bridge_aerialway_casing": {
                 "line-color": "white",
                 "line-opacity": 0.5,
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 2], [13.5, 2], [14, 2.5], [15, 3], [16, 3.5], [17, 4], [22, 5]]
-                }
+                "line-width": "aerialway_casing_width"
             },
             "bridge_aerialway": {
                 "line-color": "#876",
                 "line-opacity": 0.5,
-                "line-width": {
-                    "fn": "stops",
-                    "stops": [[0, 0.8], [13.5, 0.8], [14, 1.4], [15, 1.6], [16, 2], [17, 2.4], [18, 3], [22, 3]]
-                }
+                "line-width": "aerialway_width"
             },
             "country_label": {
                 "text-color": "country_text",
-                "text-halo-color": [1, 1, 1, 0.5]
+                "text-halo-color": "rgba(255,255,255,0.5)",
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[6, 14], [12, 24]]
+                }
             },
             "country_label_line": {
                 "line-color": "country_text",
                 "line-width": 0.5,
                 "line-opacity": 0.5
             },
-            "marine_label_point": {
-                "text-color": "marine_text"
-            },
             "marine_label_line": {
-                "text-color": "marine_text"
+                "text-color": "marine_text",
+                "text-halo-color": "water"
             },
-            "state_label": {
-                "text-color": "#666",
-                "text-halo-width": 0.4,
-                "text-halo-color": [1, 1, 1, 0.8],
+            "marine_label_point_1": {
+                "text-color": "#a9c4c7",
                 "text-size": {
                     "fn": "stops",
-                    "stops": [[0, 0], [3.99, 0], [4, 10], [9.99, 16], [10, 0], [22, 0]]
+                    "stops": [[0, 20], [3, 20], [4, 25], [5, 30], [22, 30]]
+                },
+                "text-halo-color": "water"
+            },
+            "marine_label_point_2": {
+                "text-color": "#a9c4c7",
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[0, 13], [3, 13], [4, 14], [5, 20], [6, 24], [22, 24]]
+                },
+                "text-halo-color": "water"
+            },
+            "marine_label_point_other": {
+                "text-color": "#a9c4c7",
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[0, 12], [3, 12], [4, 13], [5, 15], [6, 18], [22, 18]]
+                },
+                "text-halo-color": "water"
+            },
+            "state_label": {
+                "text-color": "#333",
+                "text-halo-width": 0.4,
+                "text-halo-color": "rgba(244,239,225,0.8)",
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[3.99, 0], [4, 10], [9.99, 16], [10, 0]]
                 }
             },
             "place_label_city_point": {
-                "point-color": "#4a4032",
-                "point-radius": 3,
-                "point-opacity": {
-                    "fn": "stops",
-                    "stops": [[0, 1], [5.99, 1], [6, 0], [22, 0]]
-                }
+                "point-color": "#4a4032"
             },
             "place_label_city": {
-                "text-color": "#4a4032",
+                "text-color": "#444",
                 "text-halo-width": 0.4,
-                "text-halo-color": [1, 1, 1, 0.8],
+                "text-halo-color": "text_stroke",
                 "text-size": {
                     "fn": "stops",
-                    "stops": [[0, 0], [3.99, 0], [4, 10], [7, 14], [14.99, 20], [15, 0], [22, 0]]
+                    "stops": [[3.99, 0], [4, 10], [7, 14], [14.99, 20], [15, 0]]
                 },
                 "text-translate": [0, ["stops", {
-                                       "z": 0,
-                                       "val": 10
-                                       }, {
                                        "z": 4,
                                        "val": 10
                                        }, {
@@ -1411,108 +1794,657 @@ module.exports = {
                                        }, {
                                        "z": 7,
                                        "val": 0
-                                       }, {
-                                       "z": 22,
-                                       "val": 0
                                        }]]
             },
             "place_label_town": {
-                "text-color": "#635644",
-                "text-halo-width": 0.4,
-                "text-halo-color": [1, 1, 1, 0.8],
+                "text-color": "#716656",
+                "text-halo-width": 0.5,
+                "text-halo-color": "text_stroke",
                 "text-size": {
                     "fn": "stops",
-                    "stops": [[0, 14], [12, 16], [14, 20], [16, 24]]
+                    "stops": [[9, 10], [12, 13], [14, 17], [16, 22]]
                 }
             },
             "place_label_village": {
                 "text-color": "#635644",
-                "text-halo-width": 0.4,
-                "text-halo-color": [1, 1, 1, 0.8],
+                "text-halo-width": 0.5,
+                "text-halo-color": "text_stroke",
                 "text-size": {
                     "fn": "stops",
-                    "stops": [[0, 12], [12, 14], [14, 28], [16, 22]]
+                    "stops": [[9, 8], [12, 10], [14, 14], [16, 16], [17, 20]]
                 }
             },
             "place_label_other": {
                 "text-color": "#7d6c55",
-                "text-halo-color": [1, 1, 1, 0.8],
+                "text-halo-color": "text_stroke",
                 "text-size": {
                     "fn": "stops",
                     "stops": [[0, 10], [14, 11], [15, 12], [16, 14]]
                 }
             },
             "road_label": {
-                "text-color": "#765",
-                "text-halo-color": [1, 1, 1, 0.5],
-                "text-size": {
-                    "fn": "stops",
-                    "stops": [[0, 12], [14, 12], [15, 13]]
-                }
+                "text-color": "#585042",
+                "text-halo-color": "land",
+                "text-halo-width": 0.6,
+                "text-size": "road_label_size"
             },
             "water_label": {
-                "text-color": "water_text",
-                "text-halo-color": [1, 1, 1, 0.75]
+                "text-color": "water_dark",
+                "text-halo-color": "rgba(255,255,255,0.75)"
             },
             "waterway_label": {
-                "text-color": "water_text",
-                "text-halo-color": [1, 1, 1, 0.75]
+                "text-color": "water_dark",
+                "text-halo-width": 0.4,
+                "text-halo-color": "text_stroke"
             },
-            "poi_airport": {
-                "point-color": "#666",
-                "point-image": "airport-24"
+            "poi": {
+                "point-color": "rgba(50,50,50,0.9)",
+                "point-antialias": false
             },
-            "poi_label_1": {
+            "poi_label": {
                 "text-color": "#444",
-                "text-halo-color": [1, 1, 1, 0.5],
-                "text-translate": [0, 26]
+                "text-size": 10,
+                "text-halo-color": "land",
+                "text-halo-width": 0.6,
+                "text-translate": [0, 14]
             },
-            "poi_rail": {
-                "point-color": "#666",
-                "point-image": "rail-12",
+            "poi_aerodrome": {
                 "point-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [16.75, 0], [17, 1], [22, 1]]
+                    "stops": [[13, 0], [13.25, 1]]
+                },
+                "point-antialias": false
+            }
+        },
+        "satellite": {
+            "background": {
+                "fill-color": "land_night"
+            },
+            "admin_maritime_cover": {
+                "line-color": "#0a1347",
+                "line-width": 5
+            },
+            "admin_maritime": {
+                "line-color": "#0a1347",
+                "line-width": {
+                    "fn": "stops",
+                    "stops": [[6, 1], [8, 2], [12, 3]]
                 }
             },
-            "poi_park": {
-                "point-color": "#666",
-                "point-image": "park-12",
+            "admin_l2": {
+                "line-color": "admin_night",
+                "line-width": "admin_l2_width"
+            },
+            "admin_l3": {
+                "line-color": "admin_night",
+                "line-dasharray": [60, 20],
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[4, 0], [6, 1]]
+                },
+                "line-width": "admin_l3_width"
+            },
+            "waterway_river_canal": {
+                "line-color": "rgb(10,20,71)",
+                "line-width": "river_canal_width"
+            },
+            "waterway_stream": {
+                "line-color": "rgb(10,20,71)",
+                "line-width": "stream_width"
+            },
+            "barrier_line_gate": {
+                "line-width": 2.5,
+                "line-color": "#59596f"
+            },
+            "barrier_line_fence": {
+                "line-color": "#014b61",
+                "line-width": "fence_width"
+            },
+            "barrier_line_hedge": {
+                "line-color": "#2e7a57",
+                "line-width": "hedge_width"
+            },
+            "barrier_line_land": {
+                "line-color": "land_night",
+                "line-width": "barrier_line_land_width"
+            },
+            "barrier_line_land_fill": {
+                "fill-color": "land_night"
+            },
+            "barrier_line_cliff": {
+                "line-color": "#63574b",
+                "line-width": 4
+            },
+            "landcover_wood": {
+                "fill-color": "wood_night",
+                "fill-opacity": {
+                    "fn": "stops",
+                    "stops": [[13, 1], [14, 0.8], [17, 0.2]]
+                }
+            },
+            "landcover_scrub": {
+                "fill-color": "scrub_night",
+                "fill-opacity": {
+                    "fn": "stops",
+                    "stops": [[13, 1], [14, 0.8], [17, 0.2]]
+                }
+            },
+            "landcover_grass": {
+                "fill-color": "grass_night",
+                "fill-opacity": {
+                    "fn": "stops",
+                    "stops": [[13, 1], [14, 0.8], [17, 0.2]]
+                }
+            },
+            "landcover_crop": {
+                "fill-color": "crop_night"
+            },
+            "landcover_snow": {
+                "fill-color": "snow_night"
+            },
+            "landuse_wood": {
+                "fill-color": "wood_night",
+                "fill-opacity": 0.8
+            },
+            "landuse_scrub": {
+                "fill-color": "scrub_night",
+                "fill-opacity": 0.8
+            },
+            "landuse_grass": {
+                "fill-color": "grass_night",
+                "fill-opacity": 0.8
+            },
+            "landuse_crop": {
+                "fill-color": "crop_night",
+                "fill-opacity": 0.8
+            },
+            "landuse_snow": {
+                "fill-color": "snow_night",
+                "fill-opacity": 0.8
+            },
+            "landuse_rock": {
+                "fill-color": "rock_night",
+                "fill-opacity": 0.8
+            },
+            "landuse_sand": {
+                "fill-color": "sand_night",
+                "fill-opacity": 0.8
+            },
+            "landuse_park": {
+                "fill-color": "park_night"
+            },
+            "landuse_cemetery": {
+                "fill-color": "cemetery_night"
+            },
+            "landuse_hospital": {
+                "fill-color": "hospital_night"
+            },
+            "landuse_school": {
+                "fill-color": "school_night"
+            },
+            "landuse_pitch": {
+                "fill-color": "pitch_night",
+                "stroke-color": "pitch"
+            },
+            "landuse_industrial": {
+                "fill-color": "builtup_night"
+            },
+            "overlay_wetland": {
+                "fill-color": "rgba(210,225,225,0.2)",
+                "fill-image": "wetland_noveg_64"
+            },
+            "overlay_breakwater_pier": {
+                "fill-color": "land_night"
+            },
+            "hillshade_full_shadow": {
+                "fill-color": "#103",
+                "fill-antialias": false,
+                "fill-opacity": {
+                    "fn": "stops",
+                    "stops": [[0, 0.3], [17, 0.2], [18, 0.1]]
+                }
+            },
+            "hillshade_medium_shadow": {
+                "fill-color": "#206",
+                "fill-antialias": false,
+                "fill-opacity": {
+                    "fn": "stops",
+                    "stops": [[0, 0.3], [17, 0.2], [18, 0.1]]
+                }
+            },
+            "hillshade_full_highlight": {
+                "fill-color": "#fdfdad",
+                "fill-antialias": false,
+                "fill-opacity": {
+                    "fn": "stops",
+                    "stops": [[14, 0.4], [15, 0.3], [17, 0.2], [18, 0.1]]
+                }
+            },
+            "hillshade_medium_highlight": {
+                "fill-color": "#ffe1b7",
+                "fill-antialias": false,
+                "fill-opacity": {
+                    "fn": "stops",
+                    "stops": [[15, 0.3], [17, 0.2], [18, 0.15]]
+                }
+            },
+            "contour_line_loud": {
+                "line-color": "contour_night",
+                "line-width": 0.9,
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[12, 0.1], [13, 0.2]]
+                }
+            },
+            "contour_line_regular": {
+                "line-color": "contour_night",
+                "line-width": 0.5,
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[12, 0.1], [13, 0.4]]
+                }
+            },
+            "water": {
+                "fill-color": "water_night",
+                "stroke-color": "water_dark_night"
+            },
+            "aeroway_fill": {
+                "fill-color": "#367"
+            },
+            "aeroway_runway": {
+                "line-color": "#367",
+                "line-width": "runway_width"
+            },
+            "aeroway_taxiway": {
+                "line-color": "#367",
+                "line-width": "taxiway_width"
+            },
+            "building": {
+                "fill-color": "#027797"
+            },
+            "building_wall": {
+                "fill-color": "#027797",
+                "fill-opacity": {
+                    "fn": "stops",
+                    "stops": [[16.5, 0], [17, 0.7]]
+                },
+                "stroke-color": "#026688"
+            },
+            "building_shadow": {
+                "fill-color": "#026688",
+                "fill-translate": [1, 1],
+                "fill-opacity": {
+                    "fn": "stops",
+                    "stops": [[16.5, 0], [17, 1]]
+                },
+                "stroke-color": "#026688"
+            },
+            "tunnel_motorway_casing": {
+                "line-color": "case_night",
+                "line-dasharray": [6, 6],
+                "line-width": "motorway_casing_width",
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[9.5, 0], [10, 1]]
+                }
+            },
+            "tunnel_motorway": {
+                "line-color": "#78b0c1",
+                "line-width": "motorway_width",
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[6.5, 0], [7, 1]]
+                }
+            },
+            "tunnel_main_casing": {
+                "line-color": "case_night",
+                "line-dasharray": [6, 6],
+                "line-width": "main_casing_width",
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[9, 0], [10, 1]]
+                }
+            },
+            "tunnel_main": {
+                "line-color": "#78b0c1",
+                "line-width": "main_width",
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[6.5, 0], [7, 1]]
+                }
+            },
+            "tunnel_motorway_link_casing": {
+                "line-color": "case_night",
+                "line-dasharray": [6, 6],
+                "line-width": "motorway_link_casing_width"
+            },
+            "tunnel_motorway_link": {
+                "line-color": "#78b0c1",
+                "line-width": "motorway_link_width"
+            },
+            "tunnel_street_casing": {
+                "line-color": "street_case_night",
+                "line-width": "street_casing_width"
+            },
+            "tunnel_street": {
+                "line-color": "street_night",
+                "line-width": "street_width"
+            },
+            "tunnel_service_casing": {
+                "line-color": "#000",
+                "line-opacity": 0.04,
+                "line-dasharray": [6, 6],
+                "line-width": "service_casing_width"
+            },
+            "tunnel_service": {
+                "line-color": "#017ca0",
+                "line-width": 2
+            },
+            "road_motorway_casing": {
+                "line-color": "case_night",
+                "line-width": "motorway_casing_width",
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[9.5, 0], [10, 1]]
+                }
+            },
+            "road_motorway": {
+                "line-color": "motorway_night",
+                "line-width": "motorway_width",
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[6.5, 0], [7, 1]]
+                }
+            },
+            "road_main_casing": {
+                "line-color": "case_night",
+                "line-width": "main_casing_width",
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[9, 0], [10, 1]]
+                }
+            },
+            "road_main": {
+                "line-color": "main_night",
+                "line-width": "main_width",
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[6.5, 0], [7, 1]]
+                }
+            },
+            "road_motorway_link_casing": {
+                "line-color": "case_night",
+                "line-width": "motorway_link_casing_width"
+            },
+            "road_motorway_link": {
+                "line-color": "motorway_night",
+                "line-width": "motorway_link_width"
+            },
+            "road_street_casing": {
+                "line-color": "street_case_night",
+                "line-width": "street_casing_width"
+            },
+            "road_street": {
+                "line-color": "street_night",
+                "line-width": "street_width"
+            },
+            "road_service_casing": {
+                "line-color": "#000",
+                "line-opacity": 0.04,
+                "line-width": "service_casing_width"
+            },
+            "road_service": {
+                "line-color": "street_night",
+                "line-width": 2
+            },
+            "road_path_case": {
+                "line-color": "land_night",
+                "line-opacity": 0.2
+            },
+            "road_path_footway": {
+                "line-color": "#fff",
+                "line-dasharray": [10, 4],
+                "line-width": "path_width"
+            },
+            "road_path_path": {
+                "line-color": "#fff",
+                "line-dasharray": [10, 4],
+                "line-opacity": 0.8,
+                "line-width": {
+                    "fn": "stops",
+                    "stops": [[14, 0.8], [15, 0.9], [16, 1.2]]
+                }
+            },
+            "road_path_cycleway": {
+                "line-color": "#94e6ff",
+                "line-dasharray": [10, 4],
+                "line-width": "path_width"
+            },
+            "road_path_mtb": {
+                "line-color": "#94e6ff",
+                "line-dasharray": [12, 4],
+                "line-width": "path_width"
+            },
+            "road_path_piste": {
+                "line-color": "#715dae",
+                "line-dasharray": [8, 4],
+                "line-width": "path_width"
+            },
+            "road_path_steps": {
+                "line-color": "#016684",
+                "line-dasharray": [10, 4],
+                "line-opacity": 0.3,
+                "line-width": 6
+            },
+            "road_major_rail": {
+                "line-color": "#c8c4c0",
+                "line-width": 0.8
+            },
+            "road_major_rail_hatching": {
+                "line-color": "#c8c4c0",
+                "line-dasharray": [2, 31],
+                "line-width": 5
+            },
+            "bridge_motorway_casing": {
+                "line-color": "case_night",
+                "line-width": "motorway_casing_width",
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[9.5, 0], [10, 1]]
+                }
+            },
+            "bridge_motorway": {
+                "line-color": "motorway_night",
+                "line-width": "motorway_width",
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[6.5, 0], [7, 1]]
+                }
+            },
+            "bridge_main_casing": {
+                "line-color": "case_night",
+                "line-width": "main_casing_width",
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[9, 0], [10, 1]]
+                }
+            },
+            "bridge_main": {
+                "line-color": "main_night",
+                "line-width": "main_width",
+                "line-opacity": {
+                    "fn": "stops",
+                    "stops": [[6.5, 0], [7, 1]]
+                }
+            },
+            "bridge_motorway_link_casing": {
+                "line-color": "case_night",
+                "line-width": "motorway_link_casing_width"
+            },
+            "bridge_motorway_link": {
+                "line-color": "motorway_night",
+                "line-width": "motorway_link_width"
+            },
+            "bridge_street_casing": {
+                "line-color": "street_case_night",
+                "line-width": "street_casing_width"
+            },
+            "bridge_street": {
+                "line-color": "street_night",
+                "line-width": "street_width"
+            },
+            "bridge_service_casing": {
+                "line-color": "#000",
+                "line-opacity": 0.04,
+                "line-width": "service_casing_width"
+            },
+            "bridge_service": {
+                "line-color": "street_night",
+                "line-width": 2
+            },
+            "bridge_aerialway_casing": {
+                "line-color": "white",
+                "line-opacity": 0.5,
+                "line-width": "aerialway_casing_width"
+            },
+            "bridge_aerialway": {
+                "line-color": "#876",
+                "line-opacity": 0.5,
+                "line-width": "aerialway_width"
+            },
+            "country_label": {
+                "text-color": "text_night",
+                "text-halo-color": "text_stroke_night",
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[6, 14], [12, 24]]
+                }
+            },
+            "country_label_line": {
+                "line-color": "text_night",
+                "line-width": 0.5,
+                "line-opacity": 0.5
+            },
+            "marine_label_line": {
+                "text-color": "water_dark_night",
+                "text-halo-color": "water_night"
+            },
+            "marine_label_point_1": {
+                "text-color": "water_dark_night",
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[0, 20], [3, 20], [4, 25], [5, 30], [22, 30]]
+                },
+                "text-halo-color": "water_night"
+            },
+            "marine_label_point_2": {
+                "text-color": "water_dark_night",
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[0, 13], [3, 13], [4, 14], [5, 20], [6, 24], [22, 24]]
+                },
+                "text-halo-color": "water_night"
+            },
+            "marine_label_point_other": {
+                "text-color": "#a9c4c7",
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[0, 12], [3, 12], [4, 13], [5, 15], [6, 18], [22, 18]]
+                },
+                "text-halo-color": "water_night"
+            },
+            "state_label": {
+                "text-color": "#fff",
+                "text-halo-width": 0.4,
+                "text-halo-color": "land_night",
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[3.99, 0], [4, 10], [9.99, 16], [10, 0]]
+                }
+            },
+            "place_label_city_point": {
+                "point-color": "#ddd"
+            },
+            "place_label_city": {
+                "text-color": "#fff",
+                "text-halo-width": 0.4,
+                "text-halo-color": "text_stroke_night",
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[3.99, 0], [4, 10], [7, 14], [14.99, 20], [15, 0]]
+                },
+                "text-translate": [0, ["stops", {
+                                       "z": 4,
+                                       "val": 10
+                                       }, {
+                                       "z": 6,
+                                       "val": 30
+                                       }, {
+                                       "z": 7,
+                                       "val": 0
+                                       }]]
+            },
+            "place_label_town": {
+                "text-color": "text_night",
+                "text-halo-width": 0.5,
+                "text-halo-color": "text_stroke_night",
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[9, 10], [12, 13], [14, 17], [16, 22]]
+                }
+            },
+            "place_label_village": {
+                "text-color": "text_night",
+                "text-halo-width": 0.5,
+                "text-halo-color": "text_stroke_night",
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[9, 8], [12, 10], [14, 14], [16, 16], [17, 20]]
+                }
+            },
+            "place_label_other": {
+                "text-color": "text_night",
+                "text-halo-color": "text_stroke_night",
+                "text-halo-width": 0.5,
+                "text-size": {
+                    "fn": "stops",
+                    "stops": [[0, 10], [14, 11], [15, 12], [16, 14]]
+                }
+            },
+            "road_label": {
+                "text-color": "text_night",
+                "text-halo-color": "text_stroke_night",
+                "text-halo-width": 0.5,
+                "text-size": "road_label_size"
+            },
+            "water_label": {
+                "text-color": "water_dark_night",
+                "text-halo-color": "text_stroke_night"
+            },
+            "waterway_label": {
+                "text-color": "land_night",
+                "text-halo-width": 0.8,
+                "text-halo-color": "water_night"
+            },
+            "poi": {
+                "point-color": "white",
+                "point-antialias": false
+            },
+            "poi_label": {
+                "text-color": "#fff",
+                "text-size": 10,
+                "text-halo-color": "land_night",
+                "text-halo-width": 0.4,
+                "text-translate": [0, 14]
+            },
+            "poi_aerodrome": {
                 "point-opacity": {
                     "fn": "stops",
-                    "stops": [[0, 0], [15.75, 0], [16, 1], [22, 1]]
-                }
-            },
-            "poi_golf": {
-                "point-color": "#666",
-                "point-image": "golf-12",
-                "point-opacity": {
-                    "fn": "stops",
-                    "stops": [[0, 0], [15.75, 0], [16, 1], [22, 1]]
-                }
-            },
-            "poi_hospital": {
-                "point-color": "#666",
-                "point-image": "hospital-12",
-                "point-opacity": {
-                    "fn": "stops",
-                    "stops": [[0, 0], [16.75, 0], [17, 1], [22, 1]]
-                }
-            },
-            "poi_college": {
-                "point-color": "#666",
-                "point-image": "college-12",
-                "point-opacity": {
-                    "fn": "stops",
-                    "stops": [[0, 0], [16.75, 0], [17, 1], [22, 1]]
-                }
-            },
-            "contour_label": {
-                "text-color": "text",
-                "text-halo-color": "#fff",
-                "text-size": 10
+                    "stops": [[13, 0], [13.25, 1]]
+                },
+                "point-antialias": false
             }
         }
     },
-    "sprite": "img/sprite"
+    "sprite": "/img/maki-sprite"
 }

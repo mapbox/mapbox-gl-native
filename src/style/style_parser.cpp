@@ -134,7 +134,7 @@ BucketDescription StyleParser::parseBucket(JSVal bucketName, JSVal value) {
             } else {
                 throw Style::exception("font size must be a number");
             }
-        } else if (name == "text_field" || name == "icon") {
+        } else if (name == "text-field" || name == "icon") {
             if (value.IsString()) {
                 bucket.geometry.field = { value.GetString(), value.GetStringLength() };
             } else {
