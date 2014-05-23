@@ -43,6 +43,7 @@ void Painter::setup() {
     assert(textShader);
     assert(dotShader);
     assert(compositeShader);
+    assert(gaussianShader);
 
 
     // Blending
@@ -73,6 +74,7 @@ void Painter::setupShaders() {
     textShader = std::make_unique<TextShader>();
     dotShader = std::make_unique<DotShader>();
     compositeShader = std::make_unique<CompositeShader>();
+    gaussianShader = std::make_unique<GaussianShader>();
 }
 
 void Painter::cleanup() {

@@ -3,20 +3,13 @@
 #include <llmr/map/map.hpp>
 #include <llmr/style/sprite.hpp>
 #include <llmr/geometry/sprite_atlas.hpp>
+#include <llmr/util/std.hpp>
 
 using namespace llmr;
 
-void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
-    // Abort early.
-    if (!bucket.hasData()) return;
 
-    auto fill_properties = map.getStyle().computed.fills;
-    auto fill_properties_it = fill_properties.find(layer_name);
-    if (fill_properties_it == fill_properties.end()) return;
 
-    const FillProperties& properties = fill_properties_it->second;
-    if (!properties.enabled) return;
-
+void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &vtxMatrix) {
     Color fill_color = properties.fill_color;
     fill_color[0] *= properties.opacity;
     fill_color[1] *= properties.opacity;
@@ -36,7 +29,6 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         stroke_color = fill_color;
     }
 
-    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
@@ -145,5 +137,156 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         glDepthRange(strata + strata_epsilon, 1.0f);
         bucket.drawVertices(*outlineShader);
+    }
+}
+
+void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+    // Abort early.
+    if (!bucket.hasData()) return;
+
+    auto fill_properties = map.getStyle().computed.fills;
+    auto fill_properties_it = fill_properties.find(layer_name);
+    if (fill_properties_it == fill_properties.end()) return;
+
+    const FillProperties& properties = fill_properties_it->second;
+    if (!properties.enabled) return;
+
+
+    if (properties.prerendered) {
+        if (pass == Translucent) {
+            // Buffer value around the 0..4096 extent that will be drawn into the 256x256 pixel
+            // texture. We later scale 
+            const int buffer = 256;
+
+            if (!bucket.prerendered) {
+                bucket.prerendered = std::make_unique<PrerenderedTexture>();
+                glDisable(GL_DEPTH_TEST);
+                glDisable(GL_STENCIL_TEST);
+
+                bucket.prerendered->bindFramebuffer();
+                // Render the actual tile.
+#if GL_EXT_discard_framebuffer
+                const GLenum discards[] = { GL_COLOR_ATTACHMENT0 };
+                glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+#endif
+                glClear(GL_COLOR_BUFFER_BIT);
+
+                glViewport(0, 0, 256, 256);
+
+
+                // When drawing the fill, we want to draw a 16.66% buffer around too, so we
+                // essentially downscale everyting, and then upscale it later when rendering.
+
+                mat4 vtxMatrix;
+                matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
+                matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
+
+                pass = Opaque;
+                renderFill(bucket, properties, id, vtxMatrix);
+                pass = Translucent;
+                renderFill(bucket, properties, id, vtxMatrix);
+
+
+
+                // BLUR
+
+                GLuint original_texture = bucket.prerendered->getTexture();
+
+                GLuint secondary_texture;
+                glGenTextures(1, &secondary_texture);
+                glBindTexture(GL_TEXTURE_2D, secondary_texture);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+                glBindTexture(GL_TEXTURE_2D, 0);
+
+
+                useProgram(gaussianShader->program);
+                gaussianShader->setMatrix(vtxMatrix);
+                gaussianShader->setImage(0);
+                glActiveTexture(GL_TEXTURE0);
+
+                const GLenum discards[] = { GL_COLOR_ATTACHMENT0 };
+
+                for (int i = 0; i < 1   ; i++) {
+                    // Render horizontal
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, secondary_texture, 0);
+#if GL_EXT_discard_framebuffer
+                    glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+#endif
+                    glClear(GL_COLOR_BUFFER_BIT);
+
+                    gaussianShader->setOffset({{ 1.0f / 256.0f, 0 }});
+                    glBindTexture(GL_TEXTURE_2D, original_texture);
+                    coveringGaussianArray.bind(*gaussianShader, tileStencilBuffer, BUFFER_OFFSET(0));
+                    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
+
+
+
+                    // Render vertical
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, original_texture, 0);
+#if GL_EXT_discard_framebuffer
+                    glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+#endif
+                    glClear(GL_COLOR_BUFFER_BIT);
+
+                    gaussianShader->setOffset({{ 0, 1.0f / 256.0f }});
+                    glBindTexture(GL_TEXTURE_2D, secondary_texture);
+                    coveringGaussianArray.bind(*gaussianShader, tileStencilBuffer, BUFFER_OFFSET(0));
+                    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
+                }
+
+                glDeleteTextures(1, &secondary_texture);
+
+
+
+
+
+                // RENDER DEBUG FRAME
+                useProgram(plainShader->program);
+
+                plainShader->setMatrix(vtxMatrix);
+
+                // draw tile outline
+                tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
+                plainShader->setColor(0, 1, 1, 1);
+                lineWidth(2);
+                glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index());
+
+
+
+                // RESET STATE
+
+
+                bucket.prerendered->unbindFramebuffer();
+                glEnable(GL_DEPTH_TEST);
+                glEnable(GL_STENCIL_TEST);
+
+                glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
+            }
+
+            // draw the texture on a quad
+            depthMask(false);
+
+            useProgram(rasterShader->program);
+            rasterShader->setMatrix(matrix);
+            rasterShader->setOpacity(1);
+
+            glDepthRange(strata, 1.0f);
+
+            glActiveTexture(GL_TEXTURE0);
+            rasterShader->setImage(0);
+            rasterShader->setBuffer(0);
+            bucket.prerendered->bindTexture();
+            coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
+            glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
+
+            depthMask(true);
+        }
+    } else {
+        const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
+        renderFill(bucket, properties, id, vtxMatrix);
     }
 }

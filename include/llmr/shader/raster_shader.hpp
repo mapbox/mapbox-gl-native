@@ -13,6 +13,7 @@ public:
 
     void setImage(int32_t image);
     void setOpacity(float opacity);
+    void setBuffer(float buffer);
 
 private:
     int32_t a_pos = -1;
@@ -22,6 +23,9 @@ private:
 
     float opacity = 0;
     int32_t u_opacity = -1;
+
+    float buffer = 0;
+    int32_t u_buffer = -1;
 };
 
 }

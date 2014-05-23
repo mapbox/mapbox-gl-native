@@ -18,6 +18,7 @@ void Painter::renderRaster(RasterBucket& bucket, const std::string& layer_name, 
 
     useProgram(rasterShader->program);
     rasterShader->setMatrix(matrix);
+    rasterShader->setBuffer(0);
     rasterShader->setOpacity(1);
     // rasterShader->setOpacity(properties.opacity * tile_data->raster->opacity);
 

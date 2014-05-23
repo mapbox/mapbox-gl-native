@@ -19,6 +19,7 @@
 #include <llmr/shader/text_shader.hpp>
 #include <llmr/shader/dot_shader.hpp>
 #include <llmr/shader/composite_shader.hpp>
+#include <llmr/shader/gaussian_shader.hpp>
 
 #include <llmr/map/transform_state.hpp>
 
@@ -77,6 +78,7 @@ public:
 
     void renderDebugText(DebugBucket& bucket);
     void renderDebugText(const std::vector<std::string> &strings);
+    void renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &mat);
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderIcon(IconBucket& bucket, const std::string& layer_name, const Tile::ID& id);
@@ -148,6 +150,7 @@ private:
     std::unique_ptr<TextShader> textShader;
     std::unique_ptr<DotShader> dotShader;
     std::unique_ptr<CompositeShader> compositeShader;
+    std::unique_ptr<GaussianShader> gaussianShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     VertexBuffer tileStencilBuffer = {
@@ -165,6 +168,7 @@ private:
     VertexArrayObject coveringPlainArray;
     VertexArrayObject coveringPatternArray;
     VertexArrayObject coveringRasterArray;
+    VertexArrayObject coveringGaussianArray;
 
     VertexArrayObject compositeArray;
     VertexArrayObject matteArray;

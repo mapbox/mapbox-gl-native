@@ -132,10 +132,10 @@ void Map::cleanup(uv_async_t *async) {
 void Map::render(uv_async_t *async) {
     Map *map = static_cast<Map *>(async->data);
 
-    map->prepare();
 
     if (map->state.hasSize()) {
         if (map->is_rendered.test_and_set() == false) {
+            map->prepare();
             if (map->is_clean.test_and_set() == false) {
                 map->render();
                 map->is_swapped.clear();
