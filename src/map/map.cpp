@@ -374,17 +374,15 @@ bool Map::getDebug() const {
 }
 
 void Map::toggleRaster() {
+    style.setDefaultTransitionDuration(300);
+    style.cancelTransitions();
+
     auto it = sources.find("satellite");
     if (it != sources.end()) {
         Source &satellite_source = *it->second;
-
         if (satellite_source.enabled) {
             satellite_source.enabled = false;
-
-            auto style_class = style.appliedClasses.find("satellite");
-            if (style_class != style.appliedClasses.end()) {
-                style.appliedClasses.erase(style_class);
-            }
+            style.appliedClasses.erase("satellite");
         } else {
             satellite_source.enabled = true;
             style.appliedClasses.insert("satellite");
@@ -427,12 +425,11 @@ void Map::updateRenderState() {
 void Map::prepare() {
     view.make_active();
 
-    // Update transitions
+    // Update transform transitions.
     animationTime = util::now();
     if (transform.needsTransition()) {
         transform.updateTransitions(animationTime);
     }
-
 
     const TransformState oldState = state;
     state = transform.currentState();
@@ -440,10 +437,8 @@ void Map::prepare() {
     bool pixelRatioChanged = oldState.getPixelRatio() != state.getPixelRatio();
     bool dimensionsChanged = oldState.getFramebufferWidth() != state.getFramebufferWidth() ||
                              oldState.getFramebufferHeight() != state.getFramebufferHeight();
-    bool zoomChanged = oldState.getNormalizedZoom() != state.getNormalizedZoom();
 
     if (pixelRatioChanged) {
-        // We have a pixelratio change
         style.sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
         style.sprite->load(kSpriteURL);
 
@@ -454,8 +449,13 @@ void Map::prepare() {
         painter.clearFramebuffers();
     }
 
-    if (zoomChanged) {
-        style.cascade(state.getNormalizedZoom());
+    style.cascade(state.getNormalizedZoom());
+
+    // Update style transitions.
+    animationTime = util::now();
+    if (style.needsTransition()) {
+        style.updateTransitions(animationTime);
+        update();
     }
 
     // Allow the sprite atlas to potentially pull new sprite images if needed.

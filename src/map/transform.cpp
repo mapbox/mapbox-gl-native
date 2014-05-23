@@ -12,6 +12,7 @@ using namespace llmr;
 const double D2R = M_PI / 180.0;
 const double R2D = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
+const double MIN_ROTATE_SCALE = 8;
 
 Transform::Transform() {
     setScale(current.scale);
@@ -32,6 +33,8 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         current.pixelRatio = final.pixelRatio = ratio;
         current.framebuffer[0] = final.framebuffer[0] = fb_w;
         current.framebuffer[1] = final.framebuffer[1] = fb_h;
+        constrain(current.scale, current.y);
+        if (current.scale < MIN_ROTATE_SCALE && current.angle) _setAngle(0, 0);
         return true;
     } else {
         return false;
@@ -52,6 +55,8 @@ void Transform::_moveBy(const double dx, const double dy, const time duration) {
     final.x = current.x + std::cos(current.angle) * dx + std::sin(current.angle) * dy;
     final.y = current.y + std::cos(current.angle) * dy + std::sin(-current.angle) * dx;
 
+    constrain(final.scale, final.y);
+
     if (duration == 0) {
         current.x = final.x;
         current.y = final.y;
@@ -59,9 +64,9 @@ void Transform::_moveBy(const double dx, const double dy, const time duration) {
         // Use a common start time for all of the transitions to avoid divergent transitions.
         time start = util::now();
         transitions.emplace_front(
-            std::make_shared<util::ease_transition>(current.x, final.x, current.x, start, duration));
+            std::make_shared<util::ease_transition<double>>(current.x, final.x, current.x, start, duration));
         transitions.emplace_front(
-            std::make_shared<util::ease_transition>(current.y, final.y, current.y, start, duration));
+            std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
     }
 }
 
@@ -243,6 +248,11 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     final.x = xn;
     final.y = yn;
 
+    constrain(final.scale, final.y);
+
+    // Undo rotation at low zooms.
+    if (final.scale < MIN_ROTATE_SCALE && current.angle) _setAngle(0, 500_milliseconds);
+
     if (duration == 0) {
         current.scale = final.scale;
         current.x = final.x;
@@ -250,18 +260,31 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     } else {
         // Use a common start time for all of the transitions to avoid divergent transitions.
         time start = util::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition>(
+        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
             current.scale, final.scale, current.scale, start, duration));
         transitions.emplace_front(
-            std::make_shared<util::ease_transition>(current.x, final.x, current.x, start, duration));
+            std::make_shared<util::ease_transition<double>>(current.x, final.x, current.x, start, duration));
         transitions.emplace_front(
-            std::make_shared<util::ease_transition>(current.y, final.y, current.y, start, duration));
+            std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
     }
 
     const double s = final.scale * util::tileSize;
     zc = s / 2;
     Bc = s / 360;
     Cc = s / (2 * M_PI);
+}
+
+#pragma mark - Constraints
+
+void Transform::constrain(double& scale, double& y) {
+    // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.
+    if (scale < (current.height / util::tileSize)) scale = (current.height / util::tileSize);
+
+    // Constrain min/max vertical pan to avoid showing off-world areas.
+    double max_y = ((scale * util::tileSize) - current.height) / 2;
+
+    if (y > max_y) y = max_y;
+    if (y < -max_y) y = -max_y;
 }
 
 #pragma mark - Angle
@@ -331,11 +354,14 @@ void Transform::_setAngle(double new_angle, const time duration) {
 
     final.angle = new_angle;
 
+    // Prevent rotation at low zooms.
+    if (final.scale < MIN_ROTATE_SCALE) final.angle = 0;
+
     if (duration == 0) {
         current.angle = final.angle;
     } else {
         time start = util::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition>(
+        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
             current.angle, final.angle, current.angle, start, duration));
     }
 }

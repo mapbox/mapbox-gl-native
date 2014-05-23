@@ -68,6 +68,8 @@ private:
     void _clearRotating();
     void _clearScaling();
 
+    void constrain(double& scale, double& y);
+
 private:
     mutable uv::rwlock mtx;
 

@@ -186,11 +186,18 @@ module.exports = {
             "value": "rock",
             "type": "fill"
         },
+        "landuse_snow": {
+            "source": "outdoors",
+            "layer": "landuse",
+            "field": "class",
+            "value": "snow",
+            "type": "fill"
+        },
         "overlay_wetland": {
             "source": "outdoors",
             "layer": "landuse_overlay",
             "field": "class",
-            "value": "wetland",
+            "value": ["wetland", "wetland_noveg"],
             "type": "fill"
         },
         "overlay_breakwater_pier": {
@@ -889,6 +896,10 @@ module.exports = {
             "bucket": "landuse_rock"
         },
         {
+            "name": "landuse_snow",
+            "bucket": "landuse_snow"
+        },
+        {
             "name": "landuse_hospital",
             "bucket": "landuse_hospital"
         },
@@ -1322,9 +1333,9 @@ module.exports = {
         "water": "#cdd",
         "water_dark": "#185869",
         "crop": "#eeeed4",
-        "grass": "#e7ebd1",
-        "scrub": "#e0e8cd",
-        "wood": "#d4e2c6",
+        "grass": "#e6e6cc",
+        "scrub": "#dfe5c8",
+        "wood": "#cee2bd",
         "snow": "#f4f8ff",
         "rock": "#ddd",
         "sand": "#ffd",
@@ -2257,6 +2268,10 @@ module.exports = {
                     "translate": [0, 14]
                 },
                 "poi_aerodrome": {
+                    "opacity": ["stops",
+                        {"z": 13, "val": 0},
+                        {"z": 13.25, "val": 1}
+                    ],
                     "antialias": false
                 }
             }
@@ -2949,6 +2964,10 @@ module.exports = {
                     "translate": [0, 14]
                 },
                 "poi_aerodrome": {
+                    "opacity": ["stops",
+                        {"z": 13, "val": 0},
+                        {"z": 13.25, "val": 1}
+                    ],
                     "antialias": false
                 }
             }
