@@ -121,7 +121,7 @@
           'shaders',
       ],
       'sources': [
-        '<!@(find src -name "*.cpp")',
+        '<!@(find src/style/ \( -name "*.cpp" ! -name resources.cpp \))',
         '<!@(find src -name "*.c")',
         '<!@(find src -name "*.h")',
         '<!@(find include -name "*.hpp")',
