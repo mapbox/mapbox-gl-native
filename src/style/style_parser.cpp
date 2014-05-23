@@ -235,8 +235,9 @@ void StyleParser::parseConstants(JSVal value) {
     if (value.IsObject()) {
         rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
         for (; itr != value.MemberEnd(); ++itr) {
+            std::string memberName = { itr->name.GetString(), itr->name.GetStringLength() };
             constants.emplace(
-                std::forward<std::string>({ itr->name.GetString(), itr->name.GetStringLength() }),
+                std::forward<std::string>(memberName),
                 &itr->value
             );
         }
@@ -373,16 +374,20 @@ std::string StyleParser::parseString(JSVal value) {
     return { value.GetString(), value.GetStringLength() };
 }
 
-const JSVal& StyleParser::replaceConstant(const JSVal& value) {
-    if (value.IsString()) {
-        const std::string string_value { value.GetString(), value.GetStringLength() };
-        auto it = constants.find(string_value);
+const JSVal& StyleParser::replaceConstant(const JSVal& possibleConstant) {
+
+    // Attempt to retrieve the value from the constants map for the given key string
+    if (possibleConstant.IsString()) {
+        const std::string key { possibleConstant.GetString(), possibleConstant.GetStringLength() };
+        auto it = constants.find(key);
         if (it != constants.end()) {
+            // The possible constant is indeed a key in the constants map, so "replace" it by returning the associated value
             return *it->second;
         }
     }
 
-    return value;
+    // The possibleConstant was not actually a constant, so return it as-is with no "replacement"
+    return possibleConstant;
 }
 
 std::vector<FunctionProperty> StyleParser::parseArray(JSVal value, uint16_t expected_count) {
@@ -428,14 +433,15 @@ Color StyleParser::parseColor(JSVal value) {
         throw Style::exception("color value must be a string");
     }
 
-    CSSColorParser::Color css_color = CSSColorParser::parse({ rvalue.GetString(), rvalue.GetStringLength() });
-
-    // Premultiply the color.
+    // Parse and premultiply the color, using local variables so the values are easy to check in the debugger.
+    const char * c_color_string = rvalue.GetString();
+    CSSColorParser::Color css_color = CSSColorParser::parse({ c_color_string, rvalue.GetStringLength()});
     const float factor = css_color.a / 255;
-    return {{(float)css_color.r * factor,
-             (float)css_color.g * factor,
-             (float)css_color.b * factor,
-             css_color.a}};
+    float red   = (float)css_color.r * factor;
+    float green = (float)css_color.g * factor;
+    float blue  = (float)css_color.b * factor;
+    float alpha = css_color.a;
+    return {{red, green, blue, alpha}};
 }
 
 FunctionProperty::fn StyleParser::parseFunctionType(JSVal type) {
@@ -503,6 +509,31 @@ FunctionProperty StyleParser::parseFunction(JSVal value) {
     } else if (rvalue.IsNumber()) {
         property.function = &functions::constant;
         property.values.push_back(rvalue.GetDouble());
+
+    } else if (rvalue.IsObject()) {
+
+        // TODO: implement linear, exponential, min, max, or whatever else is missing
+
+        // Handle the v1 object syntax for the stops function
+        if (rvalue.HasMember("fn") && rvalue["fn"].IsString() && rvalue["fn"].GetString() == std::string("stops")) {
+            if ( rvalue.HasMember("stops") && rvalue["stops"].IsArray()) {
+                for (rapidjson::SizeType i = 1; i < rvalue["stops"].Size(); ++i) {
+                    JSVal stop = rvalue["stops"][i];
+                    rapidjson::SizeType z = 0;
+                    rapidjson::SizeType v = 1;
+                    if (stop.IsArray() && stop.Size() == 2 && stop[z].IsNumber() && stop[v].IsNumber()) {
+                        double zoomStop    = stop[z].GetDouble();
+                        double valueAtZoom = stop[v].GetDouble();
+                        property.values.push_back(zoomStop);
+                        property.values.push_back(valueAtZoom);
+                    } else {
+                        throw Style::exception("inner arrays of the stops function should contain 2 numbers");
+                    }
+                }
+            } else {
+                throw Style::exception("stops function requires a stops array which was either not found or mal-formed");
+            }
+        }
     }
 
     return property;
@@ -515,8 +546,8 @@ FillClass StyleParser::parseFillClass(JSVal value) {
         klass.enabled = parseFunction(value["enabled"]);
     }
 
-    if (value.HasMember("translate")) {
-        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
+    if (value.HasMember("fill-translate")) {
+        std::vector<FunctionProperty> values = parseArray(value["fill-translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
     }
 
@@ -534,16 +565,16 @@ FillClass StyleParser::parseFillClass(JSVal value) {
         klass.stroke_color = klass.fill_color;
     }
 
-    if (value.HasMember("antialias")) {
-        klass.antialias = parseBoolean(value["antialias"]);
+    if (value.HasMember("fill-antialias")) {
+        klass.antialias = parseBoolean(value["fill-antialias"]);
     }
 
-    if (value.HasMember("image")) {
-        klass.image = parseString(value["image"]);
+    if (value.HasMember("fill-image")) {
+        klass.image = parseString(value["fill-image"]);
     }
 
-    if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
+    if (value.HasMember("fill-opacity")) {
+        klass.opacity = parseFunction(value["fill-opacity"]);
     }
 
     return klass;
@@ -556,8 +587,8 @@ LineClass StyleParser::parseLineClass(JSVal value) {
         klass.enabled = parseFunction(value["enabled"]);
     }
 
-    if (value.HasMember("translate")) {
-        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
+    if (value.HasMember("line-translate")) {
+        std::vector<FunctionProperty> values = parseArray(value["line-translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
     }
 
@@ -573,12 +604,12 @@ LineClass StyleParser::parseLineClass(JSVal value) {
         klass.width = parseFunction(value["line-width"]);
     }
 
-    if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
+    if (value.HasMember("line-opacity")) {
+        //klass.opacity = parseFunction(value["line-opacity"]);
     }
 
-    if (value.HasMember("dasharray")) {
-        std::vector<FunctionProperty> values = parseArray(value["dasharray"], 2);
+    if (value.HasMember("line-dasharray")) {
+        std::vector<FunctionProperty> values = parseArray(value["line-dasharray"], 2);
         klass.dash_array = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
     }
 
@@ -613,16 +644,16 @@ IconClass StyleParser::parseIconClass(JSVal value) {
         klass.image = parseString(value["point-image"]);
     }
 
-    if (value.HasMember("size")) {
-        klass.size = parseFunction(value["size"]);
+    if (value.HasMember("point-size")) {
+        klass.size = parseFunction(value["point-size"]);
     }
 
     if (value.HasMember("point-radius")) {
         klass.radius = parseFunction(value["point-radius"]);
     }
 
-    if (value.HasMember("blur")) {
-        klass.blur = parseFunction(value["blur"]);
+    if (value.HasMember("point-blur")) {
+        klass.blur = parseFunction(value["point-blur"]);
     }
 
     return klass;
@@ -635,8 +666,8 @@ TextClass StyleParser::parseTextClass(JSVal value) {
         klass.enabled = parseFunction(value["enabled"]);
     }
 
-    if (value.HasMember("translate")) {
-        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
+    if (value.HasMember("text-translate")) {
+        std::vector<FunctionProperty> values = parseArray(value["text-translate"], 2);
         klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
     }
 
@@ -652,8 +683,8 @@ TextClass StyleParser::parseTextClass(JSVal value) {
         klass.halo = parseColor(value["text-halo-color"]);
     }
 
-    if (value.HasMember("strokeWidth")) {
-        klass.halo_radius = parseFunction(value["strokeWidth"]);
+    if (value.HasMember("text-halo-width")) {
+        klass.halo_radius = parseFunction(value["text-halo-width"]);
     }
 
     if (value.HasMember("strokeBlur")) {
