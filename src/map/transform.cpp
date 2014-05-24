@@ -33,8 +33,8 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         current.pixelRatio = final.pixelRatio = ratio;
         current.framebuffer[0] = final.framebuffer[0] = fb_w;
         current.framebuffer[1] = final.framebuffer[1] = fb_h;
+        if (!canRotate()) _setAngle(0);
         constrain(current.scale, current.y);
-        if (current.scale < MIN_ROTATE_SCALE && current.angle) _setAngle(0, 0);
         return true;
     } else {
         return false;
@@ -56,6 +56,12 @@ void Transform::_moveBy(const double dx, const double dy, const time duration) {
     final.y = current.y + std::cos(current.angle) * dy + std::sin(-current.angle) * dx;
 
     constrain(final.scale, final.y);
+
+    // Un-rotate when rotated and panning far enough to show off-world in corners.
+    double w = final.scale * util::tileSize / 2;
+    double m = std::sqrt(pow((current.width / 2), 2) + pow((current.height / 2), 2));
+    double x = std::abs(sqrt(pow(final.x, 2) + pow(final.y, 2)));
+    if (current.angle && w - x < m) _setAngle(0, 500_milliseconds, true);
 
     if (duration == 0) {
         current.x = final.x;
@@ -197,6 +203,18 @@ void Transform::stopScaling() {
     _clearScaling();
 }
 
+double Transform::getMinZoom() {
+    double test_scale = current.scale;
+    double test_y = current.y;
+    constrain(test_scale, test_y);
+
+    return std::log2(std::fmin(min_scale, test_scale));
+}
+
+double Transform::getMaxZoom() {
+    return std::log2(max_scale);
+}
+
 void Transform::_clearScaling() {
     // This is only called internally, so we don't need a lock here.
 
@@ -251,7 +269,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     constrain(final.scale, final.y);
 
     // Undo rotation at low zooms.
-    if (final.scale < MIN_ROTATE_SCALE && current.angle) _setAngle(0, 500_milliseconds);
+    if (!canRotate() && current.angle) _setAngle(0, 500_milliseconds, true);
 
     if (duration == 0) {
         current.scale = final.scale;
@@ -344,7 +362,7 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
     }
 }
 
-void Transform::_setAngle(double new_angle, const time duration) {
+void Transform::_setAngle(double new_angle, const time duration, bool disable_interaction) {
     // This is only called internally, so we don't need a lock here.
 
     while (new_angle > M_PI)
@@ -355,14 +373,22 @@ void Transform::_setAngle(double new_angle, const time duration) {
     final.angle = new_angle;
 
     // Prevent rotation at low zooms.
-    if (final.scale < MIN_ROTATE_SCALE) final.angle = 0;
+    if (!canRotate()) final.angle = 0;
 
     if (duration == 0) {
         current.angle = final.angle;
+        transitions.remove(interaction_timeout);
+        current.interactive = true;
     } else {
         time start = util::now();
         transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
             current.angle, final.angle, current.angle, start, duration));
+        if (disable_interaction) {
+            transitions.remove(interaction_timeout);
+            current.interactive = false;
+            interaction_timeout = std::make_shared<util::timeout<bool>>(true, current.interactive, start, duration);
+            transitions.emplace_front(interaction_timeout);
+        }
     }
 }
 
@@ -398,6 +424,10 @@ void Transform::_clearRotating() {
         transitions.remove(rotate_timeout);
         rotate_timeout.reset();
     }
+}
+
+bool Transform::canRotate() {
+    return (current.scale >= MIN_ROTATE_SCALE);
 }
 
 #pragma mark - Transition

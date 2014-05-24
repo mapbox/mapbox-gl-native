@@ -73,6 +73,8 @@ public:
     void resetZoom();
     void startScaling();
     void stopScaling();
+    double getMinZoom();
+    double getMaxZoom();
 
     // Rotation
     void rotateBy(double sx, double sy, double ex, double ey, double duration = 0);
@@ -82,6 +84,7 @@ public:
     void resetNorth();
     void startRotating();
     void stopRotating();
+    bool canRotate();
 
     // Debug
     void setDebug(bool value);
