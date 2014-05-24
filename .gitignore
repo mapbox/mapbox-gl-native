@@ -12,3 +12,5 @@
 /include/llmr/shader/shaders.hpp
 /include/llmr/style/resources.hpp
 /src/style/resources.cpp
+/src/shader/shaders_gl.cpp
+/src/shader/shaders_gles2.cpp
