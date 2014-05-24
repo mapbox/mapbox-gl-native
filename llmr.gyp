@@ -21,7 +21,14 @@
           ],
           'action': ['<@(node)', 'bin/build-shaders.js'],
         }
-      ]
+      ],
+      'direct_dependent_settings': {
+        'sources': [
+            'include/llmr/shader/shaders.hpp',
+            'src/shader/shaders_gl.cpp',
+            'src/shader/shaders_gles2.cpp'
+        ]
+      }
     },
     {
       'target_name': 'build_stylesheet',
@@ -121,7 +128,7 @@
           'shaders',
       ],
       'sources': [
-        '<!@(find src -name "*.cpp")',
+        '<!@(find src/ \( -name "*.cpp" ! -name resources.cpp ! -name shaders.hpp ! -name resources.hpp ! -name shaders_gles2.cpp ! -name shaders_gl.cpp \))',
         '<!@(find src -name "*.c")',
         '<!@(find src -name "*.h")',
         '<!@(find include -name "*.hpp")',

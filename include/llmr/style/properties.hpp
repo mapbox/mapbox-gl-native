@@ -7,6 +7,8 @@
 #include <limits>
 #include <set>
 
+#include <boost/optional.hpp>
+
 namespace llmr {
 
 // Stores a premultiplied color, with all four channels ranging from 0..1
@@ -83,21 +85,20 @@ struct FunctionProperty {
 };
 
 struct IconClass {
-    FunctionProperty enabled = true;
-    std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
-    PropertyTransition translate_transition;
-    TranslateAnchor translateAnchor = TranslateAnchor::Map;
-    FunctionProperty size;
-    Color color = {{ 1, 1, 1, 1 }};
-    PropertyTransition color_transition;
-    FunctionProperty opacity = 1;
-    PropertyTransition opacity_transition;
-    std::string image;
-    FunctionProperty radius = 0;
-    PropertyTransition radius_transition;
-    FunctionProperty blur = 0;
-    PropertyTransition blur_transition;
-    std::set<std::string> specifiers;
+    boost::optional<FunctionProperty> enabled;
+    boost::optional<std::array<FunctionProperty, 2>> translate;
+    boost::optional<PropertyTransition> translate_transition;
+    boost::optional<TranslateAnchor> translateAnchor;
+    boost::optional<FunctionProperty> size;
+    boost::optional<Color> color;
+    boost::optional<PropertyTransition> color_transition;
+    boost::optional<FunctionProperty> opacity;
+    boost::optional<PropertyTransition> opacity_transition;
+    boost::optional<std::string> image;
+    boost::optional<FunctionProperty> radius;
+    boost::optional<PropertyTransition> radius_transition;
+    boost::optional<FunctionProperty> blur;
+    boost::optional<PropertyTransition> blur_transition;
 };
 
 struct IconProperties {
@@ -113,21 +114,20 @@ struct IconProperties {
 };
 
 struct LineClass {
-    FunctionProperty enabled = true;
-    std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
-    PropertyTransition translate_transition;
-    TranslateAnchor translateAnchor = TranslateAnchor::Map;
-    FunctionProperty width;
-    PropertyTransition width_transition;
-    FunctionProperty offset;
-    PropertyTransition offset_transition;
-    Color color = {{ 0, 0, 0, 1 }};
-    PropertyTransition color_transition;
-    std::array<FunctionProperty, 2> dash_array = {{ 1, -1 }};
-    PropertyTransition dash_array_transition;
-    FunctionProperty opacity = 1;
-    PropertyTransition opacity_transition;
-    std::set<std::string> specifiers;
+    boost::optional<FunctionProperty> enabled;
+    boost::optional<std::array<FunctionProperty, 2>> translate;
+    boost::optional<PropertyTransition> translate_transition;
+    boost::optional<TranslateAnchor> translateAnchor;
+    boost::optional<FunctionProperty> width;
+    boost::optional<PropertyTransition> width_transition;
+    boost::optional<FunctionProperty> offset;
+    boost::optional<PropertyTransition> offset_transition;
+    boost::optional<Color> color;
+    boost::optional<PropertyTransition> color_transition;
+    boost::optional<std::array<FunctionProperty, 2>> dash_array;
+    boost::optional<PropertyTransition> dash_array_transition;
+    boost::optional<FunctionProperty> opacity;
+    boost::optional<PropertyTransition> opacity_transition;
 };
 
 struct LineProperties {
@@ -142,20 +142,19 @@ struct LineProperties {
 };
 
 struct FillClass {
-    FunctionProperty enabled = true;
-    std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
-    PropertyTransition translate_transition;
-    TranslateAnchor translateAnchor = TranslateAnchor::Map;
-    Winding winding = Winding::NonZero;
-    FunctionProperty antialias = true;
-    Color fill_color = {{ 0, 0, 0, 1 }};
-    PropertyTransition fill_color_transition;
-    Color stroke_color = {{ 0, 0, 0, std::numeric_limits<float>::infinity() }};
-    PropertyTransition stroke_color_transition;
-    FunctionProperty opacity = 1;
-    PropertyTransition opacity_transition;
-    std::string image;
-    std::set<std::string> specifiers;
+    boost::optional<FunctionProperty> enabled;
+    boost::optional<std::array<FunctionProperty, 2>> translate;
+    boost::optional<PropertyTransition> translate_transition;
+    boost::optional<TranslateAnchor> translateAnchor;
+    boost::optional<Winding> winding;
+    boost::optional<FunctionProperty> antialias;
+    boost::optional<Color> fill_color;
+    boost::optional<PropertyTransition> fill_color_transition;
+    boost::optional<Color> stroke_color;
+    boost::optional<PropertyTransition> stroke_color_transition;
+    boost::optional<FunctionProperty> opacity;
+    boost::optional<PropertyTransition> opacity_transition;
+    boost::optional<std::string> image;
 };
 
 struct FillProperties {
@@ -171,24 +170,23 @@ struct FillProperties {
 };
 
 struct TextClass {
-    FunctionProperty enabled = true;
-    std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
-    PropertyTransition translate_transition;
-    TranslateAnchor translateAnchor = TranslateAnchor::Map;
-    Color color = {{ 0, 0, 0, 1 }};
-    PropertyTransition color_transition;
-    Color halo = {{ 1, 1, 1, 0.75 }};
-    PropertyTransition halo_transition;
-    FunctionProperty halo_radius = 0.25f;
-    PropertyTransition halo_radius_transition;
-    FunctionProperty halo_blur = 1.0f;
-    PropertyTransition halo_blur_transition;
-    FunctionProperty size = 12.0f;
-    FunctionProperty rotate = 0.0f;
-    FunctionProperty always_visible = false;
-    FunctionProperty opacity = 1;
-    PropertyTransition opacity_transition;
-    std::set<std::string> specifiers;
+    boost::optional<FunctionProperty> enabled;
+    boost::optional<std::array<FunctionProperty, 2>> translate;
+    boost::optional<PropertyTransition> translate_transition;
+    boost::optional<TranslateAnchor> translateAnchor;
+    boost::optional<Color> color;
+    boost::optional<PropertyTransition> color_transition;
+    boost::optional<Color> halo;
+    boost::optional<PropertyTransition> halo_transition;
+    boost::optional<FunctionProperty> halo_radius;
+    boost::optional<PropertyTransition> halo_radius_transition;
+    boost::optional<FunctionProperty> halo_blur;
+    boost::optional<PropertyTransition> halo_blur_transition;
+    boost::optional<FunctionProperty> size;
+    boost::optional<FunctionProperty> rotate;
+    boost::optional<FunctionProperty> always_visible;
+    boost::optional<FunctionProperty> opacity;
+    boost::optional<PropertyTransition> opacity_transition;
 };
 
 struct TextProperties {
@@ -206,11 +204,10 @@ struct TextProperties {
 };
 
 struct BackgroundClass {
-    Color color = {{ 1, 1, 1, 1 }};
-    PropertyTransition color_transition;
-    FunctionProperty opacity = 1;
-    PropertyTransition opacity_transition;
-    std::set<std::string> specifiers;
+    boost::optional<Color> color;
+    boost::optional<PropertyTransition> color_transition;
+    boost::optional<FunctionProperty> opacity;
+    boost::optional<PropertyTransition> opacity_transition;
 };
 
 struct BackgroundProperties {
@@ -219,12 +216,11 @@ struct BackgroundProperties {
 };
 
 struct RasterClass {
-    FunctionProperty enabled = true;
-    std::array<FunctionProperty, 2> translate = {{ 0, 0 }};
-    PropertyTransition translate_transition;
-    FunctionProperty opacity = 1;
-    PropertyTransition opacity_transition;
-    std::set<std::string> specifiers;
+    boost::optional<FunctionProperty> enabled;
+    boost::optional<std::array<FunctionProperty, 2>> translate;
+    boost::optional<PropertyTransition> translate_transition;
+    boost::optional<FunctionProperty> opacity;
+    boost::optional<PropertyTransition> opacity_transition;
 };
 
 struct RasterProperties {
@@ -234,10 +230,9 @@ struct RasterProperties {
 };
 
 struct CompositeClass {
-    FunctionProperty enabled = true;
-    FunctionProperty opacity = 1;
-    PropertyTransition opacity_transition;
-    std::set<std::string> specifiers;
+    boost::optional<FunctionProperty> enabled;
+    boost::optional<FunctionProperty> opacity;
+    boost::optional<PropertyTransition> opacity_transition;
 };
 
 struct CompositeProperties {
