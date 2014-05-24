@@ -2,9 +2,8 @@
 'use strict';
 
 var path = require('path');
-
-var lazy_update = require('./lazy-update');
-
+var fs = require('fs');
+var mkdirp = require('./mkdirp');
 var name = 'style';
 var data = JSON.stringify(require(path.join(process.cwd(), process.argv[2])));
 
@@ -26,7 +25,9 @@ header += '}\n';
 header += '\n';
 header += '#endif\n';
 
-lazy_update('include/llmr/style/resources.hpp', header);
+var header_path = path.join(process.argv[3], 'include/llmr/style/resources.hpp');
+mkdirp.sync(path.dirname(header_path));
+fs.writeFileSync(header_path, header);
 
 var code = '// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.\n';
 code += '#include <llmr/style/resources.hpp>\n';
@@ -36,5 +37,6 @@ code += '\n';
 code += 'const unsigned char resources::' + name + '[] = R"JSON(' + data + ')JSON";\n';
 code += 'const unsigned long resources::' + name + '_size = sizeof(resources::' + name + ');\n';
 
-lazy_update('src/style/resources.cpp', code);
-
+var file_path = path.join(process.argv[3], 'src/style/resources.cpp');
+mkdirp.sync(path.dirname(file_path));
+fs.writeFileSync(file_path, code);
