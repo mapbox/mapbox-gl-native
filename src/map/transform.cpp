@@ -35,6 +35,7 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         current.framebuffer[1] = final.framebuffer[1] = fb_h;
         if (!canRotate()) _setAngle(0);
         constrain(current.scale, current.y);
+        platform::notify_map_change();
         return true;
     } else {
         return false;
@@ -74,6 +75,8 @@ void Transform::_moveBy(const double dx, const double dy, const time duration) {
         transitions.emplace_front(
             std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
     }
+
+    platform::notify_map_change();
 }
 
 void Transform::setLonLat(const double lon, const double lat, const time duration) {
@@ -290,6 +293,8 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     zc = s / 2;
     Bc = s / 360;
     Cc = s / (2 * M_PI);
+
+    platform::notify_map_change();
 }
 
 #pragma mark - Constraints
@@ -390,6 +395,8 @@ void Transform::_setAngle(double new_angle, const time duration, bool disable_in
             transitions.emplace_front(interaction_timeout);
         }
     }
+
+    platform::notify_map_change();
 }
 
 double Transform::getAngle() const {
