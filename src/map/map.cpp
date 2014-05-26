@@ -312,6 +312,14 @@ void Map::stopScaling() {
     update();
 }
 
+double Map::getMinZoom() {
+    return transform.getMinZoom();
+}
+
+double Map::getMaxZoom() {
+    return transform.getMaxZoom();
+}
+
 
 #pragma mark - Rotation
 
@@ -354,6 +362,10 @@ void Map::startRotating() {
 void Map::stopRotating() {
     transform.stopRotating();
     update();
+}
+
+bool Map::canRotate() {
+    return transform.canRotate();
 }
 
 

@@ -5,8 +5,6 @@
 #include <uv.h>
 
 #include <llmr/map/view.hpp>
-// #include <llmr/map/tile.hpp>
-// #include <llmr/map/tile_data.hpp>
 #include <llmr/map/transform.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/geometry/glyph_atlas.hpp>
@@ -75,6 +73,8 @@ public:
     void resetZoom();
     void startScaling();
     void stopScaling();
+    double getMinZoom();
+    double getMaxZoom();
 
     // Rotation
     void rotateBy(double sx, double sy, double ex, double ey, double duration = 0);
@@ -84,6 +84,7 @@ public:
     void resetNorth();
     void startRotating();
     void stopRotating();
+    bool canRotate();
 
     // Debug
     void setDebug(bool value);

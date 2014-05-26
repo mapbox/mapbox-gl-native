@@ -39,6 +39,9 @@ public:
     // Changing
     bool isChanging() const;
 
+    // Interactive
+    bool isInteractive() const;
+
 private:
     double pixel_x() const;
     double pixel_y() const;
@@ -57,6 +60,7 @@ private:
     bool rotating = false;
     bool scaling = false;
     bool panning = false;
+    bool interactive = true;
 
     // map position
     double x = 0, y = 0;

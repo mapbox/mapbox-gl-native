@@ -2,7 +2,7 @@
 #include <llmr/util/unitbezier.hpp>
 #include <llmr/platform/platform.hpp>
 
-using namespace llmr::util;
+namespace llmr { namespace util {
 
 UnitBezier ease(0.25, 0.1, 0.25, 1);
 
@@ -74,3 +74,5 @@ transition::state ease_transition<std::array<float, 2>>::update(llmr::time now) 
         return running;
     }
 }
+
+}}

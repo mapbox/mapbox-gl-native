@@ -32,6 +32,9 @@ std::shared_ptr<Request> request_http(const std::string &url,
 // Cancels an HTTP request.
 void cancel_request_http(const std::shared_ptr<Request> &req);
 
+// Notifies a watcher of map x/y/scale/rotation changes.
+void notify_map_change();
+
 // Shows an alpha image with the specified dimensions in a named window.
 void show_debug_image(std::string name, const char *data, size_t width, size_t height);
 

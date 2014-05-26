@@ -37,16 +37,19 @@ public:
     void setZoom(double zoom, time duration = 0);
     double getZoom() const;
     double getScale() const;
-    void startRotating();
-    void stopRotating();
+    void startScaling();
+    void stopScaling();
+    double getMinZoom();
+    double getMaxZoom();
 
     // Angle
     void rotateBy(double sx, double sy, double ex, double ey, time duration = 0);
     void setAngle(double angle, time duration = 0);
     void setAngle(double angle, double cx, double cy);
     double getAngle() const;
-    void startScaling();
-    void stopScaling();
+    void startRotating();
+    void stopRotating();
+    bool canRotate();
 
     // Transitions
     bool needsTransition() const;
@@ -63,7 +66,7 @@ private:
     void _moveBy(double dx, double dy, time duration = 0);
     void _setScale(double scale, double cx, double cy, time duration = 0);
     void _setScaleXY(double new_scale, double xn, double yn, time duration = 0);
-    void _setAngle(double angle, time duration = 0);
+    void _setAngle(double angle, time duration = 0, bool disable_interaction = false);
     void _clearPanning();
     void _clearRotating();
     void _clearScaling();
@@ -93,6 +96,7 @@ private:
     std::shared_ptr<util::transition> scale_timeout;
     std::shared_ptr<util::transition> rotate_timeout;
     std::shared_ptr<util::transition> pan_timeout;
+    std::shared_ptr<util::transition> interaction_timeout;
 };
 
 }
