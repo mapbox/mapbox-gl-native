@@ -197,7 +197,9 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                 renderFill(bucket, modifiedProperties, id, vtxMatrix);
 
 
-                bucket.prerendered->blur(*this, properties.prerenderBlur);
+                if (properties.prerenderBlur > 0) {
+                    bucket.prerendered->blur(*this, properties.prerenderBlur);
+                }
 
 
                 // RESET STATE
