@@ -94,7 +94,7 @@ struct GenericClass {
     boost::optional<bool> prerender;
     boost::optional<float> prerenderBuffer;
     boost::optional<uint16_t> prerenderSize;
-    boost::optional<bool> prerenderBlur;
+    boost::optional<uint16_t> prerenderBlur;
 };
 
 struct GenericProperties {
@@ -105,7 +105,7 @@ struct GenericProperties {
     bool prerender = false;
     float prerenderBuffer = 1.0f / 32.0f;
     uint16_t prerenderSize = 256;
-    bool prerenderBlur = false;
+    uint16_t prerenderBlur = 0;
 };
 
 struct IconClass : public GenericClass {

@@ -533,7 +533,7 @@ void StyleParser::parseGenericClass(GenericClass &klass, JSVal value) {
     }
 
     if (value.HasMember("prerender-blur")) {
-        klass.prerenderBlur = parseBoolean(value["prerender-blur"]);
+        klass.prerenderBlur = toNumber<uint64_t>(parseValue(value["prerender-blur"]));
     }
 }
 

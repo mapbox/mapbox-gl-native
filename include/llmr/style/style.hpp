@@ -68,6 +68,8 @@ private:
     uint64_t transitionDuration(std::string layer_name, TransitionablePropertyKey key);
     uint64_t transitionDelay(std::string layer_name, TransitionablePropertyKey key);
 
+    void cascadeProperties(GenericProperties &properties, const GenericClass& klass, const std::string& layer_name, const std::string& class_name, float z);
+
 private:
     // Last applied settings.
     struct {
