@@ -74,15 +74,15 @@ void Style::cascade(float z) {
 
     time start = util::now();
 
-    previous.fills = computed.fills;
-    previous.lines = computed.lines;
-    previous.icons = computed.icons;
-    previous.texts = computed.texts;
-    previous.rasters = computed.rasters;
-    previous.composites = computed.composites;
+    previous.fills.swap(computed.fills);
+    previous.lines.swap(computed.lines);
+    previous.icons.swap(computed.icons);
+    previous.texts.swap(computed.texts);
+    previous.rasters.swap(computed.rasters);
+    previous.composites.swap(computed.composites);
     previous.background = computed.background;
 
-    previous.effective_classes = computed.effective_classes;
+    previous.effective_classes.swap(computed.effective_classes);
 
     reset();
 

@@ -12,6 +12,7 @@
 #include <llmr/util/uv.hpp>
 
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include <set>
 #include <memory>
@@ -52,12 +53,12 @@ public:
     std::set<std::string> appliedClasses;
     struct {
         BackgroundProperties background;
-        std::map<std::string, FillProperties> fills;
-        std::map<std::string, LineProperties> lines;
-        std::map<std::string, IconProperties> icons;
-        std::map<std::string, TextProperties> texts;
-        std::map<std::string, RasterProperties> rasters;
-        std::map<std::string, CompositeProperties> composites;
+        std::unordered_map<std::string, FillProperties> fills;
+        std::unordered_map<std::string, LineProperties> lines;
+        std::unordered_map<std::string, IconProperties> icons;
+        std::unordered_map<std::string, TextProperties> texts;
+        std::unordered_map<std::string, RasterProperties> rasters;
+        std::unordered_map<std::string, CompositeProperties> composites;
         std::map<std::string, std::map<TransitionablePropertyKey, std::string>> effective_classes;
     } computed;
 
@@ -74,24 +75,24 @@ private:
     // Last applied settings.
     struct {
         BackgroundProperties background;
-        std::map<std::string, FillProperties> fills;
-        std::map<std::string, LineProperties> lines;
-        std::map<std::string, IconProperties> icons;
-        std::map<std::string, TextProperties> texts;
-        std::map<std::string, RasterProperties> rasters;
-        std::map<std::string, CompositeProperties> composites;
+        std::unordered_map<std::string, FillProperties> fills;
+        std::unordered_map<std::string, LineProperties> lines;
+        std::unordered_map<std::string, IconProperties> icons;
+        std::unordered_map<std::string, TextProperties> texts;
+        std::unordered_map<std::string, RasterProperties> rasters;
+        std::unordered_map<std::string, CompositeProperties> composites;
         std::map<std::string, std::map<TransitionablePropertyKey, std::string>> effective_classes;
     } previous;
 
     // Settings values currently being transitioned.
     struct {
         BackgroundProperties background;
-        std::map<std::string, FillProperties> fills;
-        std::map<std::string, LineProperties> lines;
-        std::map<std::string, IconProperties> icons;
-        std::map<std::string, TextProperties> texts;
-        std::map<std::string, RasterProperties> rasters;
-        std::map<std::string, CompositeProperties> composites;
+        std::unordered_map<std::string, FillProperties> fills;
+        std::unordered_map<std::string, LineProperties> lines;
+        std::unordered_map<std::string, IconProperties> icons;
+        std::unordered_map<std::string, TextProperties> texts;
+        std::unordered_map<std::string, RasterProperties> rasters;
+        std::unordered_map<std::string, CompositeProperties> composites;
     } transitioning;
 
     std::map<std::string, std::map<TransitionablePropertyKey, PropertyTransition>> properties_to_transition;

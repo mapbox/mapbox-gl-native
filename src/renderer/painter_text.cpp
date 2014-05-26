@@ -9,8 +9,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     if (pass == Opaque) return;
     if (!bucket.hasData()) return;
 
-    auto text_properties = map.getStyle().computed.texts;
-    auto text_properties_it = text_properties.find(layer_name);
+    const std::unordered_map<std::string, TextProperties> &text_properties = map.getStyle().computed.texts;
+    const std::unordered_map<std::string, TextProperties>::const_iterator text_properties_it = text_properties.find(layer_name);
     if (text_properties_it == text_properties.end()) return;
 
     const TextProperties& properties = text_properties_it->second;
