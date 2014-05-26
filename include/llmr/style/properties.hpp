@@ -106,6 +106,12 @@ struct GenericProperties {
     float prerenderBuffer = 1.0f / 32.0f;
     uint16_t prerenderSize = 256;
     uint16_t prerenderBlur = 0;
+
+    virtual bool isVisible() const {
+        if (!enabled) { return false; }
+        if (opacity <= 0) { return false; }
+        return true;
+    }
 };
 
 struct IconClass : public GenericClass {
