@@ -157,7 +157,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             // Buffer value around the 0..4096 extent that will be drawn into the 256x256 pixel
             // texture. We later scale the texture so that the actual bounds will align with this
             // tile's bounds. The reason we do this is so that the
-            const int buffer = 128;
+            const int buffer = 4096 * properties.prerenderBuffer;
 
             if (!bucket.prerendered) {
                 bucket.prerendered = std::make_unique<PrerenderedTexture>();
@@ -172,7 +172,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 #endif
                 glClear(GL_COLOR_BUFFER_BIT);
 
-                glViewport(0, 0, 256, 256);
+                glViewport(0, 0, properties.prerenderSize, properties.prerenderSize);
 
 
                 // When drawing the fill, we want to draw a 16.66% buffer around too, so we
@@ -205,7 +205,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, properties.prerenderSize, properties.prerenderSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
                 glBindTexture(GL_TEXTURE_2D, 0);
 
 
@@ -215,7 +215,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                 glActiveTexture(GL_TEXTURE0);
 
 
-                for (int i = 0; i < 1; i++) {
+                for (int i = 0; i < properties.prerenderBlur; i++) {
                     // Render horizontal
                     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, secondary_texture, 0);
 #if GL_EXT_discard_framebuffer
@@ -224,7 +224,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 #endif
                     glClear(GL_COLOR_BUFFER_BIT);
 
-                    gaussianShader->setOffset({{ 1.0f / 256.0f, 0 }});
+                    gaussianShader->setOffset({{ 1.0f / float(properties.prerenderSize), 0 }});
                     glBindTexture(GL_TEXTURE_2D, original_texture);
                     coveringGaussianArray.bind(*gaussianShader, tileStencilBuffer, BUFFER_OFFSET(0));
                     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
@@ -238,7 +238,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 #endif
                     glClear(GL_COLOR_BUFFER_BIT);
 
-                    gaussianShader->setOffset({{ 0, 1.0f / 256.0f }});
+                    gaussianShader->setOffset({{ 0, 1.0f / float(properties.prerenderSize) }});
                     glBindTexture(GL_TEXTURE_2D, secondary_texture);
                     coveringGaussianArray.bind(*gaussianShader, tileStencilBuffer, BUFFER_OFFSET(0));
                     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
