@@ -24,7 +24,7 @@ std::atomic<int> active_tasks;
 void request_initialize_cb() {
     NSURLSessionConfiguration *sessionConfig =
         [NSURLSessionConfiguration defaultSessionConfiguration];
-    sessionConfig.timeoutIntervalForResource = 6;
+    sessionConfig.timeoutIntervalForResource = 30;
     sessionConfig.HTTPMaximumConnectionsPerHost = 8;
     sessionConfig.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
 
