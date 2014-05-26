@@ -180,16 +180,19 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                     return modifiedProperties;
                 }();
 
-                // When drawing the fill, we want to draw a 16.66% buffer around too, so we
+                // When drawing the fill, we want to draw a buffer around too, so we
                 // essentially downscale everyting, and then upscale it later when rendering.
-
-                mat4 vtxMatrix;
                 const int buffer = 4096 * properties.prerenderBuffer;
-                matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
-                matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
+                const mat4 vtxMatrix = [&]{
+                    mat4 vtxMatrix;
+                    matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
+                    matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
+                    return vtxMatrix;
+                }();
 
                 pass = Opaque;
                 renderFill(bucket, modifiedProperties, id, vtxMatrix);
+
                 pass = Translucent;
                 renderFill(bucket, modifiedProperties, id, vtxMatrix);
 
@@ -198,8 +201,6 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
 
                 // RESET STATE
-
-
                 bucket.prerendered->unbindFramebuffer();
                 glEnable(GL_DEPTH_TEST);
                 glEnable(GL_STENCIL_TEST);
