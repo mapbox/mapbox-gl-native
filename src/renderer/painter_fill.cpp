@@ -155,8 +155,9 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     if (properties.prerendered) {
         if (pass == Translucent) {
             // Buffer value around the 0..4096 extent that will be drawn into the 256x256 pixel
-            // texture. We later scale 
-            const int buffer = 256;
+            // texture. We later scale the texture so that the actual bounds will align with this
+            // tile's bounds. The reason we do this is so that the
+            const int buffer = 128;
 
             if (!bucket.prerendered) {
                 bucket.prerendered = std::make_unique<PrerenderedTexture>();
@@ -188,6 +189,11 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
 
 
+                mat4 regularMatrix;
+                matrix::ortho(regularMatrix, 0, 4096, -4096, 0, 0, 1);
+                matrix::translate(regularMatrix, regularMatrix, 0, -4096, 0);
+
+
                 // BLUR
 
                 GLuint original_texture = bucket.prerendered->getTexture();
@@ -204,16 +210,16 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
 
                 useProgram(gaussianShader->program);
-                gaussianShader->setMatrix(vtxMatrix);
+                gaussianShader->setMatrix(regularMatrix);
                 gaussianShader->setImage(0);
                 glActiveTexture(GL_TEXTURE0);
 
-                const GLenum discards[] = { GL_COLOR_ATTACHMENT0 };
 
-                for (int i = 0; i < 1   ; i++) {
+                for (int i = 0; i < 1; i++) {
                     // Render horizontal
                     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, secondary_texture, 0);
 #if GL_EXT_discard_framebuffer
+                    const GLenum discards[] = { GL_COLOR_ATTACHMENT0 };
                     glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
 #endif
                     glClear(GL_COLOR_BUFFER_BIT);
@@ -241,22 +247,6 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                 glDeleteTextures(1, &secondary_texture);
 
 
-
-
-
-                // RENDER DEBUG FRAME
-                useProgram(plainShader->program);
-
-                plainShader->setMatrix(vtxMatrix);
-
-                // draw tile outline
-                tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
-                plainShader->setColor(0, 1, 1, 1);
-                lineWidth(2);
-                glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index());
-
-
-
                 // RESET STATE
 
 
@@ -278,7 +268,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
             glActiveTexture(GL_TEXTURE0);
             rasterShader->setImage(0);
-            rasterShader->setBuffer(0);
+            rasterShader->setBuffer(buffer);
             bucket.prerendered->bindTexture();
             coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
             glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
