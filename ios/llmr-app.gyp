@@ -24,7 +24,8 @@
         'product_extension': 'app',
         'mac_bundle': 1,
         'mac_bundle_resources': [
-          '<!@(find img -type f)'
+          '<!@(find img -type f)',
+          '<(PRODUCT_DIR)/MVKMapKit.bundle'
         ],
         'link_settings': {
           'libraries': [
@@ -60,7 +61,8 @@
           }
         },
         "dependencies": [
-            "../llmr.gyp:llmr-ios"
+            "../llmr.gyp:llmr-ios",
+            "MVKMapKit/MVKMapKit.gyp:Resources"
         ]
     }
   ]
