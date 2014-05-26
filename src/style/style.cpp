@@ -25,20 +25,64 @@ void Style::reset() {
     properties_to_transition.clear();
 }
 
+void Style::cascadeProperties(GenericProperties &properties, const GenericClass& klass, const std::string& layer_name, const std::string& class_name, float z) {
+    if (klass.enabled) {
+        properties.enabled = klass.enabled.get().evaluate<bool>(z);
+    }
+
+    if (klass.translate) {
+        properties.translate = {{ klass.translate.get()[0].evaluate<float>(z),
+                            klass.translate.get()[1].evaluate<float>(z) }};
+        computed.effective_classes[layer_name][TransitionablePropertyKey::Translate] = class_name;
+        if (klass.translate_transition && klass.translate_transition.get().duration) {
+            properties_to_transition[layer_name][TransitionablePropertyKey::Translate] = klass.translate_transition.get();
+        }
+    }
+
+    if (klass.translateAnchor) {
+        properties.translateAnchor = klass.translateAnchor.get();
+    }
+
+    if (klass.opacity) {
+        properties.opacity = klass.opacity.get().evaluate<float>(z);
+        computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
+        if (klass.opacity_transition && klass.opacity_transition.get().duration) {
+            properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = klass.opacity_transition.get();
+        }
+    }
+
+    if (klass.prerender) {
+        properties.prerender = klass.prerender.get();
+    }
+
+    if (klass.prerenderBuffer) {
+        properties.prerenderBuffer = klass.prerenderBuffer.get();
+    }
+
+    if (klass.prerenderSize) {
+        properties.prerenderSize = klass.prerenderSize.get();
+    }
+
+    if (klass.prerenderBlur) {
+        properties.prerenderBlur = klass.prerenderBlur.get();
+    }
+}
+
+
 void Style::cascade(float z) {
     uv::writelock lock(mtx);
 
     time start = util::now();
 
-    previous.fills = computed.fills;
-    previous.lines = computed.lines;
-    previous.icons = computed.icons;
-    previous.texts = computed.texts;
-    previous.rasters = computed.rasters;
-    previous.composites = computed.composites;
+    previous.fills.swap(computed.fills);
+    previous.lines.swap(computed.lines);
+    previous.icons.swap(computed.icons);
+    previous.texts.swap(computed.texts);
+    previous.rasters.swap(computed.rasters);
+    previous.composites.swap(computed.composites);
     previous.background = computed.background;
 
-    previous.effective_classes = computed.effective_classes;
+    previous.effective_classes.swap(computed.effective_classes);
 
     reset();
 
@@ -62,22 +106,7 @@ void Style::cascade(float z) {
 
             llmr::FillProperties& fill = computed.fills[layer_name];
 
-            if (layer.enabled) {
-                fill.enabled = layer.enabled.get().evaluate<bool>(z);
-            }
-
-            if (layer.translate) {
-                fill.translate = {{ layer.translate.get()[0].evaluate<float>(z),
-                                    layer.translate.get()[1].evaluate<float>(z) }};
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Translate] = class_name;
-                if (layer.translate_transition && layer.translate_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Translate] = layer.translate_transition.get();
-                }
-            }
-
-            if (layer.translateAnchor) {
-                fill.translateAnchor = layer.translateAnchor.get();
-            }
+            cascadeProperties(fill, layer, layer_name, class_name, z);
 
             if (layer.winding) {
                 fill.winding = layer.winding.get();
@@ -103,14 +132,6 @@ void Style::cascade(float z) {
                 }
             }
 
-            if (layer.opacity) {
-                fill.opacity = layer.opacity.get().evaluate<float>(z);
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
-                if (layer.opacity_transition && layer.opacity_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = layer.opacity_transition.get();
-                }
-            }
-
             if (layer.image) {
                 fill.image = layer.image.get();
             }
@@ -123,22 +144,7 @@ void Style::cascade(float z) {
 
             llmr::LineProperties& stroke = computed.lines[layer_name];
 
-            if (layer.enabled) {
-                stroke.enabled = layer.enabled.get().evaluate<bool>(z);
-            }
-
-            if (layer.translate) {
-                stroke.translate = {{ layer.translate.get()[0].evaluate<float>(z),
-                                      layer.translate.get()[1].evaluate<float>(z) }};
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Translate] = class_name;
-                if (layer.translate_transition && layer.translate_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Translate] = layer.translate_transition.get();
-                }
-            }
-
-            if (layer.translateAnchor) {
-                stroke.translateAnchor = layer.translateAnchor.get();
-            }
+            cascadeProperties(stroke, layer, layer_name, class_name, z);
 
             if (layer.width) {
                 stroke.width = layer.width.get().evaluate<float>(z);
@@ -173,14 +179,6 @@ void Style::cascade(float z) {
                     properties_to_transition[layer_name][TransitionablePropertyKey::DashArray] = layer.dash_array_transition.get();
                 }
             }
-
-            if (layer.opacity) {
-                stroke.opacity = layer.opacity.get().evaluate<float>(z);
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
-                if (layer.opacity_transition && layer.opacity_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = layer.opacity_transition.get();
-                }
-            }
         }
 
         // Cascade icon classes.
@@ -190,22 +188,7 @@ void Style::cascade(float z) {
 
             llmr::IconProperties& icon = computed.icons[layer_name];
 
-            if (layer.enabled) {
-                icon.enabled = layer.enabled.get().evaluate<bool>(z);
-            }
-
-            if (layer.translate) {
-                icon.translate = {{ layer.translate.get()[0].evaluate<float>(z),
-                                    layer.translate.get()[1].evaluate<float>(z) }};
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Translate] = class_name;
-                if (layer.translate_transition && layer.translate_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Translate] = layer.translate_transition.get();
-                }
-            }
-
-            if (layer.translateAnchor) {
-                icon.translateAnchor = layer.translateAnchor.get();
-            }
+            cascadeProperties(icon, layer, layer_name, class_name, z);
 
             if (layer.color) {
                 icon.color = layer.color.get();
@@ -217,14 +200,6 @@ void Style::cascade(float z) {
 
             if (layer.size) {
                 icon.size = layer.size.get().evaluate<float>(z);
-            }
-
-            if (layer.opacity) {
-                icon.opacity = layer.opacity.get().evaluate<float>(z);
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
-                if (layer.opacity_transition && layer.opacity_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = layer.opacity_transition.get();
-                }
             }
 
             if (layer.image) {
@@ -255,22 +230,7 @@ void Style::cascade(float z) {
 
             llmr::TextProperties& text = computed.texts[layer_name];
 
-            if (layer.enabled) {
-                text.enabled = layer.enabled.get().evaluate<bool>(z);
-            }
-
-            if (layer.translate) {
-                text.translate = {{ layer.translate.get()[0].evaluate<float>(z),
-                                    layer.translate.get()[1].evaluate<float>(z) }};
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Translate] = class_name;
-                if (layer.translate_transition && layer.translate_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Translate] = layer.translate_transition.get();
-                }
-            }
-
-            if (layer.translateAnchor) {
-                text.translateAnchor = layer.translateAnchor.get();
-            }
+            cascadeProperties(text, layer, layer_name, class_name, z);
 
             if (layer.color) {
                 text.color = layer.color.get();
@@ -315,14 +275,6 @@ void Style::cascade(float z) {
             if (layer.always_visible) {
                 text.always_visible = layer.always_visible.get().evaluate<bool>(z);
             }
-
-            if (layer.opacity) {
-                text.opacity = layer.opacity.get().evaluate<float>(z);
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
-                if (layer.opacity_transition && layer.opacity_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = layer.opacity_transition.get();
-                }
-            }
         }
 
         // Cascade raster classes.
@@ -332,17 +284,7 @@ void Style::cascade(float z) {
 
             llmr::RasterProperties& raster = computed.rasters[layer_name];
 
-            if (layer.enabled) {
-                raster.enabled = layer.enabled.get().evaluate<bool>(z);
-            }
-
-            if (layer.opacity) {
-                raster.opacity = layer.opacity.get().evaluate<float>(z);
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
-                if (layer.opacity_transition && layer.opacity_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = layer.opacity_transition.get();
-                }
-            }
+            cascadeProperties(raster, layer, layer_name, class_name, z);
         }
 
         // Cascade composite classes.
@@ -352,33 +294,18 @@ void Style::cascade(float z) {
 
             llmr::CompositeProperties& composite = computed.composites[layer_name];
 
-            if (layer.enabled) {
-                composite.enabled = layer.enabled.get().evaluate<bool>(z);
-            }
-
-            if (layer.opacity) {
-                composite.opacity = layer.opacity.get().evaluate<float>(z);
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
-                if (layer.opacity_transition && layer.opacity_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = layer.opacity_transition.get();
-                }
-            }
+            cascadeProperties(composite, layer, layer_name, class_name, z);
         }
 
         // Cascade background.
         {
+            cascadeProperties(computed.background, sheetClass.background, "background", class_name, z);
+
             if (sheetClass.background.color) {
                 computed.background.color = sheetClass.background.color.get();
                 computed.effective_classes["background"][TransitionablePropertyKey::Color] = class_name;
                 if (sheetClass.background.color_transition && sheetClass.background.color_transition.get().duration) {
                     properties_to_transition["background"][TransitionablePropertyKey::Color] = sheetClass.background.color_transition.get();
-                }
-            }
-            if (sheetClass.background.opacity) {
-                computed.background.opacity = sheetClass.background.opacity.get().evaluate<float>(z);
-                computed.effective_classes["background"][TransitionablePropertyKey::Opacity] = class_name;
-                if (sheetClass.background.opacity_transition && sheetClass.background.opacity_transition.get().duration) {
-                    properties_to_transition["background"][TransitionablePropertyKey::Opacity] = sheetClass.background.opacity_transition.get();
                 }
             }
         }

@@ -4,5 +4,5 @@ uniform float u_opacity;
 varying vec2 v_pos;
 
 void main() {
-    gl_FragColor = texture2D(u_image, v_pos) * u_opacity;
+    gl_FragColor = texture2D(u_image, v_pos, 2) * u_opacity;
 }

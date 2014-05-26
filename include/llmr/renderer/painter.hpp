@@ -19,6 +19,7 @@
 #include <llmr/shader/text_shader.hpp>
 #include <llmr/shader/dot_shader.hpp>
 #include <llmr/shader/composite_shader.hpp>
+#include <llmr/shader/gaussian_shader.hpp>
 
 #include <llmr/map/transform_state.hpp>
 
@@ -77,11 +78,16 @@ public:
 
     void renderDebugText(DebugBucket& bucket);
     void renderDebugText(const std::vector<std::string> &strings);
+    void renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &mat);
     void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderIcon(IconBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderRaster(RasterBucket& bucket, const std::string& layer_name, const Tile::ID& id);
+
+    void preparePrerender(const GenericProperties &properties);
+    void finishPrerender(const GenericProperties &properties);
+    void renderPrerenderedTexture(Bucket &bucket, const GenericProperties &properties);
 
     void resize();
 
@@ -112,6 +118,8 @@ private:
     const mat4 &translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchor anchor = TranslateAnchor::Map);
 
     void prepareTile(const Tile& tile);
+
+public:
     void useProgram(uint32_t program);
     void lineWidth(float lineWidth);
     void depthMask(bool value);
@@ -122,6 +130,14 @@ public:
     mat4 projMatrix;
     mat4 nativeMatrix;
     mat4 extrudeMatrix;
+
+    // used to composite images and flips the geometry upside down
+    const mat4 flipMatrix = []{
+        mat4 flipMatrix;
+        matrix::ortho(flipMatrix, 0, 4096, -4096, 0, 0, 1);
+        matrix::translate(flipMatrix, flipMatrix, 0, -4096, 0);
+        return flipMatrix;
+    }();
 
 private:
     Map& map;
@@ -138,6 +154,7 @@ private:
     enum { Opaque, Translucent } pass = Opaque;
     const float strata_epsilon = 1.0f / (1 << 16);
 
+public:
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;
     std::unique_ptr<LineShader> lineShader;
@@ -148,6 +165,7 @@ private:
     std::unique_ptr<TextShader> textShader;
     std::unique_ptr<DotShader> dotShader;
     std::unique_ptr<CompositeShader> compositeShader;
+    std::unique_ptr<GaussianShader> gaussianShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     VertexBuffer tileStencilBuffer = {
@@ -165,6 +183,7 @@ private:
     VertexArrayObject coveringPlainArray;
     VertexArrayObject coveringPatternArray;
     VertexArrayObject coveringRasterArray;
+    VertexArrayObject coveringGaussianArray;
 
     VertexArrayObject compositeArray;
     VertexArrayObject matteArray;

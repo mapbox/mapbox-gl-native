@@ -21,11 +21,13 @@ RasterShader::RasterShader()
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_image = glGetUniformLocation(program, "u_image");
     u_opacity = glGetUniformLocation(program, "u_opacity");
+    u_buffer = glGetUniformLocation(program, "u_buffer");
 
     // fprintf(stderr, "RasterShader:\n");
     // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
     // fprintf(stderr, "    - u_image: %d\n", u_image);
     // fprintf(stderr, "    - u_opacity: %f\n", u_opacity);
+    // fprintf(stderr, "    - u_buffer: %f\n", u_buffer);
 }
 
 void RasterShader::bind(char *offset) {
@@ -44,5 +46,12 @@ void RasterShader::setOpacity(float new_opacity) {
     if (opacity != new_opacity) {
         glUniform1f(u_opacity, new_opacity);
         opacity = new_opacity;
+    }
+}
+
+void RasterShader::setBuffer(float new_buffer) {
+    if (buffer != new_buffer) {
+        glUniform1f(u_buffer, new_buffer);
+        buffer = new_buffer;
     }
 }

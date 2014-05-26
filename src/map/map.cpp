@@ -132,10 +132,10 @@ void Map::cleanup(uv_async_t *async) {
 void Map::render(uv_async_t *async) {
     Map *map = static_cast<Map *>(async->data);
 
-    map->prepare();
 
     if (map->state.hasSize()) {
         if (map->is_rendered.test_and_set() == false) {
+            map->prepare();
             if (map->is_clean.test_and_set() == false) {
                 map->render();
                 map->is_swapped.clear();
@@ -584,18 +584,11 @@ typename Styles::const_iterator find_style(const Styles &styles, const LayerDesc
     return it;
 }
 
-template <typename Properties>
-bool is_invisible(const Properties &properties) {
-    if (!properties.enabled) { return true; }
-    if (properties.opacity <= 0) { return true; }
-    return false;
-}
-
 template <typename Styles>
 bool is_invisible(const Styles &styles, const LayerDescription &layer_desc) {
     auto it = find_style(styles, layer_desc);
     if (it == styles.end()) { return true; }
-    return is_invisible(it->second);
+    return !it->second.isVisible();
 }
 
 void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
@@ -604,7 +597,7 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
         if (pass == Translucent) {
             auto it = find_style(style.computed.composites, layer_desc);
             const CompositeProperties &properties = (it != style.computed.composites.end()) ? it->second : defaultCompositeProperties;
-            if (!is_invisible(properties)) {
+            if (properties.isVisible()) {
                 gl::group group(std::string("group: ") + layer_desc.name);
 
                 if (debug::renderTree) {

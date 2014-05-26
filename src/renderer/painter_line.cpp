@@ -9,8 +9,8 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
     if (pass == Opaque) return;
     if (!bucket.hasData()) return;
 
-    auto line_properties = map.getStyle().computed.lines;
-    auto line_properties_it = line_properties.find(layer_name);
+    const std::unordered_map<std::string, LineProperties> &line_properties = map.getStyle().computed.lines;
+    const std::unordered_map<std::string, LineProperties>::const_iterator line_properties_it = line_properties.find(layer_name);
     if (line_properties_it == line_properties.end()) return;
 
     const LineProperties& properties = line_properties_it->second;

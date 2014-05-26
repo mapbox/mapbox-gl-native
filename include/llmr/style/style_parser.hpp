@@ -30,6 +30,7 @@ private:
                     const std::map<std::string, BucketDescription> &buckets,
                     const std::map<std::string, std::string> &layerBuckets);
 
+    void parseGenericClass(GenericClass &klass, JSVal value);
     FillClass parseFillClass(JSVal value);
     LineClass parseLineClass(JSVal value);
     IconClass parseIconClass(JSVal value);

@@ -85,6 +85,18 @@ struct relaxed_equal {
     Value const &lhs;
 };
 }
+
+
+template <typename T>
+T toNumber(const Value &value) {
+    if (value.is<std::string>()) return util::string_to_number<T>()(value.get<std::string>());
+    else if (value.is<bool>()) return value.get<bool>();
+    else if (value.is<int64_t>()) return value.get<int64_t>();
+    else if (value.is<uint64_t>()) return value.get<uint64_t>();
+    else if (value.is<double>()) return value.get<double>();
+    else return 0;
+}
+
 }
 
 #endif

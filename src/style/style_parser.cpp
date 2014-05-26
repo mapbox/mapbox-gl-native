@@ -500,10 +500,8 @@ PropertyTransition StyleParser::parseTransition(JSVal value, std::string propert
     return transition;
 }
 
-FillClass StyleParser::parseFillClass(JSVal value) {
-    FillClass klass;
-
-    if (value.HasMember("enabled")) {
+void StyleParser::parseGenericClass(GenericClass &klass, JSVal value) {
+     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);
     }
 
@@ -516,6 +514,33 @@ FillClass StyleParser::parseFillClass(JSVal value) {
     if (value.HasMember("translate-anchor")) {
         klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
     }
+
+    if (value.HasMember("opacity")) {
+        klass.opacity = parseFunction(value["opacity"]);
+        klass.opacity_transition = parseTransition(value, "opacity");
+    }
+
+    if (value.HasMember("prerender")) {
+        klass.prerender = parseBoolean(value["prerender"]);
+    }
+
+    if (value.HasMember("prerender-buffer")) {
+        klass.prerenderBuffer = toNumber<double>(parseValue(value["prerender-buffer"]));
+    }
+
+    if (value.HasMember("prerender-size")) {
+        klass.prerenderBuffer = toNumber<uint64_t>(parseValue(value["prerender-size"]));
+    }
+
+    if (value.HasMember("prerender-blur")) {
+        klass.prerenderBlur = toNumber<uint64_t>(parseValue(value["prerender-blur"]));
+    }
+}
+
+FillClass StyleParser::parseFillClass(JSVal value) {
+    FillClass klass;
+
+    parseGenericClass(klass, value);
 
     if (value.HasMember("winding")) {
         throw std::runtime_error("winding in stylesheets not yet supported");
@@ -541,30 +566,13 @@ FillClass StyleParser::parseFillClass(JSVal value) {
         klass.image = parseString(value["image"]);
     }
 
-    if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
-        klass.opacity_transition = parseTransition(value, "opacity");
-    }
-
     return klass;
 }
 
 LineClass StyleParser::parseLineClass(JSVal value) {
     LineClass klass;
 
-    if (value.HasMember("enabled")) {
-        klass.enabled = parseFunction(value["enabled"]);
-    }
-
-    if (value.HasMember("translate")) {
-        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
-        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
-        klass.translate_transition = parseTransition(value, "translate");
-    }
-
-    if (value.HasMember("translate-anchor")) {
-        klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
-    }
+    parseGenericClass(klass, value);
 
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
@@ -574,11 +582,6 @@ LineClass StyleParser::parseLineClass(JSVal value) {
     if (value.HasMember("width")) {
         klass.width = parseFunction(value["width"]);
         klass.width_transition = parseTransition(value, "width");
-    }
-
-    if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
-        klass.opacity_transition = parseTransition(value, "opacity");
     }
 
     if (value.HasMember("dasharray")) {
@@ -593,28 +596,11 @@ LineClass StyleParser::parseLineClass(JSVal value) {
 IconClass StyleParser::parseIconClass(JSVal value) {
     IconClass klass;
 
-    if (value.HasMember("enabled")) {
-        klass.enabled = parseFunction(value["enabled"]);
-    }
-
-    if (value.HasMember("translate")) {
-        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
-        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
-        klass.translate_transition = parseTransition(value, "translate");
-    }
-
-    if (value.HasMember("translate-anchor")) {
-        klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
-    }
+    parseGenericClass(klass, value);
 
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
         klass.color_transition = parseTransition(value, "color");
-    }
-
-    if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
-        klass.opacity_transition = parseTransition(value, "opacity");
     }
 
     if (value.HasMember("image")) {
@@ -641,19 +627,7 @@ IconClass StyleParser::parseIconClass(JSVal value) {
 TextClass StyleParser::parseTextClass(JSVal value) {
     TextClass klass;
 
-    if (value.HasMember("enabled")) {
-        klass.enabled = parseFunction(value["enabled"]);
-    }
-
-    if (value.HasMember("translate")) {
-        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
-        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
-        klass.translate_transition = parseTransition(value, "translate");
-    }
-
-    if (value.HasMember("translate-anchor")) {
-        klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
-    }
+    parseGenericClass(klass, value);
 
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
@@ -687,25 +661,13 @@ TextClass StyleParser::parseTextClass(JSVal value) {
         klass.always_visible = parseFunction(value["alwaysVisible"]);
     }
 
-    if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
-        klass.opacity_transition = parseTransition(value, "opacity");
-    }
-
     return klass;
 }
 
 RasterClass StyleParser::parseRasterClass(JSVal value) {
     RasterClass klass;
 
-    if (value.HasMember("enabled")) {
-        klass.enabled = parseFunction(value["enabled"]);
-    }
-
-    if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
-        klass.opacity_transition = parseTransition(value, "opacity");
-    }
+    parseGenericClass(klass, value);
 
     return klass;
 }
@@ -713,14 +675,7 @@ RasterClass StyleParser::parseRasterClass(JSVal value) {
 CompositeClass StyleParser::parseCompositeClass(JSVal value) {
     CompositeClass klass;
 
-    if (value.HasMember("enabled")) {
-        klass.enabled = parseFunction(value["enabled"]);
-    }
-
-    if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
-        klass.opacity_transition = parseTransition(value, "opacity");
-    }
+    parseGenericClass(klass, value);
 
     return klass;
 }
@@ -728,14 +683,11 @@ CompositeClass StyleParser::parseCompositeClass(JSVal value) {
 BackgroundClass StyleParser::parseBackgroundClass(JSVal value) {
     BackgroundClass klass;
 
+    parseGenericClass(klass, value);
+
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
         klass.color_transition = parseTransition(value, "color");
-    }
-
-    if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
-        klass.opacity_transition = parseTransition(value, "opacity");
     }
 
     return klass;

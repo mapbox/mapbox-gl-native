@@ -1732,6 +1732,8 @@ module.exports = {
                 "hillshade_full_shadow": {
                     "color": "#103",
                     "antialias": false,
+                    "prerender": true,
+                    "prerender-blur": 1,
                     "opacity": [
                         "stops",
                         {"z": 15, "val": 0.075},
@@ -1742,6 +1744,8 @@ module.exports = {
                 "hillshade_medium_shadow": {
                     "color": "#206",
                     "antialias": false,
+                    "prerender": true,
+                    "prerender-blur": 1,
                     "opacity": [
                         "stops",
                         {"z": 15, "val": 0.075},
@@ -1752,6 +1756,8 @@ module.exports = {
                 "hillshade_full_highlight": {
                     "color": "#fffff3",
                     "antialias": false,
+                    "prerender": true,
+                    "prerender-blur": 1,
                     "opacity": [
                         "stops",
                         {"z": 15, "val": 0.3},
@@ -1762,6 +1768,8 @@ module.exports = {
                 "hillshade_medium_highlight": {
                     "color": "#ffd",
                     "antialias": false,
+                    "prerender": true,
+                    "prerender-blur": 1,
                     "opacity": [
                         "stops",
                         {"z": 15, "val": 0.3},
@@ -2433,6 +2441,8 @@ module.exports = {
                 "hillshade_full_shadow": {
                     "color": "#103",
                     "antialias": false,
+                    "prerender": true,
+                    "prerender-blur": 1,
                     "opacity": [
                         "stops",
                         {"z": 0, "val": 0.3},
@@ -2443,6 +2453,8 @@ module.exports = {
                 "hillshade_medium_shadow": {
                     "color": "#206",
                     "antialias": false,
+                    "prerender": true,
+                    "prerender-blur": 1,
                     "opacity": [
                         "stops",
                         {"z": 0, "val": 0.3},
@@ -2453,6 +2465,8 @@ module.exports = {
                 "hillshade_full_highlight": {
                     "color": "#fdfdad",
                     "antialias": false,
+                    "prerender": true,
+                    "prerender-blur": 1,
                     "opacity": [
                         "stops",
                         {"z": 14, "val": 0.4},
@@ -2464,6 +2478,8 @@ module.exports = {
                 "hillshade_medium_highlight": {
                     "color": "#ffe1b7",
                     "antialias": false,
+                    "prerender": true,
+                    "prerender-blur": 1,
                     "opacity": [
                         "stops",
                         {"z": 15, "val": 0.3},
