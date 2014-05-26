@@ -1,16 +1,16 @@
 [![Travis](https://api.travis-ci.com/mapbox/llmr-native.svg?token=yZ9zvfZwYkJNWivRLoyX)](https://magnum.travis-ci.com/mapbox/llmr-native)
 
 An OpenGL renderer for [Mapbox vector tiles](https://www.mapbox.com/blog/vector-tiles),
-implemented in C++11, targeting iOS & OS X.
+implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 
 # Depends
 
  - Modern C++ compiler that supports `-std=c++11`
  - `libpng`
  - `libuv`
- - `libcurl` (depends on OpenSSL)
+ - `libcurl` (depends on OpenSSL; Linux only)
  - `glfw3`
- - Boost (for Rtree support)
+ - Boost
  - Python (for build only)
  - Node.js (for build only)
 
@@ -91,11 +91,11 @@ This is automatically taken care of as a build phase.
 
 ## Desktop
 
-- Press 'X' to reset the transform
-- Press 'N' to reset north
-- Press 'R' to toggle styles
-- Press Tab to toggle debug information
-- Press Esc to quit
+- Press `X` to reset the transform
+- Press `N` to reset north
+- Press `R` to toggle styles
+- Press `Tab` to toggle debug information
+- Press `Esc` to quit
 
 ## Mobile
 
