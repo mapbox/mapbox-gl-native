@@ -174,6 +174,12 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                 glViewport(0, 0, properties.prerenderSize, properties.prerenderSize);
 
 
+                const FillProperties modifiedProperties = [&]{
+                    FillProperties modifiedProperties = properties;
+                    modifiedProperties.opacity = 1;
+                    return modifiedProperties;
+                }();
+
                 // When drawing the fill, we want to draw a 16.66% buffer around too, so we
                 // essentially downscale everyting, and then upscale it later when rendering.
 
@@ -183,9 +189,9 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                 matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
 
                 pass = Opaque;
-                renderFill(bucket, properties, id, vtxMatrix);
+                renderFill(bucket, modifiedProperties, id, vtxMatrix);
                 pass = Translucent;
-                renderFill(bucket, properties, id, vtxMatrix);
+                renderFill(bucket, modifiedProperties, id, vtxMatrix);
 
 
                 bucket.prerendered->blur(*this, properties.prerenderBlur);

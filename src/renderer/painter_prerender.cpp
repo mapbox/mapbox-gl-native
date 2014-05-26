@@ -17,6 +17,7 @@ void Painter::renderPrerenderedTexture(Bucket &bucket, const GenericProperties &
     glActiveTexture(GL_TEXTURE0);
     rasterShader->setImage(0);
     rasterShader->setBuffer(buffer);
+    rasterShader->setOpacity(properties.opacity);
     bucket.prerendered->bindTexture();
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
