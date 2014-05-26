@@ -104,5 +104,5 @@ This is automatically taken care of as a build phase.
 - Use two fingers to rotate
 - Double-tap to zoom in one level
 - Two-finger single-tap to zoom out one level
-- Single-tap to toggle the command palette visibility for resetting north & the transform, toggling debug, and toggling styles
+- Single-tap to toggle the command palette visibility for resetting north & the transform, toggling debug, toggling styles, and locating the user
 - Double-tap, long-pressing the second, then pan up and down to "quick zoom" (iPhone only, meant for one-handed use)
