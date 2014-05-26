@@ -6,8 +6,11 @@
 
 namespace llmr {
 
+class Painter;
+
 class PrerenderedTexture : private util::noncopyable {
 public:
+    PrerenderedTexture(uint16_t size);
     ~PrerenderedTexture();
 
     void bindTexture();
@@ -16,7 +19,10 @@ public:
 
     inline GLuint getTexture() const { return texture; }
 
+    void blur(Painter& painter, uint16_t passes);
+
 private:
+    const uint16_t size;
     GLint previous_fbo = 0;
     GLuint fbo = 0;
     GLuint texture = 0;

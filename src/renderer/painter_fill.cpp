@@ -157,10 +157,9 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
             // Buffer value around the 0..4096 extent that will be drawn into the 256x256 pixel
             // texture. We later scale the texture so that the actual bounds will align with this
             // tile's bounds. The reason we do this is so that the
-            const int buffer = 4096 * properties.prerenderBuffer;
 
             if (!bucket.prerendered) {
-                bucket.prerendered = std::make_unique<PrerenderedTexture>();
+                bucket.prerendered = std::make_unique<PrerenderedTexture>(properties.prerenderSize);
                 glDisable(GL_DEPTH_TEST);
                 glDisable(GL_STENCIL_TEST);
 
@@ -179,6 +178,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                 // essentially downscale everyting, and then upscale it later when rendering.
 
                 mat4 vtxMatrix;
+                const int buffer = 4096 * properties.prerenderBuffer;
                 matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
                 matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
 
@@ -188,63 +188,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                 renderFill(bucket, properties, id, vtxMatrix);
 
 
-
-                mat4 regularMatrix;
-                matrix::ortho(regularMatrix, 0, 4096, -4096, 0, 0, 1);
-                matrix::translate(regularMatrix, regularMatrix, 0, -4096, 0);
-
-
-                // BLUR
-
-                GLuint original_texture = bucket.prerendered->getTexture();
-
-                GLuint secondary_texture;
-                glGenTextures(1, &secondary_texture);
-                glBindTexture(GL_TEXTURE_2D, secondary_texture);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, properties.prerenderSize, properties.prerenderSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-                glBindTexture(GL_TEXTURE_2D, 0);
-
-
-                useProgram(gaussianShader->program);
-                gaussianShader->setMatrix(regularMatrix);
-                gaussianShader->setImage(0);
-                glActiveTexture(GL_TEXTURE0);
-
-
-                for (int i = 0; i < properties.prerenderBlur; i++) {
-                    // Render horizontal
-                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, secondary_texture, 0);
-#if GL_EXT_discard_framebuffer
-                    const GLenum discards[] = { GL_COLOR_ATTACHMENT0 };
-                    glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
-#endif
-                    glClear(GL_COLOR_BUFFER_BIT);
-
-                    gaussianShader->setOffset({{ 1.0f / float(properties.prerenderSize), 0 }});
-                    glBindTexture(GL_TEXTURE_2D, original_texture);
-                    coveringGaussianArray.bind(*gaussianShader, tileStencilBuffer, BUFFER_OFFSET(0));
-                    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
-
-
-
-                    // Render vertical
-                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, original_texture, 0);
-#if GL_EXT_discard_framebuffer
-                    glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
-#endif
-                    glClear(GL_COLOR_BUFFER_BIT);
-
-                    gaussianShader->setOffset({{ 0, 1.0f / float(properties.prerenderSize) }});
-                    glBindTexture(GL_TEXTURE_2D, secondary_texture);
-                    coveringGaussianArray.bind(*gaussianShader, tileStencilBuffer, BUFFER_OFFSET(0));
-                    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
-                }
-
-                glDeleteTextures(1, &secondary_texture);
+                bucket.prerendered->blur(*this, properties.prerenderBlur);
 
 
                 // RESET STATE
@@ -257,23 +201,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                 glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
             }
 
-            // draw the texture on a quad
-            depthMask(false);
-
-            useProgram(rasterShader->program);
-            rasterShader->setMatrix(matrix);
-            rasterShader->setOpacity(1);
-
-            glDepthRange(strata, 1.0f);
-
-            glActiveTexture(GL_TEXTURE0);
-            rasterShader->setImage(0);
-            rasterShader->setBuffer(buffer);
-            bucket.prerendered->bindTexture();
-            coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
-            glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
-
-            depthMask(true);
+            renderPrerenderedTexture(bucket, properties);
         }
     } else {
         const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
