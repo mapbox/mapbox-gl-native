@@ -152,7 +152,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     if (!properties.enabled) return;
 
 
-    if (properties.prerendered) {
+    if (properties.prerender) {
         if (pass == Translucent) {
             // Buffer value around the 0..4096 extent that will be drawn into the 256x256 pixel
             // texture. We later scale the texture so that the actual bounds will align with this

@@ -91,6 +91,10 @@ struct GenericClass {
     boost::optional<TranslateAnchor> translateAnchor;
     boost::optional<FunctionProperty> opacity;
     boost::optional<PropertyTransition> opacity_transition;
+    boost::optional<bool> prerender;
+    boost::optional<float> prerenderBuffer;
+    boost::optional<uint16_t> prerenderSize;
+    boost::optional<bool> prerenderBlur;
 };
 
 struct GenericProperties {
@@ -98,6 +102,10 @@ struct GenericProperties {
     std::array<float, 2> translate = {{ 0, 0 }};
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     float opacity = 1.0;
+    bool prerender = false;
+    float prerenderBuffer = 1.0f / 32.0f;
+    uint16_t prerenderSize = 256;
+    bool prerenderBlur = false;
 };
 
 struct IconClass : public GenericClass {
@@ -145,8 +153,6 @@ struct FillClass : public GenericClass {
     boost::optional<Color> stroke_color;
     boost::optional<PropertyTransition> stroke_color_transition;
     boost::optional<std::string> image;
-    boost::optional<FunctionProperty> prerendered;
-    boost::optional<FunctionProperty> blur;
 };
 
 struct FillProperties : public GenericProperties {
@@ -154,9 +160,6 @@ struct FillProperties : public GenericProperties {
     bool antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
     Color stroke_color = {{ 0, 0, 0, 1 }};
-    bool prerendered = false;
-    float prerenderBuffer = 1.0f / 32.0f;
-    uint16_t prerenderSize = 256;
     float blur = 0.0f;
     std::string image;
 };

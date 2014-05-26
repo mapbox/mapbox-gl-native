@@ -115,12 +115,12 @@ void Style::cascade(float z) {
                 fill.image = layer.image.get();
             }
 
-            if (layer.prerendered) {
-                fill.prerendered = layer.prerendered.get().evaluate<bool>(z);
+            if (layer.prerender) {
+                fill.prerender = layer.prerender.get();
             }
 
-            if (layer.blur) {
-                fill.blur = layer.blur.get().evaluate<float>(z);
+            if (layer.prerenderBlur) {
+                fill.prerenderBlur = layer.prerenderBlur.get();
             }
         }
 
