@@ -6,6 +6,7 @@
 #include <string>
 #include <limits>
 #include <set>
+#include <type_traits>
 
 #include <boost/optional.hpp>
 
@@ -218,6 +219,19 @@ struct CompositeProperties : public GenericProperties {
 
 
 const CompositeProperties defaultCompositeProperties;
+
+}
+
+
+namespace std {
+
+template <> struct hash<llmr::TransitionablePropertyKey> {
+public:
+    inline size_t operator()(llmr::TransitionablePropertyKey prop) const {
+        typedef typename std::underlying_type<llmr::TransitionablePropertyKey>::type type;
+        return std::hash<type>()(static_cast<type>(prop));
+    }
+};
 
 }
 
