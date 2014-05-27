@@ -6,6 +6,7 @@
 #include <string>
 #include <limits>
 #include <set>
+#include <type_traits>
 
 #include <boost/optional.hpp>
 
@@ -92,9 +93,9 @@ struct GenericClass {
     boost::optional<FunctionProperty> opacity;
     boost::optional<PropertyTransition> opacity_transition;
     boost::optional<bool> prerender;
-    boost::optional<FunctionProperty> prerenderBuffer;
-    boost::optional<FunctionProperty> prerenderSize;
-    boost::optional<FunctionProperty> prerenderBlur;
+    boost::optional<float> prerenderBuffer;
+    boost::optional<uint16_t> prerenderSize;
+    boost::optional<uint16_t> prerenderBlur;
 };
 
 struct GenericProperties {
@@ -218,6 +219,19 @@ struct CompositeProperties : public GenericProperties {
 
 
 const CompositeProperties defaultCompositeProperties;
+
+}
+
+
+namespace std {
+
+template <> struct hash<llmr::TransitionablePropertyKey> {
+public:
+    inline size_t operator()(llmr::TransitionablePropertyKey prop) const {
+        typedef typename std::underlying_type<llmr::TransitionablePropertyKey>::type type;
+        return std::hash<type>()(static_cast<type>(prop));
+    }
+};
 
 }
 

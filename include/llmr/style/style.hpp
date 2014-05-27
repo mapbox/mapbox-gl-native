@@ -59,15 +59,15 @@ public:
         std::unordered_map<std::string, TextProperties> texts;
         std::unordered_map<std::string, RasterProperties> rasters;
         std::unordered_map<std::string, CompositeProperties> composites;
-        std::map<std::string, std::map<TransitionablePropertyKey, std::string>> effective_classes;
+        std::unordered_map<std::string, std::unordered_map<TransitionablePropertyKey, std::string>> effective_classes;
     } computed;
 
 private:
-    bool transitionInProgress(std::string layer_name, TransitionablePropertyKey key);
-    bool transitionExists(std::string layer_name, TransitionablePropertyKey key);
-    bool inNeedOfTransition(std::string layer_name, TransitionablePropertyKey key);
-    uint64_t transitionDuration(std::string layer_name, TransitionablePropertyKey key);
-    uint64_t transitionDelay(std::string layer_name, TransitionablePropertyKey key);
+    bool transitionInProgress(const std::string &layer_name, TransitionablePropertyKey key, time start);
+    bool transitionExists(const std::string &layer_name, TransitionablePropertyKey key) const;
+    bool inNeedOfTransition(const std::string &layer_name, TransitionablePropertyKey key) const;
+    uint64_t transitionDuration(const std::string &layer_name, TransitionablePropertyKey key) const;
+    uint64_t transitionDelay(const std::string &layer_name, TransitionablePropertyKey key) const;
 
     void cascadeProperties(GenericProperties &properties, const GenericClass& klass, const std::string& layer_name, const std::string& class_name, float z);
 
@@ -81,7 +81,7 @@ private:
         std::unordered_map<std::string, TextProperties> texts;
         std::unordered_map<std::string, RasterProperties> rasters;
         std::unordered_map<std::string, CompositeProperties> composites;
-        std::map<std::string, std::map<TransitionablePropertyKey, std::string>> effective_classes;
+        std::unordered_map<std::string, std::unordered_map<TransitionablePropertyKey, std::string>> effective_classes;
     } previous;
 
     // Settings values currently being transitioned.
@@ -95,8 +95,8 @@ private:
         std::unordered_map<std::string, CompositeProperties> composites;
     } transitioning;
 
-    std::map<std::string, std::map<TransitionablePropertyKey, PropertyTransition>> properties_to_transition;
-    std::map<std::string, std::map<TransitionablePropertyKey, std::shared_ptr<util::transition>>> transitions;
+    std::unordered_map<std::string, std::unordered_map<TransitionablePropertyKey, PropertyTransition>> properties_to_transition;
+    std::unordered_map<std::string, std::unordered_map<TransitionablePropertyKey, std::shared_ptr<util::transition>>> transitions;
     uint64_t default_transition_duration = 0;
     bool initial_render_complete = false;
 

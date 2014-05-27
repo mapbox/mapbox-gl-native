@@ -174,20 +174,8 @@ PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
             continue;
         }
 
-        uint32_t width = glyph.metrics.width;
-        uint32_t height = glyph.metrics.height;
-
-        width += buffer * 2;
-        height += buffer * 2;
-
-        // Increase to next number divisible by 4, but at least 1.
-        // This is so we can scale down the texture coordinates and pack them
-        // into 2 bytes rather than 4 bytes.
-        width += (4 - width % 4);
-        height += (4 - height % 4);
-
         float x =
-            (origin.x + placed.x + glyph.metrics.left - buffer + width / 2) *
+            (origin.x + placed.x + glyph.metrics.left - buffer + glyph.rect.w / 2) *
             fontScale;
 
         GlyphInstances glyphInstances;
@@ -204,8 +192,8 @@ PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
 
         const float x1 = origin.x + placed.x + glyph.metrics.left - buffer;
         const float y1 = origin.y + placed.y - glyph.metrics.top - buffer;
-        const float x2 = x1 + width;
-        const float y2 = y1 + height;
+        const float x2 = x1 + glyph.rect.w;
+        const float y2 = y1 + glyph.rect.h;
 
         const vec2<float> otl{x1, y1};
         const vec2<float> otr{x2, y1};
@@ -249,7 +237,7 @@ PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
 
             // Remember the glyph for later insertion.
             glyphs.emplace_back(PlacedGlyph{
-                tl, tr, bl, br, glyph.rect, width, height,
+                tl, tr, bl, br, glyph.rect,
                 static_cast<float>(
                     std::fmod((anchor.angle + rotate + instance.offset + 2 * M_PI),
                          (2 * M_PI))),
