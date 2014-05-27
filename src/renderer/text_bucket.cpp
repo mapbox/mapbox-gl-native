@@ -38,8 +38,6 @@ void TextBucket::addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
         const auto &bl = glyph.bl;
         const auto &br = glyph.br;
         const auto &tex = glyph.tex;
-        const auto &width = glyph.width;
-        const auto &height = glyph.height;
         const auto &angle = glyph.angle;
 
         float minZoom = util::max(
@@ -78,13 +76,13 @@ void TextBucket::addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
                           tex.y, angle, minZoom, placementRange, maxZoom,
                           placementZoom);
         vertexBuffer.add(glyphAnchor.x, glyphAnchor.y, tr.x, tr.y,
-                          tex.x + width, tex.y, angle, minZoom, placementRange,
+                          tex.x + tex.w, tex.y, angle, minZoom, placementRange,
                           maxZoom, placementZoom);
         vertexBuffer.add(glyphAnchor.x, glyphAnchor.y, bl.x, bl.y, tex.x,
-                          tex.y + height, angle, minZoom, placementRange,
+                          tex.y + tex.h, angle, minZoom, placementRange,
                           maxZoom, placementZoom);
         vertexBuffer.add(glyphAnchor.x, glyphAnchor.y, br.x, br.y,
-                          tex.x + width, tex.y + height, angle, minZoom,
+                          tex.x + tex.w, tex.y + tex.h, angle, minZoom,
                           placementRange, maxZoom, placementZoom);
 
         // add the two triangles, referencing the four coordinates we just
