@@ -24,8 +24,7 @@
         'product_extension': 'app',
         'mac_bundle': 1,
         'mac_bundle_resources': [
-          '<!@(find img -type f)',
-          '<(PRODUCT_DIR)/MVKMapKit.bundle'
+          '<!@(find img -type f)'
         ],
         'link_settings': {
           'libraries': [
