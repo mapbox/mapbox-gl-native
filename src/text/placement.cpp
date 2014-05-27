@@ -72,6 +72,14 @@ struct GlyphInstance {
     const float angle = 0.0f;
 };
 
+struct GlyphsAndBoxes {
+    explicit GlyphsAndBoxes(const PlacedGlyphs &glyphs, const GlyphBoxes &boxes)
+        : glyphs(glyphs), boxes(boxes) {}
+
+    const PlacedGlyphs glyphs;
+    const GlyphBoxes boxes;
+};
+
 typedef std::vector<GlyphInstance> GlyphInstances;
 
 void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
@@ -145,7 +153,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
     }
 }
 
-PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
+GlyphsAndBoxes getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
                        const IndexedFaces &faces, float fontScale,
                        bool horizontal, const std::vector<Coordinate> &line,
                        float maxAngleDelta, float rotate) {
@@ -163,6 +171,7 @@ PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
     // }
 
     PlacedGlyphs glyphs;
+    GlyphBoxes boxes;
 
     const uint32_t buffer = 3;
 
@@ -235,23 +244,28 @@ PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
                     fontScale * util::max(tl.y, tr.y, bl.y, br.y)};
             }
 
+            GlyphBox glyphBox = GlyphBox{
+                box,
+                // Prevent label from extending past the end of the line
+                util::max(instance.minScale, anchor.scale),
+                instance.maxScale,
+                instance.anchor,
+                horizontal};
+
             // Remember the glyph for later insertion.
             glyphs.emplace_back(PlacedGlyph{
                 tl, tr, bl, br, glyph.rect,
                 static_cast<float>(
-                    std::fmod((anchor.angle + rotate + instance.offset + 2 * M_PI),
-                         (2 * M_PI))),
-                GlyphBox{box,             instance.minScale, instance.maxScale,
-                         instance.anchor, horizontal}});
+                    std::fmod((anchor.angle + rotate + instance.offset + 2 * M_PI), (2 * M_PI))),
+                glyphBox});
+
+            if (instance.offset == 0.0f) {
+                boxes.emplace_back(glyphBox);
+            }
         }
     }
 
-    // Prevent label from extending past the end of the line
-    for (PlacedGlyph &g : glyphs) {
-        g.glyphBox.minScale = util::max(g.glyphBox.minScale, anchor.scale);
-    }
-
-    return glyphs;
+    return GlyphsAndBoxes{glyphs, boxes};
 }
 
 void Placement::addFeature(TextBucket& bucket,
@@ -289,14 +303,14 @@ void Placement::addFeature(TextBucket& bucket,
     }
 
     for (Anchor anchor : anchors) {
-        PlacedGlyphs glyphs =
+        GlyphsAndBoxes glyphsAndBoxes =
             getGlyphs(anchor, advance, shaping, faces, fontScale, horizontal,
                       line, maxAngleDelta, rotate);
         PlacementProperty place =
-            collision.place(glyphs, anchor, anchor.scale, maxPlacementScale,
+            collision.place(glyphsAndBoxes.boxes, anchor, anchor.scale, maxPlacementScale,
                             padding, horizontal, info.alwaysVisible);
         if (place) {
-            bucket.addGlyphs(glyphs, place.zoom, place.rotationRange,
+            bucket.addGlyphs(glyphsAndBoxes.glyphs, place.zoom, place.rotationRange,
                              zoom - zOffset);
         }
     }
