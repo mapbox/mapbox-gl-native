@@ -72,14 +72,6 @@ struct GlyphInstance {
     const float angle = 0.0f;
 };
 
-struct GlyphsAndBoxes {
-    explicit GlyphsAndBoxes(const PlacedGlyphs &glyphs, const GlyphBoxes &boxes)
-        : glyphs(glyphs), boxes(boxes) {}
-
-    const PlacedGlyphs glyphs;
-    const GlyphBoxes boxes;
-};
-
 typedef std::vector<GlyphInstance> GlyphInstances;
 
 void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
@@ -153,7 +145,8 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
     }
 }
 
-GlyphsAndBoxes getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
+void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
+                       Anchor &anchor, float advance, const Shaping &shaping,
                        const IndexedFaces &faces, float fontScale,
                        bool horizontal, const std::vector<Coordinate> &line,
                        float maxAngleDelta, float rotate) {
@@ -169,9 +162,6 @@ GlyphsAndBoxes getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
     // } else if (alignment == 'right') {
     //     origin.x -= advance;
     // }
-
-    PlacedGlyphs glyphs;
-    GlyphBoxes boxes;
 
     const uint32_t buffer = 3;
 
@@ -264,8 +254,6 @@ GlyphsAndBoxes getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
             }
         }
     }
-
-    return GlyphsAndBoxes{glyphs, boxes};
 }
 
 void Placement::addFeature(TextBucket& bucket,
@@ -303,15 +291,16 @@ void Placement::addFeature(TextBucket& bucket,
     }
 
     for (Anchor anchor : anchors) {
-        GlyphsAndBoxes glyphsAndBoxes =
-            getGlyphs(anchor, advance, shaping, faces, fontScale, horizontal,
+        PlacedGlyphs glyphs;
+        GlyphBoxes boxes;
+
+        getGlyphs(glyphs, boxes, anchor, advance, shaping, faces, fontScale, horizontal,
                       line, maxAngleDelta, rotate);
         PlacementProperty place =
-            collision.place(glyphsAndBoxes.boxes, anchor, anchor.scale, maxPlacementScale,
+            collision.place(boxes, anchor, anchor.scale, maxPlacementScale,
                             padding, horizontal, info.alwaysVisible);
         if (place) {
-            bucket.addGlyphs(glyphsAndBoxes.glyphs, place.zoom, place.rotationRange,
-                             zoom - zOffset);
+            bucket.addGlyphs(glyphs, place.zoom, place.rotationRange, zoom - zOffset);
         }
     }
 }
