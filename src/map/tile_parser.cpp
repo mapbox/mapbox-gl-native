@@ -157,7 +157,7 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& laye
 
 std::unique_ptr<Bucket> TileParser::createIconBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
     std::unique_ptr<IconBucket> bucket = std::make_unique<IconBucket>(
-        tile.iconVertexBuffer, bucket_desc);
+        tile.iconVertexBuffer, bucket_desc, placement.collision);
     addBucketFeatures(bucket, layer, bucket_desc, spriteAtlas);
     return obsolete() ? nullptr : std::move(bucket);
 }

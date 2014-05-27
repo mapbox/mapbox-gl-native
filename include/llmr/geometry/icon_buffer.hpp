@@ -7,12 +7,13 @@ namespace llmr {
 
     class IconVertexBuffer : public Buffer<
     4 + // int16 x/y coordinates per vertex (== 4 bytes)
-    4   // uint16 x/y coordinates of icon in sprite (== 4 bytes)
+    4 + // uint16 x/y coordinates of icon in sprite (== 4 bytes)
+    4   // 1 byte for zoom
     > {
     public:
         typedef int16_t vertex_type;
 
-        void add(vertex_type x, vertex_type y, uint16_t tx, uint16_t ty);
+        void add(vertex_type x, vertex_type y, uint16_t tx, uint16_t ty, float minzoom);
     };
 
 }

@@ -1,6 +1,7 @@
 #ifndef LLMR_RENDERER_ICONBUCKET
 #define LLMR_RENDERER_ICONBUCKET
 
+#include <llmr/text/collision.hpp>
 #include <llmr/renderer/bucket.hpp>
 #include <llmr/style/bucket_description.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
@@ -22,11 +23,12 @@ class IconShader;
 class DotShader;
 class SpriteAtlas;
 class VectorTileFeature;
+class Collision;
 
 class IconBucket : public Bucket {
 public:
     IconBucket(IconVertexBuffer& vertexBuffer,
-                const BucketDescription& bucket_desc);
+                const BucketDescription& bucket_desc, Collision &collision);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
     virtual bool hasData() const;
@@ -43,6 +45,7 @@ private:
 
     IconVertexBuffer& vertexBuffer;
     VertexArrayObject array;
+    Collision &collision;
 
     const size_t vertex_start;
     size_t vertex_end = 0;

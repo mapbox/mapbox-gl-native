@@ -16,10 +16,12 @@ public:
     void setDimension(const std::array<float, 2>& dimension);
     void setSize(float size);
     void setRatio(float ratio);
+    void setZoom(float zoom);
 
 private:
     int32_t a_pos = -1;
     int32_t a_tex = -1;
+    int32_t a_minzoom = -1;
 
     int32_t image = -1;
     int32_t u_image = -1;
@@ -35,6 +37,9 @@ private:
 
     float ratio = 0;
     int32_t u_ratio = -1;
+
+    float zoom = 0;
+    int32_t u_zoom = -1;
 };
 
 }
