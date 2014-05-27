@@ -57,7 +57,7 @@ std::list<TileHierarchy> partition(std::forward_list<Tile::ID> &&array) {
     }
 
     // Concatenate the remainder.
-    if (!array.empty()) {
+    if (!remainder.empty()) {
         result.splice(result.begin(), partition(std::move(remainder)));
     }
 
