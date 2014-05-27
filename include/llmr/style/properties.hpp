@@ -92,9 +92,9 @@ struct GenericClass {
     boost::optional<FunctionProperty> opacity;
     boost::optional<PropertyTransition> opacity_transition;
     boost::optional<bool> prerender;
-    boost::optional<FunctionProperty> prerenderBuffer;
-    boost::optional<FunctionProperty> prerenderSize;
-    boost::optional<FunctionProperty> prerenderBlur;
+    boost::optional<float> prerenderBuffer;
+    boost::optional<uint16_t> prerenderSize;
+    boost::optional<uint16_t> prerenderBlur;
 };
 
 struct GenericProperties {
