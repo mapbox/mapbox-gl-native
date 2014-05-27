@@ -63,11 +63,11 @@ public:
     } computed;
 
 private:
-    bool transitionInProgress(std::string layer_name, TransitionablePropertyKey key);
-    bool transitionExists(std::string layer_name, TransitionablePropertyKey key);
-    bool inNeedOfTransition(std::string layer_name, TransitionablePropertyKey key);
-    uint64_t transitionDuration(std::string layer_name, TransitionablePropertyKey key);
-    uint64_t transitionDelay(std::string layer_name, TransitionablePropertyKey key);
+    bool transitionInProgress(const std::string &layer_name, TransitionablePropertyKey key, time start);
+    bool transitionExists(const std::string &layer_name, TransitionablePropertyKey key) const;
+    bool inNeedOfTransition(const std::string &layer_name, TransitionablePropertyKey key) const;
+    uint64_t transitionDuration(const std::string &layer_name, TransitionablePropertyKey key) const;
+    uint64_t transitionDelay(const std::string &layer_name, TransitionablePropertyKey key) const;
 
     void cascadeProperties(GenericProperties &properties, const GenericClass& klass, const std::string& layer_name, const std::string& class_name, float z);
 

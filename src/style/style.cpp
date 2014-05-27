@@ -322,7 +322,7 @@ void Style::cascade(float z) {
         const std::string& layer_name = fill_pair.first;
 
         // translate
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Translate)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Translate, start)) {
 
             computed.fills[layer_name].translate = transitioning.fills[layer_name].translate;
 
@@ -341,7 +341,7 @@ void Style::cascade(float z) {
         }
 
         // fill color
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::FillColor)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::FillColor, start)) {
 
             computed.fills[layer_name].fill_color = transitioning.fills[layer_name].fill_color;
 
@@ -360,7 +360,7 @@ void Style::cascade(float z) {
         }
 
         // stroke color
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::StrokeColor)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::StrokeColor, start)) {
 
             computed.fills[layer_name].stroke_color = transitioning.fills[layer_name].stroke_color;
 
@@ -379,7 +379,7 @@ void Style::cascade(float z) {
         }
 
         // opacity
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity, start)) {
 
             computed.fills[layer_name].opacity = transitioning.fills[layer_name].opacity;
 
@@ -403,7 +403,7 @@ void Style::cascade(float z) {
         const std::string& layer_name = line_pair.first;
 
         // translate
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Translate)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Translate, start)) {
 
             computed.lines[layer_name].translate = transitioning.lines[layer_name].translate;
 
@@ -422,7 +422,7 @@ void Style::cascade(float z) {
         }
 
         // width
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Width)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Width, start)) {
 
             computed.lines[layer_name].width = transitioning.lines[layer_name].width;
 
@@ -441,7 +441,7 @@ void Style::cascade(float z) {
         }
 
         // offset
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Offset)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Offset, start)) {
 
             computed.lines[layer_name].offset = transitioning.lines[layer_name].offset;
 
@@ -460,7 +460,7 @@ void Style::cascade(float z) {
         }
 
         // color
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Color)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Color, start)) {
 
             computed.lines[layer_name].color = transitioning.lines[layer_name].color;
 
@@ -479,7 +479,7 @@ void Style::cascade(float z) {
         }
 
         // dasharray
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::DashArray)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::DashArray, start)) {
 
             computed.lines[layer_name].dash_array = transitioning.lines[layer_name].dash_array;
 
@@ -498,7 +498,7 @@ void Style::cascade(float z) {
         }
 
         // opacity
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity, start)) {
 
             computed.lines[layer_name].opacity = transitioning.lines[layer_name].opacity;
 
@@ -522,7 +522,7 @@ void Style::cascade(float z) {
         const std::string& layer_name = icon_pair.first;
 
         // translate
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Translate)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Translate, start)) {
 
             computed.icons[layer_name].translate = transitioning.icons[layer_name].translate;
 
@@ -541,7 +541,7 @@ void Style::cascade(float z) {
         }
 
         // color
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Color)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Color, start)) {
 
             computed.icons[layer_name].color = transitioning.icons[layer_name].color;
 
@@ -560,7 +560,7 @@ void Style::cascade(float z) {
         }
 
         // opacity
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity, start)) {
 
             computed.icons[layer_name].opacity = transitioning.icons[layer_name].opacity;
 
@@ -579,7 +579,7 @@ void Style::cascade(float z) {
         }
 
         // radius
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Radius)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Radius, start)) {
 
             computed.icons[layer_name].radius = transitioning.icons[layer_name].radius;
 
@@ -598,7 +598,7 @@ void Style::cascade(float z) {
         }
 
         // blur
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Blur)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Blur, start)) {
 
             computed.icons[layer_name].blur = transitioning.icons[layer_name].blur;
 
@@ -622,7 +622,7 @@ void Style::cascade(float z) {
         const std::string& layer_name = text_pair.first;
 
         // translate
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Translate)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Translate, start)) {
 
             computed.texts[layer_name].translate = transitioning.texts[layer_name].translate;
 
@@ -641,7 +641,7 @@ void Style::cascade(float z) {
         }
 
         // color
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Color)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Color, start)) {
 
             computed.texts[layer_name].color = transitioning.texts[layer_name].color;
 
@@ -660,7 +660,7 @@ void Style::cascade(float z) {
         }
 
         // halo
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Halo)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Halo, start)) {
 
             computed.texts[layer_name].halo = transitioning.texts[layer_name].halo;
 
@@ -679,7 +679,7 @@ void Style::cascade(float z) {
         }
 
         // halo radius
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::HaloRadius)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::HaloRadius, start)) {
 
             computed.texts[layer_name].halo_radius = transitioning.texts[layer_name].halo_radius;
 
@@ -698,7 +698,7 @@ void Style::cascade(float z) {
         }
 
         // halo blur
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::HaloBlur)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::HaloBlur, start)) {
 
             computed.texts[layer_name].halo_blur = transitioning.texts[layer_name].halo_blur;
 
@@ -717,7 +717,7 @@ void Style::cascade(float z) {
         }
 
         // opacity
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity, start)) {
 
             computed.texts[layer_name].opacity = transitioning.texts[layer_name].opacity;
 
@@ -741,7 +741,7 @@ void Style::cascade(float z) {
         const std::string& layer_name = raster_pair.first;
 
         // opacity
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity, start)) {
 
             computed.rasters[layer_name].opacity = transitioning.rasters[layer_name].opacity;
 
@@ -765,7 +765,7 @@ void Style::cascade(float z) {
         const std::string& layer_name = composite_pair.first;
 
         // opacity
-        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity)) {
+        if (transitionInProgress(layer_name, TransitionablePropertyKey::Opacity, start)) {
 
             computed.composites[layer_name].opacity = transitioning.composites[layer_name].opacity;
 
@@ -787,7 +787,7 @@ void Style::cascade(float z) {
     // Background
     {
         // color
-        if (transitionInProgress("background", TransitionablePropertyKey::Color)) {
+        if (transitionInProgress("background", TransitionablePropertyKey::Color, start)) {
 
             computed.background.color = transitioning.background.color;
 
@@ -806,7 +806,7 @@ void Style::cascade(float z) {
         }
 
         // opacity
-        if (transitionInProgress("background", TransitionablePropertyKey::Opacity)) {
+        if (transitionInProgress("background", TransitionablePropertyKey::Opacity, start)) {
 
             computed.background.opacity = transitioning.background.opacity;
 
@@ -826,31 +826,100 @@ void Style::cascade(float z) {
     }
 }
 
-bool Style::transitionInProgress(std::string layer_name, TransitionablePropertyKey key) {
-    if (!transitionExists(layer_name, key)) return false;
+bool Style::transitionInProgress(const std::string &layer_name, TransitionablePropertyKey key,
+                                 time start) {
+    const auto it = transitions.find(layer_name);
+    if (it == transitions.end()) {
+        return false;
+    }
 
-    return (transitions[layer_name].find(key)->second->update(util::now()) != util::transition::complete);
+    const auto &const_transition = it->second;
+    const auto const_transition_it = const_transition.find(key);
+
+    if (const_transition_it == const_transition.end()) {
+        return false;
+    }
+
+    return const_transition_it->second->update(start) != util::transition::complete;
 }
 
-bool Style::transitionExists(std::string layer_name, TransitionablePropertyKey key) {
-    return (transitions[layer_name].count(key) != 0);
+bool Style::transitionExists(const std::string &layer_name, TransitionablePropertyKey key) const {
+    const auto it = transitions.find(layer_name);
+    if (it == transitions.end()) {
+        return false;
+    }
+
+    const auto &const_transition = it->second;
+    return const_transition.find(key) != const_transition.end();
 }
 
-bool Style::inNeedOfTransition(std::string layer_name, TransitionablePropertyKey key) {
-    if (!transitionDuration(layer_name, key)) return false;
-    if (transitionExists(layer_name, key)) return false;
+static const std::string empty_class_name;
+inline const std::string &
+find_effective_class(const std::unordered_map<
+                         std::string, std::unordered_map<TransitionablePropertyKey, std::string>> &
+                         effective_class_keys,
+                     const std::string &layer_name, TransitionablePropertyKey key) {
+    const auto effective_class_keys_it = effective_class_keys.find(layer_name);
+    if (effective_class_keys_it != effective_class_keys.end()) {
+        const auto &effective_classes = effective_class_keys_it->second;
+        const auto effective_class_it = effective_classes.find(key);
+        if (effective_class_it != effective_classes.end()) {
+            return effective_class_it->second;
+        }
+    }
 
-    return (computed.effective_classes[layer_name][key] != previous.effective_classes[layer_name][key]);
+    return empty_class_name;
 }
 
-uint64_t Style::transitionDuration(std::string layer_name, TransitionablePropertyKey key) {
-    return (properties_to_transition[layer_name].count(key) ?
-                properties_to_transition[layer_name][key].duration :
-                default_transition_duration) * 1_millisecond;
+bool Style::inNeedOfTransition(const std::string &layer_name, TransitionablePropertyKey key) const {
+    if (!transitionDuration(layer_name, key)) {
+        return false;
+    } else if (transitionExists(layer_name, key)) {
+        return false;
+    }
+
+    // This is a const version of this code:
+    //    return (computed.effective_classes[layer_name][key] !=
+    //            previous.effective_classes[layer_name][key]);
+
+    const std::string &computed_class =
+        find_effective_class(computed.effective_classes, layer_name, key);
+    const std::string &previous_class =
+        find_effective_class(previous.effective_classes, layer_name, key);
+
+    return computed_class != previous_class;
 }
 
-uint64_t Style::transitionDelay(std::string layer_name, TransitionablePropertyKey key) {
-    return (properties_to_transition[layer_name][key].delay * 1_millisecond);
+uint64_t Style::transitionDuration(const std::string &layer_name,
+                                   TransitionablePropertyKey key) const {
+    const auto it = properties_to_transition.find(layer_name);
+    if (it == properties_to_transition.end()) {
+        return default_transition_duration * 1_millisecond;
+    }
+
+    const auto &const_properties_to_transition = it->second;
+    const auto it2 = const_properties_to_transition.find(key);
+    if (it2 != const_properties_to_transition.end()) {
+        return it2->second.duration * 1_millisecond;
+    } else {
+        return default_transition_duration * 1_millisecond;
+    }
+}
+
+uint64_t Style::transitionDelay(const std::string &layer_name,
+                                TransitionablePropertyKey key) const {
+    const auto it = properties_to_transition.find(layer_name);
+    if (it == properties_to_transition.end()) {
+        return 0;
+    }
+
+    const auto &const_properties_to_transition = it->second;
+    const auto it2 = const_properties_to_transition.find(key);
+    if (it2 != const_properties_to_transition.end()) {
+        return it2->second.delay * 1_millisecond;
+    } else {
+        return 0;
+    }
 }
 
 bool Style::needsTransition() const {
