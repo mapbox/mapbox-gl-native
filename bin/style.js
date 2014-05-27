@@ -1473,11 +1473,16 @@ module.exports = {
         ],
         "street_casing_width": [
             "stops",
-            {"z": 13,"val": 0.4},
+            {"z": 13, "val": 0.4},
             {"z": 14, "val": 1},
             {"z": 15, "val": 2.5},
             {"z": 16, "val": 4},
             {"z": 17, "val": 10}
+        ],
+        "street_casing_opacity": [
+            "stops",
+            {"z": 14, "val": 0},
+            {"z": 14.5, "val": 1}
         ],
         "service_casing_width": [
             "stops",
@@ -1892,7 +1897,8 @@ module.exports = {
                 },
                 "tunnel_street_casing": {
                     "color": "#d9d5c6",
-                    "width": "street_casing_width"
+                    "width": "street_casing_width",
+                    "opacity": "street_casing_opacity"
                 },
                 "tunnel_street": {
                     "color": "#d9d5c6",
@@ -1956,7 +1962,8 @@ module.exports = {
                 },
                 "road_street_casing": {
                     "color": "#d9d5c6",
-                    "width": "street_casing_width"
+                    "width": "street_casing_width",
+                    "opacity": "street_casing_opacity"
                 },
                 "road_street": {
                     "color": "street",
@@ -2091,7 +2098,8 @@ module.exports = {
                 },
                 "bridge_street_casing": {
                     "color": "#d9d5c6",
-                    "width": "street_casing_width"
+                    "width": "street_casing_width",
+                    "opacity": "street_casing_opacity"
                 },
                 "bridge_street": {
                     "color": "street",
@@ -2602,7 +2610,8 @@ module.exports = {
                 },
                 "tunnel_street_casing": {
                     "color": "street_case_night",
-                    "width": "street_casing_width"
+                    "width": "street_casing_width",
+                    "opacity": "street_casing_opacity"
                 },
                 "tunnel_street": {
                     "color": "street_night",
@@ -2666,7 +2675,8 @@ module.exports = {
                 },
                 "road_street_casing": {
                     "color": "street_case_night",
-                    "width": "street_casing_width"
+                    "width": "street_casing_width",
+                    "opacity": "street_casing_opacity"
                 },
                 "road_street": {
                     "color": "street_night",
@@ -2797,7 +2807,8 @@ module.exports = {
                 },
                 "bridge_street_casing": {
                     "color": "street_case_night",
-                    "width": "street_casing_width"
+                    "width": "street_casing_width",
+                    "opacity": "street_casing_opacity"
                 },
                 "bridge_street": {
                     "color": "street_night",
