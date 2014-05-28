@@ -1738,6 +1738,7 @@ module.exports = {
                     "color": "#103",
                     "antialias": false,
                     "prerender": true,
+                    "prerender-size": 512,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -1750,6 +1751,7 @@ module.exports = {
                     "color": "#206",
                     "antialias": false,
                     "prerender": true,
+                    "prerender-size": 512,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -1762,6 +1764,7 @@ module.exports = {
                     "color": "#fffff3",
                     "antialias": false,
                     "prerender": true,
+                    "prerender-size": 512,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -1774,6 +1777,7 @@ module.exports = {
                     "color": "#ffd",
                     "antialias": false,
                     "prerender": true,
+                    "prerender-size": 512,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2446,6 +2450,7 @@ module.exports = {
                     "color": "#103",
                     "antialias": false,
                     "prerender": true,
+                    "prerender-size": 512,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2458,6 +2463,7 @@ module.exports = {
                     "color": "#206",
                     "antialias": false,
                     "prerender": true,
+                    "prerender-size": 512,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2470,6 +2476,7 @@ module.exports = {
                     "color": "#fdfdad",
                     "antialias": false,
                     "prerender": true,
+                    "prerender-size": 512,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2483,6 +2490,7 @@ module.exports = {
                     "color": "#ffe1b7",
                     "antialias": false,
                     "prerender": true,
+                    "prerender-size": 512,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
