@@ -529,7 +529,7 @@ void StyleParser::parseGenericClass(GenericClass &klass, JSVal value) {
     }
 
     if (value.HasMember("prerender-size")) {
-        klass.prerenderBuffer = toNumber<uint64_t>(parseValue(value["prerender-size"]));
+        klass.prerenderSize = toNumber<uint64_t>(parseValue(value["prerender-size"]));
     }
 
     if (value.HasMember("prerender-blur")) {
