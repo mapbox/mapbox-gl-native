@@ -1642,6 +1642,11 @@ module.exports = {
             {"z": 19, "val": 12},
             {"z": 20, "val": 24},
             {"z": 21, "val": 48}
+        ],
+        "country_label_size": [
+            "stops",
+            {"z": 1, "val": 14},
+            {"z": 12, "val": 24}
         ]
     },
     "classes": [
@@ -2185,11 +2190,7 @@ module.exports = {
                 "country_label": {
                     "color": "country_text",
                     "stroke": "rgba(255,255,255,0.5)",
-                    "size": [
-                        "stops",
-                        {"z": 2, "val": 14},
-                        {"z": 12, "val": 24}
-                    ]
+                    "size": "country_label_size"
                 },
                 "country_label_line": {
                     "color": "country_text",
@@ -2932,11 +2933,7 @@ module.exports = {
                 "country_label": {
                     "color": "text_night",
                     "stroke": "text_stroke_night",
-                    "size": [
-                        "stops",
-                        {"z": 1, "val": 14},
-                        {"z": 12, "val": 24}
-                    ]
+                    "size": "country_label_size"
                 },
                 "country_label_line": {
                     "color": "text_night",
