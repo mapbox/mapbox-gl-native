@@ -57,13 +57,11 @@ void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprit
             // TODO unhardcode tilesize
             const float scale = 8.0 / 2.0;
             const CollisionRect box{-size * scale, -size * scale, size * scale, size * scale };
-            const vec2<float> c{0.0, 0.0};
             CollisionAnchor anchor{static_cast<float>(x), static_cast<float>(y)};
-            PlacedGlyphs glyphs;
-            glyphs.emplace_back(PlacedGlyph{c, c, c, c, rect, 0.0,
-                    GlyphBox{box, 1.0, 16.0, anchor, false}});
+            GlyphBoxes boxes;
+            boxes.emplace_back(GlyphBox{box, 1.0, 16.0, anchor, false});
 
-            PlacementProperty place = collision.place(glyphs, anchor, 1.0, 16.0,
+            PlacementProperty place = collision.place(boxes, anchor, 1.0, 16.0,
                     0.0, false, false);
 
             if (place) {
