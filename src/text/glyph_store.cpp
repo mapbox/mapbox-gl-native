@@ -27,7 +27,7 @@ GlyphPBF::GlyphPBF(const std::string &fontStack, GlyphRange glyphRange)
     std::string url = util::sprintf<255>("http://mapbox.s3.amazonaws.com/gl-glyphs/%s/%d-%d.pbf", fontStack.c_str(), glyphRange.first, glyphRange.second);
 
     // TODO: Find more reliable URL normalization function
-    std::replace(url.begin(), url.end(), ' ', '+');
+    // std::replace(url.begin(), url.end(), ' ', '+');
 
     platform::request_http(url, [&](platform::Response *res) {
         if (res->code != 200) {
@@ -91,7 +91,7 @@ void GlyphPBF::parse(FontStack &stack) {
                         }
                     }
 
-                    stack.insert(id, glyph);
+                    stack.insert(id, glyph.metrics, glyph.bitmap);
                 } else {
                     fontstack_pbf.skip();
                 }
