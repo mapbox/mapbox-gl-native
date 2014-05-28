@@ -477,7 +477,7 @@ FunctionProperty StyleParser::parseFunction(JSVal value) {
     return property;
 }
 
-PropertyTransition StyleParser::parseTransition(JSVal value, std::string property_name) {
+boost::optional<PropertyTransition> StyleParser::parseTransition(JSVal value, std::string property_name) {
     uint16_t duration = 0, delay = 0;
     std::string transition_property = std::string("transition-").append(property_name);
     if (value.HasMember(transition_property.c_str())) {
@@ -492,12 +492,11 @@ PropertyTransition StyleParser::parseTransition(JSVal value, std::string propert
         }
     }
 
-    PropertyTransition transition;
-
-    transition.duration = duration;
-    transition.delay = delay;
-
-    return transition;
+    if (duration || delay) {
+        return boost::optional<PropertyTransition>(PropertyTransition { duration, delay });
+    } else {
+        return boost::optional<PropertyTransition>();
+    }
 }
 
 void StyleParser::parseGenericClass(GenericClass &klass, JSVal value) {
@@ -529,7 +528,7 @@ void StyleParser::parseGenericClass(GenericClass &klass, JSVal value) {
     }
 
     if (value.HasMember("prerender-size")) {
-        klass.prerenderBuffer = toNumber<uint64_t>(parseValue(value["prerender-size"]));
+        klass.prerenderSize = toNumber<uint64_t>(parseValue(value["prerender-size"]));
     }
 
     if (value.HasMember("prerender-blur")) {

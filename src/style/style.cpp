@@ -35,7 +35,7 @@ void Style::cascadeProperties(GenericProperties &properties, const GenericClass&
                             klass.translate.get()[1].evaluate<float>(z) }};
         computed.effective_classes[layer_name][TransitionablePropertyKey::Translate] = class_name;
         if (klass.translate_transition && klass.translate_transition.get().duration) {
-            properties_to_transition[layer_name][TransitionablePropertyKey::Translate] = klass.translate_transition.get();
+            properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Translate, klass.translate_transition.get());
         }
     }
 
@@ -47,7 +47,7 @@ void Style::cascadeProperties(GenericProperties &properties, const GenericClass&
         properties.opacity = klass.opacity.get().evaluate<float>(z);
         computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
         if (klass.opacity_transition && klass.opacity_transition.get().duration) {
-            properties_to_transition[layer_name][TransitionablePropertyKey::Opacity] = klass.opacity_transition.get();
+            properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Opacity, klass.opacity_transition.get());
         }
     }
 
@@ -120,7 +120,7 @@ void Style::cascade(float z) {
                 fill.fill_color = layer.fill_color.get();
                 computed.effective_classes[layer_name][TransitionablePropertyKey::FillColor] = class_name;
                 if (layer.fill_color_transition && layer.fill_color_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::FillColor] = layer.fill_color_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::FillColor, layer.fill_color_transition.get());
                 }
             }
 
@@ -128,7 +128,7 @@ void Style::cascade(float z) {
                 fill.stroke_color = layer.stroke_color.get();
                 computed.effective_classes[layer_name][TransitionablePropertyKey::StrokeColor] = class_name;
                 if (layer.stroke_color_transition && layer.stroke_color_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::StrokeColor] = layer.stroke_color_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::StrokeColor, layer.stroke_color_transition.get());
                 }
             }
 
@@ -150,7 +150,7 @@ void Style::cascade(float z) {
                 stroke.width = layer.width.get().evaluate<float>(z);
                 computed.effective_classes[layer_name][TransitionablePropertyKey::Width] = class_name;
                 if (layer.width_transition && layer.width_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Width] = layer.width_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Width, layer.width_transition.get());
                 }
 
             }
@@ -159,7 +159,7 @@ void Style::cascade(float z) {
                 stroke.offset = layer.offset.get().evaluate<float>(z);
                 computed.effective_classes[layer_name][TransitionablePropertyKey::Offset] = class_name;
                 if (layer.offset_transition && layer.offset_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Offset] = layer.offset_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Offset, layer.offset_transition.get());
                 }
             }
 
@@ -167,7 +167,7 @@ void Style::cascade(float z) {
                 stroke.color = layer.color.get();
                 computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
                 if (layer.color_transition && layer.color_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Color] = layer.color_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Color, layer.color_transition.get());
                 }
             }
 
@@ -176,7 +176,7 @@ void Style::cascade(float z) {
                                        layer.dash_array.get()[1].evaluate<float>(z) }};
                 computed.effective_classes[layer_name][TransitionablePropertyKey::DashArray] = class_name;
                 if (layer.dash_array_transition && layer.dash_array_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::DashArray] = layer.dash_array_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::DashArray, layer.dash_array_transition.get());
                 }
             }
         }
@@ -194,7 +194,7 @@ void Style::cascade(float z) {
                 icon.color = layer.color.get();
                 computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
                 if (layer.color_transition && layer.color_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Color] = layer.color_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Color, layer.color_transition.get());
                 }
             }
 
@@ -210,7 +210,7 @@ void Style::cascade(float z) {
                 icon.radius = layer.radius.get().evaluate<float>(z);
                 computed.effective_classes[layer_name][TransitionablePropertyKey::Radius] = class_name;
                 if (layer.radius_transition && layer.radius_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Radius] = layer.radius_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Radius, layer.radius_transition.get());
                 }
             }
 
@@ -218,7 +218,7 @@ void Style::cascade(float z) {
                 icon.blur = layer.blur.get().evaluate<float>(z);
                 computed.effective_classes[layer_name][TransitionablePropertyKey::Blur] = class_name;
                 if (layer.blur_transition && layer.blur_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Blur] = layer.blur_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Blur, layer.blur_transition.get());
                 }
             }
         }
@@ -236,7 +236,7 @@ void Style::cascade(float z) {
                 text.color = layer.color.get();
                 computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
                 if (layer.color_transition && layer.color_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Color] = layer.color_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Color, layer.color_transition.get());
                 }
             }
 
@@ -248,7 +248,7 @@ void Style::cascade(float z) {
                 text.halo = layer.halo.get();
                 computed.effective_classes[layer_name][TransitionablePropertyKey::Halo] = class_name;
                 if (layer.halo_transition && layer.halo_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::Halo] = layer.halo_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Halo, layer.halo_transition.get());
                 }
             }
 
@@ -256,7 +256,7 @@ void Style::cascade(float z) {
                 text.halo_radius = layer.halo_radius.get().evaluate<float>(z);
                 computed.effective_classes[layer_name][TransitionablePropertyKey::HaloRadius] = class_name;
                 if (layer.halo_radius_transition && layer.halo_radius_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::HaloRadius] = layer.halo_radius_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::HaloRadius, layer.halo_radius_transition.get());
                 }
             }
 
@@ -264,7 +264,7 @@ void Style::cascade(float z) {
                 text.halo_blur = layer.halo_blur.get().evaluate<float>(z);
                 computed.effective_classes[layer_name][TransitionablePropertyKey::HaloBlur] = class_name;
                 if (layer.halo_blur_transition && layer.halo_blur_transition.get().duration) {
-                    properties_to_transition[layer_name][TransitionablePropertyKey::HaloBlur] = layer.halo_blur_transition.get();
+                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::HaloBlur, layer.halo_blur_transition.get());
                 }
             }
 
@@ -305,7 +305,7 @@ void Style::cascade(float z) {
                 computed.background.color = sheetClass.background.color.get();
                 computed.effective_classes["background"][TransitionablePropertyKey::Color] = class_name;
                 if (sheetClass.background.color_transition && sheetClass.background.color_transition.get().duration) {
-                    properties_to_transition["background"][TransitionablePropertyKey::Color] = sheetClass.background.color_transition.get();
+                    properties_to_transition["background"].emplace(TransitionablePropertyKey::Color, sheetClass.background.color_transition.get());
                 }
             }
         }

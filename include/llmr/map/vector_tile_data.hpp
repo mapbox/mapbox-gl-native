@@ -13,7 +13,7 @@
 #include <llmr/geometry/icon_buffer.hpp>
 #include <llmr/geometry/text_buffer.hpp>
 
-#include <map>
+#include <unordered_map>
 
 namespace llmr {
 
@@ -42,7 +42,7 @@ protected:
 
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above
-    std::map<std::string, std::unique_ptr<Bucket>> buckets;
+    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
 
 };
 

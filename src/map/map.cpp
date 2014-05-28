@@ -548,7 +548,6 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers) {
         painter.setStrata(i * strata_thickness);
         renderLayer(*it, Opaque);
     }
-    // painter.endPass();
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
     }
@@ -566,7 +565,6 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers) {
         painter.setStrata(i * strata_thickness);
         renderLayer(*it, Translucent);
     }
-    // painter.endPass();
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
     }

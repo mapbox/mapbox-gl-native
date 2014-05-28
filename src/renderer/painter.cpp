@@ -144,15 +144,19 @@ void Painter::clear() {
 }
 
 void Painter::setOpaque() {
-    pass = Opaque;
-    glDisable(GL_BLEND);
-    depthMask(true);
+    if (pass != Opaque) {
+        pass = Opaque;
+        glDisable(GL_BLEND);
+        depthMask(true);
+    }
 }
 
 void Painter::setTranslucent() {
-    pass = Translucent;
-    glEnable(GL_BLEND);
-    depthMask(false);
+    if (pass != Translucent) {
+        pass = Translucent;
+        glEnable(GL_BLEND);
+        depthMask(false);
+    }
 }
 
 void Painter::setStrata(float value) {

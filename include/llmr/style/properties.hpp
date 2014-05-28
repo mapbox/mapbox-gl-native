@@ -16,6 +16,7 @@ namespace llmr {
 typedef std::array<float, 4> Color;
 
 struct PropertyTransition {
+    inline PropertyTransition(uint16_t duration, uint16_t delay = 0) : duration(duration), delay(delay) {}
     uint16_t duration = 0;
     uint16_t delay = 0;
 };
