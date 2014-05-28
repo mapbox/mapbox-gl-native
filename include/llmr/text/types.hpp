@@ -61,21 +61,17 @@ typedef std::vector<GlyphBox> GlyphBoxes;
 struct PlacedGlyph {
     explicit PlacedGlyph(const vec2<float> &tl, const vec2<float> &tr,
                       const vec2<float> &bl, const vec2<float> &br,
-                      const Rect<uint16_t> &tex, uint32_t width,
-                      uint32_t height, float angle, const GlyphBox &glyphBox)
+                      const Rect<uint16_t> &tex, float angle, const GlyphBox &glyphBox)
         : tl(tl),
           tr(tr),
           bl(bl),
           br(br),
           tex(tex),
-          width(width),
-          height(height),
           angle(angle),
           glyphBox(glyphBox) {}
 
     vec2<float> tl, tr, bl, br;
     Rect<uint16_t> tex;
-    uint32_t width, height;
     float angle;
     GlyphBox glyphBox;
 };

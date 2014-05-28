@@ -345,6 +345,15 @@ class MsvsSettings(object):
     else:
       return None
 
+  def GetAsmflags(self, config):
+    """Returns the flags that need to be added to ml invocations."""
+    config = self._TargetConfig(config)
+    asmflags = []
+    safeseh = self._Setting(('MASM', 'UseSafeExceptionHandlers'), config)
+    if safeseh == 'true':
+      asmflags.append('/safeseh')
+    return asmflags
+
   def GetCflags(self, config):
     """Returns the flags that need to be added to .c and .cc compilations."""
     config = self._TargetConfig(config)
@@ -379,6 +388,8 @@ class MsvsSettings(object):
         map={'false': '-', 'true': ''}, prefix='/Zc:wchar_t')
     cl('EnablePREfast', map={'true': '/analyze'})
     cl('AdditionalOptions', prefix='')
+    cl('EnableEnhancedInstructionSet',
+       map={'1': 'SSE', '2': 'SSE2', '3': 'AVX', '4': 'IA32'}, prefix='/arch:')
     cflags.extend(['/FI' + f for f in self._Setting(
         ('VCCLCompilerTool', 'ForcedIncludeFiles'), config, default=[])])
     if self.vs_version.short_name in ('2013', '2013e'):
@@ -387,12 +398,6 @@ class MsvsSettings(object):
     # ninja handles parallelism by itself, don't have the compiler do it too.
     cflags = filter(lambda x: not x.startswith('/MP'), cflags)
     return cflags
-
-  def GetPrecompiledHeader(self, config, gyp_to_build_path):
-    """Returns an object that handles the generation of precompiled header
-    build steps."""
-    config = self._TargetConfig(config)
-    return _PchHelper(self, config, gyp_to_build_path)
 
   def _GetPchFlags(self, config, extension):
     """Get the flags to be added to the cflags for precompiled header support.
@@ -532,6 +537,7 @@ class MsvsSettings(object):
     ld('Profile', map={'true': '/PROFILE'})
     ld('LargeAddressAware',
         map={'1': ':NO', '2': ''}, prefix='/LARGEADDRESSAWARE')
+    ld('ImageHasSafeExceptionHandlers', map={'true': '/SAFESEH'})
     # TODO(scottmg): This should sort of be somewhere else (not really a flag).
     ld('AdditionalDependencies', prefix='')
 
@@ -787,7 +793,7 @@ class PrecompiledHeader(object):
   def GetObjDependencies(self, sources, objs, arch):
     """Given a list of sources files and the corresponding object files,
     returns a list of the pch files that should be depended upon. The
-    additional wrapping in the return value is for interface compatability
+    additional wrapping in the return value is for interface compatibility
     with make.py on Mac, and xcode_emulation.py."""
     assert arch is None
     if not self._PchHeader():
