@@ -180,10 +180,10 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                     return vtxMatrix;
                 }();
 
-                pass = Opaque;
+                setOpaque();
                 renderFill(bucket, modifiedProperties, id, vtxMatrix);
 
-                pass = Translucent;
+                setTranslucent();
                 renderFill(bucket, modifiedProperties, id, vtxMatrix);
 
 
