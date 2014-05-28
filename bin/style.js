@@ -843,7 +843,7 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "padding": 2,
-            "fontSize": 12,
+            "fontSize": 11,
             "feature_type": "point",
             "type": "text",
             //"alwaysVisible": true
@@ -856,7 +856,7 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "padding": 2,
-            "fontSize": 12,
+            "fontSize": 10,
             "feature_type": "point",
             "type": "text",
             //"alwaysVisible": true
@@ -869,7 +869,7 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "padding": 2,
-            "fontSize": 12,
+            "fontSize": 10,
             "feature_type": "point",
             "type": "text",
             //"alwaysVisible": true
