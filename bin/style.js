@@ -800,7 +800,25 @@ module.exports = {
             "layer": "poi_label",
             "icon": "maki",
             "field": "scalerank",
-            "value": [1, 2, 3],
+            "value": [1, 2],
+            "size": 12,
+            "type": "point"
+        },
+        "poi_3": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "icon": "maki",
+            "field": "scalerank",
+            "value": 3,
+            "size": 12,
+            "type": "point"
+        },
+        "poi_4": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "icon": "maki",
+            "field": "scalerank",
+            "value": 4,
             "size": 12,
             "type": "point"
         },
@@ -813,7 +831,7 @@ module.exports = {
             "size": 24,
             "type": "point"
         },
-        "poi_label": {
+        "poi_label_1-2": {
             "source": "outdoors",
             "layer": "poi_label",
             "field": "scalerank",
@@ -824,10 +842,33 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "padding": 2,
-            "fontSize": 12,
+            "fontSize": 11,
             "feature_type": "point",
-            "type": "text",
-            "alwaysVisible": true
+            "type": "text"
+        },
+        "poi_label_3": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "field": "scalerank",
+            "value": 3,
+            "text_field": "name",
+            "path": "horizontal",
+            "padding": 2,
+            "fontSize": 10,
+            "feature_type": "point",
+            "type": "text"
+        },
+        "poi_label_4": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "field": "scalerank",
+            "value": 4,
+            "text_field": "name",
+            "path": "horizontal",
+            "padding": 2,
+            "fontSize": 10,
+            "feature_type": "point",
+            "type": "text"
         }
     },
     "structure": [
@@ -1300,10 +1341,6 @@ module.exports = {
             "bucket": "place_label_other"
         },
         {
-            "name": "poi_label",
-            "bucket": "poi_label"
-        },
-        {
             "name": "road_label",
             "bucket": "road_label"
         },
@@ -1320,13 +1357,34 @@ module.exports = {
             "bucket": "waterway_label"
         },
         {
+            "name": "poi_aerodrome",
+            "bucket": "poi_aerodrome"
+        },
+        {
             "name": "poi",
             "bucket": "poi"
         },
         {
-            "name": "poi_aerodrome",
-            "bucket": "poi_aerodrome"
-        }
+            "name": "poi_label_1-2",
+            "bucket": "poi_label_1-2"
+        },
+        {
+            "name": "poi_3",
+            "bucket": "poi_3"
+        },
+        {
+            "name": "poi_label_3",
+            "bucket": "poi_label_3"
+        },
+        {
+            "name": "poi_4",
+            "bucket": "poi_4"
+        },
+        {
+            "name": "poi_label_4",
+            "bucket": "poi_label_4"
+        },
+
     ],
     "constants": {
         "land": "rgb(244,239,225)",
@@ -1584,6 +1642,11 @@ module.exports = {
             {"z": 19, "val": 12},
             {"z": 20, "val": 24},
             {"z": 21, "val": 48}
+        ],
+        "country_label_size": [
+            "stops",
+            {"z": 1, "val": 14},
+            {"z": 12, "val": 24}
         ]
     },
     "classes": [
@@ -2131,11 +2194,7 @@ module.exports = {
                 "country_label": {
                     "color": "country_text",
                     "stroke": "rgba(255,255,255,0.5)",
-                    "size": [
-                        "stops",
-                        {"z": 6, "val": 14},
-                        {"z": 12, "val": 24}
-                    ]
+                    "size": "country_label_size"
                 },
                 "country_label_line": {
                     "color": "country_text",
@@ -2275,12 +2334,54 @@ module.exports = {
                 "poi": {
                     "antialias": false
                 },
-                "poi_label": {
+                "poi_3": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 16.5, "val": 0},
+                        {"z": 16.75, "val": 1}
+                    ]
+                },
+                "poi_4": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.5, "val": 0},
+                        {"z": 18.75, "val": 1}
+                    ]
+                },
+                "poi_label_1-2": {
+                    "color": "#444",
+                    "size": 11,
+                    "stroke": "land",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                    "translate": [0, 14]
+                },
+                "poi_label_3": {
                     "color": "#444",
                     "size": 10,
                     "stroke": "land",
-                    "strokeWidth": 0.6,
-                    "strokeBlur": 2,
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                    "translate": [0, 14],
+                    "opacity": [
+                        "stops",
+                        {"z": 16.5, "val": 0},
+                        {"z": 16.75, "val": 1}
+                    ]
+                },
+                "poi_label_4": {
+                    "color": "#444",
+                    "size": 10,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.5, "val": 0},
+                        {"z": 18.75, "val": 1}
+                    ],
+                    "stroke": "land",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
                     "translate": [0, 14]
                 },
                 "poi_aerodrome": {
@@ -2840,11 +2941,7 @@ module.exports = {
                 "country_label": {
                     "color": "text_night",
                     "stroke": "text_stroke_night",
-                    "size": [
-                        "stops",
-                        {"z": 6, "val": 14},
-                        {"z": 12, "val": 24}
-                    ]
+                    "size": "country_label_size"
                 },
                 "country_label_line": {
                     "color": "text_night",
@@ -2986,12 +3083,54 @@ module.exports = {
                     "color": "white",
                     "antialias": false
                 },
-                "poi_label": {
+                "poi_3": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 16.5, "val": 0},
+                        {"z": 16.75, "val": 1}
+                    ]
+                },
+                "poi_4": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.5, "val": 0},
+                        {"z": 18.75, "val": 1}
+                    ]
+                },
+                "poi_label_1-2": {
+                    "color": "#fff",
+                    "size": 11,
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                    "translate": [0, 14]
+                },
+                "poi_label_3": {
                     "color": "#fff",
                     "size": 10,
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
-                    "strokeBlur": 2,
+                    "strokeBlur": 1,
+                    "translate": [0, 14],
+                    "opacity": [
+                        "stops",
+                        {"z": 16.5, "val": 0},
+                        {"z": 16.75, "val": 1}
+                    ]
+                },
+                "poi_label_4": {
+                    "color": "#fff",
+                    "size": 10,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.5, "val": 0},
+                        {"z": 18.75, "val": 1}
+                    ],
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
                     "translate": [0, 14]
                 },
                 "poi_aerodrome": {
