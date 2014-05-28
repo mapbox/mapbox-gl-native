@@ -753,17 +753,45 @@ module.exports = {
             ],
             "text_field": "name",
             "path": "horizontal",
-            "fontSize": 14,
+            "fontSize": 18,
             "feature_type": "point",
             "type": "text"
         },
-        "road_label": {
+        "road_label_1": {
             "source": "outdoors",
             "layer": "road_label",
+            "field": "class",
+            "value": ["motorway","main"],
             "text_field": "name",
             "path": "curve",
             "padding": 2,
-            "fontSize": 13,
+            "fontSize": 18,
+            "feature_type": "line",
+            "type": "text",
+            "maxAngleDelta": 0.5
+        },
+        "road_label_2": {
+            "source": "outdoors",
+            "layer": "road_label",
+            "field": "class",
+            "value": ["street","street_limited"],
+            "text_field": "name",
+            "path": "curve",
+            "padding": 2,
+            "fontSize": 16,
+            "feature_type": "line",
+            "type": "text",
+            "maxAngleDelta": 0.5
+        },
+        "road_label_3": {
+            "source": "outdoors",
+            "layer": "road_label",
+            "field": "class",
+            "value": ["service","driveway","path"],
+            "text_field": "name",
+            "path": "curve",
+            "padding": 2,
+            "fontSize": 14,
             "feature_type": "line",
             "type": "text",
             "maxAngleDelta": 0.5
@@ -1329,8 +1357,16 @@ module.exports = {
             "bucket": "place_label_other"
         },
         {
-            "name": "road_label",
-            "bucket": "road_label"
+            "name": "road_label_1",
+            "bucket": "road_label_1"
+        },
+        {
+            "name": "road_label_2",
+            "bucket": "road_label_2"
+        },
+        {
+            "name": "road_label_3",
+            "bucket": "road_label_3"
         },
         {
             "name": "contour_label",
@@ -1602,12 +1638,27 @@ module.exports = {
             {"z": 8, "val": 1},
             {"z": 12, "val": 2}
         ],
-        "road_label_size": [
+        "road_label_1_size": [
             "stops",
-            {"z": 0, "val": 12},
+            {"z": 0, "val": 11},
             {"z": 14, "val": 12},
             {"z": 15, "val": 13},
-            {"z": 22, "val": 13}
+            {"z": 16, "val": 14},
+            {"z": 17, "val": 16},
+            {"z": 18, "val": 18}
+        ],
+        "road_label_2_size": [
+            "stops",
+            {"z": 0, "val": 11},
+            {"z": 14, "val": 12},
+            {"z": 16, "val": 14},
+            {"z": 18, "val": 16}
+        ],
+        "road_label_3_size": [
+            "stops",
+            {"z": 0, "val": 10},
+            {"z": 16, "val": 12},
+            {"z": 18, "val": 14}
         ],
         "fence_width": [
             "stops",
@@ -2287,18 +2338,32 @@ module.exports = {
                     "stroke": "text_stroke",
                     "size": [
                         "stops",
-                        {"z": 0, "val": 10},
-                        {"z": 14, "val": 11},
-                        {"z": 15, "val": 12},
-                        {"z": 16, "val": 14}
+                        {"z": 0, "val": 11},
+                        {"z": 14, "val": 12},
+                        {"z": 16, "val": 14},
+                        {"z": 18, "val": 18}
                     ]
                 },
-                "road_label": {
+                "road_label_1": {
                     "color": "#585042",
                     "stroke": "land",
                     "strokeWidth": 0.6,
                     "strokeBlur": 2,
-                    "size": "road_label_size"
+                    "size": "road_label_1_size"
+                },
+                "road_label_2": {
+                    "color": "#585042",
+                    "stroke": "land",
+                    "strokeWidth": 0.6,
+                    "strokeBlur": 2,
+                    "size": "road_label_2_size"
+                },
+                "road_label_3": {
+                    "color": "#585042",
+                    "stroke": "land",
+                    "strokeWidth": 0.6,
+                    "strokeBlur": 2,
+                    "size": "road_label_3_size"
                 },
                 "water_label": {
                     "color": "water_dark",
@@ -3027,18 +3092,32 @@ module.exports = {
                     "strokeBlur": 2,
                     "size": [
                         "stops",
-                        {"z": 0, "val": 10},
-                        {"z": 14, "val": 11},
-                        {"z": 15, "val": 12},
-                        {"z": 16, "val": 14}
+                        {"z": 0, "val": 11},
+                        {"z": 14, "val": 12},
+                        {"z": 16, "val": 14},
+                        {"z": 18, "val": 18}
                     ]
                 },
-                "road_label": {
+                "road_label_1": {
                     "color": "text_night",
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.5,
                     "strokeBlur": 3,
-                    "size": "road_label_size"
+                    "size": "road_label_1_size"
+                },
+                "road_label_2": {
+                    "color": "text_night",
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.5,
+                    "strokeBlur": 3,
+                    "size": "road_label_2_size"
+                },
+                "road_label_3": {
+                    "color": "text_night",
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.5,
+                    "strokeBlur": 3,
+                    "size": "road_label_3_size"
                 },
                 "water_label": {
                     "color": "water_dark_night",
