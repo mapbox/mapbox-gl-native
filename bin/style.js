@@ -822,7 +822,6 @@ module.exports = {
             "size": 12,
             "type": "point"
         },
-  
         "poi_aerodrome": {
             "source": "outdoors",
             "layer": "poi_label",
@@ -845,8 +844,7 @@ module.exports = {
             "padding": 2,
             "fontSize": 11,
             "feature_type": "point",
-            "type": "text",
-            //"alwaysVisible": true
+            "type": "text"
         },
         "poi_label_3": {
             "source": "outdoors",
@@ -858,8 +856,7 @@ module.exports = {
             "padding": 2,
             "fontSize": 10,
             "feature_type": "point",
-            "type": "text",
-            //"alwaysVisible": true
+            "type": "text"
         },
         "poi_label_4": {
             "source": "outdoors",
@@ -871,8 +868,7 @@ module.exports = {
             "padding": 2,
             "fontSize": 10,
             "feature_type": "point",
-            "type": "text",
-            //"alwaysVisible": true
+            "type": "text"
         }
     },
     "structure": [
@@ -2331,28 +2327,23 @@ module.exports = {
                     "stroke": "text_stroke"
                 },
                 "poi": {
-                    //"color": "rgba(50,50,50,0.9)",
                     "antialias": false
-                //"stroke": #000,
-                //"strokeWidth": 0.4,
-                //"strokeBlur": 2
                 },
                 "poi_3": {
-                "antialias": false,
-                "opacity": [
-                            "stops",
-                            {"z": 0, "val": 0},
-                            {"z": 16.5, "val": 0},
-                            {"z": 16.75, "val": 1}
-                            ]
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 16.5, "val": 0},
+                        {"z": 16.75, "val": 1}
+                    ]
                 },
                 "poi_4": {
-                "antialias": false,
-                "opacity": [
-                         "stops",
-                         {"z": 18.5, "val": 0},
-                         {"z": 18.75, "val": 1}
-                         ]
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.5, "val": 0},
+                        {"z": 18.75, "val": 1}
+                    ]
                 },
                 "poi_label_1-2": {
                     "color": "#444",
@@ -2363,31 +2354,30 @@ module.exports = {
                     "translate": [0, 14]
                 },
                 "poi_label_3": {
-                "color": "#444",
-                "size": 10,
-                "stroke": "land",
-                "strokeWidth": 0.3,
-                "strokeBlur": 1,
-                "translate": [0, 14],
-                "opacity": [
-                            "stops",
-                            {"z": 0, "val": 0},
-                            {"z": 16.5, "val": 0},
-                            {"z": 16.75, "val": 1}
-                            ]
+                    "color": "#444",
+                    "size": 10,
+                    "stroke": "land",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                    "translate": [0, 14],
+                    "opacity": [
+                        "stops",
+                        {"z": 16.5, "val": 0},
+                        {"z": 16.75, "val": 1}
+                    ]
                 },
                 "poi_label_4": {
-                "color": "#444",
-                "size": 10,
-                "opacity": [
-                            "stops",
-                            {"z": 18.5, "val": 0},
-                            {"z": 18.75, "val": 1}
-                            ],
-                "stroke": "land",
-                "strokeWidth": 0.3,
-                "strokeBlur": 1,
-                "translate": [0, 14]
+                    "color": "#444",
+                    "size": 10,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.5, "val": 0},
+                        {"z": 18.75, "val": 1}
+                    ],
+                    "stroke": "land",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                    "translate": [0, 14]
                 },
                 "poi_aerodrome": {
                     "opacity": ["stops",
@@ -3089,21 +3079,20 @@ module.exports = {
                     "antialias": false
                 },
                 "poi_3": {
-                "antialias": false,
-                "opacity": [
-                            "stops",
-                            {"z": 0, "val": 0},
-                            {"z": 16.5, "val": 0},
-                            {"z": 16.75, "val": 1}
-                            ]
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 16.5, "val": 0},
+                        {"z": 16.75, "val": 1}
+                    ]
                 },
                 "poi_4": {
-                "antialias": false,
-                "opacity": [
-                            "stops",
-                            {"z": 18.5, "val": 0},
-                            {"z": 18.75, "val": 1}
-                            ]
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.5, "val": 0},
+                        {"z": 18.75, "val": 1}
+                    ]
                 },
                 "poi_label_1-2": {
                     "color": "#fff",
@@ -3114,31 +3103,30 @@ module.exports = {
                     "translate": [0, 14]
                 },
                 "poi_label_3": {
-                "color": "#fff",
-                "size": 10,
-                "stroke": "text2_stroke_night",
-                "strokeWidth": 0.3,
-                "strokeBlur": 1,
-                "translate": [0, 14],
-                "opacity": [
-                            "stops",
-                            {"z": 0, "val": 0},
-                            {"z": 16.5, "val": 0},
-                            {"z": 16.75, "val": 1}
-                            ]
+                    "color": "#fff",
+                    "size": 10,
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                    "translate": [0, 14],
+                    "opacity": [
+                        "stops",
+                        {"z": 16.5, "val": 0},
+                        {"z": 16.75, "val": 1}
+                    ]
                 },
                 "poi_label_4": {
-                "color": "#fff",
-                "size": 10,
-                "opacity": [
-                            "stops",
-                            {"z": 18.5, "val": 0},
-                            {"z": 18.75, "val": 1}
-                            ],
-                "stroke": "text2_stroke_night",
-                "strokeWidth": 0.3,
-                "strokeBlur": 1,
-                "translate": [0, 14]
+                    "color": "#fff",
+                    "size": 10,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.5, "val": 0},
+                        {"z": 18.75, "val": 1}
+                    ],
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                    "translate": [0, 14]
                 },
                 "poi_aerodrome": {
                     "opacity": ["stops",
