@@ -267,6 +267,7 @@ module.exports = {
             "value": 10,
             "path": "curve",
             "text_field": "ele",
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 10,
             "feature_type": "line",
             "type": "text"
@@ -648,6 +649,7 @@ module.exports = {
             "layer": "country_label",
             "text_field": "name",
             "path": "horizontal",
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 24,
             "feature_type": "point",
             "type": "text"
@@ -664,6 +666,7 @@ module.exports = {
             "type": "text",
             "text_field": "name",
             "path": "curve",
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 16
         },
         "marine_label_point_1": {
@@ -675,6 +678,7 @@ module.exports = {
             "path": "horizontal",
             "field": "labelrank",
             "value": 1,
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 30
         },
         "marine_label_point_2": {
@@ -686,6 +690,7 @@ module.exports = {
             "path": "horizontal",
             "field": "labelrank",
             "value": 2,
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 24
         },
         "marine_label_point_other": {
@@ -697,6 +702,7 @@ module.exports = {
             "path": "horizontal",
             "field": "labelrank",
             "value": [3,4,5,6],
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 18
         },
         "state_label": {
@@ -704,6 +710,7 @@ module.exports = {
             "layer": "state_label",
             "text_field": "name",
             "path": "horizontal",
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 16,
             "feature_type": "point",
             "type": "text",
@@ -724,6 +731,7 @@ module.exports = {
             "value": "city",
             "text_field": "name",
             "path": "horizontal",
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 20,
             "feature_type": "point",
             "type": "text"
@@ -735,6 +743,7 @@ module.exports = {
             "value": "town",
             "text_field": "name",
             "path": "horizontal",
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 24,
             "feature_type": "point",
             "type": "text"
@@ -746,6 +755,7 @@ module.exports = {
             "value": "village",
             "text_field": "name",
             "path": "horizontal",
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 22,
             "feature_type": "point",
             "type": "text"
@@ -761,6 +771,7 @@ module.exports = {
             ],
             "text_field": "name",
             "path": "horizontal",
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 14,
             "feature_type": "point",
             "type": "text"
@@ -771,6 +782,7 @@ module.exports = {
             "text_field": "name",
             "path": "curve",
             "padding": 2,
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 13,
             "feature_type": "line",
             "type": "text",
@@ -781,6 +793,7 @@ module.exports = {
             "layer": "water_label",
             "text_field": "name",
             "path": "horizontal",
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 12,
             "feature_type": "point",
             "type": "text"
@@ -790,6 +803,7 @@ module.exports = {
             "layer": "waterway_label",
             "text_field": "name",
             "path": "curve",
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 12,
             "textMinDistance": 15,
             "feature_type": "line",
@@ -824,6 +838,7 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "padding": 2,
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 12,
             "feature_type": "point",
             "type": "text",
