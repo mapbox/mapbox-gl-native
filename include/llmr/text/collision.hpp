@@ -11,7 +11,7 @@ public:
     Collision();
     ~Collision();
 
-    PlacementProperty place(const PlacedGlyphs &boxes,
+    PlacementProperty place(const GlyphBoxes &boxes,
                             const CollisionAnchor &anchor,
                             float minPlacementScale, float maxPlacementScale,
                             float padding, bool horizontal, bool alwaysVisible);
