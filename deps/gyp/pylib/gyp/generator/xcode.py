@@ -5,6 +5,7 @@
 import filecmp
 import gyp.common
 import gyp.xcodeproj_file
+import gyp.xcode_ninja
 import errno
 import os
 import sys
@@ -575,6 +576,12 @@ def PerformBuild(data, configurations, params):
 
 
 def GenerateOutput(target_list, target_dicts, data, params):
+  # Optionally configure each spec to use ninja as the external builder.
+  ninja_wrapper = params.get('flavor') == 'ninja'
+  if ninja_wrapper:
+    (target_list, target_dicts, data) = \
+        gyp.xcode_ninja.CreateWrapper(target_list, target_dicts, data, params)
+
   options = params['options']
   generator_flags = params.get('generator_flags', {})
   parallel_builds = generator_flags.get('xcode_parallel_builds', True)
@@ -703,11 +710,16 @@ def GenerateOutput(target_list, target_dicts, data, params):
     # and is made a dependency of this target.  This way the work is done
     # before the dependency checks for what should be recompiled.
     support_xct = None
-    if type != 'none' and (spec_actions or spec_rules):
+    # The Xcode "issues" don't affect xcode-ninja builds, since the dependency
+    # logic all happens in ninja.  Don't bother creating the extra targets in
+    # that case.
+    if type != 'none' and (spec_actions or spec_rules) and not ninja_wrapper:
       support_xccl = CreateXCConfigurationList(configuration_names);
+      support_target_suffix = generator_flags.get(
+          'support_target_suffix', ' Support')
       support_target_properties = {
         'buildConfigurationList': support_xccl,
-        'name':                   target_name + ' Support',
+        'name':                   target_name + support_target_suffix,
       }
       if target_product_name:
         support_target_properties['productName'] = \

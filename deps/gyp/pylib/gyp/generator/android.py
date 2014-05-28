@@ -55,7 +55,7 @@ generator_additional_path_sections = []
 generator_extra_sources_for_rules = []
 
 
-SHARED_FOOTER = """\
+ALL_MODULES_FOOTER = """\
 # "gyp_all_modules" is a concatenation of the "gyp_all_modules" targets from
 # all the included sub-makefiles. This is just here to clarify.
 gyp_all_modules:
@@ -133,7 +133,7 @@ class AndroidMkWriter(object):
     self.android_top_dir = android_top_dir
 
   def Write(self, qualified_target, relative_target, base_path, output_filename,
-            spec, configs, part_of_all):
+            spec, configs, part_of_all, write_alias_target):
     """The main entry point: writes a .mk file for a single target.
 
     Arguments:
@@ -144,6 +144,8 @@ class AndroidMkWriter(object):
       output_filename: output .mk file name to write
       spec, configs: gyp info
       part_of_all: flag indicating this target is part of 'all'
+      write_alias_target: flag indicating whether to create short aliases for
+                          this target
     """
     gyp.common.EnsureDirExists(output_filename)
 
@@ -186,11 +188,19 @@ class AndroidMkWriter(object):
     self.WriteLn('LOCAL_MODULE_TAGS := optional')
     if self.toolset == 'host':
       self.WriteLn('LOCAL_IS_HOST_MODULE := true')
+    else:
+      self.WriteLn('LOCAL_MODULE_TARGET_ARCH := '
+                   '$(TARGET_$(GYP_VAR_PREFIX)ARCH)')
 
     # Grab output directories; needed for Actions and Rules.
-    self.WriteLn('gyp_intermediate_dir := $(call local-intermediates-dir)')
+    if self.toolset == 'host':
+      self.WriteLn('gyp_intermediate_dir := '
+                   '$(call local-intermediates-dir)')
+    else:
+      self.WriteLn('gyp_intermediate_dir := '
+                   '$(call local-intermediates-dir,,$(GYP_VAR_PREFIX))')
     self.WriteLn('gyp_shared_intermediate_dir := '
-                 '$(call intermediates-dir-for,GYP,shared)')
+                 '$(call intermediates-dir-for,GYP,shared,,,$(GYP_VAR_PREFIX))')
     self.WriteLn()
 
     # List files this target depends on so that actions/rules/copies/sources
@@ -226,7 +236,8 @@ class AndroidMkWriter(object):
     if spec.get('sources', []) or extra_sources:
       self.WriteSources(spec, configs, extra_sources)
 
-    self.WriteTarget(spec, configs, deps, link_deps, part_of_all)
+    self.WriteTarget(spec, configs, deps, link_deps, part_of_all,
+                     write_alias_target)
 
     # Update global list of target outputs, used in dependency tracking.
     target_outputs[qualified_target] = ('path', self.output_binary)
@@ -291,6 +302,7 @@ class AndroidMkWriter(object):
       # writing duplicate dummy rules for those outputs.
       main_output = make.QuoteSpaces(self.LocalPathify(outputs[0]))
       self.WriteLn('%s: gyp_local_path := $(LOCAL_PATH)' % main_output)
+      self.WriteLn('%s: gyp_var_prefix := $(GYP_VAR_PREFIX)' % main_output)
       self.WriteLn('%s: gyp_intermediate_dir := '
                    '$(abspath $(gyp_intermediate_dir))' % main_output)
       self.WriteLn('%s: gyp_shared_intermediate_dir := '
@@ -337,13 +349,10 @@ class AndroidMkWriter(object):
     """
     if len(rules) == 0:
       return
-    rule_trigger = '%s_rule_trigger' % self.android_module
 
-    did_write_rule = False
     for rule in rules:
       if len(rule.get('rule_sources', [])) == 0:
         continue
-      did_write_rule = True
       name = make.StringToMakefileVariable('%s_%s' % (self.relative_target,
                                                       rule['rule_name']))
       self.WriteLn('\n### Generated for rule "%s":' % name)
@@ -391,6 +400,7 @@ class AndroidMkWriter(object):
         outputs = map(self.LocalPathify, outputs)
         main_output = outputs[0]
         self.WriteLn('%s: gyp_local_path := $(LOCAL_PATH)' % main_output)
+        self.WriteLn('%s: gyp_var_prefix := $(GYP_VAR_PREFIX)' % main_output)
         self.WriteLn('%s: gyp_intermediate_dir := '
                      '$(abspath $(gyp_intermediate_dir))' % main_output)
         self.WriteLn('%s: gyp_shared_intermediate_dir := '
@@ -412,13 +422,9 @@ class AndroidMkWriter(object):
           # Make each output depend on the main output, with an empty command
           # to force make to notice that the mtime has changed.
           self.WriteLn('%s: %s ;' % (output, main_output))
-        self.WriteLn('.PHONY: %s' % (rule_trigger))
-        self.WriteLn('%s: %s' % (rule_trigger, main_output))
-        self.WriteLn('')
-    if did_write_rule:
-      extra_sources.append(rule_trigger)  # Force all rules to run.
-      self.WriteLn('### Finished generating for all rules')
-      self.WriteLn('')
+        self.WriteLn()
+
+    self.WriteLn()
 
 
   def WriteCopies(self, copies, extra_outputs):
@@ -501,6 +507,9 @@ class AndroidMkWriter(object):
     self.WriteLn('LOCAL_C_INCLUDES := $(GYP_COPIED_SOURCE_ORIGIN_DIRS) '
                                      '$(LOCAL_C_INCLUDES_$(GYP_CONFIGURATION))')
     self.WriteLn('LOCAL_CPPFLAGS := $(LOCAL_CPPFLAGS_$(GYP_CONFIGURATION))')
+    # Android uses separate flags for assembly file invocations, but gyp expects
+    # the same CFLAGS to be applied:
+    self.WriteLn('LOCAL_ASFLAGS := $(LOCAL_CFLAGS)')
 
 
   def WriteSources(self, spec, configs, extra_sources):
@@ -609,16 +618,16 @@ class AndroidMkWriter(object):
       prefix = ''
 
     if spec['toolset'] == 'host':
-      suffix = '_host_gyp'
+      suffix = '_$(TARGET_$(GYP_VAR_PREFIX)ARCH)_host_gyp'
     else:
       suffix = '_gyp'
 
     if self.path:
-      name = '%s%s_%s%s' % (prefix, self.path, self.target, suffix)
+      middle = make.StringToMakefileVariable('%s_%s' % (self.path, self.target))
     else:
-      name = '%s%s%s' % (prefix, self.target, suffix)
+      middle = make.StringToMakefileVariable(self.target)
 
-    return make.StringToMakefileVariable(name)
+    return ''.join([prefix, middle, suffix])
 
 
   def ComputeOutputParts(self, spec):
@@ -680,15 +689,15 @@ class AndroidMkWriter(object):
       if self.toolset == 'host':
         path = '$(HOST_OUT_INTERMEDIATE_LIBRARIES)'
       else:
-        path = '$(TARGET_OUT_INTERMEDIATE_LIBRARIES)'
+        path = '$($(GYP_VAR_PREFIX)TARGET_OUT_INTERMEDIATE_LIBRARIES)'
     else:
       # Other targets just get built into their intermediate dir.
       if self.toolset == 'host':
         path = '$(call intermediates-dir-for,%s,%s,true)' % (self.android_class,
                                                             self.android_module)
       else:
-        path = '$(call intermediates-dir-for,%s,%s)' % (self.android_class,
-                                                        self.android_module)
+        path = ('$(call intermediates-dir-for,%s,%s,,,$(GYP_VAR_PREFIX))'
+                % (self.android_class, self.android_module))
 
     assert spec.get('product_dir') is None # TODO: not supported?
     return os.path.join(path, self.ComputeOutputBasename(spec))
@@ -816,12 +825,15 @@ class AndroidMkWriter(object):
                    'LOCAL_SHARED_LIBRARIES')
 
 
-  def WriteTarget(self, spec, configs, deps, link_deps, part_of_all):
+  def WriteTarget(self, spec, configs, deps, link_deps, part_of_all,
+                  write_alias_target):
     """Write Makefile code to produce the final target of the gyp spec.
 
     spec, configs: input from gyp.
     deps, link_deps: dependency lists; see ComputeDeps()
     part_of_all: flag indicating this target is part of 'all'
+    write_alias_target: flag indicating whether to create short aliases for this
+                        target
     """
     self.WriteLn('### Rules for final target.')
 
@@ -832,7 +844,7 @@ class AndroidMkWriter(object):
     # name 'gyp_all_modules' as the Android build system doesn't allow the use
     # of the Make target 'all' and because 'all_modules' is the equivalent of
     # the Make target 'all' on Android.
-    if part_of_all:
+    if part_of_all and write_alias_target:
       self.WriteLn('# Add target alias to "gyp_all_modules" target.')
       self.WriteLn('.PHONY: gyp_all_modules')
       self.WriteLn('gyp_all_modules: %s' % self.android_module)
@@ -841,7 +853,7 @@ class AndroidMkWriter(object):
     # Add an alias from the gyp target name to the Android module name. This
     # simplifies manual builds of the target, and is required by the test
     # framework.
-    if self.target != self.android_module:
+    if self.target != self.android_module and write_alias_target:
       self.WriteLn('# Alias gyp target name.')
       self.WriteLn('.PHONY: %s' % self.target)
       self.WriteLn('%s: %s' % (self.target, self.android_module))
@@ -870,6 +882,8 @@ class AndroidMkWriter(object):
     else:
       self.WriteLn('LOCAL_MODULE_PATH := $(PRODUCT_OUT)/gyp_stamp')
       self.WriteLn('LOCAL_UNINSTALLABLE_MODULE := true')
+      if self.toolset == 'target':
+        self.WriteLn('LOCAL_2ND_ARCH_VAR_PREFIX := $(GYP_VAR_PREFIX)')
       self.WriteLn()
       self.WriteLn('include $(BUILD_SYSTEM)/base_rules.mk')
       self.WriteLn()
@@ -877,6 +891,9 @@ class AndroidMkWriter(object):
       self.WriteLn('\t$(hide) echo "Gyp timestamp: $@"')
       self.WriteLn('\t$(hide) mkdir -p $(dir $@)')
       self.WriteLn('\t$(hide) touch $@')
+      if self.toolset == 'target':
+        self.WriteLn()
+        self.WriteLn('LOCAL_2ND_ARCH_VAR_PREFIX :=')
 
 
   def WriteList(self, value_list, variable=None, prefix='',
@@ -926,7 +943,7 @@ class AndroidMkWriter(object):
         'INPUT_ROOT': expansion,
         'INPUT_DIRNAME': dirname,
         }
-    return path
+    return os.path.normpath(path)
 
 
 def PerformBuild(data, configurations, params):
@@ -946,6 +963,7 @@ def GenerateOutput(target_list, target_dicts, data, params):
   generator_flags = params.get('generator_flags', {})
   builddir_name = generator_flags.get('output_dir', 'out')
   limit_to_target_all = generator_flags.get('limit_to_target_all', False)
+  write_alias_targets = generator_flags.get('write_alias_targets', True)
   android_top_dir = os.environ.get('ANDROID_BUILD_TOP')
   assert android_top_dir, '$ANDROID_BUILD_TOP not set; you need to run lunch.'
 
@@ -1041,7 +1059,8 @@ def GenerateOutput(target_list, target_dicts, data, params):
     writer = AndroidMkWriter(android_top_dir)
     android_module = writer.Write(qualified_target, relative_target, base_path,
                                   output_file, spec, configs,
-                                  part_of_all=part_of_all)
+                                  part_of_all=part_of_all,
+                                  write_alias_target=write_alias_targets)
     if android_module in android_modules:
       print ('ERROR: Android module names must be unique. The following '
              'targets both generate Android module name %s.\n  %s\n  %s' %
@@ -1057,6 +1076,7 @@ def GenerateOutput(target_list, target_dicts, data, params):
     include_list.add(mkfile_rel_path)
 
   root_makefile.write('GYP_CONFIGURATION ?= %s\n' % default_configuration)
+  root_makefile.write('GYP_VAR_PREFIX ?=\n')
 
   # Write out the sorted list of includes.
   root_makefile.write('\n')
@@ -1064,6 +1084,7 @@ def GenerateOutput(target_list, target_dicts, data, params):
     root_makefile.write('include $(LOCAL_PATH)/' + include_file + '\n')
   root_makefile.write('\n')
 
-  root_makefile.write(SHARED_FOOTER)
+  if write_alias_targets:
+    root_makefile.write(ALL_MODULES_FOOTER)
 
   root_makefile.close()
