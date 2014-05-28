@@ -2921,11 +2921,6 @@ module.exports = {
                     "color": "text_night",
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.4,
-                    "size": [
-                        "stops",
-                        {"z": 6, "val": 14},
-                        {"z": 12, "val": 24}
-                    ]
                     "size": "country_label_size"
                 },
                 "country_label_line": {
