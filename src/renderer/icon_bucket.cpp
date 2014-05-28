@@ -60,7 +60,7 @@ void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprit
             const vec2<float> c{0.0, 0.0};
             CollisionAnchor anchor{static_cast<float>(x), static_cast<float>(y)};
             PlacedGlyphs glyphs;
-            glyphs.emplace_back(PlacedGlyph{c, c, c, c, rect, rect.w, rect.h, 0.0,
+            glyphs.emplace_back(PlacedGlyph{c, c, c, c, rect, 0.0,
                     GlyphBox{box, 1.0, 16.0, anchor, false}});
 
             PlacementProperty place = collision.place(glyphs, anchor, 1.0, 16.0,
