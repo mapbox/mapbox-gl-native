@@ -2269,11 +2269,7 @@ module.exports = {
                     "stroke": "text_stroke"
                 },
                 "poi": {
-                    //"color": "rgba(50,50,50,0.9)",
                     "antialias": false
-                //"stroke": #000,
-                //"strokeWidth": 0.4,
-                //"strokeBlur": 2
                 },
                 "poi_label": {
                     "color": "#444",
