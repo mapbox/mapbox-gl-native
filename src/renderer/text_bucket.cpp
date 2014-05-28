@@ -7,6 +7,7 @@
 #include <llmr/style/style.hpp>
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/text/placement.hpp>
+#include <llmr/util/constants.hpp>
 
 #include <llmr/util/math.hpp>
 #include <llmr/platform/gl.hpp>
@@ -103,12 +104,18 @@ void TextBucket::addFeature(const VectorTileFeature &feature,
     auto it_prop = feature.properties.find(geom_desc.field);
     if (it_prop == feature.properties.end()) {
         // feature does not have the correct property
+        if (debug::labelTextMissingWarning) {
+            fprintf(stderr, "[WARNING] feature doesn't have property '%s' required for labelling\n", geom_desc.field.c_str());
+        }
         return;
     }
     const Value &value = it_prop->second;
 
     auto it_shaping = shapings.find(value);
     if (it_shaping == shapings.end()) {
+        if (debug::shapingWarning) {
+            fprintf(stderr, "[WARNING] missing shaping for '%s'\n", toString(value).c_str());
+        }
         // we lack shaping information for this label
         return;
     }

@@ -163,9 +163,11 @@ std::unique_ptr<Bucket> TileParser::createIconBucket(const VectorTileLayer& laye
 }
 
 std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
-
     // Determine the correct text stack.
     if (!layer.shaping.size()) {
+        if (debug::missingFontStackWarning) {
+            fprintf(stderr, "[WARNING] missing font stack '%s'\n", bucket_desc.geometry.font.c_str());
+        }
         return nullptr;
     }
 
@@ -179,6 +181,9 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
         auto it = const_faces.find(face);
         if (it == const_faces.end()) {
             // This layer references an unknown face.
+            if (debug::missingFontFaceWarning) {
+                fprintf(stderr, "[WARNING] missing font face '%s'\n", face.c_str());
+            }
             return nullptr;
         }
         faces.push_back(&it->second);
