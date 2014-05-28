@@ -9,11 +9,16 @@
 namespace llmr {
 
 
-void FontStack::insert(uint32_t id, const SDFGlyph &glyph) {
+void FontStack::insert(uint32_t id, const GlyphMetrics &glyphMetrics, const std::string &bitmap) {
     std::lock_guard<std::mutex> lock(mtx);
-    glyphs.emplace(id, glyph);
+    metrics.emplace(id, glyphMetrics);
+    bitmaps.emplace(id, bitmap);
 }
 
+const std::map<uint32_t, GlyphMetrics> &FontStack::getMetrics() const {
+    std::lock_guard<std::mutex> lock(mtx);
+    return metrics;
+}
 
 GlyphPBF::GlyphPBF(const std::string &fontStack, GlyphRange glyphRange)
     : future(promise.get_future().share())
@@ -112,11 +117,7 @@ void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set
         std::lock_guard<std::mutex> lock(mtx);
         auto &rangeSets = ranges[fontStack];
 
-        auto stack_it = stacks.find(fontStack);
-        if (stack_it == stacks.end()) {
-            stack_it = stacks.emplace(fontStack, std::make_unique<FontStack>()).first;
-        }
-        stack = stack_it->second.get();
+        stack = &createFontStack(fontStack);
 
         // Attempt to load the glyph range. If the GlyphSet already exists, we are getting back
         // the same shared_future.
@@ -141,6 +142,19 @@ std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::string &nam
     }
 
     return range_it->second->getFuture();
+}
+
+FontStack &GlyphStore::createFontStack(const std::string &fontStack) {
+    auto stack_it = stacks.find(fontStack);
+    if (stack_it == stacks.end()) {
+        stack_it = stacks.emplace(fontStack, std::make_unique<FontStack>()).first;
+    }
+    return *stack_it->second.get();
+}
+
+FontStack &GlyphStore::getFontStack(const std::string &fontStack) {
+    std::lock_guard<std::mutex> lock(mtx);
+    return createFontStack(fontStack);
 }
 
 

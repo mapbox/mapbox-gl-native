@@ -26,11 +26,14 @@ public:
 
 class FontStack {
 public:
-    void insert(uint32_t id, const SDFGlyph &glyph);
+    void insert(uint32_t id, const GlyphMetrics &glyphMetrics, const std::string &bitmap);
+
+    const std::map<uint32_t, GlyphMetrics> &getMetrics() const;
 
 private:
-    std::map<uint32_t, SDFGlyph> glyphs;
-    std::mutex mtx;
+    std::map<uint32_t, std::string> bitmaps;
+    std::map<uint32_t, GlyphMetrics> metrics;
+    mutable std::mutex mtx;
 };
 
 class GlyphPBF {
@@ -54,9 +57,13 @@ public:
     // Block until all specified GlyphRanges of the specified font stack are loaded.
     void waitForGlyphRanges(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges);
 
+    FontStack &getFontStack(const std::string &fontStack);
+
 private:
     // Loads an individual glyph range from the font stack and adds it to rangeSets
     std::shared_future<GlyphPBF &> loadGlyphRange(const std::string &fontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>> &rangeSets, GlyphRange range);
+
+    FontStack &createFontStack(const std::string &fontStack);
 
 private:
     std::unordered_map<std::string, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>> ranges;
