@@ -173,35 +173,61 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
         tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
 
 
-    std::set<GlyphRange> ranges;
     std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> ucs4conv;
 
-    FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
-    for (const pbf& feature_pbf : filtered_layer) {
-        if (obsolete()) return nullptr;
-        VectorTileFeature feature { feature_pbf, layer };
 
-        auto it_prop = feature.properties.find(bucket_desc.geometry.field);
-        if (it_prop == feature.properties.end()) {
-            // feature does not have the correct property
-            if (debug::labelTextMissingWarning) {
-                fprintf(stderr, "[WARNING] feature doesn't have property '%s' required for labelling\n", bucket_desc.geometry.field.c_str());
+    // Determine and load glyph ranges
+    {
+        std::set<GlyphRange> ranges;
+
+        FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
+        for (const pbf& feature_pbf : filtered_layer) {
+            if (obsolete()) return nullptr;
+            VectorTileFeature feature { feature_pbf, layer };
+
+            auto it_prop = feature.properties.find(bucket_desc.geometry.field);
+            if (it_prop == feature.properties.end()) {
+                // feature does not have the correct property
+                if (debug::labelTextMissingWarning) {
+                    fprintf(stderr, "[WARNING] feature doesn't have property '%s' required for labelling\n", bucket_desc.geometry.field.c_str());
+                }
+                continue;
             }
-            continue;
+
+            const std::u32string string = ucs4conv.from_bytes(toString(it_prop->second));
+
+            // Loop through all characters of this text and collect unique codepoints.
+            for (uint32_t chr : string) {
+                ranges.insert(getGlyphRange(chr));
+            }
         }
 
-        const std::u32string string = ucs4conv.from_bytes(toString(it_prop->second));
-
-        // Loop through all characters of this text and collect unique codepoints.
-        for (uint32_t chr : string) {
-            ranges.insert(getGlyphRange(chr));
-        }
+        glyphStore.waitForGlyphRanges(bucket_desc.geometry.font, ranges);
     }
 
-    glyphStore.waitForGlyphRanges(bucket_desc.geometry.font, ranges);
+    // Shape and place all labels.
+    {
+        FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
+        for (const pbf& feature_pbf : filtered_layer) {
+            if (obsolete()) return nullptr;
+            VectorTileFeature feature { feature_pbf, layer };
 
-    // TODO: Now that we have all the glyph ranges, actually perform the shaping and add features to
-    // the bucket, and add the required glyphs from the glyphStore to the glyphAtlas.
+            auto it_prop = feature.properties.find(bucket_desc.geometry.field);
+            if (it_prop == feature.properties.end()) {
+                // feature does not have the correct property
+                if (debug::labelTextMissingWarning) {
+                    fprintf(stderr, "[WARNING] feature doesn't have property '%s' required for labelling\n", bucket_desc.geometry.field.c_str());
+                }
+                continue;
+            }
+
+            const std::u32string string = ucs4conv.from_bytes(toString(it_prop->second));
+
+            // TODO: Shape label
+            // TODO: Place label
+        }
+
+    }
 
     return std::move(bucket);
 }
