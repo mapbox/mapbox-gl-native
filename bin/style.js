@@ -709,14 +709,6 @@ module.exports = {
             "type": "text",
             "enabled": 4
         },
-        "place_label_city_point": {
-            "source": "outdoors",
-            "layer": "place_label",
-            "field": "type",
-            "value": "city",
-            "type": "point",
-            "size": 4
-        },
         "place_label_city": {
             "source": "outdoors",
             "layer": "place_label",
@@ -1278,10 +1270,6 @@ module.exports = {
         {
             "name": "state_label",
             "bucket": "state_label"
-        },
-        {
-            "name": "place_label_city_point",
-            "bucket": "place_label_city_point"
         },
         {
             "name": "place_label_city",
@@ -2131,6 +2119,7 @@ module.exports = {
                 "country_label": {
                     "color": "country_text",
                     "stroke": "rgba(255,255,255,0.5)",
+                    "strokeWidth": 0.4,
                     "size": [
                         "stops",
                         {"z": 6, "val": 14},
@@ -2194,9 +2183,6 @@ module.exports = {
                         {"z": 10, "val": 0}
                     ]
                 },
-                "place_label_city_point": {
-                    "color": "#4a4032"
-                },
                 "place_label_city": {
                     "color": "#444",
                     "strokeWidth": 0.4,
@@ -2208,20 +2194,12 @@ module.exports = {
                         {"z": 7, "val": 14},
                         {"z": 14.99, "val": 20},
                         {"z": 15, "val": 0}
-                    ],
-                    "translate": [
-                        0,
-                        [
-                            "stops",
-                            {"z": 4, "val": 10},
-                            {"z": 6, "val": 30},
-                            {"z": 7, "val": 0}
-                        ]
                     ]
                 },
                 "place_label_town": {
                     "color": "#716656",
-                    "strokeWidth": 0.5,
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 2,
                     "stroke": "text_stroke",
                     "size": [
                         "stops",
@@ -2233,7 +2211,8 @@ module.exports = {
                 },
                 "place_label_village": {
                     "color": "#635644",
-                    "strokeWidth": 0.5,
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 2,
                     "stroke": "text_stroke",
                     "size": [
                         "stops",
@@ -2299,7 +2278,7 @@ module.exports = {
                     "color": "land_night"
                 },
                 "admin_maritime_cover": {
-                    "color": "#0a1347",
+                    "color": "water_night",
                     "width": 5
                 },
                 "admin_maritime": {
@@ -2839,7 +2818,8 @@ module.exports = {
                 },
                 "country_label": {
                     "color": "text_night",
-                    "stroke": "text_stroke_night",
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.4,
                     "size": [
                         "stops",
                         {"z": 6, "val": 14},
@@ -2903,13 +2883,10 @@ module.exports = {
                         {"z": 10, "val": 0}
                     ]
                 },
-                "place_label_city_point": {
-                    "color": "#ddd"
-                },
                 "place_label_city": {
                     "color": "#fff",
                     "strokeWidth": 0.4,
-                    "stroke": "text_stroke_night",
+                    "stroke": "text2_stroke_night",
                     "size": [
                         "stops",
                         {"z": 3.99, "val": 0},
@@ -2917,21 +2894,13 @@ module.exports = {
                         {"z": 7, "val": 14},
                         {"z": 14.99, "val": 20},
                         {"z": 15, "val": 0}
-                    ],
-                    "translate": [
-                        0,
-                        [
-                            "stops",
-                            {"z": 4, "val": 10},
-                            {"z": 6, "val": 30},
-                            {"z": 7, "val": 0}
-                        ]
                     ]
                 },
                 "place_label_town": {
                     "color": "text_night",
-                    "strokeWidth": 0.5,
-                    "stroke": "text_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 2,
+                    "stroke": "text2_stroke_night",
                     "size": [
                         "stops",
                         {"z": 9, "val": 10},
@@ -2942,8 +2911,9 @@ module.exports = {
                 },
                 "place_label_village": {
                     "color": "text_night",
-                    "strokeWidth": 0.5,
-                    "stroke": "text_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 2,
+                    "stroke": "text2_stroke_night",
                     "size": [
                         "stops",
                         {"z": 9, "val": 8},
@@ -2955,9 +2925,9 @@ module.exports = {
                 },
                 "place_label_other": {
                     "color": "text_night",
-                    "stroke": "text_stroke_night",
-                    "strokeWidth": 0.5,
-                    "strokeBlur": 3,
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 2,
                     "size": [
                         "stops",
                         {"z": 0, "val": 10},
