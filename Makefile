@@ -93,6 +93,7 @@ lproj: config.gypi linux/llmr-app.gyp clear_xcode_cache node
 ##### Maintenace operations ####################################################
 
 clean: clear_xcode_cache
+	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/Release
 	-rm -rf ./build/Debug
 	-rm -f include/llmr/shader/shaders.hpp
