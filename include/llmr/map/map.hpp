@@ -8,6 +8,7 @@
 #include <llmr/map/transform.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/geometry/glyph_atlas.hpp>
+#include <llmr/text/glyph_store.hpp>
 #include <llmr/renderer/painter.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/texturepool.hpp>
@@ -98,6 +99,7 @@ public:
     inline const TransformState &getState() const { return state; }
     inline const Style &getStyle() const { return style; }
     inline GlyphAtlas &getGlyphAtlas() { return glyphAtlas; }
+    inline GlyphStore &getGlyphStore() { return glyphStore; }
     inline SpriteAtlas &getSpriteAtlas() { return spriteAtlas; }
     inline uv_loop_t *getLoop() { return loop; }
     inline time getAnimationTime() const { return animationTime; }
@@ -152,6 +154,7 @@ private:
     Texturepool texturepool;
     Style style;
     GlyphAtlas glyphAtlas;
+    GlyphStore glyphStore;
     SpriteAtlas spriteAtlas;
     Painter painter;
 

@@ -9,6 +9,7 @@ namespace llmr {
 
 class Style;
 class GlyphAtlas;
+class GlyphStore;
 class SpriteAtlas;
 
 class LayerDescription;
@@ -16,7 +17,7 @@ class Bucket;
 
 class TileParser {
 public:
-    TileParser(const std::string& data, VectorTileData& tile, const Style& style, GlyphAtlas& glyphAtlas, SpriteAtlas &spriteAtlas);
+    TileParser(const std::string& data, VectorTileData& tile, const Style& style, GlyphAtlas& glyphAtlas, GlyphStore &glyphStore, SpriteAtlas &spriteAtlas);
 
 private:
     bool obsolete() const;
@@ -35,6 +36,7 @@ private:
     VectorTileData& tile;
     const Style& style;
     GlyphAtlas& glyphAtlas;
+    GlyphStore &glyphStore;
     SpriteAtlas &spriteAtlas;
     Faces faces;
     Placement placement;
