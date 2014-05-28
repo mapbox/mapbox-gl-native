@@ -17,9 +17,6 @@ namespace llmr {
 
 class SDFGlyph {
 public:
-    SDFGlyph();
-    SDFGlyph(pbf data);
-
     // A signed distance field of the glyph with a border of 3 pixels.
     std::string bitmap;
 
@@ -27,21 +24,27 @@ public:
     GlyphMetrics metrics;
 };
 
-
-class GlyphSet {
+class FontStack {
 public:
-    GlyphSet(const std::string &fontStack, GlyphRange glyphRange);
-
-    void parse();
-
-    std::shared_future<GlyphSet &> getFuture();
+    void insert(uint32_t id, const SDFGlyph &glyph);
 
 private:
     std::map<uint32_t, SDFGlyph> glyphs;
+    std::mutex mtx;
+};
 
+class GlyphPBF {
+public:
+    GlyphPBF(const std::string &fontStack, GlyphRange glyphRange);
+
+    void parse(FontStack &stack);
+
+    std::shared_future<GlyphPBF &> getFuture();
+
+private:
     std::string data;
-    std::promise<GlyphSet &> promise;
-    std::shared_future<GlyphSet &> future;
+    std::promise<GlyphPBF &> promise;
+    std::shared_future<GlyphPBF &> future;
     std::mutex mtx;
 };
 
@@ -53,10 +56,11 @@ public:
 
 private:
     // Loads an individual glyph range from the font stack and adds it to rangeSets
-    std::shared_future<GlyphSet &> loadGlyphRange(const std::string &fontStack, std::map<GlyphRange, std::unique_ptr<GlyphSet>> &rangeSets, GlyphRange range);
+    std::shared_future<GlyphPBF &> loadGlyphRange(const std::string &fontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>> &rangeSets, GlyphRange range);
 
 private:
-    std::unordered_map<std::string, std::map<GlyphRange, std::unique_ptr<GlyphSet>>> stacks;
+    std::unordered_map<std::string, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>> ranges;
+    std::unordered_map<std::string, std::unique_ptr<FontStack>> stacks;
     std::mutex mtx;
 };
 

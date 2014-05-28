@@ -2,13 +2,20 @@
 
 #include <llmr/util/std.hpp>
 #include <llmr/util/string.hpp>
+#include <llmr/util/pbf.hpp>
 #include <llmr/platform/platform.hpp>
 #include <uv.h>
 
 namespace llmr {
 
 
-GlyphSet::GlyphSet(const std::string &fontStack, GlyphRange glyphRange)
+void FontStack::insert(uint32_t id, const SDFGlyph &glyph) {
+    std::lock_guard<std::mutex> lock(mtx);
+    glyphs.emplace(id, glyph);
+}
+
+
+GlyphPBF::GlyphPBF(const std::string &fontStack, GlyphRange glyphRange)
     : future(promise.get_future().share())
 {
     // Load the glyph set URL
@@ -33,11 +40,11 @@ GlyphSet::GlyphSet(const std::string &fontStack, GlyphRange glyphRange)
     });
 }
 
-std::shared_future<GlyphSet &> GlyphSet::getFuture() {
+std::shared_future<GlyphPBF &> GlyphPBF::getFuture() {
     return future;
 }
 
-void GlyphSet::parse() {
+void GlyphPBF::parse(FontStack &stack) {
     std::lock_guard<std::mutex> lock(mtx);
 
     if (!data.size()) {
@@ -46,8 +53,48 @@ void GlyphSet::parse() {
         return;
     }
 
-    // TODO: parse the glyphs
+    // Parse the glyph PBF
+    pbf glyphs_pbf(reinterpret_cast<const uint8_t *>(data.data()), data.size());
 
+    while (glyphs_pbf.next()) {
+        if (glyphs_pbf.tag == 1) { // stacks
+            pbf fontstack_pbf = glyphs_pbf.message();
+            while (fontstack_pbf.next()) {
+                if (fontstack_pbf.tag == 3) { // glyphs
+                    pbf glyph_pbf = fontstack_pbf.message();
+
+                    SDFGlyph glyph;
+                    uint32_t id = 0;
+
+                    while (glyph_pbf.next()) {
+                        if (glyph_pbf.tag == 1) { // id
+                            id = glyph_pbf.varint();
+                        } else if (glyph_pbf.tag == 2) { // bitmap
+                            glyph.bitmap = glyph_pbf.string();
+                        } else if (glyph_pbf.tag == 3) { // width
+                            glyph.metrics.width = glyph_pbf.varint();
+                        } else if (glyph_pbf.tag == 4) { // height
+                            glyph.metrics.height = glyph_pbf.varint();
+                        } else if (glyph_pbf.tag == 5) { // left
+                            glyph.metrics.left = glyph_pbf.svarint();
+                        } else if (glyph_pbf.tag == 6) { // top
+                            glyph.metrics.top = glyph_pbf.svarint();
+                        } else if (glyph_pbf.tag == 7) { // advance
+                            glyph.metrics.advance = glyph_pbf.varint();
+                        } else {
+                            glyph_pbf.skip();
+                        }
+                    }
+
+                    stack.insert(id, glyph);
+                } else {
+                    fontstack_pbf.skip();
+                }
+            }
+        } else {
+            glyphs_pbf.skip();
+        }
+    }
 
     data.clear();
 }
@@ -57,11 +104,19 @@ void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set
     // We are implementing a blocking wait with futures: Every GlyphSet has a future that we are
     // waiting for until it is loaded.
 
-    std::vector<std::shared_future<GlyphSet &>> futures;
+    FontStack *stack = nullptr;
+
+    std::vector<std::shared_future<GlyphPBF &>> futures;
     futures.reserve(glyphRanges.size());
     {
         std::lock_guard<std::mutex> lock(mtx);
-        auto &rangeSets = stacks[fontStack];
+        auto &rangeSets = ranges[fontStack];
+
+        auto stack_it = stacks.find(fontStack);
+        if (stack_it == stacks.end()) {
+            stack_it = stacks.emplace(fontStack, std::make_unique<FontStack>()).first;
+        }
+        stack = stack_it->second.get();
 
         // Attempt to load the glyph range. If the GlyphSet already exists, we are getting back
         // the same shared_future.
@@ -73,16 +128,16 @@ void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set
     // Now that we potentially created all GlyphSets, we are waiting for the results, one by one.
     // When we get a result (or the GlyphSet is aready loaded), we are attempting to parse the
     // GlyphSet.
-    for (std::shared_future<GlyphSet &> &future : futures) {
-        future.get().parse();
+    for (std::shared_future<GlyphPBF &> &future : futures) {
+        future.get().parse(*stack);
     }
 }
 
-std::shared_future<GlyphSet &> GlyphStore::loadGlyphRange(const std::string &name, std::map<GlyphRange, std::unique_ptr<GlyphSet>> &rangeSets, const GlyphRange range) {
+std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::string &name, std::map<GlyphRange, std::unique_ptr<GlyphPBF>> &rangeSets, const GlyphRange range) {
     auto range_it = rangeSets.find(range);
     if (range_it == rangeSets.end()) {
         // We don't have this glyph set yet for this font stack.
-        range_it = rangeSets.emplace(range, std::make_unique<GlyphSet>(name, range)).first;
+        range_it = rangeSets.emplace(range, std::make_unique<GlyphPBF>(name, range)).first;
     }
 
     return range_it->second->getFuture();
