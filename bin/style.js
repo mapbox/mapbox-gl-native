@@ -649,7 +649,7 @@ module.exports = {
             "layer": "country_label",
             "text_field": "name",
             "path": "horizontal",
-            "font": "Open Sans Bold, Arial Unicode MS Bold",
+            "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 24,
             "feature_type": "point",
             "type": "text"
@@ -723,7 +723,7 @@ module.exports = {
             "value": "city",
             "text_field": "name",
             "path": "horizontal",
-            "font": "Open Sans Semibold, Arial Unicode MS Bold",
+            "font": "Open Sans Semibold, Arial Unicode MS Regular",
             "fontSize": 20,
             "feature_type": "point",
             "type": "text"
@@ -735,7 +735,7 @@ module.exports = {
             "value": "town",
             "text_field": "name",
             "path": "horizontal",
-            "font": "Open Sans Semibold, Arial Unicode MS Bold",
+            "font": "Open Sans Semibold, Arial Unicode MS Regular",
             "fontSize": 24,
             "feature_type": "point",
             "type": "text"
@@ -747,7 +747,7 @@ module.exports = {
             "value": "village",
             "text_field": "name",
             "path": "horizontal",
-            "font": "Open Sans Semibold, Arial Unicode MS Bold",
+            "font": "Open Sans Semibold, Arial Unicode MS Regular",
             "fontSize": 22,
             "feature_type": "point",
             "type": "text"
@@ -763,7 +763,7 @@ module.exports = {
             ],
             "text_field": "name",
             "path": "horizontal",
-            "font": "Open Sans Semibold, Arial Unicode MS Bold",
+            "font": "Open Sans Semibold, Arial Unicode MS Regular",
             "fontSize": 18,
             "feature_type": "point",
             "type": "text"
@@ -878,7 +878,7 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "padding": 2,
-            "font": "Open Sans Semibold, Arial Unicode MS Bold",
+            "font": "Open Sans Semibold, Arial Unicode MS Regular",
             "fontSize": 11,
             "feature_type": "point",
             "type": "text"
@@ -891,7 +891,7 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "padding": 2,
-            "font": "Open Sans Semibold, Arial Unicode MS Bold",
+            "font": "Open Sans Semibold, Arial Unicode MS Regular",
             "fontSize": 10,
             "feature_type": "point",
             "type": "text"
@@ -904,7 +904,7 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "padding": 2,
-            "font": "Open Sans Semibold, Arial Unicode MS Bold",
+            "font": "Open Sans Semibold, Arial Unicode MS Regular",
             "fontSize": 10,
             "feature_type": "point",
             "type": "text"
