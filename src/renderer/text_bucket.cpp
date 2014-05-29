@@ -112,7 +112,7 @@ void TextBucket::addFeature(const VectorTileFeature &feature,
     }
     const Value &value = it_prop->second;
 
-    auto it_shaping = shapings.find(value);
+    auto it_shaping = shapings.find(toString(value));
     if (it_shaping == shapings.end()) {
         if (debug::shapingWarning) {
             fprintf(stderr, "[WARNING] missing shaping for '%s'\n", toString(value).c_str());
