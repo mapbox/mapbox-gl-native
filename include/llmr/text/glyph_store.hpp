@@ -30,7 +30,7 @@ public:
     void insert(uint32_t id, const SDFGlyph &glyph);
     const std::map<uint32_t, GlyphMetrics> &getMetrics() const;
     const std::map<uint32_t, SDFGlyph> &getSDFs() const;
-    const Shaping getShaping(const std::string &string) const;
+    const Shaping getShaping(const std::u32string &string) const;
 
 private:
     std::map<uint32_t, std::string> bitmaps;

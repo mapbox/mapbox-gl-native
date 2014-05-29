@@ -2,10 +2,11 @@
 
 #include <llmr/util/std.hpp>
 #include <llmr/util/string.hpp>
+#include <llmr/util/utf.hpp>
 #include <llmr/util/pbf.hpp>
 #include <llmr/platform/platform.hpp>
 #include <uv.h>
-#include <regex>
+#include <algorithm>
 
 namespace llmr {
 
@@ -27,7 +28,7 @@ const std::map<uint32_t, SDFGlyph> &FontStack::getSDFs() const {
     return sdfs;
 }
 
-const Shaping FontStack::getShaping(const std::string &string) const {
+const Shaping FontStack::getShaping(const std::u32string &string) const {
     std::lock_guard<std::mutex> lock(mtx);
     uint32_t i = 0;
     uint32_t x = 0;

@@ -11,7 +11,9 @@
 #include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/text/glyph_store.hpp>
 #include <llmr/text/glyph.hpp>
+
 #include <llmr/util/std.hpp>
+#include <llmr/util/utf.hpp>
 
 using namespace llmr;
 
@@ -30,7 +32,7 @@ bool TileParser::obsolete() const {
     return tile.state == TileData::State::obsolete;
 }
 
-void TileParser::addGlyph(uint64_t tileid, const std::string stackname, const std::string &string, const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face) {
+void TileParser::addGlyph(uint64_t tileid, const std::string stackname, const std::u32string &string, const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face) {
     std::map<uint32_t, SDFGlyph> sdfs = fontStack.getSDFs();
     // Loop through all characters and add glyph to atlas, positions.
     for (uint32_t chr : string) {
@@ -164,6 +166,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
     std::unique_ptr<TextBucket> bucket = std::make_unique<TextBucket>(
         tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
 
+    util::utf8_to_utf32 ucs4conv;
 
     // Determine and load glyph ranges
     {
@@ -183,7 +186,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
                 continue;
             }
 
-            const std::string string = toString(it_prop->second);
+            const std::u32string string = ucs4conv.convert(toString(it_prop->second));
 
             // Loop through all characters of this text and collect unique codepoints.
             for (uint32_t chr : string) {
@@ -215,11 +218,11 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
                 continue;
             }
 
-            const std::string string = toString(it_prop->second);
+            const std::u32string string = ucs4conv.convert(toString(it_prop->second));
 
             // Shape labels.
             const Shaping shaped = fontStack.getShaping(string);
-            shaping.emplace(string, shaped);
+            shaping.emplace(toString(it_prop->second), shaped);
 
             // Place labels.
             addGlyph(tile.id.to_uint64(), bucket_desc.geometry.font, string, fontStack, glyphAtlas, face);
