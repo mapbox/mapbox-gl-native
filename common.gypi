@@ -17,13 +17,11 @@
         'cflags': [ '-g', '-O0' ],
         'defines': [ 'DEBUG' ],
         'xcode_settings': {
-          'GCC_OPTIMIZATION_LEVEL': '0',
+          'GCC_OPTIMIZATION_LEVEL': '1',
           'GCC_GENERATE_DEBUGGING_SYMBOLS': 'YES',
           'DEAD_CODE_STRIPPING': 'NO',
           'GCC_INLINES_ARE_PRIVATE_EXTERN': 'NO',
-          'RUN_CLANG_STATIC_ANALYZER':'YES',
-          'CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY': 'YES',
-          'CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER': 'YES'
+          'OTHER_CPLUSPLUSFLAGS': [ '-fno-omit-frame-pointer','-fwrapv', '-fstack-protector-all', '-fno-common']
         }
       },
       'Release': {

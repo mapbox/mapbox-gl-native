@@ -32,7 +32,7 @@ if [[ $MISSING_DEPS != "" ]]; then
         echo 'and then re-run ./setup-libraries.sh'
     elif [ ${UNAME} = 'Linux' ]; then
         echo "Missing build deps: ${MISSING_DEPS}"
-        echo 'Please run "sudo apt-get install automake libtool xutils-dev cmake pkg-config libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev nodejs-legacy"'
+        echo 'Please run "sudo apt-get install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config nodejs-legacy libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev"'
         echo 'and then re-run ./setup-libraries.sh'
     fi
     exit 1
