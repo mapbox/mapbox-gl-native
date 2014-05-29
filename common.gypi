@@ -11,10 +11,10 @@
       'GCC_WARN_PEDANTIC': 'YES',
       'GCC_WARN_UNINITIALIZED_AUTOS': 'YES_AGGRESSIVE'
     },
-    'cflags_cc': ['-std=c++11'],
+    'cflags_cc': ['-std=c++11', '-Wall', '-Wextra'],
     'configurations': {
       'Debug': {
-        'cflags': [ '-g', '-O0' ],
+        'cflags_cc': [ '-g', '-O1', '-fno-omit-frame-pointer','-fwrapv', '-fstack-protector-all', '-fno-common' ],
         'defines': [ 'DEBUG' ],
         'xcode_settings': {
           'GCC_OPTIMIZATION_LEVEL': '1',
@@ -25,7 +25,7 @@
         }
       },
       'Release': {
-        'cflags': [ '-O3' ],
+        'cflags_cc': [ '-O3' ],
         'defines': [ 'NDEBUG' ],
         'xcode_settings': {
           'GCC_OPTIMIZATION_LEVEL': '3',
