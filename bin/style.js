@@ -716,14 +716,6 @@ module.exports = {
             "type": "text",
             "enabled": 4
         },
-        "place_label_city_point": {
-            "source": "outdoors",
-            "layer": "place_label",
-            "field": "type",
-            "value": "city",
-            "type": "point",
-            "size": 4
-        },
         "place_label_city": {
             "source": "outdoors",
             "layer": "place_label",
@@ -772,18 +764,48 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "font": "Open Sans Semibold, Arial Unicode MS Regular",
-            "fontSize": 14,
+            "fontSize": 18,
             "feature_type": "point",
             "type": "text"
         },
-        "road_label": {
+        "road_label_1": {
             "source": "outdoors",
             "layer": "road_label",
+            "field": "class",
+            "value": ["motorway","main"],
             "text_field": "name",
             "path": "curve",
             "padding": 2,
             "font": "Open Sans Regular, Arial Unicode MS Regular",
-            "fontSize": 13,
+            "fontSize": 18,
+            "feature_type": "line",
+            "type": "text",
+            "maxAngleDelta": 0.5
+        },
+        "road_label_2": {
+            "source": "outdoors",
+            "layer": "road_label",
+            "field": "class",
+            "value": ["street","street_limited"],
+            "text_field": "name",
+            "path": "curve",
+            "padding": 2,
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
+            "fontSize": 16,
+            "feature_type": "line",
+            "type": "text",
+            "maxAngleDelta": 0.5
+        },
+        "road_label_3": {
+            "source": "outdoors",
+            "layer": "road_label",
+            "field": "class",
+            "value": ["service","driveway","path"],
+            "text_field": "name",
+            "path": "curve",
+            "padding": 2,
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
+            "fontSize": 14,
             "feature_type": "line",
             "type": "text",
             "maxAngleDelta": 0.5
@@ -814,7 +836,25 @@ module.exports = {
             "layer": "poi_label",
             "icon": "maki",
             "field": "scalerank",
-            "value": [1, 2, 3],
+            "value": [1, 2],
+            "size": 12,
+            "type": "point"
+        },
+        "poi_3": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "icon": "maki",
+            "field": "scalerank",
+            "value": 3,
+            "size": 12,
+            "type": "point"
+        },
+        "poi_4": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "icon": "maki",
+            "field": "scalerank",
+            "value": 4,
             "size": 12,
             "type": "point"
         },
@@ -827,7 +867,7 @@ module.exports = {
             "size": 24,
             "type": "point"
         },
-        "poi_label": {
+        "poi_label_1-2": {
             "source": "outdoors",
             "layer": "poi_label",
             "field": "scalerank",
@@ -839,10 +879,35 @@ module.exports = {
             "path": "horizontal",
             "padding": 2,
             "font": "Open Sans Regular, Arial Unicode MS Regular",
-            "fontSize": 12,
+            "fontSize": 11,
             "feature_type": "point",
-            "type": "text",
-            "alwaysVisible": true
+            "type": "text"
+        },
+        "poi_label_3": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "field": "scalerank",
+            "value": 3,
+            "text_field": "name",
+            "path": "horizontal",
+            "padding": 2,
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
+            "fontSize": 10,
+            "feature_type": "point",
+            "type": "text"
+        },
+        "poi_label_4": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "field": "scalerank",
+            "value": 4,
+            "text_field": "name",
+            "path": "horizontal",
+            "padding": 2,
+            "font": "Open Sans Regular, Arial Unicode MS Regular",
+            "fontSize": 10,
+            "feature_type": "point",
+            "type": "text"
         }
     },
     "structure": [
@@ -939,6 +1004,30 @@ module.exports = {
             "bucket": "waterway_stream"
         },
         {
+            "name": "contour_line_loud",
+            "bucket": "contour_line_10"
+        },
+        {
+            "name": "contour_line_loud",
+            "bucket": "contour_line_5"
+        },
+        {
+            "name": "contour_line_regular",
+            "bucket": "contour_line_other"
+        },
+        {
+            "name": "building_shadow",
+            "bucket": "building"
+        },
+        {
+            "name": "building",
+            "bucket": "building"
+        },
+        {
+            "name": "building_wall",
+            "bucket": "building"
+        },
+        {
             "name": "hillshade_full_highlight",
             "bucket": "hillshade_full_highlight"
         },
@@ -953,18 +1042,6 @@ module.exports = {
         {
             "name": "hillshade_full_shadow",
             "bucket": "hillshade_full_shadow"
-        },
-        {
-            "name": "contour_line_loud",
-            "bucket": "contour_line_10"
-        },
-        {
-            "name": "contour_line_loud",
-            "bucket": "contour_line_5"
-        },
-        {
-            "name": "contour_line_regular",
-            "bucket": "contour_line_other"
         },
         {
             "name": "barrier_line_gate",
@@ -1005,18 +1082,6 @@ module.exports = {
         {
             "name": "aeroway_taxiway",
             "bucket": "aeroway_taxiway"
-        },
-        {
-            "name": "building_shadow",
-            "bucket": "building"
-        },
-        {
-            "name": "building",
-            "bucket": "building"
-        },
-        {
-            "name": "building_wall",
-            "bucket": "building"
         },
         {
             "name": "tunnel_motorway_link_casing",
@@ -1295,10 +1360,6 @@ module.exports = {
             "bucket": "state_label"
         },
         {
-            "name": "place_label_city_point",
-            "bucket": "place_label_city_point"
-        },
-        {
             "name": "place_label_city",
             "bucket": "place_label_city"
         },
@@ -1315,12 +1376,16 @@ module.exports = {
             "bucket": "place_label_other"
         },
         {
-            "name": "poi_label",
-            "bucket": "poi_label"
+            "name": "road_label_1",
+            "bucket": "road_label_1"
         },
         {
-            "name": "road_label",
-            "bucket": "road_label"
+            "name": "road_label_2",
+            "bucket": "road_label_2"
+        },
+        {
+            "name": "road_label_3",
+            "bucket": "road_label_3"
         },
         {
             "name": "contour_label",
@@ -1337,6 +1402,26 @@ module.exports = {
         {
             "name": "poi",
             "bucket": "poi"
+        },
+        {
+            "name": "poi_label_1-2",
+            "bucket": "poi_label_1-2"
+        },
+        {
+            "name": "poi_3",
+            "bucket": "poi_3"
+        },
+        {
+            "name": "poi_label_3",
+            "bucket": "poi_label_3"
+        },
+        {
+            "name": "poi_4",
+            "bucket": "poi_4"
+        },
+        {
+            "name": "poi_label_4",
+            "bucket": "poi_label_4"
         },
         {
             "name": "poi_aerodrome",
@@ -1571,12 +1656,27 @@ module.exports = {
             {"z": 8, "val": 1},
             {"z": 12, "val": 2}
         ],
-        "road_label_size": [
+        "road_label_1_size": [
             "stops",
-            {"z": 0, "val": 12},
+            {"z": 13, "val": 11},
             {"z": 14, "val": 12},
             {"z": 15, "val": 13},
-            {"z": 22, "val": 13}
+            {"z": 16, "val": 14},
+            {"z": 17, "val": 16},
+            {"z": 18, "val": 18}
+        ],
+        "road_label_2_size": [
+            "stops",
+            {"z": 13, "val": 11},
+            {"z": 14, "val": 12},
+            {"z": 16, "val": 14},
+            {"z": 18, "val": 16}
+        ],
+        "road_label_3_size": [
+            "stops",
+            {"z": 15, "val": 10},
+            {"z": 16, "val": 12},
+            {"z": 18, "val": 14}
         ],
         "fence_width": [
             "stops",
@@ -1599,6 +1699,11 @@ module.exports = {
             {"z": 19, "val": 12},
             {"z": 20, "val": 24},
             {"z": 21, "val": 48}
+        ],
+        "country_label_size": [
+            "stops",
+            {"z": 1, "val": 14},
+            {"z": 12, "val": 24}
         ]
     },
     "classes": [
@@ -1753,7 +1858,7 @@ module.exports = {
                     "color": "#103",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 512,
+                    "prerender-size": 1024,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -1766,7 +1871,7 @@ module.exports = {
                     "color": "#206",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 512,
+                    "prerender-size": 1024,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -1779,7 +1884,7 @@ module.exports = {
                     "color": "#fffff3",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 512,
+                    "prerender-size": 1024,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -1792,7 +1897,7 @@ module.exports = {
                     "color": "#ffd",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 512,
+                    "prerender-size": 1024,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2146,11 +2251,8 @@ module.exports = {
                 "country_label": {
                     "color": "country_text",
                     "stroke": "rgba(255,255,255,0.5)",
-                    "size": [
-                        "stops",
-                        {"z": 6, "val": 14},
-                        {"z": 12, "val": 24}
-                    ]
+                    "strokeWidth": 0.4,
+                    "size": "country_label_size"
                 },
                 "country_label_line": {
                     "color": "country_text",
@@ -2164,7 +2266,6 @@ module.exports = {
                 "marine_label_point_1": {
                     "color": "#a9c4c7",
                     "size": ["stops",
-                        {"z": 0, "val": 20},
                         {"z": 3, "val": 20},
                         {"z": 4, "val": 25},
                         {"z": 5, "val": 30},
@@ -2175,7 +2276,6 @@ module.exports = {
                 "marine_label_point_2": {
                     "color": "#a9c4c7",
                     "size": ["stops",
-                        {"z": 0, "val": 13},
                         {"z": 3, "val": 13},
                         {"z": 4, "val": 14},
                         {"z": 5, "val": 20},
@@ -2187,7 +2287,6 @@ module.exports = {
                 "marine_label_point_other": {
                     "color": "#a9c4c7",
                     "size": ["stops",
-                        {"z": 0, "val": 12},
                         {"z": 3, "val": 12},
                         {"z": 4, "val": 13},
                         {"z": 5, "val": 15},
@@ -2209,9 +2308,6 @@ module.exports = {
                         {"z": 10, "val": 0}
                     ]
                 },
-                "place_label_city_point": {
-                    "color": "#4a4032"
-                },
                 "place_label_city": {
                     "color": "#444",
                     "strokeWidth": 0.4,
@@ -2223,20 +2319,12 @@ module.exports = {
                         {"z": 7, "val": 14},
                         {"z": 14.99, "val": 20},
                         {"z": 15, "val": 0}
-                    ],
-                    "translate": [
-                        0,
-                        [
-                            "stops",
-                            {"z": 4, "val": 10},
-                            {"z": 6, "val": 30},
-                            {"z": 7, "val": 0}
-                        ]
                     ]
                 },
                 "place_label_town": {
                     "color": "#716656",
-                    "strokeWidth": 0.5,
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 2,
                     "stroke": "text_stroke",
                     "size": [
                         "stops",
@@ -2248,7 +2336,8 @@ module.exports = {
                 },
                 "place_label_village": {
                     "color": "#635644",
-                    "strokeWidth": 0.5,
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 2,
                     "stroke": "text_stroke",
                     "size": [
                         "stops",
@@ -2264,18 +2353,32 @@ module.exports = {
                     "stroke": "text_stroke",
                     "size": [
                         "stops",
-                        {"z": 0, "val": 10},
-                        {"z": 14, "val": 11},
-                        {"z": 15, "val": 12},
-                        {"z": 16, "val": 14}
+                        {"z": 13, "val": 11},
+                        {"z": 14, "val": 12},
+                        {"z": 16, "val": 14},
+                        {"z": 18, "val": 18}
                     ]
                 },
-                "road_label": {
+                "road_label_1": {
                     "color": "#585042",
                     "stroke": "land",
                     "strokeWidth": 0.6,
                     "strokeBlur": 2,
-                    "size": "road_label_size"
+                    "size": "road_label_1_size"
+                },
+                "road_label_2": {
+                    "color": "#585042",
+                    "stroke": "land",
+                    "strokeWidth": 0.6,
+                    "strokeBlur": 2,
+                    "size": "road_label_2_size"
+                },
+                "road_label_3": {
+                    "color": "#585042",
+                    "stroke": "land",
+                    "strokeWidth": 0.6,
+                    "strokeBlur": 2,
+                    "size": "road_label_3_size"
                 },
                 "water_label": {
                     "color": "water_dark",
@@ -2290,12 +2393,54 @@ module.exports = {
                 "poi": {
                     "antialias": false
                 },
-                "poi_label": {
+                "poi_3": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 16.5, "val": 0},
+                        {"z": 16.75, "val": 1}
+                    ]
+                },
+                "poi_4": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.5, "val": 0},
+                        {"z": 18.75, "val": 1}
+                    ]
+                },
+                "poi_label_1-2": {
+                    "color": "#444",
+                    "size": 11,
+                    "stroke": "land",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                    "translate": [0, 14]
+                },
+                "poi_label_3": {
                     "color": "#444",
                     "size": 10,
                     "stroke": "land",
-                    "strokeWidth": 0.6,
-                    "strokeBlur": 2,
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                    "translate": [0, 14],
+                    "opacity": [
+                        "stops",
+                        {"z": 16.5, "val": 0},
+                        {"z": 16.75, "val": 1}
+                    ]
+                },
+                "poi_label_4": {
+                    "color": "#444",
+                    "size": 10,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.5, "val": 0},
+                        {"z": 18.75, "val": 1}
+                    ],
+                    "stroke": "land",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
                     "translate": [0, 14]
                 },
                 "poi_aerodrome": {
@@ -2314,7 +2459,7 @@ module.exports = {
                     "color": "land_night"
                 },
                 "admin_maritime_cover": {
-                    "color": "#0a1347",
+                    "color": "water_night",
                     "width": 5
                 },
                 "admin_maritime": {
@@ -2465,11 +2610,11 @@ module.exports = {
                     "color": "#103",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 512,
+                    "prerender-size": 1024,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
-                        {"z": 0, "val": 0.3},
+                        {"z": 16, "val": 0.3},
                         {"z": 17, "val": 0.2},
                         {"z": 18, "val": 0.1}
                     ]
@@ -2478,11 +2623,11 @@ module.exports = {
                     "color": "#206",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 512,
+                    "prerender-size": 1024,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
-                        {"z": 0, "val": 0.3},
+                        {"z": 16, "val": 0.3},
                         {"z": 17, "val": 0.2},
                         {"z": 18, "val": 0.1}
                     ]
@@ -2491,7 +2636,7 @@ module.exports = {
                     "color": "#fdfdad",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 512,
+                    "prerender-size": 1024,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2505,7 +2650,7 @@ module.exports = {
                     "color": "#ffe1b7",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 512,
+                    "prerender-size": 1024,
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2854,12 +2999,9 @@ module.exports = {
                 },
                 "country_label": {
                     "color": "text_night",
-                    "stroke": "text_stroke_night",
-                    "size": [
-                        "stops",
-                        {"z": 6, "val": 14},
-                        {"z": 12, "val": 24}
-                    ]
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.4,
+                    "size": "country_label_size"
                 },
                 "country_label_line": {
                     "color": "text_night",
@@ -2873,7 +3015,6 @@ module.exports = {
                 "marine_label_point_1": {
                     "color": "water_dark_night",
                     "size": ["stops",
-                        {"z": 0, "val": 20},
                         {"z": 3, "val": 20},
                         {"z": 4, "val": 25},
                         {"z": 5, "val": 30},
@@ -2884,7 +3025,6 @@ module.exports = {
                 "marine_label_point_2": {
                     "color": "water_dark_night",
                     "size": ["stops",
-                        {"z": 0, "val": 13},
                         {"z": 3, "val": 13},
                         {"z": 4, "val": 14},
                         {"z": 5, "val": 20},
@@ -2896,7 +3036,6 @@ module.exports = {
                 "marine_label_point_other": {
                     "color": "#a9c4c7",
                     "size": ["stops",
-                        {"z": 0, "val": 12},
                         {"z": 3, "val": 12},
                         {"z": 4, "val": 13},
                         {"z": 5, "val": 15},
@@ -2918,13 +3057,10 @@ module.exports = {
                         {"z": 10, "val": 0}
                     ]
                 },
-                "place_label_city_point": {
-                    "color": "#ddd"
-                },
                 "place_label_city": {
                     "color": "#fff",
                     "strokeWidth": 0.4,
-                    "stroke": "text_stroke_night",
+                    "stroke": "text2_stroke_night",
                     "size": [
                         "stops",
                         {"z": 3.99, "val": 0},
@@ -2932,21 +3068,13 @@ module.exports = {
                         {"z": 7, "val": 14},
                         {"z": 14.99, "val": 20},
                         {"z": 15, "val": 0}
-                    ],
-                    "translate": [
-                        0,
-                        [
-                            "stops",
-                            {"z": 4, "val": 10},
-                            {"z": 6, "val": 30},
-                            {"z": 7, "val": 0}
-                        ]
                     ]
                 },
                 "place_label_town": {
                     "color": "text_night",
-                    "strokeWidth": 0.5,
-                    "stroke": "text_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 2,
+                    "stroke": "text2_stroke_night",
                     "size": [
                         "stops",
                         {"z": 9, "val": 10},
@@ -2957,8 +3085,9 @@ module.exports = {
                 },
                 "place_label_village": {
                     "color": "text_night",
-                    "strokeWidth": 0.5,
-                    "stroke": "text_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 2,
+                    "stroke": "text2_stroke_night",
                     "size": [
                         "stops",
                         {"z": 9, "val": 8},
@@ -2970,43 +3099,100 @@ module.exports = {
                 },
                 "place_label_other": {
                     "color": "text_night",
-                    "stroke": "text_stroke_night",
-                    "strokeWidth": 0.5,
-                    "strokeBlur": 3,
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 2,
                     "size": [
                         "stops",
-                        {"z": 0, "val": 10},
-                        {"z": 14, "val": 11},
-                        {"z": 15, "val": 12},
-                        {"z": 16, "val": 14}
+                        {"z": 13, "val": 11},
+                        {"z": 14, "val": 12},
+                        {"z": 16, "val": 14},
+                        {"z": 18, "val": 18}
                     ]
                 },
-                "road_label": {
+                "road_label_1": {
                     "color": "text_night",
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.5,
                     "strokeBlur": 3,
-                    "size": "road_label_size"
+                    "size": "road_label_1_size"
+                },
+                "road_label_2": {
+                    "color": "text_night",
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.5,
+                    "strokeBlur": 3,
+                    "size": "road_label_2_size"
+                },
+                "road_label_3": {
+                    "color": "text_night",
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.5,
+                    "strokeBlur": 3,
+                    "size": "road_label_3_size"
                 },
                 "water_label": {
                     "color": "water_dark_night",
-                    "stroke": "text_stroke_night"
+                    "strokeWidth": 0.8,
+                    "stroke": "text2_stroke_night"
                 },
                 "waterway_label": {
-                    "color": "land_night",
+                    "color": "water_dark_night",
                     "strokeWidth": 0.8,
-                    "stroke": "water_night"
+                    "stroke": "text2_stroke_night"
                 },
                 "poi": {
                     "color": "white",
                     "antialias": false
                 },
-                "poi_label": {
+                "poi_3": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 16.5, "val": 0},
+                        {"z": 16.75, "val": 1}
+                    ]
+                },
+                "poi_4": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.5, "val": 0},
+                        {"z": 18.75, "val": 1}
+                    ]
+                },
+                "poi_label_1-2": {
+                    "color": "#fff",
+                    "size": 11,
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                    "translate": [0, 14]
+                },
+                "poi_label_3": {
                     "color": "#fff",
                     "size": 10,
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
-                    "strokeBlur": 2,
+                    "strokeBlur": 1,
+                    "translate": [0, 14],
+                    "opacity": [
+                        "stops",
+                        {"z": 16.5, "val": 0},
+                        {"z": 16.75, "val": 1}
+                    ]
+                },
+                "poi_label_4": {
+                    "color": "#fff",
+                    "size": 10,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.5, "val": 0},
+                        {"z": 18.75, "val": 1}
+                    ],
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
                     "translate": [0, 14]
                 },
                 "poi_aerodrome": {

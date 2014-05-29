@@ -4,6 +4,11 @@ compiler:
  - gcc
  - clang
 
+env:
+  matrix:
+   - BUILDTYPE=Release
+   - BUILDTYPE=Debug
+
 cache:
 - apt
 - directories:
@@ -18,14 +23,20 @@ before_install:
 
 install:
 - ./setup-libraries.sh
+- rm -rf mapnik-packaging/out/packages
+
 
 before_script:
-- if [ ${CXX} = "g++" ]; then export CXX="g++-4.8" ; fi
+- if [[ ${CXX} == "g++" ]]; then export CXX="g++-4.8" ; fi
 
 script:
-- make llmr
-- make linux
-- make run-tests
+- make llmr BUILDTYPE=${BUILDTYPE}
+- make clean
+- make linux BUILDTYPE=${BUILDTYPE}
+- make clean
+- make run-tests BUILDTYPE=${BUILDTYPE}
+# TODO - port to linux
+#- make run-headless-test BUILDTYPE=${BUILDTYPE}
 
 notifications:
 - hipchat: WB52YkcbCGMbNcStsGeaoRO7cyBSK4wX2ZHo2Y4b@GL

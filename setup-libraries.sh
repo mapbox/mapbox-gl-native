@@ -16,6 +16,7 @@ ensure_dep cmake
 ensure_dep automake
 ensure_dep autoconf
 ensure_dep pkg-config
+ensure_dep node
 if [ ${UNAME} = 'Darwin' ]; then
     ensure_dep makedepend
     ensure_dep glibtool
@@ -27,10 +28,12 @@ fi
 if [[ $MISSING_DEPS != "" ]]; then
     if [ ${UNAME} = 'Darwin' ]; then
         echo "Missing build deps: ${MISSING_DEPS}"
-        echo 'Please run "brew install autoconf automake libtool makedepend cmake pkg-config" and then re-run ./setup-libraries.sh'
+        echo 'Please run "brew install autoconf automake libtool makedepend cmake pkg-config node"'
+        echo 'and then re-run ./setup-libraries.sh'
     elif [ ${UNAME} = 'Linux' ]; then
         echo "Missing build deps: ${MISSING_DEPS}"
-        echo 'Please run "sudo apt-get install automake libtool xutils-dev cmake pkg-config" and then re-run ./setup-libraries.sh'
+        echo 'Please run "sudo apt-get install automake libtool xutils-dev cmake pkg-config libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev nodejs-legacy"'
+        echo 'and then re-run ./setup-libraries.sh'
     fi
     exit 1
 fi
@@ -74,8 +77,6 @@ source MacOSX.sh
     if [ ! -d out/build-cpp11-libcpp-x86_64/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
     echo '     ...done'
 
-rm -rf out/packages
-
 ./scripts/make_universal.sh
 
 cd ../../
@@ -86,14 +87,12 @@ cd ../../
 elif [ ${UNAME} = 'Linux' ]; then
 
 source Linux.sh
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libglfw3.a ] ; then ./scripts/build_glfw.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -d out/build-cpp11-libstdcpp-gcc-x86_64/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
-
-rm -rf out/packages
 
 cd ../../
 ./configure \
