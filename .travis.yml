@@ -4,6 +4,11 @@ compiler:
  - gcc
  - clang
 
+env:
+  matrix:
+   - BUILDTYPE=Release
+   - BUILDTYPE=Debug
+
 cache:
 - apt
 - directories:
@@ -23,9 +28,9 @@ before_script:
 - if [ ${CXX} = "g++" ]; then export CXX="g++-4.8" ; fi
 
 script:
-- make llmr
-- make linux
-- make run-tests
+- make llmr BUILDTYPE=${BUILDTYPE}
+- make linux BUILDTYPE=${BUILDTYPE}
+- make run-tests BUILDTYPE=${BUILDTYPE}
 
 notifications:
 - hipchat: WB52YkcbCGMbNcStsGeaoRO7cyBSK4wX2ZHo2Y4b@GL
