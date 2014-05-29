@@ -18,12 +18,12 @@ namespace util {
 
 class utf8_to_utf32 {
  public:
-    explicit utf8_to_utf32()
-        : utf32conv_() {}
+    explicit utf8_to_utf32() {}
     std::u32string convert(std::string const& utf8) {
         return boost::locale::conv::utf_to_utf<char32_t>(utf8)
     }
 };
+
 #else
 
 class utf8_to_utf32 {
