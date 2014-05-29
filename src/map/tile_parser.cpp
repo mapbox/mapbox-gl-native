@@ -10,11 +10,10 @@
 #include <llmr/util/constants.hpp>
 #include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/text/glyph_store.hpp>
-
+#include <llmr/text/glyph.hpp>
 #include <llmr/util/std.hpp>
 
 using namespace llmr;
-
 
 TileParser::TileParser(const std::string& data, VectorTileData& tile, const Style& style, GlyphAtlas& glyphAtlas, GlyphStore &glyphStore, SpriteAtlas &spriteAtlas)
     : vector_data(pbf((const uint8_t *)data.data(), data.size())),
@@ -219,10 +218,29 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
                 continue;
             }
 
+            uint32_t i = 0;
+            uint32_t x = 0;
             const std::string string = toString(it_prop->second);
-
+            std::map<uint32_t, GlyphPlacement> shaping;
+            std::map<uint32_t, GlyphMetrics> metrics = fontStack.getMetrics();
+            // fprintf(stderr, "%s\n", string.c_str());
+            // Loop through all characters of this label and shape.
+            for (uint32_t chr : string) {
+                // Can we reuse GlyphPlacement here? First arg is a faces index ...
+                GlyphPlacement shaped = GlyphPlacement(0, chr, x, 0);
+                // No idea how to properly put together a shaping std::map ...
+                shaping.emplace(i, shaped);
+                i++;
+                x += metrics[chr].advance;
+            }
             // TODO: Shape label
             // TODO: Place label
+            // Can faces here be a std::map of fontstacks?
+            // It looks like nearly the same interface through the rest
+            // of the stack.
+            std::unique_ptr<TextBucket> bucket = std::make_unique<TextBucket>(
+                tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
+            addBucketFeatures(bucket, layer, bucket_desc, faces, shaping);
         }
 
     }
