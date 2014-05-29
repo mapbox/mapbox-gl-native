@@ -16,6 +16,7 @@ ensure_dep cmake
 ensure_dep automake
 ensure_dep autoconf
 ensure_dep pkg-config
+ensure_dep node
 if [ ${UNAME} = 'Darwin' ]; then
     ensure_dep makedepend
     ensure_dep glibtool
@@ -27,11 +28,11 @@ fi
 if [[ $MISSING_DEPS != "" ]]; then
     if [ ${UNAME} = 'Darwin' ]; then
         echo "Missing build deps: ${MISSING_DEPS}"
-        echo 'Please run "brew install autoconf automake libtool makedepend cmake pkg-config"'
+        echo 'Please run "brew install autoconf automake libtool makedepend cmake pkg-config node"'
         echo 'and then re-run ./setup-libraries.sh'
     elif [ ${UNAME} = 'Linux' ]; then
         echo "Missing build deps: ${MISSING_DEPS}"
-        echo 'Please run "sudo apt-get install automake libtool xutils-dev cmake pkg-config libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev"'
+        echo 'Please run "sudo apt-get install automake libtool xutils-dev cmake pkg-config libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev nodejs-legacy"'
         echo 'and then re-run ./setup-libraries.sh'
     fi
     exit 1
