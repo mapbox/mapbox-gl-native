@@ -1,5 +1,10 @@
 language: cpp
 
+# http://docs.travis-ci.com/user/multi-os/
+os:
+ - linux
+ - osx
+
 compiler:
  - gcc
  - clang
@@ -15,28 +20,23 @@ cache:
   - mapnik-packaging
 
 before_install:
-- sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
-- sudo apt-get update -qq
-- sudo apt-get -y install gcc-4.8 g++-4.8
-- sudo apt-get -y install pkg-config nodejs cmake automake libtool xutils-dev
-- sudo apt-get -y install libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev
+- source ./scripts/install_build_deps_${TRAVIS_OS_NAME}.sh
+- source ./setup-libraries.sh
 
 install:
-- ./setup-libraries.sh
 - rm -rf mapnik-packaging/out/packages
 
-
 before_script:
-- if [[ ${CXX} == "g++" ]]; then export CXX="g++-4.8" ; fi
+- if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ ${CXX} == "g++" ]]; then export CXX="g++-4.8" ; fi
 
 script:
 - make llmr BUILDTYPE=${BUILDTYPE}
 - make clean
-- make linux BUILDTYPE=${BUILDTYPE}
+- make ${TRAVIS_OS_NAME} BUILDTYPE=${BUILDTYPE}
 - make clean
 - make run-tests BUILDTYPE=${BUILDTYPE}
-# TODO - port to linux
-#- make run-headless-test BUILDTYPE=${BUILDTYPE}
+# TODO - port this test to linux
+- if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then make run-headless-test BUILDTYPE=${BUILDTYPE} ; fi
 
 notifications:
 - hipchat: WB52YkcbCGMbNcStsGeaoRO7cyBSK4wX2ZHo2Y4b@GL
