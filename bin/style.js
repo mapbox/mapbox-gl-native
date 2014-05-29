@@ -985,18 +985,6 @@ module.exports = {
             "bucket": "waterway_stream"
         },
         {
-            "name": "contour_line_loud",
-            "bucket": "contour_line_10"
-        },
-        {
-            "name": "contour_line_loud",
-            "bucket": "contour_line_5"
-        },
-        {
-            "name": "contour_line_regular",
-            "bucket": "contour_line_other"
-        },
-        {
             "name": "building_shadow",
             "bucket": "building"
         },
@@ -1023,6 +1011,18 @@ module.exports = {
         {
             "name": "hillshade_full_shadow",
             "bucket": "hillshade_full_shadow"
+        },
+        {
+            "name": "contour_line_loud",
+            "bucket": "contour_line_10"
+        },
+        {
+            "name": "contour_line_loud",
+            "bucket": "contour_line_5"
+        },
+        {
+            "name": "contour_line_regular",
+            "bucket": "contour_line_other"
         },
         {
             "name": "barrier_line_gate",
