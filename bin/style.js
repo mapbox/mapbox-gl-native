@@ -649,7 +649,7 @@ module.exports = {
             "layer": "country_label",
             "text_field": "name",
             "path": "horizontal",
-            "font": "Open Sans Semibold, Arial Unicode MS Bold",
+            "font": "Open Sans Bold, Arial Unicode MS Bold",
             "fontSize": 24,
             "feature_type": "point",
             "type": "text"
