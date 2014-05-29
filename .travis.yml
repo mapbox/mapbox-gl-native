@@ -28,7 +28,7 @@ install:
 
 before_script:
 - if [[ ${CXX} == "g++" ]]; then export CXX="g++-4.8" ; fi
-- if [[ $BUILDTYPE} == "Debug" ]]; then export CXXFLAGS="-fsanitize=address -fsanitize=thread";export LDFLAGS="-fsanitize=address -fsanitize=thread" ; fi
+- if [[ ${BUILDTYPE} == "Debug" ]]; then export CXXFLAGS="-fsanitize=address";export LDFLAGS="-fsanitize=address" ; fi
 
 script:
 - make llmr BUILDTYPE=${BUILDTYPE}
