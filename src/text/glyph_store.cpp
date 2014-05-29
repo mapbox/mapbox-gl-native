@@ -5,6 +5,7 @@
 #include <llmr/util/pbf.hpp>
 #include <llmr/platform/platform.hpp>
 #include <uv.h>
+#include <algorithm>
 
 namespace llmr {
 
