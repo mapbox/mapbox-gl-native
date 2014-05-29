@@ -650,7 +650,7 @@ module.exports = {
             "layer": "country_label",
             "text_field": "{{name}}",
             "path": "horizontal",
-            "font": "Open Sans Bold, Arial Unicode MS Bold",
+            "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 24,
             "feature_type": "point",
             "type": "text"
@@ -667,7 +667,7 @@ module.exports = {
             "type": "text",
             "text_field": "{{name}}",
             "path": "curve",
-            "font": "Open Sans Italic, Arial Unicode MS Regular",
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 16
         },
         "marine_label_point_1": {
@@ -679,7 +679,7 @@ module.exports = {
             "path": "horizontal",
             "field": "labelrank",
             "value": 1,
-            "font": "Open Sans Italic, Arial Unicode MS Regular",
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 30
         },
         "marine_label_point_2": {
@@ -691,7 +691,7 @@ module.exports = {
             "path": "horizontal",
             "field": "labelrank",
             "value": 2,
-            "font": "Open Sans Italic, Arial Unicode MS Regular",
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 24
         },
         "marine_label_point_other": {
@@ -703,7 +703,7 @@ module.exports = {
             "path": "horizontal",
             "field": "labelrank",
             "value": [3,4,5,6],
-            "font": "Open Sans Italic, Arial Unicode MS Regular",
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 18
         },
         "state_label": {
@@ -1463,7 +1463,7 @@ module.exports = {
         "street": "#fff",
         "text": "#666",
         "text_stroke": "rgba(255,255,255,0.8)",
-        "country_text": "#333",
+        "country_text": "#222",
         "marine_text": "#a0bdc0",
         "water_text": "#185869",
 
@@ -3026,7 +3026,8 @@ module.exports = {
                 "country_label": {
                     "color": "text_night",
                     "stroke": "text2_stroke_night",
-                    "strokeWidth": 0.5,
+                    "strokeWidth": 0.4,
+                    "strokeBlur": 2,
                     "size": "country_label_size"
                 },
                 "country_label_line": {
@@ -3060,7 +3061,7 @@ module.exports = {
                     "stroke": "water_night"
                 },
                 "marine_label_point_other": {
-                    "color": "#a9c4c7",
+                    "color": "water_dark_night",
                     "size": ["stops",
                         {"z": 3, "val": 12},
                         {"z": 4, "val": 13},
