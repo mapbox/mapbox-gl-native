@@ -1640,7 +1640,7 @@ module.exports = {
         ],
         "road_label_1_size": [
             "stops",
-            {"z": 0, "val": 11},
+            {"z": 13, "val": 11},
             {"z": 14, "val": 12},
             {"z": 15, "val": 13},
             {"z": 16, "val": 14},
@@ -1649,14 +1649,14 @@ module.exports = {
         ],
         "road_label_2_size": [
             "stops",
-            {"z": 0, "val": 11},
+            {"z": 13, "val": 11},
             {"z": 14, "val": 12},
             {"z": 16, "val": 14},
             {"z": 18, "val": 16}
         ],
         "road_label_3_size": [
             "stops",
-            {"z": 0, "val": 10},
+            {"z": 15, "val": 10},
             {"z": 16, "val": 12},
             {"z": 18, "val": 14}
         ],
@@ -2248,7 +2248,6 @@ module.exports = {
                 "marine_label_point_1": {
                     "color": "#a9c4c7",
                     "size": ["stops",
-                        {"z": 0, "val": 20},
                         {"z": 3, "val": 20},
                         {"z": 4, "val": 25},
                         {"z": 5, "val": 30},
@@ -2259,7 +2258,6 @@ module.exports = {
                 "marine_label_point_2": {
                     "color": "#a9c4c7",
                     "size": ["stops",
-                        {"z": 0, "val": 13},
                         {"z": 3, "val": 13},
                         {"z": 4, "val": 14},
                         {"z": 5, "val": 20},
@@ -2271,7 +2269,6 @@ module.exports = {
                 "marine_label_point_other": {
                     "color": "#a9c4c7",
                     "size": ["stops",
-                        {"z": 0, "val": 12},
                         {"z": 3, "val": 12},
                         {"z": 4, "val": 13},
                         {"z": 5, "val": 15},
@@ -2338,7 +2335,7 @@ module.exports = {
                     "stroke": "text_stroke",
                     "size": [
                         "stops",
-                        {"z": 0, "val": 11},
+                        {"z": 13, "val": 11},
                         {"z": 14, "val": 12},
                         {"z": 16, "val": 14},
                         {"z": 18, "val": 18}
@@ -2599,7 +2596,7 @@ module.exports = {
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
-                        {"z": 0, "val": 0.3},
+                        {"z": 16, "val": 0.3},
                         {"z": 17, "val": 0.2},
                         {"z": 18, "val": 0.1}
                     ]
@@ -2612,7 +2609,7 @@ module.exports = {
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
-                        {"z": 0, "val": 0.3},
+                        {"z": 16, "val": 0.3},
                         {"z": 17, "val": 0.2},
                         {"z": 18, "val": 0.1}
                     ]
@@ -3000,7 +2997,6 @@ module.exports = {
                 "marine_label_point_1": {
                     "color": "water_dark_night",
                     "size": ["stops",
-                        {"z": 0, "val": 20},
                         {"z": 3, "val": 20},
                         {"z": 4, "val": 25},
                         {"z": 5, "val": 30},
@@ -3011,7 +3007,6 @@ module.exports = {
                 "marine_label_point_2": {
                     "color": "water_dark_night",
                     "size": ["stops",
-                        {"z": 0, "val": 13},
                         {"z": 3, "val": 13},
                         {"z": 4, "val": 14},
                         {"z": 5, "val": 20},
@@ -3023,7 +3018,6 @@ module.exports = {
                 "marine_label_point_other": {
                     "color": "#a9c4c7",
                     "size": ["stops",
-                        {"z": 0, "val": 12},
                         {"z": 3, "val": 12},
                         {"z": 4, "val": 13},
                         {"z": 5, "val": 15},
@@ -3092,7 +3086,7 @@ module.exports = {
                     "strokeBlur": 2,
                     "size": [
                         "stops",
-                        {"z": 0, "val": 11},
+                        {"z": 13, "val": 11},
                         {"z": 14, "val": 12},
                         {"z": 16, "val": 14},
                         {"z": 18, "val": 18}
@@ -3121,12 +3115,13 @@ module.exports = {
                 },
                 "water_label": {
                     "color": "water_dark_night",
-                    "stroke": "text_stroke_night"
+                    "strokeWidth": 0.8,
+                    "stroke": "text2_stroke_night"
                 },
                 "waterway_label": {
-                    "color": "land_night",
+                    "color": "water_dark_night",
                     "strokeWidth": 0.8,
-                    "stroke": "water_night"
+                    "stroke": "text2_stroke_night"
                 },
                 "poi": {
                     "color": "white",
