@@ -6,7 +6,7 @@
   'targets': [
     {
         "target_name": "iosapp",
-        "product_name": "llmr",
+        "product_name": "Mapbox GL",
         "type": "executable",
         "sources": [
             "./main.m",
