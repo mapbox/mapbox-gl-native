@@ -30,7 +30,7 @@ bool SpriteAtlas::resize(const float newRatio) {
     pixelRatio = newRatio;
 
     if (data) {
-        char *old_data = data;
+        uint32_t *old_data = data;
 
         data = nullptr;
         allocate();
@@ -185,7 +185,7 @@ void SpriteAtlas::allocate() {
     if (!data) {
         dimension w = static_cast<dimension>(width * pixelRatio);
         dimension h = static_cast<dimension>(height * pixelRatio);
-        data = (char *)calloc(w * h, sizeof(uint32_t));
+        data = (uint32_t *)calloc(w * h, sizeof(uint32_t));
     }
 }
 
