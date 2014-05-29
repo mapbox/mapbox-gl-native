@@ -30,9 +30,11 @@ before_script:
 - if [ ${CXX} = "g++" ]; then export CXX="g++-4.8" ; fi
 
 script:
-- make llmr BUILDTYPE=${BUILDTYPE} -j4
-- make linux BUILDTYPE=${BUILDTYPE} -j4
-- make run-tests BUILDTYPE=${BUILDTYPE} -j4
+- make llmr BUILDTYPE=${BUILDTYPE}
+- make clean
+- make linux BUILDTYPE=${BUILDTYPE}
+- make clean
+- make run-tests BUILDTYPE=${BUILDTYPE}
 # TODO - port to linux
 #- make run-headless-test BUILDTYPE=${BUILDTYPE}
 
