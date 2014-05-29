@@ -11,6 +11,15 @@
 
 #include <uv.h>
 
+namespace llmr {
+namespace platform {
+
+void notify_map_change() {
+    // no-op
+}
+
+}}
+
 class View : public llmr::View {
 public:
     void make_active() {

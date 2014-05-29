@@ -53,7 +53,7 @@ Collision::Collision() : cTree(new Tree()), hTree(new Tree()) {
            CollisionAnchor{m, m}, 1, {{M_PI * 2, 0}}, false, 2);
 }
 
-GlyphBox getMergedGlyphs(const PlacedGlyphs &placed_glyphs, bool horizontal,
+GlyphBox getMergedGlyphs(const GlyphBoxes &boxes, bool horizontal,
                          const CollisionAnchor &anchor) {
     GlyphBox mergedGlyphs;
     const float inf = std::numeric_limits<float>::infinity();
@@ -62,28 +62,28 @@ GlyphBox getMergedGlyphs(const PlacedGlyphs &placed_glyphs, bool horizontal,
     mergedGlyphs.anchor = anchor;
 
     CollisionRect &box = mergedGlyphs.box;
-    for (const PlacedGlyph &placed_glyph : placed_glyphs) {
-        const CollisionRect &gbox = placed_glyph.glyphBox.box;
+    for (const GlyphBox &glyph : boxes) {
+        const CollisionRect &gbox = glyph.box;
         box.tl.x = util::min(box.tl.x, gbox.tl.x);
         box.tl.y = util::min(box.tl.y, gbox.tl.y);
         box.br.x = util::max(box.br.x, gbox.br.x);
         box.br.y = util::max(box.br.y, gbox.br.y);
         mergedGlyphs.minScale =
-            util::max(mergedGlyphs.minScale, placed_glyph.glyphBox.minScale);
+            util::max(mergedGlyphs.minScale, glyph.minScale);
     }
 
     return mergedGlyphs;
 }
 
-PlacementProperty Collision::place(const PlacedGlyphs &placed_glyphs,
+PlacementProperty Collision::place(const GlyphBoxes &boxes,
                                    const CollisionAnchor &anchor,
                                    float minPlacementScale,
                                    float maxPlacementScale, float padding,
                                    bool horizontal, bool alwaysVisible) {
 
     float minScale = std::numeric_limits<float>::infinity();
-    for (const PlacedGlyph &placed_glyph : placed_glyphs) {
-        minScale = util::min(minScale, placed_glyph.glyphBox.minScale);
+    for (const GlyphBox &glyphBox : boxes) {
+        minScale = util::min(minScale, glyphBox.minScale);
     }
     minPlacementScale = util::max(minPlacementScale, minScale);
 
@@ -92,11 +92,9 @@ PlacementProperty Collision::place(const PlacedGlyphs &placed_glyphs,
     // for horizontal labels.
     GlyphBoxes glyphs;
     if (horizontal) {
-        glyphs.push_back(getMergedGlyphs(placed_glyphs, horizontal, anchor));
+        glyphs.push_back(getMergedGlyphs(boxes, horizontal, anchor));
     } else {
-        for (const PlacedGlyph &placed_glyph : placed_glyphs) {
-            glyphs.push_back(placed_glyph.glyphBox);
-        }
+        glyphs = boxes;
     }
 
     // Calculate bboxes for all the glyphs
