@@ -10,15 +10,36 @@
 namespace llmr {
 
 
-void FontStack::insert(uint32_t id, const GlyphMetrics &glyphMetrics, const std::string &bitmap) {
+void FontStack::insert(uint32_t id, const SDFGlyph &glyph) {
     std::lock_guard<std::mutex> lock(mtx);
-    metrics.emplace(id, glyphMetrics);
-    bitmaps.emplace(id, bitmap);
+    metrics.emplace(id, glyph.metrics);
+    bitmaps.emplace(id, glyph.bitmap);
+    sdfs.emplace(id, glyph);
 }
 
 const std::map<uint32_t, GlyphMetrics> &FontStack::getMetrics() const {
     std::lock_guard<std::mutex> lock(mtx);
     return metrics;
+}
+
+const std::map<uint32_t, SDFGlyph> &FontStack::getSDFs() const {
+    std::lock_guard<std::mutex> lock(mtx);
+    return sdfs;
+}
+
+const Shaping FontStack::getShaping(const std::string &string) const {
+    std::lock_guard<std::mutex> lock(mtx);
+    uint32_t i = 0;
+    uint32_t x = 0;
+    Shaping shaped;
+    // Loop through all characters of this label and shape.
+    for (uint32_t chr : string) {
+        GlyphPlacement glyph = GlyphPlacement(0, chr, x, 0);
+        shaped.push_back(glyph);
+        i++;
+        x += metrics.find(chr)->second.advance;
+    }
+    return shaped;
 }
 
 GlyphPBF::GlyphPBF(const std::string &fontStack, GlyphRange glyphRange)
@@ -29,6 +50,8 @@ GlyphPBF::GlyphPBF(const std::string &fontStack, GlyphRange glyphRange)
 
     // TODO: Find more reliable URL normalization function
     std::replace(url.begin(), url.end(), ' ', '+');
+
+    fprintf(stderr, url.c_str());
 
     platform::request_http(url, [&](platform::Response *res) {
         if (res->code != 200) {
@@ -75,6 +98,7 @@ void GlyphPBF::parse(FontStack &stack) {
                     while (glyph_pbf.next()) {
                         if (glyph_pbf.tag == 1) { // id
                             id = glyph_pbf.varint();
+                            glyph.id = glyph_pbf.varint();
                         } else if (glyph_pbf.tag == 2) { // bitmap
                             glyph.bitmap = glyph_pbf.string();
                         } else if (glyph_pbf.tag == 3) { // width
@@ -92,7 +116,7 @@ void GlyphPBF::parse(FontStack &stack) {
                         }
                     }
 
-                    stack.insert(id, glyph.metrics, glyph.bitmap);
+                    stack.insert(id, glyph);
                 } else {
                     fontstack_pbf.skip();
                 }

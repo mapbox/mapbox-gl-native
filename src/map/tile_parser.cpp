@@ -23,7 +23,6 @@ TileParser::TileParser(const std::string& data, VectorTileData& tile, const Styl
       glyphStore(glyphStore),
       spriteAtlas(spriteAtlas),
       placement(tile.id.z) {
-    parseGlyphs();
     parseStyleLayers(style.layers);
 }
 
@@ -31,17 +30,13 @@ bool TileParser::obsolete() const {
     return tile.state == TileData::State::obsolete;
 }
 
-void TileParser::parseGlyphs() {
-    for (const std::pair<std::string, const VectorTileFace> pair : vector_data.faces) {
-        const std::string &name = pair.first;
-        const VectorTileFace &face = pair.second;
-
-        GlyphPositions &glyphs = faces[name];
-        for (const VectorTileGlyph &glyph : face.glyphs) {
-            const Rect<uint16_t> rect =
-                glyphAtlas.addGlyph(tile.id.to_uint64(), name, glyph);
-            glyphs.emplace(glyph.id, Glyph{rect, glyph.metrics});
-        }
+void TileParser::addGlyph(uint64_t tileid, const std::string stackname, const std::string &string, const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face) {
+    std::map<uint32_t, SDFGlyph> sdfs = fontStack.getSDFs();
+    // Loop through all characters and add glyph to atlas, positions.
+    for (uint32_t chr : string) {
+        const SDFGlyph sdf = sdfs[chr];
+        const Rect<uint16_t> rect = glyphAtlas.addGlyph(tileid, stackname, sdf);
+        face.emplace(chr, Glyph{rect, sdf.metrics});
     }
 }
 
@@ -202,6 +197,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
     // Create a copy!
     const FontStack &fontStack = glyphStore.getFontStack(bucket_desc.geometry.font);
     std::map<Value, Shaping> shaping;
+    GlyphPositions face;
 
     // Shape and place all labels.
     {
@@ -219,33 +215,21 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
                 continue;
             }
 
-            uint32_t i = 0;
-            uint32_t x = 0;
             const std::string string = toString(it_prop->second);
-            Shaping shapedGlyphs;
-            std::map<uint32_t, GlyphMetrics> metrics = fontStack.getMetrics();
-            // fprintf(stderr, "%s\n", string.c_str());
-            // TODO: Shape label
-            // Loop through all characters of this label and shape.
-            for (uint32_t chr : string) {
-                // Can we reuse GlyphPlacement here? First arg is a faces index.
-                GlyphPlacement glyph = GlyphPlacement(0, chr, x, 0);
-                // No idea how to properly put together a shapedGlyphs vector.
-                shapedGylphs.push(glyph);
-                i++;
-                x += metrics[chr].advance;
-            }
-            // TODO: Place label
+
+            // Shape labels.
+            const Shaping shaped = fontStack.getShaping(string);
             shaping.emplace(string, shaped);
+
+            // Place labels.
+            addGlyph(tile.id.to_uint64(), bucket_desc.geometry.font, string, fontStack, glyphAtlas, face);
         }
     }
 
-    // Can faces here be a std::map of fontstacks?
     // It looks like nearly the same interface through the rest
     // of the stack.
-    std::unique_ptr<TextBucket> bucket = std::make_unique<TextBucket>(
-        tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
-    addBucketFeatures(bucket, layer, bucket_desc, faces, shaping);
+    addBucketFeatures(bucket, layer, bucket_desc, face, shaping);
 
     return std::move(bucket);
 }
+

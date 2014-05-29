@@ -4,6 +4,8 @@
 #include <llmr/map/vector_tile_data.hpp>
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/text/placement.hpp>
+#include <llmr/text/glyph_store.hpp>
+#include <llmr/text/glyph.hpp>
 
 namespace llmr {
 
@@ -23,6 +25,7 @@ private:
     bool obsolete() const;
     void parseGlyphs();
     void parseStyleLayers(const std::vector<LayerDescription>& layers);
+    void addGlyph(uint64_t tileid, const std::string stackname, const std::string &string, const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face);
     std::unique_ptr<Bucket> createBucket(const BucketDescription& bucket_desc);
     std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
     std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc);

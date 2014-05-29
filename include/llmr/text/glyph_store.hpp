@@ -4,7 +4,6 @@
 #include <llmr/text/glyph.hpp>
 #include <llmr/util/pbf.hpp>
 
-
 #include <cstdint>
 #include <vector>
 #include <future>
@@ -17,6 +16,8 @@ namespace llmr {
 
 class SDFGlyph {
 public:
+    uint32_t id = 0;
+
     // A signed distance field of the glyph with a border of 3 pixels.
     std::string bitmap;
 
@@ -26,13 +27,15 @@ public:
 
 class FontStack {
 public:
-    void insert(uint32_t id, const GlyphMetrics &glyphMetrics, const std::string &bitmap);
-
+    void insert(uint32_t id, const SDFGlyph &glyph);
     const std::map<uint32_t, GlyphMetrics> &getMetrics() const;
+    const std::map<uint32_t, SDFGlyph> &getSDFs() const;
+    const Shaping getShaping(const std::string &string) const;
 
 private:
     std::map<uint32_t, std::string> bitmaps;
     std::map<uint32_t, GlyphMetrics> metrics;
+    std::map<uint32_t, SDFGlyph> sdfs;
     mutable std::mutex mtx;
 };
 
