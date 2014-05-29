@@ -95,7 +95,10 @@ GlyphRange getGlyphRange(uint32_t glyph) {
     if (glyph <= 65279) return { 65279, 65279 }; // Specials
     if (glyph <= 65519) return { 65280, 65519 }; // Halfwidth and Fullwidth Forms
     if (glyph <= 65533) return { 65520, 65533 }; // Specials
-    return { 0, 0 };
+    // fprintf(stderr, "Glyph out of range %u\n", glyph);
+    // If glyph is out of range request basic latin for now...
+    // TODO: null range or way to prevent any range from being used at all?
+    return { 0, 127 };
 }
 
 }
