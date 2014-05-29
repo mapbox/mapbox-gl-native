@@ -93,11 +93,9 @@ void GlyphPBF::parse(FontStack &stack) {
                     pbf glyph_pbf = fontstack_pbf.message();
 
                     SDFGlyph glyph;
-                    uint32_t id = 0;
 
                     while (glyph_pbf.next()) {
                         if (glyph_pbf.tag == 1) { // id
-                            id = glyph_pbf.varint();
                             glyph.id = glyph_pbf.varint();
                         } else if (glyph_pbf.tag == 2) { // bitmap
                             glyph.bitmap = glyph_pbf.string();
@@ -116,7 +114,7 @@ void GlyphPBF::parse(FontStack &stack) {
                         }
                     }
 
-                    stack.insert(id, glyph);
+                    stack.insert(glyph.id, glyph);
                 } else {
                     fontstack_pbf.skip();
                 }
