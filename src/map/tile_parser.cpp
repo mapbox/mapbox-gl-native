@@ -201,6 +201,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
 
     // Create a copy!
     const FontStack &fontStack = glyphStore.getFontStack(bucket_desc.geometry.font);
+    std::map<Value, Shaping> shaping;
 
     // Shape and place all labels.
     {
@@ -221,29 +222,30 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
             uint32_t i = 0;
             uint32_t x = 0;
             const std::string string = toString(it_prop->second);
-            std::map<uint32_t, GlyphPlacement> shaping;
+            Shaping shapedGlyphs;
             std::map<uint32_t, GlyphMetrics> metrics = fontStack.getMetrics();
             // fprintf(stderr, "%s\n", string.c_str());
+            // TODO: Shape label
             // Loop through all characters of this label and shape.
             for (uint32_t chr : string) {
-                // Can we reuse GlyphPlacement here? First arg is a faces index ...
-                GlyphPlacement shaped = GlyphPlacement(0, chr, x, 0);
-                // No idea how to properly put together a shaping std::map ...
-                shaping.emplace(i, shaped);
+                // Can we reuse GlyphPlacement here? First arg is a faces index.
+                GlyphPlacement glyph = GlyphPlacement(0, chr, x, 0);
+                // No idea how to properly put together a shapedGlyphs vector.
+                shapedGylphs.push(glyph);
                 i++;
                 x += metrics[chr].advance;
             }
-            // TODO: Shape label
             // TODO: Place label
-            // Can faces here be a std::map of fontstacks?
-            // It looks like nearly the same interface through the rest
-            // of the stack.
-            std::unique_ptr<TextBucket> bucket = std::make_unique<TextBucket>(
-                tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
-            addBucketFeatures(bucket, layer, bucket_desc, faces, shaping);
+            shaping.emplace(string, shaped);
         }
-
     }
+
+    // Can faces here be a std::map of fontstacks?
+    // It looks like nearly the same interface through the rest
+    // of the stack.
+    std::unique_ptr<TextBucket> bucket = std::make_unique<TextBucket>(
+        tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
+    addBucketFeatures(bucket, layer, bucket_desc, faces, shaping);
 
     return std::move(bucket);
 }
