@@ -47,7 +47,7 @@ GlyphPBF::GlyphPBF(const std::string &fontStack, GlyphRange glyphRange)
     : future(promise.get_future().share())
 {
     // Load the glyph set URL
-    std::string url = util::sprintf<255>("http://mapbox.s3.amazonaws.com/gl-glyphs/%s/%d-%d.pbf", fontStack.c_str(), glyphRange.first, glyphRange.second);
+    std::string url = util::sprintf<255>("http://mapbox.s3.amazonaws.com/gl-glyphs-256/%s/%d-%d.pbf", fontStack.c_str(), glyphRange.first, glyphRange.second);
 
     // TODO: Find more reliable URL normalization function
     std::replace(url.begin(), url.end(), ' ', '+');
