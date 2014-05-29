@@ -206,7 +206,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
     }
 
     // Create a copy!
-    const FontStack fontStack = glyphStore.getFontStack(bucket_desc.geometry.font);
+    //const FontStack fontStack = glyphStore.getFontStack(bucket_desc.geometry.font);
 
     // Shape and place all labels.
     {
