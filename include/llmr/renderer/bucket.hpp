@@ -2,6 +2,7 @@
 #define LLMR_RENDERER_BUCKET
 
 #include <string>
+#include <memory>
 #include <llmr/map/tile.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/renderer/prerendered_texture.hpp>

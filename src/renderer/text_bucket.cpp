@@ -7,6 +7,8 @@
 #include <llmr/style/style.hpp>
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/text/placement.hpp>
+#include <llmr/text/glyph_store.hpp>
+#include <llmr/util/constants.hpp>
 
 #include <llmr/util/math.hpp>
 #include <llmr/platform/gl.hpp>
@@ -98,17 +100,23 @@ void TextBucket::addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
 };
 
 void TextBucket::addFeature(const VectorTileFeature &feature,
-                            const IndexedFaces &faces,
+                            const GlyphPositions &face,
                             const std::map<Value, Shaping> &shapings) {
     auto it_prop = feature.properties.find(geom_desc.field);
     if (it_prop == feature.properties.end()) {
         // feature does not have the correct property
+        if (debug::labelTextMissingWarning) {
+            fprintf(stderr, "[WARNING] feature doesn't have property '%s' required for labelling\n", geom_desc.field.c_str());
+        }
         return;
     }
     const Value &value = it_prop->second;
 
-    auto it_shaping = shapings.find(value);
+    auto it_shaping = shapings.find(toString(value));
     if (it_shaping == shapings.end()) {
+        if (debug::shapingWarning) {
+            fprintf(stderr, "[WARNING] missing shaping for '%s'\n", toString(value).c_str());
+        }
         // we lack shaping information for this label
         return;
     }
@@ -127,14 +135,14 @@ void TextBucket::addFeature(const VectorTileFeature &feature,
     while ((cmd = geometry.next(x, y)) != Geometry::end) {
         if (cmd == Geometry::move_to) {
             if (!line.empty()) {
-                placement.addFeature(*this, line, geom_desc, faces, shaping);
+                placement.addFeature(*this, line, geom_desc, face, shaping);
                 line.clear();
             }
         }
         line.emplace_back(x, y);
     }
     if (line.size()) {
-        placement.addFeature(*this, line, geom_desc, faces, shaping);
+        placement.addFeature(*this, line, geom_desc, face, shaping);
     }
 }
 

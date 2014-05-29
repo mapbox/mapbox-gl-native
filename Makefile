@@ -9,7 +9,7 @@ all: llmr
 # Builds the regular library
 llmr: config.gypi llmr.gyp node
 	deps/run_gyp llmr.gyp --depth=. -Goutput_dir=.. --generator-output=./build/llmr -f make
-	make -C build/llmr V=$(V) llmr-x86
+	$(MAKE) -C build/llmr BUILDTYPE=$(BUILDTYPE) V=$(V) llmr-x86
 
 node:
 	@if [ ! `which node` ]; then echo 'error: depends on node.js. please make sure node is on your PATH'; exit 1; fi;
@@ -20,7 +20,7 @@ build/test/Makefile: src common config.gypi test/test.gyp
 	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
 
 test: build/test/Makefile
-	make -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
+	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
 
 # Runs all test cases
 run-tests: test
@@ -29,13 +29,13 @@ run-tests: test
 	done
 
 test/%:
-	make -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
+	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
 	build/$(BUILDTYPE)/test_$*
 
 # Only runs headless test case
 run-headless-test: build/test/Makefile
-	make -C build/test BUILDTYPE=Debug V=$(V) headless
-	build/Debug/test_headless
+	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) headless
+	build/$(BUILDTYPE)/test_headless
 
 
 ##### Makefile builds ##########################################################
@@ -44,7 +44,7 @@ run-headless-test: build/test/Makefile
 # Builds the linux app with make. This is also used by Travis CI
 linux: config.gypi linux/llmr-app.gyp node
 	deps/run_gyp linux/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
-	make -C build/linux V=$(V) linuxapp
+	$(MAKE) -C build/linux BUILDTYPE=$(BUILDTYPE) V=$(V) linuxapp
 
 # Executes the Linux binary
 run-linux: linux
@@ -55,7 +55,7 @@ run-linux: linux
 # Builds the OS X app with make.
 osx: config.gypi macosx/llmr-app.gyp node
 	deps/run_gyp macosx/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/macosx -f make
-	make -C build/macosx V=$(V) osxapp
+	$(MAKE) -C build/macosx BUILDTYPE=$(BUILDTYPE) V=$(V) osxapp
 
 # Executes the OS X binary
 run-osx: osx
@@ -93,11 +93,11 @@ lproj: config.gypi linux/llmr-app.gyp clear_xcode_cache node
 ##### Maintenace operations ####################################################
 
 clean: clear_xcode_cache
-	-rm -rf ./build/Release
-	-rm -rf ./build/Debug
-	-rm -f include/llmr/shader/shaders.hpp
-	-rm -f include/llmr/style/resources.hpp
-	-rm -f src/style/resources.cpp
+	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
+	-rm -rf ./build/
+	-rm -f ./include/llmr/shader/shaders.hpp
+	-rm -f ./include/llmr/style/resources.hpp
+	-rm -f ./src/style/resources.cpp
 
 distclean: clean
 	-rm -rf ./build

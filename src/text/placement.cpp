@@ -35,21 +35,12 @@ bool byScale(const Anchor &a, const Anchor &b) { return a.scale < b.scale; }
 static const Glyph null_glyph;
 
 inline const Glyph &getGlyph(const GlyphPlacement &placed,
-                             const IndexedFaces &faces) {
-    if (placed.face < faces.size()) {
-        const GlyphPositions &face = *faces[placed.face];
-        if (&face) {
-            auto it = face.find(placed.glyph);
-            if (it != face.end()) {
-                return it->second;
-            } else {
-                fprintf(stderr, "glyph %d does not exist\n", placed.glyph);
-            }
-        } else {
-            fprintf(stderr, "face pointer is null\n");
-        }
+                             const GlyphPositions &face) {
+    auto it = face.find(placed.glyph);
+    if (it != face.end()) {
+        return it->second;
     } else {
-        fprintf(stderr, "face does not exist\n");
+        fprintf(stderr, "glyph %d does not exist\n", placed.glyph);
     }
 
     return null_glyph;
@@ -145,8 +136,9 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
     }
 }
 
-PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
-                       const IndexedFaces &faces, float fontScale,
+void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
+                       Anchor &anchor, float advance, const Shaping &shaping,
+                       const GlyphPositions &face, float fontScale,
                        bool horizontal, const std::vector<Coordinate> &line,
                        float maxAngleDelta, float rotate) {
     // The total text advance is the width of this label.
@@ -162,12 +154,10 @@ PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
     //     origin.x -= advance;
     // }
 
-    PlacedGlyphs glyphs;
-
     const uint32_t buffer = 3;
 
     for (const GlyphPlacement &placed : shaping) {
-        const Glyph &glyph = getGlyph(placed, faces);
+        const Glyph &glyph = getGlyph(placed, face);
         if (!glyph) {
             // This glyph is empty and doesn't have any pixels that we'd need to
             // show.
@@ -235,29 +225,32 @@ PlacedGlyphs getGlyphs(Anchor &anchor, float advance, const Shaping &shaping,
                     fontScale * util::max(tl.y, tr.y, bl.y, br.y)};
             }
 
+            GlyphBox glyphBox = GlyphBox{
+                box,
+                // Prevent label from extending past the end of the line
+                util::max(instance.minScale, anchor.scale),
+                instance.maxScale,
+                instance.anchor,
+                horizontal};
+
             // Remember the glyph for later insertion.
             glyphs.emplace_back(PlacedGlyph{
                 tl, tr, bl, br, glyph.rect,
                 static_cast<float>(
-                    std::fmod((anchor.angle + rotate + instance.offset + 2 * M_PI),
-                         (2 * M_PI))),
-                GlyphBox{box,             instance.minScale, instance.maxScale,
-                         instance.anchor, horizontal}});
+                    std::fmod((anchor.angle + rotate + instance.offset + 2 * M_PI), (2 * M_PI))),
+                glyphBox});
+
+            if (instance.offset == 0.0f) {
+                boxes.emplace_back(glyphBox);
+            }
         }
     }
-
-    // Prevent label from extending past the end of the line
-    for (PlacedGlyph &g : glyphs) {
-        g.glyphBox.minScale = util::max(g.glyphBox.minScale, anchor.scale);
-    }
-
-    return glyphs;
 }
 
 void Placement::addFeature(TextBucket& bucket,
                            const std::vector<Coordinate> &line,
                            const BucketGeometryDescription &info,
-                           const IndexedFaces &faces,
+                           const GlyphPositions &face,
                            const Shaping &shaping) {
 
     const bool horizontal = info.path == TextPathType::Horizontal;
@@ -268,7 +261,7 @@ void Placement::addFeature(TextBucket& bucket,
     const float fontScale =
         (tileExtent / util::tileSize) / (glyphSize / info.size);
 
-    const float advance = measureText(faces, shaping);
+    const float advance = measureText(face, shaping);
     Anchors anchors;
 
     // fprintf(stderr, "adding feature with advance %f\n", advance);
@@ -289,27 +282,28 @@ void Placement::addFeature(TextBucket& bucket,
     }
 
     for (Anchor anchor : anchors) {
-        PlacedGlyphs glyphs =
-            getGlyphs(anchor, advance, shaping, faces, fontScale, horizontal,
+        PlacedGlyphs glyphs;
+        GlyphBoxes boxes;
+
+        getGlyphs(glyphs, boxes, anchor, advance, shaping, face, fontScale, horizontal,
                       line, maxAngleDelta, rotate);
         PlacementProperty place =
-            collision.place(glyphs, anchor, anchor.scale, maxPlacementScale,
+            collision.place(boxes, anchor, anchor.scale, maxPlacementScale,
                             padding, horizontal, info.alwaysVisible);
         if (place) {
-            bucket.addGlyphs(glyphs, place.zoom, place.rotationRange,
-                             zoom - zOffset);
+            bucket.addGlyphs(glyphs, place.zoom, place.rotationRange, zoom - zOffset);
         }
     }
 }
 
-float Placement::measureText(const IndexedFaces &faces,
+float Placement::measureText(const GlyphPositions &face,
                              const Shaping &shaping) {
     float advance = 0;
 
     // TODO: advance is not calculated correctly. we should instead use the
     // bounding box of the glyph placement.
     for (const GlyphPlacement &shape : shaping) {
-        advance += getGlyph(shape, faces).metrics.advance;
+        advance += getGlyph(shape, face).metrics.advance;
     }
 
     return advance;

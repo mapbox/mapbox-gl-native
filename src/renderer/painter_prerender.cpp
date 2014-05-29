@@ -27,8 +27,6 @@ void Painter::renderPrerenderedTexture(Bucket &bucket, const GenericProperties &
     const int buffer = 4096 * properties.prerenderBuffer;
 
     // draw the texture on a quad
-    depthMask(false);
-
     useProgram(rasterShader->program);
     rasterShader->setMatrix(matrix);
     rasterShader->setOpacity(1);
@@ -42,6 +40,4 @@ void Painter::renderPrerenderedTexture(Bucket &bucket, const GenericProperties &
     bucket.prerendered->bindTexture();
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
-
-    depthMask(true);
 }

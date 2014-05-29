@@ -163,7 +163,7 @@ void Map::setup() {
     sources.emplace("outdoors",
                     std::unique_ptr<Source>(new Source(*this,
                            painter,
-                           "http://api-maps-gl.tilestream.net/v3/mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5/%d/%d/%d.gl.pbf",
+                           "http://a.tiles.mapbox.com/v3/mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5/%d/%d/%d.vector.pbf",
                            Source::Type::vector,
                            {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }},
                            512,
@@ -548,7 +548,6 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers) {
         painter.setStrata(i * strata_thickness);
         renderLayer(*it, Opaque);
     }
-    // painter.endPass();
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
     }
@@ -566,7 +565,6 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers) {
         painter.setStrata(i * strata_thickness);
         renderLayer(*it, Translucent);
     }
-    // painter.endPass();
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
     }

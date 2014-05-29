@@ -379,7 +379,7 @@ def SelectVisualStudioVersion(version='auto'):
   if version == 'auto':
     version = os.environ.get('GYP_MSVS_VERSION', 'auto')
   version_map = {
-    'auto': ('10.0', '12.0', '9.0', '8.0', '11.0'),
+    'auto': ('12.0', '10.0', '9.0', '8.0', '11.0'),
     '2005': ('8.0',),
     '2005e': ('8.0',),
     '2008': ('9.0',),

@@ -2,6 +2,7 @@
 #define LLMR_GEOMETRY_GLYPH_ATLAS
 
 #include <llmr/geometry/binpack.hpp>
+#include <llmr/text/glyph_store.hpp>
 
 #include <string>
 #include <set>
@@ -30,7 +31,7 @@ public:
 
 
     Rect<uint16_t> addGlyph(uint64_t tile_id, const std::string& face_name,
-                            const VectorTileGlyph& glyph);
+                            const SDFGlyph& glyph);
     void removeGlyphs(uint64_t tile_id);
     void bind();
 
