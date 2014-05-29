@@ -71,7 +71,7 @@ source MacOSX.sh
     if [ ! -f out/build-cpp11-libcpp-x86_64/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-x86_64/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-x86_64/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
-    if [ ! -d out/build-cpp11-libcpp-x86_64/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
+    if [ ! -d out/build-cpp11-libcpp-x86_64/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
     echo '     ...done'
 
 rm -rf out/packages
@@ -91,7 +91,7 @@ source Linux.sh
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
-    if [ ! -d out/build-cpp11-libstdcpp-gcc-x86_64/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
+    if [ ! -d out/build-cpp11-libstdcpp-gcc-x86_64/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
 
 rm -rf out/packages
 

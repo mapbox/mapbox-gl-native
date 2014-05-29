@@ -12,8 +12,7 @@
 #include <llmr/text/glyph_store.hpp>
 
 #include <llmr/util/std.hpp>
-
-#include <codecvt>
+#include <llmr/util/utf.hpp>
 
 using namespace llmr;
 
@@ -172,9 +171,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
     std::unique_ptr<TextBucket> bucket = std::make_unique<TextBucket>(
         tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
 
-
-    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> ucs4conv;
-
+    util::utf8_to_utf32 ucs4conv;
 
     // Determine and load glyph ranges
     {
@@ -194,7 +191,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
                 continue;
             }
 
-            const std::u32string string = ucs4conv.from_bytes(toString(it_prop->second));
+            const std::u32string string = ucs4conv.convert(toString(it_prop->second));
 
             // Loop through all characters of this text and collect unique codepoints.
             for (uint32_t chr : string) {
@@ -206,7 +203,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
     }
 
     // Create a copy!
-    const FontStack fontStack = glyphStore.getFontStack(bucket_desc.geometry.font);
+    //const FontStack fontStack = glyphStore.getFontStack(bucket_desc.geometry.font);
 
     // Shape and place all labels.
     {
@@ -224,7 +221,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
                 continue;
             }
 
-            const std::u32string string = ucs4conv.from_bytes(toString(it_prop->second));
+            const std::u32string string = ucs4conv.convert(toString(it_prop->second));
 
             // TODO: Shape label
             // TODO: Place label

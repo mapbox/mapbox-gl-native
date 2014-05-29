@@ -92,7 +92,7 @@ void GlyphPBF::parse(FontStack &stack) {
                         }
                     }
 
-                    stack.insert(id, glyph);
+                    stack.insert(id, glyph.metrics, glyph.bitmap);
                 } else {
                     fontstack_pbf.skip();
                 }
