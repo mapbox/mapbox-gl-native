@@ -9,7 +9,7 @@ all: llmr
 # Builds the regular library
 llmr: config.gypi llmr.gyp node
 	deps/run_gyp llmr.gyp --depth=. -Goutput_dir=.. --generator-output=./build/llmr -f make
-	make -C build/llmr V=$(V) llmr-x86
+	make -C build/llmr BUILDTYPE=$(BUILDTYPE) V=$(V) llmr-x86
 
 node:
 	@if [ ! `which node` ]; then echo 'error: depends on node.js. please make sure node is on your PATH'; exit 1; fi;
@@ -34,8 +34,8 @@ test/%:
 
 # Only runs headless test case
 run-headless-test: build/test/Makefile
-	make -C build/test BUILDTYPE=Debug V=$(V) headless
-	build/Debug/test_headless
+	make -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) headless
+	build/$(BUILDTYPE)/test_headless
 
 
 ##### Makefile builds ##########################################################
@@ -44,7 +44,7 @@ run-headless-test: build/test/Makefile
 # Builds the linux app with make. This is also used by Travis CI
 linux: config.gypi linux/llmr-app.gyp node
 	deps/run_gyp linux/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
-	make -C build/linux V=$(V) linuxapp
+	make -C build/linux BUILDTYPE=$(BUILDTYPE) V=$(V) linuxapp
 
 # Executes the Linux binary
 run-linux: linux
@@ -55,7 +55,7 @@ run-linux: linux
 # Builds the OS X app with make.
 osx: config.gypi macosx/llmr-app.gyp node
 	deps/run_gyp macosx/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/macosx -f make
-	make -C build/macosx V=$(V) osxapp
+	make -C build/macosx BUILDTYPE=$(BUILDTYPE) V=$(V) osxapp
 
 # Executes the OS X binary
 run-osx: osx
