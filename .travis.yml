@@ -31,6 +31,7 @@ script:
 - make llmr BUILDTYPE=${BUILDTYPE}
 - make linux BUILDTYPE=${BUILDTYPE}
 - make run-tests BUILDTYPE=${BUILDTYPE}
+- make run-headless-test BUILDTYPE=${BUILDTYPE}
 
 notifications:
 - hipchat: WB52YkcbCGMbNcStsGeaoRO7cyBSK4wX2ZHo2Y4b@GL
