@@ -649,7 +649,7 @@ module.exports = {
             "layer": "country_label",
             "text_field": "name",
             "path": "horizontal",
-            "font": "Open Sans Regular, Arial Unicode MS Regular",
+            "font": "Open Sans Semibold, Arial Unicode MS Regular",
             "fontSize": 24,
             "feature_type": "point",
             "type": "text"
@@ -2251,7 +2251,7 @@ module.exports = {
                 "country_label": {
                     "color": "country_text",
                     "stroke": "rgba(255,255,255,0.5)",
-                    "strokeWidth": 0.4,
+                    "strokeWidth": 0.5,
                     "size": "country_label_size"
                 },
                 "country_label_line": {
@@ -3000,7 +3000,7 @@ module.exports = {
                 "country_label": {
                     "color": "text_night",
                     "stroke": "text2_stroke_night",
-                    "strokeWidth": 0.4,
+                    "strokeWidth": 0.5,
                     "size": "country_label_size"
                 },
                 "country_label_line": {
