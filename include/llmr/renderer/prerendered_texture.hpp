@@ -26,7 +26,6 @@ private:
     GLint previous_fbo = 0;
     GLuint fbo = 0;
     GLuint texture = 0;
-    bool mipmapped = false;
 };
 
 }
