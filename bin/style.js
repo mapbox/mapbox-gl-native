@@ -649,7 +649,7 @@ module.exports = {
             "layer": "country_label",
             "text_field": "name",
             "path": "horizontal",
-            "font": "Open Sans Semibold, Arial Unicode MS Regular",
+            "font": "Open Sans Bold, Arial Unicode MS Bold",
             "fontSize": 24,
             "feature_type": "point",
             "type": "text"
@@ -666,7 +666,7 @@ module.exports = {
             "type": "text",
             "text_field": "name",
             "path": "curve",
-            "font": "Open Sans Regular, Arial Unicode MS Regular",
+            "font": "Open Sans Italic, Arial Unicode MS Regular",
             "fontSize": 16
         },
         "marine_label_point_1": {
@@ -678,7 +678,7 @@ module.exports = {
             "path": "horizontal",
             "field": "labelrank",
             "value": 1,
-            "font": "Open Sans Regular, Arial Unicode MS Regular",
+            "font": "Open Sans Italic, Arial Unicode MS Regular",
             "fontSize": 30
         },
         "marine_label_point_2": {
@@ -690,7 +690,7 @@ module.exports = {
             "path": "horizontal",
             "field": "labelrank",
             "value": 2,
-            "font": "Open Sans Regular, Arial Unicode MS Regular",
+            "font": "Open Sans Italic, Arial Unicode MS Regular",
             "fontSize": 24
         },
         "marine_label_point_other": {
@@ -702,7 +702,7 @@ module.exports = {
             "path": "horizontal",
             "field": "labelrank",
             "value": [3,4,5,6],
-            "font": "Open Sans Regular, Arial Unicode MS Regular",
+            "font": "Open Sans Italic, Arial Unicode MS Regular",
             "fontSize": 18
         },
         "state_label": {
@@ -815,7 +815,7 @@ module.exports = {
             "layer": "water_label",
             "text_field": "name",
             "path": "horizontal",
-            "font": "Open Sans Regular, Arial Unicode MS Regular",
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 12,
             "feature_type": "point",
             "type": "text"
@@ -825,7 +825,7 @@ module.exports = {
             "layer": "waterway_label",
             "text_field": "name",
             "path": "curve",
-            "font": "Open Sans Regular, Arial Unicode MS Regular",
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 12,
             "textMinDistance": 15,
             "feature_type": "line",
