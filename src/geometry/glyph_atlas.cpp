@@ -22,7 +22,7 @@ GlyphAtlas::~GlyphAtlas() {
 }
 
 Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tile_id, const std::string& face_name,
-                                    const VectorTileGlyph& glyph) {
+                                    const SDFGlyph& glyph) {
     std::lock_guard<std::mutex> lock(mtx);
 
     // Use constant value for now.

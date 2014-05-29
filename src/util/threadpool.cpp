@@ -1,6 +1,7 @@
 #include <llmr/util/threadpool.hpp>
 #include <llmr/util/std.hpp>
 #include <thread>
+#include <memory>
 
 using namespace llmr::util;
 

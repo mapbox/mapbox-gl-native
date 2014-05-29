@@ -6,7 +6,7 @@
   'targets': [
     {
       'target_name': 'linuxapp',
-      'product_name': 'llmr',
+      'product_name': 'mapbox-gl',
       'type': 'executable',
       'sources': [
         './main.cpp',

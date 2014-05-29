@@ -9,6 +9,7 @@
 #include <forward_list>
 #include <string>
 #include <bitset>
+#include <memory>
 
 namespace llmr {
 

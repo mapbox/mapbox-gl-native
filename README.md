@@ -56,7 +56,7 @@ Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, m
 Ensure you have git and other build essentials:
 
     sudo apt-get update
-    sudo apt-get install git cmake make pkg-config curl automake libtool xutils-dev
+    sudo apt-get install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config nodejs-legacy
 
 Install a `-std=c++11` capable compiler
 

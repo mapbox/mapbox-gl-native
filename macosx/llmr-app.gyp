@@ -6,7 +6,7 @@
   'targets': [
     {
       'target_name': 'osxapp',
-      'product_name': 'llmr',
+      'product_name': 'Mapbox GL',
       'type': 'executable',
       'sources': [
         './main.mm',
