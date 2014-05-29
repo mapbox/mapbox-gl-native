@@ -8,6 +8,7 @@
 #include <boost/locale.hpp>
 #else
 #include <codecvt>
+#include <locale>
 #endif
 
 namespace llmr {
