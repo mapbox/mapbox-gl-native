@@ -985,6 +985,30 @@ module.exports = {
             "bucket": "waterway_stream"
         },
         {
+            "name": "contour_line_loud",
+            "bucket": "contour_line_10"
+        },
+        {
+            "name": "contour_line_loud",
+            "bucket": "contour_line_5"
+        },
+        {
+            "name": "contour_line_regular",
+            "bucket": "contour_line_other"
+        },
+        {
+            "name": "building_shadow",
+            "bucket": "building"
+        },
+        {
+            "name": "building",
+            "bucket": "building"
+        },
+        {
+            "name": "building_wall",
+            "bucket": "building"
+        },
+        {
             "name": "hillshade_full_highlight",
             "bucket": "hillshade_full_highlight"
         },
@@ -999,18 +1023,6 @@ module.exports = {
         {
             "name": "hillshade_full_shadow",
             "bucket": "hillshade_full_shadow"
-        },
-        {
-            "name": "contour_line_loud",
-            "bucket": "contour_line_10"
-        },
-        {
-            "name": "contour_line_loud",
-            "bucket": "contour_line_5"
-        },
-        {
-            "name": "contour_line_regular",
-            "bucket": "contour_line_other"
         },
         {
             "name": "barrier_line_gate",
@@ -1051,18 +1063,6 @@ module.exports = {
         {
             "name": "aeroway_taxiway",
             "bucket": "aeroway_taxiway"
-        },
-        {
-            "name": "building_shadow",
-            "bucket": "building"
-        },
-        {
-            "name": "building",
-            "bucket": "building"
-        },
-        {
-            "name": "building_wall",
-            "bucket": "building"
         },
         {
             "name": "tunnel_motorway_link_casing",
@@ -1381,10 +1381,6 @@ module.exports = {
             "bucket": "waterway_label"
         },
         {
-            "name": "poi_aerodrome",
-            "bucket": "poi_aerodrome"
-        },
-        {
             "name": "poi",
             "bucket": "poi"
         },
@@ -1408,7 +1404,10 @@ module.exports = {
             "name": "poi_label_4",
             "bucket": "poi_label_4"
         },
-
+        {
+            "name": "poi_aerodrome",
+            "bucket": "poi_aerodrome"
+        }
     ],
     "constants": {
         "land": "rgb(244,239,225)",
