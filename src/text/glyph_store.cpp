@@ -67,7 +67,7 @@ void alignHorizontally(Shaping &shaping, const std::map<uint32_t, GlyphMetrics> 
     }
 }
 
-Shaping FontStack::lineWrap(Shaping &shaping, const float &lineHeight, const float &maxWidth,
+void FontStack::lineWrap(Shaping &shaping, const float &lineHeight, const float &maxWidth,
         const float &alignment, const float &verticalAlignment) const {
 
     uint32_t lastSafeBreak = 0;
