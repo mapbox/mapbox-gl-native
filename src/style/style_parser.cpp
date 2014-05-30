@@ -102,6 +102,24 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("curve must be a string");
             }
+        } else if (name == "alignment") {
+            if (value.IsString()) {
+                bucket.geometry.alignment = alignmentType({ value.GetString(), value.GetStringLength() });
+            } else {
+                throw Style::exception("alignment must be a string");
+            }
+        } else if (name == "lineHeight") {
+            if (value.IsNumber()) {
+                bucket.geometry.line_height = value.GetDouble() * 24;
+            } else {
+                throw Style::exception("line height must be a number");
+            }
+        } else if (name == "maxWidth") {
+            if (value.IsNumber()) {
+                bucket.geometry.max_width = value.GetDouble() * 24;
+            } else {
+                throw Style::exception("max width must be a number");
+            }
         } else if (name == "miterLimit") {
             if (value.IsNumber()) {
                 bucket.geometry.miter_limit = value.GetDouble();

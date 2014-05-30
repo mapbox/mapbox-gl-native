@@ -7,6 +7,7 @@
 #include <llmr/platform/platform.hpp>
 #include <uv.h>
 #include <algorithm>
+#include <iostream>
 
 namespace llmr {
 
@@ -28,7 +29,7 @@ const std::map<uint32_t, SDFGlyph> &FontStack::getSDFs() const {
     return sdfs;
 }
 
-const Shaping FontStack::getShaping(const std::u32string &string) const {
+const Shaping FontStack::getShaping(const std::u32string &string, const float &maxWidth, const float &lineHeight, const float &alignment) const {
     std::lock_guard<std::mutex> lock(mtx);
     uint32_t i = 0;
     uint32_t x = 0;
@@ -40,6 +41,17 @@ const Shaping FontStack::getShaping(const std::u32string &string) const {
         i++;
         x += metrics.find(chr)->second.advance;
     }
+
+    shaped = lineWrap(shaped, lineHeight, maxWidth, alignment);
+
+    return shaped;
+}
+
+Shaping FontStack::lineWrap(Shaping shaped, const float &lineHeight, const float &maxWidth, const float &alignment) const {
+    std::cerr << "\nlineHeight: " << lineHeight <<
+        "\nmaxWidth: " << maxWidth <<
+        "\nalignment: " << alignment <<
+        "\n";
     return shaped;
 }
 

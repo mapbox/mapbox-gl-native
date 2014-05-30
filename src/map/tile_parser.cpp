@@ -15,6 +15,8 @@
 #include <llmr/util/std.hpp>
 #include <llmr/util/utf.hpp>
 
+#include <iostream>
+
 using namespace llmr;
 
 TileParser::TileParser(const std::string& data, VectorTileData& tile, const Style& style, GlyphAtlas& glyphAtlas, GlyphStore &glyphStore, SpriteAtlas &spriteAtlas)
@@ -202,6 +204,8 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
     std::map<Value, Shaping> shaping;
     GlyphPositions face;
 
+    // std::cerr << bucket_desc;
+
     // Shape and place all labels.
     {
         FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
@@ -221,7 +225,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
             const std::u32string string = ucs4conv.convert(toString(it_prop->second));
 
             // Shape labels.
-            const Shaping shaped = fontStack.getShaping(string);
+            const Shaping shaped = fontStack.getShaping(string, bucket_desc.geometry.max_width, bucket_desc.geometry.line_height, bucket_desc.geometry.alignment);
             shaping.emplace(toString(it_prop->second), shaped);
 
             // Place labels.
