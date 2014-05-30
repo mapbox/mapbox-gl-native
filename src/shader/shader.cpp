@@ -1,7 +1,8 @@
 #include <llmr/shader/shader.hpp>
 #include <llmr/platform/gl.hpp>
+#if defined(DEBUG)
 #include <llmr/util/timer.hpp>
-
+#endif
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -11,18 +12,23 @@ using namespace llmr;
 Shader::Shader(const GLchar *vertSource, const GLchar *fragSource)
     : valid(false),
       program(0) {
+#if defined(DEBUG)
     util::timer timer("shader compilation");
-
+#endif
 
     GLuint vertShader;
     if (!compileShader(&vertShader, GL_VERTEX_SHADER, vertSource)) {
+#if defined(DEBUG)
         fprintf(stderr, "Vertex shader failed to compile: %s\n", vertSource);
+#endif
         return;
     }
 
     GLuint fragShader;
     if (!compileShader(&fragShader, GL_FRAGMENT_SHADER, fragSource)) {
+#if defined(DEBUG)
         fprintf(stderr, "Fragment shader failed to compile: %s\n", fragSource);
+#endif
         return;
     }
 
@@ -80,7 +86,9 @@ Shader::Shader(const GLchar *vertSource, const GLchar *fragSource)
 
         glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
         if (status == 0) {
+#if defined(DEBUG)
             fprintf(stderr, "Program failed to validate\n");
+#endif
             glDeleteShader(vertShader);
             vertShader = 0;
             glDeleteShader(fragShader);

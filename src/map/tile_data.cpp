@@ -42,7 +42,9 @@ void TileData::request() {
             // Schedule tile parsing in another thread
             tile->reparse();
         } else {
+#if defined(DEBUG)
             fprintf(stderr, "[%s] tile loading failed: %d, %s\n", tile->url.c_str(), res->code, res->error_message.c_str());
+#endif
         }
     }, map.getLoop());
 }

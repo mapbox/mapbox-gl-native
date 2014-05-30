@@ -54,7 +54,9 @@ void Sprite::complete(std::shared_ptr<Sprite> &sprite) {
     if (sprite->raster && sprite->pos.size()) {
         sprite->loaded = true;
         sprite->map.update();
+#if defined(DEBUG)
         fprintf(stderr, "sprite loaded\n");
+#endif
     }
 }
 

@@ -24,7 +24,9 @@ void VectorTileData::parse() {
         // is going to be discarded afterwards.
         TileParser parser(data, *this, map.getStyle(), map.getGlyphAtlas(), map.getGlyphStore(), map.getSpriteAtlas());
     } catch (const std::exception& ex) {
+#if defined(DEBUG)
         fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
+#endif
         cancel();
         return;
     }
