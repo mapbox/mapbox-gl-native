@@ -74,6 +74,12 @@ inline float alignmentType(const std::string& alignment) {
     else return 0.5;
 };
 
+inline float verticalAlignmentType(const std::string& alignment) {
+    if (alignment == "bottom") return 1.0f;
+    else if (alignment == "top") return 0.0f;
+    else return 0.5;
+};
+
 class BucketGeometryDescription {
 public:
     CapType cap = CapType::None;
@@ -86,6 +92,7 @@ public:
     float round_limit = 1.0f;
     TextPathType path = TextPathType::Horizontal;
     float alignment = 0.5;
+    float vertical_alignment = 0.5;
     float line_height = 1.2 * 24;
     float max_width = 15.0f * 24;
     float padding = 2.0f;

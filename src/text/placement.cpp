@@ -261,7 +261,7 @@ void Placement::addFeature(TextBucket& bucket,
     Anchors anchors;
 
     // TODO: figure out correct ascender height.
-    vec2<float> origin{0, -17};
+    vec2<float> origin{0, 0};
 
     if (line.size() == 1) {
         // Point labels

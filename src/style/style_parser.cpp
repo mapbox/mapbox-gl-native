@@ -108,6 +108,12 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("alignment must be a string");
             }
+        } else if (name == "verticalAlignment") {
+            if (value.IsString()) {
+                bucket.geometry.vertical_alignment = verticalAlignmentType({ value.GetString(), value.GetStringLength() });
+            } else {
+                throw Style::exception("alignment must be a string");
+            }
         } else if (name == "lineHeight") {
             if (value.IsNumber()) {
                 bucket.geometry.line_height = value.GetDouble() * 24;

@@ -29,7 +29,8 @@ const std::map<uint32_t, SDFGlyph> &FontStack::getSDFs() const {
     return sdfs;
 }
 
-const Shaping FontStack::getShaping(const std::u32string &string, const float &maxWidth, const float &lineHeight, const float &alignment) const {
+const Shaping FontStack::getShaping(const std::u32string &string, const float &maxWidth,
+        const float &lineHeight, const float &alignment, const float &verticalAlignment) const {
     std::lock_guard<std::mutex> lock(mtx);
     uint32_t i = 0;
     uint32_t x = 0;
@@ -42,23 +43,32 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float &m
         x += metrics.find(chr)->second.advance;
     }
 
-    shaped = lineWrap(shaped, lineHeight, maxWidth, alignment);
+    shaped = lineWrap(shaped, lineHeight, maxWidth, alignment, verticalAlignment);
 
     return shaped;
+}
+
+void alignVertically(Shaping &shaping, const uint32_t &lines, const float &lineHeight, const float &verticalAlign) {
+    const float dy = -(lineHeight * (lines - 1) + 24) * verticalAlign - 5;
+    for (GlyphPlacement &shape : shaping) {
+        shape.y += dy;
+    }
 }
 
 void alignHorizontally(Shaping &shaping, const std::map<uint32_t, GlyphMetrics> &metrics,
         const uint32_t &start, const uint32_t &end, const float &alignment) {
 
-      uint32_t lastAdvance = metrics.find(shaping[end].glyph)->second.advance;
-      int32_t lineIndent = (shaping[end].x + lastAdvance) * alignment;
+    uint32_t lastAdvance = metrics.find(shaping[end].glyph)->second.advance;
+    int32_t lineIndent = (shaping[end].x + lastAdvance) * alignment;
 
-      for (uint32_t j = start; j <= end; j++) {
-          shaping[j].x -= lineIndent;
-      }
-  }
+    for (uint32_t j = start; j <= end; j++) {
+        shaping[j].x -= lineIndent;
+    }
+}
 
-Shaping FontStack::lineWrap(Shaping shaped, const float &lineHeight, const float &maxWidth, const float &alignment) const {
+Shaping FontStack::lineWrap(Shaping shaped, const float &lineHeight, const float &maxWidth,
+        const float &alignment, const float &verticalAlignment) const {
+
     uint32_t lastSafeBreak = 0;
     uint32_t lengthBeforeCurrentLine = 0;
     uint32_t lineStartIndex = 0;
@@ -94,6 +104,7 @@ Shaping FontStack::lineWrap(Shaping shaped, const float &lineHeight, const float
     }
 
     alignHorizontally(shaped, metrics, lineStartIndex, shaped.size() - 1, alignment);
+    alignVertically(shaped, line + 1, lineHeight, verticalAlignment);
 
     return shaped;
 }

@@ -33,11 +33,13 @@ public:
     const Shaping getShaping(const std::u32string &string,
                              const float &maxWidth,
                              const float &lineHeight,
-                             const float &alignment) const;
+                             const float &alignment,
+                             const float &verticalAlignment) const;
     Shaping lineWrap(Shaping shaped,
                      const float &lineHeight,
                      const float &maxWidth,
-                     const float &alignment) const;
+                     const float &alignment,
+                     const float &verticalAlignment) const;
 
 private:
     std::map<uint32_t, std::string> bitmaps;
