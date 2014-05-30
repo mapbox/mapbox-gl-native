@@ -16,6 +16,8 @@
 #include <llmr/util/std.hpp>
 #include <llmr/util/utf.hpp>
 
+#include <regex>
+
 using namespace llmr;
 
 TileParser::TileParser(const std::string &data, VectorTileData &tile,
@@ -182,6 +184,9 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
         tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
 
     util::utf8_to_utf32 ucs4conv;
+    std::regex token_regex("\\{\\{(\\w+)\\}\\}");
+    const auto tokens_end = std::sregex_token_iterator();
+
 
     std::vector<std::pair<std::u32string, pbf>> labels;
 
@@ -195,18 +200,34 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
                 return nullptr;
             VectorTileFeature feature{feature_pbf, layer};
 
-            auto it_prop = feature.properties.find(bucket_desc.geometry.field);
-            if (it_prop == feature.properties.end()) {
-                // feature does not have the correct property
-                if (debug::labelTextMissingWarning) {
-                    fprintf(stderr,
-                            "[WARNING] feature doesn't have property '%s' required for labelling\n",
-                            bucket_desc.geometry.field.c_str());
+            const std::string &field = bucket_desc.geometry.field;
+            std::string source_string;
+            source_string.reserve(field.size());
+
+            bool token = false;
+            for (auto token_it = std::sregex_token_iterator(field.begin(), field.end(), token_regex, {-1, 1}); token_it != tokens_end; ++token_it, token = !token) {
+                if (!token_it->matched) {
+                    continue;
                 }
-                continue;
+
+                if (token) {
+                    auto it_prop = feature.properties.find(token_it->str());
+                    if (it_prop == feature.properties.end()) {
+                        // feature does not have the correct property
+                        if (debug::labelTextMissingWarning) {
+                            fprintf(stderr,
+                                    "[WARNING] feature doesn't have property '%s' required for labelling\n",
+                                    token_it->str().c_str());
+                        }
+                        continue;
+                    }
+                    source_string += toString(it_prop->second);
+                } else {
+                    source_string += token_it->str();
+                }
             }
 
-            const std::u32string string = ucs4conv.convert(toString(it_prop->second));
+            const std::u32string string = ucs4conv.convert(source_string);
 
             // Loop through all characters of this text and collect unique codepoints.
             for (uint32_t chr : string) {
