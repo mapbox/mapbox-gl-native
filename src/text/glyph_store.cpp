@@ -47,11 +47,54 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float &m
     return shaped;
 }
 
+void alignHorizontally(Shaping &shaping, const std::map<uint32_t, GlyphMetrics> &metrics,
+        const uint32_t &start, const uint32_t &end, const float &alignment) {
+
+      uint32_t lastAdvance = metrics.find(shaping[end].glyph)->second.advance;
+      int32_t lineIndent = (shaping[end].x + lastAdvance) * alignment;
+
+      for (uint32_t j = start; j <= end; j++) {
+          shaping[j].x -= lineIndent;
+      }
+  }
+
 Shaping FontStack::lineWrap(Shaping shaped, const float &lineHeight, const float &maxWidth, const float &alignment) const {
-    std::cerr << "\nlineHeight: " << lineHeight <<
-        "\nmaxWidth: " << maxWidth <<
-        "\nalignment: " << alignment <<
-        "\n";
+    uint32_t lastSafeBreak = 0;
+    uint32_t lengthBeforeCurrentLine = 0;
+    uint32_t lineStartIndex = 0;
+    uint32_t line = 0;
+
+    for (uint32_t i = 0; i < shaped.size(); i++) {
+        GlyphPlacement &shape = shaped[i];
+
+        shape.x -= lengthBeforeCurrentLine;
+        shape.y += lineHeight * line;
+
+        if (shape.x > maxWidth && lastSafeBreak != 0) {
+
+            uint32_t lineLength = shaped[lastSafeBreak + 1].x;
+
+            for (uint32_t k = lastSafeBreak + 1; k <= i; k++) {
+                shaped[k].y += lineHeight;
+                shaped[k].x -= lineLength;
+            }
+
+            if (alignment) {
+                alignHorizontally(shaped, metrics, lineStartIndex, lastSafeBreak - 1, alignment);
+            }
+
+            lineStartIndex = lastSafeBreak + 1;
+            lastSafeBreak = 0;
+            lengthBeforeCurrentLine += lineLength;
+            line++;
+        }
+        if (shape.glyph == 32) {
+            lastSafeBreak = i;
+        }
+    }
+
+    alignHorizontally(shaped, metrics, lineStartIndex, shaped.size() - 1, alignment);
+
     return shaped;
 }
 

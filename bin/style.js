@@ -765,8 +765,8 @@ module.exports = {
             "path": "horizontal",
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 18,
-            "text-max-width": 2,
-            "text-line-height": 1.4,
+            "maxWidth": 2,
+            "lineHeight": 1.4,
             "feature_type": "point",
             "type": "text"
         },
