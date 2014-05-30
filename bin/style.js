@@ -264,9 +264,9 @@ module.exports = {
             "source": "outdoors",
             "layer": "contour",
             "field": "index",
-            "value": 10,
+            "value": [5, 10],
             "path": "curve",
-            "text_field": "{{ele}}m",
+            "text_field": "{{ele}} m",
             "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 10,
             "feature_type": "line",
@@ -1884,9 +1884,11 @@ module.exports = {
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
-                        {"z": 15, "val": 0.075},
+                        {"z": 15, "val": 0.08},
+                        {"z": 16, "val": 0.075},
                         {"z": 17, "val": 0.05},
-                        {"z": 18, "val": 0.025}
+                        {"z": 18, "val": 0.05},
+                        {"z": 19, "val": 0.025}
                     ]
                 },
                 "hillshade_medium_shadow": {
@@ -1897,9 +1899,11 @@ module.exports = {
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
-                        {"z": 15, "val": 0.075},
+                        {"z": 15, "val": 0.08},
+                        {"z": 16, "val": 0.075},
                         {"z": 17, "val": 0.05},
-                        {"z": 18, "val": 0.025}
+                        {"z": 18, "val": 0.05},
+                        {"z": 19, "val": 0.025}
                     ]
                 },
                 "hillshade_full_highlight": {
@@ -1911,8 +1915,10 @@ module.exports = {
                     "opacity": [
                         "stops",
                         {"z": 15, "val": 0.3},
+                        {"z": 16, "val": 0.3},
                         {"z": 17, "val": 0.2},
-                        {"z": 18, "val": 0.1}
+                        {"z": 18, "val": 0.2},
+                        {"z": 19, "val": 0.1}
                     ]
                 },
                 "hillshade_medium_highlight": {
@@ -1924,8 +1930,10 @@ module.exports = {
                     "opacity": [
                         "stops",
                         {"z": 15, "val": 0.3},
+                        {"z": 16, "val": 0.3},
                         {"z": 17, "val": 0.2},
-                        {"z": 18, "val": 0.1}
+                        {"z": 18, "val": 0.2},
+                        {"z": 19, "val": 0.1}
                     ]
                 },
                 "contour_line_loud": {
@@ -2642,7 +2650,8 @@ module.exports = {
                         "stops",
                         {"z": 16, "val": 0.3},
                         {"z": 17, "val": 0.2},
-                        {"z": 18, "val": 0.1}
+                        {"z": 18, "val": 0.1},
+                        {"z": 19, "val": 0.05}
                     ]
                 },
                 "hillshade_medium_shadow": {
@@ -2655,7 +2664,8 @@ module.exports = {
                         "stops",
                         {"z": 16, "val": 0.3},
                         {"z": 17, "val": 0.2},
-                        {"z": 18, "val": 0.1}
+                        {"z": 18, "val": 0.1},
+                        {"z": 19, "val": 0.05}
                     ]
                 },
                 "hillshade_full_highlight": {
@@ -2669,7 +2679,8 @@ module.exports = {
                         {"z": 14, "val": 0.4},
                         {"z": 15, "val": 0.3},
                         {"z": 17, "val": 0.2},
-                        {"z": 18, "val": 0.1}
+                        {"z": 18, "val": 0.1},
+                        {"z": 19, "val": 0.05}
                     ]
                 },
                 "hillshade_medium_highlight": {
@@ -2682,7 +2693,8 @@ module.exports = {
                         "stops",
                         {"z": 15, "val": 0.3},
                         {"z": 17, "val": 0.2},
-                        {"z": 18, "val": 0.15}
+                        {"z": 18, "val": 0.15},
+                        {"z": 19, "val": 0.05}
                     ]
                 },
                 "contour_line_loud": {
@@ -2702,6 +2714,13 @@ module.exports = {
                         {"z": 12, "val": 0.1},
                         {"z": 13, "val": 0.4}
                     ]
+                },
+                "contour_label": {
+                    "color": "contour_night",
+                    "stroke": "land_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 3,
+                    "size": 10
                 },
                 "water": {
                     "color": "water_night",
