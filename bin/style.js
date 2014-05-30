@@ -886,7 +886,6 @@ module.exports = {
             "fontSize": 12,
             "feature_type": "point",
             "type": "text",
-            "translate": [0, 1], // em
         },
         "poi_label_3": {
             "source": "outdoors",
@@ -903,7 +902,6 @@ module.exports = {
             "fontSize": 11,
             "feature_type": "point",
             "type": "text",
-            "translate": [0, 1], // em
         },
         "poi_label_4": {
             "source": "outdoors",
@@ -920,7 +918,6 @@ module.exports = {
             "fontSize": 10,
             "feature_type": "point",
             "type": "text",
-            "translate": [0, 1], // em
         }
     },
     "structure": [
@@ -3187,7 +3184,7 @@ module.exports = {
                     "size": "poi_label_1-2_size",
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
-                    "strokeBlur": 1,
+                    "strokeBlur": 1
                 },
                 "poi_label_3": {
                     "color": "#fff",
@@ -3211,7 +3208,7 @@ module.exports = {
                     ],
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
-                    "strokeBlur": 1,
+                    "strokeBlur": 1
                 },
                 "poi_aerodrome": {
                     "opacity": ["stops",
