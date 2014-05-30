@@ -19,7 +19,9 @@ ensure_dep pkg-config
 ensure_dep node
 if [ ${UNAME} = 'Darwin' ]; then
     ensure_dep makedepend
-    ensure_dep glibtool
+    if [[ ! `which libtool` ]] && [[ ! `which glibtool` ]]; then
+        MISSING_DEPS="$MISSING_DEPS libtool"
+    fi
 elif [ ${UNAME} = 'Linux' ]; then
     ensure_dep libtool
     ensure_dep gccmakedep
