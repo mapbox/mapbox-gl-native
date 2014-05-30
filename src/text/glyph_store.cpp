@@ -38,7 +38,11 @@ const Shaping FontStack::getShaping(const std::u32string &string) const {
         GlyphPlacement glyph = GlyphPlacement(0, chr, x, 0);
         shaped.push_back(glyph);
         i++;
-        x += metrics.find(chr)->second.advance;
+
+        auto metrics_it = metrics.find(chr);
+        if (metrics_it != metrics.end()) {
+            x += metrics_it->second.advance;
+        }
     }
     return shaped;
 }
