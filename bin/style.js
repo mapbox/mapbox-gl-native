@@ -653,7 +653,8 @@ module.exports = {
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 24,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
+            "maxWidth": 5,
         },
         "country_label_line": {
             "source": "outdoors",
@@ -721,7 +722,8 @@ module.exports = {
             "fontSize": 16,
             "feature_type": "point",
             "type": "text",
-            "enabled": 4
+            "enabled": 4,
+            "maxWidth": 8
         },
         "place_label_city": {
             "source": "outdoors",
@@ -733,7 +735,8 @@ module.exports = {
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 20,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
+            "maxWidth": 8
         },
         "place_label_town": {
             "source": "outdoors",
@@ -745,7 +748,8 @@ module.exports = {
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 24,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
+            "maxWidth": 8
         },
         "place_label_village": {
             "source": "outdoors",
@@ -757,7 +761,8 @@ module.exports = {
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 22,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
+            "maxWidth": 8
         },
         "place_label_other": {
             "source": "outdoors",
@@ -774,7 +779,7 @@ module.exports = {
             "fontSize": 18,
             "maxWidth": 6,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
         },
         "road_label_1": {
             "source": "outdoors",
@@ -826,7 +831,8 @@ module.exports = {
             "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 12,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
+            "maxWidth": 8
         },
         "waterway_label": {
             "source": "outdoors",
@@ -886,7 +892,7 @@ module.exports = {
             "text_field": "{{name_en}}",
             "path": "horizontal",
             "padding": 2,
-            "maxWidth": 8,
+            "maxWidth": 10,
             "verticalAlignment": "top",
             "translate": [0, -1],
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -902,7 +908,7 @@ module.exports = {
             "text_field": "{{name_en}}",
             "path": "horizontal",
             "padding": 2,
-            "maxWidth": 8,
+            "maxWidth": 10,
             "verticalAlignment": "top",
             "translate": [0, -1],
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -918,7 +924,7 @@ module.exports = {
             "text_field": "{{name_en}}",
             "path": "horizontal",
             "padding": 2,
-            "maxWidth": 8,
+            "maxWidth": 10,
             "verticalAlignment": "top",
             "translate": [0, -1],
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -1492,6 +1498,7 @@ module.exports = {
 
         "admin_night": "#ffb680",
         "text_night": "#fff",
+        "text_water_night": "#2a5b8a",
         "text_stroke_night": "#103",
         "text2_stroke_night": "rgba(1,69,89,0.8)",
 
@@ -3184,14 +3191,12 @@ module.exports = {
                     "size": "road_label_3_size"
                 },
                 "water_label": {
-                    "color": "water_dark_night",
-                    "strokeWidth": 0.8,
-                    "stroke": "text2_stroke_night"
+                    "color": "text_water_night",
+                    "stroke": "water_night",
                 },
                 "waterway_label": {
-                    "color": "water_dark_night",
-                    "strokeWidth": 0.8,
-                    "stroke": "text2_stroke_night"
+                    "color": "text_water_night",
+                    "stroke": "water_night",
                 },
                 "poi": {
                     "color": "white",
