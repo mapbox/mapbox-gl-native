@@ -36,9 +36,9 @@ public:
     void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
                    PlacementRange placementRange, float zoom);
 
-    void addFeature(const VectorTileFeature &feature,
+    void addFeature(const pbf &geometry,
                     const GlyphPositions &face,
-                    const std::map<Value, Shaping> &shapings);
+                    const Shaping &shaping);
 
     void drawGlyphs(TextShader &shader);
 

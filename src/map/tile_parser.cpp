@@ -199,7 +199,6 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
 
     // Create a copy!
     const FontStack &fontStack = glyphStore.getFontStack(bucket_desc.geometry.font);
-    std::map<Value, Shaping> shaping;
     GlyphPositions face;
 
     // Shape and place all labels.
@@ -222,17 +221,14 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
             const std::u32string string = ucs4conv.convert(source_string);
 
             // Shape labels.
-            const Shaping shaped = fontStack.getShaping(string);
-            shaping.emplace(source_string, shaped);
+            const Shaping shaping = fontStack.getShaping(string);
 
             // Place labels.
             addGlyph(tile.id.to_uint64(), bucket_desc.geometry.font, string, fontStack, glyphAtlas, face);
+
+            bucket->addFeature(feature.geometry, face, shaping);
         }
     }
-
-    // It looks like nearly the same interface through the rest
-    // of the stack.
-    addBucketFeatures(bucket, layer, bucket_desc, face, shaping);
 
     return std::move(bucket);
 }
