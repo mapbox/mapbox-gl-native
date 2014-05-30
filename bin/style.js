@@ -270,7 +270,8 @@ module.exports = {
             "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 10,
             "feature_type": "line",
-            "type": "text"
+            "type": "text",
+            "maxAngleDelta": 0.5
         },
         "building": {
             "source": "outdoors",
@@ -828,9 +829,9 @@ module.exports = {
             "path": "curve",
             "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 12,
-            "textMinDistance": 15,
             "feature_type": "line",
-            "type": "text"
+            "type": "text",
+            "maxAngleDelta": 0.5
         },
         "poi": {
             "source": "outdoors",
@@ -1944,6 +1945,13 @@ module.exports = {
                         {"z": 12, "val": 0.05},
                         {"z": 13, "val": 0.11}
                     ]
+                },
+                "contour_label": {
+                    "color": "text",
+                    "stroke": "land",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 3,
+                    "size": 10
                 },
                 "water": {
                     "color": "water",
