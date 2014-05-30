@@ -182,18 +182,24 @@ void FillBucket::tessellate() {
                 if (a != TESS_UNDEF && b != TESS_UNDEF && c != TESS_UNDEF) {
                     triangleElementsBuffer.add(triangleIndex + a, triangleIndex + b, triangleIndex + c);
                 } else {
+#if defined(DEBUG)
                     // TODO: We're missing a vertex that was not part of the line.
                     fprintf(stderr, "undefined element buffer\n");
+#endif
                 }
             } else {
+#if defined(DEBUG)
                 fprintf(stderr, "undefined element buffer\n");
+#endif
             }
         }
 
         triangleGroup.vertex_length += total_vertex_count;
         triangleGroup.elements_length += triangle_count;
     } else {
+#if defined(DEBUG)
         fprintf(stderr, "tessellation failed\n");
+#endif
     }
 
     // We're adding the total vertex count *after* we added additional vertices

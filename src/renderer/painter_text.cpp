@@ -1,6 +1,7 @@
 #include <llmr/renderer/painter.hpp>
 #include <llmr/renderer/text_bucket.hpp>
 #include <llmr/map/map.hpp>
+#include <cmath>
 
 using namespace llmr;
 
@@ -66,8 +67,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
         history[0].z = history[1].z;
     }
 
-    size_t frameLen = history.size();
-    assert("there should never be less than three frames in the history" && frameLen >= 3);
+    assert("there should never be less than three frames in the history" && (history.size() >= 3));
 
     // Find the range of zoom levels we want to fade between
     float startingZ = history.front().z;
@@ -81,7 +81,9 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
         timeDiff = lastFrame.timestamp - history[1].timestamp;
     float fadedist = zoomDiff / (timeDiff / duration);
 
-    if (isnan(fadedist)) fprintf(stderr, "fadedist should never be NaN\n");
+#if defined(DEBUG)
+    if (std::isnan(fadedist)) fprintf(stderr, "fadedist should never be NaN\n");
+#endif
 
     // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
     // bump is how much farther it would have been if it had continued zooming at the same rate

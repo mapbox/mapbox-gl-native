@@ -52,7 +52,9 @@ GlyphPBF::GlyphPBF(const std::string &fontStack, GlyphRange glyphRange)
     // TODO: Find more reliable URL normalization function
     std::replace(url.begin(), url.end(), ' ', '+');
 
+#if defined(DEBUG)
     fprintf(stderr, "%s\n", url.c_str());
+#endif
 
     platform::request_http(url, [&](platform::Response *res) {
         if (res->code != 200) {

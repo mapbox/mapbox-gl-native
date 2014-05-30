@@ -479,8 +479,9 @@ void Map::prepare() {
 }
 
 void Map::render() {
+#if defined(DEBUG)
     std::vector<std::string> debug;
-
+#endif
     painter.clear();
 
     painter.resetFramebuffer();
@@ -493,6 +494,7 @@ void Map::render() {
 
     painter.drawClippingMasks(sources);
 
+#if defined(DEBUG)
     // Generate debug information
     size_t source_id = 0;
     for (const auto &pair : sources) {
@@ -501,7 +503,7 @@ void Map::render() {
         debug.emplace_back(util::sprintf<100>("source %d: %d\n", source_id, count));
         source_id++;
     }
-
+#endif
     // Actually render the layers
     if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
     renderLayers(style.layers);
@@ -520,7 +522,9 @@ void Map::render() {
 
     painter.renderMatte();
 
+#if defined(DEBUG)
     painter.renderDebugText(debug);
+#endif
 
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition()) {
@@ -573,12 +577,14 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers) {
 template <typename Styles>
 typename Styles::const_iterator find_style(const Styles &styles, const LayerDescription &layer_desc) {
     auto it = styles.find(layer_desc.name);
+#if defined(DEBUG)
     if (it == styles.end()) {
         if (debug::renderWarnings) {
             fprintf(stderr, "[WARNING] can't find class named '%s' in style\n",
                     layer_desc.name.c_str());
         }
     }
+#endif
     return it;
 }
 
