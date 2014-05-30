@@ -751,4 +751,6 @@ Value StyleParser::parseValue(JSVal value) {
             throw Style::exception("value cannot be an object or array");
             return false;
     }
+    throw Style::exception("unhandled value type in style");
+    return false;
 }
