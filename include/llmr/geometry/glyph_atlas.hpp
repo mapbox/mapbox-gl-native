@@ -12,8 +12,6 @@
 
 namespace llmr {
 
-class VectorTileGlyph;
-
 class GlyphAtlas {
 public:
 

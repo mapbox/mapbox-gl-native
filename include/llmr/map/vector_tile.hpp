@@ -83,37 +83,8 @@ public:
     uint32_t extent = 4096;
     std::vector<std::string> keys;
     std::vector<Value> values;
-    std::vector<std::string> faces;
     std::map<std::string, std::map<Value, Shaping>> shaping;
 };
-
-class VectorTileGlyph {
-public:
-    VectorTileGlyph();
-    VectorTileGlyph(pbf data);
-
-    uint32_t id = 0;
-
-    // A signed distance field of the glyph with a border of 3 pixels.
-    std::string bitmap;
-
-    // Glyph metrics
-    GlyphMetrics metrics;
-};
-
-std::ostream& operator<<(std::ostream&, const VectorTileGlyph& glyph);
-
-class VectorTileFace {
-public:
-    VectorTileFace(pbf data);
-
-    std::string name;
-    std::string family;
-    std::string style;
-    std::vector<VectorTileGlyph> glyphs;
-};
-
-std::ostream& operator<<(std::ostream&, const VectorTileFace& face);
 
 class VectorTile {
 public:
@@ -122,7 +93,6 @@ public:
     VectorTile& operator=(VectorTile&& other);
 
     std::map<std::string, const VectorTileLayer> layers;
-    std::map<std::string, const VectorTileFace> faces;
 };
 
 

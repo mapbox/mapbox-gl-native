@@ -75,43 +75,6 @@ message feature {
     optional uint32 vertex_count = 6;
 }
 
-// Stores a glyph with metrics and optional SDF bitmap information.
-message glyph {
-    required uint32 id = 1;
-
-    // A signed distance field of the glyph with a border of 3 pixels.
-    optional bytes bitmap = 2;
-
-    // Glyph metrics.
-    required uint32 width = 3;
-    required uint32 height = 4;
-    required sint32 left = 5;
-    required sint32 top = 6;
-    required uint32 advance = 7;
-}
-
-// Stores font face information and a list of glyphs.
-message face {
-    required string family = 1;
-    required string style = 2;
-    repeated glyph glyphs = 5;
-}
-
-// Stores the shaping information for the label with a given text
-message label {
-    // The original value ID this shaping information is for.
-    required uint32 text = 1;
-
-    // References the index of the font stack in the layer's fontstack array.
-    required uint32 stack = 2;
-
-    // Parallel arrays of face ID, glyph ID and position.
-    repeated uint32 faces = 3  [packed = true];
-    repeated uint32 glyphs = 4 [packed = true];
-    repeated uint32 x = 5  [packed = true];
-    repeated uint32 y = 6  [packed = true];
-}
-
 message layer {
     // Any compliant implementation must first read the version
     // number encoded in this message and choose the correct
@@ -136,18 +99,11 @@ message layer {
     // Total vertex count in this layer.
     optional uint32 vertex_count = 6;
 
-    // Shaping information for labels contained in this tile.
-    repeated string faces = 7;
-    repeated label labels = 8;
-    repeated string stacks = 9;
-
     extensions 16 to max;
 }
 
 message tile {
     repeated layer layers = 3;
-
-    repeated face faces = 4;
 
     extensions 16 to 8191;
 }
