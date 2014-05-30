@@ -12,7 +12,9 @@ GaussianShader::GaussianShader()
          shaders[GAUSSIAN_SHADER].fragment
          ) {
     if (!valid) {
+#if defined(DEBUG)
         fprintf(stderr, "invalid raster shader\n");
+#endif
         return;
     }
 

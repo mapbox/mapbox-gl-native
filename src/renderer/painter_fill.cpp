@@ -146,9 +146,10 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
     const std::unordered_map<std::string, FillProperties> &fill_properties = map.getStyle().computed.fills;
     const std::unordered_map<std::string, FillProperties>::const_iterator fill_properties_it = fill_properties.find(layer_name);
-    if (fill_properties_it == fill_properties.end()) return;
 
-    const FillProperties& properties = fill_properties_it->second;
+    const FillProperties &properties = fill_properties_it != fill_properties.end()
+                                           ? fill_properties_it->second
+                                           : defaultFillProperties;
     if (!properties.enabled) return;
 
 

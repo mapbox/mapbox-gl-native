@@ -137,6 +137,8 @@ void GlyphAtlas::bind() {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
         dirty = false;
 
+#if defined(DEBUG)
         // platform::show_debug_image("Glyph Atlas", data, width, height);
+#endif
     }
 };

@@ -1,13 +1,13 @@
 #include <llmr/renderer/painter.hpp>
-
 #include <llmr/map/map.hpp>
-
 #include <llmr/util/std.hpp>
 #include <llmr/util/string.hpp>
-#include <llmr/util/timer.hpp>
 #include <llmr/util/time.hpp>
 #include <llmr/util/clip_ids.hpp>
 #include <llmr/util/constants.hpp>
+#if defined(DEBUG)
+#include <llmr/util/timer.hpp>
+#endif
 
 #include <cassert>
 #include <algorithm>
@@ -29,8 +29,9 @@ bool Painter::needsAnimation() const {
 }
 
 void Painter::setup() {
+#if defined(DEBUG)
     util::timer timer("painter setup");
-
+#endif
     setupShaders();
 
     assert(iconShader);

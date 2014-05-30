@@ -13,9 +13,10 @@ void Painter::renderIcon(IconBucket& bucket, const std::string& layer_name, cons
 
     const std::unordered_map<std::string, IconProperties> &icon_properties = map.getStyle().computed.icons;
     const std::unordered_map<std::string, IconProperties>::const_iterator icon_properties_it = icon_properties.find(layer_name);
-    if (icon_properties_it == icon_properties.end()) return;
 
-    const IconProperties& properties = icon_properties_it->second;
+    const IconProperties &properties = icon_properties_it != icon_properties.end()
+                                           ? icon_properties_it->second
+                                           : defaultIconProperties;
     if (!properties.enabled) return;
 
     Color color = properties.color;

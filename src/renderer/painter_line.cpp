@@ -11,9 +11,10 @@ void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, cons
 
     const std::unordered_map<std::string, LineProperties> &line_properties = map.getStyle().computed.lines;
     const std::unordered_map<std::string, LineProperties>::const_iterator line_properties_it = line_properties.find(layer_name);
-    if (line_properties_it == line_properties.end()) return;
 
-    const LineProperties& properties = line_properties_it->second;
+    const LineProperties &properties = line_properties_it != line_properties.end()
+                                           ? line_properties_it->second
+                                           : defaultLineProperties;
     if (!properties.enabled) return;
 
     float width = properties.width;

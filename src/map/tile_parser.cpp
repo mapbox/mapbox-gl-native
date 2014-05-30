@@ -15,8 +15,6 @@
 #include <llmr/util/std.hpp>
 #include <llmr/util/utf.hpp>
 
-#include <iostream>
-
 using namespace llmr;
 
 TileParser::TileParser(const std::string& data, VectorTileData& tile, const Style& style, GlyphAtlas& glyphAtlas, GlyphStore &glyphStore, SpriteAtlas &spriteAtlas)
@@ -201,10 +199,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
 
     // Create a copy!
     const FontStack &fontStack = glyphStore.getFontStack(bucket_desc.geometry.font);
-    std::map<Value, Shaping> shaping;
     GlyphPositions face;
-
-    // std::cerr << bucket_desc;
 
     // Shape and place all labels.
     {
@@ -222,22 +217,20 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
                 continue;
             }
 
-            const std::u32string string = ucs4conv.convert(toString(it_prop->second));
+            const std::string source_string = toString(it_prop->second);
+            const std::u32string string = ucs4conv.convert(source_string);
 
             // Shape labels.
-            const Shaping shaped = fontStack.getShaping(string, bucket_desc.geometry.max_width,
+            const Shaping shaping = fontStack.getShaping(string, bucket_desc.geometry.max_width,
                     bucket_desc.geometry.line_height, bucket_desc.geometry.alignment, 
                     bucket_desc.geometry.vertical_alignment, bucket_desc.geometry.letter_spacing);
-            shaping.emplace(toString(it_prop->second), shaped);
 
             // Place labels.
             addGlyph(tile.id.to_uint64(), bucket_desc.geometry.font, string, fontStack, glyphAtlas, face);
+
+            bucket->addFeature(feature.geometry, face, shaping);
         }
     }
-
-    // It looks like nearly the same interface through the rest
-    // of the stack.
-    addBucketFeatures(bucket, layer, bucket_desc, face, shaping);
 
     return std::move(bucket);
 }

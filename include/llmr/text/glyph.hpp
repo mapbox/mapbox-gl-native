@@ -43,8 +43,6 @@ struct Glyph {
 };
 
 typedef std::map<uint32_t, Glyph> GlyphPositions;
-typedef std::map<std::string, GlyphPositions> Faces;
-typedef std::vector<const GlyphPositions *> IndexedFaces;
 
 class GlyphPlacement {
 public:

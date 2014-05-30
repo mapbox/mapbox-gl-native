@@ -42,7 +42,6 @@ private:
     GlyphAtlas& glyphAtlas;
     GlyphStore &glyphStore;
     SpriteAtlas &spriteAtlas;
-    Faces faces;
     Placement placement;
 };
 
