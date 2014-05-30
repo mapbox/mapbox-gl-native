@@ -591,7 +591,11 @@ typename Styles::const_iterator find_style(const Styles &styles, const LayerDesc
 template <typename Styles>
 bool is_invisible(const Styles &styles, const LayerDescription &layer_desc) {
     auto it = find_style(styles, layer_desc);
-    if (it == styles.end()) { return true; }
+    if (it == styles.end()) {
+        // We don't have a style, so we fall back to the default style which is
+        // always visible.
+        return false;
+    }
     return !it->second.isVisible();
 }
 

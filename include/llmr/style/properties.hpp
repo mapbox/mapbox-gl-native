@@ -128,6 +128,7 @@ struct IconClass : public GenericClass {
 };
 
 struct IconProperties : public GenericProperties {
+    inline IconProperties() : GenericProperties() {}
     float size = 0;
     Color color = {{ 1, 1, 1, 1 }};
     std::string image;
@@ -147,6 +148,7 @@ struct LineClass : public GenericClass {
 };
 
 struct LineProperties : public GenericProperties {
+    inline LineProperties() : GenericProperties() {}
     float width = 0;
     float offset = 0;
     Color color = {{ 0, 0, 0, 1 }};
@@ -164,6 +166,7 @@ struct FillClass : public GenericClass {
 };
 
 struct FillProperties : public GenericProperties {
+    inline FillProperties() : GenericProperties() {}
     Winding winding = Winding::NonZero;
     bool antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
@@ -187,6 +190,7 @@ struct TextClass : public GenericClass {
 };
 
 struct TextProperties : public GenericProperties {
+    inline TextProperties() : GenericProperties() {}
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     float halo_radius = 0.25f;
@@ -202,6 +206,7 @@ struct BackgroundClass : public GenericClass {
 };
 
 struct BackgroundProperties : public GenericProperties {
+    inline BackgroundProperties() : GenericProperties() {}
     Color color = {{ 1, 1, 1, 1 }};
 };
 
@@ -209,6 +214,7 @@ struct RasterClass : public GenericClass {
 };
 
 struct RasterProperties : public GenericProperties {
+    inline RasterProperties() : GenericProperties() {}
 };
 
 struct CompositeClass : public GenericClass {
@@ -219,6 +225,12 @@ struct CompositeProperties : public GenericProperties {
 };
 
 
+const IconProperties defaultIconProperties;
+const LineProperties defaultLineProperties;
+const FillProperties defaultFillProperties;
+const TextProperties defaultTextProperties;
+const BackgroundProperties defaultBackgroundProperties;
+const RasterProperties defaultRasterProperties;
 const CompositeProperties defaultCompositeProperties;
 
 }
