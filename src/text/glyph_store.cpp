@@ -38,8 +38,7 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float &m
     Shaping shaping;
     // Loop through all characters of this label and shape.
     for (uint32_t chr : string) {
-        GlyphPlacement glyph = GlyphPlacement(0, chr, x, 0);
-        shaping.push_back(glyph);
+        shaping.emplace_back(0, chr, x, 0);
         i++;
         x += metrics.find(chr)->second.advance + letterSpacing;
     }
@@ -58,18 +57,24 @@ void alignVertically(Shaping &shaping, const uint32_t &lines, const float &lineH
 
 void alignHorizontally(Shaping &shaping, const std::map<uint32_t, GlyphMetrics> &metrics,
         const uint32_t &start, const uint32_t &end, const float &alignment) {
-
-    uint32_t lastAdvance = metrics.find(shaping[end].glyph)->second.advance;
-    int32_t lineIndent = (shaping[end].x + lastAdvance) * alignment;
-
-    for (uint32_t j = start; j <= end; j++) {
-        shaping[j].x -= lineIndent;
+    auto & shape = shaping.at(end);
+    auto metric = metrics.find(shape.glyph);
+    if (metric != metrics.end()) {
+        uint32_t lastAdvance = metric->second.advance;
+        int32_t lineIndent = (shape.x + lastAdvance) * alignment;
+        for (uint32_t j = start; j <= end; j++) {
+            shaping[j].x -= lineIndent;
+        }
     }
 }
 
-Shaping FontStack::lineWrap(Shaping &shaping, const float &lineHeight, const float &maxWidth,
+void FontStack::lineWrap(Shaping &shaping, const float &lineHeight, const float &maxWidth,
         const float &alignment, const float &verticalAlignment) const {
 
+    std::size_t num_shapes = shaping.size();
+    if (!num_shapes) {
+        return;
+    }
     uint32_t lastSafeBreak = 0;
     uint32_t lengthBeforeCurrentLine = 0;
     uint32_t lineStartIndex = 0;
@@ -77,11 +82,10 @@ Shaping FontStack::lineWrap(Shaping &shaping, const float &lineHeight, const flo
 
     for (uint32_t i = 0; i < shaping.size(); i++) {
         GlyphPlacement &shape = shaping[i];
-
         shape.x -= lengthBeforeCurrentLine;
         shape.y += lineHeight * line;
 
-        if (shape.x > maxWidth && lastSafeBreak != 0) {
+        if (shape.x > maxWidth && lastSafeBreak > 0) {
 
             uint32_t lineLength = shaping[lastSafeBreak + 1].x;
 
@@ -103,7 +107,6 @@ Shaping FontStack::lineWrap(Shaping &shaping, const float &lineHeight, const flo
             lastSafeBreak = i;
         }
     }
-
     alignHorizontally(shaping, metrics, lineStartIndex, shaping.size() - 1, alignment);
     alignVertically(shaping, line + 1, lineHeight, verticalAlignment);
 }
