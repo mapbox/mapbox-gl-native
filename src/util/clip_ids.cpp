@@ -154,8 +154,12 @@ void propagate(std::map<Tile::ID, ClipID> &mapping, std::list<TileHierarchy> &ar
         item.clip.mask >>= parent.length;
         item.clip.mask |= parent.mask;
         item.clip.length += parent.length;
+#if defined(DEBUG)
         auto result = mapping.emplace(item.id, item.clip);
         assert("Tried to insert a duplicate item" && result.second == true);
+#else
+        mapping.emplace(item.id, item.clip);
+#endif
         propagate(mapping, item.children, const_cast<const ClipID &>(item.clip));
     };
 }
