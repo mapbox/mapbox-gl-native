@@ -379,7 +379,7 @@ std::string StyleParser::parseString(JSVal value) {
     return { value.GetString(), value.GetStringLength() };
 }
 
-const JSVal& StyleParser::replaceConstant(const JSVal& value) {
+JSVal StyleParser::replaceConstant(JSVal value) {
     if (value.IsString()) {
         const std::string string_value { value.GetString(), value.GetStringLength() };
         auto it = constants.find(string_value);
