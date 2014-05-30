@@ -40,13 +40,13 @@ bool TileParser::obsolete() const { return tile.state == TileData::State::obsole
 
 void TileParser::addGlyph(uint64_t tileid, const std::string stackname,
                           const std::u32string &string, const FontStack &fontStack,
-                          GlyphAtlas &glyphAtlas, GlyphPositions &face) {
-    std::map<uint32_t, SDFGlyph> sdfs = fontStack.getSDFs();
+                          GlyphAtlas &glyphAtlas, GlyphPositions &glyphPositions) {
+    std::map<char32_t, SDFGlyph> sdfs = fontStack.getSDFs();
     // Loop through all characters and add glyph to atlas, positions.
-    for (uint32_t chr : string) {
+    for (char32_t chr : string) {
         const SDFGlyph sdf = sdfs[chr];
         const Rect<uint16_t> rect = glyphAtlas.addGlyph(tileid, stackname, sdf);
-        face.emplace(chr, Glyph{rect, sdf.metrics});
+        glyphPositions.emplace(chr, Glyph{rect, sdf.metrics});
     }
 }
 
@@ -207,7 +207,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
             const std::u32string string = ucs4conv.convert(toString(it_prop->second));
 
             // Loop through all characters of this text and collect unique codepoints.
-            for (uint32_t chr : string) {
+            for (char32_t chr : string) {
                 ranges.insert(getGlyphRange(chr));
             }
         }
@@ -217,7 +217,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
 
     // Create a copy!
     const FontStack &fontStack = glyphStore->getFontStack(bucket_desc.geometry.font);
-    GlyphPositions face;
+    GlyphPositions glyphPositions;
 
     // Shape and place all labels.
     {
@@ -248,9 +248,9 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
 
             // Place labels.
             addGlyph(tile.id.to_uint64(), bucket_desc.geometry.font, string, fontStack, *glyphAtlas,
-                     face);
+                     glyphPositions);
 
-            bucket->addFeature(feature.geometry, face, shaping);
+            bucket->addFeature(feature.geometry, glyphPositions, shaping);
         }
     }
 

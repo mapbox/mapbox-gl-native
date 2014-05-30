@@ -100,7 +100,7 @@ void TextBucket::addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
 };
 
 void TextBucket::addFeature(const pbf &geom_pbf,
-                            const GlyphPositions &face,
+                            const GlyphPositions &glyphPositions,
                             const Shaping &shaping) {
     // Decode all lines.
     std::vector<Coordinate> line;
@@ -113,14 +113,14 @@ void TextBucket::addFeature(const pbf &geom_pbf,
     while ((cmd = geometry.next(x, y)) != Geometry::end) {
         if (cmd == Geometry::move_to) {
             if (!line.empty()) {
-                placement.addFeature(*this, line, geom_desc, face, shaping);
+                placement.addFeature(*this, line, geom_desc, glyphPositions, shaping);
                 line.clear();
             }
         }
         line.emplace_back(x, y);
     }
     if (line.size()) {
-        placement.addFeature(*this, line, geom_desc, face, shaping);
+        placement.addFeature(*this, line, geom_desc, glyphPositions, shaping);
     }
 }
 

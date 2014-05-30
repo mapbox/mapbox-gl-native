@@ -37,7 +37,7 @@ public:
                    PlacementRange placementRange, float zoom);
 
     void addFeature(const pbf &geometry,
-                    const GlyphPositions &face,
+                    const GlyphPositions &glyphPositions,
                     const Shaping &shaping);
 
     void drawGlyphs(TextShader &shader);
