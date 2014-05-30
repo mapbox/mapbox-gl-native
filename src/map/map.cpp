@@ -19,10 +19,11 @@ using namespace llmr;
 Map::Map(View& view)
     : view(view),
       transform(),
-      texturepool(),
-      style(),
-      glyphAtlas(1024, 1024),
-      spriteAtlas(512, 512),
+      style(std::make_shared<Style>()),
+      glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
+      glyphStore(std::make_shared<GlyphStore>()),
+      spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
+      texturepool(std::make_shared<Texturepool>()),
       painter(*this),
       loop(uv_loop_new()) {
 
@@ -35,6 +36,10 @@ Map::Map(View& view)
 }
 
 Map::~Map() {
+    if (async) {
+        stop();
+    }
+
     uv_loop_delete(loop);
     loop = nullptr;
 }
@@ -186,7 +191,7 @@ void Map::setup() {
 }
 
 void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
-    style.loadJSON(data, bytes);
+    style->loadJSON(data, bytes);
     update();
 }
 
@@ -386,18 +391,18 @@ bool Map::getDebug() const {
 }
 
 void Map::toggleRaster() {
-    style.setDefaultTransitionDuration(300);
-    style.cancelTransitions();
+    style->setDefaultTransitionDuration(300);
+    style->cancelTransitions();
 
     auto it = sources.find("satellite");
     if (it != sources.end()) {
         Source &satellite_source = *it->second;
         if (satellite_source.enabled) {
             satellite_source.enabled = false;
-            style.appliedClasses.erase("satellite");
+            style->appliedClasses.erase("satellite");
         } else {
             satellite_source.enabled = true;
-            style.appliedClasses.insert("satellite");
+            style->appliedClasses.insert("satellite");
         }
     }
 
@@ -451,28 +456,28 @@ void Map::prepare() {
                              oldState.getFramebufferHeight() != state.getFramebufferHeight();
 
     if (pixelRatioChanged) {
-        style.sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
-        style.sprite->load(kSpriteURL);
+        style->sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
+        style->sprite->load(kSpriteURL);
 
-        spriteAtlas.resize(state.getPixelRatio());
+        spriteAtlas->resize(state.getPixelRatio());
     }
 
     if (pixelRatioChanged || dimensionsChanged) {
         painter.clearFramebuffers();
     }
 
-    style.cascade(state.getNormalizedZoom());
+    style->cascade(state.getNormalizedZoom());
 
     // Update style transitions.
     animationTime = util::now();
-    if (style.needsTransition()) {
-        style.updateTransitions(animationTime);
+    if (style->needsTransition()) {
+        style->updateTransitions(animationTime);
         update();
     }
 
     // Allow the sprite atlas to potentially pull new sprite images if needed.
-    if (style.sprite && style.sprite->isLoaded()) {
-        spriteAtlas.update(*style.sprite);
+    if (style->sprite && style->sprite->isLoaded()) {
+        spriteAtlas->update(*style->sprite);
     }
 
     updateTiles();
@@ -506,7 +511,7 @@ void Map::render() {
 #endif
     // Actually render the layers
     if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
-    renderLayers(style.layers);
+    renderLayers(style->layers);
     if (debug::renderTree) { std::cout << "}" << std::endl; indent--; }
 
     // Finalize the rendering, e.g. by calling debug render calls per tile.
@@ -603,8 +608,8 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
     if (layer_desc.child_layer.size()) {
         // This is a layer group. We render them during our translucent render pass.
         if (pass == Translucent) {
-            auto it = find_style(style.computed.composites, layer_desc);
-            const CompositeProperties &properties = (it != style.computed.composites.end()) ? it->second : defaultCompositeProperties;
+            auto it = find_style(style->computed.composites, layer_desc);
+            const CompositeProperties &properties = (it != style->computed.composites.end()) ? it->second : defaultCompositeProperties;
             if (properties.isVisible()) {
                 gl::group group(std::string("group: ") + layer_desc.name);
 
@@ -633,31 +638,31 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
         // This is a singular layer. Try to find the bucket associated with
         // this layer and render it.
 
-        auto bucket_it = style.buckets.find(layer_desc.bucket_name);
-        if (bucket_it != style.buckets.end()) {
+        auto bucket_it = style->buckets.find(layer_desc.bucket_name);
+        if (bucket_it != style->buckets.end()) {
             const BucketDescription &bucket_desc = bucket_it->second;
 
             // Abort early if we can already deduce from the bucket type that
             // we're not going to render anything anyway during this pass.
             switch (bucket_desc.type) {
                 case BucketType::Fill:
-                    if (is_invisible(style.computed.fills, layer_desc)) return;
+                    if (is_invisible(style->computed.fills, layer_desc)) return;
                     break;
                 case BucketType::Line:
                     if (pass == Opaque) return;
-                    if (is_invisible(style.computed.lines, layer_desc)) return;
+                    if (is_invisible(style->computed.lines, layer_desc)) return;
                     break;
                 case BucketType::Icon:
                     if (pass == Opaque) return;
-                    if (is_invisible(style.computed.icons, layer_desc)) return;
+                    if (is_invisible(style->computed.icons, layer_desc)) return;
                     break;
                 case BucketType::Text:
                     if (pass == Opaque) return;
-                    if (is_invisible(style.computed.texts, layer_desc)) return;
+                    if (is_invisible(style->computed.texts, layer_desc)) return;
                     break;
                 case BucketType::Raster:
                     if (pass == Translucent) return;
-                    if (is_invisible(style.computed.rasters, layer_desc)) return;
+                    if (is_invisible(style->computed.rasters, layer_desc)) return;
                     break;
                 default:
                     break;

@@ -1,7 +1,6 @@
 #include <llmr/map/vector_tile_data.hpp>
-
+#include <llmr/util/std.hpp>
 #include <llmr/map/map.hpp>
-#include <llmr/map/tile_parser.hpp>
 
 using namespace llmr;
 
@@ -10,7 +9,11 @@ VectorTileData::VectorTileData(Tile::ID id, Map &map, const std::string url)
 }
 
 VectorTileData::~VectorTileData() {
-    map.getGlyphAtlas().removeGlyphs(id.to_uint64());
+    map.getGlyphAtlas()->removeGlyphs(id.to_uint64());
+}
+
+void VectorTileData::beforeParse() {
+    parser = std::make_unique<TileParser>(data, *this, map.getStyle(), map.getGlyphAtlas(), map.getGlyphStore(), map.getSpriteAtlas());
 }
 
 void VectorTileData::parse() {
@@ -22,7 +25,7 @@ void VectorTileData::parse() {
         // Parsing creates state that is encapsulated in TileParser. While parsing,
         // the TileParser object writes results into this objects. All other state
         // is going to be discarded afterwards.
-        TileParser parser(data, *this, map.getStyle(), map.getGlyphAtlas(), map.getGlyphStore(), map.getSpriteAtlas());
+        parser->parse();
     } catch (const std::exception& ex) {
 #if defined(DEBUG)
         fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
@@ -34,6 +37,10 @@ void VectorTileData::parse() {
     if (state != State::obsolete) {
         state = State::parsed;
     }
+}
+
+void VectorTileData::afterParse() {
+    parser.reset();
 }
 
 void VectorTileData::render(Painter &painter, const LayerDescription& layer_desc) {

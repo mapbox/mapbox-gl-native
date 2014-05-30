@@ -65,9 +65,9 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
     }
 
     if ((fill_color[3] >= 1.0f) == (pass == Opaque)) {
-        auto &sprite = map.getStyle().sprite;
+        const std::shared_ptr<Sprite> &sprite = map.getStyle()->sprite;
         if (properties.image.size() && sprite) {
-            auto &spriteAtlas = map.getSpriteAtlas();
+            SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
             Rect<uint16_t> imagePos = spriteAtlas.getImage(properties.image, *sprite);
 
 
@@ -144,7 +144,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     // Abort early.
     if (!bucket.hasData()) return;
 
-    const std::unordered_map<std::string, FillProperties> &fill_properties = map.getStyle().computed.fills;
+    const std::unordered_map<std::string, FillProperties> &fill_properties = map.getStyle()->computed.fills;
     const std::unordered_map<std::string, FillProperties>::const_iterator fill_properties_it = fill_properties.find(layer_name);
 
     const FillProperties &properties = fill_properties_it != fill_properties.end()

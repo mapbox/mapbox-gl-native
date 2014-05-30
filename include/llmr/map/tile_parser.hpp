@@ -1,7 +1,6 @@
 #ifndef LLMR_MAP_TILE_PARSER
 #define LLMR_MAP_TILE_PARSER
 
-#include <llmr/map/vector_tile_data.hpp>
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/text/placement.hpp>
 #include <llmr/text/glyph_store.hpp>
@@ -14,13 +13,21 @@ class Style;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
+class VectorTileData;
 
 class LayerDescription;
 class Bucket;
 
 class TileParser {
 public:
-    TileParser(const std::string& data, VectorTileData& tile, const Style& style, GlyphAtlas& glyphAtlas, GlyphStore &glyphStore, SpriteAtlas &spriteAtlas);
+    TileParser(const std::string &data, VectorTileData &tile,
+               const std::shared_ptr<const Style> &style,
+               const std::shared_ptr<GlyphAtlas> &glyphAtlas,
+               const std::shared_ptr<GlyphStore> &glyphStore,
+               const std::shared_ptr<SpriteAtlas> &spriteAtlas);
+
+public:
+    void parse();
 
 private:
     bool obsolete() const;
@@ -38,10 +45,13 @@ private:
 private:
     const VectorTile vector_data;
     VectorTileData& tile;
-    const Style& style;
-    GlyphAtlas& glyphAtlas;
-    GlyphStore &glyphStore;
-    SpriteAtlas &spriteAtlas;
+
+    // Cross-thread shared data.
+    std::shared_ptr<const Style> style;
+    std::shared_ptr<GlyphAtlas> glyphAtlas;
+    std::shared_ptr<GlyphStore> glyphStore;
+    std::shared_ptr<SpriteAtlas> spriteAtlas;
+
     Placement placement;
 };
 

@@ -10,7 +10,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     if (pass == Opaque) return;
     if (!bucket.hasData()) return;
 
-    const std::unordered_map<std::string, TextProperties> &text_properties = map.getStyle().computed.texts;
+    const std::unordered_map<std::string, TextProperties> &text_properties = map.getStyle()->computed.texts;
     const std::unordered_map<std::string, TextProperties>::const_iterator text_properties_it = text_properties.find(layer_name);
 
     const TextProperties &properties = text_properties_it != text_properties.end()
@@ -39,9 +39,10 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     textShader->setMatrix(vtxMatrix);
     textShader->setExtrudeMatrix(exMatrix);
 
-    map.getGlyphAtlas().bind();
-    textShader->setTextureSize({{static_cast<float>(map.getGlyphAtlas().width),
-                                 static_cast<float>(map.getGlyphAtlas().height)}});
+    GlyphAtlas &glyphAtlas = *map.getGlyphAtlas();
+    glyphAtlas.bind();
+    textShader->setTextureSize({{static_cast<float>(glyphAtlas.width),
+                                 static_cast<float>(glyphAtlas.height)}});
 
     // Convert the -pi..pi to an int8 range.
     float angle = std::round((map.getState().getAngle() + rotate) / M_PI * 128);

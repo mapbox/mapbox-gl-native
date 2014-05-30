@@ -97,13 +97,13 @@ public:
 
 public:
     inline const TransformState &getState() const { return state; }
-    inline const Style &getStyle() const { return style; }
-    inline GlyphAtlas &getGlyphAtlas() { return glyphAtlas; }
-    inline GlyphStore &getGlyphStore() { return glyphStore; }
-    inline SpriteAtlas &getSpriteAtlas() { return spriteAtlas; }
+    inline std::shared_ptr<const Style> getStyle() const { return style; }
+    inline std::shared_ptr<GlyphAtlas> getGlyphAtlas() { return glyphAtlas; }
+    inline std::shared_ptr<GlyphStore> getGlyphStore() { return glyphStore; }
+    inline std::shared_ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
+    inline std::shared_ptr<Texturepool> getTexturepool() { return texturepool; }
     inline uv_loop_t *getLoop() { return loop; }
     inline time getAnimationTime() const { return animationTime; }
-    inline Texturepool &getTexturepool() { return texturepool; }
     inline const Sources &getSources() { return sources; }
 
 private:
@@ -151,11 +151,12 @@ private:
     Transform transform;
     TransformState state;
 
-    Texturepool texturepool;
-    Style style;
-    GlyphAtlas glyphAtlas;
-    GlyphStore glyphStore;
-    SpriteAtlas spriteAtlas;
+    std::shared_ptr<Style> style;
+    std::shared_ptr<GlyphAtlas> glyphAtlas;
+    std::shared_ptr<GlyphStore> glyphStore;
+    std::shared_ptr<SpriteAtlas> spriteAtlas;
+    std::shared_ptr<Texturepool> texturepool;
+
     Painter painter;
 
     Sources sources;

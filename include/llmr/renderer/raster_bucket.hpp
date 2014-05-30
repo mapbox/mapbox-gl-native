@@ -13,7 +13,7 @@ class VertexArrayObject;
 
 class RasterBucket : public Bucket {
 public:
-    RasterBucket(Texturepool &texturepool);
+    RasterBucket(const std::shared_ptr<Texturepool> &texturepool);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
     virtual bool hasData() const;

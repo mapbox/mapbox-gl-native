@@ -11,7 +11,7 @@ void Painter::renderIcon(IconBucket& bucket, const std::string& layer_name, cons
     if (!bucket.hasData()) return;
     if (pass == Opaque) return;
 
-    const std::unordered_map<std::string, IconProperties> &icon_properties = map.getStyle().computed.icons;
+    const std::unordered_map<std::string, IconProperties> &icon_properties = map.getStyle()->computed.icons;
     const std::unordered_map<std::string, IconProperties>::const_iterator icon_properties_it = icon_properties.find(layer_name);
 
     const IconProperties &properties = icon_properties_it != icon_properties.end()
@@ -27,7 +27,7 @@ void Painter::renderIcon(IconBucket& bucket, const std::string& layer_name, cons
 
     const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
-    SpriteAtlas &spriteAtlas = map.getSpriteAtlas();
+    SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
 
     useProgram(iconShader->program);
     iconShader->setMatrix(vtxMatrix);

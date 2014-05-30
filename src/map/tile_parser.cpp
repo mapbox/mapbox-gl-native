@@ -1,5 +1,6 @@
 #include <llmr/map/tile_parser.hpp>
 
+#include <llmr/map/vector_tile_data.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
@@ -17,7 +18,11 @@
 
 using namespace llmr;
 
-TileParser::TileParser(const std::string& data, VectorTileData& tile, const Style& style, GlyphAtlas& glyphAtlas, GlyphStore &glyphStore, SpriteAtlas &spriteAtlas)
+TileParser::TileParser(const std::string &data, VectorTileData &tile,
+                       const std::shared_ptr<const Style> &style,
+                       const std::shared_ptr<GlyphAtlas> &glyphAtlas,
+                       const std::shared_ptr<GlyphStore> &glyphStore,
+                       const std::shared_ptr<SpriteAtlas> &spriteAtlas)
     : vector_data(pbf((const uint8_t *)data.data(), data.size())),
       tile(tile),
       style(style),
@@ -25,14 +30,17 @@ TileParser::TileParser(const std::string& data, VectorTileData& tile, const Styl
       glyphStore(glyphStore),
       spriteAtlas(spriteAtlas),
       placement(tile.id.z) {
-    parseStyleLayers(style.layers);
 }
 
-bool TileParser::obsolete() const {
-    return tile.state == TileData::State::obsolete;
+void TileParser::parse() {
+    parseStyleLayers(style->layers);
 }
 
-void TileParser::addGlyph(uint64_t tileid, const std::string stackname, const std::u32string &string, const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face) {
+bool TileParser::obsolete() const { return tile.state == TileData::State::obsolete; }
+
+void TileParser::addGlyph(uint64_t tileid, const std::string stackname,
+                          const std::u32string &string, const FontStack &fontStack,
+                          GlyphAtlas &glyphAtlas, GlyphPositions &face) {
     std::map<uint32_t, SDFGlyph> sdfs = fontStack.getSDFs();
     // Loop through all characters and add glyph to atlas, positions.
     for (uint32_t chr : string) {
@@ -42,8 +50,8 @@ void TileParser::addGlyph(uint64_t tileid, const std::string stackname, const st
     }
 }
 
-void TileParser::parseStyleLayers(const std::vector<LayerDescription>& layers) {
-    for (const LayerDescription& layer_desc : layers) {
+void TileParser::parseStyleLayers(const std::vector<LayerDescription> &layers) {
+    for (const LayerDescription &layer_desc : layers) {
         // Cancel early when parsing.
         if (obsolete()) {
             return;
@@ -59,12 +67,11 @@ void TileParser::parseStyleLayers(const std::vector<LayerDescription>& layers) {
             // parse this bucket.
             auto bucket_it = tile.buckets.find(layer_desc.bucket_name);
             if (bucket_it == tile.buckets.end()) {
-                auto bucket_it = style.buckets.find(layer_desc.bucket_name);
+                auto bucket_it = style->buckets.find(layer_desc.bucket_name);
                 if (layer_desc.bucket_name == "background") {
                     // background is a special, fake bucket
                     continue;
-                }
-                else if (bucket_it != style.buckets.end()) {
+                } else if (bucket_it != style->buckets.end()) {
                     // Only create the new bucket if we have an actual specification
                     // for it.
                     std::unique_ptr<Bucket> bucket = createBucket(bucket_it->second);
@@ -86,10 +93,10 @@ void TileParser::parseStyleLayers(const std::vector<LayerDescription>& layers) {
     }
 }
 
-std::unique_ptr<Bucket> TileParser::createBucket(const BucketDescription& bucket_desc) {
+std::unique_ptr<Bucket> TileParser::createBucket(const BucketDescription &bucket_desc) {
     auto layer_it = vector_data.layers.find(bucket_desc.source_layer);
     if (layer_it != vector_data.layers.end()) {
-        const VectorTileLayer& layer = layer_it->second;
+        const VectorTileLayer &layer = layer_it->second;
         if (bucket_desc.type == BucketType::Fill) {
             return createFillBucket(layer, bucket_desc);
         } else if (bucket_desc.type == BucketType::Line) {
@@ -114,10 +121,12 @@ std::unique_ptr<Bucket> TileParser::createBucket(const BucketDescription& bucket
 }
 
 template <class Bucket>
-void TileParser::addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+void TileParser::addBucketFeatures(Bucket &bucket, const VectorTileLayer &layer,
+                                   const BucketDescription &bucket_desc) {
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
     for (pbf feature : filtered_layer) {
-        if (obsolete()) return;
+        if (obsolete())
+            return;
 
         while (feature.next(4)) { // geometry
             pbf geometry_pbf = feature.message();
@@ -130,39 +139,45 @@ void TileParser::addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer,
     }
 }
 
-template <class Bucket, typename ...Args>
-void TileParser::addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const BucketDescription& bucket_desc, Args&& ...args) {
+template <class Bucket, typename... Args>
+void TileParser::addBucketFeatures(Bucket &bucket, const VectorTileLayer &layer,
+                                   const BucketDescription &bucket_desc, Args &&... args) {
     FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
-    for (const pbf& feature_pbf : filtered_layer) {
-        if (obsolete()) return;
-        bucket->addFeature({ feature_pbf, layer }, std::forward<Args>(args)...);
+    for (const pbf &feature_pbf : filtered_layer) {
+        if (obsolete())
+            return;
+        bucket->addFeature({feature_pbf, layer}, std::forward<Args>(args)...);
     }
 }
 
-std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer &layer,
+                                                     const BucketDescription &bucket_desc) {
     std::unique_ptr<FillBucket> bucket = std::make_unique<FillBucket>(
         tile.fillVertexBuffer, tile.triangleElementsBuffer, tile.lineElementsBuffer, bucket_desc);
     addBucketFeatures(bucket, layer, bucket_desc);
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer &layer,
+                                                     const BucketDescription &bucket_desc) {
     std::unique_ptr<LineBucket> bucket = std::make_unique<LineBucket>(
         tile.lineVertexBuffer, tile.triangleElementsBuffer, tile.pointElementsBuffer, bucket_desc);
     addBucketFeatures(bucket, layer, bucket_desc);
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createIconBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
-    std::unique_ptr<IconBucket> bucket = std::make_unique<IconBucket>(
-        tile.iconVertexBuffer, bucket_desc);
-    addBucketFeatures(bucket, layer, bucket_desc, spriteAtlas);
+std::unique_ptr<Bucket> TileParser::createIconBucket(const VectorTileLayer &layer,
+                                                     const BucketDescription &bucket_desc) {
+    std::unique_ptr<IconBucket> bucket =
+        std::make_unique<IconBucket>(tile.iconVertexBuffer, bucket_desc);
+    addBucketFeatures(bucket, layer, bucket_desc, *spriteAtlas);
     return obsolete() ? nullptr : std::move(bucket);
 }
 
 typedef std::pair<uint16_t, uint16_t> GlyphRange;
 
-std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& layer, const BucketDescription& bucket_desc) {
+std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &layer,
+                                                     const BucketDescription &bucket_desc) {
     std::unique_ptr<TextBucket> bucket = std::make_unique<TextBucket>(
         tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
 
@@ -173,15 +188,18 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
         std::set<GlyphRange> ranges;
 
         FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
-        for (const pbf& feature_pbf : filtered_layer) {
-            if (obsolete()) return nullptr;
-            VectorTileFeature feature { feature_pbf, layer };
+        for (const pbf &feature_pbf : filtered_layer) {
+            if (obsolete())
+                return nullptr;
+            VectorTileFeature feature{feature_pbf, layer};
 
             auto it_prop = feature.properties.find(bucket_desc.geometry.field);
             if (it_prop == feature.properties.end()) {
                 // feature does not have the correct property
                 if (debug::labelTextMissingWarning) {
-                    fprintf(stderr, "[WARNING] feature doesn't have property '%s' required for labelling\n", bucket_desc.geometry.field.c_str());
+                    fprintf(stderr,
+                            "[WARNING] feature doesn't have property '%s' required for labelling\n",
+                            bucket_desc.geometry.field.c_str());
                 }
                 continue;
             }
@@ -194,25 +212,28 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
             }
         }
 
-        glyphStore.waitForGlyphRanges(bucket_desc.geometry.font, ranges);
+        glyphStore->waitForGlyphRanges(bucket_desc.geometry.font, ranges);
     }
 
     // Create a copy!
-    const FontStack &fontStack = glyphStore.getFontStack(bucket_desc.geometry.font);
+    const FontStack &fontStack = glyphStore->getFontStack(bucket_desc.geometry.font);
     GlyphPositions face;
 
     // Shape and place all labels.
     {
         FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
-        for (const pbf& feature_pbf : filtered_layer) {
-            if (obsolete()) return nullptr;
-            VectorTileFeature feature { feature_pbf, layer };
+        for (const pbf &feature_pbf : filtered_layer) {
+            if (obsolete())
+                return nullptr;
+            VectorTileFeature feature{feature_pbf, layer};
 
             auto it_prop = feature.properties.find(bucket_desc.geometry.field);
             if (it_prop == feature.properties.end()) {
                 // feature does not have the correct property
                 if (debug::labelTextMissingWarning) {
-                    fprintf(stderr, "[WARNING] feature doesn't have property '%s' required for labelling\n", bucket_desc.geometry.field.c_str());
+                    fprintf(stderr,
+                            "[WARNING] feature doesn't have property '%s' required for labelling\n",
+                            bucket_desc.geometry.field.c_str());
                 }
                 continue;
             }
@@ -224,7 +245,8 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
             const Shaping shaping = fontStack.getShaping(string);
 
             // Place labels.
-            addGlyph(tile.id.to_uint64(), bucket_desc.geometry.font, string, fontStack, glyphAtlas, face);
+            addGlyph(tile.id.to_uint64(), bucket_desc.geometry.font, string, fontStack, *glyphAtlas,
+                     face);
 
             bucket->addFeature(feature.geometry, face, shaping);
         }
@@ -232,4 +254,3 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
 
     return std::move(bucket);
 }
-
