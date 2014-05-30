@@ -36,7 +36,7 @@ public:
                              const float &alignment,
                              const float &verticalAlignment,
                              const float &letterSpacing) const;
-    Shaping lineWrap(Shaping shaped,
+    Shaping lineWrap(Shaping &shaping,
                      const float &lineHeight,
                      const float &maxWidth,
                      const float &alignment,
