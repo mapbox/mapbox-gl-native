@@ -14,10 +14,10 @@
     'cflags_cc': ['-std=c++11', '-Wall', '-Wextra'],
     'configurations': {
       'Debug': {
-        'cflags_cc': [ '-g', '-O1', '-fno-omit-frame-pointer','-fwrapv', '-fstack-protector-all', '-fno-common' ],
+        'cflags_cc': [ '-g', '-O0', '-fno-omit-frame-pointer','-fwrapv', '-fstack-protector-all', '-fno-common' ],
         'defines': [ 'DEBUG' ],
         'xcode_settings': {
-          'GCC_OPTIMIZATION_LEVEL': '1',
+          'GCC_OPTIMIZATION_LEVEL': '0',
           'GCC_GENERATE_DEBUGGING_SYMBOLS': 'YES',
           'DEAD_CODE_STRIPPING': 'NO',
           'GCC_INLINES_ARE_PRIVATE_EXTERN': 'NO',
