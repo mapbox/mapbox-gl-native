@@ -680,7 +680,10 @@ module.exports = {
             "field": "labelrank",
             "value": 1,
             "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
-            "fontSize": 30
+            "fontSize": 30,
+            "maxWidth": 8,
+            "letterSpacing": 0.4,
+            "lineHeight": 2,
         },
         "marine_label_point_2": {
             "source": "outdoors",
@@ -692,7 +695,10 @@ module.exports = {
             "field": "labelrank",
             "value": 2,
             "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
-            "fontSize": 24
+            "fontSize": 24,
+            "maxWidth": 8,
+            "letterSpacing": 0.4,
+            "lineHeight": 1.5,
         },
         "marine_label_point_other": {
             "source": "outdoors",
