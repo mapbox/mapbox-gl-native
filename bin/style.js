@@ -879,7 +879,7 @@ module.exports = {
             "path": "horizontal",
             "padding": 2,
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
-            "fontSize": 11,
+            "fontSize": 12,
             "feature_type": "point",
             "type": "text"
         },
@@ -892,7 +892,7 @@ module.exports = {
             "path": "horizontal",
             "padding": 2,
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
-            "fontSize": 10,
+            "fontSize": 11,
             "feature_type": "point",
             "type": "text"
         },
@@ -1704,6 +1704,17 @@ module.exports = {
             "stops",
             {"z": 1, "val": 14},
             {"z": 12, "val": 24}
+        ],
+        "poi_label_1-2_size": [
+            "stops",
+            {"z": 15, "val": 10},
+            {"z": 16, "val": 11},
+            {"z": 17, "val": 12}
+        ],
+        "poi_label_3_size": [
+            "stops",
+            {"z": 16, "val": 10},
+            {"z": 17, "val": 11}
         ]
     },
     "classes": [
@@ -2411,7 +2422,7 @@ module.exports = {
                 },
                 "poi_label_1-2": {
                     "color": "#444",
-                    "size": 11,
+                    "size": "poi_label_1-2_size",
                     "stroke": "land",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
@@ -2419,7 +2430,7 @@ module.exports = {
                 },
                 "poi_label_3": {
                     "color": "#444",
-                    "size": 10,
+                    "size": "poi_label_3_size",
                     "stroke": "land",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
@@ -3163,7 +3174,7 @@ module.exports = {
                 },
                 "poi_label_1-2": {
                     "color": "#fff",
-                    "size": 11,
+                    "size": "poi_label_1-2_size",
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
@@ -3171,7 +3182,7 @@ module.exports = {
                 },
                 "poi_label_3": {
                     "color": "#fff",
-                    "size": 10,
+                    "size": "poi_label_3_size",
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
