@@ -122,7 +122,7 @@ private:
     }
 
 private:
-    std::shared_ptr<loop> loop;
+    std::shared_ptr<uv::loop> loop;
     uv_work_t req;
     T data;
     work_callback work_cb;
