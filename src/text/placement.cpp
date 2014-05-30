@@ -260,9 +260,6 @@ void Placement::addFeature(TextBucket& bucket,
 
     Anchors anchors;
 
-    // TODO: figure out correct ascender height.
-    vec2<float> origin{0, 0};
-
     if (line.size() == 1) {
         // Point labels
         anchors = Anchors{{Anchor{
@@ -282,7 +279,7 @@ void Placement::addFeature(TextBucket& bucket,
         PlacedGlyphs glyphs;
         GlyphBoxes boxes;
 
-        getGlyphs(glyphs, boxes, anchor, origin, shaping, face, fontScale, horizontal,
+        getGlyphs(glyphs, boxes, anchor, info.translate, shaping, face, fontScale, horizontal,
                       line, maxAngleDelta, rotate);
         PlacementProperty place =
             collision.place(boxes, anchor, anchor.scale, maxPlacementScale,
