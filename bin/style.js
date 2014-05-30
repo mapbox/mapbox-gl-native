@@ -765,6 +765,7 @@ module.exports = {
             "path": "horizontal",
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 18,
+            "maxWidth": 6,
             "feature_type": "point",
             "type": "text"
         },
@@ -878,6 +879,9 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "padding": 2,
+            "maxWidth": 8,
+            "verticalAlignment": "top",
+            "translate": [0, -1],
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 11,
             "feature_type": "point",
@@ -891,6 +895,9 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "padding": 2,
+            "maxWidth": 8,
+            "verticalAlignment": "top",
+            "translate": [0, -1],
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 10,
             "feature_type": "point",
@@ -904,6 +911,9 @@ module.exports = {
             "text_field": "name",
             "path": "horizontal",
             "padding": 2,
+            "maxWidth": 8,
+            "verticalAlignment": "top",
+            "translate": [0, -1],
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 10,
             "feature_type": "point",
@@ -2415,7 +2425,6 @@ module.exports = {
                     "stroke": "land",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
-                    "translate": [0, 14]
                 },
                 "poi_label_3": {
                     "color": "#444",
@@ -2423,7 +2432,6 @@ module.exports = {
                     "stroke": "land",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
-                    "translate": [0, 14],
                     "opacity": [
                         "stops",
                         {"z": 16.5, "val": 0},
@@ -2441,7 +2449,6 @@ module.exports = {
                     "stroke": "land",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
-                    "translate": [0, 14]
                 },
                 "poi_aerodrome": {
                     "opacity": ["stops",
@@ -3167,7 +3174,6 @@ module.exports = {
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
-                    "translate": [0, 14]
                 },
                 "poi_label_3": {
                     "color": "#fff",
@@ -3175,7 +3181,6 @@ module.exports = {
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
-                    "translate": [0, 14],
                     "opacity": [
                         "stops",
                         {"z": 16.5, "val": 0},
@@ -3193,7 +3198,6 @@ module.exports = {
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
-                    "translate": [0, 14]
                 },
                 "poi_aerodrome": {
                     "opacity": ["stops",

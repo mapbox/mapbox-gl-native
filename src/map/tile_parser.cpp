@@ -242,7 +242,9 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
             const std::u32string string = ucs4conv.convert(source_string);
 
             // Shape labels.
-            const Shaping shaping = fontStack.getShaping(string);
+            const Shaping shaping = fontStack.getShaping(string, bucket_desc.geometry.max_width,
+                    bucket_desc.geometry.line_height, bucket_desc.geometry.alignment, 
+                    bucket_desc.geometry.vertical_alignment, bucket_desc.geometry.letter_spacing);
 
             // Place labels.
             addGlyph(tile.id.to_uint64(), bucket_desc.geometry.font, string, fontStack, *glyphAtlas,

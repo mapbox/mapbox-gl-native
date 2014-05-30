@@ -6,6 +6,7 @@
 #include <cmath>
 
 #include "value.hpp"
+#include "../util/vec.hpp"
 
 namespace llmr {
 
@@ -68,6 +69,18 @@ inline TextPathType textPathType(const std::string& path) {
     else return TextPathType::Horizontal;
 };
 
+inline float alignmentType(const std::string& alignment) {
+    if (alignment == "right") return 1.0f;
+    else if (alignment == "left") return 0.0f;
+    else return 0.5;
+};
+
+inline float verticalAlignmentType(const std::string& alignment) {
+    if (alignment == "bottom") return 1.0f;
+    else if (alignment == "top") return 0.0f;
+    else return 0.5;
+};
+
 class BucketGeometryDescription {
 public:
     CapType cap = CapType::None;
@@ -79,6 +92,12 @@ public:
     float miter_limit = 2.0f;
     float round_limit = 1.0f;
     TextPathType path = TextPathType::Horizontal;
+    float alignment = 0.5;
+    float vertical_alignment = 0.5;
+    float line_height = 1.2 * 24;
+    float max_width = 15.0f * 24;
+    float letter_spacing = 0;
+    vec2<float> translate {0, 0};
     float padding = 2.0f;
     float textMinDistance = 250.0f;
     float rotate = 0.0f; // what is this?
