@@ -55,6 +55,11 @@ bool SpriteAtlas::resize(const float newRatio) {
 
         free(old_data);
         dirty = true;
+
+        // Mark all sprite images as in need of update
+        for (const auto &pair : images) {
+            uninitialized.emplace(pair.first);
+        }
     }
 
     return dirty;
