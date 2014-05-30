@@ -183,6 +183,8 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
 
     util::utf8_to_utf32 ucs4conv;
 
+    std::vector<std::pair<std::u32string, pbf>> labels;
+
     // Determine and load glyph ranges
     {
         std::set<GlyphRange> ranges;
@@ -210,6 +212,8 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
             for (uint32_t chr : string) {
                 ranges.insert(getGlyphRange(chr));
             }
+
+            labels.emplace_back(string, feature.geometry);
         }
 
         glyphStore->waitForGlyphRanges(bucket_desc.geometry.font, ranges);
@@ -220,38 +224,18 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
     GlyphPositions face;
 
     // Shape and place all labels.
-    {
-        FilteredVectorTileLayer filtered_layer(layer, bucket_desc);
-        for (const pbf &feature_pbf : filtered_layer) {
-            if (obsolete())
-                return nullptr;
-            VectorTileFeature feature{feature_pbf, layer};
+    for (const std::pair<std::u32string, pbf> &label : labels) {
 
-            auto it_prop = feature.properties.find(bucket_desc.geometry.field);
-            if (it_prop == feature.properties.end()) {
-                // feature does not have the correct property
-                if (debug::labelTextMissingWarning) {
-                    fprintf(stderr,
-                            "[WARNING] feature doesn't have property '%s' required for labelling\n",
-                            bucket_desc.geometry.field.c_str());
-                }
-                continue;
-            }
+        // Shape labels.
+        const Shaping shaping = fontStack.getShaping(label.first, bucket_desc.geometry.max_width,
+                bucket_desc.geometry.line_height, bucket_desc.geometry.alignment,
+                bucket_desc.geometry.vertical_alignment, bucket_desc.geometry.letter_spacing);
 
-            const std::string source_string = toString(it_prop->second);
-            const std::u32string string = ucs4conv.convert(source_string);
+        // Place labels.
+        addGlyph(tile.id.to_uint64(), bucket_desc.geometry.font, label.first, fontStack, *glyphAtlas,
+                 face);
 
-            // Shape labels.
-            const Shaping shaping = fontStack.getShaping(string, bucket_desc.geometry.max_width,
-                    bucket_desc.geometry.line_height, bucket_desc.geometry.alignment, 
-                    bucket_desc.geometry.vertical_alignment, bucket_desc.geometry.letter_spacing);
-
-            // Place labels.
-            addGlyph(tile.id.to_uint64(), bucket_desc.geometry.font, string, fontStack, *glyphAtlas,
-                     face);
-
-            bucket->addFeature(feature.geometry, face, shaping);
-        }
+        bucket->addFeature(label.second, face, shaping);
     }
 
     return std::move(bucket);
