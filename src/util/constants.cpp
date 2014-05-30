@@ -22,6 +22,6 @@ const bool llmr::debug::renderTree = false;
 const bool llmr::debug::labelTextMissingWarning = false;
 const bool llmr::debug::missingFontStackWarning = false;
 const bool llmr::debug::missingFontFaceWarning = false;
-const bool llmr::debug::glyphWarning = true;
-const bool llmr::debug::shapingWarning = true;
+const bool llmr::debug::glyphWarning = false;
+const bool llmr::debug::shapingWarning = false;
 #endif
