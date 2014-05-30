@@ -96,6 +96,7 @@ public:
     float vertical_alignment = 0.5;
     float line_height = 1.2 * 24;
     float max_width = 15.0f * 24;
+    float letter_spacing = 0;
     vec2<float> translate {0, 0};
     float padding = 2.0f;
     float textMinDistance = 250.0f;

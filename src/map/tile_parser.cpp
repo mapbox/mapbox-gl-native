@@ -227,7 +227,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
             // Shape labels.
             const Shaping shaped = fontStack.getShaping(string, bucket_desc.geometry.max_width,
                     bucket_desc.geometry.line_height, bucket_desc.geometry.alignment, 
-                    bucket_desc.geometry.vertical_alignment);
+                    bucket_desc.geometry.vertical_alignment, bucket_desc.geometry.letter_spacing);
             shaping.emplace(toString(it_prop->second), shaped);
 
             // Place labels.

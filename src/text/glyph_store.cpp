@@ -30,7 +30,9 @@ const std::map<uint32_t, SDFGlyph> &FontStack::getSDFs() const {
 }
 
 const Shaping FontStack::getShaping(const std::u32string &string, const float &maxWidth,
-        const float &lineHeight, const float &alignment, const float &verticalAlignment) const {
+        const float &lineHeight, const float &alignment, const float &verticalAlignment,
+        const float &letterSpacing) const {
+
     std::lock_guard<std::mutex> lock(mtx);
     uint32_t i = 0;
     uint32_t x = 0;
@@ -40,7 +42,7 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float &m
         GlyphPlacement glyph = GlyphPlacement(0, chr, x, 0);
         shaped.push_back(glyph);
         i++;
-        x += metrics.find(chr)->second.advance;
+        x += metrics.find(chr)->second.advance + letterSpacing;
     }
 
     shaped = lineWrap(shaped, lineHeight, maxWidth, alignment, verticalAlignment);

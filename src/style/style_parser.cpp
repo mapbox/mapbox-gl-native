@@ -133,6 +133,12 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("max width must be a number");
             }
+        } else if (name == "letterSpacing") {
+            if (value.IsNumber()) {
+                bucket.geometry.letter_spacing = value.GetDouble() * 24;
+            } else {
+                throw Style::exception("letter spacing must be a number");
+            }
         } else if (name == "miterLimit") {
             if (value.IsNumber()) {
                 bucket.geometry.miter_limit = value.GetDouble();
