@@ -40,7 +40,10 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float &m
     for (uint32_t chr : string) {
         shaping.emplace_back(0, chr, x, 0);
         i++;
-        x += metrics.find(chr)->second.advance + letterSpacing;
+        auto metric = metrics.find(chr);
+        if (metric != metrics.end()) {
+            x += metric->second.advance + letterSpacing;
+        }
     }
 
     lineWrap(shaping, lineHeight, maxWidth, alignment, verticalAlignment);
