@@ -137,14 +137,11 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
 }
 
 void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
-                       Anchor &anchor, float advance, const Shaping &shaping,
+                       Anchor &anchor, vec2<float> origin, const Shaping &shaping,
                        const GlyphPositions &face, float fontScale,
                        bool horizontal, const std::vector<Coordinate> &line,
                        float maxAngleDelta, float rotate) {
     // The total text advance is the width of this label.
-
-    // TODO: figure out correct ascender height.
-    vec2<float> origin{-advance / 2, -17};
 
     // TODO: allow setting an alignment
     // var alignment = 'center';
@@ -261,10 +258,7 @@ void Placement::addFeature(TextBucket& bucket,
     const float fontScale =
         (tileExtent / util::tileSize) / (glyphSize / info.size);
 
-    const float advance = measureText(face, shaping);
     Anchors anchors;
-
-    // fprintf(stderr, "adding feature with advance %f\n", advance);
 
     if (line.size() == 1) {
         // Point labels
@@ -285,7 +279,7 @@ void Placement::addFeature(TextBucket& bucket,
         PlacedGlyphs glyphs;
         GlyphBoxes boxes;
 
-        getGlyphs(glyphs, boxes, anchor, advance, shaping, face, fontScale, horizontal,
+        getGlyphs(glyphs, boxes, anchor, info.translate, shaping, face, fontScale, horizontal,
                       line, maxAngleDelta, rotate);
         PlacementProperty place =
             collision.place(boxes, anchor, anchor.scale, maxPlacementScale,
@@ -294,17 +288,4 @@ void Placement::addFeature(TextBucket& bucket,
             bucket.addGlyphs(glyphs, place.zoom, place.rotationRange, zoom - zOffset);
         }
     }
-}
-
-float Placement::measureText(const GlyphPositions &face,
-                             const Shaping &shaping) {
-    float advance = 0;
-
-    // TODO: advance is not calculated correctly. we should instead use the
-    // bounding box of the glyph placement.
-    for (const GlyphPlacement &shape : shaping) {
-        advance += getGlyph(shape, face).metrics.advance;
-    }
-
-    return advance;
 }

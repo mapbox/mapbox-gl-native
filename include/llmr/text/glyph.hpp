@@ -51,8 +51,8 @@ public:
 
     uint32_t face = 0;
     uint32_t glyph = 0;
-    uint32_t x = 0;
-    uint32_t y = 0;
+    int32_t x = 0;
+    int32_t y = 0;
 };
 
 typedef std::vector<GlyphPlacement> Shaping;

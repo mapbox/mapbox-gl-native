@@ -28,23 +28,84 @@ const std::map<uint32_t, SDFGlyph> &FontStack::getSDFs() const {
     return sdfs;
 }
 
-const Shaping FontStack::getShaping(const std::u32string &string) const {
+const Shaping FontStack::getShaping(const std::u32string &string, const float &maxWidth,
+        const float &lineHeight, const float &alignment, const float &verticalAlignment,
+        const float &letterSpacing) const {
+
     std::lock_guard<std::mutex> lock(mtx);
     uint32_t i = 0;
     uint32_t x = 0;
-    Shaping shaped;
+    Shaping shaping;
     // Loop through all characters of this label and shape.
     for (uint32_t chr : string) {
         GlyphPlacement glyph = GlyphPlacement(0, chr, x, 0);
-        shaped.push_back(glyph);
+        shaping.push_back(glyph);
         i++;
+        x += metrics.find(chr)->second.advance + letterSpacing;
+    }
 
-        auto metrics_it = metrics.find(chr);
-        if (metrics_it != metrics.end()) {
-            x += metrics_it->second.advance;
+    lineWrap(shaping, lineHeight, maxWidth, alignment, verticalAlignment);
+
+    return shaping;
+}
+
+void alignVertically(Shaping &shaping, const uint32_t &lines, const float &lineHeight, const float &verticalAlign) {
+    const float dy = -(lineHeight * (lines - 1) + 24) * verticalAlign - 5;
+    for (GlyphPlacement &shape : shaping) {
+        shape.y += dy;
+    }
+}
+
+void alignHorizontally(Shaping &shaping, const std::map<uint32_t, GlyphMetrics> &metrics,
+        const uint32_t &start, const uint32_t &end, const float &alignment) {
+
+    uint32_t lastAdvance = metrics.find(shaping[end].glyph)->second.advance;
+    int32_t lineIndent = (shaping[end].x + lastAdvance) * alignment;
+
+    for (uint32_t j = start; j <= end; j++) {
+        shaping[j].x -= lineIndent;
+    }
+}
+
+Shaping FontStack::lineWrap(Shaping &shaping, const float &lineHeight, const float &maxWidth,
+        const float &alignment, const float &verticalAlignment) const {
+
+    uint32_t lastSafeBreak = 0;
+    uint32_t lengthBeforeCurrentLine = 0;
+    uint32_t lineStartIndex = 0;
+    uint32_t line = 0;
+
+    for (uint32_t i = 0; i < shaping.size(); i++) {
+        GlyphPlacement &shape = shaping[i];
+
+        shape.x -= lengthBeforeCurrentLine;
+        shape.y += lineHeight * line;
+
+        if (shape.x > maxWidth && lastSafeBreak != 0) {
+
+            uint32_t lineLength = shaping[lastSafeBreak + 1].x;
+
+            for (uint32_t k = lastSafeBreak + 1; k <= i; k++) {
+                shaping[k].y += lineHeight;
+                shaping[k].x -= lineLength;
+            }
+
+            if (alignment) {
+                alignHorizontally(shaping, metrics, lineStartIndex, lastSafeBreak - 1, alignment);
+            }
+
+            lineStartIndex = lastSafeBreak + 1;
+            lastSafeBreak = 0;
+            lengthBeforeCurrentLine += lineLength;
+            line++;
+        }
+        if (shape.glyph == 32) {
+            lastSafeBreak = i;
         }
     }
-    return shaped;
+
+    alignHorizontally(shaping, metrics, lineStartIndex, shaping.size() - 1, alignment);
+    alignVertically(shaping, line + 1, lineHeight, verticalAlignment);
 }
 
 GlyphPBF::GlyphPBF(const std::string &fontStack, GlyphRange glyphRange)

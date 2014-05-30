@@ -20,8 +20,6 @@ public:
                     const BucketGeometryDescription &info,
                     const GlyphPositions &face,
                     const Shaping &shaping);
-    float measureText(const GlyphPositions &face,
-                      const Shaping &shaping);
 
 private:
     const int8_t zoom;
