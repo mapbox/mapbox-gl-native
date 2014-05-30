@@ -264,13 +264,14 @@ module.exports = {
             "source": "outdoors",
             "layer": "contour",
             "field": "index",
-            "value": 10,
+            "value": [5, 10],
             "path": "curve",
-            "text_field": "{{ele}}m",
+            "text_field": "{{ele}} m",
             "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 10,
             "feature_type": "line",
-            "type": "text"
+            "type": "text",
+            "maxAngleDelta": 0.5
         },
         "building": {
             "source": "outdoors",
@@ -647,12 +648,13 @@ module.exports = {
         "country_label": {
             "source": "outdoors",
             "layer": "country_label",
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
-            "font": "Open Sans Bold, Arial Unicode MS Bold",
+            "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 24,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
+            "maxWidth": 5,
         },
         "country_label_line": {
             "source": "outdoors",
@@ -664,9 +666,9 @@ module.exports = {
             "layer": "marine_label",
             "feature_type": "line",
             "type": "text",
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "curve",
-            "font": "Open Sans Italic, Arial Unicode MS Regular",
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 16
         },
         "marine_label_point_1": {
@@ -674,83 +676,93 @@ module.exports = {
             "layer": "marine_label",
             "feature_type": "point",
             "type": "text",
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
             "field": "labelrank",
             "value": 1,
-            "font": "Open Sans Italic, Arial Unicode MS Regular",
-            "fontSize": 30
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
+            "fontSize": 30,
+            "maxWidth": 8,
+            "letterSpacing": 0.4,
+            "lineHeight": 2,
         },
         "marine_label_point_2": {
             "source": "outdoors",
             "layer": "marine_label",
             "feature_type": "point",
             "type": "text",
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
             "field": "labelrank",
             "value": 2,
-            "font": "Open Sans Italic, Arial Unicode MS Regular",
-            "fontSize": 24
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
+            "fontSize": 24,
+            "maxWidth": 8,
+            "letterSpacing": 0.4,
+            "lineHeight": 1.5,
         },
         "marine_label_point_other": {
             "source": "outdoors",
             "layer": "marine_label",
             "feature_type": "point",
             "type": "text",
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
             "field": "labelrank",
             "value": [3,4,5,6],
-            "font": "Open Sans Italic, Arial Unicode MS Regular",
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 18
         },
         "state_label": {
             "source": "outdoors",
             "layer": "state_label",
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
             "font": "Open Sans Regular, Arial Unicode MS Regular",
             "fontSize": 16,
             "feature_type": "point",
             "type": "text",
-            "enabled": 4
+            "enabled": 4,
+            "maxWidth": 8
         },
         "place_label_city": {
             "source": "outdoors",
             "layer": "place_label",
             "field": "type",
             "value": "city",
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 20,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
+            "maxWidth": 8
         },
         "place_label_town": {
             "source": "outdoors",
             "layer": "place_label",
             "field": "type",
             "value": "town",
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 24,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
+            "maxWidth": 8
         },
         "place_label_village": {
             "source": "outdoors",
             "layer": "place_label",
             "field": "type",
             "value": "village",
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 22,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
+            "maxWidth": 8
         },
         "place_label_other": {
             "source": "outdoors",
@@ -761,20 +773,20 @@ module.exports = {
                 "suburb",
                 "neighbourhood"
             ],
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 18,
             "maxWidth": 6,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
         },
         "road_label_1": {
             "source": "outdoors",
             "layer": "road_label",
             "field": "class",
             "value": ["motorway","main"],
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "curve",
             "padding": 2,
             "font": "Open Sans Regular, Arial Unicode MS Regular",
@@ -788,7 +800,7 @@ module.exports = {
             "layer": "road_label",
             "field": "class",
             "value": ["street","street_limited"],
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "curve",
             "padding": 2,
             "font": "Open Sans Regular, Arial Unicode MS Regular",
@@ -802,7 +814,7 @@ module.exports = {
             "layer": "road_label",
             "field": "class",
             "value": ["service","driveway","path"],
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "curve",
             "padding": 2,
             "font": "Open Sans Regular, Arial Unicode MS Regular",
@@ -814,23 +826,24 @@ module.exports = {
         "water_label": {
             "source": "outdoors",
             "layer": "water_label",
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
             "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 12,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
+            "maxWidth": 8
         },
         "waterway_label": {
             "source": "outdoors",
             "layer": "waterway_label",
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "curve",
             "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 12,
-            "textMinDistance": 15,
             "feature_type": "line",
-            "type": "text"
+            "type": "text",
+            "maxAngleDelta": 0.5
         },
         "poi": {
             "source": "outdoors",
@@ -876,48 +889,48 @@ module.exports = {
                 1,
                 2
             ],
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
             "padding": 2,
-            "maxWidth": 8,
+            "maxWidth": 10,
             "verticalAlignment": "top",
             "translate": [0, -1],
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
-            "fontSize": 11,
+            "fontSize": 12,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
         },
         "poi_label_3": {
             "source": "outdoors",
             "layer": "poi_label",
             "field": "scalerank",
             "value": 3,
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
             "padding": 2,
-            "maxWidth": 8,
+            "maxWidth": 10,
             "verticalAlignment": "top",
             "translate": [0, -1],
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
-            "fontSize": 10,
+            "fontSize": 11,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
         },
         "poi_label_4": {
             "source": "outdoors",
             "layer": "poi_label",
             "field": "scalerank",
             "value": 4,
-            "text_field": "{{name}}",
+            "text_field": "{{name_en}}",
             "path": "horizontal",
             "padding": 2,
-            "maxWidth": 8,
+            "maxWidth": 10,
             "verticalAlignment": "top",
             "translate": [0, -1],
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
             "fontSize": 10,
             "feature_type": "point",
-            "type": "text"
+            "type": "text",
         }
     },
     "structure": [
@@ -1462,7 +1475,7 @@ module.exports = {
         "street": "#fff",
         "text": "#666",
         "text_stroke": "rgba(255,255,255,0.8)",
-        "country_text": "#333",
+        "country_text": "#222",
         "marine_text": "#a0bdc0",
         "water_text": "#185869",
 
@@ -1485,6 +1498,7 @@ module.exports = {
 
         "admin_night": "#ffb680",
         "text_night": "#fff",
+        "text_water_night": "#2a5b8a",
         "text_stroke_night": "#103",
         "text2_stroke_night": "rgba(1,69,89,0.8)",
 
@@ -1714,6 +1728,17 @@ module.exports = {
             "stops",
             {"z": 1, "val": 14},
             {"z": 12, "val": 24}
+        ],
+        "poi_label_1-2_size": [
+            "stops",
+            {"z": 15, "val": 10},
+            {"z": 16, "val": 11},
+            {"z": 17, "val": 12}
+        ],
+        "poi_label_3_size": [
+            "stops",
+            {"z": 16, "val": 10},
+            {"z": 17, "val": 11}
         ]
     },
     "classes": [
@@ -1872,9 +1897,11 @@ module.exports = {
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
-                        {"z": 15, "val": 0.075},
+                        {"z": 15, "val": 0.08},
+                        {"z": 16, "val": 0.075},
                         {"z": 17, "val": 0.05},
-                        {"z": 18, "val": 0.025}
+                        {"z": 18, "val": 0.05},
+                        {"z": 19, "val": 0.025}
                     ]
                 },
                 "hillshade_medium_shadow": {
@@ -1885,9 +1912,11 @@ module.exports = {
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
-                        {"z": 15, "val": 0.075},
+                        {"z": 15, "val": 0.08},
+                        {"z": 16, "val": 0.075},
                         {"z": 17, "val": 0.05},
-                        {"z": 18, "val": 0.025}
+                        {"z": 18, "val": 0.05},
+                        {"z": 19, "val": 0.025}
                     ]
                 },
                 "hillshade_full_highlight": {
@@ -1899,8 +1928,10 @@ module.exports = {
                     "opacity": [
                         "stops",
                         {"z": 15, "val": 0.3},
+                        {"z": 16, "val": 0.3},
                         {"z": 17, "val": 0.2},
-                        {"z": 18, "val": 0.1}
+                        {"z": 18, "val": 0.2},
+                        {"z": 19, "val": 0.1}
                     ]
                 },
                 "hillshade_medium_highlight": {
@@ -1912,8 +1943,10 @@ module.exports = {
                     "opacity": [
                         "stops",
                         {"z": 15, "val": 0.3},
+                        {"z": 16, "val": 0.3},
                         {"z": 17, "val": 0.2},
-                        {"z": 18, "val": 0.1}
+                        {"z": 18, "val": 0.2},
+                        {"z": 19, "val": 0.1}
                     ]
                 },
                 "contour_line_loud": {
@@ -1933,6 +1966,13 @@ module.exports = {
                         {"z": 12, "val": 0.05},
                         {"z": 13, "val": 0.11}
                     ]
+                },
+                "contour_label": {
+                    "color": "text",
+                    "stroke": "land",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 3,
+                    "size": 10
                 },
                 "water": {
                     "color": "water",
@@ -2421,14 +2461,14 @@ module.exports = {
                 },
                 "poi_label_1-2": {
                     "color": "#444",
-                    "size": 11,
+                    "size": "poi_label_1-2_size",
                     "stroke": "land",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
                 },
                 "poi_label_3": {
                     "color": "#444",
-                    "size": 10,
+                    "size": "poi_label_3_size",
                     "stroke": "land",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
@@ -2623,7 +2663,8 @@ module.exports = {
                         "stops",
                         {"z": 16, "val": 0.3},
                         {"z": 17, "val": 0.2},
-                        {"z": 18, "val": 0.1}
+                        {"z": 18, "val": 0.1},
+                        {"z": 19, "val": 0.05}
                     ]
                 },
                 "hillshade_medium_shadow": {
@@ -2636,7 +2677,8 @@ module.exports = {
                         "stops",
                         {"z": 16, "val": 0.3},
                         {"z": 17, "val": 0.2},
-                        {"z": 18, "val": 0.1}
+                        {"z": 18, "val": 0.1},
+                        {"z": 19, "val": 0.05}
                     ]
                 },
                 "hillshade_full_highlight": {
@@ -2650,7 +2692,8 @@ module.exports = {
                         {"z": 14, "val": 0.4},
                         {"z": 15, "val": 0.3},
                         {"z": 17, "val": 0.2},
-                        {"z": 18, "val": 0.1}
+                        {"z": 18, "val": 0.1},
+                        {"z": 19, "val": 0.05}
                     ]
                 },
                 "hillshade_medium_highlight": {
@@ -2663,7 +2706,8 @@ module.exports = {
                         "stops",
                         {"z": 15, "val": 0.3},
                         {"z": 17, "val": 0.2},
-                        {"z": 18, "val": 0.15}
+                        {"z": 18, "val": 0.15},
+                        {"z": 19, "val": 0.05}
                     ]
                 },
                 "contour_line_loud": {
@@ -2683,6 +2727,13 @@ module.exports = {
                         {"z": 12, "val": 0.1},
                         {"z": 13, "val": 0.4}
                     ]
+                },
+                "contour_label": {
+                    "color": "contour_night",
+                    "stroke": "land_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 3,
+                    "size": 10
                 },
                 "water": {
                     "color": "water_night",
@@ -3007,7 +3058,8 @@ module.exports = {
                 "country_label": {
                     "color": "text_night",
                     "stroke": "text2_stroke_night",
-                    "strokeWidth": 0.5,
+                    "strokeWidth": 0.4,
+                    "strokeBlur": 2,
                     "size": "country_label_size"
                 },
                 "country_label_line": {
@@ -3041,7 +3093,7 @@ module.exports = {
                     "stroke": "water_night"
                 },
                 "marine_label_point_other": {
-                    "color": "#a9c4c7",
+                    "color": "water_dark_night",
                     "size": ["stops",
                         {"z": 3, "val": 12},
                         {"z": 4, "val": 13},
@@ -3139,14 +3191,12 @@ module.exports = {
                     "size": "road_label_3_size"
                 },
                 "water_label": {
-                    "color": "water_dark_night",
-                    "strokeWidth": 0.8,
-                    "stroke": "text2_stroke_night"
+                    "color": "text_water_night",
+                    "stroke": "water_night",
                 },
                 "waterway_label": {
-                    "color": "water_dark_night",
-                    "strokeWidth": 0.8,
-                    "stroke": "text2_stroke_night"
+                    "color": "text_water_night",
+                    "stroke": "water_night",
                 },
                 "poi": {
                     "color": "white",
@@ -3170,14 +3220,14 @@ module.exports = {
                 },
                 "poi_label_1-2": {
                     "color": "#fff",
-                    "size": 11,
+                    "size": "poi_label_1-2_size",
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
-                    "strokeBlur": 1,
+                    "strokeBlur": 1
                 },
                 "poi_label_3": {
                     "color": "#fff",
-                    "size": 10,
+                    "size": "poi_label_3_size",
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
                     "strokeBlur": 1,
@@ -3197,7 +3247,7 @@ module.exports = {
                     ],
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
-                    "strokeBlur": 1,
+                    "strokeBlur": 1
                 },
                 "poi_aerodrome": {
                     "opacity": ["stops",
