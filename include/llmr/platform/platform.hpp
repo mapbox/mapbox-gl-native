@@ -7,6 +7,10 @@
 
 typedef struct uv_loop_s uv_loop_t;
 
+namespace uv {
+class loop;
+}
+
 namespace llmr {
 
 extern const char *kSpriteURL;
@@ -29,7 +33,7 @@ struct Response {
 // Returns a cancellable request.
 std::shared_ptr<Request> request_http(const std::string &url,
                                       std::function<void(Response *)> callback,
-                                      uv_loop_t *loop = nullptr);
+                                      std::shared_ptr<uv::loop> loop = nullptr);
 
 // Cancels an HTTP request.
 void cancel_request_http(const std::shared_ptr<Request> &req);

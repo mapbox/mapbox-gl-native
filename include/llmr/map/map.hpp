@@ -102,7 +102,7 @@ public:
     inline std::shared_ptr<GlyphStore> getGlyphStore() { return glyphStore; }
     inline std::shared_ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
     inline std::shared_ptr<Texturepool> getTexturepool() { return texturepool; }
-    inline uv_loop_t *getLoop() { return loop; }
+    inline std::shared_ptr<uv::loop> getLoop() { return loop; }
     inline time getAnimationTime() const { return animationTime; }
     inline const Sources &getSources() { return sources; }
 
@@ -168,7 +168,7 @@ private:
 
 private:
     bool async = false;
-    uv_loop_t *loop = nullptr;
+    std::shared_ptr<uv::loop> loop;
     uv_thread_t thread;
     uv_async_t *async_terminate = nullptr;
     uv_async_t *async_render = nullptr;

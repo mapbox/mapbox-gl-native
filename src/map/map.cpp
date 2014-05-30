@@ -9,6 +9,7 @@
 #include <llmr/util/clip_ids.hpp>
 #include <llmr/util/string.hpp>
 #include <llmr/util/constants.hpp>
+#include <llmr/util/uv.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -25,7 +26,7 @@ Map::Map(View& view)
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
       painter(*this),
-      loop(uv_loop_new()) {
+      loop(std::make_shared<uv::loop>()) {
 
     view.initialize(this);
 
@@ -39,9 +40,6 @@ Map::~Map() {
     if (async) {
         stop();
     }
-
-    uv_loop_delete(loop);
-    loop = nullptr;
 }
 
 void Map::start() {
@@ -51,15 +49,15 @@ void Map::start() {
 
     // Setup async notifications
     async_terminate = new uv_async_t();
-    uv_async_init(loop, async_terminate, terminate);
-    async_terminate->data = loop;
+    uv_async_init(**loop, async_terminate, terminate);
+    async_terminate->data = **loop;
 
     async_render = new uv_async_t();
-    uv_async_init(loop, async_render, render);
+    uv_async_init(**loop, async_render, render);
     async_render->data = this;
 
     async_cleanup = new uv_async_t();
-    uv_async_init(loop, async_cleanup, cleanup);
+    uv_async_init(**loop, async_cleanup, cleanup);
     async_cleanup->data = this;
 
     uv_thread_create(&thread, [](void *arg) {
@@ -80,7 +78,7 @@ void Map::stop() {
     async_cleanup = nullptr;
 
     // Run the event loop once to make sure our async delete handlers are called.
-    uv_run(loop, UV_RUN_ONCE);
+    uv_run(**loop, UV_RUN_ONCE);
 
     async = false;
 }
@@ -92,7 +90,7 @@ void Map::delete_async(uv_handle_t *handle) {
 void Map::run() {
     setup();
     prepare();
-    uv_run(loop, UV_RUN_DEFAULT);
+    uv_run(**loop, UV_RUN_DEFAULT);
 
     // If the map rendering wasn't started asynchronously, we perform one render
     // *after* all events have been processed.

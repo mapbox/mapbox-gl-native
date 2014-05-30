@@ -89,7 +89,7 @@ class CURLRequest : public llmr::platform::Request {
 public:
     CURLRequest(const std::string &url,
                 std::function<void(llmr::platform::Response *)> callback,
-                uv_loop_t *loop)
+                std::shared_ptr<uv::loop> loop)
         : Request(url, callback, loop) {}
 
     CURL *curl = nullptr;
@@ -358,7 +358,7 @@ void thread_init_cb() {
 std::shared_ptr<platform::Request>
 platform::request_http(const std::string &url,
                        std::function<void(Response *)> callback,
-                       uv_loop_t *loop) {
+                       std::shared_ptr<uv::loop> loop) {
     using namespace request;
     init_thread_once(thread_init_cb);
     std::shared_ptr<CURLRequest> req = std::make_shared<CURLRequest>(url, callback, loop);
