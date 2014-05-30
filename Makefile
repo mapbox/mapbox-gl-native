@@ -4,7 +4,12 @@ BUILDTYPE ?= Release
 PYTHON ?= python
 V ?= 1
 
-all: llmr
+all: setup
+
+setup: config.gypi
+
+config.gypi:
+	./setup-libraries.sh
 
 # Builds the regular library
 llmr: config.gypi llmr.gyp node
@@ -95,6 +100,8 @@ lproj: config.gypi linux/llmr-app.gyp clear_xcode_cache node
 clean: clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
+	-rm -rf ./config.mk
+	-rm -rf ./config.gypi
 
 distclean: clean
 	-rm -rf ./config.mk

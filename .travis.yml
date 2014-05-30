@@ -22,7 +22,7 @@ before_install:
 - sudo apt-get -y install libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev
 
 install:
-- ./setup-libraries.sh
+- make setup
 - rm -rf mapnik-packaging/out/packages
 
 

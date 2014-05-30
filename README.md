@@ -19,12 +19,19 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 We use [mapnik-packaging](https://github.com/mapnik/mapnik-packaging) to build static libraries of
 dependencies.
 
+First off: if you hit problems during development try:
+
+    make clean
+
+This will clear cached build data and update to the latest versions of dependencies.
+
 ## OS X
 
-Run `./setup-libraries.sh`
+First run:
 
-This downloads all required dependencies, builds them and creates universal libraries that can be
-used on both OS X and iOS.
+    make setup
+
+This downloads all required dependencies, builds them and creates universal libraries that can be used on both OS X and iOS.
 
 To create projects, you can run:
 - `make xproj`: Creates an Xcode project with OS X-specific handlers for HTTP downloads and
@@ -43,9 +50,11 @@ First, pull down the submodule(s):
     git submodule init
     git submodule update
 
-Then, because `libpng` isn't included in the iOS SDK, you will need to build a cross-architecture version
-yourself. Run `./setup-libraries.sh`, which is derived from Mapnik's cross-architecture build
-scripts. This will also run `./configure`.
+Then run:
+
+    make setup
+
+This downloads all required dependencies, builds them and creates universal libraries that can be used on both OS X and iOS.
 
 Lastly, `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. 
 
@@ -68,13 +77,15 @@ Install glfw3 dependencies:
 
     sudo apt-get install libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev
 
-Build static dependencies:
+Then run:
 
-    ./setup-libraries.sh
+    make setup
 
-This will automatically run configure for you and set the correct paths.
+This downloads all required dependencies, builds them and creates universal libraries that can be used on both OS X and iOS.
 
-You can then proceed to build the library, tests, or a GLFW app itself.
+You can then proceed to build the library like:
+
+    make linux
 
 # Style
 
@@ -82,7 +93,7 @@ We're currently embedding the stylesheet JSON in the binary. To create the C++
 file and the associated header, run
 
 ```
-bin/build-style.js
+node bin/build-style.js
 ```
 
 This is automatically taken care of as a build phase.
