@@ -3203,7 +3203,7 @@ module.exports = {
                         {"z": 5, "val": 30},
                         {"z": 22, "val": 30}
                     ],
-                    "stroke": "water"
+                    "stroke": "water_night"
                 },
                 "marine_label_line_2": {
                     "color": "water_dark_night",
@@ -3214,7 +3214,7 @@ module.exports = {
                         {"z": 6, "val": 24},
                         {"z": 22, "val": 24}
                     ],
-                    "stroke": "water"
+                    "stroke": "water_night"
                 },
                 "marine_label_line_3": {
                     "color": "water_dark_night",
@@ -3225,7 +3225,7 @@ module.exports = {
                         {"z": 6, "val": 18},
                         {"z": 22, "val": 18}
                     ],
-                    "stroke": "water"
+                    "stroke": "water_night"
                 },
                 "marine_label_line_other": {
                     "color": "water_dark_night",
@@ -3235,7 +3235,7 @@ module.exports = {
                         {"z": 6, "val": 16},
                         {"z": 22, "val": 16}
                     ],
-                    "stroke": "water"
+                    "stroke": "water_night"
                 },
                 "marine_label_point_1": {
                     "color": "water_dark_night",
@@ -3245,7 +3245,7 @@ module.exports = {
                         {"z": 5, "val": 30},
                         {"z": 22, "val": 30}
                     ],
-                    "stroke": "water"
+                    "stroke": "water_night"
                 },
                 "marine_label_point_2": {
                     "color": "water_dark_night",
@@ -3256,7 +3256,7 @@ module.exports = {
                         {"z": 6, "val": 24},
                         {"z": 22, "val": 24}
                     ],
-                    "stroke": "water"
+                    "stroke": "water_night"
                 },
                 "marine_label_point_3": {
                     "color": "water_dark_night",
@@ -3267,7 +3267,7 @@ module.exports = {
                         {"z": 6, "val": 18},
                         {"z": 22, "val": 18}
                     ],
-                    "stroke": "water"
+                    "stroke": "water_night"
                 },
                 "marine_label_point_other": {
                     "color": "water_dark_night",
@@ -3277,7 +3277,7 @@ module.exports = {
                         {"z": 6, "val": 16},
                         {"z": 22, "val": 16}
                     ],
-                    "stroke": "water"
+                    "stroke": "water_night"
                 },
                 "state_label": {
                     "color": "#fff",
