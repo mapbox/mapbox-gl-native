@@ -44,7 +44,7 @@ To create projects, you can run:
 
 ## iOS
 
-iOS makes use of a Cocoa-specific API currently housed in [MVKMapKit](https://github.com/mapbox/MVKMapKit), 
+iOS makes use of a Cocoa-specific API called [mapbox-gl-cocoa](https://github.com/mapbox/mapbox-gl-cocoa), 
 which is included as a submodule and provides a `UIView` interface to the map view and some bundle resources. 
 
 First, pull down the submodule(s): 

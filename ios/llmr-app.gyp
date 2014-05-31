@@ -14,10 +14,10 @@
             "./MBXAppDelegate.m",
             "./MBXViewController.h",
             "./MBXViewController.mm",
-            '<!@(find MVKMapKit/MVKMapKit -type f -name "MVKMapView.*")',
-            '<!@(find MVKMapKit/MVKMapKit -type f -name "MVKStyleFunctionValue.*")',
-            '<!@(find MVKMapKit/MVKMapKit -type f -name "MVKTypes.*")',
-            '<!@(find MVKMapKit/MVKMapKit -type f -name "*+MVKAdditions.*")',
+            '<!@(find mapbox-gl-cocoa/mapbox-gl-cocoa -type f -name "MGLMapView.*")',
+            '<!@(find mapbox-gl-cocoa/mapbox-gl-cocoa -type f -name "MGLStyleFunctionValue.*")',
+            '<!@(find mapbox-gl-cocoa/mapbox-gl-cocoa -type f -name "MGLTypes.*")',
+            '<!@(find mapbox-gl-cocoa/mapbox-gl-cocoa -type f -name "*+MGLAdditions.*")',
             "../common/settings_nsuserdefaults.hpp",
             "../common/settings_nsuserdefaults.mm",
             "../common/foundation_request.h",
@@ -27,7 +27,7 @@
         'mac_bundle': 1,
         'mac_bundle_resources': [
           '<!@(find img -type f)',
-          '<!@(find MVKMapKit/MVKMapKit/Resources -type f)',
+          '<!@(find mapbox-gl-cocoa/mapbox-gl-cocoa/Resources -type f)',
           '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
         ],
         'link_settings': {

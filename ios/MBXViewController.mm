@@ -1,6 +1,6 @@
 #import "MBXViewController.h"
 
-#import "MVKMapView.h"
+#import "MGLMapView.h"
 
 #import "../common/settings_nsuserdefaults.hpp"
 
@@ -8,7 +8,7 @@
 
 @interface MBXViewController () <CLLocationManagerDelegate>
 
-@property (nonatomic) MVKMapView *mapView;
+@property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) BOOL debug;
 @property (nonatomic) UIView *palette;
 @property (nonatomic) CLLocationManager *locationManager;
@@ -38,7 +38,7 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
 {
     [super viewDidLoad];
 
-    self.mapView = [[MVKMapView alloc] initWithFrame:self.view.bounds];
+    self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:self.mapView];
 
