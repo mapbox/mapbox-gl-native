@@ -174,23 +174,18 @@ void Map::setup() {
                            14,
                            true)));
 
-    sources.emplace("satellite",
-                    std::unique_ptr<Source>(new Source(*this,
-                           painter,
-                           "https://a.tiles.mapbox.com/v3/justin.hh0gkdfm/%d/%d/%d%s.png256",
-                           Source::Type::raster,
-                           {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }},
-                           256,
-                           0,
-                           21,
-                           false)));
-
-    loadStyle(resources::style, resources::style_size);
+    setStyleJSON(styleJSON);
 }
 
-void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
-    style->loadJSON(data, bytes);
+void Map::setStyleJSON(std::string newStyleJSON) {
+    styleJSON.swap(newStyleJSON);
+    style->cancelTransitions();
+    style->loadJSON((const uint8_t *)styleJSON.c_str());
     update();
+}
+
+std::string Map::getStyleJSON() const {
+    return styleJSON;
 }
 
 #pragma mark - Size
@@ -388,23 +383,43 @@ bool Map::getDebug() const {
     return debug;
 }
 
-void Map::toggleRaster() {
-    style->setDefaultTransitionDuration(300);
+void Map::toggleStyle() {
+    setDefaultTransitionDuration(300);
     style->cancelTransitions();
 
-    auto it = sources.find("satellite");
-    if (it != sources.end()) {
-        Source &satellite_source = *it->second;
-        if (satellite_source.enabled) {
-            satellite_source.enabled = false;
-            style->appliedClasses.erase("satellite");
-        } else {
-            satellite_source.enabled = true;
-            style->appliedClasses.insert("satellite");
+    if (style->appliedClasses.size() == 1) {
+        for (auto source_it = style->classes.begin(); source_it != style->classes.end(); source_it++) {
+            if (source_it->first != "default") {
+                style->appliedClasses.insert(source_it->first);
+                break;
+            }
+        }
+    } else {
+        for (auto source_it = style->classes.begin(); source_it != style->classes.end(); source_it++) {
+            if (source_it->first != "default") {
+                style->appliedClasses.erase(source_it->first);
+                break;
+            }
         }
     }
 
     update();
+}
+
+void Map::setAppliedClasses(std::set<std::string> appliedClasses) {
+    style->cancelTransitions();
+
+    style->appliedClasses.swap(appliedClasses);
+
+    update();
+}
+
+std::set<std::string> Map::getAppliedClasses() const {
+    return style->appliedClasses;
+}
+
+void Map::setDefaultTransitionDuration(uint64_t duration_milliseconds) {
+    style->setDefaultTransitionDuration(duration_milliseconds);
 }
 
 void Map::updateTiles() {

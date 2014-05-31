@@ -21,6 +21,7 @@
       'mac_bundle': 1,
       'mac_bundle_resources': [
         'Icon.icns',
+        '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
       ],
       'xcode_settings': {
         'SDKROOT': 'macosx',

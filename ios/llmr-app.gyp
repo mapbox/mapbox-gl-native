@@ -14,8 +14,10 @@
             "./MBXAppDelegate.m",
             "./MBXViewController.h",
             "./MBXViewController.mm",
-            "./MVKMapKit/MVKMapKit/MVKMapView.h",
-            "./MVKMapKit/MVKMapKit/MVKMapView.mm",
+            '<!@(find MVKMapKit/MVKMapKit -type f -name "MVKMapView.*")',
+            '<!@(find MVKMapKit/MVKMapKit -type f -name "MVKStyleFunctionValue.*")',
+            '<!@(find MVKMapKit/MVKMapKit -type f -name "MVKTypes.*")',
+            '<!@(find MVKMapKit/MVKMapKit -type f -name "*+MVKAdditions.*")',
             "../common/settings_nsuserdefaults.hpp",
             "../common/settings_nsuserdefaults.mm",
             "../common/foundation_request.h",
@@ -25,7 +27,8 @@
         'mac_bundle': 1,
         'mac_bundle_resources': [
           '<!@(find img -type f)',
-          '<!@(find MVKMapKit/MVKMapKit/Resources -type f)'
+          '<!@(find MVKMapKit/MVKMapKit/Resources -type f)',
+          '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
         ],
         'link_settings': {
           'libraries': [

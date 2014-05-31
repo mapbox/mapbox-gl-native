@@ -2628,7 +2628,7 @@ module.exports = {
             }
         },
         {
-            "name": "satellite",
+            "name": "night",
             "layers": {
                 "background": {
                     "color": "land_night"

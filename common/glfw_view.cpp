@@ -74,7 +74,7 @@ void GLFWView::key(GLFWwindow *window, int key, int /*scancode*/, int action, in
             break;
         case GLFW_KEY_R:
             if (!mods)
-                view->map->toggleRaster();
+                view->map->toggleStyle();
             break;
         case GLFW_KEY_N:
             if (!mods)
