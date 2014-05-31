@@ -39,6 +39,8 @@ private:
     RasterClass parseRasterClass(JSVal value);
     CompositeClass parseCompositeClass(JSVal value);
 
+    PropertyFilterExpression parseFilterOrExpression(JSVal value);
+
     bool parseBoolean(JSVal value);
     std::string parseString(JSVal value);
     JSVal replaceConstant(JSVal value);

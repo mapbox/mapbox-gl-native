@@ -5,6 +5,7 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/style/value.hpp>
 #include <llmr/text/glyph.hpp>
+#include <llmr/map/filter_expression.hpp>
 #include <vector>
 #include <map>
 #include <unordered_map>
@@ -14,8 +15,6 @@
 namespace llmr {
 
 class BucketDescription;
-class BucketExpression;
-class BucketFilter;
 class VectorTileLayer;
 
 struct pbf;
@@ -56,8 +55,9 @@ public:
         const pbf& operator*() const;
 
     private:
-        bool matchesExpression(const BucketExpression &expression, const pbf &tags_pbf);
-        bool matchesFilter(const BucketFilter &filter, const pbf &tags_pbf);
+        bool matchesFilterExpression(const PropertyFilterExpression &filterExpression, const pbf &tags_pbf);
+        bool matchesExpression(const PropertyExpression &expression, const pbf &tags_pbf);
+        bool matchesFilter(const PropertyFilter &filter, const pbf &tags_pbf);
 
     private:
         const FilteredVectorTileLayer& parent;

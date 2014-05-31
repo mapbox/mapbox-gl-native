@@ -5,8 +5,9 @@
 #include <vector>
 #include <cmath>
 
-#include "value.hpp"
-#include "../util/vec.hpp"
+#include <llmr/util/vec.hpp>
+#include <llmr/map/filter_expression.hpp>
+#include <llmr/style/value.hpp>
 
 namespace llmr {
 
@@ -36,16 +37,6 @@ enum class JoinType {
 enum class TextPathType {
     Horizontal = 0,
     Curve = 1
-};
-
-enum class FilterOperator {
-    Equal,
-    NotEqual
-};
-
-enum class ExpressionOperator {
-    Or,
-    And
 };
 
 
@@ -91,22 +82,6 @@ inline float verticalAlignmentType(const std::string& alignment) {
     else return 0.5;
 };
 
-inline FilterOperator filterOperatorType(const std::string &op) {
-    if (op == "!=" || op == "not") {
-        return FilterOperator::NotEqual;
-    } else {
-        return FilterOperator::Equal;
-    }
-}
-
-inline ExpressionOperator expressionOperatorType(const std::string &op) {
-    if (op == "&&" || op == "and") {
-        return ExpressionOperator::And;
-    } else {
-        return ExpressionOperator::Or;
-    }
-}
-
 
 class BucketGeometryDescription {
 public:
@@ -133,41 +108,6 @@ public:
 };
 
 
-class BucketFilter {
-public:
-    inline BucketFilter(const std::string &field, const Value &value) : field(field), value(value) {};
-
-    // Returns true if the filter passes, even if the key is missing.
-    inline bool isMissingFieldOkay() const {
-        switch (op) {
-        case FilterOperator::NotEqual:
-            return true;
-        default:
-            return false;
-        }
-    }
-
-    inline bool compare(const Value &other) const {
-        switch (op) {
-        case FilterOperator::NotEqual:
-            return !util::relaxed_equal(value)(other);
-        default:
-            return util::relaxed_equal(value)(other);
-        }
-    }
-
-public:
-    std::string field;
-    Value value;
-    FilterOperator op = FilterOperator::Equal;
-};
-
-class BucketExpression {
-public:
-    ExpressionOperator op = ExpressionOperator::Or;
-    std::vector<BucketFilter> operands;
-};
-
 class BucketDescription {
 public:
     BucketType feature_type = BucketType::None;
@@ -177,7 +117,7 @@ public:
     std::string source_name;
     std::string source_layer;
 
-    BucketExpression filter;
+    PropertyFilterExpression filter;
 
     // Specifies how the geometry for this bucket should be created
     BucketGeometryDescription geometry;

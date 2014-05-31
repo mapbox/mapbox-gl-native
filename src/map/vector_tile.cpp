@@ -122,9 +122,18 @@ FilteredVectorTileLayer::iterator::iterator(const FilteredVectorTileLayer& paren
     operator++();
 }
 
-bool FilteredVectorTileLayer::iterator::matchesFilter(const BucketFilter &filter, const pbf &const_tags_pbf) {
-    bool missing = true;
+bool FilteredVectorTileLayer::iterator::matchesFilterExpression(const PropertyFilterExpression &filterExpression, const pbf &tags_pbf) {
+    if (filterExpression.is<PropertyFilter>()) {
+        return matchesFilter(filterExpression.get<PropertyFilter>(), tags_pbf);
+    } else if (filterExpression.is<util::recursive_wrapper<PropertyExpression>>()) {
+        return matchesExpression(filterExpression.get<util::recursive_wrapper<PropertyExpression>>().get(), tags_pbf);
+    } else {
+        return false;
+    }
+}
 
+
+bool FilteredVectorTileLayer::iterator::matchesFilter(const PropertyFilter &filter, const pbf &const_tags_pbf) {
     auto field_it = parent.layer.key_index.find(filter.field);
     if (field_it != parent.layer.key_index.end()) {
         const uint32_t filter_key = field_it->second;
@@ -157,17 +166,17 @@ bool FilteredVectorTileLayer::iterator::matchesFilter(const BucketFilter &filter
     return filter.isMissingFieldOkay();
 }
 
-bool FilteredVectorTileLayer::iterator::matchesExpression(const BucketExpression &expression, const pbf &tags_pbf) {
+bool FilteredVectorTileLayer::iterator::matchesExpression(const PropertyExpression &expression, const pbf &tags_pbf) {
     if (expression.op == ExpressionOperator::Or) {
-        for (const BucketFilter &filter : expression.operands) {
-            if (matchesFilter(filter, tags_pbf)) {
+        for (const PropertyFilterExpression &filterExpression : expression.operands) {
+            if (matchesFilterExpression(filterExpression, tags_pbf)) {
                 return true;
             }
         }
         return false;
     } else if (expression.op == ExpressionOperator::And) {
-        for (const BucketFilter &filter : expression.operands) {
-            if (!matchesFilter(filter, tags_pbf)) {
+        for (const PropertyFilterExpression &filterExpression : expression.operands) {
+            if (!matchesFilterExpression(filterExpression, tags_pbf)) {
                 return false;
             }
         }
@@ -182,7 +191,7 @@ bool FilteredVectorTileLayer::iterator::matchesExpression(const BucketExpression
 void FilteredVectorTileLayer::iterator::operator++() {
     valid = false;
 
-    BucketExpression expression = parent.bucket_desc.filter;
+    const PropertyFilterExpression &expression = parent.bucket_desc.filter;
 
     while (data.next(2)) { // feature
         feature = data.message();
@@ -192,7 +201,7 @@ void FilteredVectorTileLayer::iterator::operator++() {
         bool matched = false;
 
         // Treat the absence of any expression filters as a match.
-        if (expression.operands.size() == 0) {
+        if (expression.is<util::recursive_wrapper<PropertyExpression>>() && expression.get<util::recursive_wrapper<PropertyExpression>>().get().operands.size() == 0) {
             matched = true;
         }
 
@@ -204,7 +213,7 @@ void FilteredVectorTileLayer::iterator::operator++() {
                 } else {
                     // We only want to parse some features.
                     const pbf tags_pbf = feature_pbf.message();
-                    matched = matchesExpression(expression, tags_pbf);
+                    matched = matchesFilterExpression(expression, tags_pbf);
                     if (!matched) {
                         break; // feature_pbf loop early
                     }

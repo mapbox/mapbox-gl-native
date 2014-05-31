@@ -263,8 +263,11 @@ module.exports = {
         "contour_label": {
             "source": "outdoors",
             "layer": "contour",
-            "field": "index",
-            "value": [5, 10],
+            "filter": [
+                "and",
+                { "field": "index", "value": [ 5, 10 ] },
+                { "field": "ele", "operator": "not", "value": 0 }
+            ],
             "path": "curve",
             "text_field": "{{ele}} m",
             "font": "Open Sans Regular, Arial Unicode MS Regular",

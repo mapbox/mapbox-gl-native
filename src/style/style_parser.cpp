@@ -20,6 +20,56 @@ void StyleParser::parseBuckets(JSVal value, std::map<std::string, BucketDescript
     }
 }
 
+PropertyFilterExpression StyleParser::parseFilterOrExpression(JSVal value) {
+    if (value.IsArray()) {
+        // This is an expression.
+        PropertyExpression expression;
+        for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+            JSVal filter_item = value[i];
+
+            if (filter_item.IsString()) {
+                expression.op = expressionOperatorType({ filter_item.GetString(), filter_item.GetStringLength() });
+            } else {
+                expression.operands.emplace_back(parseFilterOrExpression(filter_item));
+            }
+        }
+        return util::recursive_wrapper<PropertyExpression>(std::move(expression));
+    } else if (value.IsObject() && value.HasMember("field") && value.HasMember("value")) {
+        // This is a filter.
+        JSVal field = value["field"];
+        JSVal val = value["value"];
+
+        if (!field.IsString()) {
+            throw Style::exception("field name must be a string");
+        }
+
+        const std::string field_name { field.GetString(), field.GetStringLength() };
+        const FilterOperator op = [&]{
+            if (value.HasMember("operator")) {
+                JSVal op_val = value["operator"];
+                return filterOperatorType({ op_val.GetString(), op_val.GetStringLength() });
+            } else {
+                return FilterOperator::Equal;
+            }
+        }();
+
+        if (val.IsArray()) {
+            // The filter has several values, so it's an OR sub-expression.
+            PropertyExpression expression;
+            for (rapidjson::SizeType i = 0; i < val.Size(); ++i) {
+                expression.operands.emplace_back(PropertyFilter { field_name, op, parseValue(val[i]) });
+            }
+
+            return util::recursive_wrapper<PropertyExpression>(std::move(expression));
+        } else {
+            // The filter only has a single value, so it is a real filter.
+            return PropertyFilter { field_name, op, parseValue(val) };
+        }
+    }
+
+    return util::recursive_wrapper<PropertyExpression>();
+}
+
 BucketDescription StyleParser::parseBucket(JSVal value) {
     BucketDescription bucket;
 
@@ -153,26 +203,11 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
 
     }
 
-
-    if (value.HasMember("field") && value.HasMember("value")) {
-        JSVal field = value["field"];
-        JSVal val = value["value"];
-
-        if (!field.IsString()) {
-            throw Style::exception("field name must be a string");
-        }
-
-        const std::string field_name { field.GetString(), field.GetStringLength() };
-
-        bucket.filter = {};
-
-        if (val.IsArray()) {
-            for (rapidjson::SizeType i = 0; i < val.Size(); ++i) {
-                bucket.filter.operands.emplace_back(field_name, parseValue(val[i]));
-            }
-        } else {
-            bucket.filter.operands.emplace_back(field_name, parseValue(val));
-        }
+    if (value.HasMember("filter")) {
+        bucket.filter = std::move(parseFilterOrExpression(value["filter"]));
+    } else {
+        // Allow a filter triple to be specified at the bucket root as well.
+        bucket.filter = std::move(parseFilterOrExpression(value));
     }
 
     if (bucket.feature_type == BucketType::None) {
