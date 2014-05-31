@@ -965,20 +965,14 @@ size_t Style::layerCount() const {
     return count;
 }
 
-void Style::setDefaultTransitionDuration(uint64_t duration) {
-    default_transition_duration = duration;
+void Style::setDefaultTransitionDuration(uint64_t duration_milliseconds) {
+    default_transition_duration = duration_milliseconds;
 }
 
-void Style::loadJSON(const uint8_t *const data, size_t bytes) {
+void Style::loadJSON(const uint8_t *const data) {
+    uv::writelock lock(mtx);
+
     rapidjson::Document doc;
-
-    if (bytes <= 0) {
-        return;
-    }
-
-    if (data[bytes - 1] != 0) {
-        throw exception("style JSON string is not 0-terminated");
-    }
 
     doc.Parse<0>((const char *const)data);
 

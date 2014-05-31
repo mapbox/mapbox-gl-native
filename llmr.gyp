@@ -44,20 +44,15 @@
             'bin/style.js',
           ],
           'outputs': [
-            '<(SHARED_INTERMEDIATE_DIR)/include/llmr/style/resources.hpp',
-            '<(SHARED_INTERMEDIATE_DIR)/src/style/resources.cpp'
+            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
           ],
           'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)']
         }
       ],
       'direct_dependent_settings': {
         'sources': [
-          '<(SHARED_INTERMEDIATE_DIR)/include/llmr/style/resources.hpp',
-          '<(SHARED_INTERMEDIATE_DIR)/src/style/resources.cpp'
+            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
         ],
-        'include_dirs':[
-          '<(SHARED_INTERMEDIATE_DIR)/include/',
-        ]
       }
     },
     {
@@ -135,7 +130,7 @@
           'shaders',
       ],
       'sources': [
-        '<!@(find src/ \( -name "*.cpp" ! -name resources.cpp ! -name shaders.hpp ! -name resources.hpp ! -name shaders_gles2.cpp ! -name shaders_gl.cpp \))',
+        '<!@(find src/ \( -name "*.cpp" ! -name shaders.hpp ! -name shaders_gles2.cpp ! -name shaders_gl.cpp \))',
         '<!@(find src -name "*.c")',
         '<!@(find src -name "*.h")',
         '<!@(find include -name "*.hpp")',
@@ -190,7 +185,7 @@
             }, {
               'libraries': [
                 '<@(png_libraries)',
-                '<@(uv_libraries)',
+                '<@(uv_libraries)'
               ]
             }]
           ]

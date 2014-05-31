@@ -85,7 +85,7 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
     singleTap.numberOfTapsRequired = 1;
     [self.mapView addGestureRecognizer:singleTap];
 
-    NSArray *selectorNames = @[ @"unrotate", @"resetPosition", @"toggleDebug", @"toggleRaster", @"locateUser" ];
+    NSArray *selectorNames = @[ @"unrotate", @"resetPosition", @"toggleDebug", @"toggleStyle", @"locateUser" ];
     CGFloat buttonSize  = 40;
     CGFloat bufferSize  = 20;
     CGFloat alpha       = 0.75;
@@ -166,9 +166,9 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
     self.debug = ! self.debug;
 }
 
-- (void)toggleRaster
+- (void)toggleStyle
 {
-    [self.mapView toggleRaster];
+    [self.mapView toggleStyle];
 }
 
 - (void)locateUser

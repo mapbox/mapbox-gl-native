@@ -661,15 +661,61 @@ module.exports = {
             "layer": "country_label_line",
             "type": "line"
         },
-        "marine_label_line": {
+        "marine_label_line_1": {
             "source": "outdoors",
             "layer": "marine_label",
             "feature_type": "line",
             "type": "text",
+            "field": "labelrank",
+            "value": 1,
             "text_field": "{{name_en}}",
             "path": "curve",
             "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
-            "fontSize": 16
+            "fontSize": 30,
+            "letterSpacing": 0.4,
+            "maxAngleDelta": 0.5
+        },
+        "marine_label_line_2": {
+            "source": "outdoors",
+            "layer": "marine_label",
+            "feature_type": "line",
+            "field": "labelrank",
+            "value": 2,
+            "type": "text",
+            "text_field": "{{name_en}}",
+            "path": "curve",
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
+            "fontSize": 24,
+            "letterSpacing": 0.2,
+            "maxAngleDelta": 0.5
+        },
+        "marine_label_line_3": {
+            "source": "outdoors",
+            "layer": "marine_label",
+            "feature_type": "line",
+            "type": "text",
+            "field": "labelrank",
+            "value": 3,
+            "text_field": "{{name_en}}",
+            "path": "curve",
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
+            "fontSize": 18,
+            "letterSpacing": 0.1,
+            "maxAngleDelta": 0.5
+        },
+        "marine_label_line_other": {
+            "source": "outdoors",
+            "layer": "marine_label",
+            "feature_type": "line",
+            "type": "text",
+            "field": "labelrank",
+            "value": [4, 5, 6],
+            "text_field": "{{name_en}}",
+            "path": "curve",
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
+            "fontSize": 16,
+            "letterSpacing": 0.1,
+            "maxAngleDelta": 0.5
         },
         "marine_label_point_1": {
             "source": "outdoors",
@@ -698,8 +744,23 @@ module.exports = {
             "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
             "fontSize": 24,
             "maxWidth": 8,
-            "letterSpacing": 0.4,
+            "letterSpacing": 0.2,
             "lineHeight": 1.5,
+        },
+        "marine_label_point_3": {
+            "source": "outdoors",
+            "layer": "marine_label",
+            "feature_type": "point",
+            "type": "text",
+            "text_field": "{{name_en}}",
+            "path": "horizontal",
+            "field": "labelrank",
+            "value": 3,
+            "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
+            "fontSize": 18,
+            "maxWidth": 8,
+            "letterSpacing": 0.1,
+            "lineHeight": 1.3,
         },
         "marine_label_point_other": {
             "source": "outdoors",
@@ -709,9 +770,12 @@ module.exports = {
             "text_field": "{{name_en}}",
             "path": "horizontal",
             "field": "labelrank",
-            "value": [3,4,5,6],
+            "value": [4,5,6],
             "font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
-            "fontSize": 18
+            "fontSize": 16,
+            "maxWidth": 8,
+            "letterSpacing": 0.1,
+            "lineHeight": 1.2,
         },
         "state_label": {
             "source": "outdoors",
@@ -1363,8 +1427,20 @@ module.exports = {
             "bucket": "country_label"
         },
         {
-            "name": "marine_label_line",
-            "bucket": "marine_label_line"
+            "name": "marine_label_line_1",
+            "bucket": "marine_label_line_1"
+        },
+        {
+            "name": "marine_label_line_2",
+            "bucket": "marine_label_line_2"
+        },
+        {
+            "name": "marine_label_line_3",
+            "bucket": "marine_label_line_3"
+        },
+        {
+            "name": "marine_label_line_other",
+            "bucket": "marine_label_line_other"
         },
         {
             "name": "marine_label_point_1",
@@ -1373,6 +1449,10 @@ module.exports = {
         {
             "name": "marine_label_point_2",
             "bucket": "marine_label_point_2"
+        },
+        {
+            "name": "marine_label_point_3",
+            "bucket": "marine_label_point_3"
         },
         {
             "name": "marine_label_point_other",
@@ -2309,12 +2389,8 @@ module.exports = {
                     "width": 0.5,
                     "opacity": 0.5
                 },
-                "marine_label_line": {
+                "marine_label_line_1": {
                     "color": "marine_text",
-                    "stroke": "water"
-                },
-                "marine_label_point_1": {
-                    "color": "#a9c4c7",
                     "size": ["stops",
                         {"z": 3, "val": 20},
                         {"z": 4, "val": 25},
@@ -2323,8 +2399,8 @@ module.exports = {
                     ],
                     "stroke": "water"
                 },
-                "marine_label_point_2": {
-                    "color": "#a9c4c7",
+                "marine_label_line_2": {
+                    "color": "marine_text",
                     "size": ["stops",
                         {"z": 3, "val": 13},
                         {"z": 4, "val": 14},
@@ -2334,14 +2410,66 @@ module.exports = {
                     ],
                     "stroke": "water"
                 },
-                "marine_label_point_other": {
-                    "color": "#a9c4c7",
+                "marine_label_line_3": {
+                    "color": "marine_text",
                     "size": ["stops",
                         {"z": 3, "val": 12},
                         {"z": 4, "val": 13},
                         {"z": 5, "val": 15},
                         {"z": 6, "val": 18},
                         {"z": 22, "val": 18}
+                    ],
+                    "stroke": "water"
+                },
+                "marine_label_line_other": {
+                    "color": "marine_text",
+                    "size": ["stops",
+                        {"z": 4, "val": 12},
+                        {"z": 5, "val": 14},
+                        {"z": 6, "val": 16},
+                        {"z": 22, "val": 16}
+                    ],
+                    "stroke": "water"
+                },
+                "marine_label_point_1": {
+                    "color": "marine_text",
+                    "size": ["stops",
+                        {"z": 3, "val": 20},
+                        {"z": 4, "val": 25},
+                        {"z": 5, "val": 30},
+                        {"z": 22, "val": 30}
+                    ],
+                    "stroke": "water"
+                },
+                "marine_label_point_2": {
+                    "color": "marine_text",
+                    "size": ["stops",
+                        {"z": 3, "val": 13},
+                        {"z": 4, "val": 14},
+                        {"z": 5, "val": 20},
+                        {"z": 6, "val": 24},
+                        {"z": 22, "val": 24}
+                    ],
+                    "stroke": "water"
+                },
+                "marine_label_point_3": {
+                    "color": "marine_text",
+                    "size": ["stops",
+                        {"z": 3, "val": 12},
+                        {"z": 4, "val": 13},
+                        {"z": 5, "val": 15},
+                        {"z": 6, "val": 18},
+                        {"z": 22, "val": 18}
+                    ],
+                    "stroke": "water"
+                },
+                "marine_label_point_other": {
+                    "color": "marine_text",
+                    "size": ["stops",
+                        {"z": 4, "val": 12},
+                        {"z": 5, "val": 14},
+                        {"z": 6, "val": 16},
+                        {"z": 22, "val": 16}
                     ],
                     "stroke": "water"
                 },
@@ -2500,7 +2628,7 @@ module.exports = {
             }
         },
         {
-            "name": "satellite",
+            "name": "night",
             "layers": {
                 "background": {
                     "color": "land_night"
@@ -3067,8 +3195,46 @@ module.exports = {
                     "width": 0.5,
                     "opacity": 0.5
                 },
-                "marine_label_line": {
+                "marine_label_line_1": {
                     "color": "water_dark_night",
+                    "size": ["stops",
+                        {"z": 3, "val": 20},
+                        {"z": 4, "val": 25},
+                        {"z": 5, "val": 30},
+                        {"z": 22, "val": 30}
+                    ],
+                    "stroke": "water_night"
+                },
+                "marine_label_line_2": {
+                    "color": "water_dark_night",
+                    "size": ["stops",
+                        {"z": 3, "val": 13},
+                        {"z": 4, "val": 14},
+                        {"z": 5, "val": 20},
+                        {"z": 6, "val": 24},
+                        {"z": 22, "val": 24}
+                    ],
+                    "stroke": "water_night"
+                },
+                "marine_label_line_3": {
+                    "color": "water_dark_night",
+                    "size": ["stops",
+                        {"z": 3, "val": 12},
+                        {"z": 4, "val": 13},
+                        {"z": 5, "val": 15},
+                        {"z": 6, "val": 18},
+                        {"z": 22, "val": 18}
+                    ],
+                    "stroke": "water_night"
+                },
+                "marine_label_line_other": {
+                    "color": "water_dark_night",
+                    "size": ["stops",
+                        {"z": 4, "val": 12},
+                        {"z": 5, "val": 14},
+                        {"z": 6, "val": 16},
+                        {"z": 22, "val": 16}
+                    ],
                     "stroke": "water_night"
                 },
                 "marine_label_point_1": {
@@ -3092,7 +3258,7 @@ module.exports = {
                     ],
                     "stroke": "water_night"
                 },
-                "marine_label_point_other": {
+                "marine_label_point_3": {
                     "color": "water_dark_night",
                     "size": ["stops",
                         {"z": 3, "val": 12},
@@ -3100,6 +3266,16 @@ module.exports = {
                         {"z": 5, "val": 15},
                         {"z": 6, "val": 18},
                         {"z": 22, "val": 18}
+                    ],
+                    "stroke": "water_night"
+                },
+                "marine_label_point_other": {
+                    "color": "water_dark_night",
+                    "size": ["stops",
+                        {"z": 4, "val": 12},
+                        {"z": 5, "val": 14},
+                        {"z": 6, "val": 16},
+                        {"z": 22, "val": 16}
                     ],
                     "stroke": "water_night"
                 },

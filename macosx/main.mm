@@ -1,6 +1,8 @@
 #include "../common/settings_nsuserdefaults.hpp"
 #include "../common/glfw_view.hpp"
 
+#import <Foundation/Foundation.h>
+
 int main() {
     GLFWView view;
     llmr::Map map(view);
@@ -10,7 +12,13 @@ int main() {
     map.setLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
     map.setAngle(settings.angle);
     map.setDebug(settings.debug);
-    map.toggleRaster();
+
+    // Load style
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"style.min" ofType:@"js"];
+    NSString *json = [NSString stringWithContentsOfFile:path
+                                               encoding:[NSString defaultCStringEncoding]
+                                                  error:nil];
+    map.setStyleJSON((std::string)[json cStringUsingEncoding:[NSString defaultCStringEncoding]]);
 
     // fprintf(stderr, "lon: %f, lat: %f, zoom: %f, angle: %f, debug: %d\n", settings.l)
 
