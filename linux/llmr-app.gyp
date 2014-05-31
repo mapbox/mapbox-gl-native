@@ -43,7 +43,8 @@
           'link_settings': {
             'libraries': [
               '<@(glfw3_libraries)',
-              '<@(curl_libraries)'
+              '<@(curl_libraries)',
+              '-lboost_regex'
             ],
           },
         }],
