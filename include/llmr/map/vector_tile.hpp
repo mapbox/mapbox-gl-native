@@ -7,12 +7,15 @@
 #include <llmr/text/glyph.hpp>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <set>
 #include <limits>
 
 namespace llmr {
 
 class BucketDescription;
+class BucketExpression;
+class BucketFilter;
 class VectorTileLayer;
 
 struct pbf;
@@ -53,7 +56,11 @@ public:
         const pbf& operator*() const;
 
     private:
-        const FilteredVectorTileLayer& filter;
+        bool matchesExpression(const BucketExpression &expression, const pbf &tags_pbf);
+        bool matchesFilter(const BucketFilter &filter, const pbf &tags_pbf);
+
+    private:
+        const FilteredVectorTileLayer& parent;
         bool valid = false;
         pbf feature;
         pbf data;
@@ -68,8 +75,6 @@ public:
 private:
     const VectorTileLayer& layer;
     const BucketDescription& bucket_desc;
-    int32_t key = -1;
-    std::set<uint32_t> values;
 };
 
 std::ostream& operator<<(std::ostream&, const GlyphPlacement& placement);
@@ -82,6 +87,7 @@ public:
     std::string name;
     uint32_t extent = 4096;
     std::vector<std::string> keys;
+    std::unordered_map<std::string, uint32_t> key_index;
     std::vector<Value> values;
     std::map<std::string, std::map<Value, Shaping>> shaping;
 };

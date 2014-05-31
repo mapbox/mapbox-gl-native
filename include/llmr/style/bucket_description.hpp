@@ -38,6 +38,16 @@ enum class TextPathType {
     Curve = 1
 };
 
+enum class FilterOperator {
+    Equal,
+    NotEqual
+};
+
+enum class ExpressionOperator {
+    Or,
+    And
+};
+
 
 inline BucketType bucketType(const std::string& type) {
     if (type == "fill") return BucketType::Fill;
@@ -81,6 +91,23 @@ inline float verticalAlignmentType(const std::string& alignment) {
     else return 0.5;
 };
 
+inline FilterOperator filterOperatorType(const std::string &op) {
+    if (op == "!=" || op == "not") {
+        return FilterOperator::NotEqual;
+    } else {
+        return FilterOperator::Equal;
+    }
+}
+
+inline ExpressionOperator expressionOperatorType(const std::string &op) {
+    if (op == "&&" || op == "and") {
+        return ExpressionOperator::And;
+    } else {
+        return ExpressionOperator::Or;
+    }
+}
+
+
 class BucketGeometryDescription {
 public:
     CapType cap = CapType::None;
@@ -105,6 +132,42 @@ public:
     bool alwaysVisible = false;
 };
 
+
+class BucketFilter {
+public:
+    inline BucketFilter(const std::string &field, const Value &value) : field(field), value(value) {};
+
+    // Returns true if the filter passes, even if the key is missing.
+    inline bool isMissingFieldOkay() const {
+        switch (op) {
+        case FilterOperator::NotEqual:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    inline bool compare(const Value &other) const {
+        switch (op) {
+        case FilterOperator::NotEqual:
+            return !util::relaxed_equal(value)(other);
+        default:
+            return util::relaxed_equal(value)(other);
+        }
+    }
+
+public:
+    std::string field;
+    Value value;
+    FilterOperator op = FilterOperator::Equal;
+};
+
+class BucketExpression {
+public:
+    ExpressionOperator op = ExpressionOperator::Or;
+    std::vector<BucketFilter> operands;
+};
+
 class BucketDescription {
 public:
     BucketType feature_type = BucketType::None;
@@ -113,8 +176,8 @@ public:
     // Specify what data to pull into this bucket
     std::string source_name;
     std::string source_layer;
-    std::string source_field;
-    std::vector<Value> source_value;
+
+    BucketExpression filter;
 
     // Specifies how the geometry for this bucket should be created
     BucketGeometryDescription geometry;

@@ -52,20 +52,6 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             } else {
                 throw Style::exception("layer name must be a string");
             }
-        } else if (name == "field") {
-            if (value.IsString()) {
-                bucket.source_field = { value.GetString(), value.GetStringLength() };
-            } else {
-                throw Style::exception("field name must be a string");
-            }
-        } else if (name == "value") {
-            if (value.IsArray()) {
-                for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-                    bucket.source_value.push_back(parseValue(value[i]));
-                }
-            } else {
-                bucket.source_value.push_back(parseValue(value));
-            }
         } else if (name == "cap") {
             if (value.IsString()) {
                 bucket.geometry.cap = capType({ value.GetString(), value.GetStringLength() });
@@ -165,6 +151,28 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
             }
         }
 
+    }
+
+
+    if (value.HasMember("field") && value.HasMember("value")) {
+        JSVal field = value["field"];
+        JSVal val = value["value"];
+
+        if (!field.IsString()) {
+            throw Style::exception("field name must be a string");
+        }
+
+        const std::string field_name { field.GetString(), field.GetStringLength() };
+
+        bucket.filter = {};
+
+        if (val.IsArray()) {
+            for (rapidjson::SizeType i = 0; i < val.Size(); ++i) {
+                bucket.filter.operands.emplace_back(field_name, parseValue(val[i]));
+            }
+        } else {
+            bucket.filter.operands.emplace_back(field_name, parseValue(val));
+        }
     }
 
     if (bucket.feature_type == BucketType::None) {
