@@ -91,8 +91,7 @@ You can then proceed to build the library like:
 
 # Style
 
-We're currently embedding the stylesheet JSON in the binary. To create the C++
-file and the associated header, run
+The default stylesheet at `bin/style.js` is JSON and is processed into a minified version by the following script: 
 
 ```
 node bin/build-style.js
