@@ -37,7 +37,7 @@ This downloads all required dependencies, builds them and creates universal libr
 
 To create projects, you can run:
 - `make xproj`: Creates an Xcode project with OS X-specific handlers for HTTP downloads and
-  settings storage. It uses GLFW for window handling.
+  settings storage. It uses [GLFW](http://www.glfw.org) for window handling.
 - `make lproj`: Creates an Xcode project with platform-independent handlers for downloads
   and settings storage. This is what is also being built on Linux.
 - `make linux`: Builds the Linux GLFW application with `make`.
