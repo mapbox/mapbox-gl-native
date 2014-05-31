@@ -191,6 +191,7 @@
               'libraries': [
                 '<@(png_libraries)',
                 '<@(uv_libraries)',
+                '-lboost_regex'
               ]
             }]
           ]
