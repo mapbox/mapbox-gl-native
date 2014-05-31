@@ -66,7 +66,10 @@ void Map::start() {
 }
 
 void Map::stop() {
-    uv_async_send(async_terminate);
+    if (async_terminate != nullptr) {
+        uv_async_send(async_terminate);
+    }
+
     uv_thread_join(&thread);
 
     uv_close((uv_handle_t *)async_terminate, delete_async);
@@ -101,7 +104,7 @@ void Map::run() {
 void Map::rerender() {
     // We only send render events if we want to continuously update the map
     // (== async rendering).
-    if (async) {
+    if (async && async_render != nullptr) {
         uv_async_send(async_render);
     }
 }
@@ -121,7 +124,9 @@ void Map::swapped() {
 }
 
 void Map::cleanup() {
-    uv_async_send(async_cleanup);
+    if (async_cleanup != nullptr) {
+        uv_async_send(async_cleanup);
+    }
 }
 
 void Map::cleanup(uv_async_t *async) {
