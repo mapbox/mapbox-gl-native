@@ -67,7 +67,7 @@ PropertyFilterExpression StyleParser::parseFilterOrExpression(JSVal value) {
         }
     }
 
-    return std::move(util::recursive_wrapper<PropertyExpression>());
+    return std::true_type();
 }
 
 BucketDescription StyleParser::parseBucket(JSVal value) {

@@ -117,7 +117,7 @@ public:
     std::string source_name;
     std::string source_layer;
 
-    PropertyFilterExpression filter;
+    PropertyFilterExpression filter = std::true_type();
 
     // Specifies how the geometry for this bucket should be created
     BucketGeometryDescription geometry;

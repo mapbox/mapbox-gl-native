@@ -127,6 +127,8 @@ bool FilteredVectorTileLayer::iterator::matchesFilterExpression(const PropertyFi
         return matchesFilter(filterExpression.get<util::recursive_wrapper<PropertyFilter>>().get(), tags_pbf);
     } else if (filterExpression.is<util::recursive_wrapper<PropertyExpression>>()) {
         return matchesExpression(filterExpression.get<util::recursive_wrapper<PropertyExpression>>().get(), tags_pbf);
+    } else if (filterExpression.is<std::true_type>()) {
+        return true;
     } else {
         return false;
     }
@@ -201,7 +203,7 @@ void FilteredVectorTileLayer::iterator::operator++() {
         bool matched = false;
 
         // Treat the absence of any expression filters as a match.
-        if (expression.is<util::recursive_wrapper<PropertyExpression>>() && expression.get<util::recursive_wrapper<PropertyExpression>>().get().operands.size() == 0) {
+        if (expression.is<std::true_type>()) {
             matched = true;
         }
 

@@ -48,7 +48,8 @@ class PropertyExpression;
 
 typedef util::variant<
     util::recursive_wrapper<PropertyFilter>,
-    util::recursive_wrapper<PropertyExpression>
+    util::recursive_wrapper<PropertyExpression>,
+    std::true_type
 > PropertyFilterExpression;
 
 
