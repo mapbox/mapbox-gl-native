@@ -6,11 +6,12 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 # Depends
 
  - Modern C++ compiler that supports `-std=c++11`
+ - Boost headers
  - `libpng`
  - `libuv`
- - `libcurl` (depends on OpenSSL; Linux only)
  - `glfw3`
- - Boost
+ - `libcurl` (depends on OpenSSL; Linux only)
+ - `libboost_regex` (Linux only)
  - Python (for build only)
  - Node.js (for build only)
 

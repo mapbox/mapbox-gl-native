@@ -16,7 +16,13 @@
 #include <llmr/util/std.hpp>
 #include <llmr/util/utf.hpp>
 
+#ifdef __linux__
+#include <boost/regex.hpp>
+namespace regex_impl = boost;
+#else
 #include <regex>
+namespace regex_impl = std;
+#endif
 
 using namespace llmr;
 
@@ -184,8 +190,8 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
         tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
 
     util::utf8_to_utf32 ucs4conv;
-    std::regex token_regex("\\{\\{(\\w+)\\}\\}");
-    const auto tokens_end = std::sregex_token_iterator();
+    regex_impl::regex token_regex("\\{\\{(\\w+)\\}\\}");
+    const auto tokens_end = regex_impl::sregex_token_iterator();
 
 
     std::vector<std::pair<std::u32string, pbf>> labels;
@@ -205,7 +211,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
             source_string.reserve(field.size());
 
             bool token = false;
-            for (auto token_it = std::sregex_token_iterator(field.begin(), field.end(), token_regex, {-1, 1}); token_it != tokens_end; ++token_it, token = !token) {
+            for (auto token_it = regex_impl::sregex_token_iterator(field.begin(), field.end(), token_regex, {-1, 1}); token_it != tokens_end; ++token_it, token = !token) {
                 if (!token_it->matched) {
                     continue;
                 }
