@@ -123,8 +123,8 @@ FilteredVectorTileLayer::iterator::iterator(const FilteredVectorTileLayer& paren
 }
 
 bool FilteredVectorTileLayer::iterator::matchesFilterExpression(const PropertyFilterExpression &filterExpression, const pbf &tags_pbf) {
-    if (filterExpression.is<PropertyFilter>()) {
-        return matchesFilter(filterExpression.get<PropertyFilter>(), tags_pbf);
+    if (filterExpression.is<util::recursive_wrapper<PropertyFilter>>()) {
+        return matchesFilter(filterExpression.get<util::recursive_wrapper<PropertyFilter>>().get(), tags_pbf);
     } else if (filterExpression.is<util::recursive_wrapper<PropertyExpression>>()) {
         return matchesExpression(filterExpression.get<util::recursive_wrapper<PropertyExpression>>().get(), tags_pbf);
     } else {

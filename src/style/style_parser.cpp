@@ -23,17 +23,17 @@ void StyleParser::parseBuckets(JSVal value, std::map<std::string, BucketDescript
 PropertyFilterExpression StyleParser::parseFilterOrExpression(JSVal value) {
     if (value.IsArray()) {
         // This is an expression.
-        PropertyExpression expression;
+        util::recursive_wrapper<PropertyExpression> expression;
         for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
             JSVal filter_item = value[i];
 
             if (filter_item.IsString()) {
-                expression.op = expressionOperatorType({ filter_item.GetString(), filter_item.GetStringLength() });
+                expression.get().op = expressionOperatorType({ filter_item.GetString(), filter_item.GetStringLength() });
             } else {
-                expression.operands.emplace_back(parseFilterOrExpression(filter_item));
+                expression.get().operands.emplace_back(parseFilterOrExpression(filter_item));
             }
         }
-        return util::recursive_wrapper<PropertyExpression>(std::move(expression));
+        return std::move(expression);
     } else if (value.IsObject() && value.HasMember("field") && value.HasMember("value")) {
         // This is a filter.
         JSVal field = value["field"];
@@ -55,19 +55,19 @@ PropertyFilterExpression StyleParser::parseFilterOrExpression(JSVal value) {
 
         if (val.IsArray()) {
             // The filter has several values, so it's an OR sub-expression.
-            PropertyExpression expression;
+            util::recursive_wrapper<PropertyExpression> expression;
             for (rapidjson::SizeType i = 0; i < val.Size(); ++i) {
-                expression.operands.emplace_back(PropertyFilter { field_name, op, parseValue(val[i]) });
+                expression.get().operands.emplace_back(util::recursive_wrapper<PropertyFilter>(PropertyFilter { field_name, op, parseValue(val[i]) }));
             }
 
-            return util::recursive_wrapper<PropertyExpression>(std::move(expression));
+            return std::move(expression);
         } else {
             // The filter only has a single value, so it is a real filter.
-            return PropertyFilter { field_name, op, parseValue(val) };
+            return std::move(util::recursive_wrapper<PropertyFilter>(PropertyFilter { field_name, op, parseValue(val) }));
         }
     }
 
-    return util::recursive_wrapper<PropertyExpression>();
+    return std::move(util::recursive_wrapper<PropertyExpression>());
 }
 
 BucketDescription StyleParser::parseBucket(JSVal value) {

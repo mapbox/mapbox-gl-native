@@ -43,8 +43,14 @@ inline ExpressionOperator expressionOperatorType(const std::string &op) {
 }
 
 
-
+class PropertyFilter;
 class PropertyExpression;
+
+typedef util::variant<
+    util::recursive_wrapper<PropertyFilter>,
+    util::recursive_wrapper<PropertyExpression>
+> PropertyFilterExpression;
+
 
 class PropertyFilter {
 public:
@@ -79,9 +85,6 @@ public:
     FilterOperator op = FilterOperator::Equal;
     Value value;
 };
-
-typedef util::variant<PropertyFilter, util::recursive_wrapper<PropertyExpression>> PropertyFilterExpression;
-
 
 class PropertyExpression {
 public:
