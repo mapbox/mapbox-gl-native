@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     sigaction(SIGINT, &sigIntHandler, NULL);
 
     // read default stylesheet from disk
-    std::ifstream stylefile("./build/Release/style.min.js");
+    std::ifstream stylefile("./style.min.js");
     std::stringstream stylejson;
     stylejson << stylefile.rdbuf();
 
