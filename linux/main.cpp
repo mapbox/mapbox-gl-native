@@ -3,6 +3,8 @@
 
 #include <signal.h>
 #include <getopt.h>
+#include <fstream>
+#include <sstream>
 
 #include "../common/settings_json.hpp"
 #include "../common/glfw_view.hpp"
@@ -40,6 +42,11 @@ int main(int argc, char *argv[]) {
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, NULL);
 
+    // read default stylesheet from disk
+    std::ifstream stylefile("./build/Release/style.min.js");
+    std::stringstream stylejson;
+    stylejson << stylefile.rdbuf();
+
     view = new GLFWView();
     llmr::Map map(*view);
 
@@ -48,6 +55,9 @@ int main(int argc, char *argv[]) {
     map.setLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
     map.setAngle(settings.angle);
     map.setDebug(settings.debug);
+
+    // Load style
+    map.setStyleJSON(stylejson.str());
 
     int ret = view->run();
 
