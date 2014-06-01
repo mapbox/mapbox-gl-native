@@ -42,6 +42,8 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:self.mapView];
 
+    self.mapView.viewControllerForLayoutGuides = self;
+
     settings = new llmr::Settings_NSUserDefaults();
     [self restoreState:nil];
 
