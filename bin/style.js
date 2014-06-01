@@ -14,8 +14,11 @@ module.exports = {
         "admin_l2": {
             "source": "outdoors",
             "layer": "admin",
-            "field": "admin_level",
-            "value": 2,
+            "filter": [
+                "and",
+                {"field": "admin_level", "value": 2},
+                {"field": "maritime", "operator": "not", "value": 1}
+            ],
             "join": "round",
             "cap": "round",
             "type": "line"
@@ -23,11 +26,10 @@ module.exports = {
         "admin_l3": {
             "source": "outdoors",
             "layer": "admin",
-            "field": "admin_level",
-            "value": [
-                3,
-                4,
-                5
+            "filter": [
+                "and",
+                {"field": "admin_level", "value": [3,4,5]},
+                {"field": "maritime", "operator": "not", "value": 1}
             ],
             "join": "round",
             "type": "line"
