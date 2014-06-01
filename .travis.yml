@@ -41,7 +41,7 @@ script:
 #- make run-headless-test BUILDTYPE=${BUILDTYPE}
 
 notifications:
-- hipchat: WB52YkcbCGMbNcStsGeaoRO7cyBSK4wX2ZHo2Y4b@GL
+  hipchat: WB52YkcbCGMbNcStsGeaoRO7cyBSK4wX2ZHo2Y4b@GL
 
 git:
   submodules: false
