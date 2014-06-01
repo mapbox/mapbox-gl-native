@@ -557,7 +557,7 @@ void StyleParser::parseGenericClass(GenericClass &klass, JSVal value) {
     }
 
     if (value.HasMember("prerender")) {
-        klass.prerender = parseBoolean(value["prerender"]);
+        klass.prerender = parseFunction(value["prerender"]);
     }
 
     if (value.HasMember("prerender-buffer")) {

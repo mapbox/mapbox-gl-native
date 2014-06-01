@@ -93,7 +93,7 @@ struct GenericClass {
     boost::optional<TranslateAnchor> translateAnchor;
     boost::optional<FunctionProperty> opacity;
     boost::optional<PropertyTransition> opacity_transition;
-    float prerender = false;
+    boost::optional<FunctionProperty> prerender;
     boost::optional<FunctionProperty> prerenderBuffer;
     boost::optional<FunctionProperty> prerenderSize;
     boost::optional<FunctionProperty> prerenderBlur;
@@ -110,12 +110,16 @@ struct GenericProperties {
     std::array<float, 2> translate = {{ 0, 0 }};
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     float opacity = 1.0;
-    bool prerender;
 
     // These are unresolved properties because the value here is per tile, so it might differ.
+    boost::optional<FunctionProperty> prerender;
     boost::optional<FunctionProperty> prerenderBuffer;
     boost::optional<FunctionProperty> prerenderSize;
     boost::optional<FunctionProperty> prerenderBlur;
+
+    inline bool getPrerender(int8_t z) const {
+        return prerender && prerender.get().evaluate<bool>(z);
+    }
 
     // Obtains prerender properties by integer zoom level.
     inline PrerenderProperties getPrerenderProperties(int8_t z) const {
