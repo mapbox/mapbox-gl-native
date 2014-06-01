@@ -51,21 +51,10 @@ void Style::cascadeProperties(GenericProperties &properties, const GenericClass&
         }
     }
 
-    if (klass.prerender) {
-        properties.prerender = klass.prerender.get();
-    }
-
-    if (klass.prerenderBuffer) {
-        properties.prerenderBuffer = klass.prerenderBuffer.get();
-    }
-
-    if (klass.prerenderSize) {
-        properties.prerenderSize = klass.prerenderSize.get();
-    }
-
-    if (klass.prerenderBlur) {
-        properties.prerenderBlur = klass.prerenderBlur.get();
-    }
+    properties.prerender = klass.prerender;
+    properties.prerenderBuffer = klass.prerenderBuffer;
+    properties.prerenderSize = klass.prerenderSize;
+    properties.prerenderBlur = klass.prerenderBlur;
 }
 
 

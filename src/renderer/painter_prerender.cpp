@@ -2,7 +2,7 @@
 
 using namespace llmr;
 
-void Painter::preparePrerender(const GenericProperties &properties) {
+void Painter::preparePrerender(PrerenderedTexture &texture) {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_STENCIL_TEST);
 
@@ -13,18 +13,18 @@ void Painter::preparePrerender(const GenericProperties &properties) {
 #endif
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glViewport(0, 0, properties.prerenderSize, properties.prerenderSize);
+    glViewport(0, 0, texture.properties.size, texture.properties.size);
 }
 
-void Painter::finishPrerender(const GenericProperties &properties) {
+void Painter::finishPrerender(PrerenderedTexture &texture) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
 
     glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
 }
 
-void Painter::renderPrerenderedTexture(Bucket &bucket, const GenericProperties &properties) {
-    const int buffer = 4096 * properties.prerenderBuffer;
+void Painter::renderPrerenderedTexture(PrerenderedTexture &texture, const GenericProperties &properties) {
+    const int buffer = texture.properties.buffer * 4096.0f;
 
     // draw the texture on a quad
     useProgram(rasterShader->program);
@@ -37,7 +37,7 @@ void Painter::renderPrerenderedTexture(Bucket &bucket, const GenericProperties &
     rasterShader->setImage(0);
     rasterShader->setBuffer(buffer);
     rasterShader->setOpacity(properties.opacity);
-    bucket.prerendered->bindTexture();
+    texture.bindTexture();
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }

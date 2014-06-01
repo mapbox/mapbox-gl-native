@@ -93,10 +93,16 @@ struct GenericClass {
     boost::optional<TranslateAnchor> translateAnchor;
     boost::optional<FunctionProperty> opacity;
     boost::optional<PropertyTransition> opacity_transition;
-    boost::optional<bool> prerender;
-    boost::optional<float> prerenderBuffer;
-    boost::optional<uint16_t> prerenderSize;
-    boost::optional<uint16_t> prerenderBlur;
+    float prerender = false;
+    boost::optional<FunctionProperty> prerenderBuffer;
+    boost::optional<FunctionProperty> prerenderSize;
+    boost::optional<FunctionProperty> prerenderBlur;
+};
+
+struct PrerenderProperties {
+    float buffer = 1.0f / 32.0f;
+    uint16_t size = 256;
+    uint16_t blur = 0;
 };
 
 struct GenericProperties {
@@ -104,10 +110,21 @@ struct GenericProperties {
     std::array<float, 2> translate = {{ 0, 0 }};
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     float opacity = 1.0;
-    bool prerender = false;
-    float prerenderBuffer = 1.0f / 32.0f;
-    uint16_t prerenderSize = 256;
-    uint16_t prerenderBlur = 0;
+    bool prerender;
+
+    // These are unresolved properties because the value here is per tile, so it might differ.
+    boost::optional<FunctionProperty> prerenderBuffer;
+    boost::optional<FunctionProperty> prerenderSize;
+    boost::optional<FunctionProperty> prerenderBlur;
+
+    // Obtains prerender properties by integer zoom level.
+    inline PrerenderProperties getPrerenderProperties(int8_t z) const {
+        PrerenderProperties props;
+        if (prerenderBuffer) props.buffer = prerenderBuffer.get().evaluate<float>(z);
+        if (prerenderSize) props.size = prerenderSize.get().evaluate<uint16_t>(z);
+        if (prerenderBlur) props.blur = prerenderBlur.get().evaluate<uint16_t>(z);
+        return props;
+    }
 
     virtual bool isVisible() const {
         if (!enabled) { return false; }

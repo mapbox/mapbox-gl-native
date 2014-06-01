@@ -1819,6 +1819,11 @@ module.exports = {
             "stops",
             {"z": 16, "val": 10},
             {"z": 17, "val": 11}
+        ],
+        "hillshade_prerender_size": [
+            "stops",
+            {"z": 13, "val": 1024 },
+            {"z": 14, "val": 512 }
         ]
     },
     "classes": [
@@ -1973,7 +1978,7 @@ module.exports = {
                     "color": "#103",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -1988,7 +1993,7 @@ module.exports = {
                     "color": "#206",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2003,7 +2008,7 @@ module.exports = {
                     "color": "#fffff3",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2018,7 +2023,7 @@ module.exports = {
                     "color": "#ffd",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2785,7 +2790,7 @@ module.exports = {
                     "color": "#103",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2799,7 +2804,7 @@ module.exports = {
                     "color": "#206",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2813,7 +2818,7 @@ module.exports = {
                     "color": "#fdfdad",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2828,7 +2833,7 @@ module.exports = {
                     "color": "#ffe1b7",
                     "antialias": false,
                     "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",

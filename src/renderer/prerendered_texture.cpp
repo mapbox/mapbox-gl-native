@@ -4,8 +4,8 @@
 
 using namespace llmr;
 
-PrerenderedTexture::PrerenderedTexture(uint16_t size)
-    : size(size) {
+PrerenderedTexture::PrerenderedTexture(const PrerenderProperties &properties)
+    : properties(properties) {
 }
 
 PrerenderedTexture::~PrerenderedTexture() {
@@ -28,11 +28,6 @@ void PrerenderedTexture::bindTexture() {
     }
 
     glBindTexture(GL_TEXTURE_2D, texture);
-
-    // if (!mipmapped) {
-    //     glGenerateMipmap(GL_TEXTURE_2D);
-    //     mipmapped = true;
-    // }
 }
 
 void PrerenderedTexture::bindFramebuffer() {
@@ -45,7 +40,7 @@ void PrerenderedTexture::bindFramebuffer() {
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, properties.size, properties.size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
@@ -95,7 +90,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, properties.size, properties.size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
 
@@ -113,7 +108,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
 #endif
         glClear(GL_COLOR_BUFFER_BIT);
 
-        painter.gaussianShader->setOffset({{ 1.0f / float(size), 0 }});
+        painter.gaussianShader->setOffset({{ 1.0f / float(properties.size), 0 }});
         glBindTexture(GL_TEXTURE_2D, original_texture);
         painter.coveringGaussianArray.bind(*painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, (GLsizei)painter.tileStencilBuffer.index());
@@ -127,7 +122,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
 #endif
         glClear(GL_COLOR_BUFFER_BIT);
 
-        painter.gaussianShader->setOffset({{ 0, 1.0f / float(size) }});
+        painter.gaussianShader->setOffset({{ 0, 1.0f / float(properties.size) }});
         glBindTexture(GL_TEXTURE_2D, secondary_texture);
         painter.coveringGaussianArray.bind(*painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, (GLsizei)painter.tileStencilBuffer.index());
