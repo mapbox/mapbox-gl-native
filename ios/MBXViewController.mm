@@ -175,11 +175,7 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
 
 - (void)locateUser
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self.locationManager selector:@selector(stopUpdatingLocation) object:nil];
-
     [self.locationManager startUpdatingLocation];
-
-    [self.locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:5.0];
 }
 
 #pragma mark - Destruction
@@ -205,7 +201,12 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
 {
     CLLocation *latestLocation = locations.lastObject;
 
-    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(latestLocation.coordinate.latitude, latestLocation.coordinate.longitude) zoomLevel:17 animated:YES];
+    if ([latestLocation distanceFromLocation:[[CLLocation alloc] initWithLatitude:self.mapView.centerCoordinate.latitude longitude:self.mapView.centerCoordinate.longitude]] > 100)
+    {
+        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(latestLocation.coordinate.latitude, latestLocation.coordinate.longitude) zoomLevel:17 animated:YES];
+
+        [self.locationManager stopUpdatingLocation];
+    }
 }
 
 #pragma clang diagnostic pop
