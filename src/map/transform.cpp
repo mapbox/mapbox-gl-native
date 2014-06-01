@@ -206,7 +206,7 @@ void Transform::stopScaling() {
     _clearScaling();
 }
 
-double Transform::getMinZoom() {
+double Transform::getMinZoom() const {
     double test_scale = current.scale;
     double test_y = current.y;
     constrain(test_scale, test_y);
@@ -214,7 +214,7 @@ double Transform::getMinZoom() {
     return std::log2(std::fmin(min_scale, test_scale));
 }
 
-double Transform::getMaxZoom() {
+double Transform::getMaxZoom() const {
     return std::log2(max_scale);
 }
 
@@ -299,7 +299,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
 
 #pragma mark - Constraints
 
-void Transform::constrain(double& scale, double& y) {
+void Transform::constrain(double& scale, double& y) const {
     // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.
     if (scale < (current.height / util::tileSize)) scale = (current.height / util::tileSize);
 

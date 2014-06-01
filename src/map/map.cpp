@@ -314,11 +314,11 @@ void Map::stopScaling() {
     update();
 }
 
-double Map::getMinZoom() {
+double Map::getMinZoom() const {
     return transform.getMinZoom();
 }
 
-double Map::getMaxZoom() {
+double Map::getMaxZoom() const {
     return transform.getMaxZoom();
 }
 

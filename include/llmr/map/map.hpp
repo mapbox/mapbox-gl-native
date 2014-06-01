@@ -81,8 +81,8 @@ public:
     void resetZoom();
     void startScaling();
     void stopScaling();
-    double getMinZoom();
-    double getMaxZoom();
+    double getMinZoom() const;
+    double getMaxZoom() const;
 
     // Rotation
     void rotateBy(double sx, double sy, double ex, double ey, double duration = 0);

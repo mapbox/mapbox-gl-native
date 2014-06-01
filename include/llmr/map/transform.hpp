@@ -39,8 +39,8 @@ public:
     double getScale() const;
     void startScaling();
     void stopScaling();
-    double getMinZoom();
-    double getMaxZoom();
+    double getMinZoom() const;
+    double getMaxZoom() const;
 
     // Angle
     void rotateBy(double sx, double sy, double ex, double ey, time duration = 0);
@@ -71,7 +71,7 @@ private:
     void _clearRotating();
     void _clearScaling();
 
-    void constrain(double& scale, double& y);
+    void constrain(double& scale, double& y) const;
 
 private:
     mutable uv::rwlock mtx;
