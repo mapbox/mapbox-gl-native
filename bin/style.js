@@ -1822,10 +1822,15 @@ module.exports = {
         ],
         "hillshade_prerender": [
             "stops",
-            {"z": 13, "val": 0},
-            {"z": 14, "val": 1}
+            {"z": 11, "val": 0},
+            {"z": 12, "val": 1}
         ],
-        "hillshade_prerender_size": 1024
+        "hillshade_prerender_size": [
+            "stops",
+            {"z": 11, "val": 1056},
+            {"z": 12, "val": 512},
+            {"z": 13, "val": 256}
+        ]
     },
     "classes": [
         {
