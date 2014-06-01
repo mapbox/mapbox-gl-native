@@ -53,7 +53,6 @@ public:
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
 
     // Styling
-    void toggleStyle();
     void setAppliedClasses(std::set<std::string> appliedClasses);
     std::set<std::string> getAppliedClasses() const;
     void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);

@@ -152,18 +152,17 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                                            : defaultFillProperties;
     if (!properties.enabled) return;
 
-
-    if (properties.prerender) {
+    if (properties.prerender && properties.getPrerender(id.z)) {
         if (pass == Translucent) {
             // Buffer value around the 0..4096 extent that will be drawn into the 256x256 pixel
             // texture. We later scale the texture so that the actual bounds will align with this
             // tile's bounds. The reason we do this is so that the
-
             if (!bucket.prerendered) {
-                bucket.prerendered = std::make_unique<PrerenderedTexture>(properties.prerenderSize);
+                const PrerenderProperties prerender = properties.getPrerenderProperties(id.z);
+                bucket.prerendered = std::make_unique<PrerenderedTexture>(prerender);
                 bucket.prerendered->bindFramebuffer();
 
-                preparePrerender(properties);
+                preparePrerender(*bucket.prerendered);
 
                 const FillProperties modifiedProperties = [&]{
                     FillProperties modifiedProperties = properties;
@@ -173,7 +172,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
                 // When drawing the fill, we want to draw a buffer around too, so we
                 // essentially downscale everyting, and then upscale it later when rendering.
-                const int buffer = 4096 * properties.prerenderBuffer;
+                const int buffer = prerender.buffer * 4096.0f;
                 const mat4 vtxMatrix = [&]{
                     mat4 vtxMatrix;
                     matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
@@ -187,17 +186,16 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                 setTranslucent();
                 renderFill(bucket, modifiedProperties, id, vtxMatrix);
 
-
-                if (properties.prerenderBlur > 0) {
-                    bucket.prerendered->blur(*this, properties.prerenderBlur);
+                if (prerender.blur > 0) {
+                    bucket.prerendered->blur(*this, prerender.blur);
                 }
 
                 // RESET STATE
                 bucket.prerendered->unbindFramebuffer();
-                finishPrerender(properties);
+                finishPrerender(*bucket.prerendered);
             }
 
-            renderPrerenderedTexture(bucket, properties);
+            renderPrerenderedTexture(*bucket.prerendered, properties);
         }
     } else {
         const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);

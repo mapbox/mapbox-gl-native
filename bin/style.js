@@ -1819,6 +1819,17 @@ module.exports = {
             "stops",
             {"z": 16, "val": 10},
             {"z": 17, "val": 11}
+        ],
+        "hillshade_prerender": [
+            "stops",
+            {"z": 11, "val": 0},
+            {"z": 12, "val": 1}
+        ],
+        "hillshade_prerender_size": [
+            "stops",
+            {"z": 11, "val": 1056},
+            {"z": 12, "val": 512},
+            {"z": 13, "val": 256}
         ]
     },
     "classes": [
@@ -1972,8 +1983,8 @@ module.exports = {
                 "hillshade_full_shadow": {
                     "color": "#103",
                     "antialias": false,
-                    "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender": "hillshade_prerender",
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -1987,8 +1998,8 @@ module.exports = {
                 "hillshade_medium_shadow": {
                     "color": "#206",
                     "antialias": false,
-                    "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender": "hillshade_prerender",
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2002,8 +2013,8 @@ module.exports = {
                 "hillshade_full_highlight": {
                     "color": "#fffff3",
                     "antialias": false,
-                    "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender": "hillshade_prerender",
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2017,8 +2028,8 @@ module.exports = {
                 "hillshade_medium_highlight": {
                     "color": "#ffd",
                     "antialias": false,
-                    "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender": "hillshade_prerender",
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2784,8 +2795,8 @@ module.exports = {
                 "hillshade_full_shadow": {
                     "color": "#103",
                     "antialias": false,
-                    "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender": "hillshade_prerender",
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2798,8 +2809,8 @@ module.exports = {
                 "hillshade_medium_shadow": {
                     "color": "#206",
                     "antialias": false,
-                    "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender": "hillshade_prerender",
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2812,8 +2823,8 @@ module.exports = {
                 "hillshade_full_highlight": {
                     "color": "#fdfdad",
                     "antialias": false,
-                    "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender": "hillshade_prerender",
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
@@ -2827,8 +2838,8 @@ module.exports = {
                 "hillshade_medium_highlight": {
                     "color": "#ffe1b7",
                     "antialias": false,
-                    "prerender": true,
-                    "prerender-size": 1024,
+                    "prerender": "hillshade_prerender",
+                    "prerender-size": "hillshade_prerender_size",
                     "prerender-blur": 1,
                     "opacity": [
                         "stops",
