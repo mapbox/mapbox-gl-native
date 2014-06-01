@@ -190,7 +190,7 @@ void curl_perform(uv_poll_t *req, int /*status*/, int events) {
 }
 
 int handle_socket(CURL * /*easy*/, curl_socket_t s, int action, void * /*userp*/, void *socketp) {
-    curl_context *context = nullptr;
+    curl_context *context;
     if (action == CURL_POLL_IN || action == CURL_POLL_OUT) {
         if (socketp) {
             context = (curl_context *)socketp;
@@ -198,9 +198,6 @@ int handle_socket(CURL * /*easy*/, curl_socket_t s, int action, void * /*userp*/
             context = create_curl_context(s);
         }
         curl_multi_assign(curl_multi, s, (void *)context);
-    }
-    if (!context) {
-        throw std::runtime_error("unhandled action in socket handling");
     }
 
     switch (action) {
