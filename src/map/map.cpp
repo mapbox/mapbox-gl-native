@@ -387,29 +387,6 @@ bool Map::getDebug() const {
     return debug;
 }
 
-void Map::toggleStyle() {
-    setDefaultTransitionDuration(300);
-    style->cancelTransitions();
-
-    if (style->appliedClasses.size() == 1) {
-        for (auto source_it = style->classes.begin(); source_it != style->classes.end(); source_it++) {
-            if (source_it->first != "default") {
-                style->appliedClasses.insert(source_it->first);
-                break;
-            }
-        }
-    } else {
-        for (auto source_it = style->classes.begin(); source_it != style->classes.end(); source_it++) {
-            if (source_it->first != "default") {
-                style->appliedClasses.erase(source_it->first);
-                break;
-            }
-        }
-    }
-
-    update();
-}
-
 void Map::setAppliedClasses(std::set<std::string> appliedClasses) {
     style->cancelTransitions();
 
