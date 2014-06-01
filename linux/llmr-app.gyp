@@ -51,7 +51,22 @@
       ],
       'dependencies': [
         '../llmr.gyp:llmr-x86',
+        'default_stylesheet',
       ],
     },
+    {
+      'target_name': 'default_stylesheet',
+      'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [
+        '../llmr.gyp:build_stylesheet'
+      ],
+      'copies': [
+        {
+          'files': [ '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js' ],
+          'destination': '<(PRODUCT_DIR)'
+        }
+      ]
+    }
   ],
 }
