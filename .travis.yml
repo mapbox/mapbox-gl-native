@@ -23,6 +23,8 @@ before_install:
 
 install:
 - make setup
+- rm -rf mapnik-packaging/out/packages
+
 
 before_script:
 - if [[ ${CXX} == "g++" ]]; then export CXX="g++-4.8" ; fi
