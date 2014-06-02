@@ -1307,6 +1307,10 @@ module.exports = {
             "bucket": "street"
         },
         {
+            "name": "road_motorway_casing",
+            "bucket": "motorway"
+        },
+        {
             "name": "road_motorway_link",
             "bucket": "motorway_link"
         },
@@ -1321,10 +1325,6 @@ module.exports = {
         {
             "name": "road_main",
             "bucket": "main"
-        },
-        {
-            "name": "road_motorway_casing",
-            "bucket": "motorway"
         },
         {
             "name": "road_motorway",

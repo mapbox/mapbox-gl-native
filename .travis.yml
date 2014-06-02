@@ -43,7 +43,9 @@ script:
 notifications:
   hipchat:
     rooms:
-      secure: H/Z51pvNrTgdePfHpF66obRy2JF+yBCmp70MWjGnW8RZDyUQ+U5HgcVe/HBeCYFRg81hjSr3TxV70WrTUHP1NNPQ4+kcuW194bjZqq8TACwXOasFGNQ5L32izthfGto6rKtgNz6TzR5t44BpJnJhJMmqh46ybZvNTN2XBIaYkDQ=
+      secure: "ZKtTiFjXgXfrAO8eMU1nJBe46OBLgk0H7VAVmk84QwAb6DuoqT+mGMs+1yrWtjLwZI8vayZyaucupp1siM7lBWCOADx5GXA6GCCLOuE7fYLSNJFrXHa1u70IUBLOU8b5bDWRn8tcd5CM754R609l4ckTzBH3y4CIh9YNFrB0b+g="
+    template:
+      - '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}'
 
 git:
   submodules: false

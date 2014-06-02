@@ -87,17 +87,17 @@ public:
     inline bool compare(const Value &other) const {
         switch (op) {
         case FilterOperator::Equal:
-            return util::relaxed_equal(value, other);
+            return util::relaxed_equal(other, value);
         case FilterOperator::NotEqual:
-            return !util::relaxed_equal(value, other);
+            return !util::relaxed_equal(other, value);
         case FilterOperator::Greater:
-            return util::relaxed_greater(value, other);
+            return util::relaxed_greater(other, value);
         case FilterOperator::GreaterEqual:
-            return util::relaxed_greater_equal(value, other);
+            return util::relaxed_greater_equal(other, value);
         case FilterOperator::Less:
-            return util::relaxed_less(value, other);
+            return util::relaxed_less(other, value);
         case FilterOperator::LessEqual:
-            return util::relaxed_less_equal(value, other);
+            return util::relaxed_less_equal(other, value);
         default:
             return false;
         }
