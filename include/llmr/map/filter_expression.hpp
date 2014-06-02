@@ -11,7 +11,11 @@ namespace llmr {
 
 enum class FilterOperator {
     Equal,
-    NotEqual
+    NotEqual,
+    Greater,
+    GreaterEqual,
+    Less,
+    LessEqual
 };
 
 enum class ExpressionOperator {
@@ -25,6 +29,14 @@ inline FilterOperator filterOperatorType(const std::string &op) {
         return FilterOperator::NotEqual;
     } else if (op == "==" || op == "eq") {
         return FilterOperator::Equal;
+    } else if (op == ">" || op == "gt") {
+        return FilterOperator::Greater;
+    } else if (op == ">=" || op == "gte") {
+        return FilterOperator::GreaterEqual;
+    } else if (op == "<" || op == "lt") {
+        return FilterOperator::Less;
+    } else if (op == "<=" || op == "lte") {
+        return FilterOperator::LessEqual;
     } else {
         fprintf(stderr, "[WARNING] filter operator '%s' unrecognized\n", op.c_str());
         return FilterOperator::Equal;
@@ -74,10 +86,20 @@ public:
 
     inline bool compare(const Value &other) const {
         switch (op) {
+        case FilterOperator::Equal:
+            return util::relaxed_equal(value, other);
         case FilterOperator::NotEqual:
-            return !util::relaxed_equal(value)(other);
+            return !util::relaxed_equal(value, other);
+        case FilterOperator::Greater:
+            return util::relaxed_greater(value, other);
+        case FilterOperator::GreaterEqual:
+            return util::relaxed_greater_equal(value, other);
+        case FilterOperator::Less:
+            return util::relaxed_less(value, other);
+        case FilterOperator::LessEqual:
+            return util::relaxed_less_equal(value, other);
         default:
-            return util::relaxed_equal(value)(other);
+            return false;
         }
     }
 
