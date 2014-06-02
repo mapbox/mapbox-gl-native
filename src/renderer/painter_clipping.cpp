@@ -42,11 +42,11 @@ void Painter::drawClippingMasks(const Sources &sources) {
         const std::shared_ptr<Sprite> &sprite = map.getStyle()->sprite;
         if (sprite) {
             SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-            Rect<uint16_t> imagePos = spriteAtlas.getImage("matte-16", *sprite);
+            Rect<uint16_t> imagePos = spriteAtlas.getImage("matte-256", *sprite);
 
             std::array<float, 2> imageSize = {{
-                    (float)imagePos.w,
-                    (float)imagePos.h
+                    (float)(imagePos.w * 0.5),
+                    (float)(imagePos.h * 0.5)
                 }
             };
 
