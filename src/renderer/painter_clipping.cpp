@@ -39,28 +39,33 @@ void Painter::drawClippingMasks(const Sources &sources) {
         coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
     } else {
         // No viewport tiles are parsed. Draw the grid pattern.
-        useProgram(patternShader->program);
+        const std::shared_ptr<Sprite> &sprite = map.getStyle()->sprite;
+        if (sprite) {
+            SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
+            Rect<uint16_t> imagePos = spriteAtlas.getImage("matte-16", *sprite);
 
-        SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-        std::array<float, 2> imageSize = {{
-                512,
-                512
-            }
-        };
-        patternShader->setPatternSize(imageSize);
-        patternShader->setPatternTopLeft({{
-            float(66) / spriteAtlas.getWidth(),
-            float(0)  / spriteAtlas.getHeight(),
-        }});
-        patternShader->setPatternBottomRight({{
-            float(66 + 64) / spriteAtlas.getWidth(),
-            float(0  + 32) / spriteAtlas.getHeight(),
-        }});
-        std::array<float, 4> color = {{ 1, 0, 0, 1 }};
-        patternShader->setColor(color);
-        spriteAtlas.bind(true);
+            std::array<float, 2> imageSize = {{
+                    (float)imagePos.w,
+                    (float)imagePos.h
+                }
+            };
 
-        coveringPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0));
+            useProgram(patternShader->program);
+            patternShader->setPatternSize(imageSize);
+            patternShader->setPatternTopLeft({{
+                float(imagePos.x) / spriteAtlas.getWidth(),
+                float(imagePos.y) / spriteAtlas.getHeight(),
+            }});
+            patternShader->setPatternBottomRight({{
+                float(imagePos.x + imagePos.w) / spriteAtlas.getWidth(),
+                float(imagePos.y + imagePos.h) / spriteAtlas.getHeight(),
+            }});
+            std::array<float, 4> color = {{ 1, 1, 1, 1 }};
+            patternShader->setColor(color);
+            spriteAtlas.bind(true);
+
+            coveringPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0));
+        }
     }
 
     for (const auto &pair : sources) {
