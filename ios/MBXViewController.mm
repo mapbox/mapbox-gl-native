@@ -204,9 +204,9 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
     if ([latestLocation distanceFromLocation:[[CLLocation alloc] initWithLatitude:self.mapView.centerCoordinate.latitude longitude:self.mapView.centerCoordinate.longitude]] > 100)
     {
         [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(latestLocation.coordinate.latitude, latestLocation.coordinate.longitude) zoomLevel:17 animated:YES];
-
-        [self.locationManager stopUpdatingLocation];
     }
+
+    [self.locationManager stopUpdatingLocation];
 }
 
 #pragma clang diagnostic pop
