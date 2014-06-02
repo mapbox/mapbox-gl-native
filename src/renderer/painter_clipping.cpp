@@ -56,8 +56,8 @@ void Painter::drawClippingMasks(const Sources &sources) {
             float(66 + 64) / spriteAtlas.getWidth(),
             float(0  + 32) / spriteAtlas.getHeight(),
         }});
-//        std::array<float, 4> color = {{ 1, 0, 0, 1 }};
-//        patternShader->setColor(color);
+        std::array<float, 4> color = {{ 1, 0, 0, 1 }};
+        patternShader->setColor(color);
         spriteAtlas.bind(true);
 
         coveringPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0));
