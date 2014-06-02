@@ -44,6 +44,10 @@ int main(int argc, char *argv[]) {
 
     // read default stylesheet from disk
     std::ifstream stylefile("./style.min.js");
+    if (!stylefile.good()) {
+        fprintf(stder, "Cannot read style file\n");
+        return 1;
+    }
     std::stringstream stylejson;
     stylejson << stylefile.rdbuf();
 
