@@ -190,32 +190,27 @@ void curl_perform(uv_poll_t *req, int /*status*/, int events) {
 }
 
 int handle_socket(CURL * /*easy*/, curl_socket_t s, int action, void * /*userp*/, void *socketp) {
-    curl_context *context;
-    if (action == CURL_POLL_IN || action == CURL_POLL_OUT) {
-        if (socketp) {
-            context = (curl_context *)socketp;
-        } else {
-            context = create_curl_context(s);
-        }
-        curl_multi_assign(curl_multi, s, (void *)context);
+    curl_context *context = nullptr;
+
+    if (socketp) {
+        context = (curl_context *)socketp;
+    } else if (action != CURL_POLL_REMOVE) {
+        context = create_curl_context(s);
     }
 
-    switch (action) {
-    case CURL_POLL_IN:
-        uv_poll_start(&context->poll_handle, UV_READABLE, curl_perform);
-        break;
-    case CURL_POLL_OUT:
-        uv_poll_start(&context->poll_handle, UV_WRITABLE, curl_perform);
-        break;
-    case CURL_POLL_REMOVE:
-        if (socketp) {
-            uv_poll_stop(&((curl_context *)socketp)->poll_handle);
-            destroy_curl_context((curl_context *)socketp);
+    if (context) {
+        curl_multi_assign(curl_multi, s, (void *)context);
+        if (action == CURL_POLL_IN || action == CURL_POLL_INOUT) {
+            uv_poll_start(&context->poll_handle, UV_READABLE, curl_perform);
+        }
+        if (action == CURL_POLL_OUT || action == CURL_POLL_INOUT) {
+            uv_poll_start(&context->poll_handle, UV_WRITABLE, curl_perform);
+        }
+        if (action == CURL_POLL_REMOVE && socketp) {
+            uv_poll_stop(&context->poll_handle);
+            destroy_curl_context(context);
             curl_multi_assign(curl_multi, s, NULL);
         }
-        break;
-    default:
-        abort();
     }
 
     return 0;

@@ -53,7 +53,7 @@ linux: config.gypi linux/llmr-app.gyp node
 
 # Executes the Linux binary
 run-linux: linux
-	build/$(BUILDTYPE)/mapbox-gl
+	(cd build/$(BUILDTYPE) && ./mapbox-gl)
 
 
 
