@@ -25,14 +25,13 @@ install:
 - make setup
 - rm -rf mapnik-packaging/out/packages
 
-
 before_script:
 - if [[ ${CXX} == "g++" ]]; then export CXX="g++-4.8" ; fi
 - if [[ ${BUILDTYPE} == "Debug" ]] && [[ ${CXX} == "g++" ]]; then export CXXFLAGS="-fsanitize=address";export CFLAGS="${CXXFLAGS}";export LDFLAGS="-fsanitize=address" ; fi
 - if [[ ${BUILDTYPE} == "Debug" ]] && [[ ${CXX} == "clang++" ]]; then export CXXFLAGS="-fsanitize=thread -fPIC";export CFLAGS="${CXXFLAGS}";export LDFLAGS="-fsanitize=thread -pie" ; fi
 - if [[ ${CXX} == "clang++" ]]; then export LDFLAGS="${LDFLAGS}"; export CXXFLAGS="-Wno-unknown-warning-option -Wno-unused-local-typedefs -Wno-unknown-pragmas ${CXXFLAGS}"; fi
+
 script:
-- make llmr BUILDTYPE=${BUILDTYPE}
 - make linux BUILDTYPE=${BUILDTYPE}
 - make run-tests BUILDTYPE=${BUILDTYPE}
 # TODO - port to linux
