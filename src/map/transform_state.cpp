@@ -122,13 +122,6 @@ bool TransformState::isChanging() const {
 }
 
 
-#pragma mark - Interactive
-
-bool TransformState::isInteractive() const {
-    return interactive;
-}
-
-
 #pragma mark - (private helper functions)
 
 
