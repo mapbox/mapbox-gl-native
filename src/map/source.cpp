@@ -57,6 +57,19 @@ size_t Source::getTileCount() const {
     return tiles.size();
 }
 
+bool Source::viewportTileParsed() {
+    bool parsed = false;
+
+    for (auto &pair : tiles) {
+        Tile::ID id = pair.first;
+        if (hasTile(id) == TileData::State::parsed) {
+            parsed = true;
+        }
+    }
+
+    return parsed;
+}
+
 void Source::drawClippingMasks() {
     for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
         Tile &tile = *pair.second;
