@@ -160,6 +160,299 @@ TEST(Variant, RelaxedEquality) {
 }
 
 TEST(Variant, RelaxedGreater) {
+    EXPECT_TRUE(util::relaxed_greater(std::string("387"), std::string("386")));
+    EXPECT_TRUE(util::relaxed_greater(uint64_t(387), std::string("386")));
+    EXPECT_TRUE(util::relaxed_greater(int64_t(387), std::string("386")));
+    EXPECT_TRUE(util::relaxed_greater(double(387), std::string("386")));
+    EXPECT_TRUE(util::relaxed_greater(bool(true), std::string("0")));
+
+    EXPECT_TRUE(util::relaxed_greater(std::string("387"), uint64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater(uint64_t(387), uint64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater(int64_t(387), uint64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater(double(387), uint64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater(bool(true), uint64_t(0)));
+
     EXPECT_TRUE(util::relaxed_greater(std::string("387"), int64_t(386)));
     EXPECT_TRUE(util::relaxed_greater(uint64_t(387), int64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater(int64_t(387), int64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater(double(387), int64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater(bool(true), int64_t(0)));
+
+    EXPECT_TRUE(util::relaxed_greater(std::string("387"), double(386.7)));
+    EXPECT_TRUE(util::relaxed_greater(uint64_t(387), double(386.7)));
+    EXPECT_TRUE(util::relaxed_greater(int64_t(387), double(386.7)));
+    EXPECT_TRUE(util::relaxed_greater(double(387), double(386.7)));
+    EXPECT_TRUE(util::relaxed_greater(bool(true), double(0)));
+
+    EXPECT_TRUE(util::relaxed_greater(std::string("387"), bool(false)));
+    EXPECT_TRUE(util::relaxed_greater(uint64_t(387), bool(false)));
+    EXPECT_TRUE(util::relaxed_greater(int64_t(387), bool(false)));
+    EXPECT_TRUE(util::relaxed_greater(double(387), bool(false)));
+    EXPECT_TRUE(util::relaxed_greater(bool(true), double(false)));
+
+
+
+
+    EXPECT_FALSE(util::relaxed_greater(std::string("387"), std::string("388")));
+    EXPECT_FALSE(util::relaxed_greater(uint64_t(387), std::string("388")));
+    EXPECT_FALSE(util::relaxed_greater(int64_t(387), std::string("388")));
+    EXPECT_FALSE(util::relaxed_greater(double(387), std::string("388")));
+    EXPECT_FALSE(util::relaxed_greater(bool(true), std::string("388")));
+
+    EXPECT_FALSE(util::relaxed_greater(std::string("387"), uint64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater(uint64_t(387), uint64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater(int64_t(387), uint64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater(double(387), uint64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater(bool(true), uint64_t(388)));
+
+    EXPECT_FALSE(util::relaxed_greater(std::string("387"), int64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater(uint64_t(387), int64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater(int64_t(387), int64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater(double(387), int64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater(bool(true), int64_t(388)));
+
+    EXPECT_FALSE(util::relaxed_greater(std::string("387"), double(388.7)));
+    EXPECT_FALSE(util::relaxed_greater(uint64_t(387), double(388.7)));
+    EXPECT_FALSE(util::relaxed_greater(int64_t(387), double(388.7)));
+    EXPECT_FALSE(util::relaxed_greater(double(387), double(388.7)));
+    EXPECT_FALSE(util::relaxed_greater(bool(true), double(388)));
+
+    EXPECT_FALSE(util::relaxed_greater(std::string("387"), bool(true)));
+    EXPECT_FALSE(util::relaxed_greater(uint64_t(387), bool(true)));
+    EXPECT_FALSE(util::relaxed_greater(int64_t(387), bool(true)));
+    EXPECT_FALSE(util::relaxed_greater(double(387), bool(true)));
+    EXPECT_FALSE(util::relaxed_greater(bool(true), bool(true)));
+}
+
+
+
+TEST(Variant, RelaxedGreaterEqual) {
+    EXPECT_TRUE(util::relaxed_greater_equal(std::string("387"), std::string("386")));
+    EXPECT_TRUE(util::relaxed_greater_equal(std::string("387"), std::string("387")));
+    EXPECT_TRUE(util::relaxed_greater_equal(uint64_t(387), std::string("386")));
+    EXPECT_TRUE(util::relaxed_greater_equal(uint64_t(387), std::string("387")));
+    EXPECT_TRUE(util::relaxed_greater_equal(int64_t(387), std::string("386")));
+    EXPECT_TRUE(util::relaxed_greater_equal(int64_t(387), std::string("387")));
+    EXPECT_TRUE(util::relaxed_greater_equal(double(387), std::string("386")));
+    EXPECT_TRUE(util::relaxed_greater_equal(double(387), std::string("387")));
+    EXPECT_TRUE(util::relaxed_greater_equal(bool(true), std::string("0")));
+
+    EXPECT_TRUE(util::relaxed_greater_equal(std::string("387"), uint64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater_equal(std::string("387"), uint64_t(387)));
+    EXPECT_TRUE(util::relaxed_greater_equal(uint64_t(387), uint64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater_equal(uint64_t(387), uint64_t(387)));
+    EXPECT_TRUE(util::relaxed_greater_equal(int64_t(387), uint64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater_equal(int64_t(387), uint64_t(387)));
+    EXPECT_TRUE(util::relaxed_greater_equal(double(387), uint64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater_equal(double(387), uint64_t(387)));
+    EXPECT_TRUE(util::relaxed_greater_equal(bool(true), uint64_t(0)));
+
+    EXPECT_TRUE(util::relaxed_greater_equal(std::string("387"), int64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater_equal(std::string("387"), int64_t(387)));
+    EXPECT_TRUE(util::relaxed_greater_equal(uint64_t(387), int64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater_equal(uint64_t(387), int64_t(387)));
+    EXPECT_TRUE(util::relaxed_greater_equal(int64_t(387), int64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater_equal(int64_t(387), int64_t(387)));
+    EXPECT_TRUE(util::relaxed_greater_equal(double(387), int64_t(386)));
+    EXPECT_TRUE(util::relaxed_greater_equal(double(387), int64_t(387)));
+    EXPECT_TRUE(util::relaxed_greater_equal(bool(true), int64_t(0)));
+
+    EXPECT_TRUE(util::relaxed_greater_equal(std::string("387"), double(386.7)));
+    EXPECT_TRUE(util::relaxed_greater_equal(std::string("387"), double(387)));
+    EXPECT_TRUE(util::relaxed_greater_equal(uint64_t(387), double(386.7)));
+    EXPECT_TRUE(util::relaxed_greater_equal(uint64_t(387), double(387)));
+    EXPECT_TRUE(util::relaxed_greater_equal(int64_t(387), double(386.7)));
+    EXPECT_TRUE(util::relaxed_greater_equal(int64_t(387), double(387)));
+    EXPECT_TRUE(util::relaxed_greater_equal(double(387), double(386.7)));
+    EXPECT_TRUE(util::relaxed_greater_equal(double(387), double(387)));
+    EXPECT_TRUE(util::relaxed_greater_equal(bool(true), double(0)));
+
+    EXPECT_TRUE(util::relaxed_greater_equal(std::string("387"), bool(false)));
+    EXPECT_TRUE(util::relaxed_greater_equal(std::string("387"), bool(true)));
+    EXPECT_TRUE(util::relaxed_greater_equal(uint64_t(387), bool(false)));
+    EXPECT_TRUE(util::relaxed_greater_equal(uint64_t(387), bool(true)));
+    EXPECT_TRUE(util::relaxed_greater_equal(int64_t(387), bool(false)));
+    EXPECT_TRUE(util::relaxed_greater_equal(int64_t(387), bool(true)));
+    EXPECT_TRUE(util::relaxed_greater_equal(double(387), bool(false)));
+    EXPECT_TRUE(util::relaxed_greater_equal(double(387), bool(true)));
+    EXPECT_TRUE(util::relaxed_greater_equal(bool(true), bool(false)));
+    EXPECT_TRUE(util::relaxed_greater_equal(bool(true), bool(true)));
+
+
+
+
+    EXPECT_FALSE(util::relaxed_greater_equal(std::string("387"), std::string("388")));
+    EXPECT_FALSE(util::relaxed_greater_equal(uint64_t(387), std::string("388")));
+    EXPECT_FALSE(util::relaxed_greater_equal(int64_t(387), std::string("388")));
+    EXPECT_FALSE(util::relaxed_greater_equal(double(387), std::string("388")));
+
+    EXPECT_FALSE(util::relaxed_greater_equal(std::string("387"), uint64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater_equal(uint64_t(387), uint64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater_equal(int64_t(387), uint64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater_equal(double(387), uint64_t(388)));
+
+    EXPECT_FALSE(util::relaxed_greater_equal(std::string("387"), int64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater_equal(uint64_t(387), int64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater_equal(int64_t(387), int64_t(388)));
+    EXPECT_FALSE(util::relaxed_greater_equal(double(387), int64_t(388)));
+
+    EXPECT_FALSE(util::relaxed_greater_equal(std::string("387"), double(388.7)));
+    EXPECT_FALSE(util::relaxed_greater_equal(uint64_t(387), double(388.7)));
+    EXPECT_FALSE(util::relaxed_greater_equal(int64_t(387), double(388.7)));
+    EXPECT_FALSE(util::relaxed_greater_equal(double(387), double(388.7)));
+}
+
+
+TEST(Variant, RelaxedLess) {
+    EXPECT_TRUE(util::relaxed_less(std::string("387"), std::string("388")));
+    EXPECT_TRUE(util::relaxed_less(uint64_t(387), std::string("388")));
+    EXPECT_TRUE(util::relaxed_less(int64_t(387), std::string("388")));
+    EXPECT_TRUE(util::relaxed_less(double(387), std::string("388")));
+    EXPECT_TRUE(util::relaxed_less(bool(false), std::string("388")));
+    EXPECT_TRUE(util::relaxed_less(bool(false), std::string("1")));
+
+    EXPECT_TRUE(util::relaxed_less(std::string("387"), uint64_t(388)));
+    EXPECT_TRUE(util::relaxed_less(uint64_t(387), uint64_t(388)));
+    EXPECT_TRUE(util::relaxed_less(int64_t(387), uint64_t(388)));
+    EXPECT_TRUE(util::relaxed_less(double(387), uint64_t(388)));
+    EXPECT_TRUE(util::relaxed_less(bool(false), uint64_t(388)));
+    EXPECT_TRUE(util::relaxed_less(bool(false), uint64_t(1)));
+
+    EXPECT_TRUE(util::relaxed_less(std::string("387"), int64_t(388)));
+    EXPECT_TRUE(util::relaxed_less(uint64_t(387), int64_t(388)));
+    EXPECT_TRUE(util::relaxed_less(int64_t(387), int64_t(388)));
+    EXPECT_TRUE(util::relaxed_less(double(387), int64_t(388)));
+    EXPECT_TRUE(util::relaxed_less(bool(false), int64_t(388)));
+    EXPECT_TRUE(util::relaxed_less(bool(false), int64_t(1)));
+
+    EXPECT_TRUE(util::relaxed_less(std::string("387"), double(387.7)));
+    EXPECT_TRUE(util::relaxed_less(uint64_t(387), double(387.7)));
+    EXPECT_TRUE(util::relaxed_less(int64_t(387), double(387.7)));
+    EXPECT_TRUE(util::relaxed_less(double(387), double(387.7)));
+    EXPECT_TRUE(util::relaxed_less(bool(false), double(387)));
+    EXPECT_TRUE(util::relaxed_less(bool(false), double(1)));
+
+    EXPECT_TRUE(util::relaxed_less(std::string("0"), bool(true)));
+    EXPECT_TRUE(util::relaxed_less(uint64_t(0), bool(true)));
+    EXPECT_TRUE(util::relaxed_less(int64_t(0), bool(true)));
+    EXPECT_TRUE(util::relaxed_less(double(0), bool(true)));
+    EXPECT_TRUE(util::relaxed_less(bool(false), bool(true)));
+
+
+
+
+    EXPECT_FALSE(util::relaxed_less(std::string("387"), std::string("386")));
+    EXPECT_FALSE(util::relaxed_less(uint64_t(387), std::string("386")));
+    EXPECT_FALSE(util::relaxed_less(int64_t(387), std::string("386")));
+    EXPECT_FALSE(util::relaxed_less(double(387), std::string("386")));
+    EXPECT_FALSE(util::relaxed_less(bool(true), std::string("386")));
+
+    EXPECT_FALSE(util::relaxed_less(std::string("387"), uint64_t(386)));
+    EXPECT_FALSE(util::relaxed_less(uint64_t(387), uint64_t(386)));
+    EXPECT_FALSE(util::relaxed_less(int64_t(387), uint64_t(386)));
+    EXPECT_FALSE(util::relaxed_less(double(387), uint64_t(386)));
+    EXPECT_FALSE(util::relaxed_less(bool(true), uint64_t(386)));
+
+    EXPECT_FALSE(util::relaxed_less(std::string("387"), int64_t(386)));
+    EXPECT_FALSE(util::relaxed_less(uint64_t(387), int64_t(386)));
+    EXPECT_FALSE(util::relaxed_less(int64_t(387), int64_t(386)));
+    EXPECT_FALSE(util::relaxed_less(double(387), int64_t(386)));
+    EXPECT_FALSE(util::relaxed_less(bool(true), int64_t(386)));
+
+    EXPECT_FALSE(util::relaxed_less(std::string("387"), double(386.7)));
+    EXPECT_FALSE(util::relaxed_less(uint64_t(387), double(386.7)));
+    EXPECT_FALSE(util::relaxed_less(int64_t(387), double(386.7)));
+    EXPECT_FALSE(util::relaxed_less(double(387), double(386.7)));
+    EXPECT_FALSE(util::relaxed_less(bool(true), double(386)));
+
+    EXPECT_FALSE(util::relaxed_less(std::string("387"), bool(true)));
+    EXPECT_FALSE(util::relaxed_less(uint64_t(387), bool(true)));
+    EXPECT_FALSE(util::relaxed_less(int64_t(387), bool(true)));
+    EXPECT_FALSE(util::relaxed_less(double(387), bool(true)));
+    EXPECT_FALSE(util::relaxed_less(bool(true), bool(true)));
+}
+
+
+TEST(Variant, RelaxedLessEqual) {
+    EXPECT_TRUE(util::relaxed_less_equal(std::string("387"), std::string("388")));
+    EXPECT_TRUE(util::relaxed_less_equal(std::string("387"), std::string("387")));
+    EXPECT_TRUE(util::relaxed_less_equal(uint64_t(387), std::string("388")));
+    EXPECT_TRUE(util::relaxed_less_equal(uint64_t(387), std::string("387")));
+    EXPECT_TRUE(util::relaxed_less_equal(int64_t(387), std::string("388")));
+    EXPECT_TRUE(util::relaxed_less_equal(int64_t(387), std::string("387")));
+    EXPECT_TRUE(util::relaxed_less_equal(double(387), std::string("388")));
+    EXPECT_TRUE(util::relaxed_less_equal(double(387), std::string("387")));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), std::string("388")));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), std::string("1")));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), std::string("0")));
+
+    EXPECT_TRUE(util::relaxed_less_equal(std::string("387"), uint64_t(388)));
+    EXPECT_TRUE(util::relaxed_less_equal(std::string("387"), uint64_t(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(uint64_t(387), uint64_t(388)));
+    EXPECT_TRUE(util::relaxed_less_equal(uint64_t(387), uint64_t(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(int64_t(387), uint64_t(388)));
+    EXPECT_TRUE(util::relaxed_less_equal(int64_t(387), uint64_t(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(double(387), uint64_t(388)));
+    EXPECT_TRUE(util::relaxed_less_equal(double(387), uint64_t(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), uint64_t(388)));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), uint64_t(1)));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), uint64_t(0)));
+
+    EXPECT_TRUE(util::relaxed_less_equal(std::string("387"), int64_t(388)));
+    EXPECT_TRUE(util::relaxed_less_equal(std::string("387"), int64_t(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(uint64_t(387), int64_t(388)));
+    EXPECT_TRUE(util::relaxed_less_equal(uint64_t(387), int64_t(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(int64_t(387), int64_t(388)));
+    EXPECT_TRUE(util::relaxed_less_equal(int64_t(387), int64_t(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(double(387), int64_t(388)));
+    EXPECT_TRUE(util::relaxed_less_equal(double(387), int64_t(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), int64_t(388)));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), int64_t(1)));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), int64_t(0)));
+
+    EXPECT_TRUE(util::relaxed_less_equal(std::string("387"), double(387.7)));
+    EXPECT_TRUE(util::relaxed_less_equal(std::string("387"), double(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(uint64_t(387), double(387.7)));
+    EXPECT_TRUE(util::relaxed_less_equal(uint64_t(387), double(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(int64_t(387), double(387.7)));
+    EXPECT_TRUE(util::relaxed_less_equal(int64_t(387), double(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(double(387), double(387.7)));
+    EXPECT_TRUE(util::relaxed_less_equal(double(387), double(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), double(387)));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), double(1)));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), double(0)));
+
+    EXPECT_TRUE(util::relaxed_less_equal(std::string("0"), bool(true)));
+    EXPECT_TRUE(util::relaxed_less_equal(std::string("0"), bool(false)));
+    EXPECT_TRUE(util::relaxed_less_equal(uint64_t(0), bool(true)));
+    EXPECT_TRUE(util::relaxed_less_equal(uint64_t(0), bool(false)));
+    EXPECT_TRUE(util::relaxed_less_equal(int64_t(0), bool(true)));
+    EXPECT_TRUE(util::relaxed_less_equal(int64_t(0), bool(false)));
+    EXPECT_TRUE(util::relaxed_less_equal(double(0), bool(true)));
+    EXPECT_TRUE(util::relaxed_less_equal(double(0), bool(false)));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), bool(true)));
+    EXPECT_TRUE(util::relaxed_less_equal(bool(false), bool(false)));
+
+
+
+
+    EXPECT_FALSE(util::relaxed_less_equal(std::string("387"), std::string("386")));
+    EXPECT_FALSE(util::relaxed_less_equal(uint64_t(387), std::string("386")));
+    EXPECT_FALSE(util::relaxed_less_equal(int64_t(387), std::string("386")));
+    EXPECT_FALSE(util::relaxed_less_equal(double(387), std::string("386")));
+
+    EXPECT_FALSE(util::relaxed_less_equal(std::string("387"), uint64_t(386)));
+    EXPECT_FALSE(util::relaxed_less_equal(uint64_t(387), uint64_t(386)));
+    EXPECT_FALSE(util::relaxed_less_equal(int64_t(387), uint64_t(386)));
+    EXPECT_FALSE(util::relaxed_less_equal(double(387), uint64_t(386)));
+
+    EXPECT_FALSE(util::relaxed_less_equal(std::string("387"), int64_t(386)));
+    EXPECT_FALSE(util::relaxed_less_equal(uint64_t(387), int64_t(386)));
+    EXPECT_FALSE(util::relaxed_less_equal(int64_t(387), int64_t(386)));
+    EXPECT_FALSE(util::relaxed_less_equal(double(387), int64_t(386)));
+
+    EXPECT_FALSE(util::relaxed_less_equal(std::string("387"), double(386.7)));
+    EXPECT_FALSE(util::relaxed_less_equal(uint64_t(387), double(386.7)));
+    EXPECT_FALSE(util::relaxed_less_equal(int64_t(387), double(386.7)));
+    EXPECT_FALSE(util::relaxed_less_equal(double(387), double(386.7)));
 }
