@@ -213,15 +213,14 @@ void Painter::renderMatte() {
     glDisable(GL_DEPTH_TEST);
     glStencilFunc(GL_EQUAL, 0x0, 0xFF);
 
-    // Color white = {{ 0.9, 0.9, 0.9, 1 }};
-    Color white = {{ 1, 1, 0, 1 }};
+    Color matte = {{ 0, 0, 0, 1 }};
 
     useProgram(plainShader->program);
     plainShader->setMatrix(nativeMatrix);
 
     // Draw the clipping mask
     matteArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-    plainShader->setColor(white);
+    plainShader->setColor(matte);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 
     glEnable(GL_DEPTH_TEST);
