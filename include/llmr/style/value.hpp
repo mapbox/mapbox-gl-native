@@ -18,7 +18,7 @@ namespace detail {
 
 inline int string_to_bool(std::string str) {
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-    if (str == "false" || str == "null" || !str.length()) return 0;
+    if (str == "0" || str == "0.0" || str == "false" || str == "null" || !str.length()) return 0;
     else if (str == "true") return 1;
     else return -1;
 }
