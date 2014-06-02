@@ -14,8 +14,11 @@ module.exports = {
         "admin_l2": {
             "source": "outdoors",
             "layer": "admin",
-            "field": "admin_level",
-            "value": 2,
+            "filter": [
+                "and",
+                {"field": "admin_level", "value": 2},
+                {"field": "maritime", "operator": "not", "value": 1}
+            ],
             "join": "round",
             "cap": "round",
             "type": "line"
@@ -23,11 +26,10 @@ module.exports = {
         "admin_l3": {
             "source": "outdoors",
             "layer": "admin",
-            "field": "admin_level",
-            "value": [
-                3,
-                4,
-                5
+            "filter": [
+                "and",
+                {"field": "admin_level", "value": [3,4,5]},
+                {"field": "maritime", "operator": "not", "value": 1}
             ],
             "join": "round",
             "type": "line"
@@ -263,8 +265,11 @@ module.exports = {
         "contour_label": {
             "source": "outdoors",
             "layer": "contour",
-            "field": "index",
-            "value": [5, 10],
+            "filter": [
+                "and",
+                { "field": "index", "value": [ 5, 10 ] },
+                { "field": "ele", "operator": "not", "value": 0 }
+            ],
             "path": "curve",
             "text_field": "{{ele}} m",
             "font": "Open Sans Regular, Arial Unicode MS Regular",
@@ -927,11 +932,36 @@ module.exports = {
             "size": 12,
             "type": "point"
         },
-        "poi_4": {
+        "poi_4_4": {
             "source": "outdoors",
             "layer": "poi_label",
             "icon": "maki",
-            "field": "scalerank",
+            "filter": [
+                "and",
+                { "field": "scalerank", "value": 4 },
+                { "field": "localrank", "operator": "<=", "value": 4 }
+            ],
+            "size": 12,
+            "type": "point"
+        },
+        "poi_4_16": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "icon": "maki",
+            "filter": [
+                "and",
+                { "field": "scalerank", "value": 4 },
+                { "field": "localrank", "operator": "<=", "value": 16 },
+                { "field": "localrank", "operator": ">", "value": 4 }
+            ],
+            "size": 12,
+            "type": "point"
+        },
+        "poi_4_all": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "icon": "maki",
+            "field": "scalerank", 
             "value": 4,
             "size": 12,
             "type": "point"
@@ -972,7 +1002,7 @@ module.exports = {
             "text_field": "{{name_en}}",
             "path": "horizontal",
             "padding": 2,
-            "maxWidth": 10,
+            "maxWidth": 8,
             "verticalAlignment": "top",
             "translate": [0, -1],
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -980,15 +1010,53 @@ module.exports = {
             "feature_type": "point",
             "type": "text",
         },
-        "poi_label_4": {
+        "poi_label_4_4": {
             "source": "outdoors",
             "layer": "poi_label",
-            "field": "scalerank",
+            "filter": [
+                "and",
+                { "field": "scalerank", "value": 4 },
+                { "field": "localrank", "operator": "<=", "value": 4 }
+            ],
+            "text_field": "{{name_en}}",
+            "path": "horizontal",
+            "padding": 2,
+            "maxWidth": 8,
+            "verticalAlignment": "top",
+            "translate": [0, -1],
+            "font": "Open Sans Semibold, Arial Unicode MS Bold",
+            "fontSize": 10,
+            "feature_type": "point",
+            "type": "text",
+        },
+        "poi_label_4_16": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "filter": [
+                "and",
+                { "field": "scalerank", "value": 4 },
+                { "field": "localrank", "operator": "<=", "value": 16 }
+            ],
+            "text_field": "{{name_en}}",
+            "path": "horizontal",
+            "padding": 2,
+            "maxWidth": 8,
+            "verticalAlignment": "top",
+            "translate": [0, -1],
+            "font": "Open Sans Semibold, Arial Unicode MS Bold",
+            "fontSize": 10,
+            "feature_type": "point",
+            "type": "text",
+        },
+        "poi_label_4_all": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "field": "scalerank", 
             "value": 4,
             "text_field": "{{name_en}}",
             "path": "horizontal",
             "padding": 2,
-            "maxWidth": 10,
+            "maxWidth": 8,
             "verticalAlignment": "top",
             "translate": [0, -1],
             "font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -1479,8 +1547,32 @@ module.exports = {
             "bucket": "place_label_other"
         },
         {
+            "name": "water_label",
+            "bucket": "water_label"
+        },
+        {
+            "name": "poi_aerodrome",
+            "bucket": "poi_aerodrome"
+        },
+        {
+            "name": "poi",
+            "bucket": "poi"
+        },
+        {
+            "name": "poi_label_1-2",
+            "bucket": "poi_label_1-2"
+        },
+        {
             "name": "road_label_1",
             "bucket": "road_label_1"
+        },
+        {
+            "name": "poi_3",
+            "bucket": "poi_3"
+        },
+        {
+            "name": "poi_label_3",
+            "bucket": "poi_label_3"
         },
         {
             "name": "road_label_2",
@@ -1495,40 +1587,32 @@ module.exports = {
             "bucket": "contour_label"
         },
         {
-            "name": "water_label",
-            "bucket": "water_label"
-        },
-        {
             "name": "waterway_label",
             "bucket": "waterway_label"
         },
         {
-            "name": "poi",
-            "bucket": "poi"
+            "name": "poi_4_4",
+            "bucket": "poi_4_4"
         },
         {
-            "name": "poi_label_1-2",
-            "bucket": "poi_label_1-2"
+            "name": "poi_label_4_4",
+            "bucket": "poi_label_4_4"
         },
         {
-            "name": "poi_3",
-            "bucket": "poi_3"
+            "name": "poi_4_16",
+            "bucket": "poi_4_16"
         },
         {
-            "name": "poi_label_3",
-            "bucket": "poi_label_3"
+            "name": "poi_label_4_16",
+            "bucket": "poi_label_4_16"
         },
         {
-            "name": "poi_4",
-            "bucket": "poi_4"
+            "name": "poi_4_all",
+            "bucket": "poi_4_all"
         },
         {
-            "name": "poi_label_4",
-            "bucket": "poi_label_4"
-        },
-        {
-            "name": "poi_aerodrome",
-            "bucket": "poi_aerodrome"
+            "name": "poi_label_4_all",
+            "bucket": "poi_label_4_all"
         }
     ],
     "constants": {
@@ -2586,16 +2670,32 @@ module.exports = {
                     "antialias": false,
                     "opacity": [
                         "stops",
-                        {"z": 16.5, "val": 0},
-                        {"z": 16.75, "val": 1}
+                        {"z": 17.5, "val": 0},
+                        {"z": 17.75, "val": 1}
                     ]
                 },
-                "poi_4": {
+                "poi_4_4": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 18, "val": 0},
+                        {"z": 18.25, "val": 1}
+                    ]
+                },
+                "poi_4_16": {
                     "antialias": false,
                     "opacity": [
                         "stops",
                         {"z": 18.5, "val": 0},
                         {"z": 18.75, "val": 1}
+                    ]
+                },
+                "poi_4_all": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.75, "val": 0},
+                        {"z": 19, "val": 1}
                     ]
                 },
                 "poi_label_1-2": {
@@ -2613,17 +2713,41 @@ module.exports = {
                     "strokeBlur": 1,
                     "opacity": [
                         "stops",
-                        {"z": 16.5, "val": 0},
-                        {"z": 16.75, "val": 1}
+                        {"z": 17.5, "val": 0},
+                        {"z": 17.75, "val": 1}
                     ]
                 },
-                "poi_label_4": {
+                "poi_label_4_4": {
                     "color": "#444",
                     "size": 10,
                     "opacity": [
                         "stops",
-                        {"z": 18.5, "val": 0},
+                        {"z": 18, "val": 0},
+                        {"z": 17.25, "val": 1}
+                    ],
+                    "stroke": "land",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                },
+                "poi_label_4_16": {
+                    "color": "#444",
+                    "size": 10,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.25, "val": 0},
                         {"z": 18.75, "val": 1}
+                    ],
+                    "stroke": "land",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                },
+                "poi_label_4_all": {
+                    "color": "#444",
+                    "size": 10,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.75, "val": 0},
+                        {"z": 19, "val": 1}
                     ],
                     "stroke": "land",
                     "strokeWidth": 0.3,
@@ -3393,16 +3517,32 @@ module.exports = {
                     "antialias": false,
                     "opacity": [
                         "stops",
-                        {"z": 16.5, "val": 0},
-                        {"z": 16.75, "val": 1}
+                        {"z": 17.5, "val": 0},
+                        {"z": 17.75, "val": 1}
                     ]
                 },
-                "poi_4": {
+                "poi_4_4": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 18, "val": 0},
+                        {"z": 17.25, "val": 1}
+                    ]
+                },
+                "poi_4_16": {
                     "antialias": false,
                     "opacity": [
                         "stops",
                         {"z": 18.5, "val": 0},
                         {"z": 18.75, "val": 1}
+                    ]
+                },
+                "poi_4_all": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.75, "val": 0},
+                        {"z": 19, "val": 1}
                     ]
                 },
                 "poi_label_1-2": {
@@ -3420,17 +3560,41 @@ module.exports = {
                     "strokeBlur": 1,
                     "opacity": [
                         "stops",
-                        {"z": 16.5, "val": 0},
-                        {"z": 16.75, "val": 1}
+                        {"z": 17.5, "val": 0},
+                        {"z": 17.75, "val": 1}
                     ]
                 },
-                "poi_label_4": {
+                "poi_label_4_4": {
+                    "color": "#fff",
+                    "size": 10,
+                    "opacity": [
+                        "stops",
+                        {"z": 18, "val": 0},
+                        {"z": 18.25, "val": 1}
+                    ],
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1
+                },
+                "poi_label_4_16": {
                     "color": "#fff",
                     "size": 10,
                     "opacity": [
                         "stops",
                         {"z": 18.5, "val": 0},
                         {"z": 18.75, "val": 1}
+                    ],
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1
+                },
+                "poi_label_4_all": {
+                    "color": "#fff",
+                    "size": 10,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.75, "val": 0},
+                        {"z": 19, "val": 1}
                     ],
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,

@@ -5,8 +5,10 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/style/value.hpp>
 #include <llmr/text/glyph.hpp>
+#include <llmr/map/filter_expression.hpp>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <set>
 #include <limits>
 
@@ -53,7 +55,12 @@ public:
         const pbf& operator*() const;
 
     private:
-        const FilteredVectorTileLayer& filter;
+        bool matchesFilterExpression(const PropertyFilterExpression &filterExpression, const pbf &tags_pbf);
+        bool matchesExpression(const PropertyExpression &expression, const pbf &tags_pbf);
+        bool matchesFilter(const PropertyFilter &filter, const pbf &tags_pbf);
+
+    private:
+        const FilteredVectorTileLayer& parent;
         bool valid = false;
         pbf feature;
         pbf data;
@@ -68,8 +75,6 @@ public:
 private:
     const VectorTileLayer& layer;
     const BucketDescription& bucket_desc;
-    int32_t key = -1;
-    std::set<uint32_t> values;
 };
 
 std::ostream& operator<<(std::ostream&, const GlyphPlacement& placement);
@@ -82,6 +87,7 @@ public:
     std::string name;
     uint32_t extent = 4096;
     std::vector<std::string> keys;
+    std::unordered_map<std::string, uint32_t> key_index;
     std::vector<Value> values;
     std::map<std::string, std::map<Value, Shaping>> shaping;
 };

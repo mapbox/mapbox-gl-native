@@ -5,8 +5,9 @@
 #include <vector>
 #include <cmath>
 
-#include "value.hpp"
-#include "../util/vec.hpp"
+#include <llmr/util/vec.hpp>
+#include <llmr/map/filter_expression.hpp>
+#include <llmr/style/value.hpp>
 
 namespace llmr {
 
@@ -81,6 +82,7 @@ inline float verticalAlignmentType(const std::string& alignment) {
     else return 0.5;
 };
 
+
 class BucketGeometryDescription {
 public:
     CapType cap = CapType::None;
@@ -105,6 +107,7 @@ public:
     bool alwaysVisible = false;
 };
 
+
 class BucketDescription {
 public:
     BucketType feature_type = BucketType::None;
@@ -113,8 +116,8 @@ public:
     // Specify what data to pull into this bucket
     std::string source_name;
     std::string source_layer;
-    std::string source_field;
-    std::vector<Value> source_value;
+
+    PropertyFilterExpression filter = std::true_type();
 
     // Specifies how the geometry for this bucket should be created
     BucketGeometryDescription geometry;
