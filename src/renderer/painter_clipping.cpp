@@ -9,22 +9,59 @@ using namespace llmr;
 void Painter::drawClippingMasks(const Sources &sources) {
     gl::group group("clipping masks");
 
-    useProgram(plainShader->program);
     glDisable(GL_DEPTH_TEST);
     depthMask(false);
     glDepthRange(1.0f, 1.0f);
     glStencilMask(0xFF);
 
-    const BackgroundProperties &properties = map.getStyle()->computed.background;
-    Color background = properties.color;
-    const float opacity = properties.opacity;
-    background[0] *= opacity;
-    background[1] *= opacity;
-    background[2] *= opacity;
-    background[3] *= opacity;
-    plainShader->setColor(background);
+    bool ready = false;
 
-    coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    for (const auto &pair : sources) {
+        Source &source = *pair.second;
+        if (source.viewportTileParsed()) {
+            ready = true;
+        }
+    }
+
+    if (ready) {
+        // At least one viewport tile is parsed. Draw the background.
+        useProgram(plainShader->program);
+
+        const BackgroundProperties &properties = map.getStyle()->computed.background;
+        Color background = properties.color;
+        const float opacity = properties.opacity;
+        background[0] *= opacity;
+        background[1] *= opacity;
+        background[2] *= opacity;
+        background[3] *= opacity;
+        plainShader->setColor(background);
+
+        coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    } else {
+        // No viewport tiles are parsed. Draw the grid pattern.
+        useProgram(patternShader->program);
+
+        SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
+        std::array<float, 2> imageSize = {{
+                512,
+                512
+            }
+        };
+        patternShader->setPatternSize(imageSize);
+        patternShader->setPatternTopLeft({{
+            float(66) / spriteAtlas.getWidth(),
+            float(0)  / spriteAtlas.getHeight(),
+        }});
+        patternShader->setPatternBottomRight({{
+            float(66 + 64) / spriteAtlas.getWidth(),
+            float(0  + 32) / spriteAtlas.getHeight(),
+        }});
+//        std::array<float, 4> color = {{ 1, 0, 0, 1 }};
+//        patternShader->setColor(color);
+        spriteAtlas.bind(true);
+
+        coveringPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    }
 
     for (const auto &pair : sources) {
         Source &source = *pair.second;
