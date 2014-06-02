@@ -957,6 +957,15 @@ module.exports = {
             "size": 12,
             "type": "point"
         },
+        "poi_4_all": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "icon": "maki",
+            "field": "scalerank", 
+            "value": 4,
+            "size": 12,
+            "type": "point"
+        },
         "poi_aerodrome": {
             "source": "outdoors",
             "layer": "poi_label",
@@ -1026,9 +1035,24 @@ module.exports = {
             "filter": [
                 "and",
                 { "field": "scalerank", "value": 4 },
-                { "field": "localrank", "operator": "<=", "value": 16 },
-                { "field": "localrank", "operator": ">", "value": 4 }
+                { "field": "localrank", "operator": "<=", "value": 16 }
             ],
+            "text_field": "{{name_en}}",
+            "path": "horizontal",
+            "padding": 2,
+            "maxWidth": 8,
+            "verticalAlignment": "top",
+            "translate": [0, -1],
+            "font": "Open Sans Semibold, Arial Unicode MS Bold",
+            "fontSize": 10,
+            "feature_type": "point",
+            "type": "text",
+        },
+        "poi_label_4_all": {
+            "source": "outdoors",
+            "layer": "poi_label",
+            "field": "scalerank", 
+            "value": 4,
             "text_field": "{{name_en}}",
             "path": "horizontal",
             "padding": 2,
@@ -1581,6 +1605,14 @@ module.exports = {
         {
             "name": "poi_label_4_16",
             "bucket": "poi_label_4_16"
+        },
+        {
+            "name": "poi_4_all",
+            "bucket": "poi_4_all"
+        },
+        {
+            "name": "poi_label_4_all",
+            "bucket": "poi_label_4_all"
         }
     ],
     "constants": {
@@ -2638,16 +2670,16 @@ module.exports = {
                     "antialias": false,
                     "opacity": [
                         "stops",
-                        {"z": 16.5, "val": 0},
-                        {"z": 16.75, "val": 1}
+                        {"z": 17.5, "val": 0},
+                        {"z": 17.75, "val": 1}
                     ]
                 },
                 "poi_4_4": {
                     "antialias": false,
                     "opacity": [
                         "stops",
-                        {"z": 17.5, "val": 0},
-                        {"z": 17.75, "val": 1}
+                        {"z": 18, "val": 0},
+                        {"z": 18.25, "val": 1}
                     ]
                 },
                 "poi_4_16": {
@@ -2656,6 +2688,14 @@ module.exports = {
                         "stops",
                         {"z": 18.5, "val": 0},
                         {"z": 18.75, "val": 1}
+                    ]
+                },
+                "poi_4_all": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.75, "val": 0},
+                        {"z": 19, "val": 1}
                     ]
                 },
                 "poi_label_1-2": {
@@ -2673,8 +2713,8 @@ module.exports = {
                     "strokeBlur": 1,
                     "opacity": [
                         "stops",
-                        {"z": 16.5, "val": 0},
-                        {"z": 16.75, "val": 1}
+                        {"z": 17.5, "val": 0},
+                        {"z": 17.75, "val": 1}
                     ]
                 },
                 "poi_label_4_4": {
@@ -2682,8 +2722,8 @@ module.exports = {
                     "size": 10,
                     "opacity": [
                         "stops",
-                        {"z": 17.5, "val": 0},
-                        {"z": 17.75, "val": 1}
+                        {"z": 18, "val": 0},
+                        {"z": 17.25, "val": 1}
                     ],
                     "stroke": "land",
                     "strokeWidth": 0.3,
@@ -2696,6 +2736,18 @@ module.exports = {
                         "stops",
                         {"z": 18.25, "val": 0},
                         {"z": 18.75, "val": 1}
+                    ],
+                    "stroke": "land",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1,
+                },
+                "poi_label_4_all": {
+                    "color": "#444",
+                    "size": 10,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.75, "val": 0},
+                        {"z": 19, "val": 1}
                     ],
                     "stroke": "land",
                     "strokeWidth": 0.3,
@@ -3465,16 +3517,16 @@ module.exports = {
                     "antialias": false,
                     "opacity": [
                         "stops",
-                        {"z": 16.5, "val": 0},
-                        {"z": 16.75, "val": 1}
+                        {"z": 17.5, "val": 0},
+                        {"z": 17.75, "val": 1}
                     ]
                 },
                 "poi_4_4": {
                     "antialias": false,
                     "opacity": [
                         "stops",
-                        {"z": 17.5, "val": 0},
-                        {"z": 17.75, "val": 1}
+                        {"z": 18, "val": 0},
+                        {"z": 17.25, "val": 1}
                     ]
                 },
                 "poi_4_16": {
@@ -3483,6 +3535,14 @@ module.exports = {
                         "stops",
                         {"z": 18.5, "val": 0},
                         {"z": 18.75, "val": 1}
+                    ]
+                },
+                "poi_4_all": {
+                    "antialias": false,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.75, "val": 0},
+                        {"z": 19, "val": 1}
                     ]
                 },
                 "poi_label_1-2": {
@@ -3500,8 +3560,8 @@ module.exports = {
                     "strokeBlur": 1,
                     "opacity": [
                         "stops",
-                        {"z": 16.5, "val": 0},
-                        {"z": 16.75, "val": 1}
+                        {"z": 17.5, "val": 0},
+                        {"z": 17.75, "val": 1}
                     ]
                 },
                 "poi_label_4_4": {
@@ -3509,8 +3569,8 @@ module.exports = {
                     "size": 10,
                     "opacity": [
                         "stops",
-                        {"z": 17.5, "val": 0},
-                        {"z": 17.75, "val": 1}
+                        {"z": 18, "val": 0},
+                        {"z": 18.25, "val": 1}
                     ],
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
@@ -3523,6 +3583,18 @@ module.exports = {
                         "stops",
                         {"z": 18.5, "val": 0},
                         {"z": 18.75, "val": 1}
+                    ],
+                    "stroke": "text2_stroke_night",
+                    "strokeWidth": 0.3,
+                    "strokeBlur": 1
+                },
+                "poi_label_4_all": {
+                    "color": "#fff",
+                    "size": 10,
+                    "opacity": [
+                        "stops",
+                        {"z": 18.75, "val": 0},
+                        {"z": 19, "val": 1}
                     ],
                     "stroke": "text2_stroke_night",
                     "strokeWidth": 0.3,
