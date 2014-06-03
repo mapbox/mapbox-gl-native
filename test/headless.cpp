@@ -1,8 +1,4 @@
-#include <iostream>
 #include "gtest/gtest.h"
-
-
-
 
 #include <llmr/llmr.hpp>
 #include <llmr/util/image.hpp>
@@ -10,6 +6,11 @@
 #include <llmr/util/timer.hpp>
 
 #include <uv.h>
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 
 namespace llmr {
 namespace platform {
@@ -112,6 +113,13 @@ TEST(Headless, initialize) {
     llmr::Map map(view);
 
     map.resize(width, height);
+
+    std::ifstream stylefile("./style.min.js");
+    ASSERT_TRUE(stylefile.good());
+    std::stringstream stylejson;
+    stylejson << stylefile.rdbuf();
+
+    map.setStyleJSON(stylejson.str());
 
     timer.report("map resize");
 
