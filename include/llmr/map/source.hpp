@@ -37,7 +37,6 @@ public:
 
     bool update();
     void updateMatrices(const TransformState &transform);
-    bool viewportTileParsed();
     void drawClippingMasks();
     size_t getTileCount() const;
     void render(const LayerDescription& layer_desc, const BucketDescription &bucket_desc);
