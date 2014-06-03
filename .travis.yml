@@ -31,8 +31,6 @@ before_script:
 script:
 - make linux BUILDTYPE=${BUILDTYPE}
 - make run-tests BUILDTYPE=${BUILDTYPE}
-# TODO - port this test to linux
-- if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then make run-headless-test BUILDTYPE=${BUILDTYPE} ; fi
 
 notifications:
   hipchat:
