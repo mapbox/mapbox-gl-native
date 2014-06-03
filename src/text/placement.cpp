@@ -35,21 +35,12 @@ bool byScale(const Anchor &a, const Anchor &b) { return a.scale < b.scale; }
 static const Glyph null_glyph;
 
 inline const Glyph &getGlyph(const GlyphPlacement &placed,
-                             const IndexedFaces &faces) {
-    if (placed.face < faces.size()) {
-        const GlyphPositions &face = *faces[placed.face];
-        if (&face) {
-            auto it = face.find(placed.glyph);
-            if (it != face.end()) {
-                return it->second;
-            } else {
-                fprintf(stderr, "glyph %d does not exist\n", placed.glyph);
-            }
-        } else {
-            fprintf(stderr, "face pointer is null\n");
-        }
+                             const GlyphPositions &face) {
+    auto it = face.find(placed.glyph);
+    if (it != face.end()) {
+        return it->second;
     } else {
-        fprintf(stderr, "face does not exist\n");
+        fprintf(stderr, "glyph %d does not exist\n", placed.glyph);
     }
 
     return null_glyph;
@@ -146,14 +137,11 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
 }
 
 void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
-                       Anchor &anchor, float advance, const Shaping &shaping,
-                       const IndexedFaces &faces, float fontScale,
+                       Anchor &anchor, vec2<float> origin, const Shaping &shaping,
+                       const GlyphPositions &face, float fontScale,
                        bool horizontal, const std::vector<Coordinate> &line,
                        float maxAngleDelta, float rotate) {
     // The total text advance is the width of this label.
-
-    // TODO: figure out correct ascender height.
-    vec2<float> origin{-advance / 2, -17};
 
     // TODO: allow setting an alignment
     // var alignment = 'center';
@@ -166,7 +154,7 @@ void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
     const uint32_t buffer = 3;
 
     for (const GlyphPlacement &placed : shaping) {
-        const Glyph &glyph = getGlyph(placed, faces);
+        const Glyph &glyph = getGlyph(placed, face);
         if (!glyph) {
             // This glyph is empty and doesn't have any pixels that we'd need to
             // show.
@@ -259,7 +247,7 @@ void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
 void Placement::addFeature(TextBucket& bucket,
                            const std::vector<Coordinate> &line,
                            const BucketGeometryDescription &info,
-                           const IndexedFaces &faces,
+                           const GlyphPositions &face,
                            const Shaping &shaping) {
 
     const bool horizontal = info.path == TextPathType::Horizontal;
@@ -270,10 +258,7 @@ void Placement::addFeature(TextBucket& bucket,
     const float fontScale =
         (tileExtent / util::tileSize) / (glyphSize / info.size);
 
-    const float advance = measureText(faces, shaping);
     Anchors anchors;
-
-    // fprintf(stderr, "adding feature with advance %f\n", advance);
 
     if (line.size() == 1) {
         // Point labels
@@ -294,7 +279,7 @@ void Placement::addFeature(TextBucket& bucket,
         PlacedGlyphs glyphs;
         GlyphBoxes boxes;
 
-        getGlyphs(glyphs, boxes, anchor, advance, shaping, faces, fontScale, horizontal,
+        getGlyphs(glyphs, boxes, anchor, info.translate, shaping, face, fontScale, horizontal,
                       line, maxAngleDelta, rotate);
         PlacementProperty place =
             collision.place(boxes, anchor, anchor.scale, maxPlacementScale,
@@ -303,17 +288,4 @@ void Placement::addFeature(TextBucket& bucket,
             bucket.addGlyphs(glyphs, place.zoom, place.rotationRange, zoom - zOffset);
         }
     }
-}
-
-float Placement::measureText(const IndexedFaces &faces,
-                             const Shaping &shaping) {
-    float advance = 0;
-
-    // TODO: advance is not calculated correctly. we should instead use the
-    // bounding box of the glyph placement.
-    for (const GlyphPlacement &shape : shaping) {
-        advance += getGlyph(shape, faces).metrics.advance;
-    }
-
-    return advance;
 }

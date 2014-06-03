@@ -30,7 +30,7 @@ public:
 
     void reset();
 
-    void loadJSON(const uint8_t *const data, size_t bytes);
+    void loadJSON(const uint8_t *const data);
 
     size_t layerCount() const;
     void cascade(float z);
@@ -39,7 +39,7 @@ public:
     void updateTransitions(time now);
     void cancelTransitions();
 
-    void setDefaultTransitionDuration(uint64_t duration = 0);
+    void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);
 
 public:
     std::shared_ptr<Sprite> sprite;

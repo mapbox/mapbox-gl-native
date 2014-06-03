@@ -93,10 +93,16 @@ struct GenericClass {
     boost::optional<TranslateAnchor> translateAnchor;
     boost::optional<FunctionProperty> opacity;
     boost::optional<PropertyTransition> opacity_transition;
-    boost::optional<bool> prerender;
-    boost::optional<float> prerenderBuffer;
-    boost::optional<uint16_t> prerenderSize;
-    boost::optional<uint16_t> prerenderBlur;
+    boost::optional<FunctionProperty> prerender;
+    boost::optional<FunctionProperty> prerenderBuffer;
+    boost::optional<FunctionProperty> prerenderSize;
+    boost::optional<FunctionProperty> prerenderBlur;
+};
+
+struct PrerenderProperties {
+    float buffer = 1.0f / 32.0f;
+    uint16_t size = 256;
+    uint16_t blur = 0;
 };
 
 struct GenericProperties {
@@ -104,10 +110,25 @@ struct GenericProperties {
     std::array<float, 2> translate = {{ 0, 0 }};
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     float opacity = 1.0;
-    bool prerender = false;
-    float prerenderBuffer = 1.0f / 32.0f;
-    uint16_t prerenderSize = 256;
-    uint16_t prerenderBlur = 0;
+
+    // These are unresolved properties because the value here is per tile, so it might differ.
+    boost::optional<FunctionProperty> prerender;
+    boost::optional<FunctionProperty> prerenderBuffer;
+    boost::optional<FunctionProperty> prerenderSize;
+    boost::optional<FunctionProperty> prerenderBlur;
+
+    inline bool getPrerender(int8_t z) const {
+        return prerender && prerender.get().evaluate<bool>(z);
+    }
+
+    // Obtains prerender properties by integer zoom level.
+    inline PrerenderProperties getPrerenderProperties(int8_t z) const {
+        PrerenderProperties props;
+        if (prerenderBuffer) props.buffer = prerenderBuffer.get().evaluate<float>(z);
+        if (prerenderSize) props.size = prerenderSize.get().evaluate<uint16_t>(z);
+        if (prerenderBlur) props.blur = prerenderBlur.get().evaluate<uint16_t>(z);
+        return props;
+    }
 
     virtual bool isVisible() const {
         if (!enabled) { return false; }
@@ -128,6 +149,7 @@ struct IconClass : public GenericClass {
 };
 
 struct IconProperties : public GenericProperties {
+    inline IconProperties() : GenericProperties() {}
     float size = 0;
     Color color = {{ 1, 1, 1, 1 }};
     std::string image;
@@ -147,6 +169,7 @@ struct LineClass : public GenericClass {
 };
 
 struct LineProperties : public GenericProperties {
+    inline LineProperties() : GenericProperties() {}
     float width = 0;
     float offset = 0;
     Color color = {{ 0, 0, 0, 1 }};
@@ -164,6 +187,7 @@ struct FillClass : public GenericClass {
 };
 
 struct FillProperties : public GenericProperties {
+    inline FillProperties() : GenericProperties() {}
     Winding winding = Winding::NonZero;
     bool antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
@@ -187,6 +211,7 @@ struct TextClass : public GenericClass {
 };
 
 struct TextProperties : public GenericProperties {
+    inline TextProperties() : GenericProperties() {}
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     float halo_radius = 0.25f;
@@ -202,6 +227,7 @@ struct BackgroundClass : public GenericClass {
 };
 
 struct BackgroundProperties : public GenericProperties {
+    inline BackgroundProperties() : GenericProperties() {}
     Color color = {{ 1, 1, 1, 1 }};
 };
 
@@ -209,6 +235,7 @@ struct RasterClass : public GenericClass {
 };
 
 struct RasterProperties : public GenericProperties {
+    inline RasterProperties() : GenericProperties() {}
 };
 
 struct CompositeClass : public GenericClass {
@@ -219,6 +246,12 @@ struct CompositeProperties : public GenericProperties {
 };
 
 
+const IconProperties defaultIconProperties;
+const LineProperties defaultLineProperties;
+const FillProperties defaultFillProperties;
+const TextProperties defaultTextProperties;
+const BackgroundProperties defaultBackgroundProperties;
+const RasterProperties defaultRasterProperties;
 const CompositeProperties defaultCompositeProperties;
 
 }

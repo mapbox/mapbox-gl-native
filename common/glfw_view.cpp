@@ -73,8 +73,17 @@ void GLFWView::key(GLFWwindow *window, int key, int /*scancode*/, int action, in
                 view->map->resetPosition();
             break;
         case GLFW_KEY_R:
-            if (!mods)
-                view->map->toggleRaster();
+            if (!mods) {
+                std::set<std::string> newAppliedClasses;
+                if (view->map->getAppliedClasses().count("night")) {
+                    newAppliedClasses.insert("default");
+                } else {
+                    newAppliedClasses.insert("default");
+                    newAppliedClasses.insert(newAppliedClasses.end(), "night");
+                }
+                view->map->setDefaultTransitionDuration(300);
+                view->map->setAppliedClasses(newAppliedClasses);
+            }
             break;
         case GLFW_KEY_N:
             if (!mods)

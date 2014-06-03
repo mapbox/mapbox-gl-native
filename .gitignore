@@ -1,8 +1,6 @@
 .DS_Store
-*.o
 *.xcodeproj
 *.o
-/out
 /mapnik-packaging
 /macosx/build
 /ios/build
@@ -11,7 +9,6 @@
 /build
 /bin/node_modules
 /include/llmr/shader/shaders.hpp
-/include/llmr/style/resources.hpp
-/src/style/resources.cpp
 /src/shader/shaders_gl.cpp
 /src/shader/shaders_gles2.cpp
+/bin/style.bin.js

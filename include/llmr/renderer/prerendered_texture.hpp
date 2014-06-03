@@ -3,6 +3,7 @@
 
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/platform/gl.hpp>
+#include <llmr/style/properties.hpp>
 
 namespace llmr {
 
@@ -10,7 +11,7 @@ class Painter;
 
 class PrerenderedTexture : private util::noncopyable {
 public:
-    PrerenderedTexture(uint16_t size);
+    PrerenderedTexture(const PrerenderProperties &properties);
     ~PrerenderedTexture();
 
     void bindTexture();
@@ -21,12 +22,13 @@ public:
 
     void blur(Painter& painter, uint16_t passes);
 
+public:
+    const PrerenderProperties properties;
+
 private:
-    const uint16_t size;
     GLint previous_fbo = 0;
     GLuint fbo = 0;
     GLuint texture = 0;
-    bool mipmapped = false;
 };
 
 }

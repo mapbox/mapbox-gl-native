@@ -2,6 +2,7 @@
 #include <png.h>
 
 #include <cassert>
+#include <cstdlib>
 
 
 std::string llmr::util::compress_png(int width, int height, void *rgba, bool flip) {
@@ -137,7 +138,7 @@ Image::Image(const std::string &data) {
         png_size_t rowbytes = png_get_rowbytes(png, info);
         assert(width * 4 == rowbytes);
 
-        img = (char *)malloc(width * height * 4);
+        img = (char *)std::malloc(width * height * 4);
         char *surface = img;
         assert(surface);
 
@@ -160,7 +161,7 @@ Image::Image(const std::string &data) {
         fprintf(stderr, "loading PNG failed: %s\n", e.what());
         png_destroy_read_struct(&png, &info, nullptr);
         if (img) {
-            free(img);
+            std::free(img);
             img = nullptr;
         }
         width = 0;
@@ -170,7 +171,7 @@ Image::Image(const std::string &data) {
 
 Image::~Image() {
     if (img) {
-        free(img);
+        std::free(img);
         img = nullptr;
     }
 }

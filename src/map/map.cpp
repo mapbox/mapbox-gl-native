@@ -1,7 +1,6 @@
 #include <llmr/map/map.hpp>
 #include <llmr/map/source.hpp>
 #include <llmr/platform/platform.hpp>
-#include <llmr/style/resources.hpp>
 #include <llmr/style/sprite.hpp>
 #include <llmr/util/transition.hpp>
 #include <llmr/util/time.hpp>
@@ -9,6 +8,7 @@
 #include <llmr/util/clip_ids.hpp>
 #include <llmr/util/string.hpp>
 #include <llmr/util/constants.hpp>
+#include <llmr/util/uv.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -19,12 +19,13 @@ using namespace llmr;
 Map::Map(View& view)
     : view(view),
       transform(),
-      texturepool(),
-      style(),
-      glyphAtlas(1024, 1024),
-      spriteAtlas(512, 512),
+      style(std::make_shared<Style>()),
+      glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
+      glyphStore(std::make_shared<GlyphStore>()),
+      spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
+      texturepool(std::make_shared<Texturepool>()),
       painter(*this),
-      loop(uv_loop_new()) {
+      loop(std::make_shared<uv::loop>()) {
 
     view.initialize(this);
 
@@ -35,8 +36,9 @@ Map::Map(View& view)
 }
 
 Map::~Map() {
-    uv_loop_delete(loop);
-    loop = nullptr;
+    if (async) {
+        stop();
+    }
 }
 
 void Map::start() {
@@ -46,15 +48,15 @@ void Map::start() {
 
     // Setup async notifications
     async_terminate = new uv_async_t();
-    uv_async_init(loop, async_terminate, terminate);
-    async_terminate->data = loop;
+    uv_async_init(**loop, async_terminate, terminate);
+    async_terminate->data = **loop;
 
     async_render = new uv_async_t();
-    uv_async_init(loop, async_render, render);
+    uv_async_init(**loop, async_render, render);
     async_render->data = this;
 
     async_cleanup = new uv_async_t();
-    uv_async_init(loop, async_cleanup, cleanup);
+    uv_async_init(**loop, async_cleanup, cleanup);
     async_cleanup->data = this;
 
     uv_thread_create(&thread, [](void *arg) {
@@ -64,7 +66,10 @@ void Map::start() {
 }
 
 void Map::stop() {
-    uv_async_send(async_terminate);
+    if (async_terminate != nullptr) {
+        uv_async_send(async_terminate);
+    }
+
     uv_thread_join(&thread);
 
     uv_close((uv_handle_t *)async_terminate, delete_async);
@@ -75,7 +80,7 @@ void Map::stop() {
     async_cleanup = nullptr;
 
     // Run the event loop once to make sure our async delete handlers are called.
-    uv_run(loop, UV_RUN_ONCE);
+    uv_run(**loop, UV_RUN_ONCE);
 
     async = false;
 }
@@ -87,7 +92,7 @@ void Map::delete_async(uv_handle_t *handle) {
 void Map::run() {
     setup();
     prepare();
-    uv_run(loop, UV_RUN_DEFAULT);
+    uv_run(**loop, UV_RUN_DEFAULT);
 
     // If the map rendering wasn't started asynchronously, we perform one render
     // *after* all events have been processed.
@@ -99,7 +104,7 @@ void Map::run() {
 void Map::rerender() {
     // We only send render events if we want to continuously update the map
     // (== async rendering).
-    if (async) {
+    if (async && async_render != nullptr) {
         uv_async_send(async_render);
     }
 }
@@ -119,7 +124,9 @@ void Map::swapped() {
 }
 
 void Map::cleanup() {
-    uv_async_send(async_cleanup);
+    if (async_cleanup != nullptr) {
+        uv_async_send(async_cleanup);
+    }
 }
 
 void Map::cleanup(uv_async_t *async) {
@@ -163,7 +170,7 @@ void Map::setup() {
     sources.emplace("outdoors",
                     std::unique_ptr<Source>(new Source(*this,
                            painter,
-                           "http://api-maps-gl.tilestream.net/v3/mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5/%d/%d/%d.gl.pbf",
+                           "http://a.tiles.mapbox.com/v3/mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5/%d/%d/%d.vector.pbf",
                            Source::Type::vector,
                            {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }},
                            512,
@@ -171,23 +178,18 @@ void Map::setup() {
                            14,
                            true)));
 
-    sources.emplace("satellite",
-                    std::unique_ptr<Source>(new Source(*this,
-                           painter,
-                           "https://a.tiles.mapbox.com/v3/justin.hh0gkdfm/%d/%d/%d%s.png256",
-                           Source::Type::raster,
-                           {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }},
-                           256,
-                           0,
-                           21,
-                           false)));
-
-    loadStyle(resources::style, resources::style_size);
+    setStyleJSON(styleJSON);
 }
 
-void Map::loadStyle(const uint8_t *const data, uint32_t bytes) {
-    style.loadJSON(data, bytes);
+void Map::setStyleJSON(std::string newStyleJSON) {
+    styleJSON.swap(newStyleJSON);
+    style->cancelTransitions();
+    style->loadJSON((const uint8_t *)styleJSON.c_str());
     update();
+}
+
+std::string Map::getStyleJSON() const {
+    return styleJSON;
 }
 
 #pragma mark - Size
@@ -312,11 +314,11 @@ void Map::stopScaling() {
     update();
 }
 
-double Map::getMinZoom() {
+double Map::getMinZoom() const {
     return transform.getMinZoom();
 }
 
-double Map::getMaxZoom() {
+double Map::getMaxZoom() const {
     return transform.getMaxZoom();
 }
 
@@ -385,23 +387,20 @@ bool Map::getDebug() const {
     return debug;
 }
 
-void Map::toggleRaster() {
-    style.setDefaultTransitionDuration(300);
-    style.cancelTransitions();
+void Map::setAppliedClasses(std::set<std::string> appliedClasses) {
+    style->cancelTransitions();
 
-    auto it = sources.find("satellite");
-    if (it != sources.end()) {
-        Source &satellite_source = *it->second;
-        if (satellite_source.enabled) {
-            satellite_source.enabled = false;
-            style.appliedClasses.erase("satellite");
-        } else {
-            satellite_source.enabled = true;
-            style.appliedClasses.insert("satellite");
-        }
-    }
+    style->appliedClasses.swap(appliedClasses);
 
     update();
+}
+
+std::set<std::string> Map::getAppliedClasses() const {
+    return style->appliedClasses;
+}
+
+void Map::setDefaultTransitionDuration(uint64_t duration_milliseconds) {
+    style->setDefaultTransitionDuration(duration_milliseconds);
 }
 
 void Map::updateTiles() {
@@ -451,36 +450,37 @@ void Map::prepare() {
                              oldState.getFramebufferHeight() != state.getFramebufferHeight();
 
     if (pixelRatioChanged) {
-        style.sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
-        style.sprite->load(kSpriteURL);
+        style->sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
+        style->sprite->load(kSpriteURL);
 
-        spriteAtlas.resize(state.getPixelRatio());
+        spriteAtlas->resize(state.getPixelRatio());
     }
 
     if (pixelRatioChanged || dimensionsChanged) {
         painter.clearFramebuffers();
     }
 
-    style.cascade(state.getNormalizedZoom());
+    style->cascade(state.getNormalizedZoom());
 
     // Update style transitions.
     animationTime = util::now();
-    if (style.needsTransition()) {
-        style.updateTransitions(animationTime);
+    if (style->needsTransition()) {
+        style->updateTransitions(animationTime);
         update();
     }
 
     // Allow the sprite atlas to potentially pull new sprite images if needed.
-    if (style.sprite && style.sprite->isLoaded()) {
-        spriteAtlas.update(*style.sprite);
+    if (style->sprite && style->sprite->isLoaded()) {
+        spriteAtlas->update(*style->sprite);
     }
 
     updateTiles();
 }
 
 void Map::render() {
+#if defined(DEBUG)
     std::vector<std::string> debug;
-
+#endif
     painter.clear();
 
     painter.resetFramebuffer();
@@ -493,6 +493,7 @@ void Map::render() {
 
     painter.drawClippingMasks(sources);
 
+#if defined(DEBUG)
     // Generate debug information
     size_t source_id = 0;
     for (const auto &pair : sources) {
@@ -501,10 +502,10 @@ void Map::render() {
         debug.emplace_back(util::sprintf<100>("source %d: %d\n", source_id, count));
         source_id++;
     }
-
+#endif
     // Actually render the layers
     if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
-    renderLayers(style.layers);
+    renderLayers(style->layers);
     if (debug::renderTree) { std::cout << "}" << std::endl; indent--; }
 
     // Finalize the rendering, e.g. by calling debug render calls per tile.
@@ -520,7 +521,9 @@ void Map::render() {
 
     painter.renderMatte();
 
+#if defined(DEBUG)
     painter.renderDebugText(debug);
+#endif
 
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition()) {
@@ -573,19 +576,25 @@ void Map::renderLayers(const std::vector<LayerDescription>& layers) {
 template <typename Styles>
 typename Styles::const_iterator find_style(const Styles &styles, const LayerDescription &layer_desc) {
     auto it = styles.find(layer_desc.name);
+#if defined(DEBUG)
     if (it == styles.end()) {
         if (debug::renderWarnings) {
             fprintf(stderr, "[WARNING] can't find class named '%s' in style\n",
                     layer_desc.name.c_str());
         }
     }
+#endif
     return it;
 }
 
 template <typename Styles>
 bool is_invisible(const Styles &styles, const LayerDescription &layer_desc) {
     auto it = find_style(styles, layer_desc);
-    if (it == styles.end()) { return true; }
+    if (it == styles.end()) {
+        // We don't have a style, so we fall back to the default style which is
+        // always visible.
+        return false;
+    }
     return !it->second.isVisible();
 }
 
@@ -593,8 +602,8 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
     if (layer_desc.child_layer.size()) {
         // This is a layer group. We render them during our translucent render pass.
         if (pass == Translucent) {
-            auto it = find_style(style.computed.composites, layer_desc);
-            const CompositeProperties &properties = (it != style.computed.composites.end()) ? it->second : defaultCompositeProperties;
+            auto it = find_style(style->computed.composites, layer_desc);
+            const CompositeProperties &properties = (it != style->computed.composites.end()) ? it->second : defaultCompositeProperties;
             if (properties.isVisible()) {
                 gl::group group(std::string("group: ") + layer_desc.name);
 
@@ -623,31 +632,31 @@ void Map::renderLayer(const LayerDescription& layer_desc, RenderPass pass) {
         // This is a singular layer. Try to find the bucket associated with
         // this layer and render it.
 
-        auto bucket_it = style.buckets.find(layer_desc.bucket_name);
-        if (bucket_it != style.buckets.end()) {
+        auto bucket_it = style->buckets.find(layer_desc.bucket_name);
+        if (bucket_it != style->buckets.end()) {
             const BucketDescription &bucket_desc = bucket_it->second;
 
             // Abort early if we can already deduce from the bucket type that
             // we're not going to render anything anyway during this pass.
             switch (bucket_desc.type) {
                 case BucketType::Fill:
-                    if (is_invisible(style.computed.fills, layer_desc)) return;
+                    if (is_invisible(style->computed.fills, layer_desc)) return;
                     break;
                 case BucketType::Line:
                     if (pass == Opaque) return;
-                    if (is_invisible(style.computed.lines, layer_desc)) return;
+                    if (is_invisible(style->computed.lines, layer_desc)) return;
                     break;
                 case BucketType::Icon:
                     if (pass == Opaque) return;
-                    if (is_invisible(style.computed.icons, layer_desc)) return;
+                    if (is_invisible(style->computed.icons, layer_desc)) return;
                     break;
                 case BucketType::Text:
                     if (pass == Opaque) return;
-                    if (is_invisible(style.computed.texts, layer_desc)) return;
+                    if (is_invisible(style->computed.texts, layer_desc)) return;
                     break;
                 case BucketType::Raster:
                     if (pass == Translucent) return;
-                    if (is_invisible(style.computed.rasters, layer_desc)) return;
+                    if (is_invisible(style->computed.rasters, layer_desc)) return;
                     break;
                 default:
                     break;

@@ -39,9 +39,11 @@ private:
     RasterClass parseRasterClass(JSVal value);
     CompositeClass parseCompositeClass(JSVal value);
 
+    PropertyFilterExpression parseFilterOrExpression(JSVal value);
+
     bool parseBoolean(JSVal value);
     std::string parseString(JSVal value);
-    const JSVal& replaceConstant(const JSVal& value);
+    JSVal replaceConstant(JSVal value);
     std::vector<FunctionProperty> parseArray(JSVal value, uint16_t expected_count);
     Color parseColor(JSVal value);
     Value parseValue(JSVal value);

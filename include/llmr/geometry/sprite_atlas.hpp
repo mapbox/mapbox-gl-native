@@ -62,7 +62,7 @@ private:
     BinPack<dimension> bin;
     std::map<std::string, Rect<dimension>> images;
     std::set<std::string> uninitialized;
-    char *data = nullptr;
+    uint32_t *data = nullptr;
     std::atomic<bool> dirty;
     uint32_t texture = 0;
     uint32_t filter = 0;

@@ -3,7 +3,7 @@
 
 using namespace llmr;
 
-RasterBucket::RasterBucket(Texturepool &texturepool)
+RasterBucket::RasterBucket(const std::shared_ptr<Texturepool> &texturepool)
     : raster(texturepool) {
 }
 

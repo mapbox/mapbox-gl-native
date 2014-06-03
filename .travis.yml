@@ -20,26 +20,26 @@ cache:
   - mapnik-packaging
 
 before_install:
-- source ./scripts/install_build_deps_${TRAVIS_OS_NAME}.sh
-- source ./setup-libraries.sh
+- source ./scripts/setup_travis.sh
 
 install:
-- rm -rf mapnik-packaging/out/packages
+- make setup
 
 before_script:
-- if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ ${CXX} == "g++" ]]; then export CXX="g++-4.8" ; fi
+- rm -rf mapnik-packaging/out/packages
 
 script:
-- make llmr BUILDTYPE=${BUILDTYPE}
-- make clean
-- make ${TRAVIS_OS_NAME} BUILDTYPE=${BUILDTYPE}
-- make clean
+- make linux BUILDTYPE=${BUILDTYPE}
 - make run-tests BUILDTYPE=${BUILDTYPE}
 # TODO - port this test to linux
 - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then make run-headless-test BUILDTYPE=${BUILDTYPE} ; fi
 
 notifications:
-- hipchat: WB52YkcbCGMbNcStsGeaoRO7cyBSK4wX2ZHo2Y4b@GL
+  hipchat:
+    rooms:
+      secure: "ZKtTiFjXgXfrAO8eMU1nJBe46OBLgk0H7VAVmk84QwAb6DuoqT+mGMs+1yrWtjLwZI8vayZyaucupp1siM7lBWCOADx5GXA6GCCLOuE7fYLSNJFrXHa1u70IUBLOU8b5bDWRn8tcd5CM754R609l4ckTzBH3y4CIh9YNFrB0b+g="
+    template:
+      - '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}'
 
 git:
   submodules: false

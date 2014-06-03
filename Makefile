@@ -4,7 +4,12 @@ BUILDTYPE ?= Release
 PYTHON ?= python
 V ?= 1
 
-all: llmr
+all: setup
+
+setup: config.gypi
+
+config.gypi:
+	./setup-libraries.sh
 
 # Builds the regular library
 llmr: config.gypi llmr.gyp node
@@ -28,14 +33,9 @@ run-tests: test
 		$${FILE}; \
 	done
 
-test/%:
+test/%: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
-	build/$(BUILDTYPE)/test_$*
-
-# Only runs headless test case
-run-headless-test: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) headless
-	build/$(BUILDTYPE)/test_headless
+	(cd build/$(BUILDTYPE) && ./test_$*)
 
 
 ##### Makefile builds ##########################################################
@@ -48,7 +48,7 @@ linux: config.gypi linux/llmr-app.gyp node
 
 # Executes the Linux binary
 run-linux: linux
-	build/$(BUILDTYPE)/llmr
+	(cd build/$(BUILDTYPE) && ./mapbox-gl)
 
 
 
@@ -95,11 +95,12 @@ lproj: config.gypi linux/llmr-app.gyp clear_xcode_cache node
 clean: clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
-	-rm -f ./include/llmr/shader/shaders.hpp
-	-rm -f ./include/llmr/style/resources.hpp
-	-rm -f ./src/style/resources.cpp
+	-rm -rf ./config.mk
+	-rm -rf ./config.gypi
 
 distclean: clean
-	-rm -rf ./build
+	-rm -rf ./config.mk
+	-rm -rf ./config.gypi
+	-rm -rf ./mapnik-packaging/osx/out/
 
 .PHONY: llmr test linux
