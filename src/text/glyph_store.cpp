@@ -11,19 +11,19 @@
 namespace llmr {
 
 
-void FontStack::insert(uint32_t id, const SDFGlyph &glyph) {
+void FontStack::insert(char32_t id, const SDFGlyph &glyph) {
     std::lock_guard<std::mutex> lock(mtx);
     metrics.emplace(id, glyph.metrics);
     bitmaps.emplace(id, glyph.bitmap);
     sdfs.emplace(id, glyph);
 }
 
-const std::map<uint32_t, GlyphMetrics> &FontStack::getMetrics() const {
+const std::map<char32_t, GlyphMetrics> &FontStack::getMetrics() const {
     std::lock_guard<std::mutex> lock(mtx);
     return metrics;
 }
 
-const std::map<uint32_t, SDFGlyph> &FontStack::getSDFs() const {
+const std::map<char32_t, SDFGlyph> &FontStack::getSDFs() const {
     std::lock_guard<std::mutex> lock(mtx);
     return sdfs;
 }
@@ -33,13 +33,11 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float &m
         const float &letterSpacing) const {
 
     std::lock_guard<std::mutex> lock(mtx);
-    uint32_t i = 0;
-    uint32_t x = 0;
+    int32_t x = 0;
     Shaping shaping;
     // Loop through all characters of this label and shape.
-    for (uint32_t chr : string) {
-        shaping.emplace_back(0, chr, x, 0);
-        i++;
+    for (char32_t chr : string) {
+        shaping.emplace_back(chr, x, 0);
         auto metric = metrics.find(chr);
         if (metric != metrics.end()) {
             x += metric->second.advance + letterSpacing;
@@ -58,7 +56,7 @@ void alignVertically(Shaping &shaping, const uint32_t &lines, const float &lineH
     }
 }
 
-void alignHorizontally(Shaping &shaping, const std::map<uint32_t, GlyphMetrics> &metrics,
+void alignHorizontally(Shaping &shaping, const std::map<char32_t, GlyphMetrics> &metrics,
         const uint32_t &start, const uint32_t &end, const float &alignment) {
     auto & shape = shaping.at(end);
     auto metric = metrics.find(shape.glyph);

@@ -16,7 +16,7 @@ namespace llmr {
 
 class SDFGlyph {
 public:
-    uint32_t id = 0;
+    char32_t id = 0;
 
     // A signed distance field of the glyph with a border of 3 pixels.
     std::string bitmap;
@@ -27,9 +27,9 @@ public:
 
 class FontStack {
 public:
-    void insert(uint32_t id, const SDFGlyph &glyph);
-    const std::map<uint32_t, GlyphMetrics> &getMetrics() const;
-    const std::map<uint32_t, SDFGlyph> &getSDFs() const;
+    void insert(char32_t id, const SDFGlyph &glyph);
+    const std::map<char32_t, GlyphMetrics> &getMetrics() const;
+    const std::map<char32_t, SDFGlyph> &getSDFs() const;
     const Shaping getShaping(const std::u32string &string,
                              const float &maxWidth,
                              const float &lineHeight,
@@ -43,9 +43,9 @@ public:
                      const float &verticalAlignment) const;
 
 private:
-    std::map<uint32_t, std::string> bitmaps;
-    std::map<uint32_t, GlyphMetrics> metrics;
-    std::map<uint32_t, SDFGlyph> sdfs;
+    std::map<char32_t, std::string> bitmaps;
+    std::map<char32_t, GlyphMetrics> metrics;
+    std::map<char32_t, SDFGlyph> sdfs;
     mutable std::mutex mtx;
 };
 

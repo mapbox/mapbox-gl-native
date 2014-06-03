@@ -35,9 +35,9 @@ bool byScale(const Anchor &a, const Anchor &b) { return a.scale < b.scale; }
 static const Glyph null_glyph;
 
 inline const Glyph &getGlyph(const GlyphPlacement &placed,
-                             const GlyphPositions &face) {
-    auto it = face.find(placed.glyph);
-    if (it != face.end()) {
+                             const GlyphPositions &glyphPositions) {
+    auto it = glyphPositions.find(placed.glyph);
+    if (it != glyphPositions.end()) {
         return it->second;
     } else {
         fprintf(stderr, "glyph %d does not exist\n", placed.glyph);
@@ -138,7 +138,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
 
 void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
                        Anchor &anchor, vec2<float> origin, const Shaping &shaping,
-                       const GlyphPositions &face, float fontScale,
+                       const GlyphPositions &glyphPositions, float fontScale,
                        bool horizontal, const std::vector<Coordinate> &line,
                        float maxAngleDelta, float rotate) {
     // The total text advance is the width of this label.
@@ -154,7 +154,7 @@ void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
     const uint32_t buffer = 3;
 
     for (const GlyphPlacement &placed : shaping) {
-        const Glyph &glyph = getGlyph(placed, face);
+        const Glyph &glyph = getGlyph(placed, glyphPositions);
         if (!glyph) {
             // This glyph is empty and doesn't have any pixels that we'd need to
             // show.
@@ -247,7 +247,7 @@ void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
 void Placement::addFeature(TextBucket& bucket,
                            const std::vector<Coordinate> &line,
                            const BucketGeometryDescription &info,
-                           const GlyphPositions &face,
+                           const GlyphPositions &glyphPositions,
                            const Shaping &shaping) {
 
     const bool horizontal = info.path == TextPathType::Horizontal;
@@ -279,7 +279,7 @@ void Placement::addFeature(TextBucket& bucket,
         PlacedGlyphs glyphs;
         GlyphBoxes boxes;
 
-        getGlyphs(glyphs, boxes, anchor, info.translate, shaping, face, fontScale, horizontal,
+        getGlyphs(glyphs, boxes, anchor, info.translate, shaping, glyphPositions, fontScale, horizontal,
                       line, maxAngleDelta, rotate);
         PlacementProperty place =
             collision.place(boxes, anchor, anchor.scale, maxPlacementScale,

@@ -28,8 +28,8 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tile_id, const std::string& face_na
     // Use constant value for now.
     const uint8_t buffer = 3;
 
-    std::map<uint32_t, GlyphValue>& face = index[face_name];
-    std::map<uint32_t, GlyphValue>::iterator it = face.find(glyph.id);
+    std::map<char32_t, GlyphValue>& face = index[face_name];
+    std::map<char32_t, GlyphValue>::iterator it = face.find(glyph.id);
 
     // The glyph is already in this texture.
     if (it != face.end()) {
@@ -87,7 +87,7 @@ void GlyphAtlas::removeGlyphs(uint64_t tile_id) {
     std::lock_guard<std::mutex> lock(mtx);
 
     for (auto& faces : index) {
-        std::map<uint32_t, GlyphValue>& face = faces.second;
+        std::map<char32_t, GlyphValue>& face = faces.second;
         for (auto it = face.begin(); it != face.end(); /* we advance in the body */) {
             GlyphValue& value = it->second;
             value.ids.erase(tile_id);
