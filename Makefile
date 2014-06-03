@@ -33,14 +33,9 @@ run-tests: test
 		$${FILE}; \
 	done
 
-test/%:
+test/%: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
-	build/$(BUILDTYPE)/test_$*
-
-# Only runs headless test case
-run-headless-test: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) headless
-	build/$(BUILDTYPE)/test_headless
+	(cd build/$(BUILDTYPE) && ./test_$*)
 
 
 ##### Makefile builds ##########################################################
