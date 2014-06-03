@@ -49,12 +49,15 @@ bool TileParser::obsolete() const { return tile.state == TileData::State::obsole
 void TileParser::addGlyph(uint64_t tileid, const std::string stackname,
                           const std::u32string &string, const FontStack &fontStack,
                           GlyphAtlas &glyphAtlas, GlyphPositions &face) {
-    std::map<uint32_t, SDFGlyph> sdfs = fontStack.getSDFs();
+    const std::map<uint32_t, SDFGlyph> &sdfs = fontStack.getSDFs();
     // Loop through all characters and add glyph to atlas, positions.
     for (uint32_t chr : string) {
-        const SDFGlyph sdf = sdfs[chr];
-        const Rect<uint16_t> rect = glyphAtlas.addGlyph(tileid, stackname, sdf);
-        face.emplace(chr, Glyph{rect, sdf.metrics});
+        auto sdf_it = sdfs.find(chr);
+        if (sdf_it != sdfs.end()) {
+            const SDFGlyph& sdf = sdf_it->second;
+            const Rect<uint16_t> rect = glyphAtlas.addGlyph(tileid, stackname, sdf);
+            face.emplace(chr, Glyph{rect, sdf.metrics});
+        }
     }
 }
 
