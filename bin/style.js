@@ -917,7 +917,7 @@ module.exports = {
         "poi": {
             "source": "outdoors",
             "layer": "poi_label",
-            "icon": "maki",
+            "icon": "{{maki}}",
             "field": "scalerank",
             "value": [1, 2],
             "size": 12,
@@ -926,7 +926,7 @@ module.exports = {
         "poi_3": {
             "source": "outdoors",
             "layer": "poi_label",
-            "icon": "maki",
+            "icon": "{{maki}}",
             "field": "scalerank",
             "value": 3,
             "size": 12,
@@ -935,7 +935,7 @@ module.exports = {
         "poi_4_4": {
             "source": "outdoors",
             "layer": "poi_label",
-            "icon": "maki",
+            "icon": "{{maki}}",
             "filter": [
                 "and",
                 { "field": "scalerank", "value": 4 },
@@ -947,7 +947,7 @@ module.exports = {
         "poi_4_16": {
             "source": "outdoors",
             "layer": "poi_label",
-            "icon": "maki",
+            "icon": "{{maki}}",
             "filter": [
                 "and",
                 { "field": "scalerank", "value": 4 },
@@ -960,7 +960,7 @@ module.exports = {
         "poi_4_all": {
             "source": "outdoors",
             "layer": "poi_label",
-            "icon": "maki",
+            "icon": "{{maki}}",
             "field": "scalerank", 
             "value": 4,
             "size": 12,
@@ -969,7 +969,7 @@ module.exports = {
         "poi_aerodrome": {
             "source": "outdoors",
             "layer": "poi_label",
-            "icon": "maki",
+            "icon": "{{maki}}",
             "field": "maki",
             "value": "airport",
             "size": 24,
