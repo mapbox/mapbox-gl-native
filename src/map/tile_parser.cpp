@@ -68,6 +68,11 @@ void TileParser::parseStyleLayers(const std::vector<LayerDescription> &layers) {
             return;
         }
 
+        if (layer_desc.bucket_name == "background") {
+            // background is a special, fake bucket
+            continue;
+        }
+
         if (layer_desc.child_layer.size()) {
             // This is a layer group.
             // TODO: create framebuffer
@@ -79,10 +84,7 @@ void TileParser::parseStyleLayers(const std::vector<LayerDescription> &layers) {
             auto bucket_it = tile.buckets.find(layer_desc.bucket_name);
             if (bucket_it == tile.buckets.end()) {
                 auto bucket_it = style->buckets.find(layer_desc.bucket_name);
-                if (layer_desc.bucket_name == "background") {
-                    // background is a special, fake bucket
-                    continue;
-                } else if (bucket_it != style->buckets.end()) {
+                if (bucket_it != style->buckets.end()) {
                     // Only create the new bucket if we have an actual specification
                     // for it.
                     std::unique_ptr<Bucket> bucket = createBucket(bucket_it->second);
