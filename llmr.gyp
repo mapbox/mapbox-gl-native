@@ -65,6 +65,7 @@
       ],
       'sources': [
         '<!@(find src -name "*.cpp")',
+        '<!@(test -f "config/constants_local.cpp" && echo "config/constants_local.cpp" || echo "config/constants.cpp")',
         '<!@(find src -name "*.c")',
         '<!@(find src -name "*.h")',
         '<!@(find include -name "*.hpp")',
@@ -131,6 +132,7 @@
       ],
       'sources': [
         '<!@(find src/ \( -name "*.cpp" ! -name shaders.hpp ! -name shaders_gles2.cpp ! -name shaders_gl.cpp \))',
+        '<!@(test -f "config/constants_local.cpp" && echo "config/constants_local.cpp" || echo "config/constants.cpp")',
         '<!@(find src -name "*.c")',
         '<!@(find src -name "*.h")',
         '<!@(find include -name "*.hpp")',

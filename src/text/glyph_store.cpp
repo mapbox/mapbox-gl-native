@@ -4,6 +4,7 @@
 #include <llmr/util/string.hpp>
 #include <llmr/util/utf.hpp>
 #include <llmr/util/pbf.hpp>
+#include <llmr/util/constants.hpp>
 #include <llmr/platform/platform.hpp>
 #include <uv.h>
 #include <algorithm>
@@ -118,7 +119,7 @@ GlyphPBF::GlyphPBF(const std::string &fontStack, GlyphRange glyphRange)
     : future(promise.get_future().share())
 {
     // Load the glyph set URL
-    std::string url = util::sprintf<255>("http://mapbox.s3.amazonaws.com/gl-glyphs-256/%s/%d-%d.pbf", fontStack.c_str(), glyphRange.first, glyphRange.second);
+    std::string url = util::sprintf<255>(kGlyphURL, fontStack.c_str(), glyphRange.first, glyphRange.second);
 
     // TODO: Find more reliable URL normalization function
     std::replace(url.begin(), url.end(), ' ', '+');
