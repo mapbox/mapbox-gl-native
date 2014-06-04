@@ -1,4 +1,4 @@
-[![Travis](https://api.travis-ci.com/mapbox/mapbox-gl-native.svg?token=yZ9zvfZwYkJNWivRLoyX)](https://magnum.travis-ci.com/mapbox/mapbox-gl-native)
+[![Travis](https://api.travis-ci.org/mapbox/mapbox-gl-native.svg)](https://travis-ci.org/mapbox/mapbox-gl-native/builds)
 
 An OpenGL renderer for [Mapbox vector tiles](https://www.mapbox.com/blog/vector-tiles),
 implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
