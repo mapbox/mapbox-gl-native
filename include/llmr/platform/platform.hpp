@@ -12,9 +12,6 @@ class loop;
 }
 
 namespace llmr {
-
-extern const char *kSpriteURL;
-
 namespace platform {
 
 class Request;

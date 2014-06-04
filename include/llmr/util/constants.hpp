@@ -6,6 +6,11 @@
 #include "vec.hpp"
 
 namespace llmr {
+
+extern const char *kSpriteURL;
+extern const char *kVectorTileURL;
+extern const char *kGlyphURL;
+
 namespace util {
 
 extern const float tileSize;
