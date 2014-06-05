@@ -5,7 +5,7 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 
 # Depends
 
- - Modern C++ compiler that supports `-std=c++11`
+ - Modern C++ compiler that supports `-std=c++11` (On OSX clang++, on Linux g++-4.8 or g++-4.9)
  - Boost headers
  - `libpng`
  - `libuv`
