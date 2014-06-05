@@ -84,7 +84,8 @@ source MacOSX.sh
 cd ../../
 ./configure \
 --pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal/lib/pkgconfig \
---boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal
+--boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal \
+--node=`which node`
 
 elif [ ${UNAME} = 'Linux' ]; then
 
@@ -99,6 +100,6 @@ source Linux.sh
 cd ../../
 ./configure \
 --pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64/lib/pkgconfig \
---boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64
-
+--boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64 \
+--node=`which node`
 fi
