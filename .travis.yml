@@ -1,6 +1,5 @@
 language: cpp
 
-# http://docs.travis-ci.com/user/multi-os/
 os:
  - linux
  - osx
@@ -13,11 +12,6 @@ env:
   matrix:
    - BUILDTYPE=Release
    - BUILDTYPE=Debug
-
-cache:
-- apt
-- directories:
-  - mapnik-packaging
 
 before_install:
 - source ./scripts/setup_travis.sh
