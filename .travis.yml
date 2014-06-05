@@ -1,5 +1,10 @@
 language: cpp
 
+# http://docs.travis-ci.com/user/multi-os/
+os:
+ - linux
+ - osx
+
 compiler:
  - gcc
  - clang
@@ -15,27 +20,17 @@ cache:
   - mapnik-packaging
 
 before_install:
-- sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
-- sudo apt-get update -qq
-- sudo apt-get -y install gcc-4.8 g++-4.8
-- sudo apt-get -y install pkg-config nodejs cmake automake libtool xutils-dev
-- sudo apt-get -y install libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev
+- source ./scripts/setup_travis.sh
 
 install:
 - make setup
-- rm -rf mapnik-packaging/out/packages
 
 before_script:
-- if [[ ${CXX} == "g++" ]]; then export CXX="g++-4.8" ; fi
-- if [[ ${BUILDTYPE} == "Debug" ]] && [[ ${CXX} == "g++" ]]; then export CXXFLAGS="-fsanitize=address";export CFLAGS="${CXXFLAGS}";export LDFLAGS="-fsanitize=address" ; fi
-- if [[ ${BUILDTYPE} == "Debug" ]] && [[ ${CXX} == "clang++" ]]; then export CXXFLAGS="-fsanitize=thread -fPIC";export CFLAGS="${CXXFLAGS}";export LDFLAGS="-fsanitize=thread -pie" ; fi
-- if [[ ${CXX} == "clang++" ]]; then export LDFLAGS="${LDFLAGS}"; export CXXFLAGS="-Wno-unknown-warning-option -Wno-unused-local-typedefs -Wno-unknown-pragmas ${CXXFLAGS}"; fi
+- rm -rf mapnik-packaging/out/packages
 
 script:
 - make linux BUILDTYPE=${BUILDTYPE}
 - make run-tests BUILDTYPE=${BUILDTYPE}
-# TODO - port to linux
-#- make run-headless-test BUILDTYPE=${BUILDTYPE}
 
 notifications:
   hipchat:
