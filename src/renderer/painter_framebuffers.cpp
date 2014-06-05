@@ -36,7 +36,7 @@ void Painter::bindFramebuffer() {
     } else if (fbos.size() > (size_t) fbo_level) {
         GLuint fbo = fbos[fbo_level];
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-#if GL_EXT_discard_framebuffer
+#if GL_EXT_discard_framebuffer && !__ANDROID__
         const GLenum discards[] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT };
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 3, discards);
 #endif
@@ -59,7 +59,9 @@ void Painter::bindFramebuffer() {
             // Create depth/stencil buffer
             glGenRenderbuffers(1, &fbo_depth_stencil);
             glBindRenderbuffer(GL_RENDERBUFFER, fbo_depth_stencil);
+            #ifndef __ANDROID__
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, map.getState().getFramebufferWidth(), map.getState().getFramebufferHeight());
+            #endif
             glBindRenderbuffer(GL_RENDERBUFFER, 0);
         }
 

@@ -6,7 +6,6 @@ os:
 
 compiler:
  - gcc
- - clang
 
 env:
   matrix:
@@ -17,14 +16,13 @@ before_install:
 - source ./scripts/setup_travis.sh
 
 install:
-- make setup
+- true
 
 before_script:
-- rm -rf mapnik-packaging/out/packages
+- true
 
 script:
-- make linux BUILDTYPE=${BUILDTYPE}
-- make run-tests BUILDTYPE=${BUILDTYPE}
+- make android BUILDTYPE=${BUILDTYPE}
 
 notifications:
   hipchat:

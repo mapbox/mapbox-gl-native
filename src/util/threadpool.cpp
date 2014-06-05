@@ -29,7 +29,14 @@ Threadpool::Worker::Worker(Threadpool& pool)
 }
 
 Threadpool::Worker::~Worker() {
+    #ifdef __ANDROID__
+    int status = 1;
+    if ((status = pthread_kill(thread, SIGUSR1)) != 0) {
+        printf("Error cancelling thread %ld, error = %d", thread, status);
+    }
+    #else
     pthread_cancel(thread);
+    #endif
 }
 
 

@@ -49,7 +49,21 @@ git pull
 
 export CXX11=true
 
-if [ ${UNAME} = 'Darwin' ]; then
+if [ ${PLATFORM} = 'Android' ]; then
+source Android.sh
+    #if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/bin/pkg_config ] ; then ./scripts/build_pkg_config.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -d out/build-cpp11-libstdcpp-gcc-arm/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
+    echo '     ...done'
+
+cd ../../
+./configure \
+--pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-arm/lib/pkgconfig \
+--boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-arm
+
+
+elif [ ${UNAME} = 'Darwin' ]; then
 source iPhoneOS.sh
     if [ ! -f out/build-cpp11-libcpp-armv7/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
