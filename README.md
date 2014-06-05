@@ -94,10 +94,10 @@ You can then proceed to build the library like:
 The default stylesheet at `bin/style.js` is JSON and is processed into a minified version by the following script: 
 
 ```
-node bin/build-style.js
+node bin/build-style.js bin/style.js out/
 ```
 
-This is automatically taken care of as a build phase.
+Note: This is automatically taken care of as a build phase so you are not expected to do this manually.
 
 # Usage
 
