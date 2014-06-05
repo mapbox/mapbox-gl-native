@@ -13,7 +13,7 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
  - `libcurl` (depends on OpenSSL; Linux only)
  - `libboost_regex` (Linux only)
  - Homebrew (for build on OS X)
- - Python (for build only)
+ - Python 2.x (for build only)
  - Node.js (for build only)
 
 # Build instructions
