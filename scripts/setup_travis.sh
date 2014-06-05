@@ -7,7 +7,7 @@ set -o pipefail
 if [[ "${TRAVIS_OS_NAME:-false}" == false ]]; then
     if [[ $(uname -s) == "Darwin" ]]; then
         TRAVIS_OS_NAME="osx"
-    elif [[ $(uname -s) == "Darwin" ]]; then
+    elif [[ $(uname -s) == "Linux" ]]; then
         TRAVIS_OS_NAME="linux"
     fi
 fi
@@ -27,7 +27,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
         export CXX="g++-4.8" ;
     fi
 
-    # Tf building in debug then turn on sanitizers.
+    # If building in debug then turn on sanitizers.
     # They should both work with latest g++/clang++
     # but it's not worth a standalone matrix so here
     # we just test address->gcc and thread->clang for
