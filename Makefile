@@ -41,9 +41,9 @@ test/%: build/test/Makefile
 ##### Makefile builds ##########################################################
 
 android: llmr.gyp node
-	export PLATFORM=Android && ./setup-libraries.sh
-	deps/run_gyp llmr.gyp --depth=. -Goutput_dir=.. --generator-output=./build/android -f make-android
-	$(MAKE) -C ./build/android BUILDTYPE=$(BUILDTYPE) V=$(V) llmr-x86
+	bash -c "export PLATFORM=Android && source ./setup-libraries.sh && \
+	deps/run_gyp llmr.gyp --depth=. -Goutput_dir=.. --generator-output=./build/android -f make-android \
+	&& $(MAKE) -C ./build/android BUILDTYPE=$(BUILDTYPE) V=$(V) llmr-x86"
 
 # Builds the linux app with make. This is also used by Travis CI
 linux: config.gypi linux/llmr-app.gyp node
