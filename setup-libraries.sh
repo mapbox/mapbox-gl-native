@@ -65,7 +65,21 @@ cd ./osx/
 
 export CXX11=true
 
-if [ ${UNAME} = 'Darwin' ]; then
+if [ ${PLATFORM} = 'Android' ]; then
+source Android.sh
+    #if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/bin/pkg_config ] ; then ./scripts/build_pkg_config.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -d out/build-cpp11-libstdcpp-gcc-arm/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../$
+    echo '     ...done'
+
+cd ../../
+./configure \
+--pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-arm/lib/pkgconfig \
+--boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-arm
+
+
+elif [ ${UNAME} = 'Darwin' ]; then
 
 if [[ -n ${TRAVIS:-} ]]; then
     if aws s3 cp s3://mapbox-gl-testing/dependencies/build-cpp11-libcpp-osx_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then

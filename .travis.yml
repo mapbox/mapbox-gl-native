@@ -32,7 +32,7 @@ install:
 - ./scripts/travis_install.sh
 
 before_script:
-- rm -rf mapnik-packaging/out/packages
+- true
 
 script:
 - ./scripts/travis_script.sh
