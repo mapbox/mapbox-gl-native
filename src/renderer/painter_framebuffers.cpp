@@ -22,7 +22,8 @@ void Painter::clearFramebuffers() {
         fbo_depth_stencil = 0;
     }
 
-    glDeleteFramebuffers((int)fbos.size(), fbos.data());
+    if (fbos.size())
+        glDeleteFramebuffers((int)fbos.size(), fbos.data());
     fbos.clear();
 }
 
