@@ -643,6 +643,9 @@ FillClass StyleParser::parseFillClass(JSVal value) {
     if (value.HasMember("stroke-color")) {
         klass.stroke_color = parseColor(value["stroke-color"]);
         klass.stroke_color_transition = parseTransition(value, "stroke-color");
+    } else {
+        klass.stroke_color = klass.fill_color;
+        klass.stroke_color_transition = klass.fill_color_transition;
     }
 
     if (value.HasMember("fill-translate")) {
