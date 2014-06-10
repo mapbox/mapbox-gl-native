@@ -4,6 +4,7 @@
 
 from __future__ import with_statement
 
+import collections
 import errno
 import filecmp
 import os.path
@@ -470,6 +471,72 @@ def uniquer(seq, idfun=None):
         seen[marker] = 1
         result.append(item)
     return result
+
+
+# Based on http://code.activestate.com/recipes/576694/.
+class OrderedSet(collections.MutableSet):
+  def __init__(self, iterable=None):
+    self.end = end = []
+    end += [None, end, end]         # sentinel node for doubly linked list
+    self.map = {}                   # key --> [key, prev, next]
+    if iterable is not None:
+      self |= iterable
+
+  def __len__(self):
+    return len(self.map)
+
+  def __contains__(self, key):
+    return key in self.map
+
+  def add(self, key):
+    if key not in self.map:
+      end = self.end
+      curr = end[1]
+      curr[2] = end[1] = self.map[key] = [key, curr, end]
+
+  def discard(self, key):
+    if key in self.map:
+      key, prev_item, next_item = self.map.pop(key)
+      prev_item[2] = next_item
+      next_item[1] = prev_item
+
+  def __iter__(self):
+    end = self.end
+    curr = end[2]
+    while curr is not end:
+      yield curr[0]
+      curr = curr[2]
+
+  def __reversed__(self):
+    end = self.end
+    curr = end[1]
+    while curr is not end:
+      yield curr[0]
+      curr = curr[1]
+
+  # The second argument is an addition that causes a pylint warning.
+  def pop(self, last=True):  # pylint: disable=W0221
+    if not self:
+      raise KeyError('set is empty')
+    key = self.end[1][0] if last else self.end[2][0]
+    self.discard(key)
+    return key
+
+  def __repr__(self):
+    if not self:
+      return '%s()' % (self.__class__.__name__,)
+    return '%s(%r)' % (self.__class__.__name__, list(self))
+
+  def __eq__(self, other):
+    if isinstance(other, OrderedSet):
+      return len(self) == len(other) and list(self) == list(other)
+    return set(self) == set(other)
+
+  # Extensions to the recipe.
+  def update(self, iterable):
+    for i in iterable:
+      if i not in self:
+        self.add(i)
 
 
 class CycleError(Exception):

@@ -115,7 +115,7 @@ float TransformState::getAngle() const {
 }
 
 
-#pragma mark - Rotation
+#pragma mark - Changing
 
 bool TransformState::isChanging() const {
     return rotating || scaling || panning;

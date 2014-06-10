@@ -20,6 +20,56 @@ void StyleParser::parseBuckets(JSVal value, std::map<std::string, BucketDescript
     }
 }
 
+PropertyFilterExpression StyleParser::parseFilterOrExpression(JSVal value) {
+    if (value.IsArray()) {
+        // This is an expression.
+        util::recursive_wrapper<PropertyExpression> expression;
+        for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+            JSVal filter_item = value[i];
+
+            if (filter_item.IsString()) {
+                expression.get().op = expressionOperatorType({ filter_item.GetString(), filter_item.GetStringLength() });
+            } else {
+                expression.get().operands.emplace_back(parseFilterOrExpression(filter_item));
+            }
+        }
+        return std::move(expression);
+    } else if (value.IsObject() && value.HasMember("field") && value.HasMember("value")) {
+        // This is a filter.
+        JSVal field = value["field"];
+        JSVal val = value["value"];
+
+        if (!field.IsString()) {
+            throw Style::exception("field name must be a string");
+        }
+
+        const std::string field_name { field.GetString(), field.GetStringLength() };
+        const FilterOperator op = [&]{
+            if (value.HasMember("operator")) {
+                JSVal op_val = value["operator"];
+                return filterOperatorType({ op_val.GetString(), op_val.GetStringLength() });
+            } else {
+                return FilterOperator::Equal;
+            }
+        }();
+
+        if (val.IsArray()) {
+            // The filter has several values, so it's an OR sub-expression.
+            util::recursive_wrapper<PropertyExpression> expression;
+            for (rapidjson::SizeType i = 0; i < val.Size(); ++i) {
+                expression.get().operands.emplace_back(util::recursive_wrapper<PropertyFilter>(PropertyFilter { field_name, op, parseValue(val[i]) }));
+            }
+
+            return std::move(expression);
+        } else {
+            // The filter only has a single value, so it is a real filter.
+            return std::move(util::recursive_wrapper<PropertyFilter>(PropertyFilter { field_name, op, parseValue(val) }));
+        }
+    }
+
+    return std::true_type();
+}
+
 BucketDescription StyleParser::parseBucket(JSVal bucketName, JSVal value) {
     BucketDescription bucket;
     bucket.type = BucketType::None;
@@ -84,28 +134,10 @@ BucketDescription StyleParser::parseBucket(JSVal bucketName, JSVal value) {
                             throw Style::exception("layer name must be a string");
                         }
 
-                    } else {
-                        // This catches "type", "class", "maki", "index", etc
-                        if (value2.IsString() || value2.IsNumber() || value2.IsBool()) {
-                            bucket.source_field = name2;
-                            bucket.source_value.push_back(parseValue(value2));
-                        } else if (value2.IsArray()) {
-                            rapidjson::Value::ConstValueIterator itr3 = value2.Begin();
-                            for (; itr3 != value2.End(); ++itr3) {
-                                if (itr3->IsString() || itr3->IsNumber() || itr3->IsBool()) {
-                                    bucket.source_field = name2;
-                                    bucket.source_value.push_back(parseValue(itr3));
-                                } else {
-                                    printf("filter %s makes me confused\n", name2.c_str());
-                                    throw Style::exception("Unexpected type for a filter array element value");
-                                }
-                            }
-                        } else {
-                            printf("filter %s makes me confused\n", name2.c_str());
-                            throw Style::exception("Unexpected type for a filter value");
-                        }
                     }
                 }
+
+                bucket.filter = std::move(parseFilterOrExpression(value));
             } else {
                 throw Style::exception("filter type must be a object");
             }
@@ -122,7 +154,7 @@ BucketDescription StyleParser::parseBucket(JSVal bucketName, JSVal value) {
             } else {
                 throw Style::exception("line-join type must be a string");
             }
-        } else if (name == "font") {
+        } else if (name == "text-font") {
             if (value.IsString()) {
                 bucket.geometry.font = { value.GetString(), value.GetStringLength() };
             } else {
@@ -171,6 +203,13 @@ BucketDescription StyleParser::parseBucket(JSVal bucketName, JSVal value) {
                 throw Style::exception("text max angle delta must be a number");
             }
         }
+    }
+
+    if (value.HasMember("filter")) {
+        bucket.filter = std::move(parseFilterOrExpression(value["filter"]));
+    } else {
+        // Allow a filter triple to be specified at the bucket root as well.
+        bucket.filter = std::move(parseFilterOrExpression(value));
     }
 
     if (bucket.feature_type == BucketType::None) {
@@ -374,11 +413,10 @@ std::string StyleParser::parseString(JSVal value) {
     return { value.GetString(), value.GetStringLength() };
 }
 
-const JSVal& StyleParser::replaceConstant(const JSVal& possibleConstant) {
-
+JSVal StyleParser::replaceConstant(JSVal value) {
     // Attempt to retrieve the value from the constants map for the given key string
-    if (possibleConstant.IsString()) {
-        const std::string key { possibleConstant.GetString(), possibleConstant.GetStringLength() };
+    if (value.IsString()) {
+        const std::string key { value.GetString(), value.GetStringLength() };
         auto it = constants.find(key);
         if (it != constants.end()) {
             // The possible constant is indeed a key in the constants map, so "replace" it by returning the associated value
@@ -387,7 +425,7 @@ const JSVal& StyleParser::replaceConstant(const JSVal& possibleConstant) {
     }
 
     // The possibleConstant was not actually a constant, so return it as-is with no "replacement"
-    return possibleConstant;
+    return value;
 }
 
 std::vector<FunctionProperty> StyleParser::parseArray(JSVal value, uint16_t expected_count) {
@@ -539,30 +577,82 @@ FunctionProperty StyleParser::parseFunction(JSVal value) {
     return property;
 }
 
-FillClass StyleParser::parseFillClass(JSVal value) {
-    FillClass klass;
-
-    if (value.HasMember("enabled")) {
-        klass.enabled = parseFunction(value["enabled"]);
+boost::optional<PropertyTransition> StyleParser::parseTransition(JSVal value, std::string property_name) {
+    uint16_t duration = 0, delay = 0;
+    std::string transition_property = std::string("transition-").append(property_name);
+    if (value.HasMember(transition_property.c_str())) {
+        JSVal elements = value[transition_property.c_str()];
+        if (elements.IsObject()) {
+            if (elements.HasMember("duration") && elements["duration"].IsNumber()) {
+                duration = elements["duration"].GetUint();
+            }
+            if (elements.HasMember("delay") && elements["delay"].IsNumber()) {
+                delay = elements["delay"].GetUint();
+            }
+        }
     }
 
-    if (value.HasMember("fill-translate")) {
-        std::vector<FunctionProperty> values = parseArray(value["fill-translate"], 2);
-        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+    if (duration || delay) {
+        return boost::optional<PropertyTransition>(PropertyTransition { duration, delay });
+    } else {
+        return boost::optional<PropertyTransition>();
+    }
+}
+
+void StyleParser::parseGenericClass(GenericClass &klass, JSVal value) {
+    if (value.HasMember("enabled")) {
+        klass.enabled = parseFunction(value["enabled"]);
     }
 
     if (value.HasMember("translate-anchor")) {
         klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
     }
 
+    if (value.HasMember("opacity")) {
+        klass.opacity = parseFunction(value["opacity"]);
+        klass.opacity_transition = parseTransition(value, "opacity");
+    }
+
+    if (value.HasMember("prerender")) {
+        klass.prerender = parseFunction(value["prerender"]);
+    }
+
+    if (value.HasMember("prerender-buffer")) {
+        klass.prerenderBuffer = parseFunction(value["prerender-buffer"]);
+    }
+
+    if (value.HasMember("prerender-size")) {
+        klass.prerenderSize = parseFunction(value["prerender-size"]);
+    }
+
+    if (value.HasMember("prerender-blur")) {
+        klass.prerenderBlur = parseFunction(value["prerender-blur"]);
+    }
+}
+
+FillClass StyleParser::parseFillClass(JSVal value) {
+    FillClass klass;
+
+    parseGenericClass(klass, value);
+
     if (value.HasMember("fill-color")) {
         klass.fill_color = parseColor(value["fill-color"]);
+        klass.fill_color_transition = parseTransition(value, "fill-color");
     }
 
     if (value.HasMember("stroke-color")) {
         klass.stroke_color = parseColor(value["stroke-color"]);
-    } else {
-        klass.stroke_color = klass.fill_color;
+        klass.stroke_color_transition = parseTransition(value, "stroke-color");
+    }
+
+    if (value.HasMember("fill-translate")) {
+        std::vector<FunctionProperty> values = parseArray(value["fill-translate"], 2);
+        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+        klass.translate_transition = parseTransition(value, "translate");
+    }
+
+    if (value.HasMember("winding")) {
+        throw std::runtime_error("winding in stylesheets not yet supported");
     }
 
     if (value.HasMember("fill-antialias")) {
@@ -583,6 +673,8 @@ FillClass StyleParser::parseFillClass(JSVal value) {
 LineClass StyleParser::parseLineClass(JSVal value) {
     LineClass klass;
 
+    parseGenericClass(klass, value);
+
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);
     }
@@ -598,10 +690,12 @@ LineClass StyleParser::parseLineClass(JSVal value) {
 
     if (value.HasMember("line-color")) {
         klass.color = parseColor(value["line-color"]);
+        klass.color_transition = parseTransition(value, "line-color");
     }
 
     if (value.HasMember("line-width")) {
         klass.width = parseFunction(value["line-width"]);
+        klass.width_transition = parseTransition(value, "line-width");
     }
 
     if (value.HasMember("line-opacity")) {
@@ -611,6 +705,7 @@ LineClass StyleParser::parseLineClass(JSVal value) {
     if (value.HasMember("line-dasharray")) {
         std::vector<FunctionProperty> values = parseArray(value["line-dasharray"], 2);
         klass.dash_array = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
+        klass.dash_array_transition = parseTransition(value, "dasharray");
     }
 
     return klass;
@@ -619,21 +714,11 @@ LineClass StyleParser::parseLineClass(JSVal value) {
 IconClass StyleParser::parseIconClass(JSVal value) {
     IconClass klass;
 
-    if (value.HasMember("enabled")) {
-        klass.enabled = parseFunction(value["enabled"]);
-    }
-
-    if (value.HasMember("translate")) {
-        std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
-        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
-    }
-
-    if (value.HasMember("translate-anchor")) {
-        klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
-    }
+    parseGenericClass(klass, value);
 
     if (value.HasMember("point-color")) {
         klass.color = parseColor(value["point-color"]);
+        klass.color_transition = parseTransition(value, "point-color");
     }
 
     if (value.HasMember("opacity")) {
@@ -650,10 +735,12 @@ IconClass StyleParser::parseIconClass(JSVal value) {
 
     if (value.HasMember("point-radius")) {
         klass.radius = parseFunction(value["point-radius"]);
+        klass.radius_transition = parseTransition(value, "point-radius");
     }
 
     if (value.HasMember("point-blur")) {
         klass.blur = parseFunction(value["point-blur"]);
+        klass.blur_transition = parseTransition(value, "point-blur");
     }
 
     return klass;
@@ -661,6 +748,8 @@ IconClass StyleParser::parseIconClass(JSVal value) {
 
 TextClass StyleParser::parseTextClass(JSVal value) {
     TextClass klass;
+
+    parseGenericClass(klass, value);
 
     if (value.HasMember("enabled")) {
         klass.enabled = parseFunction(value["enabled"]);
@@ -677,18 +766,7 @@ TextClass StyleParser::parseTextClass(JSVal value) {
 
     if (value.HasMember("text-color")) {
         klass.color = parseColor(value["text-color"]);
-    }
-
-    if (value.HasMember("text-halo-color")) {
-        klass.halo = parseColor(value["text-halo-color"]);
-    }
-
-    if (value.HasMember("text-halo-width")) {
-        klass.halo_radius = parseFunction(value["text-halo-width"]);
-    }
-
-    if (value.HasMember("strokeBlur")) {
-        klass.halo_blur = parseFunction(value["strokeBlur"]);
+        klass.color_transition = parseTransition(value, "text-color");
     }
 
     if (value.HasMember("text-size")) {
@@ -700,7 +778,22 @@ TextClass StyleParser::parseTextClass(JSVal value) {
     }
 
     if (value.HasMember("text-always-visible")) {
-        klass.alwaysVisible = parseFunction(value["text-always-visible"]);
+        klass.always_visible = parseFunction(value["text-always-visible"]);
+    }
+
+    if (value.HasMember("text-halo-color")) {
+        klass.halo = parseColor(value["text-halo-color"]);
+        klass.halo_transition = parseTransition(value, "text-halo-color");
+    }
+
+    if (value.HasMember("text-halo-width")) {
+        klass.halo_radius = parseFunction(value["text-halo-width"]);
+        klass.halo_radius_transition = parseTransition(value, "text-halo-width");
+    }
+
+    if (value.HasMember("text-halo-blur")) {
+        klass.halo_blur = parseFunction(value["text-halo-blur"]);
+        klass.halo_blur_transition = parseTransition(value, "text-halo-blur");
     }
 
     return klass;
@@ -709,13 +802,7 @@ TextClass StyleParser::parseTextClass(JSVal value) {
 RasterClass StyleParser::parseRasterClass(JSVal value) {
     RasterClass klass;
 
-    if (value.HasMember("enabled")) {
-        klass.enabled = parseFunction(value["enabled"]);
-    }
-
-    if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
-    }
+    parseGenericClass(klass, value);
 
     return klass;
 }
@@ -723,13 +810,7 @@ RasterClass StyleParser::parseRasterClass(JSVal value) {
 CompositeClass StyleParser::parseCompositeClass(JSVal value) {
     CompositeClass klass;
 
-    if (value.HasMember("enabled")) {
-        klass.enabled = parseFunction(value["enabled"]);
-    }
-
-    if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
-    }
+    parseGenericClass(klass, value);
 
     return klass;
 }
@@ -737,12 +818,11 @@ CompositeClass StyleParser::parseCompositeClass(JSVal value) {
 BackgroundClass StyleParser::parseBackgroundClass(JSVal value) {
     BackgroundClass klass;
 
+    parseGenericClass(klass, value);
+
     if (value.HasMember("color")) {
         klass.color = parseColor(value["color"]);
-    }
-
-    if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
+        klass.color_transition = parseTransition(value, "color");
     }
 
     return klass;
@@ -770,4 +850,6 @@ Value StyleParser::parseValue(JSVal value) {
             throw Style::exception("value cannot be an object or array");
             return false;
     }
+    throw Style::exception("unhandled value type in style");
+    return false;
 }

@@ -10,6 +10,7 @@
 
 #include <llmr/platform/gl.hpp>
 #include <llmr/util/constants.hpp>
+#include <llmr/util/token.hpp>
 
 #include <cassert>
 
@@ -28,16 +29,10 @@ void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprit
     std::string field;
 
     if (geometry.field.size()) {
-        auto field_it = feature.properties.find(geometry.field);
-        if (field_it == feature.properties.end()) {
-            if (debug::tileParseWarnings) {
-                fprintf(stderr, "[WARNING] feature doesn't contain field '%s'\n", geometry.field.c_str());
-            }
-            return;
-        }
+        field = util::replaceTokens(geometry.field, feature.properties);
+    }
 
-        field = toString(field_it->second);
-    } else {
+    if (!field.size()) {
         field = "<circle>";
     }
 

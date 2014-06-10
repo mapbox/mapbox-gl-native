@@ -1,13 +1,13 @@
 #include <llmr/renderer/painter.hpp>
-
 #include <llmr/map/map.hpp>
-
 #include <llmr/util/std.hpp>
 #include <llmr/util/string.hpp>
-#include <llmr/util/timer.hpp>
 #include <llmr/util/time.hpp>
 #include <llmr/util/clip_ids.hpp>
 #include <llmr/util/constants.hpp>
+#if defined(DEBUG)
+#include <llmr/util/timer.hpp>
+#endif
 
 #include <cassert>
 #include <algorithm>
@@ -29,8 +29,9 @@ bool Painter::needsAnimation() const {
 }
 
 void Painter::setup() {
+#if defined(DEBUG)
     util::timer timer("painter setup");
-
+#endif
     setupShaders();
 
     assert(iconShader);
@@ -43,6 +44,7 @@ void Painter::setup() {
     assert(textShader);
     assert(dotShader);
     assert(compositeShader);
+    assert(gaussianShader);
 
 
     // Blending
@@ -73,6 +75,7 @@ void Painter::setupShaders() {
     textShader = std::make_unique<TextShader>();
     dotShader = std::make_unique<DotShader>();
     compositeShader = std::make_unique<CompositeShader>();
+    gaussianShader = std::make_unique<GaussianShader>();
 }
 
 void Painter::cleanup() {
@@ -142,15 +145,19 @@ void Painter::clear() {
 }
 
 void Painter::setOpaque() {
-    pass = Opaque;
-    glDisable(GL_BLEND);
-    depthMask(true);
+    if (pass != Opaque) {
+        pass = Opaque;
+        glDisable(GL_BLEND);
+        depthMask(true);
+    }
 }
 
 void Painter::setTranslucent() {
-    pass = Translucent;
-    glEnable(GL_BLEND);
-    depthMask(false);
+    if (pass != Translucent) {
+        pass = Translucent;
+        glEnable(GL_BLEND);
+        depthMask(false);
+    }
 }
 
 void Painter::setStrata(float value) {
@@ -206,15 +213,14 @@ void Painter::renderMatte() {
     glDisable(GL_DEPTH_TEST);
     glStencilFunc(GL_EQUAL, 0x0, 0xFF);
 
-    // Color white = {{ 0.9, 0.9, 0.9, 1 }};
-    Color white = {{ 1, 1, 0, 1 }};
+    Color matte = {{ 0, 0, 0, 1 }};
 
     useProgram(plainShader->program);
     plainShader->setMatrix(nativeMatrix);
 
     // Draw the clipping mask
     matteArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-    plainShader->setColor(white);
+    plainShader->setColor(matte);
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 
     glEnable(GL_DEPTH_TEST);

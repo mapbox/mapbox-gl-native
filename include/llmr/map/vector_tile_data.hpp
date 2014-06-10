@@ -12,8 +12,9 @@
 #include <llmr/geometry/line_buffer.hpp>
 #include <llmr/geometry/icon_buffer.hpp>
 #include <llmr/geometry/text_buffer.hpp>
+#include <llmr/map/tile_parser.hpp>
 
-#include <map>
+#include <unordered_map>
 
 namespace llmr {
 
@@ -25,7 +26,9 @@ public:
     VectorTileData(Tile::ID id, Map &map, const std::string url);
     ~VectorTileData();
 
+    virtual void beforeParse();
     virtual void parse();
+    virtual void afterParse();
     virtual void render(Painter &painter, const LayerDescription& layer_desc);
     virtual bool hasData(const LayerDescription& layer_desc) const;
 
@@ -42,8 +45,9 @@ protected:
 
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above
-    std::map<std::string, std::unique_ptr<Bucket>> buckets;
+    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
 
+    std::unique_ptr<TileParser> parser;
 };
 
 }

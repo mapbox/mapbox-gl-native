@@ -15,11 +15,13 @@ void Painter::drawClippingMasks(const Sources &sources) {
     glDepthRange(1.0f, 1.0f);
     glStencilMask(0xFF);
 
-    Color background = map.getStyle().computed.background.color;
-    background[0] *= map.getStyle().computed.background.opacity;
-    background[1] *= map.getStyle().computed.background.opacity;
-    background[2] *= map.getStyle().computed.background.opacity;
-    background[3] *= map.getStyle().computed.background.opacity;
+    const BackgroundProperties &properties = map.getStyle()->computed.background;
+    Color background = properties.color;
+    const float opacity = properties.opacity;
+    background[0] *= opacity;
+    background[1] *= opacity;
+    background[2] *= opacity;
+    background[3] *= opacity;
     plainShader->setColor(background);
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));

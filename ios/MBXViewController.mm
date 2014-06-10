@@ -1,6 +1,6 @@
 #import "MBXViewController.h"
 
-#import "MVKMapView.h"
+#import "MGLMapView.h"
 
 #import "../common/settings_nsuserdefaults.hpp"
 
@@ -8,7 +8,7 @@
 
 @interface MBXViewController () <CLLocationManagerDelegate>
 
-@property (nonatomic) MVKMapView *mapView;
+@property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) BOOL debug;
 @property (nonatomic) UIView *palette;
 @property (nonatomic) CLLocationManager *locationManager;
@@ -38,9 +38,11 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
 {
     [super viewDidLoad];
 
-    self.mapView = [[MVKMapView alloc] initWithFrame:self.view.bounds];
+    self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:self.mapView];
+
+    self.mapView.viewControllerForLayoutGuides = self;
 
     settings = new llmr::Settings_NSUserDefaults();
     [self restoreState:nil];
@@ -85,7 +87,7 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
     singleTap.numberOfTapsRequired = 1;
     [self.mapView addGestureRecognizer:singleTap];
 
-    NSArray *selectorNames = @[ @"unrotate", @"resetPosition", @"toggleDebug", @"toggleRaster", @"locateUser" ];
+    NSArray *selectorNames = @[ @"unrotate", @"resetPosition", @"toggleDebug", @"toggleStyle", @"locateUser" ];
     CGFloat buttonSize  = 40;
     CGFloat bufferSize  = 20;
     CGFloat alpha       = 0.75;
@@ -166,18 +168,14 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
     self.debug = ! self.debug;
 }
 
-- (void)toggleRaster
+- (void)toggleStyle
 {
-    [self.mapView toggleRaster];
+    [self.mapView toggleStyle];
 }
 
 - (void)locateUser
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self.locationManager selector:@selector(stopUpdatingLocation) object:nil];
-
     [self.locationManager startUpdatingLocation];
-
-    [self.locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:5.0];
 }
 
 #pragma mark - Destruction
@@ -203,7 +201,12 @@ llmr::Settings_NSUserDefaults *settings = nullptr;
 {
     CLLocation *latestLocation = locations.lastObject;
 
-    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(latestLocation.coordinate.latitude, latestLocation.coordinate.longitude) zoomLevel:17 animated:YES];
+    if ([latestLocation distanceFromLocation:[[CLLocation alloc] initWithLatitude:self.mapView.centerCoordinate.latitude longitude:self.mapView.centerCoordinate.longitude]] > 100)
+    {
+        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(latestLocation.coordinate.latitude, latestLocation.coordinate.longitude) zoomLevel:17 animated:YES];
+    }
+
+    [self.locationManager stopUpdatingLocation];
 }
 
 #pragma clang diagnostic pop

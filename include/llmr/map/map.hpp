@@ -5,11 +5,10 @@
 #include <uv.h>
 
 #include <llmr/map/view.hpp>
-// #include <llmr/map/tile.hpp>
-// #include <llmr/map/tile_data.hpp>
 #include <llmr/map/transform.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/geometry/glyph_atlas.hpp>
+#include <llmr/text/glyph_store.hpp>
 #include <llmr/renderer/painter.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/texturepool.hpp>
@@ -53,6 +52,13 @@ public:
     void resize(uint16_t width, uint16_t height, float ratio = 1);
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
 
+    // Styling
+    void setAppliedClasses(std::set<std::string> appliedClasses);
+    std::set<std::string> getAppliedClasses() const;
+    void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);
+    void setStyleJSON(std::string newStyleJSON);
+    std::string getStyleJSON() const;
+
     // Transition
     void cancelTransitions();
 
@@ -75,6 +81,8 @@ public:
     void resetZoom();
     void startScaling();
     void stopScaling();
+    double getMinZoom() const;
+    double getMaxZoom() const;
 
     // Rotation
     void rotateBy(double sx, double sy, double ex, double ey, double duration = 0);
@@ -84,23 +92,22 @@ public:
     void resetNorth();
     void startRotating();
     void stopRotating();
+    bool canRotate();
 
     // Debug
     void setDebug(bool value);
     void toggleDebug();
     bool getDebug() const;
 
-    // TEMPORARY DEBUG API
-    void toggleRaster();
-
 public:
     inline const TransformState &getState() const { return state; }
-    inline const Style &getStyle() const { return style; }
-    inline GlyphAtlas &getGlyphAtlas() { return glyphAtlas; }
-    inline SpriteAtlas &getSpriteAtlas() { return spriteAtlas; }
-    inline uv_loop_t *getLoop() { return loop; }
+    inline std::shared_ptr<const Style> getStyle() const { return style; }
+    inline std::shared_ptr<GlyphAtlas> getGlyphAtlas() { return glyphAtlas; }
+    inline std::shared_ptr<GlyphStore> getGlyphStore() { return glyphStore; }
+    inline std::shared_ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
+    inline std::shared_ptr<Texturepool> getTexturepool() { return texturepool; }
+    inline std::shared_ptr<uv::loop> getLoop() { return loop; }
     inline time getAnimationTime() const { return animationTime; }
-    inline Texturepool &getTexturepool() { return texturepool; }
     inline const Sources &getSources() { return sources; }
 
 private:
@@ -112,7 +119,6 @@ private:
 
     // Setup
     void setup();
-    void loadStyle(const uint8_t *const data, uint32_t bytes);
 
     void updateTiles();
     void updateRenderState();
@@ -148,13 +154,17 @@ private:
     Transform transform;
     TransformState state;
 
-    Texturepool texturepool;
-    Style style;
-    GlyphAtlas glyphAtlas;
-    SpriteAtlas spriteAtlas;
+    std::shared_ptr<Style> style;
+    std::shared_ptr<GlyphAtlas> glyphAtlas;
+    std::shared_ptr<GlyphStore> glyphStore;
+    std::shared_ptr<SpriteAtlas> spriteAtlas;
+    std::shared_ptr<Texturepool> texturepool;
+
     Painter painter;
 
     Sources sources;
+
+    std::string styleJSON = "";
 
     bool debug = false;
     time animationTime = 0;
@@ -163,7 +173,7 @@ private:
 
 private:
     bool async = false;
-    uv_loop_t *loop = nullptr;
+    std::shared_ptr<uv::loop> loop;
     uv_thread_t thread;
     uv_async_t *async_terminate = nullptr;
     uv_async_t *async_render = nullptr;

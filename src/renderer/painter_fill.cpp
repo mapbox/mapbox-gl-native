@@ -3,20 +3,13 @@
 #include <llmr/map/map.hpp>
 #include <llmr/style/sprite.hpp>
 #include <llmr/geometry/sprite_atlas.hpp>
+#include <llmr/util/std.hpp>
 
 using namespace llmr;
 
-void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
-    // Abort early.
-    if (!bucket.hasData()) return;
 
-    auto fill_properties = map.getStyle().computed.fills;
-    auto fill_properties_it = fill_properties.find(layer_name);
-    if (fill_properties_it == fill_properties.end()) return;
 
-    const FillProperties& properties = fill_properties_it->second;
-    if (!properties.enabled) return;
-
+void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &vtxMatrix) {
     Color fill_color = properties.fill_color;
     fill_color[0] *= properties.opacity;
     fill_color[1] *= properties.opacity;
@@ -36,7 +29,6 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
         stroke_color = fill_color;
     }
 
-    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
@@ -73,9 +65,9 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
     }
 
     if ((fill_color[3] >= 1.0f) == (pass == Opaque)) {
-        auto &sprite = map.getStyle().sprite;
+        const std::shared_ptr<Sprite> &sprite = map.getStyle()->sprite;
         if (properties.image.size() && sprite) {
-            auto &spriteAtlas = map.getSpriteAtlas();
+            SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
             Rect<uint16_t> imagePos = spriteAtlas.getImage(properties.image, *sprite);
 
 
@@ -145,5 +137,68 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
         glDepthRange(strata + strata_epsilon, 1.0f);
         bucket.drawVertices(*outlineShader);
+    }
+}
+
+void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+    // Abort early.
+    if (!bucket.hasData()) return;
+
+    const std::unordered_map<std::string, FillProperties> &fill_properties = map.getStyle()->computed.fills;
+    const std::unordered_map<std::string, FillProperties>::const_iterator fill_properties_it = fill_properties.find(layer_name);
+
+    const FillProperties &properties = fill_properties_it != fill_properties.end()
+                                           ? fill_properties_it->second
+                                           : defaultFillProperties;
+    if (!properties.enabled) return;
+
+    if (properties.prerender && properties.getPrerender(id.z)) {
+        if (pass == Translucent) {
+            // Buffer value around the 0..4096 extent that will be drawn into the 256x256 pixel
+            // texture. We later scale the texture so that the actual bounds will align with this
+            // tile's bounds. The reason we do this is so that the
+            if (!bucket.prerendered) {
+                const PrerenderProperties prerender = properties.getPrerenderProperties(id.z);
+                bucket.prerendered = std::make_unique<PrerenderedTexture>(prerender);
+                bucket.prerendered->bindFramebuffer();
+
+                preparePrerender(*bucket.prerendered);
+
+                const FillProperties modifiedProperties = [&]{
+                    FillProperties modifiedProperties = properties;
+                    modifiedProperties.opacity = 1;
+                    return modifiedProperties;
+                }();
+
+                // When drawing the fill, we want to draw a buffer around too, so we
+                // essentially downscale everyting, and then upscale it later when rendering.
+                const int buffer = prerender.buffer * 4096.0f;
+                const mat4 vtxMatrix = [&]{
+                    mat4 vtxMatrix;
+                    matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
+                    matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
+                    return vtxMatrix;
+                }();
+
+                setOpaque();
+                renderFill(bucket, modifiedProperties, id, vtxMatrix);
+
+                setTranslucent();
+                renderFill(bucket, modifiedProperties, id, vtxMatrix);
+
+                if (prerender.blur > 0) {
+                    bucket.prerendered->blur(*this, prerender.blur);
+                }
+
+                // RESET STATE
+                bucket.prerendered->unbindFramebuffer();
+                finishPrerender(*bucket.prerendered);
+            }
+
+            renderPrerenderedTexture(*bucket.prerendered, properties);
+        }
+    } else {
+        const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
+        renderFill(bucket, properties, id, vtxMatrix);
     }
 }

@@ -42,7 +42,9 @@ void TileData::request() {
             // Schedule tile parsing in another thread
             tile->reparse();
         } else {
+#if defined(DEBUG)
             fprintf(stderr, "[%s] tile loading failed: %d, %s\n", tile->url.c_str(), res->code, res->error_message.c_str());
+#endif
         }
     }, map.getLoop());
 }
@@ -54,12 +56,23 @@ void TileData::cancel() {
     }
 }
 
+void TileData::beforeParse() {}
+
 void TileData::reparse() {
+    beforeParse();
+
     // We're creating a new work request. The work request deletes itself after it executed
     // the after work handler
     new uv::work<std::shared_ptr<TileData>>(
         map.getLoop(),
-        [](std::shared_ptr<TileData> &tile) { tile->parse(); },
-        [](std::shared_ptr<TileData> &tile) { tile->map.update(); },
+        [](std::shared_ptr<TileData> &tile) {
+            tile->parse();
+        },
+        [](std::shared_ptr<TileData> &tile) {
+            tile->afterParse();
+            tile->map.update();
+        },
         shared_from_this());
 }
+
+void TileData::afterParse() {}

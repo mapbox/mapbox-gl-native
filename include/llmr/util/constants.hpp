@@ -6,6 +6,11 @@
 #include "vec.hpp"
 
 namespace llmr {
+
+extern const char *kSpriteURL;
+extern const char *kVectorTileURL;
+extern const char *kGlyphURL;
+
 namespace util {
 
 extern const float tileSize;
@@ -19,6 +24,11 @@ extern const bool styleParseWarnings;
 extern const bool spriteWarnings;
 extern const bool renderWarnings;
 extern const bool renderTree;
+extern const bool labelTextMissingWarning;
+extern const bool missingFontStackWarning;
+extern const bool missingFontFaceWarning;
+extern const bool glyphWarning;
+extern const bool shapingWarning;
 
 }
 

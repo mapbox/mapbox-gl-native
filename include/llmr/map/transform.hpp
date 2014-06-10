@@ -37,16 +37,19 @@ public:
     void setZoom(double zoom, time duration = 0);
     double getZoom() const;
     double getScale() const;
-    void startRotating();
-    void stopRotating();
+    void startScaling();
+    void stopScaling();
+    double getMinZoom() const;
+    double getMaxZoom() const;
 
     // Angle
     void rotateBy(double sx, double sy, double ex, double ey, time duration = 0);
     void setAngle(double angle, time duration = 0);
     void setAngle(double angle, double cx, double cy);
     double getAngle() const;
-    void startScaling();
-    void stopScaling();
+    void startRotating();
+    void stopRotating();
+    bool canRotate();
 
     // Transitions
     bool needsTransition() const;
@@ -67,6 +70,8 @@ private:
     void _clearPanning();
     void _clearRotating();
     void _clearScaling();
+
+    void constrain(double& scale, double& y) const;
 
 private:
     mutable uv::rwlock mtx;

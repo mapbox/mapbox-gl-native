@@ -14,13 +14,13 @@
 
 using namespace llmr;
 
-Raster::Raster(Texturepool &texturepool)
+Raster::Raster(const std::shared_ptr<Texturepool> &texturepool)
     : texturepool(texturepool)
 {}
 
 Raster::~Raster() {
     if (textured) {
-        texturepool.removeTextureID(texture);
+        texturepool->removeTextureID(texture);
     }
 }
 
@@ -49,7 +49,7 @@ void Raster::bind(bool linear) {
     }
 
     if (img && !textured) {
-        texture = texturepool.getTextureID();
+        texture = texturepool->getTextureID();
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -70,7 +70,7 @@ void Raster::bind(bool linear) {
 
 void Raster::beginFadeInTransition() {
     time start = util::now();
-    fade_transition = std::make_shared<util::ease_transition>(opacity, 1.0, opacity, start, 250_milliseconds);
+    fade_transition = std::make_shared<util::ease_transition<double>>(opacity, 1.0, opacity, start, 250_milliseconds);
 }
 
 bool Raster::needsTransition() const {

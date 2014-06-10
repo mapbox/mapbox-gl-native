@@ -24,7 +24,7 @@ std::atomic<int> active_tasks;
 void request_initialize_cb() {
     NSURLSessionConfiguration *sessionConfig =
         [NSURLSessionConfiguration defaultSessionConfiguration];
-    sessionConfig.timeoutIntervalForResource = 6;
+    sessionConfig.timeoutIntervalForResource = 30;
     sessionConfig.HTTPMaximumConnectionsPerHost = 8;
     sessionConfig.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
 
@@ -41,7 +41,7 @@ class FoundationRequest : public llmr::platform::Request {
 public:
     FoundationRequest(const std::string &url,
                       std::function<void(llmr::platform::Response *)> callback,
-                      uv_loop_t *loop)
+                      std::shared_ptr<uv::loop> loop)
         : Request(url, callback, loop) {
 #if TARGET_OS_IPHONE
         active_tasks++;
@@ -68,7 +68,7 @@ public:
 std::shared_ptr<llmr::platform::Request>
 llmr::platform::request_http(const std::string &url,
                              std::function<void(Response *)> callback,
-                             uv_loop_t *loop) {
+                             std::shared_ptr<uv::loop> loop) {
     uv_once(&request_initialize, request_initialize_cb);
 
     std::shared_ptr<FoundationRequest> req =
@@ -99,7 +99,7 @@ llmr::platform::request_http(const std::string &url,
         }
 
         (*req_ptr)->complete();
-                                      
+
         delete req_ptr;
     }];
 

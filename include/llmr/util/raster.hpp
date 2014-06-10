@@ -16,7 +16,7 @@ namespace llmr {
 class Raster : public std::enable_shared_from_this<Raster> {
 
 public:
-    Raster(Texturepool &texturepool);
+    Raster(const std::shared_ptr<Texturepool> &texturepool);
     ~Raster();
 
     // load image data
@@ -53,7 +53,7 @@ private:
     bool loaded = false;
 
     // shared texture pool
-    Texturepool &texturepool;
+    std::shared_ptr<Texturepool> texturepool;
 
     // min/mag filter
     uint32_t filter = 0;

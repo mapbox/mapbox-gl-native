@@ -353,7 +353,14 @@ bool LineBucket::hasData() const {
 }
 
 bool LineBucket::hasPoints() const {
-    return !pointGroups.empty();
+    if (!pointGroups.empty()) {
+        for (const point_group_type& group : pointGroups) {
+            if (group.elements_length) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void LineBucket::drawLines(LineShader& shader) {

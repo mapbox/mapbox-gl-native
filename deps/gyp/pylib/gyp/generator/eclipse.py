@@ -165,7 +165,7 @@ def GetAllIncludeDirectories(target_list, target_dicts,
   return all_includes_list
 
 
-def GetCompilerPath(target_list, data):
+def GetCompilerPath(target_list, data, options):
   """Determine a command that can be used to invoke the compiler.
 
   Returns:
@@ -173,13 +173,12 @@ def GetCompilerPath(target_list, data):
     the compiler from that.  Otherwise, see if a compiler was specified via the
     CC_target environment variable.
   """
-
   # First, see if the compiler is configured in make's settings.
   build_file, _, _ = gyp.common.ParseQualifiedTarget(target_list[0])
   make_global_settings_dict = data[build_file].get('make_global_settings', {})
   for key, value in make_global_settings_dict:
     if key in ['CC', 'CXX']:
-      return value
+      return os.path.join(options.toplevel_dir, value)
 
   # Check to see if the compiler was specified as an environment variable.
   for key in ['CC_target', 'CC', 'CXX']:
@@ -304,7 +303,7 @@ def GenerateOutputForConfig(target_list, target_dicts, data, params,
 
   eclipse_langs = ['C++ Source File', 'C Source File', 'Assembly Source File',
                    'GNU C++', 'GNU C', 'Assembly']
-  compiler_path = GetCompilerPath(target_list, data)
+  compiler_path = GetCompilerPath(target_list, data, options)
   include_dirs = GetAllIncludeDirectories(target_list, target_dicts,
                                           shared_intermediate_dirs, config_name,
                                           params, compiler_path)

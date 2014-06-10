@@ -46,7 +46,9 @@ public:
     const std::string toString() const;
 
     // Override this in the child class.
+    virtual void beforeParse();
     virtual void parse() = 0;
+    virtual void afterParse();
     virtual void render(Painter &painter, const LayerDescription& layer_desc) = 0;
     virtual bool hasData(const LayerDescription& layer_desc) const = 0;
 

@@ -7,6 +7,7 @@
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/text/types.hpp>
+#include <llmr/text/glyph.hpp>
 #include <memory>
 #include <map>
 #include <vector>
@@ -35,9 +36,9 @@ public:
     void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
                    PlacementRange placementRange, float zoom);
 
-    void addFeature(const VectorTileFeature &feature,
-                    const IndexedFaces &faces,
-                    const std::map<Value, Shaping> &shapings);
+    void addFeature(const pbf &geometry,
+                    const GlyphPositions &face,
+                    const Shaping &shaping);
 
     void drawGlyphs(TextShader &shader);
 

@@ -29,9 +29,11 @@ float functions::stops(float z, const std::vector<float>& stops) {
     if (stops.size() % 2 != 0) return 0;
 
     bool smaller = false;
-    float smaller_z, smaller_val;
+    float smaller_z = 0.0;
+    float smaller_val = 0.0;
     bool larger = false;
-    float larger_z, larger_val;
+    float larger_z = 0.0;
+    float larger_val = 0.0;
 
     for (uint32_t i = 0; i < stops.size(); i += 2) {
         float stop_z = stops[i];

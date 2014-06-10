@@ -16,8 +16,6 @@ PYLINT_BLACKLIST = [
     'test/lib/TestCmd.py',
     'test/lib/TestCommon.py',
     'test/lib/TestGyp.py',
-    # Needs style fix.
-    'pylib/gyp/generator/xcode.py',
 ]
 
 

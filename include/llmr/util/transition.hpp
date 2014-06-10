@@ -3,6 +3,7 @@
 
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/time.hpp>
+#include <llmr/style/properties.hpp>
 
 namespace llmr {
 namespace util {
@@ -19,6 +20,9 @@ public:
           duration(duration) {}
 
     inline float progress(time now) const {
+        if (duration == 0) return 1;
+        if (start > now) return 0;
+
         return (float)(now - start) / duration;
     }
 
@@ -26,32 +30,35 @@ public:
     virtual ~transition();
 
 protected:
+    double interpolateDouble(double from, double to, double t) const;
+    float interpolateFloat(float from, float to, double t) const;
+    Color interpolateColor(Color from, Color to, double t) const;
+    std::array<float, 2> interpolateFloatArray(std::array<float, 2> from, std::array<float, 2> to, double t) const;
+
+protected:
     const time start, duration;
 };
 
+template <typename T>
 class ease_transition : public transition {
 public:
-    // Disable automatic casts.
-    template <typename T1, typename T2>
-    inline ease_transition(double from, double to, double& value, T1 start, T2 duration) = delete;
+    ease_transition(T from, T to, T& value, time start, time duration)
+        : transition(start, duration),
+          from(from),
+          to(to),
+          value(value) {}
 
-    // Actual constructor.
-    ease_transition(double from, double to, double& value, time start, time duration);
     state update(time now) const;
 
 private:
-    const double from, to;
-    double& value;
+    const T from, to;
+    T& value;
+
 };
 
 template <typename T>
 class timeout : public transition {
 public:
-    // Disable automatic casts.
-    template <typename T1, typename T2>
-    inline timeout(T final_value, T& value, T1 start, T2 duration) = delete;
-
-    // Actual constructor.
     timeout(T final_value, T& value, time start, time duration)
         : transition(start, duration),
           final_value(final_value),

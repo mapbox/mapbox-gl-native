@@ -12,6 +12,7 @@ using namespace llmr;
 const double D2R = M_PI / 180.0;
 const double R2D = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
+const double MIN_ROTATE_SCALE = 8;
 
 Transform::Transform() {
     setScale(current.scale);
@@ -32,6 +33,9 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         current.pixelRatio = final.pixelRatio = ratio;
         current.framebuffer[0] = final.framebuffer[0] = fb_w;
         current.framebuffer[1] = final.framebuffer[1] = fb_h;
+        if (!canRotate() && current.angle) _setAngle(0);
+        constrain(current.scale, current.y);
+        platform::notify_map_change();
         return true;
     } else {
         return false;
@@ -52,6 +56,14 @@ void Transform::_moveBy(const double dx, const double dy, const time duration) {
     final.x = current.x + std::cos(current.angle) * dx + std::sin(current.angle) * dy;
     final.y = current.y + std::cos(current.angle) * dy + std::sin(-current.angle) * dx;
 
+    constrain(final.scale, final.y);
+
+    // Un-rotate when rotated and panning far enough to show off-world in corners.
+    double w = final.scale * util::tileSize / 2;
+    double m = std::sqrt(std::pow((current.width / 2), 2) + pow((current.height / 2), 2));
+    double x = std::abs(sqrt(std::pow(final.x, 2) + std::pow(final.y, 2)));
+    if (current.angle && w - x < m) _setAngle(0);
+
     if (duration == 0) {
         current.x = final.x;
         current.y = final.y;
@@ -59,10 +71,12 @@ void Transform::_moveBy(const double dx, const double dy, const time duration) {
         // Use a common start time for all of the transitions to avoid divergent transitions.
         time start = util::now();
         transitions.emplace_front(
-            std::make_shared<util::ease_transition>(current.x, final.x, current.x, start, duration));
+            std::make_shared<util::ease_transition<double>>(current.x, final.x, current.x, start, duration));
         transitions.emplace_front(
-            std::make_shared<util::ease_transition>(current.y, final.y, current.y, start, duration));
+            std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
     }
+
+    platform::notify_map_change();
 }
 
 void Transform::setLonLat(const double lon, const double lat, const time duration) {
@@ -192,6 +206,18 @@ void Transform::stopScaling() {
     _clearScaling();
 }
 
+double Transform::getMinZoom() const {
+    double test_scale = current.scale;
+    double test_y = current.y;
+    constrain(test_scale, test_y);
+
+    return std::log2(std::fmin(min_scale, test_scale));
+}
+
+double Transform::getMaxZoom() const {
+    return std::log2(max_scale);
+}
+
 void Transform::_clearScaling() {
     // This is only called internally, so we don't need a lock here.
 
@@ -243,6 +269,11 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     final.x = xn;
     final.y = yn;
 
+    constrain(final.scale, final.y);
+
+    // Undo rotation at low zooms.
+    if (!canRotate() && current.angle) _setAngle(0);
+
     if (duration == 0) {
         current.scale = final.scale;
         current.x = final.x;
@@ -250,18 +281,33 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     } else {
         // Use a common start time for all of the transitions to avoid divergent transitions.
         time start = util::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition>(
+        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
             current.scale, final.scale, current.scale, start, duration));
         transitions.emplace_front(
-            std::make_shared<util::ease_transition>(current.x, final.x, current.x, start, duration));
+            std::make_shared<util::ease_transition<double>>(current.x, final.x, current.x, start, duration));
         transitions.emplace_front(
-            std::make_shared<util::ease_transition>(current.y, final.y, current.y, start, duration));
+            std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
     }
 
     const double s = final.scale * util::tileSize;
     zc = s / 2;
     Bc = s / 360;
     Cc = s / (2 * M_PI);
+
+    platform::notify_map_change();
+}
+
+#pragma mark - Constraints
+
+void Transform::constrain(double& scale, double& y) const {
+    // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.
+    if (scale < (current.height / util::tileSize)) scale = (current.height / util::tileSize);
+
+    // Constrain min/max vertical pan to avoid showing off-world areas.
+    double max_y = ((scale * util::tileSize) - current.height) / 2;
+
+    if (y > max_y) y = max_y;
+    if (y < -max_y) y = -max_y;
 }
 
 #pragma mark - Angle
@@ -331,13 +377,18 @@ void Transform::_setAngle(double new_angle, const time duration) {
 
     final.angle = new_angle;
 
+    // Prevent rotation at low zooms.
+    if (!canRotate()) final.angle = 0;
+
     if (duration == 0) {
         current.angle = final.angle;
     } else {
         time start = util::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition>(
+        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
             current.angle, final.angle, current.angle, start, duration));
     }
+
+    platform::notify_map_change();
 }
 
 double Transform::getAngle() const {
@@ -372,6 +423,10 @@ void Transform::_clearRotating() {
         transitions.remove(rotate_timeout);
         rotate_timeout.reset();
     }
+}
+
+bool Transform::canRotate() {
+    return (current.scale > MIN_ROTATE_SCALE);
 }
 
 #pragma mark - Transition

@@ -219,10 +219,14 @@ class MacTool(object):
     """Calls libtool and filters out '/path/to/libtool: file: foo.o has no
     symbols'."""
     libtool_re = re.compile(r'^.*libtool: file: .* has no symbols$')
+    libtool_re5 = re.compile(
+        r'^.*libtool: warning for library: ' +
+        r'.* the table of contents is empty ' +
+        r'\(no object file members in the library define global symbols\)$')
     libtoolout = subprocess.Popen(cmd_list, stderr=subprocess.PIPE)
     _, err = libtoolout.communicate()
     for line in err.splitlines():
-      if not libtool_re.match(line):
+      if not libtool_re.match(line) and not libtool_re5.match(line):
         print >>sys.stderr, line
     return libtoolout.returncode
 
