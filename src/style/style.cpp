@@ -978,16 +978,16 @@ void Style::loadJSON(const uint8_t *const data) {
             parser.parseBuckets(document["buckets"], buckets);
         }
 
-        if (document.HasMember("structure")) {
-            parser.parseLayers(document["structure"], layers);
+        if (document.HasMember("layers")) {
+            parser.parseLayers(document["layers"], layers);
         }
 
         if (document.HasMember("constants")) {
             parser.parseConstants(document["constants"]);
         }
 
-        if (document.HasMember("classes")) {
-            parser.parseClasses(document["classes"], classes, buckets, layers);
+        if (document.HasMember("styles")) {
+            parser.parseClasses(document["styles"], classes, buckets, layers);
         }
     } else {
         throw Style::exception("stylesheet root must be an object");
