@@ -178,6 +178,44 @@ BucketDescription StyleParser::parseBucket(JSVal bucketName, JSVal value) {
             } else {
                 throw Style::exception("text-path must be a string");
             }
+        } else if (name == "text-alignment") {
+            if (value.IsString()) {
+                bucket.geometry.alignment = alignmentType({ value.GetString(), value.GetStringLength() });
+            } else {
+                throw Style::exception("text-alignment must be a string");
+            }
+        } else if (name == "text-translate") {
+            if (value.IsArray()) {
+                bucket.geometry.translate.x = value[(rapidjson::SizeType)0].GetDouble() * 24;
+                bucket.geometry.translate.y = value[(rapidjson::SizeType)1].GetDouble() * -24;
+            } else {
+                throw Style::exception("translate must be a string");
+            }
+        } else if (name == "text-vertical-alignment") {
+            if (value.IsString()) {
+                bucket.geometry.vertical_alignment = verticalAlignmentType({ value.GetString(), value.GetStringLength() });
+            } else {
+                throw Style::exception("verticalAlignment must be a string");
+                throw Style::exception("text-path must be a string");
+            }
+        } else if (name == "text-line-height") {
+            if (value.IsNumber()) {
+                bucket.geometry.line_height = value.GetDouble() * 24;
+            } else {
+                throw Style::exception("line height must be a number");
+            }
+        } else if (name == "text-max-width") {
+            if (value.IsNumber()) {
+                bucket.geometry.max_width = value.GetDouble() * 24;
+            } else {
+                throw Style::exception("max width must be a number");
+            }
+        } else if (name == "text-letter-spacing") {
+            if (value.IsNumber()) {
+                bucket.geometry.letter_spacing = value.GetDouble() * 24;
+            } else {
+                throw Style::exception("letter spacing must be a number");
+            }
         } else if (name == "line-miter-limit") {
             if (value.IsNumber()) {
                 bucket.geometry.miter_limit = value.GetDouble();
