@@ -99,6 +99,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
     if (properties.halo[3] > 0.0f) {
+        // TODO: Get rid of the 2.4 magic value. It is currently 24 / 10, with 24 being the font size
+        // of the SDF glyphs.
         textShader->setGamma(properties.halo_blur * 2.4f / fontSize / map.getState().getPixelRatio());
         textShader->setColor(properties.halo);
         textShader->setBuffer(properties.halo_radius);
@@ -108,6 +110,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 
     if (properties.color[3] > 0.0f) {
         // Then, we draw the text over the halo
+        // TODO: Get rid of the 2.4 magic value. It is currently 24 / 10, with 24 being the font size
+        // of the SDF glyphs.
         textShader->setGamma(2.4f / fontSize / map.getState().getPixelRatio());
         textShader->setColor(properties.color);
         textShader->setBuffer((256.0f - 64.0f) / 256.0f);
