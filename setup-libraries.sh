@@ -83,7 +83,6 @@ source iPhoneOS64.sh
 source iPhoneSimulator.sh
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
-    echo '     ...done'
 
 # libs conflict with MacOSX build
 # TODO: need to break apart targets
