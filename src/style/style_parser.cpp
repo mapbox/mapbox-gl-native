@@ -73,134 +73,40 @@ PropertyFilterExpression StyleParser::parseFilterOrExpression(JSVal value) {
 BucketDescription StyleParser::parseBucket(JSVal value) {
     BucketDescription bucket;
 
-    rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
-    for (; itr != value.MemberEnd(); ++itr) {
-        const std::string name(itr->name.GetString(), itr->name.GetStringLength());
-        JSVal value = itr->value;
-
-        if (name == "type") {
-            if (value.IsString()) {
-                bucket.type = bucketType({ value.GetString(), value.GetStringLength() });
-            } else {
-                throw Style::exception("bucket type must be a string");
-            }
-        } else if (name == "feature_type") {
-            if (value.IsString()) {
-                bucket.feature_type = bucketType({ value.GetString(), value.GetStringLength() });
-            } else {
-                throw Style::exception("feature type must be a string");
-            }
-        } else if (name == "source") {
-            if (value.IsString()) {
-                bucket.source_name = { value.GetString(), value.GetStringLength() };
-            } else {
-                throw Style::exception("source name must be a string");
-            }
-        } else if (name == "layer") {
-            if (value.IsString()) {
-                bucket.source_layer = { value.GetString(), value.GetStringLength() };
-            } else {
-                throw Style::exception("layer name must be a string");
-            }
-        } else if (name == "cap") {
-            if (value.IsString()) {
-                bucket.geometry.cap = capType({ value.GetString(), value.GetStringLength() });
-            } else {
-                throw Style::exception("cap type must be a string");
-            }
-        } else if (name == "join") {
-            if (value.IsString()) {
-                bucket.geometry.join = joinType({ value.GetString(), value.GetStringLength() });
-            } else {
-                throw Style::exception("join type must be a string");
-            }
-        } else if (name == "font") {
-            if (value.IsString()) {
-                bucket.geometry.font = { value.GetString(), value.GetStringLength() };
-            } else {
-                throw Style::exception("font stack must be a string");
-            }
-        } else if (name == "fontSize" || name == "size") {
-            if (value.IsNumber()) {
-                bucket.geometry.size = value.GetDouble();
-            } else {
-                throw Style::exception("font size must be a number");
-            }
-        } else if (name == "text_field" || name == "icon") {
-            if (value.IsString()) {
-                bucket.geometry.field = { value.GetString(), value.GetStringLength() };
-            } else {
-                throw Style::exception("text field must be a string");
-            }
-        } else if (name == "path") {
-            if (value.IsString()) {
-                bucket.geometry.path = textPathType({ value.GetString(), value.GetStringLength() });
-            } else {
-                throw Style::exception("curve must be a string");
-            }
-        } else if (name == "alignment") {
-            if (value.IsString()) {
-                bucket.geometry.alignment = alignmentType({ value.GetString(), value.GetStringLength() });
-            } else {
-                throw Style::exception("alignment must be a string");
-            }
-        } else if (name == "translate") {
-            if (value.IsArray()) {
-                bucket.geometry.translate.x = value[(rapidjson::SizeType)0].GetDouble() * 24;
-                bucket.geometry.translate.y = value[(rapidjson::SizeType)1].GetDouble() * -24;
-            } else {
-                throw Style::exception("translate must be a string");
-            }
-        } else if (name == "verticalAlignment") {
-            if (value.IsString()) {
-                bucket.geometry.vertical_alignment = verticalAlignmentType({ value.GetString(), value.GetStringLength() });
-            } else {
-                throw Style::exception("verticalAlignment must be a string");
-            }
-        } else if (name == "lineHeight") {
-            if (value.IsNumber()) {
-                bucket.geometry.line_height = value.GetDouble() * 24;
-            } else {
-                throw Style::exception("line height must be a number");
-            }
-        } else if (name == "maxWidth") {
-            if (value.IsNumber()) {
-                bucket.geometry.max_width = value.GetDouble() * 24;
-            } else {
-                throw Style::exception("max width must be a number");
-            }
-        } else if (name == "letterSpacing") {
-            if (value.IsNumber()) {
-                bucket.geometry.letter_spacing = value.GetDouble() * 24;
-            } else {
-                throw Style::exception("letter spacing must be a number");
-            }
-        } else if (name == "miterLimit") {
-            if (value.IsNumber()) {
-                bucket.geometry.miter_limit = value.GetDouble();
-            } else {
-                throw Style::exception("miter limit must be a number");
-            }
-        } else if (name == "roundLimit") {
-            if (value.IsNumber()) {
-                bucket.geometry.round_limit = value.GetDouble();
-            } else {
-                throw Style::exception("round limit must be a number");
-            }
-        } else if (name == "textMinDistance") {
-            if (value.IsNumber()) {
-                bucket.geometry.textMinDistance = value.GetDouble();
-            } else {
-                throw Style::exception("text min distance must be a number");
-            }
-        } else if (name == "maxAngleDelta") {
-            if (value.IsNumber()) {
-                bucket.geometry.maxAngleDelta = value.GetDouble();
-            } else {
-                throw Style::exception("max angle delta must be a number");
-            }
+    if (value.HasMember("type")) {
+        JSVal type = value["type"];
+        if (type.IsString()) {
+            bucket.type = bucketType({ type.GetString(), type.GetStringLength() });
+        } else {
+            throw Style::exception("bucket type must be a string");
         }
+    }
 
+    if (value.HasMember("feature_type")) {
+        JSVal feature_type = value["feature_type"];
+        if (feature_type.IsString()) {
+            bucket.feature_type = bucketType({ feature_type.GetString(), feature_type.GetStringLength() });
+        } else {
+            throw Style::exception("feature type must be a string");
+        }
+    }
+
+    if (value.HasMember("source")) {
+        JSVal source = value["source"];
+        if (source.IsString()) {
+            bucket.source_name = { source.GetString(), source.GetStringLength() };
+        } else {
+            throw Style::exception("source name must be a string");
+        }
+    }
+
+    if (value.HasMember("layer")) {
+        JSVal source_layer = value["layer"];
+        if (source_layer.IsString()) {
+            bucket.source_layer = { source_layer.GetString(), source_layer.GetStringLength() };
+        } else {
+            throw Style::exception("layer name must be a string");
+        }
     }
 
     if (value.HasMember("filter")) {
@@ -212,6 +118,206 @@ BucketDescription StyleParser::parseBucket(JSVal value) {
 
     if (bucket.feature_type == BucketType::None) {
         bucket.feature_type = bucket.type;
+    }
+
+    switch (bucket.type) {
+    case BucketType::Fill: {
+        bucket.render = BucketFillDescription{};
+    } break;
+
+    case BucketType::Line: {
+        bucket.render = BucketLineDescription{};
+        BucketLineDescription &render = bucket.render.get<BucketLineDescription>();
+
+        if (value.HasMember("cap")) {
+            JSVal property = value["cap"];
+            if (property.IsString()) {
+                render.cap = capType({property.GetString(), property.GetStringLength()});
+            } else {
+                throw Style::exception("cap type must be a string");
+            }
+        }
+        if (value.HasMember("join")) {
+            JSVal property = value["join"];
+            if (property.IsString()) {
+                render.join = joinType({property.GetString(), property.GetStringLength()});
+            } else {
+                throw Style::exception("join type must be a string");
+            }
+        }
+        if (value.HasMember("miterLimit")) {
+            JSVal property = value["miterLimit"];
+            if (property.IsNumber()) {
+                render.miter_limit = property.GetDouble();
+            } else {
+                throw Style::exception("miter limit must be a number");
+            }
+        }
+        if (value.HasMember("roundLimit")) {
+            JSVal property = value["roundLimit"];
+            if (property.IsNumber()) {
+                render.round_limit = property.GetDouble();
+            } else {
+                throw Style::exception("round limit must be a number");
+            }
+        }
+    } break;
+
+    case BucketType::Icon: {
+        bucket.render = BucketIconDescription{};
+        BucketIconDescription &render = bucket.render.get<BucketIconDescription>();
+
+        if (value.HasMember("size")) {
+            JSVal property = value["size"];
+            if (property.IsNumber()) {
+                render.size = property.GetDouble();
+            } else {
+                throw Style::exception("font size must be a number");
+            }
+        }
+
+        if (value.HasMember("icon")) {
+            JSVal property = value["icon"];
+            if (property.IsString()) {
+                render.icon = {property.GetString(), property.GetStringLength()};
+            } else {
+                throw Style::exception("text field must be a string");
+            }
+        }
+
+        if (value.HasMember("translate")) {
+            JSVal property = value["translate"];
+            if (property.IsArray()) {
+                render.translate.x = property[(rapidjson::SizeType)0].GetDouble() * 24;
+                render.translate.y = property[(rapidjson::SizeType)1].GetDouble() * -24;
+            } else {
+                throw Style::exception("translate must be a string");
+            }
+        }
+    } break;
+
+    case BucketType::Text: {
+        bucket.render = BucketTextDescription{};
+        BucketTextDescription &render = bucket.render.get<BucketTextDescription>();
+
+        if (value.HasMember("text_field")) {
+            JSVal property = value["text_field"];
+            if (property.IsString()) {
+                render.field = {property.GetString(), property.GetStringLength()};
+            } else {
+                throw Style::exception("text field must be a string");
+            }
+        }
+
+        if (value.HasMember("path")) {
+            JSVal property = value["path"];
+            if (property.IsString()) {
+                render.path = textPathType({property.GetString(), property.GetStringLength()});
+            } else {
+                throw Style::exception("curve must be a string");
+            }
+        }
+
+        if (value.HasMember("font")) {
+            JSVal property = value["font"];
+            if (property.IsString()) {
+                render.font = {property.GetString(), property.GetStringLength()};
+            } else {
+                throw Style::exception("font stack must be a string");
+            }
+        }
+
+        if (value.HasMember("fontSize")) {
+            JSVal property = value["fontSize"];
+            if (property.IsNumber()) {
+                render.max_size = property.GetDouble();
+            } else {
+                throw Style::exception("font size must be a number");
+            }
+        }
+
+        if (value.HasMember("maxWidth")) {
+            JSVal property = value["maxWidth"];
+            if (property.IsNumber()) {
+                render.max_width = property.GetDouble() * 24;
+            } else {
+                throw Style::exception("max width must be a number");
+            }
+        }
+
+        if (value.HasMember("lineHeight")) {
+            JSVal property = value["lineHeight"];
+            if (property.IsNumber()) {
+                render.line_height = property.GetDouble() * 24;
+            } else {
+                throw Style::exception("line height must be a number");
+            }
+        }
+
+        if (value.HasMember("letterSpacing")) {
+            JSVal property = value["letterSpacing"];
+            if (property.IsNumber()) {
+                render.letter_spacing = property.GetDouble() * 24;
+            } else {
+                throw Style::exception("letter spacing must be a number");
+            }
+        }
+
+        if (value.HasMember("alignment")) {
+            JSVal property = value["alignment"];
+            if (property.IsString()) {
+                render.alignment =
+                    alignmentType({property.GetString(), property.GetStringLength()});
+            } else {
+                throw Style::exception("alignment must be a string");
+            }
+        }
+
+        if (value.HasMember("verticalAlignment")) {
+            JSVal property = value["verticalAlignment"];
+            if (property.IsString()) {
+                render.vertical_alignment =
+                    verticalAlignmentType({property.GetString(), property.GetStringLength()});
+            } else {
+                throw Style::exception("verticalAlignment must be a string");
+            }
+        }
+
+        if (value.HasMember("translate")) {
+            JSVal property = value["translate"];
+            if (property.IsArray()) {
+                render.translate.x = property[(rapidjson::SizeType)0].GetDouble() * 24;
+                render.translate.y = property[(rapidjson::SizeType)1].GetDouble() * -24;
+            } else {
+                throw Style::exception("translate must be a string");
+            }
+        }
+
+        if (value.HasMember("maxAngleDelta")) {
+            JSVal property = value["maxAngleDelta"];
+            if (property.IsNumber()) {
+                render.max_angle_delta = property.GetDouble();
+            } else {
+                throw Style::exception("max angle delta must be a number");
+            }
+        }
+
+        if (value.HasMember("textMinDistance")) {
+            JSVal property = value["textMinDistance"];
+            if (property.IsNumber()) {
+                render.min_distance = property.GetDouble();
+            } else {
+                throw Style::exception("text min distance must be a number");
+            }
+        }
+    } break;
+
+    case BucketType::Raster: {
+        bucket.render = BucketRasterDescription{};
+    } break;
+
+    default:
+        break;
     }
 
     return bucket;

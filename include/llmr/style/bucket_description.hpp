@@ -82,31 +82,50 @@ inline float verticalAlignmentType(const std::string& alignment) {
     else return 0.5;
 };
 
+class BucketFillDescription {
+public:
+};
 
-class BucketGeometryDescription {
+class BucketLineDescription {
 public:
     CapType cap = CapType::None;
     JoinType join = JoinType::None;
-    std::string font;
-    std::string field;
-    std::string icon;
-    float size = 0.0f;
     float miter_limit = 2.0f;
     float round_limit = 1.0f;
-    TextPathType path = TextPathType::Horizontal;
-    float alignment = 0.5;
-    float vertical_alignment = 0.5;
-    float line_height = 1.2 * 24;
-    float max_width = 15.0f * 24;
-    float letter_spacing = 0;
-    vec2<float> translate {0, 0};
-    float padding = 2.0f;
-    float textMinDistance = 250.0f;
-    float rotate = 0.0f; // what is this?
-    float maxAngleDelta = M_PI;
-    bool alwaysVisible = false;
 };
 
+class BucketIconDescription {
+public:
+    uint16_t size = 16;
+    vec2<float> translate {0, 0};
+    std::string icon;
+};
+
+class BucketTextDescription {
+public:
+    std::string field;
+    TextPathType path = TextPathType::Horizontal;
+    std::string font;
+    float max_size = 16.0f;
+    float max_width = 15.0f * 24;
+    float line_height = 1.2f * 24;
+    float letter_spacing = 0.0f;
+    float alignment = 0.5f;
+    float vertical_alignment = 0.5;
+    vec2<float> translate {0, 0};
+    float max_angle_delta = M_PI;
+    float min_distance = 250.0f;
+    float rotate = 0.0f; // what is this?
+    float padding = 2.0f;
+    bool always_visible = false;
+};
+
+class BucketRasterDescription {
+public:
+};
+
+typedef util::variant<BucketFillDescription, BucketLineDescription, BucketIconDescription,
+                      BucketTextDescription, BucketRasterDescription> BucketRenderDescription;
 
 class BucketDescription {
 public:
@@ -120,7 +139,7 @@ public:
     PropertyFilterExpression filter = std::true_type();
 
     // Specifies how the geometry for this bucket should be created
-    BucketGeometryDescription geometry;
+    BucketRenderDescription render;
 };
 
 std::ostream& operator<<(std::ostream&, const BucketDescription& bucket);
