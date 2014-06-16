@@ -1,4 +1,5 @@
 #include <llmr/style/style_parser.hpp>
+#include <llmr/style/properties.hpp>
 #include <llmr/util/constants.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
@@ -482,10 +483,10 @@ void StyleParser::parseClass(const std::string &name, JSVal value, ClassDescript
     const std::string &bucket_name = layer_bucket_it->second;
     if (bucket_name == "background") {
         // background buckets are fake
-        class_desc.background = parseBackgroundClass(value);
+        class_desc.addClass("background", parseBackgroundClass(value));
     } else if (bucket_name.length() == 0) {
         // no bucket name == composite bucket.
-        class_desc.composite.insert({ name, std::forward<CompositeClass>(parseCompositeClass(value)) });
+        class_desc.addClass(name, parseCompositeClass(value));
     } else {
         auto bucket_it = buckets.find(bucket_name);
         if (bucket_it == buckets.end()) {
@@ -497,15 +498,15 @@ void StyleParser::parseClass(const std::string &name, JSVal value, ClassDescript
 
         BucketType type = bucket_it->second.type;
         if (type == BucketType::Fill) {
-            class_desc.fill.insert({ name, std::forward<FillClass>(parseFillClass(value)) });
+            class_desc.addClass(name, parseFillClass(value));
         } else if (type == BucketType::Line) {
-            class_desc.line.insert({ name, std::forward<LineClass>(parseLineClass(value)) });
+            class_desc.addClass(name, parseLineClass(value));
         } else if (type == BucketType::Icon) {
-            class_desc.icon.insert({ name, std::forward<IconClass>(parseIconClass(value)) });
+            class_desc.addClass(name, parseIconClass(value));
         } else if (type == BucketType::Text) {
-            class_desc.text.insert({ name, std::forward<TextClass>(parseTextClass(value)) });
+            class_desc.addClass(name, parseTextClass(value));
         } else if (type == BucketType::Raster) {
-            class_desc.raster.insert({ name, std::forward<RasterClass>(parseRasterClass(value)) });
+            class_desc.addClass(name, parseRasterClass(value));
         } else {
             throw Style::exception("unknown class type name");
         }
@@ -663,7 +664,7 @@ FunctionProperty StyleParser::parseFunction(JSVal value) {
     return property;
 }
 
-boost::optional<PropertyTransition> StyleParser::parseTransition(JSVal value, std::string property_name) {
+void StyleParser::parseTransition(ClassProperties &klass, ClassPropertyKey key, JSVal value, std::string property_name) {
     uint16_t duration = 0, delay = 0;
     std::string transition_property = std::string("transition-").append(property_name);
     if (value.HasMember(transition_property.c_str())) {
@@ -679,200 +680,212 @@ boost::optional<PropertyTransition> StyleParser::parseTransition(JSVal value, st
     }
 
     if (duration || delay) {
-        return boost::optional<PropertyTransition>(PropertyTransition { duration, delay });
-    } else {
-        return boost::optional<PropertyTransition>();
+        klass.emplace(key, PropertyTransition { duration, delay });
     }
 }
 
-void StyleParser::parseGenericClass(GenericClass &klass, JSVal value) {
-     if (value.HasMember("enabled")) {
-        klass.enabled = parseFunction(value["enabled"]);
+void StyleParser::parseGenericClass(ClassProperties &klass, JSVal value) {
+    using Key = ClassPropertyKey;
+
+    if (value.HasMember("enabled")) {
+        klass.emplace(Key::Enabled, parseFunction(value["enabled"]));
     }
 
     if (value.HasMember("translate")) {
         std::vector<FunctionProperty> values = parseArray(value["translate"], 2);
-        klass.translate = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
-        klass.translate_transition = parseTransition(value, "translate");
+        klass.emplace(Key::TranslateX, std::move(values[0]));
+        klass.emplace(Key::TranslateY, std::move(values[1]));
+        parseTransition(klass, Key::TranslateTransition, value, "translate");
     }
 
     if (value.HasMember("translate-anchor")) {
-        klass.translateAnchor = parseTranslateAnchor(value["translate-anchor"]);
+        klass.emplace(Key::TranslateAnchor, parseTranslateAnchor(value["translate-anchor"]));
     }
 
     if (value.HasMember("opacity")) {
-        klass.opacity = parseFunction(value["opacity"]);
-        klass.opacity_transition = parseTransition(value, "opacity");
+        klass.emplace(Key::Opacity, parseFunction(value["opacity"]));
+        parseTransition(klass, Key::OpacityTransition, value, "opacity");
     }
 
     if (value.HasMember("prerender")) {
-        klass.prerender = parseFunction(value["prerender"]);
+        klass.emplace(Key::Prerender, parseFunction(value["prerender"]));
     }
 
     if (value.HasMember("prerender-buffer")) {
-        klass.prerenderBuffer = parseFunction(value["prerender-buffer"]);
+        klass.emplace(Key::PrerenderBuffer, parseFunction(value["prerender-buffer"]));
     }
 
     if (value.HasMember("prerender-size")) {
-        klass.prerenderSize = parseFunction(value["prerender-size"]);
+        klass.emplace(Key::PrerenderSize, parseFunction(value["prerender-size"]));
     }
 
     if (value.HasMember("prerender-blur")) {
-        klass.prerenderBlur = parseFunction(value["prerender-blur"]);
+        klass.emplace(Key::PrerenderBlur, parseFunction(value["prerender-blur"]));
     }
 }
 
-FillClass StyleParser::parseFillClass(JSVal value) {
-    FillClass klass;
+ClassProperties StyleParser::parseFillClass(JSVal value) {
+    ClassProperties klass(RenderType::Fill);
 
     parseGenericClass(klass, value);
+
+    using Key = ClassPropertyKey;
 
     if (value.HasMember("winding")) {
         throw std::runtime_error("winding in stylesheets not yet supported");
     }
 
     if (value.HasMember("color")) {
-        klass.fill_color = parseColor(value["color"]);
-        klass.fill_color_transition = parseTransition(value, "color");
+        klass.emplace(Key::FillColor, parseColor(value["color"]));
+        parseTransition(klass, Key::FillColorTransition, value, "color");
     }
 
     if (value.HasMember("stroke")) {
-        klass.stroke_color = parseColor(value["stroke"]);
-        klass.stroke_color_transition = parseTransition(value, "stroke");
-    } else {
-        klass.stroke_color = klass.fill_color;
+        klass.emplace(Key::FillStrokeColor, parseColor(value["stroke"]));
+        parseTransition(klass, Key::FillStrokeColorTransition, value, "stroke");
+    } else if (const Color *fillColor = klass.get<Color>(Key::FillColor)) {
+        klass.emplace(Key::FillStrokeColor, *fillColor);
     }
 
     if (value.HasMember("antialias")) {
-        klass.antialias = parseBoolean(value["antialias"]);
+        klass.emplace(Key::FillAntialias, parseBoolean(value["antialias"]));
     }
 
     if (value.HasMember("image")) {
-        klass.image = parseString(value["image"]);
+        klass.emplace(Key::FillImage, parseString(value["image"]));
     }
 
     return klass;
 }
 
-LineClass StyleParser::parseLineClass(JSVal value) {
-    LineClass klass;
+ClassProperties StyleParser::parseLineClass(JSVal value) {
+    ClassProperties klass(RenderType::Line);
 
     parseGenericClass(klass, value);
 
+    using Key = ClassPropertyKey;
+
     if (value.HasMember("color")) {
-        klass.color = parseColor(value["color"]);
-        klass.color_transition = parseTransition(value, "color");
+        klass.emplace(Key::LineColor, parseColor(value["color"]));
+        parseTransition(klass, Key::LineColorTransition, value, "color");
     }
 
     if (value.HasMember("width")) {
-        klass.width = parseFunction(value["width"]);
-        klass.width_transition = parseTransition(value, "width");
+        klass.emplace(Key::LineWidth, parseFunction(value["width"]));
+        parseTransition(klass, Key::LineWidthTransition, value, "width");
     }
 
     if (value.HasMember("dasharray")) {
         std::vector<FunctionProperty> values = parseArray(value["dasharray"], 2);
-        klass.dash_array = std::array<FunctionProperty, 2> {{ values[0], values[1] }};
-        klass.dash_array_transition = parseTransition(value, "dasharray");
+        klass.emplace(Key::LineDashLand, std::move(values[0]));
+        klass.emplace(Key::LineDashGap, std::move(values[1]));
+        parseTransition(klass, Key::LineDashTransition, value, "dasharray");
     }
 
     return klass;
 }
 
-IconClass StyleParser::parseIconClass(JSVal value) {
-    IconClass klass;
+ClassProperties StyleParser::parseIconClass(JSVal value) {
+    ClassProperties klass(RenderType::Icon);
 
     parseGenericClass(klass, value);
 
+    using Key = ClassPropertyKey;
+
     if (value.HasMember("color")) {
-        klass.color = parseColor(value["color"]);
-        klass.color_transition = parseTransition(value, "color");
+        klass.emplace(Key::IconColor, parseColor(value["color"]));
+        parseTransition(klass, Key::IconColorTransition, value, "color");
     }
 
     if (value.HasMember("image")) {
-        klass.image = parseString(value["image"]);
+        klass.emplace(Key::IconImage, parseString(value["image"]));
     }
 
     if (value.HasMember("size")) {
-        klass.size = parseFunction(value["size"]);
+        klass.emplace(Key::IconSize, parseFunction(value["size"]));
     }
 
     if (value.HasMember("radius")) {
-        klass.radius = parseFunction(value["radius"]);
-        klass.radius_transition = parseTransition(value, "radius");
+        klass.emplace(Key::IconRadius, parseFunction(value["radius"]));
+        parseTransition(klass, Key::IconRadiusTransition, value, "radius");
     }
 
     if (value.HasMember("blur")) {
-        klass.blur = parseFunction(value["blur"]);
-        klass.blur_transition = parseTransition(value, "blur");
+        klass.emplace(Key::IconBlur, parseFunction(value["blur"]));
+        parseTransition(klass, Key::IconBlurTransition, value, "blur");
     }
 
     return klass;
 }
 
-TextClass StyleParser::parseTextClass(JSVal value) {
-    TextClass klass;
+ClassProperties StyleParser::parseTextClass(JSVal value) {
+    ClassProperties klass(RenderType::Text);
 
     parseGenericClass(klass, value);
 
+    using Key = ClassPropertyKey;
+
     if (value.HasMember("color")) {
-        klass.color = parseColor(value["color"]);
-        klass.color_transition = parseTransition(value, "color");
+        klass.emplace(Key::TextColor, parseColor(value["color"]));
+        parseTransition(klass, Key::TextColorTransition, value, "color");
     }
 
     if (value.HasMember("stroke")) {
-        klass.halo = parseColor(value["stroke"]);
-        klass.halo_transition = parseTransition(value, "stroke");
+        klass.emplace(Key::TextHaloColor, parseColor(value["stroke"]));
+        parseTransition(klass, Key::TextHaloColorTransition, value, "stroke");
     }
 
     if (value.HasMember("strokeWidth")) {
-        klass.halo_radius = parseFunction(value["strokeWidth"]);
-        klass.halo_radius_transition = parseTransition(value, "strokeWidth");
+        klass.emplace(Key::TextHaloRadius, parseFunction(value["strokeWidth"]));
+        parseTransition(klass, Key::TextHaloRadiusTransition, value, "strokeWidth");
     }
 
     if (value.HasMember("strokeBlur")) {
-        klass.halo_blur = parseFunction(value["strokeBlur"]);
-        klass.halo_blur_transition = parseTransition(value, "strokeBlur");
+        klass.emplace(Key::TextHaloBlur, parseFunction(value["strokeBlur"]));
+        parseTransition(klass, Key::TextHaloBlurTransition, value, "strokeBlur");
     }
 
     if (value.HasMember("size")) {
-        klass.size = parseFunction(value["size"]);
+        klass.emplace(Key::TextSize, parseFunction(value["size"]));
     }
 
     if (value.HasMember("rotate")) {
-        klass.rotate = parseFunction(value["rotate"]);
+        klass.emplace(Key::TextRotate, parseFunction(value["rotate"]));
     }
 
     if (value.HasMember("alwaysVisible")) {
-        klass.always_visible = parseFunction(value["alwaysVisible"]);
+        klass.emplace(Key::TextAlwaysVisible, parseFunction(value["alwaysVisible"]));
     }
 
     return klass;
 }
 
-RasterClass StyleParser::parseRasterClass(JSVal value) {
-    RasterClass klass;
+ClassProperties StyleParser::parseRasterClass(JSVal value) {
+    ClassProperties klass(RenderType::Raster);
 
     parseGenericClass(klass, value);
 
     return klass;
 }
 
-CompositeClass StyleParser::parseCompositeClass(JSVal value) {
-    CompositeClass klass;
+ClassProperties StyleParser::parseCompositeClass(JSVal value) {
+    ClassProperties klass(RenderType::Composite);
 
     parseGenericClass(klass, value);
 
     return klass;
 }
 
-BackgroundClass StyleParser::parseBackgroundClass(JSVal value) {
-    BackgroundClass klass;
+ClassProperties StyleParser::parseBackgroundClass(JSVal value) {
+    ClassProperties klass(RenderType::Background);
 
     parseGenericClass(klass, value);
+
+    using Key = ClassPropertyKey;
 
     if (value.HasMember("color")) {
-        klass.color = parseColor(value["color"]);
-        klass.color_transition = parseTransition(value, "color");
+        klass.emplace(Key::BackgroundColor, parseColor(value["color"]));
+        parseTransition(klass, Key::BackgroundColorTransition, value, "color");
     }
 
     return klass;

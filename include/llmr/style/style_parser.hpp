@@ -30,14 +30,14 @@ private:
                     const std::map<std::string, BucketDescription> &buckets,
                     const std::map<std::string, std::string> &layerBuckets);
 
-    void parseGenericClass(GenericClass &klass, JSVal value);
-    FillClass parseFillClass(JSVal value);
-    LineClass parseLineClass(JSVal value);
-    IconClass parseIconClass(JSVal value);
-    TextClass parseTextClass(JSVal value);
-    BackgroundClass parseBackgroundClass(JSVal value);
-    RasterClass parseRasterClass(JSVal value);
-    CompositeClass parseCompositeClass(JSVal value);
+    void parseGenericClass(ClassProperties &klass, JSVal value);
+    ClassProperties parseFillClass(JSVal value);
+    ClassProperties parseLineClass(JSVal value);
+    ClassProperties parseIconClass(JSVal value);
+    ClassProperties parseTextClass(JSVal value);
+    ClassProperties parseBackgroundClass(JSVal value);
+    ClassProperties parseRasterClass(JSVal value);
+    ClassProperties parseCompositeClass(JSVal value);
 
     PropertyFilterExpression parseFilterOrExpression(JSVal value);
 
@@ -49,7 +49,7 @@ private:
     Value parseValue(JSVal value);
     FunctionProperty::fn parseFunctionType(JSVal type);
     FunctionProperty parseFunction(JSVal value);
-    boost::optional<PropertyTransition> parseTransition(JSVal value, std::string property_name);
+    void parseTransition(ClassProperties &klass, ClassPropertyKey key, JSVal value, std::string property_name);
 
 private:
     std::map<std::string, const rapidjson::Value *> constants;
