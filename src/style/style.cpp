@@ -25,36 +25,275 @@ void Style::reset() {
     properties_to_transition.clear();
 }
 
-void Style::cascadeProperties(GenericProperties &properties, const GenericClass& klass, const std::string& layer_name, const std::string& class_name, float z) {
-    if (klass.enabled) {
-        properties.enabled = klass.enabled.get().evaluate<bool>(z);
+void Style::cascadeProperties(GenericProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z) {
+    using Key = ClassPropertyKey;
+
+    if (const FunctionProperty *enabled = klass.get<FunctionProperty>(Key::Enabled)) {
+        properties.enabled = enabled->evaluate<bool>(z);
     }
 
-    if (klass.translate) {
-        properties.translate = {{ klass.translate.get()[0].evaluate<float>(z),
-                            klass.translate.get()[1].evaluate<float>(z) }};
+    if (const FunctionProperty *translateX = klass.get<FunctionProperty>(Key::TranslateX)) {
+        properties.translate[0] = translateX->evaluate<float>(z);
         computed.effective_classes[layer_name][TransitionablePropertyKey::Translate] = class_name;
-        if (klass.translate_transition && klass.translate_transition.get().duration) {
-            properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Translate, klass.translate_transition.get());
+    }
+
+    if (const FunctionProperty *translateY = klass.get<FunctionProperty>(Key::TranslateY)) {
+        properties.translate[1] = translateY->evaluate<float>(z);
+        computed.effective_classes[layer_name][TransitionablePropertyKey::Translate] = class_name;
+    }
+
+    if (const PropertyTransition *translateTransition = klass.get<PropertyTransition>(Key::TranslateTransition)) {
+        if (translateTransition->duration) {
+            properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Translate, *translateTransition);
         }
     }
 
-    if (klass.translateAnchor) {
-        properties.translateAnchor = klass.translateAnchor.get();
+    if (const TranslateAnchor *translateAnchor = klass.get<TranslateAnchor>(Key::TranslateAnchor)) {
+        properties.translateAnchor = *translateAnchor;
     }
 
-    if (klass.opacity) {
-        properties.opacity = klass.opacity.get().evaluate<float>(z);
+    if (const FunctionProperty *opacity = klass.get<FunctionProperty>(Key::Opacity)) {
+        properties.opacity = opacity->evaluate<float>(z);
         computed.effective_classes[layer_name][TransitionablePropertyKey::Opacity] = class_name;
-        if (klass.opacity_transition && klass.opacity_transition.get().duration) {
-            properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Opacity, klass.opacity_transition.get());
+    }
+
+    if (const PropertyTransition *opacityTransition = klass.get<PropertyTransition>(Key::OpacityTransition)) {
+        if (opacityTransition->duration) {
+            properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Opacity, *opacityTransition);
         }
     }
 
-    properties.prerender = klass.prerender;
-    properties.prerenderBuffer = klass.prerenderBuffer;
-    properties.prerenderSize = klass.prerenderSize;
-    properties.prerenderBlur = klass.prerenderBlur;
+    if (const FunctionProperty *prerender = klass.get<FunctionProperty>(Key::Prerender)) {
+        properties.prerender = *prerender;
+    }
+
+    if (const FunctionProperty *prerenderBuffer = klass.get<FunctionProperty>(Key::PrerenderBuffer)) {
+        properties.prerenderBuffer = *prerenderBuffer;
+    }
+
+    if (const FunctionProperty *prerenderSize = klass.get<FunctionProperty>(Key::PrerenderSize)) {
+        properties.prerenderSize = *prerenderSize;
+    }
+
+    if (const FunctionProperty *prerenderBlur = klass.get<FunctionProperty>(Key::PrerenderBlur)) {
+        properties.prerenderBlur = *prerenderBlur;
+    }
+}
+
+void Style::cascadeProperties(FillProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z) {
+    cascadeProperties(reinterpret_cast<GenericProperties &>(properties), klass, layer_name, class_name, z);
+
+    using Key = ClassPropertyKey;
+
+    if (const Winding *winding = klass.get<Winding>(Key::FillWinding)) {
+        properties.winding = *winding;
+    }
+
+    if (const FunctionProperty *antialias = klass.get<FunctionProperty>(Key::FillAntialias)) {
+        properties.antialias = antialias->evaluate<bool>(z);
+    }
+
+    if (const Color *fillColor = klass.get<Color>(Key::FillColor)) {
+        properties.fill_color = *fillColor;
+        computed.effective_classes[layer_name][TransitionablePropertyKey::FillColor] = class_name;
+    }
+
+    if (const PropertyTransition *fillColorTransition = klass.get<PropertyTransition>(Key::FillColorTransition)) {
+        if (fillColorTransition->duration) {
+            properties_to_transition[layer_name].emplace(TransitionablePropertyKey::FillColor, *fillColorTransition);
+        }
+    }
+
+    if (const Color *fillStrokeColor = klass.get<Color>(Key::FillStrokeColor)) {
+        properties.stroke_color = *fillStrokeColor;
+        computed.effective_classes[layer_name][TransitionablePropertyKey::StrokeColor] = class_name;
+    } else if (const Color *fillColor = klass.get<Color>(Key::FillColor)) {
+        properties.stroke_color = *fillColor;
+        computed.effective_classes[layer_name][TransitionablePropertyKey::StrokeColor] = class_name;
+
+        if (const PropertyTransition *fillColorTransition = klass.get<PropertyTransition>(Key::FillColorTransition)) {
+            if (fillColorTransition->duration) {
+                properties_to_transition[layer_name].emplace(TransitionablePropertyKey::FillColor, *fillColorTransition);
+            }
+        }
+    }
+
+    if (const std::string *image = klass.get<std::string>(Key::FillImage)) {
+        properties.image = *image;
+    }
+}
+
+void Style::cascadeProperties(LineProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z) {
+    cascadeProperties(reinterpret_cast<GenericProperties &>(properties), klass, layer_name, class_name, z);
+
+    using Key = ClassPropertyKey;
+
+    if (const FunctionProperty *width = klass.get<FunctionProperty>(Key::LineWidth)) {
+        properties.width = width->evaluate<float>(z);
+        computed.effective_classes[layer_name][TransitionablePropertyKey::Width] = class_name;
+    }
+
+    if (const PropertyTransition *width_transition = klass.get<PropertyTransition>(Key::LineWidthTransition)) {
+        properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Width, *width_transition);
+    }
+
+    if (const FunctionProperty *offset = klass.get<FunctionProperty>(Key::LineOffset)) {
+        properties.offset = offset->evaluate<float>(z);
+        computed.effective_classes[layer_name][TransitionablePropertyKey::Offset] = class_name;
+    }
+
+    if (const PropertyTransition *offset_transition = klass.get<PropertyTransition>(Key::LineOffsetTransition)) {
+        properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Offset, *offset_transition);
+    }
+
+    if (const Color *color = klass.get<Color>(Key::LineColor)) {
+        properties.color = *color;
+        computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
+    }
+
+    if (const PropertyTransition *color_transition = klass.get<PropertyTransition>(Key::LineColorTransition)) {
+        properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Color, *color_transition);
+    }
+
+    if (const FunctionProperty *dash_array = klass.get<FunctionProperty>(Key::LineDashLand)) {
+        properties.dash_array[0] = dash_array->evaluate<float>(z);
+        computed.effective_classes[layer_name][TransitionablePropertyKey::DashArray] = class_name;
+    }
+
+    if (const FunctionProperty *dash_array = klass.get<FunctionProperty>(Key::LineDashGap)) {
+        properties.dash_array[1] = dash_array->evaluate<float>(z);
+        computed.effective_classes[layer_name][TransitionablePropertyKey::DashArray] = class_name;
+    }
+
+    if (const PropertyTransition *dash_array_transition = klass.get<PropertyTransition>(Key::LineDashTransition)) {
+        properties_to_transition[layer_name].emplace(TransitionablePropertyKey::DashArray, *dash_array_transition);
+    }
+}
+
+void Style::cascadeProperties(TextProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z) {
+    cascadeProperties(reinterpret_cast<GenericProperties &>(properties), klass, layer_name, class_name, z);
+
+    using Key = ClassPropertyKey;
+
+    if (const Color *color = klass.get<Color>(Key::TextColor)) {
+        properties.color = *color;
+        computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
+    }
+
+    if (const PropertyTransition *colorTransition = klass.get<PropertyTransition>(Key::TextColorTransition)) {
+        properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Color, *colorTransition);
+    }
+
+    if (const FunctionProperty *size = klass.get<FunctionProperty>(Key::TextSize)) {
+        properties.size = size->evaluate<float>(z);
+    }
+
+    if (const Color *haloColor = klass.get<Color>(Key::TextHaloColor)) {
+        properties.halo = *haloColor;
+        computed.effective_classes[layer_name][TransitionablePropertyKey::Halo] = class_name;
+    }
+
+    if (const PropertyTransition *haloColorTransition = klass.get<PropertyTransition>(Key::TextHaloColorTransition)) {
+        properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Halo, *haloColorTransition);
+    }
+
+    if (const FunctionProperty *haloRadius = klass.get<FunctionProperty>(Key::TextHaloRadius)) {
+        properties.halo_radius = haloRadius->evaluate<float>(z);
+        computed.effective_classes[layer_name][TransitionablePropertyKey::HaloRadius] = class_name;
+    }
+
+    if (const PropertyTransition *haloRadiusTransition = klass.get<PropertyTransition>(Key::TextHaloRadiusTransition)) {
+        properties_to_transition[layer_name].emplace(TransitionablePropertyKey::HaloRadius, *haloRadiusTransition);
+    }
+
+    if (const FunctionProperty *haloBlur = klass.get<FunctionProperty>(Key::TextHaloBlur)) {
+        properties.halo_blur = haloBlur->evaluate<float>(z);
+        computed.effective_classes[layer_name][TransitionablePropertyKey::HaloBlur] = class_name;
+    }
+
+    if (const PropertyTransition *haloBlurTransition = klass.get<PropertyTransition>(Key::TextHaloBlurTransition)) {
+        properties_to_transition[layer_name].emplace(TransitionablePropertyKey::HaloBlur, *haloBlurTransition);
+    }
+
+    if (const FunctionProperty *rotate = klass.get<FunctionProperty>(Key::TextRotate)) {
+        properties.rotate = rotate->evaluate<float>(z);
+    }
+
+    if (const FunctionProperty *alwaysVisible = klass.get<FunctionProperty>(Key::TextAlwaysVisible)) {
+        properties.always_visible = alwaysVisible->evaluate<bool>(z);
+    }
+}
+
+void Style::cascadeProperties(IconProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z) {
+    cascadeProperties(reinterpret_cast<GenericProperties &>(properties), klass, layer_name, class_name, z);
+
+    using Key = ClassPropertyKey;
+
+    if (const Color *color = klass.get<Color>(Key::IconColor)) {
+        properties.color = *color;
+        computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
+    }
+
+    if (const PropertyTransition *colorTransition = klass.get<PropertyTransition>(Key::IconColorTransition)) {
+        if (colorTransition->duration) {
+            properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Color, *colorTransition);
+        }
+    }
+
+    if (const FunctionProperty *size = klass.get<FunctionProperty>(Key::IconSize)) {
+        properties.size = size->evaluate<float>(z);
+    }
+
+    if (const std::string *image = klass.get<std::string>(Key::IconImage)) {
+        properties.image = *image;
+    }
+
+    if (const FunctionProperty *radius = klass.get<FunctionProperty>(Key::IconRadius)) {
+        properties.radius = radius->evaluate<float>(z);
+        computed.effective_classes[layer_name][TransitionablePropertyKey::Radius] = class_name;
+    }
+
+    if (const PropertyTransition *radiusTransition = klass.get<PropertyTransition>(Key::IconRadiusTransition)) {
+        if (radiusTransition->duration) {
+            properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Radius, *radiusTransition);
+        }
+    }
+
+    if (const FunctionProperty *blur = klass.get<FunctionProperty>(Key::IconBlur)) {
+        properties.blur = blur->evaluate<float>(z);
+        computed.effective_classes[layer_name][TransitionablePropertyKey::Blur] = class_name;
+    }
+
+    if (const PropertyTransition *blurTransition = klass.get<PropertyTransition>(Key::IconBlurTransition)) {
+        if (blurTransition->duration) {
+            properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Blur, *blurTransition);
+        }
+    }
+}
+
+void Style::cascadeProperties(RasterProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z) {
+    cascadeProperties(reinterpret_cast<GenericProperties &>(properties), klass, layer_name, class_name, z);
+}
+
+void Style::cascadeProperties(CompositeProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z) {
+    cascadeProperties(reinterpret_cast<GenericProperties &>(properties), klass, layer_name, class_name, z);
+}
+
+void Style::cascadeProperties(BackgroundProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z) {
+    cascadeProperties(reinterpret_cast<GenericProperties &>(properties), klass, layer_name, class_name, z);
+
+    using Key = ClassPropertyKey;
+
+    if (const Color *backgroundColor = klass.get<Color>(Key::BackgroundColor)) {
+        properties.color = *backgroundColor;
+        computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
+    }
+
+    if (const PropertyTransition *colorTransition = klass.get<PropertyTransition>(Key::TextColorTransition)) {
+        if (colorTransition->duration) {
+            properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Color, *colorTransition);
+        }
+    }
 }
 
 
@@ -85,217 +324,38 @@ void Style::cascade(float z) {
         const std::string& class_name = class_pair.first;
         const ClassDescription& sheetClass = class_pair.second;
 
+        using Key = ClassPropertyKey;
+
         // Skip if not enabled.
         if (appliedClasses.find(class_name) == appliedClasses.end()) continue;
 
-        // Cascade fill classes.
-        for (const auto& fill_pair : sheetClass.fill) {
-            const std::string& layer_name = fill_pair.first;
-            const llmr::FillClass& layer = fill_pair.second;
+        for (const auto &pair : sheetClass) {
+            const std::string& layer_name = pair.first;
+            const ClassProperties& properties = pair.second;
 
-            llmr::FillProperties& fill = computed.fills[layer_name];
-
-            cascadeProperties(fill, layer, layer_name, class_name, z);
-
-            if (layer.winding) {
-                fill.winding = layer.winding.get();
-            }
-
-            if (layer.antialias) {
-                fill.antialias = layer.antialias.get().evaluate<bool>(z);
-            }
-
-            if (layer.fill_color) {
-                fill.fill_color = layer.fill_color.get();
-                computed.effective_classes[layer_name][TransitionablePropertyKey::FillColor] = class_name;
-                if (layer.fill_color_transition && layer.fill_color_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::FillColor, layer.fill_color_transition.get());
-                }
-            }
-
-            if (layer.stroke_color) {
-                fill.stroke_color = layer.stroke_color.get();
-                computed.effective_classes[layer_name][TransitionablePropertyKey::StrokeColor] = class_name;
-                if (layer.stroke_color_transition && layer.stroke_color_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::StrokeColor, layer.stroke_color_transition.get());
-                }
-            }
-
-            if (layer.image) {
-                fill.image = layer.image.get();
-            }
-        }
-
-        // Cascade line classes.
-        for (const auto& line_pair : sheetClass.line) {
-            const std::string& layer_name = line_pair.first;
-            const llmr::LineClass& layer = line_pair.second;
-
-            llmr::LineProperties& stroke = computed.lines[layer_name];
-
-            cascadeProperties(stroke, layer, layer_name, class_name, z);
-
-            if (layer.width) {
-                stroke.width = layer.width.get().evaluate<float>(z);
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Width] = class_name;
-                if (layer.width_transition && layer.width_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Width, layer.width_transition.get());
-                }
-
-            }
-
-            if (layer.offset) {
-                stroke.offset = layer.offset.get().evaluate<float>(z);
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Offset] = class_name;
-                if (layer.offset_transition && layer.offset_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Offset, layer.offset_transition.get());
-                }
-            }
-
-            if (layer.color) {
-                stroke.color = layer.color.get();
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
-                if (layer.color_transition && layer.color_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Color, layer.color_transition.get());
-                }
-            }
-
-            if (layer.dash_array) {
-                stroke.dash_array = {{ layer.dash_array.get()[0].evaluate<float>(z),
-                                       layer.dash_array.get()[1].evaluate<float>(z) }};
-                computed.effective_classes[layer_name][TransitionablePropertyKey::DashArray] = class_name;
-                if (layer.dash_array_transition && layer.dash_array_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::DashArray, layer.dash_array_transition.get());
-                }
-            }
-        }
-
-        // Cascade icon classes.
-        for (const auto& icon_pair : sheetClass.icon) {
-            const std::string& layer_name = icon_pair.first;
-            const llmr::IconClass& layer = icon_pair.second;
-
-            llmr::IconProperties& icon = computed.icons[layer_name];
-
-            cascadeProperties(icon, layer, layer_name, class_name, z);
-
-            if (layer.color) {
-                icon.color = layer.color.get();
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
-                if (layer.color_transition && layer.color_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Color, layer.color_transition.get());
-                }
-            }
-
-            if (layer.size) {
-                icon.size = layer.size.get().evaluate<float>(z);
-            }
-
-            if (layer.image) {
-                icon.image = layer.image.get();
-            }
-
-            if (layer.radius) {
-                icon.radius = layer.radius.get().evaluate<float>(z);
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Radius] = class_name;
-                if (layer.radius_transition && layer.radius_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Radius, layer.radius_transition.get());
-                }
-            }
-
-            if (layer.blur) {
-                icon.blur = layer.blur.get().evaluate<float>(z);
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Blur] = class_name;
-                if (layer.blur_transition && layer.blur_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Blur, layer.blur_transition.get());
-                }
-            }
-        }
-
-        // Cascade text classes.
-        for (const auto& text_pair : sheetClass.text) {
-            const std::string& layer_name = text_pair.first;
-            const llmr::TextClass& layer = text_pair.second;
-
-            llmr::TextProperties& text = computed.texts[layer_name];
-
-            cascadeProperties(text, layer, layer_name, class_name, z);
-
-            if (layer.color) {
-                text.color = layer.color.get();
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Color] = class_name;
-                if (layer.color_transition && layer.color_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Color, layer.color_transition.get());
-                }
-            }
-
-            if (layer.size) {
-                text.size = layer.size.get().evaluate<float>(z);
-            }
-
-            if (layer.halo) {
-                text.halo = layer.halo.get();
-                computed.effective_classes[layer_name][TransitionablePropertyKey::Halo] = class_name;
-                if (layer.halo_transition && layer.halo_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::Halo, layer.halo_transition.get());
-                }
-            }
-
-            if (layer.halo_radius) {
-                text.halo_radius = layer.halo_radius.get().evaluate<float>(z);
-                computed.effective_classes[layer_name][TransitionablePropertyKey::HaloRadius] = class_name;
-                if (layer.halo_radius_transition && layer.halo_radius_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::HaloRadius, layer.halo_radius_transition.get());
-                }
-            }
-
-            if (layer.halo_blur) {
-                text.halo_blur = layer.halo_blur.get().evaluate<float>(z);
-                computed.effective_classes[layer_name][TransitionablePropertyKey::HaloBlur] = class_name;
-                if (layer.halo_blur_transition && layer.halo_blur_transition.get().duration) {
-                    properties_to_transition[layer_name].emplace(TransitionablePropertyKey::HaloBlur, layer.halo_blur_transition.get());
-                }
-            }
-
-            if (layer.rotate) {
-                text.rotate = layer.rotate.get().evaluate<float>(z);
-            }
-
-            if (layer.always_visible) {
-                text.always_visible = layer.always_visible.get().evaluate<bool>(z);
-            }
-        }
-
-        // Cascade raster classes.
-        for (const auto& raster_pair : sheetClass.raster) {
-            const std::string& layer_name = raster_pair.first;
-            const llmr::RasterClass& layer = raster_pair.second;
-
-            llmr::RasterProperties& raster = computed.rasters[layer_name];
-
-            cascadeProperties(raster, layer, layer_name, class_name, z);
-        }
-
-        // Cascade composite classes.
-        for (const auto& composite_pair : sheetClass.composite) {
-            const std::string& layer_name = composite_pair.first;
-            const llmr::CompositeClass& layer = composite_pair.second;
-
-            llmr::CompositeProperties& composite = computed.composites[layer_name];
-
-            cascadeProperties(composite, layer, layer_name, class_name, z);
-        }
-
-        // Cascade background.
-        {
-            cascadeProperties(computed.background, sheetClass.background, "background", class_name, z);
-
-            if (sheetClass.background.color) {
-                computed.background.color = sheetClass.background.color.get();
-                computed.effective_classes["background"][TransitionablePropertyKey::Color] = class_name;
-                if (sheetClass.background.color_transition && sheetClass.background.color_transition.get().duration) {
-                    properties_to_transition["background"].emplace(TransitionablePropertyKey::Color, sheetClass.background.color_transition.get());
-                }
+            // Find out what bucket this class is
+            switch (properties.type) {
+            case RenderType::Fill:
+                cascadeProperties(computed.fills[layer_name], properties, layer_name, class_name, z);
+                break;
+            case RenderType::Line:
+                cascadeProperties(computed.lines[layer_name], properties, layer_name, class_name, z);
+                break;
+            case RenderType::Icon:
+                cascadeProperties(computed.icons[layer_name], properties, layer_name, class_name, z);
+                break;
+            case RenderType::Text:
+                cascadeProperties(computed.texts[layer_name], properties, layer_name, class_name, z);
+                break;
+            case RenderType::Raster:
+                cascadeProperties(computed.rasters[layer_name], properties, layer_name, class_name, z);
+                break;
+            case RenderType::Composite:
+                cascadeProperties(computed.composites[layer_name], properties, layer_name, class_name, z);
+                break;
+            case RenderType::Background:
+                cascadeProperties(computed.background, properties, layer_name, class_name, z);
+                break;
             }
         }
     }

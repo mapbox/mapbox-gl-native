@@ -19,8 +19,8 @@ struct geometry_too_long_exception : std::exception {};
 using namespace llmr;
 
 IconBucket::IconBucket(IconVertexBuffer& vertexBuffer,
-                         const BucketDescription& bucket_desc)
-    : geometry(bucket_desc.geometry),
+                         const BucketIconDescription& properties)
+    : properties(properties),
       vertexBuffer(vertexBuffer),
       vertex_start(vertexBuffer.index()) {
 }
@@ -28,15 +28,15 @@ IconBucket::IconBucket(IconVertexBuffer& vertexBuffer,
 void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprite_atlas) {
     std::string field;
 
-    if (geometry.field.size()) {
-        field = util::replaceTokens(geometry.field, feature.properties);
+    if (properties.icon.size()) {
+        field = util::replaceTokens(properties.icon, feature.properties);
     }
 
     if (!field.size()) {
         field = "<circle>";
     }
 
-    const Rect<uint16_t> rect = sprite_atlas.getIcon(geometry.size, field);
+    const Rect<uint16_t> rect = sprite_atlas.getIcon(properties.size, field);
     const uint16_t tx = rect.x + rect.w / 2;
     const uint16_t ty = rect.y + rect.h / 2;
 

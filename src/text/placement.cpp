@@ -244,19 +244,11 @@ void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
     }
 }
 
-void Placement::addFeature(TextBucket& bucket,
-                           const std::vector<Coordinate> &line,
-                           const BucketGeometryDescription &info,
-                           const GlyphPositions &face,
+void Placement::addFeature(TextBucket &bucket, const std::vector<Coordinate> &line,
+                           const BucketTextDescription &info, const GlyphPositions &face,
                            const Shaping &shaping) {
-
     const bool horizontal = info.path == TextPathType::Horizontal;
-    const float padding = info.padding;
-    const float maxAngleDelta = info.maxAngleDelta;
-    const float textMinDistance = info.textMinDistance;
-    const float rotate = info.rotate;
-    const float fontScale =
-        (tileExtent / util::tileSize) / (glyphSize / info.size);
+    const float fontScale = (tileExtent / util::tileSize) / (glyphSize / info.max_size);
 
     Anchors anchors;
 
@@ -268,7 +260,7 @@ void Placement::addFeature(TextBucket& bucket,
 
     } else {
         // Line labels
-        anchors = interpolate(line, textMinDistance, minScale);
+        anchors = interpolate(line, info.min_distance, minScale);
 
         // Sort anchors by segment so that we can start placement with
         // the anchors that can be shown at the lowest zoom levels.
@@ -279,11 +271,10 @@ void Placement::addFeature(TextBucket& bucket,
         PlacedGlyphs glyphs;
         GlyphBoxes boxes;
 
-        getGlyphs(glyphs, boxes, anchor, info.translate, shaping, face, fontScale, horizontal,
-                      line, maxAngleDelta, rotate);
-        PlacementProperty place =
-            collision.place(boxes, anchor, anchor.scale, maxPlacementScale,
-                            padding, horizontal, info.alwaysVisible);
+        getGlyphs(glyphs, boxes, anchor, info.translate, shaping, face, fontScale, horizontal, line,
+                  info.max_angle_delta, info.rotate);
+        PlacementProperty place = collision.place(boxes, anchor, anchor.scale, maxPlacementScale,
+                                                  info.padding, horizontal, info.always_visible);
         if (place) {
             bucket.addGlyphs(glyphs, place.zoom, place.rotationRange, zoom - zOffset);
         }

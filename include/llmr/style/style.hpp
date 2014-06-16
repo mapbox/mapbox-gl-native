@@ -69,7 +69,14 @@ private:
     uint64_t transitionDuration(const std::string &layer_name, TransitionablePropertyKey key) const;
     uint64_t transitionDelay(const std::string &layer_name, TransitionablePropertyKey key) const;
 
-    void cascadeProperties(GenericProperties &properties, const GenericClass& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(GenericProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(FillProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(LineProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(IconProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(TextProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(RasterProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(CompositeProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(BackgroundProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
 
 private:
     // Last applied settings.

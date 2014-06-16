@@ -28,7 +28,7 @@ public:
     TextBucket(
         TextVertexBuffer &vertexBuffer,
         TriangleElementsBuffer &triangleElementsBuffer,
-        const BucketDescription &bucket_desc, Placement &placement);
+        const BucketTextDescription &properties, Placement &placement);
 
     virtual void render(Painter &painter, const std::string &layer_name, const Tile::ID &id);
     virtual bool hasData() const;
@@ -43,7 +43,7 @@ public:
     void drawGlyphs(TextShader &shader);
 
 public:
-    const BucketGeometryDescription &geom_desc;
+    const BucketTextDescription &properties;
 
 private:
     TextVertexBuffer& vertexBuffer;

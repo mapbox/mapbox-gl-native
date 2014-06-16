@@ -25,7 +25,7 @@ public:
     LineBucket(LineVertexBuffer& vertexBuffer,
                TriangleElementsBuffer& triangleElementsBuffer,
                PointElementsBuffer& pointElementsBuffer,
-               const BucketDescription& bucket_desc);
+               const BucketLineDescription& properties);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
     virtual bool hasData() const;
@@ -39,7 +39,7 @@ public:
     void drawPoints(LinejoinShader& shader);
 
 public:
-    const BucketGeometryDescription geometry;
+    const BucketLineDescription &properties;
 
 private:
 

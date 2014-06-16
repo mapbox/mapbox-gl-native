@@ -41,7 +41,7 @@ void Painter::renderIcon(IconBucket& bucket, const std::string& layer_name, cons
 
     spriteAtlas.bind(map.getState().isChanging());
 
-    const float iconSize = bucket.geometry.size * map.getState().getPixelRatio();
+    const float iconSize = bucket.properties.size * map.getState().getPixelRatio();
     iconShader->setSize(iconSize);
 #ifndef GL_ES_VERSION_2_0
     glPointSize(iconSize);

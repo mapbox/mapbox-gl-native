@@ -166,24 +166,38 @@ void TileParser::addBucketFeatures(Bucket &bucket, const VectorTileLayer &layer,
 
 std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer &layer,
                                                      const BucketDescription &bucket_desc) {
+    if (!bucket_desc.render.valid() || !bucket_desc.render.is<BucketFillDescription>()) {
+        return nullptr;
+    }
+
     std::unique_ptr<FillBucket> bucket = std::make_unique<FillBucket>(
-        tile.fillVertexBuffer, tile.triangleElementsBuffer, tile.lineElementsBuffer, bucket_desc);
+        tile.fillVertexBuffer, tile.triangleElementsBuffer, tile.lineElementsBuffer,
+        bucket_desc.render.get<BucketFillDescription>());
     addBucketFeatures(bucket, layer, bucket_desc);
     return obsolete() ? nullptr : std::move(bucket);
 }
 
 std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer &layer,
                                                      const BucketDescription &bucket_desc) {
+    if (!bucket_desc.render.valid() || !bucket_desc.render.is<BucketLineDescription>()) {
+        return nullptr;
+    }
+
     std::unique_ptr<LineBucket> bucket = std::make_unique<LineBucket>(
-        tile.lineVertexBuffer, tile.triangleElementsBuffer, tile.pointElementsBuffer, bucket_desc);
+        tile.lineVertexBuffer, tile.triangleElementsBuffer, tile.pointElementsBuffer,
+        bucket_desc.render.get<BucketLineDescription>());
     addBucketFeatures(bucket, layer, bucket_desc);
     return obsolete() ? nullptr : std::move(bucket);
 }
 
 std::unique_ptr<Bucket> TileParser::createIconBucket(const VectorTileLayer &layer,
                                                      const BucketDescription &bucket_desc) {
-    std::unique_ptr<IconBucket> bucket =
-        std::make_unique<IconBucket>(tile.iconVertexBuffer, bucket_desc);
+    if (!bucket_desc.render.valid() || !bucket_desc.render.is<BucketIconDescription>()) {
+        return nullptr;
+    }
+
+    std::unique_ptr<IconBucket> bucket = std::make_unique<IconBucket>(
+        tile.iconVertexBuffer, bucket_desc.render.get<BucketIconDescription>());
     addBucketFeatures(bucket, layer, bucket_desc, *spriteAtlas);
     return obsolete() ? nullptr : std::move(bucket);
 }
@@ -192,8 +206,15 @@ typedef std::pair<uint16_t, uint16_t> GlyphRange;
 
 std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &layer,
                                                      const BucketDescription &bucket_desc) {
+
+    if (!bucket_desc.render.valid() || !bucket_desc.render.is<BucketTextDescription>()) {
+        return nullptr;
+    }
+
+    const BucketTextDescription &properties = bucket_desc.render.get<BucketTextDescription>();
+
     std::unique_ptr<TextBucket> bucket = std::make_unique<TextBucket>(
-        tile.textVertexBuffer, tile.triangleElementsBuffer, bucket_desc, placement);
+        tile.textVertexBuffer, tile.triangleElementsBuffer, properties, placement);
 
     util::utf8_to_utf32 ucs4conv;
 
@@ -210,7 +231,7 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
             VectorTileFeature feature{feature_pbf, layer};
 
             const std::u32string string = ucs4conv.convert(
-                util::replaceTokens(bucket_desc.geometry.field, feature.properties));
+                util::replaceTokens(properties.field, feature.properties));
 
             // Loop through all characters of this text and collect unique codepoints.
             for (uint32_t chr : string) {
@@ -220,23 +241,23 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer &laye
             labels.emplace_back(string, feature.geometry);
         }
 
-        glyphStore->waitForGlyphRanges(bucket_desc.geometry.font, ranges);
+        glyphStore->waitForGlyphRanges(properties.font, ranges);
     }
 
     // Create a copy!
-    const FontStack &fontStack = glyphStore->getFontStack(bucket_desc.geometry.font);
+    const FontStack &fontStack = glyphStore->getFontStack(properties.font);
     GlyphPositions face;
 
     // Shape and place all labels.
     for (const std::pair<std::u32string, pbf> &label : labels) {
 
         // Shape labels.
-        const Shaping shaping = fontStack.getShaping(label.first, bucket_desc.geometry.max_width,
-                bucket_desc.geometry.line_height, bucket_desc.geometry.alignment,
-                bucket_desc.geometry.vertical_alignment, bucket_desc.geometry.letter_spacing);
+        const Shaping shaping = fontStack.getShaping(label.first, properties.max_width,
+                properties.line_height, properties.alignment,
+                properties.vertical_alignment, properties.letter_spacing);
 
         // Place labels.
-        addGlyph(tile.id.to_uint64(), bucket_desc.geometry.font, label.first, fontStack, *glyphAtlas,
+        addGlyph(tile.id.to_uint64(), properties.font, label.first, fontStack, *glyphAtlas,
                  face);
 
         bucket->addFeature(label.second, face, shaping);

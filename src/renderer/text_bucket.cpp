@@ -22,8 +22,8 @@ using namespace llmr;
 TextBucket::TextBucket(
     TextVertexBuffer &vertexBuffer,
     TriangleElementsBuffer &triangleElementsBuffer,
-    const BucketDescription &bucket_desc, Placement &placement)
-    : geom_desc(bucket_desc.geometry),
+    const BucketTextDescription &properties, Placement &placement)
+    : properties(properties),
       vertexBuffer(vertexBuffer),
       triangleElementsBuffer(triangleElementsBuffer),
       placement(placement),
@@ -113,14 +113,14 @@ void TextBucket::addFeature(const pbf &geom_pbf,
     while ((cmd = geometry.next(x, y)) != Geometry::end) {
         if (cmd == Geometry::move_to) {
             if (!line.empty()) {
-                placement.addFeature(*this, line, geom_desc, face, shaping);
+                placement.addFeature(*this, line, properties, face, shaping);
                 line.clear();
             }
         }
         line.emplace_back(x, y);
     }
     if (line.size()) {
-        placement.addFeature(*this, line, geom_desc, face, shaping);
+        placement.addFeature(*this, line, properties, face, shaping);
     }
 }
 

@@ -30,26 +30,33 @@ private:
                     const std::map<std::string, BucketDescription> &buckets,
                     const std::map<std::string, std::string> &layerBuckets);
 
-    void parseGenericClass(GenericClass &klass, JSVal value);
-    FillClass parseFillClass(JSVal value);
-    LineClass parseLineClass(JSVal value);
-    IconClass parseIconClass(JSVal value);
-    TextClass parseTextClass(JSVal value);
-    BackgroundClass parseBackgroundClass(JSVal value);
-    RasterClass parseRasterClass(JSVal value);
-    CompositeClass parseCompositeClass(JSVal value);
+    void parseGenericClass(ClassProperties &klass, JSVal value);
+    ClassProperties parseFillClass(JSVal value);
+    ClassProperties parseLineClass(JSVal value);
+    ClassProperties parseIconClass(JSVal value);
+    ClassProperties parseTextClass(JSVal value);
+    ClassProperties parseBackgroundClass(JSVal value);
+    ClassProperties parseRasterClass(JSVal value);
+    ClassProperties parseCompositeClass(JSVal value);
 
     PropertyFilterExpression parseFilterOrExpression(JSVal value);
 
-    bool parseBoolean(JSVal value);
-    std::string parseString(JSVal value);
     JSVal replaceConstant(JSVal value);
-    std::vector<FunctionProperty> parseArray(JSVal value, uint16_t expected_count);
-    Color parseColor(JSVal value);
     Value parseValue(JSVal value);
-    FunctionProperty::fn parseFunctionType(JSVal type);
-    FunctionProperty parseFunction(JSVal value);
-    boost::optional<PropertyTransition> parseTransition(JSVal value, std::string property_name);
+
+    template <typename T>
+    T parse(JSVal value);
+
+    template <typename T>
+    inline void parse(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
+        if (value.HasMember(property_name)) {
+            klass.emplace(key, parse<T>(value[property_name]));
+        }
+    }
+
+    void parseTransition(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value);
+    void parseFunctionArray(const char *property_name, const std::vector<ClassPropertyKey> &keys, ClassProperties &klass, JSVal value);
+
 
 private:
     std::map<std::string, const rapidjson::Value *> constants;
