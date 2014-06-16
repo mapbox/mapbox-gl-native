@@ -382,7 +382,7 @@ void StyleParser::parseConstants(JSVal value) {
     }
 }
 
-TranslateAnchor parseTranslateAnchor(JSVal anchor) {
+template<> TranslateAnchor StyleParser::parse(JSVal anchor) {
     if (anchor.IsString()) {
         std::string a { anchor.GetString(), anchor.GetStringLength() };
         if (a == "viewport") {
@@ -513,7 +513,7 @@ void StyleParser::parseClass(const std::string &name, JSVal value, ClassDescript
     }
 }
 
-bool StyleParser::parseBoolean(JSVal value) {
+template<> bool StyleParser::parse(JSVal value) {
     if (!value.IsBool()) {
         throw Style::exception("boolean value must be a boolean");
     }
@@ -521,7 +521,7 @@ bool StyleParser::parseBoolean(JSVal value) {
     return value.GetBool();
 }
 
-std::string StyleParser::parseString(JSVal value) {
+template<> std::string StyleParser::parse(JSVal value) {
     if (!value.IsString()) {
         throw Style::exception("string value must be a string");
     }
@@ -541,25 +541,7 @@ JSVal StyleParser::replaceConstant(JSVal value) {
     return value;
 }
 
-void StyleParser::parseFunctionArray(const char *property_name, const std::vector<ClassPropertyKey> &keys, ClassProperties &klass, JSVal value) {
-    if (value.HasMember(property_name)) {
-        JSVal rvalue = replaceConstant(value[property_name]);
-        if (!rvalue.IsArray()) {
-            throw Style::exception("array value must be an array");
-        }
-
-
-        if (rvalue.Size() != keys.size()) {
-            throw Style::exception("array value has unexpected number of elements");
-        }
-
-        for (uint16_t i = 0; i < keys.size(); i++) {
-            klass.emplace(keys[i], parseFunction(rvalue[(rapidjson::SizeType)i]));
-        }
-    }
-}
-
-Color StyleParser::parseColor(JSVal value) {
+template<> Color StyleParser::parse(JSVal value) {
     JSVal rvalue = replaceConstant(value);
     if (rvalue.IsArray()) {
         // [ r, g, b, a] array
@@ -593,37 +575,7 @@ Color StyleParser::parseColor(JSVal value) {
              css_color.a}};
 }
 
-void StyleParser::parseColor(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
-    if (value.HasMember(property_name)) {
-        klass.emplace(key, parseColor(value[property_name]));
-    }
-}
-
-void StyleParser::parseFunction(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
-    if (value.HasMember(property_name)) {
-        klass.emplace(key, parseFunction(value[property_name]));
-    }
-}
-
-void StyleParser::parseString(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
-    if (value.HasMember(property_name)) {
-        klass.emplace(key, parseString(value[property_name]));
-    }
-}
-
-void StyleParser::parseBoolean(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
-    if (value.HasMember(property_name)) {
-        klass.emplace(key, parseBoolean(value[property_name]));
-    }
-}
-
-void StyleParser::parseTranslateAnchor(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
-    if (value.HasMember(property_name)) {
-        klass.emplace(key, ::parseTranslateAnchor(value[property_name]));
-    }
-}
-
-FunctionProperty::fn StyleParser::parseFunctionType(JSVal type) {
+FunctionProperty::fn parseFunctionType(JSVal type) {
     if (type.IsString()) {
         std::string t { type.GetString(), type.GetStringLength() };
         if (t == "constant") {
@@ -646,7 +598,7 @@ FunctionProperty::fn StyleParser::parseFunctionType(JSVal type) {
     }
 }
 
-FunctionProperty StyleParser::parseFunction(JSVal value) {
+template<> FunctionProperty StyleParser::parse(JSVal value) {
     JSVal rvalue = replaceConstant(value);
 
     FunctionProperty property;
@@ -693,6 +645,24 @@ FunctionProperty StyleParser::parseFunction(JSVal value) {
     return property;
 }
 
+void StyleParser::parseFunctionArray(const char *property_name, const std::vector<ClassPropertyKey> &keys, ClassProperties &klass, JSVal value) {
+    if (value.HasMember(property_name)) {
+        JSVal rvalue = replaceConstant(value[property_name]);
+        if (!rvalue.IsArray()) {
+            throw Style::exception("array value must be an array");
+        }
+
+
+        if (rvalue.Size() != keys.size()) {
+            throw Style::exception("array value has unexpected number of elements");
+        }
+
+        for (uint16_t i = 0; i < keys.size(); i++) {
+            klass.emplace(keys[i], parse<FunctionProperty>(rvalue[(rapidjson::SizeType)i]));
+        }
+    }
+}
+
 void StyleParser::parseTransition(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
     uint16_t duration = 0, delay = 0;
     if (value.HasMember(property_name)) {
@@ -714,16 +684,16 @@ void StyleParser::parseTransition(const char *property_name, ClassPropertyKey ke
 
 void StyleParser::parseGenericClass(ClassProperties &klass, JSVal value) {
     using Key = ClassPropertyKey;
-    parseFunction("enabled", Key::Enabled, klass, value);
+    parse<FunctionProperty>("enabled", Key::Enabled, klass, value);
     parseFunctionArray("translate", { Key::TranslateX, Key::TranslateY }, klass, value);
     parseTransition("transition-translate", Key::TranslateTransition, klass, value);
-    parseTranslateAnchor("translate-anchor", Key::TranslateAnchor, klass, value);
-    parseFunction("opacity", Key::Opacity, klass, value);
+    parse<TranslateAnchor>("translate-anchor", Key::TranslateAnchor, klass, value);
+    parse<FunctionProperty>("opacity", Key::Opacity, klass, value);
     parseTransition("transition-opacity", Key::OpacityTransition, klass, value);
-    parseFunction("prerender", Key::Prerender, klass, value);
-    parseFunction("prerender-buffer", Key::PrerenderBuffer, klass, value);
-    parseFunction("prerender-size", Key::PrerenderSize, klass, value);
-    parseFunction("prerender-blur", Key::PrerenderBlur, klass, value);
+    parse<FunctionProperty>("prerender", Key::Prerender, klass, value);
+    parse<FunctionProperty>("prerender-buffer", Key::PrerenderBuffer, klass, value);
+    parse<FunctionProperty>("prerender-size", Key::PrerenderSize, klass, value);
+    parse<FunctionProperty>("prerender-blur", Key::PrerenderBlur, klass, value);
 }
 
 ClassProperties StyleParser::parseFillClass(JSVal value) {
@@ -731,12 +701,12 @@ ClassProperties StyleParser::parseFillClass(JSVal value) {
     parseGenericClass(klass, value);
 
     using Key = ClassPropertyKey;
-    parseColor("color", Key::FillColor, klass, value);
+    parse<Color>("color", Key::FillColor, klass, value);
     parseTransition("transition-color", Key::FillColorTransition, klass, value);
-    parseColor("stroke", Key::FillStrokeColor, klass, value);
+    parse<Color>("stroke", Key::FillStrokeColor, klass, value);
     parseTransition("transition-stroke", Key::FillStrokeColorTransition, klass, value);
-    parseBoolean("antialias", Key::FillAntialias, klass, value);
-    parseString("image", Key::FillImage, klass, value);
+    parse<bool>("antialias", Key::FillAntialias, klass, value);
+    parse<std::string>("image", Key::FillImage, klass, value);
 
     return klass;
 }
@@ -746,9 +716,9 @@ ClassProperties StyleParser::parseLineClass(JSVal value) {
     parseGenericClass(klass, value);
 
     using Key = ClassPropertyKey;
-    parseColor("color", Key::LineColor, klass, value);
+    parse<Color>("color", Key::LineColor, klass, value);
     parseTransition("transition-color", Key::LineColorTransition, klass, value);
-    parseFunction("width", Key::LineWidth, klass, value);
+    parse<FunctionProperty>("width", Key::LineWidth, klass, value);
     parseTransition("transition-width", Key::LineWidthTransition, klass, value);
     parseFunctionArray("dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);
     parseTransition("transition-dasharray", Key::LineDashTransition, klass, value);
@@ -761,13 +731,13 @@ ClassProperties StyleParser::parseIconClass(JSVal value) {
     parseGenericClass(klass, value);
 
     using Key = ClassPropertyKey;
-    parseColor("color", Key::IconColor, klass, value);
+    parse<Color>("color", Key::IconColor, klass, value);
     parseTransition("transition-color", Key::IconColorTransition, klass, value);
-    parseString("image", Key::IconImage, klass, value);
-    parseFunction("size", Key::IconSize, klass, value);
-    parseFunction("radius", Key::IconRadius, klass, value);
+    parse<std::string>("image", Key::IconImage, klass, value);
+    parse<FunctionProperty>("size", Key::IconSize, klass, value);
+    parse<FunctionProperty>("radius", Key::IconRadius, klass, value);
     parseTransition("transition-radius", Key::IconRadiusTransition, klass, value);
-    parseFunction("blur", Key::IconBlur, klass, value);
+    parse<FunctionProperty>("blur", Key::IconBlur, klass, value);
     parseTransition("transition-blur", Key::IconBlurTransition, klass, value);
 
     return klass;
@@ -779,17 +749,17 @@ ClassProperties StyleParser::parseTextClass(JSVal value) {
 
     using Key = ClassPropertyKey;
 
-    parseColor("color", Key::TextColor, klass, value);
+    parse<Color>("color", Key::TextColor, klass, value);
     parseTransition("transition-color", Key::TextColorTransition, klass, value);
-    parseColor("stroke", Key::TextHaloColor, klass, value);
+    parse<Color>("stroke", Key::TextHaloColor, klass, value);
     parseTransition("transition-stroke", Key::TextHaloColorTransition, klass, value);
-    parseFunction("strokeWidth", Key::TextHaloRadius, klass, value);
+    parse<FunctionProperty>("strokeWidth", Key::TextHaloRadius, klass, value);
     parseTransition("transition-strokeWidth", Key::TextHaloRadiusTransition, klass, value);
-    parseFunction("strokeBlur", Key::TextHaloBlur, klass, value);
+    parse<FunctionProperty>("strokeBlur", Key::TextHaloBlur, klass, value);
     parseTransition("transition-strokeBlur", Key::TextHaloBlurTransition, klass, value);
-    parseFunction("size", Key::TextSize, klass, value);
-    parseFunction("rotate", Key::TextRotate, klass, value);
-    parseFunction("alwaysVisible", Key::TextAlwaysVisible, klass, value);
+    parse<FunctionProperty>("size", Key::TextSize, klass, value);
+    parse<FunctionProperty>("rotate", Key::TextRotate, klass, value);
+    parse<FunctionProperty>("alwaysVisible", Key::TextAlwaysVisible, klass, value);
 
     return klass;
 }
@@ -813,7 +783,7 @@ ClassProperties StyleParser::parseBackgroundClass(JSVal value) {
     parseGenericClass(klass, value);
 
     using Key = ClassPropertyKey;
-    parseColor("color", Key::BackgroundColor, klass, value);
+    parse<Color>("color", Key::BackgroundColor, klass, value);
     parseTransition("transition-color", Key::BackgroundColorTransition, klass, value);
 
     return klass;
