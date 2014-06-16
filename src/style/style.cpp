@@ -107,11 +107,14 @@ void Style::cascadeProperties(FillProperties &properties, const ClassProperties&
     if (const Color *fillStrokeColor = klass.get<Color>(Key::FillStrokeColor)) {
         properties.stroke_color = *fillStrokeColor;
         computed.effective_classes[layer_name][TransitionablePropertyKey::StrokeColor] = class_name;
-    }
+    } else if (const Color *fillColor = klass.get<Color>(Key::FillColor)) {
+        properties.stroke_color = *fillColor;
+        computed.effective_classes[layer_name][TransitionablePropertyKey::StrokeColor] = class_name;
 
-    if (const PropertyTransition *fillStrokeColorTransition = klass.get<PropertyTransition>(Key::FillStrokeColorTransition)) {
-        if (fillStrokeColorTransition->duration) {
-            properties_to_transition[layer_name].emplace(TransitionablePropertyKey::StrokeColor, *fillStrokeColorTransition);
+        if (const PropertyTransition *fillColorTransition = klass.get<PropertyTransition>(Key::FillColorTransition)) {
+            if (fillColorTransition->duration) {
+                properties_to_transition[layer_name].emplace(TransitionablePropertyKey::FillColor, *fillColorTransition);
+            }
         }
     }
 

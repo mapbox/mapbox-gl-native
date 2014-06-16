@@ -44,12 +44,20 @@ private:
     bool parseBoolean(JSVal value);
     std::string parseString(JSVal value);
     JSVal replaceConstant(JSVal value);
-    std::vector<FunctionProperty> parseArray(JSVal value, uint16_t expected_count);
     Color parseColor(JSVal value);
     Value parseValue(JSVal value);
     FunctionProperty::fn parseFunctionType(JSVal type);
     FunctionProperty parseFunction(JSVal value);
-    void parseTransition(ClassProperties &klass, ClassPropertyKey key, JSVal value, std::string property_name);
+
+
+    void parseTransition(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value);
+    void parseColor(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value);
+    void parseFunction(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value);
+    void parseString(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value);
+    void parseBoolean(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value);
+    void parseTranslateAnchor(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value);
+    void parseFunctionArray(const char *property_name, const std::vector<ClassPropertyKey> &keys, ClassProperties &klass, JSVal value);
+
 
 private:
     std::map<std::string, const rapidjson::Value *> constants;
