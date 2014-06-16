@@ -3,7 +3,7 @@
 #include <llmr/util/constants.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
-using namespace llmr;
+namespace llmr {
 
 using JSVal = const rapidjson::Value&;
 
@@ -813,4 +813,6 @@ Value StyleParser::parseValue(JSVal value) {
     }
     throw Style::exception("unhandled value type in style");
     return false;
+}
+
 }
