@@ -220,6 +220,7 @@ namespace platform {
 
 double elapsed() { return glfwGetTime(); }
 
+#ifndef GL_ES_VERSION_2_0
 void show_debug_image(std::string name, const char *data, size_t width, size_t height) {
     glfwInit();
 
@@ -285,6 +286,7 @@ void show_color_debug_image(std::string name, const char *data, size_t logical_w
 
     glfwMakeContextCurrent(current_window);
 }
+#endif
 
 void notify_map_change() {
     // no-op
