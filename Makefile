@@ -59,7 +59,7 @@ osx: config.gypi macosx/llmr-app.gyp node
 
 # Executes the OS X binary
 run-osx: osx
-	build/$(BUILDTYPE)/llmr.app/Contents/MacOS/llmr
+	build/$(BUILDTYPE)/Mapbox\ GL.app/Contents/MacOS/MAPBOX\ GL
 
 ##### Xcode projects ###########################################################
 
