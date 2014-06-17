@@ -6,7 +6,10 @@
 #ifdef NVIDIA
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>
-    // #include <EGL/egl.h>
+
+    extern PFNGLDISCARDFRAMEBUFFEREXTPROC glDiscardFramebufferEXT;
+
+    #define GL_DEPTH24_STENCIL8 GL_DEPTH24_STENCIL8_OES
 #elif __APPLE__
     #include "TargetConditionals.h"
     #if TARGET_OS_IPHONE

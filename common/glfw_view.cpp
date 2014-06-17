@@ -1,6 +1,10 @@
 #include "glfw_view.hpp"
 
-GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {}
+GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {
+#ifdef NVIDIA
+    glDiscardFramebufferEXT = (PFNGLDISCARDFRAMEBUFFEREXTPROC)glfwGetProcAddress("glDiscardFramebufferEXT");
+#endif
+}
 
 GLFWView::~GLFWView() { glfwTerminate(); }
 
