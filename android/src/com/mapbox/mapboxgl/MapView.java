@@ -13,10 +13,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
-
-/**
- * TODO: document your custom view class.
- */
 public class MapView extends SurfaceView {
 
     private static String TAG = "MapView";
@@ -39,7 +35,7 @@ public class MapView extends SurfaceView {
     }
 
     private void initialize(Context context, AttributeSet attrs, int defStyle) {
-        Log.i(TAG, "initialize");
+        Log.v(TAG, "initialize");
 
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.MapView, defStyle, 0);
@@ -56,21 +52,21 @@ public class MapView extends SurfaceView {
     }
 
     public void onPause() {
-        Log.i(TAG, "onPause");
+        Log.v(TAG, "onPause");
         if (nativeMapViewPtr != 0) {
             nativeOnPause(nativeMapViewPtr);
         }
     }
 
     public void onResume() {
-        Log.i(TAG, "onResume");
+        Log.v(TAG, "onResume");
         if (nativeMapViewPtr != 0) {
             nativeOnResume(nativeMapViewPtr);
         }
     }
 
     public void onStop() {
-        Log.i(TAG, "onStop");
+        Log.v(TAG, "onStop");
         if (nativeMapViewPtr != 0) {
             nativeOnStop(nativeMapViewPtr);
         }
@@ -79,7 +75,7 @@ public class MapView extends SurfaceView {
     private class Callbacks implements SurfaceHolder.Callback2 {
         @Override
         public void surfaceRedrawNeeded(SurfaceHolder holder) {
-            Log.i(TAG, "surfaceRedrawNeeded");
+            Log.v(TAG, "surfaceRedrawNeeded");
             if (nativeMapViewPtr != 0) {
                 nativeSurfaceRedrawNeeded(nativeMapViewPtr);
             }
@@ -87,21 +83,20 @@ public class MapView extends SurfaceView {
 
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
-            Log.i(TAG, "surfaceCreated");
+            Log.v(TAG, "surfaceCreated");
             if (nativeMapViewPtr != 0) {
                 nativeSurfaceDestroyed(nativeMapViewPtr);
             }
             nativeMapViewPtr = nativeSurfaceCreated(holder.getSurface(), defaultStyleJSON);
             if (nativeMapViewPtr == 0) {
-                Log.e(TAG, "Context creation failed");
-                // TODO context creation failed
-
+                Log.e(TAG, "nativeSurfaceCreated failed");
+                throw new RuntimeException("Unable to initialize NativeMapView.");
             }
         }
 
         @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            Log.i(TAG, "surfaceChanged");
+            Log.v(TAG, "surfaceChanged");
             if (nativeMapViewPtr != 0) {
                 nativeSurfaceChanged(nativeMapViewPtr, format, width, height);
             }
@@ -109,7 +104,7 @@ public class MapView extends SurfaceView {
 
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
-            Log.i(TAG, "surfaceDestroyed");
+            Log.v(TAG, "surfaceDestroyed");
             if (nativeMapViewPtr != 0) {
                 nativeSurfaceDestroyed(nativeMapViewPtr);
             }
@@ -118,7 +113,7 @@ public class MapView extends SurfaceView {
     }
 
     static {
-        System.loadLibrary("map_view");
+        System.loadLibrary("NativeMapView");
     }
 
     private long nativeMapViewPtr;
