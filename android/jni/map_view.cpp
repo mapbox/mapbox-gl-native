@@ -16,7 +16,6 @@
 #include <llmr/platform/platform.hpp>
 
 #define TAG "map_view.cpp"
-#define STDOUT_DIR "/sdcard/"
 
 #define INFO(fmt, args...) __android_log_print(ANDROID_LOG_INFO, TAG, fmt, ##args)
 #define ERROR(fmt, args...) __android_log_print(ANDROID_LOG_ERROR, TAG, fmt, ##args)
@@ -76,15 +75,10 @@ public:
 
         ASSERT(!initialized);
 
-#ifdef DEBUG
-        freopen(STDOUT_DIR "stdout.txt", "w", stdout); // NOTE: can't use <cstdio> till NDK fix the stdout macro bug
-        freopen(STDOUT_DIR "stderr.txt", "w", stderr);
-#endif
+        freopen("/sdcard/stdout.txt", "w", stdout); // NOTE: can't use <cstdio> till NDK fix the stdout macro bug
+        freopen("/sdcard/stderr.txt", "w", stderr);
 
         View::initialize(map);
-#ifdef DEBUG
-        map->setDebug(true);
-#endif
 
         ASSERT(display == EGL_NO_DISPLAY);
         ASSERT(surface == EGL_NO_SURFACE);
@@ -187,14 +181,10 @@ public:
 
         resize(width, height);
 
+        map->setDebug(true);
         map->setStyleJSON(default_style_json);
-        map->setLonLatZoom(0, 0, map->getMinZoom());
+        map->setLonLatZoom(0, 0, 0);
         map->start();
-
-        /*glClearColor(1.0, 1.0, 0.0, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glFlush();
-        eglSwapBuffers(display, surface);*/
 
         INFO("Context initialized");
 
@@ -256,8 +246,6 @@ private:
         display = EGL_NO_DISPLAY;
     }
 };
-
-//NativeMapView* global_map_view = nullptr;
 
 void llmr::platform::notify_map_change() {
     INFO("notify_map_change() called");
