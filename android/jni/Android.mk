@@ -49,8 +49,9 @@ LOCAL_STATIC_LIBRARIES  := png uv boost_regex
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE            := map_view
-LOCAL_SRC_FILES         := map_view.cpp \
+LOCAL_MODULE            := NativeMapView
+LOCAL_SRC_FILES         := NativeMapView.cpp \
+                           JNI.cpp \
                            $(LLMR_ROOT)/common/curl_request.cpp
 LOCAL_STATIC_LIBRARIES  := llmr curl boost_atomic
 LOCAL_LDLIBS            := -llog -landroid -lEGL -lGLESv2

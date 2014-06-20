@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.mapbox.mapboxgl.MapView;
 
-
 public class MainActivity extends Activity {
 
     private static String TAG = "MainActivity";
