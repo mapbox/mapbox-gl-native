@@ -27,6 +27,11 @@
 								</outputEntries>
 							</builder>
 							<tool id="com.android.gcc.compiler.315009668" name="Android GCC Compiler" superClass="com.android.gcc.compiler">
+								<option id="com.android.gcc.option.includePath.1869135353" superClass="com.android.gcc.option.includePath" valueType="includePath">
+									<listOptionValue builtIn="false" value="../../include"/>
+									<listOptionValue builtIn="false" value="../../mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-arm-android/include"/>
+									<listOptionValue builtIn="false" value="../../mapnik-packaging/osx/out/packages/android-ndk-r9d/sources/cxx-stl/llvm-libc++/libcxx/include"/>
+								</option>
 								<inputType id="com.android.gcc.inputType.217444225" superClass="com.android.gcc.inputType"/>
 							</tool>
 						</toolChain>
@@ -48,5 +53,10 @@
 		<scannerConfigBuildInfo instanceId="com.android.toolchain.gcc.1580686060;com.android.toolchain.gcc.1580686060.124707280;com.android.gcc.compiler.315009668;com.android.gcc.inputType.217444225">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.android.AndroidPerProjectProfile"/>
 		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/MapboxGL"/>
+		</configuration>
 	</storageModule>
 </cproject>
