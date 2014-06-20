@@ -5,13 +5,30 @@
 #include <functional>
 #include <cassert>
 
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
+#endif
+
 #include <boost/lockfree/queue.hpp>
+
+#ifdef __clang__
 #pragma clang diagnostic pop
+#endif
+
 
 namespace uv {
 
+class loop {
+public:
+    inline loop() : l(uv_loop_new()) {}
+    inline ~loop() { uv_loop_delete(l); }
+
+    inline uv_loop_t *operator*() { return l; }
+
+private:
+    uv_loop_t *l;
+};
 
 class mutex {
 public:
@@ -90,12 +107,13 @@ public:
     typedef void (*after_work_callback)(T &object);
 
     template<typename... Args>
-    work(uv_loop_t *loop, work_callback work_cb, after_work_callback after_work_cb, Args&&... args)
-        : data(std::forward<Args>(args)...),
+    work(const std::shared_ptr<loop> &loop, work_callback work_cb, after_work_callback after_work_cb, Args&&... args)
+        : loop(loop),
+          data(std::forward<Args>(args)...),
           work_cb(work_cb),
           after_work_cb(after_work_cb) {
         req.data = this;
-        uv_queue_work(loop, &req, do_work, after_work);
+        uv_queue_work(**loop, &req, do_work, after_work);
     }
 
 private:
@@ -111,6 +129,7 @@ private:
     }
 
 private:
+    std::shared_ptr<uv::loop> loop;
     uv_work_t req;
     T data;
     work_callback work_cb;

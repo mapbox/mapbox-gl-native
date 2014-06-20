@@ -6,7 +6,10 @@
 #ifdef NVIDIA
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>
-    // #include <EGL/egl.h>
+
+    extern PFNGLDISCARDFRAMEBUFFEREXTPROC glDiscardFramebufferEXT;
+
+    #define GL_DEPTH24_STENCIL8 GL_DEPTH24_STENCIL8_OES
 #elif __APPLE__
     #include "TargetConditionals.h"
     #if TARGET_OS_IPHONE
@@ -39,7 +42,7 @@
 namespace llmr {
 namespace gl {
 // Debug group markers, useful for debuggin on iOS
-#if GL_EXT_debug_marker
+#if defined(__APPLE__) && defined(DEBUG) && defined(GL_EXT_debug_marker)
 // static int indent = 0;
 inline void start_group(const std::string &str) {
     glPushGroupMarkerEXT(0, str.c_str());

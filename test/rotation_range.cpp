@@ -48,7 +48,7 @@ TEST(RotationRange, rotatingFixedCollisions) {
         CollisionRect{CollisionPoint{-1, 0}, CollisionPoint{0, 1}},
         CollisionRect{CollisionPoint{1.4142, -10}, CollisionPoint{10, 10}});
 
-    EXPECT_EQ(1, collisions.size());
+    EXPECT_EQ(static_cast<std::size_t>(1), collisions.size());
     EXPECT_EQ(135, std::round(deg(collisions.front()[0])));
     EXPECT_EQ(135, std::round(deg(collisions.front()[1])));
 }
@@ -61,7 +61,7 @@ TEST(RotationRange, cornerBoxCollisions) {
             std::back_inserter(list), CollisionPoint{1, 1},
             CollisionCorners{{CollisionPoint{0, 0},   CollisionPoint{0, 10},
                               CollisionPoint{10, 10}, CollisionPoint{10, 0}}});
-        EXPECT_EQ(1, list.size());
+        EXPECT_EQ(static_cast<std::size_t>(1), list.size());
         EXPECT_EQ((CollisionRange{{M_PI / 4.0, M_PI * 7.0 / 4.0}}), list[0]);
     }
 
@@ -72,7 +72,7 @@ TEST(RotationRange, cornerBoxCollisions) {
             std::back_inserter(list), CollisionPoint{200, 200},
             CollisionCorners{{CollisionPoint{1, 1},   CollisionPoint{1, 10},
                               CollisionPoint{10, 10}, CollisionPoint{10, 1}}});
-        EXPECT_EQ(0, list.size());
+        EXPECT_EQ(static_cast<std::size_t>(0), list.size());
     }
 }
 
@@ -83,7 +83,7 @@ TEST(RotationRange, circleEdgeCollisions) {
         circleEdgeCollisions(std::back_inserter(list), CollisionPoint{0, 1}, 1,
                              CollisionPoint{-10, 0}, CollisionPoint{10, 0});
         std::sort(list.begin(), list.end());
-        EXPECT_EQ(2, list.size());
+        EXPECT_EQ(static_cast<std::size_t>(2), list.size());
         EXPECT_EQ(static_cast<float>(M_PI / 2), list[0]);
         EXPECT_EQ(static_cast<float>(M_PI * 3.0 / 2.0), list[1]);
     }
@@ -93,7 +93,7 @@ TEST(RotationRange, circleEdgeCollisions) {
         CollisionAngles list;
         circleEdgeCollisions(std::back_inserter(list), CollisionPoint{0, 1}, 1,
                              CollisionPoint{0, 0}, CollisionPoint{10, 0});
-        EXPECT_EQ(1, list.size());
+        EXPECT_EQ(static_cast<std::size_t>(1), list.size());
         EXPECT_EQ(static_cast<float>(M_PI / 2), list[0]);
     }
 
@@ -102,7 +102,7 @@ TEST(RotationRange, circleEdgeCollisions) {
         CollisionAngles list;
         circleEdgeCollisions(std::back_inserter(list), CollisionPoint{0, 1}, 1,
                              CollisionPoint{3, 1}, CollisionPoint{30, 1});
-        EXPECT_EQ(0, list.size());
+        EXPECT_EQ(static_cast<std::size_t>(0), list.size());
     }
 
     {
@@ -110,7 +110,7 @@ TEST(RotationRange, circleEdgeCollisions) {
         CollisionAngles list;
         circleEdgeCollisions(std::back_inserter(list), CollisionPoint{0, 1}, 1,
                              CollisionPoint{-10, 1}, CollisionPoint{10, 1});
-        EXPECT_EQ(0, list.size());
+        EXPECT_EQ(static_cast<std::size_t>(0), list.size());
     }
 }
 
@@ -121,7 +121,7 @@ TEST(RotationRange, rotatingRotatingCollisions) {
             CollisionRect{{-1, 0}, {1, 0}}, CollisionRect{{-1, 0}, {1, 0}},
             CollisionAnchor{1, 1});
 
-        EXPECT_EQ(2, c.size());
+        EXPECT_EQ(static_cast<std::size_t>(2), c.size());
         EXPECT_EQ(135, std::round(deg(c[0][0])));
         EXPECT_EQ(135, std::round(deg(c[0][1])));
         EXPECT_EQ(315, std::round(deg(c[1][0])));
@@ -134,6 +134,6 @@ TEST(RotationRange, rotatingRotatingCollisions) {
             CollisionRect{{-1, 0}, {1, 0}}, CollisionRect{{-1, 0}, {1, 0}},
             CollisionAnchor{2, 2});
 
-        EXPECT_EQ(0, c.size());
+        EXPECT_EQ(static_cast<std::size_t>(0), c.size());
     }
 }

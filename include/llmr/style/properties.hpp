@@ -6,9 +6,12 @@
 #include <string>
 #include <limits>
 #include <set>
+#include <map>
 #include <type_traits>
+#include <memory>
 
 #include <boost/optional.hpp>
+#include <llmr/util/variant.hpp>
 
 namespace llmr {
 
@@ -16,7 +19,10 @@ namespace llmr {
 typedef std::array<float, 4> Color;
 
 struct PropertyTransition {
-    inline PropertyTransition(uint16_t duration, uint16_t delay = 0) : duration(duration), delay(delay) {}
+    inline PropertyTransition(uint16_t duration, uint16_t delay = 0)
+        : duration(duration), delay(delay) {}
+    inline PropertyTransition(const PropertyTransition &transition)
+        : duration(transition.duration), delay(transition.delay) {}
     uint16_t duration = 0;
     uint16_t delay = 0;
 };
@@ -82,21 +88,130 @@ struct FunctionProperty {
     std::vector<float> values;
 
     inline FunctionProperty() : function(&functions::null) {}
+
+    inline FunctionProperty(const FunctionProperty &property)
+        : function(property.function), values(property.values) {}
+    inline FunctionProperty(FunctionProperty &&property)
+        : function(property.function), values(std::move(property.values)) {}
+
+
+    inline void operator=(const FunctionProperty &rhs) {
+        function = rhs.function;
+        values = rhs.values;
+    }
+
     inline FunctionProperty(float value) : function(&functions::constant), values(1, value) {}
     template <typename T> inline T evaluate(float z) const { return function(z, values); }
 };
 
-struct GenericClass {
-    boost::optional<FunctionProperty> enabled;
-    boost::optional<std::array<FunctionProperty, 2>> translate;
-    boost::optional<PropertyTransition> translate_transition;
-    boost::optional<TranslateAnchor> translateAnchor;
-    boost::optional<FunctionProperty> opacity;
-    boost::optional<PropertyTransition> opacity_transition;
-    boost::optional<bool> prerender;
-    boost::optional<float> prerenderBuffer;
-    boost::optional<uint16_t> prerenderSize;
-    boost::optional<uint16_t> prerenderBlur;
+
+enum class RenderType {
+    Fill,
+    Line,
+    Icon,
+    Text,
+    Raster,
+    Composite,
+    Background
+};
+
+enum class ClassPropertyKey {
+    Enabled,
+    TranslateX,
+    TranslateY,
+    TranslateTransition,
+    TranslateAnchor,
+    Opacity,
+    OpacityTransition,
+    Prerender,
+    PrerenderBuffer,
+    PrerenderSize,
+    PrerenderBlur,
+
+    FillWinding,
+    FillAntialias,
+    FillColor,
+    FillColorTransition,
+    FillStrokeColor,
+    FillStrokeColorTransition,
+    FillImage,
+
+    LineWidth,
+    LineWidthTransition,
+    LineOffset,
+    LineOffsetTransition,
+    LineColor,
+    LineColorTransition,
+    LineDashLand,
+    LineDashGap,
+    LineDashTransition,
+
+    IconSize,
+    IconColor,
+    IconColorTransition,
+    IconImage,
+    IconRadius,
+    IconRadiusTransition,
+    IconBlur,
+    IconBlurTransition,
+
+    TextColor,
+    TextColorTransition,
+    TextHaloColor,
+    TextHaloColorTransition,
+    TextHaloRadius,
+    TextHaloRadiusTransition,
+    TextHaloBlur,
+    TextHaloBlurTransition,
+    TextSize,
+    TextRotate,
+    TextAlwaysVisible,
+
+    BackgroundColor,
+    BackgroundColorTransition,
+};
+
+typedef util::variant<
+    FunctionProperty,
+    PropertyTransition,
+    TranslateAnchor,
+    Color,
+    Winding,
+    std::string,
+    bool
+> ClassPropertyValue;
+
+class ClassProperties {
+public:
+    inline ClassProperties(RenderType type) : type(type) {}
+    inline ClassProperties(ClassProperties &&properties)
+        : type(properties.type), properties(std::move(properties.properties)) {}
+
+    template <typename T>
+    inline const T *get(ClassPropertyKey key) const {
+        const auto it = properties.find(key);
+        if (it != properties.end() && it->second.is<T>()) {
+            return ::std::addressof(it->second.get<T>());
+        } else {
+            return nullptr;
+        }
+    }
+
+    template <typename ...Args>
+    inline void emplace(Args&& ...args) {
+        properties.emplace(::std::forward<Args>(args)...);
+    }
+
+    const RenderType type;
+
+private:
+    std::map<ClassPropertyKey, ClassPropertyValue> properties;
+};
+
+struct PrerenderProperties {
+    float buffer = 1.0f / 32.0f;
+    uint16_t size = 256;
+    uint16_t blur = 0;
 };
 
 struct GenericProperties {
@@ -104,10 +219,25 @@ struct GenericProperties {
     std::array<float, 2> translate = {{ 0, 0 }};
     TranslateAnchor translateAnchor = TranslateAnchor::Map;
     float opacity = 1.0;
-    bool prerender = false;
-    float prerenderBuffer = 1.0f / 32.0f;
-    uint16_t prerenderSize = 256;
-    uint16_t prerenderBlur = 0;
+
+    // These are unresolved properties because the value here is per tile, so it might differ.
+    boost::optional<FunctionProperty> prerender;
+    boost::optional<FunctionProperty> prerenderBuffer;
+    boost::optional<FunctionProperty> prerenderSize;
+    boost::optional<FunctionProperty> prerenderBlur;
+
+    inline bool getPrerender(int8_t z) const {
+        return prerender && prerender.get().evaluate<bool>(z);
+    }
+
+    // Obtains prerender properties by integer zoom level.
+    inline PrerenderProperties getPrerenderProperties(int8_t z) const {
+        PrerenderProperties props;
+        if (prerenderBuffer) props.buffer = prerenderBuffer.get().evaluate<float>(z);
+        if (prerenderSize) props.size = prerenderSize.get().evaluate<uint16_t>(z);
+        if (prerenderBlur) props.blur = prerenderBlur.get().evaluate<uint16_t>(z);
+        return props;
+    }
 
     virtual bool isVisible() const {
         if (!enabled) { return false; }
@@ -116,18 +246,8 @@ struct GenericProperties {
     }
 };
 
-struct IconClass : public GenericClass {
-    boost::optional<FunctionProperty> size;
-    boost::optional<Color> color;
-    boost::optional<PropertyTransition> color_transition;
-    boost::optional<std::string> image;
-    boost::optional<FunctionProperty> radius;
-    boost::optional<PropertyTransition> radius_transition;
-    boost::optional<FunctionProperty> blur;
-    boost::optional<PropertyTransition> blur_transition;
-};
-
 struct IconProperties : public GenericProperties {
+    inline IconProperties() : GenericProperties() {}
     float size = 0;
     Color color = {{ 1, 1, 1, 1 }};
     std::string image;
@@ -135,35 +255,16 @@ struct IconProperties : public GenericProperties {
     float blur = 0;
 };
 
-struct LineClass : public GenericClass {
-    boost::optional<FunctionProperty> width;
-    boost::optional<PropertyTransition> width_transition;
-    boost::optional<FunctionProperty> offset;
-    boost::optional<PropertyTransition> offset_transition;
-    boost::optional<Color> color;
-    boost::optional<PropertyTransition> color_transition;
-    boost::optional<std::array<FunctionProperty, 2>> dash_array;
-    boost::optional<PropertyTransition> dash_array_transition;
-};
-
 struct LineProperties : public GenericProperties {
+    inline LineProperties() : GenericProperties() {}
     float width = 0;
     float offset = 0;
     Color color = {{ 0, 0, 0, 1 }};
     std::array<float, 2> dash_array = {{ 1, -1 }};
 };
 
-struct FillClass : public GenericClass {
-    boost::optional<Winding> winding;
-    boost::optional<FunctionProperty> antialias;
-    boost::optional<Color> fill_color;
-    boost::optional<PropertyTransition> fill_color_transition;
-    boost::optional<Color> stroke_color;
-    boost::optional<PropertyTransition> stroke_color_transition;
-    boost::optional<std::string> image;
-};
-
 struct FillProperties : public GenericProperties {
+    inline FillProperties() : GenericProperties() {}
     Winding winding = Winding::NonZero;
     bool antialias = true;
     Color fill_color = {{ 0, 0, 0, 1 }};
@@ -172,21 +273,8 @@ struct FillProperties : public GenericProperties {
     std::string image;
 };
 
-struct TextClass : public GenericClass {
-    boost::optional<Color> color;
-    boost::optional<PropertyTransition> color_transition;
-    boost::optional<Color> halo;
-    boost::optional<PropertyTransition> halo_transition;
-    boost::optional<FunctionProperty> halo_radius;
-    boost::optional<PropertyTransition> halo_radius_transition;
-    boost::optional<FunctionProperty> halo_blur;
-    boost::optional<PropertyTransition> halo_blur_transition;
-    boost::optional<FunctionProperty> size;
-    boost::optional<FunctionProperty> rotate;
-    boost::optional<FunctionProperty> always_visible;
-};
-
 struct TextProperties : public GenericProperties {
+    inline TextProperties() : GenericProperties() {}
     Color color = {{ 0, 0, 0, 1 }};
     Color halo = {{ 1, 1, 1, 0.75 }};
     float halo_radius = 0.25f;
@@ -196,22 +284,13 @@ struct TextProperties : public GenericProperties {
     bool always_visible = false;
 };
 
-struct BackgroundClass : public GenericClass {
-    boost::optional<Color> color;
-    boost::optional<PropertyTransition> color_transition;
-};
-
 struct BackgroundProperties : public GenericProperties {
+    inline BackgroundProperties() : GenericProperties() {}
     Color color = {{ 1, 1, 1, 1 }};
 };
 
-struct RasterClass : public GenericClass {
-};
-
 struct RasterProperties : public GenericProperties {
-};
-
-struct CompositeClass : public GenericClass {
+    inline RasterProperties() : GenericProperties() {}
 };
 
 struct CompositeProperties : public GenericProperties {
@@ -219,6 +298,12 @@ struct CompositeProperties : public GenericProperties {
 };
 
 
+const IconProperties defaultIconProperties;
+const LineProperties defaultLineProperties;
+const FillProperties defaultFillProperties;
+const TextProperties defaultTextProperties;
+const BackgroundProperties defaultBackgroundProperties;
+const RasterProperties defaultRasterProperties;
 const CompositeProperties defaultCompositeProperties;
 
 }

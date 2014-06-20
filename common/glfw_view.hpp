@@ -2,7 +2,12 @@
 #define LLMR_COMMON_GLFW_VIEW
 
 #include <llmr/llmr.hpp>
+
+#ifdef NVIDIA
+#define GLFW_INCLUDE_ES2
+#endif
 #include <GLFW/glfw3.h>
+
 #include <uv.h>
 
 class GLFWView : public llmr::View {

@@ -5,8 +5,10 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/style/value.hpp>
 #include <llmr/text/glyph.hpp>
+#include <llmr/map/filter_expression.hpp>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <set>
 #include <limits>
 
@@ -53,7 +55,12 @@ public:
         const pbf& operator*() const;
 
     private:
-        const FilteredVectorTileLayer& filter;
+        bool matchesFilterExpression(const PropertyFilterExpression &filterExpression, const pbf &tags_pbf);
+        bool matchesExpression(const PropertyExpression &expression, const pbf &tags_pbf);
+        bool matchesFilter(const PropertyFilter &filter, const pbf &tags_pbf);
+
+    private:
+        const FilteredVectorTileLayer& parent;
         bool valid = false;
         pbf feature;
         pbf data;
@@ -68,8 +75,6 @@ public:
 private:
     const VectorTileLayer& layer;
     const BucketDescription& bucket_desc;
-    int32_t key = -1;
-    std::set<uint32_t> values;
 };
 
 std::ostream& operator<<(std::ostream&, const GlyphPlacement& placement);
@@ -82,38 +87,10 @@ public:
     std::string name;
     uint32_t extent = 4096;
     std::vector<std::string> keys;
+    std::unordered_map<std::string, uint32_t> key_index;
     std::vector<Value> values;
-    std::vector<std::string> faces;
     std::map<std::string, std::map<Value, Shaping>> shaping;
 };
-
-class VectorTileGlyph {
-public:
-    VectorTileGlyph();
-    VectorTileGlyph(pbf data);
-
-    uint32_t id = 0;
-
-    // A signed distance field of the glyph with a border of 3 pixels.
-    std::string bitmap;
-
-    // Glyph metrics
-    GlyphMetrics metrics;
-};
-
-std::ostream& operator<<(std::ostream&, const VectorTileGlyph& glyph);
-
-class VectorTileFace {
-public:
-    VectorTileFace(pbf data);
-
-    std::string name;
-    std::string family;
-    std::string style;
-    std::vector<VectorTileGlyph> glyphs;
-};
-
-std::ostream& operator<<(std::ostream&, const VectorTileFace& face);
 
 class VectorTile {
 public:
@@ -122,7 +99,6 @@ public:
     VectorTile& operator=(VectorTile&& other);
 
     std::map<std::string, const VectorTileLayer> layers;
-    std::map<std::string, const VectorTileFace> faces;
 };
 
 

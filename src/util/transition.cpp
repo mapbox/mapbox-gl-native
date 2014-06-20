@@ -4,7 +4,7 @@
 
 namespace llmr { namespace util {
 
-UnitBezier ease(0.25, 0.1, 0.25, 1);
+UnitBezier ease(0, 0, 0.25, 1);
 
 transition::~transition() {}
 

@@ -85,9 +85,9 @@ public:
     void renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id);
     void renderRaster(RasterBucket& bucket, const std::string& layer_name, const Tile::ID& id);
 
-    void preparePrerender(const GenericProperties &properties);
-    void finishPrerender(const GenericProperties &properties);
-    void renderPrerenderedTexture(Bucket &bucket, const GenericProperties &properties);
+    void preparePrerender(PrerenderedTexture &texture);
+    void finishPrerender(PrerenderedTexture &texture);
+    void renderPrerenderedTexture(PrerenderedTexture &texture, const GenericProperties &properties);
 
     void resize();
 

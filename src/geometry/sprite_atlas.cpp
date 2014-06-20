@@ -30,24 +30,36 @@ bool SpriteAtlas::resize(const float newRatio) {
     pixelRatio = newRatio;
 
     if (data) {
-        char *old_data = data;
+        uint32_t *old_data = data;
 
         data = nullptr;
         allocate();
 
-        dimension w = static_cast<dimension>(width * newRatio);
-        dimension h = static_cast<dimension>(height * newRatio);
-        float s = std::pow(oldRatio / newRatio, 2);
+        const int old_w = width * oldRatio;
+        const int old_h = height * oldRatio;
+        const int new_w = width * newRatio;
+        const int new_h = height * newRatio;
 
         // Basic image scaling. TODO: Replace this with better image scaling.
         uint32_t *img_new = reinterpret_cast<uint32_t *>(data);
-        uint32_t *img_old = reinterpret_cast<uint32_t *>(old_data);
-        for (size_t i = 0, length = w * h; i < length; i++) {
-            img_new[i] = img_old[static_cast<size_t>(s * i)];
+        const uint32_t *img_old = reinterpret_cast<const uint32_t *>(old_data);
+
+        for (int y = 0; y < new_h; y++) {
+            const int old_yoffset = ((y * old_h) / new_h) * old_w;
+            const int new_yoffset = y * new_w;
+            for (int x = 0; x < new_w; x++) {
+                const int old_x = (x * old_w) / new_w;
+                img_new[new_yoffset + x] = img_old[old_yoffset + old_x];
+            }
         }
 
         free(old_data);
         dirty = true;
+
+        // Mark all sprite images as in need of update
+        for (const auto &pair : images) {
+            uninitialized.emplace(pair.first);
+        }
     }
 
     return dirty;
@@ -185,7 +197,7 @@ void SpriteAtlas::allocate() {
     if (!data) {
         dimension w = static_cast<dimension>(width * pixelRatio);
         dimension h = static_cast<dimension>(height * pixelRatio);
-        data = (char *)calloc(w * h, sizeof(uint32_t));
+        data = (uint32_t *)calloc(w * h, sizeof(uint32_t));
     }
 }
 
@@ -270,8 +282,9 @@ void SpriteAtlas::bind(bool linear) {
             data // const GLvoid * data
         );
 
+#if defined(DEBUG)
         // platform::show_color_debug_image("Sprite Atlas", data, width, height, width * pixelRatio, height * pixelRatio);
-
+#endif
         dirty = false;
     }
 };

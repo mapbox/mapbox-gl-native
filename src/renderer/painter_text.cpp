@@ -1,6 +1,7 @@
 #include <llmr/renderer/painter.hpp>
 #include <llmr/renderer/text_bucket.hpp>
 #include <llmr/map/map.hpp>
+#include <cmath>
 
 using namespace llmr;
 
@@ -9,16 +10,17 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     if (pass == Opaque) return;
     if (!bucket.hasData()) return;
 
-    const std::unordered_map<std::string, TextProperties> &text_properties = map.getStyle().computed.texts;
+    const std::unordered_map<std::string, TextProperties> &text_properties = map.getStyle()->computed.texts;
     const std::unordered_map<std::string, TextProperties>::const_iterator text_properties_it = text_properties.find(layer_name);
-    if (text_properties_it == text_properties.end()) return;
 
-    const TextProperties& properties = text_properties_it->second;
+    const TextProperties &properties = text_properties_it != text_properties.end()
+                                           ? text_properties_it->second
+                                           : defaultTextProperties;
     if (!properties.enabled) return;
 
     mat4 exMatrix;
     matrix::copy(exMatrix, projMatrix);
-    if (bucket.geom_desc.path == TextPathType::Curve) {
+    if (bucket.properties.path == TextPathType::Curve) {
         matrix::rotate_z(exMatrix, exMatrix, map.getState().getAngle());
     }
 
@@ -28,7 +30,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     }
 
     // If layerStyle.size > bucket.info.fontSize then labels may collide
-    float fontSize = std::fmin(properties.size, bucket.geom_desc.size);
+    float fontSize = std::fmin(properties.size, bucket.properties.max_size);
     matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
 
     const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
@@ -37,18 +39,19 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     textShader->setMatrix(vtxMatrix);
     textShader->setExtrudeMatrix(exMatrix);
 
-    map.getGlyphAtlas().bind();
-    textShader->setTextureSize({{static_cast<float>(map.getGlyphAtlas().width),
-                                 static_cast<float>(map.getGlyphAtlas().height)}});
+    GlyphAtlas &glyphAtlas = *map.getGlyphAtlas();
+    glyphAtlas.bind();
+    textShader->setTextureSize({{static_cast<float>(glyphAtlas.width),
+                                 static_cast<float>(glyphAtlas.height)}});
 
     // Convert the -pi..pi to an int8 range.
     float angle = std::round((map.getState().getAngle() + rotate) / M_PI * 128);
 
     // adjust min/max zooms for variable font sies
-    float zoomAdjust = log(fontSize / bucket.geom_desc.size) / log(2);
+    float zoomAdjust = log(fontSize / bucket.properties.max_size) / log(2);
 
     textShader->setAngle((int32_t)(angle + 256) % 256);
-    textShader->setFlip(bucket.geom_desc.path == TextPathType::Curve ? 1 : 0);
+    textShader->setFlip(bucket.properties.path == TextPathType::Curve ? 1 : 0);
     textShader->setZoom((map.getState().getNormalizedZoom() - zoomAdjust) * 10); // current zoom level
 
     // Label fading
@@ -66,8 +69,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
         history[0].z = history[1].z;
     }
 
-    size_t frameLen = history.size();
-    assert("there should never be less than three frames in the history" && frameLen >= 3);
+    assert("there should never be less than three frames in the history" && (history.size() >= 3));
 
     // Find the range of zoom levels we want to fade between
     float startingZ = history.front().z;
@@ -81,7 +83,9 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
         timeDiff = lastFrame.timestamp - history[1].timestamp;
     float fadedist = zoomDiff / (timeDiff / duration);
 
-    if (isnan(fadedist)) fprintf(stderr, "fadedist should never be NaN\n");
+#if defined(DEBUG)
+    if (std::isnan(fadedist)) fprintf(stderr, "fadedist should never be NaN\n");
+#endif
 
     // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
     // bump is how much farther it would have been if it had continued zooming at the same rate
@@ -95,6 +99,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
     if (properties.halo[3] > 0.0f) {
+        // TODO: Get rid of the 2.4 magic value. It is currently 24 / 10, with 24 being the font size
+        // of the SDF glyphs.
         textShader->setGamma(properties.halo_blur * 2.4f / fontSize / map.getState().getPixelRatio());
         textShader->setColor(properties.halo);
         textShader->setBuffer(properties.halo_radius);
@@ -104,6 +110,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 
     if (properties.color[3] > 0.0f) {
         // Then, we draw the text over the halo
+        // TODO: Get rid of the 2.4 magic value. It is currently 24 / 10, with 24 being the font size
+        // of the SDF glyphs.
         textShader->setGamma(2.4f / fontSize / map.getState().getPixelRatio());
         textShader->setColor(properties.color);
         textShader->setBuffer((256.0f - 64.0f) / 256.0f);

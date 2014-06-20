@@ -30,7 +30,7 @@ public:
 
     void reset();
 
-    void loadJSON(const uint8_t *const data, size_t bytes);
+    void loadJSON(const uint8_t *const data);
 
     size_t layerCount() const;
     void cascade(float z);
@@ -39,7 +39,7 @@ public:
     void updateTransitions(time now);
     void cancelTransitions();
 
-    void setDefaultTransitionDuration(uint64_t duration = 0);
+    void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);
 
 public:
     std::shared_ptr<Sprite> sprite;
@@ -69,7 +69,14 @@ private:
     uint64_t transitionDuration(const std::string &layer_name, TransitionablePropertyKey key) const;
     uint64_t transitionDelay(const std::string &layer_name, TransitionablePropertyKey key) const;
 
-    void cascadeProperties(GenericProperties &properties, const GenericClass& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(GenericProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(FillProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(LineProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(IconProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(TextProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(RasterProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(CompositeProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
+    void cascadeProperties(BackgroundProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
 
 private:
     // Last applied settings.

@@ -10,6 +10,7 @@
 
 #include <llmr/platform/gl.hpp>
 #include <llmr/util/constants.hpp>
+#include <llmr/util/token.hpp>
 
 #include <cassert>
 
@@ -18,8 +19,8 @@ struct geometry_too_long_exception : std::exception {};
 using namespace llmr;
 
 IconBucket::IconBucket(IconVertexBuffer& vertexBuffer,
-                         const BucketDescription& bucket_desc, Collision &collision)
-    : geometry(bucket_desc.geometry),
+                         const BucketIconDescription& properties, Collision &collision)
+    : properties(properties),
       collision(collision),
       vertexBuffer(vertexBuffer),
       vertex_start(vertexBuffer.index()) {
@@ -28,22 +29,16 @@ IconBucket::IconBucket(IconVertexBuffer& vertexBuffer,
 void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprite_atlas) {
     std::string field;
 
-    if (geometry.field.size()) {
-        auto field_it = feature.properties.find(geometry.field);
-        if (field_it == feature.properties.end()) {
-            if (debug::tileParseWarnings) {
-                fprintf(stderr, "[WARNING] feature doesn't contain field '%s'\n", geometry.field.c_str());
-            }
-            return;
-        }
+    if (properties.icon.size()) {
+        field = util::replaceTokens(properties.icon, feature.properties);
+    }
 
-        field = toString(field_it->second);
-    } else {
+    if (!field.size()) {
         field = "<circle>";
     }
 
-    int size = geometry.size;
-    const Rect<uint16_t> rect = sprite_atlas.getIcon(geometry.size, field);
+    int size = properties.size;
+    const Rect<uint16_t> rect = sprite_atlas.getIcon(properties.size, field);
     const uint16_t tx = rect.x + rect.w / 2;
     const uint16_t ty = rect.y + rect.h / 2;
 

@@ -9,6 +9,11 @@
 
 namespace llmr {
 
+typedef std::pair<uint16_t, uint16_t> GlyphRange;
+
+// Note: this only works for the BMP
+GlyphRange getGlyphRange(uint32_t glyph);
+
 struct GlyphMetrics {
     operator bool() const {
         return width == 0 && height == 0 && advance == 0;
@@ -38,8 +43,6 @@ struct Glyph {
 };
 
 typedef std::map<uint32_t, Glyph> GlyphPositions;
-typedef std::map<std::string, GlyphPositions> Faces;
-typedef std::vector<const GlyphPositions *> IndexedFaces;
 
 class GlyphPlacement {
 public:
@@ -48,8 +51,8 @@ public:
 
     uint32_t face = 0;
     uint32_t glyph = 0;
-    uint32_t x = 0;
-    uint32_t y = 0;
+    int32_t x = 0;
+    int32_t y = 0;
 };
 
 typedef std::vector<GlyphPlacement> Shaping;

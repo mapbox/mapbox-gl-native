@@ -10,18 +10,16 @@
 namespace llmr {
 
 class TextBucket;
-class BucketGeometryDescription;
+class BucketTextDescription;
 
 class Placement {
 public:
     Placement(int8_t zoom);
 
     void addFeature(TextBucket &bucket, const std::vector<Coordinate> &line,
-                    const BucketGeometryDescription &info,
-                    const IndexedFaces &faces,
+                    const BucketTextDescription &info,
+                    const GlyphPositions &face,
                     const Shaping &shaping);
-    float measureText(const IndexedFaces &faces,
-                      const Shaping &shaping);
 
 private:
     const int8_t zoom;

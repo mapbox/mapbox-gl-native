@@ -33,7 +33,7 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         current.pixelRatio = final.pixelRatio = ratio;
         current.framebuffer[0] = final.framebuffer[0] = fb_w;
         current.framebuffer[1] = final.framebuffer[1] = fb_h;
-        if (!canRotate()) _setAngle(0);
+        if (!canRotate() && current.angle) _setAngle(0);
         constrain(current.scale, current.y);
         platform::notify_map_change();
         return true;
@@ -60,9 +60,9 @@ void Transform::_moveBy(const double dx, const double dy, const time duration) {
 
     // Un-rotate when rotated and panning far enough to show off-world in corners.
     double w = final.scale * util::tileSize / 2;
-    double m = std::sqrt(pow((current.width / 2), 2) + pow((current.height / 2), 2));
-    double x = std::abs(sqrt(pow(final.x, 2) + pow(final.y, 2)));
-    if (current.angle && w - x < m) _setAngle(0, 500_milliseconds, true);
+    double m = std::sqrt(std::pow((current.width / 2), 2) + pow((current.height / 2), 2));
+    double x = std::abs(sqrt(std::pow(final.x, 2) + std::pow(final.y, 2)));
+    if (current.angle && w - x < m) _setAngle(0);
 
     if (duration == 0) {
         current.x = final.x;
@@ -206,7 +206,7 @@ void Transform::stopScaling() {
     _clearScaling();
 }
 
-double Transform::getMinZoom() {
+double Transform::getMinZoom() const {
     double test_scale = current.scale;
     double test_y = current.y;
     constrain(test_scale, test_y);
@@ -214,7 +214,7 @@ double Transform::getMinZoom() {
     return std::log2(std::fmin(min_scale, test_scale));
 }
 
-double Transform::getMaxZoom() {
+double Transform::getMaxZoom() const {
     return std::log2(max_scale);
 }
 
@@ -272,7 +272,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     constrain(final.scale, final.y);
 
     // Undo rotation at low zooms.
-    if (!canRotate() && current.angle) _setAngle(0, 500_milliseconds, true);
+    if (!canRotate() && current.angle) _setAngle(0);
 
     if (duration == 0) {
         current.scale = final.scale;
@@ -299,7 +299,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
 
 #pragma mark - Constraints
 
-void Transform::constrain(double& scale, double& y) {
+void Transform::constrain(double& scale, double& y) const {
     // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.
     if (scale < (current.height / util::tileSize)) scale = (current.height / util::tileSize);
 
@@ -367,7 +367,7 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
     }
 }
 
-void Transform::_setAngle(double new_angle, const time duration, bool disable_interaction) {
+void Transform::_setAngle(double new_angle, const time duration) {
     // This is only called internally, so we don't need a lock here.
 
     while (new_angle > M_PI)
@@ -382,18 +382,10 @@ void Transform::_setAngle(double new_angle, const time duration, bool disable_in
 
     if (duration == 0) {
         current.angle = final.angle;
-        transitions.remove(interaction_timeout);
-        current.interactive = true;
     } else {
         time start = util::now();
         transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
             current.angle, final.angle, current.angle, start, duration));
-        if (disable_interaction) {
-            transitions.remove(interaction_timeout);
-            current.interactive = false;
-            interaction_timeout = std::make_shared<util::timeout<bool>>(true, current.interactive, start, duration);
-            transitions.emplace_front(interaction_timeout);
-        }
     }
 
     platform::notify_map_change();
@@ -434,7 +426,7 @@ void Transform::_clearRotating() {
 }
 
 bool Transform::canRotate() {
-    return (current.scale >= MIN_ROTATE_SCALE);
+    return (current.scale > MIN_ROTATE_SCALE);
 }
 
 #pragma mark - Transition

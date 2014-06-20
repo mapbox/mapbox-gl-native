@@ -7,6 +7,7 @@
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/text/types.hpp>
+#include <llmr/text/glyph.hpp>
 #include <memory>
 #include <map>
 #include <vector>
@@ -27,7 +28,7 @@ public:
     TextBucket(
         TextVertexBuffer &vertexBuffer,
         TriangleElementsBuffer &triangleElementsBuffer,
-        const BucketDescription &bucket_desc, Placement &placement);
+        const BucketTextDescription &properties, Placement &placement);
 
     virtual void render(Painter &painter, const std::string &layer_name, const Tile::ID &id);
     virtual bool hasData() const;
@@ -35,14 +36,14 @@ public:
     void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
                    PlacementRange placementRange, float zoom);
 
-    void addFeature(const VectorTileFeature &feature,
-                    const IndexedFaces &faces,
-                    const std::map<Value, Shaping> &shapings);
+    void addFeature(const pbf &geometry,
+                    const GlyphPositions &face,
+                    const Shaping &shaping);
 
     void drawGlyphs(TextShader &shader);
 
 public:
-    const BucketGeometryDescription &geom_desc;
+    const BucketTextDescription &properties;
 
 private:
     TextVertexBuffer& vertexBuffer;

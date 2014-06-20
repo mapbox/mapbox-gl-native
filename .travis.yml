@@ -1,34 +1,37 @@
 language: cpp
 
+os:
+ - linux
+ - osx
+
 compiler:
  - gcc
  - clang
 
-cache:
-- apt
-- directories:
-  - mapnik-packaging
+env:
+  matrix:
+   - BUILDTYPE=Release
+   - BUILDTYPE=Debug
 
 before_install:
-- sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
-- sudo apt-get update -qq
-- sudo apt-get -y install gcc-4.8 g++-4.8
-- sudo apt-get -y install pkg-config nodejs cmake automake libtool xutils-dev
-- sudo apt-get -y install libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev
+- source ./scripts/setup_travis.sh
 
 install:
-- ./setup-libraries.sh
+- make setup
 
 before_script:
-- if [ ${CXX} = "g++" ]; then export CXX="g++-4.8" ; fi
+- rm -rf mapnik-packaging/out/packages
 
 script:
-- make llmr
-- make linux
-- make run-tests
+- make linux BUILDTYPE=${BUILDTYPE}
+- make run-tests BUILDTYPE=${BUILDTYPE}
 
 notifications:
-- hipchat: WB52YkcbCGMbNcStsGeaoRO7cyBSK4wX2ZHo2Y4b@GL
+  hipchat:
+    rooms:
+      secure: "ZKtTiFjXgXfrAO8eMU1nJBe46OBLgk0H7VAVmk84QwAb6DuoqT+mGMs+1yrWtjLwZI8vayZyaucupp1siM7lBWCOADx5GXA6GCCLOuE7fYLSNJFrXHa1u70IUBLOU8b5bDWRn8tcd5CM754R609l4ckTzBH3y4CIh9YNFrB0b+g="
+    template:
+      - '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}'
 
 git:
   submodules: false

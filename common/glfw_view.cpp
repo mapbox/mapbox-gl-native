@@ -1,6 +1,10 @@
 #include "glfw_view.hpp"
 
-GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {}
+GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {
+#ifdef NVIDIA
+    glDiscardFramebufferEXT = (PFNGLDISCARDFRAMEBUFFEREXTPROC)glfwGetProcAddress("glDiscardFramebufferEXT");
+#endif
+}
 
 GLFWView::~GLFWView() { glfwTerminate(); }
 
@@ -73,8 +77,17 @@ void GLFWView::key(GLFWwindow *window, int key, int /*scancode*/, int action, in
                 view->map->resetPosition();
             break;
         case GLFW_KEY_R:
-            if (!mods)
-                view->map->toggleRaster();
+            if (!mods) {
+                std::set<std::string> newAppliedClasses;
+                if (view->map->getAppliedClasses().count("night")) {
+                    newAppliedClasses.insert("default");
+                } else {
+                    newAppliedClasses.insert("default");
+                    newAppliedClasses.insert(newAppliedClasses.end(), "night");
+                }
+                view->map->setDefaultTransitionDuration(300);
+                view->map->setAppliedClasses(newAppliedClasses);
+            }
             break;
         case GLFW_KEY_N:
             if (!mods)
@@ -207,6 +220,7 @@ namespace platform {
 
 double elapsed() { return glfwGetTime(); }
 
+#ifndef GL_ES_VERSION_2_0
 void show_debug_image(std::string name, const char *data, size_t width, size_t height) {
     glfwInit();
 
@@ -272,6 +286,7 @@ void show_color_debug_image(std::string name, const char *data, size_t logical_w
 
     glfwMakeContextCurrent(current_window);
 }
+#endif
 
 void notify_map_change() {
     // no-op
