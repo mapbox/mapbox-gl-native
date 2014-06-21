@@ -15,20 +15,18 @@ class NativeMapView {
 	friend class LLMRView;
 
 public:
-    NativeMapView(ANativeWindow* window, std::string default_style_json);
+    NativeMapView(std::string default_style_json);
     ~NativeMapView();
 
-    bool initialize();
+    llmr::Map* getMap() { return map; };
 
-    void resize(int width, int height);
-    void redraw();
+    bool initializeContext(ANativeWindow* window);
+    void terminateContext();
 
-    void pause();
-    void resume();
+    void start();
     void stop();
 
-private:
-    void destroy();
+    void updateAndWait();
 
 private:
     llmr::Map* map = nullptr;
