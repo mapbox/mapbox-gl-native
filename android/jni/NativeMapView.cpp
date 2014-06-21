@@ -26,59 +26,57 @@ void log_gl_string(GLenum name, const char* label) {
 	}
 }
 
-NativeMapView::NativeMapView(ANativeWindow* window, std::string default_style_json) : window(window),
-																	                  default_style_json(default_style_json) {
+NativeMapView::NativeMapView(std::string default_style_json) : default_style_json(default_style_json) {
 	VERBOSE("NativeMapView constructor");
-	ASSERT(window != nullptr);
+
+	freopen("/sdcard/stdout.txt", "w", stdout); // NOTE: can't use <cstdio> till NDK fix the stdout macro bug
+	freopen("/sdcard/stderr.txt", "w", stderr);
+
+	view = new LLMRView(this);
+	map = new llmr::Map(*view);
+
+	// TODO move out of here
+	map->setStyleJSON(default_style_json);
 }
 
 NativeMapView::~NativeMapView() {
 	VERBOSE("NativeMapView destructor");
-	destroy();
+	terminateContext();
 
-	if (map != nullptr) {
-		delete map;
-		map = nullptr;
-	}
+	delete map;
+	map = nullptr;
 
-	if (view != nullptr) {
-		delete view;
-		view = nullptr;
-	}
-
-	ANativeWindow_release(window);
-	window = nullptr;
+	delete view;
+	view = nullptr;
 }
 
-bool NativeMapView::initialize() {
-	VERBOSE("NativeMapView initialize");
+bool NativeMapView::initializeContext(ANativeWindow* window) {
+	VERBOSE("NativeMapView initializeContext");
+
+	ASSERT(this->window == nullptr);
+	ASSERT(window != nullptr);
+	this->window = window;
 
 	ASSERT(display == EGL_NO_DISPLAY);
 	ASSERT(surface == EGL_NO_SURFACE);
 	ASSERT(context == EGL_NO_CONTEXT);
 
-	view = new LLMRView(this);
-	map = new llmr::Map(*view);
-
-	freopen("/sdcard/stdout.txt", "w", stdout); // NOTE: can't use <cstdio> till NDK fix the stdout macro bug
-	freopen("/sdcard/stderr.txt", "w", stderr);
-
 	display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 	if (display == EGL_NO_DISPLAY) {
 		ERROR("eglGetDisplay() returned error %d", eglGetError());
-		destroy();
+		terminateContext();
 		return false;
 	}
 
 	EGLint major, minor;
 	if (!eglInitialize(display, &major, &minor)) {
 		ERROR("eglInitialize() returned error %d", eglGetError());
-		destroy();
+		terminateContext();
 		return false;
 	}
 	if ((major <= 1) && (minor < 3)) {
 		ERROR("EGL version is too low, need 1.3, got %d.%d", major, minor);
-		destroy();
+		terminateContext();
 		return false;
 	}
 
@@ -105,19 +103,19 @@ bool NativeMapView::initialize() {
 	EGLint num_configs;
 	if (!eglChooseConfig(display, config_attribs, &config, 1, &num_configs)) {
 		ERROR("eglChooseConfig() returned error %d", eglGetError());
-		destroy();
+		terminateContext();
 		return false;
 	}
 	if (num_configs < 1) {
 		ERROR("eglChooseConfig() returned no configs");
-		destroy();
+		terminateContext();
 		return false;
 	}
 
 	EGLint format;
 	if (!eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format)) {
 		ERROR("eglGetConfigAttrib() returned error %d", eglGetError());
-		destroy();
+		terminateContext();
 		return false;
 	}
 	DEBUG("Chosen window format is %d", format);
@@ -130,7 +128,7 @@ bool NativeMapView::initialize() {
 	surface = eglCreateWindowSurface(display, config, window, surface_attribs);
 	if (surface == EGL_NO_SURFACE) {
 		ERROR("eglCreateWindowSurface() returned error %d", eglGetError());
-		destroy();
+		terminateContext();
 		return false;
 	}
 
@@ -138,7 +136,7 @@ bool NativeMapView::initialize() {
 	if (!eglQuerySurface(display, surface, EGL_WIDTH, &width) ||
 		!eglQuerySurface(display, surface, EGL_HEIGHT, &height)) {
 		ERROR("eglQuerySurface() returned error %d", eglGetError());
-		destroy();
+		terminateContext();
 		return false;
 	}
 
@@ -149,13 +147,13 @@ bool NativeMapView::initialize() {
 	context = eglCreateContext(display, config, EGL_NO_CONTEXT, context_attribs);
 	if (context == EGL_NO_CONTEXT) {
 		ERROR("eglCreateContext() returned error %d", eglGetError());
-		destroy();
+		terminateContext();
 		return false;
 	}
 
 	if (!eglMakeCurrent(display, surface, surface, context)) {
 		ERROR("eglMakeCurrent() returned error %d", eglGetError());
-		destroy();
+		terminateContext();
 		return false;
 	}
 
@@ -165,46 +163,32 @@ bool NativeMapView::initialize() {
 	log_gl_string(GL_SHADING_LANGUAGE_VERSION, "SL Version");
 	log_gl_string(GL_EXTENSIONS, "Extensions");
 
+	map->resize(width, height);
+
+	// TODO: need to sort out which threads to which make current
 	if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
 		ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
-		destroy();
+		terminateContext();
 		return false;
 	}
 
-	resize(width, height);
-
-	map->setDebug(true);
-	map->setStyleJSON(default_style_json);
-	map->setLonLatZoom(0, 0, 0);
-	map->start();
-
 	INFO("Context initialized");
+
+	map->start();
 
 	return true;
 }
 
-void NativeMapView::resize(int width, int height) {
-	map->resize(width, height);
-}
+void NativeMapView::terminateContext() {
+	VERBOSE("NativeMapView terminateContext");
 
-void NativeMapView::redraw() {
-	map->update();
-}
-
-void NativeMapView::pause() {
-	map->stop();
-}
-
-void NativeMapView::resume() {
-	map->start();
-}
-
-void NativeMapView::stop() {
 	map->cleanup();
-}
-
-void NativeMapView::destroy() {
-	VERBOSE("NativeMapView destroy");
+	// TODO: there is a bug when you double tap home to go app switcher, as map is black if you immediately switch to the map again
+	// TODO: this is in the onPause/onResume path
+	// TODO: the bug causes an GL_INVALID_VALUE with glDelteProgram (I think due to context being deleted first)
+	// TODO: we need to free resources before we terminate
+	// TODO: but cause terminate and stop is async they try to do stuff with no context and crash!
+	//map->stop();
 
 	if (display != EGL_NO_DISPLAY) {
 		eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -223,20 +207,55 @@ void NativeMapView::destroy() {
 	context = EGL_NO_CONTEXT;
 	surface = EGL_NO_SURFACE;
 	display = EGL_NO_DISPLAY;
+
+	if (window != nullptr) {
+		ANativeWindow_release(window);
+		window = nullptr;
+	}
+}
+
+void NativeMapView::start() {
+	VERBOSE("NativeMapView start");
+	if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
+		map->start();
+	}
+}
+
+void NativeMapView::stop() {
+	VERBOSE("NativeMapView stop");
+	if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
+		map->stop();
+	}
+}
+
+void NativeMapView::updateAndWait() {
+	VERBOSE("NativeMapView updateAndWait");
+	map->update();
+	//while(map->needsSwap()) {
+		// TODO: this is not working!!!
+		// TODO: this is not very efficient
+		// nop
+	//}
 }
 
 void LLMRView::make_active()
 {
 	VERBOSE("LLMRView make_active");
 	// TODO how do we undo this? If thread is different from init thread?
-	eglMakeCurrent(nativeView->display, nativeView->surface, nativeView->surface, nativeView->context);
+	if ((nativeView->display != EGL_NO_DISPLAY) && (nativeView->surface != EGL_NO_SURFACE) && (nativeView->context != EGL_NO_CONTEXT)) {
+		if (!eglMakeCurrent(nativeView->display, nativeView->surface, nativeView->surface, nativeView->context)) {
+			ERROR("eglMakeCurrent() returned error %d", eglGetError());
+		}
+	}
 }
 
 void LLMRView::swap()
 {
 	VERBOSE("LLMRView swap");
-	if (map->needsSwap()) {
-		eglSwapBuffers(nativeView->display, nativeView->surface);
+	if (map->needsSwap() && (nativeView->display != EGL_NO_DISPLAY) && (nativeView->surface != EGL_NO_SURFACE)) {
+		if (!eglSwapBuffers(nativeView->display, nativeView->surface)) {
+			ERROR("eglSwapBuffers() returned error %d", eglGetError());
+		}
 		map->swapped();
 	}
 }
