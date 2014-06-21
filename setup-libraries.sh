@@ -41,7 +41,7 @@ if [[ $MISSING_DEPS != "" ]]; then
 fi
 
 if [ ! -d 'mapnik-packaging/.git' ]; then
-  git clone --depth=1 https://github.com/mapnik/mapnik-packaging.git
+  git clone --depth=1 --branch android-app https://github.com/ljbade/mapnik-packaging.git
 fi
 
 cd mapnik-packaging/osx/
