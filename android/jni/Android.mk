@@ -1,9 +1,9 @@
 LOCAL_PATH              := $(call my-dir)
 LLMR_ROOT               := ../..
 LLMR_INC_ROOT           := ..
-LLMR_BUILDTYPE          := Debug
-LLMR_OUT                := $(LLMR_ROOT)/build/$(LLMR_BUILDTYPE)/obj
-LLMR_OUT_TARGET         := $(LLMR_ROOT)/build/$(LLMR_BUILDTYPE)/obj.target
+BUILDTYPE               ?= Debug
+LLMR_OUT                := $(LLMR_ROOT)/build/$(BUILDTYPE)/obj
+LLMR_OUT_TARGET         := $(LLMR_ROOT)/build/$(BUILDTYPE)/obj.target
 MAPNIK_PACKAGING_OUT    := /mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-arm-android
 MAPNIK_PACKAGING_LIB    := $(LLMR_ROOT)$(MAPNIK_PACKAGING_OUT)/lib
 MAPNIK_PACKAGING_INC    := $(LLMR_INC_ROOT)$(MAPNIK_PACKAGING_OUT)/include
@@ -34,10 +34,17 @@ LOCAL_EXPORT_C_INCLUDES := $(MAPNIK_PACKAGING_INC)
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := curl
+LOCAL_MODULE            := ssl
+LOCAL_SRC_FILES         := $(MAPNIK_PACKAGING_LIB)/libssl.a
+LOCAL_EXPORT_C_INCLUDES := $(MAPNIK_PACKAGING_INC)
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE            := curl
 LOCAL_SRC_FILES         := $(MAPNIK_PACKAGING_LIB)/libcurl.a
 LOCAL_EXPORT_C_INCLUDES := $(MAPNIK_PACKAGING_INC)
 LOCAL_EXPORT_LDLIBS     := -lz
+LOCAL_STATIC_LIBRARIES  := ssl
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
