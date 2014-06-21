@@ -133,7 +133,7 @@ public class MapView extends SurfaceView {
 			centerLocation.setLatitude(centerLatitude);
 			centerLocation.setBearing(direction);
 			setCenterLocation(centerLocation);
-			setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoomLevel, 0.0f));
+			setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoomLevel, 0.0f));  // TODO these don't work?
 			setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoomEnabled, true));
 			setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scrollEnabled, true));
 			setRotateEnabled(typedArray.getBoolean(R.styleable.MapView_rotateEnabled, true));
@@ -369,7 +369,7 @@ public class MapView extends SurfaceView {
 		// Redraw map to show change
 		@Override
 		public void onChange(MapController mapController) {
-			postInvalidateOnAnimation();
+			//postInvalidateOnAnimation();
 			
 			// Tell accessibility the description text has changed
 			//sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED);
@@ -416,7 +416,8 @@ public class MapView extends SurfaceView {
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
 			// Zoom in and pan to the touch point
-			mMapAnimator.panAndZoomTo(mMapController.screenToMapX(e.getX()), mMapController.screenToMapY(e.getY()), true);
+			//mMapAnimator.panAndZoomTo(mMapController.screenToMapX(e.getX()), mMapController.screenToMapY(e.getY()), true);
+			nativeScaleBy(nativeMapViewPtr, 2.0, e.getX(), e.getY());
 			return true;
 		}
 
@@ -424,7 +425,8 @@ public class MapView extends SurfaceView {
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
 			// Pan to the touch point
-			mMapAnimator.panTo(mMapController.screenToMapX(e.getX()), mMapController.screenToMapY(e.getY()));
+			//mMapAnimator.panTo(mMapController.screenToMapX(e.getX()), mMapController.screenToMapY(e.getY()));
+			//nativeMoveBy(nativeMapViewPtr, -distanceX, -distanceY);
 			return true;
 		}
 
@@ -432,7 +434,7 @@ public class MapView extends SurfaceView {
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 			// Fling the map
-			mMapAnimator.fling(-velocityX, -velocityY);
+			//mMapAnimator.fling(-velocityX, -velocityY);
 			return true;
 		}
 
@@ -441,7 +443,7 @@ public class MapView extends SurfaceView {
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
 			// Scroll the map
-			mMapController.moveScreenBy(distanceX, distanceY);
+			nativeMoveBy(nativeMapViewPtr, -distanceX, -distanceY);
 			return true;
 		}
 	}
@@ -451,7 +453,7 @@ public class MapView extends SurfaceView {
 	@Override
 	public void computeScroll() {
 		super.computeScroll();
-		mMapAnimator.computeFling();
+		//mMapAnimator.computeFling();
 	}
 	
 	// This class handles two finger gestures	
@@ -780,15 +782,19 @@ public class MapView extends SurfaceView {
     private native void nativeCleanup(long nativeMapViewPtr);
 
     private native void nativeResize(long nativeMapViewPtr, int width, int height);
+    private native void nativeCancelTransitions(long nativeMapViewPtr);
 
     // TODO use JNI on C++ side to pass back and forth lat/lng/zoom etc class?
     private native double nativeGetLon(long nativeMapViewPtr);
     private native double nativeGetLat(long nativeMapViewPtr);
     private native void nativeSetLonLat(long nativeMapViewPtr, double lon, double lat);
     private native void nativeResetPosition(long nativeMapViewPtr);
+    private native void nativeMoveBy(long nativeMapViewPtr, double dx, double dy);
     
     private native double nativeGetZoom(long nativeMapViewPtr);
     private native void nativeSetZoom(long nativeMapViewPtr, double zoom);
+    private void nativeScaleBy(long nativeMapViewPtr, double ds) { nativeScaleBy(nativeMapViewPtr, ds, -1.0, -1.0); }
+    private native void nativeScaleBy(long nativeMapViewPtr, double ds, double cx, double cy);
     
     private native double nativeGetAngle(long nativeMapViewPtr);
     private native void nativeSetAngle(long nativeMapViewPtr, double angle);
