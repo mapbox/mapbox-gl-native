@@ -29,3 +29,5 @@ proguard/
 libs/armeabi/
 obj/
 *.so
+
+.settings/

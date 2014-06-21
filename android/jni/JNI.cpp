@@ -80,6 +80,13 @@ extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeResize(
     native_map_view->getMap()->resize(width, height);
 }
 
+extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeCancelTransitions(JNIEnv* env, jclass clazz, jlong native_map_view_ptr) {
+	VERBOSE("nativeCancelTransitions");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->cancelTransitions();
+}
+
 extern "C" JNIEXPORT jdouble JNICALL Java_com_mapbox_mapboxgl_MapView_nativeGetLon(JNIEnv* env, jclass clazz, jlong native_map_view_ptr) {
 	VERBOSE("nativeGetLon");
     ASSERT(native_map_view_ptr != 0);
@@ -112,6 +119,13 @@ extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeResetPo
     native_map_view->getMap()->resetPosition();
 }
 
+extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeMoveBy(JNIEnv* env, jclass clazz, jlong native_map_view_ptr, jdouble dx, jdouble dy) {
+	VERBOSE("nativeMoveBy");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->moveBy(dx, dy);
+}
+
 extern "C" JNIEXPORT jdouble JNICALL Java_com_mapbox_mapboxgl_MapView_nativeGetZoom(JNIEnv* env, jclass clazz, jlong native_map_view_ptr) {
 	VERBOSE("nativeGetZoom");
     ASSERT(native_map_view_ptr != 0);
@@ -124,6 +138,13 @@ extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeSetZoom
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     native_map_view->getMap()->setZoom(zoom);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeScaleBy(JNIEnv* env, jclass clazz, jlong native_map_view_ptr, jdouble ds, jdouble cx, jdouble cy) {
+	VERBOSE("nativeScaleBy");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->scaleBy(ds, cx, cy);
 }
 
 extern "C" JNIEXPORT jdouble JNICALL Java_com_mapbox_mapboxgl_MapView_nativeGetAngle(JNIEnv* env, jclass clazz, jlong native_map_view_ptr) {
