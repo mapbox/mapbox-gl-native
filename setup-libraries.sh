@@ -51,10 +51,9 @@ export CXX11=true
 
 if [ ${PLATFORM} = 'Android' ]; then
 source Android.sh
-    #if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/bin/pkg_config ] ; then ./scripts/build_pkg_config.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
-    if [ ! -d out/build-cpp11-libstdcpp-gcc-arm/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
     echo '     ...done'
 
 cd ../../
