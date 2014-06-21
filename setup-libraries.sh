@@ -73,6 +73,7 @@ source Android.sh
     if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libboost_atomic.a ] ; then ./scripts/build_boost.sh --with-atomic ; fi
     echo '     ...done'
 
 cd ../../
