@@ -51,16 +51,16 @@ export CXX11=true
 
 if [ ${PLATFORM} = 'Android' ]; then
 source Android.sh
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
     echo '     ...done'
 
 cd ../../
 ./configure \
---pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-arm/lib/pkgconfig \
+--pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-arm-android/lib/pkgconfig \
 --boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-arm
 
 
