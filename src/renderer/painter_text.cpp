@@ -20,7 +20,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 
     mat4 exMatrix;
     matrix::copy(exMatrix, projMatrix);
-    if (bucket.geom_desc.path == TextPathType::Curve) {
+    if (bucket.properties.path == TextPathType::Curve) {
         matrix::rotate_z(exMatrix, exMatrix, map.getState().getAngle());
     }
 
@@ -30,7 +30,7 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     }
 
     // If layerStyle.size > bucket.info.fontSize then labels may collide
-    float fontSize = std::fmin(properties.size, bucket.geom_desc.size);
+    float fontSize = std::fmin(properties.size, bucket.properties.max_size);
     matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
 
     const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
@@ -48,10 +48,10 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     float angle = std::round((map.getState().getAngle() + rotate) / M_PI * 128);
 
     // adjust min/max zooms for variable font sies
-    float zoomAdjust = log(fontSize / bucket.geom_desc.size) / log(2);
+    float zoomAdjust = log(fontSize / bucket.properties.max_size) / log(2);
 
     textShader->setAngle((int32_t)(angle + 256) % 256);
-    textShader->setFlip(bucket.geom_desc.path == TextPathType::Curve ? 1 : 0);
+    textShader->setFlip(bucket.properties.path == TextPathType::Curve ? 1 : 0);
     textShader->setZoom((map.getState().getNormalizedZoom() - zoomAdjust) * 10); // current zoom level
 
     // Label fading
@@ -99,6 +99,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
     if (properties.halo[3] > 0.0f) {
+        // TODO: Get rid of the 2.4 magic value. It is currently 24 / 10, with 24 being the font size
+        // of the SDF glyphs.
         textShader->setGamma(properties.halo_blur * 2.4f / fontSize / map.getState().getPixelRatio());
         textShader->setColor(properties.halo);
         textShader->setBuffer(properties.halo_radius);
@@ -108,6 +110,8 @@ void Painter::renderText(TextBucket& bucket, const std::string& layer_name, cons
 
     if (properties.color[3] > 0.0f) {
         // Then, we draw the text over the halo
+        // TODO: Get rid of the 2.4 magic value. It is currently 24 / 10, with 24 being the font size
+        // of the SDF glyphs.
         textShader->setGamma(2.4f / fontSize / map.getState().getPixelRatio());
         textShader->setColor(properties.color);
         textShader->setBuffer((256.0f - 64.0f) / 256.0f);

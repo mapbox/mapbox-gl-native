@@ -20,8 +20,8 @@ using namespace llmr;
 LineBucket::LineBucket(LineVertexBuffer& vertexBuffer,
                        TriangleElementsBuffer& triangleElementsBuffer,
                        PointElementsBuffer& pointElementsBuffer,
-                       const BucketDescription& bucket_desc)
-    : geometry(bucket_desc.geometry),
+                       const BucketLineDescription& properties)
+    : properties(properties),
       vertexBuffer(vertexBuffer),
       triangleElementsBuffer(triangleElementsBuffer),
       pointElementsBuffer(pointElementsBuffer),
@@ -60,9 +60,6 @@ struct TriangleElement {
 typedef uint16_t PointElement;
 
 void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
-    const JoinType join = geometry.join;
-    const CapType cap = geometry.cap;
-    const float miterLimit = geometry.miter_limit;
     // TODO: use roundLimit
     // const float roundLimit = geometry.round_limit;
 
@@ -80,8 +77,8 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         return;
     }
 
-    CapType beginCap = cap;
-    CapType endCap = closed ? CapType::Butt : cap;
+    CapType beginCap = properties.cap;
+    CapType endCap = closed ? CapType::Butt : properties.cap;
 
     JoinType currentJoin = JoinType::None;
 
@@ -111,7 +108,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         if (currentVertex) prevVertex = currentVertex;
 
         currentVertex = vertices[i];
-        currentJoin = join;
+        currentJoin = properties.join;
 
         if (prevVertex) distance += util::dist<double>(currentVertex, prevVertex);
 
@@ -164,7 +161,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
         // Switch to miter joins if the angle is very low.
         if (currentJoin != JoinType::Miter) {
-            if (std::fabs(joinAngularity) < 0.5 && roundness < miterLimit) {
+            if (std::fabs(joinAngularity) < 0.5 && roundness < properties.miter_limit) {
                 currentJoin = JoinType::Miter;
             }
         }
@@ -213,14 +210,14 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
                 // The two normals are almost parallel.
                 joinNormal.x = -nextNormal.y;
                 joinNormal.y = nextNormal.x;
-            } else if (roundness > miterLimit) {
+            } else if (roundness > properties.miter_limit) {
                 // If the miter grows too large, flip the direction to make a
                 // bevel join.
                 joinNormal.x = (prevNormal.x - nextNormal.x) / joinAngularity;
                 joinNormal.y = (prevNormal.y - nextNormal.y) / joinAngularity;
             }
 
-            if (roundness > miterLimit) {
+            if (roundness > properties.miter_limit) {
                 flip = -flip;
             }
 

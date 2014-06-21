@@ -30,30 +30,26 @@ void FillBucket::free(void *, void *ptr) {
     ::free(ptr);
 }
 
-FillBucket::FillBucket(FillVertexBuffer& vertexBuffer,
-                       TriangleElementsBuffer& triangleElementsBuffer,
-                       LineElementsBuffer& lineElementsBuffer,
-                       const BucketDescription& bucket_desc)
-    : geom_desc(bucket_desc.geometry),
-    allocator(new TESSalloc {
-    &alloc,
-    &realloc,
-    &free,
-    nullptr, // userData
-    64, // meshEdgeBucketSize
-    64, // meshVertexBucketSize
-    32, // meshFaceBucketSize
-    64, // dictNodeBucketSize
-    8, // regionBucketSize
-    128, // extraVertices allocated for the priority queue.
-}),
-tesselator(tessNewTess(allocator)),
-vertexBuffer(vertexBuffer),
-triangleElementsBuffer(triangleElementsBuffer),
-lineElementsBuffer(lineElementsBuffer),
-vertex_start(vertexBuffer.index()),
-triangle_elements_start(triangleElementsBuffer.index()),
-line_elements_start(lineElementsBuffer.index()) {
+FillBucket::FillBucket(FillVertexBuffer &vertexBuffer,
+                       TriangleElementsBuffer &triangleElementsBuffer,
+                       LineElementsBuffer &lineElementsBuffer,
+                       const BucketFillDescription &properties)
+    : properties(properties),
+      allocator(new TESSalloc{&alloc, &realloc, &free, nullptr, // userData
+                              64,                               // meshEdgeBucketSize
+                              64,                               // meshVertexBucketSize
+                              32,                               // meshFaceBucketSize
+                              64,                               // dictNodeBucketSize
+                              8,                                // regionBucketSize
+                              128, // extraVertices allocated for the priority queue.
+      }),
+      tesselator(tessNewTess(allocator)),
+      vertexBuffer(vertexBuffer),
+      triangleElementsBuffer(triangleElementsBuffer),
+      lineElementsBuffer(lineElementsBuffer),
+      vertex_start(vertexBuffer.index()),
+      triangle_elements_start(triangleElementsBuffer.index()),
+      line_elements_start(lineElementsBuffer.index()) {
     assert(tesselator);
 }
 

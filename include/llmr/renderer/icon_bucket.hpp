@@ -26,7 +26,7 @@ class VectorTileFeature;
 class IconBucket : public Bucket {
 public:
     IconBucket(IconVertexBuffer& vertexBuffer,
-                const BucketDescription& bucket_desc);
+                const BucketIconDescription& properties);
 
     virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
     virtual bool hasData() const;
@@ -37,7 +37,7 @@ public:
     void drawIcons(DotShader& shader);
 
 public:
-    const BucketGeometryDescription geometry;
+    const BucketIconDescription &properties;
 
 private:
 

@@ -5,7 +5,7 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 
 # Depends
 
- - Modern C++ compiler that supports `-std=c++11`
+ - Modern C++ compiler that supports `-std=c++11` (On OSX clang++, on Linux g++-4.8 or g++-4.9)
  - Boost headers
  - `libpng`
  - `libuv`
@@ -13,7 +13,7 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
  - `libcurl` (depends on OpenSSL; Linux only)
  - `libboost_regex` (Linux only)
  - Homebrew (for build on OS X)
- - Python (for build only)
+ - Python 2.x (for build only)
  - Node.js (for build only)
 
 # Build instructions
@@ -67,7 +67,7 @@ Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, m
 Ensure you have git and other build essentials:
 
     sudo apt-get update
-    sudo apt-get install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config nodejs-legacy
+    sudo apt-get install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config nodejs-legacy curl
 
 Install a `-std=c++11` capable compiler
 
@@ -94,10 +94,10 @@ You can then proceed to build the library like:
 The default stylesheet at `bin/style.js` is JSON and is processed into a minified version by the following script: 
 
 ```
-node bin/build-style.js
+node bin/build-style.js bin/style.js out/
 ```
 
-This is automatically taken care of as a build phase.
+Note: This is automatically taken care of as a build phase so you are not expected to do this manually.
 
 # Usage
 

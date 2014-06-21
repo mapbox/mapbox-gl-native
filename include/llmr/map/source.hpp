@@ -30,10 +30,8 @@ public:
 
 public:
     Source(Map &map, Painter &painter,
-           const char *url = "", Type type = Type::vector, std::vector<uint32_t> zooms = {0},
-           uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 14,
-           bool enabled = true);
-
+           const char *url = "", Type type = Type::vector, uint32_t tile_size = 512,
+           uint32_t min_zoom = 0, uint32_t max_zoom = 14, bool enabled = true);
 
     bool update();
     void updateMatrices(const TransformState &transform);
@@ -65,7 +63,6 @@ private:
     Painter& painter;
 
     const Type type;
-    const std::vector<uint32_t> zooms;
     const std::string url;
     const uint32_t tile_size;
     const int32_t min_zoom;

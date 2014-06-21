@@ -17,13 +17,12 @@
 using namespace llmr;
 
 Source::Source(Map &map, Painter &painter,
-               const char *url, Source::Type type, std::vector<uint32_t> zooms, uint32_t tile_size,
+               const char *url, Source::Type type, uint32_t tile_size,
                uint32_t min_zoom, uint32_t max_zoom, bool enabled)
     : enabled(enabled),
       map(map),
       painter(painter),
       type(type),
-      zooms(zooms),
       url(url),
       tile_size(tile_size),
       min_zoom(min_zoom),

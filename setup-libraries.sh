@@ -65,32 +65,39 @@ cd ../../
 
 elif [ ${UNAME} = 'Darwin' ]; then
 source iPhoneOS.sh
-    if [ ! -f out/build-cpp11-libcpp-armv7/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-armv7/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
 
 source iPhoneOSs.sh
-    if [ ! -f out/build-cpp11-libcpp-armv7s/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-armv7s/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
 
 source iPhoneOS64.sh
-    if [ ! -f out/build-cpp11-libcpp-arm64/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-arm64/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
 
 source iPhoneSimulator.sh
-    if [ ! -f out/build-cpp11-libcpp-i386/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-i386/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
 
+# libs conflict with MacOSX build
+# TODO: need to break apart targets
+#source iPhoneSimulator64.sh
+#    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+#    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+#    echo '     ...done'
+
 source MacOSX.sh
-    if [ ! -f out/build-cpp11-libcpp-x86_64/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-x86_64/lib/libglfw3.a ] ; then ./scripts/build_glfw.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-x86_64/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-x86_64/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-x86_64/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
-    if [ ! -d out/build-cpp11-libcpp-x86_64/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
+    if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libglfw3.a ] ; then ./scripts/build_glfw.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
+    if [ ! -d out/build-cpp11-libcpp-x86_64-macosx/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
     echo '     ...done'
 
 ./scripts/make_universal.sh
@@ -98,21 +105,22 @@ source MacOSX.sh
 cd ../../
 ./configure \
 --pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal/lib/pkgconfig \
---boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal
+--boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal \
+--node=`which node`
 
 elif [ ${UNAME} = 'Linux' ]; then
 
 source Linux.sh
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libglfw3.a ] ; then ./scripts/build_glfw.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libglfw3.a ] ; then ./scripts/build_glfw.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
 
 cd ../../
 ./configure \
---pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64/lib/pkgconfig \
---boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64
-
+--pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/pkgconfig \
+--boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64-linux \
+--node=`which node`
 fi
