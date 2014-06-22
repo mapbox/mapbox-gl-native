@@ -29,6 +29,9 @@ public:
     void updateAndWait();
 
 private:
+    int chooseConfig(const EGLConfig configs[], EGLint num_configs);
+
+private:
     llmr::Map* map = nullptr;
     LLMRView* view = nullptr;
 
