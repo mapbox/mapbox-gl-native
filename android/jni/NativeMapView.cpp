@@ -283,9 +283,9 @@ int NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_configs) {
 		config_ok &= green == 8;
 		config_ok &= blue == 8;
 		config_ok &= (alpha == 0) || (alpha == 8); // Can be either 0 for RGBX or 8 for RGBA but we don't care either way
-		config_ok &= depth == 16;
-		config_ok &= stencil == 8;
-		config_ok &= sample_buffers == 0;
+		//config_ok &= depth == 16;
+		//config_ok &= stencil == 8;
+		//config_ok &= sample_buffers == 0;
 		config_ok &= samples == 0;
 
 		if (config_ok) { // Choose the last matching config, that way we get RGBX if possible (since it is sorted highest to lowest bits)
