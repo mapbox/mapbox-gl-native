@@ -42,7 +42,7 @@ public class MapView extends SurfaceView {
     private static final String STATE_SCROLL_ENABLED = "scrollEnabled";
     private static final String STATE_ROTATE_ENABLED = "rotateEnabled";
     private static final String STATE_DEBUG_ACTIVE = "debugActive";
-
+    
     //
 	// Instance members
 	//	
@@ -60,12 +60,6 @@ public class MapView extends SurfaceView {
  	// Shows zoom buttons
  	private ZoomButtonsController mZoomButtonsController;
  	
- 	// Controls the map display
- 	private MapController mMapController;
- 	
- 	// Animates the map
- 	private MapAnimator mMapAnimator;
- 	
  	// Used to track trackball long presses
  	private TrackballLongPressTimeOut mCurrentTrackballLongPressTimeOut;
  	
@@ -73,7 +67,7 @@ public class MapView extends SurfaceView {
  	// Properties
  	//
  	
- 	private boolean mZoomEnabled = true;
+ 	private boolean mZoomEnabled = true; // TODO implement the checks for these
  	private boolean mScrollEnabled = true;
  	private boolean mRotateEnabled = true;
  	
@@ -132,7 +126,7 @@ public class MapView extends SurfaceView {
 			centerLocation.setLongitude(centerLongitude);
 			centerLocation.setLatitude(centerLatitude);
 			centerLocation.setBearing(direction);
-			setCenterLocation(centerLocation);
+			setCenterLocation(centerLocation); // TODO set zoom to min zoom on load
 			setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoomLevel, 0.0f));  // TODO these don't work?
 			setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoomEnabled, true));
 			setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scrollEnabled, true));
@@ -160,35 +154,24 @@ public class MapView extends SurfaceView {
         
         // Touch gesture detectors
  		mGestureDetector = new GestureDetector(context, new GestureListener());
+ 		mGestureDetector.setIsLongpressEnabled(true);
      	mScaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureListener());
      		
  		// Shows the zoom controls
      	// But not when in Eclipse UI editor
  		if (!isInEditMode()) {
- 				if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
- 					mZoomButtonsController = new ZoomButtonsController(this);
- 					mZoomButtonsController.setZoomSpeed(MapAnimator.ZOOM_DURATION);
- 					mZoomButtonsController.setOnZoomListener(new OnZoomListener());
- 				}
+ 			if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
+				mZoomButtonsController = new ZoomButtonsController(this);
+				mZoomButtonsController.setZoomSpeed(300);
+				mZoomButtonsController.setOnZoomListener(new OnZoomListener());
+			}
  		}
-     		
- 		// Controls the map's display
- 		mMapController = new MapController(0.0, 0.0, 1.0,
- 		//mDisplayMetrics.xdpi, mDisplayMetrics.ydpi, 0, 0);
- 		300.0, 300.0, 0, 0);
- 		OnChangeListener mapChangeListener = new OnChangeListener(); // Receives change notification from MapController
- 		mMapController.addOnChangeListener(mapChangeListener);
- 		
- 		// Animates the map
- 		mMapAnimator = new MapAnimator(this, mMapController);
     }
     
     //
     // Property methods
     //
-    
 
- 	
  	// TODO replace with custom lat/lon/dir class or use one from mapbox droid sdk
     public Location getCenterLocation() {
     	Location centerLocation = new Location(TAG);
@@ -363,8 +346,9 @@ public class MapView extends SurfaceView {
 	// TODO: onDraw for editor?
 	
 
+	// TODO replace with callback from map
 	// Called when the map's display has changed
-	private class OnChangeListener implements MapController.OnChangeListener {
+	/*private class OnChangeListener implements MapController.OnChangeListener {
 
 		// Redraw map to show change
 		@Override
@@ -374,11 +358,27 @@ public class MapView extends SurfaceView {
 			// Tell accessibility the description text has changed
 			//sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED);
 		}
-	}
+	}*/
 
 	//
 	// Input events
 	//
+	
+	// Zoom in or out
+	private void zoom(boolean zoomIn) { zoom(zoomIn, -1.0f, -1.0f); }
+	
+	private void zoom(boolean zoomIn, float x, float y) {
+		// Cancel any animation
+		nativeCancelTransitions(nativeMapViewPtr);
+		
+		if (zoomIn) {
+			nativeScaleBy(nativeMapViewPtr, 2.0, x, y, 0.3);
+		} else {
+			// TODO check min zoom like ios
+			// TODO two finger tap zoom out
+			nativeScaleBy(nativeMapViewPtr, 0.5, x, y, 0.3);
+		}
+	}
 
 	// Called when user touches the screen, all positions are absolute
 	@Override
@@ -391,10 +391,7 @@ public class MapView extends SurfaceView {
 		// Ensure we cascade the touch events correctly through the gesture detectors
 		// If an early detector consumes the event it is not passed to any more
 		// Must use the || operator for this to work correctly
-		boolean ret = false;
-		if (mScaleGestureDetector != null) {
-			ret = mScaleGestureDetector.onTouchEvent(event);
-		}
+		boolean ret = mScaleGestureDetector.onTouchEvent(event);
 		ret = mGestureDetector.onTouchEvent(event) || ret;
 		return ret || super.onTouchEvent(event);
 	}
@@ -409,65 +406,80 @@ public class MapView extends SurfaceView {
 			if (mZoomButtonsController != null) {
 				mZoomButtonsController.setVisible(true);
 			}
+
+			// Cancel any animation
+			nativeCancelTransitions(nativeMapViewPtr);
+			
 			return true;
 		}
 
 		// Called for double taps
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
-			// Zoom in and pan to the touch point
-			//mMapAnimator.panAndZoomTo(mMapController.screenToMapX(e.getX()), mMapController.screenToMapY(e.getY()), true);
-			nativeScaleBy(nativeMapViewPtr, 2.0, e.getX(), e.getY());
+			// Single finger double tap
+			// Zoom in
+			zoom(true, e.getX(), e.getY());
 			return true;
 		}
-
-		// Called for single taps
+		
+		// Called for single taps after a delay
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
-			// Pan to the touch point
-			//mMapAnimator.panTo(mMapController.screenToMapX(e.getX()), mMapController.screenToMapY(e.getY()));
-			//nativeMoveBy(nativeMapViewPtr, -distanceX, -distanceY);
-			return true;
+			return false;
+		}
+		
+		// Called for a long press
+		@Override
+		public void onLongPress(MotionEvent e) {
+			// TODO quick zoom, (but android one is double tap and swipe from scale gesture detector?
+			// https://github.com/inukshuk/gestures-lib
 		}
 
 		// Called for flings
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 			// Fling the map
-			//mMapAnimator.fling(-velocityX, -velocityY);
-			return true;
+			// TODO does not work
+			/*float ease = 0.25f;
+
+	        velocityX = velocityX * ease;
+	        velocityY = velocityY * ease;
+
+	        double speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+	        double deceleration = 2500;
+	        double duration = speed / (deceleration * ease);
+	        
+	        
+			// Cancel any animation
+			nativeCancelTransitions(nativeMapViewPtr);
+
+	        nativeMoveBy(nativeMapViewPtr, velocityX * duration / 2.0, velocityY * duration / 2.0, duration);
+			
+			return true;*/
+			return false;
 		}
 
 		// Called for drags
 		@Override
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
+			// TODO start scrolling/cancel
+			// Cancel any animation
+			nativeCancelTransitions(nativeMapViewPtr);
+			
 			// Scroll the map
 			nativeMoveBy(nativeMapViewPtr, -distanceX, -distanceY);
 			return true;
 		}
 	}
-
-	// Called when it is time to update the fling animation
-	// Delegates the logic to MapAnimator
-	@Override
-	public void computeScroll() {
-		super.computeScroll();
-		//mMapAnimator.computeFling();
-	}
 	
 	// This class handles two finger gestures	
 	private class ScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 		
-		// Stores the initial touch point
-		double firstX, firstY;
-		
 		// Called when two fingers first touch the screen
 		@Override
 		public boolean onScaleBegin(ScaleGestureDetector detector) {
-			// Save the initial touch point for translation movements
-			firstX = mMapController.screenToMapX(detector.getFocusX());
-			firstY = mMapController.screenToMapY(detector.getFocusY());
+			// TODO start scaling/cancel
 			return true;
 		}
 
@@ -476,19 +488,14 @@ public class MapView extends SurfaceView {
 		@Override
 		public boolean onScale(ScaleGestureDetector detector) {
 			// Zoom the map
-			// Finally works! (Don't ask me how it works...)
-			// TODO: rotation?
+			// TODO hande min zoom?
+			// TODO: rotation? https://github.com/Almeros/android-gesture-detectors
 			
-			// First translate initial focal point to the centre of map
-			mMapController.moveMapTo(firstX, firstY);
-			
-			// Then translate centre of the map to new focal point
-			double distX = detector.getFocusX() - mMapController.getScreenWidth() / 2.0;
-			double distY = detector.getFocusY() - mMapController.getScreenHeight() / 2.0;
-			mMapController.moveScreenBy(-distX, -distY);
-			
-			// Finally adjust the zoom
-			mMapController.setMapInverseScale(mMapController.getMapInverseScale() * detector.getScaleFactor());
+			// Cancel any animation
+			nativeCancelTransitions(nativeMapViewPtr);
+
+			// Scale the map
+			nativeScaleBy(nativeMapViewPtr, detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
 			
 			return true;
 		}
@@ -508,7 +515,7 @@ public class MapView extends SurfaceView {
 		@Override
 		public void onZoom(boolean zoomIn) {
 			// Zoom in or out
-			mMapAnimator.zoom(zoomIn);
+			zoom(zoomIn);
 		}
 	}
 	
@@ -528,23 +535,35 @@ public class MapView extends SurfaceView {
 			return true;
 			
 		case KeyEvent.KEYCODE_DPAD_LEFT:
+			// Cancel any animation
+			nativeCancelTransitions(nativeMapViewPtr);
+			
 			// Move left
-			//mMapController.moveScreenBy(scrollDist * mDisplayMetrics.density, 0.0);
+			nativeMoveBy(nativeMapViewPtr, scrollDist, 0.0);
 			return true;
 			
 		case KeyEvent.KEYCODE_DPAD_RIGHT:
+			// Cancel any animation
+			nativeCancelTransitions(nativeMapViewPtr);
+						
 			// Move right
-			//mMapController.moveScreenBy(-scrollDist * mDisplayMetrics.density, 0.0);
+			nativeMoveBy(nativeMapViewPtr, -scrollDist, 0.0);
 			return true;
 			
 		case KeyEvent.KEYCODE_DPAD_UP:
+			// Cancel any animation
+			nativeCancelTransitions(nativeMapViewPtr);
+
 			// Move up
-			//mMapController.moveScreenBy(0.0, scrollDist * mDisplayMetrics.density);
+			nativeMoveBy(nativeMapViewPtr, 0.0, scrollDist);
 			return true;
 			
 		case KeyEvent.KEYCODE_DPAD_DOWN:
+			// Cancel any animation
+			nativeCancelTransitions(nativeMapViewPtr);
+
 			// Move down
-			//mMapController.moveScreenBy(0.0, -scrollDist * mDisplayMetrics.density);
+			nativeMoveBy(nativeMapViewPtr, 0.0, -scrollDist);
 			return true;
 			
 		default:
@@ -562,7 +581,7 @@ public class MapView extends SurfaceView {
 		case KeyEvent.KEYCODE_ENTER:
 		case KeyEvent.KEYCODE_DPAD_CENTER:
 			// Zoom out
-			mMapAnimator.zoom(false);
+			zoom(false);
 			return true;
 			
 		default:
@@ -586,20 +605,7 @@ public class MapView extends SurfaceView {
 		case KeyEvent.KEYCODE_ENTER:
 		case KeyEvent.KEYCODE_DPAD_CENTER:
 			// Zoom in
-			mMapAnimator.zoom(true);
-			return true;
-		}
-		
-		// Check which character was pressed
-		switch (event.getUnicodeChar()) {
-		case '+':
-			// Zoom in
-			mMapAnimator.zoom(true);
-			return true;
-		
-		case '-':
-			// Zoom out
-			mMapAnimator.zoom(false);
+			zoom(true);
 			return true;
 		}
 
@@ -615,9 +621,12 @@ public class MapView extends SurfaceView {
 		switch (event.getActionMasked()) {
 		// The trackball was rotated
 		case MotionEvent.ACTION_MOVE:
+			// Cancel any animation
+			nativeCancelTransitions(nativeMapViewPtr);
+			
 			// Scroll the map
-			//mMapController.moveScreenBy(-10.0 * event.getX() * mDisplayMetrics.density, -10.0 * event.getY() * mDisplayMetrics.density);
-			mMapController.moveScreenBy(-10.0 * event.getX() * 300.0, -10.0 * event.getY() * 300.0);
+			nativeMoveBy(nativeMapViewPtr, -10.0 * event.getX(), -10.0 * event.getY());
+			
 			return true;
 
 		// Trackball was pushed in so start tracking and tell system we are interested
@@ -638,7 +647,7 @@ public class MapView extends SurfaceView {
 			// Only handle if we have not already long pressed
 			if (mCurrentTrackballLongPressTimeOut != null) {
 				// Zoom in
-				mMapAnimator.zoom(true);
+				zoom(true);
 			}
 		// Trackball was cancelled
 		case MotionEvent.ACTION_CANCEL:
@@ -675,7 +684,7 @@ public class MapView extends SurfaceView {
 			// Check if the trackball is still pressed
 			if (!cancelled) {
 				// Zoom out
-				mMapAnimator.zoom(false);
+				zoom(false);
 				
 				// Ensure the up action is not run
 				mCurrentTrackballLongPressTimeOut = null;
@@ -695,23 +704,14 @@ public class MapView extends SurfaceView {
 			switch (event.getActionMasked()) {
 			// Mouse scrolls
 			case MotionEvent.ACTION_SCROLL:
-				// Zoom the map
+				// Cancel any animation
+				nativeCancelTransitions(nativeMapViewPtr);
 
 				// Get the vertical scroll amount, one click = 1
 				float scrollDist = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
 				
-				// Then translate centre of the map to new focal point
-				double distX = event.getX() - mMapController.getScreenWidth() / 2.0;
-				double distY = event.getY() - mMapController.getScreenHeight() / 2.0;
-				
-				// First translate the hover point to the centre of map
-				mMapController.moveScreenBy(distX, distY);
-				
-				// Then adjust the zoom by the appropriate power of two factor
-				mMapController.setMapInverseScale(mMapController.getMapInverseScale() * Math.pow(2.0, scrollDist));
-				
-				// Then move the map back to the hover point
-				mMapController.moveScreenBy(-distX, -distY);
+				// Scale the map by the appropriate power of two factor
+				nativeScaleBy(nativeMapViewPtr, Math.pow(2.0, scrollDist), event.getX(), event.getY());
 				
 				return true;
 				
@@ -769,6 +769,8 @@ public class MapView extends SurfaceView {
     	super.finalize();
     }
     
+    // TODO for each function implement a wrapper that handles the pointer
+    // TODO implement all the other methods
     private native long nativeCreate(String defaultStyleJSON);
     private native void nativeDestroy(long nativeMapViewPtr);
 
@@ -783,18 +785,20 @@ public class MapView extends SurfaceView {
 
     private native void nativeResize(long nativeMapViewPtr, int width, int height);
     private native void nativeCancelTransitions(long nativeMapViewPtr);
-
+    
     // TODO use JNI on C++ side to pass back and forth lat/lng/zoom etc class?
     private native double nativeGetLon(long nativeMapViewPtr);
     private native double nativeGetLat(long nativeMapViewPtr);
     private native void nativeSetLonLat(long nativeMapViewPtr, double lon, double lat);
     private native void nativeResetPosition(long nativeMapViewPtr);
-    private native void nativeMoveBy(long nativeMapViewPtr, double dx, double dy);
+    private void nativeMoveBy(long nativeMapViewPtr, double dx, double dy) { nativeMoveBy(nativeMapViewPtr, dx, dy, 0.0); }
+    private native void nativeMoveBy(long nativeMapViewPtr, double dx, double dy, double duration);
     
     private native double nativeGetZoom(long nativeMapViewPtr);
     private native void nativeSetZoom(long nativeMapViewPtr, double zoom);
-    private void nativeScaleBy(long nativeMapViewPtr, double ds) { nativeScaleBy(nativeMapViewPtr, ds, -1.0, -1.0); }
-    private native void nativeScaleBy(long nativeMapViewPtr, double ds, double cx, double cy);
+    private void nativeScaleBy(long nativeMapViewPtr, double ds) { nativeScaleBy(nativeMapViewPtr, ds, -1.0, -1.0, 0.0); }
+    private void nativeScaleBy(long nativeMapViewPtr, double ds, double cx, double cy) { nativeScaleBy(nativeMapViewPtr, ds, cx, cy, 0.0); }
+    private native void nativeScaleBy(long nativeMapViewPtr, double ds, double cx, double cy, double duration);
     
     private native double nativeGetAngle(long nativeMapViewPtr);
     private native void nativeSetAngle(long nativeMapViewPtr, double angle);
