@@ -140,11 +140,11 @@ extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeSetZoom
     native_map_view->getMap()->setZoom(zoom);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeScaleBy(JNIEnv* env, jclass clazz, jlong native_map_view_ptr, jdouble ds, jdouble cx, jdouble cy) {
+extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeScaleBy(JNIEnv* env, jclass clazz, jlong native_map_view_ptr, jdouble ds, jdouble cx, jdouble cy, jdouble duration) {
 	VERBOSE("nativeScaleBy");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->scaleBy(ds, cx, cy);
+    native_map_view->getMap()->scaleBy(ds, cx, cy, duration);
 }
 
 extern "C" JNIEXPORT jdouble JNICALL Java_com_mapbox_mapboxgl_MapView_nativeGetAngle(JNIEnv* env, jclass clazz, jlong native_map_view_ptr) {
