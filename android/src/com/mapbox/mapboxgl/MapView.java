@@ -406,9 +406,6 @@ public class MapView extends SurfaceView {
 			if (mZoomButtonsController != null) {
 				mZoomButtonsController.setVisible(true);
 			}
-
-			// Cancel any animation
-			nativeCancelTransitions(nativeMapViewPtr);
 			
 			return true;
 		}
@@ -419,6 +416,14 @@ public class MapView extends SurfaceView {
 			// Single finger double tap
 			// Zoom in
 			zoom(true, e.getX(), e.getY());
+			return true;
+		}
+		
+		@Override
+		public boolean onSingleTapUp(MotionEvent e) {
+			// Cancel any animation
+			nativeCancelTransitions(nativeMapViewPtr);
+			
 			return true;
 		}
 		
