@@ -8,7 +8,10 @@ GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {
 #endif
 }
 
-GLFWView::~GLFWView() { glfwTerminate(); }
+GLFWView::~GLFWView() {
+    map->terminate();
+    glfwTerminate();
+}
 
 void GLFWView::initialize(mbgl::Map *map) {
     View::initialize(map);

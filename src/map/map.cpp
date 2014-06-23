@@ -153,6 +153,12 @@ void Map::cleanup(uv_async_t *async) {
     map->painter.cleanup();
 }
 
+void Map::terminate() {
+    view.make_active();
+    painter.terminate();
+    view.make_inactive();
+}
+
 void Map::render(uv_async_t *async) {
     Map *map = static_cast<Map *>(async->data);
 
