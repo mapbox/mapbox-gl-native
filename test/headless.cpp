@@ -29,6 +29,14 @@ public:
             fprintf(stderr, "Switching OpenGL context failed\n");
         }
     }
+
+    void make_inactive() {
+        CGLError error = CGLSetCurrentContext(nullptr);
+        if (error) {
+            fprintf(stderr, "Removing OpenGL context failed\n");
+        }
+    }
+
     void swap() {}
 
 CGLContextObj gl_context;
