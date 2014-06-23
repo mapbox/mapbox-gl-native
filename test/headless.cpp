@@ -158,6 +158,9 @@ TEST(Headless, initialize) {
     glDeleteTextures(1, &fbo_color);
     glDeleteRenderbuffersEXT(1, &fbo_depth_stencil);
 
+    map.terminate();
+
+    CGLSetCurrentContext(nullptr);
     CGLDestroyContext(view.gl_context);
 
     timer.report("destruct");
