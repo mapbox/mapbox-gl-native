@@ -99,6 +99,8 @@ void Map::run() {
     if (!async) {
         render();
     }
+
+    view.make_inactive();
 }
 
 void Map::rerender() {
