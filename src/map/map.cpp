@@ -173,6 +173,8 @@ void Map::run() {
         map_thread = -1;
 #endif
     }
+
+    view.make_inactive();
 }
 
 void Map::rerender() {

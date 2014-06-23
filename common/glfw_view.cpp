@@ -198,6 +198,10 @@ void GLFWView::notify() {
     glfwPostEmptyEvent();
 }
 
+void GLFWView::make_inactive() {
+    glfwMakeContextCurrent(nullptr);
+}
+
 void GLFWView::swap() {
     glfwPostEmptyEvent();
 

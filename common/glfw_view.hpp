@@ -19,6 +19,7 @@ public:
     void make_active();
     void notify();
     void notify_map_change(mbgl::MapChange change, mbgl::timestamp delay = 0);
+    void make_inactive();
 
     static void key(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void scroll(GLFWwindow *window, double xoffset, double yoffset);
