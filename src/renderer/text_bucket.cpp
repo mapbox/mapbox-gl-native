@@ -22,7 +22,7 @@ using namespace llmr;
 TextBucket::TextBucket(
     TextVertexBuffer &vertexBuffer,
     TriangleElementsBuffer &triangleElementsBuffer,
-    const BucketTextDescription &properties, Placement &placement)
+    const StyleBucketText &properties, Placement &placement)
     : properties(properties),
       vertexBuffer(vertexBuffer),
       triangleElementsBuffer(triangleElementsBuffer),
@@ -124,9 +124,9 @@ void TextBucket::addFeature(const pbf &geom_pbf,
     }
 }
 
-void TextBucket::render(Painter &painter, const std::string &layer_name,
+void TextBucket::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc,
                         const Tile::ID &id) {
-    painter.renderText(*this, layer_name, id);
+    painter.renderText(*this, layer_desc, id);
 }
 
 bool TextBucket::hasData() const {

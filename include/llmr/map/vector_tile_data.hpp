@@ -29,8 +29,8 @@ public:
     virtual void beforeParse();
     virtual void parse();
     virtual void afterParse();
-    virtual void render(Painter &painter, const LayerDescription& layer_desc);
-    virtual bool hasData(const LayerDescription& layer_desc) const;
+    virtual void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc);
+    virtual bool hasData(std::shared_ptr<StyleLayer> layer_desc) const;
 
 protected:
     // Holds the actual geometries in this tile.

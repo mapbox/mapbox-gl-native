@@ -245,7 +245,7 @@ void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
 }
 
 void Placement::addFeature(TextBucket &bucket, const std::vector<Coordinate> &line,
-                           const BucketTextDescription &info, const GlyphPositions &face,
+                           const StyleBucketText &info, const GlyphPositions &face,
                            const Shaping &shaping) {
     const bool horizontal = info.path == TextPathType::Horizontal;
     const float fontScale = (tileExtent / util::tileSize) / (glyphSize / info.max_size);

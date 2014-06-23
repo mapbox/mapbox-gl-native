@@ -102,9 +102,9 @@ VectorTileLayer::VectorTileLayer(pbf layer) : data(layer) {
     }
 }
 
-FilteredVectorTileLayer::FilteredVectorTileLayer(const VectorTileLayer& layer, const BucketDescription& bucket_desc)
+FilteredVectorTileLayer::FilteredVectorTileLayer(const VectorTileLayer& layer, const PropertyFilterExpression &filterExpression)
     : layer(layer),
-      bucket_desc(bucket_desc) {
+      filterExpression(filterExpression) {
 }
 
 FilteredVectorTileLayer::iterator FilteredVectorTileLayer::begin() const {
@@ -193,7 +193,7 @@ bool FilteredVectorTileLayer::iterator::matchesExpression(const PropertyExpressi
 void FilteredVectorTileLayer::iterator::operator++() {
     valid = false;
 
-    const PropertyFilterExpression &expression = parent.bucket_desc.filter;
+    const PropertyFilterExpression &expression = parent.filterExpression;
 
     while (data.next(2)) { // feature
         feature = data.message();
@@ -203,7 +203,7 @@ void FilteredVectorTileLayer::iterator::operator++() {
         bool matched = false;
 
         // Treat the absence of any expression filters as a match.
-        if (expression.is<std::true_type>()) {
+        if (!expression.valid() || expression.is<std::true_type>()) {
             matched = true;
         }
 
@@ -228,10 +228,11 @@ void FilteredVectorTileLayer::iterator::operator++() {
                     default:                 type = BucketType::None; break;
                 }
 
-                if (type != parent.bucket_desc.feature_type) {
-                    matched = false;
-                    break; // feature_pbf loop early
-                }
+                // TODO: Parse feature type
+//                if (type != parent.bucket_desc.feature_type) {
+//                    matched = false;
+//                    break; // feature_pbf loop early
+//                }
             } else {
                 feature_pbf.skip();
             }

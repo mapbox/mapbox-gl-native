@@ -32,6 +32,10 @@ public:
         return pos / itemSize;
     }
 
+    inline bool empty() const {
+        return pos == 0;
+    }
+
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
     void bind(bool force = false) {
         if (buffer == 0) {

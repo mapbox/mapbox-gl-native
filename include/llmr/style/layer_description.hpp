@@ -5,17 +5,17 @@
 #include <vector>
 
 namespace llmr {
-
-class LayerDescription {
-public:
-    std::string name;
-    std::string bucket_name;
-    std::vector<LayerDescription> child_layer;
-
-    size_t size() const;
-};
-
-std::ostream& operator<<(std::ostream&, const LayerDescription& layer);
+//
+//class LayerDescription {
+//public:
+//    std::string name;
+//    std::string bucket_name;
+//    std::vector<LayerDescription> child_layer;
+//
+//    size_t size() const;
+//};
+//
+//std::ostream& operator<<(std::ostream&, const LayerDescription& layer);
 
 }
 

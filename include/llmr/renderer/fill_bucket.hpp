@@ -41,10 +41,10 @@ public:
     FillBucket(FillVertexBuffer& vertexBuffer,
                TriangleElementsBuffer& triangleElementsBuffer,
                LineElementsBuffer& lineElementsBuffer,
-               const BucketFillDescription& properties);
+               const StyleBucketFill& properties);
     ~FillBucket();
 
-    virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
+    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
     virtual bool hasData() const;
 
     void addGeometry(pbf& data);
@@ -55,7 +55,7 @@ public:
     void drawVertices(OutlineShader& shader);
 
 public:
-    const BucketFillDescription &properties;
+    const StyleBucketFill &properties;
 
 private:
     TESSalloc *allocator;

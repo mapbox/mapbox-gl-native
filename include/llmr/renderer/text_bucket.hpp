@@ -28,9 +28,9 @@ public:
     TextBucket(
         TextVertexBuffer &vertexBuffer,
         TriangleElementsBuffer &triangleElementsBuffer,
-        const BucketTextDescription &properties, Placement &placement);
+        const StyleBucketText &properties, Placement &placement);
 
-    virtual void render(Painter &painter, const std::string &layer_name, const Tile::ID &id);
+    virtual void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id);
     virtual bool hasData() const;
 
     void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
@@ -43,7 +43,7 @@ public:
     void drawGlyphs(TextShader &shader);
 
 public:
-    const BucketTextDescription &properties;
+    const StyleBucketText &properties;
 
 private:
     TextVertexBuffer& vertexBuffer;

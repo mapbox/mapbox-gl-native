@@ -67,14 +67,14 @@ public:
     };
 
 public:
-    FilteredVectorTileLayer(const VectorTileLayer& layer, const BucketDescription& bucket_desc);
+    FilteredVectorTileLayer(const VectorTileLayer& layer, const PropertyFilterExpression &filterExpression);
 
     iterator begin() const;
     iterator end() const;
 
 private:
     const VectorTileLayer& layer;
-    const BucketDescription& bucket_desc;
+    const PropertyFilterExpression& filterExpression;
 };
 
 std::ostream& operator<<(std::ostream&, const GlyphPlacement& placement);

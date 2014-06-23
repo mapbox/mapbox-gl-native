@@ -24,6 +24,7 @@
 #include <llmr/map/transform_state.hpp>
 
 #include <map>
+#include <unordered_map>
 
 namespace llmr {
 
@@ -41,8 +42,6 @@ class RasterBucket;
 
 class LayerDescription;
 class RasterTileData;
-
-typedef std::map<std::string, const std::unique_ptr<Source>> Sources;
 
 class Painter : private util::noncopyable {
 public:
@@ -64,7 +63,7 @@ public:
     void changeMatrix();
 
     // Renders a particular layer from a tile.
-    void renderTileLayer(const Tile& tile, const LayerDescription &layer_desc);
+    void renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
@@ -79,15 +78,15 @@ public:
     void renderDebugText(DebugBucket& bucket);
     void renderDebugText(const std::vector<std::string> &strings);
     void renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &mat);
-    void renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id);
-    void renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id);
-    void renderIcon(IconBucket& bucket, const std::string& layer_name, const Tile::ID& id);
-    void renderText(TextBucket& bucket, const std::string& layer_name, const Tile::ID& id);
-    void renderRaster(RasterBucket& bucket, const std::string& layer_name, const Tile::ID& id);
+    void renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    void renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    void renderIcon(IconBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    void renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
 
     void preparePrerender(PrerenderedTexture &texture);
     void finishPrerender(PrerenderedTexture &texture);
-    void renderPrerenderedTexture(PrerenderedTexture &texture, const GenericProperties &properties);
+//    void renderPrerenderedTexture(PrerenderedTexture &texture, const GenericProperties &properties);
 
     void resize();
 
@@ -101,7 +100,7 @@ public:
     // Configures the painter strata that is used for early z-culling of fragments.
     void setStrata(float strata);
 
-    void drawClippingMasks(const Sources &sources);
+    void drawClippingMasks(const std::set<std::shared_ptr<Source>> &sources);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
 
     void clearFramebuffers();
@@ -115,7 +114,7 @@ public:
     bool needsAnimation() const;
 private:
     void setupShaders();
-    const mat4 &translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchor anchor = TranslateAnchor::Map);
+    const mat4 &translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = parseTranslateAnchorType());
 
     void prepareTile(const Tile& tile);
 

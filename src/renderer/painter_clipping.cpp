@@ -6,7 +6,7 @@
 
 using namespace llmr;
 
-void Painter::drawClippingMasks(const Sources &sources) {
+void Painter::drawClippingMasks(const std::set<std::shared_ptr<Source>> &sources) {
     gl::group group("clipping masks");
 
     useProgram(plainShader->program);
@@ -15,22 +15,15 @@ void Painter::drawClippingMasks(const Sources &sources) {
     glDepthRange(1.0f, 1.0f);
     glStencilMask(0xFF);
 
-    const BackgroundProperties &properties = map.getStyle()->computed.background;
-    Color background = properties.color;
-    const float opacity = properties.opacity;
-    background[0] *= opacity;
-    background[1] *= opacity;
-    background[2] *= opacity;
-    background[3] *= opacity;
-    plainShader->setColor(background);
+//    std::shared_ptr<StyleLayer> background_layer = map.getStyle()->background;
+//    const BackgroundProperties &properties = background_layer ? background_layer->getProperties<BackgroundProperties>() : defaultStyleProperties<BackgroundProperties>();
+    const BackgroundProperties &properties = defaultStyleProperties<BackgroundProperties>();
+    plainShader->setColor(properties.color);
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 
-    for (const auto &pair : sources) {
-        Source &source = *pair.second;
-        if (source.enabled) {
-            source.drawClippingMasks();
-        }
+    for (const std::shared_ptr<Source> &source : sources) {
+        source->drawClippingMasks(*this);
     }
 
     glEnable(GL_DEPTH_TEST);

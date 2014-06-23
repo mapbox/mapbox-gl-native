@@ -116,7 +116,7 @@ void Painter::pushFramebuffer() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glColorMask(false, false, false, false);
 
-        drawClippingMasks(map.getSources());
+        drawClippingMasks(map.getStyle()->getActiveSources());
 
         glColorMask(true, true, true, true);
         fbo_depth_stencil_valid = true;

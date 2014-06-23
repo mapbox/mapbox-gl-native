@@ -1,6 +1,6 @@
 #include <llmr/map/map.hpp>
 #include <llmr/map/raster_tile_data.hpp>
-#include <llmr/style/layer_description.hpp>
+#include <llmr/style/style.hpp>
 
 using namespace llmr;
 
@@ -25,10 +25,10 @@ void RasterTileData::parse() {
     }
 }
 
-void RasterTileData::render(Painter &painter, const LayerDescription& layer_desc) {
-    bucket.render(painter, layer_desc.name, id);
+void RasterTileData::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc) {
+    bucket.render(painter, layer_desc, id);
 }
 
-bool RasterTileData::hasData(const LayerDescription& layer_desc) const {
+bool RasterTileData::hasData(std::shared_ptr<StyleLayer> layer_desc) const {
     return bucket.hasData();
 }

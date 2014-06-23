@@ -78,15 +78,8 @@ void GLFWView::key(GLFWwindow *window, int key, int /*scancode*/, int action, in
             break;
         case GLFW_KEY_R:
             if (!mods) {
-                std::set<std::string> newAppliedClasses;
-                if (view->map->getAppliedClasses().count("night")) {
-                    newAppliedClasses.insert("default");
-                } else {
-                    newAppliedClasses.insert("default");
-                    newAppliedClasses.insert(newAppliedClasses.end(), "night");
-                }
                 view->map->setDefaultTransitionDuration(300);
-                view->map->setAppliedClasses(newAppliedClasses);
+                view->map->toggleClass("night");
             }
             break;
         case GLFW_KEY_N:
