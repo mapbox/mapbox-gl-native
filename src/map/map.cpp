@@ -114,6 +114,8 @@ void Map::run() {
         prepare();
         render();
     }
+
+    view.make_inactive();
 }
 
 void Map::rerender() {

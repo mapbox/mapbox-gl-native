@@ -179,6 +179,19 @@ void HeadlessView::make_active() {
 #endif
 }
 
+void HeadlessView::make_inactive() {
+#if MBGL_USE_CGL
+    CGLError error = CGLSetCurrentContext(nullptr);
+    if (error) {
+        fprintf(stderr, "Removing OpenGL context failed\n");
+    }
+#endif
+
+#if MBGL_USE_GLX
+    // no-op
+#endif
+}
+
 void HeadlessView::swap() {}
 
 unsigned int HeadlessView::root_fbo() {

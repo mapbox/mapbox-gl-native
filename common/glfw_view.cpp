@@ -192,6 +192,10 @@ void GLFWView::make_active() {
     glfwMakeContextCurrent(window);
 }
 
+void GLFWView::make_inactive() {
+    glfwMakeContextCurrent(nullptr);
+}
+
 void GLFWView::swap() {
     glfwPostEmptyEvent();
 
