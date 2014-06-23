@@ -57,6 +57,7 @@ public:
     // lazy initialization) in case rendering continues.
     void cleanup();
 
+    void terminate();
 
     void clear();
 
@@ -115,6 +116,7 @@ public:
     bool needsAnimation() const;
 private:
     void setupShaders();
+    void deleteShaders();
     const mat4 &translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchor anchor = TranslateAnchor::Map);
 
     void prepareTile(const Tile& tile);

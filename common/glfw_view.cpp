@@ -6,7 +6,10 @@ GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {
 #endif
 }
 
-GLFWView::~GLFWView() { glfwTerminate(); }
+GLFWView::~GLFWView() {
+    map->terminate();
+    glfwTerminate();
+}
 
 void GLFWView::initialize(llmr::Map *map) {
     View::initialize(map);
