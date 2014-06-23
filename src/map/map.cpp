@@ -223,6 +223,12 @@ void Map::setReachability(bool reachable) {
     }
 }
 
+void Map::terminate() {
+    view.make_active();
+    painter.terminate();
+    view.make_inactive();
+}
+
 void Map::render(uv_async_t *async) {
     Map *map = static_cast<Map *>(async->data);
     assert(uv_thread_self() == map->map_thread);
