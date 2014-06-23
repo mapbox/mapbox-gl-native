@@ -18,6 +18,7 @@ public:
     void swap();
     void make_active();
     void notify();
+    void make_inactive();
     void notify_map_change(mbgl::MapChange change, mbgl::timestamp delay = 0);
     void make_inactive();
 

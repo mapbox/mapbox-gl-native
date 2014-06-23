@@ -24,6 +24,7 @@ public:
     void notify();
     void notify_map_change(MapChange change, timestamp delay = 0);
     void make_active();
+    void make_inactive();
     void swap();
     unsigned int root_fbo();
 
