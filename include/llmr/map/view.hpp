@@ -24,6 +24,9 @@ public:
     // thread. This is called once just before the rendering thread terminates.
     virtual void make_inactive() = 0;
 
+    // Notifies a watcher of map x/y/scale/rotation changes.
+    virtual void notify_map_change() = 0;
+
 protected:
     llmr::Map *map = nullptr;
 };

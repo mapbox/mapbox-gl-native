@@ -11,16 +11,6 @@
 #include <fstream>
 #include <sstream>
 
-
-namespace llmr {
-namespace platform {
-
-void notify_map_change() {
-    // no-op
-}
-
-}}
-
 class View : public llmr::View {
 public:
     void make_active() {
@@ -37,7 +27,13 @@ public:
         }
     }
 
-    void swap() {}
+    void swap() {
+        // no-op
+    }
+
+    void notify_map_change() {
+        // no-op
+    }
 
 CGLContextObj gl_context;
 };

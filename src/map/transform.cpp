@@ -14,7 +14,7 @@ const double R2D = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
 const double MIN_ROTATE_SCALE = 8;
 
-Transform::Transform() {
+Transform::Transform(View &view) : view(view) {
     setScale(current.scale);
     setAngle(current.angle);
 }
@@ -35,7 +35,7 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         current.framebuffer[1] = final.framebuffer[1] = fb_h;
         if (!canRotate() && current.angle) _setAngle(0);
         constrain(current.scale, current.y);
-        platform::notify_map_change();
+        view.notify_map_change();
         return true;
     } else {
         return false;
@@ -76,7 +76,7 @@ void Transform::_moveBy(const double dx, const double dy, const time duration) {
             std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
     }
 
-    platform::notify_map_change();
+    view.notify_map_change();
 }
 
 void Transform::setLonLat(const double lon, const double lat, const time duration) {
@@ -294,7 +294,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     Bc = s / 360;
     Cc = s / (2 * M_PI);
 
-    platform::notify_map_change();
+    view.notify_map_change();
 }
 
 #pragma mark - Constraints
@@ -388,7 +388,7 @@ void Transform::_setAngle(double new_angle, const time duration) {
             current.angle, final.angle, current.angle, start, duration));
     }
 
-    platform::notify_map_change();
+    view.notify_map_change();
 }
 
 double Transform::getAngle() const {
