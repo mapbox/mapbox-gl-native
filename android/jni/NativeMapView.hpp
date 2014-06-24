@@ -10,7 +10,10 @@
 #include <EGL/egl.h>
 
 #include <llmr/llmr.hpp>
-// TODO put in namespace llmr::android
+
+namespace llmr {
+namespace android {
+
 class LLMRView;
 
 class NativeMapView {
@@ -77,5 +80,8 @@ public:
 private:
     NativeMapView* nativeView = nullptr;
 };
+
+} // namespace android
+} // namespace llmr
 
 #endif // MAP_VIEW_HPP
