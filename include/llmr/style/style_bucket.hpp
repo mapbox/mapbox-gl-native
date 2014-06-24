@@ -6,6 +6,8 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/util/variant.hpp>
 
+#include <memory>
+
 namespace llmr {
 
 class Source;
