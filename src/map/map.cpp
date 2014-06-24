@@ -18,7 +18,7 @@ using namespace llmr;
 
 Map::Map(View& view)
     : view(view),
-      transform(),
+      transform(view),
       style(std::make_shared<Style>()),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
       glyphStore(std::make_shared<GlyphStore>()),
@@ -141,7 +141,6 @@ void Map::cleanup(uv_async_t *async) {
 void Map::terminate() {
     view.make_active();
     painter.terminate();
-    view.make_inactive();
 }
 
 void Map::render(uv_async_t *async) {

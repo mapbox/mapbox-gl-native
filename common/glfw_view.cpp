@@ -210,6 +210,10 @@ void GLFWView::swap() {
     glfwPostEmptyEvent();
 }
 
+void GLFWView::notify_map_change() {
+    // no-op
+}
+
 void GLFWView::fps() {
     static int frames = 0;
     static double time_elapsed = 0;
@@ -296,10 +300,6 @@ void show_color_debug_image(std::string name, const char *data, size_t logical_w
     glfwMakeContextCurrent(current_window);
 }
 #endif
-
-void notify_map_change() {
-    // no-op
-}
 
 }
 }
