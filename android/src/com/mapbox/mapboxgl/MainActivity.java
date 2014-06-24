@@ -22,6 +22,20 @@ public class MainActivity extends Activity {
         // TODO wrapper fragment?
 		mMapView.onCreate(savedInstanceState);
     }
+    
+    @Override
+    protected void onStart() {
+    	super.onStart();
+        Log.v(TAG, "onStart");
+        mMapView.onStart();
+    }
+    
+    @Override
+    protected void onStop() {
+    	super.onStop();
+        Log.v(TAG, "onStop");
+        mMapView.onStop();
+    }
 
     @Override
     protected void onPause() {

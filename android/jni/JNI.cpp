@@ -31,11 +31,12 @@ extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeDestroy
     delete native_map_view;
     native_map_view = nullptr;
 }
-extern "C" JNIEXPORT jboolean JNICALL Java_com_mapbox_mapboxgl_MapView_nativeInitializeContext(JNIEnv* env, jclass clazz, jlong native_map_view_ptr, jobject surface) {
+
+extern "C" JNIEXPORT jboolean JNICALL Java_com_mapbox_mapboxgl_MapView_nativeInitializeContext(JNIEnv* env, jclass clazz, jlong native_map_view_ptr) {
 	VERBOSE("nativeInitializeContext");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return native_map_view->initializeContext(ANativeWindow_fromSurface(env, surface));
+    return native_map_view->initializeContext();
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeTerminateContext(JNIEnv* env, jclass clazz, jlong native_map_view_ptr) {
@@ -43,6 +44,20 @@ extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeTermina
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     native_map_view->terminateContext();
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_com_mapbox_mapboxgl_MapView_nativeCreateSurface(JNIEnv* env, jclass clazz, jlong native_map_view_ptr, jobject surface) {
+	VERBOSE("nativeCreateSurface");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    return native_map_view->createSurface(ANativeWindow_fromSurface(env, surface));
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeDestroySurface(JNIEnv* env, jclass clazz, jlong native_map_view_ptr) {
+	VERBOSE("nativeDestroySurface");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->destroySurface();
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeStart(JNIEnv* env, jclass clazz, jlong native_map_view_ptr) {
@@ -59,11 +74,11 @@ extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeStop(JN
     native_map_view->stop();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeUpdateAndWait(JNIEnv* env, jclass clazz, jlong native_map_view_ptr) {
-	VERBOSE("nativeUpdateAndWait");
+extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeUpdate(JNIEnv* env, jclass clazz, jlong native_map_view_ptr) {
+	VERBOSE("nativeUpdate");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->updateAndWait();
+    native_map_view->getMap()->update();
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_mapbox_mapboxgl_MapView_nativeCleanup(JNIEnv* env, jclass clazz, jlong native_map_view_ptr) {

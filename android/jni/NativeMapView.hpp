@@ -18,18 +18,19 @@ public:
     NativeMapView(std::string default_style_json);
     ~NativeMapView();
 
-    llmr::Map* getMap() { return map; };
+    llmr::Map* getMap() const { return map; };
 
-    bool initializeContext(ANativeWindow* window);
+    bool initializeContext();
     void terminateContext();
+
+    bool createSurface(ANativeWindow* window);
+    void destroySurface();
 
     void start();
     void stop();
 
-    void updateAndWait();
-
 private:
-    int chooseConfig(const EGLConfig configs[], EGLint num_configs);
+    EGLConfig chooseConfig(const EGLConfig configs[], EGLint num_configs, bool use565) const;
 
 private:
     llmr::Map* map = nullptr;
@@ -40,6 +41,9 @@ private:
     EGLDisplay display = EGL_NO_DISPLAY;
     EGLSurface surface = EGL_NO_SURFACE;
     EGLContext context = EGL_NO_CONTEXT;
+
+    EGLConfig config = nullptr;
+    EGLint format = -1;
 
     std::string default_style_json;
 };
@@ -53,6 +57,7 @@ public:
 	//void notify_map_change();
 
 	void make_active() override;
+	void make_inactive() override;
 
 	void swap() override;
 

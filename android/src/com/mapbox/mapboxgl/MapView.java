@@ -263,6 +263,23 @@ public class MapView extends SurfaceView {
     	outState.putBoolean(STATE_ROTATE_ENABLED, isRotateEnabled());
     	outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
     }
+    
+    // Called when we need to create the GL context
+    // Must be called from Activity onStart
+    public void onStart() {
+        Log.v(TAG, "onStart");
+        if (!nativeInitializeContext(nativeMapViewPtr)) {
+            Log.e(TAG, "nativeInitializeContext failed");
+            throw new RuntimeException("Unable to initialize GL context.");
+        }
+    }
+   
+    // Called when we need to terminate the GL context
+    // Must be called from Activity onPause
+    public void onStop() {
+        Log.v(TAG, "onStop");
+        nativeTerminateContext(nativeMapViewPtr);
+    }
 
     // Called when we need to stop the render thread
     // Must be called from Activity onPause
@@ -270,14 +287,14 @@ public class MapView extends SurfaceView {
         Log.v(TAG, "onPause");
         nativeStop(nativeMapViewPtr);
     }
-
+    
     // Called when we need to start the render thread
     // Must be called from Activity onResume
     public void onResume() {
         Log.v(TAG, "onResume");
         nativeStart(nativeMapViewPtr);
     }
-    
+
     // This class handles SurfaceHolder callbacks
     private class Callbacks implements SurfaceHolder.Callback2 {
     	
@@ -286,7 +303,7 @@ public class MapView extends SurfaceView {
         @Override
         public void surfaceRedrawNeeded(SurfaceHolder holder) {
             Log.v(TAG, "surfaceRedrawNeeded");
-            nativeUpdateAndWait(nativeMapViewPtr);
+            nativeUpdate(nativeMapViewPtr);
         }
 
         // Called when the native surface buffer has been created
@@ -294,9 +311,9 @@ public class MapView extends SurfaceView {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             Log.v(TAG, "surfaceCreated");
-            if (!nativeInitializeContext(nativeMapViewPtr, holder.getSurface())) {
+            if (!nativeCreateSurface(nativeMapViewPtr, holder.getSurface())) {
                 Log.e(TAG, "nativeInitializeContext failed");
-                throw new RuntimeException("Unable to initialize GL context.");
+                throw new RuntimeException("Unable to create GL surface.");
             }
         }
 
@@ -305,7 +322,7 @@ public class MapView extends SurfaceView {
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
             Log.v(TAG, "surfaceDestroyed");
-            nativeTerminateContext(nativeMapViewPtr);
+            nativeDestroySurface(nativeMapViewPtr);
         }
 
         // Called when the format or size of the native surface buffer has been changed
@@ -779,13 +796,16 @@ public class MapView extends SurfaceView {
     private native long nativeCreate(String defaultStyleJSON);
     private native void nativeDestroy(long nativeMapViewPtr);
 
-    private native boolean nativeInitializeContext(long nativeMapViewPtr, Surface surface);
+    private native boolean nativeInitializeContext(long nativeMapViewPtr);
     private native void nativeTerminateContext(long nativeMapViewPtr);
 
+    private native boolean nativeCreateSurface(long nativeMapViewPtr, Surface surface);
+    private native void nativeDestroySurface(long nativeMapViewPtr);
+    
     private native void nativeStart(long nativeMapViewPtr);
     private native void nativeStop(long nativeMapViewPtr);
     
-    private native void nativeUpdateAndWait(long nativeMapViewPtr);
+    private native void nativeUpdate(long nativeMapViewPtr);
     private native void nativeCleanup(long nativeMapViewPtr);
 
     private native void nativeResize(long nativeMapViewPtr, int width, int height);
