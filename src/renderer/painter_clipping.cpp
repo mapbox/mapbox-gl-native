@@ -12,13 +12,9 @@ void Painter::drawClippingMasks(const std::set<std::shared_ptr<Source>> &sources
     useProgram(plainShader->program);
     glDisable(GL_DEPTH_TEST);
     depthMask(false);
+    glColorMask(false, false, false, false);
     glDepthRange(1.0f, 1.0f);
     glStencilMask(0xFF);
-
-//    std::shared_ptr<StyleLayer> background_layer = map.getStyle()->background;
-//    const BackgroundProperties &properties = background_layer ? background_layer->getProperties<BackgroundProperties>() : defaultStyleProperties<BackgroundProperties>();
-    const BackgroundProperties &properties = defaultStyleProperties<BackgroundProperties>();
-    plainShader->setColor(properties.color);
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 
@@ -27,6 +23,7 @@ void Painter::drawClippingMasks(const std::set<std::shared_ptr<Source>> &sources
     }
 
     glEnable(GL_DEPTH_TEST);
+    glColorMask(true, true, true, true);
     depthMask(true);
     glStencilMask(0x0);
 }

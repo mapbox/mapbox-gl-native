@@ -135,13 +135,11 @@ void Painter::clear() {
     gl::group group("clear");
     glStencilMask(0xFF);
     depthMask(true);
-#ifdef NVIDIA
-    // We're painting in a way that allows us to skip clearing the color buffer.
-    // On Tegra hardware, this is faster.
-    glClear(GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#else
+
+    std::shared_ptr<StyleLayer> background_layer = map.getStyle()->background;
+    const BackgroundProperties &properties = background_layer ? background_layer->getProperties<BackgroundProperties>() : defaultStyleProperties<BackgroundProperties>();
+    glClearColor(properties.color[0], properties.color[1], properties.color[2], properties.color[3]);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#endif
 }
 
 void Painter::setOpaque() {
