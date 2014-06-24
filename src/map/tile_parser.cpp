@@ -108,19 +108,14 @@ std::unique_ptr<Bucket> TileParser::createBucket(std::shared_ptr<StyleBucket> bu
     if (layer_it != vector_data.layers.end()) {
         const VectorTileLayer &layer = layer_it->second;
         if (bucket_desc->render.is<StyleBucketFill>()) {
-            fprintf(stderr, "create fill bucket\n");
             return createFillBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketFill>());
         } else if (bucket_desc->render.is<StyleBucketLine>()) {
-            fprintf(stderr, "create line bucket\n");
             return createLineBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketLine>());
         } else if (bucket_desc->render.is<StyleBucketIcon>()) {
-            fprintf(stderr, "create icon bucket\n");
             return createIconBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketIcon>());
         } else if (bucket_desc->render.is<StyleBucketText>()) {
-            fprintf(stderr, "create text bucket\n");
             return createTextBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketText>());
         } else if (bucket_desc->render.is<StyleBucketRaster>()) {
-            fprintf(stderr, "create raster bucket\n");
             return nullptr;
         } else {
             fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s'\n", bucket_desc->source_layer.c_str());
