@@ -446,19 +446,7 @@ void NativeMapView::notifyMapChange() {
         return;
     }
 
-    jclass clazz = env->GetObjectClass(this->obj);
-    if (clazz == nullptr) {
-        env->ExceptionDescribe();
-        return;
-    }
-
-    jmethodID id = env->GetMethodID(clazz, "onMapChanged", "()V");
-    if (id == nullptr) {
-        env->ExceptionDescribe();
-        return;
-    }
-
-    env->CallVoidMethod(obj, id);
+    env->CallVoidMethod(obj, on_map_changed_id);
     if (env->ExceptionCheck() != JNI_FALSE) {
         env->ExceptionDescribe();
         return;

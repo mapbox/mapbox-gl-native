@@ -8,7 +8,6 @@ import org.apache.commons.io.IOUtils;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -17,7 +16,6 @@ import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -36,7 +34,8 @@ public class MapView extends SurfaceView {
     private static final String TAG = "MapView";
 
     // Used for saving instance state
-    private static final String STATE_CENTER_LOCATION = "centerLocation";
+    private static final String STATE_CENTER_COORDINATE = "centerCoordinate";
+    private static final String STATE_CENTER_DIRECTION = "centerDirection";
     private static final String STATE_ZOOM_LEVEL = "zoomLevel";
     private static final String STATE_ZOOM_ENABLED = "zoomEnabled";
     private static final String STATE_SCROLL_ENABLED = "scrollEnabled";
@@ -47,8 +46,8 @@ public class MapView extends SurfaceView {
     // Instance members
     //
 
-    // Holds the pointer to JNI NativeMapView
-    private long nativeMapViewPtr = 0;
+    // Used to call JNI NativeMapView
+    private NativeMapView mNativeMapView;
 
     // Used to style the map
     private String mDefaultStyleJSON;
@@ -111,7 +110,7 @@ public class MapView extends SurfaceView {
         }
 
         // Create the NativeMapView
-        nativeMapViewPtr = nativeCreate(mDefaultStyleJSON);
+        mNativeMapView = new NativeMapView(this, mDefaultStyleJSON);
 
         // Load attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
@@ -122,16 +121,13 @@ public class MapView extends SurfaceView {
                     R.styleable.MapView_centerLongitude, 0.0f);
             double centerLatitude = typedArray.getFloat(
                     R.styleable.MapView_centerLatitude, 0.0f);
-            float direction = typedArray.getFloat(
-                    R.styleable.MapView_direction, 0.0f);
-            Location centerLocation = new Location(TAG);
-            centerLocation.setLongitude(centerLongitude);
-            centerLocation.setLatitude(centerLatitude);
-            centerLocation.setBearing(direction);
-            setCenterLocation(centerLocation); // TODO set zoom to min zoom on
-                                               // load
+            LonLat centerCoordinate = new LonLat(centerLongitude,
+                    centerLatitude);
+            setCenterCoordinate(centerCoordinate);
+            setDirection(typedArray.getFloat(R.styleable.MapView_direction,
+                    0.0f));
             setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoomLevel,
-                    0.0f)); // TODO these don't work?
+                    0.0f));
             setZoomEnabled(typedArray.getBoolean(
                     R.styleable.MapView_zoomEnabled, true));
             setScrollEnabled(typedArray.getBoolean(
@@ -182,35 +178,36 @@ public class MapView extends SurfaceView {
     // Property methods
     //
 
-    // TODO replace with custom lat/lon/dir class or use one from mapbox droid
-    // sdk
-    public Location getCenterLocation() {
-        Location centerLocation = new Location(TAG);
-        centerLocation.setLongitude(nativeGetLon(nativeMapViewPtr));
-        centerLocation.setLatitude(nativeGetLat(nativeMapViewPtr));
-        centerLocation.setBearing((float) nativeGetAngle(nativeMapViewPtr));
-        return centerLocation;
+    public LonLat getCenterCoordinate() {
+        return mNativeMapView.getLonLat();
     }
 
-    public void setCenterLocation(Location centerLocation) {
-        nativeSetLonLat(nativeMapViewPtr, centerLocation.getLongitude(),
-                centerLocation.getLatitude());
+    public void setCenterCoordinate(LonLat centerCoordinate) {
+        mNativeMapView.setLonLat(centerCoordinate);
+    }
+
+    public double getDirection() {
+        return mNativeMapView.getAngle();
+    }
+
+    public void setDirection(double direction) {
+        mNativeMapView.setAngle(direction);
     }
 
     public void resetPosition() {
-        nativeResetPosition(nativeMapViewPtr);
+        mNativeMapView.resetPosition();
     }
 
     public void resetNorth() {
-        // TODO
+        mNativeMapView.resetNorth();
     }
 
     public double getZoomLevel() {
-        return nativeGetZoom(nativeMapViewPtr);
+        return mNativeMapView.getZoom();
     }
 
     public void setZoomLevel(double zoomLevel) {
-        nativeSetZoom(nativeMapViewPtr, zoomLevel);
+        mNativeMapView.setZoom(zoomLevel);
     }
 
     public boolean isZoomEnabled() {
@@ -238,15 +235,15 @@ public class MapView extends SurfaceView {
     }
 
     public boolean isDebugActive() {
-        return nativeGetDebug(nativeMapViewPtr);
+        return mNativeMapView.getDebug();
     }
 
     public void setDebugActive(boolean debugActive) {
-        nativeSetDebug(nativeMapViewPtr, debugActive);
+        mNativeMapView.setDebug(debugActive);
     }
 
     public void toggleDebug() {
-        nativeToggleDebug(nativeMapViewPtr);
+        mNativeMapView.toggleDebug();
     }
 
     //
@@ -257,8 +254,14 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onCreate
     public void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            setCenterLocation((Location) savedInstanceState
-                    .getParcelable(STATE_CENTER_LOCATION));
+            lonlat = (LonLat) savedInstanceState
+                    .getParcelable(STATE_CENTER_COORDINATE);
+            angle = savedInstanceState.getDouble(STATE_CENTER_DIRECTION);
+            zoom = savedInstanceState.getDouble(STATE_ZOOM_LEVEL);
+            setCenterCoordinate((LonLat) savedInstanceState
+                    .getParcelable(STATE_CENTER_COORDINATE));
+            setDirection(savedInstanceState.getDouble(STATE_CENTER_DIRECTION));
+            setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL));
             setZoomEnabled(savedInstanceState.getBoolean(STATE_ZOOM_ENABLED));
             setScrollEnabled(savedInstanceState
                     .getBoolean(STATE_SCROLL_ENABLED));
@@ -271,7 +274,8 @@ public class MapView extends SurfaceView {
     // Called when we need to save instance state
     // Must be called from Activity onSaveInstanceState
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(STATE_CENTER_LOCATION, getCenterLocation());
+        outState.putParcelable(STATE_CENTER_COORDINATE, getCenterCoordinate());
+        outState.putDouble(STATE_CENTER_DIRECTION, getDirection());
         outState.putDouble(STATE_ZOOM_LEVEL, getZoomLevel());
         outState.putBoolean(STATE_ZOOM_ENABLED, isZoomEnabled());
         outState.putBoolean(STATE_SCROLL_ENABLED, isScrollEnabled());
@@ -283,28 +287,41 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onStart
     public void onStart() {
         Log.v(TAG, "onStart");
-        nativeInitializeContext(nativeMapViewPtr);
+        mNativeMapView.initializeContext();
     }
 
     // Called when we need to terminate the GL context
     // Must be called from Activity onPause
     public void onStop() {
         Log.v(TAG, "onStop");
-        nativeTerminateContext(nativeMapViewPtr);
+        mNativeMapView.terminateContext();
     }
 
     // Called when we need to stop the render thread
     // Must be called from Activity onPause
     public void onPause() {
         Log.v(TAG, "onPause");
-        nativeStop(nativeMapViewPtr);
+        lonlat = mNativeMapView.getLonLat();
+        angle = mNativeMapView.getAngle();
+        zoom = mNativeMapView.getZoom();
+        mNativeMapView.stop();
     }
 
     // Called when we need to start the render thread
     // Must be called from Activity onResume
+
+    // TODO need to fix this in Map C++ code
+    private LonLat lonlat;
+    private double angle, zoom;
+
     public void onResume() {
         Log.v(TAG, "onResume");
-        nativeStart(nativeMapViewPtr);
+        mNativeMapView.start();
+        if (lonlat != null) {
+            mNativeMapView.setLonLat(lonlat);
+            mNativeMapView.setAngle(angle);
+            mNativeMapView.setZoom(zoom);
+        }
     }
 
     // This class handles SurfaceHolder callbacks
@@ -316,7 +333,7 @@ public class MapView extends SurfaceView {
         @Override
         public void surfaceRedrawNeeded(SurfaceHolder holder) {
             Log.v(TAG, "surfaceRedrawNeeded");
-            nativeUpdate(nativeMapViewPtr);
+            mNativeMapView.update();
         }
 
         // Called when the native surface buffer has been created
@@ -324,8 +341,12 @@ public class MapView extends SurfaceView {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             Log.v(TAG, "surfaceCreated");
-            nativeCreateSurface(nativeMapViewPtr, holder.getSurface());
-            ;
+            mNativeMapView.createSurface(holder.getSurface());
+            if (lonlat != null) {
+                mNativeMapView.setLonLat(lonlat);
+                mNativeMapView.setAngle(angle);
+                mNativeMapView.setZoom(zoom);
+            }
         }
 
         // Called when the native surface buffer has been destroyed
@@ -333,7 +354,7 @@ public class MapView extends SurfaceView {
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
             Log.v(TAG, "surfaceDestroyed");
-            nativeDestroySurface(nativeMapViewPtr);
+            mNativeMapView.destroySurface();
         }
 
         // Called when the format or size of the native surface buffer has been
@@ -343,7 +364,9 @@ public class MapView extends SurfaceView {
         public void surfaceChanged(SurfaceHolder holder, int format, int width,
                 int height) {
             Log.v(TAG, "surfaceChanged");
-            nativeResize(nativeMapViewPtr, width, height);
+            Log.i(TAG, "resize " + format + " " + width + " " + height);
+            mNativeMapView.resize(width, height);
+            // TODO fix bug when rotating - sometimes 1/2 map black
         }
     }
 
@@ -375,21 +398,6 @@ public class MapView extends SurfaceView {
 
     // TODO: onDraw for editor?
 
-    // TODO replace with callback from map
-    // Called when the map's display has changed
-    /*
-     * private class OnChangeListener implements MapController.OnChangeListener
-     * {
-     * 
-     * // Redraw map to show change
-     * 
-     * @Override public void onChange(MapController mapController) {
-     * //postInvalidateOnAnimation();
-     * 
-     * // Tell accessibility the description text has changed
-     * //sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED); } }
-     */
-
     //
     // Input events
     //
@@ -401,14 +409,13 @@ public class MapView extends SurfaceView {
 
     private void zoom(boolean zoomIn, float x, float y) {
         // Cancel any animation
-        nativeCancelTransitions(nativeMapViewPtr);
+        mNativeMapView.cancelTransitions();
 
         if (zoomIn) {
-            nativeScaleBy(nativeMapViewPtr, 2.0, x, y, 0.3);
+            mNativeMapView.scaleBy(2.0, x, y, 0.3);
         } else {
-            // TODO check min zoom like ios
             // TODO two finger tap zoom out
-            nativeScaleBy(nativeMapViewPtr, 0.5, x, y, 0.3);
+            mNativeMapView.scaleBy(0.5, x, y, 0.3);
         }
     }
 
@@ -457,7 +464,7 @@ public class MapView extends SurfaceView {
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             // Cancel any animation
-            nativeCancelTransitions(nativeMapViewPtr);
+            mNativeMapView.cancelTransitions();
 
             return true;
         }
@@ -492,11 +499,10 @@ public class MapView extends SurfaceView {
              * (deceleration * ease);
              * 
              * 
-             * // Cancel any animation
-             * nativeCancelTransitions(nativeMapViewPtr);
+             * // Cancel any animation mNativeMapView.cancelTransitions();
              * 
-             * nativeMoveBy(nativeMapViewPtr, velocityX * duration / 2.0,
-             * velocityY * duration / 2.0, duration);
+             * mNativeMapView.moveBy(velocityX * duration / 2.0, velocityY *
+             * duration / 2.0, duration);
              * 
              * return true;
              */
@@ -507,12 +513,11 @@ public class MapView extends SurfaceView {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2,
                 float distanceX, float distanceY) {
-            // TODO start scrolling/cancel
             // Cancel any animation
-            nativeCancelTransitions(nativeMapViewPtr);
+            mNativeMapView.cancelTransitions();
 
             // Scroll the map
-            nativeMoveBy(nativeMapViewPtr, -distanceX, -distanceY);
+            mNativeMapView.moveBy(-distanceX, -distanceY);
             return true;
         }
     }
@@ -533,15 +538,14 @@ public class MapView extends SurfaceView {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             // Zoom the map
-            // TODO hande min zoom?
             // TODO: rotation?
             // https://github.com/Almeros/android-gesture-detectors
 
             // Cancel any animation
-            nativeCancelTransitions(nativeMapViewPtr);
+            mNativeMapView.cancelTransitions();
 
             // Scale the map
-            nativeScaleBy(nativeMapViewPtr, detector.getScaleFactor(),
+            mNativeMapView.scaleBy(detector.getScaleFactor(),
                     detector.getFocusX(), detector.getFocusY());
 
             return true;
@@ -586,34 +590,34 @@ public class MapView extends SurfaceView {
 
         case KeyEvent.KEYCODE_DPAD_LEFT:
             // Cancel any animation
-            nativeCancelTransitions(nativeMapViewPtr);
+            mNativeMapView.cancelTransitions();
 
             // Move left
-            nativeMoveBy(nativeMapViewPtr, scrollDist, 0.0);
+            mNativeMapView.moveBy(scrollDist, 0.0);
             return true;
 
         case KeyEvent.KEYCODE_DPAD_RIGHT:
             // Cancel any animation
-            nativeCancelTransitions(nativeMapViewPtr);
+            mNativeMapView.cancelTransitions();
 
             // Move right
-            nativeMoveBy(nativeMapViewPtr, -scrollDist, 0.0);
+            mNativeMapView.moveBy(-scrollDist, 0.0);
             return true;
 
         case KeyEvent.KEYCODE_DPAD_UP:
             // Cancel any animation
-            nativeCancelTransitions(nativeMapViewPtr);
+            mNativeMapView.cancelTransitions();
 
             // Move up
-            nativeMoveBy(nativeMapViewPtr, 0.0, scrollDist);
+            mNativeMapView.moveBy(0.0, scrollDist);
             return true;
 
         case KeyEvent.KEYCODE_DPAD_DOWN:
             // Cancel any animation
-            nativeCancelTransitions(nativeMapViewPtr);
+            mNativeMapView.cancelTransitions();
 
             // Move down
-            nativeMoveBy(nativeMapViewPtr, 0.0, -scrollDist);
+            mNativeMapView.moveBy(0.0, -scrollDist);
             return true;
 
         default:
@@ -676,11 +680,10 @@ public class MapView extends SurfaceView {
         // The trackball was rotated
         case MotionEvent.ACTION_MOVE:
             // Cancel any animation
-            nativeCancelTransitions(nativeMapViewPtr);
+            mNativeMapView.cancelTransitions();
 
             // Scroll the map
-            nativeMoveBy(nativeMapViewPtr, -10.0 * event.getX(),
-                    -10.0 * event.getY());
+            mNativeMapView.moveBy(-10.0 * event.getX(), -10.0 * event.getY());
 
             return true;
 
@@ -762,14 +765,14 @@ public class MapView extends SurfaceView {
             // Mouse scrolls
             case MotionEvent.ACTION_SCROLL:
                 // Cancel any animation
-                nativeCancelTransitions(nativeMapViewPtr);
+                mNativeMapView.cancelTransitions();
 
                 // Get the vertical scroll amount, one click = 1
                 float scrollDist = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
 
                 // Scale the map by the appropriate power of two factor
-                nativeScaleBy(nativeMapViewPtr, Math.pow(2.0, scrollDist),
-                        event.getX(), event.getY());
+                mNativeMapView.scaleBy(Math.pow(2.0, scrollDist), event.getX(),
+                        event.getY());
 
                 return true;
 
@@ -816,102 +819,24 @@ public class MapView extends SurfaceView {
     // Map events
     //
 
+    public interface OnMapChangedListener {
+        void onMapChanged();
+    }
+
+    private OnMapChangedListener mOnMapChangedListener;
+
+    // Adds a listener for onMapChanged
+    public void setOnMapChangedListener(OnMapChangedListener listener) {
+        mOnMapChangedListener = listener;
+    }
+
     // Called when the map view transformation has changed
     // Called via JNI from NativeMapView
     // Need to update anything that relies on map state
-    // TODO need to make this a listener so users of this view can register for
-    // it
     protected void onMapChanged() {
         Log.v(TAG, "onMapChanged");
-        // TODO
+        if (mOnMapChangedListener != null) {
+            mOnMapChangedListener.onMapChanged();
+        }
     }
-
-    //
-    // JNI methods
-    //
-
-    static {
-        System.loadLibrary("NativeMapView");
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        nativeDestroy(nativeMapViewPtr);
-        nativeMapViewPtr = 0;
-        super.finalize();
-    }
-
-    // TODO for each function implement a wrapper that handles the pointer
-    // TODO implement all the other methods
-    // TODO move to private wrapper class
-    private native long nativeCreate(String defaultStyleJSON);
-
-    private native void nativeDestroy(long nativeMapViewPtr);
-
-    private native void nativeInitializeContext(long nativeMapViewPtr);
-
-    private native void nativeTerminateContext(long nativeMapViewPtr);
-
-    private native void nativeCreateSurface(long nativeMapViewPtr,
-            Surface surface);
-
-    private native void nativeDestroySurface(long nativeMapViewPtr);
-
-    private native void nativeStart(long nativeMapViewPtr);
-
-    private native void nativeStop(long nativeMapViewPtr);
-
-    private native void nativeUpdate(long nativeMapViewPtr);
-
-    private native void nativeCleanup(long nativeMapViewPtr);
-
-    private native void nativeResize(long nativeMapViewPtr, int width,
-            int height);
-
-    private native void nativeCancelTransitions(long nativeMapViewPtr);
-
-    // TODO use JNI on C++ side to pass back and forth lat/lng/zoom etc class?
-    private native double nativeGetLon(long nativeMapViewPtr);
-
-    private native double nativeGetLat(long nativeMapViewPtr);
-
-    private native void nativeSetLonLat(long nativeMapViewPtr, double lon,
-            double lat);
-
-    private native void nativeResetPosition(long nativeMapViewPtr);
-
-    private void nativeMoveBy(long nativeMapViewPtr, double dx, double dy) {
-        nativeMoveBy(nativeMapViewPtr, dx, dy, 0.0);
-    }
-
-    private native void nativeMoveBy(long nativeMapViewPtr, double dx,
-            double dy, double duration);
-
-    private native double nativeGetZoom(long nativeMapViewPtr);
-
-    private native void nativeSetZoom(long nativeMapViewPtr, double zoom);
-
-    private void nativeScaleBy(long nativeMapViewPtr, double ds) {
-        nativeScaleBy(nativeMapViewPtr, ds, -1.0, -1.0, 0.0);
-    }
-
-    private void nativeScaleBy(long nativeMapViewPtr, double ds, double cx,
-            double cy) {
-        nativeScaleBy(nativeMapViewPtr, ds, cx, cy, 0.0);
-    }
-
-    private native void nativeScaleBy(long nativeMapViewPtr, double ds,
-            double cx, double cy, double duration);
-
-    private native double nativeGetAngle(long nativeMapViewPtr);
-
-    private native void nativeSetAngle(long nativeMapViewPtr, double angle);
-
-    // private native void nativeResetNorth(long nativeMapViewPtr);
-
-    private native boolean nativeGetDebug(long nativeMapViewPtr);
-
-    private native void nativeSetDebug(long nativeMapViewPtr, boolean debug);
-
-    private native void nativeToggleDebug(long nativeMapViewPtr);
 }

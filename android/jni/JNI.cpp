@@ -11,9 +11,15 @@
 
 #include "NativeMapView.hpp"
 
-namespace {
+namespace llmr {
+namespace android {
 
-using namespace llmr::android;
+jmethodID on_map_changed_id = nullptr;
+
+jclass lon_lat_class = nullptr;
+jmethodID lon_lat_constructor_id = nullptr;
+jfieldID lon_id = nullptr;
+jfieldID lat_id = nullptr;
 
 bool throw_error(JNIEnv* env, const char* msg) {
     jclass clazz = env->FindClass("java/lang/RuntimeException");
@@ -42,6 +48,13 @@ std::string std_string_from_jstring(JNIEnv* env, jstring jstr) {
     chars = nullptr;
     return str;
 }
+
+} // namespace android
+} // namespace llmr
+
+namespace {
+
+using namespace llmr::android;
 
 jlong nativeCreate(JNIEnv* env, jobject obj, jstring default_style_json) {
     VERBOSE("nativeCreate");
@@ -136,28 +149,40 @@ void nativeCancelTransitions(JNIEnv* env, jobject obj, jlong native_map_view_ptr
     native_map_view->getMap()->cancelTransitions();
 }
 
-jdouble nativeGetLon(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
-    VERBOSE("nativeGetLon");
+jobject nativeGetLonLat(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    VERBOSE("nativeGetLonLat");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     double lon, lat;
     native_map_view->getMap()->getLonLat(lon, lat);
-    return lon;
+
+    jobject ret = env->NewObject(lon_lat_class, lon_lat_constructor_id, lon, lat);
+    if (ret == nullptr) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    return ret;
 }
 
-jdouble nativeGetLat(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
-    VERBOSE("nativeGetLat");
-    ASSERT(native_map_view_ptr != 0);
-    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    double lon, lat;
-    native_map_view->getMap()->getLonLat(lon, lat);
-    return lat;
-}
-
-void nativeSetLonLat(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble lon, jdouble lat) {
+void nativeSetLonLat(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jobject lon_lat) {
     VERBOSE("nativeSetLonLat");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+
+    double lon = env->GetDoubleField(lon_lat, lon_id);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    double lat = env->GetDoubleField(lon_lat, lat_id);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return;
+        }
+    // TODO remove when fixed
+    DEBUG("lon lat %f %f", lon, lat);
     native_map_view->getMap()->setLonLat(lon, lat);
 }
 
@@ -203,6 +228,13 @@ jdouble nativeGetAngle(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     return native_map_view->getMap()->getAngle();
 }
 
+void nativeResetNorth(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    VERBOSE("nativeResetNorth");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->resetNorth();
+}
+
 void nativeSetAngle(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble angle) {
     VERBOSE("nativeSetAngle");
     ASSERT(native_map_view_ptr != 0);
@@ -236,16 +268,48 @@ void nativeToggleDebug(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
 extern "C" {
 
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    VERBOSE("JNI_OnLoad");
+
     JNIEnv* env = nullptr;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
         env->ExceptionDescribe();
-        return -1;
+        return JNI_ERR;
     }
 
-    jclass clazz = env->FindClass("com/mapbox/mapboxgl/MapView");
-    if (clazz == nullptr) {
+    lon_lat_class = env->FindClass("com/mapbox/mapboxgl/LonLat");
+    if (lon_lat_class == nullptr) {
         env->ExceptionDescribe();
-        return -1;
+        return JNI_ERR;
+    }
+
+    lon_lat_constructor_id = env->GetMethodID(lon_lat_class, "<init>", "(DD)V");
+    if (lon_lat_constructor_id == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    lon_id = env->GetFieldID(lon_lat_class, "lon", "D");
+    if (lon_id == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    lat_id = env->GetFieldID(lon_lat_class, "lat", "D");
+    if (lat_id == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    jclass native_map_view_class = env->FindClass("com/mapbox/mapboxgl/NativeMapView");
+    if (native_map_view_class == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    on_map_changed_id = env->GetMethodID(native_map_view_class, "onMapChanged", "()V");
+    if (on_map_changed_id == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
     }
 
     std::array<JNINativeMethod, 26> methods = {{ // TODO shouldn't need double braces.. missing feature in clang?
@@ -262,9 +326,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeCleanup", "(J)V", reinterpret_cast<void*>(&nativeCleanup) },
         { "nativeResize", "(JII)V", reinterpret_cast<void*>(&nativeResize) },
         { "nativeCancelTransitions", "(J)V", reinterpret_cast<void*>(&nativeCancelTransitions) },
-        { "nativeGetLon", "(J)D", reinterpret_cast<void*>(&nativeGetLon) },
-        { "nativeGetLat", "(J)D", reinterpret_cast<void*>(&nativeGetLat) },
-        { "nativeSetLonLat", "(JDD)V", reinterpret_cast<void*>(&nativeSetLonLat) },
+        { "nativeGetLonLat", "(J)Lcom/mapbox/mapboxgl/LonLat;", reinterpret_cast<void*>(&nativeGetLonLat) },
+        { "nativeSetLonLat", "(JLcom/mapbox/mapboxgl/LonLat;)V", reinterpret_cast<void*>(&nativeSetLonLat) },
         { "nativeResetPosition", "(J)V", reinterpret_cast<void*>(&nativeResetPosition) },
         { "nativeMoveBy", "(JDDD)V", reinterpret_cast<void*>(&nativeMoveBy) },
         { "nativeGetZoom", "(J)D", reinterpret_cast<void*>(&nativeGetZoom) },
@@ -272,28 +335,48 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeScaleBy", "(JDDDD)V", reinterpret_cast<void*>(&nativeScaleBy) },
         { "nativeGetAngle", "(J)D", reinterpret_cast<void*>(&nativeGetAngle) },
         { "nativeSetAngle", "(JD)V", reinterpret_cast<void*>(&nativeSetAngle) },
-        //{ "nativeResetNorth", "(J)V", reinterpret_cast<void*>(&nativeResetNorth) },
+        { "nativeResetNorth", "(J)V", reinterpret_cast<void*>(&nativeResetNorth) },
         { "nativeGetDebug", "(J)Z", reinterpret_cast<void*>(&nativeGetDebug) },
         { "nativeSetDebug", "(JZ)V", reinterpret_cast<void*>(&nativeSetDebug) },
         { "nativeToggleDebug", "(J)V", reinterpret_cast<void*>(&nativeToggleDebug) }}
     };
-    jint ret = env->RegisterNatives(clazz, methods.data(), methods.size());
+    jint ret = env->RegisterNatives(native_map_view_class, methods.data(), methods.size());
     DEBUG("RegisterNatives returned %d", ret);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
-        return -1;
+        return JNI_ERR;
     }
     /* Need to wait for https://code.google.com/p/android/issues/detail?id=72293
     if (env->RegisterNatives(clazz, methods.data(), methods.size()) < 0) {
         env->ExceptionDescribe();
-        return -1;
+        return JNI_ERR;
     }*/
+
+    lon_lat_class = reinterpret_cast<jclass>(env->NewGlobalRef(lon_lat_class));
+    if (lon_lat_class == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
 
     return JNI_VERSION_1_6;
 }
 
 extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
-    // no-op
+    VERBOSE("JNI_OnUnload");
+
+    JNIEnv* env = nullptr;
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    env->DeleteGlobalRef(lon_lat_class);
+    lon_lat_class = nullptr;
+    lon_lat_constructor_id = nullptr;
+    lon_id = nullptr;
+    lat_id = nullptr;
+
+    on_map_changed_id = nullptr;
 }
 
 } // extern "C"
