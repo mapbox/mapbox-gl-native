@@ -6,9 +6,20 @@ import android.util.Log;
 
 public class MainActivity extends Activity {
 
+    // TODO add comments
+
+    //
+    // Static members
+    //
+
+    // Tag used for logging
     private static final String TAG = "MainActivity";
 
     private MapView mMapView;
+
+    //
+    // Lifecycle events
+    //
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

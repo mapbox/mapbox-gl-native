@@ -14,6 +14,13 @@
 namespace llmr {
 namespace android {
 
+extern jmethodID on_map_changed_id;
+
+extern jclass lon_lat_class;
+extern jmethodID lon_lat_constructor_id;
+extern jfieldID lon_id;
+extern jfieldID lat_id;
+
 class LLMRView;
 
 class NativeMapView {
