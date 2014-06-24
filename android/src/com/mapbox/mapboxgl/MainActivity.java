@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.mapbox.mapboxgl.MapView;
-
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
@@ -18,18 +16,18 @@ public class MainActivity extends Activity {
         Log.v(TAG, "onCreate");
         setContentView(R.layout.activity_main);
         mMapView = (MapView) findViewById(R.id.map);
-        
+
         // TODO wrapper fragment?
         mMapView.onCreate(savedInstanceState);
     }
-    
+
     @Override
     protected void onStart() {
         super.onStart();
         Log.v(TAG, "onStart");
         mMapView.onStart();
     }
-    
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -50,7 +48,7 @@ public class MainActivity extends Activity {
         Log.v(TAG, "onResume");
         mMapView.onResume();
     }
-    
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.v(TAG, "onSaveInstanceState");

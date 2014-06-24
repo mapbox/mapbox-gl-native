@@ -28,21 +28,23 @@ void log_gl_string(GLenum name, const char* label) {
     }
 }
 
-NativeMapView::NativeMapView(JNIEnv* env, jobject obj, std::string default_style_json) : default_style_json(default_style_json) {
+NativeMapView::NativeMapView(JNIEnv* env, jobject obj,
+        std::string default_style_json) :
+        default_style_json(default_style_json) {
     VERBOSE("NativeMapView::NativeMapView");
 
     ASSERT(env != nullptr);
     ASSERT(obj != nullptr);
 
     if (env->GetJavaVM(&vm) < 0) {
-    	env->ExceptionDescribe();
-    	return;
+        env->ExceptionDescribe();
+        return;
     }
 
     this->obj = env->NewGlobalRef(obj);
     if (this->obj == nullptr) {
-    	env->ExceptionDescribe();
-    	return;
+        env->ExceptionDescribe();
+        return;
     }
 
     // TODO replace all printfs in map code with android logging
@@ -73,7 +75,7 @@ NativeMapView::~NativeMapView() {
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) == JNI_OK) {
         env->DeleteGlobalRef(obj);
     } else {
-    	env->ExceptionDescribe();
+        env->ExceptionDescribe();
     }
     obj = nullptr;
     vm = nullptr;
@@ -144,8 +146,9 @@ bool NativeMapView::initializeContext() {
     }
 
 //    const std::unique_ptr<EGLConfig[]> configs = std::make_unique(new EGLConfig[num_configs]);
-        const std::unique_ptr<EGLConfig[]> configs(new EGLConfig[num_configs]);
-    if (!eglChooseConfig(display, config_attribs, configs.get(), num_configs, &num_configs)) {
+    const std::unique_ptr<EGLConfig[]> configs(new EGLConfig[num_configs]);
+    if (!eglChooseConfig(display, config_attribs, configs.get(), num_configs,
+            &num_configs)) {
         ERROR("eglChooseConfig() returned error %d", eglGetError());
         terminateContext();
         return false;
@@ -169,7 +172,8 @@ bool NativeMapView::initializeContext() {
         EGL_CONTEXT_CLIENT_VERSION, 2,
         EGL_NONE
     };
-    context = eglCreateContext(display, config, EGL_NO_CONTEXT, context_attribs);
+    context = eglCreateContext(display, config, EGL_NO_CONTEXT,
+            context_attribs);
     if (context == EGL_NO_CONTEXT) {
         ERROR("eglCreateContext() returned error %d", eglGetError());
         terminateContext();
@@ -181,62 +185,77 @@ bool NativeMapView::initializeContext() {
     return true;
 }
 
-EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_configs, bool use565) const {
+EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[],
+        EGLint num_configs, bool use565) const {
     INFO("Found %d configs", num_configs);
 
     int chosen_config = -1;
     for (int i = 0; i < num_configs; i++) {
         INFO("Config %d:", i);
 
-        EGLint bits, red, green, blue, alpha, alpha_mask, depth, stencil, sample_buffers, samples;
+        EGLint bits, red, green, blue, alpha, alpha_mask, depth, stencil,
+                sample_buffers, samples;
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_BUFFER_SIZE, &bits)) {
-            ERROR("eglGetConfigAttrib(EGL_BUFFER_SIZE) returned error %d", eglGetError());
+            ERROR("eglGetConfigAttrib(EGL_BUFFER_SIZE) returned error %d",
+                    eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_RED_SIZE, &red)) {
-            ERROR("eglGetConfigAttrib(EGL_RED_SIZE) returned error %d", eglGetError());
+            ERROR("eglGetConfigAttrib(EGL_RED_SIZE) returned error %d",
+                    eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_GREEN_SIZE, &green)) {
-            ERROR("eglGetConfigAttrib(EGL_GREEN_SIZE) returned error %d", eglGetError());
+            ERROR("eglGetConfigAttrib(EGL_GREEN_SIZE) returned error %d",
+                    eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_BLUE_SIZE, &blue)) {
-            ERROR("eglGetConfigAttrib(EGL_BLUE_SIZE) returned error %d", eglGetError());
+            ERROR("eglGetConfigAttrib(EGL_BLUE_SIZE) returned error %d",
+                    eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_ALPHA_SIZE, &alpha)) {
-            ERROR("eglGetConfigAttrib(EGL_ALPHA_SIZE) returned error %d", eglGetError());
+            ERROR("eglGetConfigAttrib(EGL_ALPHA_SIZE) returned error %d",
+                    eglGetError());
             return nullptr;
         }
 
-        if (!eglGetConfigAttrib(display, configs[i], EGL_ALPHA_MASK_SIZE, &alpha_mask)) {
-            ERROR("eglGetConfigAttrib(EGL_ALPHA_MASK_SIZE) returned error %d", eglGetError());
+        if (!eglGetConfigAttrib(display, configs[i], EGL_ALPHA_MASK_SIZE,
+                &alpha_mask)) {
+            ERROR("eglGetConfigAttrib(EGL_ALPHA_MASK_SIZE) returned error %d",
+                    eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_DEPTH_SIZE, &depth)) {
-            ERROR("eglGetConfigAttrib(EGL_DEPTH_SIZE) returned error %d", eglGetError());
+            ERROR("eglGetConfigAttrib(EGL_DEPTH_SIZE) returned error %d",
+                    eglGetError());
             return nullptr;
         }
 
-        if (!eglGetConfigAttrib(display, configs[i], EGL_STENCIL_SIZE, &stencil)) {
-            ERROR("eglGetConfigAttrib(EGL_STENCIL_SIZE) returned error %d", eglGetError());
+        if (!eglGetConfigAttrib(display, configs[i], EGL_STENCIL_SIZE,
+                &stencil)) {
+            ERROR("eglGetConfigAttrib(EGL_STENCIL_SIZE) returned error %d",
+                    eglGetError());
             return nullptr;
         }
 
-        if (!eglGetConfigAttrib(display, configs[i], EGL_SAMPLE_BUFFERS, &sample_buffers)) {
-            ERROR("eglGetConfigAttrib(EGL_SAMPLE_BUFFERS) returned error %d", eglGetError());
+        if (!eglGetConfigAttrib(display, configs[i], EGL_SAMPLE_BUFFERS,
+                &sample_buffers)) {
+            ERROR("eglGetConfigAttrib(EGL_SAMPLE_BUFFERS) returned error %d",
+                    eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_SAMPLES, &samples)) {
-            ERROR("eglGetConfigAttrib(EGL_SAMPLES) returned error %d", eglGetError());
+            ERROR("eglGetConfigAttrib(EGL_SAMPLES) returned error %d",
+                    eglGetError());
             return nullptr;
         }
 
@@ -269,7 +288,7 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_conf
     }
 
     DEBUG("Chosen config is %d", chosen_config);
-        if (chosen_config >= 0) {
+    if (chosen_config >= 0) {
         return configs[chosen_config];
     } else {
         return nullptr;
@@ -279,7 +298,8 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_conf
 void NativeMapView::terminateContext() {
     VERBOSE("NativeMapView::terminateContext");
 
-    if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
+    if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)
+            && (context != EGL_NO_CONTEXT)) {
         map->terminate();
     }
 
@@ -293,12 +313,14 @@ void NativeMapView::terminateContext() {
     destroySurface();
 
     if (display != EGL_NO_DISPLAY) {
-        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-            ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
+        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+                EGL_NO_CONTEXT)) {
+            ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
+                    eglGetError());
         }
 
         if (context != EGL_NO_CONTEXT) {
-            if (eglDestroyContext(display, context)) {
+            if (!eglDestroyContext(display, context)) {
                 ERROR("eglDestroyContext() returned error %d", eglGetError());
             }
         }
@@ -340,8 +362,8 @@ bool NativeMapView::createSurface(ANativeWindow* window) {
     }
 
     EGLint width, height;
-    if (!eglQuerySurface(display, surface, EGL_WIDTH, &width) ||
-        !eglQuerySurface(display, surface, EGL_HEIGHT, &height)) {
+    if (!eglQuerySurface(display, surface, EGL_WIDTH, &width)
+            || !eglQuerySurface(display, surface, EGL_HEIGHT, &height)) {
         ERROR("eglQuerySurface() returned error %d", eglGetError());
         terminateContext();
         return false;
@@ -361,8 +383,10 @@ bool NativeMapView::createSurface(ANativeWindow* window) {
     log_gl_string(GL_SHADING_LANGUAGE_VERSION, "SL Version");
     log_gl_string(GL_EXTENSIONS, "Extensions");
 
-    if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-        ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
+    if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+            EGL_NO_CONTEXT)) {
+        ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
+                eglGetError());
         terminateContext();
         return false;
     }
@@ -391,7 +415,8 @@ void NativeMapView::destroySurface() {
 
 void NativeMapView::start() {
     VERBOSE("NativeMapView::start");
-    if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
+    if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)
+            && (context != EGL_NO_CONTEXT)) {
         map->start();
     } else {
         DEBUG("Not starting because we are not ready");
@@ -400,7 +425,8 @@ void NativeMapView::start() {
 
 void NativeMapView::stop() {
     VERBOSE("NativeMapView::stop");
-    if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
+    if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)
+            && (context != EGL_NO_CONTEXT)) {
         map->stop();
     }
 }
@@ -413,33 +439,36 @@ void NativeMapView::notifyMapChange() {
 
     JNIEnv* env = nullptr;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
-    	env->ExceptionDescribe();
-    	return;
+        env->ExceptionDescribe();
+        return;
     }
 
     jclass clazz = env->GetObjectClass(this->obj);
     if (clazz == nullptr) {
-    	env->ExceptionDescribe();
-    	return;
+        env->ExceptionDescribe();
+        return;
     }
 
     jmethodID id = env->GetMethodID(clazz, "onMapChanged", "()V");
     if (id == nullptr) {
-    	env->ExceptionDescribe();
-    	return;
+        env->ExceptionDescribe();
+        return;
     }
 
     env->CallVoidMethod(obj, id);
     if (env->ExceptionCheck() != JNI_FALSE) {
-    	env->ExceptionDescribe();
-    	return;
+        env->ExceptionDescribe();
+        return;
     }
 }
 
 void LLMRView::make_active() {
     VERBOSE("LLMRView::make_active");
-    if ((nativeView->display != EGL_NO_DISPLAY) && (nativeView->surface != EGL_NO_SURFACE) && (nativeView->context != EGL_NO_CONTEXT)) {
-        if (!eglMakeCurrent(nativeView->display, nativeView->surface, nativeView->surface, nativeView->context)) {
+    if ((nativeView->display != EGL_NO_DISPLAY)
+            && (nativeView->surface != EGL_NO_SURFACE)
+            && (nativeView->context != EGL_NO_CONTEXT)) {
+        if (!eglMakeCurrent(nativeView->display, nativeView->surface,
+                nativeView->surface, nativeView->context)) {
             ERROR("eglMakeCurrent() returned error %d", eglGetError());
         }
     } else {
@@ -449,14 +478,17 @@ void LLMRView::make_active() {
 
 void LLMRView::make_inactive() {
     VERBOSE("LLMRView::make_inactive");
-    if (!eglMakeCurrent(nativeView->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-        ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
+    if (!eglMakeCurrent(nativeView->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+            EGL_NO_CONTEXT)) {
+        ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
+                eglGetError());
     }
 }
 
 void LLMRView::swap() {
     VERBOSE("LLMRView::swap");
-    if (map->needsSwap() && (nativeView->display != EGL_NO_DISPLAY) && (nativeView->surface != EGL_NO_SURFACE)) {
+    if (map->needsSwap() && (nativeView->display != EGL_NO_DISPLAY)
+            && (nativeView->surface != EGL_NO_SURFACE)) {
         if (!eglSwapBuffers(nativeView->display, nativeView->surface)) {
             ERROR("eglSwapBuffers() returned error %d", eglGetError());
         }
