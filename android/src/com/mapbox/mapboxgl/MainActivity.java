@@ -20,19 +20,19 @@ public class MainActivity extends Activity {
         mMapView = (MapView) findViewById(R.id.map);
         
         // TODO wrapper fragment?
-		mMapView.onCreate(savedInstanceState);
+        mMapView.onCreate(savedInstanceState);
     }
     
     @Override
     protected void onStart() {
-    	super.onStart();
+        super.onStart();
         Log.v(TAG, "onStart");
         mMapView.onStart();
     }
     
     @Override
     protected void onStop() {
-    	super.onStop();
+        super.onStop();
         Log.v(TAG, "onStop");
         mMapView.onStop();
     }
@@ -54,7 +54,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.v(TAG, "onSaveInstanceState");
-    	mMapView.onSaveInstanceState(outState);  	
+        mMapView.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
 }

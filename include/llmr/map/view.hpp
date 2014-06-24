@@ -25,9 +25,12 @@ public:
     virtual void make_inactive() = 0;
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     // Notifies a watcher of map x/y/scale/rotation changes.
     virtual void notify_map_change() = 0;
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 protected:

@@ -12,7 +12,7 @@
 class LLMRView;
 
 class NativeMapView {
-	friend class LLMRView;
+    friend class LLMRView;
 
 public:
     NativeMapView(std::string default_style_json);
@@ -51,18 +51,18 @@ private:
 class LLMRView : public llmr::View
 {
 public:
-	LLMRView(NativeMapView* nativeView) : nativeView(nativeView) {}
-	virtual ~LLMRView() {}
+    LLMRView(NativeMapView* nativeView) : nativeView(nativeView) {}
+    virtual ~LLMRView() {}
 
-	//void notify_map_change();
+    //void notify_map_change();
 
-	void make_active() override;
-	void make_inactive() override;
+    void make_active() override;
+    void make_inactive() override;
 
-	void swap() override;
+    void swap() override;
 
 private:
-	NativeMapView* nativeView = nullptr;
+    NativeMapView* nativeView = nullptr;
 };
 
 #endif // MAP_VIEW_HPP
