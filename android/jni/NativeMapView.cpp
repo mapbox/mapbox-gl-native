@@ -10,6 +10,9 @@
 
 #include "NativeMapView.hpp"
 
+namespace llmr {
+namespace android {
+
 void log_egl_string(EGLDisplay display, EGLint name, const char* label) {
     const char* str = eglQueryString(display, name);
     if (str == nullptr) {
@@ -502,3 +505,6 @@ void LLMRView::notify_map_change() {
     DEBUG("LLMRView::notify_map_change()");
     nativeView->notifyMapChange();
 }
+
+} // namespace android
+} // namespace llmr

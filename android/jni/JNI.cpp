@@ -13,6 +13,8 @@
 
 namespace {
 
+using namespace llmr::android;
+
 bool throw_error(JNIEnv* env, const char* msg) {
     jclass clazz = env->FindClass("java/lang/RuntimeException");
     if (clazz == nullptr) {
@@ -240,7 +242,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return -1;
     }
 
-    // TODO cache classes in here as per Anroid JNI tips
     jclass clazz = env->FindClass("com/mapbox/mapboxgl/MapView");
     if (clazz == nullptr) {
         env->ExceptionDescribe();
@@ -277,11 +278,16 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeToggleDebug", "(J)V", reinterpret_cast<void*>(&nativeToggleDebug) }}
     };
     jint ret = env->RegisterNatives(clazz, methods.data(), methods.size());
-    INFO("RegisterNatives returned %d", ret);
-    if (env->RegisterNatives(clazz, methods.data(), methods.size()) < 0) {
+    DEBUG("RegisterNatives returned %d", ret);
+    if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return -1;
     }
+    /* Need to wait for https://code.google.com/p/android/issues/detail?id=72293
+    if (env->RegisterNatives(clazz, methods.data(), methods.size()) < 0) {
+        env->ExceptionDescribe();
+        return -1;
+    }*/
 
     return JNI_VERSION_1_6;
 }
