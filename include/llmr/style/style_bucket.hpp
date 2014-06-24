@@ -12,13 +12,13 @@ class Source;
 
 class StyleBucketFill {
 public:
-    WindingType winding = parseWindingType();
+    WindingType winding = WindingType::Default;
 };
 
 class StyleBucketLine {
 public:
-    CapType cap = parseCapType();
-    JoinType join = parseJoinType();
+    CapType cap = CapType::Default;
+    JoinType join = JoinType::Default;
     float miter_limit = 2.0f;
     float round_limit = 1.0f;
 };
@@ -27,7 +27,7 @@ class StyleBucketIcon {
 public:
     uint16_t size = 16;
     vec2<float> translate {0, 0};
-    TranslateAnchorType translate_anchor = parseTranslateAnchorType();
+    TranslateAnchorType translate_anchor = TranslateAnchorType::Default;
     std::string icon;
     float spacing = 0.0f;
     float padding = 2.0f;
@@ -36,7 +36,7 @@ public:
 class StyleBucketText {
 public:
     std::string field;
-    TextPathType path = parseTextPathType();
+    TextPathType path = TextPathType::Default;
     std::string font;
     float max_size = 16.0f;
     float max_width = 15.0f * 24;
@@ -45,7 +45,7 @@ public:
     float alignment = 0.5f;
     float vertical_alignment = 0.5;
     vec2<float> translate {0, 0};
-    TranslateAnchorType translate_anchor = parseTranslateAnchorType();
+    TranslateAnchorType translate_anchor = TranslateAnchorType::Default;
     float max_angle_delta = M_PI;
     float min_distance = 250.0f;
     float rotate = 0.0f; // what is this?

@@ -11,124 +11,124 @@ enum class BucketType : uint8_t {
     Line,
     Icon,
     Text,
-    Raster
+    Raster,
+    Default = None
 };
 
 enum class WindingType : uint8_t {
     EvenOdd,
-    NonZero
+    NonZero,
+    Default = NonZero
 };
 
 enum class CapType : uint8_t {
     None,
     Round,
     Butt,
-    Square
+    Square,
+    Default = None
 };
 
 enum class JoinType : uint8_t {
     None,
     Miter,
     Bevel,
-    Round
+    Round,
+    Default = None
 };
 
 enum class TextPathType : uint8_t {
     Horizontal,
-    Curve
+    Curve,
+    Default = Horizontal
 };
 
 enum class TranslateAnchorType : uint8_t {
     Map,
-    Viewport
+    Viewport,
+    Default = Map
 };
 
 enum class RotateAnchorType : uint8_t {
     Map,
-    Viewport
+    Viewport,
+    Default = Viewport
 };
 
 enum class SourceType : uint8_t {
     Vector,
     Raster,
     GeoJSON,
-    Video
+    Video,
+    Default = Vector
 };
 
-inline constexpr BucketType parseBucketType(const std::string &type = "") {
-    return
-        type.compare("fill") == 0 ? BucketType::Fill :
-        type.compare("line") == 0 ? BucketType::Line :
-        type.compare("icon") == 0 ? BucketType::Icon :
-        type.compare("text") == 0 ? BucketType::Text :
-        type.compare("raster") == 0 ? BucketType::Raster :
-        BucketType::None;
+inline BucketType parseBucketType(const std::string &type) {
+    if (type == "fill") return BucketType::Fill;
+    if (type == "line") return BucketType::Line;
+    if (type == "icon") return BucketType::Icon;
+    if (type == "text") return BucketType::Text;
+    if (type == "raster") return BucketType::Raster;
+    return BucketType::None;
 }
 
-inline constexpr WindingType parseWindingType(const std::string &type = "") {
-    return
-        type.compare("even-odd") == 0 ? WindingType::EvenOdd :
-        WindingType::NonZero;
+inline WindingType parseWindingType(const std::string &type) {
+    if (type == "even-odd") return WindingType::EvenOdd;
+    if (type == "non-zero") return WindingType::NonZero;
+    return WindingType::Default;
 }
 
-inline constexpr CapType parseCapType(const std::string &cap = "") {
-    return
-        cap.compare("round") == 0 ? CapType::Round :
-        cap.compare("butt") == 0 ? CapType::Butt :
-        cap.compare("square") == 0 ? CapType::Square :
-        CapType::None;
+inline CapType parseCapType(const std::string &cap) {
+    if (cap == "round") return CapType::Round;
+    if (cap == "butt") return CapType::Butt;
+    if (cap == "square") return CapType::Square;
+    return CapType::None;
 }
 
-inline constexpr JoinType parseJoinType(const std::string &join = "") {
-    return
-        join.compare("miter") == 0 ? JoinType::Miter :
-        join.compare("bevel") == 0 ? JoinType::Bevel :
-        join.compare("round") == 0 ? JoinType::Round :
-        JoinType::None;
+inline JoinType parseJoinType(const std::string &join) {
+    if (join == "miter") return JoinType::Miter;
+    if (join == "bevel") return JoinType::Bevel;
+    if (join == "round") return JoinType::Round;
+    return JoinType::None;
 }
 
-inline constexpr TextPathType parseTextPathType(const std::string &path = "") {
-    return
-        path.compare("horizontal") == 0 ? TextPathType::Horizontal :
-        path.compare("curve") == 0 ? TextPathType::Curve :
-        TextPathType::Horizontal;
+inline TextPathType parseTextPathType(const std::string &path) {
+    if (path == "horizontal") return TextPathType::Horizontal;
+    if (path == "curve") return TextPathType::Curve;
+    return TextPathType::Default;
 }
 
-inline constexpr TranslateAnchorType parseTranslateAnchorType(const std::string &anchor = "") {
-    return
-        anchor.compare("viewport") == 0 ? TranslateAnchorType::Viewport :
-        TranslateAnchorType::Map;
+inline TranslateAnchorType parseTranslateAnchorType(const std::string &anchor) {
+    if (anchor == "map") return TranslateAnchorType::Map;
+    if (anchor == "viewport") return TranslateAnchorType::Viewport;
+    return TranslateAnchorType::Default;
 }
 
-inline constexpr RotateAnchorType parseRotateAnchorType(const std::string &anchor = "") {
-    return
-        anchor.compare("map") == 0 ? RotateAnchorType::Map :
-        RotateAnchorType::Viewport;
+inline RotateAnchorType parseRotateAnchorType(const std::string &anchor) {
+    if (anchor == "map") return RotateAnchorType::Map;
+    if (anchor == "viewport") return RotateAnchorType::Viewport;
+    return RotateAnchorType::Default;
 }
 
-inline constexpr float parseAlignmentType(const std::string &alignment = "") {
-    return
-        alignment.compare("right") == 0 ? 1.0f :
-        alignment.compare("left") == 0 ? 0.0f :
-        0.5f;
-};
-
-inline constexpr float parseVerticalAlignmentType(const std::string &alignment = "") {
-    return
-        alignment.compare("bottom") == 0 ? 1.0f :
-        alignment.compare("top") == 0 ? 0.0f :
-        0.5f;
-};
-
-inline constexpr SourceType parseSourceType(const std::string &source = "") {
-    return
-        source.compare("vector") == 0 ? SourceType::Vector :
-        source.compare("raster") == 0 ? SourceType::Raster :
-        source.compare("geojson") == 0 ? SourceType::GeoJSON :
-        source.compare("video") == 0 ? SourceType::Video :
-        SourceType::Vector;
+inline float parseAlignmentType(const std::string &alignment) {
+    if (alignment == "right") return 1.0f;
+    if (alignment == "left") return 0.0f;
+    return 0.5f;
 }
 
+inline float parseVerticalAlignmentType(const std::string &alignment) {
+    if (alignment == "bottom") return 1.0f;
+    if (alignment == "top") return 0.0f;
+    return 0.5f;
+}
+
+inline SourceType parseSourceType(const std::string &source) {
+    if (source == "vector") return SourceType::Vector;
+    if (source == "raster") return SourceType::Raster;
+    if (source == "geojson") return SourceType::GeoJSON;
+    if (source == "video") return SourceType::Video;
+    return SourceType::Default;
+}
 
 }
 

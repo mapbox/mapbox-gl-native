@@ -228,7 +228,7 @@ struct FillProperties {
     Color fill_color = {{ 0, 0, 0, 1 }};
     Color stroke_color = {{ 0, 0, 0, 1 }};
     std::array<float, 2> translate = {{ 0, 0 }};
-    TranslateAnchorType translateAnchor = parseTranslateAnchorType();
+    TranslateAnchorType translateAnchor = TranslateAnchorType::Default;
     std::string image;
 
     inline bool isVisible() const {
@@ -242,7 +242,7 @@ struct LineProperties {
     float opacity = 1.0f;
     Color color = {{ 0, 0, 0, 1 }};
     std::array<float, 2> translate = {{ 0, 0 }};
-    TranslateAnchorType translateAnchor = parseTranslateAnchorType();
+    TranslateAnchorType translateAnchor = TranslateAnchorType::Default;
     float width = 0;
     float offset = 0;
     float blur = 0;
@@ -259,7 +259,7 @@ struct IconProperties {
     bool enabled = true;
     float opacity = 1.0f;
     float rotate = 0.0f;
-    RotateAnchorType rotate_anchor = parseRotateAnchorType();
+    RotateAnchorType rotate_anchor = RotateAnchorType::Default;
 
     inline bool isVisible() const {
         return enabled && opacity > 0;

@@ -114,7 +114,7 @@ public:
     bool needsAnimation() const;
 private:
     void setupShaders();
-    const mat4 &translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = parseTranslateAnchorType());
+    const mat4 &translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = TranslateAnchorType::Default);
 
     void prepareTile(const Tile& tile);
 
