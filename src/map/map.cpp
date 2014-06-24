@@ -76,13 +76,6 @@ void Map::stop() {
 
     uv_thread_join(&thread);
 
-    uv_close((uv_handle_t *)async_terminate, delete_async);
-    async_terminate = nullptr;
-    uv_close((uv_handle_t *)async_render, delete_async);
-    async_render = nullptr;
-    uv_close((uv_handle_t *)async_cleanup, delete_async);
-    async_cleanup = nullptr;
-
     // Run the event loop once to make sure our async delete handlers are called.
     uv_run(**loop, UV_RUN_ONCE);
 
@@ -161,7 +154,13 @@ void Map::render(uv_async_t *async) {
 }
 
 void Map::terminate(uv_async_t *async) {
-    uv_stop(static_cast<uv_loop_t *>(async->data));
+    // Closes all open handles on the loop. This means that the loop will automatically terminate.
+    uv_loop_t *loop = static_cast<uv_loop_t *>(async->data);
+    uv_walk(loop, [](uv_handle_t *handle, void *arg) {
+        if (!uv_is_closing(handle)) {
+            uv_close(handle, NULL);
+        }
+    }, NULL);
 }
 
 #pragma mark - Setup
