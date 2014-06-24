@@ -110,10 +110,6 @@ public class MapView extends SurfaceView {
 
         // Create the NativeMapView
         nativeMapViewPtr = nativeCreate(mDefaultStyleJSON);
-        if (nativeMapViewPtr == 0) {
-            Log.e(TAG, "nativeCreate failed");
-            throw new RuntimeException("Unable to create NativeMapView.");
-        }
 
         // Load attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
@@ -268,10 +264,7 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onStart
     public void onStart() {
         Log.v(TAG, "onStart");
-        if (!nativeInitializeContext(nativeMapViewPtr)) {
-            Log.e(TAG, "nativeInitializeContext failed");
-            throw new RuntimeException("Unable to initialize GL context.");
-        }
+        nativeInitializeContext(nativeMapViewPtr);
     }
    
     // Called when we need to terminate the GL context
@@ -311,10 +304,7 @@ public class MapView extends SurfaceView {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             Log.v(TAG, "surfaceCreated");
-            if (!nativeCreateSurface(nativeMapViewPtr, holder.getSurface())) {
-                Log.e(TAG, "nativeInitializeContext failed");
-                throw new RuntimeException("Unable to create GL surface.");
-            }
+            nativeCreateSurface(nativeMapViewPtr, holder.getSurface());;
         }
 
         // Called when the native surface buffer has been destroyed
@@ -775,6 +765,19 @@ public class MapView extends SurfaceView {
     //
     // Accessibility events
     //
+    
+    //
+    // Map events
+    //
+    
+    // Called when the map view transformation has changed
+    // Called via JNI from NativeMapView
+    // Need to update anything that relies on map state
+    // TODO need to make this a listener so users of this view can register for it
+    protected void onMapChanged() {
+    	Log.v(TAG, "onMapChanged");
+    	// TODO
+    }
 
     //
     // JNI methods
@@ -796,10 +799,10 @@ public class MapView extends SurfaceView {
     private native long nativeCreate(String defaultStyleJSON);
     private native void nativeDestroy(long nativeMapViewPtr);
 
-    private native boolean nativeInitializeContext(long nativeMapViewPtr);
+    private native void nativeInitializeContext(long nativeMapViewPtr);
     private native void nativeTerminateContext(long nativeMapViewPtr);
 
-    private native boolean nativeCreateSurface(long nativeMapViewPtr, Surface surface);
+    private native void nativeCreateSurface(long nativeMapViewPtr, Surface surface);
     private native void nativeDestroySurface(long nativeMapViewPtr);
     
     private native void nativeStart(long nativeMapViewPtr);

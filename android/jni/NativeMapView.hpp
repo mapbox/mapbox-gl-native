@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <jni.h>
+
 #include <android/native_window.h>
 
 #include <EGL/egl.h>
@@ -15,7 +17,7 @@ class NativeMapView {
     friend class LLMRView;
 
 public:
-    NativeMapView(std::string default_style_json);
+    NativeMapView(JNIEnv* env, jobject obj, std::string default_style_json);
     ~NativeMapView();
 
     llmr::Map* getMap() const { return map; };
@@ -29,14 +31,19 @@ public:
     void start();
     void stop();
 
+    void notifyMapChange();
+
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint num_configs, bool use565) const;
 
 private:
-    llmr::Map* map = nullptr;
-    LLMRView* view = nullptr;
+    JavaVM* vm = nullptr;
+    jobject obj = nullptr;
 
     ANativeWindow* window = nullptr;
+
+    llmr::Map* map = nullptr;
+    LLMRView* view = nullptr;
 
     EGLDisplay display = EGL_NO_DISPLAY;
     EGLSurface surface = EGL_NO_SURFACE;
@@ -54,12 +61,12 @@ public:
     LLMRView(NativeMapView* nativeView) : nativeView(nativeView) {}
     virtual ~LLMRView() {}
 
-    //void notify_map_change();
-
     void make_active() override;
     void make_inactive() override;
 
     void swap() override;
+
+    void notify_map_change() override;
 
 private:
     NativeMapView* nativeView = nullptr;

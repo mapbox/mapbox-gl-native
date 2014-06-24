@@ -1,5 +1,3 @@
-// TODO fix tabs as spaces
-
 #include <stdio.h>
 
 #include <memory>
@@ -30,8 +28,22 @@ void log_gl_string(GLenum name, const char* label) {
     }
 }
 
-NativeMapView::NativeMapView(std::string default_style_json) : default_style_json(default_style_json) {
-    VERBOSE("NativeMapView constructor");
+NativeMapView::NativeMapView(JNIEnv* env, jobject obj, std::string default_style_json) : default_style_json(default_style_json) {
+    VERBOSE("NativeMapView::NativeMapView");
+
+    ASSERT(env != nullptr);
+    ASSERT(obj != nullptr);
+
+    if (env->GetJavaVM(&vm) < 0) {
+    	env->ExceptionDescribe();
+    	return;
+    }
+
+    this->obj = env->NewGlobalRef(obj);
+    if (this->obj == nullptr) {
+    	env->ExceptionDescribe();
+    	return;
+    }
 
     // TODO replace all printfs in map code with android logging
     freopen("/sdcard/stdout.txt", "w", stdout); // NOTE: can't use <cstdio> till NDK fix the stdout macro bug
@@ -45,7 +57,7 @@ NativeMapView::NativeMapView(std::string default_style_json) : default_style_jso
 }
 
 NativeMapView::~NativeMapView() {
-    VERBOSE("NativeMapView destructor");
+    VERBOSE("NativeMapView::~NativeMapView");
     terminateContext();
 
     delete map;
@@ -53,10 +65,22 @@ NativeMapView::~NativeMapView() {
 
     delete view;
     view = nullptr;
+
+    ASSERT(vm != nullptr);
+    ASSERT(obj != nullptr);
+
+    JNIEnv* env = nullptr;
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) == JNI_OK) {
+        env->DeleteGlobalRef(obj);
+    } else {
+    	env->ExceptionDescribe();
+    }
+    obj = nullptr;
+    vm = nullptr;
 }
 
 bool NativeMapView::initializeContext() {
-    VERBOSE("NativeMapView initializeContext");
+    VERBOSE("NativeMapView::initializeContext");
 
     ASSERT(window == nullptr);
     ASSERT(display == EGL_NO_DISPLAY);
@@ -253,7 +277,7 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_conf
 }
 
 void NativeMapView::terminateContext() {
-    VERBOSE("NativeMapView terminateContext");
+    VERBOSE("NativeMapView::terminateContext");
 
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
         map->terminate();
@@ -291,7 +315,7 @@ void NativeMapView::terminateContext() {
 }
 
 bool NativeMapView::createSurface(ANativeWindow* window) {
-    VERBOSE("NativeMapView createSurface");
+    VERBOSE("NativeMapView::createSurface");
 
     ASSERT(this->window == nullptr);
     ASSERT(window != nullptr);
@@ -349,7 +373,7 @@ bool NativeMapView::createSurface(ANativeWindow* window) {
 }
 
 void NativeMapView::destroySurface() {
-    VERBOSE("NativeMapView destroySurface");
+    VERBOSE("NativeMapView::destroySurface");
 
     if (surface != EGL_NO_SURFACE) {
         if (!eglDestroySurface(display, surface)) {
@@ -366,7 +390,7 @@ void NativeMapView::destroySurface() {
 }
 
 void NativeMapView::start() {
-    VERBOSE("NativeMapView start");
+    VERBOSE("NativeMapView::start");
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
         map->start();
     } else {
@@ -375,15 +399,45 @@ void NativeMapView::start() {
 }
 
 void NativeMapView::stop() {
-    VERBOSE("NativeMapView stop");
+    VERBOSE("NativeMapView::stop");
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
         map->stop();
     }
 }
 
-void LLMRView::make_active()
-{
-    VERBOSE("LLMRView make_active");
+void NativeMapView::notifyMapChange() {
+    DEBUG("NativeMapView::notify_map_change()");
+
+    ASSERT(vm != nullptr);
+    ASSERT(obj != nullptr);
+
+    JNIEnv* env = nullptr;
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+    	env->ExceptionDescribe();
+    	return;
+    }
+
+    jclass clazz = env->GetObjectClass(this->obj);
+    if (clazz == nullptr) {
+    	env->ExceptionDescribe();
+    	return;
+    }
+
+    jmethodID id = env->GetMethodID(clazz, "onMapChanged", "()V");
+    if (id == nullptr) {
+    	env->ExceptionDescribe();
+    	return;
+    }
+
+    env->CallVoidMethod(obj, id);
+    if (env->ExceptionCheck() != JNI_FALSE) {
+    	env->ExceptionDescribe();
+    	return;
+    }
+}
+
+void LLMRView::make_active() {
+    VERBOSE("LLMRView::make_active");
     if ((nativeView->display != EGL_NO_DISPLAY) && (nativeView->surface != EGL_NO_SURFACE) && (nativeView->context != EGL_NO_CONTEXT)) {
         if (!eglMakeCurrent(nativeView->display, nativeView->surface, nativeView->surface, nativeView->context)) {
             ERROR("eglMakeCurrent() returned error %d", eglGetError());
@@ -393,17 +447,15 @@ void LLMRView::make_active()
     }
 }
 
-void LLMRView::make_inactive()
-{
-    VERBOSE("LLMRView make_inactive");
+void LLMRView::make_inactive() {
+    VERBOSE("LLMRView::make_inactive");
     if (!eglMakeCurrent(nativeView->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
         ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
     }
 }
 
-void LLMRView::swap()
-{
-    VERBOSE("LLMRView swap");
+void LLMRView::swap() {
+    VERBOSE("LLMRView::swap");
     if (map->needsSwap() && (nativeView->display != EGL_NO_DISPLAY) && (nativeView->surface != EGL_NO_SURFACE)) {
         if (!eglSwapBuffers(nativeView->display, nativeView->surface)) {
             ERROR("eglSwapBuffers() returned error %d", eglGetError());
@@ -414,7 +466,7 @@ void LLMRView::swap()
     }
 }
 
-void llmr::platform::notify_map_change() {
-    DEBUG("notify_map_change() called");
-    // TODO is only one instance of the map allowed?
+void LLMRView::notify_map_change() {
+    DEBUG("LLMRView::notify_map_change()");
+    nativeView->notifyMapChange();
 }
