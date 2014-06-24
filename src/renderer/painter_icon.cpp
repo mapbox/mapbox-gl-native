@@ -20,7 +20,7 @@ void Painter::renderIcon(IconBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
 
     useProgram(iconShader->program);
-    iconShader->setMatrix(vtxMatrix);
+    iconShader->setMatrix(matrix);
 // TODO: update
 //    iconShader->setColor(color);
     iconShader->setImage(0);

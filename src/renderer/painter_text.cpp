@@ -28,7 +28,7 @@ void Painter::renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 //    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     useProgram(textShader->program);
-    textShader->setMatrix(vtxMatrix);
+    textShader->setMatrix(matrix);
     textShader->setExtrudeMatrix(exMatrix);
 
     GlyphAtlas &glyphAtlas = *map.getGlyphAtlas();
