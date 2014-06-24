@@ -1229,6 +1229,10 @@ void Style::setDefaultTransitionDuration(uint64_t duration_milliseconds) {
     default_transition_duration = duration_milliseconds;
 }
 
+const std::vector<std::string> &Style::getAppliedClasses() const {
+    return appliedClasses;
+}
+
 void Style::toggleClass(const std::string &name) {
     if (name.length()) {
         auto it = std::find(appliedClasses.begin(), appliedClasses.end(), name);

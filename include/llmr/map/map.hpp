@@ -52,8 +52,7 @@ public:
 
     // Styling
     void toggleClass(const std::string &name);
-//    void setAppliedClasses(const std::vector<std::string> &appliedClasses);
-//    const std::vector<std::string> &getAppliedClasses() const;
+    const std::vector<std::string> &getAppliedClasses() const;
     void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);
     void setStyleJSON(std::string newStyleJSON);
     std::string getStyleJSON() const;

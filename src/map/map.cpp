@@ -390,10 +390,10 @@ void Map::toggleClass(const std::string &name) {
 //
 //    update();
 //}
-//
-//const std::vector<std::string> &Map::getAppliedClasses() const {
-//    return style->appliedClasses;
-//}
+
+const std::vector<std::string> &Map::getAppliedClasses() const {
+   return style->getAppliedClasses();
+}
 
 void Map::setDefaultTransitionDuration(uint64_t duration_milliseconds) {
     style->setDefaultTransitionDuration(duration_milliseconds);
