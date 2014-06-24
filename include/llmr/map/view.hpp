@@ -24,17 +24,11 @@ public:
     // thread. This is called once just before the rendering thread terminates.
     virtual void make_inactive() = 0;
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     // Notifies a watcher of map x/y/scale/rotation changes.
     // Must only be called from the same thread that caused the change.
     // Must not be called from the render thread.
     virtual void notify_map_change() = 0;
 
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 protected:
     llmr::Map *map = nullptr;
 };
