@@ -10,7 +10,7 @@
 #include <EGL/egl.h>
 
 #include <llmr/llmr.hpp>
-
+// TODO put in namespace llmr::android
 class LLMRView;
 
 class NativeMapView {
@@ -20,7 +20,10 @@ public:
     NativeMapView(JNIEnv* env, jobject obj, std::string default_style_json);
     ~NativeMapView();
 
-    llmr::Map* getMap() const { return map; };
+    llmr::Map* getMap() const {
+        return map;
+    }
+    ;
 
     bool initializeContext();
     void terminateContext();
@@ -34,7 +37,8 @@ public:
     void notifyMapChange();
 
 private:
-    EGLConfig chooseConfig(const EGLConfig configs[], EGLint num_configs, bool use565) const;
+    EGLConfig chooseConfig(const EGLConfig configs[], EGLint num_configs,
+            bool use565) const;
 
 private:
     JavaVM* vm = nullptr;
@@ -55,11 +59,13 @@ private:
     std::string default_style_json;
 };
 
-class LLMRView : public llmr::View
-{
+class LLMRView: public llmr::View {
 public:
-    LLMRView(NativeMapView* nativeView) : nativeView(nativeView) {}
-    virtual ~LLMRView() {}
+    LLMRView(NativeMapView* nativeView) :
+            nativeView(nativeView) {
+    }
+    virtual ~LLMRView() {
+    }
 
     void make_active() override;
     void make_inactive() override;
