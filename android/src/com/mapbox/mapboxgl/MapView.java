@@ -1,6 +1,7 @@
 package com.mapbox.mapboxgl;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -111,6 +112,10 @@ public class MapView extends SurfaceView {
 
         // Create the NativeMapView
         mNativeMapView = new NativeMapView(this, mDefaultStyleJSON);
+
+        Set<String> styles2 = mNativeMapView.getAppliedClasses();
+        if (!styles.equals(styles2))
+            Log.d(TAG, "Styles do not match");
 
         // Load attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
