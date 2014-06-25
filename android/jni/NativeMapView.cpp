@@ -57,7 +57,6 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj,
     view = new LLMRView(this);
     map = new llmr::Map(*view);
 
-    // TODO move out of here
     map->setStyleJSON(default_style_json);
 }
 
@@ -117,10 +116,8 @@ bool NativeMapView::initializeContext() {
     log_egl_string(display, EGL_VERSION, "Version");
     log_egl_string(display, EGL_CLIENT_APIS, "Client APIs");
     log_egl_string(display, EGL_EXTENSIONS, "Client Extensions");
-    if (eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS) != nullptr) {
-        log_egl_string(EGL_NO_DISPLAY, EGL_EXTENSIONS, "Display Extensions");
-    }
 
+    // TODO should try 565, then 8888?
     bool use565 = true;
 
     const EGLint config_attribs[] = {
@@ -341,6 +338,11 @@ void NativeMapView::terminateContext() {
 
 bool NativeMapView::createSurface(ANativeWindow* window) {
     VERBOSE("NativeMapView::createSurface");
+
+    // TODO temp fix for fragments, remove later
+    /*if ((display == EGL_NO_DISPLAY) && (context == EGL_NO_CONTEXT)) {
+        initializeContext();
+    }*/
 
     ASSERT(this->window == nullptr);
     ASSERT(window != nullptr);
