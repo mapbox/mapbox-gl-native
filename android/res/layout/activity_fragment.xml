@@ -2,10 +2,10 @@
        xmlns:tools="http://schemas.android.com/tools"
        tools:context="${packageName}.${activityClass}" >
 
-    <view
+    <fragment
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        class="com.mapbox.mapboxgl.MapView"
-        android:id="@+id/map" />
+        class="com.mapbox.mapboxgl.MapFragment"
+        android:id="@+id/map_fragment" />
 
 </merge>
