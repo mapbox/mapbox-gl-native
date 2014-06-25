@@ -1,8 +1,8 @@
 // Work around error in Android's Bionic stdint.h
 // Fixed in Git https://github.com/android/platform_bionic/blob/master/libc/include/stdint.h
 // Seems to be specific to C++11 (older versions needed these macros)
-#define __STDINT_LIMITS
-#define __STDINT_MACROS
+#define __STDC_CONSTANT_MACROS
+#define __STDC_LIMIT_MACROS
 #define __STDC_FORMAT_MACROS
 #include <cstdint>
 #include <cinttypes>
@@ -669,8 +669,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeRerender", "(J)V", reinterpret_cast<void*>(&nativeRerender) },
         { "nativeUpdate", "(J)V", reinterpret_cast<void*>(&nativeUpdate) },
         { "nativeCleanup", "(J)V", reinterpret_cast<void*>(&nativeCleanup) },
-        { "nativeResize", "(JIIF)V", reinterpret_cast<void*>(static_cast<void(*)(JNIEnv*,jobject,jlong,jint,jint,jfloat)>(&nativeResize)) },
-        { "nativeResize", "(JIIFII)V", reinterpret_cast<void*>(static_cast<void(*)(JNIEnv*,jobject,jlong,jint,jint,jfloat,jint,jint)>(&nativeResize)) },
+        { "nativeResize", "(JIIF)V", reinterpret_cast<void*>(static_cast<void JNICALL(*)(JNIEnv*,jobject,jlong,jint,jint,jfloat)>(&nativeResize)) },
+        { "nativeResize", "(JIIFII)V", reinterpret_cast<void*>(static_cast<void JNICALL(*)(JNIEnv*,jobject,jlong,jint,jint,jfloat,jint,jint)>(&nativeResize)) },
         { "nativeSetAppliedClasses", "(JLjava/util/Set;)V", reinterpret_cast<void*>(&nativeSetAppliedClasses) },
         { "nativeGetAppliedClasses", "(J)Ljava/util/Set;", reinterpret_cast<void*>(&nativeGetAppliedClasses) },
         { "nativeSetDefaultTransitionDuration", "(JJ)V", reinterpret_cast<void*>(&nativeSetDefaultTransitionDuration) },
