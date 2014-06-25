@@ -18,8 +18,22 @@ extern jmethodID on_map_changed_id;
 
 extern jclass lon_lat_class;
 extern jmethodID lon_lat_constructor_id;
-extern jfieldID lon_id;
-extern jfieldID lat_id;
+extern jfieldID lon_lat_lon_id;
+extern jfieldID lon_lat_lat_id;
+
+extern jclass lon_lat_zoom_class;
+extern jmethodID lon_lat_zoom_constructor_id;
+extern jfieldID lon_lat_zoom_lon_id;
+extern jfieldID lon_lat_zoom_lat_id;
+extern jfieldID lon_lat_zoom_zoom_id;
+
+extern jclass runtime_exception_class;
+
+extern jmethodID set_to_array_id;
+
+extern jclass tree_set_class;
+extern jmethodID tree_set_constructor_id;
+extern jmethodID tree_set_add_id;
 
 class LLMRView;
 

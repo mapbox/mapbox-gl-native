@@ -447,7 +447,7 @@ void NativeMapView::notifyMapChange() {
     }
 
     env->CallVoidMethod(obj, on_map_changed_id);
-    if (env->ExceptionCheck() != JNI_FALSE) {
+    if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return;
     }
