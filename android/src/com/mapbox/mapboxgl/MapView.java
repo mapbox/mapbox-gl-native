@@ -1,7 +1,6 @@
 package com.mapbox.mapboxgl;
 
 import java.io.IOException;
-import java.util.Set;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -26,7 +25,7 @@ import android.widget.ZoomButtonsController;
 // Custom view that shows a Map
 // Based on SurfaceView as we use OpenGL ES to render
 public class MapView extends SurfaceView {
-
+    // TODO try TextureView
     //
     // Static members
     //
@@ -113,10 +112,6 @@ public class MapView extends SurfaceView {
         // Create the NativeMapView
         mNativeMapView = new NativeMapView(this, mDefaultStyleJSON);
 
-        Set<String> styles2 = mNativeMapView.getAppliedClasses();
-        if (!styles.equals(styles2))
-            Log.d(TAG, "Styles do not match");
-
         // Load attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
                 R.styleable.MapView, 0, 0);
@@ -188,15 +183,47 @@ public class MapView extends SurfaceView {
     }
 
     public void setCenterCoordinate(LonLat centerCoordinate) {
-        mNativeMapView.setLonLat(centerCoordinate);
+        setCenterCoordinate(centerCoordinate, false);
+    }
+
+    public void setCenterCoordinate(LonLat centerCoordinate, boolean animated) {
+        double duration = animated ? 0.3 : 0.0;
+        mNativeMapView.setLonLat(centerCoordinate, duration);
+    }
+
+    public void setCenterCoordinate(LonLatZoom centerCoordinate) {
+        setCenterCoordinate(centerCoordinate, false);
+    }
+
+    public void setCenterCoordinate(LonLatZoom centerCoordinate,
+            boolean animated) {
+        double duration = animated ? 0.3 : 0.0;
+        mNativeMapView.setLonLatZoom(centerCoordinate, duration);
     }
 
     public double getDirection() {
-        return mNativeMapView.getAngle();
+        double direction = mNativeMapView.getAngle();
+
+        direction *= 180 / Math.PI;
+
+        while (direction > 360)
+            direction -= 360;
+        while (direction < 0)
+            direction += 360;
+
+        return direction;
     }
 
     public void setDirection(double direction) {
-        mNativeMapView.setAngle(direction);
+        setDirection(direction, false);
+    }
+
+    public void setDirection(double direction, boolean animated) {
+        double duration = animated ? 0.3 : 0.0;
+
+        direction *= Math.PI / 180;
+
+        mNativeMapView.setAngle(direction, duration);
     }
 
     public void resetPosition() {
@@ -212,7 +239,12 @@ public class MapView extends SurfaceView {
     }
 
     public void setZoomLevel(double zoomLevel) {
-        mNativeMapView.setZoom(zoomLevel);
+        setZoomLevel(zoomLevel, false);
+    }
+
+    public void setZoomLevel(double zoomLevel, boolean animated) {
+        double duration = animated ? 0.3 : 0.0;
+        mNativeMapView.setZoom(zoomLevel, duration);
     }
 
     public boolean isZoomEnabled() {
@@ -221,6 +253,11 @@ public class MapView extends SurfaceView {
 
     public void setZoomEnabled(boolean zoomEnabled) {
         this.mZoomEnabled = zoomEnabled;
+
+        if ((mZoomButtonsController != null)
+                && (getVisibility() == View.VISIBLE) && mZoomEnabled) {
+            mZoomButtonsController.setVisible(true);
+        }
     }
 
     public boolean isScrollEnabled() {
@@ -249,6 +286,46 @@ public class MapView extends SurfaceView {
 
     public void toggleDebug() {
         mNativeMapView.toggleDebug();
+    }
+
+    public void toggleStyle() {
+        // TODO
+    }
+
+    public void getRawStyle() {
+        // TODO
+    }
+
+    public void setRawStyle() {
+        // TODO
+    }
+
+    public void getStyleOrderedLayerNames() {
+        // TODO
+    }
+
+    public void setStyleOrderedLayerNames() {
+
+    }
+
+    public void getAllStyleClasses() {
+
+    }
+
+    public void getAppliedStyleClasses() {
+
+    }
+
+    public void setAppliedStyleClasses() {
+
+    }
+
+    public void getStyleDescriptionForLayer() {
+
+    }
+
+    public void setStyleDescription() {
+
     }
 
     //
@@ -389,10 +466,11 @@ public class MapView extends SurfaceView {
     @Override
     protected void onVisibilityChanged(View changedView, int visibility) {
         // Required by ZoomButtonController (from Android SDK documentation)
-        if (mZoomButtonsController != null && visibility != View.VISIBLE) {
+        if ((mZoomButtonsController != null) && (visibility != View.VISIBLE)) {
             mZoomButtonsController.setVisible(false);
         }
-        if (mZoomButtonsController != null && visibility == View.VISIBLE) {
+        if ((mZoomButtonsController != null) && (visibility == View.VISIBLE)
+                && mZoomEnabled) {
             mZoomButtonsController.setVisible(true);
         }
     }
@@ -450,7 +528,7 @@ public class MapView extends SurfaceView {
         @Override
         public boolean onDown(MotionEvent e) {
             // Show the zoom controls
-            if (mZoomButtonsController != null) {
+            if ((mZoomButtonsController != null) && mZoomEnabled) {
                 mZoomButtonsController.setVisible(true);
             }
 
@@ -460,6 +538,10 @@ public class MapView extends SurfaceView {
         // Called for double taps
         @Override
         public boolean onDoubleTap(MotionEvent e) {
+            if (!mZoomEnabled) {
+                return false;
+            }
+
             // Single finger double tap
             // Zoom in
             zoom(true, e.getX(), e.getY());
@@ -492,6 +574,10 @@ public class MapView extends SurfaceView {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
                 float velocityY) {
+            if (!mScrollEnabled) {
+                return false;
+            }
+
             // Fling the map
             // TODO does not work
             /*
@@ -518,6 +604,10 @@ public class MapView extends SurfaceView {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2,
                 float distanceX, float distanceY) {
+            if (!mScrollEnabled) {
+                return false;
+            }
+
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
@@ -534,6 +624,10 @@ public class MapView extends SurfaceView {
         // Called when two fingers first touch the screen
         @Override
         public boolean onScaleBegin(ScaleGestureDetector detector) {
+            if (!mZoomEnabled) {
+                return false;
+            }
+
             // TODO start scaling/cancel
             return true;
         }
@@ -542,6 +636,10 @@ public class MapView extends SurfaceView {
         // Called for pinch zooms
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
+            if (!mZoomEnabled) {
+                return false;
+            }
+
             // Zoom the map
             // TODO: rotation?
             // https://github.com/Almeros/android-gesture-detectors
@@ -571,6 +669,10 @@ public class MapView extends SurfaceView {
         // Called when user pushes a zoom button
         @Override
         public void onZoom(boolean zoomIn) {
+            if (!mZoomEnabled) {
+                return;
+            }
+
             // Zoom in or out
             zoom(zoomIn);
         }
@@ -594,6 +696,10 @@ public class MapView extends SurfaceView {
             return true;
 
         case KeyEvent.KEYCODE_DPAD_LEFT:
+            if (!mScrollEnabled) {
+                return false;
+            }
+
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
@@ -602,6 +708,10 @@ public class MapView extends SurfaceView {
             return true;
 
         case KeyEvent.KEYCODE_DPAD_RIGHT:
+            if (!mScrollEnabled) {
+                return false;
+            }
+
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
@@ -610,6 +720,10 @@ public class MapView extends SurfaceView {
             return true;
 
         case KeyEvent.KEYCODE_DPAD_UP:
+            if (!mScrollEnabled) {
+                return false;
+            }
+
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
@@ -618,6 +732,10 @@ public class MapView extends SurfaceView {
             return true;
 
         case KeyEvent.KEYCODE_DPAD_DOWN:
+            if (!mScrollEnabled) {
+                return false;
+            }
+
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
@@ -640,6 +758,10 @@ public class MapView extends SurfaceView {
         // onKeyLongPress is fired
         case KeyEvent.KEYCODE_ENTER:
         case KeyEvent.KEYCODE_DPAD_CENTER:
+            if (!mZoomEnabled) {
+                return false;
+            }
+
             // Zoom out
             zoom(false);
             return true;
@@ -666,6 +788,10 @@ public class MapView extends SurfaceView {
         switch (keyCode) {
         case KeyEvent.KEYCODE_ENTER:
         case KeyEvent.KEYCODE_DPAD_CENTER:
+            if (!mZoomEnabled) {
+                return false;
+            }
+
             // Zoom in
             zoom(true);
             return true;
@@ -684,12 +810,15 @@ public class MapView extends SurfaceView {
         switch (event.getActionMasked()) {
         // The trackball was rotated
         case MotionEvent.ACTION_MOVE:
+            if (!mScrollEnabled) {
+                return false;
+            }
+
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
             // Scroll the map
             mNativeMapView.moveBy(-10.0 * event.getX(), -10.0 * event.getY());
-
             return true;
 
             // Trackball was pushed in so start tracking and tell system we are
@@ -709,11 +838,17 @@ public class MapView extends SurfaceView {
 
             // Trackball was released
         case MotionEvent.ACTION_UP:
+            if (!mZoomEnabled) {
+                return false;
+            }
+
             // Only handle if we have not already long pressed
             if (mCurrentTrackballLongPressTimeOut != null) {
                 // Zoom in
                 zoom(true);
             }
+            return true;
+
             // Trackball was cancelled
         case MotionEvent.ACTION_CANCEL:
             if (mCurrentTrackballLongPressTimeOut != null) {
@@ -769,6 +904,10 @@ public class MapView extends SurfaceView {
             switch (event.getActionMasked()) {
             // Mouse scrolls
             case MotionEvent.ACTION_SCROLL:
+                if (!mZoomEnabled) {
+                    return false;
+                }
+
                 // Cancel any animation
                 mNativeMapView.cancelTransitions();
 
@@ -799,7 +938,7 @@ public class MapView extends SurfaceView {
         case MotionEvent.ACTION_HOVER_ENTER:
         case MotionEvent.ACTION_HOVER_MOVE:
             // Show the zoom controls
-            if (mZoomButtonsController != null) {
+            if ((mZoomButtonsController != null) && mZoomEnabled) {
                 mZoomButtonsController.setVisible(true);
             }
             return true;

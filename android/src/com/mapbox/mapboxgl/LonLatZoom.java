@@ -25,6 +25,12 @@ public class LonLatZoom implements Parcelable {
         this.zoom = zoom;
     }
 
+    public LonLatZoom(LonLat lonLat, double zoom) {
+        this.lon = lonLat.getLon();
+        this.lat = lonLat.getLat();
+        this.zoom = zoom;
+    }
+
     private LonLatZoom(Parcel in) {
         lon = in.readDouble();
         lat = in.readDouble();
@@ -53,6 +59,15 @@ public class LonLatZoom implements Parcelable {
 
     public void setZoom(double zoom) {
         this.zoom = zoom;
+    }
+
+    public LonLat getLonLat() {
+        return new LonLat(lon, lat);
+    }
+
+    public void setLonLat(LonLat lonLat) {
+        this.lon = lonLat.getLon();
+        this.lat = lonLat.getLat();
     }
 
     @Override

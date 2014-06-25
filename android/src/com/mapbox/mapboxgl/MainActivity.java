@@ -28,7 +28,6 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mMapView = (MapView) findViewById(R.id.map);
 
-        // TODO wrapper fragment?
         mMapView.onCreate(savedInstanceState);
     }
 
