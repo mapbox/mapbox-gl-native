@@ -1,7 +1,11 @@
 // Work around error in Android's Bionic stdint.h
+// Fixed in Git https://github.com/android/platform_bionic/blob/master/libc/include/stdint.h
+// Seems to be specific to C++11 (older versions needed these macros)
 #define __STDINT_LIMITS
 #define __STDINT_MACROS
+#define __STDC_FORMAT_MACROS
 #include <cstdint>
+#include <cinttypes>
 
 #include <string>
 #include <locale>
@@ -702,6 +706,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeToggleDebug", "(J)V", reinterpret_cast<void*>(&nativeToggleDebug) },
         { "nativeGetDebug", "(J)Z", reinterpret_cast<void*>(&nativeGetDebug) }
     }};
+    DEBUG("RegisterNatives using clazz 0x%016" PRIxPTR, reinterpret_cast<uintptr_t>(native_map_view_class));
     jint ret = env->RegisterNatives(native_map_view_class, methods.data(), methods.size());
     DEBUG("RegisterNatives returned %d", ret);
     if (env->ExceptionCheck()) {
