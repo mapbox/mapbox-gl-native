@@ -28,9 +28,10 @@ script:
 notifications:
   hipchat:
     rooms:
-      secure: "ZKtTiFjXgXfrAO8eMU1nJBe46OBLgk0H7VAVmk84QwAb6DuoqT+mGMs+1yrWtjLwZI8vayZyaucupp1siM7lBWCOADx5GXA6GCCLOuE7fYLSNJFrXHa1u70IUBLOU8b5bDWRn8tcd5CM754R609l4ckTzBH3y4CIh9YNFrB0b+g="
+      secure: "GGP1hopxPUtKABYyMIzwu8nJco3r14RhYAlpzZwlj1Ypl3okRCHh51VxkMpmPb6WgPhjL4O7/AVxS2mDnAyMqKWdeW3wl9edirZu0kjROCfxRoeqEeLC1JLHLfjdpIvJVv++jnvp2xrw+YUMI24Y2klHvOMpHhm8+CLpmmpidfY="
     template:
-      - '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}'
+      - 'Build <a href="%{build_url}">#%{build_number}</a>: %{author} tested <a href="%{compare_url}">%{commit}</a> in branch <a href="https://github.com/%{repository_slug}/tree/%{branch}">%{branch}</a> of <a href="https://github.com/%{repository_slug}">%{repository_name}</a>: <b>%{commit_message}</b><br>%{message} (%{duration})'
+    format: html
 
 git:
   submodules: false
