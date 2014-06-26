@@ -18,6 +18,8 @@ public:
     void initialize(llmr::Map *map);
     void swap();
     void make_active();
+    void make_inactive();
+    void notify_map_change();
 
     static void key(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void scroll(GLFWwindow *window, double xoffset, double yoffset);

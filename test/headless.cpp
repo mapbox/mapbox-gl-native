@@ -11,16 +11,6 @@
 #include <fstream>
 #include <sstream>
 
-
-namespace llmr {
-namespace platform {
-
-void notify_map_change() {
-    // no-op
-}
-
-}}
-
 class View : public llmr::View {
 public:
     void make_active() {
@@ -29,7 +19,21 @@ public:
             fprintf(stderr, "Switching OpenGL context failed\n");
         }
     }
-    void swap() {}
+
+    void make_inactive() {
+        CGLError error = CGLSetCurrentContext(nullptr);
+        if (error) {
+            fprintf(stderr, "Removing OpenGL context failed\n");
+        }
+    }
+
+    void swap() {
+        // no-op
+    }
+
+    void notify_map_change() {
+        // no-op
+    }
 
 CGLContextObj gl_context;
 };
@@ -150,6 +154,9 @@ TEST(Headless, initialize) {
     glDeleteTextures(1, &fbo_color);
     glDeleteRenderbuffersEXT(1, &fbo_depth_stencil);
 
+    map.terminate();
+
+    CGLSetCurrentContext(nullptr);
     CGLDestroyContext(view.gl_context);
 
     timer.report("destruct");
