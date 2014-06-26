@@ -1,6 +1,7 @@
 package com.almeros.android.multitouch.gesturedetectors;
 
 import android.content.Context;
+import android.graphics.PointF;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
@@ -48,6 +49,8 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
     private float mCurrLen;
     private float mPrevLen;
 
+    private PointF mFocus;
+
     public TwoFingerGestureDetector(Context context) {
         super(context);
 
@@ -90,6 +93,7 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
         final float cvy = cy1 - cy0;
         mCurrFingerDiffX = cvx;
         mCurrFingerDiffY = cvy;
+        mFocus = determineFocalPoint(curr);
     }
 
     /**
@@ -135,7 +139,7 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
         if (pointerIndex < event.getPointerCount()) {
             return event.getX(pointerIndex) + offset;
         }
-        return 0f;
+        return 0.0f;
     }
 
     /**
@@ -151,7 +155,7 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
         if (pointerIndex < event.getPointerCount()) {
             return event.getY(pointerIndex) + offset;
         }
-        return 0f;
+        return 0.0f;
     }
 
     /**
@@ -189,6 +193,36 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Determine (multi)finger focal point (a.k.a. center point between all
+     * fingers)
+     * 
+     * @param MotionEvent
+     *            e
+     * @return PointF focal point
+     */
+    public static PointF determineFocalPoint(MotionEvent e) {
+        // Number of fingers on screen
+        final int pCount = e.getPointerCount();
+        float x = 0.0f;
+        float y = 0.0f;
+
+        for (int i = 0; i < pCount; i++) {
+            x += e.getX(i);
+            y += e.getY(i);
+        }
+
+        return new PointF(x / pCount, y / pCount);
+    }
+
+    public float getFocusX() {
+        return mFocus.x;
+    }
+
+    public float getFocusY() {
+        return mFocus.y;
     }
 
 }

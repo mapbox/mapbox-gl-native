@@ -162,8 +162,8 @@ public class MoveGestureDetector extends BaseGestureDetector {
     private PointF determineFocalPoint(MotionEvent e) {
         // Number of fingers on screen
         final int pCount = e.getPointerCount();
-        float x = 0f;
-        float y = 0f;
+        float x = 0.0f;
+        float y = 0.0f;
 
         for (int i = 0; i < pCount; i++) {
             x += e.getX(i);

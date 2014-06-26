@@ -295,6 +295,10 @@ class NativeMapView {
         nativeSetAngle(mNativeMapViewPtr, angle, duration);
     }
 
+    public void setAngle(double angle, double cx, double cy) {
+        nativeSetAngle(mNativeMapViewPtr, angle, cx, cy);
+    }
+
     public double getAngle() {
         return nativeGetAngle(mNativeMapViewPtr);
     }
@@ -438,6 +442,9 @@ class NativeMapView {
 
     private native void nativeSetAngle(long nativeMapViewPtr, double angle,
             double duration);
+
+    private native void nativeSetAngle(long nativeMapViewPtr, double angle,
+            double cx, double cy);
 
     private native double nativeGetAngle(long nativeMapViewPtr);
 

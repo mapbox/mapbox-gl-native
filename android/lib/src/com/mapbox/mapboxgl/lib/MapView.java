@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -23,6 +24,9 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.ZoomButtonsController;
+
+import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
+import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 
 // Custom view that shows a Map
 // Based on SurfaceView as we use OpenGL ES to render
@@ -58,6 +62,8 @@ public class MapView extends SurfaceView {
     // Touch gesture detectors
     private GestureDetector mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
+    private RotateGestureDetector mRotateGestureDetector;
+    private boolean mTwoTap = false;
 
     // Shows zoom buttons
     private ZoomButtonsController mZoomButtonsController;
@@ -164,6 +170,8 @@ public class MapView extends SurfaceView {
         mGestureDetector.setIsLongpressEnabled(true);
         mScaleGestureDetector = new ScaleGestureDetector(context,
                 new ScaleGestureListener());
+        mRotateGestureDetector = new RotateGestureDetector(context,
+                new RotateGestureListener());
 
         // Shows the zoom controls
         // But not when in Eclipse UI editor
@@ -317,27 +325,27 @@ public class MapView extends SurfaceView {
     }
 
     public void setStyleOrderedLayerNames() {
-
+        // TODO
     }
 
     public void getAllStyleClasses() {
-
+        // TODO
     }
 
     public void getAppliedStyleClasses() {
-
+        // TODO
     }
 
     public void setAppliedStyleClasses() {
-
+        // TODO
     }
 
     public void getStyleDescriptionForLayer() {
-
+        // TODO
     }
 
     public void setStyleDescription() {
-
+        // TODO
     }
 
     //
@@ -523,13 +531,58 @@ public class MapView extends SurfaceView {
             return false;
         }
 
-        // Ensure we cascade the touch events correctly through the gesture
-        // detectors
-        // If an early detector consumes the event it is not passed to any more
-        // Must use the || operator for this to work correctly
-        boolean ret = mScaleGestureDetector.onTouchEvent(event);
-        ret = mGestureDetector.onTouchEvent(event) || ret;
-        return ret || super.onTouchEvent(event);
+        // Check two finger gestures first
+        boolean rotateRetVal = false;
+        mRotateGestureDetector.onTouchEvent(event);
+        boolean scaleRetVal = false;
+        mScaleGestureDetector.onTouchEvent(event);
+
+        // Handle two finger tap
+        switch (event.getActionMasked()) {
+        case MotionEvent.ACTION_DOWN:
+            // First pointer down
+            break;
+
+        case MotionEvent.ACTION_POINTER_DOWN:
+            // Second pointer down
+            if (event.getPointerCount() == 2) {
+                mTwoTap = true;
+            } else {
+                mTwoTap = false;
+            }
+            break;
+
+        case MotionEvent.ACTION_POINTER_UP:
+            // Second pointer up
+            break;
+
+        case MotionEvent.ACTION_UP:
+            // First pointer up
+            long tapInterval = event.getEventTime() - event.getDownTime();
+            boolean isTap = tapInterval <= ViewConfiguration.getTapTimeout();
+            boolean inProgress = mRotateGestureDetector.isInProgress()
+                    || mScaleGestureDetector.isInProgress();
+
+            if (mTwoTap && isTap && !inProgress) {
+                PointF focalPoint = TwoFingerGestureDetector
+                        .determineFocalPoint(event);
+                zoom(false, focalPoint.x, focalPoint.y);
+                mTwoTap = false;
+                return true;
+            }
+
+            mTwoTap = false;
+            break;
+
+        case MotionEvent.ACTION_CANCEL:
+            mTwoTap = false;
+            break;
+        }
+
+        // Do not change this code! It will break very easily.
+        boolean retVal = rotateRetVal || scaleRetVal;
+        retVal = mGestureDetector.onTouchEvent(event) || retVal;
+        return retVal || super.onTouchEvent(event);
     }
 
     // This class handles one finger gestures
@@ -577,9 +630,7 @@ public class MapView extends SurfaceView {
         // Called for a long press
         @Override
         public void onLongPress(MotionEvent e) {
-            // TODO quick zoom, (but android one is double tap and swipe from
-            // scale gesture detector?
-            // https://github.com/inukshuk/gestures-lib
+            // TODO
         }
 
         // Called for flings
@@ -591,6 +642,7 @@ public class MapView extends SurfaceView {
             }
 
             // Fling the map
+            // TODO Google Maps also has a rotate and zoom fling
             // TODO does not work
             /*
              * float ease = 0.25f;
@@ -621,7 +673,8 @@ public class MapView extends SurfaceView {
             }
 
             // Cancel any animation
-            mNativeMapView.cancelTransitions();
+            mNativeMapView.cancelTransitions(); // TODO need to test canceling
+                                                // transitions with touch
 
             // Scroll the map
             mNativeMapView.moveBy(-distanceX, -distanceY);
@@ -633,6 +686,10 @@ public class MapView extends SurfaceView {
     private class ScaleGestureListener extends
             ScaleGestureDetector.SimpleOnScaleGestureListener {
 
+        long mBeginTime = 0;
+        float mScaleFactor = 1.0f;
+        boolean mStarted = false;
+
         // Called when two fingers first touch the screen
         @Override
         public boolean onScaleBegin(ScaleGestureDetector detector) {
@@ -640,8 +697,17 @@ public class MapView extends SurfaceView {
                 return false;
             }
 
-            // TODO start scaling/cancel
+            mBeginTime = detector.getEventTime();
+
             return true;
+        }
+
+        // Called when fingers leave screen
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+            mBeginTime = 0;
+            mScaleFactor = 1.0f;
+            mStarted = false;
         }
 
         // Called each time one of the two fingers moves
@@ -652,9 +718,24 @@ public class MapView extends SurfaceView {
                 return false;
             }
 
-            // Zoom the map
-            // TODO: rotation?
-            // https://github.com/Almeros/android-gesture-detectors
+            // If scale is large enough ignore a tap
+            // TODO: Google Maps seem to use a velocity rather than absolute
+            // value?
+            mScaleFactor *= detector.getScaleFactor();
+            if ((mScaleFactor > 1.05f) || (mScaleFactor < 0.95f)) {
+                mStarted = true;
+            }
+
+            // Ignore short touches in case it is a tap
+            // Also ignore small scales
+            long time = detector.getEventTime();
+            long interval = time - mBeginTime;
+            if (!mStarted && (interval <= ViewConfiguration.getTapTimeout())) {
+                return false;
+            }
+
+            // TODO complex decision between roate or scale or both (see Google
+            // Maps app)
 
             // Cancel any animation
             mNativeMapView.cancelTransitions();
@@ -662,6 +743,78 @@ public class MapView extends SurfaceView {
             // Scale the map
             mNativeMapView.scaleBy(detector.getScaleFactor(),
                     detector.getFocusX(), detector.getFocusY());
+
+            return true;
+        }
+    }
+
+    // This class handles two rotate gestures
+    // TODO need way to single finger rotate - need to research how google maps
+    // does this
+    private class RotateGestureListener extends
+            RotateGestureDetector.SimpleOnRotateGestureListener {
+
+        long mBeginTime = 0;
+        float mTotalAngle = 0.0f;
+        boolean mStarted = false;
+
+        // Called when two fingers first touch the screen
+        @Override
+        public boolean onRotateBegin(RotateGestureDetector detector) {
+            if (!mRotateEnabled) {
+                return false;
+            }
+
+            mBeginTime = detector.getEventTime();
+
+            return true;
+        }
+
+        // Called when the fingers leave the screen
+        @Override
+        public void onRotateEnd(RotateGestureDetector detector) {
+            mBeginTime = 0;
+            mTotalAngle = 0.0f;
+            mStarted = false;
+        }
+
+        // Called each time one of the two fingers moves
+        // Called for rotation
+        @Override
+        public boolean onRotate(RotateGestureDetector detector) {
+            if (!mRotateEnabled) {
+                return false;
+            }
+
+            // If rotate is large enough ignore a tap
+            // TODO: Google Maps seem to use a velocity rather than absolute
+            // value, up to a point then they always rotate
+            mTotalAngle += detector.getRotationDegreesDelta();
+            if ((mTotalAngle > 5.0f) || (mTotalAngle < -5.0f)) {
+                mStarted = true;
+            }
+
+            // Ignore short touches in case it is a tap
+            // Also ignore small rotate
+            long time = detector.getEventTime();
+            long interval = time - mBeginTime;
+            if (!mStarted && (interval <= ViewConfiguration.getTapTimeout())) {
+                return false;
+            }
+
+            // TODO complex decision between rotate or scale or both (see Google
+            // Maps app). It seems if you start one or the other it takes more
+            // to start the other too. Haven't figured out what it uses to
+            // decide when to transition to both at the same time.
+
+            // Cancel any animation
+            mNativeMapView.cancelTransitions();
+
+            // Rotate the map
+            double angle = mNativeMapView.getAngle();
+            angle -= detector.getRotationDegreesDelta() * Math.PI / 180.0;
+            mNativeMapView.setAngle(angle, detector.getFocusX(),
+                    detector.getFocusY());
 
             return true;
         }

@@ -175,6 +175,6 @@ public class RotateGestureDetector extends TwoFingerGestureDetector {
     public float getRotationDegreesDelta() {
         double diffRadians = Math.atan2(mPrevFingerDiffY, mPrevFingerDiffX)
                 - Math.atan2(mCurrFingerDiffY, mCurrFingerDiffX);
-        return (float) (diffRadians * 180 / Math.PI);
+        return (float) (diffRadians * 180.0 / Math.PI);
     }
 }
