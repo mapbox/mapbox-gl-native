@@ -46,7 +46,7 @@ android: llmr.gyp node
 	bash -c "export PLATFORM=Android && source ./setup-libraries.sh && \
 	deps/run_gyp llmr.gyp --depth=. -Goutput_dir=.. --generator-output=./build/android -f make-android \
 	&& $(MAKE) -C ./build/android BUILDTYPE=$(BUILDTYPE) V=$(V) llmr-x86 \
-    && ant -f ./android/ -DBUILDTYPE=$(BUILDTYPE) -DV=$(V) `echo $(BUILDTYPE) | tr A-Z a-z`"
+    && ant -f ./android/app/ -DBUILDTYPE=$(BUILDTYPE) -DV=$(V) `echo $(BUILDTYPE) | tr A-Z a-z`"
 
 # Builds the linux app with make.
 linux: config.gypi linux/mapboxgl-app.gyp node
@@ -107,9 +107,9 @@ clean: clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
 	-rm -rf ./config.gypi
-	-rm -rf ./android/bin/
-	-rm -rf ./android/gen/
-	-rm -rf ./android/lib/armeabi/
+	-rm -rf ./android/app/bin/
+	-rm -rf ./android/app/gen/
+	-rm -rf ./android/app/lib/armeabi/
 
 distclean: clean
 	-rm -rf ./mapnik-packaging/osx/out/build-*
