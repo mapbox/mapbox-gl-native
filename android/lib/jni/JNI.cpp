@@ -486,6 +486,13 @@ void JNICALL nativeSetAngle(JNIEnv* env, jobject obj, jlong native_map_view_ptr,
     native_map_view->getMap()->setAngle(angle, duration);
 }
 
+void JNICALL nativeSetAngle(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble angle, jdouble cx, jdouble cy) {
+    VERBOSE("nativeSetAngle");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->setAngle(angle, cx, cy);
+}
+
 jdouble JNICALL nativeGetAngle(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     VERBOSE("nativeGetAngle");
     ASSERT(native_map_view_ptr != 0);
@@ -657,7 +664,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    std::array<JNINativeMethod, 47> methods = {{ // Can remove the extra brace in C++14
+    std::array<JNINativeMethod, 48> methods = {{ // Can remove the extra brace in C++14
         { "nativeCreate", "(Ljava/lang/String;)J", reinterpret_cast<void*>(&nativeCreate) },
         { "nativeDestroy", "(J)V", reinterpret_cast<void*>(&nativeDestroy) },
         { "nativeInitializeContext", "(J)V", reinterpret_cast<void*>(&nativeInitializeContext) },
@@ -696,7 +703,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeGetMinZoom", "(J)D", reinterpret_cast<void*>(&nativeGetMinZoom) },
         { "nativeGetMaxZoom", "(J)D", reinterpret_cast<void*>(&nativeGetMaxZoom) },
         { "nativeRotateBy", "(JDDDDD)V", reinterpret_cast<void*>(&nativeRotateBy) },
-        { "nativeSetAngle", "(JDD)V", reinterpret_cast<void*>(&nativeSetAngle) },
+        { "nativeSetAngle", "(JDD)V", reinterpret_cast<void*>(static_cast<void JNICALL(*)(JNIEnv*,jobject,jlong,jdouble,jdouble)>(&nativeSetAngle)) },
+        { "nativeSetAngle", "(JDDD)V", reinterpret_cast<void*>(static_cast<void JNICALL(*)(JNIEnv*,jobject,jlong,jdouble,jdouble,jdouble)>(&nativeSetAngle)) },
         { "nativeGetAngle", "(J)D", reinterpret_cast<void*>(&nativeGetAngle) },
         { "nativeResetNorth", "(J)V", reinterpret_cast<void*>(&nativeResetNorth) },
         { "nativeStartRotating", "(J)V", reinterpret_cast<void*>(&nativeStartRotating) },
