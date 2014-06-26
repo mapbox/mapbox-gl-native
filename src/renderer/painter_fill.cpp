@@ -17,10 +17,14 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
     fill_color[3] *= properties.opacity;
 
     Color stroke_color = properties.stroke_color;
-    stroke_color[0] *= properties.opacity;
-    stroke_color[1] *= properties.opacity;
-    stroke_color[2] *= properties.opacity;
-    stroke_color[3] *= properties.opacity;
+    if (stroke_color[3] < 0) {
+        stroke_color = fill_color;
+    } else {
+        stroke_color[0] *= properties.opacity;
+        stroke_color[1] *= properties.opacity;
+        stroke_color[2] *= properties.opacity;
+        stroke_color[3] *= properties.opacity;
+    }
 
     bool outline = properties.antialias && properties.stroke_color != properties.fill_color;
     bool fringeline = properties.antialias && properties.stroke_color == properties.fill_color;
