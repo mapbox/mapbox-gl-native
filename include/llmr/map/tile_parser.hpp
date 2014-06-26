@@ -42,13 +42,13 @@ private:
     void addGlyph(uint64_t tileid, const std::string stackname, const std::u32string &string, const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face);
     std::unique_ptr<Bucket> createBucket(std::shared_ptr<StyleBucket> bucket_desc);
 
-    std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const PropertyFilterExpression &filter, const StyleBucketFill &fill);
-    std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const PropertyFilterExpression &filter, const StyleBucketLine &line);
-    std::unique_ptr<Bucket> createIconBucket(const VectorTileLayer& layer, const PropertyFilterExpression &filter, const StyleBucketIcon &icon);
-    std::unique_ptr<Bucket> createTextBucket(const VectorTileLayer& layer, const PropertyFilterExpression &filter, const StyleBucketText &text);
+    std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketFill &fill);
+    std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketLine &line);
+    std::unique_ptr<Bucket> createIconBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketIcon &icon);
+    std::unique_ptr<Bucket> createTextBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketText &text);
 
-    template <class Bucket> void addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const PropertyFilterExpression &filter);
-    template <class Bucket, typename ...Args> void addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const PropertyFilterExpression &filter, Args&& ...args);
+    template <class Bucket> void addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const FilterExpression &filter);
+    template <class Bucket, typename ...Args> void addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const FilterExpression &filter, Args&& ...args);
 
 private:
     const VectorTile vector_data;

@@ -39,7 +39,6 @@ private:
     void parseRasterize(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer);
-    void parseFilter(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer);
 
     // Parses optional properties into a render bucket.
@@ -54,9 +53,11 @@ private:
     template <typename T>
     bool parseStyleProperty(const char *property_name, const std::vector<ClassPropertyKey> &keys, ClassProperties &klass, JSVal value);
 
-//    PropertyFilterExpression parseFilterOrExpression(JSVal value);
-//    Value parseValue(JSVal value);
-//
+
+    FilterExpression parseFilter(JSVal, FilterExpression::Operator op);
+    FilterExpression parseFilter(JSVal);
+    Value parseValue(JSVal value);
+    std::forward_list<Value> parseValues(JSVal values);
 
 private:
     std::unordered_map<std::string, const rapidjson::Value *> constants;

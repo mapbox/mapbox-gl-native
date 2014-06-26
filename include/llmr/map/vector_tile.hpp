@@ -40,6 +40,22 @@ public:
 
 std::ostream& operator<<(std::ostream&, const VectorTileFeature& feature);
 
+
+class VectorTileTagExtractor {
+public:
+    VectorTileTagExtractor(const VectorTileLayer &layer);
+
+    void setTags(const pbf &pbf);
+    std::forward_list<Value> getValues(const std::string &key) const;
+    void setType(FilterExpression::GeometryType type);
+    FilterExpression::GeometryType getType() const;
+
+private:
+    const VectorTileLayer &layer_;
+    pbf tags_;
+    FilterExpression::GeometryType type_ = FilterExpression::GeometryType::Any;
+};
+
 /*
  * Allows iterating over the features of a VectorTileLayer using a
  * BucketDescription as filter. Only features matching the descriptions will
@@ -55,11 +71,6 @@ public:
         const pbf& operator*() const;
 
     private:
-        bool matchesFilterExpression(const PropertyFilterExpression &filterExpression, const pbf &tags_pbf);
-        bool matchesExpression(const PropertyExpression &expression, const pbf &tags_pbf);
-        bool matchesFilter(const PropertyFilter &filter, const pbf &tags_pbf);
-
-    private:
         const FilteredVectorTileLayer& parent;
         bool valid = false;
         pbf feature;
@@ -67,14 +78,14 @@ public:
     };
 
 public:
-    FilteredVectorTileLayer(const VectorTileLayer& layer, const PropertyFilterExpression &filterExpression);
+    FilteredVectorTileLayer(const VectorTileLayer& layer, const FilterExpression &filterExpression);
 
     iterator begin() const;
     iterator end() const;
 
 private:
     const VectorTileLayer& layer;
-    const PropertyFilterExpression& filterExpression;
+    const FilterExpression& filterExpression;
 };
 
 std::ostream& operator<<(std::ostream&, const GlyphPlacement& placement);

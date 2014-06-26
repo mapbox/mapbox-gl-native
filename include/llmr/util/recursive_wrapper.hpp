@@ -1,19 +1,15 @@
-#ifndef LLMR_UTIL_VARIANT_RECURSIVE_WRAPPER_HPP
-#define LLMR_UTIL_VARIANT_RECURSIVE_WRAPPER_HPP
+#ifndef MAPBOX_UTIL_VARIANT_RECURSIVE_WRAPPER_HPP
+#define MAPBOX_UTIL_VARIANT_RECURSIVE_WRAPPER_HPP
 
 #include <utility>
 
-namespace llmr {
-
-namespace util {
+namespace llmr { namespace util {
 
 template <typename T>
 class recursive_wrapper
 {
 public:
-
-    typedef T type;
-
+    using type = T;
 private:
 
     T* p_;
@@ -34,19 +30,19 @@ private:
 
 public:
 
-    recursive_wrapper& operator=(const recursive_wrapper& rhs)
+    inline recursive_wrapper& operator=(recursive_wrapper const& rhs)
     {
         assign( rhs.get() );
         return *this;
     }
 
-    recursive_wrapper& operator=(const T& rhs)
+    inline recursive_wrapper& operator=(T const& rhs)
     {
         assign( rhs );
         return *this;
     }
 
-    void swap(recursive_wrapper& operand) noexcept
+    inline void swap(recursive_wrapper& operand) noexcept
     {
         T* temp = operand.p_;
         operand.p_ = p_;
@@ -71,10 +67,10 @@ public:
 
     T& get() { return *get_pointer(); }
     const T& get() const { return *get_pointer(); }
-
     T* get_pointer() { return p_; }
     const T* get_pointer() const { return p_; }
-
+    operator T const&() const { return this->get(); }
+    operator T&() { return this->get(); }
 };
 
 template <typename T>
@@ -103,8 +99,9 @@ recursive_wrapper<T>::recursive_wrapper(T const& operand)
 
 template <typename T>
 recursive_wrapper<T>::recursive_wrapper(recursive_wrapper&& operand)
-    : p_(new T( std::move(operand.get()) ))
+    : p_(operand.p_)
 {
+    operand.p_ = nullptr;
 }
 
 template <typename T>
@@ -125,8 +122,6 @@ inline void swap(recursive_wrapper<T>& lhs, recursive_wrapper<T>& rhs) noexcept
     lhs.swap(rhs);
 }
 
-}
+}}
 
-}
-
-#endif // LLMR_UTIL_VARIANT_RECURSIVE_WRAPPER_HPP
+#endif // MAPBOX_UTIL_VARIANT_RECURSIVE_WRAPPER_HPP

@@ -622,7 +622,7 @@ void StyleParser::parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer) {
 
     if (value.HasMember("filter")) {
         JSVal value_filter = replaceConstant(value["filter"]);
-        parseFilter(value_filter, layer);
+        layer->bucket->filter = parseFilter(value_filter);
     }
 
     if (value.HasMember("render")) {
@@ -631,8 +631,92 @@ void StyleParser::parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer) {
     }
 }
 
-void StyleParser::parseFilter(JSVal value, std::shared_ptr<StyleLayer> &layer) {
-    // TODO
+FilterExpression StyleParser::parseFilter(JSVal value) {
+    return parseFilter(value, value.IsArray() ? FilterExpression::Operator::Or : FilterExpression::Operator::And);
+}
+
+FilterExpression StyleParser::parseFilter(JSVal value, FilterExpression::Operator op) {
+    FilterExpression expression(op);
+    if (value.IsObject()) {
+        rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
+        for (; itr != value.MemberEnd(); ++itr) {
+            const std::string name { itr->name.GetString(), itr->name.GetStringLength() };
+            if (name == "&") {
+                expression.add(parseFilter(replaceConstant(itr->value), FilterExpression::Operator::And));
+            } else if (name == "|") {
+                expression.add(parseFilter(replaceConstant(itr->value), FilterExpression::Operator::Or));
+            } else if (name == "^") {
+                expression.add(parseFilter(replaceConstant(itr->value), FilterExpression::Operator::Xor));
+            } else if (name == "!") {
+                expression.add(parseFilter(replaceConstant(itr->value), FilterExpression::Operator::Nor));
+            } else if (name == "$type") {
+                JSVal type = replaceConstant(itr->value);
+                if (type.IsString()) {
+                    expression.setGeometryType(parseGeometryType({ type.GetString(), type.GetStringLength() }));
+                }
+            } else {
+                FilterComparison comparison(name);
+                JSVal filterValue = replaceConstant(itr->value);
+                if (filterValue.IsObject()) {
+                    rapidjson::Value::ConstMemberIterator itr = filterValue.MemberBegin();
+                    for (; itr != filterValue.MemberEnd(); ++itr) {
+                        comparison.add(
+                            parseFilterComparisonOperator({ itr->name.GetString(), itr->name.GetStringLength() }),
+                            parseValues(replaceConstant(itr->value))
+                        );
+                    }
+                } else if (filterValue.IsArray()) {
+                    comparison.add(FilterComparison::Operator::In, parseValues(filterValue));
+                } else {
+                    comparison.add(FilterComparison::Operator::Equal, std::forward_list<Value>({ parseValue(filterValue) }));
+                }
+                expression.add(comparison);
+            }
+        }
+    } else if (value.IsArray()) {
+        for (rapidjson::SizeType i = 0; i < value.Size(); i++) {
+            expression.add(parseFilter(replaceConstant(value[i])));
+        }
+    } else {
+        fprintf(stderr, "[WARNING] expression must be either an array or an object\n");
+    }
+
+    return expression;
+}
+
+Value StyleParser::parseValue(JSVal value) {
+    switch (value.GetType()) {
+        case rapidjson::kNullType:
+        case rapidjson::kFalseType:
+            return false;
+
+        case rapidjson::kTrueType:
+            return true;
+
+        case rapidjson::kStringType:
+            return std::string { value.GetString(), value.GetStringLength() };
+
+        case rapidjson::kNumberType:
+            if (value.IsUint64()) return value.GetUint64();
+            if (value.IsInt64()) return value.GetInt64();
+            return value.GetDouble();
+
+        default:
+            return false;
+    }
+}
+
+std::forward_list<Value> StyleParser::parseValues(JSVal value) {
+    std::forward_list<Value> values;
+    if (value.IsArray()) {
+        auto it = values.before_begin();
+        for (rapidjson::SizeType i = 0; i < value.Size(); i++) {
+            it = values.emplace_after(it, parseValue(replaceConstant(value[i])));
+        }
+    } else {
+        values.emplace_front(parseValue(value));
+    }
+    return values;
 }
 
 void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
@@ -723,80 +807,5 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         break;
     }
 }
-
-//PropertyFilterExpression StyleParser::parseFilterOrExpression(JSVal value) {
-//    if (value.IsArray()) {
-//        // This is an expression.
-//        util::recursive_wrapper<PropertyExpression> expression;
-//        for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-//            JSVal filter_item = value[i];
-//
-//            if (filter_item.IsString()) {
-//                expression.get().op = expressionOperatorType({ filter_item.GetString(), filter_item.GetStringLength() });
-//            } else {
-//                expression.get().operands.emplace_back(parseFilterOrExpression(filter_item));
-//            }
-//        }
-//        return std::move(expression);
-//    } else if (value.IsObject() && value.HasMember("field") && value.HasMember("value")) {
-//        // This is a filter.
-//        JSVal field = value["field"];
-//        JSVal val = value["value"];
-//
-//        if (!field.IsString()) {
-//            throw Style::exception("field name must be a string");
-//        }
-//
-//        const std::string field_name { field.GetString(), field.GetStringLength() };
-//        const FilterOperator op = [&]{
-//            if (value.HasMember("operator")) {
-//                JSVal op_val = value["operator"];
-//                return filterOperatorType({ op_val.GetString(), op_val.GetStringLength() });
-//            } else {
-//                return FilterOperator::Equal;
-//            }
-//        }();
-//
-//        if (val.IsArray()) {
-//            // The filter has several values, so it's an OR sub-expression.
-//            util::recursive_wrapper<PropertyExpression> expression;
-//            for (rapidjson::SizeType i = 0; i < val.Size(); ++i) {
-//                expression.get().operands.emplace_back(util::recursive_wrapper<PropertyFilter>(PropertyFilter { field_name, op, parseValue(val[i]) }));
-//            }
-//
-//            return std::move(expression);
-//        } else {
-//            // The filter only has a single value, so it is a real filter.
-//            return std::move(util::recursive_wrapper<PropertyFilter>(PropertyFilter { field_name, op, parseValue(val) }));
-//        }
-//    }
-//
-//    return std::true_type();
-
-//Value StyleParser::parseValue(JSVal value) {
-//    switch (value.GetType()) {
-//        case rapidjson::kNullType:
-//        case rapidjson::kFalseType:
-//            return false;
-//
-//        case rapidjson::kTrueType:
-//            return true;
-//
-//        case rapidjson::kStringType:
-//            return std::string { value.GetString(), value.GetStringLength() };
-//
-//        case rapidjson::kNumberType:
-//            if (value.IsUint64()) return value.GetUint64();
-//            if (value.IsInt64()) return value.GetInt64();
-//            return value.GetDouble();
-//
-//        case rapidjson::kObjectType:
-//        case rapidjson::kArrayType:
-//            throw Style::exception("value cannot be an object or array");
-//            return false;
-//    }
-//    throw Style::exception("unhandled value type in style");
-//    return false;
-//}
 
 }

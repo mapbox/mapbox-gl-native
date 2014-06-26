@@ -7,6 +7,7 @@
 #include <llmr/util/variant.hpp>
 
 #include <memory>
+#include <forward_list>
 
 namespace llmr {
 
@@ -73,7 +74,7 @@ public:
     std::string name;
     std::shared_ptr<Source> source;
     std::string source_layer;
-    PropertyFilterExpression filter = std::true_type();
+    FilterExpression filter;
     StyleBucketRender render = std::false_type();
 };
 

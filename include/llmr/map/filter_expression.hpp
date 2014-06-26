@@ -4,125 +4,114 @@
 #include <llmr/style/value.hpp>
 #include <llmr/util/recursive_wrapper.hpp>
 
-#include <vector>
+#include <forward_list>
 #include <string>
+#include <ostream>
+#include <iostream>
 
 namespace llmr {
 
-enum class FilterOperator {
-    Equal,
-    NotEqual,
-    Greater,
-    GreaterEqual,
-    Less,
-    LessEqual
-};
+class VectorTileTagExtractor;
 
-enum class ExpressionOperator {
-    Or,
-    And
-};
-
-
-inline FilterOperator filterOperatorType(const std::string &op) {
-    if (op == "!=" || op == "not") {
-        return FilterOperator::NotEqual;
-    } else if (op == "==" || op == "eq") {
-        return FilterOperator::Equal;
-    } else if (op == ">" || op == "gt") {
-        return FilterOperator::Greater;
-    } else if (op == ">=" || op == "gte") {
-        return FilterOperator::GreaterEqual;
-    } else if (op == "<" || op == "lt") {
-        return FilterOperator::Less;
-    } else if (op == "<=" || op == "lte") {
-        return FilterOperator::LessEqual;
-    } else {
-        fprintf(stderr, "[WARNING] filter operator '%s' unrecognized\n", op.c_str());
-        return FilterOperator::Equal;
-    }
-}
-
-inline ExpressionOperator expressionOperatorType(const std::string &op) {
-    if (op == "&&" || op == "and") {
-        return ExpressionOperator::And;
-    } else if (op == "||" || op == "or") {
-        return ExpressionOperator::Or;
-    } else {
-        fprintf(stderr, "[WARNING] expression operator '%s' unrecognized\n", op.c_str());
-        return ExpressionOperator::Or;
-    }
-}
-
-
-class PropertyFilter;
-class PropertyExpression;
-
-typedef util::variant<
-    util::recursive_wrapper<PropertyFilter>,
-    util::recursive_wrapper<PropertyExpression>,
-    std::true_type
-> PropertyFilterExpression;
-
-
-class PropertyFilter {
+class FilterComparison {
 public:
-    inline PropertyFilter(const std::string &field, FilterOperator op, const Value &value) : field(field), op(op), value(value) {};
-    inline PropertyFilter(PropertyFilter &&filter)
-        : field(std::move(filter.field)),
-          op(filter.op),
-          value(std::move(filter.value)) {
-    }
+    enum class Operator : uint8_t {
+        Equal,
+        NotEqual,
+        Greater,
+        GreaterEqual,
+        Less,
+        LessEqual,
+        In,
+        NotIn
+    };
 
-    // Returns true if the filter passes, even if the key is missing.
-    inline bool isMissingFieldOkay() const {
-        switch (op) {
-        case FilterOperator::NotEqual:
-            return true;
-        default:
-            return false;
-        }
-    }
+    class Instance {
+    public:
+        Instance(Operator op, std::forward_list<Value> &&values)
+            : op(op), values(values) {}
 
-    inline bool compare(const Value &other) const {
-        switch (op) {
-        case FilterOperator::Equal:
-            return util::relaxed_equal(other, value);
-        case FilterOperator::NotEqual:
-            return !util::relaxed_equal(other, value);
-        case FilterOperator::Greater:
-            return util::relaxed_greater(other, value);
-        case FilterOperator::GreaterEqual:
-            return util::relaxed_greater_equal(other, value);
-        case FilterOperator::Less:
-            return util::relaxed_less(other, value);
-        case FilterOperator::LessEqual:
-            return util::relaxed_less_equal(other, value);
-        default:
-            return false;
-        }
-    }
+        bool compare(const Value &property_value) const;
+        bool compare(const std::forward_list<Value> &property_values) const;
+
+    private:
+        template <typename Comparer> inline bool includes(const Value &property_value, const Comparer &comparer) const;
+        template <typename Comparer> inline bool compare(const Value &property_value, const Comparer &comparer) const;
+        template <typename Comparer> inline bool all(const std::forward_list<Value> &property_values, const Comparer &comparer) const;
+
+    private:
+        Operator op = Operator::Equal;
+        std::forward_list<Value> values;
+
+        friend std::ostream& operator <<(std::ostream &, const Instance &);
+    };
 
 public:
+    FilterComparison(const std::string &field) : field(field) {};
+
+    const std::string &getField() const;
+    inline bool compare(const VectorTileTagExtractor &extractor) const;
+
+    template <typename ...Args>
+    inline void add(Args&& ...args) {
+        instances.emplace_front(::std::forward<Args>(args)...);
+    }
+
+private:
     std::string field;
-    FilterOperator op = FilterOperator::Equal;
-    Value value;
+    std::forward_list<Instance> instances;
+
+    friend std::ostream& operator <<(std::ostream &, const FilterComparison &);
 };
 
-class PropertyExpression {
+std::ostream& operator <<(std::ostream &s, const FilterComparison &comparison);
+std::ostream& operator <<(std::ostream &s, const FilterComparison::Instance &instance);
+
+
+FilterComparison::Operator parseFilterComparisonOperator(const std::string &op);
+
+
+class FilterExpression {
 public:
-    inline PropertyExpression() {}
-    inline PropertyExpression(PropertyExpression &&expression)
-        : op(expression.op),
-          operands(std::move(expression.operands)) {
-    }
+    typedef util::recursive_wrapper<FilterExpression> Wrapper;
+
+    enum class Operator : uint8_t {
+        And,
+        Or,
+        Xor,
+        Nor
+    };
+
+    enum class GeometryType : uint8_t {
+        Any,
+        Point,
+        Line,
+        Polygon
+    };
 
 public:
-    ExpressionOperator op = ExpressionOperator::Or;
-    std::vector<PropertyFilterExpression> operands;
+    FilterExpression() = default;
+    FilterExpression(Operator op) : op(op) {};
+
+    bool empty() const;
+
+    bool compare(const VectorTileTagExtractor &extractor) const;
+    void add(const FilterComparison &comparison);
+    void add(const FilterExpression &expression);
+    void setGeometryType(GeometryType g);
+
+private:
+    Operator op = Operator::And;
+    GeometryType type = GeometryType::Any;
+    std::forward_list<FilterComparison> comparisons;
+    std::forward_list<FilterExpression::Wrapper> expressions;
+
+    friend std::ostream& operator <<(std::ostream &, const FilterExpression &);
 };
 
+std::ostream& operator <<(std::ostream &s, const FilterExpression &expression);
 
+FilterExpression::GeometryType parseGeometryType(const std::string &geometry);
 }
 
 #endif

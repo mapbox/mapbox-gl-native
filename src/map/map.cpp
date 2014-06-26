@@ -169,8 +169,6 @@ void Map::setup() {
     view.make_active();
 
     painter.setup();
-
-    setStyleJSON(styleJSON);
 }
 
 void Map::setStyleJSON(std::string newStyleJSON) {

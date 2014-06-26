@@ -22,7 +22,7 @@ public:
     std::string source_name;
     std::string source_layer;
 
-    PropertyFilterExpression filter = std::true_type();
+    FilterExpression filter;
 
     // Specifies how the geometry for this bucket should be created
     StyleBucketRender render;
