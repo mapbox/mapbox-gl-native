@@ -27,6 +27,8 @@ First off: if you hit problems during development try:
 
 This will clear cached build data and update to the latest versions of dependencies.
 
+The demo applications use Mapbox vector tiles, which require a Mapbox account and API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/account/apps/) and paste it in the `access_token.hpp` file before building the demo projects.
+
 ## OS X
 
 First run:

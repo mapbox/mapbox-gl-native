@@ -8,6 +8,7 @@
 
 #include "../common/settings_json.hpp"
 #include "../common/glfw_view.hpp"
+#include "../access_token.hpp"
 
 GLFWView *view = nullptr;
 
@@ -50,6 +51,8 @@ int main(int argc, char *argv[]) {
     }
     std::stringstream stylejson;
     stylejson << stylefile.rdbuf();
+
+    llmr::setMapboxAccessToken(mapbox_access_token);
 
     view = new GLFWView();
     llmr::Map map(*view);

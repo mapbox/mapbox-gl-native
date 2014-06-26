@@ -1,9 +1,12 @@
 #include "../common/settings_nsuserdefaults.hpp"
 #include "../common/glfw_view.hpp"
+#include "../access_token.hpp"
 
 #import <Foundation/Foundation.h>
 
 int main() {
+    llmr::setMapboxAccessToken(mapbox_access_token);
+
     GLFWView view;
     llmr::Map map(view);
 
