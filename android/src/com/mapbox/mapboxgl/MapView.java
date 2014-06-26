@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -288,16 +290,25 @@ public class MapView extends SurfaceView {
         mNativeMapView.toggleDebug();
     }
 
+    //
+    // Style methods
+    //
+
     public void toggleStyle() {
         // TODO
     }
 
-    public void getRawStyle() {
-        // TODO
+    public JSONObject getRawStyle() {
+        try {
+            return new JSONObject(mNativeMapView.getStyleJSON());
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public void setRawStyle() {
-        // TODO
+    public void setRawStyle(JSONObject style) {
+        mNativeMapView.setStyleJSON(style.toString());
     }
 
     public void getStyleOrderedLayerNames() {
