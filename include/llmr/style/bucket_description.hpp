@@ -12,23 +12,6 @@
 
 namespace llmr {
 
-// Deprecated
-class BucketDescription {
-public:
-    BucketType feature_type = BucketType::None;
-    BucketType type = BucketType::None;
-
-    // Specify what data to pull into this bucket
-    std::string source_name;
-    std::string source_layer;
-
-    FilterExpression filter;
-
-    // Specifies how the geometry for this bucket should be created
-    StyleBucketRender render;
-};
-
-std::ostream& operator<<(std::ostream&, const BucketDescription& bucket);
 std::ostream& operator<<(std::ostream&, BucketType type);
 
 }

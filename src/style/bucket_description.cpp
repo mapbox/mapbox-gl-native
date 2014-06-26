@@ -2,15 +2,6 @@
 
 #include <iostream>
 
-
-std::ostream& llmr::operator<<(std::ostream& os, const BucketDescription& bucket) {
-    os << "Bucket:" << std::endl;
-    os << "  - type: " << (uint32_t)bucket.type << std::endl;
-    os << "  - source_name: " << bucket.source_name << std::endl;
-    os << "  - source_layer: " << bucket.source_layer << std::endl;
-    return os;
-}
-
 std::ostream& llmr::operator<<(std::ostream& os, BucketType type) {
     switch (type) {
         case BucketType::None: os << "None"; return os;
