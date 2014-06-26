@@ -27,17 +27,17 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     tar -xzf jdk-7u60-linux-x64.tar.gz
     export JAVA_HOME=$PWD/jdk1.7.0_60
     export PATH=$JAVA_HOME/bin:$PATH
-    
+
     wget http://www.us.apache.org/dist/ant/binaries/apache-ant-1.9.4-bin.tar.bz2
     tar -xjf apache-ant-1.9.4-bin.tar.bz2
     export ANT_HOME=$PWD/apache-ant-1.9.4
     export PATH=$ANT_HOME/bin:$PATH
-    
+
     wget http://dl.google.com/android/android-sdk_r22.6.2-linux.tgz
     tar -xzf android-sdk_r22.6.2-linux.tgz
     export ANDROID_HOME=$PWD/android-sdk-linux
     export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
-    echo yes | android update sdk -u -a -t tools,platform-tools,android-19,build-tools-19.1.0,extra-android-support
+    echo -e "yes\nyes\n" | android update sdk -u -a -t tools,platform-tools,android-19,build-tools-19.1.0,extra-android-support
 
     wget http://dl.google.com/android/ndk/android-ndk-r9d-linux-x86_64.tar.bz2
     tar -xjf android-ndk-r9d-linux-x86_64.tar.bz2
