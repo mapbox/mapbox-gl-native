@@ -75,7 +75,7 @@ public class MapView extends SurfaceView {
     // Properties
     //
 
-    private boolean mZoomEnabled = true; // TODO implement the checks for these
+    private boolean mZoomEnabled = true;
     private boolean mScrollEnabled = true;
     private boolean mRotateEnabled = true;
 
@@ -109,6 +109,12 @@ public class MapView extends SurfaceView {
     private void initialize(Context context, AttributeSet attrs, int defStyle) {
         Log.v(TAG, "initialize");
 
+        // Check if we are in Eclipse UI editor
+        if (isInEditMode()) {
+            // TODO editor does not load properly because
+            return;
+        }
+
         // Load the map style
         try {
             mDefaultStyleJSON = IOUtils.toString(context.getResources()
@@ -121,10 +127,9 @@ public class MapView extends SurfaceView {
         // Create the NativeMapView
         mNativeMapView = new NativeMapView(this, mDefaultStyleJSON);
 
-        // Load attributes
+        // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
                 R.styleable.MapView, 0, 0);
-
         try {
             double centerLongitude = typedArray.getFloat(
                     R.styleable.MapView_centerLongitude, 0.0f);
@@ -158,12 +163,6 @@ public class MapView extends SurfaceView {
 
         // Register the SurfaceHolder callbacks
         getHolder().addCallback(new Callbacks());
-
-        // Check if we are in Eclipse UI editor
-        if (isInEditMode()) {
-            // TODO
-            // return;
-        }
 
         // Touch gesture detectors
         mGestureDetector = new GestureDetector(context, new GestureListener());
@@ -307,6 +306,9 @@ public class MapView extends SurfaceView {
         // TODO
     }
 
+    // TODO seems like JSON simple may be better since it implements Map
+    // interface
+    // Other candidates: fastjson, json-smart, fossnova json,
     public JSONObject getRawStyle() {
         try {
             return new JSONObject(mNativeMapView.getStyleJSON());
@@ -413,6 +415,7 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onResume
 
     // TODO need to fix this in Map C++ code
+    // Seems map state gets reset when we start()
     private LonLat lonlat;
     private double angle, zoom;
 
@@ -500,6 +503,8 @@ public class MapView extends SurfaceView {
     //
 
     // TODO: onDraw for editor?
+    // By default it just shows a gray screen with "MapView"
+    // Not too important but perhaps we could put a static demo map image there
 
     //
     // Input events
@@ -750,7 +755,7 @@ public class MapView extends SurfaceView {
 
     // This class handles two rotate gestures
     // TODO need way to single finger rotate - need to research how google maps
-    // does this
+    // does this - for phones with single touch, or when using mouse etc
     private class RotateGestureListener extends
             RotateGestureDetector.SimpleOnRotateGestureListener {
 
@@ -766,7 +771,7 @@ public class MapView extends SurfaceView {
             }
 
             mBeginTime = detector.getEventTime();
-
+            Log.d("rotate", "rotate begin");
             return true;
         }
 
@@ -776,6 +781,7 @@ public class MapView extends SurfaceView {
             mBeginTime = 0;
             mTotalAngle = 0.0f;
             mStarted = false;
+            Log.d("rotate", "rotate end");
         }
 
         // Called each time one of the two fingers moves
@@ -786,12 +792,16 @@ public class MapView extends SurfaceView {
                 return false;
             }
 
+            Log.d("rotate", "rotate evt");
+
             // If rotate is large enough ignore a tap
             // TODO: Google Maps seem to use a velocity rather than absolute
             // value, up to a point then they always rotate
             mTotalAngle += detector.getRotationDegreesDelta();
+            Log.d("rotate", "ttl angle " + mTotalAngle);
             if ((mTotalAngle > 5.0f) || (mTotalAngle < -5.0f)) {
                 mStarted = true;
+                Log.d("rotate", "rotate started");
             }
 
             // Ignore short touches in case it is a tap
@@ -799,6 +809,7 @@ public class MapView extends SurfaceView {
             long time = detector.getEventTime();
             long interval = time - mBeginTime;
             if (!mStarted && (interval <= ViewConfiguration.getTapTimeout())) {
+                Log.d("rotate", "rotate ignored");
                 return false;
             }
 
@@ -813,6 +824,7 @@ public class MapView extends SurfaceView {
             // Rotate the map
             double angle = mNativeMapView.getAngle();
             angle -= detector.getRotationDegreesDelta() * Math.PI / 180.0;
+            Log.d("rotate", "rotate to " + angle);
             mNativeMapView.setAngle(angle, detector.getFocusX(),
                     detector.getFocusY());
 

@@ -6,8 +6,6 @@ import android.util.Log;
 
 public class FragmentActivity extends Activity {
 
-    // TODO add comments
-
     //
     // Static members
     //
@@ -19,10 +17,13 @@ public class FragmentActivity extends Activity {
     // Lifecycle events
     //
 
+    // Called when activity is created
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(TAG, "onCreate");
+
+        // Load the layout
         setContentView(R.layout.activity_fragment);
     }
 }
