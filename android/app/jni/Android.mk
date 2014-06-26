@@ -1,6 +1,6 @@
 LOCAL_PATH              := $(call my-dir)
-LLMR_ROOT               := ../..
-LLMR_INC_ROOT           := ..
+LLMR_ROOT               := ../../..
+LLMR_INC_ROOT           := ../..
 BUILDTYPE               ?= Release
 LLMR_OUT                := $(LLMR_ROOT)/build/$(BUILDTYPE)/obj
 LLMR_OUT_TARGET         := $(LLMR_ROOT)/build/$(BUILDTYPE)/obj.target
