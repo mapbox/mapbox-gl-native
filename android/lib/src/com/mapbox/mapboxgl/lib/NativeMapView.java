@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl;
+package com.mapbox.mapboxgl.lib;
 
 import java.util.Set;
 

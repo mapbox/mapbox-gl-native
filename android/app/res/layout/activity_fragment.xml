@@ -5,7 +5,7 @@
     <fragment
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        class="com.mapbox.mapboxgl.MapFragment"
+        class="com.mapbox.mapboxgl.lib.MapFragment"
         android:id="@+id/map_fragment" />
 
 </merge>

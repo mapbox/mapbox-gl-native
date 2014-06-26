@@ -5,7 +5,7 @@
     <view
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        class="com.mapbox.mapboxgl.MapView"
+        class="com.mapbox.mapboxgl.lib.MapView"
         android:id="@+id/map" />
 
 </merge>

@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl;
+package com.mapbox.mapboxgl.lib;
 
 import android.os.Parcel;
 import android.os.Parcelable;
