@@ -339,10 +339,9 @@ void NativeMapView::terminateContext() {
 bool NativeMapView::createSurface(ANativeWindow* window) {
     VERBOSE("NativeMapView::createSurface");
 
-    // TODO temp fix for fragments, remove later
-    /*if ((display == EGL_NO_DISPLAY) && (context == EGL_NO_CONTEXT)) {
+    if ((display == EGL_NO_DISPLAY) && (context == EGL_NO_CONTEXT)) {
         initializeContext();
-    }*/
+    }
 
     ASSERT(this->window == nullptr);
     ASSERT(window != nullptr);
