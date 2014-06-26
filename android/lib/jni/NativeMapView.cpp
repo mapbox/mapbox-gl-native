@@ -1,4 +1,4 @@
-#include <stdio.h>
+//#include <stdio.h>
 
 #include <memory>
 
@@ -51,8 +51,8 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj,
     }
 
     // TODO replace all printfs in map code with android logging
-    freopen("/sdcard/stdout.txt", "w", stdout); // NOTE: can't use <cstdio> till NDK fix the stdout macro bug
-    freopen("/sdcard/stderr.txt", "w", stderr);
+    //freopen("/sdcard/stdout.txt", "w", stdout); // NOTE: can't use <cstdio> till NDK fix the stdout macro bug
+    //freopen("/sdcard/stderr.txt", "w", stderr);
 
     view = new LLMRView(this);
     map = new llmr::Map(*view);

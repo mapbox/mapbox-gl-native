@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl;
+package com.mapbox.mapboxgl.app;
 
 import android.app.Activity;
 import android.os.Bundle;

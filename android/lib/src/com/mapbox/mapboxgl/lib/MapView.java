@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl;
+package com.mapbox.mapboxgl.lib;
 
 import java.io.IOException;
 
@@ -28,6 +28,7 @@ import android.widget.ZoomButtonsController;
 // Based on SurfaceView as we use OpenGL ES to render
 public class MapView extends SurfaceView {
     // TODO try TextureView
+
     //
     // Static members
     //

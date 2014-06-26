@@ -9,7 +9,7 @@
                 unless="ndk.dir"
     />
 
-    <property name="BUILDTYPE" value="Debug" />
+    <property name="BUILDTYPE" value="Release" />
     <property name="V" value="0" />
 
     <target name="-pre-build">
