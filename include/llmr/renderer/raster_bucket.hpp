@@ -2,7 +2,6 @@
 #define LLMR_RENDERER_RASTERBUCKET
 
 #include <llmr/renderer/bucket.hpp>
-#include <llmr/style/bucket_description.hpp>
 #include <llmr/util/raster.hpp>
 
 namespace llmr {

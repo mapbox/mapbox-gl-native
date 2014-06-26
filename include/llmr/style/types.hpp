@@ -15,6 +15,11 @@ enum class BucketType : uint8_t {
     Default = None
 };
 
+BucketType parseBucketType(const std::string &type);
+const char *stringifyBucketType(BucketType type);
+std::ostream& operator<<(std::ostream&, BucketType type);
+
+
 enum class WindingType : uint8_t {
     EvenOdd,
     NonZero,
@@ -62,15 +67,6 @@ enum class SourceType : uint8_t {
     Video,
     Default = Vector
 };
-
-inline BucketType parseBucketType(const std::string &type) {
-    if (type == "fill") return BucketType::Fill;
-    if (type == "line") return BucketType::Line;
-    if (type == "icon") return BucketType::Icon;
-    if (type == "text") return BucketType::Text;
-    if (type == "raster") return BucketType::Raster;
-    return BucketType::None;
-}
 
 inline WindingType parseWindingType(const std::string &type) {
     if (type == "even-odd") return WindingType::EvenOdd;

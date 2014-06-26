@@ -2,12 +2,13 @@
 #define LLMR_RENDERER_TEXTBUCKET
 
 #include "bucket.hpp"
-#include <llmr/style/bucket_description.hpp>
 #include <llmr/geometry/vao.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/text/types.hpp>
 #include <llmr/text/glyph.hpp>
+#include <llmr/style/style_bucket.hpp>
+
 #include <memory>
 #include <map>
 #include <vector>

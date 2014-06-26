@@ -1,5 +1,4 @@
 #include <llmr/map/vector_tile.hpp>
-#include <llmr/style/bucket_description.hpp>
 
 #include <algorithm>
 #include <iostream>

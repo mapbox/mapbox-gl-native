@@ -3,10 +3,8 @@
 
 #include <cstdint>
 
+#include <llmr/style/style_bucket.hpp>
 #include <llmr/util/pbf.hpp>
-#include <llmr/style/bucket_description.hpp>
-#include <llmr/style/layer_description.hpp>
-#include <llmr/style/class_description.hpp>
 #include <llmr/geometry/sprite_atlas.hpp>
 #include <llmr/util/transition.hpp>
 #include <llmr/util/uv.hpp>

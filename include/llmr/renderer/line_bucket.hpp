@@ -2,10 +2,11 @@
 #define LLMR_RENDERER_LINEBUCKET
 
 #include "bucket.hpp"
-#include <llmr/style/bucket_description.hpp>
 #include <llmr/geometry/vao.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/geometry/line_buffer.hpp>
+#include <llmr/style/style_bucket.hpp>
+
 #include <memory>
 #include <vector>
 

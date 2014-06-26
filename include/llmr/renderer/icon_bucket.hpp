@@ -2,9 +2,9 @@
 #define LLMR_RENDERER_ICONBUCKET
 
 #include <llmr/renderer/bucket.hpp>
-#include <llmr/style/bucket_description.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/geometry/icon_buffer.hpp>
+#include <llmr/style/style_bucket.hpp>
 
 #include <vector>
 #include <memory>

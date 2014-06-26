@@ -1,7 +1,6 @@
 #include <llmr/text/placement.hpp>
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/geometry/interpolate.hpp>
-#include <llmr/style/bucket_description.hpp>
 #include <llmr/renderer/text_bucket.hpp>
 #include <llmr/util/math.hpp>
 #include <llmr/util/constants.hpp>

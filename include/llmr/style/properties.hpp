@@ -25,22 +25,6 @@ struct ClassPropertyTransition {
     uint16_t delay = 0;
 };
 
-enum class TransitionablePropertyKey {
-    Translate = 1,
-    FillColor = 2,
-    StrokeColor = 3,
-    Opacity = 4,
-    Width = 5,
-    Offset = 6,
-    Color = 7,
-    DashArray = 8,
-    Radius = 9,
-    Blur = 10,
-    Halo = 11,
-    HaloRadius = 12,
-    HaloBlur = 13,
-};
-
 enum class Property {
     Null = 1,
     Constant = 2,
@@ -187,38 +171,6 @@ struct PrerenderProperties {
     uint16_t size = 256;
     uint16_t blur = 0;
 };
-//
-//struct GenericProperties {
-//    bool enabled = true;
-//    std::array<float, 2> translate = {{ 0, 0 }};
-//    TranslateAnchorType translateAnchor = parseTranslateAnchorType();
-//    float opacity = 1.0;
-//
-//    // These are unresolved properties because the value here is per tile, so it might differ.
-//    boost::optional<FunctionProperty> prerender;
-//    boost::optional<FunctionProperty> prerenderBuffer;
-//    boost::optional<FunctionProperty> prerenderSize;
-//    boost::optional<FunctionProperty> prerenderBlur;
-//
-//    inline bool getPrerender(int8_t z) const {
-//        return prerender && prerender.get().evaluate<bool>(z);
-//    }
-//
-//    // Obtains prerender properties by integer zoom level.
-//    inline PrerenderProperties getPrerenderProperties(int8_t z) const {
-//        PrerenderProperties props;
-//        if (prerenderBuffer) props.buffer = prerenderBuffer.get().evaluate<float>(z);
-//        if (prerenderSize) props.size = prerenderSize.get().evaluate<uint16_t>(z);
-//        if (prerenderBlur) props.blur = prerenderBlur.get().evaluate<uint16_t>(z);
-//        return props;
-//    }
-//
-//    virtual bool isVisible() const {
-//        if (!enabled) { return false; }
-//        if (opacity <= 0) { return false; }
-//        return true;
-//    }
-//};
 
 struct FillProperties {
     FillProperties() {}
@@ -325,37 +277,12 @@ typedef util::variant<
 template <typename T>
 const T &defaultStyleProperties();
 
-
-
-
-//class StyleSource {
-//public:
-//    typedef std::shared_ptr<StyleSource> Ptr;
-//
-//    enum { Vector, Raster } type = Vector;
-//    std::string url;
-//    float tileSize = 512.0f;
-//};
-
 class RasterizeProperties {
 public:
     boost::optional<FunctionProperty> enabled;
     boost::optional<FunctionProperty> buffer;
     boost::optional<FunctionProperty> size;
     boost::optional<FunctionProperty> blur;
-};
-
-}
-
-
-namespace std {
-
-template <> struct hash<llmr::TransitionablePropertyKey> {
-public:
-    inline size_t operator()(llmr::TransitionablePropertyKey prop) const {
-        typedef typename std::underlying_type<llmr::TransitionablePropertyKey>::type type;
-        return std::hash<type>()(static_cast<type>(prop));
-    }
 };
 
 }
