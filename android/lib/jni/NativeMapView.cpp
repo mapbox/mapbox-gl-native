@@ -473,7 +473,7 @@ void LLMRView::make_active() {
         // TODO still can't fix the black screen problem :-(
         EGLint width, height;
         if (!eglQuerySurface(nativeView->display, nativeView->surface, EGL_WIDTH, &width)
-                || !eglQuerySurface(display, surface, EGL_HEIGHT, &height)) {
+                || !eglQuerySurface(nativeView->display, nativeView->surface, EGL_HEIGHT, &height)) {
             ERROR("eglQuerySurface() returned error %d", eglGetError());
         }
         map->resize(width, height);
