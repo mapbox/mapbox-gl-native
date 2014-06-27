@@ -469,9 +469,10 @@ void StyleParser::parseStyles(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         const std::string name { itr->name.GetString(), itr->name.GetStringLength() };
 
         if (name == "style") {
-            parseStyle(replaceConstant(itr->value), layer->styles[""]);
+            parseStyle(replaceConstant(itr->value), layer->styles[ClassID::Default]);
         } else if (name.compare(0, 6, "style.") == 0 && name.length() > 6) {
-            parseStyle(replaceConstant(itr->value), layer->styles[name.substr(6)]);
+            const ClassID class_id = ClassDictionary::Lookup(name.substr(6));
+            parseStyle(replaceConstant(itr->value), layer->styles[class_id]);
         }
     }
 }

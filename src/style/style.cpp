@@ -164,14 +164,15 @@ void Style::cascade(const std::shared_ptr<StyleLayerGroup> &layers, float z) {
         layer->style = resetClassProperties(*layer);
 
         // Apply default class (if exists)
-        auto default_it = layer->styles.find("");
+        auto default_it = layer->styles.find(ClassID::Default);
         if (default_it != layer->styles.end()) {
             applyClassProperties(layer->style, default_it->second, z);
         }
 
         // Apply overriding classes in order.
         for (const std::string &class_name : appliedClasses) {
-            auto class_it = layer->styles.find(class_name);
+            const ClassID class_id = ClassDictionary::Lookup(class_name);
+            auto class_it = layer->styles.find(class_id);
             if (class_it != layer->styles.end()) {
                 applyClassProperties(layer->style, class_it->second, z);
             }

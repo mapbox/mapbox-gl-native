@@ -8,6 +8,7 @@
 #include <llmr/geometry/sprite_atlas.hpp>
 #include <llmr/util/transition.hpp>
 #include <llmr/util/uv.hpp>
+#include <llmr/style/class_dictionary.hpp>
 
 #include <map>
 #include <unordered_map>
@@ -38,7 +39,7 @@ public:
 public:
     std::string id;
     StyleBucket::Ptr bucket;
-    std::unordered_map<std::string, ClassProperties> styles;
+    std::map<ClassID, ClassProperties> styles;
     StyleProperties style;
     std::unique_ptr<RasterizeProperties> rasterize;
     std::shared_ptr<StyleLayerGroup> layers;
