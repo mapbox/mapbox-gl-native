@@ -46,6 +46,8 @@ enum class PropertyKey {
     CompositeEnabled,
     CompositeOpacity,
 
+    RasterEnabled,
+    RasterOpacity,
     RasterSpin,
     RasterBrightnessLow,
     RasterBrightnessHigh,

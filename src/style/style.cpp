@@ -129,6 +129,8 @@ void applyClassProperties(StyleProperties &style, const ClassProperties &propert
         applyProperty(properties, PropertyKey::CompositeOpacity, composite.opacity, z);
     } else if (style.is<RasterProperties>()) {
         RasterProperties &raster = style.get<RasterProperties>();
+        applyProperty(properties, PropertyKey::RasterEnabled, raster.enabled, z);
+        applyProperty(properties, PropertyKey::RasterOpacity, raster.opacity, z);
         applyProperty(properties, PropertyKey::RasterSpin, raster.spin, z);
         applyProperty(properties, PropertyKey::RasterBrightnessLow, raster.brightness[0], z);
         applyProperty(properties, PropertyKey::RasterBrightnessHigh, raster.brightness[1], z);

@@ -540,6 +540,10 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseStyleProperty<FunctionProperty>("composite-opacity", Key::CompositeOpacity, klass, value);
     parseStyleProperty<ClassPropertyTransition>("composite-opacity-transition", Key::CompositeOpacity, klass, value);
 
+    parseStyleProperty<FunctionProperty>("raster-enabled", Key::RasterEnabled, klass, value);
+    parseStyleProperty<ClassPropertyTransition>("raster-enabled-transition", Key::RasterEnabled, klass, value);
+    parseStyleProperty<FunctionProperty>("raster-opacity", Key::RasterOpacity, klass, value);
+    parseStyleProperty<ClassPropertyTransition>("raster-opacity-transition", Key::RasterOpacity, klass, value);
     parseStyleProperty<FunctionProperty>("raster-spin", Key::RasterSpin, klass, value);
     parseStyleProperty<ClassPropertyTransition>("raster-spin-transition", Key::RasterSpin, klass, value);
     parseStyleProperty<FunctionProperty>("raster-brightness-low", Key::RasterBrightnessLow, klass, value);
