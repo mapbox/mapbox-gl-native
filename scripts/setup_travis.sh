@@ -33,8 +33,8 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     export ANT_HOME=$PWD/apache-ant-1.9.4
     export PATH=$ANT_HOME/bin:$PATH
 
-    wget http://dl.google.com/android/android-sdk_r22.6.2-linux.tgz
-    tar -xzf android-sdk_r22.6.2-linux.tgz
+    wget http://dl.google.com/android/android-sdk_r23-linux.tgz
+    tar -xzf android-sdk_r23-linux.tgz
     export ANDROID_HOME=$PWD/android-sdk-linux
     export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
     echo -e "yes\nyes\n" | android update sdk -u -a -t tools,platform-tools,android-19,build-tools-19.1.0,extra-android-support
