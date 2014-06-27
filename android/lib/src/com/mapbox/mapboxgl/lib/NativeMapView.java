@@ -48,6 +48,14 @@ class NativeMapView {
     // Methods
     //
 
+    public void initializeDisplay() {
+        nativeInitializeDisplay(mNativeMapViewPtr);
+    }
+
+    public void terminateDisplay() {
+        nativeTerminateDisplay(mNativeMapViewPtr);
+    }
+
     public void initializeContext() {
         nativeInitializeContext(mNativeMapViewPtr);
     }
@@ -354,6 +362,10 @@ class NativeMapView {
     private native long nativeCreate(String defaultStyleJSON);
 
     private native void nativeDestroy(long nativeMapViewPtr);
+
+    private native void nativeInitializeDisplay(long nativeMapViewPtr);
+
+    private native void nativeTerminateDisplay(long nativeMapViewPtr);
 
     private native void nativeInitializeContext(long nativeMapViewPtr);
 

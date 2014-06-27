@@ -138,6 +138,9 @@ namespace {
 
 using namespace llmr::android;
 
+// TODO: wrap C++ exceptions?
+// TODO: wrap other sorts of exceptions?
+
 jlong JNICALL nativeCreate(JNIEnv* env, jobject obj, jstring default_style_json) {
     VERBOSE("nativeCreate");
     NativeMapView* native_map_view = new NativeMapView(env, obj, std_string_from_jstring(env, default_style_json));
@@ -155,6 +158,22 @@ void JNICALL nativeDestroy(JNIEnv* env, jobject obj, jlong native_map_view_ptr) 
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     delete native_map_view;
     native_map_view = nullptr;
+}
+
+void JNICALL nativeInitializeDisplay(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    VERBOSE("nativeInitializeDisplay");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    if (!native_map_view->initializeDisplay()) {
+        throw_error(env, "Unable to initialize GL display.");
+    }
+}
+
+void JNICALL nativeTerminateDisplay(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    VERBOSE("nativeTerminateDisplay");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->terminateDisplay();
 }
 
 void JNICALL nativeInitializeContext(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -664,9 +683,11 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    std::array<JNINativeMethod, 48> methods = {{ // Can remove the extra brace in C++14
+    std::array<JNINativeMethod, 50> methods = {{ // Can remove the extra brace in C++14
         { "nativeCreate", "(Ljava/lang/String;)J", reinterpret_cast<void*>(&nativeCreate) },
         { "nativeDestroy", "(J)V", reinterpret_cast<void*>(&nativeDestroy) },
+        { "nativeInitializeDisplay", "(J)V", reinterpret_cast<void*>(&nativeInitializeDisplay) },
+        { "nativeTerminateDisplay", "(J)V", reinterpret_cast<void*>(&nativeTerminateDisplay) },
         { "nativeInitializeContext", "(J)V", reinterpret_cast<void*>(&nativeInitializeContext) },
         { "nativeTerminateContext", "(J)V", reinterpret_cast<void*>(&nativeTerminateContext) },
         { "nativeCreateSurface", "(JLandroid/view/Surface;)V", reinterpret_cast<void*>(&nativeCreateSurface) },

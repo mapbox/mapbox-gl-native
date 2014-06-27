@@ -357,6 +357,7 @@ public class MapView extends SurfaceView {
     // Called when we need to restore instance state
     // Must be called from Activity onCreate
     public void onCreate(Bundle savedInstanceState) {
+        Log.v(TAG, "onCreate");
         if (savedInstanceState != null) {
             lonlat = (LonLat) savedInstanceState
                     .getParcelable(STATE_CENTER_COORDINATE);
@@ -373,11 +374,14 @@ public class MapView extends SurfaceView {
                     .getBoolean(STATE_ROTATE_ENABLED));
             setDebugActive(savedInstanceState.getBoolean(STATE_DEBUG_ACTIVE));
         }
+
+        mNativeMapView.initializeDisplay();
     }
 
     // Called when we need to save instance state
     // Must be called from Activity onSaveInstanceState
     public void onSaveInstanceState(Bundle outState) {
+        Log.v(TAG, "onSaveInstanceState");
         outState.putParcelable(STATE_CENTER_COORDINATE, getCenterCoordinate());
         outState.putDouble(STATE_CENTER_DIRECTION, getDirection());
         outState.putDouble(STATE_ZOOM_LEVEL, getZoomLevel());
@@ -385,6 +389,13 @@ public class MapView extends SurfaceView {
         outState.putBoolean(STATE_SCROLL_ENABLED, isScrollEnabled());
         outState.putBoolean(STATE_ROTATE_ENABLED, isRotateEnabled());
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
+    }
+
+    // Called when we need to clean up
+    // Must be called from Activity onDestroy
+    public void onDestroy() {
+        Log.v(TAG, "onDestroy");
+        mNativeMapView.terminateDisplay();
     }
 
     // Called when we need to create the GL context

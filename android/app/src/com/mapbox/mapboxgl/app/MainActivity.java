@@ -36,6 +36,16 @@ public class MainActivity extends Activity {
         mMapView.onCreate(savedInstanceState);
     }
 
+    // Called when the activity is destroyed
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.v(TAG, "onDestroy");
+
+        // Need to pass on to view
+        mMapView.onDestroy();
+    }
+
     // Called when the activity is visible
     @Override
     protected void onStart() {
