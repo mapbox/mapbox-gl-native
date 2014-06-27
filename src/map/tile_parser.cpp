@@ -2,6 +2,7 @@
 
 #include <llmr/map/vector_tile_data.hpp>
 #include <llmr/style/style.hpp>
+#include <llmr/style/style_layer.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
 #include <llmr/renderer/icon_bucket.hpp>

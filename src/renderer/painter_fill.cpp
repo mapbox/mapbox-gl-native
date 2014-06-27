@@ -1,5 +1,6 @@
 #include <llmr/renderer/painter.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
+#include <llmr/style/style_layer.hpp>
 #include <llmr/map/map.hpp>
 #include <llmr/style/sprite.hpp>
 #include <llmr/geometry/sprite_atlas.hpp>

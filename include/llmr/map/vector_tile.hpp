@@ -5,7 +5,7 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/style/value.hpp>
 #include <llmr/text/glyph.hpp>
-#include <llmr/map/filter_expression.hpp>
+#include <llmr/style/filter_expression.hpp>
 #include <vector>
 #include <map>
 #include <unordered_map>

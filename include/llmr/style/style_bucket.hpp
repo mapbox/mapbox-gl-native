@@ -2,7 +2,7 @@
 #define LLMR_STYLE_STYLE_BUCKET
 
 #include <llmr/style/types.hpp>
-#include <llmr/map/filter_expression.hpp>
+#include <llmr/style/filter_expression.hpp>
 #include <llmr/util/vec.hpp>
 #include <llmr/util/variant.hpp>
 

@@ -3,15 +3,8 @@
 
 #include <cstdint>
 
-#include <llmr/style/style_bucket.hpp>
-#include <llmr/util/pbf.hpp>
-#include <llmr/geometry/sprite_atlas.hpp>
-#include <llmr/util/transition.hpp>
+#include <llmr/util/time.hpp>
 #include <llmr/util/uv.hpp>
-#include <llmr/style/class_dictionary.hpp>
-#include <llmr/style/class_properties.hpp>
-#include <llmr/style/style_properties.hpp>
-#include <llmr/style/rasterize_properties.hpp>
 
 #include <map>
 #include <unordered_map>
@@ -22,33 +15,9 @@
 namespace llmr {
 
 class Sprite;
-
+class Source;
 class StyleLayer;
 typedef std::vector<std::shared_ptr<StyleLayer>> StyleLayerGroup;
-
-class StyleLayer {
-public:
-    typedef std::shared_ptr<StyleLayer> Ptr;
-
-public:
-    template <typename T> const T &getProperties() {
-        if (style.is<T>()) {
-            return style.get<T>();
-        } else {
-            return defaultStyleProperties<T>();
-        }
-    }
-
-public:
-    std::string id;
-    StyleBucket::Ptr bucket;
-    std::map<ClassID, ClassProperties> styles;
-    StyleProperties style;
-    std::unique_ptr<RasterizeProperties> rasterize;
-    std::shared_ptr<StyleLayerGroup> layers;
-};
-
-
 
 class Style {
 public:

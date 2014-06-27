@@ -1,5 +1,5 @@
-#ifndef LLMR_MAP_FILTER_EXPRESSION
-#define LLMR_MAP_FILTER_EXPRESSION
+#ifndef LLMR_STYLE_FILTER_EXPRESSION
+#define LLMR_STYLE_FILTER_EXPRESSION
 
 #include <llmr/style/value.hpp>
 #include <llmr/util/recursive_wrapper.hpp>

@@ -6,7 +6,7 @@
 #include <llmr/text/glyph_store.hpp>
 #include <llmr/text/glyph.hpp>
 #include <llmr/util/utf.hpp>
-#include <llmr/map/filter_expression.hpp>
+#include <llmr/style/filter_expression.hpp>
 
 namespace llmr {
 

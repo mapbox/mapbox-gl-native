@@ -4,6 +4,9 @@
 #include <rapidjson/document.h>
 #include <llmr/style/style.hpp>
 #include <llmr/map/source.hpp>
+#include <llmr/style/filter_expression.hpp>
+#include <llmr/style/class_properties.hpp>
+#include <llmr/style/style_bucket.hpp>
 
 #include <unordered_map>
 #include <forward_list>

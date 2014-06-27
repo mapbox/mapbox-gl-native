@@ -1,4 +1,4 @@
-#include <llmr/map/filter_expression.hpp>
+#include <llmr/style/filter_expression.hpp>
 #include <llmr/map/vector_tile.hpp>
 
 namespace llmr {

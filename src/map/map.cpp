@@ -9,6 +9,9 @@
 #include <llmr/util/string.hpp>
 #include <llmr/util/constants.hpp>
 #include <llmr/util/uv.hpp>
+#include <llmr/style/style_layer.hpp>
+#include <llmr/style/style_bucket.hpp>
+#include <llmr/geometry/sprite_atlas.hpp>
 
 #include <algorithm>
 #include <memory>

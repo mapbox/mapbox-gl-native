@@ -1,5 +1,7 @@
 #include <llmr/style/style.hpp>
+#include <llmr/style/style_layer.hpp>
 #include <llmr/style/style_parser.hpp>
+#include <llmr/style/style_bucket.hpp>
 #include <llmr/util/constants.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
@@ -193,7 +195,6 @@ void Style::cascade(float z) {
         return;
     }
 }
-
 
 bool Style::needsTransition() const {
     uv::readlock lock(mtx);

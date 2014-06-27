@@ -2,6 +2,7 @@
 #include <llmr/geometry/icon_buffer.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/geometry/geometry.hpp>
+#include <llmr/geometry/sprite_atlas.hpp>
 
 #include <llmr/renderer/painter.hpp>
 #include <llmr/style/style.hpp>

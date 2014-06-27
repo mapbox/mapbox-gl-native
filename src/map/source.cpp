@@ -9,6 +9,7 @@
 #include <llmr/util/vec.hpp>
 #include <llmr/util/std.hpp>
 #include <llmr/geometry/glyph_atlas.hpp>
+#include <llmr/style/style_layer.hpp>
 
 
 #include <llmr/map/vector_tile_data.hpp>

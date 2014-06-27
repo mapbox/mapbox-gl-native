@@ -1,5 +1,6 @@
 #include <llmr/renderer/painter.hpp>
 #include <llmr/map/map.hpp>
+#include <llmr/style/style_layer.hpp>
 #include <llmr/util/std.hpp>
 #include <llmr/util/string.hpp>
 #include <llmr/util/time.hpp>

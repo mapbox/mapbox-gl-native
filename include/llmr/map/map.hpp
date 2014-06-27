@@ -20,6 +20,7 @@
 namespace llmr {
 
 class Source;
+class SpriteAtlas;
 
 class Map : private util::noncopyable {
 public:

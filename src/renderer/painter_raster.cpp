@@ -1,5 +1,6 @@
 #include <llmr/renderer/painter.hpp>
 #include <llmr/renderer/raster_bucket.hpp>
+#include <llmr/style/style_layer.hpp>
 #include <llmr/map/map.hpp>
 
 using namespace llmr;

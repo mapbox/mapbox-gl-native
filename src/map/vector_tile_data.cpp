@@ -1,6 +1,8 @@
 #include <llmr/map/vector_tile_data.hpp>
 #include <llmr/util/std.hpp>
 #include <llmr/map/map.hpp>
+#include <llmr/style/style_layer.hpp>
+#include <llmr/style/style_bucket.hpp>
 
 using namespace llmr;
 

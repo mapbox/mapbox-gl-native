@@ -2,6 +2,8 @@
 #include <llmr/renderer/icon_bucket.hpp>
 #include <llmr/map/map.hpp>
 #include <llmr/style/sprite.hpp>
+#include <llmr/style/style_layer.hpp>
+#include <llmr/geometry/sprite_atlas.hpp>
 #include <llmr/util/math.hpp>
 
 using namespace llmr;
