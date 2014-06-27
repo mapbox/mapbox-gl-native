@@ -48,6 +48,15 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const t
             appliedProperties.add(ClassID::Fallback, begin, end, value);
         }
     }
+
+    // Update all child layers as well.
+    if (layers) {
+        for (std::shared_ptr<StyleLayer> &layer : *layers) {
+            if (layer) {
+                layer->setClasses(class_names, now, defaultTransition);
+            }
+        }
+    }
 }
 
 // Helper function for applying all properties of a a single class that haven't been applied yet.
