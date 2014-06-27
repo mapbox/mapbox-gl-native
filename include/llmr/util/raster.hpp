@@ -31,7 +31,7 @@ public:
     // transitions
     void beginFadeInTransition();
     bool needsTransition() const;
-    void updateTransitions(time now);
+    void updateTransitions(timestamp now);
 
 public:
     // loaded image dimensions

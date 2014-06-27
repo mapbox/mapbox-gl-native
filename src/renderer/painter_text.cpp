@@ -47,8 +47,8 @@ void Painter::renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     textShader->setZoom((map.getState().getNormalizedZoom() - zoomAdjust) * 10); // current zoom level
 
     // Label fading
-    const time duration = 300_milliseconds;
-    const time currentTime = util::now();
+    const timestamp duration = 300_milliseconds;
+    const timestamp currentTime = util::now();
 
     std::deque<FrameSnapshot> &history = frameHistory.history;
 

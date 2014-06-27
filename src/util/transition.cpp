@@ -28,7 +28,7 @@ std::array<float, 2> transition::interpolateFloatArray(std::array<float, 2> from
 }
 
 template <>
-transition::state ease_transition<double>::update(llmr::time now) const {
+transition::state ease_transition<double>::update(timestamp now) const {
     float t = progress(now);
     if (t >= 1) {
         value = to;
@@ -40,7 +40,7 @@ transition::state ease_transition<double>::update(llmr::time now) const {
 }
 
 template <>
-transition::state ease_transition<llmr::Color>::update(llmr::time now) const {
+transition::state ease_transition<llmr::Color>::update(timestamp now) const {
     float t = progress(now);
     if (t >= 1) {
         value = to;
@@ -52,7 +52,7 @@ transition::state ease_transition<llmr::Color>::update(llmr::time now) const {
 }
 
 template <>
-transition::state ease_transition<float>::update(llmr::time now) const {
+transition::state ease_transition<float>::update(timestamp now) const {
     float t = progress(now);
     if (t >= 1) {
         value = to;
@@ -64,7 +64,7 @@ transition::state ease_transition<float>::update(llmr::time now) const {
 }
 
 template <>
-transition::state ease_transition<std::array<float, 2>>::update(llmr::time now) const {
+transition::state ease_transition<std::array<float, 2>>::update(timestamp now) const {
     float t = progress(now);
     if (t >= 1) {
         value = to;

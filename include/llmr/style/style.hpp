@@ -61,7 +61,7 @@ public:
     void cascade(float z);
 
     bool needsTransition() const;
-    void updateTransitions(time now);
+    void updateTransitions(timestamp now);
     void cancelTransitions();
 
     void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);

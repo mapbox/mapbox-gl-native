@@ -15,18 +15,18 @@ public:
         complete
     };
 
-    inline transition(time start, time duration)
+    inline transition(timestamp start, timestamp duration)
         : start(start),
           duration(duration) {}
 
-    inline float progress(time now) const {
+    inline float progress(timestamp now) const {
         if (duration == 0) return 1;
         if (start > now) return 0;
 
         return (float)(now - start) / duration;
     }
 
-    virtual state update(time now) const = 0;
+    virtual state update(timestamp now) const = 0;
     virtual ~transition();
 
 protected:
@@ -36,19 +36,19 @@ protected:
     std::array<float, 2> interpolateFloatArray(std::array<float, 2> from, std::array<float, 2> to, double t) const;
 
 protected:
-    const time start, duration;
+    const timestamp start, duration;
 };
 
 template <typename T>
 class ease_transition : public transition {
 public:
-    ease_transition(T from, T to, T& value, time start, time duration)
+    ease_transition(T from, T to, T& value, timestamp start, timestamp duration)
         : transition(start, duration),
           from(from),
           to(to),
           value(value) {}
 
-    state update(time now) const;
+    state update(timestamp now) const;
 
 private:
     const T from, to;
@@ -59,12 +59,12 @@ private:
 template <typename T>
 class timeout : public transition {
 public:
-    timeout(T final_value, T& value, time start, time duration)
+    timeout(T final_value, T& value, timestamp start, timestamp duration)
         : transition(start, duration),
           final_value(final_value),
           value(value) {}
 
-    state update(time now) const {
+    state update(timestamp now) const {
         if (progress(now) >= 1) {
             value = final_value;
             return complete;

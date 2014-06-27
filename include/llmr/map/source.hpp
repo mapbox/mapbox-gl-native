@@ -58,7 +58,7 @@ private:
 
 private:
     // Stores the time when this source was most recently updated.
-    time updated = 0;
+    timestamp updated = 0;
 
     std::map<Tile::ID, std::unique_ptr<Tile>> tiles;
     std::map<Tile::ID, std::weak_ptr<TileData>> tile_data;

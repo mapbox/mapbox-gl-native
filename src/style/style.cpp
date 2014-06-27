@@ -201,7 +201,7 @@ bool Style::needsTransition() const {
     return false;
 }
 
-void Style::updateTransitions(time now) {
+void Style::updateTransitions(timestamp now) {
     uv::writelock lock(mtx);
 }
 

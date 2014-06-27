@@ -105,8 +105,8 @@ public:
     inline std::shared_ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
     inline std::shared_ptr<Texturepool> getTexturepool() { return texturepool; }
     inline std::shared_ptr<uv::loop> getLoop() { return loop; }
-    inline time getAnimationTime() const { return animationTime; }
-    inline time getTime() const { return animationTime; }
+    inline timestamp getAnimationTime() const { return animationTime; }
+    inline timestamp getTime() const { return animationTime; }
 
 private:
     // uv async callbacks
@@ -163,7 +163,7 @@ private:
     std::string styleJSON = "";
 
     bool debug = false;
-    time animationTime = 0;
+    timestamp animationTime = 0;
 
     int indent = 0;
 

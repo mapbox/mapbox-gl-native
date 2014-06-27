@@ -23,18 +23,18 @@ public:
                 uint16_t fb_width, uint16_t fb_height);
 
     // Position
-    void moveBy(double dx, double dy, time duration = 0);
-    void setLonLat(double lon, double lat, time duration = 0);
-    void setLonLatZoom(double lon, double lat, double zoom, time duration = 0);
+    void moveBy(double dx, double dy, timestamp duration = 0);
+    void setLonLat(double lon, double lat, timestamp duration = 0);
+    void setLonLatZoom(double lon, double lat, double zoom, timestamp duration = 0);
     void getLonLat(double& lon, double& lat) const;
     void getLonLatZoom(double& lon, double& lat, double& zoom) const;
     void startPanning();
     void stopPanning();
 
     // Zoom
-    void scaleBy(double ds, double cx = -1, double cy = -1, time duration = 0);
-    void setScale(double scale, double cx = -1, double cy = -1, time duration = 0);
-    void setZoom(double zoom, time duration = 0);
+    void scaleBy(double ds, double cx = -1, double cy = -1, timestamp duration = 0);
+    void setScale(double scale, double cx = -1, double cy = -1, timestamp duration = 0);
+    void setZoom(double zoom, timestamp duration = 0);
     double getZoom() const;
     double getScale() const;
     void startScaling();
@@ -43,8 +43,8 @@ public:
     double getMaxZoom() const;
 
     // Angle
-    void rotateBy(double sx, double sy, double ex, double ey, time duration = 0);
-    void setAngle(double angle, time duration = 0);
+    void rotateBy(double sx, double sy, double ex, double ey, timestamp duration = 0);
+    void setAngle(double angle, timestamp duration = 0);
     void setAngle(double angle, double cx, double cy);
     double getAngle() const;
     void startRotating();
@@ -53,7 +53,7 @@ public:
 
     // Transitions
     bool needsTransition() const;
-    void updateTransitions(time now);
+    void updateTransitions(timestamp now);
     void cancelTransitions();
 
     // Transform state
@@ -63,10 +63,10 @@ public:
 private:
     // Functions prefixed with underscores will *not* perform any locks. It is the caller's
     // responsibility to lock this object.
-    void _moveBy(double dx, double dy, time duration = 0);
-    void _setScale(double scale, double cx, double cy, time duration = 0);
-    void _setScaleXY(double new_scale, double xn, double yn, time duration = 0);
-    void _setAngle(double angle, time duration = 0);
+    void _moveBy(double dx, double dy, timestamp duration = 0);
+    void _setScale(double scale, double cx, double cy, timestamp duration = 0);
+    void _setScaleXY(double new_scale, double xn, double yn, timestamp duration = 0);
+    void _setAngle(double angle, timestamp duration = 0);
     void _clearPanning();
     void _clearRotating();
     void _clearScaling();
