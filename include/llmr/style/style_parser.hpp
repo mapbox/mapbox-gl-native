@@ -6,6 +6,7 @@
 #include <llmr/map/source.hpp>
 #include <llmr/style/filter_expression.hpp>
 #include <llmr/style/class_properties.hpp>
+#include <llmr/style/rasterize_properties.hpp>
 #include <llmr/style/style_bucket.hpp>
 
 #include <unordered_map>
@@ -13,6 +14,8 @@
 
 
 namespace llmr {
+
+enum class ClassID : uint32_t;
 
 class StyleLayer;
 typedef std::vector<std::shared_ptr<StyleLayer>> StyleLayerGroup;
@@ -37,9 +40,9 @@ private:
     std::shared_ptr<StyleLayer> createLayer(JSVal value);
     void parseLayers();
     void parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair);
-    void parseStyles(JSVal value, std::shared_ptr<StyleLayer> &layer);
+    void parseStyles(JSVal value, std::map<ClassID, ClassProperties> &styles);
     void parseStyle(JSVal, ClassProperties &properties);
-    void parseRasterize(JSVal value, std::shared_ptr<StyleLayer> &layer);
+    std::unique_ptr<const RasterizeProperties> parseRasterize(JSVal value);
     void parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer);
@@ -72,6 +75,9 @@ private:
 
     // This maps ids to Layer objects, with all items being at the root level.
     std::unordered_map<std::string, std::pair<JSVal, std::shared_ptr<StyleLayer>>> layers;
+
+    // Layer IDs that we have encountered previously while parsing this stylesheet.
+    std::set<std::string> existing_layer_ids;
 
     // Store a stack of layers we're parsing right now. This is to prevent reference cycles.
     std::forward_list<StyleLayer *> stack;

@@ -382,7 +382,10 @@ std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
     if (value.IsArray()) {
         std::unique_ptr<StyleLayerGroup> layers = std::make_unique<StyleLayerGroup>();
         for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-            layers->emplace_back(createLayer(value[i]));
+            std::shared_ptr<StyleLayer> layer = createLayer(value[i]);
+            if (layer) {
+                layers->emplace_back(layer);
+            }
         }
         return layers;
     } else {
@@ -391,43 +394,50 @@ std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
 }
 
 std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
-    std::shared_ptr<StyleLayer> layer = std::make_shared<StyleLayer>();
-
     if (value.IsObject()) {
         if (!value.HasMember("id")) {
-            throw Style::exception("layer must have an id");
+            fprintf(stderr, "[WARNING] layer must have an id\n");
+            return nullptr;
         }
 
         JSVal id = value["id"];
         if (!id.IsString()) {
-            throw Style::exception("layer id must be a string");
+            fprintf(stderr, "[WARNING] layer id must be a string\n");
+            return nullptr;
         }
 
-        layer->id = { id.GetString(), id.GetStringLength() };
+        const std::string layer_id = { id.GetString(), id.GetStringLength() };
 
-        if (layers.find(layer->id) != layers.end()) {
-            throw Style::exception((std::string("duplicate layer id ") + layer->id).c_str());
+        if (existing_layer_ids.find(layer_id) != existing_layer_ids.end()) {
+            fprintf(stderr, "[WARNING] duplicate layer id %s\n", layer_id.c_str());
+            return nullptr;
         }
 
-        // Store the layer ID so we can reference it later.
-        layers.emplace(layer->id, std::pair<JSVal, std::shared_ptr<StyleLayer>> { value, layer });
-
-        // Parse Styles, as they can't be inherited anyway.
-        parseStyles(value, layer);
+        // Parse styles already, as they can't be inherited anyway.
+        std::map<ClassID, ClassProperties> styles;
+        parseStyles(value, styles);
 
         // Parse Rasterization options, as they can't be inherited anyway.
+        std::unique_ptr<const RasterizeProperties> rasterize;
         if (value.HasMember("rasterize")) {
-            parseRasterize(replaceConstant(value["rasterize"]), layer);
+            rasterize = parseRasterize(replaceConstant(value["rasterize"]));
         }
+
+        std::shared_ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
+            layer_id, std::move(styles), std::move(rasterize));
 
         if (value.HasMember("layers")) {
             layer->layers = createLayers(value["layers"]);
         }
-    } else {
-        throw Style::exception("layer must be an object");
-    }
 
-    return layer;
+        // Store the layer ID so we can reference it later.
+        layers.emplace(layer_id, std::pair<JSVal, std::shared_ptr<StyleLayer>> { value, layer });
+
+        return layer;
+    } else {
+        fprintf(stderr, "[WARNING] layer must be an object\n");
+        return nullptr;
+    }
 }
 
 void StyleParser::parseLayers() {
@@ -463,16 +473,16 @@ void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair
 
 #pragma mark - Parse Styles
 
-void StyleParser::parseStyles(JSVal value, std::shared_ptr<StyleLayer> &layer) {
+void StyleParser::parseStyles(JSVal value, std::map<ClassID, ClassProperties> &styles) {
     rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
     for (; itr != value.MemberEnd(); ++itr) {
         const std::string name { itr->name.GetString(), itr->name.GetStringLength() };
 
         if (name == "style") {
-            parseStyle(replaceConstant(itr->value), layer->styles[ClassID::Default]);
+            parseStyle(replaceConstant(itr->value), styles[ClassID::Default]);
         } else if (name.compare(0, 6, "style.") == 0 && name.length() > 6) {
             const ClassID class_id = ClassDictionary::Lookup(name.substr(6));
-            parseStyle(replaceConstant(itr->value), layer->styles[class_id]);
+            parseStyle(replaceConstant(itr->value), styles[class_id]);
         }
     }
 }
@@ -560,8 +570,9 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseStyleProperty<Color>("background-color", Key::BackgroundColor, klass, value);
 }
 
-void StyleParser::parseRasterize(JSVal value, std::shared_ptr<StyleLayer> &layer) {
+std::unique_ptr<const RasterizeProperties> StyleParser::parseRasterize(JSVal value) {
     // TODO
+    return nullptr;
 }
 
 void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer) {

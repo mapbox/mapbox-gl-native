@@ -74,7 +74,7 @@ void TileParser::parseStyleLayers(std::shared_ptr<StyleLayerGroup> layers) {
             return;
         }
 
-        if (layer_desc->id == "background") {
+        if (layer_desc->isBackground()) {
             // background is a special, fake bucket
             continue;
         } else if (layer_desc->layers) {
