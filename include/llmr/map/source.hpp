@@ -5,6 +5,7 @@
 #include <llmr/map/tile_data.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/time.hpp>
+#include <llmr/style/types.hpp>
 
 #include <list>
 #include <forward_list>

@@ -1,4 +1,5 @@
 #include <llmr/renderer/painter.hpp>
+#include <llmr/style/style_properties.hpp>
 
 #include <iostream>
 

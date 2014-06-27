@@ -9,6 +9,9 @@
 #include <llmr/util/transition.hpp>
 #include <llmr/util/uv.hpp>
 #include <llmr/style/class_dictionary.hpp>
+#include <llmr/style/class_properties.hpp>
+#include <llmr/style/style_properties.hpp>
+#include <llmr/style/rasterize_properties.hpp>
 
 #include <map>
 #include <unordered_map>

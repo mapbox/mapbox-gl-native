@@ -3,7 +3,7 @@
 
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/platform/gl.hpp>
-#include <llmr/style/properties.hpp>
+#include <llmr/style/rasterize_properties.hpp>
 
 namespace llmr {
 

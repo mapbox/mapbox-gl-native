@@ -3,7 +3,7 @@
 
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/time.hpp>
-#include <llmr/style/properties.hpp>
+#include <llmr/style/types.hpp>
 
 namespace llmr {
 namespace util {

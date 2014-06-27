@@ -7,7 +7,7 @@
 #include <llmr/util/mat4.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/renderer/frame_history.hpp>
-#include <llmr/style/properties.hpp>
+#include <llmr/style/types.hpp>
 
 #include <llmr/shader/plain_shader.hpp>
 #include <llmr/shader/outline_shader.hpp>
@@ -25,6 +25,7 @@
 
 #include <map>
 #include <unordered_map>
+#include <set>
 
 namespace llmr {
 
@@ -39,6 +40,9 @@ class LineBucket;
 class IconBucket;
 class TextBucket;
 class RasterBucket;
+
+struct FillProperties;
+struct CompositeProperties;
 
 class LayerDescription;
 class RasterTileData;

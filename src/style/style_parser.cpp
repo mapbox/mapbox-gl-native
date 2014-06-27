@@ -1,5 +1,4 @@
 #include <llmr/style/style_parser.hpp>
-#include <llmr/style/properties.hpp>
 #include <llmr/util/constants.hpp>
 #include <llmr/util/std.hpp>
 #include <csscolorparser/csscolorparser.hpp>
