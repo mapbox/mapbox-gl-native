@@ -52,9 +52,9 @@ private:
 
     // Parses optional properties into style class properties.
     template <typename T>
-    bool parseStyleProperty(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value);
+    bool parseStyleProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value);
     template <typename T>
-    bool parseStyleProperty(const char *property_name, const std::vector<ClassPropertyKey> &keys, ClassProperties &klass, JSVal value);
+    bool parseStyleProperty(const char *property_name, const std::vector<PropertyKey> &keys, ClassProperties &klass, JSVal value);
 
 
     FilterExpression parseFilter(JSVal, FilterExpression::Operator op);

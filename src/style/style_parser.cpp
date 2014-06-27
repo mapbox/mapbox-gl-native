@@ -172,7 +172,7 @@ void StyleParser::parseSources(JSVal value) {
 
 #pragma mark - Parse Style Properties
 
-template<> bool StyleParser::parseStyleProperty<bool>(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
+template<> bool StyleParser::parseStyleProperty<bool>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
     }
@@ -188,7 +188,7 @@ template<> bool StyleParser::parseStyleProperty<bool>(const char *property_name,
 }
 
 
-template<> bool StyleParser::parseStyleProperty<std::string>(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
+template<> bool StyleParser::parseStyleProperty<std::string>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
     }
@@ -203,7 +203,7 @@ template<> bool StyleParser::parseStyleProperty<std::string>(const char *propert
     return true;
 }
 
-template<> bool StyleParser::parseStyleProperty<TranslateAnchorType>(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
+template<> bool StyleParser::parseStyleProperty<TranslateAnchorType>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
     }
@@ -219,7 +219,7 @@ template<> bool StyleParser::parseStyleProperty<TranslateAnchorType>(const char 
 }
 
 
-template<> bool StyleParser::parseStyleProperty<RotateAnchorType>(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
+template<> bool StyleParser::parseStyleProperty<RotateAnchorType>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
     }
@@ -234,7 +234,7 @@ template<> bool StyleParser::parseStyleProperty<RotateAnchorType>(const char *pr
     return true;
 }
 
-template<> bool StyleParser::parseStyleProperty<Color>(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
+template<> bool StyleParser::parseStyleProperty<Color>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
     }
@@ -257,7 +257,7 @@ template<> bool StyleParser::parseStyleProperty<Color>(const char *property_name
     return true;
 }
 
-template <> bool StyleParser::parseStyleProperty<ClassPropertyTransition>(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
+template <> bool StyleParser::parseStyleProperty<ClassPropertyTransition>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
     }
@@ -305,7 +305,7 @@ FunctionProperty::fn parseFunctionType(JSVal type) {
     }
 }
 
-template<> bool StyleParser::parseStyleProperty<FunctionProperty>(const char *property_name, ClassPropertyKey key, ClassProperties &klass, JSVal value) {
+template<> bool StyleParser::parseStyleProperty<FunctionProperty>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
     }
@@ -358,7 +358,7 @@ template<> bool StyleParser::parseStyleProperty<FunctionProperty>(const char *pr
 }
 
 template <typename T>
-bool StyleParser::parseStyleProperty(const char *property_name, const std::vector<ClassPropertyKey> &keys, ClassProperties &klass, JSVal value) {
+bool StyleParser::parseStyleProperty(const char *property_name, const std::vector<PropertyKey> &keys, ClassProperties &klass, JSVal value) {
     if (value.HasMember(property_name)) {
         JSVal rvalue = replaceConstant(value[property_name]);
         if (!rvalue.IsArray()) {
@@ -478,7 +478,7 @@ void StyleParser::parseStyles(JSVal value, std::shared_ptr<StyleLayer> &layer) {
 }
 
 void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
-    using Key = ClassPropertyKey;
+    using Key = PropertyKey;
 
     parseStyleProperty<FunctionProperty>("fill-enabled", Key::FillEnabled, klass, value);
     parseStyleProperty<ClassPropertyTransition>("fill-enabled-transition", Key::FillEnabled, klass, value);

@@ -59,10 +59,10 @@ StyleProperties resetClassProperties(StyleLayer &layer) {
 }
 
 template <typename T>
-void applyProperty(const ClassProperties &properties, ClassPropertyKey key, T &target) {
+void applyProperty(const ClassProperties &properties, PropertyKey key, T &target) {
     auto it = properties.properties.find(key);
     if (it != properties.properties.end()) {
-        const ClassPropertyValue &value = it->second;
+        const PropertyValue &value = it->second;
         if (value.is<T>()) {
             target = value.get<T>();
         }
@@ -70,10 +70,10 @@ void applyProperty(const ClassProperties &properties, ClassPropertyKey key, T &t
 }
 
 template <typename T>
-void applyProperty(const ClassProperties &properties, ClassPropertyKey key, T &target, float z) {
+void applyProperty(const ClassProperties &properties, PropertyKey key, T &target, float z) {
     auto it = properties.properties.find(key);
     if (it != properties.properties.end()) {
-        const ClassPropertyValue &value = it->second;
+        const PropertyValue &value = it->second;
         if (value.is<FunctionProperty>()) {
             target = value.get<FunctionProperty>().evaluate<T>(z);
         } else if (value.is<bool>()) {
@@ -85,59 +85,59 @@ void applyProperty(const ClassProperties &properties, ClassPropertyKey key, T &t
 void applyClassProperties(StyleProperties &style, const ClassProperties &properties, float z) {
     if (style.is<FillProperties>()) {
         FillProperties &fill = style.get<FillProperties>();
-        applyProperty(properties, ClassPropertyKey::FillEnabled, fill.enabled, z);
-        applyProperty(properties, ClassPropertyKey::FillAntialias, fill.antialias, z);
-        applyProperty(properties, ClassPropertyKey::FillOpacity, fill.opacity, z);
-        applyProperty(properties, ClassPropertyKey::FillColor, fill.fill_color);
-        applyProperty(properties, ClassPropertyKey::FillOutlineColor, fill.stroke_color);
-        applyProperty(properties, ClassPropertyKey::FillTranslateX, fill.translate[0], z);
-        applyProperty(properties, ClassPropertyKey::FillTranslateY, fill.translate[1], z);
-        applyProperty(properties, ClassPropertyKey::FillTranslateAnchor, fill.translateAnchor);
-        applyProperty(properties, ClassPropertyKey::FillImage, fill.image);
+        applyProperty(properties, PropertyKey::FillEnabled, fill.enabled, z);
+        applyProperty(properties, PropertyKey::FillAntialias, fill.antialias, z);
+        applyProperty(properties, PropertyKey::FillOpacity, fill.opacity, z);
+        applyProperty(properties, PropertyKey::FillColor, fill.fill_color);
+        applyProperty(properties, PropertyKey::FillOutlineColor, fill.stroke_color);
+        applyProperty(properties, PropertyKey::FillTranslateX, fill.translate[0], z);
+        applyProperty(properties, PropertyKey::FillTranslateY, fill.translate[1], z);
+        applyProperty(properties, PropertyKey::FillTranslateAnchor, fill.translateAnchor);
+        applyProperty(properties, PropertyKey::FillImage, fill.image);
     } else if (style.is<LineProperties>()) {
         LineProperties &line = style.get<LineProperties>();
-        applyProperty(properties, ClassPropertyKey::LineEnabled, line.enabled, z);
-        applyProperty(properties, ClassPropertyKey::LineOpacity, line.opacity, z);
-        applyProperty(properties, ClassPropertyKey::LineColor, line.color);
-        applyProperty(properties, ClassPropertyKey::LineTranslateX, line.translate[0], z);
-        applyProperty(properties, ClassPropertyKey::LineTranslateY, line.translate[1], z);
-        applyProperty(properties, ClassPropertyKey::LineTranslateAnchor, line.translateAnchor);
-        applyProperty(properties, ClassPropertyKey::LineWidth, line.width, z);
-        applyProperty(properties, ClassPropertyKey::LineOffset, line.offset, z);
-        applyProperty(properties, ClassPropertyKey::LineBlur, line.blur, z);
-        applyProperty(properties, ClassPropertyKey::LineDashLand, line.dash_array[0], z);
-        applyProperty(properties, ClassPropertyKey::LineDashGap, line.dash_array[1], z);
-        applyProperty(properties, ClassPropertyKey::LineImage, line.image);
+        applyProperty(properties, PropertyKey::LineEnabled, line.enabled, z);
+        applyProperty(properties, PropertyKey::LineOpacity, line.opacity, z);
+        applyProperty(properties, PropertyKey::LineColor, line.color);
+        applyProperty(properties, PropertyKey::LineTranslateX, line.translate[0], z);
+        applyProperty(properties, PropertyKey::LineTranslateY, line.translate[1], z);
+        applyProperty(properties, PropertyKey::LineTranslateAnchor, line.translateAnchor);
+        applyProperty(properties, PropertyKey::LineWidth, line.width, z);
+        applyProperty(properties, PropertyKey::LineOffset, line.offset, z);
+        applyProperty(properties, PropertyKey::LineBlur, line.blur, z);
+        applyProperty(properties, PropertyKey::LineDashLand, line.dash_array[0], z);
+        applyProperty(properties, PropertyKey::LineDashGap, line.dash_array[1], z);
+        applyProperty(properties, PropertyKey::LineImage, line.image);
     } else if (style.is<IconProperties>()) {
         IconProperties &icon = style.get<IconProperties>();
-        applyProperty(properties, ClassPropertyKey::IconEnabled, icon.enabled, z);
-        applyProperty(properties, ClassPropertyKey::IconOpacity, icon.opacity, z);
-        applyProperty(properties, ClassPropertyKey::IconRotate, icon.rotate, z);
-        applyProperty(properties, ClassPropertyKey::IconRotateAnchor, icon.rotate_anchor);
+        applyProperty(properties, PropertyKey::IconEnabled, icon.enabled, z);
+        applyProperty(properties, PropertyKey::IconOpacity, icon.opacity, z);
+        applyProperty(properties, PropertyKey::IconRotate, icon.rotate, z);
+        applyProperty(properties, PropertyKey::IconRotateAnchor, icon.rotate_anchor);
     } else if (style.is<TextProperties>()) {
         TextProperties &text = style.get<TextProperties>();
-        applyProperty(properties, ClassPropertyKey::TextEnabled, text.enabled, z);
-        applyProperty(properties, ClassPropertyKey::TextOpacity, text.opacity, z);
-        applyProperty(properties, ClassPropertyKey::TextSize, text.size, z);
-        applyProperty(properties, ClassPropertyKey::TextColor, text.color);
-        applyProperty(properties, ClassPropertyKey::TextHaloColor, text.halo_color);
-        applyProperty(properties, ClassPropertyKey::TextHaloWidth, text.halo_width, z);
-        applyProperty(properties, ClassPropertyKey::TextHaloBlur, text.halo_blur, z);
+        applyProperty(properties, PropertyKey::TextEnabled, text.enabled, z);
+        applyProperty(properties, PropertyKey::TextOpacity, text.opacity, z);
+        applyProperty(properties, PropertyKey::TextSize, text.size, z);
+        applyProperty(properties, PropertyKey::TextColor, text.color);
+        applyProperty(properties, PropertyKey::TextHaloColor, text.halo_color);
+        applyProperty(properties, PropertyKey::TextHaloWidth, text.halo_width, z);
+        applyProperty(properties, PropertyKey::TextHaloBlur, text.halo_blur, z);
     } else if (style.is<CompositeProperties>()) {
         CompositeProperties &composite = style.get<CompositeProperties>();
-        applyProperty(properties, ClassPropertyKey::CompositeEnabled, composite.enabled, z);
-        applyProperty(properties, ClassPropertyKey::CompositeOpacity, composite.opacity, z);
+        applyProperty(properties, PropertyKey::CompositeEnabled, composite.enabled, z);
+        applyProperty(properties, PropertyKey::CompositeOpacity, composite.opacity, z);
     } else if (style.is<RasterProperties>()) {
         RasterProperties &raster = style.get<RasterProperties>();
-        applyProperty(properties, ClassPropertyKey::RasterSpin, raster.spin, z);
-        applyProperty(properties, ClassPropertyKey::RasterBrightnessLow, raster.brightness[0], z);
-        applyProperty(properties, ClassPropertyKey::RasterBrightnessHigh, raster.brightness[1], z);
-        applyProperty(properties, ClassPropertyKey::RasterSaturation, raster.saturation, z);
-        applyProperty(properties, ClassPropertyKey::RasterContrast, raster.contrast, z);
-        applyProperty(properties, ClassPropertyKey::RasterFade, raster.fade, z);
+        applyProperty(properties, PropertyKey::RasterSpin, raster.spin, z);
+        applyProperty(properties, PropertyKey::RasterBrightnessLow, raster.brightness[0], z);
+        applyProperty(properties, PropertyKey::RasterBrightnessHigh, raster.brightness[1], z);
+        applyProperty(properties, PropertyKey::RasterSaturation, raster.saturation, z);
+        applyProperty(properties, PropertyKey::RasterContrast, raster.contrast, z);
+        applyProperty(properties, PropertyKey::RasterFade, raster.fade, z);
     } else if (style.is<BackgroundProperties>()) {
         BackgroundProperties &background = style.get<BackgroundProperties>();
-        applyProperty(properties, ClassPropertyKey::BackgroundColor, background.color);
+        applyProperty(properties, PropertyKey::BackgroundColor, background.color);
     }
 }
 
