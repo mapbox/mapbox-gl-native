@@ -47,7 +47,9 @@ public:
     llmr::Map* getMap() const {
         return map;
     }
-    ;
+
+    bool initializeDisplay();
+    void terminateDisplay();
 
     bool initializeContext();
     void terminateContext();

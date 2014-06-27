@@ -77,6 +77,10 @@ public class MapFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        Log.v(TAG, "onDestroyView");
+
+        // Need to pass on to view
+        mMapView.onDestroy();
         mMapView = null;
     }
 
@@ -94,7 +98,6 @@ public class MapFragment extends Fragment {
         mAttrs = attrs;
     }
 
-    // TODO crashes because lifecycle events are not being called
     // Called when the fragment is visible
     @Override
     public void onStart() {
