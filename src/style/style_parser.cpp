@@ -390,8 +390,8 @@ std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
     }
 }
 
-StyleLayer::Ptr StyleParser::createLayer(JSVal value) {
-    StyleLayer::Ptr layer = std::make_shared<StyleLayer>();
+std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
+    std::shared_ptr<StyleLayer> layer = std::make_shared<StyleLayer>();
 
     if (value.IsObject()) {
         if (!value.HasMember("id")) {

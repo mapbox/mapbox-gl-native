@@ -533,7 +533,7 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> layers) {
     if (debug::renderTree) {
         std::cout << std::string(indent++ * 4, ' ') << "OPAQUE {" << std::endl;
     }
-    typedef std::vector<StyleLayer::Ptr>::reverse_iterator riterator;
+    typedef StyleLayerGroup::reverse_iterator riterator;
     int i = 0;
     for (riterator it = layers->rbegin(), end = layers->rend(); it != end; ++it, ++i) {
         painter.setOpaque();
@@ -550,7 +550,7 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> layers) {
     if (debug::renderTree) {
         std::cout << std::string(indent++ * 4, ' ') << "TRANSLUCENT {" << std::endl;
     }
-    typedef std::vector<StyleLayer::Ptr>::iterator iterator;
+    typedef StyleLayerGroup::iterator iterator;
     --i;
     for (iterator it = layers->begin(), end = layers->end(); it != end; ++it, --i) {
         painter.setTranslucent();
