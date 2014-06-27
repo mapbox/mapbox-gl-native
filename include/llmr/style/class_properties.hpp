@@ -84,24 +84,6 @@ public:
     inline ClassProperties(ClassProperties &&properties)
         : properties(std::move(properties.properties)) {}
 
-    template <typename T>
-    inline const T *get(ClassPropertyKey key) const {
-        const auto it = properties.find(key);
-        if (it != properties.end() && it->second.is<T>()) {
-            return ::std::addressof(it->second.get<T>());
-        } else {
-            return nullptr;
-        }
-    }
-    inline const ClassPropertyTransition *getTransition(ClassPropertyKey key) const {
-        const auto it = transitions.find(key);
-        if (it != transitions.end()) {
-            return ::std::addressof(it->second);
-        } else {
-            return nullptr;
-        }
-    }
-
     template <typename ...Args>
     inline void set(Args&& ...args) {
         properties.emplace(::std::forward<Args>(args)...);
@@ -109,6 +91,23 @@ public:
     template <typename ...Args>
     inline void setTransition(Args&& ...args) {
         transitions.emplace(::std::forward<Args>(args)...);
+    }
+
+    inline const ClassPropertyTransition &getTransition(ClassPropertyKey key, const ClassPropertyTransition &defaultTransition) const {
+        auto it = transitions.find(key);
+        if (it == transitions.end()) {
+            return defaultTransition;
+        } else {
+            return it->second;
+        }
+    }
+
+    // Route-through iterable interface so that you can iterate on the object as is.
+    inline std::map<ClassPropertyKey, ClassPropertyValue>::const_iterator begin() const {
+        return properties.begin();
+    }
+    inline std::map<ClassPropertyKey, ClassPropertyValue>::const_iterator end() const {
+        return properties.end();
     }
 
 public:
