@@ -37,7 +37,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     tar -xzf android-sdk_r23-linux.tgz
     export ANDROID_HOME=$PWD/android-sdk-linux
     export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
-    echo yes | android update sdk -u -a -t tools,platform-tools,android-19,build-tools-19.1.0,extra-android-support
+    echo yes | android update sdk -u -a -t tools,platform-tools,android-19,build-tools-20.0.0,extra-android-support
 
     wget http://dl.google.com/android/ndk/android-ndk-r9d-linux-x86_64.tar.bz2
     tar -xjf android-ndk-r9d-linux-x86_64.tar.bz2
