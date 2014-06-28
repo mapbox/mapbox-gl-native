@@ -174,15 +174,9 @@ void Map::setup() {
 
     painter.setup();
 
-    sources.emplace("outdoors",
-                    std::unique_ptr<Source>(new Source(*this,
-                           painter,
-                           kVectorTileURL,
-                           Source::Type::vector,
-                           512,
-                           0,
-                           14,
-                           true)));
+    if (sources.empty()) {
+        addDefaultSource();
+    }
 
     setStyleJSON(styleJSON);
 }
@@ -196,6 +190,27 @@ void Map::setStyleJSON(std::string newStyleJSON) {
 
 std::string Map::getStyleJSON() const {
     return styleJSON;
+}
+
+#pragma mark - Sources
+
+void Map::addDefaultSource() {
+    addSource("outdoors", kVectorTileURL);
+}
+
+void Map::removeDefaultSource() {
+    removeSource("outdoors");
+}
+
+void Map::addSource(std::string name, std::string url) {
+    sources.emplace(name,
+                    std::unique_ptr<Source>(new Source(*this,
+                           painter,
+                           url.c_str())));
+}
+
+void Map::removeSource(std::string name) {
+    sources.erase(name);
 }
 
 #pragma mark - Size
