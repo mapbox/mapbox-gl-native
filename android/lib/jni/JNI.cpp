@@ -1,5 +1,5 @@
 // Work around error in Android's Bionic stdint.h
-// Fixed in Git https://github.com/android/platform_bionic/blob/master/libc/include/stdint.h
+// Should be fixed in next NDK
 // Seems to be specific to C++11 (older versions needed these macros)
 #define __STDC_CONSTANT_MACROS
 #define __STDC_LIMIT_MACROS
@@ -139,7 +139,7 @@ namespace {
 using namespace llmr::android;
 
 // TODO: wrap C++ exceptions?
-// TODO: wrap other sorts of exceptions?
+// TODO: wrap other sorts of exceptions? eg coffee catch
 
 jlong JNICALL nativeCreate(JNIEnv* env, jobject obj, jstring default_style_json) {
     VERBOSE("nativeCreate");
@@ -241,6 +241,34 @@ void JNICALL nativeCleanup(JNIEnv* env, jobject obj, jlong native_map_view_ptr) 
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     native_map_view->getMap()->cleanup();
+}
+
+void JNICALL nativeAddDefaultSource(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    VERBOSE("nativeAddDefaultSource");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->addDefaultSource();
+}
+
+void JNICALL nativeRemoveDefaultSource(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    VERBOSE("nativeRemoveDefaultSource");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->removeDefaultSource();
+}
+
+void JNICALL nativeAddSource(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jstring name, jstring url) {
+    VERBOSE("nativeAddSource");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->addSource(std_string_from_jstring(env, name), std_string_from_jstring(env, url));
+}
+
+void JNICALL nativeRemoveSource(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jstring name) {
+    VERBOSE("nativeRemoveSource");
+    ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->removeSource(std_string_from_jstring(env, name));
 }
 
 void JNICALL nativeResize(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jint width, jint height, jfloat ratio) {
@@ -683,7 +711,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    std::array<JNINativeMethod, 50> methods = {{ // Can remove the extra brace in C++14
+    std::array<JNINativeMethod, 54> methods = {{ // Can remove the extra brace in C++14
         { "nativeCreate", "(Ljava/lang/String;)J", reinterpret_cast<void*>(&nativeCreate) },
         { "nativeDestroy", "(J)V", reinterpret_cast<void*>(&nativeDestroy) },
         { "nativeInitializeDisplay", "(J)V", reinterpret_cast<void*>(&nativeInitializeDisplay) },
@@ -697,6 +725,10 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeRerender", "(J)V", reinterpret_cast<void*>(&nativeRerender) },
         { "nativeUpdate", "(J)V", reinterpret_cast<void*>(&nativeUpdate) },
         { "nativeCleanup", "(J)V", reinterpret_cast<void*>(&nativeCleanup) },
+        { "nativeAddDefaultSource", "(J)V", reinterpret_cast<void*>(&nativeAddDefaultSource) },
+        { "nativeRemoveDefaultSource", "(J)V", reinterpret_cast<void*>(&nativeRemoveDefaultSource) },
+        { "nativeAddSource", "(JLjava/lang/String;Ljava/lang/String;)V", reinterpret_cast<void*>(&nativeAddSource) },
+        { "nativeRemoveSource", "(JLjava/lang/String;)V", reinterpret_cast<void*>(&nativeRemoveSource) },
         { "nativeResize", "(JIIF)V", reinterpret_cast<void*>(static_cast<void JNICALL(*)(JNIEnv*,jobject,jlong,jint,jint,jfloat)>(&nativeResize)) },
         { "nativeResize", "(JIIFII)V", reinterpret_cast<void*>(static_cast<void JNICALL(*)(JNIEnv*,jobject,jlong,jint,jint,jfloat,jint,jint)>(&nativeResize)) },
         { "nativeSetAppliedClasses", "(JLjava/util/Set;)V", reinterpret_cast<void*>(&nativeSetAppliedClasses) },
