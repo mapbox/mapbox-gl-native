@@ -269,9 +269,17 @@ void Map::setup() {
     painter.setup();
 }
 
+<<<<<<< HEAD
 void Map::setStyleURL(const std::string &url) {
     // TODO: Make threadsafe.
     styleURL = url;
+=======
+    if (sources.empty()) {
+        addDefaultSource();
+    }
+
+    setStyleJSON(styleJSON);
+>>>>>>> Add functions to Map to allow changing tile sources
 }
 
 
@@ -315,6 +323,26 @@ util::ptr<Sprite> Map::getSprite() {
     return sprite;
 }
 
+#pragma mark - Sources
+
+void Map::addDefaultSource() {
+    addSource("outdoors", kVectorTileURL);
+}
+
+void Map::removeDefaultSource() {
+    removeSource("outdoors");
+}
+
+void Map::addSource(std::string name, std::string url) {
+    sources.emplace(name,
+                    std::unique_ptr<Source>(new Source(*this,
+                           painter,
+                           url.c_str())));
+}
+
+void Map::removeSource(std::string name) {
+    sources.erase(name);
+}
 
 #pragma mark - Size
 
