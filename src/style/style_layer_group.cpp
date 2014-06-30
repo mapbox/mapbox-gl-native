@@ -11,4 +11,12 @@ void StyleLayerGroup::setClasses(const std::vector<std::string> &class_names, ti
     }
 }
 
+void StyleLayerGroup::updateProperties(float z, timestamp t) {
+    for (const std::shared_ptr<StyleLayer> &layer: layers) {
+        if (layer) {
+            layer->updateProperties(z, t);
+        }
+    }
+}
+
 }

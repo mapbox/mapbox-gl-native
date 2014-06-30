@@ -59,6 +59,11 @@ private:
     template <typename T>
     bool parseStyleProperty(const char *property_name, const std::vector<PropertyKey> &keys, ClassProperties &klass, JSVal value);
 
+    template <typename T>
+    bool parseFunction(PropertyKey key, ClassProperties &klass, JSVal value);
+    template <typename T>
+    T parseFunctionArgument(JSVal value);
+
 
     FilterExpression parseFilter(JSVal, FilterExpression::Operator op);
     FilterExpression parseFilter(JSVal);

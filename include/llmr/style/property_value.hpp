@@ -8,12 +8,15 @@
 namespace llmr {
 
 typedef util::variant<
-    FunctionProperty,
-    TranslateAnchorType,
-    RotateAnchorType,
+    bool,
+    float,
     Color,
     std::string,
-    bool
+    TranslateAnchorType,
+    RotateAnchorType,
+    Function<bool>,
+    Function<float>,
+    Function<Color>
 > PropertyValue;
 
 }

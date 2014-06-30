@@ -6,7 +6,7 @@ module.exports = {
     "@land": "#eee",
     "@water": "#999",
     "@park": "#bda",
-    "@road": "#fefefe",
+    "@road": "#FF00FF",
     "@border": "#6d90ab",
     "@building": "#ddd",
     "@building_outline": "#ccc",
@@ -53,28 +53,26 @@ module.exports = {
       "fill-color": "blue"
     }
   }, {
-    "id": "roads",
-    "layers": [{
-      "id": "road",
-      "source": "mapbox.mapbox-streets-v5",
-      "source-layer": "road",
-      "render": {
-        "type": "line",
-        "line-cap": "round",
-        "line-join": "bevel"
-      },
-      "style": {
-        "line-color": "@road",
-        "line-blur": "@road_blur",
-        "line-width": {
-          "fn": "exponential",
-          "z": 10,
-          "val": -1,
-          "slope": 0.2,
-          "min": 1
-        }
+    "id": "road",
+    "source": "mapbox.mapbox-streets-v5",
+    "source-layer": "road",
+    "render": {
+      "type": "line",
+      "line-cap": "round",
+      "line-join": "bevel"
+    },
+    "style": {
+      "line-color": "@road",
+      "line-blur": "@road_blur",
+      "line-width": {
+        "fn": "exponential",
+        "z": 10,
+        "val": -1,
+        "slope": 0.2,
+        "min": 1,
+        "max": 1000
       }
-    }]
+    }
   }, {
     "id": "building",
     "source": "mapbox.mapbox-streets-v5",

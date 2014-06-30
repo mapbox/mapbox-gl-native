@@ -51,6 +51,6 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::BackgroundColor, Color({{ 0, 0, 0, 0 }}) },
 };
 
-const PropertyValue PropertyFallbackValue::defaultProperty;
+const PropertyValue PropertyFallbackValue::defaultProperty = PropertyValue();
 
 }

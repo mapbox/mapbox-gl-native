@@ -39,6 +39,10 @@ public:
     const std::vector<std::string> &getAppliedClasses() const;
     void toggleClass(const std::string &name);
 
+    // Updates the styling information to reflect the current array
+    // of applied classes.
+    void updateClasses();
+
 public:
     std::shared_ptr<Sprite> sprite;
     std::shared_ptr<StyleLayerGroup> layers;
@@ -49,9 +53,6 @@ private:
     void updateSources();
     void updateSources(const std::shared_ptr<StyleLayerGroup> &group);
 
-    void updateProperties(const std::shared_ptr<StyleLayerGroup> &group, float z, timestamp t);
-
-    void updateClasses();
 
 private:
     std::set<std::shared_ptr<Source>> activeSources;

@@ -24,8 +24,8 @@ public:
         std::unique_ptr<const RasterizeProperties> &&rasterize);
 
     template <typename T> const T &getProperties() {
-        if (style.is<T>()) {
-            return style.get<T>();
+        if (properties.is<T>()) {
+            return properties.get<T>();
         } else {
             return defaultStyleProperties<T>();
         }
@@ -36,7 +36,7 @@ public:
 
     // Updates the StyleProperties information in this layer by evaluating all
     // pending transitions and applied classes in order.
-    void updateStyle(float z);
+    void updateProperties(float z, timestamp t);
 
     // Sets the list of classes and creates transitions to the currently applied values.
     void setClasses(const std::vector<std::string> &class_names, timestamp now,
@@ -46,6 +46,11 @@ private:
     // Applies all properties from a class, if they haven't been applied already.
     void applyClassProperties(ClassID class_id, std::set<PropertyKey> &already_applied,
                               timestamp now, const PropertyTransition &defaultTransition);
+
+    // Sets the properties of this object by evaluating all pending transitions and
+    // aplied classes in order.
+    template <typename T> void applyStyleProperties(float z, timestamp t);
+    template <typename T> void applyStyleProperty(PropertyKey key, T &, float z, timestamp t);
 
 public:
     // The name of this layer.
@@ -66,7 +71,7 @@ private:
 public:
     // Stores the evaluated, and cascaded styling information, specific to this
     // layer's type.
-    StyleProperties style;
+    StyleProperties properties;
 
     // Rasterization properties are used for prerendering the tile to a bitmap,
     // which is then used as a raster image instead of rendering this layer

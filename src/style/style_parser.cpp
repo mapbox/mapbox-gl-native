@@ -172,21 +172,150 @@ void StyleParser::parseSources(JSVal value) {
 
 #pragma mark - Parse Style Properties
 
-template<> bool StyleParser::parseStyleProperty<bool>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
-    if (!value.HasMember(property_name)) {
-        return false;
+Color parseColor(JSVal value) {
+    if (!value.IsString()) {
+        fprintf(stderr, "[WARNING] color value must be a string\n");
+        return Color{{ 0, 0, 0, 0 }};
     }
 
-    JSVal rvalue = replaceConstant(value[property_name]);
-    if (!rvalue.IsBool()) {
-        fprintf(stderr, "[WARNING] value of '%s' must be a boolean\n", property_name);
-        return false;
-    }
+    CSSColorParser::Color css_color = CSSColorParser::parse({ value.GetString(), value.GetStringLength() });
 
-    klass.set(key, bool(value.GetBool()));
-    return true;
+    // Premultiply the color.
+    const float factor = css_color.a / 255;
+
+    return Color{{(float)css_color.r * factor,
+                  (float)css_color.g * factor,
+                  (float)css_color.b * factor,
+                  css_color.a}};
 }
 
+template <>
+bool StyleParser::parseFunctionArgument(JSVal value) {
+    JSVal rvalue = replaceConstant(value);
+    if (rvalue.IsBool()) {
+        return rvalue.GetBool();
+    } else if (rvalue.IsNumber()) {
+        return rvalue.GetDouble();
+    } else {
+        fprintf(stderr, "[WARNING] function argument must be a boolean or numeric value");
+        return false;
+    }
+}
+
+template <>
+float StyleParser::parseFunctionArgument(JSVal value) {
+    JSVal rvalue = replaceConstant(value);
+    if (rvalue.IsNumber()) {
+        return rvalue.GetDouble();
+    } else {
+        fprintf(stderr, "[WARNING] function argument must be a numeric value");
+        return 0.0f;
+    }
+}
+
+template <>
+Color StyleParser::parseFunctionArgument(JSVal value) {
+    JSVal rvalue = replaceConstant(value);
+    return parseColor(rvalue);
+}
+
+template <typename T>
+bool StyleParser::parseFunction(PropertyKey key, ClassProperties &klass, JSVal value) {
+    if (!value.HasMember("fn")) {
+        fprintf(stderr, "[WARNING] function must specify a function name\n");
+        return false;
+    }
+
+    JSVal value_fn = value["fn"];
+    if (!value_fn.IsString()) {
+        fprintf(stderr, "[WARNING] function must specify a function type\n");
+        return false;
+    }
+
+    const std::string type { value_fn.GetString(), value_fn.GetStringLength() };
+
+    if (type == "linear") {
+        if (!value.HasMember("z")) {
+            fprintf(stderr, "[WARNING] linear function must specify a base zoom level\n");
+            return false;
+        }
+        if (!value.HasMember("val")) {
+            fprintf(stderr, "[WARNING] linear function must specify a base value\n");
+            return false;
+        }
+        const float z_base = parseFunctionArgument<float>(value["z"]);
+        const T val = parseFunctionArgument<T>(value["val"]);
+        const float slope = value.HasMember("slope") ? parseFunctionArgument<float>(value["slope"]) : 1;
+        const T min = value.HasMember("min") ? parseFunctionArgument<T>(value["min"]) : T();
+        const T max = value.HasMember("max") ? parseFunctionArgument<T>(value["max"]) : T();
+        klass.set(key, LinearFunction<T>(val, z_base, slope, min, max));
+        return true;
+    }
+    else if (type == "exponential") {
+        if (!value.HasMember("z")) {
+            fprintf(stderr, "[WARNING] exponential function must specify a base zoom level\n");
+            return false;
+        }
+        if (!value.HasMember("val")) {
+            fprintf(stderr, "[WARNING] exponential function must specify a base value\n");
+            return false;
+        }
+        const float z_base = parseFunctionArgument<float>(value["z"]);
+        const T val = parseFunctionArgument<T>(value["val"]);
+        const float slope = value.HasMember("slope") ? parseFunctionArgument<float>(value["slope"]) : 1;
+        const T min = value.HasMember("min") ? parseFunctionArgument<T>(value["min"]) : T();
+        const T max = value.HasMember("max") ? parseFunctionArgument<T>(value["max"]) : T();
+        klass.set(key, ExponentialFunction<T>(val, z_base, slope, min, max));
+        return true;
+
+    }
+    else if (type == "stops") {
+        if (!value.HasMember("stops")) {
+            fprintf(stderr, "[WARNING] stops function must specify a stops array\n");
+            return false;
+        }
+
+        JSVal value_stops = value["stops"];
+        if (!value_stops.IsArray()) {
+            fprintf(stderr, "[WARNING] stops function must specify a stops array\n");
+            return false;
+        }
+
+        std::vector<std::pair<float, T>> stops;
+        for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+            JSVal stop = value[i];
+            if (stop.IsObject()) {
+                if (!stop.HasMember("z")) {
+                    fprintf(stderr, "[WARNING] stop must have zoom level specification\n");
+                    return false;
+                }
+                if (!stop.HasMember("val")) {
+                    fprintf(stderr, "[WARNING] stop must have value specification\n");
+                    return false;
+                }
+
+                JSVal z = stop["z"];
+                if (!z.IsNumber()) {
+                    fprintf(stderr, "[WARNING] zoom level in stop must be a number\n");
+                    return false;
+                }
+
+                stops.emplace_back(z.GetDouble(), parseFunctionArgument<T>(stop["val"]));
+            } else {
+                fprintf(stderr, "[WARNING] function argument must be a numeric value\n");
+                return false;
+            }
+        }
+
+        klass.set(key, StopsFunction<T>(stops));
+        return true;
+    }
+    else {
+        fprintf(stderr, "[WARNING] function type '%s' is unknown\n", type.c_str());
+    }
+
+    return false;
+}
 
 template<> bool StyleParser::parseStyleProperty<std::string>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
@@ -218,7 +347,6 @@ template<> bool StyleParser::parseStyleProperty<TranslateAnchorType>(const char 
     return true;
 }
 
-
 template<> bool StyleParser::parseStyleProperty<RotateAnchorType>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
@@ -231,29 +359,6 @@ template<> bool StyleParser::parseStyleProperty<RotateAnchorType>(const char *pr
     }
 
     klass.set(key, parseRotateAnchorType({ rvalue.GetString(), rvalue.GetStringLength() }));
-    return true;
-}
-
-template<> bool StyleParser::parseStyleProperty<Color>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
-    if (!value.HasMember(property_name)) {
-        return false;
-    }
-
-    JSVal rvalue = replaceConstant(value[property_name]);
-    if (!rvalue.IsString()) {
-        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-        return false;
-    }
-
-    CSSColorParser::Color css_color = CSSColorParser::parse({ rvalue.GetString(), rvalue.GetStringLength() });
-
-    // Premultiply the color.
-    const float factor = css_color.a / 255;
-
-    klass.set(key, Color{{(float)css_color.r * factor,
-             (float)css_color.g * factor,
-             (float)css_color.b * factor,
-             css_color.a}});
     return true;
 }
 
@@ -281,81 +386,63 @@ template <> bool StyleParser::parseStyleProperty<PropertyTransition>(const char 
     return true;
 }
 
-
-FunctionProperty::fn parseFunctionType(JSVal type) {
-    if (type.IsString()) {
-        std::string t { type.GetString(), type.GetStringLength() };
-        if (t == "constant") {
-            return &functions::constant;
-        } else if (t == "linear") {
-            return &functions::linear;
-        } else if (t == "stops") {
-            return &functions::stops;
-        } else if (t == "exponential") {
-            return &functions::exponential;
-        } else if (t == "min") {
-            return &functions::min;
-        } else if (t == "max") {
-            return &functions::max;
-        } else {
-            throw Style::exception("unknown function type");
-        }
-    } else {
-        throw Style::exception("function type must be a string");
-    }
-}
-
-template<> bool StyleParser::parseStyleProperty<FunctionProperty>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
+template<> bool StyleParser::parseStyleProperty<Function<bool>>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
-    }
-
-    JSVal rvalue = replaceConstant(value[property_name]);
-    FunctionProperty property;
-
-    if (rvalue.IsArray()) {
-        if (rvalue.Size() < 1) {
-            fprintf(stderr, "[WARNING] function of '%s' does not have arguments\n", property_name);
+    } else {
+        JSVal rvalue = replaceConstant(value[property_name]);
+        if (rvalue.IsObject()) {
+            return parseFunction<bool>(key, klass, rvalue);
+        } else if (rvalue.IsNumber()) {
+            klass.set(key, bool(rvalue.GetDouble()));
+            return true;
+        } else if (rvalue.IsBool()) {
+            klass.set(key, bool(rvalue.GetBool()));
+            return true;
+        } else {
+            fprintf(stderr, "[WARNING] value of '%s' must be a boolean, or a boolean function\n", property_name);
             return false;
         }
-
-        property.function = parseFunctionType(rvalue[(rapidjson::SizeType)0]);
-        for (rapidjson::SizeType i = 1; i < rvalue.Size(); ++i) {
-            JSVal stop = rvalue[i];
-            if (stop.IsObject()) {
-                if (!stop.HasMember("z")) {
-                    throw Style::exception("stop must have zoom level specification");
-                }
-                JSVal z = stop["z"];
-                if (!z.IsNumber()) {
-                    throw Style::exception("zoom level in stops must be a number");
-                }
-                property.values.push_back(z.GetDouble());
-
-                if (!stop.HasMember("val")) {
-                    throw Style::exception("stop must have value specification");
-                }
-                JSVal val = stop["val"];
-                if (!val.IsNumber()) {
-                    throw Style::exception("value in stops must be a number");
-                }
-                property.values.push_back(val.GetDouble());
-            } else if (stop.IsNumber()) {
-                property.values.push_back(stop.GetDouble());
-            } else if (stop.IsBool()) {
-                property.values.push_back(stop.GetBool());
-            } else {
-                throw Style::exception("function argument must be a numeric value");
-            }
-        }
-    } else if (rvalue.IsNumber()) {
-        property.function = &functions::constant;
-        property.values.push_back(rvalue.GetDouble());
     }
-
-    klass.set(key, std::move(property));
-    return true;
 }
+
+template<> bool StyleParser::parseStyleProperty<Function<float>>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
+    if (!value.HasMember(property_name)) {
+        return false;
+    } else {
+        JSVal rvalue = replaceConstant(value[property_name]);
+        if (rvalue.IsObject()) {
+            return parseFunction<float>(key, klass, rvalue);
+        } else if (rvalue.IsNumber()) {
+            klass.set(key, float(rvalue.GetDouble()));
+            return true;
+        } else if (rvalue.IsBool()) {
+            klass.set(key, float(rvalue.GetBool()));
+            return true;
+        } else {
+            fprintf(stderr, "[WARNING] value of '%s' must be a number, or a number function\n", property_name);
+            return false;
+        }
+    }
+}
+
+template<> bool StyleParser::parseStyleProperty<Function<Color>>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
+    if (!value.HasMember(property_name)) {
+        return false;
+    } else {
+        JSVal rvalue = replaceConstant(value[property_name]);
+        if (rvalue.IsObject()) {
+            return parseFunction<Color>(key, klass, rvalue);
+        } else if (rvalue.IsString()) {
+            klass.set(key, parseColor(rvalue));
+            return true;
+        } else {
+            fprintf(stderr, "[WARNING] value of '%s' must be a color, or a color function\n", property_name);
+            return false;
+        }
+    }
+}
+
 
 template <typename T>
 bool StyleParser::parseStyleProperty(const char *property_name, const std::vector<PropertyKey> &keys, ClassProperties &klass, JSVal value) {
@@ -490,84 +577,84 @@ void StyleParser::parseStyles(JSVal value, std::map<ClassID, ClassProperties> &s
 void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     using Key = PropertyKey;
 
-    parseStyleProperty<FunctionProperty>("fill-enabled", Key::FillEnabled, klass, value);
+    parseStyleProperty<Function<bool>>("fill-enabled", Key::FillEnabled, klass, value);
     parseStyleProperty<PropertyTransition>("transition-fill-enabled", Key::FillEnabled, klass, value);
-    parseStyleProperty<FunctionProperty>("fill-antialias", Key::FillAntialias, klass, value);
-    parseStyleProperty<FunctionProperty>("fill-opacity", Key::FillOpacity, klass, value);
+    parseStyleProperty<Function<bool>>("fill-antialias", Key::FillAntialias, klass, value);
+    parseStyleProperty<Function<float>>("fill-opacity", Key::FillOpacity, klass, value);
     parseStyleProperty<PropertyTransition>("transition-fill-opacity", Key::FillOpacity, klass, value);
-    parseStyleProperty<Color>("fill-color", Key::FillColor, klass, value);
+    parseStyleProperty<Function<Color>>("fill-color", Key::FillColor, klass, value);
     parseStyleProperty<PropertyTransition>("transition-fill-color", Key::FillColor, klass, value);
-    parseStyleProperty<Color>("fill-outline-color", Key::FillOutlineColor, klass, value);
+    parseStyleProperty<Function<Color>>("fill-outline-color", Key::FillOutlineColor, klass, value);
     parseStyleProperty<PropertyTransition>("transition-fill-outline-color", Key::FillOutlineColor, klass, value);
-    parseStyleProperty<FunctionProperty>("fill-translate", { Key::FillTranslateX, Key::FillTranslateY }, klass, value);
+    parseStyleProperty<Function<float>>("fill-translate", { Key::FillTranslateX, Key::FillTranslateY }, klass, value);
     parseStyleProperty<PropertyTransition>("transition-fill-translate", Key::FillTranslate, klass, value);
     parseStyleProperty<TranslateAnchorType>("fill-translate-anchor", Key::FillTranslateAnchor, klass, value);
     parseStyleProperty<std::string>("fill-image", Key::FillImage, klass, value);
 
-    parseStyleProperty<FunctionProperty>("line-enabled", Key::LineEnabled, klass, value);
+    parseStyleProperty<Function<bool>>("line-enabled", Key::LineEnabled, klass, value);
     parseStyleProperty<PropertyTransition>("transition-line-enabled", Key::LineEnabled, klass, value);
-    parseStyleProperty<FunctionProperty>("line-opacity", Key::LineOpacity, klass, value);
+    parseStyleProperty<Function<float>>("line-opacity", Key::LineOpacity, klass, value);
     parseStyleProperty<PropertyTransition>("transition-line-opacity", Key::LineOpacity, klass, value);
-    parseStyleProperty<Color>("line-color", Key::LineColor, klass, value);
+    parseStyleProperty<Function<Color>>("line-color", Key::LineColor, klass, value);
     parseStyleProperty<PropertyTransition>("transition-line-color", Key::LineColor, klass, value);
-    parseStyleProperty<FunctionProperty>("line-translate", { Key::LineTranslateX, Key::LineTranslateY }, klass, value);
+    parseStyleProperty<Function<float>>("line-translate", { Key::LineTranslateX, Key::LineTranslateY }, klass, value);
     parseStyleProperty<PropertyTransition>("transition-line-translate", Key::LineTranslate, klass, value);
     parseStyleProperty<TranslateAnchorType>("line-translate-anchor", Key::LineTranslateAnchor, klass, value);
-    parseStyleProperty<FunctionProperty>("line-width", Key::LineWidth, klass, value);
+    parseStyleProperty<Function<float>>("line-width", Key::LineWidth, klass, value);
     parseStyleProperty<PropertyTransition>("transition-line-width", Key::LineWidth, klass, value);
-    parseStyleProperty<FunctionProperty>("line-offset", Key::LineOffset, klass, value);
+    parseStyleProperty<Function<float>>("line-offset", Key::LineOffset, klass, value);
     parseStyleProperty<PropertyTransition>("transition-line-offset", Key::LineOffset, klass, value);
-    parseStyleProperty<FunctionProperty>("line-blur", Key::LineBlur, klass, value);
+    parseStyleProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
     parseStyleProperty<PropertyTransition>("transition-line-blur", Key::LineBlur, klass, value);
-    parseStyleProperty<FunctionProperty>("line-dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);
+    parseStyleProperty<Function<float>>("line-dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);
     parseStyleProperty<PropertyTransition>("transition-line-dasharray", Key::LineDashArray, klass, value);
     parseStyleProperty<std::string>("line-image", Key::LineImage, klass, value);
 
-    parseStyleProperty<FunctionProperty>("icon-enabled", Key::IconEnabled, klass, value);
+    parseStyleProperty<Function<bool>>("icon-enabled", Key::IconEnabled, klass, value);
     parseStyleProperty<PropertyTransition>("transition-icon-enabled", Key::IconEnabled, klass, value);
-    parseStyleProperty<FunctionProperty>("icon-opacity", Key::IconOpacity, klass, value);
+    parseStyleProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
     parseStyleProperty<PropertyTransition>("transition-icon-opacity", Key::IconOpacity, klass, value);
-    parseStyleProperty<FunctionProperty>("icon-rotate", Key::IconRotate, klass, value);
+    parseStyleProperty<Function<float>>("icon-rotate", Key::IconRotate, klass, value);
     parseStyleProperty<RotateAnchorType>("icon-rotate-anchor", Key::IconRotateAnchor, klass, value);
 
-    parseStyleProperty<FunctionProperty>("text-enabled", Key::TextEnabled, klass, value);
+    parseStyleProperty<Function<bool>>("text-enabled", Key::TextEnabled, klass, value);
     parseStyleProperty<PropertyTransition>("transition-text-enabled", Key::TextEnabled, klass, value);
-    parseStyleProperty<FunctionProperty>("text-opacity", Key::TextOpacity, klass, value);
+    parseStyleProperty<Function<float>>("text-opacity", Key::TextOpacity, klass, value);
     parseStyleProperty<PropertyTransition>("transition-text-opacity", Key::TextOpacity, klass, value);
-    parseStyleProperty<FunctionProperty>("text-size", Key::TextSize, klass, value);
+    parseStyleProperty<Function<float>>("text-size", Key::TextSize, klass, value);
     parseStyleProperty<PropertyTransition>("transition-text-size", Key::TextSize, klass, value);
-    parseStyleProperty<Color>("text-color", Key::TextColor, klass, value);
+    parseStyleProperty<Function<Color>>("text-color", Key::TextColor, klass, value);
     parseStyleProperty<PropertyTransition>("transition-text-color", Key::TextColor, klass, value);
-    parseStyleProperty<Color>("text-halo-color", Key::TextHaloColor, klass, value);
+    parseStyleProperty<Function<Color>>("text-halo-color", Key::TextHaloColor, klass, value);
     parseStyleProperty<PropertyTransition>("transition-text-halo-color", Key::TextHaloColor, klass, value);
-    parseStyleProperty<FunctionProperty>("text-halo-width", Key::TextHaloWidth, klass, value);
+    parseStyleProperty<Function<float>>("text-halo-width", Key::TextHaloWidth, klass, value);
     parseStyleProperty<PropertyTransition>("transition-text-halo-width", Key::TextHaloWidth, klass, value);
-    parseStyleProperty<FunctionProperty>("text-halo-blur", Key::TextHaloBlur, klass, value);
+    parseStyleProperty<Function<float>>("text-halo-blur", Key::TextHaloBlur, klass, value);
     parseStyleProperty<PropertyTransition>("transition-text-halo-blur", Key::TextHaloBlur, klass, value);
 
-    parseStyleProperty<FunctionProperty>("composite-enabled", Key::CompositeEnabled, klass, value);
+    parseStyleProperty<Function<bool>>("composite-enabled", Key::CompositeEnabled, klass, value);
     parseStyleProperty<PropertyTransition>("transition-composite-enabled", Key::CompositeEnabled, klass, value);
-    parseStyleProperty<FunctionProperty>("composite-opacity", Key::CompositeOpacity, klass, value);
+    parseStyleProperty<Function<float>>("composite-opacity", Key::CompositeOpacity, klass, value);
     parseStyleProperty<PropertyTransition>("transition-composite-opacity", Key::CompositeOpacity, klass, value);
 
-    parseStyleProperty<FunctionProperty>("raster-enabled", Key::RasterEnabled, klass, value);
+    parseStyleProperty<Function<bool>>("raster-enabled", Key::RasterEnabled, klass, value);
     parseStyleProperty<PropertyTransition>("transition-raster-enabled", Key::RasterEnabled, klass, value);
-    parseStyleProperty<FunctionProperty>("raster-opacity", Key::RasterOpacity, klass, value);
+    parseStyleProperty<Function<float>>("raster-opacity", Key::RasterOpacity, klass, value);
     parseStyleProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
-    parseStyleProperty<FunctionProperty>("raster-spin", Key::RasterSpin, klass, value);
+    parseStyleProperty<Function<float>>("raster-spin", Key::RasterSpin, klass, value);
     parseStyleProperty<PropertyTransition>("transition-raster-spin", Key::RasterSpin, klass, value);
-    parseStyleProperty<FunctionProperty>("raster-brightness-low", Key::RasterBrightnessLow, klass, value);
+    parseStyleProperty<Function<float>>("raster-brightness-low", Key::RasterBrightnessLow, klass, value);
     parseStyleProperty<PropertyTransition>("transition-raster-brightness-low", Key::RasterBrightnessLow, klass, value);
-    parseStyleProperty<FunctionProperty>("raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
+    parseStyleProperty<Function<float>>("raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
     parseStyleProperty<PropertyTransition>("transition-raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
-    parseStyleProperty<FunctionProperty>("raster-saturation", Key::RasterSaturation, klass, value);
+    parseStyleProperty<Function<float>>("raster-saturation", Key::RasterSaturation, klass, value);
     parseStyleProperty<PropertyTransition>("transition-raster-saturation", Key::RasterSaturation, klass, value);
-    parseStyleProperty<FunctionProperty>("raster-contrast", Key::RasterContrast, klass, value);
+    parseStyleProperty<Function<float>>("raster-contrast", Key::RasterContrast, klass, value);
     parseStyleProperty<PropertyTransition>("transition-raster-contrast", Key::RasterContrast, klass, value);
-    parseStyleProperty<FunctionProperty>("raster-fade", Key::RasterFade, klass, value);
+    parseStyleProperty<Function<float>>("raster-fade", Key::RasterFade, klass, value);
     parseStyleProperty<PropertyTransition>("transition-raster-fade", Key::RasterFade, klass, value);
 
-    parseStyleProperty<Color>("background-color", Key::BackgroundColor, klass, value);
+    parseStyleProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
 }
 
 std::unique_ptr<const RasterizeProperties> StyleParser::parseRasterize(JSVal value) {

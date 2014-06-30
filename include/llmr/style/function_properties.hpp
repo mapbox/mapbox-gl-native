@@ -1,43 +1,72 @@
 #ifndef LLMR_STYLE_FUNCTION_PROPERTIES
 #define LLMR_STYLE_FUNCTION_PROPERTIES
 
+#include <llmr/util/variant.hpp>
+
 #include <vector>
 
 namespace llmr {
 
-namespace functions {
+template <typename T>
+struct ConstantFunction {
+    inline ConstantFunction(const T &value) : value(value) {}
+    inline T evaluate(float) const { return value; }
 
-float null(float z, const std::vector<float>&);
-float constant(float z, const std::vector<float>& values);
-float min(float z, const std::vector<float>& values);
-float max(float z, const std::vector<float>& values);
-float stops(float z, const std::vector<float>& values);
-float linear(float z, const std::vector<float>& values);
-float exponential(float z, const std::vector<float>& values);
+private:
+    const T value;
+};
 
-}
+template <typename T>
+struct LinearFunction {
+    inline LinearFunction(const T &value, float z_base, float slope, const T &min, const T &max)
+        : value(value), min(min), max(max), z_base(z_base), slope(slope) {}
+    T evaluate(float z) const;
 
-struct FunctionProperty {
-    typedef float (*fn)(float z, const std::vector<float>& values);
+private:
+    const T value, min, max;
+    const float z_base, slope;
+};
 
-    fn function;
-    std::vector<float> values;
+template <typename T>
+struct ExponentialFunction {
+    inline ExponentialFunction(const T &value, float z_base, float slope, const T &min,
+                               const T &max)
+        : value(value), min(min), max(max), z_base(z_base), slope(slope) {}
+    T evaluate(float z) const;
 
-    inline FunctionProperty() : function(&functions::null) {}
+private:
+    const T value, min, max;
+    const float z_base, slope;
+};
 
-    inline FunctionProperty(const FunctionProperty &property)
-        : function(property.function), values(property.values) {}
-    inline FunctionProperty(FunctionProperty &&property)
-        : function(property.function), values(std::move(property.values)) {}
+template <typename T>
+struct StopsFunction {
+    inline StopsFunction(const std::vector<std::pair<float, T>> &values) : values(values) {}
+    T evaluate(float z) const;
 
+private:
+    const std::vector<std::pair<float, T>> values;
+};
 
-    inline void operator=(const FunctionProperty &rhs) {
-        function = rhs.function;
-        values = rhs.values;
+template <typename T>
+using Function = util::variant<
+    ConstantFunction<T>,
+    LinearFunction<T>,
+    ExponentialFunction<T>,
+    StopsFunction<T>
+>;
+
+template <typename T>
+struct FunctionEvaluator {
+    typedef T result_type;
+    inline FunctionEvaluator(float z) : z(z) {}
+
+    template <template <typename> class Fn>
+    inline result_type operator()(const Fn<T>& fn) {
+        return fn.evaluate(z);
     }
-
-    inline FunctionProperty(float value) : function(&functions::constant), values(1, value) {}
-    template <typename T> inline T evaluate(float z) const { return function(z, values); }
+private:
+    float z;
 };
 
 }

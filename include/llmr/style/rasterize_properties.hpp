@@ -15,10 +15,10 @@ struct PrerenderProperties {
 
 class RasterizeProperties {
 public:
-    boost::optional<FunctionProperty> enabled;
-    boost::optional<FunctionProperty> buffer;
-    boost::optional<FunctionProperty> size;
-    boost::optional<FunctionProperty> blur;
+    boost::optional<Function<bool>> enabled;
+    boost::optional<Function<float>> buffer;
+    boost::optional<Function<float>> size;
+    boost::optional<Function<float>> blur;
 };
 
 }

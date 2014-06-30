@@ -11,6 +11,7 @@ class StyleLayerGroup {
 public:
     void setClasses(const std::vector<std::string> &class_names, timestamp now,
                     const PropertyTransition &defaultTransition);
+    void updateProperties(float z, timestamp t);
 
 public:
     std::vector<std::shared_ptr<StyleLayer>> layers;
