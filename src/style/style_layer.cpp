@@ -181,6 +181,25 @@ private:
     const float z;
 };
 
+inline float interpolate(const float a, const float b, const float t) {
+    return (1.0f - t) * a + t * b;
+}
+
+inline Color interpolate(const Color &a, const Color &b, const float t) {
+    const float rt = 1.0f - t;
+    return Color {{
+        rt * a[0] + t * b[0],
+        rt * a[1] + t * b[1],
+        rt * a[2] + t * b[2],
+        rt * a[3] + t * b[3]
+    }};
+}
+
+template <typename T>
+inline T interpolate(const T a, const T b, const float t) {
+    return t >= 0.5 ? b : a;
+}
+
 template <typename T>
 void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, const timestamp t) {
     auto it = appliedStyle.find(key);
@@ -189,15 +208,15 @@ void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, c
         // Iterate through all properties that we need to apply in order.
         const PropertyEvaluator<T> evaluator(z);
         for (AppliedClassProperty &property : applied.properties) {
-            if (property.end >= t) {
+            if (t >= property.end) {
                 // We overwrite the current property with the new value.
                 target = util::apply_visitor(evaluator, property.value);
-            } else if (property.begin <= t) {
+            } else if (t >= property.begin) {
                 // We overwrite the current property partially with the new value.
                 float progress = float(t - property.begin) / float(property.end - property.begin);
-                target = util::apply_visitor(evaluator, property.value);
-//                target = (1.0f - progress) * target + (progress) *
-//                evaluateProperty(property.value, target, z);
+                target = interpolate(target, util::apply_visitor(evaluator, property.value), progress);
+            } else {
+                // Do not apply this property because its transition hasn't begun yet.
             }
         }
     }
@@ -268,5 +287,13 @@ void StyleLayer::updateProperties(float z, const timestamp t) {
     }
 }
 
+bool StyleLayer::hasTransitions() const {
+    for (const std::pair<PropertyKey, AppliedClassProperties> &pair : appliedStyle) {
+        if (pair.second.hasTransitions()) {
+            return true;
+        }
+    }
+    return false;
+}
 
 }

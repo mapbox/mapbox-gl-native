@@ -34,6 +34,10 @@ public:
     void add(ClassID class_id, timestamp begin, timestamp end, const PropertyValue &value) {
         properties.emplace_back(class_id, begin, end, value);
     }
+
+    bool hasTransitions() const {
+        return properties.size() > 1;
+    }
 };
 
 }

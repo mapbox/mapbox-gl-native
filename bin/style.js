@@ -94,6 +94,9 @@ module.exports = {
         "min": 0,
         "max": 1
       }
+    },
+    "style.night": {
+      "fill-color": "blue"
     }
   }, {
     "id": "borders",

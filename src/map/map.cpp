@@ -495,7 +495,7 @@ void Map::render() {
 #endif
 
     // Schedule another rerender when we definitely need a next frame.
-    if (transform.needsTransition()) {
+    if (transform.needsTransition() || style->hasTransitions()) {
         update();
     }
 

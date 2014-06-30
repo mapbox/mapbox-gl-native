@@ -13,6 +13,7 @@ public:
                     const PropertyTransition &defaultTransition);
     void updateProperties(float z, timestamp t);
 
+    bool hasTransitions() const;
 public:
     std::vector<std::shared_ptr<StyleLayer>> layers;
 };

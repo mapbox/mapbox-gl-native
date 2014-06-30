@@ -42,6 +42,8 @@ public:
     void setClasses(const std::vector<std::string> &class_names, timestamp now,
                     const PropertyTransition &defaultTransition);
 
+    bool hasTransitions() const;
+
 private:
     // Applies all properties from a class, if they haven't been applied already.
     void applyClassProperties(ClassID class_id, std::set<PropertyKey> &already_applied,

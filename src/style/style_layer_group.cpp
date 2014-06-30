@@ -1,3 +1,4 @@
+
 #include <llmr/style/style_layer_group.hpp>
 
 namespace llmr {
@@ -18,5 +19,17 @@ void StyleLayerGroup::updateProperties(float z, timestamp t) {
         }
     }
 }
+
+bool StyleLayerGroup::hasTransitions() const {
+    for (const std::shared_ptr<const StyleLayer> &layer: layers) {
+        if (layer) {
+            if (layer->hasTransitions()) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 
 }

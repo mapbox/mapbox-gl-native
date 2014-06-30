@@ -43,6 +43,8 @@ public:
     // of applied classes.
     void updateClasses();
 
+    bool hasTransitions() const;
+
 public:
     std::shared_ptr<Sprite> sprite;
     std::shared_ptr<StyleLayerGroup> layers;

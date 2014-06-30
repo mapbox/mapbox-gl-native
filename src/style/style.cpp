@@ -3,6 +3,7 @@
 #include <llmr/style/style_parser.hpp>
 #include <llmr/style/style_bucket.hpp>
 #include <llmr/util/constants.hpp>
+#include <llmr/util/time.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
@@ -55,7 +56,7 @@ void Style::updateProperties(float z, timestamp t) {
 }
 
 void Style::setDefaultTransitionDuration(uint16_t duration_milliseconds) {
-    defaultTransition.duration = duration_milliseconds;
+    defaultTransition.duration = duration_milliseconds * 1_millisecond;
 }
 
 const std::vector<std::string> &Style::getAppliedClasses() const {
@@ -80,6 +81,16 @@ void Style::updateClasses() {
         layers->setClasses(appliedClasses, util::now(), defaultTransition);
     }
 }
+
+bool Style::hasTransitions() const {
+    if (layers) {
+        if (layers->hasTransitions()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 void Style::loadJSON(const uint8_t *const data) {
     uv::writelock lock(mtx);
