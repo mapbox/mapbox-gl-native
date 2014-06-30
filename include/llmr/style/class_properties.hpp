@@ -3,15 +3,11 @@
 
 #include <llmr/style/property_key.hpp>
 #include <llmr/style/property_value.hpp>
+#include <llmr/style/property_transition.hpp>
 
 #include <map>
 
 namespace llmr {
-
-struct ClassPropertyTransition {
-    uint16_t duration = 0;
-    uint16_t delay = 0;
-};
 
 class ClassProperties {
 public:
@@ -28,7 +24,7 @@ public:
         transitions.emplace(::std::forward<Args>(args)...);
     }
 
-    inline const ClassPropertyTransition &getTransition(PropertyKey key, const ClassPropertyTransition &defaultTransition) const {
+    inline const PropertyTransition &getTransition(PropertyKey key, const PropertyTransition &defaultTransition) const {
         auto it = transitions.find(key);
         if (it == transitions.end()) {
             return defaultTransition;
@@ -47,7 +43,7 @@ public:
 
 public:
     std::map<PropertyKey, PropertyValue> properties;
-    std::map<PropertyKey, ClassPropertyTransition> transitions;
+    std::map<PropertyKey, PropertyTransition> transitions;
 };
 
 }

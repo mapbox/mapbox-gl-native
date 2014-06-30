@@ -132,7 +132,7 @@ private:
 
     // Unconditionally performs a render with the current map state.
     void render();
-    void renderLayers(std::shared_ptr<StyleLayerGroup> layers);
+    void renderLayers(std::shared_ptr<StyleLayerGroup> group);
     void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass);
 
 private:

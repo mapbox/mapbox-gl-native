@@ -18,7 +18,7 @@ namespace llmr {
 enum class ClassID : uint32_t;
 
 class StyleLayer;
-typedef std::vector<std::shared_ptr<StyleLayer>> StyleLayerGroup;
+class StyleLayerGroup;
 
 class StyleParser {
 public:

@@ -1,5 +1,5 @@
 #include <llmr/style/style_parser.hpp>
-#include <llmr/style/style_layer.hpp>
+#include <llmr/style/style_layer_group.hpp>
 #include <llmr/util/constants.hpp>
 #include <llmr/util/std.hpp>
 #include <csscolorparser/csscolorparser.hpp>
@@ -257,12 +257,12 @@ template<> bool StyleParser::parseStyleProperty<Color>(const char *property_name
     return true;
 }
 
-template <> bool StyleParser::parseStyleProperty<ClassPropertyTransition>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
+template <> bool StyleParser::parseStyleProperty<PropertyTransition>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
     }
     JSVal elements = replaceConstant(value[property_name]);
-    ClassPropertyTransition transition;
+    PropertyTransition transition;
 
     if (elements.IsObject()) {
         if (elements.HasMember("duration") && elements["duration"].IsNumber()) {
@@ -380,14 +380,14 @@ bool StyleParser::parseStyleProperty(const char *property_name, const std::vecto
 
 std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
     if (value.IsArray()) {
-        std::unique_ptr<StyleLayerGroup> layers = std::make_unique<StyleLayerGroup>();
+        std::unique_ptr<StyleLayerGroup> group = std::make_unique<StyleLayerGroup>();
         for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
             std::shared_ptr<StyleLayer> layer = createLayer(value[i]);
             if (layer) {
-                layers->emplace_back(layer);
+                group->layers.emplace_back(layer);
             }
         }
-        return layers;
+        return group;
     } else {
         throw Style::exception("layers must be an array");
     }
@@ -491,81 +491,81 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     using Key = PropertyKey;
 
     parseStyleProperty<FunctionProperty>("fill-enabled", Key::FillEnabled, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-fill-enabled", Key::FillEnabled, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-fill-enabled", Key::FillEnabled, klass, value);
     parseStyleProperty<FunctionProperty>("fill-antialias", Key::FillAntialias, klass, value);
     parseStyleProperty<FunctionProperty>("fill-opacity", Key::FillOpacity, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-fill-opacity", Key::FillOpacity, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-fill-opacity", Key::FillOpacity, klass, value);
     parseStyleProperty<Color>("fill-color", Key::FillColor, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-fill-color", Key::FillColor, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-fill-color", Key::FillColor, klass, value);
     parseStyleProperty<Color>("fill-outline-color", Key::FillOutlineColor, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-fill-outline-color", Key::FillOutlineColor, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-fill-outline-color", Key::FillOutlineColor, klass, value);
     parseStyleProperty<FunctionProperty>("fill-translate", { Key::FillTranslateX, Key::FillTranslateY }, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-fill-translate", Key::FillTranslate, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-fill-translate", Key::FillTranslate, klass, value);
     parseStyleProperty<TranslateAnchorType>("fill-translate-anchor", Key::FillTranslateAnchor, klass, value);
     parseStyleProperty<std::string>("fill-image", Key::FillImage, klass, value);
 
     parseStyleProperty<FunctionProperty>("line-enabled", Key::LineEnabled, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-line-enabled", Key::LineEnabled, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-line-enabled", Key::LineEnabled, klass, value);
     parseStyleProperty<FunctionProperty>("line-opacity", Key::LineOpacity, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-line-opacity", Key::LineOpacity, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-line-opacity", Key::LineOpacity, klass, value);
     parseStyleProperty<Color>("line-color", Key::LineColor, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-line-color", Key::LineColor, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-line-color", Key::LineColor, klass, value);
     parseStyleProperty<FunctionProperty>("line-translate", { Key::LineTranslateX, Key::LineTranslateY }, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-line-translate", Key::LineTranslate, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-line-translate", Key::LineTranslate, klass, value);
     parseStyleProperty<TranslateAnchorType>("line-translate-anchor", Key::LineTranslateAnchor, klass, value);
     parseStyleProperty<FunctionProperty>("line-width", Key::LineWidth, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-line-width", Key::LineWidth, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-line-width", Key::LineWidth, klass, value);
     parseStyleProperty<FunctionProperty>("line-offset", Key::LineOffset, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-line-offset", Key::LineOffset, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-line-offset", Key::LineOffset, klass, value);
     parseStyleProperty<FunctionProperty>("line-blur", Key::LineBlur, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-line-blur", Key::LineBlur, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-line-blur", Key::LineBlur, klass, value);
     parseStyleProperty<FunctionProperty>("line-dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-line-dasharray", Key::LineDashArray, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-line-dasharray", Key::LineDashArray, klass, value);
     parseStyleProperty<std::string>("line-image", Key::LineImage, klass, value);
 
     parseStyleProperty<FunctionProperty>("icon-enabled", Key::IconEnabled, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-icon-enabled", Key::IconEnabled, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-icon-enabled", Key::IconEnabled, klass, value);
     parseStyleProperty<FunctionProperty>("icon-opacity", Key::IconOpacity, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-icon-opacity", Key::IconOpacity, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-icon-opacity", Key::IconOpacity, klass, value);
     parseStyleProperty<FunctionProperty>("icon-rotate", Key::IconRotate, klass, value);
     parseStyleProperty<RotateAnchorType>("icon-rotate-anchor", Key::IconRotateAnchor, klass, value);
 
     parseStyleProperty<FunctionProperty>("text-enabled", Key::TextEnabled, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-text-enabled", Key::TextEnabled, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-text-enabled", Key::TextEnabled, klass, value);
     parseStyleProperty<FunctionProperty>("text-opacity", Key::TextOpacity, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-text-opacity", Key::TextOpacity, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-text-opacity", Key::TextOpacity, klass, value);
     parseStyleProperty<FunctionProperty>("text-size", Key::TextSize, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-text-size", Key::TextSize, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-text-size", Key::TextSize, klass, value);
     parseStyleProperty<Color>("text-color", Key::TextColor, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-text-color", Key::TextColor, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-text-color", Key::TextColor, klass, value);
     parseStyleProperty<Color>("text-halo-color", Key::TextHaloColor, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-text-halo-color", Key::TextHaloColor, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-text-halo-color", Key::TextHaloColor, klass, value);
     parseStyleProperty<FunctionProperty>("text-halo-width", Key::TextHaloWidth, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-text-halo-width", Key::TextHaloWidth, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-text-halo-width", Key::TextHaloWidth, klass, value);
     parseStyleProperty<FunctionProperty>("text-halo-blur", Key::TextHaloBlur, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-text-halo-blur", Key::TextHaloBlur, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-text-halo-blur", Key::TextHaloBlur, klass, value);
 
     parseStyleProperty<FunctionProperty>("composite-enabled", Key::CompositeEnabled, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-composite-enabled", Key::CompositeEnabled, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-composite-enabled", Key::CompositeEnabled, klass, value);
     parseStyleProperty<FunctionProperty>("composite-opacity", Key::CompositeOpacity, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-composite-opacity", Key::CompositeOpacity, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-composite-opacity", Key::CompositeOpacity, klass, value);
 
     parseStyleProperty<FunctionProperty>("raster-enabled", Key::RasterEnabled, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-raster-enabled", Key::RasterEnabled, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-raster-enabled", Key::RasterEnabled, klass, value);
     parseStyleProperty<FunctionProperty>("raster-opacity", Key::RasterOpacity, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
     parseStyleProperty<FunctionProperty>("raster-spin", Key::RasterSpin, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-raster-spin", Key::RasterSpin, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-raster-spin", Key::RasterSpin, klass, value);
     parseStyleProperty<FunctionProperty>("raster-brightness-low", Key::RasterBrightnessLow, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-raster-brightness-low", Key::RasterBrightnessLow, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-raster-brightness-low", Key::RasterBrightnessLow, klass, value);
     parseStyleProperty<FunctionProperty>("raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
     parseStyleProperty<FunctionProperty>("raster-saturation", Key::RasterSaturation, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-raster-saturation", Key::RasterSaturation, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-raster-saturation", Key::RasterSaturation, klass, value);
     parseStyleProperty<FunctionProperty>("raster-contrast", Key::RasterContrast, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-raster-contrast", Key::RasterContrast, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-raster-contrast", Key::RasterContrast, klass, value);
     parseStyleProperty<FunctionProperty>("raster-fade", Key::RasterFade, klass, value);
-    parseStyleProperty<ClassPropertyTransition>("transition-raster-fade", Key::RasterFade, klass, value);
+    parseStyleProperty<PropertyTransition>("transition-raster-fade", Key::RasterFade, klass, value);
 
     parseStyleProperty<Color>("background-color", Key::BackgroundColor, klass, value);
 }

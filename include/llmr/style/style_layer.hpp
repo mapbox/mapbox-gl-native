@@ -16,9 +16,7 @@
 namespace llmr {
 
 class StyleBucket;
-
-class StyleLayer;
-typedef std::vector<std::shared_ptr<StyleLayer>> StyleLayerGroup;
+class StyleLayerGroup;
 
 class StyleLayer {
 public:
@@ -33,16 +31,21 @@ public:
         }
     }
 
+    // Determines whether this layer is the background layer.
     bool isBackground() const;
+
+    // Updates the StyleProperties information in this layer by evaluating all
+    // pending transitions and applied classes in order.
+    void updateStyle(float z);
 
     // Sets the list of classes and creates transitions to the currently applied values.
     void setClasses(const std::vector<std::string> &class_names, timestamp now,
-                    const ClassPropertyTransition &defaultTransition);
+                    const PropertyTransition &defaultTransition);
 
 private:
     // Applies all properties from a class, if they haven't been applied already.
     void applyClassProperties(ClassID class_id, std::set<PropertyKey> &already_applied,
-                              timestamp now, const ClassPropertyTransition &defaultTransition);
+                              timestamp now, const PropertyTransition &defaultTransition);
 
 public:
     // The name of this layer.
@@ -73,7 +76,6 @@ public:
     // Child layer array (if this layer has child layers).
     std::shared_ptr<StyleLayerGroup> layers;
 };
-
 
 }
 

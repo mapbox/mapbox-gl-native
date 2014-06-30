@@ -14,10 +14,10 @@ public:
     AppliedClassProperty(ClassID class_id, timestamp begin, timestamp end, const PropertyValue &value);
 
 public:
-    ClassID name;
-    timestamp begin;
-    timestamp end;
-    PropertyValue value;
+    const ClassID name;
+    const timestamp begin;
+    const timestamp end;
+    const PropertyValue value;
 };
 
 

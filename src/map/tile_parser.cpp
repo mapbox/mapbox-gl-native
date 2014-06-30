@@ -3,6 +3,7 @@
 #include <llmr/map/vector_tile_data.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/style/style_layer.hpp>
+#include <llmr/style/style_layer_group.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
 #include <llmr/renderer/line_bucket.hpp>
 #include <llmr/renderer/icon_bucket.hpp>
@@ -63,12 +64,12 @@ void TileParser::addGlyph(uint64_t tileid, const std::string stackname,
     }
 }
 
-void TileParser::parseStyleLayers(std::shared_ptr<StyleLayerGroup> layers) {
-    if (!layers) {
+void TileParser::parseStyleLayers(std::shared_ptr<StyleLayerGroup> group) {
+    if (!group) {
         return;
     }
 
-    for (const std::shared_ptr<StyleLayer> &layer_desc : *layers) {
+    for (const std::shared_ptr<StyleLayer> &layer_desc : group->layers) {
         // Cancel early when parsing.
         if (obsolete()) {
             return;

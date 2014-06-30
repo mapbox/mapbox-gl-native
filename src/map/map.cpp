@@ -9,7 +9,7 @@
 #include <llmr/util/string.hpp>
 #include <llmr/util/constants.hpp>
 #include <llmr/util/uv.hpp>
-#include <llmr/style/style_layer.hpp>
+#include <llmr/style/style_layer_group.hpp>
 #include <llmr/style/style_bucket.hpp>
 #include <llmr/geometry/sprite_atlas.hpp>
 
@@ -176,7 +176,6 @@ void Map::setup() {
 
 void Map::setStyleJSON(std::string newStyleJSON) {
     styleJSON.swap(newStyleJSON);
-    style->cancelTransitions();
     style->loadJSON((const uint8_t *)styleJSON.c_str());
     update();
 }
@@ -384,14 +383,6 @@ void Map::toggleClass(const std::string &name) {
     style->toggleClass(name);
 }
 
-//void Map::setAppliedClasses(const std::vector<std::string> &appliedClasses) {
-//    style->cancelTransitions();
-//
-//    style->appliedClasses = appliedClasses;
-//
-//    update();
-//}
-
 const std::vector<std::string> &Map::getAppliedClasses() const {
    return style->getAppliedClasses();
 }
@@ -448,14 +439,8 @@ void Map::prepare() {
         painter.clearFramebuffers();
     }
 
-    style->cascade(state.getNormalizedZoom());
-
-    // Update style transitions.
     animationTime = util::now();
-    if (style->needsTransition()) {
-        style->updateTransitions(animationTime);
-        update();
-    }
+    style->updateProperties(state.getNormalizedZoom(), animationTime);
 
     // Allow the sprite atlas to potentially pull new sprite images if needed.
     if (style->sprite && style->sprite->isLoaded()) {
@@ -517,14 +502,14 @@ void Map::render() {
     glFlush();
 }
 
-void Map::renderLayers(std::shared_ptr<StyleLayerGroup> layers) {
-    if (!layers) {
+void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
+    if (!group) {
         // Make sure that we actually do have a layer group.
         return;
     }
 
     // TODO: Correctly compute the number of layers recursively beforehand.
-    float strata_thickness = 1.0f / (layers->size() + 1);
+    float strata_thickness = 1.0f / (group->layers.size() + 1);
 
     // - FIRST PASS ------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque
@@ -533,9 +518,8 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> layers) {
     if (debug::renderTree) {
         std::cout << std::string(indent++ * 4, ' ') << "OPAQUE {" << std::endl;
     }
-    typedef StyleLayerGroup::reverse_iterator riterator;
     int i = 0;
-    for (riterator it = layers->rbegin(), end = layers->rend(); it != end; ++it, ++i) {
+    for (auto it = group->layers.rbegin(), end = group->layers.rend(); it != end; ++it, ++i) {
         painter.setOpaque();
         painter.setStrata(i * strata_thickness);
         renderLayer(*it, Opaque);
@@ -550,9 +534,8 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> layers) {
     if (debug::renderTree) {
         std::cout << std::string(indent++ * 4, ' ') << "TRANSLUCENT {" << std::endl;
     }
-    typedef StyleLayerGroup::iterator iterator;
     --i;
-    for (iterator it = layers->begin(), end = layers->end(); it != end; ++it, --i) {
+    for (auto it = group->layers.begin(), end = group->layers.end(); it != end; ++it, --i) {
         painter.setTranslucent();
         painter.setStrata(i * strata_thickness);
         renderLayer(*it, Translucent);

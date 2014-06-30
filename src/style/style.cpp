@@ -1,5 +1,5 @@
 #include <llmr/style/style.hpp>
-#include <llmr/style/style_layer.hpp>
+#include <llmr/style/style_layer_group.hpp>
 #include <llmr/style/style_parser.hpp>
 #include <llmr/style/style_bucket.hpp>
 #include <llmr/util/constants.hpp>
@@ -13,9 +13,6 @@ namespace llmr {
 Style::Style() {
 }
 
-void Style::reset() {
-}
-
 void Style::updateSources() {
     activeSources.clear();
     updateSources(layers);
@@ -25,11 +22,11 @@ const std::set<std::shared_ptr<Source>> Style::getActiveSources() const {
     return activeSources;
 }
 
-void Style::updateSources(const std::shared_ptr<StyleLayerGroup> &layers) {
-    if (!layers) {
+void Style::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
+    if (!group) {
         return;
     }
-    for (const std::shared_ptr<StyleLayer> &layer : *layers) {
+    for (const std::shared_ptr<StyleLayer> &layer : group->layers) {
         if (!layer) continue;
         if (layer->bucket) {
             if (layer->bucket->source) {
@@ -143,16 +140,16 @@ void applyClassProperties(StyleProperties &style, const ClassProperties &propert
     }
 }
 
-void Style::cascade(const std::shared_ptr<StyleLayerGroup> &layers, float z) {
-    if (!layers) {
+void Style::updateProperties(const std::shared_ptr<StyleLayerGroup> &group, float z, timestamp t) {
+    if (!group) {
         return;
     }
 
-    for (const std::shared_ptr<StyleLayer> &layer : *layers) {
+    for (const std::shared_ptr<StyleLayer> &layer : group->layers) {
         if (!layer) continue;
 
         if (layer->layers) {
-            cascade(layer->layers, z);
+            updateProperties(layer->layers, z, t);
         }
 
         // Accomodate for different tile size.
@@ -183,13 +180,12 @@ void Style::cascade(const std::shared_ptr<StyleLayerGroup> &layers, float z) {
     }
 }
 
-void Style::cascade(float z) {
+void Style::updateProperties(float z, timestamp t) {
     uv::writelock lock(mtx);
 
     updateSources();
 
-    reset();
-    cascade(layers, z);
+    updateProperties(layers, z, t);
 
     // Apply transitions after the first time.
     if (!initial_render_complete) {
@@ -198,22 +194,8 @@ void Style::cascade(float z) {
     }
 }
 
-bool Style::needsTransition() const {
-    uv::readlock lock(mtx);
-
-    return false;
-}
-
-void Style::updateTransitions(timestamp now) {
-    uv::writelock lock(mtx);
-}
-
-void Style::cancelTransitions() {
-    uv::writelock lock(mtx);
-}
-
-void Style::setDefaultTransitionDuration(uint64_t duration_milliseconds) {
-    default_transition_duration = duration_milliseconds;
+void Style::setDefaultTransitionDuration(uint16_t duration_milliseconds) {
+    defaultTransition.duration = duration_milliseconds;
 }
 
 const std::vector<std::string> &Style::getAppliedClasses() const {
@@ -228,6 +210,14 @@ void Style::toggleClass(const std::string &name) {
         } else {
             appliedClasses.erase(it);
         }
+    }
+
+    updateClasses();
+}
+
+void Style::updateClasses() {
+    if (layers) {
+        layers->setClasses(appliedClasses, util::now(), defaultTransition);
     }
 }
 

@@ -1,4 +1,5 @@
 #include <llmr/style/style_layer.hpp>
+#include <llmr/style/style_layer_group.hpp>
 #include <llmr/style/property_fallback.hpp>
 
 namespace llmr {
@@ -12,7 +13,7 @@ bool StyleLayer::isBackground() const {
 }
 
 void StyleLayer::setClasses(const std::vector<std::string> &class_names, const timestamp now,
-                            const ClassPropertyTransition &defaultTransition) {
+                            const PropertyTransition &defaultTransition) {
     // Stores all keys that we have already added transitions for.
     std::set<PropertyKey> already_applied;
 
@@ -51,18 +52,14 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const t
 
     // Update all child layers as well.
     if (layers) {
-        for (std::shared_ptr<StyleLayer> &layer : *layers) {
-            if (layer) {
-                layer->setClasses(class_names, now, defaultTransition);
-            }
-        }
+        layers->setClasses(class_names, now, defaultTransition);
     }
 }
 
 // Helper function for applying all properties of a a single class that haven't been applied yet.
 void StyleLayer::applyClassProperties(const ClassID class_id,
                                       std::set<PropertyKey> &already_applied, timestamp now,
-                                      const ClassPropertyTransition &defaultTransition) {
+                                      const PropertyTransition &defaultTransition) {
     auto style_it = styles.find(class_id);
     if (style_it == styles.end()) {
         // There is no class in this layer with this class_name.
@@ -87,7 +84,7 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
         // a transition.
         AppliedClassProperties &appliedProperties = appliedStyle[key];
         if (appliedProperties.mostRecent() != class_id) {
-            const ClassPropertyTransition &transition =
+            const PropertyTransition &transition =
                 properties.getTransition(key, defaultTransition);
             const timestamp begin = now + transition.delay;
             const timestamp end = begin + transition.duration;

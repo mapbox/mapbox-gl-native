@@ -16,7 +16,7 @@ class GlyphStore;
 class SpriteAtlas;
 class VectorTileData;
 class StyleLayer;
-typedef std::vector<std::shared_ptr<StyleLayer>> StyleLayerGroup;
+class StyleLayerGroup;
 class StyleBucket;
 class StyleBucketFill;
 class StyleBucketLine;
@@ -38,7 +38,7 @@ public:
 private:
     bool obsolete() const;
     void parseGlyphs();
-    void parseStyleLayers(std::shared_ptr<StyleLayerGroup> layers);
+    void parseStyleLayers(std::shared_ptr<StyleLayerGroup> group);
     void addGlyph(uint64_t tileid, const std::string stackname, const std::u32string &string, const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face);
     std::unique_ptr<Bucket> createBucket(std::shared_ptr<StyleBucket> bucket_desc);
 
