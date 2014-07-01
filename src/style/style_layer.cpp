@@ -290,8 +290,18 @@ bool StyleLayer::hasTransitions() const {
 
 
 void StyleLayer::cleanupAppliedStyleProperties(timestamp now) {
-    for (std::pair<const PropertyKey, AppliedClassProperties> &pair : appliedStyle) {
-        pair.second.cleanup(now);
+    auto it = appliedStyle.begin();
+    const auto end = appliedStyle.end();
+    while (it != end) {
+        AppliedClassProperties &properties = it->second;
+        properties.cleanup(now);
+
+        // If the current properties object is empty, remove it from the map entirely.
+        if (properties.empty()) {
+            appliedStyle.erase(it++);
+        } else {
+            ++it;
+        }
     }
 }
 

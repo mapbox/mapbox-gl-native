@@ -31,6 +31,7 @@ public:
     void add(ClassID class_id, timestamp begin, timestamp end, const PropertyValue &value);
     bool hasTransitions() const;
     void cleanup(timestamp now);
+    bool empty() const;
 };
 
 }
