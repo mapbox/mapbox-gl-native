@@ -39,13 +39,13 @@ void Style::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
     }
 }
 
-void Style::updateProperties(float z, timestamp t) {
+void Style::updateProperties(float z, timestamp now) {
     uv::writelock lock(mtx);
 
     updateSources();
 
     if (layers) {
-        layers->updateProperties(z, t);
+        layers->updateProperties(z, now);
     }
 
     // Apply transitions after the first time.

@@ -96,68 +96,6 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
     }
 }
 
-//void applyStyleProperties(StyleProperties &style, const ClassProperties &properties, float z) {
-//    if (style.is<FillProperties>()) {
-//        FillProperties &fill = style.get<FillProperties>();
-//        applyStyleProperty(properties, PropertyKey::FillEnabled, fill.enabled, z);
-//        applyStyleProperty(properties, PropertyKey::FillAntialias, fill.antialias, z);
-//        applyStyleProperty(properties, PropertyKey::FillOpacity, fill.opacity, z);
-//        applyStyleProperty(properties, PropertyKey::FillColor, fill.fill_color);
-//        applyStyleProperty(properties, PropertyKey::FillOutlineColor, fill.stroke_color);
-//        applyStyleProperty(properties, PropertyKey::FillTranslateX, fill.translate[0], z);
-//        applyStyleProperty(properties, PropertyKey::FillTranslateY, fill.translate[1], z);
-//        applyStyleProperty(properties, PropertyKey::FillTranslateAnchor, fill.translateAnchor);
-//        applyStyleProperty(properties, PropertyKey::FillImage, fill.image);
-//    } else if (style.is<LineProperties>()) {
-//        LineProperties &line = style.get<LineProperties>();
-//        applyStyleProperty(properties, PropertyKey::LineEnabled, line.enabled, z);
-//        applyStyleProperty(properties, PropertyKey::LineOpacity, line.opacity, z);
-//        applyStyleProperty(properties, PropertyKey::LineColor, line.color);
-//        applyStyleProperty(properties, PropertyKey::LineTranslateX, line.translate[0], z);
-//        applyStyleProperty(properties, PropertyKey::LineTranslateY, line.translate[1], z);
-//        applyStyleProperty(properties, PropertyKey::LineTranslateAnchor, line.translateAnchor);
-//        applyStyleProperty(properties, PropertyKey::LineWidth, line.width, z);
-//        applyStyleProperty(properties, PropertyKey::LineOffset, line.offset, z);
-//        applyStyleProperty(properties, PropertyKey::LineBlur, line.blur, z);
-//        applyStyleProperty(properties, PropertyKey::LineDashLand, line.dash_array[0], z);
-//        applyStyleProperty(properties, PropertyKey::LineDashGap, line.dash_array[1], z);
-//        applyStyleProperty(properties, PropertyKey::LineImage, line.image);
-//    } else if (style.is<IconProperties>()) {
-//        IconProperties &icon = style.get<IconProperties>();
-//        applyStyleProperty(properties, PropertyKey::IconEnabled, icon.enabled, z);
-//        applyStyleProperty(properties, PropertyKey::IconOpacity, icon.opacity, z);
-//        applyStyleProperty(properties, PropertyKey::IconRotate, icon.rotate, z);
-//        applyStyleProperty(properties, PropertyKey::IconRotateAnchor, icon.rotate_anchor);
-//    } else if (style.is<TextProperties>()) {
-//        TextProperties &text = style.get<TextProperties>();
-//        applyStyleProperty(properties, PropertyKey::TextEnabled, text.enabled, z);
-//        applyStyleProperty(properties, PropertyKey::TextOpacity, text.opacity, z);
-//        applyStyleProperty(properties, PropertyKey::TextSize, text.size, z);
-//        applyStyleProperty(properties, PropertyKey::TextColor, text.color);
-//        applyStyleProperty(properties, PropertyKey::TextHaloColor, text.halo_color);
-//        applyStyleProperty(properties, PropertyKey::TextHaloWidth, text.halo_width, z);
-//        applyStyleProperty(properties, PropertyKey::TextHaloBlur, text.halo_blur, z);
-//    } else if (style.is<CompositeProperties>()) {
-//        CompositeProperties &composite = style.get<CompositeProperties>();
-//        applyStyleProperty(properties, PropertyKey::CompositeEnabled, composite.enabled, z);
-//        applyStyleProperty(properties, PropertyKey::CompositeOpacity, composite.opacity, z);
-//    } else if (style.is<RasterProperties>()) {
-//        RasterProperties &raster = style.get<RasterProperties>();
-//        applyStyleProperty(properties, PropertyKey::RasterEnabled, raster.enabled, z);
-//        applyStyleProperty(properties, PropertyKey::RasterOpacity, raster.opacity, z);
-//        applyStyleProperty(properties, PropertyKey::RasterSpin, raster.spin, z);
-//        applyStyleProperty(properties, PropertyKey::RasterBrightnessLow, raster.brightness[0], z);
-//        applyStyleProperty(properties, PropertyKey::RasterBrightnessHigh, raster.brightness[1], z);
-//        applyStyleProperty(properties, PropertyKey::RasterSaturation, raster.saturation, z);
-//        applyStyleProperty(properties, PropertyKey::RasterContrast, raster.contrast, z);
-//        applyStyleProperty(properties, PropertyKey::RasterFade, raster.fade, z);
-//    } else if (style.is<BackgroundProperties>()) {
-//        BackgroundProperties &background = style.get<BackgroundProperties>();
-//        applyStyleProperty(properties, PropertyKey::BackgroundColor, background.color);
-//    }
-//}
-//
-
 template <typename T>
 struct PropertyEvaluator {
     typedef T result_type;
@@ -201,19 +139,19 @@ inline T interpolate(const T a, const T b, const float t) {
 }
 
 template <typename T>
-void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, const timestamp t) {
+void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, const timestamp now) {
     auto it = appliedStyle.find(key);
     if (it != appliedStyle.end()) {
         AppliedClassProperties &applied = it->second;
         // Iterate through all properties that we need to apply in order.
         const PropertyEvaluator<T> evaluator(z);
         for (AppliedClassProperty &property : applied.properties) {
-            if (t >= property.end) {
+            if (now >= property.end) {
                 // We overwrite the current property with the new value.
                 target = util::apply_visitor(evaluator, property.value);
-            } else if (t >= property.begin) {
+            } else if (now >= property.begin) {
                 // We overwrite the current property partially with the new value.
-                float progress = float(t - property.begin) / float(property.end - property.begin);
+                float progress = float(now - property.begin) / float(property.end - property.begin);
                 target = interpolate(target, util::apply_visitor(evaluator, property.value), progress);
             } else {
                 // Do not apply this property because its transition hasn't begun yet.
@@ -229,41 +167,93 @@ void StyleLayer::applyStyleProperties(float, timestamp) {
 }
 
 template <>
-void StyleLayer::applyStyleProperties<FillProperties>(const float z, const timestamp t) {
+void StyleLayer::applyStyleProperties<FillProperties>(const float z, const timestamp now) {
     properties.set<FillProperties>();
     FillProperties &fill = properties.get<FillProperties>();
-    applyStyleProperty(PropertyKey::FillEnabled, fill.enabled, z, t);
-    applyStyleProperty(PropertyKey::FillAntialias, fill.antialias, z, t);
-    applyStyleProperty(PropertyKey::FillOpacity, fill.opacity, z, t);
-    applyStyleProperty(PropertyKey::FillColor, fill.fill_color, z, t);
-    applyStyleProperty(PropertyKey::FillOutlineColor, fill.stroke_color, z, t);
-    applyStyleProperty(PropertyKey::FillTranslateX, fill.translate[0], z, t);
-    applyStyleProperty(PropertyKey::FillTranslateY, fill.translate[1], z, t);
-    applyStyleProperty(PropertyKey::FillTranslateAnchor, fill.translateAnchor, z, t);
-    applyStyleProperty(PropertyKey::FillImage, fill.image, z, t);
+    applyStyleProperty(PropertyKey::FillEnabled, fill.enabled, z, now);
+    applyStyleProperty(PropertyKey::FillAntialias, fill.antialias, z, now);
+    applyStyleProperty(PropertyKey::FillOpacity, fill.opacity, z, now);
+    applyStyleProperty(PropertyKey::FillColor, fill.fill_color, z, now);
+    applyStyleProperty(PropertyKey::FillOutlineColor, fill.stroke_color, z, now);
+    applyStyleProperty(PropertyKey::FillTranslateX, fill.translate[0], z, now);
+    applyStyleProperty(PropertyKey::FillTranslateY, fill.translate[1], z, now);
+    applyStyleProperty(PropertyKey::FillTranslateAnchor, fill.translateAnchor, z, now);
+    applyStyleProperty(PropertyKey::FillImage, fill.image, z, now);
 }
 
 template <>
-void StyleLayer::applyStyleProperties<LineProperties>(const float z, const timestamp t) {
+void StyleLayer::applyStyleProperties<LineProperties>(const float z, const timestamp now) {
     properties.set<LineProperties>();
     LineProperties &line = properties.get<LineProperties>();
-    applyStyleProperty(PropertyKey::LineEnabled, line.enabled, z, t);
-    applyStyleProperty(PropertyKey::LineOpacity, line.opacity, z, t);
-    applyStyleProperty(PropertyKey::LineColor, line.color, z, t);
-    applyStyleProperty(PropertyKey::LineTranslateX, line.translate[0], z, t);
-    applyStyleProperty(PropertyKey::LineTranslateY, line.translate[1], z, t);
-    applyStyleProperty(PropertyKey::LineTranslateAnchor, line.translateAnchor, z, t);
-    applyStyleProperty(PropertyKey::LineWidth, line.width, z, t);
-    applyStyleProperty(PropertyKey::LineOffset, line.offset, z, t);
-    applyStyleProperty(PropertyKey::LineBlur, line.blur, z, t);
-    applyStyleProperty(PropertyKey::LineDashLand, line.dash_array[0], z, t);
-    applyStyleProperty(PropertyKey::LineDashGap, line.dash_array[1], z, t);
-    applyStyleProperty(PropertyKey::LineImage, line.image, z, t);
+    applyStyleProperty(PropertyKey::LineEnabled, line.enabled, z, now);
+    applyStyleProperty(PropertyKey::LineOpacity, line.opacity, z, now);
+    applyStyleProperty(PropertyKey::LineColor, line.color, z, now);
+    applyStyleProperty(PropertyKey::LineTranslateX, line.translate[0], z, now);
+    applyStyleProperty(PropertyKey::LineTranslateY, line.translate[1], z, now);
+    applyStyleProperty(PropertyKey::LineTranslateAnchor, line.translateAnchor, z, now);
+    applyStyleProperty(PropertyKey::LineWidth, line.width, z, now);
+    applyStyleProperty(PropertyKey::LineOffset, line.offset, z, now);
+    applyStyleProperty(PropertyKey::LineBlur, line.blur, z, now);
+    applyStyleProperty(PropertyKey::LineDashLand, line.dash_array[0], z, now);
+    applyStyleProperty(PropertyKey::LineDashGap, line.dash_array[1], z, now);
+    applyStyleProperty(PropertyKey::LineImage, line.image, z, now);
 }
 
-void StyleLayer::updateProperties(float z, const timestamp t) {
+template <>
+void StyleLayer::applyStyleProperties<IconProperties>(const float z, const timestamp now) {
+    properties.set<IconProperties>();
+    IconProperties &icon = properties.get<IconProperties>();
+    applyStyleProperty(PropertyKey::IconEnabled, icon.enabled, z, now);
+    applyStyleProperty(PropertyKey::IconOpacity, icon.opacity, z, now);
+    applyStyleProperty(PropertyKey::IconRotate, icon.rotate, z, now);
+    applyStyleProperty(PropertyKey::IconRotateAnchor, icon.rotate_anchor, z, now);
+}
+
+template <>
+void StyleLayer::applyStyleProperties<TextProperties>(const float z, const timestamp now) {
+    properties.set<TextProperties>();
+    TextProperties &text = properties.get<TextProperties>();
+    applyStyleProperty(PropertyKey::TextEnabled, text.enabled, z, now);
+    applyStyleProperty(PropertyKey::TextOpacity, text.opacity, z, now);
+    applyStyleProperty(PropertyKey::TextSize, text.size, z, now);
+    applyStyleProperty(PropertyKey::TextColor, text.color, z, now);
+    applyStyleProperty(PropertyKey::TextHaloColor, text.halo_color, z, now);
+    applyStyleProperty(PropertyKey::TextHaloWidth, text.halo_width, z, now);
+    applyStyleProperty(PropertyKey::TextHaloBlur, text.halo_blur, z, now);
+}
+
+template <>
+void StyleLayer::applyStyleProperties<CompositeProperties>(const float z, const timestamp now) {
+    properties.set<CompositeProperties>();
+    CompositeProperties &composite = properties.get<CompositeProperties>();
+    applyStyleProperty(PropertyKey::CompositeEnabled, composite.enabled, z, now);
+    applyStyleProperty(PropertyKey::CompositeOpacity, composite.opacity, z, now);
+}
+
+template <>
+void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const timestamp now) {
+    properties.set<RasterProperties>();
+    RasterProperties &raster = properties.get<RasterProperties>();
+    applyStyleProperty(PropertyKey::RasterEnabled, raster.enabled, z, now);
+    applyStyleProperty(PropertyKey::RasterOpacity, raster.opacity, z, now);
+    applyStyleProperty(PropertyKey::RasterSpin, raster.spin, z, now);
+    applyStyleProperty(PropertyKey::RasterBrightnessLow, raster.brightness[0], z, now);
+    applyStyleProperty(PropertyKey::RasterBrightnessHigh, raster.brightness[1], z, now);
+    applyStyleProperty(PropertyKey::RasterSaturation, raster.saturation, z, now);
+    applyStyleProperty(PropertyKey::RasterContrast, raster.contrast, z, now);
+    applyStyleProperty(PropertyKey::RasterFade, raster.fade, z, now);
+}
+
+template <>
+void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const timestamp now) {
+    properties.set<BackgroundProperties>();
+    BackgroundProperties &background = properties.get<BackgroundProperties>();
+    applyStyleProperty(PropertyKey::BackgroundColor, background.color, z, now);
+}
+
+void StyleLayer::updateProperties(float z, const timestamp now) {
     if (layers) {
-        layers->updateProperties(z, t);
+        layers->updateProperties(z, now);
     }
 
     // Accomodate for different tile size.
@@ -271,21 +261,21 @@ void StyleLayer::updateProperties(float z, const timestamp t) {
         z += std::log(bucket->source->tile_size / 256.0f) / M_LN2;
     }
 
-    cleanupAppliedStyleProperties(t);
+    cleanupAppliedStyleProperties(now);
 
     if (layers) {
-        applyStyleProperties<CompositeProperties>(z, t);
+        applyStyleProperties<CompositeProperties>(z, now);
     } else if (bucket) {
         switch (bucket->type) {
-            case BucketType::Fill: applyStyleProperties<FillProperties>(z, t); break;
-            case BucketType::Line: applyStyleProperties<LineProperties>(z, t); break;
-            case BucketType::Icon: applyStyleProperties<IconProperties>(z, t); break;
-            case BucketType::Text: applyStyleProperties<TextProperties>(z, t); break;
-            case BucketType::Raster: applyStyleProperties<RasterProperties>(z, t); break;
+            case BucketType::Fill: applyStyleProperties<FillProperties>(z, now); break;
+            case BucketType::Line: applyStyleProperties<LineProperties>(z, now); break;
+            case BucketType::Icon: applyStyleProperties<IconProperties>(z, now); break;
+            case BucketType::Text: applyStyleProperties<TextProperties>(z, now); break;
+            case BucketType::Raster: applyStyleProperties<RasterProperties>(z, now); break;
             default: properties.set<std::false_type>(); break;
         }
     } else {
-        return applyStyleProperties<BackgroundProperties>(z, t);
+        return applyStyleProperties<BackgroundProperties>(z, now);
     }
 }
 

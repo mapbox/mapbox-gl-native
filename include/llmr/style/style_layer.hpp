@@ -36,7 +36,7 @@ public:
 
     // Updates the StyleProperties information in this layer by evaluating all
     // pending transitions and applied classes in order.
-    void updateProperties(float z, timestamp t);
+    void updateProperties(float z, timestamp now);
 
     // Sets the list of classes and creates transitions to the currently applied values.
     void setClasses(const std::vector<std::string> &class_names, timestamp now,
@@ -51,11 +51,11 @@ private:
 
     // Sets the properties of this object by evaluating all pending transitions and
     // aplied classes in order.
-    template <typename T> void applyStyleProperties(float z, timestamp t);
-    template <typename T> void applyStyleProperty(PropertyKey key, T &, float z, timestamp t);
+    template <typename T> void applyStyleProperties(float z, timestamp now);
+    template <typename T> void applyStyleProperty(PropertyKey key, T &, float z, timestamp now);
 
     // Removes all expired style transitions.
-    void cleanupAppliedStyleProperties(timestamp t);
+    void cleanupAppliedStyleProperties(timestamp now);
 
 public:
     // The name of this layer.
