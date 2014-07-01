@@ -95,7 +95,16 @@ void Painter::renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         // TODO: Get rid of the 2.4 magic value. It is currently 24 / 10, with 24 being the font size
         // of the SDF glyphs.
         textShader->setGamma(properties.halo_blur * 2.4f / fontSize / map.getState().getPixelRatio());
-        textShader->setColor(properties.halo_color);
+        if (properties.opacity < 1.0f) {
+            Color color = properties.halo_color;
+            color[0] *= properties.opacity;
+            color[1] *= properties.opacity;
+            color[2] *= properties.opacity;
+            color[3] *= properties.opacity;
+            textShader->setColor(color);
+        } else {
+            textShader->setColor(properties.halo_color);
+        }
         textShader->setBuffer(properties.halo_width);
         glDepthRange(strata, 1.0f);
         bucket.drawGlyphs(*textShader);
@@ -106,7 +115,16 @@ void Painter::renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         // TODO: Get rid of the 2.4 magic value. It is currently 24 / 10, with 24 being the font size
         // of the SDF glyphs.
         textShader->setGamma(2.4f / fontSize / map.getState().getPixelRatio());
-        textShader->setColor(properties.color);
+        if (properties.opacity < 1.0f) {
+            Color color = properties.color;
+            color[0] *= properties.opacity;
+            color[1] *= properties.opacity;
+            color[2] *= properties.opacity;
+            color[3] *= properties.opacity;
+            textShader->setColor(color);
+        } else {
+            textShader->setColor(properties.color);
+        }
         textShader->setBuffer((256.0f - 64.0f) / 256.0f);
         glDepthRange(strata + strata_epsilon, 1.0f);
         bucket.drawGlyphs(*textShader);
