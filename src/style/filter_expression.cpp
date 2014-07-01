@@ -95,6 +95,8 @@ bool FilterComparison::Instance::compare(const std::forward_list<Value> &propert
             return all(property_values, util::relaxed_less);
         case Operator::LessEqual:
             return all(property_values, util::relaxed_less_equal);
+        default:
+            return false;
     }
 }
 
