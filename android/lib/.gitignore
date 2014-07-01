@@ -27,6 +27,7 @@ proguard/
 
 # NDK files
 libs/armeabi/
+libs/armeabi-v7a/
 obj/
 *.so
 
