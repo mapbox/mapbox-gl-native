@@ -1,7 +1,7 @@
 LOCAL_PATH              := $(call my-dir)
 LLMR_ROOT               := ../../..
 LLMR_INC_ROOT           := ../..
-BUILDTYPE               ?= Release
+BUILDTYPE               ?= Debug
 LLMR_OUT                := $(LLMR_ROOT)/build/$(BUILDTYPE)/obj
 LLMR_OUT_TARGET         := $(LLMR_ROOT)/build/$(BUILDTYPE)/obj.target
 MAPNIK_PACKAGING_OUT    := /mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-arm-android
