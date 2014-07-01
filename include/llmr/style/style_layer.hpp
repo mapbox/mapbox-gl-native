@@ -54,6 +54,9 @@ private:
     template <typename T> void applyStyleProperties(float z, timestamp t);
     template <typename T> void applyStyleProperty(PropertyKey key, T &, float z, timestamp t);
 
+    // Removes all expired style transitions.
+    void cleanupAppliedStyleProperties(timestamp t);
+
 public:
     // The name of this layer.
     const std::string id;

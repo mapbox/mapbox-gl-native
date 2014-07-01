@@ -56,7 +56,7 @@ void Style::updateProperties(float z, timestamp t) {
 }
 
 void Style::setDefaultTransitionDuration(uint16_t duration_milliseconds) {
-    defaultTransition.duration = duration_milliseconds * 1_millisecond;
+    defaultTransition.duration = duration_milliseconds;
 }
 
 const std::vector<std::string> &Style::getAppliedClasses() const {

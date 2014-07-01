@@ -381,6 +381,9 @@ bool Map::getDebug() const {
 
 void Map::toggleClass(const std::string &name) {
     style->toggleClass(name);
+    if (style->hasTransitions()) {
+        update();
+    }
 }
 
 const std::vector<std::string> &Map::getAppliedClasses() const {

@@ -27,17 +27,10 @@ public:
 
 public:
     // Returns thie ID of the most recent
-    ClassID mostRecent() const {
-        return properties.size() ? properties.back().name : ClassID::Fallback;
-    }
-
-    void add(ClassID class_id, timestamp begin, timestamp end, const PropertyValue &value) {
-        properties.emplace_back(class_id, begin, end, value);
-    }
-
-    bool hasTransitions() const {
-        return properties.size() > 1;
-    }
+    ClassID mostRecent() const;
+    void add(ClassID class_id, timestamp begin, timestamp end, const PropertyValue &value);
+    bool hasTransitions() const;
+    void cleanup(timestamp now);
 };
 
 }

@@ -24,14 +24,7 @@ public:
         transitions.emplace(::std::forward<Args>(args)...);
     }
 
-    inline const PropertyTransition &getTransition(PropertyKey key, const PropertyTransition &defaultTransition) const {
-        auto it = transitions.find(key);
-        if (it == transitions.end()) {
-            return defaultTransition;
-        } else {
-            return it->second;
-        }
-    }
+    const PropertyTransition &getTransition(PropertyKey key, const PropertyTransition &defaultTransition) const;
 
     // Route-through iterable interface so that you can iterate on the object as is.
     inline std::map<PropertyKey, PropertyValue>::const_iterator begin() const {

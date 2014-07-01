@@ -45,8 +45,8 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const t
         if (appliedProperties.mostRecent() != ClassID::Fallback) {
             // This property key hasn't been set by a previous class, so we need to add a transition
             // to the fallback value for that key.
-            const timestamp begin = now + defaultTransition.delay;
-            const timestamp end = begin + defaultTransition.duration;
+            const timestamp begin = now + defaultTransition.delay * 1_millisecond;
+            const timestamp end = begin + defaultTransition.duration * 1_millisecond;
             const PropertyValue &value = PropertyFallbackValue::Get(key);
             appliedProperties.add(ClassID::Fallback, begin, end, value);
         }
@@ -88,8 +88,8 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
         if (appliedProperties.mostRecent() != class_id) {
             const PropertyTransition &transition =
                 properties.getTransition(key, defaultTransition);
-            const timestamp begin = now + transition.delay;
-            const timestamp end = begin + transition.duration;
+            const timestamp begin = now + transition.delay * 1_millisecond;
+            const timestamp end = begin + transition.duration * 1_millisecond;
             const PropertyValue &value = property_pair.second;
             appliedProperties.add(class_id, begin, end, value);
         }
@@ -271,6 +271,8 @@ void StyleLayer::updateProperties(float z, const timestamp t) {
         z += std::log(bucket->source->tile_size / 256.0f) / M_LN2;
     }
 
+    cleanupAppliedStyleProperties(t);
+
     if (layers) {
         applyStyleProperties<CompositeProperties>(z, t);
     } else if (bucket) {
@@ -294,6 +296,13 @@ bool StyleLayer::hasTransitions() const {
         }
     }
     return false;
+}
+
+
+void StyleLayer::cleanupAppliedStyleProperties(timestamp now) {
+    for (std::pair<const PropertyKey, AppliedClassProperties> &pair : appliedStyle) {
+        pair.second.cleanup(now);
+    }
 }
 
 }
