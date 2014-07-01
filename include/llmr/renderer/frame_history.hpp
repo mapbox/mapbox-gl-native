@@ -11,8 +11,8 @@
 namespace llmr {
 
 struct FrameSnapshot {
-    explicit inline FrameSnapshot(timestamp timestamp, float z) : timestamp(timestamp), z(z) {}
-    float timestamp;
+    explicit inline FrameSnapshot(timestamp t, float z) : t(t), z(z) {}
+    float t;
     float z;
 };
 

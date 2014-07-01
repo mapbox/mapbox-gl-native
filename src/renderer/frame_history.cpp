@@ -26,7 +26,7 @@ bool FrameHistory::needsAnimation(const timestamp duration) const {
     const FrameSnapshot &pivot = history.back();
 
     int i = -1;
-    while ((int)history.size() > i + 1 && history[i + 1].timestamp + duration < pivot.timestamp) {
+    while ((int)history.size() > i + 1 && history[i + 1].t + duration < pivot.t) {
         i++;
     }
 
