@@ -433,8 +433,9 @@ void Map::prepare() {
 
     if (pixelRatioChanged) {
         style->sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
-        style->sprite->load(kSpriteURL);
-
+        if (style->sprite_url.size()) {
+            style->sprite->load(style->sprite_url);
+        }
         spriteAtlas->resize(state.getPixelRatio());
     }
 

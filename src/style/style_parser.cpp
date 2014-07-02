@@ -21,6 +21,10 @@ void StyleParser::parse(JSVal document) {
         root = createLayers(document["layers"]);
         parseLayers();
     }
+
+    if (document.HasMember("sprite")) {
+        parseSprite(document["sprite"]);
+    }
 }
 
 void StyleParser::parseConstants(JSVal value) {
@@ -910,5 +914,12 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         break;
     }
 }
+
+void StyleParser::parseSprite(JSVal value) {
+    if (value.IsString()) {
+        sprite = { value.GetString(), value.GetStringLength() };
+    }
+}
+
 
 }

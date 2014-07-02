@@ -2,6 +2,7 @@
 
 module.exports = {
   "version": 3,
+  "sprite": "http://mapbox-kkaefer.s3.amazonaws.com/static/outdoors-gl/sprite",
   "constants": {
     "@land": "#eee",
     "@water": "#999",

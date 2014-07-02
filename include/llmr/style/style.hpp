@@ -50,6 +50,7 @@ public:
     std::shared_ptr<StyleLayerGroup> layers;
     std::shared_ptr<StyleLayer> background;
     std::vector<std::string> appliedClasses;
+    std::string sprite_url;
 
 private:
     void updateSources();

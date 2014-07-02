@@ -102,6 +102,7 @@ void Style::loadJSON(const uint8_t *const data) {
     parser.parse(const_cast<const rapidjson::Document &>(doc));
 
     layers = parser.getLayers();
+    sprite_url = parser.getSprite();
 
     updateClasses();
 }

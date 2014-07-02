@@ -30,6 +30,10 @@ public:
         return root;
     }
 
+    std::string getSprite() const {
+        return sprite;
+    }
+
 private:
     void parseConstants(JSVal value);
     JSVal replaceConstant(JSVal value);
@@ -46,6 +50,7 @@ private:
     void parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer);
+    void parseSprite(JSVal value);
 
     // Parses optional properties into a render bucket.
     template<typename T>
@@ -86,6 +91,9 @@ private:
 
     // Store a stack of layers we're parsing right now. This is to prevent reference cycles.
     std::forward_list<StyleLayer *> stack;
+
+    // Base URL of the sprite image.
+    std::string sprite;
 };
 
 }

@@ -1,7 +1,5 @@
 #include <llmr/util/constants.hpp>
 
-const char *llmr::kSpriteURL = "http://mapbox-kkaefer.s3.amazonaws.com/static/outdoors-gl/sprite";
-const char *llmr::kVectorTileURL = "http://a.tiles.mapbox.com/v3/mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5/%d/%d/%d.vector.pbf";
 const char *llmr::kGlyphURL = "http://mapbox.s3.amazonaws.com/gl-glyphs-256/%s/%d-%d.pbf";
 
 const float llmr::util::tileSize = 512.0f;
