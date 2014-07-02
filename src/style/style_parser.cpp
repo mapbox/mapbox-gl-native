@@ -285,25 +285,20 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
         }
 
         std::vector<std::pair<float, T>> stops;
-        for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-            JSVal stop = value[i];
-            if (stop.IsObject()) {
-                if (!stop.HasMember("z")) {
-                    fprintf(stderr, "[WARNING] stop must have zoom level specification\n");
-                    return false;
-                }
-                if (!stop.HasMember("val")) {
-                    fprintf(stderr, "[WARNING] stop must have value specification\n");
-                    return false;
+        for (rapidjson::SizeType i = 0; i < value_stops.Size(); ++i) {
+            JSVal stop = value_stops[i];
+            if (stop.IsArray()) {
+                if (stop.Size() != 2) {
+                    fprintf(stderr, "[WARNING] stop must have zoom level and value specification\n");
                 }
 
-                JSVal z = stop["z"];
+                JSVal z = stop[rapidjson::SizeType(0)];
                 if (!z.IsNumber()) {
                     fprintf(stderr, "[WARNING] zoom level in stop must be a number\n");
                     return false;
                 }
 
-                stops.emplace_back(z.GetDouble(), parseFunctionArgument<T>(stop["val"]));
+                stops.emplace_back(z.GetDouble(), parseFunctionArgument<T>(stop[rapidjson::SizeType(1)]));
             } else {
                 fprintf(stderr, "[WARNING] function argument must be a numeric value\n");
                 return false;
