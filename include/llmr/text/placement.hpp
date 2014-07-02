@@ -23,7 +23,6 @@ public:
 
 private:
     const int8_t zoom;
-    Collision collision;
     const float zOffset;
     const float maxPlacementScale;
 
@@ -31,6 +30,7 @@ public:
     static const int tileExtent;
     static const int glyphSize;
     static const float minScale;
+    Collision collision;
 };
 }
 

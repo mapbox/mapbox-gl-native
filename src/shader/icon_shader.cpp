@@ -18,12 +18,14 @@ IconShader::IconShader()
 
     a_pos = glGetAttribLocation(program, "a_pos");
     a_tex = glGetAttribLocation(program, "a_tex");
+    a_minzoom = glGetAttribLocation(program, "a_minzoom");
 
     u_matrix = glGetUniformLocation(program, "u_matrix");
     u_color = glGetUniformLocation(program, "u_color");
     u_size = glGetUniformLocation(program, "u_size");
     u_ratio = glGetUniformLocation(program, "u_ratio");
     u_dimension = glGetUniformLocation(program, "u_dimension");
+    u_zoom = glGetUniformLocation(program, "u_zoom");
 
     // fprintf(stderr, "IconShader:\n");
     // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
@@ -36,10 +38,13 @@ IconShader::IconShader()
 
 void IconShader::bind(char *offset) {
     glEnableVertexAttribArray(a_pos);
-    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 8, offset);
+    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 12, offset);
 
     glEnableVertexAttribArray(a_tex);
-    glVertexAttribPointer(a_tex, 2, GL_UNSIGNED_SHORT, false, 8, offset + 4);
+    glVertexAttribPointer(a_tex, 2, GL_UNSIGNED_SHORT, false, 12, offset + 4);
+
+    glEnableVertexAttribArray(a_minzoom);
+    glVertexAttribPointer(a_minzoom, 1, GL_UNSIGNED_BYTE, false, 12, offset + 8);
 }
 
 void IconShader::setImage(int32_t new_image) {
@@ -74,5 +79,12 @@ void IconShader::setDimension(const std::array<float, 2>& new_dimension) {
     if (dimension != new_dimension) {
         glUniform2fv(u_dimension, 1, new_dimension.data());
         dimension = new_dimension;
+    }
+}
+
+void IconShader::setZoom(float new_zoom) {
+    if (zoom != new_zoom) {
+        glUniform1f(u_zoom, new_zoom * 10.0);
+        zoom = new_zoom;
     }
 }

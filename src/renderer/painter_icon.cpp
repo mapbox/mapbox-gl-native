@@ -38,6 +38,7 @@ void Painter::renderIcon(IconBucket& bucket, const std::string& layer_name, cons
         spriteAtlas.getTextureWidth(),
         spriteAtlas.getTextureHeight(),
     }});
+    iconShader->setZoom(map.getState().getZoom() - id.z);
 
     spriteAtlas.bind(map.getState().isChanging());
 

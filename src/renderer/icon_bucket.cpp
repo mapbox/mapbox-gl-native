@@ -19,8 +19,9 @@ struct geometry_too_long_exception : std::exception {};
 using namespace llmr;
 
 IconBucket::IconBucket(IconVertexBuffer& vertexBuffer,
-                         const BucketIconDescription& properties)
+                         const BucketIconDescription& properties, Collision &collision)
     : properties(properties),
+      collision(collision),
       vertexBuffer(vertexBuffer),
       vertex_start(vertexBuffer.index()) {
 }
@@ -36,6 +37,7 @@ void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprit
         field = "<circle>";
     }
 
+    int size = properties.size;
     const Rect<uint16_t> rect = sprite_atlas.getIcon(properties.size, field);
     const uint16_t tx = rect.x + rect.w / 2;
     const uint16_t ty = rect.y + rect.h / 2;
@@ -46,7 +48,21 @@ void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprit
     int32_t x, y;
     while ((cmd = geometry.next(x, y)) != Geometry::end) {
         if (cmd == Geometry::move_to) {
-            vertexBuffer.add(x, y, tx, ty);
+
+            // TODO unhardcode tilesize
+            const float scale = 8.0 / 2.0;
+            const CollisionRect box{-size * scale, -size * scale, size * scale, size * scale };
+            CollisionAnchor anchor{static_cast<float>(x), static_cast<float>(y)};
+            GlyphBoxes boxes;
+            boxes.emplace_back(GlyphBox{box, 1.0, 16.0, anchor, false});
+
+            PlacementProperty place = collision.place(boxes, anchor, 1.0, 16.0,
+                    0.0, false, false);
+
+            if (place) {
+                vertexBuffer.add(x, y, tx, ty, place.zoom);
+            }
+
         } else {
             if (debug::tileParseWarnings) {
                 fprintf(stderr, "[WARNING] other command than move_to in icon geometry\n");
