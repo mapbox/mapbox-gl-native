@@ -331,12 +331,11 @@ bool StyleParser::parseFunction(PropertyKey key, ClassProperties &klass, JSVal v
     return parsed;
 }
 
-
-template<typename T>
-bool StyleParser::parseStyleProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
-    bool parsed = false;
+template <typename T>
+bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass) {
+    bool parsed;
     T result;
-    std::tie(parsed, result) = parseStyleProperty<T>(value, property_name);
+    std::tie(parsed, result) = parseProperty<T>(value, property_name);
     if (parsed) {
         klass.set(key, result);
     }
@@ -344,10 +343,10 @@ bool StyleParser::parseStyleProperty(const char *property_name, PropertyKey key,
 }
 
 template <typename T>
-bool StyleParser::parseStyleProperty(const char *property_name, T &target, JSVal value) {
-    bool parsed = false;
+bool StyleParser::setProperty(JSVal value, const char *property_name, T &target) {
+    bool parsed;
     T result;
-    std::tie(parsed, result) = parseStyleProperty<T>(value, property_name);
+    std::tie(parsed, result) = parseProperty<T>(value, property_name);
     if (parsed) {
         target = std::move(result);
     }
@@ -355,127 +354,109 @@ bool StyleParser::parseStyleProperty(const char *property_name, T &target, JSVal
 }
 
 
-template<> std::tuple<bool, std::string> StyleParser::parseStyleProperty(JSVal value, const char *property_name) {
+template<typename T>
+bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
     } else {
-        JSVal rvalue = replaceConstant(value[property_name]);
-        if (!rvalue.IsString()) {
-            fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-            return false;
-        }
-
-        return { true, std::string { rvalue.GetString(), rvalue.GetStringLength() } };
+        return setProperty<T>(replaceConstant(value[property_name]), property_name, key, klass);
     }
 }
-
-template<> std::tuple<bool, TranslateAnchorType> StyleParser::parseStyleProperty(JSVal value, const char *property_name) {
-    if (!value.HasMember(property_name)) {
-        return false;
-    } else {
-        JSVal rvalue = replaceConstant(value[property_name]);
-        if (!rvalue.IsString()) {
-            fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-            return false;
-        }
-
-        return { true, parseTranslateAnchorType({ rvalue.GetString(), rvalue.GetStringLength() }) };
-    }
-}
-
-template<> std::tuple<bool, RotateAnchorType> StyleParser::parseStyleProperty<RotateAnchorType>(JSVal value, const char *property_name) {
-    if (!value.HasMember(property_name)) {
-        return false;
-    } else {
-        JSVal rvalue = replaceConstant(value[property_name]);
-        if (!rvalue.IsString()) {
-            fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-            return false;
-        }
-
-        return { true, parseRotateAnchorType({ rvalue.GetString(), rvalue.GetStringLength() }) };
-    }
-}
-
-template<> std::tuple<bool, PropertyTransition> StyleParser::parseStyleProperty(JSVal value, const char *property_name) {
-    if (!value.HasMember(property_name)) {
-        return false;
-    } else {
-        JSVal rvalue = replaceConstant(value[property_name]);
-        PropertyTransition transition;
-        if (rvalue.IsObject()) {
-            if (rvalue.HasMember("duration") && rvalue["duration"].IsNumber()) {
-                transition.duration = rvalue["duration"].GetUint();
-            }
-            if (rvalue.HasMember("delay") && rvalue["delay"].IsNumber()) {
-                transition.delay = rvalue["delay"].GetUint();
-            }
-        }
-
-        if (transition.duration == 0 && transition.delay == 0) {
-            return false;
-        }
-
-        return { true, std::move(transition) };
-    }
-}
-
-template<> std::tuple<bool, Function<bool>> StyleParser::parseStyleProperty(JSVal value, const char *property_name) {
-    if (!value.HasMember(property_name)) {
-        return false;
-    } else {
-        JSVal rvalue = replaceConstant(value[property_name]);
-        if (rvalue.IsObject()) {
-            return parseFunction<bool>(rvalue);
-        } else if (rvalue.IsNumber()) {
-            return { true, ConstantFunction<bool>(rvalue.GetDouble()) };
-        } else if (rvalue.IsBool()) {
-            return { true, ConstantFunction<bool>(rvalue.GetBool()) };
-        } else {
-            fprintf(stderr, "[WARNING] value of '%s' must be convertible to boolean, or a boolean function\n", property_name);
-            return false;
-        }
-    }
-}
-
-template<> std::tuple<bool, Function<float>> StyleParser::parseStyleProperty(JSVal value, const char *property_name) {
-    if (!value.HasMember(property_name)) {
-        return false;
-    } else {
-        JSVal rvalue = replaceConstant(value[property_name]);
-        if (rvalue.IsObject()) {
-            return parseFunction<float>(rvalue);
-        } else if (rvalue.IsNumber()) {
-            return { true, ConstantFunction<float>(rvalue.GetDouble()) };
-        } else if (rvalue.IsBool()) {
-            return { true, ConstantFunction<float>(rvalue.GetBool()) };
-            return true;
-        } else {
-            fprintf(stderr, "[WARNING] value of '%s' must be a number, or a number function\n", property_name);
-            return false;
-        }
-    }
-}
-
-template<> std::tuple<bool, Function<Color>> StyleParser::parseStyleProperty(JSVal value, const char *property_name) {
-    if (!value.HasMember(property_name)) {
-        return false;
-    } else {
-        JSVal rvalue = replaceConstant(value[property_name]);
-        if (rvalue.IsObject()) {
-            return parseFunction<Color>(rvalue);
-        } else if (rvalue.IsString()) {
-            return { true, ConstantFunction<Color>(parseColor(rvalue)) };
-        } else {
-            fprintf(stderr, "[WARNING] value of '%s' must be a color, or a color function\n", property_name);
-            return false;
-        }
-    }
-}
-
 
 template <typename T>
-bool StyleParser::parseStyleProperty(const char *property_name, const std::vector<PropertyKey> &keys, ClassProperties &klass, JSVal value) {
+bool StyleParser::parseOptionalProperty(const char *property_name, T &target, JSVal value) {
+    if (!value.HasMember(property_name)) {
+        return false;
+    } else {
+        return setProperty<T>(replaceConstant(value[property_name]), property_name, target);
+    }
+}
+
+template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
+    if (!value.IsString()) {
+        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
+        return false;
+    }
+
+    return { true, std::string { value.GetString(), value.GetStringLength() } };
+}
+
+template<> std::tuple<bool, TranslateAnchorType> StyleParser::parseProperty(JSVal value, const char *property_name) {
+    if (!value.IsString()) {
+        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
+        return false;
+    }
+
+    return { true, parseTranslateAnchorType({ value.GetString(), value.GetStringLength() }) };
+}
+
+template<> std::tuple<bool, RotateAnchorType> StyleParser::parseProperty<RotateAnchorType>(JSVal value, const char *property_name) {
+    if (!value.IsString()) {
+        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
+        return false;
+    }
+
+    return { true, parseRotateAnchorType({ value.GetString(), value.GetStringLength() }) };
+}
+
+template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal value, const char *property_name) {
+    PropertyTransition transition;
+    if (value.IsObject()) {
+        if (value.HasMember("duration") && value["duration"].IsNumber()) {
+            transition.duration = value["duration"].GetUint();
+        }
+        if (value.HasMember("delay") && value["delay"].IsNumber()) {
+            transition.delay = value["delay"].GetUint();
+        }
+    }
+
+    if (transition.duration == 0 && transition.delay == 0) {
+        return false;
+    }
+
+    return { true, std::move(transition) };
+}
+
+template<> std::tuple<bool, Function<bool>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+    if (value.IsObject()) {
+        return parseFunction<bool>(value);
+    } else if (value.IsNumber()) {
+        return { true, ConstantFunction<bool>(value.GetDouble()) };
+    } else if (value.IsBool()) {
+        return { true, ConstantFunction<bool>(value.GetBool()) };
+    } else {
+        fprintf(stderr, "[WARNING] value of '%s' must be convertible to boolean, or a boolean function\n", property_name);
+        return false;
+    }
+}
+
+template<> std::tuple<bool, Function<float>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+    if (value.IsObject()) {
+        return parseFunction<float>(value);
+    } else if (value.IsNumber()) {
+        return { true, ConstantFunction<float>(value.GetDouble()) };
+    } else if (value.IsBool()) {
+        return { true, ConstantFunction<float>(value.GetBool()) };
+        return true;
+    } else {
+        fprintf(stderr, "[WARNING] value of '%s' must be a number, or a number function\n", property_name);
+        return false;
+    }
+}
+
+template<> std::tuple<bool, Function<Color>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+    if (value.IsObject()) {
+        return parseFunction<Color>(value);
+    } else if (value.IsString()) {
+        return { true, ConstantFunction<Color>(parseColor(value)) };
+    } else {
+        fprintf(stderr, "[WARNING] value of '%s' must be a color, or a color function\n", property_name);
+        return false;
+    }
+}
+
+template <typename T>
+bool StyleParser::parseOptionalProperty(const char *property_name, const std::vector<PropertyKey> &keys, ClassProperties &klass, JSVal value) {
     if (value.HasMember(property_name)) {
         JSVal rvalue = replaceConstant(value[property_name]);
         if (!rvalue.IsArray()) {
@@ -487,7 +468,7 @@ bool StyleParser::parseStyleProperty(const char *property_name, const std::vecto
         }
 
         for (uint16_t i = 0; i < keys.size(); i++) {
-            parseStyleProperty<T>(property_name, keys[i], klass, rvalue[(rapidjson::SizeType)i]);
+            setProperty<T>(rvalue[(rapidjson::SizeType)i], property_name, keys[i], klass);
         }
     }
     return true;
@@ -607,94 +588,94 @@ void StyleParser::parseStyles(JSVal value, std::map<ClassID, ClassProperties> &s
 void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     using Key = PropertyKey;
 
-    parseStyleProperty<Function<bool>>("fill-enabled", Key::FillEnabled, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-fill-enabled", Key::FillEnabled, klass, value);
-    parseStyleProperty<Function<bool>>("fill-antialias", Key::FillAntialias, klass, value);
-    parseStyleProperty<Function<float>>("fill-opacity", Key::FillOpacity, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-fill-opacity", Key::FillOpacity, klass, value);
-    parseStyleProperty<Function<Color>>("fill-color", Key::FillColor, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-fill-color", Key::FillColor, klass, value);
-    parseStyleProperty<Function<Color>>("fill-outline-color", Key::FillOutlineColor, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-fill-outline-color", Key::FillOutlineColor, klass, value);
-    parseStyleProperty<Function<float>>("fill-translate", { Key::FillTranslateX, Key::FillTranslateY }, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-fill-translate", Key::FillTranslate, klass, value);
-    parseStyleProperty<TranslateAnchorType>("fill-translate-anchor", Key::FillTranslateAnchor, klass, value);
-    parseStyleProperty<std::string>("fill-image", Key::FillImage, klass, value);
+    parseOptionalProperty<Function<bool>>("fill-enabled", Key::FillEnabled, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-fill-enabled", Key::FillEnabled, klass, value);
+    parseOptionalProperty<Function<bool>>("fill-antialias", Key::FillAntialias, klass, value);
+    parseOptionalProperty<Function<float>>("fill-opacity", Key::FillOpacity, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-fill-opacity", Key::FillOpacity, klass, value);
+    parseOptionalProperty<Function<Color>>("fill-color", Key::FillColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-fill-color", Key::FillColor, klass, value);
+    parseOptionalProperty<Function<Color>>("fill-outline-color", Key::FillOutlineColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-fill-outline-color", Key::FillOutlineColor, klass, value);
+    parseOptionalProperty<Function<float>>("fill-translate", { Key::FillTranslateX, Key::FillTranslateY }, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-fill-translate", Key::FillTranslate, klass, value);
+    parseOptionalProperty<TranslateAnchorType>("fill-translate-anchor", Key::FillTranslateAnchor, klass, value);
+    parseOptionalProperty<std::string>("fill-image", Key::FillImage, klass, value);
 
-    parseStyleProperty<Function<bool>>("line-enabled", Key::LineEnabled, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-line-enabled", Key::LineEnabled, klass, value);
-    parseStyleProperty<Function<float>>("line-opacity", Key::LineOpacity, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-line-opacity", Key::LineOpacity, klass, value);
-    parseStyleProperty<Function<Color>>("line-color", Key::LineColor, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-line-color", Key::LineColor, klass, value);
-    parseStyleProperty<Function<float>>("line-translate", { Key::LineTranslateX, Key::LineTranslateY }, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-line-translate", Key::LineTranslate, klass, value);
-    parseStyleProperty<TranslateAnchorType>("line-translate-anchor", Key::LineTranslateAnchor, klass, value);
-    parseStyleProperty<Function<float>>("line-width", Key::LineWidth, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-line-width", Key::LineWidth, klass, value);
-    parseStyleProperty<Function<float>>("line-offset", Key::LineOffset, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-line-offset", Key::LineOffset, klass, value);
-    parseStyleProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-line-blur", Key::LineBlur, klass, value);
-    parseStyleProperty<Function<float>>("line-dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-line-dasharray", Key::LineDashArray, klass, value);
-    parseStyleProperty<std::string>("line-image", Key::LineImage, klass, value);
+    parseOptionalProperty<Function<bool>>("line-enabled", Key::LineEnabled, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-line-enabled", Key::LineEnabled, klass, value);
+    parseOptionalProperty<Function<float>>("line-opacity", Key::LineOpacity, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-line-opacity", Key::LineOpacity, klass, value);
+    parseOptionalProperty<Function<Color>>("line-color", Key::LineColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-line-color", Key::LineColor, klass, value);
+    parseOptionalProperty<Function<float>>("line-translate", { Key::LineTranslateX, Key::LineTranslateY }, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-line-translate", Key::LineTranslate, klass, value);
+    parseOptionalProperty<TranslateAnchorType>("line-translate-anchor", Key::LineTranslateAnchor, klass, value);
+    parseOptionalProperty<Function<float>>("line-width", Key::LineWidth, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-line-width", Key::LineWidth, klass, value);
+    parseOptionalProperty<Function<float>>("line-offset", Key::LineOffset, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-line-offset", Key::LineOffset, klass, value);
+    parseOptionalProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-line-blur", Key::LineBlur, klass, value);
+    parseOptionalProperty<Function<float>>("line-dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-line-dasharray", Key::LineDashArray, klass, value);
+    parseOptionalProperty<std::string>("line-image", Key::LineImage, klass, value);
 
-    parseStyleProperty<Function<bool>>("icon-enabled", Key::IconEnabled, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-icon-enabled", Key::IconEnabled, klass, value);
-    parseStyleProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-icon-opacity", Key::IconOpacity, klass, value);
-    parseStyleProperty<Function<float>>("icon-rotate", Key::IconRotate, klass, value);
-    parseStyleProperty<RotateAnchorType>("icon-rotate-anchor", Key::IconRotateAnchor, klass, value);
+    parseOptionalProperty<Function<bool>>("icon-enabled", Key::IconEnabled, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-enabled", Key::IconEnabled, klass, value);
+    parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-opacity", Key::IconOpacity, klass, value);
+    parseOptionalProperty<Function<float>>("icon-rotate", Key::IconRotate, klass, value);
+    parseOptionalProperty<RotateAnchorType>("icon-rotate-anchor", Key::IconRotateAnchor, klass, value);
 
-    parseStyleProperty<Function<bool>>("text-enabled", Key::TextEnabled, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-text-enabled", Key::TextEnabled, klass, value);
-    parseStyleProperty<Function<float>>("text-opacity", Key::TextOpacity, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-text-opacity", Key::TextOpacity, klass, value);
-    parseStyleProperty<Function<float>>("text-size", Key::TextSize, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-text-size", Key::TextSize, klass, value);
-    parseStyleProperty<Function<Color>>("text-color", Key::TextColor, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-text-color", Key::TextColor, klass, value);
-    parseStyleProperty<Function<Color>>("text-halo-color", Key::TextHaloColor, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-text-halo-color", Key::TextHaloColor, klass, value);
-    parseStyleProperty<Function<float>>("text-halo-width", Key::TextHaloWidth, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-text-halo-width", Key::TextHaloWidth, klass, value);
-    parseStyleProperty<Function<float>>("text-halo-blur", Key::TextHaloBlur, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-text-halo-blur", Key::TextHaloBlur, klass, value);
+    parseOptionalProperty<Function<bool>>("text-enabled", Key::TextEnabled, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-text-enabled", Key::TextEnabled, klass, value);
+    parseOptionalProperty<Function<float>>("text-opacity", Key::TextOpacity, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-text-opacity", Key::TextOpacity, klass, value);
+    parseOptionalProperty<Function<float>>("text-size", Key::TextSize, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-text-size", Key::TextSize, klass, value);
+    parseOptionalProperty<Function<Color>>("text-color", Key::TextColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-text-color", Key::TextColor, klass, value);
+    parseOptionalProperty<Function<Color>>("text-halo-color", Key::TextHaloColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-text-halo-color", Key::TextHaloColor, klass, value);
+    parseOptionalProperty<Function<float>>("text-halo-width", Key::TextHaloWidth, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-text-halo-width", Key::TextHaloWidth, klass, value);
+    parseOptionalProperty<Function<float>>("text-halo-blur", Key::TextHaloBlur, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-text-halo-blur", Key::TextHaloBlur, klass, value);
 
-    parseStyleProperty<Function<bool>>("composite-enabled", Key::CompositeEnabled, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-composite-enabled", Key::CompositeEnabled, klass, value);
-    parseStyleProperty<Function<float>>("composite-opacity", Key::CompositeOpacity, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-composite-opacity", Key::CompositeOpacity, klass, value);
+    parseOptionalProperty<Function<bool>>("composite-enabled", Key::CompositeEnabled, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-composite-enabled", Key::CompositeEnabled, klass, value);
+    parseOptionalProperty<Function<float>>("composite-opacity", Key::CompositeOpacity, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-composite-opacity", Key::CompositeOpacity, klass, value);
 
-    parseStyleProperty<Function<bool>>("raster-enabled", Key::RasterEnabled, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-raster-enabled", Key::RasterEnabled, klass, value);
-    parseStyleProperty<Function<float>>("raster-opacity", Key::RasterOpacity, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
-    parseStyleProperty<Function<float>>("raster-spin", Key::RasterSpin, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-raster-spin", Key::RasterSpin, klass, value);
-    parseStyleProperty<Function<float>>("raster-brightness-low", Key::RasterBrightnessLow, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-raster-brightness-low", Key::RasterBrightnessLow, klass, value);
-    parseStyleProperty<Function<float>>("raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
-    parseStyleProperty<Function<float>>("raster-saturation", Key::RasterSaturation, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-raster-saturation", Key::RasterSaturation, klass, value);
-    parseStyleProperty<Function<float>>("raster-contrast", Key::RasterContrast, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-raster-contrast", Key::RasterContrast, klass, value);
-    parseStyleProperty<Function<float>>("raster-fade", Key::RasterFade, klass, value);
-    parseStyleProperty<PropertyTransition>("transition-raster-fade", Key::RasterFade, klass, value);
+    parseOptionalProperty<Function<bool>>("raster-enabled", Key::RasterEnabled, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-enabled", Key::RasterEnabled, klass, value);
+    parseOptionalProperty<Function<float>>("raster-opacity", Key::RasterOpacity, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
+    parseOptionalProperty<Function<float>>("raster-spin", Key::RasterSpin, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-spin", Key::RasterSpin, klass, value);
+    parseOptionalProperty<Function<float>>("raster-brightness-low", Key::RasterBrightnessLow, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-brightness-low", Key::RasterBrightnessLow, klass, value);
+    parseOptionalProperty<Function<float>>("raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
+    parseOptionalProperty<Function<float>>("raster-saturation", Key::RasterSaturation, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-saturation", Key::RasterSaturation, klass, value);
+    parseOptionalProperty<Function<float>>("raster-contrast", Key::RasterContrast, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-contrast", Key::RasterContrast, klass, value);
+    parseOptionalProperty<Function<float>>("raster-fade", Key::RasterFade, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-fade", Key::RasterFade, klass, value);
 
-    parseStyleProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
+    parseOptionalProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
 }
 
 std::unique_ptr<RasterizeProperties> StyleParser::parseRasterize(JSVal value) {
     auto rasterize = std::make_unique<RasterizeProperties>();
 
     if (value.IsObject()) {
-        parseStyleProperty("enabled", rasterize->enabled, value);
-        parseStyleProperty("buffer", rasterize->buffer, value);
-        parseStyleProperty("size", rasterize->size, value);
-        parseStyleProperty("blur", rasterize->blur, value);
+        parseOptionalProperty("enabled", rasterize->enabled, value);
+        parseOptionalProperty("buffer", rasterize->buffer, value);
+        parseOptionalProperty("size", rasterize->size, value);
+        parseOptionalProperty("blur", rasterize->blur, value);
     }
 
     return rasterize;
