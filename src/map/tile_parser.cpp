@@ -95,7 +95,7 @@ void TileParser::parseStyleLayers(std::shared_ptr<StyleLayerGroup> group) {
                 }
             }
         } else {
-            fprintf(stderr, "[WARNING] layer does not have child layers or buckets\n");
+            fprintf(stderr, "[WARNING] layer '%s' does not have child layers or buckets\n", layer_desc->id.c_str());
         }
     }
 }
