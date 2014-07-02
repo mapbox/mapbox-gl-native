@@ -11,7 +11,7 @@
 
 #include <unordered_map>
 #include <forward_list>
-
+#include <tuple>
 
 namespace llmr {
 
@@ -50,7 +50,7 @@ private:
     void parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair);
     void parseStyles(JSVal value, std::map<ClassID, ClassProperties> &styles);
     void parseStyle(JSVal, ClassProperties &properties);
-    std::unique_ptr<const RasterizeProperties> parseRasterize(JSVal value);
+    std::unique_ptr<RasterizeProperties> parseRasterize(JSVal value);
     void parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer);
@@ -67,10 +67,16 @@ private:
     template <typename T>
     bool parseStyleProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value);
     template <typename T>
+    bool parseStyleProperty(const char *property_name, T &target, JSVal value);
+    template <typename T>
+    std::tuple<bool, T> parseStyleProperty(JSVal value, const char *property_name);
+    template <typename T>
     bool parseStyleProperty(const char *property_name, const std::vector<PropertyKey> &keys, ClassProperties &klass, JSVal value);
 
     template <typename T>
     bool parseFunction(PropertyKey key, ClassProperties &klass, JSVal value);
+    template <typename T>
+    std::tuple<bool, Function<T>> parseFunction(JSVal value);
     template <typename T>
     T parseFunctionArgument(JSVal value);
 

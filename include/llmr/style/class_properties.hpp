@@ -15,13 +15,12 @@ public:
     inline ClassProperties(ClassProperties &&properties)
         : properties(std::move(properties.properties)) {}
 
-    template <typename ...Args>
-    inline void set(Args&& ...args) {
-        properties.emplace(::std::forward<Args>(args)...);
+    inline void set(PropertyKey key, const PropertyValue &value) {
+        properties.emplace(key, value);
     }
-    template <typename ...Args>
-    inline void setTransition(Args&& ...args) {
-        transitions.emplace(::std::forward<Args>(args)...);
+
+    inline void set(PropertyKey key, const PropertyTransition &transition) {
+        transitions.emplace(key, transition);
     }
 
     const PropertyTransition &getTransition(PropertyKey key, const PropertyTransition &defaultTransition) const;

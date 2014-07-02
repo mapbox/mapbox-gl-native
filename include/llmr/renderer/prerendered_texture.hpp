@@ -11,7 +11,7 @@ class Painter;
 
 class PrerenderedTexture : private util::noncopyable {
 public:
-    PrerenderedTexture(const PrerenderProperties &properties);
+    PrerenderedTexture(const RasterizedProperties &properties);
     ~PrerenderedTexture();
 
     void bindTexture();
@@ -23,7 +23,7 @@ public:
     void blur(Painter& painter, uint16_t passes);
 
 public:
-    const PrerenderProperties properties;
+    const RasterizedProperties properties;
 
 private:
     GLint previous_fbo = 0;

@@ -50,6 +50,7 @@ private:
 
 template <typename T>
 using Function = util::variant<
+    std::false_type,
     ConstantFunction<T>,
     LinearFunction<T>,
     ExponentialFunction<T>,
@@ -60,6 +61,10 @@ template <typename T>
 struct FunctionEvaluator {
     typedef T result_type;
     inline FunctionEvaluator(float z) : z(z) {}
+
+    inline result_type operator()(const std::false_type &) {
+        return result_type();
+    }
 
     template <template <typename> class Fn>
     inline result_type operator()(const Fn<T>& fn) {

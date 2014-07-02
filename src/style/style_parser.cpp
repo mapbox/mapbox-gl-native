@@ -226,7 +226,7 @@ Color StyleParser::parseFunctionArgument(JSVal value) {
 }
 
 template <typename T>
-bool StyleParser::parseFunction(PropertyKey key, ClassProperties &klass, JSVal value) {
+std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
     if (!value.HasMember("fn")) {
         fprintf(stderr, "[WARNING] function must specify a function name\n");
         return false;
@@ -254,8 +254,7 @@ bool StyleParser::parseFunction(PropertyKey key, ClassProperties &klass, JSVal v
         const float slope = value.HasMember("slope") ? parseFunctionArgument<float>(value["slope"]) : 1;
         const T min = value.HasMember("min") ? parseFunctionArgument<T>(value["min"]) : T();
         const T max = value.HasMember("max") ? parseFunctionArgument<T>(value["max"]) : T();
-        klass.set(key, LinearFunction<T>(val, z_base, slope, min, max));
-        return true;
+        return { true, LinearFunction<T>(val, z_base, slope, min, max) };
     }
     else if (type == "exponential") {
         if (!value.HasMember("z")) {
@@ -271,9 +270,7 @@ bool StyleParser::parseFunction(PropertyKey key, ClassProperties &klass, JSVal v
         const float slope = value.HasMember("slope") ? parseFunctionArgument<float>(value["slope"]) : 1;
         const T min = value.HasMember("min") ? parseFunctionArgument<T>(value["min"]) : T();
         const T max = value.HasMember("max") ? parseFunctionArgument<T>(value["max"]) : T();
-        klass.set(key, ExponentialFunction<T>(val, z_base, slope, min, max));
-        return true;
-
+        return { true, ExponentialFunction<T>(val, z_base, slope, min, max) };
     }
     else if (type == "stops") {
         if (!value.HasMember("stops")) {
@@ -313,8 +310,7 @@ bool StyleParser::parseFunction(PropertyKey key, ClassProperties &klass, JSVal v
             }
         }
 
-        klass.set(key, StopsFunction<T>(stops));
-        return true;
+        return { true, StopsFunction<T>(stops) };
     }
     else {
         fprintf(stderr, "[WARNING] function type '%s' is unknown\n", type.c_str());
@@ -323,107 +319,136 @@ bool StyleParser::parseFunction(PropertyKey key, ClassProperties &klass, JSVal v
     return false;
 }
 
-template<> bool StyleParser::parseStyleProperty<std::string>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
-    if (!value.HasMember(property_name)) {
-        return false;
-    }
 
-    JSVal rvalue = replaceConstant(value[property_name]);
-    if (!rvalue.IsString()) {
-        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-        return false;
+template <typename T>
+bool StyleParser::parseFunction(PropertyKey key, ClassProperties &klass, JSVal value) {
+    bool parsed;
+    Function<T> function;
+    std::tie(parsed, function) = parseFunction<T>(value);
+    if (parsed) {
+        klass.set(key, function);
     }
-
-    klass.set(key, std::string { rvalue.GetString(), rvalue.GetStringLength() });
-    return true;
+    return parsed;
 }
 
-template<> bool StyleParser::parseStyleProperty<TranslateAnchorType>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
-    if (!value.HasMember(property_name)) {
-        return false;
-    }
 
-    JSVal rvalue = replaceConstant(value[property_name]);
-    if (!rvalue.IsString()) {
-        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-        return false;
+template<typename T>
+bool StyleParser::parseStyleProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
+    bool parsed = false;
+    T result;
+    std::tie(parsed, result) = parseStyleProperty<T>(value, property_name);
+    if (parsed) {
+        klass.set(key, result);
     }
-
-    klass.set(key, parseTranslateAnchorType({ rvalue.GetString(), rvalue.GetStringLength() }));
-    return true;
+    return parsed;
 }
 
-template<> bool StyleParser::parseStyleProperty<RotateAnchorType>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
-    if (!value.HasMember(property_name)) {
-        return false;
+template <typename T>
+bool StyleParser::parseStyleProperty(const char *property_name, T &target, JSVal value) {
+    bool parsed = false;
+    T result;
+    std::tie(parsed, result) = parseStyleProperty<T>(value, property_name);
+    if (parsed) {
+        target = std::move(result);
     }
-
-    JSVal rvalue = replaceConstant(value[property_name]);
-    if (!rvalue.IsString()) {
-        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-        return false;
-    }
-
-    klass.set(key, parseRotateAnchorType({ rvalue.GetString(), rvalue.GetStringLength() }));
-    return true;
+    return parsed;
 }
 
-template <> bool StyleParser::parseStyleProperty<PropertyTransition>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
+
+template<> std::tuple<bool, std::string> StyleParser::parseStyleProperty(JSVal value, const char *property_name) {
     if (!value.HasMember(property_name)) {
         return false;
-    }
-    JSVal elements = replaceConstant(value[property_name]);
-    PropertyTransition transition;
-
-    if (elements.IsObject()) {
-        if (elements.HasMember("duration") && elements["duration"].IsNumber()) {
-            transition.duration = elements["duration"].GetUint();
+    } else {
+        JSVal rvalue = replaceConstant(value[property_name]);
+        if (!rvalue.IsString()) {
+            fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
+            return false;
         }
-        if (elements.HasMember("delay") && elements["delay"].IsNumber()) {
-            transition.delay = elements["delay"].GetUint();
-        }
-    }
 
-    if (transition.duration == 0 && transition.delay == 0) {
-        return false;
+        return { true, std::string { rvalue.GetString(), rvalue.GetStringLength() } };
     }
-
-    klass.setTransition(key, std::move(transition));
-    return true;
 }
 
-template<> bool StyleParser::parseStyleProperty<Function<bool>>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
+template<> std::tuple<bool, TranslateAnchorType> StyleParser::parseStyleProperty(JSVal value, const char *property_name) {
+    if (!value.HasMember(property_name)) {
+        return false;
+    } else {
+        JSVal rvalue = replaceConstant(value[property_name]);
+        if (!rvalue.IsString()) {
+            fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
+            return false;
+        }
+
+        return { true, parseTranslateAnchorType({ rvalue.GetString(), rvalue.GetStringLength() }) };
+    }
+}
+
+template<> std::tuple<bool, RotateAnchorType> StyleParser::parseStyleProperty<RotateAnchorType>(JSVal value, const char *property_name) {
+    if (!value.HasMember(property_name)) {
+        return false;
+    } else {
+        JSVal rvalue = replaceConstant(value[property_name]);
+        if (!rvalue.IsString()) {
+            fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
+            return false;
+        }
+
+        return { true, parseRotateAnchorType({ rvalue.GetString(), rvalue.GetStringLength() }) };
+    }
+}
+
+template<> std::tuple<bool, PropertyTransition> StyleParser::parseStyleProperty(JSVal value, const char *property_name) {
+    if (!value.HasMember(property_name)) {
+        return false;
+    } else {
+        JSVal rvalue = replaceConstant(value[property_name]);
+        PropertyTransition transition;
+        if (rvalue.IsObject()) {
+            if (rvalue.HasMember("duration") && rvalue["duration"].IsNumber()) {
+                transition.duration = rvalue["duration"].GetUint();
+            }
+            if (rvalue.HasMember("delay") && rvalue["delay"].IsNumber()) {
+                transition.delay = rvalue["delay"].GetUint();
+            }
+        }
+
+        if (transition.duration == 0 && transition.delay == 0) {
+            return false;
+        }
+
+        return { true, std::move(transition) };
+    }
+}
+
+template<> std::tuple<bool, Function<bool>> StyleParser::parseStyleProperty(JSVal value, const char *property_name) {
     if (!value.HasMember(property_name)) {
         return false;
     } else {
         JSVal rvalue = replaceConstant(value[property_name]);
         if (rvalue.IsObject()) {
-            return parseFunction<bool>(key, klass, rvalue);
+            return parseFunction<bool>(rvalue);
         } else if (rvalue.IsNumber()) {
-            klass.set(key, bool(rvalue.GetDouble()));
-            return true;
+            return { true, ConstantFunction<bool>(rvalue.GetDouble()) };
         } else if (rvalue.IsBool()) {
-            klass.set(key, bool(rvalue.GetBool()));
-            return true;
+            return { true, ConstantFunction<bool>(rvalue.GetBool()) };
         } else {
-            fprintf(stderr, "[WARNING] value of '%s' must be a boolean, or a boolean function\n", property_name);
+            fprintf(stderr, "[WARNING] value of '%s' must be convertible to boolean, or a boolean function\n", property_name);
             return false;
         }
     }
 }
 
-template<> bool StyleParser::parseStyleProperty<Function<float>>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
+template<> std::tuple<bool, Function<float>> StyleParser::parseStyleProperty(JSVal value, const char *property_name) {
     if (!value.HasMember(property_name)) {
         return false;
     } else {
         JSVal rvalue = replaceConstant(value[property_name]);
         if (rvalue.IsObject()) {
-            return parseFunction<float>(key, klass, rvalue);
+            return parseFunction<float>(rvalue);
         } else if (rvalue.IsNumber()) {
-            klass.set(key, float(rvalue.GetDouble()));
-            return true;
+            return { true, ConstantFunction<float>(rvalue.GetDouble()) };
         } else if (rvalue.IsBool()) {
-            klass.set(key, float(rvalue.GetBool()));
+            return { true, ConstantFunction<float>(rvalue.GetBool()) };
             return true;
         } else {
             fprintf(stderr, "[WARNING] value of '%s' must be a number, or a number function\n", property_name);
@@ -432,16 +457,15 @@ template<> bool StyleParser::parseStyleProperty<Function<float>>(const char *pro
     }
 }
 
-template<> bool StyleParser::parseStyleProperty<Function<Color>>(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
+template<> std::tuple<bool, Function<Color>> StyleParser::parseStyleProperty(JSVal value, const char *property_name) {
     if (!value.HasMember(property_name)) {
         return false;
     } else {
         JSVal rvalue = replaceConstant(value[property_name]);
         if (rvalue.IsObject()) {
-            return parseFunction<Color>(key, klass, rvalue);
+            return parseFunction<Color>(rvalue);
         } else if (rvalue.IsString()) {
-            klass.set(key, parseColor(rvalue));
-            return true;
+            return { true, ConstantFunction<Color>(parseColor(rvalue)) };
         } else {
             fprintf(stderr, "[WARNING] value of '%s' must be a color, or a color function\n", property_name);
             return false;
@@ -663,9 +687,17 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseStyleProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
 }
 
-std::unique_ptr<const RasterizeProperties> StyleParser::parseRasterize(JSVal value) {
-    // TODO
-    return nullptr;
+std::unique_ptr<RasterizeProperties> StyleParser::parseRasterize(JSVal value) {
+    auto rasterize = std::make_unique<RasterizeProperties>();
+
+    if (value.IsObject()) {
+        parseStyleProperty("enabled", rasterize->enabled, value);
+        parseStyleProperty("buffer", rasterize->buffer, value);
+        parseStyleProperty("size", rasterize->size, value);
+        parseStyleProperty("blur", rasterize->blur, value);
+    }
+
+    return rasterize;
 }
 
 void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer) {

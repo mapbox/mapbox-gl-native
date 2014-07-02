@@ -4,7 +4,7 @@
 
 using namespace llmr;
 
-PrerenderedTexture::PrerenderedTexture(const PrerenderProperties &properties)
+PrerenderedTexture::PrerenderedTexture(const RasterizedProperties &properties)
     : properties(properties) {
 }
 
