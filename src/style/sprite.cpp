@@ -83,6 +83,8 @@ void Sprite::parseJSON(std::shared_ptr<Sprite> &sprite) {
     sprite->body.clear();
 
     if (d.IsObject()) {
+        std::unordered_map<std::string, SpritePosition> pos;
+
         for (rapidjson::Value::ConstMemberIterator itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr) {
             const std::string& name = itr->name.GetString();
             const rapidjson::Value& value = itr->value;
@@ -99,9 +101,11 @@ void Sprite::parseJSON(std::shared_ptr<Sprite> &sprite) {
                 if (value.HasMember("width")) width = value["width"].GetInt();
                 if (value.HasMember("height")) height = value["height"].GetInt();
                 if (value.HasMember("pixelRatio")) pixelRatio = value["pixelRatio"].GetInt();
-                sprite->pos.emplace(name, SpritePosition { x, y, width, height, pixelRatio });
+                pos.emplace(name, SpritePosition { x, y, width, height, pixelRatio });
             }
         }
+
+        sprite->pos.swap(pos);
     }
 }
 
