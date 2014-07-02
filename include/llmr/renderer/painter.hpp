@@ -90,7 +90,9 @@ public:
 
     void preparePrerender(PrerenderedTexture &texture);
     void finishPrerender(PrerenderedTexture &texture);
-//    void renderPrerenderedTexture(PrerenderedTexture &texture, const GenericProperties &properties);
+
+    template <typename Properties>
+    void renderPrerenderedTexture(PrerenderedTexture &texture, const Properties &properties);
 
     void resize();
 

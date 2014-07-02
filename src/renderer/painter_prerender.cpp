@@ -1,4 +1,5 @@
 #include <llmr/renderer/painter.hpp>
+#include <llmr/style/style_properties.hpp>
 
 using namespace llmr;
 
@@ -23,21 +24,24 @@ void Painter::finishPrerender(PrerenderedTexture &texture) {
     glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
 }
 
-//void Painter::renderPrerenderedTexture(PrerenderedTexture &texture, const GenericProperties &properties) {
-//    const int buffer = texture.properties.buffer * 4096.0f;
-//
-//    // draw the texture on a quad
-//    useProgram(rasterShader->program);
-//    rasterShader->setMatrix(matrix);
-//    rasterShader->setOpacity(1);
-//
-//    glDepthRange(strata, 1.0f);
-//
-//    glActiveTexture(GL_TEXTURE0);
-//    rasterShader->setImage(0);
-//    rasterShader->setBuffer(buffer);
-//    rasterShader->setOpacity(properties.opacity);
-//    texture.bindTexture();
-//    coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
-//    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
-//}
+template <typename Properties>
+void Painter::renderPrerenderedTexture(PrerenderedTexture &texture, const Properties &properties) {
+    const int buffer = texture.properties.buffer * 4096.0f;
+
+    // draw the texture on a quad
+    useProgram(rasterShader->program);
+    rasterShader->setMatrix(matrix);
+    rasterShader->setOpacity(1);
+
+    glDepthRange(strata, 1.0f);
+
+    glActiveTexture(GL_TEXTURE0);
+    rasterShader->setImage(0);
+    rasterShader->setBuffer(buffer);
+    rasterShader->setOpacity(properties.opacity);
+    texture.bindTexture();
+    coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
+}
+
+template void Painter::renderPrerenderedTexture(PrerenderedTexture &, const FillProperties &);
