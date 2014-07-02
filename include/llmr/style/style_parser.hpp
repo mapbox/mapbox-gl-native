@@ -34,6 +34,10 @@ public:
         return sprite;
     }
 
+    std::string getGlyphURL() const {
+        return glyph_url;
+    }
+
 private:
     void parseConstants(JSVal value);
     JSVal replaceConstant(JSVal value);
@@ -51,6 +55,7 @@ private:
     void parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseSprite(JSVal value);
+    void parseGlyphURL(JSVal value);
 
     // Parses optional properties into a render bucket.
     template<typename T>
@@ -94,6 +99,9 @@ private:
 
     // Base URL of the sprite image.
     std::string sprite;
+
+    // URL template for glyph PBFs.
+    std::string glyph_url;
 };
 
 }

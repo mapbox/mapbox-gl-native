@@ -51,6 +51,7 @@ public:
     std::shared_ptr<StyleLayer> background;
     std::vector<std::string> appliedClasses;
     std::string sprite_url;
+    std::string glyph_url;
 
 private:
     void updateSources();

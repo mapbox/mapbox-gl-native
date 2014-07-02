@@ -7,8 +7,6 @@
 
 namespace llmr {
 
-extern const char *kGlyphURL;
-
 namespace util {
 
 extern const float tileSize;

@@ -1,7 +1,5 @@
 #include <llmr/util/constants.hpp>
 
-const char *llmr::kGlyphURL = "http://mapbox.s3.amazonaws.com/gl-glyphs-256/%s/%d-%d.pbf";
-
 const float llmr::util::tileSize = 512.0f;
 
 #if defined(DEBUG)

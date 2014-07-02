@@ -103,6 +103,7 @@ void Style::loadJSON(const uint8_t *const data) {
 
     layers = parser.getLayers();
     sprite_url = parser.getSprite();
+    glyph_url = parser.getGlyphURL();
 
     updateClasses();
 }

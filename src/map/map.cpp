@@ -24,7 +24,6 @@ Map::Map(View& view)
       transform(),
       style(std::make_shared<Style>()),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
-      glyphStore(std::make_shared<GlyphStore>()),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
       painter(*this),
@@ -437,6 +436,16 @@ void Map::prepare() {
             style->sprite->load(style->sprite_url);
         }
         spriteAtlas->resize(state.getPixelRatio());
+    }
+
+    // Create a new glyph store object in case the glyph URL changed.
+    // TODO: Move this to a less frequently called place; we only need to do this when the
+    // stylesheet changes.
+    if (glyphStore && glyphStore->glyphURL != style->glyph_url) {
+        glyphStore.reset();
+    }
+    if (!glyphStore && style->glyph_url.size()) {
+        glyphStore = std::make_shared<GlyphStore>(style->glyph_url);
     }
 
     if (pixelRatioChanged || dimensionsChanged) {

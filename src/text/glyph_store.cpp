@@ -5,6 +5,7 @@
 #include <llmr/util/utf.hpp>
 #include <llmr/util/pbf.hpp>
 #include <llmr/util/constants.hpp>
+#include <llmr/util/token.hpp>
 #include <llmr/platform/platform.hpp>
 #include <uv.h>
 #include <algorithm>
@@ -115,11 +116,16 @@ void FontStack::lineWrap(Shaping &shaping, const float &lineHeight, const float 
     alignVertically(shaping, line + 1, lineHeight, verticalAlignment);
 }
 
-GlyphPBF::GlyphPBF(const std::string &fontStack, GlyphRange glyphRange)
+GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange)
     : future(promise.get_future().share())
 {
     // Load the glyph set URL
-    std::string url = util::sprintf<255>(kGlyphURL, fontStack.c_str(), glyphRange.first, glyphRange.second);
+
+    const std::map<std::string, std::string> tokens {{
+        { "fontstack", fontStack },
+        { "range", std::to_string(glyphRange.first) + "-" + std::to_string(glyphRange.second) }
+    }};
+    std::string url = util::replaceTokens(glyphURL, tokens);
 
     // TODO: Find more reliable URL normalization function
     std::replace(url.begin(), url.end(), ' ', '+');
@@ -202,6 +208,8 @@ void GlyphPBF::parse(FontStack &stack) {
     data.clear();
 }
 
+GlyphStore::GlyphStore(const std::string &glyphURL)
+    : glyphURL(glyphURL) {}
 
 void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges) {
     // We are implementing a blocking wait with futures: Every GlyphSet has a future that we are
@@ -232,11 +240,11 @@ void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set
     }
 }
 
-std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::string &name, std::map<GlyphRange, std::unique_ptr<GlyphPBF>> &rangeSets, const GlyphRange range) {
+std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::string &fontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>> &rangeSets, const GlyphRange range) {
     auto range_it = rangeSets.find(range);
     if (range_it == rangeSets.end()) {
         // We don't have this glyph set yet for this font stack.
-        range_it = rangeSets.emplace(range, std::make_unique<GlyphPBF>(name, range)).first;
+        range_it = rangeSets.emplace(range, std::make_unique<GlyphPBF>(glyphURL, fontStack, range)).first;
     }
 
     return range_it->second->getFuture();

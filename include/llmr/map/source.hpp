@@ -22,7 +22,7 @@ class Texturepool;
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:
-    Source(SourceType type = SourceType::Vector, const std::string &url = "", const std::string &glyphs = "",
+    Source(SourceType type = SourceType::Vector, const std::string &url = "",
            uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 22);
 
     bool update(Map &map);
@@ -40,7 +40,6 @@ public:
 public:
     const SourceType type;
     const std::string url;
-    const std::string glyphs;
     const uint32_t tile_size;
     const int32_t min_zoom;
     const int32_t max_zoom;

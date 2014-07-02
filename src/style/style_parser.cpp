@@ -25,6 +25,10 @@ void StyleParser::parse(JSVal document) {
     if (document.HasMember("sprite")) {
         parseSprite(document["sprite"]);
     }
+
+    if (document.HasMember("glyphs")) {
+        parseGlyphURL(document["glyphs"]);
+    }
 }
 
 void StyleParser::parseConstants(JSVal value) {
@@ -155,19 +159,17 @@ void StyleParser::parseSources(JSVal value) {
             std::string name { itr->name.GetString(), itr->name.GetStringLength() };
             SourceType type = SourceType::Vector;
             std::string url;
-            std::string glyphs;
             uint16_t tile_size = 512;
             int32_t min_zoom = 0;
             int32_t max_zoom = 22;
 
             parseRenderProperty(itr->value, type, "type", parseSourceType);
             parseRenderProperty(itr->value, url, "url");
-            parseRenderProperty(itr->value, glyphs, "glyphs");
             parseRenderProperty(itr->value, tile_size, "tileSize");
             parseRenderProperty(itr->value, min_zoom, "minZoom");
             parseRenderProperty(itr->value, max_zoom, "maxZoom");
 
-            sources.emplace(std::move(name), std::make_shared<Source>(type, url, glyphs, tile_size, min_zoom, max_zoom));
+            sources.emplace(std::move(name), std::make_shared<Source>(type, url, tile_size, min_zoom, max_zoom));
         }
     } else {
         throw Style::exception("sources must be an object");
@@ -918,6 +920,12 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
 void StyleParser::parseSprite(JSVal value) {
     if (value.IsString()) {
         sprite = { value.GetString(), value.GetStringLength() };
+    }
+}
+
+void StyleParser::parseGlyphURL(JSVal value) {
+    if (value.IsString()) {
+        glyph_url = { value.GetString(), value.GetStringLength() };
     }
 }
 

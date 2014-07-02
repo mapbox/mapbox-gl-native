@@ -17,11 +17,10 @@
 
 namespace llmr {
 
-Source::Source(SourceType type, const std::string &url, const std::string &glyphs,
+Source::Source(SourceType type, const std::string &url,
                uint32_t tile_size, uint32_t min_zoom, uint32_t max_zoom)
     : type(type),
       url(normalizeSourceURL(url)),
-      glyphs(glyphs),
       tile_size(tile_size),
       min_zoom(min_zoom),
       max_zoom(max_zoom) {}

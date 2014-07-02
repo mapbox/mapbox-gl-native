@@ -3,6 +3,7 @@
 module.exports = {
   "version": 3,
   "sprite": "http://mapbox-kkaefer.s3.amazonaws.com/static/outdoors-gl/sprite",
+  "glyphs": "http://mapbox.s3.amazonaws.com/gl-glyphs-256/{{fontstack}}/{{range}}.pbf",
   "constants": {
     "@land": "#eee",
     "@water": "#999",
@@ -19,7 +20,6 @@ module.exports = {
     "mapbox.mapbox-streets-v5": {
       "type": "vector",
       "url": "mapbox://mapbox.mapbox-streets-v5",
-      "glyphs": "http://mapbox.s3.amazonaws.com/gl-glyphs-256/{fontstack}/{range}.pbf",
       "maxZoom": 14
     }
   },

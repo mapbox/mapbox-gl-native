@@ -183,6 +183,12 @@ std::unique_ptr<Bucket> TileParser::createIconBucket(const VectorTileLayer& laye
 
 std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketText &text) {
 
+    // Make sure that we always have a valid glyph store. If this is not set, the stylesheet
+    // doesn't specify a glyph URL.
+    if (!glyphStore) {
+        return nullptr;
+    }
+
     const StyleBucketText &properties = text;
 
     std::unique_ptr<TextBucket> bucket = std::make_unique<TextBucket>(
