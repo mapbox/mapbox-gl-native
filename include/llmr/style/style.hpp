@@ -19,6 +19,7 @@ class Sprite;
 class Source;
 class StyleLayer;
 class StyleLayerGroup;
+class BackgroundProperties;
 
 class Style {
 public:
@@ -45,10 +46,11 @@ public:
 
     bool hasTransitions() const;
 
+    const BackgroundProperties &getBackgroundProperties() const;
+
 public:
     std::shared_ptr<Sprite> sprite;
     std::shared_ptr<StyleLayerGroup> layers;
-    std::shared_ptr<StyleLayer> background;
     std::vector<std::string> appliedClasses;
     std::string sprite_url;
     std::string glyph_url;

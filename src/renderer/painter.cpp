@@ -137,8 +137,7 @@ void Painter::clear() {
     glStencilMask(0xFF);
     depthMask(true);
 
-    std::shared_ptr<StyleLayer> background_layer = map.getStyle()->background;
-    const BackgroundProperties &properties = background_layer ? background_layer->getProperties<BackgroundProperties>() : defaultStyleProperties<BackgroundProperties>();
+    const BackgroundProperties &properties = map.getStyle()->getBackgroundProperties();
     glClearColor(properties.color[0], properties.color[1], properties.color[2], properties.color[3]);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

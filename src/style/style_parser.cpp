@@ -925,6 +925,7 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
     } break;
 
     default:
+        layer->bucket.reset();
         fprintf(stderr, "[WARNING] bucket type of layer '%s' is invalid\n", layer->id.c_str());
         break;
     }
