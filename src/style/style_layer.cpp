@@ -160,12 +160,6 @@ void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, c
     }
 }
 
-
-template <typename T>
-void StyleLayer::applyStyleProperties(float, timestamp) {
-    properties.set<std::false_type>();
-}
-
 template <>
 void StyleLayer::applyStyleProperties<FillProperties>(const float z, const timestamp now) {
     properties.set<FillProperties>();
