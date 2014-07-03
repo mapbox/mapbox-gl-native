@@ -3,7 +3,7 @@
 using namespace llmr;
 
 // Record frame history that will be used to calculate fading params
-void FrameHistory::record(time now, float zoom) {
+void FrameHistory::record(timestamp now, float zoom) {
     // first frame ever
     if (!history.size()) {
         history.emplace_back(FrameSnapshot{0, zoom});
@@ -15,7 +15,7 @@ void FrameHistory::record(time now, float zoom) {
     }
 }
 
-bool FrameHistory::needsAnimation(const time duration) const {
+bool FrameHistory::needsAnimation(const timestamp duration) const {
     if (!history.size()) {
         return false;
     }
@@ -26,7 +26,7 @@ bool FrameHistory::needsAnimation(const time duration) const {
     const FrameSnapshot &pivot = history.back();
 
     int i = -1;
-    while ((int)history.size() > i + 1 && history[i + 1].timestamp + duration < pivot.timestamp) {
+    while ((int)history.size() > i + 1 && history[i + 1].t + duration < pivot.t) {
         i++;
     }
 

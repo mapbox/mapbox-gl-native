@@ -1,4 +1,5 @@
 #include <llmr/renderer/painter.hpp>
+#include <llmr/style/style_properties.hpp>
 
 using namespace llmr;
 
@@ -23,7 +24,8 @@ void Painter::finishPrerender(PrerenderedTexture &texture) {
     glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
 }
 
-void Painter::renderPrerenderedTexture(PrerenderedTexture &texture, const GenericProperties &properties) {
+template <typename Properties>
+void Painter::renderPrerenderedTexture(PrerenderedTexture &texture, const Properties &properties) {
     const int buffer = texture.properties.buffer * 4096.0f;
 
     // draw the texture on a quad
@@ -41,3 +43,5 @@ void Painter::renderPrerenderedTexture(PrerenderedTexture &texture, const Generi
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
+
+template void Painter::renderPrerenderedTexture(PrerenderedTexture &, const FillProperties &);

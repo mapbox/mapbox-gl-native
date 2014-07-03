@@ -63,6 +63,10 @@ void Painter::renderDebugFrame() {
 }
 
 void Painter::renderDebugText(const std::vector<std::string> &strings) {
+    if (strings.empty()) {
+        return;
+    }
+
     gl::group group("debug text");
 
     glDisable(GL_DEPTH_TEST);
@@ -78,20 +82,21 @@ void Painter::renderDebugText(const std::vector<std::string> &strings) {
         line += 20;
     }
 
-    // draw debug info
-    VertexArrayObject debugFontArray;
-    debugFontArray.bind(*plainShader, debugFontBuffer, BUFFER_OFFSET(0));
-    plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
-    lineWidth(4.0f * map.getState().getPixelRatio());
-    glDrawArrays(GL_LINES, 0, (GLsizei)debugFontBuffer.index());
-#ifndef GL_ES_VERSION_2_0
-    glPointSize(2);
-    glDrawArrays(GL_POINTS, 0, (GLsizei)debugFontBuffer.index());
-#endif
-    plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
-    lineWidth(2.0f * map.getState().getPixelRatio());
-    glDrawArrays(GL_LINES, 0, (GLsizei)debugFontBuffer.index());
-
+    if (!debugFontBuffer.empty()) {
+        // draw debug info
+        VertexArrayObject debugFontArray;
+        debugFontArray.bind(*plainShader, debugFontBuffer, BUFFER_OFFSET(0));
+        plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        lineWidth(4.0f * map.getState().getPixelRatio());
+        glDrawArrays(GL_LINES, 0, (GLsizei)debugFontBuffer.index());
+    #ifndef GL_ES_VERSION_2_0
+        glPointSize(2);
+        glDrawArrays(GL_POINTS, 0, (GLsizei)debugFontBuffer.index());
+    #endif
+        plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
+        lineWidth(2.0f * map.getState().getPixelRatio());
+        glDrawArrays(GL_LINES, 0, (GLsizei)debugFontBuffer.index());
+    }
 
     glEnable(GL_DEPTH_TEST);
 }

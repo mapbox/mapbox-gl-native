@@ -1,16 +1,12 @@
 #ifndef LLMR_STYLE_STYLE
 #define LLMR_STYLE_STYLE
 
-#include <cstdint>
+#include <llmr/style/property_transition.hpp>
 
-#include <llmr/util/pbf.hpp>
-#include <llmr/style/bucket_description.hpp>
-#include <llmr/style/layer_description.hpp>
-#include <llmr/style/class_description.hpp>
-#include <llmr/geometry/sprite_atlas.hpp>
-#include <llmr/util/transition.hpp>
+#include <llmr/util/time.hpp>
 #include <llmr/util/uv.hpp>
 
+#include <cstdint>
 #include <map>
 #include <unordered_map>
 #include <vector>
@@ -20,6 +16,10 @@
 namespace llmr {
 
 class Sprite;
+class Source;
+class StyleLayer;
+class StyleLayerGroup;
+struct BackgroundProperties;
 
 class Style {
 public:
@@ -28,91 +28,46 @@ public:
 public:
     Style();
 
-    void reset();
-
     void loadJSON(const uint8_t *const data);
 
     size_t layerCount() const;
-    void cascade(float z);
+    void updateProperties(float z, timestamp t);
 
-    bool needsTransition() const;
-    void updateTransitions(time now);
-    void cancelTransitions();
+    void setDefaultTransitionDuration(uint16_t duration_milliseconds = 0);
 
-    void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);
+    const std::set<std::shared_ptr<Source>> getActiveSources() const;
+
+    const std::vector<std::string> &getAppliedClasses() const;
+    void toggleClass(const std::string &name);
+
+    // Updates the styling information to reflect the current array
+    // of applied classes.
+    void updateClasses();
+
+    bool hasTransitions() const;
+
+    const BackgroundProperties &getBackgroundProperties() const;
 
 public:
     std::shared_ptr<Sprite> sprite;
-
-    // This is static information parsed from the stylesheet.
-    std::map<std::string, BucketDescription> buckets;
-    std::vector<LayerDescription> layers;
-    std::map<std::string, ClassDescription> classes;
-
-    // Currently applied settings.
-    std::set<std::string> appliedClasses;
-    struct {
-        BackgroundProperties background;
-        std::unordered_map<std::string, FillProperties> fills;
-        std::unordered_map<std::string, LineProperties> lines;
-        std::unordered_map<std::string, IconProperties> icons;
-        std::unordered_map<std::string, TextProperties> texts;
-        std::unordered_map<std::string, RasterProperties> rasters;
-        std::unordered_map<std::string, CompositeProperties> composites;
-        std::unordered_map<std::string, std::unordered_map<TransitionablePropertyKey, std::string>> effective_classes;
-    } computed;
+    std::shared_ptr<StyleLayerGroup> layers;
+    std::vector<std::string> appliedClasses;
+    std::string sprite_url;
+    std::string glyph_url;
 
 private:
-    bool transitionInProgress(const std::string &layer_name, TransitionablePropertyKey key, time start);
-    bool transitionExists(const std::string &layer_name, TransitionablePropertyKey key) const;
-    bool inNeedOfTransition(const std::string &layer_name, TransitionablePropertyKey key) const;
-    uint64_t transitionDuration(const std::string &layer_name, TransitionablePropertyKey key) const;
-    uint64_t transitionDelay(const std::string &layer_name, TransitionablePropertyKey key) const;
+    void updateSources();
+    void updateSources(const std::shared_ptr<StyleLayerGroup> &group);
 
-    void cascadeProperties(GenericProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
-    void cascadeProperties(FillProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
-    void cascadeProperties(LineProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
-    void cascadeProperties(IconProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
-    void cascadeProperties(TextProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
-    void cascadeProperties(RasterProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
-    void cascadeProperties(CompositeProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
-    void cascadeProperties(BackgroundProperties &properties, const ClassProperties& klass, const std::string& layer_name, const std::string& class_name, float z);
 
 private:
-    // Last applied settings.
-    struct {
-        BackgroundProperties background;
-        std::unordered_map<std::string, FillProperties> fills;
-        std::unordered_map<std::string, LineProperties> lines;
-        std::unordered_map<std::string, IconProperties> icons;
-        std::unordered_map<std::string, TextProperties> texts;
-        std::unordered_map<std::string, RasterProperties> rasters;
-        std::unordered_map<std::string, CompositeProperties> composites;
-        std::unordered_map<std::string, std::unordered_map<TransitionablePropertyKey, std::string>> effective_classes;
-    } previous;
-
-    // Settings values currently being transitioned.
-    struct {
-        BackgroundProperties background;
-        std::unordered_map<std::string, FillProperties> fills;
-        std::unordered_map<std::string, LineProperties> lines;
-        std::unordered_map<std::string, IconProperties> icons;
-        std::unordered_map<std::string, TextProperties> texts;
-        std::unordered_map<std::string, RasterProperties> rasters;
-        std::unordered_map<std::string, CompositeProperties> composites;
-    } transitioning;
-
-    std::unordered_map<std::string, std::unordered_map<TransitionablePropertyKey, PropertyTransition>> properties_to_transition;
-    std::unordered_map<std::string, std::unordered_map<TransitionablePropertyKey, std::shared_ptr<util::transition>>> transitions;
-    uint64_t default_transition_duration = 0;
+    std::set<std::shared_ptr<Source>> activeSources;
+    PropertyTransition defaultTransition;
     bool initial_render_complete = false;
 
     mutable uv::rwlock mtx;
-
 };
 
 }
-
-
 
 #endif

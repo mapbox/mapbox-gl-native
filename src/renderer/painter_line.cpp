@@ -1,20 +1,16 @@
 #include <llmr/renderer/painter.hpp>
 #include <llmr/renderer/line_bucket.hpp>
+#include <llmr/style/style_layer.hpp>
 #include <llmr/map/map.hpp>
 
 using namespace llmr;
 
-void Painter::renderLine(LineBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
     // Abort early.
     if (pass == Opaque) return;
     if (!bucket.hasData()) return;
 
-    const std::unordered_map<std::string, LineProperties> &line_properties = map.getStyle()->computed.lines;
-    const std::unordered_map<std::string, LineProperties>::const_iterator line_properties_it = line_properties.find(layer_name);
-
-    const LineProperties &properties = line_properties_it != line_properties.end()
-                                           ? line_properties_it->second
-                                           : defaultLineProperties;
+    const LineProperties &properties = layer_desc->getProperties<LineProperties>();
     if (!properties.enabled) return;
 
     float width = properties.width;

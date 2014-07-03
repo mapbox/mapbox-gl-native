@@ -20,7 +20,7 @@ using namespace llmr;
 LineBucket::LineBucket(LineVertexBuffer& vertexBuffer,
                        TriangleElementsBuffer& triangleElementsBuffer,
                        PointElementsBuffer& pointElementsBuffer,
-                       const BucketLineDescription& properties)
+                       const StyleBucketLine& properties)
     : properties(properties),
       vertexBuffer(vertexBuffer),
       triangleElementsBuffer(triangleElementsBuffer),
@@ -341,8 +341,8 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     }
 }
 
-void LineBucket::render(Painter& painter, const std::string& layer_name, const Tile::ID& id) {
-    painter.renderLine(*this, layer_name, id);
+void LineBucket::render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
+    painter.renderLine(*this, layer_desc, id);
 }
 
 bool LineBucket::hasData() const {

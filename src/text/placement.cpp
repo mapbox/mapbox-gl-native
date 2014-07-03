@@ -1,7 +1,6 @@
 #include <llmr/text/placement.hpp>
 #include <llmr/map/vector_tile.hpp>
 #include <llmr/geometry/interpolate.hpp>
-#include <llmr/style/bucket_description.hpp>
 #include <llmr/renderer/text_bucket.hpp>
 #include <llmr/util/math.hpp>
 #include <llmr/util/constants.hpp>
@@ -245,7 +244,7 @@ void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
 }
 
 void Placement::addFeature(TextBucket &bucket, const std::vector<Coordinate> &line,
-                           const BucketTextDescription &info, const GlyphPositions &face,
+                           const StyleBucketText &info, const GlyphPositions &face,
                            const Shaping &shaping) {
     const bool horizontal = info.path == TextPathType::Horizontal;
     const float fontScale = (tileExtent / util::tileSize) / (glyphSize / info.max_size);

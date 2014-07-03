@@ -1,5 +1,6 @@
 #include <llmr/renderer/painter.hpp>
 #include <llmr/map/map.hpp>
+#include <llmr/style/style_layer.hpp>
 #include <llmr/util/std.hpp>
 #include <llmr/util/string.hpp>
 #include <llmr/util/time.hpp>
@@ -135,13 +136,10 @@ void Painter::clear() {
     gl::group group("clear");
     glStencilMask(0xFF);
     depthMask(true);
-#ifdef NVIDIA
-    // We're painting in a way that allows us to skip clearing the color buffer.
-    // On Tegra hardware, this is faster.
-    glClear(GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#else
+
+    const BackgroundProperties &properties = map.getStyle()->getBackgroundProperties();
+    glClearColor(properties.color[0], properties.color[1], properties.color[2], properties.color[3]);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#endif
 }
 
 void Painter::setOpaque() {
@@ -172,10 +170,10 @@ void Painter::prepareTile(const Tile& tile) {
     glStencilFunc(GL_EQUAL, id, mask);
 }
 
-void Painter::renderTileLayer(const Tile& tile, const LayerDescription &layer_desc) {
+void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc) {
     assert(tile.data);
     if (tile.data->hasData(layer_desc)) {
-        gl::group group(util::sprintf<32>("render %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
+        gl::group group(util::sprintf<32>("render %d/%d/%d\n", tile.id.z, tile.id.y, tile.id.z));
         prepareTile(tile);
         tile.data->render(*this, layer_desc);
         frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
@@ -183,14 +181,14 @@ void Painter::renderTileLayer(const Tile& tile, const LayerDescription &layer_de
 }
 
 
-const mat4 &Painter::translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchor anchor) {
+const mat4 &Painter::translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {
     if (translation[0] == 0 && translation[1] == 0) {
         return matrix;
     } else {
         // TODO: Get rid of the 8 (scaling from 4096 to tile size)
         const double factor = ((double)(1 << id.z)) / map.getState().getScale() * (4096.0 / util::tileSize);
 
-        if (anchor == TranslateAnchor::Viewport) {
+        if (anchor == TranslateAnchorType::Viewport) {
             const double sin_a = std::sin(-map.getState().getAngle());
             const double cos_a = std::cos(-map.getState().getAngle());
             matrix::translate(vtxMatrix, matrix,

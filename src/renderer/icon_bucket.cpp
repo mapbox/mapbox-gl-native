@@ -2,6 +2,7 @@
 #include <llmr/geometry/icon_buffer.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/geometry/geometry.hpp>
+#include <llmr/geometry/sprite_atlas.hpp>
 
 #include <llmr/renderer/painter.hpp>
 #include <llmr/style/style.hpp>
@@ -19,7 +20,7 @@ struct geometry_too_long_exception : std::exception {};
 using namespace llmr;
 
 IconBucket::IconBucket(IconVertexBuffer& vertexBuffer,
-                         const BucketIconDescription& properties)
+                         const StyleBucketIcon& properties)
     : properties(properties),
       vertexBuffer(vertexBuffer),
       vertex_start(vertexBuffer.index()) {
@@ -57,8 +58,8 @@ void IconBucket::addFeature(const VectorTileFeature &feature, SpriteAtlas &sprit
     vertex_end = vertexBuffer.index();
 }
 
-void IconBucket::render(Painter& painter, const std::string& layer_name, const Tile::ID& id) {
-    painter.renderIcon(*this, layer_name, id);
+void IconBucket::render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
+    painter.renderIcon(*this, layer_desc, id);
 }
 
 bool IconBucket::hasData() const {

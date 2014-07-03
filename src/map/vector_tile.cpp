@@ -1,5 +1,4 @@
 #include <llmr/map/vector_tile.hpp>
-#include <llmr/style/bucket_description.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -102,9 +101,9 @@ VectorTileLayer::VectorTileLayer(pbf layer) : data(layer) {
     }
 }
 
-FilteredVectorTileLayer::FilteredVectorTileLayer(const VectorTileLayer& layer, const BucketDescription& bucket_desc)
+FilteredVectorTileLayer::FilteredVectorTileLayer(const VectorTileLayer& layer, const FilterExpression &filterExpression)
     : layer(layer),
-      bucket_desc(bucket_desc) {
+      filterExpression(filterExpression) {
 }
 
 FilteredVectorTileLayer::iterator FilteredVectorTileLayer::begin() const {
@@ -122,119 +121,167 @@ FilteredVectorTileLayer::iterator::iterator(const FilteredVectorTileLayer& paren
     operator++();
 }
 
-bool FilteredVectorTileLayer::iterator::matchesFilterExpression(const PropertyFilterExpression &filterExpression, const pbf &tags_pbf) {
-    if (filterExpression.is<util::recursive_wrapper<PropertyFilter>>()) {
-        return matchesFilter(filterExpression.get<util::recursive_wrapper<PropertyFilter>>().get(), tags_pbf);
-    } else if (filterExpression.is<util::recursive_wrapper<PropertyExpression>>()) {
-        return matchesExpression(filterExpression.get<util::recursive_wrapper<PropertyExpression>>().get(), tags_pbf);
-    } else if (filterExpression.is<std::true_type>()) {
-        return true;
-    } else {
-        return false;
-    }
+//bool FilteredVectorTileLayer::iterator::matchesFilterExpression(const FilterExpression &filterExpression, const pbf &tags_pbf) {
+//    if (filterExpression.empty()) {
+//        return true;
+//    }
+//
+//    
+//
+//
+//    if (filterExpression.is<util::recursive_wrapper<PropertyFilter>>()) {
+//        return matchesFilter(filterExpression.get<util::recursive_wrapper<PropertyFilter>>().get(), tags_pbf);
+//    } else if (filterExpression.is<util::recursive_wrapper<PropertyExpression>>()) {
+//        return matchesExpression(filterExpression.get<util::recursive_wrapper<PropertyExpression>>().get(), tags_pbf);
+//    } else if (filterExpression.is<std::true_type>()) {
+//        return true;
+//    } else {
+//        return false;
+//    }
+//    return true;
+//}
+
+//
+//bool FilteredVectorTileLayer::iterator::matchesFilter(const PropertyFilter &filter, const pbf &const_tags_pbf) {
+//    auto field_it = parent.layer.key_index.find(filter.field);
+//    if (field_it != parent.layer.key_index.end()) {
+//        const uint32_t filter_key = field_it->second;
+//
+//        // Now loop through all the key/value pair tags.
+//        // tags are packed varints. They should have an even length.
+//        pbf tags_pbf = const_tags_pbf;
+//        while (tags_pbf) {
+//            uint32_t tag_key = tags_pbf.varint();
+//            if (!tags_pbf) {
+//                // This should not happen; otherwise the vector tile
+//                // is invalid.
+//                throw std::runtime_error("uneven number of feature tag ids");
+//            }
+//            uint32_t tag_val = tags_pbf.varint();
+//
+//            if (tag_key == filter_key) {
+//                if (parent.layer.values.size() > tag_val) {
+//                    const Value &value = parent.layer.values[tag_val];
+//                    return filter.compare(value);
+//                } else {
+//                    throw std::runtime_error("feature references out of range value");
+//                }
+//            }
+//        }
+//    }
+//
+//    // The feature doesn't contain the field that we're looking to compare.
+//    // Depending on the filter, this may still be okay.
+//    return filter.isMissingFieldOkay();
+//}
+//
+//bool FilteredVectorTileLayer::iterator::matchesExpression(const PropertyExpression &expression, const pbf &tags_pbf) {
+//    if (expression.op == ExpressionOperator::Or) {
+//        for (const PropertyFilterExpression &filterExpression : expression.operands) {
+//            if (matchesFilterExpression(filterExpression, tags_pbf)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    } else if (expression.op == ExpressionOperator::And) {
+//        for (const PropertyFilterExpression &filterExpression : expression.operands) {
+//            if (!matchesFilterExpression(filterExpression, tags_pbf)) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    } else {
+//        return false;
+//    }
+//}
+//
+
+VectorTileTagExtractor::VectorTileTagExtractor(const VectorTileLayer &layer) : layer_(layer) {}
+
+
+void VectorTileTagExtractor::setTags(const pbf &pbf) {
+    tags_ = pbf;
 }
 
+std::forward_list<Value> VectorTileTagExtractor::getValues(const std::string &key) const {
+    std::forward_list<Value> values;
 
-bool FilteredVectorTileLayer::iterator::matchesFilter(const PropertyFilter &filter, const pbf &const_tags_pbf) {
-    auto field_it = parent.layer.key_index.find(filter.field);
-    if (field_it != parent.layer.key_index.end()) {
+    auto field_it = layer_.key_index.find(key);
+    if (field_it != layer_.key_index.end()) {
+        auto it = values.before_begin();
         const uint32_t filter_key = field_it->second;
 
         // Now loop through all the key/value pair tags.
         // tags are packed varints. They should have an even length.
-        pbf tags_pbf = const_tags_pbf;
+        pbf tags_pbf = tags_;
+        uint32_t tag_key, tag_val;
         while (tags_pbf) {
-            uint32_t tag_key = tags_pbf.varint();
+            tag_key = tags_pbf.varint();
             if (!tags_pbf) {
-                // This should not happen; otherwise the vector tile
-                // is invalid.
-                throw std::runtime_error("uneven number of feature tag ids");
+                // This should not happen; otherwise the vector tile is invalid.
+                fprintf(stderr, "[WARNING] uneven number of feature tag ids\n");
+                return values;
             }
-            uint32_t tag_val = tags_pbf.varint();
+            // Note: We need to run this command in all cases, even if the keys don't match.
+            tag_val = tags_pbf.varint();
 
             if (tag_key == filter_key) {
-                if (parent.layer.values.size() > tag_val) {
-                    const Value &value = parent.layer.values[tag_val];
-                    return filter.compare(value);
+                if (layer_.values.size() > tag_val) {
+                    it = values.emplace_after(it, layer_.values[tag_val]);
                 } else {
-                    throw std::runtime_error("feature references out of range value");
+                    fprintf(stderr, "[WARNING] feature references out of range value\n");
+                    break;
                 }
             }
         }
     }
 
-    // The feature doesn't contain the field that we're looking to compare.
-    // Depending on the filter, this may still be okay.
-    return filter.isMissingFieldOkay();
+    return values;
 }
 
-bool FilteredVectorTileLayer::iterator::matchesExpression(const PropertyExpression &expression, const pbf &tags_pbf) {
-    if (expression.op == ExpressionOperator::Or) {
-        for (const PropertyFilterExpression &filterExpression : expression.operands) {
-            if (matchesFilterExpression(filterExpression, tags_pbf)) {
-                return true;
-            }
-        }
-        return false;
-    } else if (expression.op == ExpressionOperator::And) {
-        for (const PropertyFilterExpression &filterExpression : expression.operands) {
-            if (!matchesFilterExpression(filterExpression, tags_pbf)) {
-                return false;
-            }
-        }
-        return true;
-    } else {
-        return false;
-    }
+void VectorTileTagExtractor::setType(FilterExpression::GeometryType type) {
+    type_ = type;
 }
 
-
+FilterExpression::GeometryType VectorTileTagExtractor::getType() const {
+    return type_;
+}
 
 void FilteredVectorTileLayer::iterator::operator++() {
     valid = false;
 
-    const PropertyFilterExpression &expression = parent.bucket_desc.filter;
+    const FilterExpression &expression = parent.filterExpression;
 
     while (data.next(2)) { // feature
         feature = data.message();
         pbf feature_pbf = feature;
-        BucketType type = BucketType::None;
-
         bool matched = false;
 
         // Treat the absence of any expression filters as a match.
-        if (expression.is<std::true_type>()) {
+        if (expression.empty()) {
             matched = true;
         }
 
-        while (feature_pbf.next()) {
-            if (feature_pbf.tag == 2) { // tags
-                if (matched) {
-                    // There is no filter, so we want to parse the entire layer anyway.
-                    feature_pbf.skip();
-                } else {
-                    // We only want to parse some features.
-                    const pbf tags_pbf = feature_pbf.message();
-                    matched = matchesFilterExpression(expression, tags_pbf);
-                    if (!matched) {
-                        break; // feature_pbf loop early
-                    }
-                }
-            } else if (feature_pbf.tag == 3) { // geometry type
-                switch (feature_pbf.varint()) {
-                    case 1 /* Point */:      type = BucketType::Icon; break;
-                    case 2 /* LineString */: type = BucketType::Line; break;
-                    case 3 /* Polygon */:    type = BucketType::Fill; break;
-                    default:                 type = BucketType::None; break;
-                }
+        if (!matched) {
+            VectorTileTagExtractor extractor(parent.layer);
 
-                if (type != parent.bucket_desc.feature_type) {
-                    matched = false;
-                    break; // feature_pbf loop early
+            // Retrieve the basic information
+            while (feature_pbf.next()) {
+                if (feature_pbf.tag == 2) { // tags
+                    extractor.setTags(feature_pbf.message());
+                } else if (feature_pbf.tag == 3) { // geometry type
+                    switch (FeatureType(feature_pbf.varint())) {
+                        case FeatureType::Point:      extractor.setType(FilterExpression::GeometryType::Point); break;
+                        case FeatureType::LineString: extractor.setType(FilterExpression::GeometryType::Line); break;
+                        case FeatureType::Polygon:    extractor.setType(FilterExpression::GeometryType::Polygon); break;
+                        default: break;
+                    }
+                } else {
+                    feature_pbf.skip();
                 }
-            } else {
-                feature_pbf.skip();
             }
+
+            matched = expression.compare(extractor);
         }
 
         if (matched) {

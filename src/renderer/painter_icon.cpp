@@ -2,36 +2,29 @@
 #include <llmr/renderer/icon_bucket.hpp>
 #include <llmr/map/map.hpp>
 #include <llmr/style/sprite.hpp>
+#include <llmr/style/style_layer.hpp>
+#include <llmr/geometry/sprite_atlas.hpp>
 #include <llmr/util/math.hpp>
 
 using namespace llmr;
 
-void Painter::renderIcon(IconBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+void Painter::renderIcon(IconBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
     // Abort early.
     if (!bucket.hasData()) return;
     if (pass == Opaque) return;
 
-    const std::unordered_map<std::string, IconProperties> &icon_properties = map.getStyle()->computed.icons;
-    const std::unordered_map<std::string, IconProperties>::const_iterator icon_properties_it = icon_properties.find(layer_name);
-
-    const IconProperties &properties = icon_properties_it != icon_properties.end()
-                                           ? icon_properties_it->second
-                                           : defaultIconProperties;
+    const IconProperties &properties = layer_desc->getProperties<IconProperties>();
     if (!properties.enabled) return;
 
-    Color color = properties.color;
-    color[0] *= properties.opacity;
-    color[1] *= properties.opacity;
-    color[2] *= properties.opacity;
-    color[3] *= properties.opacity;
-
-    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
+// TODO: when translating icon, are we doing this in the bucket already?
+//    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
 
     useProgram(iconShader->program);
-    iconShader->setMatrix(vtxMatrix);
-    iconShader->setColor(color);
+    iconShader->setMatrix(matrix);
+// TODO: update
+//    iconShader->setColor(color);
     iconShader->setImage(0);
     iconShader->setRatio(map.getState().getPixelRatio());
     iconShader->setDimension({{

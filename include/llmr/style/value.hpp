@@ -62,6 +62,8 @@ template <> struct string_to_number<uint64_t> {
 
 template <typename Operator>
 struct relaxed_operator_visitor {
+    typedef bool result_type;
+
     bool operator()(bool lhs, bool rhs) const { return Operator()(lhs, rhs); }
 
     template <typename T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
@@ -114,23 +116,23 @@ struct relaxed_less_equal_operator {
 } // end namespace detail
 
 inline bool relaxed_equal(Value const &lhs, Value const &rhs) {
-    return apply_visitor(lhs, rhs, detail::relaxed_operator_visitor<detail::relaxed_equal_operator>());
+    return apply_visitor(detail::relaxed_operator_visitor<detail::relaxed_equal_operator>(), lhs, rhs);
 }
 
 inline bool relaxed_greater(Value const &lhs, Value const &rhs) {
-    return apply_visitor(lhs, rhs, detail::relaxed_operator_visitor<detail::relaxed_greater_operator>());
+    return apply_visitor(detail::relaxed_operator_visitor<detail::relaxed_greater_operator>(), lhs, rhs);
 }
 
 inline bool relaxed_greater_equal(Value const &lhs, Value const &rhs) {
-    return apply_visitor(lhs, rhs, detail::relaxed_operator_visitor<detail::relaxed_greater_equal_operator>());
+    return apply_visitor(detail::relaxed_operator_visitor<detail::relaxed_greater_equal_operator>(), lhs, rhs);
 }
 
 inline bool relaxed_less(Value const &lhs, Value const &rhs) {
-    return apply_visitor(lhs, rhs, detail::relaxed_operator_visitor<detail::relaxed_less_operator>());
+    return apply_visitor(detail::relaxed_operator_visitor<detail::relaxed_less_operator>(), lhs, rhs);
 }
 
 inline bool relaxed_less_equal(Value const &lhs, Value const &rhs) {
-    return apply_visitor(lhs, rhs, detail::relaxed_operator_visitor<detail::relaxed_less_equal_operator>());
+    return apply_visitor(detail::relaxed_operator_visitor<detail::relaxed_less_equal_operator>(), lhs, rhs);
 }
 
 }

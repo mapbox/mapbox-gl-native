@@ -12,7 +12,7 @@ namespace llmr {
 typedef std::pair<uint16_t, uint16_t> GlyphRange;
 
 // Note: this only works for the BMP
-GlyphRange getGlyphRange(uint32_t glyph);
+GlyphRange getGlyphRange(char32_t glyph);
 
 struct GlyphMetrics {
     operator bool() const {

@@ -51,7 +51,7 @@ private:
 
 class GlyphPBF {
 public:
-    GlyphPBF(const std::string &fontStack, GlyphRange glyphRange);
+    GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange);
 
     void parse(FontStack &stack);
 
@@ -67,6 +67,8 @@ private:
 // Manages Glyphrange PBF loading.
 class GlyphStore {
 public:
+    GlyphStore(const std::string &glyphURL);
+
     // Block until all specified GlyphRanges of the specified font stack are loaded.
     void waitForGlyphRanges(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges);
 
@@ -77,6 +79,9 @@ private:
     std::shared_future<GlyphPBF &> loadGlyphRange(const std::string &fontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>> &rangeSets, GlyphRange range);
 
     FontStack &createFontStack(const std::string &fontStack);
+
+public:
+    const std::string glyphURL;
 
 private:
     std::unordered_map<std::string, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>> ranges;

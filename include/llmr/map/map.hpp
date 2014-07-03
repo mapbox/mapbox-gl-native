@@ -20,8 +20,7 @@
 namespace llmr {
 
 class Source;
-
-typedef std::map<std::string, const std::unique_ptr<Source>> Sources;
+class SpriteAtlas;
 
 class Map : private util::noncopyable {
 public:
@@ -53,8 +52,8 @@ public:
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
 
     // Styling
-    void setAppliedClasses(std::set<std::string> appliedClasses);
-    std::set<std::string> getAppliedClasses() const;
+    void toggleClass(const std::string &name);
+    const std::vector<std::string> &getAppliedClasses() const;
     void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);
     void setStyleJSON(std::string newStyleJSON);
     std::string getStyleJSON() const;
@@ -107,8 +106,8 @@ public:
     inline std::shared_ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
     inline std::shared_ptr<Texturepool> getTexturepool() { return texturepool; }
     inline std::shared_ptr<uv::loop> getLoop() { return loop; }
-    inline time getAnimationTime() const { return animationTime; }
-    inline const Sources &getSources() { return sources; }
+    inline timestamp getAnimationTime() const { return animationTime; }
+    inline timestamp getTime() const { return animationTime; }
 
 private:
     // uv async callbacks
@@ -133,8 +132,8 @@ private:
 
     // Unconditionally performs a render with the current map state.
     void render();
-    void renderLayers(const std::vector<LayerDescription>& layers);
-    void renderLayer(const LayerDescription& layer_desc, RenderPass pass);
+    void renderLayers(std::shared_ptr<StyleLayerGroup> group);
+    void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass);
 
 private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
@@ -162,12 +161,10 @@ private:
 
     Painter painter;
 
-    Sources sources;
-
     std::string styleJSON = "";
 
     bool debug = false;
-    time animationTime = 0;
+    timestamp animationTime = 0;
 
     int indent = 0;
 

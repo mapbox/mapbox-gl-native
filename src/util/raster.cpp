@@ -69,7 +69,7 @@ void Raster::bind(bool linear) {
 }
 
 void Raster::beginFadeInTransition() {
-    time start = util::now();
+    timestamp start = util::now();
     fade_transition = std::make_shared<util::ease_transition<double>>(opacity, 1.0, opacity, start, 250_milliseconds);
 }
 
@@ -77,7 +77,7 @@ bool Raster::needsTransition() const {
     return fade_transition != nullptr;
 }
 
-void Raster::updateTransitions(time now) {
+void Raster::updateTransitions(timestamp now) {
     if (fade_transition->update(now) == util::transition::complete) {
         fade_transition = nullptr;
     }

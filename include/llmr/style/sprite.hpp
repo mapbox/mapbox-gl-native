@@ -1,14 +1,14 @@
 #ifndef LLMR_STYLE_SPRITE
 #define LLMR_STYLE_SPRITE
 
-#include <map>
+#include <llmr/util/raster.hpp>
+#include <llmr/util/vec.hpp>
+
 #include <string>
 #include <mutex>
 #include <memory>
 #include <atomic>
-
-#include <llmr/util/raster.hpp>
-#include <llmr/util/vec.hpp>
+#include <unordered_map>
 
 namespace llmr {
 
@@ -55,7 +55,7 @@ private:
     std::string body;
     std::string image;
     std::atomic<bool> loaded;
-    std::map<std::string, SpritePosition> pos;
+    std::unordered_map<std::string, SpritePosition> pos;
     const SpritePosition empty;
 };
 

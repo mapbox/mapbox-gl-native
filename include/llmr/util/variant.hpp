@@ -1,5 +1,5 @@
-#ifndef UTIL_VARIANT_HPP
-#define UTIL_VARIANT_HPP
+#ifndef MAPBOX_UTIL_VARIANT_HPP
+#define MAPBOX_UTIL_VARIANT_HPP
 
 #include <utility>
 #include <typeinfo>
@@ -9,50 +9,119 @@
 #include <new> // operator new
 #include <cstddef> // size_t
 #include <iosfwd>
+#include <string>
 
-#ifdef NDEBUG
-#define VARIANT_INLINE inline __attribute__((always_inline))
+#include "recursive_wrapper.hpp"
+
+#ifdef _MSC_VER
+ // http://msdn.microsoft.com/en-us/library/z8y1yy88.aspx
+ #ifdef NDEBUG
+  #define VARIANT_INLINE __forceinline
+ #else
+  #define VARIANT_INLINE __declspec(noinline)
+ #endif
 #else
-#define VARIANT_INLINE __attribute__((noinline))
+ #ifdef NDEBUG
+  #define VARIANT_INLINE inline __attribute__((always_inline))
+ #else
+  #define VARIANT_INLINE __attribute__((noinline))
+ #endif
 #endif
 
-namespace llmr {
+#define VARIANT_MAJOR_VERSION 0
+#define VARIANT_MINOR_VERSION 1
+#define VARIANT_PATCH_VERSION 0
 
-namespace util {
+// translates to 100
+#define VARIANT_VERSION (VARIANT_MAJOR_VERSION*100000) + (VARIANT_MINOR_VERSION*100) + (VARIANT_PATCH_VERSION)
 
-namespace detail {
+namespace llmr { namespace util { namespace detail {
 
 static constexpr std::size_t invalid_value = std::size_t(-1);
 
 template <typename T, typename...Types>
-struct type_traits;
+struct direct_type;
 
 template <typename T, typename First, typename...Types>
-struct type_traits<T, First, Types...>
+struct direct_type<T, First, Types...>
 {
-    static constexpr std::size_t id = std::is_same<T, First>::value ? sizeof...(Types) : type_traits<T, Types...>::id;
+    static constexpr std::size_t index = std::is_same<T, First>::value
+        ? sizeof...(Types) : direct_type<T, Types...>::index;
 };
 
 template <typename T>
-struct type_traits<T>
+struct direct_type<T>
 {
-    static constexpr std::size_t id = invalid_value;
+    static constexpr std::size_t index = invalid_value;
+};
+
+template <typename T, typename...Types>
+struct convertible_type;
+
+template <typename T, typename First, typename...Types>
+struct convertible_type<T, First, Types...>
+{
+    static constexpr std::size_t index = std::is_convertible<T, First>::value
+        ? sizeof...(Types) : convertible_type<T, Types...>::index;
+};
+
+template <typename T>
+struct convertible_type<T>
+{
+    static constexpr std::size_t index = invalid_value;
+};
+
+template <typename T, typename...Types>
+struct value_traits
+{
+    static constexpr std::size_t direct_index = direct_type<T, Types...>::index;
+    static constexpr std::size_t index =
+        (direct_index == invalid_value) ? convertible_type<T, Types...>::index : direct_index;
 };
 
 template <typename T, typename...Types>
 struct is_valid_type;
 
 template <typename T, typename First, typename... Types>
-struct is_valid_type<T,First,Types...>
+struct is_valid_type<T, First, Types...>
 {
-    static constexpr bool value = std::is_same<T,First>::value
-        || is_valid_type<T,Types...>::value;
+    static constexpr bool value = std::is_convertible<T, First>::value
+        || is_valid_type<T, Types...>::value;
 };
 
 template <typename T>
 struct is_valid_type<T> : std::false_type {};
 
-}
+template <std::size_t N, typename ... Types>
+struct select_type
+{
+    static_assert(N < sizeof...(Types), "index out of bounds");
+};
+
+template <std::size_t N, typename T, typename ... Types>
+struct select_type<N, T, Types...>
+{
+    using type = typename select_type<N - 1, Types...>::type;
+};
+
+template <typename T, typename ... Types>
+struct select_type<0, T, Types...>
+{
+    using type = T;
+};
+
+} // namespace detail
+
+// static visitor
+template <typename R = void>
+struct static_visitor
+{
+    using result_type = R;
+protected:
+    static_visitor() {}
+    ~static_visitor() {}
+};
+
 
 template <std::size_t arg1, std::size_t ... others>
 struct static_max;
@@ -125,37 +194,77 @@ template<> struct variant_helper<>
 
 namespace detail {
 
+template <typename T>
+struct unwrapper
+{
+    T const& operator() (T const& obj) const
+    {
+        return obj;
+    }
+
+    T& operator() (T & obj) const
+    {
+        return obj;
+    }
+};
+
+
+template <typename T>
+struct unwrapper<recursive_wrapper<T>>
+{
+    auto operator() (recursive_wrapper<T> const& obj) const
+        -> typename recursive_wrapper<T>::type const&
+    {
+        return obj.get();
+    }
+};
+
+
 template <typename F, typename V, typename...Types>
 struct dispatcher;
 
 template <typename F, typename V, typename T, typename...Types>
-struct dispatcher<F,V,T,Types...>
+struct dispatcher<F, V, T, Types...>
 {
-    typedef typename std::result_of<F(V const&)>::type result_type;
-
-    VARIANT_INLINE static result_type apply(V const& v, F f)
+    using result_type = typename F::result_type;
+    VARIANT_INLINE static result_type apply_const(V const& v, F f)
     {
-        if (v.get_type_id() == sizeof...(Types))
+        if (v.get_type_index() == sizeof...(Types))
         {
-            return f(v. template get<T>());
+            return f(unwrapper<T>()(v. template get<T>()));
         }
         else
         {
-            return dispatcher<F,V,Types...>::apply(v, f);
+            return dispatcher<F, V, Types...>::apply_const(v, f);
+        }
+    }
+
+    VARIANT_INLINE static result_type apply(V & v, F f)
+    {
+        if (v.get_type_index() == sizeof...(Types))
+        {
+            return f(unwrapper<T>()(v. template get<T>()));
+        }
+        else
+        {
+            return dispatcher<F, V, Types...>::apply(v, f);
         }
     }
 };
 
-template<typename F,typename V>
-struct dispatcher<F,V>
+template<typename F, typename V>
+struct dispatcher<F, V>
 {
-    typedef typename std::result_of<F(V const&)>::type result_type;
-
-    VARIANT_INLINE static result_type apply(V const&, F)
+    using result_type = typename F::result_type;
+    VARIANT_INLINE static result_type apply_const(V const&, F)
     {
-        throw std::runtime_error("unary dispatch: FAIL");
+        throw std::runtime_error(std::string("unary dispatch: FAIL ") + typeid(V).name());
     }
 
+    VARIANT_INLINE static result_type apply(V &, F)
+    {
+        throw std::runtime_error(std::string("unary dispatch: FAIL ") + typeid(V).name());
+    }
 };
 
 
@@ -163,28 +272,46 @@ template <typename F, typename V, typename T, typename...Types>
 struct binary_dispatcher_rhs;
 
 template <typename F, typename V, typename T0, typename T1, typename...Types>
-struct binary_dispatcher_rhs<F,V,T0,T1,Types...>
+struct binary_dispatcher_rhs<F, V, T0, T1, Types...>
 {
-    typedef typename std::result_of<F(V const&, V const&)>::type result_type;
-    VARIANT_INLINE static result_type apply(V const& lhs, V const& rhs, F f)
+    using result_type = typename F::result_type;
+    VARIANT_INLINE static result_type apply_const(V const& lhs, V const& rhs, F f)
     {
-        if (rhs.get_type_id() == sizeof...(Types)) // call binary functor
+        if (rhs.get_type_index() == sizeof...(Types)) // call binary functor
         {
-            return f(lhs. template get<T0>(), rhs. template get<T1>());
+            return f(unwrapper<T0>()(lhs. template get<T0>()),
+                     unwrapper<T1>()(rhs. template get<T1>()));
         }
         else
         {
-            return binary_dispatcher_rhs<F,V,T0,Types...>::apply(lhs, rhs, f);
+            return binary_dispatcher_rhs<F, V, T0, Types...>::apply_const(lhs, rhs, f);
         }
     }
+
+    VARIANT_INLINE static result_type apply(V & lhs, V & rhs, F f)
+    {
+        if (rhs.get_type_index() == sizeof...(Types)) // call binary functor
+        {
+            return f(unwrapper<T0>()(lhs. template get<T0>()),
+                     unwrapper<T1>()(rhs. template get<T1>()));
+        }
+        else
+        {
+            return binary_dispatcher_rhs<F, V, T0, Types...>::apply(lhs, rhs, f);
+        }
+    }
+
 };
 
-template<typename F,typename V, typename T>
-struct binary_dispatcher_rhs<F,V,T>
+template<typename F, typename V, typename T>
+struct binary_dispatcher_rhs<F, V, T>
 {
-    typedef typename std::result_of<F(V const&, V const&)>::type result_type;
-
-    VARIANT_INLINE static result_type apply(V const&, V const&, F)
+    using result_type = typename F::result_type;
+    VARIANT_INLINE static result_type apply_const(V const&, V const&, F)
+    {
+        throw std::runtime_error("binary dispatch: FAIL");
+    }
+    VARIANT_INLINE static result_type apply(V &, V &, F)
     {
         throw std::runtime_error("binary dispatch: FAIL");
     }
@@ -195,28 +322,45 @@ template <typename F, typename V, typename T, typename...Types>
 struct binary_dispatcher_lhs;
 
 template <typename F, typename V, typename T0, typename T1, typename...Types>
-struct binary_dispatcher_lhs<F,V,T0,T1,Types...>
+struct binary_dispatcher_lhs<F, V, T0, T1, Types...>
 {
-    typedef typename std::result_of<F(V const&, V const&)>::type binary_result_type;
-    VARIANT_INLINE static binary_result_type apply(V const& lhs, V const& rhs, F f)
+    using result_type = typename F::result_type;
+    VARIANT_INLINE static result_type apply_const(V const& lhs, V const& rhs, F f)
     {
-        if (lhs.get_type_id() == sizeof...(Types)) // call binary functor
+        if (lhs.get_type_index() == sizeof...(Types)) // call binary functor
         {
             return f(lhs. template get<T1>(), rhs. template get<T0>());
         }
         else
         {
-            return binary_dispatcher_lhs<F,V,T0,Types...>::apply(lhs, rhs, f);
+            return binary_dispatcher_lhs<F, V, T0, Types...>::apply_const(lhs, rhs, f);
         }
     }
+
+    VARIANT_INLINE static result_type apply(V & lhs, V & rhs, F f)
+    {
+        if (lhs.get_type_index() == sizeof...(Types)) // call binary functor
+        {
+            return f(lhs. template get<T1>(), rhs. template get<T0>());
+        }
+        else
+        {
+            return binary_dispatcher_lhs<F, V, T0, Types...>::apply(lhs, rhs, f);
+        }
+    }
+
 };
 
-template<typename F,typename V, typename T>
-struct binary_dispatcher_lhs<F,V,T>
+template<typename F, typename V, typename T>
+struct binary_dispatcher_lhs<F, V, T>
 {
-    typedef typename std::result_of<F(V const&, V const&)>::type result_type;
+    using result_type = typename F::result_type;
+    VARIANT_INLINE static result_type apply_const(V const&, V const&, F)
+    {
+        throw std::runtime_error("binary dispatch: FAIL");
+    }
 
-    VARIANT_INLINE static result_type apply(V const&, V const&, F)
+    VARIANT_INLINE static result_type apply(V &, V &, F)
     {
         throw std::runtime_error("binary dispatch: FAIL");
     }
@@ -226,37 +370,60 @@ template <typename F, typename V, typename...Types>
 struct binary_dispatcher;
 
 template <typename F, typename V, typename T, typename...Types>
-struct binary_dispatcher<F,V,T,Types...>
+struct binary_dispatcher<F, V, T, Types...>
 {
-    typedef typename std::result_of<F(V const&, V const&)>::type binary_result_type;
-
-    VARIANT_INLINE static binary_result_type apply(V const& v0, V const& v1, F f)
+    using result_type = typename F::result_type;
+    VARIANT_INLINE static result_type apply_const(V const& v0, V const& v1, F f)
     {
-        if (v0.get_type_id() == sizeof...(Types))
+        if (v0.get_type_index() == sizeof...(Types))
         {
-            if (v0.get_type_id() == v1.get_type_id())
+            if (v0.get_type_index() == v1.get_type_index())
             {
                 return f(v0. template get<T>(), v1. template get<T>()); // call binary functor
             }
             else
             {
-                return binary_dispatcher_rhs<F,V,T,Types...>::apply(v0, v1, f);
+                return binary_dispatcher_rhs<F, V, T, Types...>::apply_const(v0, v1, f);
             }
         }
-        else if (v1.get_type_id() == sizeof...(Types))
+        else if (v1.get_type_index() == sizeof...(Types))
         {
-            return binary_dispatcher_lhs<F,V,T,Types...>::apply(v0, v1, f);
+            return binary_dispatcher_lhs<F, V, T, Types...>::apply_const(v0, v1, f);
         }
-        return binary_dispatcher<F,V,Types...>::apply(v0, v1, f);
+        return binary_dispatcher<F, V, Types...>::apply_const(v0, v1, f);
+    }
+
+    VARIANT_INLINE static result_type apply(V & v0, V & v1, F f)
+    {
+        if (v0.get_type_index() == sizeof...(Types))
+        {
+            if (v0.get_type_index() == v1.get_type_index())
+            {
+                return f(v0. template get<T>(), v1. template get<T>()); // call binary functor
+            }
+            else
+            {
+                return binary_dispatcher_rhs<F, V, T, Types...>::apply(v0, v1, f);
+            }
+        }
+        else if (v1.get_type_index() == sizeof...(Types))
+        {
+            return binary_dispatcher_lhs<F, V, T, Types...>::apply(v0, v1, f);
+        }
+        return binary_dispatcher<F, V, Types...>::apply(v0, v1, f);
     }
 };
 
-template<typename F,typename V>
-struct binary_dispatcher<F,V>
+template<typename F, typename V>
+struct binary_dispatcher<F, V>
 {
-    typedef typename std::result_of<F(V const&, V const&)>::type binary_result_type;
+    using result_type = typename F::result_type;
+    VARIANT_INLINE static result_type apply_const(V const&, V const&, F)
+    {
+        throw std::runtime_error("binary dispatch: FAIL");
+    }
 
-    VARIANT_INLINE static binary_result_type apply(V const&, V const&, F)
+    VARIANT_INLINE static result_type apply(V &, V &, F)
     {
         throw std::runtime_error("binary dispatch: FAIL");
     }
@@ -275,19 +442,19 @@ struct equal_comp
 struct less_comp
 {
     template <typename T>
-    bool operator()(const T& lhs, const T& rhs) const
+    bool operator()(T const& lhs, T const& rhs) const
     {
         return lhs < rhs;
     }
 };
 
 template <typename Variant, typename Comp>
-class comparer
+class comparer : public static_visitor<bool>
 {
 public:
     explicit comparer(Variant const& lhs) noexcept
         : lhs_(lhs) {}
-    comparer& operator=(const comparer&) = delete;
+    comparer& operator=(comparer const&) = delete;
     // visitor
     template<typename T>
     bool operator()(T const& rhs_content) const
@@ -301,16 +468,16 @@ private:
 
 // operator<< helper
 template <typename Out>
-class printer
+class printer : public static_visitor<>
 {
 public:
     explicit printer(Out & out)
         : out_(out) {}
-    printer& operator=(printer const &) = delete;
+    printer& operator=(printer const&) = delete;
 
 // visitor
     template <typename T>
-    void operator()( T const & operand) const
+    void operator()(T const& operand) const
     {
         out_ << operand;
     }
@@ -318,7 +485,7 @@ private:
     Out & out_;
 };
 
-} // detail
+} // namespace detail
 
 template<typename... Types>
 class variant
@@ -329,81 +496,106 @@ private:
     static const std::size_t data_align = static_max<alignof(Types)...>::value;
 
     using data_type = typename std::aligned_storage<data_size, data_align>::type;
-
     using helper_type = variant_helper<Types...>;
 
-    std::size_t type_id;
+    std::size_t type_index;
     data_type data;
 
 public:
 
     VARIANT_INLINE variant()
-        : type_id(detail::invalid_value) {}
-
-    template <typename T>
-    VARIANT_INLINE explicit variant(T const& val) noexcept
-        : type_id(detail::type_traits<T, Types...>::id)
+        : type_index(sizeof...(Types) - 1)
     {
-        static_assert(detail::is_valid_type<T,Types...>::value, "Not a valid type for this variant");
-        new (&data) T(val);
+        new (&data) typename detail::select_type<0, Types...>::type();
     }
 
-    template <typename T>
-    VARIANT_INLINE variant(T && val) noexcept
-        : type_id(detail::type_traits<T,Types...>::id)
+    template <typename T, class = typename std::enable_if<
+                         detail::is_valid_type<T, Types...>::value>::type>
+    VARIANT_INLINE explicit variant(T const& val) noexcept
+        : type_index(detail::value_traits<T, Types...>::index)
     {
-        static_assert(detail::is_valid_type<T,Types...>::value, "Not a valid type for this variant");
-        new (&data) T(std::forward<T>(val)); // nothrow
+        constexpr std::size_t index = sizeof...(Types) - detail::value_traits<T, Types...>::index - 1;
+        using target_type = typename detail::select_type<index, Types...>::type;
+        new (&data) target_type(val);
+    }
+
+    template <typename T, class = typename std::enable_if<
+                          detail::is_valid_type<T, Types...>::value>::type>
+    VARIANT_INLINE variant(T && val) noexcept
+        : type_index(detail::value_traits<T, Types...>::index)
+    {
+        constexpr std::size_t index = sizeof...(Types) - detail::value_traits<T, Types...>::index - 1;
+        using target_type = typename detail::select_type<index, Types...>::type;
+        new (&data) target_type(std::forward<T>(val)); // nothrow
     }
 
     VARIANT_INLINE variant(variant<Types...> const& old)
-        : type_id(old.type_id)
+        : type_index(old.type_index)
     {
-        helper_type::copy(old.type_id, &old.data, &data);
+        helper_type::copy(old.type_index, &old.data, &data);
     }
 
     VARIANT_INLINE variant(variant<Types...>&& old) noexcept
-        : type_id(old.type_id)
+        : type_index(old.type_index)
     {
-        helper_type::move(old.type_id, &old.data, &data);
+        helper_type::move(old.type_index, &old.data, &data);
     }
 
     friend void swap(variant<Types...> & first, variant<Types...> & second)
     {
         using std::swap; //enable ADL
-        swap(first.type_id, second.type_id);
+        swap(first.type_index, second.type_index);
         swap(first.data, second.data);
     }
 
-    VARIANT_INLINE variant<Types...>& operator= (variant<Types...> other)
+    VARIANT_INLINE variant<Types...>& operator=(variant<Types...> other)
     {
         swap(*this, other);
+        return *this;
+    }
+
+    // conversions
+    // move-assign
+    template <typename T>
+    VARIANT_INLINE variant<Types...>& operator=(T && rhs) noexcept
+    {
+        variant<Types...> temp(std::move(rhs));
+        swap(*this, temp);
+        return *this;
+    }
+
+    // copy-assign
+    template <typename T>
+    VARIANT_INLINE variant<Types...>& operator=(T const& rhs)
+    {
+        variant<Types...> temp(rhs);
+        swap(*this, temp);
         return *this;
     }
 
     template<typename T>
     VARIANT_INLINE bool is() const
     {
-        return (type_id == detail::type_traits<T, Types...>::id);
+        return (type_index == detail::direct_type<T, Types...>::index);
     }
 
     VARIANT_INLINE bool valid() const
     {
-        return (type_id != detail::invalid_value);
+        return (type_index != detail::invalid_value);
     }
 
     template<typename T, typename... Args>
     VARIANT_INLINE void set(Args&&... args)
     {
-        helper_type::destroy(type_id, &data);
+        helper_type::destroy(type_index, &data);
         new (&data) T(std::forward<Args>(args)...);
-        type_id = detail::type_traits<T,Types...>::id;
+        type_index = detail::direct_type<T, Types...>::index;
     }
 
     template<typename T>
     VARIANT_INLINE T& get()
     {
-        if (type_id == detail::type_traits<T,Types...>::id)
+        if (type_index == detail::direct_type<T, Types...>::index)
         {
             return *reinterpret_cast<T*>(&data);
         }
@@ -416,7 +608,7 @@ public:
     template<typename T>
     VARIANT_INLINE T const& get() const
     {
-        if (type_id == detail::type_traits<T,Types...>::id)
+        if (type_index == detail::direct_type<T, Types...>::index)
         {
             return *reinterpret_cast<T const*>(&data);
         }
@@ -426,37 +618,57 @@ public:
         }
     }
 
-    VARIANT_INLINE std::size_t get_type_id() const
+    VARIANT_INLINE std::size_t get_type_index() const
     {
-        return type_id;
+        return type_index;
     }
 
     // visitor
     // unary
     template <typename F, typename V>
-    typename std::result_of<F(V const&)>::type
-    VARIANT_INLINE static visit(V const& v, F f)
+    auto VARIANT_INLINE
+    static visit(V const& v, F f)
+        -> decltype(detail::dispatcher<F, V, Types...>::apply_const(v, f))
+    {
+        return detail::dispatcher<F, V, Types...>::apply_const(v, f);
+    }
+    // non-const
+    template <typename F, typename V>
+    auto VARIANT_INLINE
+    static visit(V & v, F f)
+        -> decltype(detail::dispatcher<F, V, Types...>::apply(v, f))
     {
         return detail::dispatcher<F, V, Types...>::apply(v, f);
     }
+
     // binary
+    // const
     template <typename F, typename V>
-    typename std::result_of<F(V const&, V const& )>::type
-    VARIANT_INLINE static binary_visit(V const& v0, V const& v1, F f)
+    auto VARIANT_INLINE
+    static binary_visit(V const& v0, V const& v1, F f)
+        -> decltype(detail::binary_dispatcher<F, V, Types...>::apply_const(v0, v1, f))
+    {
+        return detail::binary_dispatcher<F, V, Types...>::apply_const(v0, v1, f);
+    }
+    // non-const
+    template <typename F, typename V>
+    auto VARIANT_INLINE
+    static binary_visit(V& v0, V& v1, F f)
+        -> decltype(detail::binary_dispatcher<F, V, Types...>::apply(v0, v1, f))
     {
         return detail::binary_dispatcher<F, V, Types...>::apply(v0, v1, f);
     }
 
     ~variant() noexcept
     {
-        helper_type::destroy(type_id, &data);
+        helper_type::destroy(type_index, &data);
     }
 
     // comparison operators
     // equality
     VARIANT_INLINE bool operator==(variant const& rhs) const
     {
-        if (this->get_type_id() != rhs.get_type_id())
+        if (this->get_type_index() != rhs.get_type_index())
             return false;
         detail::comparer<variant, detail::equal_comp> visitor(*this);
         return visit(rhs, visitor);
@@ -464,9 +676,9 @@ public:
     // less than
     VARIANT_INLINE bool operator<(variant const& rhs) const
     {
-        if (this->get_type_id() != rhs.get_type_id())
+        if (this->get_type_index() != rhs.get_type_index())
         {
-            return this->get_type_id() < rhs.get_type_id();
+            return this->get_type_index() < rhs.get_type_index();
             // ^^ borrowed from boost::variant
         }
         detail::comparer<variant, detail::less_comp> visitor(*this);
@@ -475,17 +687,30 @@ public:
 };
 
 // unary visitor interface
+
+// const
 template <typename V, typename F>
-typename std::result_of<F(V const&)>::type
-VARIANT_INLINE static apply_visitor(V const& v, F f)
+auto VARIANT_INLINE static apply_visitor(F f, V const& v) -> decltype(V::visit(v, f))
 {
-    return V::visit(v,f);
+    return V::visit(v, f);
+}
+// non-const
+template <typename V, typename F>
+auto VARIANT_INLINE static apply_visitor(F f, V & v) -> decltype(V::visit(v, f))
+{
+    return V::visit(v, f);
 }
 
 // binary visitor interface
+// const
 template <typename V, typename F>
-typename std::result_of<F(V const&, V const&)>::type
-VARIANT_INLINE static apply_visitor(V const& v0, V const& v1, F f)
+auto VARIANT_INLINE static apply_visitor(F f, V const& v0, V const& v1) -> decltype(V::binary_visit(v0, v1, f))
+{
+    return V::binary_visit(v0, v1, f);
+}
+// non-const
+template <typename V, typename F>
+auto VARIANT_INLINE static apply_visitor(F f, V & v0, V & v1) -> decltype(V::binary_visit(v0, v1, f))
 {
     return V::binary_visit(v0, v1, f);
 }
@@ -493,14 +718,14 @@ VARIANT_INLINE static apply_visitor(V const& v0, V const& v1, F f)
 
 // operator<<
 template <typename charT, typename traits, typename Variant>
-VARIANT_INLINE std::basic_ostream<charT,traits>&
-operator<< (std::basic_ostream<charT,traits>& out, Variant const& rhs)
+VARIANT_INLINE std::basic_ostream<charT, traits>&
+operator<< (std::basic_ostream<charT, traits>& out, Variant const& rhs)
 {
-    detail::printer<std::basic_ostream<charT,traits> > visitor(out);
-    apply_visitor(rhs, visitor);
+    detail::printer<std::basic_ostream<charT, traits>> visitor(out);
+    apply_visitor(visitor, rhs);
     return out;
 }
 
-}
-}
-#endif  // UTIL_VARIANT_HPP
+}}
+
+#endif  // MAPBOX_UTIL_VARIANT_HPP

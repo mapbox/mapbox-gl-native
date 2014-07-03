@@ -2,9 +2,9 @@
 #define LLMR_RENDERER_ICONBUCKET
 
 #include <llmr/renderer/bucket.hpp>
-#include <llmr/style/bucket_description.hpp>
 #include <llmr/geometry/elements_buffer.hpp>
 #include <llmr/geometry/icon_buffer.hpp>
+#include <llmr/style/style_bucket.hpp>
 
 #include <vector>
 #include <memory>
@@ -26,9 +26,9 @@ class VectorTileFeature;
 class IconBucket : public Bucket {
 public:
     IconBucket(IconVertexBuffer& vertexBuffer,
-                const BucketIconDescription& properties);
+                const StyleBucketIcon& properties);
 
-    virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
+    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
     virtual bool hasData() const;
 
     void addFeature(const VectorTileFeature &feature, SpriteAtlas &sprite_atlas);
@@ -37,7 +37,7 @@ public:
     void drawIcons(DotShader& shader);
 
 public:
-    const BucketIconDescription &properties;
+    const StyleBucketIcon &properties;
 
 private:
 

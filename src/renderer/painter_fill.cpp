@@ -1,5 +1,6 @@
 #include <llmr/renderer/painter.hpp>
 #include <llmr/renderer/fill_bucket.hpp>
+#include <llmr/style/style_layer.hpp>
 #include <llmr/map/map.hpp>
 #include <llmr/style/sprite.hpp>
 #include <llmr/geometry/sprite_atlas.hpp>
@@ -17,10 +18,14 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
     fill_color[3] *= properties.opacity;
 
     Color stroke_color = properties.stroke_color;
-    stroke_color[0] *= properties.opacity;
-    stroke_color[1] *= properties.opacity;
-    stroke_color[2] *= properties.opacity;
-    stroke_color[3] *= properties.opacity;
+    if (stroke_color[3] < 0) {
+        stroke_color = fill_color;
+    } else {
+        stroke_color[0] *= properties.opacity;
+        stroke_color[1] *= properties.opacity;
+        stroke_color[2] *= properties.opacity;
+        stroke_color[3] *= properties.opacity;
+    }
 
     bool outline = properties.antialias && properties.stroke_color != properties.fill_color;
     bool fringeline = properties.antialias && properties.stroke_color == properties.fill_color;
@@ -140,26 +145,21 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
     }
 }
 
-void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, const Tile::ID& id) {
+void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
     // Abort early.
     if (!bucket.hasData()) return;
 
-    const std::unordered_map<std::string, FillProperties> &fill_properties = map.getStyle()->computed.fills;
-    const std::unordered_map<std::string, FillProperties>::const_iterator fill_properties_it = fill_properties.find(layer_name);
-
-    const FillProperties &properties = fill_properties_it != fill_properties.end()
-                                           ? fill_properties_it->second
-                                           : defaultFillProperties;
+    const FillProperties &properties = layer_desc->getProperties<FillProperties>();
     if (!properties.enabled) return;
 
-    if (properties.prerender && properties.getPrerender(id.z)) {
+    if (layer_desc->rasterize && layer_desc->rasterize->isEnabled(id.z)) {
         if (pass == Translucent) {
+            const RasterizedProperties rasterize = layer_desc->rasterize->get(id.z);
             // Buffer value around the 0..4096 extent that will be drawn into the 256x256 pixel
             // texture. We later scale the texture so that the actual bounds will align with this
             // tile's bounds. The reason we do this is so that the
             if (!bucket.prerendered) {
-                const PrerenderProperties prerender = properties.getPrerenderProperties(id.z);
-                bucket.prerendered = std::make_unique<PrerenderedTexture>(prerender);
+                bucket.prerendered = std::make_unique<PrerenderedTexture>(rasterize);
                 bucket.prerendered->bindFramebuffer();
 
                 preparePrerender(*bucket.prerendered);
@@ -172,7 +172,7 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
 
                 // When drawing the fill, we want to draw a buffer around too, so we
                 // essentially downscale everyting, and then upscale it later when rendering.
-                const int buffer = prerender.buffer * 4096.0f;
+                const int buffer = rasterize.buffer * 4096.0f;
                 const mat4 vtxMatrix = [&]{
                     mat4 vtxMatrix;
                     matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
@@ -186,8 +186,8 @@ void Painter::renderFill(FillBucket& bucket, const std::string& layer_name, cons
                 setTranslucent();
                 renderFill(bucket, modifiedProperties, id, vtxMatrix);
 
-                if (prerender.blur > 0) {
-                    bucket.prerendered->blur(*this, prerender.blur);
+                if (rasterize.blur > 0) {
+                    bucket.prerendered->blur(*this, rasterize.blur);
                 }
 
                 // RESET STATE

@@ -11,17 +11,17 @@
 namespace llmr {
 
 struct FrameSnapshot {
-    explicit inline FrameSnapshot(time timestamp, float z) : timestamp(timestamp), z(z) {}
-    float timestamp;
+    explicit inline FrameSnapshot(timestamp t, float z) : t(t), z(z) {}
+    float t;
     float z;
 };
 
 class FrameHistory {
 public:
     // Record frame history that will be used to calculate fading params
-    void record(time now, float zoom);
+    void record(timestamp now, float zoom);
 
-    bool needsAnimation(time duration) const;
+    bool needsAnimation(timestamp duration) const;
 
 public:
     std::deque<FrameSnapshot> history;

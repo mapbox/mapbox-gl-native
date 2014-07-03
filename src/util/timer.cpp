@@ -18,7 +18,7 @@ timer::timer(const std::string &name) : name(name), start(now()) {
 }
 
 void timer::report(const std::string &name) {
-    time duration = now() - start;
+    timestamp duration = now() - start;
     std::cerr << std::string((indent - 1) * 4, ' ')
               << name << ": "
               << (double)(duration) / 1_millisecond

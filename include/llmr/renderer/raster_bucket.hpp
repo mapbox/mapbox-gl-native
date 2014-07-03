@@ -2,7 +2,6 @@
 #define LLMR_RENDERER_RASTERBUCKET
 
 #include <llmr/renderer/bucket.hpp>
-#include <llmr/style/bucket_description.hpp>
 #include <llmr/util/raster.hpp>
 
 namespace llmr {
@@ -15,7 +14,7 @@ class RasterBucket : public Bucket {
 public:
     RasterBucket(const std::shared_ptr<Texturepool> &texturepool);
 
-    virtual void render(Painter& painter, const std::string& layer_name, const Tile::ID& id);
+    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
     virtual bool hasData() const;
 
     bool setImage(const std::string &data);
