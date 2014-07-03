@@ -19,7 +19,7 @@ class Sprite;
 class Source;
 class StyleLayer;
 class StyleLayerGroup;
-class BackgroundProperties;
+struct BackgroundProperties;
 
 class Style {
 public:

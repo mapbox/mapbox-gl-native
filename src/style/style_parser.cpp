@@ -229,13 +229,13 @@ template <typename T>
 std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
     if (!value.HasMember("fn")) {
         fprintf(stderr, "[WARNING] function must specify a function name\n");
-        return false;
+        return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
     }
 
     JSVal value_fn = value["fn"];
     if (!value_fn.IsString()) {
         fprintf(stderr, "[WARNING] function must specify a function type\n");
-        return false;
+        return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
     }
 
     const std::string type { value_fn.GetString(), value_fn.GetStringLength() };
@@ -243,45 +243,45 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
     if (type == "linear") {
         if (!value.HasMember("z")) {
             fprintf(stderr, "[WARNING] linear function must specify a base zoom level\n");
-            return false;
+            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
         if (!value.HasMember("val")) {
             fprintf(stderr, "[WARNING] linear function must specify a base value\n");
-            return false;
+            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
         const float z_base = parseFunctionArgument<float>(value["z"]);
         const T val = parseFunctionArgument<T>(value["val"]);
         const float slope = value.HasMember("slope") ? parseFunctionArgument<float>(value["slope"]) : 1;
         const T min = value.HasMember("min") ? parseFunctionArgument<T>(value["min"]) : T();
         const T max = value.HasMember("max") ? parseFunctionArgument<T>(value["max"]) : T();
-        return { true, LinearFunction<T>(val, z_base, slope, min, max) };
+        return std::tuple<bool, Function<T>> { true, LinearFunction<T>(val, z_base, slope, min, max) };
     }
     else if (type == "exponential") {
         if (!value.HasMember("z")) {
             fprintf(stderr, "[WARNING] exponential function must specify a base zoom level\n");
-            return false;
+            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
         if (!value.HasMember("val")) {
             fprintf(stderr, "[WARNING] exponential function must specify a base value\n");
-            return false;
+            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
         const float z_base = parseFunctionArgument<float>(value["z"]);
         const T val = parseFunctionArgument<T>(value["val"]);
         const float slope = value.HasMember("slope") ? parseFunctionArgument<float>(value["slope"]) : 1;
         const T min = value.HasMember("min") ? parseFunctionArgument<T>(value["min"]) : T();
         const T max = value.HasMember("max") ? parseFunctionArgument<T>(value["max"]) : T();
-        return { true, ExponentialFunction<T>(val, z_base, slope, min, max) };
+        return std::tuple<bool, Function<T>> { true, ExponentialFunction<T>(val, z_base, slope, min, max) };
     }
     else if (type == "stops") {
         if (!value.HasMember("stops")) {
             fprintf(stderr, "[WARNING] stops function must specify a stops array\n");
-            return false;
+            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
 
         JSVal value_stops = value["stops"];
         if (!value_stops.IsArray()) {
             fprintf(stderr, "[WARNING] stops function must specify a stops array\n");
-            return false;
+            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
 
         std::vector<std::pair<float, T>> stops;
@@ -290,28 +290,29 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
             if (stop.IsArray()) {
                 if (stop.Size() != 2) {
                     fprintf(stderr, "[WARNING] stop must have zoom level and value specification\n");
+                    return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
                 }
 
                 JSVal z = stop[rapidjson::SizeType(0)];
                 if (!z.IsNumber()) {
                     fprintf(stderr, "[WARNING] zoom level in stop must be a number\n");
-                    return false;
+                    return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
                 }
 
                 stops.emplace_back(z.GetDouble(), parseFunctionArgument<T>(stop[rapidjson::SizeType(1)]));
             } else {
                 fprintf(stderr, "[WARNING] function argument must be a numeric value\n");
-                return false;
+                return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
             }
         }
 
-        return { true, StopsFunction<T>(stops) };
+        return std::tuple<bool, Function<T>> { true, StopsFunction<T>(stops) };
     }
     else {
         fprintf(stderr, "[WARNING] function type '%s' is unknown\n", type.c_str());
     }
 
-    return false;
+    return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
 }
 
 
@@ -370,28 +371,28 @@ bool StyleParser::parseOptionalProperty(const char *property_name, T &target, JS
 template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-        return false;
+        return std::tuple<bool, std::string> { false, std::string() };
     }
 
-    return { true, std::string { value.GetString(), value.GetStringLength() } };
+    return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
 }
 
 template<> std::tuple<bool, TranslateAnchorType> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-        return false;
+        return std::tuple<bool, TranslateAnchorType> { false, TranslateAnchorType::Default };
     }
 
-    return { true, parseTranslateAnchorType({ value.GetString(), value.GetStringLength() }) };
+    return std::tuple<bool, TranslateAnchorType> { true, parseTranslateAnchorType({ value.GetString(), value.GetStringLength() }) };
 }
 
 template<> std::tuple<bool, RotateAnchorType> StyleParser::parseProperty<RotateAnchorType>(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-        return false;
+        return std::tuple<bool, RotateAnchorType> { false, RotateAnchorType::Default };
     }
 
-    return { true, parseRotateAnchorType({ value.GetString(), value.GetStringLength() }) };
+    return std::tuple<bool, RotateAnchorType> { true, parseRotateAnchorType({ value.GetString(), value.GetStringLength() }) };
 }
 
 template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal value, const char *property_name) {
@@ -406,22 +407,22 @@ template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal
     }
 
     if (transition.duration == 0 && transition.delay == 0) {
-        return false;
+        return std::tuple<bool, PropertyTransition> { false, std::move(transition) };
     }
 
-    return { true, std::move(transition) };
+    return std::tuple<bool, PropertyTransition> { true, std::move(transition) };
 }
 
 template<> std::tuple<bool, Function<bool>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (value.IsObject()) {
         return parseFunction<bool>(value);
     } else if (value.IsNumber()) {
-        return { true, ConstantFunction<bool>(value.GetDouble()) };
+        return std::tuple<bool, Function<bool>> { true, ConstantFunction<bool>(value.GetDouble()) };
     } else if (value.IsBool()) {
-        return { true, ConstantFunction<bool>(value.GetBool()) };
+        return std::tuple<bool, Function<bool>> { true, ConstantFunction<bool>(value.GetBool()) };
     } else {
         fprintf(stderr, "[WARNING] value of '%s' must be convertible to boolean, or a boolean function\n", property_name);
-        return false;
+        return std::tuple<bool, Function<bool>> { false, ConstantFunction<bool>(false) };
     }
 }
 
@@ -429,13 +430,12 @@ template<> std::tuple<bool, Function<float>> StyleParser::parseProperty(JSVal va
     if (value.IsObject()) {
         return parseFunction<float>(value);
     } else if (value.IsNumber()) {
-        return { true, ConstantFunction<float>(value.GetDouble()) };
+        return std::tuple<bool, Function<float>> { true, ConstantFunction<float>(value.GetDouble()) };
     } else if (value.IsBool()) {
-        return { true, ConstantFunction<float>(value.GetBool()) };
-        return true;
+        return std::tuple<bool, Function<float>> { true, ConstantFunction<float>(value.GetBool()) };
     } else {
         fprintf(stderr, "[WARNING] value of '%s' must be a number, or a number function\n", property_name);
-        return false;
+        return std::tuple<bool, Function<float>> { false, ConstantFunction<float>(0) };
     }
 }
 
@@ -443,10 +443,10 @@ template<> std::tuple<bool, Function<Color>> StyleParser::parseProperty(JSVal va
     if (value.IsObject()) {
         return parseFunction<Color>(value);
     } else if (value.IsString()) {
-        return { true, ConstantFunction<Color>(parseColor(value)) };
+        return std::tuple<bool, Function<Color>> { true, ConstantFunction<Color>(parseColor(value)) };
     } else {
         fprintf(stderr, "[WARNING] value of '%s' must be a color, or a color function\n", property_name);
-        return false;
+        return std::tuple<bool, Function<Color>> { false, ConstantFunction<Color>(Color {{ 0, 0, 0, 0 }}) };
     }
 }
 
