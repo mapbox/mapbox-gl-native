@@ -1239,19 +1239,6 @@ module.exports = {
       "line-width": 0.8
     }
   }, {
-    "id": "road_major_rail_hatching",
-    "ref": "road_major_rail",
-    "style": {
-      "line-color": "#c8c4c0",
-      "line-dasharray": [2, 31],
-      "line-width": 5
-    },
-    "style.night": {
-      "line-color": "#c8c4c0",
-      "line-dasharray": [2, 31],
-      "line-width": 5
-    }
-  }, {
     "id": "road_motorway_link_casing",
     "source": "mapbox",
     "source-layer": "road",
@@ -1646,19 +1633,6 @@ module.exports = {
       "line-color": "#876",
       "line-opacity": 0.5,
       "line-width": "@aerialway_width"
-    }
-  }, {
-    "id": "road_major_rail_hatching",
-    "ref": "road_major_rail",
-    "style": {
-      "line-color": "#c8c4c0",
-      "line-dasharray": [2, 31],
-      "line-width": 5
-    },
-    "style.night": {
-      "line-color": "#c8c4c0",
-      "line-dasharray": [2, 31],
-      "line-width": 5
     }
   }, {
     "id": "admin_l3",
