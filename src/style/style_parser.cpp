@@ -890,6 +890,7 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
 
         parseRenderProperty(value, render.field, "text-field");
         parseRenderProperty(value, render.path, "text-path", parseTextPathType);
+        parseRenderProperty(value, render.transform, "text-transform", parseTextTransformType);
         parseRenderProperty(value, render.font, "text-font");
         parseRenderProperty(value, render.max_size, "text-max-size");
         if (parseRenderProperty(value, render.max_width, "text-max-width")) {
