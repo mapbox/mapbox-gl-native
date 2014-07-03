@@ -8,9 +8,6 @@
 namespace llmr {
 
 typedef util::variant<
-    bool,
-    float,
-    Color,
     std::string,
     TranslateAnchorType,
     RotateAnchorType,
