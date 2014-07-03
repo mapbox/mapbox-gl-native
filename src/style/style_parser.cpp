@@ -501,7 +501,7 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
 
         const std::string layer_id = { id.GetString(), id.GetStringLength() };
 
-        if (existing_layer_ids.find(layer_id) != existing_layer_ids.end()) {
+        if (layers.find(layer_id) != layers.end()) {
             fprintf(stderr, "[WARNING] duplicate layer id %s\n", layer_id.c_str());
             return nullptr;
         }

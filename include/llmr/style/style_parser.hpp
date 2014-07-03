@@ -102,9 +102,6 @@ private:
     // This maps ids to Layer objects, with all items being at the root level.
     std::unordered_map<std::string, std::pair<JSVal, std::shared_ptr<StyleLayer>>> layers;
 
-    // Layer IDs that we have encountered previously while parsing this stylesheet.
-    std::set<std::string> existing_layer_ids;
-
     // Store a stack of layers we're parsing right now. This is to prevent reference cycles.
     std::forward_list<StyleLayer *> stack;
 
