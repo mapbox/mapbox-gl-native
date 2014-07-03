@@ -40,6 +40,7 @@ class StyleBucketText {
 public:
     std::string field;
     TextPathType path = TextPathType::Default;
+    TextTransformType transform = TextTransformType::Default;
     std::string font;
     float max_size = 16.0f;
     float max_width = 15.0f * 24;

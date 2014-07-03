@@ -19,6 +19,8 @@
 #include <llmr/util/std.hpp>
 #include <llmr/util/utf.hpp>
 
+#include <locale>
+
 #ifdef __linux__
 #include <boost/regex.hpp>
 namespace regex_impl = boost;
@@ -208,8 +210,16 @@ std::unique_ptr<Bucket> TileParser::createTextBucket(const VectorTileLayer& laye
                 return nullptr;
             VectorTileFeature feature{feature_pbf, layer};
 
-            const std::u32string string = ucs4conv.convert(
-                util::replaceTokens(properties.field, feature.properties));
+            std::string u8string = util::replaceTokens(properties.field, feature.properties);
+
+            auto& convert = std::use_facet<std::ctype<char>>(std::locale());
+            if (properties.transform == TextTransformType::Uppercase) {
+                convert.toupper(&u8string[0], &u8string[0] + u8string.size());
+            } else if (properties.transform == TextTransformType::Lowercase) {
+                convert.tolower(&u8string[0], &u8string[0] + u8string.size());
+            }
+
+            std::u32string string = ucs4conv.convert(u8string);
 
             // Loop through all characters of this text and collect unique codepoints.
             for (char32_t chr : string) {
