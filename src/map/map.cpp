@@ -378,6 +378,14 @@ bool Map::getDebug() const {
     return debug;
 }
 
+void Map::setAppliedClasses(const std::vector<std::string> &classes) {
+    style->setAppliedClasses(classes);
+    if (style->hasTransitions()) {
+        update();
+    }
+}
+
+
 void Map::toggleClass(const std::string &name) {
     style->toggleClass(name);
     if (style->hasTransitions()) {

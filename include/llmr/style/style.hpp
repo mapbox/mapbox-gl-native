@@ -37,6 +37,7 @@ public:
 
     const std::set<std::shared_ptr<Source>> getActiveSources() const;
 
+    void setAppliedClasses(const std::vector<std::string> &classes);
     const std::vector<std::string> &getAppliedClasses() const;
     void toggleClass(const std::string &name);
 

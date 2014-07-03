@@ -63,6 +63,11 @@ const std::vector<std::string> &Style::getAppliedClasses() const {
     return appliedClasses;
 }
 
+void Style::setAppliedClasses(const std::vector<std::string> &classes) {
+    appliedClasses = classes;
+    updateClasses();
+}
+
 void Style::toggleClass(const std::string &name) {
     if (name.length()) {
         auto it = std::find(appliedClasses.begin(), appliedClasses.end(), name);
