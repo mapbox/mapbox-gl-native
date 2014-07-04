@@ -24,6 +24,19 @@ struct Response {
     std::function<void(Response *)> callback;
 };
 
+enum MapChange : uint8_t {
+    MapChangeRegionWillChange = 0,
+    MapChangeRegionWillChangeAnimated = 1,
+    MapChangeRegionDidChange = 2,
+    MapChangeRegionDidChangeAnimated = 3,
+    MapChangeWillStartLoadingMap = 4,
+    MapChangeDidFinishLoadingMap = 5,
+    MapChangeDidFailLoadingMap = 6,
+    MapChangeWillStartRenderingMap = 7,
+    MapChangeDidFinishRenderingMap = 8,
+    MapChangeDidFinishRenderingMapFullyRendered = 9
+};
+
 // Makes an HTTP request of a URL, preferrably on a background thread, and calls a function with the
 // results in the original thread (which runs the libuv loop).
 // If the loop pointer is NULL, the callback function will be called on an arbitrary thread.
