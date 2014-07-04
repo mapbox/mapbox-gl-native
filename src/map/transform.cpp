@@ -28,6 +28,8 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
     if (final.width != w || final.height != h || final.pixelRatio != ratio ||
         final.framebuffer[0] != fb_w || final.framebuffer[1] != fb_h) {
 
+        platform::notify_map_change(platform::MapChangeRegionWillChange);
+
         current.width = final.width = w;
         current.height = final.height = h;
         current.pixelRatio = final.pixelRatio = ratio;
@@ -35,7 +37,9 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         current.framebuffer[1] = final.framebuffer[1] = fb_h;
         if (!canRotate() && current.angle) _setAngle(0);
         constrain(current.scale, current.y);
-        platform::notify_map_change();
+
+        platform::notify_map_change(platform::MapChangeRegionDidChange);
+
         return true;
     } else {
         return false;
@@ -76,7 +80,9 @@ void Transform::_moveBy(const double dx, const double dy, const timestamp durati
             std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
     }
 
-    platform::notify_map_change();
+    platform::notify_map_change(duration ?
+                                platform::MapChangeRegionDidChangeAnimated :
+                                platform::MapChangeRegionDidChange);
 }
 
 void Transform::setLonLat(const double lon, const double lat, const timestamp duration) {
@@ -294,7 +300,9 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     Bc = s / 360;
     Cc = s / (2 * M_PI);
 
-    platform::notify_map_change();
+    platform::notify_map_change(duration ?
+                                platform::MapChangeRegionDidChangeAnimated :
+                                platform::MapChangeRegionDidChange);
 }
 
 #pragma mark - Constraints
@@ -388,7 +396,9 @@ void Transform::_setAngle(double new_angle, const timestamp duration) {
             current.angle, final.angle, current.angle, start, duration));
     }
 
-    platform::notify_map_change();
+    platform::notify_map_change(duration ?
+                                platform::MapChangeRegionDidChangeAnimated :
+                                platform::MapChangeRegionDidChange);
 }
 
 double Transform::getAngle() const {
