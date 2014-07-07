@@ -16,10 +16,9 @@
                         ],
                     },
                 }, {
-                    # TODO: add OpenGL link settings for linux
                     'link_settings': {
                         'libraries': [
-                          '<@(glfw3_libraries)',
+                          '<@(glfw3_libraries)', # This is a hack since we're not actually using GLFW
                           '-lboost_regex',
                         ],
                     },
@@ -167,6 +166,7 @@
           "variant",
           "tile",
           "functions",
+          "headless",
         ],
     }
   ]
