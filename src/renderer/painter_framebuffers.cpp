@@ -7,11 +7,7 @@ using namespace llmr;
 
 
 void Painter::clearFramebuffers() {
-#if TARGET_OS_IPHONE
-    glBindFramebuffer(GL_FRAMEBUFFER, 1);
-#else
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-#endif
+    glBindFramebuffer(GL_FRAMEBUFFER, map.view.root_fbo());
 
     // Delete any framebuffers that we might have allocated
     glDeleteTextures((int)fbos_color.size(), fbos.data());
@@ -28,11 +24,7 @@ void Painter::clearFramebuffers() {
 
 void Painter::bindFramebuffer() {
     if (fbo_level < 0) {
-#if TARGET_OS_IPHONE
-        glBindFramebuffer(GL_FRAMEBUFFER, 1);
-#else
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-#endif
+        glBindFramebuffer(GL_FRAMEBUFFER, map.view.root_fbo());
     } else if (fbos.size() > (size_t) fbo_level) {
         GLuint fbo = fbos[fbo_level];
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);

@@ -150,8 +150,10 @@ private:
     // ready for rendering.
     std::atomic_flag is_rendered = ATOMIC_FLAG_INIT;
 
-private:
+public:
     View &view;
+
+private:
     Transform transform;
     TransformState state;
 

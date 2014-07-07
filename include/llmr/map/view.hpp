@@ -20,6 +20,12 @@ public:
     // renderer setup since the render thread doesn't switch the contexts.
     virtual void make_active() = 0;
 
+    // Returns the base framebuffer object, if any, and 0 if using the system
+    // provided framebuffer.
+    virtual unsigned int root_fbo() {
+        return 0;
+    }
+
 protected:
     llmr::Map *map = nullptr;
 };
