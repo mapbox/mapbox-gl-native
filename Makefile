@@ -29,13 +29,11 @@ test: build/test/Makefile
 
 # Runs all test cases
 run-tests: test
-	@for FILE in build/$(BUILDTYPE)/test_*; do \
-		$${FILE}; \
-	done
+	(cd build/${BUILDTYPE} && exec find . -maxdepth 1 -name "test_*" -exec {} \;)
 
 test/%: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
-	(cd build/$(BUILDTYPE) && ./test_$*)
+	(cd build/$(BUILDTYPE) && exec ./test_$*)
 
 
 ##### Makefile builds ##########################################################
