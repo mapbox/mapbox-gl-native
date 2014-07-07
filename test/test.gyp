@@ -138,6 +138,8 @@
         "sources": [
             "./main.cpp",
             "./headless.cpp",
+            "../common/headless_view.hpp",
+            "../common/headless_view.cpp",
             "../common/curl_request.hpp",
             "../common/curl_request.cpp",
         ],
