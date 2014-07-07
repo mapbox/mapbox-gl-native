@@ -52,6 +52,13 @@ enum class TextPathType : uint8_t {
     Default = Horizontal
 };
 
+enum class TextTransformType : uint8_t {
+    None,
+    Uppercase,
+    Lowercase,
+    Default = None
+};
+
 enum class TranslateAnchorType : uint8_t {
     Map,
     Viewport,
@@ -97,6 +104,12 @@ inline TextPathType parseTextPathType(const std::string &path) {
     if (path == "curve") return TextPathType::Curve;
     return TextPathType::Default;
 }
+
+inline TextTransformType parseTextTransformType(const std::string& transform) {
+    if (transform == "uppercase") return TextTransformType::Uppercase;
+    if (transform == "lowercase") return TextTransformType::Lowercase;
+    return TextTransformType::Default;
+};
 
 inline TranslateAnchorType parseTranslateAnchorType(const std::string &anchor) {
     if (anchor == "map") return TranslateAnchorType::Map;

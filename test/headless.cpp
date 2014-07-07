@@ -15,7 +15,7 @@
 namespace llmr {
 namespace platform {
 
-void notify_map_change() {
+void notify_map_change(MapChange change) {
     // no-op
 }
 

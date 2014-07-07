@@ -281,7 +281,7 @@ void show_color_debug_image(std::string name, const char *data, size_t logical_w
 }
 #endif
 
-void notify_map_change() {
+void notify_map_change(MapChange change) {
     // no-op
 }
 
