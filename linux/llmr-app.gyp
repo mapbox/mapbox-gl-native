@@ -51,34 +51,9 @@
       ],
       'dependencies': [
         '../llmr.gyp:llmr-x86',
-        'default_stylesheet',
-        'certificate_bundle',
+        '../llmr.gyp:copy_default_stylesheet',
+        '../llmr.gyp:copy_certificate_bundle',
       ],
     },
-    {
-      'target_name': 'default_stylesheet',
-      'type': 'none',
-      'hard_dependency': 1,
-      'dependencies': [
-        '../llmr.gyp:build_stylesheet'
-      ],
-      'copies': [
-        {
-          'files': [ '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js' ],
-          'destination': '<(PRODUCT_DIR)'
-        }
-      ]
-    },
-    {
-      'target_name': 'certificate_bundle',
-      'type': 'none',
-      'hard_dependency': 1,
-      'copies': [
-        {
-          'files': [ '../common/ca-bundle.crt' ],
-          'destination': '<(PRODUCT_DIR)'
-        }
-      ]
-    }
   ],
 }

@@ -4,13 +4,11 @@ os:
  - linux
 
 compiler:
- - gcc
  - clang
 
 env:
   matrix:
    - BUILDTYPE=Release
-   - BUILDTYPE=Debug
 
 before_install:
 - source ./scripts/setup_travis.sh
@@ -22,8 +20,9 @@ before_script:
 - rm -rf mapnik-packaging/out/packages
 
 script:
-- make linux BUILDTYPE=${BUILDTYPE}
-- make run-tests BUILDTYPE=${BUILDTYPE}
+- export DISPLAY=":0.0"
+- xhost +
+- make test/headless BUILDTYPE=${BUILDTYPE}
 
 notifications:
   hipchat:
