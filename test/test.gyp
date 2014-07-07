@@ -16,7 +16,12 @@
                         ],
                     },
                 }, {
-                    # TODO: add OpenGL link settings for linux
+                    'link_settings': {
+                        'libraries': [
+                          '<@(glfw3_libraries)', # This is a hack since we're not actually using GLFW
+                          '-lboost_regex',
+                        ],
+                    },
                 }],
             ],
         },
@@ -148,6 +153,8 @@
             "../llmr.gyp:llmr-x86",
             "link_gl",
             "link_curl",
+            '../llmr.gyp:copy_default_stylesheet',
+            '../llmr.gyp:copy_certificate_bundle',
         ]
     },
     {
@@ -159,6 +166,7 @@
           "variant",
           "tile",
           "functions",
+          "headless",
         ],
     }
   ]

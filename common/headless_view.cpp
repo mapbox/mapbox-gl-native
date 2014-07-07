@@ -39,8 +39,12 @@ HeadlessView::HeadlessView() {
     }
 #endif
 
- #ifdef USE_GLX
+#if LLMR_USE_GLX
     x_display = XOpenDisplay(0);
+
+    if (x_display == nullptr) {
+        throw std::runtime_error("Failed to open X display");
+    }
 
     static int pixelFormat[] = {
         GLX_RGBA,
@@ -55,10 +59,16 @@ HeadlessView::HeadlessView() {
     };
 
     x_info = glXChooseVisual(x_display, DefaultScreen(x_display), pixelFormat);
-    gl_context = glXCreateContext(display, x_info, 0, GL_TRUE);
-  #endif
 
-    make_active();
+    if (x_info == nullptr) {
+        throw std::runtime_error("Error pixel format");
+    }
+
+    gl_context = glXCreateContext(x_display, x_info, 0, GL_TRUE);
+    if (gl_context == nullptr) {
+        throw std::runtime_error("Error creating GL context object");
+    }
+#endif
 }
 
 
@@ -66,6 +76,8 @@ void HeadlessView::resize(int width, int height) {
     clear_buffers();
 
 #if LLMR_USE_CGL
+    make_active();
+
     // Create depth/stencil buffer
     glGenRenderbuffersEXT(1, &fbo_depth_stencil);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo_depth_stencil);
@@ -99,8 +111,10 @@ void HeadlessView::resize(int width, int height) {
 #endif
 
 #if LLMR_USE_GLX
-    x_pixmap = XCreatePixmap(display, DefaultRootWindow(display), width, height, 32);
-    glx_pixmap = glXCreateGLXPixmap(display, x_info, x_pixmap);
+    x_pixmap = XCreatePixmap(x_display, DefaultRootWindow(x_display), width, height, 32);
+    glx_pixmap = glXCreateGLXPixmap(x_display, x_info, x_pixmap);
+
+    make_active();
 #endif
 
 }
@@ -128,12 +142,12 @@ void HeadlessView::clear_buffers() {
 #if LLMR_USE_GLX
     if (glx_pixmap) {
         glXDestroyGLXPixmap(x_display, glx_pixmap);
-        glx_pixmap = nullptr;
+        glx_pixmap = 0;
     }
 
     if (x_pixmap) {
         XFreePixmap(x_display, x_pixmap);
-        x_pixmap = nullptr;
+        x_pixmap = 0;
     }
 #endif
 }
@@ -155,7 +169,7 @@ void HeadlessView::make_active() {
 #endif
 
 #if LLMR_USE_GLX
-    if (!glXMakeCurrent(display, glx_pixmap, gl_context)) {
+    if (!glXMakeCurrent(x_display, glx_pixmap, gl_context)) {
         fprintf(stderr, "Switching OpenGL context failed\n");
     }
 #endif
