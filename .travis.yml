@@ -20,9 +20,6 @@ before_script:
 - rm -rf mapnik-packaging/out/packages
 
 script:
-- sudo startx
-- export DISPLAY=":0.0"
-- xhost +
 - make test/headless BUILDTYPE=${BUILDTYPE}
 
 notifications:
