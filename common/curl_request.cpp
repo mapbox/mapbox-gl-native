@@ -311,6 +311,7 @@ void async_add_cb(uv_async_t * /*async*/) {
         ((CURLRequest *)req->get())->curl = handle;
 
         curl_easy_setopt(handle, CURLOPT_PRIVATE, req);
+        curl_easy_setopt(handle, CURLOPT_CAINFO, "ca-bundle.crt");
         curl_easy_setopt(handle, CURLOPT_URL, (*req)->url.c_str());
         curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
         curl_easy_setopt(handle, CURLOPT_WRITEDATA, &(*req)->res->body);

@@ -36,7 +36,8 @@ void Sprite::load(const std::string& base_url) {
             sprite->body.swap(res->body);
             sprite->asyncParseJSON();
         } else {
-            fprintf(stderr, "failed to load sprite\n");
+            fprintf(stderr, "failed to load sprite info\n");
+            fprintf(stderr, "error %d: %s\n", res->code, res->error_message.c_str());
         }
     }, map.getLoop());
 
@@ -46,6 +47,7 @@ void Sprite::load(const std::string& base_url) {
              sprite->asyncParseImage();
         } else {
             fprintf(stderr, "failed to load sprite image\n");
+            fprintf(stderr, "error %d: %s\n", res->code, res->error_message.c_str());
         }
     }, map.getLoop());
 }

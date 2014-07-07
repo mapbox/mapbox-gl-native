@@ -52,6 +52,7 @@
       'dependencies': [
         '../llmr.gyp:llmr-x86',
         'default_stylesheet',
+        'certificate_bundle',
       ],
     },
     {
@@ -64,6 +65,17 @@
       'copies': [
         {
           'files': [ '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js' ],
+          'destination': '<(PRODUCT_DIR)'
+        }
+      ]
+    },
+    {
+      'target_name': 'certificate_bundle',
+      'type': 'none',
+      'hard_dependency': 1,
+      'copies': [
+        {
+          'files': [ '../common/ca-bundle.crt' ],
           'destination': '<(PRODUCT_DIR)'
         }
       ]
