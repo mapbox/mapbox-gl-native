@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <map>
+#include <string>
 #include <unordered_map>
 #include <vector>
 #include <set>
@@ -39,7 +40,6 @@ public:
 
     void setAppliedClasses(const std::vector<std::string> &classes);
     const std::vector<std::string> &getAppliedClasses() const;
-    void setAppliedClasses(std::vector<std::string> &class_names);
     void toggleClass(const std::string &name);
 
     // Updates the styling information to reflect the current array
