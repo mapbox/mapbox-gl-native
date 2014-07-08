@@ -15,6 +15,11 @@
                             '-framework OpenGL',
                         ],
                     },
+                    'xcode_settings': {
+                        'OTHER_LDFLAGS': [
+                            '-framework OpenGL',
+                        ],
+                    },
                 }, {
                     'link_settings': {
                         'libraries': [
@@ -145,16 +150,13 @@
             "./headless.cpp",
             "../common/headless_view.hpp",
             "../common/headless_view.cpp",
-            "../common/curl_request.hpp",
-            "../common/curl_request.cpp",
+            "./fixtures/fixture_request.cpp",
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
             "../llmr.gyp:llmr-x86",
             "link_gl",
-            "link_curl",
             '../llmr.gyp:copy_default_stylesheet',
-            '../llmr.gyp:copy_certificate_bundle',
         ]
     },
     {

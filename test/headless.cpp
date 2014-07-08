@@ -10,9 +10,15 @@
 #include <iostream>
 #include <fstream>
 
+const std::string basename = []{
+    std::string basename = __FILE__;
+    basename.erase(basename.find_last_of("/"));
+    return basename;
+}();
+
 TEST(Headless, initialize) {
-    const int width = 1024;
-    const int height = 768;
+    const unsigned int width = 1024;
+    const unsigned int height = 768;
 
     llmr::util::timer timer;
 
@@ -32,11 +38,11 @@ TEST(Headless, initialize) {
 
     map.setStyleJSON(stylejson.str());
 
+    timer.report("map style");
+
     map.setLonLatZoom(0, 0, 2);
     map.setAngle(0);
     map.setDebug(false);
-
-    timer.report("map style");
 
     // Run the loop. It will terminate when we don't have any further listeners.
     map.run();
@@ -47,17 +53,18 @@ TEST(Headless, initialize) {
 
     glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
-    timer.report("gl readpixels");
-
     std::string result = llmr::util::compress_png(width, height, pixels, true);
-
-    timer.report("compress png");
-
     llmr::util::write_file("out.png", result);
 
-    timer.report("save file");
+    std::ifstream imagefile(basename + "/fixtures/result/out.png");
+    ASSERT_TRUE(imagefile.good());
+    std::stringstream image;
+    image << imagefile.rdbuf();
+    llmr::util::Image reference(image.str(), true);
+
+    ASSERT_EQ(reference.getWidth(), width);
+    ASSERT_EQ(reference.getHeight(), height);
+    ASSERT_EQ(0, std::memcmp(pixels, reference.getData(), width * height * 4));
 
     delete[] pixels;
-
-    timer.report("destruct");
 }

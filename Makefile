@@ -35,6 +35,10 @@ test/%: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
 	(cd build/$(BUILDTYPE) && exec ./test_$*)
 
+# build Mac OS X project for Xcode
+xtest: config.gypi clear_xcode_cache node
+	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build -f xcode
+	open ./build/test/test.xcodeproj
 
 ##### Makefile builds ##########################################################
 

@@ -13,7 +13,7 @@ std::string compress_png(int width, int height, void *rgba, bool flip = false);
 
 class Image {
 public:
-    Image(const std::string &img);
+    Image(const std::string &img, bool flip = false);
     ~Image();
 
     inline const char *getData() const { return img; }
