@@ -13,6 +13,7 @@ void notify_map_change(MapChange change) {
 }
 
 HeadlessView::HeadlessView() {
+#if LLMR_USE_CGL
     // TODO: test if OpenGL 4.1 with GL_ARB_ES2_compatibility is supported
     // If it is, use kCGLOGLPVersion_3_2_Core and enable that extension.
     CGLPixelFormatAttribute attributes[] = {
@@ -36,13 +37,46 @@ HeadlessView::HeadlessView() {
         fprintf(stderr, "Error creating GL context object\n");
         return;
     }
+#endif
 
-    make_active();
+#if LLMR_USE_GLX
+    x_display = XOpenDisplay(0);
+
+    if (x_display == nullptr) {
+        throw std::runtime_error("Failed to open X display");
+    }
+
+    static int pixelFormat[] = {
+        GLX_RGBA,
+        GLX_DOUBLEBUFFER,
+        GLX_RED_SIZE, 8,
+        GLX_GREEN_SIZE, 8,
+        GLX_BLUE_SIZE, 8,
+        GLX_ALPHA_SIZE, 8,
+        GLX_DEPTH_SIZE, 24,
+        GLX_STENCIL_SIZE, 8,
+        None
+    };
+
+    x_info = glXChooseVisual(x_display, DefaultScreen(x_display), pixelFormat);
+
+    if (x_info == nullptr) {
+        throw std::runtime_error("Error pixel format");
+    }
+
+    gl_context = glXCreateContext(x_display, x_info, 0, GL_TRUE);
+    if (gl_context == nullptr) {
+        throw std::runtime_error("Error creating GL context object");
+    }
+#endif
 }
 
 
 void HeadlessView::resize(int width, int height) {
     clear_buffers();
+
+#if LLMR_USE_CGL
+    make_active();
 
     // Create depth/stencil buffer
     glGenRenderbuffersEXT(1, &fbo_depth_stencil);
@@ -74,9 +108,19 @@ void HeadlessView::resize(int width, int height) {
         }
         return;
     }
+#endif
+
+#if LLMR_USE_GLX
+    x_pixmap = XCreatePixmap(x_display, DefaultRootWindow(x_display), width, height, 32);
+    glx_pixmap = glXCreateGLXPixmap(x_display, x_info, x_pixmap);
+
+    make_active();
+#endif
+
 }
 
 void HeadlessView::clear_buffers() {
+#if LLMR_USE_CGL
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
     if (fbo) {
@@ -93,24 +137,52 @@ void HeadlessView::clear_buffers() {
         glDeleteRenderbuffersEXT(1, &fbo_depth_stencil);
         fbo_depth_stencil = 0;
     }
+#endif
+
+#if LLMR_USE_GLX
+    if (glx_pixmap) {
+        glXDestroyGLXPixmap(x_display, glx_pixmap);
+        glx_pixmap = 0;
+    }
+
+    if (x_pixmap) {
+        XFreePixmap(x_display, x_pixmap);
+        x_pixmap = 0;
+    }
+#endif
 }
 
 HeadlessView::~HeadlessView() {
     clear_buffers();
+
+#if LLMR_USE_CGL
     CGLDestroyContext(gl_context);
+#endif
 }
 
 void HeadlessView::make_active() {
+#if LLMR_USE_CGL
     CGLError error = CGLSetCurrentContext(gl_context);
     if (error) {
         fprintf(stderr, "Switching OpenGL context failed\n");
     }
+#endif
+
+#if LLMR_USE_GLX
+    if (!glXMakeCurrent(x_display, glx_pixmap, gl_context)) {
+        fprintf(stderr, "Switching OpenGL context failed\n");
+    }
+#endif
 }
 
 void HeadlessView::swap() {}
 
 unsigned int HeadlessView::root_fbo() {
+#if LLMR_USE_CGL
     return fbo;
+#endif
+
+    return 0;
 }
 
 }

@@ -78,6 +78,31 @@
       }
     },
     {
+      'target_name': 'copy_default_stylesheet',
+      'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [
+        'build_stylesheet'
+      ],
+      'copies': [
+        {
+          'files': [ '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js' ],
+          'destination': '<(PRODUCT_DIR)'
+        }
+      ]
+    },
+    {
+      'target_name': 'copy_certificate_bundle',
+      'type': 'none',
+      'hard_dependency': 1,
+      'copies': [
+        {
+          'files': [ 'common/ca-bundle.crt' ],
+          'destination': '<(PRODUCT_DIR)'
+        }
+      ]
+    },
+    {
       'target_name': 'llmr-x86',
       'product_name': 'llmr-x86',
       'type': 'static_library',

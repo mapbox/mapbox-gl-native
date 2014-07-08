@@ -22,6 +22,9 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     sudo apt-get -y install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config
     sudo apt-get -y install libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev
 
+    export DISPLAY=:99.0
+    sh -e /etc/init.d/xvfb start
+
     # use g++ that supports c++11
     if [[ ${CXX} == "g++" ]]; then
         export CXX="g++-4.8" ;
