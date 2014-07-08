@@ -4,6 +4,7 @@
 #include <llmr/style/style_bucket.hpp>
 #include <llmr/util/constants.hpp>
 #include <llmr/util/time.hpp>
+#include <llmr/util/error.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
@@ -102,6 +103,9 @@ void Style::loadJSON(const uint8_t *const data) {
 
     rapidjson::Document doc;
     doc.Parse<0>((const char *const)data);
+    if (doc.HasParseError()) {
+        throw error::style_parse(doc.GetErrorOffset(), doc.GetParseError());
+    }
 
     StyleParser parser;
     parser.parse(const_cast<const rapidjson::Document &>(doc));
