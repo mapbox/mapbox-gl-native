@@ -95,13 +95,10 @@
         "sources": [
             "./main.cpp",
             "./style.cpp",
-            "../common/headless_view.hpp",
-            "../common/headless_view.cpp",
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
             "../llmr.gyp:llmr-x86",
-            "link_gl",
         ]
     },
     {
