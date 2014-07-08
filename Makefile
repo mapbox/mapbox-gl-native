@@ -29,7 +29,7 @@ test: build/test/Makefile
 
 # Runs all test cases
 run-tests: test
-	(cd build/${BUILDTYPE} && exec find . -maxdepth 1 -name "test_*" -exec {} \;)
+	BUILDTYPE=$(BUILDTYPE) ./scripts/run_tests.sh
 
 test/%: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
