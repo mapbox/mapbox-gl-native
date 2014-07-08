@@ -29,14 +29,14 @@ private:
 
 
 private:
-#ifdef LLMR_USE_CGL
+#if LLMR_USE_CGL
     CGLContextObj gl_context;
     GLuint fbo = 0;
     GLuint fbo_depth_stencil = 0;
     GLuint fbo_color = 0;
 #endif
 
-#ifdef LLMR_USE_GLX
+#if LLMR_USE_GLX
     GLXContext gl_context = nullptr;
     XVisualInfo *x_info = nullptr;
     Display *x_display = nullptr;

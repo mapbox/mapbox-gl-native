@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <stdexcept>
 
 namespace llmr {
 namespace util {

@@ -5,8 +5,9 @@
 #include <llmr/util/io.hpp>
 #include <llmr/util/std.hpp>
 
-#include "../common/headless_view.hpp"
 #include <rapidjson/document.h>
+
+#include "../common/headless_view.hpp"
 
 const std::string base_directory = []{
     std::string fn = __FILE__;
