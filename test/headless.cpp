@@ -3,12 +3,10 @@
 #include <llmr/map/map.hpp>
 #include <llmr/util/image.hpp>
 #include <llmr/util/io.hpp>
-#include <llmr/util/timer.hpp>
+#include <llmr/util/std.hpp>
 
 #include "../common/headless_view.hpp"
-
-#include <iostream>
-#include <fstream>
+#include <rapidjson/document.h>
 
 const std::string base_directory = []{
     std::string fn = __FILE__;
@@ -16,11 +14,27 @@ const std::string base_directory = []{
     return fn;
 }();
 
-TEST(Headless, initialize) {
-    const unsigned int width = 1024;
-    const unsigned int height = 768;
+class HeadlessTest : public ::testing::TestWithParam<const char *> {};
 
-    llmr::util::timer timer;
+TEST_P(HeadlessTest, render) {
+    const char *base = GetParam();
+
+    const std::string style = llmr::util::read_file(base_directory + "/fixtures/styles/" + base + ".style.json");
+    const std::string info = llmr::util::read_file(base_directory + "/fixtures/styles/" + base + ".info.json");
+    const std::string expected_image = base_directory + "/fixtures/styles/" + base + ".expected.png";
+    const std::string actual_image = base_directory + "/fixtures/styles/" + base + ".actual.png";
+
+    // Parse settings.
+    rapidjson::Document doc;
+    doc.Parse<0>((const char *const)info.c_str());
+    ASSERT_EQ(false, doc.HasParseError());
+
+    const double zoom = doc.HasMember("zoom") ? doc["zoom"].GetDouble() : 0;
+    const double angle = doc.HasMember("angle") ? doc["angle"].GetDouble() : 0;
+    const double longitude = doc.HasMember("longitude") ? doc["longitude"].GetDouble() : 0;
+    const double latitude = doc.HasMember("latitude") ? doc["latitude"].GetDouble() : 0;
+    const unsigned int width = doc.HasMember("width") ? doc["width"].GetUint() : 0;
+    const unsigned int height = doc.HasMember("height") ? doc["height"].GetUint() : 0;
 
     // Setup OpenGL
     llmr::HeadlessView view;
@@ -29,42 +43,27 @@ TEST(Headless, initialize) {
     view.resize(width, height);
     map.resize(width, height);
 
-    timer.report("map setup");
+    map.setStyleJSON(style);
 
-    std::ifstream stylefile("./style.min.js");
-    ASSERT_TRUE(stylefile.good());
-    std::stringstream stylejson;
-    stylejson << stylefile.rdbuf();
-
-    map.setStyleJSON(stylejson.str());
-
-    timer.report("map style");
-
-    map.setLonLatZoom(0, 0, 2);
-    map.setAngle(0);
+    map.setLonLatZoom(longitude, latitude, zoom);
+    map.setAngle(angle);
     map.setDebug(false);
 
     // Run the loop. It will terminate when we don't have any further listeners.
     map.run();
 
-    timer.report("map loop");
+    const std::unique_ptr<uint32_t[]> pixels(new uint32_t[width * height]);
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
 
-    uint32_t *pixels = new uint32_t[width * height];
+    const std::string image = llmr::util::compress_png(width, height, pixels.get(), true);
+    llmr::util::write_file(actual_image, image);
 
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-
-    std::string result = llmr::util::compress_png(width, height, pixels, true);
-    llmr::util::write_file("out.png", result);
-
-    std::ifstream imagefile(base_directory + "/fixtures/result/out.png");
-    ASSERT_TRUE(imagefile.good());
-    std::stringstream image;
-    image << imagefile.rdbuf();
-    llmr::util::Image reference(image.str(), true);
-
-    ASSERT_EQ(reference.getWidth(), width);
-    ASSERT_EQ(reference.getHeight(), height);
-    ASSERT_EQ(0, std::memcmp(pixels, reference.getData(), width * height * 4));
-
-    delete[] pixels;
+    const std::string expected_image_data(llmr::util::read_file(expected_image));
+    const llmr::util::Image expected(expected_image_data, true);
+    ASSERT_EQ(width, expected.getWidth());
+    ASSERT_EQ(height, expected.getHeight());
+    ASSERT_EQ(0, std::memcmp(pixels.get(), expected.getData(), width * height * 4));
 }
+
+INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest,
+                        ::testing::Values("0"));
