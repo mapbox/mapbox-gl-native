@@ -56,6 +56,28 @@
       }
     },
     {
+      'target_name': 'fuzz_stylesheet',
+      'type': 'none',
+      'hard_dependency': 1,
+      'actions': [
+        {
+          'action_name': 'Fuzz Stylesheet',
+          'inputs': [
+            'bin/style.js',
+          ],
+          'outputs': [
+            '<(SHARED_INTERMEDIATE_DIR)/bin/style-fuzzed.min.js'
+          ],
+          'action': ['<@(node)', 'bin/fuzz-style.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)']
+        }
+      ],
+      'direct_dependent_settings': {
+        'sources': [
+            '<(SHARED_INTERMEDIATE_DIR)/bin/style-fuzzed.min.js'
+        ],
+      }
+    },
+    {
       'target_name': 'llmr-x86',
       'product_name': 'llmr-x86',
       'type': 'static_library',

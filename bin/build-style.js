@@ -4,7 +4,6 @@
 var path = require('path');
 var fs = require('fs');
 var mkdirp = require('./mkdirp');
-var name = 'style';
 var data = JSON.stringify(require(path.join(process.cwd(), process.argv[2])));
 
 var out_path = path.join(process.argv[3], 'bin/style.min.js');

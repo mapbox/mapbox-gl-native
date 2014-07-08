@@ -81,6 +81,22 @@
         ]
     },
     {
+        "target_name": "style",
+        "product_name": "test_style",
+        "type": "executable",
+        "libraries": [
+            "-lpthread",
+        ],
+        "sources": [
+            "./main.cpp",
+            "./style.cpp",
+        ],
+        "dependencies": [
+            "../deps/gtest/gtest.gyp:gtest",
+            "../llmr.gyp:llmr-x86"
+        ]
+    },
+    {
         "target_name": "variant",
         "product_name": "test_variant",
         "type": "executable",
