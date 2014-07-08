@@ -2,10 +2,10 @@
 #include <llmr/platform/request.hpp>
 #include <llmr/util/uv.hpp>
 
-const std::string basename = []{
-    std::string basename = __FILE__;
-    basename.erase(basename.find_last_of("/"));
-    return basename;
+const std::string base_directory = []{
+    std::string fn = __FILE__;
+    fn.erase(fn.find_last_of("/"));
+    return fn;
 }();
 
 
@@ -22,7 +22,7 @@ platform::request_http(const std::string &url,
         l = uv_default_loop();
     }
 
-    std::string clean_url = basename + "/" + url;
+    std::string clean_url = base_directory + "/" + url;
     auto pos = clean_url.find("://");
     if (pos != std::string::npos) {
         clean_url.replace(pos, 3, "/");

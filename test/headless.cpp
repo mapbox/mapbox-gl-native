@@ -10,10 +10,10 @@
 #include <iostream>
 #include <fstream>
 
-const std::string basename = []{
-    std::string basename = __FILE__;
-    basename.erase(basename.find_last_of("/"));
-    return basename;
+const std::string base_directory = []{
+    std::string fn = __FILE__;
+    fn.erase(fn.find_last_of("/"));
+    return fn;
 }();
 
 TEST(Headless, initialize) {
@@ -56,7 +56,7 @@ TEST(Headless, initialize) {
     std::string result = llmr::util::compress_png(width, height, pixels, true);
     llmr::util::write_file("out.png", result);
 
-    std::ifstream imagefile(basename + "/fixtures/result/out.png");
+    std::ifstream imagefile(base_directory + "/fixtures/result/out.png");
     ASSERT_TRUE(imagefile.good());
     std::stringstream image;
     image << imagefile.rdbuf();
