@@ -67,4 +67,4 @@ TEST_P(HeadlessTest, render) {
 }
 
 INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest,
-                        ::testing::Values("0"));
+                        ::testing::Values("0", "1"));
