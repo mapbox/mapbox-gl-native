@@ -2,8 +2,9 @@
 'use strict';
 
 var load = require('./load-style.js');
-var mkdirp = require('./mkdirp.js');
+var mkdirp = require('mkdirp');
 var path = require('path');
+var fs = require('fs');
 
 var transforms = {
   'style.min.js': require('./minify.js'),
@@ -11,9 +12,10 @@ var transforms = {
 };
 
 var source = load(process.argv[2]);
+var out = process.argv[3];
+mkdirp.sync(out);
 
 Object.keys(transforms).forEach(function(key) {
-  load(process.argv[2])
-    .pipe(transforms[key].call())
-    .pipe(mkdirp(path.join(process.argv[3], key)));
+  source.pipe(transforms[key].call())
+    .pipe(fs.createWriteStream(path.join(out, key)));
 });
