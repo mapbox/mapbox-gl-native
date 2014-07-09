@@ -96,6 +96,13 @@ cd ../../
 
 elif [ ${UNAME} = 'Linux' ]; then
 
+if [ ! -z "${TRAVIS:-}" ]; then
+    if aws s3 cp s3://mapbox-gl-testing/dependencies/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ./out/ ; then
+        rm -rf out/build-cpp11-libstdcpp-gcc-x86_64-linux
+        tar -xzf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz
+    fi
+fi
+
 source Linux.sh
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libglfw3.a ] ; then ./scripts/build_glfw.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
@@ -103,6 +110,13 @@ source Linux.sh
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
+
+if [ ! -z "${TRAVIS:-}" ]; then
+    if ! tar --compare -zf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ; then
+        tar -zcf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz out/build-cpp11-libstdcpp-gcc-x86_64-linux
+        aws s3 cp out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz s3://mapbox-gl-testing/dependencies/
+    fi
+fi
 
 cd ../../
 ./configure \

@@ -15,9 +15,9 @@
             '<!@(find src -name "*.glsl")'
           ],
           'outputs': [
-            'include/llmr/shader/shaders.hpp',
-            'src/shader/shaders_gl.cpp',
-            'src/shader/shaders_gles2.cpp',
+            '<(SHARED_INTERMEDIATE_DIR)/include/llmr/shader/shaders.hpp',
+            '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gl.cpp',
+            '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gles2.cpp',
           ],
           'action': ['<@(node)', 'bin/build-shaders.js', '<(SHARED_INTERMEDIATE_DIR)'],
         }
@@ -84,6 +84,7 @@
       'target_name': 'llmr-x86',
       'product_name': 'llmr-x86',
       'type': 'static_library',
+      'hard_dependency': 1,
       'dependencies': [
           'build_stylesheet',
           'shaders',
@@ -151,6 +152,7 @@
       'target_name': 'llmr-ios',
       'product_name': 'llmr-ios',
       'type': 'static_library',
+      'hard_dependency': 1,
       'dependencies': [
           'build_stylesheet',
           'shaders',

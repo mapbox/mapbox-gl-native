@@ -3,8 +3,10 @@
 set -e
 set -o pipefail
 
-cd build/$BUILDTYPE
+BUILDTYPE="${BUILDTYPE:-Release}"
 
-for TEST in test_* ; do
-    ./$TEST
+cd build/${BUILDTYPE}
+
+for TEST in ./test_* ; do
+    ${TEST}
 done

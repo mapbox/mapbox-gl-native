@@ -491,15 +491,6 @@ void Map::render() {
 
     painter.drawClippingMasks(style->getActiveSources());
 
-#if defined(DEBUG)
-    // Generate debug information
-    size_t source_id = 0;
-    for (const std::shared_ptr<Source> &source : style->getActiveSources()) {
-        size_t count = source->getTileCount();
-        debug.emplace_back(util::sprintf<100>("source %d: %d\n", source_id, count));
-        source_id++;
-    }
-#endif
     // Actually render the layers
     if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
     renderLayers(style->layers);
@@ -514,10 +505,6 @@ void Map::render() {
     }
 
     painter.renderMatte();
-
-#if defined(DEBUG)
-    painter.renderDebugText(debug);
-#endif
 
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
