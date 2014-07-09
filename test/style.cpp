@@ -7,9 +7,9 @@
 
 using namespace llmr;
 
-TEST(Style, Color) {
-    std::ifstream stylefile("./style-fuzzed.min.js");
-    ASSERT_FALSE(stylefile.good());
+TEST(Style, Style) {
+    std::ifstream stylefile("./style.min.js");
+    ASSERT_TRUE(stylefile.good());
     std::stringstream stylejson;
     stylejson << stylefile.rdbuf();
 
