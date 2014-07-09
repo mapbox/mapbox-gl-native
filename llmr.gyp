@@ -41,39 +41,17 @@
         {
           'action_name': 'Build Stylesheet',
           'inputs': [
-            'bin/style.js',
+            'bin/style.json',
           ],
           'outputs': [
             '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
           ],
-          'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)']
+          'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)', '<@(_outputs)']
         }
       ],
       'direct_dependent_settings': {
         'sources': [
             '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
-        ],
-      }
-    },
-    {
-      'target_name': 'fuzz_stylesheet',
-      'type': 'none',
-      'hard_dependency': 1,
-      'actions': [
-        {
-          'action_name': 'Fuzz Stylesheet',
-          'inputs': [
-            'bin/style.js',
-          ],
-          'outputs': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style-fuzzed.min.js'
-          ],
-          'action': ['<@(node)', 'bin/fuzz-style.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)']
-        }
-      ],
-      'direct_dependent_settings': {
-        'sources': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style-fuzzed.min.js'
         ],
       }
     },
@@ -118,7 +96,7 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
-        'bin/style.js'
+        'bin/style.json'
       ],
       'xcode_settings': {
         'SDKROOT': 'macosx',
@@ -185,7 +163,7 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
-        'bin/style.js'
+        'bin/style.json'
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',

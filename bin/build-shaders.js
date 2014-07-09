@@ -3,7 +3,7 @@
 
 var fs = require('fs');
 var path = require('path');
-var mkdirp = require('./mkdirp');
+var mkdirp = require('mkdirp');
 
 try { var glsl = require('glsl-optimizer'); } catch(err) {}
 
