@@ -1736,7 +1736,7 @@ module.exports = {
     "id": "country_label",
     "source": "mapbox",
     "source-layer": "country_label",
-    "filter": { "$type": "point" },
+    "filter": { "$type": "Point" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -1761,7 +1761,7 @@ module.exports = {
     "id": "marine_label_line_1",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "line", "labelrank": 1 },
+    "filter": { "$type": "LineString", "labelrank": 1 },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -1791,7 +1791,7 @@ module.exports = {
     "id": "marine_label_line_2",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "line", "labelrank": 2 },
+    "filter": { "$type": "LineString", "labelrank": 2 },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -1820,7 +1820,7 @@ module.exports = {
     "id": "marine_label_line_3",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "line", "labelrank": 3 },
+    "filter": { "$type": "LineString", "labelrank": 3 },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -1849,7 +1849,7 @@ module.exports = {
     "id": "marine_label_line_other",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "line", "labelrank": [4, 5, 6] },
+    "filter": { "$type": "LineString", "labelrank": [4, 5, 6] },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -1878,7 +1878,7 @@ module.exports = {
     "id": "marine_label_point_1",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "point", "labelrank": 1 },
+    "filter": { "$type": "Point", "labelrank": 1 },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -1909,7 +1909,7 @@ module.exports = {
     "id": "marine_label_point_2",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "point", "labelrank": 2 },
+    "filter": { "$type": "Point", "labelrank": 2 },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -1940,7 +1940,7 @@ module.exports = {
     "id": "marine_label_point_3",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "point", "labelrank": 3 },
+    "filter": { "$type": "Point", "labelrank": 3 },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -1971,7 +1971,7 @@ module.exports = {
     "id": "marine_label_point_other",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "point", "labelrank": [4, 5, 6] },
+    "filter": { "$type": "Point", "labelrank": [4, 5, 6] },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2002,7 +2002,7 @@ module.exports = {
     "id": "state_label",
     "source": "mapbox",
     "source-layer": "state_label",
-    "filter": { "$type": "point" },
+    "filter": { "$type": "Point" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2033,7 +2033,7 @@ module.exports = {
     "id": "place_label_city",
     "source": "mapbox",
     "source-layer": "place_label",
-    "filter": { "type": "city", "$type": "point" },
+    "filter": { "type": "city", "$type": "Point" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2064,7 +2064,7 @@ module.exports = {
     "id": "place_label_town",
     "source": "mapbox",
     "source-layer": "place_label",
-    "filter": { "type": "town", "$type": "point" },
+    "filter": { "type": "town", "$type": "Point" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2095,7 +2095,7 @@ module.exports = {
     "id": "place_label_village",
     "source": "mapbox",
     "source-layer": "place_label",
-    "filter": { "type": "village", "$type": "point" },
+    "filter": { "type": "village", "$type": "Point" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2126,7 +2126,7 @@ module.exports = {
     "id": "place_label_other",
     "source": "mapbox",
     "source-layer": "place_label",
-    "filter": { "type": ["hamlet", "suburb", "neighbourhood"], "$type": "point" },
+    "filter": { "type": ["hamlet", "suburb", "neighbourhood"], "$type": "Point" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2156,7 +2156,7 @@ module.exports = {
     "id": "road_label_1",
     "source": "mapbox",
     "source-layer": "road_label",
-    "filter": { "class": ["motorway", "main"], "$type": "line" },
+    "filter": { "class": ["motorway", "main"], "$type": "LineString" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2182,7 +2182,7 @@ module.exports = {
     "id": "road_label_2",
     "source": "mapbox",
     "source-layer": "road_label",
-    "filter": { "class": ["street", "street_limited"], "$type": "line" },
+    "filter": { "class": ["street", "street_limited"], "$type": "LineString" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2208,7 +2208,7 @@ module.exports = {
     "id": "road_label_3",
     "source": "mapbox",
     "source-layer": "road_label",
-    "filter": { "class": ["service", "driveway", "path"], "$type": "line" },
+    "filter": { "class": ["service", "driveway", "path"], "$type": "LineString" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2234,7 +2234,7 @@ module.exports = {
     "id": "contour_label",
     "source": "mapbox",
     "source-layer": "contour",
-    "filter": { "index": [5, 10], "$type": "line" },
+    "filter": { "index": [5, 10], "$type": "LineString" },
     "render": {
       "type": "text",
       "text-path": "curve",
@@ -2259,7 +2259,7 @@ module.exports = {
     "id": "water_label",
     "source": "mapbox",
     "source-layer": "water_label",
-    "filter": { "$type": "point" },
+    "filter": { "$type": "Point" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2280,7 +2280,7 @@ module.exports = {
     "id": "waterway_label",
     "source": "mapbox",
     "source-layer": "waterway_label",
-    "filter": { "$type": "line" },
+    "filter": { "$type": "LineString" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2313,7 +2313,7 @@ module.exports = {
     "id": "poi_label_1-2",
     "source": "mapbox",
     "source-layer": "poi_label",
-    "filter": { "scalerank": [1, 2], "$type": "point" },
+    "filter": { "scalerank": [1, 2], "$type": "Point" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2362,7 +2362,7 @@ module.exports = {
     "id": "poi_label_3",
     "source": "mapbox",
     "source-layer": "poi_label",
-    "filter": { "scalerank": 3, "$type": "point" },
+    "filter": { "scalerank": 3, "$type": "Point" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",
@@ -2419,7 +2419,7 @@ module.exports = {
     "id": "poi_label_4",
     "source": "mapbox",
     "source-layer": "poi_label",
-    "filter": { "scalerank": 4, "$type": "point" },
+    "filter": { "scalerank": 4, "$type": "Point" },
     "render": {
       "type": "text",
       "text-field": "{name_en}",

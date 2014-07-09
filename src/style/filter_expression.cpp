@@ -175,10 +175,10 @@ std::ostream& operator <<(std::ostream &s, FilterExpression::Operator op) {
 
 std::ostream& operator <<(std::ostream &s, FilterExpression::GeometryType type) {
     switch (type) {
-        case FilterExpression::GeometryType::Point: s << "point"; break;
-        case FilterExpression::GeometryType::Line: s << "line"; break;
-        case FilterExpression::GeometryType::Polygon: s << "polygon"; break;
-        case FilterExpression::GeometryType::Any: s << "any"; break;
+        case FilterExpression::GeometryType::Point: s << "Point"; break;
+        case FilterExpression::GeometryType::LineString: s << "LineString"; break;
+        case FilterExpression::GeometryType::Polygon: s << "Polygon"; break;
+        case FilterExpression::GeometryType::Any: s << "<Any>"; break;
     }
     return s;
 }
@@ -265,9 +265,9 @@ void FilterExpression::setGeometryType(GeometryType g) {
 }
 
 FilterExpression::GeometryType parseGeometryType(const std::string &geometry) {
-    if (geometry == "point") return FilterExpression::GeometryType::Point;
-    if (geometry == "line") return FilterExpression::GeometryType::Line;
-    if (geometry == "polygon") return FilterExpression::GeometryType::Polygon;
+    if (geometry == "Point") return FilterExpression::GeometryType::Point;
+    if (geometry == "LineString") return FilterExpression::GeometryType::LineString;
+    if (geometry == "Polygon") return FilterExpression::GeometryType::Polygon;
     return FilterExpression::GeometryType::Any;
 }
 
