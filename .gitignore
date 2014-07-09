@@ -1,6 +1,8 @@
 .DS_Store
 *.xcodeproj
 *.o
+*.actual.png
+/node_modules
 /mapnik-packaging
 /macosx/build
 /ios/build
@@ -14,3 +16,4 @@
 /src/shader/shaders_gles2.cpp
 /bin/style.bin.js
 access_token.hpp
+/test/fixtures/styles/index.html

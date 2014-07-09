@@ -117,12 +117,14 @@ module.exports = function(shader_type, prefix, suffix) {
     code += '\n};\n';
     code += suffix + '\n';
 
-    var file_path = path.join(process.argv[2], 'include/llmr/shader/shaders.hpp');
-    mkdirp.sync(path.dirname(file_path));
-    fs.writeFileSync(file_path, header);
-    var header_path = path.join(process.argv[2], 'src/shader/shaders_' + shader_type + '.cpp');
+    var header_path = path.join(process.argv[2], 'include/llmr/shader/shaders.hpp');
     mkdirp.sync(path.dirname(header_path));
-    fs.writeFileSync(header_path, code);
+    fs.writeFileSync(header_path, header);
+    console.warn('wrote file ' + header_path);
+    var file_path = path.join(process.argv[2], 'src/shader/shaders_' + shader_type + '.cpp');
+    mkdirp.sync(path.dirname(file_path));
+    fs.writeFileSync(file_path, code);
+    console.warn('wrote file ' + file_path);
 
 };
 
