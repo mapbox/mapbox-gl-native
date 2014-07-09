@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-node scripts/
+node scripts/create_result_table.js
 
 aws s3 cp test/fixtures/styles/ s3://mapbox-gl-testing/headless/$TRAVIS_BUILD_NUMBER/$TRAVIS_JOB_NUMBER/ --acl public-read --recursive --exclude "*" --include "*.actual.png" --include "*.html"
 
