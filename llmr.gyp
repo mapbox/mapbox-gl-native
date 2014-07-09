@@ -46,16 +46,30 @@
           'outputs': [
             '<(SHARED_INTERMEDIATE_DIR)/bin/node_modules',
           ],
-          'action': ['cd', 'bin/', 'npm', 'install']
+          'action': ['npm', 'install', 'bin/']
         }
       ],
+    },
+    {
+      'target_name': 'copy_node_modules',
+      'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [
+        'npm_install'
+      ],
+      'copies': [
+        {
+          'files': ['<(SHARED_INTERMEDIATE_DIR)/bin/node_modules'],
+          'destination': '<(PRODUCT_DIR)'
+        }
+      ]
     },
     {
       'target_name': 'build_stylesheet',
       'type': 'none',
       'hard_dependency': 1,
       'dependencies': [
-        'npm_install'
+        'copy_node_modules'
       ],
       'actions': [
         {
