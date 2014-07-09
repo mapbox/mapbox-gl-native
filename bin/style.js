@@ -3,7 +3,7 @@
 module.exports = {
   "version": 3,
   "sprite": "https://www.mapbox.com/mapbox-gl-styles/sprites/outdoors",
-  "glyphs": "https://mapbox.s3.amazonaws.com/gl-glyphs-256/{{fontstack}}/{{range}}.pbf",
+  "glyphs": "https://mapbox.s3.amazonaws.com/gl-glyphs-256/{fontstack}/{range}.pbf",
   "sources": {
     "mapbox": {
       "type": "vector",
@@ -1739,7 +1739,7 @@ module.exports = {
     "filter": { "$type": "point" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 24,
@@ -1764,7 +1764,7 @@ module.exports = {
     "filter": { "$type": "line", "labelrank": 1 },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 30,
@@ -1794,7 +1794,7 @@ module.exports = {
     "filter": { "$type": "line", "labelrank": 2 },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 24,
@@ -1823,7 +1823,7 @@ module.exports = {
     "filter": { "$type": "line", "labelrank": 3 },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 18,
@@ -1852,7 +1852,7 @@ module.exports = {
     "filter": { "$type": "line", "labelrank": [4, 5, 6] },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 16,
@@ -1881,7 +1881,7 @@ module.exports = {
     "filter": { "$type": "point", "labelrank": 1 },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 30,
@@ -1912,7 +1912,7 @@ module.exports = {
     "filter": { "$type": "point", "labelrank": 2 },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 24,
@@ -1943,7 +1943,7 @@ module.exports = {
     "filter": { "$type": "point", "labelrank": 3 },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 18,
@@ -1974,7 +1974,7 @@ module.exports = {
     "filter": { "$type": "point", "labelrank": [4, 5, 6] },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 16,
@@ -2005,7 +2005,7 @@ module.exports = {
     "filter": { "$type": "point" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
       "text-max-size": 16,
@@ -2036,7 +2036,7 @@ module.exports = {
     "filter": { "type": "city", "$type": "point" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 20,
@@ -2067,7 +2067,7 @@ module.exports = {
     "filter": { "type": "town", "$type": "point" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 24,
@@ -2098,7 +2098,7 @@ module.exports = {
     "filter": { "type": "village", "$type": "point" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 22,
@@ -2129,7 +2129,7 @@ module.exports = {
     "filter": { "type": ["hamlet", "suburb", "neighbourhood"], "$type": "point" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 18,
@@ -2159,7 +2159,7 @@ module.exports = {
     "filter": { "class": ["motorway", "main"], "$type": "line" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-padding": 2,
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
@@ -2185,7 +2185,7 @@ module.exports = {
     "filter": { "class": ["street", "street_limited"], "$type": "line" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-padding": 2,
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
@@ -2211,7 +2211,7 @@ module.exports = {
     "filter": { "class": ["service", "driveway", "path"], "$type": "line" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-padding": 2,
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
@@ -2238,7 +2238,7 @@ module.exports = {
     "render": {
       "type": "text",
       "text-path": "curve",
-      "text-field": "{{ele}} m",
+      "text-field": "{ele} m",
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
       "text-max-size": 10,
       "text-max-angle": 0.5
@@ -2262,7 +2262,7 @@ module.exports = {
     "filter": { "$type": "point" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 12,
@@ -2283,7 +2283,7 @@ module.exports = {
     "filter": { "$type": "line" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 12,
@@ -2305,7 +2305,7 @@ module.exports = {
     "filter": { "scalerank": [1, 2] },
     "render": {
       "type": "icon",
-      "icon-image": "{{maki}}-12",
+      "icon-image": "{maki}-12",
       "icon-size": 12
     },
     "style.night": {}
@@ -2316,7 +2316,7 @@ module.exports = {
     "filter": { "scalerank": [1, 2], "$type": "point" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-padding": 2,
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -2343,7 +2343,7 @@ module.exports = {
     "filter": { "scalerank": 3 },
     "render": {
       "type": "icon",
-      "icon-image": "{{maki}}-12",
+      "icon-image": "{maki}-12",
       "icon-size": 12
     },
     "style": {
@@ -2365,7 +2365,7 @@ module.exports = {
     "filter": { "scalerank": 3, "$type": "point" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-padding": 2,
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -2400,7 +2400,7 @@ module.exports = {
     "filter": { "scalerank": 4 },
     "render": {
       "type": "icon",
-      "icon-image": "{{maki}}-12",
+      "icon-image": "{maki}-12",
       "icon-size": 12
     },
     "style": {
@@ -2422,7 +2422,7 @@ module.exports = {
     "filter": { "scalerank": 4, "$type": "point" },
     "render": {
       "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-padding": 2,
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -2457,7 +2457,7 @@ module.exports = {
     "filter": { "maki": "airport" },
     "render": {
       "type": "icon",
-      "icon-image": "{{maki}}-12",
+      "icon-image": "{maki}-12",
       "icon-size": 12
     },
     "style": {

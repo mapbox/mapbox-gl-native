@@ -10,12 +10,6 @@ typedef util::variant<bool, int64_t, uint64_t, double, std::string> Value;
 
 std::string toString(const Value &value);
 
-inline std::string& operator+=(std::string& out, const Value& value) {
-    out += toString(value);
-    return out;
-}
-
-
 Value parseValue(pbf data);
 
 namespace util {

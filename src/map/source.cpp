@@ -7,6 +7,7 @@
 #include <llmr/util/string.hpp>
 #include <llmr/util/texturepool.hpp>
 #include <llmr/util/vec.hpp>
+#include <llmr/util/token.hpp>
 #include <llmr/util/std.hpp>
 #include <llmr/geometry/glyph_atlas.hpp>
 #include <llmr/style/style_layer.hpp>
@@ -28,7 +29,7 @@ Source::Source(SourceType type, const std::string &url,
 std::string Source::normalizeSourceURL(const std::string &url) {
     const std::string t = "mapbox://";
     if (url.compare(0, t.length(), t) == 0) {
-        return std::string("http://api.tiles.mapbox.com/v3/") + url.substr(t.length()) + "/%d/%d/%d.vector.pbf";
+        return std::string("http://api.tiles.mapbox.com/v3/") + url.substr(t.length()) + "/{z}/{x}/{y}.vector.pbf";
     } else {
         return url;
     }
@@ -142,14 +143,17 @@ TileData::State Source::addTile(Map &map, const Tile::ID& id) {
 
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
-
-        std::string formed_url;
+        const std::string formed_url = util::replaceTokens(url, [&](const std::string &token) -> std::string {
+            if (token == "z") return std::to_string(normalized_id.z);
+            if (token == "x") return std::to_string(normalized_id.x);
+            if (token == "y") return std::to_string(normalized_id.y);
+            if (token == "ratio") return (map.getState().getPixelRatio() > 1.0 ? "@2x" : "");
+            return "";
+        });
 
         if (type == SourceType::Vector) {
-            formed_url = util::sprintf<256>(url, normalized_id.z, normalized_id.x, normalized_id.y);
             new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, formed_url);
         } else if (type == SourceType::Raster) {
-            formed_url = util::sprintf<256>(url, normalized_id.z, normalized_id.x, normalized_id.y, (map.getState().getPixelRatio() > 1.0 ? "@2x" : ""));
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, map, formed_url);
         } else {
             throw std::runtime_error("source type not implemented");
