@@ -60,9 +60,12 @@ function processFiles() {
 
 function writeResult(base, info, error, difference) {
     var color = 'green';
-    if (difference > 0.01 && exitCode < 1) {
-        exitCode = 1;
+    var allowedDifference = ('diff' in info) ? info.diff : 0.01;
+    if (difference > allowedDifference) {
         color = 'red';
+        if (exitCode < 1) {
+            exitCode = 1;
+        }
     }
 
     html +=
