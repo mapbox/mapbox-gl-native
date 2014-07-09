@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 'use strict';
 
-var path = require('path');
-var fs = require('fs');
-var mkdirp = require('./mkdirp');
-var data = JSON.stringify(require(path.join(process.cwd(), process.argv[2])));
+var load = require('./load-style.js');
+var JSONStream = require('JSONStream');
+var stringify = require('./stringify');
+var mkdirp = require('./mkdirp.js');
 
-var out_path = path.join(process.argv[3], 'bin/style.min.js');
-mkdirp.sync(path.dirname(out_path));
-fs.writeFileSync(out_path, data);
+load(process.argv[2])
+  .pipe(stringify())
+  .pipe(mkdirp(process.argv[3]));

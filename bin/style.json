@@ -1,6 +1,4 @@
-"use strict";
-
-module.exports = {
+{
   "version": 3,
   "sprite": "https://www.mapbox.com/mapbox-gl-styles/sprites/outdoors",
   "glyphs": "https://mapbox.s3.amazonaws.com/gl-glyphs-256/{{fontstack}}/{{range}}.pbf",
@@ -2473,4 +2471,4 @@ module.exports = {
       }
     }
   }]
-};
+}
