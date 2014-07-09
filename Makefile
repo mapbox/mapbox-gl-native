@@ -78,9 +78,9 @@ xproj: config.gypi macosx/llmr-app.gyp clear_xcode_cache node
 	open ./build/macosx/llmr-app.xcodeproj
 
 # build iOS project for Xcode
-iproj: config.gypi ios/llmr-app.gyp clear_xcode_cache node
-	deps/run_gyp ios/llmr-app.gyp --depth=. --generator-output=./build -f xcode
-	open ./build/ios/llmr-app.xcodeproj
+iproj: config.gypi ios/mapbox-gl-cocoa/app/llmr-app.gyp clear_xcode_cache node
+	deps/run_gyp ios/mapbox-gl-cocoa/app/llmr-app.gyp --depth=. --generator-output=./build -f xcode
+	open ./build/ios/mapbox-gl-cocoa/app/llmr-app.xcodeproj
 
 # build Linux project for Xcode (Runs on Mac OS X too, but without platform-specific code)
 lproj: config.gypi linux/llmr-app.gyp clear_xcode_cache node
