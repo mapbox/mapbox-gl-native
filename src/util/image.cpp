@@ -84,7 +84,7 @@ void warningHandler(png_structp, png_const_charp error_msg) {
     fprintf(stderr, "PNG: %s\n", error_msg);
 }
 
-Image::Image(const std::string &data) {
+Image::Image(const std::string &data, bool flip) {
     Buffer buffer(data);
 
     if (buffer.length < 8 || !png_check_sig((const png_bytep)buffer.data, 8)) {
@@ -148,7 +148,7 @@ Image::Image(const std::string &data) {
             png_bytep *rows = nullptr;
         } pointers(height);
         for (unsigned i = 0; i < height; ++i) {
-            pointers.rows[i] = (png_bytep)(surface + (i * rowbytes));
+            pointers.rows[flip ? height - 1 - i : i] = (png_bytep)(surface + (i * rowbytes));
         }
 
         // Read image data

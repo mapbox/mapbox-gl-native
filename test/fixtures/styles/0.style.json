@@ -1,0 +1,34 @@
+{
+  "version": 3,
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "tiles/%d-%d-%d.vector.pbf",
+      "tileSize": 512,
+      "maxZoom": 14
+    }
+  },
+  "layers": [
+    {
+      "id": "background",
+      "render": {
+        "type": "background"
+      },
+      "style": {
+        "background-color": "red"
+      }
+    },
+    {
+      "id": "water",
+      "source": "mapbox",
+      "source-layer": "water",
+      "render": {
+        "type": "fill"
+      },
+      "style": {
+        "fill-color": "blue",
+        "fill-antialias": false
+      }
+    }
+  ]
+}
