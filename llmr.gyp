@@ -7,7 +7,7 @@
     {
       'target_name': 'shaders',
       'type': 'none',
-      # 'hard_dependency': 1,
+      'hard_dependency': 1,
       'actions': [
         {
           'action_name': 'Build Shaders',
