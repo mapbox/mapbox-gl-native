@@ -16,7 +16,8 @@ env:
    - secure: "Cbvap9ubVKgjPe3hUhI6JGeDZzBXHpOG9RaYKh+SdoIPhKnlJiNOYm1egomi+e4uqJInlFKuVHTw7Ng9Cun6Zm0jIxpkSchv1GpsR7hmB3UGnGed19Dw8121FwuUaktN+4YnbVlsyd+u8EHD3+h58t4eELrLrZolM4rS7DL6caA="
 
 before_install:
-- source ./scripts/setup_travis.sh
+- ./scripts/setup_travis.sh
+- source ./scripts/flags.sh
 
 install:
 - make setup
@@ -25,8 +26,12 @@ before_script:
 - rm -rf mapnik-packaging/out/packages
 
 script:
-- make linux BUILDTYPE=${BUILDTYPE}
-- make run-tests BUILDTYPE=${BUILDTYPE}
+- make linux -j4 BUILDTYPE=${BUILDTYPE}
+- make test -j4 BUILDTYPE=${BUILDTYPE}
+- ./scripts/run_tests.sh
+
+after_script:
+- ./scripts/deploy_results.sh
 
 notifications:
   hipchat:

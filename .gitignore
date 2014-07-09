@@ -1,6 +1,7 @@
 .DS_Store
 *.xcodeproj
 *.o
+*.actual.png
 /node_modules
 /mapnik-packaging
 /macosx/build
