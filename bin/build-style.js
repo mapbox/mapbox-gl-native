@@ -2,10 +2,9 @@
 'use strict';
 
 var load = require('./load-style.js');
-var JSONStream = require('JSONStream');
-var stringify = require('./stringify');
+var minify = require('./minify');
 var mkdirp = require('./mkdirp.js');
 
 load(process.argv[2])
-  .pipe(stringify())
+  .pipe(minify())
   .pipe(mkdirp(process.argv[3]));

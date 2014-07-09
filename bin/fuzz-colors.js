@@ -1,15 +1,13 @@
 #!/usr/bin/env node
 'use strict';
 
-var concat = require('concat-stream');
 var through = require('through2');
 var fuzzer = require('fuzzer');
 fuzzer.seed(0);
 
 module.exports = function() {
-  var read = through();
-  var write = concat(function(buffer) {
-    var json = JSON.parse(buffer);
+  return through.obj(function(chunk, env, callback) {
+    var json = JSON.parse(chunk.toString());
 
     json.constants = Object.keys(json.constants).reduce(function(obj, key, index) {
       var value = json.constants[key];
@@ -20,9 +18,9 @@ module.exports = function() {
     }, {});
 
     var data = JSON.stringify(json);
-    process.stdout.write(data);
+    this.push(data);
+    callback();
   });
-  read.pipe(write);
 };
 
-// if (!module.parent) module.exports().pipe(process.stdout);
+if (!module.parent) process.stdin.pipe(module.exports()).pipe(process.stdout);
