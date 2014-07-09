@@ -27,10 +27,6 @@ build/test/Makefile: src common config.gypi test/test.gyp
 test: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
 
-# Runs all test cases
-run-tests: test
-	BUILDTYPE=$(BUILDTYPE) ./scripts/run_tests.sh
-
 test/%: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
 	(cd build/$(BUILDTYPE) && exec ./test_$*)

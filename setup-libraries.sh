@@ -97,13 +97,7 @@ cd ../../
 elif [ ${UNAME} = 'Linux' ]; then
 
 if [ ! -z "${TRAVIS:-}" ]; then
-    echo "[default]" > ~/.s3cfg
-    echo "use_https = True" >> ~/.s3cfg
-    echo "access_key = $AWS_ACCESS_KEY_ID" >> ~/.s3cfg
-    echo "secret_key = $AWS_SECRET_ACCESS_KEY" >> ~/.s3cfg
-
-    s3cmd sync --config=~/.s3cfg s3://mapbox-gl-testing/dependencies/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ./out/
-    if [ -f out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ] ; then
+    if aws s3 cp s3://mapbox-gl-testing/dependencies/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ./out/ ; then
         rm -rf out/build-cpp11-libstdcpp-gcc-x86_64-linux
         tar -xzf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz
     fi
@@ -120,9 +114,8 @@ source Linux.sh
 if [ ! -z "${TRAVIS:-}" ]; then
     if ! tar --compare -zf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ; then
         tar -zcf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz out/build-cpp11-libstdcpp-gcc-x86_64-linux
-        s3cmd sync --config=~/.s3cfg out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz s3://mapbox-gl-testing/dependencies/
+        aws s3 cp out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz s3://mapbox-gl-testing/dependencies/
     fi
-    rm ~/.s3cfg
 fi
 
 cd ../../
