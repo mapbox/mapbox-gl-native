@@ -29,6 +29,7 @@ script:
 - make linux -j4 BUILDTYPE=${BUILDTYPE}
 - make test -j4 BUILDTYPE=${BUILDTYPE}
 - ./scripts/run_tests.sh
+- ./scripts/compare_images.js
 
 after_script:
 - ./scripts/deploy_results.sh
