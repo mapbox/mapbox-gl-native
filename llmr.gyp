@@ -44,14 +44,16 @@
             'bin/style.json',
           ],
           'outputs': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
+            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
           ],
-          'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)', '<@(_outputs)']
+          'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)/bin']
         }
       ],
       'direct_dependent_settings': {
         'sources': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
+            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
         ],
       }
     },
@@ -64,7 +66,10 @@
       ],
       'copies': [
         {
-          'files': [ '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js' ],
+          'files': [
+            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
+          ],
           'destination': '<(PRODUCT_DIR)'
         }
       ]

@@ -16,3 +16,13 @@ TEST(Style, Style) {
     Style style;
     style.loadJSON((const uint8_t *)stylejson.str().c_str());
 }
+
+TEST(Style, Colors) {
+    std::ifstream stylefile("./fuzz-colors.min.js");
+    ASSERT_TRUE(stylefile.good());
+    std::stringstream stylejson;
+    stylejson << stylefile.rdbuf();
+
+    Style style;
+    style.loadJSON((const uint8_t *)stylejson.str().c_str());
+}
