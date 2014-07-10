@@ -17,32 +17,26 @@
 
 namespace llmr {
 
-static std::string mapboxAccessToken;
-
-void setMapboxAccessToken(const std::string& token) {
-    mapboxAccessToken = token;
-}
-
 Source::Source(SourceType type, const std::string &url,
-               uint32_t tile_size, uint32_t min_zoom, uint32_t max_zoom)
+               uint32_t tile_size, uint32_t min_zoom, uint32_t max_zoom,
+               const std::string &access_token)
     : type(type),
-      url(normalizeSourceURL(url)),
+      url(normalizeSourceURL(url, access_token)),
       tile_size(tile_size),
       min_zoom(min_zoom),
       max_zoom(max_zoom) {}
 
-std::string Source::normalizeSourceURL(const std::string &url) {
+std::string Source::normalizeSourceURL(const std::string &url, const std::string &access_token) {
     const std::string t = "mapbox://";
     if (url.compare(0, t.length(), t) == 0) {
-        if (mapboxAccessToken.empty()) {
-            throw std::runtime_error("You must provide a Mapbox API access token via llmr::setMapboxAccessToken()");
+        if (access_token.empty()) {
+            throw std::runtime_error("You must provide a Mapbox API access token for Mapbox tile sources");
         }
-        return std::string("https://api.tiles.mapbox.com/v4/") + url.substr(t.length()) + "/%d/%d/%d.vector.pbf?access_token=" + mapboxAccessToken;
+        return "https://api.tiles.mapbox.com/v4/" + url.substr(t.length()) + "/%d/%d/%d.vector.pbf?access_token=" + access_token;
     } else {
         return url;
     }
 }
-
 
 bool Source::update(Map &map) {
     if (map.getTime() > updated) {

@@ -22,7 +22,7 @@ using namespace llmr;
 Map::Map(View& view)
     : view(view),
       transform(),
-      style(std::make_shared<Style>()),
+      style(std::make_shared<Style>(*this)),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
@@ -181,6 +181,14 @@ void Map::setStyleJSON(std::string newStyleJSON) {
 
 std::string Map::getStyleJSON() const {
     return styleJSON;
+}
+
+void Map::setAccessToken( std::string access_token) {
+    accessToken.swap(access_token);
+}
+
+std::string Map::getAccessToken() const {
+    return accessToken;
 }
 
 #pragma mark - Size

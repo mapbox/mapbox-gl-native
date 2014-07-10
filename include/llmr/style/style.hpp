@@ -16,6 +16,7 @@
 
 namespace llmr {
 
+class Map;
 class Sprite;
 class Source;
 class StyleLayer;
@@ -27,7 +28,7 @@ public:
     struct exception : std::runtime_error { exception(const char *msg) : std::runtime_error(msg) {} };
 
 public:
-    Style();
+    Style(Map &map);
 
     void loadJSON(const uint8_t *const data);
 
@@ -63,6 +64,7 @@ private:
 
 
 private:
+    Map &map;
     std::set<std::shared_ptr<Source>> activeSources;
     PropertyTransition defaultTransition;
     bool initial_render_complete = false;

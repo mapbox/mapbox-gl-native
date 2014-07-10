@@ -1,3 +1,4 @@
+#include <llmr/map/map.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/style/style_layer_group.hpp>
 #include <llmr/style/style_parser.hpp>
@@ -12,7 +13,8 @@
 
 namespace llmr {
 
-Style::Style() {
+Style::Style(Map &map)
+    : map(map) {
 }
 
 void Style::updateSources() {
@@ -107,7 +109,7 @@ void Style::loadJSON(const uint8_t *const data) {
         throw error::style_parse(doc.GetErrorOffset(), doc.GetParseError());
     }
 
-    StyleParser parser;
+    StyleParser parser(map);
     parser.parse(const_cast<const rapidjson::Document &>(doc));
 
     layers = parser.getLayers();
