@@ -5,8 +5,6 @@
 #import <Foundation/Foundation.h>
 
 int main() {
-    llmr::setMapboxAccessToken(mapbox_access_token);
-
     GLFWView view;
     llmr::Map map(view);
 
@@ -17,6 +15,7 @@ int main() {
     map.setDebug(settings.debug);
 
     // Load style
+    map.setAccessToken(mapbox_access_token);
     NSString *path = [[NSBundle mainBundle] pathForResource:@"style.min" ofType:@"js"];
     NSString *json = [NSString stringWithContentsOfFile:path
                                                encoding:[NSString defaultCStringEncoding]

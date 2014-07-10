@@ -52,8 +52,6 @@ int main(int argc, char *argv[]) {
     std::stringstream stylejson;
     stylejson << stylefile.rdbuf();
 
-    llmr::setMapboxAccessToken(mapbox_access_token);
-
     view = new GLFWView();
     llmr::Map map(*view);
 
@@ -64,6 +62,7 @@ int main(int argc, char *argv[]) {
     map.setDebug(settings.debug);
 
     // Load style
+    map.setAccessToken(mapbox_access_token);
     map.setStyleJSON(stylejson.str());
 
     int ret = view->run();
