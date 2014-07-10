@@ -33,7 +33,10 @@ The demo applications use Mapbox vector tiles, which **require a Mapbox account 
 
 ## OS X
 
-Insert your access token into `access_token.hpp`. 
+in the Xcode project, click on the Target icon next to the Run/Stop button, and then "Edit Scheme". In the screen, add an environment variable with the name `MAPBOX_ACCESS_TOKEN` to the targets you want to run.
+
+![Setting the access token](https://cloud.githubusercontent.com/assets/52399/3543326/9e7cfbb8-0860-11e4-8def-3684a9028b61.png)
+
 
 Run:
 
@@ -72,7 +75,7 @@ Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, m
 
 ## Ubuntu
 
-Insert your access token into `access_token.hpp`. 
+Set the environment variable `MAPBOX_ACCESS_TOKEN` to your token.
 
 Ensure you have git and other build essentials:
 
