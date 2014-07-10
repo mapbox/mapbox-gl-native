@@ -170,7 +170,9 @@ void StyleParser::parseSources(JSVal value) {
 
             parseRenderProperty(itr->value, type, "type", parseSourceType);
             parseRenderProperty(itr->value, url, "url");
-            parseRenderProperty(itr->value, tile_size, "tileSize");
+            if (type == SourceType::Raster) {
+                parseRenderProperty(itr->value, tile_size, "tileSize");
+            }
             parseRenderProperty(itr->value, min_zoom, "minZoom");
             parseRenderProperty(itr->value, max_zoom, "maxZoom");
 

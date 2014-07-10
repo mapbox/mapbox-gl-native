@@ -250,11 +250,6 @@ void StyleLayer::updateProperties(float z, const timestamp now) {
         layers->updateProperties(z, now);
     }
 
-    // Accomodate for different tile size.
-    if (bucket && bucket->source) {
-        z += std::log(bucket->source->tile_size / 256.0f) / M_LN2;
-    }
-
     cleanupAppliedStyleProperties(now);
 
     switch (type) {

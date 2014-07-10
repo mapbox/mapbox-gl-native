@@ -8,7 +8,6 @@ module.exports = {
     "mapbox": {
       "type": "vector",
       "url": "mapbox://mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5",
-      "tileSize": 512,
       "maxZoom": 14
     }
   },

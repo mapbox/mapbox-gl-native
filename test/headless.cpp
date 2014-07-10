@@ -9,21 +9,23 @@
 
 #include "../common/headless_view.hpp"
 
+#include <dirent.h>
+
 const std::string base_directory = []{
     std::string fn = __FILE__;
     fn.erase(fn.find_last_of("/"));
-    return fn;
+    return fn + "/fixtures/styles";
 }();
 
-class HeadlessTest : public ::testing::TestWithParam<const char *> {};
+class HeadlessTest : public ::testing::TestWithParam<std::string> {};
 
 TEST_P(HeadlessTest, render) {
-    const char *base = GetParam();
+    const std::string &base = GetParam();
 
-    const std::string style = llmr::util::read_file(base_directory + "/fixtures/styles/" + base + ".style.json");
-    const std::string info = llmr::util::read_file(base_directory + "/fixtures/styles/" + base + ".info.json");
-    const std::string expected_image = base_directory + "/fixtures/styles/" + base + ".expected.png";
-    const std::string actual_image = base_directory + "/fixtures/styles/" + base + ".actual.png";
+    const std::string style = llmr::util::read_file(base_directory + "/" + base + ".style.json");
+    const std::string info = llmr::util::read_file(base_directory + "/" + base + ".info.json");
+    const std::string expected_image = base_directory + "/" + base + ".expected.png";
+    const std::string actual_image = base_directory + "/" + base + ".actual.png";
 
     // Parse settings.
     rapidjson::Document doc;
@@ -58,12 +60,26 @@ TEST_P(HeadlessTest, render) {
 
     const std::string image = llmr::util::compress_png(width, height, pixels.get(), true);
     llmr::util::write_file(actual_image, image);
-
-    const std::string expected_image_data(llmr::util::read_file(expected_image));
-    const llmr::util::Image expected(expected_image_data, true);
-    ASSERT_EQ(width, expected.getWidth());
-    ASSERT_EQ(height, expected.getHeight());
 }
 
 INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest,
-                        ::testing::Values("0", "1"));
+                        ::testing::ValuesIn([]{
+    std::vector<std::string> names;
+
+    const std::string ending = ".info.json";
+
+    DIR *dir = opendir(base_directory.c_str());
+    if (dir == nullptr) return names;
+
+    for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
+        const std::string name = dp->d_name;
+        if (name.length() >= ending.length() && name.compare(name.length() - ending.length(), ending.length(), ending) == 0) {
+            names.push_back(name.substr(0, name.length() - ending.length()));
+        }
+    }
+
+    closedir(dir);
+
+
+    return names;
+                        }()));
