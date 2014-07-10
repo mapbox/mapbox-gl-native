@@ -34,22 +34,28 @@
       }
     },
     {
-      'target_name': 'copy_node_modules',
+      'target_name': 'npm_install',
       'type': 'none',
       'hard_dependency': 1,
-      'copies': [
+      'actions': [
         {
-          'files': ['bin/node_modules'],
-          'destination': '<(PRODUCT_DIR)/bin/node_modules'
+          'action_name': 'npm install',
+          'inputs': [
+            'bin/package.json',
+          ],
+          'outputs': [
+            'bin/node_modules',
+          ],
+          'action': ['./scripts/npm_install.sh']
         }
-      ]
+      ],
     },
     {
       'target_name': 'build_stylesheet',
       'type': 'none',
       'hard_dependency': 1,
       'dependencies': [
-        'copy_node_modules'
+        'npm_install'
       ],
       'actions': [
         {
