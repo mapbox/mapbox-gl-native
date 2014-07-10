@@ -273,11 +273,12 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
             return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
         const float z_base = parseFunctionArgument<float>(value["z"]);
+        const float exp_base =  value.HasMember("base") ? parseFunctionArgument<float>(value["base"]) : 1.75;
         const T val = parseFunctionArgument<T>(value["val"]);
         const float slope = value.HasMember("slope") ? parseFunctionArgument<float>(value["slope"]) : 1;
         const T min = value.HasMember("min") ? parseFunctionArgument<T>(value["min"]) : T();
         const T max = value.HasMember("max") ? parseFunctionArgument<T>(value["max"]) : T();
-        return std::tuple<bool, Function<T>> { true, ExponentialFunction<T>(val, z_base, slope, min, max) };
+        return std::tuple<bool, Function<T>> { true, ExponentialFunction<T>(val, z_base, exp_base, slope, min, max) };
     }
     else if (type == "stops") {
         if (!value.HasMember("stops")) {
