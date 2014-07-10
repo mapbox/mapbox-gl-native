@@ -12,7 +12,6 @@ void Painter::renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     if (!bucket.hasData()) return;
 
     const TextProperties &properties = layer_desc->getProperties<TextProperties>();
-    if (!properties.enabled) return;
 
     mat4 exMatrix;
     matrix::copy(exMatrix, projMatrix);

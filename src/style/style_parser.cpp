@@ -600,8 +600,6 @@ void StyleParser::parseStyles(JSVal value, std::map<ClassID, ClassProperties> &s
 void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     using Key = PropertyKey;
 
-    parseOptionalProperty<Function<bool>>("fill-enabled", Key::FillEnabled, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-fill-enabled", Key::FillEnabled, klass, value);
     parseOptionalProperty<Function<bool>>("fill-antialias", Key::FillAntialias, klass, value);
     parseOptionalProperty<Function<float>>("fill-opacity", Key::FillOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-fill-opacity", Key::FillOpacity, klass, value);
@@ -614,8 +612,6 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<TranslateAnchorType>("fill-translate-anchor", Key::FillTranslateAnchor, klass, value);
     parseOptionalProperty<std::string>("fill-image", Key::FillImage, klass, value);
 
-    parseOptionalProperty<Function<bool>>("line-enabled", Key::LineEnabled, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-line-enabled", Key::LineEnabled, klass, value);
     parseOptionalProperty<Function<float>>("line-opacity", Key::LineOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-line-opacity", Key::LineOpacity, klass, value);
     parseOptionalProperty<Function<Color>>("line-color", Key::LineColor, klass, value);
@@ -633,15 +629,11 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("transition-line-dasharray", Key::LineDashArray, klass, value);
     parseOptionalProperty<std::string>("line-image", Key::LineImage, klass, value);
 
-    parseOptionalProperty<Function<bool>>("icon-enabled", Key::IconEnabled, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-icon-enabled", Key::IconEnabled, klass, value);
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<Function<float>>("icon-rotate", Key::IconRotate, klass, value);
     parseOptionalProperty<RotateAnchorType>("icon-rotate-anchor", Key::IconRotateAnchor, klass, value);
 
-    parseOptionalProperty<Function<bool>>("text-enabled", Key::TextEnabled, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-text-enabled", Key::TextEnabled, klass, value);
     parseOptionalProperty<Function<float>>("text-opacity", Key::TextOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-text-opacity", Key::TextOpacity, klass, value);
     parseOptionalProperty<Function<float>>("text-size", Key::TextSize, klass, value);
@@ -655,13 +647,9 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<float>>("text-halo-blur", Key::TextHaloBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-text-halo-blur", Key::TextHaloBlur, klass, value);
 
-    parseOptionalProperty<Function<bool>>("composite-enabled", Key::CompositeEnabled, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-composite-enabled", Key::CompositeEnabled, klass, value);
     parseOptionalProperty<Function<float>>("composite-opacity", Key::CompositeOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-composite-opacity", Key::CompositeOpacity, klass, value);
 
-    parseOptionalProperty<Function<bool>>("raster-enabled", Key::RasterEnabled, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-enabled", Key::RasterEnabled, klass, value);
     parseOptionalProperty<Function<float>>("raster-opacity", Key::RasterOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
     parseOptionalProperty<Function<float>>("raster-spin", Key::RasterSpin, klass, value);

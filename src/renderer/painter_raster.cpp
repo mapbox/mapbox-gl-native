@@ -9,7 +9,6 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
     if (pass == Translucent) return;
 
     const RasterProperties &properties = layer_desc->getProperties<RasterProperties>();
-    if (!properties.enabled) return;
 
     depthMask(false);
 
