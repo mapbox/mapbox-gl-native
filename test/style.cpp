@@ -7,10 +7,8 @@
 
 using namespace llmr;
 
-std::string prefix = "./obj/gen/bin/";
-
 TEST(Style, Style) {
-    std::ifstream stylefile(prefix + "style.min.js");
+    std::ifstream stylefile("./style.min.js");
     ASSERT_TRUE(stylefile.good());
     std::stringstream stylejson;
     stylejson << stylefile.rdbuf();
@@ -20,7 +18,7 @@ TEST(Style, Style) {
 }
 
 TEST(Style, Colors) {
-    std::ifstream stylefile(prefix + "fuzz-colors.min.js");
+    std::ifstream stylefile("./fuzz-colors.min.js");
     ASSERT_TRUE(stylefile.good());
     std::stringstream stylejson;
     stylejson << stylefile.rdbuf();
