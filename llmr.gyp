@@ -8,6 +8,9 @@
       'target_name': 'shaders',
       'type': 'none',
       'hard_dependency': 1,
+      'dependencies': [
+        'npm_install'
+      ],
       'actions': [
         {
           'action_name': 'Build Shaders',
