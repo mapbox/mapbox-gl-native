@@ -3,7 +3,7 @@
   "sources": {
     "mapbox": {
       "type": "vector",
-      "url": "tiles/%d-%d-%d.vector.pbf",
+      "url": "tiles/{z}-{x}-{y}.vector.pbf",
       "tileSize": 512,
       "maxZoom": 14
     }
@@ -11,9 +11,7 @@
   "layers": [
     {
       "id": "background",
-      "render": {
-        "type": "background"
-      },
+      "type": "background",
       "style": {
         "background-color": "red"
       }
@@ -22,9 +20,7 @@
       "id": "water",
       "source": "mapbox",
       "source-layer": "water",
-      "render": {
-        "type": "fill"
-      },
+      "type": "fill",
       "style": {
         "fill-color": "blue"
       }

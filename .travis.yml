@@ -29,6 +29,7 @@ script:
 - make linux -j4 BUILDTYPE=${BUILDTYPE}
 - make test -j4 BUILDTYPE=${BUILDTYPE}
 - ./scripts/run_tests.sh
+- ./scripts/compare_images.js
 
 after_script:
 - ./scripts/deploy_results.sh
@@ -38,7 +39,7 @@ notifications:
     rooms:
       secure: "SgMjGDp8MP+UTAY/aWJwSQH2hv1Q0vhEc1BdIde59+lEL3u6gNMSexUTSJoVxRlIQTFXDJBU7v58ISdgJX8cPa+UvIC8hhLsayM+cbm+J3jgy7V9E9wllq3RpmXN33TxY7nwKgWdIms2t9YKZco3y4dKKAUyHXrtMvw8NNPQM+4="
     template:
-      - 'Build <a href="%{build_url}">#%{build_number}</a>: %{author} tested <a href="%{compare_url}">%{commit}</a> in branch <a href="https://github.com/%{repository_slug}/tree/%{branch}">%{branch}</a> of <a href="https://github.com/%{repository_slug}">%{repository_name}</a>: <b>%{commit_message}</b><br>%{message} (%{duration})'
+      - 'Build <a href="%{build_url}">#%{build_number}</a>: %{author} tested <a href="%{compare_url}">%{commit}</a> in branch <a href="https://github.com/%{repository_slug}/tree/%{branch}">%{branch}</a> of <a href="https://github.com/%{repository_slug}">%{repository_name}</a>: <b>%{commit_message}</b><br>%{message} (%{duration}) - Compare: <a href="http://mapbox-gl-testing.s3.amazonaws.com/headless/%{build_number}.1/index.html">1</a> <a href="http://mapbox-gl-testing.s3.amazonaws.com/headless/%{build_number}.2/index.html">2</a> <a href="http://mapbox-gl-testing.s3.amazonaws.com/headless/%{build_number}.3/index.html">3</a> <a href="http://mapbox-gl-testing.s3.amazonaws.com/headless/%{build_number}.4/index.html">4</a>'
     format: html
 
 git:

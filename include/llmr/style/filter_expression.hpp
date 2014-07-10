@@ -85,7 +85,7 @@ public:
     enum class GeometryType : uint8_t {
         Any,
         Point,
-        Line,
+        LineString,
         Polygon
     };
 

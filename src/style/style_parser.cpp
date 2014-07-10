@@ -553,6 +553,15 @@ void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair
         return;
     }
 
+    if (value.HasMember("type")) {
+        JSVal type = value["type"];
+        if (!type.IsString()) {
+            fprintf(stderr, "[WARNING] layer type of '%s' must be a string\n", layer->id.c_str());
+        } else {
+            layer->type = parseStyleLayerType({ type.GetString(), type.GetStringLength() });
+        }
+    }
+
     // Make sure we have not previously attempted to parse this layer.
     if (std::find(stack.begin(), stack.end(), layer.get()) != stack.end()) {
         fprintf(stderr, "[WARNING] layer reference of '%s' is circular\n", layer->id.c_str());
@@ -699,20 +708,24 @@ void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer
     parseLayer(it->second);
     stack.pop_front();
 
+
     std::shared_ptr<StyleLayer> reference = it->second.second;
+
+    layer->type = reference->type;
+
     if (reference->layers) {
         fprintf(stderr, "[WARNING] layer '%s' references composite layer\n", layer->id.c_str());
         // We cannot parse this layer further.
         return;
+    } else {
+        layer->bucket = reference->bucket;
     }
-
-    layer->bucket = reference->bucket;
 }
 
 #pragma mark - Parse Bucket
 
 void StyleParser::parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer) {
-    layer->bucket = std::make_shared<StyleBucket>();
+    layer->bucket = std::make_shared<StyleBucket>(layer->type);
 
     // We name the buckets according to the layer that defined it.
     layer->bucket->name = layer->id;
@@ -849,23 +862,14 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
 
     StyleBucket &bucket = *layer->bucket;
 
-    if (value.HasMember("type")) {
-        JSVal type = value["type"];
-        if (type.IsString()) {
-            bucket.type = parseBucketType({ type.GetString(), type.GetStringLength() });
-        }
-    }
-
-    switch (bucket.type) {
-    case BucketType::Fill: {
-        bucket.render = StyleBucketFill{};
+    switch (layer->type) {
+    case StyleLayerType::Fill: {
         StyleBucketFill &render = bucket.render.get<StyleBucketFill>();
 
         parseRenderProperty(value, render.winding, "fill-winding", parseWindingType);
     } break;
 
-    case BucketType::Line: {
-        bucket.render = StyleBucketLine{};
+    case StyleLayerType::Line: {
         StyleBucketLine &render = bucket.render.get<StyleBucketLine>();
 
         parseRenderProperty(value, render.cap, "line-cap", parseCapType);
@@ -874,8 +878,7 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         parseRenderProperty(value, render.round_limit, "line-round-limit");
     } break;
 
-    case BucketType::Icon: {
-        bucket.render = StyleBucketIcon{};
+    case StyleLayerType::Icon: {
         StyleBucketIcon &render = bucket.render.get<StyleBucketIcon>();
 
         parseRenderProperty(value, render.size, "icon-size");
@@ -889,8 +892,7 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         parseRenderProperty(value, render.translate_anchor, "icon-translate-anchor", parseTranslateAnchorType);
     } break;
 
-    case BucketType::Text: {
-        bucket.render = StyleBucketText{};
+    case StyleLayerType::Text: {
         StyleBucketText &render = bucket.render.get<StyleBucketText>();
 
         parseRenderProperty(value, render.field, "text-field");
@@ -920,14 +922,8 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         }
         parseRenderProperty(value, render.translate_anchor, "text-translate-anchor", parseTranslateAnchorType);
     } break;
-
-    case BucketType::Raster: {
-        bucket.render = StyleBucketRaster{};
-    } break;
-
     default:
-        layer->bucket.reset();
-        fprintf(stderr, "[WARNING] bucket type of layer '%s' is invalid\n", layer->id.c_str());
+        // There are no render properties for these layer types.
         break;
     }
 }
