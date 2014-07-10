@@ -1,4 +1,3 @@
-#include <llmr/map/map.hpp>
 #include <llmr/style/style.hpp>
 #include <llmr/style/style_layer_group.hpp>
 #include <llmr/style/style_parser.hpp>
@@ -13,39 +12,11 @@
 
 namespace llmr {
 
-Style::Style(Map &map)
-    : map(map) {
-}
-
-void Style::updateSources() {
-    activeSources.clear();
-    updateSources(layers);
-}
-
-const std::set<std::shared_ptr<Source>> Style::getActiveSources() const {
-    return activeSources;
-}
-
-void Style::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
-    if (!group) {
-        return;
-    }
-    for (const std::shared_ptr<StyleLayer> &layer : group->layers) {
-        if (!layer) continue;
-        if (layer->bucket) {
-            if (layer->bucket->source) {
-                activeSources.emplace(layer->bucket->source);
-            }
-        } else if (layer->layers) {
-            updateSources(layer->layers);
-        }
-    }
+Style::Style() {
 }
 
 void Style::updateProperties(float z, timestamp now) {
     uv::writelock lock(mtx);
-
-    updateSources();
 
     if (layers) {
         layers->updateProperties(z, now);
@@ -109,7 +80,7 @@ void Style::loadJSON(const uint8_t *const data) {
         throw error::style_parse(doc.GetErrorOffset(), doc.GetParseError());
     }
 
-    StyleParser parser(map);
+    StyleParser parser;
     parser.parse(const_cast<const rapidjson::Document &>(doc));
 
     layers = parser.getLayers();

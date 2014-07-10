@@ -5,6 +5,7 @@
 #include <llmr/map/tile_data.hpp>
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/time.hpp>
+#include <llmr/style/style_source.hpp>
 #include <llmr/style/types.hpp>
 
 #include <list>
@@ -22,6 +23,7 @@ class Texturepool;
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:
+    Source(StyleSource style_source, const std::string &access_token = "");
     Source(SourceType type = SourceType::Vector, const std::string &url = "",
            uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 22,
            const std::string &access_token = "");

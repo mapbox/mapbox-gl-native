@@ -3,7 +3,7 @@
 
 #include <rapidjson/document.h>
 #include <llmr/style/style.hpp>
-#include <llmr/map/source.hpp>
+#include <llmr/style/style_source.hpp>
 #include <llmr/style/filter_expression.hpp>
 #include <llmr/style/class_properties.hpp>
 #include <llmr/style/rasterize_properties.hpp>
@@ -17,7 +17,6 @@ namespace llmr {
 
 enum class ClassID : uint32_t;
 
-class Map;
 class StyleLayer;
 class StyleLayerGroup;
 
@@ -25,7 +24,7 @@ class StyleParser {
 public:
     using JSVal = const rapidjson::Value&;
 
-    StyleParser(Map &map);
+    StyleParser();
 
     void parse(JSVal document);
 
@@ -95,11 +94,9 @@ private:
     std::forward_list<Value> parseValues(JSVal values);
 
 private:
-    Map &map;
-
     std::unordered_map<std::string, const rapidjson::Value *> constants;
 
-    std::unordered_map<std::string, const std::shared_ptr<Source>> sources;
+    std::unordered_map<std::string, const std::shared_ptr<StyleSource>> sources;
 
     // This stores the root layer.
     std::shared_ptr<StyleLayerGroup> root;
