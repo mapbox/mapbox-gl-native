@@ -1,7 +1,7 @@
 #include <llmr/map/map.hpp>
 #include <llmr/map/source.hpp>
 #include <llmr/platform/platform.hpp>
-#include <llmr/style/sprite.hpp>
+#include <llmr/map/sprite.hpp>
 #include <llmr/util/transition.hpp>
 #include <llmr/util/time.hpp>
 #include <llmr/util/math.hpp>
