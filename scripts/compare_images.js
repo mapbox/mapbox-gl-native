@@ -23,6 +23,7 @@ var html =
     '</tr>\n';
 
 var exitCode = 0;
+var failures = 0;
 
 processFiles();
 
@@ -66,6 +67,7 @@ function writeResult(base, info, error, difference) {
         if (exitCode < 1) {
             exitCode = 1;
         }
+        failures++;
     }
 
     html +=
@@ -93,6 +95,12 @@ function done() {
     html += "</table>\n";
 
     fs.writeFileSync(path.join(base_dir, 'index.html'), html);
+    console.warn('Results at: ' + path.join(base_dir, 'index.html'));
+    if (failures) {
+        console.warn('\x1B[1m\x1B[31m' + failures + ' ' + (failures == 1 ? 'image doesn\'t' : 'images don\'t') + ' match\x1B[39m\x1B[22m');
+    } else {
+        console.warn('\x1B[1m\x1B[32mAll images match\x1B[39m\x1B[22m');
+    }
 
     process.exit(exitCode);
 }
