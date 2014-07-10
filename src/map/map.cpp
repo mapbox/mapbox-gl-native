@@ -600,23 +600,23 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
 
         // Abort early if we can already deduce from the bucket type that
         // we're not going to render anything anyway during this pass.
-        switch (layer_desc->bucket->type) {
-            case BucketType::Fill:
+        switch (layer_desc->type) {
+            case StyleLayerType::Fill:
                 if (!layer_desc->getProperties<FillProperties>().isVisible()) return;
                 break;
-            case BucketType::Line:
+            case StyleLayerType::Line:
                 if (pass == Opaque) return;
                 if (!layer_desc->getProperties<LineProperties>().isVisible()) return;
                 break;
-            case BucketType::Icon:
+            case StyleLayerType::Icon:
                 if (pass == Opaque) return;
                 if (!layer_desc->getProperties<IconProperties>().isVisible()) return;
                 break;
-            case BucketType::Text:
+            case StyleLayerType::Text:
                 if (pass == Opaque) return;
                 if (!layer_desc->getProperties<TextProperties>().isVisible()) return;
                 break;
-            case BucketType::Raster:
+            case StyleLayerType::Raster:
                 if (pass == Translucent) return;
                 if (!layer_desc->getProperties<RasterProperties>().isVisible()) return;
                 break;
@@ -626,7 +626,7 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
 
         if (debug::renderTree) {
             std::cout << std::string(indent * 4, ' ') << "- " << layer_desc->id << " ("
-                      << layer_desc->bucket->type << ")" << std::endl;
+                      << layer_desc->type << ")" << std::endl;
         }
 
         layer_desc->bucket->source->render(painter, layer_desc);

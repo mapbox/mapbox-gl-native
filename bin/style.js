@@ -192,9 +192,7 @@ module.exports = {
   },
   "layers": [{
     "id": "background",
-    "render": {
-      "type": "background"
-    },
+    "type": "background",
     "style": {
       "background-color": "@land"
     },
@@ -206,9 +204,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landcover",
     "filter": { "class": "snow" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@snow"
     },
@@ -220,9 +216,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landcover",
     "filter": { "class": "crop" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@crop"
     },
@@ -234,9 +228,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landcover",
     "filter": { "class": "grass" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@grass",
       "fill-opacity": {
@@ -256,9 +248,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landcover",
     "filter": { "class": "scrub" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@scrub",
       "fill-opacity": {
@@ -278,9 +268,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landcover",
     "filter": { "class": "wood" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@wood",
       "fill-opacity": {
@@ -300,9 +288,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "wood" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@wood"
     },
@@ -315,9 +301,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "school" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@school"
     },
@@ -329,9 +313,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "sand" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@sand"
     },
@@ -344,9 +326,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "pitch" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "rgba(255,255,255,0.5)",
       "fill-outline-color": "@pitch"
@@ -360,9 +340,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "park" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@park"
     },
@@ -374,9 +352,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "industrial" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "rgba(246,250,255,0.5)"
     },
@@ -388,9 +364,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "scrub" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@scrub"
     },
@@ -403,9 +377,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "grass" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@grass"
     },
@@ -418,9 +390,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "crop" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@crop"
     },
@@ -433,9 +403,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "rock" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@rock"
     },
@@ -448,9 +416,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "snow" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@snow"
     },
@@ -463,9 +429,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "hospital" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@hospital"
     },
@@ -477,9 +441,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "cemetery" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@cemetery"
     },
@@ -491,9 +453,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse_overlay",
     "filter": { "class": ["wetland", "wetland_noveg"] },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "rgba(210,225,225,0.2)",
       "fill-image": "wetland_noveg_64"
@@ -507,9 +467,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse_overlay",
     "filter": { "class": ["breakwater", "pier"] },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@land"
     },
@@ -521,8 +479,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "waterway",
     "filter": { "type": ["river", "canal"] },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-cap": "round"
     },
     "style": {
@@ -538,8 +496,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "waterway",
     "filter": { "type": "stream" },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-cap": "round"
     },
     "style": {
@@ -554,9 +512,7 @@ module.exports = {
     "id": "building_shadow",
     "source": "mapbox",
     "source-layer": "building",
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "#d5d1c6",
       "fill-translate": [1, 1],
@@ -608,9 +564,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "hillshade",
     "filter": { "class": "full_highlight" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "rasterize": "@hillshade_rasterize",
     "style": {
       "fill-color": "#fffff3",
@@ -633,9 +587,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "hillshade",
     "filter": { "class": "medium_highlight" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "rasterize": "@hillshade_rasterize",
     "style": {
       "fill-color": "#ffd",
@@ -658,9 +610,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "hillshade",
     "filter": { "class": "medium_shadow" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "rasterize": "@hillshade_rasterize",
     "style": {
       "fill-color": "#206",
@@ -683,9 +633,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "hillshade",
     "filter": { "class": "full_shadow" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "rasterize": "@hillshade_rasterize",
     "style": {
       "fill-color": "#103",
@@ -708,8 +656,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "contour",
     "filter": { "index": 5 },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round"
     },
     "style": {
@@ -732,8 +680,8 @@ module.exports = {
     "id": "contour_line_regular",
     "source": "mapbox",
     "source-layer": "contour",
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round"
     },
     "style": {
@@ -757,9 +705,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "barrier_line",
     "filter": { "class": "gate" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-width": 2.5,
       "line-color": "#aab"
@@ -773,9 +719,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "barrier_line",
     "filter": { "class": "fence" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#aeada3",
       "line-width": "@fence_width"
@@ -789,9 +733,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "barrier_line",
     "filter": { "class": "hedge" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#8de99b",
       "line-width": "@hedge_width"
@@ -805,9 +747,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "barrier_line",
     "filter": { "class": "land" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@land",
       "line-width": "@barrier_line_land_width"
@@ -821,9 +761,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "barrier_line",
     "filter": { "class": "land" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@land"
     },
@@ -835,9 +773,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "barrier_line",
     "filter": { "class": "cliff" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#987",
       "line-width": 4
@@ -850,9 +786,7 @@ module.exports = {
     "id": "water",
     "source": "mapbox",
     "source-layer": "water",
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@water",
       "fill-outline-color": "#a2bdc0"
@@ -865,9 +799,7 @@ module.exports = {
     "id": "aeroway_fill",
     "source": "mapbox",
     "source-layer": "aeroway",
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "#ddd"
     },
@@ -879,9 +811,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "aeroway",
     "filter": { "type": "runway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#ddd",
       "line-width": "@runway_width"
@@ -895,9 +825,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "aeroway",
     "filter": { "type": "taxiway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#ddd",
       "line-width": "@taxiway_width"
@@ -911,9 +839,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "tunnel",
     "filter": { "class": "motorway_link" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@case",
       "line-dasharray": [6, 6],
@@ -929,9 +855,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "tunnel",
     "filter": { "class": "service" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#000",
       "line-opacity": 0.04,
@@ -949,9 +873,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "tunnel",
     "filter": { "class": "main" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@case",
       "line-dasharray": [6, 6],
@@ -975,9 +897,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "tunnel",
     "filter": { "class": ["street", "street_limited"] },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#d9d5c6",
       "line-width": "@street_casing_width",
@@ -1045,9 +965,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "tunnel",
     "filter": { "class": "motorway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@case",
       "line-dasharray": [6, 6],
@@ -1090,9 +1008,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road",
     "filter": { "class": "path" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#ffd",
       "line-opacity": 0.4,
@@ -1110,9 +1026,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "type": "footway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#bba",
       "line-dasharray": [10, 4],
@@ -1128,9 +1042,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "type": "path" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#987",
       "line-dasharray": [10, 4],
@@ -1154,9 +1066,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "type": "cycleway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#488",
       "line-dasharray": [10, 4],
@@ -1172,9 +1082,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "type": "mtb" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#488",
       "line-dasharray": [12, 4],
@@ -1190,9 +1098,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "type": "piste" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#87b",
       "line-dasharray": [8, 4],
@@ -1208,9 +1114,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "type": "steps" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#bba",
       "line-dasharray": [10, 4],
@@ -1227,9 +1131,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": "major_rail" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#c8c4c0",
       "line-width": 0.8
@@ -1243,8 +1145,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road",
     "filter": { "class": "motorway_link" },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1261,8 +1163,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road",
     "filter": { "class": "service" },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1281,8 +1183,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road",
     "filter": { "class": "main" },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1307,8 +1209,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road",
     "filter": { "class": ["street", "street_limited"] },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1379,8 +1281,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road",
     "filter": { "class": "motorway" },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1437,9 +1339,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": "motorway_link" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@case",
       "line-width": "@motorway_link_casing_width"
@@ -1453,9 +1353,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": "service" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#000",
       "line-opacity": 0.04,
@@ -1471,9 +1369,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": "main" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@case",
       "line-width": "@main_casing_width",
@@ -1495,9 +1391,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": ["street", "street_limited"] },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#d9d5c6",
       "line-width": "@street_casing_width",
@@ -1565,9 +1459,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": "motorway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@case",
       "line-width": "@motorway_casing_width",
@@ -1608,9 +1500,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": "aerialway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "white",
       "line-opacity": 0.5,
@@ -1639,8 +1529,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "admin",
     "filter": { "admin_level": [3, 4, 5] },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round"
     },
     "style": {
@@ -1666,8 +1556,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "admin",
     "filter": { "admin_level": 2 },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1684,8 +1574,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "admin",
     "filter": { "maritime": 1 },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1718,9 +1608,9 @@ module.exports = {
     "id": "country_label_line",
     "source": "mapbox",
     "source-layer": "country_label_line",
+    "type": "line",
     "render": {
       "text-max-width": 5,
-      "type": "line"
     },
     "style": {
       "line-color": "@country_text",
@@ -1737,8 +1627,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "country_label",
     "filter": { "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -1762,8 +1652,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "LineString", "labelrank": 1 },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
@@ -1792,8 +1682,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "LineString", "labelrank": 2 },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
@@ -1821,8 +1711,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "LineString", "labelrank": 3 },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
@@ -1850,8 +1740,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "LineString", "labelrank": [4, 5, 6] },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
@@ -1879,8 +1769,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "Point", "labelrank": 1 },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
@@ -1910,8 +1800,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "Point", "labelrank": 2 },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
@@ -1941,8 +1831,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "Point", "labelrank": 3 },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
@@ -1972,8 +1862,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "Point", "labelrank": [4, 5, 6] },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
@@ -2003,8 +1893,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "state_label",
     "filter": { "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
@@ -2034,8 +1924,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "place_label",
     "filter": { "type": "city", "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -2065,8 +1955,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "place_label",
     "filter": { "type": "town", "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -2096,8 +1986,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "place_label",
     "filter": { "type": "village", "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -2127,8 +2017,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "place_label",
     "filter": { "type": ["hamlet", "suburb", "neighbourhood"], "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -2157,8 +2047,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road_label",
     "filter": { "class": ["motorway", "main"], "$type": "LineString" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "curve",
       "text-padding": 2,
@@ -2183,8 +2073,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road_label",
     "filter": { "class": ["street", "street_limited"], "$type": "LineString" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "curve",
       "text-padding": 2,
@@ -2209,8 +2099,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road_label",
     "filter": { "class": ["service", "driveway", "path"], "$type": "LineString" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "curve",
       "text-padding": 2,
@@ -2235,8 +2125,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "contour",
     "filter": { "index": [5, 10], "$type": "LineString" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-path": "curve",
       "text-field": "{ele} m",
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
@@ -2260,8 +2150,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "water_label",
     "filter": { "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
@@ -2281,8 +2171,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "waterway_label",
     "filter": { "$type": "LineString" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
@@ -2303,8 +2193,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": [1, 2] },
+    "type": "icon",
     "render": {
-      "type": "icon",
       "icon-image": "{maki}-12",
       "icon-size": 12
     },
@@ -2314,8 +2204,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": [1, 2], "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-padding": 2,
@@ -2341,8 +2231,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": 3 },
+    "type": "icon",
     "render": {
-      "type": "icon",
       "icon-image": "{maki}-12",
       "icon-size": 12
     },
@@ -2363,8 +2253,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": 3, "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-padding": 2,
@@ -2398,8 +2288,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": 4 },
+    "type": "icon",
     "render": {
-      "type": "icon",
       "icon-image": "{maki}-12",
       "icon-size": 12
     },
@@ -2420,8 +2310,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": 4, "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-padding": 2,
@@ -2455,8 +2345,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "maki": "airport" },
+    "type": "icon",
     "render": {
-      "type": "icon",
       "icon-image": "{maki}-12",
       "icon-size": 12
     },

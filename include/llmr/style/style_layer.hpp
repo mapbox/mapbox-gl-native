@@ -61,6 +61,8 @@ public:
     // The name of this layer.
     const std::string id;
 
+    StyleLayerType type = StyleLayerType::Unknown;
+
     // Bucket information, telling the renderer how to generate the geometries
     // for this layer (feature property filters, tessellation instructions, ...).
     std::shared_ptr<StyleBucket> bucket;
