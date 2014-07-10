@@ -4,28 +4,32 @@
 
 namespace llmr {
 
-BucketType parseBucketType(const std::string &type) {
-    if (type == "fill") return BucketType::Fill;
-    if (type == "line") return BucketType::Line;
-    if (type == "icon") return BucketType::Icon;
-    if (type == "text") return BucketType::Text;
-    if (type == "raster") return BucketType::Raster;
-    return BucketType::None;
+StyleLayerType parseStyleLayerType(const std::string &type) {
+    if (type == "fill") return StyleLayerType::Fill;
+    if (type == "line") return StyleLayerType::Line;
+    if (type == "icon") return StyleLayerType::Icon;
+    if (type == "text") return StyleLayerType::Text;
+    if (type == "raster") return StyleLayerType::Raster;
+    if (type == "composite") return StyleLayerType::Composite;
+    if (type == "background") return StyleLayerType::Background;
+    return StyleLayerType::Unknown;
 }
 
-const char *stringifyBucketType(BucketType type) {
+const char *stringifyStyleLayerType(StyleLayerType type) {
     switch (type) {
-        case BucketType::Fill: return "fill";
-        case BucketType::Line: return "line";
-        case BucketType::Icon: return "icon";
-        case BucketType::Text: return "text";
-        case BucketType::Raster: return "raster";
-        default: return "none";
+        case StyleLayerType::Fill: return "fill";
+        case StyleLayerType::Line: return "line";
+        case StyleLayerType::Icon: return "icon";
+        case StyleLayerType::Text: return "text";
+        case StyleLayerType::Raster: return "raster";
+        case StyleLayerType::Composite: return "composite";
+        case StyleLayerType::Background: return "background";
+        default: return "unknown";
     }
 }
 
-std::ostream& operator<<(std::ostream& os, BucketType type) {
-    return os << stringifyBucketType(type);
+std::ostream& operator<<(std::ostream& os, StyleLayerType type) {
+    return os << stringifyStyleLayerType(type);
 }
 
 }

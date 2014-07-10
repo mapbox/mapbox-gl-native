@@ -122,7 +122,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(std::shared_ptr<StyleBucket> bu
         } else if (bucket_desc->render.is<StyleBucketRaster>()) {
             return nullptr;
         } else {
-            fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s'\n", bucket_desc->source_layer.c_str());
+            fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucket_desc->name.c_str(), bucket_desc->source_layer.c_str());
         }
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
