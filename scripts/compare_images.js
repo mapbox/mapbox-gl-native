@@ -33,33 +33,45 @@ function processFiles() {
     var name = files.shift();
 
     var info = require(path.join(base_dir, name));
-    var base = path.basename(name, '.info.json');
 
-    var actual = path.join(base_dir, base + '.actual.png');
-    var expected = path.join(base_dir, base + '.expected.png');
-    var diff = path.join(base_dir, base + '.diff.png');
+    var keys = Object.keys(info);
 
-    var compare = spawn('compare', ['-metric', 'MAE', actual, expected, diff ]);
-    var error = '';
-    compare.stderr.on('data', function(data) {
-        error += data.toString();
-    });
-    compare.on('exit', function(code, signal) {
-        // The compare program returns 2 on error otherwise 0 if the images are similar or 1 if they are dissimilar.
-        if (code == 2) {
-            writeResult(base, info, error.trim(), Infinity);
-            exitCode = 2;
-        } else {
-            var difference = parseFloat(error.match(/^\d+(?:\.\d+)?\s+\(([^\)]+)\)\s*$/)[1]);
-            writeResult(base, info, '', difference);
+    processFileTest();
 
-        }
-        return processFiles();
-    });
-    compare.stdin.end();
+    function processFileTest() {
+        if (!keys.length) return processFiles();
+
+        var key = keys.shift();
+
+        var base = path.basename(name, '.info.json');
+
+        var actual = path.join(base_dir, base + '/' + key + '.actual.png');
+        var expected = path.join(base_dir, base + '/' + key + '.expected.png');
+        var diff = path.join(base_dir, base + '/' + key + '.diff.png');
+
+        var compare = spawn('compare', ['-metric', 'MAE', actual, expected, diff ]);
+        var error = '';
+        compare.stderr.on('data', function(data) {
+            error += data.toString();
+        });
+        compare.on('exit', function(code, signal) {
+            // The compare program returns 2 on error otherwise 0 if the images are similar or 1 if they are dissimilar.
+            if (code == 2) {
+                writeResult(base, key, info[key], error.trim(), Infinity);
+                exitCode = 2;
+            } else {
+                var match = error.match(/^\d+(?:\.\d+)?\s+\(([^\)]+)\)\s*$/);
+                var difference = match ? parseFloat(match[1]) : Infinity;
+                writeResult(base, key, info[key], match ? '' : error, difference);
+
+            }
+            processFileTest();
+        });
+        compare.stdin.end();
+    }
 }
 
-function writeResult(base, info, error, difference) {
+function writeResult(base, key, info, error, difference) {
     var color = 'green';
     var allowedDifference = ('diff' in info) ? info.diff : 0.01;
     if (difference > allowedDifference) {
@@ -72,19 +84,18 @@ function writeResult(base, info, error, difference) {
 
     html +=
         '<tr>\n' +
-        '    <td><img src="' + base + '.actual.png" onmouseover="this.src=\'' + base + '.expected.png\'" onmouseout="this.src=\'' + base + '.actual.png\'"></td>\n' +
-        '    <td><img src="' + base + '.expected.png" onmouseover="this.src=\'' + base + '.diff.png\'" onmouseout="this.src=\'' + base + '.expected.png\'"></td>\n' +
+        '    <td><img src="' + base + '/' + key + '.actual.png" onmouseover="this.src=\'' + base + '/' + key + '.expected.png\'" onmouseout="this.src=\'' + base + '/' + key + '.actual.png\'"></td>\n' +
+        '    <td><img src="' + base + '/' + key + '.expected.png" onmouseover="this.src=\'' + base + '/' + key + '.diff.png\'" onmouseout="this.src=\'' + base + '/' + key + '.expected.png\'"></td>\n' +
         '    <td>\n' +
-        '        <h2 style="text-align:center; background:' + color + '"><a href="' + base + '.style.json">' + base + '</a></h2>\n' +
+        '        <h2 style="text-align:center; background:' + color + '"><a href="' + base + '.style.json">' + base + '/' + key + '</a></h2>\n' +
         (error ? '        <p>' + error + '</p>\n' : '') +
         '        <ul>\n' +
         '            <li>diff: <strong>' + difference + '</strong></li>\n' +
         '            <li>zoom: <strong>' + (info.zoom || 0) + '</strong></li>\n' +
-        '            <li>latitude: <strong>' + (info.latitude || 0) + '</strong></li>\n' +
-        '            <li>longitude: <strong>' + (info.longitude || 0) + '</strong></li>\n' +
-        '            <li>angle: <strong>' + (info.angle || 0) + '</strong></li>\n' +
-        '            <li>width: <strong>' + (info.width || 0) + '</strong></li>\n' +
-        '            <li>height: <strong>' + (info.height || 0) + '</strong></li>\n' +
+        '            <li>center: <strong>' + (info.center || [0, 0]) + '</strong></li>\n' +
+        '            <li>bearing: <strong>' + (info.bearing || 0) + '</strong></li>\n' +
+        '            <li>width: <strong>' + (info.width || 512) + '</strong></li>\n' +
+        '            <li>height: <strong>' + (info.height || 512) + '</strong></li>\n' +
         '        </ul>\n' +
         '    </td>\n' +
         '</tr>\n'

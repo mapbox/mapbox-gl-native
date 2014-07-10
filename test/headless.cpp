@@ -24,41 +24,49 @@ TEST_P(HeadlessTest, render) {
 
     const std::string style = llmr::util::read_file(base_directory + "/" + base + ".style.json");
     const std::string info = llmr::util::read_file(base_directory + "/" + base + ".info.json");
-    const std::string actual_image = base_directory + "/" + base + ".actual.png";
 
     // Parse settings.
     rapidjson::Document doc;
     doc.Parse<0>((const char *const)info.c_str());
     ASSERT_EQ(false, doc.HasParseError());
-
-    const double zoom = doc.HasMember("zoom") ? doc["zoom"].GetDouble() : 0;
-    const double angle = doc.HasMember("angle") ? doc["angle"].GetDouble() : 0;
-    const double longitude = doc.HasMember("longitude") ? doc["longitude"].GetDouble() : 0;
-    const double latitude = doc.HasMember("latitude") ? doc["latitude"].GetDouble() : 0;
-    const unsigned int width = doc.HasMember("width") ? doc["width"].GetUint() : 0;
-    const unsigned int height = doc.HasMember("height") ? doc["height"].GetUint() : 0;
+    ASSERT_EQ(true, doc.IsObject());
 
     // Setup OpenGL
     llmr::HeadlessView view;
     llmr::Map map(view);
 
-    view.resize(width, height);
-    map.resize(width, height);
+    for (auto it = doc.MemberBegin(), end = doc.MemberEnd(); it != end; it++) {
+        const std::string name { it->name.GetString(), it->name.GetStringLength() };
+        const rapidjson::Value &value = it->value;
+        ASSERT_EQ(true, value.IsObject());
+        if (value.HasMember("center")) ASSERT_EQ(true, value["center"].IsArray());
 
-    map.setStyleJSON(style);
+        const std::string actual_image = base_directory + "/" + base + "/" + name +  ".actual.png";
 
-    map.setLonLatZoom(longitude, latitude, zoom);
-    map.setAngle(angle);
-    map.setDebug(false);
+        const double zoom = value.HasMember("zoom") ? value["zoom"].GetDouble() : 0;
+        const double bearing = value.HasMember("bearing") ? value["bearing"].GetDouble() : 0;
+        const double latitude = value.HasMember("center") ? value["center"][rapidjson::SizeType(0)].GetDouble() : 0;
+        const double longitude = value.HasMember("center") ? value["center"][rapidjson::SizeType(1)].GetDouble() : 0;
+        const unsigned int width = value.HasMember("width") ? value["width"].GetUint() : 512;
+        const unsigned int height = value.HasMember("height") ? value["height"].GetUint() : 512;
 
-    // Run the loop. It will terminate when we don't have any further listeners.
-    map.run();
+        map.setStyleJSON(style);
 
-    const std::unique_ptr<uint32_t[]> pixels(new uint32_t[width * height]);
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
+        view.resize(width, height);
+        map.resize(width, height);
+        map.setLonLatZoom(longitude, latitude, zoom);
+        map.setAngle(bearing);
 
-    const std::string image = llmr::util::compress_png(width, height, pixels.get(), true);
-    llmr::util::write_file(actual_image, image);
+        // Run the loop. It will terminate when we don't have any further listeners.
+        map.run();
+
+        const std::unique_ptr<uint32_t[]> pixels(new uint32_t[width * height]);
+        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
+
+        const std::string image = llmr::util::compress_png(width, height, pixels.get(), true);
+        llmr::util::write_file(actual_image, image);
+    }
+
 }
 
 INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest, ::testing::ValuesIn([] {
