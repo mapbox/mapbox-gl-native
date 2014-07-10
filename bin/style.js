@@ -1610,7 +1610,7 @@ module.exports = {
     "source-layer": "country_label_line",
     "type": "line",
     "render": {
-      "text-max-width": 5,
+      "text-max-width": 5
     },
     "style": {
       "line-color": "@country_text",
