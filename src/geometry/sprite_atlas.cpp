@@ -5,7 +5,7 @@
 #include <llmr/util/std.hpp>
 #include <llmr/util/constants.hpp>
 
-#include <llmr/style/sprite.hpp>
+#include <llmr/map/sprite.hpp>
 
 #include <cassert>
 #include <cmath>
