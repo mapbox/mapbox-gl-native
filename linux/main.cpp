@@ -8,7 +8,6 @@
 
 #include "../common/settings_json.hpp"
 #include "../common/glfw_view.hpp"
-#include "../access_token.hpp"
 
 GLFWView *view = nullptr;
 
@@ -61,8 +60,15 @@ int main(int argc, char *argv[]) {
     map.setAngle(settings.angle);
     map.setDebug(settings.debug);
 
+    // Set access token if present
+    const char *token = getenv("MAPBOX_ACCESS_TOKEN");
+    if (token == nullptr) {
+        fprintf(stderr, "[WARNING] no access token set. mapbox.com tiles won't work.\n");
+    } else {
+        map.setAccessToken(std::string(token));
+    }
+
     // Load style
-    map.setAccessToken(mapbox_access_token);
     map.setStyleJSON(stylejson.str());
 
     int ret = view->run();

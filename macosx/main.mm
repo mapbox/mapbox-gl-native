@@ -1,6 +1,5 @@
 #include "../common/settings_nsuserdefaults.hpp"
 #include "../common/glfw_view.hpp"
-#include "../access_token.hpp"
 
 #import <Foundation/Foundation.h>
 
@@ -14,8 +13,15 @@ int main() {
     map.setAngle(settings.angle);
     map.setDebug(settings.debug);
 
+    // Set access token if present
+    const char *token = getenv("MAPBOX_ACCESS_TOKEN");
+    if (token == nullptr) {
+        fprintf(stderr, "[WARNING] no access token set. mapbox.com tiles won't work.\n");
+    } else {
+        map.setAccessToken(std::string(token));
+    }
+
     // Load style
-    map.setAccessToken(mapbox_access_token);
     NSString *path = [[NSBundle mainBundle] pathForResource:@"style.min" ofType:@"js"];
     NSString *json = [NSString stringWithContentsOfFile:path
                                                encoding:[NSString defaultCStringEncoding]
