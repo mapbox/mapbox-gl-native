@@ -272,7 +272,7 @@ void FilteredVectorTileLayer::iterator::operator++() {
                 } else if (feature_pbf.tag == 3) { // geometry type
                     switch (FeatureType(feature_pbf.varint())) {
                         case FeatureType::Point:      extractor.setType(FilterExpression::GeometryType::Point); break;
-                        case FeatureType::LineString: extractor.setType(FilterExpression::GeometryType::Line); break;
+                        case FeatureType::LineString: extractor.setType(FilterExpression::GeometryType::LineString); break;
                         case FeatureType::Polygon:    extractor.setType(FilterExpression::GeometryType::Polygon); break;
                         default: break;
                     }

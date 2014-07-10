@@ -120,12 +120,11 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, Gl
     : future(promise.get_future().share())
 {
     // Load the glyph set URL
-
-    const std::map<std::string, std::string> tokens {{
-        { "fontstack", fontStack },
-        { "range", std::to_string(glyphRange.first) + "-" + std::to_string(glyphRange.second) }
-    }};
-    std::string url = util::replaceTokens(glyphURL, tokens);
+    std::string url = util::replaceTokens(glyphURL, [&](const std::string &name) -> std::string {
+        if (name == "fontstack") return fontStack;
+        if (name == "range") return std::to_string(glyphRange.first) + "-" + std::to_string(glyphRange.second);
+        return "";
+    });
 
     // TODO: Find more reliable URL normalization function
     std::replace(url.begin(), url.end(), ' ', '+');
