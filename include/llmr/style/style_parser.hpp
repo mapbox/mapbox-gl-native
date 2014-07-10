@@ -3,7 +3,7 @@
 
 #include <rapidjson/document.h>
 #include <llmr/style/style.hpp>
-#include <llmr/map/source.hpp>
+#include <llmr/style/style_source.hpp>
 #include <llmr/style/filter_expression.hpp>
 #include <llmr/style/class_properties.hpp>
 #include <llmr/style/rasterize_properties.hpp>
@@ -94,7 +94,7 @@ private:
 private:
     std::unordered_map<std::string, const rapidjson::Value *> constants;
 
-    std::unordered_map<std::string, const std::shared_ptr<Source>> sources;
+    std::unordered_map<std::string, const std::shared_ptr<StyleSource>> sources;
 
     // This stores the root layer.
     std::shared_ptr<StyleLayerGroup> root;

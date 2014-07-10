@@ -405,8 +405,33 @@ void Map::setDefaultTransitionDuration(uint64_t duration_milliseconds) {
     style->setDefaultTransitionDuration(duration_milliseconds);
 }
 
+void Map::updateSources() {
+    activeSources.clear();
+    updateSources(style->layers);
+}
+
+const std::set<std::shared_ptr<Source>> Map::getActiveSources() const {
+    return activeSources;
+}
+
+void Map::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
+    if (!group) {
+        return;
+    }
+    for (const std::shared_ptr<StyleLayer> &layer : group->layers) {
+        if (!layer) continue;
+        if (layer->bucket) {
+            if (layer->bucket->style_source) {
+                activeSources.emplace(std::make_shared<Source>(*layer->bucket->style_source));
+            }
+        } else if (layer->layers) {
+            updateSources(layer->layers);
+        }
+    }
+}
+
 void Map::updateTiles() {
-    for (const std::shared_ptr<Source> &source : style->getActiveSources()) {
+    for (const std::shared_ptr<Source> &source : getActiveSources()) {
         source->update(*this);
     }
 }
@@ -414,14 +439,14 @@ void Map::updateTiles() {
 void Map::updateRenderState() {
     std::forward_list<Tile::ID> ids;
 
-    for (const std::shared_ptr<Source> &source : style->getActiveSources()) {
+    for (const std::shared_ptr<Source> &source : getActiveSources()) {
         ids.splice_after(ids.before_begin(), source->getIDs());
         source->updateMatrices(painter.projMatrix, state);
     }
 
     const std::map<Tile::ID, ClipID> clipIDs = computeClipIDs(ids);
 
-    for (const std::shared_ptr<Source> &source : style->getActiveSources()) {
+    for (const std::shared_ptr<Source> &source : getActiveSources()) {
         source->updateClipIDs(clipIDs);
     }
 }
@@ -465,6 +490,7 @@ void Map::prepare() {
     }
 
     animationTime = util::now();
+    updateSources();
     style->updateProperties(state.getNormalizedZoom(), animationTime);
 
     // Allow the sprite atlas to potentially pull new sprite images if needed.
@@ -489,7 +515,7 @@ void Map::render() {
 
     updateRenderState();
 
-    painter.drawClippingMasks(style->getActiveSources());
+    painter.drawClippingMasks(getActiveSources());
 
     // Actually render the layers
     if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
@@ -500,7 +526,7 @@ void Map::render() {
     // This guarantees that we have at least one function per tile called.
     // When only rendering layers via the stylesheet, it's possible that we don't
     // ever visit a tile during rendering.
-    for (const std::shared_ptr<Source> &source : style->getActiveSources()) {
+    for (const std::shared_ptr<Source> &source : getActiveSources()) {
         source->finishRender(painter);
     }
 
@@ -593,7 +619,7 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
             return;
         }
 
-        if (!layer_desc->bucket->source) {
+        if (!layer_desc->bucket->style_source) {
             fprintf(stderr, "[WARNING] can't find source for layer '%s'\n", layer_desc->id.c_str());
             return;
         }
@@ -629,6 +655,8 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
                       << layer_desc->type << ")" << std::endl;
         }
 
-        layer_desc->bucket->source->render(painter, layer_desc);
+        // TODO: THIS IS BAD, FIXME
+        Source source(*layer_desc->bucket->style_source);
+        source.render(painter, layer_desc);
     }
 }

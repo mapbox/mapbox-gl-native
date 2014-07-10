@@ -15,35 +15,8 @@ namespace llmr {
 Style::Style() {
 }
 
-void Style::updateSources() {
-    activeSources.clear();
-    updateSources(layers);
-}
-
-const std::set<std::shared_ptr<Source>> Style::getActiveSources() const {
-    return activeSources;
-}
-
-void Style::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
-    if (!group) {
-        return;
-    }
-    for (const std::shared_ptr<StyleLayer> &layer : group->layers) {
-        if (!layer) continue;
-        if (layer->bucket) {
-            if (layer->bucket->source) {
-                activeSources.emplace(layer->bucket->source);
-            }
-        } else if (layer->layers) {
-            updateSources(layer->layers);
-        }
-    }
-}
-
 void Style::updateProperties(float z, timestamp now) {
     uv::writelock lock(mtx);
-
-    updateSources();
 
     if (layers) {
         layers->updateProperties(z, now);

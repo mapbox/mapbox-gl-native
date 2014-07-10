@@ -1,6 +1,5 @@
 #include <llmr/style/style_layer.hpp>
 #include <llmr/style/style_bucket.hpp>
-#include <llmr/map/source.hpp>
 #include <llmr/style/style_layer_group.hpp>
 #include <llmr/style/property_fallback.hpp>
 
@@ -251,8 +250,8 @@ void StyleLayer::updateProperties(float z, const timestamp now) {
     }
 
     // Accomodate for different tile size.
-    if (bucket && bucket->source) {
-        z += std::log(bucket->source->tile_size / 256.0f) / M_LN2;
+    if (bucket && bucket->style_source) {
+        z += std::log(bucket->style_source->tile_size / 256.0f) / M_LN2;
     }
 
     cleanupAppliedStyleProperties(now);

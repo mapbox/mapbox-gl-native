@@ -2,6 +2,7 @@
 #define LLMR_STYLE_STYLE
 
 #include <llmr/style/property_transition.hpp>
+#include <llmr/style/style_source.hpp>
 
 #include <llmr/util/time.hpp>
 #include <llmr/util/uv.hpp>
@@ -17,7 +18,6 @@
 namespace llmr {
 
 class Sprite;
-class Source;
 class StyleLayer;
 class StyleLayerGroup;
 struct BackgroundProperties;
@@ -35,8 +35,6 @@ public:
     void updateProperties(float z, timestamp t);
 
     void setDefaultTransitionDuration(uint16_t duration_milliseconds = 0);
-
-    const std::set<std::shared_ptr<Source>> getActiveSources() const;
 
     void setAppliedClasses(const std::vector<std::string> &classes);
     const std::vector<std::string> &getAppliedClasses() const;
@@ -57,13 +55,8 @@ public:
     std::string sprite_url;
     std::string glyph_url;
 
-private:
-    void updateSources();
-    void updateSources(const std::shared_ptr<StyleLayerGroup> &group);
-
 
 private:
-    std::set<std::shared_ptr<Source>> activeSources;
     PropertyTransition defaultTransition;
     bool initial_render_complete = false;
 
