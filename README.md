@@ -27,9 +27,18 @@ First off: if you hit problems during development try:
 
 This will clear cached build data and update to the latest versions of dependencies.
 
+### Mapbox API access tokens
+
+The demo applications use Mapbox vector tiles, which **require a Mapbox account and API access token**. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/account/apps/). 
+
 ## OS X
 
-First run:
+in the Xcode project, click on the Target icon next to the Run/Stop button, and then "Edit Scheme". In the screen, add an environment variable with the name `MAPBOX_ACCESS_TOKEN` to the targets you want to run.
+
+![Setting the access token](https://cloud.githubusercontent.com/assets/52399/3543326/9e7cfbb8-0860-11e4-8def-3684a9028b61.png)
+
+
+Run:
 
     make setup
 
@@ -52,6 +61,8 @@ First, pull down the submodule(s):
     git submodule init
     git submodule update
 
+Insert your access token into `MBXViewController.h`. 
+
 Then run:
 
     make setup
@@ -63,6 +74,8 @@ Lastly, `make iproj` to create and open an Xcode project with an iOS-specific vi
 Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina).
 
 ## Ubuntu
+
+Set the environment variable `MAPBOX_ACCESS_TOKEN` to your token.
 
 Ensure you have git and other build essentials:
 

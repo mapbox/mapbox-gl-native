@@ -1,3 +1,4 @@
+#include <llmr/map/map.hpp>
 #include <llmr/style/style_parser.hpp>
 #include <llmr/style/style_layer_group.hpp>
 #include <llmr/util/constants.hpp>
@@ -7,6 +8,10 @@
 namespace llmr {
 
 using JSVal = const rapidjson::Value&;
+
+StyleParser::StyleParser(Map &map)
+    : map(map) {
+}
 
 void StyleParser::parse(JSVal document) {
     if (document.HasMember("constants")) {
@@ -169,7 +174,7 @@ void StyleParser::parseSources(JSVal value) {
             parseRenderProperty(itr->value, min_zoom, "minZoom");
             parseRenderProperty(itr->value, max_zoom, "maxZoom");
 
-            sources.emplace(std::move(name), std::make_shared<Source>(type, url, tile_size, min_zoom, max_zoom));
+            sources.emplace(std::move(name), std::make_shared<Source>(type, url, tile_size, min_zoom, max_zoom, map.getAccessToken()));
         }
     } else {
         throw Style::exception("sources must be an object");

@@ -13,6 +13,14 @@ int main() {
     map.setAngle(settings.angle);
     map.setDebug(settings.debug);
 
+    // Set access token if present
+    const char *token = getenv("MAPBOX_ACCESS_TOKEN");
+    if (token == nullptr) {
+        fprintf(stderr, "[WARNING] no access token set. mapbox.com tiles won't work.\n");
+    } else {
+        map.setAccessToken(std::string(token));
+    }
+
     // Load style
     NSString *path = [[NSBundle mainBundle] pathForResource:@"style.min" ofType:@"js"];
     NSString *json = [NSString stringWithContentsOfFile:path
