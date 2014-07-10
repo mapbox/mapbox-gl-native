@@ -917,6 +917,9 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         }
         parseRenderProperty(value, render.translate_anchor, "text-translate-anchor", parseTranslateAnchorType);
     } break;
+    default:
+        // There are no render properties for these layer types.
+        break;
     }
 }
 
