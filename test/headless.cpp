@@ -24,7 +24,6 @@ TEST_P(HeadlessTest, render) {
 
     const std::string style = llmr::util::read_file(base_directory + "/" + base + ".style.json");
     const std::string info = llmr::util::read_file(base_directory + "/" + base + ".info.json");
-    const std::string expected_image = base_directory + "/" + base + ".expected.png";
     const std::string actual_image = base_directory + "/" + base + ".actual.png";
 
     // Parse settings.
@@ -62,14 +61,14 @@ TEST_P(HeadlessTest, render) {
     llmr::util::write_file(actual_image, image);
 }
 
-INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest,
-                        ::testing::ValuesIn([]{
+INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest, ::testing::ValuesIn([] {
     std::vector<std::string> names;
-
     const std::string ending = ".info.json";
 
     DIR *dir = opendir(base_directory.c_str());
-    if (dir == nullptr) return names;
+    if (dir == nullptr) {
+        return names;
+    }
 
     for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
         const std::string name = dp->d_name;
@@ -80,6 +79,5 @@ INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest,
 
     closedir(dir);
 
-
     return names;
-                        }()));
+}()));
