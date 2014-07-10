@@ -422,7 +422,7 @@ void Map::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
         if (!layer) continue;
         if (layer->bucket) {
             if (layer->bucket->style_source) {
-                activeSources.emplace(std::make_shared<Source>(*layer->bucket->style_source));
+                activeSources.emplace(std::make_shared<Source>(*layer->bucket->style_source, this->getAccessToken()));
             }
         } else if (layer->layers) {
             updateSources(layer->layers);
@@ -656,7 +656,7 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
         }
 
         // TODO: THIS IS BAD, FIXME
-        Source source(*layer_desc->bucket->style_source);
+        Source source(*layer_desc->bucket->style_source, this->getAccessToken());
         source.render(painter, layer_desc);
     }
 }

@@ -20,7 +20,7 @@ struct StyleSource {
         url(url),
         tile_size(tile_size),
         min_zoom(min_zoom),
-        max_zoom(max_zoom) {};
+        max_zoom(max_zoom) {}
   };
 };
 

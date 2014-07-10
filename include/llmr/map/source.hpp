@@ -23,7 +23,7 @@ class Texturepool;
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:
-    Source(StyleSource style_source);
+    Source(StyleSource style_source, const std::string &access_token = "");
     Source(SourceType type = SourceType::Vector, const std::string &url = "",
            uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 22);
 

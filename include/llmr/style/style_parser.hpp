@@ -24,6 +24,8 @@ class StyleParser {
 public:
     using JSVal = const rapidjson::Value&;
 
+    StyleParser();
+
     void parse(JSVal document);
 
     std::shared_ptr<StyleLayerGroup> getLayers() {

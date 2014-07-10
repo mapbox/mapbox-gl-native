@@ -8,6 +8,9 @@ namespace llmr {
 
 using JSVal = const rapidjson::Value&;
 
+StyleParser::StyleParser() {
+}
+
 void StyleParser::parse(JSVal document) {
     if (document.HasMember("constants")) {
         parseConstants(document["constants"]);
