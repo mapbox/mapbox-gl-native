@@ -6,6 +6,7 @@
 #include <boost/optional.hpp>
 
 #include <vector>
+#include <cstdarg>
 
 namespace llmr {
 
@@ -36,10 +37,22 @@ public:
         mutable bool checked = false;
     };
 
-    inline ~FixtureLogBackend() = default;
+    ~FixtureLogBackend();
 
     void record(EventSeverity severity, Event event, const std::string &msg) {
         messages.emplace_back(severity, event, msg);
+    }
+
+    void record(EventSeverity severity, Event event, const char* format, ...) {
+        va_list args;
+        va_start(args, format);
+        const size_t len = vsnprintf(NULL, 0, format, args);
+        va_end(args);
+        std::unique_ptr<char[]> buffer(new char[len + 1]);
+        va_start(args, format);
+        vsnprintf(buffer.get(), len + 1, format, args);
+        va_end(args);
+        messages.emplace_back(severity, event, std::string { buffer.get(), len });
     }
 
     void record(EventSeverity severity, Event event, int64_t code) {

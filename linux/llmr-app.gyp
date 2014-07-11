@@ -15,6 +15,8 @@
         '../common/glfw_view.hpp',
         '../common/glfw_view.cpp',
         '../common/curl_request.cpp',
+        '../common/stderr_log.hpp',
+        '../common/stderr_log.cpp',
       ],
 
       'conditions': [
