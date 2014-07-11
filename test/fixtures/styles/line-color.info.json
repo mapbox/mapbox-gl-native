@@ -1,0 +1,13 @@
+{
+    "default": {
+        "zoom": 14,
+        "center": [52.499167, 13.418056],
+        "height": 256
+    },
+    "colored": {
+        "zoom": 14,
+        "center": [52.499167, 13.418056],
+        "height": 256,
+        "classes": ["colored"]
+    }
+}

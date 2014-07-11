@@ -49,8 +49,19 @@ TEST_P(HeadlessTest, render) {
         const double longitude = value.HasMember("center") ? value["center"][rapidjson::SizeType(1)].GetDouble() : 0;
         const unsigned int width = value.HasMember("width") ? value["width"].GetUint() : 512;
         const unsigned int height = value.HasMember("height") ? value["height"].GetUint() : 512;
+        std::vector<std::string> classes;
+        if (value.HasMember("classes")) {
+            const rapidjson::Value &js_classes = value["classes"];
+            ASSERT_EQ(true, js_classes.IsArray());
+            for (rapidjson::SizeType i = 0; i < js_classes.Size(); i++) {
+                const rapidjson::Value &js_class = js_classes[i];
+                ASSERT_EQ(true, js_class.IsString());
+                classes.push_back({ js_class.GetString(), js_class.GetStringLength() });
+            }
+        }
 
         map.setStyleJSON(style);
+        map.setAppliedClasses(classes);
 
         view.resize(width, height);
         map.resize(width, height);
