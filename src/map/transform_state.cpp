@@ -92,7 +92,7 @@ float TransformState::getPixelRatio() const {
 #pragma mark - Zoom
 
 float TransformState::getNormalizedZoom() const {
-    return std::log(scale * util::tileSize / 256.0f) / M_LN2;
+    return std::log(scale * util::tileSize / 512.0f) / M_LN2;
 }
 
 int32_t TransformState::getIntegerZoom() const {

@@ -17,12 +17,15 @@ namespace llmr {
 
 enum class ClassID : uint32_t;
 
+class Map;
 class StyleLayer;
 class StyleLayerGroup;
 
 class StyleParser {
 public:
     using JSVal = const rapidjson::Value&;
+
+    StyleParser(Map &map);
 
     void parse(JSVal document);
 
@@ -92,6 +95,8 @@ private:
     std::forward_list<Value> parseValues(JSVal values);
 
 private:
+    Map &map;
+
     std::unordered_map<std::string, const rapidjson::Value *> constants;
 
     std::unordered_map<std::string, const std::shared_ptr<Source>> sources;

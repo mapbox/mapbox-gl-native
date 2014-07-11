@@ -2,6 +2,7 @@
 *.xcodeproj
 *.o
 *.actual.png
+*.diff.png
 /node_modules
 /mapnik-packaging
 /macosx/build

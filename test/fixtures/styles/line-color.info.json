@@ -1,0 +1,27 @@
+{
+    "default": {
+        "zoom": 14,
+        "center": [52.499167, 13.418056],
+        "height": 256,
+        "log": [
+            [1, "INFO", "HttpRequest", 200, "tiles/14-8803-5375.vector.pbf"],
+            [1, "INFO", "HttpRequest", 200, "tiles/14-8802-5375.vector.pbf"],
+            [1, "INFO", "HttpRequest", 200, "tiles/14-8803-5374.vector.pbf"],
+            [1, "INFO", "HttpRequest", 200, "tiles/14-8802-5374.vector.pbf"],
+            [4, "INFO", "HttpRequest"]
+        ]
+    },
+    "colored": {
+        "zoom": 14,
+        "center": [52.499167, 13.418056],
+        "height": 256,
+        "classes": ["colored"],
+        "log": [
+            [1, "INFO", "HttpRequest", 200, "tiles/14-8803-5375.vector.pbf"],
+            [1, "INFO", "HttpRequest", 200, "tiles/14-8802-5375.vector.pbf"],
+            [1, "INFO", "HttpRequest", 200, "tiles/14-8803-5374.vector.pbf"],
+            [1, "INFO", "HttpRequest", 200, "tiles/14-8802-5374.vector.pbf"],
+            [4, "INFO", "HttpRequest"]
+        ]
+    }
+}

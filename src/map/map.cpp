@@ -22,7 +22,7 @@ using namespace llmr;
 Map::Map(View& view)
     : view(view),
       transform(),
-      style(std::make_shared<Style>()),
+      style(std::make_shared<Style>(*this)),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
@@ -181,6 +181,14 @@ void Map::setStyleJSON(std::string newStyleJSON) {
 
 std::string Map::getStyleJSON() const {
     return styleJSON;
+}
+
+void Map::setAccessToken( std::string access_token) {
+    accessToken.swap(access_token);
+}
+
+std::string Map::getAccessToken() const {
+    return accessToken;
 }
 
 #pragma mark - Size
@@ -397,10 +405,6 @@ const std::vector<std::string> &Map::getAppliedClasses() const {
    return style->getAppliedClasses();
 }
 
-void Map::setAppliedClasses(std::vector<std::string> &class_names) {
-    style->setAppliedClasses(class_names);
-}
-
 void Map::setDefaultTransitionDuration(uint64_t duration_milliseconds) {
     style->setDefaultTransitionDuration(duration_milliseconds);
 }
@@ -600,23 +604,23 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
 
         // Abort early if we can already deduce from the bucket type that
         // we're not going to render anything anyway during this pass.
-        switch (layer_desc->bucket->type) {
-            case BucketType::Fill:
+        switch (layer_desc->type) {
+            case StyleLayerType::Fill:
                 if (!layer_desc->getProperties<FillProperties>().isVisible()) return;
                 break;
-            case BucketType::Line:
+            case StyleLayerType::Line:
                 if (pass == Opaque) return;
                 if (!layer_desc->getProperties<LineProperties>().isVisible()) return;
                 break;
-            case BucketType::Icon:
+            case StyleLayerType::Icon:
                 if (pass == Opaque) return;
                 if (!layer_desc->getProperties<IconProperties>().isVisible()) return;
                 break;
-            case BucketType::Text:
+            case StyleLayerType::Text:
                 if (pass == Opaque) return;
                 if (!layer_desc->getProperties<TextProperties>().isVisible()) return;
                 break;
-            case BucketType::Raster:
+            case StyleLayerType::Raster:
                 if (pass == Translucent) return;
                 if (!layer_desc->getProperties<RasterProperties>().isVisible()) return;
                 break;
@@ -626,7 +630,7 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
 
         if (debug::renderTree) {
             std::cout << std::string(indent * 4, ' ') << "- " << layer_desc->id << " ("
-                      << layer_desc->bucket->type << ")" << std::endl;
+                      << layer_desc->type << ")" << std::endl;
         }
 
         layer_desc->bucket->source->render(painter, layer_desc);

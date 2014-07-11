@@ -11,7 +11,6 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     if (!bucket.hasData()) return;
 
     const LineProperties &properties = layer_desc->getProperties<LineProperties>();
-    if (!properties.enabled) return;
 
     float width = properties.width;
     float offset = properties.offset / 2;

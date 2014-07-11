@@ -3,12 +3,11 @@
 module.exports = {
   "version": 3,
   "sprite": "https://www.mapbox.com/mapbox-gl-styles/sprites/outdoors",
-  "glyphs": "https://mapbox.s3.amazonaws.com/gl-glyphs-256/{{fontstack}}/{{range}}.pbf",
+  "glyphs": "https://mapbox.s3.amazonaws.com/gl-glyphs-256/{fontstack}/{range}.pbf",
   "sources": {
     "mapbox": {
       "type": "vector",
       "url": "mapbox://mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5",
-      "tileSize": 512,
       "maxZoom": 14
     }
   },
@@ -68,133 +67,131 @@ module.exports = {
     "@contour_night": "#ffff80",
     "@river_canal_width": {
       "fn": "stops",
-      "stops": [[11, 0.5], [12, 1], [14, 2], [16, 3]]
+      "stops": [[10, 0.5], [11, 1], [13, 2], [15, 3]]
     },
     "@stream_width": {
       "fn": "stops",
-      "stops": [[13, 0.25], [14, 0.5], [16, 1.5], [18, 2]]
+      "stops": [[12, 0.25], [13, 0.5], [15, 1.5], [17, 2]]
     },
     "@motorway_width": {
       "fn": "stops",
-      "stops": [[5, 0], [6, 0.5], [8, 0.8], [10, 1], [11, 1.2], [12, 2], [13, 3], [14, 4], [15, 6], [16, 9], [17, 12], [18, 14]]
+      "stops": [[4, 0], [5, 0.5], [7, 0.8], [9, 1], [10, 1.2], [11, 2], [12, 3], [13, 4], [14, 6], [15, 9], [16, 12], [17, 14]]
     },
     "@motorway_casing_width": {
       "fn": "stops",
-      "stops": [[7.5, 0.6], [8, 0.8], [10, 2.8], [11, 3], [12, 4], [13, 5], [14, 6.5], [15, 9], [16, 12], [17, 15], [18, 17]]
+      "stops": [[6.5, 0.6], [7, 0.8], [9, 2.8], [10, 3], [11, 4], [12, 5], [13, 6.5], [14, 9], [15, 12], [16, 15], [17, 17]]
     },
     "@motorway_link_width": {
       "fn": "stops",
-      "stops": [[12, 1.2], [14, 2], [16, 3], [18, 4]]
+      "stops": [[11, 1.2], [13, 2], [15, 3], [17, 4]]
     },
     "@motorway_link_casing_width": {
       "fn": "stops",
-      "stops": [[12, 2.8], [14, 3.5], [16, 5], [18, 6]]
+      "stops": [[11, 2.8], [13, 3.5], [15, 5], [17, 6]]
     },
     "@main_width": {
       "fn": "stops",
-      "stops": [[5, 1], [12, 1], [13, 1.5], [14, 2], [15, 3], [16, 6], [17, 10], [18, 12]]
+      "stops": [[4, 1], [11, 1], [12, 1.5], [13, 2], [14, 3], [15, 6], [16, 10], [17, 12]]
     },
     "@main_casing_width": {
       "fn": "stops",
-      "stops": [[9, 2.9], [12, 2.9], [13, 3.5], [14, 4], [15, 5.5], [16, 9], [17, 12], [18, 14]]
+      "stops": [[8, 2.9], [11, 2.9], [12, 3.5], [13, 4], [14, 5.5], [15, 9], [16, 12], [17, 14]]
     },
     "@street_width": {
       "fn": "stops",
-      "stops": [[14.5, 0], [15, 1.5], [16, 3], [17, 8]]
+      "stops": [[13.5, 0], [14, 1.5], [15, 3], [16, 8]]
     },
     "@street_casing_width": {
       "fn": "stops",
-      "stops": [[13, 0.4], [14, 1], [15, 2.5], [16, 4], [17, 10]]
+      "stops": [[12, 0.4], [13, 1], [14, 2.5], [15, 4], [16, 10]]
     },
     "@street_casing_opacity": {
       "fn": "stops",
-      "stops": [[14, 0], [14.5, 1]]
+      "stops": [[13, 0], [13.5, 1]]
     },
     "@service_casing_width": {
       "fn": "stops",
-      "stops": [[14, 0.5], [15, 3], [16, 3.5], [17, 4], [18, 5], [19, 6]]
+      "stops": [[13, 0.5], [14, 3], [15, 3.5], [16, 4], [17, 5], [18, 6]]
     },
     "@runway_width": {
       "fn": "stops",
-      "stops": [[10, 1], [11, 2], [12, 3], [13, 5], [14, 7], [15, 11], [16, 15], [17, 19], [18, 23]]
+      "stops": [[9, 1], [10, 2], [11, 3], [12, 5], [13, 7], [14, 11], [15, 15], [16, 19], [17, 23]]
     },
     "@taxiway_width": {
       "fn": "stops",
-      "stops": [[10, 0.2], [12, 0.2], [13, 1], [14, 1.5], [15, 2], [16, 3], [17, 4], [18, 5]]
+      "stops": [[9, 0.2], [11, 0.2], [12, 1], [13, 1.5], [14, 2], [15, 3], [16, 4], [17, 5]]
     },
     "@aerialway_width": {
       "fn": "stops",
-      "stops": [[13.5, 0.8], [14, 1.4], [15, 1.6], [16, 2], [17, 2.4], [18, 3]]
+      "stops": [[12.5, 0.8], [13, 1.4], [14, 1.6], [15, 2], [16, 2.4], [17, 3]]
     },
     "@aerialway_casing_width": {
       "fn": "stops",
-      "stops": [[13.5, 2], [14, 2.5], [15, 3], [16, 3.5], [17, 4], [22, 5]]
+      "stops": [[12.5, 2], [13, 2.5], [14, 3], [15, 3.5], [16, 4], [21, 5]]
     },
     "@path_width": {
       "fn": "stops",
-      "stops": [[14, 1.2], [15, 1.5], [16, 1.8]]
+      "stops": [[13, 1.2], [14, 1.5], [15, 1.8]]
     },
     "@admin_l2_width": {
       "fn": "stops",
-      "stops": [[2, 0.5], [3, 0.7], [4, 0.7], [5, 0.8], [6, 1], [8, 2], [10, 3]]
+      "stops": [[1, 0.5], [2, 0.7], [3, 0.7], [4, 0.8], [5, 1], [7, 2], [9, 3]]
     },
     "@admin_l3_width": {
       "fn": "stops",
-      "stops": [[6, 0.6], [8, 1], [12, 2]]
+      "stops": [[5, 0.6], [7, 1], [11, 2]]
     },
     "@road_label_1_size": {
       "fn": "stops",
-      "stops": [[13, 11], [14, 12], [15, 13], [16, 14], [17, 16], [18, 18]]
+      "stops": [[12, 11], [13, 12], [14, 13], [15, 14], [16, 16], [17, 18]]
     },
     "@road_label_2_size": {
       "fn": "stops",
-      "stops": [[13, 11], [14, 12], [16, 14], [18, 16]]
+      "stops": [[12, 11], [13, 12], [15, 14], [17, 16]]
     },
     "@road_label_3_size": {
       "fn": "stops",
-      "stops": [[15, 10], [16, 12], [18, 14]]
+      "stops": [[14, 10], [15, 12], [17, 14]]
     },
     "@fence_width": {
       "fn": "stops",
-      "stops": [[17, 0.6], [19, 1]]
+      "stops": [[16, 0.6], [18, 1]]
     },
     "@hedge_width": {
       "fn": "stops",
-      "stops": [[16, 0.6], [17, 1.2], [19, 1.6]]
+      "stops": [[15, 0.6], [16, 1.2], [18, 1.6]]
     },
     "@barrier_line_land_width": {
       "fn": "stops",
-      "stops": [[14, 0.4], [15, 0.75], [16, 1.5], [17, 3], [18, 6], [19, 12], [20, 24], [21, 48]]
+      "stops": [[13, 0.4], [14, 0.75], [15, 1.5], [16, 3], [17, 6], [18, 12], [19, 24], [20, 48]]
     },
     "@country_label_size": {
       "fn": "stops",
-      "stops": [[1, 14], [12, 24]]
+      "stops": [[0, 14], [11, 24]]
     },
     "@poi_label_1-2_size": {
       "fn": "stops",
-      "stops": [[15, 10], [16, 11], [17, 12]]
+      "stops": [[14, 10], [15, 11], [16, 12]]
     },
     "@poi_label_3_size": {
       "fn": "stops",
-      "stops": [[16, 10], [17, 11]]
+      "stops": [[15, 10], [16, 11]]
     },
     "@hillshade_rasterize": {
         "enabled": {
             "fn": "stops",
-            "stops": [[11, false], [12, true]]
+            "stops": [[10, false], [11, true]]
         },
         "size": {
             "fn": "stops",
-            "stops": [[11, 1024], [12, 512], [13, 256]]
+            "stops": [[10, 1024], [11, 512], [12, 256]]
         },
         "blur": 1
     }
   },
   "layers": [{
     "id": "background",
-    "render": {
-      "type": "background"
-    },
+    "type": "background",
     "style": {
       "background-color": "@land"
     },
@@ -206,9 +203,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landcover",
     "filter": { "class": "snow" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@snow"
     },
@@ -220,9 +215,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landcover",
     "filter": { "class": "crop" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@crop"
     },
@@ -234,21 +227,19 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landcover",
     "filter": { "class": "grass" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@grass",
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[13, 1], [14, 0.8], [17, 0.2]]
+        "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
     },
     "style.night": {
       "fill-color": "@grass_night",
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[13, 1], [14, 0.8], [17, 0.2]]
+        "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
     }
   }, {
@@ -256,21 +247,19 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landcover",
     "filter": { "class": "scrub" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@scrub",
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[13, 1], [14, 0.8], [17, 0.2]]
+        "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
     },
     "style.night": {
       "fill-color": "@scrub_night",
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[13, 1], [14, 0.8], [17, 0.2]]
+        "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
     }
   }, {
@@ -278,21 +267,19 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landcover",
     "filter": { "class": "wood" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@wood",
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[13, 1], [14, 0.8], [17, 0.2]]
+        "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
     },
     "style.night": {
       "fill-color": "@wood_night",
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[13, 1], [14, 0.8], [17, 0.2]]
+        "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
     }
   }, {
@@ -300,9 +287,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "wood" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@wood"
     },
@@ -315,9 +300,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "school" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@school"
     },
@@ -329,9 +312,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "sand" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@sand"
     },
@@ -344,9 +325,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "pitch" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "rgba(255,255,255,0.5)",
       "fill-outline-color": "@pitch"
@@ -360,9 +339,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "park" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@park"
     },
@@ -374,9 +351,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "industrial" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "rgba(246,250,255,0.5)"
     },
@@ -388,9 +363,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "scrub" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@scrub"
     },
@@ -403,9 +376,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "grass" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@grass"
     },
@@ -418,9 +389,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "crop" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@crop"
     },
@@ -433,9 +402,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "rock" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@rock"
     },
@@ -448,9 +415,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "snow" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@snow"
     },
@@ -463,9 +428,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "hospital" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@hospital"
     },
@@ -477,9 +440,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse",
     "filter": { "class": "cemetery" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@cemetery"
     },
@@ -491,9 +452,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse_overlay",
     "filter": { "class": ["wetland", "wetland_noveg"] },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "rgba(210,225,225,0.2)",
       "fill-image": "wetland_noveg_64"
@@ -507,9 +466,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "landuse_overlay",
     "filter": { "class": ["breakwater", "pier"] },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@land"
     },
@@ -521,8 +478,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "waterway",
     "filter": { "type": ["river", "canal"] },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-cap": "round"
     },
     "style": {
@@ -538,8 +495,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "waterway",
     "filter": { "type": "stream" },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-cap": "round"
     },
     "style": {
@@ -554,15 +511,13 @@ module.exports = {
     "id": "building_shadow",
     "source": "mapbox",
     "source-layer": "building",
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "#d5d1c6",
       "fill-translate": [1, 1],
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[16.5, 0], [17, 1]]
+        "stops": [[15.5, 0], [16, 1]]
       },
       "fill-outline-color": "#d5d1c6"
     },
@@ -571,7 +526,7 @@ module.exports = {
       "fill-translate": [1, 1],
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[16.5, 0], [17, 1]]
+        "stops": [[15.5, 0], [16, 1]]
       },
       "fill-outline-color": "#026688"
     }
@@ -591,7 +546,7 @@ module.exports = {
       "fill-color": "#ebe7db",
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[16.5, 0], [17, 0.7]]
+        "stops": [[15.5, 0], [16, 0.7]]
       },
       "fill-outline-color": "#d5d1c6"
     },
@@ -599,7 +554,7 @@ module.exports = {
       "fill-color": "#027797",
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[16.5, 0], [17, 0.7]]
+        "stops": [[15.5, 0], [16, 0.7]]
       },
       "fill-outline-color": "#026688"
     }
@@ -608,16 +563,14 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "hillshade",
     "filter": { "class": "full_highlight" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "rasterize": "@hillshade_rasterize",
     "style": {
       "fill-color": "#fffff3",
       "fill-antialias": false,
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[15, 0.3], [16, 0.3], [17, 0.2], [18, 0.2], [19, 0.1]]
+        "stops": [[14, 0.3], [15, 0.3], [16, 0.2], [17, 0.2], [18, 0.1]]
       }
     },
     "style.night": {
@@ -625,7 +578,7 @@ module.exports = {
       "fill-antialias": false,
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[14, 0.4], [15, 0.3], [17, 0.2], [18, 0.1], [19, 0.05]]
+        "stops": [[13, 0.4], [14, 0.3], [16, 0.2], [17, 0.1], [18, 0.05]]
       }
     }
   }, {
@@ -633,16 +586,14 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "hillshade",
     "filter": { "class": "medium_highlight" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "rasterize": "@hillshade_rasterize",
     "style": {
       "fill-color": "#ffd",
       "fill-antialias": false,
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[15, 0.3], [16, 0.3], [17, 0.2], [18, 0.2], [19, 0.1]]
+        "stops": [[14, 0.3], [15, 0.3], [16, 0.2], [17, 0.2], [18, 0.1]]
       }
     },
     "style.night": {
@@ -650,7 +601,7 @@ module.exports = {
       "fill-antialias": false,
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[15, 0.3], [17, 0.2], [18, 0.15], [19, 0.05]]
+        "stops": [[14, 0.3], [16, 0.2], [17, 0.15], [18, 0.05]]
       }
     }
   }, {
@@ -658,16 +609,14 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "hillshade",
     "filter": { "class": "medium_shadow" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "rasterize": "@hillshade_rasterize",
     "style": {
       "fill-color": "#206",
       "fill-antialias": false,
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[15, 0.08], [16, 0.075], [17, 0.05], [18, 0.05], [19, 0.025]]
+        "stops": [[14, 0.08], [15, 0.075], [16, 0.05], [17, 0.05], [18, 0.025]]
       }
     },
     "style.night": {
@@ -675,7 +624,7 @@ module.exports = {
       "fill-antialias": false,
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[16, 0.3], [17, 0.2], [18, 0.1], [19, 0.05]]
+        "stops": [[15, 0.3], [16, 0.2], [17, 0.1], [18, 0.05]]
       }
     }
   }, {
@@ -683,16 +632,14 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "hillshade",
     "filter": { "class": "full_shadow" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "rasterize": "@hillshade_rasterize",
     "style": {
       "fill-color": "#103",
       "fill-antialias": false,
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[15, 0.08], [16, 0.075], [17, 0.05], [18, 0.05], [19, 0.025]]
+        "stops": [[14, 0.08], [15, 0.075], [16, 0.05], [17, 0.05], [18, 0.025]]
       }
     },
     "style.night": {
@@ -700,7 +647,7 @@ module.exports = {
       "fill-antialias": false,
       "fill-opacity": {
         "fn": "stops",
-        "stops": [[16, 0.3], [17, 0.2], [18, 0.1], [19, 0.05]]
+        "stops": [[15, 0.3], [16, 0.2], [17, 0.1], [18, 0.05]]
       }
     }
   }, {
@@ -708,8 +655,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "contour",
     "filter": { "index": 5 },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round"
     },
     "style": {
@@ -717,7 +664,7 @@ module.exports = {
       "line-width": 0.9,
       "line-opacity": {
         "fn": "stops",
-        "stops": [[12, 0.05], [13, 0.11]]
+        "stops": [[11, 0.05], [12, 0.11]]
       }
     },
     "style.night": {
@@ -725,15 +672,15 @@ module.exports = {
       "line-width": 0.9,
       "line-opacity": {
         "fn": "stops",
-        "stops": [[12, 0.1], [13, 0.2]]
+        "stops": [[11, 0.1], [12, 0.2]]
       }
     }
   }, {
     "id": "contour_line_regular",
     "source": "mapbox",
     "source-layer": "contour",
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round"
     },
     "style": {
@@ -741,7 +688,7 @@ module.exports = {
       "line-width": 0.5,
       "line-opacity": {
         "fn": "stops",
-        "stops": [[12, 0.05], [13, 0.11]]
+        "stops": [[11, 0.05], [12, 0.11]]
       }
     },
     "style.night": {
@@ -749,7 +696,7 @@ module.exports = {
       "line-width": 0.5,
       "line-opacity": {
         "fn": "stops",
-        "stops": [[12, 0.1], [13, 0.4]]
+        "stops": [[11, 0.1], [12, 0.4]]
       }
     }
   }, {
@@ -757,9 +704,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "barrier_line",
     "filter": { "class": "gate" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-width": 2.5,
       "line-color": "#aab"
@@ -773,9 +718,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "barrier_line",
     "filter": { "class": "fence" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#aeada3",
       "line-width": "@fence_width"
@@ -789,9 +732,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "barrier_line",
     "filter": { "class": "hedge" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#8de99b",
       "line-width": "@hedge_width"
@@ -805,9 +746,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "barrier_line",
     "filter": { "class": "land" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@land",
       "line-width": "@barrier_line_land_width"
@@ -821,9 +760,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "barrier_line",
     "filter": { "class": "land" },
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@land"
     },
@@ -835,9 +772,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "barrier_line",
     "filter": { "class": "cliff" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#987",
       "line-width": 4
@@ -850,9 +785,7 @@ module.exports = {
     "id": "water",
     "source": "mapbox",
     "source-layer": "water",
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "@water",
       "fill-outline-color": "#a2bdc0"
@@ -865,9 +798,7 @@ module.exports = {
     "id": "aeroway_fill",
     "source": "mapbox",
     "source-layer": "aeroway",
-    "render": {
-      "type": "fill"
-    },
+    "type": "fill",
     "style": {
       "fill-color": "#ddd"
     },
@@ -879,9 +810,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "aeroway",
     "filter": { "type": "runway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#ddd",
       "line-width": "@runway_width"
@@ -895,9 +824,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "aeroway",
     "filter": { "type": "taxiway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#ddd",
       "line-width": "@taxiway_width"
@@ -911,9 +838,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "tunnel",
     "filter": { "class": "motorway_link" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@case",
       "line-dasharray": [6, 6],
@@ -929,9 +854,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "tunnel",
     "filter": { "class": "service" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#000",
       "line-opacity": 0.04,
@@ -949,16 +872,14 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "tunnel",
     "filter": { "class": "main" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@case",
       "line-dasharray": [6, 6],
       "line-width": "@main_casing_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[9, 0], [10, 1]]
+        "stops": [[8, 0], [9, 1]]
       }
     },
     "style.night": {
@@ -967,7 +888,7 @@ module.exports = {
       "line-width": "@main_casing_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[9, 0], [10, 1]]
+        "stops": [[8, 0], [9, 1]]
       }
     }
   }, {
@@ -975,9 +896,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "tunnel",
     "filter": { "class": ["street", "street_limited"] },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#d9d5c6",
       "line-width": "@street_casing_width",
@@ -1029,7 +948,7 @@ module.exports = {
       "line-width": "@main_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[6.5, 0], [7, 1]]
+        "stops": [[5.5, 0], [6, 1]]
       }
     },
     "style.night": {
@@ -1037,7 +956,7 @@ module.exports = {
       "line-width": "@main_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[6.5, 0], [7, 1]]
+        "stops": [[5.5, 0], [6, 1]]
       }
     }
   }, {
@@ -1045,16 +964,14 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "tunnel",
     "filter": { "class": "motorway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@case",
       "line-dasharray": [6, 6],
       "line-width": "@motorway_casing_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[9.5, 0], [10, 1]]
+        "stops": [[8.5, 0], [9, 1]]
       }
     },
     "style.night": {
@@ -1063,7 +980,7 @@ module.exports = {
       "line-width": "@motorway_casing_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[9.5, 0], [10, 1]]
+        "stops": [[8.5, 0], [9, 1]]
       }
     }
   }, {
@@ -1074,7 +991,7 @@ module.exports = {
       "line-width": "@motorway_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[6.5, 0], [7, 1]]
+        "stops": [[5.5, 0], [6, 1]]
       }
     },
     "style.night": {
@@ -1082,7 +999,7 @@ module.exports = {
       "line-width": "@motorway_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[6.5, 0], [7, 1]]
+        "stops": [[5.5, 0], [6, 1]]
       }
     }
   }, {
@@ -1090,15 +1007,13 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road",
     "filter": { "class": "path" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#ffd",
       "line-opacity": 0.4,
       "line-width": {
         "fn": "stops",
-        "stops": [[15, 3], [16, 4]]
+        "stops": [[14, 3], [15, 4]]
       }
     },
     "style.night": {
@@ -1110,9 +1025,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "type": "footway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#bba",
       "line-dasharray": [10, 4],
@@ -1128,16 +1041,14 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "type": "path" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#987",
       "line-dasharray": [10, 4],
       "line-opacity": 0.8,
       "line-width": {
         "fn": "stops",
-        "stops": [[14, 0.8], [15, 0.9], [16, 1.2]]
+        "stops": [[13, 0.8], [14, 0.9], [15, 1.2]]
       }
     },
     "style.night": {
@@ -1146,7 +1057,7 @@ module.exports = {
       "line-opacity": 0.8,
       "line-width": {
         "fn": "stops",
-        "stops": [[14, 0.8], [15, 0.9], [16, 1.2]]
+        "stops": [[13, 0.8], [14, 0.9], [15, 1.2]]
       }
     }
   }, {
@@ -1154,9 +1065,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "type": "cycleway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#488",
       "line-dasharray": [10, 4],
@@ -1172,9 +1081,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "type": "mtb" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#488",
       "line-dasharray": [12, 4],
@@ -1190,9 +1097,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "type": "piste" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#87b",
       "line-dasharray": [8, 4],
@@ -1208,9 +1113,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "type": "steps" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#bba",
       "line-dasharray": [10, 4],
@@ -1227,9 +1130,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": "major_rail" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#c8c4c0",
       "line-width": 0.8
@@ -1243,8 +1144,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road",
     "filter": { "class": "motorway_link" },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1261,8 +1162,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road",
     "filter": { "class": "service" },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1281,8 +1182,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road",
     "filter": { "class": "main" },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1291,7 +1192,7 @@ module.exports = {
       "line-width": "@main_casing_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[9, 0], [10, 1]]
+        "stops": [[8, 0], [9, 1]]
       }
     },
     "style.night": {
@@ -1299,7 +1200,7 @@ module.exports = {
       "line-width": "@main_casing_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[9, 0], [10, 1]]
+        "stops": [[8, 0], [9, 1]]
       }
     }
   }, {
@@ -1307,8 +1208,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road",
     "filter": { "class": ["street", "street_limited"] },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1363,7 +1264,7 @@ module.exports = {
       "line-width": "@main_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[6.5, 0], [7, 1]]
+        "stops": [[5.5, 0], [6, 1]]
       }
     },
     "style.night": {
@@ -1371,7 +1272,7 @@ module.exports = {
       "line-width": "@main_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[6.5, 0], [7, 1]]
+        "stops": [[5.5, 0], [6, 1]]
       }
     }
   }, {
@@ -1379,8 +1280,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road",
     "filter": { "class": "motorway" },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1389,7 +1290,7 @@ module.exports = {
       "line-width": "@motorway_casing_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[9.5, 0], [10, 1]]
+        "stops": [[8.5, 0], [9, 1]]
       }
     },
     "style.night": {
@@ -1397,7 +1298,7 @@ module.exports = {
       "line-width": "@motorway_casing_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[9.5, 0], [10, 1]]
+        "stops": [[8.5, 0], [9, 1]]
       }
     }
   }, {
@@ -1408,7 +1309,7 @@ module.exports = {
       "line-width": "@motorway_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[6.5, 0], [7, 1]]
+        "stops": [[5.5, 0], [6, 1]]
       }
     },
     "style.night": {
@@ -1416,7 +1317,7 @@ module.exports = {
       "line-width": "@motorway_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[6.5, 0], [7, 1]]
+        "stops": [[5.5, 0], [6, 1]]
       }
     }
   }, {
@@ -1437,9 +1338,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": "motorway_link" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@case",
       "line-width": "@motorway_link_casing_width"
@@ -1453,9 +1352,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": "service" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#000",
       "line-opacity": 0.04,
@@ -1471,15 +1368,13 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": "main" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@case",
       "line-width": "@main_casing_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[9, 0], [10, 1]]
+        "stops": [[8, 0], [9, 1]]
       }
     },
     "style.night": {
@@ -1487,7 +1382,7 @@ module.exports = {
       "line-width": "@main_casing_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[9, 0], [10, 1]]
+        "stops": [[8, 0], [9, 1]]
       }
     }
   }, {
@@ -1495,9 +1390,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": ["street", "street_limited"] },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "#d9d5c6",
       "line-width": "@street_casing_width",
@@ -1549,7 +1442,7 @@ module.exports = {
       "line-width": "@main_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[6.5, 0], [7, 1]]
+        "stops": [[5.5, 0], [6, 1]]
       }
     },
     "style.night": {
@@ -1557,7 +1450,7 @@ module.exports = {
       "line-width": "@main_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[6.5, 0], [7, 1]]
+        "stops": [[5.5, 0], [6, 1]]
       }
     }
   }, {
@@ -1565,15 +1458,13 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": "motorway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "@case",
       "line-width": "@motorway_casing_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[9.5, 0], [10, 1]]
+        "stops": [[8.5, 0], [9, 1]]
       }
     },
     "style.night": {
@@ -1581,7 +1472,7 @@ module.exports = {
       "line-width": "@motorway_casing_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[9.5, 0], [10, 1]]
+        "stops": [[8.5, 0], [9, 1]]
       }
     }
   }, {
@@ -1592,7 +1483,7 @@ module.exports = {
       "line-width": "@motorway_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[6.5, 0], [7, 1]]
+        "stops": [[5.5, 0], [6, 1]]
       }
     },
     "style.night": {
@@ -1600,7 +1491,7 @@ module.exports = {
       "line-width": "@motorway_width",
       "line-opacity": {
         "fn": "stops",
-        "stops": [[6.5, 0], [7, 1]]
+        "stops": [[5.5, 0], [6, 1]]
       }
     }
   }, {
@@ -1608,9 +1499,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "bridge",
     "filter": { "class": "aerialway" },
-    "render": {
-      "type": "line"
-    },
+    "type": "line",
     "style": {
       "line-color": "white",
       "line-opacity": 0.5,
@@ -1639,8 +1528,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "admin",
     "filter": { "admin_level": [3, 4, 5] },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round"
     },
     "style": {
@@ -1648,7 +1537,7 @@ module.exports = {
       "line-dasharray": [60, 20],
       "line-opacity": {
         "fn": "stops",
-        "stops": [[4, 0], [6, 1]]
+        "stops": [[3, 0], [5, 1]]
       },
       "line-width": "@admin_l3_width"
     },
@@ -1657,7 +1546,7 @@ module.exports = {
       "line-dasharray": [60, 20],
       "line-opacity": {
         "fn": "stops",
-        "stops": [[4, 0], [6, 1]]
+        "stops": [[3, 0], [5, 1]]
       },
       "line-width": "@admin_l3_width"
     }
@@ -1666,8 +1555,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "admin",
     "filter": { "admin_level": 2 },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1684,8 +1573,8 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "admin",
     "filter": { "maritime": 1 },
+    "type": "line",
     "render": {
-      "type": "line",
       "line-join": "round",
       "line-cap": "round"
     },
@@ -1704,23 +1593,23 @@ module.exports = {
       "line-color": "#c0d6d6",
       "line-width": {
         "fn": "stops",
-        "stops": [[6, 1], [8, 2], [12, 3]]
+        "stops": [[5, 1], [7, 2], [11, 3]]
       }
     },
     "style.night": {
       "line-color": "#0a1347",
       "line-width": {
         "fn": "stops",
-        "stops": [[6, 1], [8, 2], [12, 3]]
+        "stops": [[5, 1], [7, 2], [11, 3]]
       }
     }
   }, {
     "id": "country_label_line",
     "source": "mapbox",
     "source-layer": "country_label_line",
+    "type": "line",
     "render": {
-      "text-max-width": 5,
-      "type": "line"
+      "text-max-width": 5
     },
     "style": {
       "line-color": "@country_text",
@@ -1736,10 +1625,10 @@ module.exports = {
     "id": "country_label",
     "source": "mapbox",
     "source-layer": "country_label",
-    "filter": { "$type": "point" },
+    "filter": { "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 24,
@@ -1761,10 +1650,10 @@ module.exports = {
     "id": "marine_label_line_1",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "line", "labelrank": 1 },
+    "filter": { "$type": "LineString", "labelrank": 1 },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 30,
@@ -1775,7 +1664,7 @@ module.exports = {
       "text-color": "@marine_text",
       "text-size": {
         "fn": "stops",
-        "stops": [[3, 20], [4, 25], [5, 30], [22, 30]]
+        "stops": [[2, 20], [3, 25], [4, 30], [21, 30]]
       },
       "text-halo-color": "@water"
     },
@@ -1783,7 +1672,7 @@ module.exports = {
       "text-color": "@water_dark_night",
       "text-size": {
         "fn": "stops",
-        "stops": [[3, 20], [4, 25], [5, 30], [22, 30]]
+        "stops": [[2, 20], [3, 25], [4, 30], [21, 30]]
       },
       "text-halo-color": "@water_night"
     }
@@ -1791,10 +1680,10 @@ module.exports = {
     "id": "marine_label_line_2",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "line", "labelrank": 2 },
+    "filter": { "$type": "LineString", "labelrank": 2 },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 24,
@@ -1804,7 +1693,7 @@ module.exports = {
       "text-color": "@marine_text",
       "text-size": {
         "fn": "stops",
-        "stops": [[3, 13], [4, 14], [5, 20], [6, 24], [22, 24]]
+        "stops": [[2, 13], [3, 14], [4, 20], [5, 24], [21, 24]]
       },
       "text-halo-color": "@water"
     },
@@ -1812,7 +1701,7 @@ module.exports = {
       "text-color": "@water_dark_night",
       "text-size": {
         "fn": "stops",
-        "stops": [[3, 13], [4, 14], [5, 20], [6, 24], [22, 24]]
+        "stops": [[2, 13], [3, 14], [4, 20], [5, 24], [21, 24]]
       },
       "text-halo-color": "@water_night"
     }
@@ -1820,10 +1709,10 @@ module.exports = {
     "id": "marine_label_line_3",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "line", "labelrank": 3 },
+    "filter": { "$type": "LineString", "labelrank": 3 },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 18,
@@ -1833,7 +1722,7 @@ module.exports = {
       "text-color": "@marine_text",
       "text-size": {
         "fn": "stops",
-        "stops": [[3, 12], [4, 13], [5, 15], [6, 18], [22, 18]]
+        "stops": [[2, 12], [3, 13], [4, 15], [5, 18], [21, 18]]
       },
       "text-halo-color": "@water"
     },
@@ -1841,7 +1730,7 @@ module.exports = {
       "text-color": "@water_dark_night",
       "text-size": {
         "fn": "stops",
-        "stops": [[3, 12], [4, 13], [5, 15], [6, 18], [22, 18]]
+        "stops": [[2, 12], [3, 13], [4, 15], [5, 18], [21, 18]]
       },
       "text-halo-color": "@water_night"
     }
@@ -1849,10 +1738,10 @@ module.exports = {
     "id": "marine_label_line_other",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "line", "labelrank": [4, 5, 6] },
+    "filter": { "$type": "LineString", "labelrank": [4, 5, 6] },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 16,
@@ -1862,7 +1751,7 @@ module.exports = {
       "text-color": "@marine_text",
       "text-size": {
         "fn": "stops",
-        "stops": [[4, 12], [5, 14], [6, 16], [22, 16]]
+        "stops": [[3, 12], [4, 14], [5, 16], [21, 16]]
       },
       "text-halo-color": "@water"
     },
@@ -1870,7 +1759,7 @@ module.exports = {
       "text-color": "@water_dark_night",
       "text-size": {
         "fn": "stops",
-        "stops": [[4, 12], [5, 14], [6, 16], [22, 16]]
+        "stops": [[3, 12], [4, 14], [5, 16], [21, 16]]
       },
       "text-halo-color": "@water_night"
     }
@@ -1878,10 +1767,10 @@ module.exports = {
     "id": "marine_label_point_1",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "point", "labelrank": 1 },
+    "filter": { "$type": "Point", "labelrank": 1 },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 30,
@@ -1893,7 +1782,7 @@ module.exports = {
       "text-color": "@marine_text",
       "text-size": {
         "fn": "stops",
-        "stops": [[3, 20], [4, 25], [5, 30], [22, 30]]
+        "stops": [[2, 20], [3, 25], [4, 30], [21, 30]]
       },
       "text-halo-color": "@water"
     },
@@ -1901,7 +1790,7 @@ module.exports = {
       "text-color": "@water_dark_night",
       "text-size": {
         "fn": "stops",
-        "stops": [[3, 20], [4, 25], [5, 30], [22, 30]]
+        "stops": [[2, 20], [3, 25], [4, 30], [21, 30]]
       },
       "text-halo-color": "@water_night"
     }
@@ -1909,10 +1798,10 @@ module.exports = {
     "id": "marine_label_point_2",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "point", "labelrank": 2 },
+    "filter": { "$type": "Point", "labelrank": 2 },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 24,
@@ -1924,7 +1813,7 @@ module.exports = {
       "text-color": "@marine_text",
       "text-size": {
         "fn": "stops",
-        "stops": [[3, 13], [4, 14], [5, 20], [6, 24], [22, 24]]
+        "stops": [[2, 13], [3, 14], [4, 20], [5, 24], [21, 24]]
       },
       "text-halo-color": "@water"
     },
@@ -1932,7 +1821,7 @@ module.exports = {
       "text-color": "@water_dark_night",
       "text-size": {
         "fn": "stops",
-        "stops": [[3, 13], [4, 14], [5, 20], [6, 24], [22, 24]]
+        "stops": [[2, 13], [3, 14], [4, 20], [5, 24], [21, 24]]
       },
       "text-halo-color": "@water_night"
     }
@@ -1940,10 +1829,10 @@ module.exports = {
     "id": "marine_label_point_3",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "point", "labelrank": 3 },
+    "filter": { "$type": "Point", "labelrank": 3 },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 18,
@@ -1955,7 +1844,7 @@ module.exports = {
       "text-color": "@marine_text",
       "text-size": {
         "fn": "stops",
-        "stops": [[3, 12], [4, 13], [5, 15], [6, 18], [22, 18]]
+        "stops": [[2, 12], [3, 13], [4, 15], [5, 18], [21, 18]]
       },
       "text-halo-color": "@water"
     },
@@ -1963,7 +1852,7 @@ module.exports = {
       "text-color": "@water_dark_night",
       "text-size": {
         "fn": "stops",
-        "stops": [[3, 12], [4, 13], [5, 15], [6, 18], [22, 18]]
+        "stops": [[2, 12], [3, 13], [4, 15], [5, 18], [21, 18]]
       },
       "text-halo-color": "@water_night"
     }
@@ -1971,10 +1860,10 @@ module.exports = {
     "id": "marine_label_point_other",
     "source": "mapbox",
     "source-layer": "marine_label",
-    "filter": { "$type": "point", "labelrank": [4, 5, 6] },
+    "filter": { "$type": "Point", "labelrank": [4, 5, 6] },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 16,
@@ -1986,7 +1875,7 @@ module.exports = {
       "text-color": "@marine_text",
       "text-size": {
         "fn": "stops",
-        "stops": [[4, 12], [5, 14], [6, 16], [22, 16]]
+        "stops": [[3, 12], [4, 14], [5, 16], [21, 16]]
       },
       "text-halo-color": "@water"
     },
@@ -1994,7 +1883,7 @@ module.exports = {
       "text-color": "@water_dark_night",
       "text-size": {
         "fn": "stops",
-        "stops": [[4, 12], [5, 14], [6, 16], [22, 16]]
+        "stops": [[3, 12], [4, 14], [5, 16], [21, 16]]
       },
       "text-halo-color": "@water_night"
     }
@@ -2002,10 +1891,10 @@ module.exports = {
     "id": "state_label",
     "source": "mapbox",
     "source-layer": "state_label",
-    "filter": { "$type": "point" },
+    "filter": { "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
       "text-max-size": 16,
@@ -2017,7 +1906,7 @@ module.exports = {
       "text-halo-color": "rgba(244,239,225,0.8)",
       "text-size": {
         "fn": "stops",
-        "stops": [[3.99, 0], [4, 10], [9.99, 16], [10, 0]]
+        "stops": [[2.99, 0], [3, 10], [8.99, 16], [9, 0]]
       }
     },
     "style.night": {
@@ -2026,17 +1915,17 @@ module.exports = {
       "text-halo-color": "@land_night",
       "text-size": {
         "fn": "stops",
-        "stops": [[3.99, 0], [4, 10], [9.99, 16], [10, 0]]
+        "stops": [[2.99, 0], [3, 10], [8.99, 16], [9, 0]]
       }
     }
   }, {
     "id": "place_label_city",
     "source": "mapbox",
     "source-layer": "place_label",
-    "filter": { "type": "city", "$type": "point" },
+    "filter": { "type": "city", "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 20,
@@ -2048,7 +1937,7 @@ module.exports = {
       "text-halo-color": "@text_stroke",
       "text-size": {
         "fn": "stops",
-        "stops": [[3.99, 0], [4, 10], [7, 14], [14.99, 20], [15, 0]]
+        "stops": [[2.99, 0], [3, 10], [6, 14], [13.99, 20], [14, 0]]
       }
     },
     "style.night": {
@@ -2057,17 +1946,17 @@ module.exports = {
       "text-halo-color": "@text2_stroke_night",
       "text-size": {
         "fn": "stops",
-        "stops": [[3.99, 0], [4, 10], [7, 14], [14.99, 20], [15, 0]]
+        "stops": [[2.99, 0], [3, 10], [6, 14], [13.99, 20], [14, 0]]
       }
     }
   }, {
     "id": "place_label_town",
     "source": "mapbox",
     "source-layer": "place_label",
-    "filter": { "type": "town", "$type": "point" },
+    "filter": { "type": "town", "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 24,
@@ -2079,7 +1968,7 @@ module.exports = {
       "text-halo-color": "@text_stroke",
       "text-size": {
         "fn": "stops",
-        "stops": [[9, 10], [12, 13], [14, 17], [16, 22]]
+        "stops": [[8, 10], [11, 13], [13, 17], [15, 22]]
       }
     },
     "style.night": {
@@ -2088,17 +1977,17 @@ module.exports = {
       "text-halo-color": "@text2_stroke_night",
       "text-size": {
         "fn": "stops",
-        "stops": [[9, 10], [12, 13], [14, 17], [16, 22]]
+        "stops": [[8, 10], [11, 13], [13, 17], [15, 22]]
       }
     }
   }, {
     "id": "place_label_village",
     "source": "mapbox",
     "source-layer": "place_label",
-    "filter": { "type": "village", "$type": "point" },
+    "filter": { "type": "village", "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 22,
@@ -2110,7 +1999,7 @@ module.exports = {
       "text-halo-color": "@text_stroke",
       "text-size": {
         "fn": "stops",
-        "stops": [[9, 8], [12, 10], [14, 14], [16, 16], [17, 20]]
+        "stops": [[8, 8], [11, 10], [13, 14], [15, 16], [16, 20]]
       }
     },
     "style.night": {
@@ -2119,17 +2008,17 @@ module.exports = {
       "text-halo-color": "@text2_stroke_night",
       "text-size": {
         "fn": "stops",
-        "stops": [[9, 8], [12, 10], [14, 14], [16, 16], [17, 20]]
+        "stops": [[8, 8], [11, 10], [13, 14], [15, 16], [16, 20]]
       }
     }
   }, {
     "id": "place_label_other",
     "source": "mapbox",
     "source-layer": "place_label",
-    "filter": { "type": ["hamlet", "suburb", "neighbourhood"], "$type": "point" },
+    "filter": { "type": ["hamlet", "suburb", "neighbourhood"], "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 18,
@@ -2140,7 +2029,7 @@ module.exports = {
       "text-halo-color": "@text_stroke",
       "text-size": {
         "fn": "stops",
-        "stops": [[13, 11], [14, 12], [16, 14], [18, 18]]
+        "stops": [[12, 11], [13, 12], [15, 14], [17, 18]]
       }
     },
     "style.night": {
@@ -2149,17 +2038,17 @@ module.exports = {
       "text-halo-width": 0.3,
       "text-size": {
         "fn": "stops",
-        "stops": [[13, 11], [14, 12], [16, 14], [18, 18]]
+        "stops": [[12, 11], [13, 12], [15, 14], [17, 18]]
       }
     }
   }, {
     "id": "road_label_1",
     "source": "mapbox",
     "source-layer": "road_label",
-    "filter": { "class": ["motorway", "main"], "$type": "line" },
+    "filter": { "class": ["motorway", "main"], "$type": "LineString" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-padding": 2,
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
@@ -2182,10 +2071,10 @@ module.exports = {
     "id": "road_label_2",
     "source": "mapbox",
     "source-layer": "road_label",
-    "filter": { "class": ["street", "street_limited"], "$type": "line" },
+    "filter": { "class": ["street", "street_limited"], "$type": "LineString" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-padding": 2,
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
@@ -2208,10 +2097,10 @@ module.exports = {
     "id": "road_label_3",
     "source": "mapbox",
     "source-layer": "road_label",
-    "filter": { "class": ["service", "driveway", "path"], "$type": "line" },
+    "filter": { "class": ["service", "driveway", "path"], "$type": "LineString" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-padding": 2,
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
@@ -2234,11 +2123,11 @@ module.exports = {
     "id": "contour_label",
     "source": "mapbox",
     "source-layer": "contour",
-    "filter": { "index": [5, 10], "$type": "line" },
+    "filter": { "index": [5, 10], "$type": "LineString" },
+    "type": "text",
     "render": {
-      "type": "text",
       "text-path": "curve",
-      "text-field": "{{ele}} m",
+      "text-field": "{ele} m",
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
       "text-max-size": 10,
       "text-max-angle": 0.5
@@ -2259,10 +2148,10 @@ module.exports = {
     "id": "water_label",
     "source": "mapbox",
     "source-layer": "water_label",
-    "filter": { "$type": "point" },
+    "filter": { "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 12,
@@ -2280,10 +2169,10 @@ module.exports = {
     "id": "waterway_label",
     "source": "mapbox",
     "source-layer": "waterway_label",
-    "filter": { "$type": "line" },
+    "filter": { "$type": "LineString" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "curve",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 12,
@@ -2303,9 +2192,9 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": [1, 2] },
+    "type": "icon",
     "render": {
-      "type": "icon",
-      "icon-image": "{{maki}}-12",
+      "icon-image": "{maki}-12",
       "icon-size": 12
     },
     "style.night": {}
@@ -2313,10 +2202,10 @@ module.exports = {
     "id": "poi_label_1-2",
     "source": "mapbox",
     "source-layer": "poi_label",
-    "filter": { "scalerank": [1, 2], "$type": "point" },
+    "filter": { "scalerank": [1, 2], "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-padding": 2,
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -2341,31 +2230,31 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": 3 },
+    "type": "icon",
     "render": {
-      "type": "icon",
-      "icon-image": "{{maki}}-12",
+      "icon-image": "{maki}-12",
       "icon-size": 12
     },
     "style": {
       "icon-opacity": {
         "fn": "stops",
-        "stops": [[16.5, 0], [16.75, 1]]
+        "stops": [[15.5, 0], [15.75, 1]]
       }
     },
     "style.night": {
       "icon-opacity": {
         "fn": "stops",
-        "stops": [[16.5, 0], [16.75, 1]]
+        "stops": [[15.5, 0], [15.75, 1]]
       }
     }
   }, {
     "id": "poi_label_3",
     "source": "mapbox",
     "source-layer": "poi_label",
-    "filter": { "scalerank": 3, "$type": "point" },
+    "filter": { "scalerank": 3, "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-padding": 2,
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -2380,7 +2269,7 @@ module.exports = {
       "text-halo-width": 0.3,
       "text-opacity": {
         "fn": "stops",
-        "stops": [[16.5, 0], [16.75, 1]]
+        "stops": [[15.5, 0], [15.75, 1]]
       }
     },
     "style.night": {
@@ -2390,7 +2279,7 @@ module.exports = {
       "text-halo-width": 0.3,
       "text-opacity": {
         "fn": "stops",
-        "stops": [[16.5, 0], [16.75, 1]]
+        "stops": [[15.5, 0], [15.75, 1]]
       }
     }
   }, {
@@ -2398,31 +2287,31 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": 4 },
+    "type": "icon",
     "render": {
-      "type": "icon",
-      "icon-image": "{{maki}}-12",
+      "icon-image": "{maki}-12",
       "icon-size": 12
     },
     "style": {
       "icon-opacity": {
         "fn": "stops",
-        "stops": [[18.5, 0], [18.75, 1]]
+        "stops": [[17.5, 0], [17.75, 1]]
       }
     },
     "style.night": {
       "icon-opacity": {
         "fn": "stops",
-        "stops": [[18.5, 0], [18.75, 1]]
+        "stops": [[17.5, 0], [17.75, 1]]
       }
     }
   }, {
     "id": "poi_label_4",
     "source": "mapbox",
     "source-layer": "poi_label",
-    "filter": { "scalerank": 4, "$type": "point" },
+    "filter": { "scalerank": 4, "$type": "Point" },
+    "type": "text",
     "render": {
-      "type": "text",
-      "text-field": "{{name_en}}",
+      "text-field": "{name_en}",
       "text-path": "horizontal",
       "text-padding": 2,
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
@@ -2435,7 +2324,7 @@ module.exports = {
       "text-size": 10,
       "text-opacity": {
         "fn": "stops",
-        "stops": [[18.5, 0], [18.75, 1]]
+        "stops": [[17.5, 0], [17.75, 1]]
       },
       "text-halo-color": "@land",
       "text-halo-width": 0.3
@@ -2445,7 +2334,7 @@ module.exports = {
       "text-size": 10,
       "text-opacity": {
         "fn": "stops",
-        "stops": [[18.5, 0], [18.75, 1]]
+        "stops": [[17.5, 0], [17.75, 1]]
       },
       "text-halo-color": "@text2_stroke_night",
       "text-halo-width": 0.3
@@ -2455,21 +2344,21 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "maki": "airport" },
+    "type": "icon",
     "render": {
-      "type": "icon",
-      "icon-image": "{{maki}}-12",
+      "icon-image": "{maki}-12",
       "icon-size": 12
     },
     "style": {
       "icon-opacity": {
         "fn": "stops",
-        "stops": [[13, 0], [13.25, 1]]
+        "stops": [[12, 0], [12.25, 1]]
       }
     },
     "style.night": {
       "icon-opacity": {
         "fn": "stops",
-        "stops": [[13, 0], [13.25, 1]]
+        "stops": [[12, 0], [12.25, 1]]
       }
     }
   }]

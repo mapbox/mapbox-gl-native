@@ -4,7 +4,6 @@
 namespace llmr {
 
 enum class PropertyKey {
-    FillEnabled,
     FillAntialias,
     FillOpacity,
     FillColor,
@@ -15,7 +14,6 @@ enum class PropertyKey {
     FillTranslateAnchor,
     FillImage,
 
-    LineEnabled,
     LineOpacity,
     LineColor,
     LineTranslate, // for transitions only
@@ -30,12 +28,10 @@ enum class PropertyKey {
     LineDashGap,
     LineImage,
 
-    IconEnabled,
     IconOpacity,
     IconRotate,
     IconRotateAnchor,
 
-    TextEnabled,
     TextOpacity,
     TextSize,
     TextColor,
@@ -43,10 +39,8 @@ enum class PropertyKey {
     TextHaloWidth,
     TextHaloBlur,
 
-    CompositeEnabled,
     CompositeOpacity,
 
-    RasterEnabled,
     RasterOpacity,
     RasterSpin,
     RasterBrightnessLow,

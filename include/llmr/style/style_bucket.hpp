@@ -71,7 +71,8 @@ class StyleBucket {
 public:
     typedef std::shared_ptr<StyleBucket> Ptr;
 
-    BucketType type = BucketType::None;
+    StyleBucket(StyleLayerType type);
+
     std::string name;
     std::shared_ptr<Source> source;
     std::string source_layer;

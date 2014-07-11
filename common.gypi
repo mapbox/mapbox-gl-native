@@ -33,6 +33,16 @@
           'DEAD_CODE_STRIPPING': 'YES',
           'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES'
         }
+      },
+      'Testing': {
+        'cflags_cc': [ '-O3' ],
+        'defines': [ 'NDEBUG', 'TESTING' ],
+        'xcode_settings': {
+          'GCC_OPTIMIZATION_LEVEL': '3',
+          'GCC_GENERATE_DEBUGGING_SYMBOLS': 'NO',
+          'DEAD_CODE_STRIPPING': 'YES',
+          'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES'
+        }
       }
     }
   }

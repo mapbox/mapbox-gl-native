@@ -55,10 +55,11 @@ public:
     void setAppliedClasses(const std::vector<std::string> &classes);
     void toggleClass(const std::string &name);
     const std::vector<std::string> &getAppliedClasses() const;
-    void setAppliedClasses(std::vector<std::string> &class_names);
     void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);
     void setStyleJSON(std::string newStyleJSON);
     std::string getStyleJSON() const;
+    void setAccessToken(std::string access_token);
+    std::string getAccessToken() const;
 
     // Transition
     void cancelTransitions();
@@ -166,6 +167,7 @@ private:
     Painter painter;
 
     std::string styleJSON = "";
+    std::string accessToken = "";
 
     bool debug = false;
     timestamp animationTime = 0;

@@ -11,7 +11,7 @@ StyleLayer::StyleLayer(const std::string &id, std::map<ClassID, ClassProperties>
     : id(id), styles(std::move(styles)), rasterize(std::move(rasterize)) {}
 
 bool StyleLayer::isBackground() const {
-    return id == "background";
+    return type == StyleLayerType::Background && id == "background";
 }
 
 void StyleLayer::setClasses(const std::vector<std::string> &class_names, const timestamp now,
@@ -164,7 +164,6 @@ template <>
 void StyleLayer::applyStyleProperties<FillProperties>(const float z, const timestamp now) {
     properties.set<FillProperties>();
     FillProperties &fill = properties.get<FillProperties>();
-    applyStyleProperty(PropertyKey::FillEnabled, fill.enabled, z, now);
     applyStyleProperty(PropertyKey::FillAntialias, fill.antialias, z, now);
     applyStyleProperty(PropertyKey::FillOpacity, fill.opacity, z, now);
     applyStyleProperty(PropertyKey::FillColor, fill.fill_color, z, now);
@@ -179,7 +178,6 @@ template <>
 void StyleLayer::applyStyleProperties<LineProperties>(const float z, const timestamp now) {
     properties.set<LineProperties>();
     LineProperties &line = properties.get<LineProperties>();
-    applyStyleProperty(PropertyKey::LineEnabled, line.enabled, z, now);
     applyStyleProperty(PropertyKey::LineOpacity, line.opacity, z, now);
     applyStyleProperty(PropertyKey::LineColor, line.color, z, now);
     applyStyleProperty(PropertyKey::LineTranslateX, line.translate[0], z, now);
@@ -197,7 +195,6 @@ template <>
 void StyleLayer::applyStyleProperties<IconProperties>(const float z, const timestamp now) {
     properties.set<IconProperties>();
     IconProperties &icon = properties.get<IconProperties>();
-    applyStyleProperty(PropertyKey::IconEnabled, icon.enabled, z, now);
     applyStyleProperty(PropertyKey::IconOpacity, icon.opacity, z, now);
     applyStyleProperty(PropertyKey::IconRotate, icon.rotate, z, now);
     applyStyleProperty(PropertyKey::IconRotateAnchor, icon.rotate_anchor, z, now);
@@ -207,7 +204,6 @@ template <>
 void StyleLayer::applyStyleProperties<TextProperties>(const float z, const timestamp now) {
     properties.set<TextProperties>();
     TextProperties &text = properties.get<TextProperties>();
-    applyStyleProperty(PropertyKey::TextEnabled, text.enabled, z, now);
     applyStyleProperty(PropertyKey::TextOpacity, text.opacity, z, now);
     applyStyleProperty(PropertyKey::TextSize, text.size, z, now);
     applyStyleProperty(PropertyKey::TextColor, text.color, z, now);
@@ -220,7 +216,6 @@ template <>
 void StyleLayer::applyStyleProperties<CompositeProperties>(const float z, const timestamp now) {
     properties.set<CompositeProperties>();
     CompositeProperties &composite = properties.get<CompositeProperties>();
-    applyStyleProperty(PropertyKey::CompositeEnabled, composite.enabled, z, now);
     applyStyleProperty(PropertyKey::CompositeOpacity, composite.opacity, z, now);
 }
 
@@ -228,7 +223,6 @@ template <>
 void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const timestamp now) {
     properties.set<RasterProperties>();
     RasterProperties &raster = properties.get<RasterProperties>();
-    applyStyleProperty(PropertyKey::RasterEnabled, raster.enabled, z, now);
     applyStyleProperty(PropertyKey::RasterOpacity, raster.opacity, z, now);
     applyStyleProperty(PropertyKey::RasterSpin, raster.spin, z, now);
     applyStyleProperty(PropertyKey::RasterBrightnessLow, raster.brightness[0], z, now);
@@ -250,26 +244,17 @@ void StyleLayer::updateProperties(float z, const timestamp now) {
         layers->updateProperties(z, now);
     }
 
-    // Accomodate for different tile size.
-    if (bucket && bucket->source) {
-        z += std::log(bucket->source->tile_size / 256.0f) / M_LN2;
-    }
-
     cleanupAppliedStyleProperties(now);
 
-    if (layers) {
-        applyStyleProperties<CompositeProperties>(z, now);
-    } else if (bucket) {
-        switch (bucket->type) {
-            case BucketType::Fill: applyStyleProperties<FillProperties>(z, now); break;
-            case BucketType::Line: applyStyleProperties<LineProperties>(z, now); break;
-            case BucketType::Icon: applyStyleProperties<IconProperties>(z, now); break;
-            case BucketType::Text: applyStyleProperties<TextProperties>(z, now); break;
-            case BucketType::Raster: applyStyleProperties<RasterProperties>(z, now); break;
-            default: properties.set<std::false_type>(); break;
-        }
-    } else {
-        return applyStyleProperties<BackgroundProperties>(z, now);
+    switch (type) {
+        case StyleLayerType::Fill: applyStyleProperties<FillProperties>(z, now); break;
+        case StyleLayerType::Line: applyStyleProperties<LineProperties>(z, now); break;
+        case StyleLayerType::Icon: applyStyleProperties<IconProperties>(z, now); break;
+        case StyleLayerType::Text: applyStyleProperties<TextProperties>(z, now); break;
+        case StyleLayerType::Raster: applyStyleProperties<RasterProperties>(z, now); break;
+        case StyleLayerType::Composite: applyStyleProperties<CompositeProperties>(z, now); break;
+        case StyleLayerType::Background: applyStyleProperties<BackgroundProperties>(z, now); break;
+        default: properties.set<std::false_type>(); break;
     }
 }
 

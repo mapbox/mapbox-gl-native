@@ -150,7 +150,6 @@ void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     if (!bucket.hasData()) return;
 
     const FillProperties &properties = layer_desc->getProperties<FillProperties>();
-    if (!properties.enabled) return;
 
     if (layer_desc->rasterize && layer_desc->rasterize->isEnabled(id.z)) {
         if (pass == Translucent) {

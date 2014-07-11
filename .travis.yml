@@ -14,6 +14,7 @@ env:
   global:
    - secure: "bG4YYWMfl9API0MSRgmOaJrlGLv06tRg9KJNawBieZvBJbITPpxVGJZT3/l/SEJ+Rl15e2dRex4k+MGQlmT2SqPQxTEYWv1qxNigKPPcla7IWeNmWWqW8uVvFjdglojgBOK2k/xErVQtA4zDfi3mwSXH4DKwquXWsoEKmX2SV7M="
    - secure: "Cbvap9ubVKgjPe3hUhI6JGeDZzBXHpOG9RaYKh+SdoIPhKnlJiNOYm1egomi+e4uqJInlFKuVHTw7Ng9Cun6Zm0jIxpkSchv1GpsR7hmB3UGnGed19Dw8121FwuUaktN+4YnbVlsyd+u8EHD3+h58t4eELrLrZolM4rS7DL6caA="
+   - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
 
 before_install:
 - ./scripts/setup_travis.sh
@@ -29,6 +30,7 @@ script:
 - make linux -j4 BUILDTYPE=${BUILDTYPE}
 - make test -j4 BUILDTYPE=${BUILDTYPE}
 - ./scripts/run_tests.sh
+- ./scripts/compare_images.js
 
 after_script:
 - ./scripts/deploy_results.sh
@@ -38,7 +40,7 @@ notifications:
     rooms:
       secure: "SgMjGDp8MP+UTAY/aWJwSQH2hv1Q0vhEc1BdIde59+lEL3u6gNMSexUTSJoVxRlIQTFXDJBU7v58ISdgJX8cPa+UvIC8hhLsayM+cbm+J3jgy7V9E9wllq3RpmXN33TxY7nwKgWdIms2t9YKZco3y4dKKAUyHXrtMvw8NNPQM+4="
     template:
-      - 'Build <a href="%{build_url}">#%{build_number}</a>: %{author} tested <a href="%{compare_url}">%{commit}</a> in branch <a href="https://github.com/%{repository_slug}/tree/%{branch}">%{branch}</a> of <a href="https://github.com/%{repository_slug}">%{repository_name}</a>: <b>%{commit_message}</b><br>%{message} (%{duration})'
+      - 'Build <a href="%{build_url}">#%{build_number}</a>: %{author} tested <a href="%{compare_url}">%{commit}</a> in branch <a href="https://github.com/%{repository_slug}/tree/%{branch}">%{branch}</a> of <a href="https://github.com/%{repository_slug}">%{repository_name}</a>: <b>%{commit_message}</b><br>%{message} (%{duration}) - Compare: <a href="http://mapbox-gl-testing.s3.amazonaws.com/headless/%{build_number}.1/index.html">1</a> <a href="http://mapbox-gl-testing.s3.amazonaws.com/headless/%{build_number}.2/index.html">2</a> <a href="http://mapbox-gl-testing.s3.amazonaws.com/headless/%{build_number}.3/index.html">3</a> <a href="http://mapbox-gl-testing.s3.amazonaws.com/headless/%{build_number}.4/index.html">4</a>'
     format: html
 
 git:

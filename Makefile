@@ -25,11 +25,11 @@ build/test/Makefile: src common config.gypi test/test.gyp
 	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
 
 test: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
+	$(MAKE) -C build/test BUILDTYPE=Testing V=$(V) test
 
 test/%: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
-	(cd build/$(BUILDTYPE) && exec ./test_$*)
+	$(MAKE) -C build/test BUILDTYPE=Testing V=$(V) $*
+	(cd build/Testing && exec ./test_$*)
 
 # build Mac OS X project for Xcode
 xtest: config.gypi clear_xcode_cache node
@@ -42,7 +42,7 @@ xtest: config.gypi clear_xcode_cache node
 # Builds the linux app with make. This is also used by Travis CI
 linux: config.gypi linux/llmr-app.gyp node
 	deps/run_gyp linux/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
-	$(MAKE) -C build/linux BUILDTYPE=$(BUILDTYPE) V=$(V) linuxapp
+	$(MAKE) -C build/linux BUILDTYPE=Testing V=$(V) linuxapp
 
 # Executes the Linux binary
 run-linux: linux
@@ -78,9 +78,9 @@ xproj: config.gypi macosx/llmr-app.gyp clear_xcode_cache node
 	open ./build/macosx/llmr-app.xcodeproj
 
 # build iOS project for Xcode
-iproj: config.gypi ios/llmr-app.gyp clear_xcode_cache node
-	deps/run_gyp ios/llmr-app.gyp --depth=. --generator-output=./build -f xcode
-	open ./build/ios/llmr-app.xcodeproj
+iproj: config.gypi ios/mapbox-gl-cocoa/app/llmr-app.gyp clear_xcode_cache node
+	deps/run_gyp ios/mapbox-gl-cocoa/app/llmr-app.gyp --depth=. --generator-output=./build -f xcode
+	open ./build/ios/mapbox-gl-cocoa/app/llmr-app.xcodeproj
 
 # build Linux project for Xcode (Runs on Mac OS X too, but without platform-specific code)
 lproj: config.gypi linux/llmr-app.gyp clear_xcode_cache node

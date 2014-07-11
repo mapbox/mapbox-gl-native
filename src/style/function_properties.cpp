@@ -34,16 +34,16 @@ bool ExponentialFunction<bool>::evaluate(float z) const {
 
 template <>
 float ExponentialFunction<float>::evaluate(float z) const {
-    return std::fmin(std::fmax(min, value + std::pow(1.75, (z - z_base)) * slope), max);
+    return std::fmin(std::fmax(min, value + std::pow(exp_base, (z - z_base)) * slope), max);
 }
 
 template <>
 Color ExponentialFunction<Color>::evaluate(float z) const {
     return {{
-        std::fmin(std::fmax(min[0], value[0] + float(std::pow(1.75, (z - z_base))) * slope), max[0]),
-        std::fmin(std::fmax(min[1], value[1] + float(std::pow(1.75, (z - z_base))) * slope), max[1]),
-        std::fmin(std::fmax(min[2], value[2] + float(std::pow(1.75, (z - z_base))) * slope), max[2]),
-        std::fmin(std::fmax(min[3], value[3] + float(std::pow(1.75, (z - z_base))) * slope), max[3])
+        std::fmin(std::fmax(min[0], value[0] + float(std::pow(exp_base, (z - z_base))) * slope), max[0]),
+        std::fmin(std::fmax(min[1], value[1] + float(std::pow(exp_base, (z - z_base))) * slope), max[1]),
+        std::fmin(std::fmax(min[2], value[2] + float(std::pow(exp_base, (z - z_base))) * slope), max[2]),
+        std::fmin(std::fmax(min[3], value[3] + float(std::pow(exp_base, (z - z_base))) * slope), max[3])
     }};
 }
 

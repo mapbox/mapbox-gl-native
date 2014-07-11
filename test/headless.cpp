@@ -9,62 +9,152 @@
 
 #include "../common/headless_view.hpp"
 
+#include "./fixtures/fixture_log.hpp"
+
+#include <dirent.h>
+
 const std::string base_directory = []{
     std::string fn = __FILE__;
     fn.erase(fn.find_last_of("/"));
-    return fn;
+    return fn + "/fixtures/styles";
 }();
 
-class HeadlessTest : public ::testing::TestWithParam<const char *> {};
+class HeadlessTest : public ::testing::TestWithParam<std::string> {};
 
 TEST_P(HeadlessTest, render) {
-    const char *base = GetParam();
+    using namespace llmr;
 
-    const std::string style = llmr::util::read_file(base_directory + "/fixtures/styles/" + base + ".style.json");
-    const std::string info = llmr::util::read_file(base_directory + "/fixtures/styles/" + base + ".info.json");
-    const std::string expected_image = base_directory + "/fixtures/styles/" + base + ".expected.png";
-    const std::string actual_image = base_directory + "/fixtures/styles/" + base + ".actual.png";
+    const std::string &base = GetParam();
+
+    const std::string style = util::read_file(base_directory + "/" + base + ".style.json");
+    const std::string info = util::read_file(base_directory + "/" + base + ".info.json");
 
     // Parse settings.
     rapidjson::Document doc;
     doc.Parse<0>((const char *const)info.c_str());
     ASSERT_EQ(false, doc.HasParseError());
+    ASSERT_EQ(true, doc.IsObject());
 
-    const double zoom = doc.HasMember("zoom") ? doc["zoom"].GetDouble() : 0;
-    const double angle = doc.HasMember("angle") ? doc["angle"].GetDouble() : 0;
-    const double longitude = doc.HasMember("longitude") ? doc["longitude"].GetDouble() : 0;
-    const double latitude = doc.HasMember("latitude") ? doc["latitude"].GetDouble() : 0;
-    const unsigned int width = doc.HasMember("width") ? doc["width"].GetUint() : 0;
-    const unsigned int height = doc.HasMember("height") ? doc["height"].GetUint() : 0;
+    Log::Set<FixtureLogBackend>();
 
     // Setup OpenGL
-    llmr::HeadlessView view;
-    llmr::Map map(view);
+    HeadlessView view;
+    Map map(view);
 
-    view.resize(width, height);
-    map.resize(width, height);
+    for (auto it = doc.MemberBegin(), end = doc.MemberEnd(); it != end; it++) {
+        const FixtureLogBackend &log = Log::Set<FixtureLogBackend>();
 
-    map.setStyleJSON(style);
+        const std::string name { it->name.GetString(), it->name.GetStringLength() };
+        const rapidjson::Value &value = it->value;
+        ASSERT_EQ(true, value.IsObject());
+        if (value.HasMember("center")) ASSERT_EQ(true, value["center"].IsArray());
 
-    map.setLonLatZoom(longitude, latitude, zoom);
-    map.setAngle(angle);
-    map.setDebug(false);
+        const std::string actual_image = base_directory + "/" + base + "/" + name +  ".actual.png";
 
-    // Run the loop. It will terminate when we don't have any further listeners.
-    map.run();
+        const double zoom = value.HasMember("zoom") ? value["zoom"].GetDouble() : 0;
+        const double bearing = value.HasMember("bearing") ? value["bearing"].GetDouble() : 0;
+        const double latitude = value.HasMember("center") ? value["center"][rapidjson::SizeType(0)].GetDouble() : 0;
+        const double longitude = value.HasMember("center") ? value["center"][rapidjson::SizeType(1)].GetDouble() : 0;
+        const unsigned int width = value.HasMember("width") ? value["width"].GetUint() : 512;
+        const unsigned int height = value.HasMember("height") ? value["height"].GetUint() : 512;
+        std::vector<std::string> classes;
+        if (value.HasMember("classes")) {
+            const rapidjson::Value &js_classes = value["classes"];
+            ASSERT_EQ(true, js_classes.IsArray());
+            for (rapidjson::SizeType i = 0; i < js_classes.Size(); i++) {
+                const rapidjson::Value &js_class = js_classes[i];
+                ASSERT_EQ(true, js_class.IsString());
+                classes.push_back({ js_class.GetString(), js_class.GetStringLength() });
+            }
+        }
 
-    const std::unique_ptr<uint32_t[]> pixels(new uint32_t[width * height]);
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
+        map.setStyleJSON(style);
+        map.setAppliedClasses(classes);
 
-    const std::string image = llmr::util::compress_png(width, height, pixels.get(), true);
-    llmr::util::write_file(actual_image, image);
+        view.resize(width, height);
+        map.resize(width, height);
+        map.setLonLatZoom(longitude, latitude, zoom);
+        map.setAngle(bearing);
 
-    const std::string expected_image_data(llmr::util::read_file(expected_image));
-    const llmr::util::Image expected(expected_image_data, true);
-    ASSERT_EQ(width, expected.getWidth());
-    ASSERT_EQ(height, expected.getHeight());
-    ASSERT_EQ(0, std::memcmp(pixels.get(), expected.getData(), width * height * 4));
+        // Run the loop. It will terminate when we don't have any further listeners.
+        map.run();
+
+        const std::unique_ptr<uint32_t[]> pixels(new uint32_t[width * height]);
+        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
+
+        const std::string image = util::compress_png(width, height, pixels.get(), true);
+        util::write_file(actual_image, image);
+
+        if (value.HasMember("log")) {
+            const rapidjson::Value &js_log = value["log"];
+            ASSERT_EQ(true, js_log.IsArray());
+            for (rapidjson::SizeType i = 0; i < js_log.Size(); i++) {
+                const rapidjson::Value &js_entry = js_log[i];
+                ASSERT_EQ(true, js_entry.IsArray());
+                if (js_entry.Size() == 5) {
+                    const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
+                    const FixtureLogBackend::LogMessage message {
+                        parseEventSeverity(js_entry[rapidjson::SizeType(1)].GetString()),
+                        parseEvent(js_entry[rapidjson::SizeType(2)].GetString()),
+                        js_entry[rapidjson::SizeType(3)].GetInt64(),
+                        js_entry[rapidjson::SizeType(4)].GetString()
+                    };
+                    ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
+                } else if (js_entry.Size() == 4) {
+                    const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
+                    if (js_entry[rapidjson::SizeType(3)].IsString()) {
+                        const FixtureLogBackend::LogMessage message {
+                            parseEventSeverity(js_entry[rapidjson::SizeType(1)].GetString()),
+                            parseEvent(js_entry[rapidjson::SizeType(2)].GetString()),
+                            js_entry[rapidjson::SizeType(3)].GetString()
+                        };
+                        ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
+                    } else {
+                        const FixtureLogBackend::LogMessage message {
+                            parseEventSeverity(js_entry[rapidjson::SizeType(1)].GetString()),
+                            parseEvent(js_entry[rapidjson::SizeType(2)].GetString()),
+                             js_entry[rapidjson::SizeType(3)].GetInt64()
+                        };
+                        ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
+                    }
+                } else if (js_entry.Size() == 3) {
+                    const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
+                    const FixtureLogBackend::LogMessage message {
+                        parseEventSeverity(js_entry[rapidjson::SizeType(1)].GetString()),
+                        parseEvent(js_entry[rapidjson::SizeType(2)].GetString())
+                    };
+                    ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
+                } else {
+                    FAIL();
+                }
+            }
+        }
+
+        const auto &unchecked = log.unchecked();
+        if (unchecked.size()) {
+            std::cerr << "Unchecked Log Messages (" << base << "/" << name << "): " << std::endl << unchecked;
+        }
+    }
+
 }
 
-INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest,
-                        ::testing::Values("0", "1"));
+INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest, ::testing::ValuesIn([] {
+    std::vector<std::string> names;
+    const std::string ending = ".info.json";
+
+    DIR *dir = opendir(base_directory.c_str());
+    if (dir == nullptr) {
+        return names;
+    }
+
+    for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
+        const std::string name = dp->d_name;
+        if (name.length() >= ending.length() && name.compare(name.length() - ending.length(), ending.length(), ending) == 0) {
+            names.push_back(name.substr(0, name.length() - ending.length()));
+        }
+    }
+
+    closedir(dir);
+
+    return names;
+}()));

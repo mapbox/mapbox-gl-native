@@ -9,19 +9,20 @@ namespace llmr {
 // Stores a premultiplied color, with all four channels ranging from 0..1
 typedef std::array<float, 4> Color;
 
-enum class BucketType : uint8_t {
-    None,
+enum class StyleLayerType : uint8_t {
+    Unknown,
     Fill,
     Line,
     Icon,
     Text,
     Raster,
-    Default = None
+    Composite,
+    Background
 };
 
-BucketType parseBucketType(const std::string &type);
-const char *stringifyBucketType(BucketType type);
-std::ostream& operator<<(std::ostream&, BucketType type);
+StyleLayerType parseStyleLayerType(const std::string &type);
+const char *stringifyStyleLayerType(StyleLayerType type);
+std::ostream& operator<<(std::ostream&, StyleLayerType type);
 
 
 enum class WindingType : uint8_t {

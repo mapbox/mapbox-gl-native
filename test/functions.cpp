@@ -63,7 +63,7 @@ TEST(Function, Linear) {
 
 
 TEST(Function, Exponential) {
-    llmr::ExponentialFunction<float> slope_1(/* val */ 7.5, /* z_base */ 4, /* slope */ 2, /* min */ 7.5, /* max */ 20);
+    llmr::ExponentialFunction<float> slope_1(/* val */ 7.5, /* z_base */ 4, /* exp_base */ 1.75, /* slope */ 2, /* min */ 7.5, /* max */ 20);
     ASSERT_FLOAT_EQ(8.6428576, slope_1.evaluate(3)); // 7.5 + 1.75^(3 - 4) * 2
     ASSERT_FLOAT_EQ(9.5, slope_1.evaluate(4)); // 7.5 + 1.75^(4 - 4) * 2
     ASSERT_FLOAT_EQ(10.145751, slope_1.evaluate(4.5)); // 7.5 + 1.75^(4.5 - 4) * 2
