@@ -104,7 +104,6 @@
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
             "../llmr.gyp:llmr-x86",
-            "link_gl",
         ]
     },
     {
