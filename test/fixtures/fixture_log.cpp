@@ -4,6 +4,10 @@
 
 namespace llmr {
 
+FixtureLogBackend::~FixtureLogBackend() {
+    std::cerr << unchecked();
+}
+
 size_t FixtureLogBackend::count(const LogMessage &message) const {
     size_t count = 0;
     for (const LogMessage &msg : messages) {

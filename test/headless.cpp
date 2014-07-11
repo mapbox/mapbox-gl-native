@@ -35,6 +35,8 @@ TEST_P(HeadlessTest, render) {
     ASSERT_EQ(false, doc.HasParseError());
     ASSERT_EQ(true, doc.IsObject());
 
+    Log::Set<FixtureLogBackend>();
+
     // Setup OpenGL
     HeadlessView view;
     Map map(view);

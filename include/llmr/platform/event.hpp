@@ -19,7 +19,9 @@ const char *stringifyEventSeverity(EventSeverity eventSeverity);
 ::std::ostream& operator<<(::std::ostream& os, EventSeverity eventSeverity);
 
 enum class Event : uint8_t {
+    General,
     Setup,
+    Shader,
     ParseStyle,
     ParseTile,
     Render,
@@ -30,25 +32,30 @@ Event parseEvent(const char *name);
 const char *stringifyEvent(Event event);
 ::std::ostream& operator<<(::std::ostream& os, Event event);
 
-constexpr EventSeverity enabledEventSeverities[] = {
-#if DEBUG
-    EventSeverity::Debug,
-#endif
+struct EventPermutation {
+    const EventSeverity severity;
+    const Event event;
 
-#if TESTING
-    EventSeverity::Test,
-#endif
-
-    EventSeverity::Info,
-    EventSeverity::Warning,
-    EventSeverity::Error,
+    constexpr bool operator==(const EventPermutation &rhs) const {
+        return severity == rhs.severity && event == rhs.event;
+    }
 };
 
-/* enabled event classes */
-constexpr Event enabledEvents[] = {
-    Event::ParseStyle,
-    Event::ParseTile,
-    Event::HttpRequest,
+constexpr EventSeverity disabledEventSeverities[] = {
+#if !DEBUG
+    EventSeverity::Debug,
+#endif
+#if !TESTING
+    EventSeverity::Test,
+#endif
+};
+
+
+constexpr Event disabledEvents[] = {
+};
+
+constexpr EventPermutation disabledEventPermutations[] = {
+    { EventSeverity::Debug, Event::Shader }
 };
 
 }

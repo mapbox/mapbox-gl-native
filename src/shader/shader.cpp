@@ -1,34 +1,24 @@
 #include <llmr/shader/shader.hpp>
 #include <llmr/platform/gl.hpp>
-#if defined(DEBUG)
 #include <llmr/util/timer.hpp>
-#endif
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
+#include <llmr/platform/log.hpp>
 
 using namespace llmr;
 
 Shader::Shader(const GLchar *vertSource, const GLchar *fragSource)
     : valid(false),
       program(0) {
-#if defined(DEBUG)
-    util::timer timer("shader compilation");
-#endif
+    util::timer timer("shader compilation", Event::Shader);
 
     GLuint vertShader;
     if (!compileShader(&vertShader, GL_VERTEX_SHADER, vertSource)) {
-#if defined(DEBUG)
-        fprintf(stderr, "Vertex shader failed to compile: %s\n", vertSource);
-#endif
+        Log::Error(Event::Shader, "Vertex shader failed to compile: %s", vertSource);
         return;
     }
 
     GLuint fragShader;
     if (!compileShader(&fragShader, GL_FRAGMENT_SHADER, fragSource)) {
-#if defined(DEBUG)
-        fprintf(stderr, "Fragment shader failed to compile: %s\n", fragSource);
-#endif
+        Log::Error(Event::Shader, "Fragment shader failed to compile: %s", fragSource);
         return;
     }
 
@@ -44,20 +34,17 @@ Shader::Shader(const GLchar *vertSource, const GLchar *fragSource)
         GLint status;
         glLinkProgram(program);
 
-#if defined(DEBUG)
-        GLint logLength;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
-        if (logLength > 0) {
-            GLchar *log = (GLchar *)malloc(logLength);
-            glGetProgramInfoLog(program, logLength, &logLength, log);
-            fprintf(stderr, "Program link log:\n%s", log);
-            free(log);
-        }
-#endif
-
         glGetProgramiv(program, GL_LINK_STATUS, &status);
         if (status == 0) {
-            fprintf(stderr, "Program failed to link\n");
+            GLint logLength;
+            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+            if (logLength > 0) {
+                GLchar *log = (GLchar *)malloc(logLength);
+                glGetProgramInfoLog(program, logLength, &logLength, log);
+                Log::Error(Event::Shader, "Program failed to link: %s", log);
+                free(log);
+            }
+
             glDeleteShader(vertShader);
             vertShader = 0;
             glDeleteShader(fragShader);
@@ -73,22 +60,17 @@ Shader::Shader(const GLchar *vertSource, const GLchar *fragSource)
         GLint status;
         glValidateProgram(program);
 
-#if defined(DEBUG)
-        GLint logLength;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
-        if (logLength > 0) {
-            GLchar *log = (GLchar *)malloc(logLength);
-            glGetProgramInfoLog(program, logLength, &logLength, log);
-            fprintf(stderr, "Program validate log:\n%s", log);
-            free(log);
-        }
-#endif
-
         glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
         if (status == 0) {
-#if defined(DEBUG)
-            fprintf(stderr, "Program failed to validate\n");
-#endif
+            GLint logLength;
+            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+            if (logLength > 0) {
+                GLchar *log = (GLchar *)malloc(logLength);
+                glGetProgramInfoLog(program, logLength, &logLength, log);
+                Log::Error(Event::Shader, "Program failed to validate: %s", log);
+                free(log);
+            }
+
             glDeleteShader(vertShader);
             vertShader = 0;
             glDeleteShader(fragShader);
@@ -119,19 +101,17 @@ bool Shader::compileShader(GLuint *shader, GLenum type, const GLchar *source) {
 
     glCompileShader(*shader);
 
-#if defined(DEBUG)
-    GLint logLength;
-    glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &logLength);
-    if (logLength > 0) {
-        GLchar *log = (GLchar *)malloc(logLength);
-        glGetShaderInfoLog(*shader, logLength, &logLength, log);
-        fprintf(stderr, "Shader compile log:\n%s", log);
-        free(log);
-    }
-#endif
-
     glGetShaderiv(*shader, GL_COMPILE_STATUS, &status);
     if (status == 0) {
+        GLint logLength;
+        glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &logLength);
+        if (logLength > 0) {
+            GLchar *log = (GLchar *)malloc(logLength);
+            glGetShaderInfoLog(*shader, logLength, &logLength, log);
+            Log::Error(Event::Shader, "Shader failed to compile: %s", log);
+            free(log);
+        }
+
         glDeleteShader(*shader);
         *shader = 0;
         return false;

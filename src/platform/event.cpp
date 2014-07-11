@@ -29,7 +29,9 @@ const char *stringifyEventSeverity(EventSeverity eventSeverity) {
 }
 
 Event parseEvent(const char *name) {
+    if (strcmp(name, "General") == 0) return Event::General;
     if (strcmp(name, "Setup") == 0) return Event::Setup;
+    if (strcmp(name, "Shader") == 0) return Event::Shader;
     if (strcmp(name, "ParseStyle") == 0) return Event::ParseStyle;
     if (strcmp(name, "ParseTile") == 0) return Event::ParseTile;
     if (strcmp(name, "Render") == 0) return Event::Render;
@@ -39,7 +41,9 @@ Event parseEvent(const char *name) {
 
 const char *stringifyEvent(Event event) {
      switch (event) {
+        case Event::General: return "General";
         case Event::Setup: return "Setup";
+        case Event::Shader: return "Shader";
         case Event::ParseStyle: return "ParseStyle";
         case Event::ParseTile: return "ParseTile";
         case Event::Render: return "Render";
