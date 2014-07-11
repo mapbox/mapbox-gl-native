@@ -3,9 +3,7 @@
 set -e
 set -o pipefail
 
-BUILDTYPE="${BUILDTYPE:-Release}"
-
-cd build/${BUILDTYPE}
+cd build/Testing
 
 for TEST in ./test_* ; do
     ${TEST}
