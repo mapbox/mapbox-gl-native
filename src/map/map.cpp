@@ -183,7 +183,7 @@ std::string Map::getStyleJSON() const {
     return styleJSON;
 }
 
-void Map::setAccessToken( std::string access_token) {
+void Map::setAccessToken(std::string access_token) {
     accessToken.swap(access_token);
 }
 
@@ -426,7 +426,8 @@ void Map::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
         if (!layer) continue;
         if (layer->bucket) {
             if (layer->bucket->style_source) {
-                activeSources.emplace(std::make_shared<Source>(*layer->bucket->style_source, this->getAccessToken()));
+              auto ret = activeSources.emplace(std::make_shared<Source>(*layer->bucket->style_source, this->getAccessToken()));
+              layer->bucket->source = *ret.first;
             }
         } else if (layer->layers) {
             updateSources(layer->layers);
@@ -659,8 +660,6 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
                       << layer_desc->type << ")" << std::endl;
         }
 
-        // TODO: THIS IS BAD, FIXME
-        Source source(*layer_desc->bucket->style_source, this->getAccessToken());
-        source.render(painter, layer_desc);
+        layer_desc->bucket->source->render(painter, layer_desc);
     }
 }
