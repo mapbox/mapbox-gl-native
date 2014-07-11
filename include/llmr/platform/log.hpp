@@ -12,6 +12,7 @@ class LogBackend {
 public:
     virtual inline ~LogBackend() = default;
     virtual void record(EventSeverity severity, Event event, const std::string &msg) = 0;
+    virtual void record(EventSeverity severity, Event event, const char* format, ...) = 0;
     virtual void record(EventSeverity severity, Event event, int64_t code) = 0;
     virtual void record(EventSeverity severity, Event event, int64_t code, const std::string &msg) = 0;
 };
@@ -46,8 +47,9 @@ public:
 
     template <typename ...Args>
     static inline void Record(EventSeverity severity, Event event, Args&& ...args) {
-        if (includes(severity, enabledEventSeverities) &&
-            includes(event, enabledEvents)) {
+        if (!includes(severity, disabledEventSeverities) &&
+            !includes(event, disabledEvents) &&
+            !includes({ severity, event }, disabledEventPermutations)) {
             if (Backend) {
                 Backend->record(severity, event, ::std::forward<Args>(args)...);
             }
