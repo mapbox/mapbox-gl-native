@@ -183,6 +183,14 @@ std::string Map::getStyleJSON() const {
     return styleJSON;
 }
 
+void Map::setAccessToken( std::string access_token) {
+    accessToken.swap(access_token);
+}
+
+std::string Map::getAccessToken() const {
+    return accessToken;
+}
+
 #pragma mark - Size
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
@@ -395,10 +403,6 @@ void Map::toggleClass(const std::string &name) {
 
 const std::vector<std::string> &Map::getAppliedClasses() const {
    return style->getAppliedClasses();
-}
-
-void Map::setAppliedClasses(std::vector<std::string> &class_names) {
-    style->setAppliedClasses(class_names);
 }
 
 void Map::setDefaultTransitionDuration(uint64_t duration_milliseconds) {

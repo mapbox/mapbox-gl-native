@@ -14,7 +14,6 @@ void Painter::renderIcon(IconBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     if (pass == Opaque) return;
 
     const IconProperties &properties = layer_desc->getProperties<IconProperties>();
-    if (!properties.enabled) return;
 
 // TODO: when translating icon, are we doing this in the bucket already?
 //    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);

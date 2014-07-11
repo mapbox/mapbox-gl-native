@@ -1,0 +1,33 @@
+{
+  "version": 3,
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "tiles/{z}-{x}-{y}.vector.pbf",
+      "tileSize": 512,
+      "maxZoom": 14
+    }
+  },
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "style": {
+        "background-color": "white"
+      }
+    },
+    {
+      "id": "road",
+      "source": "mapbox",
+      "source-layer": "road",
+      "type": "line",
+      "style": {
+        "line-width": 2,
+        "line-color": "#3590db"
+      },
+      "style.colored": {
+        "line-color": "#222222"
+      }
+    }
+  ]
+}

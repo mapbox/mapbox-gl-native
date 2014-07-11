@@ -29,14 +29,14 @@ private:
 
 template <typename T>
 struct ExponentialFunction {
-    inline ExponentialFunction(const T &value, float z_base, float slope, const T &min,
+    inline ExponentialFunction(const T &value, float z_base, float exp_base, float slope, const T &min,
                                const T &max)
-        : value(value), min(min), max(max), z_base(z_base), slope(slope) {}
+        : value(value), min(min), max(max), z_base(z_base), exp_base(exp_base), slope(slope) {}
     T evaluate(float z) const;
 
 private:
     const T value, min, max;
-    const float z_base, slope;
+    const float z_base, exp_base, slope;
 };
 
 template <typename T>

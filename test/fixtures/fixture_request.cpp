@@ -40,6 +40,7 @@ platform::request_http(const std::string &url,
     if (err < 0) {
         req->res->code = err;
         req->res->error_message = uv_strerror(err);
+        fprintf(stderr, "[WARNING] fixture request: %s\n", uv_strerror(err));
         req->complete();
         return req;
     }
@@ -52,6 +53,7 @@ platform::request_http(const std::string &url,
     if (err < 0) {
         req->res->code = err;
         req->res->error_message = uv_strerror(err);
+        fprintf(stderr, "[WARNING] fixture request: %s\n", uv_strerror(err));
         req->complete();
         return req;
     }
@@ -69,6 +71,7 @@ platform::request_http(const std::string &url,
     if (err < 0) {
         req->res->code = err;
         req->res->error_message = uv_strerror(err);
+        fprintf(stderr, "[WARNING] fixture request: %s\n", uv_strerror(err));
         req->complete();
         return req;
     }
@@ -80,12 +83,14 @@ platform::request_http(const std::string &url,
     if (err < 0) {
         req->res->code = err;
         req->res->error_message = uv_strerror(err);
+        fprintf(stderr, "[WARNING] fixture request: %s\n", uv_strerror(err));
         req->complete();
         return req;
     }
 
     req->res->body.swap(body);
     req->res->code = 200;
+    fprintf(stderr, "[INFO] fixture request completed: %s\n", clean_url.c_str());
     req->complete();
 
     return req;

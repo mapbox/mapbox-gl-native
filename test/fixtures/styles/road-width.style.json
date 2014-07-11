@@ -1,0 +1,32 @@
+{
+  "version": 3,
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "tiles/{z}-{x}-{y}.vector.pbf",
+      "tileSize": 512,
+      "maxZoom": 14
+    }
+  },
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "style": {
+        "background-color": "white"
+      }
+    },
+    {
+      "id": "road",
+      "source": "mapbox",
+      "source-layer": "road",
+      "type": "line",
+      "style": {
+        "line-width": {
+          "fn": "stops",
+          "stops": [[13, 0], [13.999, 0], [14, 4], [14.1, 10], [14.2, 20]]
+        }
+      }
+    }
+  ]
+}
