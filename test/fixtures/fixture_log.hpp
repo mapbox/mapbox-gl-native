@@ -6,6 +6,7 @@
 #include <boost/optional.hpp>
 
 #include <vector>
+#include <cstdarg>
 
 namespace llmr {
 
@@ -45,7 +46,7 @@ public:
     void record(EventSeverity severity, Event event, const char* format, ...) {
         va_list args;
         va_start(args, format);
-        const int len = vsnprintf(NULL, 0, format, args);
+        const size_t len = vsnprintf(NULL, 0, format, args);
         va_end(args);
         std::unique_ptr<char[]> buffer(new char[len + 1]);
         va_start(args, format);

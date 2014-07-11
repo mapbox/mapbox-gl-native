@@ -1,6 +1,7 @@
 #include "stderr_log.hpp"
 
 #include <iostream>
+#include <cstdarg>
 
 namespace llmr {
 

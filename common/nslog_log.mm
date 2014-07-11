@@ -2,6 +2,8 @@
 
 #import <Foundation/Foundation.h>
 
+#include <cstdarg>
+
 namespace llmr {
 
 void NSLogBackend::record(EventSeverity severity, Event event, const std::string &msg) {
@@ -15,7 +17,7 @@ void NSLogBackend::record(EventSeverity severity, Event event, const std::string
 void NSLogBackend::record(EventSeverity severity, Event event, const char* format, ...) {
     va_list args;
     va_start(args, format);
-    const int len = vsnprintf(NULL, 0, format, args);
+    const size_t len = vsnprintf(NULL, 0, format, args);
     va_end(args);
     std::unique_ptr<char[]> buffer(new char[len + 1]);
     va_start(args, format);
