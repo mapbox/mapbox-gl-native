@@ -25,11 +25,11 @@ build/test/Makefile: src common config.gypi test/test.gyp
 	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
 
 test: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
+	$(MAKE) -C build/test BUILDTYPE=Testing V=$(V) test
 
 test/%: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
-	(cd build/$(BUILDTYPE) && exec ./test_$*)
+	$(MAKE) -C build/test BUILDTYPE=Testing V=$(V) $*
+	(cd build/Testing && exec ./test_$*)
 
 # build Mac OS X project for Xcode
 xtest: config.gypi clear_xcode_cache node
@@ -42,7 +42,7 @@ xtest: config.gypi clear_xcode_cache node
 # Builds the linux app with make. This is also used by Travis CI
 linux: config.gypi linux/llmr-app.gyp node
 	deps/run_gyp linux/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
-	$(MAKE) -C build/linux BUILDTYPE=$(BUILDTYPE) V=$(V) linuxapp
+	$(MAKE) -C build/linux BUILDTYPE=Testing V=$(V) linuxapp
 
 # Executes the Linux binary
 run-linux: linux

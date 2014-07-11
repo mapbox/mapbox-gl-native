@@ -9,6 +9,8 @@
 
 #include "../common/headless_view.hpp"
 
+#include "./fixtures/fixture_log.hpp"
+
 #include <dirent.h>
 
 const std::string base_directory = []{
@@ -20,10 +22,12 @@ const std::string base_directory = []{
 class HeadlessTest : public ::testing::TestWithParam<std::string> {};
 
 TEST_P(HeadlessTest, render) {
+    using namespace llmr;
+
     const std::string &base = GetParam();
 
-    const std::string style = llmr::util::read_file(base_directory + "/" + base + ".style.json");
-    const std::string info = llmr::util::read_file(base_directory + "/" + base + ".info.json");
+    const std::string style = util::read_file(base_directory + "/" + base + ".style.json");
+    const std::string info = util::read_file(base_directory + "/" + base + ".info.json");
 
     // Parse settings.
     rapidjson::Document doc;
@@ -32,10 +36,12 @@ TEST_P(HeadlessTest, render) {
     ASSERT_EQ(true, doc.IsObject());
 
     // Setup OpenGL
-    llmr::HeadlessView view;
-    llmr::Map map(view);
+    HeadlessView view;
+    Map map(view);
 
     for (auto it = doc.MemberBegin(), end = doc.MemberEnd(); it != end; it++) {
+        const FixtureLogBackend &log = Log::Set<FixtureLogBackend>();
+
         const std::string name { it->name.GetString(), it->name.GetStringLength() };
         const rapidjson::Value &value = it->value;
         ASSERT_EQ(true, value.IsObject());
@@ -74,8 +80,58 @@ TEST_P(HeadlessTest, render) {
         const std::unique_ptr<uint32_t[]> pixels(new uint32_t[width * height]);
         glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
 
-        const std::string image = llmr::util::compress_png(width, height, pixels.get(), true);
-        llmr::util::write_file(actual_image, image);
+        const std::string image = util::compress_png(width, height, pixels.get(), true);
+        util::write_file(actual_image, image);
+
+        if (value.HasMember("log")) {
+            const rapidjson::Value &js_log = value["log"];
+            ASSERT_EQ(true, js_log.IsArray());
+            for (rapidjson::SizeType i = 0; i < js_log.Size(); i++) {
+                const rapidjson::Value &js_entry = js_log[i];
+                ASSERT_EQ(true, js_entry.IsArray());
+                if (js_entry.Size() == 5) {
+                    const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
+                    const FixtureLogBackend::LogMessage message {
+                        parseEventSeverity(js_entry[rapidjson::SizeType(1)].GetString()),
+                        parseEvent(js_entry[rapidjson::SizeType(2)].GetString()),
+                        js_entry[rapidjson::SizeType(3)].GetInt64(),
+                        js_entry[rapidjson::SizeType(4)].GetString()
+                    };
+                    ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
+                } else if (js_entry.Size() == 4) {
+                    const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
+                    if (js_entry[rapidjson::SizeType(3)].IsString()) {
+                        const FixtureLogBackend::LogMessage message {
+                            parseEventSeverity(js_entry[rapidjson::SizeType(1)].GetString()),
+                            parseEvent(js_entry[rapidjson::SizeType(2)].GetString()),
+                            js_entry[rapidjson::SizeType(3)].GetString()
+                        };
+                        ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
+                    } else {
+                        const FixtureLogBackend::LogMessage message {
+                            parseEventSeverity(js_entry[rapidjson::SizeType(1)].GetString()),
+                            parseEvent(js_entry[rapidjson::SizeType(2)].GetString()),
+                             js_entry[rapidjson::SizeType(3)].GetInt64()
+                        };
+                        ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
+                    }
+                } else if (js_entry.Size() == 3) {
+                    const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
+                    const FixtureLogBackend::LogMessage message {
+                        parseEventSeverity(js_entry[rapidjson::SizeType(1)].GetString()),
+                        parseEvent(js_entry[rapidjson::SizeType(2)].GetString())
+                    };
+                    ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
+                } else {
+                    FAIL();
+                }
+            }
+        }
+
+        const auto &unchecked = log.unchecked();
+        if (unchecked.size()) {
+            std::cerr << "Unchecked Log Messages (" << base << "/" << name << "): " << std::endl << unchecked;
+        }
     }
 
 }
