@@ -8,6 +8,7 @@
 
 #include "../common/settings_json.hpp"
 #include "../common/glfw_view.hpp"
+#include "../common/stderr_log.hpp"
 
 GLFWView *view = nullptr;
 
@@ -22,6 +23,8 @@ void quit_handler(int) {
 }
 
 int main(int argc, char *argv[]) {
+    llmr::Log::Set<llmr::StderrLogBackend>();
+
     int fullscreen_flag = 0;
 
     const struct option long_options[] = {
@@ -63,7 +66,7 @@ int main(int argc, char *argv[]) {
     // Set access token if present
     const char *token = getenv("MAPBOX_ACCESS_TOKEN");
     if (token == nullptr) {
-        fprintf(stderr, "[WARNING] no access token set. mapbox.com tiles won't work.\n");
+        llmr::Log::Warning(llmr::Event::Setup, "no access token set. mapbox.com tiles won't work.");
     } else {
         map.setAccessToken(std::string(token));
     }

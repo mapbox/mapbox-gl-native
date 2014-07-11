@@ -15,9 +15,11 @@ enum class EventSeverity : uint8_t {
 };
 
 EventSeverity parseEventSeverity(const char *name);
+const char *stringifyEventSeverity(EventSeverity eventSeverity);
 ::std::ostream& operator<<(::std::ostream& os, EventSeverity eventSeverity);
 
 enum class Event : uint8_t {
+    Setup,
     ParseStyle,
     ParseTile,
     Render,
@@ -25,6 +27,7 @@ enum class Event : uint8_t {
 };
 
 Event parseEvent(const char *name);
+const char *stringifyEvent(Event event);
 ::std::ostream& operator<<(::std::ostream& os, Event event);
 
 constexpr EventSeverity enabledEventSeverities[] = {

@@ -13,18 +13,23 @@ EventSeverity parseEventSeverity(const char *name) {
     return EventSeverity(-1);
 }
 
-::std::ostream& operator<<(::std::ostream& os, EventSeverity eventSeverity) {
+const char *stringifyEventSeverity(EventSeverity eventSeverity) {
     switch (eventSeverity) {
-        case EventSeverity::Debug: return os << "DEBUG";
-        case EventSeverity::Info: return os << "INFO";
-        case EventSeverity::Test: return os << "TEST";
-        case EventSeverity::Warning: return os << "WARNING";
-        case EventSeverity::Error: return os << "ERROR";
-        default: return os << "UNKNOWN";
+        case EventSeverity::Debug: return "DEBUG";
+        case EventSeverity::Info: return "INFO";
+        case EventSeverity::Test: return "TEST";
+        case EventSeverity::Warning: return "WARNING";
+        case EventSeverity::Error: return "ERROR";
+        default: return "UNKNOWN";
     }
 }
 
+::std::ostream& operator<<(::std::ostream& os, EventSeverity eventSeverity) {
+    return os << stringifyEventSeverity(eventSeverity);
+}
+
 Event parseEvent(const char *name) {
+    if (strcmp(name, "Setup") == 0) return Event::Setup;
     if (strcmp(name, "ParseStyle") == 0) return Event::ParseStyle;
     if (strcmp(name, "ParseTile") == 0) return Event::ParseTile;
     if (strcmp(name, "Render") == 0) return Event::Render;
@@ -32,14 +37,19 @@ Event parseEvent(const char *name) {
     return Event(-1);
 }
 
-::std::ostream& operator<<(::std::ostream& os, Event event) {
-    switch (event) {
-        case Event::ParseStyle: return os << "ParseStyle";
-        case Event::ParseTile: return os << "ParseTile";
-        case Event::Render: return os << "Render";
-        case Event::HttpRequest: return os << "HttpRequest";
-        default: return os << "Unknown";
+const char *stringifyEvent(Event event) {
+     switch (event) {
+        case Event::Setup: return "Setup";
+        case Event::ParseStyle: return "ParseStyle";
+        case Event::ParseTile: return "ParseTile";
+        case Event::Render: return "Render";
+        case Event::HttpRequest: return "HttpRequest";
+        default: return "Unknown";
     }
+}
+
+::std::ostream& operator<<(::std::ostream& os, Event event) {
+    return os << stringifyEvent(event);
 }
 
 
