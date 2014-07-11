@@ -3,6 +3,8 @@
 #include <llmr/util/timer.hpp>
 #include <llmr/platform/log.hpp>
 
+#include <cstring>
+
 using namespace llmr;
 
 Shader::Shader(const GLchar *vertSource, const GLchar *fragSource)
