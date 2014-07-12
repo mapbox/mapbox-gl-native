@@ -1,6 +1,5 @@
 #include <llmr/style/style_layer.hpp>
 #include <llmr/style/style_bucket.hpp>
-#include <llmr/map/source.hpp>
 #include <llmr/style/style_layer_group.hpp>
 #include <llmr/style/property_fallback.hpp>
 

@@ -3,6 +3,7 @@
 
 #include <llmr/style/types.hpp>
 #include <llmr/style/filter_expression.hpp>
+#include <llmr/style/style_source.hpp>
 #include <llmr/util/vec.hpp>
 #include <llmr/util/variant.hpp>
 
@@ -74,6 +75,7 @@ public:
     StyleBucket(StyleLayerType type);
 
     std::string name;
+    std::shared_ptr<StyleSource> style_source;
     std::shared_ptr<Source> source;
     std::string source_layer;
     FilterExpression filter;

@@ -1,4 +1,4 @@
-#include <llmr/style/sprite.hpp>
+#include <llmr/map/sprite.hpp>
 #include <llmr/map/map.hpp>
 #include <llmr/util/raster.hpp>
 

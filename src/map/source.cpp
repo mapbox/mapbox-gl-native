@@ -18,6 +18,13 @@
 
 namespace llmr {
 
+Source::Source(StyleSource style_source, const std::string &access_token)
+    : type(style_source.type),
+      url(normalizeSourceURL(style_source.url, access_token)),
+      tile_size(style_source.tile_size),
+      min_zoom(style_source.min_zoom),
+      max_zoom(style_source.max_zoom) {}
+
 Source::Source(SourceType type, const std::string &url,
                uint32_t tile_size, uint32_t min_zoom, uint32_t max_zoom,
                const std::string &access_token)
