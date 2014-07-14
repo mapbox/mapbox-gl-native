@@ -12,7 +12,7 @@ struct EnumValue {
     const char *name;
 };
 
-template <typename EnumName, const constexpr EnumValue<EnumName> *names, const size_t length>
+template <typename EnumName, const EnumValue<EnumName> *names, const size_t length>
 struct Enum {
     using Type = EnumName;
     Type value;
