@@ -69,6 +69,8 @@
           'outputs': [
             '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
             '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-functions.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-layers.min.js',
           ],
           'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)/bin']
         }
@@ -77,6 +79,8 @@
         'sources': [
             '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
             '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-functions.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-layers.min.js',
         ],
       }
     },
@@ -92,6 +96,8 @@
           'files': [
             '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
             '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-functions.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-layers.min.js',
           ],
           'destination': '<(PRODUCT_DIR)'
         }

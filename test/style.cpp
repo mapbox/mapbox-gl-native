@@ -26,3 +26,24 @@ TEST(Style, Colors) {
     Style style;
     style.loadJSON((const uint8_t *)stylejson.str().c_str());
 }
+
+TEST(Style, Functions) {
+    std::ifstream stylefile("./fuzz-functions.min.js");
+    ASSERT_TRUE(stylefile.good());
+    std::stringstream stylejson;
+    stylejson << stylefile.rdbuf();
+
+    Style style;
+    style.loadJSON((const uint8_t *)stylejson.str().c_str());
+}
+
+TEST(Style, Layers) {
+    std::ifstream stylefile("./fuzz-layers.min.js");
+    ASSERT_TRUE(stylefile.good());
+    std::stringstream stylejson;
+    stylejson << stylefile.rdbuf();
+
+    Style style;
+    style.loadJSON((const uint8_t *)stylejson.str().c_str());
+}
+

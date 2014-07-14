@@ -8,7 +8,9 @@ var fs = require('fs');
 
 var transforms = {
   'style.min.js': require('./minify.js'),
-  'fuzz-colors.min.js': require('./fuzz-colors.js')
+  'fuzz-colors.min.js': require('./fuzz-colors.js'),
+  'fuzz-functions.min.js': require('./fuzz-functions.js'),
+  'fuzz-layers.min.js': require('./fuzz-layers.js')
 };
 
 var source = load(process.argv[2]);
