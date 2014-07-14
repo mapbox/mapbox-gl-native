@@ -1,6 +1,8 @@
 #ifndef LLMR_STYLE_TYPES
 #define LLMR_STYLE_TYPES
 
+#include <llmr/util/enum.hpp>
+
 #include <string>
 #include <array>
 
@@ -20,9 +22,17 @@ enum class StyleLayerType : uint8_t {
     Background
 };
 
-StyleLayerType parseStyleLayerType(const std::string &type);
-const char *stringifyStyleLayerType(StyleLayerType type);
-std::ostream& operator<<(std::ostream&, StyleLayerType type);
+LLMR_DEFINE_ENUM_CLASS(StyleLayerTypeClass, StyleLayerType, {
+    { StyleLayerType::Unknown, "unknown" },
+    { StyleLayerType::Fill, "fill" },
+    { StyleLayerType::Line, "line" },
+    { StyleLayerType::Icon, "icon" },
+    { StyleLayerType::Text, "text" },
+    { StyleLayerType::Raster, "raster" },
+    { StyleLayerType::Composite, "composite" },
+    { StyleLayerType::Background, "background" },
+    { StyleLayerType(-1), "unknown" },
+});
 
 
 enum class WindingType : uint8_t {

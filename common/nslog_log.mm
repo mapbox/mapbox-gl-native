@@ -7,7 +7,7 @@
 namespace llmr {
 
 void NSLogBackend::record(EventSeverity severity, Event event, const std::string &msg) {
-    NSLog(@"[%s] %s: %@", stringifyEventSeverity(severity), stringifyEvent(event),
+    NSLog(@"[%s] %s: %@", EventSeverityClass(severity).c_str(), EventClass(event).c_str(),
           [[NSString alloc] initWithBytes:msg.data()
                                    length:msg.size()
                                  encoding:NSUTF8StringEncoding]);
@@ -23,15 +23,15 @@ void NSLogBackend::record(EventSeverity severity, Event event, const char* forma
     va_start(args, format);
     vsnprintf(buffer.get(), len + 1, format, args);
     va_end(args);
-    NSLog(@"[%s] %s: %s", stringifyEventSeverity(severity), stringifyEvent(event), buffer.get());
+    NSLog(@"[%s] %s: %s", EventSeverityClass(severity).c_str(), EventClass(event).c_str(), buffer.get());
 }
 
 void NSLogBackend::record(EventSeverity severity, Event event, int64_t code) {
-    NSLog(@"[%s] %s: (%lld)", stringifyEventSeverity(severity), stringifyEvent(event), code);
+    NSLog(@"[%s] %s: (%lld)", EventSeverityClass(severity).c_str(), EventClass(event).c_str(), code);
 }
 
 void NSLogBackend::record(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
-    NSLog(@"[%s] %s: (%lld) %@", stringifyEventSeverity(severity), stringifyEvent(event), code,
+    NSLog(@"[%s] %s: (%lld) %@", EventSeverityClass(severity).c_str(), EventClass(event).c_str(), code,
           [[NSString alloc] initWithBytes:msg.data()
                                    length:msg.size()
                                  encoding:NSUTF8StringEncoding]);
