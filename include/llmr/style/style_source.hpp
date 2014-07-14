@@ -3,6 +3,8 @@
 
 #include <llmr/style/types.hpp>
 
+#include <memory>
+
 namespace llmr {
 
 class Source;
