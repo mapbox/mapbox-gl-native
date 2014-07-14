@@ -11,6 +11,10 @@ template<typename T, typename ...Args>
     return ::std::unique_ptr<T>(new T(::std::forward<Args>(args)...));
 }
 
+}
+
+namespace llmr {
+namespace util {
 
 template <typename Container, typename ForwardIterator, typename Predicate>
 void erase_if(Container &container, ForwardIterator it, const ForwardIterator end, Predicate pred) {
@@ -28,6 +32,7 @@ void erase_if(Container &container, Predicate pred) {
     erase_if(container, container.begin(), container.end(), pred);
 }
 
+}
 }
 
 #endif

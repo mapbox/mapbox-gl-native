@@ -284,7 +284,7 @@ bool Source::updateTiles(Map &map) {
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
     std::set<Tile::ID> retain_data;
-    std::erase_if(tiles, [&retain, &retain_data, &changed](std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
+    util::erase_if(tiles, [&retain, &retain_data, &changed](std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
         Tile &tile = *pair.second;
         bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
         if (obsolete) {
@@ -296,7 +296,7 @@ bool Source::updateTiles(Map &map) {
     });
 
     // Remove all the expired pointers from the set.
-    std::erase_if(tile_data, [&retain_data](std::pair<const Tile::ID, std::weak_ptr<TileData>> &pair) {
+    util::erase_if(tile_data, [&retain_data](std::pair<const Tile::ID, std::weak_ptr<TileData>> &pair) {
         const std::shared_ptr<TileData> tile = pair.second.lock();
         if (!tile) {
             return true;
