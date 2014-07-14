@@ -34,6 +34,7 @@ class Style;
 class Tile;
 class GlyphAtlas;
 class Source;
+class StyleSource;
 
 class FillBucket;
 class LineBucket;
@@ -106,7 +107,7 @@ public:
     // Configures the painter strata that is used for early z-culling of fragments.
     void setStrata(float strata);
 
-    void drawClippingMasks(const std::set<std::shared_ptr<Source>> &sources);
+    void drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &sources);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
 
     void clearFramebuffers();

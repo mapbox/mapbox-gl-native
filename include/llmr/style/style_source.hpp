@@ -5,14 +5,19 @@
 
 namespace llmr {
 
-struct StyleSource {
-  const SourceType type;
-  const std::string url;
-  const uint32_t tile_size;
-  const int32_t min_zoom;
-  const int32_t max_zoom;
+class Source;
 
-  StyleSource(SourceType type = SourceType::Vector,
+struct StyleSource {
+    const SourceType type;
+    const std::string url;
+    const uint32_t tile_size;
+    const int32_t min_zoom;
+    const int32_t max_zoom;
+
+    bool enabled = false;
+    std::shared_ptr<Source> source;
+
+    StyleSource(SourceType type = SourceType::Vector,
               const std::string &url = "",
               uint32_t tile_size = 512, uint32_t min_zoom = 0,
               uint32_t max_zoom = 22)
