@@ -15,7 +15,7 @@ TEST(Enums, StyleLayerType) {
     ASSERT_EQ(StyleLayerType::Line, StyleLayerTypeClass("line"));
     ASSERT_EQ(StyleLayerType::Icon, StyleLayerTypeClass("icon"));
     ASSERT_EQ(StyleLayerType::Text, StyleLayerTypeClass("text"));
-    ASSERT_EQ(StyleLayerType::Raster, StyleLayerTypeClass("rastr"));
+    ASSERT_EQ(StyleLayerType::Raster, StyleLayerTypeClass("raster"));
     ASSERT_EQ(StyleLayerType::Composite, StyleLayerTypeClass("composite"));
     ASSERT_EQ(StyleLayerType::Background, StyleLayerTypeClass("background"));
 
