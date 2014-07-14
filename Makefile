@@ -42,7 +42,7 @@ xtest: config.gypi clear_xcode_cache node
 # Builds the linux app with make. This is also used by Travis CI
 linux: config.gypi linux/llmr-app.gyp node
 	deps/run_gyp linux/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
-	$(MAKE) -C build/linux BUILDTYPE=Testing V=$(V) linuxapp
+	$(MAKE) -C build/linux BUILDTYPE=$(BUILDTYPE) V=$(V) linuxapp
 
 # Executes the Linux binary
 run-linux: linux
