@@ -2,6 +2,7 @@
 #include <llmr/style/style_layer_group.hpp>
 #include <llmr/util/constants.hpp>
 #include <llmr/util/std.hpp>
+#include <llmr/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
 namespace llmr {
@@ -45,7 +46,7 @@ void StyleParser::parseConstants(JSVal value) {
             }
         }
     } else {
-        throw Style::exception("constants must be an object");
+        Log::Warning(Event::ParseStyle, "constants must be an object");
     }
 }
 
@@ -69,7 +70,7 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, std::string &targe
             target = { property.GetString(), property.GetStringLength() };
             return true;
         } else {
-            fprintf(stderr, "[WARNING] '%s' must be a string\n", name);
+            Log::Warning(Event::ParseStyle, "'%s' must be a string", name);
         }
     }
     return false;
@@ -82,7 +83,7 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, float &target, con
             target = property.GetDouble();
             return true;
         } else {
-            fprintf(stderr, "[WARNING] '%s' must be a number\n", name);
+            Log::Warning(Event::ParseStyle, "'%s' must be a number", name);
         }
     }
     return false;
@@ -94,14 +95,14 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, uint16_t &target, 
         if (property.IsUint()) {
             unsigned int value = property.GetUint();
             if (value > std::numeric_limits<uint16_t>::max()) {
-                fprintf(stderr, "[WARNING] values for %s that are larger than %d are not supported\n", name, std::numeric_limits<uint16_t>::max());
+                Log::Warning(Event::ParseStyle, "values for %s that are larger than %d are not supported", name, std::numeric_limits<uint16_t>::max());
                 return false;
             }
 
             target = value;
             return true;
         } else {
-            fprintf(stderr, "[WARNING] %s must be an unsigned integer\n", name);
+            Log::Warning(Event::ParseStyle, "%s must be an unsigned integer", name);
         }
     }
     return false;
@@ -114,7 +115,7 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, int32_t &target, c
             target = property.GetInt();
             return true;
         } else {
-            fprintf(stderr, "[WARNING] %s must be an integer\n", name);
+            Log::Warning(Event::ParseStyle, "%s must be an integer", name);
         }
     }
     return false;
@@ -129,10 +130,10 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, vec2<float> &targe
                 target.y = property[(rapidjson::SizeType)1].GetDouble();
                 return true;
             } else {
-                fprintf(stderr, "[WARNING] %s must have at least two members\n", name);
+                Log::Warning(Event::ParseStyle, "%s must have at least two members", name);
             }
         } else {
-            fprintf(stderr, "[WARNING] %s must be a n array of numbers\n", name);
+            Log::Warning(Event::ParseStyle, "%s must be an array of numbers", name);
         }
     }
     return false;
@@ -146,7 +147,7 @@ bool StyleParser::parseRenderProperty(JSVal value, T &target, const char *name, 
             target = parser({ property.GetString(), property.GetStringLength() });
             return true;
         } else {
-            fprintf(stderr, "[WARNING] %s must have one of the enum values\n", name);
+            Log::Warning(Event::ParseStyle, "%s must have one of the enum values", name);
         }
     }
     return false;
@@ -177,7 +178,7 @@ void StyleParser::parseSources(JSVal value) {
             sources.emplace(std::move(name), std::make_shared<StyleSource>(type, url, tile_size, min_zoom, max_zoom));
         }
     } else {
-        throw Style::exception("sources must be an object");
+        Log::Warning(Event::ParseStyle, "sources must be an object");
     }
 }
 
@@ -185,7 +186,7 @@ void StyleParser::parseSources(JSVal value) {
 
 Color parseColor(JSVal value) {
     if (!value.IsString()) {
-        fprintf(stderr, "[WARNING] color value must be a string\n");
+        Log::Warning(Event::ParseStyle, "color value must be a string");
         return Color{{ 0, 0, 0, 0 }};
     }
 
@@ -208,7 +209,7 @@ bool StyleParser::parseFunctionArgument(JSVal value) {
     } else if (rvalue.IsNumber()) {
         return rvalue.GetDouble();
     } else {
-        fprintf(stderr, "[WARNING] function argument must be a boolean or numeric value");
+        Log::Warning(Event::ParseStyle, "function argument must be a boolean or numeric value");
         return false;
     }
 }
@@ -219,7 +220,7 @@ float StyleParser::parseFunctionArgument(JSVal value) {
     if (rvalue.IsNumber()) {
         return rvalue.GetDouble();
     } else {
-        fprintf(stderr, "[WARNING] function argument must be a numeric value");
+        Log::Warning(Event::ParseStyle, "function argument must be a numeric value");
         return 0.0f;
     }
 }
@@ -233,13 +234,13 @@ Color StyleParser::parseFunctionArgument(JSVal value) {
 template <typename T>
 std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
     if (!value.HasMember("fn")) {
-        fprintf(stderr, "[WARNING] function must specify a function name\n");
+        Log::Warning(Event::ParseStyle, "function must specify a function name");
         return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
     }
 
     JSVal value_fn = value["fn"];
     if (!value_fn.IsString()) {
-        fprintf(stderr, "[WARNING] function must specify a function type\n");
+        Log::Warning(Event::ParseStyle, "function must specify a function type");
         return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
     }
 
@@ -247,11 +248,11 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
 
     if (type == "linear") {
         if (!value.HasMember("z")) {
-            fprintf(stderr, "[WARNING] linear function must specify a base zoom level\n");
+            Log::Warning(Event::ParseStyle, "linear function must specify a base zoom level");
             return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
         if (!value.HasMember("val")) {
-            fprintf(stderr, "[WARNING] linear function must specify a base value\n");
+            Log::Warning(Event::ParseStyle, "linear function must specify a base value");
             return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
         const float z_base = parseFunctionArgument<float>(value["z"]);
@@ -263,11 +264,11 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
     }
     else if (type == "exponential") {
         if (!value.HasMember("z")) {
-            fprintf(stderr, "[WARNING] exponential function must specify a base zoom level\n");
+            Log::Warning(Event::ParseStyle, "exponential function must specify a base zoom level");
             return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
         if (!value.HasMember("val")) {
-            fprintf(stderr, "[WARNING] exponential function must specify a base value\n");
+            Log::Warning(Event::ParseStyle, "exponential function must specify a base value");
             return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
         const float z_base = parseFunctionArgument<float>(value["z"]);
@@ -280,13 +281,13 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
     }
     else if (type == "stops") {
         if (!value.HasMember("stops")) {
-            fprintf(stderr, "[WARNING] stops function must specify a stops array\n");
+            Log::Warning(Event::ParseStyle, "stops function must specify a stops array");
             return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
 
         JSVal value_stops = value["stops"];
         if (!value_stops.IsArray()) {
-            fprintf(stderr, "[WARNING] stops function must specify a stops array\n");
+            Log::Warning(Event::ParseStyle, "stops function must specify a stops array");
             return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
 
@@ -295,19 +296,19 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
             JSVal stop = value_stops[i];
             if (stop.IsArray()) {
                 if (stop.Size() != 2) {
-                    fprintf(stderr, "[WARNING] stop must have zoom level and value specification\n");
+                    Log::Warning(Event::ParseStyle, "stop must have zoom level and value specification");
                     return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
                 }
 
                 JSVal z = stop[rapidjson::SizeType(0)];
                 if (!z.IsNumber()) {
-                    fprintf(stderr, "[WARNING] zoom level in stop must be a number\n");
+                    Log::Warning(Event::ParseStyle, "zoom level in stop must be a number");
                     return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
                 }
 
                 stops.emplace_back(z.GetDouble(), parseFunctionArgument<T>(stop[rapidjson::SizeType(1)]));
             } else {
-                fprintf(stderr, "[WARNING] function argument must be a numeric value\n");
+                Log::Warning(Event::ParseStyle, "function argument must be a numeric value");
                 return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
             }
         }
@@ -315,7 +316,7 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
         return std::tuple<bool, Function<T>> { true, StopsFunction<T>(stops) };
     }
     else {
-        fprintf(stderr, "[WARNING] function type '%s' is unknown\n", type.c_str());
+        Log::Warning(Event::ParseStyle, "function type '%s' is unknown", type.c_str());
     }
 
     return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
@@ -376,7 +377,7 @@ bool StyleParser::parseOptionalProperty(const char *property_name, T &target, JS
 
 template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsString()) {
-        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
         return std::tuple<bool, std::string> { false, std::string() };
     }
 
@@ -385,7 +386,7 @@ template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value,
 
 template<> std::tuple<bool, TranslateAnchorType> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsString()) {
-        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
         return std::tuple<bool, TranslateAnchorType> { false, TranslateAnchorType::Default };
     }
 
@@ -394,7 +395,7 @@ template<> std::tuple<bool, TranslateAnchorType> StyleParser::parseProperty(JSVa
 
 template<> std::tuple<bool, RotateAnchorType> StyleParser::parseProperty<RotateAnchorType>(JSVal value, const char *property_name) {
     if (!value.IsString()) {
-        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
         return std::tuple<bool, RotateAnchorType> { false, RotateAnchorType::Default };
     }
 
@@ -427,7 +428,7 @@ template<> std::tuple<bool, Function<bool>> StyleParser::parseProperty(JSVal val
     } else if (value.IsBool()) {
         return std::tuple<bool, Function<bool>> { true, ConstantFunction<bool>(value.GetBool()) };
     } else {
-        fprintf(stderr, "[WARNING] value of '%s' must be convertible to boolean, or a boolean function\n", property_name);
+        Log::Warning(Event::ParseStyle, "value of '%s' must be convertible to boolean, or a boolean function", property_name);
         return std::tuple<bool, Function<bool>> { false, ConstantFunction<bool>(false) };
     }
 }
@@ -440,7 +441,7 @@ template<> std::tuple<bool, Function<float>> StyleParser::parseProperty(JSVal va
     } else if (value.IsBool()) {
         return std::tuple<bool, Function<float>> { true, ConstantFunction<float>(value.GetBool()) };
     } else {
-        fprintf(stderr, "[WARNING] value of '%s' must be a number, or a number function\n", property_name);
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a number, or a number function", property_name);
         return std::tuple<bool, Function<float>> { false, ConstantFunction<float>(0) };
     }
 }
@@ -451,7 +452,7 @@ template<> std::tuple<bool, Function<Color>> StyleParser::parseProperty(JSVal va
     } else if (value.IsString()) {
         return std::tuple<bool, Function<Color>> { true, ConstantFunction<Color>(parseColor(value)) };
     } else {
-        fprintf(stderr, "[WARNING] value of '%s' must be a color, or a color function\n", property_name);
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a color, or a color function", property_name);
         return std::tuple<bool, Function<Color>> { false, ConstantFunction<Color>(Color {{ 0, 0, 0, 0 }}) };
     }
 }
@@ -461,11 +462,11 @@ bool StyleParser::parseOptionalProperty(const char *property_name, const std::ve
     if (value.HasMember(property_name)) {
         JSVal rvalue = replaceConstant(value[property_name]);
         if (!rvalue.IsArray()) {
-            throw Style::exception("array value must be an array");
+            Log::Warning(Event::ParseStyle, "array value must be an array");
         }
 
         if (rvalue.Size() != keys.size()) {
-            throw Style::exception("array value has unexpected number of elements");
+            Log::Warning(Event::ParseStyle, "array value has unexpected number of elements");
         }
 
         for (uint16_t i = 0; i < keys.size(); i++) {
@@ -488,27 +489,27 @@ std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
         }
         return group;
     } else {
-        throw Style::exception("layers must be an array");
+        Log::Warning(Event::ParseStyle, "layers must be an array");
     }
 }
 
 std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
     if (value.IsObject()) {
         if (!value.HasMember("id")) {
-            fprintf(stderr, "[WARNING] layer must have an id\n");
+            Log::Warning(Event::ParseStyle, "layer must have an id");
             return nullptr;
         }
 
         JSVal id = value["id"];
         if (!id.IsString()) {
-            fprintf(stderr, "[WARNING] layer id must be a string\n");
+            Log::Warning(Event::ParseStyle, "layer id must be a string");
             return nullptr;
         }
 
         const std::string layer_id = { id.GetString(), id.GetStringLength() };
 
         if (layers.find(layer_id) != layers.end()) {
-            fprintf(stderr, "[WARNING] duplicate layer id %s\n", layer_id.c_str());
+            Log::Warning(Event::ParseStyle, "duplicate layer id %s", layer_id.c_str());
             return nullptr;
         }
 
@@ -534,7 +535,7 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
 
         return layer;
     } else {
-        fprintf(stderr, "[WARNING] layer must be an object\n");
+        Log::Warning(Event::ParseStyle, "layer must be an object");
         return nullptr;
     }
 }
@@ -557,7 +558,7 @@ void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair
     if (value.HasMember("type")) {
         JSVal type = value["type"];
         if (!type.IsString()) {
-            fprintf(stderr, "[WARNING] layer type of '%s' must be a string\n", layer->id.c_str());
+            Log::Warning(Event::ParseStyle, "layer type of '%s' must be a string", layer->id.c_str());
         } else {
             layer->type = parseStyleLayerType({ type.GetString(), type.GetStringLength() });
         }
@@ -565,7 +566,7 @@ void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair
 
     // Make sure we have not previously attempted to parse this layer.
     if (std::find(stack.begin(), stack.end(), layer.get()) != stack.end()) {
-        fprintf(stderr, "[WARNING] layer reference of '%s' is circular\n", layer->id.c_str());
+        Log::Warning(Event::ParseStyle, "layer reference of '%s' is circular", layer->id.c_str());
         return;
     }
 
@@ -681,13 +682,13 @@ std::unique_ptr<RasterizeProperties> StyleParser::parseRasterize(JSVal value) {
 
 void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer) {
     if (!value.IsString()) {
-        fprintf(stderr, "[WARNING] layer ref of '%s' must be a string\n", layer->id.c_str());
+        Log::Warning(Event::ParseStyle, "layer ref of '%s' must be a string", layer->id.c_str());
         return;
     }
     const std::string ref { value.GetString(), value.GetStringLength() };
     auto it = layers.find(ref);
     if (it == layers.end()) {
-        fprintf(stderr, "[WARNING] layer '%s' references unknown layer %s\n", layer->id.c_str(), ref.c_str());
+        Log::Warning(Event::ParseStyle, "layer '%s' references unknown layer %s", layer->id.c_str(), ref.c_str());
         // We cannot parse this layer further.
         return;
     }
@@ -703,7 +704,7 @@ void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer
     layer->type = reference->type;
 
     if (reference->layers) {
-        fprintf(stderr, "[WARNING] layer '%s' references composite layer\n", layer->id.c_str());
+        Log::Warning(Event::ParseStyle, "layer '%s' references composite layer", layer->id.c_str());
         // We cannot parse this layer further.
         return;
     } else {
@@ -727,11 +728,10 @@ void StyleParser::parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer) {
             if (source_it != sources.end()) {
                 layer->bucket->style_source = source_it->second;
             } else {
-                fprintf(stderr, "[WARNING] can't find source '%s' required for layer '%s'\n",
-                        source_name.c_str(), layer->id.c_str());
+                Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", source_name.c_str(), layer->id.c_str());
             }
         } else {
-            fprintf(stderr, "[WARNING] source of layer '%s' must be a string\n", layer->id.c_str());
+            Log::Warning(Event::ParseStyle, "source of layer '%s' must be a string", layer->id.c_str());
         }
     }
 
@@ -740,7 +740,7 @@ void StyleParser::parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         if (value_source_layer.IsString()) {
             layer->bucket->source_layer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
         } else {
-            fprintf(stderr, "[WARNING] source-layer of layer '%s' must be a string\n", layer->id.c_str());
+            Log::Warning(Event::ParseStyle, "source-layer of layer '%s' must be a string", layer->id.c_str());
         }
     }
 
@@ -802,7 +802,7 @@ FilterExpression StyleParser::parseFilter(JSVal value, FilterExpression::Operato
             expression.add(parseFilter(replaceConstant(value[i])));
         }
     } else {
-        fprintf(stderr, "[WARNING] expression must be either an array or an object\n");
+        Log::Warning(Event::ParseStyle, "expression must be either an array or an object");
     }
 
     return expression;
@@ -845,7 +845,7 @@ std::forward_list<Value> StyleParser::parseValues(JSVal value) {
 
 void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
     if (!value.IsObject()) {
-        fprintf(stderr, "[WARNING] render property of layer '%s' must be an object\n", layer->id.c_str());
+        Log::Warning(Event::ParseStyle, "render property of layer '%s' must be an object", layer->id.c_str());
         return;
     }
 

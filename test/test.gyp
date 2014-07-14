@@ -100,6 +100,8 @@
         "sources": [
             "./main.cpp",
             "./style.cpp",
+            "./fixtures/fixture_log.hpp",
+            "./fixtures/fixture_log.cpp",
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
