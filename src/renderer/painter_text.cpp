@@ -2,6 +2,7 @@
 #include <llmr/renderer/text_bucket.hpp>
 #include <llmr/style/style_layer.hpp>
 #include <llmr/map/map.hpp>
+#include <llmr/util/math.hpp>
 #include <cmath>
 
 using namespace llmr;
@@ -93,6 +94,17 @@ void Painter::renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     if (properties.halo_color[3] > 0.0f) {
         // TODO: Get rid of the 2.4 magic value. It is currently 24 / 10, with 24 being the font size
         // of the SDF glyphs.
+
+        // Our signed distance fields are scaled so that 1 pixel is scaled to 32 pixels.
+        // Our cutoff between positive and negative values is hard coded to 64 (== 2 pixels).
+        // This means that our 6/8 of the value range lies outside the glyph outline.
+        const float sdfOffset = (256.0f - 64.0f) / 32.0f;
+
+        // Currently, all of our fonts are rendered with a font size of 24px.
+        const float sdfFontSize = 24.0f;
+
+        const float haloWidth = util::clamp((sdfOffset - properties.halo_width / (fontSize / sdfFontSize)) / 8.0f, 0.0f, 1.0f);
+
         textShader->setGamma(properties.halo_blur * 2.4f / fontSize / map.getState().getPixelRatio());
         if (properties.opacity < 1.0f) {
             Color color = properties.halo_color;
@@ -104,7 +116,7 @@ void Painter::renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         } else {
             textShader->setColor(properties.halo_color);
         }
-        textShader->setBuffer(properties.halo_width);
+        textShader->setBuffer(haloWidth);
         glDepthRange(strata, 1.0f);
         bucket.drawGlyphs(*textShader);
     }
