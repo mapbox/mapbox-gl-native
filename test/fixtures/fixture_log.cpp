@@ -37,8 +37,8 @@ std::vector<FixtureLogBackend::LogMessage> FixtureLogBackend::unchecked() const 
 }
 
 ::std::ostream& operator<<(::std::ostream& os, const FixtureLogBackend::LogMessage& message) {
-    os << "[\"" << message.severity.get() << "\", \"" << message.event.get();
-    if (message.code) os << "\", " << message.code.get();
+    os << "[\"" << message.severity.get() << "\", \"" << message.event.get() << "\"";
+    if (message.code) os << ", " << message.code.get();
     if (message.msg) os << ", \"" << message.msg.get();
     return os << "\"]" << std::endl;
 }
