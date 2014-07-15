@@ -50,6 +50,14 @@ TEST(Style, Functions) {
     };
 
     ASSERT_EQ(0, log.count(number));
+
+    const auto &unchecked = log.unchecked();
+    if (unchecked.size()) {
+        std::cerr << "Unchecked Log Messages: " << std::endl 
+            << unchecked;
+    }
+
+    ASSERT_EQ(0, unchecked.size());
 }
 
 TEST(Style, Layers) {
