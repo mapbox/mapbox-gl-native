@@ -228,7 +228,7 @@ void SpriteAtlas::update(const Sprite &sprite) {
     if (!sprite.isLoaded()) return;
 
     SpriteAtlas &atlas = *this;
-    std::erase_if(uninitialized, [&sprite, &atlas](const std::string &name) {
+    util::erase_if(uninitialized, [&sprite, &atlas](const std::string &name) {
         Rect<dimension> dst = atlas.getImage(name, sprite);
         const SpritePosition &src = sprite.getSpritePosition(name);
         if (!src) {

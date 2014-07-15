@@ -94,8 +94,8 @@ TEST_P(HeadlessTest, render) {
                 if (js_entry.Size() == 5) {
                     const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
                     const FixtureLogBackend::LogMessage message {
-                        parseEventSeverity(js_entry[rapidjson::SizeType(1)].GetString()),
-                        parseEvent(js_entry[rapidjson::SizeType(2)].GetString()),
+                        EventSeverityClass(js_entry[rapidjson::SizeType(1)].GetString()),
+                        EventClass(js_entry[rapidjson::SizeType(2)].GetString()),
                         js_entry[rapidjson::SizeType(3)].GetInt64(),
                         js_entry[rapidjson::SizeType(4)].GetString()
                     };
@@ -104,15 +104,15 @@ TEST_P(HeadlessTest, render) {
                     const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
                     if (js_entry[rapidjson::SizeType(3)].IsString()) {
                         const FixtureLogBackend::LogMessage message {
-                            parseEventSeverity(js_entry[rapidjson::SizeType(1)].GetString()),
-                            parseEvent(js_entry[rapidjson::SizeType(2)].GetString()),
+                            EventSeverityClass(js_entry[rapidjson::SizeType(1)].GetString()),
+                            EventClass(js_entry[rapidjson::SizeType(2)].GetString()),
                             js_entry[rapidjson::SizeType(3)].GetString()
                         };
                         ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
                     } else {
                         const FixtureLogBackend::LogMessage message {
-                            parseEventSeverity(js_entry[rapidjson::SizeType(1)].GetString()),
-                            parseEvent(js_entry[rapidjson::SizeType(2)].GetString()),
+                            EventSeverityClass(js_entry[rapidjson::SizeType(1)].GetString()),
+                            EventClass(js_entry[rapidjson::SizeType(2)].GetString()),
                              js_entry[rapidjson::SizeType(3)].GetInt64()
                         };
                         ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
@@ -120,8 +120,8 @@ TEST_P(HeadlessTest, render) {
                 } else if (js_entry.Size() == 3) {
                     const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
                     const FixtureLogBackend::LogMessage message {
-                        parseEventSeverity(js_entry[rapidjson::SizeType(1)].GetString()),
-                        parseEvent(js_entry[rapidjson::SizeType(2)].GetString())
+                        EventSeverityClass(js_entry[rapidjson::SizeType(1)].GetString()),
+                        EventClass(js_entry[rapidjson::SizeType(2)].GetString())
                     };
                     ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
                 } else {

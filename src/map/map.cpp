@@ -9,6 +9,7 @@
 #include <llmr/util/string.hpp>
 #include <llmr/util/constants.hpp>
 #include <llmr/util/uv.hpp>
+#include <llmr/util/std.hpp>
 #include <llmr/style/style_layer_group.hpp>
 #include <llmr/style/style_bucket.hpp>
 #include <llmr/geometry/sprite_atlas.hpp>
@@ -410,11 +411,32 @@ void Map::setDefaultTransitionDuration(uint64_t duration_milliseconds) {
 }
 
 void Map::updateSources() {
-    activeSources.clear();
+    // First, disable all existing sources.
+    for (const std::shared_ptr<StyleSource> &source : activeSources) {
+        source->enabled = false;
+    }
+
+    // Then, reenable all of those that we actually use when drawing this layer.
     updateSources(style->layers);
+
+    // Then, construct or destroy the actual source object, depending on enabled state.
+    for (const std::shared_ptr<StyleSource> &source : activeSources) {
+        if (source->enabled) {
+            if (!source->source) {
+                source->source = std::make_shared<Source>(*source, getAccessToken());
+            }
+        } else {
+            source->source.reset();
+        }
+    }
+
+    // Finally, remove all sources that are disabled.
+    util::erase_if(activeSources, [](std::shared_ptr<StyleSource> source){
+        return !source->enabled;
+    });
 }
 
-const std::set<std::shared_ptr<Source>> Map::getActiveSources() const {
+const std::set<std::shared_ptr<StyleSource>> Map::getActiveSources() const {
     return activeSources;
 }
 
@@ -426,8 +448,7 @@ void Map::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
         if (!layer) continue;
         if (layer->bucket) {
             if (layer->bucket->style_source) {
-              auto ret = activeSources.emplace(std::make_shared<Source>(*layer->bucket->style_source, this->getAccessToken()));
-              layer->bucket->source = *ret.first;
+                (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
             }
         } else if (layer->layers) {
             updateSources(layer->layers);
@@ -436,23 +457,23 @@ void Map::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
 }
 
 void Map::updateTiles() {
-    for (const std::shared_ptr<Source> &source : getActiveSources()) {
-        source->update(*this);
+    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
+        source->source->update(*this);
     }
 }
 
 void Map::updateRenderState() {
     std::forward_list<Tile::ID> ids;
 
-    for (const std::shared_ptr<Source> &source : getActiveSources()) {
-        ids.splice_after(ids.before_begin(), source->getIDs());
-        source->updateMatrices(painter.projMatrix, state);
+    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
+        ids.splice_after(ids.before_begin(), source->source->getIDs());
+        source->source->updateMatrices(painter.projMatrix, state);
     }
 
     const std::map<Tile::ID, ClipID> clipIDs = computeClipIDs(ids);
 
-    for (const std::shared_ptr<Source> &source : getActiveSources()) {
-        source->updateClipIDs(clipIDs);
+    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
+        source->source->updateClipIDs(clipIDs);
     }
 }
 
@@ -531,8 +552,8 @@ void Map::render() {
     // This guarantees that we have at least one function per tile called.
     // When only rendering layers via the stylesheet, it's possible that we don't
     // ever visit a tile during rendering.
-    for (const std::shared_ptr<Source> &source : getActiveSources()) {
-        source->finishRender(painter);
+    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
+        source->source->finishRender(painter);
     }
 
     painter.renderMatte();
@@ -629,6 +650,8 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
             return;
         }
 
+        StyleSource &style_source = *layer_desc->bucket->style_source;
+
         // Abort early if we can already deduce from the bucket type that
         // we're not going to render anything anyway during this pass.
         switch (layer_desc->type) {
@@ -660,6 +683,8 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
                       << layer_desc->type << ")" << std::endl;
         }
 
-        layer_desc->bucket->source->render(painter, layer_desc);
+        if (style_source.source) {
+            style_source.source->render(painter, layer_desc);
+        }
     }
 }

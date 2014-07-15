@@ -76,7 +76,6 @@ public:
 
     std::string name;
     std::shared_ptr<StyleSource> style_source;
-    std::shared_ptr<Source> source;
     std::string source_layer;
     FilterExpression filter;
     StyleBucketRender render = std::false_type();

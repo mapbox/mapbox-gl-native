@@ -1,8 +1,9 @@
 #ifndef LLMR_PLATFORM_EVENT
 #define LLMR_PLATFORM_EVENT
 
+#include <llmr/util/enum.hpp>
+
 #include <cstdint>
-#include <ostream>
 
 namespace llmr {
 
@@ -14,9 +15,14 @@ enum class EventSeverity : uint8_t {
     Error,
 };
 
-EventSeverity parseEventSeverity(const char *name);
-const char *stringifyEventSeverity(EventSeverity eventSeverity);
-::std::ostream& operator<<(::std::ostream& os, EventSeverity eventSeverity);
+LLMR_DEFINE_ENUM_CLASS(EventSeverityClass, EventSeverity, {
+    { EventSeverity::Debug, "DEBUG" },
+    { EventSeverity::Info, "INFO" },
+    { EventSeverity::Test, "TEST" },
+    { EventSeverity::Warning, "WARNING" },
+    { EventSeverity::Error, "ERROR" },
+    { EventSeverity(-1), "UNKNOWN" },
+});
 
 enum class Event : uint8_t {
     General,
@@ -28,9 +34,17 @@ enum class Event : uint8_t {
     HttpRequest,
 };
 
-Event parseEvent(const char *name);
-const char *stringifyEvent(Event event);
-::std::ostream& operator<<(::std::ostream& os, Event event);
+LLMR_DEFINE_ENUM_CLASS(EventClass, Event, {
+    { Event::General, "General" },
+    { Event::Setup, "Setup" },
+    { Event::Shader, "Shader" },
+    { Event::ParseStyle, "ParseStyle" },
+    { Event::ParseTile, "ParseTile" },
+    { Event::Render, "Render" },
+    { Event::HttpRequest, "HttpRequest" },
+    { Event(-1), "Unknown" },
+});
+
 
 struct EventPermutation {
     const EventSeverity severity;

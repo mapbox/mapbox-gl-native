@@ -560,7 +560,7 @@ void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair
         if (!type.IsString()) {
             Log::Warning(Event::ParseStyle, "layer type of '%s' must be a string", layer->id.c_str());
         } else {
-            layer->type = parseStyleLayerType({ type.GetString(), type.GetStringLength() });
+            layer->type = StyleLayerTypeClass(std::string { type.GetString(), type.GetStringLength() });
         }
     }
 

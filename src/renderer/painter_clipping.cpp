@@ -6,7 +6,7 @@
 
 using namespace llmr;
 
-void Painter::drawClippingMasks(const std::set<std::shared_ptr<Source>> &sources) {
+void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &sources) {
     gl::group group("clipping masks");
 
     useProgram(plainShader->program);
@@ -18,8 +18,8 @@ void Painter::drawClippingMasks(const std::set<std::shared_ptr<Source>> &sources
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 
-    for (const std::shared_ptr<Source> &source : sources) {
-        source->drawClippingMasks(*this);
+    for (const std::shared_ptr<StyleSource> &source : sources) {
+        source->source->drawClippingMasks(*this);
     }
 
     glEnable(GL_DEPTH_TEST);

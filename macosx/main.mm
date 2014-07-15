@@ -17,12 +17,9 @@ int main() {
     map.setDebug(settings.debug);
 
     // Set access token if present
-    const char *token = getenv("MAPBOX_ACCESS_TOKEN");
-    if (token == nullptr) {
-        llmr::Log::Warning(llmr::Event::Setup, "no access token set. mapbox.com tiles won't work.");
-    } else {
-        map.setAccessToken(std::string(token));
-    }
+    NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
+    if ( ! accessToken) llmr::Log::Warning(llmr::Event::Setup, "No access token set. Mapbox vector tiles won't work.");
+    if (accessToken) map.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
 
     // Load style
     NSString *path = [[NSBundle mainBundle] pathForResource:@"style.min" ofType:@"js"];

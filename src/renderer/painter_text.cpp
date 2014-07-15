@@ -2,6 +2,7 @@
 #include <llmr/renderer/text_bucket.hpp>
 #include <llmr/style/style_layer.hpp>
 #include <llmr/map/map.hpp>
+#include <llmr/util/math.hpp>
 #include <cmath>
 
 using namespace llmr;
@@ -88,12 +89,37 @@ void Painter::renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     textShader->setMaxFadeZoom(std::floor(highZ * 10));
     textShader->setFadeZoom((map.getState().getNormalizedZoom() + bump) * 10);
 
+    // This defines the gamma around the SDF cutoff value.
+    const float sdfGamma = 0.75f / 10.0f;
+
+    // Our signed distance fields are scaled so that 1 pixel is scaled to 32 pixels.
+    // Our cutoff between positive and negative values is hard coded to 64 (== 2 pixels).
+    // This means that our 6/8 of the value range lies outside the glyph outline.
+    const float sdfOffset = (256.0f - 64.0f) / 32.0f;
+
+    // Currently, all of our fonts are rendered with a font size of 24px.
+    const float sdfFontSize = 24.0f;
+
+    // The default gamma value has to be adjust for the current pixelratio so that we're not drawing
+    // blurry font on retina screens.
+    const float gamma = sdfGamma * sdfFontSize / fontSize / map.getState().getPixelRatio();
+
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
     if (properties.halo_color[3] > 0.0f) {
-        // TODO: Get rid of the 2.4 magic value. It is currently 24 / 10, with 24 being the font size
-        // of the SDF glyphs.
-        textShader->setGamma(properties.halo_blur * 2.4f / fontSize / map.getState().getPixelRatio());
+        const float haloWidth = util::clamp((sdfOffset - properties.halo_width / (fontSize / sdfFontSize)) / 8.0f, 0.0f, 1.0f);
+
+        if (properties.halo_blur != 0.0f) {
+            // We are converting the halo_blur value to current screen pixels.
+            // Then we're dividing it by two because the gamma value is added/subtracted into both
+            // directions in the shader, but the halo_blur describes the entire width of the blur.
+            // Note that this does *not* have to be adjusted for retina screens, because we want the
+            // same blur width when we explicitly specify one.
+            textShader->setGamma((properties.halo_blur / (fontSize / sdfFontSize)) / 8.0f / 2.0f);
+        } else {
+            textShader->setGamma(sdfGamma);
+        }
+
         if (properties.opacity < 1.0f) {
             Color color = properties.halo_color;
             color[0] *= properties.opacity;
@@ -104,16 +130,14 @@ void Painter::renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         } else {
             textShader->setColor(properties.halo_color);
         }
-        textShader->setBuffer(properties.halo_width);
+        textShader->setBuffer(haloWidth);
         glDepthRange(strata, 1.0f);
         bucket.drawGlyphs(*textShader);
     }
 
     if (properties.color[3] > 0.0f) {
         // Then, we draw the text over the halo
-        // TODO: Get rid of the 2.4 magic value. It is currently 24 / 10, with 24 being the font size
-        // of the SDF glyphs.
-        textShader->setGamma(2.4f / fontSize / map.getState().getPixelRatio());
+        textShader->setGamma(gamma);
         if (properties.opacity < 1.0f) {
             Color color = properties.color;
             color[0] *= properties.opacity;

@@ -31,12 +31,11 @@ This will clear cached build data and update to the latest versions of dependenc
 
 The demo applications use Mapbox vector tiles, which **require a Mapbox account and API access token**. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/account/apps/). 
 
+For iOS and OS X use of the demo apps in Xcode, setup the access token by editing the scheme for the application target, then adding an environment variable with the name `MAPBOX_ACCESS_TOKEN`. 
+
+![setting access token in Xcode scheme](https://cloud.githubusercontent.com/assets/52399/3543326/9e7cfbb8-0860-11e4-8def-3684a9028b61.png)
+
 ## OS X
-
-in the Xcode project, click on the Target icon next to the Run/Stop button, and then "Edit Scheme". In the screen, add an environment variable with the name `MAPBOX_ACCESS_TOKEN` to the targets you want to run.
-
-![Setting the access token](https://cloud.githubusercontent.com/assets/52399/3543326/9e7cfbb8-0860-11e4-8def-3684a9028b61.png)
-
 
 Run:
 
@@ -60,8 +59,6 @@ First, pull down the submodule(s):
 
     git submodule init
     git submodule update
-
-Insert your access token into `MBXViewController.h`. 
 
 Then run:
 

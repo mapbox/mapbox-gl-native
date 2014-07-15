@@ -91,6 +91,22 @@
         ]
     },
     {
+        "target_name": "enums",
+        "product_name": "test_enums",
+        "type": "executable",
+        "libraries": [
+            "-lpthread",
+        ],
+        "sources": [
+            "./main.cpp",
+            "./enums.cpp",
+        ],
+        "dependencies": [
+            "../deps/gtest/gtest.gyp:gtest",
+            "../llmr.gyp:llmr-x86"
+        ]
+    },
+    {
         "target_name": "style",
         "product_name": "test_style",
         "type": "executable",
@@ -185,6 +201,7 @@
         "dependencies": [
           "rotation_range",
           "clip_ids",
+          "enums",
           "variant",
           "tile",
           "functions",

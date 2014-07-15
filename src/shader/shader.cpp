@@ -4,6 +4,7 @@
 #include <llmr/platform/log.hpp>
 
 #include <cstring>
+#include <cstdlib>
 
 using namespace llmr;
 
