@@ -57,6 +57,10 @@ void Transform::moveBy(const double dx, const double dy, const timestamp duratio
 void Transform::_moveBy(const double dx, const double dy, const timestamp duration) {
     // This is only called internally, so we don't need a lock here.
 
+    platform::notify_map_change(duration ?
+                                platform::MapChangeRegionWillChangeAnimated :
+                                platform::MapChangeRegionWillChange);
+
     final.x = current.x + std::cos(current.angle) * dx + std::sin(current.angle) * dy;
     final.y = current.y + std::cos(current.angle) * dy + std::sin(-current.angle) * dx;
 
@@ -271,6 +275,10 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
                             const timestamp duration) {
     // This is only called internally, so we don't need a lock here.
 
+    platform::notify_map_change(duration ?
+                                platform::MapChangeRegionWillChangeAnimated :
+                                platform::MapChangeRegionWillChange);
+
     final.scale = new_scale;
     final.x = xn;
     final.y = yn;
@@ -377,6 +385,10 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
 
 void Transform::_setAngle(double new_angle, const timestamp duration) {
     // This is only called internally, so we don't need a lock here.
+
+    platform::notify_map_change(duration ?
+                                platform::MapChangeRegionWillChangeAnimated :
+                                platform::MapChangeRegionWillChange);
 
     while (new_angle > M_PI)
         new_angle -= M2PI;
