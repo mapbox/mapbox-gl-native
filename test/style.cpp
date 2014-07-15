@@ -10,7 +10,7 @@ using namespace llmr;
 
 typedef std::vector<std::pair<uint32_t, std::string>> Messages;
 
-void checkMessages(FixtureLogBackend log, Messages messages) {
+void checkMessages(const FixtureLogBackend &log, Messages messages) {
     for (auto &it : messages) {
         const FixtureLogBackend::LogMessage message {
             EventSeverityClass("WARNING"),
