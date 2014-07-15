@@ -10,6 +10,7 @@ using namespace llmr;
 
 TEST(Style, Style) {
     const FixtureLogBackend &log = Log::Set<FixtureLogBackend>();
+
     std::ifstream stylefile("./style.min.js");
     ASSERT_TRUE(stylefile.good());
     std::stringstream stylejson;
@@ -17,11 +18,11 @@ TEST(Style, Style) {
 
     Style style;
     style.loadJSON((const uint8_t *)stylejson.str().c_str());
-    // ASSERT_EQ(0, log.count({ EventSeverity::Warning, Event::ParseStyle }));
 }
 
 TEST(Style, Colors) {
     const FixtureLogBackend &log = Log::Set<FixtureLogBackend>();
+
     std::ifstream stylefile("./fuzz-colors.min.js");
     ASSERT_TRUE(stylefile.good());
     std::stringstream stylejson;
@@ -33,6 +34,7 @@ TEST(Style, Colors) {
 
 TEST(Style, Functions) {
     const FixtureLogBackend &log = Log::Set<FixtureLogBackend>();
+
     std::ifstream stylefile("./fuzz-functions.min.js");
     ASSERT_TRUE(stylefile.good());
     std::stringstream stylejson;
@@ -40,10 +42,19 @@ TEST(Style, Functions) {
 
     Style style;
     style.loadJSON((const uint8_t *)stylejson.str().c_str());
+
+    const FixtureLogBackend::LogMessage number {
+        EventSeverityClass("WARNING"),
+        EventClass("ParseStyle"),
+        "value of 'line-width' must be a number, or a number function"
+    };
+
+    ASSERT_EQ(0, log.count(number));
 }
 
 TEST(Style, Layers) {
     const FixtureLogBackend &log = Log::Set<FixtureLogBackend>();
+
     std::ifstream stylefile("./fuzz-layers.min.js");
     ASSERT_TRUE(stylefile.good());
     std::stringstream stylejson;
