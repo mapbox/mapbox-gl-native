@@ -2,6 +2,7 @@
 #define LLMR_TEST_FIXTURE_LOG
 
 #include <llmr/platform/log.hpp>
+#include <llmr/util/noncopyable.hpp>
 
 #include <boost/optional.hpp>
 
@@ -10,7 +11,7 @@
 
 namespace llmr {
 
-class FixtureLogBackend : public LogBackend {
+class FixtureLogBackend : public LogBackend, private util::noncopyable {
 public:
     struct LogMessage {
         inline LogMessage(EventSeverity severity, Event event, int64_t code, const std::string &msg)
