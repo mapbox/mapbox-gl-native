@@ -297,7 +297,7 @@ void SpriteAtlas::bind(bool linear) {
         }
 
 #if defined(DEBUG)
-        // platform::show_color_debug_image("Sprite Atlas", data, width, height, width * pixelRatio, height * pixelRatio);
+        // platform::show_color_debug_image("Sprite Atlas", reinterpret_cast<char *>(data), width, height, width * pixelRatio, height * pixelRatio);
 #endif
         dirty = false;
     }
