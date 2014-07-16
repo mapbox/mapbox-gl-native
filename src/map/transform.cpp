@@ -86,7 +86,8 @@ void Transform::_moveBy(const double dx, const double dy, const timestamp durati
 
     platform::notify_map_change(duration ?
                                 platform::MapChangeRegionDidChangeAnimated :
-                                platform::MapChangeRegionDidChange);
+                                platform::MapChangeRegionDidChange,
+                                duration);
 }
 
 void Transform::setLonLat(const double lon, const double lat, const timestamp duration) {
@@ -310,7 +311,8 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
 
     platform::notify_map_change(duration ?
                                 platform::MapChangeRegionDidChangeAnimated :
-                                platform::MapChangeRegionDidChange);
+                                platform::MapChangeRegionDidChange,
+                                duration);
 }
 
 #pragma mark - Constraints
@@ -410,7 +412,8 @@ void Transform::_setAngle(double new_angle, const timestamp duration) {
 
     platform::notify_map_change(duration ?
                                 platform::MapChangeRegionDidChangeAnimated :
-                                platform::MapChangeRegionDidChange);
+                                platform::MapChangeRegionDidChange,
+                                duration);
 }
 
 double Transform::getAngle() const {

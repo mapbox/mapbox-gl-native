@@ -1,4 +1,5 @@
 #include "headless_view.hpp"
+#include <llmr/util/time.hpp>
 #include <llmr/util/timer.hpp>
 #include <llmr/platform/platform.hpp>
 
@@ -6,7 +7,7 @@ namespace llmr {
 
 namespace platform {
 
-void notify_map_change(MapChange change) {
+void notify_map_change(MapChange change, timestamp delay) {
     // no-op
 }
 

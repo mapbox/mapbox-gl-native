@@ -1,5 +1,7 @@
 #include "glfw_view.hpp"
 
+#include <llmr/util/time.hpp>
+
 GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {
 #ifdef NVIDIA
     glDiscardFramebufferEXT = (PFNGLDISCARDFRAMEBUFFEREXTPROC)glfwGetProcAddress("glDiscardFramebufferEXT");
@@ -281,7 +283,7 @@ void show_color_debug_image(std::string name, const char *data, size_t logical_w
 }
 #endif
 
-void notify_map_change(MapChange change) {
+void notify_map_change(MapChange change, timestamp delay) {
     // no-op
 }
 
