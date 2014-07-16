@@ -128,9 +128,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t width, size_t hei
 Rect<SpriteAtlas::dimension> SpriteAtlas::getIcon(const int size, const std::string &name) {
     std::lock_guard<std::mutex> lock(mtx);
 
-    const std::string id = name + "-" + std::to_string(size);
-
-    auto rect_it = images.find(id);
+    auto rect_it = images.find(name);
     if (rect_it != images.end()) {
         return rect_it->second;
     }
@@ -143,7 +141,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getIcon(const int size, const std::str
         return rect;
     }
 
-    images.emplace(id, rect);
+    images.emplace(name, rect);
 
     allocate();
 
@@ -158,7 +156,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getIcon(const int size, const std::str
         1.0f / size / pixelRatio
     );
 
-    uninitialized.emplace(id);
+    uninitialized.emplace(name);
 
     dirty = true;
 
