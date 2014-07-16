@@ -11,8 +11,6 @@
 
 namespace llmr {
 
-class VectorTileTagExtractor;
-
 class FilterComparison {
 public:
     enum class Operator : uint8_t {
@@ -50,7 +48,7 @@ public:
     FilterComparison(const std::string &field) : field(field) {};
 
     const std::string &getField() const;
-    inline bool compare(const VectorTileTagExtractor &extractor) const;
+    template <typename Extractor> inline bool compare(const Extractor &extractor) const;
 
     template <typename ...Args>
     inline void add(Args&& ...args) {
@@ -95,7 +93,7 @@ public:
 
     bool empty() const;
 
-    bool compare(const VectorTileTagExtractor &extractor) const;
+    template <typename Extractor> bool compare(const Extractor &extractor) const;
     void add(const FilterComparison &comparison);
     void add(const FilterExpression &expression);
     void setGeometryType(GeometryType g);

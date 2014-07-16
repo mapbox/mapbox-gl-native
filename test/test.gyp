@@ -123,6 +123,22 @@
         ]
     },
     {
+        "target_name": "expressions",
+        "product_name": "test_expressions",
+        "type": "executable",
+        "libraries": [
+            "-lpthread",
+        ],
+        "sources": [
+            "./main.cpp",
+            "./expressions.cpp",
+        ],
+        "dependencies": [
+            "../deps/gtest/gtest.gyp:gtest",
+            "../llmr.gyp:llmr-x86"
+        ]
+    },
+    {
         "target_name": "tile",
         "product_name": "test_tile",
         "type": "executable",
@@ -188,6 +204,7 @@
           "tile",
           "functions",
           "headless",
+          "expressions",
         ],
     }
   ]
