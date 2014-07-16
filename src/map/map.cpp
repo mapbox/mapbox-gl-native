@@ -97,6 +97,7 @@ void Map::run() {
     // If the map rendering wasn't started asynchronously, we perform one render
     // *after* all events have been processed.
     if (!async) {
+        prepare();
         render();
     }
 }

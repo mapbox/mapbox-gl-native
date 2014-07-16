@@ -61,11 +61,11 @@ bool FilterComparison::Instance::compare(const std::forward_list<Value> &propert
     switch (op) {
         case Operator::Equal:
             for (const Value &property_value : property_values) {
-                if (!includes(property_value, util::relaxed_equal)) {
-                    return false;
+                if (includes(property_value, util::relaxed_equal)) {
+                    return true;
                 }
             }
-            return true;
+            return false;
         case Operator::NotEqual:
             for (const Value &property_value : property_values) {
                 if (includes(property_value, util::relaxed_equal)) {

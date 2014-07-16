@@ -23,7 +23,7 @@ void Painter::renderIcon(IconBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     useProgram(iconShader->program);
     iconShader->setMatrix(matrix);
 // TODO: update
-//    iconShader->setColor(color);
+    iconShader->setColor({{ 1, 1, 1, 1 }});
     iconShader->setImage(0);
     iconShader->setRatio(map.getState().getPixelRatio());
     iconShader->setDimension({{

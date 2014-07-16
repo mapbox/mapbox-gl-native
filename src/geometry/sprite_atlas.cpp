@@ -128,9 +128,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t width, size_t hei
 Rect<SpriteAtlas::dimension> SpriteAtlas::getIcon(const int size, const std::string &name) {
     std::lock_guard<std::mutex> lock(mtx);
 
-    const std::string id = name + "-" + std::to_string(size);
-
-    auto rect_it = images.find(id);
+    auto rect_it = images.find(name);
     if (rect_it != images.end()) {
         return rect_it->second;
     }
@@ -143,7 +141,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getIcon(const int size, const std::str
         return rect;
     }
 
-    images.emplace(id, rect);
+    images.emplace(name, rect);
 
     allocate();
 
@@ -158,7 +156,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getIcon(const int size, const std::str
         1.0f / size / pixelRatio
     );
 
-    uninitialized.emplace(id);
+    uninitialized.emplace(name);
 
     dirty = true;
 
@@ -251,11 +249,13 @@ void SpriteAtlas::update(const Sprite &sprite) {
 }
 
 void SpriteAtlas::bind(bool linear) {
+    bool first = false;
     if (!texture) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        first = true;
     } else {
         glBindTexture(GL_TEXTURE_2D, texture);
     }
@@ -270,20 +270,34 @@ void SpriteAtlas::bind(bool linear) {
     if (dirty) {
         std::lock_guard<std::mutex> lock(mtx);
         allocate();
-        glTexImage2D(
-            GL_TEXTURE_2D, // GLenum target
-            0, // GLint level
-            GL_RGBA, // GLint internalformat
-            width * pixelRatio, // GLsizei width
-            height * pixelRatio, // GLsizei height
-            0, // GLint border
-            GL_RGBA, // GLenum format
-            GL_UNSIGNED_BYTE, // GLenum type
-            data // const GLvoid * data
-        );
+
+        if (first) {
+            glTexImage2D(
+                GL_TEXTURE_2D, // GLenum target
+                0, // GLint level
+                GL_RGBA, // GLint internalformat
+                width * pixelRatio, // GLsizei width
+                height * pixelRatio, // GLsizei height
+                0, // GLint border
+                GL_RGBA, // GLenum format
+                GL_UNSIGNED_BYTE, // GLenum type
+                data // const GLvoid * data
+            );
+        } else {
+            glTexSubImage2D(GL_TEXTURE_2D, // GLenum target
+                0, // GLint level
+                0, // GLint xoffset
+                0, // GLint yoffset
+                width * pixelRatio, // GLsizei width
+                height * pixelRatio, // GLsizei height
+                GL_RGBA, // GLenum format
+                GL_UNSIGNED_BYTE, // GLenum type
+                data // const GLvoid *pixels
+            );
+        }
 
 #if defined(DEBUG)
-        // platform::show_color_debug_image("Sprite Atlas", data, width, height, width * pixelRatio, height * pixelRatio);
+        // platform::show_color_debug_image("Sprite Atlas", reinterpret_cast<char *>(data), width, height, width * pixelRatio, height * pixelRatio);
 #endif
         dirty = false;
     }
@@ -291,6 +305,10 @@ void SpriteAtlas::bind(bool linear) {
 
 SpriteAtlas::~SpriteAtlas() {
     std::lock_guard<std::mutex> lock(mtx);
+
+    glDeleteTextures(1, &texture);
+    texture = 0;
+
     if (data) {
         free(data);
         data = nullptr;

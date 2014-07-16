@@ -52,6 +52,7 @@ private:
 
 private:
     Map &map;
+    std::string url;
     std::string body;
     std::string image;
     std::atomic<bool> loaded;

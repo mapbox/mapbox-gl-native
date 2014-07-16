@@ -24,6 +24,7 @@ std::vector<FixtureLogBackend::LogMessage> FixtureLogBackend::unchecked() const 
     for (const LogMessage &msg : messages) {
         if (!msg.checked) {
             unchecked.push_back(msg);
+            msg.checked = true;
         }
     }
     return unchecked;
@@ -37,10 +38,10 @@ std::vector<FixtureLogBackend::LogMessage> FixtureLogBackend::unchecked() const 
 }
 
 ::std::ostream& operator<<(::std::ostream& os, const FixtureLogBackend::LogMessage& message) {
-    os << "[\"" << message.severity.get() << "\", \"" << message.event.get();
-    if (message.code) os << "\", " << message.code.get();
-    if (message.msg) os << ", \"" << message.msg.get();
-    return os << "\"]" << std::endl;
+    os << "[\"" << message.severity.get() << "\", \"" << message.event.get() << "\"";
+    if (message.code) os << ", " << message.code.get();
+    if (message.msg) os << ", \"" << message.msg.get() << "\"";
+    return os << "]" << std::endl;
 }
 
 }

@@ -32,6 +32,7 @@ enum class Event : uint8_t {
     ParseTile,
     Render,
     HttpRequest,
+    Sprite,
 };
 
 LLMR_DEFINE_ENUM_CLASS(EventClass, Event, {
@@ -42,6 +43,7 @@ LLMR_DEFINE_ENUM_CLASS(EventClass, Event, {
     { Event::ParseTile, "ParseTile" },
     { Event::Render, "Render" },
     { Event::HttpRequest, "HttpRequest" },
+    { Event::Sprite, "Sprite" },
     { Event(-1), "Unknown" },
 });
 
