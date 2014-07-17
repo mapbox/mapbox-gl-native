@@ -4,7 +4,7 @@
   "dependencies": {
     "brfs": "^1.1.2",
     "fuzzer": "^0.2.0",
-    "glsl-optimizer": "mapbox/glsl-optimizer#amalgamation",
+    "mapbox-glsl-optimizer": "~0.1.0",
     "mkdirp": "^0.5.0",
     "through2": "^0.5.1"
   }
