@@ -6,82 +6,36 @@
 namespace mbgl {
 
 
-template <>
-bool LinearFunction<bool>::evaluate(float z) const {
-    return z < z_base ? slope >= 0 : z > z_base ? slope >= 0 : value;
-}
-
-template <>
-float LinearFunction<float>::evaluate(float z) const {
-    return std::fmin(std::fmax(min, value + (z - z_base) * slope), max);
-}
-
-template <>
-Color LinearFunction<Color>::evaluate(float z) const {
-    return {{
-        std::fmin(std::fmax(min[0], value[0] + (z - z_base) * slope), max[0]),
-        std::fmin(std::fmax(min[1], value[1] + (z - z_base) * slope), max[1]),
-        std::fmin(std::fmax(min[2], value[2] + (z - z_base) * slope), max[2]),
-        std::fmin(std::fmax(min[3], value[3] + (z - z_base) * slope), max[3])
-    }};
-}
-
-
-template <>
-bool ExponentialFunction<bool>::evaluate(float z) const {
-    return z < z_base ? slope >= 0 : z > z_base ? slope >= 0 : value;
-}
-
-template <>
-float ExponentialFunction<float>::evaluate(float z) const {
-    return std::fmin(std::fmax(min, value + std::pow(exp_base, (z - z_base)) * slope), max);
-}
-
-template <>
-Color ExponentialFunction<Color>::evaluate(float z) const {
-    return {{
-        std::fmin(std::fmax(min[0], value[0] + float(std::pow(exp_base, (z - z_base))) * slope), max[0]),
-        std::fmin(std::fmax(min[1], value[1] + float(std::pow(exp_base, (z - z_base))) * slope), max[1]),
-        std::fmin(std::fmax(min[2], value[2] + float(std::pow(exp_base, (z - z_base))) * slope), max[2]),
-        std::fmin(std::fmax(min[3], value[3] + float(std::pow(exp_base, (z - z_base))) * slope), max[3])
-    }};
-}
-
 template <typename T>
-inline T exponentialInterpolate(T smaller, T larger, const float factor);
+inline T interpolate(T smaller, T larger, const float factor);
 
 template <>
-inline float exponentialInterpolate(const float smaller, const float larger, const float factor) {
-    // Linear interpolation if base is 0
-    if (smaller == 0.0f) {
-        return factor * larger;
-    }
-    // Exponential interpolation between the values
-    return smaller * std::pow(larger / smaller, factor);
+inline float interpolate(const float smaller, const float larger, const float factor) {
+    return (smaller * (1 - factor)) + (larger * factor);
 }
 
 template <>
-inline bool exponentialInterpolate(const bool smaller, const bool larger, const float factor) {
-    return exponentialInterpolate(float(smaller), float(larger), factor);
+inline bool interpolate(const bool smaller, const bool larger, const float factor) {
+    return interpolate(float(smaller), float(larger), factor);
 }
 
 template <>
-inline Color exponentialInterpolate(const Color smaller, const Color larger, const float factor) {
+inline Color interpolate(const Color smaller, const Color larger, const float factor) {
     return {{
-        exponentialInterpolate(smaller[0], larger[0], factor),
-        exponentialInterpolate(smaller[1], larger[1], factor),
-        exponentialInterpolate(smaller[2], larger[2], factor),
-        exponentialInterpolate(smaller[3], larger[3], factor)
+        interpolate(smaller[0], larger[0], factor),
+        interpolate(smaller[1], larger[1], factor),
+        interpolate(smaller[2], larger[2], factor),
+        interpolate(smaller[3], larger[3], factor)
     }};
 }
 
 
 template <typename T>
-T exponentialDefault();
+inline T defaultStopsValue();
 
-template <> bool exponentialDefault() { return true; }
-template <> float exponentialDefault() { return 1.0f; }
-template <> Color exponentialDefault() { return {{ 0, 0, 0, 1 }}; }
+template <> inline bool defaultStopsValue() { return true; }
+template <> inline float defaultStopsValue() { return 1.0f; }
+template <> inline Color defaultStopsValue() { return {{ 0, 0, 0, 1 }}; }
 
 
 template <typename T>
@@ -112,15 +66,22 @@ T StopsFunction<T>::evaluate(float z) const {
         if (larger_z == smaller_z || larger_val == smaller_val) {
             return smaller_val;
         }
-        float factor = (z - smaller_z) / (larger_z - smaller_z);
-        return exponentialInterpolate<T>(smaller_val, larger_val, factor);
+        const float zoomDiff = larger_z - smaller_z;
+        const float zoomProgress = z - smaller_z;
+        if (base == 1.0f) {
+            const float t = zoomProgress / zoomDiff;
+            return interpolate<T>(smaller_val, larger_val, t);
+        } else {
+            const float t = (std::pow(base, zoomProgress) - 1) / (std::pow(base, zoomDiff) - 1);
+            return interpolate<T>(smaller_val, larger_val, t);
+        }
     } else if (larger) {
         return larger_val;
     } else if (smaller) {
         return smaller_val;
     } else {
         // No stop defined.
-        return exponentialDefault<T>();
+        return defaultStopsValue<T>();
     }
 }
 

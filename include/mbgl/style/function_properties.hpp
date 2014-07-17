@@ -17,43 +17,19 @@ private:
 };
 
 template <typename T>
-struct LinearFunction {
-    inline LinearFunction(const T &value, float z_base, float slope, const T &min, const T &max)
-        : value(value), min(min), max(max), z_base(z_base), slope(slope) {}
-    T evaluate(float z) const;
-
-private:
-    const T value, min, max;
-    const float z_base, slope;
-};
-
-template <typename T>
-struct ExponentialFunction {
-    inline ExponentialFunction(const T &value, float z_base, float exp_base, float slope, const T &min,
-                               const T &max)
-        : value(value), min(min), max(max), z_base(z_base), exp_base(exp_base), slope(slope) {}
-    T evaluate(float z) const;
-
-private:
-    const T value, min, max;
-    const float z_base, exp_base, slope;
-};
-
-template <typename T>
 struct StopsFunction {
-    inline StopsFunction(const std::vector<std::pair<float, T>> &values) : values(values) {}
+    inline StopsFunction(const std::vector<std::pair<float, T>> &values, float base) : values(values), base(base) {}
     T evaluate(float z) const;
 
 private:
     const std::vector<std::pair<float, T>> values;
+    const float base;
 };
 
 template <typename T>
 using Function = util::variant<
     std::false_type,
     ConstantFunction<T>,
-    LinearFunction<T>,
-    ExponentialFunction<T>,
     StopsFunction<T>
 >;
 

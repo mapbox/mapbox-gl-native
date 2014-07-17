@@ -230,95 +230,56 @@ Color StyleParser::parseFunctionArgument(JSVal value) {
     return parseColor(rvalue);
 }
 
+template <typename T> inline float defaultBaseValue() { return 1.75; }
+template <> inline float defaultBaseValue<Color>() { return 1.0; }
+
 template <typename T>
 std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
-    if (!value.HasMember("fn")) {
-        fprintf(stderr, "[WARNING] function must specify a function name\n");
+    if (!value.HasMember("stops")) {
+        fprintf(stderr, "[WARNING] stops function must specify a stops array\n");
         return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
     }
 
-    JSVal value_fn = value["fn"];
-    if (!value_fn.IsString()) {
-        fprintf(stderr, "[WARNING] function must specify a function type\n");
+    float base = defaultBaseValue<T>();
+
+    if (value.HasMember("base")) {
+        JSVal value_base = value["base"];
+        if (value_base.IsNumber()) {
+            base = value_base.GetDouble();
+        } else {
+            fprintf(stderr, "[WARNING] base must be numeric\n");
+        }
+    }
+
+    JSVal value_stops = value["stops"];
+    if (!value_stops.IsArray()) {
+        fprintf(stderr, "[WARNING] stops function must specify a stops array\n");
         return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
     }
 
-    const std::string type { value_fn.GetString(), value_fn.GetStringLength() };
-
-    if (type == "linear") {
-        if (!value.HasMember("z")) {
-            fprintf(stderr, "[WARNING] linear function must specify a base zoom level\n");
-            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
-        }
-        if (!value.HasMember("val")) {
-            fprintf(stderr, "[WARNING] linear function must specify a base value\n");
-            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
-        }
-        const float z_base = parseFunctionArgument<float>(value["z"]);
-        const T val = parseFunctionArgument<T>(value["val"]);
-        const float slope = value.HasMember("slope") ? parseFunctionArgument<float>(value["slope"]) : 1;
-        const T min = value.HasMember("min") ? parseFunctionArgument<T>(value["min"]) : T();
-        const T max = value.HasMember("max") ? parseFunctionArgument<T>(value["max"]) : T();
-        return std::tuple<bool, Function<T>> { true, LinearFunction<T>(val, z_base, slope, min, max) };
-    }
-    else if (type == "exponential") {
-        if (!value.HasMember("z")) {
-            fprintf(stderr, "[WARNING] exponential function must specify a base zoom level\n");
-            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
-        }
-        if (!value.HasMember("val")) {
-            fprintf(stderr, "[WARNING] exponential function must specify a base value\n");
-            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
-        }
-        const float z_base = parseFunctionArgument<float>(value["z"]);
-        const float exp_base =  value.HasMember("base") ? parseFunctionArgument<float>(value["base"]) : 1.75;
-        const T val = parseFunctionArgument<T>(value["val"]);
-        const float slope = value.HasMember("slope") ? parseFunctionArgument<float>(value["slope"]) : 1;
-        const T min = value.HasMember("min") ? parseFunctionArgument<T>(value["min"]) : T();
-        const T max = value.HasMember("max") ? parseFunctionArgument<T>(value["max"]) : T();
-        return std::tuple<bool, Function<T>> { true, ExponentialFunction<T>(val, z_base, exp_base, slope, min, max) };
-    }
-    else if (type == "stops") {
-        if (!value.HasMember("stops")) {
-            fprintf(stderr, "[WARNING] stops function must specify a stops array\n");
-            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
-        }
-
-        JSVal value_stops = value["stops"];
-        if (!value_stops.IsArray()) {
-            fprintf(stderr, "[WARNING] stops function must specify a stops array\n");
-            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
-        }
-
-        std::vector<std::pair<float, T>> stops;
-        for (rapidjson::SizeType i = 0; i < value_stops.Size(); ++i) {
-            JSVal stop = value_stops[i];
-            if (stop.IsArray()) {
-                if (stop.Size() != 2) {
-                    fprintf(stderr, "[WARNING] stop must have zoom level and value specification\n");
-                    return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
-                }
-
-                JSVal z = stop[rapidjson::SizeType(0)];
-                if (!z.IsNumber()) {
-                    fprintf(stderr, "[WARNING] zoom level in stop must be a number\n");
-                    return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
-                }
-
-                stops.emplace_back(z.GetDouble(), parseFunctionArgument<T>(stop[rapidjson::SizeType(1)]));
-            } else {
-                fprintf(stderr, "[WARNING] function argument must be a numeric value\n");
+    std::vector<std::pair<float, T>> stops;
+    for (rapidjson::SizeType i = 0; i < value_stops.Size(); ++i) {
+        JSVal stop = value_stops[i];
+        if (stop.IsArray()) {
+            if (stop.Size() != 2) {
+                fprintf(stderr, "[WARNING] stop must have zoom level and value specification\n");
                 return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
             }
+
+            JSVal z = stop[rapidjson::SizeType(0)];
+            if (!z.IsNumber()) {
+                fprintf(stderr, "[WARNING] zoom level in stop must be a number\n");
+                return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
+            }
+
+            stops.emplace_back(z.GetDouble(), parseFunctionArgument<T>(stop[rapidjson::SizeType(1)]));
+        } else {
+            fprintf(stderr, "[WARNING] function argument must be a numeric value\n");
+            return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
-
-        return std::tuple<bool, Function<T>> { true, StopsFunction<T>(stops) };
-    }
-    else {
-        fprintf(stderr, "[WARNING] function type '%s' is unknown\n", type.c_str());
     }
 
-    return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
+    return std::tuple<bool, Function<T>> { true, StopsFunction<T>(stops, base) };
 }
 
 
