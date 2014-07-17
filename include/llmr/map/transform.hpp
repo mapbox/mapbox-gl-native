@@ -5,6 +5,7 @@
 #include <llmr/util/noncopyable.hpp>
 #include <llmr/util/uv.hpp>
 
+#include "view.hpp"
 #include "transform_state.hpp"
 
 #include <forward_list>
@@ -15,7 +16,7 @@ struct box;
 
     class Transform : private util::noncopyable {
 public:
-    Transform();
+    Transform(View &view);
 
     // Map view
     // Note: width * ratio does not necessarily equal fb_width
@@ -74,6 +75,8 @@ private:
     void constrain(double& scale, double& y) const;
 
 private:
+    View &view;
+
     mutable uv::rwlock mtx;
 
     // This reflects the current state of the transform, representing the actual position of the

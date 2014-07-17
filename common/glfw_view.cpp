@@ -1,7 +1,5 @@
 #include "glfw_view.hpp"
 
-#include <llmr/util/time.hpp>
-
 GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {
 #ifdef NVIDIA
     glDiscardFramebufferEXT = (PFNGLDISCARDFRAMEBUFFEREXTPROC)glfwGetProcAddress("glDiscardFramebufferEXT");
@@ -196,6 +194,10 @@ void GLFWView::swap() {
     glfwPostEmptyEvent();
 }
 
+void GLFWView::notify_map_change(llmr::MapChange change, llmr::timestamp delay) {
+    // no-op
+}
+
 void GLFWView::fps() {
     static int frames = 0;
     static double time_elapsed = 0;
@@ -282,10 +284,6 @@ void show_color_debug_image(std::string name, const char *data, size_t logical_w
     glfwMakeContextCurrent(current_window);
 }
 #endif
-
-void notify_map_change(MapChange change, timestamp delay) {
-    // no-op
-}
 
 }
 }

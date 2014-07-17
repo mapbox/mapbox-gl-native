@@ -1,17 +1,5 @@
 #include "headless_view.hpp"
-#include <llmr/util/time.hpp>
 #include <llmr/util/timer.hpp>
-#include <llmr/platform/platform.hpp>
-
-namespace llmr {
-
-namespace platform {
-
-void notify_map_change(MapChange change, timestamp delay) {
-    // no-op
-}
-
-}
 
 HeadlessView::HeadlessView() {
 #if LLMR_USE_CGL
@@ -159,6 +147,10 @@ HeadlessView::~HeadlessView() {
 #if LLMR_USE_CGL
     CGLDestroyContext(gl_context);
 #endif
+}
+
+void HeadlessView::notify_map_change(llmr::MapChange change, llmr::timestamp delay) {
+    // no-op
 }
 
 void HeadlessView::make_active() {

@@ -10,6 +10,7 @@
 
 #include <llmr/map/view.hpp>
 #include <llmr/platform/gl.hpp>
+#include <llmr/util/time.hpp>
 
 namespace llmr {
 
@@ -20,6 +21,7 @@ public:
 
     void resize(int width, int height);
 
+    void notify_map_change(MapChange change, timestamp delay = 0);
     void make_active();
     void swap();
     unsigned int root_fbo();

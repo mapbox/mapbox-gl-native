@@ -2,6 +2,7 @@
 #define LLMR_COMMON_GLFW_VIEW
 
 #include <llmr/llmr.hpp>
+#include <llmr/util/time.hpp>
 
 #ifdef NVIDIA
 #define GLFW_INCLUDE_ES2
@@ -18,6 +19,7 @@ public:
     void initialize(llmr::Map *map);
     void swap();
     void make_active();
+    void notify_map_change(llmr::MapChange change, llmr::timestamp delay = 0);
 
     static void key(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void scroll(GLFWwindow *window, double xoffset, double yoffset);

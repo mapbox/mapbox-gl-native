@@ -1,8 +1,6 @@
 #ifndef LLMR_PLATFORM_PLATFORM
 #define LLMR_PLATFORM_PLATFORM
 
-#include <llmr/util/time.hpp>
-
 #include <memory>
 #include <functional>
 #include <string>
@@ -26,19 +24,6 @@ struct Response {
     std::function<void(Response *)> callback;
 };
 
-enum MapChange : uint8_t {
-    MapChangeRegionWillChange = 0,
-    MapChangeRegionWillChangeAnimated = 1,
-    MapChangeRegionDidChange = 2,
-    MapChangeRegionDidChangeAnimated = 3,
-    MapChangeWillStartLoadingMap = 4,
-    MapChangeDidFinishLoadingMap = 5,
-    MapChangeDidFailLoadingMap = 6,
-    MapChangeWillStartRenderingMap = 7,
-    MapChangeDidFinishRenderingMap = 8,
-    MapChangeDidFinishRenderingMapFullyRendered = 9
-};
-
 // Makes an HTTP request of a URL, preferrably on a background thread, and calls a function with the
 // results in the original thread (which runs the libuv loop).
 // If the loop pointer is NULL, the callback function will be called on an arbitrary thread.
@@ -49,9 +34,6 @@ std::shared_ptr<Request> request_http(const std::string &url,
 
 // Cancels an HTTP request.
 void cancel_request_http(const std::shared_ptr<Request> &req);
-
-// Notifies a watcher of map changes.
-void notify_map_change(MapChange key, timestamp delay = 0);
 
 // Shows an alpha image with the specified dimensions in a named window.
 void show_debug_image(std::string name, const char *data, size_t width, size_t height);

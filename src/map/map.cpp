@@ -22,7 +22,7 @@ using namespace llmr;
 
 Map::Map(View& view)
     : view(view),
-      transform(),
+      transform(view),
       style(std::make_shared<Style>()),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
