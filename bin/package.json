@@ -2,6 +2,6 @@
     "name": "mbgl-native",
     "version": "0.0.1",
     "dependencies": {
-        "glsl-optimizer": "git://github.com/kkaefer/glsl-optimizer.git#amalgamation"
+        "mapbox-glsl-optimizer": "~0.1.0"
     }
 }
