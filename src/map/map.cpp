@@ -421,13 +421,13 @@ void Map::updateSources() {
     updateSources(style->layers);
 
     // Then, construct or destroy the actual source object, depending on enabled state.
-    for (const std::shared_ptr<StyleSource> &source : activeSources) {
-        if (source->enabled) {
-            if (!source->source) {
-                source->source = std::make_shared<Source>(*source, getAccessToken());
+    for (const std::shared_ptr<StyleSource> &style_source : activeSources) {
+        if (style_source->enabled) {
+            if (!style_source->source) {
+                style_source->source = std::make_shared<Source>(style_source->info, getAccessToken());
             }
         } else {
-            source->source.reset();
+            style_source->source.reset();
         }
     }
 

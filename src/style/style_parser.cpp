@@ -175,7 +175,7 @@ void StyleParser::parseSources(JSVal value) {
             parseRenderProperty(itr->value, min_zoom, "minZoom");
             parseRenderProperty(itr->value, max_zoom, "maxZoom");
 
-            sources.emplace(std::move(name), std::make_shared<StyleSource>(type, url, tile_size, min_zoom, max_zoom));
+            sources.emplace(std::move(name), std::make_shared<StyleSource>(SourceInfo { type, url, tile_size, min_zoom, max_zoom }));
         }
     } else {
         throw Style::exception("sources must be an object");

@@ -23,10 +23,7 @@ class Texturepool;
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:
-    Source(StyleSource style_source, const std::string &access_token = "");
-    Source(SourceType type = SourceType::Vector, const std::string &url = "",
-           uint32_t tile_size = 512, uint32_t min_zoom = 0, uint32_t max_zoom = 22,
-           const std::string &access_token = "");
+    Source(SourceInfo info, const std::string &access_token = "");
 
     bool update(Map &map);
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
@@ -41,11 +38,7 @@ public:
     static std::string normalizeSourceURL(const std::string &url, const std::string &access_token);
 
 public:
-    const SourceType type;
-    const std::string url;
-    const uint32_t tile_size;
-    const int32_t min_zoom;
-    const int32_t max_zoom;
+    const SourceInfo info;
 
 private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
