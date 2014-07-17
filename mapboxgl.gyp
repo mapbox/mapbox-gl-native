@@ -81,8 +81,8 @@
       ]
     },
     {
-      'target_name': 'mbgl-x86',
-      'product_name': 'mbgl-x86',
+      'target_name': 'mapboxgl',
+      'product_name': 'mapboxgl',
       'type': 'static_library',
       'hard_dependency': 1,
       'dependencies': [
@@ -149,8 +149,8 @@
       }
     },
     {
-      'target_name': 'mbgl-ios',
-      'product_name': 'mbgl-ios',
+      'target_name': 'mapboxgl-ios',
+      'product_name': 'mapboxgl-ios',
       'type': 'static_library',
       'hard_dependency': 1,
       'dependencies': [

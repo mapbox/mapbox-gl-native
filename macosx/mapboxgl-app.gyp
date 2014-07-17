@@ -40,7 +40,7 @@
         'CLANG_ENABLE_OBJC_ARC': 'YES'
       },
       'dependencies': [
-        '../mbgl.gyp:mbgl-x86'
+        '../mapboxgl.gyp:mapboxgl'
       ]
     }
   ]

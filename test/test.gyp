@@ -71,7 +71,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mbgl.gyp:mbgl-x86"
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -87,7 +87,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mbgl.gyp:mbgl-x86"
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -103,7 +103,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mbgl.gyp:mbgl-x86"
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -119,7 +119,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mbgl.gyp:mbgl-x86"
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -135,7 +135,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mbgl.gyp:mbgl-x86"
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -151,7 +151,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mbgl.gyp:mbgl-x86"
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -167,7 +167,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mbgl.gyp:mbgl-x86"
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -188,9 +188,9 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mbgl.gyp:mbgl-x86",
+            "../mapboxgl.gyp:mapboxgl",
             "link_gl",
-            '../mbgl.gyp:copy_default_stylesheet',
+            '../mapboxgl.gyp:copy_default_stylesheet',
         ]
     },
     {

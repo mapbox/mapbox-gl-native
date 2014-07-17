@@ -52,9 +52,9 @@
         }],
       ],
       'dependencies': [
-        '../mbgl.gyp:mbgl-x86',
-        '../mbgl.gyp:copy_default_stylesheet',
-        '../mbgl.gyp:copy_certificate_bundle',
+        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:copy_default_stylesheet',
+        '../mapboxgl.gyp:copy_certificate_bundle',
       ],
     },
   ],
