@@ -1,15 +1,23 @@
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/map/map.hpp>
 
+#include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>
 
 using namespace mbgl;
 
-TileData::TileData(Tile::ID id, Map &map, const std::string url)
+TileData::TileData(Tile::ID id, Map &map, const SourceInfo &source)
     : id(id),
       state(State::initial),
       map(map),
-      url(url),
+      source(source),
+      url(util::replaceTokens(source.url, [&](const std::string &token) -> std::string {
+          if (token == "z") return std::to_string(id.z);
+          if (token == "x") return std::to_string(id.x);
+          if (token == "y") return std::to_string(id.y);
+          if (token == "ratio") return (map.getState().getPixelRatio() > 1.0 ? "@2x" : "");
+          return "";
+      })),
       debugBucket(debugFontBuffer) {
     // Initialize tile debug coordinates
     const std::string str = util::sprintf<32>("%d/%d/%d", id.z, id.x, id.y);

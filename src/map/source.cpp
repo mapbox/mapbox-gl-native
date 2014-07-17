@@ -7,7 +7,6 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/texturepool.hpp>
 #include <mbgl/util/vec.hpp>
-#include <mbgl/util/token.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
@@ -146,18 +145,10 @@ TileData::State Source::addTile(Map &map, const Tile::ID& id) {
 
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
-        const std::string formed_url = util::replaceTokens(info.url, [&](const std::string &token) -> std::string {
-            if (token == "z") return std::to_string(normalized_id.z);
-            if (token == "x") return std::to_string(normalized_id.x);
-            if (token == "y") return std::to_string(normalized_id.y);
-            if (token == "ratio") return (map.getState().getPixelRatio() > 1.0 ? "@2x" : "");
-            return "";
-        });
-
         if (info.type == SourceType::Vector) {
-            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, formed_url);
+            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, info);
         } else if (info.type == SourceType::Raster) {
-            new_tile.data = std::make_shared<RasterTileData>(normalized_id, map, formed_url);
+            new_tile.data = std::make_shared<RasterTileData>(normalized_id, map, info);
         } else {
             throw std::runtime_error("source type not implemented");
         }

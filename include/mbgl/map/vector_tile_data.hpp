@@ -23,7 +23,7 @@ class VectorTileData : public TileData {
     friend class TileParser;
 
 public:
-    VectorTileData(Tile::ID id, Map &map, const std::string url);
+    VectorTileData(Tile::ID id, Map &map, const SourceInfo &source);
     ~VectorTileData();
 
     virtual void beforeParse();

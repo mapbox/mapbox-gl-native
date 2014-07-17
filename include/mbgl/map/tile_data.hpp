@@ -17,6 +17,7 @@ namespace mbgl {
 class Map;
 class Painter;
 class StyleLayer;
+class SourceInfo;
 
 class TileData : public std::enable_shared_from_this<TileData>,
              private util::noncopyable {
@@ -37,7 +38,7 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, Map &map, const std::string url);
+    TileData(Tile::ID id, Map &map, const SourceInfo &source);
     ~TileData();
 
     void request();
@@ -60,8 +61,13 @@ public:
 protected:
     Map &map;
 
+public:
+    const SourceInfo &source;
+
     // Request-related information.
     const std::string url;
+
+protected:
     std::weak_ptr<platform::Request> req;
     std::string data;
 
