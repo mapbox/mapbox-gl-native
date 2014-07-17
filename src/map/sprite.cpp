@@ -1,16 +1,16 @@
-#include <llmr/map/sprite.hpp>
-#include <llmr/map/map.hpp>
-#include <llmr/util/raster.hpp>
-#include <llmr/platform/log.hpp>
+#include <mbgl/map/sprite.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/util/raster.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <string>
-#include <llmr/platform/platform.hpp>
-#include <llmr/util/uv.hpp>
-#include <llmr/util/std.hpp>
+#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/uv.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <rapidjson/document.h>
 
-using namespace llmr;
+using namespace mbgl;
 
 SpritePosition::SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t pixelRatio)
     : x(x),

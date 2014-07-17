@@ -1,7 +1,7 @@
-#include <llmr/platform/platform.hpp>
-#include <llmr/platform/request.hpp>
-#include <llmr/util/uv.hpp>
-#include <llmr/platform/log.hpp>
+#include <mbgl/platform/platform.hpp>
+#include <mbgl/platform/request.hpp>
+#include <mbgl/util/uv.hpp>
+#include <mbgl/platform/log.hpp>
 
 const std::string base_directory = []{
     std::string fn = __FILE__;
@@ -10,7 +10,7 @@ const std::string base_directory = []{
 }();
 
 
-namespace llmr {
+namespace mbgl {
 
 std::shared_ptr<platform::Request>
 platform::request_http(const std::string &url,
@@ -103,4 +103,4 @@ void platform::cancel_request_http(const std::shared_ptr<Request> &req) {
     }
 }
 
-} // end namespace llmr
+}

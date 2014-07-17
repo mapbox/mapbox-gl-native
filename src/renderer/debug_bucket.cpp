@@ -1,14 +1,14 @@
-#include <llmr/renderer/debug_bucket.hpp>
+#include <mbgl/renderer/debug_bucket.hpp>
 
-#include <llmr/renderer/painter.hpp>
+#include <mbgl/renderer/painter.hpp>
 
-#include <llmr/platform/gl.hpp>
+#include <mbgl/platform/gl.hpp>
 
 #include <cassert>
 
 struct geometry_too_long_exception : std::exception {};
 
-using namespace llmr;
+using namespace mbgl;
 
 DebugBucket::DebugBucket(DebugFontBuffer& fontBuffer)
     : fontBuffer(fontBuffer) {

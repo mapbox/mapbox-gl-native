@@ -1,9 +1,9 @@
-#include <llmr/map/tile_data.hpp>
-#include <llmr/map/map.hpp>
+#include <mbgl/map/tile_data.hpp>
+#include <mbgl/map/map.hpp>
 
-#include <llmr/util/string.hpp>
+#include <mbgl/util/string.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 TileData::TileData(Tile::ID id, Map &map, const std::string url)
     : id(id),

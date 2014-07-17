@@ -1,13 +1,13 @@
-#include <llmr/geometry/glyph_atlas.hpp>
-#include <llmr/map/vector_tile.hpp>
-#include <llmr/platform/gl.hpp>
-#include <llmr/platform/platform.hpp>
+#include <mbgl/geometry/glyph_atlas.hpp>
+#include <mbgl/map/vector_tile.hpp>
+#include <mbgl/platform/gl.hpp>
+#include <mbgl/platform/platform.hpp>
 
 #include <cassert>
 #include <algorithm>
 
 
-using namespace llmr;
+using namespace mbgl;
 
 GlyphAtlas::GlyphAtlas(uint16_t width, uint16_t height)
     : width(width),

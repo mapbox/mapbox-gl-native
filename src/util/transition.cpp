@@ -1,8 +1,8 @@
-#include <llmr/util/transition.hpp>
-#include <llmr/util/unitbezier.hpp>
-#include <llmr/platform/platform.hpp>
+#include <mbgl/util/transition.hpp>
+#include <mbgl/util/unitbezier.hpp>
+#include <mbgl/platform/platform.hpp>
 
-namespace llmr { namespace util {
+namespace mbgl { namespace util {
 
 UnitBezier ease(0, 0, 0.25, 1);
 
@@ -16,7 +16,7 @@ float transition::interpolateFloat(float from, float to, double t) const {
     return from + (to - from) * (float)t;
 }
 
-llmr::Color transition::interpolateColor(llmr::Color from, llmr::Color to, double t) const {
+mbgl::Color transition::interpolateColor(mbgl::Color from, mbgl::Color to, double t) const {
     return {{ interpolateFloat(from[0], to[0], t),
               interpolateFloat(from[1], to[1], t),
               interpolateFloat(from[2], to[2], t),
@@ -40,7 +40,7 @@ transition::state ease_transition<double>::update(timestamp now) const {
 }
 
 template <>
-transition::state ease_transition<llmr::Color>::update(timestamp now) const {
+transition::state ease_transition<mbgl::Color>::update(timestamp now) const {
     float t = progress(now);
     if (t >= 1) {
         value = to;

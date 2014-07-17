@@ -9,9 +9,9 @@
 #include <memory>
 #include <string>
 #include <functional>
-#include <llmr/platform/request.hpp>
-#include <llmr/platform/platform.hpp>
-#include <llmr/util/std.hpp>
+#include <mbgl/platform/request.hpp>
+#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/std.hpp>
 #include <uv.h>
 
 uv_once_t request_initialize = UV_ONCE_INIT;
@@ -37,10 +37,10 @@ void request_initialize_cb() {
 
 // We're using a child class to make sure ARC is working correctly, as well as to add activity
 // indicators on iOS.
-class FoundationRequest : public llmr::platform::Request {
+class FoundationRequest : public mbgl::platform::Request {
 public:
     FoundationRequest(const std::string &url,
-                      std::function<void(llmr::platform::Response *)> callback,
+                      std::function<void(mbgl::platform::Response *)> callback,
                       std::shared_ptr<uv::loop> loop)
         : Request(url, callback, loop) {
 #if TARGET_OS_IPHONE
@@ -65,8 +65,8 @@ public:
     NSURLSessionDataTask *task = nullptr;
 };
 
-std::shared_ptr<llmr::platform::Request>
-llmr::platform::request_http(const std::string &url,
+std::shared_ptr<mbgl::platform::Request>
+mbgl::platform::request_http(const std::string &url,
                              std::function<void(Response *)> callback,
                              std::shared_ptr<uv::loop> loop) {
     uv_once(&request_initialize, request_initialize_cb);
@@ -109,7 +109,7 @@ llmr::platform::request_http(const std::string &url,
     return req;
 }
 
-void llmr::platform::cancel_request_http(const std::shared_ptr<Request> &req) {
+void mbgl::platform::cancel_request_http(const std::shared_ptr<Request> &req) {
     if (req) {
         [((FoundationRequest *)(req.get()))->task cancel];
     }

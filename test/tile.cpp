@@ -1,9 +1,9 @@
 #include <iostream>
 #include "gtest/gtest.h"
 
-#include <llmr/map/tile.hpp>
+#include <mbgl/map/tile.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 
 TEST(Variant, isChild) {

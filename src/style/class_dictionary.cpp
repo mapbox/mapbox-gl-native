@@ -1,6 +1,6 @@
-#include <llmr/style/class_dictionary.hpp>
+#include <mbgl/style/class_dictionary.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 ClassID ClassDictionary::Lookup(const std::string &class_name) {
     auto it = store.find(class_name);

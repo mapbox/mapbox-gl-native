@@ -1,9 +1,9 @@
-#include <llmr/geometry/icon_buffer.hpp>
-#include <llmr/platform/gl.hpp>
+#include <mbgl/geometry/icon_buffer.hpp>
+#include <mbgl/platform/gl.hpp>
 
 #include <cmath>
 
-using namespace llmr;
+using namespace mbgl;
 
 void IconVertexBuffer::add(vertex_type x, vertex_type y, uint16_t tx, uint16_t ty) {
     void *data = addElement();

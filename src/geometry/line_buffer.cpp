@@ -1,9 +1,9 @@
-#include <llmr/geometry/line_buffer.hpp>
-#include <llmr/platform/gl.hpp>
+#include <mbgl/geometry/line_buffer.hpp>
+#include <mbgl/platform/gl.hpp>
 
 #include <cmath>
 
-using namespace llmr;
+using namespace mbgl;
 
 size_t LineVertexBuffer::add(vertex_type x, vertex_type y, float ex, float ey, int8_t tx, int8_t ty, int32_t linesofar) {
     size_t idx = index();

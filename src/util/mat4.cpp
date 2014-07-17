@@ -20,11 +20,11 @@
 //
 // 3. This notice may not be removed or altered from any source distribution.
 
-#include <llmr/util/mat4.hpp>
+#include <mbgl/util/mat4.hpp>
 
 #include <cmath>
 
-using namespace llmr;
+using namespace mbgl;
 
 void matrix::identity(mat4& out) {
     out[0] = 1.0f;

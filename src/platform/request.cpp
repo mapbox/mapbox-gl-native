@@ -1,9 +1,9 @@
-#include <llmr/platform/request.hpp>
-#include <llmr/platform/platform.hpp>
-#include <llmr/util/std.hpp>
-#include <llmr/util/uv.hpp>
+#include <mbgl/platform/request.hpp>
+#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/uv.hpp>
 
-using namespace llmr::platform;
+using namespace mbgl::platform;
 
 Request::Request(const std::string &url,
                  std::function<void(Response *)> callback,

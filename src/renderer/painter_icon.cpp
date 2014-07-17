@@ -1,12 +1,12 @@
-#include <llmr/renderer/painter.hpp>
-#include <llmr/renderer/icon_bucket.hpp>
-#include <llmr/map/map.hpp>
-#include <llmr/map/sprite.hpp>
-#include <llmr/style/style_layer.hpp>
-#include <llmr/geometry/sprite_atlas.hpp>
-#include <llmr/util/math.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/icon_bucket.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/map/sprite.hpp>
+#include <mbgl/style/style_layer.hpp>
+#include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/util/math.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 void Painter::renderIcon(IconBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
     // Abort early.

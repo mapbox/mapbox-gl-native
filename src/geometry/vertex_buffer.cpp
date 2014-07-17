@@ -1,7 +1,7 @@
-#include <llmr/geometry/vertex_buffer.hpp>
-#include <llmr/platform/gl.hpp>
+#include <mbgl/geometry/vertex_buffer.hpp>
+#include <mbgl/platform/gl.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 
 VertexBuffer::VertexBuffer(std::initializer_list<int16_t> init) : array(init) {}

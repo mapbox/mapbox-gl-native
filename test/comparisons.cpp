@@ -1,8 +1,8 @@
 #include <iostream>
 #include "gtest/gtest.h"
 
-#include <llmr/style/filter_comparison_private.hpp>
-#include <llmr/style/filter_expression_private.hpp>
+#include <mbgl/style/filter_comparison_private.hpp>
+#include <mbgl/style/filter_expression_private.hpp>
 
 #include <map>
 
@@ -10,11 +10,11 @@
 
 class MockExtractor {
 public:
-    inline MockExtractor(const std::multimap<std::string, llmr::Value> &values) : values(values) {}
+    inline MockExtractor(const std::multimap<std::string, mbgl::Value> &values) : values(values) {}
     inline MockExtractor() {}
 
-    inline std::vector<llmr::Value> getValues(const std::string &key) const {
-        std::vector<llmr::Value> result;
+    inline std::vector<mbgl::Value> getValues(const std::string &key) const {
+        std::vector<mbgl::Value> result;
         // Find all values with the requested key.
         const auto ret = values.equal_range(key);
         for (auto it = ret.first; it != ret.second; it++) {
@@ -25,12 +25,12 @@ public:
     }
 
 private:
-    const std::multimap<std::string, llmr::Value> values;
+    const std::multimap<std::string, mbgl::Value> values;
 };
 
 
 TEST(FilterComparison, EqualsSingleStringValue) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { std::string("bar") });
@@ -52,7 +52,7 @@ TEST(FilterComparison, EqualsSingleStringValue) {
 
 
 TEST(FilterComparison, EqualsSingleDoubleValue) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { double(32.8) });
@@ -72,7 +72,7 @@ TEST(FilterComparison, EqualsSingleDoubleValue) {
 }
 
 TEST(FilterComparison, EqualsSingleUintValue) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { uint64_t(42) });
@@ -94,7 +94,7 @@ TEST(FilterComparison, EqualsSingleUintValue) {
 }
 
 TEST(FilterComparison, EqualsSingleIntValue) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { int64_t(-42) });
@@ -115,7 +115,7 @@ TEST(FilterComparison, EqualsSingleIntValue) {
 }
 
 TEST(FilterComparison, EqualsSingleBoolValue) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { bool(true) });
@@ -138,7 +138,7 @@ TEST(FilterComparison, EqualsSingleBoolValue) {
 
 
 TEST(FilterComparison, EqualsMultipleStringValues) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { std::string("bar"), std::string("baz") });
@@ -152,7 +152,7 @@ TEST(FilterComparison, EqualsMultipleStringValues) {
 }
 
 TEST(FilterComparison, EqualsMultipleIdenticalStringValues) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { std::string("bar"), std::string("bar") });
@@ -167,7 +167,7 @@ TEST(FilterComparison, EqualsMultipleIdenticalStringValues) {
 
 
 TEST(FilterComparison, NotEqualsSingleStringValue) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { std::string("bar") });
@@ -189,7 +189,7 @@ TEST(FilterComparison, NotEqualsSingleStringValue) {
 
 
 TEST(FilterComparison, NotEqualsSingleDoubleValue) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { double(32.8) });
@@ -209,7 +209,7 @@ TEST(FilterComparison, NotEqualsSingleDoubleValue) {
 }
 
 TEST(FilterComparison, NotEqualsSingleUintValue) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { uint64_t(42) });
@@ -232,7 +232,7 @@ TEST(FilterComparison, NotEqualsSingleUintValue) {
 
 
 TEST(FilterComparison, NotEqualsSingleIntValue) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { int64_t(-42) });
@@ -254,7 +254,7 @@ TEST(FilterComparison, NotEqualsSingleIntValue) {
 
 
 TEST(FilterComparison, NotEqualsSingleBoolValue) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { bool(true) });
@@ -277,7 +277,7 @@ TEST(FilterComparison, NotEqualsSingleBoolValue) {
 
 
 TEST(FilterComparison, NotEqualsMultipleStringValues) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { std::string("bar"), std::string("baz") });
@@ -293,7 +293,7 @@ TEST(FilterComparison, NotEqualsMultipleStringValues) {
 
 
 TEST(FilterComparison, NotEqualsMultipleIdenticalStringValues) {
-    using namespace llmr;
+    using namespace mbgl;
 
     FilterComparison comparison("test");
     comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { std::string("bar"), std::string("bar") });

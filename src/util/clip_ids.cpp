@@ -1,7 +1,7 @@
-#include <llmr/util/clip_ids.hpp>
-#include <llmr/map/tile.hpp>
+#include <mbgl/util/clip_ids.hpp>
+#include <mbgl/map/tile.hpp>
 
-#include <llmr/util/math.hpp>
+#include <mbgl/util/math.hpp>
 
 #include <list>
 #include <vector>
@@ -10,7 +10,7 @@
 #include <iostream>
 #include <algorithm>
 
-namespace llmr {
+namespace mbgl {
 
 struct TileHierarchy {
     TileHierarchy(Tile::ID id, std::list<TileHierarchy> &&children)

@@ -1,6 +1,6 @@
 // Protocol Version 1
 
-package llmr.glyphs;
+package mapboxgl.glyphs;
 
 option optimize_for = LITE_RUNTIME;
 

@@ -1,4 +1,4 @@
-#include <llmr/util/io.hpp>
+#include <mbgl/util/io.hpp>
 
 #include <cstdio>
 #include <iostream>
@@ -6,7 +6,7 @@
 #include <fstream>
 #include <stdexcept>
 
-namespace llmr {
+namespace mbgl {
 namespace util {
 
 void write_file(const std::string &filename, const std::string &data) {

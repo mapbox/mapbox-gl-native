@@ -1,14 +1,14 @@
-#include <llmr/map/vector_tile.hpp>
-#include <llmr/style/filter_expression_private.hpp>
-#include <llmr/style/filter_comparison_private.hpp>
+#include <mbgl/map/vector_tile.hpp>
+#include <mbgl/style/filter_expression_private.hpp>
+#include <mbgl/style/filter_comparison_private.hpp>
 
 #include <algorithm>
 #include <iostream>
 
-using namespace llmr;
+using namespace mbgl;
 
 
-std::ostream& llmr::operator<<(std::ostream& os, const FeatureType& type) {
+std::ostream& mbgl::operator<<(std::ostream& os, const FeatureType& type) {
     switch (type) {
         case FeatureType::Unknown: return os << "Unknown";
         case FeatureType::Point: return os << "Point";
@@ -54,7 +54,7 @@ VectorTileFeature::VectorTileFeature(pbf feature, const VectorTileLayer& layer) 
 }
 
 
-std::ostream& llmr::operator<<(std::ostream& os, const VectorTileFeature& feature) {
+std::ostream& mbgl::operator<<(std::ostream& os, const VectorTileFeature& feature) {
     os << "Feature(" << feature.id << "): " << feature.type << std::endl;
     for (const auto& prop : feature.properties) {
         os << "  - " << prop.first << ": " << prop.second << std::endl;

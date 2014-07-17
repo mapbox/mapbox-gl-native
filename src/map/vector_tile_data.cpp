@@ -1,10 +1,10 @@
-#include <llmr/map/vector_tile_data.hpp>
-#include <llmr/util/std.hpp>
-#include <llmr/map/map.hpp>
-#include <llmr/style/style_layer.hpp>
-#include <llmr/style/style_bucket.hpp>
+#include <mbgl/map/vector_tile_data.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/style_bucket.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 VectorTileData::VectorTileData(Tile::ID id, Map &map, const std::string url)
     : TileData(id, map, url) {

@@ -71,7 +71,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mbgl.gyp:mbgl-x86"
         ]
     },
     {
@@ -87,7 +87,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mbgl.gyp:mbgl-x86"
         ]
     },
     {
@@ -103,7 +103,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mbgl.gyp:mbgl-x86"
         ]
     },
     {
@@ -119,7 +119,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mbgl.gyp:mbgl-x86"
         ]
     },
     {
@@ -135,7 +135,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mbgl.gyp:mbgl-x86"
         ]
     },
     {
@@ -151,7 +151,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mbgl.gyp:mbgl-x86"
         ]
     },
     {
@@ -167,7 +167,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mbgl.gyp:mbgl-x86"
         ]
     },
     {
@@ -188,9 +188,9 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86",
+            "../mbgl.gyp:mbgl-x86",
             "link_gl",
-            '../llmr.gyp:copy_default_stylesheet',
+            '../mbgl.gyp:copy_default_stylesheet',
         ]
     },
     {

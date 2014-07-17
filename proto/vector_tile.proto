@@ -1,6 +1,6 @@
 // Protocol Version 1
 
-package llmr.vector;
+package mapboxgl.vector;
 
 option optimize_for = LITE_RUNTIME;
 

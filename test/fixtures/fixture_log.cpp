@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace llmr {
+namespace mbgl {
 
 FixtureLogBackend::~FixtureLogBackend() {
     std::cerr << unchecked();

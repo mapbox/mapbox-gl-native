@@ -1,6 +1,6 @@
-#include <llmr/style/property_fallback.hpp>
+#include <mbgl/style/property_fallback.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::FillAntialias, true },

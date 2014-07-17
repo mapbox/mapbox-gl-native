@@ -1,18 +1,18 @@
-#ifndef LLMR_COMMON_HEADLESS_CGL
-#define LLMR_COMMON_HEADLESS_CGL
+#ifndef MBGL_COMMON_HEADLESS_CGL
+#define MBGL_COMMON_HEADLESS_CGL
 
 #ifdef __APPLE__
-#define LLMR_USE_CGL 1
+#define MBGL_USE_CGL 1
 #else
 #include <GL/glx.h>
-#define LLMR_USE_GLX 1
+#define MBGL_USE_GLX 1
 #endif
 
-#include <llmr/map/view.hpp>
-#include <llmr/platform/gl.hpp>
-#include <llmr/util/time.hpp>
+#include <mbgl/map/view.hpp>
+#include <mbgl/platform/gl.hpp>
+#include <mbgl/util/time.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 class HeadlessView : public View {
 public:
@@ -31,14 +31,14 @@ private:
 
 
 private:
-#if LLMR_USE_CGL
+#if MBGL_USE_CGL
     CGLContextObj gl_context;
     GLuint fbo = 0;
     GLuint fbo_depth_stencil = 0;
     GLuint fbo_color = 0;
 #endif
 
-#if LLMR_USE_GLX
+#if MBGL_USE_GLX
     GLXContext gl_context = nullptr;
     XVisualInfo *x_info = nullptr;
     Display *x_display = nullptr;

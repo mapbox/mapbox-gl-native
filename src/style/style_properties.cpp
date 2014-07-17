@@ -1,6 +1,6 @@
-#include <llmr/style/style_properties.hpp>
+#include <mbgl/style/style_properties.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 template<> const FillProperties &defaultStyleProperties() { static const FillProperties p; return p; }
 template<> const LineProperties &defaultStyleProperties() { static const LineProperties p; return p; }

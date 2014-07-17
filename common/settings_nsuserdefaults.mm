@@ -2,7 +2,7 @@
 
 #include "settings_nsuserdefaults.hpp"
 
-using namespace llmr;
+using namespace mbgl;
 
 Settings_NSUserDefaults::Settings_NSUserDefaults()
 {

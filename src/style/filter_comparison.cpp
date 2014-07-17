@@ -1,11 +1,11 @@
-#include <llmr/map/vector_tile.hpp>
-#include <llmr/style/filter_comparison_private.hpp>
+#include <mbgl/map/vector_tile.hpp>
+#include <mbgl/style/filter_comparison_private.hpp>
 
-#include <llmr/style/value_comparison.hpp>
+#include <mbgl/style/value_comparison.hpp>
 
 #include <ostream>
 
-namespace llmr {
+namespace mbgl {
 
 
 inline bool includes(const Value &property_value, const std::vector<Value> &filter_values) {

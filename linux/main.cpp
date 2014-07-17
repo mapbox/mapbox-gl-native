@@ -1,5 +1,5 @@
-#include <llmr/llmr.hpp>
-#include <llmr/platform/platform.hpp>
+#include <mbgl/mbgl.hpp>
+#include <mbgl/platform/platform.hpp>
 
 #include <signal.h>
 #include <getopt.h>
@@ -23,7 +23,7 @@ void quit_handler(int) {
 }
 
 int main(int argc, char *argv[]) {
-    llmr::Log::Set<llmr::StderrLogBackend>();
+    mbgl::Log::Set<mbgl::StderrLogBackend>();
 
     int fullscreen_flag = 0;
 
@@ -55,10 +55,10 @@ int main(int argc, char *argv[]) {
     stylejson << stylefile.rdbuf();
 
     view = new GLFWView();
-    llmr::Map map(*view);
+    mbgl::Map map(*view);
 
     // Load settings
-    llmr::Settings_JSON settings;
+    mbgl::Settings_JSON settings;
     map.setLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
     map.setAngle(settings.angle);
     map.setDebug(settings.debug);
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
     // Set access token if present
     const char *token = getenv("MAPBOX_ACCESS_TOKEN");
     if (token == nullptr) {
-        llmr::Log::Warning(llmr::Event::Setup, "no access token set. mapbox.com tiles won't work.");
+        mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
     } else {
         map.setAccessToken(std::string(token));
     }

@@ -12,7 +12,7 @@
 /config/constants_local.cpp
 /build
 /bin/node_modules
-/include/llmr/shader/shaders.hpp
+/include/mbgl/shader/shaders.hpp
 /src/shader/shaders_gl.cpp
 /src/shader/shaders_gles2.cpp
 /bin/style.bin.js

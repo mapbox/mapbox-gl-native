@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
 
-#include <llmr/map/map.hpp>
-#include <llmr/util/image.hpp>
-#include <llmr/util/io.hpp>
-#include <llmr/util/std.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/util/image.hpp>
+#include <mbgl/util/io.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <rapidjson/document.h>
 
@@ -22,7 +22,7 @@ const std::string base_directory = []{
 class HeadlessTest : public ::testing::TestWithParam<std::string> {};
 
 TEST_P(HeadlessTest, render) {
-    using namespace llmr;
+    using namespace mbgl;
 
     const std::string &base = GetParam();
 

@@ -1,23 +1,23 @@
-#include <llmr/map/tile_parser.hpp>
+#include <mbgl/map/tile_parser.hpp>
 
-#include <llmr/map/vector_tile_data.hpp>
-#include <llmr/style/style.hpp>
-#include <llmr/style/style_layer.hpp>
-#include <llmr/style/style_layer_group.hpp>
-#include <llmr/renderer/fill_bucket.hpp>
-#include <llmr/renderer/line_bucket.hpp>
-#include <llmr/renderer/icon_bucket.hpp>
-#include <llmr/renderer/text_bucket.hpp>
-#include <llmr/renderer/raster_bucket.hpp>
-#include <llmr/util/raster.hpp>
-#include <llmr/util/constants.hpp>
-#include <llmr/util/token.hpp>
-#include <llmr/geometry/glyph_atlas.hpp>
-#include <llmr/text/glyph_store.hpp>
-#include <llmr/text/glyph.hpp>
+#include <mbgl/map/vector_tile_data.hpp>
+#include <mbgl/style/style.hpp>
+#include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/renderer/fill_bucket.hpp>
+#include <mbgl/renderer/line_bucket.hpp>
+#include <mbgl/renderer/icon_bucket.hpp>
+#include <mbgl/renderer/text_bucket.hpp>
+#include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/util/raster.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/token.hpp>
+#include <mbgl/geometry/glyph_atlas.hpp>
+#include <mbgl/text/glyph_store.hpp>
+#include <mbgl/text/glyph.hpp>
 
-#include <llmr/util/std.hpp>
-#include <llmr/util/utf.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/utf.hpp>
 
 #include <locale>
 
@@ -29,7 +29,7 @@ namespace regex_impl = boost;
 namespace regex_impl = std;
 #endif
 
-using namespace llmr;
+using namespace mbgl;
 
 TileParser::TileParser(const std::string &data, VectorTileData &tile,
                        const std::shared_ptr<const Style> &style,

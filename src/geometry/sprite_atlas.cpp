@@ -1,18 +1,18 @@
-#include <llmr/geometry/sprite_atlas.hpp>
-#include <llmr/platform/gl.hpp>
-#include <llmr/platform/platform.hpp>
-#include <llmr/util/math.hpp>
-#include <llmr/util/std.hpp>
-#include <llmr/util/constants.hpp>
+#include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/platform/gl.hpp>
+#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/math.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/constants.hpp>
 
-#include <llmr/map/sprite.hpp>
+#include <mbgl/map/sprite.hpp>
 
 #include <cassert>
 #include <cmath>
 #include <algorithm>
 
 
-using namespace llmr;
+using namespace mbgl;
 
 SpriteAtlas::SpriteAtlas(dimension width, dimension height)
     : width(width),

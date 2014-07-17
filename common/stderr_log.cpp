@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstdarg>
 
-namespace llmr {
+namespace mbgl {
 
 void StderrLogBackend::record(EventSeverity severity, Event event, const std::string &msg) {
     std::cerr << "[" << severity << "] " << event << ": " << msg << std::endl;

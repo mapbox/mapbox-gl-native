@@ -1,10 +1,10 @@
-#include <llmr/renderer/painter.hpp>
-#include <llmr/renderer/fill_bucket.hpp>
-#include <llmr/map/map.hpp>
-#include <llmr/map/source.hpp>
-#include <llmr/util/clip_ids.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/fill_bucket.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/map/source.hpp>
+#include <mbgl/util/clip_ids.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &sources) {
     gl::group group("clipping masks");

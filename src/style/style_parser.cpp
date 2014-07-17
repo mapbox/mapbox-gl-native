@@ -1,10 +1,10 @@
-#include <llmr/style/style_parser.hpp>
-#include <llmr/style/style_layer_group.hpp>
-#include <llmr/util/constants.hpp>
-#include <llmr/util/std.hpp>
+#include <mbgl/style/style_parser.hpp>
+#include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/std.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 using JSVal = const rapidjson::Value&;
 

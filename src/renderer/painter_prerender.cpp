@@ -1,7 +1,7 @@
-#include <llmr/renderer/painter.hpp>
-#include <llmr/style/style_properties.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/style/style_properties.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 void Painter::preparePrerender(PrerenderedTexture &texture) {
     glDisable(GL_DEPTH_TEST);

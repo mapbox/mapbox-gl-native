@@ -1,12 +1,12 @@
-#include <llmr/shader/shader.hpp>
-#include <llmr/platform/gl.hpp>
-#include <llmr/util/timer.hpp>
-#include <llmr/platform/log.hpp>
+#include <mbgl/shader/shader.hpp>
+#include <mbgl/platform/gl.hpp>
+#include <mbgl/util/timer.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <cstring>
 #include <cstdlib>
 
-using namespace llmr;
+using namespace mbgl;
 
 Shader::Shader(const GLchar *vertSource, const GLchar *fragSource)
     : valid(false),

@@ -1,10 +1,10 @@
 #include "headless_view.hpp"
-#include <llmr/util/timer.hpp>
+#include <mbgl/util/timer.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 HeadlessView::HeadlessView() {
-#if LLMR_USE_CGL
+#if MBGL_USE_CGL
     // TODO: test if OpenGL 4.1 with GL_ARB_ES2_compatibility is supported
     // If it is, use kCGLOGLPVersion_3_2_Core and enable that extension.
     CGLPixelFormatAttribute attributes[] = {
@@ -30,7 +30,7 @@ HeadlessView::HeadlessView() {
     }
 #endif
 
-#if LLMR_USE_GLX
+#if MBGL_USE_GLX
     x_display = XOpenDisplay(0);
 
     if (x_display == nullptr) {
@@ -66,7 +66,7 @@ HeadlessView::HeadlessView() {
 void HeadlessView::resize(int width, int height) {
     clear_buffers();
 
-#if LLMR_USE_CGL
+#if MBGL_USE_CGL
     make_active();
 
     // Create depth/stencil buffer
@@ -101,7 +101,7 @@ void HeadlessView::resize(int width, int height) {
     }
 #endif
 
-#if LLMR_USE_GLX
+#if MBGL_USE_GLX
     x_pixmap = XCreatePixmap(x_display, DefaultRootWindow(x_display), width, height, 32);
     glx_pixmap = glXCreateGLXPixmap(x_display, x_info, x_pixmap);
 
@@ -111,7 +111,7 @@ void HeadlessView::resize(int width, int height) {
 }
 
 void HeadlessView::clear_buffers() {
-#if LLMR_USE_CGL
+#if MBGL_USE_CGL
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
     if (fbo) {
@@ -130,7 +130,7 @@ void HeadlessView::clear_buffers() {
     }
 #endif
 
-#if LLMR_USE_GLX
+#if MBGL_USE_GLX
     if (glx_pixmap) {
         glXDestroyGLXPixmap(x_display, glx_pixmap);
         glx_pixmap = 0;
@@ -146,24 +146,24 @@ void HeadlessView::clear_buffers() {
 HeadlessView::~HeadlessView() {
     clear_buffers();
 
-#if LLMR_USE_CGL
+#if MBGL_USE_CGL
     CGLDestroyContext(gl_context);
 #endif
 }
 
-void HeadlessView::notify_map_change(llmr::MapChange change, llmr::timestamp delay) {
+void HeadlessView::notify_map_change(mbgl::MapChange change, mbgl::timestamp delay) {
     // no-op
 }
 
 void HeadlessView::make_active() {
-#if LLMR_USE_CGL
+#if MBGL_USE_CGL
     CGLError error = CGLSetCurrentContext(gl_context);
     if (error) {
         fprintf(stderr, "Switching OpenGL context failed\n");
     }
 #endif
 
-#if LLMR_USE_GLX
+#if MBGL_USE_GLX
     if (!glXMakeCurrent(x_display, glx_pixmap, gl_context)) {
         fprintf(stderr, "Switching OpenGL context failed\n");
     }
@@ -173,7 +173,7 @@ void HeadlessView::make_active() {
 void HeadlessView::swap() {}
 
 unsigned int HeadlessView::root_fbo() {
-#if LLMR_USE_CGL
+#if MBGL_USE_CGL
     return fbo;
 #endif
 

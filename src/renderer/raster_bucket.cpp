@@ -1,7 +1,7 @@
-#include <llmr/renderer/raster_bucket.hpp>
-#include <llmr/renderer/painter.hpp>
+#include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/renderer/painter.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 RasterBucket::RasterBucket(const std::shared_ptr<Texturepool> &texturepool)
     : raster(texturepool) {

@@ -1,13 +1,13 @@
-#include <llmr/map/transform.hpp>
-#include <llmr/util/constants.hpp>
-#include <llmr/util/mat4.hpp>
-#include <llmr/util/std.hpp>
-#include <llmr/util/math.hpp>
-#include <llmr/util/time.hpp>
-#include <llmr/platform/platform.hpp>
+#include <mbgl/map/transform.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/mat4.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/math.hpp>
+#include <mbgl/util/time.hpp>
+#include <mbgl/platform/platform.hpp>
 #include <cstdio>
 
-using namespace llmr;
+using namespace mbgl;
 
 const double D2R = M_PI / 180.0;
 const double R2D = 180.0 / M_PI;
