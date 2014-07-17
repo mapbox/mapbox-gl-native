@@ -71,7 +71,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -87,7 +87,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -103,7 +103,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -121,7 +121,8 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
+            "../mapboxgl.gyp:copy_stylesheet_fixtures",
         ]
     },
     {
@@ -137,7 +138,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -153,7 +154,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -169,7 +170,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -185,7 +186,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -207,8 +208,8 @@
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
             "../mapboxgl.gyp:mapboxgl",
+            "../mapboxgl.gyp:copy_default_stylesheet",
             "link_gl",
-            '../mapboxgl.gyp:copy_default_stylesheet',
         ]
     },
     {

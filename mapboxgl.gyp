@@ -68,9 +68,6 @@
           ],
           'outputs': [
             '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
-            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
-            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-functions.min.js',
-            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-layers.min.js',
           ],
           'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)/bin']
         }
@@ -78,6 +75,32 @@
       'direct_dependent_settings': {
         'sources': [
             '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
+        ],
+      }
+    },
+    {
+      'target_name': 'build_stylesheet_fixtures',
+      'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [
+        'npm_install'
+      ],
+      'actions': [
+        {
+          'action_name': 'Build Stylesheet Fixtures',
+          'inputs': [
+            'bin/style.json',
+          ],
+          'outputs': [
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-functions.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-layers.min.js',
+          ],
+          'action': ['<@(node)', 'bin/build-fixtures.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)/bin']
+        }
+      ],
+      'direct_dependent_settings': {
+        'sources': [
             '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
             '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-functions.min.js',
             '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-layers.min.js',
@@ -95,6 +118,21 @@
         {
           'files': [
             '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
+          ],
+          'destination': '<(PRODUCT_DIR)'
+        }
+      ]
+    },
+    {
+      'target_name': 'copy_stylesheet_fixtures',
+      'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [
+        'build_stylesheet_fixtures'
+      ],
+      'copies': [
+        {
+          'files': [
             '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
             '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-functions.min.js',
             '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-layers.min.js',
