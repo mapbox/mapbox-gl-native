@@ -108,6 +108,11 @@ std::unique_ptr<Bucket> TileParser::createBucket(std::shared_ptr<StyleBucket> bu
         return nullptr;
     }
 
+    // Skip this bucket if we are to not render this
+    if (tile.id.z < bucket_desc->min_zoom || tile.id.z > bucket_desc->max_zoom) {
+        return nullptr;
+    }
+
     auto layer_it = vector_data.layers.find(bucket_desc->source_layer);
     if (layer_it != vector_data.layers.end()) {
         const VectorTileLayer &layer = layer_it->second;
