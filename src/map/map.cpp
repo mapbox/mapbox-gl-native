@@ -661,8 +661,9 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
         // Skip this layer if it's outside the range of min/maxzoom.
         // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
         // is set to a fractional value, or value that is larger than the source maxzoom.
-        if (style_source.info.min_zoom > state.getZoom() ||
-            style_source.info.max_zoom <= state.getZoom()) {
+        const double zoom = state.getZoom();
+        if (layer_desc->bucket->min_zoom > zoom ||
+            layer_desc->bucket->max_zoom <= zoom) {
             return;
         }
 
