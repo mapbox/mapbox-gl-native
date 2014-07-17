@@ -653,6 +653,19 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
 
         StyleSource &style_source = *layer_desc->bucket->style_source;
 
+        // Skip this layer if there is no data.
+        if (!style_source.source) {
+            return;
+        }
+
+        // Skip this layer if it's outside the range of min/maxzoom.
+        // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
+        // is set to a fractional value, or value that is larger than the source maxzoom.
+        if (style_source.info.min_zoom > state.getZoom() ||
+            style_source.info.max_zoom <= state.getZoom()) {
+            return;
+        }
+
         // Abort early if we can already deduce from the bucket type that
         // we're not going to render anything anyway during this pass.
         switch (layer_desc->type) {
@@ -684,8 +697,6 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
                       << layer_desc->type << ")" << std::endl;
         }
 
-        if (style_source.source) {
-            style_source.source->render(painter, layer_desc);
-        }
+        style_source.source->render(painter, layer_desc);
     }
 }
