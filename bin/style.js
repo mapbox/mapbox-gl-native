@@ -66,124 +66,94 @@ module.exports = {
     "@street_night": "#0186ac",
     "@contour_night": "#ffff80",
     "@river_canal_width": {
-      "fn": "stops",
       "stops": [[10, 0.5], [11, 1], [13, 2], [15, 3]]
     },
     "@stream_width": {
-      "fn": "stops",
       "stops": [[12, 0.25], [13, 0.5], [15, 1.5], [17, 2]]
     },
     "@motorway_width": {
-      "fn": "stops",
       "stops": [[4, 0], [5, 0.5], [7, 0.8], [9, 1], [10, 1.2], [11, 2], [12, 3], [13, 4], [14, 6], [15, 9], [16, 12], [17, 14]]
     },
     "@motorway_casing_width": {
-      "fn": "stops",
       "stops": [[6.5, 0.6], [7, 0.8], [9, 2.8], [10, 3], [11, 4], [12, 5], [13, 6.5], [14, 9], [15, 12], [16, 15], [17, 17]]
     },
     "@motorway_link_width": {
-      "fn": "stops",
       "stops": [[11, 1.2], [13, 2], [15, 3], [17, 4]]
     },
     "@motorway_link_casing_width": {
-      "fn": "stops",
       "stops": [[11, 2.8], [13, 3.5], [15, 5], [17, 6]]
     },
     "@main_width": {
-      "fn": "stops",
       "stops": [[4, 1], [11, 1], [12, 1.5], [13, 2], [14, 3], [15, 6], [16, 10], [17, 12]]
     },
     "@main_casing_width": {
-      "fn": "stops",
       "stops": [[8, 2.9], [11, 2.9], [12, 3.5], [13, 4], [14, 5.5], [15, 9], [16, 12], [17, 14]]
     },
     "@street_width": {
-      "fn": "stops",
       "stops": [[13.5, 0], [14, 1.5], [15, 3], [16, 8]]
     },
     "@street_casing_width": {
-      "fn": "stops",
       "stops": [[12, 0.4], [13, 1], [14, 2.5], [15, 4], [16, 10]]
     },
     "@street_casing_opacity": {
-      "fn": "stops",
       "stops": [[13, 0], [13.5, 1]]
     },
     "@service_casing_width": {
-      "fn": "stops",
       "stops": [[13, 0.5], [14, 3], [15, 3.5], [16, 4], [17, 5], [18, 6]]
     },
     "@runway_width": {
-      "fn": "stops",
       "stops": [[9, 1], [10, 2], [11, 3], [12, 5], [13, 7], [14, 11], [15, 15], [16, 19], [17, 23]]
     },
     "@taxiway_width": {
-      "fn": "stops",
       "stops": [[9, 0.2], [11, 0.2], [12, 1], [13, 1.5], [14, 2], [15, 3], [16, 4], [17, 5]]
     },
     "@aerialway_width": {
-      "fn": "stops",
       "stops": [[12.5, 0.8], [13, 1.4], [14, 1.6], [15, 2], [16, 2.4], [17, 3]]
     },
     "@aerialway_casing_width": {
-      "fn": "stops",
       "stops": [[12.5, 2], [13, 2.5], [14, 3], [15, 3.5], [16, 4], [21, 5]]
     },
     "@path_width": {
-      "fn": "stops",
       "stops": [[13, 1.2], [14, 1.5], [15, 1.8]]
     },
     "@admin_l2_width": {
-      "fn": "stops",
       "stops": [[1, 0.5], [2, 0.7], [3, 0.7], [4, 0.8], [5, 1], [7, 2], [9, 3]]
     },
     "@admin_l3_width": {
-      "fn": "stops",
       "stops": [[5, 0.6], [7, 1], [11, 2]]
     },
     "@road_label_1_size": {
-      "fn": "stops",
       "stops": [[12, 11], [13, 12], [14, 13], [15, 14], [16, 16], [17, 18]]
     },
     "@road_label_2_size": {
-      "fn": "stops",
       "stops": [[12, 11], [13, 12], [15, 14], [17, 16]]
     },
     "@road_label_3_size": {
-      "fn": "stops",
       "stops": [[14, 10], [15, 12], [17, 14]]
     },
     "@fence_width": {
-      "fn": "stops",
       "stops": [[16, 0.6], [18, 1]]
     },
     "@hedge_width": {
-      "fn": "stops",
       "stops": [[15, 0.6], [16, 1.2], [18, 1.6]]
     },
     "@barrier_line_land_width": {
-      "fn": "stops",
       "stops": [[13, 0.4], [14, 0.75], [15, 1.5], [16, 3], [17, 6], [18, 12], [19, 24], [20, 48]]
     },
     "@country_label_size": {
-      "fn": "stops",
       "stops": [[0, 14], [11, 24]]
     },
     "@poi_label_1-2_size": {
-      "fn": "stops",
       "stops": [[14, 10], [15, 11], [16, 12]]
     },
     "@poi_label_3_size": {
-      "fn": "stops",
       "stops": [[15, 10], [16, 11]]
     },
     "@hillshade_rasterize": {
         "enabled": {
-            "fn": "stops",
             "stops": [[10, false], [11, true]]
         },
         "size": {
-            "fn": "stops",
             "stops": [[10, 1024], [11, 512], [12, 256]]
         },
         "blur": 1
@@ -231,14 +201,12 @@ module.exports = {
     "style": {
       "fill-color": "@grass",
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
     },
     "style.night": {
       "fill-color": "@grass_night",
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
     }
@@ -251,14 +219,12 @@ module.exports = {
     "style": {
       "fill-color": "@scrub",
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
     },
     "style.night": {
       "fill-color": "@scrub_night",
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
     }
@@ -271,14 +237,12 @@ module.exports = {
     "style": {
       "fill-color": "@wood",
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
     },
     "style.night": {
       "fill-color": "@wood_night",
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
     }
@@ -516,7 +480,6 @@ module.exports = {
       "fill-color": "#d5d1c6",
       "fill-translate": [1, 1],
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[15.5, 0], [16, 1]]
       },
       "fill-outline-color": "#d5d1c6"
@@ -525,7 +488,6 @@ module.exports = {
       "fill-color": "#026688",
       "fill-translate": [1, 1],
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[15.5, 0], [16, 1]]
       },
       "fill-outline-color": "#026688"
@@ -545,7 +507,6 @@ module.exports = {
     "style": {
       "fill-color": "#ebe7db",
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[15.5, 0], [16, 0.7]]
       },
       "fill-outline-color": "#d5d1c6"
@@ -553,7 +514,6 @@ module.exports = {
     "style.night": {
       "fill-color": "#027797",
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[15.5, 0], [16, 0.7]]
       },
       "fill-outline-color": "#026688"
@@ -569,7 +529,6 @@ module.exports = {
       "fill-color": "#fffff3",
       "fill-antialias": false,
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[14, 0.3], [15, 0.3], [16, 0.2], [17, 0.2], [18, 0.1]]
       }
     },
@@ -577,7 +536,6 @@ module.exports = {
       "fill-color": "#fdfdad",
       "fill-antialias": false,
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[13, 0.4], [14, 0.3], [16, 0.2], [17, 0.1], [18, 0.05]]
       }
     }
@@ -592,7 +550,6 @@ module.exports = {
       "fill-color": "#ffd",
       "fill-antialias": false,
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[14, 0.3], [15, 0.3], [16, 0.2], [17, 0.2], [18, 0.1]]
       }
     },
@@ -600,7 +557,6 @@ module.exports = {
       "fill-color": "#ffe1b7",
       "fill-antialias": false,
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[14, 0.3], [16, 0.2], [17, 0.15], [18, 0.05]]
       }
     }
@@ -615,7 +571,6 @@ module.exports = {
       "fill-color": "#206",
       "fill-antialias": false,
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[14, 0.08], [15, 0.075], [16, 0.05], [17, 0.05], [18, 0.025]]
       }
     },
@@ -623,7 +578,6 @@ module.exports = {
       "fill-color": "#206",
       "fill-antialias": false,
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[15, 0.3], [16, 0.2], [17, 0.1], [18, 0.05]]
       }
     }
@@ -638,7 +592,6 @@ module.exports = {
       "fill-color": "#103",
       "fill-antialias": false,
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[14, 0.08], [15, 0.075], [16, 0.05], [17, 0.05], [18, 0.025]]
       }
     },
@@ -646,7 +599,6 @@ module.exports = {
       "fill-color": "#103",
       "fill-antialias": false,
       "fill-opacity": {
-        "fn": "stops",
         "stops": [[15, 0.3], [16, 0.2], [17, 0.1], [18, 0.05]]
       }
     }
@@ -663,7 +615,6 @@ module.exports = {
       "line-color": "#008",
       "line-width": 0.9,
       "line-opacity": {
-        "fn": "stops",
         "stops": [[11, 0.05], [12, 0.11]]
       }
     },
@@ -671,7 +622,6 @@ module.exports = {
       "line-color": "@contour_night",
       "line-width": 0.9,
       "line-opacity": {
-        "fn": "stops",
         "stops": [[11, 0.1], [12, 0.2]]
       }
     }
@@ -687,7 +637,6 @@ module.exports = {
       "line-color": "#008",
       "line-width": 0.5,
       "line-opacity": {
-        "fn": "stops",
         "stops": [[11, 0.05], [12, 0.11]]
       }
     },
@@ -695,7 +644,6 @@ module.exports = {
       "line-color": "@contour_night",
       "line-width": 0.5,
       "line-opacity": {
-        "fn": "stops",
         "stops": [[11, 0.1], [12, 0.4]]
       }
     }
@@ -878,7 +826,6 @@ module.exports = {
       "line-dasharray": [6, 6],
       "line-width": "@main_casing_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[8, 0], [9, 1]]
       }
     },
@@ -887,7 +834,6 @@ module.exports = {
       "line-dasharray": [6, 6],
       "line-width": "@main_casing_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[8, 0], [9, 1]]
       }
     }
@@ -947,7 +893,6 @@ module.exports = {
       "line-color": "#e6cec7",
       "line-width": "@main_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[5.5, 0], [6, 1]]
       }
     },
@@ -955,7 +900,6 @@ module.exports = {
       "line-color": "#78b0c1",
       "line-width": "@main_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[5.5, 0], [6, 1]]
       }
     }
@@ -970,7 +914,6 @@ module.exports = {
       "line-dasharray": [6, 6],
       "line-width": "@motorway_casing_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[8.5, 0], [9, 1]]
       }
     },
@@ -979,7 +922,6 @@ module.exports = {
       "line-dasharray": [6, 6],
       "line-width": "@motorway_casing_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[8.5, 0], [9, 1]]
       }
     }
@@ -990,7 +932,6 @@ module.exports = {
       "line-color": "#e6cec7",
       "line-width": "@motorway_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[5.5, 0], [6, 1]]
       }
     },
@@ -998,7 +939,6 @@ module.exports = {
       "line-color": "#78b0c1",
       "line-width": "@motorway_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[5.5, 0], [6, 1]]
       }
     }
@@ -1012,7 +952,6 @@ module.exports = {
       "line-color": "#ffd",
       "line-opacity": 0.4,
       "line-width": {
-        "fn": "stops",
         "stops": [[14, 3], [15, 4]]
       }
     },
@@ -1047,7 +986,6 @@ module.exports = {
       "line-dasharray": [10, 4],
       "line-opacity": 0.8,
       "line-width": {
-        "fn": "stops",
         "stops": [[13, 0.8], [14, 0.9], [15, 1.2]]
       }
     },
@@ -1056,7 +994,6 @@ module.exports = {
       "line-dasharray": [10, 4],
       "line-opacity": 0.8,
       "line-width": {
-        "fn": "stops",
         "stops": [[13, 0.8], [14, 0.9], [15, 1.2]]
       }
     }
@@ -1191,7 +1128,6 @@ module.exports = {
       "line-color": "@case",
       "line-width": "@main_casing_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[8, 0], [9, 1]]
       }
     },
@@ -1199,7 +1135,6 @@ module.exports = {
       "line-color": "@case_night",
       "line-width": "@main_casing_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[8, 0], [9, 1]]
       }
     }
@@ -1263,7 +1198,6 @@ module.exports = {
       "line-color": "@main",
       "line-width": "@main_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[5.5, 0], [6, 1]]
       }
     },
@@ -1271,7 +1205,6 @@ module.exports = {
       "line-color": "@main_night",
       "line-width": "@main_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[5.5, 0], [6, 1]]
       }
     }
@@ -1289,7 +1222,6 @@ module.exports = {
       "line-color": "@case",
       "line-width": "@motorway_casing_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[8.5, 0], [9, 1]]
       }
     },
@@ -1297,7 +1229,6 @@ module.exports = {
       "line-color": "@case_night",
       "line-width": "@motorway_casing_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[8.5, 0], [9, 1]]
       }
     }
@@ -1308,7 +1239,6 @@ module.exports = {
       "line-color": "@motorway",
       "line-width": "@motorway_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[5.5, 0], [6, 1]]
       }
     },
@@ -1316,7 +1246,6 @@ module.exports = {
       "line-color": "@motorway_night",
       "line-width": "@motorway_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[5.5, 0], [6, 1]]
       }
     }
@@ -1373,7 +1302,6 @@ module.exports = {
       "line-color": "@case",
       "line-width": "@main_casing_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[8, 0], [9, 1]]
       }
     },
@@ -1381,7 +1309,6 @@ module.exports = {
       "line-color": "@case_night",
       "line-width": "@main_casing_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[8, 0], [9, 1]]
       }
     }
@@ -1441,7 +1368,6 @@ module.exports = {
       "line-color": "@main",
       "line-width": "@main_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[5.5, 0], [6, 1]]
       }
     },
@@ -1449,7 +1375,6 @@ module.exports = {
       "line-color": "@main_night",
       "line-width": "@main_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[5.5, 0], [6, 1]]
       }
     }
@@ -1463,7 +1388,6 @@ module.exports = {
       "line-color": "@case",
       "line-width": "@motorway_casing_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[8.5, 0], [9, 1]]
       }
     },
@@ -1471,7 +1395,6 @@ module.exports = {
       "line-color": "@case_night",
       "line-width": "@motorway_casing_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[8.5, 0], [9, 1]]
       }
     }
@@ -1482,7 +1405,6 @@ module.exports = {
       "line-color": "@motorway",
       "line-width": "@motorway_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[5.5, 0], [6, 1]]
       }
     },
@@ -1490,7 +1412,6 @@ module.exports = {
       "line-color": "@motorway_night",
       "line-width": "@motorway_width",
       "line-opacity": {
-        "fn": "stops",
         "stops": [[5.5, 0], [6, 1]]
       }
     }
@@ -1536,7 +1457,6 @@ module.exports = {
       "line-color": "#88a",
       "line-dasharray": [60, 20],
       "line-opacity": {
-        "fn": "stops",
         "stops": [[3, 0], [5, 1]]
       },
       "line-width": "@admin_l3_width"
@@ -1545,7 +1465,6 @@ module.exports = {
       "line-color": "@admin_night",
       "line-dasharray": [60, 20],
       "line-opacity": {
-        "fn": "stops",
         "stops": [[3, 0], [5, 1]]
       },
       "line-width": "@admin_l3_width"
@@ -1592,14 +1511,12 @@ module.exports = {
     "style": {
       "line-color": "#c0d6d6",
       "line-width": {
-        "fn": "stops",
         "stops": [[5, 1], [7, 2], [11, 3]]
       }
     },
     "style.night": {
       "line-color": "#0a1347",
       "line-width": {
-        "fn": "stops",
         "stops": [[5, 1], [7, 2], [11, 3]]
       }
     }
@@ -1663,7 +1580,6 @@ module.exports = {
     "style": {
       "text-color": "@marine_text",
       "text-size": {
-        "fn": "stops",
         "stops": [[2, 20], [3, 25], [4, 30], [21, 30]]
       },
       "text-halo-color": "@water"
@@ -1671,7 +1587,6 @@ module.exports = {
     "style.night": {
       "text-color": "@water_dark_night",
       "text-size": {
-        "fn": "stops",
         "stops": [[2, 20], [3, 25], [4, 30], [21, 30]]
       },
       "text-halo-color": "@water_night"
@@ -1692,7 +1607,6 @@ module.exports = {
     "style": {
       "text-color": "@marine_text",
       "text-size": {
-        "fn": "stops",
         "stops": [[2, 13], [3, 14], [4, 20], [5, 24], [21, 24]]
       },
       "text-halo-color": "@water"
@@ -1700,7 +1614,6 @@ module.exports = {
     "style.night": {
       "text-color": "@water_dark_night",
       "text-size": {
-        "fn": "stops",
         "stops": [[2, 13], [3, 14], [4, 20], [5, 24], [21, 24]]
       },
       "text-halo-color": "@water_night"
@@ -1721,7 +1634,6 @@ module.exports = {
     "style": {
       "text-color": "@marine_text",
       "text-size": {
-        "fn": "stops",
         "stops": [[2, 12], [3, 13], [4, 15], [5, 18], [21, 18]]
       },
       "text-halo-color": "@water"
@@ -1729,7 +1641,6 @@ module.exports = {
     "style.night": {
       "text-color": "@water_dark_night",
       "text-size": {
-        "fn": "stops",
         "stops": [[2, 12], [3, 13], [4, 15], [5, 18], [21, 18]]
       },
       "text-halo-color": "@water_night"
@@ -1750,7 +1661,6 @@ module.exports = {
     "style": {
       "text-color": "@marine_text",
       "text-size": {
-        "fn": "stops",
         "stops": [[3, 12], [4, 14], [5, 16], [21, 16]]
       },
       "text-halo-color": "@water"
@@ -1758,7 +1668,6 @@ module.exports = {
     "style.night": {
       "text-color": "@water_dark_night",
       "text-size": {
-        "fn": "stops",
         "stops": [[3, 12], [4, 14], [5, 16], [21, 16]]
       },
       "text-halo-color": "@water_night"
@@ -1781,7 +1690,6 @@ module.exports = {
     "style": {
       "text-color": "@marine_text",
       "text-size": {
-        "fn": "stops",
         "stops": [[2, 20], [3, 25], [4, 30], [21, 30]]
       },
       "text-halo-color": "@water"
@@ -1789,7 +1697,6 @@ module.exports = {
     "style.night": {
       "text-color": "@water_dark_night",
       "text-size": {
-        "fn": "stops",
         "stops": [[2, 20], [3, 25], [4, 30], [21, 30]]
       },
       "text-halo-color": "@water_night"
@@ -1812,7 +1719,6 @@ module.exports = {
     "style": {
       "text-color": "@marine_text",
       "text-size": {
-        "fn": "stops",
         "stops": [[2, 13], [3, 14], [4, 20], [5, 24], [21, 24]]
       },
       "text-halo-color": "@water"
@@ -1820,7 +1726,6 @@ module.exports = {
     "style.night": {
       "text-color": "@water_dark_night",
       "text-size": {
-        "fn": "stops",
         "stops": [[2, 13], [3, 14], [4, 20], [5, 24], [21, 24]]
       },
       "text-halo-color": "@water_night"
@@ -1843,7 +1748,6 @@ module.exports = {
     "style": {
       "text-color": "@marine_text",
       "text-size": {
-        "fn": "stops",
         "stops": [[2, 12], [3, 13], [4, 15], [5, 18], [21, 18]]
       },
       "text-halo-color": "@water"
@@ -1851,7 +1755,6 @@ module.exports = {
     "style.night": {
       "text-color": "@water_dark_night",
       "text-size": {
-        "fn": "stops",
         "stops": [[2, 12], [3, 13], [4, 15], [5, 18], [21, 18]]
       },
       "text-halo-color": "@water_night"
@@ -1874,7 +1777,6 @@ module.exports = {
     "style": {
       "text-color": "@marine_text",
       "text-size": {
-        "fn": "stops",
         "stops": [[3, 12], [4, 14], [5, 16], [21, 16]]
       },
       "text-halo-color": "@water"
@@ -1882,7 +1784,6 @@ module.exports = {
     "style.night": {
       "text-color": "@water_dark_night",
       "text-size": {
-        "fn": "stops",
         "stops": [[3, 12], [4, 14], [5, 16], [21, 16]]
       },
       "text-halo-color": "@water_night"
@@ -1905,7 +1806,6 @@ module.exports = {
       "text-halo-width": 0.4,
       "text-halo-color": "rgba(244,239,225,0.8)",
       "text-size": {
-        "fn": "stops",
         "stops": [[2.99, 0], [3, 10], [8.99, 16], [9, 0]]
       }
     },
@@ -1914,7 +1814,6 @@ module.exports = {
       "text-halo-width": 0.4,
       "text-halo-color": "@land_night",
       "text-size": {
-        "fn": "stops",
         "stops": [[2.99, 0], [3, 10], [8.99, 16], [9, 0]]
       }
     }
@@ -1936,7 +1835,6 @@ module.exports = {
       "text-halo-width": 0.4,
       "text-halo-color": "@text_stroke",
       "text-size": {
-        "fn": "stops",
         "stops": [[2.99, 0], [3, 10], [6, 14], [13.99, 20], [14, 0]]
       }
     },
@@ -1945,7 +1843,6 @@ module.exports = {
       "text-halo-width": 0.4,
       "text-halo-color": "@text2_stroke_night",
       "text-size": {
-        "fn": "stops",
         "stops": [[2.99, 0], [3, 10], [6, 14], [13.99, 20], [14, 0]]
       }
     }
@@ -1967,7 +1864,6 @@ module.exports = {
       "text-halo-width": 0.3,
       "text-halo-color": "@text_stroke",
       "text-size": {
-        "fn": "stops",
         "stops": [[8, 10], [11, 13], [13, 17], [15, 22]]
       }
     },
@@ -1976,7 +1872,6 @@ module.exports = {
       "text-halo-width": 0.3,
       "text-halo-color": "@text2_stroke_night",
       "text-size": {
-        "fn": "stops",
         "stops": [[8, 10], [11, 13], [13, 17], [15, 22]]
       }
     }
@@ -1998,7 +1893,6 @@ module.exports = {
       "text-halo-width": 0.3,
       "text-halo-color": "@text_stroke",
       "text-size": {
-        "fn": "stops",
         "stops": [[8, 8], [11, 10], [13, 14], [15, 16], [16, 20]]
       }
     },
@@ -2007,7 +1901,6 @@ module.exports = {
       "text-halo-width": 0.3,
       "text-halo-color": "@text2_stroke_night",
       "text-size": {
-        "fn": "stops",
         "stops": [[8, 8], [11, 10], [13, 14], [15, 16], [16, 20]]
       }
     }
@@ -2028,7 +1921,6 @@ module.exports = {
       "text-color": "#7d6c55",
       "text-halo-color": "@text_stroke",
       "text-size": {
-        "fn": "stops",
         "stops": [[12, 11], [13, 12], [15, 14], [17, 18]]
       }
     },
@@ -2037,7 +1929,6 @@ module.exports = {
       "text-halo-color": "@text2_stroke_night",
       "text-halo-width": 0.3,
       "text-size": {
-        "fn": "stops",
         "stops": [[12, 11], [13, 12], [15, 14], [17, 18]]
       }
     }
@@ -2237,13 +2128,11 @@ module.exports = {
     },
     "style": {
       "icon-opacity": {
-        "fn": "stops",
         "stops": [[15.5, 0], [15.75, 1]]
       }
     },
     "style.night": {
       "icon-opacity": {
-        "fn": "stops",
         "stops": [[15.5, 0], [15.75, 1]]
       }
     }
@@ -2268,7 +2157,6 @@ module.exports = {
       "text-halo-color": "@land",
       "text-halo-width": 0.3,
       "text-opacity": {
-        "fn": "stops",
         "stops": [[15.5, 0], [15.75, 1]]
       }
     },
@@ -2278,7 +2166,6 @@ module.exports = {
       "text-halo-color": "@text2_stroke_night",
       "text-halo-width": 0.3,
       "text-opacity": {
-        "fn": "stops",
         "stops": [[15.5, 0], [15.75, 1]]
       }
     }
@@ -2294,13 +2181,11 @@ module.exports = {
     },
     "style": {
       "icon-opacity": {
-        "fn": "stops",
         "stops": [[17.5, 0], [17.75, 1]]
       }
     },
     "style.night": {
       "icon-opacity": {
-        "fn": "stops",
         "stops": [[17.5, 0], [17.75, 1]]
       }
     }
@@ -2323,7 +2208,6 @@ module.exports = {
       "text-color": "#444",
       "text-size": 10,
       "text-opacity": {
-        "fn": "stops",
         "stops": [[17.5, 0], [17.75, 1]]
       },
       "text-halo-color": "@land",
@@ -2333,7 +2217,6 @@ module.exports = {
       "text-color": "#fff",
       "text-size": 10,
       "text-opacity": {
-        "fn": "stops",
         "stops": [[17.5, 0], [17.75, 1]]
       },
       "text-halo-color": "@text2_stroke_night",
@@ -2351,13 +2234,11 @@ module.exports = {
     },
     "style": {
       "icon-opacity": {
-        "fn": "stops",
         "stops": [[12, 0], [12.25, 1]]
       }
     },
     "style.night": {
       "icon-opacity": {
-        "fn": "stops",
         "stops": [[12, 0], [12.25, 1]]
       }
     }
