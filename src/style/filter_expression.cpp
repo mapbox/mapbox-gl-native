@@ -1,5 +1,7 @@
-#include <llmr/style/filter_expression.hpp>
+#include <llmr/style/filter_expression_private.hpp>
 #include <llmr/map/vector_tile.hpp>
+
+#include <llmr/style/value_comparison.hpp>
 
 namespace llmr {
 
@@ -105,20 +107,6 @@ const std::string &FilterComparison::getField() const {
     return field;
 }
 
-inline bool FilterComparison::compare(const VectorTileTagExtractor &extractor) const {
-    const std::forward_list<Value> values = extractor.getValues(field);
-
-    // All instances are ANDed together.
-    for (const Instance &instance : instances) {
-        if (!instance.compare(values)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-
-
 std::ostream& operator <<(std::ostream &s, const FilterComparison &comparison) {
     s << "comparison" << std::endl;
     for (const FilterComparison::Instance &instance : comparison.instances) {
@@ -183,71 +171,6 @@ std::ostream& operator <<(std::ostream &s, FilterExpression::GeometryType type) 
     return s;
 }
 
-
-
-bool FilterExpression::compare(const VectorTileTagExtractor &extractor) const {
-    if (type != GeometryType::Any && extractor.getType() != type && extractor.getType() != GeometryType::Any) {
-        return false;
-    }
-
-    switch (op) {
-    case Operator::And:
-        for (const FilterComparison &comparison : comparisons) {
-            if (!comparison.compare(extractor)) {
-                return false;
-            }
-        }
-        for (const FilterExpression &expression: expressions) {
-            if (!expression.compare(extractor)) {
-                return false;
-            }
-        }
-        return true;
-    case Operator::Or:
-        for (const FilterComparison &comparison : comparisons) {
-            if (comparison.compare(extractor)) {
-                return true;
-            }
-        }
-        for (const FilterExpression &expression: expressions) {
-            if (expression.compare(extractor)) {
-                return true;
-            }
-        }
-        return false;
-    case Operator::Xor: {
-        int count = 0;
-        for (const FilterComparison &comparison : comparisons) {
-            count += comparison.compare(extractor);
-            if (count > 1) {
-                return false;
-            }
-        }
-        for (const FilterExpression &expression: expressions) {
-            count += expression.compare(extractor);
-            if (count > 1) {
-                return false;
-            }
-        }
-        return count == 1;
-    }
-    case Operator::Nor:
-        for (const FilterComparison &comparison : comparisons) {
-            if (comparison.compare(extractor)) {
-                return false;
-            }
-        }
-        for (const FilterExpression &expression: expressions) {
-            if (expression.compare(extractor)) {
-                return false;
-            }
-        }
-        return true;
-    default:
-        return true;
-    }
-}
-
 bool FilterExpression::empty() const {
     return type == GeometryType::Any && comparisons.empty() && expressions.empty();
 }
@@ -280,5 +203,9 @@ std::ostream& operator <<(std::ostream &s, const FilterExpression &expression) {
     s << "end expression" << std::endl;
     return s;
 }
+
+// Explicit instantiation
+template bool FilterComparison::compare(const VectorTileTagExtractor &extractor) const;
+template bool FilterExpression::compare(const VectorTileTagExtractor &extractor) const;
 
 }
