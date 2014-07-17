@@ -51,6 +51,11 @@ struct relaxed_equal_operator {
     inline bool operator()(T0 lhs, T1 rhs) const { return lhs == rhs; }
 };
 
+struct relaxed_not_equal_operator {
+    template <typename T0, typename T1>
+    inline bool operator()(T0 lhs, T1 rhs) const { return lhs != rhs; }
+};
+
 struct relaxed_greater_operator {
     template <typename T0, typename T1>
     inline bool operator()(T0 lhs, T1 rhs) const { return lhs > rhs; }
@@ -75,6 +80,10 @@ struct relaxed_less_equal_operator {
 
 inline bool relaxed_equal(Value const &lhs, Value const &rhs) {
     return apply_visitor(detail::relaxed_operator_visitor<detail::relaxed_equal_operator>(), lhs, rhs);
+}
+
+inline bool relaxed_not_equal(Value const &lhs, Value const &rhs) {
+    return apply_visitor(detail::relaxed_operator_visitor<detail::relaxed_not_equal_operator>(), lhs, rhs);
 }
 
 inline bool relaxed_greater(Value const &lhs, Value const &rhs) {

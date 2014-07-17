@@ -203,12 +203,11 @@ void VectorTileTagExtractor::setTags(const pbf &pbf) {
     tags_ = pbf;
 }
 
-std::forward_list<Value> VectorTileTagExtractor::getValues(const std::string &key) const {
-    std::forward_list<Value> values;
+std::vector<Value> VectorTileTagExtractor::getValues(const std::string &key) const {
+    std::vector<Value> values;
 
     auto field_it = layer_.key_index.find(key);
     if (field_it != layer_.key_index.end()) {
-        auto it = values.before_begin();
         const uint32_t filter_key = field_it->second;
 
         // Now loop through all the key/value pair tags.
@@ -227,7 +226,7 @@ std::forward_list<Value> VectorTileTagExtractor::getValues(const std::string &ke
 
             if (tag_key == filter_key) {
                 if (layer_.values.size() > tag_val) {
-                    it = values.emplace_after(it, layer_.values[tag_val]);
+                    values.emplace_back(layer_.values[tag_val]);
                 } else {
                     fprintf(stderr, "[WARNING] feature references out of range value\n");
                     break;

@@ -91,7 +91,7 @@ private:
     FilterExpression parseFilter(JSVal, FilterExpression::Operator op);
     FilterExpression parseFilter(JSVal);
     Value parseValue(JSVal value);
-    std::forward_list<Value> parseValues(JSVal values);
+    std::vector<Value> parseValues(JSVal values);
 
 private:
     std::unordered_map<std::string, const rapidjson::Value *> constants;

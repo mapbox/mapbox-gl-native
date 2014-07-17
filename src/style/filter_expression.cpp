@@ -3,13 +3,14 @@
 
 #include <llmr/style/value_comparison.hpp>
 
+#include <ostream>
+
 namespace llmr {
 
 
-template <typename Comparer>
-inline bool FilterComparison::Instance::includes(const Value &property_value, const Comparer &comparer) const {
-    for (const Value &filter_value : values) {
-        if (comparer(property_value, filter_value)) {
+inline bool includes(const Value &property_value, const std::vector<Value> &filter_values) {
+    for (const Value &filter_value : filter_values) {
+        if (util::relaxed_equal(property_value, filter_value)) {
             return true;
         }
     }
@@ -17,8 +18,8 @@ inline bool FilterComparison::Instance::includes(const Value &property_value, co
 }
 
 template <typename Comparer>
-inline bool FilterComparison::Instance::compare(const Value &property_value, const Comparer &comparer) const {
-    for (const Value &filter_value : values) {
+inline bool compare(const Value &property_value, const std::vector<Value> &filter_values, const Comparer &comparer) {
+    for (const Value &filter_value : filter_values) {
         if (!comparer(property_value, filter_value)) {
             return false;
         }
@@ -27,9 +28,9 @@ inline bool FilterComparison::Instance::compare(const Value &property_value, con
 }
 
 template <typename Comparer>
-inline bool FilterComparison::Instance::all(const std::forward_list<Value> &property_values, const Comparer &comparer) const {
+inline bool all(const std::vector<Value> &property_values, const std::vector<Value> &filter_values, const Comparer &comparer) {
     for (const Value &property_value : property_values) {
-        if (!compare(property_value, comparer)) {
+        if (!compare(property_value, filter_values, comparer)) {
             return false;
         }
     }
@@ -37,66 +38,54 @@ inline bool FilterComparison::Instance::all(const std::forward_list<Value> &prop
 }
 
 
-
-bool FilterComparison::Instance::compare(const Value &property_value) const {
-    switch (op) {
-        case Operator::Equal:
-        case Operator::In:
-            return includes(property_value, util::relaxed_equal);
-        case Operator::NotEqual:
-        case Operator::NotIn:
-            return !includes(property_value, util::relaxed_equal);
-        case Operator::Greater:
-            return compare(property_value, util::relaxed_greater);
-        case Operator::GreaterEqual:
-            return compare(property_value, util::relaxed_greater_equal);
-        case Operator::Less:
-            return compare(property_value, util::relaxed_less);
-        case Operator::LessEqual:
-            return compare(property_value, util::relaxed_less_equal);
-        default:
+inline bool set_equal(const std::vector<Value> &property_values, const std::vector<Value> &filter_values) {
+    for (const Value &property_value : property_values) {
+        if (!includes(property_value, filter_values)) {
             return false;
+        }
     }
+    if (property_values.size() == filter_values.size()) {
+        // Optimization: When the count is the same, the set is guaranteed to be identical.
+        return true;
+    }
+    // Otherwise, check again for identical reverse-mapped values.
+    for (const Value &filter_value : filter_values) {
+        if (!includes(filter_value, property_values)) {
+            return false;
+        }
+    }
+    return true;
 }
 
-bool FilterComparison::Instance::compare(const std::forward_list<Value> &property_values) const {
+
+bool FilterComparison::Instance::compare(const std::vector<Value> &property_values) const {
     switch (op) {
         case Operator::Equal:
-            for (const Value &property_value : property_values) {
-                if (includes(property_value, util::relaxed_equal)) {
-                    return true;
-                }
-            }
-            return false;
+            return set_equal(property_values, values);
         case Operator::NotEqual:
-            for (const Value &property_value : property_values) {
-                if (includes(property_value, util::relaxed_equal)) {
-                    return false;
-                }
-            }
-            return true;
+            return !set_equal(property_values, values);
         case Operator::In:
             for (const Value &property_value : property_values) {
-                if (includes(property_value, util::relaxed_equal)) {
+                if (includes(property_value, values)) {
                     return true;
                 }
             }
             return false;
         case Operator::NotIn:
             for (const Value &property_value : property_values) {
-                if (!includes(property_value, util::relaxed_equal)) {
+                if (!includes(property_value, values)) {
                     return true;
                 }
             }
             return false;
         case Operator::Greater:
-            return all(property_values, util::relaxed_greater);
+            return all(property_values, values, util::relaxed_greater);
         case Operator::GreaterEqual:
-            return all(property_values, util::relaxed_greater_equal);
+            return all(property_values, values, util::relaxed_greater_equal);
         case Operator::Less:
-            return all(property_values, util::relaxed_less);
+            return all(property_values, values, util::relaxed_less);
         case Operator::LessEqual:
-            return all(property_values, util::relaxed_less_equal);
+            return all(property_values, values, util::relaxed_less_equal);
         default:
             return false;
     }
@@ -176,11 +165,11 @@ bool FilterExpression::empty() const {
 }
 
 void FilterExpression::add(const FilterComparison &comparison) {
-    comparisons.emplace_front(comparison);
+    comparisons.emplace_back(comparison);
 }
 
 void FilterExpression::add(const FilterExpression &expression) {
-    expressions.emplace_front(expression);
+    expressions.emplace_back(expression);
 }
 
 void FilterExpression::setGeometryType(GeometryType g) {

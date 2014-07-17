@@ -792,7 +792,7 @@ FilterExpression StyleParser::parseFilter(JSVal value, FilterExpression::Operato
                 } else if (filterValue.IsArray()) {
                     comparison.add(FilterComparison::Operator::In, parseValues(filterValue));
                 } else {
-                    comparison.add(FilterComparison::Operator::Equal, std::forward_list<Value>({ parseValue(filterValue) }));
+                    comparison.add(FilterComparison::Operator::Equal, std::vector<Value>({ parseValue(filterValue) }));
                 }
                 expression.add(comparison);
             }
@@ -830,15 +830,14 @@ Value StyleParser::parseValue(JSVal value) {
     }
 }
 
-std::forward_list<Value> StyleParser::parseValues(JSVal value) {
-    std::forward_list<Value> values;
+std::vector<Value> StyleParser::parseValues(JSVal value) {
+    std::vector<Value> values;
     if (value.IsArray()) {
-        auto it = values.before_begin();
         for (rapidjson::SizeType i = 0; i < value.Size(); i++) {
-            it = values.emplace_after(it, parseValue(replaceConstant(value[i])));
+            values.emplace_back(parseValue(replaceConstant(value[i])));
         }
     } else {
-        values.emplace_front(parseValue(value));
+        values.emplace_back(parseValue(value));
     }
     return values;
 }

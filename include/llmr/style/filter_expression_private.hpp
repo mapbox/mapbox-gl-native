@@ -7,7 +7,7 @@ namespace llmr {
 
 template <typename Extractor>
 inline bool FilterComparison::compare(const Extractor &extractor) const {
-    const std::forward_list<Value> values = extractor.getValues(field);
+    const std::vector<Value> values = extractor.getValues(field);
 
     // All instances are ANDed together.
     for (const Instance &instance : instances) {

@@ -46,7 +46,7 @@ public:
     VectorTileTagExtractor(const VectorTileLayer &layer);
 
     void setTags(const pbf &pbf);
-    std::forward_list<Value> getValues(const std::string &key) const;
+    std::vector<Value> getValues(const std::string &key) const;
     void setType(FilterExpression::GeometryType type);
     FilterExpression::GeometryType getType() const;
 
