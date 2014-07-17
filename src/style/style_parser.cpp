@@ -2,6 +2,7 @@
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
 namespace mbgl {
@@ -713,6 +714,24 @@ void StyleParser::parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer) {
     if (value.HasMember("render")) {
         JSVal value_render = replaceConstant(value["render"]);
         parseRender(value_render, layer);
+    }
+
+    if (value.HasMember("min-zoom")) {
+        JSVal min_zoom = value["min-zoom"];
+        if (min_zoom.IsNumber()) {
+            layer->bucket->min_zoom = min_zoom.GetDouble();
+        } else {
+            Log::Warning(Event::ParseStyle, "min-zoom of layer %s must be numeric", layer->id.c_str());
+        }
+    }
+
+    if (value.HasMember("max-zoom")) {
+        JSVal max_zoom = value["max-zoom"];
+        if (max_zoom.IsNumber()) {
+            layer->bucket->min_zoom = max_zoom.GetDouble();
+        } else {
+            Log::Warning(Event::ParseStyle, "max-zoom of layer %s must be numeric", layer->id.c_str());
+        }
     }
 }
 

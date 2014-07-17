@@ -79,6 +79,8 @@ public:
     std::string source_layer;
     FilterExpression filter;
     StyleBucketRender render = std::false_type();
+    float min_zoom = -std::numeric_limits<float>::infinity();
+    float max_zoom = std::numeric_limits<float>::infinity();
 };
 
 
