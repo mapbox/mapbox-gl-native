@@ -1,7 +1,7 @@
 #include <iostream>
 #include "gtest/gtest.h"
 
-#include <llmr/style/filter_expression.hpp>
+#include <llmr/style/filter_comparison_private.hpp>
 #include <llmr/style/filter_expression_private.hpp>
 
 #include <map>

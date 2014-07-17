@@ -2,21 +2,9 @@
 #define LLMR_STYLE_FILTER_EXPRESSION_PRIVATE
 
 #include "filter_expression.hpp"
+#include "filter_comparison_private.hpp"
 
 namespace llmr {
-
-template <typename Extractor>
-inline bool FilterComparison::compare(const Extractor &extractor) const {
-    const std::vector<Value> values = extractor.getValues(field);
-
-    // All instances are ANDed together.
-    for (const Instance &instance : instances) {
-        if (!instance.compare(values)) {
-            return false;
-        }
-    }
-    return true;
-}
 
 template <typename Extractor>
 bool FilterExpression::compare(const Extractor &extractor) const {

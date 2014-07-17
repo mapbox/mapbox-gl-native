@@ -123,15 +123,15 @@
         ]
     },
     {
-        "target_name": "expressions",
-        "product_name": "test_expressions",
+        "target_name": "comparisons",
+        "product_name": "test_comparisons",
         "type": "executable",
         "libraries": [
             "-lpthread",
         ],
         "sources": [
             "./main.cpp",
-            "./expressions.cpp",
+            "./comparisons.cpp",
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
@@ -204,7 +204,7 @@
           "tile",
           "functions",
           "headless",
-          "expressions",
+          "comparisons",
         ],
     }
   ]

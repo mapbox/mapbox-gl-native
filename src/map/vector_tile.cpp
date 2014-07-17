@@ -1,4 +1,6 @@
 #include <llmr/map/vector_tile.hpp>
+#include <llmr/style/filter_expression_private.hpp>
+#include <llmr/style/filter_comparison_private.hpp>
 
 #include <algorithm>
 #include <iostream>
