@@ -1,6 +1,8 @@
 #include "headless_view.hpp"
 #include <mbgl/util/timer.hpp>
 
+#include <stdexcept>
+
 namespace mbgl {
 
 HeadlessView::HeadlessView() {
