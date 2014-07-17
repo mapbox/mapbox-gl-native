@@ -11,7 +11,7 @@ module.exports = function() {
 
     json.constants = Object.keys(json.constants).reduce(function(obj, key, index) {
       var value = json.constants[key];
-      if (typeof value === 'object' && value.hasOwnProperty('fn')) {
+      if (typeof value === 'object' && value.hasOwnProperty('stops')) {
         var mutator = fuzzer.mutate.object(value);
         obj[key] = mutator();
       }

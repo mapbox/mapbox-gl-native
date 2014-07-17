@@ -18,7 +18,7 @@ void checkMessages(const FixtureLogBackend &log, Messages messages) {
             it.second
         };
 
-        ASSERT_EQ(it.first, log.count(message)) << "Message: "
+        EXPECT_EQ(it.first, log.count(message)) << "Message: "
             << message << std::endl;
     }
 
@@ -75,8 +75,8 @@ TEST(Style, Functions) {
     style.loadJSON((const uint8_t *)stylejson.str().c_str());
 
     checkMessages(log, {
-        {48, "stop must have zoom level and value specification"},
-        {10, "stops function must specify a stops array"}
+        {28, "stop must have zoom level and value specification"},
+        {12, "function must specify a function type"}
     });
 }
 
@@ -92,16 +92,10 @@ TEST(Style, Layers) {
     style.loadJSON((const uint8_t *)stylejson.str().c_str());
 
     checkMessages(log, {
-        {14, "stop must have zoom level and value specification"},
-        {7, "function must specify a function name"},
-        {6, "value of 'line-width' must be a number, or a number function"},
-        {3, "stops function must specify a stops array"},
-        {2, "function type 'ss' is unknown"},
+        {20, "stop must have zoom level and value specification"},
+        {6, "function must specify a function type"},
+        {1, "value of 'line-width' must be a number, or a number function"},
         {1, "array value has unexpected number of elements"},
-        {1, "function type 'spots' is unknown"},
-        {1, "function type 'sItops' is unknown"},
-        {1, "function type 'st1tops' is unknown"},
-        {1, "function type 'sto' is unknown"},
-        {1, "function type 'sRlix4tops' is unknown"}
+        {1, "value of 'line-opacity' must be a number, or a number function"}
     });
 }
