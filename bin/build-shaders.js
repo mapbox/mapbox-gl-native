@@ -5,7 +5,7 @@ var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 
-try { var glsl = require('glsl-optimizer'); } catch(err) {}
+try { var glsl = require('mapbox-glsl-optimizer'); } catch(err) {}
 
 module.exports = function(shader_type, prefix, suffix) {
     var name;
