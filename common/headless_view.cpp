@@ -1,6 +1,8 @@
 #include "headless_view.hpp"
 #include <llmr/util/timer.hpp>
 
+namespace llmr {
+
 HeadlessView::HeadlessView() {
 #if LLMR_USE_CGL
     // TODO: test if OpenGL 4.1 with GL_ARB_ES2_compatibility is supported
