@@ -1,9 +1,9 @@
-#include <llmr/renderer/painter.hpp>
-#include <llmr/renderer/line_bucket.hpp>
-#include <llmr/style/style_layer.hpp>
-#include <llmr/map/map.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/line_bucket.hpp>
+#include <mbgl/style/style_layer.hpp>
+#include <mbgl/map/map.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
     // Abort early.

@@ -83,10 +83,10 @@ module.exports = function(shader_type, prefix, suffix) {
     }
 
     var header = '// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.\n\n';
-    header += '#ifndef LLMR_SHADER_SHADERS\n';
-    header += '#define LLMR_SHADER_SHADERS\n';
+    header += '#ifndef MBGL_SHADER_SHADERS\n';
+    header += '#define MBGL_SHADER_SHADERS\n';
     header += '\n';
-    header += 'namespace llmr {\n';
+    header += 'namespace mbgl {\n';
     header += '\n';
     header += 'struct shader_source {\n';
     header += '    const char *vertex;\n';
@@ -106,18 +106,19 @@ module.exports = function(shader_type, prefix, suffix) {
 
 
     var code = '// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.\n';
-    code += '#include <llmr/platform/gl.hpp>\n';
+    code += '#include <mbgl/platform/gl.hpp>\n';
     code += prefix + '\n';
-    code += '#include <llmr/shader/shaders.hpp>\n';
+    code += '#include <mbgl/shader/shaders.hpp>\n';
     code += '\n';
-    code += 'using namespace llmr;\n';
+    code += 'namespace mbgl {\n';
     code += '\n';
-    code += 'const shader_source llmr::shaders[SHADER_COUNT] = {\n';
+    code += 'const shader_source shaders[SHADER_COUNT] = {\n';
     code += lines.join(',\n');
     code += '\n};\n';
+    code += '\n}\n';
     code += suffix + '\n';
 
-    var header_path = path.join(process.argv[2], 'include/llmr/shader/shaders.hpp');
+    var header_path = path.join(process.argv[2], 'include/mbgl/shader/shaders.hpp');
     mkdirp.sync(path.dirname(header_path));
     fs.writeFileSync(header_path, header);
     console.warn('wrote file ' + header_path);

@@ -1,6 +1,6 @@
-#include <llmr/text/collision.hpp>
-#include <llmr/text/rotation_range.hpp>
-#include <llmr/util/math.hpp>
+#include <mbgl/text/collision.hpp>
+#include <mbgl/text/rotation_range.hpp>
+#include <mbgl/util/math.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -14,7 +14,7 @@
 #include <boost/geometry/index/rtree.hpp>
 #pragma GCC diagnostic pop
 
-namespace llmr {
+namespace mbgl {
 namespace bg = boost::geometry;
 namespace bgm = bg::model;
 namespace bgi = bg::index;
@@ -24,7 +24,7 @@ typedef std::pair<Box, PlacementBox> PlacementValue;
 typedef bgi::rtree<PlacementValue, bgi::rstar<16>> Tree;
 }
 
-using namespace llmr;
+using namespace mbgl;
 
 Collision::~Collision() {
     delete ((Tree *)cTree);

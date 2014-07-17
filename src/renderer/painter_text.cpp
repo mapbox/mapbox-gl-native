@@ -1,11 +1,11 @@
-#include <llmr/renderer/painter.hpp>
-#include <llmr/renderer/text_bucket.hpp>
-#include <llmr/style/style_layer.hpp>
-#include <llmr/map/map.hpp>
-#include <llmr/util/math.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/text_bucket.hpp>
+#include <mbgl/style/style_layer.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/util/math.hpp>
 #include <cmath>
 
-using namespace llmr;
+using namespace mbgl;
 
 void Painter::renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
     // Abort early.

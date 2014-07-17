@@ -1,8 +1,8 @@
-#include <llmr/map/map.hpp>
-#include <llmr/map/raster_tile_data.hpp>
-#include <llmr/style/style.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/map/raster_tile_data.hpp>
+#include <mbgl/style/style.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 
 RasterTileData::RasterTileData(Tile::ID id, Map &map, const std::string url)

@@ -1,10 +1,10 @@
-#include <llmr/shader/raster_shader.hpp>
-#include <llmr/shader/shaders.hpp>
-#include <llmr/platform/gl.hpp>
+#include <mbgl/shader/raster_shader.hpp>
+#include <mbgl/shader/shaders.hpp>
+#include <mbgl/platform/gl.hpp>
 
 #include <cstdio>
 
-using namespace llmr;
+using namespace mbgl;
 
 RasterShader::RasterShader()
     : Shader(

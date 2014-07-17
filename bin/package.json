@@ -1,5 +1,5 @@
 {
-  "name": "llmr-native",
+  "name": "mbgl-native",
   "version": "0.0.1",
   "dependencies": {
     "brfs": "^1.1.2",

@@ -1,10 +1,10 @@
-#include <llmr/geometry/text_buffer.hpp>
-#include <llmr/platform/gl.hpp>
-#include <llmr/util/math.hpp>
+#include <mbgl/geometry/text_buffer.hpp>
+#include <mbgl/platform/gl.hpp>
+#include <mbgl/util/math.hpp>
 
 #include <cmath>
 
-using namespace llmr;
+using namespace mbgl;
 
 const double TextVertexBuffer::angleFactor = 128.0 / M_PI;
 

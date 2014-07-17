@@ -1,28 +1,28 @@
-#include <llmr/map/map.hpp>
-#include <llmr/map/source.hpp>
-#include <llmr/platform/platform.hpp>
-#include <llmr/map/sprite.hpp>
-#include <llmr/util/transition.hpp>
-#include <llmr/util/time.hpp>
-#include <llmr/util/math.hpp>
-#include <llmr/util/clip_ids.hpp>
-#include <llmr/util/string.hpp>
-#include <llmr/util/constants.hpp>
-#include <llmr/util/uv.hpp>
-#include <llmr/util/std.hpp>
-#include <llmr/style/style_layer_group.hpp>
-#include <llmr/style/style_bucket.hpp>
-#include <llmr/geometry/sprite_atlas.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/map/source.hpp>
+#include <mbgl/platform/platform.hpp>
+#include <mbgl/map/sprite.hpp>
+#include <mbgl/util/transition.hpp>
+#include <mbgl/util/time.hpp>
+#include <mbgl/util/math.hpp>
+#include <mbgl/util/clip_ids.hpp>
+#include <mbgl/util/string.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/uv.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/style/style_bucket.hpp>
+#include <mbgl/geometry/sprite_atlas.hpp>
 
 #include <algorithm>
 #include <memory>
 #include <iostream>
 
-using namespace llmr;
+using namespace mbgl;
 
 Map::Map(View& view)
     : view(view),
-      transform(),
+      transform(view),
       style(std::make_shared<Style>()),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
@@ -97,6 +97,7 @@ void Map::run() {
     // If the map rendering wasn't started asynchronously, we perform one render
     // *after* all events have been processed.
     if (!async) {
+        prepare();
         render();
     }
 }

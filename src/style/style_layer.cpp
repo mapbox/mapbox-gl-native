@@ -1,9 +1,9 @@
-#include <llmr/style/style_layer.hpp>
-#include <llmr/style/style_bucket.hpp>
-#include <llmr/style/style_layer_group.hpp>
-#include <llmr/style/property_fallback.hpp>
+#include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/style_bucket.hpp>
+#include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/style/property_fallback.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 StyleLayer::StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles,
                        std::unique_ptr<const RasterizeProperties> &&rasterize)

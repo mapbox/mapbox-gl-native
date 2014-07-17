@@ -1,7 +1,8 @@
-#ifndef LLMR_COMMON_GLFW_VIEW
-#define LLMR_COMMON_GLFW_VIEW
+#ifndef MBGL_COMMON_GLFW_VIEW
+#define MBGL_COMMON_GLFW_VIEW
 
-#include <llmr/llmr.hpp>
+#include <mbgl/mbgl.hpp>
+#include <mbgl/util/time.hpp>
 
 #ifdef NVIDIA
 #define GLFW_INCLUDE_ES2
@@ -10,14 +11,15 @@
 
 #include <uv.h>
 
-class GLFWView : public llmr::View {
+class GLFWView : public mbgl::View {
 public:
     GLFWView(bool fullscreen = false);
     ~GLFWView();
 
-    void initialize(llmr::Map *map);
+    void initialize(mbgl::Map *map);
     void swap();
     void make_active();
+    void notify_map_change(mbgl::MapChange change, mbgl::timestamp delay = 0);
 
     static void key(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void scroll(GLFWwindow *window, double xoffset, double yoffset);

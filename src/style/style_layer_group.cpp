@@ -1,7 +1,7 @@
 
-#include <llmr/style/style_layer_group.hpp>
+#include <mbgl/style/style_layer_group.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 void StyleLayerGroup::setClasses(const std::vector<std::string> &class_names, timestamp now,
                                  const PropertyTransition &defaultTransition) {

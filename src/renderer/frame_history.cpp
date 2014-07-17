@@ -1,6 +1,6 @@
-#include <llmr/renderer/frame_history.hpp>
+#include <mbgl/renderer/frame_history.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 // Record frame history that will be used to calculate fading params
 void FrameHistory::record(timestamp now, float zoom) {

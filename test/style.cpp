@@ -1,12 +1,12 @@
 #include "gtest/gtest.h"
 
-#include <llmr/style/style.hpp>
+#include <mbgl/style/style.hpp>
 #include "./fixtures/fixture_log.hpp"
 
 #include <iostream>
 #include <fstream>
 
-using namespace llmr;
+using namespace mbgl;
 
 typedef std::vector<std::pair<uint32_t, std::string>> Messages;
 

@@ -1,8 +1,8 @@
-#include <llmr/map/tile.hpp>
+#include <mbgl/map/tile.hpp>
 
 #include <cassert>
 
-using namespace llmr;
+using namespace mbgl;
 
 #include <iostream>
 

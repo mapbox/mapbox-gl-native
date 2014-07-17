@@ -1,16 +1,16 @@
-#include <llmr/text/glyph_store.hpp>
+#include <mbgl/text/glyph_store.hpp>
 
-#include <llmr/util/std.hpp>
-#include <llmr/util/string.hpp>
-#include <llmr/util/utf.hpp>
-#include <llmr/util/pbf.hpp>
-#include <llmr/util/constants.hpp>
-#include <llmr/util/token.hpp>
-#include <llmr/platform/platform.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/string.hpp>
+#include <mbgl/util/utf.hpp>
+#include <mbgl/util/pbf.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/token.hpp>
+#include <mbgl/platform/platform.hpp>
 #include <uv.h>
 #include <algorithm>
 
-namespace llmr {
+namespace mbgl {
 
 
 void FontStack::insert(uint32_t id, const SDFGlyph &glyph) {

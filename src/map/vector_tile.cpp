@@ -1,12 +1,14 @@
-#include <llmr/map/vector_tile.hpp>
+#include <mbgl/map/vector_tile.hpp>
+#include <mbgl/style/filter_expression_private.hpp>
+#include <mbgl/style/filter_comparison_private.hpp>
 
 #include <algorithm>
 #include <iostream>
 
-using namespace llmr;
+using namespace mbgl;
 
 
-std::ostream& llmr::operator<<(std::ostream& os, const FeatureType& type) {
+std::ostream& mbgl::operator<<(std::ostream& os, const FeatureType& type) {
     switch (type) {
         case FeatureType::Unknown: return os << "Unknown";
         case FeatureType::Point: return os << "Point";
@@ -52,7 +54,7 @@ VectorTileFeature::VectorTileFeature(pbf feature, const VectorTileLayer& layer) 
 }
 
 
-std::ostream& llmr::operator<<(std::ostream& os, const VectorTileFeature& feature) {
+std::ostream& mbgl::operator<<(std::ostream& os, const VectorTileFeature& feature) {
     os << "Feature(" << feature.id << "): " << feature.type << std::endl;
     for (const auto& prop : feature.properties) {
         os << "  - " << prop.first << ": " << prop.second << std::endl;
@@ -203,12 +205,11 @@ void VectorTileTagExtractor::setTags(const pbf &pbf) {
     tags_ = pbf;
 }
 
-std::forward_list<Value> VectorTileTagExtractor::getValues(const std::string &key) const {
-    std::forward_list<Value> values;
+std::vector<Value> VectorTileTagExtractor::getValues(const std::string &key) const {
+    std::vector<Value> values;
 
     auto field_it = layer_.key_index.find(key);
     if (field_it != layer_.key_index.end()) {
-        auto it = values.before_begin();
         const uint32_t filter_key = field_it->second;
 
         // Now loop through all the key/value pair tags.
@@ -227,7 +228,7 @@ std::forward_list<Value> VectorTileTagExtractor::getValues(const std::string &ke
 
             if (tag_key == filter_key) {
                 if (layer_.values.size() > tag_val) {
-                    it = values.emplace_after(it, layer_.values[tag_val]);
+                    values.emplace_back(layer_.values[tag_val]);
                 } else {
                     fprintf(stderr, "[WARNING] feature references out of range value\n");
                     break;

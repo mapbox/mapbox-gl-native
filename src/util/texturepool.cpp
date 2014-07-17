@@ -1,10 +1,10 @@
-#include <llmr/util/texturepool.hpp>
+#include <mbgl/util/texturepool.hpp>
 
 #include <vector>
 
 const int TextureMax = 64;
 
-using namespace llmr;
+using namespace mbgl;
 
 GLuint Texturepool::getTextureID() {
     if (texture_ids.empty()) {

@@ -8,7 +8,7 @@ GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {
 
 GLFWView::~GLFWView() { glfwTerminate(); }
 
-void GLFWView::initialize(llmr::Map *map) {
+void GLFWView::initialize(mbgl::Map *map) {
     View::initialize(map);
 
     if (!glfwInit()) {
@@ -34,7 +34,7 @@ void GLFWView::initialize(llmr::Map *map) {
     glfwWindowHint(GLFW_STENCIL_BITS, 8);
     glfwWindowHint(GLFW_DEPTH_BITS, 16);
 
-    window = glfwCreateWindow(1024, 768, "llmr", monitor, NULL);
+    window = glfwCreateWindow(1024, 768, "Mapbox GL", monitor, NULL);
     if (!window) {
         glfwTerminate();
         fprintf(stderr, "Failed to initialize window\n");
@@ -194,6 +194,10 @@ void GLFWView::swap() {
     glfwPostEmptyEvent();
 }
 
+void GLFWView::notify_map_change(mbgl::MapChange change, mbgl::timestamp delay) {
+    // no-op
+}
+
 void GLFWView::fps() {
     static int frames = 0;
     static double time_elapsed = 0;
@@ -208,7 +212,7 @@ void GLFWView::fps() {
     }
 }
 
-namespace llmr {
+namespace mbgl {
 namespace platform {
 
 double elapsed() { return glfwGetTime(); }
@@ -280,10 +284,6 @@ void show_color_debug_image(std::string name, const char *data, size_t logical_w
     glfwMakeContextCurrent(current_window);
 }
 #endif
-
-void notify_map_change(MapChange change) {
-    // no-op
-}
 
 }
 }

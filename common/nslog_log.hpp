@@ -1,9 +1,9 @@
-#ifndef LLMR_COMMON_NSLOG_LOG
-#define LLMR_COMMON_NSLOG_LOG
+#ifndef MBGL_COMMON_NSLOG_LOG
+#define MBGL_COMMON_NSLOG_LOG
 
-#include <llmr/platform/log.hpp>
+#include <mbgl/platform/log.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 class NSLogBackend : public LogBackend {
 public:

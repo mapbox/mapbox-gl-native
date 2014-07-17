@@ -1,6 +1,6 @@
-#include <llmr/style/applied_class_properties.hpp>
+#include <mbgl/style/applied_class_properties.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 AppliedClassProperty::AppliedClassProperty(ClassID class_id, timestamp begin, timestamp end, const PropertyValue &value)
     : name(class_id),

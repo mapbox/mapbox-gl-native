@@ -1,4 +1,4 @@
-#include <llmr/util/io.hpp>
+#include <mbgl/util/io.hpp>
 
 #include <cstdio>
 #include <iostream>
@@ -6,7 +6,7 @@
 #include <fstream>
 #include <stdexcept>
 
-namespace llmr {
+namespace mbgl {
 namespace util {
 
 void write_file(const std::string &filename, const std::string &data) {
@@ -15,7 +15,7 @@ void write_file(const std::string &filename, const std::string &data) {
         fwrite(data.data(), sizeof(std::string::value_type), data.size(), fd);
         fclose(fd);
     } else {
-        fprintf(stderr, "Failed to open file\n");
+        throw std::runtime_error(std::string("Failed to open file ") + filename);
     }
 }
 
@@ -26,7 +26,7 @@ std::string read_file(const std::string &filename) {
         data << file.rdbuf();
         return data.str();
     } else {
-        throw std::runtime_error("Cannot read file " + filename);
+        throw std::runtime_error(std::string("Cannot read file ") + filename);
     }
 }
 

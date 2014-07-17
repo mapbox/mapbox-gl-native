@@ -4,12 +4,12 @@
 #include <rapidjson/document.h>
 #include <stdio.h>
 
-using namespace llmr;
+using namespace mbgl;
 
 Settings_JSON::Settings_JSON() { load(); }
 
 void Settings_JSON::load() {
-    FILE *settingsFile = fopen("/tmp/llmr-native.json", "r");
+    FILE *settingsFile = fopen("/tmp/mbgl-native.json", "r");
     if (settingsFile != NULL) {
         rapidjson::FileStream is(settingsFile);
         rapidjson::Document document;
@@ -26,7 +26,7 @@ void Settings_JSON::load() {
 
 void Settings_JSON::save() {
 
-    rapidjson::FileStream s(fopen("/tmp/llmr-native.json", "w"));
+    rapidjson::FileStream s(fopen("/tmp/mbgl-native.json", "w"));
     rapidjson::PrettyWriter<rapidjson::FileStream> writer(s);
     writer.StartArray();
     writer.Double(longitude);

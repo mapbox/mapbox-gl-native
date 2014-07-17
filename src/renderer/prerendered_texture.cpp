@@ -1,8 +1,8 @@
-#include <llmr/renderer/prerendered_texture.hpp>
+#include <mbgl/renderer/prerendered_texture.hpp>
 
-#include <llmr/renderer/painter.hpp>
+#include <mbgl/renderer/painter.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 PrerenderedTexture::PrerenderedTexture(const RasterizedProperties &properties)
     : properties(properties) {

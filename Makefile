@@ -12,9 +12,9 @@ config.gypi:
 	./setup-libraries.sh
 
 # Builds the regular library
-llmr: config.gypi llmr.gyp node
-	deps/run_gyp llmr.gyp --depth=. -Goutput_dir=.. --generator-output=./build/llmr -f make
-	$(MAKE) -C build/llmr BUILDTYPE=$(BUILDTYPE) V=$(V) llmr-x86
+mbgl: config.gypi mapboxgl.gyp node
+	deps/run_gyp mapboxgl.gyp --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
+	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mapboxgl
 
 node:
 	@if [ ! `which node` ]; then echo 'error: depends on node.js. please make sure node is on your PATH'; exit 1; fi;
@@ -40,8 +40,8 @@ xtest: config.gypi clear_xcode_cache node
 
 
 # Builds the linux app with make. This is also used by Travis CI
-linux: config.gypi linux/llmr-app.gyp node
-	deps/run_gyp linux/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
+linux: config.gypi linux/mapboxgl-app.gyp node
+	deps/run_gyp linux/mapboxgl-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
 	$(MAKE) -C build/linux BUILDTYPE=$(BUILDTYPE) V=$(V) linuxapp
 
 # Executes the Linux binary
@@ -51,8 +51,8 @@ run-linux: linux
 
 
 # Builds the OS X app with make.
-osx: config.gypi macosx/llmr-app.gyp node
-	deps/run_gyp macosx/llmr-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/macosx -f make
+osx: config.gypi macosx/mapboxgl-app.gyp node
+	deps/run_gyp macosx/mapboxgl-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/macosx -f make
 	$(MAKE) -C build/macosx BUILDTYPE=$(BUILDTYPE) V=$(V) osxapp
 
 # Executes the OS X binary
@@ -65,27 +65,27 @@ clear_xcode_cache:
     @CUSTOM_DD=`defaults read com.apple.dt.Xcode IDECustomDerivedDataLocation 2>/dev/null`; \
     if [[ $$CUSTOM_DD ]]; then \
         echo clearing files in $$CUSTOM_DD older than one day; \
-        find $$CUSTOM_DD/llmr-app-* -mtime +1 | xargs rm -rf; \
+        find $$CUSTOM_DD/mapboxgl-app-* -mtime +1 | xargs rm -rf; \
     fi; \
     if [[ -d ~/Library/Developer/Xcode/DerivedData/ ]] && [[ ! $$CUSTOM_DD ]]; then \
-        echo 'clearing files in ~/Library/Developer/Xcode/DerivedData/llmr-app-* older than one day'; \
-        find ~/Library/Developer/Xcode/DerivedData/llmr-app-* -mtime +1 | xargs rm -rf; \
+        echo 'clearing files in ~/Library/Developer/Xcode/DerivedData/mapboxgl-app-* older than one day'; \
+        find ~/Library/Developer/Xcode/DerivedData/mapboxgl-app-* -mtime +1 | xargs rm -rf; \
     fi
 
 # build Mac OS X project for Xcode
-xproj: config.gypi macosx/llmr-app.gyp clear_xcode_cache node
-	deps/run_gyp macosx/llmr-app.gyp --depth=. --generator-output=./build -f xcode
-	open ./build/macosx/llmr-app.xcodeproj
+xproj: config.gypi macosx/mapboxgl-app.gyp clear_xcode_cache node
+	deps/run_gyp macosx/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
+	open ./build/macosx/mapboxgl-app.xcodeproj
 
 # build iOS project for Xcode
-iproj: config.gypi ios/mapbox-gl-cocoa/app/llmr-app.gyp clear_xcode_cache node
-	deps/run_gyp ios/mapbox-gl-cocoa/app/llmr-app.gyp --depth=. --generator-output=./build -f xcode
-	open ./build/ios/mapbox-gl-cocoa/app/llmr-app.xcodeproj
+iproj: config.gypi ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp clear_xcode_cache node
+	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
+	open ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
 
 # build Linux project for Xcode (Runs on Mac OS X too, but without platform-specific code)
-lproj: config.gypi linux/llmr-app.gyp clear_xcode_cache node
-	deps/run_gyp linux/llmr-app.gyp --depth=. --generator-output=./build -f xcode
-	open ./build/linux/llmr-app.xcodeproj
+lproj: config.gypi linux/mapboxgl-app.gyp clear_xcode_cache node
+	deps/run_gyp linux/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
+	open ./build/linux/mapboxgl-app.xcodeproj
 
 
 ##### Maintenace operations ####################################################
@@ -101,4 +101,4 @@ distclean: clean
 	-rm -rf ./config.gypi
 	-rm -rf ./mapnik-packaging/osx/out/
 
-.PHONY: llmr test linux
+.PHONY: mbgl test linux

@@ -50,7 +50,7 @@ def pkg_config(pkg, pkgconfig_root):
 
   return (libs, cflags)
 
-def configure_llmr(o):
+def configure_mbgl(o):
   if options.boost_root:
       o['variables']['boost_root'] = options.boost_root
   else:
@@ -115,7 +115,7 @@ output = {
 }
 
 if __name__ == '__main__':
-  configure_llmr(output)
+  configure_mbgl(output)
   configure_glfw3(output)
   configure_uv(output)
   configure_png(output)

@@ -71,7 +71,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -87,7 +87,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -103,7 +103,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -121,7 +121,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86",
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -137,7 +137,23 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mapboxgl.gyp:mapboxgl"
+        ]
+    },
+    {
+        "target_name": "comparisons",
+        "product_name": "test_comparisons",
+        "type": "executable",
+        "libraries": [
+            "-lpthread",
+        ],
+        "sources": [
+            "./main.cpp",
+            "./comparisons.cpp",
+        ],
+        "dependencies": [
+            "../deps/gtest/gtest.gyp:gtest",
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -153,7 +169,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -169,7 +185,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86"
+            "../mapboxgl.gyp:mapboxgl"
         ]
     },
     {
@@ -190,9 +206,9 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../llmr.gyp:llmr-x86",
+            "../mapboxgl.gyp:mapboxgl",
             "link_gl",
-            '../llmr.gyp:copy_default_stylesheet',
+            '../mapboxgl.gyp:copy_default_stylesheet',
         ]
     },
     {
@@ -207,6 +223,7 @@
           "functions",
           "headless",
           "style",
+          "comparisons",
         ],
     }
   ]

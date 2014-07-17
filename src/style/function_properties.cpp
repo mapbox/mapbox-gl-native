@@ -1,9 +1,9 @@
-#include <llmr/style/function_properties.hpp>
-#include <llmr/style/types.hpp>
+#include <mbgl/style/function_properties.hpp>
+#include <mbgl/style/types.hpp>
 
 #include <cmath>
 
-namespace llmr {
+namespace mbgl {
 
 
 template <>

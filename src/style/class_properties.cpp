@@ -1,6 +1,6 @@
-#include <llmr/style/class_properties.hpp>
+#include <mbgl/style/class_properties.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 const PropertyTransition &ClassProperties::getTransition(PropertyKey key, const PropertyTransition &defaultTransition) const {
     auto it = transitions.find(key);

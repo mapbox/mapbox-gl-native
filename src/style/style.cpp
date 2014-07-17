@@ -1,16 +1,16 @@
-#include <llmr/style/style.hpp>
-#include <llmr/style/style_layer_group.hpp>
-#include <llmr/style/style_parser.hpp>
-#include <llmr/style/style_bucket.hpp>
-#include <llmr/util/constants.hpp>
-#include <llmr/util/time.hpp>
-#include <llmr/util/error.hpp>
+#include <mbgl/style/style.hpp>
+#include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/style/style_parser.hpp>
+#include <mbgl/style/style_bucket.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/time.hpp>
+#include <mbgl/util/error.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
 
 
-namespace llmr {
+namespace mbgl {
 
 Style::Style() {
 }

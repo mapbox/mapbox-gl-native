@@ -1,8 +1,8 @@
 
-#include <llmr/platform/platform.hpp>
-#include <llmr/platform/request.hpp>
-#include <llmr/util/uv.hpp>
-#include <llmr/util/std.hpp>
+#include <mbgl/platform/platform.hpp>
+#include <mbgl/platform/request.hpp>
+#include <mbgl/util/uv.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <queue>
 #include <boost/lockfree/queue.hpp>
@@ -47,7 +47,7 @@
    See http://nikhilm.github.com/uvbook/ for more information on libuv.
 */
 
-namespace llmr {
+namespace mbgl {
 namespace platform {
 namespace request {
 
@@ -66,8 +66,8 @@ static uv_async_t async_cancel;
 // Stores pointers (!) to shared_ptrs. We use shared_ptrs so that request objects don't get
 // auto-destructed while they're in progress. The TileData object retains a weak_ptr to this
 // request, so we have to use a shared_ptr here to ensure that this object stays alive.
-static boost::lockfree::queue<std::shared_ptr<llmr::platform::Request> *> add_queue(8);
-static boost::lockfree::queue<std::shared_ptr<llmr::platform::Request> *> cancel_queue(8);
+static boost::lockfree::queue<std::shared_ptr<mbgl::platform::Request> *> add_queue(8);
+static boost::lockfree::queue<std::shared_ptr<mbgl::platform::Request> *> cancel_queue(8);
 
 // Used as the CURL timer function to periodically check for socket updates.
 static uv_timer_t timeout;
@@ -85,10 +85,10 @@ static CURLSH *curl_share = nullptr;
 static std::queue<CURL *> curl_handle_cache;
 
 
-class CURLRequest : public llmr::platform::Request {
+class CURLRequest : public mbgl::platform::Request {
 public:
     CURLRequest(const std::string &url,
-                std::function<void(llmr::platform::Response *)> callback,
+                std::function<void(mbgl::platform::Response *)> callback,
                 std::shared_ptr<uv::loop> loop)
         : Request(url, callback, loop) {}
 
@@ -380,4 +380,4 @@ void platform::cancel_request_http(const std::shared_ptr<Request> &req) {
         uv_async_send(&async_cancel);
     }
 }
-} // end namespace llmr
+} // end namespace mbgl

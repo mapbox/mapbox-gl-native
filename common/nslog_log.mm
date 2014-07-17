@@ -4,7 +4,7 @@
 
 #include <cstdarg>
 
-namespace llmr {
+namespace mbgl {
 
 void NSLogBackend::record(EventSeverity severity, Event event, const std::string &msg) {
     NSLog(@"[%s] %s: %@", EventSeverityClass(severity).c_str(), EventClass(event).c_str(),

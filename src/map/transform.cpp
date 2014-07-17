@@ -1,20 +1,22 @@
-#include <llmr/map/transform.hpp>
-#include <llmr/util/constants.hpp>
-#include <llmr/util/mat4.hpp>
-#include <llmr/util/std.hpp>
-#include <llmr/util/math.hpp>
-#include <llmr/util/time.hpp>
-#include <llmr/platform/platform.hpp>
+#include <mbgl/map/transform.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/mat4.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/math.hpp>
+#include <mbgl/util/time.hpp>
+#include <mbgl/platform/platform.hpp>
 #include <cstdio>
 
-using namespace llmr;
+using namespace mbgl;
 
 const double D2R = M_PI / 180.0;
 const double R2D = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
 const double MIN_ROTATE_SCALE = 8;
 
-Transform::Transform() {
+Transform::Transform(View &view)
+    : view(view) {
+
     setScale(current.scale);
     setAngle(current.angle);
 }
@@ -28,7 +30,7 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
     if (final.width != w || final.height != h || final.pixelRatio != ratio ||
         final.framebuffer[0] != fb_w || final.framebuffer[1] != fb_h) {
 
-        platform::notify_map_change(platform::MapChangeRegionWillChange);
+        view.notify_map_change(MapChangeRegionWillChange);
 
         current.width = final.width = w;
         current.height = final.height = h;
@@ -38,7 +40,7 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         if (!canRotate() && current.angle) _setAngle(0);
         constrain(current.scale, current.y);
 
-        platform::notify_map_change(platform::MapChangeRegionDidChange);
+        view.notify_map_change(MapChangeRegionDidChange);
 
         return true;
     } else {
@@ -57,9 +59,9 @@ void Transform::moveBy(const double dx, const double dy, const timestamp duratio
 void Transform::_moveBy(const double dx, const double dy, const timestamp duration) {
     // This is only called internally, so we don't need a lock here.
 
-    platform::notify_map_change(duration ?
-                                platform::MapChangeRegionWillChangeAnimated :
-                                platform::MapChangeRegionWillChange);
+    view.notify_map_change(duration ?
+                           MapChangeRegionWillChangeAnimated :
+                           MapChangeRegionWillChange);
 
     final.x = current.x + std::cos(current.angle) * dx + std::sin(current.angle) * dy;
     final.y = current.y + std::cos(current.angle) * dy + std::sin(-current.angle) * dx;
@@ -84,9 +86,10 @@ void Transform::_moveBy(const double dx, const double dy, const timestamp durati
             std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
     }
 
-    platform::notify_map_change(duration ?
-                                platform::MapChangeRegionDidChangeAnimated :
-                                platform::MapChangeRegionDidChange);
+    view.notify_map_change(duration ?
+                           MapChangeRegionDidChangeAnimated :
+                           MapChangeRegionDidChange,
+                           duration);
 }
 
 void Transform::setLonLat(const double lon, const double lat, const timestamp duration) {
@@ -275,9 +278,9 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
                             const timestamp duration) {
     // This is only called internally, so we don't need a lock here.
 
-    platform::notify_map_change(duration ?
-                                platform::MapChangeRegionWillChangeAnimated :
-                                platform::MapChangeRegionWillChange);
+    view.notify_map_change(duration ?
+                           MapChangeRegionWillChangeAnimated :
+                           MapChangeRegionWillChange);
 
     final.scale = new_scale;
     final.x = xn;
@@ -308,9 +311,10 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     Bc = s / 360;
     Cc = s / (2 * M_PI);
 
-    platform::notify_map_change(duration ?
-                                platform::MapChangeRegionDidChangeAnimated :
-                                platform::MapChangeRegionDidChange);
+    view.notify_map_change(duration ?
+                           MapChangeRegionDidChangeAnimated :
+                           MapChangeRegionDidChange,
+                           duration);
 }
 
 #pragma mark - Constraints
@@ -386,9 +390,9 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
 void Transform::_setAngle(double new_angle, const timestamp duration) {
     // This is only called internally, so we don't need a lock here.
 
-    platform::notify_map_change(duration ?
-                                platform::MapChangeRegionWillChangeAnimated :
-                                platform::MapChangeRegionWillChange);
+    view.notify_map_change(duration ?
+                           MapChangeRegionWillChangeAnimated :
+                           MapChangeRegionWillChange);
 
     while (new_angle > M_PI)
         new_angle -= M2PI;
@@ -408,9 +412,10 @@ void Transform::_setAngle(double new_angle, const timestamp duration) {
             current.angle, final.angle, current.angle, start, duration));
     }
 
-    platform::notify_map_change(duration ?
-                                platform::MapChangeRegionDidChangeAnimated :
-                                platform::MapChangeRegionDidChange);
+    view.notify_map_change(duration ?
+                           MapChangeRegionDidChangeAnimated :
+                           MapChangeRegionDidChange,
+                           duration);
 }
 
 double Transform::getAngle() const {

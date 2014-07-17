@@ -1,7 +1,7 @@
-#ifndef LLMR_COMMON_SETTINGS_NSUSERDEFAULTS
-#define LLMR_COMMON_SETTINGS_NSUSERDEFAULTS
+#ifndef MBGL_COMMON_SETTINGS_NSUSERDEFAULTS
+#define MBGL_COMMON_SETTINGS_NSUSERDEFAULTS
 
-namespace llmr {
+namespace mbgl {
 
 class Settings_NSUserDefaults {
 public:

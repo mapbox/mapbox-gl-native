@@ -1,13 +1,13 @@
-#include <llmr/text/placement.hpp>
-#include <llmr/map/vector_tile.hpp>
-#include <llmr/geometry/interpolate.hpp>
-#include <llmr/renderer/text_bucket.hpp>
-#include <llmr/util/math.hpp>
-#include <llmr/util/constants.hpp>
+#include <mbgl/text/placement.hpp>
+#include <mbgl/map/vector_tile.hpp>
+#include <mbgl/geometry/interpolate.hpp>
+#include <mbgl/renderer/text_bucket.hpp>
+#include <mbgl/util/math.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <algorithm>
 
-using namespace llmr;
+using namespace mbgl;
 
 const int Placement::tileExtent = 4096;
 const int Placement::glyphSize =

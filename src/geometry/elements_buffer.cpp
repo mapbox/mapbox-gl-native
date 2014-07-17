@@ -1,6 +1,6 @@
-#include <llmr/geometry/elements_buffer.hpp>
+#include <mbgl/geometry/elements_buffer.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 void TriangleElementsBuffer::add(element_type a, element_type b, element_type c) {
     element_type *elements = static_cast<element_type *>(addElement());

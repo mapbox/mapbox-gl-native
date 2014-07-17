@@ -3,10 +3,10 @@
 
 #include <algorithm>
 
-#include <llmr/util/clip_ids.hpp>
-#include <llmr/util/std.hpp>
+#include <mbgl/util/clip_ids.hpp>
+#include <mbgl/util/std.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 TEST(ClipIDs, ClipMasks) {
     ASSERT_EQ(0, clipMask[0]);

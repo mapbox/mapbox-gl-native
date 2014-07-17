@@ -1,18 +1,18 @@
-#include <llmr/util/raster.hpp>
+#include <mbgl/util/raster.hpp>
 
 #include <memory>
 #include <cassert>
 #include <cstring>
 
-#include <llmr/platform/platform.hpp>
-#include <llmr/platform/gl.hpp>
-#include <llmr/util/time.hpp>
-#include <llmr/util/uv.hpp>
-#include <llmr/util/std.hpp>
+#include <mbgl/platform/platform.hpp>
+#include <mbgl/platform/gl.hpp>
+#include <mbgl/util/time.hpp>
+#include <mbgl/util/uv.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <png.h>
 
-using namespace llmr;
+using namespace mbgl;
 
 Raster::Raster(const std::shared_ptr<Texturepool> &texturepool)
     : texturepool(texturepool)

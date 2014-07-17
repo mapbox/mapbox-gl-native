@@ -1,22 +1,22 @@
-#include <llmr/map/source.hpp>
-#include <llmr/map/map.hpp>
-#include <llmr/map/transform.hpp>
-#include <llmr/renderer/painter.hpp>
-#include <llmr/util/constants.hpp>
-#include <llmr/util/raster.hpp>
-#include <llmr/util/string.hpp>
-#include <llmr/util/texturepool.hpp>
-#include <llmr/util/vec.hpp>
-#include <llmr/util/token.hpp>
-#include <llmr/util/std.hpp>
-#include <llmr/geometry/glyph_atlas.hpp>
-#include <llmr/style/style_layer.hpp>
+#include <mbgl/map/source.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/map/transform.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/raster.hpp>
+#include <mbgl/util/string.hpp>
+#include <mbgl/util/texturepool.hpp>
+#include <mbgl/util/vec.hpp>
+#include <mbgl/util/token.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/geometry/glyph_atlas.hpp>
+#include <mbgl/style/style_layer.hpp>
 
 
-#include <llmr/map/vector_tile_data.hpp>
-#include <llmr/map/raster_tile_data.hpp>
+#include <mbgl/map/vector_tile_data.hpp>
+#include <mbgl/map/raster_tile_data.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 Source::Source(StyleSource style_source, const std::string &access_token)
     : type(style_source.type),
@@ -330,7 +330,7 @@ struct edge {
 typedef const std::function<void(int32_t, int32_t, int32_t, int32_t)> ScanLine;
 
 // scan-line conversion
-edge _edge(const llmr::vec2<double> a, const llmr::vec2<double> b) {
+edge _edge(const mbgl::vec2<double> a, const mbgl::vec2<double> b) {
     if (a.y > b.y) {
         return { b.x, b.y, a.x, a.y, a.x - b.x, a.y - b.y };
     } else {
@@ -363,7 +363,7 @@ void _scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine scanLine)
 }
 
 // scan-line conversion
-void _scanTriangle(const llmr::vec2<double> a, const llmr::vec2<double> b, const llmr::vec2<double> c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
+void _scanTriangle(const mbgl::vec2<double> a, const mbgl::vec2<double> b, const mbgl::vec2<double> c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
     edge ab = _edge(a, b);
     edge bc = _edge(b, c);
     edge ca = _edge(c, a);
@@ -384,9 +384,9 @@ double Source::getZoom(const TransformState &state) const {
     return state.getZoom() + offset;
 }
 
-std::forward_list<llmr::Tile::ID> Source::covering_tiles(const TransformState &state, int32_t clamped_zoom, const box& points) {
+std::forward_list<mbgl::Tile::ID> Source::covering_tiles(const TransformState &state, int32_t clamped_zoom, const box& points) {
     int32_t dim = std::pow(2, clamped_zoom);
-    std::forward_list<llmr::Tile::ID> tiles;
+    std::forward_list<mbgl::Tile::ID> tiles;
     bool is_raster = (type == SourceType::Raster);
     double search_zoom = getZoom(state);
 

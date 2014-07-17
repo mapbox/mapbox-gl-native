@@ -1,15 +1,15 @@
-#ifndef LLMR_TEST_FIXTURE_LOG
-#define LLMR_TEST_FIXTURE_LOG
+#ifndef MBGL_TEST_FIXTURE_LOG
+#define MBGL_TEST_FIXTURE_LOG
 
-#include <llmr/platform/log.hpp>
-#include <llmr/util/noncopyable.hpp>
+#include <mbgl/platform/log.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <boost/optional.hpp>
 
 #include <vector>
 #include <cstdarg>
 
-namespace llmr {
+namespace mbgl {
 
 class FixtureLogBackend : public LogBackend, private util::noncopyable {
 public:

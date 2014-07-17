@@ -1,9 +1,9 @@
-#include <llmr/renderer/painter.hpp>
-#include <llmr/style/style_properties.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/style/style_properties.hpp>
 
 #include <iostream>
 
-using namespace llmr;
+using namespace mbgl;
 
 void Painter::drawComposite(GLuint texture, const CompositeProperties &properties) {
     // We're doing full-screen framebuffer blending, so no need to do stencil testing here.

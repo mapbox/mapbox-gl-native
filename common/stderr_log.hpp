@@ -1,9 +1,9 @@
-#ifndef LLMR_COMMON_STDERR_LOG
-#define LLMR_COMMON_STDERR_LOG
+#ifndef MBGL_COMMON_STDERR_LOG
+#define MBGL_COMMON_STDERR_LOG
 
-#include <llmr/platform/log.hpp>
+#include <mbgl/platform/log.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 class StderrLogBackend : public LogBackend {
 public:

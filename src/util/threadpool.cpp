@@ -1,11 +1,11 @@
-#include <llmr/util/threadpool.hpp>
-#include <llmr/util/std.hpp>
+#include <mbgl/util/threadpool.hpp>
+#include <mbgl/util/std.hpp>
 #include <thread>
 #include <memory>
 
-using namespace llmr::util;
+using namespace mbgl::util;
 
-std::unique_ptr<Threadpool> llmr::util::threadpool = std::make_unique<Threadpool>(std::thread::hardware_concurrency());
+std::unique_ptr<Threadpool> mbgl::util::threadpool = std::make_unique<Threadpool>(std::thread::hardware_concurrency());
 
 Threadpool::Threadpool(int max_workers)
     : max_workers(max_workers) {

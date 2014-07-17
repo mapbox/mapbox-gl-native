@@ -3,9 +3,9 @@
 
 #include <algorithm>
 
-#include <llmr/text/rotation_range.hpp>
+#include <mbgl/text/rotation_range.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 double deg(double x) { return x / M_PI * 180.0; }
 

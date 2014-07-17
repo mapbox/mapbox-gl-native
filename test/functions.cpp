@@ -1,25 +1,25 @@
 #include <iostream>
 #include "gtest/gtest.h"
 
-#include <llmr/style/function_properties.hpp>
+#include <mbgl/style/function_properties.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 TEST(Function, Constant) {
-    EXPECT_EQ(2.0f, llmr::ConstantFunction<float>(2).evaluate(0));
-    EXPECT_EQ(3.8f, llmr::ConstantFunction<float>(3.8).evaluate(0));
-    EXPECT_EQ(22.0f, llmr::ConstantFunction<float>(22).evaluate(0));
-    EXPECT_EQ(2.0f, llmr::ConstantFunction<float>(2).evaluate(4));
-    EXPECT_EQ(3.8f, llmr::ConstantFunction<float>(3.8).evaluate(4));
-    EXPECT_EQ(22.0f, llmr::ConstantFunction<float>(22).evaluate(4));
-    EXPECT_EQ(2.0f, llmr::ConstantFunction<float>(2).evaluate(22));
-    EXPECT_EQ(3.8f, llmr::ConstantFunction<float>(3.8).evaluate(22));
-    EXPECT_EQ(22.0f, llmr::ConstantFunction<float>(22).evaluate(22));
+    EXPECT_EQ(2.0f, mbgl::ConstantFunction<float>(2).evaluate(0));
+    EXPECT_EQ(3.8f, mbgl::ConstantFunction<float>(3.8).evaluate(0));
+    EXPECT_EQ(22.0f, mbgl::ConstantFunction<float>(22).evaluate(0));
+    EXPECT_EQ(2.0f, mbgl::ConstantFunction<float>(2).evaluate(4));
+    EXPECT_EQ(3.8f, mbgl::ConstantFunction<float>(3.8).evaluate(4));
+    EXPECT_EQ(22.0f, mbgl::ConstantFunction<float>(22).evaluate(4));
+    EXPECT_EQ(2.0f, mbgl::ConstantFunction<float>(2).evaluate(22));
+    EXPECT_EQ(3.8f, mbgl::ConstantFunction<float>(3.8).evaluate(22));
+    EXPECT_EQ(22.0f, mbgl::ConstantFunction<float>(22).evaluate(22));
 }
 
 TEST(Function, Stops) {
     // Explicit constant slope in fringe regions.
-    llmr::StopsFunction<float> slope_1({ { 0, 1.5 }, { 6, 1.5 }, { 8, 3 }, { 22, 3 } });
+    mbgl::StopsFunction<float> slope_1({ { 0, 1.5 }, { 6, 1.5 }, { 8, 3 }, { 22, 3 } });
     EXPECT_EQ(1.5, slope_1.evaluate(0));
     EXPECT_EQ(1.5, slope_1.evaluate(4));
     EXPECT_EQ(1.5, slope_1.evaluate(6));
@@ -31,7 +31,7 @@ TEST(Function, Stops) {
 
 
     // Test constant values in fringe regions.
-    llmr::StopsFunction<float> slope_2({ { 6, 1.5 }, { 8, 3 } });
+    mbgl::StopsFunction<float> slope_2({ { 6, 1.5 }, { 8, 3 } });
     EXPECT_EQ(1.5, slope_2.evaluate(0));
     EXPECT_EQ(1.5, slope_2.evaluate(4));
     EXPECT_EQ(1.5, slope_2.evaluate(6));
@@ -42,7 +42,7 @@ TEST(Function, Stops) {
     EXPECT_EQ(3.0, slope_2.evaluate(22));
 
     // Test no values.
-    llmr::StopsFunction<float> slope_3({});
+    mbgl::StopsFunction<float> slope_3({});
     EXPECT_EQ(1, slope_3.evaluate(2));
     EXPECT_EQ(1, slope_3.evaluate(6));
     EXPECT_EQ(1, slope_3.evaluate(12));
@@ -50,7 +50,7 @@ TEST(Function, Stops) {
 
 
 TEST(Function, Linear) {
-    llmr::LinearFunction<float> slope_1(/* val */ 7.5, /* z_base */ 4, /* slope */ 2, /* min */ 7.5, /* max */ 20);
+    mbgl::LinearFunction<float> slope_1(/* val */ 7.5, /* z_base */ 4, /* slope */ 2, /* min */ 7.5, /* max */ 20);
     ASSERT_FLOAT_EQ(7.5, slope_1.evaluate(3));
     ASSERT_FLOAT_EQ(7.5, slope_1.evaluate(4));
     ASSERT_FLOAT_EQ(8.5, slope_1.evaluate(4.5));
@@ -63,7 +63,7 @@ TEST(Function, Linear) {
 
 
 TEST(Function, Exponential) {
-    llmr::ExponentialFunction<float> slope_1(/* val */ 7.5, /* z_base */ 4, /* exp_base */ 1.75, /* slope */ 2, /* min */ 7.5, /* max */ 20);
+    mbgl::ExponentialFunction<float> slope_1(/* val */ 7.5, /* z_base */ 4, /* exp_base */ 1.75, /* slope */ 2, /* min */ 7.5, /* max */ 20);
     ASSERT_FLOAT_EQ(8.6428576, slope_1.evaluate(3)); // 7.5 + 1.75^(3 - 4) * 2
     ASSERT_FLOAT_EQ(9.5, slope_1.evaluate(4)); // 7.5 + 1.75^(4 - 4) * 2
     ASSERT_FLOAT_EQ(10.145751, slope_1.evaluate(4.5)); // 7.5 + 1.75^(4.5 - 4) * 2

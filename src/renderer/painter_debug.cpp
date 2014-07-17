@@ -1,9 +1,9 @@
-#include <llmr/renderer/painter.hpp>
-#include <llmr/renderer/debug_bucket.hpp>
-#include <llmr/map/map.hpp>
-#include <llmr/util/string.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/debug_bucket.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/util/string.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 void Painter::renderTileDebug(const Tile& tile) {
     gl::group group(util::sprintf<32>("debug %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));

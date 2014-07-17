@@ -1,6 +1,6 @@
-#include <llmr/text/glyph.hpp>
+#include <mbgl/text/glyph.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 // Note: this only works for the BMP
 // Note: we could use a binary lookup table to get averaged constant time lookups, however,

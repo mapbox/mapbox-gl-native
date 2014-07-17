@@ -1,6 +1,6 @@
-#include <llmr/style/style_bucket.hpp>
+#include <mbgl/style/style_bucket.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 StyleBucket::StyleBucket(StyleLayerType type) {
     switch (type) {

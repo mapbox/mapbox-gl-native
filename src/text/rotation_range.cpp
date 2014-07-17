@@ -1,9 +1,9 @@
-#include <llmr/text/rotation_range.hpp>
+#include <mbgl/text/rotation_range.hpp>
 
 #include <cassert>
 #include <algorithm>
 
-namespace llmr {
+namespace mbgl {
 
 /*
  * Combine an array of collision ranges to form a continuous

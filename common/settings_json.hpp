@@ -1,7 +1,7 @@
-#ifndef LLMR_JSON_SETTINGS
-#define LLMR_JSON_SETTINGS
+#ifndef MBGL_JSON_SETTINGS
+#define MBGL_JSON_SETTINGS
 
-namespace llmr {
+namespace mbgl {
 
 class Settings_JSON {
 public:

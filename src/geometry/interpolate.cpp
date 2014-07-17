@@ -1,6 +1,6 @@
-#include <llmr/geometry/interpolate.hpp>
+#include <mbgl/geometry/interpolate.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 Anchors interpolate(const std::vector<Coordinate> &vertices, float spacing,
                     float minScale, int start) {

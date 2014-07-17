@@ -1,19 +1,19 @@
-#include <llmr/renderer/painter.hpp>
-#include <llmr/map/map.hpp>
-#include <llmr/style/style_layer.hpp>
-#include <llmr/util/std.hpp>
-#include <llmr/util/string.hpp>
-#include <llmr/util/time.hpp>
-#include <llmr/util/clip_ids.hpp>
-#include <llmr/util/constants.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/style/style_layer.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/string.hpp>
+#include <mbgl/util/time.hpp>
+#include <mbgl/util/clip_ids.hpp>
+#include <mbgl/util/constants.hpp>
 #if defined(DEBUG)
-#include <llmr/util/timer.hpp>
+#include <mbgl/util/timer.hpp>
 #endif
 
 #include <cassert>
 #include <algorithm>
 
-using namespace llmr;
+using namespace mbgl;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 

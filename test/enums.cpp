@@ -3,9 +3,9 @@
 
 #include <algorithm>
 
-#include <llmr/style/types.hpp>
+#include <mbgl/style/types.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 TEST(Enums, StyleLayerType) {
     std::cerr << StyleLayerType::Raster;

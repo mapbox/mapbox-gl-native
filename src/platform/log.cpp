@@ -1,6 +1,6 @@
-#include <llmr/platform/log.hpp>
+#include <mbgl/platform/log.hpp>
 
-namespace llmr {
+namespace mbgl {
 
 std::unique_ptr<LogBackend> Log::Backend;
 

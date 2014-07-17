@@ -1,15 +1,16 @@
-#include <llmr/map/sprite.hpp>
-#include <llmr/map/map.hpp>
-#include <llmr/util/raster.hpp>
+#include <mbgl/map/sprite.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/util/raster.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <string>
-#include <llmr/platform/platform.hpp>
-#include <llmr/util/uv.hpp>
-#include <llmr/util/std.hpp>
+#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/uv.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <rapidjson/document.h>
 
-using namespace llmr;
+using namespace mbgl;
 
 SpritePosition::SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t pixelRatio)
     : x(x),
@@ -27,6 +28,8 @@ Sprite::Sprite(Map &map, float pixelRatio)
 }
 
 void Sprite::load(const std::string& base_url) {
+    loaded = false;
+    url = base_url;
     std::shared_ptr<Sprite> sprite = shared_from_this();
 
     std::string suffix = (pixelRatio > 1 ? "@2x" : "");
@@ -53,12 +56,12 @@ void Sprite::load(const std::string& base_url) {
 }
 
 void Sprite::complete(std::shared_ptr<Sprite> &sprite) {
-    if (sprite->raster && sprite->pos.size()) {
+    const bool raster = bool(sprite->raster);
+    const bool json = bool(sprite->pos.size());
+    if (raster && json && !sprite->loaded) {
         sprite->loaded = true;
         sprite->map.update();
-#if defined(DEBUG)
-        fprintf(stderr, "sprite loaded\n");
-#endif
+        Log::Info(Event::Sprite, "loaded %s", sprite->url.c_str());
     }
 }
 

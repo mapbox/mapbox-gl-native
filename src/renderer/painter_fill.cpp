@@ -1,12 +1,12 @@
-#include <llmr/renderer/painter.hpp>
-#include <llmr/renderer/fill_bucket.hpp>
-#include <llmr/style/style_layer.hpp>
-#include <llmr/map/map.hpp>
-#include <llmr/map/sprite.hpp>
-#include <llmr/geometry/sprite_atlas.hpp>
-#include <llmr/util/std.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/fill_bucket.hpp>
+#include <mbgl/style/style_layer.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/map/sprite.hpp>
+#include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/util/std.hpp>
 
-using namespace llmr;
+using namespace mbgl;
 
 
 

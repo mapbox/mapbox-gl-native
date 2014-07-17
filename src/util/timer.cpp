@@ -1,12 +1,12 @@
 #ifndef DISABLE_TIMER
-#include <llmr/util/timer.hpp>
-#include <llmr/util/time.hpp>
-#include <llmr/platform/log.hpp>
+#include <mbgl/util/timer.hpp>
+#include <mbgl/util/time.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <iostream>
 #include <atomic>
 
-using namespace llmr::util;
+using namespace mbgl::util;
 
 timer::timer(Event event)
     : event(event), start(now()) {}

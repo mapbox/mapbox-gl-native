@@ -1,11 +1,11 @@
-#include <llmr/util/image.hpp>
+#include <mbgl/util/image.hpp>
 #include <png.h>
 
 #include <cassert>
 #include <cstdlib>
 
 
-std::string llmr::util::compress_png(int width, int height, void *rgba, bool flip) {
+std::string mbgl::util::compress_png(int width, int height, void *rgba, bool flip) {
     png_voidp error_ptr = 0;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, NULL, NULL);
     if (!png_ptr) {
@@ -53,7 +53,7 @@ std::string llmr::util::compress_png(int width, int height, void *rgba, bool fli
 }
 
 
-using namespace llmr::util;
+using namespace mbgl::util;
 
 
 struct Buffer {
