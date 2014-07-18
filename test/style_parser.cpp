@@ -25,7 +25,7 @@ typedef std::vector<Message> Messages;
 
 class StyleParserTest : public ::testing::TestWithParam<std::string> {};
 
-TEST_P(StyleParserTest, render) {
+TEST_P(StyleParserTest, ParseStyle) {
     const std::string &base = base_directory + "/" + GetParam();
 
     const std::string style_path = base + ".style.json";
