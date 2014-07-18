@@ -1,0 +1,11 @@
+{
+    "default": {
+        "log": [
+            [20, "WARNING", "ParseStyle", "stop must have zoom level and value specification"],
+            [6, "WARNING", "ParseStyle", "function must specify a function type"],
+            [1, "WARNING", "ParseStyle", "value of 'line-width' must be a number, or a number function"],
+            [1, "WARNING", "ParseStyle", "array value has unexpected number of elements"],
+            [1, "WARNING", "ParseStyle", "value of 'line-opacity' must be a number, or a number function"]
+        ]
+    }
+}

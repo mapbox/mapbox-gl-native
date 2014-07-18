@@ -42,12 +42,12 @@ TEST_P(StyleParserTest, render) {
     std::stringstream stylejson;
     stylejson << stylefile.rdbuf();
 
+    const FixtureLogBackend &log = Log::Set<FixtureLogBackend>();
+
     Style style;
     style.loadJSON((const uint8_t *)stylejson.str().c_str());
 
     for (auto it = doc.MemberBegin(), end = doc.MemberEnd(); it != end; it++) {
-        const FixtureLogBackend &log = Log::Set<FixtureLogBackend>();
-
         const std::string name { it->name.GetString(), it->name.GetStringLength() };
         const rapidjson::Value &value = it->value;
         ASSERT_EQ(true, value.IsObject());
@@ -58,26 +58,21 @@ TEST_P(StyleParserTest, render) {
             for (rapidjson::SizeType i = 0; i < js_log.Size(); i++) {
                 const rapidjson::Value &js_entry = js_log[i];
                 ASSERT_EQ(true, js_entry.IsArray());
-                if (js_entry.Size() == 4) {
-                    const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
-                    if (js_entry[rapidjson::SizeType(3)].IsString()) {
-                        const FixtureLogBackend::LogMessage message {
-                            EventSeverityClass(js_entry[rapidjson::SizeType(1)].GetString()),
-                            EventClass(js_entry[rapidjson::SizeType(2)].GetString()),
-                            js_entry[rapidjson::SizeType(3)].GetString()
-                        };
-                        EXPECT_EQ(count, log.count(message)) << "Message: " << message << std::endl;
-                    }
-                } else {
-                    FAIL();
-                }
+
+                const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
+                const FixtureLogBackend::LogMessage message {
+                    EventSeverityClass(js_entry[rapidjson::SizeType(1)].GetString()),
+                    EventClass(js_entry[rapidjson::SizeType(2)].GetString()),
+                    js_entry[rapidjson::SizeType(3)].GetString()
+                };
+
+                EXPECT_EQ(count, log.count(message)) << "Message: " << message << std::endl;
             }
         }
 
         const auto &unchecked = log.unchecked();
         if (unchecked.size()) {
-            std::cerr << "Unchecked Log Messages (" << base << "): "
-                << std::endl << unchecked;
+            std::cerr << "Unchecked Log Messages (" << base << "/" << name << "): " << std::endl << unchecked;
         }
 
         ASSERT_EQ(0, unchecked.size());
