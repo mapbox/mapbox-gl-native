@@ -8,6 +8,9 @@
       'target_name': 'shaders',
       'type': 'none',
       'hard_dependency': 1,
+      'dependencies': [
+        'npm_install'
+      ],
       'actions': [
         {
           'action_name': 'Build Shaders',
@@ -34,24 +37,73 @@
       }
     },
     {
-      'target_name': 'build_stylesheet',
+      'target_name': 'npm_install',
       'type': 'none',
       'hard_dependency': 1,
       'actions': [
         {
-          'action_name': 'Build Stylesheet',
+          'action_name': 'npm install',
           'inputs': [
-            'bin/style.js',
+            'bin/package.json',
           ],
           'outputs': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
+            'bin/node_modules',
           ],
-          'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)']
+          'action': ['./scripts/npm_install.sh']
+        }
+      ],
+    },
+    {
+      'target_name': 'build_stylesheet',
+      'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [
+        'npm_install'
+      ],
+      'actions': [
+        {
+          'action_name': 'Build Stylesheet',
+          'inputs': [
+            'bin/style.json',
+          ],
+          'outputs': [
+            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
+          ],
+          'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)/bin']
         }
       ],
       'direct_dependent_settings': {
         'sources': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
+            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
+        ],
+      }
+    },
+    {
+      'target_name': 'build_stylesheet_fixtures',
+      'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [
+        'npm_install'
+      ],
+      'actions': [
+        {
+          'action_name': 'Build Stylesheet Fixtures',
+          'inputs': [
+            'bin/style.json',
+          ],
+          'outputs': [
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-functions.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-layers.min.js',
+          ],
+          'action': ['<@(node)', 'bin/build-fixtures.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)/bin']
+        }
+      ],
+      'direct_dependent_settings': {
+        'sources': [
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-functions.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-layers.min.js',
         ],
       }
     },
@@ -64,7 +116,27 @@
       ],
       'copies': [
         {
-          'files': [ '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js' ],
+          'files': [
+            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
+          ],
+          'destination': '<(PRODUCT_DIR)'
+        }
+      ]
+    },
+    {
+      'target_name': 'copy_stylesheet_fixtures',
+      'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [
+        'build_stylesheet_fixtures'
+      ],
+      'copies': [
+        {
+          'files': [
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-colors.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-functions.min.js',
+            '<(SHARED_INTERMEDIATE_DIR)/bin/fuzz-layers.min.js',
+          ],
           'destination': '<(PRODUCT_DIR)'
         }
       ]
@@ -97,7 +169,7 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
-        'bin/style.js'
+        'bin/style.json'
       ],
       'xcode_settings': {
         'SDKROOT': 'macosx',
@@ -165,7 +237,7 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
-        'bin/style.js'
+        'bin/style.json'
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
