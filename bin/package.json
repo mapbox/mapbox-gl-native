@@ -2,10 +2,7 @@
   "name": "mbgl-native",
   "version": "0.0.1",
   "dependencies": {
-    "brfs": "^1.1.2",
-    "fuzzer": "^0.2.0",
     "mapbox-glsl-optimizer": "~0.1.0",
     "mkdirp": "^0.5.0",
-    "through2": "^0.5.1"
   }
 }
