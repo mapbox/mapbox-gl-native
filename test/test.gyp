@@ -107,22 +107,22 @@
         ]
     },
     {
-        "target_name": "style",
-        "product_name": "test_style",
+        "target_name": "style_parser",
+        "product_name": "test_style_parser",
         "type": "executable",
         "libraries": [
             "-lpthread",
         ],
         "sources": [
             "./main.cpp",
-            "./style.cpp",
+            "./style_parser.cpp",
             "./fixtures/fixture_log.hpp",
             "./fixtures/fixture_log.cpp",
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
             "../mapboxgl.gyp:mapboxgl",
-            "../mapboxgl.gyp:copy_stylesheet_fixtures",
+            "../mapboxgl.gyp:copy_default_stylesheet_fixtures",
         ]
     },
     {
@@ -223,7 +223,7 @@
           "tile",
           "functions",
           "headless",
-          "style",
+          "style_parser",
           "comparisons",
         ],
     }
