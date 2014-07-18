@@ -1,8 +1,0 @@
-{
-    "default": {
-        "log": [
-            [28, "WARNING", "ParseStyle", "stop must have zoom level and value specification"],
-            [12, "WARNING", "ParseStyle", "function must specify a function type"]
-        ]
-    }
-}
