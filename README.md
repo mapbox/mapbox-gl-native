@@ -33,6 +33,8 @@ The demo applications use Mapbox vector tiles, which **require a Mapbox account 
 
 For iOS and OS X use of the demo apps in Xcode, setup the access token by editing the scheme for the application target, then adding an environment variable with the name `MAPBOX_ACCESS_TOKEN`. 
 
+![edit scheme](https://cloud.githubusercontent.com/assets/98601/3647749/30f74f26-1102-11e4-84af-f1be853b4e38.png)
+
 ![setting access token in Xcode scheme](https://cloud.githubusercontent.com/assets/52399/3543326/9e7cfbb8-0860-11e4-8def-3684a9028b61.png)
 
 ## OS X
