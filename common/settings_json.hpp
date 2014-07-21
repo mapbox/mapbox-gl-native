@@ -14,7 +14,7 @@ public:
     double longitude = 0;
     double latitude = 0;
     double zoom = 0;
-    double angle = 0;
+    double bearing = 0;
 
     bool debug = false;
 };

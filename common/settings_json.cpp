@@ -18,7 +18,7 @@ void Settings_JSON::load() {
             longitude = document[rapidjson::SizeType(0)].GetDouble();
             latitude = document[1].GetDouble();
             zoom = document[2].GetDouble();
-            angle = document[3].GetDouble();
+            bearing = document[3].GetDouble();
             debug = document[4].GetBool();
         }
     }
@@ -32,7 +32,7 @@ void Settings_JSON::save() {
     writer.Double(longitude);
     writer.Double(latitude);
     writer.Double(zoom);
-    writer.Double(angle);
+    writer.Double(bearing);
     writer.Bool(debug);
     writer.EndArray();
 }
@@ -41,6 +41,6 @@ void Settings_JSON::clear() {
     longitude = 0;
     latitude = 0;
     zoom = 0;
-    angle = 0;
+    bearing = 0;
     debug = false;
 }

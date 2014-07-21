@@ -18,6 +18,9 @@
 #include <memory>
 #include <iostream>
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 using namespace mbgl;
 
 Map::Map(View& view)
@@ -333,20 +336,20 @@ void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) 
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setAngle(double angle, double duration) {
-    transform.setAngle(angle, duration * 1_second);
+void Map::setBearing(double degrees, double duration) {
+    transform.setAngle(-degrees * M_PI / 180, duration * 1_second);
     update();
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setAngle(double angle, double cx, double cy) {
-    transform.setAngle(angle, cx, cy);
+void Map::setBearing(double degrees, double cx, double cy) {
+    transform.setAngle(-degrees * M_PI / 180, cx, cy);
     update();
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-double Map::getAngle() const {
-    return transform.getAngle();
+double Map::getBearing() const {
+    return -transform.getAngle() / M_PI * 180;
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
