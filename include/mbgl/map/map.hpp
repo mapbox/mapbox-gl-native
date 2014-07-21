@@ -89,9 +89,9 @@ public:
 
     // Rotation
     void rotateBy(double sx, double sy, double ex, double ey, double duration = 0);
-    void setAngle(double angle, double duration = 0);
-    void setAngle(double angle, double cx, double cy);
-    double getAngle() const;
+    void setBearing(double degrees, double duration = 0);
+    void setBearing(double degrees, double cx, double cy);
+    double getBearing() const;
     void resetNorth();
     void startRotating();
     void stopRotating();

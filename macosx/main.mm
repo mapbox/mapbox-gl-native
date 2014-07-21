@@ -13,7 +13,7 @@ int main() {
     // Load settings
     mbgl::Settings_NSUserDefaults settings;
     map.setLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
-    map.setAngle(settings.angle);
+    map.setBearing(settings.bearing);
     map.setDebug(settings.debug);
 
     // Set access token if present
@@ -32,7 +32,7 @@ int main() {
 
     // Save settings
     map.getLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
-    settings.angle = map.getAngle();
+    settings.bearing = map.getBearing();
     settings.debug = map.getDebug();
     settings.save();
 
