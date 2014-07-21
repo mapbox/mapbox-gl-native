@@ -24,11 +24,14 @@ Sprite::Sprite(Map &map, float pixelRatio)
     : pixelRatio(pixelRatio),
       raster(),
       map(map),
-      loaded(false) {
+      loadedImage(false),
+      loadedJSON(false) {
 }
 
 void Sprite::load(const std::string& base_url) {
-    loaded = false;
+    loadedImage = false;
+    loadedJSON = false;
+
     url = base_url;
     std::shared_ptr<Sprite> sprite = shared_from_this();
 
@@ -56,17 +59,14 @@ void Sprite::load(const std::string& base_url) {
 }
 
 void Sprite::complete(std::shared_ptr<Sprite> &sprite) {
-    const bool raster = bool(sprite->raster);
-    const bool json = bool(sprite->pos.size());
-    if (raster && json && !sprite->loaded) {
-        sprite->loaded = true;
+    if (sprite->loadedImage && sprite->loadedJSON) {
         sprite->map.update();
         Log::Info(Event::Sprite, "loaded %s", sprite->url.c_str());
     }
 }
 
 bool Sprite::isLoaded() const {
-    return loaded;
+    return loadedImage && loadedJSON;
 }
 
 void Sprite::asyncParseImage() {
@@ -80,6 +80,7 @@ void Sprite::asyncParseJSON() {
 void Sprite::parseImage(std::shared_ptr<Sprite> &sprite) {
     sprite->raster = std::make_unique<util::Image>(sprite->image);
     sprite->image.clear();
+    sprite->loadedImage = true;
 }
 
 void Sprite::parseJSON(std::shared_ptr<Sprite> &sprite) {
@@ -111,6 +112,7 @@ void Sprite::parseJSON(std::shared_ptr<Sprite> &sprite) {
         }
 
         sprite->pos.swap(pos);
+        sprite->loadedJSON = true;
     }
 }
 

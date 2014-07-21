@@ -55,7 +55,8 @@ private:
     std::string url;
     std::string body;
     std::string image;
-    std::atomic<bool> loaded;
+    std::atomic<bool> loadedImage;
+    std::atomic<bool> loadedJSON;
     std::unordered_map<std::string, SpritePosition> pos;
     const SpritePosition empty;
 };
