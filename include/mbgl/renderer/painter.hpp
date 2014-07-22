@@ -62,6 +62,8 @@ public:
     void cleanup();
 
 
+    // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
+    // tiles whatsoever.
     void clear();
 
     // Updates the default matrices to the current viewport dimensions.
@@ -72,10 +74,6 @@ public:
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
-
-    // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
-    // tiles whatsoever.
-    void renderMatte();
 
     // Renders the red debug frame around a tile, visualizing its perimeter.
     void renderDebugFrame();

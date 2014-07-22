@@ -560,8 +560,6 @@ void Map::render() {
         source->source->finishRender(painter);
     }
 
-    painter.renderMatte();
-
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
         update();
