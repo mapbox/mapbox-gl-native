@@ -94,7 +94,7 @@ struct RasterProperties {
 
 struct BackgroundProperties {
     inline BackgroundProperties() {}
-    Color color = {{ 1, 1, 1, 1 }};
+    Color color = {{ 0, 0, 0, 1 }};
 };
 
 typedef util::variant<

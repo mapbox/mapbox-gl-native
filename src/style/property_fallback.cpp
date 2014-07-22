@@ -1,48 +1,50 @@
 #include <mbgl/style/property_fallback.hpp>
+#include <mbgl/style/style_properties.hpp>
 
 namespace mbgl {
 
 const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
-    { PropertyKey::FillAntialias, true },
-    { PropertyKey::FillOpacity, 1.0f },
-    { PropertyKey::FillColor, Color({{ 0, 0, 0, 1 }}) },
-    { PropertyKey::FillTranslateX, 0.0f },
-    { PropertyKey::FillTranslateY, 0.0f },
-    { PropertyKey::FillTranslateAnchor, TranslateAnchorType::Map },
+    { PropertyKey::FillAntialias, defaultStyleProperties<FillProperties>().antialias },
+    { PropertyKey::FillOpacity, defaultStyleProperties<FillProperties>().opacity },
+    { PropertyKey::FillColor, defaultStyleProperties<FillProperties>().fill_color },
+    // no FillOutlineColor on purpose.
+    { PropertyKey::FillTranslateX, defaultStyleProperties<FillProperties>().translate[0] },
+    { PropertyKey::FillTranslateY, defaultStyleProperties<FillProperties>().translate[1] },
+    { PropertyKey::FillTranslateAnchor, defaultStyleProperties<FillProperties>().translateAnchor },
 
-    { PropertyKey::LineOpacity, 1.0f },
-    { PropertyKey::LineColor, Color({{ 0, 0, 0, 1 }}) },
-    { PropertyKey::LineTranslateX, 0.0f },
-    { PropertyKey::LineTranslateY, 0.0f },
-    { PropertyKey::LineTranslateAnchor, TranslateAnchorType::Map },
-    { PropertyKey::LineWidth, 1.0f },
-    { PropertyKey::LineOffset, 0.0f },
-    { PropertyKey::LineBlur, 1.0f },
-    { PropertyKey::LineDashLand, 1.0f },
-    { PropertyKey::LineDashGap, -1.0f },
+    { PropertyKey::LineOpacity, defaultStyleProperties<LineProperties>().opacity },
+    { PropertyKey::LineColor, defaultStyleProperties<LineProperties>().color },
+    { PropertyKey::LineTranslateX, defaultStyleProperties<LineProperties>().translate[0] },
+    { PropertyKey::LineTranslateY, defaultStyleProperties<LineProperties>().translate[1] },
+    { PropertyKey::LineTranslateAnchor, defaultStyleProperties<LineProperties>().translateAnchor },
+    { PropertyKey::LineWidth, defaultStyleProperties<LineProperties>().width },
+    { PropertyKey::LineOffset, defaultStyleProperties<LineProperties>().offset },
+    { PropertyKey::LineBlur, defaultStyleProperties<LineProperties>().blur },
+    { PropertyKey::LineDashLand, defaultStyleProperties<LineProperties>().dash_array[0] },
+    { PropertyKey::LineDashGap, defaultStyleProperties<LineProperties>().dash_array[1] },
 
-    { PropertyKey::IconOpacity, 1.0f },
-    { PropertyKey::IconRotate, 0.0f },
-    { PropertyKey::IconRotateAnchor, RotateAnchorType::Viewport },
+    { PropertyKey::IconOpacity, defaultStyleProperties<IconProperties>().opacity },
+    { PropertyKey::IconRotate, defaultStyleProperties<IconProperties>().rotate },
+    { PropertyKey::IconRotateAnchor, defaultStyleProperties<IconProperties>().rotate_anchor },
 
-    { PropertyKey::TextOpacity, 1.0f },
-    { PropertyKey::TextSize, 16.0f },
-    { PropertyKey::TextColor, Color({{ 0, 0, 0, 1 }}) },
-    { PropertyKey::TextHaloColor, Color({{ 0, 0, 0, 0 }}) },
-    { PropertyKey::TextHaloWidth, 0.25f },
-    { PropertyKey::TextHaloBlur, 1.0f },
+    { PropertyKey::TextOpacity, defaultStyleProperties<TextProperties>().opacity },
+    { PropertyKey::TextSize, defaultStyleProperties<TextProperties>().size },
+    { PropertyKey::TextColor, defaultStyleProperties<TextProperties>().color },
+    { PropertyKey::TextHaloColor, defaultStyleProperties<TextProperties>().halo_color },
+    { PropertyKey::TextHaloWidth, defaultStyleProperties<TextProperties>().halo_width },
+    { PropertyKey::TextHaloBlur, defaultStyleProperties<TextProperties>().halo_blur },
 
-    { PropertyKey::CompositeOpacity, 1.0f },
+    { PropertyKey::CompositeOpacity, defaultStyleProperties<CompositeProperties>().opacity },
 
-    { PropertyKey::RasterOpacity, 1.0f },
-    { PropertyKey::RasterSpin, 0.0f },
-    { PropertyKey::RasterBrightnessLow, 0.0f },
-    { PropertyKey::RasterBrightnessHigh, 1.0f },
-    { PropertyKey::RasterSaturation, 0.0f },
-    { PropertyKey::RasterContrast, 0.0f },
-    { PropertyKey::RasterFade, 0.0f },
+    { PropertyKey::RasterOpacity, defaultStyleProperties<RasterProperties>().opacity },
+    { PropertyKey::RasterSpin, defaultStyleProperties<RasterProperties>().spin },
+    { PropertyKey::RasterBrightnessLow, defaultStyleProperties<RasterProperties>().brightness[0] },
+    { PropertyKey::RasterBrightnessHigh, defaultStyleProperties<RasterProperties>().brightness[1] },
+    { PropertyKey::RasterSaturation, defaultStyleProperties<RasterProperties>().saturation },
+    { PropertyKey::RasterContrast, defaultStyleProperties<RasterProperties>().contrast },
+    { PropertyKey::RasterFade, defaultStyleProperties<RasterProperties>().fade },
 
-    { PropertyKey::BackgroundColor, Color({{ 0, 0, 0, 0 }}) },
+    { PropertyKey::BackgroundColor, defaultStyleProperties<BackgroundProperties>().color },
 };
 
 const PropertyValue PropertyFallbackValue::defaultProperty = false;
