@@ -42,7 +42,7 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile,
       glyphAtlas(glyphAtlas),
       glyphStore(glyphStore),
       spriteAtlas(spriteAtlas),
-      placement(tile.id.z) {
+      placement(tile.id.z, tile.id.z >= tile.source.max_zoom ? tile.source.max_zoom - tile.id.z : 1) {
 }
 
 void TileParser::parse() {

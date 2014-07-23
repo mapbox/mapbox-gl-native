@@ -14,7 +14,7 @@ class StyleBucketText;
 
 class Placement {
 public:
-    Placement(int8_t zoom);
+    Placement(int8_t zoom, float placementDepth);
 
     void addFeature(TextBucket &bucket, const std::vector<Coordinate> &line,
                     const StyleBucketText &info,

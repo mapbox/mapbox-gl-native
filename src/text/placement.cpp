@@ -14,7 +14,7 @@ const int Placement::glyphSize =
     24; // size in pixels of this glyphs in the tile
 const float Placement::minScale = 0.5; // underscale by 1 zoom level
 
-Placement::Placement(int8_t zoom)
+Placement::Placement(int8_t zoom, float placementDepth)
     : zoom(zoom),
       zOffset(log(512.0 / util::tileSize) / log(2)),
 
@@ -27,7 +27,9 @@ Placement::Placement(int8_t zoom)
       // glyphs be placed, slowing down collision checking. Only place labels if
       // they will show up within the intended zoom range of the tile.
       // TODO make this not hardcoded to 3
-      maxPlacementScale(std::exp(log(2) * util::min((25.5 - zoom), 3.0))) {}
+      maxPlacementScale(std::exp(
+          log(2) *
+          util::min(3.0f, util::min(placementDepth > 0 ? placementDepth : 1.0f, 25.5f - zoom)))) {}
 
 bool byScale(const Anchor &a, const Anchor &b) { return a.scale < b.scale; }
 
