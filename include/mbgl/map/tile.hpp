@@ -1,15 +1,17 @@
 #ifndef MBGL_MAP_TILE
 #define MBGL_MAP_TILE
 
-#include <mbgl/util/vec.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <cstdint>
-#include <forward_list>
-#include <string>
 #include <bitset>
+#include <cmath>
+#include <cstdint>
+#include <forward_list>
+#include <iosfwd>
 #include <memory>
+#include <string>
 
 namespace mbgl {
 

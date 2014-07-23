@@ -2,22 +2,25 @@
 #define MBGL_MAP_TILE_DATA
 
 #include <mbgl/map/tile.hpp>
-#include <mbgl/util/noncopyable.hpp>
-#include <mbgl/platform/platform.hpp>
-#include <mbgl/geometry/vao.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
+#include <mbgl/geometry/debug_font_buffer.hpp>
 
-#include <cstdint>
-#include <string>
-#include <memory>
+#include <mbgl/util/noncopyable.hpp>
+
 #include <atomic>
+#include <exception>
+#include <iosfwd>
+#include <memory>
+#include <string>
 
 namespace mbgl {
 
 class Map;
 class Painter;
-class StyleLayer;
 class SourceInfo;
+class StyleLayer;
+
+namespace platform { class Request; }
 
 class TileData : public std::enable_shared_from_this<TileData>,
              private util::noncopyable {

@@ -3,23 +3,25 @@
 
 #include <mbgl/map/tile.hpp>
 #include <mbgl/map/tile_data.hpp>
+#include <mbgl/style/style_source.hpp>
+
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/time.hpp>
-#include <mbgl/style/style_source.hpp>
-#include <mbgl/style/types.hpp>
+#include <mbgl/util/mat4.hpp>
 
-#include <list>
+#include <cstdint>
 #include <forward_list>
-#include <memory>
-#include <vector>
-#include <string>
+#include <iosfwd>
 #include <map>
-#include <set>
+#include <memory>
 
 namespace mbgl {
 
+class Map;
+class Painter;
+class StyleLayer;
 class TransformState;
-class Texturepool;
+struct box;
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:

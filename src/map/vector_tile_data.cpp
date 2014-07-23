@@ -1,8 +1,10 @@
 #include <mbgl/map/vector_tile_data.hpp>
+#include <mbgl/map/tile_parser.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
+#include <mbgl/geometry/glyph_atlas.hpp>
 
 using namespace mbgl;
 

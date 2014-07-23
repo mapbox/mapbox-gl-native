@@ -1,23 +1,21 @@
 #ifndef MBGL_MAP_VECTOR_TILE
 #define MBGL_MAP_VECTOR_TILE
 
-#include <mbgl/util/pbf.hpp>
-#include <mbgl/util/vec.hpp>
+#include <mbgl/style/filter_expression.hpp>
 #include <mbgl/style/value.hpp>
 #include <mbgl/text/glyph.hpp>
-#include <mbgl/style/filter_expression.hpp>
-#include <vector>
+#include <mbgl/util/pbf.hpp>
+
+#include <cstdint>
+#include <iosfwd>
 #include <map>
+#include <string>
 #include <unordered_map>
-#include <set>
-#include <limits>
+#include <vector>
 
 namespace mbgl {
 
-class BucketDescription;
 class VectorTileLayer;
-
-struct pbf;
 
 enum class FeatureType {
     Unknown = 0,

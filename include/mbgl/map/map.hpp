@@ -3,6 +3,7 @@
 
 #include <mbgl/map/transform.hpp>
 #include <mbgl/renderer/painter.hpp>
+
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/uv.hpp>

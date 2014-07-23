@@ -1,6 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/text_bucket.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/math.hpp>
 #include <cmath>

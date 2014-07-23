@@ -1,5 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/sprite.hpp>

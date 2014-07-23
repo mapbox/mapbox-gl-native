@@ -2,27 +2,30 @@
 #define MBGL_MAP_TILE_PARSER
 
 #include <mbgl/map/vector_tile.hpp>
-#include <mbgl/text/placement.hpp>
-#include <mbgl/text/glyph_store.hpp>
-#include <mbgl/text/glyph.hpp>
-#include <mbgl/util/utf.hpp>
 #include <mbgl/style/filter_expression.hpp>
+#include <mbgl/text/glyph.hpp>
+#include <mbgl/text/placement.hpp>
+
+#include <cstdint>
+#include <iosfwd>
+#include <memory>
+#include <string>
 
 namespace mbgl {
 
-class Style;
+class Bucket;
+class FontStack;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
-class VectorTileData;
-class StyleLayer;
-class StyleLayerGroup;
+class Style;
 class StyleBucket;
 class StyleBucketFill;
-class StyleBucketLine;
 class StyleBucketIcon;
-
-class Bucket;
+class StyleBucketLine;
+class StyleBucketText;
+class StyleLayerGroup;
+class VectorTileData;
 
 class TileParser {
 public:

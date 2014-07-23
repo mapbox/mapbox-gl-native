@@ -1,13 +1,13 @@
 #ifndef MBGL_STYLE_SPRITE
 #define MBGL_STYLE_SPRITE
 
-#include <mbgl/util/raster.hpp>
-#include <mbgl/util/vec.hpp>
+#include <mbgl/util/image.hpp>
 
-#include <string>
-#include <mutex>
-#include <memory>
+#include <cstdint>
 #include <atomic>
+#include <iosfwd>
+#include <memory>
+#include <string>
 #include <unordered_map>
 
 namespace mbgl {

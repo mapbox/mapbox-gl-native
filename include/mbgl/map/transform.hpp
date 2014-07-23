@@ -1,20 +1,23 @@
 #ifndef MBGL_MAP_TRANSFORM
 #define MBGL_MAP_TRANSFORM
 
-#include <mbgl/util/transition.hpp>
+#include <mbgl/util/time.hpp>
+#include <mbgl/map/transform_state.hpp>
+
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/uv.hpp>
 
-#include "view.hpp"
-#include "transform_state.hpp"
-
+#include <cstdint>
+#include <cmath>
 #include <forward_list>
+#include <memory>
 
 namespace mbgl {
 
-struct box;
+class View;
+namespace util { class transition; }
 
-    class Transform : private util::noncopyable {
+class Transform : private util::noncopyable {
 public:
     Transform(View &view);
 

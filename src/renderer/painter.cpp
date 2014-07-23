@@ -1,5 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/string.hpp>

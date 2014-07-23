@@ -1,5 +1,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/source.hpp>
+#include <mbgl/map/view.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/util/transition.hpp>
@@ -15,6 +16,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/style_bucket.hpp>
+#include <mbgl/util/texturepool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 
 #include <algorithm>

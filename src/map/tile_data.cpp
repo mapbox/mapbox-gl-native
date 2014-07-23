@@ -1,5 +1,6 @@
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/style/style_source.hpp>
 
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>

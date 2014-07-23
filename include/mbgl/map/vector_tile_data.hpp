@@ -1,23 +1,26 @@
 #ifndef MBGL_MAP_VECTOR_TILE_DATA
 #define MBGL_MAP_VECTOR_TILE_DATA
 
+#include <mbgl/map/tile.hpp>
 #include <mbgl/map/tile_data.hpp>
-
-
-#include <mbgl/renderer/bucket.hpp>
-
-#include <mbgl/geometry/vertex_buffer.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/fill_buffer.hpp>
-#include <mbgl/geometry/line_buffer.hpp>
 #include <mbgl/geometry/icon_buffer.hpp>
+#include <mbgl/geometry/line_buffer.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
-#include <mbgl/map/tile_parser.hpp>
 
+#include <iosfwd>
+#include <memory>
 #include <unordered_map>
 
 namespace mbgl {
 
+class Bucket;
+class Map;
+class Painter;
+class SourceInfo;
+class StyleLayer;
+class TileParser;
 
 class VectorTileData : public TileData {
     friend class TileParser;
