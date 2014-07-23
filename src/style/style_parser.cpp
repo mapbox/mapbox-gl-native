@@ -592,7 +592,6 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<Function<float>>("icon-rotate", Key::IconRotate, klass, value);
-    parseOptionalProperty<RotateAnchorType>("icon-rotate-anchor", Key::IconRotateAnchor, klass, value);
 
     parseOptionalProperty<Function<float>>("text-opacity", Key::TextOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-text-opacity", Key::TextOpacity, klass, value);

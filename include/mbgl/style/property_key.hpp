@@ -30,7 +30,14 @@ enum class PropertyKey {
 
     IconOpacity,
     IconRotate,
-    IconRotateAnchor,
+    IconSize,
+    IconColor,
+    IconHaloColor,
+    IconHaloWidth,
+    IconHaloBlur,
+    IconTranslateX,
+    IconTranslateY,
+    IconTranslateAnchor,
 
     TextOpacity,
     TextSize,
@@ -38,6 +45,9 @@ enum class PropertyKey {
     TextHaloColor,
     TextHaloWidth,
     TextHaloBlur,
+    TextTranslateX,
+    TextTranslateY,
+    TextTranslateAnchor,
 
     CompositeOpacity,
 

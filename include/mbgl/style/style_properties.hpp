@@ -69,6 +69,39 @@ struct TextProperties {
     }
 };
 
+struct SymbolProperties {
+    inline SymbolProperties() {}
+
+    struct {
+        float opacity = 1.0f;
+        float rotate = 0.0f;
+        float size = 1.0f;
+        Color color = {{ 0, 0, 0, 1 }};
+        Color halo_color = {{ 0, 0, 0, 0 }};
+        float halo_width = 0.0f;
+        float halo_blur = 0.0f;
+        std::array<float, 2> translate = {{ 0, 0 }};
+        TranslateAnchorType translate_anchor = TranslateAnchorType::Map;
+    } icon;
+
+    struct {
+        float opacity = 1.0f;
+        float size = 12.0f;
+        Color color = {{ 0, 0, 0, 1 }};
+        Color halo_color = {{ 0, 0, 0, 0 }};
+        float halo_width = 0.0f;
+        float halo_blur = 0.0f;
+        std::array<float, 2> translate = {{ 0, 0 }};
+        TranslateAnchorType translate_anchor = TranslateAnchorType::Map;
+    } text;
+
+    inline bool isVisible() const {
+        return (icon.opacity > 0 && (icon.color[3] > 0 || icon.halo_color[3] > 0) && icon.size > 0) ||
+               (text.opacity > 0 && (text.color[3] > 0 || text.halo_color[3] > 0) && text.size > 0);
+    }
+};
+
+
 struct CompositeProperties {
     inline CompositeProperties() {}
     float opacity = 1.0f;

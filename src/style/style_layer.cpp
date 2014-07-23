@@ -196,7 +196,6 @@ void StyleLayer::applyStyleProperties<IconProperties>(const float z, const times
     IconProperties &icon = properties.get<IconProperties>();
     applyStyleProperty(PropertyKey::IconOpacity, icon.opacity, z, now);
     applyStyleProperty(PropertyKey::IconRotate, icon.rotate, z, now);
-    applyStyleProperty(PropertyKey::IconRotateAnchor, icon.rotate_anchor, z, now);
 }
 
 template <>

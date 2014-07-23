@@ -4,8 +4,10 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/style/style_source.hpp>
+
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/variant.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <memory>
 #include <forward_list>
@@ -57,6 +59,47 @@ public:
     float padding = 2.0f;
     float slant = 0.0f;
     bool always_visible = false;
+};
+
+class StyleBucketSymbol : util::noncopyable {
+public:
+    PlacementType placement = PlacementType::Default;
+    float min_distance = 250.0f;
+
+    struct {
+        bool allow_overlap = false;
+        bool ignore_placement = false;
+        bool optional = false;
+        RotationAlignmentType rotation_alignment = RotationAlignmentType::Viewport;
+        float max_size = 1.0f;
+        std::string image;
+        float padding = 2.0f;
+        bool keep_upright = false;
+        vec2<float> offset = {0, 0};
+    } icon;
+
+    struct {
+        RotationAlignmentType rotation_alignment = RotationAlignmentType::Viewport;
+        std::string field;
+        std::string font;
+        float max_size = 16.0f;
+        float max_width = 15.0f * 24 /* em */;
+        float line_height = 1.2f * 24 /* em */;
+        float letter_spacing = 0.0f * 24 /* em */;
+        TextJustifyType justify = TextJustifyType::Center;
+        TextHorizontalAlignType horizontal_align = TextHorizontalAlignType::Center;
+        TextVerticalAlignType vertical_align = TextVerticalAlignType::Center;
+        float max_angle_delta = 45.0f /* degrees */;
+        float rotate = 0.0f;
+        float slant = 0.0f;
+        float padding = 2.0f;
+        bool keep_upright = true;
+        TextTransformType transform = TextTransformType::None;
+        vec2<float> offset = {0, 0};
+        bool allow_overlap = false;
+        bool ignore_placement = false;
+        bool optional = false;
+    } text;
 };
 
 class StyleBucketRaster {

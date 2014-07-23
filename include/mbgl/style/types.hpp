@@ -61,6 +61,12 @@ enum class TextPathType : uint8_t {
     Default = Horizontal
 };
 
+enum class PlacementType : bool {
+    Point,
+    Line,
+    Default = Point
+};
+
 enum class TextTransformType : uint8_t {
     None,
     Uppercase,
@@ -78,6 +84,33 @@ enum class RotateAnchorType : uint8_t {
     Map,
     Viewport,
     Default = Viewport
+};
+
+enum class RotationAlignmentType : bool {
+    Map,
+    Viewport,
+    Default = Viewport
+};
+
+enum class TextJustifyType : uint8_t {
+    Center,
+    Left,
+    Right,
+    Default = Center
+};
+
+enum class TextHorizontalAlignType : uint8_t {
+    Left,
+    Center,
+    Right,
+    Default = Center
+};
+
+enum class TextVerticalAlignType : uint8_t {
+    Top,
+    Center,
+    Bottom,
+    Default = Center
 };
 
 enum class SourceType : uint8_t {
@@ -112,6 +145,12 @@ inline TextPathType parseTextPathType(const std::string &path) {
     if (path == "horizontal") return TextPathType::Horizontal;
     if (path == "curve") return TextPathType::Curve;
     return TextPathType::Default;
+}
+
+inline PlacementType parsePlacementType(const std::string &path) {
+    if (path == "point") return PlacementType::Point;
+    if (path == "line") return PlacementType::Line;
+    return PlacementType::Default;
 }
 
 inline TextTransformType parseTextTransformType(const std::string& transform) {
