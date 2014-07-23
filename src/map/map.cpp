@@ -10,6 +10,9 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/style/style.hpp>
+#include <mbgl/text/glyph_store.hpp>
+#include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>

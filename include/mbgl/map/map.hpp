@@ -1,26 +1,31 @@
-
 #ifndef MBGL_MAP_MAP
 #define MBGL_MAP_MAP
 
-#include <uv.h>
-
-#include <mbgl/map/view.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/text/glyph_store.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/texturepool.hpp>
+#include <mbgl/util/time.hpp>
+#include <mbgl/util/uv.hpp>
 
 #include <cstdint>
-#include <string>
-#include <map>
+#include <atomic>
+#include <iosfwd>
+#include <memory>
+#include <set>
+#include <vector>
 
 namespace mbgl {
 
-class Source;
+class GlyphAtlas;
+class GlyphStore;
+class LayerDescription;
 class SpriteAtlas;
+class Style;
+class StyleLayer;
+class StyleLayerGroup;
+class StyleSource;
+class Texturepool;
+class View;
 
 class Map : private util::noncopyable {
 public:
