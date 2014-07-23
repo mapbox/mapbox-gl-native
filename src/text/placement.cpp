@@ -16,7 +16,7 @@ const float Placement::minScale = 0.5; // underscale by 1 zoom level
 
 Placement::Placement(int8_t zoom)
     : zoom(zoom),
-      zOffset(log(256.0 / util::tileSize) / log(2)),
+      zOffset(log(512.0 / util::tileSize) / log(2)),
 
       // Calculate the maximum scale we can go down in our fake-3d rtree so that
       // placement still makes sense. This is calculated so that the minimum
