@@ -80,7 +80,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     CapType beginCap = properties.cap;
     CapType endCap = closed ? CapType::Butt : properties.cap;
 
-    JoinType currentJoin = JoinType::None;
+    JoinType currentJoin = JoinType::Default;
 
     Coordinate currentVertex = Coordinate::null(),
                prevVertex = Coordinate::null(),

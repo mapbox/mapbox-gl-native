@@ -42,19 +42,17 @@ enum class WindingType : uint8_t {
 };
 
 enum class CapType : uint8_t {
-    None,
     Round,
     Butt,
     Square,
-    Default = None
+    Default = Butt
 };
 
 enum class JoinType : uint8_t {
-    None,
     Miter,
     Bevel,
     Round,
-    Default = None
+    Default = Miter
 };
 
 enum class TextPathType : uint8_t {
@@ -100,14 +98,14 @@ inline CapType parseCapType(const std::string &cap) {
     if (cap == "round") return CapType::Round;
     if (cap == "butt") return CapType::Butt;
     if (cap == "square") return CapType::Square;
-    return CapType::None;
+    return CapType::Default;
 }
 
 inline JoinType parseJoinType(const std::string &join) {
     if (join == "miter") return JoinType::Miter;
     if (join == "bevel") return JoinType::Bevel;
     if (join == "round") return JoinType::Round;
-    return JoinType::None;
+    return JoinType::Default;
 }
 
 inline TextPathType parseTextPathType(const std::string &path) {
