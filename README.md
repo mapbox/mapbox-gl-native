@@ -5,14 +5,15 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 
 # Depends
 
- - Modern C++ compiler that supports `-std=c++11` (On OSX clang++, on Linux g++-4.8 or g++-4.9)
+ - Modern C++ compiler that supports `-std=c++11` (On OS X clang++, on Linux g++-4.8 or g++-4.9)
  - Boost headers
  - `libpng`
  - `libuv`
  - `glfw3`
  - `libcurl` (depends on OpenSSL; Linux only)
  - `libboost_regex` (Linux only)
- - Homebrew (for build on OS X)
+ - Apple Command Line Tools (for build on OS X; available at [Apple Developer](https://developer.apple.com/downloads))
+ - [Homebrew](http://brew.sh) (for build on OS X)
  - Python 2.x (for build only)
  - Node.js (for build only)
 
