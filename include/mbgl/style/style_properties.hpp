@@ -33,7 +33,7 @@ struct LineProperties {
     Color color = {{ 0, 0, 0, 1 }};
     std::array<float, 2> translate = {{ 0, 0 }};
     TranslateAnchorType translateAnchor = TranslateAnchorType::Default;
-    float width = 0;
+    float width = 1;
     float offset = 0;
     float blur = 0;
     std::array<float, 2> dash_array = {{ 1, -1 }};
