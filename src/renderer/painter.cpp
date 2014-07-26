@@ -41,6 +41,7 @@ void Painter::setup() {
     assert(outlineShader);
     assert(lineShader);
     assert(linejoinShader);
+    assert(linepatternShader);
     assert(patternShader);
     assert(rasterShader);
     assert(textShader);
@@ -70,6 +71,7 @@ void Painter::setupShaders() {
     if (!outlineShader) outlineShader = std::make_unique<OutlineShader>();
     if (!lineShader) lineShader = std::make_unique<LineShader>();
     if (!linejoinShader) linejoinShader = std::make_unique<LinejoinShader>();
+    if (!linepatternShader) linepatternShader = std::make_unique<LinepatternShader>();
     if (!patternShader) patternShader = std::make_unique<PatternShader>();
     if (!iconShader) iconShader = std::make_unique<IconShader>();
     if (!rasterShader) rasterShader = std::make_unique<RasterShader>();

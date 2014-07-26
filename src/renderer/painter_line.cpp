@@ -1,6 +1,9 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/map/sprite.hpp>
+#include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/map/map.hpp>
 
 using namespace mbgl;
@@ -60,20 +63,50 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         bucket.drawPoints(*linejoinShader);
     }
 
-    // var imagePos = properties.image && imageSprite.getPosition(properties.image);
-    bool imagePos = false;
-    if (imagePos) {
-        // var factor = 8 / Math.pow(2, painter.transform.zoom - params.z);
+    const std::shared_ptr<Sprite> &sprite = map.getSprite();
+    if (properties.image.size() && sprite) {
+        SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
+        Rect<uint16_t> imagePos = spriteAtlas.getImage(properties.image, *sprite);
+        
+        float factor = 8.0 / std::pow(2, map.getState().getIntegerZoom() - id.z);
+        
+        float fade = std::fmod(map.getState().getZoom(), 1.0);
 
-        // imageSprite.bind(gl, true);
+        std::array<float, 2> imageSize = {{
+            imagePos.w * factor,
+            imagePos.h * factor
+        }
+        };
 
-        // //factor = Math.pow(2, 4 - painter.transform.zoom + params.z);
-        // gl.switchShader(painter.linepatternShader, painter.translatedMatrix || painter.posMatrix, painter.extrudeMatrix);
-        // shader = painter.linepatternShader;
-        // glUniform2fv(painter.linepatternShader.u_pattern_size, [imagePos.size[0] * factor, imagePos.size[1] ]);
-        // glUniform2fv(painter.linepatternShader.u_pattern_tl, imagePos.tl);
-        // glUniform2fv(painter.linepatternShader.u_pattern_br, imagePos.br);
-        // glUniform1f(painter.linepatternShader.u_fade, painter.transform.z % 1.0);
+        std::array<float, 2> offset = {{
+            (float)std::fmod(id.x * 4096, imageSize[0]),
+            (float)std::fmod(id.y * 4096, imageSize[1])
+        }
+        };
+        useProgram(linepatternShader->program);
+        linepatternShader->setMatrix(vtxMatrix);
+        linepatternShader->setExtrudeMatrix(extrudeMatrix);
+        lineShader->setDashArray({{ dash_length, dash_gap }});
+        linepatternShader->setLineWidth({{ outset, inset }});
+        linepatternShader->setRatio(map.getState().getPixelRatio());
+        
+        linepatternShader->setPatternSize(imageSize);
+        linepatternShader->setPatternTopLeft({{
+            float(imagePos.x) / spriteAtlas.getWidth(),
+            float(imagePos.y) / spriteAtlas.getHeight(),
+        }});
+        linepatternShader->setPatternBottomRight({{
+            float(imagePos.x + imagePos.w) / spriteAtlas.getWidth(),
+            float(imagePos.y + imagePos.h) / spriteAtlas.getHeight(),
+        }});
+        linepatternShader->setOffset(offset);
+        linepatternShader->setGamma(map.getState().getPixelRatio());
+        linepatternShader->setFade(fade);
+        
+        spriteAtlas.bind(true);
+        glDepthRange(strata + strata_epsilon, 1.0f);  // may or may not matter
+        
+        bucket.drawLinePatterns(*linepatternShader);
 
     } else {
         useProgram(lineShader->program);
