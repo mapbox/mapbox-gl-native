@@ -273,7 +273,7 @@ void Placement::addFeature(TextBucket &bucket, const std::vector<Coordinate> &li
         GlyphBoxes boxes;
 
         getGlyphs(glyphs, boxes, anchor, info.translate, shaping, face, fontScale, horizontal, line,
-                  info.max_angle_delta, info.rotate);
+                  info.max_angle_delta * (M_PI/180), info.rotate);
         PlacementProperty place = collision.place(boxes, anchor, anchor.scale, maxPlacementScale,
                                                   info.padding, horizontal, info.always_visible);
         if (place) {

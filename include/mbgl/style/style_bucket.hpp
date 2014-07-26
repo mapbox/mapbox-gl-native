@@ -51,7 +51,7 @@ public:
     float vertical_alignment = 0.5;
     vec2<float> translate {0, 0};
     TranslateAnchorType translate_anchor = TranslateAnchorType::Default;
-    float max_angle_delta = M_PI;
+    float max_angle_delta = 45.0f;
     float min_distance = 250.0f;
     float rotate = 0.0f; // what is this?
     float padding = 2.0f;
