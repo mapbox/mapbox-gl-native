@@ -35,6 +35,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
     if (fringeline) {
         outline = true;
         stroke_color = fill_color;
+        stroke_color[3] *= properties.opacity;
     }
 
 
