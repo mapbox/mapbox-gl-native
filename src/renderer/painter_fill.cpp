@@ -136,7 +136,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
         outlineShader->setMatrix(vtxMatrix);
         lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
-        outlineShader->setColor(fill_color);
+        outlineShader->setColor(stroke_color);
 
         // Draw the entire line
         outlineShader->setWorld({{
