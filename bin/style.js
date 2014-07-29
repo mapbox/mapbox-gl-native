@@ -1543,10 +1543,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "country_label",
     "filter": { "$type": "Point" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 24,
       "text-max-width": 5
@@ -1568,10 +1568,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "LineString", "labelrank": 1 },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "curve",
+      "symbol-placement": "line",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 30,
       "text-max-angle": 0.5,
@@ -1596,10 +1596,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "LineString", "labelrank": 2 },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "curve",
+      "symbol-placement": "line",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 24,
       "text-max-angle": 0.5
@@ -1623,10 +1623,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "LineString", "labelrank": 3 },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "curve",
+      "symbol-placement": "line",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 18,
       "text-max-angle": 0.5
@@ -1650,10 +1650,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "LineString", "labelrank": [4, 5, 6] },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "curve",
+      "symbol-placement": "line",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 16,
       "text-max-angle": 0.5
@@ -1677,10 +1677,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "Point", "labelrank": 1 },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 30,
       "text-max-width": 8,
@@ -1706,10 +1706,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "Point", "labelrank": 2 },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 24,
       "text-max-width": 8,
@@ -1735,10 +1735,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "Point", "labelrank": 3 },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 18,
       "text-max-width": 8,
@@ -1764,10 +1764,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "marine_label",
     "filter": { "$type": "Point", "labelrank": [4, 5, 6] },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 16,
       "text-max-width": 8,
@@ -1793,10 +1793,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "state_label",
     "filter": { "$type": "Point" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
       "text-max-size": 16,
       "text-max-width": 8
@@ -1822,10 +1822,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "place_label",
     "filter": { "type": "city", "$type": "Point" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 20,
       "text-max-width": 8
@@ -1851,10 +1851,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "place_label",
     "filter": { "type": "town", "$type": "Point" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 24,
       "text-max-width": 8
@@ -1880,10 +1880,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "place_label",
     "filter": { "type": "village", "$type": "Point" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 22,
       "text-max-width": 8
@@ -1909,10 +1909,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "place_label",
     "filter": { "type": ["hamlet", "suburb", "neighbourhood"], "$type": "Point" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 18,
       "text-max-width": 6
@@ -1937,10 +1937,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road_label",
     "filter": { "class": ["motorway", "main"], "$type": "LineString" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "curve",
+      "symbol-placement": "line",
       "text-padding": 2,
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
       "text-max-size": 18,
@@ -1963,10 +1963,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road_label",
     "filter": { "class": ["street", "street_limited"], "$type": "LineString" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "curve",
+      "symbol-placement": "line",
       "text-padding": 2,
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
       "text-max-size": 16,
@@ -1989,10 +1989,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "road_label",
     "filter": { "class": ["service", "driveway", "path"], "$type": "LineString" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "curve",
+      "symbol-placement": "line",
       "text-padding": 2,
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
       "text-max-size": 14,
@@ -2015,9 +2015,9 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "contour",
     "filter": { "index": [5, 10], "$type": "LineString" },
-    "type": "text",
+    "type": "symbol",
     "render": {
-      "text-path": "curve",
+      "symbol-placement": "line",
       "text-field": "{ele} m",
       "text-font": "Open Sans Regular, Arial Unicode MS Regular",
       "text-max-size": 10,
@@ -2040,10 +2040,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "water_label",
     "filter": { "$type": "Point" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 12,
       "text-max-width": 8
@@ -2061,10 +2061,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "waterway_label",
     "filter": { "$type": "LineString" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "curve",
+      "symbol-placement": "line",
       "text-font": "Open Sans Semibold Italic, Arial Unicode MS Bold",
       "text-max-size": 12,
       "text-max-angle": 0.5
@@ -2083,7 +2083,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": [1, 2] },
-    "type": "icon",
+    "type": "symbol",
     "render": {
       "icon-image": "{maki}-12",
       "icon-size": 12
@@ -2094,10 +2094,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": [1, 2], "$type": "Point" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-padding": 2,
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 12,
@@ -2121,7 +2121,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": 3 },
-    "type": "icon",
+    "type": "symbol",
     "render": {
       "icon-image": "{maki}-12",
       "icon-size": 12
@@ -2141,10 +2141,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": 3, "$type": "Point" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-padding": 2,
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 11,
@@ -2174,7 +2174,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": 4 },
-    "type": "icon",
+    "type": "symbol",
     "render": {
       "icon-image": "{maki}-12",
       "icon-size": 12
@@ -2194,10 +2194,10 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "scalerank": 4, "$type": "Point" },
-    "type": "text",
+    "type": "symbol",
     "render": {
       "text-field": "{name_en}",
-      "text-path": "horizontal",
+      "symbol-placement": "point",
       "text-padding": 2,
       "text-font": "Open Sans Semibold, Arial Unicode MS Bold",
       "text-max-size": 10,
@@ -2227,7 +2227,7 @@ module.exports = {
     "source": "mapbox",
     "source-layer": "poi_label",
     "filter": { "maki": "airport" },
-    "type": "icon",
+    "type": "symbol",
     "render": {
       "icon-image": "{maki}-12",
       "icon-size": 12

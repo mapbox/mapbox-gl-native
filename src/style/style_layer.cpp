@@ -191,23 +191,30 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const times
 }
 
 template <>
-void StyleLayer::applyStyleProperties<IconProperties>(const float z, const timestamp now) {
-    properties.set<IconProperties>();
-    IconProperties &icon = properties.get<IconProperties>();
-    applyStyleProperty(PropertyKey::IconOpacity, icon.opacity, z, now);
-    applyStyleProperty(PropertyKey::IconRotate, icon.rotate, z, now);
-}
+void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const timestamp now) {
+    properties.set<SymbolProperties>();
+    SymbolProperties &symbol = properties.get<SymbolProperties>();
+    applyStyleProperty(PropertyKey::IconOpacity, symbol.icon.opacity, z, now);
+    applyStyleProperty(PropertyKey::IconRotate, symbol.icon.rotate, z, now);
+    applyStyleProperty(PropertyKey::IconSize, symbol.icon.size, z, now);
+    applyStyleProperty(PropertyKey::IconColor, symbol.icon.color, z, now);
+    applyStyleProperty(PropertyKey::IconHaloColor, symbol.icon.halo_color, z, now);
+    applyStyleProperty(PropertyKey::IconHaloWidth, symbol.icon.halo_width, z, now);
+    applyStyleProperty(PropertyKey::IconHaloBlur, symbol.icon.halo_blur, z, now);
+    applyStyleProperty(PropertyKey::IconTranslateX, symbol.icon.translate[0], z, now);
+    applyStyleProperty(PropertyKey::IconTranslateY, symbol.icon.translate[1], z, now);
+    applyStyleProperty(PropertyKey::IconTranslateAnchor, symbol.icon.translate_anchor, z, now);
 
-template <>
-void StyleLayer::applyStyleProperties<TextProperties>(const float z, const timestamp now) {
-    properties.set<TextProperties>();
-    TextProperties &text = properties.get<TextProperties>();
-    applyStyleProperty(PropertyKey::TextOpacity, text.opacity, z, now);
-    applyStyleProperty(PropertyKey::TextSize, text.size, z, now);
-    applyStyleProperty(PropertyKey::TextColor, text.color, z, now);
-    applyStyleProperty(PropertyKey::TextHaloColor, text.halo_color, z, now);
-    applyStyleProperty(PropertyKey::TextHaloWidth, text.halo_width, z, now);
-    applyStyleProperty(PropertyKey::TextHaloBlur, text.halo_blur, z, now);
+    applyStyleProperty(PropertyKey::TextOpacity, symbol.text.opacity, z, now);
+    applyStyleProperty(PropertyKey::TextSize, symbol.text.size, z, now);
+    applyStyleProperty(PropertyKey::TextColor, symbol.text.color, z, now);
+    applyStyleProperty(PropertyKey::TextHaloColor, symbol.text.halo_color, z, now);
+    applyStyleProperty(PropertyKey::TextHaloWidth, symbol.text.halo_width, z, now);
+    applyStyleProperty(PropertyKey::TextHaloBlur, symbol.text.halo_blur, z, now);
+    applyStyleProperty(PropertyKey::TextTranslateX, symbol.text.translate[0], z, now);
+    applyStyleProperty(PropertyKey::TextTranslateY, symbol.text.translate[1], z, now);
+    applyStyleProperty(PropertyKey::TextTranslateAnchor, symbol.text.translate_anchor, z, now);
+
 }
 
 template <>
@@ -247,8 +254,7 @@ void StyleLayer::updateProperties(float z, const timestamp now) {
     switch (type) {
         case StyleLayerType::Fill: applyStyleProperties<FillProperties>(z, now); break;
         case StyleLayerType::Line: applyStyleProperties<LineProperties>(z, now); break;
-        case StyleLayerType::Icon: applyStyleProperties<IconProperties>(z, now); break;
-        case StyleLayerType::Text: applyStyleProperties<TextProperties>(z, now); break;
+        case StyleLayerType::Symbol: applyStyleProperties<SymbolProperties>(z, now); break;
         case StyleLayerType::Raster: applyStyleProperties<RasterProperties>(z, now); break;
         case StyleLayerType::Composite: applyStyleProperties<CompositeProperties>(z, now); break;
         case StyleLayerType::Background: applyStyleProperties<BackgroundProperties>(z, now); break;

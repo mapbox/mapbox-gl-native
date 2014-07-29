@@ -18,52 +18,27 @@ class Source;
 
 class StyleBucketFill {
 public:
-    WindingType winding = WindingType::Default;
+    WindingType winding = WindingType::NonZero;
 };
 
 class StyleBucketLine {
 public:
-    CapType cap = CapType::Default;
-    JoinType join = JoinType::Default;
+    CapType cap = CapType::Butt;
+    JoinType join = JoinType::Miter;
     float miter_limit = 2.0f;
     float round_limit = 1.0f;
 };
 
-class StyleBucketIcon {
+class StyleBucketSymbol {
 public:
-    uint16_t size = 16;
-    vec2<float> translate {0, 0};
-    TranslateAnchorType translate_anchor = TranslateAnchorType::Default;
-    std::string icon;
-    float spacing = 0.0f;
-    float padding = 2.0f;
-};
+    // Make movable only.
+    inline StyleBucketSymbol() = default;
+    inline StyleBucketSymbol(StyleBucketSymbol &&) = default;
+    inline StyleBucketSymbol& operator=(StyleBucketSymbol &&) = default;
+    inline StyleBucketSymbol(const StyleBucketSymbol &) = delete;
+    inline StyleBucketSymbol& operator=(const StyleBucketSymbol &) = delete;
 
-class StyleBucketText {
-public:
-    std::string field;
-    TextPathType path = TextPathType::Default;
-    TextTransformType transform = TextTransformType::Default;
-    std::string font;
-    float max_size = 16.0f;
-    float max_width = 15.0f * 24;
-    float line_height = 1.2f * 24;
-    float letter_spacing = 0.0f;
-    float alignment = 0.5f;
-    float vertical_alignment = 0.5;
-    vec2<float> translate {0, 0};
-    TranslateAnchorType translate_anchor = TranslateAnchorType::Default;
-    float max_angle_delta = 45.0f;
-    float min_distance = 250.0f;
-    float rotate = 0.0f; // what is this?
-    float padding = 2.0f;
-    float slant = 0.0f;
-    bool always_visible = false;
-};
-
-class StyleBucketSymbol : util::noncopyable {
-public:
-    PlacementType placement = PlacementType::Default;
+    PlacementType placement = PlacementType::Point;
     float min_distance = 250.0f;
 
     struct {
@@ -76,6 +51,7 @@ public:
         float padding = 2.0f;
         bool keep_upright = false;
         vec2<float> offset = {0, 0};
+        TranslateAnchorType translate_anchor = TranslateAnchorType::Map;
     } icon;
 
     struct {
@@ -96,6 +72,7 @@ public:
         bool keep_upright = true;
         TextTransformType transform = TextTransformType::None;
         vec2<float> offset = {0, 0};
+        TranslateAnchorType translate_anchor = TranslateAnchorType::Map;
         bool allow_overlap = false;
         bool ignore_placement = false;
         bool optional = false;
@@ -106,9 +83,8 @@ class StyleBucketRaster {
 public:
 };
 
-typedef util::variant<StyleBucketFill, StyleBucketLine, StyleBucketIcon,
-                      StyleBucketText, StyleBucketRaster,
-                      std::false_type> StyleBucketRender;
+typedef util::variant<StyleBucketFill, StyleBucketLine, StyleBucketSymbol,
+                      StyleBucketRaster, std::false_type> StyleBucketRender;
 
 
 class StyleBucket {

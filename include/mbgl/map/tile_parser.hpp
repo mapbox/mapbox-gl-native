@@ -21,9 +21,8 @@ class SpriteAtlas;
 class Style;
 class StyleBucket;
 class StyleBucketFill;
-class StyleBucketIcon;
 class StyleBucketLine;
-class StyleBucketText;
+class StyleBucketSymbol;
 class StyleLayerGroup;
 class VectorTileData;
 
@@ -40,18 +39,14 @@ public:
 
 private:
     bool obsolete() const;
-    void parseGlyphs();
     void parseStyleLayers(std::shared_ptr<StyleLayerGroup> group);
-    void addGlyph(uint64_t tileid, const std::string stackname, const std::u32string &string, const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face);
     std::unique_ptr<Bucket> createBucket(std::shared_ptr<StyleBucket> bucket_desc);
 
     std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketFill &fill);
     std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketLine &line);
-    std::unique_ptr<Bucket> createIconBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketIcon &icon);
-    std::unique_ptr<Bucket> createTextBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketText &text);
+    std::unique_ptr<Bucket> createSymbolBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketSymbol &symbol);
 
-    template <class Bucket> void addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const FilterExpression &filter);
-    template <class Bucket, typename ...Args> void addBucketFeatures(Bucket& bucket, const VectorTileLayer& layer, const FilterExpression &filter, Args&& ...args);
+    template <class Bucket> void addBucketGeometries(Bucket& bucket, const VectorTileLayer& layer, const FilterExpression &filter);
 
 private:
     const VectorTile vector_data;

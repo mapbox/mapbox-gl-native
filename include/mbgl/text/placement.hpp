@@ -9,15 +9,15 @@
 
 namespace mbgl {
 
-class TextBucket;
-class StyleBucketText;
+class SymbolBucket;
+class StyleBucketSymbol;
 
 class Placement {
 public:
     Placement(int8_t zoom, float placementDepth);
 
-    void addFeature(TextBucket &bucket, const std::vector<Coordinate> &line,
-                    const StyleBucketText &info,
+    void addFeature(SymbolBucket &bucket, const std::vector<Coordinate> &line,
+                    const StyleBucketSymbol &info,
                     const GlyphPositions &face,
                     const Shaping &shaping);
 

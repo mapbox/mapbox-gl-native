@@ -1,7 +1,7 @@
 #include <mbgl/text/placement.hpp>
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/geometry/interpolate.hpp>
-#include <mbgl/renderer/text_bucket.hpp>
+#include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
 
@@ -245,11 +245,11 @@ void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
     }
 }
 
-void Placement::addFeature(TextBucket &bucket, const std::vector<Coordinate> &line,
-                           const StyleBucketText &info, const GlyphPositions &face,
+void Placement::addFeature(SymbolBucket &bucket, const std::vector<Coordinate> &line,
+                           const StyleBucketSymbol &info, const GlyphPositions &face,
                            const Shaping &shaping) {
-    const bool horizontal = info.path == TextPathType::Horizontal;
-    const float fontScale = (tileExtent / util::tileSize) / (glyphSize / info.max_size);
+    const bool horizontal = info.text.rotation_alignment == RotationAlignmentType::Viewport;
+    const float fontScale = (tileExtent / util::tileSize) / (glyphSize / info.text.max_size);
 
     Anchors anchors;
 
@@ -272,10 +272,10 @@ void Placement::addFeature(TextBucket &bucket, const std::vector<Coordinate> &li
         PlacedGlyphs glyphs;
         GlyphBoxes boxes;
 
-        getGlyphs(glyphs, boxes, anchor, info.translate, shaping, face, fontScale, horizontal, line,
-                  info.max_angle_delta * (M_PI/180), info.rotate);
+        getGlyphs(glyphs, boxes, anchor, info.text.offset, shaping, face, fontScale, horizontal, line,
+                  info.text.max_angle_delta * (M_PI/180), info.text.rotate);
         PlacementProperty place = collision.place(boxes, anchor, anchor.scale, maxPlacementScale,
-                                                  info.padding, horizontal, info.always_visible);
+                                                  info.text.padding, horizontal, info.text.ignore_placement);
         if (place) {
             bucket.addGlyphs(glyphs, place.zoom, place.rotationRange, zoom - zOffset);
         }

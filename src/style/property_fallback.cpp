@@ -33,6 +33,7 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::IconTranslateX, defaultStyleProperties<SymbolProperties>().icon.translate[0] },
     { PropertyKey::IconTranslateY, defaultStyleProperties<SymbolProperties>().icon.translate[1] },
     { PropertyKey::IconTranslateAnchor, defaultStyleProperties<SymbolProperties>().icon.translate_anchor },
+
     { PropertyKey::TextOpacity, defaultStyleProperties<SymbolProperties>().text.opacity },
     { PropertyKey::TextSize, defaultStyleProperties<SymbolProperties>().text.size },
     { PropertyKey::TextColor, defaultStyleProperties<SymbolProperties>().text.color },

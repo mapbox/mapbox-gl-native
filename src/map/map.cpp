@@ -683,13 +683,9 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
                 if (pass == Opaque) return;
                 if (!layer_desc->getProperties<LineProperties>().isVisible()) return;
                 break;
-            case StyleLayerType::Icon:
+            case StyleLayerType::Symbol:
                 if (pass == Opaque) return;
-                if (!layer_desc->getProperties<IconProperties>().isVisible()) return;
-                break;
-            case StyleLayerType::Text:
-                if (pass == Opaque) return;
-                if (!layer_desc->getProperties<TextProperties>().isVisible()) return;
+                if (!layer_desc->getProperties<SymbolProperties>().isVisible()) return;
                 break;
             case StyleLayerType::Raster:
                 if (pass == Translucent) return;
