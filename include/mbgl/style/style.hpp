@@ -20,7 +20,6 @@ namespace mbgl {
 class Sprite;
 class StyleLayer;
 class StyleLayerGroup;
-struct BackgroundProperties;
 
 class Style {
 public:
@@ -46,8 +45,6 @@ public:
     void updateClasses();
 
     bool hasTransitions() const;
-
-    const BackgroundProperties &getBackgroundProperties() const;
 
     const std::string &getSpriteURL() const;
 

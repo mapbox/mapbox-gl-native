@@ -143,8 +143,7 @@ void Painter::clear() {
     glStencilMask(0xFF);
     depthMask(true);
 
-    const BackgroundProperties &properties = map.getStyle()->getBackgroundProperties();
-    glClearColor(properties.color[0], properties.color[1], properties.color[2], properties.color[3]);
+    glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -184,6 +183,19 @@ void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> laye
     }
 }
 
+void Painter::renderBackground(std::shared_ptr<StyleLayer> layer_desc) {
+    const BackgroundProperties& properties = layer_desc->getProperties<BackgroundProperties>();
+
+    useProgram(plainShader->program);
+    plainShader->setMatrix(identityMatrix);
+    plainShader->setColor(properties.color);
+    backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
+
+    glDisable(GL_STENCIL_TEST);
+    depthRange(strata + strata_epsilon, 1.0f);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glEnable(GL_STENCIL_TEST);
+}
 
 const mat4 &Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {
     if (translation[0] == 0 && translation[1] == 0) {

@@ -625,7 +625,15 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
 
 void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id, const mat4* matrix) {
     if (layer_desc->type == StyleLayerType::Background) {
-        // This layer defines the background color.
+        // This layer defines a background color/image.
+        if (pass == RenderPass::Translucent) return;
+
+        if (debug::renderTree) {
+            std::cout << std::string(indent * 4, ' ') << "- " << layer_desc->id << " ("
+                      << layer_desc->type << ")" << std::endl;
+        }
+
+        painter.renderBackground(layer_desc);
     } else {
         // This is a singular layer.
         if (!layer_desc->bucket) {

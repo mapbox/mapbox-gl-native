@@ -86,6 +86,8 @@ public:
     void renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     void renderSymbol(SymbolBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderBackground(std::shared_ptr<StyleLayer> layer_desc);
+
     std::array<float, 3> spinWeights(float spin_value);
 
     void preparePrerender(RasterBucket &bucket);
@@ -142,6 +144,12 @@ public:
         return flipMatrix;
     }();
 
+    const mat4 identityMatrix = []{
+        mat4 identity;
+        matrix::identity(identity);
+        return identity;
+    }();
+
 private:
     Map& map;
 
@@ -169,6 +177,13 @@ public:
     std::unique_ptr<TextShader> textShader;
     std::unique_ptr<DotShader> dotShader;
     std::unique_ptr<GaussianShader> gaussianShader;
+
+    StaticVertexBuffer backgroundBuffer = {
+        { -1, -1 }, { 1, -1 },
+        { -1,  1 }, { 1,  1 }
+    };
+
+    VertexArrayObject backgroundArray;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     StaticVertexBuffer tileStencilBuffer = {
