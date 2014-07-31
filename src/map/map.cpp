@@ -185,6 +185,7 @@ void Map::setup() {
 
 void Map::setStyleJSON(std::string newStyleJSON) {
     styleJSON.swap(newStyleJSON);
+    sprite.reset();
     style->loadJSON((const uint8_t *)styleJSON.c_str());
     update();
 }
@@ -202,9 +203,9 @@ std::string Map::getAccessToken() const {
 }
 
 std::shared_ptr<Sprite> Map::getSprite() {
-    float pixelRatio = state.getPixelRatio();
+    const float pixelRatio = state.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
-    if (!sprite || sprite->pixelRatio != pixelRatio || sprite->url != sprite_url) {
+    if (!sprite || sprite->pixelRatio != pixelRatio) {
         sprite = Sprite::Create(sprite_url, pixelRatio);
     }
 
@@ -531,11 +532,8 @@ void Map::prepare() {
     updateSources();
     style->updateProperties(state.getNormalizedZoom(), animationTime);
 
-    if (pixelRatioChanged) {
-        spriteAtlas->resize(state.getPixelRatio());
-    }
-
     // Allow the sprite atlas to potentially pull new sprite images if needed.
+    spriteAtlas->resize(state.getPixelRatio());
     spriteAtlas->update(*getSprite());
 
     updateTiles();

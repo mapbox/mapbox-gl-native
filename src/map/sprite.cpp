@@ -27,8 +27,10 @@ std::shared_ptr<Sprite> Sprite::Create(const std::string& base_url, float pixelR
 }
 
 Sprite::Sprite(const Key &, const std::string& base_url, float pixelRatio)
-    : pixelRatio(pixelRatio),
-      url(base_url),
+    : valid(base_url.length() > 0),
+      pixelRatio(pixelRatio),
+      spriteURL(base_url + (pixelRatio > 1 ? "@2x" : "") + ".png"),
+      jsonURL(base_url + (pixelRatio > 1 ? "@2x" : "") + ".json"),
       raster(),
       loadedImage(false),
       loadedJSON(false),
@@ -40,7 +42,7 @@ void Sprite::waitUntilLoaded() const {
 }
 
 Sprite::operator bool() const {
-    return isLoaded() && !pos.empty();
+    return valid && isLoaded() && !pos.empty();
 }
 
 
@@ -48,8 +50,8 @@ Sprite::operator bool() const {
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
 void Sprite::load() {
-    if (url.length() == 0) {
-        // Treat a non-existent sprite as an empty sprite.
+    if (!valid) {
+        // Treat a non-existent sprite as a successfully loaded empty sprite.
         loadedImage = true;
         loadedJSON = true;
         promise.set_value();
@@ -58,28 +60,24 @@ void Sprite::load() {
 
     std::shared_ptr<Sprite> sprite = shared_from_this();
 
-    const std::string suffix = (pixelRatio > 1 ? "@2x" : "");
-
-    platform::request_http(url + suffix + ".json", [sprite](platform::Response *res) {
+    platform::request_http(jsonURL, [sprite](platform::Response *res) {
         if (res->code == 200) {
             sprite->body.swap(res->body);
             sprite->parseJSON();
             sprite->complete();
         } else {
-            fprintf(stderr, "failed to load sprite info\n");
-            fprintf(stderr, "error %d: %s\n", res->code, res->error_message.c_str());
+            Log::Warning(Event::Sprite, "Failed to load sprite info: Error %d: %s", res->code, res->error_message.c_str());
             sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res->error_message)));
         }
     });
 
-    platform::request_http(url + suffix + ".png", [sprite](platform::Response *res) {
+    platform::request_http(spriteURL, [sprite](platform::Response *res) {
         if (res->code == 200) {
             sprite->image.swap(res->body);
             sprite->parseImage();
             sprite->complete();
         } else {
-            fprintf(stderr, "failed to load sprite image\n");
-            fprintf(stderr, "error %d: %s\n", res->code, res->error_message.c_str());
+            Log::Warning(Event::Sprite, "Failed to load sprite image: Error %d: %s", res->code, res->error_message.c_str());
             sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res->error_message)));
         }
     });
@@ -87,7 +85,7 @@ void Sprite::load() {
 
 void Sprite::complete() {
     if (loadedImage && loadedJSON) {
-        Log::Info(Event::Sprite, "loaded %s", url.c_str());
+        Log::Info(Event::Sprite, "loaded %s", spriteURL.c_str());
         promise.set_value();
     }
 }

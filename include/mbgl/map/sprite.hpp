@@ -46,9 +46,13 @@ public:
 
     operator bool() const;
 
+private:
+    const bool valid;
+
 public:
     const float pixelRatio;
-    const std::string url;
+    const std::string spriteURL;
+    const std::string jsonURL;
     std::unique_ptr<util::Image> raster;
 
 private:

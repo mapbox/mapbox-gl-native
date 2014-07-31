@@ -2085,8 +2085,7 @@ module.exports = {
     "filter": { "scalerank": [1, 2] },
     "type": "symbol",
     "render": {
-      "icon-image": "{maki}-12",
-      "icon-size": 12
+      "icon-image": "{maki}-12"
     },
     "style.night": {}
   }, {
@@ -2123,8 +2122,7 @@ module.exports = {
     "filter": { "scalerank": 3 },
     "type": "symbol",
     "render": {
-      "icon-image": "{maki}-12",
-      "icon-size": 12
+      "icon-image": "{maki}-12"
     },
     "style": {
       "icon-opacity": {
@@ -2176,8 +2174,7 @@ module.exports = {
     "filter": { "scalerank": 4 },
     "type": "symbol",
     "render": {
-      "icon-image": "{maki}-12",
-      "icon-size": 12
+      "icon-image": "{maki}-12"
     },
     "style": {
       "icon-opacity": {
@@ -2229,8 +2226,7 @@ module.exports = {
     "filter": { "maki": "airport" },
     "type": "symbol",
     "render": {
-      "icon-image": "{maki}-12",
-      "icon-size": 12
+      "icon-image": "{maki}-12"
     },
     "style": {
       "icon-opacity": {
