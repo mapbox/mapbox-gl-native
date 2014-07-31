@@ -24,6 +24,7 @@ class IconShader;
 class DotShader;
 class Placement;
 class SpriteAtlas;
+class Sprite;
 class GlyphAtlas;
 class GlyphStore;
 class FontStack;
@@ -44,8 +45,8 @@ public:
     virtual bool hasIconData() const;
 
     void addFeatures(const VectorTileLayer &layer, const FilterExpression &filter,
-                     const Tile::ID &id, SpriteAtlas &spriteAtlas, GlyphAtlas &glyphAtlas,
-                     GlyphStore &glyphStore);
+                     const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
+                     GlyphAtlas &glyphAtlas, GlyphStore &glyphStore);
 
     void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom, PlacementRange placementRange,
                    float zoom);

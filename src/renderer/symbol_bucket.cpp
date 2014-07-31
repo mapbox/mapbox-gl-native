@@ -62,7 +62,7 @@ void SymbolBucket::addGlyph(uint64_t tileid, const std::string stackname,
 }
 
 void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpression &filter,
-                               const Tile::ID &id, SpriteAtlas &spriteAtlas, GlyphAtlas &glyphAtlas,
+                               const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite, GlyphAtlas &glyphAtlas,
                                GlyphStore &glyphStore) {
     const bool text = properties.text.field.size();
     const bool icon = properties.icon.image.size();
@@ -106,8 +106,7 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
             if (icon) {
                 std::string field = util::replaceTokens(properties.icon.image, feature.properties);
 
-                // TODO: remove hardcoded size 12.
-                const Rect<uint16_t> rect = spriteAtlas.getIcon(12, field);
+                const Rect<uint16_t> rect = spriteAtlas.waitForImage(field, sprite);
                 const uint16_t tx = rect.x + rect.w / 2;
                 const uint16_t ty = rect.y + rect.h / 2;
 

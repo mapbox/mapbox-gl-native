@@ -34,13 +34,15 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile,
                        const std::shared_ptr<const Style> &style,
                        const std::shared_ptr<GlyphAtlas> &glyphAtlas,
                        const std::shared_ptr<GlyphStore> &glyphStore,
-                       const std::shared_ptr<SpriteAtlas> &spriteAtlas)
+                       const std::shared_ptr<SpriteAtlas> &spriteAtlas,
+                       const std::shared_ptr<Sprite> &sprite)
     : vector_data(pbf((const uint8_t *)data.data(), data.size())),
       tile(tile),
       style(style),
       glyphAtlas(glyphAtlas),
       glyphStore(glyphStore),
       spriteAtlas(spriteAtlas),
+      sprite(sprite),
       placement(tile.id.z, tile.id.z >= tile.source.max_zoom ? tile.source.max_zoom - tile.id.z : 1) {
 }
 
@@ -153,6 +155,6 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& laye
 
 std::unique_ptr<Bucket> TileParser::createSymbolBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketSymbol &symbol) {
     std::unique_ptr<SymbolBucket> bucket = std::make_unique<SymbolBucket>(tile.textVertexBuffer, tile.iconVertexBuffer, tile.triangleElementsBuffer, symbol, placement);
-    bucket->addFeatures(layer, filter, tile.id, *spriteAtlas, *glyphAtlas, *glyphStore);
+    bucket->addFeatures(layer, filter, tile.id, *spriteAtlas, *sprite, *glyphAtlas, *glyphStore);
     return obsolete() ? nullptr : std::move(bucket);
 }

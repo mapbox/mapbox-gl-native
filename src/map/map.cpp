@@ -201,6 +201,17 @@ std::string Map::getAccessToken() const {
     return accessToken;
 }
 
+std::shared_ptr<Sprite> Map::getSprite() {
+    float pixelRatio = state.getPixelRatio();
+    const std::string &sprite_url = style->getSpriteURL();
+    if (!sprite || sprite->pixelRatio != pixelRatio || sprite->url != sprite_url) {
+        sprite = Sprite::Create(sprite_url, pixelRatio);
+    }
+
+    return sprite;
+}
+
+
 #pragma mark - Size
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
@@ -502,14 +513,6 @@ void Map::prepare() {
     bool dimensionsChanged = oldState.getFramebufferWidth() != state.getFramebufferWidth() ||
                              oldState.getFramebufferHeight() != state.getFramebufferHeight();
 
-    if (pixelRatioChanged) {
-        style->sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
-        if (style->sprite_url.size()) {
-            style->sprite->load(style->sprite_url);
-        }
-        spriteAtlas->resize(state.getPixelRatio());
-    }
-
     // Create a new glyph store object in case the glyph URL changed.
     // TODO: Move this to a less frequently called place; we only need to do this when the
     // stylesheet changes.
@@ -528,10 +531,12 @@ void Map::prepare() {
     updateSources();
     style->updateProperties(state.getNormalizedZoom(), animationTime);
 
-    // Allow the sprite atlas to potentially pull new sprite images if needed.
-    if (style->sprite && style->sprite->isLoaded()) {
-        spriteAtlas->update(*style->sprite);
+    if (pixelRatioChanged) {
+        spriteAtlas->resize(state.getPixelRatio());
     }
+
+    // Allow the sprite atlas to potentially pull new sprite images if needed.
+    spriteAtlas->update(*getSprite());
 
     updateTiles();
 }

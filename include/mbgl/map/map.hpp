@@ -21,6 +21,7 @@ class GlyphAtlas;
 class GlyphStore;
 class LayerDescription;
 class SpriteAtlas;
+class Sprite;
 class Style;
 class StyleLayer;
 class StyleLayerGroup;
@@ -110,10 +111,11 @@ public:
 
 public:
     inline const TransformState &getState() const { return state; }
-    inline std::shared_ptr<const Style> getStyle() const { return style; }
+    inline std::shared_ptr<Style> getStyle() const { return style; }
     inline std::shared_ptr<GlyphAtlas> getGlyphAtlas() { return glyphAtlas; }
     inline std::shared_ptr<GlyphStore> getGlyphStore() { return glyphStore; }
     inline std::shared_ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
+    std::shared_ptr<Sprite> getSprite();
     inline std::shared_ptr<Texturepool> getTexturepool() { return texturepool; }
     inline std::shared_ptr<uv::loop> getLoop() { return loop; }
     inline timestamp getAnimationTime() const { return animationTime; }
@@ -172,6 +174,7 @@ private:
     std::shared_ptr<GlyphAtlas> glyphAtlas;
     std::shared_ptr<GlyphStore> glyphStore;
     std::shared_ptr<SpriteAtlas> spriteAtlas;
+    std::shared_ptr<Sprite> sprite;
     std::shared_ptr<Texturepool> texturepool;
 
     Painter painter;

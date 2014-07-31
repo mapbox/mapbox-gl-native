@@ -18,6 +18,7 @@ class FontStack;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
+class Sprite;
 class Style;
 class StyleBucket;
 class StyleBucketFill;
@@ -32,7 +33,8 @@ public:
                const std::shared_ptr<const Style> &style,
                const std::shared_ptr<GlyphAtlas> &glyphAtlas,
                const std::shared_ptr<GlyphStore> &glyphStore,
-               const std::shared_ptr<SpriteAtlas> &spriteAtlas);
+               const std::shared_ptr<SpriteAtlas> &spriteAtlas,
+               const std::shared_ptr<Sprite> &sprite);
 
 public:
     void parse();
@@ -57,6 +59,7 @@ private:
     std::shared_ptr<GlyphAtlas> glyphAtlas;
     std::shared_ptr<GlyphStore> glyphStore;
     std::shared_ptr<SpriteAtlas> spriteAtlas;
+    std::shared_ptr<Sprite> sprite;
 
     Placement placement;
 };

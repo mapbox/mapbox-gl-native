@@ -1,4 +1,5 @@
 #include <mbgl/style/style.hpp>
+#include <mbgl/map/sprite.hpp>
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
@@ -27,6 +28,10 @@ void Style::updateProperties(float z, timestamp now) {
         initial_render_complete = true;
         return;
     }
+}
+
+const std::string &Style::getSpriteURL() const {
+    return sprite_url;
 }
 
 void Style::setDefaultTransitionDuration(uint16_t duration_milliseconds) {
