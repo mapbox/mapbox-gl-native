@@ -112,7 +112,7 @@ void GLFWView::scroll(GLFWwindow *window, double /*xoffset*/, double yoffset) {
     }
 
     view->map->startScaling();
-    view->map->scaleBy(scale, view->last_x, view->last_y);
+    view->map->scaleBy(scale, view->last_point);
 }
 
 void GLFWView::resize(GLFWwindow *window, int, int) {
@@ -143,9 +143,9 @@ void GLFWView::mouseclick(GLFWwindow *window, int button, int action, int modifi
             double now = glfwGetTime();
             if (now - view->last_click < 0.4 /* ms */) {
                 if (modifiers & GLFW_MOD_SHIFT) {
-                    view->map->scaleBy(0.5, view->last_x, view->last_y, 0.5);
+                    view->map->scaleBy(0.5, view->last_point, 0.5);
                 } else {
-                    view->map->scaleBy(2.0, view->last_x, view->last_y, 0.5);
+                    view->map->scaleBy(2.0, view->last_point, 0.5);
                 }
             }
             view->last_click = now;
@@ -155,19 +155,18 @@ void GLFWView::mouseclick(GLFWwindow *window, int button, int action, int modifi
 
 void GLFWView::mousemove(GLFWwindow *window, double x, double y) {
     GLFWView *view = (GLFWView *)glfwGetWindowUserPointer(window);
+    mbgl::Point point(x, y);
     if (view->tracking) {
-        double dx = x - view->last_x;
-        double dy = y - view->last_y;
-        if (dx || dy) {
+        mbgl::Point delta = point.sub(view->last_point);
+        if (delta.x || delta.y) {
             view->map->startPanning();
-            view->map->moveBy(dx, dy);
+            view->map->moveBy(delta);
         }
     } else if (view->rotating) {
         view->map->startRotating();
-        view->map->rotateBy(view->last_x, view->last_y, x, y);
+        view->map->rotateBy(view->last_point, point);
     }
-    view->last_x = x;
-    view->last_y = y;
+    view->last_point = point;
 }
 
 int GLFWView::run() {

@@ -33,7 +33,7 @@ public:
 public:
     bool fullscreen = false;
 
-    double last_x = 0, last_y = 0;
+    mbgl::Point last_point;
     bool tracking = false;
 
     bool rotating = false;

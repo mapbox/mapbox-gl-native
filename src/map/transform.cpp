@@ -51,14 +51,17 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
 
 #pragma mark - Position
 
-void Transform::moveBy(const double dx, const double dy, const timestamp duration) {
+void Transform::moveBy(const Point& delta, const timestamp duration) {
     uv::writelock lock(mtx);
 
-    _moveBy(dx, dy, duration);
+    _moveBy(delta, duration);
 }
 
-void Transform::_moveBy(const double dx, const double dy, const timestamp duration) {
+void Transform::_moveBy(const Point& delta, const timestamp duration) {
     // This is only called internally, so we don't need a lock here.
+
+    const double dx = delta.x;
+    const double dy = delta.y;
 
     view.notify_map_change(duration ?
                            MapChangeRegionWillChangeAnimated :
@@ -93,42 +96,58 @@ void Transform::_moveBy(const double dx, const double dy, const timestamp durati
                            duration);
 }
 
-void Transform::setLonLat(const double lon, const double lat, const timestamp duration) {
-    uv::writelock lock(mtx);
+Point Transform::centerPoint() const {
+    return Point(current.width / 2,
+                 current.height / 2);
+}
+
+Point Transform::project(const LatLng& latLng, const double scale) const {
+    const double s = scale * util::tileSize;
+    const double Bc = s / 360;
+    const double Cc = s / (2 * M_PI);
+
+    const double lat = latLng.lat;
+    const double lon = latLng.lng;
 
     const double f = std::fmin(std::fmax(std::sin(D2R * lat), -0.9999), 0.9999);
     double xn = -lon * Bc;
     double yn = 0.5 * Cc * std::log((1 + f) / (1 - f));
 
-    _setScaleXY(current.scale, xn, yn, duration);
+    return Point(xn, yn);
 }
 
-void Transform::setLonLatZoom(const double lon, const double lat, const double zoom,
-                              const timestamp duration) {
+LatLng Transform::unproject(const Point& p) const {
+    const double s = current.scale * util::tileSize;
+    const double Bc = s / 360;
+    const double Cc = s / (2 * M_PI);
+
+    const double lon = -p.x / Bc;
+    const double lat = R2D * (2 * std::atan(std::exp(p.y / Cc)) - 0.5 * M_PI);
+
+    return LatLng(lat, lon);
+}
+
+void Transform::setLatLng(const LatLng& latLng, timestamp duration) {
+    uv::writelock lock(mtx);
+
+    _setScaleXY(current.scale, project(latLng, current.scale), duration);
+}
+
+void Transform::setLatLngZoom(const LatLng& latLng, double zoom, timestamp duration) {
     uv::writelock lock(mtx);
 
     double new_scale = std::pow(2.0, zoom);
-
-    const double s = new_scale * util::tileSize;
-    Bc = s / 360;
-    Cc = s / (2 * M_PI);
-
-    const double f = std::fmin(std::fmax(std::sin(D2R * lat), -0.9999), 0.9999);
-    double xn = -lon * Bc;
-    double yn = 0.5 * Cc * log((1 + f) / (1 - f));
-
-    _setScaleXY(new_scale, xn, yn, duration);
+    _setScaleXY(new_scale, project(latLng, new_scale), duration);
 }
 
-void Transform::getLonLat(double &lon, double &lat) const {
+LatLng Transform::getLatLng() const {
     uv::readlock lock(mtx);
 
-    lon = -final.x / Bc;
-    lat = R2D * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
+    return unproject(Point(final.x, final.y));
 }
 
-void Transform::getLonLatZoom(double &lon, double &lat, double &zoom) const {
-    getLonLat(lon, lat);
+void Transform::getLatLngZoom(LatLng& latlng, double &zoom) const {
+    latlng = getLatLng();
 
     uv::readlock lock(mtx);
     zoom = getZoom();
@@ -162,7 +181,7 @@ void Transform::_clearPanning() {
 
 #pragma mark - Zoom
 
-void Transform::scaleBy(const double ds, const double cx, const double cy, const timestamp duration) {
+void Transform::scaleBy(const double ds, const timestamp duration) {
     uv::writelock lock(mtx);
 
     // clamp scale to min/max values
@@ -173,20 +192,39 @@ void Transform::scaleBy(const double ds, const double cx, const double cy, const
         new_scale = max_scale;
     }
 
-    _setScale(new_scale, cx, cy, duration);
+    _setScale(new_scale, centerPoint(), duration);
 }
 
-void Transform::setScale(const double scale, const double cx, const double cy,
-                         const timestamp duration) {
+void Transform::scaleBy(const double ds, const Point& center, const timestamp duration) {
     uv::writelock lock(mtx);
 
-    _setScale(scale, cx, cy, duration);
+    // clamp scale to min/max values
+    double new_scale = current.scale * ds;
+    if (new_scale < min_scale) {
+        new_scale = min_scale;
+    } else if (new_scale > max_scale) {
+        new_scale = max_scale;
+    }
+
+    _setScale(new_scale, center, duration);
+}
+
+void Transform::setScale(const double scale, const timestamp duration) {
+    uv::writelock lock(mtx);
+    
+    _setScale(scale, centerPoint(), duration);
+}
+
+void Transform::setScale(const double scale, const Point& center, const timestamp duration) {
+    uv::writelock lock(mtx);
+
+    _setScale(scale, center, duration);
 }
 
 void Transform::setZoom(const double zoom, const timestamp duration) {
     uv::writelock lock(mtx);
 
-    _setScale(std::pow(2.0, zoom), -1, -1, duration);
+    _setScale(std::pow(2.0, zoom), centerPoint(), duration);
 }
 
 double Transform::getZoom() const {
@@ -241,20 +279,17 @@ void Transform::_clearScaling() {
     }
 }
 
-void Transform::_setScale(double new_scale, double cx, double cy, const timestamp duration) {
+void Transform::_setScale(double new_scale, const Point& center, const timestamp duration) {
     // This is only called internally, so we don't need a lock here.
+
+    double cx = center.x;
+    double cy = center.y;
 
     // Ensure that we don't zoom in further than the maximum allowed.
     if (new_scale < min_scale) {
         new_scale = min_scale;
     } else if (new_scale > max_scale) {
         new_scale = max_scale;
-    }
-
-    // Zoom in on the center if we don't have click or gesture anchor coordinates.
-    if (cx < 0 || cy < 0) {
-        cx = current.width / 2;
-        cy = current.height / 2;
     }
 
     // Account for the x/y offset from the center (= where the user clicked or pinched)
@@ -271,12 +306,14 @@ void Transform::_setScale(double new_scale, double cx, double cy, const timestam
     const double xn = current.x * factor + ax;
     const double yn = current.y * factor + ay;
 
-    _setScaleXY(new_scale, xn, yn, duration);
+    _setScaleXY(new_scale, Point(xn, yn), duration);
 }
 
-void Transform::_setScaleXY(const double new_scale, const double xn, const double yn,
-                            const timestamp duration) {
+void Transform::_setScaleXY(const double new_scale, const Point& center, const timestamp duration) {
     // This is only called internally, so we don't need a lock here.
+
+    double xn = center.x;
+    double yn = center.y;
 
     view.notify_map_change(duration ?
                            MapChangeRegionWillChangeAnimated :
@@ -306,10 +343,6 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
             std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
     }
 
-    const double s = final.scale * util::tileSize;
-    Bc = s / 360;
-    Cc = s / (2 * M_PI);
-
     view.notify_map_change(duration ?
                            MapChangeRegionDidChangeAnimated :
                            MapChangeRegionDidChange,
@@ -331,9 +364,13 @@ void Transform::constrain(double& scale, double& y) const {
 
 #pragma mark - Angle
 
-void Transform::rotateBy(const double start_x, const double start_y, const double end_x,
-                         const double end_y, const timestamp duration) {
+void Transform::rotateBy(const Point& start, const Point& end, const timestamp duration) {
     uv::writelock lock(mtx);
+
+    const double start_x = start.x;
+    const double start_y = start.y;
+    const double end_x = end.x;
+    const double end_y = end.y;
 
     double center_x = current.width / 2, center_y = current.height / 2;
 
@@ -376,13 +413,13 @@ void Transform::setAngle(const double new_angle, const double cx, const double c
     if (cx >= 0 && cy >= 0) {
         dx = (final.width / 2) - cx;
         dy = (final.height / 2) - cy;
-        _moveBy(dx, dy, 0);
+        _moveBy(Point(dx, dy), 0);
     }
 
     _setAngle(new_angle, 0);
 
     if (cx >= 0 && cy >= 0) {
-        _moveBy(-dx, -dy, 0);
+        _moveBy(Point(-dx, -dy), 0);
     }
 }
 

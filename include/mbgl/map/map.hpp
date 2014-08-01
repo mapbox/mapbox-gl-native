@@ -77,21 +77,23 @@ public:
     void cancelTransitions();
 
     // Position
-    void moveBy(double dx, double dy, double duration = 0);
-    void setLonLat(double lon, double lat, double duration = 0);
-    void getLonLat(double &lon, double &lat) const;
+    void moveBy(const Point& delta, double duration = 0);
+    void setLatLng(const LatLng& lat_lng, double duration = 0);
+    LatLng getLatLng() const;
     void startPanning();
     void stopPanning();
     void resetPosition();
 
     // Scale
-    void scaleBy(double ds, double cx = -1, double cy = -1, double duration = 0);
-    void setScale(double scale, double cx = -1, double cy = -1, double duration = 0);
+    void scaleBy(double ds, double duration = 0);
+    void scaleBy(double ds, const Point& center, double duration = 0);
+    void setScale(double scale, double duration = 0);
+    void setScale(double scale, const Point& center, double duration = 0);
     double getScale() const;
     void setZoom(double zoom, double duration = 0);
     double getZoom() const;
-    void setLonLatZoom(double lon, double lat, double zoom, double duration = 0);
-    void getLonLatZoom(double &lon, double &lat, double &zoom) const;
+    void setLatLngZoom(const LatLng&, double zoom, double duration = 0);
+    void getLatLngZoom(LatLng&, double &zoom) const;
     void resetZoom();
     void startScaling();
     void stopScaling();
@@ -99,7 +101,7 @@ public:
     double getMaxZoom() const;
 
     // Rotation
-    void rotateBy(double sx, double sy, double ex, double ey, double duration = 0);
+    void rotateBy(const Point& start, const Point& end, double duration = 0);
     void setBearing(double degrees, double duration = 0);
     void setBearing(double degrees, double cx, double cy);
     double getBearing() const;

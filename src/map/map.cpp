@@ -266,20 +266,20 @@ void Map::cancelTransitions() {
 #pragma mark - Position
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::moveBy(double dx, double dy, double duration) {
-    transform.moveBy(dx, dy, duration * 1_second);
+void Map::moveBy(const Point& delta, double duration) {
+    transform.moveBy(delta, duration * 1_second);
     update();
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setLonLat(double lon, double lat, double duration) {
-    transform.setLonLat(lon, lat, duration * 1_second);
+void Map::setLatLng(const LatLng& lat_lng, double duration) {
+    transform.setLatLng(lat_lng, duration * 1_second);
     update();
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::getLonLat(double& lon, double& lat) const {
-    transform.getLonLat(lon, lat);
+LatLng Map::getLatLng() const {
+    return transform.getLatLng();
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
@@ -297,7 +297,7 @@ void Map::stopPanning() {
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resetPosition() {
     transform.setAngle(0);
-    transform.setLonLat(0, 0);
+    transform.setLatLng(LatLng(0, 0));
     transform.setZoom(0);
     update();
 }
@@ -306,14 +306,26 @@ void Map::resetPosition() {
 #pragma mark - Scale
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::scaleBy(double ds, double cx, double cy, double duration) {
-    transform.scaleBy(ds, cx, cy, duration * 1_second);
+void Map::scaleBy(double ds, double duration) {
+    transform.scaleBy(ds, duration * 1_second);
     update();
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setScale(double scale, double cx, double cy, double duration) {
-    transform.setScale(scale, cx, cy, duration * 1_second);
+void Map::scaleBy(double ds, const Point& center, double duration) {
+    transform.scaleBy(ds, center, duration * 1_second);
+    update();
+}
+
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
+void Map::setScale(double scale, double duration) {
+    transform.setScale(scale, duration * 1_second);
+    update();
+}
+
+// Note: This function is called from another thread. Make sure you only call threadsafe functions!
+void Map::setScale(double scale, const Point& center, double duration) {
+    transform.setScale(scale, center, duration * 1_second);
     update();
 }
 
@@ -334,14 +346,14 @@ double Map::getZoom() const {
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
-    transform.setLonLatZoom(lon, lat, zoom, duration * 1_second);
+void Map::setLatLngZoom(const LatLng& lat_lng, double zoom, double duration) {
+    transform.setLatLngZoom(lat_lng, zoom, duration * 1_second);
     update();
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
-    transform.getLonLatZoom(lon, lat, zoom);
+void Map::getLatLngZoom(LatLng& lat_lng, double& zoom) const {
+    transform.getLatLngZoom(lat_lng, zoom);
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
@@ -373,8 +385,8 @@ double Map::getMaxZoom() const {
 #pragma mark - Rotation
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) {
-    transform.rotateBy(sx, sy, ex, ey, duration * 1_second);
+void Map::rotateBy(const Point& start, const Point& end, double duration) {
+    transform.rotateBy(start, end, duration * 1_second);
     update();
 }
 

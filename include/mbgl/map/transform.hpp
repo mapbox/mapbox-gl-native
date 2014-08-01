@@ -6,6 +6,8 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/uv.hpp>
+#include <mbgl/geometry/point.hpp>
+#include <mbgl/geometry/lat_lng.hpp>
 
 #include <cstdint>
 #include <cmath>
@@ -27,17 +29,19 @@ public:
                 uint16_t fb_width, uint16_t fb_height);
 
     // Position
-    void moveBy(double dx, double dy, timestamp duration = 0);
-    void setLonLat(double lon, double lat, timestamp duration = 0);
-    void setLonLatZoom(double lon, double lat, double zoom, timestamp duration = 0);
-    void getLonLat(double& lon, double& lat) const;
-    void getLonLatZoom(double& lon, double& lat, double& zoom) const;
+    void moveBy(const Point&, timestamp duration = 0);
+    void setLatLng(const LatLng&, timestamp duration = 0);
+    void setLatLngZoom(const LatLng&, double zoom, timestamp duration = 0);
+    LatLng getLatLng() const;
+    void getLatLngZoom(LatLng& lngLat, double &zoom) const;
     void startPanning();
     void stopPanning();
 
     // Zoom
-    void scaleBy(double ds, double cx = -1, double cy = -1, timestamp duration = 0);
-    void setScale(double scale, double cx = -1, double cy = -1, timestamp duration = 0);
+    void scaleBy(double ds, timestamp duration = 0);
+    void scaleBy(double ds, const Point& center, timestamp duration = 0);
+    void setScale(double scale, timestamp duration = 0);
+    void setScale(double scale, const Point& center, timestamp duration = 0);
     void setZoom(double zoom, timestamp duration = 0);
     double getZoom() const;
     double getScale() const;
@@ -47,7 +51,7 @@ public:
     double getMaxZoom() const;
 
     // Angle
-    void rotateBy(double sx, double sy, double ex, double ey, timestamp duration = 0);
+    void rotateBy(const Point& start, const Point& end, timestamp duration = 0);
     void setAngle(double angle, timestamp duration = 0);
     void setAngle(double angle, double cx, double cy);
     double getAngle() const;
@@ -65,11 +69,15 @@ public:
     const TransformState finalState() const;
 
 private:
+    Point centerPoint() const;
+    Point project(const LatLng&, const double scale) const;
+    LatLng unproject(const Point&) const;
+
     // Functions prefixed with underscores will *not* perform any locks. It is the caller's
     // responsibility to lock this object.
-    void _moveBy(double dx, double dy, timestamp duration = 0);
-    void _setScale(double scale, double cx, double cy, timestamp duration = 0);
-    void _setScaleXY(double new_scale, double xn, double yn, timestamp duration = 0);
+    void _moveBy(const Point& delta, timestamp duration = 0);
+    void _setScale(double scale, const Point& center, timestamp duration = 0);
+    void _setScaleXY(double new_scale, const Point& center, timestamp duration = 0);
     void _setAngle(double angle, timestamp duration = 0);
     void _clearPanning();
     void _clearRotating();
@@ -94,9 +102,6 @@ private:
     // TODO: make these modifiable from outside.
     const double min_scale = std::pow(2, 0);
     const double max_scale = std::pow(2, 18);
-
-    // cache values for spherical mercator math
-    double Bc, Cc;
 
     std::forward_list<std::shared_ptr<util::transition>> transitions;
     std::shared_ptr<util::transition> scale_timeout;
