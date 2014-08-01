@@ -228,8 +228,8 @@ void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
                 // Prevent label from extending past the end of the line
                 util::max(instance.minScale, anchor.scale),
                 instance.maxScale,
-                instance.anchor,
-                horizontal};
+                instance.anchor
+            };
 
             // Remember the glyph for later insertion.
             glyphs.emplace_back(PlacedGlyph{

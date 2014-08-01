@@ -6,6 +6,8 @@
 #include <array>
 #include <vector>
 
+#include <boost/optional.hpp>
+
 namespace mbgl {
 
 typedef vec2<float> CollisionPoint;
@@ -35,21 +37,14 @@ struct CollisionRect {
 // These are the glyph boxes that we want to have placed.
 struct GlyphBox {
     explicit GlyphBox() {}
-    explicit GlyphBox(const CollisionRect &bbox, const CollisionRect &box,
-                      float minScale)
-        : bbox(bbox), box(box), minScale(minScale) {}
+    explicit GlyphBox(const CollisionRect &box, float minScale) : box(box), minScale(minScale) {}
     explicit GlyphBox(const CollisionRect &box, float minScale, float maxScale,
-                      const CollisionAnchor &anchor, bool rotate)
-        : anchor(anchor),
-          box(box),
-          rotate(rotate),
-          minScale(minScale),
-          maxScale(maxScale) {}
+                      const CollisionAnchor &anchor)
+        : anchor(anchor), box(box), minScale(minScale), maxScale(maxScale) {}
 
     CollisionAnchor anchor;
-    CollisionRect bbox;
     CollisionRect box;
-    bool rotate = false;
+    boost::optional<CollisionRect> hBox;
     float minScale = 0.0f;
     float maxScale = std::numeric_limits<float>::infinity();
 };
@@ -81,9 +76,8 @@ typedef std::vector<PlacedGlyph> PlacedGlyphs;
 // These are the placed boxes contained in the rtree.
 struct PlacementBox {
     CollisionAnchor anchor;
-    CollisionRect bbox;
     CollisionRect box;
-    bool rotate = false;
+    boost::optional<CollisionRect> hBox;
     PlacementRange placementRange = {{0.0f, 0.0f}};
     float placementScale = 0.0f;
     float maxScale = std::numeric_limits<float>::infinity();

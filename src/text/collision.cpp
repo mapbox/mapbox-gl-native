@@ -37,20 +37,16 @@ Collision::Collision() : cTree(new Tree()), hTree(new Tree()) {
     // Hack to prevent cross-tile labels
     insert(
         {{GlyphBox{
-              CollisionRect{CollisionPoint{0, 0}, CollisionPoint{0, m * 8}},
               CollisionRect{CollisionPoint{0, 0}, CollisionPoint{0, m * 8}}, 0},
           GlyphBox{
-              CollisionRect{CollisionPoint{0, 0}, CollisionPoint{m * 8, 0}},
               CollisionRect{CollisionPoint{0, 0}, CollisionPoint{m * 8, 0}},
               0}}},
         CollisionAnchor(0, 0), 1, {{M_PI * 2, 0}}, false, 2);
 
     insert({{GlyphBox{
                  CollisionRect{CollisionPoint{-m * 8, 0}, CollisionPoint{0, 0}},
-                 CollisionRect{CollisionPoint{-m * 8, 0}, CollisionPoint{0, 0}},
                  0},
              GlyphBox{
-                 CollisionRect{CollisionPoint{0, -m * 8}, CollisionPoint{0, 0}},
                  CollisionRect{CollisionPoint{0, -m * 8}, CollisionPoint{0, 0}},
                  0}}},
            CollisionAnchor{m, m}, 1, {{M_PI * 2, 0}}, false, 2);
@@ -61,7 +57,6 @@ GlyphBox getMergedGlyphs(const GlyphBoxes &boxes, bool horizontal,
     GlyphBox mergedGlyphs;
     const float inf = std::numeric_limits<float>::infinity();
     mergedGlyphs.box = CollisionRect{{inf, inf}, {-inf, -inf}};
-    mergedGlyphs.rotate = horizontal;
     mergedGlyphs.anchor = anchor;
 
     CollisionRect &box = mergedGlyphs.box;
@@ -102,6 +97,7 @@ PlacementProperty Collision::place(const GlyphBoxes &boxes,
 
     // Calculate bboxes for all the glyphs
     for (GlyphBox &glyph : glyphs) {
+        // for all horizontal labels, calculate bbox covering all rotated positions
         if (horizontal) {
             const CollisionRect &box = glyph.box;
             float x12 = box.tl.x * box.tl.x, y12 = box.tl.y * box.tl.y,
@@ -109,9 +105,7 @@ PlacementProperty Collision::place(const GlyphBoxes &boxes,
                   diag = std::sqrt(
                       util::max(x12 + y12, x12 + y22, x22 + y12, x22 + y22));
 
-            glyph.bbox = CollisionRect{{-diag, -diag}, {diag, diag}};
-        } else {
-            glyph.bbox = glyph.box;
+            glyph.hBox = CollisionRect{{-diag, -diag}, {diag, diag}};
         }
     }
 
@@ -140,8 +134,8 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs,
                                    float maxPlacementScale, float pad) {
 
     for (const GlyphBox &glyph : glyphs) {
-        const CollisionRect &bbox = glyph.bbox;
         const CollisionRect &box = glyph.box;
+        const CollisionRect &bbox = glyph.hBox ? glyph.hBox.get() : glyph.box;
         const CollisionAnchor &anchor = glyph.anchor;
 
         if (anchor.x < 0 || anchor.x > 4096 || anchor.y < 0 ||
@@ -238,7 +232,7 @@ PlacementRange Collision::getPlacementRange(const GlyphBoxes &glyphs,
     PlacementRange placementRange = {{2.0f * M_PI, 0}};
 
     for (const GlyphBox &glyph : glyphs) {
-        const CollisionRect &bbox = glyph.bbox;
+        const CollisionRect &bbox = glyph.hBox ? glyph.hBox.get() : glyph.box;
         const CollisionAnchor &anchor = glyph.anchor;
 
         float minPlacedX = anchor.x + bbox.tl.x / placementScale;
@@ -261,15 +255,16 @@ PlacementRange Collision::getPlacementRange(const GlyphBoxes &glyphs,
         for (const PlacementValue &value : blocking) {
             const Box &s = std::get<0>(value);
             const PlacementBox &b = std::get<1>(value);
+            const CollisionRect &bbox2 = b.hBox ? b.hBox.get() : b.box;
 
             float x1, x2, y1, y2, intersectX, intersectY;
 
             // Adjust and compare bboxes to see if the glyphs might intersect
             if (placementScale > b.placementScale) {
-                x1 = b.anchor.x + b.bbox.tl.x / placementScale;
-                y1 = b.anchor.y + b.bbox.tl.y / placementScale;
-                x2 = b.anchor.x + b.bbox.br.x / placementScale;
-                y2 = b.anchor.y + b.bbox.br.y / placementScale;
+                x1 = b.anchor.x + bbox2.tl.x / placementScale;
+                y1 = b.anchor.y + bbox2.tl.y / placementScale;
+                x2 = b.anchor.x + bbox2.br.x / placementScale;
+                y2 = b.anchor.y + bbox2.br.y / placementScale;
                 intersectX = x1 < maxPlacedX && x2 > minPlacedX;
                 intersectY = y1 < maxPlacedY && y2 > minPlacedY;
             } else {
@@ -310,8 +305,8 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
     result.reserve(glyphs.size());
 
     for (const GlyphBox &glyph : glyphs) {
-        const CollisionRect &bbox = glyph.bbox;
         const CollisionRect &box = glyph.box;
+        const CollisionRect &bbox = glyph.hBox ? glyph.hBox.get() : glyph.box;
 
         float minScale = std::fmax(placementScale, glyph.minScale);
 
@@ -323,8 +318,9 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
         PlacementBox placement;
         placement.anchor = anchor;
         placement.box = box;
-        placement.bbox = bbox;
-        placement.rotate = horizontal;
+        if (glyph.hBox) {
+            placement.hBox = bbox;
+        }
         placement.placementRange = placementRange;
         placement.placementScale = minScale;
         placement.maxScale = glyph.maxScale;
