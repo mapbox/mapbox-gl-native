@@ -111,7 +111,6 @@ void Transform::setLonLatZoom(const double lon, const double lat, const double z
     double new_scale = std::pow(2.0, zoom);
 
     const double s = new_scale * util::tileSize;
-    zc = s / 2;
     Bc = s / 360;
     Cc = s / (2 * M_PI);
 
@@ -309,7 +308,6 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     }
 
     const double s = final.scale * util::tileSize;
-    zc = s / 2;
     Bc = s / 360;
     Cc = s / (2 * M_PI);
 
