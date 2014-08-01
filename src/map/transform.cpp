@@ -98,8 +98,8 @@ void Transform::setLonLat(const double lon, const double lat, const timestamp du
     uv::writelock lock(mtx);
 
     const double f = std::fmin(std::fmax(std::sin(D2R * lat), -0.9999), 0.9999);
-    double xn = -std::round(lon * Bc);
-    double yn = std::round(0.5 * Cc * std::log((1 + f) / (1 - f)));
+    double xn = -lon * Bc;
+    double yn = 0.5 * Cc * std::log((1 + f) / (1 - f));
 
     _setScaleXY(current.scale, xn, yn, duration);
 }
@@ -115,8 +115,8 @@ void Transform::setLonLatZoom(const double lon, const double lat, const double z
     Cc = s / (2 * M_PI);
 
     const double f = std::fmin(std::fmax(std::sin(D2R * lat), -0.9999), 0.9999);
-    double xn = -std::round(lon * Bc);
-    double yn = std::round(0.5 * Cc * log((1 + f) / (1 - f)));
+    double xn = -lon * Bc;
+    double yn = 0.5 * Cc * log((1 + f) / (1 - f));
 
     _setScaleXY(new_scale, xn, yn, duration);
 }
