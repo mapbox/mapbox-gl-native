@@ -52,8 +52,7 @@ Collision::Collision() : cTree(new Tree()), hTree(new Tree()) {
            CollisionAnchor{m, m}, 1, {{M_PI * 2, 0}}, false, 2);
 }
 
-GlyphBox getMergedGlyphs(const GlyphBoxes &boxes, bool horizontal,
-                         const CollisionAnchor &anchor) {
+GlyphBox getMergedGlyphs(const GlyphBoxes &boxes, const CollisionAnchor &anchor) {
     GlyphBox mergedGlyphs;
     const float inf = std::numeric_limits<float>::infinity();
     mergedGlyphs.box = CollisionRect{{inf, inf}, {-inf, -inf}};
@@ -73,40 +72,33 @@ GlyphBox getMergedGlyphs(const GlyphBoxes &boxes, bool horizontal,
     return mergedGlyphs;
 }
 
-PlacementProperty Collision::place(const GlyphBoxes &boxes,
-                                   const CollisionAnchor &anchor,
-                                   float minPlacementScale,
-                                   float maxPlacementScale, float padding,
+PlacementProperty Collision::place(const GlyphBoxes &boxes, const CollisionAnchor &anchor,
+                                   float minPlacementScale, float maxPlacementScale, float padding,
                                    bool horizontal, bool alwaysVisible) {
-
     float minScale = std::numeric_limits<float>::infinity();
     for (const GlyphBox &glyphBox : boxes) {
         minScale = util::min(minScale, glyphBox.minScale);
     }
     minPlacementScale = util::max(minPlacementScale, minScale);
 
-    // Collision checks between rotating and fixed labels are
-    // relatively expensive, so we use one box per label, not per glyph
-    // for horizontal labels.
     GlyphBoxes glyphs;
     if (horizontal) {
-        glyphs.push_back(getMergedGlyphs(boxes, horizontal, anchor));
+        // Collision checks between rotating and fixed labels are relatively expensive,
+        // so we use one box per label, not per glyph for horizontal labels.
+        glyphs.push_back(getMergedGlyphs(boxes, anchor));
+
+        // for all horizontal labels, calculate bbox covering all rotated positions
+        const CollisionRect &box = glyphs.front().box;
+        float x12 = box.tl.x * box.tl.x,
+              y12 = box.tl.y * box.tl.y,
+              x22 = box.br.x * box.br.x,
+              y22 = box.br.y * box.br.y,
+              diag = std::sqrt(util::max(x12 + y12, x12 + y22, x22 + y12, x22 + y22));
+
+        glyphs.front().hBox = CollisionRect{{-diag, -diag}, {diag, diag}};
+
     } else {
         glyphs = boxes;
-    }
-
-    // Calculate bboxes for all the glyphs
-    for (GlyphBox &glyph : glyphs) {
-        // for all horizontal labels, calculate bbox covering all rotated positions
-        if (horizontal) {
-            const CollisionRect &box = glyph.box;
-            float x12 = box.tl.x * box.tl.x, y12 = box.tl.y * box.tl.y,
-                  x22 = box.br.x * box.br.x, y22 = box.br.y * box.br.y,
-                  diag = std::sqrt(
-                      util::max(x12 + y12, x12 + y22, x22 + y12, x22 + y22));
-
-            glyph.hBox = CollisionRect{{-diag, -diag}, {diag, diag}};
-        }
     }
 
     // Calculate the minimum scale the entire label can be shown without
