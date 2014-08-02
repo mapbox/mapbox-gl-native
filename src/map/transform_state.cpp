@@ -3,19 +3,28 @@
 
 using namespace mbgl;
 
+const double D2R = M_PI / 180.0;
+const double R2D = 180.0 / M_PI;
+const double M2PI = 2 * M_PI;
+
 #pragma mark - Matrix
 
 void TransformState::matrixFor(mat4& matrix, const Tile::ID& id) const {
+    const double angle = getAngle();
+    const double scale = getScale();
     const double tile_scale = std::pow(2, id.z);
     const double tile_size = scale * util::tileSize / tile_scale;
+    const Point p = centerPoint();
+    const Point c = getPoint();
+    const double pixel_x = width / 2 - c.x;
+    const double pixel_y = height / 2 - c.y;
 
     matrix::identity(matrix);
 
-    matrix::translate(matrix, matrix, 0.5f * (float)width, 0.5f * (float)height, 0);
+    matrix::translate(matrix, matrix, p.x, p.y, 0);
     matrix::rotate_z(matrix, matrix, angle);
-    matrix::translate(matrix, matrix, -0.5f * (float)width, -0.5f * (float)height, 0);
-
-    matrix::translate(matrix, matrix, pixel_x() + id.x * tile_size, pixel_y() + id.y * tile_size, 0);
+    matrix::translate(matrix, matrix, -p.x, p.y, 0);
+    matrix::translate(matrix, matrix, pixel_x + id.x * tile_size, pixel_y + id.y * tile_size, 0);
 
     // TODO: Get rid of the 8 (scaling from 4096 to tile size);
     float factor = scale / tile_scale / (4096.0f / util::tileSize);
@@ -24,6 +33,11 @@ void TransformState::matrixFor(mat4& matrix, const Tile::ID& id) const {
 
 box TransformState::cornersToBox(uint32_t z) const {
     const double ref_scale = std::pow(2, z);
+    const double angle = getAngle();
+    const double scale = getScale();
+    const Point p = getPoint();
+    const double x = p.x;
+    const double y = p.y;
 
     const double angle_sin = std::sin(-angle);
     const double angle_cos = std::cos(-angle);
@@ -56,7 +70,6 @@ box TransformState::cornersToBox(uint32_t z) const {
     return b;
 }
 
-
 #pragma mark - Dimensions
 
 bool TransformState::hasSize() const {
@@ -83,37 +96,33 @@ const std::array<uint16_t, 2> TransformState::getFramebufferDimensions() const {
     return framebuffer;
 }
 
-
 float TransformState::getPixelRatio() const {
     return pixelRatio;
 }
 
-
 #pragma mark - Zoom
 
 float TransformState::getNormalizedZoom() const {
-    return std::log(scale * util::tileSize / 512.0f) / M_LN2;
+    return std::log(getScale() * util::tileSize / 512.0f) / M_LN2;
 }
 
 int32_t TransformState::getIntegerZoom() const {
-    return std::floor(getZoom());
+    return std::floor(zoom);
 }
 
 double TransformState::getZoom() const {
-    return std::log(scale) / M_LN2;
+    return zoom;
 }
 
 double TransformState::getScale() const {
-    return scale;
+    return std::pow(2, zoom);
 }
-
 
 #pragma mark - Rotation
 
-float TransformState::getAngle() const {
-    return angle;
+double TransformState::getAngle() const {
+    return -bearing * D2R;
 }
-
 
 #pragma mark - Changing
 
@@ -121,16 +130,22 @@ bool TransformState::isChanging() const {
     return rotating || scaling || panning;
 }
 
+#pragma mark - Projection
 
-#pragma mark - (private helper functions)
-
-
-double TransformState::pixel_x() const {
-    const double center = (width - scale * util::tileSize) / 2;
-    return center + x;
+Point TransformState::project(const LatLng& latLng) const {
+    const double lat = latLng.lat * D2R;
+    const double lng = latLng.lng * D2R;
+    const double W = getScale() * util::tileSize;
+    const double R = W / M2PI;
+    const double x = R * lng;
+    const double y = R * std::log(std::tan(M_PI / 4 + lat / 2));
+    return Point(x, y);
 }
 
-double TransformState::pixel_y() const {
-    const double center = (height - scale * util::tileSize) / 2;
-    return center + y;
+LatLng TransformState::unproject(const Point& p) const {
+    const double W = getScale() * util::tileSize;
+    const double R = W / M2PI;
+    const double lng = p.x / R;
+    const double lat = 2 * std::atan(std::exp(p.y / R)) - M_PI / 2;
+    return LatLng(lat * R2D, lng * R2D);
 }

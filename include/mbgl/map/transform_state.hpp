@@ -2,15 +2,19 @@
 #define MBGL_MAP_TRANSFORM_STATE
 
 #include <mbgl/map/tile.hpp>
+#include <mbgl/geometry/lat_lng.hpp>
+#include <mbgl/geometry/point.hpp>
 
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/vec.hpp>
 
 #include <cstdint>
 #include <array>
-#include <limits>
 
 namespace mbgl {
+
+class LatLng;
+class Point;
 
 class TransformState {
     friend class Transform;
@@ -28,6 +32,11 @@ public:
     uint16_t getFramebufferHeight() const;
     const std::array<uint16_t, 2> getFramebufferDimensions() const;
     float getPixelRatio() const;
+    Point centerPoint() const;
+
+    // Center
+    LatLng getCenter() const;
+    Point getPoint() const;
 
     // Zoom
     float getNormalizedZoom() const;
@@ -35,15 +44,16 @@ public:
     double getZoom() const;
     double getScale() const;
 
-    // Rotation
-    float getAngle() const;
+    // Bearing
+    double getBearing() const;
+    double getAngle() const;
+
+    // Projection
+    Point project(const LatLng&) const;
+    LatLng unproject(const Point&) const;
 
     // Changing
     bool isChanging() const;
-
-private:
-    double pixel_x() const;
-    double pixel_y() const;
 
 private:
     // logical dimensions
@@ -61,9 +71,9 @@ private:
     bool panning = false;
 
     // map position
-    double x = 0, y = 0;
-    double angle = 0;
-    double scale = std::numeric_limits<double>::infinity();
+    LatLng center;
+    double bearing = 0;
+    double zoom = 0;
 };
 
 }

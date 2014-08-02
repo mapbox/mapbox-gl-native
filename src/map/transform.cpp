@@ -12,14 +12,9 @@
 
 using namespace mbgl;
 
-const double D2R = M_PI / 180.0;
-const double R2D = 180.0 / M_PI;
-const double M2PI = 2 * M_PI;
-const double MIN_ROTATE_SCALE = 8;
+const double MIN_ROTATE_ZOOM = 3;
 
 Transform::Transform(View &view) : view(view), mtx(std::make_unique<uv::rwlock>()) {
-    setScale(current.scale);
-    setAngle(current.angle);
 }
 
 #pragma mark - Map View
@@ -38,8 +33,8 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         current.pixelRatio = final.pixelRatio = ratio;
         current.framebuffer[0] = final.framebuffer[0] = fb_w;
         current.framebuffer[1] = final.framebuffer[1] = fb_h;
-        if (!canRotate() && current.angle) _setAngle(0);
-        constrain(current.scale, current.y);
+//        if (!canRotate() && current.angle) setBearing(0);
+//        constrain(current.scale, current.getPoint().y);
 
         view.notify_map_change(MapChangeRegionDidChange);
 
@@ -51,43 +46,76 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
 
 #pragma mark - Position
 
-void Transform::moveBy(const Point& delta, const timestamp duration) {
+void Transform::setView(const LatLng& center, double zoom, double bearing) {
     uv::writelock lock(mtx);
-
-    _moveBy(delta, duration);
+    cancelTransitions();
+    current.center = center;
+    current.zoom = zoom;
+    current.bearing = bearing;
+    final = current;
 }
 
-void Transform::_moveBy(const Point& delta, const timestamp duration) {
-    // This is only called internally, so we don't need a lock here.
+void Transform::setCenter(const LatLng& center) {
+    uv::writelock lock(mtx);
+    cancelTransitions();
+    current.center = center;
+    final = current;
+}
 
-    const double dx = delta.x;
-    const double dy = delta.y;
+void Transform::setZoom(double zoom) {
+    uv::writelock lock(mtx);
+    cancelTransitions();
+    current.zoom = zoom;
+    final = current;
+}
+
+void Transform::setBearing(double bearing) {
+    uv::writelock lock(mtx);
+    cancelTransitions();
+    current.bearing = bearing;
+    final = current;
+}
+
+LatLng Transform::getCenter() const {
+    uv::readlock lock(mtx);
+    return current.center;
+}
+
+double Transform::getZoom() const {
+    uv::readlock lock(mtx);
+    return current.zoom;
+}
+
+double Transform::getBearing() const {
+    uv::readlock lock(mtx);
+    return current.bearing;
+}
+
+# pragma mark - Transitions
+
+void Transform::panBy(const Point& delta, const timestamp duration) {
+    uv::writelock lock(mtx);
+
+    panTo(current.unproject(current.getPoint().add(delta)), duration);
+}
+
+void Transform::panTo(const LatLng& center, const timestamp duration) {
+    uv::writelock lock(mtx);
+
+    cancelTransitions();
 
     view.notify_map_change(duration ?
                            MapChangeRegionWillChangeAnimated :
                            MapChangeRegionWillChange);
 
-    final.x = current.x + std::cos(current.angle) * dx + std::sin(current.angle) * dy;
-    final.y = current.y + std::cos(current.angle) * dy + std::sin(-current.angle) * dx;
-
-    constrain(final.scale, final.y);
-
-    // Un-rotate when rotated and panning far enough to show off-world in corners.
-    double w = final.scale * util::tileSize / 2;
-    double m = std::sqrt(std::pow((current.width / 2), 2) + pow((current.height / 2), 2));
-    double x = std::abs(sqrt(std::pow(final.x, 2) + std::pow(final.y, 2)));
-    if (current.angle && w - x < m) _setAngle(0);
+    final.center = center;
 
     if (duration == 0) {
-        current.x = final.x;
-        current.y = final.y;
+        current = final;
     } else {
-        // Use a common start time for all of the transitions to avoid divergent transitions.
         timestamp start = util::now();
-        transitions.emplace_front(
-            std::make_shared<util::ease_transition<double>>(current.x, final.x, current.x, start, duration));
-        transitions.emplace_front(
-            std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
+        transitions.emplace_front(std::make_shared<util::ease_transition<LatLng>>(
+            current.center, final.center, current.center, start, duration));
     }
 
     view.notify_map_change(duration ?
@@ -96,61 +124,65 @@ void Transform::_moveBy(const Point& delta, const timestamp duration) {
                            duration);
 }
 
-Point Transform::centerPoint() const {
-    return Point(current.width / 2,
-                 current.height / 2);
-}
-
-Point Transform::project(const LatLng& latLng, const double scale) const {
-    const double s = scale * util::tileSize;
-    const double Bc = s / 360;
-    const double Cc = s / (2 * M_PI);
-
-    const double lat = latLng.lat;
-    const double lon = latLng.lng;
-
-    const double f = std::fmin(std::fmax(std::sin(D2R * lat), -0.9999), 0.9999);
-    double xn = -lon * Bc;
-    double yn = 0.5 * Cc * std::log((1 + f) / (1 - f));
-
-    return Point(xn, yn);
-}
-
-LatLng Transform::unproject(const Point& p) const {
-    const double s = current.scale * util::tileSize;
-    const double Bc = s / 360;
-    const double Cc = s / (2 * M_PI);
-
-    const double lon = -p.x / Bc;
-    const double lat = R2D * (2 * std::atan(std::exp(p.y / Cc)) - 0.5 * M_PI);
-
-    return LatLng(lat, lon);
-}
-
-void Transform::setLatLng(const LatLng& latLng, timestamp duration) {
+void Transform::zoomTo(double zoom, const timestamp duration) {
     uv::writelock lock(mtx);
 
-    _setScaleXY(current.scale, project(latLng, current.scale), duration);
+    cancelTransitions();
+
+    zoom = std::min(std::max(zoom, min_zoom), max_zoom);
+
+    view.notify_map_change(duration ?
+                           MapChangeRegionWillChangeAnimated :
+                           MapChangeRegionWillChange);
+
+    final.zoom = zoom;
+
+    if (duration == 0) {
+        current = final;
+    } else {
+        timestamp start = util::now();
+        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
+            current.zoom, final.zoom, current.zoom, start, duration));
+    }
+
+    view.notify_map_change(duration ?
+                           MapChangeRegionDidChangeAnimated :
+                           MapChangeRegionDidChange,
+                           duration);
 }
 
-void Transform::setLatLngZoom(const LatLng& latLng, double zoom, timestamp duration) {
+void Transform::rotateTo(double bearing, const timestamp duration) {
     uv::writelock lock(mtx);
 
-    double new_scale = std::pow(2.0, zoom);
-    _setScaleXY(new_scale, project(latLng, new_scale), duration);
+    cancelTransitions();
+
+    view.notify_map_change(duration ?
+                           MapChangeRegionWillChangeAnimated :
+                           MapChangeRegionWillChange);
+
+    final.bearing = bearing;
+
+    if (duration == 0) {
+        current = final;
+    } else {
+        timestamp start = util::now();
+        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
+            current.bearing, final.bearing, current.bearing, start, duration));
+    }
+
+    view.notify_map_change(duration ?
+                           MapChangeRegionDidChangeAnimated :
+                           MapChangeRegionDidChange,
+                           duration);
 }
 
-LatLng Transform::getLatLng() const {
-    uv::readlock lock(mtx);
-
-    return unproject(Point(final.x, final.y));
+void Transform::rotateBy(const Point& start, const Point& end, const timestamp duration) {
 }
 
-void Transform::getLatLngZoom(LatLng& latlng, double &zoom) const {
-    latlng = getLatLng();
+void Transform::easeTo(const LatLng& center, double zoom, double bearing, timestamp duration) {
+}
 
-    uv::readlock lock(mtx);
-    zoom = getZoom();
+void Transform::flyTo(const LatLng& center, double zoom, double bearing, timestamp duration) {
 }
 
 void Transform::startPanning() {
@@ -179,66 +211,6 @@ void Transform::_clearPanning() {
     }
 }
 
-#pragma mark - Zoom
-
-void Transform::scaleBy(const double ds, const timestamp duration) {
-    uv::writelock lock(mtx);
-
-    // clamp scale to min/max values
-    double new_scale = current.scale * ds;
-    if (new_scale < min_scale) {
-        new_scale = min_scale;
-    } else if (new_scale > max_scale) {
-        new_scale = max_scale;
-    }
-
-    _setScale(new_scale, centerPoint(), duration);
-}
-
-void Transform::scaleBy(const double ds, const Point& center, const timestamp duration) {
-    uv::writelock lock(mtx);
-
-    // clamp scale to min/max values
-    double new_scale = current.scale * ds;
-    if (new_scale < min_scale) {
-        new_scale = min_scale;
-    } else if (new_scale > max_scale) {
-        new_scale = max_scale;
-    }
-
-    _setScale(new_scale, center, duration);
-}
-
-void Transform::setScale(const double scale, const timestamp duration) {
-    uv::writelock lock(mtx);
-    
-    _setScale(scale, centerPoint(), duration);
-}
-
-void Transform::setScale(const double scale, const Point& center, const timestamp duration) {
-    uv::writelock lock(mtx);
-
-    _setScale(scale, center, duration);
-}
-
-void Transform::setZoom(const double zoom, const timestamp duration) {
-    uv::writelock lock(mtx);
-
-    _setScale(std::pow(2.0, zoom), centerPoint(), duration);
-}
-
-double Transform::getZoom() const {
-    uv::readlock lock(mtx);
-
-    return std::log(final.scale) / M_LN2;
-}
-
-double Transform::getScale() const {
-    uv::readlock lock(mtx);
-
-    return final.scale;
-}
-
 void Transform::startScaling() {
     uv::writelock lock(mtx);
 
@@ -257,18 +229,6 @@ void Transform::stopScaling() {
     _clearScaling();
 }
 
-double Transform::getMinZoom() const {
-    double test_scale = current.scale;
-    double test_y = current.y;
-    constrain(test_scale, test_y);
-
-    return std::log2(std::fmin(min_scale, test_scale));
-}
-
-double Transform::getMaxZoom() const {
-    return std::log2(max_scale);
-}
-
 void Transform::_clearScaling() {
     // This is only called internally, so we don't need a lock here.
 
@@ -279,192 +239,11 @@ void Transform::_clearScaling() {
     }
 }
 
-void Transform::_setScale(double new_scale, const Point& center, const timestamp duration) {
-    // This is only called internally, so we don't need a lock here.
-
-    double cx = center.x;
-    double cy = center.y;
-
-    // Ensure that we don't zoom in further than the maximum allowed.
-    if (new_scale < min_scale) {
-        new_scale = min_scale;
-    } else if (new_scale > max_scale) {
-        new_scale = max_scale;
-    }
-
-    // Account for the x/y offset from the center (= where the user clicked or pinched)
-    const double factor = new_scale / current.scale;
-    const double dx = (cx - current.width / 2) * (1.0 - factor);
-    const double dy = (cy - current.height / 2) * (1.0 - factor);
-
-    // Account for angle
-    const double angle_sin = std::sin(-current.angle);
-    const double angle_cos = std::cos(-current.angle);
-    const double ax = angle_cos * dx - angle_sin * dy;
-    const double ay = angle_sin * dx + angle_cos * dy;
-
-    const double xn = current.x * factor + ax;
-    const double yn = current.y * factor + ay;
-
-    _setScaleXY(new_scale, Point(xn, yn), duration);
-}
-
-void Transform::_setScaleXY(const double new_scale, const Point& center, const timestamp duration) {
-    // This is only called internally, so we don't need a lock here.
-
-    double xn = center.x;
-    double yn = center.y;
-
-    view.notify_map_change(duration ?
-                           MapChangeRegionWillChangeAnimated :
-                           MapChangeRegionWillChange);
-
-    final.scale = new_scale;
-    final.x = xn;
-    final.y = yn;
-
-    constrain(final.scale, final.y);
-
-    // Undo rotation at low zooms.
-    if (!canRotate() && current.angle) _setAngle(0);
-
-    if (duration == 0) {
-        current.scale = final.scale;
-        current.x = final.x;
-        current.y = final.y;
-    } else {
-        // Use a common start time for all of the transitions to avoid divergent transitions.
-        timestamp start = util::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
-            current.scale, final.scale, current.scale, start, duration));
-        transitions.emplace_front(
-            std::make_shared<util::ease_transition<double>>(current.x, final.x, current.x, start, duration));
-        transitions.emplace_front(
-            std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
-    }
-
-    view.notify_map_change(duration ?
-                           MapChangeRegionDidChangeAnimated :
-                           MapChangeRegionDidChange,
-                           duration);
-}
-
-#pragma mark - Constraints
-
-void Transform::constrain(double& scale, double& y) const {
-    // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.
-    if (scale < (current.height / util::tileSize)) scale = (current.height / util::tileSize);
-
-    // Constrain min/max vertical pan to avoid showing off-world areas.
-    double max_y = ((scale * util::tileSize) - current.height) / 2;
-
-    if (y > max_y) y = max_y;
-    if (y < -max_y) y = -max_y;
-}
-
-#pragma mark - Angle
-
-void Transform::rotateBy(const Point& start, const Point& end, const timestamp duration) {
-    uv::writelock lock(mtx);
-
-    const double start_x = start.x;
-    const double start_y = start.y;
-    const double end_x = end.x;
-    const double end_y = end.y;
-
-    double center_x = current.width / 2, center_y = current.height / 2;
-
-    const double begin_center_x = start_x - center_x;
-    const double begin_center_y = start_y - center_y;
-
-    const double beginning_center_dist =
-        std::sqrt(begin_center_x * begin_center_x + begin_center_y * begin_center_y);
-
-    // If the first click was too close to the center, move the center of rotation by 200 pixels
-    // in the direction of the click.
-    if (beginning_center_dist < 200) {
-        const double offset_x = -200, offset_y = 0;
-        const double rotate_angle = std::atan2(begin_center_y, begin_center_x);
-        const double rotate_angle_sin = std::sin(rotate_angle);
-        const double rotate_angle_cos = std::cos(rotate_angle);
-        center_x = start_x + rotate_angle_cos * offset_x - rotate_angle_sin * offset_y;
-        center_y = start_y + rotate_angle_sin * offset_x + rotate_angle_cos * offset_y;
-    }
-
-    const double first_x = start_x - center_x, first_y = start_y - center_y;
-    const double second_x = end_x - center_x, second_y = end_y - center_y;
-
-    const double ang = current.angle + util::angle_between(first_x, first_y, second_x, second_y);
-
-    _setAngle(ang, duration);
-}
-
-void Transform::setAngle(const double new_angle, const timestamp duration) {
-    uv::writelock lock(mtx);
-
-    _setAngle(new_angle, duration);
-}
-
-void Transform::setAngle(const double new_angle, const double cx, const double cy) {
-    uv::writelock lock(mtx);
-
-    double dx = 0, dy = 0;
-
-    if (cx >= 0 && cy >= 0) {
-        dx = (final.width / 2) - cx;
-        dy = (final.height / 2) - cy;
-        _moveBy(Point(dx, dy), 0);
-    }
-
-    _setAngle(new_angle, 0);
-
-    if (cx >= 0 && cy >= 0) {
-        _moveBy(Point(-dx, -dy), 0);
-    }
-}
-
-void Transform::_setAngle(double new_angle, const timestamp duration) {
-    // This is only called internally, so we don't need a lock here.
-
-    view.notify_map_change(duration ?
-                           MapChangeRegionWillChangeAnimated :
-                           MapChangeRegionWillChange);
-
-    while (new_angle > M_PI)
-        new_angle -= M2PI;
-    while (new_angle <= -M_PI)
-        new_angle += M2PI;
-
-    final.angle = new_angle;
-
-    // Prevent rotation at low zooms.
-    if (!canRotate()) final.angle = 0;
-
-    if (duration == 0) {
-        current.angle = final.angle;
-    } else {
-        timestamp start = util::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
-            current.angle, final.angle, current.angle, start, duration));
-    }
-
-    view.notify_map_change(duration ?
-                           MapChangeRegionDidChangeAnimated :
-                           MapChangeRegionDidChange,
-                           duration);
-}
-
-double Transform::getAngle() const {
-    uv::readlock lock(mtx);
-
-    return final.angle;
-}
-
 void Transform::startRotating() {
     uv::writelock lock(mtx);
-
+    
     _clearRotating();
-
+    
     // Add a 200ms timeout for resetting this to false
     current.rotating = true;
     timestamp start = util::now();
@@ -474,13 +253,13 @@ void Transform::startRotating() {
 
 void Transform::stopRotating() {
     uv::writelock lock(mtx);
-
+    
     _clearRotating();
 }
 
 void Transform::_clearRotating() {
     // This is only called internally, so we don't need a lock here.
-
+    
     current.rotating = false;
     if (rotate_timeout) {
         transitions.remove(rotate_timeout);
@@ -488,8 +267,52 @@ void Transform::_clearRotating() {
     }
 }
 
+#pragma mark - Constraints
+
+void Transform::constrain(double& zoom, double& y) const {
+    double scale = std::pow(2, zoom);
+
+    // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.
+    if (scale < (current.height / util::tileSize)) {
+        scale = (current.height / util::tileSize);
+        zoom = std::log2(scale);
+    }
+
+    // Constrain min/max vertical pan to avoid showing off-world areas.
+    double max_y = ((scale * util::tileSize) - current.height) / 2;
+
+    if (y > max_y) y = max_y;
+    if (y < -max_y) y = -max_y;
+}
+
 bool Transform::canRotate() {
-    return (current.scale > MIN_ROTATE_SCALE);
+    return current.zoom > MIN_ROTATE_ZOOM;
+}
+
+double Transform::getMinZoom() const {
+    double test_zoom = current.zoom;
+    double test_y = current.getPoint().y;
+    constrain(test_zoom, test_y);
+    
+    return std::fmin(min_zoom, test_zoom);
+}
+
+double Transform::getMaxZoom() const {
+    return max_zoom;
+}
+
+# pragma mark - Projection
+
+Point Transform::locationPoint(const LatLng& latlng) const {
+    uv::readlock lock(mtx);
+    const Point p = current.project(latlng);
+    return current.centerPoint()._sub(current.getPoint()._sub(p)._rotate(current.getAngle()));
+}
+
+LatLng Transform::pointLocation(const Point& p) const {
+    uv::readlock lock(mtx);
+    const Point p2 = current.centerPoint()._sub(p)._rotate(-current.getAngle());
+    return current.unproject(current.getPoint().sub(p2));
 }
 
 #pragma mark - Transition

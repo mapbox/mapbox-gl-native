@@ -28,38 +28,39 @@ public:
     bool resize(uint16_t width, uint16_t height, float ratio,
                 uint16_t fb_width, uint16_t fb_height);
 
-    // Position
-    void moveBy(const Point&, timestamp duration = 0);
-    void setLatLng(const LatLng&, timestamp duration = 0);
-    void setLatLngZoom(const LatLng&, double zoom, timestamp duration = 0);
-    LatLng getLatLng() const;
-    void getLatLngZoom(LatLng& lngLat, double &zoom) const;
-    void startPanning();
-    void stopPanning();
+    void setView(const LatLng& center, double zoom, double bearing);
 
-    // Zoom
-    void scaleBy(double ds, timestamp duration = 0);
-    void scaleBy(double ds, const Point& center, timestamp duration = 0);
-    void setScale(double scale, timestamp duration = 0);
-    void setScale(double scale, const Point& center, timestamp duration = 0);
-    void setZoom(double zoom, timestamp duration = 0);
+    void setCenter(const LatLng& center);
+    LatLng getCenter() const;
+
+    void setZoom(double zoom);
     double getZoom() const;
-    double getScale() const;
-    void startScaling();
-    void stopScaling();
+
+    void setBearing(double bearing);
+    double getBearing() const;
+
+    bool canRotate();
     double getMinZoom() const;
     double getMaxZoom() const;
 
-    // Angle
-    void rotateBy(const Point& start, const Point& end, timestamp duration = 0);
-    void setAngle(double angle, timestamp duration = 0);
-    void setAngle(double angle, double cx, double cy);
-    double getAngle() const;
-    void startRotating();
-    void stopRotating();
-    bool canRotate();
+    Point locationPoint(const LatLng&) const;
+    LatLng pointLocation(const Point&) const;
 
     // Transitions
+    void panBy(const Point& delta, timestamp duration);
+    void panTo(const LatLng& center, timestamp duration);
+    void zoomTo(double zoom, const LatLng& around, timestamp duration);
+    void rotateTo(double bearing, const LatLng& around, timestamp duration);
+    void rotateBy(const Point& start, const Point& end, timestamp duration);
+    void easeTo(const LatLng& center, double zoom, double bearing, timestamp duration);
+    void flyTo(const LatLng& center, double zoom, double bearing, timestamp duration);
+
+    void startPanning();
+    void stopPanning();
+    void startScaling();
+    void stopScaling();
+    void startRotating();
+    void stopRotating();
     bool needsTransition() const;
     void updateTransitions(timestamp now);
     void cancelTransitions();
@@ -69,23 +70,12 @@ public:
     const TransformState finalState() const;
 
 private:
-    Point centerPoint() const;
-    Point project(const LatLng&, const double scale) const;
-    LatLng unproject(const Point&) const;
-
-    // Functions prefixed with underscores will *not* perform any locks. It is the caller's
-    // responsibility to lock this object.
-    void _moveBy(const Point& delta, timestamp duration = 0);
-    void _setScale(double scale, const Point& center, timestamp duration = 0);
-    void _setScaleXY(double new_scale, const Point& center, timestamp duration = 0);
-    void _setAngle(double angle, timestamp duration = 0);
-    void _clearPanning();
-    void _clearRotating();
-    void _clearScaling();
-
     void constrain(double& scale, double& y) const;
 
-private:
+    void _clearPanning();
+    void _clearScaling();
+    void _clearRotating();
+
     View &view;
 
     std::unique_ptr<uv::rwlock> mtx;
@@ -100,8 +90,8 @@ private:
 
     // Limit the amount of zooming possible on the map.
     // TODO: make these modifiable from outside.
-    const double min_scale = std::pow(2, 0);
-    const double max_scale = std::pow(2, 18);
+    const double min_zoom = 0;
+    const double max_zoom = 20;
 
     std::forward_list<std::shared_ptr<util::transition>> transitions;
     std::shared_ptr<util::transition> scale_timeout;

@@ -76,7 +76,7 @@ void GLFWView::key(GLFWwindow *window, int key, int /*scancode*/, int action, in
             break;
         case GLFW_KEY_X:
             if (!mods)
-                view->map->resetPosition();
+                view->map->flyTo(mbgl::LatLng(0, 0), 0, 0, 0.5);
             break;
         case GLFW_KEY_R:
             if (!mods) {
@@ -86,7 +86,7 @@ void GLFWView::key(GLFWwindow *window, int key, int /*scancode*/, int action, in
             break;
         case GLFW_KEY_N:
             if (!mods)
-                view->map->resetNorth();
+                view->map->rotateTo(0, 0.5);
             break;
         }
     }
@@ -112,7 +112,7 @@ void GLFWView::scroll(GLFWwindow *window, double /*xoffset*/, double yoffset) {
     }
 
     view->map->startScaling();
-    view->map->scaleBy(scale, view->last_point);
+    view->map->zoomTo(view->map->getZoom() * scale, view->map->unproject(view->last_point));
 }
 
 void GLFWView::resize(GLFWwindow *window, int, int) {
@@ -142,11 +142,8 @@ void GLFWView::mouseclick(GLFWwindow *window, int button, int action, int modifi
             view->map->stopPanning();
             double now = glfwGetTime();
             if (now - view->last_click < 0.4 /* ms */) {
-                if (modifiers & GLFW_MOD_SHIFT) {
-                    view->map->scaleBy(0.5, view->last_point, 0.5);
-                } else {
-                    view->map->scaleBy(2.0, view->last_point, 0.5);
-                }
+                double k = (modifiers & GLFW_MOD_SHIFT) ? 0.5 : 2.0;
+                view->map->zoomTo(view->map->getZoom() * k, view->map->unproject(view->last_point), 0.5);
             }
             view->last_click = now;
         }
@@ -160,11 +157,11 @@ void GLFWView::mousemove(GLFWwindow *window, double x, double y) {
         mbgl::Point delta = point.sub(view->last_point);
         if (delta.x || delta.y) {
             view->map->startPanning();
-            view->map->moveBy(delta);
+            view->map->panBy(delta);
         }
     } else if (view->rotating) {
         view->map->startRotating();
-        view->map->rotateBy(view->last_point, point);
+//        view->map->rotateBy(view->last_point, point);
     }
     view->last_point = point;
 }
@@ -194,10 +191,10 @@ void GLFWView::make_active() {
 void GLFWView::swap() {
     glfwPostEmptyEvent();
 
-    double lon, lat, zoom;
-    map->getLonLatZoom(lon, lat, zoom);
+    mbgl::LatLng center = map->getCenter();
+    const double zoom = map->getZoom();
     const double bearing = map->getBearing();
-    const std::string title = mbgl::util::sprintf<128>("Mapbox GL – %.2f/%.6f/%.6f/%.1f", zoom, lat, lon, bearing);
+    const std::string title = mbgl::util::sprintf<128>("Mapbox GL – %.2f/%.6f/%.6f/%.1f", zoom, center.lat, center.lng, bearing);
     glfwSetWindowTitle(window, title.c_str());
 }
 

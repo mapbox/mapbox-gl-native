@@ -73,42 +73,41 @@ public:
     void setAccessToken(std::string access_token);
     std::string getAccessToken() const;
 
-    // Transition
-    void cancelTransitions();
+    void setView(const LatLng& center, double zoom, double bearing);
 
-    // Position
-    void moveBy(const Point& delta, double duration = 0);
-    void setLatLng(const LatLng& lat_lng, double duration = 0);
-    LatLng getLatLng() const;
-    void startPanning();
-    void stopPanning();
-    void resetPosition();
+    void setCenter(const LatLng& center);
+    LatLng getCenter() const;
 
-    // Scale
-    void scaleBy(double ds, double duration = 0);
-    void scaleBy(double ds, const Point& center, double duration = 0);
-    void setScale(double scale, double duration = 0);
-    void setScale(double scale, const Point& center, double duration = 0);
-    double getScale() const;
-    void setZoom(double zoom, double duration = 0);
+    void setZoom(double zoom);
     double getZoom() const;
-    void setLatLngZoom(const LatLng&, double zoom, double duration = 0);
-    void getLatLngZoom(LatLng&, double &zoom) const;
-    void resetZoom();
-    void startScaling();
-    void stopScaling();
+
+    void setBearing(double bearing);
+    double getBearing() const;
+
+    bool canRotate();
     double getMinZoom() const;
     double getMaxZoom() const;
 
-    // Rotation
-    void rotateBy(const Point& start, const Point& end, double duration = 0);
-    void setBearing(double degrees, double duration = 0);
-    void setBearing(double degrees, double cx, double cy);
-    double getBearing() const;
-    void resetNorth();
+    Point project(const LatLng&) const;
+    LatLng unproject(const Point&) const;
+
+    // Transitions
+    void panBy(const Point& delta, double duration = 0);
+    void panTo(const LatLng& center, double duration = 0);
+    void zoomTo(double zoom, double duration = 0);
+    void zoomTo(double zoom, const LatLng& around, double duration = 0);
+    void rotateTo(double bearing, double duration = 0);
+    void rotateTo(double bearing, const LatLng& around, double duration = 0);
+    void easeTo(const LatLng& center, double zoom, double bearing, double duration);
+    void flyTo(const LatLng& center, double zoom, double bearing, double duration);
+    void cancelTransitions();
+
+    void startPanning();
+    void stopPanning();
+    void startScaling();
+    void stopScaling();
     void startRotating();
     void stopRotating();
-    bool canRotate();
 
     // Debug
     void setDebug(bool value);
