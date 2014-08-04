@@ -66,7 +66,7 @@ public:
         TextJustifyType justify = TextJustifyType::Center;
         TextHorizontalAlignType horizontal_align = TextHorizontalAlignType::Center;
         TextVerticalAlignType vertical_align = TextVerticalAlignType::Center;
-        float max_angle_delta = 45.0f /* degrees */;
+        float max_angle = 45.0f /* degrees */;
         float rotate = 0.0f;
         float slant = 0.0f;
         float padding = 2.0f;

@@ -908,7 +908,7 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         parseRenderProperty<TextJustifyTypeClass>(value, render.text.justify, "text-justify");
         parseRenderProperty<TextHorizontalAlignTypeClass>(value, render.text.horizontal_align, "text-horizontal-align");
         parseRenderProperty<TextVerticalAlignTypeClass>(value, render.text.vertical_align, "text-vertical-align");
-        parseRenderProperty(value, render.text.max_angle_delta, "text-max-angle");
+        parseRenderProperty(value, render.text.max_angle, "text-max-angle");
         parseRenderProperty(value, render.text.rotate, "text-rotate");
         parseRenderProperty(value, render.text.slant, "text-slant");
         parseRenderProperty(value, render.text.padding, "text-padding");

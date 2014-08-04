@@ -28,7 +28,7 @@ typedef std::vector<GlyphInstance> GlyphInstances;
 
 void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &anchor,
                       float offset, const std::vector<Coordinate> &line, int segment,
-                      int8_t direction, float maxAngleDelta) {
+                      int8_t direction, float maxAngle) {
     const bool upsideDown = direction < 0;
 
     if (offset < 0)
@@ -60,7 +60,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
 
         // Don't place around sharp corners
         float angleDiff = std::fmod((angle - prevAngle), (2.0f * M_PI));
-        if (prevAngle && std::fabs(angleDiff) > maxAngleDelta) {
+        if (prevAngle && std::fabs(angleDiff) > maxAngle) {
             anchor.scale = prevscale;
             break;
         }
@@ -202,7 +202,7 @@ Placement Placement::getGlyphs(Anchor &anchor, const vec2<float> &origin, const 
                                const GlyphPositions &face, float boxScale, bool horizontal,
                                const std::vector<Coordinate> &line,
                                const StyleBucketSymbol &props) {
-    const float maxAngleDelta = props.text.max_angle_delta * M_PI / 180;
+    const float maxAngle = props.text.max_angle * M_PI / 180;
     const float rotate = props.text.rotate * M_PI / 180;
     const float padding = props.text.padding;
     const bool alongLine = props.text.rotation_alignment != RotationAlignmentType::Viewport;
@@ -233,10 +233,10 @@ Placement Placement::getGlyphs(Anchor &anchor, const vec2<float> &origin, const 
         GlyphInstances glyphInstances;
         if (anchor.segment >= 0 && alongLine) {
             getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, x, line, anchor.segment, 1,
-                             maxAngleDelta);
+                             maxAngle);
             if (keepUpright)
                 getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, x, line,
-                                 anchor.segment, -1, maxAngleDelta);
+                                 anchor.segment, -1, maxAngle);
 
         } else {
             glyphInstances.emplace_back(GlyphInstance{anchor});
