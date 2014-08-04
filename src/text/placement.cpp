@@ -170,7 +170,7 @@ Placement Placement::getIcon(Anchor &anchor, const Rect<uint16_t> &image, float 
 
     const CollisionRect box{/* x1 */ x1 * boxScale,
                             /* y1 */ y1 * boxScale,
-                            /* x2 */ y2 * boxScale,
+                            /* x2 */ x2 * boxScale,
                             /* y2 */ y2 * boxScale};
 
     Placement placement;
