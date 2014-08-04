@@ -4,7 +4,7 @@
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/text/glyph.hpp>
-#include <mbgl/text/placement.hpp>
+#include <mbgl/text/collision.hpp>
 
 #include <cstdint>
 #include <iosfwd>
@@ -61,7 +61,7 @@ private:
     std::shared_ptr<SpriteAtlas> spriteAtlas;
     std::shared_ptr<Sprite> sprite;
 
-    Placement placement;
+    Collision collision;
 };
 
 }

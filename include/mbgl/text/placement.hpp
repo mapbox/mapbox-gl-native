@@ -1,36 +1,30 @@
 #ifndef MBGL_TEXT_PLACEMENT
 #define MBGL_TEXT_PLACEMENT
 
-#include <mbgl/text/collision.hpp>
-#include <mbgl/geometry/geometry.hpp>
-#include <mbgl/util/vec.hpp>
+#include <mbgl/text/types.hpp>
 #include <mbgl/text/glyph.hpp>
-#include <vector>
+
+#include <mbgl/util/vec.hpp>
 
 namespace mbgl {
 
-class SymbolBucket;
+struct Anchor;
 class StyleBucketSymbol;
 
 class Placement {
 public:
-    Placement(int8_t zoom, float placementDepth);
+    static Placement getIcon(Anchor &anchor, const Rect<uint16_t> &image, float iconBoxScale,
+                             const std::vector<Coordinate> &line, const StyleBucketSymbol &props);
 
-    void addFeature(SymbolBucket &bucket, const std::vector<Coordinate> &line,
-                    const StyleBucketSymbol &info,
-                    const GlyphPositions &face,
-                    const Shaping &shaping);
+    static Placement getGlyphs(Anchor &anchor, const vec2<float> &origin, const Shaping &shaping,
+                               const GlyphPositions &face, float boxScale, bool horizontal,
+                               const std::vector<Coordinate> &line, const StyleBucketSymbol &props);
 
-private:
-    const int8_t zoom;
-    Collision collision;
-    const float zOffset;
-    const float maxPlacementScale;
+    static const float globalMinScale;
 
-public:
-    static const int tileExtent;
-    static const int glyphSize;
-    static const float minScale;
+    GlyphBoxes boxes;
+    PlacedGlyphs shapes;
+    float minScale;
 };
 }
 

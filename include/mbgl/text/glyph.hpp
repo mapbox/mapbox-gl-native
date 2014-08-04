@@ -44,18 +44,17 @@ struct Glyph {
 
 typedef std::map<uint32_t, Glyph> GlyphPositions;
 
-class GlyphPlacement {
+class PositionedGlyph {
 public:
-    inline explicit GlyphPlacement(uint32_t face, uint32_t glyph, uint32_t x, uint32_t y)
-        : face(face), glyph(glyph), x(x), y(y) {}
+    inline explicit PositionedGlyph(uint32_t glyph, uint32_t x, uint32_t y)
+        : glyph(glyph), x(x), y(y) {}
 
-    uint32_t face = 0;
     uint32_t glyph = 0;
     int32_t x = 0;
     int32_t y = 0;
 };
 
-typedef std::vector<GlyphPlacement> Shaping;
+typedef std::vector<PositionedGlyph> Shaping;
 }
 
 #endif

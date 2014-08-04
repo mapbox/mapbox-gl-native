@@ -172,31 +172,31 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
     }
 
     if (bucket.hasIconData()) {
-        SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-
-        useProgram(iconShader->program);
-        iconShader->setMatrix(matrix);
-
-        // TODO: update
-        iconShader->setColor({{1, 1, 1, 1}});
-        iconShader->setImage(0);
-        iconShader->setRatio(map.getState().getPixelRatio());
-        iconShader->setDimension({{
-            spriteAtlas.getTextureWidth(), spriteAtlas.getTextureHeight(),
-        }});
-
-        spriteAtlas.bind(map.getState().isChanging());
-
-        // TODO: remove hardcoded icon size.
-        const float iconSize = 12 * map.getState().getPixelRatio();
-        iconShader->setSize(iconSize);
-#ifndef GL_ES_VERSION_2_0
-        glPointSize(iconSize);
-        glEnable(GL_POINT_SPRITE);
-#endif
-
-        glDepthRange(strata, 1.0f);
-        bucket.drawIcons(*iconShader);
+//        SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
+//
+//        useProgram(iconShader->program);
+//        iconShader->setMatrix(matrix);
+//
+//        // TODO: update
+//        iconShader->setColor({{1, 1, 1, 1}});
+//        iconShader->setImage(0);
+//        iconShader->setRatio(map.getState().getPixelRatio());
+//        iconShader->setDimension({{
+//            spriteAtlas.getTextureWidth(), spriteAtlas.getTextureHeight(),
+//        }});
+//
+//        spriteAtlas.bind(map.getState().isChanging());
+//
+//        // TODO: remove hardcoded icon size.
+//        const float iconSize = 12 * map.getState().getPixelRatio();
+//        iconShader->setSize(iconSize);
+//#ifndef GL_ES_VERSION_2_0
+//        glPointSize(iconSize);
+//        glEnable(GL_POINT_SPRITE);
+//#endif
+//
+//        glDepthRange(strata, 1.0f);
+//        bucket.drawIcons(*iconShader);
     }
 }
 }

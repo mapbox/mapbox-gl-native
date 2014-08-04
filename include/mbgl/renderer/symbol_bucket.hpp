@@ -21,7 +21,7 @@ class Style;
 class TextShader;
 class IconShader;
 class DotShader;
-class Placement;
+class Collision;
 class SpriteAtlas;
 class Sprite;
 class GlyphAtlas;
@@ -35,13 +35,23 @@ public:
     std::string sprite;
 };
 
+
+class Symbol {
+public:
+    vec2<float> tl, tr, bl, br;
+    Rect<uint16_t> tex;
+    float angle;
+    float minScale = 0.0f;
+    float maxScale = std::numeric_limits<float>::infinity();
+    CollisionAnchor anchor;
+};
+
+typedef std::vector<Symbol> Symbols;
+
+
 class SymbolBucket : public Bucket {
 public:
-    SymbolBucket(
-        TextVertexBuffer &textVertexBuffer,
-        IconVertexBuffer& iconVertexBuffer,
-        TriangleElementsBuffer &triangleElementsBuffer,
-        const StyleBucketSymbol &properties, Placement &placement);
+    SymbolBucket(const StyleBucketSymbol &properties, Collision &collision);
 
     virtual void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id);
     virtual bool hasData() const;
@@ -55,29 +65,31 @@ public:
     void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom, PlacementRange placementRange,
                    float zoom);
 
-
     void drawGlyphs(TextShader &shader);
     void drawIcons(IconShader& shader);
-    void drawIcons(DotShader& shader);
 
 private:
 
     std::vector<SymbolFeature> processFeatures(const VectorTileLayer &layer, const FilterExpression &filter, GlyphStore &glyphStore, const Sprite &sprite);
-    void addFeature(const pbf &geom_pbf, const Shaping &shaping, const Rect<uint16_t> &image);
-    void addFeature(const std::vector<Coordinate> &line, const Shaping &shaping, const Rect<uint16_t> &image);
 
 
+    void addFeature(const pbf &geom_pbf, const Shaping &shaping, const GlyphPositions &face, const Rect<uint16_t> &image);
+    void addFeature(const std::vector<Coordinate> &line, const Shaping &shaping, const GlyphPositions &face, const Rect<uint16_t> &image);
 
 
-    void addGlyph(uint64_t tileid, const std::string stackname, const std::u32string &string,
+    // Adds placed items to the buffer.
+    template <typename Buffer>
+    void addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale, PlacementRange placementRange);
+
+    // Adds glyphs to the glyph atlas so that they have a left/top/width/height coordinates associated to them that we can use for writing to a buffer.
+    void addGlyphsToAtlas(uint64_t tileid, const std::string stackname, const std::u32string &string,
                   const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face);
-    void addFeature(const pbf &geom_pbf, const GlyphPositions &face, const Shaping &shaping);
 
 public:
     const StyleBucketSymbol &properties;
 
 private:
-    Placement &placement;
+    Collision &collision;
 
     struct {
         TextVertexBuffer vertices;

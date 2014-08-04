@@ -48,6 +48,7 @@ public:
         RotationAlignmentType rotation_alignment = RotationAlignmentType::Viewport;
         float max_size = 1.0f;
         std::string image;
+        float rotate = 0.0f;
         float padding = 2.0f;
         bool keep_upright = false;
         vec2<float> offset = {0, 0};

@@ -885,6 +885,7 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         parseRenderProperty<RotationAlignmentTypeClass>(value, render.icon.rotation_alignment, "icon-rotation-alignment");
         parseRenderProperty(value, render.icon.max_size, "icon-max-size");
         parseRenderProperty(value, render.icon.image, "icon-image");
+        parseRenderProperty(value, render.icon.rotate, "icon-rotate");
         parseRenderProperty(value, render.icon.padding, "icon-padding");
         parseRenderProperty(value, render.icon.keep_upright, "icon-keep-upright");
         parseRenderProperty(value, render.icon.offset, "icon-offset");

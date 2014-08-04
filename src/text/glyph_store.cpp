@@ -40,7 +40,7 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float &m
     Shaping shaping;
     // Loop through all characters of this label and shape.
     for (uint32_t chr : string) {
-        shaping.emplace_back(0, chr, x, 0);
+        shaping.emplace_back(chr, x, 0);
         i++;
         auto metric = metrics.find(chr);
         if (metric != metrics.end()) {
@@ -55,7 +55,7 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float &m
 
 void alignVertically(Shaping &shaping, const uint32_t &lines, const float &lineHeight, const float &verticalAlign) {
     const float dy = -(lineHeight * (lines - 1) + 24) * verticalAlign - 5;
-    for (GlyphPlacement &shape : shaping) {
+    for (PositionedGlyph &shape : shaping) {
         shape.y += dy;
     }
 }
@@ -86,7 +86,7 @@ void FontStack::lineWrap(Shaping &shaping, const float &lineHeight, const float 
     uint32_t line = 0;
 
     for (uint32_t i = 0; i < shaping.size(); i++) {
-        GlyphPlacement &shape = shaping[i];
+        PositionedGlyph &shape = shaping[i];
         shape.x -= lengthBeforeCurrentLine;
         shape.y += lineHeight * line;
 
