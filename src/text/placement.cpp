@@ -272,10 +272,11 @@ void Placement::addFeature(SymbolBucket &bucket, const std::vector<Coordinate> &
         PlacedGlyphs glyphs;
         GlyphBoxes boxes;
 
-        getGlyphs(glyphs, boxes, anchor, info.text.offset, shaping, face, fontScale, horizontal, line,
-                  info.text.max_angle_delta * (M_PI/180), info.text.rotate);
-        PlacementProperty place = collision.place(boxes, anchor, anchor.scale, maxPlacementScale,
-                                                  info.text.padding, horizontal, info.text.ignore_placement);
+        getGlyphs(glyphs, boxes, anchor, info.text.offset, shaping, face, fontScale, horizontal,
+                  line, info.text.max_angle_delta * (M_PI / 180), info.text.rotate);
+        PlacementProperty place =
+            collision.place(boxes, anchor, anchor.scale, maxPlacementScale, info.text.padding,
+                            horizontal, info.text.allow_overlap, info.text.ignore_placement);
         if (place) {
             bucket.addGlyphs(glyphs, place.zoom, place.rotationRange, zoom - zOffset);
         }

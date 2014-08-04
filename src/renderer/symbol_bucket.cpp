@@ -8,6 +8,7 @@
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/text/placement.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/map/sprite.hpp>
 
 #include <mbgl/util/utf.hpp>
 #include <mbgl/util/token.hpp>
@@ -20,13 +21,8 @@ SymbolBucket::SymbolBucket(TextVertexBuffer &textVertexBuffer, IconVertexBuffer 
                            TriangleElementsBuffer &triangleElementsBuffer,
                            const StyleBucketSymbol &properties, Placement &placement)
     : properties(properties),
-      textVertexBuffer(textVertexBuffer),
-      iconVertexBuffer(iconVertexBuffer),
-      triangleElementsBuffer(triangleElementsBuffer),
-      placement(placement),
-      text_vertex_start(textVertexBuffer.index()),
-      icon_vertex_start(iconVertexBuffer.index()),
-      triangle_elements_start(triangleElementsBuffer.index()) {}
+      placement(placement)
+    {}
 
 void SymbolBucket::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc,
                        const Tile::ID &id) {
@@ -39,11 +35,11 @@ bool SymbolBucket::hasData() const {
 
 
 bool SymbolBucket::hasTextData() const {
-   return !triangleGroups.empty();
+   return !text.groups.empty();
 }
 
 bool SymbolBucket::hasIconData() const {
-    return icon_vertex_end > 0;
+    return !icon.groups.empty() > 0;
 }
 
 void SymbolBucket::addGlyph(uint64_t tileid, const std::string stackname,
@@ -61,73 +57,71 @@ void SymbolBucket::addGlyph(uint64_t tileid, const std::string stackname,
     }
 }
 
-void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpression &filter,
-                               const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite, GlyphAtlas &glyphAtlas,
-                               GlyphStore &glyphStore) {
+std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &layer, const FilterExpression &filter, GlyphStore &glyphStore, const Sprite &sprite) {
     const bool text = properties.text.field.size();
     const bool icon = properties.icon.image.size();
 
+    std::vector<SymbolFeature> features;
+
+    if (!text && !icon) {
+        return features;
+    }
+
     util::utf8_to_utf32 ucs4conv;
 
-    std::vector<std::pair<std::u32string, pbf>> labels;
-
     // Determine and load glyph ranges
-    {
-        std::set<GlyphRange> ranges;
+    std::set<GlyphRange> ranges;
 
-        FilteredVectorTileLayer filtered_layer(layer, filter);
-        for (const pbf &feature_pbf : filtered_layer) {
-            VectorTileFeature feature {feature_pbf, layer};
+    FilteredVectorTileLayer filtered_layer(layer, filter);
+    for (const pbf &feature_pbf : filtered_layer) {
+        const VectorTileFeature feature {feature_pbf, layer};
 
-            if (text) {
-                std::string u8string = util::replaceTokens(properties.text.field, feature.properties);
+        SymbolFeature ft;
 
-                auto& convert = std::use_facet<std::ctype<char>>(std::locale());
-                if (properties.text.transform == TextTransformType::Uppercase) {
-                    convert.toupper(&u8string[0], &u8string[0] + u8string.size());
-                } else if (properties.text.transform == TextTransformType::Lowercase) {
-                    convert.tolower(&u8string[0], &u8string[0] + u8string.size());
-                }
+        if (text) {
+            std::string u8string = util::replaceTokens(properties.text.field, feature.properties);
 
-                std::u32string string = ucs4conv.convert(u8string);
-
-                if (string.size()) {
-                    // Loop through all characters of this text and collect unique codepoints.
-                    for (char32_t chr : string) {
-                        ranges.insert(getGlyphRange(chr));
-                    }
-
-                    labels.emplace_back(string, feature.geometry);
-                }
+            auto& convert = std::use_facet<std::ctype<char>>(std::locale());
+            if (properties.text.transform == TextTransformType::Uppercase) {
+                convert.toupper(&u8string[0], &u8string[0] + u8string.size());
+            } else if (properties.text.transform == TextTransformType::Lowercase) {
+                convert.tolower(&u8string[0], &u8string[0] + u8string.size());
             }
 
-            // TODO: refactor for simultaneous placement
-            // TODO: refactor to use quads instead of GL_POINTS
-            if (icon) {
-                std::string field = util::replaceTokens(properties.icon.image, feature.properties);
+            ft.label = ucs4conv.convert(u8string);
 
-                const Rect<uint16_t> rect = spriteAtlas.waitForImage(field, sprite);
-                const uint16_t tx = rect.x + rect.w / 2;
-                const uint16_t ty = rect.y + rect.h / 2;
-
-                Geometry::command cmd;
-                pbf geom = feature.geometry;
-                Geometry geometry(geom);
-                int32_t x, y;
-                while ((cmd = geometry.next(x, y)) != Geometry::end) {
-                    if (cmd == Geometry::move_to) {
-                        iconVertexBuffer.add(x, y, tx, ty);
-                    } else {
-                        Log::Warning(Event::ParseTile, "other command than move_to in icon geometry");
-                    }
+            if (ft.label.size()) {
+                // Loop through all characters of this text and collect unique codepoints.
+                for (char32_t chr : ft.label) {
+                    ranges.insert(getGlyphRange(chr));
                 }
-
-                icon_vertex_end = iconVertexBuffer.index();
             }
         }
 
-        glyphStore.waitForGlyphRanges(properties.text.font, ranges);
+        if (icon) {
+            ft.sprite = util::replaceTokens(properties.icon.image, feature.properties);
+        }
+
+        if (ft.label.length() || ft.sprite.length()) {
+            ft.geometry = feature.geometry;
+            features.push_back(std::move(ft));
+        }
     }
+
+    glyphStore.waitForGlyphRanges(properties.text.font, ranges);
+    sprite.waitUntilLoaded();
+
+    return features;
+}
+
+
+
+
+void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpression &filter,
+                               const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite, GlyphAtlas &glyphAtlas,
+                               GlyphStore &glyphStore) {
+
+    const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore, sprite);
 
 
     float horizontalAlign = 0.5;
@@ -138,26 +132,84 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
     if (properties.text.vertical_align == TextVerticalAlignType::Bottom) verticalAlign = 1;
     else if (properties.text.vertical_align == TextVerticalAlignType::Top) verticalAlign = 0;
 
-
-
-    // Create a copy!
     const FontStack &fontStack = glyphStore.getFontStack(properties.text.font);
-    GlyphPositions face;
 
+    for (const SymbolFeature &feature : features) {
+        Shaping shaping;
+        Rect<uint16_t> image;
 
-    // Shape and place all labels.
-    for (const std::pair<std::u32string, pbf> &label : labels) {
+        // if feature has text, shape the text
+        if (feature.label.length()) {
+           shaping = fontStack.getShaping(feature.label, properties.text.max_width, properties.text.line_height, horizontalAlign, verticalAlign, properties.text.letter_spacing);
+        }
 
-        // Shape labels.
-        const Shaping shaping = fontStack.getShaping(label.first, properties.text.max_width,
-               properties.text.line_height, horizontalAlign,
-               verticalAlign, properties.text.letter_spacing);
+        // if feature has icon, get sprite atlas position
+        if (feature.sprite.length()) {
+            image = spriteAtlas.waitForImage(feature.sprite, sprite);
+        }
 
-        addGlyph(id.to_uint64(), properties.text.font, label.first, fontStack, glyphAtlas, face);
-
-        // Place labels.
-        addFeature(label.second, face, shaping);
+        // if either shaping or icon position is present, add the feature
+        if (shaping.size() || image) {
+            addFeature(feature.geometry, shaping, image);
+        }
     }
+}
+
+void SymbolBucket::addFeature(const pbf &geom_pbf, const Shaping &shaping, const Rect<uint16_t> &image) {
+    // Decode all lines.
+    std::vector<Coordinate> line;
+    Geometry::command cmd;
+
+    Coordinate coord;
+    pbf geom(geom_pbf);
+    Geometry geometry(geom);
+    int32_t x, y;
+    while ((cmd = geometry.next(x, y)) != Geometry::end) {
+       if (cmd == Geometry::move_to) {
+           if (!line.empty()) {
+               addFeature(line, shaping, image);
+               line.clear();
+           }
+       }
+       line.emplace_back(x, y);
+    }
+    if (line.size()) {
+        addFeature(line, shaping, image);
+    }
+}
+
+void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping &shaping, const Rect<uint16_t> &image) {
+    const float minScale = 0.5f;
+    const float glyphSize = 24.0f;
+
+
+    const bool horizontalText = properties.text.rotation_alignment == RotationAlignmentType::Viewport;
+    const bool horizontalIcon = properties.icon.rotation_alignment == RotationAlignmentType::Viewport;
+    const float fontScale = properties.text.max_size / glyphSize;
+    const float textBoxScale = placement.collision.tilePixelRatio * fontScale,
+        iconBoxScale = collision.tilePixelRatio * info['icon-max-size'],
+        iconWithoutText = info['text-optional'] || !shaping,
+        textWithoutIcon = info['icon-optional'] || !image;
+}
+
+
+//
+//    GlyphPositions face;
+//
+//
+//    // Shape and place all labels.
+//    for (const std::pair<std::u32string, pbf> &label : labels) {
+//
+//        // Shape labels.
+//        const Shaping shaping = fontStack.getShaping(label.first, properties.text.max_width,
+//               properties.text.line_height, horizontalAlign,
+//               verticalAlign, properties.text.letter_spacing);
+//
+//        addGlyph(id.to_uint64(), properties.text.font, label.first, fontStack, glyphAtlas, face);
+//
+//        // Place labels.
+//        addFeature(label.second, face, shaping);
+//    }
 }
 
 void SymbolBucket::addFeature(const pbf &geom_pbf, const GlyphPositions &face,
@@ -183,6 +235,79 @@ void SymbolBucket::addFeature(const pbf &geom_pbf, const GlyphPositions &face,
        placement.addFeature(*this, line, properties, face, shaping);
    }
 }
+
+
+class Symbol {
+public:
+    vec2<float> tl, tr, bl, br;
+    Rect<uint16_t> tex;
+    float angle;
+    float minScale = 0.0f;
+    float maxScale = std::numeric_limits<float>::infinity();
+    CollisionAnchor anchor;
+};
+
+typedef std::vector<Symbol> Symbols;
+
+template <typename Buffer>
+void SymbolBucket::addSymbols(Buffer &buffer, const Symbols &symbols, float placementZoom, PlacementRange placementRange, float zoom) {
+    placementZoom += zoom;
+
+    for (const Symbol &symbol : symbols) {
+        const auto &tl = symbol.tl;
+        const auto &tr = symbol.tr;
+        const auto &bl = symbol.bl;
+        const auto &br = symbol.br;
+        const auto &tex = symbol.tex;
+        const auto &angle = symbol.angle;
+
+        float minZoom = util::max(static_cast<float>(zoom + log(symbol.minScale) / log(2)),
+                                  placementZoom);
+        float maxZoom =
+            util::min(static_cast<float>(zoom + log(symbol.maxScale) / log(2)), 25.0f);
+        const auto &glyphAnchor = symbol.anchor;
+
+        if (maxZoom <= minZoom)
+            continue;
+
+        // Lower min zoom so that while fading out the label
+        // it can be shown outside of collision-free zoom levels
+        if (minZoom == placementZoom) {
+            minZoom = 0;
+        }
+
+        const int glyph_vertex_length = 4;
+
+        if (!triangleGroups.size() ||
+            (triangleGroups.back().vertex_length + glyph_vertex_length > 65535)) {
+            // Move to a new group because the old one can't hold the geometry.
+            triangleGroups.emplace_back();
+        }
+
+        // We're generating triangle fans, so we always start with the first
+        // coordinate in this polygon.
+        triangle_group_type &triangleGroup = triangleGroups.back();
+        uint32_t triangleIndex = triangleGroup.vertex_length;
+
+        // coordinates (2 triangles)
+        buffer.add(glyphAnchor.x, glyphAnchor.y, tl.x, tl.y, tex.x, tex.y, angle, minZoom,
+                             placementRange, maxZoom, placementZoom);
+        buffer.add(glyphAnchor.x, glyphAnchor.y, tr.x, tr.y, tex.x + tex.w, tex.y, angle,
+                             minZoom, placementRange, maxZoom, placementZoom);
+        buffer.add(glyphAnchor.x, glyphAnchor.y, bl.x, bl.y, tex.x, tex.y + tex.h, angle,
+                             minZoom, placementRange, maxZoom, placementZoom);
+        buffer.add(glyphAnchor.x, glyphAnchor.y, br.x, br.y, tex.x + tex.w, tex.y + tex.h,
+                             angle, minZoom, placementRange, maxZoom, placementZoom);
+
+        // add the two triangles, referencing the four coordinates we just inserted.
+        triangleElementsBuffer.add(triangleIndex + 0, triangleIndex + 1, triangleIndex + 2);
+        triangleElementsBuffer.add(triangleIndex + 1, triangleIndex + 2, triangleIndex + 3);
+
+        triangleGroup.vertex_length += glyph_vertex_length;
+        triangleGroup.elements_length += 2;
+    }
+}
+
 
 void SymbolBucket::addGlyphs(const PlacedGlyphs &glyphs, float placementZoom,
                              PlacementRange placementRange, float zoom) {

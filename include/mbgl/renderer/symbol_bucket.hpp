@@ -4,6 +4,8 @@
 #include "bucket.hpp"
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
+#include <mbgl/geometry/text_buffer.hpp>
+#include <mbgl/geometry/icon_buffer.hpp>
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/text/types.hpp>
 #include <mbgl/text/glyph.hpp>
@@ -16,9 +18,6 @@
 namespace mbgl {
 
 class Style;
-class TextVertexBuffer;
-class IconVertexBuffer;
-class TriangleElementsBuffer;
 class TextShader;
 class IconShader;
 class DotShader;
@@ -29,9 +28,14 @@ class GlyphAtlas;
 class GlyphStore;
 class FontStack;
 
-class SymbolBucket : public Bucket {
-    typedef ElementGroup triangle_group_type;
+class SymbolFeature {
+public:
+    pbf geometry;
+    std::u32string label;
+    std::string sprite;
+};
 
+class SymbolBucket : public Bucket {
 public:
     SymbolBucket(
         TextVertexBuffer &textVertexBuffer,
@@ -57,6 +61,14 @@ public:
     void drawIcons(DotShader& shader);
 
 private:
+
+    std::vector<SymbolFeature> processFeatures(const VectorTileLayer &layer, const FilterExpression &filter, GlyphStore &glyphStore, const Sprite &sprite);
+    void addFeature(const pbf &geom_pbf, const Shaping &shaping, const Rect<uint16_t> &image);
+    void addFeature(const std::vector<Coordinate> &line, const Shaping &shaping, const Rect<uint16_t> &image);
+
+
+
+
     void addGlyph(uint64_t tileid, const std::string stackname, const std::u32string &string,
                   const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face);
     void addFeature(const pbf &geom_pbf, const GlyphPositions &face, const Shaping &shaping);
@@ -65,18 +77,20 @@ public:
     const StyleBucketSymbol &properties;
 
 private:
-    TextVertexBuffer& textVertexBuffer;
-    IconVertexBuffer& iconVertexBuffer;
-    TriangleElementsBuffer& triangleElementsBuffer;
     Placement &placement;
 
-    const size_t text_vertex_start;
-    const size_t icon_vertex_start;
-    const size_t triangle_elements_start;
-    size_t icon_vertex_end = 0;
-    VertexArrayObject array;
+    struct {
+        TextVertexBuffer vertices;
+        TriangleElementsBuffer triangles;
+        std::vector<ElementGroup> groups;
+    } text;
 
-    std::vector<triangle_group_type> triangleGroups;
+    struct {
+        IconVertexBuffer vertices;
+        TriangleElementsBuffer triangles;
+        std::vector<ElementGroup> groups;
+    } icon;
+
 };
 }
 

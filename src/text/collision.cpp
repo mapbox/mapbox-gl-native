@@ -31,24 +31,40 @@ Collision::~Collision() {
     delete ((Tree *)hTree);
 }
 
-Collision::Collision() : cTree(new Tree()), hTree(new Tree()) {
+Collision::Collision(float zoom, float tileExtent, float tileSize, float placementDepth)
+    : hTree(new Tree()), // tree for horizontal labels
+      cTree(new Tree()), // tree for glyphs from curved labels
+
+      // tile pixels per screen pixels at the tile's zoom level
+      tilePixelRatio(tileExtent / tileSize),
+
+      zoom(zoom),
+
+      // Calculate the maximum scale we can go down in our fake-3d rtree so that
+      // placement still makes sense. This is calculated so that the minimum
+      // placement zoom can be at most 25.5 (we use an unsigned integer x10 to
+      // store the minimum zoom).
+      //
+      // We don't want to place labels all the way to 25.5. This lets too many
+      // glyphs be placed, slowing down collision checking. Only place labels if
+      // they will show up within the intended zoom range of the tile.
+      maxPlacementScale(std::exp(std::log(2) * util::min(3.0f, placementDepth, 25.5f - zoom)))
+{
     const float m = 4096;
+    const float edge = m * tilePixelRatio * 2;
 
     // Hack to prevent cross-tile labels
     insert(
         {{GlyphBox{
               CollisionRect{CollisionPoint{0, 0}, CollisionPoint{0, m * 8}}, 0},
           GlyphBox{
-              CollisionRect{CollisionPoint{0, 0}, CollisionPoint{m * 8, 0}},
-              0}}},
+              CollisionRect{CollisionPoint{0, 0}, CollisionPoint{m * 8, 0}}, 0}}},
         CollisionAnchor(0, 0), 1, {{M_PI * 2, 0}}, false, 2);
 
     insert({{GlyphBox{
-                 CollisionRect{CollisionPoint{-m * 8, 0}, CollisionPoint{0, 0}},
-                 0},
+                 CollisionRect{CollisionPoint{-m * 8, 0}, CollisionPoint{0, 0}}, 0},
              GlyphBox{
-                 CollisionRect{CollisionPoint{0, -m * 8}, CollisionPoint{0, 0}},
-                 0}}},
+                 CollisionRect{CollisionPoint{0, -m * 8}, CollisionPoint{0, 0}}, 0}}},
            CollisionAnchor{m, m}, 1, {{M_PI * 2, 0}}, false, 2);
 }
 
@@ -74,7 +90,7 @@ GlyphBox getMergedGlyphs(const GlyphBoxes &boxes, const CollisionAnchor &anchor)
 
 PlacementProperty Collision::place(const GlyphBoxes &boxes, const CollisionAnchor &anchor,
                                    float minPlacementScale, float maxPlacementScale, float padding,
-                                   bool horizontal, bool alwaysVisible) {
+                                   bool horizontal, bool allowOverlap, bool ignorePlacement) {
     float minScale = std::numeric_limits<float>::infinity();
     for (const GlyphBox &glyphBox : boxes) {
         minScale = util::min(minScale, glyphBox.minScale);
@@ -95,17 +111,17 @@ PlacementProperty Collision::place(const GlyphBoxes &boxes, const CollisionAncho
               y22 = box.br.y * box.br.y,
               diag = std::sqrt(util::max(x12 + y12, x12 + y22, x22 + y12, x22 + y22));
 
-        glyphs.front().hBox = CollisionRect{{-diag, -diag}, {diag, diag}};
-
-    } else {
-        glyphs = boxes;
+        glyphs.front().hBox = CollisionRect{
+            {-diag, -diag},
+            {diag, diag}
+        };
     }
 
     // Calculate the minimum scale the entire label can be shown without
     // collisions
-    float scale = alwaysVisible ? minPlacementScale
-                                : getPlacementScale(glyphs, minPlacementScale,
-                                                    maxPlacementScale, padding);
+        float scale =
+            allowOverlap ? minPlacementScale : getPlacementScale(glyphs, minPlacementScale,
+                                                                  maxPlacementScale, padding);
 
     // Return if the label can never be placed without collision
     if (scale < 0 || scale == std::numeric_limits<float>::infinity()) {
@@ -113,8 +129,10 @@ PlacementProperty Collision::place(const GlyphBoxes &boxes, const CollisionAncho
     }
 
     // Calculate the range it is safe to rotate all glyphs
-    PlacementRange rotationRange = getPlacementRange(glyphs, scale, horizontal);
-    insert(glyphs, anchor, scale, rotationRange, horizontal, padding);
+    PlacementRange rotationRange = allowOverlap ? PlacementRange{{2 * M_PI, 0.0f}}
+                                                : getPlacementRange(glyphs, scale, horizontal);
+
+    if (!ignorePlacement) insert(glyphs, anchor, scale, rotationRange, horizontal, padding);
 
     float zoom = log(scale) / log(2);
 
@@ -177,18 +195,10 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs,
                 float padding = std::fmax(pad, placement.padding) * 8.0f;
 
                 // Original algorithm:
-                float s1 = (ob.tl.x - nb.br.x - padding) /
-                           (na.x - oa.x); // scale at which new box is to the
-                                          // left of old box
-                float s2 = (ob.br.x - nb.tl.x + padding) /
-                           (na.x - oa.x); // scale at which new box is to the
-                                          // right of old box
-                float s3 = (ob.tl.y - nb.br.y - padding) /
-                           (na.y - oa.y); // scale at which new box is to the
-                                          // top of old box
-                float s4 = (ob.br.y - nb.tl.y + padding) /
-                           (na.y - oa.y); // scale at which new box is to the
-                                          // bottom of old box
+                float s1 = (ob.tl.x - nb.br.x - padding) / (na.x - oa.x); // scale at which new box is to the left of old box
+                float s2 = (ob.br.x - nb.tl.x + padding) / (na.x - oa.x); // scale at which new box is to the right of old box
+                float s3 = (ob.tl.y - nb.br.y - padding) / (na.y - oa.y); // scale at which new box is to the top of old box
+                float s4 = (ob.br.y - nb.tl.y + padding) / (na.y - oa.y); // scale at which new box is to the bottom of old box
 
                 if (isnan(s1) || isnan(s2)) {
                     s1 = s2 = 1;

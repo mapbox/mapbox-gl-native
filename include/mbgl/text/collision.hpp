@@ -8,13 +8,12 @@ namespace mbgl {
 class Collision {
 
 public:
-    Collision();
+    Collision(float zoom, float tileExtent, float tileSize, float placementDepth = 1);
     ~Collision();
 
-    PlacementProperty place(const GlyphBoxes &boxes,
-                            const CollisionAnchor &anchor,
-                            float minPlacementScale, float maxPlacementScale,
-                            float padding, bool horizontal, bool alwaysVisible);
+    PlacementProperty place(const GlyphBoxes &boxes, const CollisionAnchor &anchor,
+                            float minPlacementScale, float maxPlacementScale, float padding,
+                            bool horizontal, bool allowOverlap, bool ignorePlacement);
     float getPlacementScale(const GlyphBoxes &glyphs, float minPlacementScale,
                             float maxPlacementScale, float pad);
     PlacementRange getPlacementRange(const GlyphBoxes &glyphs,
@@ -24,8 +23,11 @@ public:
                 bool horizontal, float padding);
 
 private:
-    void *cTree;
     void *hTree;
+    void *cTree;
+    const float tilePixelRatio;
+    const float zoom;
+    const float maxPlacementScale;
 };
 }
 
