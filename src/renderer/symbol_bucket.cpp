@@ -31,7 +31,7 @@ bool SymbolBucket::hasData() const { return hasTextData() || hasIconData(); }
 
 bool SymbolBucket::hasTextData() const { return !text.groups.empty(); }
 
-bool SymbolBucket::hasIconData() const { return !icon.groups.empty() > 0; }
+bool SymbolBucket::hasIconData() const { return !icon.groups.empty(); }
 
 void SymbolBucket::addGlyphsToAtlas(uint64_t tileid, const std::string stackname,
                                     const std::u32string &string, const FontStack &fontStack,

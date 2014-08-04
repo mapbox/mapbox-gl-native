@@ -16,7 +16,7 @@ GlyphRange getGlyphRange(char32_t glyph);
 
 struct GlyphMetrics {
     operator bool() const {
-        return width == 0 && height == 0 && advance == 0;
+        return !(width == 0 && height == 0 && advance == 0);
     }
 
     // Glyph metrics.
@@ -35,7 +35,7 @@ struct Glyph {
         : rect(rect), metrics(metrics) {}
 
     operator bool() const {
-        return !metrics && !rect;
+        return metrics || rect;
     }
 
     const Rect<uint16_t> rect;

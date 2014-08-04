@@ -112,7 +112,7 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementS
         const float pad = glyph.padding;
 
         if (anchor.x < 0 || anchor.x > 4096 || anchor.y < 0 || anchor.y > 4096) {
-            return -1;
+            return 0;
         }
 
         float minScale = std::fmax(minPlacementScale, glyph.minScale);
@@ -142,7 +142,7 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementS
                 // NOTE: this isn't right because there can be glyphs with
                 // the same anchor but differing box offsets.
                 if (na == oa) {
-                    return -1;
+                    return 0;
                 }
 
                 // todo: unhardcode the 8 = tileExtent/tileSize
@@ -175,7 +175,7 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementS
                 }
 
                 if (minPlacementScale > maxPlacementScale) {
-                    return -1;
+                    return 0;
                 }
             }
         }

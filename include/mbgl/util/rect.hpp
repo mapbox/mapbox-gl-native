@@ -15,7 +15,7 @@ struct Rect {
         return Rect(x * value, y * value, w * value, h * value);
     }
 
-    operator bool() const { return w == 0 || h == 0; }
+    operator bool() const { return w != 0 && h != 0; }
 };
 }
 
