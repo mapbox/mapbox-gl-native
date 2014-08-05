@@ -27,7 +27,7 @@ void Painter::finishPrerender(PrerenderedTexture &/*texture*/) {
 template <typename Properties>
 void Painter::renderPrerenderedTexture(PrerenderedTexture &texture, const Properties &properties) {
     const int buffer = texture.properties.buffer * 4096.0f;
-
+    
     // draw the texture on a quad
     useProgram(rasterShader->program);
     rasterShader->setMatrix(matrix);
@@ -45,3 +45,4 @@ void Painter::renderPrerenderedTexture(PrerenderedTexture &texture, const Proper
 }
 
 template void Painter::renderPrerenderedTexture(PrerenderedTexture &, const FillProperties &);
+template void Painter::renderPrerenderedTexture(PrerenderedTexture &, const RasterProperties &);

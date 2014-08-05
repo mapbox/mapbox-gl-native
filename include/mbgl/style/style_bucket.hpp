@@ -82,6 +82,9 @@ public:
 
 class StyleBucketRaster {
 public:
+    uint16_t raster_size = 256;
+    float blur = 0.0f;
+    float buffer = 0.03125f;
 };
 
 typedef util::variant<StyleBucketFill, StyleBucketLine, StyleBucketSymbol,

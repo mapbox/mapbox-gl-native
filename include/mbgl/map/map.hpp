@@ -45,6 +45,8 @@ public:
     // Triggers a lazy rerender: only performs a render when the map is not clean.
     void rerender();
 
+    void renderLayers(std::shared_ptr<StyleLayerGroup> group);
+    
     // Forces a map update: always triggers a rerender.
     void update();
 
@@ -139,6 +141,7 @@ private:
 
     void updateTiles();
     void updateRenderState();
+    void updateRenderState(const mat4 vtxMatrix);
 
     size_t countLayers(const std::vector<LayerDescription>& layers);
 
@@ -150,7 +153,6 @@ private:
 
     // Unconditionally performs a render with the current map state.
     void render();
-    void renderLayers(std::shared_ptr<StyleLayerGroup> group);
     void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass);
 
 private:

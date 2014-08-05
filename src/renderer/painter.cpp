@@ -173,7 +173,7 @@ void Painter::prepareTile(const Tile& tile) {
 
 void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc) {
     assert(tile.data);
-    if (tile.data->hasData(layer_desc)) {
+    if (tile.data->hasData(layer_desc) || layer_desc->type == StyleLayerType::Raster) {
         gl::group group(util::sprintf<32>("render %d/%d/%d\n", tile.id.z, tile.id.y, tile.id.z));
         prepareTile(tile);
         tile.data->render(*this, layer_desc);

@@ -15,14 +15,14 @@ public:
 
 class RasterizeProperties {
 public:
-    Function<bool> enabled = ConstantFunction<bool>(false);
+//    Function<bool> enabled = ConstantFunction<bool>(false);                 // going to need to delete this? or keep ?
     Function<float> buffer = ConstantFunction<float>(1.0f / 32.0f);
     Function<float> size = ConstantFunction<float>(256);
     Function<float> blur = ConstantFunction<float>(0);
 
-    inline bool isEnabled(const int8_t z) const {
-        return util::apply_visitor(FunctionEvaluator<bool>(z), enabled);
-    }
+//    inline bool isEnabled(const int8_t z) const {
+//        return util::apply_visitor(FunctionEvaluator<bool>(z), enabled);
+//    }
 
     inline RasterizedProperties get(const int8_t z) const {
         RasterizedProperties properties;

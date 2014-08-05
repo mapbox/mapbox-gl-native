@@ -66,10 +66,11 @@ void TileParser::parseStyleLayers(std::shared_ptr<StyleLayerGroup> group) {
         if (layer_desc->isBackground()) {
             // background is a special, fake bucket
             continue;
-        } else if (layer_desc->layers) {
+        } else if (layer_desc->layers && layer_desc->type != StyleLayerType::Raster) {
             // This is a layer group.
             parseStyleLayers(layer_desc->layers);
-        } else if (layer_desc->bucket) {
+        }
+        if (layer_desc->bucket) {
             // This is a singular layer. Check if this bucket already exists. If not,
             // parse this bucket.
             auto bucket_it = tile.buckets.find(layer_desc->bucket->name);

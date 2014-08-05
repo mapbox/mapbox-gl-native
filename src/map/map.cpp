@@ -522,6 +522,21 @@ void Map::updateRenderState() {
     }
 }
 
+void Map::updateRenderState(const mat4 vtxMatrix) {
+    std::forward_list<Tile::ID> ids;
+    
+    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
+        ids.splice_after(ids.before_begin(), source->source->getIDs());
+        source->source->updateMatrices(vtxMatrix, state);
+    }
+    
+    const std::map<Tile::ID, ClipID> clipIDs = computeClipIDs(ids);
+    
+    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
+        source->source->updateClipIDs(clipIDs);
+    }
+}
+
 void Map::prepare() {
     view.make_active();
 
@@ -634,8 +649,8 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
 }
 
 void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
-    if (layer_desc->layers) {
-        // This is a layer group. We render them during our translucent render pass.
+    if (layer_desc->layers && layer_desc->type != StyleLayerType::Raster) {
+         // This is a layer group. We render them during our translucent render pass.
         if (pass == Translucent) {
             const CompositeProperties &properties = layer_desc->getProperties<CompositeProperties>();
             if (properties.isVisible()) {
@@ -716,7 +731,6 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
             std::cout << std::string(indent * 4, ' ') << "- " << layer_desc->id << " ("
                       << layer_desc->type << ")" << std::endl;
         }
-
         style_source.source->render(painter, layer_desc);
     }
 }
