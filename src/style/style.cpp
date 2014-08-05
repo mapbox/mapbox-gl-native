@@ -98,7 +98,7 @@ void Style::loadJSON(const uint8_t *const data) {
 const BackgroundProperties &Style::getBackgroundProperties() const {
     if (layers && layers->layers.size()) {
         const auto first = layers->layers.front();
-        if (first && first->id == "background") {
+        if (first && first->type == StyleLayerType::Background) {
             return first->getProperties<BackgroundProperties>();
         }
     }

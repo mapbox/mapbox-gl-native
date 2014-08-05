@@ -646,7 +646,7 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
                 }
             }
         }
-    } else if (layer_desc->id == "background") {
+    } else if (layer_desc->type == StyleLayerType::Background) {
         // This layer defines the background color.
     } else {
         // This is a singular layer.

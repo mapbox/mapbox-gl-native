@@ -10,7 +10,7 @@ StyleLayer::StyleLayer(const std::string &id, std::map<ClassID, ClassProperties>
     : id(id), styles(std::move(styles)), rasterize(std::move(rasterize)) {}
 
 bool StyleLayer::isBackground() const {
-    return type == StyleLayerType::Background && id == "background";
+    return type == StyleLayerType::Background;
 }
 
 void StyleLayer::setClasses(const std::vector<std::string> &class_names, const timestamp now,
