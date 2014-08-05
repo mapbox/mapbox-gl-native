@@ -28,9 +28,6 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    float dash_length = properties.dash_array[0];
-    float dash_gap = properties.dash_array[1];
-
     const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
     glDepthRange(strata, 1.0f);
@@ -79,9 +76,7 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         useProgram(lineShader->program);
         lineShader->setMatrix(vtxMatrix);
         lineShader->setExtrudeMatrix(extrudeMatrix);
-        lineShader->setDashArray({{ dash_length, dash_gap }});
         lineShader->setLineWidth({{ outset, inset }});
-        lineShader->setRatio(map.getState().getPixelRatio());
         lineShader->setBlur(blur);
         lineShader->setColor(color);
         bucket.drawLines(*lineShader);

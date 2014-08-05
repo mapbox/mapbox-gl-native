@@ -14,14 +14,9 @@ attribute float a_linesofar;
 // the extrusion vector.
 uniform mat4 u_matrix;
 uniform mat4 u_exmatrix;
-
-// shared
-uniform float u_ratio;
 uniform vec2 u_linewidth;
-uniform vec4 u_color;
 
 varying vec2 v_normal;
-varying float v_linesofar;
 
 void main() {
     // We store the texture normals in the most insignificant bit
@@ -41,5 +36,4 @@ void main() {
     // because we're extruding the line in pixel space, regardless of the current
     // tile's zoom level.
     gl_Position = u_matrix * vec4(floor(a_pos * 0.5), 0.0, 1.0) + u_exmatrix * dist;
-    v_linesofar = a_linesofar * u_ratio;
 }
