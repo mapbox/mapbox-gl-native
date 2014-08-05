@@ -272,8 +272,7 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
         const float minScale = util::max(placementScale, glyph.minScale);
         const float maxScale = glyph.maxScale || std::numeric_limits<float>::infinity();
 
-        Box bounds{Point{anchor.x + bbox.tl.x / minScale, anchor.y + bbox.tl.y / minScale},
-                   Point{anchor.x + bbox.br.x / minScale, anchor.y + bbox.br.y / minScale}};
+        const Box bounds = getBox(anchor, bbox, minScale, maxScale);
 
         PlacementBox placement;
         placement.anchor = anchor;
@@ -285,9 +284,6 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
         placement.placementScale = minScale;
         placement.maxScale = maxScale;
         placement.padding = glyph.padding;
-
-        assert(!isnan(bounds.min_corner().get<0>()) && !isnan(bounds.min_corner().get<1>()));
-        assert(!isnan(bounds.max_corner().get<0>()) && !isnan(bounds.max_corner().get<1>()));
 
         allBounds.emplace_back(bounds, placement);
     }
