@@ -26,6 +26,7 @@ LineShader::LineShader()
     u_color = glGetUniformLocation(program, "u_color");
     u_ratio = glGetUniformLocation(program, "u_ratio");
     u_dasharray = glGetUniformLocation(program, "u_dasharray");
+    u_blur = glGetUniformLocation(program, "u_blur");
 
     // fprintf(stderr, "LineShader:\n");
     // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
@@ -79,5 +80,12 @@ void LineShader::setDashArray(const std::array<float, 2>& new_dasharray) {
     if (dasharray != new_dasharray) {
         glUniform2fv(u_dasharray, 1, new_dasharray.data());
         dasharray = new_dasharray;
+    }
+}
+
+void LineShader::setBlur(float new_blur) {
+    if (blur != new_blur) {
+        glUniform1f(u_blur, new_blur);
+        blur = new_blur;
     }
 }
