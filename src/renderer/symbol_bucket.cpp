@@ -126,6 +126,10 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
     else if (properties.text.vertical_align == TextVerticalAlignType::Top)
         verticalAlign = 0;
 
+    float justify = 0.5;
+    if (properties.text.justify == TextJustifyType::Right) justify = 1;
+    else if (properties.text.justify == TextJustifyType::Left) justify = 0;
+
     const FontStack &fontStack = glyphStore.getFontStack(properties.text.font);
 
     for (const SymbolFeature &feature : features) {
@@ -135,9 +139,15 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
 
         // if feature has text, shape the text
         if (feature.label.length()) {
-            shaping = fontStack.getShaping(feature.label, properties.text.max_width,
-                                           properties.text.line_height, horizontalAlign,
-                                           verticalAlign, properties.text.letter_spacing);
+            shaping = fontStack.getShaping(
+                /* string */ feature.label,
+                /* maxWidth */ properties.text.max_width,
+                /* lineHeight */ properties.text.line_height,
+                /* horizontalAlign */ horizontalAlign,
+                /* verticalAlign */ verticalAlign,
+                /* justify */ justify,
+                /* spacing */ properties.text.letter_spacing,
+                /* translate */ properties.text.offset);
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {
@@ -219,7 +229,8 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
         anchors = {Anchor{float(line[0].x), float(line[0].y), 0, minScale}};
     }
 
-    const vec2<float> origin = {0, 0};
+    // TODO: figure out correct ascender height.
+    const vec2<float> origin = {0, -17};
 
     for (Anchor &anchor : anchors) {
 
