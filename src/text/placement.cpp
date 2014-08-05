@@ -210,9 +210,6 @@ Placement Placement::getGlyphs(Anchor &anchor, const vec2<float> &origin, const 
 
     Placement placement;
 
-    PlacedGlyphs &glyphs = placement.shapes;
-    GlyphBoxes &boxes = placement.boxes;
-
     const uint32_t buffer = 3;
 
     for (const PositionedGlyph &shape : shaping) {
@@ -281,7 +278,7 @@ Placement Placement::getGlyphs(Anchor &anchor, const vec2<float> &origin, const 
             const float glyphMinScale = std::max(instance.minScale, anchor.scale);
 
             // Remember the glyph for later insertion.
-            glyphs.emplace_back(
+            placement.shapes.emplace_back(
                 tl, tr, bl, br, rect,
                 float(std::fmod((anchor.angle + rotate + instance.offset + 2 * M_PI), (2 * M_PI))),
                 instance.anchor, glyphMinScale, instance.maxScale);
@@ -294,18 +291,18 @@ Placement Placement::getGlyphs(Anchor &anchor, const vec2<float> &origin, const 
                                         boxScale * util::max(tl.x, tr.x, bl.x, br.x),
                                         boxScale * util::max(tl.y, tr.y, bl.y, br.y)};
                 }
-                boxes.emplace_back(box, instance.anchor, glyphMinScale, instance.maxScale, padding);
+                placement.boxes.emplace_back(box, instance.anchor, glyphMinScale, instance.maxScale, padding);
             }
         }
     }
 
     // TODO avoid creating the boxes in the first place?
     if (horizontal)
-        boxes = {getMergedBoxes(boxes, anchor)};
+        placement.boxes = {getMergedBoxes(placement.boxes, anchor)};
 
     const float minPlacementScale = anchor.scale;
     placement.minScale = std::numeric_limits<float>::infinity();
-    for (const GlyphBox &box : boxes) {
+    for (const GlyphBox &box : placement.boxes) {
         placement.minScale = util::min(placement.minScale, box.minScale);
     }
     placement.minScale = util::max(minPlacementScale, Placement::globalMinScale);

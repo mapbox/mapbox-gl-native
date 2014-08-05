@@ -136,8 +136,8 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementS
         const Box searchBox = getBox(anchor, bbox, minScale, maxScale);
 
         std::vector<PlacementValue> blocking;
-        ((Tree *)cTree)->query(bgi::intersects(searchBox), std::back_inserter(blocking));
         ((Tree *)hTree)->query(bgi::intersects(searchBox), std::back_inserter(blocking));
+        ((Tree *)cTree)->query(bgi::intersects(searchBox), std::back_inserter(blocking));
 
         if (blocking.size()) {
             const CollisionAnchor &na = anchor; // new anchor
@@ -175,12 +175,14 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementS
                     s3 = s4 = 1;
                 }
 
-                float collisionFreeScale = std::fmin(std::fmax(s1, s2), std::fmax(s3, s4));
+                const float collisionFreeScale = std::fmin(std::fmax(s1, s2), std::fmax(s3, s4));
 
                 // Only update label's min scale if the glyph was
                 // restricted by a collision
-                if (collisionFreeScale > minPlacementScale && collisionFreeScale > minScale &&
-                    collisionFreeScale < maxScale && collisionFreeScale < placement.maxScale) {
+                if (collisionFreeScale > minPlacementScale &&
+                    collisionFreeScale > minScale &&
+                    collisionFreeScale < maxScale &&
+                    collisionFreeScale < placement.maxScale) {
                     minPlacementScale = collisionFreeScale;
                 }
 
