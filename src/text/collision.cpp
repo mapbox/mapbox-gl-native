@@ -126,7 +126,7 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementS
         }
 
         float minScale = std::fmax(minPlacementScale, glyph.minScale);
-        float maxScale = glyph.maxScale || std::numeric_limits<float>::infinity();
+        float maxScale = glyph.maxScale != 0 ? glyph.maxScale : std::numeric_limits<float>::infinity();
 
         if (minScale >= maxScale) {
             continue;
@@ -270,7 +270,7 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
         const CollisionRect &bbox = glyph.hBox ? glyph.hBox.get() : glyph.box;
 
         const float minScale = util::max(placementScale, glyph.minScale);
-        const float maxScale = glyph.maxScale || std::numeric_limits<float>::infinity();
+        const float maxScale = glyph.maxScale != 0 ? glyph.maxScale : std::numeric_limits<float>::infinity();
 
         const Box bounds = getBox(anchor, bbox, minScale, maxScale);
 
