@@ -59,7 +59,16 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 
     // var imagePos = properties.image && imageSprite.getPosition(properties.image);
     bool imagePos = false;
-    if (imagePos) {
+
+    if (properties.dash_array[1] >= 0) {
+        useProgram(lineSDFShader->program);
+        lineSDFShader->setMatrix(vtxMatrix);
+        lineSDFShader->setExtrudeMatrix(extrudeMatrix);
+        lineSDFShader->setLineWidth({{ outset, inset }});
+        lineSDFShader->setBlur(blur);
+        lineSDFShader->setColor(color);
+        bucket.drawLines(*lineSDFShader);
+    } else if (imagePos) {
         // var factor = 8 / Math.pow(2, painter.transform.zoom - params.z);
 
         // imageSprite.bind(gl, true);

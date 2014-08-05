@@ -40,6 +40,7 @@ void Painter::setup() {
     assert(plainShader);
     assert(outlineShader);
     assert(lineShader);
+    assert(lineSDFShader);
     assert(linejoinShader);
     assert(patternShader);
     assert(rasterShader);
@@ -70,6 +71,7 @@ void Painter::setupShaders() {
     plainShader = std::make_unique<PlainShader>();
     outlineShader = std::make_unique<OutlineShader>();
     lineShader = std::make_unique<LineShader>();
+    lineSDFShader = std::make_unique<LineSDFShader>();
     linejoinShader = std::make_unique<LinejoinShader>();
     patternShader = std::make_unique<PatternShader>();
     iconShader = std::make_unique<IconShader>();

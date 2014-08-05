@@ -16,6 +16,7 @@ class Style;
 class LineVertexBuffer;
 class TriangleElementsBuffer;
 class LineShader;
+class LineSDFShader;
 class LinejoinShader;
 struct pbf;
 
@@ -37,6 +38,7 @@ public:
     bool hasPoints() const;
 
     void drawLines(LineShader& shader);
+    void drawLines(LineSDFShader& shader);
     void drawPoints(LinejoinShader& shader);
 
 public:

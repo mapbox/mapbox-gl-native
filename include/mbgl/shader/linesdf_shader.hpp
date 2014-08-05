@@ -1,13 +1,13 @@
-#ifndef MBGL_SHADER_SHADER_LINE
-#define MBGL_SHADER_SHADER_LINE
+#ifndef MBGL_SHADER_SHADER_LINESDF
+#define MBGL_SHADER_SHADER_LINESDF
 
 #include <mbgl/shader/shader.hpp>
 
 namespace mbgl {
 
-class LineShader : public Shader {
+class LineSDFShader : public Shader {
 public:
-    LineShader();
+    LineSDFShader();
 
     void bind(char *offset);
 
