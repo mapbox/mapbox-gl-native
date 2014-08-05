@@ -53,21 +53,31 @@ Collision::Collision(float zoom, float tileExtent, float tileSize, float placeme
     const float edge = m * tilePixelRatio * 2;
 
     // Hack to prevent cross-tile labels
-    insert({GlyphBox{/* box */ CollisionRect{CollisionPoint{-edge, -edge}, CollisionPoint{0, edge}},
+    insert(
+        /* glyphs */ {
+            GlyphBox{/* box */ CollisionRect{CollisionPoint{-edge, -edge}, CollisionPoint{0, edge}},
                      /* minScale */ 0,
                      /* padding */ 2},
             GlyphBox{/* box */ CollisionRect{CollisionPoint{-edge, -edge}, CollisionPoint{edge, 0}},
                      /* minScale */ 0,
                      /* padding */ 2}},
-           CollisionAnchor(0, 0), 1, {{M_PI * 2, 0}}, false);
+        /* anchor */ CollisionAnchor(0, 0),
+        /* placementScale */ 1,
+        /* placementRange */ {{M_PI * 2, 0}},
+        /* horizontal */ false);
 
-    insert({GlyphBox{/* box*/ CollisionRect{CollisionPoint{-edge, 0}, CollisionPoint{edge, edge}},
+    insert(
+        /* glyphs */ {
+            GlyphBox{/* box*/ CollisionRect{CollisionPoint{-edge, 0}, CollisionPoint{edge, edge}},
                      /* minScale */ 0,
                      /* padding */ 2},
             GlyphBox{/* box */ CollisionRect{CollisionPoint{0, -edge}, CollisionPoint{edge, edge}},
                      /* minScale */ 0,
                      /* padding */ 2}},
-           CollisionAnchor(m, m), 1, {{M_PI * 2, 0}}, false);
+        /* anchor */ CollisionAnchor(m, m),
+        /* placementScale */ 1,
+        /* placementRange */ {{M_PI * 2, 0}},
+        /* horizontal */ false);
 }
 
 GlyphBox getMergedGlyphs(const GlyphBoxes &boxes, const CollisionAnchor &anchor) {
