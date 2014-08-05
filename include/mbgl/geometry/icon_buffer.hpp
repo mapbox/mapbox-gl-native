@@ -3,6 +3,8 @@
 
 #include "buffer.hpp"
 
+#include <array>
+
 namespace mbgl {
 
     class IconVertexBuffer : public Buffer<
