@@ -9,7 +9,8 @@
 using namespace mbgl;
 
 VectorTileData::VectorTileData(Tile::ID id, Map &map, const SourceInfo &source)
-    : TileData(id, map, source) {
+    : TileData(id, map, source),
+      depth(id.z >= source.max_zoom ? map.getMaxZoom() - id.z : 1) {
 }
 
 VectorTileData::~VectorTileData() {

@@ -43,7 +43,7 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile,
       glyphStore(glyphStore),
       spriteAtlas(spriteAtlas),
       sprite(sprite),
-      collision(tile.id.z, 4096, tile.source.tile_size, tile.id.z >= tile.source.max_zoom ? tile.source.max_zoom - tile.id.z : 1) {
+      collision(tile.id.z, 4096, tile.source.tile_size, tile.depth) {
 }
 
 void TileParser::parse() {
