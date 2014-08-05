@@ -39,8 +39,8 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
 
     Shaping shaping;
 
-    uint32_t x = translate.x;
-    const uint32_t y = translate.y;
+    int32_t x = std::round(translate.x * 24); // one em
+    const int32_t y = std::round(translate.y * 24); // one em
 
     // Loop through all characters of this label and shape.
     for (uint32_t chr : string) {
