@@ -67,7 +67,9 @@ void Sprite::load() {
             sprite->complete();
         } else {
             Log::Warning(Event::Sprite, "Failed to load sprite info: Error %d: %s", res->code, res->error_message.c_str());
-            sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res->error_message)));
+            if (!sprite->future.valid()) {
+                sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res->error_message)));
+            }
         }
     });
 
@@ -78,7 +80,9 @@ void Sprite::load() {
             sprite->complete();
         } else {
             Log::Warning(Event::Sprite, "Failed to load sprite image: Error %d: %s", res->code, res->error_message.c_str());
-            sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res->error_message)));
+            if (!sprite->future.valid()) {
+                sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res->error_message)));
+            }
         }
     });
 }
