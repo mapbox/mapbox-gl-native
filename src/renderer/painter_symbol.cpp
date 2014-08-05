@@ -100,7 +100,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         textShader->setFadeZoom((map.getState().getNormalizedZoom() + bump) * 10);
 
         // This defines the gamma around the SDF cutoff value.
-        const float sdfGamma = 0.75f / 10.0f;
+        const float sdfGamma = 1.0f / 10.0f;
 
         // Our signed distance fields are scaled so that 1 pixel is scaled to 32 pixels.
         // Our cutoff between positive and negative values is hard coded to 64 (== 2 pixels).
