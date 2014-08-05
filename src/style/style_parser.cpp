@@ -877,6 +877,12 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         StyleBucketSymbol &render = bucket.render.get<StyleBucketSymbol>();
 
         parseRenderProperty<PlacementTypeClass>(value, render.placement, "symbol-placement");
+        if (render.placement == PlacementType::Line) {
+            // Change the default value in case of line placement.
+            render.text.rotation_alignment = RotationAlignmentType::Map;
+            render.icon.rotation_alignment = RotationAlignmentType::Map;
+        }
+
         parseRenderProperty(value, render.min_distance, "symbol-min-distance");
 
         parseRenderProperty(value, render.icon.allow_overlap, "icon-allow-overlap");
