@@ -219,8 +219,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
         anchors = {Anchor{float(line[0].x), float(line[0].y), 0, minScale}};
     }
 
-    // TODO: figure out correct ascender height.
-    const vec2<float> origin = {0, -17};
+    const vec2<float> origin = {0, 0};
 
     for (Anchor &anchor : anchors) {
 

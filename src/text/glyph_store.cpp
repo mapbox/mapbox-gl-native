@@ -54,6 +54,7 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float &m
 }
 
 void alignVertically(Shaping &shaping, const uint32_t &lines, const float &lineHeight, const float &verticalAlign) {
+    // TODO: figure out correct ascender height.
     const float dy = -(lineHeight * (lines - 1) + 24) * verticalAlign - 5;
     for (PositionedGlyph &shape : shaping) {
         shape.y += dy;
