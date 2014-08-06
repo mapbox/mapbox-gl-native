@@ -2,9 +2,14 @@ uniform vec2 u_linewidth;
 uniform vec4 u_color;
 uniform float u_blur;
 
+uniform float u_fade;
+uniform float u_sdfgamma;
+
 uniform sampler2D u_image;
 
 varying vec2 v_normal;
+varying vec2 v_tex_a;
+varying vec2 v_tex_b;
 
 void main() {
     // Calculate the distance of the pixel from the line in pixels.
@@ -15,6 +20,11 @@ void main() {
     // (v_linewidth.s)
     float alpha = clamp(min(dist - (u_linewidth.t - u_blur), u_linewidth.s - dist) / u_blur, 0.0, 1.0);
 
+    float distA = texture2D(u_image, v_tex_a).a;
+    float distB = texture2D(u_image, v_tex_b).a;
+    alpha *= smoothstep(0.5 - u_sdfgamma, 0.5 + u_sdfgamma, mix(distA, distB, u_fade));
+
     gl_FragColor = u_color * alpha;
-    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0) * texture2D(u_image, vec2(0.5, 0.5)).a;
+
+    //gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0) * texture2D(u_image, vec2(0.5, 0.5)).a;
 }

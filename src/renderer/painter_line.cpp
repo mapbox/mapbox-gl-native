@@ -69,6 +69,12 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         lineSDFShader->setLineWidth({{ 10 * outset, inset }});
         lineSDFShader->setBlur(blur);
         lineSDFShader->setColor(color);
+        lineSDFShader->setFade(0);
+        lineSDFShader->setPatternScaleA({{1.0 / 40.0, 0}});
+        lineSDFShader->setPatternScaleB({{1.0 / 40.0, 0}});
+        lineSDFShader->setTexYA(0.5 / 512.0);
+        lineSDFShader->setTexYB(0.5 / 512.0);
+        lineSDFShader->setGamma(0.0);
         lineAtlas.bind();
         bucket.drawLines(*lineSDFShader);
     } else if (imagePos) {
