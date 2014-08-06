@@ -3,6 +3,8 @@
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/property_fallback.hpp>
 
+#include <mbgl/util/interpolate.hpp>
+
 namespace mbgl {
 
 StyleLayer::StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles)
@@ -117,27 +119,26 @@ private:
     const float z;
 };
 
-inline float interpolate(const float a, const float b, const float t) {
-    return (1.0f - t) * a + t * b;
-}
-
-inline Color interpolate(const Color &a, const Color &b, const float t) {
-    const float rt = 1.0f - t;
-    return Color {{
-        rt * a[0] + t * b[0],
-        rt * a[1] + t * b[1],
-        rt * a[2] + t * b[2],
-        rt * a[3] + t * b[3]
-    }};
-}
-
-template <typename T>
-inline T interpolate(const T a, const T b, const float t) {
-    return t >= 0.5 ? b : a;
-}
-
 template <typename T>
 void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, const timestamp now) {
+    auto it = appliedStyle.find(key);
+    if (it != appliedStyle.end()) {
+        AppliedClassProperties &applied = it->second;
+        // Iterate through all properties that we need to apply in order.
+        const PropertyEvaluator<T> evaluator(z);
+        for (AppliedClassProperty &property : applied.properties) {
+            if (now >= property.begin) {
+                // We overwrite the current property with the new value.
+                target = mapbox::util::apply_visitor(evaluator, property.value);
+            } else {
+                // Do not apply this property because its transition hasn't begun yet.
+            }
+        }
+    }
+}
+
+template <typename T>
+void StyleLayer::applyTransitionedStyleProperty(PropertyKey key, T &target, const float z, const timestamp now) {
     auto it = appliedStyle.find(key);
     if (it != appliedStyle.end()) {
         AppliedClassProperties &applied = it->second;
@@ -150,7 +151,7 @@ void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, c
             } else if (now >= property.begin) {
                 // We overwrite the current property partially with the new value.
                 float progress = float(now - property.begin) / float(property.end - property.begin);
-                target = interpolate(target, mapbox::util::apply_visitor(evaluator, property.value), progress);
+                target = util::interpolate(target, mapbox::util::apply_visitor(evaluator, property.value), progress);
             } else {
                 // Do not apply this property because its transition hasn't begun yet.
             }
@@ -163,11 +164,11 @@ void StyleLayer::applyStyleProperties<FillProperties>(const float z, const times
     properties.set<FillProperties>();
     FillProperties &fill = properties.get<FillProperties>();
     applyStyleProperty(PropertyKey::FillAntialias, fill.antialias, z, now);
-    applyStyleProperty(PropertyKey::FillOpacity, fill.opacity, z, now);
-    applyStyleProperty(PropertyKey::FillColor, fill.fill_color, z, now);
-    applyStyleProperty(PropertyKey::FillOutlineColor, fill.stroke_color, z, now);
-    applyStyleProperty(PropertyKey::FillTranslateX, fill.translate[0], z, now);
-    applyStyleProperty(PropertyKey::FillTranslateY, fill.translate[1], z, now);
+    applyTransitionedStyleProperty(PropertyKey::FillOpacity, fill.opacity, z, now);
+    applyTransitionedStyleProperty(PropertyKey::FillColor, fill.fill_color, z, now);
+    applyTransitionedStyleProperty(PropertyKey::FillOutlineColor, fill.stroke_color, z, now);
+    applyTransitionedStyleProperty(PropertyKey::FillTranslateX, fill.translate[0], z, now);
+    applyTransitionedStyleProperty(PropertyKey::FillTranslateY, fill.translate[1], z, now);
     applyStyleProperty(PropertyKey::FillTranslateAnchor, fill.translateAnchor, z, now);
     applyStyleProperty(PropertyKey::FillImage, fill.image, z, now);
 }
@@ -176,16 +177,16 @@ template <>
 void StyleLayer::applyStyleProperties<LineProperties>(const float z, const timestamp now) {
     properties.set<LineProperties>();
     LineProperties &line = properties.get<LineProperties>();
-    applyStyleProperty(PropertyKey::LineOpacity, line.opacity, z, now);
-    applyStyleProperty(PropertyKey::LineColor, line.color, z, now);
-    applyStyleProperty(PropertyKey::LineTranslateX, line.translate[0], z, now);
-    applyStyleProperty(PropertyKey::LineTranslateY, line.translate[1], z, now);
+    applyTransitionedStyleProperty(PropertyKey::LineOpacity, line.opacity, z, now);
+    applyTransitionedStyleProperty(PropertyKey::LineColor, line.color, z, now);
+    applyTransitionedStyleProperty(PropertyKey::LineTranslateX, line.translate[0], z, now);
+    applyTransitionedStyleProperty(PropertyKey::LineTranslateY, line.translate[1], z, now);
     applyStyleProperty(PropertyKey::LineTranslateAnchor, line.translateAnchor, z, now);
-    applyStyleProperty(PropertyKey::LineWidth, line.width, z, now);
-    applyStyleProperty(PropertyKey::LineOffset, line.offset, z, now);
-    applyStyleProperty(PropertyKey::LineBlur, line.blur, z, now);
-    applyStyleProperty(PropertyKey::LineDashLand, line.dash_array[0], z, now);
-    applyStyleProperty(PropertyKey::LineDashGap, line.dash_array[1], z, now);
+    applyTransitionedStyleProperty(PropertyKey::LineWidth, line.width, z, now);
+    applyTransitionedStyleProperty(PropertyKey::LineOffset, line.offset, z, now);
+    applyTransitionedStyleProperty(PropertyKey::LineBlur, line.blur, z, now);
+    applyTransitionedStyleProperty(PropertyKey::LineDashLand, line.dash_array[0], z, now);
+    applyTransitionedStyleProperty(PropertyKey::LineDashGap, line.dash_array[1], z, now);
     applyStyleProperty(PropertyKey::LineImage, line.image, z, now);
 }
 
@@ -193,47 +194,46 @@ template <>
 void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const timestamp now) {
     properties.set<SymbolProperties>();
     SymbolProperties &symbol = properties.get<SymbolProperties>();
-    applyStyleProperty(PropertyKey::IconOpacity, symbol.icon.opacity, z, now);
-    applyStyleProperty(PropertyKey::IconRotate, symbol.icon.rotate, z, now);
-    applyStyleProperty(PropertyKey::IconSize, symbol.icon.size, z, now);
-    applyStyleProperty(PropertyKey::IconColor, symbol.icon.color, z, now);
-    applyStyleProperty(PropertyKey::IconHaloColor, symbol.icon.halo_color, z, now);
-    applyStyleProperty(PropertyKey::IconHaloWidth, symbol.icon.halo_width, z, now);
-    applyStyleProperty(PropertyKey::IconHaloBlur, symbol.icon.halo_blur, z, now);
-    applyStyleProperty(PropertyKey::IconTranslateX, symbol.icon.translate[0], z, now);
-    applyStyleProperty(PropertyKey::IconTranslateY, symbol.icon.translate[1], z, now);
+    applyTransitionedStyleProperty(PropertyKey::IconOpacity, symbol.icon.opacity, z, now);
+    applyTransitionedStyleProperty(PropertyKey::IconRotate, symbol.icon.rotate, z, now);
+    applyTransitionedStyleProperty(PropertyKey::IconSize, symbol.icon.size, z, now);
+    applyTransitionedStyleProperty(PropertyKey::IconColor, symbol.icon.color, z, now);
+    applyTransitionedStyleProperty(PropertyKey::IconHaloColor, symbol.icon.halo_color, z, now);
+    applyTransitionedStyleProperty(PropertyKey::IconHaloWidth, symbol.icon.halo_width, z, now);
+    applyTransitionedStyleProperty(PropertyKey::IconHaloBlur, symbol.icon.halo_blur, z, now);
+    applyTransitionedStyleProperty(PropertyKey::IconTranslateX, symbol.icon.translate[0], z, now);
+    applyTransitionedStyleProperty(PropertyKey::IconTranslateY, symbol.icon.translate[1], z, now);
     applyStyleProperty(PropertyKey::IconTranslateAnchor, symbol.icon.translate_anchor, z, now);
 
-    applyStyleProperty(PropertyKey::TextOpacity, symbol.text.opacity, z, now);
-    applyStyleProperty(PropertyKey::TextSize, symbol.text.size, z, now);
-    applyStyleProperty(PropertyKey::TextColor, symbol.text.color, z, now);
-    applyStyleProperty(PropertyKey::TextHaloColor, symbol.text.halo_color, z, now);
-    applyStyleProperty(PropertyKey::TextHaloWidth, symbol.text.halo_width, z, now);
-    applyStyleProperty(PropertyKey::TextHaloBlur, symbol.text.halo_blur, z, now);
-    applyStyleProperty(PropertyKey::TextTranslateX, symbol.text.translate[0], z, now);
-    applyStyleProperty(PropertyKey::TextTranslateY, symbol.text.translate[1], z, now);
+    applyTransitionedStyleProperty(PropertyKey::TextOpacity, symbol.text.opacity, z, now);
+    applyTransitionedStyleProperty(PropertyKey::TextSize, symbol.text.size, z, now);
+    applyTransitionedStyleProperty(PropertyKey::TextColor, symbol.text.color, z, now);
+    applyTransitionedStyleProperty(PropertyKey::TextHaloColor, symbol.text.halo_color, z, now);
+    applyTransitionedStyleProperty(PropertyKey::TextHaloWidth, symbol.text.halo_width, z, now);
+    applyTransitionedStyleProperty(PropertyKey::TextHaloBlur, symbol.text.halo_blur, z, now);
+    applyTransitionedStyleProperty(PropertyKey::TextTranslateX, symbol.text.translate[0], z, now);
+    applyTransitionedStyleProperty(PropertyKey::TextTranslateY, symbol.text.translate[1], z, now);
     applyStyleProperty(PropertyKey::TextTranslateAnchor, symbol.text.translate_anchor, z, now);
-
 }
 
 template <>
 void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const timestamp now) {
     properties.set<RasterProperties>();
     RasterProperties &raster = properties.get<RasterProperties>();
-    applyStyleProperty(PropertyKey::RasterOpacity, raster.opacity, z, now);
-    applyStyleProperty(PropertyKey::RasterHueRotate, raster.hue_rotate, z, now);
-    applyStyleProperty(PropertyKey::RasterBrightnessLow, raster.brightness[0], z, now);
-    applyStyleProperty(PropertyKey::RasterBrightnessHigh, raster.brightness[1], z, now);
-    applyStyleProperty(PropertyKey::RasterSaturation, raster.saturation, z, now);
-    applyStyleProperty(PropertyKey::RasterContrast, raster.contrast, z, now);
-    applyStyleProperty(PropertyKey::RasterFade, raster.fade, z, now);
+    applyTransitionedStyleProperty(PropertyKey::RasterOpacity, raster.opacity, z, now);
+    applyTransitionedStyleProperty(PropertyKey::RasterHueRotate, raster.hue_rotate, z, now);
+    applyTransitionedStyleProperty(PropertyKey::RasterBrightnessLow, raster.brightness[0], z, now);
+    applyTransitionedStyleProperty(PropertyKey::RasterBrightnessHigh, raster.brightness[1], z, now);
+    applyTransitionedStyleProperty(PropertyKey::RasterSaturation, raster.saturation, z, now);
+    applyTransitionedStyleProperty(PropertyKey::RasterContrast, raster.contrast, z, now);
+    applyTransitionedStyleProperty(PropertyKey::RasterFade, raster.fade, z, now);
 }
 
 template <>
 void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const timestamp now) {
     properties.set<BackgroundProperties>();
     BackgroundProperties &background = properties.get<BackgroundProperties>();
-    applyStyleProperty(PropertyKey::BackgroundColor, background.color, z, now);
+    applyTransitionedStyleProperty(PropertyKey::BackgroundColor, background.color, z, now);
 }
 
 void StyleLayer::updateProperties(float z, const timestamp now) {

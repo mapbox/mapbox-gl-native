@@ -1,6 +1,6 @@
 #include <mbgl/geometry/resample.hpp>
 
-#include <mbgl/util/math.hpp>
+#include <mbgl/util/interpolate.hpp>
 
 #include <cmath>
 
@@ -43,7 +43,8 @@ Anchors resample(const std::vector<Coordinate> &vertices, float spacing,
             markedDistance += spacing;
 
             float t = (markedDistance - distance) / segmentDist,
-                  x = util::interp(a.x, b.x, t), y = util::interp(a.y, b.y, t),
+                  x = util::interpolate(a.x, b.x, t),
+                  y = util::interpolate(a.y, b.y, t),
                   s = minScales[added % len];
 
             if (x >= 0 && x < 4096 && y >= 0 && y < 4096) {

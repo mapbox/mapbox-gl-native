@@ -1,34 +1,10 @@
 #include <mbgl/style/function_properties.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/util/interpolate.hpp>
 
 #include <cmath>
 
 namespace mbgl {
-
-
-template <typename T>
-inline T interpolate(T smaller, T larger, const float factor);
-
-template <>
-inline float interpolate(const float smaller, const float larger, const float factor) {
-    return (smaller * (1 - factor)) + (larger * factor);
-}
-
-template <>
-inline bool interpolate(const bool smaller, const bool larger, const float factor) {
-    return interpolate(float(smaller), float(larger), factor);
-}
-
-template <>
-inline Color interpolate(const Color smaller, const Color larger, const float factor) {
-    return {{
-        interpolate(smaller[0], larger[0], factor),
-        interpolate(smaller[1], larger[1], factor),
-        interpolate(smaller[2], larger[2], factor),
-        interpolate(smaller[3], larger[3], factor)
-    }};
-}
-
 
 template <typename T>
 inline T defaultStopsValue();
@@ -70,10 +46,10 @@ T StopsFunction<T>::evaluate(float z) const {
         const float zoomProgress = z - smaller_z;
         if (base == 1.0f) {
             const float t = zoomProgress / zoomDiff;
-            return interpolate<T>(smaller_val, larger_val, t);
+            return util::interpolate(smaller_val, larger_val, t);
         } else {
             const float t = (std::pow(base, zoomProgress) - 1) / (std::pow(base, zoomDiff) - 1);
-            return interpolate<T>(smaller_val, larger_val, t);
+            return util::interpolate(smaller_val, larger_val, t);
         }
     } else if (larger) {
         return larger_val;

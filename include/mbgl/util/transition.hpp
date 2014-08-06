@@ -30,12 +30,6 @@ public:
     virtual ~transition();
 
 protected:
-    double interpolateDouble(double from, double to, double t) const;
-    float interpolateFloat(float from, float to, double t) const;
-    Color interpolateColor(Color from, Color to, double t) const;
-    std::array<float, 2> interpolateFloatArray(std::array<float, 2> from, std::array<float, 2> to, double t) const;
-
-protected:
     const timestamp start, duration;
 };
 
