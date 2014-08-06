@@ -1,6 +1,8 @@
 #ifndef MBGL_GEOMETRY_LINE_ATLAS
 #define MBGL_GEOMETRY_LINE_ATLAS
 
+#include <vector>
+
 #include <atomic>
 
 namespace mbgl {
@@ -11,7 +13,7 @@ public:
     ~LineAtlas();
 
     void bind();
-    void addDash();
+    void addDash(std::vector<float> &dasharray, bool round);
 
     const uint32_t width = 0;
     const uint32_t height = 0;

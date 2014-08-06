@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <memory>
 #include <iostream>
+#include <vector>
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -48,7 +49,8 @@ Map::Map(View& view)
     is_swapped.test_and_set();
 
     // TODO remove
-    lineAtlas->addDash();
+    std::vector<float> a = {{ 3.0, 4.0 }};
+    lineAtlas->addDash(a, false);
 }
 
 Map::~Map() {

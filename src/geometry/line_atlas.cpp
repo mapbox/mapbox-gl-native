@@ -1,6 +1,7 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/platform.hpp>
+#include <cmath>
 
 using namespace mbgl;
 
@@ -14,10 +15,64 @@ LineAtlas::LineAtlas(uint16_t width, uint16_t height)
 LineAtlas::~LineAtlas() {
 }
 
-void LineAtlas::addDash() {
-    for (int i = 0; i < width * height; i++) {
-        data[i] = 127;
+void LineAtlas::addDash(std::vector<float> &dasharray, bool round) {
+
+    // TODO check if already added
+
+    int n = round ? 7 : 0;
+    int height = 2 * n + 1;
+    const uint8_t offset = 128;
+
+    // TODO check if enough space
+
+    int length = 0;
+    for (const float &part : dasharray) {
+        length += part;
     }
+
+    float stretch = width / length;
+    float halfWidth = stretch * 0.5;
+
+    for (int y = -n; y <= n; y++) {
+        // TODO nextRow
+        int row = n + y;
+        int index = width * row;
+
+        float left = 0;
+        float right = dasharray[0];
+        int partIndex = 1;
+
+        for (int x = 0; x < width; x++) {
+
+            while (right < x / stretch) {
+                left = right;
+                right = right + dasharray[partIndex];
+                partIndex++;
+            }
+
+            float distLeft = fabs(x - left * stretch);
+            float distRight = fabs(x - right * stretch);
+            float dist = fmin(distLeft, distRight);
+            bool inside = (partIndex % 2) == 1;
+            int signedDistance;
+
+            if (round) {
+                float distMiddle = n ? y / n * halfWidth : 0;
+                float distEdge = halfWidth - fabs(distMiddle);
+                if (inside) {
+                    signedDistance = sqrt(dist * dist + distEdge * distEdge);
+                } else {
+                    signedDistance = halfWidth = sqrt(dist * dist + distMiddle * distMiddle);
+                }
+
+            } else {
+                signedDistance = int((inside ? 1 : -1) * dist);
+            }
+
+            data[index + x] = fmax(0, fmin(255, signedDistance + offset));
+        }
+    }
+
 
     dirty = true;
     bind();
