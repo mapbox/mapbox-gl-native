@@ -62,8 +62,8 @@ private:
     // Parses optional properties into a render bucket.
     template<typename T>
     bool parseRenderProperty(JSVal value, T &target, const char *name);
-    template <typename T, typename Parser>
-    bool parseRenderProperty(JSVal value, T &target, const char *name, Parser &parser);
+    template <typename Parser, typename T>
+    bool parseRenderProperty(JSVal value, T &target, const char *name);
 
     // Parses optional properties into style class properties.
     template <typename T>

@@ -1,18 +1,35 @@
 #include <mbgl/geometry/icon_buffer.hpp>
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/util/math.hpp>
 
 #include <cmath>
 
-using namespace mbgl;
+namespace mbgl {
 
-void IconVertexBuffer::add(vertex_type x, vertex_type y, uint16_t tx, uint16_t ty) {
+const double IconVertexBuffer::angleFactor = 128.0 / M_PI;
+
+size_t IconVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, int16_t tx, int16_t ty, float angle, float minzoom, std::array<float, 2> range, float maxzoom, float labelminzoom) {
+    const size_t idx = index();
     void *data = addElement();
 
-    vertex_type *vertices = static_cast<vertex_type *>(data);
-    vertices[0] = x;
-    vertices[1] = y;
+    int16_t *shorts = static_cast<int16_t *>(data);
+    shorts[0] /* pos */ = x;
+    shorts[1] /* pos */ = y;
+    shorts[2] /* offset */ = std::round(ox * 64); // use 1/64 pixels for placement
+    shorts[3] /* offset */ = std::round(oy * 64);
 
-    uint16_t *texture = static_cast<uint16_t *>(data);
-    texture[2] = tx;
-    texture[3] = ty;
+    uint8_t *ubytes = static_cast<uint8_t *>(data);
+    ubytes[8] /* labelminzoom */ = labelminzoom * 10;
+    ubytes[9] /* minzoom */ =  minzoom * 10; // 1/10 zoom levels: z16 == 160.
+    ubytes[10] /* maxzoom */ = std::fmin(maxzoom, 25) * 10; // 1/10 zoom levels: z16 == 160.
+    ubytes[11] /* angle */ = (int16_t)std::round(angle * angleFactor) % 256;
+    ubytes[12] /* rangeend */ = util::max((int16_t)std::round(range[0] * angleFactor), (int16_t)0) % 256;
+    ubytes[13] /* rangestart */ = util::min((int16_t)std::round(range[1] * angleFactor), (int16_t)255) % 256;
+
+    shorts[8] /* tex */ = tx;
+    shorts[9] /* tex */ = ty;
+
+    return idx;
+}
+
 }

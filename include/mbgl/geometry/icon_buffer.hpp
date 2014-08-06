@@ -3,16 +3,18 @@
 
 #include "buffer.hpp"
 
+#include <array>
+
 namespace mbgl {
 
     class IconVertexBuffer : public Buffer<
-    4 + // int16 x/y coordinates per vertex (== 4 bytes)
-    4   // uint16 x/y coordinates of icon in sprite (== 4 bytes)
+    20
     > {
     public:
-        typedef int16_t vertex_type;
+        static const double angleFactor;
 
-        void add(vertex_type x, vertex_type y, uint16_t tx, uint16_t ty);
+        size_t add(int16_t x, int16_t y, float ox, float oy, int16_t tx, int16_t ty, float angle, float minzoom, std::array<float, 2> range, float maxzoom, float labelminzoom);
+
     };
 
 }

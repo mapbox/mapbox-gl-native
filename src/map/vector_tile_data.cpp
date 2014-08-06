@@ -9,7 +9,8 @@
 using namespace mbgl;
 
 VectorTileData::VectorTileData(Tile::ID id, Map &map, const SourceInfo &source)
-    : TileData(id, map, source) {
+    : TileData(id, map, source),
+      depth(id.z >= source.max_zoom ? map.getMaxZoom() - id.z : 1) {
 }
 
 VectorTileData::~VectorTileData() {
@@ -20,7 +21,8 @@ VectorTileData::~VectorTileData() {
 }
 
 void VectorTileData::beforeParse() {
-    parser = std::make_unique<TileParser>(data, *this, map.getStyle(), map.getGlyphAtlas(), map.getGlyphStore(), map.getSpriteAtlas());
+    
+    parser = std::make_unique<TileParser>(data, *this, map.getStyle(), map.getGlyphAtlas(), map.getGlyphStore(), map.getSpriteAtlas(), map.getSprite());
 }
 
 void VectorTileData::parse() {

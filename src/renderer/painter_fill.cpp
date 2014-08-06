@@ -71,10 +71,10 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
     }
 
     if ((fill_color[3] >= 1.0f) == (pass == Opaque)) {
-        const std::shared_ptr<Sprite> &sprite = map.getStyle()->sprite;
+        Sprite &sprite = *map.getSprite();
         if (properties.image.size() && sprite) {
             SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-            Rect<uint16_t> imagePos = spriteAtlas.getImage(properties.image, *sprite);
+            Rect<uint16_t> imagePos = spriteAtlas.getImage(properties.image, sprite);
 
 
             float factor = 8.0 / std::pow(2, map.getState().getIntegerZoom() - id.z);

@@ -33,6 +33,7 @@ Map::Map(View& view)
       transform(view),
       style(std::make_shared<Style>()),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
+      glyphStore(std::make_shared<GlyphStore>()),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
       painter(*this),
@@ -185,7 +186,9 @@ void Map::setup() {
 
 void Map::setStyleJSON(std::string newStyleJSON) {
     styleJSON.swap(newStyleJSON);
+    sprite.reset();
     style->loadJSON((const uint8_t *)styleJSON.c_str());
+    glyphStore->setURL(style->glyph_url);
     update();
 }
 
@@ -200,6 +203,17 @@ void Map::setAccessToken(std::string access_token) {
 std::string Map::getAccessToken() const {
     return accessToken;
 }
+
+std::shared_ptr<Sprite> Map::getSprite() {
+    const float pixelRatio = state.getPixelRatio();
+    const std::string &sprite_url = style->getSpriteURL();
+    if (!sprite || sprite->pixelRatio != pixelRatio) {
+        sprite = Sprite::Create(sprite_url, pixelRatio);
+    }
+
+    return sprite;
+}
+
 
 #pragma mark - Size
 
@@ -502,24 +516,6 @@ void Map::prepare() {
     bool dimensionsChanged = oldState.getFramebufferWidth() != state.getFramebufferWidth() ||
                              oldState.getFramebufferHeight() != state.getFramebufferHeight();
 
-    if (pixelRatioChanged) {
-        style->sprite = std::make_shared<Sprite>(*this, state.getPixelRatio());
-        if (style->sprite_url.size()) {
-            style->sprite->load(style->sprite_url);
-        }
-        spriteAtlas->resize(state.getPixelRatio());
-    }
-
-    // Create a new glyph store object in case the glyph URL changed.
-    // TODO: Move this to a less frequently called place; we only need to do this when the
-    // stylesheet changes.
-    if (glyphStore && glyphStore->glyphURL != style->glyph_url) {
-        glyphStore.reset();
-    }
-    if (!glyphStore && style->glyph_url.size()) {
-        glyphStore = std::make_shared<GlyphStore>(style->glyph_url);
-    }
-
     if (pixelRatioChanged || dimensionsChanged) {
         painter.clearFramebuffers();
     }
@@ -529,9 +525,8 @@ void Map::prepare() {
     style->updateProperties(state.getNormalizedZoom(), animationTime);
 
     // Allow the sprite atlas to potentially pull new sprite images if needed.
-    if (style->sprite && style->sprite->isLoaded()) {
-        spriteAtlas->update(*style->sprite);
-    }
+    spriteAtlas->resize(state.getPixelRatio());
+    spriteAtlas->update(*getSprite());
 
     updateTiles();
 }
@@ -643,7 +638,7 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
                 }
             }
         }
-    } else if (layer_desc->id == "background") {
+    } else if (layer_desc->type == StyleLayerType::Background) {
         // This layer defines the background color.
     } else {
         // This is a singular layer.
@@ -683,13 +678,9 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
                 if (pass == Opaque) return;
                 if (!layer_desc->getProperties<LineProperties>().isVisible()) return;
                 break;
-            case StyleLayerType::Icon:
+            case StyleLayerType::Symbol:
                 if (pass == Opaque) return;
-                if (!layer_desc->getProperties<IconProperties>().isVisible()) return;
-                break;
-            case StyleLayerType::Text:
-                if (pass == Opaque) return;
-                if (!layer_desc->getProperties<TextProperties>().isVisible()) return;
+                if (!layer_desc->getProperties<SymbolProperties>().isVisible()) return;
                 break;
             case StyleLayerType::Raster:
                 if (pass == Translucent) return;

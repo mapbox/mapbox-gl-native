@@ -1,75 +1,34 @@
 #include <mbgl/text/placement.hpp>
-#include <mbgl/map/vector_tile.hpp>
-#include <mbgl/geometry/interpolate.hpp>
-#include <mbgl/renderer/text_bucket.hpp>
+#include <mbgl/geometry/anchor.hpp>
+#include <mbgl/text/glyph.hpp>
+#include <mbgl/text/placement.hpp>
+#include <mbgl/text/glyph_store.hpp>
+#include <mbgl/style/style_bucket.hpp>
+
 #include <mbgl/util/math.hpp>
-#include <mbgl/util/constants.hpp>
 
-#include <algorithm>
+namespace mbgl {
 
-using namespace mbgl;
-
-const int Placement::tileExtent = 4096;
-const int Placement::glyphSize =
-    24; // size in pixels of this glyphs in the tile
-const float Placement::minScale = 0.5; // underscale by 1 zoom level
-
-Placement::Placement(int8_t zoom, float placementDepth)
-    : zoom(zoom),
-      zOffset(log(512.0 / util::tileSize) / log(2)),
-
-      // Calculate the maximum scale we can go down in our fake-3d rtree so that
-      // placement still makes sense. This is calculated so that the minimum
-      // placement zoom can be at most 25.5 (we use an unsigned integer x10 to
-      // store the minimum zoom).
-      //
-      // We don't want to place labels all the way to 25.5. This lets too many
-      // glyphs be placed, slowing down collision checking. Only place labels if
-      // they will show up within the intended zoom range of the tile.
-      // TODO make this not hardcoded to 3
-      maxPlacementScale(std::exp(
-          log(2) *
-          util::min(3.0f, util::min(placementDepth > 0 ? placementDepth : 1.0f, 25.5f - zoom)))) {}
-
-bool byScale(const Anchor &a, const Anchor &b) { return a.scale < b.scale; }
-
-static const Glyph null_glyph;
-
-inline const Glyph &getGlyph(const GlyphPlacement &placed,
-                             const GlyphPositions &face) {
-    auto it = face.find(placed.glyph);
-    if (it != face.end()) {
-        return it->second;
-    } else {
-        fprintf(stderr, "glyph %d does not exist\n", placed.glyph);
-    }
-
-    return null_glyph;
-}
+const float Placement::globalMinScale = 0.5; // underscale by 1 zoom level
 
 struct GlyphInstance {
     explicit GlyphInstance(const vec2<float> &anchor) : anchor(anchor) {}
-    explicit GlyphInstance(const vec2<float> &anchor, float offset,
-                           float minScale, float maxScale, float angle)
-        : anchor(anchor),
-          offset(offset),
-          minScale(minScale),
-          maxScale(maxScale),
-          angle(angle) {}
+    explicit GlyphInstance(const vec2<float> &anchor, float offset, float minScale, float maxScale,
+                           float angle)
+        : anchor(anchor), offset(offset), minScale(minScale), maxScale(maxScale), angle(angle) {}
 
     const vec2<float> anchor;
     const float offset = 0.0f;
-    const float minScale = Placement::minScale;
+    const float minScale = Placement::globalMinScale;
     const float maxScale = std::numeric_limits<float>::infinity();
     const float angle = 0.0f;
 };
 
 typedef std::vector<GlyphInstance> GlyphInstances;
 
-void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
-                      Anchor &anchor, float offset,
-                      const std::vector<Coordinate> &line, int segment,
-                      int8_t direction, float maxAngleDelta) {
+void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &anchor,
+                      float offset, const std::vector<Coordinate> &line, int segment,
+                      int8_t direction, float maxAngle) {
     const bool upsideDown = direction < 0;
 
     if (offset < 0)
@@ -94,14 +53,14 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
     while (true) {
         const float dist = util::dist<float>(newAnchor, end);
         const float scale = offset / dist;
-        float angle = -std::atan2(end.x - newAnchor.x, end.y - newAnchor.y) +
-                      direction * M_PI / 2.0f;
+        float angle =
+            -std::atan2(end.x - newAnchor.x, end.y - newAnchor.y) + direction * M_PI / 2.0f;
         if (upsideDown)
             angle += M_PI;
 
         // Don't place around sharp corners
         float angleDiff = std::fmod((angle - prevAngle), (2.0f * M_PI));
-        if (prevAngle && std::fabs(angleDiff) > maxAngleDelta) {
+        if (prevAngle && std::fabs(angleDiff) > maxAngle) {
             anchor.scale = prevscale;
             break;
         }
@@ -111,8 +70,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
             /* offset */ static_cast<float>(upsideDown ? M_PI : 0.0),
             /* minScale */ scale,
             /* maxScale */ prevscale,
-            /* angle */ static_cast<float>(
-                std::fmod((angle + 2.0 * M_PI), (2.0 * M_PI)))};
+            /* angle */ static_cast<float>(std::fmod((angle + 2.0 * M_PI), (2.0 * M_PI)))};
 
         if (scale <= placementScale)
             break;
@@ -137,49 +95,152 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
     }
 }
 
-void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
-                       Anchor &anchor, vec2<float> origin, const Shaping &shaping,
-                       const GlyphPositions &face, float fontScale,
-                       bool horizontal, const std::vector<Coordinate> &line,
-                       float maxAngleDelta, float rotate) {
-    // The total text advance is the width of this label.
+GlyphBox getMergedBoxes(const GlyphBoxes &glyphs, const Anchor &anchor) {
+    // Collision checks between rotating and fixed labels are relatively expensive,
+    // so we use one box per label, not per glyph for horizontal labels.
 
-    // TODO: allow setting an alignment
-    // var alignment = 'center';
-    // if (alignment == 'center') {
-    //     origin.x -= advance / 2;
-    // } else if (alignment == 'right') {
-    //     origin.x -= advance;
-    // }
+    const float inf = std::numeric_limits<float>::infinity();
+
+    GlyphBox mergedglyphs{/* box */ CollisionRect{inf, inf, -inf, -inf},
+                          /* anchor */ anchor,
+                          /* minScale */ 0,
+                          /* maxScale */ inf,
+                          /* padding */ -inf};
+
+    CollisionRect &box = mergedglyphs.box;
+
+    for (const GlyphBox &glyph : glyphs) {
+        const CollisionRect &gbox = glyph.box;
+        box.tl.x = util::min(box.tl.x, gbox.tl.x);
+        box.tl.y = util::min(box.tl.y, gbox.tl.y);
+        box.br.x = util::max(box.br.x, gbox.br.x);
+        box.br.y = util::max(box.br.y, gbox.br.y);
+        mergedglyphs.minScale = util::max(mergedglyphs.minScale, glyph.minScale);
+        mergedglyphs.padding = util::max(mergedglyphs.padding, glyph.padding);
+    }
+    // for all horizontal labels, calculate bbox covering all rotated positions
+    float x12 = box.tl.x * box.tl.x, y12 = box.tl.y * box.tl.y, x22 = box.br.x * box.br.x,
+          y22 = box.br.y * box.br.y,
+          diag = std::sqrt(util::max(x12 + y12, x12 + y22, x22 + y12, x22 + y22));
+
+    mergedglyphs.hBox = CollisionRect{-diag, -diag, diag, diag};
+
+    return mergedglyphs;
+}
+
+Placement Placement::getIcon(Anchor &anchor, const Rect<uint16_t> &image, float boxScale,
+                             const std::vector<Coordinate> &line, const StyleBucketSymbol &props) {
+    const float x = image.w / 2.0f; // No need to divide by image.pixelRatio here?
+    const float y = image.h / 2.0f; // image.pixelRatio;
+
+    const float dx = props.icon.offset.x;
+    const float dy = props.icon.offset.y;
+    float x1 = (dx - x);
+    float x2 = (dx + x);
+    float y1 = (dy - y);
+    float y2 = (dy + y);
+
+    vec2<float> tl{x1, y1};
+    vec2<float> tr{x2, y1};
+    vec2<float> br{x2, y2};
+    vec2<float> bl{x1, y2};
+
+    float angle = props.icon.rotate * M_PI / 180.0f;
+    if (anchor.segment >= 0 && props.icon.rotation_alignment != RotationAlignmentType::Viewport) {
+        const Coordinate &next = line[anchor.segment];
+        angle += -std::atan2(next.x - anchor.x, next.y - anchor.y) + M_PI / 2;
+    }
+
+    if (angle) {
+        // Compute the transformation matrix.
+        float angle_sin = std::sin(angle);
+        float angle_cos = std::cos(angle);
+        std::array<float, 4> matrix = {{angle_cos, -angle_sin, angle_sin, angle_cos}};
+
+        tl = tl.matMul(matrix);
+        tr = tr.matMul(matrix);
+        bl = bl.matMul(matrix);
+        br = br.matMul(matrix);
+
+        x1 = util::min(tl.x, tr.x, bl.x, br.x);
+        x2 = util::max(tl.x, tr.x, bl.x, br.x);
+        y1 = util::min(tl.y, tr.y, bl.y, br.y);
+        y2 = util::max(tl.y, tr.y, bl.y, br.y);
+    }
+
+    const CollisionRect box{/* x1 */ x1 * boxScale,
+                            /* y1 */ y1 * boxScale,
+                            /* x2 */ x2 * boxScale,
+                            /* y2 */ y2 * boxScale};
+
+    Placement placement;
+
+    placement.boxes.emplace_back(
+        /* box */ box,
+        /* anchor */ anchor,
+        /* minScale */ Placement::globalMinScale,
+        /* maxScale */ std::numeric_limits<float>::infinity(),
+        /* padding */ props.icon.padding);
+
+    placement.shapes.emplace_back(
+        /* tl */ tl,
+        /* tr */ tr,
+        /* bl */ bl,
+        /* br */ br,
+        /* image */ image,
+        /* angle */ 0,
+        /* anchors */ anchor,
+        /* minScale */ Placement::globalMinScale,
+        /* maxScale */ std::numeric_limits<float>::infinity());
+
+    placement.minScale = anchor.scale;
+
+    return placement;
+}
+
+Placement Placement::getGlyphs(Anchor &anchor, const vec2<float> &origin, const Shaping &shaping,
+                               const GlyphPositions &face, float boxScale, bool horizontal,
+                               const std::vector<Coordinate> &line,
+                               const StyleBucketSymbol &props) {
+    const float maxAngle = props.text.max_angle * M_PI / 180;
+    const float rotate = props.text.rotate * M_PI / 180;
+    const float padding = props.text.padding;
+    const bool alongLine = props.text.rotation_alignment != RotationAlignmentType::Viewport;
+    const bool keepUpright = props.text.keep_upright;
+
+    Placement placement;
 
     const uint32_t buffer = 3;
 
-    for (const GlyphPlacement &placed : shaping) {
-        const Glyph &glyph = getGlyph(placed, face);
-        if (!glyph) {
-            // This glyph is empty and doesn't have any pixels that we'd need to
-            // show.
+    for (const PositionedGlyph &shape : shaping) {
+        auto face_it = face.find(shape.glyph);
+        if (face_it == face.end())
             continue;
-        }
+        const Glyph &glyph = face_it->second;
+        const Rect<uint16_t> &rect = glyph.rect;
 
-        float x =
-            (origin.x + placed.x + glyph.metrics.left - buffer + glyph.rect.w / 2) *
-            fontScale;
+        if (!glyph)
+            continue;
+
+        if (!rect)
+            continue;
+
+        const float x = (origin.x + shape.x + glyph.metrics.left - buffer + rect.w / 2) * boxScale;
 
         GlyphInstances glyphInstances;
-        if (anchor.segment >= 0) {
-            getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, x,
-                             line, anchor.segment, 1, maxAngleDelta);
-            getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, x,
-                             line, anchor.segment, -1, maxAngleDelta);
+        if (anchor.segment >= 0 && alongLine) {
+            getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, x, line, anchor.segment, 1,
+                             maxAngle);
+            if (keepUpright)
+                getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, x, line,
+                                 anchor.segment, -1, maxAngle);
 
         } else {
-
             glyphInstances.emplace_back(GlyphInstance{anchor});
         }
 
-        const float x1 = origin.x + placed.x + glyph.metrics.left - buffer;
-        const float y1 = origin.y + placed.y - glyph.metrics.top - buffer;
+        const float x1 = origin.x + shape.x + glyph.metrics.left - buffer;
+        const float y1 = origin.y + shape.y - glyph.metrics.top - buffer;
         const float x2 = x1 + glyph.rect.w;
         const float y2 = y1 + glyph.rect.h;
 
@@ -188,8 +249,7 @@ void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
         const vec2<float> obl{x1, y2};
         const vec2<float> obr{x2, y2};
 
-        const CollisionRect obox{fontScale *x1, fontScale *y1,
-                                 fontScale *x2, fontScale *y2};
+        const CollisionRect obox{boxScale * x1, boxScale * y1, boxScale * x2, boxScale * y2};
 
         for (const GlyphInstance &instance : glyphInstances) {
             vec2<float> tl = otl;
@@ -206,78 +266,47 @@ void getGlyphs(PlacedGlyphs &glyphs, GlyphBoxes &boxes,
                 // Compute the transformation matrix.
                 float angle_sin = std::sin(angle);
                 float angle_cos = std::cos(angle);
-                std::array<float, 4> matrix = {
-                    {angle_cos, -angle_sin, angle_sin, angle_cos}};
+                std::array<float, 4> matrix = {{angle_cos, -angle_sin, angle_sin, angle_cos}};
 
                 tl = tl.matMul(matrix);
                 tr = tr.matMul(matrix);
                 bl = bl.matMul(matrix);
                 br = br.matMul(matrix);
-
-                // Calculate the rotated glyph's bounding box offsets from the
-                // anchor point.
-                box = CollisionRect{
-                    fontScale * util::min(tl.x, tr.x, bl.x, br.x),
-                    fontScale * util::min(tl.y, tr.y, bl.y, br.y),
-                    fontScale * util::max(tl.x, tr.x, bl.x, br.x),
-                    fontScale * util::max(tl.y, tr.y, bl.y, br.y)};
             }
 
-            GlyphBox glyphBox = GlyphBox{
-                box,
-                // Prevent label from extending past the end of the line
-                util::max(instance.minScale, anchor.scale),
-                instance.maxScale,
-                instance.anchor,
-                horizontal};
+            // Prevent label from extending past the end of the line
+            const float glyphMinScale = std::max(instance.minScale, anchor.scale);
 
             // Remember the glyph for later insertion.
-            glyphs.emplace_back(PlacedGlyph{
-                tl, tr, bl, br, glyph.rect,
-                static_cast<float>(
-                    std::fmod((anchor.angle + rotate + instance.offset + 2 * M_PI), (2 * M_PI))),
-                glyphBox});
+            placement.shapes.emplace_back(
+                tl, tr, bl, br, rect,
+                float(std::fmod((anchor.angle + rotate + instance.offset + 2 * M_PI), (2 * M_PI))),
+                instance.anchor, glyphMinScale, instance.maxScale);
 
-            if (instance.offset == 0.0f) {
-                boxes.emplace_back(glyphBox);
+            if (!instance.offset) { // not a flipped glyph
+                if (angle) {
+                    // Calculate the rotated glyph's bounding box offsets from the anchor point.
+                    box = CollisionRect{boxScale * util::min(tl.x, tr.x, bl.x, br.x),
+                                        boxScale * util::min(tl.y, tr.y, bl.y, br.y),
+                                        boxScale * util::max(tl.x, tr.x, bl.x, br.x),
+                                        boxScale * util::max(tl.y, tr.y, bl.y, br.y)};
+                }
+                placement.boxes.emplace_back(box, instance.anchor, glyphMinScale, instance.maxScale, padding);
             }
         }
     }
+
+    // TODO avoid creating the boxes in the first place?
+    if (horizontal)
+        placement.boxes = {getMergedBoxes(placement.boxes, anchor)};
+
+    const float minPlacementScale = anchor.scale;
+    placement.minScale = std::numeric_limits<float>::infinity();
+    for (const GlyphBox &box : placement.boxes) {
+        placement.minScale = util::min(placement.minScale, box.minScale);
+    }
+    placement.minScale = util::max(minPlacementScale, Placement::globalMinScale);
+
+    return placement;
 }
-
-void Placement::addFeature(TextBucket &bucket, const std::vector<Coordinate> &line,
-                           const StyleBucketText &info, const GlyphPositions &face,
-                           const Shaping &shaping) {
-    const bool horizontal = info.path == TextPathType::Horizontal;
-    const float fontScale = (tileExtent / util::tileSize) / (glyphSize / info.max_size);
-
-    Anchors anchors;
-
-    if (line.size() == 1) {
-        // Point labels
-        anchors = Anchors{{Anchor{
-            static_cast<float>(line[0].x), static_cast<float>(line[0].y),
-            0,                             minScale}}};
-
-    } else {
-        // Line labels
-        anchors = interpolate(line, info.min_distance, minScale);
-
-        // Sort anchors by segment so that we can start placement with
-        // the anchors that can be shown at the lowest zoom levels.
-        std::sort(anchors.begin(), anchors.end(), byScale);
-    }
-
-    for (Anchor anchor : anchors) {
-        PlacedGlyphs glyphs;
-        GlyphBoxes boxes;
-
-        getGlyphs(glyphs, boxes, anchor, info.translate, shaping, face, fontScale, horizontal, line,
-                  info.max_angle_delta * (M_PI/180), info.rotate);
-        PlacementProperty place = collision.place(boxes, anchor, anchor.scale, maxPlacementScale,
-                                                  info.padding, horizontal, info.always_visible);
-        if (place) {
-            bucket.addGlyphs(glyphs, place.zoom, place.rotationRange, zoom - zOffset);
-        }
-    }
 }

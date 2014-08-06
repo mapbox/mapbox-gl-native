@@ -63,6 +63,20 @@ JSVal StyleParser::replaceConstant(JSVal value) {
 
 #pragma mark - Parse Render Properties
 
+template<> bool StyleParser::parseRenderProperty(JSVal value, bool &target, const char *name) {
+    if (value.HasMember(name)) {
+        JSVal property = replaceConstant(value[name]);
+        if (property.IsBool()) {
+            target = property.GetBool();
+            return true;
+        } else {
+            fprintf(stderr, "[WARNING] '%s' must be a boolean\n", name);
+        }
+    }
+    return false;
+}
+
+
 template<> bool StyleParser::parseRenderProperty(JSVal value, std::string &target, const char *name) {
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
@@ -139,12 +153,12 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, vec2<float> &targe
     return false;
 }
 
-template<typename T, typename Parser>
-bool StyleParser::parseRenderProperty(JSVal value, T &target, const char *name, Parser &parser) {
+template<typename Parser, typename T>
+bool StyleParser::parseRenderProperty(JSVal value, T &target, const char *name) {
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
         if (property.IsString()) {
-            target = parser({ property.GetString(), property.GetStringLength() });
+            target = Parser({ property.GetString(), property.GetStringLength() });
             return true;
         } else {
             fprintf(stderr, "[WARNING] %s must have one of the enum values\n", name);
@@ -167,7 +181,7 @@ void StyleParser::parseSources(JSVal value) {
             int32_t min_zoom = 0;
             int32_t max_zoom = 22;
 
-            parseRenderProperty(itr->value, type, "type", parseSourceType);
+            parseRenderProperty<SourceTypeClass>(itr->value, type, "type");
             parseRenderProperty(itr->value, url, "url");
             if (type == SourceType::Raster) {
                 parseRenderProperty(itr->value, tile_size, "tileSize");
@@ -348,19 +362,19 @@ template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value,
 template<> std::tuple<bool, TranslateAnchorType> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-        return std::tuple<bool, TranslateAnchorType> { false, TranslateAnchorType::Default };
+        return std::tuple<bool, TranslateAnchorType> { false, TranslateAnchorType::Map };
     }
 
-    return std::tuple<bool, TranslateAnchorType> { true, parseTranslateAnchorType({ value.GetString(), value.GetStringLength() }) };
+    return std::tuple<bool, TranslateAnchorType> { true, TranslateAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
 template<> std::tuple<bool, RotateAnchorType> StyleParser::parseProperty<RotateAnchorType>(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-        return std::tuple<bool, RotateAnchorType> { false, RotateAnchorType::Default };
+        return std::tuple<bool, RotateAnchorType> { false, RotateAnchorType::Map };
     }
 
-    return std::tuple<bool, RotateAnchorType> { true, parseRotateAnchorType({ value.GetString(), value.GetStringLength() }) };
+    return std::tuple<bool, RotateAnchorType> { true, RotateAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
 template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal value, const char *property_name) {
@@ -592,7 +606,18 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<Function<float>>("icon-rotate", Key::IconRotate, klass, value);
-    parseOptionalProperty<RotateAnchorType>("icon-rotate-anchor", Key::IconRotateAnchor, klass, value);
+    parseOptionalProperty<Function<float>>("icon-size", Key::IconSize, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-size", Key::IconSize, klass, value);
+    parseOptionalProperty<Function<Color>>("icon-color", Key::IconColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-color", Key::IconColor, klass, value);
+    parseOptionalProperty<Function<Color>>("icon-halo-color", Key::IconHaloColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-halo-color", Key::IconHaloColor, klass, value);
+    parseOptionalProperty<Function<float>>("icon-halo-width", Key::IconHaloWidth, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-halo-width", Key::IconHaloWidth, klass, value);
+    parseOptionalProperty<Function<float>>("icon-halo-blur", Key::IconHaloBlur, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-halo-blur", Key::IconHaloBlur, klass, value);
+    parseOptionalProperty<Function<float>>("icon-translate", { Key::IconTranslateX, Key::IconTranslateY }, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-translate", Key::IconTranslate, klass, value);
 
     parseOptionalProperty<Function<float>>("text-opacity", Key::TextOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-text-opacity", Key::TextOpacity, klass, value);
@@ -606,6 +631,8 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("transition-text-halo-width", Key::TextHaloWidth, klass, value);
     parseOptionalProperty<Function<float>>("text-halo-blur", Key::TextHaloBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-text-halo-blur", Key::TextHaloBlur, klass, value);
+    parseOptionalProperty<Function<float>>("text-translate", { Key::TextTranslateX, Key::TextTranslateY }, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-text-translate", Key::TextTranslate, klass, value);
 
     parseOptionalProperty<Function<float>>("composite-opacity", Key::CompositeOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-composite-opacity", Key::CompositeOpacity, klass, value);
@@ -834,61 +861,70 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
     case StyleLayerType::Fill: {
         StyleBucketFill &render = bucket.render.get<StyleBucketFill>();
 
-        parseRenderProperty(value, render.winding, "fill-winding", parseWindingType);
+        parseRenderProperty<WindingTypeClass>(value, render.winding, "fill-winding");
     } break;
 
     case StyleLayerType::Line: {
         StyleBucketLine &render = bucket.render.get<StyleBucketLine>();
 
-        parseRenderProperty(value, render.cap, "line-cap", parseCapType);
-        parseRenderProperty(value, render.join, "line-join", parseJoinType);
+        parseRenderProperty<CapTypeClass>(value, render.cap, "line-cap");
+        parseRenderProperty<JoinTypeClass>(value, render.join, "line-join");
         parseRenderProperty(value, render.miter_limit, "line-miter-limit");
         parseRenderProperty(value, render.round_limit, "line-round-limit");
     } break;
 
-    case StyleLayerType::Icon: {
-        StyleBucketIcon &render = bucket.render.get<StyleBucketIcon>();
+    case StyleLayerType::Symbol: {
+        StyleBucketSymbol &render = bucket.render.get<StyleBucketSymbol>();
 
-        parseRenderProperty(value, render.size, "icon-size");
-        parseRenderProperty(value, render.icon, "icon-image");
-        parseRenderProperty(value, render.spacing, "icon-spacing");
-        parseRenderProperty(value, render.padding, "icon-padding");
-        if (parseRenderProperty(value, render.translate, "icon-translate")) {
-            render.translate.x *= 24;
-            render.translate.y *= -24;
+        parseRenderProperty<PlacementTypeClass>(value, render.placement, "symbol-placement");
+        if (render.placement == PlacementType::Line) {
+            // Change the default value in case of line placement.
+            render.text.rotation_alignment = RotationAlignmentType::Map;
+            render.icon.rotation_alignment = RotationAlignmentType::Map;
         }
-        parseRenderProperty(value, render.translate_anchor, "icon-translate-anchor", parseTranslateAnchorType);
-    } break;
 
-    case StyleLayerType::Text: {
-        StyleBucketText &render = bucket.render.get<StyleBucketText>();
+        parseRenderProperty(value, render.min_distance, "symbol-min-distance");
 
-        parseRenderProperty(value, render.field, "text-field");
-        parseRenderProperty(value, render.path, "text-path", parseTextPathType);
-        parseRenderProperty(value, render.transform, "text-transform", parseTextTransformType);
-        parseRenderProperty(value, render.font, "text-font");
-        parseRenderProperty(value, render.max_size, "text-max-size");
-        if (parseRenderProperty(value, render.max_width, "text-max-width")) {
-            render.max_width *= 24; // em
+        parseRenderProperty(value, render.icon.allow_overlap, "icon-allow-overlap");
+        parseRenderProperty(value, render.icon.ignore_placement, "icon-ignore-placement");
+        parseRenderProperty(value, render.icon.optional, "icon-optional");
+        parseRenderProperty<RotationAlignmentTypeClass>(value, render.icon.rotation_alignment, "icon-rotation-alignment");
+        parseRenderProperty(value, render.icon.max_size, "icon-max-size");
+        parseRenderProperty(value, render.icon.image, "icon-image");
+        parseRenderProperty(value, render.icon.rotate, "icon-rotate");
+        parseRenderProperty(value, render.icon.padding, "icon-padding");
+        parseRenderProperty(value, render.icon.keep_upright, "icon-keep-upright");
+        parseRenderProperty(value, render.icon.offset, "icon-offset");
+        parseRenderProperty<TranslateAnchorTypeClass>(value, render.icon.translate_anchor, "icon-translate-anchor");
+
+
+        parseRenderProperty<RotationAlignmentTypeClass>(value, render.text.rotation_alignment, "text-rotation-alignment");
+        parseRenderProperty(value, render.text.field, "text-field");
+        parseRenderProperty(value, render.text.font, "text-font");
+        parseRenderProperty(value, render.text.max_size, "text-max-size");
+        if (parseRenderProperty(value, render.text.max_width, "text-max-width")) {
+            render.text.max_width *= 24; // em
         }
-        if (parseRenderProperty(value, render.line_height, "text-line-height")) {
-            render.line_height *= 24; // em
+        if (parseRenderProperty(value, render.text.line_height, "text-line-height")) {
+            render.text.line_height *= 24; // em
         }
-        if (parseRenderProperty(value, render.letter_spacing, "text-letter-spacing")) {
-            render.letter_spacing *= 24; // em
+        if (parseRenderProperty(value, render.text.letter_spacing, "text-letter-spacing")) {
+            render.text.letter_spacing *= 24; // em
         }
-        parseRenderProperty(value, render.alignment, "text-alignment", parseAlignmentType);
-        parseRenderProperty(value, render.vertical_alignment, "text-vertical-alignment", parseVerticalAlignmentType);
-        parseRenderProperty(value, render.max_angle_delta, "text-max-angle");
-        parseRenderProperty(value, render.min_distance, "text-min-distance");
-        parseRenderProperty(value, render.rotate, "text-rotate");
-        parseRenderProperty(value, render.slant, "text-slant");
-        parseRenderProperty(value, render.padding, "text-padding");
-        if (parseRenderProperty(value, render.translate, "text-translate")) {
-            render.translate.x *= 24;
-            render.translate.y *= -24;
-        }
-        parseRenderProperty(value, render.translate_anchor, "text-translate-anchor", parseTranslateAnchorType);
+        parseRenderProperty<TextJustifyTypeClass>(value, render.text.justify, "text-justify");
+        parseRenderProperty<TextHorizontalAlignTypeClass>(value, render.text.horizontal_align, "text-horizontal-align");
+        parseRenderProperty<TextVerticalAlignTypeClass>(value, render.text.vertical_align, "text-vertical-align");
+        parseRenderProperty(value, render.text.max_angle, "text-max-angle");
+        parseRenderProperty(value, render.text.rotate, "text-rotate");
+        parseRenderProperty(value, render.text.slant, "text-slant");
+        parseRenderProperty(value, render.text.padding, "text-padding");
+        parseRenderProperty(value, render.text.keep_upright, "text-keep-upright");
+        parseRenderProperty<TextTransformTypeClass>(value, render.text.transform, "text-transform");
+        parseRenderProperty(value, render.text.offset, "text-offset");
+        parseRenderProperty<TranslateAnchorTypeClass>(value, render.text.translate_anchor, "text-translate-anchor");
+        parseRenderProperty(value, render.text.allow_overlap, "text-allow-overlap");
+        parseRenderProperty(value, render.text.ignore_placement, "text-ignore-placement");
+        parseRenderProperty(value, render.text.optional, "text-optional");
     } break;
     default:
         // There are no render properties for these layer types.

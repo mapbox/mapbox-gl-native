@@ -51,6 +51,9 @@ protected:
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
 
     std::unique_ptr<TileParser> parser;
+
+public:
+    const float depth;
 };
 
 }

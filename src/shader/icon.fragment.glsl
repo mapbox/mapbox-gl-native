@@ -1,11 +1,10 @@
-uniform sampler2D u_image;
-uniform vec2 u_dimension;
-uniform vec4 u_color;
-uniform float u_size;
+uniform sampler2D u_texture;
 
 varying vec2 v_tex;
+varying float v_alpha;
 
 void main() {
-    vec2 pos = (v_tex + (gl_PointCoord - 0.5) * u_size) / u_dimension;
-    gl_FragColor = u_color * texture2D(u_image, pos);
+    // Note: We don't need to premultiply here as the image we use is already
+    // premultiplied in the sprite atlas.
+    gl_FragColor = texture2D(u_texture, v_tex) * v_alpha;
 }

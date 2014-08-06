@@ -1,9 +1,30 @@
 #include <mbgl/geometry/interpolate.hpp>
 
+#include <mbgl/util/math.hpp>
+
+#include <cmath>
+
 namespace mbgl {
 
+const float minScale = 0.5f;
+const std::array<std::vector<float>, 4> minScaleArrays = {{
+    /*1:*/ { minScale },
+    /*2:*/ { minScale, 2 },
+    /*4:*/ { minScale, 4, 2, 4 },
+    /*8:*/ { minScale, 8, 4, 8, 2, 8, 4, 8 }
+}};
+
+
 Anchors interpolate(const std::vector<Coordinate> &vertices, float spacing,
-                    float minScale, int start) {
+                    const float minScale, float maxScale, const float tilePixelRatio,
+                    const int start) {
+
+    maxScale = std::round(std::fmax(std::fmin(8.0f, maxScale / 2.0f), 1.0f));
+    spacing *= tilePixelRatio / maxScale;
+    const size_t index = util::clamp<size_t>(std::floor(std::log(maxScale) / std::log(2)), 0, minScaleArrays.size() - 1);
+    const std::vector<float> &minScales = minScaleArrays[index];
+    const size_t len = minScales.size();
+
     float distance = 0.0f;
     float markedDistance = 0.0f;
     int added = start;
@@ -23,9 +44,7 @@ Anchors interpolate(const std::vector<Coordinate> &vertices, float spacing,
 
             float t = (markedDistance - distance) / segmentDist,
                   x = util::interp(a.x, b.x, t), y = util::interp(a.y, b.y, t),
-                  s = added % 8 == 0 ? minScale : added % 4 == 0
-                                                      ? 2
-                                                      : added % 2 == 0 ? 4 : 8;
+                  s = minScales[added % len];
 
             if (x >= 0 && x < 4096 && y >= 0 && y < 4096) {
                 points.emplace_back(x, y, angle, s, i);

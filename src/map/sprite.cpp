@@ -20,48 +20,77 @@ SpritePosition::SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t 
       pixelRatio(pixelRatio) {
 }
 
-Sprite::Sprite(Map &map, float pixelRatio)
-    : pixelRatio(pixelRatio),
-      raster(),
-      map(map),
-      loadedImage(false),
-      loadedJSON(false) {
+std::shared_ptr<Sprite> Sprite::Create(const std::string& base_url, float pixelRatio) {
+    std::shared_ptr<Sprite> sprite(std::make_shared<Sprite>(Key(), base_url, pixelRatio));
+    sprite->load();
+    return sprite;
 }
 
-void Sprite::load(const std::string& base_url) {
-    loadedImage = false;
-    loadedJSON = false;
+Sprite::Sprite(const Key &, const std::string& base_url, float pixelRatio)
+    : valid(base_url.length() > 0),
+      pixelRatio(pixelRatio),
+      spriteURL(base_url + (pixelRatio > 1 ? "@2x" : "") + ".png"),
+      jsonURL(base_url + (pixelRatio > 1 ? "@2x" : "") + ".json"),
+      raster(),
+      loadedImage(false),
+      loadedJSON(false),
+      future(promise.get_future()) {
+}
 
-    url = base_url;
+void Sprite::waitUntilLoaded() const {
+    future.wait();
+}
+
+Sprite::operator bool() const {
+    return valid && isLoaded() && !pos.empty();
+}
+
+
+// Note: This is a separate function that must be called exactly once after creation
+// The reason this isn't part of the constructor is that calling shared_from_this() in
+// the constructor fails.
+void Sprite::load() {
+    if (!valid) {
+        // Treat a non-existent sprite as a successfully loaded empty sprite.
+        loadedImage = true;
+        loadedJSON = true;
+        promise.set_value();
+        return;
+    }
+
     std::shared_ptr<Sprite> sprite = shared_from_this();
 
-    std::string suffix = (pixelRatio > 1 ? "@2x" : "");
-
-    platform::request_http(base_url + suffix + ".json", [sprite](platform::Response *res) {
+    platform::request_http(jsonURL, [sprite](platform::Response *res) {
         if (res->code == 200) {
             sprite->body.swap(res->body);
-            sprite->asyncParseJSON();
+            sprite->parseJSON();
+            sprite->complete();
         } else {
-            fprintf(stderr, "failed to load sprite info\n");
-            fprintf(stderr, "error %d: %s\n", res->code, res->error_message.c_str());
+            Log::Warning(Event::Sprite, "Failed to load sprite info: Error %d: %s", res->code, res->error_message.c_str());
+            if (!sprite->future.valid()) {
+                sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res->error_message)));
+            }
         }
-    }, map.getLoop());
+    });
 
-    platform::request_http(base_url + suffix + ".png", [sprite](platform::Response *res) {
+    platform::request_http(spriteURL, [sprite](platform::Response *res) {
         if (res->code == 200) {
-             sprite->image.swap(res->body);
-             sprite->asyncParseImage();
+            sprite->image.swap(res->body);
+            sprite->parseImage();
+            sprite->complete();
         } else {
-            fprintf(stderr, "failed to load sprite image\n");
-            fprintf(stderr, "error %d: %s\n", res->code, res->error_message.c_str());
+            Log::Warning(Event::Sprite, "Failed to load sprite image: Error %d: %s", res->code, res->error_message.c_str());
+            if (!sprite->future.valid()) {
+                sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res->error_message)));
+            }
         }
-    }, map.getLoop());
+    });
 }
 
-void Sprite::complete(std::shared_ptr<Sprite> &sprite) {
-    if (sprite->loadedImage && sprite->loadedJSON) {
-        sprite->map.update();
-        Log::Info(Event::Sprite, "loaded %s", sprite->url.c_str());
+void Sprite::complete() {
+    if (loadedImage && loadedJSON) {
+        Log::Info(Event::Sprite, "loaded %s", spriteURL.c_str());
+        promise.set_value();
     }
 }
 
@@ -69,28 +98,20 @@ bool Sprite::isLoaded() const {
     return loadedImage && loadedJSON;
 }
 
-void Sprite::asyncParseImage() {
-    new uv::work<std::shared_ptr<Sprite>>(map.getLoop(), parseImage, complete, shared_from_this());
+void Sprite::parseImage() {
+    raster = std::make_unique<util::Image>(image);
+    image.clear();
+    loadedImage = true;
 }
 
-void Sprite::asyncParseJSON() {
-    new uv::work<std::shared_ptr<Sprite>>(map.getLoop(), parseJSON, complete, shared_from_this());
-}
-
-void Sprite::parseImage(std::shared_ptr<Sprite> &sprite) {
-    sprite->raster = std::make_unique<util::Image>(sprite->image);
-    sprite->image.clear();
-    sprite->loadedImage = true;
-}
-
-void Sprite::parseJSON(std::shared_ptr<Sprite> &sprite) {
+void Sprite::parseJSON() {
     rapidjson::Document d;
-    d.Parse<0>(sprite->body.c_str());
-    sprite->body.clear();
+    d.Parse<0>(body.c_str());
+    body.clear();
 
-    if (d.IsObject()) {
-        std::unordered_map<std::string, SpritePosition> pos;
-
+    if (d.HasParseError()) {
+        Log::Warning(Event::Sprite, "sprite JSON is invalid");
+    } else if (d.IsObject()) {
         for (rapidjson::Value::ConstMemberIterator itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr) {
             const std::string& name = itr->name.GetString();
             const rapidjson::Value& value = itr->value;
@@ -110,10 +131,11 @@ void Sprite::parseJSON(std::shared_ptr<Sprite> &sprite) {
                 pos.emplace(name, SpritePosition { x, y, width, height, pixelRatio });
             }
         }
-
-        sprite->pos.swap(pos);
-        sprite->loadedJSON = true;
+    } else {
+        Log::Warning(Event::Sprite, "sprite JSON root is not an object");
     }
+
+    loadedJSON = true;
 }
 
 const SpritePosition &Sprite::getSpritePosition(const std::string& name) const {

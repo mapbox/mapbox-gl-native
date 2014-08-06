@@ -48,13 +48,15 @@ public:
 
     const BackgroundProperties &getBackgroundProperties() const;
 
+    const std::string &getSpriteURL() const;
+
 public:
-    std::shared_ptr<Sprite> sprite;
     std::shared_ptr<StyleLayerGroup> layers;
     std::vector<std::string> appliedClasses;
-    std::string sprite_url;
     std::string glyph_url;
 
+private:
+    std::string sprite_url;
 
 private:
     PropertyTransition defaultTransition;
