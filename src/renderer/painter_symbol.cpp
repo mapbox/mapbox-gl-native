@@ -169,8 +169,14 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
     if (bucket.hasIconData()) {
         mat4 exMatrix;
         matrix::copy(exMatrix, projMatrix);
-        if (bucket.properties.icon.rotation_alignment == RotationAlignmentType::Map) {
-            matrix::rotate_z(exMatrix, exMatrix, map.getState().getAngle());
+
+        const float angleOffset =
+            bucket.properties.icon.rotation_alignment == RotationAlignmentType::Map
+                ? map.getState().getAngle()
+                : 0;
+
+        if (angleOffset) {
+            matrix::rotate_z(exMatrix, exMatrix, angleOffset);
         }
 
         // If layerStyle.size > bucket.info.fontSize then labels may collide
@@ -183,7 +189,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         iconShader->setExtrudeMatrix(exMatrix);
 
         SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-        spriteAtlas.bind(map.getState().isChanging());
+        spriteAtlas.bind(map.getState().isChanging() || angleOffset != 0 || fontScale != 1);
         iconShader->setTextureSize(
             {{static_cast<float>(spriteAtlas.getTextureWidth()), static_cast<float>(spriteAtlas.getTextureHeight())}});
 
