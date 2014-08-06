@@ -81,8 +81,8 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         float fadedist = zoomDiff / (timeDiff / duration);
 
 #if defined(DEBUG)
-        if (std::isnan(fadedist))
-            fprintf(stderr, "fadedist should never be NaN\n");
+//        if (std::isnan(fadedist))
+//            fprintf(stderr, "fadedist should never be NaN\n");
 #endif
 
         // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
