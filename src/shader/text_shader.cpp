@@ -52,6 +52,7 @@ TextShader::TextShader()
     // fprintf(stderr, "    - u_maxfadezoom: %d\n", u_maxfadezoom);
     // fprintf(stderr, "    - u_fadezoom: %d\n", u_fadezoom);
     // fprintf(stderr, "    - u_texsize: %d\n", u_texsize);
+    // fprintf(stderr, "    - u_opacity: %d\n", u_opacity);
 }
 
 void TextShader::bind(char *offset) {

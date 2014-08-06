@@ -16,9 +16,10 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         return;
     }
 
-    if (bucket.hasTextData()) {
-        const SymbolProperties &properties = layer_desc->getProperties<SymbolProperties>();
+    const SymbolProperties &properties = layer_desc->getProperties<SymbolProperties>();
 
+
+    if (bucket.hasTextData()) {
         mat4 exMatrix;
         matrix::copy(exMatrix, projMatrix);
         if (bucket.properties.placement == PlacementType::Line) {
@@ -28,12 +29,6 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         // If layerStyle.size > bucket.info.fontSize then labels may collide
         float fontSize = std::fmin(properties.text.size, bucket.properties.text.max_size);
         matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
-
-        // TODO: figure out whether we actually need to account for this while painting; we might
-        // already have
-        // done this during label placement.
-        //    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id,
-        //    properties.translateAnchor);
 
         useProgram(textShader->program);
         textShader->setMatrix(matrix);
@@ -172,31 +167,45 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
     }
 
     if (bucket.hasIconData()) {
-//        SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-//
-//        useProgram(iconShader->program);
-//        iconShader->setMatrix(matrix);
-//
-//        // TODO: update
-//        iconShader->setColor({{1, 1, 1, 1}});
-//        iconShader->setImage(0);
-//        iconShader->setRatio(map.getState().getPixelRatio());
-//        iconShader->setDimension({{
-//            spriteAtlas.getTextureWidth(), spriteAtlas.getTextureHeight(),
-//        }});
-//
-//        spriteAtlas.bind(map.getState().isChanging());
-//
-//        // TODO: remove hardcoded icon size.
-//        const float iconSize = 12 * map.getState().getPixelRatio();
-//        iconShader->setSize(iconSize);
-//#ifndef GL_ES_VERSION_2_0
-//        glPointSize(iconSize);
-//        glEnable(GL_POINT_SPRITE);
-//#endif
-//
-//        glDepthRange(strata, 1.0f);
-//        bucket.drawIcons(*iconShader);
+        mat4 exMatrix;
+        matrix::copy(exMatrix, projMatrix);
+        if (bucket.properties.icon.rotation_alignment == RotationAlignmentType::Map) {
+            matrix::rotate_z(exMatrix, exMatrix, map.getState().getAngle());
+        }
+
+        // If layerStyle.size > bucket.info.fontSize then labels may collide
+        const float fontSize = properties.icon.size != 0 ? properties.icon.size : bucket.properties.icon.max_size;
+        const float fontScale = fontSize / 1.0f;
+        matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
+
+        useProgram(iconShader->program);
+        iconShader->setMatrix(matrix);
+        iconShader->setExtrudeMatrix(exMatrix);
+
+        SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
+        spriteAtlas.bind(map.getState().isChanging());
+        iconShader->setTextureSize(
+            {{static_cast<float>(spriteAtlas.getTextureWidth()), static_cast<float>(spriteAtlas.getTextureHeight())}});
+
+        // Convert the -pi..pi to an int8 range.
+        float angle = std::round((map.getState().getAngle()) / M_PI * 128);
+
+        // adjust min/max zooms for variable font sies
+        float zoomAdjust = log(fontSize / bucket.properties.icon.max_size) / log(2);
+
+        iconShader->setAngle((int32_t)(angle + 256) % 256);
+        iconShader->setFlip(bucket.properties.placement == PlacementType::Line ? 1 : 0);
+        iconShader->setZoom((map.getState().getNormalizedZoom() - zoomAdjust) *
+                            10); // current zoom level
+
+        iconShader->setFadeDist(0 * 10);
+        iconShader->setMinFadeZoom(map.getState().getNormalizedZoom() * 10);
+        iconShader->setMaxFadeZoom(map.getState().getNormalizedZoom() * 10);
+        iconShader->setFadeZoom(map.getState().getNormalizedZoom() * 10);
+        iconShader->setOpacity(properties.icon.opacity);
+
+        glDepthRange(strata, 1.0f);
+        bucket.drawIcons(*iconShader);
     }
 }
 }

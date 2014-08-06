@@ -36,6 +36,7 @@ IconShader::IconShader()
     u_maxfadezoom = glGetUniformLocation(program, "u_maxfadezoom");
     u_fadezoom = glGetUniformLocation(program, "u_fadezoom");
     u_opacity = glGetUniformLocation(program, "u_opacity");
+    u_texsize = glGetUniformLocation(program, "u_texsize");
 
     // fprintf(stderr, "IconShader:\n");
     // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
@@ -141,6 +142,13 @@ void IconShader::setOpacity(float new_opacity) {
     if (opacity != new_opacity) {
         glUniform1f(u_opacity, new_opacity);
         opacity = new_opacity;
+    }
+}
+
+void IconShader::setTextureSize(const std::array<float, 2> &new_texsize) {
+    if (texsize != new_texsize) {
+        glUniform2fv(u_texsize, 1, new_texsize.data());
+        texsize = new_texsize;
     }
 }
 

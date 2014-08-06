@@ -20,6 +20,7 @@ public:
     void setMaxFadeZoom(float maxfadezoom);
     void setFadeZoom(float fadezoom);
     void setOpacity(float opacity);
+    void setTextureSize(const std::array<float, 2> &texsize);
 
 private:
     int32_t a_pos = -1;
@@ -58,6 +59,9 @@ private:
 
     float opacity = 0;
     int32_t u_opacity = -1;
+
+    std::array<float, 2> texsize = {{}};
+    int32_t u_texsize = -1;
 };
 
 }
