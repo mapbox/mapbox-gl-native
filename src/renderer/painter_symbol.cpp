@@ -189,12 +189,12 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         iconShader->setExtrudeMatrix(exMatrix);
 
         SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-        spriteAtlas.bind(map.getState().isChanging() || angleOffset != 0 || fontScale != 1);
+        spriteAtlas.bind(map.getState().isChanging() || bucket.properties.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1);
         iconShader->setTextureSize(
             {{static_cast<float>(spriteAtlas.getTextureWidth()), static_cast<float>(spriteAtlas.getTextureHeight())}});
 
         // Convert the -pi..pi to an int8 range.
-        float angle = std::round((map.getState().getAngle()) / M_PI * 128);
+        const float angle = std::round((map.getState().getAngle()) / M_PI * 128);
 
         // adjust min/max zooms for variable font sies
         float zoomAdjust = log(fontSize / bucket.properties.icon.max_size) / log(2);
