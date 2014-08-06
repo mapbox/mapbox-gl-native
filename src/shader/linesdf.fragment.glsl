@@ -2,6 +2,8 @@ uniform vec2 u_linewidth;
 uniform vec4 u_color;
 uniform float u_blur;
 
+uniform sampler2D u_image;
+
 varying vec2 v_normal;
 
 void main() {
@@ -14,5 +16,5 @@ void main() {
     float alpha = clamp(min(dist - (u_linewidth.t - u_blur), u_linewidth.s - dist) / u_blur, 0.0, 1.0);
 
     gl_FragColor = u_color * alpha;
-    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0) * texture2D(u_image, vec2(0.5, 0.5)).a;
 }

@@ -46,6 +46,9 @@ Map::Map(View& view)
     is_clean.clear();
     is_rendered.clear();
     is_swapped.test_and_set();
+
+    // TODO remove
+    lineAtlas->addDash();
 }
 
 Map::~Map() {

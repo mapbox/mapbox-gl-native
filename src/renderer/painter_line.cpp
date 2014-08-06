@@ -1,6 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/map/map.hpp>
 
 using namespace mbgl;
@@ -61,12 +62,14 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     bool imagePos = false;
 
     if (properties.dash_array[1] >= 0) {
+        LineAtlas &lineAtlas = *map.getLineAtlas();
         useProgram(lineSDFShader->program);
         lineSDFShader->setMatrix(vtxMatrix);
         lineSDFShader->setExtrudeMatrix(extrudeMatrix);
-        lineSDFShader->setLineWidth({{ outset, inset }});
+        lineSDFShader->setLineWidth({{ 10 * outset, inset }});
         lineSDFShader->setBlur(blur);
         lineSDFShader->setColor(color);
+        lineAtlas.bind();
         bucket.drawLines(*lineSDFShader);
     } else if (imagePos) {
         // var factor = 8 / Math.pow(2, painter.transform.zoom - params.z);
