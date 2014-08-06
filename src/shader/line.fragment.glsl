@@ -1,5 +1,6 @@
 uniform vec2 u_linewidth;
 uniform vec4 u_color;
+uniform float u_blur;
 
 uniform vec2 u_dasharray;
 
@@ -13,7 +14,7 @@ void main() {
     // Calculate the antialiasing fade factor. This is either when fading in
     // the line in case of an offset line (v_linewidth.t) or when fading out
     // (v_linewidth.s)
-    float alpha = clamp(min(dist - (u_linewidth.t - 1.0), u_linewidth.s - dist), 0.0, 1.0);
+    float alpha = clamp(min(dist - (u_linewidth.t - u_blur), u_linewidth.s - dist) / u_blur, 0.0, 1.0);
 
     // Calculate the antialiasing fade factor based on distance to the dash.
     // Only affects alpha when line is dashed

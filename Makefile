@@ -78,8 +78,10 @@ xproj: config.gypi macosx/mapboxgl-app.gyp clear_xcode_cache node
 	open ./build/macosx/mapboxgl-app.xcodeproj
 
 # build iOS project for Xcode
-iproj: config.gypi ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp clear_xcode_cache node
+iproj-cli: config.gypi ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp clear_xcode_cache node
 	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
+
+iproj: iproj-cli
 	open ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
 
 # build Linux project for Xcode (Runs on Mac OS X too, but without platform-specific code)

@@ -96,7 +96,7 @@ private:
     const double max_scale = std::pow(2, 18);
 
     // cache values for spherical mercator math
-    double zc, Bc, Cc;
+    double Bc, Cc;
 
     std::forward_list<std::shared_ptr<util::transition>> transitions;
     std::shared_ptr<util::transition> scale_timeout;

@@ -14,11 +14,13 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 
     float width = properties.width;
     float offset = properties.offset / 2;
+    float antialiasing = 1 / map.getState().getPixelRatio();
+    float blur = properties.blur + antialiasing;
 
     // These are the radii of the line. We are limiting it to 16, which will result
     // in a point size of 64 on retina.
-    float inset = std::fmin((std::fmax(-1, offset - width / 2 - 0.5) + 1), 16.0f);
-    float outset = std::fmin(offset + width / 2 + 0.5, 16.0f);
+    float inset = std::fmin((std::fmax(-1, offset - width / 2 - antialiasing / 2) + 1), 16.0f);
+    float outset = std::fmin(offset + width / 2 + antialiasing / 2, 16.0f);
 
     Color color = properties.color;
     color[0] *= properties.opacity;
@@ -80,6 +82,7 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         lineShader->setDashArray({{ dash_length, dash_gap }});
         lineShader->setLineWidth({{ outset, inset }});
         lineShader->setRatio(map.getState().getPixelRatio());
+        lineShader->setBlur(blur);
         lineShader->setColor(color);
         bucket.drawLines(*lineShader);
     }
