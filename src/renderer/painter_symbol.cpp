@@ -191,7 +191,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
         spriteAtlas.bind(map.getState().isChanging() || bucket.properties.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1);
         iconShader->setTextureSize(
-            {{static_cast<float>(spriteAtlas.getTextureWidth()), static_cast<float>(spriteAtlas.getTextureHeight())}});
+            {{static_cast<float>(spriteAtlas.getWidth()), static_cast<float>(spriteAtlas.getHeight())}});
 
         // Convert the -pi..pi to an int8 range.
         const float angle = std::round((map.getState().getAngle()) / M_PI * 128);
