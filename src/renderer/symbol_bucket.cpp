@@ -5,7 +5,7 @@
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/geometry.hpp>
 #include <mbgl/geometry/anchor.hpp>
-#include <mbgl/geometry/interpolate.hpp>
+#include <mbgl/geometry/resample.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/text/placement.hpp>
@@ -218,8 +218,8 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
 
     if (properties.placement == PlacementType::Line) {
         // Line labels
-        anchors = interpolate(line, properties.min_distance, minScale, collision.maxPlacementScale,
-                              collision.tilePixelRatio);
+        anchors = resample(line, properties.min_distance, minScale, collision.maxPlacementScale,
+                           collision.tilePixelRatio);
 
         // Sort anchors by segment so that we can start placement with the
         // anchors that can be shown at the lowest zoom levels.
