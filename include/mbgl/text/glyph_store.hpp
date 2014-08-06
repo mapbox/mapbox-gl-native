@@ -62,12 +62,14 @@ private:
 // Manages Glyphrange PBF loading.
 class GlyphStore {
 public:
-    GlyphStore(const std::string &glyphURL);
+    GlyphStore();
 
     // Block until all specified GlyphRanges of the specified font stack are loaded.
     void waitForGlyphRanges(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges);
 
     FontStack &getFontStack(const std::string &fontStack);
+
+    void setURL(const std::string &url);
 
 private:
     // Loads an individual glyph range from the font stack and adds it to rangeSets
@@ -76,7 +78,7 @@ private:
     FontStack &createFontStack(const std::string &fontStack);
 
 public:
-    const std::string glyphURL;
+    std::string glyphURL;
 
 private:
     std::unordered_map<std::string, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>> ranges;

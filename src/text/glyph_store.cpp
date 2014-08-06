@@ -226,12 +226,19 @@ void GlyphPBF::parse(FontStack &stack) {
     data.clear();
 }
 
-GlyphStore::GlyphStore(const std::string &glyphURL)
-    : glyphURL(glyphURL) {}
+GlyphStore::GlyphStore() {}
+
+void GlyphStore::setURL(const std::string &url) {
+    glyphURL = url;
+}
+
 
 void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges) {
     // We are implementing a blocking wait with futures: Every GlyphSet has a future that we are
     // waiting for until it is loaded.
+    if (glyphRanges.empty()) {
+        return;
+    }
 
     FontStack *stack = nullptr;
 
