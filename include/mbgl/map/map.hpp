@@ -21,6 +21,7 @@ class GlyphAtlas;
 class GlyphStore;
 class LayerDescription;
 class SpriteAtlas;
+class LineAtlas;
 class Style;
 class StyleLayer;
 class StyleLayerGroup;
@@ -114,6 +115,7 @@ public:
     inline std::shared_ptr<GlyphAtlas> getGlyphAtlas() { return glyphAtlas; }
     inline std::shared_ptr<GlyphStore> getGlyphStore() { return glyphStore; }
     inline std::shared_ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
+    inline std::shared_ptr<LineAtlas> getLineAtlas() { return lineAtlas; }
     inline std::shared_ptr<Texturepool> getTexturepool() { return texturepool; }
     inline std::shared_ptr<uv::loop> getLoop() { return loop; }
     inline timestamp getAnimationTime() const { return animationTime; }
@@ -172,6 +174,7 @@ private:
     std::shared_ptr<GlyphAtlas> glyphAtlas;
     std::shared_ptr<GlyphStore> glyphStore;
     std::shared_ptr<SpriteAtlas> spriteAtlas;
+    std::shared_ptr<LineAtlas> lineAtlas;
     std::shared_ptr<Texturepool> texturepool;
 
     Painter painter;

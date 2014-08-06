@@ -18,6 +18,7 @@
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/texturepool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/geometry/line_atlas.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -34,6 +35,7 @@ Map::Map(View& view)
       style(std::make_shared<Style>()),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
+      lineAtlas(std::make_shared<LineAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
       painter(*this),
       loop(std::make_shared<uv::loop>()) {
