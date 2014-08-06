@@ -20,8 +20,7 @@ class StyleLayerGroup;
 
 class StyleLayer {
 public:
-    StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles,
-        std::unique_ptr<const RasterizeProperties> &&rasterize);
+    StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles);
 
     template <typename T> const T &getProperties() {
         if (properties.is<T>()) {
@@ -83,7 +82,7 @@ public:
     // Rasterization properties are used for prerendering the tile to a bitmap,
     // which is then used as a raster image instead of rendering this layer
     // directly in every frame.
-    const std::unique_ptr<const RasterizeProperties> rasterize;
+//    const std::unique_ptr<const RasterizeProperties> rasterize;
 
     // Child layer array (if this layer has child layers).
     std::shared_ptr<StyleLayerGroup> layers;

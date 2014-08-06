@@ -82,6 +82,7 @@ void TileParser::parseStyleLayers(std::shared_ptr<StyleLayerGroup> group) {
                     // contain any data that falls into this bucket.
                     tile.buckets[layer_desc->bucket->name] = std::move(bucket);
                 }
+                                        // TODO? here, no bucket is being created for prerender raster layers (though buckets are being created for its sublayers)...
             }
         } else {
             fprintf(stderr, "[WARNING] layer '%s' does not have child layers or buckets\n", layer_desc->id.c_str());
@@ -100,8 +101,8 @@ std::unique_ptr<Bucket> TileParser::createBucket(std::shared_ptr<StyleBucket> bu
     if (tile.id.z >= std::ceil(bucket_desc->max_zoom)) return nullptr;
 
     auto layer_it = vector_data.layers.find(bucket_desc->source_layer);
+    const VectorTileLayer &layer = layer_it->second;
     if (layer_it != vector_data.layers.end()) {
-        const VectorTileLayer &layer = layer_it->second;
         if (bucket_desc->render.is<StyleBucketFill>()) {
             return createFillBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketFill>());
         } else if (bucket_desc->render.is<StyleBucketLine>()) {
@@ -113,6 +114,9 @@ std::unique_ptr<Bucket> TileParser::createBucket(std::shared_ptr<StyleBucket> bu
         } else {
             fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucket_desc->name.c_str(), bucket_desc->source_layer.c_str());
         }
+    } else if (bucket_desc->render.is<StyleBucketRaster>()) {
+        // Assume this is a prerendered raster layer -- TODO more thorough checking here??
+        return createRasterBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketRaster>());
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
         if (debug::tileParseWarnings) {
@@ -145,6 +149,12 @@ void TileParser::addBucketGeometries(Bucket& bucket, const VectorTileLayer& laye
 std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketFill &fill) {
     std::unique_ptr<FillBucket> bucket = std::make_unique<FillBucket>(tile.fillVertexBuffer, tile.triangleElementsBuffer, tile.lineElementsBuffer, fill);
     addBucketGeometries(bucket, layer, filter);
+    return obsolete() ? nullptr : std::move(bucket);
+}
+
+std::unique_ptr<Bucket> TileParser::createRasterBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketRaster &raster) {
+    std::unique_ptr<RasterBucket> bucket = std::make_unique<RasterBucket>(raster);
+//    addBucketFeatures(bucket, layer, filter);
     return obsolete() ? nullptr : std::move(bucket);
 }
 

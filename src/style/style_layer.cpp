@@ -5,9 +5,8 @@
 
 namespace mbgl {
 
-StyleLayer::StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles,
-                       std::unique_ptr<const RasterizeProperties> &&rasterize)
-    : id(id), styles(std::move(styles)), rasterize(std::move(rasterize)) {}
+StyleLayer::StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles)
+    : id(id), styles(std::move(styles)) {}
 
 bool StyleLayer::isBackground() const {
     return type == StyleLayerType::Background;

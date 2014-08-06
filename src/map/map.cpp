@@ -649,29 +649,63 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
 }
 
 void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
-    if (layer_desc->layers && layer_desc->type != StyleLayerType::Raster) {
-         // This is a layer group. We render them during our translucent render pass.
-        if (pass == Translucent) {
-            const CompositeProperties &properties = layer_desc->getProperties<CompositeProperties>();
-            if (properties.isVisible()) {
-                gl::group group(std::string("group: ") + layer_desc->id);
+    if (layer_desc->layers) {
+        if (layer_desc->type == StyleLayerType::Raster) {
+            const RasterProperties &properties = layer_desc->getProperties<RasterProperties>();
+            
+//            const RasterizedProperties rasterize = layer_desc->getProperties<RasterProperties>();
+//            
+//            auto prerendered = std::make_unique<PrerenderedTexture>(rasterize);
+//            prerendered->bindFramebuffer();
+//            
+//            painter.preparePrerender(*prerendered);
+//            
+//            const int buffer = rasterize.buffer * 4096.0f;
+//            const mat4 vtxMatrix = [&]{
+//                mat4 vtxMatrix;
+//                matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
+//                matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
+//                return vtxMatrix;
+//            }();
+//            
+//            painter.setOpaque();
+//            renderLayers(layer_desc->layers);
+//            painter.setTranslucent();
+//            renderLayers(layer_desc->layers);
+//            
+//            if (rasterize.blur > 0) {
+//                prerendered->blur(painter, rasterize.blur);
+//            }
+//            
+//            prerendered->unbindFramebuffer();
+//            painter.finishPrerender(*prerendered);
+//            
+//            painter.renderPrerenderedTexture(*prerendered, rasterize);
+            
+        } else {
+            // This is a layer group. We render them during our translucent render pass.
+            if (pass == Translucent) {
+                const CompositeProperties &properties = layer_desc->getProperties<CompositeProperties>();
+                if (properties.isVisible()) {
+                    gl::group group(std::string("group: ") + layer_desc->id);
 
-                if (debug::renderTree) {
-                    std::cout << std::string(indent++ * 4, ' ') << "+ " << layer_desc->id
-                              << " (Composite) {" << std::endl;
-                }
+                    if (debug::renderTree) {
+                        std::cout << std::string(indent++ * 4, ' ') << "+ " << layer_desc->id
+                                  << " (Composite) {" << std::endl;
+                    }
 
-                painter.pushFramebuffer();
+                    painter.pushFramebuffer();
 
-                renderLayers(layer_desc->layers);
+                    renderLayers(layer_desc->layers);
 
-                GLuint texture = painter.popFramebuffer();
+                    GLuint texture = painter.popFramebuffer();
 
-                // Render the previous texture onto the screen.
-                painter.drawComposite(texture, properties);
+                    // Render the previous texture onto the screen.
+                    painter.drawComposite(texture, properties);
 
-                if (debug::renderTree) {
-                    std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
+                    if (debug::renderTree) {
+                        std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
+                    }
                 }
             }
         }

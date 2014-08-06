@@ -4,6 +4,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/style/rasterize_properties.hpp>
+//#include <mbgl/renderer/raster_bucket.hpp>
 
 namespace mbgl {
 
@@ -11,7 +12,7 @@ class Painter;
 
 class PrerenderedTexture : private util::noncopyable {
 public:
-    PrerenderedTexture(const RasterizedProperties &properties);
+    PrerenderedTexture(const RasterBucket &properties);
     ~PrerenderedTexture();
 
     void bindTexture();
@@ -23,7 +24,7 @@ public:
     void blur(Painter& painter, uint16_t passes);
 
 public:
-    const RasterizedProperties properties;
+    const RasterBucket properties;
 
 private:
     GLint previous_fbo = 0;

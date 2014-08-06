@@ -38,11 +38,12 @@ void Painter::renderPrerenderedTexture(PrerenderedTexture &texture, const Proper
     glActiveTexture(GL_TEXTURE0);
     rasterShader->setImage(0);
     rasterShader->setBuffer(buffer);
-    rasterShader->setOpacity(properties.opacity);
+    rasterShader->setOpacity(1);
+//    rasterShader->setOpacity(properties.opacity);             // TODO find a place to pass opacity and change this back
     texture.bindTexture();
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
 
 template void Painter::renderPrerenderedTexture(PrerenderedTexture &, const FillProperties &);
-template void Painter::renderPrerenderedTexture(PrerenderedTexture &, const RasterProperties &);
+template void Painter::renderPrerenderedTexture(PrerenderedTexture &, const RasterizedProperties &);

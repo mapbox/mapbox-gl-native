@@ -15,7 +15,7 @@ public:
 
 class RasterizeProperties {
 public:
-//    Function<bool> enabled = ConstantFunction<bool>(false);                 // going to need to delete this? or keep ?
+    Function<bool> enabled = ConstantFunction<bool>(false);                                 // maybe delete?
     Function<float> buffer = ConstantFunction<float>(1.0f / 32.0f);
     Function<float> size = ConstantFunction<float>(256);
     Function<float> blur = ConstantFunction<float>(0);

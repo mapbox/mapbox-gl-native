@@ -493,10 +493,14 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
         parseStyles(value, styles);
 
         // Parse Rasterization options, as they can't be inherited anyway.
-        std::unique_ptr<const RasterizeProperties> rasterize;
+//        std::unique_ptr<const RasterizeProperties> rasterize;
+//        if (value.HasMember("rasterize")) {
+//            rasterize = parseRasterize(replaceConstant(value["rasterize"]));
+//        }
 
         std::shared_ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
-            layer_id, std::move(styles), std::move(rasterize));
+            layer_id, std::move(styles));
+//            layer_id, std::move(styles), std::move(rasterize));
 
         if (value.HasMember("layers")) {
             if (value.HasMember("type")) {
@@ -527,12 +531,6 @@ void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair
     JSVal value = pair.first;
     std::shared_ptr<StyleLayer> &layer = pair.second;
 
-    if (layer->bucket) {
-//    if (layer->bucket || layer->layers) {
-        // Skip parsing this again. We already have a valid layer definition.
-        return;
-    }
-
     if (value.HasMember("type")) {
         JSVal type = value["type"];
         if (!type.IsString()) {
@@ -542,6 +540,11 @@ void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair
         }
     }
 
+    if (layer->bucket || (layer->layers && layer->type != StyleLayerType::Raster)) {
+        // Skip parsing this again. We already have a valid layer definition.
+        return;
+    }
+    
     // Make sure we have not previously attempted to parse this layer.
     if (std::find(stack.begin(), stack.end(), layer.get()) != stack.end()) {
         fprintf(stderr, "[WARNING] layer reference of '%s' is circular\n", layer->id.c_str());
@@ -917,19 +920,19 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         parseRenderProperty(value, render.text.ignore_placement, "text-ignore-placement");
         parseRenderProperty(value, render.text.optional, "text-optional");
     } break;
-        
+            
     case StyleLayerType::Raster: {
         StyleBucketRaster &render = bucket.render.get<StyleBucketRaster>();
         
-        auto rasterize = std::make_unique<RasterizedProperties>();
+//        auto rasterize = std::make_unique<RasterizedProperties>();
         parseRenderProperty(value, render.raster_size, "raster-size");
         parseRenderProperty(value, render.blur, "raster-blur");
         parseRenderProperty(value, render.buffer, "raster-buffer");
-        
-//        return rasterize;
-        
+        if (layer->layers) {
+            render.prerendered = true;
+        }
     } break;
-        
+            
     default:
         // There are no render properties for these layer types.
         break;
