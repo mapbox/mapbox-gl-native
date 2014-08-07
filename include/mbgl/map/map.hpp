@@ -141,7 +141,6 @@ private:
 
     void updateTiles();
     void updateRenderState();
-    void updateRenderState(const mat4 vtxMatrix);
 
     size_t countLayers(const std::vector<LayerDescription>& layers);
 

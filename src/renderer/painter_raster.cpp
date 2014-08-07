@@ -31,7 +31,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
             matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
             return vtxMatrix;
         }();
-
+        
         map.renderLayers(layer_desc->layers);
 
         if (bucket.properties.blur > 0) {
@@ -53,7 +53,12 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
 //    rasterShader->setOpacity(properties.opacity * tile_data->raster->opacity);        // TODO fix
 
     glDepthRange(strata + strata_epsilon, 1.0f);
-    bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
+    
+    if (!bucket.hasData()) {
+        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray, bucket.texture.getTexture());
+    } else {
+        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
+    }
 
     depthMask(true);
 

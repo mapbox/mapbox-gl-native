@@ -28,8 +28,11 @@ public:
 
     void drawRaster(RasterShader& shader, VertexBuffer &vertices, VertexArrayObject &array);
 
-private:
+    void drawRaster(RasterShader& shader, VertexBuffer &vertices, VertexArrayObject &array, GLuint texture);
+    
     Raster raster;
+
+private:
 };
 
 }

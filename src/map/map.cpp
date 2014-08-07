@@ -522,21 +522,6 @@ void Map::updateRenderState() {
     }
 }
 
-void Map::updateRenderState(const mat4 vtxMatrix) {
-    std::forward_list<Tile::ID> ids;
-    
-    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
-        ids.splice_after(ids.before_begin(), source->source->getIDs());
-        source->source->updateMatrices(vtxMatrix, state);
-    }
-    
-    const std::map<Tile::ID, ClipID> clipIDs = computeClipIDs(ids);
-    
-    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
-        source->source->updateClipIDs(clipIDs);
-    }
-}
-
 void Map::prepare() {
     view.make_active();
 
