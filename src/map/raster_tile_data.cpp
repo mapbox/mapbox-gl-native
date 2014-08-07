@@ -29,6 +29,6 @@ void RasterTileData::render(Painter &painter, std::shared_ptr<StyleLayer> layer_
     bucket.render(painter, layer_desc, id);
 }
 
-bool RasterTileData::hasData(std::shared_ptr<StyleLayer> layer_desc) const {
+bool RasterTileData::hasData(std::shared_ptr<StyleLayer> /*layer_desc*/) const {
     return bucket.hasData();
 }

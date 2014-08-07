@@ -377,7 +377,7 @@ template<> std::tuple<bool, RotateAnchorType> StyleParser::parseProperty<RotateA
     return std::tuple<bool, RotateAnchorType> { true, RotateAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal value, const char */*property_name*/) {
     PropertyTransition transition;
     if (value.IsObject()) {
         if (value.HasMember("duration") && value["duration"].IsNumber()) {

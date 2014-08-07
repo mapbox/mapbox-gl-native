@@ -68,6 +68,7 @@ constexpr EventSeverity disabledEventSeverities[] = {
 
 
 constexpr Event disabledEvents[] = {
+    Event(-1) // Avoid zero size array
 };
 
 constexpr EventPermutation disabledEventPermutations[] = {

@@ -10,7 +10,7 @@
 namespace mbgl {
 
 void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> layer_desc,
-                           const Tile::ID &id) {
+                           const Tile::ID &/*id*/) {
     // Abort early.
     if (pass == Opaque) {
         return;

@@ -16,7 +16,7 @@ const std::array<std::vector<float>, 4> minScaleArrays = {{
 
 
 Anchors interpolate(const std::vector<Coordinate> &vertices, float spacing,
-                    const float minScale, float maxScale, const float tilePixelRatio,
+                    const float /*minScale*/, float maxScale, const float tilePixelRatio,
                     const int start) {
 
     maxScale = std::round(std::fmax(std::fmin(8.0f, maxScale / 2.0f), 1.0f));

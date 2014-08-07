@@ -15,6 +15,8 @@
 
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event
            withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
+    (void)replyEvent;
+
     NSString* urlString = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
     NSURL *url = [NSURL URLWithString:urlString];
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
