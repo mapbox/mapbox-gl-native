@@ -3,15 +3,11 @@
 
 using namespace mbgl;
 
-RasterBucket::RasterBucket(const std::shared_ptr<Texturepool> &texturepool)
-    : raster(texturepool) {
+RasterBucket::RasterBucket(const std::shared_ptr<Texturepool> &texturepool, const StyleBucketRaster& properties)
+: properties(properties),
+  texture(properties),
+  raster(texturepool) {
 }
-
-//RasterBucket::RasterBucket(const StyleBucketRaster &properties)
-//    : properties(properties) {
-//}
-
-// TODO ^ Somehow overload with another constructor for prerender?
 
 void RasterBucket::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id) {
     painter.renderRaster(*this, layer_desc, id);

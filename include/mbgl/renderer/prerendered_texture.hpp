@@ -3,16 +3,15 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/platform/gl.hpp>
-#include <mbgl/style/rasterize_properties.hpp>
-//#include <mbgl/renderer/raster_bucket.hpp>
 
 namespace mbgl {
 
+class StyleBucketRaster;
 class Painter;
 
 class PrerenderedTexture : private util::noncopyable {
 public:
-    PrerenderedTexture(const RasterBucket &properties);
+    PrerenderedTexture(const StyleBucketRaster &properties);
     ~PrerenderedTexture();
 
     void bindTexture();
@@ -24,7 +23,7 @@ public:
     void blur(Painter& painter, uint16_t passes);
 
 public:
-    const RasterBucket properties;
+    const StyleBucketRaster &properties;
 
 private:
     GLint previous_fbo = 0;

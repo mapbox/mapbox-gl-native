@@ -1,9 +1,11 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style_properties.hpp>
+#include <mbgl/renderer/prerendered_texture.hpp>
+#include <mbgl/renderer/raster_bucket.hpp>
 
 using namespace mbgl;
 
-void Painter::preparePrerender(PrerenderedTexture &texture) {
+void Painter::preparePrerender(RasterBucket &bucket) {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_STENCIL_TEST);
 
@@ -14,19 +16,18 @@ void Painter::preparePrerender(PrerenderedTexture &texture) {
 #endif
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glViewport(0, 0, texture.properties.size, texture.properties.size);
+    glViewport(0, 0, bucket.properties.size, bucket.properties.size);
 }
 
-void Painter::finishPrerender(PrerenderedTexture &/*texture*/) {
+void Painter::finishPrerender(RasterBucket &bucket) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
 
     glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
 }
 
-template <typename Properties>
-void Painter::renderPrerenderedTexture(PrerenderedTexture &texture, const Properties &properties) {
-    const int buffer = texture.properties.buffer * 4096.0f;
+void Painter::renderPrerenderedTexture(RasterBucket &bucket) {
+    const int buffer = bucket.properties.buffer * 4096.0f;
     
     // draw the texture on a quad
     useProgram(rasterShader->program);
@@ -39,11 +40,8 @@ void Painter::renderPrerenderedTexture(PrerenderedTexture &texture, const Proper
     rasterShader->setImage(0);
     rasterShader->setBuffer(buffer);
     rasterShader->setOpacity(1);
-//    rasterShader->setOpacity(properties.opacity);             // TODO find a place to pass opacity and change this back
-    texture.bindTexture();
+//    rasterShader->setOpacity(bucket.properties.opacity);             // TODO find a place to pass opacity and change this back
+    bucket.texture.bindTexture();
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
-
-template void Painter::renderPrerenderedTexture(PrerenderedTexture &, const FillProperties &);
-template void Painter::renderPrerenderedTexture(PrerenderedTexture &, const RasterizedProperties &);

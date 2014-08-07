@@ -492,15 +492,8 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
         std::map<ClassID, ClassProperties> styles;
         parseStyles(value, styles);
 
-        // Parse Rasterization options, as they can't be inherited anyway.
-//        std::unique_ptr<const RasterizeProperties> rasterize;
-//        if (value.HasMember("rasterize")) {
-//            rasterize = parseRasterize(replaceConstant(value["rasterize"]));
-//        }
-
         std::shared_ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
             layer_id, std::move(styles));
-//            layer_id, std::move(styles), std::move(rasterize));
 
         if (value.HasMember("layers")) {
             if (value.HasMember("type")) {
@@ -643,7 +636,7 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<float>>("composite-opacity", Key::CompositeOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-composite-opacity", Key::CompositeOpacity, klass, value);
 
-//    TODO edit these:
+//    TODO edit these?:
     parseOptionalProperty<Function<float>>("raster-opacity", Key::RasterOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
     parseOptionalProperty<Function<float>>("raster-spin", Key::RasterSpin, klass, value);
@@ -924,8 +917,7 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
     case StyleLayerType::Raster: {
         StyleBucketRaster &render = bucket.render.get<StyleBucketRaster>();
         
-//        auto rasterize = std::make_unique<RasterizedProperties>();
-        parseRenderProperty(value, render.raster_size, "raster-size");
+        parseRenderProperty(value, render.size, "raster-size");
         parseRenderProperty(value, render.blur, "raster-blur");
         parseRenderProperty(value, render.buffer, "raster-buffer");
         if (layer->layers) {

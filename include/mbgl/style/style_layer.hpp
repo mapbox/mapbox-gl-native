@@ -4,7 +4,6 @@
 #include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/style/class_properties.hpp>
 #include <mbgl/style/style_properties.hpp>
-#include <mbgl/style/rasterize_properties.hpp>
 #include <mbgl/style/applied_class_properties.hpp>
 
 #include <vector>
@@ -78,11 +77,6 @@ public:
     // Stores the evaluated, and cascaded styling information, specific to this
     // layer's type.
     StyleProperties properties;
-
-    // Rasterization properties are used for prerendering the tile to a bitmap,
-    // which is then used as a raster image instead of rendering this layer
-    // directly in every frame.
-//    const std::unique_ptr<const RasterizeProperties> rasterize;
 
     // Child layer array (if this layer has child layers).
     std::shared_ptr<StyleLayerGroup> layers;

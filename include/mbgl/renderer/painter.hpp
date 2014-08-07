@@ -40,7 +40,8 @@ class FillBucket;
 class LineBucket;
 class SymbolBucket;
 class RasterBucket;
-
+class PrerenderedTexture;
+    
 struct FillProperties;
 struct CompositeProperties;
 
@@ -84,15 +85,13 @@ public:
     void renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
     void renderSymbol(SymbolBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
     void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
-    void renderRaster(GLuint texture, const RasterizeProperties &properties); // do I want to save that?
 
-    void preparePrerender(PrerenderedTexture &texture);
-    void finishPrerender(PrerenderedTexture &texture);
+    void preparePrerender(RasterBucket &bucket);
+    void finishPrerender(RasterBucket &bucket);
 
-    template <typename Properties>
-    void renderPrerenderedTexture(PrerenderedTexture &texture, const Properties &properties);
+    void renderPrerenderedTexture(RasterBucket &bucket);
     
-    void createPrerendered(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const RasterizeProperties& properties);
+    void createPrerendered(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
 
     void resize();
 

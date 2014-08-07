@@ -26,6 +26,7 @@ public:
     virtual bool hasData(std::shared_ptr<StyleLayer> layer_desc) const;
 
 protected:
+    StyleBucketRaster properties;
     RasterBucket bucket;
 };
 

@@ -14,6 +14,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/text/glyph.hpp>
+#include <mbgl/map/map.hpp>
 
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/utf.hpp>
@@ -44,6 +45,7 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile,
       spriteAtlas(spriteAtlas),
       sprite(sprite),
       collision(tile.id.z, 4096, tile.source.tile_size, tile.depth) {
+//      placement(tile.id.z, tile.id.z >= tile.source.max_zoom ? tile.source.max_zoom - tile.id.z : 1) {                // TODO : i'm guessing remove this in the rebase?
 }
 
 void TileParser::parse() {
@@ -116,7 +118,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(std::shared_ptr<StyleBucket> bu
         }
     } else if (bucket_desc->render.is<StyleBucketRaster>()) {
         // Assume this is a prerendered raster layer -- TODO more thorough checking here??
-        return createRasterBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketRaster>());
+        return createRasterBucket(texturePool, bucket_desc->render.get<StyleBucketRaster>());
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
         if (debug::tileParseWarnings) {
@@ -152,9 +154,8 @@ std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& laye
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createRasterBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketRaster &raster) {
-    std::unique_ptr<RasterBucket> bucket = std::make_unique<RasterBucket>(raster);
-//    addBucketFeatures(bucket, layer, filter);
+std::unique_ptr<Bucket> TileParser::createRasterBucket(const std::shared_ptr<Texturepool> &texturepool, const StyleBucketRaster &raster) {
+    std::unique_ptr<RasterBucket> bucket = std::make_unique<RasterBucket>(texturepool, raster);
     return obsolete() ? nullptr : std::move(bucket);
 }
 

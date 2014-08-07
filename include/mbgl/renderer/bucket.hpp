@@ -5,7 +5,6 @@
 #include <memory>
 #include <mbgl/map/tile.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/renderer/prerendered_texture.hpp>
 
 namespace mbgl {
 
@@ -18,7 +17,6 @@ public:
     virtual bool hasData() const = 0;
     virtual ~Bucket() {}
 
-    std::unique_ptr<PrerenderedTexture> prerendered;
 };
 
 }

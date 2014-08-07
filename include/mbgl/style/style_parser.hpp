@@ -6,7 +6,6 @@
 #include <mbgl/style/style_source.hpp>
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/style/class_properties.hpp>
-#include <mbgl/style/rasterize_properties.hpp>
 #include <mbgl/style/style_bucket.hpp>
 
 #include <unordered_map>
@@ -52,7 +51,6 @@ private:
     void parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair);
     void parseStyles(JSVal value, std::map<ClassID, ClassProperties> &styles);
     void parseStyle(JSVal, ClassProperties &properties);
-    std::unique_ptr<RasterizeProperties> parseRasterize(JSVal value);
     void parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer);
     void parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer);

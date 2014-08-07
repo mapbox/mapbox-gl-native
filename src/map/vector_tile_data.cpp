@@ -58,9 +58,6 @@ void VectorTileData::render(Painter &painter, std::shared_ptr<StyleLayer> layer_
         if (databucket_it != buckets.end()) {
             assert(databucket_it->second);
             databucket_it->second->render(painter, layer_desc, id);
-        } else if (layer_desc->type == StyleLayerType::Raster && layer_desc->layers) {
-//            HELP
-
         }
     }
 }

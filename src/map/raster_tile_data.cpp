@@ -7,7 +7,7 @@ using namespace mbgl;
 
 RasterTileData::RasterTileData(Tile::ID id, Map &map, const SourceInfo &source)
     : TileData(id, map, source),
-    bucket(map.getTexturepool()) {
+    bucket(map.getTexturepool(), properties) {
 }
 
 RasterTileData::~RasterTileData() {

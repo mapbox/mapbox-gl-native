@@ -83,7 +83,7 @@ public:
 class StyleBucketRaster {
 public:
     bool prerendered = false;
-    uint16_t raster_size = 256;
+    uint16_t size = 256;
     float blur = 0.0f;
     float buffer = 0.03125f;
 };
