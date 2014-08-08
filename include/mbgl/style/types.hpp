@@ -34,6 +34,13 @@ MBGL_DEFINE_ENUM_CLASS(StyleLayerTypeClass, StyleLayerType, {
     { StyleLayerType(-1), "unknown" },
 });
 
+typedef struct {
+    std::string from;
+    std::string to;
+    float fromScale;
+    float toScale;
+    float t;
+} LinePattern;
 
 enum class WindingType : uint8_t {
     EvenOdd,

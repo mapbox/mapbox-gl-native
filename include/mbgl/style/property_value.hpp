@@ -13,7 +13,9 @@ typedef util::variant<
     RotateAnchorType,
     Function<bool>,
     Function<float>,
-    Function<Color>
+    Function<Color>,
+    LinePattern
+    //Function<LinePattern>
 > PropertyValue;
 
 }

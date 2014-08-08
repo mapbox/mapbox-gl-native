@@ -31,6 +31,7 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 
     const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
 
+    fprintf(stderr, "linepattern t %f\n", properties.dasharray.t);
     glDepthRange(strata, 1.0f);
 
     // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
@@ -63,6 +64,17 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 
     if (properties.dash_array[1] >= 0) {
         LineAtlas &lineAtlas = *map.getLineAtlas();
+
+        float tilePixelRatio = map.getState().getScale() / (1 << 15) / 8.0;
+
+        float width = 7.0;
+        float height = 0.0;
+        float scale = 1.0;
+
+        float gammaA = 512.0 / (scale * width * 256 * map.getState().getPixelRatio());
+        float gammaB = 512.0 / (scale * width * 256 * map.getState().getPixelRatio());
+        float gamma = (gammaA + gammaB) / 2;
+
         useProgram(lineSDFShader->program);
         lineSDFShader->setMatrix(vtxMatrix);
         lineSDFShader->setExtrudeMatrix(extrudeMatrix);
@@ -70,11 +82,11 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         lineSDFShader->setBlur(blur);
         lineSDFShader->setColor(color);
         lineSDFShader->setFade(0);
-        lineSDFShader->setPatternScaleA({{1.0 / 40.0, 0}});
-        lineSDFShader->setPatternScaleB({{1.0 / 40.0, 0}});
+        lineSDFShader->setPatternScaleA({{ tilePixelRatio / width / scale, height }});
+        lineSDFShader->setPatternScaleB({{ tilePixelRatio / width / scale, height }});
         lineSDFShader->setTexYA(0.5 / 512.0);
         lineSDFShader->setTexYB(0.5 / 512.0);
-        lineSDFShader->setGamma(0.0);
+        lineSDFShader->setGamma(gamma);
         lineAtlas.bind();
         bucket.drawLines(*lineSDFShader);
     } else if (imagePos) {

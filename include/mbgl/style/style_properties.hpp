@@ -38,6 +38,7 @@ struct LineProperties {
     float blur = 0;
     std::array<float, 2> dash_array = {{ 1, -1 }};
     std::string image;
+    LinePattern dasharray = {};
 
     inline bool isVisible() const {
         return opacity > 0 && color[3] > 0 && width > 0;
