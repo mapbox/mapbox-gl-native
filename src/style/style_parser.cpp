@@ -366,7 +366,7 @@ template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value,
 }
 
 // parsing Pattern Prop
-template<> std::tuple<bool, LinePattern> StyleParser::parseProperty(JSVal value, const char *property_name, PropertyValue &propertyValue) {
+template<> std::tuple<bool, Function<LinePattern>> StyleParser::parseProperty(JSVal value, const char *property_name, PropertyValue &propertyValue) {
     /*
     if (!value.IsString()) {
         fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
@@ -379,8 +379,12 @@ template<> std::tuple<bool, LinePattern> StyleParser::parseProperty(JSVal value,
     //ureturn std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
     //return std::tuple<bool, Function<bool>> { true, ConstantFunction<bool>(value.GetDouble()) };
     LinePattern l;
-    l.t = 3.0;
-    return std::tuple<bool, LinePattern> { true, l };
+    l.t = 4.0;
+    float base = defaultBaseValue<LinePattern>();
+    std::vector<std::pair<float, LinePattern>> stops;
+    stops.emplace_back(1.0, l);
+
+    return std::tuple<bool, Function<LinePattern>> { true, StopsFunction<LinePattern>(stops, base) };
 }
 
 template<> std::tuple<bool, TranslateAnchorType> StyleParser::parseProperty(JSVal value, const char *property_name) {
@@ -628,7 +632,7 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<std::string>("line-image", Key::LineImage, klass, value);
     auto it = klass.properties.find(Key::LineWidth);
     if (it != klass.properties.end()) {
-        parseOptionalProperty<LinePattern>("line-dasharray", Key::LineDasharray, klass, value, it->second);
+        parseOptionalProperty<Function<LinePattern>>("line-dasharray", Key::LineDasharray, klass, value, it->second);
     }
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);

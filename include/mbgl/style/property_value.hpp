@@ -14,8 +14,7 @@ typedef util::variant<
     Function<bool>,
     Function<float>,
     Function<Color>,
-    LinePattern
-    //Function<LinePattern>
+    Function<LinePattern>
 > PropertyValue;
 
 }

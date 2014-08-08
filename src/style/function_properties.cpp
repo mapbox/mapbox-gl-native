@@ -29,14 +29,12 @@ inline Color interpolate(const Color smaller, const Color larger, const float fa
     }};
 }
 
-/*
 template <>
 inline LinePattern interpolate(const LinePattern smaller, const LinePattern larger, const float factor) {
     LinePattern p {};
     p.t = smaller.t;
     return p;
 };
-*/
 
 
 template <typename T>
@@ -45,6 +43,7 @@ inline T defaultStopsValue();
 template <> inline bool defaultStopsValue() { return true; }
 template <> inline float defaultStopsValue() { return 1.0f; }
 template <> inline Color defaultStopsValue() { return {{ 0, 0, 0, 1 }}; }
+template <> inline LinePattern defaultStopsValue() { return LinePattern{}; }
 
 
 template <typename T>
@@ -72,7 +71,7 @@ T StopsFunction<T>::evaluate(float z) const {
     }
 
     if (smaller && larger) {
-        if (larger_z == smaller_z || larger_val == smaller_val) {
+        if (larger_z == smaller_z) {
             return smaller_val;
         }
         const float zoomDiff = larger_z - smaller_z;
@@ -97,5 +96,6 @@ T StopsFunction<T>::evaluate(float z) const {
 template bool StopsFunction<bool>::evaluate(float z) const;
 template float StopsFunction<float>::evaluate(float z) const;
 template Color StopsFunction<Color>::evaluate(float z) const;
+template LinePattern StopsFunction<LinePattern>::evaluate(float z) const;
 
 }
