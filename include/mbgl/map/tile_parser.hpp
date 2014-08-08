@@ -37,7 +37,6 @@ public:
                const std::shared_ptr<GlyphStore> &glyphStore,
                const std::shared_ptr<SpriteAtlas> &spriteAtlas,
                const std::shared_ptr<Sprite> &sprite);
-               const std::shared_ptr<Texturepool> &texturepool);
 
 public:
     void parse();
