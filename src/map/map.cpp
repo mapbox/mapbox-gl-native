@@ -18,6 +18,7 @@
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/texturepool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/util/filesource.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -29,15 +30,16 @@
 using namespace mbgl;
 
 Map::Map(View& view)
-    : view(view),
+    : loop(std::make_shared<uv::loop>()),
+      view(view),
       transform(view),
+      fileSource(std::make_shared<FileSource>(loop)),
       style(std::make_shared<Style>()),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
-      glyphStore(std::make_shared<GlyphStore>()),
+      glyphStore(std::make_shared<GlyphStore>(fileSource)),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
-      painter(*this),
-      loop(std::make_shared<uv::loop>()) {
+      painter(*this) {
 
     view.initialize(this);
 
@@ -184,10 +186,11 @@ void Map::setup() {
     painter.setup();
 }
 
-void Map::setStyleJSON(std::string newStyleJSON) {
+void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     styleJSON.swap(newStyleJSON);
     sprite.reset();
     style->loadJSON((const uint8_t *)styleJSON.c_str());
+    fileSource->setBase(base);
     glyphStore->setURL(style->glyph_url);
     update();
 }
@@ -208,7 +211,7 @@ std::shared_ptr<Sprite> Map::getSprite() {
     const float pixelRatio = state.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
     if (!sprite || sprite->pixelRatio != pixelRatio) {
-        sprite = Sprite::Create(sprite_url, pixelRatio);
+        sprite = Sprite::Create(sprite_url, pixelRatio, fileSource);
     }
 
     return sprite;
