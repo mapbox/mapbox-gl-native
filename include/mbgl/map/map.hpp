@@ -46,6 +46,9 @@ public:
     void rerender();
 
     void renderLayers(std::shared_ptr<StyleLayerGroup> group);
+    enum RenderPass { Opaque, Translucent };
+
+    void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass);
     
     // Forces a map update: always triggers a rerender.
     void update();
@@ -148,11 +151,9 @@ private:
     // the stylesheet.
     void prepare();
 
-    enum RenderPass { Opaque, Translucent };
 
     // Unconditionally performs a render with the current map state.
     void render();
-    void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass);
 
 private:
     bool async = false;

@@ -1,8 +1,11 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/map/map.hpp>
+
+#include <iterator>
 
 using namespace mbgl;
 
@@ -19,25 +22,35 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
             
             preparePrerender(bucket);
 
-            const RasterProperties modifiedProperties = [&]{
-                RasterProperties modifiedProperties = properties;
-                modifiedProperties.opacity = 1;   // figure out why this was here
-                return modifiedProperties;
-            }();
+//            const RasterProperties modifiedProperties = [&]{
+//                RasterProperties modifiedProperties = properties;
+//                modifiedProperties.opacity = 1;   // figure out why this was here
+//                return modifiedProperties;
+//            }();
 
             const int buffer = bucket.properties.buffer * 4096.0f;
             
-//            const mat4 vtxMatrix = [&]{
-//                mat4 vtxMatrix;
-//                matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
-//                matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
-//                return vtxMatrix;
-//            }();
+            const mat4 oldMatrix = matrix;
             
-//            TODO set  painter->matrix = vtxMatrix;  ?
+            const mat4 preMatrix = [&]{
+                mat4 vtxMatrix;
+                matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
+                matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
+                return vtxMatrix;
+            }();
             
+            matrix = preMatrix;
+            
+            // call updateTiles to get parsed data for sublayers
             map.updateTiles();
-            map.renderLayers(layer_desc->layers);
+            
+            int i = 0;
+            for (auto it = layer_desc->layers->layers.begin(), end = layer_desc->layers->layers.end(); it != end; ++it, --i) {
+                setOpaque();
+                map.renderLayer(*it, Map::RenderPass::Opaque);
+                setTranslucent();
+                map.renderLayer(*it, Map::RenderPass::Translucent);
+            }
 
             if (bucket.properties.blur > 0) {
                 bucket.texture.blur(*this, bucket.properties.blur);
@@ -46,6 +59,8 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
             bucket.texture.unbindFramebuffer();
             finishPrerender(bucket);
 
+            matrix = oldMatrix;
+            
         }
         
         renderPrerenderedTexture(bucket);
