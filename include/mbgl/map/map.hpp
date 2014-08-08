@@ -48,8 +48,7 @@ public:
     void renderLayers(std::shared_ptr<StyleLayerGroup> group);
     enum RenderPass { Opaque, Translucent };
 
-    void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass);
-    void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, Tile::ID id);
+    void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id = nullptr);
     
     // Forces a map update: always triggers a rerender.
     void update();

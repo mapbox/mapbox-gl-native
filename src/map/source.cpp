@@ -87,6 +87,13 @@ void Source::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc) {
         }
     }
 }
+    
+void Source::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id) {
+    auto it = tiles.find(id);
+    if (it != tiles.end() && it->second->data && it->second->data->state == TileData::State::parsed) {
+        painter.renderTileLayer(*it->second, layer_desc);
+    }
+}
 
 void Source::finishRender(Painter &painter) {
     for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {

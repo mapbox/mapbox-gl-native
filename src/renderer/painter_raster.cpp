@@ -32,7 +32,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
             
             const mat4 oldMatrix = vtxMatrix;
             
-            const mat4 preMatrix = [&]{
+            const mat4 vtxMatrix = [&]{
                 mat4 vtxMatrix;
                 matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
                 matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
@@ -42,22 +42,24 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
 //            *id.matrix = vtxMatrix;
 
             
-            map.state.matrixFor(matrix, id);
-            matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
-            matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
             
             
 //            glUniformMatrix4fv(matrix, 1, GL_FALSE, preMatrix.data());
             
             // call updateTiles to get parsed data for sublayers
             map.updateTiles();
+
+//            map.state.matrixFor(matrix, id);
+//            matrix::ortho(matrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
+//            matrix::translate(matrix, matrix, 0, -4096, 0);
+
             
             int i = 0;
             for (auto it = layer_desc->layers->layers.begin(), end = layer_desc->layers->layers.end(); it != end; ++it, --i) {
                 setOpaque();
-                map.renderLayer(*it, Map::RenderPass::Opaque);
+                map.renderLayer(*it, Map::RenderPass::Opaque, &id);
                 setTranslucent();
-                map.renderLayer(*it, Map::RenderPass::Translucent);
+                map.renderLayer(*it, Map::RenderPass::Translucent, &id);
             }
             
 //            TODO make a separate renderLayer overload that takes a prerendered + tileID
