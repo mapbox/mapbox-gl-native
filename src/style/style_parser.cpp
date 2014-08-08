@@ -365,6 +365,13 @@ template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value,
     return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
 }
 
+float getStretch(float z) {
+    return z;
+}
+
+float bisect(float lowZ, float highZ) {
+}
+
 // parsing Pattern Prop
 template<> std::tuple<bool, Function<LinePattern>> StyleParser::parseProperty(JSVal value, const char *property_name, PropertyValue &propertyValue) {
     /*
@@ -382,7 +389,18 @@ template<> std::tuple<bool, Function<LinePattern>> StyleParser::parseProperty(JS
     l.t = 4.0;
     float base = defaultBaseValue<LinePattern>();
     std::vector<std::pair<float, LinePattern>> stops;
-    stops.emplace_back(1.0, l);
+
+
+    float maxStretch = 1.5;
+    float lineWidth = 10.0;
+    float prevZ = 0;
+    float prevWidth = lineWidth;
+ 
+    for (float i = 1.0; i < 25; i += 1.0) {
+        LinePattern l;
+        l.t = i;
+        stops.emplace_back(i, l);
+    }
 
     return std::tuple<bool, Function<LinePattern>> { true, StopsFunction<LinePattern>(stops, base) };
 }

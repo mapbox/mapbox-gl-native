@@ -67,12 +67,14 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 
         float tilePixelRatio = map.getState().getScale() / (1 << 15) / 8.0;
 
+        const LinePattern &p = properties.dasharray;
+
         float width = 7.0;
         float height = 0.0;
         float scale = 1.0;
 
-        float gammaA = 512.0 / (scale * width * 256 * map.getState().getPixelRatio());
-        float gammaB = 512.0 / (scale * width * 256 * map.getState().getPixelRatio());
+        float gammaA = 512.0 / (p.fromScale * width * 256 * map.getState().getPixelRatio());
+        float gammaB = 512.0 / (p.toScale * width * 256 * map.getState().getPixelRatio());
         float gamma = (gammaA + gammaB) / 2;
 
         useProgram(lineSDFShader->program);
@@ -81,9 +83,9 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         lineSDFShader->setLineWidth({{ 10 * outset, inset }});
         lineSDFShader->setBlur(blur);
         lineSDFShader->setColor(color);
-        lineSDFShader->setFade(0);
-        lineSDFShader->setPatternScaleA({{ tilePixelRatio / width / scale, height }});
-        lineSDFShader->setPatternScaleB({{ tilePixelRatio / width / scale, height }});
+        lineSDFShader->setFade(p.t);
+        lineSDFShader->setPatternScaleA({{ tilePixelRatio / width / p.fromScale, height }});
+        lineSDFShader->setPatternScaleB({{ tilePixelRatio / width / p.toScale, height }});
         lineSDFShader->setTexYA(0.5 / 512.0);
         lineSDFShader->setTexYB(0.5 / 512.0);
         lineSDFShader->setGamma(gamma);

@@ -32,7 +32,9 @@ inline Color interpolate(const Color smaller, const Color larger, const float fa
 template <>
 inline LinePattern interpolate(const LinePattern smaller, const LinePattern larger, const float factor) {
     LinePattern p {};
-    p.t = smaller.t;
+    p.t = factor;
+    p.fromScale = 1.0 + factor;
+    p.toScale = (1.0 + factor) / 2.0;
     return p;
 };
 
