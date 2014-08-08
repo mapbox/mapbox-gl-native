@@ -18,7 +18,7 @@ class RasterBucket : public Bucket {
 public:
     RasterBucket(const std::shared_ptr<Texturepool> &texturepool, const StyleBucketRaster& properties);
     
-    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     virtual bool hasData() const;
 
     bool setImage(const std::string &data);

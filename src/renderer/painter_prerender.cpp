@@ -27,7 +27,7 @@ void Painter::finishPrerender(RasterBucket &bucket) {
     glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
 }
 
-void Painter::renderPrerenderedTexture(RasterBucket &bucket) {
+void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix) {
     const int buffer = bucket.properties.buffer * 4096.0f;
       
     // draw the texture on a quad

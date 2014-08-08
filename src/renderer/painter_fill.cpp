@@ -146,10 +146,10 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
     }
 }
 
-void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
+void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
     // Abort early.
     if (!bucket.hasData()) return;
     const FillProperties &properties = layer_desc->getProperties<FillProperties>();
-    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
+    const mat4 &vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
     renderFill(bucket, properties, id, vtxMatrix);
 }

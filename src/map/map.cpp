@@ -633,7 +633,7 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
     }
 }
 
-void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id) {
+void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id, const mat4* matrix) {
     if (layer_desc->layers && layer_desc->type != StyleLayerType::Raster) {
         // This is a layer group. We render them during our translucent render pass.
         if (pass == Translucent) {
@@ -719,7 +719,7 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, c
         if (!id) {
             style_source.source->render(painter, layer_desc);
         } else {
-            style_source.source->render(painter, layer_desc, *id);
+            style_source.source->render(painter, layer_desc, *id, *matrix);
         }
     }
 }

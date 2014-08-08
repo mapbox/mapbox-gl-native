@@ -52,12 +52,12 @@ void VectorTileData::afterParse() {
     parser.reset();
 }
 
-void VectorTileData::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc) {
+void VectorTileData::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix) {
     if (state == State::parsed && layer_desc->bucket) {
         auto databucket_it = buckets.find(layer_desc->bucket->name);
         if (databucket_it != buckets.end()) {
             assert(databucket_it->second);
-            databucket_it->second->render(painter, layer_desc, id);
+            databucket_it->second->render(painter, layer_desc, id, matrix);
         }
     }
 }

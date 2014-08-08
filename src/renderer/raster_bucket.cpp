@@ -9,8 +9,8 @@ RasterBucket::RasterBucket(const std::shared_ptr<Texturepool> &texturepool, cons
   raster(texturepool) {
 }
 
-void RasterBucket::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id) {
-    painter.renderRaster(*this, layer_desc, id);
+void RasterBucket::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix) {
+    painter.renderRaster(*this, layer_desc, id, matrix);
 }
 
 bool RasterBucket::setImage(const std::string &data) {

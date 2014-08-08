@@ -9,7 +9,7 @@
 
 using namespace mbgl;
 
-void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
+void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
     if (pass != Translucent) return;
     
     const RasterProperties &properties = layer_desc->getProperties<RasterProperties>();
@@ -32,7 +32,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
             
             const mat4 oldMatrix = vtxMatrix;
             
-            const mat4 vtxMatrix = [&]{
+            const mat4 preMatrix = [&]{
                 mat4 vtxMatrix;
                 matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
                 matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
@@ -57,9 +57,9 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
             int i = 0;
             for (auto it = layer_desc->layers->layers.begin(), end = layer_desc->layers->layers.end(); it != end; ++it, --i) {
                 setOpaque();
-                map.renderLayer(*it, Map::RenderPass::Opaque, &id);
+                map.renderLayer(*it, Map::RenderPass::Opaque, &id, &preMatrix);
                 setTranslucent();
-                map.renderLayer(*it, Map::RenderPass::Translucent, &id);
+                map.renderLayer(*it, Map::RenderPass::Translucent, &id, &preMatrix);
             }
             
 //            TODO make a separate renderLayer overload that takes a prerendered + tileID
@@ -75,7 +75,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
             
         }
         
-        renderPrerenderedTexture(bucket);
+        renderPrerenderedTexture(bucket, matrix);
 
     }
 

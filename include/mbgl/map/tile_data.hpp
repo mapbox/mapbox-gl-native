@@ -53,7 +53,7 @@ public:
     virtual void beforeParse();
     virtual void parse() = 0;
     virtual void afterParse();
-    virtual void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc) = 0;
+    virtual void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix) = 0;
     virtual bool hasData(std::shared_ptr<StyleLayer> layer_desc) const = 0;
 
 

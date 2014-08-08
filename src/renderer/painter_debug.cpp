@@ -10,12 +10,12 @@ void Painter::renderTileDebug(const Tile& tile) {
     assert(tile.data);
     if (debug) {
         prepareTile(tile);
-        renderDebugText(tile.data->debugBucket);
-        renderDebugFrame();
+        renderDebugText(tile.data->debugBucket, tile.matrix);
+        renderDebugFrame(tile.matrix);
     }
 }
 
-void Painter::renderDebugText(DebugBucket& bucket) {
+void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
     gl::group group("debug text");
 
     glDisable(GL_DEPTH_TEST);
@@ -42,7 +42,7 @@ void Painter::renderDebugText(DebugBucket& bucket) {
     glEnable(GL_DEPTH_TEST);
 }
 
-void Painter::renderDebugFrame() {
+void Painter::renderDebugFrame(const mat4 &matrix) {
     gl::group group("debug frame");
 
     // Disable depth test and don't count this towards the depth buffer,
