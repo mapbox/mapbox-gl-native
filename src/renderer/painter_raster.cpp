@@ -5,8 +5,6 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/map/map.hpp>
 
-#include <iterator>
-
 using namespace mbgl;
 
 void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
