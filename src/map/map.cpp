@@ -169,7 +169,7 @@ void Map::render(uv_async_t *async) {
 void Map::terminate(uv_async_t *async) {
     // Closes all open handles on the loop. This means that the loop will automatically terminate.
     uv_loop_t *loop = static_cast<uv_loop_t *>(async->data);
-    uv_walk(loop, [](uv_handle_t *handle, void *arg) {
+    uv_walk(loop, [](uv_handle_t *handle, void */*arg*/) {
         if (!uv_is_closing(handle)) {
             uv_close(handle, NULL);
         }

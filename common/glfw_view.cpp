@@ -202,7 +202,7 @@ void GLFWView::swap() {
     glfwSetWindowTitle(window, title.c_str());
 }
 
-void GLFWView::notify_map_change(mbgl::MapChange change, mbgl::timestamp delay) {
+void GLFWView::notify_map_change(mbgl::MapChange /*change*/, mbgl::timestamp /*delay*/) {
     // no-op
 }
 

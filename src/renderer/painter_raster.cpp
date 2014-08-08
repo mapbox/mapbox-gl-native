@@ -5,10 +5,10 @@
 
 using namespace mbgl;
 
-void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& /*id*/) {
+void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> /*layer_desc*/, const Tile::ID& /*id*/) {
     if (pass == Translucent) return;
 
-    const RasterProperties &properties = layer_desc->getProperties<RasterProperties>();
+    // const RasterProperties &properties = layer_desc->getProperties<RasterProperties>();
 
     depthMask(false);
 
