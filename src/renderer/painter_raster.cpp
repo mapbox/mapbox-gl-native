@@ -7,39 +7,47 @@
 using namespace mbgl;
 
 void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
-    if (pass == Translucent) return;
+    if (pass != Translucent) return;
     
     const RasterProperties &properties = layer_desc->getProperties<RasterProperties>();
     
     if (layer_desc->layers) {
-
-        bucket.texture.bindFramebuffer();
         
-        preparePrerender(bucket);
+        if (!bucket.texture.getTexture()) {
 
-        const RasterProperties modifiedProperties = [&]{
-            RasterProperties modifiedProperties = properties;
-            modifiedProperties.opacity = 1;   // figure out why this was here
-            return modifiedProperties;
-        }();
+            bucket.texture.bindFramebuffer();
+            
+            preparePrerender(bucket);
 
-        const int buffer = bucket.properties.buffer * 4096.0f;
-        
-        const mat4 vtxMatrix = [&]{
-            mat4 vtxMatrix;
-            matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
-            matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
-            return vtxMatrix;
-        }();
-        
-        map.renderLayers(layer_desc->layers);
+            const RasterProperties modifiedProperties = [&]{
+                RasterProperties modifiedProperties = properties;
+                modifiedProperties.opacity = 1;   // figure out why this was here
+                return modifiedProperties;
+            }();
 
-        if (bucket.properties.blur > 0) {
-            bucket.texture.blur(*this, bucket.properties.blur);
+            const int buffer = bucket.properties.buffer * 4096.0f;
+            
+//            const mat4 vtxMatrix = [&]{
+//                mat4 vtxMatrix;
+//                matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
+//                matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
+//                return vtxMatrix;
+//            }();
+            
+//            TODO set  painter->matrix = vtxMatrix;  ?
+            
+            map.updateTiles();
+            map.renderLayers(layer_desc->layers);
+
+            if (bucket.properties.blur > 0) {
+                bucket.texture.blur(*this, bucket.properties.blur);
+            }
+
+            bucket.texture.unbindFramebuffer();
+            finishPrerender(bucket);
+
         }
-
-        bucket.texture.unbindFramebuffer();
-        finishPrerender(bucket);
+        
         renderPrerenderedTexture(bucket);
 
     }
@@ -55,7 +63,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
     glDepthRange(strata + strata_epsilon, 1.0f);
     
     if (!bucket.hasData()) {
-        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray, bucket.texture.getTexture());
+//        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray, bucket.texture.getTexture());
     } else {
         bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
     }

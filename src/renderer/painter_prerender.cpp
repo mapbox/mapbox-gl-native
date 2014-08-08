@@ -14,6 +14,7 @@ void Painter::preparePrerender(RasterBucket &bucket) {
     const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
     glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
 #endif
+    glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glViewport(0, 0, bucket.properties.size, bucket.properties.size);
@@ -28,7 +29,7 @@ void Painter::finishPrerender(RasterBucket &bucket) {
 
 void Painter::renderPrerenderedTexture(RasterBucket &bucket) {
     const int buffer = bucket.properties.buffer * 4096.0f;
-    
+      
     // draw the texture on a quad
     useProgram(rasterShader->program);
     rasterShader->setMatrix(matrix);

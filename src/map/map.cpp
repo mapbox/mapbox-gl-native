@@ -705,7 +705,7 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
                 if (!layer_desc->getProperties<SymbolProperties>().isVisible()) return;
                 break;
             case StyleLayerType::Raster:
-                if (pass == Translucent) return;
+                if (pass == Opaque) return;
                 if (!layer_desc->getProperties<RasterProperties>().isVisible()) return;
                 break;
             default:
