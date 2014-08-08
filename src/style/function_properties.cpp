@@ -33,8 +33,10 @@ template <>
 inline LinePattern interpolate(const LinePattern smaller, const LinePattern larger, const float factor) {
     LinePattern p {};
     p.t = factor;
-    p.fromScale = 1.0 + factor;
-    p.toScale = (1.0 + factor) / 2.0;
+    p.fromScale = smaller.fromScale;
+    p.toScale = larger.fromScale;
+    p.fromZ = smaller.fromZ;
+    p.toZ = larger.fromZ;
     return p;
 };
 

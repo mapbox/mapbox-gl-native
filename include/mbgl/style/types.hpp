@@ -39,6 +39,8 @@ typedef struct {
     std::string to;
     float fromScale;
     float toScale;
+    float fromZ;
+    float toZ;
     float t;
 } LinePattern;
 

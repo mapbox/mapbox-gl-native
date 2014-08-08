@@ -365,11 +365,24 @@ template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value,
     return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
 }
 
-float getStretch(float z) {
-    return z;
+float getStretch(float z, float width, float prevZ, float prevWidth) {
+    float stretchX = std::pow(2, z - prevZ);
+    float stretchY = width / prevWidth;
+    return stretchX / stretchY;
 }
 
-float bisect(float lowZ, float highZ) {
+float bisect(float lowZ, float highZ, float prevZ, float prevWidth, float lineWidth, float maxStretch) {
+    float z = (lowZ + highZ) / 2;
+    float width = lineWidth;
+    float stretch = getStretch(z, width, prevZ, prevWidth);
+
+    if (fabs(stretch - maxStretch) < 0.001) {
+        return z;
+    } else if (stretch > maxStretch) {
+        return bisect(lowZ, z, prevZ, prevWidth, lineWidth, maxStretch);
+    } else {
+        return bisect(z, highZ, prevZ, prevWidth, lineWidth, maxStretch);
+    }
 }
 
 // parsing Pattern Prop
@@ -395,11 +408,21 @@ template<> std::tuple<bool, Function<LinePattern>> StyleParser::parseProperty(JS
     float lineWidth = 10.0;
     float prevZ = 0;
     float prevWidth = lineWidth;
- 
-    for (float i = 1.0; i < 25; i += 1.0) {
-        LinePattern l;
-        l.t = i;
-        stops.emplace_back(i, l);
+    float maxZoom = 25;
+    float increment = 0.1;
+    float z = increment;
+
+    while (z < maxZoom) {
+        float stretch = getStretch(z, lineWidth, prevZ, prevWidth);
+        if (stretch >= maxStretch) {
+            prevZ = bisect(z - increment, z, prevZ, prevWidth, lineWidth, maxStretch);
+            prevWidth = lineWidth;
+            LinePattern l;
+            l.fromScale = lineWidth;
+            l.fromZ = prevZ;
+            stops.emplace_back(prevZ, l);
+        }
+        z += increment;
     }
 
     return std::tuple<bool, Function<LinePattern>> { true, StopsFunction<LinePattern>(stops, base) };
