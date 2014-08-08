@@ -1,9 +1,11 @@
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/platform/gl.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/transform.hpp>
 
 using namespace mbgl;
 
@@ -28,7 +30,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
 
             const int buffer = bucket.properties.buffer * 4096.0f;
             
-            const mat4 oldMatrix = matrix;
+            const mat4 oldMatrix = vtxMatrix;
             
             const mat4 preMatrix = [&]{
                 mat4 vtxMatrix;
@@ -37,7 +39,15 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
                 return vtxMatrix;
             }();
             
-            matrix = preMatrix;
+//            *id.matrix = vtxMatrix;
+
+            
+            map.state.matrixFor(matrix, id);
+            matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
+            matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
+            
+            
+//            glUniformMatrix4fv(matrix, 1, GL_FALSE, preMatrix.data());
             
             // call updateTiles to get parsed data for sublayers
             map.updateTiles();
@@ -49,6 +59,8 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
                 setTranslucent();
                 map.renderLayer(*it, Map::RenderPass::Translucent);
             }
+            
+//            TODO make a separate renderLayer overload that takes a prerendered + tileID
 
             if (bucket.properties.blur > 0) {
                 bucket.texture.blur(*this, bucket.properties.blur);
@@ -57,7 +69,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
             bucket.texture.unbindFramebuffer();
             finishPrerender(bucket);
 
-            matrix = oldMatrix;
+//            Tile(id).matrix = oldMatrix;
             
         }
         

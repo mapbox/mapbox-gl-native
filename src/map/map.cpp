@@ -719,3 +719,65 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass) {
         style_source.source->render(painter, layer_desc);
     }
 }
+
+//void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, Tile::ID &id) {
+//    if (!layer_desc->bucket) {
+//        fprintf(stderr, "[WARNING] layer '%s' is missing bucket\n", layer_desc->id.c_str());
+//        return;
+//    }
+//    
+//    if (!layer_desc->bucket->style_source) {
+//        fprintf(stderr, "[WARNING] can't find source for layer '%s'\n", layer_desc->id.c_str());
+//        return;
+//    }
+//    
+//    StyleSource &style_source = *layer_desc->bucket->style_source;
+//    
+//    // Skip this layer if there is no data.
+//    if (!style_source.source) {
+//        return;
+//    }
+//    
+//    // Skip this layer if it's outside the range of min/maxzoom.
+//    // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
+//    // is set to a fractional value, or value that is larger than the source maxzoom.
+//    const double zoom = state.getZoom();
+//    if (layer_desc->bucket->min_zoom > zoom ||
+//        layer_desc->bucket->max_zoom <= zoom) {
+//        return;
+//    }
+//    
+//    // Abort early if we can already deduce from the bucket type that
+//    // we're not going to render anything anyway during this pass.
+//    switch (layer_desc->type) {
+//        case StyleLayerType::Fill:
+//            if (!layer_desc->getProperties<FillProperties>().isVisible()) return;
+//            break;
+//        case StyleLayerType::Line:
+//            if (pass == Opaque) return;
+//            if (!layer_desc->getProperties<LineProperties>().isVisible()) return;
+//            break;
+//        case StyleLayerType::Icon:
+//            if (pass == Opaque) return;
+//            if (!layer_desc->getProperties<IconProperties>().isVisible()) return;
+//            break;
+//        case StyleLayerType::Text:
+//            if (pass == Opaque) return;
+//            if (!layer_desc->getProperties<TextProperties>().isVisible()) return;
+//            break;
+//        case StyleLayerType::Raster:
+//            if (pass == Opaque) return;
+//            if (!layer_desc->getProperties<RasterProperties>().isVisible()) return;
+//            break;
+//        default:
+//            break;
+//    }
+//    
+//    if (debug::renderTree) {
+//        std::cout << std::string(indent * 4, ' ') << "- " << layer_desc->id << " ("
+//        << layer_desc->type << ")" << std::endl;
+//    }
+////    style_source.source->render(painter, layer_desc);
+//    painter.renderTileLayer(id, layer_desc);
+//}
+

@@ -49,6 +49,7 @@ public:
     enum RenderPass { Opaque, Translucent };
 
     void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass);
+    void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, Tile::ID id);
     
     // Forces a map update: always triggers a rerender.
     void update();
@@ -178,10 +179,10 @@ private:
 
 public:
     View &view;
+    TransformState state;
 
 private:
     Transform transform;
-    TransformState state;
 
     std::shared_ptr<FileSource> fileSource;
 
