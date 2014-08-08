@@ -15,7 +15,7 @@ namespace mbgl {
 namespace util {
 
 namespace detail {
-const regex_impl::regex tokenRegex("\\{(\\w+)\\}");
+const regex_impl::regex tokenRegex("\\{([\\w-]+)\\}");
 const regex_impl::sregex_token_iterator tokensEnd = regex_impl::sregex_token_iterator();
 }
 
