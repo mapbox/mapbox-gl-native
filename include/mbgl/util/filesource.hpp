@@ -12,7 +12,7 @@ class loop;
 namespace mbgl {
 
 namespace platform {
-class Response;
+struct Response;
 }
 
 enum class ResourceType : uint8_t {

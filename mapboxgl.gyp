@@ -34,37 +34,42 @@
       }
     },
     {
-      'target_name': 'build_stylesheet',
+      'target_name': 'bundle_styles',
       'type': 'none',
       'hard_dependency': 1,
       'actions': [
         {
-          'action_name': 'Build Stylesheet',
+          'action_name': 'Touch Stylesheet Directory',
           'inputs': [
-            'bin/style.js',
+            'styles',
           ],
-          'outputs': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
-          ],
-          'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)']
+          'outputs': [],
+          'action': ['touch', 'styles'], # required for xcode http://openradar.appspot.com/7232149
         }
       ],
       'direct_dependent_settings': {
-        'sources': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
+        'mac_bundle_resources': [
+          'styles',
         ],
       }
     },
     {
-      'target_name': 'copy_default_stylesheet',
+      'target_name': 'copy_styles',
       'type': 'none',
       'hard_dependency': 1,
-      'dependencies': [
-        'build_stylesheet'
+      'actions': [
+        {
+          'action_name': 'Touch Stylesheet Directory',
+          'inputs': [
+            'styles',
+          ],
+          'outputs': [],
+          'action': ['touch', 'styles'], # required for xcode http://openradar.appspot.com/7232149
+        }
       ],
       'copies': [
         {
-          'files': [ '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js' ],
+          'files': [ 'styles' ],
           'destination': '<(PRODUCT_DIR)'
         }
       ]
@@ -86,7 +91,6 @@
       'type': 'static_library',
       'hard_dependency': 1,
       'dependencies': [
-          'build_stylesheet',
           'shaders',
       ],
       'sources': [
@@ -154,7 +158,6 @@
       'type': 'static_library',
       'hard_dependency': 1,
       'dependencies': [
-          'build_stylesheet',
           'shaders',
       ],
       'sources': [

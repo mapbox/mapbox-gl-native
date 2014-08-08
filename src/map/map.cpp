@@ -19,6 +19,7 @@
 #include <mbgl/util/texturepool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/util/filesource.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -185,6 +186,24 @@ void Map::setup() {
 
     painter.setup();
 }
+
+void Map::setStyleURL(const std::string &url) {
+    fileSource->load(ResourceType::JSON, url, [&](platform::Response *res) {
+        if (res->code == 200) {
+            // Calculate the base
+            const size_t pos = url.rfind('/');
+            std::string base = "";
+            if (pos != std::string::npos) {
+                base = url.substr(0, pos + 1);
+            }
+
+            this->setStyleJSON(res->body, base);
+        } else {
+            Log::Error(Event::Setup, "loading style failed: %d (%s)", res->code, res->error_message.c_str());
+        }
+    });
+}
+
 
 void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     styleJSON.swap(newStyleJSON);
