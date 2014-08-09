@@ -10,14 +10,11 @@
 #include <mbgl/geometry/lat_lng.hpp>
 
 #include <cstdint>
-#include <cmath>
-#include <forward_list>
-#include <memory>
+#include <functional>
 
 namespace mbgl {
 
 class View;
-namespace util { class transition; }
 
 class Transform : private util::noncopyable {
 public:
@@ -51,52 +48,33 @@ public:
     void panTo(const LatLng& center, timestamp duration);
     void zoomTo(double zoom, const LatLng& around, timestamp duration);
     void rotateTo(double bearing, const LatLng& around, timestamp duration);
-    void rotateBy(const Point& start, const Point& end, timestamp duration);
     void easeTo(const LatLng& center, double zoom, double bearing, timestamp duration);
     void flyTo(const LatLng& center, double zoom, double bearing, timestamp duration);
 
-    void startPanning();
-    void stopPanning();
-    void startScaling();
-    void stopScaling();
-    void startRotating();
-    void stopRotating();
     bool needsTransition() const;
     void updateTransitions(timestamp now);
     void cancelTransitions();
 
-    // Transform state
-    const TransformState currentState() const;
-    const TransformState finalState() const;
+    const TransformState getState() const;
 
 private:
-    void constrain(double& scale, double& y) const;
+    typedef std::function<void (timestamp)> Transition;
 
-    void _clearPanning();
-    void _clearScaling();
-    void _clearRotating();
+    void constrain(double& scale, double& y) const;
+    void timed(const Transition&, timestamp duration);
 
     View &view;
-
     std::unique_ptr<uv::rwlock> mtx;
-
-    // This reflects the current state of the transform, representing the actual position of the
-    // map. After calling a transform function with a timer, this will likely remain the same until
-    // you render a new frame.
-    TransformState current;
-
-    // This reflects the final position of the transform, after all possible transition took place.
-    TransformState final;
+    TransformState state;
 
     // Limit the amount of zooming possible on the map.
     // TODO: make these modifiable from outside.
     const double min_zoom = 0;
     const double max_zoom = 20;
 
-    std::forward_list<std::shared_ptr<util::transition>> transitions;
-    std::shared_ptr<util::transition> scale_timeout;
-    std::shared_ptr<util::transition> rotate_timeout;
-    std::shared_ptr<util::transition> pan_timeout;
+    Transition transition;
+    timestamp start;
+    timestamp duration;
 };
 
 }

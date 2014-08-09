@@ -52,9 +52,6 @@ public:
     Point project(const LatLng&) const;
     LatLng unproject(const Point&) const;
 
-    // Changing
-    bool isChanging() const;
-
 private:
     // logical dimensions
     uint16_t width = 0, height = 0;
@@ -65,15 +62,13 @@ private:
     // map scale factor
     float pixelRatio = 0;
 
-    // animation state
-    bool rotating = false;
-    bool scaling = false;
-    bool panning = false;
-
     // map position
     LatLng center;
     double bearing = 0;
     double zoom = 0;
+
+    void setZoomAround(double zoom, const LatLng& center);
+    void setBearingAround(double bearing, const LatLng& center);
 };
 
 }

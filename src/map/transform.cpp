@@ -6,9 +6,9 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/uv_detail.hpp>
-#include <mbgl/util/transition.hpp>
+#include <mbgl/util/unitbezier.hpp>
+#include <mbgl/util/interpolate.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <cstdio>
 
 using namespace mbgl;
 
@@ -23,18 +23,18 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
                        const uint16_t fb_w, const uint16_t fb_h) {
     uv::writelock lock(mtx);
 
-    if (final.width != w || final.height != h || final.pixelRatio != ratio ||
-        final.framebuffer[0] != fb_w || final.framebuffer[1] != fb_h) {
+    if (state.width != w || state.height != h || state.pixelRatio != ratio ||
+        state.framebuffer[0] != fb_w || state.framebuffer[1] != fb_h) {
 
         view.notify_map_change(MapChangeRegionWillChange);
 
-        current.width = final.width = w;
-        current.height = final.height = h;
-        current.pixelRatio = final.pixelRatio = ratio;
-        current.framebuffer[0] = final.framebuffer[0] = fb_w;
-        current.framebuffer[1] = final.framebuffer[1] = fb_h;
-//        if (!canRotate() && current.angle) setBearing(0);
-//        constrain(current.scale, current.getPoint().y);
+        state.width = w;
+        state.height = h;
+        state.pixelRatio = ratio;
+        state.framebuffer[0] = fb_w;
+        state.framebuffer[1] = fb_h;
+//        if (!canRotate() && state.angle) setBearing(0);
+//        constrain(state.scale, state.getPoint().y);
 
         view.notify_map_change(MapChangeRegionDidChange);
 
@@ -49,46 +49,42 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
 void Transform::setView(const LatLng& center, double zoom, double bearing) {
     uv::writelock lock(mtx);
     cancelTransitions();
-    current.center = center;
-    current.zoom = zoom;
-    current.bearing = bearing;
-    final = current;
+    state.center = center;
+    state.zoom = zoom;
+    state.bearing = bearing;
 }
 
 void Transform::setCenter(const LatLng& center) {
     uv::writelock lock(mtx);
     cancelTransitions();
-    current.center = center;
-    final = current;
+    state.center = center;
 }
 
 void Transform::setZoom(double zoom) {
     uv::writelock lock(mtx);
     cancelTransitions();
-    current.zoom = zoom;
-    final = current;
+    state.zoom = zoom;
 }
 
 void Transform::setBearing(double bearing) {
     uv::writelock lock(mtx);
     cancelTransitions();
-    current.bearing = bearing;
-    final = current;
+    state.bearing = bearing;
 }
 
 LatLng Transform::getCenter() const {
     uv::readlock lock(mtx);
-    return current.center;
+    return state.center;
 }
 
 double Transform::getZoom() const {
     uv::readlock lock(mtx);
-    return current.zoom;
+    return state.zoom;
 }
 
 double Transform::getBearing() const {
     uv::readlock lock(mtx);
-    return current.bearing;
+    return state.bearing;
 }
 
 # pragma mark - Transitions
@@ -96,175 +92,65 @@ double Transform::getBearing() const {
 void Transform::panBy(const Point& delta, const timestamp duration) {
     uv::writelock lock(mtx);
 
-    panTo(current.unproject(current.getPoint().add(delta)), duration);
+    panTo(state.unproject(state.getPoint().add(delta)), duration);
 }
 
 void Transform::panTo(const LatLng& center, const timestamp duration) {
     uv::writelock lock(mtx);
 
-    cancelTransitions();
+    Point from = state.getPoint();
+    Point to = state.project(center);
 
-    view.notify_map_change(duration ?
-                           MapChangeRegionWillChangeAnimated :
-                           MapChangeRegionWillChange);
-
-    final.center = center;
-
-    if (duration == 0) {
-        current = final;
-    } else {
-        timestamp start = util::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition<LatLng>>(
-            current.center, final.center, current.center, start, duration));
-    }
-
-    view.notify_map_change(duration ?
-                           MapChangeRegionDidChangeAnimated :
-                           MapChangeRegionDidChange,
-                           duration);
+    timed([this, from, to] (double t) {
+        state.center = state.unproject(util::interpolate(from, to, t));
+    }, duration);
 }
 
-void Transform::zoomTo(double zoom, const timestamp duration) {
+void Transform::zoomTo(double zoom, const LatLng& center, const timestamp duration) {
     uv::writelock lock(mtx);
 
-    cancelTransitions();
+    double from = state.zoom;
+    double to = zoom;
 
-    zoom = std::min(std::max(zoom, min_zoom), max_zoom);
-
-    view.notify_map_change(duration ?
-                           MapChangeRegionWillChangeAnimated :
-                           MapChangeRegionWillChange);
-
-    final.zoom = zoom;
-
-    if (duration == 0) {
-        current = final;
-    } else {
-        timestamp start = util::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
-            current.zoom, final.zoom, current.zoom, start, duration));
-    }
-
-    view.notify_map_change(duration ?
-                           MapChangeRegionDidChangeAnimated :
-                           MapChangeRegionDidChange,
-                           duration);
+    timed([this, from, to, center] (double t) {
+        state.setZoomAround(util::interpolate(from, to, t), center);
+    }, duration);
 }
 
-void Transform::rotateTo(double bearing, const timestamp duration) {
+void Transform::rotateTo(double bearing, const LatLng& center, const timestamp duration) {
     uv::writelock lock(mtx);
 
-    cancelTransitions();
+    double from = state.bearing;
+    double to = bearing;
 
-    view.notify_map_change(duration ?
-                           MapChangeRegionWillChangeAnimated :
-                           MapChangeRegionWillChange);
-
-    final.bearing = bearing;
-
-    if (duration == 0) {
-        current = final;
-    } else {
-        timestamp start = util::now();
-        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
-            current.bearing, final.bearing, current.bearing, start, duration));
-    }
-
-    view.notify_map_change(duration ?
-                           MapChangeRegionDidChangeAnimated :
-                           MapChangeRegionDidChange,
-                           duration);
-}
-
-void Transform::rotateBy(const Point& start, const Point& end, const timestamp duration) {
+    timed([this, from, to, center] (double t) {
+        state.setBearingAround(util::interpolate(from, to, t), center);
+    }, duration);
 }
 
 void Transform::easeTo(const LatLng& center, double zoom, double bearing, timestamp duration) {
+    Point offset;
+
+    double startZoom = state.zoom;
+    double startBearing = state.bearing;
+
+    double scale = state.zoomScale(zoom - startZoom);
+    Point from = state.getPoint();
+    Point to = state.project(center);
+    LatLng around = state.pointLocation(state.centerPoint().add(to.sub(from).div(1 - 1 / scale)));
+
+    timed([this, startZoom, zoom, startBearing, bearing, around] (double t) {
+        if (zoom != startZoom) {
+            state.setZoomAround(util::interpolate(startZoom, zoom, t), around);
+        }
+
+        if (bearing != startBearing) {
+            state.bearing = util::interpolate(startBearing, bearing, t);
+        }
+    }, duration);
 }
 
 void Transform::flyTo(const LatLng& center, double zoom, double bearing, timestamp duration) {
-}
-
-void Transform::startPanning() {
-    uv::writelock lock(mtx);
-
-    _clearPanning();
-
-    // Add a 200ms timeout for resetting this to false
-    current.panning = true;
-    timestamp start = util::now();
-    pan_timeout = std::make_shared<util::timeout<bool>>(false, current.panning, start, 200_milliseconds);
-    transitions.emplace_front(pan_timeout);
-}
-
-void Transform::stopPanning() {
-    uv::writelock lock(mtx);
-
-    _clearPanning();
-}
-
-void Transform::_clearPanning() {
-    current.panning = false;
-    if (pan_timeout) {
-        transitions.remove(pan_timeout);
-        pan_timeout.reset();
-    }
-}
-
-void Transform::startScaling() {
-    uv::writelock lock(mtx);
-
-    _clearScaling();
-
-    // Add a 200ms timeout for resetting this to false
-    current.scaling = true;
-    timestamp start = util::now();
-    scale_timeout = std::make_shared<util::timeout<bool>>(false, current.scaling, start, 200_milliseconds);
-    transitions.emplace_front(scale_timeout);
-}
-
-void Transform::stopScaling() {
-    uv::writelock lock(mtx);
-
-    _clearScaling();
-}
-
-void Transform::_clearScaling() {
-    // This is only called internally, so we don't need a lock here.
-
-    current.scaling = false;
-    if (scale_timeout) {
-        transitions.remove(scale_timeout);
-        scale_timeout.reset();
-    }
-}
-
-void Transform::startRotating() {
-    uv::writelock lock(mtx);
-    
-    _clearRotating();
-    
-    // Add a 200ms timeout for resetting this to false
-    current.rotating = true;
-    timestamp start = util::now();
-    rotate_timeout = std::make_shared<util::timeout<bool>>(false, current.rotating, start, 200_milliseconds);
-    transitions.emplace_front(rotate_timeout);
-}
-
-void Transform::stopRotating() {
-    uv::writelock lock(mtx);
-    
-    _clearRotating();
-}
-
-void Transform::_clearRotating() {
-    // This is only called internally, so we don't need a lock here.
-    
-    current.rotating = false;
-    if (rotate_timeout) {
-        transitions.remove(rotate_timeout);
-        rotate_timeout.reset();
-    }
 }
 
 #pragma mark - Constraints
@@ -273,25 +159,25 @@ void Transform::constrain(double& zoom, double& y) const {
     double scale = std::pow(2, zoom);
 
     // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.
-    if (scale < (current.height / util::tileSize)) {
-        scale = (current.height / util::tileSize);
+    if (scale < (state.height / util::tileSize)) {
+        scale = (state.height / util::tileSize);
         zoom = std::log2(scale);
     }
 
     // Constrain min/max vertical pan to avoid showing off-world areas.
-    double max_y = ((scale * util::tileSize) - current.height) / 2;
+    double max_y = ((scale * util::tileSize) - state.height) / 2;
 
     if (y > max_y) y = max_y;
     if (y < -max_y) y = -max_y;
 }
 
 bool Transform::canRotate() {
-    return current.zoom > MIN_ROTATE_ZOOM;
+    return state.zoom > MIN_ROTATE_ZOOM;
 }
 
 double Transform::getMinZoom() const {
-    double test_zoom = current.zoom;
-    double test_y = current.getPoint().y;
+    double test_zoom = state.zoom;
+    double test_y = state.getPoint().y;
     constrain(test_zoom, test_y);
     
     return std::fmin(min_zoom, test_zoom);
@@ -305,48 +191,69 @@ double Transform::getMaxZoom() const {
 
 Point Transform::locationPoint(const LatLng& latlng) const {
     uv::readlock lock(mtx);
-    const Point p = current.project(latlng);
-    return current.centerPoint()._sub(current.getPoint()._sub(p)._rotate(current.getAngle()));
+    const Point p = state.project(latlng);
+    return state.centerPoint()._sub(state.getPoint()._sub(p)._rotate(state.getAngle()));
 }
 
 LatLng Transform::pointLocation(const Point& p) const {
     uv::readlock lock(mtx);
-    const Point p2 = current.centerPoint()._sub(p)._rotate(-current.getAngle());
-    return current.unproject(current.getPoint().sub(p2));
+    const Point p2 = state.centerPoint()._sub(p)._rotate(-state.getAngle());
+    return state.unproject(state.getPoint().sub(p2));
 }
 
 #pragma mark - Transition
 
+util::UnitBezier ease(0, 0, 0.25, 1);
+
+void Transform::timed(const Transition& t, const timestamp d) {
+    cancelTransitions();
+
+    view.notify_map_change(duration ?
+                           MapChangeRegionWillChangeAnimated :
+                           MapChangeRegionWillChange);
+
+    if (d == 0) {
+        t(1);
+    } else {
+        start = util::now();
+        duration = d;
+        transition = t;
+    }
+
+    view.notify_map_change(duration ?
+                           MapChangeRegionDidChangeAnimated :
+                           MapChangeRegionDidChange,
+                           duration);
+}
+
 bool Transform::needsTransition() const {
     uv::readlock lock(mtx);
 
-    return !transitions.empty();
+    return transition.operator bool();
 }
 
 void Transform::updateTransitions(const timestamp now) {
     uv::writelock lock(mtx);
 
-    transitions.remove_if([now](const std::shared_ptr<util::transition> &transition) {
-        return transition->update(now) == util::transition::complete;
-    });
+    double t = (now - start) / duration;
+    if (t >= 1) {
+        transition(1);
+        transition = nullptr;
+    } else {
+        transition(ease.solve(t, 0.001));
+    }
 }
 
 void Transform::cancelTransitions() {
     uv::writelock lock(mtx);
 
-    transitions.clear();
+    transition = nullptr;
 }
 
 #pragma mark - Transform state
 
-const TransformState Transform::currentState() const {
+const TransformState Transform::getState() const {
     uv::readlock lock(mtx);
 
-    return current;
-}
-
-const TransformState Transform::finalState() const {
-    uv::readlock lock(mtx);
-
-    return final;
+    return state;
 }

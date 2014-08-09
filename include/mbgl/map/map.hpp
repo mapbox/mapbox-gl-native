@@ -102,13 +102,6 @@ public:
     void flyTo(const LatLng& center, double zoom, double bearing, double duration);
     void cancelTransitions();
 
-    void startPanning();
-    void stopPanning();
-    void startScaling();
-    void stopScaling();
-    void startRotating();
-    void stopRotating();
-
     // Debug
     void setDebug(bool value);
     void toggleDebug();

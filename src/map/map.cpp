@@ -311,36 +311,6 @@ void Map::cancelTransitions() {
     update();
 }
 
-void Map::startPanning() {
-    transform.startPanning();
-    update();
-}
-
-void Map::stopPanning() {
-    transform.stopPanning();
-    update();
-}
-
-void Map::startScaling() {
-    transform.startScaling();
-    update();
-}
-
-void Map::stopScaling() {
-    transform.stopScaling();
-    update();
-}
-
-void Map::startRotating() {
-    transform.startRotating();
-    update();
-}
-
-void Map::stopRotating() {
-    transform.stopRotating();
-    update();
-}
-
 #pragma mark - Size
 
 void Map::resize(uint16_t width, uint16_t height, float ratio) {
@@ -487,7 +457,7 @@ void Map::prepare() {
         transform.updateTransitions(animationTime);
     }
 
-    state = transform.currentState();
+    state = transform.getState();
 
     animationTime = util::now();
     updateSources();

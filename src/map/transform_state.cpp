@@ -124,12 +124,6 @@ double TransformState::getAngle() const {
     return -bearing * D2R;
 }
 
-#pragma mark - Changing
-
-bool TransformState::isChanging() const {
-    return rotating || scaling || panning;
-}
-
 #pragma mark - Projection
 
 Point TransformState::project(const LatLng& latLng) const {
