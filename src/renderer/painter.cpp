@@ -1,5 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/string.hpp>
@@ -204,22 +205,4 @@ const mat4 &Painter::translatedMatrix(const std::array<float, 2> &translation, c
 
         return vtxMatrix;
     }
-}
-
-void Painter::renderMatte() {
-    gl::group group("matte");
-    glDisable(GL_DEPTH_TEST);
-    glStencilFunc(GL_EQUAL, 0x0, 0xFF);
-
-    Color matte = {{ 0, 0, 0, 1 }};
-
-    useProgram(plainShader->program);
-    plainShader->setMatrix(nativeMatrix);
-
-    // Draw the clipping mask
-    matteArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
-    plainShader->setColor(matte);
-    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
-
-    glEnable(GL_DEPTH_TEST);
 }

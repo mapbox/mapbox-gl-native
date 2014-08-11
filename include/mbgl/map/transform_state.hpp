@@ -1,14 +1,16 @@
 #ifndef MBGL_MAP_TRANSFORM_STATE
 #define MBGL_MAP_TRANSFORM_STATE
 
-#include <mbgl/util/mat4.hpp>
 #include <mbgl/map/tile.hpp>
 
+#include <mbgl/util/mat4.hpp>
+#include <mbgl/util/vec.hpp>
+
 #include <cstdint>
+#include <array>
+#include <limits>
 
 namespace mbgl {
-
-class Transform;
 
 class TransformState {
     friend class Transform;

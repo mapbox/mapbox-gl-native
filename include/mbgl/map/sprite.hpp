@@ -1,18 +1,20 @@
 #ifndef MBGL_STYLE_SPRITE
 #define MBGL_STYLE_SPRITE
 
-#include <mbgl/util/raster.hpp>
-#include <mbgl/util/vec.hpp>
+#include <mbgl/util/image.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
-#include <string>
-#include <mutex>
-#include <memory>
+#include <cstdint>
 #include <atomic>
+#include <iosfwd>
+#include <memory>
+#include <string>
 #include <unordered_map>
+#include <future>
 
 namespace mbgl {
 
-class Map;
+class FileSource;
 
 class SpritePosition {
 public:
@@ -28,36 +30,47 @@ public:
     uint8_t pixelRatio = 1;
 };
 
-class Sprite : public std::enable_shared_from_this<Sprite> {
-public:
-    Sprite(Map &map, float pixelRatio = 1);
+class Sprite : public std::enable_shared_from_this<Sprite>, private util::noncopyable {
+private:
+    struct Key {};
+    void load(const std::shared_ptr<FileSource> &fileSource);
 
-    void load(const std::string& base_url);
+public:
+    Sprite(const Key &, const std::string& base_url, float pixelRatio);
+    static std::shared_ptr<Sprite> Create(const std::string& base_url, float pixelRatio, const std::shared_ptr<FileSource> &fileSource);
 
     const SpritePosition &getSpritePosition(const std::string& name) const;
 
+    void waitUntilLoaded() const;
     bool isLoaded() const;
+
+    operator bool() const;
+
+private:
+    const bool valid;
 
 public:
     const float pixelRatio;
+    const std::string spriteURL;
+    const std::string jsonURL;
     std::unique_ptr<util::Image> raster;
 
 private:
-    void asyncParseJSON();
-    void asyncParseImage();
-
-    static void parseJSON(std::shared_ptr<Sprite> &sprite);
-    static void parseImage(std::shared_ptr<Sprite> &sprite);
-    static void complete(std::shared_ptr<Sprite> &sprite);
+    void parseJSON();
+    void parseImage();
+    void complete();
 
 private:
-    Map &map;
-    std::string url;
     std::string body;
     std::string image;
-    std::atomic<bool> loaded;
+    std::atomic<bool> loadedImage;
+    std::atomic<bool> loadedJSON;
     std::unordered_map<std::string, SpritePosition> pos;
     const SpritePosition empty;
+
+    std::promise<void> promise;
+    std::future<void> future;
+
 };
 
 }

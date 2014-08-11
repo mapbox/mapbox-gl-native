@@ -19,7 +19,7 @@ struct FillProperties {
     Color fill_color = {{ 0, 0, 0, 1 }};
     Color stroke_color = {{ 0, 0, 0, -1 }};
     std::array<float, 2> translate = {{ 0, 0 }};
-    TranslateAnchorType translateAnchor = TranslateAnchorType::Default;
+    TranslateAnchorType translateAnchor = TranslateAnchorType::Map;
     std::string image;
 
     inline bool isVisible() const {
@@ -32,8 +32,8 @@ struct LineProperties {
     float opacity = 1.0f;
     Color color = {{ 0, 0, 0, 1 }};
     std::array<float, 2> translate = {{ 0, 0 }};
-    TranslateAnchorType translateAnchor = TranslateAnchorType::Default;
-    float width = 0;
+    TranslateAnchorType translateAnchor = TranslateAnchorType::Map;
+    float width = 1;
     float offset = 0;
     float blur = 0;
     std::array<float, 2> dash_array = {{ 1, -1 }};
@@ -44,30 +44,38 @@ struct LineProperties {
     }
 };
 
-struct IconProperties {
-    inline IconProperties() {}
-    float opacity = 1.0f;
-    float rotate = 0.0f;
-    RotateAnchorType rotate_anchor = RotateAnchorType::Default;
+struct SymbolProperties {
+    inline SymbolProperties() {}
+
+    struct {
+        float opacity = 1.0f;
+        float rotate = 0.0f;
+        float size = 1.0f;
+        Color color = {{ 0, 0, 0, 1 }};
+        Color halo_color = {{ 0, 0, 0, 0 }};
+        float halo_width = 0.0f;
+        float halo_blur = 0.0f;
+        std::array<float, 2> translate = {{ 0, 0 }};
+        TranslateAnchorType translate_anchor = TranslateAnchorType::Map;
+    } icon;
+
+    struct {
+        float opacity = 1.0f;
+        float size = 12.0f;
+        Color color = {{ 0, 0, 0, 1 }};
+        Color halo_color = {{ 0, 0, 0, 0 }};
+        float halo_width = 0.0f;
+        float halo_blur = 0.0f;
+        std::array<float, 2> translate = {{ 0, 0 }};
+        TranslateAnchorType translate_anchor = TranslateAnchorType::Map;
+    } text;
 
     inline bool isVisible() const {
-        return opacity > 0;
+        return (icon.opacity > 0 && (icon.color[3] > 0 || icon.halo_color[3] > 0) && icon.size > 0) ||
+               (text.opacity > 0 && (text.color[3] > 0 || text.halo_color[3] > 0) && text.size > 0);
     }
 };
 
-struct TextProperties {
-    inline TextProperties() {}
-    float opacity = 1.0f;
-    float size = 12.0f;
-    Color color = {{ 0, 0, 0, 1 }};
-    Color halo_color = {{ 1, 1, 1, 0.75 }};
-    float halo_width = 0.25f;
-    float halo_blur = 1.0f;
-
-    inline bool isVisible() const {
-        return opacity > 0 && (color[3] > 0 || halo_color[3] > 0) && size > 0;
-    }
-};
 
 struct CompositeProperties {
     inline CompositeProperties() {}
@@ -94,14 +102,13 @@ struct RasterProperties {
 
 struct BackgroundProperties {
     inline BackgroundProperties() {}
-    Color color = {{ 1, 1, 1, 1 }};
+    Color color = {{ 0, 0, 0, 1 }};
 };
 
 typedef util::variant<
     FillProperties,
     LineProperties,
-    IconProperties,
-    TextProperties,
+    SymbolProperties,
     CompositeProperties,
     RasterProperties,
     BackgroundProperties,

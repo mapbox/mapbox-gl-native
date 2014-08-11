@@ -5,14 +5,15 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 
 # Depends
 
- - Modern C++ compiler that supports `-std=c++11` (On OSX clang++, on Linux g++-4.8 or g++-4.9)
+ - Modern C++ compiler that supports `-std=c++11` (On OS X clang++, on Linux g++-4.8 or g++-4.9)
  - Boost headers
  - `libpng`
  - `libuv`
  - `glfw3`
  - `libcurl` (depends on OpenSSL; Linux only)
  - `libboost_regex` (Linux only)
- - Homebrew (for build on OS X)
+ - Apple Command Line Tools (for build on OS X; available at [Apple Developer](https://developer.apple.com/downloads))
+ - [Homebrew](http://brew.sh) (for build on OS X)
  - Python 2.x (for build only)
  - Node.js (for build only)
 
@@ -32,6 +33,8 @@ This will clear cached build data and update to the latest versions of dependenc
 The demo applications use Mapbox vector tiles, which **require a Mapbox account and API access token**. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/account/apps/). 
 
 For iOS and OS X use of the demo apps in Xcode, setup the access token by editing the scheme for the application target, then adding an environment variable with the name `MAPBOX_ACCESS_TOKEN`. 
+
+![edit scheme](https://cloud.githubusercontent.com/assets/98601/3647749/30f74f26-1102-11e4-84af-f1be853b4e38.png)
 
 ![setting access token in Xcode scheme](https://cloud.githubusercontent.com/assets/52399/3543326/9e7cfbb8-0860-11e4-8def-3684a9028b61.png)
 

@@ -2,21 +2,25 @@
 #define MBGL_MAP_TILE_DATA
 
 #include <mbgl/map/tile.hpp>
-#include <mbgl/util/noncopyable.hpp>
-#include <mbgl/platform/platform.hpp>
-#include <mbgl/geometry/vao.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
+#include <mbgl/geometry/debug_font_buffer.hpp>
 
-#include <cstdint>
-#include <string>
-#include <memory>
+#include <mbgl/util/noncopyable.hpp>
+
 #include <atomic>
+#include <exception>
+#include <iosfwd>
+#include <memory>
+#include <string>
 
 namespace mbgl {
 
 class Map;
 class Painter;
+class SourceInfo;
 class StyleLayer;
+
+namespace platform { class Request; }
 
 class TileData : public std::enable_shared_from_this<TileData>,
              private util::noncopyable {
@@ -37,7 +41,7 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, Map &map, const std::string url);
+    TileData(Tile::ID id, Map &map, const SourceInfo &source);
     ~TileData();
 
     void request();
@@ -60,8 +64,13 @@ public:
 protected:
     Map &map;
 
+public:
+    const SourceInfo &source;
+
     // Request-related information.
     const std::string url;
+
+protected:
     std::weak_ptr<platform::Request> req;
     std::string data;
 

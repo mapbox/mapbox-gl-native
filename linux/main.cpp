@@ -45,22 +45,13 @@ int main(int argc, char *argv[]) {
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, NULL);
 
-    // read default stylesheet from disk
-    std::ifstream stylefile("./style.min.js");
-    if (!stylefile.good()) {
-        fprintf(stderr, "Cannot read style file\n");
-        return 1;
-    }
-    std::stringstream stylejson;
-    stylejson << stylefile.rdbuf();
-
     view = new GLFWView();
     mbgl::Map map(*view);
 
     // Load settings
     mbgl::Settings_JSON settings;
     map.setLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
-    map.setAngle(settings.angle);
+    map.setBearing(settings.bearing);
     map.setDebug(settings.debug);
 
     // Set access token if present
@@ -72,13 +63,14 @@ int main(int argc, char *argv[]) {
     }
 
     // Load style
-    map.setStyleJSON(stylejson.str());
+    const std::string style = std::string("file://") + uv::cwd() + std::string("/styles/bright/style.json");
+    map.setStyleURL(style);
 
     int ret = view->run();
 
     // Save settings
     map.getLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
-    settings.angle = map.getAngle();
+    settings.bearing = map.getBearing();
     settings.debug = map.getDebug();
     settings.save();
 

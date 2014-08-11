@@ -1,26 +1,34 @@
-
 #ifndef MBGL_MAP_MAP
 #define MBGL_MAP_MAP
 
-#include <uv.h>
-
-#include <mbgl/map/view.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/text/glyph_store.hpp>
 #include <mbgl/renderer/painter.hpp>
+
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/texturepool.hpp>
+#include <mbgl/util/time.hpp>
+#include <mbgl/util/uv.hpp>
 
 #include <cstdint>
-#include <string>
-#include <map>
+#include <atomic>
+#include <iosfwd>
+#include <memory>
+#include <set>
+#include <vector>
 
 namespace mbgl {
 
-class Source;
+class GlyphAtlas;
+class GlyphStore;
+class LayerDescription;
 class SpriteAtlas;
+class Sprite;
+class Style;
+class StyleLayer;
+class StyleLayerGroup;
+class StyleSource;
+class Texturepool;
+class FileSource;
+class View;
 
 class Map : private util::noncopyable {
 public:
@@ -57,7 +65,8 @@ public:
     void toggleClass(const std::string &name);
     const std::vector<std::string> &getAppliedClasses() const;
     void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);
-    void setStyleJSON(std::string newStyleJSON);
+    void setStyleURL(const std::string &url);
+    void setStyleJSON(std::string newStyleJSON, const std::string &base = "");
     std::string getStyleJSON() const;
     void setAccessToken(std::string access_token);
     std::string getAccessToken() const;
@@ -89,9 +98,9 @@ public:
 
     // Rotation
     void rotateBy(double sx, double sy, double ex, double ey, double duration = 0);
-    void setAngle(double angle, double duration = 0);
-    void setAngle(double angle, double cx, double cy);
-    double getAngle() const;
+    void setBearing(double degrees, double duration = 0);
+    void setBearing(double degrees, double cx, double cy);
+    double getBearing() const;
     void resetNorth();
     void startRotating();
     void stopRotating();
@@ -104,10 +113,12 @@ public:
 
 public:
     inline const TransformState &getState() const { return state; }
-    inline std::shared_ptr<const Style> getStyle() const { return style; }
+    inline std::shared_ptr<FileSource> getFileSource() const { return fileSource; }
+    inline std::shared_ptr<Style> getStyle() const { return style; }
     inline std::shared_ptr<GlyphAtlas> getGlyphAtlas() { return glyphAtlas; }
     inline std::shared_ptr<GlyphStore> getGlyphStore() { return glyphStore; }
     inline std::shared_ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
+    std::shared_ptr<Sprite> getSprite();
     inline std::shared_ptr<Texturepool> getTexturepool() { return texturepool; }
     inline std::shared_ptr<uv::loop> getLoop() { return loop; }
     inline timestamp getAnimationTime() const { return animationTime; }
@@ -143,6 +154,14 @@ private:
     void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass);
 
 private:
+    bool async = false;
+    std::shared_ptr<uv::loop> loop;
+    uv_thread_t thread;
+    uv_async_t *async_terminate = nullptr;
+    uv_async_t *async_render = nullptr;
+    uv_async_t *async_cleanup = nullptr;
+
+private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
     // render the map.
     std::atomic_flag is_clean = ATOMIC_FLAG_INIT;
@@ -162,10 +181,13 @@ private:
     Transform transform;
     TransformState state;
 
+    std::shared_ptr<FileSource> fileSource;
+
     std::shared_ptr<Style> style;
     std::shared_ptr<GlyphAtlas> glyphAtlas;
     std::shared_ptr<GlyphStore> glyphStore;
     std::shared_ptr<SpriteAtlas> spriteAtlas;
+    std::shared_ptr<Sprite> sprite;
     std::shared_ptr<Texturepool> texturepool;
 
     Painter painter;
@@ -180,13 +202,6 @@ private:
 
     std::set<std::shared_ptr<StyleSource>> activeSources;
 
-private:
-    bool async = false;
-    std::shared_ptr<uv::loop> loop;
-    uv_thread_t thread;
-    uv_async_t *async_terminate = nullptr;
-    uv_async_t *async_render = nullptr;
-    uv_async_t *async_cleanup = nullptr;
 };
 
 }

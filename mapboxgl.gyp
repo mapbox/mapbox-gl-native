@@ -54,7 +54,7 @@
       ],
     },
     {
-      'target_name': 'build_stylesheet',
+      'target_name': 'bundle_styles',
       'type': 'none',
       'hard_dependency': 1,
       'dependencies': [
@@ -62,40 +62,39 @@
       ],
       'actions': [
         {
-          'action_name': 'Build Stylesheet',
-          'inputs': [
-            'bin/default.style.json',
-          ],
-          'outputs': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
-          ],
-          'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)/bin']
+          'action_name': 'Touch Stylesheet Directory',
+          'inputs': ['styles'],
+          'outputs': ['styles'],
+          'action': ['touch', 'styles'], # required for xcode http://openradar.appspot.com/7232149
         }
       ],
       'direct_dependent_settings': {
-        'sources': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
+        'mac_bundle_resources': [
+          'styles',
         ],
       }
     },
     {
-      'target_name': 'copy_default_stylesheet',
+      'target_name': 'copy_styles',
       'type': 'none',
       'hard_dependency': 1,
-      'dependencies': [
-        'build_stylesheet'
+      'actions': [
+        {
+          'action_name': 'Touch Stylesheet Directory',
+          'inputs': ['styles'],
+          'outputs': ['styles'],
+          'action': ['touch', 'styles'], # required for xcode http://openradar.appspot.com/7232149
+        }
       ],
       'copies': [
         {
-          'files': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js',
-          ],
+          'files': [ 'styles' ],
           'destination': '<(PRODUCT_DIR)'
         }
       ]
     },
     {
-      'target_name': 'copy_default_stylesheet_fixtures',
+      'target_name': 'copy_fixtures',
       'type': 'none',
       'hard_dependency': 1,
       'dependencies': [
@@ -103,9 +102,7 @@
       ],
       'copies': [
         {
-          'files': [
-            'bin/default.style.json',
-          ],
+          'files': [ 'styles' ],
           'destination': 'test/fixtures/style_parser'
         }
       ]
@@ -127,7 +124,6 @@
       'type': 'static_library',
       'hard_dependency': 1,
       'dependencies': [
-          'build_stylesheet',
           'shaders',
       ],
       'sources': [
@@ -195,7 +191,6 @@
       'type': 'static_library',
       'hard_dependency': 1,
       'dependencies': [
-          'build_stylesheet',
           'shaders',
       ],
       'sources': [

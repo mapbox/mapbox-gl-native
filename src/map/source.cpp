@@ -7,7 +7,6 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/texturepool.hpp>
 #include <mbgl/util/vec.hpp>
-#include <mbgl/util/token.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
@@ -18,21 +17,14 @@
 
 namespace mbgl {
 
-Source::Source(StyleSource style_source, const std::string &access_token)
-    : type(style_source.type),
-      url(normalizeSourceURL(style_source.url, access_token)),
-      tile_size(style_source.tile_size),
-      min_zoom(style_source.min_zoom),
-      max_zoom(style_source.max_zoom) {}
-
-Source::Source(SourceType type, const std::string &url,
-               uint32_t tile_size, uint32_t min_zoom, uint32_t max_zoom,
-               const std::string &access_token)
-    : type(type),
-      url(normalizeSourceURL(url, access_token)),
-      tile_size(tile_size),
-      min_zoom(min_zoom),
-      max_zoom(max_zoom) {}
+Source::Source(SourceInfo info, const std::string &access_token)
+    : info(
+          info.type,
+          normalizeSourceURL(info.url, access_token),
+          info.tile_size,
+          info.min_zoom,
+          info.max_zoom
+      ) {}
 
 std::string Source::normalizeSourceURL(const std::string &url, const std::string &access_token) {
     const std::string t = "mapbox://";
@@ -153,18 +145,10 @@ TileData::State Source::addTile(Map &map, const Tile::ID& id) {
 
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
-        const std::string formed_url = util::replaceTokens(url, [&](const std::string &token) -> std::string {
-            if (token == "z") return std::to_string(normalized_id.z);
-            if (token == "x") return std::to_string(normalized_id.x);
-            if (token == "y") return std::to_string(normalized_id.y);
-            if (token == "ratio") return (map.getState().getPixelRatio() > 1.0 ? "@2x" : "");
-            return "";
-        });
-
-        if (type == SourceType::Vector) {
-            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, formed_url);
-        } else if (type == SourceType::Raster) {
-            new_tile.data = std::make_shared<RasterTileData>(normalized_id, map, formed_url);
+        if (info.type == SourceType::Vector) {
+            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, info);
+        } else if (info.type == SourceType::Raster) {
+            new_tile.data = std::make_shared<RasterTileData>(normalized_id, map, info);
         } else {
             throw std::runtime_error("source type not implemented");
         }
@@ -232,14 +216,14 @@ bool Source::updateTiles(Map &map) {
 
     // Figure out what tiles we need to load
     int32_t clamped_zoom = map.getState().getIntegerZoom();
-    if (clamped_zoom > max_zoom) clamped_zoom = max_zoom;
-    if (clamped_zoom < min_zoom) clamped_zoom = min_zoom;
+    if (clamped_zoom > info.max_zoom) clamped_zoom = info.max_zoom;
+    if (clamped_zoom < info.min_zoom) clamped_zoom = info.min_zoom;
 
     int32_t max_covering_zoom = clamped_zoom + 1;
-    if (max_covering_zoom > max_zoom) max_covering_zoom = max_zoom;
+    if (max_covering_zoom > info.max_zoom) max_covering_zoom = info.max_zoom;
 
     int32_t min_covering_zoom = clamped_zoom - 10;
-    if (min_covering_zoom < min_zoom) min_covering_zoom = min_zoom;
+    if (min_covering_zoom < info.min_zoom) min_covering_zoom = info.min_zoom;
 
     // Map four viewport corners to pixel coordinates
     box box = map.getState().cornersToBox(clamped_zoom);
@@ -379,7 +363,7 @@ void _scanTriangle(const mbgl::vec2<double> a, const mbgl::vec2<double> b, const
 }
 
 double Source::getZoom(const TransformState &state) const {
-    double offset = log(util::tileSize / tile_size) / log(2);
+    double offset = log(util::tileSize / info.tile_size) / log(2);
     offset += (state.getPixelRatio() > 1.0 ? 1 :0);
     return state.getZoom() + offset;
 }
@@ -387,7 +371,7 @@ double Source::getZoom(const TransformState &state) const {
 std::forward_list<mbgl::Tile::ID> Source::covering_tiles(const TransformState &state, int32_t clamped_zoom, const box& points) {
     int32_t dim = std::pow(2, clamped_zoom);
     std::forward_list<mbgl::Tile::ID> tiles;
-    bool is_raster = (type == SourceType::Raster);
+    bool is_raster = (info.type == SourceType::Raster);
     double search_zoom = getZoom(state);
 
     auto scanLine = [&tiles, clamped_zoom, is_raster, search_zoom](int32_t x0, int32_t x1, int32_t y, int32_t ymax) {

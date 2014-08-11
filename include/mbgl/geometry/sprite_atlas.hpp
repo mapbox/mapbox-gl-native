@@ -26,17 +26,20 @@ public:
     // Changes the pixel ratio.
     bool resize(float newRatio);
 
-    // Update uninitialized sprites in this atlas from the given sprite.
+    // Update uninitialized (= outdated) sprites in this atlas from the given sprite.
     void update(const Sprite &sprite);
 
-    // Returns the coordinates of a square icon. The getter also *creates* new square icons in the
-    // atlas if they don't exist, but they'll be default-initialized with a a black circle.
-    Rect<dimension> getIcon(int size, const std::string &name);
+    // Returns the coordinates of an image that is sourced from the sprite image.
+    // This getter attempts to read the image from the sprite if it is already loaded.
+    // In that case, it copies it into the sprite atlas and returns the dimensions.
+    // Otherwise, it returns a 0/0/0/0 rect.
+    Rect<dimension> getImage(const std::string &name, const Sprite &sprite);
 
     // Returns the coordinates of an image that is sourced from the sprite image.
-    // This getter does not create images, as the dimension of the texture us unknown if the
-    // sprite is not yet loaded. Instead, it returns a 0/0/0/0 rect.
-    Rect<dimension> getImage(const std::string &name, const Sprite &sprite);
+    // This getter waits until the sprite image was loaded, copies it into the sprite
+    // image and returns the dimensions.
+    // NEVER CALL THIS FUNCTION FROM THE RENDER THREAD! it is blocking.
+    Rect<dimension> waitForImage(const std::string &name, const Sprite &sprite);
 
     // Binds the image buffer of this sprite atlas to the GPU, and uploads data if it is out
     // of date.

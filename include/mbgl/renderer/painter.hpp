@@ -38,8 +38,7 @@ class StyleSource;
 
 class FillBucket;
 class LineBucket;
-class IconBucket;
-class TextBucket;
+class SymbolBucket;
 class RasterBucket;
 
 struct FillProperties;
@@ -62,6 +61,8 @@ public:
     void cleanup();
 
 
+    // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
+    // tiles whatsoever.
     void clear();
 
     // Updates the default matrices to the current viewport dimensions.
@@ -73,10 +74,6 @@ public:
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
 
-    // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
-    // tiles whatsoever.
-    void renderMatte();
-
     // Renders the red debug frame around a tile, visualizing its perimeter.
     void renderDebugFrame();
 
@@ -85,8 +82,7 @@ public:
     void renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &mat);
     void renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
     void renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
-    void renderIcon(IconBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
-    void renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    void renderSymbol(SymbolBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
     void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
 
     void preparePrerender(PrerenderedTexture &texture);
@@ -121,7 +117,7 @@ public:
     bool needsAnimation() const;
 private:
     void setupShaders();
-    const mat4 &translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = TranslateAnchorType::Default);
+    const mat4 &translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = TranslateAnchorType::Map);
 
     void prepareTile(const Tile& tile);
 

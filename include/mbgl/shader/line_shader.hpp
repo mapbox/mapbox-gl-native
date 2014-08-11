@@ -16,6 +16,7 @@ public:
     void setLineWidth(const std::array<float, 2>& linewidth);
     void setRatio(float ratio);
     void setDashArray(const std::array<float, 2>& dasharray);
+    void setBlur(float blur);
     void setDebug(float debug);
 
 private:
@@ -37,6 +38,9 @@ private:
 
     std::array<float, 2> dasharray = {{}};
     int32_t u_dasharray = -1;
+
+    float blur = 0.0f;
+    int32_t u_blur = -1;
 };
 
 

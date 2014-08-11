@@ -16,18 +16,37 @@
 #pragma clang diagnostic pop
 #endif
 
+#include <string>
+
 
 namespace uv {
 
+inline std::string cwd() {
+    size_t max = 0;
+    std::string dir;
+    do {
+        max += 256;
+        dir.resize(max);
+        uv_cwd(const_cast<char *>(dir.data()), &max);
+    } while (max == dir.size());
+    dir.resize(max - 1);
+    return dir;
+}
+
 class loop {
 public:
-    inline loop() : l(uv_loop_new()) {}
-    inline ~loop() { uv_loop_delete(l); }
+    inline loop() {
+        if (uv_loop_init(&l) != 0) {
+            throw std::runtime_error("failed to initialize loop");
+        }
+    }
 
-    inline uv_loop_t *operator*() { return l; }
+    inline ~loop() { uv_loop_close(&l); }
+
+    inline uv_loop_t *operator*() { return &l; }
 
 private:
-    uv_loop_t *l;
+    uv_loop_t l;
 };
 
 class mutex {

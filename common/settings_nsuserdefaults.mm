@@ -9,7 +9,7 @@ Settings_NSUserDefaults::Settings_NSUserDefaults()
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"longitude" : @(longitude),
                                                                @"latitude"  : @(latitude),
                                                                @"zoom"      : @(zoom),
-                                                               @"angle"     : @(angle),
+                                                               @"bearing"   : @(bearing),
                                                                @"debug"     : @(debug) }];
     load();
 }
@@ -21,7 +21,7 @@ void Settings_NSUserDefaults::load()
     longitude = [settings[@"longitude"] doubleValue];
     latitude  = [settings[@"latitude"]  doubleValue];
     zoom      = [settings[@"zoom"]      doubleValue];
-    angle     = [settings[@"angle"]     doubleValue];
+    bearing   = [settings[@"bearing"]   doubleValue];
     debug     = [settings[@"debug"]     boolValue];
 }
 
@@ -29,8 +29,8 @@ void Settings_NSUserDefaults::save()
 {
     [[NSUserDefaults standardUserDefaults] setValuesForKeysWithDictionary:@{ @"longitude" : @(longitude),
                                                                              @"latitude"  : @(latitude),
-                                                                             @"zoom"     : @(zoom),
-                                                                             @"angle"     : @(angle),
+                                                                             @"zoom"      : @(zoom),
+                                                                             @"bearing"   : @(bearing),
                                                                              @"debug"     : @(debug) }];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }

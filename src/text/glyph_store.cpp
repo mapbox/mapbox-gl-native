@@ -6,6 +6,8 @@
 #include <mbgl/util/pbf.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/token.hpp>
+#include <mbgl/util/math.hpp>
+#include <mbgl/util/filesource.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <uv.h>
 #include <algorithm>
@@ -30,93 +32,111 @@ const std::map<uint32_t, SDFGlyph> &FontStack::getSDFs() const {
     return sdfs;
 }
 
-const Shaping FontStack::getShaping(const std::u32string &string, const float &maxWidth,
-        const float &lineHeight, const float &alignment, const float &verticalAlignment,
-        const float &letterSpacing) const {
-
+const Shaping FontStack::getShaping(const std::u32string &string, const float maxWidth,
+                                    const float lineHeight, const float horizontalAlign,
+                                    const float verticalAlign, const float justify,
+                                    const float spacing, const vec2<float> &translate) const {
     std::lock_guard<std::mutex> lock(mtx);
-    uint32_t i = 0;
-    uint32_t x = 0;
+
     Shaping shaping;
+
+    int32_t x = std::round(translate.x * 24); // one em
+    const int32_t y = std::round(translate.y * 24); // one em
+
     // Loop through all characters of this label and shape.
     for (uint32_t chr : string) {
-        shaping.emplace_back(0, chr, x, 0);
-        i++;
+        shaping.emplace_back(chr, x, y);
         auto metric = metrics.find(chr);
         if (metric != metrics.end()) {
-            x += metric->second.advance + letterSpacing;
+            x += metric->second.advance + spacing;
         }
     }
 
-    lineWrap(shaping, lineHeight, maxWidth, alignment, verticalAlignment);
+    if (!shaping.size())
+        return shaping;
+
+    lineWrap(shaping, lineHeight, maxWidth, horizontalAlign, verticalAlign, justify);
 
     return shaping;
 }
 
-void alignVertically(Shaping &shaping, const uint32_t &lines, const float &lineHeight, const float &verticalAlign) {
-    const float dy = -(lineHeight * (lines - 1) + 24) * verticalAlign - 5;
-    for (GlyphPlacement &shape : shaping) {
-        shape.y += dy;
+void align(Shaping &shaping, const float justify, const float horizontalAlign,
+           const float verticalAlign, const uint32_t maxLineLength, const float lineHeight,
+           const uint32_t line) {
+    const float shiftX = (justify - horizontalAlign) * maxLineLength;
+    const float shiftY = (-verticalAlign * (line + 1) + 0.5) * lineHeight;
+
+    for (PositionedGlyph &glyph : shaping) {
+        glyph.x += shiftX;
+        glyph.y += shiftY;
     }
 }
 
-void alignHorizontally(Shaping &shaping, const std::map<uint32_t, GlyphMetrics> &metrics,
-        const uint32_t &start, const uint32_t &end, const float &alignment) {
-    auto & shape = shaping.at(end);
-    auto metric = metrics.find(shape.glyph);
+void justifyLine(Shaping &shaping, const std::map<uint32_t, GlyphMetrics> &metrics, uint32_t start,
+                 uint32_t end, float justify) {
+    PositionedGlyph &glyph = shaping[end];
+    auto metric = metrics.find(glyph.glyph);
     if (metric != metrics.end()) {
-        uint32_t lastAdvance = metric->second.advance;
-        int32_t lineIndent = (shape.x + lastAdvance) * alignment;
+        const uint32_t lastAdvance = metric->second.advance;
+        const float lineIndent = float(glyph.x + lastAdvance) * justify;
+
         for (uint32_t j = start; j <= end; j++) {
             shaping[j].x -= lineIndent;
         }
     }
 }
 
-void FontStack::lineWrap(Shaping &shaping, const float &lineHeight, const float &maxWidth,
-        const float &alignment, const float &verticalAlignment) const {
-
-    std::size_t num_shapes = shaping.size();
-    if (!num_shapes) {
-        return;
-    }
+void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float maxWidth,
+                         const float horizontalAlign, const float verticalAlign,
+                         const float justify) const {
     uint32_t lastSafeBreak = 0;
+
     uint32_t lengthBeforeCurrentLine = 0;
     uint32_t lineStartIndex = 0;
     uint32_t line = 0;
 
-    for (uint32_t i = 0; i < shaping.size(); i++) {
-        GlyphPlacement &shape = shaping[i];
-        shape.x -= lengthBeforeCurrentLine;
-        shape.y += lineHeight * line;
+    uint32_t maxLineLength = 0;
 
-        if (shape.x > maxWidth && lastSafeBreak > 0) {
+    if (maxWidth) {
+        for (uint32_t i = 0; i < shaping.size(); i++) {
+            PositionedGlyph &shape = shaping[i];
 
-            uint32_t lineLength = shaping[lastSafeBreak + 1].x;
+            shape.x -= lengthBeforeCurrentLine;
+            shape.y += lineHeight * line;
 
-            for (uint32_t k = lastSafeBreak + 1; k <= i; k++) {
-                shaping[k].y += lineHeight;
-                shaping[k].x -= lineLength;
+            if (shape.x > maxWidth && lastSafeBreak > 0) {
+
+                uint32_t lineLength = shaping[lastSafeBreak + 1].x;
+                maxLineLength = util::max(lineLength, maxLineLength);
+
+                for (uint32_t k = lastSafeBreak + 1; k <= i; k++) {
+                    shaping[k].y += lineHeight;
+                    shaping[k].x -= lineLength;
+                }
+
+                if (justify) {
+                    justifyLine(shaping, metrics, lineStartIndex, lastSafeBreak - 1, justify);
+                }
+
+                lineStartIndex = lastSafeBreak + 1;
+                lastSafeBreak = 0;
+                lengthBeforeCurrentLine += lineLength;
+                line++;
             }
 
-            if (alignment) {
-                alignHorizontally(shaping, metrics, lineStartIndex, lastSafeBreak - 1, alignment);
+            if (shape.glyph == 32) {
+                lastSafeBreak = i;
             }
-
-            lineStartIndex = lastSafeBreak + 1;
-            lastSafeBreak = 0;
-            lengthBeforeCurrentLine += lineLength;
-            line++;
-        }
-        if (shape.glyph == 32) {
-            lastSafeBreak = i;
         }
     }
-    alignHorizontally(shaping, metrics, lineStartIndex, shaping.size() - 1, alignment);
-    alignVertically(shaping, line + 1, lineHeight, verticalAlignment);
+
+    maxLineLength = maxLineLength || shaping.back().x;
+
+    justifyLine(shaping, metrics, lineStartIndex, shaping.size() - 1, justify);
+    align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line);
 }
 
-GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange)
+GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange, const std::shared_ptr<FileSource> &fileSource)
     : future(promise.get_future().share())
 {
     // Load the glyph set URL
@@ -133,7 +153,7 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, Gl
     fprintf(stderr, "%s\n", url.c_str());
 #endif
 
-    platform::request_http(url, [&](platform::Response *res) {
+    fileSource->load(ResourceType::Glyphs, url, [&](platform::Response *res) {
         if (res->code != 200) {
             // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
             const std::string msg = util::sprintf<255>("[ERROR] failed to load glyphs (%d): %s\n", res->code, res->error_message.c_str());
@@ -207,12 +227,19 @@ void GlyphPBF::parse(FontStack &stack) {
     data.clear();
 }
 
-GlyphStore::GlyphStore(const std::string &glyphURL)
-    : glyphURL(glyphURL) {}
+GlyphStore::GlyphStore(const std::shared_ptr<FileSource> &fileSource) : fileSource(fileSource) {}
+
+void GlyphStore::setURL(const std::string &url) {
+    glyphURL = url;
+}
+
 
 void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges) {
     // We are implementing a blocking wait with futures: Every GlyphSet has a future that we are
     // waiting for until it is loaded.
+    if (glyphRanges.empty()) {
+        return;
+    }
 
     FontStack *stack = nullptr;
 
@@ -243,7 +270,7 @@ std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::string &fon
     auto range_it = rangeSets.find(range);
     if (range_it == rangeSets.end()) {
         // We don't have this glyph set yet for this font stack.
-        range_it = rangeSets.emplace(range, std::make_unique<GlyphPBF>(glyphURL, fontStack, range)).first;
+        range_it = rangeSets.emplace(range, std::make_unique<GlyphPBF>(glyphURL, fontStack, range, fileSource)).first;
     }
 
     return range_it->second->getFuture();

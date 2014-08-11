@@ -6,6 +6,8 @@
 #include <mbgl/util/std.hpp>
 
 #include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
 
 #include "../common/headless_view.hpp"
 
@@ -16,24 +18,47 @@
 const std::string base_directory = []{
     std::string fn = __FILE__;
     fn.erase(fn.find_last_of("/"));
-    return fn + "/fixtures/styles";
+    return fn + "/../node_modules/mapbox-gl-test-suite/";
 }();
 
 class HeadlessTest : public ::testing::TestWithParam<std::string> {};
+
+void ResolveLocalURL(rapidjson::Value& value, rapidjson::Document& doc) {
+    std::string str { value.GetString(), value.GetStringLength() };
+    str.replace(0, 8, base_directory); // local://
+    value.SetString(str.c_str(), str.length(), doc.GetAllocator());
+}
 
 TEST_P(HeadlessTest, render) {
     using namespace mbgl;
 
     const std::string &base = GetParam();
 
-    const std::string style = util::read_file(base_directory + "/" + base + ".style.json");
-    const std::string info = util::read_file(base_directory + "/" + base + ".info.json");
+    std::string style = util::read_file(base_directory + "tests/" + base + "/style.json");
+    std::string info = util::read_file(base_directory + "tests/" + base + "/info.json");
+
+    // Parse style.
+    rapidjson::Document styleDoc;
+    styleDoc.Parse<0>((const char *const)style.c_str());
+    ASSERT_EQ(false, styleDoc.HasParseError());
+    ASSERT_EQ(true, styleDoc.IsObject());
+
+    if (styleDoc.HasMember("sprite")) {
+        ResolveLocalURL(styleDoc["sprite"], styleDoc);
+    }
+
+    ResolveLocalURL(styleDoc["sources"]["mapbox"]["url"], styleDoc);
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    styleDoc.Accept(writer);
+    style = buffer.GetString();
 
     // Parse settings.
-    rapidjson::Document doc;
-    doc.Parse<0>((const char *const)info.c_str());
-    ASSERT_EQ(false, doc.HasParseError());
-    ASSERT_EQ(true, doc.IsObject());
+    rapidjson::Document infoDoc;
+    infoDoc.Parse<0>((const char *const)info.c_str());
+    ASSERT_EQ(false, infoDoc.HasParseError());
+    ASSERT_EQ(true, infoDoc.IsObject());
 
     Log::Set<FixtureLogBackend>();
 
@@ -41,15 +66,13 @@ TEST_P(HeadlessTest, render) {
     HeadlessView view;
     Map map(view);
 
-    for (auto it = doc.MemberBegin(), end = doc.MemberEnd(); it != end; it++) {
-        const FixtureLogBackend &log = Log::Set<FixtureLogBackend>();
-
+    for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
         const std::string name { it->name.GetString(), it->name.GetStringLength() };
         const rapidjson::Value &value = it->value;
         ASSERT_EQ(true, value.IsObject());
         if (value.HasMember("center")) ASSERT_EQ(true, value["center"].IsArray());
 
-        const std::string actual_image = base_directory + "/" + base + "/" + name +  ".actual.png";
+        const std::string actual_image = base_directory + "tests/" + base + "/" + name +  "/actual.png";
 
         const double zoom = value.HasMember("zoom") ? value["zoom"].GetDouble() : 0;
         const double bearing = value.HasMember("bearing") ? value["bearing"].GetDouble() : 0;
@@ -74,7 +97,7 @@ TEST_P(HeadlessTest, render) {
         view.resize(width, height);
         map.resize(width, height);
         map.setLonLatZoom(longitude, latitude, zoom);
-        map.setAngle(bearing);
+        map.setBearing(bearing);
 
         // Run the loop. It will terminate when we don't have any further listeners.
         map.run();
@@ -84,73 +107,22 @@ TEST_P(HeadlessTest, render) {
 
         const std::string image = util::compress_png(width, height, pixels.get(), true);
         util::write_file(actual_image, image);
-
-        if (value.HasMember("log")) {
-            const rapidjson::Value &js_log = value["log"];
-            ASSERT_EQ(true, js_log.IsArray());
-            for (rapidjson::SizeType i = 0; i < js_log.Size(); i++) {
-                const rapidjson::Value &js_entry = js_log[i];
-                ASSERT_EQ(true, js_entry.IsArray());
-                if (js_entry.Size() == 5) {
-                    const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
-                    const FixtureLogBackend::LogMessage message {
-                        EventSeverityClass(js_entry[rapidjson::SizeType(1)].GetString()),
-                        EventClass(js_entry[rapidjson::SizeType(2)].GetString()),
-                        js_entry[rapidjson::SizeType(3)].GetInt64(),
-                        js_entry[rapidjson::SizeType(4)].GetString()
-                    };
-                    ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
-                } else if (js_entry.Size() == 4) {
-                    const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
-                    if (js_entry[rapidjson::SizeType(3)].IsString()) {
-                        const FixtureLogBackend::LogMessage message {
-                            EventSeverityClass(js_entry[rapidjson::SizeType(1)].GetString()),
-                            EventClass(js_entry[rapidjson::SizeType(2)].GetString()),
-                            js_entry[rapidjson::SizeType(3)].GetString()
-                        };
-                        ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
-                    } else {
-                        const FixtureLogBackend::LogMessage message {
-                            EventSeverityClass(js_entry[rapidjson::SizeType(1)].GetString()),
-                            EventClass(js_entry[rapidjson::SizeType(2)].GetString()),
-                             js_entry[rapidjson::SizeType(3)].GetInt64()
-                        };
-                        ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
-                    }
-                } else if (js_entry.Size() == 3) {
-                    const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
-                    const FixtureLogBackend::LogMessage message {
-                        EventSeverityClass(js_entry[rapidjson::SizeType(1)].GetString()),
-                        EventClass(js_entry[rapidjson::SizeType(2)].GetString())
-                    };
-                    ASSERT_EQ(count, log.count(message)) << "Message: " << message << "Full Log: " << std::endl << log.messages;
-                } else {
-                    FAIL();
-                }
-            }
-        }
-
-        const auto &unchecked = log.unchecked();
-        if (unchecked.size()) {
-            std::cerr << "Unchecked Log Messages (" << base << "/" << name << "): " << std::endl << unchecked;
-        }
     }
 
 }
 
 INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest, ::testing::ValuesIn([] {
     std::vector<std::string> names;
-    const std::string ending = ".info.json";
 
-    DIR *dir = opendir(base_directory.c_str());
+    DIR *dir = opendir((base_directory + "tests").c_str());
     if (dir == nullptr) {
         return names;
     }
 
     for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
         const std::string name = dp->d_name;
-        if (name.length() >= ending.length() && name.compare(name.length() - ending.length(), ending.length(), ending) == 0) {
-            names.push_back(name.substr(0, name.length() - ending.length()));
+        if (name != "." && name != ".." && name != "index.html") {
+            names.push_back(name);
         }
     }
 

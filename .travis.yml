@@ -22,6 +22,7 @@ before_install:
 
 install:
 - make setup
+- npm install git+https://github.com/mapbox/mapbox-gl-test-suite.git
 
 before_script:
 - rm -rf mapnik-packaging/out/packages
@@ -30,10 +31,7 @@ script:
 - make linux -j4 BUILDTYPE=${BUILDTYPE}
 - make test -j4 BUILDTYPE=${BUILDTYPE}
 - ./scripts/run_tests.sh
-- ./scripts/compare_images.js
-
-after_script:
-- ./scripts/deploy_results.sh
+- (cd ./node_modules/mapbox-gl-test-suite/ && (./bin/compare_images.js; ./bin/deploy_results.sh))
 
 notifications:
   hipchat:

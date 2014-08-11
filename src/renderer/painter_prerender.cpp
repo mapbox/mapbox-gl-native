@@ -17,7 +17,7 @@ void Painter::preparePrerender(PrerenderedTexture &texture) {
     glViewport(0, 0, texture.properties.size, texture.properties.size);
 }
 
-void Painter::finishPrerender(PrerenderedTexture &texture) {
+void Painter::finishPrerender(PrerenderedTexture &/*texture*/) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
 

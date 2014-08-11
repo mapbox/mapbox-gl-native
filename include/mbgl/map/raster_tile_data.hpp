@@ -1,18 +1,24 @@
 #ifndef MBGL_MAP_RASTER_TILE_DATA
 #define MBGL_MAP_RASTER_TILE_DATA
 
+#include <mbgl/map/tile.hpp>
 #include <mbgl/map/tile_data.hpp>
-
 #include <mbgl/renderer/raster_bucket.hpp>
 
+#include <memory>
 
 namespace mbgl {
+
+class Map;
+class Painter;
+class SourceInfo;
+class StyleLayer;
 
 class RasterTileData : public TileData {
     friend class TileParser;
 
 public:
-    RasterTileData(Tile::ID id, Map &map, const std::string url);
+    RasterTileData(Tile::ID id, Map &map, const SourceInfo &source);
     ~RasterTileData();
 
     virtual void parse();

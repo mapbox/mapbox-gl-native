@@ -23,7 +23,6 @@
       'mac_bundle': 1,
       'mac_bundle_resources': [
         'Icon.icns',
-        '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
       ],
       'xcode_settings': {
         'SDKROOT': 'macosx',
@@ -40,7 +39,8 @@
         'CLANG_ENABLE_OBJC_ARC': 'YES'
       },
       'dependencies': [
-        '../mapboxgl.gyp:mapboxgl'
+        '../mapboxgl.gyp:bundle_styles',
+        '../mapboxgl.gyp:mapboxgl',
       ]
     }
   ]

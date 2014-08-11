@@ -53,7 +53,7 @@
       ],
       'dependencies': [
         '../mapboxgl.gyp:mapboxgl',
-        '../mapboxgl.gyp:copy_default_stylesheet',
+        '../mapboxgl.gyp:copy_styles',
         '../mapboxgl.gyp:copy_certificate_bundle',
       ],
     },
