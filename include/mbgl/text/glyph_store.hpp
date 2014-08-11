@@ -14,6 +14,7 @@
 
 namespace mbgl {
 
+class FileSource;
 
 class SDFGlyph {
 public:
@@ -46,7 +47,7 @@ private:
 
 class GlyphPBF {
 public:
-    GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange);
+    GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange, const std::shared_ptr<FileSource> &fileSource);
 
     void parse(FontStack &stack);
 
@@ -62,7 +63,7 @@ private:
 // Manages Glyphrange PBF loading.
 class GlyphStore {
 public:
-    GlyphStore();
+    GlyphStore(const std::shared_ptr<FileSource> &fileSource);
 
     // Block until all specified GlyphRanges of the specified font stack are loaded.
     void waitForGlyphRanges(const std::string &fontStack, const std::set<GlyphRange> &glyphRanges);
@@ -81,6 +82,7 @@ public:
     std::string glyphURL;
 
 private:
+    const std::shared_ptr<FileSource> fileSource;
     std::unordered_map<std::string, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>> ranges;
     std::unordered_map<std::string, std::unique_ptr<FontStack>> stacks;
     std::mutex mtx;

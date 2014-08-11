@@ -7,6 +7,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/util/filesource.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <uv.h>
 #include <algorithm>
@@ -135,7 +136,7 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line);
 }
 
-GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange)
+GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange, const std::shared_ptr<FileSource> &fileSource)
     : future(promise.get_future().share())
 {
     // Load the glyph set URL
@@ -152,7 +153,7 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, Gl
     fprintf(stderr, "%s\n", url.c_str());
 #endif
 
-    platform::request_http(url, [&](platform::Response *res) {
+    fileSource->load(ResourceType::Glyphs, url, [&](platform::Response *res) {
         if (res->code != 200) {
             // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
             const std::string msg = util::sprintf<255>("[ERROR] failed to load glyphs (%d): %s\n", res->code, res->error_message.c_str());
@@ -226,7 +227,7 @@ void GlyphPBF::parse(FontStack &stack) {
     data.clear();
 }
 
-GlyphStore::GlyphStore() {}
+GlyphStore::GlyphStore(const std::shared_ptr<FileSource> &fileSource) : fileSource(fileSource) {}
 
 void GlyphStore::setURL(const std::string &url) {
     glyphURL = url;
@@ -269,7 +270,7 @@ std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::string &fon
     auto range_it = rangeSets.find(range);
     if (range_it == rangeSets.end()) {
         // We don't have this glyph set yet for this font stack.
-        range_it = rangeSets.emplace(range, std::make_unique<GlyphPBF>(glyphURL, fontStack, range)).first;
+        range_it = rangeSets.emplace(range, std::make_unique<GlyphPBF>(glyphURL, fontStack, range, fileSource)).first;
     }
 
     return range_it->second->getFuture();

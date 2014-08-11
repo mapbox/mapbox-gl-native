@@ -27,6 +27,7 @@ class StyleLayer;
 class StyleLayerGroup;
 class StyleSource;
 class Texturepool;
+class FileSource;
 class View;
 
 class Map : private util::noncopyable {
@@ -64,7 +65,8 @@ public:
     void toggleClass(const std::string &name);
     const std::vector<std::string> &getAppliedClasses() const;
     void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);
-    void setStyleJSON(std::string newStyleJSON);
+    void setStyleURL(const std::string &url);
+    void setStyleJSON(std::string newStyleJSON, const std::string &base = "");
     std::string getStyleJSON() const;
     void setAccessToken(std::string access_token);
     std::string getAccessToken() const;
@@ -111,6 +113,7 @@ public:
 
 public:
     inline const TransformState &getState() const { return state; }
+    inline std::shared_ptr<FileSource> getFileSource() const { return fileSource; }
     inline std::shared_ptr<Style> getStyle() const { return style; }
     inline std::shared_ptr<GlyphAtlas> getGlyphAtlas() { return glyphAtlas; }
     inline std::shared_ptr<GlyphStore> getGlyphStore() { return glyphStore; }
@@ -151,6 +154,14 @@ private:
     void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass);
 
 private:
+    bool async = false;
+    std::shared_ptr<uv::loop> loop;
+    uv_thread_t thread;
+    uv_async_t *async_terminate = nullptr;
+    uv_async_t *async_render = nullptr;
+    uv_async_t *async_cleanup = nullptr;
+
+private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
     // render the map.
     std::atomic_flag is_clean = ATOMIC_FLAG_INIT;
@@ -169,6 +180,8 @@ public:
 private:
     Transform transform;
     TransformState state;
+
+    std::shared_ptr<FileSource> fileSource;
 
     std::shared_ptr<Style> style;
     std::shared_ptr<GlyphAtlas> glyphAtlas;
@@ -189,13 +202,6 @@ private:
 
     std::set<std::shared_ptr<StyleSource>> activeSources;
 
-private:
-    bool async = false;
-    std::shared_ptr<uv::loop> loop;
-    uv_thread_t thread;
-    uv_async_t *async_terminate = nullptr;
-    uv_async_t *async_render = nullptr;
-    uv_async_t *async_cleanup = nullptr;
 };
 
 }

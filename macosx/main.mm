@@ -73,14 +73,17 @@ int main() {
     GLFWView view;
     mbgl::Map map(view);
 
+    URLHandler *handler = [[URLHandler alloc] init];
+    [handler setMap:&map];
+    NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
+    [appleEventManager setEventHandler:handler andSelector:@selector(handleGetURLEvent:withReplyEvent:) forEventClass:kInternetEventClass andEventID:kAEGetURL];
+
     // Load settings
     mbgl::Settings_NSUserDefaults settings;
     map.setLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
     map.setBearing(settings.bearing);
     map.setDebug(settings.debug);
 
-    URLHandler *handler = [[URLHandler alloc] init];
-    [handler setMap:&map];
 
     // Set access token if present
     NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
@@ -88,15 +91,9 @@ int main() {
     if (accessToken) map.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
 
     // Load style
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"style.min" ofType:@"js"];
-    NSString *json = [NSString stringWithContentsOfFile:path
-                                               encoding:[NSString defaultCStringEncoding]
-                                                  error:nil];
-    map.setStyleJSON((std::string)[json cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+    const std::string path([[[NSBundle mainBundle] pathForResource:@"style" ofType:@"json" inDirectory:@"styles/bright"] UTF8String]);
 
-    NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
-    [appleEventManager setEventHandler:handler andSelector:@selector(handleGetURLEvent:withReplyEvent:) forEventClass:kInternetEventClass andEventID:kAEGetURL];
-
+    map.setStyleURL(std::string("file://") + path);
 
     int ret = view.run();
 
