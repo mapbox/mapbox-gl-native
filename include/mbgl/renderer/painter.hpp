@@ -129,7 +129,6 @@ public:
     void depthMask(bool value);
 
 public:
-//    mat4 matrix;
     mat4 vtxMatrix;
     mat4 projMatrix;
     mat4 nativeMatrix;

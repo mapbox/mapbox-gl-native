@@ -45,7 +45,6 @@ public:
     // Triggers a lazy rerender: only performs a render when the map is not clean.
     void rerender();
 
-    void renderLayers(std::shared_ptr<StyleLayerGroup> group);
     enum RenderPass { Opaque, Translucent };
 
     void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
@@ -154,6 +153,7 @@ private:
 
     // Unconditionally performs a render with the current map state.
     void render();
+    void renderLayers(std::shared_ptr<StyleLayerGroup> group);
 
 private:
     bool async = false;
@@ -178,10 +178,10 @@ private:
 
 public:
     View &view;
-    TransformState state;
 
 private:
     Transform transform;
+    TransformState state;
 
     std::shared_ptr<FileSource> fileSource;
 

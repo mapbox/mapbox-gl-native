@@ -496,11 +496,6 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
             layer_id, std::move(styles));
 
         if (value.HasMember("layers")) {
-            if (value.HasMember("type")) {
-                JSVal type = value["type"];
-                if (std::string { type.GetString(), type.GetStringLength() } == "raster") {
-                }
-            }
             layer->layers = createLayers(value["layers"]);
         }
 

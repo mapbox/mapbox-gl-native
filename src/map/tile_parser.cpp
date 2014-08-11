@@ -101,8 +101,8 @@ std::unique_ptr<Bucket> TileParser::createBucket(std::shared_ptr<StyleBucket> bu
     if (tile.id.z >= std::ceil(bucket_desc->max_zoom)) return nullptr;
 
     auto layer_it = vector_data.layers.find(bucket_desc->source_layer);
-    const VectorTileLayer &layer = layer_it->second;
     if (layer_it != vector_data.layers.end()) {
+        const VectorTileLayer &layer = layer_it->second;
         if (bucket_desc->render.is<StyleBucketFill>()) {
             return createFillBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketFill>());
         } else if (bucket_desc->render.is<StyleBucketLine>()) {

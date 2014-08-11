@@ -164,8 +164,6 @@ void Painter::setStrata(float value) {
 }
 
 void Painter::prepareTile(const Tile& tile) {
-//    matrix = tile.matrix;
-
     GLint id = (GLint)tile.clip.mask.to_ulong();
     GLuint mask = clipMask[tile.clip.length];
     glStencilFunc(GL_EQUAL, id, mask);
