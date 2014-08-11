@@ -3,5 +3,5 @@
 set -o pipefail
 
 cd bin
-npm install
+npm install --clang=1
 cd ../
