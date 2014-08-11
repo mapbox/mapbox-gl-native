@@ -34,7 +34,7 @@ Map::Map(View& view)
     : loop(std::make_shared<uv::loop>()),
       view(view),
       transform(view),
-      fileSource(std::make_shared<FileSource>(loop)),
+      fileSource(std::make_shared<FileSource>()),
       style(std::make_shared<Style>()),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
       glyphStore(std::make_shared<GlyphStore>(fileSource)),
@@ -201,7 +201,7 @@ void Map::setStyleURL(const std::string &url) {
         } else {
             Log::Error(Event::Setup, "loading style failed: %d (%s)", res->code, res->error_message.c_str());
         }
-    });
+    }, loop);
 }
 
 

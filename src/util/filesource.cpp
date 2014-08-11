@@ -6,8 +6,7 @@
 
 namespace mbgl {
 
-FileSource::FileSource(const std::shared_ptr<uv::loop> &loop)
-    : loop(loop) {}
+FileSource::FileSource() {}
 
 
 void FileSource::setBase(const std::string &value) {
@@ -18,7 +17,7 @@ const std::string &FileSource::getBase() const {
     return base;
 }
 
-void FileSource::load(ResourceType type, const std::string &url, std::function<void(platform::Response *)> callback) {
+void FileSource::load(ResourceType type, const std::string &url, std::function<void(platform::Response *)> callback, const std::shared_ptr<uv::loop> loop) {
     // convert relative URLs to absolute URLs
 
     const std::string absoluteURL = [&]() -> std::string {
