@@ -63,9 +63,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Load style
-    std::string style = "file://";
-    style += uv::cwd();
-    style += "/styles/bright/style.json";
+    const std::string style = std::string("file://") + uv::cwd() + std::string("/styles/bright/style.json");
     map.setStyleURL(style);
 
     int ret = view->run();
