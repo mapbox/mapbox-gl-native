@@ -57,9 +57,6 @@
       'target_name': 'bundle_styles',
       'type': 'none',
       'hard_dependency': 1,
-      'dependencies': [
-        'npm_install'
-      ],
       'actions': [
         {
           'action_name': 'Touch Stylesheet Directory',
@@ -98,7 +95,7 @@
       'type': 'none',
       'hard_dependency': 1,
       'dependencies': [
-        'build_stylesheet'
+        'bundle_styles'
       ],
       'copies': [
         {
