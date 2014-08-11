@@ -40,10 +40,8 @@
       'actions': [
         {
           'action_name': 'Touch Stylesheet Directory',
-          'inputs': [
-            'styles',
-          ],
-          'outputs': [],
+          'inputs': ['styles'],
+          'outputs': ['styles'],
           'action': ['touch', 'styles'], # required for xcode http://openradar.appspot.com/7232149
         }
       ],
@@ -60,10 +58,8 @@
       'actions': [
         {
           'action_name': 'Touch Stylesheet Directory',
-          'inputs': [
-            'styles',
-          ],
-          'outputs': [],
+          'inputs': ['styles'],
+          'outputs': ['styles'],
           'action': ['touch', 'styles'], # required for xcode http://openradar.appspot.com/7232149
         }
       ],
