@@ -29,7 +29,7 @@ inline std::string cwd() {
         dir.resize(max);
         uv_cwd(const_cast<char *>(dir.data()), &max);
     } while (max == dir.size());
-    dir.resize(max);
+    dir.resize(max - 1);
     return dir;
 }
 
