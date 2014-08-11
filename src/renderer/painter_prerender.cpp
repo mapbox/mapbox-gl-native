@@ -20,14 +20,7 @@ void Painter::preparePrerender(RasterBucket &bucket) {
     glViewport(0, 0, bucket.properties.size, bucket.properties.size);
 }
 
-void Painter::finishPrerender(RasterBucket &bucket) {
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
-
-    glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
-}
-
-void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix) {
+void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties) {
     const int buffer = bucket.properties.buffer * 4096.0f;
       
     // draw the texture on a quad
@@ -40,8 +33,7 @@ void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix)
     glActiveTexture(GL_TEXTURE0);
     rasterShader->setImage(0);
     rasterShader->setBuffer(buffer);
-    rasterShader->setOpacity(1);
-//    rasterShader->setOpacity(bucket.properties.opacity);             // TODO find a place to pass opacity and change this back
+    rasterShader->setOpacity(properties.opacity);
     bucket.texture.bindTexture();
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());

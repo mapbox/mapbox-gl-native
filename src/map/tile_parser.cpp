@@ -45,7 +45,6 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile,
       spriteAtlas(spriteAtlas),
       sprite(sprite),
       collision(tile.id.z, 4096, tile.source.tile_size, tile.depth) {
-//      placement(tile.id.z, tile.id.z >= tile.source.max_zoom ? tile.source.max_zoom - tile.id.z : 1) {                // TODO : i'm guessing remove this in the rebase?
 }
 
 void TileParser::parse() {
@@ -84,7 +83,6 @@ void TileParser::parseStyleLayers(std::shared_ptr<StyleLayerGroup> group) {
                     // contain any data that falls into this bucket.
                     tile.buckets[layer_desc->bucket->name] = std::move(bucket);
                 }
-                                        // TODO? here, no bucket is being created for prerender raster layers (though buckets are being created for its sublayers)...
             }
         } else {
             fprintf(stderr, "[WARNING] layer '%s' does not have child layers or buckets\n", layer_desc->id.c_str());
@@ -116,8 +114,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(std::shared_ptr<StyleBucket> bu
         } else {
             fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucket_desc->name.c_str(), bucket_desc->source_layer.c_str());
         }
-    } else if (bucket_desc->render.is<StyleBucketRaster>()) {
-        // Assume this is a prerendered raster layer -- TODO more thorough checking here??
+    } else if (bucket_desc->render.is<StyleBucketRaster>() && bucket_desc->render.get<StyleBucketRaster>().prerendered == true) {
         return createRasterBucket(texturePool, bucket_desc->render.get<StyleBucketRaster>());
     } else {
         // The layer specified in the bucket does not exist. Do nothing.

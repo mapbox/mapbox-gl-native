@@ -22,15 +22,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
             
             preparePrerender(bucket);
 
-//            const RasterProperties modifiedProperties = [&]{
-//                RasterProperties modifiedProperties = properties;
-//                modifiedProperties.opacity = 1;   // figure out why this was here
-//                return modifiedProperties;
-//            }();
-
             const int buffer = bucket.properties.buffer * 4096.0f;
-            
-            const mat4 oldMatrix = vtxMatrix;
             
             const mat4 preMatrix = [&]{
                 mat4 vtxMatrix;
@@ -39,20 +31,8 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
                 return vtxMatrix;
             }();
             
-//            *id.matrix = vtxMatrix;
-
-            
-            
-            
-//            glUniformMatrix4fv(matrix, 1, GL_FALSE, preMatrix.data());
-            
             // call updateTiles to get parsed data for sublayers
             map.updateTiles();
-
-//            map.state.matrixFor(matrix, id);
-//            matrix::ortho(matrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
-//            matrix::translate(matrix, matrix, 0, -4096, 0);
-
             
             int i = 0;
             for (auto it = layer_desc->layers->layers.begin(), end = layer_desc->layers->layers.end(); it != end; ++it, --i) {
@@ -62,39 +42,37 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
                 map.renderLayer(*it, Map::RenderPass::Translucent, &id, &preMatrix);
             }
             
-//            TODO make a separate renderLayer overload that takes a prerendered + tileID
-
             if (bucket.properties.blur > 0) {
                 bucket.texture.blur(*this, bucket.properties.blur);
             }
 
             bucket.texture.unbindFramebuffer();
-            finishPrerender(bucket);
 
-//            Tile(id).matrix = oldMatrix;
+            glEnable(GL_DEPTH_TEST);
+            glEnable(GL_STENCIL_TEST);
+            
+            glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
             
         }
         
-        renderPrerenderedTexture(bucket, matrix);
+        renderPrerenderedTexture(bucket, matrix, properties);
 
     }
 
-    depthMask(false);
+    // Only draw non-prerendered raster here
+    if (bucket.hasData()) {
+        depthMask(false);
 
-    useProgram(rasterShader->program);
-    rasterShader->setMatrix(matrix);
-    rasterShader->setBuffer(0);
-    rasterShader->setOpacity(1);
-//    rasterShader->setOpacity(properties.opacity * tile_data->raster->opacity);        // TODO fix
+        useProgram(rasterShader->program);
+        rasterShader->setMatrix(matrix);
+        rasterShader->setBuffer(0);
+        rasterShader->setOpacity(properties.opacity);
 
-    glDepthRange(strata + strata_epsilon, 1.0f);
+        glDepthRange(strata + strata_epsilon, 1.0f);
     
-    if (!bucket.hasData()) {
-//        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray, bucket.texture.getTexture());
-    } else {
         bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
-    }
 
-    depthMask(true);
+        depthMask(true);
+    }
 
 }

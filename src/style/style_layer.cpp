@@ -228,7 +228,7 @@ void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const tim
     properties.set<RasterProperties>();
     RasterProperties &raster = properties.get<RasterProperties>();
     applyStyleProperty(PropertyKey::RasterOpacity, raster.opacity, z, now);
-    applyStyleProperty(PropertyKey::RasterSpin, raster.spin, z, now);
+    applyStyleProperty(PropertyKey::RasterHueRotate, raster.hue_rotate, z, now);
     applyStyleProperty(PropertyKey::RasterBrightnessLow, raster.brightness[0], z, now);
     applyStyleProperty(PropertyKey::RasterBrightnessHigh, raster.brightness[1], z, now);
     applyStyleProperty(PropertyKey::RasterSaturation, raster.saturation, z, now);

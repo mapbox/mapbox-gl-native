@@ -639,8 +639,8 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
 //    TODO edit these?:
     parseOptionalProperty<Function<float>>("raster-opacity", Key::RasterOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
-    parseOptionalProperty<Function<float>>("raster-spin", Key::RasterSpin, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-spin", Key::RasterSpin, klass, value);
+    parseOptionalProperty<Function<float>>("raster-hue-rotate", Key::RasterHueRotate, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-hue-rotate", Key::RasterHueRotate, klass, value);
     parseOptionalProperty<Function<float>>("raster-brightness-low", Key::RasterBrightnessLow, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-raster-brightness-low", Key::RasterBrightnessLow, klass, value);
     parseOptionalProperty<Function<float>>("raster-brightness-high", Key::RasterBrightnessHigh, klass, value);

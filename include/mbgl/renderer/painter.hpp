@@ -43,6 +43,7 @@ class RasterBucket;
 class PrerenderedTexture;
     
 struct FillProperties;
+struct RasterProperties;
 struct CompositeProperties;
 
 class LayerDescription;
@@ -87,9 +88,8 @@ public:
     void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
 
     void preparePrerender(RasterBucket &bucket);
-    void finishPrerender(RasterBucket &bucket);
 
-    void renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix);
+    void renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties);
     
     void createPrerendered(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
 
