@@ -73,8 +73,10 @@ clear_xcode_cache:
     fi
 
 # build Mac OS X project for Xcode
-xproj: config.gypi macosx/mapboxgl-app.gyp clear_xcode_cache node
+xproj-cli: config.gypi macosx/mapboxgl-app.gyp clear_xcode_cache node
 	deps/run_gyp macosx/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
+
+xproj: xproj-cli
 	open ./build/macosx/mapboxgl-app.xcodeproj
 
 # build iOS project for Xcode
