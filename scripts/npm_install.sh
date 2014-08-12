@@ -4,5 +4,5 @@ set -e
 set -o pipefail
 
 cd bin
-npm install --clang=1
+$1 install --clang=1
 cd ../

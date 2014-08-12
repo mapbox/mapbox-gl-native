@@ -49,7 +49,7 @@
           'outputs': [
             'bin/node_modules',
           ],
-          'action': ['./scripts/npm_install.sh']
+          'action': ['./scripts/npm_install.sh', '<@(npm)']
         }
       ],
     },
