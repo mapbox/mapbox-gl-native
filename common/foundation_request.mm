@@ -12,28 +12,15 @@
 #include <mbgl/platform/request.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/std.hpp>
-#include <uv.h>
+#include <mbgl/util/uv.hpp>
 
-uv_once_t request_initialize = UV_ONCE_INIT;
+dispatch_once_t request_initialize = 0;
 NSURLSession *session = nullptr;
 
 #if TARGET_OS_IPHONE
 std::atomic<int> active_tasks;
 #endif
 
-void request_initialize_cb() {
-    NSURLSessionConfiguration *sessionConfig =
-        [NSURLSessionConfiguration defaultSessionConfiguration];
-    sessionConfig.timeoutIntervalForResource = 30;
-    sessionConfig.HTTPMaximumConnectionsPerHost = 8;
-    sessionConfig.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
-
-    session = [NSURLSession sessionWithConfiguration:sessionConfig];
-
-#if TARGET_OS_IPHONE
-    active_tasks = 0;
-#endif
-}
 
 // We're using a child class to make sure ARC is working correctly, as well as to add activity
 // indicators on iOS.
@@ -69,7 +56,19 @@ std::shared_ptr<mbgl::platform::Request>
 mbgl::platform::request_http(const std::string &url,
                              std::function<void(Response *)> callback,
                              std::shared_ptr<uv::loop> loop) {
-    uv_once(&request_initialize, request_initialize_cb);
+    dispatch_once(&request_initialize, ^{
+        NSURLSessionConfiguration *sessionConfig =
+            [NSURLSessionConfiguration defaultSessionConfiguration];
+        sessionConfig.timeoutIntervalForResource = 30;
+        sessionConfig.HTTPMaximumConnectionsPerHost = 8;
+        sessionConfig.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
+
+        session = [NSURLSession sessionWithConfiguration:sessionConfig];
+
+#if TARGET_OS_IPHONE
+        active_tasks = 0;
+#endif
+    });
 
     std::shared_ptr<FoundationRequest> req =
         std::make_shared<FoundationRequest>(url, callback, loop);
