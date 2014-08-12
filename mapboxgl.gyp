@@ -61,7 +61,7 @@
         {
           'action_name': 'Touch Stylesheet Directory',
           'inputs': ['styles'],
-          'outputs': ['<(PRODUCT_DIR)/'], # need to specify a distinct directory
+          'outputs': ['<(SHARED_INTERMEDIATE_DIR)/'], # need to specify a distinct directory
           'action': ['touch', 'styles'],
         }
       ],
