@@ -47,7 +47,7 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::CompositeOpacity, defaultStyleProperties<CompositeProperties>().opacity },
 
     { PropertyKey::RasterOpacity, defaultStyleProperties<RasterProperties>().opacity },
-    { PropertyKey::RasterSpin, defaultStyleProperties<RasterProperties>().spin },
+    { PropertyKey::RasterHueRotate, defaultStyleProperties<RasterProperties>().hue_rotate },
     { PropertyKey::RasterBrightnessLow, defaultStyleProperties<RasterProperties>().brightness[0] },
     { PropertyKey::RasterBrightnessHigh, defaultStyleProperties<RasterProperties>().brightness[1] },
     { PropertyKey::RasterSaturation, defaultStyleProperties<RasterProperties>().saturation },

@@ -28,7 +28,7 @@ public:
                PointElementsBuffer& pointElementsBuffer,
                const StyleBucketLine& properties);
 
-    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     virtual bool hasData() const;
 
     void addGeometry(pbf& data);

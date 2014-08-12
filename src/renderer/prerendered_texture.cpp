@@ -1,10 +1,11 @@
 #include <mbgl/renderer/prerendered_texture.hpp>
 
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/style/style_bucket.hpp>
 
 using namespace mbgl;
 
-PrerenderedTexture::PrerenderedTexture(const RasterizedProperties &properties)
+PrerenderedTexture::PrerenderedTexture(const StyleBucketRaster &properties)
     : properties(properties) {
 }
 
@@ -44,10 +45,24 @@ void PrerenderedTexture::bindFramebuffer() {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
+    if (fbo_depth_stencil == 0) {
+        // Create depth/stencil buffer
+        glGenRenderbuffers(1, &fbo_depth_stencil);
+        glBindRenderbuffer(GL_RENDERBUFFER, fbo_depth_stencil);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, properties.size, properties.size);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    }
+
     if (fbo == 0) {
         glGenFramebuffers(1, &fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+#ifdef GL_ES_VERSION_2_0
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo_depth_stencil);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_depth_stencil);
+#else
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_depth_stencil);
+#endif
 
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (status != GL_FRAMEBUFFER_COMPLETE) {

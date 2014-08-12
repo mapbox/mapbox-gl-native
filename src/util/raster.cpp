@@ -68,6 +68,28 @@ void Raster::bind(bool linear) {
     }
 }
 
+// overload ::bind for prerendered raster textures
+void Raster::bind(const GLuint texture) {
+    if (img && !textured) {
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->getData());
+        img.reset();
+        textured = true;
+    } else if (textured) {
+        glBindTexture(GL_TEXTURE_2D, texture);
+    }
+
+    GLuint filter = GL_LINEAR;
+    if (filter != this->filter) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+        this->filter = filter;
+    }
+
+}
+
 void Raster::beginFadeInTransition() {
     timestamp start = util::now();
     fade_transition = std::make_shared<util::ease_transition<double>>(opacity, 1.0, opacity, start, 250_milliseconds);

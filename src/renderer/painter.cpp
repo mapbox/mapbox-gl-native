@@ -144,16 +144,16 @@ void Painter::clear() {
 }
 
 void Painter::setOpaque() {
-    if (pass != Opaque) {
-        pass = Opaque;
+    if (pass != RenderPass::Opaque) {
+        pass = RenderPass::Opaque;
         glDisable(GL_BLEND);
         depthMask(true);
     }
 }
 
 void Painter::setTranslucent() {
-    if (pass != Translucent) {
-        pass = Translucent;
+    if (pass != RenderPass::Translucent) {
+        pass = RenderPass::Translucent;
         glEnable(GL_BLEND);
         depthMask(false);
     }
@@ -164,25 +164,23 @@ void Painter::setStrata(float value) {
 }
 
 void Painter::prepareTile(const Tile& tile) {
-    matrix = tile.matrix;
-
     GLint id = (GLint)tile.clip.mask.to_ulong();
     GLuint mask = clipMask[tile.clip.length];
     glStencilFunc(GL_EQUAL, id, mask);
 }
 
-void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc) {
+void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix) {
     assert(tile.data);
-    if (tile.data->hasData(layer_desc)) {
+    if (tile.data->hasData(layer_desc) || layer_desc->type == StyleLayerType::Raster) {
         gl::group group(util::sprintf<32>("render %d/%d/%d\n", tile.id.z, tile.id.y, tile.id.z));
         prepareTile(tile);
-        tile.data->render(*this, layer_desc);
+        tile.data->render(*this, layer_desc, matrix);
         frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
     }
 }
 
 
-const mat4 &Painter::translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {
+const mat4 &Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {
     if (translation[0] == 0 && translation[1] == 0) {
         return matrix;
     } else {
