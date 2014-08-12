@@ -9,7 +9,7 @@
 #include <mbgl/util/clip_ids.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/uv.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/text/glyph_store.hpp>
@@ -32,6 +32,7 @@ using namespace mbgl;
 
 Map::Map(View& view)
     : loop(std::make_shared<uv::loop>()),
+      thread(std::make_unique<uv::thread>()),
       view(view),
       transform(view),
       fileSource(std::make_shared<FileSource>()),
@@ -78,7 +79,7 @@ void Map::start() {
     uv_async_init(**loop, async_cleanup, cleanup);
     async_cleanup->data = this;
 
-    uv_thread_create(&thread, [](void *arg) {
+    uv_thread_create(*thread, [](void *arg) {
         Map *map = static_cast<Map *>(arg);
         map->run();
     }, this);
@@ -89,7 +90,7 @@ void Map::stop() {
         uv_async_send(async_terminate);
     }
 
-    uv_thread_join(&thread);
+    uv_thread_join(*thread);
 
     // Run the event loop once to make sure our async delete handlers are called.
     uv_run(**loop, UV_RUN_ONCE);

@@ -9,8 +9,6 @@
 #endif
 #include <GLFW/glfw3.h>
 
-#include <uv.h>
-
 class GLFWView : public mbgl::View {
 public:
     GLFWView(bool fullscreen = false);
@@ -43,8 +41,6 @@ public:
     double last_click = -1;
 
     GLFWwindow *window = nullptr;
-
-    uv_loop_t *loop = nullptr;
 };
 
 #endif

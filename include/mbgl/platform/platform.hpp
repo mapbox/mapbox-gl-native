@@ -1,15 +1,11 @@
 #ifndef MBGL_PLATFORM_PLATFORM
 #define MBGL_PLATFORM_PLATFORM
 
+#include <mbgl/util/uv.hpp>
+
 #include <memory>
 #include <functional>
 #include <string>
-
-typedef struct uv_loop_s uv_loop_t;
-
-namespace uv {
-class loop;
-}
 
 namespace mbgl {
 namespace platform {

@@ -1,6 +1,5 @@
 #include <mbgl/util/time.hpp>
-
-#include <uv.h>
+#include <mbgl/util/uv_detail.hpp>
 
 namespace mbgl {
 namespace util {

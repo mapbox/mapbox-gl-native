@@ -1,13 +1,11 @@
 #ifndef MBGL_UTIL_FILESOURCE
 #define MBGL_UTIL_FILESOURCE
 
+#include <mbgl/util/uv.hpp>
+
 #include <string>
 #include <memory>
 #include <functional>
-
-namespace uv {
-class loop;
-}
 
 namespace mbgl {
 
