@@ -1,5 +1,6 @@
 #include <mbgl/mbgl.hpp>
 #include <mbgl/platform/platform.hpp>
+#include <mbgl/util/uv.hpp>
 
 #include <signal.h>
 #include <getopt.h>

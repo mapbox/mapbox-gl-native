@@ -1,7 +1,7 @@
 #ifndef MBGL_UTIL_TIME
 #define MBGL_UTIL_TIME
 
-#include <uv.h>
+#include <cstdint>
 
 namespace mbgl {
 
@@ -13,9 +13,8 @@ namespace util {
 // Returns time in nanoseconds since an arbitrary point in the past. This has
 // no relation to the current time, but is continuously increasing, so
 // comparisons between different timestamps produce meaningful values.
-inline timestamp now() {
-    return uv_hrtime();
-}
+timestamp now();
+
 }
 
 // used for time conversions

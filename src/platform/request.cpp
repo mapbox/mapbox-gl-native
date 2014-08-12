@@ -1,7 +1,7 @@
 #include <mbgl/platform/request.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/std.hpp>
-#include <mbgl/util/uv.hpp>
+#include <mbgl/util/uv_detail.hpp>
 
 using namespace mbgl::platform;
 

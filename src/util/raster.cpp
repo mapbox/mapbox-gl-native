@@ -7,7 +7,7 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/util/time.hpp>
-#include <mbgl/util/uv.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
 
 #include <png.h>
