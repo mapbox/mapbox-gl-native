@@ -28,6 +28,7 @@ public:
 
 public:
     Style();
+    ~Style();
 
     void loadJSON(const uint8_t *const data);
 
