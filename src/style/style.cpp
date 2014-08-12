@@ -6,6 +6,8 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/error.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
@@ -13,7 +15,8 @@
 
 namespace mbgl {
 
-Style::Style() {
+Style::Style()
+    : mtx(std::make_unique<uv::rwlock>()) {
 }
 
 void Style::updateProperties(float z, timestamp now) {

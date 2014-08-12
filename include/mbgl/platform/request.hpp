@@ -7,14 +7,7 @@
 #include <atomic>
 
 #include <mbgl/util/noncopyable.hpp>
-
-// Forward definition.
-typedef struct uv_loop_s uv_loop_t;
-typedef struct uv_async_s uv_async_t;
-
-namespace uv {
-class loop;
-}
+#include <mbgl/util/uv.hpp>
 
 namespace mbgl {
 namespace platform {

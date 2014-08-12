@@ -9,7 +9,7 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/filesource.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <uv.h>
+#include <mbgl/util/uv_detail.hpp>
 #include <algorithm>
 
 namespace mbgl {

@@ -34,52 +34,45 @@
       }
     },
     {
-      'target_name': 'bundle_styles',
+      'target_name': 'touch_styles',
       'type': 'none',
       'hard_dependency': 1,
       'actions': [
         {
           'action_name': 'Touch Stylesheet Directory',
           'inputs': ['styles'],
-          'outputs': ['styles'],
-          'action': ['touch', 'styles'], # required for xcode http://openradar.appspot.com/7232149
+          'outputs': ['<(PRODUCT_DIR)/'], # need to specify a distinct directory
+          'action': ['touch', 'styles'],
         }
       ],
+    },
+    {
+      'target_name': 'bundle_styles',
+      'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [ 'touch_styles' ], # required for xcode http://openradar.appspot.com/7232149
       'direct_dependent_settings': {
-        'mac_bundle_resources': [
-          'styles',
-        ],
+        'mac_bundle_resources': [ 'styles' ],
       }
     },
     {
       'target_name': 'copy_styles',
       'type': 'none',
       'hard_dependency': 1,
-      'actions': [
-        {
-          'action_name': 'Touch Stylesheet Directory',
-          'inputs': ['styles'],
-          'outputs': [],
-          'action': ['touch', 'styles'], # required for xcode http://openradar.appspot.com/7232149
-        }
-      ],
-      'copies': [
-        {
-          'files': [ 'styles' ],
-          'destination': '<(PRODUCT_DIR)'
-        }
-      ]
+      'dependencies': [ 'touch_styles' ], # required for xcode http://openradar.appspot.com/7232149
+      'copies': [{
+        'files': [ 'styles' ],
+        'destination': '<(PRODUCT_DIR)'
+      }],
     },
     {
       'target_name': 'copy_certificate_bundle',
       'type': 'none',
       'hard_dependency': 1,
-      'copies': [
-        {
-          'files': [ 'common/ca-bundle.crt' ],
-          'destination': '<(PRODUCT_DIR)'
-        }
-      ]
+      'copies': [{
+        'files': [ 'common/ca-bundle.crt' ],
+        'destination': '<(PRODUCT_DIR)'
+      }],
     },
     {
       'target_name': 'mapboxgl',

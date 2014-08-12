@@ -5,6 +5,7 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/filesource.hpp>
+#include <mbgl/util/uv_detail.hpp>
 
 using namespace mbgl;
 
