@@ -44,7 +44,7 @@ NODE=`which node`
 NPM=`which npm`
 
 if [ ! -d 'mapnik-packaging/.git' ]; then
-  git clone --depth=1 https://github.com/mapnik/mapnik-packaging.git
+  git clone --depth=1 -b libuv010 https://github.com/mapnik/mapnik-packaging.git
 fi
 
 cd mapnik-packaging/osx/
