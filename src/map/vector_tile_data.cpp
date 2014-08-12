@@ -21,7 +21,7 @@ VectorTileData::~VectorTileData() {
 }
 
 void VectorTileData::beforeParse() {
-    
+
     parser = std::make_unique<TileParser>(data, *this, map.getStyle(), map.getGlyphAtlas(), map.getGlyphStore(), map.getSpriteAtlas(), map.getSprite());
 }
 

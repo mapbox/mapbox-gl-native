@@ -43,7 +43,7 @@ class LineBucket;
 class SymbolBucket;
 class RasterBucket;
 class PrerenderedTexture;
-    
+
 struct FillProperties;
 struct RasterProperties;
 struct CompositeProperties;
@@ -92,7 +92,7 @@ public:
     void preparePrerender(RasterBucket &bucket);
 
     void renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties);
-    
+
     void createPrerendered(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
 
     void resize();

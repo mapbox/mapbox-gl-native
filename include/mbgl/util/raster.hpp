@@ -28,7 +28,7 @@ public:
 
     // bind prerendered texture
     void bind(const GLuint texture);
-    
+
     // loaded status
     bool isLoaded() const;
 

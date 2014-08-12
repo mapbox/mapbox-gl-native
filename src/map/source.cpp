@@ -87,7 +87,7 @@ void Source::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc) {
         }
     }
 }
-    
+
 void Source::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix) {
     auto it = tiles.find(id);
     if (it != tiles.end() && it->second->data && it->second->data->state == TileData::State::parsed) {

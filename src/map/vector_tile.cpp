@@ -128,7 +128,7 @@ FilteredVectorTileLayer::iterator::iterator(const FilteredVectorTileLayer& paren
 //        return true;
 //    }
 //
-//    
+//
 //
 //
 //    if (filterExpression.is<util::recursive_wrapper<PropertyFilter>>()) {

@@ -80,14 +80,14 @@ void Raster::bind(const GLuint texture) {
     } else if (textured) {
         glBindTexture(GL_TEXTURE_2D, texture);
     }
-    
+
     GLuint filter = GL_LINEAR;
     if (filter != this->filter) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
         this->filter = filter;
     }
-    
+
 }
 
 void Raster::beginFadeInTransition() {

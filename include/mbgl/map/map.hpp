@@ -46,7 +46,7 @@ public:
     void rerender();
 
     void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
-    
+
     // Forces a map update: always triggers a rerender.
     void update();
 

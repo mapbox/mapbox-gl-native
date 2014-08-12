@@ -22,7 +22,7 @@ void Painter::preparePrerender(RasterBucket &bucket) {
 
 void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties) {
     const int buffer = bucket.properties.buffer * 4096.0f;
-      
+
     // draw the texture on a quad
     useProgram(rasterShader->program);
     rasterShader->setMatrix(matrix);

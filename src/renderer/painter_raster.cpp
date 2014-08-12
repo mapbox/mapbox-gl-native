@@ -11,29 +11,29 @@ using namespace mbgl;
 
 void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
     if (pass != RenderPass::Translucent) return;
-    
+
     const RasterProperties &properties = layer_desc->getProperties<RasterProperties>();
-    
+
     if (layer_desc->layers) {
-        
+
         if (!bucket.texture.getTexture()) {
 
             bucket.texture.bindFramebuffer();
-            
+
             preparePrerender(bucket);
 
             const int buffer = bucket.properties.buffer * 4096.0f;
-            
+
             const mat4 preMatrix = [&]{
                 mat4 vtxMatrix;
                 matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
                 matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
                 return vtxMatrix;
             }();
-            
+
             // call updateTiles to get parsed data for sublayers
             map.updateTiles();
-            
+
             int i = 0;
             for (auto it = layer_desc->layers->layers.begin(), end = layer_desc->layers->layers.end(); it != end; ++it, --i) {
                 setOpaque();
@@ -41,7 +41,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
                 setTranslucent();
                 map.renderLayer(*it, RenderPass::Translucent, &id, &preMatrix);
             }
-            
+
             if (bucket.properties.blur > 0) {
                 bucket.texture.blur(*this, bucket.properties.blur);
             }
@@ -50,11 +50,11 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
 
             glEnable(GL_DEPTH_TEST);
             glEnable(GL_STENCIL_TEST);
-            
+
             glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
-            
+
         }
-        
+
         renderPrerenderedTexture(bucket, matrix, properties);
 
     }
@@ -69,7 +69,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
         rasterShader->setOpacity(properties.opacity);
 
         glDepthRange(strata + strata_epsilon, 1.0f);
-    
+
         bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
 
         depthMask(true);

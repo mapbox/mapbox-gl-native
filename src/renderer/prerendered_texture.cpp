@@ -44,7 +44,7 @@ void PrerenderedTexture::bindFramebuffer() {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, properties.size, properties.size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-    
+
     if (fbo_depth_stencil == 0) {
         // Create depth/stencil buffer
         glGenRenderbuffers(1, &fbo_depth_stencil);

@@ -532,7 +532,7 @@ void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair
         // Skip parsing this again. We already have a valid layer definition.
         return;
     }
-    
+
     // Make sure we have not previously attempted to parse this layer.
     if (std::find(stack.begin(), stack.end(), layer.get()) != stack.end()) {
         Log::Warning(Event::ParseStyle, "layer reference of '%s' is circular", layer->id.c_str());
@@ -907,10 +907,10 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         parseRenderProperty(value, render.text.ignore_placement, "text-ignore-placement");
         parseRenderProperty(value, render.text.optional, "text-optional");
     } break;
-            
+
     case StyleLayerType::Raster: {
         StyleBucketRaster &render = bucket.render.get<StyleBucketRaster>();
-        
+
         parseRenderProperty(value, render.size, "raster-size");
         parseRenderProperty(value, render.blur, "raster-blur");
         parseRenderProperty(value, render.buffer, "raster-buffer");
@@ -918,7 +918,7 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
             render.prerendered = true;
         }
     } break;
-            
+
     default:
         // There are no render properties for these layer types.
         break;
