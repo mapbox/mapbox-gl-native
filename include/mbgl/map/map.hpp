@@ -156,7 +156,7 @@ private:
 private:
     bool async = false;
     std::shared_ptr<uv::loop> loop;
-    uv_thread_t thread;
+    std::unique_ptr<uv::thread> thread;
     uv_async_t *async_terminate = nullptr;
     uv_async_t *async_render = nullptr;
     uv_async_t *async_cleanup = nullptr;

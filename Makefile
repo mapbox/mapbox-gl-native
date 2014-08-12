@@ -27,7 +27,7 @@ build/test/Makefile: src common config.gypi test/test.gyp
 test: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=Testing V=$(V) test
 
-test/%: build/test/Makefile
+test_%: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=Testing V=$(V) $*
 	(cd build/Testing && exec ./test_$*)
 

@@ -208,7 +208,6 @@
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
             "../mapboxgl.gyp:mapboxgl",
-            '../mapboxgl.gyp:bundle_styles',
             "link_gl",
         ]
     },

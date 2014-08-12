@@ -6,7 +6,7 @@
 #include <string>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/filesource.hpp>
-#include <mbgl/util/uv.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
 
 #include <rapidjson/document.h>

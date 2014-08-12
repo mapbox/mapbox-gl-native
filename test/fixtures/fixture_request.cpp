@@ -1,6 +1,6 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/request.hpp>
-#include <mbgl/util/uv.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>
 
 const std::string base_directory = []{
