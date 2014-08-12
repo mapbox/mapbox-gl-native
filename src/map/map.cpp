@@ -611,7 +611,7 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
     for (auto it = group->layers.rbegin(), end = group->layers.rend(); it != end; ++it, ++i) {
         painter.setOpaque();
         painter.setStrata(i * strata_thickness);
-        renderLayer(*it, Opaque);
+        renderLayer(*it, RenderPass::Opaque);
     }
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
@@ -627,7 +627,7 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
     for (auto it = group->layers.begin(), end = group->layers.end(); it != end; ++it, --i) {
         painter.setTranslucent();
         painter.setStrata(i * strata_thickness);
-        renderLayer(*it, Translucent);
+        renderLayer(*it, RenderPass::Translucent);
     }
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
@@ -637,7 +637,7 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
 void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id, const mat4* matrix) {
     if (layer_desc->layers && layer_desc->type != StyleLayerType::Raster) {
         // This is a layer group. We render them during our translucent render pass.
-        if (pass == Translucent) {
+        if (pass == RenderPass::Translucent) {
             const CompositeProperties &properties = layer_desc->getProperties<CompositeProperties>();
             if (properties.isVisible()) {
                 gl::group group(std::string("group: ") + layer_desc->id);
@@ -698,15 +698,15 @@ void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, c
                 if (!layer_desc->getProperties<FillProperties>().isVisible()) return;
                 break;
             case StyleLayerType::Line:
-                if (pass == Opaque) return;
+                if (pass == RenderPass::Opaque) return;
                 if (!layer_desc->getProperties<LineProperties>().isVisible()) return;
                 break;
             case StyleLayerType::Symbol:
-                if (pass == Opaque) return;
+                if (pass == RenderPass::Opaque) return;
                 if (!layer_desc->getProperties<SymbolProperties>().isVisible()) return;
                 break;
             case StyleLayerType::Raster:
-                if (pass == Opaque) return;
+                if (pass == RenderPass::Opaque) return;
                 if (!layer_desc->getProperties<RasterProperties>().isVisible()) return;
                 break;
             default:

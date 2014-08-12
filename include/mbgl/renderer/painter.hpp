@@ -29,6 +29,8 @@
 
 namespace mbgl {
 
+enum class RenderPass : bool { Opaque, Translucent };
+
 class Transform;
 class Style;
 class Tile;
@@ -154,7 +156,7 @@ private:
     bool gl_depthMask = true;
     std::array<uint16_t, 2> gl_viewport = {{ 0, 0 }};
     float strata = 0;
-    enum { Opaque, Translucent } pass = Opaque;
+    RenderPass pass = RenderPass::Opaque;
     const float strata_epsilon = 1.0f / (1 << 16);
 
 public:

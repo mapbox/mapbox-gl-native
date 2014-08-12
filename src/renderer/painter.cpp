@@ -144,16 +144,16 @@ void Painter::clear() {
 }
 
 void Painter::setOpaque() {
-    if (pass != Opaque) {
-        pass = Opaque;
+    if (pass != RenderPass::Opaque) {
+        pass = RenderPass::Opaque;
         glDisable(GL_BLEND);
         depthMask(true);
     }
 }
 
 void Painter::setTranslucent() {
-    if (pass != Translucent) {
-        pass = Translucent;
+    if (pass != RenderPass::Translucent) {
+        pass = RenderPass::Translucent;
         glEnable(GL_BLEND);
         depthMask(false);
     }

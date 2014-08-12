@@ -7,7 +7,7 @@ using namespace mbgl;
 
 void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
     // Abort early.
-    if (pass == Opaque) return;
+    if (pass == RenderPass::Opaque) return;
     if (!bucket.hasData()) return;
 
     const LineProperties &properties = layer_desc->getProperties<LineProperties>();

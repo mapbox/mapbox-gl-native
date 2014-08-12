@@ -38,7 +38,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
-    if (outline && pass == Translucent) {
+    if (outline && pass == RenderPass::Translucent) {
         useProgram(outlineShader->program);
         outlineShader->setMatrix(vtxMatrix);
         lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
@@ -70,7 +70,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
         // glStencilOp(GL_KEEP, GL_KEEP, GL_INCR_WRAP);
     }
 
-    if ((fill_color[3] >= 1.0f) == (pass == Opaque)) {
+    if ((fill_color[3] >= 1.0f) == (pass == RenderPass::Opaque)) {
         Sprite &sprite = *map.getSprite();
         if (properties.image.size() && sprite) {
             SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
@@ -128,7 +128,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
-    if (fringeline && pass == Translucent) {
+    if (fringeline && pass == RenderPass::Translucent) {
         useProgram(outlineShader->program);
         outlineShader->setMatrix(vtxMatrix);
         lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!

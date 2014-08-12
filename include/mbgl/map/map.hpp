@@ -45,8 +45,6 @@ public:
     // Triggers a lazy rerender: only performs a render when the map is not clean.
     void rerender();
 
-    enum RenderPass { Opaque, Translucent };
-
     void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
     
     // Forces a map update: always triggers a rerender.

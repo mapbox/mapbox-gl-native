@@ -10,7 +10,7 @@
 using namespace mbgl;
 
 void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
-    if (pass != Translucent) return;
+    if (pass != RenderPass::Translucent) return;
     
     const RasterProperties &properties = layer_desc->getProperties<RasterProperties>();
     
@@ -37,9 +37,9 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
             int i = 0;
             for (auto it = layer_desc->layers->layers.begin(), end = layer_desc->layers->layers.end(); it != end; ++it, --i) {
                 setOpaque();
-                map.renderLayer(*it, Map::RenderPass::Opaque, &id, &preMatrix);
+                map.renderLayer(*it, RenderPass::Opaque, &id, &preMatrix);
                 setTranslucent();
-                map.renderLayer(*it, Map::RenderPass::Translucent, &id, &preMatrix);
+                map.renderLayer(*it, RenderPass::Translucent, &id, &preMatrix);
             }
             
             if (bucket.properties.blur > 0) {
