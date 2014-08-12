@@ -40,6 +40,9 @@ if [[ $MISSING_DEPS != "" ]]; then
     exit 1
 fi
 
+NODE=`which node`
+NPM=`which npm`
+
 if [ ! -d 'mapnik-packaging/.git' ]; then
   git clone --depth=1 https://github.com/mapnik/mapnik-packaging.git
 fi
@@ -92,7 +95,8 @@ cd ../../
 ./configure \
 --pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal/lib/pkgconfig \
 --boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal \
---node=`which node`
+--npm=$NPM \
+--node=$NODE
 
 elif [ ${UNAME} = 'Linux' ]; then
 
@@ -122,5 +126,6 @@ cd ../../
 ./configure \
 --pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/pkgconfig \
 --boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64-linux \
---node=`which node`
+--npm=$NPM \
+--node=$NODE
 fi

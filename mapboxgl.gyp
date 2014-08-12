@@ -8,6 +8,9 @@
       'target_name': 'shaders',
       'type': 'none',
       'hard_dependency': 1,
+      'dependencies': [
+        'npm_install'
+      ],
       'actions': [
         {
           'action_name': 'Build Shaders',
@@ -32,6 +35,23 @@
           '<(SHARED_INTERMEDIATE_DIR)/include/',
         ]
       }
+    },
+    {
+      'target_name': 'npm_install',
+      'type': 'none',
+      'hard_dependency': 1,
+      'actions': [
+        {
+          'action_name': 'npm install',
+          'inputs': [
+            'bin/package.json',
+          ],
+          'outputs': [
+            'bin/node_modules',
+          ],
+          'action': ['./scripts/npm_install.sh', '<@(npm)']
+        }
+      ],
     },
     {
       'target_name': 'touch_styles',
@@ -66,6 +86,20 @@
       }],
     },
     {
+      'target_name': 'copy_fixtures',
+      'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [
+        'bundle_styles'
+      ],
+      'copies': [
+        {
+          'files': [ 'styles' ],
+          'destination': 'test/fixtures/style_parser'
+        }
+      ]
+    },
+    {
       'target_name': 'copy_certificate_bundle',
       'type': 'none',
       'hard_dependency': 1,
@@ -90,7 +124,7 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
-        'bin/style.js'
+        'bin/style.json'
       ],
       'xcode_settings': {
         'SDKROOT': 'macosx',
@@ -157,7 +191,7 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
-        'bin/style.js'
+        'bin/style.json'
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
