@@ -59,7 +59,7 @@
         {
           'action_name': 'Touch Stylesheet Directory',
           'inputs': ['styles'],
-          'outputs': ['styles'],
+          'outputs': [],
           'action': ['touch', 'styles'], # required for xcode http://openradar.appspot.com/7232149
         }
       ],
