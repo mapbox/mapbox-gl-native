@@ -1,7 +1,8 @@
 {
-    "name": "mbgl-native",
-    "version": "0.0.1",
-    "dependencies": {
-        "mapbox-glsl-optimizer": "~0.1.0"
-    }
+  "name": "mbgl-native",
+  "version": "0.0.1",
+  "dependencies": {
+    "mapbox-glsl-optimizer": "~0.1.0",
+    "mkdirp": "^0.5.0"
+  }
 }
