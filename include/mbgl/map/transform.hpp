@@ -80,7 +80,7 @@ private:
 private:
     View &view;
 
-    mutable uv::rwlock mtx;
+    std::unique_ptr<uv::rwlock> mtx;
 
     // This reflects the current state of the transform, representing the actual position of the
     // map. After calling a transform function with a timer, this will likely remain the same until

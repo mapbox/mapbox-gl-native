@@ -5,6 +5,7 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/time.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/transition.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <cstdio>
@@ -16,9 +17,7 @@ const double R2D = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
 const double MIN_ROTATE_SCALE = 8;
 
-Transform::Transform(View &view)
-    : view(view) {
-
+Transform::Transform(View &view) : view(view), mtx(std::make_unique<uv::rwlock>()) {
     setScale(current.scale);
     setAngle(current.angle);
 }
