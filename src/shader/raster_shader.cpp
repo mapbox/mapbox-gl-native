@@ -68,7 +68,7 @@ void RasterShader::setBrightness(float new_brightness_low, float new_brightness_
         glUniform1f(u_brightness_low, new_brightness_low);
         brightness_low = new_brightness_low;
     }
-    if (brightness_high!= new_brightness_high) {
+    if (brightness_high != new_brightness_high) {
         glUniform1f(u_brightness_high, new_brightness_high);
         brightness_high = new_brightness_high;
     }

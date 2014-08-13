@@ -7,8 +7,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/transform.hpp>
 
-#include <cmath>
-
 using namespace mbgl;
 
 void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
@@ -85,12 +83,12 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
 
 std::array<float, 3> Painter::spinWeights(float spin) {
     spin *= M_PI / 180;
-    float s = sin(spin);
-    float c = cos(spin);
+    float s = std::sin(spin);
+    float c = std::cos(spin);
     std::array<float, 3> spin_weights = {{
         (2 * c + 1) / 3,
-        (-sqrtf(3.0) * s - c + 1) / 3,
-        (sqrtf(3.0) * s - c + 1) / 3
+        (-std::sqrtf(3.0) * s - c + 1) / 3,
+        (std::sqrtf(3.0) * s - c + 1) / 3
     }};
     return spin_weights;
 }
