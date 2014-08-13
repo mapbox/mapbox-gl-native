@@ -11,7 +11,7 @@ class VertexArrayObject {
 public:
     template <typename Shader, typename VertexBuffer>
     void bind(Shader& shader, VertexBuffer& vertex_buffer, char *offset) {
-#ifdef GL_ARB_vertex_array_object
+#if GL_ARB_vertex_array_object
         if (!vao) {
             glGenVertexArrays(1, &vao);
             glBindVertexArray(vao);
@@ -28,7 +28,7 @@ public:
             vertex_buffer.bind();
             shader.bind(offset);
 
-#ifdef GL_ARB_vertex_array_object
+#if GL_ARB_vertex_array_object
             shader_ptr = &shader;
             vertex_buffer_ptr = &vertex_buffer;
             elements_buffer_ptr = nullptr;
@@ -45,7 +45,7 @@ public:
 
     template <typename Shader, typename VertexBuffer, typename ElementsBuffer>
     void bind(Shader& shader, VertexBuffer& vertex_buffer, ElementsBuffer& elements_buffer, char *offset) {
-#ifdef GL_ARB_vertex_array_object
+#if GL_ARB_vertex_array_object
         if (!vao) {
             glGenVertexArrays(1, &vao);
             glBindVertexArray(vao);
@@ -60,7 +60,7 @@ public:
             elements_buffer.bind();
             shader.bind(offset);
 
-#ifdef GL_ARB_vertex_array_object
+#if GL_ARB_vertex_array_object
             shader_ptr = &shader;
             vertex_buffer_ptr = &vertex_buffer;
             elements_buffer_ptr = &elements_buffer;
@@ -76,7 +76,7 @@ public:
     }
 
     ~VertexArrayObject() {
-#ifdef GL_ARB_vertex_array_object
+#if GL_ARB_vertex_array_object
         if (vao) {
             glDeleteVertexArrays(1, &vao);
         }
@@ -84,7 +84,7 @@ public:
     }
 
 private:
-#ifdef GL_ARB_vertex_array_object
+#if GL_ARB_vertex_array_object
     GLuint vao = 0;
 
     // For debug reasons, we're storing the bind information so that we can
