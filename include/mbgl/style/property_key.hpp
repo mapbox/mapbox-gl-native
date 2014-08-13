@@ -55,6 +55,7 @@ enum class PropertyKey {
 
     RasterOpacity,
     RasterHueRotate,
+    RasterBrightness, // for transitions only
     RasterBrightnessLow,
     RasterBrightnessHigh,
     RasterSaturation,

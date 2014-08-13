@@ -34,7 +34,7 @@ private:
     float brightness_low = 0;
     int32_t u_brightness_low = -1;
 
-    float brightness_high = 1;
+    float brightness_high = 0;
     int32_t u_brightness_high = -1;
 
     float saturation_factor = 0;
