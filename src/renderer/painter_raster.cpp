@@ -65,8 +65,6 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
     if (bucket.hasData()) {
         depthMask(false);
 
-//        const Tile::ID parent_id = id.parent(id.z);
-
         useProgram(rasterShader->program);
         rasterShader->setMatrix(matrix);
         rasterShader->setBuffer(0);
