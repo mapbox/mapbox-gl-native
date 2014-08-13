@@ -66,6 +66,10 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
         rasterShader->setMatrix(matrix);
         rasterShader->setBuffer(0);
         rasterShader->setOpacity(properties.opacity);
+        rasterShader->setBrightness(properties.brightness[0], properties.brightness[1]);
+        rasterShader->setSaturation(properties.saturation);
+        rasterShader->setContrast(properties.contrast);
+        rasterShader->setSpin(spinWeights(properties.hue_rotate));
 
         glDepthRange(strata + strata_epsilon, 1.0f);
 
@@ -74,4 +78,16 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
         depthMask(true);
     }
 
+}
+
+std::array<float, 3> Painter::spinWeights(float spin) {
+    spin *= M_PI / 180;
+    float s = std::sin(spin);
+    float c = std::cos(spin);
+    std::array<float, 3> spin_weights = {{
+        (2 * c + 1) / 3,
+        (-std::sqrt(3.0f) * s - c + 1) / 3,
+        (std::sqrt(3.0f) * s - c + 1) / 3
+    }};
+    return spin_weights;
 }
