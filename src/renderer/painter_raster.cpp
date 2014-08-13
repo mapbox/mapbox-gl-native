@@ -87,8 +87,8 @@ std::array<float, 3> Painter::spinWeights(float spin) {
     float c = std::cos(spin);
     std::array<float, 3> spin_weights = {{
         (2 * c + 1) / 3,
-        (-std::sqrtf(3.0) * s - c + 1) / 3,
-        (std::sqrtf(3.0) * s - c + 1) / 3
+        (-std::sqrt(3.0f) * s - c + 1) / 3,
+        (std::sqrt(3.0f) * s - c + 1) / 3
     }};
     return spin_weights;
 }
