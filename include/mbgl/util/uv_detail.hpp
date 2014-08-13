@@ -31,18 +31,13 @@ private:
 
 class loop {
 public:
-    inline loop() {
-        if (uv_loop_init(&l) != 0) {
-            throw std::runtime_error("failed to initialize loop");
-        }
-    }
+    inline loop() : l(uv_loop_new()) {}
+    inline ~loop() { uv_loop_delete(l); }
 
-    inline ~loop() { uv_loop_close(&l); }
-
-    inline uv_loop_t *operator*() { return &l; }
+    inline uv_loop_t *operator*() { return l; }
 
 private:
-    uv_loop_t l;
+    uv_loop_t *l;
 };
 
 class mutex {
