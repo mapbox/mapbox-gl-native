@@ -18,7 +18,6 @@
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/shader/text_shader.hpp>
 #include <mbgl/shader/dot_shader.hpp>
-#include <mbgl/shader/composite_shader.hpp>
 #include <mbgl/shader/gaussian_shader.hpp>
 
 #include <mbgl/map/transform_state.hpp>
@@ -46,7 +45,6 @@ class PrerenderedTexture;
 
 struct FillProperties;
 struct RasterProperties;
-struct CompositeProperties;
 
 class LayerDescription;
 class RasterTileData;
@@ -111,13 +109,11 @@ public:
     void drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &sources);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
 
-    void clearFramebuffers();
     void resetFramebuffer();
     void bindFramebuffer();
     void pushFramebuffer();
     GLuint popFramebuffer();
     void discardFramebuffers();
-    void drawComposite(GLuint texture, const CompositeProperties &properties);
 
     bool needsAnimation() const;
 private:
@@ -172,7 +168,6 @@ public:
     std::unique_ptr<RasterShader> rasterShader;
     std::unique_ptr<TextShader> textShader;
     std::unique_ptr<DotShader> dotShader;
-    std::unique_ptr<CompositeShader> compositeShader;
     std::unique_ptr<GaussianShader> gaussianShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
@@ -193,7 +188,6 @@ public:
     VertexArrayObject coveringRasterArray;
     VertexArrayObject coveringGaussianArray;
 
-    VertexArrayObject compositeArray;
     VertexArrayObject matteArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
