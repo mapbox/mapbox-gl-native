@@ -34,12 +34,11 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
             // call updateTiles to get parsed data for sublayers
             map.updateTiles();
 
-            int i = 0;
-            for (auto it = layer_desc->layers->layers.begin(), end = layer_desc->layers->layers.end(); it != end; ++it, --i) {
+            for (const std::shared_ptr<StyleLayer> &layer : layer_desc->layers->layers) {
                 setOpaque();
-                map.renderLayer(*it, RenderPass::Opaque, &id, &preMatrix);
+                map.renderLayer(layer, RenderPass::Opaque, &id, &preMatrix);
                 setTranslucent();
-                map.renderLayer(*it, RenderPass::Translucent, &id, &preMatrix);
+                map.renderLayer(layer, RenderPass::Translucent, &id, &preMatrix);
             }
 
             if (bucket.properties.blur > 0) {
