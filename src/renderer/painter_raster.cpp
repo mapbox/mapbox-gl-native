@@ -7,6 +7,8 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/transform.hpp>
 
+#include <cmath>
+
 using namespace mbgl;
 
 void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
@@ -63,10 +65,16 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
     if (bucket.hasData()) {
         depthMask(false);
 
+//        const Tile::ID parent_id = id.parent(id.z);
+
         useProgram(rasterShader->program);
         rasterShader->setMatrix(matrix);
         rasterShader->setBuffer(0);
         rasterShader->setOpacity(properties.opacity);
+        rasterShader->setBrightness(properties.brightness[0], properties.brightness[1]);
+        rasterShader->setSaturation(properties.saturation);
+        rasterShader->setContrast(properties.contrast);
+        rasterShader->setSpin(spinWeights(properties.hue_rotate));
 
         glDepthRange(strata + strata_epsilon, 1.0f);
 
@@ -75,4 +83,16 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
         depthMask(true);
     }
 
+}
+
+std::array<float, 3> Painter::spinWeights(float spin) {
+    spin *= M_PI / 180;
+    float s = sin(spin);
+    float c = cos(spin);
+    std::array<float, 3> spin_weights = {{
+        (2 * c + 1) / 3,
+        (-sqrtf(3.0) * s - c + 1) / 3,
+        (sqrtf(3.0) * s - c + 1) / 3
+    }};
+    return spin_weights;
 }

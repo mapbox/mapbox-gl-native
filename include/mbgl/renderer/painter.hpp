@@ -88,6 +88,7 @@ public:
     void renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     void renderSymbol(SymbolBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    std::array<float, 3> spinWeights(float spin_value);
 
     void preparePrerender(RasterBucket &bucket);
 
