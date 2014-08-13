@@ -5,9 +5,9 @@
 
 using namespace mbgl;
 
-void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
+void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
     // Abort early.
-    if (pass == Opaque) return;
+    if (pass == RenderPass::Opaque) return;
     if (!bucket.hasData()) return;
 
     const LineProperties &properties = layer_desc->getProperties<LineProperties>();
@@ -31,7 +31,7 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     float dash_length = properties.dash_array[0];
     float dash_gap = properties.dash_array[1];
 
-    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
+    const mat4 &vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
     glDepthRange(strata, 1.0f);
 

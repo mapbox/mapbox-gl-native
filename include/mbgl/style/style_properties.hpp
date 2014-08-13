@@ -89,7 +89,7 @@ struct CompositeProperties {
 struct RasterProperties {
     inline RasterProperties() {}
     float opacity = 1.0f;
-    float spin = 0.0f;
+    float hue_rotate = 0.0f;
     std::array<float, 2> brightness = {{ 0, 1 }};
     float saturation = 0.0f;
     float contrast = 0.0f;

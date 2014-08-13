@@ -29,6 +29,8 @@
 
 namespace mbgl {
 
+enum class RenderPass : bool { Opaque, Translucent };
+
 class Transform;
 class Style;
 class Tile;
@@ -40,8 +42,10 @@ class FillBucket;
 class LineBucket;
 class SymbolBucket;
 class RasterBucket;
+class PrerenderedTexture;
 
 struct FillProperties;
+struct RasterProperties;
 struct CompositeProperties;
 
 class LayerDescription;
@@ -69,27 +73,28 @@ public:
     void changeMatrix();
 
     // Renders a particular layer from a tile.
-    void renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc);
+    void renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
 
     // Renders the red debug frame around a tile, visualizing its perimeter.
-    void renderDebugFrame();
+    void renderDebugFrame(const mat4 &matrix);
 
-    void renderDebugText(DebugBucket& bucket);
+    void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
     void renderDebugText(const std::vector<std::string> &strings);
-    void renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &mat);
-    void renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
-    void renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
-    void renderSymbol(SymbolBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
-    void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    void renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &matrix);
+    void renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderSymbol(SymbolBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    std::array<float, 3> spinWeights(float spin_value);
 
-    void preparePrerender(PrerenderedTexture &texture);
-    void finishPrerender(PrerenderedTexture &texture);
+    void preparePrerender(RasterBucket &bucket);
 
-    template <typename Properties>
-    void renderPrerenderedTexture(PrerenderedTexture &texture, const Properties &properties);
+    void renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties);
+
+    void createPrerendered(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
 
     void resize();
 
@@ -117,7 +122,7 @@ public:
     bool needsAnimation() const;
 private:
     void setupShaders();
-    const mat4 &translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = TranslateAnchorType::Map);
+    const mat4 &translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = TranslateAnchorType::Map);
 
     void prepareTile(const Tile& tile);
 
@@ -127,7 +132,6 @@ public:
     void depthMask(bool value);
 
 public:
-    mat4 matrix;
     mat4 vtxMatrix;
     mat4 projMatrix;
     mat4 nativeMatrix;
@@ -153,7 +157,7 @@ private:
     bool gl_depthMask = true;
     std::array<uint16_t, 2> gl_viewport = {{ 0, 0 }};
     float strata = 0;
-    enum { Opaque, Translucent } pass = Opaque;
+    RenderPass pass = RenderPass::Opaque;
     const float strata_epsilon = 1.0f / (1 << 16);
 
 public:

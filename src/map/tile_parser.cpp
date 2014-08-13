@@ -14,6 +14,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/text/glyph.hpp>
+#include <mbgl/map/map.hpp>
 
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/utf.hpp>
@@ -69,7 +70,8 @@ void TileParser::parseStyleLayers(std::shared_ptr<StyleLayerGroup> group) {
         } else if (layer_desc->layers) {
             // This is a layer group.
             parseStyleLayers(layer_desc->layers);
-        } else if (layer_desc->bucket) {
+        }
+        if (layer_desc->bucket) {
             // This is a singular layer. Check if this bucket already exists. If not,
             // parse this bucket.
             auto bucket_it = tile.buckets.find(layer_desc->bucket->name);
@@ -112,6 +114,8 @@ std::unique_ptr<Bucket> TileParser::createBucket(std::shared_ptr<StyleBucket> bu
         } else {
             fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucket_desc->name.c_str(), bucket_desc->source_layer.c_str());
         }
+    } else if (bucket_desc->render.is<StyleBucketRaster>() && bucket_desc->render.get<StyleBucketRaster>().prerendered == true) {
+        return createRasterBucket(texturePool, bucket_desc->render.get<StyleBucketRaster>());
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
         if (debug::tileParseWarnings) {
@@ -144,6 +148,11 @@ void TileParser::addBucketGeometries(Bucket& bucket, const VectorTileLayer& laye
 std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketFill &fill) {
     std::unique_ptr<FillBucket> bucket = std::make_unique<FillBucket>(tile.fillVertexBuffer, tile.triangleElementsBuffer, tile.lineElementsBuffer, fill);
     addBucketGeometries(bucket, layer, filter);
+    return obsolete() ? nullptr : std::move(bucket);
+}
+
+std::unique_ptr<Bucket> TileParser::createRasterBucket(const std::shared_ptr<Texturepool> &texturepool, const StyleBucketRaster &raster) {
+    std::unique_ptr<RasterBucket> bucket = std::make_unique<RasterBucket>(texturepool, raster);
     return obsolete() ? nullptr : std::move(bucket);
 }
 

@@ -38,7 +38,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
-    if (outline && pass == Translucent) {
+    if (outline && pass == RenderPass::Translucent) {
         useProgram(outlineShader->program);
         outlineShader->setMatrix(vtxMatrix);
         lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
@@ -70,7 +70,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
         // glStencilOp(GL_KEEP, GL_KEEP, GL_INCR_WRAP);
     }
 
-    if ((fill_color[3] >= 1.0f) == (pass == Opaque)) {
+    if ((fill_color[3] >= 1.0f) == (pass == RenderPass::Opaque)) {
         Sprite &sprite = *map.getSprite();
         if (properties.image.size() && sprite) {
             SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
@@ -128,7 +128,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
-    if (fringeline && pass == Translucent) {
+    if (fringeline && pass == RenderPass::Translucent) {
         useProgram(outlineShader->program);
         outlineShader->setMatrix(vtxMatrix);
         lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
@@ -146,59 +146,10 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
     }
 }
 
-void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
+void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
     // Abort early.
     if (!bucket.hasData()) return;
-
     const FillProperties &properties = layer_desc->getProperties<FillProperties>();
-
-    if (layer_desc->rasterize && layer_desc->rasterize->isEnabled(id.z)) {
-        if (pass == Translucent) {
-            const RasterizedProperties rasterize = layer_desc->rasterize->get(id.z);
-            // Buffer value around the 0..4096 extent that will be drawn into the 256x256 pixel
-            // texture. We later scale the texture so that the actual bounds will align with this
-            // tile's bounds. The reason we do this is so that the
-            if (!bucket.prerendered) {
-                bucket.prerendered = std::make_unique<PrerenderedTexture>(rasterize);
-                bucket.prerendered->bindFramebuffer();
-
-                preparePrerender(*bucket.prerendered);
-
-                const FillProperties modifiedProperties = [&]{
-                    FillProperties modifiedProperties = properties;
-                    modifiedProperties.opacity = 1;
-                    return modifiedProperties;
-                }();
-
-                // When drawing the fill, we want to draw a buffer around too, so we
-                // essentially downscale everyting, and then upscale it later when rendering.
-                const int buffer = rasterize.buffer * 4096.0f;
-                const mat4 vtxMatrix = [&]{
-                    mat4 vtxMatrix;
-                    matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
-                    matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
-                    return vtxMatrix;
-                }();
-
-                setOpaque();
-                renderFill(bucket, modifiedProperties, id, vtxMatrix);
-
-                setTranslucent();
-                renderFill(bucket, modifiedProperties, id, vtxMatrix);
-
-                if (rasterize.blur > 0) {
-                    bucket.prerendered->blur(*this, rasterize.blur);
-                }
-
-                // RESET STATE
-                bucket.prerendered->unbindFramebuffer();
-                finishPrerender(*bucket.prerendered);
-            }
-
-            renderPrerenderedTexture(*bucket.prerendered, properties);
-        }
-    } else {
-        const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
-        renderFill(bucket, properties, id, vtxMatrix);
-    }
+    const mat4 &vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
+    renderFill(bucket, properties, id, vtxMatrix);
 }

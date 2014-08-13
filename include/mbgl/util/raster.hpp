@@ -4,6 +4,7 @@
 #include <mbgl/util/transition.hpp>
 #include <mbgl/util/texturepool.hpp>
 #include <mbgl/util/image.hpp>
+#include <mbgl/renderer/prerendered_texture.hpp>
 
 #include <string>
 #include <mutex>
@@ -24,6 +25,9 @@ public:
 
     // bind current texture
     void bind(bool linear = false);
+
+    // bind prerendered texture
+    void bind(const GLuint texture);
 
     // loaded status
     bool isLoaded() const;

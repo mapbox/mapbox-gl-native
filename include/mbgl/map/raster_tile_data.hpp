@@ -22,10 +22,11 @@ public:
     ~RasterTileData();
 
     virtual void parse();
-    virtual void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc);
+    virtual void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix);
     virtual bool hasData(std::shared_ptr<StyleLayer> layer_desc) const;
 
 protected:
+    StyleBucketRaster properties;
     RasterBucket bucket;
 };
 

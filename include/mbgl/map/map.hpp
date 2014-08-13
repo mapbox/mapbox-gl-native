@@ -45,6 +45,8 @@ public:
     // Triggers a lazy rerender: only performs a render when the map is not clean.
     void rerender();
 
+    void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
+
     // Forces a map update: always triggers a rerender.
     void update();
 
@@ -123,6 +125,7 @@ public:
     inline std::shared_ptr<uv::loop> getLoop() { return loop; }
     inline timestamp getAnimationTime() const { return animationTime; }
     inline timestamp getTime() const { return animationTime; }
+    void updateTiles();
 
 private:
     // uv async callbacks
@@ -137,7 +140,6 @@ private:
     void updateSources();
     void updateSources(const std::shared_ptr<StyleLayerGroup> &group);
 
-    void updateTiles();
     void updateRenderState();
 
     size_t countLayers(const std::vector<LayerDescription>& layers);
@@ -146,12 +148,10 @@ private:
     // the stylesheet.
     void prepare();
 
-    enum RenderPass { Opaque, Translucent };
 
     // Unconditionally performs a render with the current map state.
     void render();
     void renderLayers(std::shared_ptr<StyleLayerGroup> group);
-    void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass);
 
 private:
     bool async = false;

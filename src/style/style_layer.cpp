@@ -5,9 +5,8 @@
 
 namespace mbgl {
 
-StyleLayer::StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles,
-                       std::unique_ptr<const RasterizeProperties> &&rasterize)
-    : id(id), styles(std::move(styles)), rasterize(std::move(rasterize)) {}
+StyleLayer::StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles)
+    : id(id), styles(std::move(styles)) {}
 
 bool StyleLayer::isBackground() const {
     return type == StyleLayerType::Background;
@@ -229,7 +228,7 @@ void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const tim
     properties.set<RasterProperties>();
     RasterProperties &raster = properties.get<RasterProperties>();
     applyStyleProperty(PropertyKey::RasterOpacity, raster.opacity, z, now);
-    applyStyleProperty(PropertyKey::RasterSpin, raster.spin, z, now);
+    applyStyleProperty(PropertyKey::RasterHueRotate, raster.hue_rotate, z, now);
     applyStyleProperty(PropertyKey::RasterBrightnessLow, raster.brightness[0], z, now);
     applyStyleProperty(PropertyKey::RasterBrightnessHigh, raster.brightness[1], z, now);
     applyStyleProperty(PropertyKey::RasterSaturation, raster.saturation, z, now);

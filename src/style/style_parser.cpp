@@ -344,7 +344,7 @@ bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey k
 template <typename T>
 bool StyleParser::parseOptionalProperty(const char *property_name, T &target, JSVal value) {
     if (!value.HasMember(property_name)) {
-        return false;
+         return false;
     } else {
         return setProperty<T>(replaceConstant(value[property_name]), property_name, target);
     }
@@ -492,14 +492,8 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
         std::map<ClassID, ClassProperties> styles;
         parseStyles(value, styles);
 
-        // Parse Rasterization options, as they can't be inherited anyway.
-        std::unique_ptr<const RasterizeProperties> rasterize;
-        if (value.HasMember("rasterize")) {
-            rasterize = parseRasterize(replaceConstant(value["rasterize"]));
-        }
-
         std::shared_ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
-            layer_id, std::move(styles), std::move(rasterize));
+            layer_id, std::move(styles));
 
         if (value.HasMember("layers")) {
             layer->layers = createLayers(value["layers"]);
@@ -525,11 +519,6 @@ void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair
     JSVal value = pair.first;
     std::shared_ptr<StyleLayer> &layer = pair.second;
 
-    if (layer->bucket || layer->layers) {
-        // Skip parsing this again. We already have a valid layer definition.
-        return;
-    }
-
     if (value.HasMember("type")) {
         JSVal type = value["type"];
         if (!type.IsString()) {
@@ -537,6 +526,11 @@ void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair
         } else {
             layer->type = StyleLayerTypeClass(std::string { type.GetString(), type.GetStringLength() });
         }
+    }
+
+    if (layer->bucket || (layer->layers && layer->type != StyleLayerType::Raster)) {
+        // Skip parsing this again. We already have a valid layer definition.
+        return;
     }
 
     // Make sure we have not previously attempted to parse this layer.
@@ -639,12 +633,10 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
 
     parseOptionalProperty<Function<float>>("raster-opacity", Key::RasterOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
-    parseOptionalProperty<Function<float>>("raster-spin", Key::RasterSpin, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-spin", Key::RasterSpin, klass, value);
-    parseOptionalProperty<Function<float>>("raster-brightness-low", Key::RasterBrightnessLow, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-brightness-low", Key::RasterBrightnessLow, klass, value);
-    parseOptionalProperty<Function<float>>("raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
+    parseOptionalProperty<Function<float>>("raster-hue-rotate", Key::RasterHueRotate, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-hue-rotate", Key::RasterHueRotate, klass, value);
+    parseOptionalProperty<Function<float>>("raster-brightness", { Key::RasterBrightnessLow, Key::RasterBrightnessHigh }, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-brightness", Key::RasterBrightness, klass, value);
     parseOptionalProperty<Function<float>>("raster-saturation", Key::RasterSaturation, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-raster-saturation", Key::RasterSaturation, klass, value);
     parseOptionalProperty<Function<float>>("raster-contrast", Key::RasterContrast, klass, value);
@@ -653,19 +645,6 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("transition-raster-fade", Key::RasterFade, klass, value);
 
     parseOptionalProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
-}
-
-std::unique_ptr<RasterizeProperties> StyleParser::parseRasterize(JSVal value) {
-    auto rasterize = std::make_unique<RasterizeProperties>();
-
-    if (value.IsObject()) {
-        parseOptionalProperty("enabled", rasterize->enabled, value);
-        parseOptionalProperty("buffer", rasterize->buffer, value);
-        parseOptionalProperty("size", rasterize->size, value);
-        parseOptionalProperty("blur", rasterize->blur, value);
-    }
-
-    return rasterize;
 }
 
 void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer) {
@@ -925,6 +904,18 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         parseRenderProperty(value, render.text.ignore_placement, "text-ignore-placement");
         parseRenderProperty(value, render.text.optional, "text-optional");
     } break;
+
+    case StyleLayerType::Raster: {
+        StyleBucketRaster &render = bucket.render.get<StyleBucketRaster>();
+
+        parseRenderProperty(value, render.size, "raster-size");
+        parseRenderProperty(value, render.blur, "raster-blur");
+        parseRenderProperty(value, render.buffer, "raster-buffer");
+        if (layer->layers) {
+            render.prerendered = true;
+        }
+    } break;
+
     default:
         // There are no render properties for these layer types.
         break;
