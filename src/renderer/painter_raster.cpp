@@ -71,7 +71,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
         rasterShader->setContrast(properties.contrast);
         rasterShader->setSpin(spinWeights(properties.hue_rotate));
 
-        glDepthRange(strata + strata_epsilon, 1.0f);
+        depthRange(strata + strata_epsilon, 1.0f);
 
         bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
 

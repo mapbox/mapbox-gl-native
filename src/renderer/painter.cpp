@@ -118,6 +118,14 @@ void Painter::depthMask(bool value) {
     }
 }
 
+void Painter::depthRange(const float near, const float far) {
+    if (gl_depthRange[0] != near || gl_depthRange[1] != far) {
+        glDepthRange(near, far);
+        gl_depthRange = {{ near, far }};
+    }
+}
+
+
 void Painter::changeMatrix() {
     // Initialize projection matrix
     matrix::ortho(projMatrix, 0, map.getState().getWidth(), map.getState().getHeight(), 0, 0, 1);

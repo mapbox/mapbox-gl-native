@@ -50,7 +50,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
             static_cast<float>(map.getState().getFramebufferWidth()),
             static_cast<float>(map.getState().getFramebufferHeight())
         }});
-        glDepthRange(strata, 1.0f);
+        depthRange(strata, 1.0f);
         bucket.drawVertices(*outlineShader);
     } else if (fringeline) {
         // // We're only drawing to the first seven bits (== support a maximum of
@@ -109,7 +109,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
             spriteAtlas.bind(true);
 
             // Draw the actual triangles into the color & stencil buffer.
-            glDepthRange(strata + strata_epsilon, 1.0f);
+            depthRange(strata + strata_epsilon, 1.0f);
             bucket.drawElements(*patternShader);
         } else {
             // Only draw the fill when it's either opaque and we're drawing opaque
@@ -121,7 +121,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
             plainShader->setColor(fill_color);
 
             // Draw the actual triangles into the color & stencil buffer.
-            glDepthRange(strata + strata_epsilon, 1.0f);
+            depthRange(strata + strata_epsilon, 1.0f);
             bucket.drawElements(*plainShader);
         }
     }
@@ -141,7 +141,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
             static_cast<float>(map.getState().getFramebufferHeight())
         }});
 
-        glDepthRange(strata + strata_epsilon, 1.0f);
+        depthRange(strata + strata_epsilon, 1.0f);
         bucket.drawVertices(*outlineShader);
     }
 }

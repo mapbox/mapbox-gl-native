@@ -143,7 +143,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
                 textShader->setColor(properties.text.halo_color);
             }
             textShader->setBuffer(haloWidth);
-            glDepthRange(strata, 1.0f);
+            depthRange(strata, 1.0f);
             bucket.drawGlyphs(*textShader);
         }
 
@@ -161,7 +161,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
                 textShader->setColor(properties.text.color);
             }
             textShader->setBuffer((256.0f - 64.0f) / 256.0f);
-            glDepthRange(strata + strata_epsilon, 1.0f);
+            depthRange(strata + strata_epsilon, 1.0f);
             bucket.drawGlyphs(*textShader);
         }
     }
@@ -210,7 +210,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         iconShader->setFadeZoom(map.getState().getNormalizedZoom() * 10);
         iconShader->setOpacity(properties.icon.opacity);
 
-        glDepthRange(strata, 1.0f);
+        depthRange(strata, 1.0f);
         bucket.drawIcons(*iconShader);
     }
 }
