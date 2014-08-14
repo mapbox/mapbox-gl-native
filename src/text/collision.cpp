@@ -19,17 +19,9 @@ Box getBox(const CollisionAnchor &anchor, const CollisionRect &bbox, float minSc
     };
 };
 
-Collision::~Collision() {
-    delete ((Tree *)cTree);
-    delete ((Tree *)hTree);
-}
-
 Collision::Collision(float zoom, float tileExtent, float tileSize, float placementDepth)
-    : hTree(new Tree()), // tree for horizontal labels
-      cTree(new Tree()), // tree for glyphs from curved labels
-
       // tile pixels per screen pixels at the tile's zoom level
-      tilePixelRatio(tileExtent / tileSize),
+    : tilePixelRatio(tileExtent / tileSize),
 
       zoom(zoom),
 
@@ -135,8 +127,8 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementS
         const Box searchBox = getBox(anchor, bbox, minScale, maxScale);
 
         std::vector<PlacementValue> blocking;
-        ((Tree *)hTree)->query(bgi::intersects(searchBox), std::back_inserter(blocking));
-        ((Tree *)cTree)->query(bgi::intersects(searchBox), std::back_inserter(blocking));
+        hTree.query(bgi::intersects(searchBox), std::back_inserter(blocking));
+        cTree.query(bgi::intersects(searchBox), std::back_inserter(blocking));
 
         if (avoidEdges) {
             if (searchBox.min_corner().get<0>() < 0) blocking.emplace_back(leftEdge);
@@ -218,10 +210,10 @@ PlacementRange Collision::getPlacementRange(const GlyphBoxes &glyphs, float plac
         Box query_box{Point{minPlacedX, minPlacedY}, Point{maxPlacedX, maxPlacedY}};
 
         std::vector<PlacementValue> blocking;
-        ((Tree *)hTree)->query(bgi::intersects(query_box), std::back_inserter(blocking));
+        hTree.query(bgi::intersects(query_box), std::back_inserter(blocking));
 
         if (horizontal) {
-            ((Tree *)cTree)->query(bgi::intersects(query_box), std::back_inserter(blocking));
+            cTree.query(bgi::intersects(query_box), std::back_inserter(blocking));
         }
 
         for (const PlacementValue &value : blocking) {
@@ -298,8 +290,8 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
 
     // Bulk-insert all glyph boxes
     if (horizontal) {
-        ((Tree *)hTree)->insert(allBounds.begin(), allBounds.end());
+        hTree.insert(allBounds.begin(), allBounds.end());
     } else {
-        ((Tree *)cTree)->insert(allBounds.begin(), allBounds.end());
+        cTree.insert(allBounds.begin(), allBounds.end());
     }
 }

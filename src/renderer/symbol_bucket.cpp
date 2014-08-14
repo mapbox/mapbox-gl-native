@@ -240,7 +240,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
         Placement iconPlacement;
         float glyphScale = 0;
         float iconScale = 0;
-        bool inside = !(anchor.x < 0 || anchor.x > 4096 || anchor.y < 0 || anchor.y > 4096);
+        const bool inside = !(anchor.x < 0 || anchor.x > 4096 || anchor.y < 0 || anchor.y > 4096);
 
         if (avoidEdges && !inside) continue;
 

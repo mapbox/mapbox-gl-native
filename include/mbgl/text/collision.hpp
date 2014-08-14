@@ -29,7 +29,6 @@ class Collision {
 
 public:
     Collision(float zoom, float tileExtent, float tileSize, float placementDepth = 1);
-    ~Collision();
 
     float getPlacementScale(const GlyphBoxes &glyphs, float minPlacementScale, bool avoidEdges);
     PlacementRange getPlacementRange(const GlyphBoxes &glyphs, float placementScale,
@@ -38,8 +37,8 @@ public:
                 const PlacementRange &placementRange, bool horizontal);
 
 private:
-    void *hTree;
-    void *cTree;
+    Tree hTree;
+    Tree cTree;
     PlacementValue leftEdge;
     PlacementValue topEdge;
     PlacementValue rightEdge;

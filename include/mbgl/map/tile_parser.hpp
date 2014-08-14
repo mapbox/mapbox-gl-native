@@ -4,7 +4,6 @@
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/text/glyph.hpp>
-#include <mbgl/text/collision.hpp>
 
 #include <cstdint>
 #include <iosfwd>
@@ -28,6 +27,7 @@ class StyleBucketLine;
 class StyleBucketSymbol;
 class StyleLayerGroup;
 class VectorTileData;
+class Collision;
 
 class TileParser {
 public:
@@ -37,6 +37,7 @@ public:
                const std::shared_ptr<GlyphStore> &glyphStore,
                const std::shared_ptr<SpriteAtlas> &spriteAtlas,
                const std::shared_ptr<Sprite> &sprite);
+    ~TileParser();
 
 public:
     void parse();
@@ -65,7 +66,7 @@ private:
     std::shared_ptr<Sprite> sprite;
     std::shared_ptr<Texturepool> texturePool;
 
-    Collision collision;
+    std::unique_ptr<Collision> collision;
 };
 
 }
