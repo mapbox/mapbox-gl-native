@@ -44,7 +44,7 @@ NODE=`which node`
 NPM=`which npm`
 
 if [ ! -d 'mapnik-packaging/.git' ]; then
-  git clone --depth=1 -b libuv010 https://github.com/mapnik/mapnik-packaging.git
+  git clone --depth=1 https://github.com/mapnik/mapnik-packaging.git
 fi
 
 cd mapnik-packaging/osx/
@@ -54,21 +54,25 @@ export CXX11=true
 
 if [ ${UNAME} = 'Darwin' ]; then
 source iPhoneOS.sh
+export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
 
 source iPhoneOSs.sh
+export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
 
 source iPhoneOS64.sh
+export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
 
 source iPhoneSimulator.sh
+export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
@@ -81,6 +85,7 @@ source iPhoneSimulator.sh
 #    echo '     ...done'
 
 source MacOSX.sh
+export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libglfw3.a ] ; then ./scripts/build_glfw.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
@@ -108,6 +113,7 @@ if [ ! -z "${TRAVIS:-}" ]; then
 fi
 
 source Linux.sh
+export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libglfw3.a ] ; then ./scripts/build_glfw.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
