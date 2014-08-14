@@ -49,6 +49,7 @@ public:
     inline float getHeight() const { return height; }
     inline float getTextureWidth() const { return width * pixelRatio; }
     inline float getTextureHeight() const { return height * pixelRatio; }
+    inline float getPixelRatio() const { return pixelRatio; }
 
 private:
     void allocate();

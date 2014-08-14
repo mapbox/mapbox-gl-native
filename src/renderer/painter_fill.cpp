@@ -6,6 +6,7 @@
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/mat3.hpp>
 
 using namespace mbgl;
 
@@ -28,13 +29,10 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
         stroke_color[3] *= properties.opacity;
     }
 
-    bool outline = properties.antialias && properties.stroke_color != properties.fill_color;
-    bool fringeline = properties.antialias && properties.stroke_color == properties.fill_color;
-    if (fringeline) {
-        outline = true;
-        stroke_color = fill_color;
-    }
+    const bool pattern = properties.image.size();
 
+    bool outline = properties.antialias && !pattern && properties.stroke_color != properties.fill_color;
+    bool fringeline = properties.antialias && !pattern && properties.stroke_color == properties.fill_color;
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
@@ -52,66 +50,59 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
         }});
         depthRange(strata, 1.0f);
         bucket.drawVertices(*outlineShader);
-    } else if (fringeline) {
-        // // We're only drawing to the first seven bits (== support a maximum of
-        // // 127 overlapping polygons in one place before we get rendering errors).
-        // glStencilMask(0x3F);
-        // glClear(GL_STENCIL_BUFFER_BIT);
-
-        // // Draw front facing triangles. Wherever the 0x80 bit is 1, we are
-        // // increasing the lower 7 bits by one if the triangle is a front-facing
-        // // triangle. This means that all visible polygons should be in CCW
-        // // orientation, while all holes (see below) are in CW orientation.
-        // glStencilFunc(GL_EQUAL, 0x80, 0x80);
-
-        // // When we do a nonzero fill, we count the number of times a pixel is
-        // // covered by a counterclockwise polygon, and subtract the number of
-        // // times it is "uncovered" by a clockwise polygon.
-        // glStencilOp(GL_KEEP, GL_KEEP, GL_INCR_WRAP);
     }
 
-    if ((fill_color[3] >= 1.0f) == (pass == RenderPass::Opaque)) {
+    if (pattern) {
+        // Image fill.
         Sprite &sprite = *map.getSprite();
-        if (properties.image.size() && sprite) {
+        if (pass == RenderPass::Translucent && sprite) {
             SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-            Rect<uint16_t> imagePos = spriteAtlas.getImage(properties.image, sprite);
+            const Rect<uint16_t> pos = spriteAtlas.getImage(properties.image, sprite);
 
+            // `repeating` indicates that the image will be used in a repeating pattern
+            // repeating pattern images are assumed to have a 1px padding that mirrors the opposite edge
+            // positions for repeating images are adjusted to exclude the edge
+            const int repeating = 1;
+            const std::array<float, 2> size {{
+                float(pos.w) / spriteAtlas.getPixelRatio(),
+                float(pos.h) / spriteAtlas.getPixelRatio(),
+            }};
+            const std::array<float, 2> tl {{
+                (float(pos.x + repeating) / spriteAtlas.getWidth()),
+                (float(pos.y + repeating) / spriteAtlas.getHeight()),
+            }};
+            const std::array<float, 2> br {{
+                (float(pos.x + pos.w - 2 * repeating) / spriteAtlas.getWidth()),
+                (float(pos.y + pos.h - 2 * repeating) / spriteAtlas.getHeight()),
+            }};
+            const float mix = std::fmod(float(map.getState().getZoom()), 1.0f);
 
-            float factor = 8.0 / std::pow(2, map.getState().getIntegerZoom() - id.z);
-            float mix = std::fmod(map.getState().getZoom(), 1.0);
+            const float factor = 8.0 / std::pow(2, map.getState().getIntegerZoom() - id.z);
 
-            std::array<float, 2> imageSize = {{
-                    imagePos.w * factor,
-                    imagePos.h * factor
-                }
-            };
-
-            std::array<float, 2> offset = {{
-                    (float)std::fmod(id.x * 4096, imageSize[0]),
-                    (float)std::fmod(id.y * 4096, imageSize[1])
-                }
-            };
+            mat3 patternMatrix;
+            matrix::identity(patternMatrix);
+            matrix::scale(patternMatrix, patternMatrix, 1.0f / (size[0] * factor), 1.0f / (size[1] * factor));
 
             useProgram(patternShader->program);
             patternShader->setMatrix(vtxMatrix);
-            patternShader->setOffset(offset);
-            patternShader->setPatternSize(imageSize);
-            patternShader->setPatternTopLeft({{
-                float(imagePos.x) / spriteAtlas.getWidth(),
-                float(imagePos.y) / spriteAtlas.getHeight(),
-            }});
-            patternShader->setPatternBottomRight({{
-                float(imagePos.x + imagePos.w) / spriteAtlas.getWidth(),
-                float(imagePos.y + imagePos.h) / spriteAtlas.getHeight(),
-            }});
-            patternShader->setColor(fill_color);
+            patternShader->setPatternTopLeft(tl);
+            patternShader->setPatternBottomRight(br);
+            patternShader->setOpacity(properties.opacity);
+            patternShader->setImage(0);
             patternShader->setMix(mix);
+            patternShader->setPatternMatrix(patternMatrix);
+
+            glActiveTexture(GL_TEXTURE0);
             spriteAtlas.bind(true);
 
             // Draw the actual triangles into the color & stencil buffer.
-            depthRange(strata + strata_epsilon, 1.0f);
+            depthRange(strata, 1.0f);
             bucket.drawElements(*patternShader);
-        } else {
+        }
+    }
+    else {
+        // No image fill.
+        if ((fill_color[3] >= 1.0f) == (pass == RenderPass::Opaque)) {
             // Only draw the fill when it's either opaque and we're drawing opaque
             // fragments or when it's translucent and we're drawing translucent
             // fragments
