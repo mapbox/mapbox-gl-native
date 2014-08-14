@@ -701,6 +701,7 @@
     },
     "style": {
       "line-color": "@admin",
+      "line-opacity": "@admin-opacity",
       "line-dasharray": [10, 3],
       "line-width": "@admin_level_3_width"
     },
@@ -719,6 +720,7 @@
     },
     "style": {
       "line-color": "@admin",
+      "line-opacity": "@admin-opacity",
       "line-width": "@admin_level_2_width"
     },
     "type": "line"
@@ -736,6 +738,7 @@
     },
     "style": {
       "line-color": "@admin",
+      "line-opacity": "@admin-opacity",
       "line-dasharray": [4, 4],
       "line-width": "@admin_level_2_width"
     },
@@ -753,6 +756,7 @@
     },
     "style": {
       "line-color": "@water",
+      "line-opacity": "@admin-opacity",
       "line-dasharray": [10, 3],
       "line-width": "@admin_level_3_width"
     },
@@ -770,6 +774,7 @@
     },
     "style": {
       "line-color": "@water",
+      "line-opacity": "@admin-opacity",
       "line-width": "@admin_level_2_width"
     },
     "type": "line"
