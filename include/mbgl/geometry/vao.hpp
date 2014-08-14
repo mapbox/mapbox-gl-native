@@ -22,7 +22,7 @@ public:
 
         if (shader_ptr != &shader) {
             if (shader_ptr != nullptr) {
-                fprintf(stderr, "shader rebind!");
+                throw std::runtime_error("shader rebind!");
             }
 #endif
             vertex_buffer.bind();
@@ -55,6 +55,9 @@ public:
         }
 
         if (shader_ptr != &shader) {
+            if (shader_ptr != nullptr) {
+                throw std::runtime_error("shader rebind!");
+            }
 #endif
             vertex_buffer.bind();
             elements_buffer.bind();

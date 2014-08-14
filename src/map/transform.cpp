@@ -128,9 +128,9 @@ void Transform::getLonLat(double &lon, double &lat) const {
 }
 
 void Transform::getLonLatZoom(double &lon, double &lat, double &zoom) const {
-    uv::readlock lock(mtx);
-
     getLonLat(lon, lat);
+
+    uv::readlock lock(mtx);
     zoom = getZoom();
 }
 
@@ -192,7 +192,7 @@ void Transform::setZoom(const double zoom, const timestamp duration) {
 double Transform::getZoom() const {
     uv::readlock lock(mtx);
 
-    return log(final.scale) / M_LN2;
+    return std::log(final.scale) / M_LN2;
 }
 
 double Transform::getScale() const {

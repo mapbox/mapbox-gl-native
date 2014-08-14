@@ -216,7 +216,7 @@ void FillBucket::drawElements(PlainShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
     char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (triangle_group_type& group : triangleGroups) {
-        group.array.bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
+        group.array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * vertexBuffer.itemSize;
         elements_index += group.elements_length * triangleElementsBuffer.itemSize;
@@ -227,7 +227,7 @@ void FillBucket::drawElements(PatternShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
     char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (triangle_group_type& group : triangleGroups) {
-        group.array.bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
+        group.array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * vertexBuffer.itemSize;
         elements_index += group.elements_length * triangleElementsBuffer.itemSize;
@@ -238,7 +238,7 @@ void FillBucket::drawVertices(OutlineShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
     char *elements_index = BUFFER_OFFSET(line_elements_start * lineElementsBuffer.itemSize);
     for (line_group_type& group : lineGroups) {
-        group.array.bind(shader, vertexBuffer, lineElementsBuffer, vertex_index);
+        group.array[0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index);
         glDrawElements(GL_LINES, group.elements_length * 2, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * vertexBuffer.itemSize;
         elements_index += group.elements_length * lineElementsBuffer.itemSize;
