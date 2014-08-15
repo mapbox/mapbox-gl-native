@@ -67,17 +67,17 @@ void Painter::setup() {
 }
 
 void Painter::setupShaders() {
-    plainShader = std::make_unique<PlainShader>();
-    outlineShader = std::make_unique<OutlineShader>();
-    lineShader = std::make_unique<LineShader>();
-    linejoinShader = std::make_unique<LinejoinShader>();
-    patternShader = std::make_unique<PatternShader>();
-    iconShader = std::make_unique<IconShader>();
-    rasterShader = std::make_unique<RasterShader>();
-    textShader = std::make_unique<TextShader>();
-    dotShader = std::make_unique<DotShader>();
-    compositeShader = std::make_unique<CompositeShader>();
-    gaussianShader = std::make_unique<GaussianShader>();
+    if (!plainShader) plainShader = std::make_unique<PlainShader>();
+    if (!outlineShader) outlineShader = std::make_unique<OutlineShader>();
+    if (!lineShader) lineShader = std::make_unique<LineShader>();
+    if (!linejoinShader) linejoinShader = std::make_unique<LinejoinShader>();
+    if (!patternShader) patternShader = std::make_unique<PatternShader>();
+    if (!iconShader) iconShader = std::make_unique<IconShader>();
+    if (!rasterShader) rasterShader = std::make_unique<RasterShader>();
+    if (!textShader) textShader = std::make_unique<TextShader>();
+    if (!dotShader) dotShader = std::make_unique<DotShader>();
+    if (!compositeShader) compositeShader = std::make_unique<CompositeShader>();
+    if (!gaussianShader) gaussianShader = std::make_unique<GaussianShader>();
 }
 
 void Painter::cleanup() {
