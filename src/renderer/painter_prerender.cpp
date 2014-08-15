@@ -28,7 +28,7 @@ void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix,
 
     state.depthRange({{ strata, 1.0f }});
 
-    glActiveTexture(GL_TEXTURE0);
+    state.activeTexture(0);
     rasterShader->setImage(0);
     rasterShader->setBuffer(buffer);
     rasterShader->setOpacity(properties.opacity);

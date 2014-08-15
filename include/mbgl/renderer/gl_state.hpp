@@ -68,6 +68,15 @@ public:
         }
     }
 
+    inline void activeTexture(const uint8_t activeTexture) {
+        if (currentActiveTexture != activeTexture) {
+            // https://www.khronos.org/opengles/sdk/1.1/docs/man/glActiveTexture.xml states that
+            // "It is always the case that GL_TEXTUREi = GL_TEXTURE0+i"
+            glActiveTexture(GL_TEXTURE0 + activeTexture);
+            currentActiveTexture = activeTexture;
+        }
+    }
+
     inline const std::array<uint16_t, 2> &viewport() const {
         return currentViewport;
     }
@@ -81,6 +90,7 @@ private:
     bool currentBlend = false;
     bool currentDepthTest = false;
     bool currentStencilTest = false;
+    uint8_t currentActiveTexture = 0;
 };
 
 }

@@ -112,7 +112,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
     painter.state.useProgram(painter.gaussianShader->program);
     painter.gaussianShader->setMatrix(painter.flipMatrix);
     painter.gaussianShader->setImage(0);
-    glActiveTexture(GL_TEXTURE0);
+    painter.state.activeTexture(0);
 
     for (int i = 0; i < passes; i++) {
         // Render horizontal
