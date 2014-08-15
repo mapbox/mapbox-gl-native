@@ -13,6 +13,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     for TEST in ./test_* ; do
         ${TEST}
     done
+    cd ../..
     (cd ./node_modules/mapbox-gl-test-suite/ && (./bin/compare_images.js; ./bin/deploy_results.sh))
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     #
