@@ -40,6 +40,7 @@ public:
 
     PlacementType placement = PlacementType::Point;
     float min_distance = 250.0f;
+    bool avoid_edges = false;
 
     struct {
         bool allow_overlap = false;

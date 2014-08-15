@@ -51,10 +51,9 @@ enum class PropertyKey {
     TextTranslateY,
     TextTranslateAnchor,
 
-    CompositeOpacity,
-
     RasterOpacity,
     RasterHueRotate,
+    RasterBrightness, // for transitions only
     RasterBrightnessLow,
     RasterBrightnessHigh,
     RasterSaturation,

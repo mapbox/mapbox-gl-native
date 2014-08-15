@@ -8,6 +8,7 @@ using namespace mbgl;
 
 PatternShader::PatternShader()
     : Shader(
+        "pattern",
         shaders[PATTERN_SHADER].vertex,
         shaders[PATTERN_SHADER].fragment
     ) {
@@ -19,47 +20,26 @@ PatternShader::PatternShader()
     a_pos = glGetAttribLocation(program, "a_pos");
 
     u_matrix = glGetUniformLocation(program, "u_matrix");
-    u_color = glGetUniformLocation(program, "u_color");
-    u_offset = glGetUniformLocation(program, "u_offset");
-    u_pattern_size = glGetUniformLocation(program, "u_pattern_size");
     u_pattern_tl = glGetUniformLocation(program, "u_pattern_tl");
     u_pattern_br = glGetUniformLocation(program, "u_pattern_br");
+    u_opacity = glGetUniformLocation(program, "u_opacity");
+    u_image = glGetUniformLocation(program, "u_image");
     u_mix = glGetUniformLocation(program, "u_mix");
+    u_patternmatrix = glGetUniformLocation(program, "u_patternmatrix");
 
     // fprintf(stderr, "PatternShader:\n");
     // fprintf(stderr, "    - u_matrix: %d\n", u_matrix);
-    // fprintf(stderr, "    - u_color: %d\n", u_color);
-    // fprintf(stderr, "    - u_offset: %d\n", u_offset);
-    // fprintf(stderr, "    - u_pattern_size: %d\n", u_pattern_size);
     // fprintf(stderr, "    - u_pattern_tl: %d\n", u_pattern_tl);
     // fprintf(stderr, "    - u_pattern_br: %d\n", u_pattern_br);
+    // fprintf(stderr, "    - u_opacity: %d\n", u_opacity);
+    // fprintf(stderr, "    - u_image: %d\n", u_image);
     // fprintf(stderr, "    - u_mix: %d\n", u_mix);
+    // fprintf(stderr, "    - u_patternmatrix: %d\n", u_patternmatrix);
 }
 
 void PatternShader::bind(char *offset) {
     glEnableVertexAttribArray(a_pos);
     glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
-}
-
-void PatternShader::setColor(const std::array<float, 4>& new_color) {
-    if (color != new_color) {
-        glUniform4fv(u_color, 1, new_color.data());
-        color = new_color;
-    }
-}
-
-void PatternShader::setOffset(const std::array<float, 2>& new_offset) {
-    if (offset != new_offset) {
-        glUniform2fv(u_offset, 1, new_offset.data());
-        offset = new_offset;
-    }
-}
-
-void PatternShader::setPatternSize(const std::array<float, 2>& new_pattern_size) {
-    if (pattern_size != new_pattern_size) {
-        glUniform2fv(u_pattern_size, 1, new_pattern_size.data());
-        pattern_size = new_pattern_size;
-    }
 }
 
 void PatternShader::setPatternTopLeft(const std::array<float, 2>& new_pattern_tl) {
@@ -76,10 +56,31 @@ void PatternShader::setPatternBottomRight(const std::array<float, 2>& new_patter
     }
 }
 
+void PatternShader::setOpacity(float new_opacity) {
+    if (opacity != new_opacity) {
+        glUniform1f(u_opacity, new_opacity);
+        opacity = new_opacity;
+    }
+}
+
+void PatternShader::setImage(int new_image) {
+    if (image != new_image) {
+        glUniform1i(u_image, new_image);
+        image = new_image;
+    }
+}
+
 void PatternShader::setMix(float new_mix) {
     if (mix != new_mix) {
         glUniform1f(u_mix, new_mix);
         mix = new_mix;
+    }
+}
+
+void PatternShader::setPatternMatrix(const std::array<float, 9>& new_patternmatrix) {
+    if (patternmatrix != new_patternmatrix) {
+        glUniformMatrix3fv(u_patternmatrix, 1, GL_FALSE, new_patternmatrix.data());
+        patternmatrix = new_patternmatrix;
     }
 }
 

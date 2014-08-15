@@ -2,41 +2,26 @@
 #include <mbgl/text/rotation_range.hpp>
 #include <mbgl/util/math.hpp>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point.hpp>
-#include <boost/geometry/geometries/box.hpp>
-#include <boost/geometry/index/rtree.hpp>
-#pragma GCC diagnostic pop
-
-namespace mbgl {
-namespace bg = boost::geometry;
-namespace bgm = bg::model;
-namespace bgi = bg::index;
-typedef bgm::point<float, 2, bg::cs::cartesian> Point;
-typedef bgm::box<Point> Box;
-typedef std::pair<Box, PlacementBox> PlacementValue;
-typedef bgi::rtree<PlacementValue, bgi::rstar<16>> Tree;
-}
 
 using namespace mbgl;
 
-Collision::~Collision() {
-    delete ((Tree *)cTree);
-    delete ((Tree *)hTree);
-}
+Box getBox(const CollisionAnchor &anchor, const CollisionRect &bbox, float minScale,
+           float maxScale) {
+    return Box{
+        Point{
+            anchor.x + util::min(bbox.tl.x / minScale, bbox.tl.x / maxScale),
+            anchor.y + util::min(bbox.tl.y / minScale, bbox.tl.y / maxScale),
+        },
+        Point{
+            anchor.x + util::max(bbox.br.x / minScale, bbox.br.x / maxScale),
+            anchor.y + util::max(bbox.br.y / minScale, bbox.br.y / maxScale),
+        },
+    };
+};
 
 Collision::Collision(float zoom, float tileExtent, float tileSize, float placementDepth)
-    : hTree(new Tree()), // tree for horizontal labels
-      cTree(new Tree()), // tree for glyphs from curved labels
-
       // tile pixels per screen pixels at the tile's zoom level
-      tilePixelRatio(tileExtent / tileSize),
+    : tilePixelRatio(tileExtent / tileSize),
 
       zoom(zoom),
 
@@ -52,32 +37,51 @@ Collision::Collision(float zoom, float tileExtent, float tileSize, float placeme
     const float m = 4096;
     const float edge = m * tilePixelRatio * 2;
 
-    // Hack to prevent cross-tile labels
-    insert(
-        /* glyphs */ {
-            GlyphBox{/* box */ CollisionRect{CollisionPoint{-edge, -edge}, CollisionPoint{0, edge}},
-                     /* minScale */ 0,
-                     /* padding */ 2},
-            GlyphBox{/* box */ CollisionRect{CollisionPoint{-edge, -edge}, CollisionPoint{edge, 0}},
-                     /* minScale */ 0,
-                     /* padding */ 2}},
-        /* anchor */ CollisionAnchor(0, 0),
-        /* placementScale */ 1,
-        /* placementRange */ {{M_PI * 2, 0}},
-        /* horizontal */ false);
 
-    insert(
-        /* glyphs */ {
-            GlyphBox{/* box*/ CollisionRect{CollisionPoint{-edge, 0}, CollisionPoint{edge, edge}},
-                     /* minScale */ 0,
-                     /* padding */ 2},
-            GlyphBox{/* box */ CollisionRect{CollisionPoint{0, -edge}, CollisionPoint{edge, edge}},
-                     /* minScale */ 0,
-                     /* padding */ 2}},
-        /* anchor */ CollisionAnchor(m, m),
-        /* placementScale */ 1,
-        /* placementRange */ {{M_PI * 2, 0}},
-        /* horizontal */ false);
+    PlacementBox left;
+    left.anchor = CollisionAnchor{ 0.0f, 0.0f };
+    left.box = CollisionRect{CollisionPoint{-edge, -edge}, CollisionPoint{0, edge}};
+    left.placementRange = {{ 2.0f * M_PI, 0.0f }};
+    left.placementScale = 0.5f;
+    left.maxScale = std::numeric_limits<float>::infinity();
+    left.padding = 0.0f;
+    leftEdge = PlacementValue{
+        getBox(left.anchor, left.box, left.placementScale, left.maxScale),
+        left};
+
+    PlacementBox top;
+    top.anchor = CollisionAnchor{ 0.0f, 0.0f };
+    top.box = CollisionRect{CollisionPoint{-edge, -edge}, CollisionPoint{edge, 0}};
+    top.placementRange = {{ 2.0f * M_PI, 0.0f }};
+    top.placementScale = 0.5f;
+    top.maxScale = std::numeric_limits<float>::infinity();
+    top.padding = 0.0f;
+    topEdge = PlacementValue{
+        getBox(top.anchor, top.box, top.placementScale, top.maxScale),
+        top};
+
+    PlacementBox bottom;
+    bottom.anchor = CollisionAnchor{ m, m };
+    bottom.box = CollisionRect{CollisionPoint{-edge, 0}, CollisionPoint{edge, edge}};
+    bottom.placementRange = {{ 2.0f * M_PI, 0.0f }};
+    bottom.placementScale = 0.5f;
+    bottom.maxScale = std::numeric_limits<float>::infinity();
+    bottom.padding = 0.0f;
+    bottomEdge = PlacementValue{
+        getBox(bottom.anchor, bottom.box, bottom.placementScale, bottom.maxScale),
+        bottom};
+
+    PlacementBox right;
+    right.anchor = CollisionAnchor{ m, m };
+    right.box = CollisionRect{CollisionPoint{0, -edge}, CollisionPoint{edge, edge}};
+    right.placementRange = {{ 2.0f * M_PI, 0.0f }};
+    right.placementScale = 0.5f;
+    right.maxScale = std::numeric_limits<float>::infinity();
+    right.padding = 0.0f;
+    rightEdge = PlacementValue{
+        getBox(right.anchor, right.box, right.placementScale, right.maxScale),
+        right};
+
 }
 
 GlyphBox getMergedGlyphs(const GlyphBoxes &boxes, const CollisionAnchor &anchor) {
@@ -99,27 +103,14 @@ GlyphBox getMergedGlyphs(const GlyphBoxes &boxes, const CollisionAnchor &anchor)
     return mergedGlyphs;
 }
 
-Box getBox(const CollisionAnchor &anchor, const CollisionRect &bbox, float minScale,
-           float maxScale) {
-    return Box{
-        Point{
-            anchor.x + util::min(bbox.tl.x / minScale, bbox.tl.x / maxScale),
-            anchor.y + util::min(bbox.tl.y / minScale, bbox.tl.y / maxScale),
-        },
-        Point{
-            anchor.x + util::max(bbox.br.x / minScale, bbox.br.x / maxScale),
-            anchor.y + util::max(bbox.br.y / minScale, bbox.br.y / maxScale),
-        },
-    };
-};
-
-float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementScale) {
+float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementScale, bool avoidEdges) {
 
     for (const GlyphBox &glyph : glyphs) {
         const CollisionRect &box = glyph.box;
         const CollisionRect &bbox = glyph.hBox ? glyph.hBox.get() : glyph.box;
         const CollisionAnchor &anchor = glyph.anchor;
         const float pad = glyph.padding;
+
 
         if (anchor.x < 0 || anchor.x > 4096 || anchor.y < 0 || anchor.y > 4096) {
             return 0;
@@ -136,8 +127,15 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementS
         const Box searchBox = getBox(anchor, bbox, minScale, maxScale);
 
         std::vector<PlacementValue> blocking;
-        ((Tree *)hTree)->query(bgi::intersects(searchBox), std::back_inserter(blocking));
-        ((Tree *)cTree)->query(bgi::intersects(searchBox), std::back_inserter(blocking));
+        hTree.query(bgi::intersects(searchBox), std::back_inserter(blocking));
+        cTree.query(bgi::intersects(searchBox), std::back_inserter(blocking));
+
+        if (avoidEdges) {
+            if (searchBox.min_corner().get<0>() < 0) blocking.emplace_back(leftEdge);
+            if (searchBox.min_corner().get<1>() < 0) blocking.emplace_back(topEdge);
+            if (searchBox.max_corner().get<0>() >= 4096) blocking.emplace_back(rightEdge);
+            if (searchBox.max_corner().get<1>() >= 4096) blocking.emplace_back(bottomEdge);
+        }
 
         if (blocking.size()) {
             const CollisionAnchor &na = anchor; // new anchor
@@ -212,10 +210,10 @@ PlacementRange Collision::getPlacementRange(const GlyphBoxes &glyphs, float plac
         Box query_box{Point{minPlacedX, minPlacedY}, Point{maxPlacedX, maxPlacedY}};
 
         std::vector<PlacementValue> blocking;
-        ((Tree *)hTree)->query(bgi::intersects(query_box), std::back_inserter(blocking));
+        hTree.query(bgi::intersects(query_box), std::back_inserter(blocking));
 
         if (horizontal) {
-            ((Tree *)cTree)->query(bgi::intersects(query_box), std::back_inserter(blocking));
+            cTree.query(bgi::intersects(query_box), std::back_inserter(blocking));
         }
 
         for (const PlacementValue &value : blocking) {
@@ -292,8 +290,8 @@ void Collision::insert(const GlyphBoxes &glyphs, const CollisionAnchor &anchor,
 
     // Bulk-insert all glyph boxes
     if (horizontal) {
-        ((Tree *)hTree)->insert(allBounds.begin(), allBounds.end());
+        hTree.insert(allBounds.begin(), allBounds.end());
     } else {
-        ((Tree *)cTree)->insert(allBounds.begin(), allBounds.end());
+        cTree.insert(allBounds.begin(), allBounds.end());
     }
 }

@@ -19,7 +19,6 @@ enum class StyleLayerType : uint8_t {
     Line,
     Symbol,
     Raster,
-    Composite,
     Background
 };
 
@@ -29,7 +28,6 @@ MBGL_DEFINE_ENUM_CLASS(StyleLayerTypeClass, StyleLayerType, {
     { StyleLayerType::Line, "line" },
     { StyleLayerType::Symbol, "symbol" },
     { StyleLayerType::Raster, "raster" },
-    { StyleLayerType::Composite, "composite" },
     { StyleLayerType::Background, "background" },
     { StyleLayerType(-1), "unknown" },
 });

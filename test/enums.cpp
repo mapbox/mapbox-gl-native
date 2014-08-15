@@ -15,7 +15,6 @@ TEST(Enums, StyleLayerType) {
     ASSERT_EQ(StyleLayerType::Line, StyleLayerTypeClass("line"));
     ASSERT_EQ(StyleLayerType::Symbol, StyleLayerTypeClass("symbol"));
     ASSERT_EQ(StyleLayerType::Raster, StyleLayerTypeClass("raster"));
-    ASSERT_EQ(StyleLayerType::Composite, StyleLayerTypeClass("composite"));
     ASSERT_EQ(StyleLayerType::Background, StyleLayerTypeClass("background"));
 
     ASSERT_EQ(StyleLayerType::Unknown, StyleLayerTypeClass(StyleLayerType::Unknown));
@@ -23,7 +22,6 @@ TEST(Enums, StyleLayerType) {
     ASSERT_EQ(StyleLayerType::Line, StyleLayerTypeClass(StyleLayerType::Line));
     ASSERT_EQ(StyleLayerType::Symbol, StyleLayerTypeClass(StyleLayerType::Symbol));
     ASSERT_EQ(StyleLayerType::Raster, StyleLayerTypeClass(StyleLayerType::Raster));
-    ASSERT_EQ(StyleLayerType::Composite, StyleLayerTypeClass(StyleLayerType::Composite));
     ASSERT_EQ(StyleLayerType::Background, StyleLayerTypeClass(StyleLayerType::Background));
 
     ASSERT_EQ(StyleLayerTypeClass(StyleLayerType::Unknown), StyleLayerTypeClass(StyleLayerType::Unknown));
@@ -31,7 +29,6 @@ TEST(Enums, StyleLayerType) {
     ASSERT_EQ(StyleLayerTypeClass(StyleLayerType::Line), StyleLayerTypeClass(StyleLayerType::Line));
     ASSERT_EQ(StyleLayerTypeClass(StyleLayerType::Symbol), StyleLayerTypeClass(StyleLayerType::Symbol));
     ASSERT_EQ(StyleLayerTypeClass(StyleLayerType::Raster), StyleLayerTypeClass(StyleLayerType::Raster));
-    ASSERT_EQ(StyleLayerTypeClass(StyleLayerType::Composite), StyleLayerTypeClass(StyleLayerType::Composite));
     ASSERT_EQ(StyleLayerTypeClass(StyleLayerType::Background), StyleLayerTypeClass(StyleLayerType::Background));
 
     ASSERT_EQ(false, StyleLayerTypeClass("").valid());

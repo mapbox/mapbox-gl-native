@@ -13,6 +13,7 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/text/glyph_store.hpp>
+#include <mbgl/text/collision.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/map/map.hpp>
 
@@ -29,7 +30,12 @@ namespace regex_impl = boost;
 namespace regex_impl = std;
 #endif
 
-using namespace mbgl;
+namespace mbgl {
+
+// Note: This destructor is seemingly empty, but we need to declare it anyway
+// because this object has a std::unique_ptr<> of a forward-declare type in
+// its header file.
+TileParser::~TileParser() = default;
 
 TileParser::TileParser(const std::string &data, VectorTileData &tile,
                        const std::shared_ptr<const Style> &style,
@@ -44,7 +50,7 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile,
       glyphStore(glyphStore),
       spriteAtlas(spriteAtlas),
       sprite(sprite),
-      collision(tile.id.z, 4096, tile.source.tile_size, tile.depth) {
+      collision(std::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
 }
 
 void TileParser::parse() {
@@ -163,7 +169,9 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& laye
 }
 
 std::unique_ptr<Bucket> TileParser::createSymbolBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketSymbol &symbol) {
-    std::unique_ptr<SymbolBucket> bucket = std::make_unique<SymbolBucket>(symbol, collision);
+    std::unique_ptr<SymbolBucket> bucket = std::make_unique<SymbolBucket>(symbol, *collision);
     bucket->addFeatures(layer, filter, tile.id, *spriteAtlas, *sprite, *glyphAtlas, *glyphStore);
     return obsolete() ? nullptr : std::move(bucket);
+}
+
 }

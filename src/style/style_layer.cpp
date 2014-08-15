@@ -217,13 +217,6 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const tim
 }
 
 template <>
-void StyleLayer::applyStyleProperties<CompositeProperties>(const float z, const timestamp now) {
-    properties.set<CompositeProperties>();
-    CompositeProperties &composite = properties.get<CompositeProperties>();
-    applyStyleProperty(PropertyKey::CompositeOpacity, composite.opacity, z, now);
-}
-
-template <>
 void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const timestamp now) {
     properties.set<RasterProperties>();
     RasterProperties &raster = properties.get<RasterProperties>();
@@ -255,7 +248,6 @@ void StyleLayer::updateProperties(float z, const timestamp now) {
         case StyleLayerType::Line: applyStyleProperties<LineProperties>(z, now); break;
         case StyleLayerType::Symbol: applyStyleProperties<SymbolProperties>(z, now); break;
         case StyleLayerType::Raster: applyStyleProperties<RasterProperties>(z, now); break;
-        case StyleLayerType::Composite: applyStyleProperties<CompositeProperties>(z, now); break;
         case StyleLayerType::Background: applyStyleProperties<BackgroundProperties>(z, now); break;
         default: properties.set<std::false_type>(); break;
     }

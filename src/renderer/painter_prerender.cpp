@@ -28,12 +28,16 @@ void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix,
     rasterShader->setMatrix(matrix);
     rasterShader->setOpacity(1);
 
-    glDepthRange(strata, 1.0f);
+    depthRange(strata, 1.0f);
 
     glActiveTexture(GL_TEXTURE0);
     rasterShader->setImage(0);
     rasterShader->setBuffer(buffer);
     rasterShader->setOpacity(properties.opacity);
+    rasterShader->setBrightness(properties.brightness[0], properties.brightness[1]);
+    rasterShader->setSaturation(properties.saturation);
+    rasterShader->setContrast(properties.contrast);
+    rasterShader->setSpin(spinWeights(properties.hue_rotate));
     bucket.texture.bindTexture();
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());

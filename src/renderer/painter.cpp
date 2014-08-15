@@ -45,7 +45,6 @@ void Painter::setup() {
     assert(rasterShader);
     assert(textShader);
     assert(dotShader);
-    assert(compositeShader);
     assert(gaussianShader);
 
 
@@ -67,21 +66,19 @@ void Painter::setup() {
 }
 
 void Painter::setupShaders() {
-    plainShader = std::make_unique<PlainShader>();
-    outlineShader = std::make_unique<OutlineShader>();
-    lineShader = std::make_unique<LineShader>();
-    linejoinShader = std::make_unique<LinejoinShader>();
-    patternShader = std::make_unique<PatternShader>();
-    iconShader = std::make_unique<IconShader>();
-    rasterShader = std::make_unique<RasterShader>();
-    textShader = std::make_unique<TextShader>();
-    dotShader = std::make_unique<DotShader>();
-    compositeShader = std::make_unique<CompositeShader>();
-    gaussianShader = std::make_unique<GaussianShader>();
+    if (!plainShader) plainShader = std::make_unique<PlainShader>();
+    if (!outlineShader) outlineShader = std::make_unique<OutlineShader>();
+    if (!lineShader) lineShader = std::make_unique<LineShader>();
+    if (!linejoinShader) linejoinShader = std::make_unique<LinejoinShader>();
+    if (!patternShader) patternShader = std::make_unique<PatternShader>();
+    if (!iconShader) iconShader = std::make_unique<IconShader>();
+    if (!rasterShader) rasterShader = std::make_unique<RasterShader>();
+    if (!textShader) textShader = std::make_unique<TextShader>();
+    if (!dotShader) dotShader = std::make_unique<DotShader>();
+    if (!gaussianShader) gaussianShader = std::make_unique<GaussianShader>();
 }
 
 void Painter::cleanup() {
-    clearFramebuffers();
 }
 
 void Painter::resize() {
@@ -117,6 +114,14 @@ void Painter::depthMask(bool value) {
         gl_depthMask = value;
     }
 }
+
+void Painter::depthRange(const float near, const float far) {
+    if (gl_depthRange[0] != near || gl_depthRange[1] != far) {
+        glDepthRange(near, far);
+        gl_depthRange = {{ near, far }};
+    }
+}
+
 
 void Painter::changeMatrix() {
     // Initialize projection matrix

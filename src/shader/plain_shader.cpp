@@ -8,6 +8,7 @@ using namespace mbgl;
 
 PlainShader::PlainShader()
     : Shader(
+        "plain",
         shaders[PLAIN_SHADER].vertex,
         shaders[PLAIN_SHADER].fragment
     ) {
