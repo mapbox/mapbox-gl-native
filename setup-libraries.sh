@@ -44,11 +44,11 @@ NODE=`which node`
 NPM=`which npm`
 
 if [ ! -d 'mapnik-packaging/.git' ]; then
-  git clone --depth=1 https://github.com/mapnik/mapnik-packaging.git
+  git clone https://github.com/mapnik/mapnik-packaging.git
+  git checkout 848c6e8d6692a9
 fi
 
 cd mapnik-packaging/osx/
-git pull
 
 export CXX11=true
 
