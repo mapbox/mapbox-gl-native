@@ -53,10 +53,13 @@ To create projects, you can run:
   and settings storage. This is what is also being built on Linux.
 - `make linux`: Builds the Linux GLFW application with `make`.
 
+Target OS: 10.9+
+
 ## iOS
 
-iOS makes use of a Cocoa-specific API called [mapbox-gl-cocoa](https://github.com/mapbox/mapbox-gl-cocoa), 
-which is included as a submodule and provides a `UIView` interface to the map view and some bundle resources. 
+iOS makes use of a Cocoa-specific API called [`mapbox-gl-cocoa`](https://github.com/mapbox/mapbox-gl-cocoa). If you are just interested in running Mapbox GL on iOS and not developing with it, head to that project and you can use this library as a pre-built static library instead. A `UIView` interface to the map view and bundle resources are provided there. 
+
+If you intend to develop here, `mapbox-gl-cocoa` is included as a submodule of the overall build setup. 
 
 First, pull down the submodule(s): 
 
@@ -72,6 +75,8 @@ This downloads all required dependencies, builds them and creates universal libr
 Lastly, `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. 
 
 Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina).
+
+Target OS: 7.0+
 
 ## Ubuntu
 
