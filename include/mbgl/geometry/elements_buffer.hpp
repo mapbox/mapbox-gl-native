@@ -4,6 +4,8 @@
 #include <mbgl/geometry/buffer.hpp>
 #include <mbgl/geometry/vao.hpp>
 
+#include <array>
+
 namespace mbgl {
 
 template <int count>
