@@ -16,7 +16,6 @@ ensure_dep cmake
 ensure_dep automake
 ensure_dep autoconf
 ensure_dep pkg-config
-ensure_dep node
 if [ ${UNAME} = 'Darwin' ]; then
     ensure_dep makedepend
     if [[ ! `which libtool` ]] && [[ ! `which glibtool` ]]; then
@@ -30,25 +29,36 @@ fi
 if [[ $MISSING_DEPS != "" ]]; then
     if [ ${UNAME} = 'Darwin' ]; then
         echo "Missing build deps: ${MISSING_DEPS}"
-        echo 'Please run "brew install autoconf automake libtool makedepend cmake pkg-config node"'
+        echo 'Please run "brew install autoconf automake libtool makedepend cmake pkg-config"'
         echo 'and then re-run ./setup-libraries.sh'
     elif [ ${UNAME} = 'Linux' ]; then
         echo "Missing build deps: ${MISSING_DEPS}"
-        echo 'Please run "sudo apt-get install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config nodejs-legacy libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev"'
+        echo 'Please run "sudo apt-get install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev"'
         echo 'and then re-run ./setup-libraries.sh'
     fi
     exit 1
 fi
 
-NODE=`which node`
-NPM=`which npm`
+# bootstrap node install
+if [[ ! -d ~/.nvm ]]; then
+    git clone --depth 1 https://github.com/creationix/nvm.git ~/.nvm
+fi
+set +u
+source ~/.nvm/nvm.sh
+nvm install 0.10
+set -u
 
-if [ ! -d 'mapnik-packaging/.git' ]; then
+NODE=$(which node)
+NPM=$(which npm)
+
+MP_HASH="848c6e8"
+if [ ! -d 'mapnik-packaging/' ]; then
   git clone https://github.com/mapnik/mapnik-packaging.git
-  git checkout 848c6e8d6692a9
 fi
 
-cd mapnik-packaging/osx/
+cd mapnik-packaging
+git checkout ${MP_HASH}
+cd ./osx/
 
 export CXX11=true
 
