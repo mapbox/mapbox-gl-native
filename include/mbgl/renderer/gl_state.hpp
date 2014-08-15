@@ -78,6 +78,13 @@ public:
         }
     }
 
+    inline void bindTexture(const uint32_t texture) {
+        if (currentTexture != texture) {
+            glBindTexture(GL_TEXTURE_2D, texture);
+            currentTexture = texture;
+        }
+    }
+
     inline const std::array<uint16_t, 2> &viewport() const {
         return currentViewport;
     }
@@ -92,6 +99,7 @@ private:
     bool currentDepthTest = false;
     bool currentStencilTest = false;
     uint8_t currentActiveTexture = 0;
+    uint32_t currentTexture = 0;
 };
 
 }

@@ -24,10 +24,10 @@ public:
     bool load(const std::string &img);
 
     // bind current texture
-    void bind(bool linear = false);
+    void bind(GLState &state, bool linear = false);
 
     // bind prerendered texture
-    void bind(const GLuint texture);
+    void bind(GLState &state, const GLuint texture);
 
     // loaded status
     bool isLoaded() const;

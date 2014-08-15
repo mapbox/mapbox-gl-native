@@ -1,6 +1,7 @@
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/platform.hpp>
+#include <mbgl/renderer/gl_state.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
@@ -195,14 +196,14 @@ void SpriteAtlas::update(const Sprite &sprite) {
     });
 }
 
-void SpriteAtlas::bind(bool linear) {
+void SpriteAtlas::bind(GLState &state, bool linear) {
     if (!texture) {
         glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        state.bindTexture(texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     } else {
-        glBindTexture(GL_TEXTURE_2D, texture);
+        state.bindTexture(texture);
     }
 
     GLuint filter_val = linear ? GL_LINEAR : GL_NEAREST;
@@ -213,10 +214,10 @@ void SpriteAtlas::bind(bool linear) {
     }
 }
 
-void SpriteAtlas::upload() {
+void SpriteAtlas::upload(GLState &state) {
     if (dirty) {
         bool exists = texture;
-        bind(filter); // Make sure we don't change the filter value.
+        bind(state, filter); // Make sure we don't change the filter value.
 
         std::lock_guard<std::mutex> lock(mtx);
         allocate();

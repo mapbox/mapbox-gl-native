@@ -18,7 +18,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
 
         if (!bucket.texture.getTexture()) {
 
-            bucket.texture.bindFramebuffer();
+            bucket.texture.bindFramebuffer(state);
 
             preparePrerender(bucket);
 
@@ -79,7 +79,7 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
 
         state.depthRange({{ strata + strata_epsilon, 1.0f }});
 
-        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
+        bucket.drawRaster(state, *rasterShader, tileStencilBuffer, coveringRasterArray);
 
         state.depthMask(true);
     }

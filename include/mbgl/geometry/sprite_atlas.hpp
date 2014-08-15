@@ -13,6 +13,7 @@ namespace mbgl {
 
 class Sprite;
 class SpritePosition;
+class GLState;
 
 class SpriteAtlas {
 public:
@@ -42,10 +43,10 @@ public:
     Rect<dimension> waitForImage(const std::string &name, const Sprite &sprite);
 
     // Binds the image buffer of this sprite atlas to the GPU.
-    void bind(bool linear = false);
+    void bind(GLState &state, bool linear = false);
 
     // Uploads the image buffer to the GPU if it is out of date.
-    void upload();
+    void upload(GLState &state);
 
     inline float getWidth() const { return width; }
     inline float getHeight() const { return height; }

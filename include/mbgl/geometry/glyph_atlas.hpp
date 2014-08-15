@@ -12,6 +12,8 @@
 
 namespace mbgl {
 
+class GLState;
+
 class GlyphAtlas {
 public:
 
@@ -31,8 +33,8 @@ public:
     Rect<uint16_t> addGlyph(uint64_t tile_id, const std::string& face_name,
                             const SDFGlyph& glyph);
     void removeGlyphs(uint64_t tile_id);
-    void bind();
-    void upload();
+    void bind(GLState &state);
+    void upload(GLState &state);
 
 public:
     const uint16_t width = 0;

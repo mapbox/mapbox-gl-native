@@ -6,6 +6,7 @@
 
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/renderer/gl_state.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
@@ -42,7 +43,7 @@ bool Raster::load(const std::string &data) {
 }
 
 
-void Raster::bind(bool linear) {
+void Raster::bind(GLState &state, bool linear) {
     if (!width || !height) {
         fprintf(stderr, "trying to bind texture without dimension\n");
         return;
@@ -50,14 +51,14 @@ void Raster::bind(bool linear) {
 
     if (img && !textured) {
         texture = texturepool->getTextureID();
-        glBindTexture(GL_TEXTURE_2D, texture);
+        state.bindTexture(texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->getData());
         img.reset();
         textured = true;
     } else if (textured) {
-        glBindTexture(GL_TEXTURE_2D, texture);
+        state.bindTexture(texture);
     }
 
     GLuint filter = linear ? GL_LINEAR : GL_NEAREST;
@@ -69,16 +70,16 @@ void Raster::bind(bool linear) {
 }
 
 // overload ::bind for prerendered raster textures
-void Raster::bind(const GLuint texture) {
+void Raster::bind(GLState &state, const GLuint texture) {
     if (img && !textured) {
-        glBindTexture(GL_TEXTURE_2D, texture);
+        state.bindTexture(texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->getData());
         img.reset();
         textured = true;
     } else if (textured) {
-        glBindTexture(GL_TEXTURE_2D, texture);
+        state.bindTexture(texture);
     }
 
     GLuint filter = GL_LINEAR;

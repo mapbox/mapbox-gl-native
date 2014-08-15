@@ -36,7 +36,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         textShader->setExtrudeMatrix(exMatrix);
 
         GlyphAtlas &glyphAtlas = *map.getGlyphAtlas();
-        glyphAtlas.bind();
+        glyphAtlas.bind(state);
         textShader->setTextureSize(
             {{static_cast<float>(glyphAtlas.width), static_cast<float>(glyphAtlas.height)}});
 
@@ -190,7 +190,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         iconShader->setExtrudeMatrix(exMatrix);
 
         SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-        spriteAtlas.bind(map.getState().isChanging() || bucket.properties.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1);
+        spriteAtlas.bind(state, map.getState().isChanging() || bucket.properties.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1);
         iconShader->setTextureSize(
             {{static_cast<float>(spriteAtlas.getWidth()), static_cast<float>(spriteAtlas.getHeight())}});
 

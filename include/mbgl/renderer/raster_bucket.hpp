@@ -13,6 +13,7 @@ namespace mbgl {
 class RasterShader;
 class StaticVertexBuffer;
 class VertexArrayObject;
+class GLState;
 
 class RasterBucket : public Bucket {
 public:
@@ -26,9 +27,9 @@ public:
     const StyleBucketRaster &properties;
     PrerenderedTexture texture;
 
-    void drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array);
+    void drawRaster(GLState &state, RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array);
 
-    void drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array, GLuint texture);
+    void drawRaster(GLState &state, RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array, GLuint texture);
 
     Raster raster;
 

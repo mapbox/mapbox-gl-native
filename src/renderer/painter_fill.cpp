@@ -93,7 +93,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
             patternShader->setPatternMatrix(patternMatrix);
 
             state.activeTexture(0);
-            spriteAtlas.bind(true);
+            spriteAtlas.bind(state, true);
 
             // Draw the actual triangles into the color & stencil buffer.
             state.depthRange({{ strata, 1.0f }});
