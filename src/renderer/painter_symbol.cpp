@@ -18,7 +18,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
 
     const SymbolProperties &properties = layer_desc->getProperties<SymbolProperties>();
 
-    glDisable(GL_STENCIL_TEST);
+    state.stencilTest(false);
 
     if (bucket.hasTextData()) {
         mat4 exMatrix;
@@ -215,6 +215,6 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         bucket.drawIcons(*iconShader);
     }
 
-    glEnable(GL_STENCIL_TEST);
+    state.stencilTest(true);
 }
 }

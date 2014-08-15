@@ -1,20 +1,76 @@
 #ifndef MBGL_RENDERER_GL_STATE
 #define MBGL_RENDERER_GL_STATE
 
+#include <mbgl/platform/gl.hpp>
+
 #include <cstdint>
 #include <array>
+#include <cassert>
 
 namespace mbgl {
 
 class GLState {
 public:
-    void useProgram(uint32_t program);
-    void lineWidth(float lineWidth);
-    void depthMask(bool value);
-    void depthRange(const std::array<float, 2> &range);
-    void viewport(const std::array<uint16_t, 2> &dimensions);
+    inline void useProgram(const uint32_t program) {
+        if (currentProgram != program) {
+            glUseProgram(program);
+            currentProgram = program;
+        }
+    }
 
-    const std::array<uint16_t, 2> &viewport() const;
+    inline void lineWidth(const float lineWidth) {
+        if (currentLineWidth != lineWidth) {
+            glLineWidth(lineWidth);
+            currentLineWidth = lineWidth;
+        }
+    }
+
+    inline void depthMask(const bool value) {
+        if (currentDepthMask != value) {
+            glDepthMask(value ? GL_TRUE : GL_FALSE);
+            currentDepthMask = value;
+        }
+    }
+
+    inline void depthRange(const std::array<float, 2> &range) {
+        if (currentDepthRange != range) {
+            glDepthRange(range[0], range[1]);
+            currentDepthRange = range;
+        }
+    }
+
+    inline void viewport(const std::array<uint16_t, 2> &viewport) {
+        if (currentViewport != viewport) {
+            assert(viewport[0] > 0 && viewport[1] > 0);
+            glViewport(0, 0, viewport[0], viewport[1]);
+            currentViewport = viewport;
+        }
+    }
+
+    inline void blend(const bool blend) {
+        if (currentBlend != blend) {
+            blend ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
+            currentBlend = blend;
+        }
+    }
+
+    inline void depthTest(const bool depthTest) {
+        if (currentDepthTest != depthTest) {
+            depthTest ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+            currentDepthTest = depthTest;
+        }
+    }
+
+    inline void stencilTest(const bool stencilTest) {
+        if (currentStencilTest != stencilTest) {
+            stencilTest ? glEnable(GL_STENCIL_TEST) : glDisable(GL_STENCIL_TEST);
+            currentStencilTest = stencilTest;
+        }
+    }
+
+    inline const std::array<uint16_t, 2> &viewport() const {
+        return currentViewport;
+    }
 
 private:
     uint32_t currentProgram = 0;
@@ -22,6 +78,9 @@ private:
     bool currentDepthMask = true;
     std::array<float, 2> currentDepthRange = {{ 0, 1 }};
     std::array<uint16_t, 2> currentViewport = {{ 0, 0 }};
+    bool currentBlend = false;
+    bool currentDepthTest = false;
+    bool currentStencilTest = false;
 };
 
 }

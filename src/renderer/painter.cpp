@@ -52,7 +52,7 @@ void Painter::setup() {
     // We are blending new pixels on top of old pixels. Since we have depth testing
     // and are drawing opaque fragments first front-to-back, then translucent
     // fragments back-to-front, this shades the fewest fragments possible.
-    glEnable(GL_BLEND);
+    state.blend(true);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     // Set clear values
@@ -61,7 +61,7 @@ void Painter::setup() {
     glClearStencil(0x0);
 
     // Stencil test
-    glEnable(GL_STENCIL_TEST);
+    state.stencilTest(true);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 }
 
@@ -118,7 +118,7 @@ void Painter::clear() {
 void Painter::setOpaque() {
     if (pass != RenderPass::Opaque) {
         pass = RenderPass::Opaque;
-        glDisable(GL_BLEND);
+        state.blend(false);
         state.depthMask(true);
     }
 }
@@ -126,7 +126,7 @@ void Painter::setOpaque() {
 void Painter::setTranslucent() {
     if (pass != RenderPass::Translucent) {
         pass = RenderPass::Translucent;
-        glEnable(GL_BLEND);
+        state.blend(true);
         state.depthMask(false);
     }
 }

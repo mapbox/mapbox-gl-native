@@ -6,8 +6,8 @@
 using namespace mbgl;
 
 void Painter::preparePrerender(RasterBucket &bucket) {
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_STENCIL_TEST);
+    state.depthTest(false);
+    state.stencilTest(false);
 
 // Render the actual tile.
 #if GL_EXT_discard_framebuffer

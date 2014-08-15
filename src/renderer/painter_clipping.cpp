@@ -10,7 +10,7 @@ void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &so
     gl::group group("clipping masks");
 
     state.useProgram(plainShader->program);
-    glDisable(GL_DEPTH_TEST);
+    state.depthTest(false);
     state.depthMask(false);
     glColorMask(false, false, false, false);
     state.depthRange({{ 1.0f, 1.0f }});
@@ -22,7 +22,7 @@ void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &so
         source->source->drawClippingMasks(*this);
     }
 
-    glEnable(GL_DEPTH_TEST);
+    state.depthTest(true);
     glColorMask(true, true, true, true);
     state.depthMask(true);
     glStencilMask(0x0);

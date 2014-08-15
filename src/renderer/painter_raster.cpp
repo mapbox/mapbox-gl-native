@@ -52,8 +52,8 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
 
             bucket.texture.unbindFramebuffer();
 
-            glEnable(GL_DEPTH_TEST);
-            glEnable(GL_STENCIL_TEST);
+            state.depthTest(true);
+            state.stencilTest(true);
 
             // Restore the viewport.
             state.viewport(viewport);
