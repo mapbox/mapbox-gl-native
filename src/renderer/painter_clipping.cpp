@@ -9,11 +9,11 @@ using namespace mbgl;
 void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &sources) {
     gl::group group("clipping masks");
 
-    useProgram(plainShader->program);
+    state.useProgram(plainShader->program);
     glDisable(GL_DEPTH_TEST);
-    depthMask(false);
+    state.depthMask(false);
     glColorMask(false, false, false, false);
-    depthRange(1.0f, 1.0f);
+    state.depthRange({{ 1.0f, 1.0f }});
     glStencilMask(0xFF);
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
@@ -24,7 +24,7 @@ void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &so
 
     glEnable(GL_DEPTH_TEST);
     glColorMask(true, true, true, true);
-    depthMask(true);
+    state.depthMask(true);
     glStencilMask(0x0);
 }
 

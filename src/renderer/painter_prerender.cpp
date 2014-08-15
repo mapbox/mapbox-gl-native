@@ -16,19 +16,17 @@ void Painter::preparePrerender(RasterBucket &bucket) {
 #endif
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    glViewport(0, 0, bucket.properties.size, bucket.properties.size);
 }
 
 void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties) {
     const int buffer = bucket.properties.buffer * 4096.0f;
 
     // draw the texture on a quad
-    useProgram(rasterShader->program);
+    state.useProgram(rasterShader->program);
     rasterShader->setMatrix(matrix);
     rasterShader->setOpacity(1);
 
-    depthRange(strata, 1.0f);
+    state.depthRange({{ strata, 1.0f }});
 
     glActiveTexture(GL_TEXTURE0);
     rasterShader->setImage(0);

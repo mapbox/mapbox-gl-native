@@ -109,7 +109,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
     glBindTexture(GL_TEXTURE_2D, 0);
 
 
-    painter.useProgram(painter.gaussianShader->program);
+    painter.state.useProgram(painter.gaussianShader->program);
     painter.gaussianShader->setMatrix(painter.flipMatrix);
     painter.gaussianShader->setImage(0);
     glActiveTexture(GL_TEXTURE0);

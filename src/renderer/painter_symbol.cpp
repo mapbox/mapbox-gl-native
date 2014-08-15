@@ -31,7 +31,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         float fontSize = std::fmin(properties.text.size, bucket.properties.text.max_size);
         matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
 
-        useProgram(textShader->program);
+        state.useProgram(textShader->program);
         textShader->setMatrix(matrix);
         textShader->setExtrudeMatrix(exMatrix);
 
@@ -144,7 +144,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
                 textShader->setColor(properties.text.halo_color);
             }
             textShader->setBuffer(haloWidth);
-            depthRange(strata, 1.0f);
+            state.depthRange({{ strata, 1.0f }});
             bucket.drawGlyphs(*textShader);
         }
 
@@ -162,7 +162,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
                 textShader->setColor(properties.text.color);
             }
             textShader->setBuffer((256.0f - 64.0f) / 256.0f);
-            depthRange(strata + strata_epsilon, 1.0f);
+            state.depthRange({{ strata + strata_epsilon, 1.0f }});
             bucket.drawGlyphs(*textShader);
         }
     }
@@ -185,7 +185,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         const float fontScale = fontSize / 1.0f;
         matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
 
-        useProgram(iconShader->program);
+        state.useProgram(iconShader->program);
         iconShader->setMatrix(matrix);
         iconShader->setExtrudeMatrix(exMatrix);
 
@@ -211,7 +211,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         iconShader->setFadeZoom(map.getState().getNormalizedZoom() * 10);
         iconShader->setOpacity(properties.icon.opacity);
 
-        depthRange(strata, 1.0f);
+        state.depthRange({{ strata, 1.0f }});
         bucket.drawIcons(*iconShader);
     }
 
