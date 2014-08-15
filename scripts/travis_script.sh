@@ -16,6 +16,14 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     (cd ./node_modules/mapbox-gl-test-suite/ && (./bin/compare_images.js; ./bin/deploy_results.sh))
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     #
+    # setup code signing per http://docs.travis-ci.com/user/common-build-problems/#Mac%3A-Code-Signing-Errors
+    #
+    KEY_CHAIN=ios-build.keychain
+    security create-keychain -p travis $KEY_CHAIN
+    security default-keychain -s $KEY_CHAIN
+    security unlock-keychain -p travis $KEY_CHAIN
+    security set-keychain-settings -t 3600 -u $KEY_CHAIN
+    #
     # build OS X
     #
     make xproj-cli
