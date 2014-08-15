@@ -18,35 +18,9 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
                             x11proto-xext-dev libxrandr-dev \
                             x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev
     sudo pip install awscli
-
-    #
-    # setup flags
-    #
-    export DISPLAY=:99.0
-    sh -e /etc/init.d/xvfb start
-
-    #
-    # turn on sanitizers during debug builds
-    #
-    if [[ ${BUILDTYPE} == "Debug" ]]; then
-        if [[ ${CXX} == "g++" ]]; then
-            export CXXFLAGS="-fsanitize=address ${CXXFLAGS}"
-            export CFLAGS="-fsanitize=address ${CFLAGS}"
-            export LDFLAGS="-fsanitize=address  ${LDFLAGS}"
-        elif [[ ${CXX} == "clang++" ]]; then
-            export CXXFLAGS="-fsanitize=thread -fPIC ${CXXFLAGS}"
-            export CFLAGS="-fsanitize=thread ${CFLAGS}"
-            export LDFLAGS="-fsanitize=thread -pie ${LDFLAGS}"
-        fi
-    fi
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     #
     # install OS X dependencies
     #
     brew install autoconf automake libtool makedepend cmake pkg-config node git
 fi
-
-#
-# turn off a few warnings
-#
-export CXXFLAGS="-Wno-unknown-warning-option -Wno-unused-local-typedefs -Wno-unknown-pragmas ${CXXFLAGS}";

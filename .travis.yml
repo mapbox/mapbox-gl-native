@@ -17,13 +17,15 @@ env:
    - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
 
 before_install:
+- source ./scripts/flags.sh
 - ./scripts/travis_before_install.sh
 
 install:
+- make setup
 - ./scripts/travis_install.sh
 
 before_script:
-- ./scripts/travis_before_script.sh
+- rm -rf mapnik-packaging/out/packages
 
 script:
 - ./scripts/travis_script.sh
