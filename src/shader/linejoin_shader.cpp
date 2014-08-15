@@ -8,6 +8,7 @@ using namespace mbgl;
 
 LinejoinShader::LinejoinShader()
     : Shader(
+        "linejoin",
         shaders[LINEJOIN_SHADER].vertex,
         shaders[LINEJOIN_SHADER].fragment
     ) {

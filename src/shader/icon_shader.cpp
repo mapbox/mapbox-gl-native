@@ -8,6 +8,7 @@ using namespace mbgl;
 
 IconShader::IconShader()
     : Shader(
+         "icon",
          shaders[ICON_SHADER].vertex,
          shaders[ICON_SHADER].fragment
          ) {

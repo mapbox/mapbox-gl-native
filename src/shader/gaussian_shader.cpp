@@ -8,6 +8,7 @@ using namespace mbgl;
 
 GaussianShader::GaussianShader()
     : Shader(
+         "gaussian",
          shaders[GAUSSIAN_SHADER].vertex,
          shaders[GAUSSIAN_SHADER].fragment
          ) {

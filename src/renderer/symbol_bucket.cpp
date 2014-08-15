@@ -348,7 +348,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
 
         // We're generating triangle fans, so we always start with the first
         // coordinate in this polygon.
-        ElementGroup &triangleGroup = buffer.groups.back();
+        TextElementGroup &triangleGroup = buffer.groups.back();
         uint32_t triangleIndex = triangleGroup.vertex_length;
 
         // coordinates (2 triangles)
@@ -373,8 +373,8 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
 void SymbolBucket::drawGlyphs(TextShader &shader) {
     char *vertex_index = BUFFER_OFFSET(0);
     char *elements_index = BUFFER_OFFSET(0);
-    for (ElementGroup &group : text.groups) {
-        group.array.bind(shader, text.vertices, text.triangles, vertex_index);
+    for (TextElementGroup &group : text.groups) {
+        group.array[0].bind(shader, text.vertices, text.triangles, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * text.vertices.itemSize;
         elements_index += group.elements_length * text.triangles.itemSize;
@@ -384,8 +384,8 @@ void SymbolBucket::drawGlyphs(TextShader &shader) {
 void SymbolBucket::drawIcons(IconShader &shader) {
     char *vertex_index = BUFFER_OFFSET(0);
     char *elements_index = BUFFER_OFFSET(0);
-    for (ElementGroup &group : icon.groups) {
-        group.array.bind(shader, icon.vertices, icon.triangles, vertex_index);
+    for (IconElementGroup &group : icon.groups) {
+        group.array[0].bind(shader, icon.vertices, icon.triangles, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * icon.vertices.itemSize;
         elements_index += group.elements_length * icon.triangles.itemSize;

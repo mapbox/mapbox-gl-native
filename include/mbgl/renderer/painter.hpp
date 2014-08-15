@@ -3,7 +3,7 @@
 
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/geometry/vao.hpp>
-#include <mbgl/geometry/vertex_buffer.hpp>
+#include <mbgl/geometry/static_vertex_buffer.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/renderer/frame_history.hpp>
@@ -176,16 +176,16 @@ public:
     std::unique_ptr<GaussianShader> gaussianShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
-    VertexBuffer tileStencilBuffer = {
+    StaticVertexBuffer tileStencilBuffer = {
         // top left triangle
-        0, 0,
-        4096, 0,
-        0, 4096,
+        { 0, 0 },
+        { 4096, 0 },
+        { 0, 4096 },
 
         // bottom right triangle
-        4096, 0,
-        0, 4096,
-        4096, 4096
+        { 4096, 0 },
+        { 0, 4096 },
+        { 4096, 4096 },
     };
 
     VertexArrayObject coveringPlainArray;
@@ -197,12 +197,12 @@ public:
     VertexArrayObject matteArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
-    VertexBuffer tileBorderBuffer = {
-        0, 0,
-        4096, 0,
-        4096, 4096,
-        0, 4096,
-        0, 0
+    StaticVertexBuffer tileBorderBuffer = {
+        { 0, 0 },
+        { 4096, 0 },
+        { 4096, 4096 },
+        { 0, 4096 },
+        { 0, 0 },
     };
 
     VertexArrayObject tileBorderArray;
