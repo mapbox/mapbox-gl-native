@@ -32,6 +32,7 @@ public:
                             const SDFGlyph& glyph);
     void removeGlyphs(uint64_t tile_id);
     void bind();
+    void upload();
 
 public:
     const uint16_t width = 0;
