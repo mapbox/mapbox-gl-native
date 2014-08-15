@@ -2,6 +2,7 @@
 #define MBGL_RENDERER_GL_STATE
 
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <cstdint>
 #include <array>
@@ -9,7 +10,7 @@
 
 namespace mbgl {
 
-class GLState {
+class GLState : private util::noncopyable {
 public:
     inline void useProgram(const uint32_t program) {
         if (currentProgram != program) {
