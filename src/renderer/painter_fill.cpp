@@ -49,7 +49,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
             static_cast<float>(map.getState().getFramebufferHeight())
         }});
         state.depthRange({{ strata, 1.0f }});
-        bucket.drawVertices(*outlineShader);
+        bucket.drawVertices(state, *outlineShader);
     }
 
     if (pattern) {
@@ -97,7 +97,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
 
             // Draw the actual triangles into the color & stencil buffer.
             state.depthRange({{ strata, 1.0f }});
-            bucket.drawElements(*patternShader);
+            bucket.drawElements(state, *patternShader);
         }
     }
     else {
@@ -113,7 +113,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
 
             // Draw the actual triangles into the color & stencil buffer.
             state.depthRange({{ strata + strata_epsilon, 1.0f }});
-            bucket.drawElements(*plainShader);
+            bucket.drawElements(state, *plainShader);
         }
     }
 
@@ -133,7 +133,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
         }});
 
         state.depthRange({{ strata + strata_epsilon, 1.0f }});
-        bucket.drawVertices(*outlineShader);
+        bucket.drawVertices(state, *outlineShader);
     }
 }
 

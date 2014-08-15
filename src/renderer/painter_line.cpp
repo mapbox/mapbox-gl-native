@@ -57,7 +57,7 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 #else
         glPointSize(pointSize);
 #endif
-        bucket.drawPoints(*linejoinShader);
+        bucket.drawPoints(state, *linejoinShader);
     }
 
     // var imagePos = properties.image && imageSprite.getPosition(properties.image);
@@ -84,6 +84,6 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         lineShader->setRatio(map.getState().getPixelRatio());
         lineShader->setBlur(blur);
         lineShader->setColor(color);
-        bucket.drawLines(*lineShader);
+        bucket.drawLines(state, *lineShader);
     }
 }

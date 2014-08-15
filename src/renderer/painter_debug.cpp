@@ -26,18 +26,18 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
     // Draw white outline
     plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
     state.lineWidth(4.0f * map.getState().getPixelRatio());
-    bucket.drawLines(*plainShader);
+    bucket.drawLines(state, *plainShader);
 
 #ifndef GL_ES_VERSION_2_0
     // Draw line "end caps"
     glPointSize(2);
-    bucket.drawPoints(*plainShader);
+    bucket.drawPoints(state, *plainShader);
 #endif
 
     // Draw black text.
     plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
     state.lineWidth(2.0f * map.getState().getPixelRatio());
-    bucket.drawLines(*plainShader);
+    bucket.drawLines(state, *plainShader);
 
     state.depthTest(true);
 }
@@ -54,7 +54,7 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     plainShader->setMatrix(matrix);
 
     // draw tile outline
-    tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
+    tileBorderArray.bind(state, *plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
     plainShader->setColor(1.0f, 0.0f, 0.0f, 1.0f);
     state.lineWidth(4.0f * map.getState().getPixelRatio());
     glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index());
@@ -85,7 +85,7 @@ void Painter::renderDebugText(const std::vector<std::string> &strings) {
     if (!debugFontBuffer.empty()) {
         // draw debug info
         VertexArrayObject debugFontArray;
-        debugFontArray.bind(*plainShader, debugFontBuffer, BUFFER_OFFSET(0));
+        debugFontArray.bind(state, *plainShader, debugFontBuffer, BUFFER_OFFSET(0));
         plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
         state.lineWidth(4.0f * map.getState().getPixelRatio());
         glDrawArrays(GL_LINES, 0, (GLsizei)debugFontBuffer.index());

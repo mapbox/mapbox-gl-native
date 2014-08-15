@@ -16,7 +16,7 @@ void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &so
     state.depthRange({{ 1.0f, 1.0f }});
     glStencilMask(0xFF);
 
-    coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    coveringPlainArray.bind(state, *plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 
     for (const std::shared_ptr<StyleSource> &source : sources) {
         source->source->drawClippingMasks(*this);

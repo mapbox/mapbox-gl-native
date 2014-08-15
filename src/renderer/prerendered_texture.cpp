@@ -125,7 +125,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
 
         painter.gaussianShader->setOffset({{ 1.0f / float(properties.size), 0 }});
         painter.state.bindTexture(original_texture);
-        painter.coveringGaussianArray.bind(*painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
+        painter.coveringGaussianArray.bind(painter.state, *painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, (GLsizei)painter.tileStencilBuffer.index());
 
 
@@ -139,7 +139,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
 
         painter.gaussianShader->setOffset({{ 0, 1.0f / float(properties.size) }});
         painter.state.bindTexture(secondary_texture);
-        painter.coveringGaussianArray.bind(*painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
+        painter.coveringGaussianArray.bind(painter.state, *painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, (GLsizei)painter.tileStencilBuffer.index());
     }
 

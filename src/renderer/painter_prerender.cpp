@@ -37,6 +37,6 @@ void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix,
     rasterShader->setContrast(properties.contrast);
     rasterShader->setSpin(spinWeights(properties.hue_rotate));
     bucket.texture.bindTexture(state);
-    coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    coveringRasterArray.bind(state, *rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }

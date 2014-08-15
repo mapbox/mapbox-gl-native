@@ -36,8 +36,8 @@ public:
 
     bool hasPoints() const;
 
-    void drawLines(LineShader& shader);
-    void drawPoints(LinejoinShader& shader);
+    void drawLines(GLState &state, LineShader& shader);
+    void drawPoints(GLState &state, LinejoinShader& shader);
 
 public:
     const StyleBucketLine &properties;

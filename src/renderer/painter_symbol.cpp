@@ -145,7 +145,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
             }
             textShader->setBuffer(haloWidth);
             state.depthRange({{ strata, 1.0f }});
-            bucket.drawGlyphs(*textShader);
+            bucket.drawGlyphs(state, *textShader);
         }
 
         if (properties.text.color[3] > 0.0f) {
@@ -163,7 +163,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
             }
             textShader->setBuffer((256.0f - 64.0f) / 256.0f);
             state.depthRange({{ strata + strata_epsilon, 1.0f }});
-            bucket.drawGlyphs(*textShader);
+            bucket.drawGlyphs(state, *textShader);
         }
     }
 
@@ -212,7 +212,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         iconShader->setOpacity(properties.icon.opacity);
 
         state.depthRange({{ strata, 1.0f }});
-        bucket.drawIcons(*iconShader);
+        bucket.drawIcons(state, *iconShader);
     }
 
     state.stencilTest(true);
