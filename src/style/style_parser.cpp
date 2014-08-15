@@ -862,6 +862,7 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         }
 
         parseRenderProperty(value, render.min_distance, "symbol-min-distance");
+        parseRenderProperty(value, render.avoid_edges, "symbol-avoid-edges");
 
         parseRenderProperty(value, render.icon.allow_overlap, "icon-allow-overlap");
         parseRenderProperty(value, render.icon.ignore_placement, "icon-ignore-placement");

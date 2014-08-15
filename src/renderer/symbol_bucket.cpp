@@ -212,6 +212,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
     const float iconBoxScale = collision.tilePixelRatio * properties.icon.max_size;
     const bool iconWithoutText = properties.text.optional || !shaping.size();
     const bool textWithoutIcon = properties.icon.optional || !image;
+    const bool avoidEdges = properties.avoid_edges && properties.placement != PlacementType::Line;
 
     Anchors anchors;
 
@@ -239,6 +240,9 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
         Placement iconPlacement;
         float glyphScale = 0;
         float iconScale = 0;
+        const bool inside = !(anchor.x < 0 || anchor.x > 4096 || anchor.y < 0 || anchor.y > 4096);
+
+        if (avoidEdges && !inside) continue;
 
         if (shaping.size()) {
             glyphPlacement = Placement::getGlyphs(anchor, origin, shaping, face, textBoxScale,
@@ -246,7 +250,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
             glyphScale =
                 properties.text.allow_overlap
                     ? glyphPlacement.minScale
-                    : collision.getPlacementScale(glyphPlacement.boxes, glyphPlacement.minScale);
+                    : collision.getPlacementScale(glyphPlacement.boxes, glyphPlacement.minScale, avoidEdges);
             if (!glyphScale && !iconWithoutText)
                 continue;
         }
@@ -256,7 +260,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
             iconScale =
                 properties.icon.allow_overlap
                     ? iconPlacement.minScale
-                    : collision.getPlacementScale(iconPlacement.boxes, iconPlacement.minScale);
+                    : collision.getPlacementScale(iconPlacement.boxes, iconPlacement.minScale, avoidEdges);
             if (!iconScale && !textWithoutIcon)
                 continue;
         }
@@ -297,14 +301,14 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
                 collision.insert(glyphPlacement.boxes, anchor, glyphScale, glyphRange,
                                  horizontalText);
             }
-            addSymbols(text, glyphPlacement.shapes, glyphScale, glyphRange);
+            if (inside) addSymbols(text, glyphPlacement.shapes, glyphScale, glyphRange);
         }
 
         if (iconScale) {
             if (!properties.icon.ignore_placement) {
                 collision.insert(iconPlacement.boxes, anchor, iconScale, iconRange, horizontalIcon);
             }
-            addSymbols(icon, iconPlacement.shapes, iconScale, iconRange);
+            if (inside) addSymbols(icon, iconPlacement.shapes, iconScale, iconRange);
         }
     }
 }
