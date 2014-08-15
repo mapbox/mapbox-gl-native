@@ -45,7 +45,6 @@ void Painter::setup() {
     assert(rasterShader);
     assert(textShader);
     assert(dotShader);
-    assert(compositeShader);
     assert(gaussianShader);
 
 
@@ -76,12 +75,10 @@ void Painter::setupShaders() {
     if (!rasterShader) rasterShader = std::make_unique<RasterShader>();
     if (!textShader) textShader = std::make_unique<TextShader>();
     if (!dotShader) dotShader = std::make_unique<DotShader>();
-    if (!compositeShader) compositeShader = std::make_unique<CompositeShader>();
     if (!gaussianShader) gaussianShader = std::make_unique<GaussianShader>();
 }
 
 void Painter::cleanup() {
-    clearFramebuffers();
 }
 
 void Painter::resize() {

@@ -628,9 +628,6 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<float>>("text-translate", { Key::TextTranslateX, Key::TextTranslateY }, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-text-translate", Key::TextTranslate, klass, value);
 
-    parseOptionalProperty<Function<float>>("composite-opacity", Key::CompositeOpacity, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-composite-opacity", Key::CompositeOpacity, klass, value);
-
     parseOptionalProperty<Function<float>>("raster-opacity", Key::RasterOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
     parseOptionalProperty<Function<float>>("raster-hue-rotate", Key::RasterHueRotate, klass, value);
