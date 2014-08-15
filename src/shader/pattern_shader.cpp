@@ -8,6 +8,7 @@ using namespace mbgl;
 
 PatternShader::PatternShader()
     : Shader(
+        "pattern",
         shaders[PATTERN_SHADER].vertex,
         shaders[PATTERN_SHADER].fragment
     ) {

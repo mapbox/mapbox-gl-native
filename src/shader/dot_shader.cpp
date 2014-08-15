@@ -8,6 +8,7 @@ using namespace mbgl;
 
 DotShader::DotShader()
 : Shader(
+         "dot",
          shaders[DOT_SHADER].vertex,
          shaders[DOT_SHADER].fragment
          ) {

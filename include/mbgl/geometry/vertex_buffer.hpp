@@ -25,6 +25,11 @@ public:
      */
     void bind();
 
+    /*
+     * Returns the OpenGL ID of the buffer object.
+     */
+    uint32_t getID() const;
+
 private:
     const std::vector<vertex_type> array;
     uint32_t buffer = 0;

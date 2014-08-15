@@ -8,6 +8,7 @@ using namespace mbgl;
 
 CompositeShader::CompositeShader()
     : Shader(
+         "composite",
          shaders[COMPOSITE_SHADER].vertex,
          shaders[COMPOSITE_SHADER].fragment
          ) {

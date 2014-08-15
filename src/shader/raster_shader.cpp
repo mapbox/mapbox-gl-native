@@ -8,6 +8,7 @@ using namespace mbgl;
 
 RasterShader::RasterShader()
     : Shader(
+         "raster",
          shaders[RASTER_SHADER].vertex,
          shaders[RASTER_SHADER].fragment
          ) {

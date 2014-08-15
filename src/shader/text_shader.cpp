@@ -8,6 +8,7 @@ using namespace mbgl;
 
 TextShader::TextShader()
     : Shader(
+        "text",
         shaders[TEXT_SHADER].vertex,
         shaders[TEXT_SHADER].fragment
     ) {

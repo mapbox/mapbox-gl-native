@@ -26,3 +26,7 @@ void VertexBuffer::bind() {
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
     }
 }
+
+uint32_t VertexBuffer::getID() const {
+    return buffer;
+}
