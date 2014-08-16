@@ -109,13 +109,7 @@ You can then proceed to build the library like:
 
 # Style
 
-The default stylesheet at `bin/style.js` is JSON and is processed into a minified version by the following script: 
-
-```
-node bin/build-style.js bin/style.js out/
-```
-
-Note: This is automatically taken care of as a build phase so you are not expected to do this manually.
+Some styles in JSON format are included at `./styles`. See the [style spec](https://github.com/mapbox/mapbox-gl-style-spec) for more details. 
 
 # Usage
 
@@ -123,7 +117,6 @@ Note: This is automatically taken care of as a build phase so you are not expect
 
 - Press `X` to reset the transform
 - Press `N` to reset north
-- Press `R` to toggle styles
 - Press `Tab` to toggle debug information
 - Press `Esc` to quit
 
@@ -134,7 +127,7 @@ Note: This is automatically taken care of as a build phase so you are not expect
 - Use two fingers to rotate
 - Double-tap to zoom in one level
 - Two-finger single-tap to zoom out one level
-- Single-tap to toggle the command palette visibility for resetting north & the transform, toggling debug, toggling styles, and locating the user
+- Single-tap to toggle the command palette visibility for resetting north & the transform, toggling debug, and locating the user
 - Double-tap, long-pressing the second, then pan up and down to "quick zoom" (iPhone only, meant for one-handed use)
 
 # Other notes
