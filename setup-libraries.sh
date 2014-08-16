@@ -57,6 +57,7 @@ if [ ! -d 'mapnik-packaging/' ]; then
 fi
 
 cd mapnik-packaging
+git fetch
 git checkout ${MP_HASH}
 cd ./osx/
 
