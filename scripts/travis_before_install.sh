@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-set -o pipefail
-
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #
     # install Linux dependencies
