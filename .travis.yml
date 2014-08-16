@@ -2,9 +2,9 @@ language: cpp
 
 os:
  - linux
+ - osx
 
 compiler:
- - gcc
  - clang
 
 env:
@@ -17,28 +17,25 @@ env:
    - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
 
 before_install:
-- ./scripts/setup_travis.sh
 - source ./scripts/flags.sh
+- ./scripts/travis_before_install.sh
 
 install:
 - make setup
-- npm install git+https://github.com/mapbox/mapbox-gl-test-suite.git
+- ./scripts/travis_install.sh
 
 before_script:
 - rm -rf mapnik-packaging/out/packages
 
 script:
-- make linux -j4 BUILDTYPE=${BUILDTYPE}
-- make test -j4 BUILDTYPE=${BUILDTYPE}
-- ./scripts/run_tests.sh
-- (cd ./node_modules/mapbox-gl-test-suite/ && (./bin/compare_images.js; ./bin/deploy_results.sh))
+- ./scripts/travis_script.sh
 
 notifications:
   hipchat:
     rooms:
       secure: "SgMjGDp8MP+UTAY/aWJwSQH2hv1Q0vhEc1BdIde59+lEL3u6gNMSexUTSJoVxRlIQTFXDJBU7v58ISdgJX8cPa+UvIC8hhLsayM+cbm+J3jgy7V9E9wllq3RpmXN33TxY7nwKgWdIms2t9YKZco3y4dKKAUyHXrtMvw8NNPQM+4="
     template:
-      - 'Build <a href="%{build_url}">#%{build_number}</a>: %{author} tested <a href="%{compare_url}">%{commit}</a> in branch <a href="https://github.com/%{repository_slug}/tree/%{branch}">%{branch}</a> of <a href="https://github.com/%{repository_slug}">%{repository_name}</a>: <b>%{commit_message}</b><br>%{message} (%{duration}) - Compare: <a href="http://mapbox-gl-testing.s3.amazonaws.com/headless/%{build_number}.1/index.html">1</a> <a href="http://mapbox-gl-testing.s3.amazonaws.com/headless/%{build_number}.2/index.html">2</a> <a href="http://mapbox-gl-testing.s3.amazonaws.com/headless/%{build_number}.3/index.html">3</a> <a href="http://mapbox-gl-testing.s3.amazonaws.com/headless/%{build_number}.4/index.html">4</a>'
+      - 'Build <a href="%{build_url}">#%{build_number}</a>: %{author} tested <a href="%{compare_url}">%{commit}</a> in branch <a href="https://github.com/%{repository_slug}/tree/%{branch}">%{branch}</a> of <a href="https://github.com/%{repository_slug}">%{repository_name}</a>: <b>%{commit_message}</b><br>%{message} (%{duration})'
     format: html
 
 git:
