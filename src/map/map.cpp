@@ -532,12 +532,7 @@ void Map::prepare() {
         transform.updateTransitions(animationTime);
     }
 
-    const TransformState oldState = state;
     state = transform.currentState();
-
-    bool pixelRatioChanged = oldState.getPixelRatio() != state.getPixelRatio();
-    bool dimensionsChanged = oldState.getFramebufferWidth() != state.getFramebufferWidth() ||
-                             oldState.getFramebufferHeight() != state.getFramebufferHeight();
 
     animationTime = util::now();
     updateSources();
