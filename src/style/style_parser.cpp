@@ -465,6 +465,7 @@ std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
         return group;
     } else {
         Log::Warning(Event::ParseStyle, "layers must be an array");
+        return nullptr;
     }
 }
 
