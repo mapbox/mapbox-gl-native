@@ -71,7 +71,7 @@ if [ ! -z "${TRAVIS:-}" ]; then
     fi
 fi
 
-if [ -z "${TRAVIS:-}" -o ! -d out/build-cpp11-libcpp-universal ]; then
+if test -z "${TRAVIS:-}" || ! test -d out/build-cpp11-libcpp-universal; then
 
 source iPhoneOS.sh
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
