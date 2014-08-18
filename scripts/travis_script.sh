@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -e
+set -o pipefail
+
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #
     # build & test Linux
@@ -11,7 +14,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
         ${TEST}
     done
     cd ../..
-    (cd ./node_modules/mapbox-gl-test-suite/ && (./bin/compare_images.js; ./bin/deploy_results.sh))
+    (cd ./node_modules/mapbox-gl-test-suite/ && (./bin/compare_images.js || true; ./bin/deploy_results.sh))
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     #
     # build OS X
