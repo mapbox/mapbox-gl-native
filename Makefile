@@ -21,10 +21,8 @@ node:
 
 ##### Test cases ###############################################################
 
-build/test/Makefile: src common config.gypi test/test.gyp
+test: config.gypi test/test.gyp node
 	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
-
-test: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=Testing V=$(V) test
 
 test_%: build/test/Makefile

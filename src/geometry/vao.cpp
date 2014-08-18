@@ -1,4 +1,5 @@
 #include <mbgl/geometry/vao.hpp>
+#include <mbgl/renderer/gl_state.hpp>
 
 namespace mbgl {
 
@@ -10,11 +11,11 @@ VertexArrayObject::~VertexArrayObject() {
     }
 }
 
-void VertexArrayObject::bindVertexArrayObject() {
+void VertexArrayObject::bindVertexArrayObject(GLState &state) {
     if (!vao) {
         glGenVertexArrays(1, &vao);
     }
-    glBindVertexArray(vao);
+    state.bindVertexArray(vao);
 }
 
 void VertexArrayObject::verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer,

@@ -8,12 +8,14 @@
 
 namespace mbgl {
 
+class GLState;
+
 #if GL_ARB_vertex_array_object
 class VertexArrayObject {
 public:
     template <typename Shader, typename VertexBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, char *offset) {
-        bindVertexArrayObject();
+    inline void bind(GLState &state, Shader& shader, VertexBuffer &vertexBuffer, char *offset) {
+        bindVertexArrayObject(state);
         if (bound_shader == 0) {
             vertexBuffer.bind();
             shader.bind(offset);
@@ -24,8 +26,8 @@ public:
     }
 
     template <typename Shader, typename VertexBuffer, typename ElementsBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, char *offset) {
-        bindVertexArrayObject();
+    inline void bind(GLState &state, Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, char *offset) {
+        bindVertexArrayObject(state);
         if (bound_shader == 0) {
             vertexBuffer.bind();
             elementsBuffer.bind();
@@ -39,7 +41,7 @@ public:
     ~VertexArrayObject();
 
 private:
-    void bindVertexArrayObject();
+    void bindVertexArrayObject(GLState &state);
     void storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, char *offset);
     void verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, char *offset);
 
@@ -58,11 +60,16 @@ private:
 
 class VertexArrayObject {
 public:
-    template <typename Shader, typename Buffers>
-    void bind(Shader& shader, Buffers& buffers, char *offset) {
-        for (auto &buffer : buffers) {
-            buffer.bind();
-        }
+    template <typename Shader, typename VertexBuffer>
+    void bind(GLState &state, Shader& shader, VertexBuffer& vertexBuffer, char *offset) {
+        vertexBuffer.bind();
+        shader.bind(offset);
+    }
+
+    template <typename Shader, typename VertexBuffer>
+    void bind(GLState &state, Shader& shader, VertexBuffer& vertexBuffer, ElementsBuffer &elementsBuffer, char *offset) {
+        vertexBuffer.bind();
+        elementsBuffer.bind();
         shader.bind(offset);
     }
 };

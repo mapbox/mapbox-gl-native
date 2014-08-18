@@ -18,9 +18,14 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
 
         if (!bucket.texture.getTexture()) {
 
-            bucket.texture.bindFramebuffer();
+            bucket.texture.bindFramebuffer(state);
 
             preparePrerender(bucket);
+
+            // Save the current viewport dimension so that we can restore it later.
+            const std::array<uint16_t, 2> viewport = state.viewport();
+
+            glViewport(0, 0, bucket.properties.size, bucket.properties.size);
 
             const int buffer = bucket.properties.buffer * 4096.0f;
 
@@ -47,10 +52,11 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
 
             bucket.texture.unbindFramebuffer();
 
-            glEnable(GL_DEPTH_TEST);
-            glEnable(GL_STENCIL_TEST);
+            state.depthTest(true);
+            state.stencilTest(true);
 
-            glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
+            // Restore the viewport.
+            state.viewport(viewport);
 
         }
 
@@ -60,9 +66,9 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
 
     // Only draw non-prerendered raster here
     if (bucket.hasData()) {
-        depthMask(false);
+        state.depthMask(false);
 
-        useProgram(rasterShader->program);
+        state.useProgram(rasterShader->program);
         rasterShader->setMatrix(matrix);
         rasterShader->setBuffer(0);
         rasterShader->setOpacity(properties.opacity);
@@ -71,11 +77,11 @@ void Painter::renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> lay
         rasterShader->setContrast(properties.contrast);
         rasterShader->setSpin(spinWeights(properties.hue_rotate));
 
-        depthRange(strata + strata_epsilon, 1.0f);
+        state.depthRange({{ strata + strata_epsilon, 1.0f }});
 
-        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
+        bucket.drawRaster(state, *rasterShader, tileStencilBuffer, coveringRasterArray);
 
-        depthMask(true);
+        state.depthMask(true);
     }
 
 }

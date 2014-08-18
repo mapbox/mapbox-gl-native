@@ -49,9 +49,9 @@ public:
     void addGeometry(pbf& data);
     void tessellate();
 
-    void drawElements(PlainShader& shader);
-    void drawElements(PatternShader& shader);
-    void drawVertices(OutlineShader& shader);
+    void drawElements(GLState &state, PlainShader& shader);
+    void drawElements(GLState &state, PatternShader& shader);
+    void drawVertices(GLState &state, OutlineShader& shader);
 
 public:
     const StyleBucketFill &properties;

@@ -52,7 +52,7 @@ void Painter::setup() {
     // We are blending new pixels on top of old pixels. Since we have depth testing
     // and are drawing opaque fragments first front-to-back, then translucent
     // fragments back-to-front, this shades the fewest fragments possible.
-    glEnable(GL_BLEND);
+    state.blend(true);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     // Set clear values
@@ -61,7 +61,7 @@ void Painter::setup() {
     glClearStencil(0x0);
 
     // Stencil test
-    glEnable(GL_STENCIL_TEST);
+    state.stencilTest(true);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 }
 
@@ -82,46 +82,13 @@ void Painter::cleanup() {
 }
 
 void Painter::resize() {
-    const TransformState &state = map.getState();
-    if (gl_viewport != state.getFramebufferDimensions()) {
-        gl_viewport = state.getFramebufferDimensions();
-        assert(gl_viewport[0] > 0 && gl_viewport[1] > 0);
-        glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
-    }
+    const TransformState &transformState = map.getState();
+    state.viewport(transformState.getFramebufferDimensions());
 }
 
 void Painter::setDebug(bool enabled) {
     debug = enabled;
 }
-
-void Painter::useProgram(uint32_t program) {
-    if (gl_program != program) {
-        glUseProgram(program);
-        gl_program = program;
-    }
-}
-
-void Painter::lineWidth(float lineWidth) {
-    if (gl_lineWidth != lineWidth) {
-        glLineWidth(lineWidth);
-        gl_lineWidth = lineWidth;
-    }
-}
-
-void Painter::depthMask(bool value) {
-    if (gl_depthMask != value) {
-        glDepthMask(value ? GL_TRUE : GL_FALSE);
-        gl_depthMask = value;
-    }
-}
-
-void Painter::depthRange(const float near, const float far) {
-    if (gl_depthRange[0] != near || gl_depthRange[1] != far) {
-        glDepthRange(near, far);
-        gl_depthRange = {{ near, far }};
-    }
-}
-
 
 void Painter::changeMatrix() {
     // Initialize projection matrix
@@ -141,7 +108,7 @@ void Painter::changeMatrix() {
 void Painter::clear() {
     gl::group group("clear");
     glStencilMask(0xFF);
-    depthMask(true);
+    state.depthMask(true);
 
     const BackgroundProperties &properties = map.getStyle()->getBackgroundProperties();
     glClearColor(properties.color[0], properties.color[1], properties.color[2], properties.color[3]);
@@ -151,16 +118,16 @@ void Painter::clear() {
 void Painter::setOpaque() {
     if (pass != RenderPass::Opaque) {
         pass = RenderPass::Opaque;
-        glDisable(GL_BLEND);
-        depthMask(true);
+        state.blend(false);
+        state.depthMask(true);
     }
 }
 
 void Painter::setTranslucent() {
     if (pass != RenderPass::Translucent) {
         pass = RenderPass::Translucent;
-        glEnable(GL_BLEND);
-        depthMask(false);
+        state.blend(true);
+        state.depthMask(false);
     }
 }
 

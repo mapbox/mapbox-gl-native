@@ -360,28 +360,28 @@ bool LineBucket::hasPoints() const {
     return false;
 }
 
-void LineBucket::drawLines(LineShader& shader) {
+void LineBucket::drawLines(GLState &state, LineShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
     char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (triangle_group_type& group : triangleGroups) {
         if (!group.elements_length) {
             continue;
         }
-        group.array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
+        group.array[0].bind(state, shader, vertexBuffer, triangleElementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * vertexBuffer.itemSize;
         elements_index += group.elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
-void LineBucket::drawPoints(LinejoinShader& shader) {
+void LineBucket::drawPoints(GLState &state, LinejoinShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
     char *elements_index = BUFFER_OFFSET(point_elements_start * pointElementsBuffer.itemSize);
     for (point_group_type& group : pointGroups) {
         if (!group.elements_length) {
             continue;
         }
-        group.array[0].bind(shader, vertexBuffer, pointElementsBuffer, vertex_index);
+        group.array[0].bind(state, shader, vertexBuffer, pointElementsBuffer, vertex_index);
         glDrawElements(GL_POINTS, group.elements_length, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * vertexBuffer.itemSize;
         elements_index += group.elements_length * pointElementsBuffer.itemSize;

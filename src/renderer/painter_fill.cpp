@@ -37,9 +37,9 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (outline && pass == RenderPass::Translucent) {
-        useProgram(outlineShader->program);
+        state.useProgram(outlineShader->program);
         outlineShader->setMatrix(vtxMatrix);
-        lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
+        state.lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
         outlineShader->setColor(stroke_color);
 
@@ -48,8 +48,8 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
             static_cast<float>(map.getState().getFramebufferWidth()),
             static_cast<float>(map.getState().getFramebufferHeight())
         }});
-        depthRange(strata, 1.0f);
-        bucket.drawVertices(*outlineShader);
+        state.depthRange({{ strata, 1.0f }});
+        bucket.drawVertices(state, *outlineShader);
     }
 
     if (pattern) {
@@ -83,7 +83,7 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
             matrix::identity(patternMatrix);
             matrix::scale(patternMatrix, patternMatrix, 1.0f / (size[0] * factor), 1.0f / (size[1] * factor));
 
-            useProgram(patternShader->program);
+            state.useProgram(patternShader->program);
             patternShader->setMatrix(vtxMatrix);
             patternShader->setPatternTopLeft(tl);
             patternShader->setPatternBottomRight(br);
@@ -92,12 +92,12 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
             patternShader->setMix(mix);
             patternShader->setPatternMatrix(patternMatrix);
 
-            glActiveTexture(GL_TEXTURE0);
-            spriteAtlas.bind(true);
+            state.activeTexture(0);
+            spriteAtlas.bind(state, true);
 
             // Draw the actual triangles into the color & stencil buffer.
-            depthRange(strata, 1.0f);
-            bucket.drawElements(*patternShader);
+            state.depthRange({{ strata, 1.0f }});
+            bucket.drawElements(state, *patternShader);
         }
     }
     else {
@@ -107,22 +107,22 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
             // fragments or when it's translucent and we're drawing translucent
             // fragments
             // Draw filling rectangle.
-            useProgram(plainShader->program);
+            state.useProgram(plainShader->program);
             plainShader->setMatrix(vtxMatrix);
             plainShader->setColor(fill_color);
 
             // Draw the actual triangles into the color & stencil buffer.
-            depthRange(strata + strata_epsilon, 1.0f);
-            bucket.drawElements(*plainShader);
+            state.depthRange({{ strata + strata_epsilon, 1.0f }});
+            bucket.drawElements(state, *plainShader);
         }
     }
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (fringeline && pass == RenderPass::Translucent) {
-        useProgram(outlineShader->program);
+        state.useProgram(outlineShader->program);
         outlineShader->setMatrix(vtxMatrix);
-        lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
+        state.lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
         outlineShader->setColor(fill_color);
 
@@ -132,8 +132,8 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
             static_cast<float>(map.getState().getFramebufferHeight())
         }});
 
-        depthRange(strata + strata_epsilon, 1.0f);
-        bucket.drawVertices(*outlineShader);
+        state.depthRange({{ strata + strata_epsilon, 1.0f }});
+        bucket.drawVertices(state, *outlineShader);
     }
 }
 

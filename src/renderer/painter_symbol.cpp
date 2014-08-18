@@ -18,7 +18,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
 
     const SymbolProperties &properties = layer_desc->getProperties<SymbolProperties>();
 
-    glDisable(GL_STENCIL_TEST);
+    state.stencilTest(false);
 
     if (bucket.hasTextData()) {
         mat4 exMatrix;
@@ -31,12 +31,12 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         float fontSize = std::fmin(properties.text.size, bucket.properties.text.max_size);
         matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
 
-        useProgram(textShader->program);
+        state.useProgram(textShader->program);
         textShader->setMatrix(matrix);
         textShader->setExtrudeMatrix(exMatrix);
 
         GlyphAtlas &glyphAtlas = *map.getGlyphAtlas();
-        glyphAtlas.bind();
+        glyphAtlas.bind(state);
         textShader->setTextureSize(
             {{static_cast<float>(glyphAtlas.width), static_cast<float>(glyphAtlas.height)}});
 
@@ -144,8 +144,8 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
                 textShader->setColor(properties.text.halo_color);
             }
             textShader->setBuffer(haloWidth);
-            depthRange(strata, 1.0f);
-            bucket.drawGlyphs(*textShader);
+            state.depthRange({{ strata, 1.0f }});
+            bucket.drawGlyphs(state, *textShader);
         }
 
         if (properties.text.color[3] > 0.0f) {
@@ -162,8 +162,8 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
                 textShader->setColor(properties.text.color);
             }
             textShader->setBuffer((256.0f - 64.0f) / 256.0f);
-            depthRange(strata + strata_epsilon, 1.0f);
-            bucket.drawGlyphs(*textShader);
+            state.depthRange({{ strata + strata_epsilon, 1.0f }});
+            bucket.drawGlyphs(state, *textShader);
         }
     }
 
@@ -185,12 +185,12 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         const float fontScale = fontSize / 1.0f;
         matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
 
-        useProgram(iconShader->program);
+        state.useProgram(iconShader->program);
         iconShader->setMatrix(matrix);
         iconShader->setExtrudeMatrix(exMatrix);
 
         SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-        spriteAtlas.bind(map.getState().isChanging() || bucket.properties.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1);
+        spriteAtlas.bind(state, map.getState().isChanging() || bucket.properties.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1);
         iconShader->setTextureSize(
             {{static_cast<float>(spriteAtlas.getWidth()), static_cast<float>(spriteAtlas.getHeight())}});
 
@@ -211,10 +211,10 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         iconShader->setFadeZoom(map.getState().getNormalizedZoom() * 10);
         iconShader->setOpacity(properties.icon.opacity);
 
-        depthRange(strata, 1.0f);
-        bucket.drawIcons(*iconShader);
+        state.depthRange({{ strata, 1.0f }});
+        bucket.drawIcons(state, *iconShader);
     }
 
-    glEnable(GL_STENCIL_TEST);
+    state.stencilTest(true);
 }
 }

@@ -6,8 +6,8 @@
 using namespace mbgl;
 
 void Painter::preparePrerender(RasterBucket &bucket) {
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_STENCIL_TEST);
+    state.depthTest(false);
+    state.stencilTest(false);
 
 // Render the actual tile.
 #if GL_EXT_discard_framebuffer
@@ -16,21 +16,19 @@ void Painter::preparePrerender(RasterBucket &bucket) {
 #endif
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    glViewport(0, 0, bucket.properties.size, bucket.properties.size);
 }
 
 void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties) {
     const int buffer = bucket.properties.buffer * 4096.0f;
 
     // draw the texture on a quad
-    useProgram(rasterShader->program);
+    state.useProgram(rasterShader->program);
     rasterShader->setMatrix(matrix);
     rasterShader->setOpacity(1);
 
-    depthRange(strata, 1.0f);
+    state.depthRange({{ strata, 1.0f }});
 
-    glActiveTexture(GL_TEXTURE0);
+    state.activeTexture(0);
     rasterShader->setImage(0);
     rasterShader->setBuffer(buffer);
     rasterShader->setOpacity(properties.opacity);
@@ -38,7 +36,7 @@ void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix,
     rasterShader->setSaturation(properties.saturation);
     rasterShader->setContrast(properties.contrast);
     rasterShader->setSpin(spinWeights(properties.hue_rotate));
-    bucket.texture.bindTexture();
-    coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
+    bucket.texture.bindTexture(state);
+    coveringRasterArray.bind(state, *rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }

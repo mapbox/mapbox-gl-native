@@ -22,12 +22,12 @@ bool DebugBucket::hasData() const {
     return fontBuffer.index() > 0;
 }
 
-void DebugBucket::drawLines(PlainShader& shader) {
-    array.bind(shader, fontBuffer, BUFFER_OFFSET(0));
+void DebugBucket::drawLines(GLState &state, PlainShader& shader) {
+    array.bind(state, shader, fontBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_LINES, 0, (GLsizei)(fontBuffer.index()));
 }
 
-void DebugBucket::drawPoints(PlainShader& shader) {
-    array.bind(shader, fontBuffer, BUFFER_OFFSET(0));
+void DebugBucket::drawPoints(GLState &state, PlainShader& shader) {
+    array.bind(state, shader, fontBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_POINTS, 0, (GLsizei)(fontBuffer.index()));
 }

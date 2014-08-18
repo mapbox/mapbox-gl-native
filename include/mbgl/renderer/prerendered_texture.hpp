@@ -8,14 +8,15 @@ namespace mbgl {
 
 class StyleBucketRaster;
 class Painter;
+class GLState;
 
 class PrerenderedTexture : private util::noncopyable {
 public:
     PrerenderedTexture(const StyleBucketRaster &properties);
     ~PrerenderedTexture();
 
-    void bindTexture();
-    void bindFramebuffer();
+    void bindTexture(GLState &state);
+    void bindFramebuffer(GLState &state);
     void unbindFramebuffer();
 
     inline GLuint getTexture() const { return texture; }

@@ -22,27 +22,27 @@ PrerenderedTexture::~PrerenderedTexture() {
 }
 
 
-void PrerenderedTexture::bindTexture() {
+void PrerenderedTexture::bindTexture(GLState &state) {
     if (texture == 0) {
-        bindFramebuffer();
+        bindFramebuffer(state);
         unbindFramebuffer();
     }
 
-    glBindTexture(GL_TEXTURE_2D, texture);
+    state.bindTexture(texture);
 }
 
-void PrerenderedTexture::bindFramebuffer() {
+void PrerenderedTexture::bindFramebuffer(GLState &state) {
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_fbo);
 
     if (texture == 0) {
         glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        state.bindTexture(texture);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, properties.size, properties.size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        state.bindTexture(0);
     }
 
     if (fbo_depth_stencil == 0) {
@@ -100,19 +100,19 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
     // Create a secondary texture
     GLuint secondary_texture;
     glGenTextures(1, &secondary_texture);
-    glBindTexture(GL_TEXTURE_2D, secondary_texture);
+    painter.state.bindTexture(secondary_texture);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, properties.size, properties.size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    painter.state.bindTexture(0);
 
 
-    painter.useProgram(painter.gaussianShader->program);
+    painter.state.useProgram(painter.gaussianShader->program);
     painter.gaussianShader->setMatrix(painter.flipMatrix);
     painter.gaussianShader->setImage(0);
-    glActiveTexture(GL_TEXTURE0);
+    painter.state.activeTexture(0);
 
     for (int i = 0; i < passes; i++) {
         // Render horizontal
@@ -124,8 +124,8 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         painter.gaussianShader->setOffset({{ 1.0f / float(properties.size), 0 }});
-        glBindTexture(GL_TEXTURE_2D, original_texture);
-        painter.coveringGaussianArray.bind(*painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
+        painter.state.bindTexture(original_texture);
+        painter.coveringGaussianArray.bind(painter.state, *painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, (GLsizei)painter.tileStencilBuffer.index());
 
 
@@ -138,8 +138,8 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         painter.gaussianShader->setOffset({{ 0, 1.0f / float(properties.size) }});
-        glBindTexture(GL_TEXTURE_2D, secondary_texture);
-        painter.coveringGaussianArray.bind(*painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
+        painter.state.bindTexture(secondary_texture);
+        painter.coveringGaussianArray.bind(painter.state, *painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, (GLsizei)painter.tileStencilBuffer.index());
     }
 

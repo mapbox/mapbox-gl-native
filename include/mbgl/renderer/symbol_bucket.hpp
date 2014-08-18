@@ -68,8 +68,8 @@ public:
     void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom, PlacementRange placementRange,
                    float zoom);
 
-    void drawGlyphs(TextShader &shader);
-    void drawIcons(IconShader& shader);
+    void drawGlyphs(GLState &state, TextShader &shader);
+    void drawIcons(GLState &state, IconShader& shader);
 
 private:
 

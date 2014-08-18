@@ -33,11 +33,11 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 
     const mat4 &vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
-    depthRange(strata, 1.0f);
+    state.depthRange({{ strata, 1.0f }});
 
     // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
     if (bucket.hasPoints() && outset > 1.0f) {
-        useProgram(linejoinShader->program);
+        state.useProgram(linejoinShader->program);
         linejoinShader->setMatrix(vtxMatrix);
         linejoinShader->setColor(color);
         linejoinShader->setWorld({{
@@ -57,7 +57,7 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 #else
         glPointSize(pointSize);
 #endif
-        bucket.drawPoints(*linejoinShader);
+        bucket.drawPoints(state, *linejoinShader);
     }
 
     // var imagePos = properties.image && imageSprite.getPosition(properties.image);
@@ -76,7 +76,7 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         // glUniform1f(painter.linepatternShader.u_fade, painter.transform.z % 1.0);
 
     } else {
-        useProgram(lineShader->program);
+        state.useProgram(lineShader->program);
         lineShader->setMatrix(vtxMatrix);
         lineShader->setExtrudeMatrix(extrudeMatrix);
         lineShader->setDashArray({{ dash_length, dash_gap }});
@@ -84,6 +84,6 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         lineShader->setRatio(map.getState().getPixelRatio());
         lineShader->setBlur(blur);
         lineShader->setColor(color);
-        bucket.drawLines(*lineShader);
+        bucket.drawLines(state, *lineShader);
     }
 }
