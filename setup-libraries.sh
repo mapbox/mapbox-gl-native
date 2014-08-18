@@ -63,6 +63,16 @@ cd ./osx/
 export CXX11=true
 
 if [ ${UNAME} = 'Darwin' ]; then
+
+if [ ! -z "${TRAVIS:-}" ]; then
+    if aws s3 cp s3://mapbox-gl-testing/dependencies/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz ./out/ ; then
+        rm -rf out/build-cpp11-libcpp-universal
+        tar -xzf out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz
+    fi
+fi
+
+if [ -z "${TRAVIS:-}" -o ! -d out/build-cpp11-libcpp-universal ]; then
+
 source iPhoneOS.sh
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
@@ -100,6 +110,13 @@ source MacOSX.sh
     echo '     ...done'
 
 ./scripts/make_universal.sh
+
+if [ ! -z "${TRAVIS:-}" ]; then
+    tar -zcf out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz out/build-cpp11-libcpp-universal
+    aws s3 cp out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz s3://mapbox-gl-testing/dependencies/
+fi
+
+fi
 
 cd ../../
 ./configure \
