@@ -239,14 +239,14 @@ CollisionRange rotationRange(const GlyphBox &inserting,
         static_cast<float>((b.anchor.y - a.anchor.y) * scale)};
 
     // Generate a list of collision interval
-    if (a.rotate && b.rotate) {
+    if (a.hBox && b.hBox) {
         collisions = rotatingRotatingCollisions(a.box, b.box, relativeAnchor);
-    } else if (a.rotate) {
+    } else if (a.hBox) {
         const CollisionRect box {
             b.box.tl.x + relativeAnchor.x, b.box.tl.y + relativeAnchor.y,
             b.box.br.x + relativeAnchor.x, b.box.br.y + relativeAnchor.y};
         collisions = rotatingFixedCollisions(a.box, box);
-    } else if (b.rotate) {
+    } else if (b.hBox) {
         const CollisionRect box {
             a.box.tl.x - relativeAnchor.x, a.box.tl.y - relativeAnchor.y,
             a.box.br.x - relativeAnchor.x, a.box.br.y - relativeAnchor.y};

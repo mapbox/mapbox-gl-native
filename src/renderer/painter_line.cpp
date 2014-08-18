@@ -6,9 +6,9 @@
 
 using namespace mbgl;
 
-void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
+void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
     // Abort early.
-    if (pass == Opaque) return;
+    if (pass == RenderPass::Opaque) return;
     if (!bucket.hasData()) return;
 
     const LineProperties &properties = layer_desc->getProperties<LineProperties>();
@@ -29,10 +29,11 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    const mat4 &vtxMatrix = translatedMatrix(properties.translate, id, properties.translateAnchor);
-
     fprintf(stderr, "linepattern t %f\n", properties.dasharray.t);
-    glDepthRange(strata, 1.0f);
+
+    const mat4 &vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
+
+    depthRange(strata, 1.0f);
 
     // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
     if (bucket.hasPoints() && outset > 1.0f) {

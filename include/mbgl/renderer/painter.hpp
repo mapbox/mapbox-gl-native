@@ -3,7 +3,7 @@
 
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/geometry/vao.hpp>
-#include <mbgl/geometry/vertex_buffer.hpp>
+#include <mbgl/geometry/static_vertex_buffer.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/renderer/frame_history.hpp>
@@ -19,7 +19,6 @@
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/shader/text_shader.hpp>
 #include <mbgl/shader/dot_shader.hpp>
-#include <mbgl/shader/composite_shader.hpp>
 #include <mbgl/shader/gaussian_shader.hpp>
 
 #include <mbgl/map/transform_state.hpp>
@@ -30,6 +29,8 @@
 
 namespace mbgl {
 
+enum class RenderPass : bool { Opaque, Translucent };
+
 class Transform;
 class Style;
 class Tile;
@@ -39,12 +40,12 @@ class StyleSource;
 
 class FillBucket;
 class LineBucket;
-class IconBucket;
-class TextBucket;
+class SymbolBucket;
 class RasterBucket;
+class PrerenderedTexture;
 
 struct FillProperties;
-struct CompositeProperties;
+struct RasterProperties;
 
 class LayerDescription;
 class RasterTileData;
@@ -71,28 +72,28 @@ public:
     void changeMatrix();
 
     // Renders a particular layer from a tile.
-    void renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc);
+    void renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
 
     // Renders the red debug frame around a tile, visualizing its perimeter.
-    void renderDebugFrame();
+    void renderDebugFrame(const mat4 &matrix);
 
-    void renderDebugText(DebugBucket& bucket);
+    void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
     void renderDebugText(const std::vector<std::string> &strings);
-    void renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &mat);
-    void renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
-    void renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
-    void renderIcon(IconBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
-    void renderText(TextBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
-    void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    void renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &matrix);
+    void renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderSymbol(SymbolBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    std::array<float, 3> spinWeights(float spin_value);
 
-    void preparePrerender(PrerenderedTexture &texture);
-    void finishPrerender(PrerenderedTexture &texture);
+    void preparePrerender(RasterBucket &bucket);
 
-    template <typename Properties>
-    void renderPrerenderedTexture(PrerenderedTexture &texture, const Properties &properties);
+    void renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties);
+
+    void createPrerendered(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
 
     void resize();
 
@@ -109,18 +110,16 @@ public:
     void drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &sources);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
 
-    void clearFramebuffers();
     void resetFramebuffer();
     void bindFramebuffer();
     void pushFramebuffer();
     GLuint popFramebuffer();
     void discardFramebuffers();
-    void drawComposite(GLuint texture, const CompositeProperties &properties);
 
     bool needsAnimation() const;
 private:
     void setupShaders();
-    const mat4 &translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = TranslateAnchorType::Default);
+    const mat4 &translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = TranslateAnchorType::Map);
 
     void prepareTile(const Tile& tile);
 
@@ -128,9 +127,9 @@ public:
     void useProgram(uint32_t program);
     void lineWidth(float lineWidth);
     void depthMask(bool value);
+    void depthRange(float near, float far);
 
 public:
-    mat4 matrix;
     mat4 vtxMatrix;
     mat4 projMatrix;
     mat4 nativeMatrix;
@@ -155,8 +154,9 @@ private:
     float gl_lineWidth = 0;
     bool gl_depthMask = true;
     std::array<uint16_t, 2> gl_viewport = {{ 0, 0 }};
+    std::array<float, 2> gl_depthRange = {{ 0, 1 }};
     float strata = 0;
-    enum { Opaque, Translucent } pass = Opaque;
+    RenderPass pass = RenderPass::Opaque;
     const float strata_epsilon = 1.0f / (1 << 16);
 
 public:
@@ -170,20 +170,19 @@ public:
     std::unique_ptr<RasterShader> rasterShader;
     std::unique_ptr<TextShader> textShader;
     std::unique_ptr<DotShader> dotShader;
-    std::unique_ptr<CompositeShader> compositeShader;
     std::unique_ptr<GaussianShader> gaussianShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
-    VertexBuffer tileStencilBuffer = {
+    StaticVertexBuffer tileStencilBuffer = {
         // top left triangle
-        0, 0,
-        4096, 0,
-        0, 4096,
+        { 0, 0 },
+        { 4096, 0 },
+        { 0, 4096 },
 
         // bottom right triangle
-        4096, 0,
-        0, 4096,
-        4096, 4096
+        { 4096, 0 },
+        { 0, 4096 },
+        { 4096, 4096 },
     };
 
     VertexArrayObject coveringPlainArray;
@@ -191,16 +190,15 @@ public:
     VertexArrayObject coveringRasterArray;
     VertexArrayObject coveringGaussianArray;
 
-    VertexArrayObject compositeArray;
     VertexArrayObject matteArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
-    VertexBuffer tileBorderBuffer = {
-        0, 0,
-        4096, 0,
-        4096, 4096,
-        0, 4096,
-        0, 0
+    StaticVertexBuffer tileBorderBuffer = {
+        { 0, 0 },
+        { 4096, 0 },
+        { 4096, 4096 },
+        { 0, 4096 },
+        { 0, 0 },
     };
 
     VertexArrayObject tileBorderArray;

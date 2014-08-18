@@ -8,6 +8,7 @@ using namespace mbgl;
 
 LineSDFShader::LineSDFShader()
     : Shader(
+        "linesdf",
         shaders[LINESDF_SHADER].vertex,
         shaders[LINESDF_SHADER].fragment
     ) {

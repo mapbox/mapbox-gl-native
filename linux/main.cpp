@@ -1,5 +1,6 @@
 #include <mbgl/mbgl.hpp>
 #include <mbgl/platform/platform.hpp>
+#include <mbgl/util/uv.hpp>
 
 #include <signal.h>
 #include <getopt.h>
@@ -45,15 +46,6 @@ int main(int argc, char *argv[]) {
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, NULL);
 
-    // read default stylesheet from disk
-    std::ifstream stylefile("./style.min.js");
-    if (!stylefile.good()) {
-        fprintf(stderr, "Cannot read style file\n");
-        return 1;
-    }
-    std::stringstream stylejson;
-    stylejson << stylefile.rdbuf();
-
     view = new GLFWView();
     mbgl::Map map(*view);
 
@@ -72,7 +64,8 @@ int main(int argc, char *argv[]) {
     }
 
     // Load style
-    map.setStyleJSON(stylejson.str());
+    const std::string style = std::string("file://") + uv::cwd() + std::string("/styles/bright/style.json");
+    map.setStyleURL(style);
 
     int ret = view->run();
 

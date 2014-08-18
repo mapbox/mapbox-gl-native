@@ -20,7 +20,7 @@ class DebugBucket : public Bucket {
 public:
     DebugBucket(DebugFontBuffer& fontBuffer);
 
-    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     virtual bool hasData() const;
 
     void drawLines(PlainShader& shader);

@@ -80,7 +80,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     CapType beginCap = properties.cap;
     CapType endCap = closed ? CapType::Butt : properties.cap;
 
-    JoinType currentJoin = JoinType::Default;
+    JoinType currentJoin = JoinType::Miter;
 
     Coordinate currentVertex = Coordinate::null(),
                prevVertex = Coordinate::null(),
@@ -341,8 +341,8 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     }
 }
 
-void LineBucket::render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id) {
-    painter.renderLine(*this, layer_desc, id);
+void LineBucket::render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
+    painter.renderLine(*this, layer_desc, id, matrix);
 }
 
 bool LineBucket::hasData() const {
@@ -367,7 +367,7 @@ void LineBucket::drawLines(LineShader& shader) {
         if (!group.elements_length) {
             continue;
         }
-        group.array.bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
+        group.array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * vertexBuffer.itemSize;
         elements_index += group.elements_length * triangleElementsBuffer.itemSize;
@@ -381,7 +381,7 @@ void LineBucket::drawLines(LineSDFShader& shader) {
         if (!group.elements_length) {
             continue;
         }
-        group.array.bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
+        group.array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * vertexBuffer.itemSize;
         elements_index += group.elements_length * triangleElementsBuffer.itemSize;
@@ -395,7 +395,7 @@ void LineBucket::drawPoints(LinejoinShader& shader) {
         if (!group.elements_length) {
             continue;
         }
-        group.array.bind(shader, vertexBuffer, pointElementsBuffer, vertex_index);
+        group.array[0].bind(shader, vertexBuffer, pointElementsBuffer, vertex_index);
         glDrawElements(GL_POINTS, group.elements_length, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * vertexBuffer.itemSize;
         elements_index += group.elements_length * pointElementsBuffer.itemSize;

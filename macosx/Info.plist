@@ -32,5 +32,16 @@
     <string>0.0.1</string>
     <key>NSHighResolutionCapable</key>
     <true/>
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleURLName</key>
+        <string>${PRODUCT_NAME}</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>mapboxgl</string>
+        </array>
+      </dict>
+    </array>
 </dict>
 </plist>

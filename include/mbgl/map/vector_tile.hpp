@@ -86,7 +86,7 @@ private:
     const FilterExpression& filterExpression;
 };
 
-std::ostream& operator<<(std::ostream&, const GlyphPlacement& placement);
+std::ostream& operator<<(std::ostream&, const PositionedGlyph& placement);
 
 class VectorTileLayer {
 public:

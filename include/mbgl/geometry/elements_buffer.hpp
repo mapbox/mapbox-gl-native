@@ -4,10 +4,13 @@
 #include <mbgl/geometry/buffer.hpp>
 #include <mbgl/geometry/vao.hpp>
 
+#include <array>
+
 namespace mbgl {
 
+template <int count>
 struct ElementGroup {
-    VertexArrayObject array;
+    std::array<VertexArrayObject, count> array;
     uint32_t vertex_length;
     uint32_t elements_length;
 

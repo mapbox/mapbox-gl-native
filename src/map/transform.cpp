@@ -5,6 +5,7 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/time.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/transition.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <cstdio>
@@ -16,9 +17,7 @@ const double R2D = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
 const double MIN_ROTATE_SCALE = 8;
 
-Transform::Transform(View &view)
-    : view(view) {
-
+Transform::Transform(View &view) : view(view), mtx(std::make_unique<uv::rwlock>()) {
     setScale(current.scale);
     setAngle(current.angle);
 }
@@ -129,9 +128,9 @@ void Transform::getLonLat(double &lon, double &lat) const {
 }
 
 void Transform::getLonLatZoom(double &lon, double &lat, double &zoom) const {
-    uv::readlock lock(mtx);
-
     getLonLat(lon, lat);
+
+    uv::readlock lock(mtx);
     zoom = getZoom();
 }
 
@@ -193,7 +192,7 @@ void Transform::setZoom(const double zoom, const timestamp duration) {
 double Transform::getZoom() const {
     uv::readlock lock(mtx);
 
-    return log(final.scale) / M_LN2;
+    return std::log(final.scale) / M_LN2;
 }
 
 double Transform::getScale() const {

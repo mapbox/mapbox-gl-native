@@ -1,10 +1,13 @@
 #include <mbgl/style/style.hpp>
+#include <mbgl/map/sprite.hpp>
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/error.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
@@ -12,8 +15,14 @@
 
 namespace mbgl {
 
-Style::Style() {
+Style::Style()
+    : mtx(std::make_unique<uv::rwlock>()) {
 }
+
+// Note: This constructor is seemingly empty, but we need to declare it anyway
+// because this file includes uv_detail.hpp, which has the declarations necessary
+// for deleting the std::unique_ptr<uv::rwlock>.
+Style::~Style() {}
 
 void Style::updateProperties(float z, timestamp now) {
     uv::writelock lock(mtx);
@@ -27,6 +36,10 @@ void Style::updateProperties(float z, timestamp now) {
         initial_render_complete = true;
         return;
     }
+}
+
+const std::string &Style::getSpriteURL() const {
+    return sprite_url;
 }
 
 void Style::setDefaultTransitionDuration(uint16_t duration_milliseconds) {
@@ -93,7 +106,7 @@ void Style::loadJSON(const uint8_t *const data) {
 const BackgroundProperties &Style::getBackgroundProperties() const {
     if (layers && layers->layers.size()) {
         const auto first = layers->layers.front();
-        if (first && first->id == "background") {
+        if (first && first->type == StyleLayerType::Background) {
             return first->getProperties<BackgroundProperties>();
         }
     }

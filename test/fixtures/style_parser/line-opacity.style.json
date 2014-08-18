@@ -1,0 +1,22 @@
+{
+  "version": 3,
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "mapbox://mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v5",
+      "maxZoom": 14
+    }
+  },
+  "layers": [{
+    "id": "contour_line_loud",
+    "source": "mapbox",
+    "source-layer": "contour",
+    "filter": { "index": 5 },
+    "type": "line",
+    "style": {
+      "line-color": "#008",
+      "line-width": 0.9,
+      "line-opacity": null
+    }
+  }]
+}

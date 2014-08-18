@@ -7,7 +7,7 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/util/time.hpp>
-#include <mbgl/util/uv.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
 
 #include <png.h>
@@ -66,6 +66,28 @@ void Raster::bind(bool linear) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
         this->filter = filter;
     }
+}
+
+// overload ::bind for prerendered raster textures
+void Raster::bind(const GLuint texture) {
+    if (img && !textured) {
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->getData());
+        img.reset();
+        textured = true;
+    } else if (textured) {
+        glBindTexture(GL_TEXTURE_2D, texture);
+    }
+
+    GLuint filter = GL_LINEAR;
+    if (filter != this->filter) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+        this->filter = filter;
+    }
+
 }
 
 void Raster::beginFadeInTransition() {

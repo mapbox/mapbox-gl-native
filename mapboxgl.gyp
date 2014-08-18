@@ -8,6 +8,9 @@
       'target_name': 'shaders',
       'type': 'none',
       'hard_dependency': 1,
+      'dependencies': [
+        'npm_install'
+      ],
       'actions': [
         {
           'action_name': 'Build Shaders',
@@ -34,38 +37,65 @@
       }
     },
     {
-      'target_name': 'build_stylesheet',
+      'target_name': 'npm_install',
       'type': 'none',
       'hard_dependency': 1,
       'actions': [
         {
-          'action_name': 'Build Stylesheet',
+          'action_name': 'npm install',
           'inputs': [
-            'bin/style.js',
+            'bin/package.json',
           ],
           'outputs': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
+            'bin/node_modules',
           ],
-          'action': ['<@(node)', 'bin/build-style.js', '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)']
+          'action': ['./scripts/npm_install.sh', '<@(npm)']
         }
       ],
+    },
+    {
+      'target_name': 'touch_styles',
+      'type': 'none',
+      'hard_dependency': 1,
+      'actions': [
+        {
+          'action_name': 'Touch Stylesheet Directory',
+          'inputs': ['styles'],
+          'outputs': ['<(SHARED_INTERMEDIATE_DIR)/'], # need to specify a distinct directory
+          'action': ['touch', 'styles'],
+        }
+      ],
+    },
+    {
+      'target_name': 'bundle_styles',
+      'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [ 'touch_styles' ], # required for xcode http://openradar.appspot.com/7232149
       'direct_dependent_settings': {
-        'sources': [
-            '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js'
-        ],
+        'mac_bundle_resources': [ 'styles' ],
       }
     },
     {
-      'target_name': 'copy_default_stylesheet',
+      'target_name': 'copy_styles',
+      'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [ 'touch_styles' ], # required for xcode http://openradar.appspot.com/7232149
+      'copies': [{
+        'files': [ 'styles' ],
+        'destination': '<(PRODUCT_DIR)'
+      }],
+    },
+    {
+      'target_name': 'copy_fixtures',
       'type': 'none',
       'hard_dependency': 1,
       'dependencies': [
-        'build_stylesheet'
+        'bundle_styles'
       ],
       'copies': [
         {
-          'files': [ '<(SHARED_INTERMEDIATE_DIR)/bin/style.min.js' ],
-          'destination': '<(PRODUCT_DIR)'
+          'files': [ 'styles' ],
+          'destination': 'test/fixtures/style_parser'
         }
       ]
     },
@@ -73,12 +103,10 @@
       'target_name': 'copy_certificate_bundle',
       'type': 'none',
       'hard_dependency': 1,
-      'copies': [
-        {
-          'files': [ 'common/ca-bundle.crt' ],
-          'destination': '<(PRODUCT_DIR)'
-        }
-      ]
+      'copies': [{
+        'files': [ 'common/ca-bundle.crt' ],
+        'destination': '<(PRODUCT_DIR)'
+      }],
     },
     {
       'target_name': 'mapboxgl',
@@ -86,7 +114,6 @@
       'type': 'static_library',
       'hard_dependency': 1,
       'dependencies': [
-          'build_stylesheet',
           'shaders',
       ],
       'sources': [
@@ -97,7 +124,7 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
-        'bin/style.js'
+        'bin/style.json'
       ],
       'xcode_settings': {
         'SDKROOT': 'macosx',
@@ -154,7 +181,6 @@
       'type': 'static_library',
       'hard_dependency': 1,
       'dependencies': [
-          'build_stylesheet',
           'shaders',
       ],
       'sources': [
@@ -165,7 +191,7 @@
         '<!@(find include -name "*.hpp")',
         '<!@(find include -name "*.h")',
         '<!@(find src -name "*.glsl")',
-        'bin/style.js'
+        'bin/style.json'
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',

@@ -88,27 +88,6 @@ void copy_bitmap(const uint32_t *src, const int src_stride, const int src_x, con
     }
 }
 
-void draw_circle(uint32_t *dst, const int dst_stride, const int dst_x, const int dst_y,
-                const int width, const int height, const float blur,
-                const uint8_t r = 0xFF, const uint8_t g = 0xFF, const uint8_t b = 0xFF) {
-    const int sprite_stride = dst_stride;
-    const int radius = util::min(width, height);
-    for (int y = 0; y < height; y++) {
-        const int img_y = (dst_y + y) * sprite_stride + dst_x;
-        for (int x = 0; x < height; x++) {
-            const float dist = util::length(float(x) / radius - 0.5f, float(y) / radius - 0.5f);
-            const float t = util::smoothstep(0.5f, 0.5f - blur, dist);
-            const uint8_t alpha = t * 255;
-
-            uint32_t color = (uint32_t(r * t) << 0) |
-                             (uint32_t(g * t) << 8) |
-                             (uint32_t(b * t) << 16) |
-                             (uint32_t(alpha) << 24);
-            dst[img_y + x] = color;
-        }
-    }
-}
-
 Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t width, size_t height) {
     // We have to allocate a new area in the bin, and store an empty image in it.
     // Add a 1px border around every image.
@@ -121,44 +100,6 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t width, size_t hei
     rect.y += buffer;
     rect.w -= 2 * buffer;
     rect.h -= 2 * buffer;
-
-    return rect;
-}
-
-Rect<SpriteAtlas::dimension> SpriteAtlas::getIcon(const int size, const std::string &name) {
-    std::lock_guard<std::mutex> lock(mtx);
-
-    auto rect_it = images.find(name);
-    if (rect_it != images.end()) {
-        return rect_it->second;
-    }
-
-    Rect<dimension> rect = allocateImage(size, size);
-    if (rect.w == 0) {
-        if (debug::spriteWarnings) {
-            fprintf(stderr, "[WARNING] sprite atlas bitmap overflow\n");
-        }
-        return rect;
-    }
-
-    images.emplace(name, rect);
-
-    allocate();
-
-    // Draw an antialiased circle.
-    draw_circle(
-        reinterpret_cast<uint32_t *>(data),
-        width * pixelRatio,
-        rect.x * pixelRatio,
-        rect.y * pixelRatio,
-        size * pixelRatio,
-        size * pixelRatio,
-        1.0f / size / pixelRatio
-    );
-
-    uninitialized.emplace(name);
-
-    dirty = true;
 
     return rect;
 }
@@ -189,6 +130,12 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string &name, cons
     copy(rect, pos, sprite);
 
     return rect;
+}
+
+
+Rect<SpriteAtlas::dimension> SpriteAtlas::waitForImage(const std::string &name, const Sprite &sprite) {
+    sprite.waitUntilLoaded();
+    return getImage(name, sprite);
 }
 
 void SpriteAtlas::allocate() {
@@ -249,13 +196,11 @@ void SpriteAtlas::update(const Sprite &sprite) {
 }
 
 void SpriteAtlas::bind(bool linear) {
-    bool first = false;
     if (!texture) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        first = true;
     } else {
         glBindTexture(GL_TEXTURE_2D, texture);
     }
@@ -266,12 +211,17 @@ void SpriteAtlas::bind(bool linear) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_val);
         filter = filter_val;
     }
+}
 
+void SpriteAtlas::upload() {
     if (dirty) {
+        bool exists = texture;
+        bind(filter); // Make sure we don't change the filter value.
+
         std::lock_guard<std::mutex> lock(mtx);
         allocate();
 
-        if (first) {
+        if (!exists) {
             glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target
                 0, // GLint level
@@ -301,7 +251,7 @@ void SpriteAtlas::bind(bool linear) {
 #endif
         dirty = false;
     }
-};
+}
 
 SpriteAtlas::~SpriteAtlas() {
     std::lock_guard<std::mutex> lock(mtx);

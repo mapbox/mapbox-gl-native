@@ -21,15 +21,15 @@ class LinejoinShader;
 struct pbf;
 
 class LineBucket : public Bucket {
-    typedef ElementGroup triangle_group_type;
-    typedef ElementGroup point_group_type;
+    typedef ElementGroup<2> triangle_group_type;
+    typedef ElementGroup<1> point_group_type;
 public:
     LineBucket(LineVertexBuffer& vertexBuffer,
                TriangleElementsBuffer& triangleElementsBuffer,
                PointElementsBuffer& pointElementsBuffer,
                const StyleBucketLine& properties);
 
-    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     virtual bool hasData() const;
 
     void addGeometry(pbf& data);

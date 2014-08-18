@@ -32,6 +32,7 @@ public:
     void drawClippingMasks(Painter &painter);
     size_t getTileCount() const;
     void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc);
+    void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix);
     void finishRender(Painter &painter);
 
     std::forward_list<Tile::ID> getIDs() const;

@@ -62,6 +62,10 @@ public:
         }
     }
 
+    inline GLuint getID() const {
+        return buffer;
+    }
+
 protected:
     // increase the buffer size by at least /required/ bytes.
     inline void *addElement() {
@@ -72,7 +76,7 @@ protected:
             while (length < pos + itemSize) length += defaultLength;
             array = realloc(array, length);
             if (array == nullptr) {
-                throw std::runtime_error("Buffer reallocation failed¯");
+                throw std::runtime_error("Buffer reallocation failed");
             }
         }
         pos += itemSize;
@@ -106,7 +110,7 @@ private:
     size_t length = 0;
 
     // GL buffer ID
-    uint32_t buffer = 0;
+    GLuint buffer = 0;
 };
 
 }

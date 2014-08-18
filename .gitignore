@@ -17,3 +17,4 @@
 /src/shader/shaders_gles2.cpp
 /bin/style.bin.js
 /test/fixtures/styles/index.html
+/test/fixtures/style_parser/styles

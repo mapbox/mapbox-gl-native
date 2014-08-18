@@ -46,7 +46,6 @@ void Painter::setup() {
     assert(rasterShader);
     assert(textShader);
     assert(dotShader);
-    assert(compositeShader);
     assert(gaussianShader);
 
 
@@ -68,22 +67,20 @@ void Painter::setup() {
 }
 
 void Painter::setupShaders() {
-    plainShader = std::make_unique<PlainShader>();
-    outlineShader = std::make_unique<OutlineShader>();
-    lineShader = std::make_unique<LineShader>();
-    lineSDFShader = std::make_unique<LineSDFShader>();
-    linejoinShader = std::make_unique<LinejoinShader>();
-    patternShader = std::make_unique<PatternShader>();
-    iconShader = std::make_unique<IconShader>();
-    rasterShader = std::make_unique<RasterShader>();
-    textShader = std::make_unique<TextShader>();
-    dotShader = std::make_unique<DotShader>();
-    compositeShader = std::make_unique<CompositeShader>();
-    gaussianShader = std::make_unique<GaussianShader>();
+    if (!plainShader) plainShader = std::make_unique<PlainShader>();
+    if (!outlineShader) outlineShader = std::make_unique<OutlineShader>();
+    if (!lineShader) lineShader = std::make_unique<LineShader>();
+    if (!lineSDFShader) lineSDFShader = std::make_unique<LineSDFShader>();
+    if (!linejoinShader) linejoinShader = std::make_unique<LinejoinShader>();
+    if (!patternShader) patternShader = std::make_unique<PatternShader>();
+    if (!iconShader) iconShader = std::make_unique<IconShader>();
+    if (!rasterShader) rasterShader = std::make_unique<RasterShader>();
+    if (!textShader) textShader = std::make_unique<TextShader>();
+    if (!dotShader) dotShader = std::make_unique<DotShader>();
+    if (!gaussianShader) gaussianShader = std::make_unique<GaussianShader>();
 }
 
 void Painter::cleanup() {
-    clearFramebuffers();
 }
 
 void Painter::resize() {
@@ -120,6 +117,14 @@ void Painter::depthMask(bool value) {
     }
 }
 
+void Painter::depthRange(const float near, const float far) {
+    if (gl_depthRange[0] != near || gl_depthRange[1] != far) {
+        glDepthRange(near, far);
+        gl_depthRange = {{ near, far }};
+    }
+}
+
+
 void Painter::changeMatrix() {
     // Initialize projection matrix
     matrix::ortho(projMatrix, 0, map.getState().getWidth(), map.getState().getHeight(), 0, 0, 1);
@@ -146,16 +151,16 @@ void Painter::clear() {
 }
 
 void Painter::setOpaque() {
-    if (pass != Opaque) {
-        pass = Opaque;
+    if (pass != RenderPass::Opaque) {
+        pass = RenderPass::Opaque;
         glDisable(GL_BLEND);
         depthMask(true);
     }
 }
 
 void Painter::setTranslucent() {
-    if (pass != Translucent) {
-        pass = Translucent;
+    if (pass != RenderPass::Translucent) {
+        pass = RenderPass::Translucent;
         glEnable(GL_BLEND);
         depthMask(false);
     }
@@ -166,25 +171,23 @@ void Painter::setStrata(float value) {
 }
 
 void Painter::prepareTile(const Tile& tile) {
-    matrix = tile.matrix;
-
     GLint id = (GLint)tile.clip.mask.to_ulong();
     GLuint mask = clipMask[tile.clip.length];
     glStencilFunc(GL_EQUAL, id, mask);
 }
 
-void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc) {
+void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix) {
     assert(tile.data);
-    if (tile.data->hasData(layer_desc)) {
+    if (tile.data->hasData(layer_desc) || layer_desc->type == StyleLayerType::Raster) {
         gl::group group(util::sprintf<32>("render %d/%d/%d\n", tile.id.z, tile.id.y, tile.id.z));
         prepareTile(tile);
-        tile.data->render(*this, layer_desc);
+        tile.data->render(*this, layer_desc, matrix);
         frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
     }
 }
 
 
-const mat4 &Painter::translatedMatrix(const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {
+const mat4 &Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {
     if (translation[0] == 0 && translation[1] == 0) {
         return matrix;
     } else {

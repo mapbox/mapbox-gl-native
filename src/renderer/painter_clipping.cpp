@@ -13,7 +13,7 @@ void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &so
     glDisable(GL_DEPTH_TEST);
     depthMask(false);
     glColorMask(false, false, false, false);
-    glDepthRange(1.0f, 1.0f);
+    depthRange(1.0f, 1.0f);
     glStencilMask(0xFF);
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));

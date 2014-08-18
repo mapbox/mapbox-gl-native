@@ -71,7 +71,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -87,7 +87,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -103,7 +103,26 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
+        ]
+    },
+    {
+        "target_name": "style_parser",
+        "product_name": "test_style_parser",
+        "type": "executable",
+        "libraries": [
+            "-lpthread",
+        ],
+        "sources": [
+            "./main.cpp",
+            "./style_parser.cpp",
+            "./fixtures/fixture_log.hpp",
+            "./fixtures/fixture_log.cpp",
+        ],
+        "dependencies": [
+            "../deps/gtest/gtest.gyp:gtest",
+            "../mapboxgl.gyp:mapboxgl",
+            "../mapboxgl.gyp:copy_fixtures",
         ]
     },
     {
@@ -119,7 +138,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -135,7 +154,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -151,7 +170,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -167,7 +186,7 @@
         ],
         "dependencies": [
             "../deps/gtest/gtest.gyp:gtest",
-            "../mapboxgl.gyp:mapboxgl"
+            "../mapboxgl.gyp:mapboxgl",
         ]
     },
     {
@@ -190,7 +209,6 @@
             "../deps/gtest/gtest.gyp:gtest",
             "../mapboxgl.gyp:mapboxgl",
             "link_gl",
-            '../mapboxgl.gyp:copy_default_stylesheet',
         ]
     },
     {
@@ -204,6 +222,7 @@
           "tile",
           "functions",
           "headless",
+          "style_parser",
           "comparisons",
         ],
     }

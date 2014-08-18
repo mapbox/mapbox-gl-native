@@ -16,7 +16,6 @@ ensure_dep cmake
 ensure_dep automake
 ensure_dep autoconf
 ensure_dep pkg-config
-ensure_dep node
 if [ ${UNAME} = 'Darwin' ]; then
     ensure_dep makedepend
     if [[ ! `which libtool` ]] && [[ ! `which glibtool` ]]; then
@@ -30,26 +29,50 @@ fi
 if [[ $MISSING_DEPS != "" ]]; then
     if [ ${UNAME} = 'Darwin' ]; then
         echo "Missing build deps: ${MISSING_DEPS}"
-        echo 'Please run "brew install autoconf automake libtool makedepend cmake pkg-config node"'
+        echo 'Please run "brew install autoconf automake libtool makedepend cmake pkg-config"'
         echo 'and then re-run ./setup-libraries.sh'
     elif [ ${UNAME} = 'Linux' ]; then
         echo "Missing build deps: ${MISSING_DEPS}"
-        echo 'Please run "sudo apt-get install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config nodejs-legacy libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev"'
+        echo 'Please run "sudo apt-get install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config libxi-dev libglu1-mesa-dev x11proto-randr-dev x11proto-xext-dev libxrandr-dev x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev"'
         echo 'and then re-run ./setup-libraries.sh'
     fi
     exit 1
 fi
 
-if [ ! -d 'mapnik-packaging/.git' ]; then
-  git clone --depth=1 https://github.com/mapnik/mapnik-packaging.git
+# bootstrap node install
+if [[ ! -d ~/.nvm ]]; then
+    git clone --depth 1 https://github.com/creationix/nvm.git ~/.nvm
+fi
+set +u
+source ~/.nvm/nvm.sh
+nvm install 0.10
+set -u
+
+NODE=$(which node)
+NPM=$(which npm)
+
+MP_HASH="6d7e83e8042"
+if [ ! -d 'mapnik-packaging/' ]; then
+  git clone https://github.com/mapnik/mapnik-packaging.git
 fi
 
-cd mapnik-packaging/osx/
-git pull
+cd mapnik-packaging
+git checkout ${MP_HASH}
+cd ./osx/
 
 export CXX11=true
 
 if [ ${UNAME} = 'Darwin' ]; then
+
+if [ ! -z "${TRAVIS:-}" ]; then
+    if aws s3 cp s3://mapbox-gl-testing/dependencies/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz ./out/ ; then
+        rm -rf out/build-cpp11-libcpp-universal
+        tar -xzf out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz
+    fi
+fi
+
+if test -z "${TRAVIS:-}" || ! test -d out/build-cpp11-libcpp-universal; then
+
 source iPhoneOS.sh
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
@@ -88,11 +111,19 @@ source MacOSX.sh
 
 ./scripts/make_universal.sh
 
+if [ ! -z "${TRAVIS:-}" ]; then
+    tar -zcf out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz out/build-cpp11-libcpp-universal
+    aws s3 cp out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz s3://mapbox-gl-testing/dependencies/
+fi
+
+fi
+
 cd ../../
 ./configure \
 --pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal/lib/pkgconfig \
 --boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal \
---node=`which node`
+--npm=$NPM \
+--node=$NODE
 
 elif [ ${UNAME} = 'Linux' ]; then
 
@@ -122,5 +153,6 @@ cd ../../
 ./configure \
 --pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/pkgconfig \
 --boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-x86_64-linux \
---node=`which node`
+--npm=$NPM \
+--node=$NODE
 fi

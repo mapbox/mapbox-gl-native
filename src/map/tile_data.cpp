@@ -4,6 +4,8 @@
 
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/filesource.hpp>
+#include <mbgl/util/uv_detail.hpp>
 
 using namespace mbgl;
 
@@ -38,7 +40,7 @@ void TileData::request() {
 
     // Note: Somehow this feels slower than the change to request_http()
     std::weak_ptr<TileData> weak_tile = shared_from_this();
-    req = platform::request_http(url, [weak_tile](platform::Response *res) {
+    map.getFileSource()->load(ResourceType::Tile, url, [weak_tile](platform::Response *res) {
         std::shared_ptr<TileData> tile = weak_tile.lock();
         if (!tile || tile->state == State::obsolete) {
             // noop. Tile is obsolete and we're now just waiting for the refcount
@@ -55,7 +57,7 @@ void TileData::request() {
             fprintf(stderr, "[%s] tile loading failed: %d, %s\n", tile->url.c_str(), res->code, res->error_message.c_str());
 #endif
         }
-    }, map.getLoop());
+    });
 }
 
 void TileData::cancel() {

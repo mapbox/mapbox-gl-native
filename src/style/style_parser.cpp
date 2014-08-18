@@ -46,7 +46,7 @@ void StyleParser::parseConstants(JSVal value) {
             }
         }
     } else {
-        throw Style::exception("constants must be an object");
+        Log::Warning(Event::ParseStyle, "constants must be an object");
     }
 }
 
@@ -63,6 +63,20 @@ JSVal StyleParser::replaceConstant(JSVal value) {
 
 #pragma mark - Parse Render Properties
 
+template<> bool StyleParser::parseRenderProperty(JSVal value, bool &target, const char *name) {
+    if (value.HasMember(name)) {
+        JSVal property = replaceConstant(value[name]);
+        if (property.IsBool()) {
+            target = property.GetBool();
+            return true;
+        } else {
+            fprintf(stderr, "[WARNING] '%s' must be a boolean\n", name);
+        }
+    }
+    return false;
+}
+
+
 template<> bool StyleParser::parseRenderProperty(JSVal value, std::string &target, const char *name) {
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
@@ -70,7 +84,7 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, std::string &targe
             target = { property.GetString(), property.GetStringLength() };
             return true;
         } else {
-            fprintf(stderr, "[WARNING] '%s' must be a string\n", name);
+            Log::Warning(Event::ParseStyle, "'%s' must be a string", name);
         }
     }
     return false;
@@ -83,7 +97,7 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, float &target, con
             target = property.GetDouble();
             return true;
         } else {
-            fprintf(stderr, "[WARNING] '%s' must be a number\n", name);
+            Log::Warning(Event::ParseStyle, "'%s' must be a number", name);
         }
     }
     return false;
@@ -95,14 +109,14 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, uint16_t &target, 
         if (property.IsUint()) {
             unsigned int value = property.GetUint();
             if (value > std::numeric_limits<uint16_t>::max()) {
-                fprintf(stderr, "[WARNING] values for %s that are larger than %d are not supported\n", name, std::numeric_limits<uint16_t>::max());
+                Log::Warning(Event::ParseStyle, "values for %s that are larger than %d are not supported", name, std::numeric_limits<uint16_t>::max());
                 return false;
             }
 
             target = value;
             return true;
         } else {
-            fprintf(stderr, "[WARNING] %s must be an unsigned integer\n", name);
+            Log::Warning(Event::ParseStyle, "%s must be an unsigned integer", name);
         }
     }
     return false;
@@ -115,7 +129,7 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, int32_t &target, c
             target = property.GetInt();
             return true;
         } else {
-            fprintf(stderr, "[WARNING] %s must be an integer\n", name);
+            Log::Warning(Event::ParseStyle, "%s must be an integer", name);
         }
     }
     return false;
@@ -130,24 +144,24 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, vec2<float> &targe
                 target.y = property[(rapidjson::SizeType)1].GetDouble();
                 return true;
             } else {
-                fprintf(stderr, "[WARNING] %s must have at least two members\n", name);
+                Log::Warning(Event::ParseStyle, "%s must have at least two members", name);
             }
         } else {
-            fprintf(stderr, "[WARNING] %s must be a n array of numbers\n", name);
+            Log::Warning(Event::ParseStyle, "%s must be an array of numbers", name);
         }
     }
     return false;
 }
 
-template<typename T, typename Parser>
-bool StyleParser::parseRenderProperty(JSVal value, T &target, const char *name, Parser &parser) {
+template<typename Parser, typename T>
+bool StyleParser::parseRenderProperty(JSVal value, T &target, const char *name) {
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
         if (property.IsString()) {
-            target = parser({ property.GetString(), property.GetStringLength() });
+            target = Parser({ property.GetString(), property.GetStringLength() });
             return true;
         } else {
-            fprintf(stderr, "[WARNING] %s must have one of the enum values\n", name);
+            Log::Warning(Event::ParseStyle, "%s must have one of the enum values", name);
         }
     }
     return false;
@@ -167,7 +181,7 @@ void StyleParser::parseSources(JSVal value) {
             int32_t min_zoom = 0;
             int32_t max_zoom = 22;
 
-            parseRenderProperty(itr->value, type, "type", parseSourceType);
+            parseRenderProperty<SourceTypeClass>(itr->value, type, "type");
             parseRenderProperty(itr->value, url, "url");
             if (type == SourceType::Raster) {
                 parseRenderProperty(itr->value, tile_size, "tileSize");
@@ -178,7 +192,7 @@ void StyleParser::parseSources(JSVal value) {
             sources.emplace(std::move(name), std::make_shared<StyleSource>(SourceInfo { type, url, tile_size, min_zoom, max_zoom }));
         }
     } else {
-        throw Style::exception("sources must be an object");
+        Log::Warning(Event::ParseStyle, "sources must be an object");
     }
 }
 
@@ -186,7 +200,7 @@ void StyleParser::parseSources(JSVal value) {
 
 Color parseColor(JSVal value) {
     if (!value.IsString()) {
-        fprintf(stderr, "[WARNING] color value must be a string\n");
+        Log::Warning(Event::ParseStyle, "color value must be a string");
         return Color{{ 0, 0, 0, 0 }};
     }
 
@@ -209,7 +223,7 @@ bool StyleParser::parseFunctionArgument(JSVal value) {
     } else if (rvalue.IsNumber()) {
         return rvalue.GetDouble();
     } else {
-        fprintf(stderr, "[WARNING] function argument must be a boolean or numeric value");
+        Log::Warning(Event::ParseStyle, "function argument must be a boolean or numeric value");
         return false;
     }
 }
@@ -220,7 +234,7 @@ float StyleParser::parseFunctionArgument(JSVal value) {
     if (rvalue.IsNumber()) {
         return rvalue.GetDouble();
     } else {
-        fprintf(stderr, "[WARNING] function argument must be a numeric value");
+        Log::Warning(Event::ParseStyle, "function argument must be a numeric value");
         return 0.0f;
     }
 }
@@ -237,7 +251,7 @@ template <> inline float defaultBaseValue<Color>() { return 1.0; }
 template <typename T>
 std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
     if (!value.HasMember("stops")) {
-        fprintf(stderr, "[WARNING] stops function must specify a stops array\n");
+        Log::Warning(Event::ParseStyle, "function must specify a function type");
         return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
     }
 
@@ -248,13 +262,13 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
         if (value_base.IsNumber()) {
             base = value_base.GetDouble();
         } else {
-            fprintf(stderr, "[WARNING] base must be numeric\n");
+            Log::Warning(Event::ParseStyle, "base must be numeric");
         }
     }
 
     JSVal value_stops = value["stops"];
     if (!value_stops.IsArray()) {
-        fprintf(stderr, "[WARNING] stops function must specify a stops array\n");
+        Log::Warning(Event::ParseStyle, "stops function must specify a stops array");
         return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
     }
 
@@ -263,19 +277,19 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
         JSVal stop = value_stops[i];
         if (stop.IsArray()) {
             if (stop.Size() != 2) {
-                fprintf(stderr, "[WARNING] stop must have zoom level and value specification\n");
+                Log::Warning(Event::ParseStyle, "stop must have zoom level and value specification");
                 return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
             }
 
             JSVal z = stop[rapidjson::SizeType(0)];
             if (!z.IsNumber()) {
-                fprintf(stderr, "[WARNING] zoom level in stop must be a number\n");
+                Log::Warning(Event::ParseStyle, "zoom level in stop must be a number");
                 return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
             }
 
             stops.emplace_back(z.GetDouble(), parseFunctionArgument<T>(stop[rapidjson::SizeType(1)]));
         } else {
-            fprintf(stderr, "[WARNING] function argument must be a numeric value\n");
+            Log::Warning(Event::ParseStyle, "function argument must be a numeric value");
             return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
         }
     }
@@ -350,7 +364,7 @@ bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey k
 template <typename T>
 bool StyleParser::parseOptionalProperty(const char *property_name, T &target, JSVal value) {
     if (!value.HasMember(property_name)) {
-        return false;
+         return false;
     } else {
         return setProperty<T>(replaceConstant(value[property_name]), property_name, target);
     }
@@ -358,7 +372,7 @@ bool StyleParser::parseOptionalProperty(const char *property_name, T &target, JS
 
 template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsString()) {
-        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
         return std::tuple<bool, std::string> { false, std::string() };
     }
 
@@ -430,23 +444,23 @@ template<> std::tuple<bool, Function<LinePattern>> StyleParser::parseProperty(JS
 
 template<> std::tuple<bool, TranslateAnchorType> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsString()) {
-        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-        return std::tuple<bool, TranslateAnchorType> { false, TranslateAnchorType::Default };
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
+        return std::tuple<bool, TranslateAnchorType> { false, TranslateAnchorType::Map };
     }
 
-    return std::tuple<bool, TranslateAnchorType> { true, parseTranslateAnchorType({ value.GetString(), value.GetStringLength() }) };
+    return std::tuple<bool, TranslateAnchorType> { true, TranslateAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
 template<> std::tuple<bool, RotateAnchorType> StyleParser::parseProperty<RotateAnchorType>(JSVal value, const char *property_name) {
     if (!value.IsString()) {
-        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
-        return std::tuple<bool, RotateAnchorType> { false, RotateAnchorType::Default };
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
+        return std::tuple<bool, RotateAnchorType> { false, RotateAnchorType::Map };
     }
 
-    return std::tuple<bool, RotateAnchorType> { true, parseRotateAnchorType({ value.GetString(), value.GetStringLength() }) };
+    return std::tuple<bool, RotateAnchorType> { true, RotateAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal value, const char */*property_name*/) {
     PropertyTransition transition;
     if (value.IsObject()) {
         if (value.HasMember("duration") && value["duration"].IsNumber()) {
@@ -472,7 +486,7 @@ template<> std::tuple<bool, Function<bool>> StyleParser::parseProperty(JSVal val
     } else if (value.IsBool()) {
         return std::tuple<bool, Function<bool>> { true, ConstantFunction<bool>(value.GetBool()) };
     } else {
-        fprintf(stderr, "[WARNING] value of '%s' must be convertible to boolean, or a boolean function\n", property_name);
+        Log::Warning(Event::ParseStyle, "value of '%s' must be convertible to boolean, or a boolean function", property_name);
         return std::tuple<bool, Function<bool>> { false, ConstantFunction<bool>(false) };
     }
 }
@@ -485,7 +499,7 @@ template<> std::tuple<bool, Function<float>> StyleParser::parseProperty(JSVal va
     } else if (value.IsBool()) {
         return std::tuple<bool, Function<float>> { true, ConstantFunction<float>(value.GetBool()) };
     } else {
-        fprintf(stderr, "[WARNING] value of '%s' must be a number, or a number function\n", property_name);
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a number, or a number function", property_name);
         return std::tuple<bool, Function<float>> { false, ConstantFunction<float>(0) };
     }
 }
@@ -496,7 +510,7 @@ template<> std::tuple<bool, Function<Color>> StyleParser::parseProperty(JSVal va
     } else if (value.IsString()) {
         return std::tuple<bool, Function<Color>> { true, ConstantFunction<Color>(parseColor(value)) };
     } else {
-        fprintf(stderr, "[WARNING] value of '%s' must be a color, or a color function\n", property_name);
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a color, or a color function", property_name);
         return std::tuple<bool, Function<Color>> { false, ConstantFunction<Color>(Color {{ 0, 0, 0, 0 }}) };
     }
 }
@@ -506,11 +520,11 @@ bool StyleParser::parseOptionalProperty(const char *property_name, const std::ve
     if (value.HasMember(property_name)) {
         JSVal rvalue = replaceConstant(value[property_name]);
         if (!rvalue.IsArray()) {
-            throw Style::exception("array value must be an array");
+            Log::Warning(Event::ParseStyle, "array value must be an array");
         }
 
         if (rvalue.Size() != keys.size()) {
-            throw Style::exception("array value has unexpected number of elements");
+            Log::Warning(Event::ParseStyle, "array value has unexpected number of elements");
         }
 
         for (uint16_t i = 0; i < keys.size(); i++) {
@@ -533,27 +547,28 @@ std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
         }
         return group;
     } else {
-        throw Style::exception("layers must be an array");
+        Log::Warning(Event::ParseStyle, "layers must be an array");
+        return nullptr;
     }
 }
 
 std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
     if (value.IsObject()) {
         if (!value.HasMember("id")) {
-            fprintf(stderr, "[WARNING] layer must have an id\n");
+            Log::Warning(Event::ParseStyle, "layer must have an id");
             return nullptr;
         }
 
         JSVal id = value["id"];
         if (!id.IsString()) {
-            fprintf(stderr, "[WARNING] layer id must be a string\n");
+            Log::Warning(Event::ParseStyle, "layer id must be a string");
             return nullptr;
         }
 
         const std::string layer_id = { id.GetString(), id.GetStringLength() };
 
         if (layers.find(layer_id) != layers.end()) {
-            fprintf(stderr, "[WARNING] duplicate layer id %s\n", layer_id.c_str());
+            Log::Warning(Event::ParseStyle, "duplicate layer id %s", layer_id.c_str());
             return nullptr;
         }
 
@@ -561,14 +576,8 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
         std::map<ClassID, ClassProperties> styles;
         parseStyles(value, styles);
 
-        // Parse Rasterization options, as they can't be inherited anyway.
-        std::unique_ptr<const RasterizeProperties> rasterize;
-        if (value.HasMember("rasterize")) {
-            rasterize = parseRasterize(replaceConstant(value["rasterize"]));
-        }
-
         std::shared_ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
-            layer_id, std::move(styles), std::move(rasterize));
+            layer_id, std::move(styles));
 
         if (value.HasMember("layers")) {
             layer->layers = createLayers(value["layers"]);
@@ -579,7 +588,7 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
 
         return layer;
     } else {
-        fprintf(stderr, "[WARNING] layer must be an object\n");
+        Log::Warning(Event::ParseStyle, "layer must be an object");
         return nullptr;
     }
 }
@@ -594,23 +603,23 @@ void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair
     JSVal value = pair.first;
     std::shared_ptr<StyleLayer> &layer = pair.second;
 
-    if (layer->bucket || layer->layers) {
-        // Skip parsing this again. We already have a valid layer definition.
-        return;
-    }
-
     if (value.HasMember("type")) {
         JSVal type = value["type"];
         if (!type.IsString()) {
-            fprintf(stderr, "[WARNING] layer type of '%s' must be a string\n", layer->id.c_str());
+            Log::Warning(Event::ParseStyle, "layer type of '%s' must be a string", layer->id.c_str());
         } else {
             layer->type = StyleLayerTypeClass(std::string { type.GetString(), type.GetStringLength() });
         }
     }
 
+    if (layer->bucket || (layer->layers && layer->type != StyleLayerType::Raster)) {
+        // Skip parsing this again. We already have a valid layer definition.
+        return;
+    }
+
     // Make sure we have not previously attempted to parse this layer.
     if (std::find(stack.begin(), stack.end(), layer.get()) != stack.end()) {
-        fprintf(stderr, "[WARNING] layer reference of '%s' is circular\n", layer->id.c_str());
+        Log::Warning(Event::ParseStyle, "layer reference of '%s' is circular", layer->id.c_str());
         return;
     }
 
@@ -679,7 +688,18 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<Function<float>>("icon-rotate", Key::IconRotate, klass, value);
-    parseOptionalProperty<RotateAnchorType>("icon-rotate-anchor", Key::IconRotateAnchor, klass, value);
+    parseOptionalProperty<Function<float>>("icon-size", Key::IconSize, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-size", Key::IconSize, klass, value);
+    parseOptionalProperty<Function<Color>>("icon-color", Key::IconColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-color", Key::IconColor, klass, value);
+    parseOptionalProperty<Function<Color>>("icon-halo-color", Key::IconHaloColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-halo-color", Key::IconHaloColor, klass, value);
+    parseOptionalProperty<Function<float>>("icon-halo-width", Key::IconHaloWidth, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-halo-width", Key::IconHaloWidth, klass, value);
+    parseOptionalProperty<Function<float>>("icon-halo-blur", Key::IconHaloBlur, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-halo-blur", Key::IconHaloBlur, klass, value);
+    parseOptionalProperty<Function<float>>("icon-translate", { Key::IconTranslateX, Key::IconTranslateY }, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-icon-translate", Key::IconTranslate, klass, value);
 
     parseOptionalProperty<Function<float>>("text-opacity", Key::TextOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-text-opacity", Key::TextOpacity, klass, value);
@@ -693,18 +713,15 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("transition-text-halo-width", Key::TextHaloWidth, klass, value);
     parseOptionalProperty<Function<float>>("text-halo-blur", Key::TextHaloBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-text-halo-blur", Key::TextHaloBlur, klass, value);
-
-    parseOptionalProperty<Function<float>>("composite-opacity", Key::CompositeOpacity, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-composite-opacity", Key::CompositeOpacity, klass, value);
+    parseOptionalProperty<Function<float>>("text-translate", { Key::TextTranslateX, Key::TextTranslateY }, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-text-translate", Key::TextTranslate, klass, value);
 
     parseOptionalProperty<Function<float>>("raster-opacity", Key::RasterOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
-    parseOptionalProperty<Function<float>>("raster-spin", Key::RasterSpin, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-spin", Key::RasterSpin, klass, value);
-    parseOptionalProperty<Function<float>>("raster-brightness-low", Key::RasterBrightnessLow, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-brightness-low", Key::RasterBrightnessLow, klass, value);
-    parseOptionalProperty<Function<float>>("raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-brightness-high", Key::RasterBrightnessHigh, klass, value);
+    parseOptionalProperty<Function<float>>("raster-hue-rotate", Key::RasterHueRotate, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-hue-rotate", Key::RasterHueRotate, klass, value);
+    parseOptionalProperty<Function<float>>("raster-brightness", { Key::RasterBrightnessLow, Key::RasterBrightnessHigh }, klass, value);
+    parseOptionalProperty<PropertyTransition>("transition-raster-brightness", Key::RasterBrightness, klass, value);
     parseOptionalProperty<Function<float>>("raster-saturation", Key::RasterSaturation, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-raster-saturation", Key::RasterSaturation, klass, value);
     parseOptionalProperty<Function<float>>("raster-contrast", Key::RasterContrast, klass, value);
@@ -715,28 +732,15 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
 }
 
-std::unique_ptr<RasterizeProperties> StyleParser::parseRasterize(JSVal value) {
-    auto rasterize = std::make_unique<RasterizeProperties>();
-
-    if (value.IsObject()) {
-        parseOptionalProperty("enabled", rasterize->enabled, value);
-        parseOptionalProperty("buffer", rasterize->buffer, value);
-        parseOptionalProperty("size", rasterize->size, value);
-        parseOptionalProperty("blur", rasterize->blur, value);
-    }
-
-    return rasterize;
-}
-
 void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer) {
     if (!value.IsString()) {
-        fprintf(stderr, "[WARNING] layer ref of '%s' must be a string\n", layer->id.c_str());
+        Log::Warning(Event::ParseStyle, "layer ref of '%s' must be a string", layer->id.c_str());
         return;
     }
     const std::string ref { value.GetString(), value.GetStringLength() };
     auto it = layers.find(ref);
     if (it == layers.end()) {
-        fprintf(stderr, "[WARNING] layer '%s' references unknown layer %s\n", layer->id.c_str(), ref.c_str());
+        Log::Warning(Event::ParseStyle, "layer '%s' references unknown layer %s", layer->id.c_str(), ref.c_str());
         // We cannot parse this layer further.
         return;
     }
@@ -752,7 +756,7 @@ void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer
     layer->type = reference->type;
 
     if (reference->layers) {
-        fprintf(stderr, "[WARNING] layer '%s' references composite layer\n", layer->id.c_str());
+        Log::Warning(Event::ParseStyle, "layer '%s' references composite layer", layer->id.c_str());
         // We cannot parse this layer further.
         return;
     } else {
@@ -776,11 +780,10 @@ void StyleParser::parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer) {
             if (source_it != sources.end()) {
                 layer->bucket->style_source = source_it->second;
             } else {
-                fprintf(stderr, "[WARNING] can't find source '%s' required for layer '%s'\n",
-                        source_name.c_str(), layer->id.c_str());
+                Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", source_name.c_str(), layer->id.c_str());
             }
         } else {
-            fprintf(stderr, "[WARNING] source of layer '%s' must be a string\n", layer->id.c_str());
+            Log::Warning(Event::ParseStyle, "source of layer '%s' must be a string", layer->id.c_str());
         }
     }
 
@@ -789,7 +792,7 @@ void StyleParser::parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         if (value_source_layer.IsString()) {
             layer->bucket->source_layer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
         } else {
-            fprintf(stderr, "[WARNING] source-layer of layer '%s' must be a string\n", layer->id.c_str());
+            Log::Warning(Event::ParseStyle, "source-layer of layer '%s' must be a string", layer->id.c_str());
         }
     }
 
@@ -869,7 +872,7 @@ FilterExpression StyleParser::parseFilter(JSVal value, FilterExpression::Operato
             expression.add(parseFilter(replaceConstant(value[i])));
         }
     } else {
-        fprintf(stderr, "[WARNING] expression must be either an array or an object\n");
+        Log::Warning(Event::ParseStyle, "expression must be either an array or an object");
     }
 
     return expression;
@@ -911,7 +914,7 @@ std::vector<Value> StyleParser::parseValues(JSVal value) {
 
 void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
     if (!value.IsObject()) {
-        fprintf(stderr, "[WARNING] render property of layer '%s' must be an object\n", layer->id.c_str());
+        Log::Warning(Event::ParseStyle, "render property of layer '%s' must be an object", layer->id.c_str());
         return;
     }
 
@@ -921,62 +924,84 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
     case StyleLayerType::Fill: {
         StyleBucketFill &render = bucket.render.get<StyleBucketFill>();
 
-        parseRenderProperty(value, render.winding, "fill-winding", parseWindingType);
+        parseRenderProperty<WindingTypeClass>(value, render.winding, "fill-winding");
     } break;
 
     case StyleLayerType::Line: {
         StyleBucketLine &render = bucket.render.get<StyleBucketLine>();
 
-        parseRenderProperty(value, render.cap, "line-cap", parseCapType);
-        parseRenderProperty(value, render.join, "line-join", parseJoinType);
+        parseRenderProperty<CapTypeClass>(value, render.cap, "line-cap");
+        parseRenderProperty<JoinTypeClass>(value, render.join, "line-join");
         parseRenderProperty(value, render.miter_limit, "line-miter-limit");
         parseRenderProperty(value, render.round_limit, "line-round-limit");
     } break;
 
-    case StyleLayerType::Icon: {
-        StyleBucketIcon &render = bucket.render.get<StyleBucketIcon>();
+    case StyleLayerType::Symbol: {
+        StyleBucketSymbol &render = bucket.render.get<StyleBucketSymbol>();
 
-        parseRenderProperty(value, render.size, "icon-size");
-        parseRenderProperty(value, render.icon, "icon-image");
-        parseRenderProperty(value, render.spacing, "icon-spacing");
-        parseRenderProperty(value, render.padding, "icon-padding");
-        if (parseRenderProperty(value, render.translate, "icon-translate")) {
-            render.translate.x *= 24;
-            render.translate.y *= -24;
+        parseRenderProperty<PlacementTypeClass>(value, render.placement, "symbol-placement");
+        if (render.placement == PlacementType::Line) {
+            // Change the default value in case of line placement.
+            render.text.rotation_alignment = RotationAlignmentType::Map;
+            render.icon.rotation_alignment = RotationAlignmentType::Map;
         }
-        parseRenderProperty(value, render.translate_anchor, "icon-translate-anchor", parseTranslateAnchorType);
+
+        parseRenderProperty(value, render.min_distance, "symbol-min-distance");
+        parseRenderProperty(value, render.avoid_edges, "symbol-avoid-edges");
+
+        parseRenderProperty(value, render.icon.allow_overlap, "icon-allow-overlap");
+        parseRenderProperty(value, render.icon.ignore_placement, "icon-ignore-placement");
+        parseRenderProperty(value, render.icon.optional, "icon-optional");
+        parseRenderProperty<RotationAlignmentTypeClass>(value, render.icon.rotation_alignment, "icon-rotation-alignment");
+        parseRenderProperty(value, render.icon.max_size, "icon-max-size");
+        parseRenderProperty(value, render.icon.image, "icon-image");
+        parseRenderProperty(value, render.icon.rotate, "icon-rotate");
+        parseRenderProperty(value, render.icon.padding, "icon-padding");
+        parseRenderProperty(value, render.icon.keep_upright, "icon-keep-upright");
+        parseRenderProperty(value, render.icon.offset, "icon-offset");
+        parseRenderProperty<TranslateAnchorTypeClass>(value, render.icon.translate_anchor, "icon-translate-anchor");
+
+
+        parseRenderProperty<RotationAlignmentTypeClass>(value, render.text.rotation_alignment, "text-rotation-alignment");
+        parseRenderProperty(value, render.text.field, "text-field");
+        parseRenderProperty(value, render.text.font, "text-font");
+        parseRenderProperty(value, render.text.max_size, "text-max-size");
+        if (parseRenderProperty(value, render.text.max_width, "text-max-width")) {
+            render.text.max_width *= 24; // em
+        }
+        if (parseRenderProperty(value, render.text.line_height, "text-line-height")) {
+            render.text.line_height *= 24; // em
+        }
+        if (parseRenderProperty(value, render.text.letter_spacing, "text-letter-spacing")) {
+            render.text.letter_spacing *= 24; // em
+        }
+        parseRenderProperty<TextJustifyTypeClass>(value, render.text.justify, "text-justify");
+        parseRenderProperty<TextHorizontalAlignTypeClass>(value, render.text.horizontal_align, "text-horizontal-align");
+        parseRenderProperty<TextVerticalAlignTypeClass>(value, render.text.vertical_align, "text-vertical-align");
+        parseRenderProperty(value, render.text.max_angle, "text-max-angle");
+        parseRenderProperty(value, render.text.rotate, "text-rotate");
+        parseRenderProperty(value, render.text.slant, "text-slant");
+        parseRenderProperty(value, render.text.padding, "text-padding");
+        parseRenderProperty(value, render.text.keep_upright, "text-keep-upright");
+        parseRenderProperty<TextTransformTypeClass>(value, render.text.transform, "text-transform");
+        parseRenderProperty(value, render.text.offset, "text-offset");
+        parseRenderProperty<TranslateAnchorTypeClass>(value, render.text.translate_anchor, "text-translate-anchor");
+        parseRenderProperty(value, render.text.allow_overlap, "text-allow-overlap");
+        parseRenderProperty(value, render.text.ignore_placement, "text-ignore-placement");
+        parseRenderProperty(value, render.text.optional, "text-optional");
     } break;
 
-    case StyleLayerType::Text: {
-        StyleBucketText &render = bucket.render.get<StyleBucketText>();
+    case StyleLayerType::Raster: {
+        StyleBucketRaster &render = bucket.render.get<StyleBucketRaster>();
 
-        parseRenderProperty(value, render.field, "text-field");
-        parseRenderProperty(value, render.path, "text-path", parseTextPathType);
-        parseRenderProperty(value, render.transform, "text-transform", parseTextTransformType);
-        parseRenderProperty(value, render.font, "text-font");
-        parseRenderProperty(value, render.max_size, "text-max-size");
-        if (parseRenderProperty(value, render.max_width, "text-max-width")) {
-            render.max_width *= 24; // em
+        parseRenderProperty(value, render.size, "raster-size");
+        parseRenderProperty(value, render.blur, "raster-blur");
+        parseRenderProperty(value, render.buffer, "raster-buffer");
+        if (layer->layers) {
+            render.prerendered = true;
         }
-        if (parseRenderProperty(value, render.line_height, "text-line-height")) {
-            render.line_height *= 24; // em
-        }
-        if (parseRenderProperty(value, render.letter_spacing, "text-letter-spacing")) {
-            render.letter_spacing *= 24; // em
-        }
-        parseRenderProperty(value, render.alignment, "text-alignment", parseAlignmentType);
-        parseRenderProperty(value, render.vertical_alignment, "text-vertical-alignment", parseVerticalAlignmentType);
-        parseRenderProperty(value, render.max_angle_delta, "text-max-angle");
-        parseRenderProperty(value, render.min_distance, "text-min-distance");
-        parseRenderProperty(value, render.rotate, "text-rotate");
-        parseRenderProperty(value, render.slant, "text-slant");
-        parseRenderProperty(value, render.padding, "text-padding");
-        if (parseRenderProperty(value, render.translate, "text-translate")) {
-            render.translate.x *= 24;
-            render.translate.y *= -24;
-        }
-        parseRenderProperty(value, render.translate_anchor, "text-translate-anchor", parseTranslateAnchorType);
     } break;
+
     default:
         // There are no render properties for these layer types.
         break;

@@ -22,6 +22,11 @@ parser.add_option("--node",
     dest="node",
     help="Name of the node executable (defaults to node)")
 
+parser.add_option("--npm",
+    action="store",
+    dest="npm",
+    help="Name of the npm executable (defaults to npm)")
+
 parser.add_option("--pkg-config-root",
     action="store",
     dest="pkgconfig_root",
@@ -59,6 +64,10 @@ def configure_mbgl(o):
       o['variables']['node'] = options.node
   else:
       o['variables']['node'] = 'node'
+  if options.npm:
+      o['variables']['npm'] = options.npm
+  else:
+      o['variables']['npm'] = 'npm'
   o['target_defaults']['default_configuration'] = 'Debug' if options.debug else 'Release'
 
 

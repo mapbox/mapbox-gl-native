@@ -7,7 +7,7 @@
 namespace mbgl {
 
 Anchors interpolate(const std::vector<Coordinate> &vertices, float spacing,
-                    float minScale = 0.0f, int start = 0);
+                    float minScale, float maxScale, float tilePixelRatio, int start = 0);
 }
 
 #endif

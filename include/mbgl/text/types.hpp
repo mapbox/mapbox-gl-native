@@ -6,6 +6,8 @@
 #include <array>
 #include <vector>
 
+#include <boost/optional.hpp>
+
 namespace mbgl {
 
 typedef vec2<float> CollisionPoint;
@@ -35,23 +37,23 @@ struct CollisionRect {
 // These are the glyph boxes that we want to have placed.
 struct GlyphBox {
     explicit GlyphBox() {}
-    explicit GlyphBox(const CollisionRect &bbox, const CollisionRect &box,
-                      float minScale)
-        : bbox(bbox), box(box), minScale(minScale) {}
-    explicit GlyphBox(const CollisionRect &box, float minScale, float maxScale,
-                      const CollisionAnchor &anchor, bool rotate)
-        : anchor(anchor),
-          box(box),
-          rotate(rotate),
-          minScale(minScale),
-          maxScale(maxScale) {}
+    explicit GlyphBox(const CollisionRect &box,
+                      const CollisionAnchor &anchor,
+                      float minScale,
+                      float maxScale,
+                      float padding)
+        : box(box), anchor(anchor), minScale(minScale), maxScale(maxScale), padding(padding) {}
+    explicit GlyphBox(const CollisionRect &box,
+                      float minScale,
+                      float padding)
+        : box(box), minScale(minScale), padding(padding) {}
 
-    CollisionAnchor anchor;
-    CollisionRect bbox;
     CollisionRect box;
-    bool rotate = false;
+    CollisionAnchor anchor;
     float minScale = 0.0f;
     float maxScale = std::numeric_limits<float>::infinity();
+    float padding = 0.0f;
+    boost::optional<CollisionRect> hBox;
 };
 
 typedef std::vector<GlyphBox> GlyphBoxes;
@@ -61,19 +63,23 @@ typedef std::vector<GlyphBox> GlyphBoxes;
 struct PlacedGlyph {
     explicit PlacedGlyph(const vec2<float> &tl, const vec2<float> &tr,
                       const vec2<float> &bl, const vec2<float> &br,
-                      const Rect<uint16_t> &tex, float angle, const GlyphBox &glyphBox)
+                      const Rect<uint16_t> &tex, float angle, const vec2<float> &anchor,
+                      float minScale, float maxScale)
         : tl(tl),
           tr(tr),
           bl(bl),
           br(br),
           tex(tex),
           angle(angle),
-          glyphBox(glyphBox) {}
+          anchor(anchor),
+          minScale(minScale),
+          maxScale(maxScale) {}
 
     vec2<float> tl, tr, bl, br;
     Rect<uint16_t> tex;
     float angle;
-    GlyphBox glyphBox;
+    vec2<float> anchor;
+    float minScale, maxScale;
 };
 
 typedef std::vector<PlacedGlyph> PlacedGlyphs;
@@ -81,9 +87,8 @@ typedef std::vector<PlacedGlyph> PlacedGlyphs;
 // These are the placed boxes contained in the rtree.
 struct PlacementBox {
     CollisionAnchor anchor;
-    CollisionRect bbox;
     CollisionRect box;
-    bool rotate = false;
+    boost::optional<CollisionRect> hBox;
     PlacementRange placementRange = {{0.0f, 0.0f}};
     float placementScale = 0.0f;
     float maxScale = std::numeric_limits<float>::infinity();

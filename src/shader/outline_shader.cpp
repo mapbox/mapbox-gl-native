@@ -8,6 +8,7 @@ using namespace mbgl;
 
 OutlineShader::OutlineShader()
     : Shader(
+        "outline",
         shaders[OUTLINE_SHADER].vertex,
         shaders[OUTLINE_SHADER].fragment
     ) {
