@@ -39,6 +39,10 @@ public:
         return glyph_url;
     }
 
+    std::shared_ptr<std::map<std::string, std::vector<float>>> getDasharrays() const {
+        return dasharrays;
+    }
+
 private:
     void parseConstants(JSVal value);
     JSVal replaceConstant(JSVal value);
@@ -116,6 +120,9 @@ private:
 
     // URL template for glyph PBFs.
     std::string glyph_url;
+
+    // Dasharrays used in the style
+    std::shared_ptr<std::map<std::string, std::vector<float>>> dasharrays;
 };
 
 }

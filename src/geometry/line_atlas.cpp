@@ -15,7 +15,8 @@ LineAtlas::LineAtlas(uint16_t width, uint16_t height)
 LineAtlas::~LineAtlas() {
 }
 
-void LineAtlas::addDash(std::vector<float> &dasharray, bool round) {
+void LineAtlas::addDash(const std::string &name, std::vector<float> &dasharray, bool round) {
+    fprintf(stderr, "add %s\n", name.c_str());
 
     // TODO check if already added
 
@@ -76,7 +77,7 @@ void LineAtlas::addDash(std::vector<float> &dasharray, bool round) {
     position.y = (0.5 + nextRow + n) / height;
     position.height = 2 * n / height;
     position.width = length;
-    positions.emplace("asdf", position);
+    positions.emplace(name, position);
 
     nextRow += dashheight;
 

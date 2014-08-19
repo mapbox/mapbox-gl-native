@@ -55,6 +55,7 @@ public:
     std::shared_ptr<StyleLayerGroup> layers;
     std::vector<std::string> appliedClasses;
     std::string glyph_url;
+    std::shared_ptr<std::map<std::string, std::vector<float>>> dasharrays;
 
 private:
     std::string sprite_url;

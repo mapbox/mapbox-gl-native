@@ -52,10 +52,6 @@ Map::Map(View& view)
     is_clean.clear();
     is_rendered.clear();
     is_swapped.test_and_set();
-
-    // TODO remove
-    std::vector<float> a = {{ 10.0, 10.0 }};
-    lineAtlas->addDash(a, false);
 }
 
 Map::~Map() {
@@ -219,6 +215,10 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     style->loadJSON((const uint8_t *)styleJSON.c_str());
     fileSource->setBase(base);
     glyphStore->setURL(style->glyph_url);
+
+    for (auto it = style->dasharrays->begin(); it !=  style->dasharrays->end(); it++) {
+        lineAtlas->addDash(it->first, it->second, false);
+    }
     update();
 }
 

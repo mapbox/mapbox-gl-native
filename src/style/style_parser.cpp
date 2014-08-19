@@ -10,6 +10,7 @@ namespace mbgl {
 using JSVal = const rapidjson::Value&;
 
 StyleParser::StyleParser() {
+    dasharrays = std::make_shared<std::map<std::string, std::vector<float>>>();
 }
 
 void StyleParser::parse(JSVal document) {
@@ -402,19 +403,32 @@ float bisect(float lowZ, float highZ, float prevZ, float prevWidth, PropertyValu
 
 // parsing Pattern Prop
 template<> std::tuple<bool, Function<LinePattern>> StyleParser::parseProperty(JSVal value, const char *property_name, PropertyValue &propertyValue) {
-    /*
-    if (!value.IsString()) {
-        fprintf(stderr, "[WARNING] value of '%s' must be a string\n", property_name);
 
+    if (!value.IsArray()) {
+        fprintf(stderr, "[WARNING] value of '%s' must be an array\n", property_name);
         return std::tuple<bool, LinePattern> { false, LinePattern() };
     }
-    */
 
-    //return std::tuple<bool, Function<T>> { true, StopsFunction<T>(stops, base) };
-    //ureturn std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
-    //return std::tuple<bool, Function<bool>> { true, ConstantFunction<bool>(value.GetDouble()) };
+    // Convert the array to a vector and add it to a map of dasharrays
+    // that will later be added to the line atlas.
+    std::string name = "";
+    std::vector<float> dasharray;
+
+    for (rapidjson::SizeType i = 0; i < value.Size(); i++) {
+        if (!value[i].IsNumber()) {
+            return std::tuple<bool, LinePattern> { false, LinePattern() };
+        }
+
+        float component = value[i].GetDouble();
+        dasharray.emplace_back(component);
+        name += std::to_string(component);
+        name += " ";
+    }
+
+    dasharrays->emplace(name, dasharray);
+
+
     LinePattern l;
-    l.t = 4.0;
     float base = defaultBaseValue<LinePattern>();
     std::vector<std::pair<float, LinePattern>> stops;
 
@@ -436,8 +450,9 @@ template<> std::tuple<bool, Function<LinePattern>> StyleParser::parseProperty(JS
             prevZ = bisect(z - increment, z, prevZ, prevWidth, propertyValue, maxStretch);
             prevWidth = lineWidth;
             LinePattern l;
-            l.fromScale = lineWidth;
+            l.fromScale = lineWidth; // TODO should this be updated?
             l.fromZ = prevZ;
+            l.from = name;
             stops.emplace_back(prevZ, l);
         }
         z += increment;

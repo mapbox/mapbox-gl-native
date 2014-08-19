@@ -20,7 +20,7 @@ public:
     ~LineAtlas();
 
     void bind();
-    void addDash(std::vector<float> &dasharray, bool round);
+    void addDash(const std::string &name, std::vector<float> &dasharray, bool round);
     LinePatternPos getPattern(const std::string &name);
 
     const uint32_t width = 0;

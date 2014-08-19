@@ -62,12 +62,12 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     bool imagePos = false;
 
     if (properties.dash_array[1] >= 0) {
+        const LinePattern &p = properties.dasharray;
+
         LineAtlas &lineAtlas = *map.getLineAtlas();
-        LinePatternPos pos = lineAtlas.getPattern("asdf");
+        LinePatternPos pos = lineAtlas.getPattern(p.from);
 
         float tilePixelRatio = map.getState().getScale() / (1 << id.z) / 8.0;
-
-        const LinePattern &p = properties.dasharray;
 
         float currentZ = map.getState().getZoom();
         float scaleA = p.fromScale * std::pow(2, currentZ - p.fromZ);
