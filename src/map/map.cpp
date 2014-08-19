@@ -54,7 +54,7 @@ Map::Map(View& view)
     is_swapped.test_and_set();
 
     // TODO remove
-    std::vector<float> a = {{ 3.0, 4.0 }};
+    std::vector<float> a = {{ 10.0, 10.0 }};
     lineAtlas->addDash(a, false);
 }
 

@@ -29,8 +29,6 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    fprintf(stderr, "linepattern t %f\n", properties.dasharray.t);
-
     const mat4 &vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
     depthRange(strata, 1.0f);
@@ -65,33 +63,30 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 
     if (properties.dash_array[1] >= 0) {
         LineAtlas &lineAtlas = *map.getLineAtlas();
+        LinePatternPos pos = lineAtlas.getPattern("asdf");
 
         float tilePixelRatio = map.getState().getScale() / (1 << id.z) / 8.0;
 
         const LinePattern &p = properties.dasharray;
 
-        float width = 7.0;
-        float height = 0.0;
-        float scale = 1.0;
-
         float currentZ = map.getState().getZoom();
-        float scaleA = std::pow(2, currentZ - p.fromZ);
-        float scaleB = std::pow(2, currentZ - p.toZ);
-        float gammaA = 512.0 / (p.fromScale * scaleA * width * 256 * map.getState().getPixelRatio());
-        float gammaB = 512.0 / (p.toScale * scaleB * width * 256 * map.getState().getPixelRatio());
+        float scaleA = p.fromScale * std::pow(2, currentZ - p.fromZ);
+        float scaleB = p.toScale * std::pow(2, currentZ - p.toZ);
+        float gammaA = 512.0 / (scaleA * pos.width * 256 * map.getState().getPixelRatio());
+        float gammaB = 512.0 / (scaleB * pos.width * 256 * map.getState().getPixelRatio());
         float gamma = (gammaA + gammaB) / 2;
 
         useProgram(lineSDFShader->program);
         lineSDFShader->setMatrix(vtxMatrix);
         lineSDFShader->setExtrudeMatrix(extrudeMatrix);
-        lineSDFShader->setLineWidth({{ 10 * outset, inset }});
+        lineSDFShader->setLineWidth({{ outset , inset }});
         lineSDFShader->setBlur(blur);
         lineSDFShader->setColor(color);
         lineSDFShader->setFade(p.t);
-        lineSDFShader->setPatternScaleA({{ tilePixelRatio / width / p.fromScale / scaleA, height }});
-        lineSDFShader->setPatternScaleB({{ tilePixelRatio / width / p.toScale / scaleB, height }});
-        lineSDFShader->setTexYA(0.5 / 512.0);
-        lineSDFShader->setTexYB(0.5 / 512.0);
+        lineSDFShader->setPatternScaleA({{ tilePixelRatio / pos.width / scaleA, pos.height }});
+        lineSDFShader->setPatternScaleB({{ tilePixelRatio / pos.width / scaleB, pos.height }});
+        lineSDFShader->setTexYA(pos.y);
+        lineSDFShader->setTexYB(pos.y);
         lineSDFShader->setGamma(gamma);
         lineAtlas.bind();
         bucket.drawLines(*lineSDFShader);

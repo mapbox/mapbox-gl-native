@@ -20,7 +20,7 @@ void LineAtlas::addDash(std::vector<float> &dasharray, bool round) {
     // TODO check if already added
 
     int n = round ? 7 : 0;
-    int height = 2 * n + 1;
+    int dashheight = 2 * n + 1;
     const uint8_t offset = 128;
 
     // TODO check if enough space
@@ -34,8 +34,7 @@ void LineAtlas::addDash(std::vector<float> &dasharray, bool round) {
     float halfWidth = stretch * 0.5;
 
     for (int y = -n; y <= n; y++) {
-        // TODO nextRow
-        int row = n + y;
+        int row = nextRow + n + y;
         int index = width * row;
 
         float left = 0;
@@ -73,10 +72,24 @@ void LineAtlas::addDash(std::vector<float> &dasharray, bool round) {
         }
     }
 
+    LinePatternPos position;
+    position.y = (0.5 + nextRow + n) / height;
+    position.height = 2 * n / height;
+    position.width = length;
+    positions.emplace("asdf", position);
+
+    nextRow += dashheight;
 
     dirty = true;
     bind();
 };
+
+LinePatternPos LineAtlas::getPattern(const std::string &name) {
+    auto it = positions.find(name);
+    if (it == positions.end()) {
+    }
+    return it->second;
+}
 
 void LineAtlas::bind() {
     if (!texture) {

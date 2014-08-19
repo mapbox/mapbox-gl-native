@@ -34,9 +34,11 @@ inline LinePattern interpolate(const LinePattern smaller, const LinePattern larg
     LinePattern p {};
     p.t = factor;
     p.fromScale = smaller.fromScale;
-    p.toScale = larger.fromScale;
+    //p.toScale = larger.fromScale;
+    p.toScale = smaller.fromScale;
     p.fromZ = smaller.fromZ;
-    p.toZ = larger.fromZ;
+    //p.toZ = larger.fromZ;
+    p.toZ = smaller.fromZ;
     return p;
 };
 
