@@ -44,8 +44,6 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::TextTranslateY, defaultStyleProperties<SymbolProperties>().text.translate[1] },
     { PropertyKey::TextTranslateAnchor, defaultStyleProperties<SymbolProperties>().text.translate_anchor },
 
-    { PropertyKey::CompositeOpacity, defaultStyleProperties<CompositeProperties>().opacity },
-
     { PropertyKey::RasterOpacity, defaultStyleProperties<RasterProperties>().opacity },
     { PropertyKey::RasterHueRotate, defaultStyleProperties<RasterProperties>().hue_rotate },
     { PropertyKey::RasterBrightnessLow, defaultStyleProperties<RasterProperties>().brightness[0] },

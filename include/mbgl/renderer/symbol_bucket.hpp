@@ -50,6 +50,9 @@ typedef std::vector<Symbol> Symbols;
 
 
 class SymbolBucket : public Bucket {
+    typedef ElementGroup<1> TextElementGroup;
+    typedef ElementGroup<1> IconElementGroup;
+
 public:
     SymbolBucket(const StyleBucketSymbol &properties, Collision &collision);
 
@@ -94,13 +97,13 @@ private:
     struct {
         TextVertexBuffer vertices;
         TriangleElementsBuffer triangles;
-        std::vector<ElementGroup> groups;
+        std::vector<TextElementGroup> groups;
     } text;
 
     struct {
         IconVertexBuffer vertices;
         TriangleElementsBuffer triangles;
-        std::vector<ElementGroup> groups;
+        std::vector<IconElementGroup> groups;
     } icon;
 
 };

@@ -465,6 +465,7 @@ std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
         return group;
     } else {
         Log::Warning(Event::ParseStyle, "layers must be an array");
+        return nullptr;
     }
 }
 
@@ -627,9 +628,6 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("transition-text-halo-blur", Key::TextHaloBlur, klass, value);
     parseOptionalProperty<Function<float>>("text-translate", { Key::TextTranslateX, Key::TextTranslateY }, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-text-translate", Key::TextTranslate, klass, value);
-
-    parseOptionalProperty<Function<float>>("composite-opacity", Key::CompositeOpacity, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-composite-opacity", Key::CompositeOpacity, klass, value);
 
     parseOptionalProperty<Function<float>>("raster-opacity", Key::RasterOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
@@ -862,6 +860,7 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         }
 
         parseRenderProperty(value, render.min_distance, "symbol-min-distance");
+        parseRenderProperty(value, render.avoid_edges, "symbol-avoid-edges");
 
         parseRenderProperty(value, render.icon.allow_overlap, "icon-allow-overlap");
         parseRenderProperty(value, render.icon.ignore_placement, "icon-ignore-placement");

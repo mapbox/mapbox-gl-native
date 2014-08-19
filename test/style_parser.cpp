@@ -75,7 +75,7 @@ TEST_P(StyleParserTest, ParseStyle) {
             std::cerr << "Unchecked Log Messages (" << base << "/" << name << "): " << std::endl << unchecked;
         }
 
-        ASSERT_EQ(0, unchecked.size());
+        ASSERT_EQ(0ul, unchecked.size());
     }
 }
 

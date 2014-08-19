@@ -3,7 +3,7 @@
 
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/geometry/vao.hpp>
-#include <mbgl/geometry/vertex_buffer.hpp>
+#include <mbgl/geometry/static_vertex_buffer.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/renderer/frame_history.hpp>
@@ -18,7 +18,6 @@
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/shader/text_shader.hpp>
 #include <mbgl/shader/dot_shader.hpp>
-#include <mbgl/shader/composite_shader.hpp>
 #include <mbgl/shader/gaussian_shader.hpp>
 
 #include <mbgl/map/transform_state.hpp>
@@ -46,7 +45,6 @@ class PrerenderedTexture;
 
 struct FillProperties;
 struct RasterProperties;
-struct CompositeProperties;
 
 class LayerDescription;
 class RasterTileData;
@@ -111,13 +109,11 @@ public:
     void drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &sources);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
 
-    void clearFramebuffers();
     void resetFramebuffer();
     void bindFramebuffer();
     void pushFramebuffer();
     GLuint popFramebuffer();
     void discardFramebuffers();
-    void drawComposite(GLuint texture, const CompositeProperties &properties);
 
     bool needsAnimation() const;
 private:
@@ -130,6 +126,7 @@ public:
     void useProgram(uint32_t program);
     void lineWidth(float lineWidth);
     void depthMask(bool value);
+    void depthRange(float near, float far);
 
 public:
     mat4 vtxMatrix;
@@ -156,6 +153,7 @@ private:
     float gl_lineWidth = 0;
     bool gl_depthMask = true;
     std::array<uint16_t, 2> gl_viewport = {{ 0, 0 }};
+    std::array<float, 2> gl_depthRange = {{ 0, 1 }};
     float strata = 0;
     RenderPass pass = RenderPass::Opaque;
     const float strata_epsilon = 1.0f / (1 << 16);
@@ -170,20 +168,19 @@ public:
     std::unique_ptr<RasterShader> rasterShader;
     std::unique_ptr<TextShader> textShader;
     std::unique_ptr<DotShader> dotShader;
-    std::unique_ptr<CompositeShader> compositeShader;
     std::unique_ptr<GaussianShader> gaussianShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
-    VertexBuffer tileStencilBuffer = {
+    StaticVertexBuffer tileStencilBuffer = {
         // top left triangle
-        0, 0,
-        4096, 0,
-        0, 4096,
+        { 0, 0 },
+        { 4096, 0 },
+        { 0, 4096 },
 
         // bottom right triangle
-        4096, 0,
-        0, 4096,
-        4096, 4096
+        { 4096, 0 },
+        { 0, 4096 },
+        { 4096, 4096 },
     };
 
     VertexArrayObject coveringPlainArray;
@@ -191,16 +188,15 @@ public:
     VertexArrayObject coveringRasterArray;
     VertexArrayObject coveringGaussianArray;
 
-    VertexArrayObject compositeArray;
     VertexArrayObject matteArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
-    VertexBuffer tileBorderBuffer = {
-        0, 0,
-        4096, 0,
-        4096, 4096,
-        0, 4096,
-        0, 0
+    StaticVertexBuffer tileBorderBuffer = {
+        { 0, 0 },
+        { 4096, 0 },
+        { 4096, 4096 },
+        { 0, 4096 },
+        { 0, 0 },
     };
 
     VertexArrayObject tileBorderArray;

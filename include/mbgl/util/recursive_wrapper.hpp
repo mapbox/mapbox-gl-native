@@ -3,7 +3,7 @@
 
 #include <utility>
 
-namespace mbgl { namespace util {
+namespace mapbox { namespace util {
 
 template <typename T>
 class recursive_wrapper

@@ -76,16 +76,6 @@ struct SymbolProperties {
     }
 };
 
-
-struct CompositeProperties {
-    inline CompositeProperties() {}
-    float opacity = 1.0f;
-
-    inline bool isVisible() const {
-        return opacity > 0;
-    }
-};
-
 struct RasterProperties {
     inline RasterProperties() {}
     float opacity = 1.0f;
@@ -105,11 +95,10 @@ struct BackgroundProperties {
     Color color = {{ 0, 0, 0, 1 }};
 };
 
-typedef util::variant<
+typedef mapbox::util::variant<
     FillProperties,
     LineProperties,
     SymbolProperties,
-    CompositeProperties,
     RasterProperties,
     BackgroundProperties,
     std::false_type

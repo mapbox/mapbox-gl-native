@@ -11,6 +11,7 @@
     "@land": "#f8f4f0",
     "@water": "#a0c8f0",
     "@admin": "#446",
+    "@admin-opacity": 0.5,
     "@park": "#d8e8c8",
     "@cemetary": "#e0e4dd",
     "@hospital": "#fde",
@@ -688,97 +689,95 @@
       "line-width": "@rail_hatch_width"
     }
   }, {
-    "id": "admin",
-    "type": "composite",
-    "style": {
-      "composite-opacity": 0.5
+    "id": "admin_level_3",
+    "source": "mapbox",
+    "source-layer": "admin",
+    "filter": {
+      "admin_level": {">=": 3},
+      "maritime": 0
     },
-    "layers": [{
-      "id": "admin_level_3",
-      "source": "mapbox",
-      "source-layer": "admin",
-      "filter": {
-        "admin_level": {">=": 3},
-        "maritime": 0
-      },
-      "render": {
-        "line-join": "round"
-      },
-      "style": {
-        "line-color": "@admin",
-        "line-dasharray": [10, 3],
-        "line-width": "@admin_level_3_width"
-      },
-      "type": "line"
-    }, {
-      "id": "admin_level_2",
-      "source": "mapbox",
-      "source-layer": "admin",
-      "filter": {
-        "admin_level": 2,
-        "disputed": 0,
-        "maritime": 0
-      },
-      "render": {
-        "line-cap": "round"
-      },
-      "style": {
-        "line-color": "@admin",
-        "line-width": "@admin_level_2_width"
-      },
-      "type": "line"
-    }, {
-      "id": "admin_level_2_disputed",
-      "source": "mapbox",
-      "source-layer": "admin",
-      "filter": {
-        "admin_level": 2,
-        "disputed": 1,
-        "maritime": 0
-      },
-      "render": {
-        "line-cap": "round"
-      },
-      "style": {
-        "line-color": "@admin",
-        "line-dasharray": [4, 4],
-        "line-width": "@admin_level_2_width"
-      },
-      "type": "line"
-    }, {
-      "id": "admin_level_3_maritime",
-      "source": "mapbox",
-      "source-layer": "admin",
-      "filter": {
-        "admin_level": {">=": 3},
-        "maritime": 1
-      },
-      "render": {
-        "line-join": "round"
-      },
-      "style": {
-        "line-color": "@water",
-        "line-dasharray": [10, 3],
-        "line-width": "@admin_level_3_width"
-      },
-      "type": "line"
-    }, {
-      "id": "admin_level_2_maritime",
-      "source": "mapbox",
-      "source-layer": "admin",
-      "filter": {
-        "admin_level": 2,
-        "maritime": 1
-      },
-      "render": {
-        "line-cap": "round"
-      },
-      "style": {
-        "line-color": "@water",
-        "line-width": "@admin_level_2_width"
-      },
-      "type": "line"
-    }]
+    "render": {
+      "line-join": "round"
+    },
+    "style": {
+      "line-color": "@admin",
+      "line-opacity": "@admin-opacity",
+      "line-dasharray": [10, 3],
+      "line-width": "@admin_level_3_width"
+    },
+    "type": "line"
+  }, {
+    "id": "admin_level_2",
+    "source": "mapbox",
+    "source-layer": "admin",
+    "filter": {
+      "admin_level": 2,
+      "disputed": 0,
+      "maritime": 0
+    },
+    "render": {
+      "line-cap": "round"
+    },
+    "style": {
+      "line-color": "@admin",
+      "line-opacity": "@admin-opacity",
+      "line-width": "@admin_level_2_width"
+    },
+    "type": "line"
+  }, {
+    "id": "admin_level_2_disputed",
+    "source": "mapbox",
+    "source-layer": "admin",
+    "filter": {
+      "admin_level": 2,
+      "disputed": 1,
+      "maritime": 0
+    },
+    "render": {
+      "line-cap": "round"
+    },
+    "style": {
+      "line-color": "@admin",
+      "line-opacity": "@admin-opacity",
+      "line-dasharray": [4, 4],
+      "line-width": "@admin_level_2_width"
+    },
+    "type": "line"
+  }, {
+    "id": "admin_level_3_maritime",
+    "source": "mapbox",
+    "source-layer": "admin",
+    "filter": {
+      "admin_level": {">=": 3},
+      "maritime": 1
+    },
+    "render": {
+      "line-join": "round"
+    },
+    "style": {
+      "line-color": "@water",
+      "line-opacity": "@admin-opacity",
+      "line-dasharray": [10, 3],
+      "line-width": "@admin_level_3_width"
+    },
+    "type": "line"
+  }, {
+    "id": "admin_level_2_maritime",
+    "source": "mapbox",
+    "source-layer": "admin",
+    "filter": {
+      "admin_level": 2,
+      "maritime": 1
+    },
+    "render": {
+      "line-cap": "round"
+    },
+    "style": {
+      "line-color": "@water",
+      "line-opacity": "@admin-opacity",
+      "line-width": "@admin_level_2_width"
+    },
+    "type": "line"
   }, {
     "id": "country_label_line",
     "source": "mapbox",

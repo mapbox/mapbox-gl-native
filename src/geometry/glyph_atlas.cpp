@@ -120,6 +120,46 @@ void GlyphAtlas::removeGlyphs(uint64_t tile_id) {
     }
 }
 
+void GlyphAtlas::upload() {
+    if (dirty) {
+        const bool exists = texture;
+        bind();
+
+        std::lock_guard<std::mutex> lock(mtx);
+
+        if (!exists) {
+            glTexImage2D(
+                GL_TEXTURE_2D, // GLenum target
+                0, // GLint level
+                GL_ALPHA, // GLint internalformat
+                width, // GLsizei width
+                height, // GLsizei height
+                0, // GLint border
+                GL_ALPHA, // GLenum format
+                GL_UNSIGNED_BYTE, // GLenum type
+                data // const GLvoid * data
+            );
+        } else {
+            glTexSubImage2D(
+                GL_TEXTURE_2D, // GLenum target
+                0, // GLint level
+                0, // GLint xoffset
+                0, // GLint yoffset
+                width, // GLsizei width
+                height, // GLsizei height
+                GL_ALPHA, // GLenum format
+                GL_UNSIGNED_BYTE, // GLenum type
+                data // const GLvoid *pixels
+            );
+        }
+        dirty = false;
+
+#if defined(DEBUG)
+        // platform::show_debug_image("Glyph Atlas", data, width, height);
+#endif
+    }
+}
+
 void GlyphAtlas::bind() {
     if (!texture) {
         glGenTextures(1, &texture);
@@ -130,15 +170,5 @@ void GlyphAtlas::bind() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     } else {
         glBindTexture(GL_TEXTURE_2D, texture);
-    }
-
-    if (dirty) {
-        std::lock_guard<std::mutex> lock(mtx);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
-        dirty = false;
-
-#if defined(DEBUG)
-        // platform::show_debug_image("Glyph Atlas", data, width, height);
-#endif
     }
 };

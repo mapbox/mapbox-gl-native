@@ -532,16 +532,7 @@ void Map::prepare() {
         transform.updateTransitions(animationTime);
     }
 
-    const TransformState oldState = state;
     state = transform.currentState();
-
-    bool pixelRatioChanged = oldState.getPixelRatio() != state.getPixelRatio();
-    bool dimensionsChanged = oldState.getFramebufferWidth() != state.getFramebufferWidth() ||
-                             oldState.getFramebufferHeight() != state.getFramebufferHeight();
-
-    if (pixelRatioChanged || dimensionsChanged) {
-        painter.clearFramebuffers();
-    }
 
     animationTime = util::now();
     updateSources();
@@ -558,9 +549,11 @@ void Map::render() {
 #if defined(DEBUG)
     std::vector<std::string> debug;
 #endif
-    painter.clear();
 
-    painter.resetFramebuffer();
+    glyphAtlas->upload();
+    spriteAtlas->upload();
+
+    painter.clear();
 
     painter.resize();
 
@@ -635,33 +628,7 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
 }
 
 void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id, const mat4* matrix) {
-    if (layer_desc->layers && layer_desc->type != StyleLayerType::Raster) {
-        // This is a layer group. We render them during our translucent render pass.
-        if (pass == RenderPass::Translucent) {
-            const CompositeProperties &properties = layer_desc->getProperties<CompositeProperties>();
-            if (properties.isVisible()) {
-                gl::group group(std::string("group: ") + layer_desc->id);
-
-                if (debug::renderTree) {
-                    std::cout << std::string(indent++ * 4, ' ') << "+ " << layer_desc->id
-                              << " (Composite) {" << std::endl;
-                }
-
-                painter.pushFramebuffer();
-
-                renderLayers(layer_desc->layers);
-
-                GLuint texture = painter.popFramebuffer();
-
-                // Render the previous texture onto the screen.
-                painter.drawComposite(texture, properties);
-
-                if (debug::renderTree) {
-                    std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
-                }
-            }
-        }
-    } else if (layer_desc->type == StyleLayerType::Background) {
+    if (layer_desc->type == StyleLayerType::Background) {
         // This layer defines the background color.
     } else {
         // This is a singular layer.

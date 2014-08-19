@@ -53,10 +53,13 @@ To create projects, you can run:
   and settings storage. This is what is also being built on Linux.
 - `make linux`: Builds the Linux GLFW application with `make`.
 
+Target OS: 10.9+
+
 ## iOS
 
-iOS makes use of a Cocoa-specific API called [mapbox-gl-cocoa](https://github.com/mapbox/mapbox-gl-cocoa), 
-which is included as a submodule and provides a `UIView` interface to the map view and some bundle resources. 
+iOS makes use of a Cocoa-specific API called [`mapbox-gl-cocoa`](https://github.com/mapbox/mapbox-gl-cocoa). If you are just interested in running Mapbox GL on iOS and not developing with it, head to that project and you can use this library as a pre-built static library instead. A `UIView` interface to the map view and bundle resources are provided there. 
+
+If you intend to develop here, `mapbox-gl-cocoa` is included as a submodule of the overall build setup. 
 
 First, pull down the submodule(s): 
 
@@ -72,6 +75,8 @@ This downloads all required dependencies, builds them and creates universal libr
 Lastly, `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. 
 
 Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina).
+
+Target OS: 7.0+
 
 ## Ubuntu
 
@@ -104,13 +109,7 @@ You can then proceed to build the library like:
 
 # Style
 
-The default stylesheet at `bin/style.js` is JSON and is processed into a minified version by the following script: 
-
-```
-node bin/build-style.js bin/style.js out/
-```
-
-Note: This is automatically taken care of as a build phase so you are not expected to do this manually.
+Some styles in JSON format are included at `./styles`. See the [style spec](https://github.com/mapbox/mapbox-gl-style-spec) for more details. 
 
 # Usage
 
@@ -118,7 +117,6 @@ Note: This is automatically taken care of as a build phase so you are not expect
 
 - Press `X` to reset the transform
 - Press `N` to reset north
-- Press `R` to toggle styles
 - Press `Tab` to toggle debug information
 - Press `Esc` to quit
 
@@ -129,7 +127,7 @@ Note: This is automatically taken care of as a build phase so you are not expect
 - Use two fingers to rotate
 - Double-tap to zoom in one level
 - Two-finger single-tap to zoom out one level
-- Single-tap to toggle the command palette visibility for resetting north & the transform, toggling debug, toggling styles, and locating the user
+- Single-tap to toggle the command palette visibility for resetting north & the transform, toggling debug, and locating the user
 - Double-tap, long-pressing the second, then pan up and down to "quick zoom" (iPhone only, meant for one-handed use)
 
 # Other notes

@@ -35,7 +35,7 @@
 // translates to 100
 #define VARIANT_VERSION (VARIANT_MAJOR_VERSION*100000) + (VARIANT_MINOR_VERSION*100) + (VARIANT_PATCH_VERSION)
 
-namespace mbgl { namespace util { namespace detail {
+namespace mapbox { namespace util { namespace detail {
 
 static constexpr std::size_t invalid_value = std::size_t(-1);
 
@@ -487,6 +487,8 @@ private:
 
 } // namespace detail
 
+struct no_init {};
+
 template<typename... Types>
 class variant
 {
@@ -503,11 +505,15 @@ private:
 
 public:
 
+
     VARIANT_INLINE variant()
         : type_index(sizeof...(Types) - 1)
     {
         new (&data) typename detail::select_type<0, Types...>::type();
     }
+
+    VARIANT_INLINE variant(no_init)
+        : type_index(detail::invalid_value) {}
 
     template <typename T, class = typename std::enable_if<
                          detail::is_valid_type<T, Types...>::value>::type>
@@ -715,11 +721,24 @@ auto VARIANT_INLINE static apply_visitor(F f, V & v0, V & v1) -> decltype(V::bin
     return V::binary_visit(v0, v1, f);
 }
 
+// getter interface
+template<typename ResultType, typename T>
+ResultType &  get(T & var)
+{
+    return var.template get<ResultType>();
+}
+
+template<typename ResultType, typename T>
+ResultType const&  get(T const& var)
+{
+    return var.template get<ResultType>();
+}
+
 
 // operator<<
-template <typename charT, typename traits, typename Variant>
+template <typename charT, typename traits, typename... Types>
 VARIANT_INLINE std::basic_ostream<charT, traits>&
-operator<< (std::basic_ostream<charT, traits>& out, Variant const& rhs)
+operator<< (std::basic_ostream<charT, traits>& out, variant<Types...> const& rhs)
 {
     detail::printer<std::basic_ostream<charT, traits>> visitor(out);
     apply_visitor(visitor, rhs);

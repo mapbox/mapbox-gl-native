@@ -105,7 +105,7 @@ struct PropertyEvaluator {
     }
 
     T operator()(const Function<T> &value) const {
-        return util::apply_visitor(FunctionEvaluator<T>(z), value);
+        return mapbox::util::apply_visitor(FunctionEvaluator<T>(z), value);
     }
 
     template <typename P, typename std::enable_if<!std::is_convertible<P, T>::value, int>::type = 0>
@@ -146,11 +146,11 @@ void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, c
         for (AppliedClassProperty &property : applied.properties) {
             if (now >= property.end) {
                 // We overwrite the current property with the new value.
-                target = util::apply_visitor(evaluator, property.value);
+                target = mapbox::util::apply_visitor(evaluator, property.value);
             } else if (now >= property.begin) {
                 // We overwrite the current property partially with the new value.
                 float progress = float(now - property.begin) / float(property.end - property.begin);
-                target = interpolate(target, util::apply_visitor(evaluator, property.value), progress);
+                target = interpolate(target, mapbox::util::apply_visitor(evaluator, property.value), progress);
             } else {
                 // Do not apply this property because its transition hasn't begun yet.
             }
@@ -217,13 +217,6 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const tim
 }
 
 template <>
-void StyleLayer::applyStyleProperties<CompositeProperties>(const float z, const timestamp now) {
-    properties.set<CompositeProperties>();
-    CompositeProperties &composite = properties.get<CompositeProperties>();
-    applyStyleProperty(PropertyKey::CompositeOpacity, composite.opacity, z, now);
-}
-
-template <>
 void StyleLayer::applyStyleProperties<RasterProperties>(const float z, const timestamp now) {
     properties.set<RasterProperties>();
     RasterProperties &raster = properties.get<RasterProperties>();
@@ -255,7 +248,6 @@ void StyleLayer::updateProperties(float z, const timestamp now) {
         case StyleLayerType::Line: applyStyleProperties<LineProperties>(z, now); break;
         case StyleLayerType::Symbol: applyStyleProperties<SymbolProperties>(z, now); break;
         case StyleLayerType::Raster: applyStyleProperties<RasterProperties>(z, now); break;
-        case StyleLayerType::Composite: applyStyleProperties<CompositeProperties>(z, now); break;
         case StyleLayerType::Background: applyStyleProperties<BackgroundProperties>(z, now); break;
         default: properties.set<std::false_type>(); break;
     }

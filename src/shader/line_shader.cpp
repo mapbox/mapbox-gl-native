@@ -8,6 +8,7 @@ using namespace mbgl;
 
 LineShader::LineShader()
     : Shader(
+        "line",
         shaders[LINE_SHADER].vertex,
         shaders[LINE_SHADER].fragment
     ) {

@@ -10,7 +10,7 @@ namespace mbgl {
 
 class FilterExpression {
 public:
-    typedef util::recursive_wrapper<FilterExpression> Wrapper;
+    typedef mapbox::util::recursive_wrapper<FilterExpression> Wrapper;
 
     enum class Operator : uint8_t {
         And,

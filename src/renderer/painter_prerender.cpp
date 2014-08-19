@@ -28,7 +28,7 @@ void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix,
     rasterShader->setMatrix(matrix);
     rasterShader->setOpacity(1);
 
-    glDepthRange(strata, 1.0f);
+    depthRange(strata, 1.0f);
 
     glActiveTexture(GL_TEXTURE0);
     rasterShader->setImage(0);

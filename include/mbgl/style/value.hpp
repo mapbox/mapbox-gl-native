@@ -9,7 +9,7 @@
 
 namespace mbgl {
 
-typedef util::variant<bool, int64_t, uint64_t, double, std::string> Value;
+typedef mapbox::util::variant<bool, int64_t, uint64_t, double, std::string> Value;
 
 std::string toString(const Value &value);
 
