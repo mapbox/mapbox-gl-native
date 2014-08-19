@@ -89,8 +89,8 @@ public:
     float buffer = 0.03125f;
 };
 
-typedef util::variant<StyleBucketFill, StyleBucketLine, StyleBucketSymbol,
-                      StyleBucketRaster, std::false_type> StyleBucketRender;
+typedef mapbox::util::variant<StyleBucketFill, StyleBucketLine, StyleBucketSymbol,
+                              StyleBucketRaster, std::false_type> StyleBucketRender;
 
 
 class StyleBucket {

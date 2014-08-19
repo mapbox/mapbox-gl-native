@@ -95,7 +95,7 @@ struct BackgroundProperties {
     Color color = {{ 0, 0, 0, 1 }};
 };
 
-typedef util::variant<
+typedef mapbox::util::variant<
     FillProperties,
     LineProperties,
     SymbolProperties,
