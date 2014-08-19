@@ -38,6 +38,29 @@ public:
     std::map<PropertyKey, PropertyTransition> transitions;
 };
 
+template <typename T>
+struct PropertyEvaluator {
+    typedef T result_type;
+    PropertyEvaluator(float z) : z(z) {}
+
+    template <typename P, typename std::enable_if<std::is_convertible<P, T>::value, int>::type = 0>
+        T operator()(const P &value) const {
+            return value;
+        }
+
+    T operator()(const Function<T> &value) const {
+        return util::apply_visitor(FunctionEvaluator<T>(z), value);
+    }
+
+    template <typename P, typename std::enable_if<!std::is_convertible<P, T>::value, int>::type = 0>
+        T operator()(const P &) const {
+            return T();
+        }
+
+    private:
+    const float z;
+};
+
 }
 
 #endif

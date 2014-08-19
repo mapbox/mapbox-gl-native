@@ -94,29 +94,6 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
     }
 }
 
-template <typename T>
-struct PropertyEvaluator {
-    typedef T result_type;
-    PropertyEvaluator(float z) : z(z) {}
-
-    template <typename P, typename std::enable_if<std::is_convertible<P, T>::value, int>::type = 0>
-    T operator()(const P &value) const {
-        return value;
-    }
-
-    T operator()(const Function<T> &value) const {
-        return util::apply_visitor(FunctionEvaluator<T>(z), value);
-    }
-
-    template <typename P, typename std::enable_if<!std::is_convertible<P, T>::value, int>::type = 0>
-    T operator()(const P &) const {
-        return T();
-    }
-
-private:
-    const float z;
-};
-
 inline float interpolate(const float a, const float b, const float t) {
     return (1.0f - t) * a + t * b;
 }

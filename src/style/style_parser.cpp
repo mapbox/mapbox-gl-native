@@ -385,17 +385,18 @@ float getStretch(float z, float width, float prevZ, float prevWidth) {
     return stretchX / stretchY;
 }
 
-float bisect(float lowZ, float highZ, float prevZ, float prevWidth, float lineWidth, float maxStretch) {
+float bisect(float lowZ, float highZ, float prevZ, float prevWidth, PropertyValue &propertyValue, float maxStretch) {
     float z = (lowZ + highZ) / 2;
-    float width = lineWidth;
+    const PropertyEvaluator<float> evaluator(z);
+    float width = util::apply_visitor(evaluator, propertyValue);
     float stretch = getStretch(z, width, prevZ, prevWidth);
 
     if (fabs(stretch - maxStretch) < 0.001) {
         return z;
     } else if (stretch > maxStretch) {
-        return bisect(lowZ, z, prevZ, prevWidth, lineWidth, maxStretch);
+        return bisect(lowZ, z, prevZ, prevWidth, propertyValue, maxStretch);
     } else {
-        return bisect(z, highZ, prevZ, prevWidth, lineWidth, maxStretch);
+        return bisect(z, highZ, prevZ, prevWidth, propertyValue, maxStretch);
     }
 }
 
@@ -417,9 +418,10 @@ template<> std::tuple<bool, Function<LinePattern>> StyleParser::parseProperty(JS
     float base = defaultBaseValue<LinePattern>();
     std::vector<std::pair<float, LinePattern>> stops;
 
+    const PropertyEvaluator<float> evaluator(0.0);
+    float lineWidth = util::apply_visitor(evaluator, propertyValue);
 
     float maxStretch = 1.5;
-    float lineWidth = 10.0;
     float prevZ = 0;
     float prevWidth = lineWidth;
     float maxZoom = 25;
@@ -427,9 +429,11 @@ template<> std::tuple<bool, Function<LinePattern>> StyleParser::parseProperty(JS
     float z = increment;
 
     while (z < maxZoom) {
+        const PropertyEvaluator<float> evaluator(z);
+        lineWidth = util::apply_visitor(evaluator, propertyValue);
         float stretch = getStretch(z, lineWidth, prevZ, prevWidth);
         if (stretch >= maxStretch) {
-            prevZ = bisect(z - increment, z, prevZ, prevWidth, lineWidth, maxStretch);
+            prevZ = bisect(z - increment, z, prevZ, prevWidth, propertyValue, maxStretch);
             prevWidth = lineWidth;
             LinePattern l;
             l.fromScale = lineWidth;
