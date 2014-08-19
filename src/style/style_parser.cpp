@@ -696,12 +696,10 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("transition-line-offset", Key::LineOffset, klass, value);
     parseOptionalProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-line-blur", Key::LineBlur, klass, value);
-    parseOptionalProperty<Function<float>>("line-dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-line-dasharray", Key::LineDashArray, klass, value);
     parseOptionalProperty<std::string>("line-image", Key::LineImage, klass, value);
     auto it = klass.properties.find(Key::LineWidth);
     if (it != klass.properties.end()) {
-        parseOptionalProperty<Function<LinePattern>>("line-dasharray", Key::LineDasharray, klass, value, it->second);
+        parseOptionalProperty<Function<LinePattern>>("line-dasharray", Key::LineDashArray, klass, value, it->second);
     }
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);

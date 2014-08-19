@@ -61,7 +61,7 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     // var imagePos = properties.image && imageSprite.getPosition(properties.image);
     bool imagePos = false;
 
-    if (properties.dash_array[1] >= 0) {
+    if (properties.dasharray.from.size()) {
         const LinePattern &p = properties.dasharray;
 
         LineAtlas &lineAtlas = *map.getLineAtlas();

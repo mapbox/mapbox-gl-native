@@ -25,6 +25,4 @@ void main() {
     alpha *= smoothstep(0.5 - u_sdfgamma, 0.5 + u_sdfgamma, mix(distA, distB, u_fade));
 
     gl_FragColor = u_color * alpha;
-
-    //gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0) * texture2D(u_image, vec2(0.5, 0.5)).a;
 }

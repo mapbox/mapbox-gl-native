@@ -23,10 +23,7 @@ enum class PropertyKey {
     LineWidth,
     LineOffset,
     LineBlur,
-    LineDashArray, // for transitions only
-    LineDasharray, // TODO
-    LineDashLand,
-    LineDashGap,
+    LineDashArray,
     LineImage,
 
     IconOpacity,

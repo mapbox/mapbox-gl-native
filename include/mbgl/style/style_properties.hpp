@@ -36,7 +36,6 @@ struct LineProperties {
     float width = 1;
     float offset = 0;
     float blur = 0;
-    std::array<float, 2> dash_array = {{ 1, -1 }};
     std::string image;
     LinePattern dasharray = {};
 

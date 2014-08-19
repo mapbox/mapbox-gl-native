@@ -161,10 +161,8 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const times
     applyStyleProperty(PropertyKey::LineWidth, line.width, z, now);
     applyStyleProperty(PropertyKey::LineOffset, line.offset, z, now);
     applyStyleProperty(PropertyKey::LineBlur, line.blur, z, now);
-    applyStyleProperty(PropertyKey::LineDashLand, line.dash_array[0], z, now);
-    applyStyleProperty(PropertyKey::LineDashGap, line.dash_array[1], z, now);
     applyStyleProperty(PropertyKey::LineImage, line.image, z, now);
-    applyStyleProperty(PropertyKey::LineDasharray, line.dasharray, z, now);
+    applyStyleProperty(PropertyKey::LineDashArray, line.dasharray, z, now);
 }
 
 template <>
