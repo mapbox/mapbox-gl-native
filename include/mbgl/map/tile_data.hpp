@@ -67,9 +67,6 @@ protected:
 public:
     const SourceInfo &source;
 
-    // Request-related information.
-    const std::string url;
-
 protected:
     std::weak_ptr<platform::Request> req;
     std::string data;

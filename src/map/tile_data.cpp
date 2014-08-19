@@ -14,13 +14,6 @@ TileData::TileData(Tile::ID id, Map &map, const SourceInfo &source)
       state(State::initial),
       map(map),
       source(source),
-      url(util::replaceTokens(source.url, [&](const std::string &token) -> std::string {
-          if (token == "z") return std::to_string(id.z);
-          if (token == "x") return std::to_string(id.x);
-          if (token == "y") return std::to_string(id.y);
-          if (token == "ratio") return (map.getState().getPixelRatio() > 1.0 ? "@2x" : "");
-          return "";
-      })),
       debugBucket(debugFontBuffer) {
     // Initialize tile debug coordinates
     const std::string str = util::sprintf<32>("%d/%d/%d", id.z, id.x, id.y);
@@ -36,11 +29,23 @@ const std::string TileData::toString() const {
 }
 
 void TileData::request() {
+    if (source.tiles.empty())
+        return;
+
+    std::string url = source.tiles[(id.x + id.y) % source.tiles.size()];
+    url = util::replaceTokens(url, [&](const std::string &token) -> std::string {
+        if (token == "z") return std::to_string(id.z);
+        if (token == "x") return std::to_string(id.x);
+        if (token == "y") return std::to_string(id.y);
+        if (token == "ratio") return (map.getState().getPixelRatio() > 1.0 ? "@2x" : "");
+        return "";
+    });
+
     state = State::loading;
 
     // Note: Somehow this feels slower than the change to request_http()
     std::weak_ptr<TileData> weak_tile = shared_from_this();
-    map.getFileSource()->load(ResourceType::Tile, url, [weak_tile](platform::Response *res) {
+    map.getFileSource()->load(ResourceType::Tile, url, [weak_tile, url](platform::Response *res) {
         std::shared_ptr<TileData> tile = weak_tile.lock();
         if (!tile || tile->state == State::obsolete) {
             // noop. Tile is obsolete and we're now just waiting for the refcount
@@ -54,7 +59,7 @@ void TileData::request() {
             tile->reparse();
         } else {
 #if defined(DEBUG)
-            fprintf(stderr, "[%s] tile loading failed: %d, %s\n", tile->url.c_str(), res->code, res->error_message.c_str());
+            fprintf(stderr, "[%s] tile loading failed: %d, %s\n", url.c_str(), res->code, res->error_message.c_str());
 #endif
         }
     });

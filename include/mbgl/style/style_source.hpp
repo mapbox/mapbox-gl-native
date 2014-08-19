@@ -4,6 +4,10 @@
 #include <mbgl/style/types.hpp>
 
 #include <memory>
+#include <vector>
+#include <string>
+
+#include <rapidjson/document.h>
 
 namespace mbgl {
 
@@ -11,27 +15,32 @@ class Source;
 
 class SourceInfo {
 public:
-    const SourceType type;
-    const std::string url;
-    const uint32_t tile_size;
-    const int32_t min_zoom;
-    const int32_t max_zoom;
+    SourceType type = SourceType::Vector;
+    std::string url;
+    std::vector<std::string> tiles;
+    uint16_t tile_size = 512;
+    uint16_t min_zoom = 0;
+    uint16_t max_zoom = 22;
+    std::string attribution;
+    std::array<float, 3> center = {{0, 0, 0}};
+    std::array<float, 4> bounds = {{-180, -90, 180, 90}};
 
-    SourceInfo(SourceType type = SourceType::Vector, const std::string &url = "",
-                uint32_t tile_size = 512, int32_t min_zoom = 0, int32_t max_zoom = 22)
-        : type(type), url(url), tile_size(tile_size), min_zoom(min_zoom), max_zoom(max_zoom) {}
+    void parseTileJSONProperties(const rapidjson::Value&);
 };
 
 
-class StyleSource {
+class StyleSource : public std::enable_shared_from_this<StyleSource> {
 public:
-    const SourceInfo info;
+    SourceInfo info;
 
     bool enabled = false;
     std::shared_ptr<Source> source;
 
-    StyleSource(const SourceInfo &info) : info(info) {}
+    StyleSource(const SourceInfo &info)
+        : info(info)
+    {}
 };
+
 }
 
 #endif

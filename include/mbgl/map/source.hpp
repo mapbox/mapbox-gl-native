@@ -25,7 +25,9 @@ struct box;
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:
-    Source(SourceInfo info, const std::string &access_token = "");
+    Source(SourceInfo& info);
+
+    void load(Map &map);
 
     bool update(Map &map);
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
@@ -37,11 +39,6 @@ public:
 
     std::forward_list<Tile::ID> getIDs() const;
     void updateClipIDs(const std::map<Tile::ID, ClipID> &mapping);
-
-    static std::string normalizeSourceURL(const std::string &url, const std::string &access_token);
-
-public:
-    const SourceInfo info;
 
 private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
@@ -55,7 +52,9 @@ private:
 
     double getZoom(const TransformState &state) const;
 
-private:
+    SourceInfo& info;
+    bool loaded = false;
+
     // Stores the time when this source was most recently updated.
     timestamp updated = 0;
 

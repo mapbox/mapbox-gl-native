@@ -469,7 +469,8 @@ void Map::updateSources() {
     for (const std::shared_ptr<StyleSource> &style_source : activeSources) {
         if (style_source->enabled) {
             if (!style_source->source) {
-                style_source->source = std::make_shared<Source>(style_source->info, getAccessToken());
+                style_source->source = std::make_shared<Source>(style_source->info);
+                style_source->source->load(*this);
             }
         } else {
             style_source->source.reset();

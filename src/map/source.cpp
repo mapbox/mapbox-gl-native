@@ -6,40 +6,73 @@
 #include <mbgl/util/raster.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/texturepool.hpp>
+#include <mbgl/util/filesource.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
-
+#include <mbgl/platform/log.hpp>
 
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
 
 namespace mbgl {
 
-Source::Source(SourceInfo info, const std::string &access_token)
-    : info(
-          info.type,
-          normalizeSourceURL(info.url, access_token),
-          info.tile_size,
-          info.min_zoom,
-          info.max_zoom
-      ) {}
+Source::Source(SourceInfo& info)
+    : info(info)
+{
+}
 
-std::string Source::normalizeSourceURL(const std::string &url, const std::string &access_token) {
+std::string normalizeURL(const std::string& url, const std::string& access_token) {
     const std::string t = "mapbox://";
-    if (url.compare(0, t.length(), t) == 0) {
-        if (access_token.empty()) {
-            throw std::runtime_error("You must provide a Mapbox API access token for Mapbox tile sources");
-        }
-        return std::string("https://api.tiles.mapbox.com/v4/") + url.substr(t.length()) + "/{z}/{x}/{y}.vector.pbf?access_token=" + access_token;
-    } else {
+
+    if (url.compare(0, t.length(), t) != 0)
         return url;
+
+    if (access_token.empty())
+        throw std::runtime_error("You must provide a Mapbox API access token for Mapbox tile sources");
+
+    return std::string("https://api.tiles.mapbox.com/v4/")
+        + url.substr(t.length())
+        + ".json?access_token="
+        + access_token;
+}
+
+// Note: This is a separate function that must be called exactly once after creation
+// The reason this isn't part of the constructor is that calling shared_from_this() in
+// the constructor fails.
+void Source::load(Map& map) {
+    if (info.url.empty()) {
+        loaded = true;
+        return;
     }
+
+    std::string url = normalizeURL(info.url, map.getAccessToken());
+    std::shared_ptr<Source> source = shared_from_this();
+
+    map.getFileSource()->load(ResourceType::JSON, url, [source, &map](platform::Response *res) {
+        if (res->code != 200) {
+            Log::Warning(Event::General, "failed to load source TileJSON");
+            return;
+        }
+
+        rapidjson::Document d;
+        d.Parse<0>(res->body.c_str());
+
+        if (d.HasParseError()) {
+            Log::Warning(Event::General, "invalid source TileJSON");
+            return;
+        }
+
+        source->info.parseTileJSONProperties(d);
+        source->loaded = true;
+
+        map.update();
+    });
 }
 
 bool Source::update(Map &map) {
-    if (map.getTime() > updated) {
+    if (loaded && map.getTime() > updated) {
         return updateTiles(map);
     } else {
         return false;
