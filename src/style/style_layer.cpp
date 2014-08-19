@@ -105,7 +105,7 @@ struct PropertyEvaluator {
     }
 
     T operator()(const Function<T> &value) const {
-        return util::apply_visitor(FunctionEvaluator<T>(z), value);
+        return mapbox::util::apply_visitor(FunctionEvaluator<T>(z), value);
     }
 
     template <typename P, typename std::enable_if<!std::is_convertible<P, T>::value, int>::type = 0>
@@ -146,11 +146,11 @@ void StyleLayer::applyStyleProperty(PropertyKey key, T &target, const float z, c
         for (AppliedClassProperty &property : applied.properties) {
             if (now >= property.end) {
                 // We overwrite the current property with the new value.
-                target = util::apply_visitor(evaluator, property.value);
+                target = mapbox::util::apply_visitor(evaluator, property.value);
             } else if (now >= property.begin) {
                 // We overwrite the current property partially with the new value.
                 float progress = float(now - property.begin) / float(property.end - property.begin);
-                target = interpolate(target, util::apply_visitor(evaluator, property.value), progress);
+                target = interpolate(target, mapbox::util::apply_visitor(evaluator, property.value), progress);
             } else {
                 // Do not apply this property because its transition hasn't begun yet.
             }

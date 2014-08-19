@@ -27,7 +27,7 @@ private:
 };
 
 template <typename T>
-using Function = util::variant<
+using Function = mapbox::util::variant<
     std::false_type,
     ConstantFunction<T>,
     StopsFunction<T>

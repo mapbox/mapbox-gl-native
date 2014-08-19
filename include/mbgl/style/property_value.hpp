@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-typedef util::variant<
+typedef mapbox::util::variant<
     std::string,
     TranslateAnchorType,
     RotateAnchorType,
