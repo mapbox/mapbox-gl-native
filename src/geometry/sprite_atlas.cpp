@@ -215,7 +215,7 @@ void SpriteAtlas::bind(bool linear) {
 
 void SpriteAtlas::upload() {
     if (dirty) {
-        bool exists = texture;
+        const bool exists = texture;
         bind(filter); // Make sure we don't change the filter value.
 
         std::lock_guard<std::mutex> lock(mtx);
@@ -234,7 +234,8 @@ void SpriteAtlas::upload() {
                 data // const GLvoid * data
             );
         } else {
-            glTexSubImage2D(GL_TEXTURE_2D, // GLenum target
+            glTexSubImage2D(
+                GL_TEXTURE_2D, // GLenum target
                 0, // GLint level
                 0, // GLint xoffset
                 0, // GLint yoffset
