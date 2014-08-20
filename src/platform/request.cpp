@@ -41,7 +41,7 @@ void Request::complete() {
     }
 }
 
-void Request::complete(uv_async_t *async) {
+void Request::complete(uv_async_t *async, int status) {
     Response *res = static_cast<std::unique_ptr<Response> *>(async->data)->get();
 
     res->callback(res);

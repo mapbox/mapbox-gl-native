@@ -24,7 +24,7 @@ public:
     void complete();
 
 private:
-    static void complete(uv_async_t *async);
+    static void complete(uv_async_t *async, int status);
 
 public:
     const std::string url;

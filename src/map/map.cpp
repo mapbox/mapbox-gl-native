@@ -98,7 +98,7 @@ void Map::stop() {
     async = false;
 }
 
-void Map::delete_async(uv_handle_t *handle) {
+void Map::delete_async(uv_handle_t *handle, int status) {
     delete (uv_async_t *)handle;
 }
 
@@ -143,14 +143,14 @@ void Map::cleanup() {
     }
 }
 
-void Map::cleanup(uv_async_t *async) {
+void Map::cleanup(uv_async_t *async, int status) {
     Map *map = static_cast<Map *>(async->data);
 
     map->view.make_active();
     map->painter.cleanup();
 }
 
-void Map::render(uv_async_t *async) {
+void Map::render(uv_async_t *async, int status) {
     Map *map = static_cast<Map *>(async->data);
 
 
@@ -170,7 +170,7 @@ void Map::render(uv_async_t *async) {
     }
 }
 
-void Map::terminate(uv_async_t *async) {
+void Map::terminate(uv_async_t *async, int status) {
     // Closes all open handles on the loop. This means that the loop will automatically terminate.
     uv_loop_t *loop = static_cast<uv_loop_t *>(async->data);
     uv_walk(loop, [](uv_handle_t *handle, void */*arg*/) {

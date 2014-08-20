@@ -129,10 +129,10 @@ public:
 
 private:
     // uv async callbacks
-    static void render(uv_async_t *async);
-    static void terminate(uv_async_t *async);
-    static void cleanup(uv_async_t *async);
-    static void delete_async(uv_handle_t *handle);
+    static void render(uv_async_t *async, int status);
+    static void terminate(uv_async_t *async, int status);
+    static void cleanup(uv_async_t *async, int status);
+    static void delete_async(uv_handle_t *handle, int status);
 
     // Setup
     void setup();
