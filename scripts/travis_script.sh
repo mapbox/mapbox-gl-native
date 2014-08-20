@@ -9,7 +9,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #
     make linux -j4 BUILDTYPE=${BUILDTYPE}
     make test -j4 BUILDTYPE=${BUILDTYPE}
-    ./scripts/run_linux_tests.sh
+    ./scripts/run_tests.sh
     (cd ./node_modules/mapbox-gl-test-suite/ && (./bin/compare_images.js || true; ./bin/deploy_results.sh))
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     #
