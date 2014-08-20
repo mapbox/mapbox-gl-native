@@ -66,7 +66,7 @@ export CXX11=true
 if [ ${UNAME} = 'Darwin' ]; then
 
 if [ ! -z "${TRAVIS:-}" ]; then
-    if aws s3 cp s3://mapbox-gl-testing/dependencies/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz ./out/ ; then
+    if aws s3 cp s3://${AWS_S3_BUCKET}/dependencies/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz ./out/ ; then
         rm -rf out/build-cpp11-libcpp-universal
         tar -xzf out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz
     fi
@@ -119,7 +119,7 @@ export LIBUV_VERSION=0.10.28
 
 if [ ! -z "${TRAVIS:-}" ]; then
     tar -zcf out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz out/build-cpp11-libcpp-universal
-    aws s3 cp out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz s3://mapbox-gl-testing/dependencies/
+    aws s3 cp out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz s3://${AWS_S3_BUCKET}/dependencies/
 fi
 
 fi
@@ -134,7 +134,7 @@ cd ../../
 elif [ ${UNAME} = 'Linux' ]; then
 
 if [ ! -z "${TRAVIS:-}" ]; then
-    if aws s3 cp s3://mapbox-gl-testing/dependencies/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ./out/ ; then
+    if aws s3 cp s3://${AWS_S3_BUCKET}/dependencies/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ./out/ ; then
         rm -rf out/build-cpp11-libstdcpp-gcc-x86_64-linux
         tar -xzf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz
     fi
@@ -152,7 +152,7 @@ export LIBUV_VERSION=0.10.28
 if [ ! -z "${TRAVIS:-}" ]; then
     if ! tar --compare -zf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ; then
         tar -zcf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz out/build-cpp11-libstdcpp-gcc-x86_64-linux
-        aws s3 cp out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz s3://mapbox-gl-testing/dependencies/
+        aws s3 cp out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz s3://${AWS_S3_BUCKET}/dependencies/
     fi
 fi
 

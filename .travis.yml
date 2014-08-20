@@ -15,6 +15,7 @@ env:
    - secure: "bG4YYWMfl9API0MSRgmOaJrlGLv06tRg9KJNawBieZvBJbITPpxVGJZT3/l/SEJ+Rl15e2dRex4k+MGQlmT2SqPQxTEYWv1qxNigKPPcla7IWeNmWWqW8uVvFjdglojgBOK2k/xErVQtA4zDfi3mwSXH4DKwquXWsoEKmX2SV7M="
    - secure: "Cbvap9ubVKgjPe3hUhI6JGeDZzBXHpOG9RaYKh+SdoIPhKnlJiNOYm1egomi+e4uqJInlFKuVHTw7Ng9Cun6Zm0jIxpkSchv1GpsR7hmB3UGnGed19Dw8121FwuUaktN+4YnbVlsyd+u8EHD3+h58t4eELrLrZolM4rS7DL6caA="
    - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
+   - AWS_S3_BUCKET=mapbox-gl-testing
 
 before_install:
 - source ./scripts/flags.sh
