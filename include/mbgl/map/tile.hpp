@@ -51,6 +51,10 @@ public:
             return w == rhs.w && z == rhs.z && x == rhs.x && y == rhs.y;
         }
 
+        inline bool operator!=(const ID& rhs) const {
+            return !operator==(rhs);
+        }
+
         inline bool operator<(const ID &rhs) const {
             if (w != rhs.w) return w < rhs.w;
             if (z != rhs.z) return z < rhs.z;
