@@ -12,23 +12,6 @@
 
 namespace mbgl {
 
-uint32_t ceil_log2(uint64_t x) {
-    static const uint64_t t[6] = {0xFFFFFFFF00000000, 0x00000000FFFF0000,
-                                  0x000000000000FF00, 0x00000000000000F0,
-                                  0x000000000000000C, 0x0000000000000002};
-    uint32_t y = (((x & (x - 1)) == 0) ? 0 : 1);
-    uint32_t j = 32;
-
-    for (int32_t i = 0; i < 6; i++) {
-        const uint32_t k = (((x & t[i]) == 0) ? 0 : j);
-        y += k;
-        x >>= k;
-        j >>= 1;
-    }
-
-    return y;
-}
-
 ClipIDGenerator::Leaf::Leaf(Tile &tile_) : tile(tile_) {}
 
 void ClipIDGenerator::Leaf::add(const Tile::ID &p) {
@@ -90,7 +73,7 @@ void ClipIDGenerator::update(std::forward_list<Tile *> tiles) {
     }
 
     if (pool.size()) {
-        const uint32_t bit_count = ceil_log2(pool.size() + 1);
+        const uint32_t bit_count = util::ceil_log2(pool.size() + 1);
         const std::bitset<8> mask = uint64_t(((1 << bit_count) - 1) << bit_offset);
 
         // We are starting our count with 1 since we need at least 1 bit set to distinguish between
