@@ -22,7 +22,7 @@ private:
     };
 
     typedef std::vector<Leaf> Pool;
-    std::forward_list<const Pool> pools;
+    std::forward_list<Pool> pools;
     uint8_t bit_offset = 0;
 
 private:
