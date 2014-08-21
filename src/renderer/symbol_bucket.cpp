@@ -296,7 +296,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
         }
 
         // Insert final placement into collision tree and add glyphs/icons to buffers
-        if (glyphScale) {
+        if (glyphScale && std::isfinite(glyphScale)) {
             if (!properties.text.ignore_placement) {
                 collision.insert(glyphPlacement.boxes, anchor, glyphScale, glyphRange,
                                  horizontalText);
@@ -304,7 +304,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
             if (inside) addSymbols(text, glyphPlacement.shapes, glyphScale, glyphRange);
         }
 
-        if (iconScale) {
+        if (iconScale && std::isfinite(iconScale)) {
             if (!properties.icon.ignore_placement) {
                 collision.insert(iconPlacement.boxes, anchor, iconScale, iconRange, horizontalIcon);
             }
