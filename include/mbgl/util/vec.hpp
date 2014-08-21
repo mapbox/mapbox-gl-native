@@ -71,7 +71,7 @@ struct vec2 {
 
     template<typename U = T, typename std::enable_if<std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
     inline operator bool() const {
-        return !isnan(x) && !isnan(y);
+        return !std::isnan(x) && !std::isnan(y);
     }
 
     template<typename U = T, typename std::enable_if<!std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>

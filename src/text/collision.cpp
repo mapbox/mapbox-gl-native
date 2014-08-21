@@ -166,10 +166,10 @@ float Collision::getPlacementScale(const GlyphBoxes &glyphs, float minPlacementS
                 float s4 = (ob.br.y - nb.tl.y + padding) /
                            (na.y - oa.y); // scale at which new box is to the bottom of old box
 
-                if (isnan(s1) || isnan(s2)) {
+                if (std::isnan(s1) || std::isnan(s2)) {
                     s1 = s2 = 1;
                 }
-                if (isnan(s3) || isnan(s4)) {
+                if (std::isnan(s3) || std::isnan(s4)) {
                     s3 = s4 = 1;
                 }
 

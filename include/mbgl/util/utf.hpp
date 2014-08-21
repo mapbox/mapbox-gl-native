@@ -4,11 +4,9 @@
 #include <memory>
 
 // g++/libstdc++ is missing c++11 codecvt support
-#ifdef __linux__
-#pragma GCC diagnostic push
 #ifndef __clang__
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
 #include <boost/locale.hpp>
 #pragma GCC diagnostic pop
 #else
@@ -20,7 +18,7 @@ namespace mbgl {
 
 namespace util {
 
-#ifdef __linux__
+#ifndef __clang__
 
 class utf8_to_utf32 {
  public:

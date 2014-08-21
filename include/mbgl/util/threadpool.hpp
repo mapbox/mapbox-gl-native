@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <forward_list>
 #include <queue>
+#include <memory>
 
 namespace mbgl {
 namespace util {

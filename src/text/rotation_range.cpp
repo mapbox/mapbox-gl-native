@@ -95,7 +95,7 @@ rotatingRotatingCollisions(const CollisionRect &a, const CollisionRect &b,
     std::vector<float> f;
     for (size_t i = 0; i < c.size(); i++) {
         // Check if they are close enough to collide
-        if (!isnan(c[i]) && d_sq <= e[i]) {
+        if (!std::isnan(c[i]) && d_sq <= e[i]) {
             // So far, angles have been calulated as relative to the vector
             // between anchors.
             // Convert the angles to angles from north.
