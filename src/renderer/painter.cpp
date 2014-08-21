@@ -169,9 +169,9 @@ void Painter::setStrata(float value) {
 }
 
 void Painter::prepareTile(const Tile& tile) {
-    GLint id = (GLint)tile.clip.mask.to_ulong();
-    GLuint mask = clipMask[tile.clip.length];
-    glStencilFunc(GL_EQUAL, id, mask);
+    const GLint ref = (GLint)tile.clip.reference.to_ulong();
+    const GLuint mask = (GLuint)tile.clip.mask.to_ulong();
+    glStencilFunc(GL_EQUAL, ref, mask);
 }
 
 void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix) {

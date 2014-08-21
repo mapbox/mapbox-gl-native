@@ -4,15 +4,34 @@
 #include <mbgl/map/tile.hpp>
 #include <list>
 #include <set>
+#include <vector>
+#include <forward_list>
 #include <map>
 
 namespace mbgl {
 
-static constexpr uint8_t clipMask[9] { 0x00, 0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xFE, 0xFF };
+class ClipIDGenerator {
+private:
+    struct Leaf {
+        Leaf(Tile &tile);
+        void add(const Tile::ID &p);
+        bool operator==(const Leaf &other) const;
 
-void updateClipIDs(const std::list<Tile *> &array);
+        Tile &tile;
+        std::forward_list<Tile::ID> children;
+    };
 
-std::map<Tile::ID, ClipID> computeClipIDs(std::forward_list<Tile::ID> array);
+    typedef std::vector<Leaf> Pool;
+    std::forward_list<const Pool> pools;
+    uint8_t bit_offset = 0;
+
+private:
+    bool reuseExisting(Leaf &leaf);
+
+public:
+    void update(std::forward_list<Tile *> tiles);
+};
+
 
 }
 

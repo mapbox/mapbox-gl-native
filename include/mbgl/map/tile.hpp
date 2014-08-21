@@ -18,11 +18,15 @@ namespace mbgl {
 class TileData;
 
 struct ClipID {
-    explicit ClipID() {}
-    explicit ClipID(const std::bitset<8> &mask, uint8_t length) : mask(mask), length(length) {}
-    explicit ClipID(const std::string &mask, uint8_t length) : mask(mask), length(length) {}
+    inline ClipID() {}
+    inline ClipID(const std::string &mask_, const std::string &reference_) : mask(mask_), reference(reference_) {}
+
     std::bitset<8> mask;
-    uint8_t length = 0;
+    std::bitset<8> reference;
+
+    inline bool operator==(const ClipID &other) const {
+        return mask == other.mask && reference == other.reference;
+    }
 };
 
 class Tile : private util::noncopyable {

@@ -509,17 +509,11 @@ void Map::updateTiles() {
 }
 
 void Map::updateRenderState() {
-    std::forward_list<Tile::ID> ids;
-
+    // Update all clipping IDs.
+    ClipIDGenerator generator;
     for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
-        ids.splice_after(ids.before_begin(), source->source->getIDs());
+        generator.update(source->source->getLoadedTiles());
         source->source->updateMatrices(painter.projMatrix, state);
-    }
-
-    const std::map<Tile::ID, ClipID> clipIDs = computeClipIDs(ids);
-
-    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
-        source->source->updateClipIDs(clipIDs);
     }
 }
 

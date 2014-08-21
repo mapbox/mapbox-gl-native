@@ -12,187 +12,102 @@
 
 namespace mbgl {
 
-struct TileHierarchy {
-    TileHierarchy(Tile::ID id, std::list<TileHierarchy> &&children)
-        : id(id), children(std::move(children)) {}
+uint32_t ceil_log2(uint64_t x) {
+    static const uint64_t t[6] = {0xFFFFFFFF00000000, 0x00000000FFFF0000,
+                                  0x000000000000FF00, 0x00000000000000F0,
+                                  0x000000000000000C, 0x0000000000000002};
+    uint32_t y = (((x & (x - 1)) == 0) ? 0 : 1);
+    uint32_t j = 32;
 
-    const Tile::ID id;
-    ClipID clip;
-    std::list<TileHierarchy> children;
-};
-
-std::list<TileHierarchy> partition(std::forward_list<Tile::ID> &&array) {
-    if (array.empty()) {
-        // We don't have to update the clipping mask because there are no tiles
-        // anyway.
-        return {};
+    for (int32_t i = 0; i < 6; i++) {
+        const uint32_t k = (((x & t[i]) == 0) ? 0 : j);
+        y += k;
+        x >>= k;
+        j >>= 1;
     }
 
-    int8_t minZ = array.begin()->z;
-
-    std::list<TileHierarchy> result;
-    std::forward_list<Tile::ID> remainder;
-    auto remainder_it = remainder.before_begin();
-
-    while (!array.empty()) {
-        const Tile::ID id = array.front();
-        array.pop_front();
-        if (id.z == minZ) {
-            std::forward_list<Tile::ID> children;
-            auto children_it = children.before_begin();
-
-            array.remove_if([&id, &children, &children_it](const Tile::ID &child) {
-                if (child.isChildOf(id)) {
-                    children_it = children.insert_after(children_it, child);
-                    return true;
-                } else {
-                    return false;
-                }
-            });
-
-            result.emplace_back(id, partition(std::move(children)));
-        } else {
-            remainder_it = remainder.insert_after(remainder_it, id);
-        }
-    }
-
-    // Concatenate the remainder.
-    if (!remainder.empty()) {
-        result.splice(result.begin(), partition(std::move(remainder)));
-    }
-
-    return result;
+    return y;
 }
 
-uint8_t prefix(std::list<TileHierarchy> &array, TileHierarchy *parent = nullptr) {
-    if (array.empty()) {
-        return 0;
+ClipIDGenerator::Leaf::Leaf(Tile &tile_) : tile(tile_) {}
+
+void ClipIDGenerator::Leaf::add(const Tile::ID &p) {
+    if (p.isChildOf(tile.id)) {
+        // Ensure that no already present child is a parent of the new p.
+        for (const Tile::ID &child : children) {
+            if (p.isChildOf(child))
+                return;
+        }
+        children.push_front(p);
     }
+}
 
-    bool all_children_are_immediate = true;
-    uint8_t max_child_prefix_length = 0;
+bool ClipIDGenerator::Leaf::operator==(const Leaf &other) const {
+    return tile.id == other.tile.id && children == other.children;
+}
 
-    struct Huffman {
-        explicit Huffman(int prefix_length, TileHierarchy *item)
-            : prefix_length(prefix_length), children(1, item) {}
-        uint8_t prefix_length;
-        std::vector<TileHierarchy *> children;
-    };
-
-    // Create a temporary structure that we use for sorting the prefix tree.
-    std::list<Huffman> huffman;
-    std::transform(array.begin(), array.end(), std::back_inserter(huffman), [parent, &all_children_are_immediate, &max_child_prefix_length](TileHierarchy &item) {
-        uint8_t prefix_length = prefix(item.children, &item);
-
-        if (prefix_length > max_child_prefix_length) {
-            max_child_prefix_length = prefix_length;
+bool ClipIDGenerator::reuseExisting(Leaf &leaf) {
+    for (const std::vector<Leaf> &pool : pools) {
+        auto existing = std::find(pool.begin(), pool.end(), leaf);
+        if (existing != pool.end()) {
+            leaf.tile.clip = existing->tile.clip;
+            return true;
         }
+    }
+    return false;
+}
 
-        if (!parent || item.id.z != parent->id.z + 1) {
-            all_children_are_immediate = false;
-        }
+void ClipIDGenerator::update(std::forward_list<Tile *> tiles) {
+    Pool pool;
 
-        return Huffman { prefix_length + 1, &item };
+    tiles.sort([](const Tile *a, const Tile *b) {
+        return a->id < b->id;
     });
 
-    while (huffman.size() > 1) {
-        huffman.sort([](const Huffman &a, const Huffman &b) {
-            return a.prefix_length < b.prefix_length;
-        });
-
-        Huffman &first = *huffman.begin();
-        Huffman &second = *(++huffman.begin());
-
-        assert(&first != &second);
-
-        // Prefix with 0
-        std::for_each(first.children.begin(), first.children.end(), [](TileHierarchy *child) {
-            child->clip.mask >>= 1;
-            child->clip.mask.set(7, false); // noop
-            child->clip.length++;
-        });
-        first.prefix_length++;
-
-        // Prefix with 1
-        std::for_each(second.children.begin(), second.children.end(), [](TileHierarchy *child) {
-            child->clip.mask >>= 1;
-            child->clip.mask.set(7, true);
-            child->clip.length++;
-        });
-        second.prefix_length++;
-
-        second.children.insert(second.children.end(), first.children.begin(), first.children.end());
-        second.prefix_length = first.prefix_length + second.prefix_length;
-
-        // Remove the first child as we've just merged it into the second version.
-        huffman.erase(huffman.begin());
-    }
-
-    uint8_t prefix_length = 0;
-
-    // Filter out all-zero bits
-    bool filter_zero = !all_children_are_immediate || array.size() != 4;
-
-    for (TileHierarchy &item : array) {
-        if (filter_zero && !item.clip.mask.any()) {
-            // Make sure we don't have a prefix that is all zeros.
-            // item.clip.mask |= (0x80 >> item.length);
-            item.clip.mask.set(7 - item.clip.length);
-            item.clip.length++;
+    const auto end = tiles.end();
+    for (auto it = tiles.begin(); it != end; it++) {
+        if (!*it) {
+            // Handle null pointers.
+            continue;
         }
 
-        if (item.clip.length > prefix_length) {
-            prefix_length = item.clip.length;
+        Tile &tile = **it;
+        Leaf clip { tile };
+
+        // Try to add all remaining ids as children. We sorted the tile list
+        // by z earlier, so all preceding items cannot be children of the current
+        // tile.
+        for (auto child_it = std::next(it); child_it != end; child_it++) {
+            clip.add((*child_it)->id);
+        }
+        clip.children.sort();
+
+        // Loop through all existing pools and try to find a matching ClipID.
+        if (!reuseExisting(clip)) {
+            // We haven't found an existing clip ID
+            pool.push_back(std::move(clip));
         }
     }
 
-    return max_child_prefix_length + prefix_length;
-}
+    if (pool.size()) {
+        const uint32_t bit_count = ceil_log2(pool.size() + 1);
+        const std::bitset<8> mask = uint64_t(((1 << bit_count) - 1) << bit_offset);
 
-void propagate(std::map<Tile::ID, ClipID> &mapping, std::list<TileHierarchy> &array, const ClipID &parent = ClipID{}) {
-    for (auto &item : array) {
-        item.clip.mask >>= parent.length;
-        item.clip.mask |= parent.mask;
-        item.clip.length += parent.length;
-#if defined(DEBUG)
-        auto result = mapping.emplace(item.id, item.clip);
-        assert("Tried to insert a duplicate item" && result.second == true);
-#else
-        mapping.emplace(item.id, item.clip);
-#endif
-        propagate(mapping, item.children, const_cast<const ClipID &>(item.clip));
-    };
-}
-
-void updateClipIDs(const std::list<Tile *> &array) {
-    std::forward_list<Tile::ID> ids;
-    std::transform(array.begin(), array.end(), std::front_inserter(ids), [](Tile *item) {
-        return item->id;
-    });
-
-    const std::map<Tile::ID, ClipID> mapping = computeClipIDs(ids);
-
-    std::for_each(array.begin(), array.end(), [&mapping](Tile *item) {
-        auto it = mapping.find(item->id);
-        if (it != mapping.end()) {
-            item->clip = it->second;
-        } else {
-            item->clip = ClipID {};
+        // We are starting our count with 1 since we need at least 1 bit set to distinguish between
+        // areas without any tiles whatsoever and the current area.
+        uint8_t count = 1;
+        for (Leaf &leaf : pool) {
+            leaf.tile.clip.mask = mask;
+            leaf.tile.clip.reference = count++ << bit_offset;
         }
-    });
-}
 
-std::map<Tile::ID, ClipID> computeClipIDs(std::forward_list<Tile::ID> array) {
-    // Sort by zoom level and make sure that we don't have duplicate elements.
-    array.sort();
-    array.unique();
+        bit_offset += bit_count;
+        pools.push_front(std::move(pool));
+    }
 
-    std::list<TileHierarchy> hierarchy = partition(std::move(array));
-    prefix(hierarchy);
-
-    std::map<Tile::ID, ClipID> mapping;
-    propagate(mapping, hierarchy);
-    return mapping;
+    if (bit_offset > 8) {
+        fprintf(stderr, "stencil mask overflow\n");
+    }
 }
 
 }
