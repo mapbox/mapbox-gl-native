@@ -4,12 +4,13 @@
 #include <memory>
 
 // g++/libstdc++ is missing c++11 codecvt support
-#ifndef __clang__
+#if ! defined(__clang__) || defined(__linux__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #include <boost/locale.hpp>
 #pragma GCC diagnostic pop
 #else
+// Assume that codecvt is present on clang on non-linux systems
 #include <codecvt>
 #include <locale>
 #endif
