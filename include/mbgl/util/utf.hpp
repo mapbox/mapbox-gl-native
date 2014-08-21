@@ -19,7 +19,7 @@ namespace mbgl {
 
 namespace util {
 
-#ifndef __clang__
+#if ! defined(__clang__) || defined(__linux__)
 
 class utf8_to_utf32 {
  public:
