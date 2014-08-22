@@ -16,12 +16,12 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     # build OS X
     #
     make xproj-cli
-    xcodebuild -project ./build/macosx/mapboxgl-app.xcodeproj
+    xcodebuild -project ./build/macosx/mapboxgl-app.xcodeproj -jobs 4
     #
     # build iOS
     #
     git submodule init
     git submodule update
     make iproj-cli
-    xcodebuild -project ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
+    xcodebuild -project ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO -jobs 4
 fi
