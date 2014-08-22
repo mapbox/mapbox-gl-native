@@ -82,32 +82,38 @@ if test -z "${TRAVIS:-}" || ! test -d out/build-cpp11-libcpp-universal; then
 source iPhoneOS.sh
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneOSs.sh
     if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libsqlite3.a ] ; then ./scripts/build_libsqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneOS64.sh
     if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libsqlite3.a ] ; then ./scripts/build_libsqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneSimulator.sh
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneSimulator64.sh
    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+   if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
    echo '     ...done'
 
 source MacOSX.sh
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libglfw3.a ] ; then ./scripts/build_glfw.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -d out/build-cpp11-libcpp-x86_64-macosx/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
@@ -143,6 +149,7 @@ source Linux.sh
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libglfw3.a ] ; then ./scripts/build_glfw.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi

@@ -126,23 +126,36 @@
         '<!@(find src -name "*.glsl")',
         'bin/style.json'
       ],
-      'xcode_settings': {
-        'SDKROOT': 'macosx',
-        'SUPPORTED_PLATFORMS':['macosx'],
-        'MACOSX_DEPLOYMENT_TARGET':'10.9',
-        'PUBLIC_HEADERS_FOLDER_PATH': 'include',
-        'OTHER_CPLUSPLUSFLAGS':[
-          '<@(png_cflags)',
-          '<@(uv_cflags)',
-          '-I<(boost_root)/include',
-        ]
-      },
       'include_dirs':[
-          './include'
+        './include'
       ],
-      'cflags': [
-          '<@(png_cflags)',
-          '-I<(boost_root)/include',
+      'conditions': [
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'SDKROOT': 'macosx',
+            'SUPPORTED_PLATFORMS':['macosx'],
+            'MACOSX_DEPLOYMENT_TARGET':'10.9',
+            'PUBLIC_HEADERS_FOLDER_PATH': 'include',
+            'OTHER_CPLUSPLUSFLAGS':[
+              '<@(png_cflags)',
+              '<@(uv_cflags)',
+              '<@(sqlite3_cflags)',
+              '-I<(boost_root)/include',
+            ],
+            'OTHER_LDFLAGS': [
+              '<(sqlite3_libraries)',
+            ],
+          },
+        }, {
+          'cflags': [
+            '<@(png_cflags)',
+            '<@(sqlite3_cflags)',
+            '-I<(boost_root)/include',
+          ],
+          'libraries': [
+            '<@(sqlite3_libraries)',
+          ],
+        }]
       ],
       'direct_dependent_settings': {
           'include_dirs':[
@@ -205,8 +218,12 @@
         'OTHER_CPLUSPLUSFLAGS':[
           '<@(png_cflags)',
           '<@(uv_cflags)',
+          '<@(sqlite3_cflags)',
           '-I<(boost_root)/include',
-        ]
+        ],
+        'OTHER_LDFLAGS': [
+          '<@(sqlite3_libraries)',
+        ],
       },
       'include_dirs':[
           './include'
@@ -214,7 +231,11 @@
       'cflags': [
           '<@(png_cflags)',
           '<@(uv_cflags)',
+          '<@(sqlite3_cflags)',
           '-I<(boost_root)/include',
+      ],
+      'libraries': [
+        '<@(sqlite3_libraries)',
       ],
       'direct_dependent_settings': {
           'include_dirs':[

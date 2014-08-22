@@ -29,6 +29,7 @@ enum class Event : uint8_t {
     ParseStyle,
     ParseTile,
     Render,
+    Database,
     HttpRequest,
     Sprite,
 };
@@ -40,6 +41,7 @@ MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
     { Event::ParseStyle, "ParseStyle" },
     { Event::ParseTile, "ParseTile" },
     { Event::Render, "Render" },
+    { Event::Database, "Database" },
     { Event::HttpRequest, "HttpRequest" },
     { Event::Sprite, "Sprite" },
     { Event(-1), "Unknown" },
