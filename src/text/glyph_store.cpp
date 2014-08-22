@@ -4,6 +4,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/utf.hpp>
 #include <mbgl/util/pbf.hpp>
+#include <mbgl/util/url.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
@@ -141,13 +142,10 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, Gl
 {
     // Load the glyph set URL
     std::string url = util::replaceTokens(glyphURL, [&](const std::string &name) -> std::string {
-        if (name == "fontstack") return fontStack;
+        if (name == "fontstack") return util::percentEncode(fontStack);
         if (name == "range") return std::to_string(glyphRange.first) + "-" + std::to_string(glyphRange.second);
         return "";
     });
-
-    // TODO: Find more reliable URL normalization function
-    std::replace(url.begin(), url.end(), ' ', '+');
 
 #if defined(DEBUG)
     fprintf(stderr, "%s\n", url.c_str());

@@ -9,6 +9,7 @@
 #include <mbgl/util/filesource.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/mapbox.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/platform/log.hpp>
@@ -23,21 +24,6 @@ Source::Source(SourceInfo& info)
 {
 }
 
-std::string normalizeURL(const std::string& url, const std::string& access_token) {
-    const std::string t = "mapbox://";
-
-    if (url.compare(0, t.length(), t) != 0)
-        return url;
-
-    if (access_token.empty())
-        throw std::runtime_error("You must provide a Mapbox API access token for Mapbox tile sources");
-
-    return std::string("https://api.tiles.mapbox.com/v4/")
-        + url.substr(t.length())
-        + ".json?access_token="
-        + access_token;
-}
-
 // Note: This is a separate function that must be called exactly once after creation
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
@@ -47,7 +33,7 @@ void Source::load(Map& map) {
         return;
     }
 
-    std::string url = normalizeURL(info.url, map.getAccessToken());
+    std::string url = util::mapbox::normalizeSourceURL(info.url, map.getAccessToken());
     std::shared_ptr<Source> source = shared_from_this();
 
     map.getFileSource()->load(ResourceType::JSON, url, [source, &map](platform::Response *res) {
