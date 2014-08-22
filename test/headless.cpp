@@ -47,7 +47,7 @@ TEST_P(HeadlessTest, render) {
         ResolveLocalURL(styleDoc["sprite"], styleDoc);
     }
 
-    ResolveLocalURL(styleDoc["sources"]["mapbox"]["url"], styleDoc);
+    ResolveLocalURL(styleDoc["sources"]["mapbox"]["tiles"][rapidjson::SizeType(0)], styleDoc);
 
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
