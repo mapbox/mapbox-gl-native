@@ -20,7 +20,8 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     #
     # build iOS
     #
-    git clone --depth 1 https://github.com/mapbox/mapbox-gl-cocoa ios/mapbox-gl-cocoa
+    git submodule init
+    git submodule update
     make iproj-cli
     xcodebuild -project ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
 fi
