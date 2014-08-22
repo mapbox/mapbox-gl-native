@@ -315,7 +315,7 @@ void async_add_cb(uv_async_t * /*async*/) {
         curl_easy_setopt(handle, CURLOPT_URL, (*req)->url.c_str());
         curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
         curl_easy_setopt(handle, CURLOPT_WRITEDATA, &(*req)->res->body);
-        curl_easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "deflate");
+        curl_easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "gzip, deflate");
         curl_easy_setopt(handle, CURLOPT_SHARE, curl_share);
         curl_multi_add_handle(curl_multi, handle);
     }
