@@ -26,7 +26,13 @@ FileSource::~FileSource() {
 void FileSource::createSchema() {
     if (db) {
         // Create schema
-        const int err = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS `http_cache` (`url` TEXT PRIMARY KEY, `expires` INTEGER, `data` BLOB)", nullptr, nullptr, nullptr);
+        const int err = sqlite3_exec(db,
+            "CREATE TABLE IF NOT EXISTS `http_cache` ("
+                "`url` TEXT PRIMARY KEY NOT NULL,"
+                "`code` INTEGER NOT NULL,"
+                "`expires` INTEGER,"
+                "`data` BLOB"
+            ")", nullptr, nullptr, nullptr);
         if (err != SQLITE_OK) {
             Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
             closeDatabase();
@@ -75,7 +81,7 @@ bool FileSource::loadFile(const std::string &url, std::function<void(platform::R
     sqlite3_stmt *stmt = nullptr;
     int err;
 
-    err = sqlite3_prepare_v2(db, "SELECT `data` FROM `http_cache` WHERE `url` = ?", -1, &stmt, nullptr);
+    err = sqlite3_prepare_v2(db, "SELECT `code`, `data` FROM `http_cache` WHERE `url` = ?", -1, &stmt, nullptr);
     if (err != SQLITE_OK) {
         Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
         return false;
@@ -97,9 +103,9 @@ bool FileSource::loadFile(const std::string &url, std::function<void(platform::R
     if (err == SQLITE_ROW) {
         // There is data.
         platform::Response res(callback);
-        res.code = 200;
-        const char *data = reinterpret_cast<const char *>(sqlite3_column_blob(stmt, 0));
-        const size_t size = sqlite3_column_bytes(stmt, 0);
+        res.code = sqlite3_column_int(stmt, 0);
+        const char *data = reinterpret_cast<const char *>(sqlite3_column_blob(stmt, 1));
+        const size_t size = sqlite3_column_bytes(stmt, 1);
         res.body = { data, size };
         callback(&res);
         status = true;
@@ -126,7 +132,7 @@ void FileSource::saveFile(const std::string &url, platform::Response *const res)
     sqlite3_stmt *stmt = nullptr;
     int err;
 
-    err = sqlite3_prepare_v2(db, "REPLACE INTO `http_cache` (`url`, `data`) VALUES(?, ?)", -1, &stmt, nullptr);
+    err = sqlite3_prepare_v2(db, "REPLACE INTO `http_cache` (`url`, `code`, `data`) VALUES(?, ?, ?)", -1, &stmt, nullptr);
     if (err != SQLITE_OK) {
         Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
         return;
@@ -142,7 +148,17 @@ void FileSource::saveFile(const std::string &url, platform::Response *const res)
         return;
     }
 
-    err = sqlite3_bind_blob(stmt, 2, res->body.data(), res->body.size(), nullptr);
+    err = sqlite3_bind_int(stmt, 2, res->code);
+    if (err != SQLITE_OK) {
+        Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
+        err = sqlite3_finalize(stmt);
+        if (err != SQLITE_OK) {
+            Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
+        }
+        return;
+    }
+
+    err = sqlite3_bind_blob(stmt, 3, res->body.data(), res->body.size(), nullptr);
     if (err != SQLITE_OK) {
         Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
         err = sqlite3_finalize(stmt);
@@ -205,9 +221,7 @@ void FileSource::load(ResourceType /*type*/, const std::string &url, std::functi
         if (!loadFile(cleanURL, callback)) {
             const std::shared_ptr<FileSource> source = shared_from_this();
             platform::request_http(absoluteURL, [=](platform::Response *res) {
-                if (res->code == 200) {
-                    source->saveFile(cleanURL, res);
-                }
+                source->saveFile(cleanURL, res);
                 callback(res);
             }, loop);
         }
