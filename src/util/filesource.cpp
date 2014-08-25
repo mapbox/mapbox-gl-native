@@ -48,7 +48,9 @@ void FileSource::createSchema() {
 void FileSource::closeDatabase() {
     if (db) {
         const int err = sqlite3_close_v2(db);
-        Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
+        if (err != SQLITE_OK) {
+            Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
+        }
         db = nullptr;
     }
 }
