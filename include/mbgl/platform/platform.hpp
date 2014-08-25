@@ -1,24 +1,17 @@
 #ifndef MBGL_PLATFORM_PLATFORM
 #define MBGL_PLATFORM_PLATFORM
 
+#include <mbgl/platform/response.hpp>
+
 #include <mbgl/util/uv.hpp>
 
 #include <memory>
-#include <functional>
 #include <string>
 
 namespace mbgl {
 namespace platform {
 
 class Request;
-
-struct Response {
-    Response(std::function<void(Response *)> callback) : callback(callback) {}
-    int16_t code = -1;
-    std::string body;
-    std::string error_message;
-    std::function<void(Response *)> callback;
-};
 
 // Makes an HTTP request of a URL, preferrably on a background thread, and calls a function with the
 // results in the original thread (which runs the libuv loop).

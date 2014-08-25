@@ -286,6 +286,35 @@ size_t curl_write_cb(void *contents, size_t size, size_t nmemb, void *userp) {
     return size * nmemb;
 }
 
+// Compares the beginning of the (non-zero-terminated!) data buffer with the (zero-terminated!)
+// header string. If the data buffer contains the header string at the beginning, it returns
+// the length of the header string == begin of the value, otherwise it returns npos.
+// The comparison of the header is ASCII-case-insensitive.
+size_t header_matches(const char *header, const char *buffer, size_t length) {
+    const size_t header_length = strlen(header);
+    if (length < header_length) return std::string::npos;
+    size_t i = 0;
+    while (i < length && i < header_length && std::tolower(buffer[i]) == header[i]) {
+        i++;
+    }
+    return i == header_length ? i : std::string::npos;
+}
+
+size_t curl_header_cb(char *buffer, size_t size, size_t nmemb, void *userp) {
+    const size_t length = size * nmemb;
+
+    size_t begin = std::string::npos;
+    if ((begin = header_matches("last-modified: ", buffer, length)) != std::string::npos) {
+        const std::string value { buffer + begin, length - begin - 2 /* remove \r\n */ };
+        static_cast<Response *>(userp)->setLastModified(value.c_str());
+    } else if ((begin = header_matches("cache-control: ", buffer, length)) != std::string::npos) {
+        const std::string value { buffer + begin, length - begin - 2 /* remove \r\n */ };
+        static_cast<Response *>(userp)->setCacheControl(value.c_str());
+    }
+
+    return length;
+}
+
 // This callback is called in the request event loop (on the request thread).
 // It initializes newly queued up download requests and adds them to the CURL
 // multi handle.
@@ -315,6 +344,8 @@ void async_add_cb(uv_async_t * /*async*/) {
         curl_easy_setopt(handle, CURLOPT_URL, (*req)->url.c_str());
         curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
         curl_easy_setopt(handle, CURLOPT_WRITEDATA, &(*req)->res->body);
+        curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, curl_header_cb);
+        curl_easy_setopt(handle, CURLOPT_HEADERDATA, (*req)->res.get());
         curl_easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "gzip, deflate");
         curl_easy_setopt(handle, CURLOPT_SHARE, curl_share);
         curl_multi_add_handle(curl_multi, handle);

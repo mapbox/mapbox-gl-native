@@ -32,6 +32,7 @@ void FileSource::createSchema() {
                 "`url` TEXT PRIMARY KEY NOT NULL,"
                 "`code` INTEGER NOT NULL,"
                 "`type` INTEGER NOT NULL,"
+                "`modified` INTEGER,"
                 "`expires` INTEGER,"
                 "`data` BLOB,"
                 "`compressed` INTEGER NOT NULL DEFAULT 0"
@@ -143,7 +144,7 @@ void FileSource::saveFile(ResourceType type, const std::string &url, platform::R
     sqlite3_stmt *stmt = nullptr;
     int err;
 
-    err = sqlite3_prepare_v2(db, "REPLACE INTO `http_cache` (`url`, `code`, `type`, `data`, `compressed`) VALUES(?, ?, ?, ?, ?)", -1, &stmt, nullptr);
+    err = sqlite3_prepare_v2(db, "REPLACE INTO `http_cache` (`url`, `code`, `type`, `modified`, `expires`, `data`, `compressed`) VALUES(?, ?, ?, ?, ?, ?, ?)", -1, &stmt, nullptr);
     if (err != SQLITE_OK) {
         Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
         return;
@@ -179,15 +180,35 @@ void FileSource::saveFile(ResourceType type, const std::string &url, platform::R
         return;
     }
 
+    err = sqlite3_bind_int(stmt, 4, res->modified);
+    if (err != SQLITE_OK) {
+        Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
+        err = sqlite3_finalize(stmt);
+        if (err != SQLITE_OK) {
+            Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
+        }
+        return;
+    }
+
+    err = sqlite3_bind_int(stmt, 5, res->expires);
+    if (err != SQLITE_OK) {
+        Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
+        err = sqlite3_finalize(stmt);
+        if (err != SQLITE_OK) {
+            Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
+        }
+        return;
+    }
+
     bool compressed = false;
     switch (type) {
         case ResourceType::Image:
-            err = sqlite3_bind_blob(stmt, 4, res->body.data(), res->body.size(), SQLITE_STATIC);
+            err = sqlite3_bind_blob(stmt, 6, res->body.data(), res->body.size(), SQLITE_STATIC);
             break;
         default:
             const std::string *data = new std::string(std::move(util::compress(res->body)));
             compressed = true;
-            err = sqlite3_bind_blob(stmt, 4, data->data(), data->size(), [](void *p) { delete (std::string *)p; });
+            err = sqlite3_bind_blob(stmt, 6, data->data(), data->size(), [](void *p) { delete (std::string *)p; });
             break;
     }
     if (err != SQLITE_OK) {
@@ -199,7 +220,7 @@ void FileSource::saveFile(ResourceType type, const std::string &url, platform::R
         return;
     }
 
-    err = sqlite3_bind_int(stmt, 5, compressed);
+    err = sqlite3_bind_int(stmt, 7, compressed);
     if (err != SQLITE_OK) {
         Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
         err = sqlite3_finalize(stmt);

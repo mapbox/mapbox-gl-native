@@ -91,8 +91,12 @@ mbgl::platform::request_http(const std::string &url,
         }
 
         if (!error && [response isKindOfClass:[NSHTTPURLResponse class]]) {
+            NSDictionary *headers = [(NSHTTPURLResponse *)response allHeaderFields];
             (*req_ptr)->res->code = [(NSHTTPURLResponse *)response statusCode];
             (*req_ptr)->res->body = {(const char *)[data bytes], [data length]};
+            (*req_ptr)->res->setCacheControl([[headers objectForKey:@"Cache-Control"] UTF8String]);
+            (*req_ptr)->res->setLastModified([[headers objectForKey:@"Last-Modified"] UTF8String]);
+
         } else {
             (*req_ptr)->res->error_message = [[error localizedDescription] UTF8String];
         }
