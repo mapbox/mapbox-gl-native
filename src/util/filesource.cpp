@@ -50,6 +50,23 @@ const std::string &FileSource::getBase() const {
     return base;
 }
 
+std::string removeAccessTokenFromURL(const std::string &url) {
+    const size_t token_start = url.find("access_token=");
+    // Ensure that token exists, isn't at the front and is preceded by either & or ?.
+    if (token_start == std::string::npos || token_start == 0 || !(url[token_start - 1] == '&' || url[token_start - 1] == '?')) {
+        return url;
+    }
+
+    const size_t token_end = url.find_first_of('&', token_start);
+    if (token_end == std::string::npos) {
+        // The token is the last query argument. We slice away the "&access_token=..." part
+        return url.substr(0, token_start - 1);
+    } else {
+        // We slice away the "access_token=...&" part.
+        return url.substr(0, token_start) + url.substr(token_end + 1);
+    }
+}
+
 bool FileSource::loadFile(const std::string &url, std::function<void(platform::Response *)> callback) {
     if (!db) {
         return false;
@@ -181,12 +198,15 @@ void FileSource::load(ResourceType /*type*/, const std::string &url, std::functi
 
         callback(&response);
     } else {
+        // Don't use the access token when storing/retrieving URLs from the database
+        const std::string cleanURL = removeAccessTokenFromURL(url);
+
         // load from the internet
-        if (!loadFile(absoluteURL, callback)) {
+        if (!loadFile(cleanURL, callback)) {
             const std::shared_ptr<FileSource> source = shared_from_this();
             platform::request_http(absoluteURL, [=](platform::Response *res) {
                 if (res->code == 200) {
-                    source->saveFile(absoluteURL, res);
+                    source->saveFile(cleanURL, res);
                 }
                 callback(res);
             }, loop);
