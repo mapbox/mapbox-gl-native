@@ -2,6 +2,9 @@
 
 #include <zlib.h>
 
+#include <cstring>
+#include <stdexcept>
+
 namespace mbgl {
 namespace util {
 
