@@ -114,7 +114,7 @@ source MacOSX.sh
 
 if [[ $TRAVIS_PULL_REQUEST = "false" ]]; then
     tar -zcf out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz out/build-cpp11-libcpp-universal
-    aws s3 cp out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz s3://mapbox-gl-testing/dependencies/
+    aws s3 cp --acl public-read out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz s3://mapbox-gl-testing/dependencies/
 fi
 
 fi
@@ -146,7 +146,7 @@ source Linux.sh
 if [[ $TRAVIS_PULL_REQUEST = "false" ]]; then
     if ! tar --compare -zf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ; then
         tar -zcf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz out/build-cpp11-libstdcpp-gcc-x86_64-linux
-        aws s3 cp out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz s3://mapbox-gl-testing/dependencies/
+        aws s3 cp --acl public-read out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz s3://mapbox-gl-testing/dependencies/
     fi
 fi
 
