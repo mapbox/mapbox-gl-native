@@ -18,11 +18,11 @@ struct Response;
 }
 
 enum class ResourceType : uint8_t {
-    Unknown,
-    Tile,
-    Glyphs,
-    Image,
-    JSON
+    Unknown = 0,
+    Tile = 1,
+    Glyphs = 2,
+    Image = 3,
+    JSON = 4
 };
 
 class FileSource : private util::noncopyable, public std::enable_shared_from_this<FileSource> {
@@ -38,8 +38,8 @@ public:
 private:
     void closeDatabase();
     void createSchema();
-    bool loadFile(const std::string &url, std::function<void(platform::Response *)> callback);
-    void saveFile(const std::string &url, platform::Response *res);
+    bool loadFile(ResourceType type, const std::string &url, std::function<void(platform::Response *)> callback);
+    void saveFile(ResourceType type, const std::string &url, platform::Response *res);
 
 private:
     // Stores a URL that is used as a base for loading resources with relative path.

@@ -1,6 +1,7 @@
 #include <mbgl/util/filesource.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/compression.hpp>
 
 #include <sqlite3.h>
 
@@ -30,9 +31,12 @@ void FileSource::createSchema() {
             "CREATE TABLE IF NOT EXISTS `http_cache` ("
                 "`url` TEXT PRIMARY KEY NOT NULL,"
                 "`code` INTEGER NOT NULL,"
+                "`type` INTEGER NOT NULL,"
                 "`expires` INTEGER,"
-                "`data` BLOB"
-            ")", nullptr, nullptr, nullptr);
+                "`data` BLOB,"
+                "`compressed` INTEGER NOT NULL DEFAULT 0"
+            ");"
+            "CREATE INDEX IF NOT EXISTS `http_cache_type_idx` ON `http_cache` (`type`);", nullptr, nullptr, nullptr);
         if (err != SQLITE_OK) {
             Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
             closeDatabase();
@@ -73,7 +77,7 @@ std::string removeAccessTokenFromURL(const std::string &url) {
     }
 }
 
-bool FileSource::loadFile(const std::string &url, std::function<void(platform::Response *)> callback) {
+bool FileSource::loadFile(ResourceType /*type*/, const std::string &url, std::function<void(platform::Response *)> callback) {
     if (!db) {
         return false;
     }
@@ -81,7 +85,7 @@ bool FileSource::loadFile(const std::string &url, std::function<void(platform::R
     sqlite3_stmt *stmt = nullptr;
     int err;
 
-    err = sqlite3_prepare_v2(db, "SELECT `code`, `data` FROM `http_cache` WHERE `url` = ?", -1, &stmt, nullptr);
+    err = sqlite3_prepare_v2(db, "SELECT `code`, `data`, `compressed` FROM `http_cache` WHERE `url` = ?", -1, &stmt, nullptr);
     if (err != SQLITE_OK) {
         Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
         return false;
@@ -106,7 +110,14 @@ bool FileSource::loadFile(const std::string &url, std::function<void(platform::R
         res.code = sqlite3_column_int(stmt, 0);
         const char *data = reinterpret_cast<const char *>(sqlite3_column_blob(stmt, 1));
         const size_t size = sqlite3_column_bytes(stmt, 1);
-        res.body = { data, size };
+        const bool compressed = sqlite3_column_int(stmt, 2);
+
+        if (compressed) {
+            res.body = util::decompress({ data, size });
+        } else {
+            res.body = { data, size };
+        }
+
         callback(&res);
         status = true;
     } else if (err == SQLITE_DONE) {
@@ -124,7 +135,7 @@ bool FileSource::loadFile(const std::string &url, std::function<void(platform::R
     return status;
 }
 
-void FileSource::saveFile(const std::string &url, platform::Response *const res) {
+void FileSource::saveFile(ResourceType type, const std::string &url, platform::Response *const res) {
     if (!db) {
         return;
     }
@@ -132,7 +143,7 @@ void FileSource::saveFile(const std::string &url, platform::Response *const res)
     sqlite3_stmt *stmt = nullptr;
     int err;
 
-    err = sqlite3_prepare_v2(db, "REPLACE INTO `http_cache` (`url`, `code`, `data`) VALUES(?, ?, ?)", -1, &stmt, nullptr);
+    err = sqlite3_prepare_v2(db, "REPLACE INTO `http_cache` (`url`, `code`, `type`, `data`, `compressed`) VALUES(?, ?, ?, ?, ?)", -1, &stmt, nullptr);
     if (err != SQLITE_OK) {
         Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
         return;
@@ -158,7 +169,37 @@ void FileSource::saveFile(const std::string &url, platform::Response *const res)
         return;
     }
 
-    err = sqlite3_bind_blob(stmt, 3, res->body.data(), res->body.size(), nullptr);
+    err = sqlite3_bind_int(stmt, 3, int(type));
+    if (err != SQLITE_OK) {
+        Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
+        err = sqlite3_finalize(stmt);
+        if (err != SQLITE_OK) {
+            Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
+        }
+        return;
+    }
+
+    bool compressed = false;
+    switch (type) {
+        case ResourceType::Image:
+            err = sqlite3_bind_blob(stmt, 4, res->body.data(), res->body.size(), SQLITE_STATIC);
+            break;
+        default:
+            const std::string *data = new std::string(std::move(util::compress(res->body)));
+            compressed = true;
+            err = sqlite3_bind_blob(stmt, 4, data->data(), data->size(), [](void *p) { delete (std::string *)p; });
+            break;
+    }
+    if (err != SQLITE_OK) {
+        Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
+        err = sqlite3_finalize(stmt);
+        if (err != SQLITE_OK) {
+            Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
+        }
+        return;
+    }
+
+    err = sqlite3_bind_int(stmt, 5, compressed);
     if (err != SQLITE_OK) {
         Log::Warning(Event::Database, "%s: %s", sqlite3_errstr(err), sqlite3_errmsg(db));
         err = sqlite3_finalize(stmt);
@@ -181,7 +222,7 @@ void FileSource::saveFile(const std::string &url, platform::Response *const res)
 }
 
 
-void FileSource::load(ResourceType /*type*/, const std::string &url, std::function<void(platform::Response *)> callback, const std::shared_ptr<uv::loop> loop) {
+void FileSource::load(ResourceType type, const std::string &url, std::function<void(platform::Response *)> callback, const std::shared_ptr<uv::loop> loop) {
     // convert relative URLs to absolute URLs
 
     const std::string absoluteURL = [&]() -> std::string {
@@ -218,10 +259,10 @@ void FileSource::load(ResourceType /*type*/, const std::string &url, std::functi
         const std::string cleanURL = removeAccessTokenFromURL(url);
 
         // load from the internet
-        if (!loadFile(cleanURL, callback)) {
+        if (!loadFile(type, cleanURL, callback)) {
             const std::shared_ptr<FileSource> source = shared_from_this();
             platform::request_http(absoluteURL, [=](platform::Response *res) {
-                source->saveFile(cleanURL, res);
+                source->saveFile(type, cleanURL, res);
                 callback(res);
             }, loop);
         }
