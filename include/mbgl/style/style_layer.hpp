@@ -51,6 +51,7 @@ private:
     // aplied classes in order.
     template <typename T> void applyStyleProperties(float z, timestamp now);
     template <typename T> void applyStyleProperty(PropertyKey key, T &, float z, timestamp now);
+    template <typename T> void applyTransitionedStyleProperty(PropertyKey key, T &, float z, timestamp now);
 
     // Removes all expired style transitions.
     void cleanupAppliedStyleProperties(timestamp now);

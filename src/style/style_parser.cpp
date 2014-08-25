@@ -1,3 +1,4 @@
+#include <mbgl/style/style_source.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/util/constants.hpp>
@@ -175,21 +176,14 @@ void StyleParser::parseSources(JSVal value) {
         rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
         for (; itr != value.MemberEnd(); ++itr) {
             std::string name { itr->name.GetString(), itr->name.GetStringLength() };
-            SourceType type = SourceType::Vector;
-            std::string url;
-            uint16_t tile_size = 512;
-            int32_t min_zoom = 0;
-            int32_t max_zoom = 22;
+            SourceInfo info;
 
-            parseRenderProperty<SourceTypeClass>(itr->value, type, "type");
-            parseRenderProperty(itr->value, url, "url");
-            if (type == SourceType::Raster) {
-                parseRenderProperty(itr->value, tile_size, "tileSize");
-            }
-            parseRenderProperty(itr->value, min_zoom, "minZoom");
-            parseRenderProperty(itr->value, max_zoom, "maxZoom");
+            parseRenderProperty<SourceTypeClass>(itr->value, info.type, "type");
+            parseRenderProperty(itr->value, info.url, "url");
+            parseRenderProperty(itr->value, info.tile_size, "tileSize");
+            info.parseTileJSONProperties(itr->value);
 
-            sources.emplace(std::move(name), std::make_shared<StyleSource>(SourceInfo { type, url, tile_size, min_zoom, max_zoom }));
+            sources.emplace(std::move(name), std::make_shared<StyleSource>(info));
         }
     } else {
         Log::Warning(Event::ParseStyle, "sources must be an object");

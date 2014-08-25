@@ -57,11 +57,6 @@ inline T angle_to(const vec2<S>& a, const vec2<S>& b) {
     return std::atan2(a.y - b.y, a.x - b.x);
 }
 
-template <typename T, typename S1, typename S2>
-inline T interp(S1 a, S2 b, T t) {
-    return (a * ((T)1 - t)) + (b * t);
-}
-
 // Reflect an angle around 0 degrees
 template <typename T>
 inline std::array<T, 2> flip(const std::array<T, 2>& c) {

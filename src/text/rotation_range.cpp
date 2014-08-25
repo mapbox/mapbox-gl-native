@@ -1,5 +1,7 @@
 #include <mbgl/text/rotation_range.hpp>
 
+#include <mbgl/util/interpolate.hpp>
+
 #include <cassert>
 #include <algorithm>
 
@@ -117,8 +119,8 @@ rotatingRotatingCollisions(const CollisionRect &a, const CollisionRect &b,
 
 double getAngle(const CollisionPoint &p1, const CollisionPoint &p2,
                 CollisionAngle d, const CollisionPoint &corner) {
-    return std::fmod(util::angle_between(util::interp(p1.x, p2.x, d),
-                                    util::interp(p1.y, p2.y, d), corner.x,
+    return std::fmod(util::angle_between(util::interpolate(p1.x, p2.x, d),
+                                    util::interpolate(p1.y, p2.y, d), corner.x,
                                     corner.y) +
                     2 * M_PI,
                 2 * M_PI);

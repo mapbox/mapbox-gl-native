@@ -13,7 +13,7 @@
 
 using namespace mbgl;
 
-SpritePosition::SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t pixelRatio)
+SpritePosition::SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t height, float pixelRatio)
     : x(x),
       y(y),
       width(width),
@@ -122,7 +122,7 @@ void Sprite::parseJSON() {
                 uint16_t y = 0;
                 uint16_t width = 0;
                 uint16_t height = 0;
-                uint8_t pixelRatio = 1;
+                float pixelRatio = 1.0f;
 
                 if (value.HasMember("x")) x = value["x"].GetInt();
                 if (value.HasMember("y")) y = value["y"].GetInt();

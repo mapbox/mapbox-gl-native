@@ -1,6 +1,6 @@
-#include <mbgl/geometry/interpolate.hpp>
+#include <mbgl/geometry/resample.hpp>
 
-#include <mbgl/util/math.hpp>
+#include <mbgl/util/interpolate.hpp>
 
 #include <cmath>
 
@@ -15,9 +15,9 @@ const std::array<std::vector<float>, 4> minScaleArrays = {{
 }};
 
 
-Anchors interpolate(const std::vector<Coordinate> &vertices, float spacing,
-                    const float /*minScale*/, float maxScale, const float tilePixelRatio,
-                    const int start) {
+Anchors resample(const std::vector<Coordinate> &vertices, float spacing,
+                 const float /*minScale*/, float maxScale, const float tilePixelRatio,
+                 const int start) {
 
     maxScale = std::round(std::fmax(std::fmin(8.0f, maxScale / 2.0f), 1.0f));
     spacing *= tilePixelRatio / maxScale;
@@ -43,7 +43,8 @@ Anchors interpolate(const std::vector<Coordinate> &vertices, float spacing,
             markedDistance += spacing;
 
             float t = (markedDistance - distance) / segmentDist,
-                  x = util::interp(a.x, b.x, t), y = util::interp(a.y, b.y, t),
+                  x = util::interpolate(a.x, b.x, t),
+                  y = util::interpolate(a.y, b.y, t),
                   s = minScales[added % len];
 
             if (x >= 0 && x < 4096 && y >= 0 && y < 4096) {

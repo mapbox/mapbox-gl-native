@@ -11,6 +11,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/mapbox.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
@@ -211,7 +212,7 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     sprite.reset();
     style->loadJSON((const uint8_t *)styleJSON.c_str());
     fileSource->setBase(base);
-    glyphStore->setURL(style->glyph_url);
+    glyphStore->setURL(util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken()));
     update();
 }
 
@@ -469,7 +470,8 @@ void Map::updateSources() {
     for (const std::shared_ptr<StyleSource> &style_source : activeSources) {
         if (style_source->enabled) {
             if (!style_source->source) {
-                style_source->source = std::make_shared<Source>(style_source->info, getAccessToken());
+                style_source->source = std::make_shared<Source>(style_source->info);
+                style_source->source->load(*this);
             }
         } else {
             style_source->source.reset();
