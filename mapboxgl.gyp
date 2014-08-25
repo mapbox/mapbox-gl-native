@@ -143,9 +143,6 @@
               '<@(sqlite3_cflags)',
               '-I<(boost_root)/include',
             ],
-            'OTHER_LDFLAGS': [
-              '<(sqlite3_libraries)',
-            ],
           },
         }, {
           'cflags': [
@@ -153,9 +150,6 @@
             '<@(curl_cflags)',
             '<@(sqlite3_cflags)',
             '-I<(boost_root)/include',
-          ],
-          'libraries': [
-            '<@(sqlite3_libraries)',
           ],
         }]
       ],
@@ -180,6 +174,7 @@
                     '<@(png_libraries)',
                     '<@(uv_libraries)',
                     '<@(curl_libraries)',
+                    '<@(sqlite3_libraries)',
                 ]
               }
             }, {
@@ -187,6 +182,7 @@
                 '<@(png_libraries)',
                 '<@(uv_libraries)',
                 '<@(curl_libraries)',
+                '<@(sqlite3_libraries)',
               ]
             }]
           ]
