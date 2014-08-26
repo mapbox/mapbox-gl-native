@@ -216,7 +216,7 @@ int handle_socket(CURL * /*easy*/, curl_socket_t s, int action, void * /*userp*/
     return 0;
 }
 
-void on_timeout(uv_timer_t * /*req*/) {
+void on_timeout(uv_timer_t *, int status /*req*/) {
     int running_handles;
     CURLMcode error =
         curl_multi_socket_action(curl_multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
@@ -227,9 +227,9 @@ void on_timeout(uv_timer_t * /*req*/) {
 
 void start_timeout(CURLM * /*multi*/, long timeout_ms, void * /*userp*/) {
     if (timeout_ms <= 0) {
-        on_timeout(&timeout);
+        on_timeout(&timeout, -1);
     } else {
-        uv_timer_start(&timeout, on_timeout, timeout_ms, 0);
+        uv_timer_start(&timeout, &on_timeout, timeout_ms, 0);
     }
 }
 
@@ -289,7 +289,7 @@ size_t curl_write_cb(void *contents, size_t size, size_t nmemb, void *userp) {
 // This callback is called in the request event loop (on the request thread).
 // It initializes newly queued up download requests and adds them to the CURL
 // multi handle.
-void async_add_cb(uv_async_t * /*async*/) {
+void async_add_cb(uv_async_t *, int status /*async*/) {
     std::shared_ptr<Request> *req = nullptr;
     while (add_queue.pop(req)) {
         // Make sure that we're not starting requests that have been cancelled
@@ -321,7 +321,7 @@ void async_add_cb(uv_async_t * /*async*/) {
     }
 }
 
-void async_cancel_cb(uv_async_t * /*async*/) {
+void async_cancel_cb(uv_async_t *, int status /*async*/) {
     std::shared_ptr<Request> *req = nullptr;
     while (cancel_queue.pop(req)) {
         // It is possible that the request has not yet been started, but that it already has been
@@ -343,8 +343,8 @@ void thread_init_cb() {
     curl_global_init(CURL_GLOBAL_ALL);
 
     loop = uv_loop_new();
-    uv_async_init(loop, &async_add, async_add_cb);
-    uv_async_init(loop, &async_cancel, async_cancel_cb);
+    uv_async_init(loop, &async_add, &async_add_cb);
+    uv_async_init(loop, &async_cancel, &async_cancel_cb);
     uv_thread_create(&thread, thread_init, nullptr);
 }
 } // end namespace request
