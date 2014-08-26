@@ -16,12 +16,12 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     # some limited coverage
     if [[ ${BUILDTYPE} == "Debug" ]]; then
         if [[ ${CXX} == "g++" ]]; then
-            export CXXFLAGS="-fsanitize=address ${CXXFLAGS}"
-            export CFLAGS="-fsanitize=address ${CFLAGS}"
+            export CXXFLAGS="-fsanitize=address -g ${CXXFLAGS}"
+            export CFLAGS="-fsanitize=address -g ${CFLAGS}"
             export LDFLAGS="-fsanitize=address  ${LDFLAGS}"
         elif [[ ${CXX} == "clang++" ]]; then
-            export CXXFLAGS="-fsanitize=thread -fPIC ${CXXFLAGS}"
-            export CFLAGS="-fsanitize=thread ${CFLAGS}"
+            export CXXFLAGS="-fsanitize=thread -g -fPIC ${CXXFLAGS}"
+            export CFLAGS="-fsanitize=thread -g ${CFLAGS}"
             export LDFLAGS="-fsanitize=thread -pie ${LDFLAGS}"
         fi
     fi
