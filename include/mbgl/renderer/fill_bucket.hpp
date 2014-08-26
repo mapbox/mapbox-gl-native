@@ -34,8 +34,9 @@ class FillBucket : public Bucket {
     static void *realloc(void *data, void *ptr, unsigned int size);
     static void free(void *userData, void *ptr);
 
-    typedef ElementGroup<2> triangle_group_type;
-    typedef ElementGroup<1> line_group_type;
+    typedef std::unique_ptr<ElementGroup<2>> triangle_group_type;
+    typedef std::unique_ptr<ElementGroup<1>> line_group_type;
+
 public:
     FillBucket(FillVertexBuffer& vertexBuffer,
                TriangleElementsBuffer& triangleElementsBuffer,

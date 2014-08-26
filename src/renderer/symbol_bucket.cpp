@@ -16,6 +16,7 @@
 #include <mbgl/util/utf.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/util/std.hpp>
 
 namespace mbgl {
 
@@ -344,15 +345,15 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
         const int glyph_vertex_length = 4;
 
         if (!buffer.groups.size() ||
-            (buffer.groups.back().vertex_length + glyph_vertex_length > 65535)) {
+            (buffer.groups.back()->vertex_length + glyph_vertex_length > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            buffer.groups.emplace_back();
+            buffer.groups.emplace_back(std::make_unique<ElementGroup<1>>());
         }
 
         // We're generating triangle fans, so we always start with the first
         // coordinate in this polygon.
         TextElementGroup &triangleGroup = buffer.groups.back();
-        uint32_t triangleIndex = triangleGroup.vertex_length;
+        uint32_t triangleIndex = triangleGroup->vertex_length;
 
         // coordinates (2 triangles)
         buffer.vertices.add(glyphAnchor.x, glyphAnchor.y, tl.x, tl.y, tex.x, tex.y, angle, minZoom,
@@ -368,8 +369,8 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
         buffer.triangles.add(triangleIndex + 0, triangleIndex + 1, triangleIndex + 2);
         buffer.triangles.add(triangleIndex + 1, triangleIndex + 2, triangleIndex + 3);
 
-        triangleGroup.vertex_length += glyph_vertex_length;
-        triangleGroup.elements_length += 2;
+        triangleGroup->vertex_length += glyph_vertex_length;
+        triangleGroup->elements_length += 2;
     }
 }
 
@@ -377,10 +378,10 @@ void SymbolBucket::drawGlyphs(TextShader &shader) {
     char *vertex_index = BUFFER_OFFSET(0);
     char *elements_index = BUFFER_OFFSET(0);
     for (TextElementGroup &group : text.groups) {
-        group.array[0].bind(shader, text.vertices, text.triangles, vertex_index);
-        glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group.vertex_length * text.vertices.itemSize;
-        elements_index += group.elements_length * text.triangles.itemSize;
+        group->array[0].bind(shader, text.vertices, text.triangles, vertex_index);
+        glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
+        vertex_index += group->vertex_length * text.vertices.itemSize;
+        elements_index += group->elements_length * text.triangles.itemSize;
     }
 }
 
@@ -388,10 +389,10 @@ void SymbolBucket::drawIcons(IconShader &shader) {
     char *vertex_index = BUFFER_OFFSET(0);
     char *elements_index = BUFFER_OFFSET(0);
     for (IconElementGroup &group : icon.groups) {
-        group.array[0].bind(shader, icon.vertices, icon.triangles, vertex_index);
-        glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group.vertex_length * icon.vertices.itemSize;
-        elements_index += group.elements_length * icon.triangles.itemSize;
+        group->array[0].bind(shader, icon.vertices, icon.triangles, vertex_index);
+        glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
+        vertex_index += group->vertex_length * icon.vertices.itemSize;
+        elements_index += group->elements_length * icon.triangles.itemSize;
     }
 }
 }
