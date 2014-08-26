@@ -284,7 +284,7 @@ void FileSource::load(ResourceType type, const std::string &url, std::function<v
 
         // load from the internet
         if (!loadFile(type, cleanURL, callback)) {
-            const std::shared_ptr<FileSource> source = shared_from_this();
+            FileSource *source = this;
             platform::request_http(absoluteURL, [=](platform::Response *res) {
                 source->saveFile(type, cleanURL, res);
                 callback(res);
