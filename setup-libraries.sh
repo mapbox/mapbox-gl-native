@@ -53,6 +53,7 @@ NPM=$(which npm)
 
 MP_HASH="eb8c6d7e6bd6adb42c232ed806b889f3e6825bb5"
 DIR_HASH=$(echo `pwd` | git hash-object --stdin)
+
 if [ ! -d 'mapnik-packaging/' ]; then
   git clone https://github.com/mapnik/mapnik-packaging.git
 fi
@@ -90,14 +91,14 @@ source iPhoneOSs.sh
     if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libsqlite3.a ] ; then ./scripts/build_libsqlite.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneOS64.sh
     if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libsqlite3.a ] ; then ./scripts/build_libsqlite.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneSimulator.sh
@@ -126,6 +127,8 @@ source MacOSX.sh
 
 # setup iOS universal libs
 ./scripts/make_universal.sh
+patch -p0 --forward < patches/curl-ios.diff || true
+echo "NOTE: One patch FAILURE is expected. The other should have been applied or ignored."
 
 if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
     tar -zcf out/build-cpp11-libcpp-ios_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libcpp-universal

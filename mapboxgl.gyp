@@ -31,7 +31,7 @@
             '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gl.cpp',
             '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gles2.cpp'
         ],
-        'include_dirs':[
+        'include_dirs': [
           '<(SHARED_INTERMEDIATE_DIR)/include/',
         ]
       }
@@ -126,17 +126,17 @@
         '<!@(find src -name "*.glsl")',
         'bin/style.json'
       ],
-      'include_dirs':[
+      'include_dirs': [
         './include'
       ],
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {
             'SDKROOT': 'macosx',
-            'SUPPORTED_PLATFORMS':['macosx'],
-            'MACOSX_DEPLOYMENT_TARGET':'10.9',
+            'SUPPORTED_PLATFORMS': ['macosx'],
+            'MACOSX_DEPLOYMENT_TARGET': '10.9',
             'PUBLIC_HEADERS_FOLDER_PATH': 'include',
-            'OTHER_CPLUSPLUSFLAGS':[
+            'OTHER_CPLUSPLUSFLAGS': [
               '<@(png_cflags)',
               '<@(uv_cflags)',
               '<@(curl_cflags)',
@@ -147,6 +147,7 @@
         }, {
           'cflags': [
             '<@(png_cflags)',
+            '<@(uv_cflags)',
             '<@(curl_cflags)',
             '<@(sqlite3_cflags)',
             '-I<(boost_root)/include',
@@ -154,38 +155,28 @@
         }]
       ],
       'direct_dependent_settings': {
-          'include_dirs':[
-              './include',
-          ],
-          'cflags': [
-              '<@(png_cflags)',
-              '<@(uv_cflags)',
-          ],
-          'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS':[
-                '<@(png_cflags)',
-                '<@(uv_cflags)',
-            ]
-          },
-          'conditions': [
-            ['OS == "mac"', {
-              'xcode_settings': {
-                'OTHER_LDFLAGS': [
-                    '<@(png_libraries)',
-                    '<@(uv_libraries)',
-                    '<@(curl_libraries)',
-                    '<@(sqlite3_libraries)',
-                ]
-              }
-            }, {
-              'libraries': [
+        'include_dirs': [
+          './include',
+        ],
+        'conditions': [
+          ['OS == "mac"', {
+            'xcode_settings': {
+              'OTHER_LDFLAGS': [
                 '<@(png_libraries)',
                 '<@(uv_libraries)',
                 '<@(curl_libraries)',
                 '<@(sqlite3_libraries)',
               ]
-            }]
-          ]
+            }
+          }, {
+            'libraries': [
+              '<@(png_libraries)',
+              '<@(uv_libraries)',
+              '<@(curl_libraries)',
+              '<@(sqlite3_libraries)',
+            ]
+          }]
+        ]
       }
     },
     {
@@ -194,7 +185,7 @@
       'type': 'static_library',
       'hard_dependency': 1,
       'dependencies': [
-          'shaders',
+        'shaders',
       ],
       'sources': [
         '<!@(find src/ \( -name "*.cpp" ! -name shaders.hpp ! -name shaders_gles2.cpp ! -name shaders_gl.cpp \))',
@@ -208,64 +199,36 @@
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
-        'SUPPORTED_PLATFORMS':['iphonesimulator','iphoneos'],
+        'SUPPORTED_PLATFORMS': ['iphonesimulator','iphoneos'],
         'ARCHS': [ "armv7", "armv7s", "arm64", "i386", "x86_64" ],
         'TARGETED_DEVICE_FAMILY': '1,2',
         'CODE_SIGN_IDENTITY': 'iPhone Developer',
         'IPHONEOS_DEPLOYMENT_TARGET': '7.0',
         'PUBLIC_HEADERS_FOLDER_PATH': 'include',
-        'GCC_INPUT_FILETYPE':'sourcecode.cpp.cpp',
-        'OTHER_CPLUSPLUSFLAGS':[
+        'GCC_INPUT_FILETYPE': 'sourcecode.cpp.cpp',
+        'OTHER_CPLUSPLUSFLAGS': [
           '<@(png_cflags)',
           '<@(uv_cflags)',
+          '<@(curl_cflags)',
           '<@(sqlite3_cflags)',
           '-I<(boost_root)/include',
-        ],
-        'OTHER_LDFLAGS': [
-          '<@(sqlite3_libraries)',
         ],
       },
-      'include_dirs':[
-          './include'
-      ],
-      'cflags': [
-          '<@(png_cflags)',
-          '<@(uv_cflags)',
-          '<@(sqlite3_cflags)',
-          '-I<(boost_root)/include',
-      ],
-      'libraries': [
-        '<@(sqlite3_libraries)',
+      'include_dirs': [
+        './include'
       ],
       'direct_dependent_settings': {
-          'include_dirs':[
-              './include'
-          ],
-          'cflags': [
-              '<@(png_cflags)',
-              '<@(uv_cflags)',
-          ],
-          'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS':[
-                '<@(png_cflags)',
-                '<@(uv_cflags)',
-            ]
-          },
-          'conditions': [
-            ['OS == "mac"', {
-              'xcode_settings': {
-                'OTHER_LDFLAGS': [
-                    '<@(png_libraries)',
-                    '<@(uv_libraries)',
-                ]
-              }
-            }, {
-              'libraries': [
-                '<@(png_libraries)',
-                '<@(uv_libraries)'
-              ]
-            }]
+        'include_dirs': [
+          './include',
+        ],
+        'xcode_settings': {
+          'OTHER_LDFLAGS': [
+            '<@(png_libraries)',
+            '<@(uv_libraries)',
+            '<@(curl_libraries)',
+            '<@(sqlite3_libraries)',
           ]
+        }
       }
     }
   ]
