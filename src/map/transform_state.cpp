@@ -83,9 +83,29 @@ const std::array<uint16_t, 2> TransformState::getFramebufferDimensions() const {
     return framebuffer;
 }
 
-
 float TransformState::getPixelRatio() const {
     return pixelRatio;
+}
+
+float TransformState::worldSize() const {
+    return scale * util::tileSize;
+}
+
+float TransformState::lngX(float lon) const {
+    return (180 + lon) * worldSize() / 360;
+}
+
+float TransformState::latY(float lat) const {
+    float y = 180 / M_PI * std::log(std::tan(M_PI / 4 + lat * M_PI / 360));
+    return (180 - y) * worldSize() / 360;
+}
+
+std::array<float, 2> TransformState::locationCoordinate(float lon, float lat) const {
+    float k = std::pow(2, getIntegerZoom()) / worldSize();
+    return {{
+        lngX(lon) * k,
+        latY(lat) * k
+    }};
 }
 
 
@@ -95,12 +115,16 @@ float TransformState::getNormalizedZoom() const {
     return std::log(scale * util::tileSize / 512.0f) / M_LN2;
 }
 
+double TransformState::getZoom() const {
+    return std::log(scale) / M_LN2;
+}
+
 int32_t TransformState::getIntegerZoom() const {
     return std::floor(getZoom());
 }
 
-double TransformState::getZoom() const {
-    return std::log(scale) / M_LN2;
+double TransformState::getZoomFraction() const {
+    return getZoom() - getIntegerZoom();
 }
 
 double TransformState::getScale() const {

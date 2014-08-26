@@ -7,6 +7,9 @@
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/clip_ids.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/mat3.hpp>
+#include <mbgl/geometry/sprite_atlas.hpp>
+
 #if defined(DEBUG)
 #include <mbgl/util/timer.hpp>
 #endif
@@ -188,24 +191,66 @@ void Painter::renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc
 
 void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
     const BackgroundProperties& properties = layer_desc->getProperties<BackgroundProperties>();
+    const std::shared_ptr<Sprite> sprite = map.getSprite();
 
-    Color color = properties.color;
-    color[0] *= properties.opacity;
-    color[1] *= properties.opacity;
-    color[2] *= properties.opacity;
-    color[3] *= properties.opacity;
+    if (properties.image.size() && sprite) {
+        if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))
+            return;
 
-    if ((color[3] >= 1.0f) == (pass == RenderPass::Opaque)) {
+        SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
+        SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image, *sprite, true);
+        float zoomFraction = map.getState().getZoomFraction();
+
+        useProgram(patternShader->program);
+        patternShader->u_matrix = identityMatrix;
+        patternShader->u_pattern_tl = imagePos.tl;
+        patternShader->u_pattern_br = imagePos.br;
+        patternShader->u_mix = zoomFraction;
+        patternShader->u_opacity = properties.opacity;
+
+        std::array<float, 2> size = imagePos.size;
+        double lon, lat;
+        map.getLonLat(lon, lat);
+        std::array<float, 2> center = map.getState().locationCoordinate(lon, lat);
+        float scale = 1 / std::pow(2, zoomFraction);
+
+        mat3 matrix;
+        matrix::identity(matrix);
+        matrix::scale(matrix, matrix,
+                      1.0f / size[0],
+                      1.0f / size[1]);
+        matrix::translate(matrix, matrix,
+                          std::fmod(center[0] * 512, size[0]),
+                          std::fmod(center[1] * 512, size[1]));
+        matrix::rotate(matrix, matrix, -map.getState().getAngle());
+        matrix::scale(matrix, matrix,
+                       scale * map.getState().getWidth()  / 2,
+                      -scale * map.getState().getHeight() / 2);
+        patternShader->u_patternmatrix = matrix;
+
+        backgroundBuffer.bind();
+        patternShader->bind(0);
+        spriteAtlas.bind(true);
+    } else {
+        Color color = properties.color;
+        color[0] *= properties.opacity;
+        color[1] *= properties.opacity;
+        color[2] *= properties.opacity;
+        color[3] *= properties.opacity;
+
+        if ((color[3] >= 1.0f) != (pass == RenderPass::Opaque))
+            return;
+
         useProgram(plainShader->program);
         plainShader->u_matrix = identityMatrix;
         plainShader->u_color = color;
         backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
-
-        glDisable(GL_STENCIL_TEST);
-        depthRange(strata + strata_epsilon, 1.0f);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glEnable(GL_STENCIL_TEST);
     }
+
+    glDisable(GL_STENCIL_TEST);
+    depthRange(strata + strata_epsilon, 1.0f);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glEnable(GL_STENCIL_TEST);
 }
 
 mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {

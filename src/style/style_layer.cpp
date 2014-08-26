@@ -235,6 +235,7 @@ void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const
     BackgroundProperties &background = properties.get<BackgroundProperties>();
     applyTransitionedStyleProperty(PropertyKey::BackgroundOpacity, background.opacity, z, now);
     applyTransitionedStyleProperty(PropertyKey::BackgroundColor, background.color, z, now);
+    applyStyleProperty(PropertyKey::BackgroundImage, background.image, z, now);
 }
 
 void StyleLayer::updateProperties(float z, const timestamp now) {
