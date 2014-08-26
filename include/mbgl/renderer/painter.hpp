@@ -184,11 +184,8 @@ public:
     };
 
     VertexArrayObject coveringPlainArray;
-    VertexArrayObject coveringPatternArray;
     VertexArrayObject coveringRasterArray;
     VertexArrayObject coveringGaussianArray;
-
-    VertexArrayObject matteArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
     StaticVertexBuffer tileBorderBuffer = {
