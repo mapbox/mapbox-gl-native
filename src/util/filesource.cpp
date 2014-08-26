@@ -202,15 +202,16 @@ void FileSource::saveFile(ResourceType type, const std::string &url, platform::R
         return;
     }
 
+    std::string data;
     bool compressed = false;
     switch (type) {
         case ResourceType::Image:
             err = sqlite3_bind_blob(stmt, 6, res->body.data(), res->body.size(), SQLITE_STATIC);
             break;
         default:
-            const std::string *data = new std::string(std::move(util::compress(res->body)));
+            data = std::move(util::compress(res->body));
             compressed = true;
-            err = sqlite3_bind_blob(stmt, 6, data->data(), data->size(), [](void *p) { delete (std::string *)p; });
+            err = sqlite3_bind_blob(stmt, 6, data.data(), data.size(), SQLITE_STATIC);
             break;
     }
     if (err != SQLITE_OK) {
