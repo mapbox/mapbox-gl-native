@@ -82,30 +82,35 @@ if test -z "${TRAVIS:-}" || ! test -d out/build-cpp11-libcpp-universal; then
 source iPhoneOS.sh
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneOSs.sh
     if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libsqlite3.a ] ; then ./scripts/build_libsqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneOS64.sh
     if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libsqlite3.a ] ; then ./scripts/build_libsqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneSimulator.sh
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneSimulator64.sh
    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+   if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
    echo '     ...done'
 
