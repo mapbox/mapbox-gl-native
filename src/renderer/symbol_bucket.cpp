@@ -75,11 +75,10 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
         if (text) {
             std::string u8string = util::replaceTokens(properties.text.field, feature.properties);
 
-            auto &convert = std::use_facet<std::ctype<char>>(std::locale());
             if (properties.text.transform == TextTransformType::Uppercase) {
-                convert.toupper(&u8string[0], &u8string[0] + u8string.size());
+                u8string = platform::uppercase(u8string);
             } else if (properties.text.transform == TextTransformType::Lowercase) {
-                convert.tolower(&u8string[0], &u8string[0] + u8string.size());
+                u8string = platform::lowercase(u8string);
             }
 
             ft.label = ucs4conv.convert(u8string);
@@ -296,7 +295,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
         }
 
         // Insert final placement into collision tree and add glyphs/icons to buffers
-        if (glyphScale) {
+        if (glyphScale && std::isfinite(glyphScale)) {
             if (!properties.text.ignore_placement) {
                 collision.insert(glyphPlacement.boxes, anchor, glyphScale, glyphRange,
                                  horizontalText);
@@ -304,7 +303,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
             if (inside) addSymbols(text, glyphPlacement.shapes, glyphScale, glyphRange);
         }
 
-        if (iconScale) {
+        if (iconScale && std::isfinite(iconScale)) {
             if (!properties.icon.ignore_placement) {
                 collision.insert(iconPlacement.boxes, anchor, iconScale, iconRange, horizontalIcon);
             }

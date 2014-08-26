@@ -101,7 +101,7 @@ struct PlacementProperty {
         : zoom(zoom), rotationRange(rotationRange) {}
 
     inline operator bool() const {
-        return !isnan(zoom) && zoom != std::numeric_limits<float>::infinity() &&
+        return !std::isnan(zoom) && zoom != std::numeric_limits<float>::infinity() &&
                rotationRange[0] != rotationRange[1];
     }
 

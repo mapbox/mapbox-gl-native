@@ -49,6 +49,10 @@ public:
     void reparse();
     const std::string toString() const;
 
+    inline bool ready() const {
+        return state == State::parsed;
+    }
+
     // Override this in the child class.
     virtual void beforeParse();
     virtual void parse() = 0;

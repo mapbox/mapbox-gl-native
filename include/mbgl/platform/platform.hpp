@@ -28,6 +28,12 @@ std::shared_ptr<Request> request_http(const std::string &url,
                                       std::function<void(Response *)> callback,
                                       std::shared_ptr<uv::loop> loop = nullptr);
 
+// Uppercase a string, potentially using platform-specific routines.
+std::string uppercase(const std::string &string);
+
+// Lowercase a string, potentially using platform-specific routines.
+std::string lowercase(const std::string &string);
+
 // Cancels an HTTP request.
 void cancel_request_http(const std::shared_ptr<Request> &req);
 

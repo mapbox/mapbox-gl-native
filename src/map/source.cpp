@@ -121,7 +121,6 @@ void Source::finishRender(Painter &painter) {
     }
 }
 
-
 std::forward_list<Tile::ID> Source::getIDs() const {
     std::forward_list<Tile::ID> ptrs;
 
@@ -131,6 +130,18 @@ std::forward_list<Tile::ID> Source::getIDs() const {
     });
     return ptrs;
 }
+
+std::forward_list<Tile *> Source::getLoadedTiles() const {
+    std::forward_list<Tile *> ptrs;
+    auto it = ptrs.before_begin();
+    for (const auto &pair : tiles) {
+        if (pair.second->data->ready()) {
+            it = ptrs.insert_after(it, pair.second.get());
+        }
+    }
+    return ptrs;
+}
+
 
 TileData::State Source::hasTile(const Tile::ID& id) {
     auto it = tiles.find(id);

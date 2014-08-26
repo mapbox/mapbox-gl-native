@@ -38,6 +38,7 @@ public:
     void finishRender(Painter &painter);
 
     std::forward_list<Tile::ID> getIDs() const;
+    std::forward_list<Tile *> getLoadedTiles() const;
     void updateClipIDs(const std::map<Tile::ID, ClipID> &mapping);
 
 private:

@@ -51,7 +51,8 @@ set -u
 NODE=$(which node)
 NPM=$(which npm)
 
-MP_HASH="c07b197"
+MP_HASH="e741a075d28812e5d16b581e1540248fe19c52ce"
+DIR_HASH=$(echo `pwd` | git hash-object --stdin)
 if [ ! -d 'mapnik-packaging/' ]; then
   git clone https://github.com/mapnik/mapnik-packaging.git
 fi
@@ -66,9 +67,9 @@ export CXX11=true
 if [ ${UNAME} = 'Darwin' ]; then
 
 if [ ! -z "${TRAVIS:-}" ]; then
-    if aws s3 cp s3://${AWS_S3_BUCKET}/dependencies/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz ./out/ ; then
+    if aws s3 cp s3://${AWS_S3_BUCKET}/dependencies/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then
         rm -rf out/build-cpp11-libcpp-universal
-        tar -xzf out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz
+        tar -xzf out/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz
     fi
 fi
 
@@ -82,14 +83,14 @@ export LIBUV_VERSION=0.10.28
 
 source iPhoneOSs.sh
 export LIBUV_VERSION=0.10.28
-    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
 
 source iPhoneOS64.sh
 export LIBUV_VERSION=0.10.28
-    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
 
 source iPhoneSimulator.sh
@@ -117,9 +118,9 @@ export LIBUV_VERSION=0.10.28
 
 ./scripts/make_universal.sh
 
-if [ ! -z "${TRAVIS:-}" ]; then
-    tar -zcf out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz out/build-cpp11-libcpp-universal
-    aws s3 cp out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz s3://${AWS_S3_BUCKET}/dependencies/
+if [[ $TRAVIS_PULL_REQUEST = "false" ]]; then
+    tar -zcf out/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libcpp-universal
+    aws s3 cp --acl public-read out/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz s3://${AWS_S3_BUCKET}/dependencies/
 fi
 
 fi
@@ -149,10 +150,10 @@ export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
 
-if [ ! -z "${TRAVIS:-}" ]; then
+if [[ $TRAVIS_PULL_REQUEST = "false" ]]; then
     if ! tar --compare -zf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ; then
         tar -zcf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz out/build-cpp11-libstdcpp-gcc-x86_64-linux
-        aws s3 cp out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz s3://${AWS_S3_BUCKET}/dependencies/
+        aws s3 cp --acl public-read out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz s3://${AWS_S3_BUCKET}/dependencies/
     fi
 fi
 

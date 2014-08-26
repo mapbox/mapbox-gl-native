@@ -12,6 +12,7 @@
         './main.mm',
         '../common/settings_nsuserdefaults.hpp',
         '../common/settings_nsuserdefaults.mm',
+        '../common/platform_nsstring.mm',
         '../common/glfw_view.hpp',
         '../common/glfw_view.cpp',
         '../common/foundation_request.h',

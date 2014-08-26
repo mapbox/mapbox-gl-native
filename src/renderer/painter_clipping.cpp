@@ -14,7 +14,6 @@ void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &so
     depthMask(false);
     glColorMask(false, false, false, false);
     depthRange(1.0f, 1.0f);
-    glStencilMask(0xFF);
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 
@@ -31,9 +30,10 @@ void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &so
 void Painter::drawClippingMask(const mat4& matrix, const ClipID &clip) {
     plainShader->setMatrix(matrix);
 
-    GLint id = static_cast<GLint>(clip.mask.to_ulong());
-    GLuint mask = clipMask[clip.length];
-    glStencilFunc(GL_ALWAYS, id, mask);
+    const GLint ref = (GLint)(clip.reference.to_ulong());
+    const GLuint mask = (GLuint)(clip.mask.to_ulong());
+    glStencilFunc(GL_ALWAYS, ref, mask);
+    glStencilMask(mask);
 
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
 }
