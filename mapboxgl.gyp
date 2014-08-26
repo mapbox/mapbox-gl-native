@@ -161,6 +161,11 @@
         'conditions': [
           ['OS == "mac"', {
             'xcode_settings': {
+              'OTHER_CPLUSPLUSFLAGS': [
+                '<@(uv_cflags)',
+                '<@(curl_cflags)',
+                '-I<(boost_root)/include',
+              ],
               'OTHER_LDFLAGS': [
                 '<@(png_libraries)',
                 '<@(uv_libraries)',
@@ -169,6 +174,11 @@
               ]
             }
           }, {
+            'cflags': [
+              '<@(uv_cflags)',
+              '<@(curl_cflags)',
+              '-I<(boost_root)/include',
+            ],
             'libraries': [
               '<@(png_libraries)',
               '<@(uv_libraries)',

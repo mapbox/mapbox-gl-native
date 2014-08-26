@@ -108,4 +108,4 @@ distclean: clean
 	-rm -rf ./mapnik-packaging/osx/out/universal
 	-find ./mapnik-packaging/osx/out/packages -type d ! -name 'packages' -maxdepth 1 -exec rm -rf {} \;
 
-.PHONY: mbgl test linux
+.PHONY: mbgl test linux build/test/Makefile
