@@ -75,11 +75,10 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
         if (text) {
             std::string u8string = util::replaceTokens(properties.text.field, feature.properties);
 
-            auto &convert = std::use_facet<std::ctype<char>>(std::locale());
             if (properties.text.transform == TextTransformType::Uppercase) {
-                convert.toupper(&u8string[0], &u8string[0] + u8string.size());
+                u8string = platform::uppercase(u8string);
             } else if (properties.text.transform == TextTransformType::Lowercase) {
-                convert.tolower(&u8string[0], &u8string[0] + u8string.size());
+                u8string = platform::lowercase(u8string);
             }
 
             ft.label = ucs4conv.convert(u8string);

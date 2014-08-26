@@ -12,6 +12,7 @@
         './main.cpp',
         '../common/settings_json.cpp',
         '../common/settings_json.hpp',
+        '../common/platform_default.cpp',
         '../common/glfw_view.hpp',
         '../common/glfw_view.cpp',
         '../common/curl_request.cpp',
