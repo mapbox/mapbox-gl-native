@@ -51,7 +51,8 @@ set -u
 NODE=$(which node)
 NPM=$(which npm)
 
-MP_HASH="6d7e83e8042"
+MP_HASH="e741a075d28812e5d16b581e1540248fe19c52ce"
+DIR_HASH=$(echo `pwd` | git hash-object --stdin)
 if [ ! -d 'mapnik-packaging/' ]; then
   git clone https://github.com/mapnik/mapnik-packaging.git
 fi
@@ -66,9 +67,9 @@ export CXX11=true
 if [ ${UNAME} = 'Darwin' ]; then
 
 if [ ! -z "${TRAVIS:-}" ]; then
-    if aws s3 cp s3://mapbox-gl-testing/dependencies/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz ./out/ ; then
+    if aws s3 cp s3://mapbox-gl-testing/dependencies/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then
         rm -rf out/build-cpp11-libcpp-universal
-        tar -xzf out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz
+        tar -xzf out/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz
     fi
 fi
 
@@ -113,8 +114,8 @@ source MacOSX.sh
 ./scripts/make_universal.sh
 
 if [[ $TRAVIS_PULL_REQUEST = "false" ]]; then
-    tar -zcf out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz out/build-cpp11-libcpp-universal
-    aws s3 cp --acl public-read out/build-cpp11-libcpp-universal_${MP_HASH}.tar.gz s3://mapbox-gl-testing/dependencies/
+    tar -zcf out/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libcpp-universal
+    aws s3 cp --acl public-read out/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz s3://mapbox-gl-testing/dependencies/
 fi
 
 fi
