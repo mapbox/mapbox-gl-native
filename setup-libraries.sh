@@ -81,13 +81,13 @@ source iPhoneOS.sh
     echo '     ...done'
 
 source iPhoneOSs.sh
-    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
 
 source iPhoneOS64.sh
-    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
 
 source iPhoneSimulator.sh
