@@ -51,7 +51,7 @@ set -u
 NODE=$(which node)
 NPM=$(which npm)
 
-MP_HASH="e741a075d28812e5d16b581e1540248fe19c52ce"
+MP_HASH="bc0e0b4e02979e56dc9bbc2a601e98583f6e6e6e"
 DIR_HASH=$(echo `pwd` | git hash-object --stdin)
 if [ ! -d 'mapnik-packaging/' ]; then
   git clone https://github.com/mapnik/mapnik-packaging.git
