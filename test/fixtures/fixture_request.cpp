@@ -40,8 +40,8 @@ platform::request_http(const std::string &url,
     uv_fs_req_cleanup(&open_req);
     if (err < 0) {
         req->res->code = err;
-        req->res->error_message = uv_strerror(err);
-        Log::Warning(Event::HttpRequest, err, url + ": " + uv_strerror(err));
+        req->res->error_message = uv_strerror(uv_last_error(l));
+        Log::Warning(Event::HttpRequest, err, url + ": " + uv_strerror(uv_last_error(l)));
         req->complete();
         return req;
     }
@@ -53,13 +53,13 @@ platform::request_http(const std::string &url,
     err = uv_fs_fstat(l, &stat_req, fd, nullptr);
     if (err < 0) {
         req->res->code = err;
-        req->res->error_message = uv_strerror(err);
-        Log::Warning(Event::HttpRequest, err, url + ": " + uv_strerror(err));
+        req->res->error_message = uv_strerror(uv_last_error(l));
+        Log::Warning(Event::HttpRequest, err, url + ": " + uv_strerror(uv_last_error(l)));
         req->complete();
         return req;
     }
 
-    const uint64_t size = static_cast<const uv_stat_t*>(stat_req.ptr)->st_size;
+    const uint64_t size = static_cast<const uv_statbuf_t*>(stat_req.ptr)->st_size;
 
 
     std::string body;
@@ -71,8 +71,8 @@ platform::request_http(const std::string &url,
     uv_fs_req_cleanup(&read_req);
     if (err < 0) {
         req->res->code = err;
-        req->res->error_message = uv_strerror(err);
-        Log::Warning(Event::HttpRequest, err, url + ": " + uv_strerror(err));
+        req->res->error_message = uv_strerror(uv_last_error(l));
+        Log::Warning(Event::HttpRequest, err, url + ": " + uv_strerror(uv_last_error(l)));
         req->complete();
         return req;
     }
@@ -83,8 +83,8 @@ platform::request_http(const std::string &url,
     uv_fs_req_cleanup(&close_req);
     if (err < 0) {
         req->res->code = err;
-        req->res->error_message = uv_strerror(err);
-        Log::Warning(Event::HttpRequest, err, url + ": " + uv_strerror(err));
+        req->res->error_message = uv_strerror(uv_last_error(l));
+        Log::Warning(Event::HttpRequest, err, url + ": " + uv_strerror(uv_last_error(l)));
         req->complete();
         return req;
     }
