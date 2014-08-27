@@ -13,7 +13,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     (cd ./node_modules/mapbox-gl-test-suite/ && (./bin/compare_images.js || true))
 
     if [ "${TRAVIS_PULL_REQUEST}" == "false" ] ; then
-        ./bin/deploy_results.sh
+        (cd ./node_modules/mapbox-gl-test-suite/ && ./bin/deploy_results.sh)
     fi
 
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
