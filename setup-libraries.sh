@@ -113,7 +113,7 @@ source MacOSX.sh
 
 ./scripts/make_universal.sh
 
-if [[ $TRAVIS_PULL_REQUEST = "false" ]]; then
+if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
     tar -zcf out/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libcpp-universal
     aws s3 cp --acl public-read out/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz s3://mapbox-gl-testing/dependencies/
 fi
@@ -144,7 +144,7 @@ source Linux.sh
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
 
-if [[ $TRAVIS_PULL_REQUEST = "false" ]]; then
+if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
     if ! tar --compare -zf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ; then
         tar -zcf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz out/build-cpp11-libstdcpp-gcc-x86_64-linux
         aws s3 cp --acl public-read out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz s3://mapbox-gl-testing/dependencies/
