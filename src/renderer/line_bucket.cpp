@@ -7,7 +7,6 @@
 #include <mbgl/map/vector_tile.hpp>
 
 #include <mbgl/util/math.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/platform/gl.hpp>
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))

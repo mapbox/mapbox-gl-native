@@ -16,7 +16,6 @@
 #include <mbgl/util/utf.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/util/std.hpp>
 
 namespace mbgl {
 

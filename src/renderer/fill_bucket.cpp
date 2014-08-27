@@ -8,7 +8,7 @@
 #include <mbgl/map/vector_tile.hpp>
 
 #include <mbgl/platform/gl.hpp>
-#include <mbgl/util/std.hpp>
+
 
 #include <cassert>
 
