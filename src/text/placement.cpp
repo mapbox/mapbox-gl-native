@@ -80,7 +80,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
         // skip duplicate nodes
         while (newAnchor == end) {
             segment += direction;
-            if ((int)line.size() <= segment) {
+            if ((int)line.size() <= segment || segment < 0) {
                 anchor.scale = scale;
                 return;
             }
