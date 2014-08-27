@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
+#include <algorithm>
 
 namespace mbgl {
 namespace util {
