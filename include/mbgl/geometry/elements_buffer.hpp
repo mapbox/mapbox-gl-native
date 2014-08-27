@@ -3,13 +3,14 @@
 
 #include <mbgl/geometry/buffer.hpp>
 #include <mbgl/geometry/vao.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <array>
 
 namespace mbgl {
 
 template <int count>
-struct ElementGroup {
+struct ElementGroup : public util::noncopyable {
     std::array<VertexArrayObject, count> array;
     uint32_t vertex_length;
     uint32_t elements_length;
@@ -19,6 +20,11 @@ struct ElementGroup {
         : vertex_length(vertex_length),
           elements_length(elements_length) {
     }
+
+    ElementGroup(ElementGroup &&rhs) noexcept
+        : array(std::move(rhs.array)),
+          vertex_length(rhs.vertex_length),
+          elements_length(rhs.elements_length) {};
 };
 
 class TriangleElementsBuffer : public Buffer<

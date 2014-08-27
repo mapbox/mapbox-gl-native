@@ -22,6 +22,7 @@ struct pbf;
 class LineBucket : public Bucket {
     typedef ElementGroup<1> triangle_group_type;
     typedef ElementGroup<1> point_group_type;
+
 public:
     LineBucket(LineVertexBuffer& vertexBuffer,
                TriangleElementsBuffer& triangleElementsBuffer,
@@ -43,7 +44,6 @@ public:
     const StyleBucketLine &properties;
 
 private:
-
     LineVertexBuffer& vertexBuffer;
     TriangleElementsBuffer& triangleElementsBuffer;
     PointElementsBuffer& pointElementsBuffer;

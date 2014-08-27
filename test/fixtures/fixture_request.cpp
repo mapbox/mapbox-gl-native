@@ -1,12 +1,15 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/request.hpp>
 #include <mbgl/util/uv_detail.hpp>
+#include <mbgl/util/url.hpp>
 #include <mbgl/platform/log.hpp>
 
 const std::string base_directory = []{
     std::string fn = __FILE__;
     fn.erase(fn.find_last_of("/"));
-    return fn;
+    fn.erase(fn.find_last_of("/"));
+    fn.erase(fn.find_last_of("/"));
+    return fn + "/node_modules/mapbox-gl-test-suite/";
 }();
 
 
@@ -23,13 +26,10 @@ platform::request_http(const std::string &url,
         l = uv_default_loop();
     }
 
-    std::string clean_url = base_directory + "/" + url;
-    auto pos = clean_url.find("://");
-    if (pos != std::string::npos) {
-        clean_url.replace(pos, 3, "/");
+    std::string clean_url = util::percentDecode(url);
+    if (clean_url.find("local://") == 0) {
+        clean_url = base_directory + clean_url.substr(8);
     }
-
-    std::replace(clean_url.begin(), clean_url.end(), '+', ' ');
 
     std::shared_ptr<Request> req = std::make_shared<Request>(url, callback, loop);
 

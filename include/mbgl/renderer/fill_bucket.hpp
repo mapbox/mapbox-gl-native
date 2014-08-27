@@ -36,6 +36,7 @@ class FillBucket : public Bucket {
 
     typedef ElementGroup<2> triangle_group_type;
     typedef ElementGroup<1> line_group_type;
+
 public:
     FillBucket(FillVertexBuffer& vertexBuffer,
                TriangleElementsBuffer& triangleElementsBuffer,

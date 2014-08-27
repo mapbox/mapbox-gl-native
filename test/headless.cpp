@@ -18,16 +18,11 @@
 const std::string base_directory = []{
     std::string fn = __FILE__;
     fn.erase(fn.find_last_of("/"));
-    return fn + "/../node_modules/mapbox-gl-test-suite/";
+    fn.erase(fn.find_last_of("/"));
+    return fn + "/node_modules/mapbox-gl-test-suite/";
 }();
 
 class HeadlessTest : public ::testing::TestWithParam<std::string> {};
-
-void ResolveLocalURL(rapidjson::Value& value, rapidjson::Document& doc) {
-    std::string str { value.GetString(), value.GetStringLength() };
-    str.replace(0, 8, base_directory); // local://
-    value.SetString(str.c_str(), str.length(), doc.GetAllocator());
-}
 
 TEST_P(HeadlessTest, render) {
     using namespace mbgl;
@@ -42,12 +37,6 @@ TEST_P(HeadlessTest, render) {
     styleDoc.Parse<0>((const char *const)style.c_str());
     ASSERT_EQ(false, styleDoc.HasParseError());
     ASSERT_EQ(true, styleDoc.IsObject());
-
-    if (styleDoc.HasMember("sprite")) {
-        ResolveLocalURL(styleDoc["sprite"], styleDoc);
-    }
-
-    ResolveLocalURL(styleDoc["sources"]["mapbox"]["tiles"][rapidjson::SizeType(0)], styleDoc);
 
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
@@ -91,7 +80,7 @@ TEST_P(HeadlessTest, render) {
             }
         }
 
-        map.setStyleJSON(style);
+        map.setStyleJSON(style, base_directory);
         map.setAppliedClasses(classes);
 
         view.resize(width, height);

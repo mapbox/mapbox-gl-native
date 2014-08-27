@@ -3,14 +3,25 @@
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/platform/gl.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <stdexcept>
 
 namespace mbgl {
 
 #if GL_ARB_vertex_array_object
-class VertexArrayObject {
+class VertexArrayObject : public util::noncopyable {
 public:
+    inline VertexArrayObject() {};
+
+    inline VertexArrayObject(VertexArrayObject &&rhs) noexcept
+        : vao(rhs.vao),
+          bound_shader(rhs.bound_shader),
+          bound_shader_name(rhs.bound_shader_name),
+          bound_vertex_buffer(rhs.bound_vertex_buffer),
+          bound_elements_buffer(rhs.bound_elements_buffer),
+          bound_offset(rhs.bound_offset) {};
+
     template <typename Shader, typename VertexBuffer>
     inline void bind(Shader& shader, VertexBuffer &vertexBuffer, char *offset) {
         bindVertexArrayObject();
@@ -56,7 +67,7 @@ private:
 
 #else
 
-class VertexArrayObject {
+class VertexArrayObject : public util::noncopyable {
 public:
     template <typename Shader, typename Buffers>
     void bind(Shader& shader, Buffers& buffers, char *offset) {

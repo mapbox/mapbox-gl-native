@@ -56,44 +56,37 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         const timestamp currentTime = util::now();
 
         std::deque<FrameSnapshot> &history = frameHistory.history;
+        if (history.size() >= 2) {
+            // Remove frames until only one is outside the duration, or until there are only three
+            while (history.size() > 3 && history[1].t + duration < currentTime) {
+                history.pop_front();
+            }
 
-        // Remove frames until only one is outside the duration, or until there are only three
-        while (history.size() > 3 && history[1].t + duration < currentTime) {
-            history.pop_front();
+            if (history[1].t + duration < currentTime) {
+                history[0].z = history[1].z;
+            }
+
+            // Find the range of zoom levels we want to fade between
+            float startingZ = history.front().z;
+            const FrameSnapshot lastFrame = history.back();
+            float endingZ = lastFrame.z;
+            float lowZ = std::fmin(startingZ, endingZ);
+            float highZ = std::fmax(startingZ, endingZ);
+
+            // Calculate the speed of zooming, and how far it would zoom in terms of zoom levels in one
+            // duration
+            float zoomDiff = endingZ - history[1].z, timeDiff = lastFrame.t - history[1].t;
+            float fadedist = zoomDiff / (timeDiff / duration);
+
+            // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
+            // bump is how much farther it would have been if it had continued zooming at the same rate
+            float bump = (currentTime - lastFrame.t) / duration * fadedist;
+
+            textShader->setFadeDist(fadedist * 10);
+            textShader->setMinFadeZoom(std::floor(lowZ * 10));
+            textShader->setMaxFadeZoom(std::floor(highZ * 10));
+            textShader->setFadeZoom((map.getState().getNormalizedZoom() + bump) * 10);
         }
-
-        if (history[1].t + duration < currentTime) {
-            history[0].z = history[1].z;
-        }
-
-        assert("there should never be less than three frames in the history" &&
-               (history.size() >= 3));
-
-        // Find the range of zoom levels we want to fade between
-        float startingZ = history.front().z;
-        const FrameSnapshot lastFrame = history.back();
-        float endingZ = lastFrame.z;
-        float lowZ = std::fmin(startingZ, endingZ);
-        float highZ = std::fmax(startingZ, endingZ);
-
-        // Calculate the speed of zooming, and how far it would zoom in terms of zoom levels in one
-        // duration
-        float zoomDiff = endingZ - history[1].z, timeDiff = lastFrame.t - history[1].t;
-        float fadedist = zoomDiff / (timeDiff / duration);
-
-#if defined(DEBUG)
-//        if (std::isnan(fadedist))
-//            fprintf(stderr, "fadedist should never be NaN\n");
-#endif
-
-        // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
-        // bump is how much farther it would have been if it had continued zooming at the same rate
-        float bump = (currentTime - lastFrame.t) / duration * fadedist;
-
-        textShader->setFadeDist(fadedist * 10);
-        textShader->setMinFadeZoom(std::floor(lowZ * 10));
-        textShader->setMaxFadeZoom(std::floor(highZ * 10));
-        textShader->setFadeZoom((map.getState().getNormalizedZoom() + bump) * 10);
 
         // This defines the gamma around the SDF cutoff value.
         const float sdfGamma = 1.0f / 10.0f;
