@@ -20,6 +20,11 @@ struct ElementGroup : public util::noncopyable {
         : vertex_length(vertex_length),
           elements_length(elements_length) {
     }
+
+    ElementGroup(ElementGroup &&rhs) noexcept
+        : array(std::move(rhs.array)),
+          vertex_length(rhs.vertex_length),
+          elements_length(rhs.elements_length) {};
 };
 
 class TriangleElementsBuffer : public Buffer<

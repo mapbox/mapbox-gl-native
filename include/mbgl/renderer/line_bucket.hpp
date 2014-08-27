@@ -20,8 +20,8 @@ class LinejoinShader;
 struct pbf;
 
 class LineBucket : public Bucket {
-    typedef std::unique_ptr<ElementGroup<1>> triangle_group_type;
-    typedef std::unique_ptr<ElementGroup<1>> point_group_type;
+    typedef ElementGroup<1> triangle_group_type;
+    typedef ElementGroup<1> point_group_type;
 
 public:
     LineBucket(LineVertexBuffer& vertexBuffer,

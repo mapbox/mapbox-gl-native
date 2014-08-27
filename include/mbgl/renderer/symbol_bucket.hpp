@@ -50,8 +50,8 @@ typedef std::vector<Symbol> Symbols;
 
 
 class SymbolBucket : public Bucket {
-    typedef std::unique_ptr<ElementGroup<1>> TextElementGroup;
-    typedef std::unique_ptr<ElementGroup<1>> IconElementGroup;
+    typedef ElementGroup<1> TextElementGroup;
+    typedef ElementGroup<1> IconElementGroup;
 
 public:
     SymbolBucket(const StyleBucketSymbol &properties, Collision &collision);

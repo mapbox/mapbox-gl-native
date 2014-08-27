@@ -111,13 +111,13 @@ void FillBucket::tessellate() {
         throw geometry_too_long_exception();
     }
 
-    if (!lineGroups.size() || (lineGroups.back()->vertex_length + total_vertex_count > 65535)) {
+    if (!lineGroups.size() || (lineGroups.back().vertex_length + total_vertex_count > 65535)) {
         // Move to a new group because the old one can't hold the geometry.
-        lineGroups.emplace_back(std::make_unique<ElementGroup<1>>());
+        lineGroups.emplace_back();
     }
 
     line_group_type& lineGroup = lineGroups.back();
-    uint32_t lineIndex = lineGroup->vertex_length;
+    uint32_t lineIndex = lineGroup.vertex_length;
 
     for (const std::vector<ClipperLib::IntPoint>& polygon : polygons) {
         const size_t group_count = polygon.size();
@@ -140,7 +140,7 @@ void FillBucket::tessellate() {
         tessAddContour(tesselator, vertexSize, line.data(), stride, (int)line.size() / vertexSize);
     }
 
-    lineGroup->elements_length += total_vertex_count;
+    lineGroup.elements_length += total_vertex_count;
 
     if (tessTesselate(tesselator, TESS_WINDING_POSITIVE, TESS_POLYGONS, vertices_per_group, vertexSize, 0)) {
         const TESSreal *vertices = tessGetVertices(tesselator);
@@ -157,15 +157,15 @@ void FillBucket::tessellate() {
             }
         }
 
-        if (!triangleGroups.size() || (triangleGroups.back()->vertex_length + total_vertex_count > 65535)) {
+        if (!triangleGroups.size() || (triangleGroups.back().vertex_length + total_vertex_count > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            triangleGroups.emplace_back(std::make_unique<ElementGroup<2>>());
+            triangleGroups.emplace_back();
         }
 
         // We're generating triangle fans, so we always start with the first
         // coordinate in this polygon.
         triangle_group_type& triangleGroup = triangleGroups.back();
-        uint32_t triangleIndex = triangleGroup->vertex_length;
+        uint32_t triangleIndex = triangleGroup.vertex_length;
 
         for (int i = 0; i < triangle_count; ++i) {
             const TESSindex *element_group = &elements[i * vertices_per_group];
@@ -190,8 +190,8 @@ void FillBucket::tessellate() {
             }
         }
 
-        triangleGroup->vertex_length += total_vertex_count;
-        triangleGroup->elements_length += triangle_count;
+        triangleGroup.vertex_length += total_vertex_count;
+        triangleGroup.elements_length += triangle_count;
     } else {
 #if defined(DEBUG)
         fprintf(stderr, "tessellation failed\n");
@@ -201,7 +201,7 @@ void FillBucket::tessellate() {
     // We're adding the total vertex count *after* we added additional vertices
     // in the tessellation step. They won't be part of the actual lines, but
     // we need to skip over them anyway if we draw the next group.
-    lineGroup->vertex_length += total_vertex_count;
+    lineGroup.vertex_length += total_vertex_count;
 }
 
 void FillBucket::render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
@@ -216,10 +216,10 @@ void FillBucket::drawElements(PlainShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
     char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (triangle_group_type& group : triangleGroups) {
-        group->array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
-        glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * triangleElementsBuffer.itemSize;
+        group.array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
+        glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
+        vertex_index += group.vertex_length * vertexBuffer.itemSize;
+        elements_index += group.elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
@@ -227,10 +227,10 @@ void FillBucket::drawElements(PatternShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
     char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
     for (triangle_group_type& group : triangleGroups) {
-        group->array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
-        glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * triangleElementsBuffer.itemSize;
+        group.array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
+        glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
+        vertex_index += group.vertex_length * vertexBuffer.itemSize;
+        elements_index += group.elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
@@ -238,9 +238,9 @@ void FillBucket::drawVertices(OutlineShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
     char *elements_index = BUFFER_OFFSET(line_elements_start * lineElementsBuffer.itemSize);
     for (line_group_type& group : lineGroups) {
-        group->array[0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index);
-        glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT, elements_index);
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * lineElementsBuffer.itemSize;
+        group.array[0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index);
+        glDrawElements(GL_LINES, group.elements_length * 2, GL_UNSIGNED_SHORT, elements_index);
+        vertex_index += group.vertex_length * vertexBuffer.itemSize;
+        elements_index += group.elements_length * lineElementsBuffer.itemSize;
     }
 }
