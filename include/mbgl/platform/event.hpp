@@ -10,7 +10,6 @@ namespace mbgl {
 enum class EventSeverity : uint8_t {
     Debug,
     Info,
-    Test,
     Warning,
     Error,
 };
@@ -18,7 +17,6 @@ enum class EventSeverity : uint8_t {
 MBGL_DEFINE_ENUM_CLASS(EventSeverityClass, EventSeverity, {
     { EventSeverity::Debug, "DEBUG" },
     { EventSeverity::Info, "INFO" },
-    { EventSeverity::Test, "TEST" },
     { EventSeverity::Warning, "WARNING" },
     { EventSeverity::Error, "ERROR" },
     { EventSeverity(-1), "UNKNOWN" },
@@ -60,9 +58,6 @@ struct EventPermutation {
 constexpr EventSeverity disabledEventSeverities[] = {
 #if !DEBUG
     EventSeverity::Debug,
-#endif
-#if !TESTING
-    EventSeverity::Test,
 #endif
 };
 

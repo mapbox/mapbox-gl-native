@@ -25,11 +25,11 @@ build/test/Makefile: src common config.gypi test/test.gyp
 	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
 
 test: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=Testing V=$(V) test
+	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
 
 test_%: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=Testing V=$(V) $*
-	(cd build/Testing && exec ./test_$*)
+	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
+	(cd build/$(BUILDTYPE) && exec ./test_$*)
 
 # build Mac OS X project for Xcode
 xtest: config.gypi clear_xcode_cache node
