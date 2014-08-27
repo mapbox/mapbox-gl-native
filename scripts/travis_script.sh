@@ -12,7 +12,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     ./scripts/run_tests.sh
     (cd ./node_modules/mapbox-gl-test-suite/ && (./bin/compare_images.js || true))
 
-    if [ "${TRAVIS_PULL_REQUEST}" == "false" ] ; then
+    if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
         (cd ./node_modules/mapbox-gl-test-suite/ && ./bin/deploy_results.sh)
     fi
 
