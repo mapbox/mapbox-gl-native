@@ -179,7 +179,6 @@ void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> laye
         gl::group group(util::sprintf<32>("render %d/%d/%d\n", tile.id.z, tile.id.y, tile.id.z));
         prepareTile(tile);
         tile.data->render(*this, layer_desc, matrix);
-        frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
     }
 }
 

@@ -559,6 +559,8 @@ void Map::render() {
 
     painter.drawClippingMasks(getActiveSources());
 
+    painter.frameHistory.record(getAnimationTime(), getState().getNormalizedZoom());
+
     // Actually render the layers
     if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
     renderLayers(style->layers);

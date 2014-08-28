@@ -153,8 +153,6 @@ public:
 private:
     Map& map;
 
-    FrameHistory frameHistory;
-
     bool debug = false;
 
     uint32_t gl_program = 0;
@@ -167,6 +165,8 @@ private:
     const float strata_epsilon = 1.0f / (1 << 16);
 
 public:
+    FrameHistory frameHistory;
+
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;
     std::unique_ptr<LineShader> lineShader;
