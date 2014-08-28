@@ -186,15 +186,23 @@ void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> laye
 void Painter::renderBackground(std::shared_ptr<StyleLayer> layer_desc) {
     const BackgroundProperties& properties = layer_desc->getProperties<BackgroundProperties>();
 
-    useProgram(plainShader->program);
-    plainShader->setMatrix(identityMatrix);
-    plainShader->setColor(properties.color);
-    backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
+    Color color = properties.color;
+    color[0] *= properties.opacity;
+    color[1] *= properties.opacity;
+    color[2] *= properties.opacity;
+    color[3] *= properties.opacity;
 
-    glDisable(GL_STENCIL_TEST);
-    depthRange(strata + strata_epsilon, 1.0f);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glEnable(GL_STENCIL_TEST);
+    if ((color[3] >= 1.0f) == (pass == RenderPass::Opaque)) {
+        useProgram(plainShader->program);
+        plainShader->setMatrix(identityMatrix);
+        plainShader->setColor(color);
+        backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
+
+        glDisable(GL_STENCIL_TEST);
+        depthRange(strata + strata_epsilon, 1.0f);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glEnable(GL_STENCIL_TEST);
+    }
 }
 
 const mat4 &Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {

@@ -636,6 +636,7 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<float>>("raster-fade-duration", Key::RasterFade, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-raster-fade-duration", Key::RasterFade, klass, value);
 
+    parseOptionalProperty<Function<float>>("background-opacity", Key::BackgroundOpacity, klass, value);
     parseOptionalProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
 }
 

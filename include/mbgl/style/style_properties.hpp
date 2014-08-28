@@ -92,6 +92,7 @@ struct RasterProperties {
 
 struct BackgroundProperties {
     inline BackgroundProperties() {}
+    float opacity = 1.0f;
     Color color = {{ 0, 0, 0, 1 }};
 };
 

@@ -233,6 +233,7 @@ template <>
 void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const timestamp now) {
     properties.set<BackgroundProperties>();
     BackgroundProperties &background = properties.get<BackgroundProperties>();
+    applyTransitionedStyleProperty(PropertyKey::BackgroundOpacity, background.opacity, z, now);
     applyTransitionedStyleProperty(PropertyKey::BackgroundColor, background.color, z, now);
 }
 
