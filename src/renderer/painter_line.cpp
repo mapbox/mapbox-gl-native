@@ -15,9 +15,9 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 
     const LineProperties &properties = layer_desc->getProperties<LineProperties>();
 
+    float antialiasing = 1 / map.getState().getPixelRatio();
     float width = properties.width;
     float offset = properties.offset / 2;
-    float antialiasing = 1 / map.getState().getPixelRatio();
     float blur = properties.blur + antialiasing;
 
     // These are the radii of the line. We are limiting it to 16, which will result
@@ -34,6 +34,7 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     float dash_length = properties.dash_array[0];
     float dash_gap = properties.dash_array[1];
 
+    float ratio = map.getState().getPixelRatio();
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
     depthRange(strata, 1.0f);
@@ -67,29 +68,23 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     if (properties.image.size() && sprite) {
         SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
         Rect<uint16_t> imagePos = spriteAtlas.getImage(properties.image, *sprite);
-        
+
         float factor = 8.0 / std::pow(2, map.getState().getIntegerZoom() - id.z);
-        
         float fade = std::fmod(map.getState().getZoom(), 1.0);
 
         std::array<float, 2> imageSize = {{
             imagePos.w * factor,
             imagePos.h * factor
-        }
-        };
+        }};
 
-        std::array<float, 2> offset = {{
-            (float)std::fmod(id.x * 4096, imageSize[0]),
-            (float)std::fmod(id.y * 4096, imageSize[1])
-        }
-        };
         useProgram(linepatternShader->program);
+
         linepatternShader->setMatrix(vtxMatrix);
         linepatternShader->setExtrudeMatrix(extrudeMatrix);
-        lineShader->setDashArray({{ dash_length, dash_gap }});
         linepatternShader->setLineWidth({{ outset, inset }});
-        linepatternShader->setRatio(map.getState().getPixelRatio());
-        
+        linepatternShader->setRatio(ratio);
+        linepatternShader->setBlur(blur);
+
         linepatternShader->setPatternSize(imageSize);
         linepatternShader->setPatternTopLeft({{
             float(imagePos.x) / spriteAtlas.getWidth(),
@@ -99,8 +94,6 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
             float(imagePos.x + imagePos.w) / spriteAtlas.getWidth(),
             float(imagePos.y + imagePos.h) / spriteAtlas.getHeight(),
         }});
-        linepatternShader->setOffset(offset);
-        linepatternShader->setGamma(map.getState().getPixelRatio());
         linepatternShader->setFade(fade);
         
         spriteAtlas.bind(true);
@@ -110,13 +103,16 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 
     } else {
         useProgram(lineShader->program);
+
         lineShader->setMatrix(vtxMatrix);
         lineShader->setExtrudeMatrix(extrudeMatrix);
-        lineShader->setDashArray({{ dash_length, dash_gap }});
         lineShader->setLineWidth({{ outset, inset }});
-        lineShader->setRatio(map.getState().getPixelRatio());
+        lineShader->setRatio(ratio);
         lineShader->setBlur(blur);
+
         lineShader->setColor(color);
+        lineShader->setDashArray({{ dash_length, dash_gap }});
+
         bucket.drawLines(*lineShader);
     }
 }

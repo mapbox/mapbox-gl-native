@@ -22,7 +22,7 @@ LinepatternShader::LinepatternShader()
     a_extrude = glGetAttribLocation(program, "a_extrude");
     a_linesofar = glGetAttribLocation(program, "a_linesofar");
 
-    u_matrix = glGetUniformLocation(program, "u_matrix");
+    u_matrix = glGetUniformLocation(program, "u_posmatrix");
     u_exmatrix = glGetUniformLocation(program, "u_exmatrix");
     u_linewidth = glGetUniformLocation(program, "u_linewidth");
     u_ratio = glGetUniformLocation(program, "u_ratio");
@@ -30,8 +30,8 @@ LinepatternShader::LinepatternShader()
 
     u_pattern_tl = glGetUniformLocation(program, "u_pattern_tl");
     u_pattern_br = glGetUniformLocation(program, "u_pattern_br");
-    u_offset = glGetUniformLocation(program, "u_offset");
-    u_gamma = glGetUniformLocation(program, "u_gamma");
+    u_point = glGetUniformLocation(program, "u_point");
+    u_blur = glGetUniformLocation(program, "u_blur");
     u_fade = glGetUniformLocation(program, "u_fade");
 
     //fprintf(stderr, "LinepatternShader:\n");
@@ -42,8 +42,9 @@ LinepatternShader::LinepatternShader()
     //fprintf(stderr, "    - u_pattern_size: %d\n", u_pattern_size);
     //fprintf(stderr, "    - u_pattern_tl: %d\n", u_pattern_tl);
     //fprintf(stderr, "    - u_pattern_br: %d\n", u_pattern_br);
-    //fprintf(stderr, "    - u_offset: %d\n", u_offset);
-    //fprintf(stderr, "    - u_gamma: %d\n", u_gamma);
+    //fprintf(stderr, "    - u_point: %d\n", u_point);
+    //fprintf(stderr, "    - u_blur: %d\n", u_blur);
+    //fprintf(stderr, "    - u_fade: %d\n", u_fade);
 }
 
 void LinepatternShader::bind(char *offset) {
@@ -99,17 +100,17 @@ void LinepatternShader::setPatternBottomRight(const std::array<float, 2>& new_pa
     }
 }
 
-void LinepatternShader::setOffset(const std::array<float, 2>& new_offset) {
-    if (offset != new_offset) {
-        glUniform2fv(u_offset, 1, new_offset.data());
-        offset = new_offset;
+void LinepatternShader::setPoint(float new_point) {
+    if (point != new_point) {
+        glUniform1f(u_point, new_point);
+        point = new_point;
     }
 }
 
-void LinepatternShader::setGamma(float new_gamma) {
-    if (gamma != new_gamma) {
-        glUniform1f(u_gamma, new_gamma);
-        gamma = new_gamma;
+void LinepatternShader::setBlur(float new_blur) {
+    if (blur != new_blur) {
+        glUniform1f(u_blur, new_blur);
+        blur = new_blur;
     }
 }
 

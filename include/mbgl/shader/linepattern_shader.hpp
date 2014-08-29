@@ -14,12 +14,11 @@ public:
     void setExtrudeMatrix(const std::array<float, 16>& exmatrix);
     void setLineWidth(const std::array<float, 2>& linewidth);
     void setRatio(float ratio);
-    void setDebug(float debug);
     void setPatternSize(const std::array<float, 2>& new_pattern_size);
     void setPatternTopLeft(const std::array<float, 2>& new_pattern_tl);
     void setPatternBottomRight(const std::array<float, 2>& new_pattern_br);
-    void setOffset(const std::array<float, 2>& offset);
-    void setGamma(float new_gamma);
+    void setPoint(float new_point);
+    void setBlur(float new_blur);
     void setFade(float new_fade);
 
 private:
@@ -45,11 +44,11 @@ private:
     std::array<float, 2> pattern_br = {{}};
     int32_t u_pattern_br = -1;
 
-    std::array<float, 2> offset = {{}};
-    int32_t u_offset = -1;
+    float point = 0.0f;
+    int32_t u_point = -1;
 
-    float gamma = 0.0f;
-    int32_t u_gamma = -1;
+    float blur = 0.0f;
+    int32_t u_blur = -1;
 
     float fade = 0;
     int32_t u_fade = -1;
