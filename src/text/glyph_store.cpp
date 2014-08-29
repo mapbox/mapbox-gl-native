@@ -131,7 +131,7 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
         }
     }
 
-    maxLineLength = maxLineLength || shaping.back().x;
+    if (!maxLineLength) maxLineLength = shaping.back().x;
 
     justifyLine(shaping, metrics, lineStartIndex, uint32_t(shaping.size()) - 1, justify);
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line);
