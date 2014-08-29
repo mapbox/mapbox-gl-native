@@ -81,7 +81,6 @@ public:
 
     void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
     void renderDebugText(const std::vector<std::string> &strings);
-    void renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &matrix);
     void renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     void renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     void renderSymbol(SymbolBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
