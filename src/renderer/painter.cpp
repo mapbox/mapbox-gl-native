@@ -204,13 +204,14 @@ void Painter::renderBackground(std::shared_ptr<StyleLayer> layer_desc) {
     }
 }
 
-const mat4 &Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {
+mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {
     if (translation[0] == 0 && translation[1] == 0) {
         return matrix;
     } else {
         // TODO: Get rid of the 8 (scaling from 4096 to tile size)
         const double factor = ((double)(1 << id.z)) / map.getState().getScale() * (4096.0 / util::tileSize);
 
+        mat4 vtxMatrix;
         if (anchor == TranslateAnchorType::Viewport) {
             const double sin_a = std::sin(-map.getState().getAngle());
             const double cos_a = std::cos(-map.getState().getAngle());

@@ -120,7 +120,7 @@ public:
     bool needsAnimation() const;
 private:
     void setupShaders();
-    const mat4 &translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = TranslateAnchorType::Map);
+    mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = TranslateAnchorType::Map);
 
     void prepareTile(const Tile& tile);
 
@@ -131,7 +131,6 @@ public:
     void depthRange(float near, float far);
 
 public:
-    mat4 vtxMatrix;
     mat4 projMatrix;
     mat4 nativeMatrix;
     mat4 extrudeMatrix;
