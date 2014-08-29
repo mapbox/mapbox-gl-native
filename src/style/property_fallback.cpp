@@ -52,6 +52,7 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::RasterContrast, defaultStyleProperties<RasterProperties>().contrast },
     { PropertyKey::RasterFade, defaultStyleProperties<RasterProperties>().fade },
 
+    { PropertyKey::BackgroundOpacity, defaultStyleProperties<BackgroundProperties>().opacity },
     { PropertyKey::BackgroundColor, defaultStyleProperties<BackgroundProperties>().color },
 };
 

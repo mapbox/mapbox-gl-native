@@ -143,8 +143,7 @@ void Painter::clear() {
     glStencilMask(0xFF);
     depthMask(true);
 
-    const BackgroundProperties &properties = map.getStyle()->getBackgroundProperties();
-    glClearColor(properties.color[0], properties.color[1], properties.color[2], properties.color[3]);
+    glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -180,18 +179,39 @@ void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> laye
         gl::group group(util::sprintf<32>("render %d/%d/%d\n", tile.id.z, tile.id.y, tile.id.z));
         prepareTile(tile);
         tile.data->render(*this, layer_desc, matrix);
-        frameHistory.record(map.getAnimationTime(), map.getState().getNormalizedZoom());
     }
 }
 
+void Painter::renderBackground(std::shared_ptr<StyleLayer> layer_desc) {
+    const BackgroundProperties& properties = layer_desc->getProperties<BackgroundProperties>();
 
-const mat4 &Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {
+    Color color = properties.color;
+    color[0] *= properties.opacity;
+    color[1] *= properties.opacity;
+    color[2] *= properties.opacity;
+    color[3] *= properties.opacity;
+
+    if ((color[3] >= 1.0f) == (pass == RenderPass::Opaque)) {
+        useProgram(plainShader->program);
+        plainShader->setMatrix(identityMatrix);
+        plainShader->setColor(color);
+        backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
+
+        glDisable(GL_STENCIL_TEST);
+        depthRange(strata + strata_epsilon, 1.0f);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glEnable(GL_STENCIL_TEST);
+    }
+}
+
+mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {
     if (translation[0] == 0 && translation[1] == 0) {
         return matrix;
     } else {
         // TODO: Get rid of the 8 (scaling from 4096 to tile size)
         const double factor = ((double)(1 << id.z)) / map.getState().getScale() * (4096.0 / util::tileSize);
 
+        mat4 vtxMatrix;
         if (anchor == TranslateAnchorType::Viewport) {
             const double sin_a = std::sin(-map.getState().getAngle());
             const double cos_a = std::cos(-map.getState().getAngle());

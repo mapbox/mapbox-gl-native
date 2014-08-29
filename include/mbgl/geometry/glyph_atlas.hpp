@@ -3,6 +3,7 @@
 
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/text/glyph_store.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <string>
 #include <set>
@@ -12,7 +13,7 @@
 
 namespace mbgl {
 
-class GlyphAtlas {
+class GlyphAtlas : public util::noncopyable {
 public:
 
 private:

@@ -61,7 +61,7 @@ struct SymbolProperties {
 
     struct {
         float opacity = 1.0f;
-        float size = 12.0f;
+        float size = 16.0f;
         Color color = {{ 0, 0, 0, 1 }};
         Color halo_color = {{ 0, 0, 0, 0 }};
         float halo_width = 0.0f;
@@ -92,6 +92,7 @@ struct RasterProperties {
 
 struct BackgroundProperties {
     inline BackgroundProperties() {}
+    float opacity = 1.0f;
     Color color = {{ 0, 0, 0, 1 }};
 };
 

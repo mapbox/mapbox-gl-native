@@ -81,11 +81,12 @@ public:
 
     void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
     void renderDebugText(const std::vector<std::string> &strings);
-    void renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &matrix);
     void renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     void renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     void renderSymbol(SymbolBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderBackground(std::shared_ptr<StyleLayer> layer_desc);
+
     std::array<float, 3> spinWeights(float spin_value);
 
     void preparePrerender(RasterBucket &bucket);
@@ -118,7 +119,7 @@ public:
     bool needsAnimation() const;
 private:
     void setupShaders();
-    const mat4 &translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = TranslateAnchorType::Map);
+    mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = TranslateAnchorType::Map);
 
     void prepareTile(const Tile& tile);
 
@@ -129,7 +130,6 @@ public:
     void depthRange(float near, float far);
 
 public:
-    mat4 vtxMatrix;
     mat4 projMatrix;
     mat4 nativeMatrix;
     mat4 extrudeMatrix;
@@ -142,10 +142,14 @@ public:
         return flipMatrix;
     }();
 
+    const mat4 identityMatrix = []{
+        mat4 identity;
+        matrix::identity(identity);
+        return identity;
+    }();
+
 private:
     Map& map;
-
-    FrameHistory frameHistory;
 
     bool debug = false;
 
@@ -159,6 +163,8 @@ private:
     const float strata_epsilon = 1.0f / (1 << 16);
 
 public:
+    FrameHistory frameHistory;
+
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;
     std::unique_ptr<LineShader> lineShader;
@@ -169,6 +175,13 @@ public:
     std::unique_ptr<TextShader> textShader;
     std::unique_ptr<DotShader> dotShader;
     std::unique_ptr<GaussianShader> gaussianShader;
+
+    StaticVertexBuffer backgroundBuffer = {
+        { -1, -1 }, { 1, -1 },
+        { -1,  1 }, { 1,  1 }
+    };
+
+    VertexArrayObject backgroundArray;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     StaticVertexBuffer tileStencilBuffer = {

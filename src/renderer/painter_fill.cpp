@@ -10,9 +10,13 @@
 
 using namespace mbgl;
 
+void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
+    // Abort early.
+    if (!bucket.hasData()) return;
 
+    const FillProperties &properties = layer_desc->getProperties<FillProperties>();
+    mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
-void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, const Tile::ID& id, const mat4 &vtxMatrix) {
     Color fill_color = properties.fill_color;
     fill_color[0] *= properties.opacity;
     fill_color[1] *= properties.opacity;
@@ -135,12 +139,4 @@ void Painter::renderFill(FillBucket& bucket, const FillProperties& properties, c
         depthRange(strata + strata_epsilon, 1.0f);
         bucket.drawVertices(*outlineShader);
     }
-}
-
-void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
-    // Abort early.
-    if (!bucket.hasData()) return;
-    const FillProperties &properties = layer_desc->getProperties<FillProperties>();
-    const mat4 &vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
-    renderFill(bucket, properties, id, vtxMatrix);
 }

@@ -9,8 +9,7 @@
 
 namespace mbgl {
 
-void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> layer_desc,
-                           const Tile::ID &/*id*/, const mat4 &matrix) {
+void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix) {
     // Abort early.
     if (pass == RenderPass::Opaque) {
         return;
@@ -21,6 +20,8 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
     glDisable(GL_STENCIL_TEST);
 
     if (bucket.hasTextData()) {
+        mat4 vtxMatrix = translatedMatrix(matrix, properties.text.translate, id, properties.text.translate_anchor);
+
         mat4 exMatrix;
         matrix::copy(exMatrix, projMatrix);
         if (bucket.properties.placement == PlacementType::Line) {
@@ -32,7 +33,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
 
         useProgram(textShader->program);
-        textShader->setMatrix(matrix);
+        textShader->setMatrix(vtxMatrix);
         textShader->setExtrudeMatrix(exMatrix);
 
         GlyphAtlas &glyphAtlas = *map.getGlyphAtlas();
@@ -161,6 +162,8 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
     }
 
     if (bucket.hasIconData()) {
+        mat4 vtxMatrix = translatedMatrix(matrix, properties.icon.translate, id, properties.icon.translate_anchor);
+
         mat4 exMatrix;
         matrix::copy(exMatrix, projMatrix);
 
@@ -179,7 +182,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
 
         useProgram(iconShader->program);
-        iconShader->setMatrix(matrix);
+        iconShader->setMatrix(vtxMatrix);
         iconShader->setExtrudeMatrix(exMatrix);
 
         SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();

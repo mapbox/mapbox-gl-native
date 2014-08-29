@@ -46,12 +46,12 @@ typedef std::map<uint32_t, Glyph> GlyphPositions;
 
 class PositionedGlyph {
 public:
-    inline explicit PositionedGlyph(uint32_t glyph, uint32_t x, uint32_t y)
+    inline explicit PositionedGlyph(uint32_t glyph, float x, float y)
         : glyph(glyph), x(x), y(y) {}
 
     uint32_t glyph = 0;
-    int32_t x = 0;
-    int32_t y = 0;
+    float x = 0;
+    float y = 0;
 };
 
 typedef std::vector<PositionedGlyph> Shaping;

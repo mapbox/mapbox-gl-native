@@ -51,10 +51,6 @@ TEST_P(HeadlessTest, render) {
 
     Log::Set<FixtureLogBackend>();
 
-    // Setup OpenGL
-    HeadlessView view;
-    Map map(view);
-
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
         const std::string name { it->name.GetString(), it->name.GetStringLength() };
         const rapidjson::Value &value = it->value;
@@ -80,6 +76,9 @@ TEST_P(HeadlessTest, render) {
             }
         }
 
+        HeadlessView view;
+        Map map(view);
+
         map.setStyleJSON(style, base_directory);
         map.setAppliedClasses(classes);
 
@@ -97,7 +96,6 @@ TEST_P(HeadlessTest, render) {
         const std::string image = util::compress_png(width, height, pixels.get(), true);
         util::write_file(actual_image, image);
     }
-
 }
 
 INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest, ::testing::ValuesIn([] {

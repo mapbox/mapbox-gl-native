@@ -2,6 +2,7 @@
 #define MBGL_GEOMETRY_SPRITE_ATLAS
 
 #include <mbgl/geometry/binpack.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <string>
 #include <map>
@@ -14,7 +15,7 @@ namespace mbgl {
 class Sprite;
 class SpritePosition;
 
-class SpriteAtlas {
+class SpriteAtlas : public util::noncopyable {
 public:
     typedef uint16_t dimension;
 
