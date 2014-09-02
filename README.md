@@ -1,6 +1,6 @@
 [![Travis](https://api.travis-ci.org/mapbox/mapbox-gl-native.svg)](https://travis-ci.org/mapbox/mapbox-gl-native/builds)
 
-An OpenGL renderer for [Mapbox vector tiles](https://www.mapbox.com/blog/vector-tiles),
+An OpenGL renderer for [Mapbox Vector Tiles](https://www.mapbox.com/blog/vector-tiles),
 implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 
 # Depends
