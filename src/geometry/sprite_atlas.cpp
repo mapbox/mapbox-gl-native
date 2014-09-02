@@ -132,6 +132,18 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string &name, cons
     return rect;
 }
 
+SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, const Sprite& sprite, bool repeating) {
+    // `repeating` indicates that the image will be used in a repeating pattern
+    // repeating pattern images are assumed to have a 1px padding that mirrors the opposite edge
+    // positions for repeating images are adjusted to exclude the edge
+    Rect<dimension> rect = getImage(name, sprite);
+    const int r = repeating ? 1 : 0;
+    return SpriteAtlasPosition {
+        {{ float(rect.w)           / pixelRatio, float(rect.h)            / pixelRatio }},
+        {{ float(rect.x + r)            / width, float(rect.y + r)            / height }},
+        {{ float(rect.x + rect.w - 2*r) / width, float(rect.y + rect.h - 2*r) / height }}
+    };
+}
 
 Rect<SpriteAtlas::dimension> SpriteAtlas::waitForImage(const std::string &name, const Sprite &sprite) {
     sprite.waitUntilLoaded();

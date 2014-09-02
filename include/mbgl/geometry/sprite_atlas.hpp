@@ -9,11 +9,18 @@
 #include <mutex>
 #include <atomic>
 #include <set>
+#include <array>
 
 namespace mbgl {
 
 class Sprite;
 class SpritePosition;
+
+struct SpriteAtlasPosition {
+    std::array<float, 2> size;
+    std::array<float, 2> tl;
+    std::array<float, 2> br;
+};
 
 class SpriteAtlas : public util::noncopyable {
 public:
@@ -41,6 +48,8 @@ public:
     // image and returns the dimensions.
     // NEVER CALL THIS FUNCTION FROM THE RENDER THREAD! it is blocking.
     Rect<dimension> waitForImage(const std::string &name, const Sprite &sprite);
+
+    SpriteAtlasPosition getPosition(const std::string &name, const Sprite &sprite, bool repeating = false);
 
     // Binds the image buffer of this sprite atlas to the GPU, and uploads data if it is out
     // of date.

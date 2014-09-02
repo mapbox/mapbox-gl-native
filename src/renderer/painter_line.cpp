@@ -66,16 +66,10 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 
     const std::shared_ptr<Sprite> &sprite = map.getSprite();
     if (properties.image.size() && sprite) {
-        SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-        Rect<uint16_t> imagePos = spriteAtlas.getImage(properties.image, *sprite);
+        SpriteAtlasPosition imagePos = map.getSpriteAtlas()->getPosition(properties.image, *sprite);
 
         float factor = 8.0 / std::pow(2, map.getState().getIntegerZoom() - id.z);
         float fade = std::fmod(map.getState().getZoom(), 1.0);
-
-        std::array<float, 2> imageSize = {{
-            imagePos.w * factor,
-            imagePos.h * factor
-        }};
 
         useProgram(linepatternShader->program);
 
@@ -85,20 +79,14 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         linepatternShader->setRatio(ratio);
         linepatternShader->setBlur(blur);
 
-        linepatternShader->setPatternSize(imageSize);
-        linepatternShader->setPatternTopLeft({{
-            float(imagePos.x) / spriteAtlas.getWidth(),
-            float(imagePos.y) / spriteAtlas.getHeight(),
-        }});
-        linepatternShader->setPatternBottomRight({{
-            float(imagePos.x + imagePos.w) / spriteAtlas.getWidth(),
-            float(imagePos.y + imagePos.h) / spriteAtlas.getHeight(),
-        }});
+        linepatternShader->setPatternSize({{imagePos.size[0] * factor, imagePos.size[1]}});
+        linepatternShader->setPatternTopLeft(imagePos.tl);
+        linepatternShader->setPatternBottomRight(imagePos.br);
         linepatternShader->setFade(fade);
-        
-        spriteAtlas.bind(true);
+
+        map.getSpriteAtlas()->bind(true);
         glDepthRange(strata + strata_epsilon, 1.0f);  // may or may not matter
-        
+
         bucket.drawLinePatterns(*linepatternShader);
 
     } else {

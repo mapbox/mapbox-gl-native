@@ -61,36 +61,18 @@ void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         Sprite &sprite = *map.getSprite();
         if (pass == RenderPass::Translucent && sprite) {
             SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-            const Rect<uint16_t> pos = spriteAtlas.getImage(properties.image, sprite);
-
-            // `repeating` indicates that the image will be used in a repeating pattern
-            // repeating pattern images are assumed to have a 1px padding that mirrors the opposite edge
-            // positions for repeating images are adjusted to exclude the edge
-            const int repeating = 1;
-            const std::array<float, 2> size {{
-                float(pos.w) / spriteAtlas.getPixelRatio(),
-                float(pos.h) / spriteAtlas.getPixelRatio(),
-            }};
-            const std::array<float, 2> tl {{
-                (float(pos.x + repeating) / spriteAtlas.getWidth()),
-                (float(pos.y + repeating) / spriteAtlas.getHeight()),
-            }};
-            const std::array<float, 2> br {{
-                (float(pos.x + pos.w - 2 * repeating) / spriteAtlas.getWidth()),
-                (float(pos.y + pos.h - 2 * repeating) / spriteAtlas.getHeight()),
-            }};
+            const SpriteAtlasPosition pos = spriteAtlas.getPosition(properties.image, sprite, true);
             const float mix = std::fmod(float(map.getState().getZoom()), 1.0f);
-
             const float factor = 8.0 / std::pow(2, map.getState().getIntegerZoom() - id.z);
 
             mat3 patternMatrix;
             matrix::identity(patternMatrix);
-            matrix::scale(patternMatrix, patternMatrix, 1.0f / (size[0] * factor), 1.0f / (size[1] * factor));
+            matrix::scale(patternMatrix, patternMatrix, 1.0f / (pos.size[0] * factor), 1.0f / (pos.size[1] * factor));
 
             useProgram(patternShader->program);
             patternShader->setMatrix(vtxMatrix);
-            patternShader->setPatternTopLeft(tl);
-            patternShader->setPatternBottomRight(br);
+            patternShader->setPatternTopLeft(pos.tl);
+            patternShader->setPatternBottomRight(pos.br);
             patternShader->setOpacity(properties.opacity);
             patternShader->setImage(0);
             patternShader->setMix(mix);
