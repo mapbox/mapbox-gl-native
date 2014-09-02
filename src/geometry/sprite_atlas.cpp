@@ -196,11 +196,13 @@ void SpriteAtlas::update(const Sprite &sprite) {
 }
 
 void SpriteAtlas::bind(bool linear) {
+    bool first = false;
     if (!texture) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        first = true;
     } else {
         glBindTexture(GL_TEXTURE_2D, texture);
     }
@@ -211,17 +213,12 @@ void SpriteAtlas::bind(bool linear) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_val);
         filter = filter_val;
     }
-}
 
-void SpriteAtlas::upload() {
     if (dirty) {
-        const bool exists = texture;
-        bind(filter); // Make sure we don't change the filter value.
-
         std::lock_guard<std::mutex> lock(mtx);
         allocate();
 
-        if (!exists) {
+        if (first) {
             glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target
                 0, // GLint level
@@ -252,7 +249,7 @@ void SpriteAtlas::upload() {
 #endif
         dirty = false;
     }
-}
+};
 
 SpriteAtlas::~SpriteAtlas() {
     std::lock_guard<std::mutex> lock(mtx);

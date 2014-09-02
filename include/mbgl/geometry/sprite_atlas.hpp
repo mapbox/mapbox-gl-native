@@ -42,11 +42,9 @@ public:
     // NEVER CALL THIS FUNCTION FROM THE RENDER THREAD! it is blocking.
     Rect<dimension> waitForImage(const std::string &name, const Sprite &sprite);
 
-    // Binds the image buffer of this sprite atlas to the GPU.
+    // Binds the image buffer of this sprite atlas to the GPU, and uploads data if it is out
+    // of date.
     void bind(bool linear = false);
-
-    // Uploads the image buffer to the GPU if it is out of date.
-    void upload();
 
     inline float getWidth() const { return width; }
     inline float getHeight() const { return height; }
