@@ -3,6 +3,7 @@
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/url.hpp>
 #include <mbgl/platform/log.hpp>
+#include <iostream>
 
 const std::string base_directory = []{
     std::string fn = __FILE__;
@@ -35,6 +36,20 @@ platform::request_http(const std::string &url,
 
     int err;
 
+    std::string body;
+    FILE *file = std::fopen(clean_url.c_str(),"rb");
+
+    if (file != NULL)
+    {
+        std::fseek(file, 0, SEEK_END);
+        std::size_t file_size = std::ftell(file);
+        std::fseek(file, 0, SEEK_SET);
+        body.resize(file_size);
+        std::fread(&body[0], file_size, 1, file);
+        std::fclose(file);
+    }
+
+    /*
     uv_fs_t open_req;
     err = uv_fs_open(l, &open_req, clean_url.c_str(), O_RDONLY, S_IRUSR, nullptr);
     uv_fs_req_cleanup(&open_req);
@@ -67,9 +82,12 @@ platform::request_http(const std::string &url,
     uv_buf_t uvbuf = uv_buf_init(const_cast<char *>(body.data()), body.size());
 
     uv_fs_t read_req;
+    std::cerr << "fd: " << fd << '\n';
+    std::cerr << "uvbuf.len: " << uvbuf.len << '\n';
     err = uv_fs_read(l, &read_req, fd, &uvbuf, 1, 0, nullptr);
     uv_fs_req_cleanup(&read_req);
     if (err < 0) {
+        std::cerr << "err: " << read_req.errorno << '\n';
         req->res->code = err;
         req->res->error_message = uv_strerror(uv_last_error(l));
         Log::Warning(Event::HttpRequest, err, url + ": " + uv_strerror(uv_last_error(l)));
@@ -88,6 +106,7 @@ platform::request_http(const std::string &url,
         req->complete();
         return req;
     }
+    */
 
     req->res->body.swap(body);
     req->res->code = 200;
