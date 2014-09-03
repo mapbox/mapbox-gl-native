@@ -135,9 +135,9 @@ cd ../../
 elif [ ${UNAME} = 'Linux' ]; then
 
 if [ ! -z "${TRAVIS:-}" ]; then
-    if aws s3 cp s3://${AWS_S3_BUCKET}/dependencies/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ./out/ ; then
+    if aws s3 cp s3://${AWS_S3_BUCKET}/dependencies/build-cpp11-libstdcpp-gcc-x86_64-linux_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then
         rm -rf out/build-cpp11-libstdcpp-gcc-x86_64-linux
-        tar -xzf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz
+        tar -xzf out/build-cpp11-libstdcpp-gcc-x86_64-linux_${MP_HASH}_${DIR_HASH}.tar.gz
     fi
 fi
 
@@ -152,8 +152,8 @@ export LIBUV_VERSION=0.10.28
 
 if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
     if ! tar --compare -zf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ; then
-        tar -zcf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz out/build-cpp11-libstdcpp-gcc-x86_64-linux
-        aws s3 cp --acl public-read out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz s3://${AWS_S3_BUCKET}/dependencies/
+        tar -zcf out/build-cpp11-libstdcpp-gcc-x86_64-linux_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libstdcpp-gcc-x86_64-linux
+        aws s3 cp --acl public-read out/build-cpp11-libstdcpp-gcc-x86_64-linux_${MP_HASH}_${DIR_HASH}.tar.gz s3://${AWS_S3_BUCKET}/dependencies/
     fi
 fi
 
