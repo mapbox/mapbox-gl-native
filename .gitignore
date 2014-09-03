@@ -8,7 +8,6 @@
 /macosx/build
 /ios/build
 /config.gypi
-/config.mk
 /config/constants_local.cpp
 /build
 /bin/node_modules

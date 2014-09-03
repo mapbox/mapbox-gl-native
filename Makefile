@@ -1,5 +1,3 @@
--include config.mk
-
 BUILDTYPE ?= Release
 PYTHON ?= python
 V ?= 1
@@ -97,11 +95,9 @@ lproj: config.gypi linux/mapboxgl-app.gyp clear_xcode_cache node
 clean: clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
-	-rm -rf ./config.mk
 	-rm -rf ./config.gypi
 
 distclean: clean
-	-rm -rf ./config.mk
 	-rm -rf ./config.gypi
 	-rm -rf ./mapnik-packaging/osx/out/
 
