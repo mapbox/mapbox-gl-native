@@ -20,7 +20,7 @@ Request::Request(const std::string &url,
         // create an actual work request that is attached to the default loop.
         async = new uv_async_t();
         async->data = new std::unique_ptr<Response>();
-        uv_async_init(**loop, async, complete);
+        uv_async_init(**loop, async, &complete);
     }
 }
 
