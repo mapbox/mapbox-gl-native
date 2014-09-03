@@ -153,6 +153,7 @@ HeadlessView::~HeadlessView() {
 #endif
 
 #if MBGL_USE_GLX
+    glXMakeCurrent(x_display, None, NULL);
     glXDestroyContext(x_display, gl_context);
     XFree(x_info);
     XCloseDisplay(x_display);
