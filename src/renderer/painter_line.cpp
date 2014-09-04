@@ -42,22 +42,20 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     // We're only drawing end caps + round line joins if the line is > 2px. Otherwise, they aren't visible anyway.
     if (bucket.hasPoints() && outset > 1.0f) {
         useProgram(linejoinShader->program);
-        linejoinShader->setMatrix(vtxMatrix);
-        linejoinShader->setColor(color);
-        linejoinShader->setWorld({{
-                map.getState().getFramebufferWidth() * 0.5f,
-                map.getState().getFramebufferHeight() * 0.5f
-            }
-        });
-        linejoinShader->setLineWidth({{
-                ((outset - 0.25f) * map.getState().getPixelRatio()),
-                ((inset - 0.25f) * map.getState().getPixelRatio())
-            }
-        });
+        linejoinShader->u_matrix = vtxMatrix;
+        linejoinShader->u_color = color;
+        linejoinShader->u_world = {{
+            map.getState().getFramebufferWidth() * 0.5f,
+            map.getState().getFramebufferHeight() * 0.5f
+        }};
+        linejoinShader->u_linewidth = {{
+            ((outset - 0.25f) * map.getState().getPixelRatio()),
+            ((inset - 0.25f) * map.getState().getPixelRatio())
+        }};
 
         float pointSize = std::ceil(map.getState().getPixelRatio() * outset * 2.0);
 #if defined(GL_ES_VERSION_2_0)
-        linejoinShader->setSize(pointSize);
+        linejoinShader->u_size = pointSize;
 #else
         glPointSize(pointSize);
 #endif
@@ -73,16 +71,16 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
 
         useProgram(linepatternShader->program);
 
-        linepatternShader->setMatrix(vtxMatrix);
-        linepatternShader->setExtrudeMatrix(extrudeMatrix);
-        linepatternShader->setLineWidth({{ outset, inset }});
-        linepatternShader->setRatio(ratio);
-        linepatternShader->setBlur(blur);
+        linepatternShader->u_matrix = vtxMatrix;
+        linepatternShader->u_exmatrix = extrudeMatrix;
+        linepatternShader->u_linewidth = {{ outset, inset }};
+        linepatternShader->u_ratio = ratio;
+        linepatternShader->u_blur = blur;
 
-        linepatternShader->setPatternSize({{imagePos.size[0] * factor, imagePos.size[1]}});
-        linepatternShader->setPatternTopLeft(imagePos.tl);
-        linepatternShader->setPatternBottomRight(imagePos.br);
-        linepatternShader->setFade(fade);
+        linepatternShader->u_pattern_size = {{imagePos.size[0] * factor, imagePos.size[1]}};
+        linepatternShader->u_pattern_tl = imagePos.tl;
+        linepatternShader->u_pattern_br = imagePos.br;
+        linepatternShader->u_fade = fade;
 
         map.getSpriteAtlas()->bind(true);
         glDepthRange(strata + strata_epsilon, 1.0f);  // may or may not matter
@@ -92,14 +90,14 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     } else {
         useProgram(lineShader->program);
 
-        lineShader->setMatrix(vtxMatrix);
-        lineShader->setExtrudeMatrix(extrudeMatrix);
-        lineShader->setLineWidth({{ outset, inset }});
-        lineShader->setRatio(ratio);
-        lineShader->setBlur(blur);
+        lineShader->u_matrix = vtxMatrix;
+        lineShader->u_exmatrix = extrudeMatrix;
+        lineShader->u_linewidth = {{ outset, inset }};
+        lineShader->u_ratio = ratio;
+        lineShader->u_blur = blur;
 
-        lineShader->setColor(color);
-        lineShader->setDashArray({{ dash_length, dash_gap }});
+        lineShader->u_color = color;
+        lineShader->u_dasharray = {{ dash_length, dash_gap }};
 
         bucket.drawLines(*lineShader);
     }

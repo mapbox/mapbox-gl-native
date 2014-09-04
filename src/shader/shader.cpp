@@ -124,15 +124,6 @@ bool Shader::compileShader(GLuint *shader, GLenum type, const GLchar *source) {
     return true;
 }
 
-
-void Shader::setMatrix(const std::array<float, 16>& newMatrix) {
-    if (matrix != newMatrix) {
-        glUniformMatrix4fv(u_matrix, 1, GL_FALSE, newMatrix.data());
-        matrix = newMatrix;
-    }
-}
-
-
 Shader::~Shader() {
     if (program) {
         glDeleteProgram(program);

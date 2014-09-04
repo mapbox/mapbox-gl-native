@@ -21,10 +21,10 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
     glDisable(GL_DEPTH_TEST);
 
     useProgram(plainShader->program);
-    plainShader->setMatrix(matrix);
+    plainShader->u_matrix = matrix;
 
     // Draw white outline
-    plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
+    plainShader->u_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
     lineWidth(4.0f * map.getState().getPixelRatio());
     bucket.drawLines(*plainShader);
 
@@ -35,7 +35,7 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
 #endif
 
     // Draw black text.
-    plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
+    plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
     lineWidth(2.0f * map.getState().getPixelRatio());
     bucket.drawLines(*plainShader);
 
@@ -51,11 +51,11 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     glDisable(GL_DEPTH_TEST);
 
     useProgram(plainShader->program);
-    plainShader->setMatrix(matrix);
+    plainShader->u_matrix = matrix;
 
     // draw tile outline
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
-    plainShader->setColor(1.0f, 0.0f, 0.0f, 1.0f);
+    plainShader->u_color = {{ 1.0f, 0.0f, 0.0f, 1.0f }};
     lineWidth(4.0f * map.getState().getPixelRatio());
     glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index());
 
@@ -73,7 +73,7 @@ void Painter::renderDebugText(const std::vector<std::string> &strings) {
     glStencilFunc(GL_ALWAYS, 0xFF, 0xFF);
 
     useProgram(plainShader->program);
-    plainShader->setMatrix(nativeMatrix);
+    plainShader->u_matrix = nativeMatrix;
 
     DebugFontBuffer debugFontBuffer;
     int line = 25;
@@ -86,14 +86,14 @@ void Painter::renderDebugText(const std::vector<std::string> &strings) {
         // draw debug info
         VertexArrayObject debugFontArray;
         debugFontArray.bind(*plainShader, debugFontBuffer, BUFFER_OFFSET(0));
-        plainShader->setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        plainShader->u_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
         lineWidth(4.0f * map.getState().getPixelRatio());
         glDrawArrays(GL_LINES, 0, (GLsizei)debugFontBuffer.index());
     #ifndef GL_ES_VERSION_2_0
         glPointSize(2);
         glDrawArrays(GL_POINTS, 0, (GLsizei)debugFontBuffer.index());
     #endif
-        plainShader->setColor(0.0f, 0.0f, 0.0f, 1.0f);
+        plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
         lineWidth(2.0f * map.getState().getPixelRatio());
         glDrawArrays(GL_LINES, 0, (GLsizei)debugFontBuffer.index());
     }

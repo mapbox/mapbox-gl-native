@@ -88,6 +88,8 @@ public:
     void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     void renderBackground(std::shared_ptr<StyleLayer> layer_desc);
 
+    float saturationFactor(float saturation);
+    float contrastFactor(float contrast);
     std::array<float, 3> spinWeights(float spin_value);
 
     void preparePrerender(RasterBucket &bucket);

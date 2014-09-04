@@ -25,19 +25,20 @@ void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix,
 
     // draw the texture on a quad
     useProgram(rasterShader->program);
-    rasterShader->setMatrix(matrix);
-    rasterShader->setOpacity(1);
+    rasterShader->u_matrix = matrix;
+    rasterShader->u_opacity = 1;
 
     depthRange(strata, 1.0f);
 
     glActiveTexture(GL_TEXTURE0);
-    rasterShader->setImage(0);
-    rasterShader->setBuffer(buffer);
-    rasterShader->setOpacity(properties.opacity);
-    rasterShader->setBrightness(properties.brightness[0], properties.brightness[1]);
-    rasterShader->setSaturation(properties.saturation);
-    rasterShader->setContrast(properties.contrast);
-    rasterShader->setSpin(spinWeights(properties.hue_rotate));
+    rasterShader->u_image = 0;
+    rasterShader->u_buffer = buffer;
+    rasterShader->u_opacity = properties.opacity;
+    rasterShader->u_brightness_low = properties.brightness[0];
+    rasterShader->u_brightness_high = properties.brightness[1];
+    rasterShader->u_saturation_factor = saturationFactor(properties.saturation);
+    rasterShader->u_contrast_factor = contrastFactor(properties.contrast);
+    rasterShader->u_spin_weights = spinWeights(properties.hue_rotate);
     bucket.texture.bindTexture();
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
