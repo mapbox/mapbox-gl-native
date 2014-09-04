@@ -1,4 +1,4 @@
-#include <mbgl/shader/text_shader.hpp>
+#include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/shaders.hpp>
 #include <mbgl/platform/gl.hpp>
 
@@ -6,14 +6,14 @@
 
 using namespace mbgl;
 
-TextShader::TextShader()
+SDFShader::SDFShader()
     : Shader(
-        "text",
-        shaders[TEXT_SHADER].vertex,
-        shaders[TEXT_SHADER].fragment
+        "sdf",
+        shaders[SDF_SHADER].vertex,
+        shaders[SDF_SHADER].fragment
     ) {
     if (!valid) {
-        fprintf(stderr, "invalid text shader\n");
+        fprintf(stderr, "invalid sdf shader\n");
         return;
     }
 
@@ -23,7 +23,7 @@ TextShader::TextShader()
     a_data2 = glGetAttribLocation(program, "a_data2");
 }
 
-void TextShader::bind(char *offset) {
+void SDFShader::bind(char *offset) {
     glEnableVertexAttribArray(a_pos);
     glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 16, offset + 0);
 

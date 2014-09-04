@@ -373,7 +373,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
     }
 }
 
-void SymbolBucket::drawGlyphs(TextShader &shader) {
+void SymbolBucket::drawGlyphs(SDFShader &shader) {
     char *vertex_index = BUFFER_OFFSET(0);
     char *elements_index = BUFFER_OFFSET(0);
     for (TextElementGroup &group : text.groups) {

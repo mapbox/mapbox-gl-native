@@ -44,7 +44,7 @@ void Painter::setup() {
     assert(linepatternShader);
     assert(patternShader);
     assert(rasterShader);
-    assert(textShader);
+    assert(sdfShader);
     assert(dotShader);
     assert(gaussianShader);
 
@@ -75,7 +75,7 @@ void Painter::setupShaders() {
     if (!patternShader) patternShader = std::make_unique<PatternShader>();
     if (!iconShader) iconShader = std::make_unique<IconShader>();
     if (!rasterShader) rasterShader = std::make_unique<RasterShader>();
-    if (!textShader) textShader = std::make_unique<TextShader>();
+    if (!sdfShader) sdfShader = std::make_unique<SDFShader>();
     if (!dotShader) dotShader = std::make_unique<DotShader>();
     if (!gaussianShader) gaussianShader = std::make_unique<GaussianShader>();
 }

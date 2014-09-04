@@ -1,14 +1,14 @@
-#ifndef MBGL_SHADER_TEXT_SHADER
-#define MBGL_SHADER_TEXT_SHADER
+#ifndef MBGL_SHADER_SDF_SHADER
+#define MBGL_SHADER_SDF_SHADER
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/shader/uniform.hpp>
 
 namespace mbgl {
 
-class TextShader : public Shader {
+class SDFShader : public Shader {
 public:
-    TextShader();
+    SDFShader();
 
     void bind(char *offset);
 

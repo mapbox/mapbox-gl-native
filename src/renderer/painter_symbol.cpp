@@ -32,13 +32,13 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         float fontSize = std::fmin(properties.text.size, bucket.properties.text.max_size);
         matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
 
-        useProgram(textShader->program);
-        textShader->u_matrix = vtxMatrix;
-        textShader->u_exmatrix = exMatrix;
+        useProgram(sdfShader->program);
+        sdfShader->u_matrix = vtxMatrix;
+        sdfShader->u_exmatrix = exMatrix;
 
         GlyphAtlas &glyphAtlas = *map.getGlyphAtlas();
         glyphAtlas.bind();
-        textShader->u_texsize = {{
+        sdfShader->u_texsize = {{
             static_cast<float>(glyphAtlas.width),
             static_cast<float>(glyphAtlas.height)
         }};
@@ -49,9 +49,9 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         // adjust min/max zooms for variable font sies
         float zoomAdjust = log(fontSize / bucket.properties.text.max_size) / log(2);
 
-        textShader->u_angle = (int32_t)(angle + 256) % 256;
-        textShader->u_flip = (bucket.properties.placement == PlacementType::Line ? 1 : 0);
-        textShader->u_zoom = (map.getState().getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
+        sdfShader->u_angle = (int32_t)(angle + 256) % 256;
+        sdfShader->u_flip = (bucket.properties.placement == PlacementType::Line ? 1 : 0);
+        sdfShader->u_zoom = (map.getState().getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
         // Label fading
         const timestamp duration = 300_milliseconds;
@@ -84,10 +84,10 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
             // bump is how much farther it would have been if it had continued zooming at the same rate
             float bump = (currentTime - lastFrame.t) / duration * fadedist;
 
-            textShader->u_fadedist = fadedist * 10;
-            textShader->u_minfadezoom = std::floor(lowZ * 10);
-            textShader->u_maxfadezoom = std::floor(highZ * 10);
-            textShader->u_fadezoom = (map.getState().getNormalizedZoom() + bump) * 10;
+            sdfShader->u_fadedist = fadedist * 10;
+            sdfShader->u_minfadezoom = std::floor(lowZ * 10);
+            sdfShader->u_maxfadezoom = std::floor(highZ * 10);
+            sdfShader->u_fadezoom = (map.getState().getNormalizedZoom() + bump) * 10;
         }
 
         // This defines the gamma around the SDF cutoff value.
@@ -122,9 +122,9 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
                 // Note that this does *not* have to be adjusted for retina screens, because we want
                 // the
                 // same blur width when we explicitly specify one.
-                textShader->u_gamma = (properties.text.halo_blur / (fontSize / sdfFontSize)) / 8.0f / 2.0f;
+                sdfShader->u_gamma = (properties.text.halo_blur / (fontSize / sdfFontSize)) / 8.0f / 2.0f;
             } else {
-                textShader->u_gamma = sdfGamma;
+                sdfShader->u_gamma = sdfGamma;
             }
 
             if (properties.text.opacity < 1.0f) {
@@ -133,31 +133,31 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
                 color[1] *= properties.text.opacity;
                 color[2] *= properties.text.opacity;
                 color[3] *= properties.text.opacity;
-                textShader->u_color = color;
+                sdfShader->u_color = color;
             } else {
-                textShader->u_color = properties.text.halo_color;
+                sdfShader->u_color = properties.text.halo_color;
             }
-            textShader->u_buffer = haloWidth;
+            sdfShader->u_buffer = haloWidth;
             depthRange(strata, 1.0f);
-            bucket.drawGlyphs(*textShader);
+            bucket.drawGlyphs(*sdfShader);
         }
 
         if (properties.text.color[3] > 0.0f) {
             // Then, we draw the text over the halo
-            textShader->u_gamma = gamma;
+            sdfShader->u_gamma = gamma;
             if (properties.text.opacity < 1.0f) {
                 Color color = properties.text.color;
                 color[0] *= properties.text.opacity;
                 color[1] *= properties.text.opacity;
                 color[2] *= properties.text.opacity;
                 color[3] *= properties.text.opacity;
-                textShader->u_color = color;
+                sdfShader->u_color = color;
             } else {
-                textShader->u_color = properties.text.color;
+                sdfShader->u_color = properties.text.color;
             }
-            textShader->u_buffer = (256.0f - 64.0f) / 256.0f;
+            sdfShader->u_buffer = (256.0f - 64.0f) / 256.0f;
             depthRange(strata + strata_epsilon, 1.0f);
-            bucket.drawGlyphs(*textShader);
+            bucket.drawGlyphs(*sdfShader);
         }
     }
 

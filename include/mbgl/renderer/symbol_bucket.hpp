@@ -18,7 +18,7 @@
 namespace mbgl {
 
 class Style;
-class TextShader;
+class SDFShader;
 class IconShader;
 class DotShader;
 class Collision;
@@ -68,7 +68,7 @@ public:
     void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom, PlacementRange placementRange,
                    float zoom);
 
-    void drawGlyphs(TextShader &shader);
+    void drawGlyphs(SDFShader &shader);
     void drawIcons(IconShader& shader);
 
 private:

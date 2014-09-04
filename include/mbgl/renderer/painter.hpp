@@ -17,7 +17,7 @@
 #include <mbgl/shader/linepattern_shader.hpp>
 #include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/shader/raster_shader.hpp>
-#include <mbgl/shader/text_shader.hpp>
+#include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/dot_shader.hpp>
 #include <mbgl/shader/gaussian_shader.hpp>
 
@@ -176,7 +176,7 @@ public:
     std::unique_ptr<PatternShader> patternShader;
     std::unique_ptr<IconShader> iconShader;
     std::unique_ptr<RasterShader> rasterShader;
-    std::unique_ptr<TextShader> textShader;
+    std::unique_ptr<SDFShader> sdfShader;
     std::unique_ptr<DotShader> dotShader;
     std::unique_ptr<GaussianShader> gaussianShader;
 
