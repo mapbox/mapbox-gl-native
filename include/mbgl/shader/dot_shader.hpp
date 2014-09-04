@@ -2,30 +2,23 @@
 #define MBGL_SHADER_SHADER_DOT
 
 #include <mbgl/shader/shader.hpp>
+#include <mbgl/shader/uniform.hpp>
 
 namespace mbgl {
 
-    class DotShader : public Shader {
-    public:
-        DotShader();
+class DotShader : public Shader {
+public:
+    DotShader();
 
-        void bind(char *offset);
+    void bind(char *offset);
 
-        void setColor(const std::array<float, 4>& color);
-        void setSize(float size);
-        void setBlur(float blur);
+    UniformMatrix<4>              u_matrix = {"u_matrix", *this};
+    Uniform<std::array<float, 4>> u_color  = {"u_color",  *this};
+    Uniform<float>                u_size   = {"u_size",   *this};
+    Uniform<float>                u_blur   = {"u_blur",   *this};
 
-    private:
-        int32_t a_pos = -1;
-
-        std::array<float, 4> color = {{}};
-        int32_t u_color = -1;
-
-        float size = 0;
-        int32_t u_size = -1;
-
-        float blur = 0;
-        int32_t u_blur = -1;
+private:
+    int32_t a_pos = -1;
 };
 
 }

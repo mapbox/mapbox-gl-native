@@ -195,8 +195,8 @@ void Painter::renderBackground(std::shared_ptr<StyleLayer> layer_desc) {
 
     if ((color[3] >= 1.0f) == (pass == RenderPass::Opaque)) {
         useProgram(plainShader->program);
-        plainShader->setMatrix(identityMatrix);
-        plainShader->setColor(color);
+        plainShader->u_matrix = identityMatrix;
+        plainShader->u_color = color;
         backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
 
         glDisable(GL_STENCIL_TEST);

@@ -42,16 +42,16 @@ void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     // below, we have to draw the outline first (!)
     if (outline && pass == RenderPass::Translucent) {
         useProgram(outlineShader->program);
-        outlineShader->setMatrix(vtxMatrix);
+        outlineShader->u_matrix = vtxMatrix;
         lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
-        outlineShader->setColor(stroke_color);
+        outlineShader->u_color = stroke_color;
 
         // Draw the entire line
-        outlineShader->setWorld({{
+        outlineShader->u_world = {{
             static_cast<float>(map.getState().getFramebufferWidth()),
             static_cast<float>(map.getState().getFramebufferHeight())
-        }});
+        }};
         depthRange(strata, 1.0f);
         bucket.drawVertices(*outlineShader);
     }
@@ -70,13 +70,13 @@ void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_d
             matrix::scale(patternMatrix, patternMatrix, 1.0f / (pos.size[0] * factor), 1.0f / (pos.size[1] * factor));
 
             useProgram(patternShader->program);
-            patternShader->setMatrix(vtxMatrix);
-            patternShader->setPatternTopLeft(pos.tl);
-            patternShader->setPatternBottomRight(pos.br);
-            patternShader->setOpacity(properties.opacity);
-            patternShader->setImage(0);
-            patternShader->setMix(mix);
-            patternShader->setPatternMatrix(patternMatrix);
+            patternShader->u_matrix = vtxMatrix;
+            patternShader->u_pattern_tl = pos.tl;
+            patternShader->u_pattern_br = pos.br;
+            patternShader->u_opacity = properties.opacity;
+            patternShader->u_image = 0;
+            patternShader->u_mix = mix;
+            patternShader->u_patternmatrix = patternMatrix;
 
             glActiveTexture(GL_TEXTURE0);
             spriteAtlas.bind(true);
@@ -94,8 +94,8 @@ void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_d
             // fragments
             // Draw filling rectangle.
             useProgram(plainShader->program);
-            plainShader->setMatrix(vtxMatrix);
-            plainShader->setColor(fill_color);
+            plainShader->u_matrix = vtxMatrix;
+            plainShader->u_color = fill_color;
 
             // Draw the actual triangles into the color & stencil buffer.
             depthRange(strata + strata_epsilon, 1.0f);
@@ -107,16 +107,16 @@ void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_d
     // below, we have to draw the outline first (!)
     if (fringeline && pass == RenderPass::Translucent) {
         useProgram(outlineShader->program);
-        outlineShader->setMatrix(vtxMatrix);
+        outlineShader->u_matrix = vtxMatrix;
         lineWidth(2.0f); // This is always fixed and does not depend on the pixelRatio!
 
-        outlineShader->setColor(fill_color);
+        outlineShader->u_color = fill_color;
 
         // Draw the entire line
-        outlineShader->setWorld({{
+        outlineShader->u_world = {{
             static_cast<float>(map.getState().getFramebufferWidth()),
             static_cast<float>(map.getState().getFramebufferHeight())
-        }});
+        }};
 
         depthRange(strata + strata_epsilon, 1.0f);
         bucket.drawVertices(*outlineShader);

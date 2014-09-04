@@ -2,6 +2,7 @@
 #define MBGL_SHADER_SHADER_PATTERN
 
 #include <mbgl/shader/shader.hpp>
+#include <mbgl/shader/uniform.hpp>
 
 namespace mbgl {
 
@@ -11,33 +12,16 @@ public:
 
     void bind(char *offset);
 
-    void setPatternTopLeft(const std::array<float, 2>& pattern_tl);
-    void setPatternBottomRight(const std::array<float, 2>& pattern_br);
-    void setOpacity(float opacity);
-    void setImage(int image);
-    void setMix(float mix);
-    void setPatternMatrix(const std::array<float, 9> &patternmatrix);
+    UniformMatrix<4>              u_matrix        = {"u_matrix",        *this};
+    Uniform<std::array<float, 2>> u_pattern_tl    = {"u_pattern_tl",    *this};
+    Uniform<std::array<float, 2>> u_pattern_br    = {"u_pattern_br",    *this};
+    Uniform<float>                u_opacity       = {"u_opacity",       *this};
+    Uniform<float>                u_mix           = {"u_mix",           *this};
+    Uniform<int32_t>              u_image         = {"u_image",         *this};
+    UniformMatrix<3>              u_patternmatrix = {"u_patternmatrix", *this};
 
 private:
     int32_t a_pos = -1;
-
-    std::array<float, 2> pattern_tl = {{}};
-    int32_t u_pattern_tl = -1;
-
-    std::array<float, 2> pattern_br = {{}};
-    int32_t u_pattern_br = -1;
-
-    float opacity = 0;
-    int32_t u_opacity = -1;
-
-    int image = 0;
-    int32_t u_image = -1;
-
-    float mix = 0;
-    int32_t u_mix = -1;
-
-    std::array<float, 9> patternmatrix = {{}};
-    int32_t u_patternmatrix = -1;
 };
 
 }

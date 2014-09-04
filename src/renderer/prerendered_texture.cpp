@@ -110,8 +110,8 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
 
 
     painter.useProgram(painter.gaussianShader->program);
-    painter.gaussianShader->setMatrix(painter.flipMatrix);
-    painter.gaussianShader->setImage(0);
+    painter.gaussianShader->u_matrix = painter.flipMatrix;
+    painter.gaussianShader->u_image = 0;
     glActiveTexture(GL_TEXTURE0);
 
     for (int i = 0; i < passes; i++) {
@@ -123,7 +123,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
 #endif
         glClear(GL_COLOR_BUFFER_BIT);
 
-        painter.gaussianShader->setOffset({{ 1.0f / float(properties.size), 0 }});
+        painter.gaussianShader->u_offset = {{ 1.0f / float(properties.size), 0 }};
         glBindTexture(GL_TEXTURE_2D, original_texture);
         painter.coveringGaussianArray.bind(*painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, (GLsizei)painter.tileStencilBuffer.index());
@@ -137,7 +137,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
 #endif
         glClear(GL_COLOR_BUFFER_BIT);
 
-        painter.gaussianShader->setOffset({{ 0, 1.0f / float(properties.size) }});
+        painter.gaussianShader->u_offset = {{ 0, 1.0f / float(properties.size) }};
         glBindTexture(GL_TEXTURE_2D, secondary_texture);
         painter.coveringGaussianArray.bind(*painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
         glDrawArrays(GL_TRIANGLES, 0, (GLsizei)painter.tileStencilBuffer.index());

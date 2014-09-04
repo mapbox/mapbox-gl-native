@@ -33,13 +33,15 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
 
         useProgram(textShader->program);
-        textShader->setMatrix(vtxMatrix);
-        textShader->setExtrudeMatrix(exMatrix);
+        textShader->u_matrix = vtxMatrix;
+        textShader->u_exmatrix = exMatrix;
 
         GlyphAtlas &glyphAtlas = *map.getGlyphAtlas();
         glyphAtlas.bind();
-        textShader->setTextureSize(
-            {{static_cast<float>(glyphAtlas.width), static_cast<float>(glyphAtlas.height)}});
+        textShader->u_texsize = {{
+            static_cast<float>(glyphAtlas.width),
+            static_cast<float>(glyphAtlas.height)
+        }};
 
         // Convert the -pi..pi to an int8 range.
         float angle = std::round((map.getState().getAngle()) / M_PI * 128);
@@ -47,10 +49,9 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         // adjust min/max zooms for variable font sies
         float zoomAdjust = log(fontSize / bucket.properties.text.max_size) / log(2);
 
-        textShader->setAngle((int32_t)(angle + 256) % 256);
-        textShader->setFlip(bucket.properties.placement == PlacementType::Line ? 1 : 0);
-        textShader->setZoom((map.getState().getNormalizedZoom() - zoomAdjust) *
-                            10); // current zoom level
+        textShader->u_angle = (int32_t)(angle + 256) % 256;
+        textShader->u_flip = (bucket.properties.placement == PlacementType::Line ? 1 : 0);
+        textShader->u_zoom = (map.getState().getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
         // Label fading
         const timestamp duration = 300_milliseconds;
@@ -83,10 +84,10 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
             // bump is how much farther it would have been if it had continued zooming at the same rate
             float bump = (currentTime - lastFrame.t) / duration * fadedist;
 
-            textShader->setFadeDist(fadedist * 10);
-            textShader->setMinFadeZoom(std::floor(lowZ * 10));
-            textShader->setMaxFadeZoom(std::floor(highZ * 10));
-            textShader->setFadeZoom((map.getState().getNormalizedZoom() + bump) * 10);
+            textShader->u_fadedist = fadedist * 10;
+            textShader->u_minfadezoom = std::floor(lowZ * 10);
+            textShader->u_maxfadezoom = std::floor(highZ * 10);
+            textShader->u_fadezoom = (map.getState().getNormalizedZoom() + bump) * 10;
         }
 
         // This defines the gamma around the SDF cutoff value.
@@ -121,10 +122,9 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
                 // Note that this does *not* have to be adjusted for retina screens, because we want
                 // the
                 // same blur width when we explicitly specify one.
-                textShader->setGamma((properties.text.halo_blur / (fontSize / sdfFontSize)) / 8.0f /
-                                     2.0f);
+                textShader->u_gamma = (properties.text.halo_blur / (fontSize / sdfFontSize)) / 8.0f / 2.0f;
             } else {
-                textShader->setGamma(sdfGamma);
+                textShader->u_gamma = sdfGamma;
             }
 
             if (properties.text.opacity < 1.0f) {
@@ -133,29 +133,29 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
                 color[1] *= properties.text.opacity;
                 color[2] *= properties.text.opacity;
                 color[3] *= properties.text.opacity;
-                textShader->setColor(color);
+                textShader->u_color = color;
             } else {
-                textShader->setColor(properties.text.halo_color);
+                textShader->u_color = properties.text.halo_color;
             }
-            textShader->setBuffer(haloWidth);
+            textShader->u_buffer = haloWidth;
             depthRange(strata, 1.0f);
             bucket.drawGlyphs(*textShader);
         }
 
         if (properties.text.color[3] > 0.0f) {
             // Then, we draw the text over the halo
-            textShader->setGamma(gamma);
+            textShader->u_gamma = gamma;
             if (properties.text.opacity < 1.0f) {
                 Color color = properties.text.color;
                 color[0] *= properties.text.opacity;
                 color[1] *= properties.text.opacity;
                 color[2] *= properties.text.opacity;
                 color[3] *= properties.text.opacity;
-                textShader->setColor(color);
+                textShader->u_color = color;
             } else {
-                textShader->setColor(properties.text.color);
+                textShader->u_color = properties.text.color;
             }
-            textShader->setBuffer((256.0f - 64.0f) / 256.0f);
+            textShader->u_buffer = (256.0f - 64.0f) / 256.0f;
             depthRange(strata + strata_epsilon, 1.0f);
             bucket.drawGlyphs(*textShader);
         }
@@ -182,13 +182,15 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
 
         useProgram(iconShader->program);
-        iconShader->setMatrix(vtxMatrix);
-        iconShader->setExtrudeMatrix(exMatrix);
+        iconShader->u_matrix = vtxMatrix;
+        iconShader->u_exmatrix = exMatrix;
 
         SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
         spriteAtlas.bind(map.getState().isChanging() || bucket.properties.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1);
-        iconShader->setTextureSize(
-            {{static_cast<float>(spriteAtlas.getWidth()), static_cast<float>(spriteAtlas.getHeight())}});
+        iconShader->u_texsize = {{
+            static_cast<float>(spriteAtlas.getWidth()),
+            static_cast<float>(spriteAtlas.getHeight())
+        }};
 
         // Convert the -pi..pi to an int8 range.
         const float angle = std::round((map.getState().getAngle()) / M_PI * 128);
@@ -196,16 +198,15 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         // adjust min/max zooms for variable font sies
         float zoomAdjust = log(fontSize / bucket.properties.icon.max_size) / log(2);
 
-        iconShader->setAngle((int32_t)(angle + 256) % 256);
-        iconShader->setFlip(bucket.properties.placement == PlacementType::Line ? 1 : 0);
-        iconShader->setZoom((map.getState().getNormalizedZoom() - zoomAdjust) *
-                            10); // current zoom level
+        iconShader->u_angle = (int32_t)(angle + 256) % 256;
+        iconShader->u_flip = bucket.properties.placement == PlacementType::Line ? 1 : 0;
+        iconShader->u_zoom = (map.getState().getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
-        iconShader->setFadeDist(0 * 10);
-        iconShader->setMinFadeZoom(map.getState().getNormalizedZoom() * 10);
-        iconShader->setMaxFadeZoom(map.getState().getNormalizedZoom() * 10);
-        iconShader->setFadeZoom(map.getState().getNormalizedZoom() * 10);
-        iconShader->setOpacity(properties.icon.opacity);
+        iconShader->u_fadedist = 0 * 10;
+        iconShader->u_minfadezoom = map.getState().getNormalizedZoom() * 10;
+        iconShader->u_maxfadezoom = map.getState().getNormalizedZoom() * 10;
+        iconShader->u_fadezoom = map.getState().getNormalizedZoom() * 10;
+        iconShader->u_opacity = properties.icon.opacity;
 
         depthRange(strata, 1.0f);
         bucket.drawIcons(*iconShader);
