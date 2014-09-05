@@ -63,42 +63,11 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
         sdfShader->u_flip = (bucket.properties.placement == PlacementType::Line ? 1 : 0);
         sdfShader->u_zoom = (map.getState().getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
-        // Label fading
-        const timestamp duration = 300_milliseconds;
-        const timestamp currentTime = util::now();
-
-        std::deque<FrameSnapshot> &history = frameHistory.history;
-        if (history.size() >= 2) {
-            // Remove frames until only one is outside the duration, or until there are only three
-            while (history.size() > 3 && history[1].t + duration < currentTime) {
-                history.pop_front();
-            }
-
-            if (history[1].t + duration < currentTime) {
-                history[0].z = history[1].z;
-            }
-
-            // Find the range of zoom levels we want to fade between
-            float startingZ = history.front().z;
-            const FrameSnapshot lastFrame = history.back();
-            float endingZ = lastFrame.z;
-            float lowZ = std::fmin(startingZ, endingZ);
-            float highZ = std::fmax(startingZ, endingZ);
-
-            // Calculate the speed of zooming, and how far it would zoom in terms of zoom levels in one
-            // duration
-            float zoomDiff = endingZ - history[1].z, timeDiff = lastFrame.t - history[1].t;
-            float fadedist = zoomDiff / (timeDiff / duration);
-
-            // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
-            // bump is how much farther it would have been if it had continued zooming at the same rate
-            float bump = (currentTime - lastFrame.t) / duration * fadedist;
-
-            sdfShader->u_fadedist = fadedist * 10;
-            sdfShader->u_minfadezoom = std::floor(lowZ * 10);
-            sdfShader->u_maxfadezoom = std::floor(highZ * 10);
-            sdfShader->u_fadezoom = (map.getState().getNormalizedZoom() + bump) * 10;
-        }
+        FadeProperties f = frameHistory.getFadeProperties(300_milliseconds);
+        sdfShader->u_fadedist = f.fadedist * 10;
+        sdfShader->u_minfadezoom = std::floor(f.minfadezoom * 10);
+        sdfShader->u_maxfadezoom = std::floor(f.maxfadezoom * 10);
+        sdfShader->u_fadezoom = (map.getState().getNormalizedZoom() + f.bump) * 10;
 
         // This defines the gamma around the SDF cutoff value.
         const float sdfGamma = 1.0f / 10.0f;

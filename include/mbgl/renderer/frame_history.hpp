@@ -16,12 +16,20 @@ struct FrameSnapshot {
     float z;
 };
 
+struct FadeProperties {
+    float fadedist;
+    float minfadezoom;
+    float maxfadezoom;
+    float bump;
+};
+
 class FrameHistory {
 public:
     // Record frame history that will be used to calculate fading params
     void record(timestamp now, float zoom);
 
     bool needsAnimation(timestamp duration) const;
+    FadeProperties getFadeProperties(timestamp duration);
 
 public:
     std::deque<FrameSnapshot> history;
