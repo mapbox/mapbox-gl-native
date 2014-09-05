@@ -24,6 +24,16 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
 
         mat4 exMatrix;
         matrix::copy(exMatrix, projMatrix);
+
+        const float angleOffset =
+            bucket.properties.text.rotation_alignment == RotationAlignmentType::Map
+                ? map.getState().getAngle()
+                : 0;
+
+        if (angleOffset) {
+            matrix::rotate_z(exMatrix, exMatrix, angleOffset);
+        }
+
         if (bucket.properties.placement == PlacementType::Line) {
             matrix::rotate_z(exMatrix, exMatrix, map.getState().getAngle());
         }
