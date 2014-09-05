@@ -51,7 +51,7 @@ typedef std::vector<Symbol> Symbols;
 
 class SymbolBucket : public Bucket {
     typedef ElementGroup<1> TextElementGroup;
-    typedef ElementGroup<1> IconElementGroup;
+    typedef ElementGroup<2> IconElementGroup;
 
 public:
     SymbolBucket(const StyleBucketSymbol &properties, Collision &collision);
@@ -68,7 +68,8 @@ public:
     void addGlyphs(const PlacedGlyphs &glyphs, float placementZoom, PlacementRange placementRange,
                    float zoom);
 
-    void drawGlyphs(SDFShader &shader);
+    void drawGlyphs(SDFShader& shader);
+    void drawIcons(SDFShader& shader);
     void drawIcons(IconShader& shader);
 
 private:
@@ -90,6 +91,7 @@ private:
 
 public:
     const StyleBucketSymbol &properties;
+    bool sdfIcons = false;
 
 private:
     Collision &collision;

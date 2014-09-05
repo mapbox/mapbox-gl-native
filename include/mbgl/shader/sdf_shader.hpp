@@ -10,7 +10,7 @@ class SDFShader : public Shader {
 public:
     SDFShader();
 
-    void bind(char *offset);
+    virtual void bind(char *offset) = 0;
 
     UniformMatrix<4>              u_matrix      = {"u_matrix",      *this};
     UniformMatrix<4>              u_exmatrix    = {"u_exmatrix",    *this};
@@ -26,7 +26,7 @@ public:
     Uniform<float>                u_maxfadezoom = {"u_maxfadezoom", *this};
     Uniform<float>                u_fadezoom    = {"u_fadezoom",    *this};
 
-private:
+protected:
     int32_t a_pos = -1;
     int32_t a_offset = -1;
     int32_t a_tex = -1;
@@ -37,6 +37,17 @@ private:
     int32_t a_rangestart = -1;
     int32_t a_labelminzoom = -1;
 };
+
+class SDFGlyphShader : public SDFShader {
+public:
+    void bind(char *offset);
+};
+
+class SDFIconShader : public SDFShader {
+public:
+    void bind(char *offset);
+};
+
 }
 
 #endif

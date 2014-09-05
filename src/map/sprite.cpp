@@ -13,12 +13,13 @@
 
 using namespace mbgl;
 
-SpritePosition::SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t height, float pixelRatio)
+SpritePosition::SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t height, float pixelRatio, bool sdf)
     : x(x),
       y(y),
       width(width),
       height(height),
-      pixelRatio(pixelRatio) {
+      pixelRatio(pixelRatio),
+      sdf(sdf) {
 }
 
 std::shared_ptr<Sprite> Sprite::Create(const std::string& base_url, float pixelRatio, const std::shared_ptr<FileSource> &fileSource) {
@@ -123,13 +124,15 @@ void Sprite::parseJSON() {
                 uint16_t width = 0;
                 uint16_t height = 0;
                 float pixelRatio = 1.0f;
+                bool sdf = false;
 
                 if (value.HasMember("x")) x = value["x"].GetInt();
                 if (value.HasMember("y")) y = value["y"].GetInt();
                 if (value.HasMember("width")) width = value["width"].GetInt();
                 if (value.HasMember("height")) height = value["height"].GetInt();
                 if (value.HasMember("pixelRatio")) pixelRatio = value["pixelRatio"].GetInt();
-                pos.emplace(name, SpritePosition { x, y, width, height, pixelRatio });
+                if (value.HasMember("sdf")) sdf = value["sdf"].GetBool();
+                pos.emplace(name, SpritePosition { x, y, width, height, pixelRatio, sdf });
             }
         }
     } else {
