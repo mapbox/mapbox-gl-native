@@ -10,7 +10,7 @@ attribute vec2 a_pos;
 attribute vec2 a_extrude;
 attribute float a_linesofar;
 
-// posmatrix is for the vertex position, exmatrix is for rotating and projecting
+// matrix is for the vertex position, exmatrix is for rotating and projecting
 // the extrusion vector.
 uniform mat4 u_matrix;
 uniform mat4 u_exmatrix;

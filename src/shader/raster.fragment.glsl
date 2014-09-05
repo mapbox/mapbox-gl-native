@@ -17,9 +17,9 @@ void main() {
 
     // spin
     rgb = vec3(
-          dot(rgb, u_spin_weights.xyz),
-          dot(rgb, u_spin_weights.zxy),
-          dot(rgb, u_spin_weights.yzx));
+        dot(rgb, u_spin_weights.xyz),
+        dot(rgb, u_spin_weights.zxy),
+        dot(rgb, u_spin_weights.yzx));
 
     // saturation
     float average = (color.r + color.g + color.b) / 3.0;
