@@ -26,9 +26,6 @@
 #include <memory>
 #include <iostream>
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 using namespace mbgl;
 
 Map::Map(View& view)
@@ -238,128 +235,95 @@ std::shared_ptr<Sprite> Map::getSprite() {
     return sprite;
 }
 
+#pragma mark - View
+
+void Map::setCenter(const LatLng& center) {
+    transform.setCenter(center);
+    update();
+}
+
+LatLng Map::getCenter() const {
+    return transform.getCenter();
+}
+
+void Map::setZoom(double zoom) {
+    transform.setZoom(zoom);
+    update();
+}
+
+double Map::getZoom() const {
+    return transform.getZoom();
+}
+
+void Map::setBearing(double degrees) {
+    transform.setBearing(degrees);
+    update();
+}
+
+double Map::getBearing() const {
+    return transform.getBearing();
+}
+
+#pragma mark - Transitions
+
+void Map::panBy(const Point& delta, double duration) {
+    transform.panBy(delta, duration * 1_second);
+    update();
+}
+
+void Map::panTo(const LatLng& latLng, double duration) {
+    transform.panTo(latLng, duration * 1_second);
+    update();
+}
+
+void Map::zoomTo(double zoom, double duration) {
+    transform.zoomTo(zoom, transform.getCenter(), duration * 1_second);
+    update();
+}
+
+void Map::zoomTo(double zoom, const LatLng& around, double duration) {
+    transform.zoomTo(zoom, around, duration * 1_second);
+    update();
+}
+
+void Map::rotateTo(double bearing, double duration) {
+    transform.rotateTo(bearing, transform.getCenter(), duration * 1_second);
+    update();
+}
+
+void Map::rotateTo(double bearing, const LatLng& around, double duration) {
+    transform.rotateTo(bearing, around, duration * 1_second);
+    update();
+}
+
+void Map::easeTo(const LatLng& center, double zoom, double bearing, double duration) {
+    transform.easeTo(center, zoom, bearing, duration * 1_second);
+    update();
+}
+
+void Map::flyTo(const LatLng& center, double zoom, double bearing, double duration) {
+    transform.flyTo(center, zoom, bearing, duration * 1_second);
+    update();
+}
+
+void Map::cancelTransitions() {
+    transform.cancelTransitions();
+    update();
+}
 
 #pragma mark - Size
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resize(uint16_t width, uint16_t height, float ratio) {
     resize(width, height, ratio, width * ratio, height * ratio);
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height) {
     if (transform.resize(width, height, ratio, fb_width, fb_height)) {
         update();
     }
 }
 
-#pragma mark - Transitions
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::cancelTransitions() {
-    transform.cancelTransitions();
-
-    update();
-}
-
-
-#pragma mark - Position
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::moveBy(double dx, double dy, double duration) {
-    transform.moveBy(dx, dy, duration * 1_second);
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setLonLat(double lon, double lat, double duration) {
-    transform.setLonLat(lon, lat, duration * 1_second);
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::getLonLat(double& lon, double& lat) const {
-    transform.getLonLat(lon, lat);
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::startPanning() {
-    transform.startPanning();
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::stopPanning() {
-    transform.stopPanning();
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::resetPosition() {
-    transform.setAngle(0);
-    transform.setLonLat(0, 0);
-    transform.setZoom(0);
-    update();
-}
-
-
-#pragma mark - Scale
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::scaleBy(double ds, double cx, double cy, double duration) {
-    transform.scaleBy(ds, cx, cy, duration * 1_second);
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setScale(double scale, double cx, double cy, double duration) {
-    transform.setScale(scale, cx, cy, duration * 1_second);
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-double Map::getScale() const {
-    return transform.getScale();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setZoom(double zoom, double duration) {
-    transform.setZoom(zoom, duration * 1_second);
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-double Map::getZoom() const {
-    return transform.getZoom();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
-    transform.setLonLatZoom(lon, lat, zoom, duration * 1_second);
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
-    transform.getLonLatZoom(lon, lat, zoom);
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::resetZoom() {
-    setZoom(0);
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::startScaling() {
-    transform.startScaling();
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::stopScaling() {
-    transform.stopScaling();
-    update();
-}
+#pragma mark - Constraints
 
 double Map::getMinZoom() const {
     return transform.getMinZoom();
@@ -369,54 +333,19 @@ double Map::getMaxZoom() const {
     return transform.getMaxZoom();
 }
 
-
-#pragma mark - Rotation
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) {
-    transform.rotateBy(sx, sy, ex, ey, duration * 1_second);
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setBearing(double degrees, double duration) {
-    transform.setAngle(-degrees * M_PI / 180, duration * 1_second);
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setBearing(double degrees, double cx, double cy) {
-    transform.setAngle(-degrees * M_PI / 180, cx, cy);
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-double Map::getBearing() const {
-    return -transform.getAngle() / M_PI * 180;
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::resetNorth() {
-    transform.setAngle(0, 500_milliseconds);
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::startRotating() {
-    transform.startRotating();
-    update();
-}
-
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::stopRotating() {
-    transform.stopRotating();
-    update();
-}
-
 bool Map::canRotate() {
     return transform.canRotate();
 }
 
+#pragma mark - Projection
+
+Point Map::project(const LatLng& latlng) const {
+    return transform.locationPoint(latlng);
+}
+
+LatLng Map::unproject(const Point& point) const {
+    return transform.pointLocation(point);
+}
 
 #pragma mark - Toggles
 
@@ -528,7 +457,7 @@ void Map::prepare() {
         transform.updateTransitions(animationTime);
     }
 
-    state = transform.currentState();
+    state = transform.getState();
 
     animationTime = util::now();
     updateSources();

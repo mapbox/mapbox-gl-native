@@ -52,11 +52,11 @@
     }
 
     if ([self map]) {
-        if (hasCenter && hasZoom) {
-            [self map]->setLonLatZoom(longitude, latitude, zoom);
-        } else if (hasCenter) {
-            [self map]->setLonLat(longitude, latitude);
-        } else if (hasZoom) {
+        if (hasCenter) {
+            [self map]->setCenter(mbgl::LatLng(latitude, longitude));
+        }
+
+        if (hasZoom) {
             [self map]->setZoom(zoom);
         }
 
@@ -80,7 +80,8 @@ int main() {
 
     // Load settings
     mbgl::Settings_NSUserDefaults settings;
-    map.setLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
+    map.setCenter(mbgl::LatLng(settings.latitude, settings.longitude));
+    map.setZoom(settings.zoom);
     map.setBearing(settings.bearing);
     map.setDebug(settings.debug);
 
@@ -98,7 +99,10 @@ int main() {
     int ret = view.run();
 
     // Save settings
-    map.getLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
+    mbgl::LatLng latLng = map.getCenter();
+    settings.longitude = latLng.lng;
+    settings.latitude = latLng.lat;
+    settings.zoom = map.getZoom();
     settings.bearing = map.getBearing();
     settings.debug = map.getDebug();
     settings.save();
