@@ -34,10 +34,6 @@ void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> lay
             matrix::rotate_z(exMatrix, exMatrix, angleOffset);
         }
 
-        if (bucket.properties.placement == PlacementType::Line) {
-            matrix::rotate_z(exMatrix, exMatrix, map.getState().getAngle());
-        }
-
         // If layerStyle.size > bucket.info.fontSize then labels may collide
         float fontSize = std::fmin(properties.text.size, bucket.properties.text.max_size);
         matrix::scale(exMatrix, exMatrix, fontSize / 24.0f, fontSize / 24.0f, 1.0f);
