@@ -158,6 +158,10 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
         // if feature has icon, get sprite atlas position
         if (feature.sprite.length()) {
             image = spriteAtlas.waitForImage(feature.sprite, sprite);
+
+            if (sprite.getSpritePosition(feature.sprite).sdf) {
+                sdfIcons = true;
+            }
         }
 
         // if either shaping or icon position is present, add the feature
@@ -351,7 +355,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
 
         // We're generating triangle fans, so we always start with the first
         // coordinate in this polygon.
-        TextElementGroup &triangleGroup = buffer.groups.back();
+        auto &triangleGroup = buffer.groups.back();
         uint32_t triangleIndex = triangleGroup.vertex_length;
 
         // coordinates (2 triangles)
@@ -373,7 +377,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
     }
 }
 
-void SymbolBucket::drawGlyphs(TextShader &shader) {
+void SymbolBucket::drawGlyphs(SDFShader &shader) {
     char *vertex_index = BUFFER_OFFSET(0);
     char *elements_index = BUFFER_OFFSET(0);
     for (TextElementGroup &group : text.groups) {
@@ -384,11 +388,22 @@ void SymbolBucket::drawGlyphs(TextShader &shader) {
     }
 }
 
-void SymbolBucket::drawIcons(IconShader &shader) {
+void SymbolBucket::drawIcons(SDFShader &shader) {
     char *vertex_index = BUFFER_OFFSET(0);
     char *elements_index = BUFFER_OFFSET(0);
     for (IconElementGroup &group : icon.groups) {
         group.array[0].bind(shader, icon.vertices, icon.triangles, vertex_index);
+        glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
+        vertex_index += group.vertex_length * icon.vertices.itemSize;
+        elements_index += group.elements_length * icon.triangles.itemSize;
+    }
+}
+
+void SymbolBucket::drawIcons(IconShader &shader) {
+    char *vertex_index = BUFFER_OFFSET(0);
+    char *elements_index = BUFFER_OFFSET(0);
+    for (IconElementGroup &group : icon.groups) {
+        group.array[1].bind(shader, icon.vertices, icon.triangles, vertex_index);
         glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
         vertex_index += group.vertex_length * icon.vertices.itemSize;
         elements_index += group.elements_length * icon.triangles.itemSize;

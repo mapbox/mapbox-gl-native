@@ -2,6 +2,7 @@
 #define MBGL_SHADER_SHADER_PLAIN
 
 #include <mbgl/shader/shader.hpp>
+#include <mbgl/shader/uniform.hpp>
 
 namespace mbgl {
 
@@ -11,14 +12,11 @@ public:
 
     void bind(char *offset);
 
-    void setColor(float r, float g, float b, float a);
-    void setColor(const std::array<float, 4>& color);
+    UniformMatrix<4>              u_matrix   = {"u_matrix", *this};
+    Uniform<std::array<float, 4>> u_color    = {"u_color",  *this};
 
 private:
     int32_t a_pos = -1;
-
-    std::array<float, 4> color = {{}};
-    int32_t u_color = -1;
 };
 
 }

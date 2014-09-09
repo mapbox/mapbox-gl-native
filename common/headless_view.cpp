@@ -151,6 +151,13 @@ HeadlessView::~HeadlessView() {
 #if MBGL_USE_CGL
     CGLDestroyContext(gl_context);
 #endif
+
+#if MBGL_USE_GLX
+    glXMakeCurrent(x_display, None, NULL);
+    glXDestroyContext(x_display, gl_context);
+    XFree(x_info);
+    XCloseDisplay(x_display);
+#endif
 }
 
 void HeadlessView::notify_map_change(mbgl::MapChange /*change*/, mbgl::timestamp /*delay*/) {

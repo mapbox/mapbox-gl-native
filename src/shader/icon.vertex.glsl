@@ -9,7 +9,7 @@ attribute float a_rangestart;
 attribute float a_labelminzoom;
 
 
-// posmatrix is for the vertex position, exmatrix is for rotating and projecting
+// matrix is for the vertex position, exmatrix is for rotating and projecting
 // the extrusion vector.
 uniform mat4 u_matrix;
 uniform mat4 u_exmatrix;

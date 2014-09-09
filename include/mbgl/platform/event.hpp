@@ -59,7 +59,6 @@ constexpr EventSeverity disabledEventSeverities[] = {
 #if !DEBUG
     EventSeverity::Debug,
 #endif
-    EventSeverity(-1) // Avoid zero size array
 };
 
 

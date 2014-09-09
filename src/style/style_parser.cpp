@@ -607,6 +607,7 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("transition-icon-halo-blur", Key::IconHaloBlur, klass, value);
     parseOptionalProperty<Function<float>>("icon-translate", { Key::IconTranslateX, Key::IconTranslateY }, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-icon-translate", Key::IconTranslate, klass, value);
+    parseOptionalProperty<TranslateAnchorType>("icon-translate-anchor", Key::IconTranslateAnchor, klass, value);
 
     parseOptionalProperty<Function<float>>("text-opacity", Key::TextOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-text-opacity", Key::TextOpacity, klass, value);
@@ -622,6 +623,7 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("transition-text-halo-blur", Key::TextHaloBlur, klass, value);
     parseOptionalProperty<Function<float>>("text-translate", { Key::TextTranslateX, Key::TextTranslateY }, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-text-translate", Key::TextTranslate, klass, value);
+    parseOptionalProperty<TranslateAnchorType>("text-translate-anchor", Key::TextTranslateAnchor, klass, value);
 
     parseOptionalProperty<Function<float>>("raster-opacity", Key::RasterOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
@@ -867,7 +869,6 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         parseRenderProperty(value, render.icon.padding, "icon-padding");
         parseRenderProperty(value, render.icon.keep_upright, "icon-keep-upright");
         parseRenderProperty(value, render.icon.offset, "icon-offset");
-        parseRenderProperty<TranslateAnchorTypeClass>(value, render.icon.translate_anchor, "icon-translate-anchor");
 
 
         parseRenderProperty<RotationAlignmentTypeClass>(value, render.text.rotation_alignment, "text-rotation-alignment");
@@ -893,7 +894,6 @@ void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
         parseRenderProperty(value, render.text.keep_upright, "text-keep-upright");
         parseRenderProperty<TextTransformTypeClass>(value, render.text.transform, "text-transform");
         parseRenderProperty(value, render.text.offset, "text-offset");
-        parseRenderProperty<TranslateAnchorTypeClass>(value, render.text.translate_anchor, "text-translate-anchor");
         parseRenderProperty(value, render.text.allow_overlap, "text-allow-overlap");
         parseRenderProperty(value, render.text.ignore_placement, "text-ignore-placement");
         parseRenderProperty(value, render.text.optional, "text-optional");

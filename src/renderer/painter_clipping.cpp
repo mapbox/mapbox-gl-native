@@ -28,7 +28,7 @@ void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &so
 }
 
 void Painter::drawClippingMask(const mat4& matrix, const ClipID &clip) {
-    plainShader->setMatrix(matrix);
+    plainShader->u_matrix = matrix;
 
     const GLint ref = (GLint)(clip.reference.to_ulong());
     const GLuint mask = (GLuint)(clip.mask.to_ulong());

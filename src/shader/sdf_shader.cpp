@@ -1,4 +1,4 @@
-#include <mbgl/shader/icon_shader.hpp>
+#include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/shaders.hpp>
 #include <mbgl/platform/gl.hpp>
 
@@ -6,14 +6,14 @@
 
 using namespace mbgl;
 
-IconShader::IconShader()
+SDFShader::SDFShader()
     : Shader(
-         "icon",
-         shaders[ICON_SHADER].vertex,
-         shaders[ICON_SHADER].fragment
-         ) {
+        "sdf",
+        shaders[SDF_SHADER].vertex,
+        shaders[SDF_SHADER].fragment
+    ) {
     if (!valid) {
-        fprintf(stderr, "invalid icon shader\n");
+        fprintf(stderr, "invalid sdf shader\n");
         return;
     }
 
@@ -28,7 +28,38 @@ IconShader::IconShader()
     a_labelminzoom = glGetAttribLocation(program, "a_labelminzoom");
 }
 
-void IconShader::bind(char *offset) {
+void SDFGlyphShader::bind(char *offset) {
+    const int stride = 16;
+
+    glEnableVertexAttribArray(a_pos);
+    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, stride, offset + 0);
+
+    glEnableVertexAttribArray(a_offset);
+    glVertexAttribPointer(a_offset, 2, GL_SHORT, false, stride, offset + 4);
+
+    glEnableVertexAttribArray(a_labelminzoom);
+    glVertexAttribPointer(a_labelminzoom, 1, GL_UNSIGNED_BYTE, false, stride, offset + 8);
+
+    glEnableVertexAttribArray(a_minzoom);
+    glVertexAttribPointer(a_minzoom, 1, GL_UNSIGNED_BYTE, false, stride, offset + 9);
+
+    glEnableVertexAttribArray(a_maxzoom);
+    glVertexAttribPointer(a_maxzoom, 1, GL_UNSIGNED_BYTE, false, stride, offset + 10);
+
+    glEnableVertexAttribArray(a_angle);
+    glVertexAttribPointer(a_angle, 1, GL_UNSIGNED_BYTE, false, stride, offset + 11);
+
+    glEnableVertexAttribArray(a_rangeend);
+    glVertexAttribPointer(a_rangeend, 1, GL_UNSIGNED_BYTE, false, stride, offset + 12);
+
+    glEnableVertexAttribArray(a_rangestart);
+    glVertexAttribPointer(a_rangestart, 1, GL_UNSIGNED_BYTE, false, stride, offset + 13);
+
+    glEnableVertexAttribArray(a_tex);
+    glVertexAttribPointer(a_tex, 2, GL_UNSIGNED_BYTE, false, stride, offset + 14);
+}
+
+void SDFIconShader::bind(char *offset) {
     const int stride = 20;
 
     glEnableVertexAttribArray(a_pos);

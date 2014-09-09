@@ -19,17 +19,15 @@ size_t TextVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, uint16_t 
     shorts[3] = std::round(oy * 64);
 
     uint8_t *ubytes = static_cast<uint8_t *>(data);
-    // a_data1
-    ubytes[8] = tx / 4;
-    ubytes[9] = ty / 4;
-    ubytes[10] = labelminzoom * 10;
-    ubytes[11] = (int16_t)std::round(angle * angleFactor) % 256;
+    ubytes[8] = labelminzoom * 10;
+    ubytes[9] = minzoom * 10; // 1/10 zoom levels: z16 == 160.
+    ubytes[10] = fmin(maxzoom, 25) * 10; // 1/10 zoom levels: z16 == 160.
+    ubytes[11] = (int16_t)round(angle * angleFactor) % 256;
+    ubytes[12] = util::max((int16_t)std::round(range[0] * angleFactor), (int16_t)0) % 256;
+    ubytes[13] = util::min((int16_t)std::round(range[1] * angleFactor), (int16_t)255) % 256;
 
-    // a_data2
-    ubytes[12] = minzoom * 10; // 1/10 zoom levels: z16 == 160.
-    ubytes[13] = std::fmin(maxzoom, 25) * 10; // 1/10 zoom levels: z16 == 160.
-    ubytes[14] = util::max((int16_t)std::round(range[0] * angleFactor), (int16_t)0) % 256;
-    ubytes[15] = util::min((int16_t)std::round(range[1] * angleFactor), (int16_t)255) % 256;
+    ubytes[14] = tx / 4;
+    ubytes[15] = ty / 4;
 
     return idx;
 }

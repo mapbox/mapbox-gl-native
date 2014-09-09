@@ -545,10 +545,6 @@ void Map::render() {
 #if defined(DEBUG)
     std::vector<std::string> debug;
 #endif
-
-    glyphAtlas->upload();
-    spriteAtlas->upload();
-
     painter.clear();
 
     painter.resize();

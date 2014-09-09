@@ -41,9 +41,11 @@ void Painter::setup() {
     assert(outlineShader);
     assert(lineShader);
     assert(linejoinShader);
+    assert(linepatternShader);
     assert(patternShader);
     assert(rasterShader);
-    assert(textShader);
+    assert(sdfGlyphShader);
+    assert(sdfIconShader);
     assert(dotShader);
     assert(gaussianShader);
 
@@ -70,10 +72,12 @@ void Painter::setupShaders() {
     if (!outlineShader) outlineShader = std::make_unique<OutlineShader>();
     if (!lineShader) lineShader = std::make_unique<LineShader>();
     if (!linejoinShader) linejoinShader = std::make_unique<LinejoinShader>();
+    if (!linepatternShader) linepatternShader = std::make_unique<LinepatternShader>();
     if (!patternShader) patternShader = std::make_unique<PatternShader>();
     if (!iconShader) iconShader = std::make_unique<IconShader>();
     if (!rasterShader) rasterShader = std::make_unique<RasterShader>();
-    if (!textShader) textShader = std::make_unique<TextShader>();
+    if (!sdfGlyphShader) sdfGlyphShader = std::make_unique<SDFGlyphShader>();
+    if (!sdfIconShader) sdfIconShader = std::make_unique<SDFIconShader>();
     if (!dotShader) dotShader = std::make_unique<DotShader>();
     if (!gaussianShader) gaussianShader = std::make_unique<GaussianShader>();
 }
@@ -193,8 +197,8 @@ void Painter::renderBackground(std::shared_ptr<StyleLayer> layer_desc) {
 
     if ((color[3] >= 1.0f) == (pass == RenderPass::Opaque)) {
         useProgram(plainShader->program);
-        plainShader->setMatrix(identityMatrix);
-        plainShader->setColor(color);
+        plainShader->u_matrix = identityMatrix;
+        plainShader->u_color = color;
         backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
 
         glDisable(GL_STENCIL_TEST);

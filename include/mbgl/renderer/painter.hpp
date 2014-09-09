@@ -14,9 +14,10 @@
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/line_shader.hpp>
 #include <mbgl/shader/linejoin_shader.hpp>
+#include <mbgl/shader/linepattern_shader.hpp>
 #include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/shader/raster_shader.hpp>
-#include <mbgl/shader/text_shader.hpp>
+#include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/dot_shader.hpp>
 #include <mbgl/shader/gaussian_shader.hpp>
 
@@ -87,6 +88,8 @@ public:
     void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     void renderBackground(std::shared_ptr<StyleLayer> layer_desc);
 
+    float saturationFactor(float saturation);
+    float contrastFactor(float contrast);
     std::array<float, 3> spinWeights(float spin_value);
 
     void preparePrerender(RasterBucket &bucket);
@@ -117,11 +120,23 @@ public:
     void discardFramebuffers();
 
     bool needsAnimation() const;
+
 private:
     void setupShaders();
-    mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor = TranslateAnchorType::Map);
+    mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor);
 
     void prepareTile(const Tile& tile);
+
+    template <typename BucketProperties, typename StyleProperties>
+    void renderSDF(SymbolBucket &bucket,
+                   const Tile::ID &id,
+                   const mat4 &matrixSymbol,
+                   const BucketProperties& bucketProperties,
+                   const StyleProperties& styleProperties,
+                   float scaleDivisor,
+                   std::array<float, 2> texsize,
+                   SDFShader& sdfShader,
+                   void (SymbolBucket::*drawSDF)(SDFShader&));
 
 public:
     void useProgram(uint32_t program);
@@ -169,10 +184,12 @@ public:
     std::unique_ptr<OutlineShader> outlineShader;
     std::unique_ptr<LineShader> lineShader;
     std::unique_ptr<LinejoinShader> linejoinShader;
+    std::unique_ptr<LinepatternShader> linepatternShader;
     std::unique_ptr<PatternShader> patternShader;
     std::unique_ptr<IconShader> iconShader;
     std::unique_ptr<RasterShader> rasterShader;
-    std::unique_ptr<TextShader> textShader;
+    std::unique_ptr<SDFGlyphShader> sdfGlyphShader;
+    std::unique_ptr<SDFIconShader> sdfIconShader;
     std::unique_ptr<DotShader> dotShader;
     std::unique_ptr<GaussianShader> gaussianShader;
 

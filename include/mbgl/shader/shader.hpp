@@ -15,18 +15,12 @@ public:
     bool valid;
     uint32_t program;
 
-    void setMatrix(const std::array<float, 16>& matrix);
-
     inline uint32_t getID() const {
         return program;
     }
 
 private:
     bool compileShader(uint32_t *shader, uint32_t type, const char *source);
-
-protected:
-    std::array<float, 16> matrix = {{}};
-    int32_t u_matrix = -1;
 };
 
 }

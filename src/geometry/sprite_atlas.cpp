@@ -132,6 +132,18 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string &name, cons
     return rect;
 }
 
+SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, const Sprite& sprite, bool repeating) {
+    // `repeating` indicates that the image will be used in a repeating pattern
+    // repeating pattern images are assumed to have a 1px padding that mirrors the opposite edge
+    // positions for repeating images are adjusted to exclude the edge
+    Rect<dimension> rect = getImage(name, sprite);
+    const int r = repeating ? 1 : 0;
+    return SpriteAtlasPosition {
+        {{ float(rect.w)           / pixelRatio, float(rect.h)            / pixelRatio }},
+        {{ float(rect.x + r)            / width, float(rect.y + r)            / height }},
+        {{ float(rect.x + rect.w - 2*r) / width, float(rect.y + rect.h - 2*r) / height }}
+    };
+}
 
 Rect<SpriteAtlas::dimension> SpriteAtlas::waitForImage(const std::string &name, const Sprite &sprite) {
     sprite.waitUntilLoaded();
@@ -196,11 +208,13 @@ void SpriteAtlas::update(const Sprite &sprite) {
 }
 
 void SpriteAtlas::bind(bool linear) {
+    bool first = false;
     if (!texture) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        first = true;
     } else {
         glBindTexture(GL_TEXTURE_2D, texture);
     }
@@ -211,17 +225,12 @@ void SpriteAtlas::bind(bool linear) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_val);
         filter = filter_val;
     }
-}
 
-void SpriteAtlas::upload() {
     if (dirty) {
-        const bool exists = texture;
-        bind(filter); // Make sure we don't change the filter value.
-
         std::lock_guard<std::mutex> lock(mtx);
         allocate();
 
-        if (!exists) {
+        if (first) {
             glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target
                 0, // GLint level
@@ -252,7 +261,7 @@ void SpriteAtlas::upload() {
 #endif
         dirty = false;
     }
-}
+};
 
 SpriteAtlas::~SpriteAtlas() {
     std::lock_guard<std::mutex> lock(mtx);

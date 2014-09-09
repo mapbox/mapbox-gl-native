@@ -46,3 +46,40 @@ bool FrameHistory::needsAnimation(const timestamp duration) const {
 
     return false;
 }
+
+FadeProperties FrameHistory::getFadeProperties(timestamp duration)
+{
+    const timestamp currentTime = util::now();
+
+    // Remove frames until only one is outside the duration, or until there are only three
+    while (history.size() > 3 && history[1].t + duration < currentTime) {
+        history.pop_front();
+    }
+
+    if (history[1].t + duration < currentTime) {
+        history[0].z = history[1].z;
+    }
+
+    // Find the range of zoom levels we want to fade between
+    float startingZ = history.front().z;
+    const FrameSnapshot lastFrame = history.back();
+    float endingZ = lastFrame.z;
+    float lowZ = std::fmin(startingZ, endingZ);
+    float highZ = std::fmax(startingZ, endingZ);
+
+    // Calculate the speed of zooming, and how far it would zoom in terms of zoom levels in one
+    // duration
+    float zoomDiff = endingZ - history[1].z, timeDiff = lastFrame.t - history[1].t;
+    float fadedist = zoomDiff / (timeDiff / duration);
+
+    // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
+    // bump is how much farther it would have been if it had continued zooming at the same rate
+    float bump = (currentTime - lastFrame.t) / duration * fadedist;
+
+    return FadeProperties {
+        fadedist,
+        lowZ,
+        highZ,
+        bump
+    };
+}

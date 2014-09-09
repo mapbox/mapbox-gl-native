@@ -1,19 +1,20 @@
-#include <mbgl/shader/line_shader.hpp>
+#include <mbgl/shader/linepattern_shader.hpp>
 #include <mbgl/shader/shaders.hpp>
 #include <mbgl/platform/gl.hpp>
+#include <iostream>
 
 #include <cstdio>
 
 using namespace mbgl;
 
-LineShader::LineShader()
+LinepatternShader::LinepatternShader()
     : Shader(
-        "line",
-        shaders[LINE_SHADER].vertex,
-        shaders[LINE_SHADER].fragment
+        "linepattern",
+         shaders[LINEPATTERN_SHADER].vertex,
+         shaders[LINEPATTERN_SHADER].fragment
     ) {
     if (!valid) {
-        fprintf(stderr, "invalid line shader\n");
+        fprintf(stderr, "invalid line pattern shader\n");
         return;
     }
 
@@ -22,7 +23,7 @@ LineShader::LineShader()
     a_linesofar = glGetAttribLocation(program, "a_linesofar");
 }
 
-void LineShader::bind(char *offset) {
+void LinepatternShader::bind(char *offset) {
     glEnableVertexAttribArray(a_pos);
     glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 8, offset + 0);
 

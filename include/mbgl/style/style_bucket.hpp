@@ -53,7 +53,6 @@ public:
         float padding = 2.0f;
         bool keep_upright = false;
         vec2<float> offset = {0, 0};
-        TranslateAnchorType translate_anchor = TranslateAnchorType::Map;
     } icon;
 
     struct {
@@ -74,7 +73,6 @@ public:
         bool keep_upright = true;
         TextTransformType transform = TextTransformType::None;
         vec2<float> offset = {0, 0};
-        TranslateAnchorType translate_anchor = TranslateAnchorType::Map;
         bool allow_overlap = false;
         bool ignore_placement = false;
         bool optional = false;

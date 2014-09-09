@@ -2,6 +2,7 @@
 #define MBGL_RENDERER_SHADER_RASTER
 
 #include <mbgl/shader/shader.hpp>
+#include <mbgl/shader/uniform.hpp>
 
 namespace mbgl {
 
@@ -11,41 +12,18 @@ public:
 
     void bind(char *offset);
 
-    void setImage(int32_t image);
-    void setOpacity(float opacity);
-    void setBuffer(float buffer);
-    void setBrightness(float brightness_low, float brightness_high);
-    void setSaturation(float saturation_factor);
-    void setContrast(float contrast_factor);
-    void setSpin(std::array<float, 3> spin_weights);
+    UniformMatrix<4>              u_matrix            = {"u_matrix",            *this};
+    Uniform<int32_t>              u_image             = {"u_image",             *this};
+    Uniform<float>                u_opacity           = {"u_opacity",           *this};
+    Uniform<float>                u_buffer            = {"u_buffer",            *this};
+    Uniform<float>                u_brightness_low    = {"u_brightness_low",    *this};
+    Uniform<float>                u_brightness_high   = {"u_brightness_high",   *this};
+    Uniform<float>                u_saturation_factor = {"u_saturation_factor", *this};
+    Uniform<float>                u_contrast_factor   = {"u_contrast_factor",   *this};
+    Uniform<std::array<float, 3>> u_spin_weights      = {"u_spin_weights",      *this};
 
 private:
     int32_t a_pos = -1;
-
-    int32_t image = 0;
-    int32_t u_image = -1;
-
-    float opacity = 0;
-    int32_t u_opacity = -1;
-
-    float buffer = 0;
-    int32_t u_buffer = -1;
-
-    float brightness_low = 0;
-    int32_t u_brightness_low = -1;
-
-    float brightness_high = 0;
-    int32_t u_brightness_high = -1;
-
-    float saturation_factor = 0;
-    int32_t u_saturation_factor = -1;
-
-    float contrast_factor = 1;
-    int32_t u_contrast_factor = -1;
-
-    std::array<float, 3> spin_weights = {{}};
-    int32_t u_spin_weights = -1;
-
 };
 
 }
