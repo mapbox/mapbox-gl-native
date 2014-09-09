@@ -1,6 +1,6 @@
 #include <mbgl/shader/uniform.hpp>
 
-using namespace mbgl;
+namespace mbgl {
 
 template <>
 void Uniform<float>::bind(const float& t) {
@@ -43,3 +43,5 @@ void UniformMatrix<4>::bind(const std::array<float, 16>& t) {
 }
 
 // Add more as needed.
+
+}
