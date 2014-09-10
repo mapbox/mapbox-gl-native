@@ -114,8 +114,6 @@ void Map::run() {
         prepare();
         render();
     }
-
-    terminate();
 }
 
 void Map::rerender() {
