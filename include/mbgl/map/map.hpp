@@ -53,6 +53,9 @@ public:
     // Triggers a cleanup that releases resources.
     void cleanup();
 
+    // Releases resources immediately
+    void terminate();
+
     // Controls buffer swapping.
     bool needsSwap();
     void swapped();
