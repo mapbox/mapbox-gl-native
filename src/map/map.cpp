@@ -115,7 +115,7 @@ void Map::run() {
         render();
     }
 
-    view.make_inactive();
+    terminate();
 }
 
 void Map::rerender() {
@@ -156,6 +156,7 @@ void Map::cleanup(uv_async_t *async, int status) {
 void Map::terminate() {
     view.make_active();
     painter.terminate();
+    view.make_inactive();
 }
 
 void Map::render(uv_async_t *async, int status) {
