@@ -148,6 +148,8 @@ void HeadlessView::clear_buffers() {
 }
 
 HeadlessView::~HeadlessView() {
+    make_inactive();
+
 #if MBGL_USE_CGL
     CGLDestroyContext(gl_context);
 #endif
@@ -179,6 +181,8 @@ void HeadlessView::make_active() {
 }
 
 void HeadlessView::make_inactive() {
+    clear_buffers();
+
 #if MBGL_USE_CGL
     CGLError error = CGLSetCurrentContext(nullptr);
     if (error) {
