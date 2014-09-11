@@ -191,7 +191,7 @@ void HeadlessView::make_inactive() {
 #endif
 
 #if MBGL_USE_GLX
-    if (!glXMakeCurrent(x_display, None, nullptr)) {
+    if (!glXMakeCurrent(x_display, None, NULL)) {
         fprintf(stderr, "Removing OpenGL context failed\n");
     }
 #endif
