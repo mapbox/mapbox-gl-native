@@ -8,7 +8,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/util/filesource.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <algorithm>
@@ -147,23 +147,22 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, Gl
         return "";
     });
 
-#if defined(DEBUG)
-    fprintf(stderr, "%s\n", url.c_str());
-#endif
-
-    fileSource->load(ResourceType::Glyphs, url, [&](platform::Response *res) {
-        if (res->code != 200) {
-            // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
-            const std::string msg = util::sprintf<255>("[ERROR] failed to load glyphs (%d): %s\n", res->code, res->error_message.c_str());
-            promise.set_exception(std::make_exception_ptr(std::runtime_error(msg)));
-        } else {
-            // Transfer the data to the GlyphSet and signal its availability.
-            // Once it is available, the caller will need to call parse() to actually
-            // parse the data we received. We are not doing this here since this callback is being
-            // called from another (unknown) thread.
-            data.swap(res->body);
-            promise.set_value(*this);
-        }
+    // The prepare call jumps back to the main thread.
+    fileSource->prepare([&, url, fileSource] {
+        fileSource->request(ResourceType::Glyphs, url)->onload([&, url](const Response &res) {
+            if (res.code != 200) {
+                // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
+                const std::string msg = util::sprintf<255>("[ERROR] failed to load glyphs (%d): %s\n", res.code, res.message.c_str());
+                promise.set_exception(std::make_exception_ptr(std::runtime_error(msg)));
+            } else {
+                // Transfer the data to the GlyphSet and signal its availability.
+                // Once it is available, the caller will need to call parse() to actually
+                // parse the data we received. We are not doing this here since this callback is being
+                // called from another (unknown) thread.
+                data = res.data;
+                promise.set_value(*this);
+            }
+        });
     });
 }
 

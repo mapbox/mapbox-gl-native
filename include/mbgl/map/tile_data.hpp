@@ -19,8 +19,7 @@ class Map;
 class Painter;
 class SourceInfo;
 class StyleLayer;
-
-namespace platform { class Request; }
+class Request;
 
 class TileData : public std::enable_shared_from_this<TileData>,
              private util::noncopyable {
@@ -72,7 +71,7 @@ public:
     const SourceInfo &source;
 
 protected:
-    std::weak_ptr<platform::Request> req;
+    std::unique_ptr<Request> req;
     std::string data;
 
     // Contains the tile ID string for painting debug information.

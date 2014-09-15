@@ -4,7 +4,7 @@
 
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/filesource.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/uv_detail.hpp>
 
 using namespace mbgl;
@@ -45,21 +45,28 @@ void TileData::request() {
 
     // Note: Somehow this feels slower than the change to request_http()
     std::weak_ptr<TileData> weak_tile = shared_from_this();
-    map.getFileSource()->load(ResourceType::Tile, url, [weak_tile, url](platform::Response *res) {
+    req = map.getFileSource()->request(ResourceType::Tile, url);
+    req->onload([weak_tile, url](const Response &res) {
         std::shared_ptr<TileData> tile = weak_tile.lock();
         if (!tile || tile->state == State::obsolete) {
             // noop. Tile is obsolete and we're now just waiting for the refcount
             // to drop to zero for destruction.
-        } else if (res->code == 200) {
+            return;
+        }
+
+        // Clear the request object.
+        tile->req.reset();
+
+        if (res.code == 200) {
             tile->state = State::loaded;
 
-            tile->data.swap(res->body);
+            tile->data = res.data;
 
             // Schedule tile parsing in another thread
             tile->reparse();
         } else {
 #if defined(DEBUG)
-            fprintf(stderr, "[%s] tile loading failed: %d, %s\n", url.c_str(), res->code, res->error_message.c_str());
+            fprintf(stderr, "[%s] tile loading failed: %ld, %s\n", url.c_str(), res.code, res.message.c_str());
 #endif
         }
     });
@@ -68,7 +75,7 @@ void TileData::request() {
 void TileData::cancel() {
     if (state != State::obsolete) {
         state = State::obsolete;
-        platform::cancel_request_http(req.lock());
+        req.reset();
     }
 }
 

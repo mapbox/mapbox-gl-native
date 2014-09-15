@@ -143,6 +143,9 @@
               '<@(sqlite3_cflags)',
               '-I<(boost_root)/include',
             ],
+            'OTHER_CFLAGS': [
+              '<@(uv_cflags)',
+            ],
           },
         }, {
           'cflags': [
@@ -237,7 +240,10 @@
             '<@(uv_libraries)',
             '<@(curl_libraries)',
             '<@(sqlite3_libraries)',
-          ]
+          ],
+          'OTHER_CFLAGS': [
+            '<@(uv_cflags)',
+          ],
         }
       }
     }

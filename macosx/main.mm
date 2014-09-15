@@ -4,6 +4,8 @@
 
 #import <Foundation/Foundation.h>
 
+#include <uv.h>
+
 @interface URLHandler : NSObject
 @property (nonatomic) mbgl::Map *map;
 
@@ -68,6 +70,7 @@
 @end
 
 int main() {
+    fprintf(stderr, "main thread: 0x%lx\n", uv_thread_self());
     mbgl::Log::Set<mbgl::NSLogBackend>();
 
     GLFWView view;

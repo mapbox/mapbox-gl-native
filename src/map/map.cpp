@@ -19,7 +19,7 @@
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/texturepool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
-#include <mbgl/util/filesource.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <algorithm>
@@ -36,10 +36,7 @@ Map::Map(View& view)
       thread(std::make_unique<uv::thread>()),
       view(view),
       transform(view),
-      fileSource(std::make_shared<FileSource>()),
-      style(std::make_shared<Style>()),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
-      glyphStore(std::make_shared<GlyphStore>(fileSource)),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
       painter(*this) {
@@ -70,7 +67,7 @@ void Map::start() {
     // Setup async notifications
     async_terminate = new uv_async_t();
     uv_async_init(**loop, async_terminate, terminate);
-    async_terminate->data = **loop;
+    async_terminate->data = this;
 
     async_render = new uv_async_t();
     uv_async_init(**loop, async_render, render);
@@ -82,6 +79,9 @@ void Map::start() {
 
     uv_thread_create(*thread, [](void *arg) {
         Map *map = static_cast<Map *>(arg);
+#ifdef __APPLE__
+        pthread_setname_np("Map");
+#endif
         map->run();
     }, this);
 }
@@ -173,8 +173,10 @@ void Map::render(uv_async_t *async) {
 
 void Map::terminate(uv_async_t *async) {
     // Closes all open handles on the loop. This means that the loop will automatically terminate.
-    uv_loop_t *loop = static_cast<uv_loop_t *>(async->data);
-    uv_walk(loop, [](uv_handle_t *handle, void */*arg*/) {
+    Map *map = static_cast<Map *>(async->data);
+    map->glyphStore.reset();
+    map->fileSource.reset();
+    uv_walk(**map->loop, [](uv_handle_t *handle, void */*arg*/) {
         if (!uv_is_closing(handle)) {
             uv_close(handle, NULL);
         }
@@ -190,24 +192,13 @@ void Map::setup() {
 }
 
 void Map::setStyleURL(const std::string &url) {
-    fileSource->load(ResourceType::JSON, url, [&](platform::Response *res) {
-        if (res->code == 200) {
-            // Calculate the base
-            const size_t pos = url.rfind('/');
-            std::string base = "";
-            if (pos != std::string::npos) {
-                base = url.substr(0, pos + 1);
-            }
-
-            this->setStyleJSON(res->body, base);
-        } else {
-            Log::Error(Event::Setup, "loading style failed: %d (%s)", res->code, res->error_message.c_str());
-        }
-    }, loop);
+    // TODO: Make threadsafe.
+    styleURL = url;
 }
 
 
 void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
+    // TODO: Make threadsafe.
     styleJSON.swap(newStyleJSON);
     sprite.reset();
     style->loadJSON((const uint8_t *)styleJSON.c_str());
@@ -221,6 +212,7 @@ std::string Map::getStyleJSON() const {
 }
 
 void Map::setAccessToken(std::string access_token) {
+    // TODO: Make threadsafe.
     accessToken.swap(access_token);
 }
 
@@ -521,6 +513,30 @@ void Map::updateRenderState() {
 
 void Map::prepare() {
     view.make_active();
+
+    if (!fileSource) {
+        fileSource = std::make_shared<FileSource>(**loop);
+        glyphStore = std::make_shared<GlyphStore>(fileSource);
+    }
+
+    if (!style) {
+        style = std::make_shared<Style>();
+
+        fileSource->request(ResourceType::JSON, styleURL)->onload([&](const Response &res) {
+            if (res.code == 200) {
+                // Calculate the base
+                const size_t pos = styleURL.rfind('/');
+                std::string base = "";
+                if (pos != std::string::npos) {
+                    base = styleURL.substr(0, pos + 1);
+                }
+
+                setStyleJSON(res.data, base);
+            } else {
+                Log::Error(Event::Setup, "loading style failed: %ld (%s)", res.code, res.message.c_str());
+            }
+        });
+    }
 
     // Update transform transitions.
     animationTime = util::now();

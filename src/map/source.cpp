@@ -6,7 +6,7 @@
 #include <mbgl/util/raster.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/texturepool.hpp>
-#include <mbgl/util/filesource.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
@@ -37,14 +37,14 @@ void Source::load(Map& map) {
     std::string url = util::mapbox::normalizeSourceURL(info.url, map.getAccessToken());
     std::shared_ptr<Source> source = shared_from_this();
 
-    map.getFileSource()->load(ResourceType::JSON, url, [source, &map](platform::Response *res) {
-        if (res->code != 200) {
+    map.getFileSource()->request(ResourceType::JSON, url)->onload([source, &map](const Response &res) {
+        if (res.code != 200) {
             Log::Warning(Event::General, "failed to load source TileJSON");
             return;
         }
 
         rapidjson::Document d;
-        d.Parse<0>(res->body.c_str());
+        d.Parse<0>(res.data.c_str());
 
         if (d.HasParseError()) {
             Log::Warning(Event::General, "invalid source TileJSON");
@@ -55,6 +55,7 @@ void Source::load(Map& map) {
         source->loaded = true;
 
         map.update();
+
     });
 }
 

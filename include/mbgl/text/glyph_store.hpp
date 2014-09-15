@@ -49,6 +49,13 @@ class GlyphPBF {
 public:
     GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange, const std::shared_ptr<FileSource> &fileSource);
 
+private:
+    GlyphPBF(const GlyphPBF &) = delete;
+    GlyphPBF(GlyphPBF &&) = delete;
+    GlyphPBF &operator=(const GlyphPBF &) = delete;
+    GlyphPBF &operator=(GlyphPBF &&) = delete;
+
+public:
     void parse(FontStack &stack);
 
     std::shared_future<GlyphPBF &> getFuture();

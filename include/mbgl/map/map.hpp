@@ -35,11 +35,14 @@ public:
     explicit Map(View &view);
     ~Map();
 
-    // Start/stop the map render thread
+    // Start/stop the map render thread. the start() call is asynchronous, while the stop() call
+    // will block until the map rendering thread stopped.
     void start();
     void stop();
 
-    // Runs the map event loop.
+    // Runs the map event loop. ONLY run this function when you want to get render a single frame
+    // with this map object. It will *not* spawn a separate thread and instead block until the
+    // frame is completely rendered.
     void run();
 
     // Triggers a lazy rerender: only performs a render when the map is not clean.
@@ -192,6 +195,7 @@ private:
 
     Painter painter;
 
+    std::string styleURL;
     std::string styleJSON = "";
     std::string accessToken = "";
 
