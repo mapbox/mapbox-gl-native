@@ -32,7 +32,7 @@ SQLiteStore::SQLiteStore(uv_loop_t *loop, const std::string &path)
       db(std::make_shared<Database>(path.c_str(), ReadWrite | Create)) {
     createSchema();
     worker = new uv_worker_t;
-    uv_worker_init_named(worker, loop, "SQLite");
+    uv_worker_init(worker, loop, 1, "SQLite");
 }
 
 SQLiteStore::~SQLiteStore() {

@@ -60,6 +60,13 @@ Map::~Map() {
     }
 }
 
+uv::worker &Map::getWorker() {
+    if (!workers) {
+        workers = std::make_unique<uv::worker>(**loop, 4, "Tile Worker");
+    }
+    return *workers;
+}
+
 void Map::start() {
     assert(uv_thread_self() == main_thread);
     assert(!async);
@@ -198,6 +205,7 @@ void Map::terminate(uv_async_t *async) {
     map->glyphStore.reset();
     map->fileSource.reset();
     map->style.reset();
+    map->workers.reset();
     map->activeSources.clear();
 
     uv_close((uv_handle_t *)map->async_cleanup.get(), nullptr);

@@ -14,6 +14,7 @@ std::string cwd();
 class thread;
 class rwlock;
 class loop;
+class worker;
 
 }
 

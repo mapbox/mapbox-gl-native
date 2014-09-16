@@ -87,7 +87,7 @@ void TileData::reparse() {
     // We're creating a new work request. The work request deletes itself after it executed
     // the after work handler
     new uv::work<util::ptr<TileData>>(
-        map.getLoop(),
+        map.getWorker(),
         [](util::ptr<TileData> &tile) {
             tile->parse();
         },

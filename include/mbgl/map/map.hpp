@@ -126,6 +126,7 @@ public:
     util::ptr<Sprite> getSprite();
     inline util::ptr<Texturepool> getTexturepool() { return texturepool; }
     inline util::ptr<uv::loop> getLoop() { return loop; }
+    uv::worker &getWorker();
     inline timestamp getAnimationTime() const { return animationTime; }
     inline timestamp getTime() const { return animationTime; }
     void updateTiles();
@@ -159,6 +160,7 @@ private:
 private:
     bool async = false;
     util::ptr<uv::loop> loop;
+    std::unique_ptr<uv::worker> workers;
     std::unique_ptr<uv::thread> thread;
     std::unique_ptr<uv_async_t> async_terminate;
     std::unique_ptr<uv_async_t> async_render;

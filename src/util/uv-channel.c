@@ -49,7 +49,21 @@ void *uv_chan_receive(uv_chan_t *chan) {
     return data;
 }
 
+void uv_chan_clear(uv_chan_t *chan) {
+    uv_mutex_lock(&chan->mutex);
+    uv__chan_item_t *item = NULL;
+    QUEUE *head = NULL;
+    while (!QUEUE_EMPTY(&chan->q)) {
+        head = QUEUE_HEAD(&chan->q);
+        item = QUEUE_DATA(head, uv__chan_item_t, active_queue);
+        QUEUE_REMOVE(head);
+        free(item);
+    }
+    uv_mutex_unlock(&chan->mutex);
+}
+
 void uv_chan_destroy(uv_chan_t *chan) {
+    uv_chan_clear(chan);
     uv_cond_destroy(&chan->cond);
     uv_mutex_destroy(&chan->mutex);
 }
