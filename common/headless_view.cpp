@@ -113,8 +113,6 @@ void HeadlessView::resize(int width, int height) {
 }
 
 void HeadlessView::clear_buffers() {
-    make_active();
-
 #if MBGL_USE_CGL
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
@@ -181,8 +179,6 @@ void HeadlessView::make_active() {
 }
 
 void HeadlessView::make_inactive() {
-    clear_buffers();
-
 #if MBGL_USE_CGL
     CGLError error = CGLSetCurrentContext(nullptr);
     if (error) {
