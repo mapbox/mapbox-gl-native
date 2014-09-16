@@ -20,8 +20,6 @@ public:
     ~FileRequest();
 
 private:
-    const std::string path;
-    const unsigned long thread_id;
     FileRequestBaton *ptr = nullptr;
 
     friend struct FileRequestBaton;

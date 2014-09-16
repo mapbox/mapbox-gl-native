@@ -160,9 +160,9 @@ private:
     bool async = false;
     std::shared_ptr<uv::loop> loop;
     std::unique_ptr<uv::thread> thread;
-    uv_async_t *async_terminate = nullptr;
-    uv_async_t *async_render = nullptr;
-    uv_async_t *async_cleanup = nullptr;
+    std::unique_ptr<uv_async_t> async_terminate;
+    std::unique_ptr<uv_async_t> async_render;
+    std::unique_ptr<uv_async_t> async_cleanup;
 
 private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
@@ -181,6 +181,11 @@ public:
     View &view;
 
 private:
+#ifndef NDEBUG
+    const unsigned long main_thread;
+    unsigned long map_thread = -1;
+#endif
+
     Transform transform;
     TransformState state;
 

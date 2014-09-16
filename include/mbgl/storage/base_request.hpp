@@ -25,7 +25,7 @@ private:
     BaseRequest& operator=(BaseRequest &&) = delete;
 
 public:
-    BaseRequest();
+    BaseRequest(const std::string &path);
     virtual ~BaseRequest();
 
     Callback *add(Callback &&callback, const std::shared_ptr<BaseRequest> &request);
@@ -34,10 +34,14 @@ public:
 
 public:
     const unsigned long thread_id;
+    const std::string path;
     std::unique_ptr<Response> response;
 
 private:
+    // This object may hold a shared_ptr to itself. It does this to prevent destruction of this object
+    // while a request is in progress.
     std::shared_ptr<BaseRequest> self;
+
     std::forward_list<std::unique_ptr<Callback>> callbacks;
 };
 

@@ -8,7 +8,7 @@
 
 namespace mbgl {
 
-BaseRequest::BaseRequest() : thread_id(uv_thread_self()) {
+BaseRequest::BaseRequest(const std::string &path_) : thread_id(uv_thread_self()), path(path_) {
 }
 
 BaseRequest::~BaseRequest() {
@@ -32,6 +32,7 @@ void BaseRequest::notify() {
     if (response) {
         // Now that we have our private copy, notify all observers.
         for (std::unique_ptr<Callback> &callback : list) {
+            assert(callback);
             (*callback)(*response);
         }
     }

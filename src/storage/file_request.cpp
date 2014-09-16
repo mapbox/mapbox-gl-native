@@ -5,6 +5,8 @@
 
 #include <cassert>
 
+#include <unistd.h>
+
 namespace mbgl {
 
 struct FileRequestBaton {
@@ -161,7 +163,7 @@ void FileRequestBaton::cleanup(uv_fs_t *req) {
 }
 
 FileRequest::FileRequest(const std::string &path_, uv_loop_t *loop)
-    : BaseRequest(), path(path_), thread_id(uv_thread_self()), ptr(new FileRequestBaton(this, path, loop)) {
+    : BaseRequest(path_), ptr(new FileRequestBaton(this, path, loop)) {
 }
 
 FileRequest::~FileRequest() {

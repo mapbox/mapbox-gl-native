@@ -13,6 +13,7 @@ FileSource::FileSource(uv_loop_t *loop_)
       store(std::shared_ptr<SQLiteStore>(new SQLiteStore(loop_, "cache.db"))),
       loop(loop_),
       queue(new uv_messenger_t) {
+
     uv_messenger_init(loop, queue, [](void *ptr) {
         std::unique_ptr<std::function<void()>> fn { reinterpret_cast<std::function<void()> *>(ptr) };
         (*fn)();
@@ -22,6 +23,8 @@ FileSource::FileSource(uv_loop_t *loop_)
 FileSource::~FileSource() {
     assert(thread_id == uv_thread_self());
     uv_messenger_stop(queue);
+    // NOTE: We don't need to delete the messenger since it will be deleted by the
+    // uv_messenger_stop() function.
 }
 
 void FileSource::setBase(const std::string &value) {

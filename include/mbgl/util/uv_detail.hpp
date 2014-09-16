@@ -2,20 +2,9 @@
 #define MBGL_UTIL_UV_DETAIL
 
 #include <uv.h>
+
 #include <functional>
 #include <cassert>
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-#endif
-
-#include <boost/lockfree/queue.hpp>
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-
 #include <string>
 
 
