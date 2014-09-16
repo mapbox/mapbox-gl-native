@@ -47,7 +47,7 @@ void TileData::request() {
     std::weak_ptr<TileData> weak_tile = shared_from_this();
     req = map.getFileSource()->request(ResourceType::Tile, url);
     req->onload([weak_tile, url](const Response &res) {
-        std::shared_ptr<TileData> tile = weak_tile.lock();
+        util::ptr<TileData> tile = weak_tile.lock();
         if (!tile || tile->state == State::obsolete) {
             // noop. Tile is obsolete and we're now just waiting for the refcount
             // to drop to zero for destruction.
@@ -86,12 +86,12 @@ void TileData::reparse() {
 
     // We're creating a new work request. The work request deletes itself after it executed
     // the after work handler
-    new uv::work<std::shared_ptr<TileData>>(
+    new uv::work<util::ptr<TileData>>(
         map.getLoop(),
-        [](std::shared_ptr<TileData> &tile) {
+        [](util::ptr<TileData> &tile) {
             tile->parse();
         },
-        [](std::shared_ptr<TileData> &tile) {
+        [](util::ptr<TileData> &tile) {
             tile->afterParse();
             tile->map.update();
         },

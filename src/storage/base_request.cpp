@@ -20,7 +20,7 @@ void BaseRequest::notify() {
 
     // The parameter exists solely so that any calls to ->remove()
     // are not going to cause deallocation of this object while this call is in progress.
-    std::shared_ptr<BaseRequest> retain = self;
+    util::ptr<BaseRequest> retain = self;
 
     // Swap the lists so that it's safe for callbacks to call ->cancel()
     // on the request object, which would modify the list.
@@ -40,7 +40,7 @@ void BaseRequest::notify() {
     self.reset();
 }
 
-Callback *BaseRequest::add(Callback &&callback, const std::shared_ptr<BaseRequest> &request) {
+Callback *BaseRequest::add(Callback &&callback, const util::ptr<BaseRequest> &request) {
     assert(thread_id == uv_thread_self());
     assert(this == request.get());
     if (response) {

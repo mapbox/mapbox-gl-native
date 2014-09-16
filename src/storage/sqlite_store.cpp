@@ -62,7 +62,7 @@ void SQLiteStore::createSchema() {
 }
 
 struct GetBaton {
-    std::shared_ptr<Database> db;
+    util::ptr<Database> db;
     std::string path;
     ResourceType type;
     void *ptr = nullptr;
@@ -120,7 +120,7 @@ void SQLiteStore::get(const std::string &path, GetCallback callback, void *ptr) 
 
 
 struct PutBaton {
-    std::shared_ptr<Database> db;
+    util::ptr<Database> db;
     std::string path;
     ResourceType type;
     Response response;
@@ -164,7 +164,7 @@ void SQLiteStore::put(const std::string &path, ResourceType type, const Response
 }
 
 struct ExpirationBaton {
-    std::shared_ptr<Database> db;
+    util::ptr<Database> db;
     std::string path;
     int64_t expires;
 };

@@ -23,7 +23,6 @@
 #include <mbgl/platform/log.hpp>
 
 #include <algorithm>
-#include <memory>
 #include <iostream>
 
 #define _USE_MATH_DEFINES
@@ -245,7 +244,7 @@ std::string Map::getAccessToken() const {
     return accessToken;
 }
 
-std::shared_ptr<Sprite> Map::getSprite() {
+util::ptr<Sprite> Map::getSprite() {
     const float pixelRatio = state.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
     if (!sprite || sprite->pixelRatio != pixelRatio) {
@@ -478,7 +477,7 @@ void Map::updateSources() {
     assert(uv_thread_self() == map_thread);
 
     // First, disable all existing sources.
-    for (const std::shared_ptr<StyleSource> &source : activeSources) {
+    for (const util::ptr<StyleSource> &source : activeSources) {
         source->enabled = false;
     }
 
@@ -486,7 +485,7 @@ void Map::updateSources() {
     updateSources(style->layers);
 
     // Then, construct or destroy the actual source object, depending on enabled state.
-    for (const std::shared_ptr<StyleSource> &style_source : activeSources) {
+    for (const util::ptr<StyleSource> &style_source : activeSources) {
         if (style_source->enabled) {
             if (!style_source->source) {
                 style_source->source = std::make_shared<Source>(style_source->info);
@@ -498,20 +497,20 @@ void Map::updateSources() {
     }
 
     // Finally, remove all sources that are disabled.
-    util::erase_if(activeSources, [](std::shared_ptr<StyleSource> source){
+    util::erase_if(activeSources, [](util::ptr<StyleSource> source){
         return !source->enabled;
     });
 }
 
-const std::set<std::shared_ptr<StyleSource>> Map::getActiveSources() const {
+const std::set<util::ptr<StyleSource>> Map::getActiveSources() const {
     return activeSources;
 }
 
-void Map::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
+void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
     if (!group) {
         return;
     }
-    for (const std::shared_ptr<StyleLayer> &layer : group->layers) {
+    for (const util::ptr<StyleLayer> &layer : group->layers) {
         if (!layer) continue;
         if (layer->bucket) {
             if (layer->bucket->style_source) {
@@ -524,7 +523,7 @@ void Map::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
 }
 
 void Map::updateTiles() {
-    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
+    for (const util::ptr<StyleSource> &source : getActiveSources()) {
         source->source->update(*this);
     }
 }
@@ -532,7 +531,7 @@ void Map::updateTiles() {
 void Map::updateRenderState() {
     // Update all clipping IDs.
     ClipIDGenerator generator;
-    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
+    for (const util::ptr<StyleSource> &source : getActiveSources()) {
         generator.update(source->source->getLoadedTiles());
         source->source->updateMatrices(painter.projMatrix, state);
     }
@@ -609,7 +608,7 @@ void Map::render() {
     // This guarantees that we have at least one function per tile called.
     // When only rendering layers via the stylesheet, it's possible that we don't
     // ever visit a tile during rendering.
-    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
+    for (const util::ptr<StyleSource> &source : getActiveSources()) {
         source->source->finishRender(painter);
     }
 
@@ -621,7 +620,7 @@ void Map::render() {
     glFlush();
 }
 
-void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
+void Map::renderLayers(util::ptr<StyleLayerGroup> group) {
     if (!group) {
         // Make sure that we actually do have a layer group.
         return;
@@ -664,7 +663,7 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
     }
 }
 
-void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id, const mat4* matrix) {
+void Map::renderLayer(util::ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id, const mat4* matrix) {
     if (layer_desc->type == StyleLayerType::Background) {
         // This layer defines a background color/image.
 

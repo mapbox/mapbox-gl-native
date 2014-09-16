@@ -3,11 +3,11 @@
 
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/ptr.hpp>
 
 #include <cstdint>
 #include <atomic>
 #include <iosfwd>
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <future>
@@ -34,11 +34,11 @@ public:
 class Sprite : public std::enable_shared_from_this<Sprite>, private util::noncopyable {
 private:
     struct Key {};
-    void load(const std::shared_ptr<FileSource> &fileSource);
+    void load(const util::ptr<FileSource> &fileSource);
 
 public:
     Sprite(const Key &, const std::string& base_url, float pixelRatio);
-    static std::shared_ptr<Sprite> Create(const std::string& base_url, float pixelRatio, const std::shared_ptr<FileSource> &fileSource);
+    static util::ptr<Sprite> Create(const std::string& base_url, float pixelRatio, const util::ptr<FileSource> &fileSource);
 
     const SpritePosition &getSpritePosition(const std::string& name) const;
 

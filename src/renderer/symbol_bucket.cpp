@@ -22,7 +22,7 @@ namespace mbgl {
 SymbolBucket::SymbolBucket(const StyleBucketSymbol &properties, Collision &collision)
     : properties(properties), collision(collision) {}
 
-void SymbolBucket::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc,
+void SymbolBucket::render(Painter &painter, util::ptr<StyleLayer> layer_desc,
                           const Tile::ID &id, const mat4 &matrix) {
     painter.renderSymbol(*this, layer_desc, id, matrix);
 }

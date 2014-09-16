@@ -466,7 +466,7 @@ bool Transform::needsTransition() const {
 void Transform::updateTransitions(const timestamp now) {
     uv::writelock lock(mtx);
 
-    transitions.remove_if([now](const std::shared_ptr<util::transition> &transition) {
+    transitions.remove_if([now](const util::ptr<util::transition> &transition) {
         return transition->update(now) == util::transition::complete;
     });
 }

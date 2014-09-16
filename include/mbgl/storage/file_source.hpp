@@ -5,7 +5,6 @@
 #include <mbgl/storage/request.hpp>
 
 #include <string>
-#include <memory>
 #include <unordered_map>
 #include <functional>
 
@@ -44,7 +43,7 @@ private:
     std::string base;
 
     std::unordered_map<std::string, std::weak_ptr<BaseRequest>> pending;
-    std::shared_ptr<SQLiteStore> store;
+    util::ptr<SQLiteStore> store;
     uv_loop_t *loop = nullptr;
     uv_messenger_t *queue = nullptr;
 };

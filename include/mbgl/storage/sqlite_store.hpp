@@ -38,7 +38,7 @@ private:
 
 private:
     const unsigned long thread_id;
-    std::shared_ptr<mapbox::sqlite::Database> db;
+    util::ptr<mapbox::sqlite::Database> db;
     uv_worker_t *worker = nullptr;
 };
 

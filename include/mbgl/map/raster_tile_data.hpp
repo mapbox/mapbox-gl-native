@@ -5,8 +5,6 @@
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 
-#include <memory>
-
 namespace mbgl {
 
 class Map;
@@ -22,8 +20,8 @@ public:
     ~RasterTileData();
 
     virtual void parse();
-    virtual void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix);
-    virtual bool hasData(std::shared_ptr<StyleLayer> layer_desc) const;
+    virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix);
+    virtual bool hasData(util::ptr<StyleLayer> layer_desc) const;
 
 protected:
     StyleBucketRaster properties;

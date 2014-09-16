@@ -19,7 +19,7 @@ class SQLiteStore;
 
 class HTTPRequest : public BaseRequest {
 public:
-    HTTPRequest(ResourceType type, const std::string &path, uv_loop_t *loop, std::shared_ptr<SQLiteStore> store);
+    HTTPRequest(ResourceType type, const std::string &path, uv_loop_t *loop, util::ptr<SQLiteStore> store);
     ~HTTPRequest();
 
 private:
@@ -29,7 +29,7 @@ private:
     const unsigned long thread_id;
     CacheRequestBaton *cache_baton = nullptr;
     HTTPRequestBaton *http_baton = nullptr;
-    std::shared_ptr<SQLiteStore> store;
+    util::ptr<SQLiteStore> store;
     const ResourceType type;
 };
 

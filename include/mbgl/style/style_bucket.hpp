@@ -8,8 +8,8 @@
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/ptr.hpp>
 
-#include <memory>
 #include <forward_list>
 
 namespace mbgl {
@@ -93,12 +93,12 @@ typedef mapbox::util::variant<StyleBucketFill, StyleBucketLine, StyleBucketSymbo
 
 class StyleBucket {
 public:
-    typedef std::shared_ptr<StyleBucket> Ptr;
+    typedef util::ptr<StyleBucket> Ptr;
 
     StyleBucket(StyleLayerType type);
 
     std::string name;
-    std::shared_ptr<StyleSource> style_source;
+    util::ptr<StyleSource> style_source;
     std::string source_layer;
     FilterExpression filter;
     StyleBucketRender render = std::false_type();

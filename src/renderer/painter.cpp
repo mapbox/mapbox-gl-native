@@ -177,7 +177,7 @@ void Painter::prepareTile(const Tile& tile) {
     glStencilFunc(GL_EQUAL, ref, mask);
 }
 
-void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix) {
+void Painter::renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc, const mat4 &matrix) {
     assert(tile.data);
     if (tile.data->hasData(layer_desc) || layer_desc->type == StyleLayerType::Raster) {
         gl::group group(util::sprintf<32>("render %d/%d/%d\n", tile.id.z, tile.id.y, tile.id.z));
@@ -186,7 +186,7 @@ void Painter::renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> laye
     }
 }
 
-void Painter::renderBackground(std::shared_ptr<StyleLayer> layer_desc) {
+void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
     const BackgroundProperties& properties = layer_desc->getProperties<BackgroundProperties>();
 
     Color color = properties.color;

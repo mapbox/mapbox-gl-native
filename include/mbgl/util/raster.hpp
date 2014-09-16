@@ -4,11 +4,11 @@
 #include <mbgl/util/transition.hpp>
 #include <mbgl/util/texturepool.hpp>
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/ptr.hpp>
 #include <mbgl/renderer/prerendered_texture.hpp>
 
 #include <string>
 #include <mutex>
-#include <memory>
 
 typedef struct uv_loop_s uv_loop_t;
 
@@ -17,7 +17,7 @@ namespace mbgl {
 class Raster : public std::enable_shared_from_this<Raster> {
 
 public:
-    Raster(const std::shared_ptr<Texturepool> &texturepool);
+    Raster(const util::ptr<Texturepool> &texturepool);
     ~Raster();
 
     // load image data
@@ -57,7 +57,7 @@ private:
     bool loaded = false;
 
     // shared texture pool
-    std::shared_ptr<Texturepool> texturepool;
+    util::ptr<Texturepool> texturepool;
 
     // min/mag filter
     uint32_t filter = 0;
@@ -66,7 +66,7 @@ private:
     std::unique_ptr<util::Image> img;
 
     // fade in transition
-    std::shared_ptr<util::transition> fade_transition = nullptr;
+    util::ptr<util::transition> fade_transition = nullptr;
 };
 
 }

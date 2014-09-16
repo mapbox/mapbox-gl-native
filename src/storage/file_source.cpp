@@ -10,7 +10,7 @@ namespace mbgl {
 
 FileSource::FileSource(uv_loop_t *loop_)
     : thread_id(uv_thread_self()),
-      store(std::shared_ptr<SQLiteStore>(new SQLiteStore(loop_, "cache.db"))),
+      store(util::ptr<SQLiteStore>(new SQLiteStore(loop_, "cache.db"))),
       loop(loop_),
       queue(new uv_messenger_t) {
 
@@ -51,7 +51,7 @@ std::unique_ptr<Request> FileSource::request(ResourceType type, const std::strin
         }
     }();
 
-    std::shared_ptr<BaseRequest> request;
+    util::ptr<BaseRequest> request;
 
     // First, try to find an existing Request object.
     auto it = pending.find(absoluteURL);

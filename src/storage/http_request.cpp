@@ -21,7 +21,7 @@ struct CacheRequestBaton {
     uv_loop_t *loop;
 };
 
-HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path, uv_loop_t *loop, std::shared_ptr<SQLiteStore> store_)
+HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path, uv_loop_t *loop, util::ptr<SQLiteStore> store_)
     : BaseRequest(path), thread_id(uv_thread_self()), store(store_), type(type_) {
     cache_baton = new CacheRequestBaton;
     cache_baton->request = this;

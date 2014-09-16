@@ -38,11 +38,11 @@ namespace mbgl {
 TileParser::~TileParser() = default;
 
 TileParser::TileParser(const std::string &data, VectorTileData &tile,
-                       const std::shared_ptr<const Style> &style_,
-                       const std::shared_ptr<GlyphAtlas> &glyphAtlas_,
-                       const std::shared_ptr<GlyphStore> &glyphStore_,
-                       const std::shared_ptr<SpriteAtlas> &spriteAtlas_,
-                       const std::shared_ptr<Sprite> &sprite_)
+                       const util::ptr<const Style> &style_,
+                       const util::ptr<GlyphAtlas> &glyphAtlas_,
+                       const util::ptr<GlyphStore> &glyphStore_,
+                       const util::ptr<SpriteAtlas> &spriteAtlas_,
+                       const util::ptr<Sprite> &sprite_)
     : vector_data(pbf((const uint8_t *)data.data(), data.size())),
       tile(tile),
       style(style_),
@@ -66,12 +66,12 @@ void TileParser::parse() {
 
 bool TileParser::obsolete() const { return tile.state == TileData::State::obsolete; }
 
-void TileParser::parseStyleLayers(std::shared_ptr<StyleLayerGroup> group) {
+void TileParser::parseStyleLayers(util::ptr<StyleLayerGroup> group) {
     if (!group) {
         return;
     }
 
-    for (const std::shared_ptr<StyleLayer> &layer_desc : group->layers) {
+    for (const util::ptr<StyleLayer> &layer_desc : group->layers) {
         // Cancel early when parsing.
         if (obsolete()) {
             return;
@@ -103,7 +103,7 @@ void TileParser::parseStyleLayers(std::shared_ptr<StyleLayerGroup> group) {
     }
 }
 
-std::unique_ptr<Bucket> TileParser::createBucket(std::shared_ptr<StyleBucket> bucket_desc) {
+std::unique_ptr<Bucket> TileParser::createBucket(util::ptr<StyleBucket> bucket_desc) {
     if (!bucket_desc) {
         fprintf(stderr, "missing bucket desc\n");
         return nullptr;
@@ -164,7 +164,7 @@ std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& laye
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createRasterBucket(const std::shared_ptr<Texturepool> &texturepool, const StyleBucketRaster &raster) {
+std::unique_ptr<Bucket> TileParser::createRasterBucket(const util::ptr<Texturepool> &texturepool, const StyleBucketRaster &raster) {
     std::unique_ptr<RasterBucket> bucket = std::make_unique<RasterBucket>(texturepool, raster);
     return obsolete() ? nullptr : std::move(bucket);
 }

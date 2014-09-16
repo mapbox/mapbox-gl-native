@@ -35,7 +35,7 @@ void Source::load(Map& map) {
     }
 
     std::string url = util::mapbox::normalizeSourceURL(info.url, map.getAccessToken());
-    std::shared_ptr<Source> source = shared_from_this();
+    util::ptr<Source> source = shared_from_this();
 
     map.getFileSource()->request(ResourceType::JSON, url)->onload([source, &map](const Response &res) {
         if (res.code != 200) {
@@ -99,7 +99,7 @@ void Source::drawClippingMasks(Painter &painter) {
     }
 }
 
-void Source::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc) {
+void Source::render(Painter &painter, util::ptr<StyleLayer> layer_desc) {
     gl::group group(std::string("layer: ") + layer_desc->id);
     for (const std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
         Tile &tile = *pair.second;
@@ -109,7 +109,7 @@ void Source::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc) {
     }
 }
 
-void Source::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix) {
+void Source::render(Painter &painter, util::ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix) {
     auto it = tiles.find(id);
     if (it != tiles.end() && it->second->data && it->second->data->state == TileData::State::parsed) {
         painter.renderTileLayer(*it->second, layer_desc, matrix);
@@ -334,7 +334,7 @@ bool Source::updateTiles(Map &map) {
 
     // Remove all the expired pointers from the set.
     util::erase_if(tile_data, [&retain_data](std::pair<const Tile::ID, std::weak_ptr<TileData>> &pair) {
-        const std::shared_ptr<TileData> tile = pair.second.lock();
+        const util::ptr<TileData> tile = pair.second.lock();
         if (!tile) {
             return true;
         }

@@ -1,13 +1,12 @@
 #ifndef MBGL_RENDERER_LINEBUCKET
 #define MBGL_RENDERER_LINEBUCKET
 
-#include "bucket.hpp"
+#include <mbgl/renderer/bucket.hpp>
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
 #include <mbgl/style/style_bucket.hpp>
 
-#include <memory>
 #include <vector>
 
 namespace mbgl {
@@ -30,7 +29,7 @@ public:
                PointElementsBuffer& pointElementsBuffer,
                const StyleBucketLine& properties);
 
-    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    virtual void render(Painter& painter, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     virtual bool hasData() const;
 
     void addGeometry(pbf& data);

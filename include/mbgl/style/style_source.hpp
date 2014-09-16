@@ -2,12 +2,11 @@
 #define MBGL_STYLE_STYLE_SOURCE
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/util/ptr.hpp>
+#include <rapidjson/document.h>
 
-#include <memory>
 #include <vector>
 #include <string>
-
-#include <rapidjson/document.h>
 
 namespace mbgl {
 
@@ -34,7 +33,7 @@ public:
     SourceInfo info;
 
     bool enabled = false;
-    std::shared_ptr<Source> source;
+    util::ptr<Source> source;
 
     StyleSource(const SourceInfo &info)
         : info(info)

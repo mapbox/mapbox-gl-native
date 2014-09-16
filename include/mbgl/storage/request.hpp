@@ -2,8 +2,8 @@
 #define MBGL_STORAGE_REQUEST
 
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/ptr.hpp>
 
-#include <memory>
 #include <functional>
 #include <forward_list>
 
@@ -22,7 +22,7 @@ private:
     Request& operator=(Request &&) = delete;
 
 public:
-    Request(const std::shared_ptr<BaseRequest> &base);
+    Request(const util::ptr<BaseRequest> &base);
     ~Request();
 
     void onload(Callback cb);
@@ -30,7 +30,7 @@ public:
 
 private:
     const unsigned long thread_id;
-    std::shared_ptr<BaseRequest> base;
+    util::ptr<BaseRequest> base;
     std::forward_list<Callback *> callbacks;
 };
 

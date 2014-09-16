@@ -6,11 +6,11 @@
 #include <mbgl/geometry/debug_font_buffer.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/ptr.hpp>
 
 #include <atomic>
 #include <exception>
 #include <iosfwd>
-#include <memory>
 #include <string>
 
 namespace mbgl {
@@ -28,7 +28,7 @@ public:
     struct geometry_too_long_exception : exception {};
 
 public:
-    typedef std::shared_ptr<TileData> Ptr;
+    typedef util::ptr<TileData> Ptr;
 
     enum class State {
         invalid,
@@ -56,8 +56,8 @@ public:
     virtual void beforeParse();
     virtual void parse() = 0;
     virtual void afterParse();
-    virtual void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix) = 0;
-    virtual bool hasData(std::shared_ptr<StyleLayer> layer_desc) const = 0;
+    virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix) = 0;
+    virtual bool hasData(util::ptr<StyleLayer> layer_desc) const = 0;
 
 
 public:

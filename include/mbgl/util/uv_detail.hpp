@@ -1,6 +1,8 @@
 #ifndef MBGL_UTIL_UV_DETAIL
 #define MBGL_UTIL_UV_DETAIL
 
+#include <mbgl/util/ptr.hpp>
+
 #include <uv.h>
 
 #include <functional>
@@ -113,7 +115,7 @@ public:
     typedef void (*after_work_callback)(T &object);
 
     template<typename... Args>
-    work(const std::shared_ptr<loop> &loop, work_callback work_cb, after_work_callback after_work_cb, Args&&... args)
+    work(const mbgl::util::ptr<loop> &loop, work_callback work_cb, after_work_callback after_work_cb, Args&&... args)
         : loop(loop),
           data(std::forward<Args>(args)...),
           work_cb(work_cb),
@@ -135,7 +137,7 @@ private:
     }
 
 private:
-    std::shared_ptr<uv::loop> loop;
+    mbgl::util::ptr<uv::loop> loop;
     uv_work_t req;
     T data;
     work_callback work_cb;

@@ -1,11 +1,6 @@
 #ifndef MBGL_STORAGE_FILE_REQUEST
 #define MBGL_STORAGE_FILE_REQUEST
 
-
-#include <string>
-#include <memory>
-#include <cassert>
-
 #include <mbgl/storage/base_request.hpp>
 
 namespace mbgl {

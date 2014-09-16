@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-Request::Request(const std::shared_ptr<BaseRequest> &base_)
+Request::Request(const util::ptr<BaseRequest> &base_)
     : thread_id(uv_thread_self()), base(base_) {
 }
 

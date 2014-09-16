@@ -1,20 +1,19 @@
-#include <mbgl/util/raster.hpp>
-
-#include <memory>
-#include <cassert>
-#include <cstring>
-
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/gl.hpp>
+
+#include <mbgl/util/raster.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
 
 #include <png.h>
 
+#include <cassert>
+#include <cstring>
+
 using namespace mbgl;
 
-Raster::Raster(const std::shared_ptr<Texturepool> &texturepool)
+Raster::Raster(const util::ptr<Texturepool> &texturepool)
     : texturepool(texturepool)
 {}
 

@@ -451,7 +451,7 @@ std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
     if (value.IsArray()) {
         std::unique_ptr<StyleLayerGroup> group = std::make_unique<StyleLayerGroup>();
         for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-            std::shared_ptr<StyleLayer> layer = createLayer(value[i]);
+            util::ptr<StyleLayer> layer = createLayer(value[i]);
             if (layer) {
                 group->layers.emplace_back(layer);
             }
@@ -463,7 +463,7 @@ std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
     }
 }
 
-std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
+util::ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
     if (value.IsObject()) {
         if (!value.HasMember("id")) {
             Log::Warning(Event::ParseStyle, "layer must have an id");
@@ -487,7 +487,7 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
         std::map<ClassID, ClassProperties> styles;
         parseStyles(value, styles);
 
-        std::shared_ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
+        util::ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
             layer_id, std::move(styles));
 
         if (value.HasMember("layers")) {
@@ -495,7 +495,7 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
         }
 
         // Store the layer ID so we can reference it later.
-        layers.emplace(layer_id, std::pair<JSVal, std::shared_ptr<StyleLayer>> { value, layer });
+        layers.emplace(layer_id, std::pair<JSVal, util::ptr<StyleLayer>> { value, layer });
 
         return layer;
     } else {
@@ -505,14 +505,14 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
 }
 
 void StyleParser::parseLayers() {
-    for (std::pair<const std::string, std::pair<JSVal, std::shared_ptr<StyleLayer>>> &pair : layers) {
+    for (std::pair<const std::string, std::pair<JSVal, util::ptr<StyleLayer>>> &pair : layers) {
         parseLayer(pair.second);
     }
 }
 
-void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair) {
+void StyleParser::parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair) {
     JSVal value = pair.first;
-    std::shared_ptr<StyleLayer> &layer = pair.second;
+    util::ptr<StyleLayer> &layer = pair.second;
 
     if (value.HasMember("type")) {
         JSVal type = value["type"];
@@ -642,7 +642,7 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
 }
 
-void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer) {
+void StyleParser::parseReference(JSVal value, util::ptr<StyleLayer> &layer) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "layer ref of '%s' must be a string", layer->id.c_str());
         return;
@@ -661,7 +661,7 @@ void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer
     stack.pop_front();
 
 
-    std::shared_ptr<StyleLayer> reference = it->second.second;
+    util::ptr<StyleLayer> reference = it->second.second;
 
     layer->type = reference->type;
 
@@ -676,7 +676,7 @@ void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer
 
 #pragma mark - Parse Bucket
 
-void StyleParser::parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer) {
+void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
     layer->bucket = std::make_shared<StyleBucket>(layer->type);
 
     // We name the buckets according to the layer that defined it.
@@ -822,7 +822,7 @@ std::vector<Value> StyleParser::parseValues(JSVal value) {
     return values;
 }
 
-void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
+void StyleParser::parseRender(JSVal value, util::ptr<StyleLayer> &layer) {
     if (!value.IsObject()) {
         Log::Warning(Event::ParseStyle, "render property of layer '%s' must be an object", layer->id.c_str());
         return;

@@ -137,7 +137,7 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line);
 }
 
-GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange, const std::shared_ptr<FileSource> &fileSource)
+GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange, const util::ptr<FileSource> &fileSource)
     : future(promise.get_future().share())
 {
     // Load the glyph set URL
@@ -224,7 +224,7 @@ void GlyphPBF::parse(FontStack &stack) {
     data.clear();
 }
 
-GlyphStore::GlyphStore(const std::shared_ptr<FileSource> &fileSource) : fileSource(fileSource) {}
+GlyphStore::GlyphStore(const util::ptr<FileSource> &fileSource) : fileSource(fileSource) {}
 
 void GlyphStore::setURL(const std::string &url) {
     glyphURL = url;
