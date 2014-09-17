@@ -31,16 +31,21 @@ class FileSource;
 class View;
 
 class Map : private util::noncopyable {
-    typedef void (*stop_callback)();
+    typedef void (*stop_callback)(void *);
 
 public:
     explicit Map(View &view);
     ~Map();
 
-    // Start/stop the map render thread. the start() call is asynchronous, while the stop() call
-    // will block until the map rendering thread stopped.
+    // Start the map render thread. It is asynchronous.
     void start();
-    void stop(stop_callback cb = nullptr);
+
+    // Stop the map render thread. This call will block until the map rendering thread stopped.
+    // The optional callback function will be invoked repeatedly until the map thread is stopped.
+    // The callback function should wait until it is woken up again by view.notify(), otherwise
+    // this will be a busy waiting loop. The optional data parameter will be passed to the callback
+    // function.
+    void stop(stop_callback cb = nullptr, void *data = nullptr);
 
     // Runs the map event loop. ONLY run this function when you want to get render a single frame
     // with this map object. It will *not* spawn a separate thread and instead block until the

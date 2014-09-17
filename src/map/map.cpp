@@ -100,11 +100,14 @@ void Map::start() {
 #ifndef NDEBUG
         map->map_thread = -1;
 #endif
+
+        // Make sure that the stop() function knows when to stop invoking the callback function.
         map->is_stopped = true;
+        map->view.notify();
     }, this);
 }
 
-void Map::stop(stop_callback cb) {
+void Map::stop(stop_callback cb, void *data) {
     assert(uv_thread_self() == main_thread);
     assert(main_thread != map_thread);
     assert(async);
@@ -112,11 +115,19 @@ void Map::stop(stop_callback cb) {
     uv_async_send(async_terminate.get());
 
     if (cb) {
+        // Wait until the render thread stopped. We are using this construct instead of plainly
+        // relying on the thread_join because the system might need to run things in the current
+        // thread that is required for the render thread to terminate correctly. This is for example
+        // the case with Cocoa's NSURLRequest. Otherwise, we will eventually deadlock because this
+        // thread (== main thread) is blocked. The callback function should use an efficient waiting
+        // function to avoid a busy waiting loop.
         while (!is_stopped) {
-            cb();
+            cb(data);
         }
     }
 
+    // If a callback function was provided, this should return immediately because the thread has
+    // already finished executing.
     uv_thread_join(*thread);
 
     async = false;
