@@ -111,18 +111,20 @@ private:
 
 class worker {
 public:
-    inline worker(uv_loop_t *loop, unsigned int count, const char *name = nullptr) {
-        uv_worker_init(&w, loop, count, name);
+    inline worker(uv_loop_t *loop, unsigned int count, const char *name = nullptr) : w(new uv_worker_t) {
+        uv_worker_init(w, loop, count, name);
     }
     inline ~worker() {
-        uv_worker_close(&w);
+        uv_worker_close(w, [](uv_worker_t *worker) {
+            delete worker;
+        });
     }
     inline void add(void *data, uv_worker_cb work_cb, uv_worker_after_cb after_work_cb) {
-        uv_worker_send(&w, data, work_cb, after_work_cb);
+        uv_worker_send(w, data, work_cb, after_work_cb);
     }
 
 private:
-    uv_worker_t w;
+    uv_worker_t *w;
 };
 
 template <typename T>
