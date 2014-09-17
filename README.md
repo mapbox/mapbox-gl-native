@@ -85,9 +85,9 @@ Set the environment variable `MAPBOX_ACCESS_TOKEN` to your token.
 Ensure you have git and other build essentials:
 
     sudo apt-get update
-    sudo apt-get install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config nodejs-legacy curl
+    sudo apt-get install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config nodejs-legacy curl libuv-dev
 
-Install a `-std=c++11` capable compiler
+If you are running Ubuntu 13.10 or older, install a `-std=c++11` capable compiler:
 
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get update
