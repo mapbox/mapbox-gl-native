@@ -1,6 +1,7 @@
 #ifndef MBGL_STORAGE_BASE_REQUEST
 #define MBGL_STORAGE_BASE_REQUEST
 
+#include <mbgl/storage/request_callback.hpp>
 #include <mbgl/util/ptr.hpp>
 
 #include <string>
@@ -15,8 +16,6 @@ namespace mbgl {
 
 class Response;
 class Request;
-using Callback = std::function<void(const Response &)>;
-
 
 class BaseRequest {
 private:
@@ -43,7 +42,6 @@ private:
     // This object may hold a shared_ptr to itself. It does this to prevent destruction of this object
     // while a request is in progress.
     util::ptr<BaseRequest> self;
-
     std::forward_list<std::unique_ptr<Callback>> callbacks;
 };
 

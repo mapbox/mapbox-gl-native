@@ -8,15 +8,31 @@
 
 namespace mbgl {
 
+template <typename T, typename ...Args>
+void invoke(const std::forward_list<std::unique_ptr<Callback>> &list, Args&& ...args) {
+    for (const std::unique_ptr<Callback> &callback : list) {
+        assert(callback);
+        if (callback->is<T>()) {
+            callback->get<T>()(::std::forward<Args>(args)...);
+        }
+    }
+}
+
 BaseRequest::BaseRequest(const std::string &path_) : thread_id(uv_thread_self()), path(path_) {
 }
 
+// A base request can only be "canceled" by destroying the object. In that case, we'll have to
+// notify all cancel callbacks.
 BaseRequest::~BaseRequest() {
     assert(thread_id == uv_thread_self());
+    invoke<AbortedCallback>(callbacks);
 }
 
 void BaseRequest::notify() {
     assert(thread_id == uv_thread_self());
+
+    // We are only supposed to call notify when a result exists.
+    assert(response);
 
     // The parameter exists solely so that any calls to ->remove()
     // are not going to cause deallocation of this object while this call is in progress.
@@ -24,18 +40,9 @@ void BaseRequest::notify() {
 
     // Swap the lists so that it's safe for callbacks to call ->cancel()
     // on the request object, which would modify the list.
-    std::forward_list<std::unique_ptr<Callback>> list;
-    list.swap(callbacks);
-
-    // Only notify when we actually have a response. When the response code is 0, the request was
-    // canceled and we don't need to notify.
-    if (response) {
-        // Now that we have our private copy, notify all observers.
-        for (std::unique_ptr<Callback> &callback : list) {
-            assert(callback);
-            (*callback)(*response);
-        }
-    }
+    const std::forward_list<std::unique_ptr<Callback>> list = std::move(callbacks);
+    callbacks.clear();
+    invoke<CompletedCallback>(list, *response);
 
     self.reset();
 }
@@ -43,9 +50,15 @@ void BaseRequest::notify() {
 Callback *BaseRequest::add(Callback &&callback, const util::ptr<BaseRequest> &request) {
     assert(thread_id == uv_thread_self());
     assert(this == request.get());
+
     if (response) {
         // We already have a response. Notify right away.
-        callback(*response);
+        if (callback.is<CompletedCallback>()) {
+            callback.get<CompletedCallback>()(*response);
+        } else {
+            // We already know that this request was successful. The AbortedCallback will be discarded
+            // here since it would never be called.
+        }
         return nullptr;
     } else {
         self = request;

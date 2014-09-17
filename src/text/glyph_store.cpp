@@ -149,7 +149,8 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, Gl
 
     // The prepare call jumps back to the main thread.
     fileSource->prepare([&, url, fileSource] {
-        fileSource->request(ResourceType::Glyphs, url)->onload([&, url](const Response &res) {
+        auto request = fileSource->request(ResourceType::Glyphs, url);
+        request->onload([&, url](const Response &res) {
             if (res.code != 200) {
                 // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
                 const std::string msg = util::sprintf<255>("[ERROR] failed to load glyphs (%d): %s\n", res.code, res.message.c_str());
@@ -162,6 +163,9 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, Gl
                 data = res.data;
                 promise.set_value(*this);
             }
+        });
+        request->oncancel([&]() {
+            promise.set_exception(std::make_exception_ptr(std::runtime_error("Loading glyphs was canceled")));
         });
     });
 }

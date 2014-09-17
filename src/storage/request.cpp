@@ -15,7 +15,17 @@ Request::~Request() {
     assert(thread_id == uv_thread_self());
 }
 
-void Request::onload(Callback cb) {
+void Request::onload(CompletedCallback cb) {
+    assert(thread_id == uv_thread_self());
+    if (base) {
+        Callback *callback = base->add(std::move(cb), base);
+        if (callback) {
+            callbacks.push_front(callback);
+        }
+    }
+}
+
+void Request::oncancel(AbortedCallback cb) {
     assert(thread_id == uv_thread_self());
     if (base) {
         Callback *callback = base->add(std::move(cb), base);

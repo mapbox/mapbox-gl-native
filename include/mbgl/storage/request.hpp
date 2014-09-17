@@ -1,10 +1,10 @@
 #ifndef MBGL_STORAGE_REQUEST
 #define MBGL_STORAGE_REQUEST
 
+#include <mbgl/storage/request_callback.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/ptr.hpp>
 
-#include <functional>
 #include <forward_list>
 
 typedef struct uv_loop_s uv_loop_t;
@@ -12,7 +12,6 @@ typedef struct uv_loop_s uv_loop_t;
 namespace mbgl {
 
 class BaseRequest;
-using Callback = std::function<void(const Response &)>;
 
 class Request {
 private:
@@ -25,7 +24,8 @@ public:
     Request(const util::ptr<BaseRequest> &base);
     ~Request();
 
-    void onload(Callback cb);
+    void onload(CompletedCallback cb);
+    void oncancel(AbortedCallback cb);
     void cancel();
 
 private:
