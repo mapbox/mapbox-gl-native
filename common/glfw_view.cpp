@@ -183,13 +183,17 @@ int GLFWView::run() {
         glfwWaitEvents();
     }
 
-    map->stop();
+    map->stop(glfwWaitEvents);
 
     return 0;
 }
 
 void GLFWView::make_active() {
     glfwMakeContextCurrent(window);
+}
+
+void GLFWView::notify() {
+    glfwPostEmptyEvent();
 }
 
 void GLFWView::swap() {

@@ -75,6 +75,9 @@ void Map::start() {
     // updated rendering. Only in these cases, we attach the async handlers.
     async = true;
 
+    // Reset the flag.
+    is_stopped = false;
+
     // Setup async notifications
     uv_async_init(**loop, async_terminate.get(), terminate);
     async_terminate->data = this;
@@ -97,14 +100,22 @@ void Map::start() {
 #ifndef NDEBUG
         map->map_thread = -1;
 #endif
+        map->is_stopped = true;
     }, this);
 }
 
-void Map::stop() {
+void Map::stop(stop_callback cb) {
     assert(uv_thread_self() == main_thread);
     assert(main_thread != map_thread);
+    assert(async);
 
     uv_async_send(async_terminate.get());
+
+    if (cb) {
+        while (!is_stopped) {
+            cb();
+        }
+    }
 
     uv_thread_join(*thread);
 

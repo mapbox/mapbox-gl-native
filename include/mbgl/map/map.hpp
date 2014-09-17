@@ -31,6 +31,8 @@ class FileSource;
 class View;
 
 class Map : private util::noncopyable {
+    typedef void (*stop_callback)();
+
 public:
     explicit Map(View &view);
     ~Map();
@@ -38,7 +40,7 @@ public:
     // Start/stop the map render thread. the start() call is asynchronous, while the stop() call
     // will block until the map rendering thread stopped.
     void start();
-    void stop();
+    void stop(stop_callback cb = nullptr);
 
     // Runs the map event loop. ONLY run this function when you want to get render a single frame
     // with this map object. It will *not* spawn a separate thread and instead block until the
@@ -178,6 +180,9 @@ private:
     // This is cleared once the current front buffer has been presented and the back buffer is
     // ready for rendering.
     std::atomic_flag is_rendered = ATOMIC_FLAG_INIT;
+
+    // Stores whether the map thread has been stopped already.
+    std::atomic_bool is_stopped;
 
 public:
     View &view;
