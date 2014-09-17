@@ -20,7 +20,7 @@
 
 namespace mbgl {
 
-Source::Source(SourceInfo& info)
+Source::Source(const util::ptr<SourceInfo>& info)
     : info(info)
 {
 }
@@ -29,12 +29,12 @@ Source::Source(SourceInfo& info)
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
 void Source::load(Map& map) {
-    if (info.url.empty()) {
+    if (info->url.empty()) {
         loaded = true;
         return;
     }
 
-    std::string url = util::mapbox::normalizeSourceURL(info.url, map.getAccessToken());
+    std::string url = util::mapbox::normalizeSourceURL(info->url, map.getAccessToken());
     util::ptr<Source> source = shared_from_this();
 
     map.getFileSource()->request(ResourceType::JSON, url)->onload([source, &map](const Response &res) {
@@ -51,7 +51,7 @@ void Source::load(Map& map) {
             return;
         }
 
-        source->info.parseTileJSONProperties(d);
+        source->info->parseTileJSONProperties(d);
         source->loaded = true;
 
         map.update();
@@ -184,9 +184,9 @@ TileData::State Source::addTile(Map &map, const Tile::ID& id) {
 
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
-        if (info.type == SourceType::Vector) {
+        if (info->type == SourceType::Vector) {
             new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, info);
-        } else if (info.type == SourceType::Raster) {
+        } else if (info->type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, map, info);
         } else {
             throw std::runtime_error("source type not implemented");
@@ -200,7 +200,7 @@ TileData::State Source::addTile(Map &map, const Tile::ID& id) {
 }
 
 double Source::getZoom(const TransformState& state) const {
-    double offset = std::log(util::tileSize / info.tile_size) / std::log(2);
+    double offset = std::log(util::tileSize / info->tile_size) / std::log(2);
     offset += (state.getPixelRatio() > 1.0 ? 1 :0);
     return state.getZoom() + offset;
 }
@@ -212,8 +212,8 @@ int32_t Source::coveringZoomLevel(const TransformState& state) const {
 std::forward_list<Tile::ID> Source::coveringTiles(const TransformState& state) const {
     int32_t z = coveringZoomLevel(state);
 
-    if (z < info.min_zoom) return {{}};
-    if (z > info.max_zoom) z = info.max_zoom;
+    if (z < info->min_zoom) return {{}};
+    if (z > info->max_zoom) z = info->max_zoom;
 
     // Map four viewport corners to pixel coordinates
     box points = state.cornersToBox(z);
@@ -286,8 +286,8 @@ bool Source::updateTiles(Map &map) {
     std::forward_list<Tile::ID> required = coveringTiles(map.getState());
 
     // Determine the overzooming/underzooming amounts.
-    int32_t minCoveringZoom = util::clamp<int32_t>(zoom - 10, info.min_zoom, info.max_zoom);
-    int32_t maxCoveringZoom = util::clamp<int32_t>(zoom + 1,  info.min_zoom, info.max_zoom);
+    int32_t minCoveringZoom = util::clamp<int32_t>(zoom - 10, info->min_zoom, info->max_zoom);
+    int32_t maxCoveringZoom = util::clamp<int32_t>(zoom + 1,  info->min_zoom, info->max_zoom);
 
     // Retain is a list of tiles that we shouldn't delete, even if they are not
     // the most ideal tile for the current viewport. This may include tiles like

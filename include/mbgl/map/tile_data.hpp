@@ -40,7 +40,7 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, Map &map, const SourceInfo &source);
+    TileData(Tile::ID id, Map &map, const util::ptr<SourceInfo> &source);
     ~TileData();
 
     void request();
@@ -68,7 +68,7 @@ protected:
     Map &map;
 
 public:
-    const SourceInfo &source;
+    util::ptr<SourceInfo> source;
 
 protected:
     std::unique_ptr<Request> req;

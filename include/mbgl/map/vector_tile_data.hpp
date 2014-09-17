@@ -26,7 +26,7 @@ class VectorTileData : public TileData {
     friend class TileParser;
 
 public:
-    VectorTileData(Tile::ID id, Map &map, const SourceInfo &source);
+    VectorTileData(Tile::ID id, Map &map, const util::ptr<SourceInfo> &source);
     ~VectorTileData();
 
     virtual void beforeParse();

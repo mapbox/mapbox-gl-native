@@ -3,6 +3,7 @@
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/noncopyable.hpp>
 #include <rapidjson/document.h>
 
 #include <vector>
@@ -12,7 +13,7 @@ namespace mbgl {
 
 class Source;
 
-class SourceInfo {
+class SourceInfo : private util::noncopyable {
 public:
     SourceType type = SourceType::Vector;
     std::string url;
@@ -30,12 +31,12 @@ public:
 
 class StyleSource : public std::enable_shared_from_this<StyleSource> {
 public:
-    SourceInfo info;
+    util::ptr<SourceInfo> info;
 
     bool enabled = false;
     util::ptr<Source> source;
 
-    StyleSource(const SourceInfo &info)
+    StyleSource(const util::ptr<SourceInfo> &info)
         : info(info)
     {}
 };

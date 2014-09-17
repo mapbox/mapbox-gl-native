@@ -16,7 +16,7 @@ class RasterTileData : public TileData {
     friend class TileParser;
 
 public:
-    RasterTileData(Tile::ID id, Map &map, const SourceInfo &source);
+    RasterTileData(Tile::ID id, Map &map, const util::ptr<SourceInfo> &source);
     ~RasterTileData();
 
     virtual void parse();
