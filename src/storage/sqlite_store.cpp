@@ -25,6 +25,35 @@ std::string removeAccessTokenFromURL(const std::string &url) {
     }
 }
 
+std::string convertMapboxDomainsToProtocol(const std::string &url) {
+    const size_t protocol_separator = url.find("://");
+    if (protocol_separator == std::string::npos) {
+        return url;
+    }
+
+    const std::string protocol = url.substr(0, protocol_separator);
+    if (!(protocol == "http" || protocol == "https")) {
+        return url;
+    }
+
+    const size_t domain_begin = protocol_separator + 3;
+    const size_t path_separator = url.find("/", domain_begin);
+    if (path_separator == std::string::npos) {
+        return url;
+    }
+
+    const std::string domain = url.substr(domain_begin, path_separator - domain_begin);
+    if (domain.find(".tiles.mapbox.com") != std::string::npos) {
+        return "mapbox://" + url.substr(path_separator + 1);
+    } else {
+        return url;
+    }
+}
+
+std::string unifyMapboxURLs(const std::string &url) {
+    return removeAccessTokenFromURL(convertMapboxDomainsToProtocol(url));
+}
+
 namespace mbgl {
 
 SQLiteStore::SQLiteStore(uv_loop_t *loop, const std::string &path)
@@ -88,7 +117,7 @@ void SQLiteStore::get(const std::string &path, GetCallback callback, void *ptr) 
 
     uv_worker_send(worker, get_baton, [](void *data) {
         GetBaton *baton = (GetBaton *)data;
-        const std::string url = removeAccessTokenFromURL(baton->path);
+        const std::string url = unifyMapboxURLs(baton->path);
         //                                                    0       1         2
         Statement stmt = baton->db->prepare("SELECT `code`, `type`, `modified`, "
         //       3        4          5
@@ -139,7 +168,7 @@ void SQLiteStore::put(const std::string &path, ResourceType type, const Response
 
     uv_worker_send(worker, put_baton, [](void *data) {
         PutBaton *baton = (PutBaton *)data;
-        const std::string url = removeAccessTokenFromURL(baton->path);
+        const std::string url = unifyMapboxURLs(baton->path);
         Statement stmt = baton->db->prepare("REPLACE INTO `http_cache` ("
         //     1      2       3         4           5        6          7
             "`url`, `code`, `type`, `modified`, `expires`, `data`, `compressed`"
@@ -181,7 +210,7 @@ void SQLiteStore::updateExpiration(const std::string &path, int64_t expires) {
 
     uv_worker_send(worker, expiration_baton, [](void *data) {
         ExpirationBaton *baton = (ExpirationBaton *)data;
-        const std::string url = removeAccessTokenFromURL(baton->path);
+        const std::string url = unifyMapboxURLs(baton->path);
         Statement stmt = //                                 1               2
             baton->db->prepare("UPDATE `http_cache` SET `expires` = ? WHERE `url` = ?");
         stmt.bind<int64_t>(1, baton->expires);
