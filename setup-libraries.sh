@@ -51,7 +51,7 @@ set -u
 NODE=$(which node)
 NPM=$(which npm)
 
-MP_HASH="e741a075d28812e5d16b581e1540248fe19c52ce"
+MP_HASH="eb8c6d7e6bd6adb42c232ed806b889f3e6825bb5"
 DIR_HASH=$(echo `pwd` | git hash-object --stdin)
 if [ ! -d 'mapnik-packaging/' ]; then
   git clone https://github.com/mapnik/mapnik-packaging.git
@@ -67,9 +67,13 @@ export CXX11=true
 if [ ${UNAME} = 'Darwin' ]; then
 
 if [ ! -z "${TRAVIS:-}" ]; then
-    if aws s3 cp s3://mapbox-gl-testing/dependencies/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then
-        rm -rf out/build-cpp11-libcpp-universal
-        tar -xzf out/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz
+    if aws s3 cp s3://mapbox-gl-testing/dependencies/build-cpp11-libcpp-osx_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then
+        if aws s3 cp s3://mapbox-gl-testing/dependencies/build-cpp11-libcpp-ios_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then
+            rm -rf out/build-cpp11-libcpp-x86_64-macosx
+            rm -rf out/build-cpp11-libcpp-universal
+            tar -xzf out/build-cpp11-libcpp-osx_${MP_HASH}_${DIR_HASH}.tar.gz
+            tar -xzf out/build-cpp11-libcpp-ios_${MP_HASH}_${DIR_HASH}.tar.gz
+        fi
     fi
 fi
 
@@ -95,12 +99,10 @@ source iPhoneSimulator.sh
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
     echo '     ...done'
 
-# libs conflict with MacOSX build
-# TODO: need to break apart targets
-#source iPhoneSimulator64.sh
-#    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-#    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
-#    echo '     ...done'
+source iPhoneSimulator64.sh
+   if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+   if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+   echo '     ...done'
 
 source MacOSX.sh
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
@@ -111,21 +113,22 @@ source MacOSX.sh
     if [ ! -d out/build-cpp11-libcpp-x86_64-macosx/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
     echo '     ...done'
 
+# setup iOS universal libs
 ./scripts/make_universal.sh
 
 if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
-    tar -zcf out/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libcpp-universal
-    aws s3 cp --acl public-read out/build-cpp11-libcpp-universal_${MP_HASH}_${DIR_HASH}.tar.gz s3://mapbox-gl-testing/dependencies/
+    tar -zcf out/build-cpp11-libcpp-ios_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libcpp-universal
+    aws s3 cp --acl public-read out/build-cpp11-libcpp-ios_${MP_HASH}_${DIR_HASH}.tar.gz s3://mapbox-gl-testing/dependencies/
+    tar -zcf out/build-cpp11-libcpp-osx_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libcpp-x86_64-macosx
+    aws s3 cp --acl public-read out/build-cpp11-libcpp-osx_${MP_HASH}_${DIR_HASH}.tar.gz s3://mapbox-gl-testing/dependencies/
 fi
 
 fi
 
 cd ../../
-./configure \
---pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal/lib/pkgconfig \
---boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-universal \
---npm=$NPM \
---node=$NODE
+
+# default to OS X build product symlinking
+./mapnik-packaging/osx/darwin_configure.sh osx
 
 elif [ ${UNAME} = 'Linux' ]; then
 

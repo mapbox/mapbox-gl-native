@@ -53,6 +53,8 @@ To create projects, you can run:
   and settings storage. This is what is also being built on Linux.
 - `make linux`: Builds the Linux GLFW application with `make`.
 
+Note that if you are doing iOS development as well, to toggle from iOS back to OS X, you will need to `make xproj` again. 
+
 Target OS: 10.9+
 
 ## iOS
@@ -73,6 +75,8 @@ Then run:
 This downloads all required dependencies, builds them and creates universal libraries that can be used on both OS X and iOS.
 
 Lastly, `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. 
+
+Note that if you are doing OS X development as well, to toggle from OS X back to iOS, you will need to `make iproj` again. 
 
 Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina).
 
