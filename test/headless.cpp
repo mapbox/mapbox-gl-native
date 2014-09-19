@@ -91,7 +91,9 @@ TEST_P(HeadlessTest, render) {
         map.run();
 
         const std::unique_ptr<uint32_t[]> pixels(new uint32_t[width * height]);
+        map.view.make_active();
         glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
+        map.view.make_inactive();
 
         const std::string image = util::compress_png(width, height, pixels.get(), true);
         util::write_file(actual_image, image);

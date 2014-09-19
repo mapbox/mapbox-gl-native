@@ -106,10 +106,7 @@ void HeadlessView::resize(int width, int height) {
 #if MBGL_USE_GLX
     x_pixmap = XCreatePixmap(x_display, DefaultRootWindow(x_display), width, height, 32);
     glx_pixmap = glXCreateGLXPixmap(x_display, x_info, x_pixmap);
-
-    make_active();
 #endif
-
 }
 
 void HeadlessView::clear_buffers() {
@@ -132,6 +129,8 @@ void HeadlessView::clear_buffers() {
         glDeleteRenderbuffersEXT(1, &fbo_depth_stencil);
         fbo_depth_stencil = 0;
     }
+
+    make_inactive();
 #endif
 
 #if MBGL_USE_GLX

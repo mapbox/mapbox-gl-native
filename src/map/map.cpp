@@ -111,7 +111,6 @@ void Map::run() {
     // If the map rendering wasn't started asynchronously, we perform one render
     // *after* all events have been processed.
     if (!async) {
-        prepare();
         render();
     }
 }
@@ -147,12 +146,10 @@ void Map::cleanup() {
 void Map::cleanup(uv_async_t *async, int status) {
     Map *map = static_cast<Map *>(async->data);
 
-    map->view.make_active();
     map->painter.cleanup();
 }
 
 void Map::terminate() {
-    view.make_active();
     painter.terminate();
 }
 
@@ -189,8 +186,6 @@ void Map::terminate(uv_async_t *async, int status) {
 #pragma mark - Setup
 
 void Map::setup() {
-    view.make_active();
-
     painter.setup();
 }
 
@@ -525,8 +520,6 @@ void Map::updateRenderState() {
 }
 
 void Map::prepare() {
-    view.make_active();
-
     // Update transform transitions.
     animationTime = util::now();
     if (transform.needsTransition()) {
@@ -544,11 +537,11 @@ void Map::prepare() {
     spriteAtlas->update(*getSprite());
 
     updateTiles();
-
-    view.make_inactive();
 }
 
 void Map::render() {
+    view.make_active();
+
 #if defined(DEBUG)
     std::vector<std::string> debug;
 #endif
@@ -583,6 +576,8 @@ void Map::render() {
     }
 
     glFlush();
+
+    view.make_inactive();
 }
 
 void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
