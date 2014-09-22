@@ -22,6 +22,8 @@ public:
     HTTPRequest(ResourceType type, const std::string &path, uv_loop_t *loop, util::ptr<SQLiteStore> store);
     ~HTTPRequest();
 
+    void cancel();
+
 private:
     void loadedCacheEntry(std::unique_ptr<Response> &&response);
 
@@ -31,6 +33,8 @@ private:
     HTTPRequestBaton *http_baton = nullptr;
     util::ptr<SQLiteStore> store;
     const ResourceType type;
+
+    friend struct HTTPRequestBaton;
 };
 
 }

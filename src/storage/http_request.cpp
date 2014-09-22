@@ -1,5 +1,4 @@
 #include <mbgl/storage/http_request.hpp>
-#include <mbgl/storage/request.hpp>
 #include <mbgl/storage/sqlite_store.hpp>
 #include <mbgl/storage/http_request_baton.hpp>
 
@@ -18,6 +17,7 @@ namespace mbgl {
 struct CacheRequestBaton {
     HTTPRequest *request = nullptr;
     std::string path;
+    util::ptr<SQLiteStore> store;
     uv_loop_t *loop;
 };
 
@@ -26,6 +26,7 @@ HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path, uv_loop_t 
     cache_baton = new CacheRequestBaton;
     cache_baton->request = this;
     cache_baton->path = path;
+    cache_baton->store = store;
     cache_baton->loop = loop;
     store->get(path, [](std::unique_ptr<Response> &&response, void *ptr) {
         // Wrap in a unique_ptr, so it'll always get auto-destructed.
@@ -68,28 +69,12 @@ void HTTPRequest::loadedCacheEntry(std::unique_ptr<Response> &&response) {
     http_baton->async = new uv_async_t;
     http_baton->response = std::move(response);
     http_baton->async->data = http_baton;
-    uv_async_init(cache_baton->loop, http_baton->async, [](uv_async_t *async) {
-        std::unique_ptr<HTTPRequestBaton> baton((HTTPRequestBaton *)async->data);
-        if (baton->request) {
-            assert(uv_thread_self() == baton->request->thread_id);
-            baton->request->response = std::move(baton->response);
-            if (baton->not_modified) {
-                baton->request->store->updateExpiration(baton->path, baton->request->response->expires);
-            } else {
-                baton->request->store->put(baton->path, baton->request->type, *baton->request->response);
-            }
-            baton->request->notify();
-            // Note: after calling notify(), the baton object may cease to exist.
-        }
-
-        uv_close((uv_handle_t *)async, [](uv_handle_t *handle) {
-            delete (uv_async_t *)handle;
-        });
-    });
+    uv_async_init(cache_baton->loop, http_baton->async, HTTPRequestBaton::notify);
+    http_baton->reset();
     http_baton->start();
 }
 
-HTTPRequest::~HTTPRequest() {
+void HTTPRequest::cancel() {
     assert(uv_thread_self() == thread_id);
 
     if (cache_baton) {
@@ -99,12 +84,22 @@ HTTPRequest::~HTTPRequest() {
         // Note: We don't manually delete the CacheRequestBaton since it'll be deleted by the
         // callback.
         cache_baton->request = nullptr;
+        cache_baton = nullptr;
     }
 
     if (http_baton) {
         http_baton->request = nullptr;
-        http_baton->cancel();
+        http_baton->stop();
+        http_baton = nullptr;
     }
+
+    notify();
+}
+
+
+HTTPRequest::~HTTPRequest() {
+    assert(uv_thread_self() == thread_id);
+    cancel();
 }
 
 #pragma clang diagnostic pop

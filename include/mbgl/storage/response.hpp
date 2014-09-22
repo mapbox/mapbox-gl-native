@@ -6,6 +6,8 @@
 
 namespace mbgl {
 
+
+
 class Response {
 public:
     long code = 0;

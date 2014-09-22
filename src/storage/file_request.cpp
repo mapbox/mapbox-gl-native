@@ -166,7 +166,7 @@ FileRequest::FileRequest(const std::string &path_, uv_loop_t *loop)
     : BaseRequest(path_), ptr(new FileRequestBaton(this, path, loop)) {
 }
 
-FileRequest::~FileRequest() {
+void FileRequest::cancel() {
     assert(thread_id == uv_thread_self());
 
     if (ptr) {
@@ -175,7 +175,14 @@ FileRequest::~FileRequest() {
         // When deleting a FileRequest object with a uv_fs_* call is in progress, we are making sure
         // that the callback doesn't accidentally reference this object again.
         ptr->request = nullptr;
+        ptr = nullptr;
     }
+
+}
+
+FileRequest::~FileRequest() {
+    assert(thread_id == uv_thread_self());
+    cancel();
 }
 
 }

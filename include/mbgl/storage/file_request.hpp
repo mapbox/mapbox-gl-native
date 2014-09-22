@@ -14,6 +14,8 @@ public:
     FileRequest(const std::string &path, uv_loop_t *loop);
     ~FileRequest();
 
+    void cancel();
+
 private:
     FileRequestBaton *ptr = nullptr;
 

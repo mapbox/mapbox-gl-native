@@ -25,6 +25,15 @@ FileSource::~FileSource() {
     uv_messenger_stop(queue);
     // NOTE: We don't need to delete the messenger since it will be deleted by the
     // uv_messenger_stop() function.
+
+    util::ptr<BaseRequest> request;
+
+    // Send a cancel() message to all requests that we are still holding.
+    for (const std::pair<std::string, std::weak_ptr<BaseRequest>> &pair : pending) {
+        if ((request = pair.second.lock())) {
+            request->cancel();
+        }
+    }
 }
 
 void FileSource::setBase(const std::string &value) {

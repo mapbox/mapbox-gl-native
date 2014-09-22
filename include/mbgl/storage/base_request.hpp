@@ -31,14 +31,22 @@ public:
 
     Callback *add(Callback &&callback, const util::ptr<BaseRequest> &request);
     void remove(Callback *callback);
+
+    // Must be called by subclasses when a valid Response object is available. It will notify
+    // all listeners.
     void notify();
+
+    // This function is called when the request ought to be stopped. Any subclass must make sure this
+    // is also called in its destructor. Calling this function repeatedly must be safe.
+    // This function must call notify().
+    virtual void cancel() = 0;
 
 public:
     const unsigned long thread_id;
     const std::string path;
     std::unique_ptr<Response> response;
 
-private:
+protected:
     // This object may hold a shared_ptr to itself. It does this to prevent destruction of this object
     // while a request is in progress.
     util::ptr<BaseRequest> self;

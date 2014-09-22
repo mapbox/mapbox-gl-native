@@ -25,14 +25,11 @@ BaseRequest::BaseRequest(const std::string &path_) : thread_id(uv_thread_self())
 // notify all cancel callbacks.
 BaseRequest::~BaseRequest() {
     assert(thread_id == uv_thread_self());
-    invoke<AbortedCallback>(callbacks);
+    notify();
 }
 
 void BaseRequest::notify() {
     assert(thread_id == uv_thread_self());
-
-    // We are only supposed to call notify when a result exists.
-    assert(response);
 
     // The parameter exists solely so that any calls to ->remove()
     // are not going to cause deallocation of this object while this call is in progress.
@@ -42,7 +39,12 @@ void BaseRequest::notify() {
     // on the request object, which would modify the list.
     const std::forward_list<std::unique_ptr<Callback>> list = std::move(callbacks);
     callbacks.clear();
-    invoke<CompletedCallback>(list, *response);
+
+    if (response) {
+        invoke<CompletedCallback>(list, *response);
+    } else {
+        invoke<AbortedCallback>(list);
+    }
 
     self.reset();
 }
