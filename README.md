@@ -53,6 +53,8 @@ To create projects, you can run:
   and settings storage. This is what is also being built on Linux.
 - `make linux`: Builds the Linux GLFW application with `make`.
 
+Note that if you are doing iOS development as well, to toggle from iOS back to OS X, you will need to `make xproj` again. 
+
 Target OS: 10.9+
 
 ## iOS
@@ -74,6 +76,8 @@ This downloads all required dependencies, builds them and creates universal libr
 
 Lastly, `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. 
 
+Note that if you are doing OS X development as well, to toggle from OS X back to iOS, you will need to `make iproj` again. 
+
 Target devices: iPhone 4 and above (4S, 5, 5c, 5s) and iPad 2 and above (3, 4, mini and/or retina).
 
 Target OS: 7.0+
@@ -85,9 +89,9 @@ Set the environment variable `MAPBOX_ACCESS_TOKEN` to your token.
 Ensure you have git and other build essentials:
 
     sudo apt-get update
-    sudo apt-get install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config nodejs-legacy curl
+    sudo apt-get install git build-essential zlib1g-dev automake libtool xutils-dev make cmake pkg-config nodejs-legacy curl libuv-dev
 
-Install a `-std=c++11` capable compiler
+If you are running Ubuntu 13.10 or older, install a `-std=c++11` capable compiler:
 
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get update
