@@ -65,6 +65,8 @@ TEST_P(HeadlessTest, render) {
         const double longitude = value.HasMember("center") ? value["center"][rapidjson::SizeType(1)].GetDouble() : 0;
         const unsigned int width = value.HasMember("width") ? value["width"].GetUint() : 512;
         const unsigned int height = value.HasMember("height") ? value["height"].GetUint() : 512;
+        const unsigned int pixelRatio = value.HasMember("pixelRatio") ? value["pixelRatio"].GetUint() : 1;
+
         std::vector<std::string> classes;
         if (value.HasMember("classes")) {
             const rapidjson::Value &js_classes = value["classes"];
@@ -82,18 +84,21 @@ TEST_P(HeadlessTest, render) {
         map.setStyleJSON(style, base_directory);
         map.setAppliedClasses(classes);
 
-        view.resize(width, height);
-        map.resize(width, height);
+        view.resize(width, height, pixelRatio);
+        map.resize(width, height, pixelRatio);
         map.setLonLatZoom(longitude, latitude, zoom);
         map.setBearing(bearing);
 
         // Run the loop. It will terminate when we don't have any further listeners.
         map.run();
 
-        const std::unique_ptr<uint32_t[]> pixels(new uint32_t[width * height]);
-        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
+        const unsigned int w = width * pixelRatio;
+        const unsigned int h = height * pixelRatio;
 
-        const std::string image = util::compress_png(width, height, pixels.get(), true);
+        const std::unique_ptr<uint32_t[]> pixels(new uint32_t[w * h]);
+        glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
+
+        const std::string image = util::compress_png(w, h, pixels.get(), true);
         util::write_file(actual_image, image);
     }
 }

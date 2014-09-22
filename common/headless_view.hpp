@@ -19,7 +19,7 @@ public:
     HeadlessView();
     ~HeadlessView();
 
-    void resize(int width, int height);
+    void resize(uint16_t width, uint16_t height, float pixelRatio);
 
     void notify_map_change(MapChange change, timestamp delay = 0);
     void make_active();
