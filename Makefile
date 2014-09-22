@@ -9,6 +9,12 @@ setup: config.gypi
 config.gypi:
 	./setup-libraries.sh
 
+xlibs:
+	@./mapnik-packaging/osx/darwin_configure.sh osx
+
+ilibs:
+	@./mapnik-packaging/osx/darwin_configure.sh ios
+
 # Builds the regular library
 mbgl: config.gypi mapboxgl.gyp node
 	deps/run_gyp mapboxgl.gyp --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
@@ -37,7 +43,7 @@ xtest: config.gypi clear_xcode_cache node
 ##### Makefile builds ##########################################################
 
 
-# Builds the linux app with make. This is also used by Travis CI
+# Builds the linux app with make.
 linux: config.gypi linux/mapboxgl-app.gyp node
 	deps/run_gyp linux/mapboxgl-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
 	$(MAKE) -C build/linux BUILDTYPE=$(BUILDTYPE) V=$(V) linuxapp
@@ -71,14 +77,14 @@ clear_xcode_cache:
     fi
 
 # build Mac OS X project for Xcode
-xproj-cli: config.gypi macosx/mapboxgl-app.gyp clear_xcode_cache node
+xproj-cli: config.gypi xlibs macosx/mapboxgl-app.gyp clear_xcode_cache node
 	deps/run_gyp macosx/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
 
 xproj: xproj-cli
 	open ./build/macosx/mapboxgl-app.xcodeproj
 
 # build iOS project for Xcode
-iproj-cli: config.gypi ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp clear_xcode_cache node
+iproj-cli: config.gypi ilibs ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp clear_xcode_cache node
 	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
 
 iproj: iproj-cli
@@ -98,7 +104,8 @@ clean: clear_xcode_cache
 	-rm -rf ./config.gypi
 
 distclean: clean
-	-rm -rf ./config.gypi
-	-rm -rf ./mapnik-packaging/osx/out/
+	-rm -rf ./mapnik-packaging/osx/out/build-*
+	-rm -rf ./mapnik-packaging/osx/out/universal
+	-find ./mapnik-packaging/osx/out/packages -type d ! -name 'packages' -maxdepth 1 -exec rm -rf {} \;
 
 .PHONY: mbgl test linux
