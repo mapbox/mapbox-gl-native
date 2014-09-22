@@ -8,6 +8,7 @@
 #include <mbgl/util/texturepool.hpp>
 #include <mbgl/util/filesource.hpp>
 #include <mbgl/util/vec.hpp>
+#include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
@@ -197,6 +198,37 @@ TileData::State Source::addTile(Map &map, const Tile::ID& id) {
     return new_tile.data->state;
 }
 
+double Source::getZoom(const TransformState& state) const {
+    double offset = std::log(util::tileSize / info.tile_size) / std::log(2);
+    offset += (state.getPixelRatio() > 1.0 ? 1 :0);
+    return state.getZoom() + offset;
+}
+
+int32_t Source::coveringZoomLevel(const TransformState& state) const {
+    return std::floor(getZoom(state));
+}
+
+std::forward_list<Tile::ID> Source::coveringTiles(const TransformState& state) const {
+    int32_t z = coveringZoomLevel(state);
+
+    if (z < info.min_zoom) return {{}};
+    if (z > info.max_zoom) z = info.max_zoom;
+
+    // Map four viewport corners to pixel coordinates
+    box points = state.cornersToBox(z);
+    const vec2<double>& center = points.center;
+
+    std::forward_list<Tile::ID> tiles = Tile::cover(z, points);
+
+    tiles.sort([&center](const Tile::ID& a, const Tile::ID& b) {
+        // Sorts by distance from the box center
+        return std::fabs(a.x - center.x) + std::fabs(a.y - center.y) <
+               std::fabs(b.x - center.x) + std::fabs(b.y - center.y);
+    });
+
+    return tiles;
+}
+
 /**
  * Recursively find children of the given tile that are already loaded.
  *
@@ -209,8 +241,6 @@ TileData::State Source::addTile(Map &map, const Tile::ID& id) {
 bool Source::findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain) {
     bool complete = true;
     int32_t z = id.z;
-
-
     auto ids = id.children(z + 1);
     for (const Tile::ID& child_id : ids) {
         const TileData::State state = hasTile(child_id);
@@ -251,24 +281,12 @@ bool Source::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::
 bool Source::updateTiles(Map &map) {
     bool changed = false;
 
-    // Figure out what tiles we need to load
-    int32_t clamped_zoom = map.getState().getIntegerZoom();
-    if (clamped_zoom > info.max_zoom) clamped_zoom = info.max_zoom;
-    if (clamped_zoom < info.min_zoom) clamped_zoom = info.min_zoom;
+    int32_t zoom = std::floor(getZoom(map.getState()));
+    std::forward_list<Tile::ID> required = coveringTiles(map.getState());
 
-    int32_t max_covering_zoom = clamped_zoom + 1;
-    if (max_covering_zoom > info.max_zoom) max_covering_zoom = info.max_zoom;
-
-    int32_t min_covering_zoom = clamped_zoom - 10;
-    if (min_covering_zoom < info.min_zoom) min_covering_zoom = info.min_zoom;
-
-    // Map four viewport corners to pixel coordinates
-    box box = map.getState().cornersToBox(clamped_zoom);
-
-    // Performs a scanline algorithm search that covers the rectangle of the box
-    // and sorts them by proximity to the center.
-
-    std::forward_list<Tile::ID> required = covering_tiles(map.getState(), clamped_zoom, box);
+    // Determine the overzooming/underzooming amounts.
+    int32_t minCoveringZoom = util::clamp<int32_t>(zoom - 10, info.min_zoom, info.max_zoom);
+    int32_t maxCoveringZoom = util::clamp<int32_t>(zoom + 1,  info.min_zoom, info.max_zoom);
 
     // Retain is a list of tiles that we shouldn't delete, even if they are not
     // the most ideal tile for the current viewport. This may include tiles like
@@ -280,20 +298,17 @@ bool Source::updateTiles(Map &map) {
         const TileData::State state = addTile(map, id);
 
         if (state != TileData::State::parsed) {
-//            if (use_raster && (transform.rotating || transform.scaling || transform.panning))
-//                break;
-
             // The tile we require is not yet loaded. Try to find a parent or
             // child tile that we already have.
 
             // First, try to find existing child tiles that completely cover the
             // missing tile.
-            bool complete = findLoadedChildren(id, max_covering_zoom, retain);
+            bool complete = findLoadedChildren(id, maxCoveringZoom, retain);
 
             // Then, if there are no complete child tiles, try to find existing
             // parent tiles that completely cover the missing tile.
             if (!complete) {
-                findLoadedParent(id, min_covering_zoom, retain);
+                findLoadedParent(id, minCoveringZoom, retain);
             }
         }
 
@@ -335,116 +350,6 @@ bool Source::updateTiles(Map &map) {
     updated = map.getTime();
 
     return changed;
-}
-
-// Taken from polymaps src/Layer.js
-// https://github.com/simplegeo/polymaps/blob/master/src/Layer.js#L333-L383
-
-struct edge {
-    double x0 = 0, y0 = 0;
-    double x1 = 0, y1 = 0;
-    double dx = 0, dy = 0;
-    edge(double x0, double y0, double x1, double y1, double dx, double dy)
-    : x0(x0), y0(y0), x1(x1), y1(y1), dx(dx), dy(dy) {}
-};
-
-typedef const std::function<void(int32_t, int32_t, int32_t, int32_t)> ScanLine;
-
-// scan-line conversion
-edge _edge(const mbgl::vec2<double> a, const mbgl::vec2<double> b) {
-    if (a.y > b.y) {
-        return { b.x, b.y, a.x, a.y, a.x - b.x, a.y - b.y };
-    } else {
-        return { a.x, a.y, b.x, b.y, b.x - a.x, b.y - a.y };
-    }
-}
-
-// scan-line conversion
-void _scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine scanLine) {
-    double y0 = std::fmax(ymin, std::floor(e1.y0)),
-    y1 = std::fmin(ymax, std::ceil(e1.y1));
-
-    // sort edges by x-coordinate
-    if ((e0.x0 == e1.x0 && e0.y0 == e1.y0) ?
-        (e0.x0 + e1.dy / e0.dy * e0.dx < e1.x1) :
-        (e0.x1 - e1.dy / e0.dy * e0.dx < e1.x0)) {
-        std::swap(e0, e1);
-    }
-
-    // scan lines!
-    double m0 = e0.dx / e0.dy,
-    m1 = e1.dx / e1.dy,
-    d0 = e0.dx > 0, // use y + 1 to compute x0
-    d1 = e1.dx < 0; // use y + 1 to compute x1
-    for (int32_t y = y0; y < y1; y++) {
-        double x0 = m0 * std::fmax(0, std::fmin(e0.dy, y + d0 - e0.y0)) + e0.x0,
-        x1 = m1 * std::fmax(0, std::fmin(e1.dy, y + d1 - e1.y0)) + e1.x0;
-        scanLine(std::floor(x1), std::ceil(x0), y, ymax);
-    }
-}
-
-// scan-line conversion
-void _scanTriangle(const mbgl::vec2<double> a, const mbgl::vec2<double> b, const mbgl::vec2<double> c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
-    edge ab = _edge(a, b);
-    edge bc = _edge(b, c);
-    edge ca = _edge(c, a);
-
-    // sort edges by y-length
-    if (ab.dy > bc.dy) { std::swap(ab, bc); }
-    if (ab.dy > ca.dy) { std::swap(ab, ca); }
-    if (bc.dy > ca.dy) { std::swap(bc, ca); }
-
-    // scan span! scan span!
-    if (ab.dy) _scanSpans(ca, ab, ymin, ymax, scanLine);
-    if (bc.dy) _scanSpans(ca, bc, ymin, ymax, scanLine);
-}
-
-double Source::getZoom(const TransformState &state) const {
-    double offset = log(util::tileSize / info.tile_size) / log(2);
-    offset += (state.getPixelRatio() > 1.0 ? 1 :0);
-    return state.getZoom() + offset;
-}
-
-std::forward_list<mbgl::Tile::ID> Source::covering_tiles(const TransformState &state, int32_t clamped_zoom, const box& points) {
-    int32_t dim = std::pow(2, clamped_zoom);
-    std::forward_list<mbgl::Tile::ID> tiles;
-    bool is_raster = (info.type == SourceType::Raster);
-    double search_zoom = getZoom(state);
-
-    auto scanLine = [&tiles, clamped_zoom, is_raster, search_zoom](int32_t x0, int32_t x1, int32_t y, int32_t ymax) {
-        int32_t x;
-        if (y >= 0 && y <= ymax) {
-            for (x = x0; x < x1; x++) {
-                if (is_raster) {
-                    Tile::ID id = Tile::ID(clamped_zoom, x, y);
-                    auto ids = id.children(search_zoom);
-                    for (const Tile::ID& child_id : ids) {
-                        tiles.emplace_front(child_id.z, child_id.x, child_id.y);
-                    }
-                } else {
-                    tiles.emplace_front(clamped_zoom, x, y);
-                }
-            }
-        }
-    };
-
-    // Divide the screen up in two triangles and scan each of them:
-    // \---+
-    // | \ |
-    // +---\.
-    _scanTriangle(points.tl, points.tr, points.br, 0, dim, scanLine);
-    _scanTriangle(points.br, points.bl, points.tl, 0, dim, scanLine);
-
-    const vec2<double>& center = points.center;
-    tiles.sort([&center](const Tile::ID& a, const Tile::ID& b) {
-        // Sorts by distance from the box center
-        return std::fabs(a.x - center.x) + std::fabs(a.y - center.y) <
-        std::fabs(b.x - center.x) + std::fabs(b.y - center.y);
-    });
-
-    tiles.unique();
-
-    return tiles;
 }
 
 }
