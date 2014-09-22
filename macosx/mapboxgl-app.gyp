@@ -15,7 +15,7 @@
         '../common/platform_nsstring.mm',
         '../common/glfw_view.hpp',
         '../common/glfw_view.cpp',
-        '../src/storage/http_request_baton_darwin.mm',
+        '../common/http_request_baton_cocoa.mm',
         '../common/nslog_log.hpp',
         '../common/nslog_log.mm',
       ],
