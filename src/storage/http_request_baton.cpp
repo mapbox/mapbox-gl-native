@@ -53,7 +53,6 @@ void HTTPRequestBaton::stop() {
     cancel();
 }
 
-
 void HTTPRequestBaton::notify(uv_async_t *async_unguarded) {
     // Ensure deletion of pointers.
     std::unique_ptr<uv_async_t, uv::deleter> async(async_unguarded);

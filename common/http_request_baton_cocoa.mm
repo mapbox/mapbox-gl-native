@@ -37,8 +37,8 @@ void HTTPRequestBaton::start() {
         struct tm *timeinfo;
         char buffer[32];
         const time_t modified = response->modified;
-        timeinfo = std::gmtime (&modified);
-        strftime_l(buffer, 32 ,"%a, %d %b %Y %H:%M:%S GMT", timeinfo, locale);
+        timeinfo = std::gmtime(&modified);
+        strftime_l(buffer, 32, "%a, %d %b %Y %H:%M:%S GMT", timeinfo, locale);
         [request addValue:@(buffer) forHTTPHeaderField:@"If-Modified-Since"];
     }
 
