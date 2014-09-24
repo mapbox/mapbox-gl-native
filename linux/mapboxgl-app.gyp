@@ -15,7 +15,7 @@
         '../common/platform_default.cpp',
         '../common/glfw_view.hpp',
         '../common/glfw_view.cpp',
-        '../common/curl_request.cpp',
+        '../common/http_request_baton_curl.cpp',
         '../common/stderr_log.hpp',
         '../common/stderr_log.cpp',
       ],

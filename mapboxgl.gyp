@@ -241,6 +241,9 @@
             '<@(curl_libraries)',
             '<@(sqlite3_libraries)',
           ],
+          'OTHER_CPLUSPLUSFLAGS': [
+            '<@(uv_cflags)',
+          ],
           'OTHER_CFLAGS': [
             '<@(uv_cflags)',
           ],

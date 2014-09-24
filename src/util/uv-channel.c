@@ -21,7 +21,7 @@ int uv_chan_init(uv_chan_t *chan) {
 }
 
 void uv_chan_send(uv_chan_t *chan, void *data) {
-    uv__chan_item_t *item = malloc(sizeof(uv__chan_item_t));
+    uv__chan_item_t *item = (uv__chan_item_t *)malloc(sizeof(uv__chan_item_t));
     item->data = data;
 
     uv_mutex_lock(&chan->mutex);

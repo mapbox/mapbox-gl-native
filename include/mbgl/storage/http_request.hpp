@@ -3,12 +3,14 @@
 
 #include <mbgl/storage/resource_type.hpp>
 #include <mbgl/storage/base_request.hpp>
+#include <mbgl/storage/http_request_baton.hpp>
 
 #include <string>
 #include <memory>
 #include <cassert>
 
 typedef struct uv_loop_s uv_loop_t;
+typedef struct uv_timer_s uv_timer_t;
 
 namespace mbgl {
 
@@ -25,14 +27,22 @@ public:
     void cancel();
 
 private:
-    void loadedCacheEntry(std::unique_ptr<Response> &&response);
+    void handleCacheResponse(std::unique_ptr<Response> &&response, uv_loop_t *loop);
+    void handleHTTPResponse(HTTPResponseType responseType, std::unique_ptr<Response> &&response, uv_loop_t *loop);
+
+    void startRequest(uv_loop_t *loop);
+
+    void removeCacheBaton();
+    void removeHTTPBaton();
 
 private:
     const unsigned long thread_id;
     CacheRequestBaton *cache_baton = nullptr;
-    HTTPRequestBaton *http_baton = nullptr;
+    util::ptr<HTTPRequestBaton> http_baton;
+    uv_timer_t *backoff_timer = nullptr;
     util::ptr<SQLiteStore> store;
     const ResourceType type;
+    uint8_t attempts = 0;
 
     friend struct HTTPRequestBaton;
 };

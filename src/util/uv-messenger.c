@@ -47,7 +47,7 @@ int uv_messenger_init(uv_loop_t *loop, uv_messenger_t *msgr, uv_messenger_cb cal
 }
 
 void uv_messenger_send(uv_messenger_t *msgr, void *data) {
-    uv__messenger_item_t *item = malloc(sizeof(uv__messenger_item_t));
+    uv__messenger_item_t *item = (uv__messenger_item_t *)malloc(sizeof(uv__messenger_item_t));
     item->data = data;
 
     uv_mutex_lock(&msgr->mutex);

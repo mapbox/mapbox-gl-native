@@ -178,6 +178,7 @@ void FileRequest::cancel() {
         ptr = nullptr;
     }
 
+    notify();
 }
 
 FileRequest::~FileRequest() {

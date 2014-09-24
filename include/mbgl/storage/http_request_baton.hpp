@@ -2,11 +2,11 @@
 #define MBGL_STORAGE_HTTP_REQUEST_BATON
 
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/ptr.hpp>
 
 #include <string>
 
 typedef struct uv_async_s uv_async_t;
-typedef struct uv_timer_s uv_timer_t;
 
 namespace mbgl {
 
@@ -44,44 +44,28 @@ enum class HTTPResponseType : int8_t {
 };
 
 struct HTTPRequestBaton {
-    HTTPRequestBaton();
+    HTTPRequestBaton(const std::string &path);
     ~HTTPRequestBaton();
 
     const unsigned long thread_id;
+    const std::string path;
+
     HTTPRequest *request = nullptr;
-    std::string path;
     uv_async_t *async = nullptr;
-    uv_timer_t *timer = nullptr;
-    std::unique_ptr<Response> response;
-    void *ptr = nullptr;
+
     HTTPResponseType type = HTTPResponseType::Unknown;
-    uint8_t attempts = 0;
+    std::unique_ptr<Response> response;
+
+    // Implementation specific use.
+    void *ptr = nullptr;
 
     // IMPLEMENT THESE 3 PLATFORM SPECIFIC FUNCTIONS:
 
     // Begin the HTTP request. Platform-specific implementation.
-    void start();
+    static void start(const util::ptr<HTTPRequestBaton> &ptr);
 
-    // This will be called so that the baton can release resources. It is expected that the ptr is
-    // null after this call. Platform-specific implementation.
-    void cleanup();
-
-    // This will be called to cancel the HTTP request (if possible). Platform-specific implementation.
-    void cancel();
-
-
-
-    // Called when the request should be canceled. This will call cancel() in turn.
-    void stop();
-
-    // After calling reset(), it is safe to call start() again on this baton object.
-    void reset();
-
-    // Will call start() after the specified timeout.
-    void retry(uint64_t delay);
-
-    // Will be
-    static void notify(uv_async_t *async);
+    // This will be called to stop/cancel the HTTP request (if possible). Platform-specific implementation.
+    static void stop(const util::ptr<HTTPRequestBaton> &ptr);
 };
 
 }

@@ -15,9 +15,11 @@ namespace mbgl {
 dispatch_once_t request_initialize = 0;
 NSURLSession *session = nullptr;
 
-void HTTPRequestBaton::start() {
+void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
+    assert(uv_thread_self() == ptr->thread_id);
+
     // Starts the request.
-    assert(!ptr);
+    util::ptr<HTTPRequestBaton> baton = ptr;
 
     // Create a C locale
     static locale_t locale = newlocale(LC_ALL_MASK, nullptr, nullptr);
@@ -32,11 +34,11 @@ void HTTPRequestBaton::start() {
         // TODO: add a delegate to the session that prohibits caching, since we handle this ourselves.
     });
 
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@(path.c_str())]];
-    if (response && response->modified) {
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@(baton->path.c_str())]];
+    if (baton->response && baton->response->modified) {
         struct tm *timeinfo;
         char buffer[32];
-        const time_t modified = response->modified;
+        const time_t modified = baton->response->modified;
         timeinfo = std::gmtime(&modified);
         strftime_l(buffer, 32, "%a, %d %b %Y %H:%M:%S GMT", timeinfo, locale);
         [request addValue:@(buffer) forHTTPHeaderField:@"If-Modified-Since"];
@@ -48,23 +50,23 @@ void HTTPRequestBaton::start() {
             if ([error code] == NSURLErrorCancelled) {
                 // The response code remains at 0 to indicate cancelation.
                 // In addition, we don't need any response object.
-                response.reset();
-                type = HTTPResponseType::Canceled;
+                baton->response.reset();
+                baton->type = HTTPResponseType::Canceled;
             } else {
                 // TODO: Use different codes for host not found, timeout, invalid URL etc.
                 // These can be categorized in temporary and permanent errors.
-                response = std::make_unique<Response>();
-                response->code = [(NSHTTPURLResponse *)res statusCode];
-                response->message = [[error localizedDescription] UTF8String];
+                baton->response = std::make_unique<Response>();
+                baton->response->code = [(NSHTTPURLResponse *)res statusCode];
+                baton->response->message = [[error localizedDescription] UTF8String];
 
                 switch ([error code]) {
                     case NSURLErrorBadServerResponse: // 5xx errors
-                        type = HTTPResponseType::TemporaryError;
+                        baton->type = HTTPResponseType::TemporaryError;
                         break;
 
                     case NSURLErrorTimedOut:
                     case NSURLErrorUserCancelledAuthentication:
-                        type = HTTPResponseType::SingularError; // retry immediately
+                        baton->type = HTTPResponseType::SingularError; // retry immediately
                         break;
 
                     case NSURLErrorNetworkConnectionLost:
@@ -75,28 +77,28 @@ void HTTPRequestBaton::start() {
                     case NSURLErrorInternationalRoamingOff:
                     case NSURLErrorCallIsActive:
                     case NSURLErrorDataNotAllowed:
-                        type = HTTPResponseType::ConnectionError;
+                        baton->type = HTTPResponseType::ConnectionError;
                         break;
 
                     default:
-                        type = HTTPResponseType::PermanentError;
+                        baton->type = HTTPResponseType::PermanentError;
                 }
             }
         } else if ([res isKindOfClass:[NSHTTPURLResponse class]]) {
             const long code = [(NSHTTPURLResponse *)res statusCode];
             if (code == 304) {
                 // Assume a Response object already exists.
-                assert(response);
+                assert(baton->response);
             } else {
-                response = std::make_unique<Response>();
-                response->code = code;
-                response->data = {(const char *)[data bytes], [data length]};
+                baton->response = std::make_unique<Response>();
+                baton->response->code = code;
+                baton->response->data = {(const char *)[data bytes], [data length]};
             }
 
             if (code == 304) {
-                type = HTTPResponseType::NotModified;
+                baton->type = HTTPResponseType::NotModified;
             } else if (code == 200) {
-                type = HTTPResponseType::Successful;
+                baton->type = HTTPResponseType::Successful;
             } else {
                 assert(!"code must be either 200 or 304");
             }
@@ -104,47 +106,36 @@ void HTTPRequestBaton::start() {
             NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
             NSString *cache_control = [headers objectForKey:@"Cache-Control"];
             if (cache_control) {
-                response->expires = Response::parseCacheControl([cache_control UTF8String]);
+                baton->response->expires = Response::parseCacheControl([cache_control UTF8String]);
             }
 
             NSString *last_modified = [headers objectForKey:@"Last-Modified"];
             if (last_modified) {
-                response->modified = parse_date([last_modified UTF8String]);
+                baton->response->modified = parse_date([last_modified UTF8String]);
             }
         } else {
             // This should never happen.
-            type = HTTPResponseType::PermanentError;
-            response = std::make_unique<Response>();
-            response->code = -1;
-            response->message = "response class is not NSHTTPURLResponse";
+            baton->type = HTTPResponseType::PermanentError;
+            baton->response = std::make_unique<Response>();
+            baton->response->code = -1;
+            baton->response->message = "response class is not NSHTTPURLResponse";
         }
 
-        uv_async_send(async);
+        uv_async_send(baton->async);
     }];
 
     [task resume];
 
-    ptr = const_cast<void *>(CFBridgingRetain(task));
+    baton->ptr = const_cast<void *>(CFBridgingRetain(task));
 }
 
-void HTTPRequestBaton::cleanup() {
-    if (ptr) {
-        CFBridgingRelease(ptr);
-        ptr = nullptr;
-    }
-}
+void HTTPRequestBaton::stop(const util::ptr<HTTPRequestBaton> &ptr) {
+    assert(uv_thread_self() == ptr->thread_id);
+    assert(ptr->ptr);
 
-void HTTPRequestBaton::cancel() {
-    // After this function returns, the HTTPRequestBaton object may cease to exist at any time.
-    // try to stop the request
-    if (ptr) {
-        NSURLSessionDataTask *task = CFBridgingRelease(ptr);
-        ptr = nullptr;
-        [task cancel];
-    } else {
-        // Currently, there is no request in progress. We can delete the async right away.
-        uv_async_send(async);
-    }
+    NSURLSessionDataTask *task = CFBridgingRelease(ptr->ptr);
+    ptr->ptr = nullptr;
+    [task cancel];
 }
 
 }

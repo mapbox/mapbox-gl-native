@@ -69,7 +69,7 @@ void uv__worker_thread_loop(void *ptr) {
 #endif
 
     uv__worker_item_t *item = NULL;
-    while ((item = uv_chan_receive(&worker->chan)) != NULL) {
+    while ((item = (uv__worker_item_t *)uv_chan_receive(&worker->chan)) != NULL) {
         assert(item->work_cb);
         item->work_cb(item->data);
 
@@ -86,7 +86,7 @@ void uv__worker_thread_loop(void *ptr) {
     uv_chan_send(&worker->chan, NULL);
 
     // Create a new worker item that acts as a terminate flag for this thread.
-    item = malloc(sizeof(uv__worker_item_t));
+    item = (uv__worker_item_t *)malloc(sizeof(uv__worker_item_t));
     item->data = worker_thread;
     item->work_cb = NULL;
     item->after_work_cb = NULL;
@@ -100,7 +100,7 @@ int uv_worker_init(uv_worker_t *worker, uv_loop_t *loop, int count, const char *
     worker->name = name;
     worker->count = 0;
     worker->close_cb = NULL;
-    worker->msgr = malloc(sizeof(uv_messenger_t));
+    worker->msgr = (uv_messenger_t *)malloc(sizeof(uv_messenger_t));
     int ret = uv_messenger_init(loop, worker->msgr, uv__worker_after);
     if (ret < 0) {
         free(worker->msgr);
@@ -111,7 +111,7 @@ int uv_worker_init(uv_worker_t *worker, uv_loop_t *loop, int count, const char *
 
     // Initialize all worker threads.
     for (int i = 0; i < count; i++) {
-        uv__worker_thread_t *worker_thread = malloc(sizeof(uv__worker_thread_t));
+        uv__worker_thread_t *worker_thread = (uv__worker_thread_t *)malloc(sizeof(uv__worker_thread_t));
         worker_thread->worker = worker;
         ret = uv_thread_create(&worker_thread->thread, uv__worker_thread_loop, worker_thread);
         if (ret < 0) return ret;
@@ -132,7 +132,7 @@ void uv_worker_send(uv_worker_t *worker, void *data, uv_worker_cb work_cb,
     // worker item will instead be freed in the worker thread.
     assert(work_cb);
 
-    uv__worker_item_t *item = malloc(sizeof(uv__worker_item_t));
+    uv__worker_item_t *item = (uv__worker_item_t *)malloc(sizeof(uv__worker_item_t));
     item->work_cb = work_cb;
     item->after_work_cb = after_work_cb;
     item->data = data;
