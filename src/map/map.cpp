@@ -571,7 +571,7 @@ void Map::prepare() {
     view.make_active();
 
     if (!fileSource) {
-        fileSource = std::make_shared<FileSource>(**loop);
+        fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
         glyphStore = std::make_shared<GlyphStore>(fileSource);
     }
 

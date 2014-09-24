@@ -24,7 +24,7 @@ private:
     FileSource& operator=(FileSource &&) = delete;
 
 public:
-    FileSource(uv_loop_t *loop);
+    FileSource(uv_loop_t *loop, const std::string &path);
     ~FileSource();
 
 public:

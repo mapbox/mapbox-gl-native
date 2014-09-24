@@ -8,9 +8,9 @@
 
 namespace mbgl {
 
-FileSource::FileSource(uv_loop_t *loop_)
+FileSource::FileSource(uv_loop_t *loop_, const std::string &path)
     : thread_id(uv_thread_self()),
-      store(util::ptr<SQLiteStore>(new SQLiteStore(loop_, "cache.db"))),
+      store(util::ptr<SQLiteStore>(new SQLiteStore(loop_, path))),
       loop(loop_),
       queue(new uv_messenger_t) {
 

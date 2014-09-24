@@ -17,6 +17,9 @@ std::string uppercase(const std::string &string);
 // Lowercase a string, potentially using platform-specific routines.
 std::string lowercase(const std::string &string);
 
+// Returns the path to the default cache database on this system.
+std::string defaultCacheDatabase();
+
 // Shows an alpha image with the specified dimensions in a named window.
 void show_debug_image(std::string name, const char *data, size_t width, size_t height);
 
