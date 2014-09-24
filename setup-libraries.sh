@@ -104,6 +104,7 @@ export LIBUV_VERSION=0.10.28
     echo '     ...done'
 
 source iPhoneSimulator64.sh
+export LIBUV_VERSION=0.10.28
    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
    echo '     ...done'
