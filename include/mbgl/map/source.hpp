@@ -44,7 +44,8 @@ public:
 private:
     bool findLoadedChildren(const Tile::ID& id, int32_t maxCoveringZoom, std::forward_list<Tile::ID>& retain);
     bool findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain);
-    std::forward_list<Tile::ID> covering_tiles(const TransformState &state, int32_t clamped_zoom, const box& points);
+    int32_t coveringZoomLevel(const TransformState&) const;
+    std::forward_list<Tile::ID> coveringTiles(const TransformState&) const;
 
     bool updateTiles(Map &map);
 
