@@ -16,6 +16,7 @@
 namespace mbgl {
 
 class TileData;
+struct box;
 
 struct ClipID {
     inline ClipID() {}
@@ -67,6 +68,8 @@ public:
         std::forward_list<ID> children(int32_t z) const;
         bool isChildOf(const Tile::ID &id) const;
     };
+
+    static std::forward_list<Tile::ID> cover(int8_t z, const box& bounds);
 
 public:
     explicit Tile(const ID& id);

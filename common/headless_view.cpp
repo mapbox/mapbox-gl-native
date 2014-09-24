@@ -66,8 +66,11 @@ HeadlessView::HeadlessView() {
 }
 
 
-void HeadlessView::resize(int width, int height) {
+void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
     clear_buffers();
+
+    width *= pixelRatio;
+    height *= pixelRatio;
 
 #if MBGL_USE_CGL
     make_active();
