@@ -109,6 +109,8 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
 #if MBGL_USE_GLX
     x_pixmap = XCreatePixmap(x_display, DefaultRootWindow(x_display), width, height, 32);
     glx_pixmap = glXCreateGLXPixmap(x_display, x_info, x_pixmap);
+
+    make_active();
 #endif
 }
 
