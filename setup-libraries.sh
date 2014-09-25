@@ -51,7 +51,7 @@ set -u
 NODE=$(which node)
 NPM=$(which npm)
 
-MP_HASH="573abb5e0bfb87798172f6f9b90094e9efc58ad9"
+MP_HASH="e82e6c00ea5a0cda147e4c121a3c7751cae69ff8"
 DIR_HASH=$(echo `pwd` | git hash-object --stdin)
 if [ ! -d 'mapnik-packaging/' ]; then
   git clone https://github.com/mapnik/mapnik-packaging.git
@@ -104,6 +104,7 @@ export LIBUV_VERSION=0.10.28
     echo '     ...done'
 
 source iPhoneSimulator64.sh
+export LIBUV_VERSION=0.10.28
    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
    echo '     ...done'

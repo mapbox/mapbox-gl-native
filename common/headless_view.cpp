@@ -2,7 +2,6 @@
 #include <mbgl/util/timer.hpp>
 
 #include <stdexcept>
-#include <iostream>
 
 namespace mbgl {
 
@@ -110,6 +109,8 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
 #if MBGL_USE_GLX
     x_pixmap = XCreatePixmap(x_display, DefaultRootWindow(x_display), width, height, 32);
     glx_pixmap = glXCreateGLXPixmap(x_display, x_info, x_pixmap);
+
+    make_active();
 #endif
 }
 
@@ -158,11 +159,6 @@ HeadlessView::~HeadlessView() {
 #endif
 
 #if MBGL_USE_GLX
-    std::cerr << "~HeadlessView()" << '\n';
-    std::cerr << "x_display: " << x_display << '\n';
-    std::cerr << "glx_pixmap: " << glx_pixmap << '\n';
-    std::cerr << "gl_context: " << gl_context << '\n';
-
     glXDestroyContext(x_display, gl_context);
     XFree(x_info);
     XCloseDisplay(x_display);
@@ -182,11 +178,6 @@ void HeadlessView::make_active() {
 #endif
 
 #if MBGL_USE_GLX
-    std::cerr << "make_active()" << '\n';
-    std::cerr << "x_display: " << x_display << '\n';
-    std::cerr << "glx_pixmap: " << glx_pixmap << '\n';
-    std::cerr << "gl_context: " << gl_context << '\n';
-
     if (!glXMakeCurrent(x_display, glx_pixmap, gl_context)) {
         fprintf(stderr, "Switching OpenGL context failed\n");
     }
