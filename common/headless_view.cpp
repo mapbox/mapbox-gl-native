@@ -148,11 +148,13 @@ void HeadlessView::clear_buffers() {
         XFreePixmap(x_display, x_pixmap);
         x_pixmap = 0;
     }
+
+    make_inactive();
 #endif
 }
 
 HeadlessView::~HeadlessView() {
-    make_inactive();
+    clear_buffers();
 
 #if MBGL_USE_CGL
     CGLDestroyContext(gl_context);
