@@ -2,7 +2,6 @@
 #include <mbgl/util/timer.hpp>
 
 #include <stdexcept>
-#include <iostream>
 
 namespace mbgl {
 
@@ -158,11 +157,6 @@ HeadlessView::~HeadlessView() {
 #endif
 
 #if MBGL_USE_GLX
-    std::cerr << "~HeadlessView()" << '\n';
-    std::cerr << "x_display: " << x_display << '\n';
-    std::cerr << "glx_pixmap: " << glx_pixmap << '\n';
-    std::cerr << "gl_context: " << gl_context << '\n';
-
     glXDestroyContext(x_display, gl_context);
     XFree(x_info);
     XCloseDisplay(x_display);
@@ -182,11 +176,6 @@ void HeadlessView::make_active() {
 #endif
 
 #if MBGL_USE_GLX
-    std::cerr << "make_active()" << '\n';
-    std::cerr << "x_display: " << x_display << '\n';
-    std::cerr << "glx_pixmap: " << glx_pixmap << '\n';
-    std::cerr << "gl_context: " << gl_context << '\n';
-
     if (!glXMakeCurrent(x_display, glx_pixmap, gl_context)) {
         fprintf(stderr, "Switching OpenGL context failed\n");
     }
