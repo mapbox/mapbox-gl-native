@@ -8,6 +8,8 @@
 
 #include <queue>
 #include <cassert>
+#include <ctime>
+#include <xlocale.h>
 
 // This file contains code from http://curl.haxx.se/libcurl/c/multi-uv.html:
 
@@ -72,9 +74,25 @@ static std::queue<CURL *> handles;
 
 namespace mbgl {
 
-struct curl_context {
-    uv_poll_t poll_handle;
-    curl_socket_t sockfd;
+struct CURLContext {
+    util::ptr<HTTPRequestBaton> baton;
+    uv_poll_t *poll_handle = nullptr;
+    curl_socket_t sockfd = 0;
+    curl_slist *headers = nullptr;
+
+    CURLContext(const util::ptr<HTTPRequestBaton> &baton_) : baton(baton_) {
+    }
+
+    ~CURLContext() {
+        // We are destructing the poll handle in a CURL callback already.
+        assert(!poll_handle);
+
+        // Once the CURLContext gets destroyed, CURL doesn't need any headers anymore.
+        if (headers) {
+            curl_slist_free_all(headers);
+            headers = nullptr;
+        }
+    }
 };
 
 // Locks the CURL share handle
@@ -85,22 +103,6 @@ void curl_share_lock(CURL *, curl_lock_data, curl_lock_access, void *) {
 // Unlocks the CURL share handle
 void curl_share_unlock(CURL *, curl_lock_data, void *) {
     uv_mutex_unlock(&share_mutex);
-}
-
-curl_context *create_curl_context(curl_socket_t sockfd) {
-    curl_context *context = new curl_context;
-    context->sockfd = sockfd;
-
-    uv_poll_init_socket(&loop, &context->poll_handle, sockfd);
-    context->poll_handle.data = context;
-
-    return context;
-}
-
-void destroy_curl_context(curl_context *context) {
-    uv_close((uv_handle_t *)&context->poll_handle, [](uv_handle_t *handle) {
-        delete (curl_context *)handle->data;
-    });
 }
 
 // This function must run in the CURL thread.
@@ -117,10 +119,12 @@ void finish_request(const util::ptr<HTTPRequestBaton> &baton) {
         }
 
         // Destroy the shared pointer. We still have one pointing to it
-        util::ptr<HTTPRequestBaton> *baton_ptr = nullptr;
-        curl_easy_getinfo(handle, CURLINFO_PRIVATE, (char *)&baton_ptr);
+        CURLContext *context = nullptr;
+        curl_easy_getinfo(handle, CURLINFO_PRIVATE, (char *)&context);
         curl_easy_setopt(handle, CURLOPT_PRIVATE, nullptr);
-        delete baton_ptr;
+        delete context;
+
+        // TODO: delete the headers object again.
 
         curl_easy_reset(handle);
         handles.push(handle);
@@ -128,10 +132,10 @@ void finish_request(const util::ptr<HTTPRequestBaton> &baton) {
     }
 }
 
-void curl_perform(uv_poll_t *req, int status, int events) {
+void curl_perform(uv_poll_t *req, int, int events) {
     int running_handles;
     int flags = 0;
-    curl_context *context = (curl_context *)req;
+    CURLContext *context = (CURLContext *)req->data;
     CURLMsg *message;
     int pending;
 
@@ -149,9 +153,11 @@ void curl_perform(uv_poll_t *req, int status, int events) {
     while ((message = curl_multi_info_read(multi, &pending))) {
         switch (message->msg) {
         case CURLMSG_DONE: {
-            util::ptr<HTTPRequestBaton> *baton_ptr = nullptr;
-            curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&baton_ptr);
-            util::ptr<HTTPRequestBaton> baton = *baton_ptr;
+            CURLContext *context = nullptr;
+            curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&context);
+
+            // Make a copy so that the Baton stays around even after we are calling finish_request
+            util::ptr<HTTPRequestBaton> baton = context->baton;
 
             // Add human-readable error code
             if (message->data.result != CURLE_OK) {
@@ -211,34 +217,42 @@ void curl_perform(uv_poll_t *req, int status, int events) {
     }
 }
 
-int handle_socket(CURL *easy, curl_socket_t s, int action, void * userp, void *socketp) {
-    curl_context *context = nullptr;
+int handle_socket(CURL *handle, curl_socket_t sockfd, int action, void *, void *socketp) {
+    CURLContext *context = nullptr;
+    curl_easy_getinfo(handle, CURLINFO_PRIVATE, (char *)&context);
 
-    if (socketp) {
-        context = (curl_context *)socketp;
-    } else if (action != CURL_POLL_REMOVE) {
-        context = create_curl_context(s);
+    if (!socketp && action != CURL_POLL_REMOVE) {
+        // We haven't initialized the socket yet, so we need to do this now.
+        assert(context->sockfd == 0);
+        context->sockfd = sockfd;
+        assert(!context->poll_handle);
+        context->poll_handle = new uv_poll_t;
+        uv_poll_init_socket(&loop, context->poll_handle, sockfd);
+        context->poll_handle->data = context;
+        curl_multi_assign(multi, sockfd, context);
     }
 
     if (context) {
-        curl_multi_assign(multi, s, (void *)context);
         if (action == CURL_POLL_IN || action == CURL_POLL_INOUT) {
-            uv_poll_start(&context->poll_handle, UV_READABLE, curl_perform);
+            uv_poll_start(context->poll_handle, UV_READABLE, curl_perform);
         }
         if (action == CURL_POLL_OUT || action == CURL_POLL_INOUT) {
-            uv_poll_start(&context->poll_handle, UV_WRITABLE, curl_perform);
+            uv_poll_start(context->poll_handle, UV_WRITABLE, curl_perform);
         }
         if (action == CURL_POLL_REMOVE && socketp) {
-            uv_poll_stop(&context->poll_handle);
-            destroy_curl_context(context);
-            curl_multi_assign(multi, s, NULL);
+            uv_poll_stop(context->poll_handle);
+            uv_close((uv_handle_t *)context->poll_handle, [](uv_handle_t *handle) {
+                delete (uv_poll_t *)handle;
+            });
+            context->poll_handle = nullptr;
+            curl_multi_assign(multi, sockfd, NULL);
         }
     }
 
     return 0;
 }
 
-void on_timeout(uv_timer_t *req) {
+void on_timeout(uv_timer_t *) {
     int running_handles;
     CURLMcode error = curl_multi_socket_action(multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
     if (error != CURLM_OK) {
@@ -246,7 +260,7 @@ void on_timeout(uv_timer_t *req) {
     }
 }
 
-void start_timeout(CURLM * multi, long timeout_ms, void * userp) {
+void start_timeout(CURLM *, long timeout_ms, void *) {
     if (timeout_ms <= 0) {
         on_timeout(&timeout);
     } else {
@@ -325,13 +339,19 @@ size_t header_matches(const char *const header, const char *const buffer, const 
 size_t curl_header_cb(char * const buffer, const size_t size, const size_t nmemb, void *const userp) {
     const size_t length = size * nmemb;
 
+    Response *response = static_cast<Response *>(userp);
+
     size_t begin = std::string::npos;
     if ((begin = header_matches("last-modified: ", buffer, length)) != std::string::npos) {
+        // Always overwrite the modification date; We might already have a value here from the
+        // Date header, but this one is more accurate.
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        static_cast<Response *>(userp)->modified = curl_getdate(value.c_str(), nullptr);
+        response->modified = curl_getdate(value.c_str(), nullptr);
+    } else if ((begin = header_matches("etag: ", buffer, length)) != std::string::npos) {
+        response->etag = { buffer + begin, length - begin - 2 }; // remove \r\n
     } else if ((begin = header_matches("cache-control: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        static_cast<Response *>(userp)->expires = Response::parseCacheControl(value.c_str());
+        response->expires = Response::parseCacheControl(value.c_str());
     }
 
     return length;
@@ -340,8 +360,12 @@ size_t curl_header_cb(char * const buffer, const size_t size, const size_t nmemb
 // This function must run in the CURL thread.
 void start_request(void *const ptr) {
     assert(uv_thread_self() == thread_id);
-    util::ptr<HTTPRequestBaton> &baton = *(util::ptr<HTTPRequestBaton> *)ptr;
+    std::unique_ptr<util::ptr<HTTPRequestBaton>> baton_guard { (util::ptr<HTTPRequestBaton> *)ptr };
+    util::ptr<HTTPRequestBaton> &baton = *baton_guard.get();
     assert(baton);
+
+    // Create a C locale
+    static locale_t locale = newlocale(LC_ALL_MASK, nullptr, nullptr);
 
     CURL *handle = nullptr;
     if (!handles.empty()) {
@@ -353,12 +377,32 @@ void start_request(void *const ptr) {
 
     baton->ptr = handle;
 
+    // Wrap this in a unique_ptr for now so that it destructs until we assign it the the CURL handle.
+    std::unique_ptr<CURLContext> context = std::make_unique<CURLContext>(baton);
+
+    if (baton->response) {
+        if (!baton->response->etag.empty()) {
+            const std::string header = std::string("If-None-Match: ") + baton->response->etag;
+            context->headers = curl_slist_append(context->headers, header.c_str());
+        } else if (baton->response->modified) {
+            const time_t modified = baton->response->modified;
+            struct tm *timeinfo = std::gmtime(&modified);
+            char buffer[64];
+            strftime_l(buffer, 64, "If-Modified-Since: %a, %d %b %Y %H:%M:%S GMT", timeinfo, locale);
+            context->headers = curl_slist_append(context->headers, buffer);
+        }
+    }
+
+    if (context->headers) {
+        curl_easy_setopt(handle, CURLOPT_HTTPHEADER, context->headers);
+    }
+
     if (!baton->response) {
         baton->response = std::make_unique<Response>();
     }
 
     // Carry on the shared pointer in the private information of the CURL handle.
-    curl_easy_setopt(handle, CURLOPT_PRIVATE, ptr);
+    curl_easy_setopt(handle, CURLOPT_PRIVATE, context.release());
     curl_easy_setopt(handle, CURLOPT_CAINFO, "ca-bundle.crt");
     curl_easy_setopt(handle, CURLOPT_URL, baton->path.c_str());
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
@@ -375,7 +419,8 @@ void start_request(void *const ptr) {
 // This function must run in the CURL thread.
 void stop_request(void *const ptr) {
     assert(uv_thread_self() == thread_id);
-    util::ptr<HTTPRequestBaton> &baton = *(util::ptr<HTTPRequestBaton> *)ptr;
+    std::unique_ptr<util::ptr<HTTPRequestBaton>> baton_guard { (util::ptr<HTTPRequestBaton> *)ptr };
+    util::ptr<HTTPRequestBaton> &baton = *baton_guard.get();
     assert(baton);
 
     if (baton->async) {
@@ -392,8 +437,6 @@ void stop_request(void *const ptr) {
         // the pointer below is the last lifeline of the HTTPRequestBaton. This means we're going
         // to delete the HTTPRequestBaton in the current (CURL) thread.
     }
-
-    delete (util::ptr<HTTPRequestBaton> *)ptr;
 }
 
 void create_thread() {

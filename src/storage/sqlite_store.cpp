@@ -58,7 +58,7 @@ namespace mbgl {
 
 SQLiteStore::SQLiteStore(uv_loop_t *loop, const std::string &path)
     : thread_id(uv_thread_self()),
-      db(std::make_shared<Database>(path.c_str(), ReadWrite | Create)) {
+      db(!path.empty() ? std::make_shared<Database>(path.c_str(), ReadWrite | Create) : nullptr) {
     createSchema();
     worker = new uv_worker_t;
     uv_worker_init(worker, loop, 1, "SQLite");
@@ -84,6 +84,7 @@ void SQLiteStore::createSchema() {
              "    `code` INTEGER NOT NULL,"
              "    `type` INTEGER NOT NULL,"
              "    `modified` INTEGER,"
+             "    `etag` TEXT,"
              "    `expires` INTEGER,"
              "    `data` BLOB,"
              "    `compressed` INTEGER NOT NULL DEFAULT 0"
@@ -120,8 +121,8 @@ void SQLiteStore::get(const std::string &path, GetCallback callback, void *ptr) 
         const std::string url = unifyMapboxURLs(baton->path);
         //                                                    0       1         2
         Statement stmt = baton->db->prepare("SELECT `code`, `type`, `modified`, "
-        //       3        4          5
-            "`expires`, `data`, `compressed` FROM `http_cache` WHERE `url` = ?");
+        //     3         4        5           6
+            "`etag`, `expires`, `data`, `compressed` FROM `http_cache` WHERE `url` = ?");
 
         stmt.bind(1, url.c_str());
         if (stmt.run()) {
@@ -131,9 +132,10 @@ void SQLiteStore::get(const std::string &path, GetCallback callback, void *ptr) 
             baton->response->code = stmt.get<int>(0);
             baton->type = ResourceType(stmt.get<int>(1));
             baton->response->modified = stmt.get<int64_t>(2);
-            baton->response->expires = stmt.get<int64_t>(3);
-            baton->response->data = stmt.get<std::string>(4);
-            if (stmt.get<int>(5)) { // == compressed
+            baton->response->etag = stmt.get<std::string>(3);
+            baton->response->expires = stmt.get<int64_t>(4);
+            baton->response->data = stmt.get<std::string>(5);
+            if (stmt.get<int>(6)) { // == compressed
                 baton->response->data = util::decompress(baton->response->data);
             }
         } else {
@@ -170,21 +172,22 @@ void SQLiteStore::put(const std::string &path, ResourceType type, const Response
         PutBaton *baton = (PutBaton *)data;
         const std::string url = unifyMapboxURLs(baton->path);
         Statement stmt = baton->db->prepare("REPLACE INTO `http_cache` ("
-        //     1      2       3         4           5        6          7
-            "`url`, `code`, `type`, `modified`, `expires`, `data`, `compressed`"
-            ") VALUES(?, ?, ?, ?, ?, ?, ?)");
+        //     1      2       3         4         5         6        7          8
+            "`url`, `code`, `type`, `modified`, `etag`, `expires`, `data`, `compressed`"
+            ") VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
         stmt.bind(1, url.c_str());
         stmt.bind(2, int(baton->response.code));
         stmt.bind(3, int(baton->type));
         stmt.bind(4, baton->response.modified);
-        stmt.bind(5, baton->response.expires);
+        stmt.bind(5, baton->response.etag.c_str());
+        stmt.bind(6, baton->response.expires);
 
         if (baton->type == ResourceType::Image) {
-            stmt.bind(6, baton->response.data, false); // do not retain the string internally.
-            stmt.bind(7, false);
+            stmt.bind(7, baton->response.data, false); // do not retain the string internally.
+            stmt.bind(8, false);
         } else {
-            stmt.bind(6, util::compress(baton->response.data), true); // retain the string internally.
-            stmt.bind(7, true);
+            stmt.bind(7, util::compress(baton->response.data), true); // retain the string internally.
+            stmt.bind(8, true);
         }
 
         stmt.run();

@@ -13,6 +13,7 @@ public:
     long code = 0;
     int64_t modified = 0;
     int64_t expires = 0;
+    std::string etag;
     std::string data;
 
     std::string message;

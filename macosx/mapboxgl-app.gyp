@@ -16,6 +16,7 @@
         '../common/glfw_view.hpp',
         '../common/glfw_view.cpp',
         '../common/http_request_baton_cocoa.mm',
+        '../common/osx.mm',
         '../common/nslog_log.hpp',
         '../common/nslog_log.mm',
       ],

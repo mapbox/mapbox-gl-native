@@ -30,7 +30,7 @@ private:
     void handleCacheResponse(std::unique_ptr<Response> &&response, uv_loop_t *loop);
     void handleHTTPResponse(HTTPResponseType responseType, std::unique_ptr<Response> &&response, uv_loop_t *loop);
 
-    void startRequest(uv_loop_t *loop);
+    void startRequest(std::unique_ptr<Response> &&res, uv_loop_t *loop);
 
     void removeCacheBaton();
     void removeHTTPBaton();

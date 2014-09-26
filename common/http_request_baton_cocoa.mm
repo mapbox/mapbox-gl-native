@@ -35,13 +35,16 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
     });
 
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@(baton->path.c_str())]];
-    if (baton->response && baton->response->modified) {
-        struct tm *timeinfo;
-        char buffer[32];
-        const time_t modified = baton->response->modified;
-        timeinfo = std::gmtime(&modified);
-        strftime_l(buffer, 32, "%a, %d %b %Y %H:%M:%S GMT", timeinfo, locale);
-        [request addValue:@(buffer) forHTTPHeaderField:@"If-Modified-Since"];
+    if (baton->response) {
+        if (!baton->response->etag.empty()) {
+            [request addValue:@(baton->response->etag.c_str()) forHTTPHeaderField:@"If-None-Match"];
+        } else if (baton->response->modified) {
+            const time_t modified = baton->response->modified;
+            struct tm *timeinfo = std::gmtime(&modified);
+            char buffer[32];
+            strftime_l(buffer, 32, "%a, %d %b %Y %H:%M:%S GMT", timeinfo, locale);
+            [request addValue:@(buffer) forHTTPHeaderField:@"If-Modified-Since"];
+        }
     }
 
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
@@ -112,6 +115,11 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
             NSString *last_modified = [headers objectForKey:@"Last-Modified"];
             if (last_modified) {
                 baton->response->modified = parse_date([last_modified UTF8String]);
+            }
+
+            NSString *etag = [headers objectForKey:@"ETag"];
+            if (etag) {
+                baton->response->etag = [etag UTF8String];
             }
         } else {
             // This should never happen.

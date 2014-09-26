@@ -32,27 +32,23 @@ HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path, uv_loop_t 
         // Wrap in a unique_ptr, so it'll always get auto-destructed.
         std::unique_ptr<CacheRequestBaton> baton((CacheRequestBaton *)ptr);
         if (baton->request) {
-            assert(uv_thread_self() == baton->request->thread_id);
+            baton->request->cache_baton = nullptr;
             baton->request->handleCacheResponse(std::move(response), baton->loop);
-            if (baton->request) {
-                // If we called notify(), the request object may already have ceased to exist.
-                baton->request->cache_baton = nullptr;
-            }
         }
     }, cache_baton);
 }
 
-void HTTPRequest::handleCacheResponse(std::unique_ptr<Response> &&response, uv_loop_t *loop) {
-    if (response) {
+void HTTPRequest::handleCacheResponse(std::unique_ptr<Response> &&res, uv_loop_t *loop) {
+    assert(uv_thread_self() == thread_id);
+
+    if (res) {
         // This entry was stored in the cache. Now determine if we need to revalidate.
         const int64_t now = std::chrono::duration_cast<std::chrono::seconds>(
                                 std::chrono::system_clock::now().time_since_epoch()).count();
-        if (response->expires > now) {
-            if (cache_baton->request) {
-                cache_baton->request->response = std::move(response);
-                cache_baton->request->notify();
-                // Note: after calling notify(), the request object may cease to exist.
-            }
+        if (res->expires > now) {
+            response = std::move(res);
+            notify();
+            // Note: after calling notify(), the request object may cease to exist.
             // This HTTPRequest is completed.
             return;
         } else {
@@ -60,17 +56,17 @@ void HTTPRequest::handleCacheResponse(std::unique_ptr<Response> &&response, uv_l
         }
     }
 
-    startRequest(loop);
+    startRequest(std::move(res), loop);
 }
 
-void HTTPRequest::startRequest(uv_loop_t *loop) {
+void HTTPRequest::startRequest(std::unique_ptr<Response> &&res, uv_loop_t *loop) {
     assert(uv_thread_self() == thread_id);
     assert(!http_baton);
 
     http_baton = std::make_shared<HTTPRequestBaton>(path);
     http_baton->request = this;
     http_baton->async = new uv_async_t;
-    http_baton->response = std::move(response);
+    http_baton->response = std::move(res);
     http_baton->async->data = new util::ptr<HTTPRequestBaton>(http_baton);
 
     uv_async_init(loop, http_baton->async, [](uv_async_t *async) {
