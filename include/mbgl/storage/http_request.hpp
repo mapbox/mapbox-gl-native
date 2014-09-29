@@ -32,9 +32,11 @@ private:
     void startHTTPRequest(std::unique_ptr<Response> &&res);
     void handleHTTPResponse(HTTPResponseType responseType, std::unique_ptr<Response> &&response);
 
+    void retryHTTPRequest(std::unique_ptr<Response> &&res, uint64_t timeout);
 
     void removeCacheBaton();
     void removeHTTPBaton();
+    void removeBackoffTimer();
 
 private:
     const unsigned long thread_id;

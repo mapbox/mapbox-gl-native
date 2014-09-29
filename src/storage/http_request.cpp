@@ -93,35 +93,78 @@ void HTTPRequest::startHTTPRequest(std::unique_ptr<Response> &&res) {
     HTTPRequestBaton::start(http_baton);
 }
 
+
+
 void HTTPRequest::handleHTTPResponse(HTTPResponseType responseType, std::unique_ptr<Response> &&res) {
     assert(uv_thread_self() == thread_id);
     assert(!http_baton);
     assert(!response);
 
     switch (responseType) {
-        case HTTPResponseType::TemporaryError:
+        // This error was caused by a temporary error and it is likely that it will be resolved
+        // immediately. We are going to try again right away. This is like the TemporaryError,
+        // except that we will not perform exponential back-off.
         case HTTPResponseType::SingularError:
-        case HTTPResponseType::ConnectionError:
-            fprintf(stderr, "error: %s\n", res->message.c_str());
-            // TODO: retry
+            if (attempts >= 4) {
+                // Report as error after 4 attempts.
+                response = std::move(res);
+                notify();
+            } else if (attempts >= 2) {
+                // Switch to the back-off algorithm after the second failure.
+                retryHTTPRequest(std::move(res), (1 << attempts) * 1000);
+                return;
+            } else {
+                startHTTPRequest(std::move(res));
+            }
             break;
 
+        // This error might be resolved by waiting some time (e.g. server issues).
+        // We are going to do an exponential back-off and will try again in a few seconds.
+        case HTTPResponseType::TemporaryError:
+            if (attempts >= 4) {
+                // Report error back after it failed completely.
+                response = std::move(res);
+                notify();
+            } else {
+                retryHTTPRequest(std::move(res), (1 << attempts) * 1000);
+            }
+            break;
+
+        // This error might be resolved once the network reachability status changes.
+        // We are going to watch the network status for changes and will retry as soon as the
+        // operating system notifies us of a network status change.
+        case HTTPResponseType::ConnectionError:
+
+            if (attempts >= 4) {
+                // Report error back after it failed completely.
+                response = std::move(res);
+                notify();
+            } else {
+                // By default, we will retry every 60 seconds.
+                retryHTTPRequest(std::move(res), 60000);
+            }
+            break;
+
+        // The request was canceled programatically.
         case HTTPResponseType::Canceled:
             response.reset();
             notify();
             break;
 
+        // This error probably won't be resolved by retrying anytime soon. We are giving up.
         case HTTPResponseType::PermanentError:
             response = std::move(res);
             notify();
             break;
 
+        // The request returned data successfully. We retrieved and decoded the data successfully.
         case HTTPResponseType::Successful:
             store->put(path, type, *res);
             response = std::move(res);
             notify();
             break;
 
+        // The request confirmed that the data wasn't changed. We already have the data.
         case HTTPResponseType::NotModified:
             store->updateExpiration(path, res->expires);
             response = std::move(res);
@@ -132,6 +175,22 @@ void HTTPRequest::handleHTTPResponse(HTTPResponseType responseType, std::unique_
             assert(!"Response wasn't set");
             break;
     }
+}
+
+void HTTPRequest::retryHTTPRequest(std::unique_ptr<Response> &&res, uint64_t timeout) {
+    assert(uv_thread_self() == thread_id);
+    assert(!backoff_timer);
+    backoff_timer = new uv_timer_t();
+    uv_timer_init(loop, backoff_timer);
+    using Store = std::pair<HTTPRequest *, std::unique_ptr<Response>>;
+    backoff_timer->data = new Store(this, std::move(res));
+    uv_timer_start(backoff_timer, [](uv_timer_t *timer) {
+        std::unique_ptr<Store> pair { static_cast<Store *>(timer->data) };
+        pair->first->startHTTPRequest(std::move(pair->second));
+        pair->first->backoff_timer = nullptr;
+        uv_timer_stop(timer);
+        uv_close((uv_handle_t *)timer, [](uv_handle_t *handle) { delete (uv_timer_t *)handle; });
+    }, timeout, 0);
 }
 
 void HTTPRequest::removeHTTPBaton() {
@@ -156,10 +215,21 @@ void HTTPRequest::removeCacheBaton() {
     }
 }
 
+void HTTPRequest::removeBackoffTimer() {
+    assert(uv_thread_self() == thread_id);
+    if (backoff_timer) {
+        delete static_cast<std::pair<HTTPRequest *, std::unique_ptr<Response>> *>(backoff_timer->data);
+        uv_timer_stop(backoff_timer);
+        uv_close((uv_handle_t *)backoff_timer, [](uv_handle_t *handle) { delete (uv_timer_t *)handle; });
+        backoff_timer = nullptr;
+    }
+}
+
 void HTTPRequest::cancel() {
     assert(uv_thread_self() == thread_id);
     removeCacheBaton();
     removeHTTPBaton();
+    removeBackoffTimer();
     notify();
 }
 
