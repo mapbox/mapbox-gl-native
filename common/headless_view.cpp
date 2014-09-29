@@ -98,7 +98,10 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
         switch (status) {
             case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT: fprintf(stderr, "incomplete attachment\n"); break;
             case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT: fprintf(stderr, "incomplete missing attachment\n"); break;
+            case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT: fprintf(stderr, "incomplete dimensions\n"); break;
+            case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT: fprintf(stderr, "incomplete formats\n"); break;
             case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: fprintf(stderr, "incomplete draw buffer\n"); break;
+            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT: fprintf(stderr, "incomplete read buffer\n"); break;
             case GL_FRAMEBUFFER_UNSUPPORTED: fprintf(stderr, "unsupported\n"); break;
             default: fprintf(stderr, "other\n"); break;
         }
