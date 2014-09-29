@@ -8,6 +8,7 @@
 
 #include <queue>
 #include <cassert>
+#include <cstring>
 #include <ctime>
 #include <xlocale.h>
 
