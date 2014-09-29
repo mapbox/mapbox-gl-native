@@ -198,6 +198,17 @@ void Map::cleanup(uv_async_t *async) {
     map->painter.cleanup();
 }
 
+void Map::setReachability(bool reachable) {
+    // Note: This function may be called from *any* thread.
+    if (reachable) {
+        if (fileSource) {
+            fileSource->prepare([&]() {
+                fileSource->retryAllPending();
+            });
+        }
+    }
+}
+
 void Map::render(uv_async_t *async) {
     Map *map = static_cast<Map *>(async->data);
     assert(uv_thread_self() == map->map_thread);

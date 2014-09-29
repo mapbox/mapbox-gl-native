@@ -89,4 +89,16 @@ void FileSource::prepare(std::function<void()> fn) {
     }
 }
 
+void FileSource::retryAllPending() {
+    assert(thread_id == uv_thread_self());
+
+    util::ptr<BaseRequest> request;
+    for (const std::pair<std::string, std::weak_ptr<BaseRequest>> &pair : pending) {
+        if ((request = pair.second.lock())) {
+            request->retryImmediately();
+        }
+    }
+
+}
+
 }

@@ -41,6 +41,10 @@ public:
     // This function must call notify().
     virtual void cancel() = 0;
 
+    // This function is called when the request should be reattempted immediately. This is typically
+    // reaction to a network status change.
+    virtual void retryImmediately();
+
 public:
     const unsigned long thread_id;
     const std::string path;

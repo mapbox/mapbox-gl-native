@@ -36,6 +36,8 @@ public:
 
     void prepare(std::function<void()> fn);
 
+    void retryAllPending();
+
 private:
     const unsigned long thread_id;
 

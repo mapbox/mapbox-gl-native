@@ -1,6 +1,7 @@
 #include "../common/settings_nsuserdefaults.hpp"
 #include "../common/glfw_view.hpp"
 #include "../common/nslog_log.hpp"
+#include "../common/Reachability.h"
 
 #import <Foundation/Foundation.h>
 
@@ -75,11 +76,19 @@ int main() {
 
     GLFWView view;
     mbgl::Map map(view);
+    mbgl::Map *map_ptr = &map;
 
     URLHandler *handler = [[URLHandler alloc] init];
     [handler setMap:&map];
     NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
     [appleEventManager setEventHandler:handler andSelector:@selector(handleGetURLEvent:withReplyEvent:) forEventClass:kInternetEventClass andEventID:kAEGetURL];
+
+    // Notify map object when network reachability status changes.
+    Reachability* reachability = [Reachability reachabilityForInternetConnection];
+    reachability.reachableBlock = ^(Reachability *reachability) {
+        map_ptr->setReachability(true);
+    };
+    [reachability startNotifier];
 
     // Load settings
     mbgl::Settings_NSUserDefaults settings;
@@ -99,6 +108,8 @@ int main() {
     map.setStyleURL(std::string("file://") + path);
 
     int ret = view.run();
+
+    [reachability stopNotifier];
 
     // Save settings
     map.getLonLatZoom(settings.longitude, settings.latitude, settings.zoom);

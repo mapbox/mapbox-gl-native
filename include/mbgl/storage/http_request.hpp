@@ -25,6 +25,7 @@ public:
     ~HTTPRequest();
 
     void cancel();
+    void retryImmediately();
 
 private:
     void startCacheRequest();

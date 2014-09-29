@@ -15,6 +15,8 @@
         '../common/platform_nsstring.mm',
         '../common/glfw_view.hpp',
         '../common/glfw_view.cpp',
+        '../common/reachability.h',
+        '../common/reachability.m',
         '../common/http_request_baton_cocoa.mm',
         '../common/osx.mm',
         '../common/nslog_log.hpp',
@@ -33,6 +35,7 @@
         ],
         'OTHER_LDFLAGS': [
           '<@(glfw3_libraries)',
+          '-framework SystemConfiguration',
         ],
         'SDKROOT': 'macosx',
         'INFOPLIST_FILE': 'Info.plist',

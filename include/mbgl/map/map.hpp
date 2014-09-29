@@ -123,6 +123,9 @@ public:
     void toggleDebug();
     bool getDebug() const;
 
+    // Call this when the network reachability changed.
+    void setReachability(bool status);
+
 public:
     inline const TransformState &getState() const { return state; }
     inline util::ptr<FileSource> getFileSource() const { return fileSource; }

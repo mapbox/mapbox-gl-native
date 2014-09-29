@@ -177,15 +177,16 @@ void HTTPRequest::handleHTTPResponse(HTTPResponseType responseType, std::unique_
     }
 }
 
+using RetryBaton = std::pair<HTTPRequest *, std::unique_ptr<Response>>;
+
 void HTTPRequest::retryHTTPRequest(std::unique_ptr<Response> &&res, uint64_t timeout) {
     assert(uv_thread_self() == thread_id);
     assert(!backoff_timer);
     backoff_timer = new uv_timer_t();
     uv_timer_init(loop, backoff_timer);
-    using Store = std::pair<HTTPRequest *, std::unique_ptr<Response>>;
-    backoff_timer->data = new Store(this, std::move(res));
+    backoff_timer->data = new RetryBaton(this, std::move(res));
     uv_timer_start(backoff_timer, [](uv_timer_t *timer) {
-        std::unique_ptr<Store> pair { static_cast<Store *>(timer->data) };
+        std::unique_ptr<RetryBaton> pair { static_cast<RetryBaton *>(timer->data) };
         pair->first->startHTTPRequest(std::move(pair->second));
         pair->first->backoff_timer = nullptr;
         uv_timer_stop(timer);
@@ -218,10 +219,27 @@ void HTTPRequest::removeCacheBaton() {
 void HTTPRequest::removeBackoffTimer() {
     assert(uv_thread_self() == thread_id);
     if (backoff_timer) {
-        delete static_cast<std::pair<HTTPRequest *, std::unique_ptr<Response>> *>(backoff_timer->data);
+        delete static_cast<RetryBaton *>(backoff_timer->data);
         uv_timer_stop(backoff_timer);
         uv_close((uv_handle_t *)backoff_timer, [](uv_handle_t *handle) { delete (uv_timer_t *)handle; });
         backoff_timer = nullptr;
+    }
+}
+
+void HTTPRequest::retryImmediately() {
+    assert(uv_thread_self() == thread_id);
+    if (!cache_baton && !http_baton) {
+        if (backoff_timer) {
+            // Retry immediately.
+            uv_timer_stop(backoff_timer);
+            std::unique_ptr<RetryBaton> pair { static_cast<RetryBaton *>(backoff_timer->data) };
+            assert(pair->first == this);
+            startHTTPRequest(std::move(pair->second));
+            uv_close((uv_handle_t *)backoff_timer, [](uv_handle_t *handle) { delete (uv_timer_t *)handle; });
+            backoff_timer = nullptr;
+        } else {
+            assert(!"We should always have a backoff_timer when there are no batons");
+        }
     }
 }
 

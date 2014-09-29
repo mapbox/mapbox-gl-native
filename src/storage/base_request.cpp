@@ -28,6 +28,10 @@ BaseRequest::~BaseRequest() {
     notify();
 }
 
+void BaseRequest::retryImmediately() {
+    // no-op. override in child class.
+}
+
 void BaseRequest::notify() {
     assert(thread_id == uv_thread_self());
 
