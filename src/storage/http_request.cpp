@@ -18,27 +18,31 @@ struct CacheRequestBaton {
     HTTPRequest *request = nullptr;
     std::string path;
     util::ptr<SQLiteStore> store;
-    uv_loop_t *loop;
 };
 
-HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path, uv_loop_t *loop, util::ptr<SQLiteStore> store_)
-    : BaseRequest(path), thread_id(uv_thread_self()), store(store_), type(type_) {
+HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path, uv_loop_t *loop_, util::ptr<SQLiteStore> store_)
+    : BaseRequest(path), thread_id(uv_thread_self()), loop(loop_), store(store_), type(type_) {
+    startCacheRequest();
+}
+
+void HTTPRequest::startCacheRequest() {
+    assert(uv_thread_self() == thread_id);
+
     cache_baton = new CacheRequestBaton;
     cache_baton->request = this;
     cache_baton->path = path;
     cache_baton->store = store;
-    cache_baton->loop = loop;
     store->get(path, [](std::unique_ptr<Response> &&response, void *ptr) {
         // Wrap in a unique_ptr, so it'll always get auto-destructed.
         std::unique_ptr<CacheRequestBaton> baton((CacheRequestBaton *)ptr);
         if (baton->request) {
             baton->request->cache_baton = nullptr;
-            baton->request->handleCacheResponse(std::move(response), baton->loop);
+            baton->request->handleCacheResponse(std::move(response));
         }
     }, cache_baton);
 }
 
-void HTTPRequest::handleCacheResponse(std::unique_ptr<Response> &&res, uv_loop_t *loop) {
+void HTTPRequest::handleCacheResponse(std::unique_ptr<Response> &&res) {
     assert(uv_thread_self() == thread_id);
 
     if (res) {
@@ -56,10 +60,10 @@ void HTTPRequest::handleCacheResponse(std::unique_ptr<Response> &&res, uv_loop_t
         }
     }
 
-    startRequest(std::move(res), loop);
+    startHTTPRequest(std::move(res));
 }
 
-void HTTPRequest::startRequest(std::unique_ptr<Response> &&res, uv_loop_t *loop) {
+void HTTPRequest::startHTTPRequest(std::unique_ptr<Response> &&res) {
     assert(uv_thread_self() == thread_id);
     assert(!http_baton);
 
@@ -76,7 +80,7 @@ void HTTPRequest::startRequest(std::unique_ptr<Response> &&res, uv_loop_t *loop)
             HTTPRequest *request = http_baton->request;
             request->http_baton.reset();
             http_baton->request = nullptr;
-            request->handleHTTPResponse(http_baton->type, std::move(http_baton->response), async->loop);
+            request->handleHTTPResponse(http_baton->type, std::move(http_baton->response));
         }
 
         delete (util::ptr<HTTPRequestBaton> *)async->data;
@@ -85,10 +89,11 @@ void HTTPRequest::startRequest(std::unique_ptr<Response> &&res, uv_loop_t *loop)
             delete async;
         });
     });
+    attempts++;
     HTTPRequestBaton::start(http_baton);
 }
 
-void HTTPRequest::handleHTTPResponse(HTTPResponseType responseType, std::unique_ptr<Response> &&res, uv_loop_t *loop) {
+void HTTPRequest::handleHTTPResponse(HTTPResponseType responseType, std::unique_ptr<Response> &&res) {
     assert(uv_thread_self() == thread_id);
     assert(!http_baton);
     assert(!response);

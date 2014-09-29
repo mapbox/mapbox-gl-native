@@ -27,16 +27,18 @@ public:
     void cancel();
 
 private:
-    void handleCacheResponse(std::unique_ptr<Response> &&response, uv_loop_t *loop);
-    void handleHTTPResponse(HTTPResponseType responseType, std::unique_ptr<Response> &&response, uv_loop_t *loop);
+    void startCacheRequest();
+    void handleCacheResponse(std::unique_ptr<Response> &&response);
+    void startHTTPRequest(std::unique_ptr<Response> &&res);
+    void handleHTTPResponse(HTTPResponseType responseType, std::unique_ptr<Response> &&response);
 
-    void startRequest(std::unique_ptr<Response> &&res, uv_loop_t *loop);
 
     void removeCacheBaton();
     void removeHTTPBaton();
 
 private:
     const unsigned long thread_id;
+    uv_loop_t *const loop;
     CacheRequestBaton *cache_baton = nullptr;
     util::ptr<HTTPRequestBaton> http_baton;
     uv_timer_t *backoff_timer = nullptr;
