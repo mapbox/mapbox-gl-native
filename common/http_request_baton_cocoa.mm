@@ -29,9 +29,9 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
         sessionConfig.timeoutIntervalForResource = 30;
         sessionConfig.HTTPMaximumConnectionsPerHost = 8;
         sessionConfig.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+        sessionConfig.URLCache = nil;
 
         session = [NSURLSession sessionWithConfiguration:sessionConfig];
-        // TODO: add a delegate to the session that prohibits caching, since we handle this ourselves.
     });
 
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@(baton->path.c_str())]];
