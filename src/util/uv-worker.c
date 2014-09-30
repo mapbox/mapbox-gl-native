@@ -6,6 +6,7 @@
 
 typedef struct uv__worker_item_s uv__worker_item_t;
 struct uv__worker_item_s {
+    uv_worker_t *worker;
     void *data;
     uv_worker_cb work_cb;
     uv_worker_after_cb after_work_cb;
@@ -46,8 +47,14 @@ void uv__worker_after(void *ptr) {
 
     if (item->work_cb) {
         // We are finishing a regular work request.
-        assert(item->after_work_cb);
-        item->after_work_cb(item->data);
+        if (item->after_work_cb) {
+            assert(item->after_work_cb);
+            item->after_work_cb(item->data);
+        }
+        assert(item->worker->active > 0);
+        if (--item->worker->active == 0) {
+            uv_unref((uv_handle_t *)&item->worker->msgr->async);
+        }
     } else {
         // This is a worker thread termination.
         uv__worker_thread_t *worker_thread = (uv__worker_thread_t *)item->data;
@@ -73,13 +80,8 @@ void uv__worker_thread_loop(void *ptr) {
         assert(item->work_cb);
         item->work_cb(item->data);
 
-        if (item->after_work_cb) {
-            // Trigger the after callback in the main thread.
-            uv_messenger_send(worker->msgr, item);
-        } else {
-            // There is no after work callback, so it wouldn't do anything anyway.
-            free(item);
-        }
+        // Trigger the after callback in the main thread.
+        uv_messenger_send(worker->msgr, item);
     }
 
     // Make sure to close all other workers too.
@@ -97,9 +99,11 @@ int uv_worker_init(uv_worker_t *worker, uv_loop_t *loop, int count, const char *
 #ifndef NDEBUG
     worker->thread_id = uv_thread_self();
 #endif
+    worker->loop = loop;
     worker->name = name;
     worker->count = 0;
     worker->close_cb = NULL;
+    worker->active = 0;
     worker->msgr = (uv_messenger_t *)malloc(sizeof(uv_messenger_t));
     int ret = uv_messenger_init(loop, worker->msgr, uv__worker_after);
     if (ret < 0) {
@@ -133,10 +137,12 @@ void uv_worker_send(uv_worker_t *worker, void *data, uv_worker_cb work_cb,
     assert(work_cb);
 
     uv__worker_item_t *item = (uv__worker_item_t *)malloc(sizeof(uv__worker_item_t));
+    item->worker = worker;
     item->work_cb = work_cb;
     item->after_work_cb = after_work_cb;
     item->data = data;
     uv_chan_send(&worker->chan, item);
+    worker->active++;
 }
 
 void uv_worker_close(uv_worker_t *worker, uv_worker_close_cb close_cb) {
@@ -149,4 +155,8 @@ void uv_worker_close(uv_worker_t *worker, uv_worker_close_cb close_cb) {
 
     worker->close_cb = close_cb;
     uv_chan_send(&worker->chan, NULL);
+    assert(worker->active >= 0);
+    if (worker->active++ == 0) {
+        uv_ref((uv_handle_t *)&worker->msgr->async);
+    }
 }

@@ -58,7 +58,7 @@ namespace mbgl {
 
 SQLiteStore::SQLiteStore(uv_loop_t *loop, const std::string &path)
     : thread_id(uv_thread_self()),
-      db(!path.empty() ? std::make_shared<Database>(path.c_str(), ReadWrite | Create) : nullptr) {
+      db(std::make_shared<Database>(path.c_str(), ReadWrite | Create)) {
     createSchema();
     worker = new uv_worker_t;
     uv_worker_init(worker, loop, 1, "SQLite");

@@ -10,7 +10,7 @@ namespace mbgl {
 
 FileSource::FileSource(uv_loop_t *loop_, const std::string &path)
     : thread_id(uv_thread_self()),
-      store(util::ptr<SQLiteStore>(new SQLiteStore(loop_, path))),
+      store(!path.empty() ? util::ptr<SQLiteStore>(new SQLiteStore(loop_, path)) : nullptr),
       loop(loop_),
       queue(new uv_messenger_t) {
 
@@ -18,6 +18,7 @@ FileSource::FileSource(uv_loop_t *loop_, const std::string &path)
         std::unique_ptr<std::function<void()>> fn { reinterpret_cast<std::function<void()> *>(ptr) };
         (*fn)();
     });
+    uv_unref((uv_handle_t *)&queue->async);
 }
 
 FileSource::~FileSource() {

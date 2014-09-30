@@ -30,18 +30,18 @@ void VectorTileData::parse() {
         return;
     }
 
-//    try {
+    try {
         // Parsing creates state that is encapsulated in TileParser. While parsing,
         // the TileParser object writes results into this objects. All other state
         // is going to be discarded afterwards.
         parser->parse();
-//    } catch (const std::exception& ex) {
-//#if defined(DEBUG)
-//        fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
-//#endif
-//        cancel();
-//        return;
-//    }
+    } catch (const std::exception& ex) {
+#if defined(DEBUG)
+        fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
+#endif
+        cancel();
+        return;
+    }
 
     if (state != State::obsolete) {
         state = State::parsed;

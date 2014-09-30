@@ -41,7 +41,7 @@ public:
 
 public:
     TileData(Tile::ID id, Map &map, const util::ptr<SourceInfo> &source);
-    ~TileData();
+    virtual ~TileData();
 
     void request();
     void cancel();

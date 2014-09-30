@@ -21,11 +21,13 @@ struct uv_worker_s {
 #ifndef NDEBUG
     unsigned long thread_id;
 #endif
+    uv_loop_t *loop;
     uv_messenger_t *msgr;
     uv_chan_t chan;
     const char *name;
     int count;
     uv_worker_close_cb close_cb;
+    int active;
 };
 
 int uv_worker_init(uv_worker_t *worker, uv_loop_t *loop, int count, const char *name);

@@ -22,7 +22,11 @@ struct CacheRequestBaton {
 
 HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path, uv_loop_t *loop_, util::ptr<SQLiteStore> store_)
     : BaseRequest(path), thread_id(uv_thread_self()), loop(loop_), store(store_), type(type_) {
-    startCacheRequest();
+    if (store) {
+        startCacheRequest();
+    } else {
+        startHTTPRequest(nullptr);
+    }
 }
 
 void HTTPRequest::startCacheRequest() {
@@ -159,14 +163,18 @@ void HTTPRequest::handleHTTPResponse(HTTPResponseType responseType, std::unique_
 
         // The request returned data successfully. We retrieved and decoded the data successfully.
         case HTTPResponseType::Successful:
-            store->put(path, type, *res);
+            if (store) {
+                store->put(path, type, *res);
+            }
             response = std::move(res);
             notify();
             break;
 
         // The request confirmed that the data wasn't changed. We already have the data.
         case HTTPResponseType::NotModified:
-            store->updateExpiration(path, res->expires);
+            if (store) {
+                store->updateExpiration(path, res->expires);
+            }
             response = std::move(res);
             notify();
             break;

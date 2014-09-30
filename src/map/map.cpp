@@ -58,6 +58,15 @@ Map::~Map() {
     if (async) {
         stop();
     }
+
+    // Explicitly reset all pointers.
+    texturepool.reset();
+    sprite.reset();
+    spriteAtlas.reset();
+    glyphStore.reset();
+    glyphAtlas.reset();
+    style.reset();
+    fileSource.reset();
 }
 
 uv::worker &Map::getWorker() {
@@ -265,8 +274,14 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     // TODO: Make threadsafe.
     styleJSON.swap(newStyleJSON);
     sprite.reset();
-    assert(style);
+    if (!style) {
+        style = std::make_shared<Style>();
+    }
     style->loadJSON((const uint8_t *)styleJSON.c_str());
+    if (!fileSource) {
+        fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
+        glyphStore = std::make_shared<GlyphStore>(fileSource);
+    }
     fileSource->setBase(base);
     glyphStore->setURL(util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken()));
     update();
