@@ -186,7 +186,9 @@ void Map::terminate(uv_async_t *async, int status) {
 #pragma mark - Setup
 
 void Map::setup() {
+    view.make_active();
     painter.setup();
+    view.make_inactive();
 }
 
 void Map::setStyleURL(const std::string &url) {
