@@ -1,5 +1,6 @@
 #include "glfw_view.hpp"
 
+#include <mbgl/map/geography.h>
 #include <mbgl/util/string.hpp>
 
 GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {
@@ -195,10 +196,11 @@ void GLFWView::make_active() {
 void GLFWView::swap() {
     glfwPostEmptyEvent();
 
-    double lon, lat, zoom;
-    map->getLonLatZoom(lon, lat, zoom);
+    mbgl::LatLng latLng;
+    double zoom;
+    map->getLatLngZoom(latLng, zoom);
     const double bearing = map->getBearing();
-    const std::string title = mbgl::util::sprintf<128>("Mapbox GL – %.2f/%.6f/%.6f/%.1f", zoom, lat, lon, bearing);
+    const std::string title = mbgl::util::sprintf<128>("Mapbox GL – %.2f/%.6f/%.6f/%.1f", zoom, latLng.latitude, latLng.longitude, bearing);
     glfwSetWindowTitle(window, title.c_str());
 }
 

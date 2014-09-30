@@ -93,18 +93,17 @@ void Transform::_moveBy(const double dx, const double dy, const timestamp durati
                            duration);
 }
 
-void Transform::setLonLat(const double lon, const double lat, const timestamp duration) {
+void Transform::setLatLng(const LatLng latLng, const timestamp duration) {
     uv::writelock lock(mtx);
 
-    const double f = std::fmin(std::fmax(std::sin(D2R * lat), -0.9999), 0.9999);
-    double xn = -lon * Bc;
+    const double f = std::fmin(std::fmax(std::sin(D2R * latLng.latitude), -0.9999), 0.9999);
+    double xn = -latLng.longitude * Bc;
     double yn = 0.5 * Cc * std::log((1 + f) / (1 - f));
 
     _setScaleXY(current.scale, xn, yn, duration);
 }
 
-void Transform::setLonLatZoom(const double lon, const double lat, const double zoom,
-                              const timestamp duration) {
+void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const timestamp duration) {
     uv::writelock lock(mtx);
 
     double new_scale = std::pow(2.0, zoom);
@@ -113,22 +112,26 @@ void Transform::setLonLatZoom(const double lon, const double lat, const double z
     Bc = s / 360;
     Cc = s / (2 * M_PI);
 
-    const double f = std::fmin(std::fmax(std::sin(D2R * lat), -0.9999), 0.9999);
-    double xn = -lon * Bc;
+    const double f = std::fmin(std::fmax(std::sin(D2R * latLng.latitude), -0.9999), 0.9999);
+    double xn = -latLng.longitude * Bc;
     double yn = 0.5 * Cc * log((1 + f) / (1 - f));
 
     _setScaleXY(new_scale, xn, yn, duration);
 }
 
-void Transform::getLonLat(double &lon, double &lat) const {
+const LatLng Transform::getLatLng() const {
     uv::readlock lock(mtx);
 
-    lon = -final.x / Bc;
-    lat = R2D * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
+    LatLng ll;
+
+    ll.longitude = -final.x / Bc;
+    ll.latitude  = R2D * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
+
+    return ll;
 }
 
-void Transform::getLonLatZoom(double &lon, double &lat, double &zoom) const {
-    getLonLat(lon, lat);
+void Transform::getLatLngZoom(LatLng &latLng, double &zoom) const {
+    latLng = getLatLng();
 
     uv::readlock lock(mtx);
     zoom = getZoom();

@@ -1,6 +1,7 @@
 #ifndef MBGL_MAP_MAP
 #define MBGL_MAP_MAP
 
+#include <mbgl/map/geography.h>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/renderer/painter.hpp>
 
@@ -78,8 +79,8 @@ public:
 
     // Position
     void moveBy(double dx, double dy, double duration = 0);
-    void setLonLat(double lon, double lat, double duration = 0);
-    void getLonLat(double &lon, double &lat) const;
+    void setLatLng(LatLng latLng, double duration = 0);
+    const LatLng getLatLng() const;
     void startPanning();
     void stopPanning();
     void resetPosition();
@@ -90,8 +91,8 @@ public:
     double getScale() const;
     void setZoom(double zoom, double duration = 0);
     double getZoom() const;
-    void setLonLatZoom(double lon, double lat, double zoom, double duration = 0);
-    void getLonLatZoom(double &lon, double &lat, double &zoom) const;
+    void setLatLngZoom(LatLng latLng, double zoom, double duration = 0);
+    void getLatLngZoom(LatLng &latLng, double &zoom) const;
     void resetZoom();
     void startScaling();
     void stopScaling();

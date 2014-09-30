@@ -86,7 +86,7 @@ TEST_P(HeadlessTest, render) {
 
         view.resize(width, height, pixelRatio);
         map.resize(width, height, pixelRatio);
-        map.setLonLatZoom(longitude, latitude, zoom);
+        map.setLatLngZoom({ latitude, longitude }, zoom);
         map.setBearing(bearing);
 
         // Run the loop. It will terminate when we don't have any further listeners.

@@ -272,14 +272,14 @@ void Map::moveBy(double dx, double dy, double duration) {
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setLonLat(double lon, double lat, double duration) {
-    transform.setLonLat(lon, lat, duration * 1_second);
+void Map::setLatLng(LatLng latLng, double duration) {
+    transform.setLatLng(latLng, duration * 1_second);
     update();
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::getLonLat(double& lon, double& lat) const {
-    transform.getLonLat(lon, lat);
+const LatLng Map::getLatLng() const {
+    return transform.getLatLng();
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
@@ -297,7 +297,7 @@ void Map::stopPanning() {
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resetPosition() {
     transform.setAngle(0);
-    transform.setLonLat(0, 0);
+    transform.setLatLng({ 0, 0 });
     transform.setZoom(0);
     update();
 }
@@ -334,14 +334,14 @@ double Map::getZoom() const {
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
-    transform.setLonLatZoom(lon, lat, zoom, duration * 1_second);
+void Map::setLatLngZoom(LatLng latLng, double zoom, double duration) {
+    transform.setLatLngZoom(latLng, zoom, duration * 1_second);
     update();
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!
-void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
-    transform.getLonLatZoom(lon, lat, zoom);
+void Map::getLatLngZoom(LatLng &latLng, double& zoom) const {
+    transform.getLatLngZoom(latLng, zoom);
 }
 
 // Note: This function is called from another thread. Make sure you only call threadsafe functions!

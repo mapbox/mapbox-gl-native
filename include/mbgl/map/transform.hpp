@@ -2,6 +2,7 @@
 #define MBGL_MAP_TRANSFORM
 
 #include <mbgl/util/time.hpp>
+#include <mbgl/map/geography.h>
 #include <mbgl/map/transform_state.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
@@ -28,10 +29,10 @@ public:
 
     // Position
     void moveBy(double dx, double dy, timestamp duration = 0);
-    void setLonLat(double lon, double lat, timestamp duration = 0);
-    void setLonLatZoom(double lon, double lat, double zoom, timestamp duration = 0);
-    void getLonLat(double& lon, double& lat) const;
-    void getLonLatZoom(double& lon, double& lat, double& zoom) const;
+    void setLatLng(LatLng latLng, timestamp duration = 0);
+    void setLatLngZoom(LatLng latLng, double zoom, timestamp duration = 0);
+    const LatLng getLatLng() const;
+    void getLatLngZoom(LatLng &latLng, double& zoom) const;
     void startPanning();
     void stopPanning();
 
