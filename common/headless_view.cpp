@@ -20,7 +20,7 @@ HeadlessView::HeadlessView() {
     GLint num;
     CGLError error = CGLChoosePixelFormat(attributes, &pixelFormat, &num);
     if (error) {
-        fprintf(stderr, "Error pixel format\n");
+        fprintf(stderr, "Error pixel format: %s\n", CGLErrorString(error));
         return;
     }
 
@@ -28,6 +28,12 @@ HeadlessView::HeadlessView() {
     CGLDestroyPixelFormat(pixelFormat);
     if (error) {
         fprintf(stderr, "Error creating GL context object\n");
+        return;
+    }
+
+    error = CGLEnable(gl_context, kCGLCEMPEngine);
+    if (error != kCGLNoError ) {
+        fprintf(stderr, "Error enabling OpenGL multithreading\n");
         return;
     }
 #endif
