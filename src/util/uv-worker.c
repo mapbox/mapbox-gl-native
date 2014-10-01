@@ -116,7 +116,8 @@ int uv_worker_init(uv_worker_t *worker, uv_loop_t *loop, int count, const char *
     if (ret < 0) return ret;
 
     // Initialize all worker threads.
-    for (int i = 0; i < count; i++) {
+    int i;
+    for (i = 0; i < count; i++) {
         uv__worker_thread_t *worker_thread = (uv__worker_thread_t *)malloc(sizeof(uv__worker_thread_t));
         worker_thread->worker = worker;
         ret = uv_thread_create(&worker_thread->thread, uv__worker_thread_loop, worker_thread);
