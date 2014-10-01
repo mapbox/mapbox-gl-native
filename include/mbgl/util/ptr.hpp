@@ -14,11 +14,11 @@ public:
     inline ptr(Args &&... args)
         : ::std::shared_ptr<T>(::std::forward<Args>(args)...) {}
 
-    inline auto operator->() const -> decltype(::std::shared_ptr<T>::operator->()) {
+    inline auto operator->() const -> decltype(this->::std::shared_ptr<T>::operator->()) {
         assert(*this);
         return ::std::shared_ptr<T>::operator->();
     }
-    inline auto operator*() const -> decltype(::std::shared_ptr<T>::operator*()) {
+    inline auto operator*() const -> decltype(this->::std::shared_ptr<T>::operator*()) {
         assert(*this);
         return ::std::shared_ptr<T>::operator*();
     }
