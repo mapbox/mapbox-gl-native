@@ -27,7 +27,7 @@ struct uv_worker_s {
     const char *name;
     int count;
     uv_worker_close_cb close_cb;
-    int active;
+    unsigned int active_items;
 };
 
 int uv_worker_init(uv_worker_t *worker, uv_loop_t *loop, int count, const char *name);

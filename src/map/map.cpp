@@ -67,6 +67,9 @@ Map::~Map() {
     glyphAtlas.reset();
     style.reset();
     fileSource.reset();
+    workers.reset();
+
+    uv_run(**loop, UV_RUN_DEFAULT);
 }
 
 uv::worker &Map::getWorker() {

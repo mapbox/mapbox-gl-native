@@ -57,6 +57,10 @@ void uv_messenger_send(uv_messenger_t *msgr, void *data) {
     uv_async_send(&msgr->async);
 }
 
+void uv_messenger_ref(uv_messenger_t *msgr) {
+    uv_ref((uv_handle_t *)&msgr->async);
+}
+
 void uv_messenger_unref(uv_messenger_t *msgr) {
     uv_unref((uv_handle_t *)&msgr->async);
 }

@@ -51,9 +51,10 @@ void uv__worker_after(void *ptr) {
             assert(item->after_work_cb);
             item->after_work_cb(item->data);
         }
-        assert(item->worker->active > 0);
-        if (--item->worker->active == 0) {
-            uv_unref((uv_handle_t *)&item->worker->msgr->async);
+        uv_worker_t *worker = item->worker;
+        assert(worker->active_items > 0);
+        if (--worker->active_items == 0) {
+            uv_messenger_unref(worker->msgr);
         }
     } else {
         // This is a worker thread termination.
@@ -103,13 +104,14 @@ int uv_worker_init(uv_worker_t *worker, uv_loop_t *loop, int count, const char *
     worker->name = name;
     worker->count = 0;
     worker->close_cb = NULL;
-    worker->active = 0;
+    worker->active_items = 0;
     worker->msgr = (uv_messenger_t *)malloc(sizeof(uv_messenger_t));
     int ret = uv_messenger_init(loop, worker->msgr, uv__worker_after);
     if (ret < 0) {
         free(worker->msgr);
         return ret;
     }
+    uv_messenger_unref(worker->msgr);
     ret = uv_chan_init(&worker->chan);
     if (ret < 0) return ret;
 
@@ -142,7 +144,9 @@ void uv_worker_send(uv_worker_t *worker, void *data, uv_worker_cb work_cb,
     item->after_work_cb = after_work_cb;
     item->data = data;
     uv_chan_send(&worker->chan, item);
-    worker->active++;
+    if (worker->active_items++ == 0) {
+        uv_messenger_ref(worker->msgr);
+    }
 }
 
 void uv_worker_close(uv_worker_t *worker, uv_worker_close_cb close_cb) {
@@ -155,8 +159,7 @@ void uv_worker_close(uv_worker_t *worker, uv_worker_close_cb close_cb) {
 
     worker->close_cb = close_cb;
     uv_chan_send(&worker->chan, NULL);
-    assert(worker->active >= 0);
-    if (worker->active++ == 0) {
-        uv_ref((uv_handle_t *)&worker->msgr->async);
+    if (worker->active_items++ == 0) {
+        uv_messenger_ref(worker->msgr);
     }
 }
