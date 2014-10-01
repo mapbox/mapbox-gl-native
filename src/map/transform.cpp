@@ -98,7 +98,9 @@ void Transform::_moveBy(const double dx, const double dy, const timestamp durati
 void Transform::setLatLng(const LatLng latLng, const timestamp duration) {
     uv::writelock lock(mtx);
 
-    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * latLng.latitude), -0.9999), 0.9999);
+    const double m = 1 - 1e-15;
+    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * latLng.latitude), -m), m);
+
     double xn = -latLng.longitude * Bc;
     double yn = 0.5 * Cc * std::log((1 + f) / (1 - f));
 
@@ -114,9 +116,11 @@ void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const time
     Bc = s / 360;
     Cc = s / (2 * M_PI);
 
-    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * latLng.latitude), -0.9999), 0.9999);
+    const double m = 1 - 1e-15;
+    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * latLng.latitude), -m), m);
+
     double xn = -latLng.longitude * Bc;
-    double yn = 0.5 * Cc * log((1 + f) / (1 - f));
+    double yn = 0.5 * Cc * std::log((1 + f) / (1 - f));
 
     _setScaleXY(new_scale, xn, yn, duration);
 }
@@ -511,19 +515,19 @@ void Transform::getViewportBoundsLatLng(LatLng &sw, LatLng &ne) const {
 
 double Transform::getMetersPerPixelAtLatitude(const double lat, const double zoom) const {
     const double mapPixelWidthAtZoom = std::pow(2, zoom) * 512;
-    const double constrainedLatitude = std::fmax(std::fmin(lat, LATITUDE_MAX), -LATITUDE_MAX);
+    const double constrainedLatitude = std::fmin(std::fmax(lat, -LATITUDE_MAX), LATITUDE_MAX);
 
-    return std::cos(constrainedLatitude * DEG2RAD) * 2 * M_PI * EARTH_RADIUS_M / mapPixelWidthAtZoom;
+    return std::cos(constrainedLatitude * DEG2RAD) * M2PI * EARTH_RADIUS_M / mapPixelWidthAtZoom;
 }
 
 const ProjectedMeters Transform::projectedMetersForLatLng(const LatLng latLng) const {
-    const double constrainedLatitude = std::max(std::min(latLng.latitude, LATITUDE_MAX), -LATITUDE_MAX);
+    const double constrainedLatitude = std::fmin(std::fmax(latLng.latitude, -LATITUDE_MAX), LATITUDE_MAX);
 
     const double m = 1 - 1e-15;
-    const double s = std::max(std::min(std::sin(constrainedLatitude * DEG2RAD), m), -m);
+    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * constrainedLatitude), -m), m);
 
     const double easting  = EARTH_RADIUS_M * latLng.longitude * DEG2RAD;
-    const double northing = EARTH_RADIUS_M * std::log((1 + s) / (1 - s)) / 2;
+    const double northing = 0.5 * EARTH_RADIUS_M * std::log((1 + f) / (1 - f));
 
     return { northing, easting };
 }
@@ -532,7 +536,7 @@ const LatLng Transform::latLngForProjectedMeters(const ProjectedMeters projected
     double latitude = (2 * std::atan(std::exp(projectedMeters.northing / EARTH_RADIUS_M)) - (M_PI / 2)) * RAD2DEG;
     const double longitude = projectedMeters.easting * RAD2DEG / EARTH_RADIUS_M;
 
-    latitude = std::max(std::min(latitude, LATITUDE_MAX), -LATITUDE_MAX);
+    latitude = std::fmin(std::fmax(latitude, -LATITUDE_MAX), LATITUDE_MAX);
 
     return { latitude, longitude };
 }
