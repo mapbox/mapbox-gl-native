@@ -418,6 +418,44 @@ bool Map::canRotate() {
 }
 
 
+#pragma mark - Projection
+
+void Map::getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const {
+    transform.getWorldBoundsMeters(sw, ne);
+}
+
+void Map::getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const {
+    transform.getWorldBoundsLatLng(sw, ne);
+}
+
+void Map::getViewportBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const {
+    transform.getViewportBoundsMeters(sw, ne);
+}
+
+void Map::getViewportBoundsLatLng(LatLng &sw, LatLng &ne) const {
+    transform.getViewportBoundsLatLng(sw, ne);
+}
+
+double Map::getMetersPerPixelAtLatitude(const double lat, const double zoom) const {
+    return transform.getMetersPerPixelAtLatitude(lat, zoom);
+}
+
+const ProjectedMeters Map::projectedMetersForLatLng(const LatLng latLng) const {
+    return transform.projectedMetersForLatLng(latLng);
+}
+
+const LatLng Map::latLngForProjectedMeters(const ProjectedMeters projectedMeters) const {
+    return transform.latLngForProjectedMeters(projectedMeters);
+}
+
+void Map::offsetForLatLng(const LatLng latLng, double &x, double &y) const {
+    transform.offsetForLatLng(latLng, x, y);
+}
+const LatLng Map::latLngForOffset(const double x, const double y) const {
+    return transform.latLngForOffset(x, y);
+}
+
+
 #pragma mark - Toggles
 
 void Map::setDebug(bool value) {

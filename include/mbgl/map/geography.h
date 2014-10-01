@@ -8,6 +8,11 @@ typedef struct {
     double longitude;
 } LatLng;
 
+typedef struct {
+    double northing;
+    double easting;
+} ProjectedMeters;
+
 }
 
 #endif

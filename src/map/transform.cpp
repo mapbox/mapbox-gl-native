@@ -12,10 +12,12 @@
 
 using namespace mbgl;
 
-const double D2R = M_PI / 180.0;
-const double R2D = 180.0 / M_PI;
+const double DEG2RAD = M_PI / 180.0;
+const double RAD2DEG = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
 const double MIN_ROTATE_SCALE = 8;
+const double EARTH_RADIUS_M = 6378137;
+const double LATITUDE_MAX = 85.05113;
 
 Transform::Transform(View &view) : view(view), mtx(std::make_unique<uv::rwlock>()) {
     setScale(current.scale);
@@ -96,7 +98,7 @@ void Transform::_moveBy(const double dx, const double dy, const timestamp durati
 void Transform::setLatLng(const LatLng latLng, const timestamp duration) {
     uv::writelock lock(mtx);
 
-    const double f = std::fmin(std::fmax(std::sin(D2R * latLng.latitude), -0.9999), 0.9999);
+    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * latLng.latitude), -0.9999), 0.9999);
     double xn = -latLng.longitude * Bc;
     double yn = 0.5 * Cc * std::log((1 + f) / (1 - f));
 
@@ -112,7 +114,7 @@ void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const time
     Bc = s / 360;
     Cc = s / (2 * M_PI);
 
-    const double f = std::fmin(std::fmax(std::sin(D2R * latLng.latitude), -0.9999), 0.9999);
+    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * latLng.latitude), -0.9999), 0.9999);
     double xn = -latLng.longitude * Bc;
     double yn = 0.5 * Cc * log((1 + f) / (1 - f));
 
@@ -125,7 +127,7 @@ const LatLng Transform::getLatLng() const {
     LatLng ll;
 
     ll.longitude = -final.x / Bc;
-    ll.latitude  = R2D * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
+    ll.latitude  = RAD2DEG * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
 
     return ll;
 }
@@ -456,6 +458,120 @@ void Transform::_clearRotating() {
 
 bool Transform::canRotate() {
     return (current.scale > MIN_ROTATE_SCALE);
+}
+
+#pragma mark - Projection & conversion
+
+void Transform::getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const {
+    const double d = EARTH_RADIUS_M * M_PI;
+
+    sw.easting  = -d;
+    sw.northing = -d;
+
+    ne.easting  =  d;
+    ne.northing =  d;
+}
+
+void Transform::getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const {
+    ProjectedMeters projectedMetersSW, projectedMetersNE;
+
+    getWorldBoundsMeters(projectedMetersSW, projectedMetersNE);
+
+    sw = latLngForProjectedMeters(projectedMetersSW);
+    ne = latLngForProjectedMeters(projectedMetersNE);
+}
+
+void Transform::getViewportBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const {
+    LatLng ll;
+    double zoom;
+    getLatLngZoom(ll, zoom);
+
+    uv::readlock lock(mtx);
+
+    const ProjectedMeters center = projectedMetersForLatLng(ll);
+    const double metersPerPixel = getMetersPerPixelAtLatitude(ll.latitude, zoom);
+
+    const double deltaY = (final.height / 2) * metersPerPixel;
+    const double deltaX = (final.width  / 2) * metersPerPixel;
+
+    sw = { center.northing - deltaY, center.easting - deltaX };
+    ne = { center.northing + deltaY, center.easting + deltaX };
+}
+
+void Transform::getViewportBoundsLatLng(LatLng &sw, LatLng &ne) const {
+    ProjectedMeters projectedSW, projectedNE;
+
+    getViewportBoundsMeters(projectedSW, projectedNE);
+
+    uv::readlock lock(mtx);
+
+    sw = latLngForProjectedMeters(projectedSW);
+    ne = latLngForProjectedMeters(projectedNE);
+}
+
+double Transform::getMetersPerPixelAtLatitude(const double lat, const double zoom) const {
+    const double mapPixelWidthAtZoom = std::pow(2, zoom) * 512;
+    const double constrainedLatitude = std::fmax(std::fmin(lat, LATITUDE_MAX), -LATITUDE_MAX);
+
+    return std::cos(constrainedLatitude * DEG2RAD) * 2 * M_PI * EARTH_RADIUS_M / mapPixelWidthAtZoom;
+}
+
+const ProjectedMeters Transform::projectedMetersForLatLng(const LatLng latLng) const {
+    const double constrainedLatitude = std::max(std::min(latLng.latitude, LATITUDE_MAX), -LATITUDE_MAX);
+
+    const double m = 1 - 1e-15;
+    const double s = std::max(std::min(std::sin(constrainedLatitude * DEG2RAD), m), -m);
+
+    const double easting  = EARTH_RADIUS_M * latLng.longitude * DEG2RAD;
+    const double northing = EARTH_RADIUS_M * std::log((1 + s) / (1 - s)) / 2;
+
+    return { northing, easting };
+}
+
+const LatLng Transform::latLngForProjectedMeters(const ProjectedMeters projectedMeters) const {
+    double latitude = (2 * std::atan(std::exp(projectedMeters.northing / EARTH_RADIUS_M)) - (M_PI / 2)) * RAD2DEG;
+    const double longitude = projectedMeters.easting * RAD2DEG / EARTH_RADIUS_M;
+
+    latitude = std::max(std::min(latitude, LATITUDE_MAX), -LATITUDE_MAX);
+
+    return { latitude, longitude };
+}
+
+void Transform::offsetForLatLng(const LatLng latLng, double &x, double &y) const {
+    // FIXME: angles
+
+    LatLng ll;
+    double zoom;
+    getLatLngZoom(ll, zoom);
+
+    uv::readlock lock(mtx);
+
+    const ProjectedMeters a = projectedMetersForLatLng(ll);
+    const ProjectedMeters b = projectedMetersForLatLng(latLng);
+
+    const double metersPerPixel = getMetersPerPixelAtLatitude(ll.latitude, zoom);
+
+    x = (final.width  / 2) - ((a.easting  - b.easting)  / metersPerPixel);
+    y = (final.height / 2) - ((a.northing - b.northing) / metersPerPixel);
+}
+
+const LatLng Transform::latLngForOffset(const double x, const double y) const {
+    // FIXME: angles
+
+    LatLng ll;
+    double zoom;
+    getLatLngZoom(ll, zoom);
+
+    uv::readlock lock(mtx);
+
+    const ProjectedMeters a = projectedMetersForLatLng(ll);
+
+    const double metersPerPixel = getMetersPerPixelAtLatitude(ll.latitude, zoom);
+
+    const double easting  = a.easting  - (((final.width  / 2) - x) * metersPerPixel);
+    const double northing = a.northing - (((final.height / 2) - y) * metersPerPixel);
+
+    return latLngForProjectedMeters({ northing, easting });
 }
 
 #pragma mark - Transition
