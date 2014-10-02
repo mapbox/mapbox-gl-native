@@ -112,7 +112,7 @@ void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const time
 
     const double s = new_scale * util::tileSize;
     Bc = s / 360;
-    Cc = s / (2 * M_PI);
+    Cc = s / M2PI;
 
     const double f = std::fmin(std::fmax(std::sin(DEG2RAD * latLng.latitude), -0.9999), 0.9999);
     double xn = -latLng.longitude * Bc;
@@ -313,7 +313,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
 
     const double s = final.scale * util::tileSize;
     Bc = s / 360;
-    Cc = s / (2 * M_PI);
+    Cc = s / M2PI;
 
     view.notify_map_change(duration ?
                            MapChangeRegionDidChangeAnimated :
@@ -510,10 +510,10 @@ void Transform::getViewportBoundsLatLng(LatLng &sw, LatLng &ne) const {
 }
 
 double Transform::getMetersPerPixelAtLatitude(const double lat, const double zoom) const {
-    const double mapPixelWidthAtZoom = std::pow(2, zoom) * 512;
+    const double mapPixelWidthAtZoom = std::pow(2.0, zoom) * util::tileSize;
     const double constrainedLatitude = std::fmax(std::fmin(lat, LATITUDE_MAX), -LATITUDE_MAX);
 
-    return std::cos(constrainedLatitude * DEG2RAD) * 2 * M_PI * EARTH_RADIUS_M / mapPixelWidthAtZoom;
+    return std::cos(constrainedLatitude * DEG2RAD) * M2PI * EARTH_RADIUS_M / mapPixelWidthAtZoom;
 }
 
 const ProjectedMeters Transform::projectedMetersForLatLng(const LatLng latLng) const {
