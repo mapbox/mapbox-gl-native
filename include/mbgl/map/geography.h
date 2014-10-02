@@ -3,15 +3,15 @@
 
 namespace mbgl {
 
-typedef struct {
+struct LatLng {
     double latitude;
     double longitude;
-} LatLng;
+};
 
-typedef struct {
+struct ProjectedMeters {
     double northing;
     double easting;
-} ProjectedMeters;
+};
 
 }
 
