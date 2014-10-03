@@ -534,9 +534,12 @@ const ProjectedMeters Transform::projectedMetersForLatLng(const LatLng latLng) c
 
 const LatLng Transform::latLngForProjectedMeters(const ProjectedMeters projectedMeters) const {
     double latitude = (2 * std::atan(std::exp(projectedMeters.northing / EARTH_RADIUS_M)) - (M_PI / 2)) * RAD2DEG;
-    const double longitude = projectedMeters.easting * RAD2DEG / EARTH_RADIUS_M;
+    double longitude = projectedMeters.easting * RAD2DEG / EARTH_RADIUS_M;
 
     latitude = std::fmin(std::fmax(latitude, -LATITUDE_MAX), LATITUDE_MAX);
+
+    while (longitude >  180) longitude -= 180;
+    while (longitude < -180) longitude += 180;
 
     return { latitude, longitude };
 }
