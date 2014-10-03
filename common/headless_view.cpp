@@ -1,31 +1,21 @@
 #include "headless_view.hpp"
-#include <mbgl/util/timer.hpp>
 
 #include <stdexcept>
 
 namespace mbgl {
 
-HeadlessView::HeadlessView() {
+HeadlessView::HeadlessView() : display_(new HeadlessDisplay()) {
+    createContext();
+}
+
+HeadlessView::HeadlessView(HeadlessDisplay *display)
+    : display_(display) {
+    createContext();
+}
+
+void HeadlessView::createContext() {
 #if MBGL_USE_CGL
-    // TODO: test if OpenGL 4.1 with GL_ARB_ES2_compatibility is supported
-    // If it is, use kCGLOGLPVersion_3_2_Core and enable that extension.
-    CGLPixelFormatAttribute attributes[] = {
-        kCGLPFAOpenGLProfile,
-        (CGLPixelFormatAttribute) kCGLOGLPVersion_Legacy,
-        kCGLPFAAccelerated,
-        (CGLPixelFormatAttribute) 0
-    };
-
-    CGLPixelFormatObj pixelFormat;
-    GLint num;
-    CGLError error = CGLChoosePixelFormat(attributes, &pixelFormat, &num);
-    if (error) {
-        fprintf(stderr, "Error pixel format: %s\n", CGLErrorString(error));
-        return;
-    }
-
-    error = CGLCreateContext(pixelFormat, NULL, &gl_context);
-    CGLDestroyPixelFormat(pixelFormat);
+    CGLError error = CGLCreateContext(display_->pixelFormat, NULL, &gl_context);
     if (error) {
         fprintf(stderr, "Error creating GL context object\n");
         return;
@@ -39,29 +29,8 @@ HeadlessView::HeadlessView() {
 #endif
 
 #if MBGL_USE_GLX
-    x_display = XOpenDisplay(0);
-
-    if (x_display == nullptr) {
-        throw std::runtime_error("Failed to open X display");
-    }
-
-    static int pixelFormat[] = {
-        GLX_RGBA,
-        GLX_DOUBLEBUFFER,
-        GLX_RED_SIZE, 8,
-        GLX_GREEN_SIZE, 8,
-        GLX_BLUE_SIZE, 8,
-        GLX_ALPHA_SIZE, 8,
-        GLX_DEPTH_SIZE, 24,
-        GLX_STENCIL_SIZE, 8,
-        None
-    };
-
-    x_info = glXChooseVisual(x_display, DefaultScreen(x_display), pixelFormat);
-
-    if (x_info == nullptr) {
-        throw std::runtime_error("Error pixel format");
-    }
+    x_display = display_->x_display;
+    x_info = display_->x_info;
 
     gl_context = glXCreateContext(x_display, x_info, 0, GL_TRUE);
     if (gl_context == nullptr) {
@@ -69,7 +38,6 @@ HeadlessView::HeadlessView() {
     }
 #endif
 }
-
 
 void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
     clear_buffers();
@@ -171,8 +139,6 @@ HeadlessView::~HeadlessView() {
 
 #if MBGL_USE_GLX
     glXDestroyContext(x_display, gl_context);
-    XFree(x_info);
-    XCloseDisplay(x_display);
 #endif
 }
 

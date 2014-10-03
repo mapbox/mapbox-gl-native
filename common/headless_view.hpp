@@ -1,23 +1,19 @@
-#ifndef MBGL_COMMON_HEADLESS_CGL
-#define MBGL_COMMON_HEADLESS_CGL
+#ifndef MBGL_COMMON_HEADLESS_VIEW
+#define MBGL_COMMON_HEADLESS_VIEW
 
-#ifdef __APPLE__
-#define MBGL_USE_CGL 1
-#else
-#include <GL/glx.h>
-#define MBGL_USE_GLX 1
-#endif
+#include "headless_display.hpp"
 
 #include <mbgl/map/view.hpp>
-#include <mbgl/platform/gl.hpp>
-#include <mbgl/util/time.hpp>
 
 namespace mbgl {
 
 class HeadlessView : public View {
 public:
     HeadlessView();
+    HeadlessView(HeadlessDisplay *display);
     ~HeadlessView();
+
+    void createContext();
 
     void resize(uint16_t width, uint16_t height, float pixelRatio);
 
@@ -32,6 +28,8 @@ private:
 
 
 private:
+    HeadlessDisplay *display_;
+
 #if MBGL_USE_CGL
     CGLContextObj gl_context;
     GLuint fbo = 0;
@@ -40,9 +38,9 @@ private:
 #endif
 
 #if MBGL_USE_GLX
-    GLXContext gl_context = nullptr;
-    XVisualInfo *x_info = nullptr;
     Display *x_display = nullptr;
+    XVisualInfo *x_info = nullptr;
+    GLXContext gl_context = nullptr;
     Pixmap x_pixmap = 0;
     GLXPixmap glx_pixmap = 0;
 #endif

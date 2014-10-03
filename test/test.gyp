@@ -201,6 +201,8 @@
             "./headless.cpp",
             "../common/headless_view.hpp",
             "../common/headless_view.cpp",
+            "../common/headless_display.hpp",
+            "../common/headless_display.cpp",
             "../common/platform_default.cpp",
             "./fixtures/fixture_request.cpp",
             "./fixtures/fixture_log.hpp",
