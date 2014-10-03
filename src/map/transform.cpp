@@ -553,13 +553,20 @@ void Transform::offsetForLatLng(const LatLng latLng, double &x, double &y) const
 
     uv::readlock lock(mtx);
 
-    const ProjectedMeters a = projectedMetersForLatLng(ll);
-    const ProjectedMeters b = projectedMetersForLatLng(latLng);
+    const double m = getMetersPerPixelAtLatitude(0, zoom);
 
-    const double metersPerPixel = getMetersPerPixelAtLatitude(ll.latitude, zoom);
+    const ProjectedMeters givenMeters = projectedMetersForLatLng(latLng);
 
-    x = (final.width  / 2) - ((a.easting  - b.easting)  / metersPerPixel);
-    y = (final.height / 2) - ((a.northing - b.northing) / metersPerPixel);
+    const double givenAbsoluteX = givenMeters.easting  / m;
+    const double givenAbsoluteY = givenMeters.northing / m;
+
+    const ProjectedMeters centerMeters = projectedMetersForLatLng(ll);
+
+    const double centerAbsoluteX = centerMeters.easting  / m;
+    const double centerAbsoluteY = centerMeters.northing / m;
+
+    x = givenAbsoluteX - centerAbsoluteX + (final.width  / 2);
+    y = givenAbsoluteY - centerAbsoluteY + (final.height / 2);
 }
 
 const LatLng Transform::latLngForOffset(const double x, const double y) const {
@@ -571,14 +578,19 @@ const LatLng Transform::latLngForOffset(const double x, const double y) const {
 
     uv::readlock lock(mtx);
 
-    const ProjectedMeters a = projectedMetersForLatLng(ll);
+    const double m = getMetersPerPixelAtLatitude(0, zoom);
 
-    const double metersPerPixel = getMetersPerPixelAtLatitude(ll.latitude, zoom);
+    const ProjectedMeters centerMeters = projectedMetersForLatLng(ll);
 
-    const double easting  = a.easting  - (((final.width  / 2) - x) * metersPerPixel);
-    const double northing = a.northing - (((final.height / 2) - y) * metersPerPixel);
+    const double centerAbsoluteX = centerMeters.easting  / m;
+    const double centerAbsoluteY = centerMeters.northing / m;
 
-    return latLngForProjectedMeters({ northing, easting });
+    const double givenAbsoluteX = x + centerAbsoluteX - (final.width  / 2);
+    const double givenAbsoluteY = y + centerAbsoluteY - (final.height / 2);
+
+    const ProjectedMeters givenMeters = { givenAbsoluteY * m, givenAbsoluteX * m };
+
+    return latLngForProjectedMeters(givenMeters);
 }
 
 #pragma mark - Transition
