@@ -17,7 +17,7 @@ const double RAD2DEG = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
 const double MIN_ROTATE_SCALE = 8;
 const double EARTH_RADIUS_M = 6378137;
-const double LATITUDE_MAX = 85.05113;
+const double LATITUDE_MAX = 85.05112878;
 
 Transform::Transform(View &view) : view(view), mtx(std::make_unique<uv::rwlock>()) {
     setScale(current.scale);
