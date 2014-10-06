@@ -5,18 +5,18 @@
 
 namespace mbgl {
 
-HeadlessView::HeadlessView() : display_(new HeadlessDisplay()) {
+HeadlessView::HeadlessView() : display_ptr(std::make_shared<HeadlessDisplay>()) {
     createContext();
 }
 
-HeadlessView::HeadlessView(HeadlessDisplay *display)
-    : display_(display) {
+HeadlessView::HeadlessView(HeadlessDisplay &display)
+    : display_ptr(std::make_shared<HeadlessDisplay>(display)) {
     createContext();
 }
 
 void HeadlessView::createContext() {
 #if MBGL_USE_CGL
-    CGLError error = CGLCreateContext(display_->pixelFormat, NULL, &gl_context);
+    CGLError error = CGLCreateContext(display_ptr->pixelFormat, NULL, &gl_context);
     if (error) {
         fprintf(stderr, "Error creating GL context object\n");
         return;
@@ -30,8 +30,8 @@ void HeadlessView::createContext() {
 #endif
 
 #if MBGL_USE_GLX
-    x_display = display_->x_display;
-    x_info = display_->x_info;
+    x_display = display_ptr->x_display;
+    x_info = display_ptr->x_info;
 
     gl_context = glXCreateContext(x_display, x_info, 0, GL_TRUE);
     if (gl_context == nullptr) {

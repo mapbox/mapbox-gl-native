@@ -11,6 +11,8 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/platform/gl.hpp>
 
+#include <memory>
+
 namespace mbgl {
 
 class HeadlessDisplay;
@@ -18,7 +20,7 @@ class HeadlessDisplay;
 class HeadlessView : public View {
 public:
     HeadlessView();
-    HeadlessView(HeadlessDisplay *display);
+    HeadlessView(HeadlessDisplay &display);
     ~HeadlessView();
 
     void createContext();
@@ -36,7 +38,7 @@ private:
 
 
 private:
-    HeadlessDisplay *display_;
+    std::shared_ptr<HeadlessDisplay> display_ptr;
 
 #if MBGL_USE_CGL
     CGLContextObj gl_context;
