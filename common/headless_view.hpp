@@ -1,11 +1,19 @@
 #ifndef MBGL_COMMON_HEADLESS_VIEW
 #define MBGL_COMMON_HEADLESS_VIEW
 
-#include "headless_display.hpp"
+#ifdef __APPLE__
+#define MBGL_USE_CGL 1
+#else
+#include <GL/glx.h>
+#define MBGL_USE_GLX 1
+#endif
 
 #include <mbgl/map/view.hpp>
+#include <mbgl/platform/gl.hpp>
 
 namespace mbgl {
+
+class HeadlessDisplay;
 
 class HeadlessView : public View {
 public:

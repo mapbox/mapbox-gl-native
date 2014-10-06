@@ -1,14 +1,7 @@
 #ifndef MBGL_COMMON_HEADLESS_DISPLAY
 #define MBGL_COMMON_HEADLESS_DISPLAY
 
-#ifdef __APPLE__
-#define MBGL_USE_CGL 1
-#else
-#include <GL/glx.h>
-#define MBGL_USE_GLX 1
-#endif
-
-#include <mbgl/platform/gl.hpp>
+#include "headless_view.hpp"
 
 namespace mbgl {
 
