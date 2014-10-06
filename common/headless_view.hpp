@@ -4,7 +4,7 @@
 #ifdef __APPLE__
 #define MBGL_USE_CGL 1
 #else
-#include <GL/glx.h>
+#include "glx.h"
 #define MBGL_USE_GLX 1
 #endif
 

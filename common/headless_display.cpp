@@ -39,7 +39,7 @@ HeadlessDisplay::HeadlessDisplay() {
         GLX_ALPHA_SIZE, 8,
         GLX_DEPTH_SIZE, 24,
         GLX_STENCIL_SIZE, 8,
-        None
+        0
     };
 
     x_info = glXChooseVisual(x_display, DefaultScreen(x_display), pixelFormat);
