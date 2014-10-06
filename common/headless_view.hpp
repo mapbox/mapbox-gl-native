@@ -20,7 +20,7 @@ class HeadlessDisplay;
 class HeadlessView : public View {
 public:
     HeadlessView();
-    HeadlessView(HeadlessDisplay &display);
+    HeadlessView(std::shared_ptr<HeadlessDisplay> display_ptr);
     ~HeadlessView();
 
     void createContext();
@@ -38,7 +38,7 @@ private:
 
 
 private:
-    std::shared_ptr<HeadlessDisplay> display_ptr;
+    std::shared_ptr<HeadlessDisplay> display_ptr_;
 
 #if MBGL_USE_CGL
     CGLContextObj gl_context;
