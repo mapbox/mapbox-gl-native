@@ -10,6 +10,7 @@
 #include <rapidjson/stringbuffer.h>
 
 #include "../common/headless_view.hpp"
+#include "../common/headless_display.hpp"
 
 #include "./fixtures/fixture_log.hpp"
 
@@ -21,6 +22,8 @@ const std::string base_directory = []{
     fn.erase(fn.find_last_of("/"));
     return fn + "/node_modules/mapbox-gl-test-suite/";
 }();
+
+auto display_ = std::make_shared<mbgl::HeadlessDisplay>();
 
 class HeadlessTest : public ::testing::TestWithParam<std::string> {};
 
@@ -78,7 +81,7 @@ TEST_P(HeadlessTest, render) {
             }
         }
 
-        HeadlessView view;
+        HeadlessView view(display_);
         Map map(view);
 
         map.setStyleJSON(style, base_directory);
