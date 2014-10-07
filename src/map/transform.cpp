@@ -545,15 +545,19 @@ const LatLng Transform::latLngForProjectedMeters(const ProjectedMeters projected
 }
 
 void Transform::offsetForLatLng(const LatLng latLng, double &x, double &y) const {
-    // FIXME: angles
-
     LatLng ll;
     double zoom;
     getLatLngZoom(ll, zoom);
 
     uv::readlock lock(mtx);
 
+    const double centerX = final.width  / 2;
+    const double centerY = final.height / 2;
+
     const double m = getMetersPerPixelAtLatitude(0, zoom);
+
+    const double angle_sin = std::sin(-current.angle);
+    const double angle_cos = std::cos(-current.angle);
 
     const ProjectedMeters givenMeters = projectedMetersForLatLng(latLng);
 
@@ -565,28 +569,53 @@ void Transform::offsetForLatLng(const LatLng latLng, double &x, double &y) const
     const double centerAbsoluteX = centerMeters.easting  / m;
     const double centerAbsoluteY = centerMeters.northing / m;
 
-    x = givenAbsoluteX - centerAbsoluteX + (final.width  / 2);
-    y = givenAbsoluteY - centerAbsoluteY + (final.height / 2);
+    const double deltaX = givenAbsoluteX - centerAbsoluteX;
+    const double deltaY = givenAbsoluteY - centerAbsoluteY;
+
+    const double translatedX = deltaX + centerX;
+    const double translatedY = deltaY + centerY;
+
+    const double rotatedX = translatedX * angle_cos - translatedY * angle_sin;
+    const double rotatedY = translatedX * angle_sin + translatedY * angle_cos;
+
+    const double rotatedCenterX = centerX * angle_cos - centerY * angle_sin;
+    const double rotatedCenterY = centerX * angle_sin + centerY * angle_cos;
+
+    x = rotatedX + (centerX - rotatedCenterX);
+    y = rotatedY + (centerY - rotatedCenterY);
 }
 
 const LatLng Transform::latLngForOffset(const double x, const double y) const {
-    // FIXME: angles
-
     LatLng ll;
     double zoom;
     getLatLngZoom(ll, zoom);
 
     uv::readlock lock(mtx);
 
+    const double centerX = final.width  / 2;
+    const double centerY = final.height / 2;
+
     const double m = getMetersPerPixelAtLatitude(0, zoom);
+
+    const double angle_sin = std::sin(current.angle);
+    const double angle_cos = std::cos(current.angle);
+
+    const double unrotatedCenterX = centerX * angle_cos - centerY * angle_sin;
+    const double unrotatedCenterY = centerX * angle_sin + centerY * angle_cos;
+
+    const double unrotatedX = x * angle_cos - y * angle_sin;
+    const double unrotatedY = x * angle_sin + y * angle_cos;
+
+    const double givenX = unrotatedX + (centerX - unrotatedCenterX);
+    const double givenY = unrotatedY + (centerY - unrotatedCenterY);
 
     const ProjectedMeters centerMeters = projectedMetersForLatLng(ll);
 
     const double centerAbsoluteX = centerMeters.easting  / m;
     const double centerAbsoluteY = centerMeters.northing / m;
 
-    const double givenAbsoluteX = x + centerAbsoluteX - (final.width  / 2);
-    const double givenAbsoluteY = y + centerAbsoluteY - (final.height / 2);
+    const double givenAbsoluteX = givenX + centerAbsoluteX - centerX;
+    const double givenAbsoluteY = givenY + centerAbsoluteY - centerY;
 
     const ProjectedMeters givenMeters = { givenAbsoluteY * m, givenAbsoluteX * m };
 
