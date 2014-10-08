@@ -26,6 +26,7 @@ public:
     void createContext();
 
     void resize(uint16_t width, uint16_t height, float pixelRatio);
+    const std::unique_ptr<uint32_t[]>* readPixels();
 
     void notify_map_change(MapChange change, timestamp delay = 0);
     void make_active();
@@ -36,9 +37,11 @@ public:
 private:
     void clear_buffers();
 
-
 private:
     std::shared_ptr<HeadlessDisplay> display_;
+    uint16_t width_;
+    uint16_t height_;
+    float pixelRatio_;
 
 #if MBGL_USE_CGL
     CGLContextObj gl_context;

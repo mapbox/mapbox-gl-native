@@ -98,13 +98,7 @@ TEST_P(HeadlessTest, render) {
         const unsigned int w = width * pixelRatio;
         const unsigned int h = height * pixelRatio;
 
-        const std::unique_ptr<uint32_t[]> pixels(new uint32_t[w * h]);
-
-        map.view.make_active();
-        glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
-        map.view.make_inactive();
-
-        const std::string image = util::compress_png(w, h, pixels.get(), true);
+        const std::string image = util::compress_png(w, h, view.readPixels()->get(), true);
         util::write_file(actual_image, image);
     }
 }

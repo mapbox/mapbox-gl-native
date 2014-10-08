@@ -7,7 +7,8 @@
 
 namespace mbgl {
 
-HeadlessView::HeadlessView() : display_(std::make_shared<HeadlessDisplay>()) {
+HeadlessView::HeadlessView()
+    : display_(std::make_shared<HeadlessDisplay>()) {
     createContext();
 }
 
@@ -43,8 +44,12 @@ void HeadlessView::createContext() {
 void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
     clear_buffers();
 
-    width *= pixelRatio;
-    height *= pixelRatio;
+    width_ = width;
+    height_ = height;
+    pixelRatio_ = pixelRatio;
+
+    const unsigned int w = width_ * pixelRatio_;
+    const unsigned int h = height_ * pixelRatio_;
 
 #if MBGL_USE_CGL
     make_active();
@@ -52,12 +57,12 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
     // Create depth/stencil buffer
     glGenRenderbuffersEXT(1, &fbo_depth_stencil);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo_depth_stencil);
-    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, width, height);
+    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, w, h);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 
     glGenRenderbuffersEXT(1, &fbo_color);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo_color);
-    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_RGBA8, width, height);
+    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_RGBA8, w, h);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 
     glGenFramebuffersEXT(1, &fbo);
@@ -87,9 +92,22 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
 #endif
 
 #if MBGL_USE_GLX
-    x_pixmap = XCreatePixmap(x_display, DefaultRootWindow(x_display), width, height, 32);
+    x_pixmap = XCreatePixmap(x_display, DefaultRootWindow(x_display), w, h, 32);
     glx_pixmap = glXCreateGLXPixmap(x_display, x_info, x_pixmap);
 #endif
+}
+
+const std::unique_ptr<uint32_t[]>* HeadlessView::readPixels() {
+    const unsigned int w = width_ * pixelRatio_;
+    const unsigned int h = height_ * pixelRatio_;
+
+    const std::unique_ptr<uint32_t[]> pixels(new uint32_t[w * h]);
+
+    make_active();
+    glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
+    make_inactive();
+
+    return &pixels;
 }
 
 void HeadlessView::clear_buffers() {
