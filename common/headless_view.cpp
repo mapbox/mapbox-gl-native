@@ -97,17 +97,17 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
 #endif
 }
 
-const std::unique_ptr<uint32_t[]>* HeadlessView::readPixels() {
+const std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
     const unsigned int w = width_ * pixelRatio_;
     const unsigned int h = height_ * pixelRatio_;
 
-    const std::unique_ptr<uint32_t[]> pixels(new uint32_t[w * h]);
+    std::unique_ptr<uint32_t[]> pixels(new uint32_t[w * h]);
 
     make_active();
     glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
     make_inactive();
 
-    return &pixels;
+    return pixels;
 }
 
 void HeadlessView::clear_buffers() {

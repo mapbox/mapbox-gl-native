@@ -98,7 +98,7 @@ TEST_P(HeadlessTest, render) {
         const unsigned int w = width * pixelRatio;
         const unsigned int h = height * pixelRatio;
 
-        const std::string image = util::compress_png(w, h, view.readPixels()->get(), true);
+        const std::string image = util::compress_png(w, h, view.readPixels().get(), true);
         util::write_file(actual_image, image);
     }
 }
