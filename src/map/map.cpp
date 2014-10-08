@@ -428,14 +428,6 @@ void Map::getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const {
     transform.getWorldBoundsLatLng(sw, ne);
 }
 
-void Map::getViewportBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const {
-    transform.getViewportBoundsMeters(sw, ne);
-}
-
-void Map::getViewportBoundsLatLng(LatLng &sw, LatLng &ne) const {
-    transform.getViewportBoundsLatLng(sw, ne);
-}
-
 double Map::getMetersPerPixelAtLatitude(const double lat, const double zoom) const {
     return transform.getMetersPerPixelAtLatitude(lat, zoom);
 }

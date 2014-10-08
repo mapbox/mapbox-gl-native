@@ -485,34 +485,6 @@ void Transform::getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const {
     ne = latLngForProjectedMeters(projectedMetersNE);
 }
 
-void Transform::getViewportBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const {
-    LatLng ll;
-    double zoom;
-    getLatLngZoom(ll, zoom);
-
-    uv::readlock lock(mtx);
-
-    const ProjectedMeters center = projectedMetersForLatLng(ll);
-    const double metersPerPixel = getMetersPerPixelAtLatitude(ll.latitude, zoom);
-
-    const double deltaY = (final.height / 2) * metersPerPixel;
-    const double deltaX = (final.width  / 2) * metersPerPixel;
-
-    sw = { center.northing - deltaY, center.easting - deltaX };
-    ne = { center.northing + deltaY, center.easting + deltaX };
-}
-
-void Transform::getViewportBoundsLatLng(LatLng &sw, LatLng &ne) const {
-    ProjectedMeters projectedSW, projectedNE;
-
-    getViewportBoundsMeters(projectedSW, projectedNE);
-
-    uv::readlock lock(mtx);
-
-    sw = latLngForProjectedMeters(projectedSW);
-    ne = latLngForProjectedMeters(projectedNE);
-}
-
 double Transform::getMetersPerPixelAtLatitude(const double lat, const double zoom) const {
     const double mapPixelWidthAtZoom = std::pow(2.0, zoom) * util::tileSize;
     const double constrainedLatitude = std::fmin(std::fmax(lat, -LATITUDE_MAX), LATITUDE_MAX);

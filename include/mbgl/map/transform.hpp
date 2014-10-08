@@ -59,8 +59,6 @@ public:
     // Projection
     void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;
     void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const;
-    void getViewportBoundsMeters(ProjectedMeters &nw, ProjectedMeters &se) const;
-    void getViewportBoundsLatLng(LatLng &sw, LatLng &ne) const;
     double getMetersPerPixelAtLatitude(const double lat, const double zoom) const;
     const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const;
     const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const;
