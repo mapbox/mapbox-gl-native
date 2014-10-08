@@ -103,7 +103,7 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
             } else if (code == 200) {
                 baton->type = HTTPResponseType::Successful;
             } else {
-                assert(!"code must be either 200 or 304");
+                baton->type = HTTPResponseType::PermanentError;
             }
 
             NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
