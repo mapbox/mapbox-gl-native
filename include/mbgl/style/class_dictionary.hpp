@@ -14,17 +14,22 @@ enum class ClassID : uint32_t {
 };
 
 class ClassDictionary {
+private:
+    ClassDictionary();
+
 public:
+    static ClassDictionary &Get();
+
     // Returns an ID for a class name. If the class name does not yet have an ID, one is
     // auto-generated and stored for future reference.
-    static ClassID Lookup(const std::string &class_name);
+    ClassID lookup(const std::string &class_name);
 
     // Returns either Fallback, Default or Named, depending on the type of the class id.
-    static ClassID Normalize(ClassID id);
+    ClassID normalize(ClassID id);
 
 private:
-    static std::unordered_map<std::string, ClassID> store;
-    static uint32_t offset;
+    std::unordered_map<std::string, ClassID> store = { { "", ClassID::Default } };
+    uint32_t offset = 0;
 };
 
 }
