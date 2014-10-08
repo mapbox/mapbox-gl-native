@@ -2,6 +2,8 @@
 #include "headless_display.hpp"
 
 #include <stdexcept>
+#include <sstream>
+#include <string>
 
 namespace mbgl {
 
@@ -18,14 +20,12 @@ void HeadlessView::createContext() {
 #if MBGL_USE_CGL
     CGLError error = CGLCreateContext(display_->pixelFormat, NULL, &gl_context);
     if (error) {
-        fprintf(stderr, "Error creating GL context object\n");
-        return;
+        throw std::runtime_error("Error creating GL context object\n");
     }
 
     error = CGLEnable(gl_context, kCGLCEMPEngine);
     if (error != kCGLNoError ) {
-        fprintf(stderr, "Error enabling OpenGL multithreading\n");
-        return;
+        throw std::runtime_error("Error enabling OpenGL multithreading\n");
     }
 #endif
 
@@ -69,18 +69,18 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
     GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 
     if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-        fprintf(stderr, "Couldn't create framebuffer: ");
+        std::stringstream error("Couldn't create framebuffer: ");
         switch (status) {
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT: fprintf(stderr, "incomplete attachment\n"); break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT: fprintf(stderr, "incomplete missing attachment\n"); break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT: fprintf(stderr, "incomplete dimensions\n"); break;
-            case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT: fprintf(stderr, "incomplete formats\n"); break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: fprintf(stderr, "incomplete draw buffer\n"); break;
-            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT: fprintf(stderr, "incomplete read buffer\n"); break;
-            case GL_FRAMEBUFFER_UNSUPPORTED: fprintf(stderr, "unsupported\n"); break;
-            default: fprintf(stderr, "other\n"); break;
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT: (error << "incomplete attachment\n"); break;
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT: error << "incomplete missing attachment\n"; break;
+            case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT: error << "incomplete dimensions\n"; break;
+            case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT: error << "incomplete formats\n"; break;
+            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: error << "incomplete draw buffer\n"; break;
+            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT: error << "incomplete read buffer\n"; break;
+            case GL_FRAMEBUFFER_UNSUPPORTED: error << "unsupported\n"; break;
+            default: error << "other\n"; break;
         }
-        return;
+        throw std::runtime_error(error.str());
     }
 
     make_inactive();
@@ -151,13 +151,13 @@ void HeadlessView::make_active() {
 #if MBGL_USE_CGL
     CGLError error = CGLSetCurrentContext(gl_context);
     if (error) {
-        fprintf(stderr, "Switching OpenGL context failed\n");
+        throw std::runtime_error("Switching OpenGL context failed\n");
     }
 #endif
 
 #if MBGL_USE_GLX
     if (!glXMakeCurrent(x_display, glx_pixmap, gl_context)) {
-        fprintf(stderr, "Switching OpenGL context failed\n");
+        throw std::runtime_error("Switching OpenGL context failed\n");
     }
 #endif
 }
@@ -166,13 +166,13 @@ void HeadlessView::make_inactive() {
 #if MBGL_USE_CGL
     CGLError error = CGLSetCurrentContext(nullptr);
     if (error) {
-        fprintf(stderr, "Removing OpenGL context failed\n");
+        throw std::runtime_error("Removing OpenGL context failed\n");
     }
 #endif
 
 #if MBGL_USE_GLX
     if (!glXMakeCurrent(x_display, 0, NULL)) {
-        fprintf(stderr, "Removing OpenGL context failed\n");
+        throw std::runtime_error("Removing OpenGL context failed\n");
     }
 #endif
 }
