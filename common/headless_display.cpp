@@ -24,6 +24,10 @@ HeadlessDisplay::HeadlessDisplay() {
 #endif
 
 #if MBGL_USE_GLX
+    if (!XInitThreads()) {
+        throw std::runtime_error("Failed to XInitThreads");
+    }
+    
     x_display = XOpenDisplay(0);
 
     if (x_display == nullptr) {
