@@ -253,7 +253,7 @@ int handle_socket(CURL *handle, curl_socket_t sockfd, int action, void *, void *
     return 0;
 }
 
-void on_timeout(uv_timer_t *) {
+void on_timeout(uv_timer_t *, int status) {
     int running_handles;
     CURLMcode error = curl_multi_socket_action(multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
     if (error != CURLM_OK) {
@@ -442,7 +442,6 @@ void stop_request(void *const ptr) {
 
 void create_thread() {
     uv_mutex_init(&share_mutex);
-    uv_loop_init(&loop);
     uv_messenger_init(&loop, &start_messenger, start_request);
     uv_messenger_init(&loop, &stop_messenger, stop_request);
     uv_thread_create(&thread, thread_init, nullptr);
