@@ -67,7 +67,7 @@ export CXX11=true
 
 if [ ${UNAME} = 'Darwin' ]; then
 
-if [[ -n ${TRAVIS:-} ]]; then
+if [[ ${TRAVIS:-} ]]; then
     if aws s3 cp s3://${AWS_S3_BUCKET}/dependencies/build-cpp11-libcpp-osx_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then
         if aws s3 cp s3://${AWS_S3_BUCKET}/dependencies/build-cpp11-libcpp-ios_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then
             rm -rf out/build-cpp11-libcpp-x86_64-macosx
@@ -136,7 +136,7 @@ export LIBUV_VERSION=0.10.28
 patch -p0 --forward < patches/curl-ios.diff || true
 echo "NOTE: One patch FAILURE is expected. The other should have been applied or ignored."
 
-if [[ -n ${TRAVIS:-} && ${AWS_ACCESS_KEY_ID} && ${AWS_SECRET_ACCESS_KEY} ]] ; then
+if [[ ${TRAVIS:-} && ${AWS_ACCESS_KEY_ID:-} && ${AWS_SECRET_ACCESS_KEY:-} ]] ; then
     tar -zcf out/build-cpp11-libcpp-ios_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libcpp-universal
     aws s3 cp --acl public-read out/build-cpp11-libcpp-ios_${MP_HASH}_${DIR_HASH}.tar.gz s3://${AWS_S3_BUCKET}/dependencies/
     tar -zcf out/build-cpp11-libcpp-osx_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libcpp-x86_64-macosx
@@ -152,7 +152,7 @@ cd ../../
 
 elif [ ${UNAME} = 'Linux' ]; then
 
-if [[ -n ${TRAVIS:-} ]]; then
+if [[ ${TRAVIS:-} ]]; then
     if aws s3 cp s3://${AWS_S3_BUCKET}/dependencies/build-cpp11-libstdcpp-gcc-x86_64-linux_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then
         rm -rf out/build-cpp11-libstdcpp-gcc-x86_64-linux
         tar -xzf out/build-cpp11-libstdcpp-gcc-x86_64-linux_${MP_HASH}_${DIR_HASH}.tar.gz
@@ -169,7 +169,7 @@ export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
 
-if [[ -n ${TRAVIS:-} && ${AWS_ACCESS_KEY_ID} && ${AWS_SECRET_ACCESS_KEY} ]] ; then
+if [[ ${TRAVIS:-} && ${AWS_ACCESS_KEY_ID:-} && ${AWS_SECRET_ACCESS_KEY:-} ]] ; then
     if ! tar --compare -zf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ; then
         tar -zcf out/build-cpp11-libstdcpp-gcc-x86_64-linux_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libstdcpp-gcc-x86_64-linux
         aws s3 cp --acl public-read out/build-cpp11-libstdcpp-gcc-x86_64-linux_${MP_HASH}_${DIR_HASH}.tar.gz s3://${AWS_S3_BUCKET}/dependencies/
