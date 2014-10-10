@@ -27,7 +27,7 @@ public:
 
     void parse(JSVal document);
 
-    std::shared_ptr<StyleLayerGroup> getLayers() {
+    util::ptr<StyleLayerGroup> getLayers() {
         return root;
     }
 
@@ -46,14 +46,14 @@ private:
     void parseSources(JSVal value);
 
     std::unique_ptr<StyleLayerGroup> createLayers(JSVal value);
-    std::shared_ptr<StyleLayer> createLayer(JSVal value);
+    util::ptr<StyleLayer> createLayer(JSVal value);
     void parseLayers();
-    void parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair);
+    void parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair);
     void parseStyles(JSVal value, std::map<ClassID, ClassProperties> &styles);
     void parseStyle(JSVal, ClassProperties &properties);
-    void parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer);
-    void parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer);
-    void parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer);
+    void parseReference(JSVal value, util::ptr<StyleLayer> &layer);
+    void parseBucket(JSVal value, util::ptr<StyleLayer> &layer);
+    void parseRender(JSVal value, util::ptr<StyleLayer> &layer);
     void parseSprite(JSVal value);
     void parseGlyphURL(JSVal value);
 
@@ -94,13 +94,13 @@ private:
 private:
     std::unordered_map<std::string, const rapidjson::Value *> constants;
 
-    std::unordered_map<std::string, const std::shared_ptr<StyleSource>> sources;
+    std::unordered_map<std::string, const util::ptr<StyleSource>> sources;
 
     // This stores the root layer.
-    std::shared_ptr<StyleLayerGroup> root;
+    util::ptr<StyleLayerGroup> root;
 
     // This maps ids to Layer objects, with all items being at the root level.
-    std::unordered_map<std::string, std::pair<JSVal, std::shared_ptr<StyleLayer>>> layers;
+    std::unordered_map<std::string, std::pair<JSVal, util::ptr<StyleLayer>>> layers;
 
     // Store a stack of layers we're parsing right now. This is to prevent reference cycles.
     std::forward_list<StyleLayer *> stack;

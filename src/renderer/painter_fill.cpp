@@ -10,7 +10,7 @@
 
 using namespace mbgl;
 
-void Painter::renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
+void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
     // Abort early.
     if (!bucket.hasData()) return;
 

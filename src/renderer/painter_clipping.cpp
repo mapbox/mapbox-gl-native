@@ -6,7 +6,7 @@
 
 using namespace mbgl;
 
-void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &sources) {
+void Painter::drawClippingMasks(const std::set<util::ptr<StyleSource>> &sources) {
     gl::group group("clipping masks");
 
     useProgram(plainShader->program);
@@ -17,7 +17,7 @@ void Painter::drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &so
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
 
-    for (const std::shared_ptr<StyleSource> &source : sources) {
+    for (const util::ptr<StyleSource> &source : sources) {
         source->source->drawClippingMasks(*this);
     }
 

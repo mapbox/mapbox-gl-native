@@ -26,14 +26,14 @@ class VectorTileData : public TileData {
     friend class TileParser;
 
 public:
-    VectorTileData(Tile::ID id, Map &map, const SourceInfo &source);
+    VectorTileData(Tile::ID id, Map &map, const util::ptr<SourceInfo> &source);
     ~VectorTileData();
 
     virtual void beforeParse();
     virtual void parse();
     virtual void afterParse();
-    virtual void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix);
-    virtual bool hasData(std::shared_ptr<StyleLayer> layer_desc) const;
+    virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix);
+    virtual bool hasData(util::ptr<StyleLayer> layer_desc) const;
 
 protected:
     // Holds the actual geometries in this tile.

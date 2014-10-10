@@ -6,6 +6,7 @@
 
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/uv.hpp>
+#include <mbgl/util/ptr.hpp>
 
 #include <cstdint>
 #include <map>
@@ -13,7 +14,6 @@
 #include <unordered_map>
 #include <vector>
 #include <set>
-#include <memory>
 
 namespace mbgl {
 
@@ -49,7 +49,7 @@ public:
     const std::string &getSpriteURL() const;
 
 public:
-    std::shared_ptr<StyleLayerGroup> layers;
+    util::ptr<StyleLayerGroup> layers;
     std::vector<std::string> appliedClasses;
     std::string glyph_url;
 

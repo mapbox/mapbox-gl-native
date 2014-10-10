@@ -19,11 +19,10 @@
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/texturepool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
-#include <mbgl/util/filesource.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <algorithm>
-#include <memory>
 #include <iostream>
 
 #define _USE_MATH_DEFINES
@@ -34,12 +33,15 @@ using namespace mbgl;
 Map::Map(View& view)
     : loop(std::make_shared<uv::loop>()),
       thread(std::make_unique<uv::thread>()),
+      async_terminate(new uv_async_t()),
+      async_render(new uv_async_t()),
+      async_cleanup(new uv_async_t()),
       view(view),
+#ifndef NDEBUG
+      main_thread(uv_thread_self()),
+#endif
       transform(view),
-      fileSource(std::make_shared<FileSource>()),
-      style(std::make_shared<Style>()),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
-      glyphStore(std::make_shared<GlyphStore>(fileSource)),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
       painter(*this) {
@@ -53,48 +55,92 @@ Map::Map(View& view)
 }
 
 Map::~Map() {
-    // Clear the style first before the rest of the constructor deletes members of this object.
-    // This is required because members of the style reference the Map object in their destructors.
-    style.reset();
-
     if (async) {
         stop();
     }
+
+    // Explicitly reset all pointers.
+    texturepool.reset();
+    sprite.reset();
+    spriteAtlas.reset();
+    glyphStore.reset();
+    glyphAtlas.reset();
+    style.reset();
+    fileSource.reset();
+    workers.reset();
+
+    uv_run(**loop, UV_RUN_DEFAULT);
+}
+
+uv::worker &Map::getWorker() {
+    if (!workers) {
+        workers = std::make_unique<uv::worker>(**loop, 4, "Tile Worker");
+    }
+    return *workers;
 }
 
 void Map::start() {
+    assert(uv_thread_self() == main_thread);
+    assert(!async);
+
     // When starting map rendering in another thread, we perform async/continuously
     // updated rendering. Only in these cases, we attach the async handlers.
     async = true;
 
-    // Setup async notifications
-    async_terminate = new uv_async_t();
-    uv_async_init(**loop, async_terminate, terminate);
-    async_terminate->data = **loop;
+    // Reset the flag.
+    is_stopped = false;
 
-    async_render = new uv_async_t();
-    uv_async_init(**loop, async_render, render);
+    // Setup async notifications
+    uv_async_init(**loop, async_terminate.get(), terminate);
+    async_terminate->data = this;
+
+    uv_async_init(**loop, async_render.get(), render);
     async_render->data = this;
 
-    async_cleanup = new uv_async_t();
-    uv_async_init(**loop, async_cleanup, cleanup);
+    uv_async_init(**loop, async_cleanup.get(), cleanup);
     async_cleanup->data = this;
 
     uv_thread_create(*thread, [](void *arg) {
         Map *map = static_cast<Map *>(arg);
+#ifndef NDEBUG
+        map->map_thread = uv_thread_self();
+#endif
+#ifdef __APPLE__
+        pthread_setname_np("Map");
+#endif
         map->run();
+#ifndef NDEBUG
+        map->map_thread = -1;
+#endif
+
+        // Make sure that the stop() function knows when to stop invoking the callback function.
+        map->is_stopped = true;
+        map->view.notify();
     }, this);
 }
 
-void Map::stop() {
-    if (async_terminate != nullptr) {
-        uv_async_send(async_terminate);
+void Map::stop(stop_callback cb, void *data) {
+    assert(uv_thread_self() == main_thread);
+    assert(main_thread != map_thread);
+    assert(async);
+
+    uv_async_send(async_terminate.get());
+
+    if (cb) {
+        // Wait until the render thread stopped. We are using this construct instead of plainly
+        // relying on the thread_join because the system might need to run things in the current
+        // thread that is required for the render thread to terminate correctly. This is for example
+        // the case with Cocoa's NSURLRequest. Otherwise, we will eventually deadlock because this
+        // thread (== main thread) is blocked. The callback function should use an efficient waiting
+        // function to avoid a busy waiting loop.
+        while (!is_stopped) {
+            cb(data);
+        }
     }
 
+    // If a callback function was provided, this should return immediately because the thread has
+    // already finished executing.
     uv_thread_join(*thread);
-
-    // Run the event loop once to make sure our async delete handlers are called.
-    uv_run(**loop, UV_RUN_ONCE);
 
     async = false;
 }
@@ -104,22 +150,35 @@ void Map::delete_async(uv_handle_t *handle, int status) {
 }
 
 void Map::run() {
+#ifndef NDEBUG
+    if (!async) {
+        map_thread = main_thread;
+    }
+#endif
+    assert(uv_thread_self() == map_thread);
+
     setup();
     prepare();
     uv_run(**loop, UV_RUN_DEFAULT);
+
+    // Run the event loop once more to make sure our async delete handlers are called.
+    uv_run(**loop, UV_RUN_ONCE);
 
     // If the map rendering wasn't started asynchronously, we perform one render
     // *after* all events have been processed.
     if (!async) {
         render();
+#ifndef NDEBUG
+        map_thread = -1;
+#endif
     }
 }
 
 void Map::rerender() {
     // We only send render events if we want to continuously update the map
     // (== async rendering).
-    if (async && async_render != nullptr) {
-        uv_async_send(async_render);
+    if (async) {
+        uv_async_send(async_render.get());
     }
 }
 
@@ -139,7 +198,7 @@ void Map::swapped() {
 
 void Map::cleanup() {
     if (async_cleanup != nullptr) {
-        uv_async_send(async_cleanup);
+        uv_async_send(async_cleanup.get());
     }
 }
 
@@ -153,9 +212,20 @@ void Map::terminate() {
     painter.terminate();
 }
 
+void Map::setReachability(bool reachable) {
+    // Note: This function may be called from *any* thread.
+    if (reachable) {
+        if (fileSource) {
+            fileSource->prepare([&]() {
+                fileSource->retryAllPending();
+            });
+        }
+    }
+}
+
 void Map::render(uv_async_t *async, int status) {
     Map *map = static_cast<Map *>(async->data);
-
+    assert(uv_thread_self() == map->map_thread);
 
     if (map->state.hasSize()) {
         if (map->is_rendered.test_and_set() == false) {
@@ -175,44 +245,48 @@ void Map::render(uv_async_t *async, int status) {
 
 void Map::terminate(uv_async_t *async, int status) {
     // Closes all open handles on the loop. This means that the loop will automatically terminate.
-    uv_loop_t *loop = static_cast<uv_loop_t *>(async->data);
-    uv_walk(loop, [](uv_handle_t *handle, void */*arg*/) {
-        if (!uv_is_closing(handle)) {
-            uv_close(handle, NULL);
-        }
-    }, NULL);
+    Map *map = static_cast<Map *>(async->data);
+    assert(uv_thread_self() == map->map_thread);
+
+    // Remove all of these to make sure they are destructed in the correct thread.
+    map->glyphStore.reset();
+    map->fileSource.reset();
+    map->style.reset();
+    map->workers.reset();
+    map->activeSources.clear();
+
+    uv_close((uv_handle_t *)map->async_cleanup.get(), nullptr);
+    uv_close((uv_handle_t *)map->async_render.get(), nullptr);
+    uv_close((uv_handle_t *)map->async_terminate.get(), nullptr);
 }
 
 #pragma mark - Setup
 
 void Map::setup() {
+    assert(uv_thread_self() == map_thread);
     view.make_active();
     painter.setup();
     view.make_inactive();
 }
 
 void Map::setStyleURL(const std::string &url) {
-    fileSource->load(ResourceType::JSON, url, [&](platform::Response *res) {
-        if (res->code == 200) {
-            // Calculate the base
-            const size_t pos = url.rfind('/');
-            std::string base = "";
-            if (pos != std::string::npos) {
-                base = url.substr(0, pos + 1);
-            }
-
-            this->setStyleJSON(res->body, base);
-        } else {
-            Log::Error(Event::Setup, "loading style failed: %d (%s)", res->code, res->error_message.c_str());
-        }
-    }, loop);
+    // TODO: Make threadsafe.
+    styleURL = url;
 }
 
 
 void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
+    // TODO: Make threadsafe.
     styleJSON.swap(newStyleJSON);
     sprite.reset();
+    if (!style) {
+        style = std::make_shared<Style>();
+    }
     style->loadJSON((const uint8_t *)styleJSON.c_str());
+    if (!fileSource) {
+        fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
+        glyphStore = std::make_shared<GlyphStore>(fileSource);
+    }
     fileSource->setBase(base);
     glyphStore->setURL(util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken()));
     update();
@@ -223,6 +297,7 @@ std::string Map::getStyleJSON() const {
 }
 
 void Map::setAccessToken(std::string access_token) {
+    // TODO: Make threadsafe.
     accessToken.swap(access_token);
 }
 
@@ -230,7 +305,7 @@ std::string Map::getAccessToken() const {
     return accessToken;
 }
 
-std::shared_ptr<Sprite> Map::getSprite() {
+util::ptr<Sprite> Map::getSprite() {
     const float pixelRatio = state.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
     if (!sprite || sprite->pixelRatio != pixelRatio) {
@@ -460,8 +535,10 @@ void Map::setDefaultTransitionDuration(uint64_t duration_milliseconds) {
 }
 
 void Map::updateSources() {
+    assert(uv_thread_self() == map_thread);
+
     // First, disable all existing sources.
-    for (const std::shared_ptr<StyleSource> &source : activeSources) {
+    for (const util::ptr<StyleSource> &source : activeSources) {
         source->enabled = false;
     }
 
@@ -469,7 +546,7 @@ void Map::updateSources() {
     updateSources(style->layers);
 
     // Then, construct or destroy the actual source object, depending on enabled state.
-    for (const std::shared_ptr<StyleSource> &style_source : activeSources) {
+    for (const util::ptr<StyleSource> &style_source : activeSources) {
         if (style_source->enabled) {
             if (!style_source->source) {
                 style_source->source = std::make_shared<Source>(style_source->info);
@@ -481,20 +558,20 @@ void Map::updateSources() {
     }
 
     // Finally, remove all sources that are disabled.
-    util::erase_if(activeSources, [](std::shared_ptr<StyleSource> source){
+    util::erase_if(activeSources, [](util::ptr<StyleSource> source){
         return !source->enabled;
     });
 }
 
-const std::set<std::shared_ptr<StyleSource>> Map::getActiveSources() const {
+const std::set<util::ptr<StyleSource>> Map::getActiveSources() const {
     return activeSources;
 }
 
-void Map::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
+void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
     if (!group) {
         return;
     }
-    for (const std::shared_ptr<StyleLayer> &layer : group->layers) {
+    for (const util::ptr<StyleLayer> &layer : group->layers) {
         if (!layer) continue;
         if (layer->bucket) {
             if (layer->bucket->style_source) {
@@ -507,7 +584,7 @@ void Map::updateSources(const std::shared_ptr<StyleLayerGroup> &group) {
 }
 
 void Map::updateTiles() {
-    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
+    for (const util::ptr<StyleSource> &source : getActiveSources()) {
         source->source->update(*this);
     }
 }
@@ -515,13 +592,37 @@ void Map::updateTiles() {
 void Map::updateRenderState() {
     // Update all clipping IDs.
     ClipIDGenerator generator;
-    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
+    for (const util::ptr<StyleSource> &source : getActiveSources()) {
         generator.update(source->source->getLoadedTiles());
         source->source->updateMatrices(painter.projMatrix, state);
     }
 }
 
 void Map::prepare() {
+    if (!fileSource) {
+        fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
+        glyphStore = std::make_shared<GlyphStore>(fileSource);
+    }
+
+    if (!style) {
+        style = std::make_shared<Style>();
+
+        fileSource->request(ResourceType::JSON, styleURL)->onload([&](const Response &res) {
+            if (res.code == 200) {
+                // Calculate the base
+                const size_t pos = styleURL.rfind('/');
+                std::string base = "";
+                if (pos != std::string::npos) {
+                    base = styleURL.substr(0, pos + 1);
+                }
+
+                setStyleJSON(res.data, base);
+            } else {
+                Log::Error(Event::Setup, "loading style failed: %ld (%s)", res.code, res.message.c_str());
+            }
+        });
+    }
+
     // Update transform transitions.
     animationTime = util::now();
     if (transform.needsTransition()) {
@@ -568,7 +669,7 @@ void Map::render() {
     // This guarantees that we have at least one function per tile called.
     // When only rendering layers via the stylesheet, it's possible that we don't
     // ever visit a tile during rendering.
-    for (const std::shared_ptr<StyleSource> &source : getActiveSources()) {
+    for (const util::ptr<StyleSource> &source : getActiveSources()) {
         source->source->finishRender(painter);
     }
 
@@ -582,7 +683,7 @@ void Map::render() {
     view.make_inactive();
 }
 
-void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
+void Map::renderLayers(util::ptr<StyleLayerGroup> group) {
     if (!group) {
         // Make sure that we actually do have a layer group.
         return;
@@ -625,7 +726,7 @@ void Map::renderLayers(std::shared_ptr<StyleLayerGroup> group) {
     }
 }
 
-void Map::renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id, const mat4* matrix) {
+void Map::renderLayer(util::ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id, const mat4* matrix) {
     if (layer_desc->type == StyleLayerType::Background) {
         // This layer defines a background color/image.
 

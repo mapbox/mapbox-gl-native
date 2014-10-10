@@ -186,7 +186,9 @@ int GLFWView::run() {
         glfwWaitEvents();
     }
 
-    map->stop();
+    map->stop([](void *) {
+        glfwWaitEvents();
+    });
 
     return 0;
 }
@@ -197,6 +199,10 @@ void GLFWView::make_active() {
 
 void GLFWView::make_inactive() {
     glfwMakeContextCurrent(nullptr);
+}
+
+void GLFWView::notify() {
+    glfwPostEmptyEvent();
 }
 
 void GLFWView::swap() {

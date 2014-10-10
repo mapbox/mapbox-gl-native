@@ -38,19 +38,26 @@ namespace mbgl {
 TileParser::~TileParser() = default;
 
 TileParser::TileParser(const std::string &data, VectorTileData &tile,
-                       const std::shared_ptr<const Style> &style,
-                       const std::shared_ptr<GlyphAtlas> &glyphAtlas,
-                       const std::shared_ptr<GlyphStore> &glyphStore,
-                       const std::shared_ptr<SpriteAtlas> &spriteAtlas,
-                       const std::shared_ptr<Sprite> &sprite)
+                       const util::ptr<const Style> &style_,
+                       const util::ptr<GlyphAtlas> &glyphAtlas_,
+                       const util::ptr<GlyphStore> &glyphStore_,
+                       const util::ptr<SpriteAtlas> &spriteAtlas_,
+                       const util::ptr<Sprite> &sprite_)
     : vector_data(pbf((const uint8_t *)data.data(), data.size())),
       tile(tile),
-      style(style),
-      glyphAtlas(glyphAtlas),
-      glyphStore(glyphStore),
-      spriteAtlas(spriteAtlas),
-      sprite(sprite),
-      collision(std::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
+      style(style_),
+      glyphAtlas(glyphAtlas_),
+      glyphStore(glyphStore_),
+      spriteAtlas(spriteAtlas_),
+      sprite(sprite_),
+      collision(std::make_unique<Collision>(tile.id.z, 4096, tile.source->tile_size, tile.depth)) {
+    assert(&tile != nullptr);
+    assert(style);
+    assert(glyphAtlas);
+    assert(glyphStore);
+    assert(spriteAtlas);
+    assert(sprite);
+    assert(collision);
 }
 
 void TileParser::parse() {
@@ -59,12 +66,12 @@ void TileParser::parse() {
 
 bool TileParser::obsolete() const { return tile.state == TileData::State::obsolete; }
 
-void TileParser::parseStyleLayers(std::shared_ptr<StyleLayerGroup> group) {
+void TileParser::parseStyleLayers(util::ptr<StyleLayerGroup> group) {
     if (!group) {
         return;
     }
 
-    for (const std::shared_ptr<StyleLayer> &layer_desc : group->layers) {
+    for (const util::ptr<StyleLayer> &layer_desc : group->layers) {
         // Cancel early when parsing.
         if (obsolete()) {
             return;
@@ -96,14 +103,14 @@ void TileParser::parseStyleLayers(std::shared_ptr<StyleLayerGroup> group) {
     }
 }
 
-std::unique_ptr<Bucket> TileParser::createBucket(std::shared_ptr<StyleBucket> bucket_desc) {
+std::unique_ptr<Bucket> TileParser::createBucket(util::ptr<StyleBucket> bucket_desc) {
     if (!bucket_desc) {
         fprintf(stderr, "missing bucket desc\n");
         return nullptr;
     }
 
     // Skip this bucket if we are to not render this
-    if (tile.id.z < std::floor(bucket_desc->min_zoom) && std::floor(bucket_desc->min_zoom) < tile.source.max_zoom) return nullptr;
+    if (tile.id.z < std::floor(bucket_desc->min_zoom) && std::floor(bucket_desc->min_zoom) < tile.source->max_zoom) return nullptr;
     if (tile.id.z >= std::ceil(bucket_desc->max_zoom)) return nullptr;
 
     auto layer_it = vector_data.layers.find(bucket_desc->source_layer);
@@ -157,7 +164,7 @@ std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& laye
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createRasterBucket(const std::shared_ptr<Texturepool> &texturepool, const StyleBucketRaster &raster) {
+std::unique_ptr<Bucket> TileParser::createRasterBucket(const util::ptr<Texturepool> &texturepool, const StyleBucketRaster &raster) {
     std::unique_ptr<RasterBucket> bucket = std::make_unique<RasterBucket>(texturepool, raster);
     return obsolete() ? nullptr : std::move(bucket);
 }

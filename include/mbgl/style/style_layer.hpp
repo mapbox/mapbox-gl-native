@@ -6,8 +6,9 @@
 #include <mbgl/style/style_properties.hpp>
 #include <mbgl/style/applied_class_properties.hpp>
 
+#include <mbgl/util/ptr.hpp>
+
 #include <vector>
-#include <memory>
 #include <string>
 #include <map>
 #include <set>
@@ -64,7 +65,7 @@ public:
 
     // Bucket information, telling the renderer how to generate the geometries
     // for this layer (feature property filters, tessellation instructions, ...).
-    std::shared_ptr<StyleBucket> bucket;
+    util::ptr<StyleBucket> bucket;
 
     // Contains all style classes that can be applied to this layer.
     const std::map<ClassID, ClassProperties> styles;
@@ -80,7 +81,7 @@ public:
     StyleProperties properties;
 
     // Child layer array (if this layer has child layers).
-    std::shared_ptr<StyleLayerGroup> layers;
+    util::ptr<StyleLayerGroup> layers;
 };
 
 }

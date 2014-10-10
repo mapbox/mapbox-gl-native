@@ -7,11 +7,11 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/uv.hpp>
+#include <mbgl/util/ptr.hpp>
 
 #include <cstdint>
 #include <atomic>
 #include <iosfwd>
-#include <memory>
 #include <set>
 #include <vector>
 
@@ -31,21 +31,31 @@ class FileSource;
 class View;
 
 class Map : private util::noncopyable {
+    typedef void (*stop_callback)(void *);
+
 public:
     explicit Map(View &view);
     ~Map();
 
-    // Start/stop the map render thread
+    // Start the map render thread. It is asynchronous.
     void start();
-    void stop();
 
-    // Runs the map event loop.
+    // Stop the map render thread. This call will block until the map rendering thread stopped.
+    // The optional callback function will be invoked repeatedly until the map thread is stopped.
+    // The callback function should wait until it is woken up again by view.notify(), otherwise
+    // this will be a busy waiting loop. The optional data parameter will be passed to the callback
+    // function.
+    void stop(stop_callback cb = nullptr, void *data = nullptr);
+
+    // Runs the map event loop. ONLY run this function when you want to get render a single frame
+    // with this map object. It will *not* spawn a separate thread and instead block until the
+    // frame is completely rendered.
     void run();
 
     // Triggers a lazy rerender: only performs a render when the map is not clean.
     void rerender();
 
-    void renderLayer(std::shared_ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
+    void renderLayer(util::ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
 
     // Forces a map update: always triggers a rerender.
     void update();
@@ -65,7 +75,7 @@ public:
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
 
     // Styling
-    const std::set<std::shared_ptr<StyleSource>> getActiveSources() const;
+    const std::set<util::ptr<StyleSource>> getActiveSources() const;
     void setAppliedClasses(const std::vector<std::string> &classes);
     void toggleClass(const std::string &name);
     const std::vector<std::string> &getAppliedClasses() const;
@@ -116,16 +126,20 @@ public:
     void toggleDebug();
     bool getDebug() const;
 
+    // Call this when the network reachability changed.
+    void setReachability(bool status);
+
 public:
     inline const TransformState &getState() const { return state; }
-    inline std::shared_ptr<FileSource> getFileSource() const { return fileSource; }
-    inline std::shared_ptr<Style> getStyle() const { return style; }
-    inline std::shared_ptr<GlyphAtlas> getGlyphAtlas() { return glyphAtlas; }
-    inline std::shared_ptr<GlyphStore> getGlyphStore() { return glyphStore; }
-    inline std::shared_ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
-    std::shared_ptr<Sprite> getSprite();
-    inline std::shared_ptr<Texturepool> getTexturepool() { return texturepool; }
-    inline std::shared_ptr<uv::loop> getLoop() { return loop; }
+    inline util::ptr<FileSource> getFileSource() const { return fileSource; }
+    inline util::ptr<Style> getStyle() const { return style; }
+    inline util::ptr<GlyphAtlas> getGlyphAtlas() { return glyphAtlas; }
+    inline util::ptr<GlyphStore> getGlyphStore() { return glyphStore; }
+    inline util::ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
+    util::ptr<Sprite> getSprite();
+    inline util::ptr<Texturepool> getTexturepool() { return texturepool; }
+    inline util::ptr<uv::loop> getLoop() { return loop; }
+    uv::worker &getWorker();
     inline timestamp getAnimationTime() const { return animationTime; }
     inline timestamp getTime() const { return animationTime; }
     void updateTiles();
@@ -141,7 +155,7 @@ private:
     void setup();
 
     void updateSources();
-    void updateSources(const std::shared_ptr<StyleLayerGroup> &group);
+    void updateSources(const util::ptr<StyleLayerGroup> &group);
 
     void updateRenderState();
 
@@ -154,15 +168,16 @@ private:
 
     // Unconditionally performs a render with the current map state.
     void render();
-    void renderLayers(std::shared_ptr<StyleLayerGroup> group);
+    void renderLayers(util::ptr<StyleLayerGroup> group);
 
 private:
     bool async = false;
-    std::shared_ptr<uv::loop> loop;
+    util::ptr<uv::loop> loop;
+    std::unique_ptr<uv::worker> workers;
     std::unique_ptr<uv::thread> thread;
-    uv_async_t *async_terminate = nullptr;
-    uv_async_t *async_render = nullptr;
-    uv_async_t *async_cleanup = nullptr;
+    std::unique_ptr<uv_async_t> async_terminate;
+    std::unique_ptr<uv_async_t> async_render;
+    std::unique_ptr<uv_async_t> async_cleanup;
 
 private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
@@ -177,24 +192,33 @@ private:
     // ready for rendering.
     std::atomic_flag is_rendered = ATOMIC_FLAG_INIT;
 
+    // Stores whether the map thread has been stopped already.
+    std::atomic_bool is_stopped;
+
 public:
     View &view;
 
 private:
+#ifndef NDEBUG
+    const unsigned long main_thread;
+    unsigned long map_thread = -1;
+#endif
+
     Transform transform;
     TransformState state;
 
-    std::shared_ptr<FileSource> fileSource;
+    util::ptr<FileSource> fileSource;
 
-    std::shared_ptr<Style> style;
-    std::shared_ptr<GlyphAtlas> glyphAtlas;
-    std::shared_ptr<GlyphStore> glyphStore;
-    std::shared_ptr<SpriteAtlas> spriteAtlas;
-    std::shared_ptr<Sprite> sprite;
-    std::shared_ptr<Texturepool> texturepool;
+    util::ptr<Style> style;
+    util::ptr<GlyphAtlas> glyphAtlas;
+    util::ptr<GlyphStore> glyphStore;
+    util::ptr<SpriteAtlas> spriteAtlas;
+    util::ptr<Sprite> sprite;
+    util::ptr<Texturepool> texturepool;
 
     Painter painter;
 
+    std::string styleURL;
     std::string styleJSON = "";
     std::string accessToken = "";
 
@@ -203,7 +227,7 @@ private:
 
     int indent = 0;
 
-    std::set<std::shared_ptr<StyleSource>> activeSources;
+    std::set<util::ptr<StyleSource>> activeSources;
 
 };
 

@@ -28,6 +28,7 @@ public:
     void resize(uint16_t width, uint16_t height, float pixelRatio);
     const std::unique_ptr<uint32_t[]> readPixels();
 
+    void notify();
     void notify_map_change(MapChange change, timestamp delay = 0);
     void make_active();
     void make_inactive();

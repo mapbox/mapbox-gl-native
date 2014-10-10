@@ -15,7 +15,8 @@
         '../common/platform_default.cpp',
         '../common/glfw_view.hpp',
         '../common/glfw_view.cpp',
-        '../common/curl_request.cpp',
+        '../common/http_request_baton_curl.cpp',
+        '../common/linux.cpp',
         '../common/stderr_log.hpp',
         '../common/stderr_log.cpp',
       ],
@@ -32,7 +33,6 @@
             ],
             'OTHER_LDFLAGS': [
               '<@(glfw3_libraries)',
-              '<@(curl_libraries)',
             ],
           }
         },
@@ -46,7 +46,6 @@
           'link_settings': {
             'libraries': [
               '<@(glfw3_libraries)',
-              '<@(curl_libraries)',
               '-lboost_regex'
             ],
           },

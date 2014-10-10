@@ -45,6 +45,8 @@ public:
         return 0;
     }
 
+    virtual void notify() = 0;
+
     // Notifies a watcher of map x/y/scale/rotation changes.
     // Must only be called from the same thread that caused the change.
     // Must not be called from the render thread.

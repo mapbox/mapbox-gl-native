@@ -98,10 +98,10 @@ private:
     // cache values for spherical mercator math
     double Bc, Cc;
 
-    std::forward_list<std::shared_ptr<util::transition>> transitions;
-    std::shared_ptr<util::transition> scale_timeout;
-    std::shared_ptr<util::transition> rotate_timeout;
-    std::shared_ptr<util::transition> pan_timeout;
+    std::forward_list<util::ptr<util::transition>> transitions;
+    util::ptr<util::transition> scale_timeout;
+    util::ptr<util::transition> rotate_timeout;
+    util::ptr<util::transition> pan_timeout;
 };
 
 }

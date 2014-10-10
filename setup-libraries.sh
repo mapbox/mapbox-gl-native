@@ -53,6 +53,7 @@ NPM=$(which npm)
 
 MP_HASH="e82e6c00ea5a0cda147e4c121a3c7751cae69ff8"
 DIR_HASH=$(echo `pwd` | git hash-object --stdin)
+
 if [ ! -d 'mapnik-packaging/' ]; then
   git clone https://github.com/mapnik/mapnik-packaging.git
 fi
@@ -66,7 +67,7 @@ export CXX11=true
 
 if [ ${UNAME} = 'Darwin' ]; then
 
-if [ ! -z "${TRAVIS:-}" ]; then
+if [[ $TRAVIS ]]; then
     if aws s3 cp s3://${AWS_S3_BUCKET}/dependencies/build-cpp11-libcpp-osx_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then
         if aws s3 cp s3://${AWS_S3_BUCKET}/dependencies/build-cpp11-libcpp-ios_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then
             rm -rf out/build-cpp11-libcpp-x86_64-macosx
@@ -83,30 +84,40 @@ source iPhoneOS.sh
 export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7-iphoneos/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneOSs.sh
 export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-armv7s-iphoneoss/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneOS64.sh
 export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-arm64-iphoneos64/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneSimulator.sh
 export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     echo '     ...done'
 
 source iPhoneSimulator64.sh
 export LIBUV_VERSION=0.10.28
    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
    if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+   if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
+   if [ ! -f out/build-cpp11-libcpp-x86_64-iphonesimulator/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
    echo '     ...done'
 
 source MacOSX.sh
@@ -114,6 +125,7 @@ export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libglfw3.a ] ; then ./scripts/build_glfw.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-x86_64-macosx/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -d out/build-cpp11-libcpp-x86_64-macosx/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
@@ -121,8 +133,10 @@ export LIBUV_VERSION=0.10.28
 
 # setup iOS universal libs
 ./scripts/make_universal.sh
+patch -p0 --forward < patches/curl-ios.diff || true
+echo "NOTE: One patch FAILURE is expected. The other should have been applied or ignored."
 
-if [ ! -z "${TRAVIS:-}" ] && [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
+if [[ $TRAVIS && $AWS_ACCESS_KEY_ID && $AWS_SECRET_ACCESS_KEY ]] ; then
     tar -zcf out/build-cpp11-libcpp-ios_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libcpp-universal
     aws s3 cp --acl public-read out/build-cpp11-libcpp-ios_${MP_HASH}_${DIR_HASH}.tar.gz s3://${AWS_S3_BUCKET}/dependencies/
     tar -zcf out/build-cpp11-libcpp-osx_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libcpp-x86_64-macosx
@@ -138,7 +152,7 @@ cd ../../
 
 elif [ ${UNAME} = 'Linux' ]; then
 
-if [ ! -z "${TRAVIS:-}" ]; then
+if [[ $TRAVIS ]]; then
     if aws s3 cp s3://${AWS_S3_BUCKET}/dependencies/build-cpp11-libstdcpp-gcc-x86_64-linux_${MP_HASH}_${DIR_HASH}.tar.gz ./out/ ; then
         rm -rf out/build-cpp11-libstdcpp-gcc-x86_64-linux
         tar -xzf out/build-cpp11-libstdcpp-gcc-x86_64-linux_${MP_HASH}_${DIR_HASH}.tar.gz
@@ -150,11 +164,12 @@ export LIBUV_VERSION=0.10.28
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libglfw3.a ] ; then ./scripts/build_glfw.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-x86_64-linux/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
 
-if [ ! -z "${TRAVIS:-}" ] && [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
+if [[ $TRAVIS && $AWS_ACCESS_KEY_ID && $AWS_SECRET_ACCESS_KEY ]] ; then
     if ! tar --compare -zf out/build-cpp11-libstdcpp-gcc-x86_64-linux.tar.gz ; then
         tar -zcf out/build-cpp11-libstdcpp-gcc-x86_64-linux_${MP_HASH}_${DIR_HASH}.tar.gz out/build-cpp11-libstdcpp-gcc-x86_64-linux
         aws s3 cp --acl public-read out/build-cpp11-libstdcpp-gcc-x86_64-linux_${MP_HASH}_${DIR_HASH}.tar.gz s3://${AWS_S3_BUCKET}/dependencies/
