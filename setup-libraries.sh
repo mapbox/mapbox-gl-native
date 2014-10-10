@@ -51,7 +51,7 @@ set -u
 NODE=$(which node)
 NPM=$(which npm)
 
-MP_HASH="e82e6c00ea5a0cda147e4c121a3c7751cae69ff8"
+MP_HASH="f543fecbeb0982983593aa0847715d26c323b990"
 DIR_HASH=$(echo `pwd` | git hash-object --stdin)
 
 if [ ! -d 'mapnik-packaging/' ]; then
