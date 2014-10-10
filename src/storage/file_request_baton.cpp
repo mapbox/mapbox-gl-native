@@ -29,7 +29,7 @@ void FileRequestBaton::notify_error(uv_fs_t *req) {
     if (ptr->request && req->result < 0 && !ptr->canceled && req->result != UV_ECANCELED) {
         ptr->request->response = std::unique_ptr<Response>(new Response);
         ptr->request->response->code = req->result == UV_ENOENT ? 404 : 500;
-        ptr->request->response->message = uv_strerror(int(req->result));
+        ptr->request->response->message = uv_strerror(uv_last_error(req->loop));
         ptr->request->notify();
     }
 }
@@ -71,13 +71,14 @@ void FileRequestBaton::file_stated(uv_fs_t *req) {
         uv_fs_req_cleanup(req);
         uv_fs_close(req->loop, req, ptr->fd, file_closed);
     } else {
-        if (static_cast<const uv_stat_t *>(req->ptr)->st_size > std::numeric_limits<int>::max()) {
+        if (static_cast<const uv_statbuf_t *>(req->ptr)->st_size > std::numeric_limits<int>::max()) {
             // File is too large for us to open this way because uv_buf's only support unsigned
             // ints as maximum size.
+            const uv_err_t error = {UV_EFBIG, 0};
             if (ptr->request) {
                 ptr->request->response = std::unique_ptr<Response>(new Response);
-                ptr->request->response->code = UV_EFBIG;
-                ptr->request->response->message = uv_strerror(UV_EFBIG);
+                ptr->request->response->code = error.code;
+                ptr->request->response->message = uv_strerror(error);
                 ptr->request->notify();
             }
 
@@ -85,7 +86,7 @@ void FileRequestBaton::file_stated(uv_fs_t *req) {
             uv_fs_close(req->loop, req, ptr->fd, file_closed);
         } else {
             const unsigned int size =
-                (unsigned int)(static_cast<const uv_stat_t *>(req->ptr)->st_size);
+                (unsigned int)(static_cast<const uv_statbuf_t *>(req->ptr)->st_size);
             ptr->body.resize(size);
             ptr->buffer = uv_buf_init(const_cast<char *>(ptr->body.data()), size);
             uv_fs_req_cleanup(req);
