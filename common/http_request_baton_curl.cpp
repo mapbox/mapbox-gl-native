@@ -263,7 +263,7 @@ void on_timeout(uv_timer_t *, int status) {
 
 void start_timeout(CURLM *, long timeout_ms, void *) {
     if (timeout_ms <= 0) {
-        on_timeout(&timeout);
+        on_timeout(&timeout, 0);
     } else {
         uv_timer_start(&timeout, on_timeout, timeout_ms, 0);
     }
