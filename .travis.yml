@@ -19,8 +19,8 @@ matrix:
 
 env:
   global:
-   - secure: "bG4YYWMfl9API0MSRgmOaJrlGLv06tRg9KJNawBieZvBJbITPpxVGJZT3/l/SEJ+Rl15e2dRex4k+MGQlmT2SqPQxTEYWv1qxNigKPPcla7IWeNmWWqW8uVvFjdglojgBOK2k/xErVQtA4zDfi3mwSXH4DKwquXWsoEKmX2SV7M="
-   - secure: "Cbvap9ubVKgjPe3hUhI6JGeDZzBXHpOG9RaYKh+SdoIPhKnlJiNOYm1egomi+e4uqJInlFKuVHTw7Ng9Cun6Zm0jIxpkSchv1GpsR7hmB3UGnGed19Dw8121FwuUaktN+4YnbVlsyd+u8EHD3+h58t4eELrLrZolM4rS7DL6caA="
+   - secure: "2ie/lwLSSUpx9q98geDlT/BxKYExK18i3PIgaPpgojnWPOOYr1S9TQfwggxd4FdU3eUwgq8dxuW9NuH2qmEBYvnB9BTcGSoNhrnpDZ0lrA/dFOArDHEheyLz8XirTauzciq+r1pbF0dld5uVaxZfNzbI6labDZPjf/jjSDgVc4c="
+   - secure: "RsEbBA2yhdg2MYvMucJ1mmfm99UjEaC47NcYimy0Fsvzjfoe1vYrSJlYzyb9SIOj2URo8v4sAFWUbD+RTX/5pBgXCzSzEKh6ZZ1Sd7O05sx5dz8M3kRzo4asm9di8kAI842eCW/n6EhlykQBvtgA00os3ivG0Gh6KS/WebMsXsM="
    - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
    - AWS_S3_BUCKET: 'node-mapbox-gl-native'
 
