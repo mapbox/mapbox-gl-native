@@ -44,7 +44,7 @@
                         }
                     },
                     {
-                        "PolicyName": "list testing",
+                        "PolicyName": "list-testing",
                         "PolicyDocument": {
                             "Statement": [
                                 {
@@ -60,7 +60,7 @@
                         }
                     },
                     {
-                        "PolicyName": "build testing",
+                        "PolicyName": "build-testing",
                         "PolicyDocument": {
                             "Statement": [
                                 {
