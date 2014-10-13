@@ -8,7 +8,7 @@ typedef struct {
     void *queue[2];
 } uv__messenger_item_t;
 
-void uv__messenger_callback(uv_async_t *async) {
+void uv__messenger_callback(uv_async_t *async, int status) {
     uv_messenger_t *msgr = (uv_messenger_t *)async->data;
 
     uv__messenger_item_t *item;
