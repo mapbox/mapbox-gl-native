@@ -114,8 +114,8 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
 
 #if MBGL_USE_GLX
     int attributes[] = {
-        GLX_PBUFFER_WIDTH, w,
-        GLX_PBUFFER_HEIGHT, h,
+        GLX_PBUFFER_WIDTH, static_cast<int>(w),
+        GLX_PBUFFER_HEIGHT, static_cast<int>(h),
         None
     };
     glx_pbuffer = glXCreatePbuffer(x_display, fb_configs[0], attributes);
