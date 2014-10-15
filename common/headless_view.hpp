@@ -4,6 +4,7 @@
 #ifdef __APPLE__
 #define MBGL_USE_CGL 1
 #else
+#define GL_GLEXT_PROTOTYPES
 #include <GL/glx.h>
 #define MBGL_USE_GLX 1
 #endif
@@ -46,9 +47,6 @@ private:
 
 #if MBGL_USE_CGL
     CGLContextObj gl_context;
-    GLuint fbo = 0;
-    GLuint fbo_depth_stencil = 0;
-    GLuint fbo_color = 0;
 #endif
 
 #if MBGL_USE_GLX
@@ -57,6 +55,10 @@ private:
     GLXContext gl_context = nullptr;
     GLXPbuffer glx_pbuffer = 0;
 #endif
+
+    GLuint fbo = 0;
+    GLuint fbo_depth_stencil = 0;
+    GLuint fbo_color = 0;
 };
 
 }

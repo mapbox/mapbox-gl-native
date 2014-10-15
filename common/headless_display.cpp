@@ -45,15 +45,9 @@ HeadlessDisplay::HeadlessDisplay() {
         throw std::runtime_error("Cannot find glXCreateContextAttribsARB");
     }
 
-
+    // We're creating a dummy pbuffer anyway that we're not using.
     static int pixelFormat[] = {
-        GLX_DOUBLEBUFFER, False,
-        GLX_RED_SIZE, 8,
-        GLX_GREEN_SIZE, 8,
-        GLX_BLUE_SIZE, 8,
-        GLX_ALPHA_SIZE, 8,
-        GLX_DEPTH_SIZE, 24,
-        GLX_STENCIL_SIZE, 8,
+        GLX_DRAWABLE_TYPE, GLX_PBUFFER_BIT,
         None
     };
 
@@ -62,8 +56,6 @@ HeadlessDisplay::HeadlessDisplay() {
     if (configs <= 0) {
         throw std::runtime_error("No Framebuffer configurations");
     }
-
-    XSync(x_display, False);
 #endif
 }
 

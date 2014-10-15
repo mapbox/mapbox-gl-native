@@ -47,17 +47,24 @@ void HeadlessView::createContext() {
     fb_configs = display_->fb_configs;
 
 
-    int attributes[] = {
+    int context_attributes[] = {
         GLX_CONTEXT_MAJOR_VERSION_ARB, 2,
         GLX_CONTEXT_MINOR_VERSION_ARB, 1,
         GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
         GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
         None
     };
-    gl_context = glXCreateContextAttribsARB(x_display, fb_configs[0], 0, True, attributes);
+    gl_context = glXCreateContextAttribsARB(x_display, fb_configs[0], 0, True, context_attributes);
     if (gl_context == nullptr) {
         throw std::runtime_error("Error creating GL context object");
     }
+
+    int pbuffer_attributes[] = {
+        GLX_PBUFFER_WIDTH, 32,
+        GLX_PBUFFER_HEIGHT, 32,
+        None
+    };
+    glx_pbuffer = glXCreatePbuffer(x_display, fb_configs[0], pbuffer_attributes);
 
 #endif
 }
@@ -72,7 +79,6 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
     const unsigned int w = width_ * pixelRatio_;
     const unsigned int h = height_ * pixelRatio_;
 
-#if MBGL_USE_CGL
     make_active();
 
     // Create depth/stencil buffer
@@ -110,16 +116,6 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
     }
 
     make_inactive();
-#endif
-
-#if MBGL_USE_GLX
-    int attributes[] = {
-        GLX_PBUFFER_WIDTH, static_cast<int>(w),
-        GLX_PBUFFER_HEIGHT, static_cast<int>(h),
-        None
-    };
-    glx_pbuffer = glXCreatePbuffer(x_display, fb_configs[0], attributes);
-#endif
 }
 
 const std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
@@ -136,7 +132,6 @@ const std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
 }
 
 void HeadlessView::clear_buffers() {
-#if MBGL_USE_CGL
     make_active();
 
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -157,16 +152,6 @@ void HeadlessView::clear_buffers() {
     }
 
     make_inactive();
-#endif
-
-#if MBGL_USE_GLX
-    make_inactive();
-
-    if (glx_pbuffer) {
-        glXDestroyPbuffer(x_display, glx_pbuffer);
-        glx_pbuffer = 0;
-    }
-#endif
 }
 
 HeadlessView::~HeadlessView() {
@@ -177,6 +162,11 @@ HeadlessView::~HeadlessView() {
 #endif
 
 #if MBGL_USE_GLX
+    if (glx_pbuffer) {
+        glXDestroyPbuffer(x_display, glx_pbuffer);
+        glx_pbuffer = 0;
+    }
+
     glXDestroyContext(x_display, gl_context);
 #endif
 }
