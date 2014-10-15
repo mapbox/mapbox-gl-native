@@ -27,30 +27,42 @@ HeadlessDisplay::HeadlessDisplay() {
     if (!XInitThreads()) {
         throw std::runtime_error("Failed to XInitThreads");
     }
-    
-    x_display = XOpenDisplay(0);
 
+    x_display = XOpenDisplay(nullptr);
     if (x_display == nullptr) {
         throw std::runtime_error("Failed to open X display");
     }
 
+    const char *extensions = (char *)glXQueryServerString(x_display, DefaultScreen(x_display), GLX_EXTENSIONS);
+    if (!extensions) {
+        throw std::runtime_error("Cannot read GLX extensions");
+    }
+    if (!strstr(extensions,"GLX_SGIX_fbconfig")) {
+        throw std::runtime_error("Extension GLX_SGIX_fbconfig was not found");
+    }
+    if (!strstr(extensions, "GLX_SGIX_pbuffer")) {
+        throw std::runtime_error("Cannot find glXCreateContextAttribsARB");
+    }
+
+
     static int pixelFormat[] = {
-        GLX_RGBA,
-        GLX_DOUBLEBUFFER,
+        GLX_DOUBLEBUFFER, False,
         GLX_RED_SIZE, 8,
         GLX_GREEN_SIZE, 8,
         GLX_BLUE_SIZE, 8,
         GLX_ALPHA_SIZE, 8,
         GLX_DEPTH_SIZE, 24,
         GLX_STENCIL_SIZE, 8,
-        0
+        None
     };
 
-    x_info = glXChooseVisual(x_display, DefaultScreen(x_display), pixelFormat);
-
-    if (x_info == nullptr) {
-        throw std::runtime_error("Error pixel format");
+    int configs = 0;
+    fb_configs = glXChooseFBConfig(x_display, DefaultScreen(x_display), pixelFormat, &configs);
+    if (configs <= 0) {
+        throw std::runtime_error("No Framebuffer configurations");
     }
+
+    XSync(x_display, False);
 #endif
 }
 
@@ -60,7 +72,7 @@ HeadlessDisplay::~HeadlessDisplay() {
 #endif
 
 #if MBGL_USE_GLX
-    XFree(x_info);
+    XFree(fb_configs);
     XCloseDisplay(x_display);
 #endif
 }

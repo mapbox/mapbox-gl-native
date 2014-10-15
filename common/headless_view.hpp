@@ -53,10 +53,9 @@ private:
 
 #if MBGL_USE_GLX
     Display *x_display = nullptr;
-    XVisualInfo *x_info = nullptr;
+    GLXFBConfig *fb_configs = nullptr;
     GLXContext gl_context = nullptr;
-    Pixmap x_pixmap = 0;
-    GLXPixmap glx_pixmap = 0;
+    GLXPBuffer glx_pbuffer = 0;
 #endif
 };
 

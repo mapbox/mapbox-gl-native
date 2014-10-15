@@ -5,6 +5,11 @@
 #include <sstream>
 #include <string>
 
+#if MBGL_USE_GLX
+typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig, GLXContext, Bool, const int *);
+static glXCreateContextAttribsARBProc glXCreateContextAttribsARB = nullptr;
+#endif
+
 namespace mbgl {
 
 HeadlessView::HeadlessView()
@@ -31,13 +36,29 @@ void HeadlessView::createContext() {
 #endif
 
 #if MBGL_USE_GLX
-    x_display = display_->x_display;
-    x_info = display_->x_info;
+    if (glXCreateContextAttribsARB == nullptr) {
+        glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)glXGetProcAddressARB((const GLubyte *)"glXCreateContextAttribsARB");
+    }
+    if (glXCreateContextAttribsARB == nullptr) {
+        throw std::runtime_error("Cannot find glXCreateContextAttribsARB");
+    }
 
-    gl_context = glXCreateContext(x_display, x_info, 0, GL_TRUE);
+    x_display = display_->x_display;
+    fb_configs = display_->fb_configs;
+
+
+    int attributes[] = {
+        GLX_CONTEXT_MAJOR_VERSION_ARB, 2,
+        GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+        GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+        None
+    };
+    gl_context = glXCreateContextAttribsARB(x_display, fb_configs[0], 0, True, attributes);
     if (gl_context == nullptr) {
         throw std::runtime_error("Error creating GL context object");
     }
+
 #endif
 }
 
@@ -92,8 +113,12 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
 #endif
 
 #if MBGL_USE_GLX
-    x_pixmap = XCreatePixmap(x_display, DefaultRootWindow(x_display), w, h, 32);
-    glx_pixmap = glXCreateGLXPixmap(x_display, x_info, x_pixmap);
+    int attributes[] = {
+        GLX_PBUFFER_WIDTH, w,
+        GLX_PBUFFER_HEIGHT, h,
+        None
+    };
+    GLXPbuffer pbuffer = glXCreatePbuffer(x_display, fg_configs[0], attributes);
 #endif
 }
 
@@ -135,17 +160,12 @@ void HeadlessView::clear_buffers() {
 #endif
 
 #if MBGL_USE_GLX
-    if (glx_pixmap) {
-        glXDestroyGLXPixmap(x_display, glx_pixmap);
-        glx_pixmap = 0;
-    }
-
-    if (x_pixmap) {
-        XFreePixmap(x_display, x_pixmap);
-        x_pixmap = 0;
-    }
-
     make_inactive();
+
+    if (glx_pbuffer) {
+        glXDestroyPbuffer(x_display, glx_pbuffer);
+        glx_pbuffer = 0;
+    }
 #endif
 }
 
@@ -178,7 +198,7 @@ void HeadlessView::make_active() {
 #endif
 
 #if MBGL_USE_GLX
-    if (!glXMakeCurrent(x_display, glx_pixmap, gl_context)) {
+    if (!glXMakeContextCurrent(x_display, glx_pbuffer, glx_pbuffer, gl_context)) {
         throw std::runtime_error("Switching OpenGL context failed\n");
     }
 #endif
@@ -193,7 +213,7 @@ void HeadlessView::make_inactive() {
 #endif
 
 #if MBGL_USE_GLX
-    if (!glXMakeCurrent(x_display, 0, NULL)) {
+    if (!glXMakeContextCurrent(x_display, 0, 0, nullptr)) {
         throw std::runtime_error("Removing OpenGL context failed\n");
     }
 #endif
