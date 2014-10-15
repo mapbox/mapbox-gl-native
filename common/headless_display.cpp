@@ -1,5 +1,6 @@
 #include "headless_display.hpp"
 
+#include <cstring>
 #include <stdexcept>
 
 namespace mbgl {

@@ -4,7 +4,7 @@
 #ifdef __APPLE__
 #define MBGL_USE_CGL 1
 #else
-#include "glx.h"
+#include <GL/glx.h>
 #define MBGL_USE_GLX 1
 #endif
 
@@ -55,7 +55,7 @@ private:
     Display *x_display = nullptr;
     GLXFBConfig *fb_configs = nullptr;
     GLXContext gl_context = nullptr;
-    GLXPBuffer glx_pbuffer = 0;
+    GLXPbuffer glx_pbuffer = 0;
 #endif
 };
 

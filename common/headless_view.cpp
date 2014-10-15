@@ -118,7 +118,7 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
         GLX_PBUFFER_HEIGHT, h,
         None
     };
-    GLXPbuffer pbuffer = glXCreatePbuffer(x_display, fg_configs[0], attributes);
+    glx_pbuffer = glXCreatePbuffer(x_display, fb_configs[0], attributes);
 #endif
 }
 
