@@ -9,4 +9,9 @@ function mapbox_time {
     travis_fold end "${NAME}"
 }
 
+export -f travis_fold
+export -f travis_time_start
+export -f travis_time_finish
+export -f travis_nanoseconds
+export ANSI_CLEAR
 export -f mapbox_time
