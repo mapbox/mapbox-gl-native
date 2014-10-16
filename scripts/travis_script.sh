@@ -16,12 +16,14 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     mapbox_time "run_tests" \
     ./scripts/run_tests.sh
 
-    mapbox_time "compare_results" \
+    mapbox_time_start "compare_results"
     (cd ./node_modules/mapbox-gl-test-suite/ && (./bin/compare_images.js || true))
+    mapbox_time_end
 
     if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
-        mapbox_time "deploy_results" \
+        mapbox_time_start "deploy_results"
         (cd ./node_modules/mapbox-gl-test-suite/ && ./bin/deploy_results.sh)
+        mapbox_time_end
     fi
 
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
