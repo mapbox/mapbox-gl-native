@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 
+function mapbox_time {
+    local NAME=$1 ; shift
+    travis_fold start "${NAME}"
+    travis_time_start
+    "$@"
+    travis_time_finish
+    travis_fold end "${NAME}"
+}
+
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     export DISPLAY=:99.0
+
+    mapbox_time "start xvfb" \
     sh -e /etc/init.d/xvfb start
 
     # use g++ that supports c++11
