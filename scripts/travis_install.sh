@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
+. ./scripts/travis_helper.sh
+
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #
     # we'll need the test suite on Linux
     #
-    mapbox_time "install test suite" \
+    mapbox_time "install_test_suite" \
     npm install git+https://github.com/mapbox/mapbox-gl-test-suite.git
 fi
