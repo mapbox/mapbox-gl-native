@@ -275,11 +275,7 @@ void HeadlessView::make_inactive() {
 void HeadlessView::swap() {}
 
 unsigned int HeadlessView::root_fbo() {
-#if MBGL_USE_CGL
     return fbo;
-#endif
-
-    return 0;
 }
 
 }
