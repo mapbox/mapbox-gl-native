@@ -3,8 +3,6 @@
 set -e
 set -o pipefail
 
-. ./scripts/travis_helper.sh
-
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #
     # build & test Linux

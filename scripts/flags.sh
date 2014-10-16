@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-. ./scripts/travis_helper.sh
-
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     export DISPLAY=:99.0
 

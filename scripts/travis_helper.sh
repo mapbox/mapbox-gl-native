@@ -8,3 +8,5 @@ function mapbox_time {
     travis_time_finish
     travis_fold end "${NAME}"
 }
+
+export -f mapbox_time
