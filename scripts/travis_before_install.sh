@@ -31,7 +31,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     git clone git://anongit.freedesktop.org/git/mesa/mesa && \
     cd mesa && \
     ./autogen.sh --prefix=/usr --with-gallium-drivers=svga,swrast --disable-dri \
-        --enable-xlib-glx --disable-llvm-shared-libs && \
+        --enable-xlib-glx --disable-llvm-shared-libs --enable-glx-tls && \
     make && sudo make install && \
     glxinfo && \
     cd ../
