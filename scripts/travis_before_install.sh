@@ -21,6 +21,18 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     sudo apt-get -y install git build-essential zlib1g-dev automake \
                             libtool xutils-dev make cmake pkg-config python-pip
 
+    mapbox_time "install_mesa_deps" \
+    sudo apt-get install -y libpthread-stubs0-dev \
+                            xserver-xorg-dev x11proto-xinerama-dev libx11-xcb-dev \
+                            libxcb-glx0-dev libxrender-dev llvm-dev && \
+    sudo apt-get build-dep -y libgl1-mesa-dri libxcb-glx0-dev
+
+    mapbox_time "build_mesa" \
+    git clone git://anongit.freedesktop.org/git/mesa/mesa && \
+    ./autogen.sh --prefix=/usr --with-gallium-drivers=svga,swrast --disable-dri --enable-xlib-glx && \
+    make && sudo make install && \
+    glxinfo
+
     mapbox_time "install_opengl" \
     sudo apt-get -y install libxi-dev libglu1-mesa-dev x11proto-randr-dev \
                             x11proto-xext-dev libxrandr-dev \
