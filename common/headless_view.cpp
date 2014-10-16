@@ -274,9 +274,5 @@ void HeadlessView::make_inactive() {
 
 void HeadlessView::swap() {}
 
-unsigned int HeadlessView::root_fbo() {
-    return fbo;
-}
-
 }
 

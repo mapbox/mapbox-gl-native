@@ -39,12 +39,6 @@ public:
     // thread. This is called once just before the rendering thread terminates.
     virtual void make_inactive() = 0;
 
-    // Returns the base framebuffer object, if any, and 0 if using the system
-    // provided framebuffer.
-    virtual unsigned int root_fbo() {
-        return 0;
-    }
-
     virtual void notify() = 0;
 
     // Notifies a watcher of map x/y/scale/rotation changes.

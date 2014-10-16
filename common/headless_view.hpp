@@ -34,7 +34,6 @@ public:
     void make_active();
     void make_inactive();
     void swap();
-    unsigned int root_fbo();
 
 private:
     void clear_buffers();
