@@ -30,7 +30,8 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     mapbox_time "build_mesa" \
     git clone git://anongit.freedesktop.org/git/mesa/mesa && \
     cd mesa && \
-    ./autogen.sh --prefix=/usr --with-gallium-drivers=svga,swrast --disable-dri --enable-xlib-glx && \
+    ./autogen.sh --prefix=/usr --with-gallium-drivers=svga,swrast --disable-dri \
+        --enable-xlib-glx --disable-llvm-shared-libs && \
     make && sudo make install && \
     glxinfo && \
     cd ../
