@@ -6,8 +6,9 @@
 #include <string>
 
 #if MBGL_USE_GLX
-typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig, GLXContext, Bool, const int *);
-static glXCreateContextAttribsARBProc glXCreateContextAttribsARB = nullptr;
+#ifdef GLX_ARB_create_context
+static PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = nullptr;
+#endif
 #endif
 
 namespace mbgl {
@@ -21,6 +22,59 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display)
     : display_(display) {
     createContext();
 }
+
+
+#if MBGL_USE_GLX
+#ifdef GLX_ARB_create_context
+
+// These are all of the OpenGL Core profile version that we know about.
+struct core_profile_version { int major, minor; };
+static const core_profile_version core_profile_versions[] = {
+    {4, 5},
+    {4, 4},
+    {4, 3},
+    {4, 2},
+    {4, 1},
+    {4, 0},
+    {3, 3},
+    {3, 2},
+    {3, 1},
+    {3, 0},
+    {0, 0},
+};
+
+GLXContext createCoreProfile(Display *dpy, GLXFBConfig fbconfig) {
+    static bool context_creation_failed = false;
+    GLXContext ctx = 0;
+
+    // Set the Error Handler to avoid crashing the program when the context creation fails.
+    // It is expected that some context creation attempts fail, e.g. because the OpenGL
+    // implementation does not support the version we're requesting.
+    int (*previous_error_handler)(Display *, XErrorEvent *) = XSetErrorHandler([](Display *, XErrorEvent *) {
+        context_creation_failed = true;
+        return 0;
+    });
+
+    // Try to create core profiles from the highest known version on down.
+    for (int i = 0; !ctx && core_profile_versions[i].major; i++) {
+        context_creation_failed = false;
+        const int context_flags[] = {
+            GLX_CONTEXT_MAJOR_VERSION_ARB, core_profile_versions[i].major,
+            GLX_CONTEXT_MINOR_VERSION_ARB, core_profile_versions[i].minor,
+            None
+        };
+        ctx = glXCreateContextAttribsARB(dpy, fbconfig, 0, True, context_flags);
+        if (context_creation_failed) {
+            ctx = 0;
+        }
+    }
+
+    // Restore the old error handler.
+    XSetErrorHandler(previous_error_handler);
+    return ctx;
+}
+#endif
+#endif
 
 void HeadlessView::createContext() {
 #if MBGL_USE_CGL
@@ -36,36 +90,45 @@ void HeadlessView::createContext() {
 #endif
 
 #if MBGL_USE_GLX
+#ifdef GLX_ARB_create_context
     if (glXCreateContextAttribsARB == nullptr) {
-        glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)glXGetProcAddressARB((const GLubyte *)"glXCreateContextAttribsARB");
+        glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)glXGetProcAddressARB((const GLubyte *)"glXCreateContextAttribsARB");
     }
-    if (glXCreateContextAttribsARB == nullptr) {
-        throw std::runtime_error("Cannot find glXCreateContextAttribsARB");
-    }
+#endif
 
     x_display = display_->x_display;
     fb_configs = display_->fb_configs;
 
+#ifdef GLX_ARB_create_context
+    if (glXCreateContextAttribsARB) {
+        // Try to create a core profile context.
+        gl_context = createCoreProfile(x_display, fb_configs[0]);
+    }
+#endif
 
-    int context_attributes[] = {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, 2,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 1,
-        GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
-        GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
-        None
-    };
-    gl_context = glXCreateContextAttribsARB(x_display, fb_configs[0], 0, True, context_attributes);
-    if (gl_context == nullptr) {
+    if (!gl_context) {
+        // Try to create a legacy context
+        gl_context = glXCreateNewContext(x_display, fb_configs[0], GLX_RGBA_TYPE, 0, True);
+        if (gl_context) {
+            if (!glXIsDirect(x_display, gl_context)) {
+                glXDestroyContext(x_display, gl_context);
+                gl_context = 0;
+            }
+        }
+    }
+
+    if (gl_context == 0) {
         throw std::runtime_error("Error creating GL context object");
     }
 
+    // Create a dummy pbuffer. We will render to framebuffers anyway, but we need a pbuffer to
+    // activate the context.
     int pbuffer_attributes[] = {
-        GLX_PBUFFER_WIDTH, 32,
-        GLX_PBUFFER_HEIGHT, 32,
+        GLX_PBUFFER_WIDTH, 8,
+        GLX_PBUFFER_HEIGHT, 8,
         None
     };
     glx_pbuffer = glXCreatePbuffer(x_display, fb_configs[0], pbuffer_attributes);
-
 #endif
 }
 

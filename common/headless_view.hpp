@@ -52,7 +52,7 @@ private:
 #if MBGL_USE_GLX
     Display *x_display = nullptr;
     GLXFBConfig *fb_configs = nullptr;
-    GLXContext gl_context = nullptr;
+    GLXContext gl_context = 0;
     GLXPbuffer glx_pbuffer = 0;
 #endif
 
