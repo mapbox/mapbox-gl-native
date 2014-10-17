@@ -27,6 +27,15 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
                             libxcb-glx0-dev libxrender-dev mesa-utils && \
     sudo apt-get build-dep -y libgl1-mesa-dri libxcb-glx0-dev
 
+    ls -la /usr/lib
+    ls -la /usr/bin
+
+    ls -la /usr/local/lib
+    ls -la /usr/local/bin
+
+    llvm-config --libdir
+    llvm-config-3.4 --libdir
+
     mapbox_time "build_mesa" \
     git clone git://anongit.freedesktop.org/git/mesa/mesa && \
     cd mesa && \
