@@ -48,7 +48,7 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &baton) {
     uv_async_send(baton->async);
 }
 
-void HTTPRequestBaton::stop(const util::ptr<HTTPRequestBaton> &baton) {
+void HTTPRequestBaton::stop(const util::ptr<HTTPRequestBaton> &/*baton*/) {
     fprintf(stderr, "HTTP request cannot be canceled because it is answered immediately");
     abort();
 }
