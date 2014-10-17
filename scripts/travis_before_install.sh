@@ -32,7 +32,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     cd mesa && \
     ./autogen.sh --with-gallium-drivers=svga,swrast --disable-dri \
         --enable-xlib-glx --enable-glx-tls \
-        --with-clang-libdir=llvm-config-3.4 --libdir && \
+        --with-clang-libdir="llvm-config-3.4 --libdir" && \
     make && sudo make install && \
     export LD_LIBRARY_PATH=/usr/local/lib && \
     glxinfo && \
