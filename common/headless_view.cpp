@@ -163,6 +163,10 @@ HeadlessView::~HeadlessView() {
 #endif
 }
 
+void HeadlessView::notify() {
+    // no-op
+}
+
 void HeadlessView::notify_map_change(mbgl::MapChange /*change*/, mbgl::timestamp /*delay*/) {
     // no-op
 }

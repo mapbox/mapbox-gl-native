@@ -3,13 +3,13 @@
 
 using namespace mbgl;
 
-RasterBucket::RasterBucket(const std::shared_ptr<Texturepool> &texturepool, const StyleBucketRaster& properties)
+RasterBucket::RasterBucket(const util::ptr<Texturepool> &texturepool, const StyleBucketRaster& properties)
 : properties(properties),
   texture(properties),
   raster(texturepool) {
 }
 
-void RasterBucket::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix) {
+void RasterBucket::render(Painter &painter, util::ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix) {
     painter.renderRaster(*this, layer_desc, id, matrix);
 }
 

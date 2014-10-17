@@ -22,6 +22,7 @@
 #include <mbgl/shader/gaussian_shader.hpp>
 
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/util/ptr.hpp>
 
 #include <map>
 #include <unordered_map>
@@ -72,7 +73,7 @@ public:
     void changeMatrix();
 
     // Renders a particular layer from a tile.
-    void renderTileLayer(const Tile& tile, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix);
+    void renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc, const mat4 &matrix);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
@@ -82,11 +83,11 @@ public:
 
     void renderDebugText(DebugBucket& bucket, const mat4 &matrix);
     void renderDebugText(const std::vector<std::string> &strings);
-    void renderFill(FillBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
-    void renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
-    void renderSymbol(SymbolBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
-    void renderRaster(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
-    void renderBackground(std::shared_ptr<StyleLayer> layer_desc);
+    void renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderSymbol(SymbolBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderRaster(RasterBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    void renderBackground(util::ptr<StyleLayer> layer_desc);
 
     float saturationFactor(float saturation);
     float contrastFactor(float contrast);
@@ -96,7 +97,7 @@ public:
 
     void renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties);
 
-    void createPrerendered(RasterBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id);
+    void createPrerendered(RasterBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id);
 
     void resize();
 
@@ -110,7 +111,7 @@ public:
     // Configures the painter strata that is used for early z-culling of fragments.
     void setStrata(float strata);
 
-    void drawClippingMasks(const std::set<std::shared_ptr<StyleSource>> &sources);
+    void drawClippingMasks(const std::set<util::ptr<StyleSource>> &sources);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
 
     void resetFramebuffer();

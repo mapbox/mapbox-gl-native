@@ -5,7 +5,7 @@
 
 #include <string>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/util/filesource.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
 
@@ -22,8 +22,8 @@ SpritePosition::SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t 
       sdf(sdf) {
 }
 
-std::shared_ptr<Sprite> Sprite::Create(const std::string& base_url, float pixelRatio, const std::shared_ptr<FileSource> &fileSource) {
-    std::shared_ptr<Sprite> sprite(std::make_shared<Sprite>(Key(), base_url, pixelRatio));
+util::ptr<Sprite> Sprite::Create(const std::string& base_url, float pixelRatio, const util::ptr<FileSource> &fileSource) {
+    util::ptr<Sprite> sprite(std::make_shared<Sprite>(Key(), base_url, pixelRatio));
     sprite->load(fileSource);
     return sprite;
 }
@@ -51,7 +51,7 @@ Sprite::operator bool() const {
 // Note: This is a separate function that must be called exactly once after creation
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
-void Sprite::load(const std::shared_ptr<FileSource> &fileSource) {
+void Sprite::load(const util::ptr<FileSource> &fileSource) {
     if (!valid) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
         loadedImage = true;
@@ -60,30 +60,30 @@ void Sprite::load(const std::shared_ptr<FileSource> &fileSource) {
         return;
     }
 
-    std::shared_ptr<Sprite> sprite = shared_from_this();
+    util::ptr<Sprite> sprite = shared_from_this();
 
-    fileSource->load(ResourceType::JSON, jsonURL, [sprite](platform::Response *res) {
-        if (res->code == 200) {
-            sprite->body.swap(res->body);
+    fileSource->request(ResourceType::JSON, jsonURL)->onload([sprite](const Response &res) {
+        if (res.code == 200) {
+            sprite->body = res.data;
             sprite->parseJSON();
             sprite->complete();
         } else {
-            Log::Warning(Event::Sprite, "Failed to load sprite info: Error %d: %s", res->code, res->error_message.c_str());
+            Log::Warning(Event::Sprite, "Failed to load sprite info: Error %d: %s", res.code, res.message.c_str());
             if (!sprite->future.valid()) {
-                sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res->error_message)));
+                sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res.message)));
             }
         }
     });
 
-    fileSource->load(ResourceType::Image, spriteURL, [sprite](platform::Response *res) {
-        if (res->code == 200) {
-            sprite->image.swap(res->body);
+    fileSource->request(ResourceType::Image, spriteURL)->onload([sprite](const Response &res) {
+        if (res.code == 200) {
+            sprite->image = res.data;
             sprite->parseImage();
             sprite->complete();
         } else {
-            Log::Warning(Event::Sprite, "Failed to load sprite image: Error %d: %s", res->code, res->error_message.c_str());
+            Log::Warning(Event::Sprite, "Failed to load sprite image: Error %d: %s", res.code, res.message.c_str());
             if (!sprite->future.valid()) {
-                sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res->error_message)));
+                sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res.message)));
             }
         }
     });

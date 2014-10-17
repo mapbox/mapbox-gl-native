@@ -8,13 +8,13 @@
 
 using namespace mbgl;
 
-VectorTileData::VectorTileData(Tile::ID id, Map &map, const SourceInfo &source)
+VectorTileData::VectorTileData(Tile::ID id, Map &map, const util::ptr<SourceInfo> &source)
     : TileData(id, map, source),
-      depth(id.z >= source.max_zoom ? map.getMaxZoom() - id.z : 1) {
+      depth(id.z >= source->max_zoom ? map.getMaxZoom() - id.z : 1) {
 }
 
 VectorTileData::~VectorTileData() {
-    std::shared_ptr<GlyphAtlas> glyphAtlas = map.getGlyphAtlas();
+    util::ptr<GlyphAtlas> glyphAtlas = map.getGlyphAtlas();
     if (glyphAtlas) {
         glyphAtlas->removeGlyphs(id.to_uint64());
     }
@@ -52,7 +52,7 @@ void VectorTileData::afterParse() {
     parser.reset();
 }
 
-void VectorTileData::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix) {
+void VectorTileData::render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix) {
     if (state == State::parsed && layer_desc->bucket) {
         auto databucket_it = buckets.find(layer_desc->bucket->name);
         if (databucket_it != buckets.end()) {
@@ -62,7 +62,7 @@ void VectorTileData::render(Painter &painter, std::shared_ptr<StyleLayer> layer_
     }
 }
 
-bool VectorTileData::hasData(std::shared_ptr<StyleLayer> layer_desc) const {
+bool VectorTileData::hasData(util::ptr<StyleLayer> layer_desc) const {
     if (state == State::parsed && layer_desc->bucket) {
         auto databucket_it = buckets.find(layer_desc->bucket->name);
         if (databucket_it != buckets.end()) {

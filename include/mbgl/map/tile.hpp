@@ -3,6 +3,7 @@
 
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/ptr.hpp>
 
 #include <cstdint>
 #include <bitset>
@@ -10,7 +11,6 @@
 #include <cstdint>
 #include <forward_list>
 #include <iosfwd>
-#include <memory>
 #include <string>
 
 namespace mbgl {
@@ -78,7 +78,7 @@ public:
     const Tile::ID id;
     ClipID clip;
     mat4 matrix;
-    std::shared_ptr<TileData> data;
+    util::ptr<TileData> data;
 };
 
 }

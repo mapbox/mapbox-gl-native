@@ -8,12 +8,12 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/mat4.hpp>
+#include <mbgl/util/ptr.hpp>
 
 #include <cstdint>
 #include <forward_list>
 #include <iosfwd>
 #include <map>
-#include <memory>
 
 namespace mbgl {
 
@@ -25,7 +25,7 @@ struct box;
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:
-    Source(SourceInfo& info);
+    Source(const util::ptr<SourceInfo>& info);
 
     void load(Map &map);
 
@@ -33,8 +33,8 @@ public:
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
     size_t getTileCount() const;
-    void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc);
-    void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix);
+    void render(Painter &painter, util::ptr<StyleLayer> layer_desc);
+    void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix);
     void finishRender(Painter &painter);
 
     std::forward_list<Tile::ID> getIDs() const;
@@ -54,7 +54,7 @@ private:
 
     double getZoom(const TransformState &state) const;
 
-    SourceInfo& info;
+    util::ptr<SourceInfo> info;
     bool loaded = false;
 
     // Stores the time when this source was most recently updated.

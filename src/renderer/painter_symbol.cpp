@@ -112,7 +112,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     }
 }
 
-void Painter::renderSymbol(SymbolBucket &bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix) {
+void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix) {
     // Abort early.
     if (pass == RenderPass::Opaque) {
         return;
