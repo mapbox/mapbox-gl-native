@@ -24,23 +24,22 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     mapbox_time "install_mesa_deps" \
     sudo apt-get install -y libpthread-stubs0-dev \
                             xserver-xorg-dev x11proto-xinerama-dev libx11-xcb-dev \
-                            libxcb-glx0-dev libxrender-dev llvm-dev mesa-utils && \
+                            libxcb-glx0-dev libxrender-dev llvm-3.4 mesa-utils && \
     sudo apt-get build-dep -y libgl1-mesa-dri libxcb-glx0-dev
 
     ls -la /usr/lib | grep llvm
     ls -la /usr/bin | grep llvm
 
     ls -la /usr/local
-    ls -la /usr/local/clang-3.4
-    ls -la /usr/local/clang-3.4/lib
 
     llvm-config --libdir
+    llvm-config-3.4 --libdir
 
     mapbox_time "build_mesa" \
     git clone git://anongit.freedesktop.org/git/mesa/mesa && \
     cd mesa && \
     ./autogen.sh --with-gallium-drivers=svga,swrast --disable-dri \
-        --enable-xlib-glx --enable-glx-tls --with-llvm-prefix=/usr/lib/llvm-3.4/lib && \
+        --enable-xlib-glx --enable-glx-tls --with-llvm-prefix=/usr/local/clang-3.4/lib && \
     make && sudo make install && \
     export LD_LIBRARY_PATH=/usr/local/lib && \
     glxinfo && \
