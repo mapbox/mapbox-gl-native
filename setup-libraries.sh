@@ -41,7 +41,7 @@ if [[ $MISSING_DEPS != "" ]]; then
 fi
 
 if [ ! -d 'mapnik-packaging/.git' ]; then
-  git clone --depth=1 https://github.com/mapnik/mapnik-packaging.git
+  git clone --depth=1 --branch android-app https://github.com/ljbade/mapnik-packaging.git
 fi
 
 cd mapnik-packaging/osx/
@@ -53,9 +53,10 @@ if [ ${PLATFORM} = 'Android' ]; then
 source Android.sh
     if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
+#    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
     if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
+    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libboost_atomic.a ] ; then ./scripts/build_boost.sh --with-atomic ; fi
     echo '     ...done'
 
 cd ../../
@@ -83,7 +84,6 @@ source iPhoneOS64.sh
 source iPhoneSimulator.sh
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-i386-iphonesimulator/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
-    echo '     ...done'
 
 # libs conflict with MacOSX build
 # TODO: need to break apart targets

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="MapboxGL-custom_rules" default="help">
+    <condition property="ndk.dir" value="${env.NDK_HOME}">
+        <isset property="env.NDK_HOME" />
+    </condition>
+
+    <fail
+                message="ndk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through the NDK_HOME environment variable."
+                unless="ndk.dir"
+    />
+
+    <property name="BUILDTYPE" value="Release" />
+    <property name="V" value="0" />
+
+    <target name="-pre-build">
+        <condition property="ndkDebugValue" value="NDK_DEBUG=1" else="NDK_DEBUG=0">
+            <equals arg1="${build.target}" arg2="debug"/>
+        </condition>
+        <exec executable="${ndk.dir}/ndk-build" dir="${basedir}" failonerror="true">
+            <arg value="${ndkDebugValue}"/>
+            <arg value="BUILDTYPE=${BUILDTYPE}" />
+            <arg value="V=${V}" />
+        </exec>
+    </target>
+
+    <target name="clean" depends="android_rules.clean">
+        <exec executable="${ndk.dir}/ndk-build" dir="${basedir}" failonerror="true">
+            <arg value="clean"/>
+            <arg value="BUILDTYPE=${BUILDTYPE}" />
+            <arg value="V=${V}" />
+        </exec>
+    </target>
+</project>

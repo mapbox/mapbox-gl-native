@@ -18,7 +18,7 @@ using namespace llmr;
 
 Map::Map(View& view)
     : view(view),
-      transform(),
+      transform(view),
       style(std::make_shared<Style>()),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
       glyphStore(std::make_shared<GlyphStore>()),
@@ -99,6 +99,8 @@ void Map::run() {
     if (!async) {
         render();
     }
+
+    view.make_inactive();
 }
 
 void Map::rerender() {
@@ -136,6 +138,11 @@ void Map::cleanup(uv_async_t *async) {
     map->painter.cleanup();
 }
 
+void Map::terminate() {
+    view.make_active();
+    painter.terminate();
+}
+
 void Map::render(uv_async_t *async) {
     Map *map = static_cast<Map *>(async->data);
 
@@ -167,15 +174,9 @@ void Map::setup() {
 
     painter.setup();
 
-    sources.emplace("outdoors",
-                    std::unique_ptr<Source>(new Source(*this,
-                           painter,
-                           kVectorTileURL,
-                           Source::Type::vector,
-                           512,
-                           0,
-                           14,
-                           true)));
+    if (sources.empty()) {
+        addDefaultSource();
+    }
 
     setStyleJSON(styleJSON);
 }
@@ -189,6 +190,27 @@ void Map::setStyleJSON(std::string newStyleJSON) {
 
 std::string Map::getStyleJSON() const {
     return styleJSON;
+}
+
+#pragma mark - Sources
+
+void Map::addDefaultSource() {
+    addSource("outdoors", kVectorTileURL);
+}
+
+void Map::removeDefaultSource() {
+    removeSource("outdoors");
+}
+
+void Map::addSource(std::string name, std::string url) {
+    sources.emplace(name,
+                    std::unique_ptr<Source>(new Source(*this,
+                           painter,
+                           url.c_str())));
+}
+
+void Map::removeSource(std::string name) {
+    sources.erase(name);
 }
 
 #pragma mark - Size

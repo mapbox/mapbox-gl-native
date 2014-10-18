@@ -6,7 +6,10 @@ GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {
 #endif
 }
 
-GLFWView::~GLFWView() { glfwTerminate(); }
+GLFWView::~GLFWView() {
+    map->terminate();
+    glfwTerminate();
+}
 
 void GLFWView::initialize(llmr::Map *map) {
     View::initialize(map);
@@ -199,8 +202,16 @@ void GLFWView::make_active() {
     glfwMakeContextCurrent(window);
 }
 
+void GLFWView::make_inactive() {
+    glfwMakeContextCurrent(nullptr);
+}
+
 void GLFWView::swap() {
     glfwPostEmptyEvent();
+}
+
+void GLFWView::notify_map_change() {
+    // no-op
 }
 
 void GLFWView::fps() {
@@ -289,10 +300,6 @@ void show_color_debug_image(std::string name, const char *data, size_t logical_w
     glfwMakeContextCurrent(current_window);
 }
 #endif
-
-void notify_map_change() {
-    // no-op
-}
 
 }
 }

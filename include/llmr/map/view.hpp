@@ -20,6 +20,15 @@ public:
     // renderer setup since the render thread doesn't switch the contexts.
     virtual void make_active() = 0;
 
+    // Called from the render thread. Makes the GL context inactive in the current
+    // thread. This is called once just before the rendering thread terminates.
+    virtual void make_inactive() = 0;
+
+    // Notifies a watcher of map x/y/scale/rotation changes.
+    // Must only be called from the same thread that caused the change.
+    // Must not be called from the render thread.
+    virtual void notify_map_change() = 0;
+
 protected:
     llmr::Map *map = nullptr;
 };
