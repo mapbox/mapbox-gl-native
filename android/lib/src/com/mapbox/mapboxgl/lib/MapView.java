@@ -118,6 +118,7 @@ public class MapView extends SurfaceView {
         // Load the map style
         try {
             mDefaultStyleJSON = IOUtils.toString(context.getResources()
+            // .openRawResource(R.raw.style_leith), Charsets.UTF_8);
                     .openRawResource(R.raw.style), Charsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(
@@ -126,6 +127,9 @@ public class MapView extends SurfaceView {
 
         // Create the NativeMapView
         mNativeMapView = new NativeMapView(this, mDefaultStyleJSON);
+        mNativeMapView.addDefaultSource();
+        // mNativeMapView.addSource("countries",
+        // "http://192.168.20.103/%d/%d/%d.pbf");
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
