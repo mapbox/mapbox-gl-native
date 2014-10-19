@@ -42,11 +42,12 @@ xtest: config.gypi clear_xcode_cache node
 
 ##### Makefile builds ##########################################################
 
-android: llmr.gyp node
+android: android/mapboxgl-app.gyp node
 	bash -c "export PLATFORM=Android && source ./setup-libraries.sh && \
-	deps/run_gyp llmr.gyp --depth=. -Goutput_dir=.. --generator-output=./build/android -f make-android \
-	&& $(MAKE) -C ./build/android BUILDTYPE=$(BUILDTYPE) V=$(V) llmr-x86 \
-    && ant -f ./android/app/ -DBUILDTYPE=$(BUILDTYPE) -DV=$(V) `echo $(BUILDTYPE) | tr A-Z a-z`"
+	deps/run_gyp android/mapboxgl-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/android -f make-android \
+	&& $(MAKE) -C ./build/android BUILDTYPE=$(BUILDTYPE) V=$(V) androidapp"
+# \
+#    && ant -f ./android/app/ -DBUILDTYPE=$(BUILDTYPE) -DV=$(V) `echo $(BUILDTYPE) | tr A-Z a-z`"
 
 # Builds the linux app with make.
 linux: config.gypi linux/mapboxgl-app.gyp node

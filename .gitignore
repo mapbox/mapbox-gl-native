@@ -3,6 +3,7 @@
 *.o
 *.actual.png
 *.diff.png
+config.mk
 /node_modules
 /mapnik-packaging
 /macosx/build

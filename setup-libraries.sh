@@ -16,6 +16,7 @@ ensure_dep cmake
 ensure_dep automake
 ensure_dep autoconf
 ensure_dep pkg-config
+
 if [ ${UNAME} = 'Darwin' ]; then
     ensure_dep makedepend
     if [[ ! `which libtool` ]] && [[ ! `which glibtool` ]]; then
@@ -54,9 +55,9 @@ NPM=$(which npm)
 MP_HASH="f543fecbeb0982983593aa0847715d26c323b990"
 DIR_HASH=$(echo `pwd` | git hash-object --stdin)
 
-if [ ! -d 'mapnik-packaging/' ]; then
-  git clone https://github.com/mapnik/mapnik-packaging.git
-fi
+#if [ ! -d 'mapnik-packaging/' ]; then
+#  git clone https://github.com/mapnik/mapnik-packaging.git
+#fi
 
 cd mapnik-packaging
 git fetch
@@ -65,22 +66,25 @@ cd ./osx/
 
 export CXX11=true
 
-if [ ${PLATFORM} = 'Android' ]; then
+if [ -n "${PLATFORM}" ] && [ ${PLATFORM} = 'Android' ]; then
+
 source Android.sh
-    if [ ! -d out/build-cpp11-libstdcpp-gcc-arm-android/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../$
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
-#    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
-    if [ ! -f out/build-cpp11-libstdcpp-gcc-arm-android/lib/libboost_atomic.a ] ; then ./scripts/build_boost.sh --with-atomic ; fi
+    if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libpng.a ] ; then ./scripts/build_png.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libuv.a ] ; then ./scripts/build_libuv.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
+#    if [ ! -d out/build-cpp11-libcpp-gcc-arm-android/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
+#    if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
+#    if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libboost_atomic.a ] ; then ./scripts/build_boost.sh --with-atomic ; fi
     echo '     ...done'
 
 cd ../../
 ./configure \
---pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-arm-android/lib/pkgconfig \
---boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libstdcpp-gcc-arm
-
+--pkg-config-root=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-gcc-arm-android/lib/pkgconfig \
+--boost=`pwd`/mapnik-packaging/osx/out/build-cpp11-libcpp-gcc-arm \
+--npm=$NPM \
+--node=$NODE
 
 elif [ ${UNAME} = 'Darwin' ]; then
 
