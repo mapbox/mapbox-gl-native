@@ -24,21 +24,25 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     mapbox_time "install_mesa_deps" \
     sudo apt-get install -y libpthread-stubs0-dev \
                             xserver-xorg-dev x11proto-xinerama-dev libx11-xcb-dev \
-                            libxcb-glx0-dev libxrender-dev llvm-3.4 libtsan0 \
-                            mesa-utils && \
+                            libxcb-glx0-dev libxrender-dev llvm-3.4 mesa-utils && \
     sudo apt-get build-dep -y libgl1-mesa-dri libxcb-glx0-dev
+
+    mapbox_time "build_libva" \
+    sudo apt-get install -y libgl1-mesa-dev libpciaccess-dev libdrm-dev \
+                            libXfixes-dev libXext-dev && \
+    git clone git://anongit.freedesktop.org/git/vaapi/libva && \
+    cd libva && \
+    ./autogen.sh && \
+    make && sudo make install && \
+    cd ../
 
     mapbox_time "build_mesa" \
     git clone git://anongit.freedesktop.org/git/mesa/mesa && \
     cd mesa && \
     ./autogen.sh --with-gallium-drivers=svga,swrast --disable-dri \
-        --enable-xlib-glx --enable-glx-tls --with-llvm-prefix=/usr/lib/llvm-3.4 \
-        --disable-va && \
+        --enable-xlib-glx --enable-glx-tls --with-llvm-prefix=/usr/lib/llvm-3.4 && \
     make && sudo make install && \
     cd ../
-
-    mapbox_time "glxinfo" \
-    glxinfo
 
     mapbox_time "install_opengl" \
     sudo apt-get -y install libxi-dev x11proto-randr-dev \
