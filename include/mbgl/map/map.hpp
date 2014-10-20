@@ -143,10 +143,15 @@ public:
 
 private:
     // uv async callbacks
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+    static void render(uv_async_t *async, int status);
+    static void terminate(uv_async_t *async, int status);
+    static void cleanup(uv_async_t *async, int status);
+#else
     static void render(uv_async_t *async);
     static void terminate(uv_async_t *async);
     static void cleanup(uv_async_t *async);
-    static void delete_async(uv_handle_t *handle);
+#endif
 
     // Setup
     void setup();

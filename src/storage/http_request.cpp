@@ -77,7 +77,11 @@ void HTTPRequest::startHTTPRequest(std::unique_ptr<Response> &&res) {
     http_baton->response = std::move(res);
     http_baton->async->data = new util::ptr<HTTPRequestBaton>(http_baton);
 
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+    uv_async_init(loop, http_baton->async, [](uv_async_t *async, int) {
+#else
     uv_async_init(loop, http_baton->async, [](uv_async_t *async) {
+#endif
         util::ptr<HTTPRequestBaton> &http_baton = *(util::ptr<HTTPRequestBaton> *)async->data;
 
         if (http_baton->request) {
@@ -193,7 +197,12 @@ void HTTPRequest::retryHTTPRequest(std::unique_ptr<Response> &&res, uint64_t tim
     backoff_timer = new uv_timer_t();
     uv_timer_init(loop, backoff_timer);
     backoff_timer->data = new RetryBaton(this, std::move(res));
+
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+    uv_timer_start(backoff_timer, [](uv_timer_t *timer, int) {
+#else
     uv_timer_start(backoff_timer, [](uv_timer_t *timer) {
+#endif
         std::unique_ptr<RetryBaton> pair { static_cast<RetryBaton *>(timer->data) };
         pair->first->startHTTPRequest(std::move(pair->second));
         pair->first->backoff_timer = nullptr;
