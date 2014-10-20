@@ -139,7 +139,6 @@
             'OTHER_CPLUSPLUSFLAGS': [
               '<@(png_cflags)',
               '<@(uv_cflags)',
-              '<@(curl_cflags)',
               '<@(sqlite3_cflags)',
               '-I<(boost_root)/include',
             ],
@@ -151,7 +150,6 @@
           'cflags': [
             '<@(png_cflags)',
             '<@(uv_cflags)',
-            '<@(curl_cflags)',
             '<@(sqlite3_cflags)',
             '-I<(boost_root)/include',
           ],
@@ -166,26 +164,22 @@
             'xcode_settings': {
               'OTHER_CPLUSPLUSFLAGS': [
                 '<@(uv_cflags)',
-                '<@(curl_cflags)',
                 '-I<(boost_root)/include',
               ],
               'OTHER_LDFLAGS': [
                 '<@(png_libraries)',
                 '<@(uv_libraries)',
-                '<@(curl_libraries)',
                 '<@(sqlite3_libraries)',
               ]
             }
           }, {
             'cflags': [
               '<@(uv_cflags)',
-              '<@(curl_cflags)',
               '-I<(boost_root)/include',
             ],
             'libraries': [
               '<@(png_libraries)',
               '<@(uv_libraries)',
-              '<@(curl_libraries)',
               '<@(sqlite3_libraries)',
             ]
           }]
@@ -222,7 +216,6 @@
         'OTHER_CPLUSPLUSFLAGS': [
           '<@(png_cflags)',
           '<@(uv_cflags)',
-          '<@(curl_cflags)',
           '<@(sqlite3_cflags)',
           '-I<(boost_root)/include',
         ],
@@ -238,7 +231,6 @@
           'OTHER_LDFLAGS': [
             '<@(png_libraries)',
             '<@(uv_libraries)',
-            '<@(curl_libraries)',
             '<@(sqlite3_libraries)',
           ],
           'OTHER_CPLUSPLUSFLAGS': [
