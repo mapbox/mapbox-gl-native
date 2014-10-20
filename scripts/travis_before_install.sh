@@ -34,8 +34,10 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     ./autogen.sh --with-gallium-drivers=svga,swrast --disable-dri \
         --enable-xlib-glx --enable-glx-tls --with-llvm-prefix=/usr/lib/llvm-3.4 && \
     make && sudo make install && \
-    export LD_LIBRARY_PATH=/usr/local/lib && \
     cd ../
+
+    mapbox_time "glxinfo" \
+    glxinfo
 
     mapbox_time "install_opengl" \
     sudo apt-get -y install libxi-dev x11proto-randr-dev \

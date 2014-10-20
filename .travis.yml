@@ -23,12 +23,12 @@ env:
    - secure: "R/+uOeccl7GqjJbknailAV7VtjAtGwHHM9xToVnhfPVUXp9fzJs+oNk3IWcs3Eg4sw4WsYxXRfbCQG9bA3MnPlTOsxETGRioO9CAuXap6mwcwNAzeWuq7ePFki2u01pJGQD5b6WFqBCdnAQ4o2SgHgGzhs0TJzYd9tONQxSmkCI="
    - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
    - AWS_S3_BUCKET: 'node-mapbox-gl-native'
+   - LD_LIBRARY_PATH: '/usr/local/lib'
 
 before_install:
 - source ./scripts/travis_helper.sh
 - source ./scripts/flags.sh
 - ./scripts/travis_before_install.sh
-- glxinfo
 
 install:
 - make setup
