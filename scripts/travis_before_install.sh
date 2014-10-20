@@ -33,11 +33,12 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     git clone git://anongit.freedesktop.org/git/vaapi/libva && \
     cd libva && \
     ./autogen.sh && \
-    make && sudo make install && \
+    make && sudo -i make install && \
     cd ../
 
     mapbox_time "build_mesa" \
     git clone git://anongit.freedesktop.org/git/mesa/mesa && \
+    git checkout mesa-10.3.1 && \
     cd mesa && \
     ./autogen.sh --with-gallium-drivers=svga,swrast --disable-dri \
         --enable-xlib-glx --enable-glx-tls --with-llvm-prefix=/usr/lib/llvm-3.4 && \
