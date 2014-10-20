@@ -29,11 +29,12 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
 
     mapbox_time "build_mesa" \
     git clone git://anongit.freedesktop.org/git/mesa/mesa && \
+    cd mesa && \
     git tag -l && \
     cd ../ && \
     wget ftp://ftp.freedesktop.org/pub/mesa/10.3.1/MesaLib-10.3.1.tar.gz && \
     wget ftp://ftp.freedesktop.org/pub/mesa/10.3.1/MesaLib-10.3.1.tar.gz.sig && \
-    gpg --verify MesaLib-10.3.1.tar.gz.sig && \
+    # gpg --verify MesaLib-10.3.1.tar.gz.sig && \
     tar xzvf MesaLib-10.3.1.tar.gz && \
     cd Mesa-10.3.1 && \
     ./autogen.sh --with-gallium-drivers=svga,swrast --disable-dri \
