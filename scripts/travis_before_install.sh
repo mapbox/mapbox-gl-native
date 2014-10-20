@@ -33,7 +33,13 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     git clone git://anongit.freedesktop.org/git/vaapi/libva && \
     cd libva && \
     ./autogen.sh && \
-    make && sudo -i make install && \
+    make && \
+    $CC --version && \
+    which $CC && \
+    clang --version && \
+    which clang && \
+    export $CC=`which $CC` && \
+    sudo make install && \
     cd ../
 
     mapbox_time "build_mesa" \
