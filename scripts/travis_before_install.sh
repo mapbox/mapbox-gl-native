@@ -27,27 +27,13 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
                             libxcb-glx0-dev libxrender-dev llvm-3.4 mesa-utils && \
     sudo apt-get build-dep -y libgl1-mesa-dri libxcb-glx0-dev
 
-    mapbox_time "build_libva" \
-    sudo apt-get install -y libgl1-mesa-dev libpciaccess-dev libdrm-dev \
-                            libXfixes-dev libXext-dev && \
-    git clone git://anongit.freedesktop.org/git/vaapi/libva && \
-    cd libva && \
-    ./autogen.sh && \
-    make && \
-    $CC --version && \
-    which $CC && \
-    clang --version && \
-    which clang && \
-    export $CC=`which $CC` && \
-    sudo make install && \
-    cd ../
-
     mapbox_time "build_mesa" \
     git clone git://anongit.freedesktop.org/git/mesa/mesa && \
     git checkout mesa-10.3.1 && \
     cd mesa && \
     ./autogen.sh --with-gallium-drivers=svga,swrast --disable-dri \
-        --enable-xlib-glx --enable-glx-tls --with-llvm-prefix=/usr/lib/llvm-3.4 && \
+        --enable-xlib-glx --enable-glx-tls --with-llvm-prefix=/usr/lib/llvm-3.4 \
+        --without-va && \
     make && sudo make install && \
     cd ../
 
