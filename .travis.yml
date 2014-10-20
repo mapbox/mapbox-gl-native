@@ -28,6 +28,7 @@ before_install:
 - source ./scripts/travis_helper.sh
 - source ./scripts/flags.sh
 - ./scripts/travis_before_install.sh
+- glxinfo
 
 install:
 - make setup

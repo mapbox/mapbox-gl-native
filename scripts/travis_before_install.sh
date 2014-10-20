@@ -27,14 +27,6 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
                             libxcb-glx0-dev libxrender-dev llvm-3.4 mesa-utils && \
     sudo apt-get build-dep -y libgl1-mesa-dri libxcb-glx0-dev
 
-    ls -la /usr/lib | grep llvm
-    ls -la /usr/bin | grep llvm
-
-    ls -la /usr/local
-
-    llvm-config --libdir
-    llvm-config-3.4 --libdir
-
     mapbox_time "build_mesa" \
     git clone git://anongit.freedesktop.org/git/mesa/mesa && \
     cd mesa && \
@@ -42,7 +34,6 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
         --enable-xlib-glx --enable-glx-tls --with-llvm-prefix=/usr/lib/llvm-3.4 && \
     make && sudo make install && \
     export LD_LIBRARY_PATH=/usr/local/lib && \
-    glxinfo && \
     cd ../
 
     mapbox_time "install_opengl" \
