@@ -12,12 +12,12 @@
                 ['OS == "mac"', {
                     'link_settings': {
                         'libraries': [
-                            '-framework OpenGL',
+                            '<@(glfw3_libraries)', # This is a hack since we're not actually using GLFW
                         ],
                     },
                     'xcode_settings': {
                         'OTHER_LDFLAGS': [
-                            '-framework OpenGL',
+                            '<@(glfw3_libraries)', # This is a hack since we're not actually using GLFW
                         ],
                     },
                 }, {
