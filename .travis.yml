@@ -25,6 +25,7 @@ env:
 
 before_install:
 - source ./scripts/flags.sh
+- (git clone https://github.com/mapbox/mason.git ~/.mason ; sudo ln -s ~/.mason/mason /usr/local/bin/mason)
 - ./scripts/travis_before_install.sh
 
 install:
