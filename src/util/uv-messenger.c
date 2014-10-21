@@ -10,7 +10,7 @@ typedef struct {
 
 
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void uv__messenger_callback(uv_async_t *async, int) {
+void uv__messenger_callback(uv_async_t *async, int status) {
 #else
 void uv__messenger_callback(uv_async_t *async) {
 #endif
