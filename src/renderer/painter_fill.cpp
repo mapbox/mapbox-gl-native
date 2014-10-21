@@ -49,8 +49,8 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 
         // Draw the entire line
         outlineShader->u_world = {{
-            static_cast<float>(map.getState().getFramebufferWidth()),
-            static_cast<float>(map.getState().getFramebufferHeight())
+            static_cast<float>(state.getFramebufferWidth()),
+            static_cast<float>(state.getFramebufferHeight())
         }};
         depthRange(strata, 1.0f);
         bucket.drawVertices(*outlineShader);
@@ -58,12 +58,10 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 
     if (pattern) {
         // Image fill.
-        Sprite &sprite = *map.getSprite();
-        if (pass == RenderPass::Translucent && sprite) {
-            SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
+        if (pass == RenderPass::Translucent) {
             const SpriteAtlasPosition pos = spriteAtlas.getPosition(properties.image, true);
-            const float mix = std::fmod(float(map.getState().getZoom()), 1.0f);
-            const float factor = 8.0 / std::pow(2, map.getState().getIntegerZoom() - id.z);
+            const float mix = std::fmod(float(state.getZoom()), 1.0f);
+            const float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
 
             mat3 patternMatrix;
             matrix::identity(patternMatrix);
@@ -114,8 +112,8 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 
         // Draw the entire line
         outlineShader->u_world = {{
-            static_cast<float>(map.getState().getFramebufferWidth()),
-            static_cast<float>(map.getState().getFramebufferHeight())
+            static_cast<float>(state.getFramebufferWidth()),
+            static_cast<float>(state.getFramebufferHeight())
         }};
 
         depthRange(strata + strata_epsilon, 1.0f);

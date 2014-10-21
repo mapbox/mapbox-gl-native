@@ -13,13 +13,13 @@
 using namespace mbgl;
 
 const double D2R = M_PI / 180.0;
-const double R2D = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
 const double MIN_ROTATE_SCALE = 8;
 
-Transform::Transform(View &view_) : view(view_), mtx(std::make_unique<uv::rwlock>()) {
-    setScale(current.scale);
-    setAngle(current.angle);
+Transform::Transform(View &view_)
+    : view(view_)
+    , mtx(std::make_unique<uv::rwlock>())
+{
 }
 
 #pragma mark - Map View
@@ -123,8 +123,7 @@ void Transform::setLonLatZoom(const double lon, const double lat, const double z
 void Transform::getLonLat(double &lon, double &lat) const {
     uv::readlock lock(mtx);
 
-    lon = -final.x / Bc;
-    lat = R2D * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
+    final.getLonLat(lon, lat);
 }
 
 void Transform::getLonLatZoom(double &lon, double &lat, double &zoom) const {

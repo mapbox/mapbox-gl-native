@@ -55,8 +55,6 @@ public:
     // Triggers a lazy rerender: only performs a render when the map is not clean.
     void rerender();
 
-    void renderLayer(util::ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
-
     // Forces a map update: always triggers a rerender.
     void update();
 
@@ -156,18 +154,14 @@ private:
     void updateSources();
     void updateSources(const util::ptr<StyleLayerGroup> &group);
 
-    void updateRenderState();
-
     size_t countLayers(const std::vector<LayerDescription>& layers);
 
     // Prepares a map render by updating the tiles we need for the current view, as well as updating
     // the stylesheet.
     void prepare();
 
-
     // Unconditionally performs a render with the current map state.
     void render();
-    void renderLayers(util::ptr<StyleLayerGroup> group);
 
 private:
     bool async = false;
@@ -223,8 +217,6 @@ private:
 
     bool debug = false;
     timestamp animationTime = 0;
-
-    int indent = 0;
 
     std::set<util::ptr<StyleSource>> activeSources;
 

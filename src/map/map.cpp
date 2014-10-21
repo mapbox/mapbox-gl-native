@@ -44,7 +44,7 @@ Map::Map(View& view_)
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
-      painter(*this) {
+      painter(*spriteAtlas, *glyphAtlas) {
 
     view.initialize(this);
 
@@ -598,15 +598,6 @@ void Map::updateTiles() {
     }
 }
 
-void Map::updateRenderState() {
-    // Update all clipping IDs.
-    ClipIDGenerator generator;
-    for (const util::ptr<StyleSource> &source : getActiveSources()) {
-        generator.update(source->source->getLoadedTiles());
-        source->source->updateMatrices(painter.projMatrix, state);
-    }
-}
-
 void Map::prepare() {
     if (!fileSource) {
         fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
@@ -654,152 +645,13 @@ void Map::prepare() {
 void Map::render() {
     view.make_active();
 
-    painter.clear();
-
-    painter.resize();
-
-    painter.changeMatrix();
-
-    updateRenderState();
-
-    painter.drawClippingMasks(getActiveSources());
-
-    painter.frameHistory.record(getAnimationTime(), getState().getNormalizedZoom());
-
-    // Actually render the layers
-    if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
-    renderLayers(style->layers);
-    if (debug::renderTree) { std::cout << "}" << std::endl; indent--; }
-
-    // Finalize the rendering, e.g. by calling debug render calls per tile.
-    // This guarantees that we have at least one function per tile called.
-    // When only rendering layers via the stylesheet, it's possible that we don't
-    // ever visit a tile during rendering.
-    for (const util::ptr<StyleSource> &source : getActiveSources()) {
-        source->source->finishRender(painter);
-    }
+    painter.render(*style, getActiveSources(),
+                   getState(), getAnimationTime());
 
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
         update();
     }
 
-    glFlush();
-
     view.make_inactive();
-}
-
-void Map::renderLayers(util::ptr<StyleLayerGroup> group) {
-    if (!group) {
-        // Make sure that we actually do have a layer group.
-        return;
-    }
-
-    // TODO: Correctly compute the number of layers recursively beforehand.
-    float strata_thickness = 1.0f / (group->layers.size() + 1);
-
-    // - FIRST PASS ------------------------------------------------------------
-    // Render everything top-to-bottom by using reverse iterators. Render opaque
-    // objects first.
-
-    if (debug::renderTree) {
-        std::cout << std::string(indent++ * 4, ' ') << "OPAQUE {" << std::endl;
-    }
-    int i = 0;
-    for (auto it = group->layers.rbegin(), end = group->layers.rend(); it != end; ++it, ++i) {
-        painter.setOpaque();
-        painter.setStrata(i * strata_thickness);
-        renderLayer(*it, RenderPass::Opaque);
-    }
-    if (debug::renderTree) {
-        std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
-    }
-
-    // - SECOND PASS -----------------------------------------------------------
-    // Make a second pass, rendering translucent objects. This time, we render
-    // bottom-to-top.
-    if (debug::renderTree) {
-        std::cout << std::string(indent++ * 4, ' ') << "TRANSLUCENT {" << std::endl;
-    }
-    --i;
-    for (auto it = group->layers.begin(), end = group->layers.end(); it != end; ++it, --i) {
-        painter.setTranslucent();
-        painter.setStrata(i * strata_thickness);
-        renderLayer(*it, RenderPass::Translucent);
-    }
-    if (debug::renderTree) {
-        std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
-    }
-}
-
-void Map::renderLayer(util::ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id, const mat4* matrix) {
-    if (layer_desc->type == StyleLayerType::Background) {
-        // This layer defines a background color/image.
-
-        if (debug::renderTree) {
-            std::cout << std::string(indent * 4, ' ') << "- " << layer_desc->id << " ("
-                      << layer_desc->type << ")" << std::endl;
-        }
-
-        painter.renderBackground(layer_desc);
-    } else {
-        // This is a singular layer.
-        if (!layer_desc->bucket) {
-            fprintf(stderr, "[WARNING] layer '%s' is missing bucket\n", layer_desc->id.c_str());
-            return;
-        }
-
-        if (!layer_desc->bucket->style_source) {
-            fprintf(stderr, "[WARNING] can't find source for layer '%s'\n", layer_desc->id.c_str());
-            return;
-        }
-
-        StyleSource &style_source = *layer_desc->bucket->style_source;
-
-        // Skip this layer if there is no data.
-        if (!style_source.source) {
-            return;
-        }
-
-        // Skip this layer if it's outside the range of min/maxzoom.
-        // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
-        // is set to a fractional value, or value that is larger than the source maxzoom.
-        const double zoom = state.getZoom();
-        if (layer_desc->bucket->min_zoom > zoom ||
-            layer_desc->bucket->max_zoom <= zoom) {
-            return;
-        }
-
-        // Abort early if we can already deduce from the bucket type that
-        // we're not going to render anything anyway during this pass.
-        switch (layer_desc->type) {
-            case StyleLayerType::Fill:
-                if (!layer_desc->getProperties<FillProperties>().isVisible()) return;
-                break;
-            case StyleLayerType::Line:
-                if (pass == RenderPass::Opaque) return;
-                if (!layer_desc->getProperties<LineProperties>().isVisible()) return;
-                break;
-            case StyleLayerType::Symbol:
-                if (pass == RenderPass::Opaque) return;
-                if (!layer_desc->getProperties<SymbolProperties>().isVisible()) return;
-                break;
-            case StyleLayerType::Raster:
-                if (pass == RenderPass::Opaque) return;
-                if (!layer_desc->getProperties<RasterProperties>().isVisible()) return;
-                break;
-            default:
-                break;
-        }
-
-        if (debug::renderTree) {
-            std::cout << std::string(indent * 4, ' ') << "- " << layer_desc->id << " ("
-                      << layer_desc->type << ")" << std::endl;
-        }
-        if (!id) {
-            style_source.source->render(painter, layer_desc);
-        } else {
-            style_source.source->render(painter, layer_desc, *id, *matrix);
-        }
-    }
 }
