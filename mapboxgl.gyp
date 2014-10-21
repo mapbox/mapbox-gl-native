@@ -140,6 +140,7 @@
               '<@(png_cflags)',
               '<@(uv_cflags)',
               '<@(sqlite3_cflags)',
+              '<@(zlib_cflags)',
               '-I<(boost_root)/include',
             ],
             'OTHER_CFLAGS': [
@@ -151,6 +152,7 @@
             '<@(png_cflags)',
             '<@(uv_cflags)',
             '<@(sqlite3_cflags)',
+            '<@(zlib_cflags)',
             '-I<(boost_root)/include',
           ],
         }]
@@ -170,6 +172,7 @@
                 '<@(png_libraries)',
                 '<@(uv_libraries)',
                 '<@(sqlite3_libraries)',
+                '<@(zlib_libraries)',
               ]
             }
           }, {
@@ -181,6 +184,7 @@
               '<@(png_libraries)',
               '<@(uv_libraries)',
               '<@(sqlite3_libraries)',
+              '<@(zlib_libraries)',
             ]
           }]
         ]
@@ -217,6 +221,7 @@
           '<@(png_cflags)',
           '<@(uv_cflags)',
           '<@(sqlite3_cflags)',
+          '<@(zlib_cflags)',
           '-I<(boost_root)/include',
         ],
       },
@@ -232,6 +237,7 @@
             '<@(png_libraries)',
             '<@(uv_libraries)',
             '<@(sqlite3_libraries)',
+            '<@(zlib_libraries)',
           ],
           'OTHER_CPLUSPLUSFLAGS': [
             '<@(uv_cflags)',

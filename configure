@@ -6,17 +6,12 @@ set -o pipefail
 . ~/.nvm/nvm.sh
 nvm use 0.10
 
-LIBCURL_VERSION=system
-GLFW_VERSION=a21f2377
-LIBPNG_VERSION=1.6.13
-SQLITE_VERSION=system
-LIBUV_VERSION=0.10.28
-
 case $MASON_PLATFORM in
     'ios')
         SQLITE_VERSION=system
         LIBPNG_VERSION=1.6.13
         LIBUV_VERSION=0.10.28
+        ZLIB_VERSION=system
         ;;
     *)
         GLFW_VERSION=a21f2377
@@ -24,12 +19,26 @@ case $MASON_PLATFORM in
         LIBPNG_VERSION=system
         LIBCURL_VERSION=system
         LIBUV_VERSION=0.10.28
+        ZLIB_VERSION=system
         ;;
 esac
 
+if [ -z "${BOOST_ROOT}" ]; then
+    if [ -d '/usr/local/include/boost' ]; then
+        BOOST_ROOT='/usr/local'
+    elif [ -d '/usr/include/boost' ]; then
+        BOOST_ROOT='/usr'
+    else
+        >&2 echo -e "\033[1m\033[31mCannot find Boost\033[0m";
+    fi
+fi
 
-BOOST_ROOT=/usr
-if [ -d '/usr/local/boost' ]; then BOOST_ROOT='/usr/local' ; fi
+if [ ! -d "${BOOST_ROOT}/include/boost" ]; then
+    >&2 echo -e "\033[1m\033[31mCannot find Boost at ${BOOST_ROOT}\033[0m";
+else
+    >&2 echo -e "\033[1m\033[32m* Using Boost installation at ${BOOST_ROOT}\033[0m";
+fi
+
 
 function quote_flags {
     python -c "import sys, re; print re.split('(?<!-framework)\s+', ' '.join(sys.argv[1:]))" "$@"
@@ -81,6 +90,12 @@ if [ ! -z ${LIBUV_VERSION} ]; then
     mason install libuv ${LIBUV_VERSION}
     CONFIG+=$"    'uv_cflags': $(quote_flags $(mason cflags libuv ${LIBUV_VERSION})),"$LN
     CONFIG+=$"    'uv_libraries': $(quote_flags $(mason ldflags libuv ${LIBUV_VERSION})),"$LN
+fi
+
+if [ ! -z ${ZLIB_VERSION} ]; then
+    mason install zlib ${ZLIB_VERSION}
+    CONFIG+=$"    'zlib_cflags': $(quote_flags $(mason cflags zlib ${ZLIB_VERSION})),"$LN
+    CONFIG+=$"    'zlib_libraries': $(quote_flags $(mason ldflags zlib ${ZLIB_VERSION})),"$LN
 fi
 
 CONFIG+="  }
