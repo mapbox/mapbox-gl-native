@@ -5,8 +5,18 @@ set -o pipefail
 
 CONFIG_FILE=${1:-config.gypi}
 
+# Install node
+if [[ ! -d ~/.nvm ]]; then
+    git clone --depth 1 https://github.com/creationix/nvm.git ~/.nvm
+fi
+set +u
 . ~/.nvm/nvm.sh
-nvm use 0.10
+if [ ! `nvm use 0.10 > /dev/null; echo $?` = 0 ]; then
+    >&2 echo -e "\033[1m\033[32m* $(nvm install 0.10)\033[0m";
+else
+    >&2 echo -e "\033[1m\033[32m* $(nvm use 0.10)\033[0m";
+fi
+
 
 case $MASON_PLATFORM in
     'ios')
