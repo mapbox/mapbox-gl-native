@@ -28,11 +28,8 @@ before_install:
 - ./scripts/travis_before_install.sh
 
 install:
-- make setup
-- ./scripts/travis_install.sh
-
-before_script:
-- rm -rf mapnik-packaging/out/packages
+- make config.gypi
+- ./scripts/travis_install_test_suite.sh
 
 script:
 - ./scripts/travis_script.sh

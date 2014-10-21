@@ -2,15 +2,13 @@ BUILDTYPE ?= Release
 PYTHON ?= python
 V ?= 1
 
-all: setup
+all: mbgl
 
-setup: config.gypi
+config.gypi:
+	./configure
 
-xlibs:
-	@./mapnik-packaging/osx/darwin_configure.sh osx
-
-ilibs:
-	MASON_PLATFORM=ios ./configure
+config-ios.gypi:
+	MASON_PLATFORM=ios ./configure config-ios.gypi
 
 # Builds the regular library
 mbgl: config.gypi mapboxgl.gyp node
@@ -74,14 +72,14 @@ clear_xcode_cache:
     fi
 
 # build Mac OS X project for Xcode
-xproj-cli: config.gypi xlibs macosx/mapboxgl-app.gyp clear_xcode_cache node
+xproj-cli: config.gypi macosx/mapboxgl-app.gyp clear_xcode_cache node
 	deps/run_gyp macosx/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
 
 xproj: xproj-cli
 	open ./build/macosx/mapboxgl-app.xcodeproj
 
 # build iOS project for Xcode
-iproj-cli: ilibs config.gypi ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp clear_xcode_cache node
+iproj-cli: config-ios.gypi ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp clear_xcode_cache node
 	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
 
 iproj: iproj-cli
@@ -98,12 +96,10 @@ lproj: config.gypi linux/mapboxgl-app.gyp clear_xcode_cache node
 clean: clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
-	-rm -rf ./config.gypi
+	-rm -rf ./config.gypi ./config-ios.gypi
 
 distclean: clean
-	-rm -rf ./mapnik-packaging/osx/out/build-*
-	-rm -rf ./mapnik-packaging/osx/out/universal
-	-find ./mapnik-packaging/osx/out/packages -type d ! -name 'packages' -maxdepth 1 -exec rm -rf {} \;
+	-rm -rf ./mason_packages
 
 .PHONY: mbgl test linux build/test/Makefile
 # DO NOT DELETE

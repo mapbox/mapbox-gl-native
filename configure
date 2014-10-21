@@ -3,6 +3,8 @@
 set -e
 set -o pipefail
 
+CONFIG_FILE=${1:-config.gypi}
+
 . ~/.nvm/nvm.sh
 nvm use 0.10
 
@@ -30,11 +32,13 @@ if [ -z "${BOOST_ROOT}" ]; then
         BOOST_ROOT='/usr'
     else
         >&2 echo -e "\033[1m\033[31mCannot find Boost\033[0m";
+        exit 1
     fi
 fi
 
 if [ ! -d "${BOOST_ROOT}/include/boost" ]; then
     >&2 echo -e "\033[1m\033[31mCannot find Boost at ${BOOST_ROOT}\033[0m";
+    exit 1
 else
     >&2 echo -e "\033[1m\033[32m* Using Boost installation at ${BOOST_ROOT}\033[0m";
 fi
