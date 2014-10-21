@@ -5,8 +5,7 @@
 extern "C" {
 #endif
 
-typedef struct uv_messenger_s uv_messenger_t;
-
+#include <mbgl/util/uv-messenger.h>
 #include <mbgl/util/uv-channel.h>
 
 #include <stdlib.h>

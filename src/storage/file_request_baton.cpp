@@ -58,8 +58,7 @@ void FileRequestBaton::file_opened(uv_fs_t *req) {
             uv_fs_close(req->loop, req, fd, file_closed);
         } else {
             ptr->fd = fd;
-            const int r = uv_fs_fstat(req->loop, req, fd, file_stated);
-            assert(r == 0);
+            uv_fs_fstat(req->loop, req, fd, file_stated);
         }
     }
 }
@@ -135,8 +134,7 @@ void FileRequestBaton::file_read(uv_fs_t *req) {
 }
 
 void FileRequestBaton::file_closed(uv_fs_t *req) {
-    FileRequestBaton *ptr = (FileRequestBaton *)req->data;
-    assert(ptr->thread_id == uv_thread_self());
+    assert(((FileRequestBaton *)req->data)->thread_id == uv_thread_self());
 
     if (req->result < 0) {
         // Closing the file failed. But there isn't anything we can do.
