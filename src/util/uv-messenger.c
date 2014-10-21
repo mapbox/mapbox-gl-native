@@ -8,7 +8,12 @@ typedef struct {
     void *queue[2];
 } uv__messenger_item_t;
 
+
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+void uv__messenger_callback(uv_async_t *async, int) {
+#else
 void uv__messenger_callback(uv_async_t *async) {
+#endif
     uv_messenger_t *msgr = (uv_messenger_t *)async->data;
 
     uv__messenger_item_t *item;

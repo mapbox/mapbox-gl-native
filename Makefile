@@ -6,14 +6,11 @@ all: setup
 
 setup: config.gypi
 
-config.gypi:
-	./setup-libraries.sh
-
 xlibs:
 	@./mapnik-packaging/osx/darwin_configure.sh osx
 
 ilibs:
-	@./mapnik-packaging/osx/darwin_configure.sh ios
+	MASON_PLATFORM=ios ./configure
 
 # Builds the regular library
 mbgl: config.gypi mapboxgl.gyp node
@@ -84,7 +81,7 @@ xproj: xproj-cli
 	open ./build/macosx/mapboxgl-app.xcodeproj
 
 # build iOS project for Xcode
-iproj-cli: config.gypi ilibs ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp clear_xcode_cache node
+iproj-cli: ilibs config.gypi ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp clear_xcode_cache node
 	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
 
 iproj: iproj-cli
