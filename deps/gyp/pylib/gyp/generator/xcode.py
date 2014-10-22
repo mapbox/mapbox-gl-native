@@ -604,7 +604,11 @@ def GenerateOutput(target_list, target_dicts, data, params):
 
     if parallel_builds:
       pbxp.SetProperty('attributes',
-                       {'BuildIndependentTargetsInParallel': 'YES'})
+                       {
+                           'BuildIndependentTargetsInParallel': 'YES',
+                           'LastUpgradeCheck': '0500'
+                       }
+                       )
     if project_version:
       xcp.project_file.SetXcodeVersion(project_version)
 
