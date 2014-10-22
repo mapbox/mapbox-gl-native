@@ -126,6 +126,6 @@ CONFIG+="  }
 }
 "
 
-echo "${CONFIG}" > config.gypi
+echo "${CONFIG}" > ${CONFIG_FILE}
 
-cat config.gypi
+cat ${CONFIG_FILE}
