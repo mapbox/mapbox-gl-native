@@ -18,10 +18,10 @@ template <typename T>
 T StopsFunction<T>::evaluate(float z) const {
     bool smaller = false;
     float smaller_z = 0.0f;
-    T smaller_val {};
+    T smaller_val = T();
     bool larger = false;
     float larger_z = 0.0f;
-    T larger_val {};
+    T larger_val = T();
 
     for (uint32_t i = 0; i < values.size(); i++) {
         float stop_z = values[i].first;
