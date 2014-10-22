@@ -433,7 +433,6 @@ static void VertexWeights( TESSvertex *isect, TESSvertex *org, TESSvertex *dst,
 static void GetIntersectData( TESStesselator *tess, TESSvertex *isect,
 							 TESSvertex *orgUp, TESSvertex *dstUp,
 							 TESSvertex *orgLo, TESSvertex *dstLo )
-#pragma GCC diagnostic pop
  /*
  * We've computed a new intersection point, now we need a "data" pointer
  * from the user so that we can refer to this new vertex in the
@@ -447,6 +446,7 @@ static void GetIntersectData( TESStesselator *tess, TESSvertex *isect,
 	VertexWeights( isect, orgUp, dstUp, &weights[0] );
 	VertexWeights( isect, orgLo, dstLo, &weights[2] );
 }
+#pragma GCC diagnostic pop
 
 static int CheckForRightSplice( TESStesselator *tess, ActiveRegion *regUp )
 /*
