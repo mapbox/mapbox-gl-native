@@ -209,13 +209,13 @@ PQhandle pqHeapInsert( TESSalloc* alloc, PriorityQHeap *pq, PQkey keyNew )
 			// If the heap overflows, double its size.
 			pq->max <<= 1;
 			pq->nodes = (PQnode *)alloc->memrealloc( alloc->userData, pq->nodes,
-				(size_t)((pq->max + 1) * sizeof( pq->nodes[0] )));
+				(unsigned int)((pq->max + 1) * sizeof( pq->nodes[0] )));
 			if (pq->nodes == NULL) {
 				pq->nodes = saveNodes;	// restore ptr to free upon return
 				return INV_HANDLE;
 			}
 			pq->handles = (PQhandleElem *)alloc->memrealloc( alloc->userData, pq->handles,
-				(size_t) ((pq->max + 1) * sizeof( pq->handles[0] )));
+				(unsigned int) ((pq->max + 1) * sizeof( pq->handles[0] )));
 			if (pq->handles == NULL) {
 				pq->handles = saveHandles; // restore ptr to free upon return
 				return INV_HANDLE;
@@ -351,7 +351,7 @@ int pqInit( TESSalloc* alloc, PriorityQ *pq )
 	(pq->size * sizeof(pq->order[0])) );
 	*/
 	pq->order = (PQkey **)alloc->memalloc( alloc->userData,
-										  (size_t)((pq->size+1) * sizeof(pq->order[0])) );
+										  (unsigned int)((pq->size+1) * sizeof(pq->order[0])) );
 	/* the previous line is a patch to compensate for the fact that IBM */
 	/* machines return a null on a malloc of zero bytes (unlike SGI),   */
 	/* so we have to put in this defense to guard against a memory      */
@@ -438,7 +438,7 @@ PQhandle pqInsert( TESSalloc* alloc, PriorityQ *pq, PQkey keyNew )
 			// If the heap overflows, double its size.
 			pq->max <<= 1;
 			pq->keys = (PQkey *)alloc->memrealloc( alloc->userData, pq->keys,
-				(size_t)(pq->max * sizeof( pq->keys[0] )));
+				(unsigned int)(pq->max * sizeof( pq->keys[0] )));
 			if (pq->keys == NULL) {
 				pq->keys = saveKey;  // restore ptr to free upon return
 				return INV_HANDLE;

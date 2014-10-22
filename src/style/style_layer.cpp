@@ -7,8 +7,8 @@
 
 namespace mbgl {
 
-StyleLayer::StyleLayer(const std::string &id, std::map<ClassID, ClassProperties> &&styles)
-    : id(id), styles(std::move(styles)) {}
+StyleLayer::StyleLayer(const std::string &id_, std::map<ClassID, ClassProperties> &&styles_)
+    : id(id_), styles(std::move(styles_)) {}
 
 bool StyleLayer::isBackground() const {
     return type == StyleLayerType::Background;
@@ -70,8 +70,8 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
 
     // Loop through all the properties in this style, and add transitions to them, if they're
     // not already the most recent transition.
-    const ClassProperties &properties = style_it->second;
-    for (const std::pair<PropertyKey, PropertyValue> &property_pair : properties)  {
+    const ClassProperties &class_properties = style_it->second;
+    for (const std::pair<PropertyKey, PropertyValue> &property_pair : class_properties)  {
         PropertyKey key = property_pair.first;
         if (already_applied.find(key) != already_applied.end()) {
             // This property has already been set by a previous class.
@@ -87,7 +87,7 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
         AppliedClassProperties &appliedProperties = appliedStyle[key];
         if (appliedProperties.mostRecent() != class_id) {
             const PropertyTransition &transition =
-                properties.getTransition(key, defaultTransition);
+                class_properties.getTransition(key, defaultTransition);
             const timestamp begin = now + transition.delay * 1_millisecond;
             const timestamp end = begin + transition.duration * 1_millisecond;
             const PropertyValue &value = property_pair.second;
@@ -99,7 +99,7 @@ void StyleLayer::applyClassProperties(const ClassID class_id,
 template <typename T>
 struct PropertyEvaluator {
     typedef T result_type;
-    PropertyEvaluator(float z) : z(z) {}
+    PropertyEvaluator(float z_) : z(z_) {}
 
     template <typename P, typename std::enable_if<std::is_convertible<P, T>::value, int>::type = 0>
     T operator()(const P &value) const {
@@ -235,6 +235,7 @@ void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const
     BackgroundProperties &background = properties.get<BackgroundProperties>();
     applyTransitionedStyleProperty(PropertyKey::BackgroundOpacity, background.opacity, z, now);
     applyTransitionedStyleProperty(PropertyKey::BackgroundColor, background.color, z, now);
+    applyStyleProperty(PropertyKey::BackgroundImage, background.image, z, now);
 }
 
 void StyleLayer::updateProperties(float z, const timestamp now) {
@@ -268,11 +269,11 @@ void StyleLayer::cleanupAppliedStyleProperties(timestamp now) {
     auto it = appliedStyle.begin();
     const auto end = appliedStyle.end();
     while (it != end) {
-        AppliedClassProperties &properties = it->second;
-        properties.cleanup(now);
+        AppliedClassProperties &applied_properties = it->second;
+        applied_properties.cleanup(now);
 
         // If the current properties object is empty, remove it from the map entirely.
-        if (properties.empty()) {
+        if (applied_properties.empty()) {
             appliedStyle.erase(it++);
         } else {
             ++it;

@@ -18,7 +18,7 @@ std::string compress(const std::string &raw) {
     }
 
     deflate_stream.next_in = (Bytef *)raw.data();
-    deflate_stream.avail_in = raw.size();
+    deflate_stream.avail_in = uInt(raw.size());
 
     std::string result;
     char out[16384];
@@ -53,7 +53,7 @@ std::string decompress(const std::string &raw) {
     }
 
     inflate_stream.next_in = (Bytef *)raw.data();
-    inflate_stream.avail_in = raw.size();
+    inflate_stream.avail_in = uInt(raw.size());
 
     std::string result;
     char out[15384];

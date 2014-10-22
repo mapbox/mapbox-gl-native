@@ -28,15 +28,13 @@ env:
 before_install:
 - source ./scripts/travis_helper.sh
 - source ./scripts/flags.sh
+- (git clone https://github.com/mapbox/mason.git ~/.mason ; sudo ln -s ~/.mason/mason /usr/local/bin/mason)
 - ./scripts/travis_before_install.sh
 - if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then glxinfo; fi
 
 install:
-- make setup
-- ./scripts/travis_install.sh
-
-before_script:
-- rm -rf mapnik-packaging/out/packages
+- make config.gypi
+- ./scripts/travis_install_test_suite.sh
 
 script:
 - ./scripts/travis_script.sh

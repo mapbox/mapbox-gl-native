@@ -58,11 +58,12 @@ struct EventPermutation {
 };
 
 constexpr EventSeverity disabledEventSeverities[] = {
-#if !DEBUG
-    EventSeverity::Debug,
+#if DEBUG
+    EventSeverity(-1) // Avoid zero size array
+#else
+    EventSeverity::Debug
 #endif
 };
-
 
 constexpr Event disabledEvents[] = {
     Event(-1) // Avoid zero size array

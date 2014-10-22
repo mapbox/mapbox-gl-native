@@ -8,8 +8,6 @@
 using namespace mbgl;
 
 TEST(Enums, StyleLayerType) {
-    std::cerr << StyleLayerType::Raster;
-
     ASSERT_EQ(StyleLayerType::Unknown, StyleLayerTypeClass("unknown"));
     ASSERT_EQ(StyleLayerType::Fill, StyleLayerTypeClass("fill"));
     ASSERT_EQ(StyleLayerType::Line, StyleLayerTypeClass("line"));
@@ -31,7 +29,7 @@ TEST(Enums, StyleLayerType) {
     ASSERT_EQ(StyleLayerTypeClass(StyleLayerType::Raster), StyleLayerTypeClass(StyleLayerType::Raster));
     ASSERT_EQ(StyleLayerTypeClass(StyleLayerType::Background), StyleLayerTypeClass(StyleLayerType::Background));
 
-    ASSERT_EQ(false, StyleLayerTypeClass("").valid());
-    ASSERT_EQ(false, StyleLayerTypeClass("Backgrund").valid());
+    ASSERT_FALSE(StyleLayerTypeClass("").valid());
+    ASSERT_FALSE(StyleLayerTypeClass("Backgrund").valid());
 }
 

@@ -9,11 +9,11 @@
 
 using namespace mbgl;
 
-GlyphAtlas::GlyphAtlas(uint16_t width, uint16_t height)
-    : width(width),
-      height(height),
-      bin(width, height),
-      data(new char[width *height]),
+GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
+    : width(width_),
+      height(height_),
+      bin(width_, height_),
+      data(new char[width_ *height_]),
       dirty(true) {
 }
 

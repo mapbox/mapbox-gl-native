@@ -7,8 +7,8 @@ using namespace mbgl;
 
 #include <iostream>
 
-Tile::Tile(const ID& id)
-    : id(id) {
+Tile::Tile(const ID& id_)
+    : id(id_) {
 }
 
 Tile::ID Tile::ID::parent(int8_t parent_z) const {

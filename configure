@@ -1,144 +1,131 @@
-#!/usr/bin/env python
-import optparse
-import os
-import pprint
-import re
-import shlex
-import subprocess
-import sys
+#!/usr/bin/env bash
 
-root_dir = os.path.dirname(__file__)
+set -e
+set -o pipefail
 
-# parse our options
-parser = optparse.OptionParser()
+CONFIG_FILE=${1:-config.gypi}
 
-parser.add_option("--debug",
-    action="store_true",
-    dest="debug",
-    help="Also build debug build")
+function finish {
+    >&2 echo -en "\033[0m";
+}
+trap finish EXIT
 
-parser.add_option("--node",
-    action="store",
-    dest="node",
-    help="Name of the node executable (defaults to node)")
-
-parser.add_option("--npm",
-    action="store",
-    dest="npm",
-    help="Name of the npm executable (defaults to npm)")
-
-parser.add_option("--pkg-config-root",
-    action="store",
-    dest="pkgconfig_root",
-    help="Path to pkg-config directory")
-
-parser.add_option("--boost",
-    action="store",
-    dest="boost_root",
-    help="Path to boost (defaults to /usr/local)")
-
-(options, args) = parser.parse_args()
-
-def pkg_config(pkg, pkgconfig_root):
-  env = os.environ.copy()
-  if pkgconfig_root:
-    env["PKG_CONFIG_PATH"] = pkgconfig_root
-  env["PKG_CONFIG_ALLOW_SYSTEM_CFLAGS"] = "1"
-  env["PKG_CONFIG_ALLOW_SYSTEM_LIBS"] = "1"
-  cmd = subprocess.Popen(['pkg-config', '--static', '--libs', pkg], stdout=subprocess.PIPE, env=env)
-  libs, ret = cmd.communicate()
-  if (ret): return None
-
-  cmd = subprocess.Popen(['pkg-config', '--static', '--cflags', pkg], stdout=subprocess.PIPE, env=env)
-  cflags, ret = cmd.communicate()
-  if (ret): return None
-
-  return (libs, cflags)
-
-def configure_mbgl(o):
-  if options.boost_root:
-      o['variables']['boost_root'] = options.boost_root
-  else:
-      o['variables']['boost_root'] = '/usr/local'
-  if options.node:
-      o['variables']['node'] = options.node
-  else:
-      o['variables']['node'] = 'node'
-  if options.npm:
-      o['variables']['npm'] = options.npm
-  else:
-      o['variables']['npm'] = 'npm'
-  o['target_defaults']['default_configuration'] = 'Debug' if options.debug else 'Release'
+# Install node
+if [[ ! -d ~/.nvm ]]; then
+    git clone --depth 1 https://github.com/creationix/nvm.git ~/.nvm
+fi
+set +u
+. ~/.nvm/nvm.sh
+if [ ! `nvm use 0.10 > /dev/null; echo $?` = 0 ]; then
+    >&2 echo -en "\033[1m\033[32m* "
+    nvm install 0.10
+    >&2 echo -en "\033[0m";
+else
+    >&2 echo -en "\033[1m\033[32m* "
+    nvm use 0.10
+    >&2 echo -en "\033[0m";
+fi
 
 
-def fix_frameworks(libs):
-  # don't split "-framework Foo"
-  return re.split('(?<!-framework)\s+', libs.strip())
+case $MASON_PLATFORM in
+    'ios')
+        SQLITE_VERSION=system
+        LIBPNG_VERSION=1.6.13
+        LIBUV_VERSION=0.10.28
+        ZLIB_VERSION=system
+        BOOST_VERSION=system
+        ;;
+    *)
+        GLFW_VERSION=a21f2377
+        SQLITE_VERSION=system
+        LIBPNG_VERSION=system
+        LIBCURL_VERSION=system
+        LIBUV_VERSION=0.10.28
+        ZLIB_VERSION=system
+        BOOST_VERSION=system
+        ;;
+esac
 
-def configure_glfw3(o):
-  ret = pkg_config('glfw3', options.pkgconfig_root)
-  if not ret:
-      sys.stderr.write('could not find glfw3 with pkg-config')
-      sys.exit(-1)
-  o['variables']['glfw3_libraries'] = fix_frameworks(ret[0])
-  o['variables']['glfw3_cflags'] = ret[1].split()
+function abort { >&2 echo -e "\033[1m\033[31m$1\033[0m"; exit 1; }
 
-def configure_uv(o):
-  ret = pkg_config('libuv', options.pkgconfig_root)
-  if not ret:
-      sys.stderr.write('could not find uv with pkg-config')
-      sys.exit(-1)
-  o['variables']['uv_libraries'] = ret[0].split()
-  o['variables']['uv_cflags'] = ret[1].split()
+NODE=`which node || abort 'Cannot find node'`
+NPM=`which npm || abort 'Cannot find npm'`
+PYTHON=`which python || abort 'Cannot find python'`
 
-def configure_png(o):
-  ret = pkg_config('libpng', options.pkgconfig_root)
-  if not ret:
-      sys.stderr.write('could not find png with pkg-config')
-      sys.exit(-1)
-  o['variables']['png_libraries'] = ret[0].split()
-  o['variables']['png_cflags'] = ret[1].split()
+>&2 echo -en "\033[1m\033[32m* Using npm "
+>&2 ${NPM} --version
+>&2 echo -en "\033[0m";
 
-def configure_curl(o):
-  ret = pkg_config('libcurl', options.pkgconfig_root)
-  if not ret:
-      sys.stderr.write('could not find curl with pkg-config')
-      sys.exit(-1)
-  o['variables']['curl_libraries'] = ret[0].split()
-  o['variables']['curl_cflags'] = ret[1].split()
+>&2 echo -en "\033[1m\033[32m* Using "
+>&2 ${PYTHON} --version
+>&2 echo -en "\033[0m";
 
-def configure_sqlite3(o):
-  ret = pkg_config('sqlite3', options.pkgconfig_root)
-  if not ret:
-      sys.stderr.write('could not find sqlite3 with pkg-config')
-      sys.exit(-1)
-  o['variables']['sqlite3_libraries'] = ret[0].split()
-  o['variables']['sqlite3_cflags'] = ret[1].split()
-
-def write(filename, data):
-  filename = os.path.join(root_dir, filename)
-  print "creating ", filename
-  f = open(filename, 'w+')
-  f.write(data)
-
-output = {
-  'variables': { 'python': sys.executable },
-  'target_defaults' : {
-    'include_dirs': [],
-    'libraries': [],
-    'defines': [],
-    'cflags': []
-  }
+function quote_flags {
+    ${PYTHON} -c "import sys, re; print re.split('(?<!-framework)\s+', ' '.join(sys.argv[1:]))" "$@"
 }
 
-if __name__ == '__main__':
-  configure_mbgl(output)
-  configure_glfw3(output)
-  configure_uv(output)
-  configure_png(output)
-  configure_curl(output)
-  configure_sqlite3(output)
-  pprint.pprint(output, indent=2)
+LN=$'\n'
 
-  write('config.gypi', "# Do not edit. Generated by the configure script.\n" +
-    pprint.pformat(output, indent=2) + "\n")
+CONFIG="# Do not edit. Generated by the configure script.
+{
+  'target_defaults': {
+    'cflags': [],
+    'default_configuration': 'Release',
+    'defines': [],
+    'include_dirs': [],
+    'libraries': []
+  },
+  'variables': {
+    'node': '${NODE}',
+    'npm': '${NPM}',
+    'python': '${PYTHON}',
+"
+
+if [ ! -z ${BOOST_VERSION} ]; then
+    mason install boost ${BOOST_VERSION}
+    CONFIG+="    'boost_root': '$(mason prefix boost ${BOOST_VERSION})',"$LN
+fi
+
+if [ ! -z ${LIBCURL_VERSION} ]; then
+    mason install libcurl ${LIBCURL_VERSION}
+    CONFIG+="    'curl_cflags': $(quote_flags $(mason cflags libcurl ${LIBCURL_VERSION})),"$LN
+    CONFIG+="    'curl_libraries': $(quote_flags $(mason ldflags libcurl ${LIBCURL_VERSION})),"$LN
+fi
+
+if [ ! -z ${GLFW_VERSION} ]; then
+    mason install glfw ${GLFW_VERSION}
+    CONFIG+="    'glfw3_cflags': $(quote_flags $(mason cflags glfw ${GLFW_VERSION})),"$LN
+    CONFIG+="    'glfw3_libraries': $(quote_flags $(mason ldflags glfw ${GLFW_VERSION})),"$LN
+fi
+
+if [ ! -z ${LIBPNG_VERSION} ]; then
+    mason install libpng ${LIBPNG_VERSION}
+    CONFIG+="    'png_cflags': $(quote_flags $(mason cflags libpng ${LIBPNG_VERSION})),"$LN
+    CONFIG+="    'png_libraries': $(quote_flags $(mason ldflags libpng ${LIBPNG_VERSION})),"$LN
+fi
+
+if [ ! -z ${SQLITE_VERSION} ]; then
+    mason install sqlite ${SQLITE_VERSION}
+    CONFIG+="    'sqlite3_cflags': $(quote_flags $(mason cflags sqlite ${SQLITE_VERSION})),"$LN
+    CONFIG+="    'sqlite3_libraries': $(quote_flags $(mason ldflags sqlite ${SQLITE_VERSION})),"$LN
+fi
+
+if [ ! -z ${LIBUV_VERSION} ]; then
+    mason install libuv ${LIBUV_VERSION}
+    CONFIG+="    'uv_cflags': $(quote_flags $(mason cflags libuv ${LIBUV_VERSION})),"$LN
+    CONFIG+="    'uv_libraries': $(quote_flags $(mason ldflags libuv ${LIBUV_VERSION})),"$LN
+fi
+
+if [ ! -z ${ZLIB_VERSION} ]; then
+    mason install zlib ${ZLIB_VERSION}
+    CONFIG+="    'zlib_cflags': $(quote_flags $(mason cflags zlib ${ZLIB_VERSION})),"$LN
+    CONFIG+="    'zlib_libraries': $(quote_flags $(mason ldflags zlib ${ZLIB_VERSION})),"$LN
+fi
+
+CONFIG+="  }
+}
+"
+
+echo "${CONFIG}" > ${CONFIG_FILE}
+
+cat ${CONFIG_FILE}

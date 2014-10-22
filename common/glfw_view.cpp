@@ -2,7 +2,7 @@
 
 #include <mbgl/util/string.hpp>
 
-GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {
+GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
 #ifdef NVIDIA
     glDiscardFramebufferEXT = (PFNGLDISCARDFRAMEBUFFEREXTPROC)glfwGetProcAddress("glDiscardFramebufferEXT");
 #endif

@@ -30,17 +30,17 @@
 
 using namespace mbgl;
 
-Map::Map(View& view)
+Map::Map(View& view_)
     : loop(std::make_shared<uv::loop>()),
       thread(std::make_unique<uv::thread>()),
       async_terminate(new uv_async_t()),
       async_render(new uv_async_t()),
       async_cleanup(new uv_async_t()),
-      view(view),
+      view(view_),
 #ifndef NDEBUG
       main_thread(uv_thread_self()),
 #endif
-      transform(view),
+      transform(view_),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
@@ -145,10 +145,6 @@ void Map::stop(stop_callback cb, void *data) {
     async = false;
 }
 
-void Map::delete_async(uv_handle_t *handle, int status) {
-    delete (uv_async_t *)handle;
-}
-
 void Map::run() {
 #ifndef NDEBUG
     if (!async) {
@@ -202,7 +198,11 @@ void Map::cleanup() {
     }
 }
 
-void Map::cleanup(uv_async_t *async, int status) {
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+void Map::cleanup(uv_async_t *async, int) {
+#else
+void Map::cleanup(uv_async_t *async) {
+#endif
     Map *map = static_cast<Map *>(async->data);
 
     map->painter.cleanup();
@@ -223,7 +223,11 @@ void Map::setReachability(bool reachable) {
     }
 }
 
-void Map::render(uv_async_t *async, int status) {
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+void Map::render(uv_async_t *async, int) {
+#else
+void Map::render(uv_async_t *async) {
+#endif
     Map *map = static_cast<Map *>(async->data);
     assert(uv_thread_self() == map->map_thread);
 
@@ -243,7 +247,11 @@ void Map::render(uv_async_t *async, int status) {
     }
 }
 
-void Map::terminate(uv_async_t *async, int status) {
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+void Map::terminate(uv_async_t *async, int) {
+#else
+void Map::terminate(uv_async_t *async) {
+#endif
     // Closes all open handles on the loop. This means that the loop will automatically terminate.
     Map *map = static_cast<Map *>(async->data);
     assert(uv_thread_self() == map->map_thread);
@@ -645,9 +653,6 @@ void Map::prepare() {
 void Map::render() {
     view.make_active();
 
-#if defined(DEBUG)
-    std::vector<std::string> debug;
-#endif
     painter.clear();
 
     painter.resize();

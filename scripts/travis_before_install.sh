@@ -10,6 +10,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     if [[ `lsb_release -r` =~ "12.04" ]]; then
         sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     fi
+    sudo add-apt-repository --yes ppa:boost-latest/ppa
 
     mapbox_time "apt_update" \
     sudo apt-get update -y
@@ -19,7 +20,9 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
 
     mapbox_time "install_build_tools" \
     sudo apt-get -y install git build-essential zlib1g-dev automake \
-                            libtool xutils-dev make cmake pkg-config python-pip
+                            libtool xutils-dev make cmake pkg-config python-pip \
+                            libboost1.55-dev libboost-regex1.55-dev libcurl4-openssl-dev \
+                            libpng-dev libsqlite3-dev
 
     mapbox_time "install_mesa_deps" \
     sudo apt-get install -y libpthread-stubs0-dev \
@@ -40,7 +43,8 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     mapbox_time "install_opengl" \
     sudo apt-get -y install libxi-dev x11proto-randr-dev \
                             x11proto-xext-dev libxrandr-dev \
-                            x11proto-xf86vidmode-dev libxxf86vm-dev libxcursor-dev
+                            x11proto-xf86vidmode-dev libxxf86vm-dev \
+                            libxcursor-dev libxinerama-dev
 
     mapbox_time "install_awscli" \
     sudo pip install awscli
@@ -49,7 +53,7 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     # install OS X dependencies
     #
     mapbox_time "install_build_tools" \
-    brew install autoconf automake libtool makedepend cmake pkg-config node git
+    brew install autoconf automake libtool makedepend cmake pkg-config node git boost
 
     mapbox_time "install_awscli" \
     sudo pip install awscli

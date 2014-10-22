@@ -428,6 +428,8 @@ static void VertexWeights( TESSvertex *isect, TESSvertex *org, TESSvertex *dst,
 }
 
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 static void GetIntersectData( TESStesselator *tess, TESSvertex *isect,
 							 TESSvertex *orgUp, TESSvertex *dstUp,
 							 TESSvertex *orgLo, TESSvertex *dstLo )
@@ -444,6 +446,7 @@ static void GetIntersectData( TESStesselator *tess, TESSvertex *isect,
 	VertexWeights( isect, orgUp, dstUp, &weights[0] );
 	VertexWeights( isect, orgLo, dstLo, &weights[2] );
 }
+#pragma GCC diagnostic pop
 
 static int CheckForRightSplice( TESStesselator *tess, ActiveRegion *regUp )
 /*

@@ -52,7 +52,7 @@
 
 // Handles the request thread + messaging to the thread.
 static uv_once_t once;
-static uv_loop_t loop;
+static uv_loop_t *loop = nullptr;
 static uv_messenger_t start_messenger;
 static uv_messenger_t stop_messenger;
 static uv_thread_t thread;
@@ -228,7 +228,7 @@ int handle_socket(CURL *handle, curl_socket_t sockfd, int action, void *, void *
         context->sockfd = sockfd;
         assert(!context->poll_handle);
         context->poll_handle = new uv_poll_t;
-        uv_poll_init_socket(&loop, context->poll_handle, sockfd);
+        uv_poll_init_socket(loop, context->poll_handle, sockfd);
         context->poll_handle->data = context;
         curl_multi_assign(multi, sockfd, context);
     }
@@ -253,7 +253,11 @@ int handle_socket(CURL *handle, curl_socket_t sockfd, int action, void *, void *
     return 0;
 }
 
-void on_timeout(uv_timer_t *, int status) {
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+void on_timeout(uv_timer_t *, int = 0) {
+#else
+void on_timeout(uv_timer_t *) {
+#endif
     int running_handles;
     CURLMcode error = curl_multi_socket_action(multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
     if (error != CURLM_OK) {
@@ -275,7 +279,7 @@ void thread_init(void *) {
 #endif
     thread_id = uv_thread_self();
 
-    uv_timer_init(&loop, &timeout);
+    uv_timer_init(loop, &timeout);
 
     CURLSHcode share_error;
     share = curl_share_init();
@@ -305,7 +309,7 @@ void thread_init(void *) {
     }
 
     // Main event loop. This will not return until the request loop is terminated.
-    uv_run(&loop, UV_RUN_DEFAULT);
+    uv_run(loop, UV_RUN_DEFAULT);
 
     curl_multi_cleanup(multi);
     multi = nullptr;
@@ -442,8 +446,14 @@ void stop_request(void *const ptr) {
 
 void create_thread() {
     uv_mutex_init(&share_mutex);
-    uv_messenger_init(&loop, &start_messenger, start_request);
-    uv_messenger_init(&loop, &stop_messenger, stop_request);
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+    loop = uv_loop_new();
+#else
+    loop = new uv_loop_t;
+    uv_loop_init(loop);
+#endif
+    uv_messenger_init(loop, &start_messenger, start_request);
+    uv_messenger_init(loop, &stop_messenger, stop_request);
     uv_thread_create(&thread, thread_init, nullptr);
 }
 

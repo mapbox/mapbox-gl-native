@@ -49,9 +49,9 @@ struct pbf {
     uint32_t tag = 0;
 };
 
-pbf::pbf(const unsigned char *data, size_t length)
-    : data(data),
-      end(data + length),
+pbf::pbf(const unsigned char *data_, size_t length)
+    : data(data_),
+      end(data_ + length),
       value(0),
       tag(0) {
 }

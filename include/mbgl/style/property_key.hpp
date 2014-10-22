@@ -61,7 +61,8 @@ enum class PropertyKey {
     RasterFade,
 
     BackgroundOpacity,
-    BackgroundColor
+    BackgroundColor,
+    BackgroundImage
 };
 
 }

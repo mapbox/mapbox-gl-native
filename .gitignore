@@ -4,10 +4,11 @@
 *.actual.png
 *.diff.png
 /node_modules
-/mapnik-packaging
+/mason_packages
 /macosx/build
 /ios/build
 /config.gypi
+/config-ios.gypi
 /config/constants_local.cpp
 /build
 /bin/node_modules

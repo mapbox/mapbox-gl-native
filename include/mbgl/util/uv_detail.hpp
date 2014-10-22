@@ -23,13 +23,32 @@ private:
 
 class loop {
 public:
-    inline loop() : l(uv_loop_new()) {}
-    inline ~loop() { uv_loop_delete(l); }
+    inline loop() {
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+        l = uv_loop_new();
+        if (l == nullptr) {
+#else
+        l = new uv_loop_t;
+        if (uv_loop_init(&l) != 0) {
+#endif
+            throw std::runtime_error("failed to initialize loop");
+        }
+    }
+
+    inline ~loop() {
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+        uv_loop_delete(l);
+#else
+        uv_loop_close(l);
+        delete l;
+#endif
+
+    }
 
     inline uv_loop_t *operator*() { return l; }
 
 private:
-    uv_loop_t *l;
+    uv_loop_t *l = nullptr;
 };
 
 class mutex {
@@ -49,7 +68,7 @@ private:
 
 class lock {
 public:
-    lock(mutex &mtx) : mtx(mtx) { mtx.lock(); }
+    lock(mutex &mtx_) : mtx(mtx_) { mtx.lock(); }
     ~lock() { mtx.unlock(); }
 
 private:
@@ -75,8 +94,8 @@ private:
 
 class readlock {
 public:
-    inline readlock(rwlock &mtx) : mtx(mtx) { mtx.rdlock(); }
-    inline readlock(const std::unique_ptr<rwlock> &mtx) : mtx(*mtx) { mtx->rdlock(); }
+    inline readlock(rwlock &mtx_) : mtx(mtx_) { mtx.rdlock(); }
+    inline readlock(const std::unique_ptr<rwlock> &mtx_) : mtx(*mtx_) { mtx.rdlock(); }
     inline ~readlock() { mtx.rdunlock(); }
 
 private:
@@ -85,8 +104,8 @@ private:
 
 class writelock {
 public:
-    inline writelock(rwlock &mtx) : mtx(mtx) { mtx.wrlock(); }
-    inline writelock(const std::unique_ptr<rwlock> &mtx) : mtx(*mtx) { mtx->wrlock(); }
+    inline writelock(rwlock &mtx_) : mtx(mtx_) { mtx.wrlock(); }
+    inline writelock(const std::unique_ptr<rwlock> &mtx_) : mtx(*mtx_) { mtx.wrlock(); }
     inline ~writelock() { mtx.wrunlock(); }
 
 private:
@@ -129,10 +148,10 @@ public:
     typedef void (*after_work_callback)(T &object);
 
     template<typename... Args>
-    work(worker &worker, work_callback work_cb, after_work_callback after_work_cb, Args&&... args)
+    work(worker &worker, work_callback work_cb_, after_work_callback after_work_cb_, Args&&... args)
         : data(std::forward<Args>(args)...),
-          work_cb(work_cb),
-          after_work_cb(after_work_cb) {
+          work_cb(work_cb_),
+          after_work_cb(after_work_cb_) {
         worker.add(this, do_work, after_work);
     }
 

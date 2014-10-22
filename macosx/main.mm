@@ -85,7 +85,7 @@ int main() {
 
     // Notify map object when network reachability status changes.
     Reachability* reachability = [Reachability reachabilityForInternetConnection];
-    reachability.reachableBlock = ^(Reachability *reachability) {
+    reachability.reachableBlock = ^(Reachability *) {
         map_ptr->setReachability(true);
     };
     [reachability startNotifier];

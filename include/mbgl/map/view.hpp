@@ -22,8 +22,8 @@ enum MapChange : uint8_t {
 
 class View {
 public:
-    virtual void initialize(Map *map) {
-        this->map = map;
+    virtual void initialize(Map *map_) {
+        map = map_;
     }
 
     // Called from the render (=GL) thread. Signals that the context should

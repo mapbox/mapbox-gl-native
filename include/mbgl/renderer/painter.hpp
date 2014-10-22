@@ -154,10 +154,10 @@ public:
 
     // used to composite images and flips the geometry upside down
     const mat4 flipMatrix = []{
-        mat4 flipMatrix;
-        matrix::ortho(flipMatrix, 0, 4096, -4096, 0, 0, 1);
-        matrix::translate(flipMatrix, flipMatrix, 0, -4096, 0);
-        return flipMatrix;
+        mat4 flip;
+        matrix::ortho(flip, 0, 4096, -4096, 0, 0, 1);
+        matrix::translate(flip, flip, 0, -4096, 0);
+        return flip;
     }();
 
     const mat4 identityMatrix = []{
