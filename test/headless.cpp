@@ -35,8 +35,8 @@ TEST_P(HeadlessTest, render) {
     // Parse style.
     rapidjson::Document styleDoc;
     styleDoc.Parse<0>((const char *const)style.c_str());
-    ASSERT_EQ(false, styleDoc.HasParseError());
-    ASSERT_EQ(true, styleDoc.IsObject());
+    ASSERT_FALSE(styleDoc.HasParseError());
+    ASSERT_TRUE(styleDoc.IsObject());
 
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
@@ -46,16 +46,16 @@ TEST_P(HeadlessTest, render) {
     // Parse settings.
     rapidjson::Document infoDoc;
     infoDoc.Parse<0>((const char *const)info.c_str());
-    ASSERT_EQ(false, infoDoc.HasParseError());
-    ASSERT_EQ(true, infoDoc.IsObject());
+    ASSERT_FALSE(infoDoc.HasParseError());
+    ASSERT_TRUE(infoDoc.IsObject());
 
     Log::Set<FixtureLogBackend>();
 
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
         const std::string name { it->name.GetString(), it->name.GetStringLength() };
         const rapidjson::Value &value = it->value;
-        ASSERT_EQ(true, value.IsObject());
-        if (value.HasMember("center")) ASSERT_EQ(true, value["center"].IsArray());
+        ASSERT_TRUE(value.IsObject());
+        if (value.HasMember("center")) ASSERT_TRUE(value["center"].IsArray());
 
         const std::string actual_image = base_directory + "tests/" + base + "/" + name +  "/actual.png";
 
@@ -70,10 +70,10 @@ TEST_P(HeadlessTest, render) {
         std::vector<std::string> classes;
         if (value.HasMember("classes")) {
             const rapidjson::Value &js_classes = value["classes"];
-            ASSERT_EQ(true, js_classes.IsArray());
+            ASSERT_TRUE(js_classes.IsArray());
             for (rapidjson::SizeType i = 0; i < js_classes.Size(); i++) {
                 const rapidjson::Value &js_class = js_classes[i];
-                ASSERT_EQ(true, js_class.IsString());
+                ASSERT_TRUE(js_class.IsString());
                 classes.push_back({ js_class.GetString(), js_class.GetStringLength() });
             }
         }

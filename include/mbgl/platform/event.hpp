@@ -57,11 +57,13 @@ struct EventPermutation {
     }
 };
 
-constexpr EventSeverity disabledEventSeverities[] = {
 #if !DEBUG
+constexpr EventSeverity disabledEventSeverities[] = {
     EventSeverity::Debug,
-#endif
 };
+#else
+constexpr EventSeverity *disabledEventSeverities = nullptr;
+#endif
 
 
 constexpr Event disabledEvents[] = {

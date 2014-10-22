@@ -208,7 +208,7 @@ int raw_equal(const char *first, const char *second)
 
 int clamp_to_int(long slnum)
 {
-  return slnum > INT_MAX ? INT_MAX : slnum < INT_MIN ? INT_MIN : slnum;
+  return slnum > INT_MAX ? INT_MAX : slnum < INT_MIN ? INT_MIN : (int)slnum;
 }
 
 

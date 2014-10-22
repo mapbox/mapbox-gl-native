@@ -21,7 +21,7 @@ class Log {
 private:
     template <typename T>
     constexpr static bool includes(const T e, T const *l, const size_t i = 0) {
-        return i >= sizeof l ? false : *(l + i) == e ? true : includes(e, l, i + 1);
+        return l == nullptr ? false : i >= sizeof l ? false : *(l + i) == e ? true : includes(e, l, i + 1);
     }
 
 public:
