@@ -37,6 +37,9 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     ./autogen.sh --with-gallium-drivers=svga,swrast --disable-dri \
         --enable-xlib-glx --enable-glx-tls --with-llvm-prefix=/usr/lib/llvm-3.4 \
         --without-va && \
+    echo $CXXFLAGS
+    echo $CFLAGS
+    echo $LDFLAGS
     make && sudo make install && \
     cd ../
 
