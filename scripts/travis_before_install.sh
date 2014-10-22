@@ -24,7 +24,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
                             libboost1.55-dev libboost-regex1.55-dev libcurl4-openssl-dev \
                             libpng-dev libsqlite3-dev
 
-    apbox_time "install_opengl" \
+    mapbox_time "install_opengl" \
     sudo apt-get -y install libxi-dev libglu1-mesa-dev x11proto-randr-dev \
                             x11proto-xext-dev libxrandr-dev \
                             x11proto-xf86vidmode-dev libxxf86vm-dev \
