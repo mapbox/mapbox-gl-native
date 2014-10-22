@@ -61,7 +61,7 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         Sprite &sprite = *map.getSprite();
         if (pass == RenderPass::Translucent && sprite) {
             SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-            const SpriteAtlasPosition pos = spriteAtlas.getPosition(properties.image, sprite, true);
+            const SpriteAtlasPosition pos = spriteAtlas.getPosition(properties.image, true);
             const float mix = std::fmod(float(map.getState().getZoom()), 1.0f);
             const float factor = 8.0 / std::pow(2, map.getState().getIntegerZoom() - id.z);
 

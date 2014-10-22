@@ -218,7 +218,7 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
             return;
 
         SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-        SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image, *sprite, true);
+        SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image, true);
         float zoomFraction = map.getState().getZoomFraction();
 
         useProgram(patternShader->program);

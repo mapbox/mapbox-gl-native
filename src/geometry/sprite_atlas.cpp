@@ -24,7 +24,7 @@ SpriteAtlas::SpriteAtlas(dimension width_, dimension height_)
 bool SpriteAtlas::resize(const float newRatio) {
     if (pixelRatio == newRatio) return false;
 
-    std::lock_guard<std::mutex> lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     const float oldRatio = pixelRatio;
     pixelRatio = newRatio;
@@ -104,15 +104,15 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t pixel_width, size
     return rect;
 }
 
-Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string &name, const Sprite &sprite) {
-    std::lock_guard<std::mutex> lock(mtx);
+Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string& name) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     auto rect_it = images.find(name);
     if (rect_it != images.end()) {
         return rect_it->second;
     }
 
-    const SpritePosition &pos = sprite.getSpritePosition(name);
+    const SpritePosition &pos = sprite->getSpritePosition(name);
     if (!pos.width || !pos.height) {
         return Rect<dimension> { 0, 0, 0, 0 };
     }
@@ -127,27 +127,23 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string &name, cons
 
     images.emplace(name, rect);
 
-    copy(rect, pos, sprite);
+    copy(rect, pos);
 
     return rect;
 }
 
-SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, const Sprite& sprite, bool repeating) {
+SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, bool repeating) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     // `repeating` indicates that the image will be used in a repeating pattern
     // repeating pattern images are assumed to have a 1px padding that mirrors the opposite edge
     // positions for repeating images are adjusted to exclude the edge
-    Rect<dimension> rect = getImage(name, sprite);
+    Rect<dimension> rect = getImage(name);
     const int r = repeating ? 1 : 0;
     return SpriteAtlasPosition {
         {{ float(rect.w)           / pixelRatio, float(rect.h)            / pixelRatio }},
         {{ float(rect.x + r)            / width, float(rect.y + r)            / height }},
         {{ float(rect.x + rect.w - 2*r) / width, float(rect.y + rect.h - 2*r) / height }}
     };
-}
-
-Rect<SpriteAtlas::dimension> SpriteAtlas::waitForImage(const std::string &name, const Sprite &sprite) {
-    sprite.waitUntilLoaded();
-    return getImage(name, sprite);
 }
 
 void SpriteAtlas::allocate() {
@@ -159,15 +155,15 @@ void SpriteAtlas::allocate() {
     }
 }
 
-void SpriteAtlas::copy(const Rect<dimension> &dst, const SpritePosition &src, const Sprite &sprite) {
-    if (!sprite.raster) return;
-    const uint32_t *src_img = reinterpret_cast<const uint32_t *>(sprite.raster->getData());
+void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src) {
+    if (!sprite->raster) return;
+    const uint32_t *src_img = reinterpret_cast<const uint32_t *>(sprite->raster->getData());
     allocate();
     uint32_t *dst_img = reinterpret_cast<uint32_t *>(data);
 
     copy_bitmap(
         /* source buffer */  src_img,
-        /* source stride */  sprite.raster->getWidth(),
+        /* source stride */  sprite->raster->getWidth(),
         /* source x */       src.x,
         /* source y */       src.y,
         /* dest buffer */    dst_img,
@@ -181,14 +177,16 @@ void SpriteAtlas::copy(const Rect<dimension> &dst, const SpritePosition &src, co
     dirty = true;
 }
 
+void SpriteAtlas::setSprite(util::ptr<Sprite> sprite_) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
-void SpriteAtlas::update(const Sprite &sprite) {
-    if (!sprite.isLoaded()) return;
+    sprite = sprite_;
 
-    SpriteAtlas &atlas = *this;
-    util::erase_if(uninitialized, [&sprite, &atlas](const std::string &name) {
-        Rect<dimension> dst = atlas.getImage(name, sprite);
-        const SpritePosition &src = sprite.getSpritePosition(name);
+    if (!sprite->isLoaded()) return;
+
+    util::erase_if(uninitialized, [this](const std::string &name) {
+        Rect<dimension> dst = getImage(name);
+        const SpritePosition& src = sprite->getSpritePosition(name);
         if (!src) {
             if (debug::spriteWarnings) {
                 fprintf(stderr, "[WARNING] sprite doesn't have image with name '%s'\n", name.c_str());
@@ -196,8 +194,8 @@ void SpriteAtlas::update(const Sprite &sprite) {
             return true;
         }
 
-        if (src.width == dst.w * atlas.pixelRatio && src.height == dst.h * atlas.pixelRatio && src.pixelRatio == atlas.pixelRatio) {
-            atlas.copy(dst, src, sprite);
+        if (src.width == dst.w * pixelRatio && src.height == dst.h * pixelRatio && src.pixelRatio == pixelRatio) {
+            copy(dst, src);
             return true;
         } else {
             if (debug::spriteWarnings) {
@@ -228,7 +226,7 @@ void SpriteAtlas::bind(bool linear) {
     }
 
     if (dirty) {
-        std::lock_guard<std::mutex> lock(mtx);
+        std::lock_guard<std::recursive_mutex> lock(mtx);
         allocate();
 
         if (first) {
@@ -257,15 +255,12 @@ void SpriteAtlas::bind(bool linear) {
             );
         }
 
-#if defined(DEBUG)
-        // platform::show_color_debug_image("Sprite Atlas", reinterpret_cast<char *>(data), width, height, width * pixelRatio, height * pixelRatio);
-#endif
         dirty = false;
     }
 };
 
 SpriteAtlas::~SpriteAtlas() {
-    std::lock_guard<std::mutex> lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     glDeleteTextures(1, &texture);
     texture = 0;

@@ -646,7 +646,7 @@ void Map::prepare() {
 
     // Allow the sprite atlas to potentially pull new sprite images if needed.
     spriteAtlas->resize(state.getPixelRatio());
-    spriteAtlas->update(*getSprite());
+    spriteAtlas->setSprite(getSprite());
 
     updateTiles();
 }
