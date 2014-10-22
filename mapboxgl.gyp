@@ -165,7 +165,6 @@
             'xcode_settings': {
               'OTHER_CPLUSPLUSFLAGS': [
                 '<@(uv_cflags)',
-                '-I<(boost_root)/include',
               ],
               'OTHER_LDFLAGS': [
                 '<@(png_libraries)',
@@ -177,7 +176,6 @@
           }, {
             'cflags': [
               '<@(uv_cflags)',
-              '-I<(boost_root)/include',
             ],
             'libraries': [
               '<@(png_libraries)',
