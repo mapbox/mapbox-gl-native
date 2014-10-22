@@ -10,7 +10,10 @@ typedef struct {
 
 
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
 void uv__messenger_callback(uv_async_t *async, int status) {
+#pragma clang diagnostic pop
 #else
 void uv__messenger_callback(uv_async_t *async) {
 #endif
