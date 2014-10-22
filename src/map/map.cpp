@@ -551,10 +551,6 @@ void Map::stopRotating() {
     update();
 }
 
-bool Map::canRotate() {
-    return transform.canRotate();
-}
-
 
 #pragma mark - Toggles
 
