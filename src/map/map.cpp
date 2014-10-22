@@ -145,10 +145,6 @@ void Map::stop(stop_callback cb, void *data) {
     async = false;
 }
 
-void Map::delete_async(uv_handle_t *handle) {
-    delete (uv_async_t *)handle;
-}
-
 void Map::run() {
 #ifndef NDEBUG
     if (!async) {
@@ -203,7 +199,11 @@ void Map::cleanup() {
     }
 }
 
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+void Map::cleanup(uv_async_t *async, int) {
+#else
 void Map::cleanup(uv_async_t *async) {
+#endif
     Map *map = static_cast<Map *>(async->data);
 
     map->view.make_active();
@@ -221,7 +221,11 @@ void Map::setReachability(bool reachable) {
     }
 }
 
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+void Map::render(uv_async_t *async, int) {
+#else
 void Map::render(uv_async_t *async) {
+#endif
     Map *map = static_cast<Map *>(async->data);
     assert(uv_thread_self() == map->map_thread);
 
@@ -241,7 +245,11 @@ void Map::render(uv_async_t *async) {
     }
 }
 
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+void Map::terminate(uv_async_t *async, int) {
+#else
 void Map::terminate(uv_async_t *async) {
+#endif
     // Closes all open handles on the loop. This means that the loop will automatically terminate.
     Map *map = static_cast<Map *>(async->data);
     assert(uv_thread_self() == map->map_thread);

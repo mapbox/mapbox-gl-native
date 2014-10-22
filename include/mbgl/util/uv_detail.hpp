@@ -24,17 +24,31 @@ private:
 class loop {
 public:
     inline loop() {
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+        l = uv_loop_new();
+        if (l == nullptr) {
+#else
+        l = new uv_loop_t;
         if (uv_loop_init(&l) != 0) {
+#endif
             throw std::runtime_error("failed to initialize loop");
         }
     }
 
-    inline ~loop() { uv_loop_close(&l); }
+    inline ~loop() {
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+        uv_loop_delete(l);
+#else
+        uv_loop_close(l);
+        delete l;
+#endif
 
-    inline uv_loop_t *operator*() { return &l; }
+    }
+
+    inline uv_loop_t *operator*() { return l; }
 
 private:
-    uv_loop_t l;
+    uv_loop_t *l = nullptr;
 };
 
 class mutex {

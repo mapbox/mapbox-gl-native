@@ -31,7 +31,7 @@ TEST(Enums, StyleLayerType) {
     ASSERT_EQ(StyleLayerTypeClass(StyleLayerType::Raster), StyleLayerTypeClass(StyleLayerType::Raster));
     ASSERT_EQ(StyleLayerTypeClass(StyleLayerType::Background), StyleLayerTypeClass(StyleLayerType::Background));
 
-    ASSERT_EQ(false, StyleLayerTypeClass("").valid());
-    ASSERT_EQ(false, StyleLayerTypeClass("Backgrund").valid());
+    ASSERT_FALSE(StyleLayerTypeClass("").valid());
+    ASSERT_FALSE(StyleLayerTypeClass("Backgrund").valid());
 }
 

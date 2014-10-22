@@ -35,11 +35,17 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &baton) {
         const size_t size = ftell(file);
         fseek(file, 0, SEEK_SET);
         baton->response->data.resize(size);
-        fread(&baton->response->data[0], size, 1, file);
+        const size_t read = fread(&baton->response->data[0], 1, size, file);
         fclose(file);
 
-        baton->response->code = 200;
-        baton->type = HTTPResponseType::Successful;
+        if (read == size) {
+            baton->response->code = 200;
+            baton->type = HTTPResponseType::Successful;
+        } else {
+            baton->response->code = 500;
+            baton->type = HTTPResponseType::PermanentError;
+            baton->response->message = "Read bytes differed from file size";
+        }
     } else {
         baton->type = HTTPResponseType::PermanentError;
         baton->response->code = 404;

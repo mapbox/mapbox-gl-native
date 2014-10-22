@@ -31,6 +31,10 @@ _intermediate_var = 'INTERMEDIATE_DIR'
 # targets that share the same BUILT_PRODUCTS_DIR.
 _shared_intermediate_var = 'SHARED_INTERMEDIATE_DIR'
 
+# ONLY_ACTIVE_ARCH means that only the active architecture should be build for
+# Debugging purposes to shorten the build time
+_only_active_arch = 'ONLY_ACTIVE_ARCH'
+
 _library_search_paths_var = 'LIBRARY_SEARCH_PATHS'
 
 generator_default_variables = {
@@ -167,6 +171,8 @@ class XcodeProject(object):
                          '$(PROJECT_DERIVED_FILE_DIR)/$(CONFIGURATION)')
     xccl.SetBuildSetting(_shared_intermediate_var,
                          '$(SYMROOT)/DerivedSources/$(CONFIGURATION)')
+
+    xccl.ConfigurationNamed('Debug').SetBuildSetting(_only_active_arch, 'YES')
 
     # Set user-specified project-wide build settings and config files.  This
     # is intended to be used very sparingly.  Really, almost everything should
@@ -604,7 +610,11 @@ def GenerateOutput(target_list, target_dicts, data, params):
 
     if parallel_builds:
       pbxp.SetProperty('attributes',
-                       {'BuildIndependentTargetsInParallel': 'YES'})
+                       {
+                           'BuildIndependentTargetsInParallel': 'YES',
+                           'LastUpgradeCheck': '0500'
+                       }
+                       )
     if project_version:
       xcp.project_file.SetXcodeVersion(project_version)
 

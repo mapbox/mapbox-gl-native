@@ -29,7 +29,11 @@ void FileRequestBaton::notify_error(uv_fs_t *req) {
     if (ptr->request && req->result < 0 && !ptr->canceled && req->result != UV_ECANCELED) {
         ptr->request->response = std::unique_ptr<Response>(new Response);
         ptr->request->response->code = req->result == UV_ENOENT ? 404 : 500;
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+        ptr->request->response->message = uv_strerror(uv_last_error(req->loop));
+#else
         ptr->request->response->message = uv_strerror(int(req->result));
+#endif
         ptr->request->notify();
     }
 }
@@ -63,7 +67,7 @@ void FileRequestBaton::file_stated(uv_fs_t *req) {
     FileRequestBaton *ptr = (FileRequestBaton *)req->data;
     assert(ptr->thread_id == uv_thread_self());
 
-    if (req->result < 0 || ptr->canceled || !ptr->request) {
+    if (req->result != 0 || ptr->canceled || !ptr->request) {
         // Stating failed or was canceled. We already have an open file handle
         // though, which we'll have to close.
         notify_error(req);
@@ -71,13 +75,22 @@ void FileRequestBaton::file_stated(uv_fs_t *req) {
         uv_fs_req_cleanup(req);
         uv_fs_close(req->loop, req, ptr->fd, file_closed);
     } else {
-        if (static_cast<const uv_stat_t *>(req->ptr)->st_size > std::numeric_limits<int>::max()) {
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+        const uv_statbuf_t *stat = static_cast<const uv_statbuf_t *>(req->ptr);
+#else
+        const uv_stat_t *stat = static_cast<const uv_stat_t *>(req->ptr);
+#endif
+        if (stat->st_size > std::numeric_limits<int>::max()) {
             // File is too large for us to open this way because uv_buf's only support unsigned
             // ints as maximum size.
             if (ptr->request) {
                 ptr->request->response = std::unique_ptr<Response>(new Response);
                 ptr->request->response->code = UV_EFBIG;
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+                ptr->request->response->message = uv_strerror(uv_err_t {UV_EFBIG, 0});
+#else
                 ptr->request->response->message = uv_strerror(UV_EFBIG);
+#endif
                 ptr->request->notify();
             }
 
@@ -85,11 +98,15 @@ void FileRequestBaton::file_stated(uv_fs_t *req) {
             uv_fs_close(req->loop, req, ptr->fd, file_closed);
         } else {
             const unsigned int size =
-                (unsigned int)(static_cast<const uv_stat_t *>(req->ptr)->st_size);
+                (unsigned int)(stat->st_size);
             ptr->body.resize(size);
             ptr->buffer = uv_buf_init(const_cast<char *>(ptr->body.data()), size);
             uv_fs_req_cleanup(req);
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+            uv_fs_read(req->loop, req, ptr->fd, ptr->buffer.base, ptr->buffer.len, -1, file_read);
+#else
             uv_fs_read(req->loop, req, ptr->fd, &ptr->buffer, 1, 0, file_read);
+#endif
         }
     }
 }
@@ -117,8 +134,7 @@ void FileRequestBaton::file_read(uv_fs_t *req) {
 }
 
 void FileRequestBaton::file_closed(uv_fs_t *req) {
-    FileRequestBaton *ptr = (FileRequestBaton *)req->data;
-    assert(ptr->thread_id == uv_thread_self());
+    assert(((FileRequestBaton *)req->data)->thread_id == uv_thread_self());
 
     if (req->result < 0) {
         // Closing the file failed. But there isn't anything we can do.

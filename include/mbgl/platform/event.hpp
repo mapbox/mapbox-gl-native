@@ -65,7 +65,6 @@ constexpr EventSeverity disabledEventSeverities[] = {
 #endif
 };
 
-
 constexpr Event disabledEvents[] = {
     Event(-1) // Avoid zero size array
 };

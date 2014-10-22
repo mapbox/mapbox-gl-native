@@ -5,6 +5,7 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-variable"
 #ifdef __clang__
 #pragma GCC diagnostic ignored "-Wdeprecated-register"
 #else

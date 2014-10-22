@@ -1,7 +1,6 @@
 {
   'includes': [
     './common.gypi',
-    './config.gypi',
   ],
   'targets': [
     {
@@ -139,8 +138,8 @@
             'OTHER_CPLUSPLUSFLAGS': [
               '<@(png_cflags)',
               '<@(uv_cflags)',
-              '<@(curl_cflags)',
               '<@(sqlite3_cflags)',
+              '<@(zlib_cflags)',
               '-I<(boost_root)/include',
             ],
             'OTHER_CFLAGS': [
@@ -151,8 +150,8 @@
           'cflags': [
             '<@(png_cflags)',
             '<@(uv_cflags)',
-            '<@(curl_cflags)',
             '<@(sqlite3_cflags)',
+            '<@(zlib_cflags)',
             '-I<(boost_root)/include',
           ],
         }]
@@ -166,27 +165,23 @@
             'xcode_settings': {
               'OTHER_CPLUSPLUSFLAGS': [
                 '<@(uv_cflags)',
-                '<@(curl_cflags)',
-                '-I<(boost_root)/include',
               ],
               'OTHER_LDFLAGS': [
                 '<@(png_libraries)',
                 '<@(uv_libraries)',
-                '<@(curl_libraries)',
                 '<@(sqlite3_libraries)',
+                '<@(zlib_libraries)',
               ]
             }
           }, {
             'cflags': [
               '<@(uv_cflags)',
-              '<@(curl_cflags)',
-              '-I<(boost_root)/include',
             ],
             'libraries': [
               '<@(png_libraries)',
               '<@(uv_libraries)',
-              '<@(curl_libraries)',
               '<@(sqlite3_libraries)',
+              '<@(zlib_libraries)',
             ]
           }]
         ]
@@ -212,8 +207,7 @@
       ],
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
-        'SUPPORTED_PLATFORMS': ['iphonesimulator','iphoneos'],
-        'ARCHS': [ "armv7", "armv7s", "arm64", "i386", "x86_64" ],
+        'SUPPORTED_PLATFORMS': 'iphonesimulator iphoneos',
         'TARGETED_DEVICE_FAMILY': '1,2',
         'CODE_SIGN_IDENTITY': 'iPhone Developer',
         'IPHONEOS_DEPLOYMENT_TARGET': '7.0',
@@ -222,8 +216,8 @@
         'OTHER_CPLUSPLUSFLAGS': [
           '<@(png_cflags)',
           '<@(uv_cflags)',
-          '<@(curl_cflags)',
           '<@(sqlite3_cflags)',
+          '<@(zlib_cflags)',
           '-I<(boost_root)/include',
         ],
       },
@@ -238,8 +232,8 @@
           'OTHER_LDFLAGS': [
             '<@(png_libraries)',
             '<@(uv_libraries)',
-            '<@(curl_libraries)',
             '<@(sqlite3_libraries)',
+            '<@(zlib_libraries)',
           ],
           'OTHER_CPLUSPLUSFLAGS': [
             '<@(uv_cflags)',
