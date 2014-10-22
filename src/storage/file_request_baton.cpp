@@ -83,7 +83,6 @@ void FileRequestBaton::file_stated(uv_fs_t *req) {
         if (stat->st_size > std::numeric_limits<int>::max()) {
             // File is too large for us to open this way because uv_buf's only support unsigned
             // ints as maximum size.
-            const uv_err_t error = {UV_EFBIG, 0};
             if (ptr->request) {
                 ptr->request->response = std::unique_ptr<Response>(new Response);
                 ptr->request->response->code = UV_EFBIG;
