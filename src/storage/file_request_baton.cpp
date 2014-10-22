@@ -2,6 +2,8 @@
 #include <mbgl/storage/file_request.hpp>
 #include <mbgl/storage/response.hpp>
 
+#include <limits>
+
 namespace mbgl {
 
 FileRequestBaton::FileRequestBaton(FileRequest *request_, const std::string &path, uv_loop_t *loop)
