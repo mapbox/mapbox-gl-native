@@ -428,9 +428,12 @@ static void VertexWeights( TESSvertex *isect, TESSvertex *org, TESSvertex *dst,
 }
 
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 static void GetIntersectData( TESStesselator *tess, TESSvertex *isect,
 							 TESSvertex *orgUp, TESSvertex *dstUp,
 							 TESSvertex *orgLo, TESSvertex *dstLo )
+#pragma GCC diagnostic pop
  /*
  * We've computed a new intersection point, now we need a "data" pointer
  * from the user so that we can refer to this new vertex in the

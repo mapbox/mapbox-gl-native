@@ -46,17 +46,6 @@
 
 #define Dot(u,v)	(u[0]*v[0] + u[1]*v[1] + u[2]*v[2])
 
-static void Normalize( TESSreal v[3] )
-{
-	TESSreal len = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-
-	assert( len > 0 );
-	len = sqrtf( len );
-	v[0] /= len;
-	v[1] /= len;
-	v[2] /= len;
-}
-
 #define ABS(x)	((x) < 0 ? -(x) : (x))
 
 static int LongAxis( TESSreal v[3] )
@@ -436,6 +425,8 @@ int tessMeshSetWindingNumber( TESSmesh *mesh, int value,
 	return 1;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void* heapAlloc( void* userData, unsigned int size )
 {
 	return malloc( size );
@@ -450,6 +441,7 @@ void heapFree( void* userData, void* ptr )
 {
 	free( ptr );
 }
+#pragma GCC diagnostic pop
 
 static TESSalloc defaulAlloc =
 {
