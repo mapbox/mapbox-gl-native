@@ -26,6 +26,6 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     #
     # install OS X dependencies
     #
-    brew install autoconf automake libtool makedepend cmake pkg-config node git
+    brew install autoconf automake libtool makedepend cmake pkg-config node git boost
     sudo pip install awscli
 fi
