@@ -18,6 +18,8 @@
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
 
+#include <algorithm>
+
 namespace mbgl {
 
 Source::Source(const util::ptr<SourceInfo>& info_)
