@@ -23,7 +23,7 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const t
     for (auto it = class_names.rbegin(); it != class_names.rend(); it++) {
         const std::string &class_name = *it;
         // From here on, we're only dealing with IDs to avoid comparing strings all the time.
-        const ClassID class_id = ClassDictionary::Lookup(class_name);
+        const ClassID class_id = ClassDictionary::Get().lookup(class_name);
         applyClassProperties(class_id, already_applied, now, defaultTransition);
     }
 

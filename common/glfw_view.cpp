@@ -8,7 +8,10 @@ GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {
 #endif
 }
 
-GLFWView::~GLFWView() { glfwTerminate(); }
+GLFWView::~GLFWView() {
+    map->terminate();
+    glfwTerminate();
+}
 
 void GLFWView::initialize(mbgl::Map *map) {
     View::initialize(map);
@@ -192,6 +195,10 @@ int GLFWView::run() {
 
 void GLFWView::make_active() {
     glfwMakeContextCurrent(window);
+}
+
+void GLFWView::make_inactive() {
+    glfwMakeContextCurrent(nullptr);
 }
 
 void GLFWView::notify() {

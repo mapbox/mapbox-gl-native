@@ -15,7 +15,7 @@ std::string cwd() {
     do {
         max += 256;
         dir.resize(max);
-        uv_cwd(const_cast<char *>(dir.data()), &max);
+        uv_cwd(const_cast<char *>(dir.data()), max);
     } while (max == dir.size());
     dir.resize(max - 1);
     return dir;

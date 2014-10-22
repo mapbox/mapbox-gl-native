@@ -82,7 +82,27 @@ void Painter::setupShaders() {
     if (!gaussianShader) gaussianShader = std::make_unique<GaussianShader>();
 }
 
+void Painter::deleteShaders() {
+    plainShader = nullptr;
+    outlineShader = nullptr;
+    lineShader = nullptr;
+    linejoinShader = nullptr;
+    linepatternShader = nullptr;
+    patternShader = nullptr;
+    iconShader = nullptr;
+    rasterShader = nullptr;
+    sdfGlyphShader = nullptr;
+    sdfIconShader = nullptr;
+    dotShader = nullptr;
+    gaussianShader = nullptr;
+}
+
 void Painter::cleanup() {
+}
+
+void Painter::terminate() {
+    cleanup();
+    deleteShaders();
 }
 
 void Painter::resize() {

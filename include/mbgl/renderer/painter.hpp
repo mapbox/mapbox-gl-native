@@ -64,6 +64,7 @@ public:
     // lazy initialization) in case rendering continues.
     void cleanup();
 
+    void terminate();
 
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
     // tiles whatsoever.
@@ -124,6 +125,7 @@ public:
 
 private:
     void setupShaders();
+    void deleteShaders();
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor);
 
     void prepareTile(const Tile& tile);

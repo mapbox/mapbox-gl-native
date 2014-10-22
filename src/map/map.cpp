@@ -163,7 +163,6 @@ void Map::run() {
     // If the map rendering wasn't started asynchronously, we perform one render
     // *after* all events have been processed.
     if (!async) {
-        prepare();
         render();
 #ifndef NDEBUG
         map_thread = -1;
@@ -206,8 +205,11 @@ void Map::cleanup(uv_async_t *async) {
 #endif
     Map *map = static_cast<Map *>(async->data);
 
-    map->view.make_active();
     map->painter.cleanup();
+}
+
+void Map::terminate() {
+    painter.terminate();
 }
 
 void Map::setReachability(bool reachable) {
@@ -271,8 +273,8 @@ void Map::terminate(uv_async_t *async) {
 void Map::setup() {
     assert(uv_thread_self() == map_thread);
     view.make_active();
-
     painter.setup();
+    view.make_inactive();
 }
 
 void Map::setStyleURL(const std::string &url) {
@@ -605,8 +607,6 @@ void Map::updateRenderState() {
 }
 
 void Map::prepare() {
-    view.make_active();
-
     if (!fileSource) {
         fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
         glyphStore = std::make_shared<GlyphStore>(fileSource);
@@ -651,6 +651,8 @@ void Map::prepare() {
 }
 
 void Map::render() {
+    view.make_active();
+
 #if defined(DEBUG)
     std::vector<std::string> debug;
 #endif
@@ -685,6 +687,8 @@ void Map::render() {
     }
 
     glFlush();
+
+    view.make_inactive();
 }
 
 void Map::renderLayers(util::ptr<StyleLayerGroup> group) {

@@ -554,7 +554,7 @@ void StyleParser::parseStyles(JSVal value, std::map<ClassID, ClassProperties> &s
         if (name == "style") {
             parseStyle(replaceConstant(itr->value), styles[ClassID::Default]);
         } else if (name.compare(0, 6, "style.") == 0 && name.length() > 6) {
-            const ClassID class_id = ClassDictionary::Lookup(name.substr(6));
+            const ClassID class_id = ClassDictionary::Get().lookup(name.substr(6));
             parseStyle(replaceConstant(itr->value), styles[class_id]);
         }
     }
