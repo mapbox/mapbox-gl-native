@@ -3,10 +3,9 @@
 
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/rect.hpp>
+#include <mbgl/util/optional.hpp>
 #include <array>
 #include <vector>
-
-#include <boost/optional.hpp>
 
 namespace mbgl {
 
@@ -53,7 +52,7 @@ struct GlyphBox {
     float minScale = 0.0f;
     float maxScale = std::numeric_limits<float>::infinity();
     float padding = 0.0f;
-    boost::optional<CollisionRect> hBox;
+    mapbox::util::optional<CollisionRect> hBox;
 };
 
 typedef std::vector<GlyphBox> GlyphBoxes;
@@ -88,7 +87,7 @@ typedef std::vector<PlacedGlyph> PlacedGlyphs;
 struct PlacementBox {
     CollisionAnchor anchor;
     CollisionRect box;
-    boost::optional<CollisionRect> hBox;
+    mapbox::util::optional<CollisionRect> hBox;
     PlacementRange placementRange = {{0.0f, 0.0f}};
     float placementScale = 0.0f;
     float maxScale = std::numeric_limits<float>::infinity();
