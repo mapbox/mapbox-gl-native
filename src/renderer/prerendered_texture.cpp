@@ -5,8 +5,8 @@
 
 using namespace mbgl;
 
-PrerenderedTexture::PrerenderedTexture(const StyleBucketRaster &properties)
-    : properties(properties) {
+PrerenderedTexture::PrerenderedTexture(const StyleBucketRaster &properties_)
+    : properties(properties_) {
 }
 
 PrerenderedTexture::~PrerenderedTexture() {

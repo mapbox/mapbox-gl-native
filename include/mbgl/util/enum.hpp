@@ -21,11 +21,11 @@ private:
     static constexpr inline bool compare(const char *a, const char *b) {
         return *a == *b && (*a == '\0' || compare(a + 1, b + 1));
     }
-    static constexpr inline const char *lookup_type(Type e, EnumValue<Type> const * const l, size_t r) {
-        return r == 0 ? "" : l->value == e ? l->name : lookup_type(e, l + 1, r - 1);
+    static constexpr inline const char *lookup_type(Type e, EnumValue<Type> const * const list, size_t r) {
+        return r == 0 ? "" : list->value == e ? list->name : lookup_type(e, list + 1, r - 1);
     }
-    static constexpr inline Type lookup_name(const char *n, EnumValue<Type> const * const l, size_t r) {
-        return r == 0 ? Type(-1) : compare(l->name, n) ? l->value : lookup_name(n, l + 1, r - 1);
+    static constexpr inline Type lookup_name(const char *n, EnumValue<Type> const * const list, size_t r) {
+        return r == 0 ? Type(-1) : compare(list->name, n) ? list->value : lookup_name(n, list + 1, r - 1);
     }
 public:
     inline constexpr Enum(const char *n) : value(lookup_name(n, names, length)) {}

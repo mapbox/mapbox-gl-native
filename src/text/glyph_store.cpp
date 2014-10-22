@@ -228,7 +228,7 @@ void GlyphPBF::parse(FontStack &stack) {
     data.clear();
 }
 
-GlyphStore::GlyphStore(const util::ptr<FileSource> &fileSource) : fileSource(fileSource) {}
+GlyphStore::GlyphStore(const util::ptr<FileSource> &fileSource_) : fileSource(fileSource_) {}
 
 void GlyphStore::setURL(const std::string &url) {
     glyphURL = url;

@@ -68,8 +68,8 @@ SQLiteStore::~SQLiteStore() {
     // Nothing to do. This function needs to be here because we're forward-declaring
     // Database, so we need the actual definition here to be able to properly destruct it.
     if (worker) {
-        uv_worker_close(worker, [](uv_worker_t *worker) {
-            delete worker;
+        uv_worker_close(worker, [](uv_worker_t *worker_handle) {
+            delete worker_handle;
         });
     }
 }

@@ -98,5 +98,5 @@ clean: clear_xcode_cache
 distclean: clean
 	-rm -rf ./mason_packages
 
-.PHONY: mbgl test linux build/test/Makefile
+.PHONY: mbgl test linux build/test/Makefile clean distclean
 # DO NOT DELETE

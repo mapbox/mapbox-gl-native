@@ -18,8 +18,8 @@ public:
 
 private:
     struct GlyphValue {
-        GlyphValue(const Rect<uint16_t>& rect, uint64_t id)
-            : rect(rect), ids({ id }) {}
+        GlyphValue(const Rect<uint16_t>& rect_, uint64_t id)
+            : rect(rect_), ids({ id }) {}
         Rect<uint16_t> rect;
         std::set<uint64_t> ids;
     };

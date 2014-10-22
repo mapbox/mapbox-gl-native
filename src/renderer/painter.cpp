@@ -21,8 +21,8 @@ using namespace mbgl;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(Map &map)
-    : map(map) {
+Painter::Painter(Map &map_)
+    : map(map_) {
 }
 
 Painter::~Painter() {

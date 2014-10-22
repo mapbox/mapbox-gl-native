@@ -96,8 +96,8 @@ float TransformState::lngX(float lon) const {
 }
 
 float TransformState::latY(float lat) const {
-    float y = 180 / M_PI * std::log(std::tan(M_PI / 4 + lat * M_PI / 360));
-    return (180 - y) * worldSize() / 360;
+    float latY = 180 / M_PI * std::log(std::tan(M_PI / 4 + lat * M_PI / 360));
+    return (180 - latY) * worldSize() / 360;
 }
 
 std::array<float, 2> TransformState::locationCoordinate(float lon, float lat) const {

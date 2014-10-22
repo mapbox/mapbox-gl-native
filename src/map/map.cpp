@@ -30,17 +30,17 @@
 
 using namespace mbgl;
 
-Map::Map(View& view)
+Map::Map(View& view_)
     : loop(std::make_shared<uv::loop>()),
       thread(std::make_unique<uv::thread>()),
       async_terminate(new uv_async_t()),
       async_render(new uv_async_t()),
       async_cleanup(new uv_async_t()),
-      view(view),
+      view(view_),
 #ifndef NDEBUG
       main_thread(uv_thread_self()),
 #endif
-      transform(view),
+      transform(view_),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
@@ -653,9 +653,6 @@ void Map::prepare() {
 void Map::render() {
     view.make_active();
 
-#if defined(DEBUG)
-    std::vector<std::string> debug;
-#endif
     painter.clear();
 
     painter.resize();

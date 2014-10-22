@@ -19,8 +19,8 @@
 
 namespace mbgl {
 
-SymbolBucket::SymbolBucket(const StyleBucketSymbol &properties, Collision &collision)
-    : properties(properties), collision(collision) {}
+SymbolBucket::SymbolBucket(const StyleBucketSymbol &properties_, Collision &collision_)
+    : properties(properties_), collision(collision_) {}
 
 void SymbolBucket::render(Painter &painter, util::ptr<StyleLayer> layer_desc,
                           const Tile::ID &id, const mat4 &matrix) {
@@ -52,12 +52,12 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
                                                          const FilterExpression &filter,
                                                          GlyphStore &glyphStore,
                                                          const Sprite &sprite) {
-    const bool text = properties.text.field.size();
-    const bool icon = properties.icon.image.size();
+    const bool has_text = properties.text.field.size();
+    const bool has_icon = properties.icon.image.size();
 
     std::vector<SymbolFeature> features;
 
-    if (!text && !icon) {
+    if (!has_text && !has_icon) {
         return features;
     }
 
@@ -72,7 +72,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
 
         SymbolFeature ft;
 
-        if (text) {
+        if (has_text) {
             std::string u8string = util::replaceTokens(properties.text.field, feature.properties);
 
             if (properties.text.transform == TextTransformType::Uppercase) {
@@ -91,7 +91,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
             }
         }
 
-        if (icon) {
+        if (has_icon) {
             ft.sprite = util::replaceTokens(properties.icon.image, feature.properties);
         }
 

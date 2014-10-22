@@ -30,9 +30,9 @@ struct GlyphMetrics {
 
 struct Glyph {
     inline explicit Glyph() : rect(0, 0, 0, 0), metrics() {}
-    inline explicit Glyph(const Rect<uint16_t> &rect,
-                          const GlyphMetrics &metrics)
-        : rect(rect), metrics(metrics) {}
+    inline explicit Glyph(const Rect<uint16_t> &rect_,
+                          const GlyphMetrics &metrics_)
+        : rect(rect_), metrics(metrics_) {}
 
     operator bool() const {
         return metrics || rect;
@@ -46,8 +46,8 @@ typedef std::map<uint32_t, Glyph> GlyphPositions;
 
 class PositionedGlyph {
 public:
-    inline explicit PositionedGlyph(uint32_t glyph, float x, float y)
-        : glyph(glyph), x(x), y(y) {}
+    inline explicit PositionedGlyph(uint32_t glyph_, float x_, float y_)
+        : glyph(glyph_), x(x_), y(y_) {}
 
     uint32_t glyph = 0;
     float x = 0;

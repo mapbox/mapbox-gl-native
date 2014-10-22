@@ -13,13 +13,13 @@
 
 using namespace mbgl;
 
-SpritePosition::SpritePosition(uint16_t x, uint16_t y, uint16_t width, uint16_t height, float pixelRatio, bool sdf)
-    : x(x),
-      y(y),
-      width(width),
-      height(height),
-      pixelRatio(pixelRatio),
-      sdf(sdf) {
+SpritePosition::SpritePosition(uint16_t x_, uint16_t y_, uint16_t width_, uint16_t height_, float pixelRatio_, bool sdf_)
+    : x(x_),
+      y(y_),
+      width(width_),
+      height(height_),
+      pixelRatio(pixelRatio_),
+      sdf(sdf_) {
 }
 
 util::ptr<Sprite> Sprite::Create(const std::string& base_url, float pixelRatio, const util::ptr<FileSource> &fileSource) {
@@ -28,11 +28,11 @@ util::ptr<Sprite> Sprite::Create(const std::string& base_url, float pixelRatio, 
     return sprite;
 }
 
-Sprite::Sprite(const Key &, const std::string& base_url, float pixelRatio)
+Sprite::Sprite(const Key &, const std::string& base_url, float pixelRatio_)
     : valid(base_url.length() > 0),
-      pixelRatio(pixelRatio),
-      spriteURL(base_url + (pixelRatio > 1 ? "@2x" : "") + ".png"),
-      jsonURL(base_url + (pixelRatio > 1 ? "@2x" : "") + ".json"),
+      pixelRatio(pixelRatio_),
+      spriteURL(base_url + (pixelRatio_ > 1 ? "@2x" : "") + ".png"),
+      jsonURL(base_url + (pixelRatio_ > 1 ? "@2x" : "") + ".json"),
       raster(),
       loadedImage(false),
       loadedJSON(false),
@@ -123,16 +123,16 @@ void Sprite::parseJSON() {
                 uint16_t y = 0;
                 uint16_t width = 0;
                 uint16_t height = 0;
-                float pixelRatio = 1.0f;
+                float spritePixelRatio = 1.0f;
                 bool sdf = false;
 
                 if (value.HasMember("x")) x = value["x"].GetInt();
                 if (value.HasMember("y")) y = value["y"].GetInt();
                 if (value.HasMember("width")) width = value["width"].GetInt();
                 if (value.HasMember("height")) height = value["height"].GetInt();
-                if (value.HasMember("pixelRatio")) pixelRatio = value["pixelRatio"].GetInt();
+                if (value.HasMember("pixelRatio")) spritePixelRatio = value["pixelRatio"].GetInt();
                 if (value.HasMember("sdf")) sdf = value["sdf"].GetBool();
-                pos.emplace(name, SpritePosition { x, y, width, height, pixelRatio, sdf });
+                pos.emplace(name, SpritePosition { x, y, width, height, spritePixelRatio, sdf });
             }
         }
     } else {

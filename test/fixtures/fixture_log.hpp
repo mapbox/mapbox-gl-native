@@ -13,14 +13,14 @@ namespace mbgl {
 class FixtureLogBackend : public LogBackend, private util::noncopyable {
 public:
     struct LogMessage {
-        inline LogMessage(EventSeverity severity, Event event, int64_t code, const std::string &msg)
-            : severity(severity), event(event), code(code), msg(msg) {}
-        inline LogMessage(EventSeverity severity, Event event, int64_t code)
-            : severity(severity), event(event), code(code), msg() {}
-        inline LogMessage(EventSeverity severity, Event event, const std::string &msg)
-            : severity(severity), event(event), code(), msg(msg) {}
-        inline LogMessage(EventSeverity severity, Event event)
-            : severity(severity), event(event), code(), msg() {}
+        inline LogMessage(EventSeverity severity_, Event event_, int64_t code_, const std::string &msg_)
+            : severity(severity_), event(event_), code(code_), msg(msg_) {}
+        inline LogMessage(EventSeverity severity_, Event event_, int64_t code_)
+            : severity(severity_), event(event_), code(code_), msg() {}
+        inline LogMessage(EventSeverity severity_, Event event_, const std::string &msg_)
+            : severity(severity_), event(event_), code(), msg(msg_) {}
+        inline LogMessage(EventSeverity severity_, Event event_)
+            : severity(severity_), event(event_), code(), msg() {}
 
         inline bool operator==(const LogMessage &rhs) const {
             return (!severity || !rhs.severity || severity.get() == rhs.severity.get()) &&

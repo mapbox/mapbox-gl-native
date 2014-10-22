@@ -30,11 +30,11 @@ void FillBucket::free(void *, void *ptr) {
     ::free(ptr);
 }
 
-FillBucket::FillBucket(FillVertexBuffer &vertexBuffer,
-                       TriangleElementsBuffer &triangleElementsBuffer,
-                       LineElementsBuffer &lineElementsBuffer,
-                       const StyleBucketFill &properties)
-    : properties(properties),
+FillBucket::FillBucket(FillVertexBuffer &vertexBuffer_,
+                       TriangleElementsBuffer &triangleElementsBuffer_,
+                       LineElementsBuffer &lineElementsBuffer_,
+                       const StyleBucketFill &properties_)
+    : properties(properties_),
       allocator(new TESSalloc{&alloc, &realloc, &free, nullptr, // userData
                               64,                               // meshEdgeBucketSize
                               64,                               // meshVertexBucketSize
@@ -44,11 +44,11 @@ FillBucket::FillBucket(FillVertexBuffer &vertexBuffer,
                               128, // extraVertices allocated for the priority queue.
       }),
       tesselator(tessNewTess(allocator)),
-      vertexBuffer(vertexBuffer),
-      triangleElementsBuffer(triangleElementsBuffer),
-      lineElementsBuffer(lineElementsBuffer),
-      vertex_start(vertexBuffer.index()),
-      triangle_elements_start(triangleElementsBuffer.index()),
+      vertexBuffer(vertexBuffer_),
+      triangleElementsBuffer(triangleElementsBuffer_),
+      lineElementsBuffer(lineElementsBuffer_),
+      vertex_start(vertexBuffer_.index()),
+      triangle_elements_start(triangleElementsBuffer_.index()),
       line_elements_start(lineElementsBuffer.index()) {
     assert(tesselator);
 }
@@ -123,10 +123,10 @@ void FillBucket::tessellate() {
         const size_t group_count = polygon.size();
         assert(group_count >= 3);
 
-        std::vector<TESSreal> line;
+        std::vector<TESSreal> clipped_line;
         for (const ClipperLib::IntPoint& pt : polygon) {
-            line.push_back(pt.X);
-            line.push_back(pt.Y);
+            clipped_line.push_back(pt.X);
+            clipped_line.push_back(pt.Y);
             vertexBuffer.add(pt.X, pt.Y);
         }
 
@@ -137,7 +137,7 @@ void FillBucket::tessellate() {
 
         lineIndex += group_count;
 
-        tessAddContour(tesselator, vertexSize, line.data(), stride, (int)line.size() / vertexSize);
+        tessAddContour(tesselator, vertexSize, clipped_line.data(), stride, (int)clipped_line.size() / vertexSize);
     }
 
     lineGroup.elements_length += total_vertex_count;

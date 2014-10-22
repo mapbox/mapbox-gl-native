@@ -30,8 +30,8 @@ std::string mbgl::util::compress_png(int width, int height, void *rgba, bool fli
     }
 
     std::string result;
-    png_set_write_fn(png_ptr, &result, [](png_structp png_ptr, png_bytep data, png_size_t length) {
-        std::string *out = static_cast<std::string *>(png_get_io_ptr(png_ptr));
+    png_set_write_fn(png_ptr, &result, [](png_structp png_ptr_, png_bytep data, png_size_t length) {
+        std::string *out = static_cast<std::string *>(png_get_io_ptr(png_ptr_));
         out->append(reinterpret_cast<char *>(data), length);
     }, NULL);
 
@@ -57,8 +57,8 @@ using namespace mbgl::util;
 
 
 struct Buffer {
-    Buffer(const std::string& data)
-    : data(data.data()), length(data.size()) {}
+    Buffer(const std::string& data_)
+    : data(data_.data()), length(data_.size()) {}
     const char *const data = 0;
     const size_t length = 0;
     size_t pos = 0;

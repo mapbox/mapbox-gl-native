@@ -108,13 +108,13 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, uint16_t &target, 
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
         if (property.IsUint()) {
-            unsigned int value = property.GetUint();
-            if (value > std::numeric_limits<uint16_t>::max()) {
+            unsigned int int_value = property.GetUint();
+            if (int_value > std::numeric_limits<uint16_t>::max()) {
                 Log::Warning(Event::ParseStyle, "values for %s that are larger than %d are not supported", name, std::numeric_limits<uint16_t>::max());
                 return false;
             }
 
-            target = value;
+            target = int_value;
             return true;
         } else {
             Log::Warning(Event::ParseStyle, "%s must be an unsigned integer", name);
@@ -763,11 +763,11 @@ FilterExpression StyleParser::parseFilter(JSVal value, FilterExpression::Operato
                 FilterComparison comparison(name);
                 JSVal filterValue = replaceConstant(itr->value);
                 if (filterValue.IsObject()) {
-                    rapidjson::Value::ConstMemberIterator itr = filterValue.MemberBegin();
-                    for (; itr != filterValue.MemberEnd(); ++itr) {
+                    rapidjson::Value::ConstMemberIterator filter_itr = filterValue.MemberBegin();
+                    for (; filter_itr != filterValue.MemberEnd(); ++filter_itr) {
                         comparison.add(
-                            parseFilterComparisonOperator({ itr->name.GetString(), itr->name.GetStringLength() }),
-                            parseValues(replaceConstant(itr->value))
+                            parseFilterComparisonOperator({ filter_itr->name.GetString(), filter_itr->name.GetStringLength() }),
+                            parseValues(replaceConstant(filter_itr->value))
                         );
                     }
                 } else if (filterValue.IsArray()) {

@@ -13,8 +13,8 @@
 
 using namespace mbgl;
 
-Raster::Raster(const util::ptr<Texturepool> &texturepool)
-    : texturepool(texturepool)
+Raster::Raster(const util::ptr<Texturepool> &texturepool_)
+    : texturepool(texturepool_)
 {}
 
 Raster::~Raster() {
@@ -59,32 +59,32 @@ void Raster::bind(bool linear) {
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 
-    GLuint filter = linear ? GL_LINEAR : GL_NEAREST;
-    if (filter != this->filter) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-        this->filter = filter;
+    GLuint new_filter = linear ? GL_LINEAR : GL_NEAREST;
+    if (new_filter != this->filter) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, new_filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, new_filter);
+        filter = new_filter;
     }
 }
 
 // overload ::bind for prerendered raster textures
-void Raster::bind(const GLuint texture) {
+void Raster::bind(const GLuint custom_texture) {
     if (img && !textured) {
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glBindTexture(GL_TEXTURE_2D, custom_texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->getData());
         img.reset();
         textured = true;
     } else if (textured) {
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glBindTexture(GL_TEXTURE_2D, custom_texture);
     }
 
-    GLuint filter = GL_LINEAR;
-    if (filter != this->filter) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-        this->filter = filter;
+    GLuint new_filter = GL_LINEAR;
+    if (new_filter != this->filter) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, new_filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, new_filter);
+        filter = new_filter;
     }
 
 }
