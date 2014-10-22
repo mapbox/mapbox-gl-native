@@ -22,8 +22,8 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
             export CFLAGS="-fsanitize=address -g ${CFLAGS}"
             export LDFLAGS="-fsanitize=address  ${LDFLAGS}"
         elif [[ ${CXX} == "clang++" ]]; then
-            export CXXFLAGS="-fsanitize=thread -g -fPIC ${CXXFLAGS}"
-            export CFLAGS="-fsanitize=thread -g ${CFLAGS}"
+            export CXXFLAGS="-fsanitize=thread -g -fPIE ${CXXFLAGS}"
+            export CFLAGS="-fsanitize=thread -g -fPIE ${CFLAGS}"
             export LDFLAGS="-fsanitize=thread -pie ${LDFLAGS}"
         fi
     fi
