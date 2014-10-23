@@ -128,10 +128,10 @@ void Painter::useProgram(uint32_t program) {
     }
 }
 
-void Painter::lineWidth(float lineWidth) {
-    if (gl_lineWidth != lineWidth) {
-        glLineWidth(lineWidth);
-        gl_lineWidth = lineWidth;
+void Painter::lineWidth(float line_width) {
+    if (gl_lineWidth != line_width) {
+        glLineWidth(line_width);
+        gl_lineWidth = line_width;
     }
 }
 

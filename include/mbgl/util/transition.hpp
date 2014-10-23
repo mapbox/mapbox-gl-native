@@ -36,8 +36,8 @@ protected:
 template <typename T>
 class ease_transition : public transition {
 public:
-    ease_transition(T from_, T to_, T& value_, timestamp start, timestamp duration)
-        : transition(start, duration),
+    ease_transition(T from_, T to_, T& value_, timestamp start_, timestamp duration_)
+        : transition(start_, duration_),
           from(from_),
           to(to_),
           value(value_) {}
@@ -53,8 +53,8 @@ private:
 template <typename T>
 class timeout : public transition {
 public:
-    timeout(T final_value_, T& value_, timestamp start, timestamp duration)
-        : transition(start, duration),
+    timeout(T final_value_, T& value_, timestamp start_, timestamp duration_)
+        : transition(start_, duration_),
           final_value(final_value_),
           value(value_) {}
 

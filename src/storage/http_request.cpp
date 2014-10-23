@@ -20,8 +20,8 @@ struct CacheRequestBaton {
     util::ptr<SQLiteStore> store;
 };
 
-HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path, uv_loop_t *loop_, util::ptr<SQLiteStore> store_)
-    : BaseRequest(path), thread_id(uv_thread_self()), loop(loop_), store(store_), type(type_) {
+HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path_, uv_loop_t *loop_, util::ptr<SQLiteStore> store_)
+    : BaseRequest(path_), thread_id(uv_thread_self()), loop(loop_), store(store_), type(type_) {
     if (store) {
         startCacheRequest();
     } else {

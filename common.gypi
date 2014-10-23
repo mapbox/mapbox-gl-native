@@ -14,8 +14,14 @@
           'GCC_WARN_UNINITIALIZED_AUTOS': 'YES_AGGRESSIVE',
         },
       }],
+      ['OS=="linux"', {
+        'cflags_cc': [
+          '-Wno-unknown-pragmas', # We are using '#pragma mark', but it is only available on Darwin.
+          '-Wno-literal-suffix', # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61653
+        ],
+      }],
     ],
-    'cflags_cc!': [ '-std=c++11', '-Wall', '-Wextra', '-Wshadow', '-frtti', '-fexceptions' ],
+    'cflags_cc': [ '-std=c++11', '-Werror', '-Wall', '-Wextra', '-Wshadow', '-frtti', '-fexceptions' ],
     'configurations': {
       'Debug': {
         'cflags_cc': [ '-g', '-O0', '-fno-omit-frame-pointer','-fwrapv', '-fstack-protector-all', '-fno-common' ],

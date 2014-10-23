@@ -132,9 +132,9 @@ double pbf::float64() {
 
 std::string pbf::string() {
     uint32_t bytes = static_cast<uint32_t>(varint());
-    const char *string = reinterpret_cast<const char*>(data);
+    const char *string_data = reinterpret_cast<const char*>(data);
     skipBytes(bytes);
-    return std::string(string, bytes);
+    return std::string(string_data, bytes);
 }
 
 bool pbf::boolean() {

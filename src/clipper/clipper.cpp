@@ -48,6 +48,8 @@
 #include <ostream>
 #include <functional>
 
+#pragma GCC diagnostic ignored "-Wshadow"
+
 namespace ClipperLib {
 
 #ifdef use_int32

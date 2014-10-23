@@ -154,11 +154,11 @@ void curl_perform(uv_poll_t *req, int, int events) {
     while ((message = curl_multi_info_read(multi, &pending))) {
         switch (message->msg) {
         case CURLMSG_DONE: {
-            CURLContext *context = nullptr;
-            curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&context);
+            CURLContext *ctx = nullptr;
+            curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&ctx);
 
             // Make a copy so that the Baton stays around even after we are calling finish_request
-            util::ptr<HTTPRequestBaton> baton = context->baton;
+            util::ptr<HTTPRequestBaton> baton = ctx->baton;
 
             // Add human-readable error code
             if (message->data.result != CURLE_OK) {
@@ -242,8 +242,8 @@ int handle_socket(CURL *handle, curl_socket_t sockfd, int action, void *, void *
         }
         if (action == CURL_POLL_REMOVE && socketp) {
             uv_poll_stop(context->poll_handle);
-            uv_close((uv_handle_t *)context->poll_handle, [](uv_handle_t *handle) {
-                delete (uv_poll_t *)handle;
+            uv_close((uv_handle_t *)context->poll_handle, [](uv_handle_t *poll_handle) {
+                delete (uv_poll_t *)poll_handle;
             });
             context->poll_handle = nullptr;
             curl_multi_assign(multi, sockfd, NULL);
