@@ -3,14 +3,20 @@
 set -e
 set -o pipefail
 
-# allow writing core files
-ulimit -c unlimited -S
 
 cd build/${BUILDTYPE:-Release}
 
 for TEST in ./test_* ; do
+    # allow writing core files
+    ulimit -c unlimited -S
+
     RESULT=0
     ${TEST} || RESULT=$?
+
+    if [[ ${RESULT} != 0 ]]; then
+        echo "The program crashed with exit code ${RESULT}. We're now trying to output the core dump."
+        ls -la
+    fi
 
     # output core dump if we got one
     for DUMP in $(find ./ -maxdepth 1 -name 'core*' -print); do
