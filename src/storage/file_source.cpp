@@ -27,12 +27,12 @@ FileSource::~FileSource() {
     // NOTE: We don't need to delete the messenger since it will be deleted by the
     // uv_messenger_stop() function.
 
-    util::ptr<BaseRequest> request;
+    util::ptr<BaseRequest> req;
 
     // Send a cancel() message to all requests that we are still holding.
     for (const std::pair<std::string, std::weak_ptr<BaseRequest>> &pair : pending) {
-        if ((request = pair.second.lock())) {
-            request->cancel();
+        if ((req = pair.second.lock())) {
+            req->cancel();
         }
     }
 }
@@ -61,25 +61,25 @@ std::unique_ptr<Request> FileSource::request(ResourceType type, const std::strin
         }
     }();
 
-    util::ptr<BaseRequest> request;
+    util::ptr<BaseRequest> req;
 
     // First, try to find an existing Request object.
     auto it = pending.find(absoluteURL);
     if (it != pending.end()) {
-        request = it->second.lock();
+        req = it->second.lock();
     }
 
-    if (!request) {
+    if (!req) {
         if (absoluteURL.substr(0, 7) == "file://") {
-            request = std::make_shared<FileRequest>(absoluteURL.substr(7), loop);
+            req = std::make_shared<FileRequest>(absoluteURL.substr(7), loop);
         } else {
-            request = std::make_shared<HTTPRequest>(type, absoluteURL, loop, store);
+            req = std::make_shared<HTTPRequest>(type, absoluteURL, loop, store);
         }
 
-        pending.emplace(absoluteURL, request);
+        pending.emplace(absoluteURL, req);
     }
 
-    return std::unique_ptr<Request>(new Request(request));
+    return std::unique_ptr<Request>(new Request(req));
 }
 
 void FileSource::prepare(std::function<void()> fn) {
@@ -93,10 +93,10 @@ void FileSource::prepare(std::function<void()> fn) {
 void FileSource::retryAllPending() {
     assert(thread_id == uv_thread_self());
 
-    util::ptr<BaseRequest> request;
+    util::ptr<BaseRequest> req;
     for (const std::pair<std::string, std::weak_ptr<BaseRequest>> &pair : pending) {
-        if ((request = pair.second.lock())) {
-            request->retryImmediately();
+        if ((req = pair.second.lock())) {
+            req->retryImmediately();
         }
     }
 

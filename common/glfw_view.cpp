@@ -13,8 +13,8 @@ GLFWView::~GLFWView() {
     glfwTerminate();
 }
 
-void GLFWView::initialize(mbgl::Map *map) {
-    View::initialize(map);
+void GLFWView::initialize(mbgl::Map *map_) {
+    View::initialize(map_);
 
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize glfw\n");

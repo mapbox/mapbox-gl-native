@@ -19,7 +19,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     sudo apt-get -y install gcc-4.8 g++-4.8
 
     mapbox_time "install_build_tools" \
-    sudo apt-get -y install git build-essential zlib1g-dev automake \
+    sudo apt-get -y install git build-essential zlib1g-dev automake gdb \
                             libtool xutils-dev make cmake pkg-config python-pip \
                             libboost1.55-dev libboost-regex1.55-dev libcurl4-openssl-dev \
                             libpng-dev libsqlite3-dev

@@ -6,6 +6,8 @@
 #include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
+#include <algorithm>
+
 namespace mbgl {
 
 using JSVal = const rapidjson::Value&;

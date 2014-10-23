@@ -6,8 +6,6 @@
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
 
-#include <png.h>
-
 #include <cassert>
 #include <cstring>
 

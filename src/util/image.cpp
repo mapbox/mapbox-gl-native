@@ -1,4 +1,5 @@
 #include <mbgl/util/image.hpp>
+
 #include <png.h>
 
 #include <cassert>

@@ -84,15 +84,15 @@ protected:
     }
 
     // Get a pointer to the item at a given index.
-    inline void *getElement(size_t index) {
+    inline void *getElement(size_t i) {
         if (array == nullptr) {
             throw std::runtime_error("Buffer was already deleted or doesn't contain elements");
         }
 
-        if (index * itemSize >= pos) {
+        if (i * itemSize >= pos) {
             throw new std::runtime_error("Can't get element after array bounds");
         } else {
-            return static_cast<char *>(array) + (index * itemSize);
+            return static_cast<char *>(array) + (i * itemSize);
         }
     }
 

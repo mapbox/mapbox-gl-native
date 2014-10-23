@@ -35,6 +35,11 @@ before_install:
 install:
 - make config.gypi
 - ./scripts/travis_install_test_suite.sh
+- ulimit -c
+
+before_script:
+ # Set the core file limit to unlimited so a core file is generated upon crash
+ - ulimit -c unlimited -S
 
 script:
 - ./scripts/travis_script.sh
