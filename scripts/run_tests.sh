@@ -2,14 +2,14 @@
 
 set -e
 set -o pipefail
-c
+
 cd build/${BUILDTYPE:-Release}
 
 for TEST in ./test_* ; do
     # allow writing core files
     ulimit -c unlimited -S
-    ulimit -c
-    cat /proc/sys/kernel/core_pattern
+    echo 'ulimit -c: '`ulimit -c`
+    echo '/proc/sys/kernel/core_pattern: '`cat /proc/sys/kernel/core_pattern`
     sysctl kernel.core_pattern
 
     RESULT=0
