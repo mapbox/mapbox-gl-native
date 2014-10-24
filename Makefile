@@ -4,10 +4,10 @@ V ?= 1
 
 all: mbgl
 
-config.gypi:
+config.gypi: configure
 	./configure
 
-config-ios.gypi:
+config-ios.gypi: configure
 	MASON_PLATFORM=ios ./configure config-ios.gypi
 
 # Builds the regular library
