@@ -3,9 +3,9 @@
 
 using namespace mbgl;
 
-RasterBucket::RasterBucket(const util::ptr<Texturepool> &texturepool, const StyleBucketRaster& properties)
-: properties(properties),
-  texture(properties),
+RasterBucket::RasterBucket(const util::ptr<Texturepool> &texturepool, const StyleBucketRaster& properties_)
+: properties(properties_),
+  texture(properties_),
   raster(texturepool) {
 }
 
@@ -24,8 +24,8 @@ void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index());
 }
 
-void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array, GLuint texture) {
-    raster.bind(texture);
+void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array, GLuint texture_) {
+    raster.bind(texture_);
     shader.u_image = 0;
     array.bind(shader, vertices, BUFFER_OFFSET(0));
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index());

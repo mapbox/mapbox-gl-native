@@ -4,6 +4,7 @@
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/platform/log.hpp>
+#include <iostream>
 
 #include <uv.h>
 

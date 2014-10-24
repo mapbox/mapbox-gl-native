@@ -14,10 +14,10 @@
 
 using namespace mbgl;
 
-SpriteAtlas::SpriteAtlas(dimension width, dimension height)
-    : width(width),
-      height(height),
-      bin(width, height),
+SpriteAtlas::SpriteAtlas(dimension width_, dimension height_)
+    : width(width_),
+      height(height_),
+      bin(width_, height_),
       dirty(true) {
 }
 
@@ -88,10 +88,10 @@ void copy_bitmap(const uint32_t *src, const int src_stride, const int src_x, con
     }
 }
 
-Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t width, size_t height) {
+Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t pixel_width, size_t pixel_height) {
     // We have to allocate a new area in the bin, and store an empty image in it.
     // Add a 1px border around every image.
-    Rect<dimension> rect = bin.allocate(width + 2 * buffer, height + 2 * buffer);
+    Rect<dimension> rect = bin.allocate(pixel_width + 2 * buffer, pixel_height + 2 * buffer);
     if (rect.w == 0) {
         return rect;
     }

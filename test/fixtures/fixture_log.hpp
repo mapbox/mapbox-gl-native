@@ -3,8 +3,7 @@
 
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/noncopyable.hpp>
-
-#include <boost/optional.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <vector>
 #include <cstdarg>
@@ -14,14 +13,14 @@ namespace mbgl {
 class FixtureLogBackend : public LogBackend, private util::noncopyable {
 public:
     struct LogMessage {
-        inline LogMessage(EventSeverity severity, Event event, int64_t code, const std::string &msg)
-            : severity(severity), event(event), code(code), msg(msg) {}
-        inline LogMessage(EventSeverity severity, Event event, int64_t code)
-            : severity(severity), event(event), code(code) {}
-        inline LogMessage(EventSeverity severity, Event event, const std::string &msg)
-            : severity(severity), event(event), msg(msg) {}
-        inline LogMessage(EventSeverity severity, Event event)
-            : severity(severity), event(event) {}
+        inline LogMessage(EventSeverity severity_, Event event_, int64_t code_, const std::string &msg_)
+            : severity(severity_), event(event_), code(code_), msg(msg_) {}
+        inline LogMessage(EventSeverity severity_, Event event_, int64_t code_)
+            : severity(severity_), event(event_), code(code_), msg() {}
+        inline LogMessage(EventSeverity severity_, Event event_, const std::string &msg_)
+            : severity(severity_), event(event_), code(), msg(msg_) {}
+        inline LogMessage(EventSeverity severity_, Event event_)
+            : severity(severity_), event(event_), code(), msg() {}
 
         inline bool operator==(const LogMessage &rhs) const {
             return (!severity || !rhs.severity || severity.get() == rhs.severity.get()) &&
@@ -30,10 +29,10 @@ public:
                    (!msg || !rhs.msg || msg.get() == rhs.msg.get());
         }
 
-        const boost::optional<EventSeverity> severity;
-        const boost::optional<Event> event;
-        const boost::optional<int64_t> code;
-        const boost::optional<std::string> msg;
+        const mapbox::util::optional<EventSeverity> severity;
+        const mapbox::util::optional<Event> event;
+        const mapbox::util::optional<int64_t> code;
+        const mapbox::util::optional<std::string> msg;
 
         mutable bool checked = false;
     };

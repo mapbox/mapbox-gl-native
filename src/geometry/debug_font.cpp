@@ -98,10 +98,10 @@ const int8_t simplex_94[] = { 3, 6, 3, 8, 4, 11, 6, 12, 8, 12, 10, 11, 14, 8, 16
 
 struct glyph {
     glyph() : width(0), length(0), data(nullptr) { }
-    glyph(uint8_t width, uint8_t length, const int8_t *data)
-        : width(width),
-          length(length),
-          data(data) {}
+    glyph(uint8_t width_, uint8_t length_, const int8_t *data_)
+        : width(width_),
+          length(length_),
+          data(data_) {}
     uint8_t width;
     uint8_t length;
     const int8_t *data;

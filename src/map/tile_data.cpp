@@ -9,14 +9,14 @@
 
 using namespace mbgl;
 
-TileData::TileData(Tile::ID id, Map &map, const util::ptr<SourceInfo> &source)
-    : id(id),
+TileData::TileData(Tile::ID id_, Map &map_, const util::ptr<SourceInfo> &source_)
+    : id(id_),
       state(State::initial),
-      map(map),
-      source(source),
+      map(map_),
+      source(source_),
       debugBucket(debugFontBuffer) {
     // Initialize tile debug coordinates
-    const std::string str = util::sprintf<32>("%d/%d/%d", id.z, id.x, id.y);
+    const std::string str = util::sprintf<32>("%d/%d/%d", id_.z, id_.x, id_.y);
     debugFontBuffer.addText(str.c_str(), 50, 200, 5);
 }
 

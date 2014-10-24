@@ -49,9 +49,9 @@ struct pbf {
     uint32_t tag = 0;
 };
 
-pbf::pbf(const unsigned char *data, size_t length)
-    : data(data),
-      end(data + length),
+pbf::pbf(const unsigned char *data_, size_t length)
+    : data(data_),
+      end(data_ + length),
       value(0),
       tag(0) {
 }
@@ -132,9 +132,9 @@ double pbf::float64() {
 
 std::string pbf::string() {
     uint32_t bytes = static_cast<uint32_t>(varint());
-    const char *string = reinterpret_cast<const char*>(data);
+    const char *string_data = reinterpret_cast<const char*>(data);
     skipBytes(bytes);
-    return std::string(string, bytes);
+    return std::string(string_data, bytes);
 }
 
 bool pbf::boolean() {

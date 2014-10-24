@@ -64,6 +64,7 @@ public:
     // lazy initialization) in case rendering continues.
     void cleanup();
 
+    void terminate();
 
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
     // tiles whatsoever.
@@ -124,6 +125,7 @@ public:
 
 private:
     void setupShaders();
+    void deleteShaders();
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor);
 
     void prepareTile(const Tile& tile);
@@ -152,10 +154,10 @@ public:
 
     // used to composite images and flips the geometry upside down
     const mat4 flipMatrix = []{
-        mat4 flipMatrix;
-        matrix::ortho(flipMatrix, 0, 4096, -4096, 0, 0, 1);
-        matrix::translate(flipMatrix, flipMatrix, 0, -4096, 0);
-        return flipMatrix;
+        mat4 flip;
+        matrix::ortho(flip, 0, 4096, -4096, 0, 0, 1);
+        matrix::translate(flip, flip, 0, -4096, 0);
+        return flip;
     }();
 
     const mat4 identityMatrix = []{

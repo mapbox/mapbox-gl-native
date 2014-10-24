@@ -28,7 +28,7 @@ public:
 
 public:
     FilterExpression() = default;
-    FilterExpression(Operator op) : op(op) {};
+    FilterExpression(Operator op_) : op(op_) {};
 
     bool empty() const;
 

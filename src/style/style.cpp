@@ -12,6 +12,7 @@
 
 #include <rapidjson/document.h>
 
+#include <algorithm>
 
 namespace mbgl {
 

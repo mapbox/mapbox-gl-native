@@ -36,8 +36,8 @@ public:
     bool enabled = false;
     util::ptr<Source> source;
 
-    StyleSource(const util::ptr<SourceInfo> &info)
-        : info(info)
+    StyleSource(const util::ptr<SourceInfo> &info_)
+        : info(info_)
     {}
 };
 

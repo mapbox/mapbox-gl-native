@@ -18,10 +18,12 @@
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
 
+#include <algorithm>
+
 namespace mbgl {
 
-Source::Source(const util::ptr<SourceInfo>& info)
-    : info(info)
+Source::Source(const util::ptr<SourceInfo>& info_)
+    : info(info_)
 {
 }
 
@@ -219,15 +221,15 @@ std::forward_list<Tile::ID> Source::coveringTiles(const TransformState& state) c
     box points = state.cornersToBox(z);
     const vec2<double>& center = points.center;
 
-    std::forward_list<Tile::ID> tiles = Tile::cover(z, points);
+    std::forward_list<Tile::ID> covering_tiles = Tile::cover(z, points);
 
-    tiles.sort([&center](const Tile::ID& a, const Tile::ID& b) {
+    covering_tiles.sort([&center](const Tile::ID& a, const Tile::ID& b) {
         // Sorts by distance from the box center
         return std::fabs(a.x - center.x) + std::fabs(a.y - center.y) <
                std::fabs(b.x - center.x) + std::fabs(b.y - center.y);
     });
 
-    return tiles;
+    return covering_tiles;
 }
 
 /**

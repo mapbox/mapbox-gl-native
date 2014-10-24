@@ -20,8 +20,8 @@ struct CacheRequestBaton {
     util::ptr<SQLiteStore> store;
 };
 
-HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path, uv_loop_t *loop_, util::ptr<SQLiteStore> store_)
-    : BaseRequest(path), thread_id(uv_thread_self()), loop(loop_), store(store_), type(type_) {
+HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path_, uv_loop_t *loop_, util::ptr<SQLiteStore> store_)
+    : BaseRequest(path_), thread_id(uv_thread_self()), loop(loop_), store(store_), type(type_) {
     if (store) {
         startCacheRequest();
     } else {
@@ -82,19 +82,19 @@ void HTTPRequest::startHTTPRequest(std::unique_ptr<Response> &&res) {
 #else
     uv_async_init(loop, http_baton->async, [](uv_async_t *async) {
 #endif
-        util::ptr<HTTPRequestBaton> &http_baton = *(util::ptr<HTTPRequestBaton> *)async->data;
+        util::ptr<HTTPRequestBaton> &baton = *(util::ptr<HTTPRequestBaton> *)async->data;
 
-        if (http_baton->request) {
-            HTTPRequest *request = http_baton->request;
+        if (baton->request) {
+            HTTPRequest *request = baton->request;
             request->http_baton.reset();
-            http_baton->request = nullptr;
-            request->handleHTTPResponse(http_baton->type, std::move(http_baton->response));
+            baton->request = nullptr;
+            request->handleHTTPResponse(baton->type, std::move(baton->response));
         }
 
         delete (util::ptr<HTTPRequestBaton> *)async->data;
         uv_close((uv_handle_t *)async, [](uv_handle_t *handle) {
-            uv_async_t *async = (uv_async_t *)handle;
-            delete async;
+            uv_async_t *async_handle = (uv_async_t *)handle;
+            delete async_handle;
         });
     });
     attempts++;

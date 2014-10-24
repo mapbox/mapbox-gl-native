@@ -2,16 +2,19 @@
 
 #include <mbgl/util/string.hpp>
 
-GLFWView::GLFWView(bool fullscreen) : fullscreen(fullscreen) {
+GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
 #ifdef NVIDIA
     glDiscardFramebufferEXT = (PFNGLDISCARDFRAMEBUFFEREXTPROC)glfwGetProcAddress("glDiscardFramebufferEXT");
 #endif
 }
 
-GLFWView::~GLFWView() { glfwTerminate(); }
+GLFWView::~GLFWView() {
+    map->terminate();
+    glfwTerminate();
+}
 
-void GLFWView::initialize(mbgl::Map *map) {
-    View::initialize(map);
+void GLFWView::initialize(mbgl::Map *map_) {
+    View::initialize(map_);
 
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize glfw\n");
@@ -192,6 +195,10 @@ int GLFWView::run() {
 
 void GLFWView::make_active() {
     glfwMakeContextCurrent(window);
+}
+
+void GLFWView::make_inactive() {
+    glfwMakeContextCurrent(nullptr);
 }
 
 void GLFWView::notify() {

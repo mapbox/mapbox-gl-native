@@ -17,17 +17,17 @@ struct geometry_too_long_exception : std::exception {};
 
 using namespace mbgl;
 
-LineBucket::LineBucket(LineVertexBuffer& vertexBuffer,
-                       TriangleElementsBuffer& triangleElementsBuffer,
-                       PointElementsBuffer& pointElementsBuffer,
-                       const StyleBucketLine& properties)
-    : properties(properties),
-      vertexBuffer(vertexBuffer),
-      triangleElementsBuffer(triangleElementsBuffer),
-      pointElementsBuffer(pointElementsBuffer),
-      vertex_start(vertexBuffer.index()),
-      triangle_elements_start(triangleElementsBuffer.index()),
-      point_elements_start(pointElementsBuffer.index())
+LineBucket::LineBucket(LineVertexBuffer& vertexBuffer_,
+                       TriangleElementsBuffer& triangleElementsBuffer_,
+                       PointElementsBuffer& pointElementsBuffer_,
+                       const StyleBucketLine& properties_)
+    : properties(properties_),
+      vertexBuffer(vertexBuffer_),
+      triangleElementsBuffer(triangleElementsBuffer_),
+      pointElementsBuffer(pointElementsBuffer_),
+      vertex_start(vertexBuffer_.index()),
+      triangle_elements_start(triangleElementsBuffer_.index()),
+      point_elements_start(pointElementsBuffer_.index())
 {
 }
 
@@ -53,7 +53,7 @@ void LineBucket::addGeometry(pbf& geom) {
 }
 
 struct TriangleElement {
-    TriangleElement(uint16_t a, uint16_t b, uint16_t c) : a(a), b(b), c(c) {}
+    TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
     uint16_t a, b, c;
 };
 
