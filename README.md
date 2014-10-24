@@ -108,7 +108,11 @@ Or proceed to building the debug application with:
 
 # Troubleshooting
 
+To trigger a complete rebuild, run `make clean` and then start over generating the Xcode projects or Makefiles as described above.
+
 If you are having trouble getting the dependencies right, you can blow away the `mason_packages` directory, or run `make distclean`. This means the Makefile and configure script will automatically install the dependencies again on the next try.
+
+On OS X, you can also try clearing the Xcode cache with `make clear_xcode_cache`.
 
 # Mapbox API access tokens
 
