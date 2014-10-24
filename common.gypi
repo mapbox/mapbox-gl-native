@@ -34,6 +34,6 @@
           'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES'
         }
       },
-    }
+    },
   }
 }

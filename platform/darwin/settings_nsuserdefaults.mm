@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-#include "settings_nsuserdefaults.hpp"
+#include <mbgl/platform/darwin/settings_nsuserdefaults.hpp>
 
 using namespace mbgl;
 

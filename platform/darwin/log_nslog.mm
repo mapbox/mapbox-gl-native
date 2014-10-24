@@ -1,4 +1,4 @@
-#include "nslog_log.hpp"
+#include "log_nslog.hpp"
 
 #import <Foundation/Foundation.h>
 
