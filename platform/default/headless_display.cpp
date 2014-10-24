@@ -1,4 +1,4 @@
-#include "headless_display.hpp"
+#include <mbgl/platform/default/headless_display.hpp>
 
 #include <cstring>
 #include <stdexcept>

@@ -44,6 +44,7 @@
             'libraries': [
               '<@(uv_libraries)',
               '<@(curl_libraries)',
+              '-lboost_regex',
             ]
           }]
         ]

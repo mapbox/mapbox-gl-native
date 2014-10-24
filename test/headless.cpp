@@ -9,8 +9,8 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
-#include "../common/headless_view.hpp"
-#include "../common/headless_display.hpp"
+#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/headless_display.hpp>
 
 #include "./fixtures/fixture_log.hpp"
 

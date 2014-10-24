@@ -1,4 +1,4 @@
-#include "log_nslog.hpp"
+#include <mbgl/platform/darwin/log_nslog.hpp>
 
 #import <Foundation/Foundation.h>
 

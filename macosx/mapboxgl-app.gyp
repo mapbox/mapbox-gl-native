@@ -1,6 +1,6 @@
 {
   'includes': [
-    '../common.gypi',
+    '../gyp/common.gypi',
   ],
   'targets': [
     {

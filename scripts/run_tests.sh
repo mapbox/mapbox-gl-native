@@ -10,7 +10,10 @@ for TEST in ./test_* ; do
     ulimit -c unlimited -S
     echo 'ulimit -c: '`ulimit -c`
     echo '/proc/sys/kernel/core_pattern: '`cat /proc/sys/kernel/core_pattern`
-    sysctl kernel.core_pattern
+
+    if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
+        sysctl kernel.core_pattern
+    fi
 
     RESULT=0
     ${TEST} || RESULT=$?
