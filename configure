@@ -2,6 +2,7 @@
 
 set -e
 set -o pipefail
+shopt -s expand_aliases
 
 CONFIG_FILE=${1:-config.gypi}
 
@@ -25,6 +26,13 @@ else
     nvm use 0.10
     >&2 echo -en "\033[0m";
 fi
+
+# Install mason
+if [[ ! -d ~/.mason ]]; then
+    >&2 echo -e "\033[1m\033[32m* Installing Mason\033[0m"
+    git clone https://github.com/mapbox/mason.git ~/.mason
+fi
+alias mason='~/.mason/mason'
 
 
 case $MASON_PLATFORM in
