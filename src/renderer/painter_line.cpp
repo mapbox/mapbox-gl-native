@@ -17,8 +17,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 
     float antialiasing = 1 / state.getPixelRatio();
     float width = properties.width;
-    float offset = properties.gap_width / 2;
-    offset = offset == 0 ? offset : offset + width / 2;
+    float offset = properties.gap_width == 0 ? 0 : (properties.gap_width + width) / 2;
     float blur = properties.blur + antialiasing;
 
     // These are the radii of the line. We are limiting it to 16, which will result
