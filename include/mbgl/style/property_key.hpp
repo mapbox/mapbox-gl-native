@@ -21,7 +21,7 @@ enum class PropertyKey {
     LineTranslateY,
     LineTranslateAnchor,
     LineWidth,
-    LineOffset,
+    LineGapWidth,
     LineBlur,
     LineDashArray, // for transitions only
     LineDashLand,

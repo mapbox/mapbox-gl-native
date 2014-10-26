@@ -586,8 +586,8 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<TranslateAnchorType>("line-translate-anchor", Key::LineTranslateAnchor, klass, value);
     parseOptionalProperty<Function<float>>("line-width", Key::LineWidth, klass, value);
     parseOptionalProperty<PropertyTransition>("line-width-transition", Key::LineWidth, klass, value);
-    parseOptionalProperty<Function<float>>("line-offset", Key::LineOffset, klass, value);
-    parseOptionalProperty<PropertyTransition>("line-offset-transition", Key::LineOffset, klass, value);
+    parseOptionalProperty<Function<float>>("line-gap-width", Key::LineGapWidth, klass, value);
+    parseOptionalProperty<PropertyTransition>("line-gap-width-transition", Key::LineGapWidth, klass, value);
     parseOptionalProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("line-blur-transition", Key::LineBlur, klass, value);
     parseOptionalProperty<Function<float>>("line-dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);

@@ -18,7 +18,7 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::LineTranslateY, defaultStyleProperties<LineProperties>().translate[1] },
     { PropertyKey::LineTranslateAnchor, defaultStyleProperties<LineProperties>().translateAnchor },
     { PropertyKey::LineWidth, defaultStyleProperties<LineProperties>().width },
-    { PropertyKey::LineOffset, defaultStyleProperties<LineProperties>().offset },
+    { PropertyKey::LineGapWidth, defaultStyleProperties<LineProperties>().gap_width },
     { PropertyKey::LineBlur, defaultStyleProperties<LineProperties>().blur },
     { PropertyKey::LineDashLand, defaultStyleProperties<LineProperties>().dash_array[0] },
     { PropertyKey::LineDashGap, defaultStyleProperties<LineProperties>().dash_array[1] },
