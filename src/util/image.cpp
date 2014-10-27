@@ -139,7 +139,8 @@ Image::Image(const std::string &data, bool flip) {
         png_size_t rowbytes = png_get_rowbytes(png, info);
         assert(width * 4 == rowbytes);
 
-        img = (char *)std::malloc(width * height * 4);
+        img = static_cast<char*>(::operator new(width * height * 4));
+
         char *surface = img;
         assert(surface);
 
@@ -162,7 +163,7 @@ Image::Image(const std::string &data, bool flip) {
         fprintf(stderr, "loading PNG failed: %s\n", e.what());
         png_destroy_read_struct(&png, &info, nullptr);
         if (img) {
-            std::free(img);
+            ::operator delete(img);
             img = nullptr;
         }
         width = 0;
@@ -172,7 +173,7 @@ Image::Image(const std::string &data, bool flip) {
 
 Image::~Image() {
     if (img) {
-        std::free(img);
+        ::operator delete(img);
         img = nullptr;
     }
 }
