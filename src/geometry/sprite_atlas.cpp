@@ -53,7 +53,7 @@ bool SpriteAtlas::resize(const float newRatio) {
             }
         }
 
-        free(old_data);
+        ::operator delete(old_data);
         dirty = true;
 
         // Mark all sprite images as in need of update
@@ -154,7 +154,8 @@ void SpriteAtlas::allocate() {
     if (!data) {
         dimension w = static_cast<dimension>(width * pixelRatio);
         dimension h = static_cast<dimension>(height * pixelRatio);
-        data = (uint32_t *)calloc(w * h, sizeof(uint32_t));
+        data = static_cast<uint32_t*>(::operator new(w * h * sizeof(uint32_t)));
+        std::fill(data, data + w * h, 0);
     }
 }
 
@@ -268,9 +269,5 @@ SpriteAtlas::~SpriteAtlas() {
 
     glDeleteTextures(1, &texture);
     texture = 0;
-
-    if (data) {
-        free(data);
-        data = nullptr;
-    }
+    ::operator delete(data), data = nullptr;
 }
