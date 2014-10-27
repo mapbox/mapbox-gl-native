@@ -1,4 +1,4 @@
-#include "glfw_view.hpp"
+#include <mbgl/platform/default/glfw_view.hpp>
 
 #include <mbgl/util/string.hpp>
 

@@ -1,4 +1,7 @@
 {
+  'variables': {
+    'install_prefix%': '',
+  },
   'target_defaults': {
     'default_configuration': 'Release',
     'conditions': [
@@ -44,6 +47,6 @@
           'GCC_INLINES_ARE_PRIVATE_EXTERN': 'NO'
         }
       },
-    }
+    },
   }
 }

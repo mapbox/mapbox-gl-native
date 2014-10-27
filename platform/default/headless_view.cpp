@@ -1,5 +1,5 @@
-#include "headless_view.hpp"
-#include "headless_display.hpp"
+#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/headless_display.hpp>
 
 #include <stdexcept>
 #include <sstream>

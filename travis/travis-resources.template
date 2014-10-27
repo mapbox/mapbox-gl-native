@@ -1,7 +1,7 @@
 
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "node-mapbox-gl-native travis resources",
+    "Description": "mapbox-gl-native travis resources",
     "Resources": {
         "BuildUser": {
             "Type": "AWS::IAM::User",
@@ -17,7 +17,7 @@
                                     ],
                                     "Effect": "Allow",
                                     "Resource": [
-                                        "arn:aws:s3:::node-mapbox-gl-native"
+                                        "arn:aws:s3:::mapbox-gl-testing"
                                     ]
                                 }
                             ]
@@ -37,7 +37,7 @@
                                     ],
                                     "Effect": "Allow",
                                     "Resource": [
-                                        "arn:aws:s3:::node-mapbox-gl-native/*"
+                                        "arn:aws:s3:::mapbox-gl-testing/*"
                                     ]
                                 }
                             ]

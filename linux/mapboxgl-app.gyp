@@ -1,7 +1,6 @@
 {
   'includes': [
-    '../common.gypi',
-    '../config.gypi',
+    '../gyp/common.gypi',
   ],
   'targets': [
     {
@@ -10,15 +9,9 @@
       'type': 'executable',
       'sources': [
         './main.cpp',
-        '../common/settings_json.cpp',
-        '../common/settings_json.hpp',
-        '../common/platform_default.cpp',
-        '../common/glfw_view.hpp',
-        '../common/glfw_view.cpp',
-        '../common/http_request_baton_curl.cpp',
-        '../common/linux.cpp',
-        '../common/stderr_log.hpp',
-        '../common/stderr_log.cpp',
+        '../platform/default/settings_json.cpp',
+        '../platform/default/glfw_view.cpp',
+        '../platform/default/log_stderr.cpp',
       ],
 
       'conditions': [
@@ -29,11 +22,9 @@
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS':[
               '<@(glfw3_cflags)',
-              '<@(curl_cflags)',
             ],
             'OTHER_LDFLAGS': [
               '<@(glfw3_libraries)',
-              '<@(curl_libraries)',
             ],
           }
         },
@@ -42,19 +33,19 @@
         {
           'cflags': [
             '<@(glfw3_cflags)',
-            '<@(curl_cflags)',
           ],
           'link_settings': {
             'libraries': [
               '<@(glfw3_libraries)',
-              '<@(curl_libraries)',
-              '-lboost_regex'
+              '-L<(boost_root)/lib',
+              '-lboost_regex',
             ],
           },
         }],
       ],
       'dependencies': [
-        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-linux',
         '../mapboxgl.gyp:copy_styles',
         '../mapboxgl.gyp:copy_certificate_bundle',
       ],

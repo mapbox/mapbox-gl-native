@@ -1,4 +1,4 @@
-#include "settings_json.hpp"
+#include <mbgl/platform/default/settings_json.hpp>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/filestream.h>
 #include <rapidjson/document.h>
