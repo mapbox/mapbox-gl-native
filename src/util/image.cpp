@@ -172,8 +172,5 @@ Image::Image(const std::string &data, bool flip) {
 }
 
 Image::~Image() {
-    if (img) {
-        ::operator delete(img);
-        img = nullptr;
-    }
+    ::operator delete(img),img = nullptr;
 }
