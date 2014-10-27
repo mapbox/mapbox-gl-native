@@ -91,14 +91,27 @@ void Map::start() {
     is_stopped = false;
 
     // Setup async notifications
-    uv_async_init(**loop, async_terminate.get(), terminate);
+
+// Iron out the differences between libuv 0.10 and 0.11
+#ifdef UV_ASYNC_CALLBACK
+#error Cannot overwrite UV_ASYNC_CALLBACK
+#endif
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+#define UV_ASYNC_CALLBACK(name) [](uv_async_t *a, int) { return Map::name(a); }
+#else
+#define UV_ASYNC_CALLBACK(name) name
+#endif
+
+    uv_async_init(**loop, async_terminate.get(), UV_ASYNC_CALLBACK(terminate));
     async_terminate->data = this;
 
-    uv_async_init(**loop, async_render.get(), render);
+    uv_async_init(**loop, async_render.get(), UV_ASYNC_CALLBACK(render));
     async_render->data = this;
 
-    uv_async_init(**loop, async_cleanup.get(), cleanup);
+    uv_async_init(**loop, async_cleanup.get(), UV_ASYNC_CALLBACK(cleanup));
     async_cleanup->data = this;
+
+#undef UV_ASYNC_CALLBACK
 
     uv_thread_create(*thread, [](void *arg) {
         Map *map = static_cast<Map *>(arg);
@@ -198,11 +211,7 @@ void Map::cleanup() {
     }
 }
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void Map::cleanup(uv_async_t *async, int) {
-#else
 void Map::cleanup(uv_async_t *async) {
-#endif
     Map *map = static_cast<Map *>(async->data);
 
     map->painter.cleanup();
@@ -223,11 +232,7 @@ void Map::setReachability(bool reachable) {
     }
 }
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void Map::render(uv_async_t *async, int) {
-#else
 void Map::render(uv_async_t *async) {
-#endif
     Map *map = static_cast<Map *>(async->data);
     assert(uv_thread_self() == map->map_thread);
 
@@ -247,11 +252,7 @@ void Map::render(uv_async_t *async) {
     }
 }
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void Map::terminate(uv_async_t *async, int) {
-#else
 void Map::terminate(uv_async_t *async) {
-#endif
     // Closes all open handles on the loop. This means that the loop will automatically terminate.
     Map *map = static_cast<Map *>(async->data);
     assert(uv_thread_self() == map->map_thread);
