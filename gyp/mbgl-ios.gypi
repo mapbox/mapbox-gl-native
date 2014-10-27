@@ -13,7 +13,14 @@
           'CLANG_ENABLE_OBJC_ARC': 'YES',
           'CODE_SIGN_IDENTITY': 'iPhone Developer',
           'PUBLIC_HEADERS_FOLDER_PATH': 'include',
-        }
+        },
+        'configurations': {
+          'Release': {
+            'xcode_settings': {
+              'ARCHS': [ "armv7", "armv7s", "arm64", "i386", "x86_64" ],
+            },
+          },
+        },
       }],
     ],
   },
