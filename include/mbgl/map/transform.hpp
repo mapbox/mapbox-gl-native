@@ -91,7 +91,6 @@ private:
     TransformState final;
 
     // Limit the amount of zooming possible on the map.
-    // TODO: make these modifiable from outside.
     const double min_scale = std::pow(2, 0);
     const double max_scale = std::pow(2, 18);
 
