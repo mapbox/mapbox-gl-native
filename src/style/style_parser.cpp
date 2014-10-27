@@ -719,21 +719,21 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
         parseRender(value_render, layer);
     }
 
-    if (value.HasMember("min-zoom")) {
-        JSVal min_zoom = value["min-zoom"];
+    if (value.HasMember("minzoom")) {
+        JSVal min_zoom = value["minzoom"];
         if (min_zoom.IsNumber()) {
             layer->bucket->min_zoom = min_zoom.GetDouble();
         } else {
-            Log::Warning(Event::ParseStyle, "min-zoom of layer %s must be numeric", layer->id.c_str());
+            Log::Warning(Event::ParseStyle, "minzoom of layer %s must be numeric", layer->id.c_str());
         }
     }
 
-    if (value.HasMember("max-zoom")) {
-        JSVal max_zoom = value["max-zoom"];
+    if (value.HasMember("maxzoom")) {
+        JSVal max_zoom = value["maxzoom"];
         if (max_zoom.IsNumber()) {
             layer->bucket->min_zoom = max_zoom.GetDouble();
         } else {
-            Log::Warning(Event::ParseStyle, "max-zoom of layer %s must be numeric", layer->id.c_str());
+            Log::Warning(Event::ParseStyle, "maxzoom of layer %s must be numeric", layer->id.c_str());
         }
     }
 }
