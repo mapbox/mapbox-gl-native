@@ -9,11 +9,11 @@
 
 using namespace mbgl;
 
-GlyphAtlas::GlyphAtlas(uint16_t width, uint16_t height)
-    : width(width),
-      height(height),
-      bin(width, height),
-      data(new char[width *height]),
+GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
+    : width(width_),
+      height(height_),
+      bin(width_, height_),
+      data(new char[width_ *height_]),
       dirty(true) {
 }
 
@@ -22,9 +22,15 @@ GlyphAtlas::~GlyphAtlas() {
 }
 
 Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tile_id, const std::string& face_name,
-                                    const SDFGlyph& glyph) {
+                                    const SDFGlyph& glyph)
+{
     std::lock_guard<std::mutex> lock(mtx);
+    return addGlyph_impl(tile_id, face_name, glyph);
+}
 
+Rect<uint16_t> GlyphAtlas::addGlyph_impl(uint64_t tile_id, const std::string& face_name,
+                                    const SDFGlyph& glyph)
+{
     // Use constant value for now.
     const uint8_t buffer = 3;
 
@@ -81,6 +87,23 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tile_id, const std::string& face_na
     dirty = true;
 
     return rect;
+}
+
+void GlyphAtlas::addGlyphs(uint64_t tileid, std::u32string const& text, std::string const& stackname, FontStack const& fontStack, GlyphPositions & face)
+{
+    std::lock_guard<std::mutex> lock(mtx);
+
+    std::map<uint32_t, SDFGlyph> const& sdfs = fontStack.getSDFs();
+    for (uint32_t chr : text)
+    {
+        auto sdf_it = sdfs.find(chr);
+        if (sdf_it != sdfs.end())
+        {
+            SDFGlyph const& sdf = sdf_it->second;
+            Rect<uint16_t> rect = addGlyph_impl(tileid, stackname, sdf);
+            face.emplace(chr, Glyph{rect, sdf.metrics});
+        }
+    }
 }
 
 void GlyphAtlas::removeGlyphs(uint64_t tile_id) {

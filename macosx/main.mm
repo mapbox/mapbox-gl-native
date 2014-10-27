@@ -1,11 +1,9 @@
-#include "../common/settings_nsuserdefaults.hpp"
-#include "../common/glfw_view.hpp"
-#include "../common/nslog_log.hpp"
-#include "../common/Reachability.h"
+#include <mbgl/platform/darwin/settings_nsuserdefaults.hpp>
+#include <mbgl/platform/darwin/log_nslog.hpp>
+#include <mbgl/platform/darwin/Reachability.h>
+#include <mbgl/platform/default/glfw_view.hpp>
 
 #import <Foundation/Foundation.h>
-
-#include <uv.h>
 
 @interface URLHandler : NSObject
 @property (nonatomic) mbgl::Map *map;
@@ -71,7 +69,6 @@
 @end
 
 int main() {
-    fprintf(stderr, "main thread: 0x%lx\n", uv_thread_self());
     mbgl::Log::Set<mbgl::NSLogBackend>();
 
     GLFWView view;

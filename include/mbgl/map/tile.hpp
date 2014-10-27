@@ -37,8 +37,8 @@ public:
         const int8_t z = 0;
         const int32_t x = 0, y = 0;
 
-        inline explicit ID(int8_t z, int32_t x, int32_t y)
-            : w((x < 0 ? x - (1 << z) + 1 : x) / (1 << z)), z(z), x(x), y(y) {}
+        inline explicit ID(int8_t z_, int32_t x_, int32_t y_)
+            : w((x_ < 0 ? x_ - (1 << z_) + 1 : x_) / (1 << z_)), z(z_), x(x_), y(y_) {}
 
         inline uint64_t to_uint64() const {
             return ((std::pow(2, z) * y + x) * 32) + z;

@@ -11,7 +11,7 @@
 namespace mbgl {
 
 struct FrameSnapshot {
-    explicit inline FrameSnapshot(timestamp t, float z) : t(t), z(z) {}
+    explicit inline FrameSnapshot(timestamp t_, float z_) : t(t_), z(z_) {}
     float t;
     float z;
 };

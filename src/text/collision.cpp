@@ -19,11 +19,11 @@ Box getBox(const CollisionAnchor &anchor, const CollisionRect &bbox, float minSc
     };
 };
 
-Collision::Collision(float zoom, float tileExtent, float tileSize, float placementDepth)
+Collision::Collision(float zoom_, float tileExtent, float tileSize, float placementDepth)
       // tile pixels per screen pixels at the tile's zoom level
     : tilePixelRatio(tileExtent / tileSize),
 
-      zoom(zoom),
+      zoom(zoom_),
 
       // Calculate the maximum scale we can go down in our fake-3d rtree so that
       // placement still makes sense. This is calculated so that the minimum
@@ -33,7 +33,7 @@ Collision::Collision(float zoom, float tileExtent, float tileSize, float placeme
       // We don't want to place labels all the way to 25.5. This lets too many
       // glyphs be placed, slowing down collision checking. Only place labels if
       // they will show up within the intended zoom range of the tile.
-      maxPlacementScale(std::exp(std::log(2) * util::min(3.0f, placementDepth, 25.5f - zoom))) {
+      maxPlacementScale(std::exp(std::log(2) * util::min(3.0f, placementDepth, 25.5f - zoom_))) {
     const float m = 4096;
     const float edge = m * tilePixelRatio * 2;
 

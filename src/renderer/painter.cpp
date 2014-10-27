@@ -21,8 +21,8 @@ using namespace mbgl;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(Map &map)
-    : map(map) {
+Painter::Painter(Map &map_)
+    : map(map_) {
 }
 
 Painter::~Painter() {
@@ -85,7 +85,27 @@ void Painter::setupShaders() {
     if (!gaussianShader) gaussianShader = std::make_unique<GaussianShader>();
 }
 
+void Painter::deleteShaders() {
+    plainShader = nullptr;
+    outlineShader = nullptr;
+    lineShader = nullptr;
+    linejoinShader = nullptr;
+    linepatternShader = nullptr;
+    patternShader = nullptr;
+    iconShader = nullptr;
+    rasterShader = nullptr;
+    sdfGlyphShader = nullptr;
+    sdfIconShader = nullptr;
+    dotShader = nullptr;
+    gaussianShader = nullptr;
+}
+
 void Painter::cleanup() {
+}
+
+void Painter::terminate() {
+    cleanup();
+    deleteShaders();
 }
 
 void Painter::resize() {
@@ -108,10 +128,10 @@ void Painter::useProgram(uint32_t program) {
     }
 }
 
-void Painter::lineWidth(float lineWidth) {
-    if (gl_lineWidth != lineWidth) {
-        glLineWidth(lineWidth);
-        gl_lineWidth = lineWidth;
+void Painter::lineWidth(float line_width) {
+    if (gl_lineWidth != line_width) {
+        glLineWidth(line_width);
+        gl_lineWidth = line_width;
     }
 }
 

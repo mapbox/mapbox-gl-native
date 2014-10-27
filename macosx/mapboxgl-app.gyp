@@ -1,7 +1,6 @@
 {
   'includes': [
-    '../common.gypi',
-    '../config.gypi'
+    '../gyp/common.gypi',
   ],
   'targets': [
     {
@@ -10,17 +9,11 @@
       'type': 'executable',
       'sources': [
         './main.mm',
-        '../common/settings_nsuserdefaults.hpp',
-        '../common/settings_nsuserdefaults.mm',
-        '../common/platform_nsstring.mm',
-        '../common/glfw_view.hpp',
-        '../common/glfw_view.cpp',
-        '../common/reachability.h',
-        '../common/reachability.m',
-        '../common/http_request_baton_cocoa.mm',
-        '../common/osx.mm',
-        '../common/nslog_log.hpp',
-        '../common/nslog_log.mm',
+        '../platform/darwin/settings_nsuserdefaults.hpp',
+        '../platform/darwin/settings_nsuserdefaults.mm',
+        '../platform/darwin/reachability.m',
+        '../platform/default/glfw_view.hpp',
+        '../platform/default/glfw_view.cpp',
       ],
       'product_extension': 'app',
       'mac_bundle': 1,
@@ -44,7 +37,8 @@
       },
       'dependencies': [
         '../mapboxgl.gyp:bundle_styles',
-        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-osx',
       ]
     }
   ]

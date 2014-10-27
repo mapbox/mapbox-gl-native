@@ -29,7 +29,7 @@ struct vec2 {
     template<typename U>
     inline vec2(const U& u) : x(u.x), y(u.y) {}
 
-    inline vec2(T x, T y) : x(x), y(y) {}
+    inline vec2(T x_, T y_) : x(x_), y(y_) {}
 
     inline bool operator==(const vec2& rhs) const {
         return x == rhs.x && y == rhs.y;
@@ -86,7 +86,7 @@ struct vec3 {
 
     inline vec3() {}
     inline vec3(const vec3& o) : x(o.x), y(o.y), z(o.z) {}
-    inline vec3(T x, T y, T z) : x(x), y(y), z(z) {}
+    inline vec3(T x_, T y_, T z_) : x(x_), y(y_), z(z_) {}
     inline bool operator==(const vec3& rhs) const {
         return x == rhs.x && y == rhs.y && z == rhs.z;
     }
@@ -98,7 +98,7 @@ struct vec4 {
 
     inline vec4() {}
     inline vec4(const vec4& o) : x(o.x), y(o.y), z(o.z), w(o.w) {}
-    inline vec4(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) {}
+    inline vec4(T x_, T y_, T z_, T w_) : x(x_), y(y_), z(z_), w(w_) {}
     inline bool operator==(const vec4& rhs) const {
         return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w;
     }

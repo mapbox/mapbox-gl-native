@@ -24,8 +24,8 @@ public:
 
     class Instance {
     public:
-        Instance(Operator op, std::vector<Value> &&values)
-            : op(op), values(values) {}
+        Instance(Operator op_, std::vector<Value> &&values_)
+            : op(op_), values(values_) {}
 
         bool compare(const std::vector<Value> &property_values) const;
 
@@ -37,7 +37,7 @@ public:
     };
 
 public:
-    FilterComparison(const std::string &field) : field(field) {};
+    FilterComparison(const std::string &field_) : field(field_) {};
 
     const std::string &getField() const;
     template <typename Extractor> inline bool compare(const Extractor &extractor) const;

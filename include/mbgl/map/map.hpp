@@ -63,6 +63,9 @@ public:
     // Triggers a cleanup that releases resources.
     void cleanup();
 
+    // Releases resources immediately
+    void terminate();
+
     // Controls buffer swapping.
     bool needsSwap();
     void swapped();
@@ -143,15 +146,9 @@ public:
 
 private:
     // uv async callbacks
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-    static void render(uv_async_t *async, int status);
-    static void terminate(uv_async_t *async, int status);
-    static void cleanup(uv_async_t *async, int status);
-#else
     static void render(uv_async_t *async);
     static void terminate(uv_async_t *async);
     static void cleanup(uv_async_t *async);
-#endif
 
     // Setup
     void setup();

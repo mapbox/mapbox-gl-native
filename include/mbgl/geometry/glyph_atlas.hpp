@@ -18,12 +18,14 @@ public:
 
 private:
     struct GlyphValue {
-        GlyphValue(const Rect<uint16_t>& rect, uint64_t id)
-            : rect(rect), ids({ id }) {}
+        GlyphValue(const Rect<uint16_t>& rect_, uint64_t id)
+            : rect(rect_), ids({ id }) {}
         Rect<uint16_t> rect;
         std::set<uint64_t> ids;
     };
 
+    Rect<uint16_t> addGlyph_impl(uint64_t tile_id, const std::string& face_name,
+                                 const SDFGlyph& glyph);
 public:
     GlyphAtlas(uint16_t width, uint16_t height);
     ~GlyphAtlas();
@@ -31,6 +33,8 @@ public:
 
     Rect<uint16_t> addGlyph(uint64_t tile_id, const std::string& face_name,
                             const SDFGlyph& glyph);
+    void addGlyphs(uint64_t tileid, std::u32string const& text, std::string const& stackname,
+                   FontStack const& fontStack, GlyphPositions & face);
     void removeGlyphs(uint64_t tile_id);
     void bind();
 

@@ -15,9 +15,9 @@ public:
         complete
     };
 
-    inline transition(timestamp start, timestamp duration)
-        : start(start),
-          duration(duration) {}
+    inline transition(timestamp start_, timestamp duration_)
+        : start(start_),
+          duration(duration_) {}
 
     inline float progress(timestamp now) const {
         if (duration == 0) return 1;
@@ -36,11 +36,11 @@ protected:
 template <typename T>
 class ease_transition : public transition {
 public:
-    ease_transition(T from, T to, T& value, timestamp start, timestamp duration)
-        : transition(start, duration),
-          from(from),
-          to(to),
-          value(value) {}
+    ease_transition(T from_, T to_, T& value_, timestamp start_, timestamp duration_)
+        : transition(start_, duration_),
+          from(from_),
+          to(to_),
+          value(value_) {}
 
     state update(timestamp now) const;
 
@@ -53,10 +53,10 @@ private:
 template <typename T>
 class timeout : public transition {
 public:
-    timeout(T final_value, T& value, timestamp start, timestamp duration)
-        : transition(start, duration),
-          final_value(final_value),
-          value(value) {}
+    timeout(T final_value_, T& value_, timestamp start_, timestamp duration_)
+        : transition(start_, duration_),
+          final_value(final_value_),
+          value(value_) {}
 
     state update(timestamp now) const {
         if (progress(now) >= 1) {

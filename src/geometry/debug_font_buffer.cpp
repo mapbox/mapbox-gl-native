@@ -10,9 +10,9 @@ using namespace mbgl;
 void DebugFontBuffer::addText(const char *text, double left, double baseline, double scale) {
     uint16_t *coords = nullptr;
 
-    size_t length = strlen(text);
-    for (size_t i = 0; i < length; ++i) {
-        if (text[i] < 32 || text[i] > 127) {
+    const size_t len = strlen(text);
+    for (size_t i = 0; i < len; ++i) {
+        if (text[i] < 32 || (unsigned char)(text[i]) > 127) {
             continue;
         }
 

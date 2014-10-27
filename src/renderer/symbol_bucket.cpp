@@ -19,8 +19,8 @@
 
 namespace mbgl {
 
-SymbolBucket::SymbolBucket(const StyleBucketSymbol &properties, Collision &collision)
-    : properties(properties), collision(collision) {}
+SymbolBucket::SymbolBucket(const StyleBucketSymbol &properties_, Collision &collision_)
+    : properties(properties_), collision(collision_) {}
 
 void SymbolBucket::render(Painter &painter, util::ptr<StyleLayer> layer_desc,
                           const Tile::ID &id, const mat4 &matrix) {
@@ -34,30 +34,21 @@ bool SymbolBucket::hasTextData() const { return !text.groups.empty(); }
 bool SymbolBucket::hasIconData() const { return !icon.groups.empty(); }
 
 void SymbolBucket::addGlyphsToAtlas(uint64_t tileid, const std::string stackname,
-                                    const std::u32string &string, const FontStack &fontStack,
+                                    const std::u32string &text, const FontStack &fontStack,
                                     GlyphAtlas &glyphAtlas, GlyphPositions &face) {
-    const std::map<uint32_t, SDFGlyph> &sdfs = fontStack.getSDFs();
-    // Loop through all characters and add glyph to atlas, positions.
-    for (uint32_t chr : string) {
-        auto sdf_it = sdfs.find(chr);
-        if (sdf_it != sdfs.end()) {
-            const SDFGlyph &sdf = sdf_it->second;
-            const Rect<uint16_t> rect = glyphAtlas.addGlyph(tileid, stackname, sdf);
-            face.emplace(chr, Glyph{rect, sdf.metrics});
-        }
-    }
+    glyphAtlas.addGlyphs(tileid, text, stackname, fontStack,face);
 }
 
 std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &layer,
                                                          const FilterExpression &filter,
                                                          GlyphStore &glyphStore,
                                                          const Sprite &sprite) {
-    const bool text = properties.text.field.size();
-    const bool icon = properties.icon.image.size();
+    const bool has_text = properties.text.field.size();
+    const bool has_icon = properties.icon.image.size();
 
     std::vector<SymbolFeature> features;
 
-    if (!text && !icon) {
+    if (!has_text && !has_icon) {
         return features;
     }
 
@@ -72,7 +63,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
 
         SymbolFeature ft;
 
-        if (text) {
+        if (has_text) {
             std::string u8string = util::replaceTokens(properties.text.field, feature.properties);
 
             if (properties.text.transform == TextTransformType::Uppercase) {
@@ -91,7 +82,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
             }
         }
 
-        if (icon) {
+        if (has_icon) {
             ft.sprite = util::replaceTokens(properties.icon.image, feature.properties);
         }
 
@@ -150,8 +141,8 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {
-                addGlyphsToAtlas(id.to_uint64(), properties.text.font, feature.label, fontStack,
-                                 glyphAtlas, face);
+                SymbolBucket::addGlyphsToAtlas(id.to_uint64(), properties.text.font, feature.label, fontStack,
+                                               glyphAtlas, face);
             }
         }
 

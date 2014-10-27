@@ -8,8 +8,8 @@
 
 using namespace mbgl;
 
-Shader::Shader(const char *name, const GLchar *vertSource, const GLchar *fragSource)
-    : name(name),
+Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSource)
+    : name(name_),
       valid(false),
       program(0) {
     util::timer timer("shader compilation", Event::Shader);

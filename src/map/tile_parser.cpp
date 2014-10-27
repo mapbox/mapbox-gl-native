@@ -37,14 +37,14 @@ namespace mbgl {
 // its header file.
 TileParser::~TileParser() = default;
 
-TileParser::TileParser(const std::string &data, VectorTileData &tile,
+TileParser::TileParser(const std::string &data, VectorTileData &tile_,
                        const util::ptr<const Style> &style_,
                        const util::ptr<GlyphAtlas> &glyphAtlas_,
                        const util::ptr<GlyphStore> &glyphStore_,
                        const util::ptr<SpriteAtlas> &spriteAtlas_,
                        const util::ptr<Sprite> &sprite_)
     : vector_data(pbf((const uint8_t *)data.data(), data.size())),
-      tile(tile),
+      tile(tile_),
       style(style_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),

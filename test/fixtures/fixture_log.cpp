@@ -9,25 +9,25 @@ FixtureLogBackend::~FixtureLogBackend() {
 }
 
 size_t FixtureLogBackend::count(const LogMessage &message) const {
-    size_t count = 0;
+    size_t message_count = 0;
     for (const LogMessage &msg : messages) {
         if (msg == message) {
-            count++;
+            message_count++;
             msg.checked = true;
         }
     }
-    return count;
+    return message_count;
 }
 
 std::vector<FixtureLogBackend::LogMessage> FixtureLogBackend::unchecked() const {
-    std::vector<LogMessage> unchecked;
+    std::vector<LogMessage> unchecked_messages;
     for (const LogMessage &msg : messages) {
         if (!msg.checked) {
-            unchecked.push_back(msg);
+            unchecked_messages.push_back(msg);
             msg.checked = true;
         }
     }
-    return unchecked;
+    return unchecked_messages;
 }
 
 ::std::ostream& operator<<(::std::ostream& os, const std::vector<FixtureLogBackend::LogMessage>& messages) {

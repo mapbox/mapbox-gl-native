@@ -1,4 +1,5 @@
 #include <mbgl/util/image.hpp>
+
 #include <png.h>
 
 #include <cassert>
@@ -30,8 +31,8 @@ std::string mbgl::util::compress_png(int width, int height, void *rgba, bool fli
     }
 
     std::string result;
-    png_set_write_fn(png_ptr, &result, [](png_structp png_ptr, png_bytep data, png_size_t length) {
-        std::string *out = static_cast<std::string *>(png_get_io_ptr(png_ptr));
+    png_set_write_fn(png_ptr, &result, [](png_structp png_ptr_, png_bytep data, png_size_t length) {
+        std::string *out = static_cast<std::string *>(png_get_io_ptr(png_ptr_));
         out->append(reinterpret_cast<char *>(data), length);
     }, NULL);
 
@@ -57,8 +58,8 @@ using namespace mbgl::util;
 
 
 struct Buffer {
-    Buffer(const std::string& data)
-    : data(data.data()), length(data.size()) {}
+    Buffer(const std::string& data_)
+    : data(data_.data()), length(data_.size()) {}
     const char *const data = 0;
     const size_t length = 0;
     size_t pos = 0;
@@ -138,7 +139,8 @@ Image::Image(const std::string &data, bool flip) {
         png_size_t rowbytes = png_get_rowbytes(png, info);
         assert(width * 4 == rowbytes);
 
-        img = (char *)std::malloc(width * height * 4);
+        img = static_cast<char*>(::operator new(width * height * 4));
+
         char *surface = img;
         assert(surface);
 
@@ -161,7 +163,7 @@ Image::Image(const std::string &data, bool flip) {
         fprintf(stderr, "loading PNG failed: %s\n", e.what());
         png_destroy_read_struct(&png, &info, nullptr);
         if (img) {
-            std::free(img);
+            ::operator delete(img);
             img = nullptr;
         }
         width = 0;
@@ -170,8 +172,5 @@ Image::Image(const std::string &data, bool flip) {
 }
 
 Image::~Image() {
-    if (img) {
-        std::free(img);
-        img = nullptr;
-    }
+    ::operator delete(img),img = nullptr;
 }

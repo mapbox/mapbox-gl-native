@@ -9,7 +9,8 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
-#include "../common/headless_view.hpp"
+#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/headless_display.hpp>
 
 #include "./fixtures/fixture_log.hpp"
 
@@ -21,6 +22,8 @@ const std::string base_directory = []{
     fn.erase(fn.find_last_of("/"));
     return fn + "/node_modules/mapbox-gl-test-suite/";
 }();
+
+auto display_ = std::make_shared<mbgl::HeadlessDisplay>();
 
 class HeadlessTest : public ::testing::TestWithParam<std::string> {};
 
@@ -78,7 +81,7 @@ TEST_P(HeadlessTest, render) {
             }
         }
 
-        HeadlessView view;
+        HeadlessView view(display_);
         Map map(view);
 
         map.setStyleJSON(style, base_directory);
@@ -95,10 +98,7 @@ TEST_P(HeadlessTest, render) {
         const unsigned int w = width * pixelRatio;
         const unsigned int h = height * pixelRatio;
 
-        const std::unique_ptr<uint32_t[]> pixels(new uint32_t[w * h]);
-        glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
-
-        const std::string image = util::compress_png(w, h, pixels.get(), true);
+        const std::string image = util::compress_png(w, h, view.readPixels().get(), true);
         util::write_file(actual_image, image);
     }
 }

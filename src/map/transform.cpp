@@ -17,7 +17,7 @@ const double R2D = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
 const double MIN_ROTATE_SCALE = 8;
 
-Transform::Transform(View &view) : view(view), mtx(std::make_unique<uv::rwlock>()) {
+Transform::Transform(View &view_) : view(view_), mtx(std::make_unique<uv::rwlock>()) {
     setScale(current.scale);
     setAngle(current.angle);
 }

@@ -14,10 +14,10 @@
 
 using namespace mbgl;
 
-SpriteAtlas::SpriteAtlas(dimension width, dimension height)
-    : width(width),
-      height(height),
-      bin(width, height),
+SpriteAtlas::SpriteAtlas(dimension width_, dimension height_)
+    : width(width_),
+      height(height_),
+      bin(width_, height_),
       dirty(true) {
 }
 
@@ -53,7 +53,7 @@ bool SpriteAtlas::resize(const float newRatio) {
             }
         }
 
-        free(old_data);
+        ::operator delete(old_data);
         dirty = true;
 
         // Mark all sprite images as in need of update
@@ -88,10 +88,10 @@ void copy_bitmap(const uint32_t *src, const int src_stride, const int src_x, con
     }
 }
 
-Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t width, size_t height) {
+Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t pixel_width, size_t pixel_height) {
     // We have to allocate a new area in the bin, and store an empty image in it.
     // Add a 1px border around every image.
-    Rect<dimension> rect = bin.allocate(width + 2 * buffer, height + 2 * buffer);
+    Rect<dimension> rect = bin.allocate(pixel_width + 2 * buffer, pixel_height + 2 * buffer);
     if (rect.w == 0) {
         return rect;
     }
@@ -154,7 +154,8 @@ void SpriteAtlas::allocate() {
     if (!data) {
         dimension w = static_cast<dimension>(width * pixelRatio);
         dimension h = static_cast<dimension>(height * pixelRatio);
-        data = (uint32_t *)calloc(w * h, sizeof(uint32_t));
+        data = static_cast<uint32_t*>(::operator new(w * h * sizeof(uint32_t)));
+        std::fill(data, data + w * h, 0);
     }
 }
 
@@ -268,9 +269,5 @@ SpriteAtlas::~SpriteAtlas() {
 
     glDeleteTextures(1, &texture);
     texture = 0;
-
-    if (data) {
-        free(data);
-        data = nullptr;
-    }
+    ::operator delete(data), data = nullptr;
 }

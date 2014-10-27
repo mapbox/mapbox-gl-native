@@ -2,6 +2,8 @@
 #include <mbgl/storage/file_request.hpp>
 #include <mbgl/storage/response.hpp>
 
+#include <limits>
+
 namespace mbgl {
 
 FileRequestBaton::FileRequestBaton(FileRequest *request_, const std::string &path, uv_loop_t *loop)
@@ -97,8 +99,7 @@ void FileRequestBaton::file_stated(uv_fs_t *req) {
             uv_fs_req_cleanup(req);
             uv_fs_close(req->loop, req, ptr->fd, file_closed);
         } else {
-            const unsigned int size =
-                (unsigned int)(stat->st_size);
+            const unsigned int size = (unsigned int)(stat->st_size);
             ptr->body.resize(size);
             ptr->buffer = uv_buf_init(const_cast<char *>(ptr->body.data()), size);
             uv_fs_req_cleanup(req);

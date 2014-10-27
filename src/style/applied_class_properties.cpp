@@ -2,11 +2,11 @@
 
 namespace mbgl {
 
-AppliedClassProperty::AppliedClassProperty(ClassID class_id, timestamp begin, timestamp end, const PropertyValue &value)
+AppliedClassProperty::AppliedClassProperty(ClassID class_id, timestamp begin_, timestamp end_, const PropertyValue &value_)
     : name(class_id),
-    begin(begin),
-    end(end),
-    value(value) {}
+    begin(begin_),
+    end(end_),
+    value(value_) {}
 
 // Returns thie ID of the most recent
 ClassID AppliedClassProperties::mostRecent() const {

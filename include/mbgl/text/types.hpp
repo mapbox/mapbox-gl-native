@@ -3,10 +3,9 @@
 
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/rect.hpp>
+#include <mbgl/util/optional.hpp>
 #include <array>
 #include <vector>
-
-#include <boost/optional.hpp>
 
 namespace mbgl {
 
@@ -29,31 +28,31 @@ struct CollisionRect {
                                   CollisionPoint::Type bx,
                                   CollisionPoint::Type by)
         : tl(ax, ay), br(bx, by) {}
-    inline explicit CollisionRect(const CollisionPoint &tl,
-                                  const CollisionPoint &br)
-        : tl(tl), br(br) {}
+    inline explicit CollisionRect(const CollisionPoint &tl_,
+                                  const CollisionPoint &br_)
+        : tl(tl_), br(br_) {}
 };
 
 // These are the glyph boxes that we want to have placed.
 struct GlyphBox {
     explicit GlyphBox() {}
-    explicit GlyphBox(const CollisionRect &box,
-                      const CollisionAnchor &anchor,
-                      float minScale,
-                      float maxScale,
-                      float padding)
-        : box(box), anchor(anchor), minScale(minScale), maxScale(maxScale), padding(padding) {}
-    explicit GlyphBox(const CollisionRect &box,
-                      float minScale,
-                      float padding)
-        : box(box), minScale(minScale), padding(padding) {}
+    explicit GlyphBox(const CollisionRect &box_,
+                      const CollisionAnchor &anchor_,
+                      float minScale_,
+                      float maxScale_,
+                      float padding_)
+        : box(box_), anchor(anchor_), minScale(minScale_), maxScale(maxScale_), padding(padding_) {}
+    explicit GlyphBox(const CollisionRect &box_,
+                      float minScale_,
+                      float padding_)
+        : box(box_), minScale(minScale_), padding(padding_) {}
 
     CollisionRect box;
     CollisionAnchor anchor;
     float minScale = 0.0f;
     float maxScale = std::numeric_limits<float>::infinity();
     float padding = 0.0f;
-    boost::optional<CollisionRect> hBox;
+    mapbox::util::optional<CollisionRect> hBox;
 };
 
 typedef std::vector<GlyphBox> GlyphBoxes;
@@ -61,19 +60,19 @@ typedef std::vector<GlyphBox> GlyphBoxes;
 
 // TODO: Transform the vec2<float>s to vec2<int16_t> to save bytes
 struct PlacedGlyph {
-    explicit PlacedGlyph(const vec2<float> &tl, const vec2<float> &tr,
-                      const vec2<float> &bl, const vec2<float> &br,
-                      const Rect<uint16_t> &tex, float angle, const vec2<float> &anchor,
-                      float minScale, float maxScale)
-        : tl(tl),
-          tr(tr),
-          bl(bl),
-          br(br),
-          tex(tex),
-          angle(angle),
-          anchor(anchor),
-          minScale(minScale),
-          maxScale(maxScale) {}
+    explicit PlacedGlyph(const vec2<float> &tl_, const vec2<float> &tr_,
+                      const vec2<float> &bl_, const vec2<float> &br_,
+                      const Rect<uint16_t> &tex_, float angle_, const vec2<float> &anchor_,
+                      float minScale_, float maxScale_)
+        : tl(tl_),
+          tr(tr_),
+          bl(bl_),
+          br(br_),
+          tex(tex_),
+          angle(angle_),
+          anchor(anchor_),
+          minScale(minScale_),
+          maxScale(maxScale_) {}
 
     vec2<float> tl, tr, bl, br;
     Rect<uint16_t> tex;
@@ -88,7 +87,7 @@ typedef std::vector<PlacedGlyph> PlacedGlyphs;
 struct PlacementBox {
     CollisionAnchor anchor;
     CollisionRect box;
-    boost::optional<CollisionRect> hBox;
+    mapbox::util::optional<CollisionRect> hBox;
     PlacementRange placementRange = {{0.0f, 0.0f}};
     float placementScale = 0.0f;
     float maxScale = std::numeric_limits<float>::infinity();
@@ -97,8 +96,8 @@ struct PlacementBox {
 
 struct PlacementProperty {
     explicit PlacementProperty() {}
-    explicit PlacementProperty(float zoom, const PlacementRange &rotationRange)
-        : zoom(zoom), rotationRange(rotationRange) {}
+    explicit PlacementProperty(float zoom_, const PlacementRange &rotationRange_)
+        : zoom(zoom_), rotationRange(rotationRange_) {}
 
     inline operator bool() const {
         return !std::isnan(zoom) && zoom != std::numeric_limits<float>::infinity() &&
