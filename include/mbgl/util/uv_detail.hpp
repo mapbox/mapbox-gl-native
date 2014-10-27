@@ -29,7 +29,7 @@ public:
         if (l == nullptr) {
 #else
         l = new uv_loop_t;
-        if (uv_loop_init(&l) != 0) {
+        if (uv_loop_init(l) != 0) {
 #endif
             throw std::runtime_error("failed to initialize loop");
         }
