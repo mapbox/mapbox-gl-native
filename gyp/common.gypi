@@ -24,6 +24,19 @@
         ],
       }],
     ],
+    'target_conditions': [
+      ['_type == "static_library"', {
+        'conditions': [
+          ['OS=="mac"', {
+            'xcode_settings': {
+              'OTHER_CPLUSPLUSFLAGS': [ '-fPIC' ],
+            },
+          }, {
+            'cflags_cc': [ '-fPIC' ],
+          }]
+        ],
+      }],
+    ],
     'cflags_cc': [ '-std=c++11', '-Werror', '-Wall', '-Wextra', '-Wshadow', '-frtti', '-fexceptions' ],
     'configurations': {
       'Debug': {
