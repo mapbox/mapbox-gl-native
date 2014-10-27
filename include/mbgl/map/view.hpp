@@ -22,8 +22,8 @@ enum MapChange : uint8_t {
 
 class View {
 public:
-    virtual void initialize(Map *map) {
-        this->map = map;
+    virtual void initialize(Map *map_) {
+        map = map_;
     }
 
     // Called from the render (=GL) thread. Signals that the context should
@@ -39,11 +39,7 @@ public:
     // thread. This is called once just before the rendering thread terminates.
     virtual void make_inactive() = 0;
 
-    // Returns the base framebuffer object, if any, and 0 if using the system
-    // provided framebuffer.
-    virtual unsigned int root_fbo() {
-        return 0;
-    }
+    virtual void notify() = 0;
 
     // Notifies a watcher of map x/y/scale/rotation changes.
     // Must only be called from the same thread that caused the change.

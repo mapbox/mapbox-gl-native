@@ -5,8 +5,8 @@
 using namespace mbgl;
 
 
-RasterTileData::RasterTileData(Tile::ID id, Map &map, const SourceInfo &source)
-    : TileData(id, map, source),
+RasterTileData::RasterTileData(Tile::ID id_, Map &map_, const util::ptr<SourceInfo> &source_)
+    : TileData(id_, map_, source_),
     bucket(map.getTexturepool(), properties) {
 }
 
@@ -25,10 +25,10 @@ void RasterTileData::parse() {
     }
 }
 
-void RasterTileData::render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix) {
+void RasterTileData::render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix) {
     bucket.render(painter, layer_desc, id, matrix);
 }
 
-bool RasterTileData::hasData(std::shared_ptr<StyleLayer> /*layer_desc*/) const {
+bool RasterTileData::hasData(util::ptr<StyleLayer> /*layer_desc*/) const {
     return bucket.hasData();
 }

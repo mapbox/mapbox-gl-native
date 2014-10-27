@@ -1,7 +1,6 @@
 {
   'includes': [
-    '../common.gypi',
-    '../config.gypi'
+    '../gyp/common.gypi',
   ],
   'targets': [
     {
@@ -10,15 +9,11 @@
       'type': 'executable',
       'sources': [
         './main.mm',
-        '../common/settings_nsuserdefaults.hpp',
-        '../common/settings_nsuserdefaults.mm',
-        '../common/platform_nsstring.mm',
-        '../common/glfw_view.hpp',
-        '../common/glfw_view.cpp',
-        '../common/foundation_request.h',
-        '../common/foundation_request.mm',
-        '../common/nslog_log.hpp',
-        '../common/nslog_log.mm',
+        '../platform/darwin/settings_nsuserdefaults.hpp',
+        '../platform/darwin/settings_nsuserdefaults.mm',
+        '../platform/darwin/reachability.m',
+        '../platform/default/glfw_view.hpp',
+        '../platform/default/glfw_view.cpp',
       ],
       'product_extension': 'app',
       'mac_bundle': 1,
@@ -33,6 +28,7 @@
         ],
         'OTHER_LDFLAGS': [
           '<@(glfw3_libraries)',
+          '-framework SystemConfiguration',
         ],
         'SDKROOT': 'macosx',
         'INFOPLIST_FILE': 'Info.plist',
@@ -41,7 +37,8 @@
       },
       'dependencies': [
         '../mapboxgl.gyp:bundle_styles',
-        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-osx',
       ]
     }
   ]

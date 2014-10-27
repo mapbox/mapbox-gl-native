@@ -6,6 +6,8 @@
 #include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
+#include <algorithm>
+
 namespace mbgl {
 
 using JSVal = const rapidjson::Value&;
@@ -108,13 +110,13 @@ template<> bool StyleParser::parseRenderProperty(JSVal value, uint16_t &target, 
     if (value.HasMember(name)) {
         JSVal property = replaceConstant(value[name]);
         if (property.IsUint()) {
-            unsigned int value = property.GetUint();
-            if (value > std::numeric_limits<uint16_t>::max()) {
+            unsigned int int_value = property.GetUint();
+            if (int_value > std::numeric_limits<uint16_t>::max()) {
                 Log::Warning(Event::ParseStyle, "values for %s that are larger than %d are not supported", name, std::numeric_limits<uint16_t>::max());
                 return false;
             }
 
-            target = value;
+            target = int_value;
             return true;
         } else {
             Log::Warning(Event::ParseStyle, "%s must be an unsigned integer", name);
@@ -176,12 +178,12 @@ void StyleParser::parseSources(JSVal value) {
         rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
         for (; itr != value.MemberEnd(); ++itr) {
             std::string name { itr->name.GetString(), itr->name.GetStringLength() };
-            SourceInfo info;
+            util::ptr<SourceInfo> info = std::make_shared<SourceInfo>();
 
-            parseRenderProperty<SourceTypeClass>(itr->value, info.type, "type");
-            parseRenderProperty(itr->value, info.url, "url");
-            parseRenderProperty(itr->value, info.tile_size, "tileSize");
-            info.parseTileJSONProperties(itr->value);
+            parseRenderProperty<SourceTypeClass>(itr->value, info->type, "type");
+            parseRenderProperty(itr->value, info->url, "url");
+            parseRenderProperty(itr->value, info->tile_size, "tileSize");
+            info->parseTileJSONProperties(itr->value);
 
             sources.emplace(std::move(name), std::make_shared<StyleSource>(info));
         }
@@ -451,7 +453,7 @@ std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
     if (value.IsArray()) {
         std::unique_ptr<StyleLayerGroup> group = std::make_unique<StyleLayerGroup>();
         for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-            std::shared_ptr<StyleLayer> layer = createLayer(value[i]);
+            util::ptr<StyleLayer> layer = createLayer(value[i]);
             if (layer) {
                 group->layers.emplace_back(layer);
             }
@@ -463,7 +465,7 @@ std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
     }
 }
 
-std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
+util::ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
     if (value.IsObject()) {
         if (!value.HasMember("id")) {
             Log::Warning(Event::ParseStyle, "layer must have an id");
@@ -487,7 +489,7 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
         std::map<ClassID, ClassProperties> styles;
         parseStyles(value, styles);
 
-        std::shared_ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
+        util::ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
             layer_id, std::move(styles));
 
         if (value.HasMember("layers")) {
@@ -495,7 +497,7 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
         }
 
         // Store the layer ID so we can reference it later.
-        layers.emplace(layer_id, std::pair<JSVal, std::shared_ptr<StyleLayer>> { value, layer });
+        layers.emplace(layer_id, std::pair<JSVal, util::ptr<StyleLayer>> { value, layer });
 
         return layer;
     } else {
@@ -505,14 +507,14 @@ std::shared_ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
 }
 
 void StyleParser::parseLayers() {
-    for (std::pair<const std::string, std::pair<JSVal, std::shared_ptr<StyleLayer>>> &pair : layers) {
+    for (std::pair<const std::string, std::pair<JSVal, util::ptr<StyleLayer>>> &pair : layers) {
         parseLayer(pair.second);
     }
 }
 
-void StyleParser::parseLayer(std::pair<JSVal, std::shared_ptr<StyleLayer>> &pair) {
+void StyleParser::parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair) {
     JSVal value = pair.first;
-    std::shared_ptr<StyleLayer> &layer = pair.second;
+    util::ptr<StyleLayer> &layer = pair.second;
 
     if (value.HasMember("type")) {
         JSVal type = value["type"];
@@ -554,7 +556,7 @@ void StyleParser::parseStyles(JSVal value, std::map<ClassID, ClassProperties> &s
         if (name == "style") {
             parseStyle(replaceConstant(itr->value), styles[ClassID::Default]);
         } else if (name.compare(0, 6, "style.") == 0 && name.length() > 6) {
-            const ClassID class_id = ClassDictionary::Lookup(name.substr(6));
+            const ClassID class_id = ClassDictionary::Get().lookup(name.substr(6));
             parseStyle(replaceConstant(itr->value), styles[class_id]);
         }
     }
@@ -565,84 +567,85 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
 
     parseOptionalProperty<Function<bool>>("fill-antialias", Key::FillAntialias, klass, value);
     parseOptionalProperty<Function<float>>("fill-opacity", Key::FillOpacity, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-fill-opacity", Key::FillOpacity, klass, value);
+    parseOptionalProperty<PropertyTransition>("fill-opacity-transition", Key::FillOpacity, klass, value);
     parseOptionalProperty<Function<Color>>("fill-color", Key::FillColor, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-fill-color", Key::FillColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("fill-color-transition", Key::FillColor, klass, value);
     parseOptionalProperty<Function<Color>>("fill-outline-color", Key::FillOutlineColor, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-fill-outline-color", Key::FillOutlineColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("fill-outline-color-transition", Key::FillOutlineColor, klass, value);
     parseOptionalProperty<Function<float>>("fill-translate", { Key::FillTranslateX, Key::FillTranslateY }, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-fill-translate", Key::FillTranslate, klass, value);
+    parseOptionalProperty<PropertyTransition>("fill-translate-transition", Key::FillTranslate, klass, value);
     parseOptionalProperty<TranslateAnchorType>("fill-translate-anchor", Key::FillTranslateAnchor, klass, value);
     parseOptionalProperty<std::string>("fill-image", Key::FillImage, klass, value);
 
     parseOptionalProperty<Function<float>>("line-opacity", Key::LineOpacity, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-line-opacity", Key::LineOpacity, klass, value);
+    parseOptionalProperty<PropertyTransition>("line-opacity-transition", Key::LineOpacity, klass, value);
     parseOptionalProperty<Function<Color>>("line-color", Key::LineColor, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-line-color", Key::LineColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("line-color-transition", Key::LineColor, klass, value);
     parseOptionalProperty<Function<float>>("line-translate", { Key::LineTranslateX, Key::LineTranslateY }, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-line-translate", Key::LineTranslate, klass, value);
+    parseOptionalProperty<PropertyTransition>("line-translate-transition", Key::LineTranslate, klass, value);
     parseOptionalProperty<TranslateAnchorType>("line-translate-anchor", Key::LineTranslateAnchor, klass, value);
     parseOptionalProperty<Function<float>>("line-width", Key::LineWidth, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-line-width", Key::LineWidth, klass, value);
+    parseOptionalProperty<PropertyTransition>("line-width-transition", Key::LineWidth, klass, value);
     parseOptionalProperty<Function<float>>("line-offset", Key::LineOffset, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-line-offset", Key::LineOffset, klass, value);
+    parseOptionalProperty<PropertyTransition>("line-offset-transition", Key::LineOffset, klass, value);
     parseOptionalProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-line-blur", Key::LineBlur, klass, value);
+    parseOptionalProperty<PropertyTransition>("line-blur-transition", Key::LineBlur, klass, value);
     parseOptionalProperty<Function<float>>("line-dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-line-dasharray", Key::LineDashArray, klass, value);
+    parseOptionalProperty<PropertyTransition>("line-dasharray-transition", Key::LineDashArray, klass, value);
     parseOptionalProperty<std::string>("line-image", Key::LineImage, klass, value);
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-icon-opacity", Key::IconOpacity, klass, value);
+    parseOptionalProperty<PropertyTransition>("icon-opacity-transition", Key::IconOpacity, klass, value);
     parseOptionalProperty<Function<float>>("icon-rotate", Key::IconRotate, klass, value);
     parseOptionalProperty<Function<float>>("icon-size", Key::IconSize, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-icon-size", Key::IconSize, klass, value);
+    parseOptionalProperty<PropertyTransition>("icon-size-transition", Key::IconSize, klass, value);
     parseOptionalProperty<Function<Color>>("icon-color", Key::IconColor, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-icon-color", Key::IconColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("icon-color-transition", Key::IconColor, klass, value);
     parseOptionalProperty<Function<Color>>("icon-halo-color", Key::IconHaloColor, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-icon-halo-color", Key::IconHaloColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("icon-halo-color-transition", Key::IconHaloColor, klass, value);
     parseOptionalProperty<Function<float>>("icon-halo-width", Key::IconHaloWidth, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-icon-halo-width", Key::IconHaloWidth, klass, value);
+    parseOptionalProperty<PropertyTransition>("icon-halo-width-transition", Key::IconHaloWidth, klass, value);
     parseOptionalProperty<Function<float>>("icon-halo-blur", Key::IconHaloBlur, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-icon-halo-blur", Key::IconHaloBlur, klass, value);
+    parseOptionalProperty<PropertyTransition>("icon-halo-blur-transition", Key::IconHaloBlur, klass, value);
     parseOptionalProperty<Function<float>>("icon-translate", { Key::IconTranslateX, Key::IconTranslateY }, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-icon-translate", Key::IconTranslate, klass, value);
+    parseOptionalProperty<PropertyTransition>("icon-translate-transition", Key::IconTranslate, klass, value);
     parseOptionalProperty<TranslateAnchorType>("icon-translate-anchor", Key::IconTranslateAnchor, klass, value);
 
     parseOptionalProperty<Function<float>>("text-opacity", Key::TextOpacity, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-text-opacity", Key::TextOpacity, klass, value);
+    parseOptionalProperty<PropertyTransition>("text-opacity-transition", Key::TextOpacity, klass, value);
     parseOptionalProperty<Function<float>>("text-size", Key::TextSize, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-text-size", Key::TextSize, klass, value);
+    parseOptionalProperty<PropertyTransition>("text-size-transition", Key::TextSize, klass, value);
     parseOptionalProperty<Function<Color>>("text-color", Key::TextColor, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-text-color", Key::TextColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("text-color-transition", Key::TextColor, klass, value);
     parseOptionalProperty<Function<Color>>("text-halo-color", Key::TextHaloColor, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-text-halo-color", Key::TextHaloColor, klass, value);
+    parseOptionalProperty<PropertyTransition>("text-halo-color-transition", Key::TextHaloColor, klass, value);
     parseOptionalProperty<Function<float>>("text-halo-width", Key::TextHaloWidth, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-text-halo-width", Key::TextHaloWidth, klass, value);
+    parseOptionalProperty<PropertyTransition>("text-halo-width-transition", Key::TextHaloWidth, klass, value);
     parseOptionalProperty<Function<float>>("text-halo-blur", Key::TextHaloBlur, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-text-halo-blur", Key::TextHaloBlur, klass, value);
+    parseOptionalProperty<PropertyTransition>("text-halo-blur-transition", Key::TextHaloBlur, klass, value);
     parseOptionalProperty<Function<float>>("text-translate", { Key::TextTranslateX, Key::TextTranslateY }, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-text-translate", Key::TextTranslate, klass, value);
+    parseOptionalProperty<PropertyTransition>("text-translate-transition", Key::TextTranslate, klass, value);
     parseOptionalProperty<TranslateAnchorType>("text-translate-anchor", Key::TextTranslateAnchor, klass, value);
 
     parseOptionalProperty<Function<float>>("raster-opacity", Key::RasterOpacity, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-opacity", Key::RasterOpacity, klass, value);
+    parseOptionalProperty<PropertyTransition>("raster-opacity-transition", Key::RasterOpacity, klass, value);
     parseOptionalProperty<Function<float>>("raster-hue-rotate", Key::RasterHueRotate, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-hue-rotate", Key::RasterHueRotate, klass, value);
+    parseOptionalProperty<PropertyTransition>("raster-hue-rotate-transition", Key::RasterHueRotate, klass, value);
     parseOptionalProperty<Function<float>>("raster-brightness", { Key::RasterBrightnessLow, Key::RasterBrightnessHigh }, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-brightness", Key::RasterBrightness, klass, value);
+    parseOptionalProperty<PropertyTransition>("raster-brightness-transition", Key::RasterBrightness, klass, value);
     parseOptionalProperty<Function<float>>("raster-saturation", Key::RasterSaturation, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-saturation", Key::RasterSaturation, klass, value);
+    parseOptionalProperty<PropertyTransition>("raster-saturation-transition", Key::RasterSaturation, klass, value);
     parseOptionalProperty<Function<float>>("raster-contrast", Key::RasterContrast, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-contrast", Key::RasterContrast, klass, value);
+    parseOptionalProperty<PropertyTransition>("raster-contrast-transition", Key::RasterContrast, klass, value);
     parseOptionalProperty<Function<float>>("raster-fade-duration", Key::RasterFade, klass, value);
-    parseOptionalProperty<PropertyTransition>("transition-raster-fade-duration", Key::RasterFade, klass, value);
+    parseOptionalProperty<PropertyTransition>("raster-fade-duration-transition", Key::RasterFade, klass, value);
 
     parseOptionalProperty<Function<float>>("background-opacity", Key::BackgroundOpacity, klass, value);
     parseOptionalProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
+    parseOptionalProperty<std::string>("background-image", Key::BackgroundImage, klass, value);
 }
 
-void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer) {
+void StyleParser::parseReference(JSVal value, util::ptr<StyleLayer> &layer) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "layer ref of '%s' must be a string", layer->id.c_str());
         return;
@@ -661,7 +664,7 @@ void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer
     stack.pop_front();
 
 
-    std::shared_ptr<StyleLayer> reference = it->second.second;
+    util::ptr<StyleLayer> reference = it->second.second;
 
     layer->type = reference->type;
 
@@ -676,7 +679,7 @@ void StyleParser::parseReference(JSVal value, std::shared_ptr<StyleLayer> &layer
 
 #pragma mark - Parse Bucket
 
-void StyleParser::parseBucket(JSVal value, std::shared_ptr<StyleLayer> &layer) {
+void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
     layer->bucket = std::make_shared<StyleBucket>(layer->type);
 
     // We name the buckets according to the layer that defined it.
@@ -762,11 +765,11 @@ FilterExpression StyleParser::parseFilter(JSVal value, FilterExpression::Operato
                 FilterComparison comparison(name);
                 JSVal filterValue = replaceConstant(itr->value);
                 if (filterValue.IsObject()) {
-                    rapidjson::Value::ConstMemberIterator itr = filterValue.MemberBegin();
-                    for (; itr != filterValue.MemberEnd(); ++itr) {
+                    rapidjson::Value::ConstMemberIterator filter_itr = filterValue.MemberBegin();
+                    for (; filter_itr != filterValue.MemberEnd(); ++filter_itr) {
                         comparison.add(
-                            parseFilterComparisonOperator({ itr->name.GetString(), itr->name.GetStringLength() }),
-                            parseValues(replaceConstant(itr->value))
+                            parseFilterComparisonOperator({ filter_itr->name.GetString(), filter_itr->name.GetStringLength() }),
+                            parseValues(replaceConstant(filter_itr->value))
                         );
                     }
                 } else if (filterValue.IsArray()) {
@@ -822,7 +825,7 @@ std::vector<Value> StyleParser::parseValues(JSVal value) {
     return values;
 }
 
-void StyleParser::parseRender(JSVal value, std::shared_ptr<StyleLayer> &layer) {
+void StyleParser::parseRender(JSVal value, util::ptr<StyleLayer> &layer) {
     if (!value.IsObject()) {
         Log::Warning(Event::ParseStyle, "render property of layer '%s' must be an object", layer->id.c_str());
         return;

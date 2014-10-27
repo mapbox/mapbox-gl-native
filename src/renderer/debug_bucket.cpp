@@ -10,11 +10,11 @@ struct geometry_too_long_exception : std::exception {};
 
 using namespace mbgl;
 
-DebugBucket::DebugBucket(DebugFontBuffer& fontBuffer)
-    : fontBuffer(fontBuffer) {
+DebugBucket::DebugBucket(DebugFontBuffer& fontBuffer_)
+    : fontBuffer(fontBuffer_) {
 }
 
-void DebugBucket::render(Painter& painter, std::shared_ptr<StyleLayer> /*layer_desc*/, const Tile::ID& /*id*/, const mat4 &matrix) {
+void DebugBucket::render(Painter& painter, util::ptr<StyleLayer> /*layer_desc*/, const Tile::ID& /*id*/, const mat4 &matrix) {
     painter.renderDebugText(*this, matrix);
 }
 

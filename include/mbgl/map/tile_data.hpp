@@ -6,11 +6,11 @@
 #include <mbgl/geometry/debug_font_buffer.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/ptr.hpp>
 
 #include <atomic>
 #include <exception>
 #include <iosfwd>
-#include <memory>
 #include <string>
 
 namespace mbgl {
@@ -19,8 +19,7 @@ class Map;
 class Painter;
 class SourceInfo;
 class StyleLayer;
-
-namespace platform { class Request; }
+class Request;
 
 class TileData : public std::enable_shared_from_this<TileData>,
              private util::noncopyable {
@@ -29,7 +28,7 @@ public:
     struct geometry_too_long_exception : exception {};
 
 public:
-    typedef std::shared_ptr<TileData> Ptr;
+    typedef util::ptr<TileData> Ptr;
 
     enum class State {
         invalid,
@@ -41,7 +40,7 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, Map &map, const SourceInfo &source);
+    TileData(Tile::ID id, Map &map, const util::ptr<SourceInfo> &source);
     ~TileData();
 
     void request();
@@ -57,8 +56,8 @@ public:
     virtual void beforeParse();
     virtual void parse() = 0;
     virtual void afterParse();
-    virtual void render(Painter &painter, std::shared_ptr<StyleLayer> layer_desc, const mat4 &matrix) = 0;
-    virtual bool hasData(std::shared_ptr<StyleLayer> layer_desc) const = 0;
+    virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix) = 0;
+    virtual bool hasData(util::ptr<StyleLayer> layer_desc) const = 0;
 
 
 public:
@@ -69,10 +68,10 @@ protected:
     Map &map;
 
 public:
-    const SourceInfo &source;
+    util::ptr<SourceInfo> source;
 
 protected:
-    std::weak_ptr<platform::Request> req;
+    std::unique_ptr<Request> req;
     std::string data;
 
     // Contains the tile ID string for painting debug information.

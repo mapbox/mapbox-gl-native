@@ -9,7 +9,7 @@ namespace mbgl {
 
 template <typename T>
 struct ConstantFunction {
-    inline ConstantFunction(const T &value) : value(value) {}
+    inline ConstantFunction(const T &value_) : value(value_) {}
     inline T evaluate(float) const { return value; }
 
 private:
@@ -18,7 +18,7 @@ private:
 
 template <typename T>
 struct StopsFunction {
-    inline StopsFunction(const std::vector<std::pair<float, T>> &values, float base) : values(values), base(base) {}
+    inline StopsFunction(const std::vector<std::pair<float, T>> &values_, float base_) : values(values_), base(base_) {}
     T evaluate(float z) const;
 
 private:
@@ -36,7 +36,7 @@ using Function = mapbox::util::variant<
 template <typename T>
 struct FunctionEvaluator {
     typedef T result_type;
-    inline FunctionEvaluator(float z) : z(z) {}
+    inline FunctionEvaluator(float z_) : z(z_) {}
 
     inline result_type operator()(const std::false_type &) {
         return result_type();

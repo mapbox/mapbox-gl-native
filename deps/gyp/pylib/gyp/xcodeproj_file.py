@@ -2158,6 +2158,7 @@ class XCTarget(XCRemoteObject):
         if configs.HasBuildSetting('PRODUCT_NAME') == 0:
           configs.SetBuildSetting('PRODUCT_NAME',
                                   self._properties['productName'])
+          configs.SetBuildSetting('COMBINE_HIDPI_IMAGES', 'YES')
 
   def AddDependency(self, other):
     pbxproject = self.PBXProjectAncestor()
@@ -2811,7 +2812,7 @@ class XCProjectFile(XCObject):
   _schema.update({
     'archiveVersion': [0, int,        0, 1, 1],
     'classes':        [0, dict,       0, 1, {}],
-    'objectVersion':  [0, int,        0, 1, 45],
+    'objectVersion':  [0, int,        0, 1, 46],
     'rootObject':     [0, PBXProject, 1, 1],
   })
 

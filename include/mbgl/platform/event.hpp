@@ -29,6 +29,7 @@ enum class Event : uint8_t {
     ParseStyle,
     ParseTile,
     Render,
+    Database,
     HttpRequest,
     Sprite,
 };
@@ -40,6 +41,7 @@ MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
     { Event::ParseStyle, "ParseStyle" },
     { Event::ParseTile, "ParseTile" },
     { Event::Render, "Render" },
+    { Event::Database, "Database" },
     { Event::HttpRequest, "HttpRequest" },
     { Event::Sprite, "Sprite" },
     { Event(-1), "Unknown" },
@@ -56,11 +58,12 @@ struct EventPermutation {
 };
 
 constexpr EventSeverity disabledEventSeverities[] = {
-#if !DEBUG
-    EventSeverity::Debug,
+#if DEBUG
+    EventSeverity(-1) // Avoid zero size array
+#else
+    EventSeverity::Debug
 #endif
 };
-
 
 constexpr Event disabledEvents[] = {
     Event(-1) // Avoid zero size array

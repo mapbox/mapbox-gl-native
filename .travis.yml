@@ -1,31 +1,42 @@
 language: cpp
 
-os:
- - linux
- - osx
-
-compiler:
- - clang
+matrix:
+  exclude:
+    - os: linux
+  include:
+    - os: linux
+      env: BUILDTYPE=Release
+      compiler: clang
+    - os: linux
+      env: BUILDTYPE=Debug
+      compiler: clang
+    - os: linux
+      env: BUILDTYPE=Release
+      compiler: gcc
+    - os: osx
+      env: BUILDTYPE=Debug
+      compiler: clang
 
 env:
-  matrix:
-   - BUILDTYPE=Release
-   - BUILDTYPE=Debug
   global:
    - secure: "bG4YYWMfl9API0MSRgmOaJrlGLv06tRg9KJNawBieZvBJbITPpxVGJZT3/l/SEJ+Rl15e2dRex4k+MGQlmT2SqPQxTEYWv1qxNigKPPcla7IWeNmWWqW8uVvFjdglojgBOK2k/xErVQtA4zDfi3mwSXH4DKwquXWsoEKmX2SV7M="
    - secure: "Cbvap9ubVKgjPe3hUhI6JGeDZzBXHpOG9RaYKh+SdoIPhKnlJiNOYm1egomi+e4uqJInlFKuVHTw7Ng9Cun6Zm0jIxpkSchv1GpsR7hmB3UGnGed19Dw8121FwuUaktN+4YnbVlsyd+u8EHD3+h58t4eELrLrZolM4rS7DL6caA="
    - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
 
 before_install:
+- source ./scripts/travis_helper.sh
 - source ./scripts/flags.sh
+- (git clone https://github.com/mapbox/mason.git ~/.mason ; sudo ln -s ~/.mason/mason /usr/local/bin/mason)
 - ./scripts/travis_before_install.sh
 
 install:
-- make setup
-- ./scripts/travis_install.sh
+- make config.gypi
+- ./scripts/travis_install_test_suite.sh
+- ulimit -c
 
 before_script:
-- rm -rf mapnik-packaging/out/packages
+ # Set the core file limit to unlimited so a core file is generated upon crash
+ - ulimit -c unlimited -S
 
 script:
 - ./scripts/travis_script.sh

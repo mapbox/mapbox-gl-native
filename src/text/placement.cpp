@@ -12,10 +12,10 @@ namespace mbgl {
 const float Placement::globalMinScale = 0.5; // underscale by 1 zoom level
 
 struct GlyphInstance {
-    explicit GlyphInstance(const vec2<float> &anchor) : anchor(anchor) {}
-    explicit GlyphInstance(const vec2<float> &anchor, float offset, float minScale, float maxScale,
-                           float angle)
-        : anchor(anchor), offset(offset), minScale(minScale), maxScale(maxScale), angle(angle) {}
+    explicit GlyphInstance(const vec2<float> &anchor_) : anchor(anchor_) {}
+    explicit GlyphInstance(const vec2<float> &anchor_, float offset_, float minScale_, float maxScale_,
+                           float angle_)
+        : anchor(anchor_), offset(offset_), minScale(minScale_), maxScale(maxScale_), angle(angle_) {}
 
     const vec2<float> anchor;
     const float offset = 0.0f;

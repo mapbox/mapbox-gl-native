@@ -8,7 +8,7 @@
 
 using namespace mbgl;
 
-void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
+void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
     // Abort early.
     if (pass == RenderPass::Opaque) return;
     if (!bucket.hasData()) return;
@@ -62,7 +62,7 @@ void Painter::renderLine(LineBucket& bucket, std::shared_ptr<StyleLayer> layer_d
         bucket.drawPoints(*linejoinShader);
     }
 
-    const std::shared_ptr<Sprite> &sprite = map.getSprite();
+    const util::ptr<Sprite> &sprite = map.getSprite();
     if (properties.image.size() && sprite) {
         SpriteAtlasPosition imagePos = map.getSpriteAtlas()->getPosition(properties.image, *sprite);
 

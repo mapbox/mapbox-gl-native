@@ -31,8 +31,8 @@ namespace CSSColorParser {
 
 struct Color {
     inline Color() {}
-    inline Color(unsigned char r, unsigned char g, unsigned char b, float a)
-        : r(r), g(g), b(b), a(a) {}
+    inline Color(unsigned char r_, unsigned char g_, unsigned char b_, float a_)
+        : r(r_), g(g_), b(b_), a(a_) {}
     unsigned char r = 0, g = 0, b = 0;
     float a = 1.0f;
 };

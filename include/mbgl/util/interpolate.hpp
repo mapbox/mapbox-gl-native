@@ -1,6 +1,8 @@
 #ifndef MBGL_UTIL_INTERPOLATE
 #define MBGL_UTIL_INTERPOLATE
 
+#include <array>
+
 namespace mbgl {
 namespace util {
 

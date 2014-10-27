@@ -15,7 +15,7 @@ public:
 
     bool hasTransitions() const;
 public:
-    std::vector<std::shared_ptr<StyleLayer>> layers;
+    std::vector<util::ptr<StyleLayer>> layers;
 };
 
 }

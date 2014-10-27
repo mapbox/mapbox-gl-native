@@ -34,8 +34,8 @@ TEST_P(StyleParserTest, ParseStyle) {
     // Parse settings.
     rapidjson::Document doc;
     doc.Parse<0>((const char *const)info.c_str());
-    ASSERT_EQ(false, doc.HasParseError());
-    ASSERT_EQ(true, doc.IsObject());
+    ASSERT_FALSE(doc.HasParseError());
+    ASSERT_TRUE(doc.IsObject());
 
     std::ifstream stylefile(style_path);
     ASSERT_TRUE(stylefile.good());

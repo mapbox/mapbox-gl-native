@@ -3,6 +3,7 @@
 
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/ptr.hpp>
 
 #include <cstdint>
 #include <bitset>
@@ -10,12 +11,12 @@
 #include <cstdint>
 #include <forward_list>
 #include <iosfwd>
-#include <memory>
 #include <string>
 
 namespace mbgl {
 
 class TileData;
+struct box;
 
 struct ClipID {
     inline ClipID() {}
@@ -36,8 +37,8 @@ public:
         const int8_t z = 0;
         const int32_t x = 0, y = 0;
 
-        inline explicit ID(int8_t z, int32_t x, int32_t y)
-            : w((x < 0 ? x - (1 << z) + 1 : x) / (1 << z)), z(z), x(x), y(y) {}
+        inline explicit ID(int8_t z_, int32_t x_, int32_t y_)
+            : w((x_ < 0 ? x_ - (1 << z_) + 1 : x_) / (1 << z_)), z(z_), x(x_), y(y_) {}
 
         inline uint64_t to_uint64() const {
             return ((std::pow(2, z) * y + x) * 32) + z;
@@ -68,6 +69,8 @@ public:
         bool isChildOf(const Tile::ID &id) const;
     };
 
+    static std::forward_list<Tile::ID> cover(int8_t z, const box& bounds);
+
 public:
     explicit Tile(const ID& id);
 
@@ -75,7 +78,7 @@ public:
     const Tile::ID id;
     ClipID clip;
     mat4 matrix;
-    std::shared_ptr<TileData> data;
+    util::ptr<TileData> data;
 };
 
 }

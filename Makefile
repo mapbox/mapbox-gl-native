@@ -1,26 +1,35 @@
 BUILDTYPE ?= Release
 PYTHON ?= python
 V ?= 1
+PREFIX ?= /usr/local
 
-all: setup
+ifeq ($(shell uname -s), Darwin)
+PLATFORM ?= osx
+endif
+PLATFORM ?= linux
 
-setup: config.gypi
 
-config.gypi:
-	./setup-libraries.sh
+all: mbgl
+
+config.gypi: configure
+	./configure
+
+config-ios.gypi: configure
+	MASON_PLATFORM=ios ./configure config-ios.gypi
 
 # Builds the regular library
-mbgl: config.gypi mapboxgl.gyp node
-	deps/run_gyp mapboxgl.gyp --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mapboxgl
+mbgl: config.gypi mapboxgl.gyp
+	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
+	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl
 
-node:
-	@if [ ! `which node` ]; then echo 'error: depends on node.js. please make sure node is on your PATH'; exit 1; fi;
+install: config.gypi mapboxgl.gyp
+	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) -Dinstall_prefix=$(PREFIX) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
+	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) install
 
 ##### Test cases ###############################################################
 
 build/test/Makefile: src common config.gypi test/test.gyp
-	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
+	deps/run_gyp test/test.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
 
 test: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
@@ -30,16 +39,16 @@ test_%: build/test/Makefile
 	(cd build/$(BUILDTYPE) && exec ./test_$*)
 
 # build Mac OS X project for Xcode
-xtest: config.gypi clear_xcode_cache node
-	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build -f xcode
+xtest: config.gypi clear_xcode_cache
+	deps/run_gyp test/test.gyp -Iconfig.gypi -Dplatform=osx --depth=. -Goutput_dir=.. --generator-output=./build -f xcode
 	open ./build/test/test.xcodeproj
 
 ##### Makefile builds ##########################################################
 
 
-# Builds the linux app with make. This is also used by Travis CI
-linux: config.gypi linux/mapboxgl-app.gyp node
-	deps/run_gyp linux/mapboxgl-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
+# Builds the linux app with make.
+linux: config.gypi linux/mapboxgl-app.gyp
+	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=linux --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
 	$(MAKE) -C build/linux BUILDTYPE=$(BUILDTYPE) V=$(V) linuxapp
 
 # Executes the Linux binary
@@ -49,8 +58,8 @@ run-linux: linux
 
 
 # Builds the OS X app with make.
-osx: config.gypi macosx/mapboxgl-app.gyp node
-	deps/run_gyp macosx/mapboxgl-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/macosx -f make
+osx: config.gypi macosx/mapboxgl-app.gyp
+	deps/run_gyp macosx/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=osx --depth=. -Goutput_dir=.. --generator-output=./build/macosx -f make
 	$(MAKE) -C build/macosx BUILDTYPE=$(BUILDTYPE) V=$(V) osxapp
 
 # Executes the OS X binary
@@ -71,22 +80,22 @@ clear_xcode_cache:
     fi
 
 # build Mac OS X project for Xcode
-xproj-cli: config.gypi macosx/mapboxgl-app.gyp clear_xcode_cache node
-	deps/run_gyp macosx/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
+xproj-cli: config.gypi macosx/mapboxgl-app.gyp clear_xcode_cache
+	deps/run_gyp macosx/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=osx --depth=. --generator-output=./build -f xcode
 
 xproj: xproj-cli
 	open ./build/macosx/mapboxgl-app.xcodeproj
 
 # build iOS project for Xcode
-iproj-cli: config.gypi ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp clear_xcode_cache node
-	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
+iproj-cli: config-ios.gypi ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp clear_xcode_cache
+	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp -Iconfig-ios.gypi -Dplatform=ios --depth=. --generator-output=./build -f xcode
 
 iproj: iproj-cli
 	open ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
 
 # build Linux project for Xcode (Runs on Mac OS X too, but without platform-specific code)
-lproj: config.gypi linux/mapboxgl-app.gyp clear_xcode_cache node
-	deps/run_gyp linux/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
+lproj: config.gypi linux/mapboxgl-app.gyp clear_xcode_cache
+	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=linux --depth=. --generator-output=./build -f xcode
 	open ./build/linux/mapboxgl-app.xcodeproj
 
 
@@ -95,10 +104,10 @@ lproj: config.gypi linux/mapboxgl-app.gyp clear_xcode_cache node
 clean: clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
-	-rm -rf ./config.gypi
+	-rm -rf ./config.gypi ./config-ios.gypi
 
 distclean: clean
-	-rm -rf ./config.gypi
-	-rm -rf ./mapnik-packaging/osx/out/
+	-rm -rf ./mason_packages
 
-.PHONY: mbgl test linux
+.PHONY: mbgl install test linux clear_xcode_cache build/test/Makefile clean distclean
+# DO NOT DELETE

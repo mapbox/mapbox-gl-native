@@ -44,7 +44,7 @@ public:
                const StyleBucketFill& properties);
     ~FillBucket();
 
-    virtual void render(Painter& painter, std::shared_ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
+    virtual void render(Painter& painter, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     virtual bool hasData() const;
 
     void addGeometry(pbf& data);
