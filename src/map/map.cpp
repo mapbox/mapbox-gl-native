@@ -210,6 +210,7 @@ void Map::cleanup(uv_async_t *async) {
 
 void Map::terminate() {
     painter.terminate();
+    view.make_inactive();
 }
 
 void Map::setReachability(bool reachable) {
