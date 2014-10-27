@@ -15,9 +15,8 @@ Database::Database(const std::string &filename, int flags) {
     }
 }
 
-Database::Database(Database &&other) {
-    *this = std::move(other);
-}
+Database::Database(Database &&other)
+    : db(std::move(other.db)) {}
 
 Database &Database::operator=(Database &&other) {
     std::swap(db, other.db);

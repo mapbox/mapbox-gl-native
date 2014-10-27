@@ -20,7 +20,7 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const t
     std::set<PropertyKey> already_applied;
 
     // Reverse iterate through all class names and apply them last to first.
-    for (auto it = class_names.rbegin(); it != class_names.rend(); it++) {
+    for (auto it = class_names.rbegin(); it != class_names.rend(); ++it) {
         const std::string &class_name = *it;
         // From here on, we're only dealing with IDs to avoid comparing strings all the time.
         const ClassID class_id = ClassDictionary::Get().lookup(class_name);

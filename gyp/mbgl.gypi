@@ -3,6 +3,7 @@
     { 'target_name': 'mbgl',
       'product_name': 'mbgl',
       'type': 'static_library',
+      'standalone_static_library': 1,
       'hard_dependency': 1,
       'dependencies': [
           'shaders',
