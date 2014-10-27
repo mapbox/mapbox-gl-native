@@ -20,8 +20,8 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
     float offset = properties.gap_width == 0 ? 0 : (properties.gap_width + width) / 2;
     float blur = properties.blur + antialiasing;
 
-    float inset = std::fmax(-1, offset - width / 2 - antialiasing / 2) + 1;
-    float outset = offset + width / 2 + antialiasing / 2;
+    float inset = std::fmin((std::fmax(-1, offset - width / 2 - antialiasing / 2) + 1), 16.0f);
+    float outset = std::fmin(offset + width / 2 + antialiasing / 2, 16.0f);
 
     Color color = properties.color;
     color[0] *= properties.opacity;
