@@ -86,8 +86,8 @@ private:
     void addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale, PlacementRange placementRange);
 
     // Adds glyphs to the glyph atlas so that they have a left/top/width/height coordinates associated to them that we can use for writing to a buffer.
-    void addGlyphsToAtlas(uint64_t tileid, const std::string stackname, const std::u32string &string,
-                  const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face);
+    static void addGlyphsToAtlas(uint64_t tileid, const std::string stackname, const std::u32string &string,
+                          const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face);
 
 public:
     const StyleBucketSymbol &properties;

@@ -34,18 +34,9 @@ bool SymbolBucket::hasTextData() const { return !text.groups.empty(); }
 bool SymbolBucket::hasIconData() const { return !icon.groups.empty(); }
 
 void SymbolBucket::addGlyphsToAtlas(uint64_t tileid, const std::string stackname,
-                                    const std::u32string &string, const FontStack &fontStack,
+                                    const std::u32string &text, const FontStack &fontStack,
                                     GlyphAtlas &glyphAtlas, GlyphPositions &face) {
-    const std::map<uint32_t, SDFGlyph> &sdfs = fontStack.getSDFs();
-    // Loop through all characters and add glyph to atlas, positions.
-    for (uint32_t chr : string) {
-        auto sdf_it = sdfs.find(chr);
-        if (sdf_it != sdfs.end()) {
-            const SDFGlyph &sdf = sdf_it->second;
-            const Rect<uint16_t> rect = glyphAtlas.addGlyph(tileid, stackname, sdf);
-            face.emplace(chr, Glyph{rect, sdf.metrics});
-        }
-    }
+    glyphAtlas.addGlyphs(tileid, text, stackname, fontStack,face);
 }
 
 std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &layer,
@@ -150,8 +141,8 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {
-                addGlyphsToAtlas(id.to_uint64(), properties.text.font, feature.label, fontStack,
-                                 glyphAtlas, face);
+                SymbolBucket::addGlyphsToAtlas(id.to_uint64(), properties.text.font, feature.label, fontStack,
+                                               glyphAtlas, face);
             }
         }
 
