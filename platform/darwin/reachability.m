@@ -25,7 +25,7 @@
  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "Reachability.h"
+#import <mbgl/platform/darwin/reachability.h>
 
 
 NSString *const kReachabilityChangedNotification = @"kReachabilityChangedNotification";

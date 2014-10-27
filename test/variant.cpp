@@ -4,13 +4,6 @@
 #include <mbgl/style/value.hpp>
 #include <mbgl/style/value_comparison.hpp>
 
-#pragma GCC diagnostic push
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
-#include <boost/lexical_cast.hpp>
-#pragma GCC diagnostic pop
-
 using namespace mbgl;
 
 TEST(Variant, toString) {

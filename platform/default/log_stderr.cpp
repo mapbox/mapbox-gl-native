@@ -1,4 +1,4 @@
-#include "stderr_log.hpp"
+#include <mbgl/platform/default/log_stderr.hpp>
 
 #include <iostream>
 #include <cstdarg>

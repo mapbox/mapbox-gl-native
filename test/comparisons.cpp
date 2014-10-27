@@ -10,7 +10,7 @@
 
 class MockExtractor {
 public:
-    inline MockExtractor(const std::multimap<std::string, mbgl::Value> &values) : values(values) {}
+    inline MockExtractor(const std::multimap<std::string, mbgl::Value> &values_) : values(values_) {}
     inline MockExtractor() {}
 
     inline std::vector<mbgl::Value> getValues(const std::string &key) const {

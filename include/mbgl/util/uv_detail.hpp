@@ -68,7 +68,7 @@ private:
 
 class lock {
 public:
-    lock(mutex &mtx) : mtx(mtx) { mtx.lock(); }
+    lock(mutex &mtx_) : mtx(mtx_) { mtx.lock(); }
     ~lock() { mtx.unlock(); }
 
 private:
@@ -94,8 +94,8 @@ private:
 
 class readlock {
 public:
-    inline readlock(rwlock &mtx) : mtx(mtx) { mtx.rdlock(); }
-    inline readlock(const std::unique_ptr<rwlock> &mtx) : mtx(*mtx) { mtx->rdlock(); }
+    inline readlock(rwlock &mtx_) : mtx(mtx_) { mtx.rdlock(); }
+    inline readlock(const std::unique_ptr<rwlock> &mtx_) : mtx(*mtx_) { mtx.rdlock(); }
     inline ~readlock() { mtx.rdunlock(); }
 
 private:
@@ -104,8 +104,8 @@ private:
 
 class writelock {
 public:
-    inline writelock(rwlock &mtx) : mtx(mtx) { mtx.wrlock(); }
-    inline writelock(const std::unique_ptr<rwlock> &mtx) : mtx(*mtx) { mtx->wrlock(); }
+    inline writelock(rwlock &mtx_) : mtx(mtx_) { mtx.wrlock(); }
+    inline writelock(const std::unique_ptr<rwlock> &mtx_) : mtx(*mtx_) { mtx.wrlock(); }
     inline ~writelock() { mtx.wrunlock(); }
 
 private:
@@ -148,10 +148,10 @@ public:
     typedef void (*after_work_callback)(T &object);
 
     template<typename... Args>
-    work(worker &worker, work_callback work_cb, after_work_callback after_work_cb, Args&&... args)
+    work(worker &worker, work_callback work_cb_, after_work_callback after_work_cb_, Args&&... args)
         : data(std::forward<Args>(args)...),
-          work_cb(work_cb),
-          after_work_cb(after_work_cb) {
+          work_cb(work_cb_),
+          after_work_cb(after_work_cb_) {
         worker.add(this, do_work, after_work);
     }
 

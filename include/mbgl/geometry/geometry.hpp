@@ -30,8 +30,8 @@ private:
     int32_t ox, oy;
 };
 
-Geometry::Geometry(pbf& data)
-    : data(data),
+Geometry::Geometry(pbf& data_)
+    : data(data_),
       cmd(1),
       length(0),
       x(0), y(0),

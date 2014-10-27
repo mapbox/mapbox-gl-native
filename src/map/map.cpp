@@ -30,17 +30,17 @@
 
 using namespace mbgl;
 
-Map::Map(View& view)
+Map::Map(View& view_)
     : loop(std::make_shared<uv::loop>()),
       thread(std::make_unique<uv::thread>()),
       async_terminate(new uv_async_t()),
       async_render(new uv_async_t()),
       async_cleanup(new uv_async_t()),
-      view(view),
+      view(view_),
 #ifndef NDEBUG
       main_thread(uv_thread_self()),
 #endif
-      transform(view),
+      transform(view_),
       glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
@@ -163,7 +163,6 @@ void Map::run() {
     // If the map rendering wasn't started asynchronously, we perform one render
     // *after* all events have been processed.
     if (!async) {
-        prepare();
         render();
 #ifndef NDEBUG
         map_thread = -1;
@@ -206,8 +205,11 @@ void Map::cleanup(uv_async_t *async) {
 #endif
     Map *map = static_cast<Map *>(async->data);
 
-    map->view.make_active();
     map->painter.cleanup();
+}
+
+void Map::terminate() {
+    painter.terminate();
 }
 
 void Map::setReachability(bool reachable) {
@@ -271,8 +273,8 @@ void Map::terminate(uv_async_t *async) {
 void Map::setup() {
     assert(uv_thread_self() == map_thread);
     view.make_active();
-
     painter.setup();
+    view.make_inactive();
 }
 
 void Map::setStyleURL(const std::string &url) {
@@ -605,8 +607,6 @@ void Map::updateRenderState() {
 }
 
 void Map::prepare() {
-    view.make_active();
-
     if (!fileSource) {
         fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
         glyphStore = std::make_shared<GlyphStore>(fileSource);
@@ -651,9 +651,8 @@ void Map::prepare() {
 }
 
 void Map::render() {
-#if defined(DEBUG)
-    std::vector<std::string> debug;
-#endif
+    view.make_active();
+
     painter.clear();
 
     painter.resize();
@@ -685,6 +684,8 @@ void Map::render() {
     }
 
     glFlush();
+
+    view.make_inactive();
 }
 
 void Map::renderLayers(util::ptr<StyleLayerGroup> group) {

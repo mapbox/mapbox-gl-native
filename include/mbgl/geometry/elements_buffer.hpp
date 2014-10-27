@@ -16,9 +16,9 @@ struct ElementGroup : public util::noncopyable {
     uint32_t elements_length;
 
     ElementGroup() : vertex_length(0), elements_length(0) {}
-    ElementGroup(uint32_t vertex_length, uint32_t elements_length)
-        : vertex_length(vertex_length),
-          elements_length(elements_length) {
+    ElementGroup(uint32_t vertex_length_, uint32_t elements_length_)
+        : vertex_length(vertex_length_),
+          elements_length(elements_length_) {
     }
 
     ElementGroup(ElementGroup &&rhs) noexcept

@@ -8,7 +8,6 @@ typedef struct {
     void *queue[2];
 } uv__messenger_item_t;
 
-
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"

@@ -103,9 +103,9 @@ VectorTileLayer::VectorTileLayer(pbf layer) : data(layer) {
     }
 }
 
-FilteredVectorTileLayer::FilteredVectorTileLayer(const VectorTileLayer& layer, const FilterExpression &filterExpression)
-    : layer(layer),
-      filterExpression(filterExpression) {
+FilteredVectorTileLayer::FilteredVectorTileLayer(const VectorTileLayer& layer_, const FilterExpression &filterExpression_)
+    : layer(layer_),
+      filterExpression(filterExpression_) {
 }
 
 FilteredVectorTileLayer::iterator FilteredVectorTileLayer::begin() const {
@@ -116,10 +116,10 @@ FilteredVectorTileLayer::iterator FilteredVectorTileLayer::end() const {
     return iterator(*this, pbf(layer.data.end, 0));
 }
 
-FilteredVectorTileLayer::iterator::iterator(const FilteredVectorTileLayer& parent, const pbf& data)
-    : parent(parent),
+FilteredVectorTileLayer::iterator::iterator(const FilteredVectorTileLayer& parent_, const pbf& data_)
+    : parent(parent_),
       feature(pbf()),
-      data(data) {
+      data(data_) {
     operator++();
 }
 
