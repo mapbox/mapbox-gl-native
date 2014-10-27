@@ -18,10 +18,10 @@
     ],
   },
   'targets': [
-    {
-      'target_name': 'mapboxgl-ios',
-      'product_name': 'mapboxgl-ios',
+    { 'target_name': 'mbgl-ios',
+      'product_name': 'mbgl-ios',
       'type': 'static_library',
+      'hard_dependency': 1,
       'include_dirs': [
         '../include',
       ],

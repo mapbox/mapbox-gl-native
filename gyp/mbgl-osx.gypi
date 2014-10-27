@@ -1,9 +1,9 @@
 {
   'targets': [
-    {
-      'target_name': 'mapboxgl-osx',
-      'product_name': 'mapboxgl-osx',
+    { 'target_name': 'mbgl-osx',
+      'product_name': 'mbgl-osx',
       'type': 'static_library',
+      'hard_dependency': 1,
       'include_dirs': [
         '../include',
       ],

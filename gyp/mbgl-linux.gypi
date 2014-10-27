@@ -1,9 +1,9 @@
 {
   'targets': [
-    {
-      'target_name': 'mapboxgl-linux',
-      'product_name': 'mapboxgl-linux',
+    { 'target_name': 'mbgl-linux',
+      'product_name': 'mbgl-linux',
       'type': 'static_library',
+      'hard_dependency': 1,
       'include_dirs': [
         '../include'
       ],

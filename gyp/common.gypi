@@ -1,4 +1,7 @@
 {
+  'variables': {
+    'install_prefix%': '',
+  },
   'target_defaults': {
     'default_configuration': 'Release',
     'conditions': [

@@ -1,7 +1,6 @@
 {
   'targets': [
-    {
-      'target_name': 'npm_install',
+    { 'target_name': 'npm_install',
       'type': 'none',
       'hard_dependency': 1,
       'actions': [

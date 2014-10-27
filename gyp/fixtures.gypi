@@ -1,7 +1,6 @@
 {
   'targets': [
-    {
-      'target_name': 'copy_fixtures',
+    { 'target_name': 'copy_fixtures',
       'type': 'none',
       'hard_dependency': 1,
       'dependencies': [

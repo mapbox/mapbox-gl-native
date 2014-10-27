@@ -6,7 +6,9 @@
     './gyp/styles.gypi',
     './gyp/fixtures.gypi',
     './gyp/certificates.gypi',
-    './gyp/library.gypi',
-    './gyp/platform.gypi',
+    './gyp/mbgl.gypi',
+    './gyp/mbgl-platform.gypi',
+    './gyp/mbgl-headless.gypi',
+    './gyp/install.gypi',
   ],
 }

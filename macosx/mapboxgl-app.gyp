@@ -37,8 +37,8 @@
       },
       'dependencies': [
         '../mapboxgl.gyp:bundle_styles',
-        '../mapboxgl.gyp:mapboxgl',
-        '../mapboxgl.gyp:mapboxgl-osx',
+        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-osx',
       ]
     }
   ]

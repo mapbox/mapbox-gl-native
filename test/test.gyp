@@ -1,7 +1,7 @@
 {
   'includes': [
     '../gyp/common.gypi',
-    '../gyp/platform.gypi',
+    '../gyp/mbgl-platform.gypi',
   ],
   'targets': [
     { 'target_name': 'rotation_range',
@@ -13,7 +13,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:mbgl',
       ]
     },
     { 'target_name': 'clip_ids',
@@ -25,7 +25,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:mbgl',
       ]
     },
     { 'target_name': 'enums',
@@ -37,7 +37,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:mbgl',
       ]
     },
     { 'target_name': 'style_parser',
@@ -51,7 +51,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:mbgl',
         '../mapboxgl.gyp:copy_fixtures',
       ]
     },
@@ -64,7 +64,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:mbgl',
       ]
     },
     { 'target_name': 'comparisons',
@@ -76,7 +76,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:mbgl',
       ]
     },
     { 'target_name': 'tile',
@@ -88,7 +88,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:mbgl',
       ]
     },
     { 'target_name': 'functions',
@@ -100,7 +100,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:mbgl',
         ]
     },
     { 'target_name': 'headless',
@@ -130,7 +130,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mapboxgl',
+        '../mapboxgl.gyp:mbgl',
         '<(platform_library)',
       ],
     },

@@ -1,8 +1,7 @@
 {
   'targets': [
-    {
-      'target_name': 'mapboxgl',
-      'product_name': 'mapboxgl',
+    { 'target_name': 'mbgl',
+      'product_name': 'mbgl',
       'type': 'static_library',
       'hard_dependency': 1,
       'dependencies': [

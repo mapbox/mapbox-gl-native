@@ -1,6 +1,7 @@
 BUILDTYPE ?= Release
 PYTHON ?= python
 V ?= 1
+PREFIX ?= /usr/local
 
 ifeq ($(shell uname -s), Darwin)
 PLATFORM ?= osx
@@ -19,7 +20,11 @@ config-ios.gypi: configure
 # Builds the regular library
 mbgl: config.gypi mapboxgl.gyp
 	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mapboxgl
+	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl
+
+install: config.gypi mapboxgl.gyp
+	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) -Dinstall_prefix=$(PREFIX) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
+	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) install
 
 ##### Test cases ###############################################################
 
@@ -104,5 +109,5 @@ clean: clear_xcode_cache
 distclean: clean
 	-rm -rf ./mason_packages
 
-.PHONY: mbgl test linux clear_xcode_cache build/test/Makefile clean distclean
+.PHONY: mbgl install test linux clear_xcode_cache build/test/Makefile clean distclean
 # DO NOT DELETE
