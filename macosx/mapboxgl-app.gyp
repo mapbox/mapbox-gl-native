@@ -27,7 +27,7 @@
           '<@(glfw3_cflags)'
         ],
         'OTHER_LDFLAGS': [
-          '<@(glfw3_libraries)',
+          '<@(glfw3_ldflags)',
           '-framework SystemConfiguration',
         ],
         'SDKROOT': 'macosx',
@@ -35,6 +35,9 @@
         'MACOSX_DEPLOYMENT_TARGET':'10.9',
         'CLANG_ENABLE_OBJC_ARC': 'YES'
       },
+      'libraries': [
+        '<@(glfw3_static_libs)',
+      ],
       'dependencies': [
         '../mapboxgl.gyp:bundle_styles',
         '../mapboxgl.gyp:mbgl',

@@ -11,7 +11,7 @@
 #include <mbgl/geometry/sprite_atlas.hpp>
 
 #if defined(DEBUG)
-#include <mbgl/util/timer.hpp>
+#include <mbgl/util/stopwatch.hpp>
 #endif
 
 #include <cassert>
@@ -35,7 +35,7 @@ bool Painter::needsAnimation() const {
 
 void Painter::setup() {
 #if defined(DEBUG)
-    util::timer timer("painter setup");
+    util::stopwatch stopwatch("painter setup");
 #endif
     setupShaders();
 

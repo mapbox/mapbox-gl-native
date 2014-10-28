@@ -22,9 +22,21 @@ mbgl: config.gypi mapboxgl.gyp
 	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
 	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl
 
+mbgl-platform: config.gypi mapboxgl.gyp
+	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
+	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-$(PLATFORM)
+
+mbgl-headless: config.gypi mapboxgl.gyp
+	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
+	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-headless
+
 install: config.gypi mapboxgl.gyp
 	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) -Dinstall_prefix=$(PREFIX) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
 	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) install
+
+config: config.gypi mapboxgl.gyp
+	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
+	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-config
 
 ##### Test cases ###############################################################
 

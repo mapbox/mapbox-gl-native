@@ -11,5 +11,5 @@
         '../platform/default/headless_display.cpp',
       ],
     },
-  ]
+  ],
 }

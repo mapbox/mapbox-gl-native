@@ -7,6 +7,24 @@
       'dependencies': [
           'shaders',
       ],
+      'variables': {
+        'cflags_cc': [
+          '<@(png_cflags)',
+          '<@(uv_cflags)',
+          '<@(sqlite3_cflags)',
+          '<@(zlib_cflags)',
+          '-I<(boost_root)/include',
+        ],
+        'cflags': [
+          '<@(uv_cflags)',
+        ],
+        'ldflags': [
+          '<@(png_ldflags)',
+          '<@(uv_ldflags)',
+          '<@(sqlite3_ldflags)',
+          '<@(zlib_ldflags)',
+        ],
+      },
       'sources': [
         '<!@(find src -name "*.cpp")',
         '<!@(test -f "config/constants_local.cpp" && echo "config/constants_local.cpp" || echo "config/constants.cpp")',
@@ -18,31 +36,25 @@
         'bin/style.json'
       ],
       'include_dirs': [
-        '../include'
+        '../include',
+      ],
+      'libraries': [
+        '<@(png_static_libs)',
+        '<@(uv_static_libs)',
+        '<@(sqlite3_static_libs)',
+        '<@(zlib_static_libs)',
       ],
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {
-            'PUBLIC_HEADERS_FOLDER_PATH': 'include',
-            'OTHER_CPLUSPLUSFLAGS': [
-              '<@(png_cflags)',
-              '<@(uv_cflags)',
-              '<@(sqlite3_cflags)',
-              '<@(zlib_cflags)',
-              '-I<(boost_root)/include',
-            ],
-            'OTHER_CFLAGS': [
-              '<@(uv_cflags)',
-            ],
+            'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
+            'OTHER_CFLAGS': [ '<@(cflags)' ],
+            # Makefile builds don't respect 'libraries' on OS X.
+            'OTHER_LDFLAGS': [ '>@(_libraries)' ],
           },
         }, {
-          'cflags': [
-            '<@(png_cflags)',
-            '<@(uv_cflags)',
-            '<@(sqlite3_cflags)',
-            '<@(zlib_cflags)',
-            '-I<(boost_root)/include',
-          ],
+          'cflags_cc': [ '<@(cflags_cc)' ],
+          'cflags': [ '<@(cflags)' ],
         }]
       ],
       'direct_dependent_settings': {
@@ -52,20 +64,10 @@
         'conditions': [
           ['OS == "mac"', {
             'xcode_settings': {
-              'OTHER_LDFLAGS': [
-                '<@(png_libraries)',
-                '<@(uv_libraries)',
-                '<@(sqlite3_libraries)',
-                '<@(zlib_libraries)',
-              ]
+              'OTHER_LDFLAGS': [ '<@(ldflags)' ]
             }
           }, {
-            'libraries': [
-              '<@(png_libraries)',
-              '<@(uv_libraries)',
-              '<@(sqlite3_libraries)',
-              '<@(zlib_libraries)',
-            ]
+            'ldflags': [ '<@(ldflags)' ]
           }]
         ]
       }

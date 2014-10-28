@@ -13,7 +13,9 @@
         '../platform/default/glfw_view.cpp',
         '../platform/default/log_stderr.cpp',
       ],
-
+      'libraries': [
+        '<@(glfw3_static_libs)',
+      ],
       'conditions': [
         ['OS == "mac"',
 
@@ -24,23 +26,22 @@
               '<@(glfw3_cflags)',
             ],
             'OTHER_LDFLAGS': [
-              '<@(glfw3_libraries)',
+              '<@(glfw3_ldflags)',
             ],
           }
         },
 
         # Non-Mac OS X
         {
-          'cflags': [
+          'cflags_cc': [
             '<@(glfw3_cflags)',
+            '-I<(boost_root)/include',
           ],
-          'link_settings': {
-            'libraries': [
-              '<@(glfw3_libraries)',
-              '-L<(boost_root)/lib',
-              '-lboost_regex',
-            ],
-          },
+          'ldflags': [
+            '<@(glfw3_ldflags)',
+            '-L<(boost_root)/lib',
+            '-lboost_regex',
+          ],
         }],
       ],
       'dependencies': [

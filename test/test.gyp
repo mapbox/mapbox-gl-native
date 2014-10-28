@@ -111,8 +111,6 @@
         './headless.cpp',
         './fixtures/fixture_request.cpp',
         './fixtures/fixture_log.cpp',
-        '../platform/default/headless_view.cpp',
-        '../platform/default/headless_display.cpp',
       ],
       'conditions': [
         # add libuv include path and OpenGL libs
@@ -120,17 +118,18 @@
           {
             'xcode_settings': {
               'OTHER_CPLUSPLUSFLAGS': ['<@(uv_cflags)'],
-              'OTHER_LDFLAGS': ['<@(glfw3_libraries)'],
+              'OTHER_LDFLAGS': ['<@(glfw3_ldflags)'],
             },
           },
           {
             'cflags': ['<@(uv_cflags)'],
-            'libraries': ['<@(glfw3_libraries)'],
+            'libraries': ['<@(glfw3_ldflags)'],
           }],
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
         '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-headless',
         '<(platform_library)',
       ],
     },
