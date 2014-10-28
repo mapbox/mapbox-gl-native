@@ -119,21 +119,6 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
 
     glDisable(GL_STENCIL_TEST);
 
-    if (bucket.hasTextData()) {
-        GlyphAtlas &glyphAtlas = *map.getGlyphAtlas();
-        glyphAtlas.bind();
-
-        renderSDF(bucket,
-                  id,
-                  matrix,
-                  bucket.properties.text,
-                  properties.text,
-                  24.0f,
-                  {{ float(glyphAtlas.width) / 4, float(glyphAtlas.height) / 4 }},
-                  *sdfGlyphShader,
-                  &SymbolBucket::drawGlyphs);
-    }
-
     if (bucket.hasIconData()) {
         bool sdf = bucket.sdfIcons;
 
@@ -205,5 +190,19 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
         }
     }
 
+    if (bucket.hasTextData()) {
+        GlyphAtlas &glyphAtlas = *map.getGlyphAtlas();
+        glyphAtlas.bind();
+
+        renderSDF(bucket,
+                  id,
+                  matrix,
+                  bucket.properties.text,
+                  properties.text,
+                  24.0f,
+                  {{ float(glyphAtlas.width) / 4, float(glyphAtlas.height) / 4 }},
+                  *sdfGlyphShader,
+                  &SymbolBucket::drawGlyphs);
+    }
     glEnable(GL_STENCIL_TEST);
 }
