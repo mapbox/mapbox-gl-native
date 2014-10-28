@@ -1,75 +1,118 @@
-#ifndef MBGL_STYLE_FILTER_EXPRESSION_PRIVATE
-#define MBGL_STYLE_FILTER_EXPRESSION_PRIVATE
-
-#include "filter_expression.hpp"
-#include "filter_comparison_private.hpp"
+#include <mbgl/util/optional.hpp>
+#include <mbgl/style/value_comparison.hpp>
 
 namespace mbgl {
 
-template <typename Extractor>
-bool FilterExpression::compare(const Extractor &extractor) const {
-    if (type != GeometryType::Any && extractor.getType() != type && extractor.getType() != GeometryType::Any) {
-        return false;
-    }
+template <class Extractor>
+struct Evaluator : public mapbox::util::static_visitor<bool>
+{
+    const Extractor& extractor;
 
-    switch (op) {
-    case Operator::And:
-        for (const FilterComparison &comparison : comparisons) {
-            if (!comparison.compare(extractor)) {
-                return false;
-            }
-        }
-        for (const FilterExpression &expression: expressions) {
-            if (!expression.compare(extractor)) {
-                return false;
-            }
-        }
-        return true;
-    case Operator::Or:
-        for (const FilterComparison &comparison : comparisons) {
-            if (comparison.compare(extractor)) {
-                return true;
-            }
-        }
-        for (const FilterExpression &expression: expressions) {
-            if (expression.compare(extractor)) {
-                return true;
-            }
-        }
+    Evaluator(const Extractor& extractor_)
+        : extractor(extractor_) {}
+
+    template <class E>
+    bool operator()(const E& e) const { return e.evaluate(extractor); }
+};
+
+template <class Extractor>
+bool evaluate(const FilterExpression& expression, const Extractor& extractor) {
+    return mapbox::util::apply_visitor(Evaluator<Extractor>(extractor), expression);
+};
+
+template <class Extractor>
+bool EqualsExpression::evaluate(const Extractor& extractor) const {
+    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    return actual && util::relaxed_equal(*actual, value);
+}
+
+template <class Extractor>
+bool NotEqualsExpression::evaluate(const Extractor& extractor) const {
+    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    return !actual || util::relaxed_not_equal(*actual, value);
+}
+
+template <class Extractor>
+bool LessThanExpression::evaluate(const Extractor& extractor) const {
+    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    return actual && util::relaxed_less(*actual, value);
+}
+
+template <class Extractor>
+bool LessThanEqualsExpression::evaluate(const Extractor& extractor) const {
+    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    return actual && util::relaxed_less_equal(*actual, value);
+}
+
+template <class Extractor>
+bool GreaterThanExpression::evaluate(const Extractor& extractor) const {
+    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    return actual && util::relaxed_greater(*actual, value);
+}
+
+template <class Extractor>
+bool GreaterThanEqualsExpression::evaluate(const Extractor& extractor) const {
+    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    return actual && util::relaxed_greater_equal(*actual, value);
+}
+
+template <class Extractor>
+bool InExpression::evaluate(const Extractor& extractor) const {
+    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    if (!actual)
         return false;
-    case Operator::Xor: {
-        int count = 0;
-        for (const FilterComparison &comparison : comparisons) {
-            count += comparison.compare(extractor);
-            if (count > 1) {
-                return false;
-            }
+    for (const auto& v: values) {
+        if (util::relaxed_equal(*actual, v)) {
+            return true;
         }
-        for (const FilterExpression &expression: expressions) {
-            count += expression.compare(extractor);
-            if (count > 1) {
-                return false;
-            }
-        }
-        return count == 1;
     }
-    case Operator::Nor:
-        for (const FilterComparison &comparison : comparisons) {
-            if (comparison.compare(extractor)) {
-                return false;
-            }
-        }
-        for (const FilterExpression &expression: expressions) {
-            if (expression.compare(extractor)) {
-                return false;
-            }
-        }
+    return false;
+}
+
+template <class Extractor>
+bool NotInExpression::evaluate(const Extractor& extractor) const {
+    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    if (!actual)
         return true;
-    default:
-        return true;
+    for (const auto& v: values) {
+        if (util::relaxed_equal(*actual, v)) {
+            return false;
+        }
     }
+    return true;
+}
+
+template <class Extractor>
+bool AnyExpression::evaluate(const Extractor& extractor) const {
+    Evaluator<Extractor> evaluator(extractor);
+    for (const auto& e: expressions) {
+        if (mapbox::util::apply_visitor(evaluator, e)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+template <class Extractor>
+bool AllExpression::evaluate(const Extractor& extractor) const {
+    Evaluator<Extractor> evaluator(extractor);
+    for (const auto& e: expressions) {
+        if (!mapbox::util::apply_visitor(evaluator, e)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <class Extractor>
+bool NoneExpression::evaluate(const Extractor& extractor) const {
+    Evaluator<Extractor> evaluator(extractor);
+    for (const auto& e: expressions) {
+        if (mapbox::util::apply_visitor(evaluator, e)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 }
-
-#endif

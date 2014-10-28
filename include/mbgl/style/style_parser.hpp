@@ -85,11 +85,7 @@ private:
     template <typename T>
     T parseFunctionArgument(JSVal value);
 
-
-    FilterExpression parseFilter(JSVal, FilterExpression::Operator op);
     FilterExpression parseFilter(JSVal);
-    Value parseValue(JSVal value);
-    std::vector<Value> parseValues(JSVal values);
 
 private:
     std::unordered_map<std::string, const rapidjson::Value *> constants;
