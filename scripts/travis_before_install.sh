@@ -31,9 +31,9 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     sudo apt-get build-dep -y libgl1-mesa-dri libxcb-glx0-dev
 
     mapbox_time "build_mesa" \
-    git clone git://anongit.freedesktop.org/git/mesa/mesa && \
-    cd mesa && \
-    git checkout mesa-10.3.1 && \
+    curl -sfo MesaLib-10.3.1.tar.gz http://ftp.de.debian.org/debian/pool/main/m/mesa/mesa_10.3.1.orig.tar.gz && \
+    tar -zxf MesaLib-10.3.1.tar.gz && \
+    cd Mesa-10.3.1 && \
     ./autogen.sh --with-gallium-drivers=svga,swrast --disable-dri \
         --enable-xlib-glx --enable-glx-tls --with-llvm-prefix=/usr/lib/llvm-3.4 \
         --without-va && \
