@@ -24,11 +24,8 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     mat4 exMatrix;
     matrix::copy(exMatrix, projMatrix);
-
-    const float angleOffset =
-        bucketProperties.rotation_alignment == RotationAlignmentType::Map
-            ? map.getState().getAngle()
-            : 0;
+    bool aligned_with_map = (bucketProperties.rotation_alignment == RotationAlignmentType::Map);
+    const float angleOffset = aligned_with_map ? map.getState().getAngle() : 0;
 
     if (angleOffset) {
         matrix::rotate_z(exMatrix, exMatrix, angleOffset);
@@ -50,8 +47,8 @@ void Painter::renderSDF(SymbolBucket &bucket,
     // adjust min/max zooms for variable font sies
     float zoomAdjust = std::log(fontSize / bucketProperties.max_size) / std::log(2);
 
+    sdfShader.u_flip = (aligned_with_map && bucketProperties.keep_upright) ? 1 : 0;
     sdfShader.u_angle = (int32_t)(angle + 256) % 256;
-    sdfShader.u_flip = (bucket.properties.placement == PlacementType::Line ? 1 : 0);
     sdfShader.u_zoom = (map.getState().getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
     FadeProperties f = frameHistory.getFadeProperties(300_milliseconds);
@@ -191,7 +188,10 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
             float zoomAdjust = std::log(fontSize / bucket.properties.icon.max_size) / std::log(2);
 
             iconShader->u_angle = (int32_t)(angle + 256) % 256;
-            iconShader->u_flip = bucket.properties.placement == PlacementType::Line ? 1 : 0;
+
+            bool flip = (bucket.properties.icon.rotation_alignment == RotationAlignmentType::Map)
+                && bucket.properties.icon.keep_upright;
+            iconShader->u_flip = flip ? 1 : 0;
             iconShader->u_zoom = (map.getState().getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
             iconShader->u_fadedist = 0 * 10;
