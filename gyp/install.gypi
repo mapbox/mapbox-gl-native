@@ -10,14 +10,6 @@
             'mbgl-headless',
             'mbgl-<(platform)',
           ],
-          'defines': [
-            'PLATFORM=<(platform)',
-          ],
-          'export_dependent_settings': [
-            'mbgl',
-            'mbgl-headless',
-            'mbgl-<(platform)',
-          ],
           'copies': [
             { 'files': [ '<(PRODUCT_DIR)/libmbgl.a' ], 'destination': '<(install_prefix)/lib' },
             { 'files': [ '<(PRODUCT_DIR)/libmbgl-headless.a' ], 'destination': '<(install_prefix)/lib' },
@@ -28,15 +20,16 @@
               { 'action_name': 'mbgl-config',  
                 'inputs': [
                     '../utils/mbgl-config/mbgl-config.template.sh',
-                    '../utils/mbgl-config/dummy.sh',
+                    '../utils/mbgl-config/build.sh',
                 ],
                 'outputs': [
                     '<(install_prefix)/bin/mbgl-config',
                 ],
                 'action': [
-                    './utils/mbgl-config/dummy.sh',
-                    'PREFIX=<(install_prefix)',
-                    'PLATFORM=<(platform)',
+                    './utils/mbgl-config/build.sh',
+                    '<(install_prefix)',
+                    '<(platform)',
+                    'mbgl',
                 ]
               }
           ]
