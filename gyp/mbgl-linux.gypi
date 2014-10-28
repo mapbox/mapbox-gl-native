@@ -9,6 +9,9 @@
           '<@(uv_cflags)',
           '<@(curl_cflags)',
         ],
+        'cflags': [
+          '<@(uv_cflags)',
+        ],
         'ldflags': [
           '<@(uv_ldflags)',
           '<@(curl_ldflags)',
@@ -31,9 +34,12 @@
         ['OS == "mac"', {
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
+            'OTHER_CFLAGS': [ '<@(cflags)' ],
           }
         }, {
           'ldflags': [ '<@(ldflags)' ],
+          'cflags_cc': [ '<@(cflags_cc)' ],
+          'cflags': [ '<@(cflags)' ],
         }]
       ],
       'direct_dependent_settings': {
