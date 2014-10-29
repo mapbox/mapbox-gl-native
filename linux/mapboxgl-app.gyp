@@ -13,52 +13,26 @@
         '../platform/default/glfw_view.cpp',
         '../platform/default/log_stderr.cpp',
       ],
-      'libraries': [
-        '<@(glfw3_static_libs)',
+      'xcode_settings': {
+        'OTHER_CPLUSPLUSFLAGS':[
+          '<@(glfw3_cflags)',
+        ],
+      },
+      'cflags_cc': [
+        '<@(glfw3_cflags)',
+        '-I<(boost_root)/include',
       ],
-      'conditions': [
-        ['OS == "mac"',
-
-        # Mac OS X
-        {
-          'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS':[
-              '<@(glfw3_cflags)',
-            ],
-          },
-          'libraries': [
-            '-L<(PRODUCT_DIR)/',
-            '-lmbgl',
-            '-lmbgl-linux',
-            '<@(png_ldflags)',
-            '<@(sqlite3_ldflags)',
-            '<@(glfw3_ldflags)',
-            '<@(curl_ldflags)',
-            '<@(zlib_ldflags)',
-          ]
-        },
-        # Non-Mac OS X
-        {
-          'cflags_cc': [
-            '<@(glfw3_cflags)',
-            '-I<(boost_root)/include',
-          ],
-          'libraries': [
-            '-Wl,--start-group',
-            '-L<(PRODUCT_DIR)/',
-            '-lmbgl',
-            '-lmbgl-linux',
-            '<@(curl_static_libs)',
-            '<@(png_ldflags)',
-            '<@(sqlite3_ldflags)',
-            '<@(glfw3_ldflags)',
-            '-L<(boost_root)/lib',
-            '-lboost_regex',
-            '<@(curl_ldflags)',
-            '<@(zlib_ldflags)',
-            '-Wl,--end-group'
-          ],
-        }],
+      'libraries': [
+        '-L<(PRODUCT_DIR)/',
+        '-lmbgl',
+        '-lmbgl-linux',
+        '<@(curl_static_libs)',
+        '<@(png_ldflags)',
+        '<@(sqlite3_ldflags)',
+        '<@(glfw3_static_libs)',
+        '<@(glfw3_ldflags)',
+        '<@(curl_ldflags)',
+        '<@(zlib_ldflags)',
       ],
       'dependencies': [
         '../mapboxgl.gyp:mbgl-standalone',
