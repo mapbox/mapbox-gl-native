@@ -42,12 +42,11 @@ Map::Map(View& view_)
 #endif
       transform(view_),
       glyphAtlas(1024, 1024),
-      spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
+      spriteAtlas(512, 512),
       texturepool(std::make_shared<Texturepool>()),
-      painter(*spriteAtlas, glyphAtlas) {
-
+      painter(spriteAtlas, glyphAtlas)
+{
     view.initialize(this);
-
     // Make sure that we're doing an initial drawing in all cases.
     is_clean.clear();
     is_rendered.clear();
@@ -62,7 +61,6 @@ Map::~Map() {
     // Explicitly reset all pointers.
     texturepool.reset();
     sprite.reset();
-    spriteAtlas.reset();
     glyphStore.reset();
     style.reset();
     fileSource.reset();
@@ -635,8 +633,8 @@ void Map::prepare() {
     style->updateProperties(state.getNormalizedZoom(), animationTime);
 
     // Allow the sprite atlas to potentially pull new sprite images if needed.
-    spriteAtlas->resize(state.getPixelRatio());
-    spriteAtlas->setSprite(getSprite());
+    spriteAtlas.resize(state.getPixelRatio());
+    spriteAtlas.setSprite(getSprite());
 
     updateTiles();
 }

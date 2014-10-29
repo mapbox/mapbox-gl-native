@@ -4,6 +4,7 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
+#include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/uv.hpp>
@@ -18,7 +19,6 @@ namespace mbgl {
 
 class GlyphStore;
 class LayerDescription;
-class SpriteAtlas;
 class Sprite;
 class Style;
 class StyleLayer;
@@ -131,7 +131,7 @@ public:
     inline util::ptr<Style> getStyle() const { return style; }
     inline GlyphAtlas & getGlyphAtlas() { return glyphAtlas; }
     inline util::ptr<GlyphStore> getGlyphStore() { return glyphStore; }
-    inline util::ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
+    inline SpriteAtlas & getSpriteAtlas() { return spriteAtlas; }
     util::ptr<Sprite> getSprite();
     inline util::ptr<Texturepool> getTexturepool() { return texturepool; }
     inline util::ptr<uv::loop> getLoop() { return loop; }
@@ -203,7 +203,7 @@ private:
     util::ptr<Style> style;
     GlyphAtlas glyphAtlas;
     util::ptr<GlyphStore> glyphStore;
-    util::ptr<SpriteAtlas> spriteAtlas;
+    SpriteAtlas spriteAtlas;
     util::ptr<Sprite> sprite;
     util::ptr<Texturepool> texturepool;
 

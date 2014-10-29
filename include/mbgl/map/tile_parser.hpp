@@ -5,7 +5,7 @@
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/ptr.hpp>
-
+#include <mbgl/util/noncopyable.hpp>
 #include <cstdint>
 #include <iosfwd>
 #include <string>
@@ -29,13 +29,14 @@ class StyleLayerGroup;
 class VectorTileData;
 class Collision;
 
-class TileParser {
+class TileParser : private util::noncopyable
+{
 public:
     TileParser(const std::string &data, VectorTileData &tile,
                const util::ptr<const Style> &style,
                GlyphAtlas & glyphAtlas,
                const util::ptr<GlyphStore> &glyphStore,
-               const util::ptr<SpriteAtlas> &spriteAtlas,
+               SpriteAtlas & spriteAtlas,
                const util::ptr<Sprite> &sprite);
     ~TileParser();
 
@@ -62,7 +63,7 @@ private:
     util::ptr<const Style> style;
     GlyphAtlas & glyphAtlas;
     util::ptr<GlyphStore> glyphStore;
-    util::ptr<SpriteAtlas> spriteAtlas;
+    SpriteAtlas & spriteAtlas;
     util::ptr<Sprite> sprite;
     util::ptr<Texturepool> texturePool;
 
