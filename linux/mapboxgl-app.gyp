@@ -23,8 +23,6 @@
         '-I<(boost_root)/include',
       ],
       'libraries': [
-        '-L<(PRODUCT_DIR)/',
-        '-lmbgl-linux' # hack: double-linking to workaround lack of start/end group support for /path/to/libmbgl-linux with g++-4.8
         '<@(curl_static_libs)',
         '<@(png_ldflags)',
         '<@(sqlite3_ldflags)',
