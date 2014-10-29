@@ -304,7 +304,7 @@ void Painter::renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id, 
             return;
         }
 
-        StyleSource &style_source = *layer_desc->bucket->style_source;
+        StyleSource const& style_source = *layer_desc->bucket->style_source;
 
         // Skip this layer if there is no data.
         if (!style_source.source) {
