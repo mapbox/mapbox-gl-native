@@ -31,7 +31,7 @@
 using namespace mbgl;
 
 Map::Map(View& view_)
-    : loop(std::make_shared<uv::loop>()),
+    : loop(std::make_unique<uv::loop>()),
       thread(std::make_unique<uv::thread>()),
       async_terminate(new uv_async_t()),
       async_render(new uv_async_t()),
