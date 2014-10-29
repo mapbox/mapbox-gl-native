@@ -38,9 +38,19 @@
       'libraries': [
         '<@(glfw3_static_libs)',
       ],
+      'libraries': [
+        '-L<(PRODUCT_DIR)/',
+        '-lmbgl',
+        '<@(png_ldflags)',
+        '<@(sqlite3_ldflags)',
+        '<@(glfw3_static_libs)',
+        '<@(glfw3_ldflags)',
+        '<@(curl_ldflags)',
+        '<@(zlib_ldflags)',
+      ],
       'dependencies': [
         '../mapboxgl.gyp:bundle_styles',
-        '../mapboxgl.gyp:mbgl-core',
+        '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:mbgl-osx',
       ]
     }
