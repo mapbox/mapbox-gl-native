@@ -356,7 +356,7 @@ void Painter::renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id, 
 
 void Painter::renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc, const mat4 &matrix) {
     assert(tile.data);
-    if (tile.data->hasData(layer_desc) || layer_desc->type == StyleLayerType::Raster) {
+    if (tile.data->hasData(*layer_desc) || layer_desc->type == StyleLayerType::Raster) {
         gl::group group(util::sprintf<32>("render %d/%d/%d\n", tile.id.z, tile.id.y, tile.id.z));
         prepareTile(tile);
         tile.data->render(*this, layer_desc, matrix);

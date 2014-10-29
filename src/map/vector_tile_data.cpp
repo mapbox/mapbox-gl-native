@@ -14,15 +14,12 @@ VectorTileData::VectorTileData(Tile::ID id_, Map &map_, const util::ptr<SourceIn
 }
 
 VectorTileData::~VectorTileData() {
-    util::ptr<GlyphAtlas> glyphAtlas = map.getGlyphAtlas();
-    if (glyphAtlas) {
-        glyphAtlas->removeGlyphs(id.to_uint64());
-    }
+    map.getGlyphAtlas().removeGlyphs(id.to_uint64());
 }
 
 void VectorTileData::beforeParse() {
-
-    parser = std::make_unique<TileParser>(data, *this, map.getStyle(), map.getGlyphAtlas(), map.getGlyphStore(), map.getSpriteAtlas(), map.getSprite());
+    parser = std::make_unique<TileParser>(data, *this, map.getStyle(), map.getGlyphAtlas(),
+                                          map.getGlyphStore(), map.getSpriteAtlas(), map.getSprite());
 }
 
 void VectorTileData::parse() {
@@ -62,9 +59,9 @@ void VectorTileData::render(Painter &painter, util::ptr<StyleLayer> layer_desc, 
     }
 }
 
-bool VectorTileData::hasData(util::ptr<StyleLayer> layer_desc) const {
-    if (state == State::parsed && layer_desc->bucket) {
-        auto databucket_it = buckets.find(layer_desc->bucket->name);
+bool VectorTileData::hasData(StyleLayer const& layer_desc) const {
+    if (state == State::parsed && layer_desc.bucket) {
+        auto databucket_it = buckets.find(layer_desc.bucket->name);
         if (databucket_it != buckets.end()) {
             assert(databucket_it->second);
             return databucket_it->second->hasData();

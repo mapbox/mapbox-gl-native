@@ -39,7 +39,7 @@ TileParser::~TileParser() = default;
 
 TileParser::TileParser(const std::string &data, VectorTileData &tile_,
                        const util::ptr<const Style> &style_,
-                       const util::ptr<GlyphAtlas> &glyphAtlas_,
+                       GlyphAtlas& glyphAtlas_,
                        const util::ptr<GlyphStore> &glyphStore_,
                        const util::ptr<SpriteAtlas> &spriteAtlas_,
                        const util::ptr<Sprite> &sprite_)
@@ -53,7 +53,7 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile_,
       collision(std::make_unique<Collision>(tile.id.z, 4096, tile.source->tile_size, tile.depth)) {
     assert(&tile != nullptr);
     assert(style);
-    assert(glyphAtlas);
+    //assert(glyphAtlas);
     assert(glyphStore);
     assert(spriteAtlas);
     assert(sprite);
@@ -177,7 +177,7 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& laye
 
 std::unique_ptr<Bucket> TileParser::createSymbolBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketSymbol &symbol) {
     std::unique_ptr<SymbolBucket> bucket = std::make_unique<SymbolBucket>(symbol, *collision);
-    bucket->addFeatures(layer, filter, tile.id, *spriteAtlas, *sprite, *glyphAtlas, *glyphStore);
+    bucket->addFeatures(layer, filter, tile.id, *spriteAtlas, *sprite, glyphAtlas, *glyphStore);
     return obsolete() ? nullptr : std::move(bucket);
 }
 

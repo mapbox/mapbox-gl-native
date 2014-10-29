@@ -3,12 +3,11 @@
 
 #include <mbgl/map/transform.hpp>
 #include <mbgl/renderer/painter.hpp>
-
+#include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
-
 #include <cstdint>
 #include <atomic>
 #include <iosfwd>
@@ -17,7 +16,6 @@
 
 namespace mbgl {
 
-class GlyphAtlas;
 class GlyphStore;
 class LayerDescription;
 class SpriteAtlas;
@@ -131,7 +129,7 @@ public:
     inline const TransformState &getState() const { return state; }
     inline util::ptr<FileSource> getFileSource() const { return fileSource; }
     inline util::ptr<Style> getStyle() const { return style; }
-    inline util::ptr<GlyphAtlas> getGlyphAtlas() { return glyphAtlas; }
+    inline GlyphAtlas & getGlyphAtlas() { return glyphAtlas; }
     inline util::ptr<GlyphStore> getGlyphStore() { return glyphStore; }
     inline util::ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
     util::ptr<Sprite> getSprite();
@@ -203,7 +201,7 @@ private:
     util::ptr<FileSource> fileSource;
 
     util::ptr<Style> style;
-    util::ptr<GlyphAtlas> glyphAtlas;
+    GlyphAtlas glyphAtlas;
     util::ptr<GlyphStore> glyphStore;
     util::ptr<SpriteAtlas> spriteAtlas;
     util::ptr<Sprite> sprite;

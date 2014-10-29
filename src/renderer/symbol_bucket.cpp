@@ -100,7 +100,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
 
 void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpression &filter,
                                const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
-                               GlyphAtlas &glyphAtlas, GlyphStore &glyphStore) {
+                               GlyphAtlas & glyphAtlas, GlyphStore &glyphStore) {
 
     const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore, sprite);
 

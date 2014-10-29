@@ -41,10 +41,10 @@ Map::Map(View& view_)
       main_thread(uv_thread_self()),
 #endif
       transform(view_),
-      glyphAtlas(std::make_shared<GlyphAtlas>(1024, 1024)),
+      glyphAtlas(1024, 1024),
       spriteAtlas(std::make_shared<SpriteAtlas>(512, 512)),
       texturepool(std::make_shared<Texturepool>()),
-      painter(*spriteAtlas, *glyphAtlas) {
+      painter(*spriteAtlas, glyphAtlas) {
 
     view.initialize(this);
 
@@ -64,7 +64,6 @@ Map::~Map() {
     sprite.reset();
     spriteAtlas.reset();
     glyphStore.reset();
-    glyphAtlas.reset();
     style.reset();
     fileSource.reset();
     workers.reset();
