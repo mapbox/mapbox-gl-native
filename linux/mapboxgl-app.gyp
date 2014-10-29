@@ -62,6 +62,7 @@
       ],
       'dependencies': [
         '../mapboxgl.gyp:mbgl-standalone',
+        '../mapboxgl.gyp:mbgl-linux',
         '../mapboxgl.gyp:copy_styles',
         '../mapboxgl.gyp:copy_certificate_bundle',
       ],
