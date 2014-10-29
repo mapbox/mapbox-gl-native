@@ -99,6 +99,8 @@ if [ ! -z ${LIBCURL_VERSION} ]; then
     CONFIG+="    'curl_static_libs': $(quote_flags $(mason static_libs libcurl ${LIBCURL_VERSION})),"$LN
     CONFIG+="    'curl_cflags': $(quote_flags $(mason cflags libcurl ${LIBCURL_VERSION})),"$LN
     CONFIG+="    'curl_ldflags': $(quote_flags $(mason ldflags libcurl ${LIBCURL_VERSION})),"$LN
+else
+    CONFIG+="    'curl_static_libs': [],"$LN
 fi
 
 if [ ! -z ${GLFW_VERSION} ]; then

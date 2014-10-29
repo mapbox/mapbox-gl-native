@@ -23,7 +23,6 @@
         '-I<(boost_root)/include',
       ],
       'libraries': [
-        '<@(curl_static_libs)',
         '<@(png_ldflags)',
         '<@(sqlite3_ldflags)',
         '<@(glfw3_static_libs)',
