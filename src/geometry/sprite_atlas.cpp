@@ -158,6 +158,7 @@ void SpriteAtlas::allocate() {
 void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src) {
     if (!sprite->raster) return;
     const uint32_t *src_img = reinterpret_cast<const uint32_t *>(sprite->raster->getData());
+    if (!src_img) return;
     allocate();
     uint32_t *dst_img = reinterpret_cast<uint32_t *>(data);
 

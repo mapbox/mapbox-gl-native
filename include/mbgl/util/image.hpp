@@ -17,6 +17,7 @@ public:
     inline const char *getData() const { return img.get(); }
     inline uint32_t getWidth() const { return width; }
     inline uint32_t getHeight() const { return height; }
+    inline operator bool() const { return img && width && height; }
 
 private:
     // loaded image dimensions
@@ -24,7 +25,6 @@ private:
 
     // the raw image data
     std::unique_ptr<char[]> img;
-
 };
 
 
