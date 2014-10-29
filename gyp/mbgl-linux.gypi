@@ -26,10 +26,12 @@
       'include_dirs': [
         '../include',
       ],
-      'libraries': [
-        '<@(uv_static_libs)',
-        '<@(curl_static_libs)',
-      ],
+      'link_settings': {
+        'libraries': [
+          '<@(uv_static_libs)',
+          '<@(curl_static_libs)',
+        ],
+      },
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {

@@ -38,19 +38,19 @@
       'include_dirs': [
         '../include',
       ],
-      'libraries': [
-        '<@(png_static_libs)',
-        '<@(uv_static_libs)',
-        '<@(sqlite3_static_libs)',
-        '<@(zlib_static_libs)',
-      ],
+      'link_settings': {
+        'libraries': [
+          '<@(png_static_libs)',
+          '<@(uv_static_libs)',
+          '<@(sqlite3_static_libs)',
+          '<@(zlib_static_libs)',
+        ],
+      },
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
             'OTHER_CFLAGS': [ '<@(cflags)' ],
-            # Makefile builds don't respect 'libraries' on OS X.
-            'OTHER_LDFLAGS': [ '>@(_libraries)' ],
           },
         }, {
           'cflags_cc': [ '<@(cflags_cc)' ],
