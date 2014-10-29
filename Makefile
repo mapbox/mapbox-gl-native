@@ -9,7 +9,7 @@ endif
 PLATFORM ?= linux
 
 
-all: mbgl-core mblg-platform mbgl-headless
+all: mbgl-core mbgl-platform mbgl-headless
 
 config.gypi: configure
 	./configure
