@@ -642,9 +642,8 @@ void Map::prepare() {
 void Map::render() {
     view.make_active();
 
-    painter.render(*style, getActiveSources(),
-                   getState(), getAnimationTime());
-
+    painter.render(*style, activeSources,
+                   state, animationTime);
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
         update();
