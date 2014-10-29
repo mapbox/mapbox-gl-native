@@ -29,7 +29,6 @@
                     './utils/mbgl-config/build.sh',
                     '<(install_prefix)',
                     '<(platform)',
-                    'mbgl',
                 ]
               }
           ]
