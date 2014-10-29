@@ -3,6 +3,8 @@
 
 using namespace mbgl;
 
+const double R2D = 180.0 / M_PI;
+
 #pragma mark - Matrix
 
 void TransformState::matrixFor(mat4& matrix, const Tile::ID& id) const {
@@ -106,6 +108,15 @@ std::array<float, 2> TransformState::locationCoordinate(float lon, float lat) co
         lngX(lon) * k,
         latY(lat) * k
     }};
+}
+
+void TransformState::getLonLat(double &lon, double &lat) const {
+    const double s = scale * util::tileSize;
+    const double Bc = s / 360;
+    const double Cc = s / (2 * M_PI);
+
+    lon = -x / Bc;
+    lat = R2D * (2 * std::atan(std::exp(y / Cc)) - 0.5 * M_PI);
 }
 
 

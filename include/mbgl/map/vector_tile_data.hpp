@@ -33,7 +33,7 @@ public:
     virtual void parse();
     virtual void afterParse();
     virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix);
-    virtual bool hasData(util::ptr<StyleLayer> layer_desc) const;
+    virtual bool hasData(StyleLayer const& layer_desc) const;
 
 protected:
     // Holds the actual geometries in this tile.

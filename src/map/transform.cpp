@@ -5,28 +5,27 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/time.hpp>
-#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/transition.hpp>
 #include <mbgl/platform/platform.hpp>
+
 #include <cstdio>
 
 using namespace mbgl;
 
 const double D2R = M_PI / 180.0;
-const double R2D = 180.0 / M_PI;
 const double M2PI = 2 * M_PI;
 const double MIN_ROTATE_SCALE = 8;
 
-Transform::Transform(View &view_) : view(view_), mtx(std::make_unique<uv::rwlock>()) {
-    setScale(current.scale);
-    setAngle(current.angle);
+Transform::Transform(View &view_)
+    : view(view_)
+{
 }
 
 #pragma mark - Map View
 
 bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
                        const uint16_t fb_w, const uint16_t fb_h) {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     if (final.width != w || final.height != h || final.pixelRatio != ratio ||
         final.framebuffer[0] != fb_w || final.framebuffer[1] != fb_h) {
@@ -52,7 +51,7 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
 #pragma mark - Position
 
 void Transform::moveBy(const double dx, const double dy, const timestamp duration) {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _moveBy(dx, dy, duration);
 }
@@ -94,7 +93,7 @@ void Transform::_moveBy(const double dx, const double dy, const timestamp durati
 }
 
 void Transform::setLonLat(const double lon, const double lat, const timestamp duration) {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     const double f = std::fmin(std::fmax(std::sin(D2R * lat), -0.9999), 0.9999);
     double xn = -lon * Bc;
@@ -105,7 +104,7 @@ void Transform::setLonLat(const double lon, const double lat, const timestamp du
 
 void Transform::setLonLatZoom(const double lon, const double lat, const double zoom,
                               const timestamp duration) {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     double new_scale = std::pow(2.0, zoom);
 
@@ -121,21 +120,20 @@ void Transform::setLonLatZoom(const double lon, const double lat, const double z
 }
 
 void Transform::getLonLat(double &lon, double &lat) const {
-    uv::readlock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    lon = -final.x / Bc;
-    lat = R2D * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
+    final.getLonLat(lon, lat);
 }
 
 void Transform::getLonLatZoom(double &lon, double &lat, double &zoom) const {
-    getLonLat(lon, lat);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    uv::readlock lock(mtx);
+    getLonLat(lon, lat);
     zoom = getZoom();
 }
 
 void Transform::startPanning() {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _clearPanning();
 
@@ -147,7 +145,7 @@ void Transform::startPanning() {
 }
 
 void Transform::stopPanning() {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _clearPanning();
 }
@@ -163,7 +161,7 @@ void Transform::_clearPanning() {
 #pragma mark - Zoom
 
 void Transform::scaleBy(const double ds, const double cx, const double cy, const timestamp duration) {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     // clamp scale to min/max values
     double new_scale = current.scale * ds;
@@ -178,31 +176,31 @@ void Transform::scaleBy(const double ds, const double cx, const double cy, const
 
 void Transform::setScale(const double scale, const double cx, const double cy,
                          const timestamp duration) {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _setScale(scale, cx, cy, duration);
 }
 
 void Transform::setZoom(const double zoom, const timestamp duration) {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _setScale(std::pow(2.0, zoom), -1, -1, duration);
 }
 
 double Transform::getZoom() const {
-    uv::readlock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     return std::log(final.scale) / M_LN2;
 }
 
 double Transform::getScale() const {
-    uv::readlock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     return final.scale;
 }
 
 void Transform::startScaling() {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _clearScaling();
 
@@ -214,7 +212,7 @@ void Transform::startScaling() {
 }
 
 void Transform::stopScaling() {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _clearScaling();
 }
@@ -333,7 +331,7 @@ void Transform::constrain(double& scale, double& y) const {
 
 void Transform::rotateBy(const double start_x, const double start_y, const double end_x,
                          const double end_y, const timestamp duration) {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     double center_x = current.width / 2, center_y = current.height / 2;
 
@@ -363,13 +361,13 @@ void Transform::rotateBy(const double start_x, const double start_y, const doubl
 }
 
 void Transform::setAngle(const double new_angle, const timestamp duration) {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _setAngle(new_angle, duration);
 }
 
 void Transform::setAngle(const double new_angle, const double cx, const double cy) {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     double dx = 0, dy = 0;
 
@@ -418,13 +416,13 @@ void Transform::_setAngle(double new_angle, const timestamp duration) {
 }
 
 double Transform::getAngle() const {
-    uv::readlock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     return final.angle;
 }
 
 void Transform::startRotating() {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _clearRotating();
 
@@ -436,7 +434,7 @@ void Transform::startRotating() {
 }
 
 void Transform::stopRotating() {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     _clearRotating();
 }
@@ -458,13 +456,13 @@ bool Transform::canRotate() {
 #pragma mark - Transition
 
 bool Transform::needsTransition() const {
-    uv::readlock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     return !transitions.empty();
 }
 
 void Transform::updateTransitions(const timestamp now) {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     transitions.remove_if([now](const util::ptr<util::transition> &transition) {
         return transition->update(now) == util::transition::complete;
@@ -472,7 +470,7 @@ void Transform::updateTransitions(const timestamp now) {
 }
 
 void Transform::cancelTransitions() {
-    uv::writelock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     transitions.clear();
 }
@@ -480,13 +478,13 @@ void Transform::cancelTransitions() {
 #pragma mark - Transform state
 
 const TransformState Transform::currentState() const {
-    uv::readlock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     return current;
 }
 
 const TransformState Transform::finalState() const {
-    uv::readlock lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mtx);
 
     return final;
 }

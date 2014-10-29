@@ -33,6 +33,7 @@ public:
     float lngX(float lon) const;
     float latY(float lat) const;
     std::array<float, 2> locationCoordinate(float lon, float lat) const;
+    void getLonLat(double &lon, double &lat) const;
 
     // Zoom
     float getNormalizedZoom() const;
@@ -69,7 +70,7 @@ private:
     // map position
     double x = 0, y = 0;
     double angle = 0;
-    double scale = std::numeric_limits<double>::infinity();
+    double scale = 1;
 };
 
 }
