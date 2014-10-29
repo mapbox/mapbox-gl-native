@@ -81,7 +81,7 @@ public:
                 timestamp time);
 
     void renderLayers(util::ptr<StyleLayerGroup> group);
-    void renderLayer(util::ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
+    void renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
 
     // Renders a particular layer from a tile.
     void renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc, const mat4 &matrix);

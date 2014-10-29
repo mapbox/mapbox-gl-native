@@ -259,7 +259,7 @@ void Painter::renderLayers(util::ptr<StyleLayerGroup> group) {
     for (auto it = group->layers.rbegin(), end = group->layers.rend(); it != end; ++it, ++i) {
         setOpaque();
         setStrata(i * strata_thickness);
-        renderLayer(*it, RenderPass::Opaque);
+        renderLayer(*it);
     }
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
@@ -275,14 +275,14 @@ void Painter::renderLayers(util::ptr<StyleLayerGroup> group) {
     for (auto it = group->layers.begin(), end = group->layers.end(); it != end; ++it, --i) {
         setTranslucent();
         setStrata(i * strata_thickness);
-        renderLayer(*it, RenderPass::Translucent);
+        renderLayer(*it);
     }
     if (debug::renderTree) {
         std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
     }
 }
 
-void Painter::renderLayer(util::ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id, const mat4* matrix) {
+void Painter::renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id, const mat4* matrix) {
     if (layer_desc->type == StyleLayerType::Background) {
         // This layer defines a background color/image.
 
