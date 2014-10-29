@@ -72,6 +72,31 @@
           }]
         ]
       }
+    },
+    {
+      'target_name': 'mbgl-standalone',
+      'type': 'none',
+      'variables': {
+        'core_lib':'<(PRODUCT_DIR)/libmbgl-core.a',
+        'standalone_lib':'<(PRODUCT_DIR)/libmbgl.a'
+      },
+      'actions': [
+        {
+          'action_name': 'build standalone core lib',
+          'inputs': [
+              '<(core_lib)'
+          ],
+          'outputs': [
+              '<(standalone_lib)'
+          ],
+          'action': [
+              './gyp/merge_static_libs.py',
+              '<(standalone_lib)',
+              '<@(uv_static_libs)',
+              '<(core_lib)'
+          ],
+        }
+      ]
     }
   ]
 }
