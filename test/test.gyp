@@ -6,12 +6,18 @@
   'target_defaults': {
     "libraries": [
       '-L<(PRODUCT_DIR)/',
-      '-lmbgl'
+      '-lmbgl',
+      '<@(uv_ldflags)',
       '<@(curl_static_libs)',
       '<@(png_ldflags)',
       '<@(sqlite3_ldflags)',
       '<@(zlib_ldflags)'
-      ]
+      ],
+      'conditions': [
+        ['OS == "linux"', {
+            'libraries':[ '-L<(boost_root)/lib','-lboost_regex' ]
+        }]
+      ],
   },
   'targets': [
     { 'target_name': 'rotation_range',
