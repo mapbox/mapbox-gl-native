@@ -2,8 +2,7 @@
 #define MBGL_UTIL_IMAGE
 
 #include <string>
-#include <cstring>
-#include <stdexcept>
+#include <memory>
 
 namespace mbgl {
 namespace util {
@@ -14,9 +13,8 @@ std::string compress_png(int width, int height, void *rgba, bool flip = false);
 class Image {
 public:
     Image(const std::string &img, bool flip = false);
-    ~Image();
 
-    inline const char *getData() const { return img; }
+    inline const char *getData() const { return img.get(); }
     inline uint32_t getWidth() const { return width; }
     inline uint32_t getHeight() const { return height; }
 
@@ -25,7 +23,7 @@ private:
     uint32_t width = 0, height = 0;
 
     // the raw image data
-    char *img = nullptr;
+    std::unique_ptr<char[]> img;
 
 };
 

@@ -1,12 +1,17 @@
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <png.h>
 
 #include <cassert>
 #include <cstdlib>
+#include <stdexcept>
 
 
-std::string mbgl::util::compress_png(int width, int height, void *rgba, bool flip) {
+namespace mbgl {
+namespace util {
+
+std::string compress_png(int width, int height, void *rgba, bool flip) {
     png_voidp error_ptr = 0;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, NULL, NULL);
     if (!png_ptr) {
@@ -52,9 +57,6 @@ std::string mbgl::util::compress_png(int width, int height, void *rgba, bool fli
 
     return result;
 }
-
-
-using namespace mbgl::util;
 
 
 struct Buffer {
@@ -139,9 +141,9 @@ Image::Image(const std::string &data, bool flip) {
         png_size_t rowbytes = png_get_rowbytes(png, info);
         assert(width * 4 == rowbytes);
 
-        img = static_cast<char*>(::operator new(width * height * 4));
+        img = ::std::unique_ptr<char[]>(new char[width * height * 4]());
 
-        char *surface = img;
+        char *surface = img.get();
         assert(surface);
 
         struct ptrs {
@@ -163,14 +165,12 @@ Image::Image(const std::string &data, bool flip) {
         fprintf(stderr, "loading PNG failed: %s\n", e.what());
         png_destroy_read_struct(&png, &info, nullptr);
         if (img) {
-            ::operator delete(img);
-            img = nullptr;
+            img.reset();
         }
         width = 0;
         height = 0;
     }
 }
 
-Image::~Image() {
-    ::operator delete(img),img = nullptr;
+}
 }
