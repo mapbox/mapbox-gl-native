@@ -12,7 +12,7 @@ Help Options:
 Application Options:
   --prefix          output prefix where mbgl is installed
   --libs            output -L flags
-  --includes        output -I flags
+  --includedir      output include directory path
 EOF
 
     exit $1
@@ -46,8 +46,8 @@ while test $# -gt 0; do
       echo -L${CONFIG_MBGL_PREFIX}/lib -lmbgl -lmbgl-${CONFIG_MBGL_PLATFORM} -lmbgl-headless
       ;;
 
-    --includes)
-      echo -I${CONFIG_MBGL_PREFIX}/include/mbgl
+    --includedir)
+      echo ${CONFIG_MBGL_PREFIX}/include
       ;;
 
     *)
