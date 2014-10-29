@@ -3,6 +3,16 @@
     '../gyp/common.gypi',
     '../gyp/mbgl-platform.gypi',
   ],
+  'target_defaults': {
+    "libraries": [
+      '-L<(PRODUCT_DIR)/',
+      '-lmbgl'
+      '<@(curl_static_libs)',
+      '<@(png_ldflags)',
+      '<@(sqlite3_ldflags)',
+      '<@(zlib_ldflags)'
+      ]
+  },
   'targets': [
     { 'target_name': 'rotation_range',
       'product_name': 'test_rotation_range',
@@ -13,7 +23,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-core',
+        '../mapboxgl.gyp:mbgl-standalone',
       ]
     },
     { 'target_name': 'clip_ids',
@@ -25,7 +35,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-core',
+        '../mapboxgl.gyp:mbgl-standalone',
       ]
     },
     { 'target_name': 'enums',
@@ -37,7 +47,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-core',
+        '../mapboxgl.gyp:mbgl-standalone',
       ]
     },
     { 'target_name': 'style_parser',
@@ -51,7 +61,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-core',
+        '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:copy_fixtures',
       ]
     },
@@ -64,7 +74,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-core',
+        '../mapboxgl.gyp:mbgl-standalone',
       ]
     },
     { 'target_name': 'comparisons',
@@ -76,7 +86,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-core',
+        '../mapboxgl.gyp:mbgl-standalone',
       ]
     },
     { 'target_name': 'tile',
@@ -88,7 +98,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-core',
+        '../mapboxgl.gyp:mbgl-standalone',
       ]
     },
     { 'target_name': 'functions',
@@ -100,7 +110,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-core',
+        '../mapboxgl.gyp:mbgl-standalone',
         ]
     },
     { 'target_name': 'headless',
@@ -128,7 +138,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-core',
+        '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:mbgl-headless',
         '<(platform_library)',
       ],
