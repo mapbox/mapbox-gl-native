@@ -5,8 +5,6 @@
   ],
   'target_defaults': {
     "libraries": [
-      '-L<(PRODUCT_DIR)/',
-      '-lmbgl',
       '<@(uv_ldflags)',
       '<@(curl_static_libs)',
       '<@(png_ldflags)',

@@ -17,18 +17,10 @@
       'xcode_settings': {
         'OTHER_CPLUSPLUSFLAGS': [ '<@(uv_cflags)' ],
       },
-      'link_settings': {
-        'libraries': [
-          '<@(uv_static_libs)',
-        ],
-      },
       'direct_dependent_settings': {
         'include_dirs': [
           '../include',
-        ],
-        'xcode_settings': {
-          'OTHER_LDFLAGS': [ '<@(uv_ldflags)' ],
-        },
+        ]
       },
     },
   ],

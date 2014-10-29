@@ -112,6 +112,7 @@ lproj: config.gypi linux/mapboxgl-app.gyp clear_xcode_cache
 clean: clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
+	-rm -rf ./macosx/build/
 	-rm -rf ./config.gypi ./config-ios.gypi
 
 distclean: clean

@@ -37,8 +37,6 @@
       },
       'variables' : {
         'ldflags': [
-          '-L<(PRODUCT_DIR)/',
-          '-lmbgl',
           '<@(sqlite3_ldflags)',
           '<@(glfw3_static_libs)',
           '<@(glfw3_ldflags)',

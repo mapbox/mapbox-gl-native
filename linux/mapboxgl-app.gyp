@@ -23,9 +23,6 @@
         '-I<(boost_root)/include',
       ],
       'libraries': [
-        '-L<(PRODUCT_DIR)/',
-        '-lmbgl',
-        '-lmbgl-linux',
         '<@(curl_static_libs)',
         '<@(png_ldflags)',
         '<@(sqlite3_ldflags)',
