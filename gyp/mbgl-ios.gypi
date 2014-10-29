@@ -27,6 +27,7 @@
     { 'target_name': 'mbgl-ios',
       'product_name': 'mbgl-ios',
       'type': 'static_library',
+      'standalone_static_library': 1,
       'hard_dependency': 1,
       'sources': [
         '../platform/ios/cache_database_library.mm',
