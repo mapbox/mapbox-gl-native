@@ -40,7 +40,7 @@
       ],
       'dependencies': [
         '../mapboxgl.gyp:bundle_styles',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-core',
         '../mapboxgl.gyp:mbgl-osx',
       ]
     }

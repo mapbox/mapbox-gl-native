@@ -9,7 +9,7 @@ endif
 PLATFORM ?= linux
 
 
-all: mbgl
+all: mbgl-core mblg-platform mbgl-headless
 
 config.gypi: configure
 	./configure
@@ -18,9 +18,9 @@ config-ios.gypi: configure
 	MASON_PLATFORM=ios ./configure config-ios.gypi
 
 # Builds the regular library
-mbgl: config.gypi mapboxgl.gyp
+mbgl-core: config.gypi mapboxgl.gyp
 	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl
+	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-core
 
 mbgl-platform: config.gypi mapboxgl.gyp
 	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
@@ -33,10 +33,6 @@ mbgl-headless: config.gypi mapboxgl.gyp
 install: config.gypi mapboxgl.gyp
 	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) -Dinstall_prefix=$(PREFIX) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
 	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) install
-
-config: config.gypi mapboxgl.gyp
-	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-config
 
 ##### Test cases ###############################################################
 
@@ -121,5 +117,5 @@ clean: clear_xcode_cache
 distclean: clean
 	-rm -rf ./mason_packages
 
-.PHONY: mbgl install test linux clear_xcode_cache build/test/Makefile clean distclean
+.PHONY: mbgl-core install test linux clear_xcode_cache build/test/Makefile clean distclean
 # DO NOT DELETE

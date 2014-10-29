@@ -1,8 +1,9 @@
 {
   'targets': [
-    { 'target_name': 'mbgl',
-      'product_name': 'mbgl',
+    { 'target_name': 'mbgl-core',
+      'product_name': 'mbgl-core',
       'type': 'static_library',
+      'standalone_static_library': 1,
       'hard_dependency': 1,
       'dependencies': [
           'shaders',

@@ -13,7 +13,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-core',
       ]
     },
     { 'target_name': 'clip_ids',
@@ -25,7 +25,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-core',
       ]
     },
     { 'target_name': 'enums',
@@ -37,7 +37,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-core',
       ]
     },
     { 'target_name': 'style_parser',
@@ -51,7 +51,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-core',
         '../mapboxgl.gyp:copy_fixtures',
       ]
     },
@@ -64,7 +64,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-core',
       ]
     },
     { 'target_name': 'comparisons',
@@ -76,7 +76,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-core',
       ]
     },
     { 'target_name': 'tile',
@@ -88,7 +88,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-core',
       ]
     },
     { 'target_name': 'functions',
@@ -100,7 +100,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-core',
         ]
     },
     { 'target_name': 'headless',
@@ -128,7 +128,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-core',
         '../mapboxgl.gyp:mbgl-headless',
         '<(platform_library)',
       ],
