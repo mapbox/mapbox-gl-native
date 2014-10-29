@@ -48,6 +48,10 @@
     {
       'target_name': 'mbgl-standalone',
       'type': 'none',
+      'hard_dependency': 1,
+      'dependencies': [
+          'mbgl-core'
+      ],
       'variables': {
         'core_lib':'<(PRODUCT_DIR)/libmbgl-core.a',
         'standalone_lib':'<(PRODUCT_DIR)/libmbgl.a'

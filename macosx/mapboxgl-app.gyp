@@ -35,18 +35,25 @@
         'MACOSX_DEPLOYMENT_TARGET':'10.9',
         'CLANG_ENABLE_OBJC_ARC': 'YES'
       },
-      'libraries': [
-        '<@(glfw3_static_libs)',
-      ],
-      'libraries': [
-        '-L<(PRODUCT_DIR)/',
-        '-lmbgl',
-        '<@(png_ldflags)',
-        '<@(sqlite3_ldflags)',
-        '<@(glfw3_static_libs)',
-        '<@(glfw3_ldflags)',
-        '<@(curl_ldflags)',
-        '<@(zlib_ldflags)',
+      'variables' : {
+        'ldflags': [
+          '-L<(PRODUCT_DIR)/',
+          '-lmbgl',
+          '<@(sqlite3_ldflags)',
+          '<@(glfw3_static_libs)',
+          '<@(glfw3_ldflags)',
+          '<@(curl_ldflags)',
+          '<@(png_ldflags)'
+        ]
+      },
+      'conditions': [
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'OTHER_LDFLAGS': [ '<@(ldflags)' ],
+          }
+        }, {
+          'ldflags': [ '<@(ldflags)' ],
+        }]
       ],
       'dependencies': [
         '../mapboxgl.gyp:bundle_styles',
