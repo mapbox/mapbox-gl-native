@@ -34,6 +34,11 @@
         '<@(curl_ldflags)',
         '<@(zlib_ldflags)',
       ],
+      'conditions': [
+        ['OS == "linux"', {
+            'libraries':[ '-L<(boost_root)/lib','-lboost_regex' ]
+        }]
+      ],
       'dependencies': [
         '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:mbgl-linux',
