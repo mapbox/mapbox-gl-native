@@ -22,14 +22,6 @@
 
 #include <locale>
 
-#ifdef __linux__
-#include <boost/regex.hpp>
-namespace regex_impl = boost;
-#else
-#include <regex>
-namespace regex_impl = std;
-#endif
-
 namespace mbgl {
 
 // Note: This destructor is seemingly empty, but we need to declare it anyway

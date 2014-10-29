@@ -12,7 +12,6 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
  - [`libuv 0.10+`](https://github.com/joyent/libuv)
  - [`glfw 3.1+`](http://www.glfw.org/)
  - [`libcurl`](http://curl.haxx.se/libcurl/) (depends on OpenSSL; Linux only)
- - `libboost_regex` (Linux only)
  - Apple Command Line Tools (for build on OS X; available at [Apple Developer](https://developer.apple.com/downloads))
  - `pkg-config` (for build only)
  - [Homebrew](http://brew.sh) (for build on OS X)
@@ -85,11 +84,11 @@ Finally, install Boost. If you're running Ubuntu 12.04 or older, you need to ins
 
 	sudo add-apt-repository --yes ppa:boost-latest/ppa
 	sudo apt-get update
-	sudo apt-get install libboost1.55-dev libboost-regex1.55-dev
+	sudo apt-get install libboost1.55-dev
 
 Otherwise, you can just install
 
-	sudo apt-get install libboost-dev libboost-regex-dev
+	sudo apt-get install libboost-dev
 
 Once you're done installing the build dependencies, you can get started by running
 
