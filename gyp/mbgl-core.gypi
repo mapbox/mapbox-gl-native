@@ -19,12 +19,6 @@
         'cflags': [
           '<@(uv_cflags)',
         ],
-        'ldflags': [
-          '<@(png_ldflags)',
-          '<@(uv_ldflags)',
-          '<@(sqlite3_ldflags)',
-          '<@(zlib_ldflags)',
-        ],
       },
       'sources': [
         '<!@(find src -name "*.cpp")',
@@ -39,14 +33,6 @@
       'include_dirs': [
         '../include',
       ],
-      'link_settings': {
-        'libraries': [
-          '<@(png_static_libs)',
-          '<@(uv_static_libs)',
-          '<@(sqlite3_static_libs)',
-          '<@(zlib_static_libs)',
-        ],
-      },
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {
@@ -57,21 +43,7 @@
           'cflags_cc': [ '<@(cflags_cc)' ],
           'cflags': [ '<@(cflags)' ],
         }]
-      ],
-      'direct_dependent_settings': {
-        'include_dirs': [
-          '../include',
-        ],
-        'conditions': [
-          ['OS == "mac"', {
-            'xcode_settings': {
-              'OTHER_LDFLAGS': [ '<@(ldflags)' ]
-            }
-          }, {
-            'ldflags': [ '<@(ldflags)' ]
-          }]
-        ]
-      }
+      ]
     },
     {
       'target_name': 'mbgl-standalone',
@@ -79,6 +51,11 @@
       'variables': {
         'core_lib':'<(PRODUCT_DIR)/libmbgl-core.a',
         'standalone_lib':'<(PRODUCT_DIR)/libmbgl.a'
+      },
+      'direct_dependent_settings': {
+        'include_dirs': [
+          '../include',
+        ],
       },
       'actions': [
         {
@@ -93,6 +70,7 @@
               './gyp/merge_static_libs.py',
               '<(standalone_lib)',
               '<@(uv_static_libs)',
+              '<@(curl_static_libs)',
               '<(core_lib)'
           ],
         }

@@ -25,28 +25,43 @@
             'OTHER_CPLUSPLUSFLAGS':[
               '<@(glfw3_cflags)',
             ],
-            'OTHER_LDFLAGS': [
-              '<@(glfw3_ldflags)',
-            ],
-          }
+          },
+          'libraries': [
+            '-L<(PRODUCT_DIR)/',
+            '-lmbgl',
+            '-lmbgl-linux',
+            '<@(png_ldflags)',
+            '<@(sqlite3_ldflags)',
+            '<@(glfw3_ldflags)',
+            '<@(curl_ldflags)',
+            '<@(zlib_ldflags)',
+          ]
         },
-
         # Non-Mac OS X
         {
           'cflags_cc': [
             '<@(glfw3_cflags)',
             '-I<(boost_root)/include',
           ],
-          'ldflags': [
+          'libraries': [
+            '-Wl,--start-group',
+            '-L<(PRODUCT_DIR)/',
+            '-lmbgl',
+            '-lmbgl-linux',
+            '<@(curl_static_libs)',
+            '<@(png_ldflags)',
+            '<@(sqlite3_ldflags)',
             '<@(glfw3_ldflags)',
             '-L<(boost_root)/lib',
             '-lboost_regex',
+            '<@(curl_ldflags)',
+            '<@(zlib_ldflags)',
+            '-Wl,--end-group'
           ],
         }],
       ],
       'dependencies': [
-        '../mapboxgl.gyp:mbgl-core',
-        '../mapboxgl.gyp:mbgl-linux',
+        '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:copy_styles',
         '../mapboxgl.gyp:copy_certificate_bundle',
       ],
