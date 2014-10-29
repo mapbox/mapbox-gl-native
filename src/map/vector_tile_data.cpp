@@ -17,10 +17,6 @@ VectorTileData::~VectorTileData() {
     map.getGlyphAtlas().removeGlyphs(id.to_uint64());
 }
 
-void VectorTileData::beforeParse() {
-    parser = std::make_unique<TileParser>(data, *this, map.getStyle(), map.getGlyphAtlas(),
-                                          map.getGlyphStore(), map.getSpriteAtlas(), map.getSprite());
-}
 
 void VectorTileData::parse() {
     if (state != State::loaded) {
@@ -31,7 +27,9 @@ void VectorTileData::parse() {
         // Parsing creates state that is encapsulated in TileParser. While parsing,
         // the TileParser object writes results into this objects. All other state
         // is going to be discarded afterwards.
-        parser->parse();
+        TileParser parser(data, *this, map.getStyle(), map.getGlyphAtlas(),
+                          map.getGlyphStore(), map.getSpriteAtlas(), map.getSprite());
+        parser.parse();
     } catch (const std::exception& ex) {
 #if defined(DEBUG)
         fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
@@ -43,10 +41,6 @@ void VectorTileData::parse() {
     if (state != State::obsolete) {
         state = State::parsed;
     }
-}
-
-void VectorTileData::afterParse() {
-    parser.reset();
 }
 
 void VectorTileData::render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix) {

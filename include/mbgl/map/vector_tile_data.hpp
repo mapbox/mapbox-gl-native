@@ -28,10 +28,7 @@ class VectorTileData : public TileData {
 public:
     VectorTileData(Tile::ID id, Map &map, const util::ptr<SourceInfo> &source);
     ~VectorTileData();
-
-    virtual void beforeParse();
     virtual void parse();
-    virtual void afterParse();
     virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix);
     virtual bool hasData(StyleLayer const& layer_desc) const;
 
@@ -49,9 +46,6 @@ protected:
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
-
-    std::unique_ptr<TileParser> parser;
-
 public:
     const float depth;
 };
