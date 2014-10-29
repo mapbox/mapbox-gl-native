@@ -6,6 +6,10 @@ shopt -s expand_aliases
 
 CONFIG_FILE=${1:-config.gypi}
 
+if [ `uname -s` = 'Darwin' ]; then
+    MASON_PLATFORM=${MASON_PLATFORM:-osx}
+fi
+
 function finish {
     >&2 echo -en "\033[0m";
 }
@@ -34,11 +38,16 @@ if [[ ! -d ~/.mason ]]; then
 fi
 alias mason='~/.mason/mason'
 
-
-case $MASON_PLATFORM in
+case ${MASON_PLATFORM} in
     'ios')
         SQLITE_VERSION=system
-        LIBPNG_VERSION=1.6.13
+        LIBUV_VERSION=0.10.28
+        ZLIB_VERSION=system
+        BOOST_VERSION=system
+        ;;
+    'osx')
+        GLFW_VERSION=a21f2377
+        SQLITE_VERSION=system
         LIBUV_VERSION=0.10.28
         ZLIB_VERSION=system
         BOOST_VERSION=system

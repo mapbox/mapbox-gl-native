@@ -7,12 +7,12 @@
 namespace mbgl {
 namespace util {
 
-std::string compress_png(int width, int height, void *rgba, bool flip = false);
+std::string compress_png(int width, int height, void *rgba);
 
 
 class Image {
 public:
-    Image(const std::string &img, bool flip = false);
+    Image(const std::string &img);
 
     inline const char *getData() const { return img.get(); }
     inline uint32_t getWidth() const { return width; }

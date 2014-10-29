@@ -72,18 +72,7 @@ void copy_bitmap(const uint32_t *src, const int src_stride, const int src_x, con
     dst += dst_y * dst_stride + dst_x;
     for (int y = 0; y < height; y++, src += src_stride, dst += dst_stride) {
         for (int x = 0; x < width; x++) {
-            const uint8_t *s = reinterpret_cast<const uint8_t *>(src + x);
-            uint8_t *d = reinterpret_cast<uint8_t *>(dst + x);
-
-            // Premultiply the bitmap.
-            // Note: We don't need to clamp the component values to 0..255, since
-            // the source value is already 0..255 and the operation means they will
-            // stay within the range of 0..255 and won't overflow.
-            const uint8_t a = s[3];
-            d[0] = s[0] * a / 255;
-            d[1] = s[1] * a / 255;
-            d[2] = s[2] * a / 255;
-            d[3] = a;
+            dst[x] = src[x];
         }
     }
 }

@@ -7,6 +7,7 @@
       'hard_dependency': 1,
       'variables': {
         'cflags_cc': [
+          '<@(png_cflags)',
           '<@(uv_cflags)',
           '<@(curl_cflags)',
         ],
@@ -14,6 +15,7 @@
           '<@(uv_cflags)',
         ],
         'ldflags': [
+          '<@(png_ldflags)',
           '<@(uv_ldflags)',
           '<@(curl_ldflags)',
         ],
@@ -23,6 +25,7 @@
         '../platform/default/log_stderr.cpp',
         '../platform/default/string_stdlib.cpp',
         '../platform/default/http_request_baton_curl.cpp',
+        '../platform/default/image.cpp',
       ],
       'include_dirs': [
         '../include',
