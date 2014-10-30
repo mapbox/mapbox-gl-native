@@ -1,7 +1,11 @@
 {
-    'includes': [
-      '../../gyp/common.gypi',
-    ],
+    'target_defaults': {
+        'default_configuration': 'Release',
+        'configurations': {
+          'Debug': {},
+          'Release': {}
+        },
+    },
     'targets': [{
         'target_name': 'gtest',
         'type': 'static_library',
