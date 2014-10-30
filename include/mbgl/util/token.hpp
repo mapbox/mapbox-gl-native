@@ -22,7 +22,7 @@ std::string replaceTokens(const std::string &source, const Lookup &lookup) {
         result.append(pos, brace);
         pos = brace;
         if (pos != end) {
-            for (brace++; brace != end && std::isalnum(*brace); brace++);
+            for (brace++; brace != end && (std::isalnum(*brace) || *brace == '_'); brace++);
             if (brace != end && *brace == '}') {
                 result.append(lookup({ pos + 1, brace }));
                 pos = brace + 1;
