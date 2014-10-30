@@ -8,13 +8,13 @@ matrix:
       env: BUILDTYPE=Release JOBS=16
       compiler: clang
     - os: linux
-      env: BUILDTYPE=Debug JOBS=8
+      env: BUILDTYPE=Debug JOBS=16
       compiler: clang
     - os: linux
-      env: BUILDTYPE=Release JOBS=4
+      env: BUILDTYPE=Release JOBS=8
       compiler: gcc
     - os: osx
-      env: BUILDTYPE=Debug JOBS=4
+      env: BUILDTYPE=Debug JOBS=8
       compiler: clang
 
 env:
