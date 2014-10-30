@@ -29,12 +29,12 @@
 #include <sstream>
 #include <cmath>
 #include <algorithm>
-#include <map>
 
 using namespace CSSColorParser;
 
 // http://www.w3.org/TR/css3-color/
-const std::map<std::string, Color> kCSSColorTable = {
+struct NamedColor { const char *const name; const Color color; };
+const NamedColor namedColors[] = {
     { "transparent", { 0, 0, 0, 0 } }, { "aliceblue", { 240, 248, 255, 1 } },
     { "antiquewhite", { 250, 235, 215, 1 } }, { "aqua", { 0, 255, 255, 1 } },
     { "aquamarine", { 127, 255, 212, 1 } }, { "azure", { 240, 255, 255, 1 } },
@@ -110,6 +110,8 @@ const std::map<std::string, Color> kCSSColorTable = {
     { "white", { 255, 255, 255, 1 } }, { "whitesmoke", { 245, 245, 245, 1 } },
     { "yellow", { 255, 255, 0, 1 } }, { "yellowgreen", { 154, 205, 50, 1 } }
 };
+
+const size_t namedColorCount = sizeof (namedColors) / sizeof (NamedColor);
 
 
 template <typename T>
@@ -187,10 +189,11 @@ Color CSSColorParser::parse(const std::string& css_str) {
     // Convert to lowercase.
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 
-    // Color keywords (and transparent) lookup.
-    auto it = kCSSColorTable.find(str);
-    if (it != kCSSColorTable.end()) {
-        return it->second;
+
+    for (size_t i = 0; i < namedColorCount; i++) {
+        if (str == namedColors[i].name) {
+            return namedColors[i].color;
+        }
     }
 
     // #abc and #abc123 syntax.
