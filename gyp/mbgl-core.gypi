@@ -17,7 +17,7 @@
           '-I<(boost_root)/include',
         ],
         'cflags': [
-          '<@(uv_cflags)',
+          '<@(uv_cflags)','-fPIC'
         ],
       },
       'sources': [
