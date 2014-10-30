@@ -8,10 +8,10 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     # build & test Linux
     #
     mapbox_time "compile_program" \
-    make linux -j4 BUILDTYPE=${BUILDTYPE}
+    make linux -j$(nproc) BUILDTYPE=${BUILDTYPE}
 
     mapbox_time "compile_tests" \
-    make test -j4 BUILDTYPE=${BUILDTYPE}
+    make test -j$(nproc) BUILDTYPE=${BUILDTYPE}
 
     mapbox_time "run_tests" \
     ./scripts/run_tests.sh
