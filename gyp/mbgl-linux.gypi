@@ -30,6 +30,11 @@
       'include_dirs': [
         '../include',
       ],
+      'link_settings': {
+        'libraries': [
+          '<@(png_static_libs)',
+        ],
+      },
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {
@@ -37,7 +42,6 @@
             'OTHER_CFLAGS': [ '<@(cflags)' ],
           }
         }, {
-          'ldflags': [ '<@(ldflags)' ],
           'cflags_cc': [ '<@(cflags_cc)' ],
           'cflags': [ '<@(cflags)' ],
         }]

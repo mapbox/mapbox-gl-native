@@ -38,7 +38,7 @@
             'OTHER_LDFLAGS': [ '<@(ldflags)' ],
           }
         }, {
-          'ldflags': [ '<@(ldflags)' ],
+          'libraries': [ '<@(ldflags)' ],
         }]
       ],
       'dependencies': [

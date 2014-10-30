@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <stdexcept>
+#include <cstring>
 
 
 namespace mbgl {
@@ -73,7 +74,7 @@ void readCallback(png_structp png, png_bytep data, png_size_t length) {
     if (reader->pos + length > reader->length) {
         png_error(png, "Read Error");
     } else {
-        memcpy(data, reader->data + reader->pos, length);
+        std::memcpy(data, reader->data + reader->pos, length);
         reader->pos += length;
     }
 }
