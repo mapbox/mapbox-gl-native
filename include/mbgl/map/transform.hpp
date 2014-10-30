@@ -3,14 +3,12 @@
 
 #include <mbgl/util/time.hpp>
 #include <mbgl/map/transform_state.hpp>
-
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/uv.hpp>
 
 #include <cstdint>
 #include <cmath>
 #include <forward_list>
-#include <memory>
+#include <mutex>
 
 namespace mbgl {
 
@@ -80,7 +78,7 @@ private:
 private:
     View &view;
 
-    std::unique_ptr<uv::rwlock> mtx;
+    mutable std::recursive_mutex mtx;
 
     // This reflects the current state of the transform, representing the actual position of the
     // map. After calling a transform function with a timer, this will likely remain the same until
@@ -91,7 +89,6 @@ private:
     TransformState final;
 
     // Limit the amount of zooming possible on the map.
-    // TODO: make these modifiable from outside.
     const double min_scale = std::pow(2, 0);
     const double max_scale = std::pow(2, 18);
 

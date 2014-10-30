@@ -100,7 +100,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
 
 void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpression &filter,
                                const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
-                               GlyphAtlas &glyphAtlas, GlyphStore &glyphStore) {
+                               GlyphAtlas & glyphAtlas, GlyphStore &glyphStore) {
 
     const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore, sprite);
 
@@ -148,7 +148,8 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
 
         // if feature has icon, get sprite atlas position
         if (feature.sprite.length()) {
-            image = spriteAtlas.waitForImage(feature.sprite, sprite);
+            sprite.waitUntilLoaded();
+            image = spriteAtlas.getImage(feature.sprite);
 
             if (sprite.getSpritePosition(feature.sprite).sdf) {
                 sdfIcons = true;

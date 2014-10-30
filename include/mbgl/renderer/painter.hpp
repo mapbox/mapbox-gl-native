@@ -35,9 +35,12 @@ enum class RenderPass : bool { Opaque, Translucent };
 class Transform;
 class Style;
 class Tile;
+class Sprite;
+class SpriteAtlas;
 class GlyphAtlas;
 class Source;
 class StyleSource;
+class StyleLayerGroup;
 
 class FillBucket;
 class LineBucket;
@@ -53,9 +56,8 @@ class RasterTileData;
 
 class Painter : private util::noncopyable {
 public:
-    Painter(Map &map);
+    Painter(SpriteAtlas&, GlyphAtlas&);
     ~Painter();
-
 
     void setup();
 
@@ -72,6 +74,14 @@ public:
 
     // Updates the default matrices to the current viewport dimensions.
     void changeMatrix();
+
+    void render(const Style& style,
+                const std::set<util::ptr<StyleSource>>& sources,
+                TransformState state,
+                timestamp time);
+
+    void renderLayers(util::ptr<StyleLayerGroup> group);
+    void renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
 
     // Renders a particular layer from a tile.
     void renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc, const mat4 &matrix);
@@ -167,9 +177,10 @@ public:
     }();
 
 private:
-    Map& map;
+    TransformState state;
 
     bool debug = false;
+    int indent = 0;
 
     uint32_t gl_program = 0;
     float gl_lineWidth = 0;
@@ -182,6 +193,9 @@ private:
 
 public:
     FrameHistory frameHistory;
+
+    SpriteAtlas& spriteAtlas;
+    GlyphAtlas& glyphAtlas;
 
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;

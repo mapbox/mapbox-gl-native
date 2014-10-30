@@ -1,7 +1,8 @@
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/map/map.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/time.hpp>
@@ -9,6 +10,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/map/source.hpp>
 
 #if defined(DEBUG)
 #include <mbgl/util/stopwatch.hpp>
@@ -16,13 +18,16 @@
 
 #include <cassert>
 #include <algorithm>
+#include <iostream>
 
 using namespace mbgl;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(Map &map_)
-    : map(map_) {
+Painter::Painter(SpriteAtlas& spriteAtlas_, GlyphAtlas& glyphAtlas_)
+    : spriteAtlas(spriteAtlas_)
+    , glyphAtlas(glyphAtlas_)
+{
 }
 
 Painter::~Painter() {
@@ -109,7 +114,6 @@ void Painter::terminate() {
 }
 
 void Painter::resize() {
-    const TransformState &state = map.getState();
     if (gl_viewport != state.getFramebufferDimensions()) {
         gl_viewport = state.getFramebufferDimensions();
         assert(gl_viewport[0] > 0 && gl_viewport[1] > 0);
@@ -152,12 +156,12 @@ void Painter::depthRange(const float near, const float far) {
 
 void Painter::changeMatrix() {
     // Initialize projection matrix
-    matrix::ortho(projMatrix, 0, map.getState().getWidth(), map.getState().getHeight(), 0, 0, 1);
+    matrix::ortho(projMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, 1);
 
     // The extrusion matrix.
     matrix::identity(extrudeMatrix);
     matrix::multiply(extrudeMatrix, projMatrix, extrudeMatrix);
-    matrix::rotate_z(extrudeMatrix, extrudeMatrix, map.getState().getAngle());
+    matrix::rotate_z(extrudeMatrix, extrudeMatrix, state.getAngle());
 
     // The native matrix is a 1:1 matrix that paints the coordinates at the
     // same screen position as the vertex specifies.
@@ -200,9 +204,159 @@ void Painter::prepareTile(const Tile& tile) {
     glStencilFunc(GL_EQUAL, ref, mask);
 }
 
+void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>& sources,
+                     TransformState state_, timestamp time) {
+    state = state_;
+
+    clear();
+    resize();
+    changeMatrix();
+
+    // Update all clipping IDs.
+    ClipIDGenerator generator;
+    for (const util::ptr<StyleSource> &source : sources) {
+        generator.update(source->source->getLoadedTiles());
+        source->source->updateMatrices(projMatrix, state);
+    }
+
+    drawClippingMasks(sources);
+
+    frameHistory.record(time, state.getNormalizedZoom());
+
+    // Actually render the layers
+    if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
+    renderLayers(style.layers);
+    if (debug::renderTree) { std::cout << "}" << std::endl; indent--; }
+
+    // Finalize the rendering, e.g. by calling debug render calls per tile.
+    // This guarantees that we have at least one function per tile called.
+    // When only rendering layers via the stylesheet, it's possible that we don't
+    // ever visit a tile during rendering.
+    for (const util::ptr<StyleSource> &source : sources) {
+        source->source->finishRender(*this);
+    }
+
+    glFlush();
+}
+
+void Painter::renderLayers(util::ptr<StyleLayerGroup> group) {
+    if (!group) {
+        // Make sure that we actually do have a layer group.
+        return;
+    }
+
+    // TODO: Correctly compute the number of layers recursively beforehand.
+    float strata_thickness = 1.0f / (group->layers.size() + 1);
+
+    // - FIRST PASS ------------------------------------------------------------
+    // Render everything top-to-bottom by using reverse iterators. Render opaque
+    // objects first.
+
+    if (debug::renderTree) {
+        std::cout << std::string(indent++ * 4, ' ') << "OPAQUE {" << std::endl;
+    }
+    int i = 0;
+    for (auto it = group->layers.rbegin(), end = group->layers.rend(); it != end; ++it, ++i) {
+        setOpaque();
+        setStrata(i * strata_thickness);
+        renderLayer(*it);
+    }
+    if (debug::renderTree) {
+        std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
+    }
+
+    // - SECOND PASS -----------------------------------------------------------
+    // Make a second pass, rendering translucent objects. This time, we render
+    // bottom-to-top.
+    if (debug::renderTree) {
+        std::cout << std::string(indent++ * 4, ' ') << "TRANSLUCENT {" << std::endl;
+    }
+    --i;
+    for (auto it = group->layers.begin(), end = group->layers.end(); it != end; ++it, --i) {
+        setTranslucent();
+        setStrata(i * strata_thickness);
+        renderLayer(*it);
+    }
+    if (debug::renderTree) {
+        std::cout << std::string(--indent * 4, ' ') << "}" << std::endl;
+    }
+}
+
+void Painter::renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id, const mat4* matrix) {
+    if (layer_desc->type == StyleLayerType::Background) {
+        // This layer defines a background color/image.
+
+        if (debug::renderTree) {
+            std::cout << std::string(indent * 4, ' ') << "- " << layer_desc->id << " ("
+                      << layer_desc->type << ")" << std::endl;
+        }
+
+        renderBackground(layer_desc);
+    } else {
+        // This is a singular layer.
+        if (!layer_desc->bucket) {
+            fprintf(stderr, "[WARNING] layer '%s' is missing bucket\n", layer_desc->id.c_str());
+            return;
+        }
+
+        if (!layer_desc->bucket->style_source) {
+            fprintf(stderr, "[WARNING] can't find source for layer '%s'\n", layer_desc->id.c_str());
+            return;
+        }
+
+        StyleSource const& style_source = *layer_desc->bucket->style_source;
+
+        // Skip this layer if there is no data.
+        if (!style_source.source) {
+            return;
+        }
+
+        // Skip this layer if it's outside the range of min/maxzoom.
+        // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
+        // is set to a fractional value, or value that is larger than the source maxzoom.
+        const double zoom = state.getZoom();
+        if (layer_desc->bucket->min_zoom > zoom ||
+            layer_desc->bucket->max_zoom <= zoom) {
+            return;
+        }
+
+        // Abort early if we can already deduce from the bucket type that
+        // we're not going to render anything anyway during this pass.
+        switch (layer_desc->type) {
+            case StyleLayerType::Fill:
+                if (!layer_desc->getProperties<FillProperties>().isVisible()) return;
+                break;
+            case StyleLayerType::Line:
+                if (pass == RenderPass::Opaque) return;
+                if (!layer_desc->getProperties<LineProperties>().isVisible()) return;
+                break;
+            case StyleLayerType::Symbol:
+                if (pass == RenderPass::Opaque) return;
+                if (!layer_desc->getProperties<SymbolProperties>().isVisible()) return;
+                break;
+            case StyleLayerType::Raster:
+                if (pass == RenderPass::Opaque) return;
+                if (!layer_desc->getProperties<RasterProperties>().isVisible()) return;
+                break;
+            default:
+                break;
+        }
+
+        if (debug::renderTree) {
+            std::cout << std::string(indent * 4, ' ') << "- " << layer_desc->id << " ("
+                      << layer_desc->type << ")" << std::endl;
+        }
+        if (!id) {
+            style_source.source->render(*this, layer_desc);
+        } else {
+            style_source.source->render(*this, layer_desc, *id, *matrix);
+        }
+    }
+}
+
 void Painter::renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc, const mat4 &matrix) {
     assert(tile.data);
-    if (tile.data->hasData(layer_desc) || layer_desc->type == StyleLayerType::Raster) {
+    if (tile.data->hasData(*layer_desc) || layer_desc->type == StyleLayerType::Raster) {
         gl::group group(util::sprintf<32>("render %d/%d/%d\n", tile.id.z, tile.id.y, tile.id.z));
         prepareTile(tile);
         tile.data->render(*this, layer_desc, matrix);
@@ -211,15 +365,13 @@ void Painter::renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc
 
 void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
     const BackgroundProperties& properties = layer_desc->getProperties<BackgroundProperties>();
-    const std::shared_ptr<Sprite> sprite = map.getSprite();
 
-    if (properties.image.size() && sprite) {
+    if (properties.image.size()) {
         if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))
             return;
 
-        SpriteAtlas &spriteAtlas = *map.getSpriteAtlas();
-        SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image, *sprite, true);
-        float zoomFraction = map.getState().getZoomFraction();
+        SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image, true);
+        float zoomFraction = state.getZoomFraction();
 
         useProgram(patternShader->program);
         patternShader->u_matrix = identityMatrix;
@@ -230,8 +382,8 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
 
         std::array<float, 2> size = imagePos.size;
         double lon, lat;
-        map.getLonLat(lon, lat);
-        std::array<float, 2> center = map.getState().locationCoordinate(lon, lat);
+        state.getLonLat(lon, lat);
+        std::array<float, 2> center = state.locationCoordinate(lon, lat);
         float scale = 1 / std::pow(2, zoomFraction);
 
         mat3 matrix;
@@ -242,10 +394,10 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
         matrix::translate(matrix, matrix,
                           std::fmod(center[0] * 512, size[0]),
                           std::fmod(center[1] * 512, size[1]));
-        matrix::rotate(matrix, matrix, -map.getState().getAngle());
+        matrix::rotate(matrix, matrix, -state.getAngle());
         matrix::scale(matrix, matrix,
-                       scale * map.getState().getWidth()  / 2,
-                      -scale * map.getState().getHeight() / 2);
+                       scale * state.getWidth()  / 2,
+                      -scale * state.getHeight() / 2);
         patternShader->u_patternmatrix = matrix;
 
         backgroundBuffer.bind();
@@ -278,12 +430,12 @@ mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &t
         return matrix;
     } else {
         // TODO: Get rid of the 8 (scaling from 4096 to tile size)
-        const double factor = ((double)(1 << id.z)) / map.getState().getScale() * (4096.0 / util::tileSize);
+        const double factor = ((double)(1 << id.z)) / state.getScale() * (4096.0 / util::tileSize);
 
         mat4 vtxMatrix;
         if (anchor == TranslateAnchorType::Viewport) {
-            const double sin_a = std::sin(-map.getState().getAngle());
-            const double cos_a = std::cos(-map.getState().getAngle());
+            const double sin_a = std::sin(-state.getAngle());
+            const double cos_a = std::cos(-state.getAngle());
             matrix::translate(vtxMatrix, matrix,
                     factor * (translation[0] * cos_a - translation[1] * sin_a),
                     factor * (translation[0] * sin_a + translation[1] * cos_a),
