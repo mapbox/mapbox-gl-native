@@ -151,8 +151,6 @@ private:
     void updateSources();
     void updateSources(const util::ptr<StyleLayerGroup> &group);
 
-    size_t countLayers(const std::vector<LayerDescription>& layers);
-
     // Prepares a map render by updating the tiles we need for the current view, as well as updating
     // the stylesheet.
     void prepare();
