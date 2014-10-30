@@ -18,6 +18,10 @@ struct uv__worker_thread_s {
     uv_thread_t thread;
 };
 
+void uv__worker_free_messenger(uv_messenger_t *msgr) {
+    free(msgr);
+}
+
 void uv__worker_thread_finished(uv__worker_thread_t *worker_thread) {
     uv_worker_t *worker = worker_thread->worker;
 
@@ -35,7 +39,7 @@ void uv__worker_thread_finished(uv__worker_thread_t *worker_thread) {
     worker->count--;
     if (worker->count == 0) {
         uv_chan_destroy(&worker->chan);
-        uv_messenger_stop(worker->msgr);
+        uv_messenger_stop(worker->msgr, uv__worker_free_messenger);
         if (worker->close_cb) {
             worker->close_cb(worker);
         }
