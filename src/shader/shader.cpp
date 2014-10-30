@@ -1,6 +1,6 @@
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/platform/gl.hpp>
-#include <mbgl/util/timer.hpp>
+#include <mbgl/util/stopwatch.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <cstring>
@@ -12,7 +12,7 @@ Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSo
     : name(name_),
       valid(false),
       program(0) {
-    util::timer timer("shader compilation", Event::Shader);
+    util::stopwatch stopwatch("shader compilation", Event::Shader);
 
     GLuint vertShader;
     if (!compileShader(&vertShader, GL_VERTEX_SHADER, vertSource)) {

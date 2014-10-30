@@ -3,6 +3,20 @@
     '../gyp/common.gypi',
     '../gyp/mbgl-platform.gypi',
   ],
+  'target_defaults': {
+    "libraries": [
+      '<@(uv_ldflags)',
+      '<@(curl_static_libs)',
+      '<@(png_ldflags)',
+      '<@(sqlite3_ldflags)',
+      '<@(zlib_ldflags)'
+      ],
+      'conditions': [
+        ['OS == "linux"', {
+            'libraries':[ '-L<(boost_root)/lib','-lboost_regex' ]
+        }]
+      ],
+  },
   'targets': [
     { 'target_name': 'rotation_range',
       'product_name': 'test_rotation_range',
@@ -13,7 +27,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-standalone',
       ]
     },
     { 'target_name': 'clip_ids',
@@ -25,7 +39,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-standalone',
       ]
     },
     { 'target_name': 'enums',
@@ -37,7 +51,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-standalone',
       ]
     },
     { 'target_name': 'style_parser',
@@ -51,7 +65,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:copy_fixtures',
       ]
     },
@@ -64,7 +78,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-standalone',
       ]
     },
     { 'target_name': 'comparisons',
@@ -76,7 +90,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-standalone',
       ]
     },
     { 'target_name': 'tile',
@@ -88,7 +102,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-standalone',
       ]
     },
     { 'target_name': 'functions',
@@ -100,7 +114,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-standalone',
         ]
     },
     { 'target_name': 'headless',
@@ -111,8 +125,6 @@
         './headless.cpp',
         './fixtures/fixture_request.cpp',
         './fixtures/fixture_log.cpp',
-        '../platform/default/headless_view.cpp',
-        '../platform/default/headless_display.cpp',
       ],
       'conditions': [
         # add libuv include path and OpenGL libs
@@ -120,17 +132,18 @@
           {
             'xcode_settings': {
               'OTHER_CPLUSPLUSFLAGS': ['<@(uv_cflags)'],
-              'OTHER_LDFLAGS': ['<@(glfw3_libraries)'],
+              'OTHER_LDFLAGS': ['<@(glfw3_ldflags)'],
             },
           },
           {
             'cflags': ['<@(uv_cflags)'],
-            'libraries': ['<@(glfw3_libraries)'],
+            'libraries': ['<@(glfw3_ldflags)'],
           }],
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-standalone',
+        '../mapboxgl.gyp:mbgl-headless',
         '<(platform_library)',
       ],
     },
