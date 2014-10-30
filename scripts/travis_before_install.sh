@@ -40,7 +40,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     echo $CXXFLAGS
     echo $CFLAGS
     echo $LDFLAGS
-    make -j4 && sudo make install && \
+    make -j$JOBS && sudo make install && \
     cd ../
 
     mapbox_time "install_opengl" \

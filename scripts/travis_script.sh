@@ -8,10 +8,10 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     # build & test Linux
     #
     mapbox_time "compile_program" \
-    make linux -j$(nproc) BUILDTYPE=${BUILDTYPE}
+    make linux -j$JOBS BUILDTYPE=${BUILDTYPE}
 
     mapbox_time "compile_tests" \
-    make test -j$(nproc) BUILDTYPE=${BUILDTYPE}
+    make test -j$JOBS BUILDTYPE=${BUILDTYPE}
 
     mapbox_time "run_tests" \
     ./scripts/run_tests.sh
@@ -34,7 +34,7 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     make build/macosx/mapboxgl-app.xcodeproj
 
     mapbox_time "build_osx" \
-    xcodebuild -project ./build/macosx/mapboxgl-app.xcodeproj -jobs 4
+    xcodebuild -project ./build/macosx/mapboxgl-app.xcodeproj -jobs $JOBS
 
     #
     # build iOS
@@ -48,5 +48,5 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     make build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
 
     mapbox_time "build_ios" \
-    xcodebuild -project ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO -jobs 4
+    xcodebuild -project ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO -jobs $JOBS
 fi
