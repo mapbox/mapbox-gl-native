@@ -5,8 +5,6 @@
 *.diff.png
 /node_modules
 /mason_packages
-/macosx/build
-/ios/build
 /config.gypi
 /config-ios.gypi
 /config/constants_local.cpp
