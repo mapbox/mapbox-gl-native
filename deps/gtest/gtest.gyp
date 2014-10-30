@@ -13,8 +13,8 @@
             'gtest-all.cc'
         ],
         'link_settings': {
-            'xcode_settings': { 'OTHER_LDFLAGS': [ '-pthread' ] },
-            'ldflags': [ '-pthread' ],
+            'xcode_settings': { 'OTHER_LDFLAGS': [ '-lpthread' ] },
+            'ldflags': [ '-lpthread' ],
         },
         'direct_dependent_settings': {
             'include_dirs': [
