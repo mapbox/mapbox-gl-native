@@ -1,3 +1,5 @@
+// This is an implementation file, so omit include guards.
+
 #include <cstdint>
 #include <map>
 

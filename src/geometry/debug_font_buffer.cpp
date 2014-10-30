@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstring>
 
-#include "debug_font.cpp"
+#include "debug_font_data.hpp"
 
 using namespace mbgl;
 
