@@ -1,13 +1,13 @@
 #ifndef MBGL_UTIL_TOKEN
 #define MBGL_UTIL_TOKEN
 
-#ifdef __linux__
+/*#ifdef __linux__
 #include <boost/regex.hpp>
 namespace regex_impl = boost;
-#else
+#else*/
 #include <regex>
 namespace regex_impl = std;
-#endif
+//#endif
 
 #include <map>
 

@@ -22,13 +22,13 @@
 
 #include <locale>
 
-#ifdef __linux__
+/*#ifdef __linux__
 #include <boost/regex.hpp>
 namespace regex_impl = boost;
-#else
+#else*/
 #include <regex>
 namespace regex_impl = std;
-#endif
+//#endif
 
 namespace mbgl {
 
