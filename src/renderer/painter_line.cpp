@@ -15,7 +15,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 
     const LineProperties &properties = layer_desc->getProperties<LineProperties>();
 
-    float antialiasing = 1 / map.getState().getPixelRatio();
+    float antialiasing = 1 / state.getPixelRatio();
     float width = properties.width;
     float offset = properties.offset / 2;
     float blur = properties.blur + antialiasing;
@@ -34,7 +34,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
     float dash_length = properties.dash_array[0];
     float dash_gap = properties.dash_array[1];
 
-    float ratio = map.getState().getPixelRatio();
+    float ratio = state.getPixelRatio();
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
     depthRange(strata, 1.0f);
@@ -45,15 +45,15 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linejoinShader->u_matrix = vtxMatrix;
         linejoinShader->u_color = color;
         linejoinShader->u_world = {{
-            map.getState().getFramebufferWidth() * 0.5f,
-            map.getState().getFramebufferHeight() * 0.5f
+            state.getFramebufferWidth() * 0.5f,
+            state.getFramebufferHeight() * 0.5f
         }};
         linejoinShader->u_linewidth = {{
-            ((outset - 0.25f) * map.getState().getPixelRatio()),
-            ((inset - 0.25f) * map.getState().getPixelRatio())
+            ((outset - 0.25f) * state.getPixelRatio()),
+            ((inset - 0.25f) * state.getPixelRatio())
         }};
 
-        float pointSize = std::ceil(map.getState().getPixelRatio() * outset * 2.0);
+        float pointSize = std::ceil(state.getPixelRatio() * outset * 2.0);
 #if defined(GL_ES_VERSION_2_0)
         linejoinShader->u_size = pointSize;
 #else
@@ -62,12 +62,11 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         bucket.drawPoints(*linejoinShader);
     }
 
-    const util::ptr<Sprite> &sprite = map.getSprite();
-    if (properties.image.size() && sprite) {
-        SpriteAtlasPosition imagePos = map.getSpriteAtlas()->getPosition(properties.image, *sprite);
+    if (properties.image.size()) {
+        SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image);
 
-        float factor = 8.0 / std::pow(2, map.getState().getIntegerZoom() - id.z);
-        float fade = std::fmod(map.getState().getZoom(), 1.0);
+        float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
+        float fade = std::fmod(state.getZoom(), 1.0);
 
         useProgram(linepatternShader->program);
 
@@ -82,7 +81,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linepatternShader->u_pattern_br = imagePos.br;
         linepatternShader->u_fade = fade;
 
-        map.getSpriteAtlas()->bind(true);
+        spriteAtlas.bind(true);
         glDepthRange(strata + strata_epsilon, 1.0f);  // may or may not matter
 
         bucket.drawLinePatterns(*linepatternShader);

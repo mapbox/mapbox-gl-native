@@ -3,6 +3,7 @@
 
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/ptr.hpp>
 
 #include <string>
 #include <map>
@@ -26,7 +27,6 @@ class SpriteAtlas : public util::noncopyable {
 public:
     typedef uint16_t dimension;
 
-public:
     // Add way to construct this from another SpriteAtlas (e.g. with another pixelRatio)
     SpriteAtlas(dimension width, dimension height);
     ~SpriteAtlas();
@@ -34,22 +34,16 @@ public:
     // Changes the pixel ratio.
     bool resize(float newRatio);
 
-    // Update uninitialized (= outdated) sprites in this atlas from the given sprite.
-    void update(const Sprite &sprite);
+    // Changes the source sprite.
+    void setSprite(util::ptr<Sprite> sprite);
 
     // Returns the coordinates of an image that is sourced from the sprite image.
     // This getter attempts to read the image from the sprite if it is already loaded.
     // In that case, it copies it into the sprite atlas and returns the dimensions.
     // Otherwise, it returns a 0/0/0/0 rect.
-    Rect<dimension> getImage(const std::string &name, const Sprite &sprite);
+    Rect<dimension> getImage(const std::string& name);
 
-    // Returns the coordinates of an image that is sourced from the sprite image.
-    // This getter waits until the sprite image was loaded, copies it into the sprite
-    // image and returns the dimensions.
-    // NEVER CALL THIS FUNCTION FROM THE RENDER THREAD! it is blocking.
-    Rect<dimension> waitForImage(const std::string &name, const Sprite &sprite);
-
-    SpriteAtlasPosition getPosition(const std::string &name, const Sprite &sprite, bool repeating = false);
+    SpriteAtlasPosition getPosition(const std::string& name, bool repeating = false);
 
     // Binds the image buffer of this sprite atlas to the GPU, and uploads data if it is out
     // of date.
@@ -61,19 +55,18 @@ public:
     inline float getTextureHeight() const { return height * pixelRatio; }
     inline float getPixelRatio() const { return pixelRatio; }
 
-private:
-    void allocate();
-    Rect<SpriteAtlas::dimension> allocateImage(size_t width, size_t height);
-    void copy(const Rect<dimension> &dst, const SpritePosition &src, const Sprite &sprite);
-
-public:
     const dimension width = 0;
     const dimension height = 0;
 
 private:
-    std::mutex mtx;
+    void allocate();
+    Rect<SpriteAtlas::dimension> allocateImage(size_t width, size_t height);
+    void copy(const Rect<dimension>& dst, const SpritePosition& src);
+
+    std::recursive_mutex mtx;
     float pixelRatio = 1.0f;
     BinPack<dimension> bin;
+    util::ptr<Sprite> sprite;
     std::map<std::string, Rect<dimension>> images;
     std::set<std::string> uninitialized;
     uint32_t *data = nullptr;
