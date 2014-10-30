@@ -26,7 +26,7 @@
       'conditions': [
         ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
         }, {
-          'ldflags': [ '<@(ldflags)' ],
+          'libraries': [ '<@(ldflags)' ],
         }]
       ]
     },
@@ -44,7 +44,7 @@
       'conditions': [
         ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
         }, {
-          'ldflags': [ '<@(ldflags)' ],
+          'libraries': [ '<@(ldflags)' ],
         }]
       ]
     },
@@ -62,7 +62,7 @@
       'conditions': [
         ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
         }, {
-          'ldflags': [ '<@(ldflags)' ],
+          'libraries': [ '<@(ldflags)' ],
         }]
       ]
     },
@@ -83,7 +83,7 @@
       'conditions': [
         ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
         }, {
-          'ldflags': [ '<@(ldflags)' ],
+          'libraries': [ '<@(ldflags)' ],
         }]
       ]
     },
@@ -101,7 +101,7 @@
       'conditions': [
         ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
         }, {
-          'ldflags': [ '<@(ldflags)' ],
+          'libraries': [ '<@(ldflags)' ],
         }]
       ]
     },
@@ -119,7 +119,7 @@
       'conditions': [
         ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
         }, {
-          'ldflags': [ '<@(ldflags)' ],
+          'libraries': [ '<@(ldflags)' ],
         }]
       ]
     },
@@ -137,7 +137,7 @@
       'conditions': [
         ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
         }, {
-          'ldflags': [ '<@(ldflags)' ],
+          'libraries': [ '<@(ldflags)' ],
         }]
       ]
     },
@@ -155,7 +155,7 @@
       'conditions': [
         ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
         }, {
-          'ldflags': [ '<@(ldflags)' ],
+          'libraries': [ '<@(ldflags)' ],
         }]
       ]
     },
