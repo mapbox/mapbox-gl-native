@@ -5,16 +5,16 @@ matrix:
     - os: linux
   include:
     - os: linux
-      env: BUILDTYPE=Release
+      env: BUILDTYPE=Release JOBS=16
       compiler: clang
     - os: linux
-      env: BUILDTYPE=Debug
+      env: BUILDTYPE=Debug JOBS=8
       compiler: clang
     - os: linux
-      env: BUILDTYPE=Release
+      env: BUILDTYPE=Release JOBS=4
       compiler: gcc
     - os: osx
-      env: BUILDTYPE=Debug
+      env: BUILDTYPE=Debug JOBS=4
       compiler: clang
 
 env:
