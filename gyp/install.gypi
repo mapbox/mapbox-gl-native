@@ -31,6 +31,7 @@
                     './utils/mbgl-config/build.sh',
                     '<(install_prefix)',
                     '<(platform)',
+                    '<@(png_ldflags)'
                 ]
               }
           ]

@@ -43,7 +43,7 @@ while test $# -gt 0; do
       ;;
 
     --libs)
-      echo -L${CONFIG_MBGL_PREFIX}/lib -lmbgl -lmbgl-${CONFIG_MBGL_PLATFORM} -lmbgl-headless
+      echo -L${CONFIG_MBGL_PREFIX}/lib -lmbgl -lmbgl-${CONFIG_MBGL_PLATFORM} -lmbgl-headless ${CONFIG_MBGL_LDFLAGS}
       ;;
 
     --includedir)
