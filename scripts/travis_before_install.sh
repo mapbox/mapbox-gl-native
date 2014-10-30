@@ -24,8 +24,27 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
                             libboost1.55-dev libboost-regex1.55-dev libcurl4-openssl-dev \
                             libpng-dev libsqlite3-dev
 
+    mapbox_time "install_mesa_deps" \
+    sudo apt-get install -y libpthread-stubs0-dev \
+                            xserver-xorg-dev x11proto-xinerama-dev libx11-xcb-dev \
+                            libxcb-glx0-dev libxrender-dev llvm-3.4 mesa-utils && \
+    sudo apt-get build-dep -y libgl1-mesa-dri libxcb-glx0-dev
+
+    mapbox_time "build_mesa" \
+    curl -sfo MesaLib-10.3.1.tar.gz http://ftp.de.debian.org/debian/pool/main/m/mesa/mesa_10.3.1.orig.tar.gz && \
+    tar -zxf MesaLib-10.3.1.tar.gz && \
+    cd Mesa-10.3.1 && \
+    ./autogen.sh --with-gallium-drivers=svga,swrast --disable-dri \
+        --enable-xlib-glx --enable-glx-tls --with-llvm-prefix=/usr/lib/llvm-3.4 \
+        --without-va && \
+    echo $CXXFLAGS
+    echo $CFLAGS
+    echo $LDFLAGS
+    make && sudo make install && \
+    cd ../
+
     mapbox_time "install_opengl" \
-    sudo apt-get -y install libxi-dev libglu1-mesa-dev x11proto-randr-dev \
+    sudo apt-get -y install libxi-dev x11proto-randr-dev \
                             x11proto-xext-dev libxrandr-dev \
                             x11proto-xf86vidmode-dev libxxf86vm-dev \
                             libxcursor-dev libxinerama-dev
