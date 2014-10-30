@@ -1,38 +1,36 @@
 #ifndef MBGL_UTIL_TOKEN
 #define MBGL_UTIL_TOKEN
 
-#ifdef __linux__
-#include <boost/regex.hpp>
-namespace regex_impl = boost;
-#else
-#include <regex>
-namespace regex_impl = std;
-#endif
-
 #include <map>
+#include <string>
+#include <algorithm>
 
 namespace mbgl {
 namespace util {
 
-namespace detail {
-const regex_impl::regex tokenRegex("\\{([\\w-]+)\\}");
-const regex_impl::sregex_token_iterator tokensEnd = regex_impl::sregex_token_iterator();
-}
-
+// Replaces {tokens} in a string by calling the lookup function.
 template <typename Lookup>
 std::string replaceTokens(const std::string &source, const Lookup &lookup) {
     std::string result;
     result.reserve(source.size());
 
-    bool token = false;
-    for (auto token_it = regex_impl::sregex_token_iterator(source.begin(), source.end(),
-                                                           detail::tokenRegex, {-1, 1});
-        token_it != detail::tokensEnd; ++token_it, token = !token) {
-        if (!token_it->matched) {
-            continue;
-        }
+    auto pos = source.begin();
+    const auto end = source.end();
 
-        result += token ? lookup(token_it->str()) : token_it->str();
+    while (pos != end) {
+        auto brace = std::find(pos, end, '{');
+        result.append(pos, brace);
+        pos = brace;
+        if (pos != end) {
+            for (brace++; brace != end && std::isalnum(*brace); brace++);
+            if (brace != end && *brace == '}') {
+                result.append(lookup({ pos + 1, brace }));
+                pos = brace + 1;
+            } else {
+                result.append(pos, brace);
+                pos = brace;
+            }
+        }
     }
 
     return result;

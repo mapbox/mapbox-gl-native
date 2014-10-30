@@ -10,11 +10,6 @@
       '<@(curl_ldflags)',
       '<@(png_ldflags)'
     ],
-    'conditions': [
-      ['OS == "linux"', {
-          'ldflags':[ '-L<(boost_root)/lib','-lboost_regex' ]
-      }]
-    ],
   },
   'targets': [
     { 'target_name': 'rotation_range',
