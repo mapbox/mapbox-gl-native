@@ -751,6 +751,9 @@
     "id": "aeroway_fill",
     "source": "mapbox",
     "source-layer": "aeroway",
+     "filter": {
+      "$type": "Polygon"
+    },
     "style": {
       "fill-color": "#ddd"
     },
