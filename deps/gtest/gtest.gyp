@@ -1,4 +1,7 @@
 {
+    'includes': [
+      '../../gyp/common.gypi',
+    ],
     'targets': [{
         'target_name': 'gtest',
         'type': 'static_library',

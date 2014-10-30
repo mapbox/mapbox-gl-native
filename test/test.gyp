@@ -3,19 +3,18 @@
     '../gyp/common.gypi',
     '../gyp/mbgl-platform.gypi',
   ],
-  'target_defaults': {
-    "libraries": [
+  'variables' : {
+    'ldflags': [
       '<@(uv_ldflags)',
-      '<@(curl_static_libs)',
-      '<@(png_ldflags)',
       '<@(sqlite3_ldflags)',
-      '<@(zlib_ldflags)'
-      ],
-      'conditions': [
-        ['OS == "linux"', {
-            'libraries':[ '-L<(boost_root)/lib','-lboost_regex' ]
-        }]
-      ],
+      '<@(curl_ldflags)',
+      '<@(png_ldflags)'
+    ],
+    'conditions': [
+      ['OS == "linux"', {
+          'ldflags':[ '-L<(boost_root)/lib','-lboost_regex' ]
+      }]
+    ],
   },
   'targets': [
     { 'target_name': 'rotation_range',
@@ -28,6 +27,12 @@
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
         '../mapboxgl.gyp:mbgl-standalone',
+      ],
+      'conditions': [
+        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+        }, {
+          'ldflags': [ '<@(ldflags)' ],
+        }]
       ]
     },
     { 'target_name': 'clip_ids',
@@ -40,6 +45,12 @@
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
         '../mapboxgl.gyp:mbgl-standalone',
+      ],
+      'conditions': [
+        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+        }, {
+          'ldflags': [ '<@(ldflags)' ],
+        }]
       ]
     },
     { 'target_name': 'enums',
@@ -52,6 +63,12 @@
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
         '../mapboxgl.gyp:mbgl-standalone',
+      ],
+      'conditions': [
+        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+        }, {
+          'ldflags': [ '<@(ldflags)' ],
+        }]
       ]
     },
     { 'target_name': 'style_parser',
@@ -67,6 +84,12 @@
         '../deps/gtest/gtest.gyp:gtest',
         '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:copy_fixtures',
+      ],
+      'conditions': [
+        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+        }, {
+          'ldflags': [ '<@(ldflags)' ],
+        }]
       ]
     },
     { 'target_name': 'variant',
@@ -79,6 +102,12 @@
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
         '../mapboxgl.gyp:mbgl-standalone',
+      ],
+      'conditions': [
+        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+        }, {
+          'ldflags': [ '<@(ldflags)' ],
+        }]
       ]
     },
     { 'target_name': 'comparisons',
@@ -91,6 +120,12 @@
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
         '../mapboxgl.gyp:mbgl-standalone',
+      ],
+      'conditions': [
+        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+        }, {
+          'ldflags': [ '<@(ldflags)' ],
+        }]
       ]
     },
     { 'target_name': 'tile',
@@ -103,6 +138,12 @@
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
         '../mapboxgl.gyp:mbgl-standalone',
+      ],
+      'conditions': [
+        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+        }, {
+          'ldflags': [ '<@(ldflags)' ],
+        }]
       ]
     },
     { 'target_name': 'functions',
@@ -115,7 +156,13 @@
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
         '../mapboxgl.gyp:mbgl-standalone',
-        ]
+      ],
+      'conditions': [
+        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+        }, {
+          'ldflags': [ '<@(ldflags)' ],
+        }]
+      ]
     },
     { 'target_name': 'headless',
       'product_name': 'test_headless',
@@ -132,12 +179,12 @@
           {
             'xcode_settings': {
               'OTHER_CPLUSPLUSFLAGS': ['<@(uv_cflags)'],
-              'OTHER_LDFLAGS': ['<@(glfw3_ldflags)'],
+              'OTHER_LDFLAGS': ['<@(glfw3_ldflags)', '<@(ldflags)'],
             },
           },
           {
             'cflags': ['<@(uv_cflags)'],
-            'libraries': ['<@(glfw3_ldflags)'],
+            'libraries': ['<@(glfw3_ldflags)', '<@(ldflags)'],
           }],
       ],
       'dependencies': [
@@ -145,7 +192,7 @@
         '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:mbgl-headless',
         '<(platform_library)',
-      ],
+      ]
     },
 
     # Build all targets
