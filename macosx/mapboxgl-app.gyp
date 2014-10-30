@@ -27,7 +27,7 @@
           '<@(glfw3_cflags)'
         ],
         'OTHER_LDFLAGS': [
-          '<@(glfw3_libraries)',
+          '<@(glfw3_ldflags)',
           '-framework SystemConfiguration',
         ],
         'SDKROOT': 'macosx',
@@ -35,9 +35,27 @@
         'MACOSX_DEPLOYMENT_TARGET':'10.9',
         'CLANG_ENABLE_OBJC_ARC': 'YES'
       },
+      'variables' : {
+        'ldflags': [
+          '<@(sqlite3_ldflags)',
+          '<@(glfw3_static_libs)',
+          '<@(glfw3_ldflags)',
+          '<@(curl_ldflags)',
+          '<@(png_ldflags)'
+        ]
+      },
+      'conditions': [
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'OTHER_LDFLAGS': [ '<@(ldflags)' ],
+          }
+        }, {
+          'ldflags': [ '<@(ldflags)' ],
+        }]
+      ],
       'dependencies': [
         '../mapboxgl.gyp:bundle_styles',
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:mbgl-osx',
       ]
     }

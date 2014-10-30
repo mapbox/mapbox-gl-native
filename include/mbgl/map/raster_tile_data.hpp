@@ -21,7 +21,7 @@ public:
 
     virtual void parse();
     virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix);
-    virtual bool hasData(util::ptr<StyleLayer> layer_desc) const;
+    virtual bool hasData(StyleLayer const& layer_desc) const;
 
 protected:
     StyleBucketRaster properties;

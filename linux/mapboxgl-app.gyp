@@ -13,38 +13,30 @@
         '../platform/default/glfw_view.cpp',
         '../platform/default/log_stderr.cpp',
       ],
-
+      'xcode_settings': {
+        'OTHER_CPLUSPLUSFLAGS':[
+          '<@(glfw3_cflags)',
+        ],
+      },
+      'cflags_cc': [
+        '<@(glfw3_cflags)',
+        '-I<(boost_root)/include',
+      ],
+      'libraries': [
+        '<@(png_ldflags)',
+        '<@(sqlite3_ldflags)',
+        '<@(glfw3_static_libs)',
+        '<@(glfw3_ldflags)',
+        '<@(curl_ldflags)',
+        '<@(zlib_ldflags)',
+      ],
       'conditions': [
-        ['OS == "mac"',
-
-        # Mac OS X
-        {
-          'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS':[
-              '<@(glfw3_cflags)',
-            ],
-            'OTHER_LDFLAGS': [
-              '<@(glfw3_libraries)',
-            ],
-          }
-        },
-
-        # Non-Mac OS X
-        {
-          'cflags': [
-            '<@(glfw3_cflags)',
-          ],
-          'link_settings': {
-            'libraries': [
-              '<@(glfw3_libraries)',
-              '-L<(boost_root)/lib',
-              '-lboost_regex',
-            ],
-          },
-        }],
+        ['OS == "linux"', {
+            'libraries':[ '-L<(boost_root)/lib','-lboost_regex' ]
+        }]
       ],
       'dependencies': [
-        '../mapboxgl.gyp:mbgl',
+        '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:mbgl-linux',
         '../mapboxgl.gyp:copy_styles',
         '../mapboxgl.gyp:copy_certificate_bundle',

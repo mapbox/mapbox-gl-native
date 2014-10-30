@@ -31,14 +31,11 @@ void Painter::renderRaster(RasterBucket& bucket, util::ptr<StyleLayer> layer_des
                 return vtxMatrix;
             }();
 
-            // call updateTiles to get parsed data for sublayers
-            map.updateTiles();
-
             for (const util::ptr<StyleLayer> &layer : layer_desc->layers->layers) {
                 setOpaque();
-                map.renderLayer(layer, RenderPass::Opaque, &id, &preMatrix);
+                renderLayer(layer, &id, &preMatrix);
                 setTranslucent();
-                map.renderLayer(layer, RenderPass::Translucent, &id, &preMatrix);
+                renderLayer(layer, &id, &preMatrix);
             }
 
             if (bucket.properties.blur > 0) {

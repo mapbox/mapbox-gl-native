@@ -1,6 +1,7 @@
 {
   'variables': {
     'install_prefix%': '',
+    'standalone_product_dir':'<!@(pwd)/../build'
   },
   'target_defaults': {
     'default_configuration': 'Release',
@@ -21,6 +22,19 @@
         'cflags_cc': [
           '-Wno-unknown-pragmas', # We are using '#pragma mark', but it is only available on Darwin.
           '-Wno-literal-suffix', # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61653
+        ],
+      }],
+    ],
+    'target_conditions': [
+      ['_type == "static_library"', {
+        'conditions': [
+          ['OS=="mac"', {
+            'xcode_settings': {
+              'OTHER_CPLUSPLUSFLAGS': [ '-fPIC' ],
+            },
+          }, {
+            'cflags_cc': [ '-fPIC' ],
+          }]
         ],
       }],
     ],

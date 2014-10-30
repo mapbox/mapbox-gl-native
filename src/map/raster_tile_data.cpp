@@ -29,6 +29,6 @@ void RasterTileData::render(Painter &painter, util::ptr<StyleLayer> layer_desc, 
     bucket.render(painter, layer_desc, id, matrix);
 }
 
-bool RasterTileData::hasData(util::ptr<StyleLayer> /*layer_desc*/) const {
+bool RasterTileData::hasData(StyleLayer const& /*layer_desc*/) const {
     return bucket.hasData();
 }

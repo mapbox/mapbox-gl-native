@@ -53,11 +53,9 @@ public:
     }
 
     // Override this in the child class.
-    virtual void beforeParse();
     virtual void parse() = 0;
-    virtual void afterParse();
     virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix) = 0;
-    virtual bool hasData(util::ptr<StyleLayer> layer_desc) const = 0;
+    virtual bool hasData(StyleLayer const& layer_desc) const = 0;
 
 
 public:
