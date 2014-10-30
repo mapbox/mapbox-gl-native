@@ -26,7 +26,7 @@ class VectorTileData : public TileData {
     friend class TileParser;
 
 public:
-    VectorTileData(Tile::ID id, Map &map, const util::ptr<SourceInfo> &source);
+    VectorTileData(Tile::ID const& id, Map &map, const util::ptr<SourceInfo> &source);
     ~VectorTileData();
     virtual void parse();
     virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix);

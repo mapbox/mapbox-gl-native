@@ -9,7 +9,7 @@
 
 using namespace mbgl;
 
-TileData::TileData(Tile::ID id_, Map &map_, const util::ptr<SourceInfo> &source_)
+TileData::TileData(Tile::ID const& id_, Map &map_, const util::ptr<SourceInfo> &source_)
     : id(id_),
       state(State::initial),
       map(map_),

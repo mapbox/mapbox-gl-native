@@ -40,7 +40,7 @@ public:
     };
 
 public:
-    TileData(Tile::ID id, Map &map, const util::ptr<SourceInfo> &source);
+    TileData(Tile::ID const& id, Map &map, const util::ptr<SourceInfo> &source);
     ~TileData();
 
     void request();
