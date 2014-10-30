@@ -45,13 +45,6 @@ case ${MASON_PLATFORM} in
         ZLIB_VERSION=system
         BOOST_VERSION=system
         ;;
-    'osx')
-        GLFW_VERSION=a21f2377
-        SQLITE_VERSION=system
-        LIBUV_VERSION=0.10.28
-        ZLIB_VERSION=system
-        BOOST_VERSION=system
-        ;;
     *)
         GLFW_VERSION=a21f2377
         SQLITE_VERSION=system

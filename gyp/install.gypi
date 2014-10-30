@@ -22,8 +22,6 @@
             'conditions': [
               ['OS == "linux"', {
                   'other_ldflags': [
-                      '-L<(boost_root)/lib',
-                      '-lboost_regex',
                       '<@(glfw3_static_libs)',
                       '<@(glfw3_ldflags)',
                   ]
