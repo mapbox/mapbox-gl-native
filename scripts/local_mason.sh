@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-shopt -s expand_aliases
-
 git submodule update --init .mason
-
-alias mason=`pwd`/.mason/mason
+PATH=`pwd`/.mason:$PATH
 export MASON_DIR=`pwd`/.mason
