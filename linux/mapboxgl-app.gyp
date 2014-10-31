@@ -4,16 +4,6 @@
   ],
   'targets': [
     {
-      'target_name': 'copy_styles',
-      'type': 'none',
-      'hard_dependency': 1,
-      'dependencies': [ '../styles.gyp:touch_styles' ], # required for xcode http://openradar.appspot.com/7232149
-      'copies': [{
-        'files': [ '../styles/styles' ],
-        'destination': '<(PRODUCT_DIR)'
-      }],
-    },
-    {
       'target_name': 'linuxapp',
       'product_name': 'mapbox-gl',
       'type': 'executable',
@@ -52,11 +42,14 @@
         }]
       ],
       'dependencies': [
-        'copy_styles',
         '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:mbgl-linux',
         '../mapboxgl.gyp:copy_certificate_bundle',
       ],
+      'copies': [{
+        'files': [ '../styles/styles' ],
+        'destination': '<(PRODUCT_DIR)'
+      }],
     },
   ],
 }
