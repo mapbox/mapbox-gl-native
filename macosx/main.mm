@@ -100,7 +100,7 @@ int main() {
     if (accessToken) map.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
 
     // Load style
-    const std::string path([[[NSBundle mainBundle] pathForResource:@"bright-v5" ofType:@"json" inDirectory:@"styles/"] UTF8String]);
+    const std::string path([[[NSBundle mainBundle] pathForResource:@"bright-v6" ofType:@"json" inDirectory:@"styles/"] UTF8String]);
 
     map.setStyleURL(std::string("file://") + path);
 
