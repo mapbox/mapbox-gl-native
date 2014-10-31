@@ -4,6 +4,7 @@
 #define NU_WITH_TOLOWER
 #define NU_WITH_UTF8_WRITER
 #include <libnu/libnu.h>
+#include <cstring>
 
 namespace mbgl {
 namespace platform {
