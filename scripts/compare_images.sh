@@ -3,4 +3,4 @@
 set -e
 set -o pipefail
 
-(cd ./test/suite/ && (./bin/compare_images.js || true))
+(cd ./test/suite/ && (./bin/compare_images.py || true))
