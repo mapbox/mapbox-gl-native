@@ -33,7 +33,6 @@ before_install:
 
 install:
 - make config.gypi
-- ./scripts/travis_install_test_suite.sh
 - ulimit -c
 
 before_script:
