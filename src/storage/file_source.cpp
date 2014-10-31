@@ -23,9 +23,9 @@ FileSource::FileSource(uv_loop_t *loop_, const std::string &path)
 
 FileSource::~FileSource() {
     assert(thread_id == uv_thread_self());
-    uv_messenger_stop(queue);
-    // NOTE: We don't need to delete the messenger since it will be deleted by the
-    // uv_messenger_stop() function.
+    uv_messenger_stop(queue, [](uv_messenger_t *msgr) {
+        delete msgr;
+    });
 
     util::ptr<BaseRequest> req;
 

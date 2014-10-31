@@ -2,6 +2,7 @@
 #include <mbgl/util/queue.h>
 
 #include <stdlib.h>
+#include <assert.h>
 
 typedef struct {
     void *data;
@@ -46,6 +47,7 @@ int uv_messenger_init(uv_loop_t *loop, uv_messenger_t *msgr, uv_messenger_cb cal
     }
 
     msgr->callback = callback;
+    msgr->stop_callback = NULL;
 
     QUEUE_INIT(&msgr->queue);
 
@@ -73,9 +75,12 @@ void uv_messenger_unref(uv_messenger_t *msgr) {
 }
 
 void uv__messenger_stop_callback(uv_handle_t *handle) {
-    free((uv_messenger_t *)handle->data);
+    uv_messenger_t *msgr = (uv_messenger_t *)handle->data;
+    msgr->stop_callback(msgr);
 }
 
-void uv_messenger_stop(uv_messenger_t *msgr) {
+void uv_messenger_stop(uv_messenger_t *msgr, uv_messenger_stop_cb stop_callback) {
+    assert(!msgr->stop_callback);
+    msgr->stop_callback = stop_callback;
     uv_close((uv_handle_t *)&msgr->async, uv__messenger_stop_callback);
 }

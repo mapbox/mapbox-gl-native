@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstring>
 
-#include "debug_font.cpp"
+#include "debug_font_data.hpp"
 
 using namespace mbgl;
 
@@ -12,19 +12,11 @@ void DebugFontBuffer::addText(const char *text, double left, double baseline, do
 
     const size_t len = strlen(text);
     for (size_t i = 0; i < len; ++i) {
-        if (text[i] < 32 || (unsigned char)(text[i]) > 127) {
+        if (text[i] < 32 || (unsigned char)(text[i]) >= 127) {
             continue;
         }
 
-        auto it = simplex.find((int)text[i]);
-        if (it == simplex.end()) {
-            continue;
-        }
-
-        const glyph& glyph = it->second;
-        if (!glyph.width) {
-            continue;
-        }
+        const glyph& glyph = simplex[text[i] - 32];
 
         int16_t prev_x = -1, prev_y = -1, prev = false;
         for (int32_t j = 0; j < glyph.length; j += 2) {

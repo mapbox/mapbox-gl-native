@@ -16,7 +16,6 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
  - `pkg-config` (for build only)
  - [Homebrew](http://brew.sh) (for build on OS X)
  - Python 2.x (for build only)
- - Node.js (for build only)
 
 # Build instructions
 
@@ -109,7 +108,7 @@ Or proceed to building the debug application with:
 
 To trigger a complete rebuild, run `make clean` and then start over generating the Xcode projects or Makefiles as described above.
 
-This will also blow away the `mason_packages` directory. This means the Makefile and configure script will automatically install the dependencies again on the next try.
+If you are having trouble getting the dependencies right, you can blow away the `mason_packages` directory, or run `make distclean`. This means the Makefile and configure script will automatically install the dependencies again on the next try.
 
 On OS X, you can also try clearing the Xcode cache with `make clear_xcode_cache`.
 

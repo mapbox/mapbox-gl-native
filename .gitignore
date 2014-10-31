@@ -3,15 +3,11 @@
 *.o
 *.actual.png
 *.diff.png
-/node_modules
 /mason_packages
-/macosx/build
-/ios/build
 /config.gypi
 /config-ios.gypi
 /config/constants_local.cpp
 /build
-/bin/node_modules
 /include/mbgl/shader/shaders.hpp
 /src/shader/shaders_gl.cpp
 /src/shader/shaders_gles2.cpp

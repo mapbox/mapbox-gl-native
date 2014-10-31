@@ -20,7 +20,7 @@ const std::string base_directory = []{
     std::string fn = __FILE__;
     fn.erase(fn.find_last_of("/"));
     fn.erase(fn.find_last_of("/"));
-    return fn + "/node_modules/mapbox-gl-test-suite/";
+    return fn + "/test/suite/";
 }();
 
 auto display_ = std::make_shared<mbgl::HeadlessDisplay>();

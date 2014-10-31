@@ -4,10 +4,11 @@
 #include <memory>
 
 // g++/libstdc++ is missing c++11 codecvt support
-#if ! defined(__clang__) || defined(__linux__)
+#if 1//! defined(__clang__) || defined(__linux__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#include <boost/locale.hpp>
+//#include <boost/locale.hpp>
+#include <boost/regex/pending/unicode_iterator.hpp>
 #pragma GCC diagnostic pop
 #else
 // Assume that codecvt is present on clang on non-linux systems
@@ -19,13 +20,16 @@ namespace mbgl {
 
 namespace util {
 
-#if ! defined(__clang__) || defined(__linux__)
+#if 1 //! defined(__clang__) || defined(__linux__)
 
 class utf8_to_utf32 {
  public:
     explicit utf8_to_utf32() {}
-    std::u32string convert(std::string const& utf8) {
-        return boost::locale::conv::utf_to_utf<char32_t>(utf8);
+    std::u32string convert(std::string const& utf8)
+    {
+        boost::u8_to_u32_iterator<std::string::const_iterator> begin(utf8.begin());
+        boost::u8_to_u32_iterator<std::string::const_iterator> end(utf8.end());
+        return std::u32string(begin,end);
     }
 };
 
