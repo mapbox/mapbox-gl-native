@@ -2,7 +2,6 @@
 
 set -e
 set -o pipefail
-shopt -s expand_aliases
 
 CONFIG_FILE=${1:-config.gypi}
 
@@ -16,11 +15,7 @@ function finish {
 trap finish EXIT
 
 # Install mason
-if [[ ! -d ~/.mason ]]; then
-    >&2 echo -e "\033[1m\033[32m* Installing Mason\033[0m"
-    git clone https://github.com/mapbox/mason.git ~/.mason
-fi
-alias mason='~/.mason/mason'
+. ./scripts/local_mason.sh
 
 case ${MASON_PLATFORM} in
     'ios')
