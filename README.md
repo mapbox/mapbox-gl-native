@@ -16,7 +16,6 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
  - `pkg-config` (for build only)
  - [Homebrew](http://brew.sh) (for build on OS X)
  - Python 2.x (for build only)
- - Node.js (for build only)
 
 # Build instructions
 
