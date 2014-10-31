@@ -10,7 +10,7 @@
 #include <cassert>
 #include <cstring>
 #include <ctime>
-#include <xlocale.h>
+#include <locale.h>
 
 // This file contains code from http://curl.haxx.se/libcurl/c/multi-uv.html:
 
