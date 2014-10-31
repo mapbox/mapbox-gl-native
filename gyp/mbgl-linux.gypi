@@ -9,13 +9,16 @@
         'cflags_cc': [
           '<@(uv_cflags)',
           '<@(curl_cflags)',
+          '<@(nu_cflags)',
         ],
         'cflags': [
           '<@(uv_cflags)',
+          '<@(nu_cflags)',
         ],
         'ldflags': [
           '<@(uv_ldflags)',
           '<@(curl_ldflags)',
+          '<@(nu_ldflags)',
         ],
       },
       'sources': [

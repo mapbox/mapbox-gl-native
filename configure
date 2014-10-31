@@ -37,21 +37,23 @@ alias mason='~/.mason/mason'
 
 case $MASON_PLATFORM in
     'ios')
-        SQLITE_VERSION=system
-        LIBPNG_VERSION=1.6.13
-        LIBUV_VERSION=0.10.28
-        ZLIB_VERSION=system
-        BOOST_VERSION=system
-        ;;
+	SQLITE_VERSION=system
+	LIBPNG_VERSION=1.6.13
+	LIBUV_VERSION=0.10.28
+	ZLIB_VERSION=system
+	BOOST_VERSION=system
+	NUNICODE_VERSION=1.4
+	;;
     *)
-        GLFW_VERSION=a21f2377
-        SQLITE_VERSION=system
-        LIBPNG_VERSION=system
-        LIBCURL_VERSION=system
-        LIBUV_VERSION=0.10.28
-        ZLIB_VERSION=system
-        BOOST_VERSION=system
-        ;;
+	GLFW_VERSION=a21f2377
+	SQLITE_VERSION=system
+	LIBPNG_VERSION=system
+	LIBCURL_VERSION=system
+	LIBUV_VERSION=0.10.28
+	ZLIB_VERSION=system
+	BOOST_VERSION=system
+	NUNICODE_VERSION=1.4
+	;;
 esac
 
 function abort { >&2 echo -e "\033[1m\033[31m$1\033[0m"; exit 1; }
@@ -137,6 +139,14 @@ if [ ! -z ${ZLIB_VERSION} ]; then
     CONFIG+="    'zlib_cflags': $(quote_flags $(mason cflags zlib ${ZLIB_VERSION})),"$LN
     CONFIG+="    'zlib_ldflags': $(quote_flags $(mason ldflags zlib ${ZLIB_VERSION})),"$LN
 fi
+
+if [ ! -z ${NUNICODE_VERSION} ]; then
+    mason install nunicode ${NUNICODE_VERSION}
+    CONFIG+="    'nu_static_libs': $(quote_flags $(mason static_libs nunicode ${NUNICODE_VERSION})),"$LN
+    CONFIG+="    'nu_cflags': $(quote_flags $(mason cflags nunicode ${NUNICODE_VERSION})),"$LN
+    CONFIG+="    'nu_ldflags': $(quote_flags $(mason ldflags nunicode ${NUNICODE_VERSION})),"$LN
+fi
+
 
 CONFIG+="  }
 }
