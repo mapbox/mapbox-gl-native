@@ -29,6 +29,7 @@ before_install:
 - source ./scripts/flags.sh
 - (git clone https://github.com/mapbox/mason.git ~/.mason ; sudo ln -s ~/.mason/mason /usr/local/bin/mason)
 - ./scripts/travis_before_install.sh
+- if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then export LD_LIBRARY_PATH=`mason prefix mesa 10.3.1`/lib; fi
 - if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then glxinfo; fi
 
 install:
