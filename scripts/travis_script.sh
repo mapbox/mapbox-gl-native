@@ -3,6 +3,9 @@
 set -e
 set -o pipefail
 
+mapbox_time "checkout_styles" \
+git submodule update --init styles
+
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #
     # build & test Linux
