@@ -12,6 +12,10 @@
         'sources': [
             'gtest-all.cc'
         ],
+        'link_settings': {
+            'xcode_settings': { 'OTHER_LDFLAGS': [ '-lpthread' ] },
+            'ldflags': [ '-lpthread' ],
+        },
         'direct_dependent_settings': {
             'include_dirs': [
               '.',

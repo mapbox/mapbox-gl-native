@@ -4,9 +4,14 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <stdexcept>
+#include <cstring>
 
 
-std::string mbgl::util::compress_png(int width, int height, void *rgba, bool flip) {
+namespace mbgl {
+namespace util {
+
+std::string compress_png(int width, int height, void *rgba) {
     png_voidp error_ptr = 0;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, NULL, NULL);
     if (!png_ptr) {
@@ -43,7 +48,7 @@ std::string mbgl::util::compress_png(int width, int height, void *rgba, bool fli
     } pointers(height);
 
     for (int i = 0; i < height; i++) {
-        pointers.rows[flip ? height - 1 - i : i] = (png_bytep)((png_bytep)rgba + width * 4 * i);
+        pointers.rows[i] = (png_bytep)((png_bytep)rgba + width * 4 * i);
     }
 
     png_set_rows(png_ptr, info_ptr, pointers.rows);
@@ -52,9 +57,6 @@ std::string mbgl::util::compress_png(int width, int height, void *rgba, bool fli
 
     return result;
 }
-
-
-using namespace mbgl::util;
 
 
 struct Buffer {
@@ -72,7 +74,7 @@ void readCallback(png_structp png, png_bytep data, png_size_t length) {
     if (reader->pos + length > reader->length) {
         png_error(png, "Read Error");
     } else {
-        memcpy(data, reader->data + reader->pos, length);
+        std::memcpy(data, reader->data + reader->pos, length);
         reader->pos += length;
     }
 }
@@ -85,7 +87,7 @@ void warningHandler(png_structp, png_const_charp error_msg) {
     fprintf(stderr, "PNG: %s\n", error_msg);
 }
 
-Image::Image(const std::string &data, bool flip) {
+Image::Image(const std::string &data) {
     Buffer buffer(data);
 
     if (buffer.length < 8 || !png_check_sig((const png_bytep)buffer.data, 8)) {
@@ -134,14 +136,16 @@ Image::Image(const std::string &data, bool flip) {
         if (png_get_gAMA(png, info, &gamma))
             png_set_gamma(png, 2.2, gamma);
 
+        png_set_alpha_mode(png, PNG_ALPHA_PREMULTIPLIED, 2.2);
+
         png_read_update_info(png, info);
 
         png_size_t rowbytes = png_get_rowbytes(png, info);
         assert(width * 4 == rowbytes);
 
-        img = static_cast<char*>(::operator new(width * height * 4));
+        img = ::std::unique_ptr<char[]>(new char[width * height * 4]());
 
-        char *surface = img;
+        char *surface = img.get();
         assert(surface);
 
         struct ptrs {
@@ -150,7 +154,7 @@ Image::Image(const std::string &data, bool flip) {
             png_bytep *rows = nullptr;
         } pointers(height);
         for (unsigned i = 0; i < height; ++i) {
-            pointers.rows[flip ? height - 1 - i : i] = (png_bytep)(surface + (i * rowbytes));
+            pointers.rows[i] = (png_bytep)(surface + (i * rowbytes));
         }
 
         // Read image data
@@ -163,14 +167,12 @@ Image::Image(const std::string &data, bool flip) {
         fprintf(stderr, "loading PNG failed: %s\n", e.what());
         png_destroy_read_struct(&png, &info, nullptr);
         if (img) {
-            ::operator delete(img);
-            img = nullptr;
+            img.reset();
         }
         width = 0;
         height = 0;
     }
 }
 
-Image::~Image() {
-    ::operator delete(img),img = nullptr;
+}
 }

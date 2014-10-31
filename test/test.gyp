@@ -8,7 +8,7 @@
       '<@(uv_ldflags)',
       '<@(sqlite3_ldflags)',
       '<@(curl_ldflags)',
-      '<@(png_ldflags)'
+      '<@(png_ldflags)',
     ],
   },
   'targets': [

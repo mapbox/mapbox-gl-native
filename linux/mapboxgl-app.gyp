@@ -22,13 +22,24 @@
         '<@(glfw3_cflags)',
         '-I<(boost_root)/include',
       ],
-      'libraries': [
-        '<@(png_ldflags)',
-        '<@(sqlite3_ldflags)',
-        '<@(glfw3_static_libs)',
-        '<@(glfw3_ldflags)',
-        '<@(curl_ldflags)',
-        '<@(zlib_ldflags)',
+      'variables': {
+        'ldflags': [
+          '<@(png_ldflags)',
+          '<@(sqlite3_ldflags)',
+          '<@(glfw3_static_libs)',
+          '<@(glfw3_ldflags)',
+          '<@(curl_ldflags)',
+          '<@(zlib_ldflags)',
+        ],
+      },
+      'conditions': [
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'OTHER_LDFLAGS': [ '<@(ldflags)' ],
+          }
+        }, {
+          'libraries': [ '<@(ldflags)' ],
+        }]
       ],
       'dependencies': [
         '../mapboxgl.gyp:mbgl-standalone',

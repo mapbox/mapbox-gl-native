@@ -10,6 +10,7 @@
         '../platform/darwin/log_nslog.mm',
         '../platform/darwin/string_nsstring.mm',
         '../platform/darwin/http_request_baton_cocoa.mm',
+        '../platform/darwin/image.mm',
       ],
       'include_dirs': [
         '../include',
@@ -20,7 +21,13 @@
       'direct_dependent_settings': {
         'include_dirs': [
           '../include',
-        ]
+        ],
+        'xcode_settings': {
+          'OTHER_LDFLAGS': [
+            '-framework ImageIO',
+            '-framework CoreServices',
+          ],
+        },
       },
     },
   ],
