@@ -77,8 +77,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-standalone',
-        '../mapboxgl.gyp:copy_fixtures',
+        '../mapboxgl.gyp:mbgl-standalone'
       ],
       'conditions': [
         ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
