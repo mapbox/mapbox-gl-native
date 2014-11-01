@@ -73,7 +73,9 @@ LOCAL_MODULE            := NativeMapView
 LOCAL_SRC_FILES         := NativeMapView.cpp \
                            JNI.cpp \
                            $(MBGL_ROOT)/common/http_request_baton_curl.cpp \
-                           $(MBGL_ROOT)/common/platform_default.cpp
+                           $(MBGL_ROOT)/common/platform_default.cpp \
+                           $(MBGL_ROOT)/common/linux.cpp
+# TODO need to add android specific platform stuff for case and cache db
 LOCAL_STATIC_LIBRARIES  := mbgl curl boost_atomic
 LOCAL_LDLIBS            := -llog -landroid -lEGL -lGLESv2
 include $(BUILD_SHARED_LIBRARY)
