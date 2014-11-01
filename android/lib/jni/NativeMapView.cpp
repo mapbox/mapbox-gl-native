@@ -4,13 +4,13 @@
 
 #include <GLES2/gl2.h>
 
-#include <llmr/platform/platform.hpp>
+#include <mbgl/platform/platform.hpp>
 
 #include "log.h"
 
 #include "NativeMapView.hpp"
 
-namespace llmr {
+namespace mbgl {
 namespace android {
 
 void log_egl_string(EGLDisplay display, EGLint name, const char* label) {
@@ -54,8 +54,8 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj,
     //freopen("/sdcard/stdout.txt", "w", stdout); // NOTE: can't use <cstdio> till NDK fix the stdout macro bug
     //freopen("/sdcard/stderr.txt", "w", stderr);
 
-    view = new LLMRView(this);
-    map = new llmr::Map(*view);
+    view = new MBGLView(this);
+    map = new mbgl::Map(*view);
 
     map->setStyleJSON(default_style_json);
 }
@@ -216,7 +216,8 @@ bool NativeMapView::initializeContext() {
 void NativeMapView::terminateContext() {
     VERBOSE("NativeMapView::terminateContext");
 
-    map->terminate();
+    //map->terminate();
+    // TODO need to bring this back?
 
     // TODO: there is a bug when you double tap home to go app switcher, as map is black if you immediately switch to the map again
     // TODO: this is in the onPause/onResume path
@@ -460,8 +461,8 @@ void NativeMapView::notifyMapChange() {
     }
 }
 
-void LLMRView::make_active() {
-    VERBOSE("LLMRView::make_active");
+void MBGLView::make_active() {
+    VERBOSE("MBGLView::make_active");
     if ((nativeView->display != EGL_NO_DISPLAY)
             && (nativeView->surface != EGL_NO_SURFACE)
             && (nativeView->context != EGL_NO_CONTEXT)) {
@@ -483,8 +484,8 @@ void LLMRView::make_active() {
     }
 }
 
-void LLMRView::make_inactive() {
-    VERBOSE("LLMRView::make_inactive");
+void MBGLView::make_inactive() {
+    VERBOSE("MBGLView::make_inactive");
     if (!eglMakeCurrent(nativeView->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
             EGL_NO_CONTEXT)) {
         ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
@@ -492,8 +493,8 @@ void LLMRView::make_inactive() {
     }
 }
 
-void LLMRView::swap() {
-    VERBOSE("LLMRView::swap");
+void MBGLView::swap() {
+    VERBOSE("MBGLView::swap");
     if (map->needsSwap() && (nativeView->display != EGL_NO_DISPLAY)
             && (nativeView->surface != EGL_NO_SURFACE)) {
         if (!eglSwapBuffers(nativeView->display, nativeView->surface)) {
@@ -505,10 +506,16 @@ void LLMRView::swap() {
     }
 }
 
-void LLMRView::notify_map_change() {
-    DEBUG("LLMRView::notify_map_change()");
+void MBGLView::notify() {
+    DEBUG("MBGLView::notify()");
+    // TODO
+}
+
+void MBGLView::notify_map_change(mbgl::MapChange change, mbgl::timestamp delay) {
+    DEBUG("MBGLView::notify_map_change()");
     nativeView->notifyMapChange();
+    // TODO: use new variables
 }
 
 } // namespace android
-} // namespace llmr
+} // namespace mbgl

@@ -93,9 +93,9 @@ void Painter::deleteShaders() {
     patternShader = nullptr;
     iconShader = nullptr;
     rasterShader = nullptr;
-    textShader = nullptr;
+    sdfGlyphShader = nullptr;
+    sdfIconShader = nullptr;
     dotShader = nullptr;
-    compositeShader = nullptr;
     gaussianShader = nullptr;
 }
 

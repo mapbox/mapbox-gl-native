@@ -11,7 +11,7 @@
 #include <locale>
 #include <codecvt>
 #include <array>
-#include <set>
+#include <vector>
 
 #include <jni.h>
 
@@ -21,7 +21,7 @@
 
 #include "NativeMapView.hpp"
 
-namespace llmr {
+namespace mbgl {
 namespace android {
 
 jmethodID on_map_changed_id = nullptr;
@@ -85,42 +85,45 @@ jstring std_string_to_jstring(JNIEnv* env, std::string str) {
     return jstr;
 }
 
-std::set<std::string> std_set_string_from_jobject(JNIEnv* env, jobject jset) {
-    std::set<std::string> set;
+
+// TODO: change from Java TreeSet to ArrayList
+std::vector<std::string> std_vector_string_from_jobject(JNIEnv* env, jobject jset) {
+    std::vector<std::string> vector;
 
     jobjectArray array = reinterpret_cast<jobjectArray>(env->CallObjectMethod(jset, set_to_array_id));
     if (env->ExceptionCheck() || (array == nullptr)) {
         env->ExceptionDescribe();
-        return set;
+        return vector;
     }
 
     jsize len = env->GetArrayLength(array);
     if (len < 0) {
         env->ExceptionDescribe();
-        return set;
+        return vector;
     }
 
     for (jsize i = 0; i < len; i++) {
         jstring jstr = reinterpret_cast<jstring>(env->GetObjectArrayElement(array, i));
         if (jstr == nullptr) {
             env->ExceptionDescribe();
-            return set;
+            return vector;
         }
 
-        set.insert(std_string_from_jstring(env, jstr));
+        vector.push_back(std_string_from_jstring(env, jstr));
     }
 
-    return set;
+    return vector;
 }
 
-jobject std_set_string_to_jobject(JNIEnv* env, std::set<std::string> set)  {
+// TODO: change from Java TreeSet to ArrayList
+jobject std_vector_string_to_jobject(JNIEnv* env, std::vector<std::string> vector)  {
     jobject jset = env->NewObject(tree_set_class, tree_set_constructor_id);
     if (jset == nullptr) {
         env->ExceptionDescribe();
         return nullptr;
     }
 
-    for (std::string str : set) {
+    for (std::string str : vector) {
         env->CallBooleanMethod(jset, tree_set_add_id, std_string_to_jstring(env, str));
         if (env->ExceptionCheck()) {
             env->ExceptionDescribe();
@@ -132,11 +135,11 @@ jobject std_set_string_to_jobject(JNIEnv* env, std::set<std::string> set)  {
 }
 
 } // namespace android
-} // namespace llmr
+} // namespace mbgl
 
 namespace {
 
-using namespace llmr::android;
+using namespace mbgl::android;
 
 // TODO: wrap C++ exceptions?
 // TODO: wrap other sorts of exceptions? eg coffee catch
@@ -301,14 +304,14 @@ void JNICALL nativeSetAppliedClasses(JNIEnv* env, jobject obj, jlong native_map_
     VERBOSE("nativeSetAppliedClasses");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setAppliedClasses(std_set_string_from_jobject(env, applied_classes));
+    native_map_view->getMap()->setAppliedClasses(std_vector_string_from_jobject(env, applied_classes));
 }
 
 jobject JNICALL nativeGetAppliedClasses(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     VERBOSE("nativeGetAppliedClasses");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return std_set_string_to_jobject(env, native_map_view->getMap()->getAppliedClasses());
+    return std_vector_string_to_jobject(env, native_map_view->getMap()->getAppliedClasses());
 }
 
 void JNICALL nativeSetDefaultTransitionDuration(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jlong duration_milliseconds) {
@@ -530,21 +533,30 @@ void JNICALL nativeSetAngle(JNIEnv* env, jobject obj, jlong native_map_view_ptr,
     VERBOSE("nativeSetAngle");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setAngle(angle, duration);
+    // TODO update java class
+    //native_map_view->getMap()->setAngle(angle, duration);
+    double degrees = -angle / M_PI * 180;
+    native_map_view->getMap()->setBearing(degrees, duration);
 }
 
 void JNICALL nativeSetAngle(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble angle, jdouble cx, jdouble cy) {
     VERBOSE("nativeSetAngle");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setAngle(angle, cx, cy);
+    // TODO update java class
+    //native_map_view->getMap()->setAngle(angle, cx, cy);
+    double degrees = -angle / M_PI * 180;
+    native_map_view->getMap()->setBearing(degrees, cx, cy);
 }
 
 jdouble JNICALL nativeGetAngle(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     VERBOSE("nativeGetAngle");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return native_map_view->getMap()->getAngle();
+    // TODO update java class
+    //return native_map_view->getMap()->getAngle();
+    double degrees = native_map_view->getMap()->getBearing();
+    return -degrees * M_PI / 180;
 }
 
 void JNICALL nativeResetNorth(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
