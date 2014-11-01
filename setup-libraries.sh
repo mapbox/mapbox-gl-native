@@ -74,6 +74,7 @@ source Android.sh
     if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libssl.a ] ; then ./scripts/build_openssl.sh ; fi
     if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libcurl.a ] ; then ./scripts/build_curl.sh ; fi
+    if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libsqlite3.a ] ; then ./scripts/build_sqlite.sh ; fi
     if [ ! -d out/build-cpp11-libcpp-gcc-arm-android/include/boost ] ; then ./scripts/build_boost.sh `pwd`/../../src/ `pwd`/../../include/ `pwd`/../../linux/ `pwd`/../../common/ ; fi
 #    if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libboost_regex.a ] ; then ./scripts/build_boost.sh --with-regex ; fi
 #    if [ ! -f out/build-cpp11-libcpp-gcc-arm-android/lib/libboost_atomic.a ] ; then ./scripts/build_boost.sh --with-atomic ; fi
