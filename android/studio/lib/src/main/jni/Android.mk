@@ -1,6 +1,6 @@
 LOCAL_PATH              := $(call my-dir)
-MBGL_ROOT               := ../../..
-MBGL_INC_ROOT           := ../..
+MBGL_ROOT               := ../../../../../..
+MBGL_INC_ROOT           := ../../../../..
 BUILDTYPE               ?= Release
 MBGL_OUT                := $(MBGL_ROOT)/build/$(BUILDTYPE)/obj
 MBGL_OUT_TARGET         := $(MBGL_ROOT)/build/$(BUILDTYPE)/obj.target
