@@ -485,12 +485,12 @@ util::ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
             return nullptr;
         }
 
-        // Parse styles already, as they can't be inherited anyway.
-        std::map<ClassID, ClassProperties> styles;
-        parseStyles(value, styles);
+        // Parse paints already, as they can't be inherited anyway.
+        std::map<ClassID, ClassProperties> paints;
+        parsePaints(value, paints);
 
         util::ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
-            layer_id, std::move(styles));
+            layer_id, std::move(paints));
 
         if (value.HasMember("layers")) {
             layer->layers = createLayers(value["layers"]);
@@ -548,21 +548,21 @@ void StyleParser::parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair) {
 
 #pragma mark - Parse Styles
 
-void StyleParser::parseStyles(JSVal value, std::map<ClassID, ClassProperties> &styles) {
+void StyleParser::parsePaints(JSVal value, std::map<ClassID, ClassProperties> &paints) {
     rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
     for (; itr != value.MemberEnd(); ++itr) {
         const std::string name { itr->name.GetString(), itr->name.GetStringLength() };
 
-        if (name == "style") {
-            parseStyle(replaceConstant(itr->value), styles[ClassID::Default]);
-        } else if (name.compare(0, 6, "style.") == 0 && name.length() > 6) {
+        if (name == "paint") {
+            parsePaint(replaceConstant(itr->value), paints[ClassID::Default]);
+        } else if (name.compare(0, 6, "paint.") == 0 && name.length() > 6) {
             const ClassID class_id = ClassDictionary::Get().lookup(name.substr(6));
-            parseStyle(replaceConstant(itr->value), styles[class_id]);
+            parsePaint(replaceConstant(itr->value), paints[class_id]);
         }
     }
 }
 
-void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
+void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     using Key = PropertyKey;
 
     parseOptionalProperty<Function<bool>>("fill-antialias", Key::FillAntialias, klass, value);
@@ -714,9 +714,9 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
         layer->bucket->filter = parseFilterExpression(value_filter);
     }
 
-    if (value.HasMember("render")) {
-        JSVal value_render = replaceConstant(value["render"]);
-        parseRender(value_render, layer);
+    if (value.HasMember("layout")) {
+        JSVal value_render = replaceConstant(value["layout"]);
+        parseLayout(value_render, layer);
     }
 
     if (value.HasMember("minzoom")) {
@@ -738,9 +738,9 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
     }
 }
 
-void StyleParser::parseRender(JSVal value, util::ptr<StyleLayer> &layer) {
+void StyleParser::parseLayout(JSVal value, util::ptr<StyleLayer> &layer) {
     if (!value.IsObject()) {
-        Log::Warning(Event::ParseStyle, "render property of layer '%s' must be an object", layer->id.c_str());
+        Log::Warning(Event::ParseStyle, "layout property of layer '%s' must be an object", layer->id.c_str());
         return;
     }
 

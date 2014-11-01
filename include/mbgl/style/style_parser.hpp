@@ -49,11 +49,11 @@ private:
     util::ptr<StyleLayer> createLayer(JSVal value);
     void parseLayers();
     void parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair);
-    void parseStyles(JSVal value, std::map<ClassID, ClassProperties> &styles);
-    void parseStyle(JSVal, ClassProperties &properties);
+    void parsePaints(JSVal value, std::map<ClassID, ClassProperties> &paints);
+    void parsePaint(JSVal, ClassProperties &properties);
     void parseReference(JSVal value, util::ptr<StyleLayer> &layer);
     void parseBucket(JSVal value, util::ptr<StyleLayer> &layer);
-    void parseRender(JSVal value, util::ptr<StyleLayer> &layer);
+    void parseLayout(JSVal value, util::ptr<StyleLayer> &layer);
     void parseSprite(JSVal value);
     void parseGlyphURL(JSVal value);
 
