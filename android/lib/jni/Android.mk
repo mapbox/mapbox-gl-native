@@ -72,7 +72,8 @@ include $(CLEAR_VARS)
 LOCAL_MODULE            := NativeMapView
 LOCAL_SRC_FILES         := NativeMapView.cpp \
                            JNI.cpp \
-                           $(MBGL_ROOT)/common/http_request_baton_curl.cpp
+                           $(MBGL_ROOT)/common/http_request_baton_curl.cpp \
+                           $(MBGL_ROOT)/common/platform_default.cpp
 LOCAL_STATIC_LIBRARIES  := mbgl curl boost_atomic
 LOCAL_LDLIBS            := -llog -landroid -lEGL -lGLESv2
 include $(BUILD_SHARED_LIBRARY)
