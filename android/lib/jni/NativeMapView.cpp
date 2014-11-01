@@ -216,8 +216,7 @@ bool NativeMapView::initializeContext() {
 void NativeMapView::terminateContext() {
     VERBOSE("NativeMapView::terminateContext");
 
-    //map->terminate();
-    // TODO need to bring this back?
+    map->terminate();
 
     // TODO: there is a bug when you double tap home to go app switcher, as map is black if you immediately switch to the map again
     // TODO: this is in the onPause/onResume path
