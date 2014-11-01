@@ -8,17 +8,17 @@ MAPNIK_PACKAGING_OUT    := /mapnik-packaging/osx/out/build-cpp11-libcpp-gcc-arm-
 MAPNIK_PACKAGING_LIB    := $(MBGL_ROOT)$(MAPNIK_PACKAGING_OUT)/lib
 MAPNIK_PACKAGING_INC    := $(MBGL_INC_ROOT)$(MAPNIK_PACKAGING_OUT)/include
 
-include $(CLEAR_VARS)
-LOCAL_MODULE            := boost_regex
-LOCAL_SRC_FILES         := $(MAPNIK_PACKAGING_LIB)/libboost_regex.a
-LOCAL_EXPORT_C_INCLUDES := $(MAPNIK_PACKAGING_INC)
-include $(PREBUILT_STATIC_LIBRARY)
+#include $(CLEAR_VARS)
+#LOCAL_MODULE            := boost_regex
+#LOCAL_SRC_FILES         := $(MAPNIK_PACKAGING_LIB)/libboost_regex.a
+#LOCAL_EXPORT_C_INCLUDES := $(MAPNIK_PACKAGING_INC)
+#include $(PREBUILT_STATIC_LIBRARY)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE            := boost_atomic
-LOCAL_SRC_FILES         := $(MAPNIK_PACKAGING_LIB)/libboost_atomic.a
-LOCAL_EXPORT_C_INCLUDES := $(MAPNIK_PACKAGING_INC)
-include $(PREBUILT_STATIC_LIBRARY)
+#include $(CLEAR_VARS)
+#LOCAL_MODULE            := boost_atomic
+#LOCAL_SRC_FILES         := $(MAPNIK_PACKAGING_LIB)/libboost_atomic.a
+#LOCAL_EXPORT_C_INCLUDES := $(MAPNIK_PACKAGING_INC)
+#include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE            := png
@@ -65,7 +65,8 @@ LOCAL_MODULE            := mbgl
 LOCAL_SRC_FILES         := $(MBGL_OUT_TARGET)/libmapboxgl.a
 LOCAL_EXPORT_C_INCLUDES := $(MBGL_INC_ROOT)/include
 LOCAL_EXPORT_LDLIBS     := -latomic
-LOCAL_STATIC_LIBRARIES  := png uv sqlite boost_regex
+LOCAL_STATIC_LIBRARIES  := png uv sqlite
+# boost_regex
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -76,6 +77,7 @@ LOCAL_SRC_FILES         := NativeMapView.cpp \
                            $(MBGL_ROOT)/common/platform_default.cpp \
                            $(MBGL_ROOT)/common/linux.cpp
 # TODO need to add android specific platform stuff for case and cache db
-LOCAL_STATIC_LIBRARIES  := mbgl curl boost_atomic
+LOCAL_STATIC_LIBRARIES  := mbgl curl
+# boost_atomic
 LOCAL_LDLIBS            := -llog -landroid -lEGL -lGLESv2
 include $(BUILD_SHARED_LIBRARY)

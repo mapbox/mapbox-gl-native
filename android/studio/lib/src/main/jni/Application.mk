@@ -1,6 +1,6 @@
 APP_MODULES := NativeMapView
 APP_ABI := armeabi-v7a-hard
-APP_PLATFORM := android-21
+APP_PLATFORM := android-19
 APP_STL := c++_static
 APP_CPPFLAGS := -fexceptions -std=c++11
 
