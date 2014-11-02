@@ -62,6 +62,7 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj,
 
     // FIXME this asserts because it creates FileSource of different thread from run thread
     //map->setStyleJSON(default_style_json);
+    map->setStyleURL("https://raw.githubusercontent.com/mapbox/mapbox-gl-styles/mb-pages/styles/bright-v5.json");
 }
 
 NativeMapView::~NativeMapView() {
