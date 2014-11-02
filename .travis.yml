@@ -25,8 +25,8 @@ env:
    - LD_LIBRARY_PATH: '/usr/local/lib'
 
 before_install:
-- if [ "${MASON_PLATFORM}" = "android" ]; then MASON_PLATFORM= ~/.mason/mason install 7z 9.20; export PATH=$(MASON_PLATFORM= ~/.mason/mason prefix 7z 9.20)/bin:${PATH}; wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin; chmod a+x ./android-ndk-r10c-linux-x86_64.bin; 7za x ./android-ndk-r10c-linux-x86_64.bin > /dev/null; export ANDROID_NDK_PATH=$(pwd)/android-ndk-r10c; ls -l;ls -l $ANDROID_NDK_PATH; fi;
 - source ./scripts/local_mason.sh
+- if [ "${MASON_PLATFORM}" = "android" ]; then MASON_PLATFORM= ./.mason/mason install 7z 9.20; export PATH=$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin:${PATH}; wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin; chmod a+x ./android-ndk-r10c-linux-x86_64.bin; 7za x ./android-ndk-r10c-linux-x86_64.bin > /dev/null; export ANDROID_NDK_PATH=$(pwd)/android-ndk-r10c; ls -l;ls -l $ANDROID_NDK_PATH; fi;
 - source ./scripts/travis_helper.sh
 - source ./scripts/flags.sh
 - ./scripts/travis_before_install.sh
