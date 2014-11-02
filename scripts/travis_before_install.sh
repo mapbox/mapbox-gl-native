@@ -5,12 +5,12 @@ set -o pipefail
 
 if [[ "${MASON_PLATFORM}" == "android" ]]; then
     MASON_PLATFORM= ./.mason/mason install 7z 9.20
-    7Z_PATH=$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za
+    SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
     mapbox_time "fetching NDK" \
       wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
     chmod a+x ./android-ndk-r10c-linux-x86_64.bin
     mapbox_time "unpacking NDK" \
-      7Z_PATH x ./android-ndk-r10c-linux-x86_64.bin > /dev/null;
+      SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > /dev/null;
     export ANDROID_NDK_PATH=$(pwd)/android-ndk-r10c;
 fi
 
