@@ -15,6 +15,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            jniDebugBuild true
+        }
+
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
@@ -22,7 +26,8 @@ android {
     }
 
     sourceSets.main {
-        jni.srcDirs = []
+        jniLibs.srcDir 'libs'
+        jni.srcDirs = [] // disable automatic ndk-build call
     }
 }
 
