@@ -69,11 +69,20 @@ private:
 
 class VertexArrayObject : public util::noncopyable {
 public:
-    template <typename Shader, typename Buffers>
-    void bind(Shader& shader, Buffers& buffers, char *offset) {
-        for (auto &buffer : buffers) {
-            buffer.bind();
-        }
+    inline VertexArrayObject() {};
+
+    inline VertexArrayObject(VertexArrayObject &&) noexcept {};
+
+    template <typename Shader, typename VertexBuffer>
+    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, char *offset) {
+        vertexBuffer.bind();
+        shader.bind(offset);
+    }
+
+    template <typename Shader, typename VertexBuffer, typename ElementsBuffer>
+    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, char *offset) {
+        vertexBuffer.bind();
+        elementsBuffer.bind();
         shader.bind(offset);
     }
 };

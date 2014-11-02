@@ -69,6 +69,21 @@ build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj: ios/mapbox-gl-cocoa/app/ma
 build/linux/mapboxgl-app.xcodeproj: linux/mapboxgl-app.gyp config.gypi
 	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=linux --depth=. --generator-output=./build -f xcode
 
+.PHONY: android
+android:
+	export CXX=`MASON_PLATFORM=android ~/.mason/mason env CXX` && \
+	export CC=`MASON_PLATFORM=android ~/.mason/mason env CC` && \
+	export LD=`MASON_PLATFORM=android ~/.mason/mason env LD` && \
+	export AR=`MASON_PLATFORM=android ~/.mason/mason env AR` && \
+	export RANLIB=`MASON_PLATFORM=android ~/.mason/mason env RANLIB` && \
+	export LDFLAGS=`MASON_PLATFORM=android ~/.mason/mason env LDFLAGS` && \
+	export CFLAGS=`MASON_PLATFORM=android ~/.mason/mason env CFLAGS` && \
+	export CPPFLAGS=`MASON_PLATFORM=android ~/.mason/mason env CPPFLAGS` && \
+	export PATH=`MASON_PLATFORM=android ~/.mason/mason env PATH` && \
+	MASON_PLATFORM=android ./configure config-android.gypi && \
+	deps/run_gyp mapboxgl.gyp -Iconfig-android.gypi -Dplatform=android --depth=. --generator-output=./build/android -f make-android && \
+	$(MAKE) -C ./build/android BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-core
+
 ##### Test cases ###############################################################
 
 test: build/test/Makefile
@@ -131,7 +146,7 @@ clean: clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
 	-rm -rf ./macosx/build/
-	-rm -rf ./config.gypi ./config-ios.gypi
+	-rm -rf ./config.gypi ./config-ios.gypi ./config-android.gypi
 
 distclean: clean
 	-rm -rf ./mason_packages
