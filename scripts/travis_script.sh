@@ -11,7 +11,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     # build & test Linux
     #
     mapbox_time "compile_program" \
-    make linux -j$JOBS BUILDTYPE=${BUILDTYPE}
+    make android -j$JOBS BUILDTYPE=${BUILDTYPE}
 
     mapbox_time "compile_tests" \
     make test -j$JOBS BUILDTYPE=${BUILDTYPE}
