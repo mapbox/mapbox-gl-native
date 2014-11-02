@@ -4,15 +4,28 @@ set -e
 set -o pipefail
 
 if [[ "${MASON_PLATFORM}" == "android" ]]; then
+    echo "debug: unpacking"
     mapbox_time "unpacking NDK" \
       $(MASON_PLATFORM= ./.mason/mason install 7z 9.20)
+
+    echo "debug: setting 7z path"
     SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
+
+    echo "debug: fetching NDK"
     mapbox_time "fetching NDK" \
       wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
+
+    echo "debug: chmod NDK"
     chmod a+x ./android-ndk-r10c-linux-x86_64.bin
+
+    echo "debug: upacking NDK"
     mapbox_time "unpacking NDK" \
-      $(SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > /dev/null);
-    export ANDROID_NDK_PATH=$(pwd)/android-ndk-r10c;
+      $(SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > /dev/null)
+
+    echo "debug: setting ANDROID_NDK_PATH"
+    export ANDROID_NDK_PATH=$(pwd)/android-ndk-r10c
+
+    echo "debug: $ANDROID_NDK_PATH"
 fi
 
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
