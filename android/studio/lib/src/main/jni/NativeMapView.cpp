@@ -57,6 +57,9 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj,
     view = new MBGLView(this);
     map = new mbgl::Map(*view);
 
+    // FIXME need way to load this from Java
+    map->setAccessToken("pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ");
+
     // FIXME this asserts because it creates FileSource of different thread from run thread
     //map->setStyleJSON(default_style_json);
 }
