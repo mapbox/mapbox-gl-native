@@ -3,6 +3,17 @@
 set -e
 set -o pipefail
 
+if [[ "${MASON_PLATFORM}" == "android" ]]; then
+    MASON_PLATFORM= ./.mason/mason install 7z 9.20
+    7Z_PATH=$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za
+    mapbox_time "fetching NDK" \
+      wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
+    chmod a+x ./android-ndk-r10c-linux-x86_64.bin
+    mapbox_time "unpacking NDK" \
+      7Z_PATH x ./android-ndk-r10c-linux-x86_64.bin > /dev/null;
+    export ANDROID_NDK_PATH=$(pwd)/android-ndk-r10c;
+fi
+
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #
     # install Linux dependencies
@@ -32,9 +43,9 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
                             llvm-3.4 # required for mesa
 
 
-    unset MASON_PLATFORM
-    mapbox_time "install_mesa" \
-    mason install mesa 10.3.1
+    # TODO - figure out how to unset MASON_PLATFORM for just this command
+    #mapbox_time "install_mesa" \
+    MASON_PLATFORM= mason install mesa 10.3.1
 
     mapbox_time "install_awscli" \
     sudo pip install awscli
