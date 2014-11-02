@@ -366,7 +366,10 @@ void start_request(void *const ptr) {
     assert(baton);
 
     // Create a C locale
-    static locale_t locale = newlocale(LC_ALL_MASK, nullptr, nullptr);
+    //static locale_t locale = newlocale(LC_ALL_MASK, nullptr, nullptr);
+
+    // FIXME work around for bug in Android NDK, see https://code.google.com/p/android/issues/detail?id=78567
+    static locale_t locale = newlocale(LC_ALL_MASK, "", nullptr);
 
     CURL *handle = nullptr;
     if (!handles.empty()) {

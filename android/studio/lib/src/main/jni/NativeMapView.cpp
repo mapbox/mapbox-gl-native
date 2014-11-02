@@ -57,7 +57,8 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj,
     view = new MBGLView(this);
     map = new mbgl::Map(*view);
 
-    map->setStyleJSON(default_style_json);
+    // FIXME this asserts because it creates FileSource of different thread from run thread
+    //map->setStyleJSON(default_style_json);
 }
 
 NativeMapView::~NativeMapView() {
@@ -77,7 +78,7 @@ NativeMapView::~NativeMapView() {
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) == JNI_OK) {
         env->DeleteGlobalRef(obj);
     } else {
-        env->ExceptionDescribe();
+        ERROR("GetEnv() failed");
     }
     obj = nullptr;
     vm = nullptr;
@@ -448,8 +449,9 @@ void NativeMapView::notifyMapChange() {
     ASSERT(obj != nullptr);
 
     JNIEnv* env = nullptr;
+    // FIXME this returns failure
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
-        env->ExceptionDescribe();
+        ERROR("GetEnv() failed");
         return;
     }
 
