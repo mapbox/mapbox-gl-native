@@ -28,7 +28,8 @@ before_install:
 - source ./scripts/local_mason.sh
 - source ./scripts/travis_helper.sh
 - source ./scripts/flags.sh
-- source ./scripts/travis_before_install.sh
+- export ANDROID_NDK_PATH="$(pwd)/android-ndk-r10c"
+- ./scripts/travis_before_install.sh
 - if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then export LD_LIBRARY_PATH=`mason prefix mesa 10.3.1`/lib; fi
 - if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then glxinfo; fi
 

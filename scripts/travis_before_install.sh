@@ -21,11 +21,6 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
     echo "debug: upacking NDK"
     #mapbox_time "unpacking NDK" \
     $SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > /dev/null
-
-    echo "debug: setting ANDROID_NDK_PATH"
-    #export ANDROID_NDK_PATH=$(pwd)/android-ndk-r10c
-
-    echo "debug: $ANDROID_NDK_PATH"
 fi
 
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
