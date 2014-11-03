@@ -33,8 +33,8 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     fi
     sudo add-apt-repository --yes ppa:boost-latest/ppa
 
-    mapbox_time "apt_update" \
-    sudo apt-get update -y
+    #mapbox_time "apt_update" \
+    sudo apt-get update -y || true
 
     mapbox_time "install_gcc" \
     sudo apt-get -y install gcc-4.8 g++-4.8
