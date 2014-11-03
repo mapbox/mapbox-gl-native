@@ -20,7 +20,8 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
 
     echo "debug: upacking NDK"
     #mapbox_time "unpacking NDK" \
-    $SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > /dev/null
+    $SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > .tmp-ndk-log
+    rm .tmp-ndk-log
 fi
 
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
