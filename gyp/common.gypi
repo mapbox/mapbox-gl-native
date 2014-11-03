@@ -8,6 +8,7 @@
     'conditions': [
       ['OS=="mac"', {
         'xcode_settings': {
+          'MACOSX_DEPLOYMENT_TARGET':'10.9',
           'CLANG_CXX_LIBRARY': 'libc++',
           'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
           'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',

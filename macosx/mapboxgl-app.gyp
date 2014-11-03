@@ -40,8 +40,7 @@
           '<@(sqlite3_ldflags)',
           '<@(glfw3_static_libs)',
           '<@(glfw3_ldflags)',
-          '<@(curl_ldflags)',
-          '<@(png_ldflags)'
+          '<@(zlib_ldflags)',
         ]
       },
       'conditions': [

@@ -16,7 +16,7 @@ const std::string base_directory = []{
     fn.erase(fn.find_last_of("/"));
     fn.erase(fn.find_last_of("/"));
     fn.erase(fn.find_last_of("/"));
-    return fn + "/node_modules/mapbox-gl-test-suite/";
+    return fn + "/test/suite/";
 }();
 
 namespace mbgl {

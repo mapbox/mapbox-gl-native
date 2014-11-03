@@ -10,7 +10,6 @@
       ],
       'variables': {
         'cflags_cc': [
-          '<@(png_cflags)',
           '<@(uv_cflags)',
           '<@(sqlite3_cflags)',
           '<@(zlib_cflags)',
