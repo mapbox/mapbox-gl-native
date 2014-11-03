@@ -10,14 +10,17 @@
           '<@(png_cflags)',
           '<@(uv_cflags)',
           '<@(curl_cflags)',
+          '<@(nu_cflags)',
         ],
         'cflags': [
           '<@(uv_cflags)',
+          '<@(nu_cflags)',
         ],
         'ldflags': [
           '<@(png_ldflags)',
           '<@(uv_ldflags)',
           '<@(curl_ldflags)',
+          '<@(nu_ldflags)',
         ],
       },
       'sources': [
