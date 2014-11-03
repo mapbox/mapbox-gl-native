@@ -801,8 +801,7 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleLayer> &layer) {
             render.text.letter_spacing *= 24; // em
         }
         parseRenderProperty<TextJustifyTypeClass>(value, render.text.justify, "text-justify");
-        parseRenderProperty<TextHorizontalAlignTypeClass>(value, render.text.horizontal_align, "text-horizontal-align");
-        parseRenderProperty<TextVerticalAlignTypeClass>(value, render.text.vertical_align, "text-vertical-align");
+        parseRenderProperty<TextAnchorTypeClass>(value, render.text.anchor, "text-anchor");
         parseRenderProperty(value, render.text.max_angle, "text-max-angle");
         parseRenderProperty(value, render.text.rotate, "text-rotate");
         parseRenderProperty(value, render.text.slant, "text-slant");

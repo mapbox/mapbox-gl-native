@@ -103,16 +103,24 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
     const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore, sprite);
 
     float horizontalAlign = 0.5;
-    if (properties.text.horizontal_align == TextHorizontalAlignType::Right)
-        horizontalAlign = 1;
-    else if (properties.text.horizontal_align == TextHorizontalAlignType::Left)
-        horizontalAlign = 0;
-
     float verticalAlign = 0.5;
-    if (properties.text.vertical_align == TextVerticalAlignType::Bottom)
-        verticalAlign = 1;
-    else if (properties.text.vertical_align == TextVerticalAlignType::Top)
-        verticalAlign = 0;
+
+    switch (properties.text.anchor) {
+        case TextAnchorType::Center:
+            break;
+        case TextAnchorType::Right:
+            horizontalAlign = 1;
+            break;
+        case TextAnchorType::Left:
+            horizontalAlign = 0;
+            break;
+        case TextAnchorType::Bottom:
+            verticalAlign = 1;
+            break;
+        case TextAnchorType::Top:
+            verticalAlign = 0;
+            break;
+    }
 
     float justify = 0.5;
     if (properties.text.justify == TextJustifyType::Right) justify = 1;

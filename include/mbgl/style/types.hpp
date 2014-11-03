@@ -152,30 +152,20 @@ MBGL_DEFINE_ENUM_CLASS(TextJustifyTypeClass, TextJustifyType, {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class TextHorizontalAlignType : uint8_t {
+enum class TextAnchorType : uint8_t {
+    Center,
     Left,
-    Center,
     Right,
-};
-
-MBGL_DEFINE_ENUM_CLASS(TextHorizontalAlignTypeClass, TextHorizontalAlignType, {
-    { TextHorizontalAlignType::Left, "left" },
-    { TextHorizontalAlignType::Center, "center" },
-    { TextHorizontalAlignType::Right, "right" },
-});
-
-// -------------------------------------------------------------------------------------------------
-
-enum class TextVerticalAlignType : uint8_t {
     Top,
-    Center,
-    Bottom,
+    Bottom
 };
 
-MBGL_DEFINE_ENUM_CLASS(TextVerticalAlignTypeClass, TextVerticalAlignType, {
-    { TextVerticalAlignType::Top, "top" },
-    { TextVerticalAlignType::Center, "center" },
-    { TextVerticalAlignType::Bottom, "bottom" },
+MBGL_DEFINE_ENUM_CLASS(TextAnchorTypeClass, TextAnchorType, {
+    { TextAnchorType::Center, "center" },
+    { TextAnchorType::Left, "left" },
+    { TextAnchorType::Right, "right" },
+    { TextAnchorType::Top, "top" },
+    { TextAnchorType::Bottom, "bottom" },
 });
 
 // -------------------------------------------------------------------------------------------------

@@ -64,8 +64,7 @@ public:
         float line_height = 1.2f * 24 /* em */;
         float letter_spacing = 0.0f * 24 /* em */;
         TextJustifyType justify = TextJustifyType::Center;
-        TextHorizontalAlignType horizontal_align = TextHorizontalAlignType::Center;
-        TextVerticalAlignType vertical_align = TextVerticalAlignType::Center;
+        TextAnchorType anchor = TextAnchorType::Center;
         float max_angle = 45.0f /* degrees */;
         float rotate = 0.0f;
         float slant = 0.0f;
