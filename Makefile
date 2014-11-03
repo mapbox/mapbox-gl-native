@@ -71,15 +71,15 @@ build/linux/mapboxgl-app.xcodeproj: linux/mapboxgl-app.gyp config.gypi
 
 .PHONY: android
 android:
-	export CXX=`MASON_PLATFORM=android ./.mason/mason env CXX` && \
-	export CC=`MASON_PLATFORM=android ./.mason/mason env CC` && \
-	export LD=`MASON_PLATFORM=android ./.mason/mason env LD` && \
-	export AR=`MASON_PLATFORM=android ./.mason/mason env AR` && \
-	export RANLIB=`MASON_PLATFORM=android ./.mason/mason env RANLIB` && \
-	export LDFLAGS=`MASON_PLATFORM=android ./.mason/mason env LDFLAGS` && \
-	export CFLAGS=`MASON_PLATFORM=android ./.mason/mason env CFLAGS` && \
-	export CPPFLAGS=`MASON_PLATFORM=android ./.mason/mason env CPPFLAGS` && \
-	export PATH=`MASON_PLATFORM=android ./.mason/mason env PATH` && \
+	export CXX="`MASON_PLATFORM=android ./.mason/mason env CXX`" && \
+	export CC="`MASON_PLATFORM=android ./.mason/mason env CC`" && \
+	export LD="`MASON_PLATFORM=android ./.mason/mason env LD`" && \
+	export AR="`MASON_PLATFORM=android ./.mason/mason env AR`" && \
+	export RANLIB="`MASON_PLATFORM=android ./.mason/mason env RANLIB`" && \
+	export LDFLAGS="`MASON_PLATFORM=android ./.mason/mason env LDFLAGS` ${LDFLAGS}" && \
+	export CFLAGS="`MASON_PLATFORM=android ./.mason/mason env CFLAGS` ${CFLAGS}" && \
+	export CPPFLAGS="`MASON_PLATFORM=android ./.mason/mason env CPPFLAGS` ${CPPFLAGS}" && \
+	export PATH="`MASON_PLATFORM=android ./.mason/mason env PATH`:${PATH}" && \
 	MASON_PLATFORM=android ./configure config-android.gypi && \
 	deps/run_gyp mapboxgl.gyp -Iconfig-android.gypi -Dplatform=android --depth=. --generator-output=./build/android -f make-android && \
 	$(MAKE) -C ./build/android BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-core
