@@ -52,8 +52,6 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
         return features;
     }
 
-    util::utf8_to_utf32 ucs4conv;
-
     // Determine and load glyph ranges
     std::set<GlyphRange> ranges;
 
@@ -72,7 +70,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
                 u8string = platform::lowercase(u8string);
             }
 
-            ft.label = ucs4conv.convert(u8string);
+            ft.label = util::utf8_to_utf32::convert(u8string);
 
             if (ft.label.size()) {
                 // Loop through all characters of this text and collect unique codepoints.

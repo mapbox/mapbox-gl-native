@@ -11,8 +11,7 @@ namespace util {
 
 class utf8_to_utf32 {
  public:
-    explicit utf8_to_utf32() {}
-    std::u32string convert(std::string const& utf8)
+    static std::u32string convert(std::string const& utf8)
     {
         boost::u8_to_u32_iterator<std::string::const_iterator> begin(utf8.begin());
         boost::u8_to_u32_iterator<std::string::const_iterator> end(utf8.end());
