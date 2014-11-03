@@ -49,12 +49,8 @@ void PrerenderedTexture::bindFramebuffer() {
         // Create depth/stencil buffer
         glGenRenderbuffers(1, &fbo_depth_stencil);
         glBindRenderbuffer(GL_RENDERBUFFER, fbo_depth_stencil);
-#ifdef GL_ES_VERSION_2_0
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, properties.size, properties.size);
-#else
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, properties.size, properties.size);
-#endif
-       glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
     }
 
     if (fbo == 0) {
@@ -121,7 +117,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
     for (int i = 0; i < passes; i++) {
         // Render horizontal
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, secondary_texture, 0);
-#if GL_EXT_discard_framebuffer && !__ANDROID__
+#if GL_EXT_discard_framebuffer
         const GLenum discards[] = { GL_COLOR_ATTACHMENT0 };
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
 #endif
@@ -136,7 +132,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
 
         // Render vertical
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, original_texture, 0);
-#if GL_EXT_discard_framebuffer && !__ANDROID__
+#if GL_EXT_discard_framebuffer
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
 #endif
         glClear(GL_COLOR_BUFFER_BIT);

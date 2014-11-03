@@ -10,7 +10,7 @@ void Painter::preparePrerender(RasterBucket &bucket) {
     glDisable(GL_STENCIL_TEST);
 
 // Render the actual tile.
-#if GL_EXT_discard_framebuffer && !__ANDROID__
+#if GL_EXT_discard_framebuffer
     const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
     glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
 #endif

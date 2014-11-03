@@ -36,8 +36,10 @@
         #error Unsupported Apple platform
     #endif
 #elif __ANDROID__
+    #define GL_GLEXT_PROTOTYPES
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>
+    #define GL_DEPTH24_STENCIL8 GL_DEPTH24_STENCIL8_OES
 #else
     #define GL_GLEXT_PROTOTYPES
     #include <GL/gl.h>
