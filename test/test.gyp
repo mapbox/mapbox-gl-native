@@ -60,7 +60,7 @@
         '../mapboxgl.gyp:mbgl-standalone',
       ],
       'conditions': [
-        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)'] }
         }, {
           'libraries': [ '<@(ldflags)' ],
         }]
@@ -188,7 +188,25 @@
         '<(platform_library)',
       ]
     },
-
+    { 'target_name': 'text_conversions',
+      'product_name': 'test_text_conversions',
+      'type': 'executable',
+      'sources': [
+        './main.cpp',
+        './text_conversions.cpp',
+      ],
+      'dependencies': [
+        '../deps/gtest/gtest.gyp:gtest',
+        '../mapboxgl.gyp:mbgl-standalone',
+        '<(platform_library)',
+      ],
+      'conditions': [
+        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)', '-framework Foundation' ] }
+        }, {
+          'libraries': [ '<@(ldflags)'],
+        }]
+      ]
+    },
     # Build all targets
     { 'target_name': 'test',
       'type': 'none',
@@ -202,6 +220,7 @@
         'headless',
         'style_parser',
         'comparisons',
+        'text_conversions',
       ],
     }
   ]
