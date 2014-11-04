@@ -76,6 +76,11 @@ TEST_P(HeadlessTest, render) {
     std::string style = util::read_file(base_directory + "tests/" + base + "/style.json");
     std::string info = util::read_file(base_directory + "tests/" + base + "/info.json");
 
+    std::size_t pos = 0;
+    while ((pos = style.find("local://", pos)) != std::string::npos) {
+        style.replace(pos, 8, "http://localhost:2900/");
+    }
+
     // Parse style.
     rapidjson::Document styleDoc;
     styleDoc.Parse<0>((const char *const)style.c_str());
