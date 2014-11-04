@@ -162,9 +162,7 @@
       'product_name': 'test_headless',
       'type': 'executable',
       'sources': [
-        './main.cpp',
         './headless.cpp',
-        './fixtures/fixture_request.cpp',
         './fixtures/fixture_log.cpp',
       ],
       'conditions': [

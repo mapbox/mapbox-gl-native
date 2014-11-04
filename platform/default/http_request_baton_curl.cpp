@@ -2,6 +2,7 @@
 #include <mbgl/util/uv-messenger.h>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/time.hpp>
 
 #include <uv.h>
 #include <curl/curl.h>
@@ -9,8 +10,6 @@
 #include <queue>
 #include <cassert>
 #include <cstring>
-#include <ctime>
-#include <xlocale.h>
 
 // This file contains code from http://curl.haxx.se/libcurl/c/multi-uv.html:
 
@@ -369,9 +368,6 @@ void start_request(void *const ptr) {
     util::ptr<HTTPRequestBaton> &baton = *baton_guard.get();
     assert(baton);
 
-    // Create a C locale
-    static locale_t locale = newlocale(LC_ALL_MASK, nullptr, nullptr);
-
     CURL *handle = nullptr;
     if (!handles.empty()) {
         handle = handles.front();
@@ -390,11 +386,9 @@ void start_request(void *const ptr) {
             const std::string header = std::string("If-None-Match: ") + baton->response->etag;
             context->headers = curl_slist_append(context->headers, header.c_str());
         } else if (baton->response->modified) {
-            const time_t modified = baton->response->modified;
-            struct tm *timeinfo = std::gmtime(&modified);
-            char buffer[64];
-            strftime_l(buffer, 64, "If-Modified-Since: %a, %d %b %Y %H:%M:%S GMT", timeinfo, locale);
-            context->headers = curl_slist_append(context->headers, buffer);
+            const std::string time = std::string("If-Modified-Since: ") +
+                util::rfc1123(baton->response->modified);
+            context->headers = curl_slist_append(context->headers, time.c_str());
         }
     }
 
