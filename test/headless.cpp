@@ -15,22 +15,58 @@
 #include "./fixtures/fixture_log.hpp"
 
 #include <dirent.h>
+#include <signal.h>
+#include <libgen.h>
 
-const std::string base_directory = []{
-    std::string fn = __FILE__;
-    fn.erase(fn.find_last_of("/"));
-    fn.erase(fn.find_last_of("/"));
-    return fn + "/test/suite/";
-}();
+std::string base_directory;
 
-auto display_ = std::make_shared<mbgl::HeadlessDisplay>();
+
+class ServerEnvironment : public ::testing::Environment {
+public:
+    virtual void SetUp() {
+        pid = fork();
+        if (pid < 0) {
+            throw std::runtime_error("Cannot create web server");
+        } else if (pid == 0) {
+            int ret = execve((base_directory + "bin/server.py").c_str(), nullptr, nullptr);
+            // This call should not return. In case execve failed, we exit anyway.
+            if (ret < 0) {
+                fprintf(stderr, "Failed to start server: %s\n", strerror(errno));
+            }
+            exit(0);
+        } else {
+            display = std::make_shared<mbgl::HeadlessDisplay>();
+        }
+    }
+    virtual void TearDown() {
+        ASSERT_TRUE(pid);
+        kill(pid, SIGHUP);
+    }
+
+    std::shared_ptr<mbgl::HeadlessDisplay> display;
+
+private:
+    pid_t pid = 0;
+};
+
+
+ServerEnvironment* env = nullptr;
+
+
+GTEST_API_ int main(int argc, char *argv[]) {
+    base_directory = std::string(dirname(argv[0])) + "/" + dirname(const_cast<char *>(__FILE__)) + "/suite/";
+    testing::InitGoogleTest(&argc, argv);
+    env = new ServerEnvironment();
+    ::testing::AddGlobalTestEnvironment(env);
+    return RUN_ALL_TESTS();
+}
 
 class HeadlessTest : public ::testing::TestWithParam<std::string> {};
 
 TEST_P(HeadlessTest, render) {
     using namespace mbgl;
 
-    const std::string &base = GetParam();
+    const std::string& base = GetParam();
 
     std::string style = util::read_file(base_directory + "tests/" + base + "/style.json");
     std::string info = util::read_file(base_directory + "tests/" + base + "/info.json");
@@ -55,8 +91,10 @@ TEST_P(HeadlessTest, render) {
     Log::Set<FixtureLogBackend>();
 
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
-        const std::string name { it->name.GetString(), it->name.GetStringLength() };
-        const rapidjson::Value &value = it->value;
+        const std::string name {
+            it->name.GetString(), it->name.GetStringLength()
+        };
+        const rapidjson::Value& value = it->value;
         ASSERT_TRUE(value.IsObject());
         if (value.HasMember("center")) ASSERT_TRUE(value["center"].IsArray());
 
@@ -72,16 +110,16 @@ TEST_P(HeadlessTest, render) {
 
         std::vector<std::string> classes;
         if (value.HasMember("classes")) {
-            const rapidjson::Value &js_classes = value["classes"];
+            const rapidjson::Value& js_classes = value["classes"];
             ASSERT_TRUE(js_classes.IsArray());
             for (rapidjson::SizeType i = 0; i < js_classes.Size(); i++) {
-                const rapidjson::Value &js_class = js_classes[i];
+                const rapidjson::Value& js_class = js_classes[i];
                 ASSERT_TRUE(js_class.IsString());
                 classes.push_back({ js_class.GetString(), js_class.GetStringLength() });
             }
         }
 
-        HeadlessView view(display_);
+        HeadlessView view(env->display);
         Map map(view);
 
         map.setStyleJSON(style, base_directory);
