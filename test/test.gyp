@@ -42,7 +42,7 @@
         '../mapboxgl.gyp:mbgl-standalone',
       ],
       'conditions': [
-        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)'] }
         }, {
           'libraries': [ '<@(ldflags)' ],
         }]
