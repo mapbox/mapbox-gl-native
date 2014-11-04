@@ -106,18 +106,35 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
     float verticalAlign = 0.5;
 
     switch (properties.text.anchor) {
+        case TextAnchorType::Top:
+        case TextAnchorType::Bottom:
         case TextAnchorType::Center:
             break;
         case TextAnchorType::Right:
+        case TextAnchorType::TopRight:
+        case TextAnchorType::BottomRight:
             horizontalAlign = 1;
             break;
         case TextAnchorType::Left:
+        case TextAnchorType::TopLeft:
+        case TextAnchorType::BottomLeft:
             horizontalAlign = 0;
             break;
+    }
+
+    switch (properties.text.anchor) {
+        case TextAnchorType::Left:
+        case TextAnchorType::Right:
+        case TextAnchorType::Center:
+            break;
         case TextAnchorType::Bottom:
+        case TextAnchorType::BottomLeft:
+        case TextAnchorType::BottomRight:
             verticalAlign = 1;
             break;
         case TextAnchorType::Top:
+        case TextAnchorType::TopLeft:
+        case TextAnchorType::TopRight:
             verticalAlign = 0;
             break;
     }

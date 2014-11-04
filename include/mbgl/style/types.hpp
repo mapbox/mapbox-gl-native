@@ -157,7 +157,11 @@ enum class TextAnchorType : uint8_t {
     Left,
     Right,
     Top,
-    Bottom
+    Bottom,
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight
 };
 
 MBGL_DEFINE_ENUM_CLASS(TextAnchorTypeClass, TextAnchorType, {
@@ -166,6 +170,10 @@ MBGL_DEFINE_ENUM_CLASS(TextAnchorTypeClass, TextAnchorType, {
     { TextAnchorType::Right, "right" },
     { TextAnchorType::Top, "top" },
     { TextAnchorType::Bottom, "bottom" },
+    { TextAnchorType::TopLeft, "top-left" },
+    { TextAnchorType::TopRight, "top-right" },
+    { TextAnchorType::BottomLeft, "bottom-left" },
+    { TextAnchorType::BottomRight, "bottom-right" }
 });
 
 // -------------------------------------------------------------------------------------------------
