@@ -55,7 +55,11 @@ ServerEnvironment* env = nullptr;
 
 
 GTEST_API_ int main(int argc, char *argv[]) {
-    base_directory = std::string(dirname(argv[0])) + "/" + dirname(const_cast<char *>(__FILE__)) + "/suite/";
+    // Note: glibc's dirname() **modifies** the argument and can't handle static strings.
+    std::string argv0 { argv[0] }; argv0 = dirname(const_cast<char *>(argv0.c_str()));
+    std::string file { __FILE__ }; file = dirname(const_cast<char *>(file.c_str()));
+    base_directory = argv0 + "/" + file + "/suite/";
+
     testing::InitGoogleTest(&argc, argv);
     env = new ServerEnvironment();
     ::testing::AddGlobalTestEnvironment(env);
