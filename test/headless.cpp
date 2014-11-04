@@ -28,7 +28,7 @@ public:
         if (pid < 0) {
             throw std::runtime_error("Cannot create web server");
         } else if (pid == 0) {
-            int ret = execve((base_directory + "bin/server.py").c_str(), nullptr, nullptr);
+            int ret = execve((base_directory + "bin/server.py").c_str(), { nullptr }, { nullptr });
             // This call should not return. In case execve failed, we exit anyway.
             if (ret < 0) {
                 fprintf(stderr, "Failed to start server: %s\n", strerror(errno));
