@@ -28,7 +28,7 @@ case ${MASON_PLATFORM} in
         SQLITE_VERSION=3.8.6
         LIBUV_VERSION=0.11.29
         ZLIB_VERSION=system
-        BOOST_VERSION=system
+        BOOST_VERSION=1.57.0
         NUNICODE_VERSION=1.4
         ;;
     *)
