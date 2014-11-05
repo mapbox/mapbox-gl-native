@@ -30,6 +30,18 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
     echo "debug: unpacking JDK"
     #mapbox_time "unpacking JDK" \
     tar -xzf ./jdk-7u71-linux-x64.tar.gz
+
+    echo "debug: fetching SDK"
+    #mapbox_time "fetching SDK" \
+    wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
+
+    echo "debug: unpacking SDK"
+    #mapbox_time "unpacking SDK" \
+    tar -xzf ./android-sdk_r23.0.2-linux.tgz
+
+    echo "debug: installing SDK"
+    #mapbox_time "installing SDK" \
+    echo y | ./android-sdk-linux/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.0,android-19
 fi
 
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
