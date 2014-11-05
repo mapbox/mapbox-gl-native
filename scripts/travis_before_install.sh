@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+#set -e
 set -o pipefail
 
 if [[ "${MASON_PLATFORM}" == "android" ]]; then
