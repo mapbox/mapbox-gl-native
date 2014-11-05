@@ -86,7 +86,7 @@ void rewriteLocalScheme(rapidjson::Value &value, rapidjson::Document::AllocatorT
     ASSERT_TRUE(value.IsString());
     auto string = std::string { value.GetString(),value.GetStringLength() };
     if (string.compare(0, 8, "local://") == 0) {
-        string.replace(0, 8, "http://localhost:2900/");
+        string.replace(0, 8, "http://127.0.0.1:2900/");
         value.SetString(string.data(), string.size(), allocator);
     }
 }
@@ -107,7 +107,7 @@ TEST_P(HeadlessTest, render) {
     ASSERT_FALSE(styleDoc.HasParseError());
     ASSERT_TRUE(styleDoc.IsObject());
 
-    // Rewrite "local://" to "http://localhost:2900/".
+    // Rewrite "local://" to "http://127.0.0.1:2900/".
     if (styleDoc.HasMember("sprite")) {
         rewriteLocalScheme(styleDoc["sprite"], styleDoc.GetAllocator());
     }
