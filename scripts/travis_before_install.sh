@@ -43,7 +43,7 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
     #mapbox_time "installing SDK" \
     echo y | ./android-sdk-linux/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.0,android-19
 
-    find android-sdk-linux/
+    find find $PWD/android-sdk-linux/
 fi
 
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
