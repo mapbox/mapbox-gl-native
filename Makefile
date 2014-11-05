@@ -55,7 +55,7 @@ build/macosx/Makefile: macosx/mapboxgl-app.gyp config.gypi
 
 .PHONY: build/test/test.xcodeproj
 build/test/test.xcodeproj: test/test.gyp config.gypi
-	deps/run_gyp test/test.gyp -Iconfig.gypi -Dplatform=osx --depth=. -Goutput_dir=.. --generator-output=./build -f xcode
+	deps/run_gyp test/test.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build -f xcode
 
 .PHONY: build/macosx/mapboxgl-app.xcodeproj
 build/macosx/mapboxgl-app.xcodeproj: macosx/mapboxgl-app.gyp config.gypi
