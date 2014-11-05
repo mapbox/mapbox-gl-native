@@ -42,3 +42,25 @@ std::string mbgl::toString(const mbgl::Value& value) {
     else if (value.is<double>()) return boost::lexical_cast<std::string>(value.get<double>());
     else return "null";
 }
+
+mbgl::Value mbgl::parseValue(const rapidjson::Value& value) {
+    switch (value.GetType()) {
+        case rapidjson::kNullType:
+        case rapidjson::kFalseType:
+            return false;
+
+        case rapidjson::kTrueType:
+            return true;
+
+        case rapidjson::kStringType:
+            return std::string { value.GetString(), value.GetStringLength() };
+
+        case rapidjson::kNumberType:
+            if (value.IsUint64()) return value.GetUint64();
+            if (value.IsInt64()) return value.GetInt64();
+            return value.GetDouble();
+
+        default:
+            return false;
+    }
+}

@@ -183,7 +183,7 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const times
     applyTransitionedStyleProperty(PropertyKey::LineTranslateY, line.translate[1], z, now);
     applyStyleProperty(PropertyKey::LineTranslateAnchor, line.translateAnchor, z, now);
     applyTransitionedStyleProperty(PropertyKey::LineWidth, line.width, z, now);
-    applyTransitionedStyleProperty(PropertyKey::LineOffset, line.offset, z, now);
+    applyTransitionedStyleProperty(PropertyKey::LineGapWidth, line.gap_width, z, now);
     applyTransitionedStyleProperty(PropertyKey::LineBlur, line.blur, z, now);
     applyTransitionedStyleProperty(PropertyKey::LineDashLand, line.dash_array[0], z, now);
     applyTransitionedStyleProperty(PropertyKey::LineDashGap, line.dash_array[1], z, now);

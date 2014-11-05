@@ -15,35 +15,35 @@ template <typename Operator>
 struct relaxed_operator_visitor {
     typedef bool result_type;
 
-    inline bool operator()(bool lhs, bool rhs) const { return Operator()(lhs, rhs); }
+    template <typename T0, typename T1>
+    inline bool operator()(T0, T1) const { return false; }
 
-    template <typename T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
-    inline bool operator()(bool lhs, T rhs) const { return Operator()(T(lhs), rhs); }
-
-    template <typename T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
-    inline bool operator()(T lhs, bool rhs) const { return Operator()(lhs, T(rhs)); }
+    template <typename T>
+    inline bool operator()(T lhs, T rhs) const { return Operator()(lhs, rhs); }
 
     inline bool operator()(int64_t lhs, uint64_t rhs) const {
-        return lhs < 0 ? false : Operator()(uint64_t(lhs), rhs);
+        return Operator()(double(lhs), double(rhs));
     }
+
+    inline bool operator()(int64_t lhs, double rhs) const {
+        return Operator()(double(lhs), rhs);
+    }
+
     inline bool operator()(uint64_t lhs, int64_t rhs) const {
-        return rhs < 0 ? false : Operator()(lhs, uint64_t(rhs));
+        return Operator()(double(lhs), double(rhs));
     }
 
-    template <typename T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
-    inline bool operator()(const std::string &lhs, T rhs) const {
-        double value;
-        return parseNumericString(lhs, value) ? Operator()(value, double(rhs)) : false;
+    inline bool operator()(uint64_t lhs, double rhs) const {
+        return Operator()(double(lhs), rhs);
     }
 
-    template <typename T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
-    inline bool operator()(T lhs, const std::string &rhs) const {
-        double value;
-        return parseNumericString(rhs, value) ? Operator()(double(lhs), value) : false;
+    inline bool operator()(double lhs, uint64_t rhs) const {
+        return Operator()(lhs, double(rhs));
     }
 
-    template <typename T0, typename T1>
-    inline bool operator()(T0 lhs, T1 rhs) const { return Operator()(lhs, rhs); }
+    inline bool operator()(double lhs, int64_t rhs) const {
+        return Operator()(lhs, double(rhs));
+    }
 };
 
 struct relaxed_equal_operator {

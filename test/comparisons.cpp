@@ -1,306 +1,103 @@
 #include <iostream>
 #include "gtest/gtest.h"
 
-#include <mbgl/style/filter_comparison_private.hpp>
+#include <mbgl/map/vector_tile.hpp>
+#include <mbgl/style/filter_expression.hpp>
 #include <mbgl/style/filter_expression_private.hpp>
 
 #include <map>
 
+using namespace mbgl;
 
+typedef std::multimap<std::string, mbgl::Value> Properties;
 
-class MockExtractor {
+class Extractor {
 public:
-    inline MockExtractor(const std::multimap<std::string, mbgl::Value> &values_) : values(values_) {}
-    inline MockExtractor() {}
+    inline Extractor(const Properties& properties_, FeatureType type_)
+        : properties(properties_)
+        , type(type_)
+    {}
 
-    inline std::vector<mbgl::Value> getValues(const std::string &key) const {
-        std::vector<mbgl::Value> result;
-        // Find all values with the requested key.
-        const auto ret = values.equal_range(key);
-        for (auto it = ret.first; it != ret.second; it++) {
-            // Append the newly found value to the forward list.
-            result.emplace_back(it->second);
-        }
-        return result;
+    mapbox::util::optional<Value> getValue(const std::string &key) const {
+        if (key == "$type")
+            return Value(uint64_t(type));
+        auto it = properties.find(key);
+        if (it == properties.end())
+            return mapbox::util::optional<Value>();
+        return it->second;
+    }
+
+    FeatureType getType() const {
+        return type;
     }
 
 private:
-    const std::multimap<std::string, mbgl::Value> values;
+    const Properties properties;
+    FeatureType type;
 };
 
-
-TEST(FilterComparison, EqualsSingleStringValue) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { std::string("bar") });
-    // comparison is { "test": { "==": "bar" } }
-
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("bar") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("bar") }, { "test", std::string("bar") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("bar") }, { "test", std::string("booz") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "other", std::string("bar") }, { "test", std::string("bar") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "other", std::string("bar") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor()));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("barst") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", int64_t(-18932) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", uint64_t(18932) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", double(32.8) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", bool(false) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", bool(true) }})));
+FilterExpression parse(const char * expression) {
+    rapidjson::Document doc;
+    doc.Parse<0>(expression);
+    return parseFilterExpression(doc);
 }
 
-
-TEST(FilterComparison, EqualsSingleDoubleValue) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { double(32.8) });
-    // comparison is { "test": { "==": 32.8 } }
-
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", double(32.8) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("32.8") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "other", std::string("bar") }, { "test", double(32.8) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", double(32.8) }, { "test", std::string("booz") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "other", double(32.8) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor()));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", double(32.9) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", int64_t(-18932) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", uint64_t(18932) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", bool(false) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", bool(true) }})));
+bool evaluate(const FilterExpression& expression, const Properties& properties, FeatureType type = FeatureType::Unknown) {
+    return mbgl::evaluate(expression, Extractor(properties, type));
 }
 
-TEST(FilterComparison, EqualsSingleUintValue) {
-    using namespace mbgl;
+TEST(FilterComparison, EqualsString) {
+    FilterExpression f = parse("[\"==\", \"foo\", \"bar\"]");
+    ASSERT_TRUE(evaluate(f, {{ "foo", std::string("bar") }}));
+    ASSERT_FALSE(evaluate(f, {{ "foo", std::string("baz") }}));
+};
 
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { uint64_t(42) });
-    // comparison is { "test": { "==": 42 } }
-
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", uint64_t(42) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", double(42) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", int64_t(42) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("42") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "other", std::string("bar") }, { "test", uint64_t(42) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", uint64_t(42) }, { "test", std::string("booz") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "other", uint64_t(42) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor()));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", double(43) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", int64_t(-18932) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", uint64_t(18932) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", bool(false) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", bool(true) }})));
+TEST(FilterComparison, EqualsNumber) {
+    FilterExpression f = parse("[\"==\", \"foo\", 0]");
+    ASSERT_TRUE(evaluate(f, {{ "foo", int64_t(0) }}));
+    ASSERT_TRUE(evaluate(f, {{ "foo", uint64_t(0) }}));
+    ASSERT_TRUE(evaluate(f, {{ "foo", double(0) }}));
+    ASSERT_FALSE(evaluate(f, {{ "foo", int64_t(1) }}));
+    ASSERT_FALSE(evaluate(f, {{ "foo", uint64_t(1) }}));
+    ASSERT_FALSE(evaluate(f, {{ "foo", double(1) }}));
+    ASSERT_FALSE(evaluate(f, {{ "foo", std::string("0") }}));
+    ASSERT_FALSE(evaluate(f, {{ "foo", false }}));
+    ASSERT_FALSE(evaluate(f, {{ "foo", true }}));
+    ASSERT_FALSE(evaluate(f, {{}}));
 }
 
-TEST(FilterComparison, EqualsSingleIntValue) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { int64_t(-42) });
-    // comparison is { "test": { "==": -42 } }
-
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", int64_t(-42) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", double(-42) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("-42") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "other", std::string("bar") }, { "test", int64_t(-42) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", int64_t(-42) }, { "test", std::string("booz") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "other", int64_t(-42) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor()));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", int64_t(-43) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", double(-43) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", uint64_t(-42) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", bool(false) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", bool(true) }})));
+TEST(FilterComparison, EqualsType) {
+    FilterExpression f = parse("[\"==\", \"$type\", \"LineString\"]");
+    ASSERT_FALSE(evaluate(f, {{}}, FeatureType::Point));
+    ASSERT_TRUE(evaluate(f, {{}}, FeatureType::LineString));
 }
 
-TEST(FilterComparison, EqualsSingleBoolValue) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { bool(true) });
-    // comparison is { "test": { "==": true } }
-
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", bool(true) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", int64_t(1) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", uint64_t(1) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", double(1) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("1") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "other", std::string("bar") }, { "test", bool(true) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", bool(true) }, { "test", std::string("booz") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "other", bool(true) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor()));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", bool(false) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", int64_t(-18932) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", uint64_t(18932) }})));
+TEST(FilterComparison, Any) {
+    ASSERT_FALSE(evaluate(parse("[\"any\"]"), {{}}));
+    ASSERT_TRUE(evaluate(parse("[\"any\", [\"==\", \"foo\", 1]]"),
+                         {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(evaluate(parse("[\"any\", [\"==\", \"foo\", 0]]"),
+                          {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_TRUE(evaluate(parse("[\"any\", [\"==\", \"foo\", 0], [\"==\", \"foo\", 1]]"),
+                         {{ std::string("foo"), int64_t(1) }}));
 }
 
-
-
-TEST(FilterComparison, EqualsMultipleStringValues) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { std::string("bar"), std::string("baz") });
-    // comparison is { "test": { "==": ["bar", "baz"]̇ } }
-
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("bar") }, { "test", std::string("baz") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("baz") }, { "test", std::string("bar") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("bar") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("baz") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("bar") }, { "test", std::string("baz") }, { "test", std::string("boo") }})));
+TEST(FilterComparison, All) {
+    ASSERT_TRUE(evaluate(parse("[\"all\"]"), {{}}));
+    ASSERT_TRUE(evaluate(parse("[\"all\", [\"==\", \"foo\", 1]]"),
+                         {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(evaluate(parse("[\"all\", [\"==\", \"foo\", 0]]"),
+                          {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(evaluate(parse("[\"all\", [\"==\", \"foo\", 0], [\"==\", \"foo\", 1]]"),
+                          {{ std::string("foo"), int64_t(1) }}));
 }
 
-TEST(FilterComparison, EqualsMultipleIdenticalStringValues) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::Equal, std::vector<Value> { std::string("bar"), std::string("bar") });
-    // comparison is { "test": { "==": ["bar", "bar"]̇ } }
-
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("bar") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("bar") }, { "test", std::string("bar") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("baz") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("bar") }, { "test", std::string("baz") }})));
-}
-
-
-
-TEST(FilterComparison, NotEqualsSingleStringValue) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { std::string("bar") });
-    // comparison is { "test": { "!=": "bar" } }
-
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("bar") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("bar") }, { "test", std::string("bar") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "other", std::string("bar") }, { "test", std::string("bar") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("bar") }, { "test", std::string("booz") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "other", std::string("bar") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor()));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("barst") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", int64_t(-18932) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", uint64_t(18932) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", double(32.8) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", bool(false) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", bool(true) }})));
-}
-
-
-TEST(FilterComparison, NotEqualsSingleDoubleValue) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { double(32.8) });
-    // comparison is { "test": { "!=": 32.8 } }
-
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", double(32.8) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("32.8") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "other", std::string("bar") }, { "test", double(32.8) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", double(32.8) }, { "test", std::string("booz") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "other", double(32.8) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor()));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", double(32.9) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", int64_t(-18932) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", uint64_t(18932) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", bool(false) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", bool(true) }})));
-}
-
-TEST(FilterComparison, NotEqualsSingleUintValue) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { uint64_t(42) });
-    // comparison is { "test": { "!=": 42 } }
-
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", uint64_t(42) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", double(42) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", int64_t(42) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("42") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "other", std::string("bar") }, { "test", uint64_t(42) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", uint64_t(42) }, { "test", std::string("booz") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "other", uint64_t(42) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor()));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", double(43) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", int64_t(-18932) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", uint64_t(18932) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", bool(false) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", bool(true) }})));
-}
-
-
-TEST(FilterComparison, NotEqualsSingleIntValue) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { int64_t(-42) });
-    // comparison is { "test": { "!=": -42 } }
-
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", int64_t(-42) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", double(-42) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("-42") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "other", std::string("bar") }, { "test", int64_t(-42) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", int64_t(-42) }, { "test", std::string("booz") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "other", int64_t(-42) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor()));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", int64_t(-43) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", double(-43) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", uint64_t(-42) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", bool(false) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", bool(true) }})));
-}
-
-
-TEST(FilterComparison, NotEqualsSingleBoolValue) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { bool(true) });
-    // comparison is { "test": { "!=": true } }
-
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", bool(true) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", int64_t(1) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", uint64_t(1) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", double(1) }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("1") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "other", std::string("bar") }, { "test", bool(true) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", bool(true) }, { "test", std::string("booz") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "other", bool(true) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor()));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", bool(false) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", int64_t(-18932) }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", uint64_t(18932) }})));
-}
-
-
-
-TEST(FilterComparison, NotEqualsMultipleStringValues) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { std::string("bar"), std::string("baz") });
-    // comparison is { "test": { "!=": ["bar", "baz"]̇ } }
-
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("bar") }, { "test", std::string("baz") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("baz") }, { "test", std::string("bar") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("bar") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("baz") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("bar") }, { "test", std::string("baz") }, { "test", std::string("boo") }})));
-}
-
-
-
-TEST(FilterComparison, NotEqualsMultipleIdenticalStringValues) {
-    using namespace mbgl;
-
-    FilterComparison comparison("test");
-    comparison.add(FilterComparison::Operator::NotEqual, std::vector<Value> { std::string("bar"), std::string("bar") });
-    // comparison is { "test": { "!=": ["bar", "bar"]̇ } }
-
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("bar") }})));
-    ASSERT_FALSE(comparison.compare(MockExtractor({{ "test", std::string("bar") }, { "test", std::string("bar") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("baz") }})));
-    ASSERT_TRUE(comparison.compare(MockExtractor({{ "test", std::string("bar") }, { "test", std::string("baz") }})));
+TEST(FilterComparison, None) {
+    ASSERT_TRUE(evaluate(parse("[\"none\"]"), {{}}));
+    ASSERT_FALSE(evaluate(parse("[\"none\", [\"==\", \"foo\", 1]]"),
+                          {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_TRUE(evaluate(parse("[\"none\", [\"==\", \"foo\", 0]]"),
+                         {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(evaluate(parse("[\"none\", [\"==\", \"foo\", 0], [\"==\", \"foo\", 1]]"),
+                          {{ std::string("foo"), int64_t(1) }}));
 }

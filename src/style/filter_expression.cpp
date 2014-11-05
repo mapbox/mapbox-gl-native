@@ -1,66 +1,123 @@
-#include <mbgl/style/filter_expression_private.hpp>
 #include <mbgl/map/vector_tile.hpp>
-
-#include <mbgl/style/value_comparison.hpp>
-
-#include <ostream>
+#include <mbgl/platform/log.hpp>
 
 namespace mbgl {
 
-std::ostream& operator <<(std::ostream &s, FilterExpression::Operator op) {
-    switch (op) {
-        case FilterExpression::Operator::And: s << "AND"; break;
-        case FilterExpression::Operator::Or: s << "OR"; break;
-        case FilterExpression::Operator::Xor: s << "XOR"; break;
-        case FilterExpression::Operator::Nor: s << "NOR"; break;
+Value parseFeatureType(const Value& value) {
+    if (value == std::string("Point")) {
+        return Value(uint64_t(FeatureType::Point));
+    } else if (value == std::string("LineString")) {
+        return Value(uint64_t(FeatureType::LineString));
+    } else if (value == std::string("Polygon")) {
+        return Value(uint64_t(FeatureType::Polygon));
+    } else {
+        Log::Warning(Event::ParseStyle, "value for $type filter must be Point, LineString, or Polygon");
+        return Value(uint64_t(FeatureType::Unknown));
     }
-    return s;
 }
 
+template <class Expression>
+FilterExpression parseBinaryFilter(const rapidjson::Value& value) {
+    FilterExpression empty;
 
-std::ostream& operator <<(std::ostream &s, FilterExpression::GeometryType type) {
-    switch (type) {
-        case FilterExpression::GeometryType::Point: s << "Point"; break;
-        case FilterExpression::GeometryType::LineString: s << "LineString"; break;
-        case FilterExpression::GeometryType::Polygon: s << "Polygon"; break;
-        case FilterExpression::GeometryType::Any: s << "<Any>"; break;
+    if (value.Size() < 3) {
+        Log::Warning(Event::ParseStyle, "filter expression must have 3 elements");
+        return empty;
     }
-    return s;
-}
 
-bool FilterExpression::empty() const {
-    return type == GeometryType::Any && comparisons.empty() && expressions.empty();
-}
-
-void FilterExpression::add(const FilterComparison &comparison) {
-    comparisons.emplace_back(comparison);
-}
-
-void FilterExpression::add(const FilterExpression &expression) {
-    expressions.emplace_back(expression);
-}
-
-void FilterExpression::setGeometryType(GeometryType g) {
-    type = g;
-}
-
-FilterExpression::GeometryType parseGeometryType(const std::string &geometry) {
-    if (geometry == "Point") return FilterExpression::GeometryType::Point;
-    if (geometry == "LineString") return FilterExpression::GeometryType::LineString;
-    if (geometry == "Polygon") return FilterExpression::GeometryType::Polygon;
-    return FilterExpression::GeometryType::Any;
-}
-
-std::ostream& operator <<(std::ostream &s, const FilterExpression &expression) {
-    s << "expression " << expression.op << std::endl;
-    s << " - $type = " << expression.type << std::endl;
-    for (const FilterComparison &comparison : expression.comparisons) {
-        s << comparison;
+    if (!value[1u].IsString()) {
+        Log::Warning(Event::ParseStyle, "filter expression key must be a string");
+        return empty;
     }
-    s << "end expression" << std::endl;
-    return s;
+
+    Expression expression;
+    expression.key = { value[1u].GetString(), value[1u].GetStringLength() };
+    expression.value = parseValue(value[2u]);
+
+    if (expression.key == "$type") {
+        expression.value = parseFeatureType(expression.value);
+    }
+
+    return expression;
 }
 
-template bool FilterExpression::compare(const VectorTileTagExtractor &extractor) const;
+template <class Expression>
+FilterExpression parseSetFilter(const rapidjson::Value& value) {
+    FilterExpression empty;
+
+    if (value.Size() < 2) {
+        Log::Warning(Event::ParseStyle, "filter expression must at least 2 elements");
+        return empty;
+    }
+
+    if (!value[1u].IsString()) {
+        Log::Warning(Event::ParseStyle, "filter expression key must be a string");
+        return empty;
+    }
+
+    Expression expression;
+    expression.key = { value[1u].GetString(), value[1u].GetStringLength() };
+    for (rapidjson::SizeType i = 2; i < value.Size(); ++i) {
+        expression.values.push_back(parseValue(value[i]));
+    }
+    return expression;
+}
+
+template <class Expression>
+FilterExpression parseCompoundFilter(const rapidjson::Value& value) {
+    Expression expression;
+    for (rapidjson::SizeType i = 1; i < value.Size(); ++i) {
+        expression.expressions.push_back(parseFilterExpression(value[i]));
+    }
+    return expression;
+}
+
+FilterExpression parseFilterExpression(const rapidjson::Value& value) {
+    FilterExpression empty;
+
+    if (!value.IsArray()) {
+        Log::Warning(Event::ParseStyle, "filter expression must be an array");
+        return empty;
+    }
+
+    if (value.Size() < 1) {
+        Log::Warning(Event::ParseStyle, "filter expression must have at least 1 element");
+        return empty;
+    }
+
+    if (!value[0u].IsString()) {
+        Log::Warning(Event::ParseStyle, "filter operator must be a string");
+        return empty;
+    }
+
+    std::string op = { value[0u].GetString(), value[0u].GetStringLength() };
+
+    if (op == "==") {
+        return parseBinaryFilter<EqualsExpression>(value);
+    } else if (op == "!=") {
+        return parseBinaryFilter<NotEqualsExpression>(value);
+    } else if (op == ">") {
+        return parseBinaryFilter<GreaterThanExpression>(value);
+    } else if (op == ">=") {
+        return parseBinaryFilter<GreaterThanEqualsExpression>(value);
+    } else if (op == "<") {
+        return parseBinaryFilter<LessThanExpression>(value);
+    } else if (op == "<=") {
+        return parseBinaryFilter<LessThanEqualsExpression>(value);
+    } else if (op == "in") {
+        return parseSetFilter<InExpression>(value);
+    } else if (op == "!in") {
+        return parseSetFilter<NotInExpression>(value);
+    } else if (op == "all") {
+        return parseCompoundFilter<AllExpression>(value);
+    } else if (op == "any") {
+        return parseCompoundFilter<AnyExpression>(value);
+    } else if (op == "none") {
+        return parseCompoundFilter<NoneExpression>(value);
+    } else {
+        Log::Warning(Event::ParseStyle, "filter operator must be one of \"==\", \"!=\", \">\", \">=\", \"<\", \"<=\", \"in\", \"!in\", \"all\", \"any\", \"none\"");
+        return empty;
+    }
+}
 
 }

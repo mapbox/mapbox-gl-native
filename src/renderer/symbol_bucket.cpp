@@ -52,8 +52,6 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
         return features;
     }
 
-    util::utf8_to_utf32 ucs4conv;
-
     // Determine and load glyph ranges
     std::set<GlyphRange> ranges;
 
@@ -72,7 +70,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
                 u8string = platform::lowercase(u8string);
             }
 
-            ft.label = ucs4conv.convert(u8string);
+            ft.label = util::utf8_to_utf32::convert(u8string);
 
             if (ft.label.size()) {
                 // Loop through all characters of this text and collect unique codepoints.
@@ -105,16 +103,41 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
     const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore, sprite);
 
     float horizontalAlign = 0.5;
-    if (properties.text.horizontal_align == TextHorizontalAlignType::Right)
-        horizontalAlign = 1;
-    else if (properties.text.horizontal_align == TextHorizontalAlignType::Left)
-        horizontalAlign = 0;
-
     float verticalAlign = 0.5;
-    if (properties.text.vertical_align == TextVerticalAlignType::Bottom)
-        verticalAlign = 1;
-    else if (properties.text.vertical_align == TextVerticalAlignType::Top)
-        verticalAlign = 0;
+
+    switch (properties.text.anchor) {
+        case TextAnchorType::Top:
+        case TextAnchorType::Bottom:
+        case TextAnchorType::Center:
+            break;
+        case TextAnchorType::Right:
+        case TextAnchorType::TopRight:
+        case TextAnchorType::BottomRight:
+            horizontalAlign = 1;
+            break;
+        case TextAnchorType::Left:
+        case TextAnchorType::TopLeft:
+        case TextAnchorType::BottomLeft:
+            horizontalAlign = 0;
+            break;
+    }
+
+    switch (properties.text.anchor) {
+        case TextAnchorType::Left:
+        case TextAnchorType::Right:
+        case TextAnchorType::Center:
+            break;
+        case TextAnchorType::Bottom:
+        case TextAnchorType::BottomLeft:
+        case TextAnchorType::BottomRight:
+            verticalAlign = 1;
+            break;
+        case TextAnchorType::Top:
+        case TextAnchorType::TopLeft:
+        case TextAnchorType::TopRight:
+            verticalAlign = 0;
+            break;
+    }
 
     float justify = 0.5;
     if (properties.text.justify == TextJustifyType::Right) justify = 1;

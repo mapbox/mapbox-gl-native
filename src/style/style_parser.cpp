@@ -485,12 +485,12 @@ util::ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
             return nullptr;
         }
 
-        // Parse styles already, as they can't be inherited anyway.
-        std::map<ClassID, ClassProperties> styles;
-        parseStyles(value, styles);
+        // Parse paints already, as they can't be inherited anyway.
+        std::map<ClassID, ClassProperties> paints;
+        parsePaints(value, paints);
 
         util::ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
-            layer_id, std::move(styles));
+            layer_id, std::move(paints));
 
         if (value.HasMember("layers")) {
             layer->layers = createLayers(value["layers"]);
@@ -548,21 +548,21 @@ void StyleParser::parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair) {
 
 #pragma mark - Parse Styles
 
-void StyleParser::parseStyles(JSVal value, std::map<ClassID, ClassProperties> &styles) {
+void StyleParser::parsePaints(JSVal value, std::map<ClassID, ClassProperties> &paints) {
     rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
     for (; itr != value.MemberEnd(); ++itr) {
         const std::string name { itr->name.GetString(), itr->name.GetStringLength() };
 
-        if (name == "style") {
-            parseStyle(replaceConstant(itr->value), styles[ClassID::Default]);
-        } else if (name.compare(0, 6, "style.") == 0 && name.length() > 6) {
+        if (name == "paint") {
+            parsePaint(replaceConstant(itr->value), paints[ClassID::Default]);
+        } else if (name.compare(0, 6, "paint.") == 0 && name.length() > 6) {
             const ClassID class_id = ClassDictionary::Get().lookup(name.substr(6));
-            parseStyle(replaceConstant(itr->value), styles[class_id]);
+            parsePaint(replaceConstant(itr->value), paints[class_id]);
         }
     }
 }
 
-void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
+void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     using Key = PropertyKey;
 
     parseOptionalProperty<Function<bool>>("fill-antialias", Key::FillAntialias, klass, value);
@@ -586,8 +586,8 @@ void StyleParser::parseStyle(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<TranslateAnchorType>("line-translate-anchor", Key::LineTranslateAnchor, klass, value);
     parseOptionalProperty<Function<float>>("line-width", Key::LineWidth, klass, value);
     parseOptionalProperty<PropertyTransition>("line-width-transition", Key::LineWidth, klass, value);
-    parseOptionalProperty<Function<float>>("line-offset", Key::LineOffset, klass, value);
-    parseOptionalProperty<PropertyTransition>("line-offset-transition", Key::LineOffset, klass, value);
+    parseOptionalProperty<Function<float>>("line-gap-width", Key::LineGapWidth, klass, value);
+    parseOptionalProperty<PropertyTransition>("line-gap-width-transition", Key::LineGapWidth, klass, value);
     parseOptionalProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("line-blur-transition", Key::LineBlur, klass, value);
     parseOptionalProperty<Function<float>>("line-dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);
@@ -711,123 +711,36 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
 
     if (value.HasMember("filter")) {
         JSVal value_filter = replaceConstant(value["filter"]);
-        layer->bucket->filter = parseFilter(value_filter);
+        layer->bucket->filter = parseFilterExpression(value_filter);
     }
 
-    if (value.HasMember("render")) {
-        JSVal value_render = replaceConstant(value["render"]);
-        parseRender(value_render, layer);
+    if (value.HasMember("layout")) {
+        JSVal value_render = replaceConstant(value["layout"]);
+        parseLayout(value_render, layer);
     }
 
-    if (value.HasMember("min-zoom")) {
-        JSVal min_zoom = value["min-zoom"];
+    if (value.HasMember("minzoom")) {
+        JSVal min_zoom = value["minzoom"];
         if (min_zoom.IsNumber()) {
             layer->bucket->min_zoom = min_zoom.GetDouble();
         } else {
-            Log::Warning(Event::ParseStyle, "min-zoom of layer %s must be numeric", layer->id.c_str());
+            Log::Warning(Event::ParseStyle, "minzoom of layer %s must be numeric", layer->id.c_str());
         }
     }
 
-    if (value.HasMember("max-zoom")) {
-        JSVal max_zoom = value["max-zoom"];
+    if (value.HasMember("maxzoom")) {
+        JSVal max_zoom = value["maxzoom"];
         if (max_zoom.IsNumber()) {
             layer->bucket->min_zoom = max_zoom.GetDouble();
         } else {
-            Log::Warning(Event::ParseStyle, "max-zoom of layer %s must be numeric", layer->id.c_str());
+            Log::Warning(Event::ParseStyle, "maxzoom of layer %s must be numeric", layer->id.c_str());
         }
     }
 }
 
-FilterExpression StyleParser::parseFilter(JSVal value) {
-    return parseFilter(value, value.IsArray() ? FilterExpression::Operator::Or : FilterExpression::Operator::And);
-}
-
-FilterExpression StyleParser::parseFilter(JSVal value, FilterExpression::Operator op) {
-    FilterExpression expression(op);
-    if (value.IsObject()) {
-        rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
-        for (; itr != value.MemberEnd(); ++itr) {
-            const std::string name { itr->name.GetString(), itr->name.GetStringLength() };
-            if (name == "&") {
-                expression.add(parseFilter(replaceConstant(itr->value), FilterExpression::Operator::And));
-            } else if (name == "|") {
-                expression.add(parseFilter(replaceConstant(itr->value), FilterExpression::Operator::Or));
-            } else if (name == "^") {
-                expression.add(parseFilter(replaceConstant(itr->value), FilterExpression::Operator::Xor));
-            } else if (name == "!") {
-                expression.add(parseFilter(replaceConstant(itr->value), FilterExpression::Operator::Nor));
-            } else if (name == "$type") {
-                JSVal type = replaceConstant(itr->value);
-                if (type.IsString()) {
-                    expression.setGeometryType(parseGeometryType({ type.GetString(), type.GetStringLength() }));
-                }
-            } else {
-                FilterComparison comparison(name);
-                JSVal filterValue = replaceConstant(itr->value);
-                if (filterValue.IsObject()) {
-                    rapidjson::Value::ConstMemberIterator filter_itr = filterValue.MemberBegin();
-                    for (; filter_itr != filterValue.MemberEnd(); ++filter_itr) {
-                        comparison.add(
-                            parseFilterComparisonOperator({ filter_itr->name.GetString(), filter_itr->name.GetStringLength() }),
-                            parseValues(replaceConstant(filter_itr->value))
-                        );
-                    }
-                } else if (filterValue.IsArray()) {
-                    comparison.add(FilterComparison::Operator::In, parseValues(filterValue));
-                } else {
-                    comparison.add(FilterComparison::Operator::Equal, std::vector<Value>({ parseValue(filterValue) }));
-                }
-                expression.add(comparison);
-            }
-        }
-    } else if (value.IsArray()) {
-        for (rapidjson::SizeType i = 0; i < value.Size(); i++) {
-            expression.add(parseFilter(replaceConstant(value[i])));
-        }
-    } else {
-        Log::Warning(Event::ParseStyle, "expression must be either an array or an object");
-    }
-
-    return expression;
-}
-
-Value StyleParser::parseValue(JSVal value) {
-    switch (value.GetType()) {
-        case rapidjson::kNullType:
-        case rapidjson::kFalseType:
-            return false;
-
-        case rapidjson::kTrueType:
-            return true;
-
-        case rapidjson::kStringType:
-            return std::string { value.GetString(), value.GetStringLength() };
-
-        case rapidjson::kNumberType:
-            if (value.IsUint64()) return value.GetUint64();
-            if (value.IsInt64()) return value.GetInt64();
-            return value.GetDouble();
-
-        default:
-            return false;
-    }
-}
-
-std::vector<Value> StyleParser::parseValues(JSVal value) {
-    std::vector<Value> values;
-    if (value.IsArray()) {
-        for (rapidjson::SizeType i = 0; i < value.Size(); i++) {
-            values.emplace_back(parseValue(replaceConstant(value[i])));
-        }
-    } else {
-        values.emplace_back(parseValue(value));
-    }
-    return values;
-}
-
-void StyleParser::parseRender(JSVal value, util::ptr<StyleLayer> &layer) {
+void StyleParser::parseLayout(JSVal value, util::ptr<StyleLayer> &layer) {
     if (!value.IsObject()) {
-        Log::Warning(Event::ParseStyle, "render property of layer '%s' must be an object", layer->id.c_str());
+        Log::Warning(Event::ParseStyle, "layout property of layer '%s' must be an object", layer->id.c_str());
         return;
     }
 
@@ -888,8 +801,7 @@ void StyleParser::parseRender(JSVal value, util::ptr<StyleLayer> &layer) {
             render.text.letter_spacing *= 24; // em
         }
         parseRenderProperty<TextJustifyTypeClass>(value, render.text.justify, "text-justify");
-        parseRenderProperty<TextHorizontalAlignTypeClass>(value, render.text.horizontal_align, "text-horizontal-align");
-        parseRenderProperty<TextVerticalAlignTypeClass>(value, render.text.vertical_align, "text-vertical-align");
+        parseRenderProperty<TextAnchorTypeClass>(value, render.text.anchor, "text-anchor");
         parseRenderProperty(value, render.text.max_angle, "text-max-angle");
         parseRenderProperty(value, render.text.rotate, "text-rotate");
         parseRenderProperty(value, render.text.slant, "text-slant");

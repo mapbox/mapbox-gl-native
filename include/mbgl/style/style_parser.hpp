@@ -49,11 +49,11 @@ private:
     util::ptr<StyleLayer> createLayer(JSVal value);
     void parseLayers();
     void parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair);
-    void parseStyles(JSVal value, std::map<ClassID, ClassProperties> &styles);
-    void parseStyle(JSVal, ClassProperties &properties);
+    void parsePaints(JSVal value, std::map<ClassID, ClassProperties> &paints);
+    void parsePaint(JSVal, ClassProperties &properties);
     void parseReference(JSVal value, util::ptr<StyleLayer> &layer);
     void parseBucket(JSVal value, util::ptr<StyleLayer> &layer);
-    void parseRender(JSVal value, util::ptr<StyleLayer> &layer);
+    void parseLayout(JSVal value, util::ptr<StyleLayer> &layer);
     void parseSprite(JSVal value);
     void parseGlyphURL(JSVal value);
 
@@ -85,11 +85,7 @@ private:
     template <typename T>
     T parseFunctionArgument(JSVal value);
 
-
-    FilterExpression parseFilter(JSVal, FilterExpression::Operator op);
     FilterExpression parseFilter(JSVal);
-    Value parseValue(JSVal value);
-    std::vector<Value> parseValues(JSVal values);
 
 private:
     std::unordered_map<std::string, const rapidjson::Value *> constants;

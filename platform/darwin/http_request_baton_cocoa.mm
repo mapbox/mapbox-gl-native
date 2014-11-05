@@ -1,14 +1,13 @@
 #include <mbgl/storage/http_request_baton.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/parsedate.h>
+#include <mbgl/util/time.hpp>
 
 #include <uv.h>
 
 #include <mbgl/util/uv.hpp>
 
 #import <Foundation/Foundation.h>
-#include <ctime>
-#include <xlocale.h>
 
 namespace mbgl {
 
@@ -20,9 +19,6 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
 
     // Starts the request.
     util::ptr<HTTPRequestBaton> baton = ptr;
-
-    // Create a C locale
-    static locale_t locale = newlocale(LC_ALL_MASK, nullptr, nullptr);
 
     dispatch_once(&request_initialize, ^{
         NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
@@ -39,11 +35,8 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
         if (!baton->response->etag.empty()) {
             [request addValue:@(baton->response->etag.c_str()) forHTTPHeaderField:@"If-None-Match"];
         } else if (baton->response->modified) {
-            const time_t modified = baton->response->modified;
-            struct tm *timeinfo = std::gmtime(&modified);
-            char buffer[32];
-            strftime_l(buffer, 32, "%a, %d %b %Y %H:%M:%S GMT", timeinfo, locale);
-            [request addValue:@(buffer) forHTTPHeaderField:@"If-Modified-Since"];
+            const std::string time = util::rfc1123(baton->response->modified);
+            [request addValue:@(time.c_str()) forHTTPHeaderField:@"If-Modified-Since"];
         }
     }
 

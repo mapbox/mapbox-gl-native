@@ -11,7 +11,6 @@
 #include <sstream>
 
 
-
 GLFWView *view = nullptr;
 
 void quit_handler(int) {
@@ -28,16 +27,32 @@ int main(int argc, char *argv[]) {
     mbgl::Log::Set<mbgl::StderrLogBackend>();
 
     int fullscreen_flag = 0;
+    std::string style;
 
     const struct option long_options[] = {
-        {"fullscreen", no_argument, &fullscreen_flag, 1},
+        {"fullscreen", no_argument, &fullscreen_flag, 'f'},
+        {"style", required_argument, 0, 's'},
         {0, 0, 0, 0}
     };
 
     while (true) {
         int option_index = 0;
-        int c = getopt_long(argc, argv, "f", long_options, &option_index);
-        if (c == -1) break;
+        int opt = getopt_long(argc, argv, "fs:", long_options, &option_index);
+        if (opt == -1) break;
+        switch (opt)
+        {
+        case 0:
+            if (long_options[option_index].flag != 0)
+                break;
+        case 'f':
+            // handle fullscreen_flag
+            break;
+        case 's':
+            style = std::string("file://") + std::string(optarg);
+        default:
+            break;
+        }
+
     }
 
     // sigint handling
@@ -65,7 +80,9 @@ int main(int argc, char *argv[]) {
     }
 
     // Load style
-    const std::string style = std::string("file://") + uv::cwd() + std::string("/../../styles/styles/bright-v5.json");
+    if (style.empty())
+        style = std::string("file://") + uv::cwd() + std::string("/../../styles/styles/bright-v6.json");
+
     map.setStyleURL(style);
 
     int ret = view->run();

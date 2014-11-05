@@ -17,11 +17,9 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 
     float antialiasing = 1 / state.getPixelRatio();
     float width = properties.width;
-    float offset = properties.offset / 2;
+    float offset = properties.gap_width == 0 ? 0 : (properties.gap_width + width) / 2;
     float blur = properties.blur + antialiasing;
 
-    // These are the radii of the line. We are limiting it to 16, which will result
-    // in a point size of 64 on retina.
     float inset = std::fmin((std::fmax(-1, offset - width / 2 - antialiasing / 2) + 1), 16.0f);
     float outset = std::fmin(offset + width / 2 + antialiasing / 2, 16.0f);
 

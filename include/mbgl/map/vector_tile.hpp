@@ -5,6 +5,7 @@
 #include <mbgl/style/value.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/pbf.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <cstdint>
 #include <iosfwd>
@@ -44,14 +45,14 @@ public:
     VectorTileTagExtractor(const VectorTileLayer &layer);
 
     void setTags(const pbf &pbf);
-    std::vector<Value> getValues(const std::string &key) const;
-    void setType(FilterExpression::GeometryType type);
-    FilterExpression::GeometryType getType() const;
+    mapbox::util::optional<Value> getValue(const std::string &key) const;
+    void setType(FeatureType type);
+    FeatureType getType() const;
 
 private:
     const VectorTileLayer &layer_;
     pbf tags_;
-    FilterExpression::GeometryType type_ = FilterExpression::GeometryType::Any;
+    FeatureType type_ = FeatureType::Unknown;
 };
 
 /*
