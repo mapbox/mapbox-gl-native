@@ -6,14 +6,13 @@ set -o pipefail
 mapbox_time "checkout_styles" \
 git submodule update --init styles
 
-if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
+if [[ $MASON_PLATFORM == "android" ]]; then
+    mapbox_time "compile_program" \
+    make android -j$JOBS BUILDTYPE=${BUILDTYPE}
+elif [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #
     # build & test Linux
     #
-    if [[ $MASON_PLATFORM == "android" ]]; then
-        mapbox_time "compile_program" \
-        make android -j$JOBS BUILDTYPE=${BUILDTYPE}
-    fi
 
     mapbox_time "compile_tests" \
     make test -j$JOBS BUILDTYPE=${BUILDTYPE}
