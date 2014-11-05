@@ -75,7 +75,10 @@ void TileData::request() {
 void TileData::cancel() {
     if (state != State::obsolete) {
         state = State::obsolete;
-        req.reset();
+        if (req) {
+            req->cancel();
+            req.reset();
+        }
     }
 }
 
