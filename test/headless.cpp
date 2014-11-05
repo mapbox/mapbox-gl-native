@@ -20,6 +20,15 @@
 
 std::string base_directory;
 
+namespace mbgl {
+namespace platform {
+
+std::string defaultCacheDatabase() {
+    // Disables the cache.
+    return "";
+}
+}
+}
 
 class ServerEnvironment : public ::testing::Environment {
 public:
