@@ -4,8 +4,8 @@
 set -o pipefail
 
 if [[ "${MASON_PLATFORM}" == "android" ]]; then
-    echo "debug: unpacking"
-    #mapbox_time "unpacking NDK" \
+    echo "debug: installing 7z"
+    #mapbox_time "installing 7z" \
     MASON_PLATFORM= ./.mason/mason install 7z 9.20
 
     echo "debug: setting 7z path"
@@ -22,6 +22,14 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
     #mapbox_time "unpacking NDK" \
     $SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > .tmp-ndk-log
     rm .tmp-ndk-log
+
+    echo "debug: fetching JDK"
+    #mapbox_time "fetching JDK" \
+    wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-linux-x64.tar.gz
+
+    echo "debug: unpacking JDK"
+    #mapbox_time "unpacking JDK" \
+    tar -xzf ./jdk-7u71-linux-x64.tar.gz
 fi
 
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
