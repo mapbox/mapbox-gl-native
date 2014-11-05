@@ -28,8 +28,10 @@ public:
         if (pid < 0) {
             throw std::runtime_error("Cannot create web server");
         } else if (pid == 0) {
-            char *arg[] = { nullptr };
-            int ret = execv((base_directory + "bin/server.py").c_str(), arg);
+            const auto executable = base_directory + "bin/server.py";
+            const char *port = "2900";
+            char *arg[] = { const_cast<char *>(executable.c_str()), const_cast<char *>(port), nullptr };
+            int ret = execv(executable.c_str(), arg);
             // This call should not return. In case execve failed, we exit anyway.
             if (ret < 0) {
                 fprintf(stderr, "Failed to start server: %s\n", strerror(errno));
@@ -66,6 +68,15 @@ GTEST_API_ int main(int argc, char *argv[]) {
     return RUN_ALL_TESTS();
 }
 
+void rewriteLocalScheme(rapidjson::Value &value, rapidjson::Document::AllocatorType &allocator) {
+    ASSERT_TRUE(value.IsString());
+    auto string = std::string { value.GetString(),value.GetStringLength() };
+    if (string.compare(0, 8, "local://") == 0) {
+        string.replace(0, 8, "http://localhost:2900/");
+        value.SetString(string.data(), string.size(), allocator);
+    }
+}
+
 class HeadlessTest : public ::testing::TestWithParam<std::string> {};
 
 TEST_P(HeadlessTest, render) {
@@ -76,17 +87,40 @@ TEST_P(HeadlessTest, render) {
     std::string style = util::read_file(base_directory + "tests/" + base + "/style.json");
     std::string info = util::read_file(base_directory + "tests/" + base + "/info.json");
 
-    std::size_t pos = 0;
-    while ((pos = style.find("local://", pos)) != std::string::npos) {
-        style.replace(pos, 8, "http://localhost:2900/");
-    }
-
     // Parse style.
     rapidjson::Document styleDoc;
     styleDoc.Parse<0>((const char *const)style.c_str());
     ASSERT_FALSE(styleDoc.HasParseError());
     ASSERT_TRUE(styleDoc.IsObject());
 
+    // Rewrite "local://" to "http://localhost:2900/".
+    if (styleDoc.HasMember("sprite")) {
+        rewriteLocalScheme(styleDoc["sprite"], styleDoc.GetAllocator());
+    }
+
+    if (styleDoc.HasMember("glyphs")) {
+        rewriteLocalScheme(styleDoc["glyphs"], styleDoc.GetAllocator());
+    }
+
+    if (styleDoc.HasMember("sources")) {
+        auto &sources = styleDoc["sources"];
+        ASSERT_TRUE(sources.IsObject());
+        for (auto source = sources.MemberBegin(), end = sources.MemberEnd(); source != end; source++) {
+            if (source->value.HasMember("tiles")) {
+                auto &tiles = source->value["tiles"];
+                ASSERT_TRUE(tiles.IsArray());
+                for (rapidjson::SizeType i = 0; i < tiles.Size(); i++) {
+                    rewriteLocalScheme(tiles[i], styleDoc.GetAllocator());
+                }
+            }
+
+            if (source->value.HasMember("url")) {
+                rewriteLocalScheme(source->value["url"], styleDoc.GetAllocator());
+            }
+        }
+    }
+
+    // Convert the JSON object back into a stringified version.
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     styleDoc.Accept(writer);
