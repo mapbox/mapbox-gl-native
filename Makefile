@@ -81,8 +81,8 @@ android:
 	export CPPFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CPPFLAGS` ${CPPFLAGS}" && \
 	export PATH="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env PATH`:${PATH}" && \
 	MASON_PLATFORM=android ./configure config-android.gypi && \
-	deps/run_gyp mapboxgl.gyp -Iconfig-android.gypi -Dplatform=android --depth=. --generator-output=./build/android -f make-android && \
-	$(MAKE) -C ./build/android BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-core
+	deps/run_gyp android/mapboxgl-app.gyp -Iconfig-android.gypi -Dplatform=android --depth=. --generator-output=./build/android -f make-android && \
+    $(MAKE) -C build/android BUILDTYPE=$(BUILDTYPE) V=$(V) androidapp
 
 ##### Test cases ###############################################################
 
