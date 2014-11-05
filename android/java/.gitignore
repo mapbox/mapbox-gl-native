@@ -1,0 +1,14 @@
+# Gradle files
+.gradle/
+
+# IntelliJ files
+.idea
+*.iml
+
+# Build files
+build/
+*/build/
+*.so
+
+# Local settings
+local.properties

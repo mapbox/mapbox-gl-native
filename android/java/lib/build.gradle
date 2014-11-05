@@ -1,0 +1,31 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "21.1.0"
+
+    defaultConfig {
+        applicationId "com.mapbox.mapboxgl.lib"
+        minSdkVersion 19
+        targetSdkVersion 20
+
+        ndk {
+            moduleName "NativeMapView"
+        }
+    }
+
+    buildTypes {
+        debug {
+            jniDebugBuild true
+        }
+
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile "commons-io:commons-io:2.4"
+}
