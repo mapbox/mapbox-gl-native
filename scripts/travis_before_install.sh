@@ -18,7 +18,7 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
     echo "debug: chmod NDK"
     chmod a+x ./android-ndk-r10c-linux-x86_64.bin
 
-    echo "debug: upacking NDK"
+    echo "debug: unpacking NDK"
     #mapbox_time "unpacking NDK" \
     $SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > .tmp-ndk-log
     rm .tmp-ndk-log
