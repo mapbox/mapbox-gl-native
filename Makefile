@@ -74,7 +74,7 @@ android:
 	export CXX="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CXX`" && \
 	export CC="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CC`" && \
 	export LD="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env LD`" && \
-        export LINK="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CXX`" && \
+    export LINK="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CXX`" && \
 	export AR="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env AR`" && \
 	export RANLIB="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env RANLIB`" && \
 	export LDFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env LDFLAGS` ${LDFLAGS}" && \
