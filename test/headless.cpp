@@ -17,6 +17,9 @@
 #include <dirent.h>
 #include <signal.h>
 #include <libgen.h>
+#ifdef __linux__
+#include <sys/prctl.h>
+#endif
 
 std::string base_directory;
 
@@ -37,6 +40,9 @@ public:
         if (pid < 0) {
             throw std::runtime_error("Cannot create web server");
         } else if (pid == 0) {
+#ifdef __linux__
+            prctl(PR_SET_PDEATHSIG, SIGHUP);
+#endif
             const auto executable = base_directory + "bin/server.py";
             const char *port = "2900";
             char *arg[] = { const_cast<char *>(executable.c_str()), const_cast<char *>(port), nullptr };
