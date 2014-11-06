@@ -134,6 +134,8 @@ public:
     }
 
     void stop() {
+        assert(poll_handle.data);
+        poll_handle.data = nullptr;
         uv_poll_stop(&poll_handle);
         uv_close((uv_handle_t *)&poll_handle, [](uv_handle_t *handle) {
             delete (Socket *)handle->data;
@@ -141,7 +143,7 @@ public:
     }
 
 private:
-    // Make the destructor private to ensure that ew can only close the Socket
+    // Make the destructor private to ensure that we can only close the Socket
     // with stop(), and disallow manual deletion.
     ~Socket() {
         assert(!poll_handle.data);
