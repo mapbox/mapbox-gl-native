@@ -62,7 +62,7 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj_,
 
     // FIXME this asserts because it creates FileSource of different thread from run thread
     //map->setStyleJSON(default_style_json);
-    map->setStyleURL("https://raw.githubusercontent.com/mapbox/mapbox-gl-styles/mb-pages/styles/bright-v5.json");
+    map->setStyleURL("https://raw.githubusercontent.com/mapbox/mapbox-gl-styles/mb-pages/styles/bright-v6.json");
 }
 
 NativeMapView::~NativeMapView() {
@@ -515,6 +515,7 @@ void MBGLView::make_active() {
 
 void MBGLView::make_inactive() {
     VERBOSE("MBGLView::make_inactive");
+    // FIXME: this gets called before swap? bug?
     if (!eglMakeCurrent(nativeView->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
             EGL_NO_CONTEXT)) {
         ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
@@ -524,20 +525,26 @@ void MBGLView::make_inactive() {
 
 void MBGLView::swap() {
     VERBOSE("MBGLView::swap");
+    // FIXME bug workaround
+    make_active();
+
     if (map->needsSwap() && (nativeView->display != EGL_NO_DISPLAY)
             && (nativeView->surface != EGL_NO_SURFACE)) {
         if (!eglSwapBuffers(nativeView->display, nativeView->surface)) {
             ERROR("eglSwapBuffers() returned error %d", eglGetError());
+            ERROR("%u", reinterpret_cast<unsigned int>(nativeView->surface)); // TODO remove
         }
         map->swapped();
     } else {
         DEBUG("Not swapping as we are not ready");
     }
+    // FIXME bug workaround
+    make_inactive();
 }
 
 void MBGLView::notify() {
     DEBUG("MBGLView::notify()");
-    // TODO
+    // noop
 }
 
 void MBGLView::notify_map_change(mbgl::MapChange change, mbgl::timestamp delay) {
