@@ -543,7 +543,7 @@ void MBGLView::notify() {
 void MBGLView::notify_map_change(mbgl::MapChange change, mbgl::timestamp delay) {
     DEBUG("MBGLView::notify_map_change()");
     nativeView->notifyMapChange();
-    // TODO: use new variables
+    // TODO: use new variables - do i need to?
     (void)change;
     (void)delay;
 }
