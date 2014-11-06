@@ -14,9 +14,17 @@
       'cflags_cc': [
         '-I<(boost_root)/include',
       ],
+      'libraries': [
+          '<@(openssl_static_libs)',
+          '<@(curl_static_libs)',
+          '<@(png_static_libs)',
+          '<@(sqlite3_static_libs)',
+          '<@(uv_static_libs)',
+          '<@(nu_static_libs)',
+      ],
       'variables': {
         'ldflags': [
-          '-llog -landroid -lEGL -lGLESv2 '
+          '-llog -landroid -lEGL -lGLESv2 -lstdc++ -latomic '
           '<@(png_ldflags)',
           '<@(sqlite3_ldflags)',
           '<@(openssl_ldflags)',
