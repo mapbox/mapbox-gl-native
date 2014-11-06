@@ -78,11 +78,12 @@ NativeMapView::~NativeMapView() {
     ASSERT(vm != nullptr);
     ASSERT(obj != nullptr);
 
+    jint ret;
     JNIEnv* env = nullptr;
-    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) == JNI_OK) {
+    if ((ret = vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6)) == JNI_OK) {
         env->DeleteGlobalRef(obj);
     } else {
-        ERROR("GetEnv() failed");
+        ERROR("GetEnv() failed with %i", ret);
     }
     obj = nullptr;
     vm = nullptr;
@@ -452,18 +453,41 @@ void NativeMapView::notifyMapChange() {
     ASSERT(vm != nullptr);
     ASSERT(obj != nullptr);
 
+    JavaVMAttachArgs args = {
+        JNI_VERSION_1_2,
+        "NativeMapView::notify_map_change()",
+        NULL
+    };
+
+    jint ret;
     JNIEnv* env = nullptr;
-    // FIXME this returns failure
-    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
-        ERROR("GetEnv() failed");
-        return;
+    bool detach = false;
+    if ((ret = vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6)) != JNI_OK) {
+        if (ret != JNI_EDETACHED) {
+            ERROR("GetEnv() failed with %i", ret);
+            return;
+        } else {
+            if ((ret = vm->AttachCurrentThread(&env, &args)) != JNI_OK) {
+                ERROR("AttachCurrentThread() failed with %i", ret);
+                return;
+            }
+            detach = true;
+        }
     }
+
 
     env->CallVoidMethod(obj, on_map_changed_id);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
-        return;
     }
+
+    if (detach) {
+        if ((ret = vm->DetachCurrentThread()) != JNI_OK) {
+            ERROR("DetachCurrentThread() failed with %i", ret);
+            return;
+        }
+    }
+    env = nullptr;
 }
 
 void MBGLView::make_active() {
