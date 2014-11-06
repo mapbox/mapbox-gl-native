@@ -213,9 +213,7 @@ public class MapView extends SurfaceView {
     }
 
     public double getDirection() {
-        double direction = mNativeMapView.getAngle();
-
-        direction *= 180 / Math.PI;
+        double direction = -mNativeMapView.getBearing();
 
         while (direction > 360)
             direction -= 360;
@@ -232,9 +230,7 @@ public class MapView extends SurfaceView {
     public void setDirection(double direction, boolean animated) {
         double duration = animated ? 0.3 : 0.0;
 
-        direction *= Math.PI / 180;
-
-        mNativeMapView.setAngle(direction, duration);
+        mNativeMapView.setBearing(-direction, duration);
     }
 
     public void resetPosition() {
@@ -362,7 +358,7 @@ public class MapView extends SurfaceView {
         if (savedInstanceState != null) {
             lonlat = (LonLat) savedInstanceState
                     .getParcelable(STATE_CENTER_COORDINATE);
-            angle = savedInstanceState.getDouble(STATE_CENTER_DIRECTION);
+            bearing = savedInstanceState.getDouble(STATE_CENTER_DIRECTION);
             zoom = savedInstanceState.getDouble(STATE_ZOOM_LEVEL);
             setCenterCoordinate((LonLat) savedInstanceState
                     .getParcelable(STATE_CENTER_COORDINATE));
@@ -418,7 +414,7 @@ public class MapView extends SurfaceView {
     public void onPause() {
         Log.v(TAG, "onPause");
         lonlat = mNativeMapView.getLonLat();
-        angle = mNativeMapView.getAngle();
+        bearing = mNativeMapView.getBearing();
         zoom = mNativeMapView.getZoom();
         mNativeMapView.stop();
     }
@@ -429,14 +425,14 @@ public class MapView extends SurfaceView {
     // TODO need to fix this in Map C++ code
     // Seems map state gets reset when we start()
     private LonLat lonlat;
-    private double angle, zoom;
+    private double bearing, zoom;
 
     public void onResume() {
         Log.v(TAG, "onResume");
         mNativeMapView.start();
         if (lonlat != null) {
             mNativeMapView.setLonLat(lonlat);
-            mNativeMapView.setAngle(angle);
+            mNativeMapView.setBearing(bearing);
             mNativeMapView.setZoom(zoom);
         }
     }
@@ -461,7 +457,7 @@ public class MapView extends SurfaceView {
             mNativeMapView.createSurface(holder.getSurface());
             if (lonlat != null) {
                 mNativeMapView.setLonLat(lonlat);
-                mNativeMapView.setAngle(angle);
+                mNativeMapView.setBearing(bearing);
                 mNativeMapView.setZoom(zoom);
             }
         }
@@ -834,10 +830,10 @@ public class MapView extends SurfaceView {
             mNativeMapView.cancelTransitions();
 
             // Rotate the map
-            double angle = mNativeMapView.getAngle();
-            angle -= detector.getRotationDegreesDelta() * Math.PI / 180.0;
-            Log.d("rotate", "rotate to " + angle);
-            mNativeMapView.setAngle(angle, detector.getFocusX(),
+            double bearing = mNativeMapView.getBearing();
+            bearing += detector.getRotationDegreesDelta() * Math.PI / 180.0;
+            Log.d("rotate", "rotate to " + bearing);
+            mNativeMapView.setBearing(bearing, detector.getFocusX(),
                     detector.getFocusY());
 
             return true;

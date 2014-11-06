@@ -497,34 +497,25 @@ void JNICALL nativeRotateBy(JNIEnv* env, jobject obj, jlong native_map_view_ptr,
     native_map_view->getMap()->rotateBy(sx, sy, ex, ey, duration);
 }
 
-void JNICALL nativeSetAngle(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble angle, jdouble duration) {
-    VERBOSE("nativeSetAngle");
+void JNICALL nativeSetBearing(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble degrees, jdouble duration) {
+    VERBOSE("nativeSetBearing");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    // TODO update java class
-    //native_map_view->getMap()->setAngle(angle, duration);
-    double degrees = -angle / M_PI * 180;
     native_map_view->getMap()->setBearing(degrees, duration);
 }
 
-void JNICALL nativeSetAngle(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble angle, jdouble cx, jdouble cy) {
-    VERBOSE("nativeSetAngle");
+void JNICALL nativeSetBearing(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble degrees, jdouble cx, jdouble cy) {
+    VERBOSE("nativeSetBearing");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    // TODO update java class
-    //native_map_view->getMap()->setAngle(angle, cx, cy);
-    double degrees = -angle / M_PI * 180;
     native_map_view->getMap()->setBearing(degrees, cx, cy);
 }
 
-jdouble JNICALL nativeGetAngle(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
-    VERBOSE("nativeGetAngle");
+jdouble JNICALL nativeGetBearing(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    VERBOSE("nativeGetBearing");
     ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    // TODO update java class
-    //return native_map_view->getMap()->getAngle();
-    double degrees = native_map_view->getMap()->getBearing();
-    return -degrees * M_PI / 180;
+    return native_map_view->getMap()->getBearing();
 }
 
 void JNICALL nativeResetNorth(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -732,9 +723,9 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeGetMinZoom", "(J)D", reinterpret_cast<void*>(&nativeGetMinZoom) },
         { "nativeGetMaxZoom", "(J)D", reinterpret_cast<void*>(&nativeGetMaxZoom) },
         { "nativeRotateBy", "(JDDDDD)V", reinterpret_cast<void*>(&nativeRotateBy) },
-        { "nativeSetAngle", "(JDD)V", reinterpret_cast<void*>(static_cast<void JNICALL(*)(JNIEnv*,jobject,jlong,jdouble,jdouble)>(&nativeSetAngle)) },
-        { "nativeSetAngle", "(JDDD)V", reinterpret_cast<void*>(static_cast<void JNICALL(*)(JNIEnv*,jobject,jlong,jdouble,jdouble,jdouble)>(&nativeSetAngle)) },
-        { "nativeGetAngle", "(J)D", reinterpret_cast<void*>(&nativeGetAngle) },
+        { "nativeSetBearing", "(JDD)V", reinterpret_cast<void*>(static_cast<void JNICALL(*)(JNIEnv*,jobject,jlong,jdouble,jdouble)>(&nativeSetBearing)) },
+        { "nativeSetBearing", "(JDDD)V", reinterpret_cast<void*>(static_cast<void JNICALL(*)(JNIEnv*,jobject,jlong,jdouble,jdouble,jdouble)>(&nativeSetBearing)) },
+        { "nativeGetBearing", "(J)D", reinterpret_cast<void*>(&nativeGetBearing) },
         { "nativeResetNorth", "(J)V", reinterpret_cast<void*>(&nativeResetNorth) },
         { "nativeStartRotating", "(J)V", reinterpret_cast<void*>(&nativeStartRotating) },
         { "nativeStopRotating", "(J)V", reinterpret_cast<void*>(&nativeStopRotating) },

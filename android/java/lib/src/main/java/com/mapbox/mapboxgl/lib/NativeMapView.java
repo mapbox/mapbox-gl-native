@@ -295,20 +295,20 @@ class NativeMapView {
         nativeRotateBy(mNativeMapViewPtr, sx, sy, ex, ey, duration);
     }
 
-    public void setAngle(double angle) {
-        setAngle(angle, 0.0);
+    public void setBearing(double degrees) {
+        setBearing(degrees, 0.0);
     }
 
-    public void setAngle(double angle, double duration) {
-        nativeSetAngle(mNativeMapViewPtr, angle, duration);
+    public void setBearing(double degrees, double duration) {
+        nativeSetBearing(mNativeMapViewPtr, degrees, duration);
     }
 
-    public void setAngle(double angle, double cx, double cy) {
-        nativeSetAngle(mNativeMapViewPtr, angle, cx, cy);
+    public void setBearing(double degrees, double cx, double cy) {
+        nativeSetBearing(mNativeMapViewPtr, degrees, cx, cy);
     }
 
-    public double getAngle() {
-        return nativeGetAngle(mNativeMapViewPtr);
+    public double getBearing() {
+        return nativeGetBearing(mNativeMapViewPtr);
     }
 
     public void resetNorth() {
@@ -452,13 +452,13 @@ class NativeMapView {
     private native void nativeRotateBy(long nativeMapViewPtr, double sx,
             double sy, double ex, double ey, double duration);
 
-    private native void nativeSetAngle(long nativeMapViewPtr, double angle,
+    private native void nativeSetBearing(long nativeMapViewPtr, double degrees,
             double duration);
 
-    private native void nativeSetAngle(long nativeMapViewPtr, double angle,
+    private native void nativeSetBearing(long nativeMapViewPtr, double degrees,
             double cx, double cy);
 
-    private native double nativeGetAngle(long nativeMapViewPtr);
+    private native double nativeGetBearing(long nativeMapViewPtr);
 
     private native void nativeResetNorth(long nativeMapViewPtr);
 
