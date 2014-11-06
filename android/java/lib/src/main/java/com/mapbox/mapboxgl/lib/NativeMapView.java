@@ -92,22 +92,6 @@ class NativeMapView {
         nativeCleanup(mNativeMapViewPtr);
     }
 
-    public void addDefaultSource() {
-        nativeAddDefaultSource(mNativeMapViewPtr);
-    }
-
-    public void removeDefaultSource() {
-        nativeRemoveDefaultSource(mNativeMapViewPtr);
-    }
-
-    public void addSource(String name, String url) {
-        nativeAddSource(mNativeMapViewPtr, name, url);
-    }
-
-    public void removeSource(String name) {
-        nativeRemoveSource(mNativeMapViewPtr, name);
-    }
-
     public void resize(int width, int height) {
         resize(width, height, 1.0f);
     }
@@ -401,15 +385,6 @@ class NativeMapView {
     private native void nativeUpdate(long nativeMapViewPtr);
 
     private native void nativeCleanup(long nativeMapViewPtr);
-
-    private native void nativeAddDefaultSource(long nativeMapViewPtr);
-
-    private native void nativeRemoveDefaultSource(long nativeMapViewPtr);
-
-    private native void nativeAddSource(long nativeMapViewPtr, String name,
-            String url);
-
-    private native void nativeRemoveSource(long nativeMapViewPtr, String name);
 
     private native void nativeResize(long nativeMapViewPtr, int width,
             int height, float ratio);
