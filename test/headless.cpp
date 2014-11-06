@@ -17,6 +17,9 @@
 #include <dirent.h>
 #include <signal.h>
 #include <libgen.h>
+#ifdef __linux__
+#include <sys/prctl.h>
+#endif
 
 std::string base_directory;
 
@@ -37,6 +40,9 @@ public:
         if (pid < 0) {
             throw std::runtime_error("Cannot create web server");
         } else if (pid == 0) {
+#ifdef __linux__
+            prctl(PR_SET_PDEATHSIG, SIGHUP);
+#endif
             const auto executable = base_directory + "bin/server.py";
             const char *port = "2900";
             char *arg[] = { const_cast<char *>(executable.c_str()), const_cast<char *>(port), nullptr };
@@ -67,9 +73,14 @@ ServerEnvironment* env = nullptr;
 
 GTEST_API_ int main(int argc, char *argv[]) {
     // Note: glibc's dirname() **modifies** the argument and can't handle static strings.
-    std::string argv0 { argv[0] }; argv0 = dirname(const_cast<char *>(argv0.c_str()));
     std::string file { __FILE__ }; file = dirname(const_cast<char *>(file.c_str()));
-    base_directory = argv0 + "/" + file + "/suite/";
+    if (file[0] == '/') {
+        // If __FILE__ is an absolute path, we don't have to guess from the argv 0.
+        base_directory = file + "/suite/";
+    } else {
+        std::string argv0 { argv[0] }; argv0 = dirname(const_cast<char *>(argv0.c_str()));
+        base_directory = argv0 + "/" + file + "/suite/";
+    }
 
     testing::InitGoogleTest(&argc, argv);
     env = new ServerEnvironment();
@@ -81,7 +92,7 @@ void rewriteLocalScheme(rapidjson::Value &value, rapidjson::Document::AllocatorT
     ASSERT_TRUE(value.IsString());
     auto string = std::string { value.GetString(),value.GetStringLength() };
     if (string.compare(0, 8, "local://") == 0) {
-        string.replace(0, 8, "http://localhost:2900/");
+        string.replace(0, 8, "http://127.0.0.1:2900/");
         value.SetString(string.data(), string.size(), allocator);
     }
 }
@@ -102,7 +113,7 @@ TEST_P(HeadlessTest, render) {
     ASSERT_FALSE(styleDoc.HasParseError());
     ASSERT_TRUE(styleDoc.IsObject());
 
-    // Rewrite "local://" to "http://localhost:2900/".
+    // Rewrite "local://" to "http://127.0.0.1:2900/".
     if (styleDoc.HasMember("sprite")) {
         rewriteLocalScheme(styleDoc["sprite"], styleDoc.GetAllocator());
     }
