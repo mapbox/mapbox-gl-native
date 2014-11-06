@@ -1,13 +1,13 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 19
+    compileSdkVersion 21
     buildToolsVersion "21.1.0"
 
     defaultConfig {
         applicationId "com.mapbox.mapboxgl.lib"
         minSdkVersion 19
-        targetSdkVersion 20
+        targetSdkVersion 21
 
         ndk {
             moduleName "NativeMapView"
