@@ -245,13 +245,9 @@ void curl_perform(uv_poll_t *req, int /* status */, int events) {
 }
 
 int handle_socket(CURL * /* handle */, curl_socket_t s, int action, void * /* userp */, void *socketp) {
-    Socket *socket;
-    if (action == CURL_POLL_IN || action == CURL_POLL_OUT) {
-        if (socketp) {
-            socket = (Socket *)socketp;
-        } else {
-            socket = new Socket(s);
-        }
+    Socket *socket = (Socket *)socketp;
+    if (!socket && action != CURL_POLL_REMOVE) {
+        socket = new Socket(s);
         curl_multi_assign(multi, s, (void *)socket);
     }
 
@@ -263,8 +259,8 @@ int handle_socket(CURL * /* handle */, curl_socket_t s, int action, void * /* us
         socket->start(UV_WRITABLE, curl_perform);
         break;
     case CURL_POLL_REMOVE:
-        if (socketp) {
-            ((Socket *)socketp)->stop();
+        if (socket) {
+            socket->stop();
             curl_multi_assign(multi, s, NULL);
         }
         break;
