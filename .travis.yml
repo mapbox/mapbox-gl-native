@@ -8,6 +8,9 @@ matrix:
       env: BUILDTYPE=Release JOBS=16 MASON_PLATFORM=android
       compiler: clang
     - os: linux
+      env: BUILDTYPE=Release JOBS=16 MASON_PLATFORM=android
+      compiler: gcc
+    - os: linux
       env: BUILDTYPE=Debug JOBS=16
       compiler: clang
     - os: linux
