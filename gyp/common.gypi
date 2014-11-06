@@ -14,7 +14,7 @@
           'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
           'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
           'GCC_ENABLE_CPP_RTTI':'YES',
-          'OTHER_CPLUSPLUSFLAGS': [ '-Wall', '-Wextra', '-Wshadow', '-Wno-variadic-macros', '-frtti', '-fexceptions' ],
+          'OTHER_CPLUSPLUSFLAGS': [ '-Werror', '-Wall', '-Wextra', '-Wshadow', '-Wno-variadic-macros', '-frtti', '-fexceptions' ],
           'GCC_WARN_PEDANTIC': 'YES',
           'GCC_WARN_UNINITIALIZED_AUTOS': 'YES_AGGRESSIVE',
         },
