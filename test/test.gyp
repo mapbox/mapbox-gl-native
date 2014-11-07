@@ -163,6 +163,7 @@
       'type': 'executable',
       'sources': [
         './headless.cpp',
+        '../platform/default/png_reader.cpp',
         './fixtures/fixture_log.cpp',
       ],
       'conditions': [
@@ -170,12 +171,12 @@
         ['OS == "mac"',
           {
             'xcode_settings': {
-              'OTHER_CPLUSPLUSFLAGS': ['<@(uv_cflags)'],
+              'OTHER_CPLUSPLUSFLAGS': ['<@(uv_cflags)','<@(png_cflags)'],
               'OTHER_LDFLAGS': ['<@(glfw3_ldflags)', '<@(ldflags)'],
             },
           },
           {
-            'cflags': ['<@(uv_cflags)'],
+            'cflags': ['<@(uv_cflags)','<@(png_cflags)'],
             'libraries': ['<@(glfw3_ldflags)', '<@(ldflags)'],
           }],
       ],
