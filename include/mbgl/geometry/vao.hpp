@@ -9,7 +9,6 @@
 
 namespace mbgl {
 
-#if GL_ARB_vertex_array_object
 class VertexArrayObject : public util::noncopyable {
 public:
     inline VertexArrayObject() {};
@@ -28,7 +27,9 @@ public:
         if (bound_shader == 0) {
             vertexBuffer.bind();
             shader.bind(offset);
-            storeBinding(shader, vertexBuffer.getID(), 0, offset);
+            if (vao) {
+                storeBinding(shader, vertexBuffer.getID(), 0, offset);
+            }
         } else {
             verifyBinding(shader, vertexBuffer.getID(), 0, offset);
         }
@@ -41,7 +42,9 @@ public:
             vertexBuffer.bind();
             elementsBuffer.bind();
             shader.bind(offset);
-            storeBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
+            if (vao) {
+                storeBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
+            }
         } else {
             verifyBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
         }
@@ -64,21 +67,6 @@ private:
     GLuint bound_elements_buffer = 0;
     char *bound_offset = 0;
 };
-
-#else
-
-class VertexArrayObject : public util::noncopyable {
-public:
-    template <typename Shader, typename Buffers>
-    void bind(Shader& shader, Buffers& buffers, char *offset) {
-        for (auto &buffer : buffers) {
-            buffer.bind();
-        }
-        shader.bind(offset);
-    }
-};
-
-#endif
 
 }
 

@@ -1,4 +1,5 @@
 #include <mbgl/platform/default/glfw_view.hpp>
+#include <mbgl/platform/gl.hpp>
 
 #include <mbgl/util/string.hpp>
 
@@ -25,6 +26,10 @@ void GLFWView::initialize(mbgl::Map *map_) {
     if (fullscreen) {
         monitor = glfwGetPrimaryMonitor();
     }
+
+#ifdef DEBUG
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#endif
 
 #ifdef GL_ES_VERSION_2_0
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
@@ -62,6 +67,25 @@ void GLFWView::initialize(mbgl::Map *map_) {
     glfwSetFramebufferSizeCallback(window, resize);
     glfwSetScrollCallback(window, scroll);
     glfwSetKeyCallback(window, key);
+
+
+    const std::string extensions = (char *)glGetString(GL_EXTENSIONS);
+    {
+        using namespace mbgl;
+
+
+        if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
+            gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glfwGetProcAddress("glBindVertexArrayARB");
+            gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glfwGetProcAddress("glDeleteVertexArraysARB");
+            gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glfwGetProcAddress("glGenVertexArraysARB");
+            gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glfwGetProcAddress("glIsVertexArrayARB");
+        } else if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
+            gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glfwGetProcAddress("glBindVertexArrayAPPLE");
+            gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glfwGetProcAddress("glDeleteVertexArraysAPPLE");
+            gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glfwGetProcAddress("glGenVertexArraysAPPLE");
+            gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glfwGetProcAddress("glIsVertexArrayAPPLE");
+        }
+    }
 
     glfwMakeContextCurrent(nullptr);
 }
