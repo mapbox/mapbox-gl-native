@@ -117,7 +117,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
     for (int i = 0; i < passes; i++) {
         // Render horizontal
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, secondary_texture, 0);
-#if GL_EXT_discard_framebuffer
+#if GL_EXT_discard_framebuffer && !__ANDROID__
         const GLenum discards[] = { GL_COLOR_ATTACHMENT0 };
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
 #endif
@@ -132,7 +132,7 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
 
         // Render vertical
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, original_texture, 0);
-#if GL_EXT_discard_framebuffer
+#if GL_EXT_discard_framebuffer && !__ANDROID__
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
 #endif
         glClear(GL_COLOR_BUFFER_BIT);

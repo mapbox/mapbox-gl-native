@@ -4,8 +4,8 @@
 set -o pipefail
 
 if [[ "${MASON_PLATFORM}" == "android" ]]; then
-    echo "debug: unpacking"
-    #mapbox_time "unpacking NDK" \
+    echo "debug: installing 7z"
+    #mapbox_time "installing 7z" \
     MASON_PLATFORM= ./.mason/mason install 7z 9.20
 
     echo "debug: setting 7z path"
@@ -18,10 +18,31 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
     echo "debug: chmod NDK"
     chmod a+x ./android-ndk-r10c-linux-x86_64.bin
 
-    echo "debug: upacking NDK"
+    echo "debug: unpacking NDK"
     #mapbox_time "unpacking NDK" \
     $SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > .tmp-ndk-log
     rm .tmp-ndk-log
+
+    echo "debug: fetching JDK"
+    #mapbox_time "fetching JDK" \
+    wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-linux-x64.tar.gz
+
+    echo "debug: unpacking JDK"
+    #mapbox_time "unpacking JDK" \
+    tar -xzf ./jdk-7u71-linux-x64.tar.gz
+
+    echo "debug: fetching SDK"
+    #mapbox_time "fetching SDK" \
+    wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
+
+    echo "debug: unpacking SDK"
+    #mapbox_time "unpacking SDK" \
+    tar -xzf ./android-sdk_r23.0.2-linux.tgz
+
+    echo "debug: installing SDK"
+    #mapbox_time "installing SDK" \
+    sudo apt-get -y install lib32stdc++6 lib32z1
+    echo y | ./android-sdk-linux/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.0,android-19,android-21
 fi
 
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then

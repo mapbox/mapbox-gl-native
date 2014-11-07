@@ -1,0 +1,32 @@
+<resources>
+    <attr name="centerLongitude" format="float" />
+    <attr name="centerLatitude" format="float" />
+    <attr name="zoomLevel" format="float" />
+    <attr name="direction" format="float" />
+    <attr name="zoomEnabled" format="boolean" />
+    <attr name="scrollEnabled" format="boolean" />
+    <attr name="rotateEnabled" format="boolean" />
+    <attr name="debugActive" format="boolean" />
+    
+    <declare-styleable name="MapView">
+        <attr name="centerLongitude" />
+        <attr name="centerLatitude" />
+        <attr name="zoomLevel" />
+        <attr name="direction" />
+        <attr name="zoomEnabled" />
+        <attr name="scrollEnabled" />
+        <attr name="rotateEnabled" />
+        <attr name="debugActive" />
+    </declare-styleable>
+    
+    <declare-styleable name="MapFragment">
+        <attr name="centerLongitude" />
+        <attr name="centerLatitude" />
+        <attr name="zoomLevel" />
+        <attr name="direction" />
+        <attr name="zoomEnabled" />
+        <attr name="scrollEnabled" />
+        <attr name="rotateEnabled" />
+        <attr name="debugActive" />
+    </declare-styleable>
+</resources>

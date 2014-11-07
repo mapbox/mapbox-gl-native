@@ -74,6 +74,7 @@ android:
 	export CXX="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CXX`" && \
 	export CC="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CC`" && \
 	export LD="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env LD`" && \
+	export LINK="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CXX`" && \
 	export AR="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env AR`" && \
 	export RANLIB="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env RANLIB`" && \
 	export LDFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env LDFLAGS` ${LDFLAGS}" && \
@@ -81,8 +82,12 @@ android:
 	export CPPFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CPPFLAGS` ${CPPFLAGS}" && \
 	export PATH="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env PATH`:${PATH}" && \
 	MASON_PLATFORM=android ./configure config-android.gypi && \
-	deps/run_gyp mapboxgl.gyp -Iconfig-android.gypi -Dplatform=android --depth=. --generator-output=./build/android -f make-android && \
-	$(MAKE) -C ./build/android BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-core
+	deps/run_gyp android/mapboxgl-app.gyp -Iconfig-android.gypi -Dplatform=android --depth=. --generator-output=./build/android -f make-android && \
+	$(MAKE) -C build/android BUILDTYPE=$(BUILDTYPE) V=$(V) androidapp && \
+	mkdir -p android/java/lib/src/main/jniLibs/armeabi-v7a && \
+	cp build/android/out/$(BUILDTYPE)/lib.target/libmapbox-gl.so android/java/lib/src/main/jniLibs/armeabi-v7a/libmapbox-gl.so && \
+	cd android/java && \
+	./gradlew build
 
 ##### Test cases ###############################################################
 
@@ -147,6 +152,8 @@ clean: clear_xcode_cache
 	-rm -rf ./build/
 	-rm -rf ./macosx/build/
 	-rm -rf ./config.gypi ./config-ios.gypi ./config-android.gypi
+	-rm -rf ./android/java/build ./android/java/app/build ./android/java/lib/build
+	-rm -rf ./android/java/lib/src/main/jniLibs
 
 distclean: clean
 	-rm -rf ./mason_packages

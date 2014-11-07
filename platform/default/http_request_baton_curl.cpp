@@ -266,7 +266,11 @@ void on_timeout(uv_timer_t *) {
 
 void start_timeout(CURLM *, long timeout_ms, void *) {
     if (timeout_ms <= 0) {
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
         on_timeout(&timeout, 0);
+#else
+        on_timeout(&timeout);
+#endif
     } else {
         uv_timer_start(&timeout, on_timeout, timeout_ms, 0);
     }
