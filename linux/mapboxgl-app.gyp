@@ -12,7 +12,6 @@
         '../platform/default/settings_json.cpp',
         '../platform/default/glfw_view.cpp',
         '../platform/default/log_stderr.cpp',
-        '../platform/default/image_reader.cpp',
         '../platform/default/png_reader.cpp',
         '../platform/default/jpeg_reader.cpp',
       ],

@@ -31,6 +31,7 @@
         '../platform/default/string_stdlib.cpp',
         '../platform/default/http_request_baton_curl.cpp',
         '../platform/default/image.cpp',
+        '../platform/default/image_reader.cpp',
       ],
       'include_dirs': [
         '../include',
