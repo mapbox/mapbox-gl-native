@@ -134,11 +134,12 @@ Image::Image(const std::string &data) {
             png_set_add_alpha(png, 0xFF, PNG_FILLER_AFTER);
         }
 
-        double gamma;
+        // FIXME work around gamma crash
+        /*double gamma;
         if (png_get_gAMA(png, info, &gamma))
             png_set_gamma(png, 2.2, gamma);
 
-        png_set_alpha_mode(png, PNG_ALPHA_PREMULTIPLIED, 2.2);
+        png_set_alpha_mode(png, PNG_ALPHA_PREMULTIPLIED, 2.2);*/
 
         png_read_update_info(png, info);
 
