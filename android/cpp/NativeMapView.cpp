@@ -57,9 +57,7 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj_,
     // FIXME need way to load this from Java
     map->setAccessToken("pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ");
 
-    // FIXME this asserts because it creates FileSource of different thread from run thread
-    //map->setStyleJSON(default_style_json);
-    map->setStyleURL("https://raw.githubusercontent.com/mapbox/mapbox-gl-styles/mb-pages/styles/bright-v6.json");
+    map->setStyleURL("http://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json");
 }
 
 NativeMapView::~NativeMapView() {
