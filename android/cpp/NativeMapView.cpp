@@ -1,10 +1,9 @@
-//#include <cstdio>
-
 #include <memory>
 
 #include <GLES2/gl2.h>
 
 #include <mbgl/platform/platform.hpp>
+#include <mbgl/platform/android/log_android.hpp>
 
 #include "log.h"
 
@@ -50,9 +49,7 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj_,
         return;
     }
 
-    // TODO replace all printfs in map code with android logging
-    //freopen("/sdcard/stdout.txt", "w", stdout); // NOTE: can't use <cstdio> till NDK fix the stdout macro bug
-    //freopen("/sdcard/stderr.txt", "w", stderr);
+    mbgl::Log::Set<mbgl::AndroidLogBackend>();
 
     view = new MBGLView(this);
     map = new mbgl::Map(*view);
