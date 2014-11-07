@@ -73,7 +73,13 @@ void GLFWView::initialize(mbgl::Map *map_) {
     {
         using namespace mbgl;
 
-        if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
+
+        if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
+            gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glfwGetProcAddress("glBindVertexArrayARB");
+            gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glfwGetProcAddress("glDeleteVertexArraysARB");
+            gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glfwGetProcAddress("glGenVertexArraysARB");
+            gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glfwGetProcAddress("glIsVertexArrayARB");
+        } else if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
             gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glfwGetProcAddress("glBindVertexArrayAPPLE");
             gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glfwGetProcAddress("glDeleteVertexArraysAPPLE");
             gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glfwGetProcAddress("glGenVertexArraysAPPLE");

@@ -58,6 +58,14 @@ void HeadlessView::loadExtensions() {
         gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)CGLGetProcAddress("glIsVertexArrayAPPLE");
     }
 #endif
+#ifdef MBGL_USE_GLX
+    if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
+        gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glXGetProcAddress((const GLubyte *)"glBindVertexArrayARB");
+        gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glXGetProcAddress((const GLubyte *)"glDeleteVertexArraysARB");
+        gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glXGetProcAddress((const GLubyte *)"glGenVertexArraysARB");
+        gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glXGetProcAddress((const GLubyte *)"glIsVertexArrayARB");
+    }
+#endif
     make_inactive();
 }
 
