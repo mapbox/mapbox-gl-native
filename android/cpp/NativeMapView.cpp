@@ -56,8 +56,7 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj_,
 
     // FIXME need way to load this from Java
     map->setAccessToken("pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ");
-
-    map->setStyleURL("http://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json");
+    map->setStyleURL("https://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json");
 }
 
 NativeMapView::~NativeMapView() {

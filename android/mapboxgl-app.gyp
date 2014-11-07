@@ -44,7 +44,12 @@
       'dependencies': [
         '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:mbgl-android',
+        '../mapboxgl.gyp:copy_certificate_bundle',
       ],
+      'copies': [{
+        'files': [ '../styles/styles' ],
+        'destination': '<(PRODUCT_DIR)'
+      }],
     },
   ],
 }

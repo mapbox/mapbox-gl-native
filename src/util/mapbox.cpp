@@ -13,7 +13,7 @@ std::string normalizeURL(const std::string& url, const std::string& accessToken)
         throw std::runtime_error("You must provide a Mapbox API access token for Mapbox tile sources");
 
     // FIXME for test only change back to https after
-    return std::string("http://api.tiles.mapbox.com/v4/")
+    return std::string("https://api.tiles.mapbox.com/v4/")
         + url.substr(mapbox.length())
         + "?access_token="
         + accessToken;

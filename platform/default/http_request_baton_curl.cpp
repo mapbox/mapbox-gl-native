@@ -406,7 +406,9 @@ void start_request(void *const ptr) {
 
     // Carry on the shared pointer in the private information of the CURL handle.
     curl_easy_setopt(handle, CURLOPT_PRIVATE, context.release());
-    curl_easy_setopt(handle, CURLOPT_CAINFO, "ca-bundle.crt");
+    // FIXME temp work around
+    curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 0);
+    //curl_easy_setopt(handle, CURLOPT_CAINFO, "ca-bundle.crt");
     curl_easy_setopt(handle, CURLOPT_URL, baton->path.c_str());
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
     curl_easy_setopt(handle, CURLOPT_WRITEDATA, &baton->response->data);
