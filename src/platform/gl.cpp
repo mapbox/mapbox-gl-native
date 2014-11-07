@@ -2,9 +2,17 @@
 
 #include <iostream>
 
-#ifdef NVIDIA
-PFNGLDISCARDFRAMEBUFFEREXTPROC glDiscardFramebufferEXT;
-#endif
+
+namespace mbgl {
+namespace gl {
+
+PFNGLBINDVERTEXARRAYPROC BindVertexArray = nullptr;
+PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays = nullptr;
+PFNGLGENVERTEXARRAYSPROC GenVertexArrays = nullptr;
+PFNGLISVERTEXARRAYPROC IsVertexArray = nullptr;
+
+}
+}
 
 void _CHECK_GL_ERROR(const char *cmd, const char *file, int line) {
     std::cout <<  cmd << ";" << std::endl;

@@ -1,20 +1,30 @@
 #include <mbgl/geometry/vao.hpp>
+#include <mbgl/platform/log.hpp>
 
 namespace mbgl {
 
-#if GL_ARB_vertex_array_object
-
 VertexArrayObject::~VertexArrayObject() {
+    if (!gl::DeleteVertexArrays) return;
+
     if (vao) {
-        glDeleteVertexArrays(1, &vao);
+        gl::DeleteVertexArrays(1, &vao);
     }
 }
 
 void VertexArrayObject::bindVertexArrayObject() {
-    if (!vao) {
-        glGenVertexArrays(1, &vao);
+    if (!gl::GenVertexArrays || !gl::BindVertexArray) {
+        static bool reported = false;
+        if (!reported) {
+            Log::Warning(Event::OpenGL, "Not using Vertex Array Objects");
+            reported = true;
+        }
+        return;
     }
-    glBindVertexArray(vao);
+
+    if (!vao) {
+        gl::GenVertexArrays(1, &vao);
+    }
+    gl::BindVertexArray(vao);
 }
 
 void VertexArrayObject::verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer,
@@ -40,7 +50,5 @@ void VertexArrayObject::storeBinding(Shader &shader, GLuint vertexBuffer, GLuint
     bound_vertex_buffer = vertexBuffer;
     bound_elements_buffer = elementsBuffer;
 }
-
-#endif
 
 }

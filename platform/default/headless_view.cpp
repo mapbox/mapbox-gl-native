@@ -11,16 +11,54 @@ static PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = nullptr;
 #endif
 #endif
 
+#ifdef MBGL_USE_CGL
+#include <CoreFoundation/CoreFoundation.h>
+
+typedef void (* CGLProc)(void);
+CGLProc CGLGetProcAddress(const char *proc) {
+    static CFBundleRef framework = nullptr;
+    if (!framework) {
+        framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
+        if (!framework) {
+            throw std::runtime_error("Failed to load OpenGL.framework");
+        }
+    }
+
+    CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault, proc, kCFStringEncodingASCII);
+    CGLProc symbol = (CGLProc)CFBundleGetFunctionPointerForName(framework, name);
+    CFRelease(name);
+    return symbol;
+}
+#endif
+
 namespace mbgl {
+
 
 HeadlessView::HeadlessView()
     : display_(std::make_shared<HeadlessDisplay>()) {
     createContext();
+    loadExtensions();
 }
 
 HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display)
     : display_(display) {
     createContext();
+    loadExtensions();
+}
+
+void HeadlessView::loadExtensions() {
+    make_active();
+    const std::string extensions = (char *)glGetString(GL_EXTENSIONS);
+
+#ifdef MBGL_USE_CGL
+    if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
+        gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)CGLGetProcAddress("glBindVertexArrayAPPLE");
+        gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)CGLGetProcAddress("glDeleteVertexArraysAPPLE");
+        gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)CGLGetProcAddress("glGenVertexArraysAPPLE");
+        gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)CGLGetProcAddress("glIsVertexArrayAPPLE");
+    }
+#endif
+    make_inactive();
 }
 
 
