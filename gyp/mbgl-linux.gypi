@@ -19,6 +19,7 @@
         ],
         'ldflags': [
           '<@(png_ldflags)',
+          '<@(jpeg_ldflags)',
           '<@(uv_ldflags)',
           '<@(curl_ldflags)',
           '<@(nu_ldflags)',
