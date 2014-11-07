@@ -1,6 +1,7 @@
 #include <mbgl/storage/http_request.hpp>
 #include <mbgl/storage/sqlite_store.hpp>
 #include <mbgl/storage/http_request_baton.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <uv.h>
 
@@ -22,6 +23,8 @@ struct CacheRequestBaton {
 
 HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path_, uv_loop_t *loop_, util::ptr<SQLiteStore> store_)
     : BaseRequest(path_), thread_id(uv_thread_self()), loop(loop_), store(store_), type(type_) {
+    Log::Error(Event::HttpRequest, "HTTPRequest %s", path.c_str());
+
     if (store) {
         startCacheRequest();
     } else {
