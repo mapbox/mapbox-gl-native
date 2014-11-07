@@ -1,4 +1,5 @@
 #include <mbgl/util/image.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <png.h>
 
@@ -15,14 +16,14 @@ std::string compress_png(int width, int height, void *rgba) {
     png_voidp error_ptr = 0;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, NULL, NULL);
     if (!png_ptr) {
-        fprintf(stderr, "Couldn't create png_ptr\n");
+        Log::Error(Event::Image, "Couldn't create png_ptr");
         return "";
     }
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!png_ptr) {
         png_destroy_write_struct(&png_ptr, (png_infopp)0);
-        fprintf(stderr, "Couldn't create info_ptr\n");
+        Log::Error(Event::Image, "Couldn't create info_ptr");
         return "";
     }
 
@@ -80,18 +81,19 @@ void readCallback(png_structp png, png_bytep data, png_size_t length) {
 }
 
 void errorHandler(png_structp, png_const_charp error_msg) {
+    Log::Error(Event::Image, "PNG: %s", error_msg);
     throw std::runtime_error(error_msg);
 }
 
 void warningHandler(png_structp, png_const_charp error_msg) {
-    fprintf(stderr, "PNG: %s\n", error_msg);
+    Log::Warning(Event::General, "PNG: %s", error_msg);
 }
 
 Image::Image(const std::string &data) {
     Buffer buffer(data);
 
     if (buffer.length < 8 || !png_check_sig((const png_bytep)buffer.data, 8)) {
-        fprintf(stderr, "image is not a valid PNG image\n");
+        Log::Error(Event::Image, "image is not a valid PNG image");
         return;
     }
 
@@ -164,7 +166,7 @@ Image::Image(const std::string &data) {
 
         png_destroy_read_struct(&png, &info, nullptr);
     } catch (std::exception& e) {
-        fprintf(stderr, "loading PNG failed: %s\n", e.what());
+        Log::Error(Event::Image, "loading PNG failed: %s", e.what());
         png_destroy_read_struct(&png, &info, nullptr);
         if (img) {
             img.reset();

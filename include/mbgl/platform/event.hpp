@@ -32,6 +32,7 @@ enum class Event : uint8_t {
     Database,
     HttpRequest,
     Sprite,
+    Image,
 };
 
 MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
@@ -44,6 +45,7 @@ MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
     { Event::Database, "Database" },
     { Event::HttpRequest, "HttpRequest" },
     { Event::Sprite, "Sprite" },
+    { Event::Image, "Image" },
     { Event(-1), "Unknown" },
 });
 
