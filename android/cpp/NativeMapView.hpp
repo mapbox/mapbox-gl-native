@@ -31,11 +31,11 @@ extern jfieldID lon_lat_zoom_zoom_id;
 
 extern jclass runtime_exception_class;
 
-extern jmethodID set_to_array_id;
+extern jmethodID list_to_array_id;
 
-extern jclass tree_set_class;
-extern jmethodID tree_set_constructor_id;
-extern jmethodID tree_set_add_id;
+extern jclass array_list_class;
+extern jmethodID array_list_constructor_id;
+extern jmethodID array_list_add_id;
 
 class MBGLView;
 
@@ -43,7 +43,7 @@ class NativeMapView {
     friend class MBGLView;
 
 public:
-    NativeMapView(JNIEnv* env, jobject obj, std::string style_url, std::string api_key);
+    NativeMapView(JNIEnv* env, jobject obj);
     ~NativeMapView();
 
     mbgl::Map* getMap() const {

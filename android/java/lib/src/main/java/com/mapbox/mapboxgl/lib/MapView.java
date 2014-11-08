@@ -1,9 +1,5 @@
 package com.mapbox.mapboxgl.lib;
 
-import java.io.IOException;
-
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -61,7 +58,7 @@ public class MapView extends SurfaceView {
     private String mStyleUrl;
 
     // Used to load map tiles
-    private String mApiKey;
+    private String mAccessToken;
 
     // Touch gesture detectors
     private GestureDetector mGestureDetector;
@@ -90,19 +87,19 @@ public class MapView extends SurfaceView {
     // Called when no properties are being set from XML
     public MapView(Context context) {
         super(context);
-        initialize(context, null, 0);
+        initialize(context, null);
     }
 
     // Called when properties are being set from XML
     public MapView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initialize(context, attrs, 0);
+        initialize(context, attrs);
     }
 
     // Called when properties are being set from XML
     public MapView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        initialize(context, attrs, defStyle);
+        initialize(context, attrs);
     }
 
     //
@@ -110,7 +107,7 @@ public class MapView extends SurfaceView {
     //
 
     // Common initialization code goes here
-    private void initialize(Context context, AttributeSet attrs, int defStyle) {
+    private void initialize(Context context, AttributeSet attrs) {
         Log.v(TAG, "initialize");
 
         // Check if we are in Eclipse UI editor
@@ -128,10 +125,12 @@ public class MapView extends SurfaceView {
         // Load the map style and API key
         //mStyleUrl = "https://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json";
         mStyleUrl = "file://" + cachePath + "/styles/styles/bright-v6.json";
-        mApiKey = "pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ";
+        mAccessToken = "pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ";
 
         // Create the NativeMapView
-        mNativeMapView = new NativeMapView(this, cachePath, mStyleUrl, mApiKey);
+        mNativeMapView = new NativeMapView(this, cachePath);
+        mNativeMapView.setStyleURL(mStyleUrl);
+        mNativeMapView.setAccessToken(mAccessToken);
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
@@ -500,7 +499,7 @@ public class MapView extends SurfaceView {
 
     // Called when view is hidden and shown
     @Override
-    protected void onVisibilityChanged(View changedView, int visibility) {
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         // Required by ZoomButtonController (from Android SDK documentation)
         if ((mZoomButtonsController != null) && (visibility != View.VISIBLE)) {
             mZoomButtonsController.setVisible(false);
@@ -542,7 +541,7 @@ public class MapView extends SurfaceView {
 
     // Called when user touches the screen, all positions are absolute
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(@NonNull MotionEvent event) {
         // Check and ignore non touch or left clicks
         if ((event.getButtonState() != 0)
                 && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
@@ -563,11 +562,7 @@ public class MapView extends SurfaceView {
 
         case MotionEvent.ACTION_POINTER_DOWN:
             // Second pointer down
-            if (event.getPointerCount() == 2) {
-                mTwoTap = true;
-            } else {
-                mTwoTap = false;
-            }
+            mTwoTap = event.getPointerCount() == 2;
             break;
 
         case MotionEvent.ACTION_POINTER_UP:
@@ -598,6 +593,7 @@ public class MapView extends SurfaceView {
         }
 
         // Do not change this code! It will break very easily.
+        // TODO fix up these warnings
         boolean retVal = rotateRetVal || scaleRetVal;
         retVal = mGestureDetector.onTouchEvent(event) || retVal;
         return retVal || super.onTouchEvent(event);
@@ -871,7 +867,7 @@ public class MapView extends SurfaceView {
     // Called when the user presses a key, also called for repeating keys held
     // down
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
         // If the user has held the scroll key down for a while then accelerate
         // the scroll speed
         double scrollDist = event.getRepeatCount() >= 5 ? 50.0 : 10.0;
@@ -1123,7 +1119,7 @@ public class MapView extends SurfaceView {
     // Called when the mouse pointer enters or exits the view
     // or when it fades in or out due to movement
     @Override
-    public boolean onHoverEvent(MotionEvent event) {
+    public boolean onHoverEvent(@NonNull MotionEvent event) {
         switch (event.getActionMasked()) {
         case MotionEvent.ACTION_HOVER_ENTER:
         case MotionEvent.ACTION_HOVER_MOVE:

@@ -3,21 +3,17 @@ package com.arieslabs.assetbridge;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-
-
 
 public class Assetbridge {
     /*static {
         System.loadLibrary("assetbridge");
     }*/
-
 
     // unpack 
     public static void unpack(Context c) {
@@ -47,7 +43,7 @@ public class Assetbridge {
 
 
     public static void copyAssetFolder(AssetManager am, String src, String dest)
-    	throws IOException{
+    	throws IOException {
 
         InputStream srcIS = null;
         File destfh;
@@ -69,8 +65,10 @@ public class Assetbridge {
     	if(isDir) {
 
             // If the directory doesn't yet exist, create it
-            if( !destfh.exists() ){
-                destfh.mkdir();
+            if( !destfh.exists() ) {
+                if (!destfh.mkdir()) {
+                    throw new IOException("Failed to mkdir");
+                }
             }
 
             // list the assets in the directory...
@@ -100,7 +98,6 @@ public class Assetbridge {
 
     	}
     }
-
 
     // the native method to set the environment variable
     //public static native void setassetdir(String s);

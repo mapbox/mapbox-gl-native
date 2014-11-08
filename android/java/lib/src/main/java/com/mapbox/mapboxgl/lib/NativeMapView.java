@@ -1,9 +1,9 @@
 package com.mapbox.mapboxgl.lib;
 
-import java.util.Set;
-
 import android.util.Log;
 import android.view.Surface;
+
+import java.util.List;
 
 // Class that wraps the native methods for convenience
 class NativeMapView {
@@ -37,11 +37,11 @@ class NativeMapView {
     // Constructors
     //
 
-    public NativeMapView(MapView mapView, String cachePath, String styleUrl, String apiKey) {
+    public NativeMapView(MapView mapView, String cachePath) {
         mMapView = mapView;
 
         // Create the NativeMapView
-        mNativeMapViewPtr = nativeCreate(cachePath, styleUrl, apiKey);
+        mNativeMapViewPtr = nativeCreate(cachePath);
     }
 
     //
@@ -80,6 +80,10 @@ class NativeMapView {
         nativeStop(mNativeMapViewPtr);
     }
 
+    public void run() {
+        nativeRun(mNativeMapViewPtr);
+    }
+
     public void rerender() {
         nativeRerender(mNativeMapViewPtr);
     }
@@ -90,6 +94,18 @@ class NativeMapView {
 
     public void cleanup() {
         nativeCleanup(mNativeMapViewPtr);
+    }
+
+    public void terminate() {
+        nativeTerminate(mNativeMapViewPtr);
+    }
+
+    public boolean needsSwap() {
+        return nativeNeedsSwap(mNativeMapViewPtr);
+    }
+
+    public void swapped() {
+        nativeSwapped(mNativeMapViewPtr);
     }
 
     public void resize(int width, int height) {
@@ -148,11 +164,15 @@ class NativeMapView {
         nativeResize(mNativeMapViewPtr, width, height, ratio, fbWidth, fbHeight);
     }
 
-    public void setAppliedClasses(Set<String> appliedClasses) {
-        nativeSetAppliedClasses(mNativeMapViewPtr, appliedClasses);
+    /*public void Set<StyleSource> getActiveSources() {
+        return nativeGetActiveSources(mNativeMapViewPtr);
+    }*/
+
+    public void setAppliedClasses(List<String> classes) {
+        nativeSetAppliedClasses(mNativeMapViewPtr, classes);
     }
 
-    public Set<String> getAppliedClasses() {
+    public List<String> getAppliedClasses() {
         return nativeGetAppliedClasses(mNativeMapViewPtr);
     }
 
@@ -170,12 +190,28 @@ class NativeMapView {
                 durationMilliseconds);
     }
 
+    public void setStyleURL(String url) {
+        nativeSetStyleURL(mNativeMapViewPtr, url);
+    }
+
     public void setStyleJSON(String newStyleJSON) {
-        nativeSetStyleJSON(mNativeMapViewPtr, newStyleJSON);
+        setStyleJSON(newStyleJSON,  "");
+    }
+
+    public void setStyleJSON(String newStyleJSON, String base) {
+        nativeSetStyleJSON(mNativeMapViewPtr, newStyleJSON, base);
     }
 
     public String getStyleJSON() {
         return nativeGetStyleJSON(mNativeMapViewPtr);
+    }
+
+    public void setAccessToken(String accessToken) {
+        nativeSetAccessToken(mNativeMapViewPtr, accessToken);
+    }
+
+    public String getAccessToken() {
+        return nativeGetAccessToken(mNativeMapViewPtr);
     }
 
     public void cancelTransitions() {
@@ -339,6 +375,10 @@ class NativeMapView {
         return nativeGetDebug(mNativeMapViewPtr);
     }
 
+    public void setReachability(boolean status) {
+        nativeSetReachability(mNativeMapViewPtr, status);
+    }
+
     //
     // Callbacks
     //
@@ -359,7 +399,7 @@ class NativeMapView {
         super.finalize();
     }
 
-    private native long nativeCreate(String cachePath, String styleUrl, String apiKey);
+    private native long nativeCreate(String cachePath);
 
     private native void nativeDestroy(long nativeMapViewPtr);
 
@@ -380,11 +420,19 @@ class NativeMapView {
 
     private native void nativeStop(long nativeMapViewPtr);
 
+    private native void nativeRun(long nativeMapViewPtr);
+
     private native void nativeRerender(long nativeMapViewPtr);
 
     private native void nativeUpdate(long nativeMapViewPtr);
 
     private native void nativeCleanup(long nativeMapViewPtr);
+
+    private native void nativeTerminate(long nativeMapViewPtr);
+
+    private native boolean nativeNeedsSwap(long nativeMapViewPtr);
+
+    private native void nativeSwapped(long nativeMapViewPtr);
 
     private native void nativeResize(long nativeMapViewPtr, int width,
             int height, float ratio);
@@ -392,18 +440,26 @@ class NativeMapView {
     private native void nativeResize(long nativeMapViewPtr, int width,
             int height, float ratio, int fbWidth, int fbHeight);
 
-    private native void nativeSetAppliedClasses(long nativeMapViewPtr,
-            Set<String> appliedClasses);
+    //private native void Set<StyleSource> nativeGetActiveSources(long nativeMapViewPtr);
 
-    private native Set<String> nativeGetAppliedClasses(long nativeMapViewPtr);
+    private native void nativeSetAppliedClasses(long nativeMapViewPtr,
+            List<String> classes);
+
+    private native List<String> nativeGetAppliedClasses(long nativeMapViewPtr);
 
     private native void nativeSetDefaultTransitionDuration(
             long nativeMapViewPtr, long durationMilliseconds);
 
+    private native void nativeSetStyleURL(long nativeMapViewPtr, String url);
+
     private native void nativeSetStyleJSON(long nativeMapViewPtr,
-            String newStyleJSON);
+            String newStyleJSON, String base);
 
     private native String nativeGetStyleJSON(long nativeMapViewPtr);
+
+    private native void nativeSetAccessToken(long nativeMapViewPtr, String accessToken);
+
+    private native String nativeGetAccessToken(long nativeMapViewPtr);
 
     private native void nativeCancelTransitions(long nativeMapViewPtr);
 
@@ -473,4 +529,6 @@ class NativeMapView {
     private native void nativeToggleDebug(long nativeMapViewPtr);
 
     private native boolean nativeGetDebug(long nativeMapViewPtr);
+
+    private native void nativeSetReachability(long nativeMapViewPtr, boolean status);
 }

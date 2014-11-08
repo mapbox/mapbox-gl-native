@@ -74,8 +74,6 @@ public class MoveGestureDetector extends BaseGestureDetector {
 
     private final OnMoveGestureListener mListener;
 
-    private PointF mCurrFocusInternal;
-    private PointF mPrevFocusInternal;
     private PointF mFocusExternal = new PointF();
     private PointF mFocusDeltaExternal = new PointF();
 
@@ -134,8 +132,8 @@ public class MoveGestureDetector extends BaseGestureDetector {
         final MotionEvent prev = mPrevEvent;
 
         // Focus intenal
-        mCurrFocusInternal = determineFocalPoint(curr);
-        mPrevFocusInternal = determineFocalPoint(prev);
+        PointF mCurrFocusInternal = determineFocalPoint(curr);
+        PointF mPrevFocusInternal = determineFocalPoint(prev);
 
         // Focus external
         // - Prevent skipping of focus delta when a finger is added or removed
@@ -155,8 +153,7 @@ public class MoveGestureDetector extends BaseGestureDetector {
      * Determine (multi)finger focal point (a.k.a. center point between all
      * fingers)
      * 
-     * @param MotionEvent
-     *            e
+     * @param e
      * @return PointF focal point
      */
     private PointF determineFocalPoint(MotionEvent e) {

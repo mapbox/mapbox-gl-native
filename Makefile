@@ -72,6 +72,7 @@ build/linux/mapboxgl-app.xcodeproj: linux/mapboxgl-app.gyp config.gypi
 .PHONY: android
 android:
 	./scripts/local_mason.sh && \
+	MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env PATH && \
 	export CXX="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CXX`" && \
 	export CC="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CC`" && \
 	export LD="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env LD`" && \

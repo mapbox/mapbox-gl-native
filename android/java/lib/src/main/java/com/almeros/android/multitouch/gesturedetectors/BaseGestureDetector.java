@@ -91,7 +91,8 @@ public abstract class BaseGestureDetector {
      * handling in this implementation may set the gesture out of progress (via
      * mGestureInProgress).
      * 
-     * @param action
+     *
+     * @param actionCode
      * @param event
      */
     protected abstract void handleInProgressEvent(int actionCode,

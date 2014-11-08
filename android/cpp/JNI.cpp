@@ -37,11 +37,11 @@ jfieldID lon_lat_zoom_zoom_id = nullptr;
 
 jclass runtime_exception_class = nullptr;
 
-jmethodID set_to_array_id = nullptr;
+jmethodID list_to_array_id = nullptr;
 
-jclass tree_set_class = nullptr;
-jmethodID tree_set_constructor_id = nullptr;
-jmethodID tree_set_add_id = nullptr;
+jclass array_list_class = nullptr;
+jmethodID array_list_constructor_id = nullptr;
+jmethodID array_list_add_id = nullptr;
 
 bool throw_error(JNIEnv* env, const char* msg) {
     if (env->ThrowNew(runtime_exception_class, msg) < 0) {
@@ -83,12 +83,10 @@ jstring std_string_to_jstring(JNIEnv* env, std::string str) {
     return jstr;
 }
 
-
-// TODO: change from Java TreeSet to ArrayList
-std::vector<std::string> std_vector_string_from_jobject(JNIEnv* env, jobject jset) {
+std::vector<std::string> std_vector_string_from_jobject(JNIEnv* env, jobject jlist) {
     std::vector<std::string> vector;
 
-    jobjectArray array = reinterpret_cast<jobjectArray>(env->CallObjectMethod(jset, set_to_array_id));
+    jobjectArray array = reinterpret_cast<jobjectArray>(env->CallObjectMethod(jlist, list_to_array_id));
     if (env->ExceptionCheck() || (array == nullptr)) {
         env->ExceptionDescribe();
         return vector;
@@ -113,23 +111,22 @@ std::vector<std::string> std_vector_string_from_jobject(JNIEnv* env, jobject jse
     return vector;
 }
 
-// TODO: change from Java TreeSet to ArrayList
 jobject std_vector_string_to_jobject(JNIEnv* env, std::vector<std::string> vector)  {
-    jobject jset = env->NewObject(tree_set_class, tree_set_constructor_id);
-    if (jset == nullptr) {
+    jobject jlist = env->NewObject(array_list_class, array_list_constructor_id);
+    if (jlist == nullptr) {
         env->ExceptionDescribe();
         return nullptr;
     }
 
     for (std::string str : vector) {
-        env->CallBooleanMethod(jset, tree_set_add_id, std_string_to_jstring(env, str));
+        env->CallBooleanMethod(jlist, array_list_add_id, std_string_to_jstring(env, str));
         if (env->ExceptionCheck()) {
             env->ExceptionDescribe();
             return nullptr;
         }
     }
 
-    return jset;
+    return jlist;
 }
 
 } // namespace android
@@ -142,10 +139,10 @@ using namespace mbgl::android;
 // TODO: wrap C++ exceptions?
 // TODO: wrap other sorts of exceptions? eg coffee catch
 
-jlong JNICALL nativeCreate(JNIEnv* env, jobject obj, jstring cache_path_, jstring style_url, jstring api_key) {
+jlong JNICALL nativeCreate(JNIEnv* env, jobject obj, jstring cache_path_) {
     LOG_VERBOSE("nativeCreate");
     cache_path = std_string_from_jstring(env, cache_path_);
-    NativeMapView* native_map_view = new NativeMapView(env, obj, std_string_from_jstring(env, style_url), std_string_from_jstring(env, api_key));
+    NativeMapView* native_map_view = new NativeMapView(env, obj);
     if (native_map_view == nullptr) {
         throw_error(env, "Unable to create NativeMapView.");
         return 0;
@@ -224,6 +221,13 @@ void JNICALL nativeStop(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     native_map_view->stop();
 }
 
+void JNICALL nativeRun(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    LOG_VERBOSE("nativeRun");
+    LOG_ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->run();
+}
+
 void JNICALL nativeRerender(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeRerender");
     LOG_ASSERT(native_map_view_ptr != 0);
@@ -243,6 +247,27 @@ void JNICALL nativeCleanup(JNIEnv* env, jobject obj, jlong native_map_view_ptr) 
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     native_map_view->getMap()->cleanup();
+}
+
+void JNICALL nativeTerminate(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    LOG_VERBOSE("nativeTerminate");
+    LOG_ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->terminate();
+}
+
+jboolean JNICALL nativeNeedsSwap(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    LOG_VERBOSE("nativeNeedsSwap");
+    LOG_ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    return native_map_view->getMap()->needsSwap();
+}
+
+void JNICALL nativeSwapped(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    LOG_VERBOSE("nativeSwapped");
+    LOG_ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->swapped();
 }
 
 void JNICALL nativeResize(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jint width, jint height, jfloat ratio) {
@@ -271,11 +296,11 @@ void JNICALL nativeResize(JNIEnv* env, jobject obj, jlong native_map_view_ptr, j
     native_map_view->getMap()->resize(width, height, ratio, fb_width, fb_height);
 }
 
-void JNICALL nativeSetAppliedClasses(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jobject applied_classes) {
+void JNICALL nativeSetAppliedClasses(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jobject classes) {
     LOG_VERBOSE("nativeSetAppliedClasses");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setAppliedClasses(std_vector_string_from_jobject(env, applied_classes));
+    native_map_view->getMap()->setAppliedClasses(std_vector_string_from_jobject(env, classes));
 }
 
 jobject JNICALL nativeGetAppliedClasses(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -294,11 +319,18 @@ void JNICALL nativeSetDefaultTransitionDuration(JNIEnv* env, jobject obj, jlong 
     native_map_view->getMap()->setDefaultTransitionDuration(duration_milliseconds);
 }
 
-void JNICALL nativeSetStyleJSON(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jstring new_style_json) {
+void JNICALL nativeSetStyleURL(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jstring url) {
+    LOG_VERBOSE("nativeSetStyleURL");
+    LOG_ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->setStyleURL(std_string_from_jstring(env, url));
+}
+
+void JNICALL nativeSetStyleJSON(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jstring new_style_json, jstring base) {
     LOG_VERBOSE("nativeSetStyleJSON");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setStyleJSON(std_string_from_jstring(env, new_style_json));
+    native_map_view->getMap()->setStyleJSON(std_string_from_jstring(env, new_style_json), std_string_from_jstring(env, base));
 }
 
 jstring JNICALL nativeGetStyleJSON(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -306,6 +338,20 @@ jstring JNICALL nativeGetStyleJSON(JNIEnv* env, jobject obj, jlong native_map_vi
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     return std_string_to_jstring(env, native_map_view->getMap()->getStyleJSON());
+}
+
+void JNICALL nativeSetAccessToken(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jstring access_token) {
+    LOG_VERBOSE("nativeSetAccessToken");
+    LOG_ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->setAccessToken(std_string_from_jstring(env, access_token));
+}
+
+jstring JNICALL nativeGetAccessToken(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    LOG_VERBOSE("nativeGetAccessToken");
+    LOG_ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    return std_string_to_jstring(env, native_map_view->getMap()->getAccessToken());
 }
 
 void JNICALL nativeCancelTransitions(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -570,6 +616,13 @@ jboolean JNICALL nativeGetDebug(JNIEnv* env, jobject obj, jlong native_map_view_
     return native_map_view->getMap()->getDebug();
 }
 
+void JNICALL nativeSetReachability(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jboolean status) {
+    LOG_VERBOSE("nativeSetReachability");
+    LOG_ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->getMap()->setReachability(status);
+}
+
 } // namespace
 
 extern "C" {
@@ -655,39 +708,39 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    jclass set_class = env->FindClass("java/util/Set");
-    if (set_class == nullptr) {
+    jclass list_class = env->FindClass("java/util/List");
+    if (list_class == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    set_to_array_id = env->GetMethodID(set_class, "toArray", "()[Ljava/lang/Object;");
-    if (set_to_array_id == nullptr) {
+    list_to_array_id = env->GetMethodID(list_class, "toArray", "()[Ljava/lang/Object;");
+    if (list_to_array_id == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    tree_set_class = env->FindClass("java/util/TreeSet");
-    if (tree_set_class == nullptr) {
+    array_list_class = env->FindClass("java/util/ArrayList");
+    if (array_list_class == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    tree_set_constructor_id = env->GetMethodID(tree_set_class, "<init>", "()V");
-    if (tree_set_constructor_id == nullptr) {
+    array_list_constructor_id = env->GetMethodID(array_list_class, "<init>", "()V");
+    if (array_list_constructor_id == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    tree_set_add_id = env->GetMethodID(tree_set_class, "add", "(Ljava/lang/Object;)Z");
-    if (tree_set_add_id == nullptr) {
+    array_list_add_id = env->GetMethodID(array_list_class, "add", "(Ljava/lang/Object;)Z");
+    if (array_list_add_id == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
     // NOTE: if you get java.lang.UnsatisfiedLinkError you likely forgot to set the size of the array correctly (too large)
-    std::array<JNINativeMethod, 50> methods = {{ // Can remove the extra brace in C++14
-        { "nativeCreate", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J", reinterpret_cast<void*>(&nativeCreate) },
+    std::array<JNINativeMethod, 58> methods = {{ // Can remove the extra brace in C++14
+        { "nativeCreate", "(Ljava/lang/String;)J", reinterpret_cast<void*>(&nativeCreate) },
         { "nativeDestroy", "(J)V", reinterpret_cast<void*>(&nativeDestroy) },
         { "nativeInitializeDisplay", "(J)V", reinterpret_cast<void*>(&nativeInitializeDisplay) },
         { "nativeTerminateDisplay", "(J)V", reinterpret_cast<void*>(&nativeTerminateDisplay) },
@@ -697,16 +750,23 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeDestroySurface", "(J)V", reinterpret_cast<void*>(&nativeDestroySurface) },
         { "nativeStart", "(J)V", reinterpret_cast<void*>(&nativeStart) },
         { "nativeStop", "(J)V", reinterpret_cast<void*>(&nativeStop) },
+        { "nativeRun", "(J)V", reinterpret_cast<void*>(&nativeRun) },
         { "nativeRerender", "(J)V", reinterpret_cast<void*>(&nativeRerender) },
         { "nativeUpdate", "(J)V", reinterpret_cast<void*>(&nativeUpdate) },
         { "nativeCleanup", "(J)V", reinterpret_cast<void*>(&nativeCleanup) },
+        { "nativeTerminate", "(J)V", reinterpret_cast<void*>(&nativeTerminate) },
+        { "nativeNeedsSwap", "(J)Z", reinterpret_cast<void*>(&nativeNeedsSwap) },
+        { "nativeSwapped", "(J)V", reinterpret_cast<void*>(&nativeSwapped) },
         { "nativeResize", "(JIIF)V", reinterpret_cast<void*>(static_cast<void JNICALL(*)(JNIEnv*,jobject,jlong,jint,jint,jfloat)>(&nativeResize)) },
         { "nativeResize", "(JIIFII)V", reinterpret_cast<void*>(static_cast<void JNICALL(*)(JNIEnv*,jobject,jlong,jint,jint,jfloat,jint,jint)>(&nativeResize)) },
-        { "nativeSetAppliedClasses", "(JLjava/util/Set;)V", reinterpret_cast<void*>(&nativeSetAppliedClasses) },
-        { "nativeGetAppliedClasses", "(J)Ljava/util/Set;", reinterpret_cast<void*>(&nativeGetAppliedClasses) },
+        { "nativeSetAppliedClasses", "(JLjava/util/List;)V", reinterpret_cast<void*>(&nativeSetAppliedClasses) },
+        { "nativeGetAppliedClasses", "(J)Ljava/util/List;", reinterpret_cast<void*>(&nativeGetAppliedClasses) },
         { "nativeSetDefaultTransitionDuration", "(JJ)V", reinterpret_cast<void*>(&nativeSetDefaultTransitionDuration) },
-        { "nativeSetStyleJSON", "(JLjava/lang/String;)V", reinterpret_cast<void*>(&nativeSetStyleJSON) },
+        { "nativeSetStyleURL", "(JLjava/lang/String;)V", reinterpret_cast<void*>(&nativeSetStyleURL) },
+        { "nativeSetStyleJSON", "(JLjava/lang/String;Ljava/lang/String;)V", reinterpret_cast<void*>(&nativeSetStyleJSON) },
         { "nativeGetStyleJSON", "(J)Ljava/lang/String;", reinterpret_cast<void*>(&nativeGetStyleJSON) },
+        { "nativeSetAccessToken", "(JLjava/lang/String;)V", reinterpret_cast<void*>(&nativeSetAccessToken) },
+        { "nativeGetAccessToken", "(J)Ljava/lang/String;", reinterpret_cast<void*>(&nativeGetAccessToken) },
         { "nativeCancelTransitions", "(J)V", reinterpret_cast<void*>(&nativeCancelTransitions) },
         { "nativeMoveBy", "(JDDD)V", reinterpret_cast<void*>(&nativeMoveBy) },
         { "nativeSetLonLat", "(JLcom/mapbox/mapboxgl/lib/LonLat;D)V", reinterpret_cast<void*>(&nativeSetLonLat) },
@@ -736,7 +796,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeCanRotate", "(J)Z", reinterpret_cast<void*>(&nativeCanRotate) },
         { "nativeSetDebug", "(JZ)V", reinterpret_cast<void*>(&nativeSetDebug) },
         { "nativeToggleDebug", "(J)V", reinterpret_cast<void*>(&nativeToggleDebug) },
-        { "nativeGetDebug", "(J)Z", reinterpret_cast<void*>(&nativeGetDebug) }
+        { "nativeGetDebug", "(J)Z", reinterpret_cast<void*>(&nativeGetDebug) },
+        { "nativeSetReachability", "(JZ)V", reinterpret_cast<void*>(&nativeSetReachability) }
     }};
 
     if (env->RegisterNatives(native_map_view_class, methods.data(), methods.size()) < 0) {
@@ -765,8 +826,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    tree_set_class = reinterpret_cast<jclass>(env->NewGlobalRef(tree_set_class));
-    if (tree_set_class == nullptr) {
+    array_list_class = reinterpret_cast<jclass>(env->NewGlobalRef(array_list_class));
+    if (array_list_class == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(lon_lat_class);
         env->DeleteGlobalRef(lon_lat_zoom_class);
@@ -804,12 +865,12 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     env->DeleteGlobalRef(runtime_exception_class);
     runtime_exception_class = nullptr;
 
-    set_to_array_id = nullptr;
+    list_to_array_id = nullptr;
 
-    env->DeleteGlobalRef(tree_set_class);
-    tree_set_class = nullptr;
-    tree_set_constructor_id = nullptr;
-    tree_set_add_id = nullptr;
+    env->DeleteGlobalRef(array_list_class);
+    array_list_class = nullptr;
+    array_list_constructor_id = nullptr;
+    array_list_add_id = nullptr;
 }
 
 } // extern "C"

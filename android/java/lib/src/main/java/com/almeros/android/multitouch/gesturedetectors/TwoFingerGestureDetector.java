@@ -38,8 +38,6 @@ import android.view.ViewConfiguration;
 public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
 
     private final float mEdgeSlop;
-    private float mRightSlopEdge;
-    private float mBottomSlopEdge;
 
     protected float mPrevFingerDiffX;
     protected float mPrevFingerDiffY;
@@ -168,22 +166,20 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
     protected boolean isSloppyGesture(MotionEvent event) {
         // As orientation can change, query the metrics in touch down
         DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
-        mRightSlopEdge = metrics.widthPixels - mEdgeSlop;
-        mBottomSlopEdge = metrics.heightPixels - mEdgeSlop;
+        float mRightSlopEdge = metrics.widthPixels - mEdgeSlop;
+        float mBottomSlopEdge = metrics.heightPixels - mEdgeSlop;
 
         final float edgeSlop = mEdgeSlop;
-        final float rightSlop = mRightSlopEdge;
-        final float bottomSlop = mBottomSlopEdge;
 
         final float x0 = event.getRawX();
         final float y0 = event.getRawY();
         final float x1 = getRawX(event, 1);
         final float y1 = getRawY(event, 1);
 
-        boolean p0sloppy = x0 < edgeSlop || y0 < edgeSlop || x0 > rightSlop
-                || y0 > bottomSlop;
-        boolean p1sloppy = x1 < edgeSlop || y1 < edgeSlop || x1 > rightSlop
-                || y1 > bottomSlop;
+        boolean p0sloppy = x0 < edgeSlop || y0 < edgeSlop || x0 > mRightSlopEdge
+                || y0 > mBottomSlopEdge;
+        boolean p1sloppy = x1 < edgeSlop || y1 < edgeSlop || x1 > mRightSlopEdge
+                || y1 > mBottomSlopEdge;
 
         if (p0sloppy && p1sloppy) {
             return true;
@@ -199,8 +195,7 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
      * Determine (multi)finger focal point (a.k.a. center point between all
      * fingers)
      * 
-     * @param MotionEvent
-     *            e
+     * @param e
      * @return PointF focal point
      */
     public static PointF determineFocalPoint(MotionEvent e) {

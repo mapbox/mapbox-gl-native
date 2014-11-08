@@ -93,14 +93,7 @@ public class LonLatZoom implements Parcelable {
         if (getClass() != obj.getClass())
             return false;
         LonLatZoom other = (LonLatZoom) obj;
-        if (Double.doubleToLongBits(lat) != Double.doubleToLongBits(other.lat))
-            return false;
-        if (Double.doubleToLongBits(lon) != Double.doubleToLongBits(other.lon))
-            return false;
-        if (Double.doubleToLongBits(zoom) != Double
-                .doubleToLongBits(other.zoom))
-            return false;
-        return true;
+        return Double.doubleToLongBits(lat) == Double.doubleToLongBits(other.lat) && Double.doubleToLongBits(lon) == Double.doubleToLongBits(other.lon) && Double.doubleToLongBits(zoom) == Double.doubleToLongBits(other.zoom);
     }
 
     @Override

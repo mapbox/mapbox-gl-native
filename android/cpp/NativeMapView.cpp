@@ -30,9 +30,7 @@ void log_gl_string(GLenum name, const char* label) {
     }
 }
 
-NativeMapView::NativeMapView(JNIEnv* env, jobject obj_,
-        std::string style_url_, std::string api_key_) :
-        style_url(style_url_), api_key(api_key_) {
+NativeMapView::NativeMapView(JNIEnv* env, jobject obj_) {
     LOG_VERBOSE("NativeMapView::NativeMapView");
 
     LOG_ASSERT(env != nullptr);
@@ -53,9 +51,6 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj_,
 
     view = new MBGLView(this);
     map = new mbgl::Map(*view);
-
-    map->setAccessToken(api_key);
-    map->setStyleURL(style_url);
 }
 
 NativeMapView::~NativeMapView() {

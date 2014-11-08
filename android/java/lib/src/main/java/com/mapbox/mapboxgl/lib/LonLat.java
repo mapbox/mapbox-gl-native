@@ -65,11 +65,7 @@ public class LonLat implements Parcelable {
         if (getClass() != obj.getClass())
             return false;
         LonLat other = (LonLat) obj;
-        if (Double.doubleToLongBits(lat) != Double.doubleToLongBits(other.lat))
-            return false;
-        if (Double.doubleToLongBits(lon) != Double.doubleToLongBits(other.lon))
-            return false;
-        return true;
+        return Double.doubleToLongBits(lat) == Double.doubleToLongBits(other.lat) && Double.doubleToLongBits(lon) == Double.doubleToLongBits(other.lon);
     }
 
     @Override

@@ -27,5 +27,6 @@ android {
 }
 
 dependencies {
-    compile "commons-io:commons-io:2.4"
+    compile 'commons-io:commons-io:2.4'
+    compile 'com.android.support:support-annotations:21.0.0'
 }

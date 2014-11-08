@@ -2,6 +2,7 @@ package com.mapbox.mapboxgl.app;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.mapbox.mapboxgl.lib.MapView;
@@ -88,7 +89,7 @@ public class MainActivity extends Activity {
 
     // Called before activity is destroyed
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         Log.v(TAG, "onSaveInstanceState");
 
         // Need to retrieve any saved state from the map
