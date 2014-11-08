@@ -31,8 +31,8 @@ void log_gl_string(GLenum name, const char* label) {
 }
 
 NativeMapView::NativeMapView(JNIEnv* env, jobject obj_,
-        std::string default_style_json_) :
-        default_style_json(default_style_json_) {
+        std::string style_url_, std::string api_key_) :
+        style_url(style_url_), api_key(api_key_) {
     LOG_VERBOSE("NativeMapView::NativeMapView");
 
     LOG_ASSERT(env != nullptr);
@@ -54,9 +54,8 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj_,
     view = new MBGLView(this);
     map = new mbgl::Map(*view);
 
-    // FIXME need way to load this from Java
-    map->setAccessToken("pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ");
-    map->setStyleURL("https://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json");
+    map->setAccessToken(api_key);
+    map->setStyleURL(style_url);
 }
 
 NativeMapView::~NativeMapView() {
@@ -114,18 +113,17 @@ bool NativeMapView::initializeDisplay() {
     log_egl_string(display, EGL_CLIENT_APIS, "Client APIs");
     log_egl_string(display, EGL_EXTENSIONS, "Client Extensions");
 
-    // TODO should try 565, then 8888?
+    // Try 565 first (faster)
     bool use565 = true;
-
-    const EGLint config_attribs[] = {
+    EGLint config_attribs[] = {
         EGL_CONFIG_CAVEAT, EGL_NONE,
         EGL_CONFORMANT, EGL_OPENGL_ES2_BIT,
         EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
         EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER,
-        EGL_BUFFER_SIZE, use565 ? 16 : 32, // Ensure we get 32bit color buffer on Tegra, 24 bit will be sorted first without it (slow software mode)
-        EGL_RED_SIZE, use565 ? 5 : 8,
-        EGL_GREEN_SIZE, use565 ? 6 : 8,
-        EGL_BLUE_SIZE, use565 ? 5 : 8,
+        EGL_BUFFER_SIZE, 16,
+        EGL_RED_SIZE, 5,
+        EGL_GREEN_SIZE, 6,
+        EGL_BLUE_SIZE, 5,
         EGL_DEPTH_SIZE, 16,
         EGL_STENCIL_SIZE, 8,
         EGL_NONE
@@ -137,9 +135,24 @@ bool NativeMapView::initializeDisplay() {
         return false;
     }
     if (num_configs < 1) {
-        LOG_ERROR("eglChooseConfig() returned no configs");
-        terminateDisplay();
-        return false;
+        LOG_WARN("eglChooseConfig() returned no configs for 565");
+
+        // Now try 8888
+        use565 = false;
+        config_attribs[9] = 32; // EGL_BUFFER_SIZE // Ensure we get 32bit color buffer on Tegra, 24 bit will be sorted first without it (slow software mode)
+        config_attribs[11] = 8; // EGL_RED_SIZE
+        config_attribs[13] = 8; // EGL_GREEN_SIZE
+        config_attribs[15] = 8; // EGL_BLUE_SIZE
+        if (!eglChooseConfig(display, config_attribs, nullptr, 0, &num_configs)) {
+            LOG_ERROR("eglChooseConfig(NULL) returned error %d", eglGetError());
+            terminateDisplay();
+            return false;
+        }
+        if (num_configs < 1) {
+            LOG_ERROR("eglChooseConfig() returned no configs for 8888");
+            terminateDisplay();
+            return false;
+        }
     }
 
     // TODO make_unique missing in Android NDK?

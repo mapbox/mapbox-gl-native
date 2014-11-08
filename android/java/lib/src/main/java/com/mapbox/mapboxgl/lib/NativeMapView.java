@@ -37,11 +37,11 @@ class NativeMapView {
     // Constructors
     //
 
-    public NativeMapView(MapView mapView, String defaultStyleJSON) {
+    public NativeMapView(MapView mapView, String styleUrl, String apiKey) {
         mMapView = mapView;
 
         // Create the NativeMapView
-        mNativeMapViewPtr = nativeCreate(defaultStyleJSON);
+        mNativeMapViewPtr = nativeCreate(styleUrl, apiKey);
     }
 
     //
@@ -359,7 +359,7 @@ class NativeMapView {
         super.finalize();
     }
 
-    private native long nativeCreate(String defaultStyleJSON);
+    private native long nativeCreate(String styleUrl, String apiKey);
 
     private native void nativeDestroy(long nativeMapViewPtr);
 

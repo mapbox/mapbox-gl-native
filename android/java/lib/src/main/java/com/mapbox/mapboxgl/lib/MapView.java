@@ -57,7 +57,10 @@ public class MapView extends SurfaceView {
     private NativeMapView mNativeMapView;
 
     // Used to style the map
-    private String mDefaultStyleJSON;
+    private String mStyleUrl;
+
+    // Used to load map tiles
+    private String mApiKey;
 
     // Touch gesture detectors
     private GestureDetector mGestureDetector;
@@ -115,18 +118,12 @@ public class MapView extends SurfaceView {
             return;
         }
 
-        // Load the map style
-        try {
-            mDefaultStyleJSON = IOUtils.toString(context.getResources()
-            // .openRawResource(R.raw.style_leith), Charsets.UTF_8);
-                    .openRawResource(R.raw.style), Charsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(
-                    "Couldn't load default style JSON resource", e);
-        }
+        // Load the map style and API key
+        mStyleUrl = "https://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json";
+        mApiKey = "pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ";
 
         // Create the NativeMapView
-        mNativeMapView = new NativeMapView(this, mDefaultStyleJSON);
+        mNativeMapView = new NativeMapView(this, mStyleUrl, mApiKey);
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,

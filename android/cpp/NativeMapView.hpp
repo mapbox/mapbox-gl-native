@@ -41,7 +41,7 @@ class NativeMapView {
     friend class MBGLView;
 
 public:
-    NativeMapView(JNIEnv* env, jobject obj, std::string default_style_json);
+    NativeMapView(JNIEnv* env, jobject obj, std::string style_url, std::string api_key);
     ~NativeMapView();
 
     mbgl::Map* getMap() const {
@@ -82,7 +82,8 @@ private:
     EGLConfig config = nullptr;
     EGLint format = -1;
 
-    std::string default_style_json;
+    std::string style_url;
+    std::string api_key;
 };
 
 class MBGLView: public mbgl::View {
