@@ -11,6 +11,7 @@
           '<@(uv_cflags)',
           '<@(curl_cflags)',
           '<@(nu_cflags)',
+          '-I<(boost_root)/include',
         ],
         'cflags': [
           '<@(uv_cflags)',

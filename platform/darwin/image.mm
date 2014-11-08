@@ -93,8 +93,8 @@ Image::Image(const std::string &source_data) {
         return;
     }
 
-    width = CGImageGetWidth(image);
-    height = CGImageGetHeight(image);
+    width = uint32_t(CGImageGetWidth(image));
+    height = uint32_t(CGImageGetHeight(image));
     CGRect rect = {{ 0, 0 }, { static_cast<CGFloat>(width), static_cast<CGFloat>(height) }};
 
     img = ::std::unique_ptr<char[]>(new char[width * height * 4]());

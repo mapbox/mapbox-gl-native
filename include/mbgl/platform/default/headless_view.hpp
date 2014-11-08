@@ -25,6 +25,7 @@ public:
     ~HeadlessView();
 
     void createContext();
+    void loadExtensions();
 
     void resize(uint16_t width, uint16_t height, float pixelRatio);
     std::unique_ptr<uint32_t[]> readPixels();

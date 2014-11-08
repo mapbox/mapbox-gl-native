@@ -49,7 +49,11 @@ void PrerenderedTexture::bindFramebuffer() {
         // Create depth/stencil buffer
         glGenRenderbuffers(1, &fbo_depth_stencil);
         glBindRenderbuffer(GL_RENDERBUFFER, fbo_depth_stencil);
+#ifdef GL_ES_VERSION_2_0
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, properties.size, properties.size);
+#else
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, properties.size, properties.size);
+#endif
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
     }
 

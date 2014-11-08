@@ -3,35 +3,22 @@
 
 #include <string>
 
-#ifdef NVIDIA
-    #include <GLES2/gl2.h>
-    #include <GLES2/gl2ext.h>
-
-    extern PFNGLDISCARDFRAMEBUFFEREXTPROC glDiscardFramebufferEXT;
-
-    #define GL_DEPTH24_STENCIL8 GL_DEPTH24_STENCIL8_OES
-#elif __APPLE__
+#if __APPLE__
     #include "TargetConditionals.h"
     #if TARGET_OS_IPHONE
         #include <OpenGLES/ES2/gl.h>
         #include <OpenGLES/ES2/glext.h>
-        #define glGenVertexArrays glGenVertexArraysOES
-        #define glBindVertexArray glBindVertexArrayOES
-        #define glDeleteVertexArrays glDeleteVertexArraysOES
-        #define GL_ARB_vertex_array_object 1
-        #define GL_DEPTH24_STENCIL8 GL_DEPTH24_STENCIL8_OES
+        // #define glGenVertexArrays glGenVertexArraysOES
+        // #define glBindVertexArray glBindVertexArrayOES
+        // #define glDeleteVertexArrays glDeleteVertexArraysOES
+        // #define GL_ARB_vertex_array_object 1
+        // #define GL_DEPTH24_STENCIL8 GL_DEPTH24_STENCIL8_OES
     #elif TARGET_IPHONE_SIMULATOR
         #include <OpenGLES/ES2/gl.h>
         #include <OpenGLES/ES2/glext.h>
     #elif TARGET_OS_MAC
         #include <OpenGL/OpenGL.h>
         #include <OpenGL/gl.h>
-        #if GL_APPLE_vertex_array_object
-            #define GL_ARB_vertex_array_object 1
-            #define glGenVertexArrays glGenVertexArraysAPPLE
-            #define glBindVertexArray glBindVertexArrayAPPLE
-            #define glDeleteVertexArrays glDeleteVertexArraysAPPLE
-        #endif
     #else
         #error Unsupported Apple platform
     #endif
@@ -39,7 +26,6 @@
     #define GL_GLEXT_PROTOTYPES
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>
-    #define GL_DEPTH24_STENCIL8 GL_DEPTH24_STENCIL8_OES
 #else
     #define GL_GLEXT_PROTOTYPES
     #include <GL/gl.h>
@@ -48,8 +34,19 @@
 
 namespace mbgl {
 namespace gl {
+
+typedef void (* PFNGLBINDVERTEXARRAYPROC) (GLuint array);
+typedef void (* PFNGLDELETEVERTEXARRAYSPROC) (GLsizei n, const GLuint* arrays);
+typedef void (* PFNGLGENVERTEXARRAYSPROC) (GLsizei n, GLuint* arrays);
+typedef GLboolean (* PFNGLISVERTEXARRAYPROC) (GLuint array);
+extern PFNGLBINDVERTEXARRAYPROC BindVertexArray;
+extern PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays;
+extern PFNGLGENVERTEXARRAYSPROC GenVertexArrays;
+extern PFNGLISVERTEXARRAYPROC IsVertexArray;
+
+
 // Debug group markers, useful for debuggin on iOS
-#if defined(__APPLE__) && defined(DEBUG) && defined(GL_EXT_debug_marker)
+#if __APPLE__ && defined(DEBUG) && defined(GL_EXT_debug_marker)
 // static int indent = 0;
 inline void start_group(const std::string &str) {
     glPushGroupMarkerEXT(0, str.c_str());

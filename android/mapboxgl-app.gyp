@@ -24,7 +24,12 @@
       ],
       'variables': {
         'ldflags': [
-          '-llog -landroid -lEGL -lGLESv2 -lstdc++ -latomic '
+          '-llog',
+          '-landroid',
+          '-lEGL',
+          '-lGLESv2',
+          '-lstdc++',
+          '-latomic',
           '<@(png_ldflags)',
           '<@(sqlite3_ldflags)',
           '<@(openssl_ldflags)',

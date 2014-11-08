@@ -14,7 +14,16 @@
           'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
           'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
           'GCC_ENABLE_CPP_RTTI':'YES',
-          'OTHER_CPLUSPLUSFLAGS': [ '-Wall', '-Wextra', '-Wshadow', '-Wno-variadic-macros', '-frtti', '-fexceptions' ],
+          'OTHER_CPLUSPLUSFLAGS': [
+            '-Werror',
+            '-Wall',
+            '-Wextra',
+            '-Wshadow',
+            '-Wno-variadic-macros',
+            '-frtti',
+            '-fexceptions',
+            '-Wno-error=unused-parameter',
+          ],
           'GCC_WARN_PEDANTIC': 'YES',
           'GCC_WARN_UNINITIALIZED_AUTOS': 'YES_AGGRESSIVE',
         },
@@ -23,7 +32,8 @@
         'cflags_cc': [
           '-Wno-unknown-pragmas', # We are using '#pragma mark', but it is only available on Darwin.
           '-Wno-literal-suffix', # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61653
-          '-Wno-unknown-warning-option'
+          '-Wno-unknown-warning-option',
+          '-Wno-error=unused-parameter',
         ],
       }],
     ],

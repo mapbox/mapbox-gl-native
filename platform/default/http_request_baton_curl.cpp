@@ -1,7 +1,5 @@
 #include <mbgl/storage/http_request_baton.hpp>
 #include <mbgl/util/uv-messenger.h>
-#include <mbgl/util/std.hpp>
-#include <mbgl/util/ptr.hpp>
 #include <mbgl/util/time.hpp>
 #ifdef __ANDROID__
     #include "../../android/cpp/NativeMapView.hpp"
@@ -23,7 +21,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -77,24 +75,81 @@ static std::queue<CURL *> handles;
 
 namespace mbgl {
 
-struct CURLContext {
-    util::ptr<HTTPRequestBaton> baton;
-    uv_poll_t *poll_handle = nullptr;
-    curl_socket_t sockfd = 0;
+struct Context {
+    const util::ptr<HTTPRequestBaton> baton;
+    CURL *handle = nullptr;
     curl_slist *headers = nullptr;
 
-    CURLContext(const util::ptr<HTTPRequestBaton> &baton_) : baton(baton_) {
+    Context(const util::ptr<HTTPRequestBaton> &baton_) : baton(baton_) {
+        assert(baton);
+        baton->ptr = this;
+
+        if (!handles.empty()) {
+            handle = handles.front();
+            handles.pop();
+        } else {
+            handle = curl_easy_init();
+        }
     }
 
-    ~CURLContext() {
-        // We are destructing the poll handle in a CURL callback already.
-        assert(!poll_handle);
+    ~Context() {
+        baton->ptr = nullptr;
 
-        // Once the CURLContext gets destroyed, CURL doesn't need any headers anymore.
         if (headers) {
             curl_slist_free_all(headers);
             headers = nullptr;
         }
+
+        CURLMcode error = curl_multi_remove_handle(multi, handle);
+        if (error != CURLM_OK) {
+            baton->response = std::unique_ptr<Response>(new Response());
+            baton->response->code = -1;
+            baton->response->message = curl_multi_strerror(error);
+        }
+
+        curl_easy_setopt(handle, CURLOPT_PRIVATE, nullptr);
+        curl_easy_reset(handle);
+        handles.push(handle);
+        handle = nullptr;
+
+        if (baton->async) {
+            uv_async_send(baton->async);
+            baton->async = nullptr;
+        }
+    }
+};
+
+struct Socket {
+private:
+    uv_poll_t poll_handle;
+
+public:
+    const curl_socket_t sockfd = 0;
+
+public:
+    Socket(curl_socket_t sockfd_) : sockfd(sockfd_) {
+        uv_poll_init_socket(loop, &poll_handle, sockfd);
+        poll_handle.data = this;
+    }
+
+    void start(int events, uv_poll_cb cb) {
+        uv_poll_start(&poll_handle, events, cb);
+    }
+
+    void stop() {
+        assert(poll_handle.data);
+        poll_handle.data = nullptr;
+        uv_poll_stop(&poll_handle);
+        uv_close((uv_handle_t *)&poll_handle, [](uv_handle_t *handle) {
+            delete (Socket *)handle->data;
+        });
+    }
+
+private:
+    // Make the destructor private to ensure that we can only close the Socket
+    // with stop(), and disallow manual deletion.
+    ~Socket() {
+        assert(!poll_handle.data);
     }
 };
 
@@ -108,59 +163,22 @@ void curl_share_unlock(CURL *, curl_lock_data, void *) {
     uv_mutex_unlock(&share_mutex);
 }
 
-// This function must run in the CURL thread.
-// It is either called when the request is completed, or when we try to cancel the request.
-void finish_request(const util::ptr<HTTPRequestBaton> &baton) {
-    assert(uv_thread_self() == thread_id);
-    if (baton->ptr) {
-        CURL *handle = (CURL *)baton->ptr;
-        CURLMcode error = curl_multi_remove_handle(multi, handle);
-        if (error != CURLM_OK) {
-            baton->response = std::make_unique<Response>();
-            baton->response->code = -1;
-            baton->response->message = curl_multi_strerror(error);
-        }
-
-        // Destroy the shared pointer. We still have one pointing to it
-        CURLContext *context = nullptr;
-        curl_easy_getinfo(handle, CURLINFO_PRIVATE, (char *)&context);
-        curl_easy_setopt(handle, CURLOPT_PRIVATE, nullptr);
-        delete context;
-
-        // TODO: delete the headers object again.
-
-        curl_easy_reset(handle);
-        handles.push(handle);
-        baton->ptr = nullptr;
-    }
-}
-
-void curl_perform(uv_poll_t *req, int, int events) {
-    int running_handles;
-    int flags = 0;
-    CURLContext *context = (CURLContext *)req->data;
-    CURLMsg *message;
-    int pending;
-
-    uv_timer_stop(&timeout);
-
-    if (events & UV_READABLE) {
-        flags |= CURL_CSELECT_IN;
-    }
-    if (events & UV_WRITABLE) {
-        flags |= CURL_CSELECT_OUT;
-    }
-
-    curl_multi_socket_action(multi, context->sockfd, flags, &running_handles);
+void check_multi_info() {
+    CURLMsg *message = nullptr;
+    int pending = 0;
 
     while ((message = curl_multi_info_read(multi, &pending))) {
         switch (message->msg) {
         case CURLMSG_DONE: {
-            CURLContext *ctx = nullptr;
-            curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&ctx);
+            Context *context = nullptr;
+            curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&context);
+            assert(context);
 
-            // Make a copy so that the Baton stays around even after we are calling finish_request
-            util::ptr<HTTPRequestBaton> baton = ctx->baton;
+            auto baton = context->baton;
+
+            // This request is complete. We are removing the pointer to the CURL easy handle again
+            // to prevent this request from getting canceled.
+            context->baton->ptr = nullptr;
 
             // Add human-readable error code
             if (message->data.result != CURLE_OK) {
@@ -202,16 +220,8 @@ void curl_perform(uv_poll_t *req, int, int events) {
                 }
             }
 
-            // We're currently in the CURL request thread.
-            finish_request(baton);
-
-            if (baton->async) {
-                uv_async_send(baton->async);
-                baton->async = nullptr;
-            }
-
-            break;
-        }
+            delete context;
+        } break;
 
         default:
             // This should never happen, because there are no other message types.
@@ -220,63 +230,71 @@ void curl_perform(uv_poll_t *req, int, int events) {
     }
 }
 
-int handle_socket(CURL *handle, curl_socket_t sockfd, int action, void *, void *socketp) {
-    CURLContext *context = nullptr;
-    curl_easy_getinfo(handle, CURLINFO_PRIVATE, (char *)&context);
+void curl_perform(uv_poll_t *req, int /* status */, int events) {
+    int flags = 0;
 
-    if (!socketp && action != CURL_POLL_REMOVE) {
-        // We haven't initialized the socket yet, so we need to do this now.
-        assert(context->sockfd == 0);
-        context->sockfd = sockfd;
-        assert(!context->poll_handle);
-        context->poll_handle = new uv_poll_t;
-        uv_poll_init_socket(loop, context->poll_handle, sockfd);
-        context->poll_handle->data = context;
-        curl_multi_assign(multi, sockfd, context);
+    uv_timer_stop(&timeout);
+
+    if (events & UV_READABLE) {
+        flags |= CURL_CSELECT_IN;
+    }
+    if (events & UV_WRITABLE) {
+        flags |= CURL_CSELECT_OUT;
     }
 
-    if (context) {
-        if (action == CURL_POLL_IN || action == CURL_POLL_INOUT) {
-            uv_poll_start(context->poll_handle, UV_READABLE, curl_perform);
+    Socket *context = (Socket *)req->data;
+    int running_handles = 0;
+    curl_multi_socket_action(multi, context->sockfd, flags, &running_handles);
+
+    check_multi_info();
+}
+
+int handle_socket(CURL * /* handle */, curl_socket_t s, int action, void * /* userp */, void *socketp) {
+    Socket *socket = (Socket *)socketp;
+    if (!socket && action != CURL_POLL_REMOVE) {
+        socket = new Socket(s);
+        curl_multi_assign(multi, s, (void *)socket);
+    }
+
+    switch (action) {
+    case CURL_POLL_IN:
+        socket->start(UV_READABLE, curl_perform);
+        break;
+    case CURL_POLL_OUT:
+        socket->start(UV_WRITABLE, curl_perform);
+        break;
+    case CURL_POLL_REMOVE:
+        if (socket) {
+            socket->stop();
+            curl_multi_assign(multi, s, NULL);
         }
-        if (action == CURL_POLL_OUT || action == CURL_POLL_INOUT) {
-            uv_poll_start(context->poll_handle, UV_WRITABLE, curl_perform);
-        }
-        if (action == CURL_POLL_REMOVE && socketp) {
-            uv_poll_stop(context->poll_handle);
-            uv_close((uv_handle_t *)context->poll_handle, [](uv_handle_t *poll_handle) {
-                delete (uv_poll_t *)poll_handle;
-            });
-            context->poll_handle = nullptr;
-            curl_multi_assign(multi, sockfd, NULL);
-        }
+        break;
+    default:
+        abort();
     }
 
     return 0;
 }
 
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void on_timeout(uv_timer_t *, int = 0) {
+void on_timeout(uv_timer_t * /* req */, int /* status */) {
 #else
-void on_timeout(uv_timer_t *) {
+void on_timeout(uv_timer_t * /* req */) {
 #endif
     int running_handles;
     CURLMcode error = curl_multi_socket_action(multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
     if (error != CURLM_OK) {
         throw std::runtime_error(std::string("CURL multi error: ") + curl_multi_strerror(error));
     }
+
+    check_multi_info();
 }
 
-void start_timeout(CURLM *, long timeout_ms, void *) {
+void start_timeout(CURLM * /* multi */, long timeout_ms, void * /* userp */) {
     if (timeout_ms <= 0) {
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-        on_timeout(&timeout, 0);
-#else
-        on_timeout(&timeout);
-#endif
-    } else {
-        uv_timer_start(&timeout, on_timeout, timeout_ms, 0);
+        timeout_ms = 1; /* 0 means directly call socket_action, but we'll do it in a bit */
     }
+    uv_timer_start(&timeout, on_timeout, timeout_ms, 0);
 }
 
 void thread_init(void *) {
@@ -284,6 +302,10 @@ void thread_init(void *) {
     pthread_setname_np("CURL");
 #endif
     thread_id = uv_thread_self();
+
+    if (curl_global_init(CURL_GLOBAL_ALL)) {
+        throw std::runtime_error("Could not init cURL");
+    }
 
     uv_timer_init(loop, &timeout);
 
@@ -300,7 +322,6 @@ void thread_init(void *) {
         throw std::runtime_error(std::string("CURL share error: ") + curl_share_strerror(share_error));
     }
 
-
     CURLMcode multi_error;
     multi = curl_multi_init();
 
@@ -311,7 +332,6 @@ void thread_init(void *) {
     multi_error = curl_multi_setopt(multi, CURLMOPT_TIMERFUNCTION, start_timeout);
     if (multi_error != CURLM_OK) {
         throw std::runtime_error(std::string("CURL multi error: ") + curl_multi_strerror(multi_error));
-
     }
 
     // Main event loop. This will not return until the request loop is terminated.
@@ -329,7 +349,9 @@ void thread_init(void *) {
 // This function is called when we have new data for a request. We just append it to the string
 // containing the previous data.
 size_t curl_write_cb(void *const contents, const size_t size, const size_t nmemb, void *const userp) {
-    ((std::string *)userp)->append((char *)contents, size * nmemb);
+    auto &response = *(std::unique_ptr<Response> *)userp;
+    assert(response);
+    response->data.append((char *)contents, size * nmemb);
     return size * nmemb;
 }
 
@@ -350,7 +372,8 @@ size_t header_matches(const char *const header, const char *const buffer, const 
 size_t curl_header_cb(char * const buffer, const size_t size, const size_t nmemb, void *const userp) {
     const size_t length = size * nmemb;
 
-    Response *response = static_cast<Response *>(userp);
+    auto &response = *(std::unique_ptr<Response> *)userp;
+    assert(response);
 
     size_t begin = std::string::npos;
     if ((begin = header_matches("last-modified: ", buffer, length)) != std::string::npos) {
@@ -371,40 +394,30 @@ size_t curl_header_cb(char * const buffer, const size_t size, const size_t nmemb
 // This function must run in the CURL thread.
 void start_request(void *const ptr) {
     assert(uv_thread_self() == thread_id);
-    std::unique_ptr<util::ptr<HTTPRequestBaton>> baton_guard { (util::ptr<HTTPRequestBaton> *)ptr };
-    util::ptr<HTTPRequestBaton> &baton = *baton_guard.get();
-    assert(baton);
 
-    CURL *handle = nullptr;
-    if (!handles.empty()) {
-        handle = handles.front();
-        handles.pop();
-    } else {
-        handle = curl_easy_init();
-    }
+    // The Context object stores information that we need to retain throughout the request, such
+    // as the actual CURL easy handle, the baton, and the list of headers. The Context itself is
+    // stored in both the CURL easy handle's PRIVATE field, and the baton's `ptr` field.
+    auto context = new Context(*(util::ptr<HTTPRequestBaton> *)ptr);
+    delete (util::ptr<HTTPRequestBaton> *)ptr;
 
-    baton->ptr = handle;
-
-    // Wrap this in a unique_ptr for now so that it destructs until we assign it the the CURL handle.
-    std::unique_ptr<CURLContext> context = std::make_unique<CURLContext>(baton);
-
-    if (baton->response) {
-        if (!baton->response->etag.empty()) {
-            const std::string header = std::string("If-None-Match: ") + baton->response->etag;
+    if (context->baton->response) {
+        if (!context->baton->response->etag.empty()) {
+            const std::string header = std::string("If-None-Match: ") + context->baton->response->etag;
             context->headers = curl_slist_append(context->headers, header.c_str());
-        } else if (baton->response->modified) {
-            const std::string time = std::string("If-Modified-Since: ") +
-                util::rfc1123(baton->response->modified);
+        } else if (context->baton->response->modified) {
+            const std::string time =
+                std::string("If-Modified-Since: ") + util::rfc1123(context->baton->response->modified);
             context->headers = curl_slist_append(context->headers, time.c_str());
         }
     }
 
     if (context->headers) {
-        curl_easy_setopt(handle, CURLOPT_HTTPHEADER, context->headers);
+        curl_easy_setopt(context->handle, CURLOPT_HTTPHEADER, context->headers);
     }
 
-    if (!baton->response) {
-        baton->response = std::make_unique<Response>();
+    if (!context->baton->response) {
+        context->baton->response = std::unique_ptr<Response>(new Response());
     }
 
 #ifndef __ANDROID__
@@ -414,35 +427,35 @@ void start_request(void *const ptr) {
 #endif
 
     // Carry on the shared pointer in the private information of the CURL handle.
-    curl_easy_setopt(handle, CURLOPT_PRIVATE, context.release());
-    curl_easy_setopt(handle, CURLOPT_CAINFO, ca_path.c_str());
-    curl_easy_setopt(handle, CURLOPT_URL, baton->path.c_str());
-    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
-    curl_easy_setopt(handle, CURLOPT_WRITEDATA, &baton->response->data);
-    curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, curl_header_cb);
-    curl_easy_setopt(handle, CURLOPT_HEADERDATA, baton->response.get());
-    curl_easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "gzip, deflate");
-    curl_easy_setopt(handle, CURLOPT_SHARE, share);
+    curl_easy_setopt(context->handle, CURLOPT_PRIVATE, context);
+    curl_easy_setopt(context->handle, CURLOPT_CAINFO, ca_path.c_str());
+    curl_easy_setopt(context->handle, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt(context->handle, CURLOPT_URL, context->baton->path.c_str());
+    curl_easy_setopt(context->handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
+    curl_easy_setopt(context->handle, CURLOPT_WRITEDATA, &context->baton->response);
+    curl_easy_setopt(context->handle, CURLOPT_HEADERFUNCTION, curl_header_cb);
+    curl_easy_setopt(context->handle, CURLOPT_HEADERDATA, &context->baton->response);
+    curl_easy_setopt(context->handle, CURLOPT_ACCEPT_ENCODING, "gzip, deflate");
 
     // Start requesting the information.
-    curl_multi_add_handle(multi, handle);
+    curl_multi_add_handle(multi, context->handle);
 }
 
 // This function must run in the CURL thread.
 void stop_request(void *const ptr) {
     assert(uv_thread_self() == thread_id);
-    std::unique_ptr<util::ptr<HTTPRequestBaton>> baton_guard { (util::ptr<HTTPRequestBaton> *)ptr };
-    util::ptr<HTTPRequestBaton> &baton = *baton_guard.get();
+    auto baton = *(util::ptr<HTTPRequestBaton> *)ptr;
+    delete (util::ptr<HTTPRequestBaton> *)ptr;
     assert(baton);
 
     if (baton->async) {
         baton->type = HTTPResponseType::Canceled;
 
-        // We can still stop the request because it is still in progress.
-        finish_request(baton);
+        assert(baton->ptr);
 
-        uv_async_send(baton->async);
-        baton->async = nullptr;
+        // We can still stop the request because it is still in progress.
+        delete (Context *)baton->ptr;
+        assert(!baton->ptr);
     } else {
         // If the async handle is gone, it means that the actual request has been completed before
         // we got a chance to cancel it. In this case, this is a no-op. It is likely that
