@@ -3,7 +3,9 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/time.hpp>
-#include "../../android/cpp/NativeMapView.hpp"
+#ifdef __ANDROID__
+    #include "../../android/cpp/NativeMapView.hpp"
+#endif
 
 #include <uv.h>
 #include <curl/curl.h>
