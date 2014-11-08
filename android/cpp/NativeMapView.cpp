@@ -432,6 +432,8 @@ void NativeMapView::start() {
         log_gl_string(GL_SHADING_LANGUAGE_VERSION, "SL Version");
         log_gl_string(GL_EXTENSIONS, "Extensions");
 
+        loadExtensions();        
+
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
                 EGL_NO_CONTEXT)) {
             LOG_ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
@@ -441,6 +443,32 @@ void NativeMapView::start() {
         map->start();
     } else {
         LOG_DEBUG("Not starting because we are not ready");
+    }
+}
+
+void NativeMapView::loadExtensions() {
+    const GLubyte* str = glGetString(GL_EXTENSIONS);
+    if (str == nullptr) {
+        LOG_ERROR("glGetString(GL_EXTENSIONS) returned error %d", glGetError());
+        return;
+    }
+
+    std::string extensions(reinterpret_cast<const char*>(str));
+    
+    if (extensions.find("GL_OES_vertex_array_object") != std::string::npos) {
+        LOG_INFO("Using GL_OES_vertex_array_object.");
+        gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)eglGetProcAddress("glBindVertexArrayOES");
+        gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)eglGetProcAddress("glDeleteVertexArraysOES");
+        gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)eglGetProcAddress("glGenVertexArraysOES");
+        gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)eglGetProcAddress("glIsVertexArrayOES");
+
+        if ((gl::BindVertexArray == nullptr) || (gl::DeleteVertexArrays == nullptr) || (gl::GenVertexArrays == nullptr) || (gl::IsVertexArray == nullptr)) {
+            LOG_ERROR("Could not load GL_OES_vertex_array_object functions.");
+            gl::BindVertexArray = nullptr;
+            gl::DeleteVertexArrays = nullptr;
+            gl::GenVertexArrays = nullptr;
+            gl::IsVertexArray = nullptr;
+        }
     }
 }
 

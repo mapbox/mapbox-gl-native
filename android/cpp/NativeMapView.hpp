@@ -68,6 +68,8 @@ private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint num_configs,
             bool use565) const;
 
+    void loadExtensions();
+
 private:
     JavaVM* vm = nullptr;
     jobject obj = nullptr;
