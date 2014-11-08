@@ -47,7 +47,7 @@
         '../mapboxgl.gyp:copy_certificate_bundle',
       ],
       'copies': [{
-        'files': [ '../styles/styles' ],
+        'files': [ '../styles' ],
         'destination': '<(PRODUCT_DIR)'
       }],
     },
