@@ -119,12 +119,13 @@ Install Android NDK
 	chmod +x android-ndk-r10c-linux-x86_64.bin
 	./android-ndk-r10c-linux-x86_64.bin
 	export ANDROID_NDK_PATH="/dir/to/android-ndk-r10c"
+	export NDK_PATH=$(ANDROID_NDK_PATH)
 
 Install Android SDK
 
 	wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
 	tar -xzf ./android-sdk_r23.0.2-linux.tgz
-    ./android-sdk-linux/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.0,android-19,android-21
+    ./android-sdk-linux/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.0,android-19,android-21,extra-android-m2repository,extra-google-m2repository
     export ANDROID_HOME="/dir/to/android-sdk-linux"
 
 Run
