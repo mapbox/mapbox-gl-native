@@ -131,6 +131,7 @@ public class MapView extends SurfaceView {
         mNativeMapView = new NativeMapView(this, cachePath);
         mNativeMapView.setStyleURL(mStyleUrl);
         mNativeMapView.setAccessToken(mAccessToken);
+        mNativeMapView.setDebug(true);
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,

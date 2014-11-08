@@ -386,7 +386,7 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[],
         config_ok &= green == (use565 ? 6 : 8);
         config_ok &= blue == (use565 ? 5 : 8);
         config_ok &= (alpha == 0) || (alpha == 8); // Can be either 0 for RGBX or 8 for RGBA but we don't care either way
-        config_ok &= depth == 16;
+        config_ok &= (depth == 24) || (depth == 16);
         config_ok &= stencil == 8;
         config_ok &= sample_buffers == 0;
         config_ok &= samples == 0;
@@ -444,12 +444,13 @@ void NativeMapView::stop() {
     LOG_VERBOSE("NativeMapView::stop");
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)
             && (context != EGL_NO_CONTEXT)) {
+    // FIXME make_inactive before this so no valid context
         map->stop();
     }
 }
 
 void NativeMapView::notifyMapChange() {
-    LOG_DEBUG("NativeMapView::notify_map_change()");
+    LOG_VERBOSE("NativeMapView::notify_map_change()");
 
     LOG_ASSERT(vm != nullptr);
     LOG_ASSERT(obj != nullptr);
@@ -515,13 +516,13 @@ void MBGLView::make_active() {
 }
 
 void MBGLView::make_inactive() {
-    LOG_VERBOSE("MBGLView::make_inactive");
-    // FIXME: this gets called before swap? bug?
+    // FIXME for testing
+    /*LOG_VERBOSE("MBGLView::make_inactive");
     if (!eglMakeCurrent(nativeView->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
             EGL_NO_CONTEXT)) {
         LOG_ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
                 eglGetError());
-    }
+    }*/
 }
 
 void MBGLView::swap() {
@@ -544,12 +545,12 @@ void MBGLView::swap() {
 }
 
 void MBGLView::notify() {
-    LOG_DEBUG("MBGLView::notify()");
+    LOG_VERBOSE("MBGLView::notify()");
     // noop
 }
 
 void MBGLView::notify_map_change(mbgl::MapChange /* change */, mbgl::timestamp /* delay */) {
-    LOG_DEBUG("MBGLView::notify_map_change()");
+    LOG_VERBOSE("MBGLView::notify_map_change()");
     nativeView->notifyMapChange();
 }
 
