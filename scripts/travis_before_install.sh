@@ -83,7 +83,7 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
         echo "debug: unpacking SDK"
         #mapbox_time "unpacking SDK" \
-        unzip android-sdk_r23.0.2-macosx.zip
+        unzip -qq android-sdk_r23.0.2-macosx.zip
         mv ./android-sdk-macosx ./android-sdk
 
         echo "debug: installing SDK"
