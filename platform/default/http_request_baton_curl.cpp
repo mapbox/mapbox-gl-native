@@ -3,6 +3,7 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/time.hpp>
+#include "../../android/cpp/NativeMapView.hpp"
 
 #include <uv.h>
 #include <curl/curl.h>
@@ -404,11 +405,15 @@ void start_request(void *const ptr) {
         baton->response = std::make_unique<Response>();
     }
 
+#ifndef __ANDROID__
+    std::string ca_path = "ca-bundle.crt";
+#else
+    std::string ca_path = mbgl::android::cache_path + "/ca-bundle.crt";
+#endif
+
     // Carry on the shared pointer in the private information of the CURL handle.
     curl_easy_setopt(handle, CURLOPT_PRIVATE, context.release());
-    // FIXME temp work around
-    curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 0);
-    //curl_easy_setopt(handle, CURLOPT_CAINFO, "ca-bundle.crt");
+    curl_easy_setopt(handle, CURLOPT_CAINFO, ca_path.c_str());
     curl_easy_setopt(handle, CURLOPT_URL, baton->path.c_str());
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
     curl_easy_setopt(handle, CURLOPT_WRITEDATA, &baton->response->data);

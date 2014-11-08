@@ -10,5 +10,8 @@ build/
 */build/
 *.so
 
+# Lib assets
+lib/src/main/assets/
+
 # Local settings
 local.properties

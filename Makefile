@@ -87,6 +87,9 @@ android:
 	$(MAKE) -C build/android BUILDTYPE=$(BUILDTYPE) V=$(V) androidapp && \
 	mkdir -p android/java/lib/src/main/jniLibs/armeabi-v7a && \
 	cp build/android/out/$(BUILDTYPE)/lib.target/libmapbox-gl.so android/java/lib/src/main/jniLibs/armeabi-v7a/libmapbox-gl.so && \
+	mkdir -p android/java/lib/src/main/assets && \
+	cp build/android/out/$(BUILDTYPE)/ca-bundle.crt android/java/lib/src/main/assets/ca-bundle.crt && \
+	cp -r build/android/out/$(BUILDTYPE)/styles android/java/lib/src/main/assets/styles && \
 	cd android/java && \
 	./gradlew build
 
@@ -154,7 +157,7 @@ clean: clear_xcode_cache
 	-rm -rf ./macosx/build/
 	-rm -rf ./config.gypi ./config-ios.gypi ./config-android.gypi
 	-rm -rf ./android/java/build ./android/java/app/build ./android/java/lib/build
-	-rm -rf ./android/java/lib/src/main/jniLibs
+	-rm -rf ./android/java/lib/src/main/jniLibs ./android/java/lib/src/main/assets
 
 distclean: clean
 	-rm -rf ./mason_packages

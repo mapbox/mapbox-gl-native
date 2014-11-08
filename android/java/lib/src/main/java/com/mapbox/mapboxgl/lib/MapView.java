@@ -27,6 +27,7 @@ import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
+import com.arieslabs.assetbridge.Assetbridge;
 
 // Custom view that shows a Map
 // Based on SurfaceView as we use OpenGL ES to render
@@ -118,12 +119,19 @@ public class MapView extends SurfaceView {
             return;
         }
 
+        // Get the cache path
+        String cachePath = context.getCacheDir().getPath();
+
+        // Extract the asset files
+        Assetbridge.unpack(context);
+
         // Load the map style and API key
-        mStyleUrl = "https://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json";
+        //mStyleUrl = "https://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json";
+        mStyleUrl = "file://" + cachePath + "/styles/styles/bright-v6.json";
         mApiKey = "pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ";
 
         // Create the NativeMapView
-        mNativeMapView = new NativeMapView(this, mStyleUrl, mApiKey);
+        mNativeMapView = new NativeMapView(this, cachePath, mStyleUrl, mApiKey);
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
