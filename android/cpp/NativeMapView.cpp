@@ -180,6 +180,8 @@ bool NativeMapView::initializeDisplay() {
 void NativeMapView::terminateDisplay() {
     LOG_VERBOSE("NativeMapView::terminateDisplay");
 
+    map->terminate();
+
     if (display != EGL_NO_DISPLAY) {
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
                 EGL_NO_CONTEXT)) {
@@ -280,6 +282,8 @@ bool NativeMapView::createSurface(ANativeWindow* window_) {
 
 void NativeMapView::destroySurface() {
     LOG_VERBOSE("NativeMapView::destroySurface");
+
+    map->terminate();
 
     if (surface != EGL_NO_SURFACE) {
         if (!eglDestroySurface(display, surface)) {
@@ -444,7 +448,6 @@ void NativeMapView::stop() {
     LOG_VERBOSE("NativeMapView::stop");
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)
             && (context != EGL_NO_CONTEXT)) {
-    // FIXME make_inactive before this so no valid context
         map->stop();
     }
 }
@@ -501,47 +504,32 @@ void MBGLView::make_active() {
                 nativeView->surface, nativeView->context)) {
             LOG_ERROR("eglMakeCurrent() returned error %d", eglGetError());
         }
-
-        // TODO still can't fix the black screen problem :-(
-        EGLint width, height;
-        if (!(eglQuerySurface(nativeView->display, nativeView->surface, EGL_WIDTH, &width)
-                & eglQuerySurface(nativeView->display, nativeView->surface, EGL_HEIGHT, &height))) {
-            LOG_ERROR("eglQuerySurface() returned error %d", eglGetError());
-        }
-        map->resize(width, height);
-
     } else {
         LOG_DEBUG("Not activating as we are not ready");
     }
 }
 
 void MBGLView::make_inactive() {
-    // FIXME for testing
-    /*LOG_VERBOSE("MBGLView::make_inactive");
+    LOG_VERBOSE("MBGLView::make_inactive");
     if (!eglMakeCurrent(nativeView->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
             EGL_NO_CONTEXT)) {
         LOG_ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
                 eglGetError());
-    }*/
+    }
 }
 
 void MBGLView::swap() {
     LOG_VERBOSE("MBGLView::swap");
-    // FIXME bug workaround
-    make_active();
 
     if (map->needsSwap() && (nativeView->display != EGL_NO_DISPLAY)
             && (nativeView->surface != EGL_NO_SURFACE)) {
         if (!eglSwapBuffers(nativeView->display, nativeView->surface)) {
             LOG_ERROR("eglSwapBuffers() returned error %d", eglGetError());
-            LOG_ERROR("%u", reinterpret_cast<unsigned int>(nativeView->surface)); // TODO remove
         }
         map->swapped();
     } else {
         LOG_DEBUG("Not swapping as we are not ready");
     }
-    // FIXME bug workaround
-    make_inactive();
 }
 
 void MBGLView::notify() {

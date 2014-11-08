@@ -361,10 +361,6 @@ public class MapView extends SurfaceView {
     public void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "onCreate");
         if (savedInstanceState != null) {
-            lonlat = (LonLat) savedInstanceState
-                    .getParcelable(STATE_CENTER_COORDINATE);
-            bearing = savedInstanceState.getDouble(STATE_CENTER_DIRECTION);
-            zoom = savedInstanceState.getDouble(STATE_ZOOM_LEVEL);
             setCenterCoordinate((LonLat) savedInstanceState
                     .getParcelable(STATE_CENTER_COORDINATE));
             setDirection(savedInstanceState.getDouble(STATE_CENTER_DIRECTION));
@@ -418,28 +414,15 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onPause
     public void onPause() {
         Log.v(TAG, "onPause");
-        lonlat = mNativeMapView.getLonLat();
-        bearing = mNativeMapView.getBearing();
-        zoom = mNativeMapView.getZoom();
         mNativeMapView.stop();
     }
 
     // Called when we need to start the render thread
     // Must be called from Activity onResume
 
-    // TODO need to fix this in Map C++ code
-    // Seems map state gets reset when we start()
-    private LonLat lonlat;
-    private double bearing, zoom;
-
     public void onResume() {
         Log.v(TAG, "onResume");
         mNativeMapView.start();
-        if (lonlat != null) {
-            mNativeMapView.setLonLat(lonlat);
-            mNativeMapView.setBearing(bearing);
-            mNativeMapView.setZoom(zoom);
-        }
     }
 
     // This class handles SurfaceHolder callbacks
@@ -460,11 +443,6 @@ public class MapView extends SurfaceView {
         public void surfaceCreated(SurfaceHolder holder) {
             Log.v(TAG, "surfaceCreated");
             mNativeMapView.createSurface(holder.getSurface());
-            if (lonlat != null) {
-                mNativeMapView.setLonLat(lonlat);
-                mNativeMapView.setBearing(bearing);
-                mNativeMapView.setZoom(zoom);
-            }
         }
 
         // Called when the native surface buffer has been destroyed
@@ -484,7 +462,6 @@ public class MapView extends SurfaceView {
             Log.v(TAG, "surfaceChanged");
             Log.i(TAG, "resize " + format + " " + width + " " + height);
             mNativeMapView.resize(width, height);
-            // TODO fix bug when rotating - sometimes 1/2 map black
         }
     }
 
@@ -515,7 +492,7 @@ public class MapView extends SurfaceView {
     // Draw events
     //
 
-    // TODO: onDraw for editor?
+    // TODO: onDraw for UI editor mockup?
     // By default it just shows a gray screen with "MapView"
     // Not too important but perhaps we could put a static demo map image there
 
