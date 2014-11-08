@@ -385,11 +385,10 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[],
         config_ok &= red == (use565 ? 5 : 8);
         config_ok &= green == (use565 ? 6 : 8);
         config_ok &= blue == (use565 ? 5 : 8);
-        //config_ok &= (alpha == 0) || (alpha == 8); // Can be either 0 for RGBX or 8 for RGBA but we don't care either way
-        config_ok &= alpha == 0; // TODO should prefer no alpha over alpha, and 565 over 8888?
-        //config_ok &= depth == 16;
-        //config_ok &= stencil == 8;
-        //config_ok &= sample_buffers == 0;
+        config_ok &= (alpha == 0) || (alpha == 8); // Can be either 0 for RGBX or 8 for RGBA but we don't care either way
+        config_ok &= depth == 16;
+        config_ok &= stencil == 8;
+        config_ok &= sample_buffers == 0;
         config_ok &= samples == 0;
 
         if (config_ok) { // Choose the last matching config, that way we get RGBX if possible (since it is sorted highest to lowest bits)
