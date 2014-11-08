@@ -7,10 +7,10 @@ matrix:
     - os: linux
       env: BUILDTYPE=Release JOBS=16 MASON_PLATFORM=android
       compiler: clang
-   - os: linux
+    - os: linux
       env: BUILDTYPE=Debug JOBS=16 MASON_PLATFORM=android
       compiler: clang
-   - os: linux
+    - os: linux
       env: BUILDTYPE=Release JOBS=16
       compiler: clang
     - os: linux
