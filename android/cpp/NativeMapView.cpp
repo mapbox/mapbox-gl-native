@@ -316,7 +316,7 @@ bool NativeMapView::createSurface(ANativeWindow* window_) {
 void NativeMapView::destroySurface() {
     LOG_VERBOSE("NativeMapView::destroySurface");
 
-    pause();
+    pause(true);
 
     if (surface != EGL_NO_SURFACE) {
         if (!eglDestroySurface(display, surface)) {
@@ -518,13 +518,13 @@ void NativeMapView::stop() {
 }
 
 
-void NativeMapView::pause() {
-    LOG_VERBOSE("NativeMapView::pause");
+void NativeMapView::pause(bool wait_for_pause) {
+    LOG_VERBOSE("NativeMapView::pause %s", (wait_for_pause) ? "true" : "false");
 
     LOG_ASSERT(display != EGL_NO_DISPLAY);
     LOG_ASSERT(context != EGL_NO_CONTEXT);
     
-    map->pause();
+    map->pause(wait_for_pause);
 }
 
 void NativeMapView::resume() {

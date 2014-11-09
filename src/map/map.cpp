@@ -36,8 +36,10 @@ Map::Map(View& view_)
       async_terminate(new uv_async_t()),
       async_render(new uv_async_t()),
       async_cleanup(new uv_async_t()),
+      mutex_run(std::make_unique<uv::mutex>()),
+      cond_run(std::make_unique<uv::cond>()),
       mutex_pause(std::make_unique<uv::mutex>()),
-      cond_resume(std::make_unique<uv::cond>()),
+      cond_pause(std::make_unique<uv::cond>()),
       view(view_),
 #ifndef NDEBUG
       main_thread(uv_thread_self()),
@@ -89,11 +91,6 @@ void Map::start(bool start_paused) {
     // Reset the flag.
     is_stopped = false;
 
-    // Do we need to pause first?
-    if (start_paused) {
-        pause();
-    }
-
     // Setup async notifications
 
 // Iron out the differences between libuv 0.10 and 0.11
@@ -116,6 +113,11 @@ void Map::start(bool start_paused) {
     async_cleanup->data = this;
 
 #undef UV_ASYNC_CALLBACK
+
+    // Do we need to pause first?
+    if (start_paused) {
+        pause();
+    }
 
     uv_thread_create(*thread, [](void *arg) {
         Map *map = static_cast<Map *>(arg);
@@ -167,42 +169,30 @@ void Map::stop(stop_callback cb, void *data) {
 void Map::pause(bool wait_for_pause) {
     assert(uv_thread_self() == main_thread);
     assert(async);
-    Log::Info(Event::General, "Map::pause() start");
+    mutex_run->lock();
+    pausing = true;
+    mutex_run->unlock();
 
-    // TODO wait until paused before return
-
-
-    Log::Info(Event::General, "Map::pause() locking");
-    mutex_pause->lock();
-    Log::Info(Event::General, "Map::pause() locked");
-    is_paused = true;
-    Log::Info(Event::General, "Map::pause() set is_paused = true");
-    Log::Info(Event::General, "Map::pause() unlocking");
-    mutex_pause->unlock();
-    Log::Info(Event::General, "Map::pause() unlocked");
-
-    Log::Info(Event::General, "Map::pause() stopping loop");
     uv_stop(**loop);
-    Log::Info(Event::General, "Map::pause() stopping done");
+    rerender(); // Needed to ensure uv_stop is seen and uv_run exits, otherwise we deadlock on wait_for_pause
+
+    if (wait_for_pause) {
+        mutex_pause->lock();
+        while (!is_paused) {
+            cond_pause->wait(*mutex_pause);
+        }
+        mutex_pause->unlock();
+    }
 }
 
 void Map::resume() {
     assert(uv_thread_self() == main_thread);
     assert(async);
-    Log::Info(Event::General, "Map::resume() start");
-    
-    Log::Info(Event::General, "Map::resume() locking");
-    mutex_pause->lock();
-    Log::Info(Event::General, "Map::resume() locked");
-    is_paused = false;
-    Log::Info(Event::General, "Map::resume() set is_paused = false");
-    Log::Info(Event::General, "Map::resume() broadcasting");
-    cond_resume->broadcast();
-    Log::Info(Event::General, "Map::resume() broadcasted");
-    Log::Info(Event::General, "Map::resume() unlocking");
-    mutex_pause->unlock();
-    Log::Info(Event::General, "Map::resume() unlocked");
-    Log::Info(Event::General, "Map::resume() done");
+
+    mutex_run->lock();
+    pausing = false;
+    cond_run->broadcast();
+    mutex_run->unlock();
 }
 
 void Map::run() {
@@ -218,23 +208,11 @@ void Map::run() {
     setup();
     prepare();
 
-    Log::Info(Event::General, "Map::run() start");
     terminating = false;
-    Log::Info(Event::General, "Map::run() set terminating = false");
-
-    Log::Info(Event::General, "Map::run() entering run loop");
     while(!terminating) {
-        Log::Info(Event::General, "Map::run() next run loop, terminating = %s", terminating ? "true" : "false");
-        Log::Info(Event::General, "Map::run() uv_run enter");
         uv_run(**loop, UV_RUN_DEFAULT);
-        Log::Info(Event::General, "Map::run() exit");
-
         check_for_pause();
-
-        //uv_run(**loop, UV_RUN_DEFAULT);
     }
-
-    Log::Info(Event::General, "Map::run() run loop exit");
 
     // Run the event loop once more to make sure our async delete handlers are called.
     uv_run(**loop, UV_RUN_ONCE);
@@ -250,20 +228,21 @@ void Map::run() {
 }
 
 void Map::check_for_pause() {
-    Log::Info(Event::General, "Map::check_for_pause() locking");
-    mutex_pause->lock();
-    Log::Info(Event::General, "Map::check_for_pause() locked");
-    Log::Info(Event::General, "Map::check_for_pause() entering pause loop");
-    while (is_paused) {
-        Log::Info(Event::General, "Map::check_for_pause() next pause loop, is_paused = %s", is_paused ? "true" : "false");
-        Log::Info(Event::General, "Map::check_for_pause() waiting");
-        cond_resume->wait(*mutex_pause);
-        Log::Info(Event::General, "Map::check_for_pause() waited");
+    mutex_run->lock();
+    while (pausing) {
+        mutex_pause->lock();
+        is_paused = true;
+        cond_pause->broadcast();
+        mutex_pause->unlock();
+
+        cond_run->wait(*mutex_run);
     }
-    Log::Info(Event::General, "Map::check_for_pause() exit pause loop");
-    Log::Info(Event::General, "Map::check_for_pause() unlocking");
+
+    mutex_pause->lock();
+    is_paused = false;
     mutex_pause->unlock();
-    Log::Info(Event::General, "Map::check_for_pause() unlocked");
+
+    mutex_run->unlock();
 }
 
 void Map::rerender() {

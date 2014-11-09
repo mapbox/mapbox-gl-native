@@ -63,7 +63,7 @@ public:
     void stop();
 
     void resume();
-    void pause();
+    void pause(bool wait_for_pause = false);
 
     void notifyMapChange();
 

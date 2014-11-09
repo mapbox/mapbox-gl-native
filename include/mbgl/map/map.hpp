@@ -178,9 +178,12 @@ private:
 
 private:
     bool terminating = false;
+    bool pausing = false;
     bool is_paused = false;
+    std::unique_ptr<uv::mutex> mutex_run;
+    std::unique_ptr<uv::cond> cond_run;
     std::unique_ptr<uv::mutex> mutex_pause;
-    std::unique_ptr<uv::cond> cond_resume;
+    std::unique_ptr<uv::cond> cond_pause;
 
 private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
