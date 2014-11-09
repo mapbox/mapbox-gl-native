@@ -149,12 +149,6 @@ bool NativeMapView::initializeDisplay() {
 
         // Now try 8888
         use565 = false;
-        // TODO removed these due to different indices
-        //config_attribs[9] = 32; // EGL_BUFFER_SIZE // Ensure we get 32bit color buffer on Tegra, 24 bit will be sorted first without it (slow software mode)
-        //config_attribs[11] = 8; // EGL_RED_SIZE
-        //config_attribs[13] = 8; // EGL_GREEN_SIZE
-        //config_attribs[15] = 8; // EGL_BLUE_SIZE
-
         config_attribs[5] = 32; // EGL_BUFFER_SIZE // Ensure we get 32bit color buffer on Tegra, 24 bit will be sorted first without it (slow software mode)
         config_attribs[7] = 8; // EGL_RED_SIZE
         config_attribs[9] = 8; // EGL_GREEN_SIZE
@@ -296,7 +290,25 @@ bool NativeMapView::createSurface(ANativeWindow* window_) {
         return false;
     }
 
-    start();
+    if (!eglMakeCurrent(display, surface, surface, context)) {
+        LOG_ERROR("eglMakeCurrent() returned error %d", eglGetError());
+    }
+
+    log_gl_string(GL_VENDOR, "Vendor");
+    log_gl_string(GL_RENDERER, "Renderer");
+    log_gl_string(GL_VERSION, "Version");
+    log_gl_string(GL_SHADING_LANGUAGE_VERSION, "SL Version"); // In the emulator this returns NULL with error code 0? https://code.google.com/p/android/issues/detail?id=78977
+    log_gl_string(GL_EXTENSIONS, "Extensions");
+
+    loadExtensions();        
+
+    if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+            EGL_NO_CONTEXT)) {
+        LOG_ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
+                eglGetError());
+    }
+
+    resume();
 
     return true;
 }
@@ -304,7 +316,7 @@ bool NativeMapView::createSurface(ANativeWindow* window_) {
 void NativeMapView::destroySurface() {
     LOG_VERBOSE("NativeMapView::destroySurface");
 
-    map->terminate();
+    pause();
 
     if (surface != EGL_NO_SURFACE) {
         if (!eglDestroySurface(display, surface)) {
@@ -464,31 +476,10 @@ void NativeMapView::start() {
         initializeContext();
     }
 
-    if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)
-            && (context != EGL_NO_CONTEXT)) {
-
-        if (!eglMakeCurrent(display, surface, surface, context)) {
-            LOG_ERROR("eglMakeCurrent() returned error %d", eglGetError());
-        }
-
-        log_gl_string(GL_VENDOR, "Vendor");
-        log_gl_string(GL_RENDERER, "Renderer");
-        log_gl_string(GL_VERSION, "Version");
-        log_gl_string(GL_SHADING_LANGUAGE_VERSION, "SL Version"); // In the emulator this returns NULL with error code 0? https://code.google.com/p/android/issues/detail?id=78977
-        log_gl_string(GL_EXTENSIONS, "Extensions");
-
-        loadExtensions();        
-
-        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
-                EGL_NO_CONTEXT)) {
-            LOG_ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
-                    eglGetError());
-        }
-
-        map->start();
-    } else {
-        LOG_DEBUG("Not starting because we are not ready");
-    }
+    LOG_ASSERT(display != EGL_NO_DISPLAY);
+    LOG_ASSERT(context != EGL_NO_CONTEXT);
+    
+    map->start();
 }
 
 void NativeMapView::loadExtensions() {
@@ -519,9 +510,33 @@ void NativeMapView::loadExtensions() {
 
 void NativeMapView::stop() {
     LOG_VERBOSE("NativeMapView::stop");
-    if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)
-            && (context != EGL_NO_CONTEXT)) {
-        map->stop();
+
+    LOG_ASSERT(display != EGL_NO_DISPLAY);
+    LOG_ASSERT(context != EGL_NO_CONTEXT);
+    
+    map->stop();
+}
+
+
+void NativeMapView::pause() {
+    LOG_VERBOSE("NativeMapView::pause");
+
+    LOG_ASSERT(display != EGL_NO_DISPLAY);
+    LOG_ASSERT(context != EGL_NO_CONTEXT);
+    
+    map->pause();
+}
+
+void NativeMapView::resume() {
+    LOG_VERBOSE("NativeMapView::resume");
+
+    LOG_ASSERT(display != EGL_NO_DISPLAY);
+    LOG_ASSERT(context != EGL_NO_CONTEXT);
+
+    if (surface != EGL_NO_SURFACE) {
+        map->resume();
+    } else {
+        LOG_DEBUG("Not resuming because we are not ready");
     }
 }
 

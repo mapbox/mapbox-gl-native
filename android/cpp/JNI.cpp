@@ -221,6 +221,20 @@ void JNICALL nativeStop(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     native_map_view->stop();
 }
 
+void JNICALL nativePause(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    LOG_VERBOSE("nativePause");
+    LOG_ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->pause();
+}
+
+void JNICALL nativeResume(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    LOG_VERBOSE("nativeResume");
+    LOG_ASSERT(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    native_map_view->resume();
+}
+
 void JNICALL nativeRun(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeRun");
     LOG_ASSERT(native_map_view_ptr != 0);
@@ -739,7 +753,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     // NOTE: if you get java.lang.UnsatisfiedLinkError you likely forgot to set the size of the array correctly (too large)
-    std::array<JNINativeMethod, 58> methods = {{ // Can remove the extra brace in C++14
+    std::array<JNINativeMethod, 60> methods = {{ // Can remove the extra brace in C++14
         { "nativeCreate", "(Ljava/lang/String;)J", reinterpret_cast<void*>(&nativeCreate) },
         { "nativeDestroy", "(J)V", reinterpret_cast<void*>(&nativeDestroy) },
         { "nativeInitializeDisplay", "(J)V", reinterpret_cast<void*>(&nativeInitializeDisplay) },
@@ -750,6 +764,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeDestroySurface", "(J)V", reinterpret_cast<void*>(&nativeDestroySurface) },
         { "nativeStart", "(J)V", reinterpret_cast<void*>(&nativeStart) },
         { "nativeStop", "(J)V", reinterpret_cast<void*>(&nativeStop) },
+        { "nativePause", "(J)V", reinterpret_cast<void*>(&nativePause) },
+        { "nativeResume", "(J)V", reinterpret_cast<void*>(&nativeResume) },
         { "nativeRun", "(J)V", reinterpret_cast<void*>(&nativeRun) },
         { "nativeRerender", "(J)V", reinterpret_cast<void*>(&nativeRerender) },
         { "nativeUpdate", "(J)V", reinterpret_cast<void*>(&nativeUpdate) },

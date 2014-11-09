@@ -373,6 +373,7 @@ public class MapView extends SurfaceView {
         }
 
         mNativeMapView.initializeDisplay();
+        mNativeMapView.initializeContext();
     }
 
     // Called when we need to save instance state
@@ -392,6 +393,7 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onDestroy
     public void onDestroy() {
         Log.v(TAG, "onDestroy");
+        mNativeMapView.terminateContext();
         mNativeMapView.terminateDisplay();
     }
 
@@ -399,21 +401,22 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onStart
     public void onStart() {
         Log.v(TAG, "onStart");
-        mNativeMapView.initializeContext();
+        mNativeMapView.pause();
+        mNativeMapView.start();
     }
 
     // Called when we need to terminate the GL context
     // Must be called from Activity onPause
     public void onStop() {
         Log.v(TAG, "onStop");
-        mNativeMapView.terminateContext();
+        mNativeMapView.stop();
     }
 
     // Called when we need to stop the render thread
     // Must be called from Activity onPause
     public void onPause() {
         Log.v(TAG, "onPause");
-        mNativeMapView.stop();
+        mNativeMapView.pause();
     }
 
     // Called when we need to start the render thread
@@ -421,7 +424,7 @@ public class MapView extends SurfaceView {
 
     public void onResume() {
         Log.v(TAG, "onResume");
-        mNativeMapView.start();
+        mNativeMapView.resume();
     }
 
     // This class handles SurfaceHolder callbacks
@@ -463,6 +466,8 @@ public class MapView extends SurfaceView {
             mNativeMapView.resize(width, height);
         }
     }
+
+    // TODO examine how GLSurvaceView hadles attach/detach from window
 
     // Called when view is no longer connected
     @Override

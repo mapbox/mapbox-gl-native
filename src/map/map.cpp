@@ -36,6 +36,8 @@ Map::Map(View& view_)
       async_terminate(new uv_async_t()),
       async_render(new uv_async_t()),
       async_cleanup(new uv_async_t()),
+      mutex_pause(std::make_unique<uv::mutex>()),
+      cond_resume(std::make_unique<uv::cond>()),
       view(view_),
 #ifndef NDEBUG
       main_thread(uv_thread_self()),
@@ -76,7 +78,7 @@ uv::worker &Map::getWorker() {
     return *workers;
 }
 
-void Map::start() {
+void Map::start() { // TODO add pause arg
     assert(uv_thread_self() == main_thread);
     assert(!async);
 
@@ -136,6 +138,8 @@ void Map::stop(stop_callback cb, void *data) {
 
     uv_async_send(async_terminate.get());
 
+    resume();
+
     if (cb) {
         // Wait until the render thread stopped. We are using this construct instead of plainly
         // relying on the thread_join because the system might need to run things in the current
@@ -155,6 +159,45 @@ void Map::stop(stop_callback cb, void *data) {
     async = false;
 }
 
+void Map::pause() {
+    assert(uv_thread_self() == main_thread);
+    Log::Info(Event::General, "Map::pause() start");
+
+    // TODO wait until paused before return
+
+
+    Log::Info(Event::General, "Map::pause() locking");
+    mutex_pause->lock();
+    Log::Info(Event::General, "Map::pause() locked");
+    is_paused = true;
+    Log::Info(Event::General, "Map::pause() set is_paused = true");
+    Log::Info(Event::General, "Map::pause() unlocking");
+    mutex_pause->unlock();
+    Log::Info(Event::General, "Map::pause() unlocked");
+
+    Log::Info(Event::General, "Map::pause() stopping loop");
+    uv_stop(**loop);
+    Log::Info(Event::General, "Map::pause() stopping done");
+}
+
+void Map::resume() {
+    assert(uv_thread_self() == main_thread);
+    Log::Info(Event::General, "Map::resume() start");
+    
+    Log::Info(Event::General, "Map::resume() locking");
+    mutex_pause->lock();
+    Log::Info(Event::General, "Map::resume() locked");
+    is_paused = false;
+    Log::Info(Event::General, "Map::resume() set is_paused = false");
+    Log::Info(Event::General, "Map::resume() broadcasting");
+    cond_resume->broadcast();
+    Log::Info(Event::General, "Map::resume() broadcasted");
+    Log::Info(Event::General, "Map::resume() unlocking");
+    mutex_pause->unlock();
+    Log::Info(Event::General, "Map::resume() unlocked");
+    Log::Info(Event::General, "Map::resume() done");
+}
+
 void Map::run() {
 #ifndef NDEBUG
     if (!async) {
@@ -163,9 +206,28 @@ void Map::run() {
 #endif
     assert(uv_thread_self() == map_thread);
 
+    check_for_pause();
+
     setup();
     prepare();
-    uv_run(**loop, UV_RUN_DEFAULT);
+
+    Log::Info(Event::General, "Map::run() start");
+    terminating = false;
+    Log::Info(Event::General, "Map::run() set terminating = false");
+
+    Log::Info(Event::General, "Map::run() entering run loop");
+    while(!terminating) {
+        Log::Info(Event::General, "Map::run() next run loop, terminating = %s", terminating ? "true" : "false");
+        Log::Info(Event::General, "Map::run() uv_run enter");
+        uv_run(**loop, UV_RUN_DEFAULT);
+        Log::Info(Event::General, "Map::run() exit");
+
+        check_for_pause();
+
+        //uv_run(**loop, UV_RUN_DEFAULT);
+    }
+
+    Log::Info(Event::General, "Map::run() run loop exit");
 
     // Run the event loop once more to make sure our async delete handlers are called.
     uv_run(**loop, UV_RUN_ONCE);
@@ -178,6 +240,23 @@ void Map::run() {
         map_thread = -1;
 #endif
     }
+}
+
+void Map::check_for_pause() {
+    Log::Info(Event::General, "Map::check_for_pause() locking");
+    mutex_pause->lock();
+    Log::Info(Event::General, "Map::check_for_pause() locked");
+    Log::Info(Event::General, "Map::check_for_pause() entering pause loop");
+    while (is_paused) {
+        Log::Info(Event::General, "Map::check_for_pause() next pause loop, is_paused = %s", is_paused ? "true" : "false");
+        Log::Info(Event::General, "Map::check_for_pause() waiting");
+        cond_resume->wait(*mutex_pause);
+        Log::Info(Event::General, "Map::check_for_pause() waited");
+    }
+    Log::Info(Event::General, "Map::check_for_pause() exit pause loop");
+    Log::Info(Event::General, "Map::check_for_pause() unlocking");
+    mutex_pause->unlock();
+    Log::Info(Event::General, "Map::check_for_pause() unlocked");
 }
 
 void Map::rerender() {
@@ -250,6 +329,7 @@ void Map::render(uv_async_t *async) {
 }
 
 void Map::terminate(uv_async_t *async) {
+    Log::Info(Event::General, "Map::terminate() start");
     // Closes all open handles on the loop. This means that the loop will automatically terminate.
     Map *map = static_cast<Map *>(async->data);
     assert(uv_thread_self() == map->map_thread);
@@ -263,9 +343,14 @@ void Map::terminate(uv_async_t *async) {
 
     map->view.make_inactive();
 
+    map->terminating = true;
+    Log::Info(Event::General, "Map::terminate() set terminating = true");
+
     uv_close((uv_handle_t *)map->async_cleanup.get(), nullptr);
     uv_close((uv_handle_t *)map->async_render.get(), nullptr);
     uv_close((uv_handle_t *)map->async_terminate.get(), nullptr);
+
+    Log::Info(Event::General, "Map::terminate() done");
 }
 
 #pragma mark - Setup

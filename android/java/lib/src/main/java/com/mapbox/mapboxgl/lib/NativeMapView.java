@@ -80,6 +80,14 @@ class NativeMapView {
         nativeStop(mNativeMapViewPtr);
     }
 
+    public void pause() {
+        nativePause(mNativeMapViewPtr);
+    }
+
+    public void resume() {
+        nativeResume(mNativeMapViewPtr);
+    }
+
     public void run() {
         nativeRun(mNativeMapViewPtr);
     }
@@ -419,6 +427,10 @@ class NativeMapView {
     private native void nativeStart(long nativeMapViewPtr);
 
     private native void nativeStop(long nativeMapViewPtr);
+
+    private native void nativePause(long nativeMapViewPtr);
+
+    private native void nativeResume(long nativeMapViewPtr);
 
     private native void nativeRun(long nativeMapViewPtr);
 

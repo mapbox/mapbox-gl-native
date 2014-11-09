@@ -21,6 +21,8 @@ class thread;
 class rwlock;
 class loop;
 class worker;
+class mutex;
+class cond;
 
 }
 

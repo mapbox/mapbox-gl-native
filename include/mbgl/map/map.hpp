@@ -45,6 +45,12 @@ public:
     // function.
     void stop(stop_callback cb = nullptr, void *data = nullptr);
 
+    // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
+    void pause();
+
+    // Resumes a paused render thread
+    void resume();
+
     // Runs the map event loop. ONLY run this function when you want to get render a single frame
     // with this map object. It will *not* spawn a separate thread and instead block until the
     // frame is completely rendered.
@@ -145,6 +151,9 @@ private:
     static void terminate(uv_async_t *async);
     static void cleanup(uv_async_t *async);
 
+    // Checks if render thread needs to pause
+    void check_for_pause();
+
     // Setup
     void setup();
 
@@ -166,6 +175,12 @@ private:
     std::unique_ptr<uv_async_t> async_terminate;
     std::unique_ptr<uv_async_t> async_render;
     std::unique_ptr<uv_async_t> async_cleanup;
+
+private:
+    bool terminating = false;
+    bool is_paused = false;
+    std::unique_ptr<uv::mutex> mutex_pause;
+    std::unique_ptr<uv::cond> cond_resume;
 
 private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*

@@ -62,6 +62,9 @@ public:
     void start();
     void stop();
 
+    void resume();
+    void pause();
+
     void notifyMapChange();
 
 private:

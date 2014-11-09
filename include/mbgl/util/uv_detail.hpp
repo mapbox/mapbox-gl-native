@@ -52,6 +52,7 @@ private:
 };
 
 class mutex {
+    friend class cond;
 public:
     inline mutex() {
         if (uv_mutex_init(&mtx) != 0) {
@@ -64,6 +65,23 @@ public:
 
 private:
     uv_mutex_t mtx;
+};
+
+class cond {
+public:
+    inline cond() {
+        if (uv_cond_init(&cnd) != 0) {
+            throw std::runtime_error("failed to initialize condition variable");
+        }
+    }
+    inline ~cond() { uv_cond_destroy(&cnd); }
+    inline void signal() { uv_cond_signal(&cnd); }
+    inline void broadcast() { uv_cond_broadcast(&cnd); }
+    inline void wait(mutex &mtx) { uv_cond_wait(&cnd, &mtx.mtx); }
+    inline void timedwait(mutex &mtx, uint64_t timeout) { uv_cond_timedwait(&cnd, &mtx.mtx, timeout); }
+
+private:
+    uv_cond_t cnd;
 };
 
 class lock {
