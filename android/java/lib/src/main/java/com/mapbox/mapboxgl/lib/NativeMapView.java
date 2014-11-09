@@ -384,7 +384,7 @@ class NativeMapView {
     //
 
     protected void onMapChanged() {
-        Log.v(TAG, "onMapChanged");
+        //Log.v(TAG, "onMapChanged");
         mMapView.onMapChanged();
     }
 

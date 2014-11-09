@@ -29,7 +29,6 @@ import com.arieslabs.assetbridge.Assetbridge;
 // Custom view that shows a Map
 // Based on SurfaceView as we use OpenGL ES to render
 public class MapView extends SurfaceView {
-    // TODO try TextureView
 
     //
     // Static members
@@ -112,7 +111,7 @@ public class MapView extends SurfaceView {
 
         // Check if we are in Eclipse UI editor
         if (isInEditMode()) {
-            // TODO editor does not load properly because
+            // TODO editor does not load properly because we dont implement this
             return;
         }
 
@@ -1142,7 +1141,7 @@ public class MapView extends SurfaceView {
     // Called via JNI from NativeMapView
     // Need to update anything that relies on map state
     protected void onMapChanged() {
-        Log.v(TAG, "onMapChanged");
+        //Log.v(TAG, "onMapChanged");
         if (mOnMapChangedListener != null) {
             mOnMapChangedListener.onMapChanged();
         }

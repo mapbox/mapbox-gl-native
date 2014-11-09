@@ -537,6 +537,7 @@ void NativeMapView::notifyMapChange() {
         NULL
     };
 
+    // TODO do this only once per thread?
     jint ret;
     JNIEnv* env = nullptr;
     bool detach = false;
@@ -552,7 +553,6 @@ void NativeMapView::notifyMapChange() {
             detach = true;
         }
     }
-
 
     env->CallVoidMethod(obj, on_map_changed_id);
     if (env->ExceptionCheck()) {
