@@ -66,7 +66,7 @@ void Painter::setup() {
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     // Set clear values
-    glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClearDepth(1.0f);
     glClearStencil(0x0);
 
@@ -174,7 +174,7 @@ void Painter::clear() {
     glStencilMask(0xFF);
     depthMask(true);
 
-    glClearColor(1, 0, 0, 0);
+    glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
