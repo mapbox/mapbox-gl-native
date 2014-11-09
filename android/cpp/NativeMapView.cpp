@@ -243,12 +243,6 @@ void NativeMapView::terminateContext() {
 
     map->terminate();
 
-    // TODO: there is a bug when you double tap home to go app switcher, as map is black if you immediately switch to the map again
-    // TODO: this is in the onPause/onResume path
-    // TODO: the bug causes an GL_INVALID_VALUE with glDelteProgram (I think due to context being deleted first)
-    // TODO: we need to free resources before we terminate
-    // TODO: but cause terminate and stop is async they try to do stuff with no context and crash!
-
     if (display != EGL_NO_DISPLAY) {
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
                 EGL_NO_CONTEXT)) {
