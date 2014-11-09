@@ -1,4 +1,7 @@
+#include <cstdlib>
 #include <memory>
+
+#include <sys/system_properties.h>
 
 #include <GLES2/gl2.h>
 
@@ -108,19 +111,31 @@ bool NativeMapView::initializeDisplay() {
     log_egl_string(display, EGL_CLIENT_APIS, "Client APIs");
     log_egl_string(display, EGL_EXTENSIONS, "Client Extensions");
 
+    // Detect if we are in emulator
+    char prop[PROP_VALUE_MAX];
+    __system_property_get("ro.kernel.qemu", prop);
+    bool in_emulator = strtol(prop, nullptr, 0) == 1;
+    LOG_INFO("ro.kernel.qemu = %s", prop);
+    if (in_emulator) {
+        LOG_INFO("In emulator! Enabling hacks :-(");
+    }
+
     // Try 565 first (faster)
     bool use565 = true;
     EGLint config_attribs[] = {
         EGL_CONFIG_CAVEAT, EGL_NONE,
-        EGL_CONFORMANT, EGL_OPENGL_ES2_BIT,
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        //EGL_CONFORMANT, EGL_OPENGL_ES2_BIT, // Emulator does not support this, in here, but will return conformant anyway, what?
         EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-        EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER,
+        //EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER, // Emulator does not support this, what?
         EGL_BUFFER_SIZE, 16,
         EGL_RED_SIZE, 5,
         EGL_GREEN_SIZE, 6,
         EGL_BLUE_SIZE, 5,
         EGL_DEPTH_SIZE, 16,
         EGL_STENCIL_SIZE, 8,
+        (in_emulator ? EGL_NONE : EGL_CONFORMANT), EGL_OPENGL_ES2_BIT, // Ugly hack
+        (in_emulator ? EGL_NONE : EGL_COLOR_BUFFER_TYPE), EGL_RGB_BUFFER, // Ugly hack
         EGL_NONE
     };
     EGLint num_configs;
@@ -134,10 +149,16 @@ bool NativeMapView::initializeDisplay() {
 
         // Now try 8888
         use565 = false;
-        config_attribs[9] = 32; // EGL_BUFFER_SIZE // Ensure we get 32bit color buffer on Tegra, 24 bit will be sorted first without it (slow software mode)
-        config_attribs[11] = 8; // EGL_RED_SIZE
-        config_attribs[13] = 8; // EGL_GREEN_SIZE
-        config_attribs[15] = 8; // EGL_BLUE_SIZE
+        // TODO removed these due to different indices
+        //config_attribs[9] = 32; // EGL_BUFFER_SIZE // Ensure we get 32bit color buffer on Tegra, 24 bit will be sorted first without it (slow software mode)
+        //config_attribs[11] = 8; // EGL_RED_SIZE
+        //config_attribs[13] = 8; // EGL_GREEN_SIZE
+        //config_attribs[15] = 8; // EGL_BLUE_SIZE
+
+        config_attribs[5] = 32; // EGL_BUFFER_SIZE // Ensure we get 32bit color buffer on Tegra, 24 bit will be sorted first without it (slow software mode)
+        config_attribs[7] = 8; // EGL_RED_SIZE
+        config_attribs[9] = 8; // EGL_GREEN_SIZE
+        config_attribs[11] = 8; // EGL_BLUE_SIZE
         if (!eglChooseConfig(display, config_attribs, nullptr, 0, &num_configs)) {
             LOG_ERROR("eglChooseConfig(NULL) returned error %d", eglGetError());
             terminateDisplay();
@@ -304,11 +325,25 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[],
     LOG_INFO("Found %d configs", num_configs);
 
     int chosen_config = -1;
+    bool is_caveat = false;
+    bool is_conformant = false;
     for (int i = 0; i < num_configs; i++) {
         LOG_INFO("Config %d:", i);
 
-        EGLint bits, red, green, blue, alpha, alpha_mask, depth, stencil,
+        EGLint caveat, conformant, bits, red, green, blue, alpha, alpha_mask, depth, stencil,
                 sample_buffers, samples;
+
+        if (!eglGetConfigAttrib(display, configs[i], EGL_CONFIG_CAVEAT, &caveat)) {
+            LOG_ERROR("eglGetConfigAttrib(EGL_CONFIG_CAVEAT) returned error %d",
+                    eglGetError());
+            return nullptr;
+        }
+
+        if (!eglGetConfigAttrib(display, configs[i], EGL_CONFORMANT, &conformant)) {
+            LOG_ERROR("eglGetConfigAttrib(EGL_CONFORMANT) returned error %d",
+                    eglGetError());
+            return nullptr;
+        }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_BUFFER_SIZE, &bits)) {
             LOG_ERROR("eglGetConfigAttrib(EGL_BUFFER_SIZE) returned error %d",
@@ -372,7 +407,9 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[],
                     eglGetError());
             return nullptr;
         }
-
+        
+        LOG_INFO("Caveat: %d", caveat);
+        LOG_INFO("Conformant: %d", conformant);
         LOG_INFO("Color: %d", bits);
         LOG_INFO("Red: %d", red);
         LOG_INFO("Green: %d", green);
@@ -397,6 +434,8 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[],
 
         if (config_ok) { // Choose the last matching config, that way we get RGBX if possible (since it is sorted highest to lowest bits)
             chosen_config = i;
+            is_conformant = (conformant & EGL_OPENGL_ES2_BIT) == EGL_OPENGL_ES2_BIT;
+            is_caveat = caveat != EGL_NONE;
         }
     }
 
@@ -405,6 +444,12 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[],
         return configs[chosen_config];
     } else {
         return nullptr;
+    }
+    if (!is_caveat) {
+        LOG_WARN("Chosen config has a caveat.");
+    }
+    if (!is_conformant) {
+        LOG_WARN("Chosen config is not conformant.");
     }
 }
 
@@ -429,7 +474,7 @@ void NativeMapView::start() {
         log_gl_string(GL_VENDOR, "Vendor");
         log_gl_string(GL_RENDERER, "Renderer");
         log_gl_string(GL_VERSION, "Version");
-        log_gl_string(GL_SHADING_LANGUAGE_VERSION, "SL Version");
+        log_gl_string(GL_SHADING_LANGUAGE_VERSION, "SL Version"); // In the emulator this returns NULL with error code 0? https://code.google.com/p/android/issues/detail?id=78977
         log_gl_string(GL_EXTENSIONS, "Extensions");
 
         loadExtensions();        
