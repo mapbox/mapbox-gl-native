@@ -91,6 +91,8 @@ private:
 
     std::string style_url;
     std::string api_key;
+
+    bool first_time = false;
 };
 
 class MBGLView: public mbgl::View {

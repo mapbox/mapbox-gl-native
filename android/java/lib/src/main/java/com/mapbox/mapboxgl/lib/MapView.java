@@ -374,6 +374,7 @@ public class MapView extends SurfaceView {
 
         mNativeMapView.initializeDisplay();
         mNativeMapView.initializeContext();
+        mNativeMapView.start();
     }
 
     // Called when we need to save instance state
@@ -393,6 +394,7 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onDestroy
     public void onDestroy() {
         Log.v(TAG, "onDestroy");
+        mNativeMapView.stop();
         mNativeMapView.terminateContext();
         mNativeMapView.terminateDisplay();
     }
@@ -401,14 +403,14 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onStart
     public void onStart() {
         Log.v(TAG, "onStart");
-        mNativeMapView.start();
+        //mNativeMapView.start();
     }
 
     // Called when we need to terminate the GL context
     // Must be called from Activity onPause
     public void onStop() {
         Log.v(TAG, "onStop");
-        mNativeMapView.stop();
+        //mNativeMapView.stop();
     }
 
     // Called when we need to stop the render thread

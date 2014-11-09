@@ -230,12 +230,16 @@ void Map::run() {
 void Map::check_for_pause() {
     mutex_run->lock();
     while (pausing) {
+        view.make_inactive();
+
         mutex_pause->lock();
         is_paused = true;
         cond_pause->broadcast();
         mutex_pause->unlock();
 
         cond_run->wait(*mutex_run);
+
+        view.make_active();
     }
 
     mutex_pause->lock();

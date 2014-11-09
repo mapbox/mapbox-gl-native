@@ -284,22 +284,26 @@ bool NativeMapView::createSurface(ANativeWindow* window_) {
         return false;
     }
 
-    if (!eglMakeCurrent(display, surface, surface, context)) {
-        LOG_ERROR("eglMakeCurrent() returned error %d", eglGetError());
-    }
+    if (!first_time) {
+        first_time = true;
 
-    log_gl_string(GL_VENDOR, "Vendor");
-    log_gl_string(GL_RENDERER, "Renderer");
-    log_gl_string(GL_VERSION, "Version");
-    log_gl_string(GL_SHADING_LANGUAGE_VERSION, "SL Version"); // In the emulator this returns NULL with error code 0? https://code.google.com/p/android/issues/detail?id=78977
-    log_gl_string(GL_EXTENSIONS, "Extensions");
+        if (!eglMakeCurrent(display, surface, surface, context)) {
+            LOG_ERROR("eglMakeCurrent() returned error %d", eglGetError());
+        }
 
-    loadExtensions();        
+        log_gl_string(GL_VENDOR, "Vendor");
+        log_gl_string(GL_RENDERER, "Renderer");
+        log_gl_string(GL_VERSION, "Version");
+        log_gl_string(GL_SHADING_LANGUAGE_VERSION, "SL Version"); // In the emulator this returns NULL with error code 0? https://code.google.com/p/android/issues/detail?id=78977
+        log_gl_string(GL_EXTENSIONS, "Extensions");
 
-    if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
-            EGL_NO_CONTEXT)) {
-        LOG_ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
-                eglGetError());
+        loadExtensions();        
+
+        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+                EGL_NO_CONTEXT)) {
+            LOG_ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
+                    eglGetError());
+        }
     }
 
     resume();
