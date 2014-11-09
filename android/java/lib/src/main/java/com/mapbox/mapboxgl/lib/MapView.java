@@ -401,7 +401,6 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onStart
     public void onStart() {
         Log.v(TAG, "onStart");
-        mNativeMapView.pause();
         mNativeMapView.start();
     }
 

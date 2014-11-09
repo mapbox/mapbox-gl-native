@@ -36,7 +36,7 @@ public:
     ~Map();
 
     // Start the map render thread. It is asynchronous.
-    void start();
+    void start(bool start_paused = false);
 
     // Stop the map render thread. This call will block until the map rendering thread stopped.
     // The optional callback function will be invoked repeatedly until the map thread is stopped.
@@ -46,7 +46,7 @@ public:
     void stop(stop_callback cb = nullptr, void *data = nullptr);
 
     // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
-    void pause();
+    void pause(bool wait_for_pause = false);
 
     // Resumes a paused render thread
     void resume();

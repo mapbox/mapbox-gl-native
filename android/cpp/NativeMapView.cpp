@@ -479,7 +479,7 @@ void NativeMapView::start() {
     LOG_ASSERT(display != EGL_NO_DISPLAY);
     LOG_ASSERT(context != EGL_NO_CONTEXT);
     
-    map->start();
+    map->start(true);
 }
 
 void NativeMapView::loadExtensions() {

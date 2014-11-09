@@ -78,7 +78,7 @@ uv::worker &Map::getWorker() {
     return *workers;
 }
 
-void Map::start() { // TODO add pause arg
+void Map::start(bool start_paused) {
     assert(uv_thread_self() == main_thread);
     assert(!async);
 
@@ -88,6 +88,11 @@ void Map::start() { // TODO add pause arg
 
     // Reset the flag.
     is_stopped = false;
+
+    // Do we need to pause first?
+    if (start_paused) {
+        pause();
+    }
 
     // Setup async notifications
 
@@ -159,8 +164,9 @@ void Map::stop(stop_callback cb, void *data) {
     async = false;
 }
 
-void Map::pause() {
+void Map::pause(bool wait_for_pause) {
     assert(uv_thread_self() == main_thread);
+    assert(async);
     Log::Info(Event::General, "Map::pause() start");
 
     // TODO wait until paused before return
@@ -182,6 +188,7 @@ void Map::pause() {
 
 void Map::resume() {
     assert(uv_thread_self() == main_thread);
+    assert(async);
     Log::Info(Event::General, "Map::resume() start");
     
     Log::Info(Event::General, "Map::resume() locking");
