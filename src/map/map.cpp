@@ -215,9 +215,7 @@ void Map::cleanup(uv_async_t *async) {
 }
 
 void Map::terminate() {
-    view.make_active();
     painter.terminate();
-    view.make_inactive();
 }
 
 void Map::setReachability(bool reachable) {
@@ -241,9 +239,7 @@ void Map::render(uv_async_t *async) {
             if (map->is_clean.test_and_set() == false) {
                 map->render();
                 map->is_swapped.clear();
-                map->view.make_active();
                 map->view.swap();
-                map->view.make_inactive();
             } else {
                 // We set the rendered flag in the test above, so we have to reset it
                 // now that we're not actually rendering because the map is clean.
@@ -257,9 +253,6 @@ void Map::terminate(uv_async_t *async) {
     // Closes all open handles on the loop. This means that the loop will automatically terminate.
     Map *map = static_cast<Map *>(async->data);
     assert(uv_thread_self() == map->map_thread);
-
-    // Makre sure we have a GL context
-    map->view.make_active();
 
     // Remove all of these to make sure they are destructed in the correct thread.
     map->glyphStore.reset();
@@ -281,7 +274,6 @@ void Map::setup() {
     assert(uv_thread_self() == map_thread);
     view.make_active();
     painter.setup();
-    view.make_inactive();
 }
 
 void Map::setStyleURL(const std::string &url) {
@@ -649,14 +641,10 @@ void Map::prepare() {
 }
 
 void Map::render() {
-    view.make_active();
-
     painter.render(*style, activeSources,
                    state, animationTime);
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
         update();
     }
-
-    view.make_inactive();
 }
