@@ -243,7 +243,7 @@ bool NativeMapView::initializeContext() {
 void NativeMapView::terminateContext() {
     LOG_VERBOSE("NativeMapView::terminateContext");
 
-    map->terminate();
+    //map->terminate();
 
     if (display != EGL_NO_DISPLAY) {
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
