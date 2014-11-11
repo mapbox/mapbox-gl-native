@@ -197,7 +197,7 @@ bool NativeMapView::initializeDisplay() {
 void NativeMapView::terminateDisplay() {
     LOG_VERBOSE("NativeMapView::terminateDisplay");
 
-    map->terminate();
+    //map->terminate();
 
     if (display != EGL_NO_DISPLAY) {
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
