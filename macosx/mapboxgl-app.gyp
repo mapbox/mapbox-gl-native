@@ -37,6 +37,8 @@
       },
       'variables' : {
         'ldflags': [
+          '<@(uv_ldflags)',
+          '<@(uv_static_libs)',
           '<@(sqlite3_ldflags)',
           '<@(glfw3_static_libs)',
           '<@(glfw3_ldflags)',
@@ -54,7 +56,7 @@
       ],
       'dependencies': [
         '../mapboxgl.gyp:bundle_styles',
-        '../mapboxgl.gyp:mbgl-standalone',
+        '../mapboxgl.gyp:mbgl-core',
         '../mapboxgl.gyp:mbgl-osx',
       ]
     }
