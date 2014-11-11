@@ -37,11 +37,11 @@ class NativeMapView {
     // Constructors
     //
 
-    public NativeMapView(MapView mapView, String cachePath) {
+    public NativeMapView(MapView mapView, String cachePath, String dataPath) {
         mMapView = mapView;
 
         // Create the NativeMapView
-        mNativeMapViewPtr = nativeCreate(cachePath);
+        mNativeMapViewPtr = nativeCreate(cachePath, dataPath);
     }
 
     //
@@ -407,7 +407,7 @@ class NativeMapView {
         super.finalize();
     }
 
-    private native long nativeCreate(String cachePath);
+    private native long nativeCreate(String cachePath, String dataPath);
 
     private native void nativeDestroy(long nativeMapViewPtr);
 

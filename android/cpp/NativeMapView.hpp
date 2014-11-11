@@ -15,6 +15,7 @@ namespace mbgl {
 namespace android {
 
 extern std::string cache_path;
+extern std::string data_path;
 
 extern jmethodID on_map_changed_id;
 

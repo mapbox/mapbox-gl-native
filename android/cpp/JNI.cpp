@@ -21,6 +21,7 @@ namespace mbgl {
 namespace android {
 
 std::string cache_path;
+std::string data_path;
 
 jmethodID on_map_changed_id = nullptr;
 
@@ -139,9 +140,10 @@ using namespace mbgl::android;
 // TODO: wrap C++ exceptions?
 // TODO: wrap other sorts of exceptions? eg coffee catch
 
-jlong JNICALL nativeCreate(JNIEnv* env, jobject obj, jstring cache_path_) {
+jlong JNICALL nativeCreate(JNIEnv* env, jobject obj, jstring cache_path_, jstring data_path_) {
     LOG_VERBOSE("nativeCreate");
     cache_path = std_string_from_jstring(env, cache_path_);
+    data_path = std_string_from_jstring(env, data_path_);
     NativeMapView* native_map_view = new NativeMapView(env, obj);
     if (native_map_view == nullptr) {
         throw_error(env, "Unable to create NativeMapView.");
@@ -754,7 +756,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     // NOTE: if you get java.lang.UnsatisfiedLinkError you likely forgot to set the size of the array correctly (too large)
     std::array<JNINativeMethod, 60> methods = {{ // Can remove the extra brace in C++14
-        { "nativeCreate", "(Ljava/lang/String;)J", reinterpret_cast<void*>(&nativeCreate) },
+        { "nativeCreate", "(Ljava/lang/String;Ljava/lang/String;)J", reinterpret_cast<void*>(&nativeCreate) },
         { "nativeDestroy", "(J)V", reinterpret_cast<void*>(&nativeDestroy) },
         { "nativeInitializeDisplay", "(J)V", reinterpret_cast<void*>(&nativeInitializeDisplay) },
         { "nativeTerminateDisplay", "(J)V", reinterpret_cast<void*>(&nativeTerminateDisplay) },

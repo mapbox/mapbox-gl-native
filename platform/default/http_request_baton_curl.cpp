@@ -423,7 +423,7 @@ void start_request(void *const ptr) {
 #ifndef __ANDROID__
     std::string ca_path = "ca-bundle.crt";
 #else
-    std::string ca_path = mbgl::android::cache_path + "/ca-bundle.crt";
+    std::string ca_path = mbgl::android::data_path + "/ca-bundle.crt";
 #endif
 
     // Carry on the shared pointer in the private information of the CURL handle.

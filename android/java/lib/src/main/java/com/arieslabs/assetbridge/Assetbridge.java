@@ -9,8 +9,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class Assetbridge {
+
+    private static final String TAG = "Assetbridge";
+
     /*static {
         System.loadLibrary("assetbridge");
     }*/
@@ -19,16 +23,21 @@ public class Assetbridge {
     public static void unpack(Context c) {
 
         try {
-            // first let's get the temp directory
-            String tmpdir = c.getCacheDir().getPath();
+            // first let's get the data directory
+            String datadir = c.getFilesDir().getAbsolutePath();
+            Log.v(TAG, "Extracting assets to " + datadir);
 
             // now we need the assetmanager
             AssetManager am = c.getAssets();
-            String[] assets = am.list("");
+
+            // only extract what we need
+            ArrayList<String> assets = new ArrayList<String>();
+            assets.add("ca-bundle.crt");
+            assets.add("styles");
 
             // iterate on the files...
             for(String asset : assets) {
-                copyAssetFolder(am, asset, tmpdir + "/" + asset);
+                copyAssetFolder(am, asset, datadir + "/" + asset);
             }
 
             // last, set the ASSETDIR environment variable for the C
@@ -44,6 +53,7 @@ public class Assetbridge {
 
     public static void copyAssetFolder(AssetManager am, String src, String dest)
     	throws IOException {
+        Log.v(TAG, "Copying " + src);
 
         InputStream srcIS = null;
         File destfh;
@@ -57,6 +67,8 @@ public class Assetbridge {
         } catch (FileNotFoundException e) {
             isDir = true;
         }
+
+        Log.v(TAG, src + " was " + (isDir ? "a dir" : "a file"));
 
         // either way, we'll use the dest as a File
         destfh = new File(dest);

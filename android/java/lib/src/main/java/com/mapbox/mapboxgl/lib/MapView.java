@@ -116,18 +116,19 @@ public class MapView extends SurfaceView {
         }
 
         // Get the cache path
-        String cachePath = context.getCacheDir().getPath();
+        String cachePath = context.getCacheDir().getAbsolutePath();
+        String dataPath = context.getFilesDir().getAbsolutePath();
 
         // Extract the asset files
         Assetbridge.unpack(context);
 
         // Load the map style and API key
         //mStyleUrl = "https://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json";
-        mStyleUrl = "file://" + cachePath + "/styles/styles/bright-v6.json";
+        mStyleUrl = "file://" + dataPath + "/styles/styles/bright-v6.json";
         mAccessToken = "pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ";
 
         // Create the NativeMapView
-        mNativeMapView = new NativeMapView(this, cachePath);
+        mNativeMapView = new NativeMapView(this, cachePath, dataPath);
         mNativeMapView.setStyleURL(mStyleUrl);
         mNativeMapView.setAccessToken(mAccessToken);
         mNativeMapView.setDebug(true);
