@@ -122,8 +122,8 @@ public class MapView extends SurfaceView {
         Assetbridge.unpack(context);
 
         // Load the map style and API key
-        //mStyleUrl = "https://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json";
-        mStyleUrl = "file://" + cachePath + "/styles/styles/bright-v6.json";
+        mStyleUrl = "https://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json";
+        //mStyleUrl = "file://" + cachePath + "/styles/styles/bright-v6.json";
         mAccessToken = "pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ";
 
         // Create the NativeMapView
