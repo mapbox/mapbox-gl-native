@@ -258,6 +258,8 @@ void SpriteAtlas::bind(bool linear) {
         }
 
         dirty = false;
+
+        // platform::show_color_debug_image("Sprite Atlas", reinterpret_cast<const char *>(data), width, height, width * pixelRatio, height * pixelRatio);
     }
 };
 
