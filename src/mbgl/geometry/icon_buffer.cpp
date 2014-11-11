@@ -19,15 +19,17 @@ size_t IconVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, int16_t t
     shorts[3] /* offset */ = std::round(oy * 64);
 
     uint8_t *ubytes = static_cast<uint8_t *>(data);
-    ubytes[8] /* labelminzoom */ = labelminzoom * 10;
-    ubytes[9] /* minzoom */ =  minzoom * 10; // 1/10 zoom levels: z16 == 160.
-    ubytes[10] /* maxzoom */ = std::fmin(maxzoom, 25) * 10; // 1/10 zoom levels: z16 == 160.
+    // a_data1
+    ubytes[8] /* tex */ = tx / 4;
+    ubytes[9] /* tex */ = ty / 4;
+    ubytes[10] /* labelminzoom */ = labelminzoom * 10;
     ubytes[11] /* angle */ = (int16_t)std::round(angle * angleFactor) % 256;
-    ubytes[12] /* rangeend */ = util::max((int16_t)std::round(range[0] * angleFactor), (int16_t)0) % 256;
-    ubytes[13] /* rangestart */ = util::min((int16_t)std::round(range[1] * angleFactor), (int16_t)255) % 256;
 
-    shorts[8] /* tex */ = tx;
-    shorts[9] /* tex */ = ty;
+    // a_data2
+    ubytes[12] /* minzoom */ = minzoom * 10; // 1/10 zoom levels: z16 == 160.
+    ubytes[13] /* maxzoom */ = std::fmin(maxzoom, 25) * 10; // 1/10 zoom levels: z16 == 160.
+    ubytes[14] /* rangeend */ = util::max((int16_t)std::round(range[0] * angleFactor), (int16_t)0) % 256;
+    ubytes[15] /* rangestart */ = util::min((int16_t)std::round(range[1] * angleFactor), (int16_t)255) % 256;
 
     return idx;
 }

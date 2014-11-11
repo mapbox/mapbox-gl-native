@@ -78,17 +78,26 @@ void copy_bitmap(const uint32_t *src, const int src_stride, const int src_x, con
 }
 
 Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t pixel_width, size_t pixel_height) {
+    uint16_t pack_width = pixel_width + buffer * 2;
+    uint16_t pack_height = pixel_height + buffer * 2;
+
+    // Increase to next number divisible by 4, but at least 1.
+    // This is so we can scale down the texture coordinates and pack them
+    // into 2 bytes rather than 4 bytes.
+    pack_width += (4 - pack_width % 4);
+    pack_height += (4 - pack_height % 4);
+
     // We have to allocate a new area in the bin, and store an empty image in it.
     // Add a 1px border around every image.
-    Rect<dimension> rect = bin.allocate(pixel_width + 2 * buffer, pixel_height + 2 * buffer);
+    Rect<dimension> rect = bin.allocate(pack_width, pack_height);
     if (rect.w == 0) {
         return rect;
     }
 
     rect.x += buffer;
     rect.y += buffer;
-    rect.w -= 2 * buffer;
-    rect.h -= 2 * buffer;
+    rect.w = pixel_width;
+    rect.h = pixel_height;
 
     return rect;
 }

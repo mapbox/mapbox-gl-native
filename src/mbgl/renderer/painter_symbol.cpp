@@ -134,11 +134,6 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
 
         spriteAtlas.bind(state.isChanging() || bucket.properties.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1 || sdf);
 
-        std::array<float, 2> texsize = {{
-            float(spriteAtlas.getWidth()),
-            float(spriteAtlas.getHeight())
-        }};
-
         if (sdf) {
             renderSDF(bucket,
                       id,
@@ -146,7 +141,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
                       bucket.properties.icon,
                       properties.icon,
                       1.0f,
-                      texsize,
+                      {{ float(spriteAtlas.getWidth()) / 4.0f, float(spriteAtlas.getHeight()) / 4.0f }},
                       *sdfIconShader,
                       &SymbolBucket::drawIcons);
         } else {
@@ -164,7 +159,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
             useProgram(iconShader->program);
             iconShader->u_matrix = vtxMatrix;
             iconShader->u_exmatrix = exMatrix;
-            iconShader->u_texsize = texsize;
+            iconShader->u_texsize = {{ float(spriteAtlas.getWidth()) / 4.0f, float(spriteAtlas.getHeight()) / 4.0f }};
 
             // Convert the -pi..pi to an int8 range.
             const float angle = std::round(state.getAngle() / M_PI * 128);
