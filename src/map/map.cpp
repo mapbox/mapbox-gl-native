@@ -319,7 +319,6 @@ void Map::render(uv_async_t *async) {
 }
 
 void Map::terminate(uv_async_t *async) {
-    Log::Info(Event::General, "Map::terminate() start");
     // Closes all open handles on the loop. This means that the loop will automatically terminate.
     Map *map = static_cast<Map *>(async->data);
     assert(uv_thread_self() == map->map_thread);
@@ -334,13 +333,10 @@ void Map::terminate(uv_async_t *async) {
     map->view.make_inactive();
 
     map->terminating = true;
-    Log::Info(Event::General, "Map::terminate() set terminating = true");
 
     uv_close((uv_handle_t *)map->async_cleanup.get(), nullptr);
     uv_close((uv_handle_t *)map->async_render.get(), nullptr);
     uv_close((uv_handle_t *)map->async_terminate.get(), nullptr);
-
-    Log::Info(Event::General, "Map::terminate() done");
 }
 
 #pragma mark - Setup
