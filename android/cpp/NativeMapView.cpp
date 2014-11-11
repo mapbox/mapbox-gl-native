@@ -59,6 +59,8 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj_) {
 NativeMapView::~NativeMapView() {
     LOG_VERBOSE("NativeMapView::~NativeMapView");
     terminateContext();
+    terminateSurface();
+    terminateDisplay();
 
     delete map;
     map = nullptr;
