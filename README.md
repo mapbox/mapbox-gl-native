@@ -142,7 +142,7 @@ Install the [Android NDK](https://developer.android.com/tools/sdk/ndk/index.html
 
     export ANDROID_NDK_PATH="/dir/to/android-ndk-r10c"
 
-Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html). The latest versions recommend that place the SDK someplace like `/usr/local/android-sdk-macosx`. 
+Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html). The latest versions recommend that you place the SDK someplace like `/usr/local/android-sdk-macosx`. 
 
     export ANDROID_HOME="/dir/to/android-sdk-macosx"
 
