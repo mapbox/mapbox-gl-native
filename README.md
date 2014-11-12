@@ -136,6 +136,22 @@ APKs for testing are output to `android/java/app/build/outputs/apk/app-debug.apk
 
 You can also open `android/java` in Android Studio.
 
+## Android (on OS X)
+
+Install the [Android NDK](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X. 
+
+    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10c"
+
+Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html). The latest versions recommend that place the SDK someplace like `/usr/local/android-sdk-macosx`. 
+
+    export ANDROID_HOME="/dir/to/android-sdk-macosx"
+
+Run:
+
+    make android
+
+You can then open `android/java` in Android Studio. 
+
 # Troubleshooting
 
 To trigger a complete rebuild, run `make clean` and then start over generating the Xcode projects or Makefiles as described above.
