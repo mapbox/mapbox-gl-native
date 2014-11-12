@@ -48,7 +48,7 @@ HeadlessDisplay::HeadlessDisplay() {
     // We're creating a dummy pbuffer anyway that we're not using.
     static int pixelFormat[] = {
         GLX_DRAWABLE_TYPE, GLX_PBUFFER_BIT,
-        None
+        0
     };
 
     int configs = 0;
