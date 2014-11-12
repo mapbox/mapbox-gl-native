@@ -1,5 +1,5 @@
-#ifndef LOG_H
-#define LOG_H
+#ifndef MBGL_ANDROID_LOG
+#define MBGL_ANDROID_LOG
 
 #include <android/log.h>
 
@@ -22,4 +22,4 @@
 #define LOG_WARN(fmt, args...) __android_log_print(ANDROID_LOG_WARN, __FILE__ ":" S__LINE__, fmt, ##args)
 #define LOG_ERROR(fmt, args...) __android_log_print(ANDROID_LOG_ERROR, __FILE__ ":" S__LINE__, fmt, ##args)
 
-#endif // LOG_H
+#endif

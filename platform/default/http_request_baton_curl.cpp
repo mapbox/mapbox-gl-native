@@ -1,8 +1,10 @@
+#include <mbgl/mbgl.hpp>
 #include <mbgl/storage/http_request_baton.hpp>
 #include <mbgl/util/uv-messenger.h>
 #include <mbgl/util/time.hpp>
+
 #ifdef __ANDROID__
-    #include "../../android/cpp/NativeMapView.hpp"
+    #include <mbgl/android/jni.hpp>
 #endif
 
 #include <uv.h>

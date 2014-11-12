@@ -1,42 +1,14 @@
-#ifndef MAP_VIEW_HPP
-#define MAP_VIEW_HPP
+#ifndef MBGL_ANDROID_NATIVE_MAP_VIEW
+#define MBGL_ANDROID_NATIVE_MAP_VIEW
 
+#include <mbgl/map/view.hpp>
 #include <string>
-
 #include <jni.h>
-
 #include <android/native_window.h>
-
 #include <EGL/egl.h>
-
-#include <mbgl/mbgl.hpp>
 
 namespace mbgl {
 namespace android {
-
-extern std::string cache_path;
-extern std::string data_path;
-
-extern jmethodID on_map_changed_id;
-
-extern jclass lon_lat_class;
-extern jmethodID lon_lat_constructor_id;
-extern jfieldID lon_lat_lon_id;
-extern jfieldID lon_lat_lat_id;
-
-extern jclass lon_lat_zoom_class;
-extern jmethodID lon_lat_zoom_constructor_id;
-extern jfieldID lon_lat_zoom_lon_id;
-extern jfieldID lon_lat_zoom_lat_id;
-extern jfieldID lon_lat_zoom_zoom_id;
-
-extern jclass runtime_exception_class;
-
-extern jmethodID list_to_array_id;
-
-extern jclass array_list_class;
-extern jmethodID array_list_constructor_id;
-extern jmethodID array_list_add_id;
 
 class MBGLView;
 
@@ -116,7 +88,7 @@ private:
     NativeMapView* nativeView = nullptr;
 };
 
-} // namespace android
-} // namespace mbgl
+}
+}
 
-#endif // MAP_VIEW_HPP
+#endif

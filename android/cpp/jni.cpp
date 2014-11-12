@@ -11,9 +11,10 @@
 
 #include <android/native_window_jni.h>
 
-#include "log.h"
-
-#include "NativeMapView.hpp"
+#include <mbgl/map/map.hpp>
+#include <mbgl/android/jni.hpp>
+#include <mbgl/android/log.hpp>
+#include <mbgl/android/native_map_view.hpp>
 
 #pragma clang diagnostic ignored "-Wunused-parameter"
 

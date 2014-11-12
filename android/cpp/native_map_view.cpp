@@ -5,12 +5,13 @@
 
 #include <GLES2/gl2.h>
 
+#include <mbgl/android/log.hpp>
+#include <mbgl/android/native_map_view.hpp>
+
+#include <mbgl/map/map.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/android/log_android.hpp>
-
-#include "log.h"
-
-#include "NativeMapView.hpp"
+#include <mbgl/android/jni.hpp>
 
 namespace mbgl {
 namespace android {
