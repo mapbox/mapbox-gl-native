@@ -72,8 +72,8 @@ private:
 
     ANativeWindow* window = nullptr;
 
+    MBGLView view; // Must be before map
     mbgl::Map map;
-    MBGLView view;
 
     EGLDisplay display = EGL_NO_DISPLAY;
     EGLSurface surface = EGL_NO_SURFACE;

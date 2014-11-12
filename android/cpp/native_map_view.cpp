@@ -80,7 +80,7 @@ void MBGLView::notify_map_change(mbgl::MapChange /* change */, mbgl::timestamp /
     nativeView.notifyMapChange();
 }
 
-NativeMapView::NativeMapView(JNIEnv* env, jobject obj_) : map(view), view(*this) {
+NativeMapView::NativeMapView(JNIEnv* env, jobject obj_) : view(*this), map(view) {
     LOG_VERBOSE("NativeMapView::NativeMapView");
 
     LOG_ASSERT(env != nullptr);
