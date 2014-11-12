@@ -3,13 +3,14 @@
 
 #include <mbgl/mbgl.hpp>
 #include <mbgl/util/time.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #ifdef NVIDIA
 #define GLFW_INCLUDE_ES2
 #endif
 #include <GLFW/glfw3.h>
 
-class GLFWView : public mbgl::View {
+class GLFWView : public mbgl::View, private mbgl::util::noncopyable {
 public:
     GLFWView(bool fullscreen = false);
     ~GLFWView();
