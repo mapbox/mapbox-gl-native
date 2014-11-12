@@ -10,6 +10,7 @@ import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.InputDevice;
@@ -58,6 +59,9 @@ public class MapView extends SurfaceView {
 
     // Used to load map tiles
     private String mAccessToken;
+
+    // Used to handle DPI scaling
+    private float mScreenDensity = 1.0f;
 
     // Touch gesture detectors
     private GestureDetector mGestureDetector;
@@ -114,6 +118,9 @@ public class MapView extends SurfaceView {
             // TODO editor does not load properly because we dont implement this
             return;
         }
+
+        // Get the screen's density
+        mScreenDensity = context.getResources().getDisplayMetrics().density;
 
         // Get the cache path
         String cachePath = context.getCacheDir().getAbsolutePath();
@@ -465,7 +472,7 @@ public class MapView extends SurfaceView {
                 int height) {
             Log.v(TAG, "surfaceChanged");
             Log.i(TAG, "resize " + format + " " + width + " " + height);
-            mNativeMapView.resize(width, height);
+            mNativeMapView.resize((int) (width / mScreenDensity), (int) (height / mScreenDensity), mScreenDensity, width, height);
         }
     }
 
@@ -516,10 +523,10 @@ public class MapView extends SurfaceView {
         mNativeMapView.cancelTransitions();
 
         if (zoomIn) {
-            mNativeMapView.scaleBy(2.0, x, y, 0.3);
+            mNativeMapView.scaleBy(2.0, x / mScreenDensity, y / mScreenDensity, 0.3);
         } else {
             // TODO two finger tap zoom out
-            mNativeMapView.scaleBy(0.5, x, y, 0.3);
+            mNativeMapView.scaleBy(0.5, x / mScreenDensity, y / mScreenDensity, 0.3);
         }
     }
 
@@ -654,8 +661,8 @@ public class MapView extends SurfaceView {
              * 
              * // Cancel any animation mNativeMapView.cancelTransitions();
              * 
-             * mNativeMapView.moveBy(velocityX * duration / 2.0, velocityY *
-             * duration / 2.0, duration);
+             * mNativeMapView.moveBy(velocityX * duration / 2.0 / mScreenDensity, velocityY *
+             * duration / 2.0 / mScreenDensity, duration);
              * 
              * return true;
              */
@@ -675,7 +682,7 @@ public class MapView extends SurfaceView {
                                                 // transitions with touch
 
             // Scroll the map
-            mNativeMapView.moveBy(-distanceX, -distanceY);
+            mNativeMapView.moveBy(-distanceX / mScreenDensity, -distanceY / mScreenDensity);
             return true;
         }
     }
@@ -740,7 +747,7 @@ public class MapView extends SurfaceView {
 
             // Scale the map
             mNativeMapView.scaleBy(detector.getScaleFactor(),
-                    detector.getFocusX(), detector.getFocusY());
+                    detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
 
             return true;
         }
@@ -818,8 +825,8 @@ public class MapView extends SurfaceView {
             double bearing = mNativeMapView.getBearing();
             bearing += detector.getRotationDegreesDelta() * Math.PI / 180.0;
             Log.d("rotate", "rotate to " + bearing);
-            mNativeMapView.setBearing(bearing, detector.getFocusX(),
-                    detector.getFocusY());
+            mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity,
+                    detector.getFocusY() / mScreenDensity);
 
             return true;
         }
@@ -874,7 +881,7 @@ public class MapView extends SurfaceView {
             mNativeMapView.cancelTransitions();
 
             // Move left
-            mNativeMapView.moveBy(scrollDist, 0.0);
+            mNativeMapView.moveBy(scrollDist / mScreenDensity, 0.0 / mScreenDensity);
             return true;
 
         case KeyEvent.KEYCODE_DPAD_RIGHT:
@@ -886,7 +893,7 @@ public class MapView extends SurfaceView {
             mNativeMapView.cancelTransitions();
 
             // Move right
-            mNativeMapView.moveBy(-scrollDist, 0.0);
+            mNativeMapView.moveBy(-scrollDist / mScreenDensity, 0.0 / mScreenDensity);
             return true;
 
         case KeyEvent.KEYCODE_DPAD_UP:
@@ -898,7 +905,7 @@ public class MapView extends SurfaceView {
             mNativeMapView.cancelTransitions();
 
             // Move up
-            mNativeMapView.moveBy(0.0, scrollDist);
+            mNativeMapView.moveBy(0.0 / mScreenDensity, scrollDist / mScreenDensity);
             return true;
 
         case KeyEvent.KEYCODE_DPAD_DOWN:
@@ -910,7 +917,7 @@ public class MapView extends SurfaceView {
             mNativeMapView.cancelTransitions();
 
             // Move down
-            mNativeMapView.moveBy(0.0, -scrollDist);
+            mNativeMapView.moveBy(0.0 / mScreenDensity, -scrollDist / mScreenDensity);
             return true;
 
         default:
@@ -988,7 +995,7 @@ public class MapView extends SurfaceView {
             mNativeMapView.cancelTransitions();
 
             // Scroll the map
-            mNativeMapView.moveBy(-10.0 * event.getX(), -10.0 * event.getY());
+            mNativeMapView.moveBy(-10.0 * event.getX() / mScreenDensity, -10.0 * event.getY() / mScreenDensity);
             return true;
 
             // Trackball was pushed in so start tracking and tell system we are
@@ -1085,8 +1092,8 @@ public class MapView extends SurfaceView {
                 float scrollDist = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
 
                 // Scale the map by the appropriate power of two factor
-                mNativeMapView.scaleBy(Math.pow(2.0, scrollDist), event.getX(),
-                        event.getY());
+                mNativeMapView.scaleBy(Math.pow(2.0, scrollDist), event.getX() / mScreenDensity,
+                        event.getY() / mScreenDensity);
 
                 return true;
 
