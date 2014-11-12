@@ -1,5 +1,5 @@
 #include <mbgl/platform/platform.hpp>
-#include "../../android/cpp/NativeMapView.hpp"
+#include <mbgl/android/jni.hpp>
 
 namespace mbgl {
 namespace platform {

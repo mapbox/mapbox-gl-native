@@ -1,8 +1,11 @@
+#include <mbgl/mbgl.hpp>
 #include <mbgl/storage/http_request_baton.hpp>
 #include <mbgl/util/uv-messenger.h>
 #include <mbgl/util/time.hpp>
+#include <mbgl/util/string.hpp>
+
 #ifdef __ANDROID__
-    #include "../../android/cpp/NativeMapView.hpp"
+    #include <mbgl/android/jni.hpp>
 #endif
 
 #include <uv.h>
@@ -11,6 +14,20 @@
 #include <queue>
 #include <cassert>
 #include <cstring>
+
+
+// Check curl library version.
+const static bool curl_version_check = []() {
+    const auto version = curl_version_info(CURLVERSION_NOW);
+    if (version->version_num != LIBCURL_VERSION_NUM) {
+        throw std::runtime_error(mbgl::util::sprintf<96>(
+            "libcurl version mismatch: headers report %d.%d.%d, but library reports %d.%d.%d",
+            (LIBCURL_VERSION_NUM >> 16) & 0xFF, (LIBCURL_VERSION_NUM >> 8) & 0xFF, LIBCURL_VERSION_NUM & 0xFF,
+            (version->version_num >> 16) & 0xFF, (version->version_num >> 8) & 0xFF, version->version_num & 0xFF));
+    }
+    return true;
+}();
+
 
 // This file contains code from http://curl.haxx.se/libcurl/c/multi-uv.html:
 
@@ -423,7 +440,7 @@ void start_request(void *const ptr) {
 #ifndef __ANDROID__
     std::string ca_path = "ca-bundle.crt";
 #else
-    std::string ca_path = mbgl::android::cache_path + "/ca-bundle.crt";
+    std::string ca_path = mbgl::android::data_path + "/ca-bundle.crt";
 #endif
 
     // Carry on the shared pointer in the private information of the CURL handle.

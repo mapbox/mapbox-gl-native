@@ -8,8 +8,8 @@
       'product_name': 'mapbox-gl',
       'type': 'shared_library',
       'sources': [
-        './cpp/NativeMapView.cpp',
-        './cpp/JNI.cpp',
+        './cpp/native_map_view.cpp',
+        './cpp/jni.cpp',
       ],
       'cflags_cc': [
         '-I<(boost_root)/include',
