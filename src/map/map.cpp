@@ -21,12 +21,67 @@
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <algorithm>
 #include <iostream>
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+
+#include <uv.h>
+
+// Check libuv library version.
+const static bool uv_version_check = []() {
+    const unsigned int version = uv_version();
+    const unsigned int major = (version >> 16) & 0xFF;
+    const unsigned int minor = (version >> 8) & 0xFF;
+    const unsigned int patch = version & 0xFF;
+
+#ifndef UV_VERSION_PATCH
+    // 0.10 doesn't have UV_VERSION_PATCH defined, so we "fake" it by using the library patch level.
+    const unsigned int UV_VERSION_PATCH = version & 0xFF;
+#endif
+
+    if (major != UV_VERSION_MAJOR || minor != UV_VERSION_MINOR || patch != UV_VERSION_PATCH) {
+        throw std::runtime_error(mbgl::util::sprintf<96>(
+            "libuv version mismatch: headers report %d.%d.%d, but library reports %d.%d.%d", UV_VERSION_MAJOR,
+            UV_VERSION_MINOR, UV_VERSION_PATCH, major, minor, patch));
+    }
+    return true;
+}();
+
+
+#include <zlib.h>
+// Check zlib library version.
+const static bool zlib_version_check = []() {
+    const char *const version = zlibVersion();
+    if (version[0] != ZLIB_VERSION[0]) {
+        throw std::runtime_error(mbgl::util::sprintf<96>(
+            "zlib version mismatch: headers report %s, but library reports %s", ZLIB_VERSION, version));
+    }
+
+    return true;
+}();
+
+
+#include <sqlite3.h>
+// Check sqlite3 library version.
+const static bool sqlite_version_check = []() {
+    if (sqlite3_libversion_number() != SQLITE_VERSION_NUMBER) {
+        throw std::runtime_error(mbgl::util::sprintf<96>(
+            "sqlite3 libversion mismatch: headers report %d, but library reports %d",
+            SQLITE_VERSION_NUMBER, sqlite3_libversion_number()));
+    }
+    if (strcmp(sqlite3_sourceid(), SQLITE_SOURCE_ID) != 0) {
+        throw std::runtime_error(mbgl::util::sprintf<256>(
+            "sqlite3 sourceid mismatch: headers report \"%s\", but library reports \"%s\"",
+            SQLITE_SOURCE_ID, sqlite3_sourceid()));
+    }
+
+    return true;
+}();
+
 
 using namespace mbgl;
 
