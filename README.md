@@ -105,15 +105,15 @@ Or proceed to building the debug application with:
 
 ## Android (on Linux)
 
-Follow Linux steps until ./configure
+Follow Linux steps until `./configure`. 
 
-Install Oracle JDK 7
+Install Oracle JDK 7: 
 
 	wget http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-linux-x64.tar.gz
 	tar -xzf jdk-7u71-linux-x64.tar.gz
 	export JAVA_HOME="/dir/to/jdk1.7.0_71"
 
-Install Android NDK
+Install Android NDK: 
 
 	wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
 	chmod +x android-ndk-r10c-linux-x86_64.bin
@@ -121,20 +121,20 @@ Install Android NDK
 	export ANDROID_NDK_PATH="/dir/to/android-ndk-r10c"
 	export NDK_PATH=$(ANDROID_NDK_PATH)
 
-Install Android SDK
+Install Android SDK: 
 
 	wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
 	tar -xzf ./android-sdk_r23.0.2-linux.tgz
     ./android-sdk-linux/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.0,android-19,android-21,extra-android-m2repository,extra-google-m2repository
     export ANDROID_HOME="/dir/to/android-sdk-linux"
 
-Run
+Run: 
 
 	make android
 
-APKs for testing are output to android/java/app/build/outputs/apk/app-debug.apk
+APKs for testing are output to `android/java/app/build/outputs/apk/app-debug.apk`
 
-You can also open android/java in Android Studio.
+You can also open `android/java` in Android Studio.
 
 # Troubleshooting
 
