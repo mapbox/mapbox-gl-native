@@ -21,6 +21,11 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 
 We try to link to as many system-provided libraries as possible. When these are unavailable or too outdated, we run a thin build-script layer called [Mason](https://github.com/mapbox/mason) to automate builds, and load precompiled binary packages when possible.
 
+Be sure to pull down all submodules first: 
+
+    git submodule init
+    git submodule update
+
 ## OS X
 
 On OS X, we are using `zlib`, `SQLite3`, `libcurl` and `libpng` provided by the operating system. In addition to that, you need to have the Boost headers installed. To install all prerequisites, use [Homebrew](http://brew.sh/) and type `brew install pkg-config boost`.
@@ -43,12 +48,7 @@ iOS makes use of a Cocoa-specific API called [`mapbox-gl-cocoa`](https://github.
 
 If you intend to develop here, `mapbox-gl-cocoa` is included as a submodule of the overall build setup.
 
-To pull down the submodule(s), run:
-
-    git submodule init
-    git submodule update
-
-Then, you can run `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. This will automatically install required dependencies as well.
+You can run `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. This will automatically install required dependencies as well.
 
 Note that if you are doing OS X development as well, to toggle from OS X back to iOS, you will need to `make iproj` again.
 
