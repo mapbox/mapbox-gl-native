@@ -62,9 +62,9 @@ We are using Ubuntu for development. While the software should work on other dis
 
 Install GCC 4.8+ if you are running Ubuntu 13.10 or older. Alternatively, you can also use Clang 3.4+.
 
-	sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
-	sudo apt-get update
-	sudo apt-get install gcc-4.8 g++-4.8
+    sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+    sudo apt-get update
+    sudo apt-get install gcc-4.8 g++-4.8
 
 Ensure you have git and other build essentials:
 
@@ -81,17 +81,17 @@ Install glfw3 dependencies:
 
 Finally, install Boost. If you're running Ubuntu 12.04 or older, you need to install a backport PPA since the version provided by APT doesn't contain Boost Geometry:
 
-	sudo add-apt-repository --yes ppa:boost-latest/ppa
-	sudo apt-get update
-	sudo apt-get install libboost1.55-dev
+    sudo add-apt-repository --yes ppa:boost-latest/ppa
+    sudo apt-get update
+    sudo apt-get install libboost1.55-dev
 
 Otherwise, you can just install
 
-	sudo apt-get install libboost-dev
+    sudo apt-get install libboost-dev
 
 Once you're done installing the build dependencies, you can get started by running
 
-	./configure
+    ./configure
 
 which downloads all other dependencies that we need to build manually with [Mason](https://github.com/mapbox/mason). There's a good chance that there already are binary files and that you don't need to compile anything.
 
@@ -101,7 +101,7 @@ Then, you can then proceed to build the library like:
 
 Or proceed to building the debug application with:
 
-	make linux
+    make linux
 
 ## Android (on Linux)
 
@@ -109,28 +109,28 @@ Follow Linux steps until `./configure`.
 
 Install Oracle JDK 7: 
 
-	wget http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-linux-x64.tar.gz
-	tar -xzf jdk-7u71-linux-x64.tar.gz
-	export JAVA_HOME="/dir/to/jdk1.7.0_71"
+    wget http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-linux-x64.tar.gz
+    tar -xzf jdk-7u71-linux-x64.tar.gz
+    export JAVA_HOME="/dir/to/jdk1.7.0_71"
 
 Install Android NDK: 
 
-	wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
-	chmod +x android-ndk-r10c-linux-x86_64.bin
-	./android-ndk-r10c-linux-x86_64.bin
-	export ANDROID_NDK_PATH="/dir/to/android-ndk-r10c"
-	export NDK_PATH=$(ANDROID_NDK_PATH)
+    wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
+    chmod +x android-ndk-r10c-linux-x86_64.bin
+    ./android-ndk-r10c-linux-x86_64.bin
+    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10c"
+    export NDK_PATH=$(ANDROID_NDK_PATH)
 
 Install Android SDK: 
 
-	wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
-	tar -xzf ./android-sdk_r23.0.2-linux.tgz
+    wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
+    tar -xzf ./android-sdk_r23.0.2-linux.tgz
     ./android-sdk-linux/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.0,android-19,android-21,extra-android-m2repository,extra-google-m2repository
     export ANDROID_HOME="/dir/to/android-sdk-linux"
 
 Run: 
 
-	make android
+    make android
 
 APKs for testing are output to `android/java/app/build/outputs/apk/app-debug.apk`
 
