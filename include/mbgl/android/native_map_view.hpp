@@ -1,7 +1,9 @@
 #ifndef MBGL_ANDROID_NATIVE_MAP_VIEW
 #define MBGL_ANDROID_NATIVE_MAP_VIEW
 
+#include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
+#include <mbgl/util/noncopyable.hpp>
 #include <string>
 #include <jni.h>
 #include <android/native_window.h>
@@ -10,16 +12,34 @@
 namespace mbgl {
 namespace android {
 
-class MBGLView;
+class NativeMapView;
 
-class NativeMapView {
+class MBGLView: public mbgl::View, private mbgl::util::noncopyable {
+public:
+    explicit MBGLView(NativeMapView& nativeView_) :
+            nativeView(nativeView_) {
+    }
+
+    void make_active() override;
+    void make_inactive() override;
+
+    void swap() override;
+
+    void notify() override;
+    void notify_map_change(mbgl::MapChange change, mbgl::timestamp delay = 0) override;
+
+private:
+    NativeMapView& nativeView;
+};
+
+class NativeMapView : private mbgl::util::noncopyable {
     friend class MBGLView;
 
 public:
     NativeMapView(JNIEnv* env, jobject obj);
     ~NativeMapView();
 
-    mbgl::Map* getMap() const {
+    mbgl::Map& getMap() {
         return map;
     }
 
@@ -52,8 +72,8 @@ private:
 
     ANativeWindow* window = nullptr;
 
-    mbgl::Map* map = nullptr;
-    MBGLView* view = nullptr;
+    mbgl::Map map;
+    MBGLView view;
 
     EGLDisplay display = EGL_NO_DISPLAY;
     EGLSurface surface = EGL_NO_SURFACE;
@@ -66,26 +86,6 @@ private:
     std::string api_key;
 
     bool first_time = false;
-};
-
-class MBGLView: public mbgl::View {
-public:
-    MBGLView(NativeMapView* nativeView_) :
-            nativeView(nativeView_) {
-    }
-    virtual ~MBGLView() {
-    }
-
-    void make_active() override;
-    void make_inactive() override;
-
-    void swap() override;
-
-    void notify() override;
-    void notify_map_change(mbgl::MapChange change, mbgl::timestamp delay = 0) override;
-
-private:
-    NativeMapView* nativeView = nullptr;
 };
 
 }

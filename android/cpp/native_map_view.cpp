@@ -8,9 +8,7 @@
 #include <mbgl/android/log.hpp>
 #include <mbgl/android/native_map_view.hpp>
 
-#include <mbgl/map/map.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/platform/android/log_android.hpp>
 #include <mbgl/android/jni.hpp>
 
 namespace mbgl {
@@ -34,7 +32,55 @@ void log_gl_string(GLenum name, const char* label) {
     }
 }
 
-NativeMapView::NativeMapView(JNIEnv* env, jobject obj_) {
+
+void MBGLView::make_active() {
+    LOG_VERBOSE("MBGLView::make_active");
+    if ((nativeView.display != EGL_NO_DISPLAY)
+            && (nativeView.surface != EGL_NO_SURFACE)
+            && (nativeView.context != EGL_NO_CONTEXT)) {
+        if (!eglMakeCurrent(nativeView.display, nativeView.surface,
+                nativeView.surface, nativeView.context)) {
+            LOG_ERROR("eglMakeCurrent() returned error %d", eglGetError());
+        }
+    } else {
+        LOG_DEBUG("Not activating as we are not ready");
+    }
+}
+
+void MBGLView::make_inactive() {
+    LOG_VERBOSE("MBGLView::make_inactive");
+    if (!eglMakeCurrent(nativeView.display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+            EGL_NO_CONTEXT)) {
+        LOG_ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
+                eglGetError());
+    }
+}
+
+void MBGLView::swap() {
+    LOG_VERBOSE("MBGLView::swap");
+
+    if (map->needsSwap() && (nativeView.display != EGL_NO_DISPLAY)
+            && (nativeView.surface != EGL_NO_SURFACE)) {
+        if (!eglSwapBuffers(nativeView.display, nativeView.surface)) {
+            LOG_ERROR("eglSwapBuffers() returned error %d", eglGetError());
+        }
+        map->swapped();
+    } else {
+        LOG_DEBUG("Not swapping as we are not ready");
+    }
+}
+
+void MBGLView::notify() {
+    LOG_VERBOSE("MBGLView::notify()");
+    // noop
+}
+
+void MBGLView::notify_map_change(mbgl::MapChange /* change */, mbgl::timestamp /* delay */) {
+    LOG_VERBOSE("MBGLView::notify_map_change()");
+    nativeView.notifyMapChange();
+}
+
+NativeMapView::NativeMapView(JNIEnv* env, jobject obj_) : map(view), view(*this) {
     LOG_VERBOSE("NativeMapView::NativeMapView");
 
     LOG_ASSERT(env != nullptr);
@@ -50,11 +96,6 @@ NativeMapView::NativeMapView(JNIEnv* env, jobject obj_) {
         env->ExceptionDescribe();
         return;
     }
-
-    mbgl::Log::Set<mbgl::AndroidLogBackend>();
-
-    view = new MBGLView(this);
-    map = new mbgl::Map(*view);
 }
 
 NativeMapView::~NativeMapView() {
@@ -62,12 +103,6 @@ NativeMapView::~NativeMapView() {
     terminateContext();
     destroySurface();
     terminateDisplay();
-
-    delete map;
-    map = nullptr;
-
-    delete view;
-    view = nullptr;
 
     LOG_ASSERT(vm != nullptr);
     LOG_ASSERT(obj != nullptr);
@@ -168,8 +203,8 @@ bool NativeMapView::initializeDisplay() {
         }
     }
 
-    // TODO make_unique missing in Android NDK?
-//    const std::unique_ptr<EGLConfig[]> configs = std::make_unique(new EGLConfig[num_configs]);
+    // TODO: make_unique is missing in Android NDK?
+    // const std::unique_ptr<EGLConfig[]> configs = std::make_unique(new EGLConfig[num_configs]);
     const std::unique_ptr<EGLConfig[]> configs(new EGLConfig[num_configs]);
     if (!eglChooseConfig(display, config_attribs, configs.get(), num_configs,
             &num_configs)) {
@@ -197,8 +232,6 @@ bool NativeMapView::initializeDisplay() {
 
 void NativeMapView::terminateDisplay() {
     LOG_VERBOSE("NativeMapView::terminateDisplay");
-
-    //map->terminate();
 
     if (display != EGL_NO_DISPLAY) {
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
@@ -243,8 +276,6 @@ bool NativeMapView::initializeContext() {
 
 void NativeMapView::terminateContext() {
     LOG_VERBOSE("NativeMapView::terminateContext");
-
-    //map->terminate();
 
     if (display != EGL_NO_DISPLAY) {
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
@@ -480,7 +511,7 @@ void NativeMapView::start() {
     LOG_ASSERT(display != EGL_NO_DISPLAY);
     LOG_ASSERT(context != EGL_NO_CONTEXT);
     
-    map->start(true);
+    map.start(true);
 }
 
 void NativeMapView::loadExtensions() {
@@ -515,7 +546,7 @@ void NativeMapView::stop() {
     LOG_ASSERT(display != EGL_NO_DISPLAY);
     LOG_ASSERT(context != EGL_NO_CONTEXT);
     
-    map->stop();
+    map.stop();
 }
 
 
@@ -525,7 +556,7 @@ void NativeMapView::pause(bool wait_for_pause) {
     LOG_ASSERT(display != EGL_NO_DISPLAY);
     LOG_ASSERT(context != EGL_NO_CONTEXT);
     
-    map->pause(wait_for_pause);
+    map.pause(wait_for_pause);
 }
 
 void NativeMapView::resume() {
@@ -535,7 +566,7 @@ void NativeMapView::resume() {
     LOG_ASSERT(context != EGL_NO_CONTEXT);
 
     if (surface != EGL_NO_SURFACE) {
-        map->resume();
+        map.resume();
     } else {
         LOG_DEBUG("Not resuming because we are not ready");
     }
@@ -553,7 +584,6 @@ void NativeMapView::notifyMapChange() {
         NULL
     };
 
-    // TODO do this only once per thread?
     jint ret;
     JNIEnv* env = nullptr;
     bool detach = false;
@@ -584,52 +614,5 @@ void NativeMapView::notifyMapChange() {
     env = nullptr;
 }
 
-void MBGLView::make_active() {
-    LOG_VERBOSE("MBGLView::make_active");
-    if ((nativeView->display != EGL_NO_DISPLAY)
-            && (nativeView->surface != EGL_NO_SURFACE)
-            && (nativeView->context != EGL_NO_CONTEXT)) {
-        if (!eglMakeCurrent(nativeView->display, nativeView->surface,
-                nativeView->surface, nativeView->context)) {
-            LOG_ERROR("eglMakeCurrent() returned error %d", eglGetError());
-        }
-    } else {
-        LOG_DEBUG("Not activating as we are not ready");
-    }
 }
-
-void MBGLView::make_inactive() {
-    LOG_VERBOSE("MBGLView::make_inactive");
-    if (!eglMakeCurrent(nativeView->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
-            EGL_NO_CONTEXT)) {
-        LOG_ERROR("eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
-                eglGetError());
-    }
 }
-
-void MBGLView::swap() {
-    LOG_VERBOSE("MBGLView::swap");
-
-    if (map->needsSwap() && (nativeView->display != EGL_NO_DISPLAY)
-            && (nativeView->surface != EGL_NO_SURFACE)) {
-        if (!eglSwapBuffers(nativeView->display, nativeView->surface)) {
-            LOG_ERROR("eglSwapBuffers() returned error %d", eglGetError());
-        }
-        map->swapped();
-    } else {
-        LOG_DEBUG("Not swapping as we are not ready");
-    }
-}
-
-void MBGLView::notify() {
-    LOG_VERBOSE("MBGLView::notify()");
-    // noop
-}
-
-void MBGLView::notify_map_change(mbgl::MapChange /* change */, mbgl::timestamp /* delay */) {
-    LOG_VERBOSE("MBGLView::notify_map_change()");
-    nativeView->notifyMapChange();
-}
-
-} // namespace android
-} // namespace mbgl

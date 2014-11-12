@@ -15,6 +15,7 @@
 #include <mbgl/android/jni.hpp>
 #include <mbgl/android/log.hpp>
 #include <mbgl/android/native_map_view.hpp>
+#include <mbgl/platform/android/log_android.hpp>
 
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
@@ -242,49 +243,49 @@ void JNICALL nativeRun(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeRun");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->run();
+    native_map_view->getMap().run();
 }
 
 void JNICALL nativeRerender(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeRerender");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->rerender();
+    native_map_view->getMap().rerender();
 }
 
 void JNICALL nativeUpdate(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeUpdate");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->update();
+    native_map_view->getMap().update();
 }
 
 void JNICALL nativeCleanup(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeCleanup");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->cleanup();
+    native_map_view->getMap().cleanup();
 }
 
 void JNICALL nativeTerminate(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeTerminate");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->terminate();
+    native_map_view->getMap().terminate();
 }
 
 jboolean JNICALL nativeNeedsSwap(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeNeedsSwap");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return native_map_view->getMap()->needsSwap();
+    return native_map_view->getMap().needsSwap();
 }
 
 void JNICALL nativeSwapped(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeSwapped");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->swapped();
+    native_map_view->getMap().swapped();
 }
 
 void JNICALL nativeResize(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jint width, jint height, jfloat ratio) {
@@ -295,7 +296,7 @@ void JNICALL nativeResize(JNIEnv* env, jobject obj, jlong native_map_view_ptr, j
     LOG_ASSERT(width <= UINT16_MAX);
     LOG_ASSERT(height <= UINT16_MAX);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->resize(width, height, ratio);
+    native_map_view->getMap().resize(width, height, ratio);
 }
 
 void JNICALL nativeResize(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jint width, jint height, jfloat ratio, jint fb_width, jint fb_height) {
@@ -310,21 +311,21 @@ void JNICALL nativeResize(JNIEnv* env, jobject obj, jlong native_map_view_ptr, j
     LOG_ASSERT(fb_width <= UINT16_MAX);
     LOG_ASSERT(fb_height <= UINT16_MAX);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->resize(width, height, ratio, fb_width, fb_height);
+    native_map_view->getMap().resize(width, height, ratio, fb_width, fb_height);
 }
 
 void JNICALL nativeSetAppliedClasses(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jobject classes) {
     LOG_VERBOSE("nativeSetAppliedClasses");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setAppliedClasses(std_vector_string_from_jobject(env, classes));
+    native_map_view->getMap().setAppliedClasses(std_vector_string_from_jobject(env, classes));
 }
 
 jobject JNICALL nativeGetAppliedClasses(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeGetAppliedClasses");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return std_vector_string_to_jobject(env, native_map_view->getMap()->getAppliedClasses());
+    return std_vector_string_to_jobject(env, native_map_view->getMap().getAppliedClasses());
 }
 
 void JNICALL nativeSetDefaultTransitionDuration(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jlong duration_milliseconds) {
@@ -333,56 +334,56 @@ void JNICALL nativeSetDefaultTransitionDuration(JNIEnv* env, jobject obj, jlong 
     LOG_ASSERT(duration_milliseconds >= 0);
     //LOG_ASSERT(duration_milliseconds <= UINT64_MAX);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setDefaultTransitionDuration(duration_milliseconds);
+    native_map_view->getMap().setDefaultTransitionDuration(duration_milliseconds);
 }
 
 void JNICALL nativeSetStyleURL(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jstring url) {
     LOG_VERBOSE("nativeSetStyleURL");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setStyleURL(std_string_from_jstring(env, url));
+    native_map_view->getMap().setStyleURL(std_string_from_jstring(env, url));
 }
 
 void JNICALL nativeSetStyleJSON(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jstring new_style_json, jstring base) {
     LOG_VERBOSE("nativeSetStyleJSON");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setStyleJSON(std_string_from_jstring(env, new_style_json), std_string_from_jstring(env, base));
+    native_map_view->getMap().setStyleJSON(std_string_from_jstring(env, new_style_json), std_string_from_jstring(env, base));
 }
 
 jstring JNICALL nativeGetStyleJSON(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeGetStyleJSON");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return std_string_to_jstring(env, native_map_view->getMap()->getStyleJSON());
+    return std_string_to_jstring(env, native_map_view->getMap().getStyleJSON());
 }
 
 void JNICALL nativeSetAccessToken(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jstring access_token) {
     LOG_VERBOSE("nativeSetAccessToken");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setAccessToken(std_string_from_jstring(env, access_token));
+    native_map_view->getMap().setAccessToken(std_string_from_jstring(env, access_token));
 }
 
 jstring JNICALL nativeGetAccessToken(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeGetAccessToken");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return std_string_to_jstring(env, native_map_view->getMap()->getAccessToken());
+    return std_string_to_jstring(env, native_map_view->getMap().getAccessToken());
 }
 
 void JNICALL nativeCancelTransitions(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeCancelTransitions");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->cancelTransitions();
+    native_map_view->getMap().cancelTransitions();
 }
 
 void JNICALL nativeMoveBy(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble dx, jdouble dy, jdouble duration) {
     LOG_VERBOSE("nativeMoveBy");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->moveBy(dx, dy, duration);
+    native_map_view->getMap().moveBy(dx, dy, duration);
 }
 
 void JNICALL nativeSetLonLat(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jobject lon_lat, jdouble duration) {
@@ -404,7 +405,7 @@ void JNICALL nativeSetLonLat(JNIEnv* env, jobject obj, jlong native_map_view_ptr
 
     // TODO remove when fixed
     LOG_DEBUG("lon lat %f %f", lon, lat);
-    native_map_view->getMap()->setLonLat(lon, lat, duration);
+    native_map_view->getMap().setLonLat(lon, lat, duration);
 }
 
 jobject JNICALL nativeGetLonLat(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -412,7 +413,7 @@ jobject JNICALL nativeGetLonLat(JNIEnv* env, jobject obj, jlong native_map_view_
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     double lon, lat;
-    native_map_view->getMap()->getLonLat(lon, lat);
+    native_map_view->getMap().getLonLat(lon, lat);
 
     jobject ret = env->NewObject(lon_lat_class, lon_lat_constructor_id, lon, lat);
     if (ret == nullptr) {
@@ -427,56 +428,56 @@ void JNICALL nativeStartPanning(JNIEnv* env, jobject obj, jlong native_map_view_
     LOG_VERBOSE("nativeStartPanning");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->startPanning();
+    native_map_view->getMap().startPanning();
 }
 
 void JNICALL nativeStopPanning(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeStopPanning");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->stopPanning();
+    native_map_view->getMap().stopPanning();
 }
 
 void JNICALL nativeResetPosition(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeResetPosition");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->resetPosition();
+    native_map_view->getMap().resetPosition();
 }
 
 void JNICALL nativeScaleBy(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble ds, jdouble cx, jdouble cy, jdouble duration) {
     LOG_VERBOSE("nativeScaleBy");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->scaleBy(ds, cx, cy, duration);
+    native_map_view->getMap().scaleBy(ds, cx, cy, duration);
 }
 
 void JNICALL nativeSetScale(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble scale, jdouble cx, jdouble cy, jdouble duration) {
     LOG_VERBOSE("nativeSetScale");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setScale(scale, cx, cy, duration);
+    native_map_view->getMap().setScale(scale, cx, cy, duration);
 }
 
 jdouble JNICALL nativeGetScale(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeGetScale");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return native_map_view->getMap()->getScale();
+    return native_map_view->getMap().getScale();
 }
 
 void JNICALL nativeSetZoom(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble zoom, jdouble duration) {
     LOG_VERBOSE("nativeSetZoom");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setZoom(zoom, duration);
+    native_map_view->getMap().setZoom(zoom, duration);
 }
 
 jdouble JNICALL nativeGetZoom(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeGetZoom");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return native_map_view->getMap()->getZoom();
+    return native_map_view->getMap().getZoom();
 }
 
 void JNICALL nativeSetLonLatZoom(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jobject lon_lat_zoom, jdouble duration) {
@@ -502,7 +503,7 @@ void JNICALL nativeSetLonLatZoom(JNIEnv* env, jobject obj, jlong native_map_view
         return;
     }
 
-    native_map_view->getMap()->setLonLatZoom(lon, lat, zoom, duration);
+    native_map_view->getMap().setLonLatZoom(lon, lat, zoom, duration);
 }
 
 jobject JNICALL nativeGetLonLatZoom(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -510,7 +511,7 @@ jobject JNICALL nativeGetLonLatZoom(JNIEnv* env, jobject obj, jlong native_map_v
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     double lon, lat, zoom;
-    native_map_view->getMap()->getLonLatZoom(lon, lat, zoom);
+    native_map_view->getMap().getLonLatZoom(lon, lat, zoom);
 
     jobject ret = env->NewObject(lon_lat_zoom_class, lon_lat_zoom_constructor_id, lon, lat, zoom);
     if (ret == nullptr) {
@@ -525,119 +526,119 @@ void JNICALL nativeResetZoom(JNIEnv* env, jobject obj, jlong native_map_view_ptr
     LOG_VERBOSE("nativeResetZoom");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->resetZoom();
+    native_map_view->getMap().resetZoom();
 }
 
 void JNICALL nativeStartScaling(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeStartScaling");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->startScaling();
+    native_map_view->getMap().startScaling();
 }
 
 void JNICALL nativeStopScaling(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeStopScaling");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->stopScaling();
+    native_map_view->getMap().stopScaling();
 }
 
 jdouble JNICALL nativeGetMinZoom(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeGetMinZoom");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return native_map_view->getMap()->getMinZoom();
+    return native_map_view->getMap().getMinZoom();
 }
 
 jdouble JNICALL nativeGetMaxZoom(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeGetMaxZoom");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return native_map_view->getMap()->getMaxZoom();
+    return native_map_view->getMap().getMaxZoom();
 }
 
 void JNICALL nativeRotateBy(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble sx, jdouble sy, jdouble ex, jdouble ey, jdouble duration) {
     LOG_VERBOSE("nativeRotateBy");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->rotateBy(sx, sy, ex, ey, duration);
+    native_map_view->getMap().rotateBy(sx, sy, ex, ey, duration);
 }
 
 void JNICALL nativeSetBearing(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble degrees, jdouble duration) {
     LOG_VERBOSE("nativeSetBearing");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setBearing(degrees, duration);
+    native_map_view->getMap().setBearing(degrees, duration);
 }
 
 void JNICALL nativeSetBearing(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble degrees, jdouble cx, jdouble cy) {
     LOG_VERBOSE("nativeSetBearing");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setBearing(degrees, cx, cy);
+    native_map_view->getMap().setBearing(degrees, cx, cy);
 }
 
 jdouble JNICALL nativeGetBearing(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeGetBearing");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return native_map_view->getMap()->getBearing();
+    return native_map_view->getMap().getBearing();
 }
 
 void JNICALL nativeResetNorth(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeResetNorth");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->resetNorth();
+    native_map_view->getMap().resetNorth();
 }
 
 void JNICALL nativeStartRotating(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeStartRotating");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->startRotating();
+    native_map_view->getMap().startRotating();
 }
 
 void JNICALL nativeStopRotating(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeStopRotating");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->stopRotating();
+    native_map_view->getMap().stopRotating();
 }
 
 jboolean JNICALL nativeCanRotate(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeCanRotate");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return native_map_view->getMap()->canRotate();
+    return native_map_view->getMap().canRotate();
 }
 
 void JNICALL nativeSetDebug(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jboolean debug) {
     LOG_VERBOSE("nativeSetDebug");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setDebug(debug);
+    native_map_view->getMap().setDebug(debug);
 }
 
 void JNICALL nativeToggleDebug(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeToggleDebug");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->toggleDebug();
+    native_map_view->getMap().toggleDebug();
 }
 
 jboolean JNICALL nativeGetDebug(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     LOG_VERBOSE("nativeGetDebug");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    return native_map_view->getMap()->getDebug();
+    return native_map_view->getMap().getDebug();
 }
 
 void JNICALL nativeSetReachability(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jboolean status) {
     LOG_VERBOSE("nativeSetReachability");
     LOG_ASSERT(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    native_map_view->getMap()->setReachability(status);
+    native_map_view->getMap().setReachability(status);
 }
 
 } // namespace
@@ -645,6 +646,8 @@ void JNICALL nativeSetReachability(JNIEnv* env, jobject obj, jlong native_map_vi
 extern "C" {
 
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    mbgl::Log::Set<mbgl::AndroidLogBackend>();
+
     LOG_VERBOSE("JNI_OnLoad");
 
     JNIEnv* env = nullptr;
