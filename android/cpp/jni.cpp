@@ -132,15 +132,12 @@ jobject std_vector_string_to_jobject(JNIEnv* env, std::vector<std::string> vecto
     return jlist;
 }
 
-} // namespace android
-} // namespace mbgl
+}
+}
 
 namespace {
 
 using namespace mbgl::android;
-
-// TODO: wrap C++ exceptions?
-// TODO: wrap other sorts of exceptions? eg coffee catch
 
 jlong JNICALL nativeCreate(JNIEnv* env, jobject obj, jstring cache_path_, jstring data_path_) {
     LOG_VERBOSE("nativeCreate");
@@ -332,7 +329,6 @@ void JNICALL nativeSetDefaultTransitionDuration(JNIEnv* env, jobject obj, jlong 
     LOG_VERBOSE("nativeSetDefaultTransitionDuration");
     LOG_ASSERT(native_map_view_ptr != 0);
     LOG_ASSERT(duration_milliseconds >= 0);
-    //LOG_ASSERT(duration_milliseconds <= UINT64_MAX);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     native_map_view->getMap().setDefaultTransitionDuration(duration_milliseconds);
 }
@@ -403,8 +399,6 @@ void JNICALL nativeSetLonLat(JNIEnv* env, jobject obj, jlong native_map_view_ptr
         return;
     }
 
-    // TODO remove when fixed
-    LOG_DEBUG("lon lat %f %f", lon, lat);
     native_map_view->getMap().setLonLat(lon, lat, duration);
 }
 
@@ -641,7 +635,7 @@ void JNICALL nativeSetReachability(JNIEnv* env, jobject obj, jlong native_map_vi
     native_map_view->getMap().setReachability(status);
 }
 
-} // namespace
+}
 
 extern "C" {
 
@@ -895,4 +889,4 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     array_list_add_id = nullptr;
 }
 
-} // extern "C"
+}
