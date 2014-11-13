@@ -173,13 +173,11 @@ void png_reader<T>::init()
     png_set_sig_bytes(png_ptr,8);
     png_read_info(png_ptr, info_ptr);
 
-    png_uint_32  width, height;
-    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth_, &color_type_,0,0,0);
+    png_uint_32  w, h;
+    png_get_IHDR(png_ptr, info_ptr, &w, &h, &bit_depth_, &color_type_,0,0,0);
     has_alpha_ = (color_type_ & PNG_COLOR_MASK_ALPHA) || png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS);
-    width_=width;
-    height_=height;
-
-    //MAPNIK_LOG_DEBUG(png_reader) << "png_reader: bit_depth=" << bit_depth_ << ",color_type=" << color_type_;
+    width_=w;
+    height_=h;
 }
 
 template <typename T>
@@ -195,7 +193,7 @@ unsigned png_reader<T>::height() const
 }
 
 template <typename T>
-void png_reader<T>::read(unsigned x0, unsigned y0, unsigned width, unsigned height, char * image)
+void png_reader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char * image)
 {
     stream_.clear();
     stream_.seekg(0, std::ios_base::beg);
@@ -238,7 +236,7 @@ void png_reader<T>::read(unsigned x0, unsigned y0, unsigned width, unsigned heig
     if (png_get_gAMA(png_ptr, info_ptr, &gamma))
         png_set_gamma(png_ptr, 2.2, gamma);
 
-    if (x0 == 0 && y0 == 0 && width >= width_ && height >= height_)
+    if (x0 == 0 && y0 == 0 && w >= width_ && h >= height_)
     {
         if (png_get_interlace_type(png_ptr,info_ptr) == PNG_INTERLACE_ADAM7)
         {
@@ -258,21 +256,18 @@ void png_reader<T>::read(unsigned x0, unsigned y0, unsigned width, unsigned heig
     else
     {
         png_read_update_info(png_ptr, info_ptr);
-        //unsigned w=std::min(width, width_ - x0);
-        unsigned h=std::min(height, height_ - y0);
+        w=std::min(w, width_ - x0);
+        h=std::min(h, height_ - y0);
         unsigned rowbytes=png_get_rowbytes(png_ptr, info_ptr);
         const std::unique_ptr<png_byte[]> row(new png_byte[rowbytes]);
-        //START read image rows
         for (unsigned i = 0; i < height_; ++i)
         {
             png_read_row(png_ptr,row.get(),0);
             if (i >= y0 && i < (y0 + h))
             {
-////image.setRow(i-y0,reinterpret_cast<unsigned*>(&row[x0 * 4]),w);
-                //std::copy(image, buf + size, pData_ + i * width);
+                std::copy(&row[x0 * 4], &row[x0 * 4] + w, image + i * width_* 4);
             }
         }
-        //END
     }
     png_read_end(png_ptr,0);
 }

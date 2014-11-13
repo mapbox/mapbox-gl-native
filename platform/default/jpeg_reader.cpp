@@ -278,9 +278,8 @@ void jpeg_reader<T>::read(unsigned x0, unsigned y0, unsigned width, unsigned hei
                     g = r;
                     b = r;
                 }
-                out_row[x] =  (0xff << 24) | (b << 16) | (g << 8) | r;//color(r, g, b, a).rgba();
+                out_row[x] =  (0xff << 24) | (b << 16) | (g << 8) | r;
             }
-            //image.setRow(row - y0, out_row.get(), w);
             std::copy((char*)out_row.get(), (char*)out_row.get() + w*4, image + (row - y0)*width_*4);
         }
         ++row;
