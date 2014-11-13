@@ -5,7 +5,7 @@
 #define MBGL_USE_CGL 1
 #else
 #define GL_GLEXT_PROTOTYPES
-#include <GL/glx.h>
+#include <mbgl/platform/default/glx.h>
 #define MBGL_USE_GLX 1
 #endif
 
@@ -25,6 +25,7 @@ public:
     ~HeadlessView();
 
     void createContext();
+    void loadExtensions();
 
     void resize(uint16_t width, uint16_t height, float pixelRatio);
     std::unique_ptr<uint32_t[]> readPixels();

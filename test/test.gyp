@@ -199,9 +199,19 @@
         '../mapboxgl.gyp:mbgl-standalone',
         '<(platform_library)',
       ],
+      'variables': {
+        'cflags_cc': [
+          '-I<(boost_root)/include',
+        ]
+      },
       'conditions': [
-        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)', '-framework Foundation' ] }
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
+            'OTHER_LDFLAGS': [ '<@(ldflags)', '-framework Foundation' ]
+          },
         }, {
+          'cflags_cc': [ '<@(cflags_cc)' ],
           'libraries': [ '<@(ldflags)'],
         }]
       ]
