@@ -511,6 +511,8 @@ public class MapView extends SurfaceView {
                 int height) {
             Log.v(TAG, "surfaceChanged");
             Log.i(TAG, "resize " + format + " " + width + " " + height);
+            Log.v(TAG, "calling map resize with " + (int) (width / mScreenDensity) + "," + (int) (height / mScreenDensity) + "," +
+                    mScreenDensity + "," + width + "," + height);
             mNativeMapView.resize((int) (width / mScreenDensity), (int) (height / mScreenDensity),
                     mScreenDensity, width, height);
         }
