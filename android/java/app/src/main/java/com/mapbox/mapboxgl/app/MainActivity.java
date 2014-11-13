@@ -1,6 +1,10 @@
 package com.mapbox.mapboxgl.app;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -15,6 +19,10 @@ public class MainActivity extends Activity {
 
     // Tag used for logging
     private static final String TAG = "MainActivity";
+
+    //
+    // Instance members
+    //
 
     // The map
     private MapView mMapView;

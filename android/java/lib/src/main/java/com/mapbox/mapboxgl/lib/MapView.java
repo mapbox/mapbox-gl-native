@@ -3,10 +3,16 @@ package com.mapbox.mapboxgl.lib;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.PointF;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
@@ -75,6 +81,13 @@ public class MapView extends SurfaceView {
     // Used to track trackball long presses
     private TrackballLongPressTimeOut mCurrentTrackballLongPressTimeOut;
 
+    // Used to check connection status
+    private ConnectivityManager mConnectivityManager;
+    private ConnectivityReceiver mConnectivityReceiver;
+
+    // Holds the context
+    private Context mContext;
+
     //
     // Properties
     //
@@ -113,9 +126,12 @@ public class MapView extends SurfaceView {
     private void initialize(Context context, AttributeSet attrs) {
         Log.v(TAG, "initialize");
 
+        // Save the context
+        mContext = context;
+
         // Check if we are in Eclipse UI editor
         if (isInEditMode()) {
-            // TODO editor does not load properly because we dont implement this
+            // TODO editor does not load properly because we don't implement this
             return;
         }
 
@@ -134,11 +150,15 @@ public class MapView extends SurfaceView {
         mStyleUrl = "file://" + dataPath + "/styles/styles/bright-v6.json";
         mAccessToken = "pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ";
 
+        // Are we a debug build?
+        boolean isDebuggable = (context.getApplicationInfo().flags &
+                ApplicationInfo.FLAG_DEBUGGABLE) == ApplicationInfo.FLAG_DEBUGGABLE;
+
         // Create the NativeMapView
         mNativeMapView = new NativeMapView(this, cachePath, dataPath);
         mNativeMapView.setStyleURL(mStyleUrl);
         mNativeMapView.setAccessToken(mAccessToken);
-        mNativeMapView.setDebug(true);
+        mNativeMapView.setDebug(isDebuggable);
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
@@ -194,6 +214,14 @@ public class MapView extends SurfaceView {
                 mZoomButtonsController.setZoomSpeed(300);
                 mZoomButtonsController.setOnZoomListener(new OnZoomListener());
             }
+
+            // Check current connection status
+            mConnectivityManager = (ConnectivityManager)context.getSystemService(
+                    Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+            boolean isConnected = (activeNetwork != null) &&
+                    activeNetwork.isConnectedOrConnecting();
+            onConnectivityChanged(isConnected);
         }
     }
 
@@ -425,6 +453,11 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onPause
     public void onPause() {
         Log.v(TAG, "onPause");
+
+        // Register for connectivity changes
+        getContext().unregisterReceiver(mConnectivityReceiver);
+        mConnectivityReceiver = null;
+
         mNativeMapView.pause();
     }
 
@@ -433,6 +466,12 @@ public class MapView extends SurfaceView {
 
     public void onResume() {
         Log.v(TAG, "onResume");
+
+        // Register for connectivity changes
+        mConnectivityReceiver = new ConnectivityReceiver();
+        mContext.registerReceiver(mConnectivityReceiver,
+                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
         mNativeMapView.resume();
     }
 
@@ -472,7 +511,8 @@ public class MapView extends SurfaceView {
                 int height) {
             Log.v(TAG, "surfaceChanged");
             Log.i(TAG, "resize " + format + " " + width + " " + height);
-            mNativeMapView.resize((int) (width / mScreenDensity), (int) (height / mScreenDensity), mScreenDensity, width, height);
+            mNativeMapView.resize((int) (width / mScreenDensity), (int) (height / mScreenDensity),
+                    mScreenDensity, width, height);
         }
     }
 
@@ -1130,6 +1170,32 @@ public class MapView extends SurfaceView {
             // We are not interested in this event
             return super.onHoverEvent(event);
         }
+    }
+
+    //
+    // Action events
+    //
+
+    // This class handles connectivity changes
+    private class ConnectivityReceiver extends BroadcastReceiver {
+
+        // Called when an action we are listening to in the manifest has been sent
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.v(TAG, "ConnectivityReceiver.onReceive: action = " + intent.getAction());
+            if (intent.getAction() == ConnectivityManager.CONNECTIVITY_ACTION) {
+                boolean noConnectivity = intent.getBooleanExtra(
+                        ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+                onConnectivityChanged(!noConnectivity);
+            }
+        }
+    }
+
+
+    // Called when our Internet connectivity has changed
+    private void onConnectivityChanged(boolean isConnected) {
+        Log.v(TAG, "onConnectivityChanged: " + isConnected);
+        mNativeMapView.setReachability(isConnected);
     }
 
     //
