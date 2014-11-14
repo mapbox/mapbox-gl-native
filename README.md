@@ -123,6 +123,7 @@ Install Android NDK:
 
 Install Android SDK: 
 
+    sudo apt-get install lib32stdc++6 lib32z1
     wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
     tar -xzf ./android-sdk_r23.0.2-linux.tgz
     ./android-sdk-linux/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.0,android-19,android-21,extra-android-m2repository,extra-google-m2repository
