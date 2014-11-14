@@ -17,6 +17,12 @@ elif [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #
     # build & test Linux
     #
+    echo "removing potentially conflicting libraries"
+    # remove travis default installed libs which will conflict
+    sudo apt-get purge -qq -y libtiff* libjpeg* libpng3
+    sudo apt-get autoremove -y -qq
+    mapbox_time "compile_program" \
+    make linux -j$JOBS BUILDTYPE=${BUILDTYPE}
 
     mapbox_time "compile_tests" \
     make test -j$JOBS BUILDTYPE=${BUILDTYPE}
@@ -31,9 +37,9 @@ elif [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     ./scripts/compare_images.sh
 
     if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
-        mapbox_time_start "deploy_results"
-        (cd ./test/suite/ && ./bin/deploy_results.sh)
-        mapbox_time_finish
+	mapbox_time_start "deploy_results"
+	(cd ./test/suite/ && ./bin/deploy_results.sh)
+	mapbox_time_finish
     fi
 
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
