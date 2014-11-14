@@ -90,7 +90,7 @@ android:
 	cp build/android/out/$(BUILDTYPE)/lib.target/libmapbox-gl.so android/java/lib/src/main/jniLibs/armeabi-v7a/libmapbox-gl.so && \
 	mkdir -p android/java/lib/src/main/assets && \
 	cp build/android/out/$(BUILDTYPE)/ca-bundle.crt android/java/lib/src/main/assets/ca-bundle.crt && \
-	cp build/android/out/$(BUILDTYPE)/styles/package.json android/java/lib/src/main/assets/styles/package.json && \
+	cp build/android/out/$(BUILDTYPE)/styles/package.json android/java/lib/src/main/assets/styles/package.json && \ # Ensures error when no styles submodule loaded
 	cp -r build/android/out/$(BUILDTYPE)/styles android/java/lib/src/main/assets/styles && \
 	cd android/java && \
 	./gradlew build
