@@ -61,7 +61,7 @@ public:
     unsigned height() const;
     inline bool has_alpha() const { return false; }
     inline bool premultiplied_alpha() const { return true; }
-    void read(unsigned x,unsigned y, unsigned width, unsigned height, char *image);
+    void read(unsigned x,unsigned y, unsigned w, unsigned h, char *image);
 private:
     void init();
     static void on_error(j_common_ptr cinfo);
@@ -85,8 +85,8 @@ image_reader* create_jpeg_reader2(char const* data, size_t size)
     return new jpeg_reader<boost::iostreams::array_source>(data, size);
 }
 
-const bool registered  = register_image_reader("jpeg",create_jpeg_reader);
-const bool registered2 = register_image_reader("jpeg",create_jpeg_reader2);
+const static bool registered  = register_image_reader("jpeg",create_jpeg_reader);
+const static bool registered2 = register_image_reader("jpeg",create_jpeg_reader2);
 }
 
 // ctors
@@ -234,7 +234,7 @@ unsigned jpeg_reader<T>::height() const
 }
 
 template <typename T>
-void jpeg_reader<T>::read(unsigned x0, unsigned y0, unsigned width, unsigned height, char* image)
+void jpeg_reader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char* image)
 {
     stream_.clear();
     stream_.seekg(0, std::ios_base::beg);
@@ -256,8 +256,8 @@ void jpeg_reader<T>::read(unsigned x0, unsigned y0, unsigned width, unsigned hei
     row_stride = cinfo.output_width * cinfo.output_components;
     buffer = (*cinfo.mem->alloc_sarray) ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
 
-    unsigned w = std::min(width,width_ - x0);
-    unsigned h = std::min(height,height_ - y0);
+    w = std::min(w,width_ - x0);
+    h = std::min(h,height_ - y0);
 
     const std::unique_ptr<unsigned int[]> out_row(new unsigned int[w]);
     unsigned row = 0;

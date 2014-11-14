@@ -74,8 +74,8 @@ image_reader* create_png_reader2(char const * data, std::size_t size)
     return new png_reader<boost::iostreams::array_source>(data, size);
 }
 
-const bool registered = register_image_reader("png",create_png_reader);
-const bool registered2 = register_image_reader("png", create_png_reader2);
+const static bool registered = register_image_reader("png",create_png_reader);
+const static bool registered2 = register_image_reader("png", create_png_reader2);
 }
 
 
