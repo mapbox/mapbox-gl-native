@@ -38,11 +38,9 @@ struct image_reader : private noncopyable
 template <typename...Args>
 bool register_image_reader(std::string const& type, image_reader* (* fun)(Args...))
 {
-    return factory<image_reader,std::string, Args...>::instance().register_product(type, fun);
+    return factory<image_reader,std::string, Args...>::register_product(type, fun);
 }
 
-//image_reader* get_image_reader(std::string const& file,std::string const& type);
-//image_reader* get_image_reader(std::string const& file);
 image_reader* get_image_reader(char const* data, size_t size);
 
 }}
