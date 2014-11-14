@@ -4,13 +4,11 @@ extern "C"
 {
 #include <png.h>
 }
+
 // boost
-#pragma GCC diagnostic push
-//#pragma GCC diagnostic ignored "-Wunused-local-typedef"
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/device/array.hpp>
 #include <boost/iostreams/stream.hpp>
-#pragma GCC diagnostic pop
 
 // stl
 #include <cstring>
