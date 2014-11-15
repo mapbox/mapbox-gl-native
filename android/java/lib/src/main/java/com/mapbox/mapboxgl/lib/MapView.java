@@ -1116,7 +1116,8 @@ public class MapView extends SurfaceView {
         // Mouse events
         // TODO: SOURCE_TOUCH_NAVIGATION?
         // TODO: source device resolution?
-        if (event.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) {
+        //if (event.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) { // this is not available before API 18
+        if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) == InputDevice.SOURCE_CLASS_POINTER) {
             // Choose the action
             switch (event.getActionMasked()) {
             // Mouse scrolls
