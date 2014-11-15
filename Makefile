@@ -71,7 +71,6 @@ build/linux/mapboxgl-app.xcodeproj: linux/mapboxgl-app.gyp config.gypi
 
 .PHONY: android
 android:
-	git submodule update --init --recursive && \
 	./scripts/local_mason.sh && \
 	MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env PATH && \
 	export CXX="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CXX`" && \
