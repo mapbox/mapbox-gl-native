@@ -7,6 +7,9 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
 
     if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
 
+        echo "debug: load submodules"
+        git submodule update --init --recursive
+
         echo "debug: installing 7z"
         #mapbox_time "installing 7z" \
         MASON_PLATFORM= ./.mason/mason install 7z 9.20
