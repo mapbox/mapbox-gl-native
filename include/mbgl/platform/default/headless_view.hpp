@@ -9,7 +9,6 @@
 #define MBGL_USE_GLX 1
 #endif
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/platform/gl.hpp>
 
@@ -19,7 +18,7 @@ namespace mbgl {
 
 class HeadlessDisplay;
 
-class HeadlessView : public View, private util::noncopyable {
+class HeadlessView : public View {
 public:
     HeadlessView();
     HeadlessView(std::shared_ptr<HeadlessDisplay> display);

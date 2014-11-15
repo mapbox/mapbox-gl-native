@@ -1,12 +1,11 @@
 #ifndef MBGL_COMMON_HEADLESS_DISPLAY
 #define MBGL_COMMON_HEADLESS_DISPLAY
 
-#include <mbgl/util/noncopyable.hpp>
 #include "headless_view.hpp"
 
 namespace mbgl {
 
-class HeadlessDisplay, private mbgl::util::noncopyable {
+class HeadlessDisplay {
 public:
     HeadlessDisplay();
     ~HeadlessDisplay();
