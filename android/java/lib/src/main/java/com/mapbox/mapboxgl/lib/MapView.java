@@ -1177,7 +1177,7 @@ public class MapView extends SurfaceView {
     //
 
     // This class handles connectivity changes
-    private class ConnectivityReceiver extends BroadcastReceiver {
+    public class ConnectivityReceiver extends BroadcastReceiver {
 
         // Called when an action we are listening to in the manifest has been sent
         @Override
