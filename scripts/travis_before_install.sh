@@ -91,7 +91,7 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
         echo "debug: installing SDK"
         #mapbox_time "installing SDK" \
-        echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.0,android-19,android-21,extra-android-m2repository,extra-google-m2repository
+        echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
 
     fi
 
