@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.mapbox.mapboxgl.lib"
-        minSdkVersion 15
+        minSdkVersion 14
         targetSdkVersion 21
 
         ndk {
