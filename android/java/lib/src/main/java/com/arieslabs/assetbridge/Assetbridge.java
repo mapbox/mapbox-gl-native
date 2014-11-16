@@ -37,6 +37,7 @@ public class Assetbridge {
 
             // iterate on the files...
             for(String asset : assets) {
+                delete(datadir + "/" + asset);
                 copyAssetFolder(am, asset, datadir + "/" + asset);
             }
 
@@ -48,6 +49,13 @@ public class Assetbridge {
             Log.e("Assetbridge", "Can't unpack assets from APK", e);
         }
 
+    }
+
+    public static void delete(String dest) {
+        File destfh = new File(dest);
+        if (destfh.exists()) {
+            destfh.delete();
+        }
     }
 
 
