@@ -205,7 +205,7 @@ void JNICALL nativeCreateSurface(JNIEnv* env, jobject obj, jlong native_map_view
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     bool ret = false;
-    COFFEE_TRY_JNI(env, native_map_view->createSurface(ANativeWindow_fromSurface(env, surface)));
+    COFFEE_TRY_JNI(env, ret = native_map_view->createSurface(ANativeWindow_fromSurface(env, surface)));
     if (!ret) {
         throw_error(env, "Unable to create GL surface.");
     }
