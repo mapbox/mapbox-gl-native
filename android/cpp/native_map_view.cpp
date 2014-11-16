@@ -329,7 +329,7 @@ bool NativeMapView::createSurface(ANativeWindow* window_) {
         log_gl_string(GL_SHADING_LANGUAGE_VERSION, "SL Version"); // In the emulator this returns NULL with error code 0? https://code.google.com/p/android/issues/detail?id=78977
         log_gl_string(GL_EXTENSIONS, "Extensions");
 
-        loadExtensions();        
+        loadExtensions();
 
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
                 EGL_NO_CONTEXT)) {
@@ -449,7 +449,7 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[],
                     eglGetError());
             return nullptr;
         }
-        
+
         mbgl::Log::Info(mbgl::Event::OpenGL, "Caveat: %d", caveat);
         mbgl::Log::Info(mbgl::Event::OpenGL, "Conformant: %d", conformant);
         mbgl::Log::Info(mbgl::Event::OpenGL, "Color: %d", bits);
@@ -508,7 +508,7 @@ void NativeMapView::start() {
 
     assert(display != EGL_NO_DISPLAY);
     assert(context != EGL_NO_CONTEXT);
-    
+
     map.start(true);
 }
 
@@ -520,7 +520,7 @@ void NativeMapView::loadExtensions() {
     }
 
     std::string extensions(reinterpret_cast<const char*>(str));
-    
+
     if (extensions.find("GL_OES_vertex_array_object") != std::string::npos) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_vertex_array_object.");
         gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)eglGetProcAddress("glBindVertexArrayOES");
@@ -543,7 +543,7 @@ void NativeMapView::stop() {
 
     assert(display != EGL_NO_DISPLAY);
     assert(context != EGL_NO_CONTEXT);
-    
+
     map.stop();
 }
 
@@ -553,7 +553,7 @@ void NativeMapView::pause(bool wait_for_pause) {
 
     assert(display != EGL_NO_DISPLAY);
     assert(context != EGL_NO_CONTEXT);
-    
+
     map.pause(wait_for_pause);
 }
 

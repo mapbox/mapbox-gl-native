@@ -1,0 +1,216 @@
+diff --git a/coffeecatch.c b/coffeecatch.c
+index 448fe0f..f39fcdb 100644
+--- a/coffeecatch.c
++++ b/coffeecatch.c
+@@ -43,10 +43,7 @@
+ #include <assert.h>
+ #include <signal.h>
+ #include <setjmp.h>
+-#if defined(__ANDROID__) && !defined(__BIONIC_HAVE_UCONTEXT_T) && \
+-    defined(__arm__) && !defined(__BIONIC_HAVE_STRUCT_SIGCONTEXT)
+-#include <asm/sigcontext.h>
+-#endif 
++#include <sys/ucontext.h>
+ #if (defined(USE_UNWIND) && !defined(USE_CORKSCREW))
+ #include <unwind.h>
+ #endif
+@@ -88,154 +85,34 @@ static const int native_sig_catch[SIG_CATCH_COUNT + 1]
+ /* Maximum value of a caught signal. */
+ #define SIG_NUMBER_MAX 32
+ 
+-#if (defined(__ANDROID__) && (!defined(__BIONIC_HAVE_UCONTEXT_T)))
+-#ifndef ucontext_h_seen
+-#define ucontext_h_seen
+-
+-/* stack_t definition */
+-#include <asm/signal.h>
+-
+-#if defined(__arm__)
+-
+-/* Taken from richard.quirk's header file. (Android does not have it) */
+-
+-typedef struct ucontext {
+-  unsigned long uc_flags;
+-  struct ucontext *uc_link;
+-  stack_t uc_stack;
+-  struct sigcontext uc_mcontext;
+-  unsigned long uc_sigmask;
+-} ucontext_t;
+-
+-#elif defined(__i386__)
+-
+-/* Taken from Google Breakpad. */
+-
+-/* 80-bit floating-point register */
+-struct _libc_fpreg {
+-  unsigned short significand[4];
+-  unsigned short exponent;
+-};
+-
+-/* Simple floating-point state, see FNSTENV instruction */
+-struct _libc_fpstate {
+-  unsigned long cw;
+-  unsigned long sw;
+-  unsigned long tag;
+-  unsigned long ipoff;
+-  unsigned long cssel;
+-  unsigned long dataoff;
+-  unsigned long datasel;
+-  struct _libc_fpreg _st[8];
+-  unsigned long status;
+-};
+-
+-typedef uint32_t  greg_t;
+-
+-typedef struct {
+-  uint32_t gregs[19];
+-  struct _libc_fpstate* fpregs;
+-  uint32_t oldmask;
+-  uint32_t cr2;
+-} mcontext_t;
+-
+-enum {
+-  REG_GS = 0,
+-  REG_FS,
+-  REG_ES,
+-  REG_DS,
+-  REG_EDI,
+-  REG_ESI,
+-  REG_EBP,
+-  REG_ESP,
+-  REG_EBX,
+-  REG_EDX,
+-  REG_ECX,
+-  REG_EAX,
+-  REG_TRAPNO,
+-  REG_ERR,
+-  REG_EIP,
+-  REG_CS,
+-  REG_EFL,
+-  REG_UESP,
+-  REG_SS,
+-};
+-
+-typedef struct ucontext {
+-  uint32_t uc_flags;
+-  struct ucontext* uc_link;
+-  stack_t uc_stack;
+-  mcontext_t uc_mcontext;
+-} ucontext_t;
+-
+-#elif defined(__mips__)
+-
+-/* Taken from Google Breakpad. */
+-
+-typedef struct {
+-  uint32_t regmask;
+-  uint32_t status;
+-  uint64_t pc;
+-  uint64_t gregs[32];
+-  uint64_t fpregs[32];
+-  uint32_t acx;
+-  uint32_t fpc_csr;
+-  uint32_t fpc_eir;
+-  uint32_t used_math;
+-  uint32_t dsp;
+-  uint64_t mdhi;
+-  uint64_t mdlo;
+-  uint32_t hi1;
+-  uint32_t lo1;
+-  uint32_t hi2;
+-  uint32_t lo2;
+-  uint32_t hi3;
+-  uint32_t lo3;
+-} mcontext_t;
+-
+-typedef struct ucontext {
+-  uint32_t uc_flags;
+-  struct ucontext* uc_link;
+-  stack_t uc_stack;
+-  mcontext_t uc_mcontext;
+-} ucontext_t;
+-
+-#else
+-#error "Architecture is not supported (unknown ucontext layout)"
+-#endif
+-
+-#endif
+-
+ #ifdef USE_CORKSCREW
+ typedef struct map_info_t map_info_t;
+ /* Extracted from Android's include/corkscrew/backtrace.h */
+-typedef struct {
+-    uintptr_t absolute_pc;
+-    uintptr_t stack_top;
+-    size_t stack_size;
+-} backtrace_frame_t;
+-typedef struct {
+-    uintptr_t relative_pc;
+-    uintptr_t relative_symbol_addr;
+-    char* map_name;
+-    char* symbol_name;
+-    char* demangled_name;
++typedef struct {
++    uintptr_t absolute_pc;
++    uintptr_t stack_top;
++    size_t stack_size;
++} backtrace_frame_t;
++typedef struct {
++    uintptr_t relative_pc;
++    uintptr_t relative_symbol_addr;
++    char* map_name;
++    char* symbol_name;
++    char* demangled_name;
+ } backtrace_symbol_t;
+ /* Extracted from Android's libcorkscrew/arch-arm/backtrace-arm.c */
+-typedef ssize_t (*t_unwind_backtrace_signal_arch)
+-(siginfo_t* si, void* sc, const map_info_t* lst, backtrace_frame_t* bt,
+-size_t ignore_depth, size_t max_depth);
+-typedef map_info_t* (*t_acquire_my_map_info_list)();
+-typedef void (*t_release_my_map_info_list)(map_info_t* milist);
+-typedef void (*t_get_backtrace_symbols)(const backtrace_frame_t* backtrace,
++typedef ssize_t (*t_unwind_backtrace_signal_arch)
++(siginfo_t* si, void* sc, const map_info_t* lst, backtrace_frame_t* bt,
++size_t ignore_depth, size_t max_depth);
++typedef map_info_t* (*t_acquire_my_map_info_list)();
++typedef void (*t_release_my_map_info_list)(map_info_t* milist);
++typedef void (*t_get_backtrace_symbols)(const backtrace_frame_t* backtrace,
+                                         size_t frames,
+                                         backtrace_symbol_t* symbols);
+ typedef void (*t_free_backtrace_symbols)(backtrace_symbol_t* symbols,
+                                          size_t frames);
+ #endif
+ 
+-#endif
+-
+ /* Process-wide crash handler structure. */
+ typedef struct native_code_global_struct {
+   /* Initialized. */
+@@ -341,7 +218,7 @@ static ssize_t coffeecatch_backtrace_signal(siginfo_t* si, void* sc,
+         && acquire_my_map_info_list != NULL
+         && release_my_map_info_list != NULL) {
+       map_info_t*const info = acquire_my_map_info_list();
+-      const ssize_t size = 
++      const ssize_t size = 
+         unwind_backtrace_signal_arch(si, sc, info, frames, ignore_depth,
+                                      max_depth);
+       release_my_map_info_list(info);
+@@ -1073,12 +950,12 @@ static uintptr_t coffeecatch_get_pc_from_ucontext(const ucontext_t *uc) {
+   return uc->uc_mcontext.regs->nip;
+ #elif (defined(__hppa__))
+   return uc->uc_mcontext.sc_iaoq[0] & ~0x3UL;
+-#elif (defined(__sparc__) && defined (__arch64__))
+-  return uc->uc_mcontext.mc_gregs[MC_PC];
+-#elif (defined(__sparc__) && !defined (__arch64__))
+-  return uc->uc_mcontext.gregs[REG_PC];
+-#elif (defined(__mips__))
+-  return uc->uc_mcontext.gregs[31];
++#elif (defined(__sparc__) && defined (__arch64__))
++  return uc->uc_mcontext.mc_gregs[MC_PC];
++#elif (defined(__sparc__) && !defined (__arch64__))
++  return uc->uc_mcontext.gregs[REG_PC];
++#elif (defined(__mips__))
++  return uc->uc_mcontext.gregs[31];
+ #else
+ #error "Architecture is unknown, please report me!"
+ #endif
