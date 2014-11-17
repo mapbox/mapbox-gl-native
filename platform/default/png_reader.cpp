@@ -61,19 +61,13 @@ private:
 
 namespace
 {
-
-image_reader* create_png_reader(std::string const& file)
-{
-      return new png_reader<boost::iostreams::file_source>(file);
-}
-
-image_reader* create_png_reader2(char const * data, std::size_t size)
+image_reader* create_png_reader(char const * data, std::size_t size)
 {
     return new png_reader<boost::iostreams::array_source>(data, size);
 }
 
 const static bool registered = register_image_reader("png",create_png_reader);
-const static bool registered2 = register_image_reader("png", create_png_reader2);
+
 }
 
 
