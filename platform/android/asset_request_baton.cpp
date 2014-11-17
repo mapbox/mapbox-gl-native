@@ -89,25 +89,7 @@ void AssetRequestBaton::run(uv_async_t *async) {
         cleanup(async);
         return;
     }
-/*
-    if (stat.size > std::numeric_limits<int>::max()) {
-        // File is too large for us to open this way because uv_buf's only support unsigned
-        // ints as maximum size.
-        if (ptr->request) {
-            ptr->request->response = std::unique_ptr<Response>(new Response);
-            ptr->request->response->code = UV_EFBIG;
-            ptr->request->response->message = uv_strerror(UV_EFBIG);
-            ptr->request->notify();
-        }
-        zip_fclose(ptr->apk_file);
-        ptr->apk_file = nullptr;
-        zip_close(ptr->apk);
-        ptr->apk = nullptr;
-        cleanup(async);
-        return;
-    }
-*/
-    //const unsigned int size = static_cast<unsigned int>(stat.size);
+
     const std::unique_ptr<char[]> body = boost::make_unique<char[]>(stat.size);
 
     if (zip_fread(ptr->apk_file, reinterpret_cast<void *>(body.get()), stat.size) == -1 ||

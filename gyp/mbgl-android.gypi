@@ -12,6 +12,7 @@
           '<@(curl_cflags)',
           '<@(nu_cflags)',
           '<@(zip_cflags)',
+          '<@(openssl_cflags)',
           '-I<(boost_root)/include',
         ],
         'cflags': [

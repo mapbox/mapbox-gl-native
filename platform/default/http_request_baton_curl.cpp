@@ -6,6 +6,9 @@
 
 #ifdef __ANDROID__
     #include <mbgl/android/jni.hpp>
+    #include <zip.h>
+    #include <boost/make_unique.hpp>
+    #include <openssl/ssl.h>
 #endif
 
 #include <uv.h>
@@ -408,6 +411,103 @@ size_t curl_header_cb(char * const buffer, const size_t size, const size_t nmemb
     return length;
 }
 
+// This function is called to load the CA bundle
+// from http://curl.haxx.se/libcurl/c/cacertinmem.html
+#ifdef __ANDROID__
+static CURLcode sslctx_function(CURL */*curl*/, void *sslctx, void */*parm*/) {
+
+    int error = 0;
+    struct zip *apk = zip_open(mbgl::android::apk_path.c_str(), 0, &error);
+    if (apk == nullptr) {
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    struct zip_file *apk_file = zip_fopen(apk, "assets/ca-bundle.crt", ZIP_FL_NOCASE);
+    if (apk_file == nullptr) {
+        zip_close(apk);
+        apk = nullptr;
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    struct zip_stat stat;
+    if (zip_stat(apk, "assets/ca-bundle.crt", ZIP_FL_NOCASE, &stat) != 0) {
+        zip_fclose(apk_file);
+        apk_file = nullptr;
+        zip_close(apk);
+        apk = nullptr;
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    if (stat.size > std::numeric_limits<int>::max()) {
+        zip_fclose(apk_file);
+        apk_file = nullptr;
+        zip_close(apk);
+        apk = nullptr;
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    const std::unique_ptr<char[]> pem = boost::make_unique<char[]>(stat.size);
+
+    if (zip_fread(apk_file, reinterpret_cast<void *>(pem.get()), stat.size) == -1) {
+        zip_fclose(apk_file);
+        apk_file = nullptr;
+        zip_close(apk);
+        apk = nullptr;
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    // get a pointer to the X509 certificate store (which may be empty!)
+    X509_STORE *store = SSL_CTX_get_cert_store((SSL_CTX *)sslctx);
+    if (store == nullptr) {
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    // get a BIO
+    BIO *bio = BIO_new_mem_buf(pem.get(), static_cast<int>(stat.size));
+    if (bio == nullptr) {
+        store = nullptr;
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    // use it to read the PEM formatted certificate from memory into an X509
+    // structure that SSL can use
+    X509 *cert = nullptr;
+    while (PEM_read_bio_X509(bio, &cert, 0, nullptr) != nullptr) {
+        if (cert == nullptr) {
+            BIO_free(bio);
+            bio = nullptr;
+            store = nullptr;
+            return CURLE_SSL_CACERT_BADFILE;
+        }
+
+        // add our certificate to this store
+        if (X509_STORE_add_cert(store, cert) == 0) {
+            X509_free(cert);
+            cert = nullptr;
+            BIO_free(bio);
+            bio = nullptr;
+            store = nullptr;
+            return CURLE_SSL_CACERT_BADFILE;
+        }
+
+        X509_free(cert);
+        cert = nullptr;
+    }
+
+    // decrease reference counts
+    BIO_free(bio);
+    bio = nullptr;
+
+    zip_fclose(apk_file);
+    apk_file = nullptr;
+    zip_close(apk);
+    apk = nullptr;
+
+    // all set to go
+    return CURLE_OK;
+}
+#endif
+
 // This function must run in the CURL thread.
 void start_request(void *const ptr) {
     assert(uv_thread_self() == thread_id);
@@ -437,15 +537,14 @@ void start_request(void *const ptr) {
         context->baton->response = std::unique_ptr<Response>(new Response());
     }
 
-#ifndef __ANDROID__
-    std::string ca_path = "ca-bundle.crt";
-#else
-    std::string ca_path = mbgl::android::data_path + "/ca-bundle.crt";
-#endif
-
     // Carry on the shared pointer in the private information of the CURL handle.
     curl_easy_setopt(context->handle, CURLOPT_PRIVATE, context);
-    curl_easy_setopt(context->handle, CURLOPT_CAINFO, ca_path.c_str());
+#ifndef __ANDROID__
+    curl_easy_setopt(context->handle, CURLOPT_CAINFO, "ca-bundle.crt")
+#else
+    curl_easy_setopt(context->handle, CURLOPT_SSLCERTTYPE, "PEM");
+    curl_easy_setopt(context->handle, CURLOPT_SSL_CTX_FUNCTION, sslctx_function);
+#endif
     curl_easy_setopt(context->handle, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(context->handle, CURLOPT_URL, context->baton->path.c_str());
     curl_easy_setopt(context->handle, CURLOPT_WRITEFUNCTION, curl_write_cb);

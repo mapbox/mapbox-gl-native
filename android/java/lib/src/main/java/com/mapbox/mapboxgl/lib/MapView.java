@@ -16,7 +16,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.InputDevice;
@@ -31,7 +30,6 @@ import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
-import com.arieslabs.assetbridge.Assetbridge;
 
 // Custom view that shows a Map
 // Based on SurfaceView as we use OpenGL ES to render
@@ -142,9 +140,6 @@ public class MapView extends SurfaceView {
         String cachePath = context.getCacheDir().getAbsolutePath();
         String dataPath = context.getFilesDir().getAbsolutePath();
         String apkPath = context.getPackageCodePath();
-
-        // Extract the asset files
-        Assetbridge.unpack(context);
 
         // Load the map style and API key
         //mStyleUrl = "https://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json";
