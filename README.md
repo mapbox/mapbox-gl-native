@@ -103,6 +103,8 @@ Or proceed to building the debug application with:
 
 	make linux
 
+Be sure to setup an access token per below before running `build/Release/mapbox-gl`. 
+
 
 # Troubleshooting
 
