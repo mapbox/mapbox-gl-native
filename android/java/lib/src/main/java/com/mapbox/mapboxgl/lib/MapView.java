@@ -854,7 +854,7 @@ public class MapView extends SurfaceView {
 
             // Rotate the map
             double bearing = mNativeMapView.getBearing();
-            bearing += detector.getRotationDegreesDelta() * Math.PI / 180.0;
+            bearing += detector.getRotationDegreesDelta();
             Log.d("rotate", "rotate to " + bearing);
             mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity,
                     detector.getFocusY() / mScreenDensity);
