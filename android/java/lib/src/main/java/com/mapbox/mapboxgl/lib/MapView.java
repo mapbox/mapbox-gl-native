@@ -173,7 +173,7 @@ public class MapView extends SurfaceView {
             setRotateEnabled(typedArray.getBoolean(
                     R.styleable.MapView_rotateEnabled, true));
             setDebugActive(typedArray.getBoolean(
-                    R.styleable.MapView_debugActive, true));
+                    R.styleable.MapView_debugActive, false));
         } finally {
             typedArray.recycle();
         }
