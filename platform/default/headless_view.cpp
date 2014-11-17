@@ -107,7 +107,7 @@ GLXContext createCoreProfile(Display *dpy, GLXFBConfig fbconfig) {
         const int context_flags[] = {
             GLX_CONTEXT_MAJOR_VERSION_ARB, core_profile_versions[i].major,
             GLX_CONTEXT_MINOR_VERSION_ARB, core_profile_versions[i].minor,
-            None
+            0
         };
         ctx = glXCreateContextAttribsARB(dpy, fbconfig, 0, True, context_flags);
         if (context_creation_failed) {
@@ -172,7 +172,7 @@ void HeadlessView::createContext() {
     int pbuffer_attributes[] = {
         GLX_PBUFFER_WIDTH, 8,
         GLX_PBUFFER_HEIGHT, 8,
-        None
+        0
     };
     glx_pbuffer = glXCreatePbuffer(x_display, fb_configs[0], pbuffer_attributes);
 #endif
