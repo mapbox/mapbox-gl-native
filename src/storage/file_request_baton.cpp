@@ -117,7 +117,7 @@ void FileRequestBaton::file_read(uv_fs_t *req) {
     assert(ptr->thread_id == uv_thread_self());
 
     if (req->result < 0 || ptr->canceled || !ptr->request) {
-        // Stating failed or was canceled. We already have an open file handle
+        // Reading failed or was canceled. We already have an open file handle
         // though, which we'll have to close.
         notify_error(req);
     } else {

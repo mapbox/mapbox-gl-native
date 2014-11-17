@@ -23,6 +23,7 @@
           '<@(sqlite3_static_libs)',
           '<@(uv_static_libs)',
           '<@(nu_static_libs)',
+          '<@(zip_static_libs)',
       ],
       'variables': {
         'ldflags': [
@@ -37,6 +38,7 @@
           '<@(openssl_ldflags)',
           '<@(curl_ldflags)',
           '<@(zlib_ldflags)',
+          '<@(zip_ldflags)',
         ],
       },
       'conditions': [

@@ -33,7 +33,7 @@ public class Assetbridge {
             // only extract what we need
             ArrayList<String> assets = new ArrayList<String>();
             assets.add("ca-bundle.crt");
-            assets.add("styles");
+            //assets.add("styles");
 
             // iterate on the files...
             for(String asset : assets) {

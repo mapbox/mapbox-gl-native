@@ -4,6 +4,7 @@
 #include <mbgl/platform/android/asset_request.hpp>
 
 #include <uv.h>
+#include <zip.h>
 
 namespace mbgl {
 
@@ -12,20 +13,17 @@ struct AssetRequestBaton {
     ~AssetRequestBaton();
 
     void cancel();
-    static void file_opened(uv_fs_t *req);
-    static void file_stated(uv_fs_t *req);
-    static void file_read(uv_fs_t *req);
-    static void file_closed(uv_fs_t *req);
-    static void notify_error(uv_fs_t *req);
-    static void cleanup(uv_fs_t *req);
+    static void run(uv_async_t *async);
+    static void notify_error(uv_async_t *async, const int code, const char *message);
+    static void cleanup(uv_async_t *async);
 
     const unsigned long thread_id;
     AssetRequest *request = nullptr;
-    uv_fs_t req;
-    uv_file fd = -1;
+    std::unique_ptr<uv_async_t> async_run;
+    struct zip *apk = nullptr;
+    struct zip_file *apk_file = nullptr;
+    std::string path;
     bool canceled = false;
-    std::string body;
-    uv_buf_t buffer;
 };
 
 
