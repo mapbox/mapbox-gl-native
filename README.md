@@ -107,19 +107,20 @@ Or proceed to building the debug application with:
 
 Follow Linux steps until `./configure`. 
 
-Install Oracle JDK 7: 
+Install Oracle JDK 7 (requires license agreement) from http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 
-    wget http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-linux-x64.tar.gz
-    tar -xzf jdk-7u71-linux-x64.tar.gz
-    export JAVA_HOME="/dir/to/jdk1.7.0_71"
+Or the OPEN JDK:
+
+    sudo apt-get install -y openjdk-7-jdk
 
 Install Android NDK: 
 
+    sudo apt-get install p7zip-full
     wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
     chmod +x android-ndk-r10c-linux-x86_64.bin
-    ./android-ndk-r10c-linux-x86_64.bin
-    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10c"
-    export NDK_PATH=$(ANDROID_NDK_PATH)
+    7z x ./android-ndk-r10c-linux-x86_64.bin > /dev/null
+    export ANDROID_NDK_PATH="$(pwd)/android-ndk-r10c"
+    export NDK_PATH=${ANDROID_NDK_PATH}
 
 Install Android SDK: 
 
@@ -127,7 +128,7 @@ Install Android SDK:
     wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
     tar -xzf ./android-sdk_r23.0.2-linux.tgz
     ./android-sdk-linux/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
-    export ANDROID_HOME="/dir/to/android-sdk-linux"
+    export ANDROID_HOME="$(pwd)/android-sdk-linux"
 
 Run: 
 
