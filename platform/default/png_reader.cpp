@@ -248,7 +248,7 @@ void png_reader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char 
         // alloc row pointers
         const std::unique_ptr<png_bytep[]> rows(new png_bytep[height_]);
         for (unsigned row = 0; row < height_; ++row)
-            rows[row] = (png_bytep)image + row * width_ ;
+            rows[row] = (png_bytep)image + row * width_ * 4 ;
         png_read_image(png_ptr, rows.get());
     }
     else
@@ -263,7 +263,7 @@ void png_reader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char 
             png_read_row(png_ptr,row.get(),0);
             if (i >= y0 && i < (y0 + h))
             {
-                std::copy(&row[x0 * 4], &row[x0 * 4] + w, image + i * width_* 4);
+                std::copy(&row[x0 * 4], &row[x0 * 4] + w * 4, image + i * width_* 4);
             }
         }
     }
