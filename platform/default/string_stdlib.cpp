@@ -31,19 +31,22 @@ std::string uppercase(const std::string& str)
 
 std::string lowercase(const std::string& str)
 {
-    boost::u8_to_u32_iterator<std::string::const_iterator> itr(str.begin());
-    boost::u8_to_u32_iterator<std::string::const_iterator> end(str.end());
     std::string output;
-    char buf[5];
-    for (; itr!=end; ++itr)
+    char lo[5];
+    char const* itr = str.c_str();
+    char const* end = itr + str.length();
+    char const* buf = 0;
+    uint32_t code_point;
+    for ( ; itr!=end;)
     {
-        char const* lo = nu_tolower(*itr);
-        if (lo != 0)  output.append(lo);
+
+        itr = _nu_tolower(itr, end, nu_utf8_read, &code_point, &buf, 0);
+        if (buf != 0) output.append(buf);
         else
         {
-            std::memset(buf, 0, 5);
-            nu_utf8_write(*itr, buf);
-            output.append(buf);
+            std::memset(lo, 0, 5);
+            nu_utf8_write(code_point, lo);
+            output.append(lo);
         }
     }
     return output;
