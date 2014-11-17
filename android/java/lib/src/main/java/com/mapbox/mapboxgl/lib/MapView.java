@@ -7,13 +7,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.PointF;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -146,15 +146,10 @@ public class MapView extends SurfaceView {
         mStyleUrl = "asset://styles/styles/bright-v6.json";
         mAccessToken = "pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ";
 
-        // Are we a debug build?
-        boolean isDebuggable = (context.getApplicationInfo().flags &
-                ApplicationInfo.FLAG_DEBUGGABLE) == ApplicationInfo.FLAG_DEBUGGABLE;
-
         // Create the NativeMapView
         mNativeMapView = new NativeMapView(this, cachePath, dataPath, apkPath);
         mNativeMapView.setStyleURL(mStyleUrl);
         mNativeMapView.setAccessToken(mAccessToken);
-        mNativeMapView.setDebug(isDebuggable);
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
