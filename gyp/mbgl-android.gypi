@@ -11,6 +11,7 @@
           '<@(uv_cflags)',
           '<@(curl_cflags)',
           '<@(nu_cflags)',
+          '<@(zip_cflags)',
           '-I<(boost_root)/include',
         ],
         'cflags': [
@@ -22,6 +23,7 @@
           '<@(uv_ldflags)',
           '<@(curl_ldflags)',
           '<@(nu_ldflags)',
+          '<@(zip_ldflags)',
         ],
       },
       'sources': [

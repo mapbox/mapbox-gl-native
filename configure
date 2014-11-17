@@ -33,6 +33,7 @@ case ${MASON_PLATFORM} in
         ZLIB_VERSION=system
         BOOST_VERSION=1.57.0
         NUNICODE_VERSION=1.4
+        LIBZIP_VERSION=0.11.2
         ;;
     *)
 	GLFW_VERSION=a21f2377
@@ -136,6 +137,12 @@ if [ ! -z ${NUNICODE_VERSION} ]; then
     CONFIG+="    'nu_ldflags': $(quote_flags $(mason ldflags nunicode ${NUNICODE_VERSION})),"$LN
 fi
 
+if [ ! -z ${LIBZIP_VERSION} ]; then
+    mason install libzip ${LIBZIP_VERSION}
+    CONFIG+="    'zip_static_libs': $(quote_flags $(mason static_libs libzip ${LIBZIP_VERSION})),"$LN
+    CONFIG+="    'zip_cflags': $(quote_flags $(mason cflags libzip ${LIBZIP_VERSION})),"$LN
+    CONFIG+="    'zip_ldflags': $(quote_flags $(mason ldflags libzip ${LIBZIP_VERSION})),"$LN
+fi
 
 CONFIG+="  }
 }
