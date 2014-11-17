@@ -540,7 +540,7 @@ void start_request(void *const ptr) {
     // Carry on the shared pointer in the private information of the CURL handle.
     curl_easy_setopt(context->handle, CURLOPT_PRIVATE, context);
 #ifndef __ANDROID__
-    curl_easy_setopt(context->handle, CURLOPT_CAINFO, "ca-bundle.crt")
+    curl_easy_setopt(context->handle, CURLOPT_CAINFO, "ca-bundle.crt");
 #else
     curl_easy_setopt(context->handle, CURLOPT_SSLCERTTYPE, "PEM");
     curl_easy_setopt(context->handle, CURLOPT_SSL_CTX_FUNCTION, sslctx_function);
