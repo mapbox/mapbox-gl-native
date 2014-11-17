@@ -4,6 +4,10 @@
 #include <mbgl/storage/sqlite_store.hpp>
 #include <mbgl/util/uv-messenger.h>
 
+#ifdef __ANDROID__
+    #include <mbgl/platform/android/asset_request.hpp>
+#endif
+
 #include <uv.h>
 
 namespace mbgl {
@@ -72,6 +76,10 @@ std::unique_ptr<Request> FileSource::request(ResourceType type, const std::strin
     if (!req) {
         if (absoluteURL.substr(0, 7) == "file://") {
             req = std::make_shared<FileRequest>(absoluteURL.substr(7), loop);
+#ifdef __ANDROID__
+        } else if (absoluteURL.substr(0, 7) == "asset://") {
+            req = std::make_shared<AssetRequest>(absoluteURL.substr(7), loop);
+#endif
         } else {
             req = std::make_shared<HTTPRequest>(type, absoluteURL, loop, store);
         }

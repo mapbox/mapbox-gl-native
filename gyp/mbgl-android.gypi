@@ -29,6 +29,8 @@
       'sources': [
         '../platform/android/cache_database_data.cpp',
         '../platform/android/log_android.cpp',
+        '../platform/android/asset_request.cpp',
+        '../platform/android/asset_request_baton.cpp',
         '../platform/default/string_stdlib.cpp',
         '../platform/default/http_request_baton_curl.cpp',
         '../platform/default/image.cpp',
