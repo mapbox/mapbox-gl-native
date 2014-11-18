@@ -8,10 +8,13 @@ android {
         applicationId "com.mapbox.mapboxgl.lib"
         minSdkVersion 14
         targetSdkVersion 21
+        versionCode 1
+        versionName "0.1"
+    }
 
-        ndk {
-            moduleName "NativeMapView"
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 
     buildTypes {
@@ -20,7 +23,7 @@ android {
         }
 
         release {
-            runProguard false
+            runProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }

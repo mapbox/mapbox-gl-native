@@ -1,7 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mapbox.mapboxgl.lib"
-    android:versionCode="1"
-    android:versionName="0.1" >
+    package="com.mapbox.mapboxgl.lib" >
     
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
     
