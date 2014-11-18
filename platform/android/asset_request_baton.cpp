@@ -53,7 +53,7 @@ void AssetRequestBaton::run(uv_async_t *async) {
 
     int error = 0;
     ptr->apk = zip_open(mbgl::android::apk_path.c_str(), 0, &error);
-    if (ptr->apk == nullptr || ptr->canceled || !ptr->request) {
+    if ((ptr->apk == nullptr) || ptr->canceled || !ptr->request) {
         // Opening the APK failed or was canceled. There isn't much left we can do.
         const int message_size = zip_error_to_str(nullptr, 0, error, errno);
         const std::unique_ptr<char[]> message = boost::make_unique<char[]>(message_size);
@@ -65,7 +65,7 @@ void AssetRequestBaton::run(uv_async_t *async) {
 
     std::string apk_file_path = "assets/" + ptr->path;
     ptr->apk_file = zip_fopen(ptr->apk, apk_file_path.c_str(), ZIP_FL_NOCASE);
-    if (ptr->apk_file == nullptr || ptr->canceled || !ptr->request) {
+    if ((ptr->apk_file == nullptr) || ptr->canceled || !ptr->request) {
         // Opening the asset failed or was canceled. We already have an open file handle
         // though, which we'll have to close.
         zip_error_get(ptr->apk, &error, nullptr);
@@ -77,7 +77,7 @@ void AssetRequestBaton::run(uv_async_t *async) {
     }
 
     struct zip_stat stat;
-    if (zip_stat(ptr->apk, apk_file_path.c_str(), ZIP_FL_NOCASE, &stat) != 0 ||
+    if ((zip_stat(ptr->apk, apk_file_path.c_str(), ZIP_FL_NOCASE, &stat) != 0) ||
             ptr->canceled || !ptr->request) {
         // Stating failed or was canceled. We already have an open file handle
         // though, which we'll have to close.
@@ -90,9 +90,9 @@ void AssetRequestBaton::run(uv_async_t *async) {
         return;
     }
 
-    const std::unique_ptr<char[]> body = boost::make_unique<char[]>(stat.size);
+    const std::unique_ptr<char[]> data = boost::make_unique<char[]>(stat.size);
 
-    if (zip_fread(ptr->apk_file, reinterpret_cast<void *>(body.get()), stat.size) == -1 ||
+    if (static_cast<zip_uint64_t>(zip_fread(ptr->apk_file, reinterpret_cast<void *>(data.get()), stat.size)) != stat.size ||
             ptr->canceled || !ptr->request) {
         // Reading failed or was canceled. We already have an open file handle
         // though, which we'll have to close.
@@ -108,7 +108,8 @@ void AssetRequestBaton::run(uv_async_t *async) {
     if (ptr->request) {
         ptr->request->response = std::unique_ptr<Response>(new Response);
         ptr->request->response->code = 200;
-        ptr->request->response->data = body.get();
+        std::string body(data.get(), stat.size);
+        ptr->request->response->data = body;
         ptr->request->notify();
     }
 

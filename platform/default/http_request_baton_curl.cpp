@@ -448,7 +448,7 @@ static CURLcode sslctx_function(CURL */*curl*/, void *sslctx, void */*parm*/) {
 
     const std::unique_ptr<char[]> pem = boost::make_unique<char[]>(stat.size);
 
-    if (zip_fread(apk_file, reinterpret_cast<void *>(pem.get()), stat.size) == -1) {
+    if (static_cast<zip_uint64_t>(zip_fread(apk_file, reinterpret_cast<void *>(pem.get()), stat.size)) != stat.size) {
         zip_fclose(apk_file);
         apk_file = nullptr;
         zip_close(apk);
