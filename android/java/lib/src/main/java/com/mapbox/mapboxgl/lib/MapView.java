@@ -13,7 +13,6 @@ import android.graphics.PointF;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -50,6 +49,8 @@ public class MapView extends SurfaceView {
     private static final String STATE_SCROLL_ENABLED = "scrollEnabled";
     private static final String STATE_ROTATE_ENABLED = "rotateEnabled";
     private static final String STATE_DEBUG_ACTIVE = "debugActive";
+    private static final String STATE_STYLE_URL = "styleUrl";
+    private static final String STATE_ACCESS_TOKEN = "accessToken";
 
     //
     // Instance members
@@ -57,12 +58,6 @@ public class MapView extends SurfaceView {
 
     // Used to call JNI NativeMapView
     private NativeMapView mNativeMapView;
-
-    // Used to style the map
-    private String mStyleUrl;
-
-    // Used to load map tiles
-    private String mAccessToken;
 
     // Used to handle DPI scaling
     private float mScreenDensity = 1.0f;
@@ -79,8 +74,6 @@ public class MapView extends SurfaceView {
     // Used to track trackball long presses
     private TrackballLongPressTimeOut mCurrentTrackballLongPressTimeOut;
 
-    // Used to check connection status
-    private ConnectivityManager mConnectivityManager;
     private ConnectivityReceiver mConnectivityReceiver;
 
     // Holds the context
@@ -93,6 +86,7 @@ public class MapView extends SurfaceView {
     private boolean mZoomEnabled = true;
     private boolean mScrollEnabled = true;
     private boolean mRotateEnabled = true;
+    private String mStyleUrl = "asset://styles/styles/bright-v6.json";
 
     //
     // Constructors
@@ -141,15 +135,9 @@ public class MapView extends SurfaceView {
         String dataPath = context.getFilesDir().getAbsolutePath();
         String apkPath = context.getPackageCodePath();
 
-        // Load the map style and API key
-        //mStyleUrl = "https://mapbox.github.io/mapbox-gl-styles/styles/bright-v6.json";
-        mStyleUrl = "asset://styles/styles/bright-v6.json";
-        mAccessToken = "pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ";
-
         // Create the NativeMapView
         mNativeMapView = new NativeMapView(this, cachePath, dataPath, apkPath);
-        mNativeMapView.setStyleURL(mStyleUrl);
-        mNativeMapView.setAccessToken(mAccessToken);
+        mNativeMapView.setStyleUrl(mStyleUrl);
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
@@ -174,6 +162,10 @@ public class MapView extends SurfaceView {
                     R.styleable.MapView_rotateEnabled, true));
             setDebugActive(typedArray.getBoolean(
                     R.styleable.MapView_debugActive, false));
+            setStyleUrl(typedArray.getString(
+                    R.styleable.MapView_styleUrl));
+            setAccessToken(typedArray.getString(
+                    R.styleable.MapView_accessToken));
         } finally {
             typedArray.recycle();
         }
@@ -207,9 +199,9 @@ public class MapView extends SurfaceView {
             }
 
             // Check current connection status
-            mConnectivityManager = (ConnectivityManager)context.getSystemService(
+            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(
                     Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
             boolean isConnected = (activeNetwork != null) &&
                     activeNetwork.isConnectedOrConnecting();
             onConnectivityChanged(isConnected);
@@ -326,6 +318,23 @@ public class MapView extends SurfaceView {
         mNativeMapView.toggleDebug();
     }
 
+    public void setStyleUrl(String url) {
+        mStyleUrl = url;
+        mNativeMapView.setStyleUrl(url);
+    }
+
+    public String getStyleUrl() {
+        return mStyleUrl;
+    }
+
+    public void setAccessToken(String accessToken) {
+        mNativeMapView.setAccessToken(accessToken);
+    }
+
+    public String getAccessToken() {
+        return mNativeMapView.getAccessToken();
+    }
+
     //
     // Style methods
     //
@@ -334,12 +343,11 @@ public class MapView extends SurfaceView {
         // TODO
     }
 
-    // TODO seems like JSON simple may be better since it implements Map
-    // interface
+    // TODO seems like JSON simple may be better since it implements Map interface
     // Other candidates: fastjson, json-smart, fossnova json,
     public JSONObject getRawStyle() {
         try {
-            return new JSONObject(mNativeMapView.getStyleJSON());
+            return new JSONObject(mNativeMapView.getStyleJson());
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -347,7 +355,7 @@ public class MapView extends SurfaceView {
     }
 
     public void setRawStyle(JSONObject style) {
-        mNativeMapView.setStyleJSON(style.toString());
+        mNativeMapView.setStyleJson(style.toString());
     }
 
     public void getStyleOrderedLayerNames() {
@@ -397,6 +405,8 @@ public class MapView extends SurfaceView {
             setRotateEnabled(savedInstanceState
                     .getBoolean(STATE_ROTATE_ENABLED));
             setDebugActive(savedInstanceState.getBoolean(STATE_DEBUG_ACTIVE));
+            setStyleUrl(savedInstanceState.getString(STATE_STYLE_URL));
+            setAccessToken(savedInstanceState.getString(STATE_ACCESS_TOKEN));
         }
 
         mNativeMapView.initializeDisplay();
@@ -415,6 +425,8 @@ public class MapView extends SurfaceView {
         outState.putBoolean(STATE_SCROLL_ENABLED, isScrollEnabled());
         outState.putBoolean(STATE_ROTATE_ENABLED, isRotateEnabled());
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
+        outState.putString(STATE_STYLE_URL, getStyleUrl());
+        outState.putString(STATE_ACCESS_TOKEN, getAccessToken());
     }
 
     // Called when we need to clean up

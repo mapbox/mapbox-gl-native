@@ -41,6 +41,9 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mMapView = (MapView) findViewById(R.id.map);
 
+        // Load the API key
+        mMapView.setAccessToken("pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ");
+
         // Need to pass on any saved state to the map
         mMapView.onCreate(savedInstanceState);
     }

@@ -172,10 +172,6 @@ class NativeMapView {
         nativeResize(mNativeMapViewPtr, width, height, ratio, fbWidth, fbHeight);
     }
 
-    /*public void Set<StyleSource> getActiveSources() {
-        return nativeGetActiveSources(mNativeMapViewPtr);
-    }*/
-
     public void setAppliedClasses(List<String> classes) {
         nativeSetAppliedClasses(mNativeMapViewPtr, classes);
     }
@@ -198,20 +194,20 @@ class NativeMapView {
                 durationMilliseconds);
     }
 
-    public void setStyleURL(String url) {
-        nativeSetStyleURL(mNativeMapViewPtr, url);
+    public void setStyleUrl(String url) {
+        nativeSetStyleUrl(mNativeMapViewPtr, url);
     }
 
-    public void setStyleJSON(String newStyleJSON) {
-        setStyleJSON(newStyleJSON,  "");
+    public void setStyleJson(String newStyleJson) {
+        setStyleJson(newStyleJson,  "");
     }
 
-    public void setStyleJSON(String newStyleJSON, String base) {
-        nativeSetStyleJSON(mNativeMapViewPtr, newStyleJSON, base);
+    public void setStyleJson(String newStyleJson, String base) {
+        nativeSetStyleJson(mNativeMapViewPtr, newStyleJson, base);
     }
 
-    public String getStyleJSON() {
-        return nativeGetStyleJSON(mNativeMapViewPtr);
+    public String getStyleJson() {
+        return nativeGetStyleJson(mNativeMapViewPtr);
     }
 
     public void setAccessToken(String accessToken) {
@@ -452,8 +448,6 @@ class NativeMapView {
     private native void nativeResize(long nativeMapViewPtr, int width,
             int height, float ratio, int fbWidth, int fbHeight);
 
-    //private native void Set<StyleSource> nativeGetActiveSources(long nativeMapViewPtr);
-
     private native void nativeSetAppliedClasses(long nativeMapViewPtr,
             List<String> classes);
 
@@ -462,12 +456,12 @@ class NativeMapView {
     private native void nativeSetDefaultTransitionDuration(
             long nativeMapViewPtr, long durationMilliseconds);
 
-    private native void nativeSetStyleURL(long nativeMapViewPtr, String url);
+    private native void nativeSetStyleUrl(long nativeMapViewPtr, String url);
 
-    private native void nativeSetStyleJSON(long nativeMapViewPtr,
-            String newStyleJSON, String base);
+    private native void nativeSetStyleJson(long nativeMapViewPtr,
+            String newStyleJson, String base);
 
-    private native String nativeGetStyleJSON(long nativeMapViewPtr);
+    private native String nativeGetStyleJson(long nativeMapViewPtr);
 
     private native void nativeSetAccessToken(long nativeMapViewPtr, String accessToken);
 
