@@ -102,6 +102,8 @@ Then, you can then proceed to build the library like:
 Or proceed to building the debug application with:
 
     make linux
+    
+Be sure to setup an access token per below before running `build/Release/mapbox-gl`. 
 
 ## Android (on Linux)
 
@@ -152,7 +154,7 @@ Run:
 
     make android
 
-You can then open `android/java` in Android Studio. 
+You can then open `android/java` in Android Studio.
 
 # Troubleshooting
 
