@@ -86,7 +86,7 @@ public class MapView extends SurfaceView {
     private boolean mZoomEnabled = true;
     private boolean mScrollEnabled = true;
     private boolean mRotateEnabled = true;
-    private String mStyleUrl = "asset://styles/styles/bright-v6.json";
+    private String mStyleUrl;
 
     //
     // Constructors
@@ -137,7 +137,6 @@ public class MapView extends SurfaceView {
 
         // Create the NativeMapView
         mNativeMapView = new NativeMapView(this, cachePath, dataPath, apkPath);
-        mNativeMapView.setStyleUrl(mStyleUrl);
 
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
@@ -164,8 +163,6 @@ public class MapView extends SurfaceView {
                     R.styleable.MapView_debugActive, false));
             setStyleUrl(typedArray.getString(
                     R.styleable.MapView_styleUrl));
-            setAccessToken(typedArray.getString(
-                    R.styleable.MapView_accessToken));
         } finally {
             typedArray.recycle();
         }

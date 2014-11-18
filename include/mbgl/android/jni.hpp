@@ -25,6 +25,7 @@ extern jfieldID lon_lat_zoom_lat_id;
 extern jfieldID lon_lat_zoom_zoom_id;
 
 extern jclass runtime_exception_class;
+extern jclass null_pointer_exception_class;;
 
 extern jmethodID list_to_array_id;
 

@@ -8,7 +8,6 @@
     <attr name="rotateEnabled" format="boolean" />
     <attr name="debugActive" format="boolean" />
     <attr name="styleUrl" format="string" />
-    <attr name="accessToken" format="string" />
     
     <declare-styleable name="MapView">
         <attr name="centerLongitude" />
@@ -20,6 +19,5 @@
         <attr name="rotateEnabled" />
         <attr name="debugActive" />
         <attr name="styleUrl" />
-        <attr name="accessToken" />
     </declare-styleable>
 </resources>

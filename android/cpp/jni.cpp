@@ -43,6 +43,7 @@ jfieldID lon_lat_zoom_lat_id = nullptr;
 jfieldID lon_lat_zoom_zoom_id = nullptr;
 
 jclass runtime_exception_class = nullptr;
+jclass null_pointer_exception_class = nullptr;
 
 jmethodID list_to_array_id = nullptr;
 
@@ -61,16 +62,28 @@ bool throw_error(JNIEnv* env, const char* msg) {
 
 std::string std_string_from_jstring(JNIEnv* env, jstring jstr) {
     std::string str;
+
+    if (jstr == nullptr) {
+        if (env->ThrowNew(null_pointer_exception_class, "String cannot be null.") < 0) {
+            env->ExceptionDescribe();
+            return str;
+        }
+
+        return str;
+    }
+
     jsize len = env->GetStringLength(jstr);
     if (len < 0) {
         env->ExceptionDescribe();
         return str;
     }
+
     const jchar* chars = env->GetStringChars(jstr, nullptr);
     if (chars == nullptr) {
         env->ExceptionDescribe();
         return str;
     }
+
     std::u16string ustr(reinterpret_cast<const char16_t*>(chars), len);
     env->ReleaseStringChars(jstr, chars);
     chars = nullptr;
@@ -92,6 +105,15 @@ jstring std_string_to_jstring(JNIEnv* env, std::string str) {
 
 std::vector<std::string> std_vector_string_from_jobject(JNIEnv* env, jobject jlist) {
     std::vector<std::string> vector;
+
+    if (jlist == nullptr) {
+        if (env->ThrowNew(null_pointer_exception_class, "List cannot be null.") < 0) {
+            env->ExceptionDescribe();
+            return vector;
+        }
+
+        return vector;
+    }
 
     jobjectArray array = reinterpret_cast<jobjectArray>(env->CallObjectMethod(jlist, list_to_array_id));
     if (env->ExceptionCheck() || (array == nullptr)) {
@@ -757,6 +779,12 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    null_pointer_exception_class = env->FindClass("java/lang/NullPointerException");
+    if (null_pointer_exception_class == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
     jclass list_class = env->FindClass("java/util/List");
     if (list_class == nullptr) {
         env->ExceptionDescribe();
@@ -877,12 +905,22 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    null_pointer_exception_class = reinterpret_cast<jclass>(env->NewGlobalRef(null_pointer_exception_class));
+    if (runtime_exception_class == nullptr) {
+        env->ExceptionDescribe();
+        env->DeleteGlobalRef(lon_lat_class);
+        env->DeleteGlobalRef(lon_lat_zoom_class);
+        env->DeleteGlobalRef(runtime_exception_class);
+        return JNI_ERR;
+    }
+
     array_list_class = reinterpret_cast<jclass>(env->NewGlobalRef(array_list_class));
     if (array_list_class == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(lon_lat_class);
         env->DeleteGlobalRef(lon_lat_zoom_class);
         env->DeleteGlobalRef(runtime_exception_class);
+        env->DeleteGlobalRef(null_pointer_exception_class);
         return JNI_ERR;
     }
 
@@ -916,6 +954,9 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 
     env->DeleteGlobalRef(runtime_exception_class);
     runtime_exception_class = nullptr;
+
+    env->DeleteGlobalRef(null_pointer_exception_class);
+    null_pointer_exception_class = nullptr;
 
     list_to_array_id = nullptr;
 
