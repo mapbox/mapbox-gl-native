@@ -679,25 +679,23 @@ public class MapView extends SurfaceView {
 
             // Fling the map
             // TODO Google Maps also has a rotate and zoom fling
-            // TODO does not work
-            /*
-             * float ease = 0.25f;
-             * 
-             * velocityX = velocityX * ease; velocityY = velocityY * ease;
-             * 
-             * double speed = Math.sqrt(velocityX * velocityX + velocityY *
-             * velocityY); double deceleration = 2500; double duration = speed /
-             * (deceleration * ease);
-             * 
-             * 
-             * // Cancel any animation mNativeMapView.cancelTransitions();
-             * 
-             * mNativeMapView.moveBy(velocityX * duration / 2.0 / mScreenDensity, velocityY *
-             * duration / 2.0 / mScreenDensity, duration);
-             * 
-             * return true;
-             */
-            return false;
+
+            float ease = 0.25f;
+
+            velocityX = velocityX * ease;
+            velocityY = velocityY * ease;
+
+            double speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+            double deceleration = 2500;
+            double duration = speed / (deceleration * ease);
+
+            // Cancel any animation
+            mNativeMapView.cancelTransitions();
+
+            mNativeMapView.moveBy(velocityX * duration / 2.0 / mScreenDensity, velocityY *
+                duration / 2.0 / mScreenDensity, duration);
+
+            return true;
         }
 
         // Called for drags
