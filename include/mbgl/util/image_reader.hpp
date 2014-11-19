@@ -1,7 +1,8 @@
 #ifndef MBGL_UTIL_IMAGE_READER_HPP
 #define MBGL_UTIL_IMAGE_READER_HPP
 
-#include "noncopyable.hpp"
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/noncopyable.hpp>
 // stl
 #include <stdexcept>
 #include <string>

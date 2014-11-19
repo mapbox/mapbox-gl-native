@@ -1,4 +1,3 @@
-#include "mbgl/util/std.hpp"
 #include "mbgl/util/image_reader.hpp"
 #include "mbgl/util/png_reader.hpp"
 #include "mbgl/util/jpeg_reader.hpp"
