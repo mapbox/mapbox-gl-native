@@ -227,6 +227,8 @@ private:
     std::string styleURL;
     std::string styleJSON = "";
     std::string accessToken = "";
+    util::ptr<std::vector<std::string>> appliedClasses;
+    std::mutex appliedClassesMutex;
 
     bool debug = false;
     timestamp animationTime = 0;

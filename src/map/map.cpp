@@ -437,6 +437,18 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     }
     fileSource->setBase(base);
     glyphStore->setURL(util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken()));
+
+    // set applied classes if theys were set while the style was loading
+    appliedClassesMutex.lock();
+    util::ptr<std::vector<std::string>> classes = appliedClasses;
+    if (appliedClasses) {
+        appliedClasses.reset();
+    }
+    appliedClassesMutex.unlock();
+    if (classes) {
+        style->setAppliedClasses(*classes);
+    }
+
     update();
 }
 
@@ -660,9 +672,16 @@ bool Map::getDebug() const {
 }
 
 void Map::setAppliedClasses(const std::vector<std::string> &classes) {
-    style->setAppliedClasses(classes);
-    if (style->hasTransitions()) {
-        update();
+    if (style) {
+        style->setAppliedClasses(classes);
+        if (style->hasTransitions()) {
+            update();
+        }
+    }
+    else {
+        appliedClassesMutex.lock();
+        appliedClasses = std::make_unique<std::vector<std::string>>(classes);
+        appliedClassesMutex.unlock();
     }
 }
 
