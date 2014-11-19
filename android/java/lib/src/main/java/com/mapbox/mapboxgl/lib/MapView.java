@@ -30,6 +30,9 @@ import android.widget.ZoomButtonsController;
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // Custom view that shows a Map
 // Based on SurfaceView as we use OpenGL ES to render
 public class MapView extends SurfaceView {
@@ -52,6 +55,9 @@ public class MapView extends SurfaceView {
     private static final String STATE_DEBUG_ACTIVE = "debugActive";
     private static final String STATE_STYLE_URL = "styleUrl";
     private static final String STATE_ACCESS_TOKEN = "accessToken";
+    private static final String STATE_APPLIED_CLASSES = "appliedClasses";
+    private static final String STATE_DEFAULT_TRANSITION_DURATION = "defaultTransitionDuration";
+
 
     //
     // Instance members
@@ -368,12 +374,12 @@ public class MapView extends SurfaceView {
         // TODO
     }
 
-    public void getAppliedStyleClasses() {
-        // TODO
+    List<String> getAppliedStyleClasses() {
+        return mNativeMapView.getAppliedClasses();
     }
 
-    public void setAppliedStyleClasses() {
-        // TODO
+    public void setAppliedStyleClasses(List<String> styleClasses) {
+        mNativeMapView.setAppliedClasses(styleClasses);
     }
 
     public void getStyleDescriptionForLayer() {
@@ -406,6 +412,8 @@ public class MapView extends SurfaceView {
             setDebugActive(savedInstanceState.getBoolean(STATE_DEBUG_ACTIVE));
             setStyleUrl(savedInstanceState.getString(STATE_STYLE_URL));
             setAccessToken(savedInstanceState.getString(STATE_ACCESS_TOKEN));
+            setAppliedStyleClasses(savedInstanceState.getStringArrayList(STATE_APPLIED_CLASSES));
+            //mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION)); // TODO
         }
 
         mNativeMapView.initializeDisplay();
@@ -426,6 +434,8 @@ public class MapView extends SurfaceView {
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
         outState.putString(STATE_STYLE_URL, getStyleUrl());
         outState.putString(STATE_ACCESS_TOKEN, getAccessToken());
+        outState.putStringArrayList(STATE_APPLIED_CLASSES, new ArrayList<String>(getAppliedStyleClasses()));
+        //outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView. // TODO
     }
 
     // Called when we need to clean up
