@@ -1,7 +1,6 @@
 #ifndef MBGL_UTIL_IMAGE_READER_HPP
 #define MBGL_UTIL_IMAGE_READER_HPP
 
-#include "factory.hpp"
 #include "noncopyable.hpp"
 // stl
 #include <stdexcept>
@@ -34,12 +33,6 @@ struct image_reader : private noncopyable
     virtual void read(unsigned x,unsigned y, unsigned width, unsigned height, char* image)=0;
     virtual ~image_reader() {}
 };
-
-template <typename...Args>
-bool register_image_reader(std::string const& type, image_reader* (* fun)(Args...))
-{
-    return factory<image_reader,std::string, Args...>::register_product(type, fun);
-}
 
 image_reader* get_image_reader(char const* data, size_t size);
 

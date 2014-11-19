@@ -1,4 +1,4 @@
-#include "mbgl/util/image_reader.hpp"
+#include "mbgl/util/png_reader.hpp"
 #include <iostream>
 extern "C"
 {
@@ -15,61 +15,6 @@ extern "C"
 #include <memory>
 
 namespace mbgl { namespace util {
-
-template <typename T>
-class png_reader : public image_reader
-{
-    using source_type = T;
-    using input_stream = boost::iostreams::stream<source_type>;
-
-    struct png_struct_guard
-    {
-        png_struct_guard(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
-            : p_(png_ptr_ptr),
-              i_(info_ptr_ptr) {}
-
-        ~png_struct_guard()
-        {
-            png_destroy_read_struct(p_,i_,0);
-        }
-        png_structpp p_;
-        png_infopp i_;
-    };
-
-private:
-
-    source_type source_;
-    input_stream stream_;
-    unsigned width_;
-    unsigned height_;
-    int bit_depth_;
-    int color_type_;
-    bool has_alpha_;
-public:
-    explicit png_reader(std::string const& file_name);
-    png_reader(char const* data, std::size_t size);
-    ~png_reader();
-    unsigned width() const;
-    unsigned height() const;
-    inline bool has_alpha() const { return has_alpha_; }
-    bool premultiplied_alpha() const { return false; } //http://www.libpng.org/pub/png/spec/1.1/PNG-Rationale.html
-    void read(unsigned x,unsigned y, unsigned width, unsigned height, char * image);
-private:
-    void init();
-    static void png_read_data(png_structp png_ptr, png_bytep data, png_size_t length);
-};
-
-namespace
-{
-image_reader* create_png_reader(char const * data, std::size_t size)
-{
-    return new png_reader<boost::iostreams::array_source>(data, size);
-}
-
-const static bool registered = register_image_reader("png",create_png_reader);
-
-}
-
 
 void user_error_fn(png_structp /*png_ptr*/, png_const_charp error_msg)
 {
@@ -92,21 +37,6 @@ void png_reader<T>::png_read_data(png_structp png_ptr, png_bytep data, png_size_
     {
         png_error(png_ptr, "Read Error");
     }
-}
-
-template <typename T>
-png_reader<T>::png_reader(std::string const& file_name)
-    : source_(file_name,std::ios_base::in | std::ios_base::binary),
-      stream_(source_),
-      width_(0),
-      height_(0),
-      bit_depth_(0),
-      color_type_(0),
-      has_alpha_(false)
-{
-    if (!source_.is_open()) throw image_reader_exception("PNG reader: cannot open file '"+ file_name + "'");
-    if (!stream_) throw image_reader_exception("PNG reader: cannot open file '"+ file_name + "'");
-    init();
 }
 
 template <typename T>
@@ -263,4 +193,7 @@ void png_reader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char 
     }
     png_read_end(png_ptr,0);
 }
+
+template class png_reader<boost::iostreams::array_source>;
+
 }}
