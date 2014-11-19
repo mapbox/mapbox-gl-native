@@ -34,7 +34,7 @@ struct image_reader : private noncopyable
     virtual ~image_reader() {}
 };
 
-image_reader* get_image_reader(char const* data, size_t size);
+std::unique_ptr<image_reader> get_image_reader(char const* data, size_t size);
 
 }}
 
