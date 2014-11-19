@@ -150,9 +150,9 @@ public class MapView extends SurfaceView {
             LonLat centerCoordinate = new LonLat(centerLongitude,
                     centerLatitude);
             setCenterCoordinate(centerCoordinate);
-            setDirection(typedArray.getFloat(R.styleable.MapView_direction,
-                    0.0f));
             setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoomLevel,
+                    0.0f)); // need to set zoom level first because of limitation on rotating when zoomed out
+            setDirection(typedArray.getFloat(R.styleable.MapView_direction,
                     0.0f));
             setZoomEnabled(typedArray.getBoolean(
                     R.styleable.MapView_zoomEnabled, true));
@@ -395,8 +395,8 @@ public class MapView extends SurfaceView {
         if (savedInstanceState != null) {
             setCenterCoordinate((LonLat) savedInstanceState
                     .getParcelable(STATE_CENTER_COORDINATE));
+            setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL)); // need to set zoom level first because of limitation on rotating when zoomed out
             setDirection(savedInstanceState.getDouble(STATE_CENTER_DIRECTION));
-            setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL));
             setDirection(savedInstanceState.getDouble(STATE_DIRECTION));
             setZoomEnabled(savedInstanceState.getBoolean(STATE_ZOOM_ENABLED));
             setScrollEnabled(savedInstanceState
@@ -418,9 +418,8 @@ public class MapView extends SurfaceView {
     public void onSaveInstanceState(Bundle outState) {
         Log.v(TAG, "onSaveInstanceState");
         outState.putParcelable(STATE_CENTER_COORDINATE, getCenterCoordinate());
+        outState.putDouble(STATE_ZOOM_LEVEL, getZoomLevel()); // need to set zoom level first because of limitation on rotating when zoomed out
         outState.putDouble(STATE_CENTER_DIRECTION, getDirection());
-        outState.putDouble(STATE_ZOOM_LEVEL, getZoomLevel());
-        outState.putDouble(STATE_DIRECTION, getDirection());
         outState.putBoolean(STATE_ZOOM_ENABLED, isZoomEnabled());
         outState.putBoolean(STATE_SCROLL_ENABLED, isScrollEnabled());
         outState.putBoolean(STATE_ROTATE_ENABLED, isRotateEnabled());
