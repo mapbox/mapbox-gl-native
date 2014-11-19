@@ -234,6 +234,14 @@ void NativeMapView::terminateDisplay() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::terminateDisplay");
 
     if (display != EGL_NO_DISPLAY) {
+        // Destroy the surface first, if it still exists. This call needs a valid surface.
+        if (surface != EGL_NO_SURFACE) {
+            if (!eglDestroySurface(display, surface)) {
+                mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroySurface() returned error %d", eglGetError());
+            }
+            surface = EGL_NO_SURFACE;
+        }
+
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
                 EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
@@ -541,7 +549,7 @@ void NativeMapView::loadExtensions() {
 void NativeMapView::stop() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::stop");
 
-    if ((display != EGL_NO_DISPLAY) && (display != EGL_NO_CONTEXT)) {
+    if ((display != EGL_NO_DISPLAY) && (context != EGL_NO_CONTEXT)) {
         map.stop();
     }
 }
@@ -550,7 +558,7 @@ void NativeMapView::stop() {
 void NativeMapView::pause(bool wait_for_pause) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause %s", (wait_for_pause) ? "true" : "false");
 
-    if ((display != EGL_NO_DISPLAY) && (display != EGL_NO_CONTEXT)) {
+    if ((display != EGL_NO_DISPLAY) && (context != EGL_NO_CONTEXT)) {
         map.pause(wait_for_pause);
     }
 }
