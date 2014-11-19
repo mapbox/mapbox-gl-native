@@ -1,5 +1,9 @@
 #include "mbgl/util/image_reader.hpp"
+#include "mbgl/util/png_reader.hpp"
+#include "mbgl/util/jpeg_reader.hpp"
+
 #include <boost/optional.hpp>
+#include <boost/iostreams/device/array.hpp>
 
 namespace mbgl { namespace util {
 
@@ -43,10 +47,16 @@ image_reader* get_image_reader(char const* data, size_t size)
     boost::optional<std::string> type = type_from_bytes(data,size);
     if (type)
     {
-        return factory<image_reader,std::string,char const*,size_t>::create_object(*type, data,size);
+        if (*type == "png")
+        {
+            return new png_reader<boost::iostreams::array_source>(data, size);
+        }
+        else if (*type == "jpeg")
+        {
+            return new jpeg_reader<boost::iostreams::array_source>(data, size);
+        }
     }
-    else
-        throw image_reader_exception("image_reader: can't determine type from input data");
+    throw image_reader_exception("image_reader: can't determine type from input data");
 }
 
 }}
