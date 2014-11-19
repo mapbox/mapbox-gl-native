@@ -541,20 +541,18 @@ void NativeMapView::loadExtensions() {
 void NativeMapView::stop() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::stop");
 
-    assert(display != EGL_NO_DISPLAY);
-    assert(context != EGL_NO_CONTEXT);
-
-    map.stop();
+    if ((display != EGL_NO_DISPLAY) && (display != EGL_NO_CONTEXT)) {
+        map.stop();
+    }
 }
 
 
 void NativeMapView::pause(bool wait_for_pause) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause %s", (wait_for_pause) ? "true" : "false");
 
-    assert(display != EGL_NO_DISPLAY);
-    assert(context != EGL_NO_CONTEXT);
-
-    map.pause(wait_for_pause);
+    if ((display != EGL_NO_DISPLAY) && (display != EGL_NO_CONTEXT)) {
+        map.pause(wait_for_pause);
+    }
 }
 
 void NativeMapView::resume() {

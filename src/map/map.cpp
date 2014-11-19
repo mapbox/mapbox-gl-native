@@ -429,6 +429,7 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     if (!style) {
         style = std::make_shared<Style>();
     }
+
     style->loadJSON((const uint8_t *)styleJSON.c_str());
     if (!fileSource) {
         fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
