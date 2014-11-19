@@ -84,11 +84,18 @@ Image::Image(std::string const& data)
     }
     catch (image_reader_exception const& ex)
     {
-        fprintf(stderr, "ImageReader: %s\n", ex.what());
+        fprintf(stderr, "Image: %s\n", ex.what());
         img.reset();
         width = 0;
         height = 0;
 
+    }
+    catch (...) // catch the rest
+    {
+        fprintf(stderr, "Image: exception in constructor");
+        img.reset();
+        width = 0;
+        height = 0;
     }
 }
 
