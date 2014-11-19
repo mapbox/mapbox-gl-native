@@ -76,7 +76,7 @@ Image::Image(std::string const& data)
 {
     try
     {
-        std::unique_ptr<image_reader> reader(get_image_reader(data.c_str(), data.size()));
+        auto reader = get_image_reader(data.c_str(), data.size());
         width = reader->width();
         height = reader->height();
         img = ::std::unique_ptr<char[]>(new char[width * height * 4]());
