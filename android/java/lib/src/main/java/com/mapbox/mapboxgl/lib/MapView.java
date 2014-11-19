@@ -45,6 +45,7 @@ public class MapView extends SurfaceView {
     private static final String STATE_CENTER_COORDINATE = "centerCoordinate";
     private static final String STATE_CENTER_DIRECTION = "centerDirection";
     private static final String STATE_ZOOM_LEVEL = "zoomLevel";
+    private static final String STATE_DIRECTION = "direction";
     private static final String STATE_ZOOM_ENABLED = "zoomEnabled";
     private static final String STATE_SCROLL_ENABLED = "scrollEnabled";
     private static final String STATE_ROTATE_ENABLED = "rotateEnabled";
@@ -396,6 +397,7 @@ public class MapView extends SurfaceView {
                     .getParcelable(STATE_CENTER_COORDINATE));
             setDirection(savedInstanceState.getDouble(STATE_CENTER_DIRECTION));
             setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL));
+            setDirection(savedInstanceState.getDouble(STATE_DIRECTION));
             setZoomEnabled(savedInstanceState.getBoolean(STATE_ZOOM_ENABLED));
             setScrollEnabled(savedInstanceState
                     .getBoolean(STATE_SCROLL_ENABLED));
@@ -418,6 +420,7 @@ public class MapView extends SurfaceView {
         outState.putParcelable(STATE_CENTER_COORDINATE, getCenterCoordinate());
         outState.putDouble(STATE_CENTER_DIRECTION, getDirection());
         outState.putDouble(STATE_ZOOM_LEVEL, getZoomLevel());
+        outState.putDouble(STATE_DIRECTION, getDirection());
         outState.putBoolean(STATE_ZOOM_ENABLED, isZoomEnabled());
         outState.putBoolean(STATE_SCROLL_ENABLED, isScrollEnabled());
         outState.putBoolean(STATE_ROTATE_ENABLED, isRotateEnabled());
