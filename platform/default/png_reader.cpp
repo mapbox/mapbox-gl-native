@@ -1,4 +1,4 @@
-#include "mbgl/util/png_reader.hpp"
+#include <mbgl/platform/default/png_reader.hpp>
 #include <iostream>
 extern "C"
 {

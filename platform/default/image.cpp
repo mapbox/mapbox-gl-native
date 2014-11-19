@@ -7,7 +7,8 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <cstring>
-#include <mbgl/util/image_reader.hpp>
+
+#include <mbgl/platform/default/image_reader.hpp>
 
 // Check png library version.
 const static bool png_version_check = []() {

@@ -1,4 +1,4 @@
-#include "mbgl/util/jpeg_reader.hpp"
+#include <mbgl/platform/default/jpeg_reader.hpp>
 
 // boost
 #include <boost/iostreams/device/file.hpp>

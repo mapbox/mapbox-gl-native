@@ -1,6 +1,6 @@
-#include "mbgl/util/image_reader.hpp"
-#include "mbgl/util/png_reader.hpp"
-#include "mbgl/util/jpeg_reader.hpp"
+#include <mbgl/platform/default/image_reader.hpp>
+#include <mbgl/platform/default/png_reader.hpp>
+#include <mbgl/platform/default/jpeg_reader.hpp>
 
 #include <boost/optional.hpp>
 #include <boost/iostreams/device/array.hpp>
