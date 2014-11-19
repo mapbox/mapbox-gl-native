@@ -1,7 +1,7 @@
 #ifndef MBGL_UTIL_PNG_READER_HPP
 #define MBGL_UTIL_PNG_READER_HPP
 
-#include "mbgl/util/image_reader.hpp"
+#include <mbgl/platform/default/image_reader.hpp>
 
 extern "C"
 {
