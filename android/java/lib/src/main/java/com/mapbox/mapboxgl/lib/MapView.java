@@ -416,7 +416,7 @@ public class MapView extends SurfaceView {
             if (!appliedClasses.isEmpty()) {
                 setAppliedStyleClasses(appliedClasses);
             }
-            //mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION)); // TODO
+            mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
         }
 
         mNativeMapView.initializeDisplay();
@@ -438,7 +438,7 @@ public class MapView extends SurfaceView {
         outState.putString(STATE_STYLE_URL, getStyleUrl());
         outState.putString(STATE_ACCESS_TOKEN, getAccessToken());
         outState.putStringArrayList(STATE_APPLIED_CLASSES, new ArrayList<String>(getAppliedStyleClasses()));
-        //outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView. // TODO
+        outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
     }
 
     // Called when we need to clean up

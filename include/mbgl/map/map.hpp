@@ -82,6 +82,7 @@ public:
     void toggleClass(const std::string &name);
     const std::vector<std::string> &getAppliedClasses() const;
     void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);
+    uint64_t getDefaultTransitionDuration();
     void setStyleURL(const std::string &url);
     void setStyleJSON(std::string newStyleJSON, const std::string &base = "");
     std::string getStyleJSON() const;
@@ -227,6 +228,9 @@ private:
     std::string styleURL;
     std::string styleJSON = "";
     std::string accessToken = "";
+
+    std::atomic_uint_fast64_t defaultTransitionDuration;
+
     util::ptr<std::vector<std::string>> appliedClasses;
     std::mutex appliedClassesMutex;
 

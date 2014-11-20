@@ -438,6 +438,8 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     fileSource->setBase(base);
     glyphStore->setURL(util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken()));
 
+    style->setDefaultTransitionDuration(defaultTransitionDuration);
+
     // set applied classes if theys were set while the style was loading
     appliedClassesMutex.lock();
     util::ptr<std::vector<std::string>> classes = appliedClasses;
@@ -698,7 +700,14 @@ const std::vector<std::string> &Map::getAppliedClasses() const {
 }
 
 void Map::setDefaultTransitionDuration(uint64_t duration_milliseconds) {
-    style->setDefaultTransitionDuration(duration_milliseconds);
+    defaultTransitionDuration = duration_milliseconds;
+    if (style) {
+        style->setDefaultTransitionDuration(duration_milliseconds);
+    }
+}
+
+uint64_t Map::getDefaultTransitionDuration() {
+    return defaultTransitionDuration;
 }
 
 void Map::updateSources() {

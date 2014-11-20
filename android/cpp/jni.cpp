@@ -371,6 +371,15 @@ void JNICALL nativeSetDefaultTransitionDuration(JNIEnv* env, jobject obj, jlong 
     COFFEE_TRY_JNI(env, native_map_view->getMap().setDefaultTransitionDuration(duration_milliseconds));
 }
 
+jlong JNICALL nativeGetDefaultTransitionDuration(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetDefaultTransitionDuration");
+    assert(native_map_view_ptr != 0);
+    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
+    jlong ret = 0.0;
+    COFFEE_TRY_JNI(env, ret = native_map_view->getMap().getDefaultTransitionDuration());
+    return ret;
+}
+
 void JNICALL nativeSetStyleURL(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jstring url) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetStyleURL");
     assert(native_map_view_ptr != 0);
@@ -816,7 +825,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     // NOTE: if you get java.lang.UnsatisfiedLinkError you likely forgot to set the size of the array correctly (too large)
-    std::array<JNINativeMethod, 60> methods = {{ // Can remove the extra brace in C++14
+    std::array<JNINativeMethod, 61> methods = {{ // Can remove the extra brace in C++14
         { "nativeCreate", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J", reinterpret_cast<void*>(&nativeCreate) },
         { "nativeDestroy", "(J)V", reinterpret_cast<void*>(&nativeDestroy) },
         { "nativeInitializeDisplay", "(J)V", reinterpret_cast<void*>(&nativeInitializeDisplay) },
@@ -841,6 +850,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeSetAppliedClasses", "(JLjava/util/List;)V", reinterpret_cast<void*>(&nativeSetAppliedClasses) },
         { "nativeGetAppliedClasses", "(J)Ljava/util/List;", reinterpret_cast<void*>(&nativeGetAppliedClasses) },
         { "nativeSetDefaultTransitionDuration", "(JJ)V", reinterpret_cast<void*>(&nativeSetDefaultTransitionDuration) },
+        { "nativeGetDefaultTransitionDuration", "(J)J", reinterpret_cast<void*>(&nativeGetDefaultTransitionDuration) },
         { "nativeSetStyleUrl", "(JLjava/lang/String;)V", reinterpret_cast<void*>(&nativeSetStyleURL) },
         { "nativeSetStyleJson", "(JLjava/lang/String;Ljava/lang/String;)V", reinterpret_cast<void*>(&nativeSetStyleJSON) },
         { "nativeGetStyleJson", "(J)Ljava/lang/String;", reinterpret_cast<void*>(&nativeGetStyleJSON) },
