@@ -379,6 +379,11 @@ public class MapView extends SurfaceView {
     }
 
     public void setAppliedStyleClasses(List<String> styleClasses) {
+        setAppliedStyleClasses(styleClasses, 0);
+    }
+
+    public void setAppliedStyleClasses(List<String> styleClasses, long transitionDuration) {
+        mNativeMapView.setDefaultTransitionDuration(transitionDuration);
         mNativeMapView.setAppliedClasses(styleClasses);
     }
 
