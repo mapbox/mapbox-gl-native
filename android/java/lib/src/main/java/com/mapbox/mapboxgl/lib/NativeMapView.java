@@ -1,6 +1,5 @@
 package com.mapbox.mapboxgl.lib;
 
-import android.util.Log;
 import android.view.Surface;
 
 import java.util.List;
