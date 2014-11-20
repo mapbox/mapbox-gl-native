@@ -440,7 +440,7 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
 
     style->setDefaultTransitionDuration(defaultTransitionDuration);
 
-    // set applied classes if theys were set while the style was loading
+    // set applied classes if they were set while the style was loading
     appliedClassesMutex.lock();
     util::ptr<std::vector<std::string>> classes = appliedClasses;
     if (appliedClasses) {

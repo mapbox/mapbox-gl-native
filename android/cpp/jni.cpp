@@ -375,7 +375,7 @@ jlong JNICALL nativeGetDefaultTransitionDuration(JNIEnv* env, jobject obj, jlong
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetDefaultTransitionDuration");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    jlong ret = 0.0;
+    jlong ret = 0;
     COFFEE_TRY_JNI(env, ret = native_map_view->getMap().getDefaultTransitionDuration());
     return ret;
 }
