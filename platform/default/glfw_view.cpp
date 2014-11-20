@@ -239,8 +239,11 @@ void GLFWView::swap() {
     glfwSetWindowTitle(window, title.c_str());
 }
 
-void GLFWView::notify_map_change(mbgl::MapChange /*change*/, mbgl::timestamp /*delay*/) {
-    // no-op
+void GLFWView::notify_map_change(mbgl::MapChange change, mbgl::timestamp /*delay*/) {
+    if ((change == mbgl::MapChange::MapChangeRegionDidChange || change == mbgl::MapChange::MapChangeRegionDidChangeAnimated)
+        && map->getZoom() <= 3 && map->getBearing() != 0) {
+        map->setBearing(0, 0.2);
+    }
 }
 
 void GLFWView::fps() {
