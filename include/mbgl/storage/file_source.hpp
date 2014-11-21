@@ -3,6 +3,7 @@
 
 #include <mbgl/storage/resource_type.hpp>
 #include <mbgl/storage/request.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <string>
 #include <unordered_map>
@@ -16,18 +17,12 @@ namespace mbgl {
 class BaseRequest;
 class SQLiteStore;
 
-class FileSource {
+class FileSource : public util::noncopyable {
 private:
-    FileSource(const FileSource &) = delete;
-    FileSource(FileSource &&) = delete;
-    FileSource& operator=(const FileSource &) = delete;
-    FileSource& operator=(FileSource &&) = delete;
-
 public:
     FileSource(uv_loop_t *loop, const std::string &path);
     ~FileSource();
 
-public:
     // Stores and retrieves the base path/URL for relative requests
     void setBase(const std::string &value);
     const std::string &getBase() const;
