@@ -122,7 +122,6 @@ public:
     void resetNorth();
     void startRotating();
     void stopRotating();
-    bool canRotate();
 
     // Debug
     void setDebug(bool value);

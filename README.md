@@ -68,7 +68,7 @@ Install GCC 4.8+ if you are running Ubuntu 13.10 or older. Alternatively, you ca
 
 Ensure you have git and other build essentials:
 
-    sudo apt-get install git build-essential zlib1g-dev automake \
+    sudo apt-get install curl git build-essential zlib1g-dev automake \
                          libtool xutils-dev make cmake pkg-config python-pip \
                          libcurl4-openssl-dev libpng-dev libsqlite3-dev
 
