@@ -22,6 +22,7 @@
             'conditions': [
               ['OS == "linux"', {
                   'other_ldflags': [
+                      '<@(png_static_libs)',
                       '<@(glfw3_static_libs)',
                       '<@(glfw3_ldflags)',
                   ]

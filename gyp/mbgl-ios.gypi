@@ -12,6 +12,7 @@
           'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
           'CLANG_ENABLE_OBJC_ARC': 'YES',
           'CODE_SIGN_IDENTITY': 'iPhone Developer',
+          'SKIP_INSTALL': 'YES'
         },
         'configurations': {
           'Release': {
