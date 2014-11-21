@@ -346,7 +346,7 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     style->loadJSON((const uint8_t *)styleJSON.c_str());
     if (!fileSource) {
         fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
-        glyphStore = std::make_shared<GlyphStore>(fileSource);
+        glyphStore = std::make_shared<GlyphStore>(*fileSource);
     }
     fileSource->setBase(base);
     glyphStore->setURL(util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken()));
@@ -370,7 +370,7 @@ util::ptr<Sprite> Map::getSprite() {
     const float pixelRatio = state.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
     if (!sprite || sprite->pixelRatio != pixelRatio) {
-        sprite = Sprite::Create(sprite_url, pixelRatio, fileSource);
+        sprite = Sprite::Create(sprite_url, pixelRatio, *fileSource);
     }
 
     return sprite;
@@ -649,7 +649,7 @@ void Map::updateTiles() {
 void Map::prepare() {
     if (!fileSource) {
         fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
-        glyphStore = std::make_shared<GlyphStore>(fileSource);
+        glyphStore = std::make_shared<GlyphStore>(*fileSource);
     }
 
     if (!style) {
