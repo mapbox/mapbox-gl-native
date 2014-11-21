@@ -661,15 +661,6 @@ void JNICALL nativeStopRotating(JNIEnv* env, jobject obj, jlong native_map_view_
     COFFEE_TRY_JNI(env, native_map_view->getMap().stopRotating());
 }
 
-jboolean JNICALL nativeCanRotate(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeCanRotate");
-    assert(native_map_view_ptr != 0);
-    NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    jboolean ret = false;
-    COFFEE_TRY_JNI(env, ret = native_map_view->getMap().canRotate());
-    return ret;
-}
-
 void JNICALL nativeSetDebug(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jboolean debug) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetDebug");
     assert(native_map_view_ptr != 0);
@@ -825,7 +816,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     // NOTE: if you get java.lang.UnsatisfiedLinkError you likely forgot to set the size of the array correctly (too large)
-    std::array<JNINativeMethod, 61> methods = {{ // Can remove the extra brace in C++14
+    std::array<JNINativeMethod, 60> methods = {{ // Can remove the extra brace in C++14
         { "nativeCreate", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J", reinterpret_cast<void*>(&nativeCreate) },
         { "nativeDestroy", "(J)V", reinterpret_cast<void*>(&nativeDestroy) },
         { "nativeInitializeDisplay", "(J)V", reinterpret_cast<void*>(&nativeInitializeDisplay) },
@@ -882,7 +873,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeResetNorth", "(J)V", reinterpret_cast<void*>(&nativeResetNorth) },
         { "nativeStartRotating", "(J)V", reinterpret_cast<void*>(&nativeStartRotating) },
         { "nativeStopRotating", "(J)V", reinterpret_cast<void*>(&nativeStopRotating) },
-        { "nativeCanRotate", "(J)Z", reinterpret_cast<void*>(&nativeCanRotate) },
         { "nativeSetDebug", "(JZ)V", reinterpret_cast<void*>(&nativeSetDebug) },
         { "nativeToggleDebug", "(J)V", reinterpret_cast<void*>(&nativeToggleDebug) },
         { "nativeGetDebug", "(J)Z", reinterpret_cast<void*>(&nativeGetDebug) },

@@ -366,10 +366,6 @@ class NativeMapView {
         nativeStopRotating(mNativeMapViewPtr);
     }
 
-    public boolean canRotate() {
-        return nativeCanRotate(mNativeMapViewPtr);
-    }
-
     public void setDebug(boolean debug) {
         nativeSetDebug(mNativeMapViewPtr, debug);
     }
@@ -532,8 +528,6 @@ class NativeMapView {
     private native void nativeStartRotating(long nativeMapViewPtr);
 
     private native void nativeStopRotating(long nativeMapViewPtr);
-
-    private native boolean nativeCanRotate(long nativeMapViewPtr);
 
     private native void nativeSetDebug(long nativeMapViewPtr, boolean debug);
 
