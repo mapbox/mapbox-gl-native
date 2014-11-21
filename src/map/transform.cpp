@@ -66,12 +66,6 @@ void Transform::_moveBy(const double dx, const double dy, const timestamp durati
 
     constrain(final.scale, final.y);
 
-    // Un-rotate when rotated and panning far enough to show off-world in corners.
-    double w = final.scale * util::tileSize / 2;
-    double m = std::sqrt(std::pow((current.width / 2), 2) + pow((current.height / 2), 2));
-    double x = std::abs(sqrt(std::pow(final.x, 2) + std::pow(final.y, 2)));
-    if (current.angle && w - x < m) _setAngle(0);
-
     if (duration == 0) {
         current.x = final.x;
         current.y = final.y;
