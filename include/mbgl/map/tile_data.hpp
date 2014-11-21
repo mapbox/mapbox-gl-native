@@ -16,6 +16,7 @@
 namespace mbgl {
 
 class Map;
+class FileSource;
 class Painter;
 class SourceInfo;
 class StyleLayer;
@@ -43,7 +44,7 @@ public:
     TileData(Tile::ID const& id, Map &map, const util::ptr<SourceInfo> &source);
     ~TileData();
 
-    void request();
+    void request(FileSource&);
     void cancel();
     void reparse();
     const std::string toString() const;

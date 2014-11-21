@@ -18,6 +18,7 @@
 namespace mbgl {
 
 class Map;
+class FileSource;
 class Painter;
 class StyleLayer;
 class TransformState;
@@ -27,9 +28,9 @@ class Source : public std::enable_shared_from_this<Source>, private util::noncop
 public:
     Source(const util::ptr<SourceInfo>& info);
 
-    void load(Map &map);
+    void load(Map&, FileSource&);
+    bool update(Map&, FileSource&);
 
-    bool update(Map &map);
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
     size_t getTileCount() const;
@@ -47,9 +48,9 @@ private:
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<Tile::ID> coveringTiles(const TransformState&) const;
 
-    bool updateTiles(Map &map);
+    bool updateTiles(Map&, FileSource&);
 
-    TileData::State addTile(Map &map, const Tile::ID& id);
+    TileData::State addTile(Map&, FileSource&, const Tile::ID&);
     TileData::State hasTile(const Tile::ID& id);
 
     double getZoom(const TransformState &state) const;

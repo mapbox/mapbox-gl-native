@@ -607,7 +607,7 @@ void Map::updateSources() {
         if (style_source->enabled) {
             if (!style_source->source) {
                 style_source->source = std::make_shared<Source>(style_source->info);
-                style_source->source->load(*this);
+                style_source->source->load(*this, *fileSource);
             }
         } else {
             style_source->source.reset();
@@ -642,7 +642,7 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
 
 void Map::updateTiles() {
     for (const util::ptr<StyleSource> &source : getActiveSources()) {
-        source->source->update(*this);
+        source->source->update(*this, *fileSource);
     }
 }
 
