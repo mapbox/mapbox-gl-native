@@ -49,7 +49,7 @@ public:
     unsigned width() const;
     unsigned height() const;
     inline bool has_alpha() const { return has_alpha_; }
-    bool premultiplied_alpha() const { return false; } //http://www.libpng.org/pub/png/spec/1.1/PNG-Rationale.html
+    bool premultiplied_alpha() const { return true; } // png_set_alpha_mode(png, PNG_ALPHA_PREMULTIPLIED, 2.2)
     void read(unsigned x,unsigned y, unsigned width, unsigned height, char * image);
 private:
     void init();
