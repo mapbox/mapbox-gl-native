@@ -127,7 +127,6 @@ public:
 public:
     inline const TransformState &getState() const { return state; }
     inline util::ptr<Style> getStyle() const { return style; }
-    inline GlyphAtlas & getGlyphAtlas() { return glyphAtlas; }
     inline util::ptr<GlyphStore> getGlyphStore() { return glyphStore; }
     inline SpriteAtlas & getSpriteAtlas() { return spriteAtlas; }
     util::ptr<Sprite> getSprite();

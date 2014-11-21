@@ -21,13 +21,15 @@ class Painter;
 class SourceInfo;
 class StyleLayer;
 class TileParser;
+class GlyphAtlas;
 
 class VectorTileData : public TileData {
     friend class TileParser;
 
 public:
-    VectorTileData(Tile::ID const& id, Map &map, const util::ptr<SourceInfo> &source);
+    VectorTileData(Tile::ID const&, Map&, GlyphAtlas&, const util::ptr<SourceInfo>&);
     ~VectorTileData();
+
     virtual void parse();
     virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const mat4 &matrix);
     virtual bool hasData(StyleLayer const& layer_desc) const;
@@ -46,6 +48,8 @@ protected:
     // Holds the buckets of this tile.
     // They contain the location offsets in the buffers stored above
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+    GlyphAtlas& glyphAtlas;
+
 public:
     const float depth;
 };
