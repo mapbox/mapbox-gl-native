@@ -35,7 +35,7 @@ public:
     TileParser(const std::string &data, VectorTileData &tile,
                const util::ptr<const Style> &style,
                GlyphAtlas & glyphAtlas,
-               const util::ptr<GlyphStore> &glyphStore,
+               GlyphStore & glyphStore,
                SpriteAtlas & spriteAtlas,
                const util::ptr<Sprite> &sprite);
     ~TileParser();
@@ -62,7 +62,7 @@ private:
     // Cross-thread shared data.
     util::ptr<const Style> style;
     GlyphAtlas & glyphAtlas;
-    util::ptr<GlyphStore> glyphStore;
+    GlyphStore & glyphStore;
     SpriteAtlas & spriteAtlas;
     util::ptr<Sprite> sprite;
     util::ptr<Texturepool> texturePool;

@@ -22,6 +22,7 @@ class SourceInfo;
 class StyleLayer;
 class TileParser;
 class GlyphAtlas;
+class GlyphStore;
 class SpriteAtlas;
 
 class VectorTileData : public TileData {
@@ -29,7 +30,8 @@ class VectorTileData : public TileData {
 
 public:
     VectorTileData(Tile::ID const&, Map&,
-                   GlyphAtlas&, SpriteAtlas&,
+                   GlyphAtlas&, GlyphStore&,
+                   SpriteAtlas&,
                    const util::ptr<SourceInfo>&);
     ~VectorTileData();
 
@@ -53,6 +55,7 @@ protected:
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
 
     GlyphAtlas& glyphAtlas;
+    GlyphStore& glyphStore;
     SpriteAtlas& spriteAtlas;
 
 public:

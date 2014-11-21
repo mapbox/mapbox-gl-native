@@ -9,10 +9,12 @@
 using namespace mbgl;
 
 VectorTileData::VectorTileData(Tile::ID const& id_, Map &map_,
-                               GlyphAtlas& glyphAtlas_, SpriteAtlas& spriteAtlas_,
+                               GlyphAtlas& glyphAtlas_, GlyphStore& glyphStore_,
+                               SpriteAtlas& spriteAtlas_,
                                const util::ptr<SourceInfo> &source_)
     : TileData(id_, map_, source_),
       glyphAtlas(glyphAtlas_),
+      glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       depth(id.z >= source->max_zoom ? map.getMaxZoom() - id.z : 1) {
 }
@@ -31,8 +33,9 @@ void VectorTileData::parse() {
         // Parsing creates state that is encapsulated in TileParser. While parsing,
         // the TileParser object writes results into this objects. All other state
         // is going to be discarded afterwards.
-        TileParser parser(data, *this, map.getStyle(), glyphAtlas,
-                          map.getGlyphStore(), spriteAtlas, map.getSprite());
+        TileParser parser(data, *this, map.getStyle(),
+                          glyphAtlas, glyphStore,
+                          spriteAtlas, map.getSprite());
         parser.parse();
     } catch (const std::exception& ex) {
 #if defined(DEBUG)

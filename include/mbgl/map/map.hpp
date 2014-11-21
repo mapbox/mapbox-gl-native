@@ -127,7 +127,6 @@ public:
 public:
     inline const TransformState &getState() const { return state; }
     inline util::ptr<Style> getStyle() const { return style; }
-    inline util::ptr<GlyphStore> getGlyphStore() { return glyphStore; }
     util::ptr<Sprite> getSprite();
     inline util::ptr<Texturepool> getTexturepool() { return texturepool; }
     uv::worker &getWorker();
