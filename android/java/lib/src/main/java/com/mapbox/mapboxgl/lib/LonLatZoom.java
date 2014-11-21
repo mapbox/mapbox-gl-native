@@ -41,7 +41,7 @@ public class LonLatZoom implements Parcelable {
         return lon;
     }
 
-    public void setLon(double lon) {
+     public void setLon(double lon) {
         this.lon = lon;
     }
 

@@ -28,8 +28,7 @@ public class MapFragment extends Fragment {
 
     // Called when the fragment is created
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         Log.v(TAG, "onCreateView");
 

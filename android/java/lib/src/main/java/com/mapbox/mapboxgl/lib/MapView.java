@@ -29,8 +29,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.ZoomButtonsController;
 
-import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
-import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
+import com.almeros.android.multitouch.MoveGestureDetector;
+import com.almeros.android.multitouch.RotateGestureDetector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +75,7 @@ public class MapView extends SurfaceView {
     private GestureDetectorCompat mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
     private RotateGestureDetector mRotateGestureDetector;
+    private MoveGestureDetector mMoveGestureDetector;
     private boolean mTwoTap = false;
 
     // Shows zoom buttons
@@ -148,30 +149,19 @@ public class MapView extends SurfaceView {
         mNativeMapView = new NativeMapView(this, cachePath, dataPath, apkPath);
 
         // Load the attributes
-        TypedArray typedArray = context.obtainStyledAttributes(attrs,
-                R.styleable.MapView, 0, 0);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
         try {
-            double centerLongitude = typedArray.getFloat(
-                    R.styleable.MapView_centerLongitude, 0.0f);
-            double centerLatitude = typedArray.getFloat(
-                    R.styleable.MapView_centerLatitude, 0.0f);
-            LonLat centerCoordinate = new LonLat(centerLongitude,
-                    centerLatitude);
+            double centerLongitude = typedArray.getFloat(R.styleable.MapView_centerLongitude, 0.0f);
+            double centerLatitude = typedArray.getFloat(R.styleable.MapView_centerLatitude, 0.0f);
+            LonLat centerCoordinate = new LonLat(centerLongitude, centerLatitude);
             setCenterCoordinate(centerCoordinate);
-            setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoomLevel,
-                    0.0f)); // need to set zoom level first because of limitation on rotating when zoomed out
-            setDirection(typedArray.getFloat(R.styleable.MapView_direction,
-                    0.0f));
-            setZoomEnabled(typedArray.getBoolean(
-                    R.styleable.MapView_zoomEnabled, true));
-            setScrollEnabled(typedArray.getBoolean(
-                    R.styleable.MapView_scrollEnabled, true));
-            setRotateEnabled(typedArray.getBoolean(
-                    R.styleable.MapView_rotateEnabled, true));
-            setDebugActive(typedArray.getBoolean(
-                    R.styleable.MapView_debugActive, false));
-            setStyleUrl(typedArray.getString(
-                    R.styleable.MapView_styleUrl));
+            setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoomLevel, 0.0f)); // need to set zoom level first because of limitation on rotating when zoomed out
+            setDirection(typedArray.getFloat(R.styleable.MapView_direction, 0.0f));
+            setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoomEnabled, true));
+            setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scrollEnabled, true));
+            setRotateEnabled(typedArray.getBoolean(R.styleable.MapView_rotateEnabled, true));
+            setDebugActive(typedArray.getBoolean(R.styleable.MapView_debugActive, false));
+            setStyleUrl(typedArray.getString(R.styleable.MapView_styleUrl));
         } finally {
             typedArray.recycle();
         }
@@ -189,28 +179,24 @@ public class MapView extends SurfaceView {
         // Touch gesture detectors
         mGestureDetector = new GestureDetectorCompat(context, new GestureListener());
         mGestureDetector.setIsLongpressEnabled(true);
-        mScaleGestureDetector = new ScaleGestureDetector(context,
-                new ScaleGestureListener());
+        mScaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureListener());
         ScaleGestureDetectorCompat.setQuickScaleEnabled(mScaleGestureDetector, true);
-        mRotateGestureDetector = new RotateGestureDetector(context,
-                new RotateGestureListener());
+        mRotateGestureDetector = new RotateGestureDetector(context, new RotateGestureListener());
+        mMoveGestureDetector = new MoveGestureDetector(context, new MoveGestureListener());
 
         // Shows the zoom controls
         // But not when in Eclipse UI editor
         if (!isInEditMode()) {
-            if (!context.getPackageManager().hasSystemFeature(
-                    PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
+            if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
                 mZoomButtonsController = new ZoomButtonsController(this);
                 mZoomButtonsController.setZoomSpeed(300);
                 mZoomButtonsController.setOnZoomListener(new OnZoomListener());
             }
 
             // Check current connection status
-            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(
-                    Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-            boolean isConnected = (activeNetwork != null) &&
-                    activeNetwork.isConnectedOrConnecting();
+            boolean isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
             onConnectivityChanged(isConnected);
         }
     }
@@ -291,8 +277,7 @@ public class MapView extends SurfaceView {
     public void setZoomEnabled(boolean zoomEnabled) {
         this.mZoomEnabled = zoomEnabled;
 
-        if ((mZoomButtonsController != null)
-                && (getVisibility() == View.VISIBLE) && mZoomEnabled) {
+        if ((mZoomButtonsController != null) && (getVisibility() == View.VISIBLE) && mZoomEnabled) {
             mZoomButtonsController.setVisible(true);
         }
     }
@@ -407,16 +392,13 @@ public class MapView extends SurfaceView {
     public void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "onCreate");
         if (savedInstanceState != null) {
-            setCenterCoordinate((LonLat) savedInstanceState
-                    .getParcelable(STATE_CENTER_COORDINATE));
+            setCenterCoordinate((LonLat) savedInstanceState.getParcelable(STATE_CENTER_COORDINATE));
             setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL)); // need to set zoom level first because of limitation on rotating when zoomed out
             setDirection(savedInstanceState.getDouble(STATE_CENTER_DIRECTION));
             setDirection(savedInstanceState.getDouble(STATE_DIRECTION));
             setZoomEnabled(savedInstanceState.getBoolean(STATE_ZOOM_ENABLED));
-            setScrollEnabled(savedInstanceState
-                    .getBoolean(STATE_SCROLL_ENABLED));
-            setRotateEnabled(savedInstanceState
-                    .getBoolean(STATE_ROTATE_ENABLED));
+            setScrollEnabled(savedInstanceState.getBoolean(STATE_SCROLL_ENABLED));
+            setRotateEnabled(savedInstanceState.getBoolean(STATE_ROTATE_ENABLED));
             setDebugActive(savedInstanceState.getBoolean(STATE_DEBUG_ACTIVE));
             setStyleUrl(savedInstanceState.getString(STATE_STYLE_URL));
             setAccessToken(savedInstanceState.getString(STATE_ACCESS_TOKEN));
@@ -492,8 +474,7 @@ public class MapView extends SurfaceView {
 
         // Register for connectivity changes
         mConnectivityReceiver = new ConnectivityReceiver();
-        mContext.registerReceiver(mConnectivityReceiver,
-                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        mContext.registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         mNativeMapView.resume();
     }
@@ -534,8 +515,7 @@ public class MapView extends SurfaceView {
                 int height) {
             Log.v(TAG, "surfaceChanged");
             Log.i(TAG, "resize " + format + " " + width + " " + height);
-            mNativeMapView.resize((int) (width / mScreenDensity), (int) (height / mScreenDensity),
-                    mScreenDensity, width, height);
+            mNativeMapView.resize((int) (width / mScreenDensity), (int) (height / mScreenDensity), mScreenDensity, width, height);
         }
     }
 
@@ -597,15 +577,13 @@ public class MapView extends SurfaceView {
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         // Check and ignore non touch or left clicks
-        if ((event.getButtonState() != 0)
-                && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
+        if ((event.getButtonState() != 0) && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
             return false;
         }
 
         // Check two finger gestures first
-        boolean rotateRetVal = false;
+        mMoveGestureDetector.onTouchEvent(event);
         mRotateGestureDetector.onTouchEvent(event);
-        boolean scaleRetVal = false;
         mScaleGestureDetector.onTouchEvent(event);
 
         // Handle two finger tap
@@ -627,13 +605,10 @@ public class MapView extends SurfaceView {
             // First pointer up
             long tapInterval = event.getEventTime() - event.getDownTime();
             boolean isTap = tapInterval <= ViewConfiguration.getTapTimeout();
-            boolean inProgress = mRotateGestureDetector.isInProgress()
-                    || mScaleGestureDetector.isInProgress();
+            boolean inProgress = mRotateGestureDetector.isInProgress() || mScaleGestureDetector.isInProgress();
 
             if (mTwoTap && isTap && !inProgress) {
-                PointF focalPoint = TwoFingerGestureDetector
-                        .determineFocalPoint(event);
-                zoom(false, focalPoint.x, focalPoint.y);
+                zoom(false, mMoveGestureDetector.getFocusX(), mMoveGestureDetector.getFocusY());
                 mTwoTap = false;
                 return true;
             }
@@ -646,10 +621,7 @@ public class MapView extends SurfaceView {
             break;
         }
 
-        // Do not change this code! It will break very easily.
-        // TODO fix up these warnings
-        boolean retVal = rotateRetVal || scaleRetVal;
-        retVal = mGestureDetector.onTouchEvent(event) || retVal;
+        boolean retVal = mGestureDetector.onTouchEvent(event);
         return retVal || super.onTouchEvent(event);
     }
 
@@ -724,16 +696,15 @@ public class MapView extends SurfaceView {
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
-            mNativeMapView.moveBy(velocityX * duration / 2.0 / mScreenDensity, velocityY *
-                duration / 2.0 / mScreenDensity, duration);
+            mNativeMapView.moveBy(velocityX * duration / 2.0 / mScreenDensity, velocityY * duration / 2.0 / mScreenDensity, duration);
 
             return true;
         }
 
         // Called for drags
+        // TODO use MoveGestureDetector
         @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2,
-                float distanceX, float distanceY) {
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (!mScrollEnabled) {
                 return false;
             }
@@ -749,8 +720,7 @@ public class MapView extends SurfaceView {
     }
 
     // This class handles two finger gestures
-    private class ScaleGestureListener extends
-            ScaleGestureDetector.SimpleOnScaleGestureListener {
+    private class ScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
         long mBeginTime = 0;
         float mScaleFactor = 1.0f;
@@ -807,18 +777,16 @@ public class MapView extends SurfaceView {
             mNativeMapView.cancelTransitions();
 
             // Scale the map
-            mNativeMapView.scaleBy(detector.getScaleFactor(),
-                    detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
+            mNativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
 
             return true;
         }
     }
 
-    // This class handles two rotate gestures
+    // This class handles two finger rotate gestures
     // TODO need way to single finger rotate - need to research how google maps
     // does this - for phones with single touch, or when using mouse etc
-    private class RotateGestureListener extends
-            RotateGestureDetector.SimpleOnRotateGestureListener {
+    private class RotateGestureListener extends RotateGestureDetector.SimpleOnRotateGestureListener {
 
         long mBeginTime = 0;
         float mTotalAngle = 0.0f;
@@ -878,17 +846,20 @@ public class MapView extends SurfaceView {
             // Rotate the map
             double bearing = mNativeMapView.getBearing();
             bearing += detector.getRotationDegreesDelta();
-            mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity,
-                    detector.getFocusY() / mScreenDensity);
+            mNativeMapView.setBearing(bearing, mMoveGestureDetector.getFocusX() / mScreenDensity, mMoveGestureDetector.getFocusY() / mScreenDensity);
 
             return true;
         }
     }
 
+    // This class handles two finger moves during rotation
+    private class MoveGestureListener extends MoveGestureDetector.SimpleOnMoveGestureListener {
+
+    }
+
     // This class handles input events from the zoom control buttons
     // Zoom controls allow single touch only devices to zoom in and out
-    private class OnZoomListener implements
-            ZoomButtonsController.OnZoomListener {
+    private class OnZoomListener implements ZoomButtonsController.OnZoomListener {
 
         // Not used
         @Override
@@ -1146,8 +1117,7 @@ public class MapView extends SurfaceView {
                 float scrollDist = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
 
                 // Scale the map by the appropriate power of two factor
-                mNativeMapView.scaleBy(Math.pow(2.0, scrollDist), event.getX() / mScreenDensity,
-                        event.getY() / mScreenDensity);
+                mNativeMapView.scaleBy(Math.pow(2.0, scrollDist), event.getX() / mScreenDensity, event.getY() / mScreenDensity);
 
                 return true;
 
@@ -1198,8 +1168,7 @@ public class MapView extends SurfaceView {
         public void onReceive(Context context, Intent intent) {
             Log.v(TAG, "ConnectivityReceiver.onReceive: action = " + intent.getAction());
             if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-                boolean noConnectivity = intent.getBooleanExtra(
-                        ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+                boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
                 onConnectivityChanged(!noConnectivity);
             }
         }
@@ -1235,7 +1204,6 @@ public class MapView extends SurfaceView {
     // Called via JNI from NativeMapView
     // Need to update anything that relies on map state
     protected void onMapChanged() {
-        //Log.v(TAG, "onMapChanged");
         if (mOnMapChangedListener != null) {
             mOnMapChangedListener.onMapChanged();
         }
