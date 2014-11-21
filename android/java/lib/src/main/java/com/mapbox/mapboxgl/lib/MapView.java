@@ -14,13 +14,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.ScaleGestureDetectorCompat;
+import android.view.GestureDetector;
+import android.view.ScaleGestureDetector;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -70,7 +72,7 @@ public class MapView extends SurfaceView {
     private float mScreenDensity = 1.0f;
 
     // Touch gesture detectors
-    private GestureDetector mGestureDetector;
+    private GestureDetectorCompat mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
     private RotateGestureDetector mRotateGestureDetector;
     private boolean mTwoTap = false;
@@ -185,10 +187,11 @@ public class MapView extends SurfaceView {
         getHolder().addCallback(new Callbacks());
 
         // Touch gesture detectors
-        mGestureDetector = new GestureDetector(context, new GestureListener());
+        mGestureDetector = new GestureDetectorCompat(context, new GestureListener());
         mGestureDetector.setIsLongpressEnabled(true);
         mScaleGestureDetector = new ScaleGestureDetector(context,
                 new ScaleGestureListener());
+        ScaleGestureDetectorCompat.setQuickScaleEnabled(mScaleGestureDetector, true);
         mRotateGestureDetector = new RotateGestureDetector(context,
                 new RotateGestureListener());
 
@@ -829,7 +832,6 @@ public class MapView extends SurfaceView {
             }
 
             mBeginTime = detector.getEventTime();
-            Log.d("rotate", "rotate begin");
             return true;
         }
 
@@ -839,7 +841,6 @@ public class MapView extends SurfaceView {
             mBeginTime = 0;
             mTotalAngle = 0.0f;
             mStarted = false;
-            Log.d("rotate", "rotate end");
         }
 
         // Called each time one of the two fingers moves
@@ -850,16 +851,12 @@ public class MapView extends SurfaceView {
                 return false;
             }
 
-            Log.d("rotate", "rotate evt");
-
             // If rotate is large enough ignore a tap
             // TODO: Google Maps seem to use a velocity rather than absolute
             // value, up to a point then they always rotate
             mTotalAngle += detector.getRotationDegreesDelta();
-            Log.d("rotate", "ttl angle " + mTotalAngle);
             if ((mTotalAngle > 5.0f) || (mTotalAngle < -5.0f)) {
                 mStarted = true;
-                Log.d("rotate", "rotate started");
             }
 
             // Ignore short touches in case it is a tap
@@ -867,7 +864,6 @@ public class MapView extends SurfaceView {
             long time = detector.getEventTime();
             long interval = time - mBeginTime;
             if (!mStarted && (interval <= ViewConfiguration.getTapTimeout())) {
-                Log.d("rotate", "rotate ignored");
                 return false;
             }
 
@@ -882,7 +878,6 @@ public class MapView extends SurfaceView {
             // Rotate the map
             double bearing = mNativeMapView.getBearing();
             bearing += detector.getRotationDegreesDelta();
-            Log.d("rotate", "rotate to " + bearing);
             mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity,
                     detector.getFocusY() / mScreenDensity);
 
@@ -1108,7 +1103,7 @@ public class MapView extends SurfaceView {
             cancelled = false;
         }
 
-        // Cancel the timeoht
+        // Cancel the timeout
         public void cancel() {
             cancelled = true;
         }
@@ -1202,7 +1197,7 @@ public class MapView extends SurfaceView {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.v(TAG, "ConnectivityReceiver.onReceive: action = " + intent.getAction());
-            if (intent.getAction() == ConnectivityManager.CONNECTIVITY_ACTION) {
+            if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
                 boolean noConnectivity = intent.getBooleanExtra(
                         ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
                 onConnectivityChanged(!noConnectivity);
