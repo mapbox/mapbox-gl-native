@@ -61,9 +61,9 @@ void Source::load(Map& map, FileSource& fileSource) {
     });
 }
 
-bool Source::update(Map& map, GlyphAtlas& glyphAtlas, FileSource& fileSource) {
+bool Source::update(Map& map, GlyphAtlas& glyphAtlas, SpriteAtlas& spriteAtlas, FileSource& fileSource) {
     if (loaded && map.getTime() > updated) {
-        return updateTiles(map, glyphAtlas, fileSource);
+        return updateTiles(map, glyphAtlas, spriteAtlas, fileSource);
     } else {
         return false;
     }
@@ -159,7 +159,7 @@ TileData::State Source::hasTile(const Tile::ID& id) {
     return TileData::State::invalid;
 }
 
-TileData::State Source::addTile(Map& map, GlyphAtlas& glyphAtlas, FileSource& fileSource, const Tile::ID& id) {
+TileData::State Source::addTile(Map& map, GlyphAtlas& glyphAtlas, SpriteAtlas& spriteAtlas, FileSource& fileSource, const Tile::ID& id) {
     const TileData::State state = hasTile(id);
 
     if (state != TileData::State::invalid) {
@@ -187,7 +187,7 @@ TileData::State Source::addTile(Map& map, GlyphAtlas& glyphAtlas, FileSource& fi
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
         if (info->type == SourceType::Vector) {
-            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, glyphAtlas, info);
+            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, glyphAtlas, spriteAtlas, info);
         } else if (info->type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, map, info);
         } else {
@@ -281,7 +281,7 @@ bool Source::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::
     return false;
 }
 
-bool Source::updateTiles(Map& map, GlyphAtlas& glyphAtlas, FileSource& fileSource) {
+bool Source::updateTiles(Map& map, GlyphAtlas& glyphAtlas, SpriteAtlas& spriteAtlas, FileSource& fileSource) {
     bool changed = false;
 
     int32_t zoom = std::floor(getZoom(map.getState()));
@@ -298,7 +298,7 @@ bool Source::updateTiles(Map& map, GlyphAtlas& glyphAtlas, FileSource& fileSourc
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
     for (const Tile::ID& id : required) {
-        const TileData::State state = addTile(map, glyphAtlas, fileSource, id);
+        const TileData::State state = addTile(map, glyphAtlas, spriteAtlas, fileSource, id);
 
         if (state != TileData::State::parsed) {
             // The tile we require is not yet loaded. Try to find a parent or
