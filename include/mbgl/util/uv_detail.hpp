@@ -147,8 +147,8 @@ public:
         uv_worker_init(w, loop, count, name);
     }
     inline ~worker() {
-        uv_worker_close(w, [](uv_worker_t *worker) {
-            delete worker;
+        uv_worker_close(w, [](uv_worker_t *worker_) {
+            delete worker_;
         });
     }
     inline void add(void *data, uv_worker_cb work_cb, uv_worker_after_cb after_work_cb) {
