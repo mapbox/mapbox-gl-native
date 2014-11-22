@@ -159,6 +159,7 @@ clean: clear_xcode_cache
 	-rm -rf ./config.gypi ./config-ios.gypi ./config-android.gypi
 	-rm -rf ./android/java/build ./android/java/app/build ./android/java/lib/build
 	-rm -rf ./android/java/lib/src/main/jniLibs ./android/java/lib/src/main/assets
+	-rm -f ./android/test/features.zip
 
 distclean: clean
 	-rm -rf ./mason_packages

@@ -9,6 +9,9 @@ git submodule update --init styles
 if [[ $MASON_PLATFORM == "android" ]]; then
     mapbox_time "compile_program" \
     make android -j$JOBS BUILDTYPE=${BUILDTYPE}
+    
+    mapbox_time "upload_testmunk" \
+    ./scripts/upload_testmunk.sh
 elif [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #
     # build & test Linux
