@@ -409,6 +409,10 @@ public class MapView extends SurfaceView {
             mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
         }
 
+        if (mNativeMapView.getAccessToken().isEmpty()) {
+            throw new RuntimeException("Using MapView requires setting an access key.");
+        }
+
         mNativeMapView.initializeDisplay();
         mNativeMapView.initializeContext();
         mNativeMapView.start();
