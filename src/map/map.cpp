@@ -426,7 +426,7 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     style->loadJSON((const uint8_t *)styleJSON.c_str());
     if (!fileSource) {
         fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
-        glyphStore = std::make_shared<GlyphStore>(fileSource);
+        glyphStore = std::make_shared<GlyphStore>(*fileSource);
     }
     fileSource->setBase(base);
     glyphStore->setURL(util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken()));
@@ -464,7 +464,7 @@ util::ptr<Sprite> Map::getSprite() {
     const float pixelRatio = state.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
     if (!sprite || sprite->pixelRatio != pixelRatio) {
-        sprite = Sprite::Create(sprite_url, pixelRatio, fileSource);
+        sprite = Sprite::Create(sprite_url, pixelRatio, *fileSource);
     }
 
     return sprite;
@@ -715,7 +715,7 @@ void Map::updateSources() {
         if (style_source->enabled) {
             if (!style_source->source) {
                 style_source->source = std::make_shared<Source>(style_source->info);
-                style_source->source->load(*this);
+                style_source->source->load(*this, *fileSource);
             }
         } else {
             style_source->source.reset();
@@ -750,14 +750,14 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
 
 void Map::updateTiles() {
     for (const util::ptr<StyleSource> &source : getActiveSources()) {
-        source->source->update(*this);
+        source->source->update(*this, *fileSource);
     }
 }
 
 void Map::prepare() {
     if (!fileSource) {
         fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
-        glyphStore = std::make_shared<GlyphStore>(fileSource);
+        glyphStore = std::make_shared<GlyphStore>(*fileSource);
     }
 
     if (!style) {

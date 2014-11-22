@@ -22,7 +22,7 @@ SpritePosition::SpritePosition(uint16_t x_, uint16_t y_, uint16_t width_, uint16
       sdf(sdf_) {
 }
 
-util::ptr<Sprite> Sprite::Create(const std::string& base_url, float pixelRatio, const util::ptr<FileSource> &fileSource) {
+util::ptr<Sprite> Sprite::Create(const std::string& base_url, float pixelRatio, FileSource& fileSource) {
     util::ptr<Sprite> sprite(std::make_shared<Sprite>(Key(), base_url, pixelRatio));
     sprite->load(fileSource);
     return sprite;
@@ -51,7 +51,7 @@ Sprite::operator bool() const {
 // Note: This is a separate function that must be called exactly once after creation
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
-void Sprite::load(const util::ptr<FileSource> &fileSource) {
+void Sprite::load(FileSource& fileSource) {
     if (!valid) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
         loadedImage = true;
@@ -62,7 +62,7 @@ void Sprite::load(const util::ptr<FileSource> &fileSource) {
 
     util::ptr<Sprite> sprite = shared_from_this();
 
-    fileSource->request(ResourceType::JSON, jsonURL)->onload([sprite](const Response &res) {
+    fileSource.request(ResourceType::JSON, jsonURL)->onload([sprite](const Response &res) {
         if (res.code == 200) {
             sprite->body = res.data;
             sprite->parseJSON();
@@ -75,7 +75,7 @@ void Sprite::load(const util::ptr<FileSource> &fileSource) {
         }
     });
 
-    fileSource->request(ResourceType::Image, spriteURL)->onload([sprite](const Response &res) {
+    fileSource.request(ResourceType::Image, spriteURL)->onload([sprite](const Response &res) {
         if (res.code == 200) {
             sprite->image = res.data;
             sprite->parseImage();
