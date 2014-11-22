@@ -38,7 +38,10 @@ esac
 
 function abort { >&2 echo -e "\033[1m\033[31m$1\033[0m"; exit 1; }
 
-PYTHON=`which python || abort 'Cannot find python'`
+PYTHON=`
+(which python2 &> /dev/null && which python2) ||
+(which python &> /dev/null && which python) ||
+abort 'Cannot find python'`
 
 >&2 echo -en "\033[1m\033[32m* Using "
 >&2 ${PYTHON} --version
