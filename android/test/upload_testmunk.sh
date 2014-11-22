@@ -12,11 +12,11 @@ echo "uploading features"
 echo
 
 zip -r features.zip features/
-curl -H 'Accept: application/vnd.testmunk.v1+json' -F 'file=@features.zip' 'https://${TESTMUNK_KEY}@api.testmunk.com/apps/${APP_NAME}/testcases'
+curl -H 'Accept: application/vnd.testmunk.v1+json' -F 'file=@features.zip' 'https://${TESTMUNK_KEY}@api.testmunk.com/apps/${APP_NAME}/testcases' | jq '.'
 
 echo "uploading apk"
 echo
 
 cd `dirname ${APK_PATH}`
-curl -H 'Accept: application/vnd.testmunk.v1+json' -F 'file=@`basename ${APK_PATH}`' -F 'email=leith@mapbox.com' -F 'autoStart=true' -F 'public=true' 'https://${TESTMUNK_KEY}@api.testmunk.com/apps/${APP_NAME}/testruns'
+curl -H 'Accept: application/vnd.testmunk.v1+json' -F 'file=@`basename ${APK_PATH}`' -F 'email=leith@mapbox.com' -F 'autoStart=true' -F 'public=true' 'https://${TESTMUNK_KEY}@api.testmunk.com/apps/${APP_NAME}/testruns' | jq '.'
 cd -
