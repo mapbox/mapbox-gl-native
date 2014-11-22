@@ -362,7 +362,7 @@ public class MapView extends SurfaceView {
         // TODO
     }
 
-    List<String> getAppliedStyleClasses() {
+    public List<String> getAppliedStyleClasses() {
         return mNativeMapView.getAppliedClasses();
     }
 
