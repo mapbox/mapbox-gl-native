@@ -95,10 +95,6 @@ Map::Map(View& view_)
       async_terminate(new uv_async_t()),
       async_render(new uv_async_t()),
       async_cleanup(new uv_async_t()),
-      mutex_run(std::make_unique<uv::mutex>()),
-      cond_run(std::make_unique<uv::cond>()),
-      mutex_pause(std::make_unique<uv::mutex>()),
-      cond_pause(std::make_unique<uv::cond>()),
       view(view_),
 #ifndef NDEBUG
       main_thread(uv_thread_self()),
@@ -228,19 +224,18 @@ void Map::stop(stop_callback cb, void *data) {
 void Map::pause(bool wait_for_pause) {
     assert(uv_thread_self() == main_thread);
     assert(async);
-    mutex_run->lock();
+    mutex_run.lock();
     pausing = true;
-    mutex_run->unlock();
+    mutex_run.unlock();
 
     uv_stop(**loop);
     rerender(); // Needed to ensure uv_stop is seen and uv_run exits, otherwise we deadlock on wait_for_pause
 
     if (wait_for_pause) {
-        mutex_pause->lock();
+        std::unique_lock<std::mutex> lock_pause (mutex_pause);
         while (!is_paused) {
-            cond_pause->wait(*mutex_pause);
+            cond_pause.wait(lock_pause);
         }
-        mutex_pause->unlock();
     }
 }
 
@@ -248,10 +243,10 @@ void Map::resume() {
     assert(uv_thread_self() == main_thread);
     assert(async);
 
-    mutex_run->lock();
+    mutex_run.lock();
     pausing = false;
-    cond_run->broadcast();
-    mutex_run->unlock();
+    cond_run.notify_all();
+    mutex_run.unlock();
 }
 
 void Map::run() {
@@ -297,25 +292,23 @@ void Map::run() {
 }
 
 void Map::check_for_pause() {
-    mutex_run->lock();
+    std::unique_lock<std::mutex> lock_run (mutex_run);
     while (pausing) {
         view.make_inactive();
 
-        mutex_pause->lock();
+        mutex_pause.lock();
         is_paused = true;
-        cond_pause->broadcast();
-        mutex_pause->unlock();
+        cond_pause.notify_all();
+        mutex_pause.unlock();
 
-        cond_run->wait(*mutex_run);
+        cond_run.wait(lock_run);
 
         view.make_active();
     }
 
-    mutex_pause->lock();
+    mutex_pause.lock();
     is_paused = false;
-    mutex_pause->unlock();
-
-    mutex_run->unlock();
+    mutex_pause.unlock();
 }
 
 void Map::rerender() {
