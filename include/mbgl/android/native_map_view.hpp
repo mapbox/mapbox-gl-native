@@ -16,8 +16,7 @@ class NativeMapView;
 
 class MBGLView: public mbgl::View, private mbgl::util::noncopyable {
 public:
-    explicit MBGLView(NativeMapView& nativeView_) :
-            nativeView(nativeView_) {
+    explicit MBGLView(NativeMapView& nativeView_) : nativeView(nativeView_) {
     }
 
     void make_active() override;
@@ -61,8 +60,7 @@ public:
     void notifyMapChange();
 
 private:
-    EGLConfig chooseConfig(const EGLConfig configs[], EGLint num_configs,
-            bool use565) const;
+    EGLConfig chooseConfig(const EGLConfig configs[], EGLint num_configs) const;
 
     void loadExtensions();
 

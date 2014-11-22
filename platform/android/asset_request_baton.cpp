@@ -77,8 +77,7 @@ void AssetRequestBaton::run(uv_async_t *async) {
     }
 
     struct zip_stat stat;
-    if ((zip_stat(ptr->apk, apk_file_path.c_str(), ZIP_FL_NOCASE, &stat) != 0) ||
-            ptr->canceled || !ptr->request) {
+    if ((zip_stat(ptr->apk, apk_file_path.c_str(), ZIP_FL_NOCASE, &stat) != 0) || ptr->canceled || !ptr->request) {
         // Stating failed or was canceled. We already have an open file handle
         // though, which we'll have to close.
         notify_error(async, 500, zip_strerror(ptr->apk));
@@ -92,8 +91,7 @@ void AssetRequestBaton::run(uv_async_t *async) {
 
     const std::unique_ptr<char[]> data = boost::make_unique<char[]>(stat.size);
 
-    if (static_cast<zip_uint64_t>(zip_fread(ptr->apk_file, reinterpret_cast<void *>(data.get()), stat.size)) != stat.size ||
-            ptr->canceled || !ptr->request) {
+    if (static_cast<zip_uint64_t>(zip_fread(ptr->apk_file, reinterpret_cast<void *>(data.get()), stat.size)) != stat.size || ptr->canceled || !ptr->request) {
         // Reading failed or was canceled. We already have an open file handle
         // though, which we'll have to close.
         notify_error(async, 500, zip_file_strerror(ptr->apk_file));

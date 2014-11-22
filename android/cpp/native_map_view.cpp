@@ -1,5 +1,7 @@
 #include <cstdlib>
 #include <memory>
+#include <list>
+#include <tuple>
 
 #include <boost/make_unique.hpp>
 
@@ -34,14 +36,10 @@ void log_gl_string(GLenum name, const char* label) {
     }
 }
 
-
 void MBGLView::make_active() {
     mbgl::Log::Debug(mbgl::Event::Android, "MBGLView::make_active");
-    if ((nativeView.display != EGL_NO_DISPLAY)
-            && (nativeView.surface != EGL_NO_SURFACE)
-            && (nativeView.context != EGL_NO_CONTEXT)) {
-        if (!eglMakeCurrent(nativeView.display, nativeView.surface,
-                nativeView.surface, nativeView.context)) {
+    if ((nativeView.display != EGL_NO_DISPLAY) && (nativeView.surface != EGL_NO_SURFACE) && (nativeView.context != EGL_NO_CONTEXT)) {
+        if (!eglMakeCurrent(nativeView.display, nativeView.surface, nativeView.surface, nativeView.context)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d", eglGetError());
         }
     } else {
@@ -51,18 +49,15 @@ void MBGLView::make_active() {
 
 void MBGLView::make_inactive() {
     mbgl::Log::Debug(mbgl::Event::Android, "MBGLView::make_inactive");
-    if (!eglMakeCurrent(nativeView.display, EGL_NO_SURFACE, EGL_NO_SURFACE,
-            EGL_NO_CONTEXT)) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
-                eglGetError());
+    if (!eglMakeCurrent(nativeView.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
     }
 }
 
 void MBGLView::swap() {
     mbgl::Log::Debug(mbgl::Event::Android, "MBGLView::swap");
 
-    if (map->needsSwap() && (nativeView.display != EGL_NO_DISPLAY)
-            && (nativeView.surface != EGL_NO_SURFACE)) {
+    if (map->needsSwap() && (nativeView.display != EGL_NO_DISPLAY) && (nativeView.surface != EGL_NO_SURFACE)) {
         if (!eglSwapBuffers(nativeView.display, nativeView.surface)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d", eglGetError());
         }
@@ -160,14 +155,11 @@ bool NativeMapView::initializeDisplay() {
         mbgl::Log::Warning(mbgl::Event::Android, "In emulator! Enabling hacks :-(");
     }
 
-    // Try 565 first (faster)
-    bool use565 = true;
+    // Get all configs at least RGB 565 with 16 depth and 8 stencil
     EGLint config_attribs[] = {
         EGL_CONFIG_CAVEAT, EGL_NONE,
         EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-        //EGL_CONFORMANT, EGL_OPENGL_ES2_BIT, // Emulator does not support this, in here, but will return conformant anyway, what?
         EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-        //EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER, // Emulator does not support this, what?
         EGL_BUFFER_SIZE, 16,
         EGL_RED_SIZE, 5,
         EGL_GREEN_SIZE, 6,
@@ -185,35 +177,19 @@ bool NativeMapView::initializeDisplay() {
         return false;
     }
     if (num_configs < 1) {
-        mbgl::Log::Warning(mbgl::Event::OpenGL, "eglChooseConfig() returned no configs for 565");
-
-        // Now try 8888
-        use565 = false;
-        config_attribs[5] = 32; // EGL_BUFFER_SIZE // Ensure we get 32bit color buffer on Tegra, 24 bit will be sorted first without it (slow software mode)
-        config_attribs[7] = 8; // EGL_RED_SIZE
-        config_attribs[9] = 8; // EGL_GREEN_SIZE
-        config_attribs[11] = 8; // EGL_BLUE_SIZE
-        if (!eglChooseConfig(display, config_attribs, nullptr, 0, &num_configs)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig(NULL) returned error %d", eglGetError());
-            terminateDisplay();
-            return false;
-        }
-        if (num_configs < 1) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig() returned no configs for 8888");
-            terminateDisplay();
-            return false;
-        }
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig() returned no configs.");
+        terminateDisplay();
+        return false;
     }
 
     const std::unique_ptr<EGLConfig[]> configs = boost::make_unique<EGLConfig[]>(num_configs); //  switch to std::make_unique in C++14
-    if (!eglChooseConfig(display, config_attribs, configs.get(), num_configs,
-            &num_configs)) {
+    if (!eglChooseConfig(display, config_attribs, configs.get(), num_configs, &num_configs)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig() returned error %d", eglGetError());
         terminateDisplay();
         return false;
     }
 
-    config = chooseConfig(configs.get(), num_configs, use565);
+    config = chooseConfig(configs.get(), num_configs);
     if (config == nullptr) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "No config chosen");
         terminateDisplay();
@@ -242,8 +218,7 @@ void NativeMapView::terminateDisplay() {
             surface = EGL_NO_SURFACE;
         }
 
-        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
-                EGL_NO_CONTEXT)) {
+        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
                     eglGetError());
         }
@@ -269,8 +244,7 @@ bool NativeMapView::initializeContext() {
         EGL_CONTEXT_CLIENT_VERSION, 2,
         EGL_NONE
     };
-    context = eglCreateContext(display, config, EGL_NO_CONTEXT,
-            context_attribs);
+    context = eglCreateContext(display, config, EGL_NO_CONTEXT, context_attribs);
     if (context == EGL_NO_CONTEXT) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateContext() returned error %d", eglGetError());
         terminateContext();
@@ -284,8 +258,7 @@ void NativeMapView::terminateContext() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::terminateContext");
 
     if (display != EGL_NO_DISPLAY) {
-        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
-                EGL_NO_CONTEXT)) {
+        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
                     eglGetError());
         }
@@ -339,10 +312,8 @@ bool NativeMapView::createSurface(ANativeWindow* window_) {
 
         loadExtensions();
 
-        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE,
-                EGL_NO_CONTEXT)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
-                    eglGetError());
+        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
         }
     }
 
@@ -370,137 +341,155 @@ void NativeMapView::destroySurface() {
     }
 }
 
-EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[],
-        EGLint num_configs, bool use565) const {
+typedef enum {
+    Format16Bit = 0,
+    Format32BitNoAlpha = 1,
+    Format32BitAlpha = 2,
+    Format24Bit = 3,
+    Unknown = 4
+} BufferFormat;
+
+// Tuple is <format, depth, is_not_conformant, is_caveat, config_num, config_id>
+typedef std::tuple<BufferFormat, EGLint, bool, bool, int, EGLConfig> ConfigProperties;
+
+EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_configs) const {
     mbgl::Log::Info(mbgl::Event::OpenGL, "Found %d configs", num_configs);
 
-    int chosen_config = -1;
-    bool is_caveat = false;
-    bool is_conformant = false;
+    // Create a list of configs that pass our filters
+    std::list<ConfigProperties> config_list;
     for (int i = 0; i < num_configs; i++) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Config %d:", i);
 
-        EGLint caveat, conformant, bits, red, green, blue, alpha, alpha_mask, depth, stencil,
-                sample_buffers, samples;
+        EGLint caveat, conformant, bits, red, green, blue, alpha, alpha_mask, depth, stencil, sample_buffers, samples;
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_CONFIG_CAVEAT, &caveat)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_CONFIG_CAVEAT) returned error %d",
-                    eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_CONFIG_CAVEAT) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_CONFORMANT, &conformant)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_CONFORMANT) returned error %d",
-                    eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_CONFORMANT) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_BUFFER_SIZE, &bits)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_BUFFER_SIZE) returned error %d",
-                    eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_BUFFER_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_RED_SIZE, &red)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_RED_SIZE) returned error %d",
-                    eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_RED_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_GREEN_SIZE, &green)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_GREEN_SIZE) returned error %d",
-                    eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_GREEN_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_BLUE_SIZE, &blue)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_BLUE_SIZE) returned error %d",
-                    eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_BLUE_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_ALPHA_SIZE, &alpha)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_ALPHA_SIZE) returned error %d",
-                    eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_ALPHA_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
-        if (!eglGetConfigAttrib(display, configs[i], EGL_ALPHA_MASK_SIZE,
-                &alpha_mask)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_ALPHA_MASK_SIZE) returned error %d",
-                    eglGetError());
+        if (!eglGetConfigAttrib(display, configs[i], EGL_ALPHA_MASK_SIZE, &alpha_mask)) {
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_ALPHA_MASK_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_DEPTH_SIZE, &depth)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_DEPTH_SIZE) returned error %d",
-                    eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_DEPTH_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
-        if (!eglGetConfigAttrib(display, configs[i], EGL_STENCIL_SIZE,
-                &stencil)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_STENCIL_SIZE) returned error %d",
-                    eglGetError());
+        if (!eglGetConfigAttrib(display, configs[i], EGL_STENCIL_SIZE, &stencil)) {
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_STENCIL_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
-        if (!eglGetConfigAttrib(display, configs[i], EGL_SAMPLE_BUFFERS,
-                &sample_buffers)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_SAMPLE_BUFFERS) returned error %d",
-                    eglGetError());
+        if (!eglGetConfigAttrib(display, configs[i], EGL_SAMPLE_BUFFERS, &sample_buffers)) {
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_SAMPLE_BUFFERS) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_SAMPLES, &samples)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_SAMPLES) returned error %d",
-                    eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_SAMPLES) returned error %d", eglGetError());
             return nullptr;
         }
 
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Caveat: %d", caveat);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Conformant: %d", conformant);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Color: %d", bits);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Red: %d", red);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Green: %d", green);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Blue: %d", blue);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Alpha: %d", alpha);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Alpha mask: %d", alpha_mask);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Depth: %d", depth);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Stencil: %d", stencil);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Sample buffers: %d", sample_buffers);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Samples: %d", samples);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "   Caveat: %d", caveat);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "   Conformant: %d", conformant);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "   Color: %d", bits);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "   Red: %d", red);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "   Green: %d", green);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "   Blue: %d", blue);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "   Alpha: %d", alpha);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "   Alpha mask: %d", alpha_mask);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "   Depth: %d", depth);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "   Stencil: %d", stencil);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "   Sample buffers: %d", sample_buffers);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "   Samples: %d", samples);
 
         bool config_ok = true;
-        config_ok &= bits == (use565 ? 16 : 32);
-        config_ok &= red == (use565 ? 5 : 8);
-        config_ok &= green == (use565 ? 6 : 8);
-        config_ok &= blue == (use565 ? 5 : 8);
-        config_ok &= (alpha == 0) || (alpha == 8); // Can be either 0 for RGBX or 8 for RGBA but we don't care either way
         config_ok &= (depth == 24) || (depth == 16);
         config_ok &= stencil == 8;
         config_ok &= sample_buffers == 0;
         config_ok &= samples == 0;
 
-        if (config_ok) { // Choose the last matching config, that way we get RGBX if possible (since it is sorted highest to lowest bits)
-            chosen_config = i;
-            is_conformant = (conformant & EGL_OPENGL_ES2_BIT) == EGL_OPENGL_ES2_BIT;
-            is_caveat = caveat != EGL_NONE;
+        // Filter our configs first for depth, stencil and anti-aliasing
+        if (config_ok) {
+            // Work out the config's buffer format
+            BufferFormat buffer_format;
+            if ((bits == 16) && (red == 5) && (green == 6) && (blue == 5) && (alpha == 0)) {
+                buffer_format = Format16Bit;
+            } else if ((bits == 32) && (red == 8) && (green == 8) && (blue == 8) && (alpha == 0)) {
+                buffer_format = Format32BitNoAlpha;
+            } else if ((bits == 32) && (red == 8) && (green == 8) && (blue == 8) && (alpha == 8)) {
+                buffer_format = Format32BitAlpha;
+            } else if ((bits == 24) && (red == 8) && (green == 8) && (blue == 8) && (alpha == 0)) {
+                buffer_format = Format24Bit;
+            } else {
+                buffer_format = Unknown;
+            }
+
+            bool is_not_conformant = (conformant & EGL_OPENGL_ES2_BIT) != EGL_OPENGL_ES2_BIT;
+            bool is_caveat = caveat != EGL_NONE;
+            EGLConfig config_id = configs[i];
+
+            // Ignore formats we don't recognise
+            if (format != Unknown)
+            {
+                config_list.push_back(std::make_tuple(buffer_format, depth, is_not_conformant, is_caveat, i, config_id));
+            }
         }
     }
 
-    mbgl::Log::Debug(mbgl::Event::OpenGL, "Chosen config is %d", chosen_config);
-    if (chosen_config >= 0) {
-        return configs[chosen_config];
-    } else {
-        return nullptr;
+    if (config_list.empty()) {
+        mbgl::Log::Error(mbgl::Event::OpenGL, "Config list was empty.");
     }
-    if (!is_caveat) {
+
+    // Sort the configs to find the best one
+    config_list.sort();
+    bool is_conformant = !std::get<2>(config_list.front());
+    bool is_caveat = std::get<3>(config_list.front());
+    int config_num = std::get<4>(config_list.front());
+    EGLConfig config_id = std::get<5>(config_list.front());
+
+    mbgl::Log::Debug(mbgl::Event::OpenGL, "Chosen config is %d", config_num);
+
+    if (is_caveat) {
         mbgl::Log::Warning(mbgl::Event::OpenGL, "Chosen config has a caveat.");
     }
     if (!is_conformant) {
         mbgl::Log::Warning(mbgl::Event::OpenGL, "Chosen config is not conformant.");
     }
+
+    return config_id;
 }
 
 void NativeMapView::start() {
