@@ -7,9 +7,9 @@ matrix:
     - os: linux
       env: BUILDTYPE=Release JOBS=16 MASON_PLATFORM=android
       compiler: clang
-    - os: linux
-      env: BUILDTYPE=Debug JOBS=16 MASON_PLATFORM=android
-      compiler: clang
+#    - os: linux
+#      env: BUILDTYPE=Debug JOBS=16 MASON_PLATFORM=android
+#      compiler: clang
     - os: linux
       env: BUILDTYPE=Release JOBS=16
       compiler: clang
@@ -22,12 +22,12 @@ matrix:
     - os: linux
       env: BUILDTYPE=Debug JOBS=8
       compiler: gcc
-    - os: osx
-      env: BUILDTYPE=Release JOBS=8 MASON_PLATFORM=android
-      compiler: clang
-    - os: osx
-      env: BUILDTYPE=Debug JOBS=8 MASON_PLATFORM=android
-      compiler: clang
+#    - os: osx
+#      env: BUILDTYPE=Release JOBS=8 MASON_PLATFORM=android
+#      compiler: clang
+#    - os: osx
+#      env: BUILDTYPE=Debug JOBS=8 MASON_PLATFORM=android
+#      compiler: clang
     - os: osx
       env: BUILDTYPE=Release JOBS=8
       compiler: clang
