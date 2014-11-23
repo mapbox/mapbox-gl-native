@@ -1,7 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
-    tools:context="${packageName}.${activityClass}"
-    android:name="com.mapbox.mapboxgl.app.MapFragment"
-    android:id="@+id/map_fragment"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_main"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary">
+
+        <Spinner
+            android:id="@+id/spinner_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </android.support.v7.widget.Toolbar>
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+        tools:context="${packageName}.${activityClass}"
+        android:name="com.mapbox.mapboxgl.app.MapFragment"
+        android:id="@+id/fragment_map"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent" />
+</LinearLayout>

@@ -60,7 +60,6 @@ public class MapView extends SurfaceView {
     private static final String STATE_APPLIED_CLASSES = "appliedClasses";
     private static final String STATE_DEFAULT_TRANSITION_DURATION = "defaultTransitionDuration";
 
-
     //
     // Instance members
     //
@@ -161,7 +160,9 @@ public class MapView extends SurfaceView {
             setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scrollEnabled, true));
             setRotateEnabled(typedArray.getBoolean(R.styleable.MapView_rotateEnabled, true));
             setDebugActive(typedArray.getBoolean(R.styleable.MapView_debugActive, false));
-            setStyleUrl(typedArray.getString(R.styleable.MapView_styleUrl));
+            if (typedArray.getString(R.styleable.MapView_styleUrl) != null) {
+                setStyleUrl(typedArray.getString(R.styleable.MapView_styleUrl));
+            }
         } finally {
             typedArray.recycle();
         }

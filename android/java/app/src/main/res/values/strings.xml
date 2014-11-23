@@ -3,4 +3,13 @@
 
     <string name="app_name">Mapbox GL</string>
 
+    <string-array name="style_list">
+        <item>Basic</item>
+        <item>Bright</item>
+        <item>Outdoors (Vector)</item>
+        <item>Outdoors (Raster)</item>
+        <item>Pencil</item>
+        <item>Satellite</item>
+    </string-array>
+
 </resources>

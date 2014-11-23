@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxgl.lib.LonLat;
 import com.mapbox.mapboxgl.lib.MapView;
 
 public class MapFragment extends Fragment {
@@ -19,8 +18,12 @@ public class MapFragment extends Fragment {
     // Tag used for logging
     private static final String TAG = "MapFragment";
 
+    //
+    // Instance members
+    //
+
     // The map
-    private MapView mMapView;
+    private MapView mMap;
 
     //
     // Lifecycle events
@@ -33,16 +36,16 @@ public class MapFragment extends Fragment {
         Log.v(TAG, "onCreateView");
 
         // Create the map
-        mMapView = (MapView) inflater.inflate(R.layout.fragment_main, container, true);
+        mMap = (MapView) inflater.inflate(R.layout.fragment_main, container, true);
 
         // Load the API key
-        mMapView.setAccessToken("pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ");
+        mMap.setAccessToken("pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ");
 
         // Need to pass on any saved state to the map
-        mMapView.onCreate(savedInstanceState);
+        mMap.onCreate(savedInstanceState);
 
         // Return the map as the root view
-        return mMapView;
+        return mMap;
     }
 
     // Called when the fragment is destroyed
@@ -52,8 +55,8 @@ public class MapFragment extends Fragment {
         Log.v(TAG, "onDestroyView");
 
         // Need to pass on to view
-        mMapView.onDestroy();
-        mMapView = null;
+        mMap.onDestroy();
+        mMap = null;
     }
 
     // Called when the fragment is visible
@@ -63,7 +66,7 @@ public class MapFragment extends Fragment {
         Log.v(TAG, "onStart");
 
         // Need to pass on to view
-        mMapView.onStart();
+        mMap.onStart();
     }
 
     // Called when the fragment is invisible
@@ -73,7 +76,7 @@ public class MapFragment extends Fragment {
         Log.v(TAG, "onStop");
 
         // Need to pass on to view
-        mMapView.onStop();
+        mMap.onStop();
     }
 
     // Called when the fragment is in the background
@@ -83,7 +86,7 @@ public class MapFragment extends Fragment {
         Log.v(TAG, "onPause");
 
         // Need to pass on to view
-        mMapView.onPause();
+        mMap.onPause();
     }
 
     // Called when the fragment is no longer in the background
@@ -93,7 +96,7 @@ public class MapFragment extends Fragment {
         Log.v(TAG, "onResume");
 
         // Need to pass on to view
-        mMapView.onResume();
+        mMap.onResume();
     }
 
     // Called before fragment is destroyed
@@ -102,7 +105,7 @@ public class MapFragment extends Fragment {
         Log.v(TAG, "onSaveInstanceState");
 
         // Need to retrieve any saved state from the map
-        mMapView.onSaveInstanceState(outState);
+        mMap.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -110,7 +113,7 @@ public class MapFragment extends Fragment {
     // Property methods
     //
 
-    public MapView getMapView() {
-        return mMapView;
+    public MapView getMap() {
+        return mMap;
     }
 }
