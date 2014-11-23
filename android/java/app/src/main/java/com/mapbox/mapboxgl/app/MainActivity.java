@@ -79,8 +79,10 @@ public class MainActivity extends ActionBarActivity {
                 LocationManager locationManager = (LocationManager)getSystemService(getApplicationContext().LOCATION_SERVICE);
                 String provider = locationManager.getBestProvider(new Criteria(), true);
                 Location location = locationManager.getLastKnownLocation(provider);
-                LonLatZoom coordinate = new LonLatZoom(location.getLongitude(), location.getLatitude(), 15);
-                mMapFragment.getMap().setCenterCoordinate(coordinate, true);
+                if (location != null) {
+                    LonLatZoom coordinate = new LonLatZoom(location.getLongitude(), location.getLatitude(), 15);
+                    mMapFragment.getMap().setCenterCoordinate(coordinate, true);
+                }
                 locationManager.requestSingleUpdate(provider, new MyLocationListener(), null);
                 return true;
 
