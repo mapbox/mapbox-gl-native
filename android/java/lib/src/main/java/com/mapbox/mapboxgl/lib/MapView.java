@@ -29,8 +29,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.ZoomButtonsController;
 
-import com.almeros.android.multitouch.MoveGestureDetector;
-import com.almeros.android.multitouch.RotateGestureDetector;
+import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
+import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +74,6 @@ public class MapView extends SurfaceView {
     private GestureDetectorCompat mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
     private RotateGestureDetector mRotateGestureDetector;
-    private MoveGestureDetector mMoveGestureDetector;
     private boolean mTwoTap = false;
 
     // Shows zoom buttons
@@ -183,7 +182,6 @@ public class MapView extends SurfaceView {
         mScaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureListener());
         ScaleGestureDetectorCompat.setQuickScaleEnabled(mScaleGestureDetector, true);
         mRotateGestureDetector = new RotateGestureDetector(context, new RotateGestureListener());
-        mMoveGestureDetector = new MoveGestureDetector(context, new MoveGestureListener());
 
         // Shows the zoom controls
         // But not when in Eclipse UI editor
@@ -587,7 +585,6 @@ public class MapView extends SurfaceView {
         }
 
         // Check two finger gestures first
-        mMoveGestureDetector.onTouchEvent(event);
         mRotateGestureDetector.onTouchEvent(event);
         mScaleGestureDetector.onTouchEvent(event);
 
@@ -613,7 +610,8 @@ public class MapView extends SurfaceView {
             boolean inProgress = mRotateGestureDetector.isInProgress() || mScaleGestureDetector.isInProgress();
 
             if (mTwoTap && isTap && !inProgress) {
-                zoom(false, mMoveGestureDetector.getFocusX(), mMoveGestureDetector.getFocusY());
+                PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
+                zoom(false, focalPoint.x, focalPoint.y);
                 mTwoTap = false;
                 return true;
             }
@@ -851,15 +849,10 @@ public class MapView extends SurfaceView {
             // Rotate the map
             double bearing = mNativeMapView.getBearing();
             bearing += detector.getRotationDegreesDelta();
-            mNativeMapView.setBearing(bearing, mMoveGestureDetector.getFocusX() / mScreenDensity, mMoveGestureDetector.getFocusY() / mScreenDensity);
+            mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
 
             return true;
         }
-    }
-
-    // This class handles two finger moves during rotation
-    private class MoveGestureListener extends MoveGestureDetector.SimpleOnMoveGestureListener {
-
     }
 
     // This class handles input events from the zoom control buttons
