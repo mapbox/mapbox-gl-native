@@ -62,14 +62,14 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             switch(position) {
-                // Basic
+                // Bright
                 case 0:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/basic-v6.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/bright-v6.json");
                     break;
 
-                // Bright
+                // Basic
                 case 1:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/bright-v6.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/basic-v6.json");
                     break;
 
                 // Outdoors (Vector)
