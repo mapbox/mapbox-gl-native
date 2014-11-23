@@ -91,6 +91,11 @@ public class MainActivity extends ActionBarActivity {
                 case 5:
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/satellite-v6.json");
                     break;
+
+                // Empty
+                case 6:
+                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/empty-v6.json");
+                    break;
             }
         }
 

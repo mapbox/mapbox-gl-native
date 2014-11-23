@@ -10,6 +10,7 @@
         <item>Outdoors (Raster)</item>
         <item>Pencil</item>
         <item>Satellite</item>
+        <item>Empty</item>
     </string-array>
 
 </resources>
