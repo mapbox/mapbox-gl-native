@@ -48,7 +48,7 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
 
         echo "debug: installing SDK"
         #mapbox_time "installing SDK" \
-        sudo apt-get -y install lib32stdc++6 lib32z1
+        sudo apt-get -y install lib32stdc++6 lib32z1 jq
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
     
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
