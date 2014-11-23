@@ -3,6 +3,8 @@
 
     <string name="app_name">Mapbox GL</string>
 
+    <string name="action_gps">Go to GPS location</string>
+
     <string-array name="style_list">
         <item>Bright</item>
         <item>Basic</item>

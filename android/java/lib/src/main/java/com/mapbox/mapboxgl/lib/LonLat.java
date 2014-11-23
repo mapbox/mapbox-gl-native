@@ -23,7 +23,7 @@ public class LonLat implements Parcelable {
         this.lat = lat;
     }
 
-    private LonLat(Parcel in) {
+    protected LonLat(Parcel in) {
         lon = in.readDouble();
         lat = in.readDouble();
     }

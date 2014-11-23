@@ -3,7 +3,7 @@ package com.mapbox.mapboxgl.lib;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class LonLatZoom implements Parcelable {
+public class LonLatZoom extends LonLat implements Parcelable {
 
     public static final Parcelable.Creator<LonLatZoom> CREATOR = new Parcelable.Creator<LonLatZoom>() {
         public LonLatZoom createFromParcel(Parcel in) {
@@ -15,42 +15,21 @@ public class LonLatZoom implements Parcelable {
         }
     };
 
-    private double lon;
-    private double lat;
     private double zoom;
 
     public LonLatZoom(double lon, double lat, double zoom) {
-        this.lon = lon;
-        this.lat = lat;
+        super(lon, lat);
         this.zoom = zoom;
     }
 
     public LonLatZoom(LonLat lonLat, double zoom) {
-        this.lon = lonLat.getLon();
-        this.lat = lonLat.getLat();
+        super(lonLat.getLon(), lonLat.getLat());
         this.zoom = zoom;
     }
 
     private LonLatZoom(Parcel in) {
-        lon = in.readDouble();
-        lat = in.readDouble();
+        super(in);
         zoom = in.readDouble();
-    }
-
-    public double getLon() {
-        return lon;
-    }
-
-     public void setLon(double lon) {
-        this.lon = lon;
-    }
-
-    public double getLat() {
-        return lat;
-    }
-
-    public void setLat(double lat) {
-        this.lat = lat;
     }
 
     public double getZoom() {
@@ -61,25 +40,12 @@ public class LonLatZoom implements Parcelable {
         this.zoom = zoom;
     }
 
-    public LonLat getLonLat() {
-        return new LonLat(lon, lat);
-    }
-
-    public void setLonLat(LonLat lonLat) {
-        this.lon = lonLat.getLon();
-        this.lat = lonLat.getLat();
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         long temp;
-        temp = Double.doubleToLongBits(lat);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(lon);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(zoom);
+        temp = super.hashCode();
         result = prime * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
@@ -93,12 +59,12 @@ public class LonLatZoom implements Parcelable {
         if (getClass() != obj.getClass())
             return false;
         LonLatZoom other = (LonLatZoom) obj;
-        return Double.doubleToLongBits(lat) == Double.doubleToLongBits(other.lat) && Double.doubleToLongBits(lon) == Double.doubleToLongBits(other.lon) && Double.doubleToLongBits(zoom) == Double.doubleToLongBits(other.zoom);
+        return super.equals(obj) && Double.doubleToLongBits(zoom) == Double.doubleToLongBits(other.zoom);
     }
 
     @Override
     public String toString() {
-        return "LonLatZoom [lon=" + lon + ", lat=" + lat + ", zoom=" + zoom
+        return "LonLatZoom [lon=" + super.getLon() + ", lat=" + super.getLat() + ", zoom=" + zoom
                 + "]";
     }
 
@@ -109,8 +75,7 @@ public class LonLatZoom implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        out.writeDouble(lon);
-        out.writeDouble(lat);
+        super.writeToParcel(out, flags);
         out.writeDouble(zoom);
     }
 
