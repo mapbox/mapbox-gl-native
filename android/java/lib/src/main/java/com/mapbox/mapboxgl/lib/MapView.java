@@ -342,7 +342,7 @@ public class MapView extends SurfaceView {
         mNativeMapView.setDefaultTransitionDuration(transitionDuration);
         mNativeMapView.setAppliedClasses(styleClasses);
     }
-    
+
     //
     // Lifecycle events
     //
