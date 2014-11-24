@@ -13,6 +13,7 @@
         <item>Pencil</item>
         <item>Satellite</item>
         <item>Empty</item>
+        <item>Auto</item>
     </string-array>
 
 </resources>

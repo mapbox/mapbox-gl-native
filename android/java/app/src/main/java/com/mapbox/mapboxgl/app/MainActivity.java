@@ -156,6 +156,15 @@ public class MainActivity extends ActionBarActivity {
                 case 6:
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/empty-v6.json");
                     break;
+
+                // Auto
+                case 7:
+                    mMapFragment.getMap().setStyleUrl("https://www.mapbox.com/auto/style.json");
+                    break;
+
+                default:
+                    onNothingSelected(parent);
+                    break;
             }
         }
 
