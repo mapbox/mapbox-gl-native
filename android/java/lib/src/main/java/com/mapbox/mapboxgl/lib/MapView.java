@@ -330,37 +330,6 @@ public class MapView extends SurfaceView {
     // Style methods
     //
 
-    public void toggleStyle() {
-        // TODO
-    }
-
-    // TODO seems like JSON simple may be better since it implements Map interface
-    // Other candidates: fastjson, json-smart, fossnova json,
-    public JSONObject getRawStyle() {
-        try {
-            return new JSONObject(mNativeMapView.getStyleJson());
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public void setRawStyle(JSONObject style) {
-        mNativeMapView.setStyleJson(style.toString());
-    }
-
-    public void getStyleOrderedLayerNames() {
-        // TODO
-    }
-
-    public void setStyleOrderedLayerNames() {
-        // TODO
-    }
-
-    public void getAllStyleClasses() {
-        // TODO
-    }
-
     public List<String> getAppliedStyleClasses() {
         return mNativeMapView.getAppliedClasses();
     }
@@ -373,15 +342,7 @@ public class MapView extends SurfaceView {
         mNativeMapView.setDefaultTransitionDuration(transitionDuration);
         mNativeMapView.setAppliedClasses(styleClasses);
     }
-
-    public void getStyleDescriptionForLayer() {
-        // TODO
-    }
-
-    public void setStyleDescription() {
-        // TODO
-    }
-
+    
     //
     // Lifecycle events
     //
