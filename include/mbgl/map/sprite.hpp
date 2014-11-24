@@ -34,11 +34,11 @@ public:
 class Sprite : public std::enable_shared_from_this<Sprite>, private util::noncopyable {
 private:
     struct Key {};
-    void load(const util::ptr<FileSource> &fileSource);
+    void load(FileSource& fileSource);
 
 public:
     Sprite(const Key &, const std::string& base_url, float pixelRatio);
-    static util::ptr<Sprite> Create(const std::string& base_url, float pixelRatio, const util::ptr<FileSource> &fileSource);
+    static util::ptr<Sprite> Create(const std::string& base_url, float pixelRatio, FileSource& fileSource);
 
     const SpritePosition &getSpritePosition(const std::string& name) const;
 

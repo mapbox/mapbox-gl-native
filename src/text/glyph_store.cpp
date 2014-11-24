@@ -137,7 +137,7 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line);
 }
 
-GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange, const util::ptr<FileSource> &fileSource)
+GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, GlyphRange glyphRange, FileSource& fileSource)
     : future(promise.get_future().share())
 {
     // Load the glyph set URL
@@ -148,8 +148,8 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, Gl
     });
 
     // The prepare call jumps back to the main thread.
-    fileSource->prepare([&, url, fileSource] {
-        auto request = fileSource->request(ResourceType::Glyphs, url);
+    fileSource.prepare([&, url] {
+        auto request = fileSource.request(ResourceType::Glyphs, url);
         request->onload([&, url](const Response &res) {
             if (res.code != 200) {
                 // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
@@ -228,7 +228,7 @@ void GlyphPBF::parse(FontStack &stack) {
     data.clear();
 }
 
-GlyphStore::GlyphStore(const util::ptr<FileSource> &fileSource_) : fileSource(fileSource_) {}
+GlyphStore::GlyphStore(FileSource& fileSource_) : fileSource(fileSource_) {}
 
 void GlyphStore::setURL(const std::string &url) {
     glyphURL = url;

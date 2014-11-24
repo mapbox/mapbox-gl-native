@@ -28,7 +28,7 @@ const std::string TileData::toString() const {
     return util::sprintf<32>("[tile %d/%d/%d]", id.z, id.x, id.y);
 }
 
-void TileData::request() {
+void TileData::request(FileSource& fileSource) {
     if (source->tiles.empty())
         return;
 
@@ -45,7 +45,7 @@ void TileData::request() {
 
     // Note: Somehow this feels slower than the change to request_http()
     std::weak_ptr<TileData> weak_tile = shared_from_this();
-    req = map.getFileSource()->request(ResourceType::Tile, url);
+    req = fileSource.request(ResourceType::Tile, url);
     req->onload([weak_tile, url](const Response &res) {
         util::ptr<TileData> tile = weak_tile.lock();
         if (!tile || tile->state == State::obsolete) {
