@@ -10,9 +10,9 @@
         <item>Basic</item>
         <item>Outdoors (Vector)</item>
         <item>Outdoors (Raster)</item>
-        <item>Pencil</item>
-        <item>Satellite</item>
-        <item>Empty</item>
+        <!--<item>Pencil</item>-->
+        <!--<item>Satellite</item>-->
+        <!--<item>Empty</item>-->
     </string-array>
 
 </resources>
