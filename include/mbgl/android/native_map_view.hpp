@@ -60,7 +60,7 @@ public:
     void notifyMapChange();
 
 private:
-    EGLConfig chooseConfig(const EGLConfig configs[], EGLint num_configs) const;
+    EGLConfig chooseConfig(const EGLConfig configs[], EGLint num_configs);
 
     void loadExtensions();
 
@@ -84,6 +84,8 @@ private:
     std::string api_key;
 
     bool first_time = false;
+
+    bool using_depth24 = false;
 };
 
 }

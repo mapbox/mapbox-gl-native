@@ -23,7 +23,12 @@ void log_egl_string(EGLDisplay display, EGLint name, const char* label) {
     if (str == nullptr) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglQueryString(%d) returned error %d", name, eglGetError());
     } else {
-        mbgl::Log::Info(mbgl::Event::OpenGL, "EGL %s: %s", label, str);
+        char buf[513];
+        for (int len = std::strlen(str), pos = 0; len > 0; len -= 512, pos += 512) {
+            strncpy(buf, str + pos, 512);
+            buf[512] = 0;
+            mbgl::Log::Info(mbgl::Event::OpenGL, "EGL %s: %s", label, buf);
+        }
     }
 }
 
@@ -32,7 +37,12 @@ void log_gl_string(GLenum name, const char* label) {
     if (str == nullptr) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "glGetString(%d) returned error %d", name, glGetError());
     } else {
-        mbgl::Log::Info(mbgl::Event::OpenGL, "GL %s: %s", label, str);
+        char buf[513];
+        for (int len = std::strlen(reinterpret_cast<const char *>(str)), pos = 0; len > 0; len -= 512, pos += 512) {
+            strncpy(buf, reinterpret_cast<const char *>(str) + pos, 512);
+            buf[512] = 0;
+            mbgl::Log::Info(mbgl::Event::OpenGL, "GL %s: %s", label, buf);
+        }
     }
 }
 
@@ -352,7 +362,7 @@ typedef enum {
 // Tuple is <format, depth, is_not_conformant, is_caveat, config_num, config_id>
 typedef std::tuple<BufferFormat, EGLint, bool, bool, int, EGLConfig> ConfigProperties;
 
-EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_configs) const {
+EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_configs) {
     mbgl::Log::Info(mbgl::Event::OpenGL, "Found %d configs", num_configs);
 
     // Create a list of configs that pass our filters
@@ -475,6 +485,7 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_conf
 
     // Sort the configs to find the best one
     config_list.sort();
+    using_depth24 = std::get<1>(config_list.front()) == 24;
     bool is_conformant = !std::get<2>(config_list.front());
     bool is_caveat = std::get<3>(config_list.front());
     int config_num = std::get<4>(config_list.front());
@@ -541,7 +552,11 @@ void NativeMapView::loadExtensions() {
 
     if (extensions.find("GL_OES_depth24") != std::string::npos) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_depth24.");
-        gl::is_depth24_supported = true;
+        if (!using_depth24) {
+            gl::is_depth24_supported = true;
+        } else {
+            mbgl::Log::Debug(mbgl::Event::OpenGL, "Preferring 16 bit depth.");
+        }
     }
 }
 
