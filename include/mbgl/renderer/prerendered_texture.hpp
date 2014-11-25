@@ -29,7 +29,8 @@ private:
     GLint previous_fbo = 0;
     GLuint fbo = 0;
     GLuint texture = 0;
-    GLuint fbo_depth_stencil = 0;
+    GLuint fbo_depth= 0;
+    GLuint fbo_stencil = 0;
 };
 
 }

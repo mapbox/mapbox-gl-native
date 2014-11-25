@@ -8,11 +8,6 @@
     #if TARGET_OS_IPHONE
         #include <OpenGLES/ES2/gl.h>
         #include <OpenGLES/ES2/glext.h>
-        // #define glGenVertexArrays glGenVertexArraysOES
-        // #define glBindVertexArray glBindVertexArrayOES
-        // #define glDeleteVertexArrays glDeleteVertexArraysOES
-        // #define GL_ARB_vertex_array_object 1
-        // #define GL_DEPTH24_STENCIL8 GL_DEPTH24_STENCIL8_OES
     #elif TARGET_IPHONE_SIMULATOR
         #include <OpenGLES/ES2/gl.h>
         #include <OpenGLES/ES2/glext.h>
@@ -44,6 +39,11 @@ extern PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays;
 extern PFNGLGENVERTEXARRAYSPROC GenVertexArrays;
 extern PFNGLISVERTEXARRAYPROC IsVertexArray;
 
+extern bool is_packed_depth_stencil_supported;
+#define GL_DEPTH24_STENCIL8 0x88F0
+
+extern bool is_depth24_supported;
+#define GL_DEPTH_COMPONENT24 0x81A6
 
 // Debug group markers, useful for debuggin on iOS
 #if __APPLE__ && defined(DEBUG) && defined(GL_EXT_debug_marker)
@@ -62,7 +62,6 @@ inline void end_group() {
 inline void start_group(const std::string &) {}
 inline void end_group() {}
 #endif
-
 
 struct group {
     inline group(const std::string &str) { start_group(str); }

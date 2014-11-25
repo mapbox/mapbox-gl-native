@@ -533,6 +533,16 @@ void NativeMapView::loadExtensions() {
             gl::IsVertexArray = nullptr;
         }
     }
+
+    if (extensions.find("GL_OES_packed_depth_stencil") != std::string::npos) {
+        mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_packed_depth_stencil.");
+        gl::is_packed_depth_stencil_supported = true;
+    }
+
+    if (extensions.find("GL_OES_depth24") != std::string::npos) {
+        mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_depth24.");
+        gl::is_depth24_supported = true;
+    }
 }
 
 void NativeMapView::stop() {
