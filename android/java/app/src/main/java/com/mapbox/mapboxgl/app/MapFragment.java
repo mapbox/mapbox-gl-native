@@ -39,7 +39,7 @@ public class MapFragment extends Fragment {
         mMap = (MapView) inflater.inflate(R.layout.fragment_main, container, true);
 
         // Load the API key
-        mMap.setAccessToken("pk.eyJ1IjoibGpiYWRlIiwiYSI6IlJSQ0FEZ2MifQ.7mE4aOegldh3595AG9dxpQ");
+        mMap.setAccessToken("access key goes here");
 
         // Need to pass on any saved state to the map
         mMap.onCreate(savedInstanceState);
