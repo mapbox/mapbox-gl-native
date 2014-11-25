@@ -8,6 +8,7 @@
       'variables': {
         'cflags_cc': [
           '<@(png_cflags)',
+	  '<@(jpeg_cflags)',
           '<@(uv_cflags)',
           '<@(curl_cflags)',
           '<@(nu_cflags)',
@@ -19,6 +20,7 @@
         ],
         'ldflags': [
           '<@(png_ldflags)',
+          '<@(jpeg_ldflags)',
           '<@(uv_ldflags)',
           '<@(curl_ldflags)',
           '<@(nu_ldflags)',
@@ -30,6 +32,9 @@
         '../platform/default/string_stdlib.cpp',
         '../platform/default/http_request_baton_curl.cpp',
         '../platform/default/image.cpp',
+        '../platform/default/image_reader.cpp',
+        '../platform/default/png_reader.cpp',
+        '../platform/default/jpeg_reader.cpp',
       ],
       'include_dirs': [
         '../include',

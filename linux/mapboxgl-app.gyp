@@ -16,10 +16,14 @@
       'xcode_settings': {
         'OTHER_CPLUSPLUSFLAGS':[
           '<@(glfw3_cflags)',
+          '<@(png_cflags)',
+          '<@(jpeg_cflags)',
         ],
       },
       'cflags_cc': [
         '<@(glfw3_cflags)',
+        '<@(png_cflags)',
+        '<@(jpeg_cflags)',
         '-I<(boost_root)/include',
       ],
       'variables': {

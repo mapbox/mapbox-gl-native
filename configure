@@ -27,6 +27,7 @@ case ${MASON_PLATFORM} in
     'android')
         SQLITE_VERSION=3.8.6
         LIBPNG_VERSION=1.6.13
+        LIBJPEG_VERSION=v8d
         OPENSSL_VERSION=1.0.1i
         LIBCURL_VERSION=7.38.0
         LIBUV_VERSION=0.11.29
@@ -36,15 +37,16 @@ case ${MASON_PLATFORM} in
         LIBZIP_VERSION=0.11.2
         ;;
     *)
-	GLFW_VERSION=a21f2377
-	SQLITE_VERSION=system
-	LIBPNG_VERSION=1.6.13
-	LIBCURL_VERSION=system
-	LIBUV_VERSION=0.10.28
-	ZLIB_VERSION=system
-	BOOST_VERSION=system
-	NUNICODE_VERSION=1.4
-	;;
+        GLFW_VERSION=a21f2377
+        SQLITE_VERSION=system
+        LIBPNG_VERSION=1.6.13
+        LIBJPEG_VERSION=v8d
+        LIBCURL_VERSION=system
+        LIBUV_VERSION=0.10.28
+        ZLIB_VERSION=system
+        BOOST_VERSION=system
+        NUNICODE_VERSION=1.4
+        ;;
 esac
 
 function abort { >&2 echo -e "\033[1m\033[31m$1\033[0m"; exit 1; }
@@ -107,6 +109,13 @@ if [ ! -z ${LIBPNG_VERSION} ]; then
     CONFIG+="    'png_static_libs': $(quote_flags $(mason static_libs libpng ${LIBPNG_VERSION})),"$LN
     CONFIG+="    'png_cflags': $(quote_flags $(mason cflags libpng ${LIBPNG_VERSION})),"$LN
     CONFIG+="    'png_ldflags': $(quote_flags $(mason ldflags libpng ${LIBPNG_VERSION})),"$LN
+fi
+
+if [ ! -z ${LIBJPEG_VERSION} ]; then
+    mason install jpeg ${LIBJPEG_VERSION}
+    CONFIG+="    'jpeg_static_libs': $(quote_flags $(mason static_libs jpeg ${LIBJPEG_VERSION})),"$LN
+    CONFIG+="    'jpeg_cflags': $(quote_flags $(mason cflags jpeg ${LIBJPEG_VERSION})),"$LN
+    CONFIG+="    'jpeg_ldflags': $(quote_flags $(mason ldflags jpeg ${LIBJPEG_VERSION})),"$LN
 fi
 
 if [ ! -z ${SQLITE_VERSION} ]; then
