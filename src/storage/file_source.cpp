@@ -26,7 +26,8 @@ FileSource::FileSource(uv_loop_t *loop_, const std::string &path)
 }
 
 FileSource::~FileSource() {
-    assert(thread_id == uv_thread_self());
+    // FIXME temp fix for #608 crash
+    //assert(thread_id == uv_thread_self());
     uv_messenger_stop(queue, [](uv_messenger_t *msgr) {
         delete msgr;
     });
