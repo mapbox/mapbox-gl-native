@@ -359,8 +359,13 @@ typedef enum {
     Unknown = 4
 } BufferFormat;
 
-// Tuple is <format, depth, is_not_conformant, is_caveat, config_num, config_id>
-typedef std::tuple<BufferFormat, EGLint, bool, bool, int, EGLConfig> ConfigProperties;
+typedef enum {
+    Format16Depth8Stencil = 0,
+    Format24Depth8Stencil = 1,
+} DepthStencilFormat;
+
+// Tuple is <buffer_format, depth_stencil_format, is_not_conformant, is_caveat, config_num, config_id>
+typedef std::tuple<BufferFormat, DepthStencilFormat, bool, bool, int, EGLConfig> ConfigProperties;
 
 EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_configs) {
     mbgl::Log::Info(mbgl::Event::OpenGL, "Found %d configs", num_configs);
@@ -432,18 +437,18 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_conf
             return nullptr;
         }
 
-        mbgl::Log::Info(mbgl::Event::OpenGL, "   Caveat: %d", caveat);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "   Conformant: %d", conformant);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "   Color: %d", bits);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "   Red: %d", red);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "   Green: %d", green);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "   Blue: %d", blue);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "   Alpha: %d", alpha);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "   Alpha mask: %d", alpha_mask);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "   Depth: %d", depth);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "   Stencil: %d", stencil);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "   Sample buffers: %d", sample_buffers);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "   Samples: %d", samples);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Caveat: %d", caveat);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Conformant: %d", conformant);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Color: %d", bits);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Red: %d", red);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Green: %d", green);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Blue: %d", blue);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Alpha: %d", alpha);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Alpha mask: %d", alpha_mask);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Depth: %d", depth);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Stencil: %d", stencil);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Sample buffers: %d", sample_buffers);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Samples: %d", samples);
 
         bool config_ok = true;
         config_ok &= (depth == 24) || (depth == 16);
@@ -467,14 +472,22 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_conf
                 buffer_format = Unknown;
             }
 
+            // Work out the config's depth stencil format
+            DepthStencilFormat depth_stencil_format;
+            if ((depth == 16) && (stencil == 8)) {
+                depth_stencil_format = Format16Depth8Stencil;
+            } else {
+                depth_stencil_format = Format24Depth8Stencil;
+            }
+
             bool is_not_conformant = (conformant & EGL_OPENGL_ES2_BIT) != EGL_OPENGL_ES2_BIT;
             bool is_caveat = caveat != EGL_NONE;
             EGLConfig config_id = configs[i];
 
             // Ignore formats we don't recognise
-            if (format != Unknown)
+            if (buffer_format != Unknown)
             {
-                config_list.push_back(std::make_tuple(buffer_format, depth, is_not_conformant, is_caveat, i, config_id));
+                config_list.push_back(std::make_tuple(buffer_format, depth_stencil_format, is_not_conformant, is_caveat, i, config_id));
             }
         }
     }
@@ -485,13 +498,13 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_conf
 
     // Sort the configs to find the best one
     config_list.sort();
-    using_depth24 = std::get<1>(config_list.front()) == 24;
+    using_depth24 = std::get<1>(config_list.front()) == Format24Depth8Stencil;
     bool is_conformant = !std::get<2>(config_list.front());
     bool is_caveat = std::get<3>(config_list.front());
     int config_num = std::get<4>(config_list.front());
     EGLConfig config_id = std::get<5>(config_list.front());
 
-    mbgl::Log::Debug(mbgl::Event::OpenGL, "Chosen config is %d", config_num);
+    mbgl::Log::Info(mbgl::Event::OpenGL, "Chosen config is %d", config_num);
 
     if (is_caveat) {
         mbgl::Log::Warning(mbgl::Event::OpenGL, "Chosen config has a caveat.");
@@ -555,7 +568,7 @@ void NativeMapView::loadExtensions() {
         if (!using_depth24) {
             gl::is_depth24_supported = true;
         } else {
-            mbgl::Log::Debug(mbgl::Event::OpenGL, "Preferring 16 bit depth.");
+            mbgl::Log::Info(mbgl::Event::OpenGL, "Preferring 16 bit depth.");
         }
     }
 }
