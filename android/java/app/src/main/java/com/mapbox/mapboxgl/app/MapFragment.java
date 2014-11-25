@@ -39,6 +39,7 @@ public class MapFragment extends Fragment {
         mMap = (MapView) inflater.inflate(R.layout.fragment_main, container, true);
 
         // Load the API key
+        throw new RuntimeException("You must insert a valid Mapbox API key and then delete this throw.");
         mMap.setAccessToken("access key goes here");
 
         // Need to pass on any saved state to the map
