@@ -11,11 +11,13 @@ using namespace mbgl;
 VectorTileData::VectorTileData(Tile::ID const& id_, Map &map_,
                                GlyphAtlas& glyphAtlas_, GlyphStore& glyphStore_,
                                SpriteAtlas& spriteAtlas_,
+                               Texturepool& texturepool_,
                                const util::ptr<SourceInfo> &source_)
     : TileData(id_, map_, source_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
+      texturepool(texturepool_),
       depth(id.z >= source->max_zoom ? map.getMaxZoom() - id.z : 1) {
 }
 
@@ -35,7 +37,8 @@ void VectorTileData::parse() {
         // is going to be discarded afterwards.
         TileParser parser(data, *this, map.getStyle(),
                           glyphAtlas, glyphStore,
-                          spriteAtlas, map.getSprite());
+                          spriteAtlas, map.getSprite(),
+                          texturepool);
         parser.parse();
     } catch (const std::exception& ex) {
 #if defined(DEBUG)

@@ -17,7 +17,7 @@ namespace mbgl {
 class Raster : public std::enable_shared_from_this<Raster> {
 
 public:
-    Raster(const util::ptr<Texturepool> &texturepool);
+    Raster(Texturepool&);
     ~Raster();
 
     // load image data
@@ -57,7 +57,7 @@ private:
     bool loaded = false;
 
     // shared texture pool
-    util::ptr<Texturepool> texturepool;
+    Texturepool& texturepool;
 
     // min/mag filter
     uint32_t filter = 0;

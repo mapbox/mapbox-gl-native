@@ -63,9 +63,10 @@ void Source::load(Map& map, FileSource& fileSource) {
 
 bool Source::update(Map& map, uv::worker& worker,
                     GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
-                    SpriteAtlas& spriteAtlas, FileSource& fileSource) {
+                    SpriteAtlas& spriteAtlas,
+                    Texturepool& texturepool, FileSource& fileSource) {
     if (loaded && map.getTime() > updated) {
-        return updateTiles(map, worker, glyphAtlas, glyphStore, spriteAtlas, fileSource);
+        return updateTiles(map, worker, glyphAtlas, glyphStore, spriteAtlas, texturepool, fileSource);
     } else {
         return false;
     }
@@ -164,7 +165,8 @@ TileData::State Source::hasTile(const Tile::ID& id) {
 TileData::State Source::addTile(Map& map, uv::worker& worker,
                                 GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
                                 SpriteAtlas& spriteAtlas,
-                                FileSource& fileSource, const Tile::ID& id) {
+                                FileSource& fileSource, Texturepool& texturepool,
+                                const Tile::ID& id) {
     const TileData::State state = hasTile(id);
 
     if (state != TileData::State::invalid) {
@@ -192,9 +194,9 @@ TileData::State Source::addTile(Map& map, uv::worker& worker,
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
         if (info->type == SourceType::Vector) {
-            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, glyphAtlas, glyphStore, spriteAtlas, info);
+            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, glyphAtlas, glyphStore, spriteAtlas, texturepool, info);
         } else if (info->type == SourceType::Raster) {
-            new_tile.data = std::make_shared<RasterTileData>(normalized_id, map, info);
+            new_tile.data = std::make_shared<RasterTileData>(normalized_id, map, texturepool, info);
         } else {
             throw std::runtime_error("source type not implemented");
         }
@@ -288,7 +290,8 @@ bool Source::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::
 
 bool Source::updateTiles(Map& map, uv::worker& worker,
                          GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
-                         SpriteAtlas& spriteAtlas, FileSource& fileSource) {
+                         SpriteAtlas& spriteAtlas,
+                         Texturepool& texturepool, FileSource& fileSource) {
     bool changed = false;
 
     int32_t zoom = std::floor(getZoom(map.getState()));
@@ -305,7 +308,11 @@ bool Source::updateTiles(Map& map, uv::worker& worker,
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
     for (const Tile::ID& id : required) {
-        const TileData::State state = addTile(map, worker, glyphAtlas, glyphStore, spriteAtlas, fileSource, id);
+        const TileData::State state = addTile(map, worker,
+                                              glyphAtlas, glyphStore,
+                                              spriteAtlas,
+                                              fileSource, texturepool,
+                                              id);
 
         if (state != TileData::State::parsed) {
             // The tile we require is not yet loaded. Try to find a parent or

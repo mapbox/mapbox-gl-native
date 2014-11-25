@@ -22,6 +22,7 @@ class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
 class FileSource;
+class Texturepool;
 class Painter;
 class StyleLayer;
 class TransformState;
@@ -32,7 +33,10 @@ public:
     Source(const util::ptr<SourceInfo>& info);
 
     void load(Map&, FileSource&);
-    bool update(Map&, uv::worker&, GlyphAtlas&, GlyphStore&, SpriteAtlas&, FileSource&);
+    bool update(Map&, uv::worker&,
+                GlyphAtlas&, GlyphStore&,
+                SpriteAtlas&,
+                Texturepool&, FileSource&);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
@@ -51,9 +55,17 @@ private:
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<Tile::ID> coveringTiles(const TransformState&) const;
 
-    bool updateTiles(Map&, uv::worker&, GlyphAtlas&, GlyphStore&, SpriteAtlas&, FileSource&);
+    bool updateTiles(Map&, uv::worker&,
+                     GlyphAtlas&, GlyphStore&,
+                     SpriteAtlas&,
+                     Texturepool&, FileSource&);
 
-    TileData::State addTile(Map&, uv::worker&, GlyphAtlas&, GlyphStore&, SpriteAtlas&, FileSource&, const Tile::ID&);
+    TileData::State addTile(Map&, uv::worker&,
+                            GlyphAtlas&, GlyphStore&,
+                            SpriteAtlas&,
+                            FileSource&, Texturepool&,
+                            const Tile::ID&);
+
     TileData::State hasTile(const Tile::ID& id);
 
     double getZoom(const TransformState &state) const;

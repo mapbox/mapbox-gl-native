@@ -34,7 +34,8 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile_,
                        GlyphAtlas & glyphAtlas_,
                        GlyphStore & glyphStore_,
                        SpriteAtlas & spriteAtlas_,
-                       const util::ptr<Sprite> &sprite_)
+                       const util::ptr<Sprite> &sprite_,
+                       Texturepool& texturePool_)
     : vector_data(pbf((const uint8_t *)data.data(), data.size())),
       tile(tile_),
       style(style_),
@@ -42,6 +43,7 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile_,
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
+      texturePool(texturePool_),
       collision(std::make_unique<Collision>(tile.id.z, 4096, tile.source->tile_size, tile.depth)) {
     assert(&tile != nullptr);
     assert(style);
@@ -153,7 +155,7 @@ std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& laye
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createRasterBucket(const util::ptr<Texturepool> &texturepool, const StyleBucketRaster &raster) {
+std::unique_ptr<Bucket> TileParser::createRasterBucket(Texturepool& texturepool, const StyleBucketRaster &raster) {
     std::unique_ptr<RasterBucket> bucket = std::make_unique<RasterBucket>(texturepool, raster);
     return obsolete() ? nullptr : std::move(bucket);
 }
