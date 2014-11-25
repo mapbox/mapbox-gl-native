@@ -351,6 +351,8 @@ void NativeMapView::destroySurface() {
     }
 }
 
+// Speed
+/*
 typedef enum {
     Format16Bit = 0,
     Format32BitNoAlpha = 1,
@@ -362,6 +364,21 @@ typedef enum {
 typedef enum {
     Format16Depth8Stencil = 0,
     Format24Depth8Stencil = 1,
+} DepthStencilFormat;
+*/
+
+// Quality
+typedef enum {
+    Format16Bit = 3,
+    Format32BitNoAlpha = 1,
+    Format32BitAlpha = 2,
+    Format24Bit = 0,
+    Unknown = 4
+} BufferFormat;
+
+typedef enum {
+    Format16Depth8Stencil = 1,
+    Format24Depth8Stencil = 0,
 } DepthStencilFormat;
 
 // Tuple is <buffer_format, depth_stencil_format, is_not_conformant, is_caveat, config_num, config_id>
