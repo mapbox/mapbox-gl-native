@@ -15,6 +15,16 @@ PrerenderedTexture::~PrerenderedTexture() {
         texture = 0;
     }
 
+    if (fbo_depth != 0) {
+        glDeleteRenderbuffers(1, &fbo_depth);
+        fbo_depth = 0;
+    }
+
+    if (fbo_stencil != 0) {
+        glDeleteRenderbuffers(1, &fbo_stencil);
+        fbo_stencil = 0;
+    }
+
     if (fbo != 0) {
         glDeleteFramebuffers(1, &fbo);
         fbo = 0;
@@ -45,15 +55,29 @@ void PrerenderedTexture::bindFramebuffer() {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    if (fbo_depth_stencil == 0) {
-        // Create depth/stencil buffer
-        glGenRenderbuffers(1, &fbo_depth_stencil);
-        glBindRenderbuffer(GL_RENDERBUFFER, fbo_depth_stencil);
-#ifdef GL_ES_VERSION_2_0
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, properties.size, properties.size);
-#else
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, properties.size, properties.size);
-#endif
+    if (fbo_depth == 0) {
+        // Create depth buffer
+        glGenRenderbuffers(1, &fbo_depth);
+        glBindRenderbuffer(GL_RENDERBUFFER, fbo_depth);
+        if (gl::is_packed_depth_stencil_supported) {
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, properties.size, properties.size);
+        } else {
+            if (gl::is_depth24_supported) {
+                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, properties.size, properties.size);
+            } else {
+                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, properties.size, properties.size);
+            }
+        }
+
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    }
+
+    if (!gl::is_packed_depth_stencil_supported && (fbo_stencil == 0)) {
+        // Create stencil buffer
+        glGenRenderbuffers(1, &fbo_stencil);
+        glBindRenderbuffer(GL_RENDERBUFFER, fbo_stencil);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, properties.size, properties.size);
+
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
     }
 
@@ -61,12 +85,18 @@ void PrerenderedTexture::bindFramebuffer() {
         glGenFramebuffers(1, &fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+        if (gl::is_packed_depth_stencil_supported) {
 #ifdef GL_ES_VERSION_2_0
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo_depth_stencil);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_depth_stencil);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo_depth);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_depth);
 #else
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_depth_stencil);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_depth);
 #endif
+        } else {
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo_depth);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_stencil);
+        }
 
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (status != GL_FRAMEBUFFER_COMPLETE) {

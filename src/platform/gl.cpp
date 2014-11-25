@@ -11,6 +11,12 @@ PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays = nullptr;
 PFNGLGENVERTEXARRAYSPROC GenVertexArrays = nullptr;
 PFNGLISVERTEXARRAYPROC IsVertexArray = nullptr;
 
+// GL_OES_packed_depth_stencil
+bool is_packed_depth_stencil_supported = false;
+
+// GL_OES_depth24
+bool is_depth24_supported = false;
+
 }
 }
 
