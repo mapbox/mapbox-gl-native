@@ -3,6 +3,8 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style_bucket.hpp>
 
+#include <mbgl/platform/log.hpp>
+
 using namespace mbgl;
 
 PrerenderedTexture::PrerenderedTexture(const StyleBucketRaster &properties_)
@@ -100,17 +102,17 @@ void PrerenderedTexture::bindFramebuffer() {
 
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (status != GL_FRAMEBUFFER_COMPLETE) {
-            fprintf(stderr, "Couldn't create framebuffer: ");
+            mbgl::Log::Error(mbgl::Event::OpenGL, "Couldn't create framebuffer: ");
             switch (status) {
-                case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: fprintf(stderr, "incomplete attachment\n"); break;
-                case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: fprintf(stderr, "incomplete missing attachment\n"); break;
+                case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: mbgl::Log::Error(mbgl::Event::OpenGL, "incomplete attachment\n"); break;
+                case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: mbgl::Log::Error(mbgl::Event::OpenGL, "incomplete missing attachment\n"); break;
 #ifdef GL_ES_VERSION_2_0
-                case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS: fprintf(stderr, "incomplete dimensions\n"); break;
+                case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS: mbgl::Log::Error(mbgl::Event::OpenGL, "incomplete dimensions\n"); break;
 #else
-                case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER: fprintf(stderr, "incomplete draw buffer\n"); break;
+                case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER: mbgl::Log::Error(mbgl::Event::OpenGL, "incomplete draw buffer\n"); break;
 #endif
-                case GL_FRAMEBUFFER_UNSUPPORTED: fprintf(stderr, "unsupported\n"); break;
-                default: fprintf(stderr, "other\n"); break;
+                case GL_FRAMEBUFFER_UNSUPPORTED: mbgl::Log::Error(mbgl::Event::OpenGL, "unsupported\n"); break;
+                default: mbgl::Log::Error(mbgl::Event::OpenGL, "other\n"); break;
             }
             return;
         }
