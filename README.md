@@ -176,6 +176,8 @@ For iOS and OS X use of the demo apps in Xcode, setup the access token by editin
 
 For Linux, set the environment variable `MAPBOX_ACCESS_TOKEN` to your token.
 
+For Android, open the class MapFragment and look for the line with `mMap.setAccessToken("access key goes here");`. Also delete the throw statement on the previous line.
+
 # Style
 
 Some styles in JSON format are included at `./styles`. See the [style spec](https://github.com/mapbox/mapbox-gl-style-spec) for more details.
