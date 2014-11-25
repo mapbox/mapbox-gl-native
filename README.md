@@ -93,17 +93,14 @@ Once you're done installing the build dependencies, you can get started by runni
 
     ./configure
 
-which downloads all other dependencies that we need to build manually with [Mason](https://github.com/mapbox/mason). There's a good chance that there already are binary files and that you don't need to compile anything.
+Then, you can then proceed to build the library:
 
-Then, you can then proceed to build the library like:
+	git submodule update --init
+	make linux
 
-    make mbgl
+Set an access token as described below, and then run:
 
-Or proceed to building the debug application with:
-
-    make linux
-    
-Be sure to setup an access token per below before running `build/Release/mapbox-gl`. 
+	make run-linux
 
 ## Android (on Linux)
 
