@@ -13,6 +13,10 @@
 #include <iosfwd>
 #include <string>
 
+namespace uv {
+class worker;
+}
+
 namespace mbgl {
 
 class Map;
@@ -44,9 +48,9 @@ public:
     TileData(Tile::ID const& id, Map &map, const util::ptr<SourceInfo> &source);
     ~TileData();
 
-    void request(FileSource&);
+    void request(uv::worker&, FileSource&);
+    void reparse(uv::worker&);
     void cancel();
-    void reparse();
     const std::string toString() const;
 
     inline bool ready() const {

@@ -61,11 +61,11 @@ void Source::load(Map& map, FileSource& fileSource) {
     });
 }
 
-bool Source::update(Map& map,
+bool Source::update(Map& map, uv::worker& worker,
                     GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
                     SpriteAtlas& spriteAtlas, FileSource& fileSource) {
     if (loaded && map.getTime() > updated) {
-        return updateTiles(map, glyphAtlas, glyphStore, spriteAtlas, fileSource);
+        return updateTiles(map, worker, glyphAtlas, glyphStore, spriteAtlas, fileSource);
     } else {
         return false;
     }
@@ -161,7 +161,7 @@ TileData::State Source::hasTile(const Tile::ID& id) {
     return TileData::State::invalid;
 }
 
-TileData::State Source::addTile(Map& map,
+TileData::State Source::addTile(Map& map, uv::worker& worker,
                                 GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
                                 SpriteAtlas& spriteAtlas,
                                 FileSource& fileSource, const Tile::ID& id) {
@@ -199,7 +199,7 @@ TileData::State Source::addTile(Map& map,
             throw std::runtime_error("source type not implemented");
         }
 
-        new_tile.data->request(fileSource);
+        new_tile.data->request(worker, fileSource);
         tile_data.emplace(new_tile.data->id, new_tile.data);
     }
 
@@ -286,7 +286,7 @@ bool Source::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::
     return false;
 }
 
-bool Source::updateTiles(Map& map,
+bool Source::updateTiles(Map& map, uv::worker& worker,
                          GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
                          SpriteAtlas& spriteAtlas, FileSource& fileSource) {
     bool changed = false;
@@ -305,7 +305,7 @@ bool Source::updateTiles(Map& map,
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
     for (const Tile::ID& id : required) {
-        const TileData::State state = addTile(map, glyphAtlas, glyphStore, spriteAtlas, fileSource, id);
+        const TileData::State state = addTile(map, worker, glyphAtlas, glyphStore, spriteAtlas, fileSource, id);
 
         if (state != TileData::State::parsed) {
             // The tile we require is not yet loaded. Try to find a parent or

@@ -129,12 +129,13 @@ public:
     inline util::ptr<Style> getStyle() const { return style; }
     util::ptr<Sprite> getSprite();
     inline util::ptr<Texturepool> getTexturepool() { return texturepool; }
-    uv::worker &getWorker();
     inline timestamp getAnimationTime() const { return animationTime; }
     inline timestamp getTime() const { return animationTime; }
     void updateTiles();
 
 private:
+    uv::worker& getWorker();
+
     // uv async callbacks
     static void render(uv_async_t *async);
     static void terminate(uv_async_t *async);
