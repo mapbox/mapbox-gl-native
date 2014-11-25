@@ -142,14 +142,14 @@ public class MainActivity extends ActionBarActivity {
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/outdoors-raster-v6.json");
                     break;
 
-                // Pencil
+                // Satellite
                 case 4:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/pencil-v6.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/satellite-v6.json");
                     break;
 
-                // Satellite
+                // Pencil
                 case 5:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/satellite-v6.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/pencil-v6.json");
                     break;
 
                 // Empty
