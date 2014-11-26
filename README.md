@@ -173,7 +173,7 @@ For iOS and OS X use of the demo apps in Xcode, setup the access token by editin
 
 For Linux, set the environment variable `MAPBOX_ACCESS_TOKEN` to your token.
 
-For Android, open the class MapFragment and look for the line with `mMap.setAccessToken("access key goes here");`.
+For Android, open the class MapFragment and look for the line with `mMap.setAccessToken("access token goes here");`.
 
 # Style
 
