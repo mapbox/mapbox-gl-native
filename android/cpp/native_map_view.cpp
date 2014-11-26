@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <ctime>
 #include <memory>
 #include <list>
 #include <tuple>
@@ -72,6 +73,7 @@ void MBGLView::swap() {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d", eglGetError());
         }
         map->swapped();
+        nativeView.updateFps();
     } else {
         mbgl::Log::Info(mbgl::Event::Android, "Not swapping as we are not ready");
     }
@@ -651,6 +653,75 @@ void NativeMapView::notifyMapChange() {
     }
 
     env->CallVoidMethod(obj, on_map_changed_id);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+    }
+
+    if (detach) {
+        if ((ret = vm->DetachCurrentThread()) != JNI_OK) {
+            mbgl::Log::Error(mbgl::Event::JNI, "DetachCurrentThread() failed with %i", ret);
+            return;
+        }
+    }
+    env = nullptr;
+}
+
+void NativeMapView::enableFps(bool enable) {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::enableFps()");
+
+    fps_enabled = enable;
+}
+
+void NativeMapView::updateFps() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::updateFps()");
+
+    if (!fps_enabled) {
+        return;
+    }
+
+    static int frames = 0;
+    static int64_t time_elapsed = 0LL;
+
+    frames++;
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    int64_t current_time = now.tv_sec*1000000000LL + now.tv_nsec;
+
+    if (current_time - time_elapsed >= 1) {
+        fps = frames / ((current_time - time_elapsed) / 1E9);
+        mbgl::Log::Debug(mbgl::Event::Render, "FPS: %4.2f", fps);
+        time_elapsed = current_time;
+        frames = 0;
+    }
+
+    assert(vm != nullptr);
+    assert(obj != nullptr);
+
+    JavaVMAttachArgs args = {
+        JNI_VERSION_1_2,
+        "NativeMapView::updateFps()",
+        NULL
+    };
+
+    jint ret;
+    JNIEnv* env = nullptr;
+                  bool detach = false;
+                                ret = vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6);
+    if (ret != JNI_OK) {
+        if (ret != JNI_EDETACHED) {
+            mbgl::Log::Error(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
+            return;
+        } else {
+            ret = vm->AttachCurrentThread(&env, &args);
+            if (ret != JNI_OK) {
+                mbgl::Log::Error(mbgl::Event::JNI, "AttachCurrentThread() failed with %i", ret);
+                return;
+            }
+            detach = true;
+        }
+    }
+
+    env->CallVoidMethod(obj, on_fps_changed_id, fps);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
     }

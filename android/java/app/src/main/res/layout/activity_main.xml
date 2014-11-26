@@ -10,16 +10,33 @@
         android:layout_width="match_parent"
         android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary">
+
         <Spinner
             android:id="@+id/spinner_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </android.support.v7.widget.Toolbar>
 
-    <fragment
-        tools:context="${packageName}.${activityClass}"
-        android:name="com.mapbox.mapboxgl.app.MapFragment"
-        android:id="@+id/fragment_map"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="fill_parent" />
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+        <fragment
+            android:name="com.mapbox.mapboxgl.app.MapFragment"
+            android:id="@+id/fragment_map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="${packageName}.${activityClass}"
+            tools:layout="@layout/fragment_main" />
+
+            <TextView
+                android:id="@+id/view_fps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/label_fps"
+                android:padding="10dp" />
+
+    </FrameLayout>
 </LinearLayout>

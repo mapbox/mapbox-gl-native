@@ -15,8 +15,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.mapbox.mapboxgl.lib.LonLatZoom;
+import com.mapbox.mapboxgl.lib.MapView;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -34,6 +36,9 @@ public class MainActivity extends ActionBarActivity {
     // Holds the MapFragment
     MapFragment mMapFragment;
 
+    // The FPS label
+    TextView mFpsTextView;
+
     //
     // Lifecycle events
     //
@@ -47,6 +52,9 @@ public class MainActivity extends ActionBarActivity {
         // Load the layout
         setContentView(R.layout.activity_main);
         mMapFragment = (MapFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_map);
+        mMapFragment.getMap().setOnFpsChangedListener(new MyOnFpsChangedListener());
+        mFpsTextView = (TextView)findViewById(R.id.view_fps);
+        mFpsTextView.setText("");
 
         // Add a toolbar as the action bar
         Toolbar mainToolbar = (Toolbar)findViewById(R.id.toolbar_main);
@@ -62,6 +70,10 @@ public class MainActivity extends ActionBarActivity {
         styleSpinner.setOnItemSelectedListener(new StyleSpinnerListener());
     }
 
+    //
+    // Other events
+    //
+
     // Adds items to the action bar menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -70,9 +82,9 @@ public class MainActivity extends ActionBarActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    // Called when pressing action bar items
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_gps:
                 // Get a GPS position
@@ -89,6 +101,14 @@ public class MainActivity extends ActionBarActivity {
             case R.id.action_debug:
                 // Toggle debug mode
                 mMapFragment.getMap().toggleDebug();
+
+                // Show the FPS counter
+                if (mMapFragment.getMap().isDebugActive()) {
+                    mFpsTextView.setVisibility(View.VISIBLE);
+                    mFpsTextView.setText(getResources().getString(R.string.label_fps));
+                } else {
+                    mFpsTextView.setVisibility(View.INVISIBLE);
+                }
                 return true;
 
             default:
@@ -121,7 +141,7 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    // This class handles navigation events
+    // This class handles style change events
     private class StyleSpinnerListener implements AdapterView.OnItemSelectedListener {
 
         @Override
@@ -166,6 +186,15 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
             mMapFragment.getMap().setStyleUrl("");
+        }
+    }
+
+    // Called when FPS changes
+    public class MyOnFpsChangedListener implements MapView.OnFpsChangedListener {
+
+        @Override
+        public void onFpsChanged(double fps) {
+            mFpsTextView.setText(getResources().getString(R.string.label_fps) + String.format(" %4.2f", fps));
         }
     }
 }

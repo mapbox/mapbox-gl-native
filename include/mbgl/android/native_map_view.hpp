@@ -59,6 +59,9 @@ public:
 
     void notifyMapChange();
 
+    void enableFps(bool enable);
+    void updateFps();
+
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint num_configs);
 
@@ -86,6 +89,9 @@ private:
     bool first_time = false;
 
     bool using_depth24 = false;
+
+    bool fps_enabled = false;
+    double fps = 0.0;
 };
 
 }

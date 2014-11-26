@@ -1177,7 +1177,36 @@ public class MapView extends SurfaceView {
     // Need to update anything that relies on map state
     protected void onMapChanged() {
         if (mOnMapChangedListener != null) {
-            mOnMapChangedListener.onMapChanged();
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    mOnMapChangedListener.onMapChanged();
+                }
+            });
+        }
+    }
+
+    public interface OnFpsChangedListener {
+        void onFpsChanged(double fps);
+    }
+
+    private OnFpsChangedListener mOnFpsChangedListener;
+
+    // Adds a listener for onFpsChanged
+    public void setOnFpsChangedListener(OnFpsChangedListener listener) {
+        mOnFpsChangedListener = listener;
+    }
+
+    // Called when debug mode is enabled to update a FPS counter
+    // Called via JNI from NativeMapView
+    protected void onFpsChanged(final double fps) {
+        if (mOnFpsChangedListener != null) {
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    mOnFpsChangedListener.onFpsChanged(fps);
+                }
+            });
         }
     }
 }

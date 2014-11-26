@@ -387,8 +387,11 @@ class NativeMapView {
     //
 
     protected void onMapChanged() {
-        //Log.v(TAG, "onMapChanged");
         mMapView.onMapChanged();
+    }
+
+    protected void onFpsChanged(double fps) {
+        mMapView.onFpsChanged(fps);
     }
 
     //

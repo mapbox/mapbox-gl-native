@@ -12,6 +12,7 @@ extern std::string data_path;
 extern std::string apk_path;
 
 extern jmethodID on_map_changed_id;
+extern jmethodID on_fps_changed_id;
 
 extern jclass lon_lat_class;
 extern jmethodID lon_lat_constructor_id;

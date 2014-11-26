@@ -30,6 +30,7 @@ std::string data_path;
 std::string apk_path;
 
 jmethodID on_map_changed_id = nullptr;
+jmethodID on_fps_changed_id = nullptr;
 
 jclass lon_lat_class = nullptr;
 jmethodID lon_lat_constructor_id = nullptr;
@@ -665,14 +666,14 @@ void JNICALL nativeSetDebug(JNIEnv* env, jobject obj, jlong native_map_view_ptr,
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetDebug");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setDebug(debug));
+    COFFEE_TRY_JNI(env, native_map_view->getMap().setDebug(debug); native_map_view->enableFps(debug));
 }
 
 void JNICALL nativeToggleDebug(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeToggleDebug");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().toggleDebug());
+    COFFEE_TRY_JNI(env, native_map_view->getMap().toggleDebug(); native_map_view->enableFps(native_map_view->getMap().getDebug()));
 }
 
 jboolean JNICALL nativeGetDebug(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -769,6 +770,12 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     on_map_changed_id = env->GetMethodID(native_map_view_class, "onMapChanged", "()V");
     if (on_map_changed_id == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    on_fps_changed_id = env->GetMethodID(native_map_view_class, "onFpsChanged", "(D)V");
+    if (on_fps_changed_id == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -951,6 +958,7 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     lon_lat_zoom_zoom_id = nullptr;
 
     on_map_changed_id = nullptr;
+    on_fps_changed_id = nullptr;
 
     env->DeleteGlobalRef(runtime_exception_class);
     runtime_exception_class = nullptr;
