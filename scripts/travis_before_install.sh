@@ -50,6 +50,9 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         #mapbox_time "installing SDK" \
         sudo apt-get -y install lib32stdc++6 lib32z1 jq
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
+        
+        echo "debug: inserting access token"
+        sed -i 's/access token goes here/${ANDROID_KEY}/g' android/java/app/src/main/java/com/mapbox/mapboxgl/app/MapFragment.java
     
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
