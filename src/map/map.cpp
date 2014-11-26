@@ -606,7 +606,7 @@ void Map::updateSources() {
     for (const util::ptr<StyleSource> &style_source : activeSources) {
         if (style_source->enabled) {
             if (!style_source->source) {
-                style_source->source = std::make_shared<Source>(style_source->info);
+                style_source->source = std::make_shared<Source>(*style_source->info);
                 style_source->source->load(*this, *fileSource);
             }
         } else {

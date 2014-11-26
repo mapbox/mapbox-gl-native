@@ -46,7 +46,7 @@ public:
     };
 
 public:
-    TileData(Tile::ID const& id, const util::ptr<SourceInfo> &source);
+    TileData(Tile::ID const& id, const SourceInfo&);
     ~TileData();
 
     void request(uv::worker&, FileSource&, float pixelRatio, std::function<void ()> callback);
@@ -69,7 +69,7 @@ public:
     std::atomic<State> state;
 
 public:
-    util::ptr<SourceInfo> source;
+    const SourceInfo& source;
 
 protected:
     std::unique_ptr<Request> req;

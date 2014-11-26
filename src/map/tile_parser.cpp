@@ -44,7 +44,7 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile_,
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
       texturePool(texturePool_),
-      collision(std::make_unique<Collision>(tile.id.z, 4096, tile.source->tile_size, tile.depth)) {
+      collision(std::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
     assert(&tile != nullptr);
     assert(style);
     assert(sprite);
@@ -101,7 +101,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(util::ptr<StyleBucket> bucket_d
     }
 
     // Skip this bucket if we are to not render this
-    if (tile.id.z < std::floor(bucket_desc->min_zoom) && std::floor(bucket_desc->min_zoom) < tile.source->max_zoom) return nullptr;
+    if (tile.id.z < std::floor(bucket_desc->min_zoom) && std::floor(bucket_desc->min_zoom) < tile.source.max_zoom) return nullptr;
     if (tile.id.z >= std::ceil(bucket_desc->max_zoom)) return nullptr;
 
     auto layer_it = vector_data.layers.find(bucket_desc->source_layer);

@@ -9,7 +9,7 @@
 
 using namespace mbgl;
 
-TileData::TileData(Tile::ID const& id_, const util::ptr<SourceInfo> &source_)
+TileData::TileData(Tile::ID const& id_, const SourceInfo& source_)
     : id(id_),
       state(State::initial),
       source(source_),
@@ -29,10 +29,10 @@ const std::string TileData::toString() const {
 
 void TileData::request(uv::worker& worker, FileSource& fileSource,
                        float pixelRatio, std::function<void ()> callback) {
-    if (source->tiles.empty())
+    if (source.tiles.empty())
         return;
 
-    std::string url = source->tiles[(id.x + id.y) % source->tiles.size()];
+    std::string url = source.tiles[(id.x + id.y) % source.tiles.size()];
     url = util::replaceTokens(url, [&](const std::string &token) -> std::string {
         if (token == "z") return std::to_string(id.z);
         if (token == "x") return std::to_string(id.x);

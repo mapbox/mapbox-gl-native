@@ -32,7 +32,7 @@ struct box;
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:
-    Source(const util::ptr<SourceInfo>& info);
+    Source(SourceInfo&);
 
     void load(Map&, FileSource&);
     bool update(Map&, uv::worker&,
@@ -78,7 +78,7 @@ private:
 
     double getZoom(const TransformState &state) const;
 
-    util::ptr<SourceInfo> info;
+    SourceInfo& info;
     bool loaded = false;
 
     // Stores the time when this source was most recently updated.
