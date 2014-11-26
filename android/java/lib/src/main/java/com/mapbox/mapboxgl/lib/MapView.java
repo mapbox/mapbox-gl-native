@@ -375,6 +375,9 @@ public class MapView extends SurfaceView {
 
         mNativeMapView.initializeDisplay();
         mNativeMapView.initializeContext();
+        if (!getAccessToken().startsWith("pk.") && !getAccessToken().startsWith("sk.")) {
+            throw new RuntimeException("You must set a valid access token! See the README.md");
+        }
         mNativeMapView.start();
     }
 
@@ -408,7 +411,6 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onStart
     public void onStart() {
         Log.v(TAG, "onStart");
-        //mNativeMapView.start();
     }
 
     // Called when we need to terminate the GL context
