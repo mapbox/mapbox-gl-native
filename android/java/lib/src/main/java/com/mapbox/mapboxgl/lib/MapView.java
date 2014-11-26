@@ -328,7 +328,7 @@ public class MapView extends SurfaceView {
 
     private void validateAccessToken(String accessToken) {
 
-        if (accessToken.isEmpty() | (!getAccessToken().startsWith("pk.") && !getAccessToken().startsWith("sk."))) {
+        if (accessToken.isEmpty() | (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {
             throw new RuntimeException("Using MapView requires setting a valid access token. See the README.md");
         }
     }
