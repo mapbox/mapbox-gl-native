@@ -16,7 +16,7 @@ extern "C"
 namespace mbgl { namespace util {
 
 template <typename T>
-class png_reader : public image_reader
+class PngReader : public ImageReader
 {
     using source_type = T;
     using input_stream = boost::iostreams::stream<source_type>;
@@ -44,12 +44,12 @@ private:
     int color_type_;
     bool has_alpha_;
 public:
-    png_reader(char const* data, std::size_t size);
-    ~png_reader();
+    PngReader(char const* data, std::size_t size);
+    ~PngReader();
     unsigned width() const;
     unsigned height() const;
-    inline bool has_alpha() const { return has_alpha_; }
-    bool premultiplied_alpha() const { return true; } // png_set_alpha_mode(png, PNG_ALPHA_PREMULTIPLIED, 2.2)
+    inline bool hasAlpha() const { return has_alpha_; }
+    bool premultipliedAlpha() const { return true; } // png_set_alpha_mode(png, PNG_ALPHA_PREMULTIPLIED, 2.2)
     void read(unsigned x,unsigned y, unsigned width, unsigned height, char * image);
 private:
     void init();

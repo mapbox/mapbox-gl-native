@@ -14,7 +14,7 @@ extern "C"
 namespace mbgl { namespace util {
 
 template <typename T>
-class jpeg_reader : public image_reader
+class JpegReader : public ImageReader
 {
 public:
     using source_type = T;
@@ -46,12 +46,12 @@ private:
     unsigned width_;
     unsigned height_;
 public:
-    jpeg_reader(char const* data, size_t size);
-    ~jpeg_reader();
+    JpegReader(char const* data, size_t size);
+    ~JpegReader();
     unsigned width() const;
     unsigned height() const;
-    inline bool has_alpha() const { return false; }
-    inline bool premultiplied_alpha() const { return true; }
+    inline bool hasAlpha() const { return false; }
+    inline bool premultipliedAlpha() const { return true; }
     void read(unsigned x,unsigned y, unsigned w, unsigned h, char *image);
 private:
     void init();
