@@ -126,7 +126,6 @@ public:
 
 public:
     inline const TransformState &getState() const { return state; }
-    inline util::ptr<Style> getStyle() const { return style; }
     inline timestamp getAnimationTime() const { return animationTime; }
     inline timestamp getTime() const { return animationTime; }
     void updateTiles();

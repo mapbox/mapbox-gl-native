@@ -26,12 +26,14 @@ class GlyphStore;
 class SpriteAtlas;
 class Sprite;
 class Texturepool;
+class Style;
 
 class VectorTileData : public TileData {
     friend class TileParser;
 
 public:
     VectorTileData(Tile::ID const&, Map&,
+                   util::ptr<Style>,
                    GlyphAtlas&, GlyphStore&,
                    SpriteAtlas&, util::ptr<Sprite>,
                    Texturepool&,
@@ -62,6 +64,7 @@ protected:
     SpriteAtlas& spriteAtlas;
     util::ptr<Sprite> sprite;
     Texturepool& texturepool;
+    util::ptr<Style> style;
 
 public:
     const float depth;

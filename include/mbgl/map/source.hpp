@@ -24,6 +24,7 @@ class SpriteAtlas;
 class Sprite;
 class FileSource;
 class Texturepool;
+class Style;
 class Painter;
 class StyleLayer;
 class TransformState;
@@ -35,6 +36,7 @@ public:
 
     void load(Map&, FileSource&);
     bool update(Map&, uv::worker&,
+                util::ptr<Style>,
                 GlyphAtlas&, GlyphStore&,
                 SpriteAtlas&, util::ptr<Sprite>,
                 Texturepool&, FileSource&);
@@ -57,11 +59,13 @@ private:
     std::forward_list<Tile::ID> coveringTiles(const TransformState&) const;
 
     bool updateTiles(Map&, uv::worker&,
+                     util::ptr<Style>,
                      GlyphAtlas&, GlyphStore&,
                      SpriteAtlas&, util::ptr<Sprite>,
                      Texturepool&, FileSource&);
 
     TileData::State addTile(Map&, uv::worker&,
+                            util::ptr<Style>,
                             GlyphAtlas&, GlyphStore&,
                             SpriteAtlas&, util::ptr<Sprite>,
                             FileSource&, Texturepool&,
