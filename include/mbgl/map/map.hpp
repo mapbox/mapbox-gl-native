@@ -124,7 +124,6 @@ public:
     // Call this when the network reachability changed.
     void setReachability(bool status);
 
-public:
     inline const TransformState &getState() const { return state; }
     inline timestamp getAnimationTime() const { return animationTime; }
     inline timestamp getTime() const { return animationTime; }
@@ -152,7 +151,6 @@ private:
     // Unconditionally performs a render with the current map state.
     void render();
 
-private:
     bool async = false;
     std::unique_ptr<uv::loop> loop;
     std::unique_ptr<uv::worker> workers;
@@ -161,7 +159,6 @@ private:
     std::unique_ptr<uv_async_t> async_render;
     std::unique_ptr<uv_async_t> async_cleanup;
 
-private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
     // render the map.
     std::atomic_flag is_clean = ATOMIC_FLAG_INIT;
@@ -177,10 +174,8 @@ private:
     // Stores whether the map thread has been stopped already.
     std::atomic_bool is_stopped;
 
-public:
     View &view;
 
-private:
 #ifndef NDEBUG
     const unsigned long main_thread;
     unsigned long map_thread = -1;
@@ -208,7 +203,6 @@ private:
     timestamp animationTime = 0;
 
     std::set<util::ptr<StyleSource>> activeSources;
-
 };
 
 }
