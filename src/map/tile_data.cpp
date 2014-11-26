@@ -37,6 +37,12 @@ void TileData::request(FileSource& fileSource) {
         if (token == "z") return std::to_string(id.z);
         if (token == "x") return std::to_string(id.x);
         if (token == "y") return std::to_string(id.y);
+        if (token == "prefix") {
+            std::string prefix { 2 };
+            prefix[0] = "0123456789abcdef"[id.x % 16];
+            prefix[1] = "0123456789abcdef"[id.y % 16];
+            return prefix;
+        }
         if (token == "ratio") return (map.getState().getPixelRatio() > 1.0 ? "@2x" : "");
         return "";
     });

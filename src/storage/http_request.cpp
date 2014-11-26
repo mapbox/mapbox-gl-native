@@ -36,12 +36,12 @@ void HTTPRequest::startCacheRequest() {
     cache_baton->request = this;
     cache_baton->path = path;
     cache_baton->store = store;
-    store->get(path, [](std::unique_ptr<Response> &&response, void *ptr) {
+    store->get(path, [](std::unique_ptr<Response> &&response_, void *ptr) {
         // Wrap in a unique_ptr, so it'll always get auto-destructed.
         std::unique_ptr<CacheRequestBaton> baton((CacheRequestBaton *)ptr);
         if (baton->request) {
             baton->request->cache_baton = nullptr;
-            baton->request->handleCacheResponse(std::move(response));
+            baton->request->handleCacheResponse(std::move(response_));
         }
     }, cache_baton);
 }
