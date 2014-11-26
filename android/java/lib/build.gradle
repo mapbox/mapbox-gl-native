@@ -29,6 +29,10 @@ android {
     }
 }
 
+configurations {
+    all*.exclude group: 'commons-logging', module: 'commons-logging'
+}
+
 dependencies {
     compile 'commons-validator:commons-validator:1.4.0'
     compile 'com.android.support:support-annotations:21.0.0'
