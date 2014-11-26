@@ -9,15 +9,15 @@
 
 namespace mbgl { namespace util {
 
-class image_reader_exception : public std::exception
+class ImageReaderException : public std::exception
 {
 private:
     std::string message_;
 public:
-    image_reader_exception(std::string const& message)
+    ImageReaderException(std::string const& message)
         : message_(message) {}
 
-    ~image_reader_exception() throw() {}
+    ~ImageReaderException() throw() {}
 
     virtual const char* what() const throw()
     {
@@ -25,17 +25,17 @@ public:
     }
 };
 
-struct image_reader : private noncopyable
+struct ImageReader : private noncopyable
 {
     virtual unsigned width() const=0;
     virtual unsigned height() const=0;
-    virtual bool has_alpha() const=0;
-    virtual bool premultiplied_alpha() const=0;
+    virtual bool hasAlpha() const=0;
+    virtual bool premultipliedAlpha() const=0;
     virtual void read(unsigned x,unsigned y, unsigned width, unsigned height, char* image)=0;
-    virtual ~image_reader() {}
+    virtual ~ImageReader() {}
 };
 
-std::unique_ptr<image_reader> get_image_reader(char const* data, size_t size);
+std::unique_ptr<ImageReader> getImageReader(char const* data, size_t size);
 
 }}
 

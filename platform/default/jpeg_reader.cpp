@@ -13,30 +13,30 @@ namespace mbgl { namespace util {
 
 // ctor
 template <typename T>
-jpeg_reader<T>::jpeg_reader(char const* data, size_t size)
+JpegReader<T>::JpegReader(char const* data, size_t size)
     : source_(data, size),
       stream_(source_),
       width_(0),
       height_(0)
 {
-    if (!stream_) throw image_reader_exception("cannot open image stream");
+    if (!stream_) throw ImageReaderException("cannot open image stream");
     init();
 }
 
 // dtor
 template <typename T>
-jpeg_reader<T>::~jpeg_reader() {}
+JpegReader<T>::~JpegReader() {}
 
 // jpeg stream wrapper
 template <typename T>
-void jpeg_reader<T>::init_source (j_decompress_ptr cinfo)
+void JpegReader<T>::init_source (j_decompress_ptr cinfo)
 {
     jpeg_stream_wrapper* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
     wrap->stream->seekg(0,std::ios_base::beg);
 }
 
 template <typename T>
-boolean jpeg_reader<T>::fill_input_buffer (j_decompress_ptr cinfo)
+boolean JpegReader<T>::fill_input_buffer (j_decompress_ptr cinfo)
 {
     jpeg_stream_wrapper* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
     wrap->stream->read(reinterpret_cast<char*>(&wrap->buffer[0]),BUF_SIZE);
@@ -47,7 +47,7 @@ boolean jpeg_reader<T>::fill_input_buffer (j_decompress_ptr cinfo)
 }
 
 template <typename T>
-void jpeg_reader<T>::skip(j_decompress_ptr cinfo, long count)
+void JpegReader<T>::skip(j_decompress_ptr cinfo, long count)
 {
     if (count <= 0) return; //A zero or negative skip count should be treated as a no-op.
     jpeg_stream_wrapper* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
@@ -67,20 +67,20 @@ void jpeg_reader<T>::skip(j_decompress_ptr cinfo, long count)
 }
 
 template <typename T>
-void jpeg_reader<T>::term (j_decompress_ptr /*cinfo*/)
+void JpegReader<T>::term (j_decompress_ptr /*cinfo*/)
 {
 // no-op
 }
 
 template <typename T>
-void jpeg_reader<T>::attach_stream (j_decompress_ptr cinfo, input_stream* in)
+void JpegReader<T>::attach_stream (j_decompress_ptr cinfo, input_stream* in)
 {
     if (cinfo->src == 0)
     {
         cinfo->src = (struct jpeg_source_mgr *)
             (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT, sizeof(jpeg_stream_wrapper));
     }
-    jpeg_reader::jpeg_stream_wrapper * src = reinterpret_cast<jpeg_reader::jpeg_stream_wrapper*> (cinfo->src);
+    JpegReader::jpeg_stream_wrapper * src = reinterpret_cast<JpegReader::jpeg_stream_wrapper*> (cinfo->src);
     src->manager.init_source = init_source;
     src->manager.fill_input_buffer = fill_input_buffer;
     src->manager.skip_input_data = skip;
@@ -92,20 +92,20 @@ void jpeg_reader<T>::attach_stream (j_decompress_ptr cinfo, input_stream* in)
 }
 
 template <typename T>
-void jpeg_reader<T>::on_error(j_common_ptr /*cinfo*/)
+void JpegReader<T>::on_error(j_common_ptr /*cinfo*/)
 {
 }
 
 template <typename T>
-void jpeg_reader<T>::on_error_message(j_common_ptr cinfo)
+void JpegReader<T>::on_error_message(j_common_ptr cinfo)
 {
     char buffer[JMSG_LENGTH_MAX];
     (*cinfo->err->format_message)(cinfo, buffer);
-    throw image_reader_exception(std::string("JPEG Reader: libjpeg could not read image: ") + buffer);
+    throw ImageReaderException(std::string("JPEG Reader: libjpeg could not read image: ") + buffer);
 }
 
 template <typename T>
-void jpeg_reader<T>::init()
+void JpegReader<T>::init()
 {
     jpeg_decompress_struct cinfo;
     jpeg_info_guard iguard(&cinfo);
@@ -117,35 +117,35 @@ void jpeg_reader<T>::init()
     attach_stream(&cinfo, &stream_);
     int ret = jpeg_read_header(&cinfo, TRUE);
     if (ret != JPEG_HEADER_OK)
-        throw image_reader_exception("JPEG Reader: failed to read header");
+        throw ImageReaderException("JPEG Reader: failed to read header");
     jpeg_start_decompress(&cinfo);
     width_ = cinfo.output_width;
     height_ = cinfo.output_height;
 
     if (cinfo.out_color_space == JCS_UNKNOWN)
     {
-        throw image_reader_exception("JPEG Reader: failed to read unknown color space");
+        throw ImageReaderException("JPEG Reader: failed to read unknown color space");
     }
     if (cinfo.output_width == 0 || cinfo.output_height == 0)
     {
-        throw image_reader_exception("JPEG Reader: failed to read image size of");
+        throw ImageReaderException("JPEG Reader: failed to read image size of");
     }
 }
 
 template <typename T>
-unsigned jpeg_reader<T>::width() const
+unsigned JpegReader<T>::width() const
 {
     return width_;
 }
 
 template <typename T>
-unsigned jpeg_reader<T>::height() const
+unsigned JpegReader<T>::height() const
 {
     return height_;
 }
 
 template <typename T>
-void jpeg_reader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char* image)
+void JpegReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char* image)
 {
     stream_.clear();
     stream_.seekg(0, std::ios_base::beg);
@@ -159,7 +159,7 @@ void jpeg_reader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char
     jpeg_create_decompress(&cinfo);
     attach_stream(&cinfo, &stream_);
     int ret = jpeg_read_header(&cinfo, TRUE);
-    if (ret != JPEG_HEADER_OK) throw image_reader_exception("JPEG Reader read(): failed to read header");
+    if (ret != JPEG_HEADER_OK) throw ImageReaderException("JPEG Reader read(): failed to read header");
     jpeg_start_decompress(&cinfo);
     JSAMPARRAY buffer;
     int row_stride;
@@ -198,6 +198,6 @@ void jpeg_reader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char
     jpeg_finish_decompress(&cinfo);
 }
 
-template class jpeg_reader<boost::iostreams::array_source>;
+template class JpegReader<boost::iostreams::array_source>;
 
 }}
