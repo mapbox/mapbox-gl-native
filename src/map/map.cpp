@@ -114,10 +114,11 @@ Map::~Map() {
     }
 
     // Explicitly reset all pointers.
-    texturepool.reset();
+    activeSources.clear();
     sprite.reset();
     glyphStore.reset();
     style.reset();
+    texturepool.reset();
     fileSource.reset();
     workers.reset();
 
