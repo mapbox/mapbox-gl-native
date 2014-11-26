@@ -8,8 +8,7 @@
     <string-array name="style_list">
         <item>Bright</item>
         <item>Basic</item>
-        <item>Outdoors (Vector)</item>
-        <item>Outdoors (Raster)</item>
+        <item>Outdoors</item>
         <!--<item>Pencil</item>-->
         <item>Satellite</item>
         <!--<item>Empty</item>-->

@@ -132,28 +132,23 @@ public class MainActivity extends ActionBarActivity {
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/basic-v6.json");
                     break;
 
-                // Outdoors (Vector)
+                // Outdoors
                 case 2:
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/outdoors-v6.json");
                     break;
 
-                // Outdoors (Raster)
-                case 3:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/outdoors-raster-v6.json");
-                    break;
-
                 // Satellite
-                case 4:
+                case 3:
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/satellite-v6.json");
                     break;
 
                 // Pencil
-                case 5:
+                case 4:
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/pencil-v6.json");
                     break;
 
                 // Empty
-                case 6:
+                case 5:
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/empty-v6.json");
                     break;
 
