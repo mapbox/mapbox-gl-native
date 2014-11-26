@@ -63,10 +63,10 @@ void Source::load(Map& map, FileSource& fileSource) {
 
 bool Source::update(Map& map, uv::worker& worker,
                     GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
-                    SpriteAtlas& spriteAtlas,
+                    SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
                     Texturepool& texturepool, FileSource& fileSource) {
     if (loaded && map.getTime() > updated) {
-        return updateTiles(map, worker, glyphAtlas, glyphStore, spriteAtlas, texturepool, fileSource);
+        return updateTiles(map, worker, glyphAtlas, glyphStore, spriteAtlas, sprite, texturepool, fileSource);
     } else {
         return false;
     }
@@ -164,7 +164,7 @@ TileData::State Source::hasTile(const Tile::ID& id) {
 
 TileData::State Source::addTile(Map& map, uv::worker& worker,
                                 GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
-                                SpriteAtlas& spriteAtlas,
+                                SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
                                 FileSource& fileSource, Texturepool& texturepool,
                                 const Tile::ID& id) {
     const TileData::State state = hasTile(id);
@@ -194,7 +194,7 @@ TileData::State Source::addTile(Map& map, uv::worker& worker,
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
         if (info->type == SourceType::Vector) {
-            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, glyphAtlas, glyphStore, spriteAtlas, texturepool, info);
+            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, glyphAtlas, glyphStore, spriteAtlas, sprite, texturepool, info);
         } else if (info->type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, map, texturepool, info);
         } else {
@@ -290,7 +290,7 @@ bool Source::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::
 
 bool Source::updateTiles(Map& map, uv::worker& worker,
                          GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
-                         SpriteAtlas& spriteAtlas,
+                         SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
                          Texturepool& texturepool, FileSource& fileSource) {
     bool changed = false;
 
@@ -310,7 +310,7 @@ bool Source::updateTiles(Map& map, uv::worker& worker,
     for (const Tile::ID& id : required) {
         const TileData::State state = addTile(map, worker,
                                               glyphAtlas, glyphStore,
-                                              spriteAtlas,
+                                              spriteAtlas, sprite,
                                               fileSource, texturepool,
                                               id);
 

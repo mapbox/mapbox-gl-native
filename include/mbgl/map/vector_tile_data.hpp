@@ -24,6 +24,7 @@ class TileParser;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
+class Sprite;
 class Texturepool;
 
 class VectorTileData : public TileData {
@@ -32,7 +33,7 @@ class VectorTileData : public TileData {
 public:
     VectorTileData(Tile::ID const&, Map&,
                    GlyphAtlas&, GlyphStore&,
-                   SpriteAtlas&,
+                   SpriteAtlas&, util::ptr<Sprite>,
                    Texturepool&,
                    const util::ptr<SourceInfo>&);
     ~VectorTileData();
@@ -59,6 +60,7 @@ protected:
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
     SpriteAtlas& spriteAtlas;
+    util::ptr<Sprite> sprite;
     Texturepool& texturepool;
 
 public:

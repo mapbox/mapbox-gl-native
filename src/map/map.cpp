@@ -642,7 +642,10 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
 
 void Map::updateTiles() {
     for (const util::ptr<StyleSource> &source : getActiveSources()) {
-        source->source->update(*this, getWorker(), glyphAtlas, *glyphStore, spriteAtlas, *texturepool, *fileSource);
+        source->source->update(*this, getWorker(),
+                               glyphAtlas, *glyphStore,
+                               spriteAtlas, getSprite(),
+                               *texturepool, *fileSource);
     }
 }
 

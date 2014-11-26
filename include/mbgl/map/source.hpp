@@ -21,6 +21,7 @@ class Map;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
+class Sprite;
 class FileSource;
 class Texturepool;
 class Painter;
@@ -35,7 +36,7 @@ public:
     void load(Map&, FileSource&);
     bool update(Map&, uv::worker&,
                 GlyphAtlas&, GlyphStore&,
-                SpriteAtlas&,
+                SpriteAtlas&, util::ptr<Sprite>,
                 Texturepool&, FileSource&);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
@@ -57,12 +58,12 @@ private:
 
     bool updateTiles(Map&, uv::worker&,
                      GlyphAtlas&, GlyphStore&,
-                     SpriteAtlas&,
+                     SpriteAtlas&, util::ptr<Sprite>,
                      Texturepool&, FileSource&);
 
     TileData::State addTile(Map&, uv::worker&,
                             GlyphAtlas&, GlyphStore&,
-                            SpriteAtlas&,
+                            SpriteAtlas&, util::ptr<Sprite>,
                             FileSource&, Texturepool&,
                             const Tile::ID&);
 
