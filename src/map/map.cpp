@@ -595,7 +595,7 @@ void Map::updateSources() {
     assert(uv_thread_self() == map_thread);
 
     // First, disable all existing sources.
-    for (const util::ptr<StyleSource> &source : activeSources) {
+    for (const auto& source : activeSources) {
         source->enabled = false;
     }
 
@@ -603,7 +603,7 @@ void Map::updateSources() {
     updateSources(style->layers);
 
     // Then, construct or destroy the actual source object, depending on enabled state.
-    for (const util::ptr<StyleSource> &style_source : activeSources) {
+    for (const auto& style_source : activeSources) {
         if (style_source->enabled) {
             if (!style_source->source) {
                 style_source->source = std::make_shared<Source>(style_source->info);
