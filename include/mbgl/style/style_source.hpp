@@ -29,16 +29,11 @@ public:
 };
 
 
-class StyleSource : public std::enable_shared_from_this<StyleSource> {
+class StyleSource : private util::noncopyable {
 public:
-    util::ptr<SourceInfo> info;
-
+    SourceInfo info;
     bool enabled = false;
     util::ptr<Source> source;
-
-    StyleSource(const util::ptr<SourceInfo> &info_)
-        : info(info_)
-    {}
 };
 
 }

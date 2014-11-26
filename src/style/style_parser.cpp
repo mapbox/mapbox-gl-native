@@ -178,14 +178,12 @@ void StyleParser::parseSources(JSVal value) {
         rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
         for (; itr != value.MemberEnd(); ++itr) {
             std::string name { itr->name.GetString(), itr->name.GetStringLength() };
-            util::ptr<SourceInfo> info = std::make_shared<SourceInfo>();
+            SourceInfo& info = sources.emplace(name, std::make_shared<StyleSource>()).first->second->info;
 
-            parseRenderProperty<SourceTypeClass>(itr->value, info->type, "type");
-            parseRenderProperty(itr->value, info->url, "url");
-            parseRenderProperty(itr->value, info->tile_size, "tileSize");
-            info->parseTileJSONProperties(itr->value);
-
-            sources.emplace(std::move(name), std::make_shared<StyleSource>(info));
+            parseRenderProperty<SourceTypeClass>(itr->value, info.type, "type");
+            parseRenderProperty(itr->value, info.url, "url");
+            parseRenderProperty(itr->value, info.tile_size, "tileSize");
+            info.parseTileJSONProperties(itr->value);
         }
     } else {
         Log::Warning(Event::ParseStyle, "sources must be an object");
