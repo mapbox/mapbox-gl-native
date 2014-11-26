@@ -1,8 +1,5 @@
 package com.mapbox.mapboxgl.lib;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -32,8 +29,11 @@ import android.widget.ZoomButtonsController;
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 
+import org.apache.commons.validator.routines.UrlValidator;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UnknownFormatConversionException;
 
 // Custom view that shows a Map
 // Based on SurfaceView as we use OpenGL ES to render
@@ -309,6 +309,14 @@ public class MapView extends SurfaceView {
         mNativeMapView.toggleDebug();
     }
 
+    private void validateStyleUrl(String url) {
+        String[] schemes = {"http", "https", "file", "asset"};
+        UrlValidator urlValidator = new UrlValidator(schemes, UrlValidator.NO_FRAGMENTS | UrlValidator.ALLOW_LOCAL_URLS);
+        if (!urlValidator.isValid(url)) {
+            throw new RuntimeException("Style URL is not a valid http, https, file or asset URL.");
+        }
+    }
+
     public void setStyleUrl(String url) {
         mStyleUrl = url;
         mNativeMapView.setStyleUrl(url);
@@ -318,7 +326,15 @@ public class MapView extends SurfaceView {
         return mStyleUrl;
     }
 
+    private void validateAccessToken(String accessToken) {
+
+        if (accessToken.isEmpty() | (!getAccessToken().startsWith("pk.") && !getAccessToken().startsWith("sk."))) {
+            throw new RuntimeException("Using MapView requires setting a valid access token. See the README.md");
+        }
+    }
+
     public void setAccessToken(String accessToken) {
+        validateAccessToken(accessToken);
         mNativeMapView.setAccessToken(accessToken);
     }
 
@@ -369,15 +385,10 @@ public class MapView extends SurfaceView {
             mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
         }
 
-        if (mNativeMapView.getAccessToken().isEmpty()) {
-            throw new RuntimeException("Using MapView requires setting an access key.");
-        }
+        validateAccessToken(getAccessToken());
 
         mNativeMapView.initializeDisplay();
         mNativeMapView.initializeContext();
-        if (!getAccessToken().startsWith("pk.") && !getAccessToken().startsWith("sk.")) {
-            throw new RuntimeException("You must set a valid access token! See the README.md");
-        }
         mNativeMapView.start();
     }
 
