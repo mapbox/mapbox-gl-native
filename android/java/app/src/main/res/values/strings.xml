@@ -5,12 +5,14 @@
 
     <string name="action_gps">Go to GPS location</string>
 
+    <string name="action_debug">Toggle debug mode</string>
+
     <string-array name="style_list">
         <item>Bright</item>
         <item>Basic</item>
         <item>Outdoors</item>
-        <!--<item>Pencil</item>-->
         <item>Satellite</item>
+        <!--<item>Pencil</item>-->
         <!--<item>Empty</item>-->
     </string-array>
 

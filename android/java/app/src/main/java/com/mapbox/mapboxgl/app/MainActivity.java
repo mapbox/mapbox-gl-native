@@ -86,6 +86,11 @@ public class MainActivity extends ActionBarActivity {
                 locationManager.requestSingleUpdate(provider, new MyLocationListener(), null);
                 return true;
 
+            case R.id.action_debug:
+                // Toggle debug mode
+                mMapFragment.getMap().toggleDebug();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
