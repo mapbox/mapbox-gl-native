@@ -8,20 +8,20 @@
 
 using namespace mbgl;
 
-VectorTileData::VectorTileData(Tile::ID const& id_, Map &map_,
-                               util::ptr<Style> style_,
+VectorTileData::VectorTileData(Tile::ID const& id_,
+                               float mapMaxZoom, util::ptr<Style> style_,
                                GlyphAtlas& glyphAtlas_, GlyphStore& glyphStore_,
                                SpriteAtlas& spriteAtlas_, util::ptr<Sprite> sprite_,
                                Texturepool& texturepool_,
                                const util::ptr<SourceInfo> &source_)
-    : TileData(id_, map_, source_),
+    : TileData(id_, source_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
       texturepool(texturepool_),
       style(style_),
-      depth(id.z >= source->max_zoom ? map.getMaxZoom() - id.z : 1) {
+      depth(id.z >= source->max_zoom ? mapMaxZoom - id.z : 1) {
 }
 
 VectorTileData::~VectorTileData() {

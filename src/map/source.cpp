@@ -65,12 +65,14 @@ bool Source::update(Map& map, uv::worker& worker,
                     util::ptr<Style> style,
                     GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
                     SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
-                    Texturepool& texturepool, FileSource& fileSource) {
+                    Texturepool& texturepool, FileSource& fileSource,
+                    std::function<void ()> callback) {
     if (loaded && map.getTime() > updated) {
         return updateTiles(map, worker, style,
                            glyphAtlas, glyphStore,
                            spriteAtlas, sprite,
-                           texturepool, fileSource);
+                           texturepool, fileSource,
+                           callback);
     } else {
         return false;
     }
@@ -171,7 +173,8 @@ TileData::State Source::addTile(Map& map, uv::worker& worker,
                                 GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
                                 SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
                                 FileSource& fileSource, Texturepool& texturepool,
-                                const Tile::ID& id) {
+                                const Tile::ID& id,
+                                std::function<void ()> callback) {
     const TileData::State state = hasTile(id);
 
     if (state != TileData::State::invalid) {
@@ -199,17 +202,17 @@ TileData::State Source::addTile(Map& map, uv::worker& worker,
     if (!new_tile.data) {
         // If we don't find working tile data, we're just going to load it.
         if (info->type == SourceType::Vector) {
-            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map, style,
+            new_tile.data = std::make_shared<VectorTileData>(normalized_id, map.getMaxZoom(), style,
                                                              glyphAtlas, glyphStore,
                                                              spriteAtlas, sprite,
                                                              texturepool, info);
         } else if (info->type == SourceType::Raster) {
-            new_tile.data = std::make_shared<RasterTileData>(normalized_id, map, texturepool, info);
+            new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturepool, info);
         } else {
             throw std::runtime_error("source type not implemented");
         }
 
-        new_tile.data->request(worker, fileSource);
+        new_tile.data->request(worker, fileSource, map.getState().getPixelRatio(), callback);
         tile_data.emplace(new_tile.data->id, new_tile.data);
     }
 
@@ -299,7 +302,8 @@ bool Source::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::
 bool Source::updateTiles(Map& map, uv::worker& worker, util::ptr<Style> style,
                          GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
                          SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
-                         Texturepool& texturepool, FileSource& fileSource) {
+                         Texturepool& texturepool, FileSource& fileSource,
+                         std::function<void ()> callback) {
     bool changed = false;
 
     int32_t zoom = std::floor(getZoom(map.getState()));
@@ -320,7 +324,7 @@ bool Source::updateTiles(Map& map, uv::worker& worker, util::ptr<Style> style,
                                               glyphAtlas, glyphStore,
                                               spriteAtlas, sprite,
                                               fileSource, texturepool,
-                                              id);
+                                              id, callback);
 
         if (state != TileData::State::parsed) {
             // The tile we require is not yet loaded. Try to find a parent or

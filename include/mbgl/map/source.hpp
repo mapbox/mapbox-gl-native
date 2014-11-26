@@ -39,7 +39,8 @@ public:
                 util::ptr<Style>,
                 GlyphAtlas&, GlyphStore&,
                 SpriteAtlas&, util::ptr<Sprite>,
-                Texturepool&, FileSource&);
+                Texturepool&, FileSource&,
+                std::function<void ()> callback);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
@@ -62,14 +63,16 @@ private:
                      util::ptr<Style>,
                      GlyphAtlas&, GlyphStore&,
                      SpriteAtlas&, util::ptr<Sprite>,
-                     Texturepool&, FileSource&);
+                     Texturepool&, FileSource&,
+                     std::function<void ()> callback);
 
     TileData::State addTile(Map&, uv::worker&,
                             util::ptr<Style>,
                             GlyphAtlas&, GlyphStore&,
                             SpriteAtlas&, util::ptr<Sprite>,
                             FileSource&, Texturepool&,
-                            const Tile::ID&);
+                            const Tile::ID&,
+                            std::function<void ()> callback);
 
     TileData::State hasTile(const Tile::ID& id);
 

@@ -144,8 +144,8 @@ private:
 template <typename T>
 class work {
 public:
-    typedef void (*work_callback)(T &object);
-    typedef void (*after_work_callback)(T &object);
+    typedef std::function<void (T&)> work_callback;
+    typedef std::function<void (T&)> after_work_callback;
 
     template<typename... Args>
     work(worker &worker, work_callback work_cb_, after_work_callback after_work_cb_, Args&&... args)

@@ -16,7 +16,6 @@
 namespace mbgl {
 
 class Bucket;
-class Map;
 class Painter;
 class SourceInfo;
 class StyleLayer;
@@ -32,8 +31,8 @@ class VectorTileData : public TileData {
     friend class TileParser;
 
 public:
-    VectorTileData(Tile::ID const&, Map&,
-                   util::ptr<Style>,
+    VectorTileData(Tile::ID const&,
+                   float mapMaxZoom, util::ptr<Style>,
                    GlyphAtlas&, GlyphStore&,
                    SpriteAtlas&, util::ptr<Sprite>,
                    Texturepool&,

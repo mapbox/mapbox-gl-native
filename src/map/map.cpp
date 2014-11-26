@@ -645,7 +645,7 @@ void Map::updateTiles() {
         source->source->update(*this, getWorker(),
                                style, glyphAtlas, *glyphStore,
                                spriteAtlas, getSprite(),
-                               *texturepool, *fileSource);
+                               *texturepool, *fileSource, [this](){ update(); });
     }
 }
 

@@ -12,6 +12,7 @@
 #include <exception>
 #include <iosfwd>
 #include <string>
+#include <functional>
 
 namespace uv {
 class worker;
@@ -45,11 +46,11 @@ public:
     };
 
 public:
-    TileData(Tile::ID const& id, Map &map, const util::ptr<SourceInfo> &source);
+    TileData(Tile::ID const& id, const util::ptr<SourceInfo> &source);
     ~TileData();
 
-    void request(uv::worker&, FileSource&);
-    void reparse(uv::worker&);
+    void request(uv::worker&, FileSource&, float pixelRatio, std::function<void ()> callback);
+    void reparse(uv::worker&, std::function<void ()> callback);
     void cancel();
     const std::string toString() const;
 
@@ -66,9 +67,6 @@ public:
 public:
     const Tile::ID id;
     std::atomic<State> state;
-
-protected:
-    Map &map;
 
 public:
     util::ptr<SourceInfo> source;
