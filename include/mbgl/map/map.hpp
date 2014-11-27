@@ -74,11 +74,11 @@ public:
     void setAppliedClasses(const std::vector<std::string> &classes);
     void toggleClass(const std::string &name);
     const std::vector<std::string> &getAppliedClasses() const;
-    void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);
+    void setDefaultTransitionDuration(uint64_t milliseconds = 0);
     void setStyleURL(const std::string &url);
     void setStyleJSON(std::string newStyleJSON, const std::string &base = "");
     std::string getStyleJSON() const;
-    void setAccessToken(std::string access_token);
+    void setAccessToken(std::string accessToken);
     std::string getAccessToken() const;
 
     // Transition
@@ -148,30 +148,30 @@ private:
     std::unique_ptr<uv::loop> loop;
     std::unique_ptr<uv::worker> workers;
     std::unique_ptr<uv::thread> thread;
-    std::unique_ptr<uv::async> async_terminate;
-    std::unique_ptr<uv::async> async_render;
-    std::unique_ptr<uv::async> async_cleanup;
+    std::unique_ptr<uv::async> asyncTerminate;
+    std::unique_ptr<uv::async> asyncRender;
+    std::unique_ptr<uv::async> asyncCleanup;
 
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
     // render the map.
-    std::atomic_flag is_clean = ATOMIC_FLAG_INIT;
+    std::atomic_flag isClean = ATOMIC_FLAG_INIT;
 
     // If this flag is cleared, the current back buffer is ready for being swapped with the front
     // buffer (i.e. it has rendered data).
-    std::atomic_flag is_swapped = ATOMIC_FLAG_INIT;
+    std::atomic_flag isSwapped = ATOMIC_FLAG_INIT;
 
     // This is cleared once the current front buffer has been presented and the back buffer is
     // ready for rendering.
-    std::atomic_flag is_rendered = ATOMIC_FLAG_INIT;
+    std::atomic_flag isRendered = ATOMIC_FLAG_INIT;
 
     // Stores whether the map thread has been stopped already.
-    std::atomic_bool is_stopped;
+    std::atomic_bool isStopped;
 
     View &view;
 
 #ifndef NDEBUG
-    const unsigned long main_thread;
-    unsigned long map_thread = -1;
+    const unsigned long mainThread;
+    unsigned long mapThread = -1;
 #endif
 
     Transform transform;
