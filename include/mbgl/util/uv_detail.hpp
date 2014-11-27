@@ -1,19 +1,19 @@
 #ifndef MBGL_UTIL_UV_DETAIL
 #define MBGL_UTIL_UV_DETAIL
 
-#include <mbgl/util/ptr.hpp>
 #include <mbgl/util/uv-worker.h>
+#include <mbgl/util/noncopyable.hpp>
 
 #include <uv.h>
 
 #include <functional>
 #include <cassert>
+#include <memory>
 #include <string>
-
 
 namespace uv {
 
-class thread {
+class thread : public mbgl::util::noncopyable {
 public:
     inline operator uv_thread_t *() { return &t; }
 
@@ -21,7 +21,7 @@ private:
     uv_thread_t t;
 };
 
-class loop {
+class loop : public mbgl::util::noncopyable {
 public:
     inline loop() {
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
@@ -51,7 +51,7 @@ private:
     uv_loop_t *l = nullptr;
 };
 
-class mutex {
+class mutex : public mbgl::util::noncopyable {
 public:
     inline mutex() {
         if (uv_mutex_init(&mtx) != 0) {
@@ -66,7 +66,7 @@ private:
     uv_mutex_t mtx;
 };
 
-class lock {
+class lock : public mbgl::util::noncopyable {
 public:
     lock(mutex &mtx_) : mtx(mtx_) { mtx.lock(); }
     ~lock() { mtx.unlock(); }
@@ -75,7 +75,7 @@ private:
     mutex &mtx;
 };
 
-class rwlock {
+class rwlock : public mbgl::util::noncopyable {
 public:
     inline rwlock() {
         if (uv_rwlock_init(&mtx) != 0) {
@@ -92,7 +92,7 @@ private:
     uv_rwlock_t mtx;
 };
 
-class readlock {
+class readlock : public mbgl::util::noncopyable {
 public:
     inline readlock(rwlock &mtx_) : mtx(mtx_) { mtx.rdlock(); }
     inline readlock(const std::unique_ptr<rwlock> &mtx_) : mtx(*mtx_) { mtx.rdlock(); }
@@ -102,7 +102,7 @@ private:
     rwlock &mtx;
 };
 
-class writelock {
+class writelock : public mbgl::util::noncopyable {
 public:
     inline writelock(rwlock &mtx_) : mtx(mtx_) { mtx.wrlock(); }
     inline writelock(const std::unique_ptr<rwlock> &mtx_) : mtx(*mtx_) { mtx.wrlock(); }
@@ -112,7 +112,7 @@ private:
     rwlock &mtx;
 };
 
-class worker {
+class worker : public mbgl::util::noncopyable {
 public:
     inline worker(uv_loop_t *loop, unsigned int count, const char *name = nullptr) : w(new uv_worker_t) {
         uv_worker_init(w, loop, count, name);
@@ -131,7 +131,7 @@ private:
 };
 
 template <typename T>
-class work {
+class work : public mbgl::util::noncopyable {
 public:
     typedef std::function<void (T&)> work_callback;
     typedef std::function<void (T&)> after_work_callback;
