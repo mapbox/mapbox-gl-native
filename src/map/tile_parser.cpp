@@ -32,9 +32,10 @@ TileParser::~TileParser() = default;
 TileParser::TileParser(const std::string &data, VectorTileData &tile_,
                        const util::ptr<const Style> &style_,
                        GlyphAtlas & glyphAtlas_,
-                       const util::ptr<GlyphStore> &glyphStore_,
+                       GlyphStore & glyphStore_,
                        SpriteAtlas & spriteAtlas_,
-                       const util::ptr<Sprite> &sprite_)
+                       const util::ptr<Sprite> &sprite_,
+                       Texturepool& texturePool_)
     : vector_data(pbf((const uint8_t *)data.data(), data.size())),
       tile(tile_),
       style(style_),
@@ -42,10 +43,10 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile_,
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
-      collision(std::make_unique<Collision>(tile.id.z, 4096, tile.source->tile_size, tile.depth)) {
+      texturePool(texturePool_),
+      collision(std::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
     assert(&tile != nullptr);
     assert(style);
-    assert(glyphStore);
     assert(sprite);
     assert(collision);
 }
@@ -100,7 +101,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(util::ptr<StyleBucket> bucket_d
     }
 
     // Skip this bucket if we are to not render this
-    if (tile.id.z < std::floor(bucket_desc->min_zoom) && std::floor(bucket_desc->min_zoom) < tile.source->max_zoom) return nullptr;
+    if (tile.id.z < std::floor(bucket_desc->min_zoom) && std::floor(bucket_desc->min_zoom) < tile.source.max_zoom) return nullptr;
     if (tile.id.z >= std::ceil(bucket_desc->max_zoom)) return nullptr;
 
     auto layer_it = vector_data.layers.find(bucket_desc->source_layer);
@@ -154,7 +155,7 @@ std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& laye
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createRasterBucket(const util::ptr<Texturepool> &texturepool, const StyleBucketRaster &raster) {
+std::unique_ptr<Bucket> TileParser::createRasterBucket(Texturepool& texturepool, const StyleBucketRaster &raster) {
     std::unique_ptr<RasterBucket> bucket = std::make_unique<RasterBucket>(texturepool, raster);
     return obsolete() ? nullptr : std::move(bucket);
 }
@@ -167,7 +168,7 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& laye
 
 std::unique_ptr<Bucket> TileParser::createSymbolBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketSymbol &symbol) {
     std::unique_ptr<SymbolBucket> bucket = std::make_unique<SymbolBucket>(symbol, *collision);
-    bucket->addFeatures(layer, filter, tile.id, spriteAtlas, *sprite, glyphAtlas, *glyphStore);
+    bucket->addFeatures(layer, filter, tile.id, spriteAtlas, *sprite, glyphAtlas, glyphStore);
     return obsolete() ? nullptr : std::move(bucket);
 }
 

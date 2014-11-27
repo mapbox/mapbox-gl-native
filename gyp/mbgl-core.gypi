@@ -37,6 +37,7 @@
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
             'OTHER_CFLAGS': [ '<@(cflags)' ],
+            'SKIP_INSTALL': 'YES'
           },
         }, {
           'cflags_cc': [ '<@(cflags_cc)' ],

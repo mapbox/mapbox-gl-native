@@ -163,7 +163,6 @@
       'type': 'executable',
       'sources': [
         './headless.cpp',
-        '../platform/default/png_reader.cpp',
         './fixtures/fixture_log.cpp',
       ],
       'conditions': [

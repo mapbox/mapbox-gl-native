@@ -8,13 +8,24 @@
 
 using namespace mbgl;
 
-VectorTileData::VectorTileData(Tile::ID const& id_, Map &map_, const util::ptr<SourceInfo> &source_)
-    : TileData(id_, map_, source_),
-      depth(id.z >= source->max_zoom ? map.getMaxZoom() - id.z : 1) {
+VectorTileData::VectorTileData(Tile::ID const& id_,
+                               float mapMaxZoom, util::ptr<Style> style_,
+                               GlyphAtlas& glyphAtlas_, GlyphStore& glyphStore_,
+                               SpriteAtlas& spriteAtlas_, util::ptr<Sprite> sprite_,
+                               Texturepool& texturepool_,
+                               const SourceInfo& source_)
+    : TileData(id_, source_),
+      glyphAtlas(glyphAtlas_),
+      glyphStore(glyphStore_),
+      spriteAtlas(spriteAtlas_),
+      sprite(sprite_),
+      texturepool(texturepool_),
+      style(style_),
+      depth(id.z >= source.max_zoom ? mapMaxZoom - id.z : 1) {
 }
 
 VectorTileData::~VectorTileData() {
-    map.getGlyphAtlas().removeGlyphs(id.to_uint64());
+    glyphAtlas.removeGlyphs(id.to_uint64());
 }
 
 
@@ -27,8 +38,10 @@ void VectorTileData::parse() {
         // Parsing creates state that is encapsulated in TileParser. While parsing,
         // the TileParser object writes results into this objects. All other state
         // is going to be discarded afterwards.
-        TileParser parser(data, *this, map.getStyle(), map.getGlyphAtlas(),
-                          map.getGlyphStore(), map.getSpriteAtlas(), map.getSprite());
+        TileParser parser(data, *this, style,
+                          glyphAtlas, glyphStore,
+                          spriteAtlas, sprite,
+                          texturepool);
         parser.parse();
     } catch (const std::exception& ex) {
 #if defined(DEBUG)

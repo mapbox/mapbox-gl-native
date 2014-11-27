@@ -28,8 +28,6 @@ private:
                                  const SDFGlyph& glyph);
 public:
     GlyphAtlas(uint16_t width, uint16_t height);
-    ~GlyphAtlas();
-
 
     Rect<uint16_t> addGlyph(uint64_t tile_id, const std::string& face_name,
                             const SDFGlyph& glyph);
@@ -46,7 +44,7 @@ private:
     std::mutex mtx;
     BinPack<uint16_t> bin;
     std::map<std::string, std::map<uint32_t, GlyphValue>> index;
-    char *const data = nullptr;
+    std::unique_ptr<char[]> data;
     std::atomic<bool> dirty;
     uint32_t texture = 0;
 };

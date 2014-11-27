@@ -12,14 +12,10 @@ namespace uv {
 
 std::string cwd();
 
-struct deleter {
-    void operator()(uv_async_t *async);
-    void operator()(uv_timer_t *timer);
-};
-
 class thread;
 class rwlock;
 class loop;
+class async;
 class worker;
 
 }

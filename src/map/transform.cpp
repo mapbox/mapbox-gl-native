@@ -14,7 +14,6 @@ using namespace mbgl;
 
 const double D2R = M_PI / 180.0;
 const double M2PI = 2 * M_PI;
-const double MIN_ROTATE_SCALE = 8;
 
 Transform::Transform(View &view_)
     : view(view_)
@@ -37,7 +36,6 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
         current.pixelRatio = final.pixelRatio = ratio;
         current.framebuffer[0] = final.framebuffer[0] = fb_w;
         current.framebuffer[1] = final.framebuffer[1] = fb_h;
-        if (!canRotate() && current.angle) _setAngle(0);
         constrain(current.scale, current.y);
 
         view.notify_map_change(MapChangeRegionDidChange);
@@ -67,12 +65,6 @@ void Transform::_moveBy(const double dx, const double dy, const timestamp durati
     final.y = current.y + std::cos(current.angle) * dy + std::sin(-current.angle) * dx;
 
     constrain(final.scale, final.y);
-
-    // Un-rotate when rotated and panning far enough to show off-world in corners.
-    double w = final.scale * util::tileSize / 2;
-    double m = std::sqrt(std::pow((current.width / 2), 2) + pow((current.height / 2), 2));
-    double x = std::abs(sqrt(std::pow(final.x, 2) + std::pow(final.y, 2)));
-    if (current.angle && w - x < m) _setAngle(0);
 
     if (duration == 0) {
         current.x = final.x;
@@ -286,9 +278,6 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
 
     constrain(final.scale, final.y);
 
-    // Undo rotation at low zooms.
-    if (!canRotate() && current.angle) _setAngle(0);
-
     if (duration == 0) {
         current.scale = final.scale;
         current.x = final.x;
@@ -398,9 +387,6 @@ void Transform::_setAngle(double new_angle, const timestamp duration) {
 
     final.angle = new_angle;
 
-    // Prevent rotation at low zooms.
-    if (!canRotate()) final.angle = 0;
-
     if (duration == 0) {
         current.angle = final.angle;
     } else {
@@ -447,10 +433,6 @@ void Transform::_clearRotating() {
         transitions.remove(rotate_timeout);
         rotate_timeout.reset();
     }
-}
-
-bool Transform::canRotate() {
-    return (current.scale > MIN_ROTATE_SCALE);
 }
 
 #pragma mark - Transition

@@ -68,7 +68,7 @@ Install GCC 4.8+ if you are running Ubuntu 13.10 or older. Alternatively, you ca
 
 Ensure you have git and other build essentials:
 
-    sudo apt-get install git build-essential zlib1g-dev automake \
+    sudo apt-get install curl git build-essential zlib1g-dev automake \
                          libtool xutils-dev make cmake pkg-config python-pip \
                          libcurl4-openssl-dev libpng-dev libsqlite3-dev
 
@@ -93,15 +93,14 @@ Once you're done installing the build dependencies, you can get started by runni
 
 	./configure
 
-which downloads all other dependencies that we need to build manually with [Mason](https://github.com/mapbox/mason). There's a good chance that there already are binary files and that you don't need to compile anything.
+Then, you can then proceed to build the library:
 
-Then, you can then proceed to build the library like:
-
-    make mbgl
-
-Or proceed to building the debug application with:
-
+	git submodule update --init
 	make linux
+
+Set an access token as described below, and then run:
+
+	make run-linux
 
 
 # Troubleshooting

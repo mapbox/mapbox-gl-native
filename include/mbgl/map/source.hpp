@@ -18,6 +18,13 @@
 namespace mbgl {
 
 class Map;
+class GlyphAtlas;
+class GlyphStore;
+class SpriteAtlas;
+class Sprite;
+class FileSource;
+class Texturepool;
+class Style;
 class Painter;
 class StyleLayer;
 class TransformState;
@@ -25,11 +32,16 @@ struct box;
 
 class Source : public std::enable_shared_from_this<Source>, private util::noncopyable {
 public:
-    Source(const util::ptr<SourceInfo>& info);
+    Source(SourceInfo&);
 
-    void load(Map &map);
+    void load(Map&, FileSource&);
+    void update(Map&, uv::worker&,
+                util::ptr<Style>,
+                GlyphAtlas&, GlyphStore&,
+                SpriteAtlas&, util::ptr<Sprite>,
+                Texturepool&, FileSource&,
+                std::function<void ()> callback);
 
-    bool update(Map &map);
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void drawClippingMasks(Painter &painter);
     size_t getTileCount() const;
@@ -47,14 +59,19 @@ private:
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<Tile::ID> coveringTiles(const TransformState&) const;
 
-    bool updateTiles(Map &map);
+    TileData::State addTile(Map&, uv::worker&,
+                            util::ptr<Style>,
+                            GlyphAtlas&, GlyphStore&,
+                            SpriteAtlas&, util::ptr<Sprite>,
+                            FileSource&, Texturepool&,
+                            const Tile::ID&,
+                            std::function<void ()> callback);
 
-    TileData::State addTile(Map &map, const Tile::ID& id);
     TileData::State hasTile(const Tile::ID& id);
 
     double getZoom(const TransformState &state) const;
 
-    util::ptr<SourceInfo> info;
+    SourceInfo& info;
     bool loaded = false;
 
     // Stores the time when this source was most recently updated.

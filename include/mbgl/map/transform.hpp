@@ -51,7 +51,6 @@ public:
     double getAngle() const;
     void startRotating();
     void stopRotating();
-    bool canRotate();
 
     // Transitions
     bool needsTransition() const;

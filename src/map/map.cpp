@@ -88,9 +88,6 @@ using namespace mbgl;
 Map::Map(View& view_)
     : loop(std::make_unique<uv::loop>()),
       thread(std::make_unique<uv::thread>()),
-      async_terminate(new uv_async_t()),
-      async_render(new uv_async_t()),
-      async_cleanup(new uv_async_t()),
       view(view_),
 #ifndef NDEBUG
       main_thread(uv_thread_self()),
@@ -114,10 +111,11 @@ Map::~Map() {
     }
 
     // Explicitly reset all pointers.
-    texturepool.reset();
+    activeSources.clear();
     sprite.reset();
     glyphStore.reset();
     style.reset();
+    texturepool.reset();
     fileSource.reset();
     workers.reset();
 
@@ -143,27 +141,44 @@ void Map::start() {
     is_stopped = false;
 
     // Setup async notifications
+    async_terminate = std::make_unique<uv::async>(**loop, [this]() {
+        assert(uv_thread_self() == map_thread);
 
-// Iron out the differences between libuv 0.10 and 0.11
-#ifdef UV_ASYNC_CALLBACK
-#error Cannot overwrite UV_ASYNC_CALLBACK
-#endif
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-#define UV_ASYNC_CALLBACK(name) [](uv_async_t *a, int) { return Map::name(a); }
-#else
-#define UV_ASYNC_CALLBACK(name) name
-#endif
+        // Remove all of these to make sure they are destructed in the correct thread.
+        glyphStore.reset();
+        fileSource.reset();
+        style.reset();
+        workers.reset();
+        activeSources.clear();
 
-    uv_async_init(**loop, async_terminate.get(), UV_ASYNC_CALLBACK(terminate));
-    async_terminate->data = this;
+        // Closes all open handles on the loop. This means that the loop will automatically terminate.
+        async_cleanup.reset();
+        async_render.reset();
+        async_terminate.reset();
+    });
 
-    uv_async_init(**loop, async_render.get(), UV_ASYNC_CALLBACK(render));
-    async_render->data = this;
+    async_render = std::make_unique<uv::async>(**loop, [this]() {
+        assert(uv_thread_self() == map_thread);
 
-    uv_async_init(**loop, async_cleanup.get(), UV_ASYNC_CALLBACK(cleanup));
-    async_cleanup->data = this;
+        if (state.hasSize()) {
+            if (is_rendered.test_and_set() == false) {
+                prepare();
+                if (is_clean.test_and_set() == false) {
+                    render();
+                    is_swapped.clear();
+                    view.swap();
+                } else {
+                    // We set the rendered flag in the test above, so we have to reset it
+                    // now that we're not actually rendering because the map is clean.
+                    is_rendered.clear();
+                }
+            }
+        }
+    });
 
-#undef UV_ASYNC_CALLBACK
+    async_cleanup = std::make_unique<uv::async>(**loop, [this]() {
+        painter.cleanup();
+    });
 
     uv_thread_create(*thread, [](void *arg) {
         Map *map = static_cast<Map *>(arg);
@@ -189,7 +204,7 @@ void Map::stop(stop_callback cb, void *data) {
     assert(main_thread != map_thread);
     assert(async);
 
-    uv_async_send(async_terminate.get());
+    async_terminate->send();
 
     if (cb) {
         // Wait until the render thread stopped. We are using this construct instead of plainly
@@ -239,7 +254,7 @@ void Map::rerender() {
     // We only send render events if we want to continuously update the map
     // (== async rendering).
     if (async) {
-        uv_async_send(async_render.get());
+        async_render->send();
     }
 }
 
@@ -259,14 +274,8 @@ void Map::swapped() {
 
 void Map::cleanup() {
     if (async_cleanup != nullptr) {
-        uv_async_send(async_cleanup.get());
+        async_cleanup->send();
     }
-}
-
-void Map::cleanup(uv_async_t *async) {
-    Map *map = static_cast<Map *>(async->data);
-
-    map->painter.cleanup();
 }
 
 void Map::terminate() {
@@ -282,43 +291,6 @@ void Map::setReachability(bool reachable) {
             });
         }
     }
-}
-
-void Map::render(uv_async_t *async) {
-    Map *map = static_cast<Map *>(async->data);
-    assert(uv_thread_self() == map->map_thread);
-
-    if (map->state.hasSize()) {
-        if (map->is_rendered.test_and_set() == false) {
-            map->prepare();
-            if (map->is_clean.test_and_set() == false) {
-                map->render();
-                map->is_swapped.clear();
-                map->view.swap();
-            } else {
-                // We set the rendered flag in the test above, so we have to reset it
-                // now that we're not actually rendering because the map is clean.
-                map->is_rendered.clear();
-            }
-        }
-    }
-}
-
-void Map::terminate(uv_async_t *async) {
-    // Closes all open handles on the loop. This means that the loop will automatically terminate.
-    Map *map = static_cast<Map *>(async->data);
-    assert(uv_thread_self() == map->map_thread);
-
-    // Remove all of these to make sure they are destructed in the correct thread.
-    map->glyphStore.reset();
-    map->fileSource.reset();
-    map->style.reset();
-    map->workers.reset();
-    map->activeSources.clear();
-
-    uv_close((uv_handle_t *)map->async_cleanup.get(), nullptr);
-    uv_close((uv_handle_t *)map->async_render.get(), nullptr);
-    uv_close((uv_handle_t *)map->async_terminate.get(), nullptr);
 }
 
 #pragma mark - Setup
@@ -346,7 +318,7 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     style->loadJSON((const uint8_t *)styleJSON.c_str());
     if (!fileSource) {
         fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
-        glyphStore = std::make_shared<GlyphStore>(fileSource);
+        glyphStore = std::make_shared<GlyphStore>(*fileSource);
     }
     fileSource->setBase(base);
     glyphStore->setURL(util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken()));
@@ -370,7 +342,7 @@ util::ptr<Sprite> Map::getSprite() {
     const float pixelRatio = state.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
     if (!sprite || sprite->pixelRatio != pixelRatio) {
-        sprite = Sprite::Create(sprite_url, pixelRatio, fileSource);
+        sprite = Sprite::Create(sprite_url, pixelRatio, *fileSource);
     }
 
     return sprite;
@@ -379,12 +351,10 @@ util::ptr<Sprite> Map::getSprite() {
 
 #pragma mark - Size
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resize(uint16_t width, uint16_t height, float ratio) {
     resize(width, height, ratio, width * ratio, height * ratio);
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height) {
     if (transform.resize(width, height, ratio, fb_width, fb_height)) {
         update();
@@ -393,7 +363,6 @@ void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width
 
 #pragma mark - Transitions
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::cancelTransitions() {
     transform.cancelTransitions();
 
@@ -403,36 +372,30 @@ void Map::cancelTransitions() {
 
 #pragma mark - Position
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::moveBy(double dx, double dy, double duration) {
     transform.moveBy(dx, dy, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setLonLat(double lon, double lat, double duration) {
     transform.setLonLat(lon, lat, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::getLonLat(double& lon, double& lat) const {
     transform.getLonLat(lon, lat);
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::startPanning() {
     transform.startPanning();
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::stopPanning() {
     transform.stopPanning();
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resetPosition() {
     transform.setAngle(0);
     transform.setLonLat(0, 0);
@@ -443,57 +406,47 @@ void Map::resetPosition() {
 
 #pragma mark - Scale
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::scaleBy(double ds, double cx, double cy, double duration) {
     transform.scaleBy(ds, cx, cy, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setScale(double scale, double cx, double cy, double duration) {
     transform.setScale(scale, cx, cy, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 double Map::getScale() const {
     return transform.getScale();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setZoom(double zoom, double duration) {
     transform.setZoom(zoom, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 double Map::getZoom() const {
     return transform.getZoom();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
     transform.setLonLatZoom(lon, lat, zoom, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
     transform.getLonLatZoom(lon, lat, zoom);
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resetZoom() {
     setZoom(0);
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::startScaling() {
     transform.startScaling();
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::stopScaling() {
     transform.stopScaling();
     update();
@@ -510,49 +463,38 @@ double Map::getMaxZoom() const {
 
 #pragma mark - Rotation
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) {
     transform.rotateBy(sx, sy, ex, ey, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setBearing(double degrees, double duration) {
     transform.setAngle(-degrees * M_PI / 180, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setBearing(double degrees, double cx, double cy) {
     transform.setAngle(-degrees * M_PI / 180, cx, cy);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 double Map::getBearing() const {
     return -transform.getAngle() / M_PI * 180;
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resetNorth() {
     transform.setAngle(0, 500_milliseconds);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::startRotating() {
     transform.startRotating();
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::stopRotating() {
     transform.stopRotating();
     update();
-}
-
-bool Map::canRotate() {
-    return transform.canRotate();
 }
 
 
@@ -599,7 +541,7 @@ void Map::updateSources() {
     assert(uv_thread_self() == map_thread);
 
     // First, disable all existing sources.
-    for (const util::ptr<StyleSource> &source : activeSources) {
+    for (const auto& source : activeSources) {
         source->enabled = false;
     }
 
@@ -607,11 +549,11 @@ void Map::updateSources() {
     updateSources(style->layers);
 
     // Then, construct or destroy the actual source object, depending on enabled state.
-    for (const util::ptr<StyleSource> &style_source : activeSources) {
+    for (const auto& style_source : activeSources) {
         if (style_source->enabled) {
             if (!style_source->source) {
                 style_source->source = std::make_shared<Source>(style_source->info);
-                style_source->source->load(*this);
+                style_source->source->load(*this, *fileSource);
             }
         } else {
             style_source->source.reset();
@@ -622,10 +564,6 @@ void Map::updateSources() {
     util::erase_if(activeSources, [](util::ptr<StyleSource> source){
         return !source->enabled;
     });
-}
-
-const std::set<util::ptr<StyleSource>> Map::getActiveSources() const {
-    return activeSources;
 }
 
 void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
@@ -645,15 +583,18 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
 }
 
 void Map::updateTiles() {
-    for (const util::ptr<StyleSource> &source : getActiveSources()) {
-        source->source->update(*this);
+    for (const auto& source : activeSources) {
+        source->source->update(*this, getWorker(),
+                               style, glyphAtlas, *glyphStore,
+                               spriteAtlas, getSprite(),
+                               *texturepool, *fileSource, [this](){ update(); });
     }
 }
 
 void Map::prepare() {
     if (!fileSource) {
         fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
-        glyphStore = std::make_shared<GlyphStore>(fileSource);
+        glyphStore = std::make_shared<GlyphStore>(*fileSource);
     }
 
     if (!style) {

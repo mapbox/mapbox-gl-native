@@ -7,7 +7,8 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <cstring>
-#include <mbgl/util/image_reader.hpp>
+
+#include <mbgl/platform/default/image_reader.hpp>
 
 // Check png library version.
 const static bool png_version_check = []() {
@@ -76,19 +77,26 @@ Image::Image(std::string const& data)
 {
     try
     {
-        std::unique_ptr<image_reader> reader(get_image_reader(data.c_str(), data.size()));
+        auto reader = getImageReader(data.c_str(), data.size());
         width = reader->width();
         height = reader->height();
         img = ::std::unique_ptr<char[]>(new char[width * height * 4]());
         reader->read(0, 0, width, height, img.get());
     }
-    catch (image_reader_exception const& ex)
+    catch (ImageReaderException const& ex)
     {
-        fprintf(stderr, "ImageReader: %s\n", ex.what());
+        fprintf(stderr, "Image: %s\n", ex.what());
         img.reset();
         width = 0;
         height = 0;
 
+    }
+    catch (...) // catch the rest
+    {
+        fprintf(stderr, "Image: exception in constructor");
+        img.reset();
+        width = 0;
+        height = 0;
     }
 }
 

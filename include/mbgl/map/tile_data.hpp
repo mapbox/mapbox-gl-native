@@ -12,10 +12,16 @@
 #include <exception>
 #include <iosfwd>
 #include <string>
+#include <functional>
+
+namespace uv {
+class worker;
+}
 
 namespace mbgl {
 
 class Map;
+class FileSource;
 class Painter;
 class SourceInfo;
 class StyleLayer;
@@ -40,12 +46,12 @@ public:
     };
 
 public:
-    TileData(Tile::ID const& id, Map &map, const util::ptr<SourceInfo> &source);
+    TileData(Tile::ID const& id, const SourceInfo&);
     ~TileData();
 
-    void request();
+    void request(uv::worker&, FileSource&, float pixelRatio, std::function<void ()> callback);
+    void reparse(uv::worker&, std::function<void ()> callback);
     void cancel();
-    void reparse();
     const std::string toString() const;
 
     inline bool ready() const {
@@ -62,11 +68,8 @@ public:
     const Tile::ID id;
     std::atomic<State> state;
 
-protected:
-    Map &map;
-
 public:
-    util::ptr<SourceInfo> source;
+    const SourceInfo& source;
 
 protected:
     std::unique_ptr<Request> req;

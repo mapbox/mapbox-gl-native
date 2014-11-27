@@ -42,7 +42,7 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     # install OS X dependencies
     #
     mapbox_time "install_build_tools" \
-    brew install autoconf automake libtool makedepend cmake pkg-config node git boost
+    brew install makedepend git
 
     mapbox_time "install_awscli" \
     sudo pip install awscli
