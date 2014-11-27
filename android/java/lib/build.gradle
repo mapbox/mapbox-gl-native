@@ -11,6 +11,12 @@ android {
         versionCode 2
         versionName "0.1.1"
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
     buildTypes {
         debug {
             jniDebugBuild true
