@@ -380,12 +380,10 @@ util::ptr<Sprite> Map::getSprite() {
 
 #pragma mark - Size
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resize(uint16_t width, uint16_t height, float ratio) {
     resize(width, height, ratio, width * ratio, height * ratio);
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height) {
     if (transform.resize(width, height, ratio, fb_width, fb_height)) {
         update();
@@ -394,7 +392,6 @@ void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width
 
 #pragma mark - Transitions
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::cancelTransitions() {
     transform.cancelTransitions();
 
@@ -404,36 +401,30 @@ void Map::cancelTransitions() {
 
 #pragma mark - Position
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::moveBy(double dx, double dy, double duration) {
     transform.moveBy(dx, dy, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setLonLat(double lon, double lat, double duration) {
     transform.setLonLat(lon, lat, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::getLonLat(double& lon, double& lat) const {
     transform.getLonLat(lon, lat);
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::startPanning() {
     transform.startPanning();
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::stopPanning() {
     transform.stopPanning();
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resetPosition() {
     transform.setAngle(0);
     transform.setLonLat(0, 0);
@@ -444,57 +435,47 @@ void Map::resetPosition() {
 
 #pragma mark - Scale
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::scaleBy(double ds, double cx, double cy, double duration) {
     transform.scaleBy(ds, cx, cy, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setScale(double scale, double cx, double cy, double duration) {
     transform.setScale(scale, cx, cy, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 double Map::getScale() const {
     return transform.getScale();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setZoom(double zoom, double duration) {
     transform.setZoom(zoom, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 double Map::getZoom() const {
     return transform.getZoom();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
     transform.setLonLatZoom(lon, lat, zoom, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
     transform.getLonLatZoom(lon, lat, zoom);
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resetZoom() {
     setZoom(0);
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::startScaling() {
     transform.startScaling();
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::stopScaling() {
     transform.stopScaling();
     update();
@@ -511,42 +492,35 @@ double Map::getMaxZoom() const {
 
 #pragma mark - Rotation
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) {
     transform.rotateBy(sx, sy, ex, ey, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setBearing(double degrees, double duration) {
     transform.setAngle(-degrees * M_PI / 180, duration * 1_second);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::setBearing(double degrees, double cx, double cy) {
     transform.setAngle(-degrees * M_PI / 180, cx, cy);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 double Map::getBearing() const {
     return -transform.getAngle() / M_PI * 180;
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::resetNorth() {
     transform.setAngle(0, 500_milliseconds);
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::startRotating() {
     transform.startRotating();
     update();
 }
 
-// Note: This function is called from another thread. Make sure you only call threadsafe functions!
 void Map::stopRotating() {
     transform.stopRotating();
     update();
