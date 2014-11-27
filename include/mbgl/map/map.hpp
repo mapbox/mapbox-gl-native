@@ -71,7 +71,6 @@ public:
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
 
     // Styling
-    const std::set<util::ptr<StyleSource>> getActiveSources() const;
     void setAppliedClasses(const std::vector<std::string> &classes);
     void toggleClass(const std::string &name);
     const std::vector<std::string> &getAppliedClasses() const;

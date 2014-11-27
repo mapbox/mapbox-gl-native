@@ -621,10 +621,6 @@ void Map::updateSources() {
     });
 }
 
-const std::set<util::ptr<StyleSource>> Map::getActiveSources() const {
-    return activeSources;
-}
-
 void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
     if (!group) {
         return;
@@ -642,7 +638,7 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
 }
 
 void Map::updateTiles() {
-    for (const util::ptr<StyleSource> &source : getActiveSources()) {
+    for (const auto& source : activeSources) {
         source->source->update(*this, getWorker(),
                                style, glyphAtlas, *glyphStore,
                                spriteAtlas, getSprite(),
