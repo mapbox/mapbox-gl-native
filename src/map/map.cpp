@@ -87,7 +87,6 @@ using namespace mbgl;
 
 Map::Map(View& view_)
     : loop(std::make_unique<uv::loop>()),
-      thread(std::make_unique<uv::thread>()),
       view(view_),
 #ifndef NDEBUG
       main_thread(uv_thread_self()),
@@ -180,23 +179,25 @@ void Map::start() {
         painter.cleanup();
     });
 
-    uv_thread_create(*thread, [](void *arg) {
-        Map *map = static_cast<Map *>(arg);
+    thread = std::make_unique<uv::thread>([this]() {
 #ifndef NDEBUG
-        map->map_thread = uv_thread_self();
+        map_thread = uv_thread_self();
 #endif
+
 #ifdef __APPLE__
         pthread_setname_np("Map");
 #endif
-        map->run();
+
+        run();
+
 #ifndef NDEBUG
-        map->map_thread = -1;
+        map_thread = -1;
 #endif
 
         // Make sure that the stop() function knows when to stop invoking the callback function.
-        map->is_stopped = true;
-        map->view.notify();
-    }, this);
+        is_stopped = true;
+        view.notify();
+    });
 }
 
 void Map::stop(stop_callback cb, void *data) {
@@ -220,7 +221,7 @@ void Map::stop(stop_callback cb, void *data) {
 
     // If a callback function was provided, this should return immediately because the thread has
     // already finished executing.
-    uv_thread_join(*thread);
+    thread->join();
 
     async = false;
 }
