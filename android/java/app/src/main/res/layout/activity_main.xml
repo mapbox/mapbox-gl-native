@@ -30,7 +30,16 @@
             tools:context="${packageName}.${activityClass}"
             tools:layout="@layout/fragment_main" />
 
-            <TextView
+        <ImageView
+            android:id="@+id/view_compass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|top"
+            android:padding="10dp"
+            android:contentDescription="Map compass. Click to reset the map rotation to North."
+            android:src="@drawable/compass"/>
+
+        <TextView
                 android:id="@+id/view_fps"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

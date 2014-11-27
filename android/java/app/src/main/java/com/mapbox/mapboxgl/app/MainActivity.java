@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -39,6 +40,9 @@ public class MainActivity extends ActionBarActivity {
     // The FPS label
     TextView mFpsTextView;
 
+    // The compass
+    ImageView mCompassView;
+
     //
     // Lifecycle events
     //
@@ -53,8 +57,13 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         mMapFragment = (MapFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_map);
         mMapFragment.getMap().setOnFpsChangedListener(new MyOnFpsChangedListener());
+        mMapFragment.getMap().setOnMapChangedListener(new MyOnMapChangedListener());
+
         mFpsTextView = (TextView)findViewById(R.id.view_fps);
         mFpsTextView.setText("");
+
+        mCompassView = (ImageView)findViewById(R.id.view_compass);
+        mCompassView.setOnClickListener(new CompassOnClickListener());
 
         // Add a toolbar as the action bar
         Toolbar mainToolbar = (Toolbar)findViewById(R.id.toolbar_main);
@@ -195,6 +204,24 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onFpsChanged(double fps) {
             mFpsTextView.setText(getResources().getString(R.string.label_fps) + String.format(" %4.2f", fps));
+        }
+    }
+
+    // Called when map state changes
+    public class MyOnMapChangedListener implements MapView.OnMapChangedListener {
+
+        @Override
+        public void onMapChanged() {
+            mCompassView.setRotation((float)mMapFragment.getMap().getDirection());
+        }
+    }
+
+    // Called when someone presses the compass
+    public class CompassOnClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View view) {
+            mMapFragment.getMap().resetNorth();
         }
     }
 }
