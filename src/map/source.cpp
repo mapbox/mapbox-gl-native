@@ -61,23 +61,6 @@ void Source::load(Map& map, FileSource& fileSource) {
     });
 }
 
-bool Source::update(Map& map, uv::worker& worker,
-                    util::ptr<Style> style,
-                    GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
-                    SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
-                    Texturepool& texturepool, FileSource& fileSource,
-                    std::function<void ()> callback) {
-    if (loaded && map.getTime() > updated) {
-        return updateTiles(map, worker, style,
-                           glyphAtlas, glyphStore,
-                           spriteAtlas, sprite,
-                           texturepool, fileSource,
-                           callback);
-    } else {
-        return false;
-    }
-}
-
 void Source::updateClipIDs(const std::map<Tile::ID, ClipID> &mapping) {
     std::for_each(tiles.begin(), tiles.end(), [&mapping](std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair) {
         Tile &tile = *pair.second;
@@ -299,11 +282,15 @@ bool Source::findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::
     return false;
 }
 
-bool Source::updateTiles(Map& map, uv::worker& worker, util::ptr<Style> style,
-                         GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
-                         SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
-                         Texturepool& texturepool, FileSource& fileSource,
-                         std::function<void ()> callback) {
+void Source::update(Map& map, uv::worker& worker,
+                    util::ptr<Style> style,
+                    GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
+                    SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
+                    Texturepool& texturepool, FileSource& fileSource,
+                    std::function<void ()> callback) {
+    if (!loaded || map.getTime() <= updated)
+        return;
+
     bool changed = false;
 
     int32_t zoom = std::floor(getZoom(map.getState()));
@@ -377,8 +364,6 @@ bool Source::updateTiles(Map& map, uv::worker& worker, util::ptr<Style> style,
     });
 
     updated = map.getTime();
-
-    return changed;
 }
 
 }

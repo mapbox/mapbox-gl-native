@@ -35,7 +35,7 @@ public:
     Source(SourceInfo&);
 
     void load(Map&, FileSource&);
-    bool update(Map&, uv::worker&,
+    void update(Map&, uv::worker&,
                 util::ptr<Style>,
                 GlyphAtlas&, GlyphStore&,
                 SpriteAtlas&, util::ptr<Sprite>,
@@ -58,13 +58,6 @@ private:
     bool findLoadedParent(const Tile::ID& id, int32_t minCoveringZoom, std::forward_list<Tile::ID>& retain);
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<Tile::ID> coveringTiles(const TransformState&) const;
-
-    bool updateTiles(Map&, uv::worker&,
-                     util::ptr<Style>,
-                     GlyphAtlas&, GlyphStore&,
-                     SpriteAtlas&, util::ptr<Sprite>,
-                     Texturepool&, FileSource&,
-                     std::function<void ()> callback);
 
     TileData::State addTile(Map&, uv::worker&,
                             util::ptr<Style>,
