@@ -130,11 +130,6 @@ private:
     util::ptr<Sprite> getSprite();
     uv::worker& getWorker();
 
-    // uv async callbacks
-    static void render(uv_async_t *async);
-    static void terminate(uv_async_t *async);
-    static void cleanup(uv_async_t *async);
-
     // Setup
     void setup();
 
@@ -153,9 +148,9 @@ private:
     std::unique_ptr<uv::loop> loop;
     std::unique_ptr<uv::worker> workers;
     std::unique_ptr<uv::thread> thread;
-    std::unique_ptr<uv_async_t> async_terminate;
-    std::unique_ptr<uv_async_t> async_render;
-    std::unique_ptr<uv_async_t> async_cleanup;
+    std::unique_ptr<uv::async> async_terminate;
+    std::unique_ptr<uv::async> async_render;
+    std::unique_ptr<uv::async> async_cleanup;
 
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
     // render the map.

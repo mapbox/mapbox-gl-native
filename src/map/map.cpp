@@ -88,9 +88,6 @@ using namespace mbgl;
 Map::Map(View& view_)
     : loop(std::make_unique<uv::loop>()),
       thread(std::make_unique<uv::thread>()),
-      async_terminate(new uv_async_t()),
-      async_render(new uv_async_t()),
-      async_cleanup(new uv_async_t()),
       view(view_),
 #ifndef NDEBUG
       main_thread(uv_thread_self()),
@@ -144,27 +141,44 @@ void Map::start() {
     is_stopped = false;
 
     // Setup async notifications
+    async_terminate = std::make_unique<uv::async>(**loop, [this]() {
+        assert(uv_thread_self() == map_thread);
 
-// Iron out the differences between libuv 0.10 and 0.11
-#ifdef UV_ASYNC_CALLBACK
-#error Cannot overwrite UV_ASYNC_CALLBACK
-#endif
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-#define UV_ASYNC_CALLBACK(name) [](uv_async_t *a, int) { return Map::name(a); }
-#else
-#define UV_ASYNC_CALLBACK(name) name
-#endif
+        // Remove all of these to make sure they are destructed in the correct thread.
+        glyphStore.reset();
+        fileSource.reset();
+        style.reset();
+        workers.reset();
+        activeSources.clear();
 
-    uv_async_init(**loop, async_terminate.get(), UV_ASYNC_CALLBACK(terminate));
-    async_terminate->data = this;
+        // Closes all open handles on the loop. This means that the loop will automatically terminate.
+        async_cleanup.reset();
+        async_render.reset();
+        async_terminate.reset();
+    });
 
-    uv_async_init(**loop, async_render.get(), UV_ASYNC_CALLBACK(render));
-    async_render->data = this;
+    async_render = std::make_unique<uv::async>(**loop, [this]() {
+        assert(uv_thread_self() == map_thread);
 
-    uv_async_init(**loop, async_cleanup.get(), UV_ASYNC_CALLBACK(cleanup));
-    async_cleanup->data = this;
+        if (state.hasSize()) {
+            if (is_rendered.test_and_set() == false) {
+                prepare();
+                if (is_clean.test_and_set() == false) {
+                    render();
+                    is_swapped.clear();
+                    view.swap();
+                } else {
+                    // We set the rendered flag in the test above, so we have to reset it
+                    // now that we're not actually rendering because the map is clean.
+                    is_rendered.clear();
+                }
+            }
+        }
+    });
 
-#undef UV_ASYNC_CALLBACK
+    async_cleanup = std::make_unique<uv::async>(**loop, [this]() {
+        painter.cleanup();
+    });
 
     uv_thread_create(*thread, [](void *arg) {
         Map *map = static_cast<Map *>(arg);
@@ -190,7 +204,7 @@ void Map::stop(stop_callback cb, void *data) {
     assert(main_thread != map_thread);
     assert(async);
 
-    uv_async_send(async_terminate.get());
+    async_terminate->send();
 
     if (cb) {
         // Wait until the render thread stopped. We are using this construct instead of plainly
@@ -240,7 +254,7 @@ void Map::rerender() {
     // We only send render events if we want to continuously update the map
     // (== async rendering).
     if (async) {
-        uv_async_send(async_render.get());
+        async_render->send();
     }
 }
 
@@ -260,14 +274,8 @@ void Map::swapped() {
 
 void Map::cleanup() {
     if (async_cleanup != nullptr) {
-        uv_async_send(async_cleanup.get());
+        async_cleanup->send();
     }
-}
-
-void Map::cleanup(uv_async_t *async) {
-    Map *map = static_cast<Map *>(async->data);
-
-    map->painter.cleanup();
 }
 
 void Map::terminate() {
@@ -283,43 +291,6 @@ void Map::setReachability(bool reachable) {
             });
         }
     }
-}
-
-void Map::render(uv_async_t *async) {
-    Map *map = static_cast<Map *>(async->data);
-    assert(uv_thread_self() == map->map_thread);
-
-    if (map->state.hasSize()) {
-        if (map->is_rendered.test_and_set() == false) {
-            map->prepare();
-            if (map->is_clean.test_and_set() == false) {
-                map->render();
-                map->is_swapped.clear();
-                map->view.swap();
-            } else {
-                // We set the rendered flag in the test above, so we have to reset it
-                // now that we're not actually rendering because the map is clean.
-                map->is_rendered.clear();
-            }
-        }
-    }
-}
-
-void Map::terminate(uv_async_t *async) {
-    // Closes all open handles on the loop. This means that the loop will automatically terminate.
-    Map *map = static_cast<Map *>(async->data);
-    assert(uv_thread_self() == map->map_thread);
-
-    // Remove all of these to make sure they are destructed in the correct thread.
-    map->glyphStore.reset();
-    map->fileSource.reset();
-    map->style.reset();
-    map->workers.reset();
-    map->activeSources.clear();
-
-    uv_close((uv_handle_t *)map->async_cleanup.get(), nullptr);
-    uv_close((uv_handle_t *)map->async_render.get(), nullptr);
-    uv_close((uv_handle_t *)map->async_terminate.get(), nullptr);
 }
 
 #pragma mark - Setup
