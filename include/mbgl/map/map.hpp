@@ -126,7 +126,6 @@ public:
 
     inline const TransformState &getState() const { return state; }
     inline timestamp getTime() const { return animationTime; }
-    void updateTiles();
 
 private:
     util::ptr<Sprite> getSprite();
@@ -140,6 +139,7 @@ private:
     // Setup
     void setup();
 
+    void updateTiles();
     void updateSources();
     void updateSources(const util::ptr<StyleLayerGroup> &group);
 
