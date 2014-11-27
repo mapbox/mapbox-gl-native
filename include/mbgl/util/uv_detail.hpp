@@ -112,17 +112,6 @@ private:
     rwlock &mtx;
 };
 
-class once {
-public:
-    typedef void (*callback)();
-    void operator()(void (*callback)(void)) {
-        uv_once(&o, callback);
-    }
-
-private:
-    uv_once_t o = UV_ONCE_INIT;
-};
-
 class worker {
 public:
     inline worker(uv_loop_t *loop, unsigned int count, const char *name = nullptr) : w(new uv_worker_t) {
