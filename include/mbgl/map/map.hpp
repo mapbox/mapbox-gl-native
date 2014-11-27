@@ -79,7 +79,6 @@ public:
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
 
     // Styling
-    const std::set<util::ptr<StyleSource>> getActiveSources() const;
     void setAppliedClasses(const std::vector<std::string> &classes);
     void toggleClass(const std::string &name);
     const std::vector<std::string> &getAppliedClasses() const;
@@ -133,24 +132,12 @@ public:
     // Call this when the network reachability changed.
     void setReachability(bool status);
 
-public:
     inline const TransformState &getState() const { return state; }
-    inline util::ptr<Style> getStyle() const { return style; }
-    inline GlyphAtlas & getGlyphAtlas() { return glyphAtlas; }
-    inline util::ptr<GlyphStore> getGlyphStore() { return glyphStore; }
-    inline SpriteAtlas & getSpriteAtlas() { return spriteAtlas; }
-    util::ptr<Sprite> getSprite();
-    inline util::ptr<Texturepool> getTexturepool() { return texturepool; }
-    uv::worker &getWorker();
-    inline timestamp getAnimationTime() const { return animationTime; }
     inline timestamp getTime() const { return animationTime; }
-    void updateTiles();
 
 private:
-    // uv async callbacks
-    static void render(uv_async_t *async);
-    static void terminate(uv_async_t *async);
-    static void cleanup(uv_async_t *async);
+    util::ptr<Sprite> getSprite();
+    uv::worker& getWorker();
 
     // Checks if render thread needs to pause
     void check_for_pause();
@@ -158,6 +145,7 @@ private:
     // Setup
     void setup();
 
+    void updateTiles();
     void updateSources();
     void updateSources(const util::ptr<StyleLayerGroup> &group);
 
@@ -168,16 +156,14 @@ private:
     // Unconditionally performs a render with the current map state.
     void render();
 
-private:
     bool async = false;
     std::unique_ptr<uv::loop> loop;
     std::unique_ptr<uv::worker> workers;
     std::unique_ptr<uv::thread> thread;
-    std::unique_ptr<uv_async_t> async_terminate;
-    std::unique_ptr<uv_async_t> async_render;
-    std::unique_ptr<uv_async_t> async_cleanup;
+    std::unique_ptr<uv::async> async_terminate;
+    std::unique_ptr<uv::async> async_render;
+    std::unique_ptr<uv::async> async_cleanup;
 
-private:
     bool terminating = false;
     bool pausing = false;
     bool is_paused = false;
@@ -186,7 +172,6 @@ private:
     std::mutex mutex_pause;
     std::condition_variable cond_pause;
 
-private:
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
     // render the map.
     std::atomic_flag is_clean = ATOMIC_FLAG_INIT;
@@ -202,10 +187,8 @@ private:
     // Stores whether the map thread has been stopped already.
     std::atomic_bool is_stopped;
 
-public:
     View &view;
 
-private:
 #ifndef NDEBUG
     const unsigned long main_thread;
     unsigned long map_thread = -1;
@@ -238,7 +221,6 @@ private:
     timestamp animationTime = 0;
 
     std::set<util::ptr<StyleSource>> activeSources;
-
 };
 
 }

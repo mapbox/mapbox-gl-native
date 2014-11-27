@@ -17,10 +17,6 @@ GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
       dirty(true) {
 }
 
-GlyphAtlas::~GlyphAtlas() {
-    delete[] data;
-}
-
 Rect<uint16_t> GlyphAtlas::addGlyph(uint64_t tile_id, const std::string& face_name,
                                     const SDFGlyph& glyph)
 {
@@ -74,7 +70,7 @@ Rect<uint16_t> GlyphAtlas::addGlyph_impl(uint64_t tile_id, const std::string& fa
     face.emplace(glyph.id, GlyphValue { rect, tile_id });
 
     // Copy the bitmap
-    char *target = data;
+    char *target = data.get();
     const char *source = glyph.bitmap.data();
     for (uint32_t y = 0; y < buffered_height; y++) {
         uint32_t y1 = width * (rect.y + y) + rect.x;
@@ -119,7 +115,7 @@ void GlyphAtlas::removeGlyphs(uint64_t tile_id) {
                 const Rect<uint16_t>& rect = value.rect;
 
                 // Clear out the bitmap.
-                char *target = data;
+                char *target = data.get();
                 for (uint32_t y = 0; y < rect.h; y++) {
                     uint32_t y1 = width * (rect.y + y) + rect.x;
                     for (uint32_t x = 0; x < rect.w; x++) {
@@ -157,7 +153,7 @@ void GlyphAtlas::bind() {
 
     if (dirty) {
         std::lock_guard<std::mutex> lock(mtx);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data.get());
         dirty = false;
 
 #if defined(DEBUG)

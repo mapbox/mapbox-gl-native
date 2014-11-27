@@ -18,7 +18,7 @@ namespace mbgl { namespace util {
 
 void user_error_fn(png_structp /*png_ptr*/, png_const_charp error_msg)
 {
-    throw image_reader_exception(std::string("failed to read invalid png: '") + error_msg + "'");
+    throw ImageReaderException(std::string("failed to read invalid png: '") + error_msg + "'");
 }
 
 void user_warning_fn(png_structp /*png_ptr*/, png_const_charp warning_msg)
@@ -28,7 +28,7 @@ void user_warning_fn(png_structp /*png_ptr*/, png_const_charp warning_msg)
 }
 
 template <typename T>
-void png_reader<T>::png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
+void PngReader<T>::png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
     input_stream * fin = reinterpret_cast<input_stream*>(png_get_io_ptr(png_ptr));
     fin->read(reinterpret_cast<char*>(data), length);
@@ -40,7 +40,7 @@ void png_reader<T>::png_read_data(png_structp png_ptr, png_bytep data, png_size_
 }
 
 template <typename T>
-png_reader<T>::png_reader(char const* data, std::size_t size)
+PngReader<T>::PngReader(char const* data, std::size_t size)
     : source_(data,size),
       stream_(source_),
       width_(0),
@@ -50,36 +50,36 @@ png_reader<T>::png_reader(char const* data, std::size_t size)
       has_alpha_(false)
 {
 
-    if (!stream_) throw image_reader_exception("PNG reader: cannot open image stream");
+    if (!stream_) throw ImageReaderException("PNG reader: cannot open image stream");
     init();
 }
 
 
 template <typename T>
-png_reader<T>::~png_reader() {}
+PngReader<T>::~PngReader() {}
 
 
 template <typename T>
-void png_reader<T>::init()
+void PngReader<T>::init()
 {
     png_byte header[8];
     std::memset(header,0,8);
     stream_.read(reinterpret_cast<char*>(header),8);
     if ( stream_.gcount() != 8)
     {
-        throw image_reader_exception("PNG reader: Could not read image");
+        throw ImageReaderException("PNG reader: Could not read image");
     }
     int is_png=!png_sig_cmp(header,0,8);
     if (!is_png)
     {
-        throw image_reader_exception("File or stream is not a png");
+        throw ImageReaderException("File or stream is not a png");
     }
     png_structp png_ptr = png_create_read_struct
         (PNG_LIBPNG_VER_STRING,0,0,0);
 
     if (!png_ptr)
     {
-        throw image_reader_exception("failed to allocate png_ptr");
+        throw ImageReaderException("failed to allocate png_ptr");
     }
 
     // catch errors in a custom way to avoid the need for setjmp
@@ -88,7 +88,7 @@ void png_reader<T>::init()
     png_infop info_ptr;
     png_struct_guard sguard(&png_ptr,&info_ptr);
     info_ptr = png_create_info_struct(png_ptr);
-    if (!info_ptr) throw image_reader_exception("failed to create info_ptr");
+    if (!info_ptr) throw ImageReaderException("failed to create info_ptr");
 
     png_set_read_fn(png_ptr, (png_voidp)&stream_, png_read_data);
 
@@ -103,19 +103,19 @@ void png_reader<T>::init()
 }
 
 template <typename T>
-unsigned png_reader<T>::width() const
+unsigned PngReader<T>::width() const
 {
     return width_;
 }
 
 template <typename T>
-unsigned png_reader<T>::height() const
+unsigned PngReader<T>::height() const
 {
     return height_;
 }
 
 template <typename T>
-void png_reader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char * image)
+void PngReader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char * image)
 {
     stream_.clear();
     stream_.seekg(0, std::ios_base::beg);
@@ -125,7 +125,7 @@ void png_reader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char 
 
     if (!png_ptr)
     {
-        throw image_reader_exception("failed to allocate png_ptr");
+        throw ImageReaderException("failed to allocate png_ptr");
     }
 
     // catch errors in a custom way to avoid the need for setjmp
@@ -134,7 +134,7 @@ void png_reader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char 
     png_infop info_ptr;
     png_struct_guard sguard(&png_ptr,&info_ptr);
     info_ptr = png_create_info_struct(png_ptr);
-    if (!info_ptr) throw image_reader_exception("failed to create info_ptr");
+    if (!info_ptr) throw ImageReaderException("failed to create info_ptr");
 
     png_set_read_fn(png_ptr, (png_voidp)&stream_, png_read_data);
     png_read_info(png_ptr, info_ptr);
@@ -195,6 +195,6 @@ void png_reader<T>::read(unsigned x0, unsigned y0, unsigned w, unsigned h, char 
     png_read_end(png_ptr,0);
 }
 
-template class png_reader<boost::iostreams::array_source>;
+template class PngReader<boost::iostreams::array_source>;
 
 }}

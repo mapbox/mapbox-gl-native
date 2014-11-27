@@ -7,16 +7,16 @@
 
 namespace mbgl {
 
-class Map;
 class Painter;
 class SourceInfo;
 class StyleLayer;
+class Texturepool;
 
 class RasterTileData : public TileData {
     friend class TileParser;
 
 public:
-    RasterTileData(Tile::ID const& id, Map &map, const util::ptr<SourceInfo> &source);
+    RasterTileData(Tile::ID const& id, Texturepool&, const SourceInfo&);
     ~RasterTileData();
 
     virtual void parse();

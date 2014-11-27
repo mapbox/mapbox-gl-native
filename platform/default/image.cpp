@@ -78,13 +78,13 @@ Image::Image(std::string const& data)
 {
     try
     {
-        auto reader = get_image_reader(data.c_str(), data.size());
+        auto reader = getImageReader(data.c_str(), data.size());
         width = reader->width();
         height = reader->height();
         img = ::std::unique_ptr<char[]>(new char[width * height * 4]());
         reader->read(0, 0, width, height, img.get());
     }
-    catch (image_reader_exception const& ex)
+    catch (ImageReaderException const& ex)
     {
         fprintf(stderr, "Image: %s\n", ex.what());
         img.reset();

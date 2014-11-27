@@ -28,6 +28,7 @@ class StyleBucketSymbol;
 class StyleLayerGroup;
 class VectorTileData;
 class Collision;
+class Texturepool;
 
 class TileParser : private util::noncopyable
 {
@@ -35,9 +36,10 @@ public:
     TileParser(const std::string &data, VectorTileData &tile,
                const util::ptr<const Style> &style,
                GlyphAtlas & glyphAtlas,
-               const util::ptr<GlyphStore> &glyphStore,
+               GlyphStore & glyphStore,
                SpriteAtlas & spriteAtlas,
-               const util::ptr<Sprite> &sprite);
+               const util::ptr<Sprite> &sprite,
+               Texturepool& texturepool);
     ~TileParser();
 
 public:
@@ -49,7 +51,7 @@ private:
     std::unique_ptr<Bucket> createBucket(util::ptr<StyleBucket> bucket_desc);
 
     std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketFill &fill);
-    std::unique_ptr<Bucket> createRasterBucket(const util::ptr<Texturepool> &texturepool, const StyleBucketRaster &raster);
+    std::unique_ptr<Bucket> createRasterBucket(Texturepool& texturepool, const StyleBucketRaster &raster);
     std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketLine &line);
     std::unique_ptr<Bucket> createSymbolBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketSymbol &symbol);
 
@@ -62,10 +64,10 @@ private:
     // Cross-thread shared data.
     util::ptr<const Style> style;
     GlyphAtlas & glyphAtlas;
-    util::ptr<GlyphStore> glyphStore;
+    GlyphStore & glyphStore;
     SpriteAtlas & spriteAtlas;
     util::ptr<Sprite> sprite;
-    util::ptr<Texturepool> texturePool;
+    Texturepool& texturePool;
 
     std::unique_ptr<Collision> collision;
 };

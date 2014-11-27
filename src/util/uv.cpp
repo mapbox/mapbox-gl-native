@@ -22,16 +22,4 @@ std::string cwd() {
 #endif
 }
 
-void deleter::operator()(uv_async_t *async) {
-    uv_close((uv_handle_t *)async, [](uv_handle_t *handle) {
-        delete (uv_async_t *)handle;
-    });
-}
-
-void deleter::operator()(uv_timer_t *timer) {
-    uv_close((uv_handle_t *)timer, [](uv_handle_t *handle) {
-        delete (uv_timer_t *)handle;
-    });
-}
-
 }

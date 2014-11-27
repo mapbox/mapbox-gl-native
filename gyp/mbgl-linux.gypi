@@ -8,7 +8,7 @@
       'variables': {
         'cflags_cc': [
           '<@(png_cflags)',
-	      '<@(jpeg_cflags)',
+	  '<@(jpeg_cflags)',
           '<@(uv_cflags)',
           '<@(curl_cflags)',
           '<@(nu_cflags)',
