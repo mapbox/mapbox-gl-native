@@ -24,7 +24,7 @@ class Style;
 class StyleLayer;
 class StyleLayerGroup;
 class StyleSource;
-class Texturepool;
+class TexturePool;
 class FileSource;
 class View;
 
@@ -184,7 +184,7 @@ private:
     util::ptr<GlyphStore> glyphStore;
     SpriteAtlas spriteAtlas;
     util::ptr<Sprite> sprite;
-    util::ptr<Texturepool> texturepool;
+    util::ptr<TexturePool> texturePool;
 
     Painter painter;
 

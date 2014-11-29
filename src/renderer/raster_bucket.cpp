@@ -3,10 +3,10 @@
 
 using namespace mbgl;
 
-RasterBucket::RasterBucket(Texturepool& texturepool, const StyleBucketRaster& properties_)
+RasterBucket::RasterBucket(TexturePool& texturePool, const StyleBucketRaster& properties_)
 : properties(properties_),
   texture(properties_),
-  raster(texturepool) {
+  raster(texturePool) {
 }
 
 void RasterBucket::render(Painter &painter, util::ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix) {

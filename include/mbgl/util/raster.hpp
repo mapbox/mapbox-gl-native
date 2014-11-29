@@ -2,7 +2,7 @@
 #define MBGL_UTIL_RASTER
 
 #include <mbgl/util/transition.hpp>
-#include <mbgl/util/texturepool.hpp>
+#include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/renderer/prerendered_texture.hpp>
@@ -17,7 +17,7 @@ namespace mbgl {
 class Raster : public std::enable_shared_from_this<Raster> {
 
 public:
-    Raster(Texturepool&);
+    Raster(TexturePool&);
     ~Raster();
 
     // load image data
@@ -57,7 +57,7 @@ private:
     bool loaded = false;
 
     // shared texture pool
-    Texturepool& texturepool;
+    TexturePool& texturePool;
 
     // min/mag filter
     uint32_t filter = 0;

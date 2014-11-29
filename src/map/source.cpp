@@ -5,7 +5,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/raster.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/texturepool.hpp>
+#include <mbgl/util/texture_pool.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/math.hpp>
@@ -155,7 +155,7 @@ TileData::State Source::addTile(Map& map, uv::worker& worker,
                                 util::ptr<Style> style,
                                 GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
                                 SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
-                                FileSource& fileSource, Texturepool& texturepool,
+                                FileSource& fileSource, TexturePool& texturePool,
                                 const Tile::ID& id,
                                 std::function<void ()> callback) {
     const TileData::State state = hasTile(id);
@@ -188,9 +188,9 @@ TileData::State Source::addTile(Map& map, uv::worker& worker,
             new_tile.data = std::make_shared<VectorTileData>(normalized_id, map.getMaxZoom(), style,
                                                              glyphAtlas, glyphStore,
                                                              spriteAtlas, sprite,
-                                                             texturepool, info);
+                                                             texturePool, info);
         } else if (info.type == SourceType::Raster) {
-            new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturepool, info);
+            new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
         } else {
             throw std::runtime_error("source type not implemented");
         }
@@ -286,7 +286,7 @@ void Source::update(Map& map, uv::worker& worker,
                     util::ptr<Style> style,
                     GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
                     SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
-                    Texturepool& texturepool, FileSource& fileSource,
+                    TexturePool& texturePool, FileSource& fileSource,
                     std::function<void ()> callback) {
     if (!loaded || map.getTime() <= updated)
         return;
@@ -310,7 +310,7 @@ void Source::update(Map& map, uv::worker& worker,
         const TileData::State state = addTile(map, worker, style,
                                               glyphAtlas, glyphStore,
                                               spriteAtlas, sprite,
-                                              fileSource, texturepool,
+                                              fileSource, texturePool,
                                               id, callback);
 
         if (state != TileData::State::parsed) {

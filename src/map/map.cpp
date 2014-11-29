@@ -17,7 +17,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/style/style_bucket.hpp>
-#include <mbgl/util/texturepool.hpp>
+#include <mbgl/util/texture_pool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/log.hpp>
@@ -94,7 +94,7 @@ Map::Map(View& view_)
       transform(view_),
       glyphAtlas(1024, 1024),
       spriteAtlas(512, 512),
-      texturepool(std::make_shared<Texturepool>()),
+      texturePool(std::make_shared<TexturePool>()),
       painter(spriteAtlas, glyphAtlas)
 {
     view.initialize(this);
@@ -114,7 +114,7 @@ Map::~Map() {
     sprite.reset();
     glyphStore.reset();
     style.reset();
-    texturepool.reset();
+    texturePool.reset();
     fileSource.reset();
     workers.reset();
 
@@ -588,7 +588,7 @@ void Map::updateTiles() {
         source->source->update(*this, getWorker(),
                                style, glyphAtlas, *glyphStore,
                                spriteAtlas, getSprite(),
-                               *texturepool, *fileSource, [this](){ update(); });
+                               *texturePool, *fileSource, [this](){ update(); });
     }
 }
 
