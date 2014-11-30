@@ -53,6 +53,7 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         
         echo "debug: inserting access token"
         sed -i 's/access token goes here/${ANDROID_KEY}/g' android/java/app/src/main/java/com/mapbox/mapboxgl/app/MapFragment.java
+        cat android/java/app/src/main/java/com/mapbox/mapboxgl/app/MapFragment.java
     
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
