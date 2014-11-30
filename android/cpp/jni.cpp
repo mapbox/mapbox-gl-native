@@ -22,6 +22,16 @@
 
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
+#define CPP_TRY_JNI(ENV, CODE)                          \
+    try {                                               \
+        CODE;                                           \
+    } catch(std::exception e) {                         \
+        std::string msg("Unhandled C++ exception: ");   \
+        msg.append(e.what());                            \
+        throw_error(ENV, msg.c_str());                  \
+    }
+
+
 namespace mbgl {
 namespace android {
 
@@ -172,7 +182,7 @@ jlong JNICALL nativeCreate(JNIEnv* env, jobject obj, jstring cache_path_, jstrin
     data_path = std_string_from_jstring(env, data_path_);
     apk_path = std_string_from_jstring(env, apk_path_);
     NativeMapView* native_map_view = nullptr;
-    COFFEE_TRY_JNI(env, native_map_view = new NativeMapView(env, obj));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view = new NativeMapView(env, obj)));
     if (native_map_view == nullptr) {
         throw_error(env, "Unable to create NativeMapView.");
         return 0;
@@ -194,7 +204,7 @@ void JNICALL nativeInitializeDisplay(JNIEnv* env, jobject obj, jlong native_map_
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     bool ret = false;
-    COFFEE_TRY_JNI(env, ret = native_map_view->initializeDisplay());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = native_map_view->initializeDisplay()));
     if (!ret) {
         throw_error(env, "Unable to initialize GL display.");
     }
@@ -204,7 +214,7 @@ void JNICALL nativeTerminateDisplay(JNIEnv* env, jobject obj, jlong native_map_v
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeTerminateDisplay");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->terminateDisplay());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->terminateDisplay()));
 }
 
 void JNICALL nativeInitializeContext(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -212,7 +222,7 @@ void JNICALL nativeInitializeContext(JNIEnv* env, jobject obj, jlong native_map_
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     bool ret = false;
-    COFFEE_TRY_JNI(env, ret = native_map_view->initializeContext());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = native_map_view->initializeContext()));
     if (!ret) {
         throw_error(env, "Unable to initialize GL context.");
     }
@@ -222,7 +232,7 @@ void JNICALL nativeTerminateContext(JNIEnv* env, jobject obj, jlong native_map_v
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeTerminateContext");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->terminateContext());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->terminateContext()));
 }
 
 void JNICALL nativeCreateSurface(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jobject surface) {
@@ -230,7 +240,7 @@ void JNICALL nativeCreateSurface(JNIEnv* env, jobject obj, jlong native_map_view
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     bool ret = false;
-    COFFEE_TRY_JNI(env, ret = native_map_view->createSurface(ANativeWindow_fromSurface(env, surface)));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = native_map_view->createSurface(ANativeWindow_fromSurface(env, surface))));
     if (!ret) {
         throw_error(env, "Unable to create GL surface.");
     }
@@ -240,70 +250,70 @@ void JNICALL nativeDestroySurface(JNIEnv* env, jobject obj, jlong native_map_vie
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeDestroySurface");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->destroySurface());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->destroySurface()));
 }
 
 void JNICALL nativeStart(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeStart");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->start());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->start()));
 }
 
 void JNICALL nativeStop(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeStop");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->stop());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->stop()));
 }
 
 void JNICALL nativePause(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativePause");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->pause());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->pause()));
 }
 
 void JNICALL nativeResume(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeResume");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->resume());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->resume()));
 }
 
 void JNICALL nativeRun(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeRun");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().run());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().run()));
 }
 
 void JNICALL nativeRerender(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeRerender");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().rerender());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().rerender()));
 }
 
 void JNICALL nativeUpdate(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeUpdate");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().update());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().update()));
 }
 
 void JNICALL nativeCleanup(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeCleanup");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().cleanup());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().cleanup()));
 }
 
 void JNICALL nativeTerminate(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeTerminate");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().terminate());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().terminate()));
 }
 
 jboolean JNICALL nativeNeedsSwap(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -311,7 +321,7 @@ jboolean JNICALL nativeNeedsSwap(JNIEnv* env, jobject obj, jlong native_map_view
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     jboolean ret = false;
-    COFFEE_TRY_JNI(env, ret = native_map_view->getMap().needsSwap());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = native_map_view->getMap().needsSwap()));
     return ret;
 }
 
@@ -319,7 +329,7 @@ void JNICALL nativeSwapped(JNIEnv* env, jobject obj, jlong native_map_view_ptr) 
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSwapped");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, (native_map_view->getMap().swapped()));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, (native_map_view->getMap().swapped())));
 }
 
 void JNICALL nativeResize(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jint width, jint height, jfloat ratio) {
@@ -330,7 +340,7 @@ void JNICALL nativeResize(JNIEnv* env, jobject obj, jlong native_map_view_ptr, j
     assert(width <= UINT16_MAX);
     assert(height <= UINT16_MAX);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().resize(width, height, ratio));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().resize(width, height, ratio)));
 }
 
 void JNICALL nativeResize(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jint width, jint height, jfloat ratio, jint fb_width, jint fb_height) {
@@ -345,14 +355,14 @@ void JNICALL nativeResize(JNIEnv* env, jobject obj, jlong native_map_view_ptr, j
     assert(fb_width <= UINT16_MAX);
     assert(fb_height <= UINT16_MAX);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().resize(width, height, ratio, fb_width, fb_height));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().resize(width, height, ratio, fb_width, fb_height)));
 }
 
 void JNICALL nativeSetAppliedClasses(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jobject classes) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetAppliedClasses");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setAppliedClasses(std_vector_string_from_jobject(env, classes)));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setAppliedClasses(std_vector_string_from_jobject(env, classes))));
 }
 
 jobject JNICALL nativeGetAppliedClasses(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -360,7 +370,7 @@ jobject JNICALL nativeGetAppliedClasses(JNIEnv* env, jobject obj, jlong native_m
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     jobject ret = nullptr;
-    COFFEE_TRY_JNI(env, ret = std_vector_string_to_jobject(env, native_map_view->getMap().getAppliedClasses()));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = std_vector_string_to_jobject(env, native_map_view->getMap().getAppliedClasses())));
     return ret;
 }
 
@@ -369,7 +379,7 @@ void JNICALL nativeSetDefaultTransitionDuration(JNIEnv* env, jobject obj, jlong 
     assert(native_map_view_ptr != 0);
     assert(duration_milliseconds >= 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setDefaultTransitionDuration(duration_milliseconds));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setDefaultTransitionDuration(duration_milliseconds)));
 }
 
 jlong JNICALL nativeGetDefaultTransitionDuration(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -377,7 +387,7 @@ jlong JNICALL nativeGetDefaultTransitionDuration(JNIEnv* env, jobject obj, jlong
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     jlong ret = 0;
-    COFFEE_TRY_JNI(env, ret = native_map_view->getMap().getDefaultTransitionDuration());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = native_map_view->getMap().getDefaultTransitionDuration()));
     return ret;
 }
 
@@ -385,14 +395,14 @@ void JNICALL nativeSetStyleURL(JNIEnv* env, jobject obj, jlong native_map_view_p
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetStyleURL");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setStyleURL(std_string_from_jstring(env, url)));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setStyleURL(std_string_from_jstring(env, url))));
 }
 
 void JNICALL nativeSetStyleJSON(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jstring new_style_json, jstring base) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetStyleJSON");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setStyleJSON(std_string_from_jstring(env, new_style_json), std_string_from_jstring(env, base)));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setStyleJSON(std_string_from_jstring(env, new_style_json), std_string_from_jstring(env, base))));
 }
 
 jstring JNICALL nativeGetStyleJSON(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -400,7 +410,7 @@ jstring JNICALL nativeGetStyleJSON(JNIEnv* env, jobject obj, jlong native_map_vi
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     jstring ret = nullptr;
-    COFFEE_TRY_JNI(env, ret = std_string_to_jstring(env, native_map_view->getMap().getStyleJSON()));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = std_string_to_jstring(env, native_map_view->getMap().getStyleJSON())));
     return ret;
 }
 
@@ -408,7 +418,7 @@ void JNICALL nativeSetAccessToken(JNIEnv* env, jobject obj, jlong native_map_vie
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetAccessToken");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setAccessToken(std_string_from_jstring(env, access_token)));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setAccessToken(std_string_from_jstring(env, access_token))));
 }
 
 jstring JNICALL nativeGetAccessToken(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -416,7 +426,7 @@ jstring JNICALL nativeGetAccessToken(JNIEnv* env, jobject obj, jlong native_map_
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     jstring ret = nullptr;
-    COFFEE_TRY_JNI(env, ret = std_string_to_jstring(env, native_map_view->getMap().getAccessToken()));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = std_string_to_jstring(env, native_map_view->getMap().getAccessToken())));
     return ret;
 }
 
@@ -424,14 +434,14 @@ void JNICALL nativeCancelTransitions(JNIEnv* env, jobject obj, jlong native_map_
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeCancelTransitions");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().cancelTransitions());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().cancelTransitions()));
 }
 
 void JNICALL nativeMoveBy(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble dx, jdouble dy, jdouble duration) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeMoveBy");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().moveBy(dx, dy, duration));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().moveBy(dx, dy, duration)));
 }
 
 void JNICALL nativeSetLonLat(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jobject lon_lat, jdouble duration) {
@@ -451,7 +461,7 @@ void JNICALL nativeSetLonLat(JNIEnv* env, jobject obj, jlong native_map_view_ptr
         return;
     }
 
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setLonLat(lon, lat, duration));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setLonLat(lon, lat, duration)));
 }
 
 jobject JNICALL nativeGetLonLat(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -459,7 +469,7 @@ jobject JNICALL nativeGetLonLat(JNIEnv* env, jobject obj, jlong native_map_view_
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     double lon = 0.0, lat = 0.0;
-    COFFEE_TRY_JNI(env, native_map_view->getMap().getLonLat(lon, lat));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().getLonLat(lon, lat)));
 
     jobject ret = env->NewObject(lon_lat_class, lon_lat_constructor_id, lon, lat);
     if (ret == nullptr) {
@@ -474,35 +484,35 @@ void JNICALL nativeStartPanning(JNIEnv* env, jobject obj, jlong native_map_view_
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeStartPanning");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().startPanning());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().startPanning()));
 }
 
 void JNICALL nativeStopPanning(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeStopPanning");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().stopPanning());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().stopPanning()));
 }
 
 void JNICALL nativeResetPosition(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeResetPosition");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().resetPosition());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().resetPosition()));
 }
 
 void JNICALL nativeScaleBy(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble ds, jdouble cx, jdouble cy, jdouble duration) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeScaleBy");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().scaleBy(ds, cx, cy, duration));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().scaleBy(ds, cx, cy, duration)));
 }
 
 void JNICALL nativeSetScale(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble scale, jdouble cx, jdouble cy, jdouble duration) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetScale");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setScale(scale, cx, cy, duration));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setScale(scale, cx, cy, duration)));
 }
 
 jdouble JNICALL nativeGetScale(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -510,7 +520,7 @@ jdouble JNICALL nativeGetScale(JNIEnv* env, jobject obj, jlong native_map_view_p
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     jdouble ret = 0.0;
-    COFFEE_TRY_JNI(env, ret = native_map_view->getMap().getScale());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = native_map_view->getMap().getScale()));
     return ret;
 }
 
@@ -518,7 +528,7 @@ void JNICALL nativeSetZoom(JNIEnv* env, jobject obj, jlong native_map_view_ptr, 
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetZoom");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setZoom(zoom, duration));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setZoom(zoom, duration)));
 }
 
 jdouble JNICALL nativeGetZoom(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -526,7 +536,7 @@ jdouble JNICALL nativeGetZoom(JNIEnv* env, jobject obj, jlong native_map_view_pt
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     jdouble ret = 0.0;
-    COFFEE_TRY_JNI(env, ret = native_map_view->getMap().getZoom());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = native_map_view->getMap().getZoom()));
     return ret;
 }
 
@@ -553,7 +563,7 @@ void JNICALL nativeSetLonLatZoom(JNIEnv* env, jobject obj, jlong native_map_view
         return;
     }
 
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setLonLatZoom(lon, lat, zoom, duration));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setLonLatZoom(lon, lat, zoom, duration)));
 }
 
 jobject JNICALL nativeGetLonLatZoom(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -561,7 +571,7 @@ jobject JNICALL nativeGetLonLatZoom(JNIEnv* env, jobject obj, jlong native_map_v
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     double lon = 0.0, lat = 0.0, zoom = 0.0;
-    COFFEE_TRY_JNI(env, native_map_view->getMap().getLonLatZoom(lon, lat, zoom));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().getLonLatZoom(lon, lat, zoom)));
 
     jobject ret = env->NewObject(lon_lat_zoom_class, lon_lat_zoom_constructor_id, lon, lat, zoom);
     if (ret == nullptr) {
@@ -576,21 +586,21 @@ void JNICALL nativeResetZoom(JNIEnv* env, jobject obj, jlong native_map_view_ptr
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeResetZoom");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().resetZoom());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().resetZoom()));
 }
 
 void JNICALL nativeStartScaling(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeStartScaling");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().startScaling());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().startScaling()));
 }
 
 void JNICALL nativeStopScaling(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeStopScaling");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().stopScaling());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().stopScaling()));
 }
 
 jdouble JNICALL nativeGetMinZoom(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -598,7 +608,7 @@ jdouble JNICALL nativeGetMinZoom(JNIEnv* env, jobject obj, jlong native_map_view
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     jdouble ret = 0.0;
-    COFFEE_TRY_JNI(env, ret = native_map_view->getMap().getMinZoom());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = native_map_view->getMap().getMinZoom()));
     return ret;
 }
 
@@ -607,7 +617,7 @@ jdouble JNICALL nativeGetMaxZoom(JNIEnv* env, jobject obj, jlong native_map_view
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     jdouble ret = 0.0;
-    COFFEE_TRY_JNI(env, ret = native_map_view->getMap().getMaxZoom());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = native_map_view->getMap().getMaxZoom()));
     return ret;
 }
 
@@ -615,21 +625,21 @@ void JNICALL nativeRotateBy(JNIEnv* env, jobject obj, jlong native_map_view_ptr,
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeRotateBy");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().rotateBy(sx, sy, ex, ey, duration));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().rotateBy(sx, sy, ex, ey, duration)));
 }
 
 void JNICALL nativeSetBearing(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble degrees, jdouble duration) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetBearing");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setBearing(degrees, duration));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setBearing(degrees, duration)));
 }
 
 void JNICALL nativeSetBearing(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jdouble degrees, jdouble cx, jdouble cy) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetBearing");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setBearing(degrees, cx, cy));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setBearing(degrees, cx, cy)));
 }
 
 jdouble JNICALL nativeGetBearing(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -637,7 +647,7 @@ jdouble JNICALL nativeGetBearing(JNIEnv* env, jobject obj, jlong native_map_view
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     jdouble ret = 0.0;
-    COFFEE_TRY_JNI(env, ret = native_map_view->getMap().getBearing());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = native_map_view->getMap().getBearing()));
     return ret;
 }
 
@@ -645,35 +655,35 @@ void JNICALL nativeResetNorth(JNIEnv* env, jobject obj, jlong native_map_view_pt
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeResetNorth");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().resetNorth());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().resetNorth()));
 }
 
 void JNICALL nativeStartRotating(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeStartRotating");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().startRotating());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().startRotating()));
 }
 
 void JNICALL nativeStopRotating(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeStopRotating");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().stopRotating());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().stopRotating()));
 }
 
 void JNICALL nativeSetDebug(JNIEnv* env, jobject obj, jlong native_map_view_ptr, jboolean debug) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetDebug");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setDebug(debug); native_map_view->enableFps(debug));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setDebug(debug); native_map_view->enableFps(debug)));
 }
 
 void JNICALL nativeToggleDebug(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeToggleDebug");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().toggleDebug(); native_map_view->enableFps(native_map_view->getMap().getDebug()));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().toggleDebug(); native_map_view->enableFps(native_map_view->getMap().getDebug())));
 }
 
 jboolean JNICALL nativeGetDebug(JNIEnv* env, jobject obj, jlong native_map_view_ptr) {
@@ -681,7 +691,7 @@ jboolean JNICALL nativeGetDebug(JNIEnv* env, jobject obj, jlong native_map_view_
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
     jboolean ret = false;
-    COFFEE_TRY_JNI(env, ret = native_map_view->getMap().getDebug());
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = native_map_view->getMap().getDebug()));
     return ret;
 }
 
@@ -689,7 +699,7 @@ void JNICALL nativeSetReachability(JNIEnv* env, jobject obj, jlong native_map_vi
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetReachability");
     assert(native_map_view_ptr != 0);
     NativeMapView* native_map_view = reinterpret_cast<NativeMapView*>(native_map_view_ptr);
-    COFFEE_TRY_JNI(env, native_map_view->getMap().setReachability(status));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, native_map_view->getMap().setReachability(status)));
 }
 
 }

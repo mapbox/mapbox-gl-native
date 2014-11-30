@@ -53,7 +53,7 @@ MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
     { Event::OpenGL, "OpenGL" },
     { Event::JNI, "JNI" },
     { Event::Android, "Android" },
-    { Event::Android, "Crash" },
+    { Event::Crash, "Crash" },
     { Event(-1), "Unknown" },
 });
 
