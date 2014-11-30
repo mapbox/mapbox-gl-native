@@ -1,5 +1,10 @@
 package com.mapbox.mapboxgl.app;
 
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -30,18 +35,26 @@ public class MainActivity extends ActionBarActivity {
     // Tag used for logging
     private static final String TAG = "MainActivity";
 
+    // Used for GPS
+    private static final String SINGLE_LOCATION_UPDATE_ACTION = "com.mapbox.mapboxgl.app.SINGLE_LOCATION_UPDATE_ACTION";
+
     //
     // Instance members
     //
 
     // Holds the MapFragment
-    MapFragment mMapFragment;
+    private MapFragment mMapFragment;
 
     // The FPS label
-    TextView mFpsTextView;
+    private TextView mFpsTextView;
 
     // The compass
-    ImageView mCompassView;
+    private ImageView mCompassView;
+
+    // Used for GPS
+    private LocationManager mLocationManager;
+    private PendingIntent mLocationPendingIntent;
+    private LocationReceiver mLocationReceiver;
 
     //
     // Lifecycle events
@@ -52,6 +65,10 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(TAG, "onCreate");
+
+        Intent locationIntent = new Intent(SINGLE_LOCATION_UPDATE_ACTION);
+        mLocationManager = (LocationManager)getSystemService(getApplicationContext().LOCATION_SERVICE);
+        mLocationPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Load the layout
         setContentView(R.layout.activity_main);
@@ -79,6 +96,21 @@ public class MainActivity extends ActionBarActivity {
         styleSpinner.setOnItemSelectedListener(new StyleSpinnerListener());
     }
 
+    // Called when our app goes into the background
+    @Override
+    public void onPause()  {
+        super.onPause();
+        Log.v(TAG, "onPause");
+
+        // Cancel any outstanding GPS
+        if (mLocationReceiver != null) {
+            getApplicationContext().unregisterReceiver(mLocationReceiver);
+            mLocationReceiver = null;
+        }
+
+        mLocationManager.removeUpdates(mLocationPendingIntent);
+    }
+
     //
     // Other events
     //
@@ -97,14 +129,18 @@ public class MainActivity extends ActionBarActivity {
         switch (item.getItemId()) {
             case R.id.action_gps:
                 // Get a GPS position
-                LocationManager locationManager = (LocationManager)getSystemService(getApplicationContext().LOCATION_SERVICE);
-                String provider = locationManager.getBestProvider(new Criteria(), true);
-                Location location = locationManager.getLastKnownLocation(provider);
+                Criteria criteria = new Criteria();
+                criteria.setAccuracy(Criteria.ACCURACY_LOW);
+                String provider = mLocationManager.getBestProvider(criteria, true);
+                Location location = mLocationManager.getLastKnownLocation(provider);
                 if (location != null) {
                     LonLatZoom coordinate = new LonLatZoom(location.getLongitude(), location.getLatitude(), 15);
                     mMapFragment.getMap().setCenterCoordinate(coordinate, true);
                 }
-                locationManager.requestSingleUpdate(provider, new MyLocationListener(), null);
+                IntentFilter locationIntentFilter = new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION);
+                mLocationReceiver = new LocationReceiver();
+                getApplicationContext().registerReceiver(mLocationReceiver, locationIntentFilter);
+                mLocationManager.requestSingleUpdate(provider, mLocationPendingIntent);
                 return true;
 
             case R.id.action_debug:
@@ -126,27 +162,20 @@ public class MainActivity extends ActionBarActivity {
     }
 
     // This class handles location events
-    private class MyLocationListener implements LocationListener {
+    private class LocationReceiver extends BroadcastReceiver {
 
         @Override
-        public void onLocationChanged(Location location) {
-            LonLatZoom coordinate = new LonLatZoom(location.getLongitude(), location.getLatitude(), 15);
-            mMapFragment.getMap().setCenterCoordinate(coordinate, true);
-        }
+        public void onReceive(Context context, Intent intent) {
+            context.unregisterReceiver(this);
 
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            // Do nothing
-        }
+            Location location = (Location)intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
+            if (location != null) {
+                LonLatZoom coordinate = new LonLatZoom(location.getLongitude(), location.getLatitude(), 15);
+                mMapFragment.getMap().setCenterCoordinate(coordinate, true);
+            }
 
-        @Override
-        public void onProviderEnabled(String provider) {
-            // Do nothing
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            // Do nothing
+            mLocationManager.removeUpdates(mLocationPendingIntent);
+            mLocationReceiver = null;
         }
     }
 
