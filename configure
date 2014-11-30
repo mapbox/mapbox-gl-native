@@ -45,7 +45,7 @@ case ${MASON_PLATFORM} in
         LIBUV_VERSION=0.10.28
         ZLIB_VERSION=system
         BOOST_VERSION=system
-        NUNICODE_VERSION=1.4
+        NUNICODE_VERSION=1.5-dev
         ;;
 esac
 

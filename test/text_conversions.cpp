@@ -30,8 +30,6 @@ TEST(TextConversions, to_lower) {
     EXPECT_EQ(std::string("weisskopfseeadler"), platform::lowercase("weiSSkopfseeadler")); // DE
 
     EXPECT_EQ(std::string("azərbaycan"), platform::lowercase("AZƏRBAYCAN")); // AZ
-
-    //EXPECT_EQ(std::string("ὀδυσσεύσ"), platform::lowercase("ὈΔΥΣΣΕΎΣ")); // GR
-    // nunicode can't map last Σ to word-ending ς
+    EXPECT_EQ(std::string("ὀδυσσεύς"), platform::lowercase("ὈΔΥΣΣΕΎΣ")); // GR
 
 }
