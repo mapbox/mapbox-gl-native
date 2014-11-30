@@ -40,7 +40,6 @@ env:
    - secure: "bG4YYWMfl9API0MSRgmOaJrlGLv06tRg9KJNawBieZvBJbITPpxVGJZT3/l/SEJ+Rl15e2dRex4k+MGQlmT2SqPQxTEYWv1qxNigKPPcla7IWeNmWWqW8uVvFjdglojgBOK2k/xErVQtA4zDfi3mwSXH4DKwquXWsoEKmX2SV7M="
    - secure: "Cbvap9ubVKgjPe3hUhI6JGeDZzBXHpOG9RaYKh+SdoIPhKnlJiNOYm1egomi+e4uqJInlFKuVHTw7Ng9Cun6Zm0jIxpkSchv1GpsR7hmB3UGnGed19Dw8121FwuUaktN+4YnbVlsyd+u8EHD3+h58t4eELrLrZolM4rS7DL6caA="
    - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
-   # TODO: generate a new API key before using paid testmonk plan
    - secure: "CHBiUM60TolDbQnn+4IRA/tvOKwKs3g9EDvv8YHSJMg3FuHmjKQkprBasvxf3hnTXg4WLZEubmeDcyJ6RRzPP5mMSr/hksYl0pSjj/6TUecE5fHPVVeN7txVqkpOBf9i45Y+iBUQMjBb1NnDK3pHXxpnAs1Q/pe7vReErj4GF1U="
    - secure: "E1+87Ni3BxqDDTLf3Z2hjmFy0VeFzoLBPLAqchJGCxSblgjKdEbg+18TVM7faD57JI8WQ1jK5Z+p4ebqX0S5TAGlGsnFhcP7+ClntVi/pTkKZrF8ynoH8aIFhZCZ8wqaEVZeljO9ZFrW1VIxWlIqM1U8+WvcGki1NxGkPNaPhpo="
    - LD_LIBRARY_PATH: '/usr/local/lib'
