@@ -104,7 +104,9 @@ Set an access token as described below, and then run:
 
 ## Android (on Linux)
 
-Follow Linux steps until `./configure`. 
+Install a few build depedencies:
+
+    apt-get install -y make pkg-config
 
 Install Oracle JDK 7 (requires license agreement) from http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 
