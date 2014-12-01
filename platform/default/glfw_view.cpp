@@ -73,6 +73,19 @@ void GLFWView::initialize(mbgl::Map *map_) {
     {
         using namespace mbgl;
 
+        if (extensions.find("GL_KHR_debug") != std::string::npos) {
+            gl::DebugMessageControl = (gl::PFNGLDEBUGMESSAGECONTROLPROC)glfwGetProcAddress("glDebugMessageControl");
+            gl::DebugMessageInsert = (gl::PFNGLDEBUGMESSAGEINSERTPROC)glfwGetProcAddress("glDebugMessageInsert");
+            gl::DebugMessageCallback = (gl::PFNGLDEBUGMESSAGECALLBACKPROC)glfwGetProcAddress("glDebugMessageCallback");
+            gl::GetDebugMessageLog = (gl::PFNGLGETDEBUGMESSAGELOGPROC)glfwGetProcAddress("glGetDebugMessageLog");
+            gl::GetPointerv = (gl::PFNGLGETPOINTERVPROC)glfwGetProcAddress("glGetPointerv");
+            gl::PushDebugGroup = (gl::PFNGLPUSHDEBUGGROUPPROC)glfwGetProcAddress("glPushDebugGroup");
+            gl::PopDebugGroup = (gl::PFNGLPOPDEBUGGROUPPROC)glfwGetProcAddress("glPopDebugGroup");
+            gl::ObjectLabel = (gl::PFNGLOBJECTLABELPROC)glfwGetProcAddress("glObjectLabel");
+            gl::GetObjectLabel = (gl::PFNGLGETOBJECTLABELPROC)glfwGetProcAddress("glGetObjectLabel");
+            gl::ObjectPtrLabel = (gl::PFNGLOBJECTPTRLABELPROC)glfwGetProcAddress("glObjectPtrLabel");
+            gl::GetObjectPtrLabel = (gl::PFNGLGETOBJECTPTRLABELPROC)glfwGetProcAddress("glGetObjectPtrLabel");
+        }
 
         if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
             gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glfwGetProcAddress("glBindVertexArray");
