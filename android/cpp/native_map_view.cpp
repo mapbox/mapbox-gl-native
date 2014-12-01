@@ -584,7 +584,7 @@ void NativeMapView::loadExtensions() {
 
     if (extensions.find("GL_OES_depth24") != std::string::npos) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_depth24.");
-        if (!using_depth24) {
+        if (using_depth24) {
             gl::is_depth24_supported = true;
         } else {
             mbgl::Log::Info(mbgl::Event::OpenGL, "Preferring 16 bit depth.");
