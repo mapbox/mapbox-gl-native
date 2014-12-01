@@ -55,7 +55,7 @@ void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsi
         default: strSource = "(unknown)"; evtSeverity = mbgl::EventSeverity::Debug; break;
     }
 
-    mbgl::Log::Record(evtSeverity, mbgl::Event::OpenGL, "GL Debug Message: %s %s %u %s - %s", strSource.c_str(), strType.c_str(), id, strSeverity.c_str(), message);
+    mbgl::Log::Record(evtSeverity, mbgl::Event::OpenGL, "GL_%s GL_%s %u GL_%s - %s", strSource.c_str(), strType.c_str(), id, strSeverity.c_str(), message);
 }
 
 PFNGLBINDVERTEXARRAYPROC BindVertexArray = nullptr;
@@ -82,7 +82,7 @@ void _CHECK_GL_ERROR(const char *cmd, const char *file, int line) {
             default: error = "(unknown)"; break;
         }
 
-        mbgl::Log::Error(mbgl::Event::OpenGL, "GL Error: GL_%s(0x%04X) - %s:%i", error.c_str(), file, line, err);
+        mbgl::Log::Error(mbgl::Event::OpenGL, "GL_%s (0x%04X) - %s:%i", error.c_str(), file, line, err);
         exit(1);
     }
 }
