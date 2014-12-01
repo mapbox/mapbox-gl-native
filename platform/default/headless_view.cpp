@@ -237,6 +237,15 @@ std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
     glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
     make_inactive();
 
+    const int stride = w * 4;
+    auto tmp = std::unique_ptr<char[]>(new char[stride]());
+    char *rgba = reinterpret_cast<char *>(pixels.get());
+    for (int i = 0, j = height_ - 1; i < j; i++, j--) {
+        memcpy(tmp.get(), rgba + i * stride, stride);
+        memcpy(rgba + i * stride, rgba + j * stride, stride);
+        memcpy(rgba + j * stride, tmp.get(), stride);
+    }
+
     return pixels;
 }
 
