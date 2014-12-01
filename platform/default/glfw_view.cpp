@@ -85,6 +85,12 @@ void GLFWView::initialize(mbgl::Map *map_) {
             gl::GetObjectLabel = (gl::PFNGLGETOBJECTLABELPROC)glfwGetProcAddress("glGetObjectLabel");
             gl::ObjectPtrLabel = (gl::PFNGLOBJECTPTRLABELPROC)glfwGetProcAddress("glObjectPtrLabel");
             gl::GetObjectPtrLabel = (gl::PFNGLGETOBJECTPTRLABELPROC)glfwGetProcAddress("glGetObjectPtrLabel");
+        } else if (extensions.find("GL_ARB_debug_output") != std::string::npos) {
+            gl::DebugMessageControl = (gl::PFNGLDEBUGMESSAGECONTROLPROC)glfwGetProcAddress("glDebugMessageControlARB");
+            gl::DebugMessageInsert = (gl::PFNGLDEBUGMESSAGEINSERTPROC)glfwGetProcAddress("glDebugMessageInsertARB");
+            gl::DebugMessageCallback = (gl::PFNGLDEBUGMESSAGECALLBACKPROC)glfwGetProcAddress("glDebugMessageCallbackARB");
+            gl::GetDebugMessageLog = (gl::PFNGLGETDEBUGMESSAGELOGPROC)glfwGetProcAddress("glGetDebugMessageLogARB");
+            gl::GetPointerv = (gl::PFNGLGETPOINTERVPROC)glfwGetProcAddress("glGetPointerv");
         }
 
         if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {

@@ -29,7 +29,7 @@
 namespace mbgl {
 namespace gl {
 
-// GL_KHR_debug
+// GL_KHR_debug / GL_ARB_debug_output
 #define GL_DEBUG_OUTPUT_SYNCHRONOUS       0x8242
 #define GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH 0x8243
 #define GL_DEBUG_CALLBACK_FUNCTION        0x8244
