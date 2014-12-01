@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <string>
+#include <cstring>
 
 #if MBGL_USE_GLX
 #ifdef GLX_ARB_create_context
@@ -241,9 +242,9 @@ std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
     auto tmp = std::unique_ptr<char[]>(new char[stride]());
     char *rgba = reinterpret_cast<char *>(pixels.get());
     for (int i = 0, j = height_ - 1; i < j; i++, j--) {
-        memcpy(tmp.get(), rgba + i * stride, stride);
-        memcpy(rgba + i * stride, rgba + j * stride, stride);
-        memcpy(rgba + j * stride, tmp.get(), stride);
+        std::memcpy(tmp.get(), rgba + i * stride, stride);
+        std::memcpy(rgba + i * stride, rgba + j * stride, stride);
+        std::memcpy(rgba + j * stride, tmp.get(), stride);
     }
 
     return pixels;
