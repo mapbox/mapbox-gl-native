@@ -7,17 +7,17 @@
 namespace mbgl {
 namespace gl {
 
-PFNGLDEBUGMESSAGECONTROLPROC DebugMessageControl;
-PFNGLDEBUGMESSAGEINSERTPROC DebugMessageInsert;
-PFNGLDEBUGMESSAGECALLBACKPROC DebugMessageCallback;
-PFNGLGETDEBUGMESSAGELOGPROC GetDebugMessageLog;
-PFNGLGETPOINTERVPROC GetPointerv;
-PFNGLPUSHDEBUGGROUPPROC PushDebugGroup;
-PFNGLPOPDEBUGGROUPPROC PopDebugGroup;
-PFNGLOBJECTLABELPROC ObjectLabel;
-PFNGLGETOBJECTLABELPROC GetObjectLabel;
-PFNGLOBJECTPTRLABELPROC ObjectPtrLabel;
-PFNGLGETOBJECTPTRLABELPROC GetObjectPtrLabel;
+PFNGLDEBUGMESSAGECONTROLPROC DebugMessageControl = nullptr;
+PFNGLDEBUGMESSAGEINSERTPROC DebugMessageInsert = nullptr;
+PFNGLDEBUGMESSAGECALLBACKPROC DebugMessageCallback = nullptr;
+PFNGLGETDEBUGMESSAGELOGPROC GetDebugMessageLog = nullptr;
+PFNGLGETPOINTERVPROC GetPointerv = nullptr;
+PFNGLPUSHDEBUGGROUPPROC PushDebugGroup = nullptr;
+PFNGLPOPDEBUGGROUPPROC PopDebugGroup = nullptr;
+PFNGLOBJECTLABELPROC ObjectLabel = nullptr;
+PFNGLGETOBJECTLABELPROC GetObjectLabel = nullptr;
+PFNGLOBJECTPTRLABELPROC ObjectPtrLabel = nullptr;
+PFNGLGETOBJECTPTRLABELPROC GetObjectPtrLabel = nullptr;
 
 void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei, const GLchar *message, const void *) {
     std::string strSource;
@@ -57,6 +57,13 @@ void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsi
 
     mbgl::Log::Record(evtSeverity, mbgl::Event::OpenGL, "GL_%s GL_%s %u GL_%s - %s", strSource.c_str(), strType.c_str(), id, strSeverity.c_str(), message);
 }
+
+PFNGLINSERTEVENTMARKEREXTPROC InsertEventMarkerEXT = nullptr;
+PFNGLPUSHGROUPMARKEREXTPROC PushGroupMarkerEXT = nullptr;
+PFNGLPOPGROUPMARKEREXTPROC PopGroupMarkerEXT = nullptr;
+
+PFNGLLABELOBJECTEXTPROC LabelObjectEXT = nullptr;
+PFNGLGETOBJECTLABELEXTPROC GetObjectLabelEXT = nullptr;
 
 PFNGLBINDVERTEXARRAYPROC BindVertexArray = nullptr;
 PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays = nullptr;

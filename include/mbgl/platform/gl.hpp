@@ -98,6 +98,26 @@ extern PFNGLOBJECTPTRLABELPROC ObjectPtrLabel;
 extern PFNGLGETOBJECTPTRLABELPROC GetObjectPtrLabel;
 void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
 
+// GL_EXT_debug_marker
+typedef void (* PFNGLINSERTEVENTMARKEREXTPROC) (GLsizei length, const GLchar *marker);
+typedef void (* PFNGLPUSHGROUPMARKEREXTPROC) (GLsizei length, const GLchar *marker);
+typedef void (* PFNGLPOPGROUPMARKEREXTPROC) (void);
+extern PFNGLINSERTEVENTMARKEREXTPROC InsertEventMarkerEXT;
+extern PFNGLPUSHGROUPMARKEREXTPROC PushGroupMarkerEXT;
+extern PFNGLPOPGROUPMARKEREXTPROC PopGroupMarkerEXT;
+
+// GL_EXT_debug_label
+#define GL_PROGRAM_PIPELINE_OBJECT_EXT    0x8A4F
+#define GL_PROGRAM_OBJECT_EXT             0x8B40
+#define GL_SHADER_OBJECT_EXT              0x8B48
+#define GL_BUFFER_OBJECT_EXT              0x9151
+#define GL_QUERY_OBJECT_EXT               0x9153
+#define GL_VERTEX_ARRAY_OBJECT_EXT        0x9154
+typedef void (* PFNGLLABELOBJECTEXTPROC) (GLenum type, GLuint object, GLsizei length, const GLchar *label);
+typedef void (* PFNGLGETOBJECTLABELEXTPROC) (GLenum type, GLuint object, GLsizei bufSize, GLsizei *length, GLchar *label);
+extern PFNGLLABELOBJECTEXTPROC LabelObjectEXT;
+extern PFNGLGETOBJECTLABELEXTPROC GetObjectLabelEXT;
+
 #define GL_VERTEX_ARRAY_BINDING 0x85B5
 typedef void (* PFNGLBINDVERTEXARRAYPROC) (GLuint array);
 typedef void (* PFNGLDELETEVERTEXARRAYSPROC) (GLsizei n, const GLuint* arrays);
