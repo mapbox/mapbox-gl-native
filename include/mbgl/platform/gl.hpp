@@ -129,17 +129,25 @@ extern PFNGLGENVERTEXARRAYSPROC GenVertexArrays;
 extern PFNGLISVERTEXARRAYPROC IsVertexArray;
 
 
-// Debug group markers, useful for debuggin on iOS
-#if __APPLE__ && defined(DEBUG) && defined(GL_EXT_debug_marker)
+// Debug group markers, useful for debugging on iOS
+#if defined(DEBUG)
 // static int indent = 0;
 inline void start_group(const std::string &str) {
-    glPushGroupMarkerEXT(0, str.c_str());
+    if (gl::PushDebugGroup != nullptr) {
+        gl::PushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, str.size(), str.c_str());
+    } else if (gl::PushGroupMarkerEXT != nullptr) {
+        gl::PushGroupMarkerEXT(str.size(), str.c_str());
+    }
     // fprintf(stderr, "%s%s\n", std::string(indent * 4, ' ').c_str(), str.c_str());
     // indent++;
 }
 
 inline void end_group() {
-    glPopGroupMarkerEXT();
+    if (gl::PopDebugGroup != nullptr) {
+        gl::PopDebugGroup();
+    } else if (gl::PopGroupMarkerEXT != nullptr) {
+        gl::PopGroupMarkerEXT();
+    }
     // indent--;
 }
 #else

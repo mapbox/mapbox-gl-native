@@ -37,7 +37,9 @@ void PrerenderedTexture::bindFramebuffer() {
     if (texture == 0) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
+#ifndef GL_ES_VERSION_2_0
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+#endif
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

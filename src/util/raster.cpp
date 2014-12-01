@@ -48,7 +48,9 @@ void Raster::bind(bool linear) {
     if (img && !textured) {
         texture = texturepool.getTextureID();
         glBindTexture(GL_TEXTURE_2D, texture);
+#ifndef GL_ES_VERSION_2_0
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+#endif
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->getData());
