@@ -1,10 +1,6 @@
-#include <mbgl/android/jni.hpp>
 #include <mbgl/storage/asset_request_baton.hpp>
 #include <mbgl/storage/asset_request.hpp>
 #include <mbgl/storage/response.hpp>
-
-#include <limits>
-#include <boost/make_unique.hpp>
 
 namespace mbgl {
 

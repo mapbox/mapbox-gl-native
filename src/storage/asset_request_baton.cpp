@@ -1,10 +1,6 @@
-#include <mbgl/android/jni.hpp>
 #include <mbgl/storage/asset_request_baton.hpp>
 #include <mbgl/storage/asset_request.hpp>
 #include <mbgl/storage/response.hpp>
-
-#include <limits>
-#include <boost/make_unique.hpp>
 
 namespace mbgl {
 
@@ -14,8 +10,20 @@ AssetRequestBaton::AssetRequestBaton(AssetRequest *request_, const std::string &
       async_run(new uv_async_t()),
       path(path_) {
 
-    uv_async_init(loop, async_run.get(), run);
+// Iron out the differences between libuv 0.10 and 0.11
+#ifdef UV_ASYNC_CALLBACK
+#error Cannot overwrite UV_ASYNC_CALLBACK
+#endif
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+#define UV_ASYNC_CALLBACK(name) [](uv_async_t *a, int) { return AssetRequestBaton::name(a); }
+#else
+#define UV_ASYNC_CALLBACK(name) name
+#endif
+
+    uv_async_init(loop, async_run.get(), UV_ASYNC_CALLBACK(run));
     async_run->data = this;
+
+#undef UV_ASYNC_CALLBACK
 
     uv_async_send(async_run.get());
 }

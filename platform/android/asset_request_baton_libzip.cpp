@@ -3,7 +3,6 @@
 #include <mbgl/storage/asset_request.hpp>
 #include <mbgl/storage/response.hpp>
 
-#include <limits>
 #include <boost/make_unique.hpp>
 
 #include <zip.h>
