@@ -278,15 +278,21 @@ void Map::run() {
 #endif
     assert(uv_thread_self() == map_thread);
 
-    check_for_pause();
+    if (async) {
+        check_for_pause();
+    }
 
     setup();
     prepare();
 
-    terminating = false;
-    while(!terminating) {
+    if (async) {
+        terminating = false;
+        while(!terminating) {
+            uv_run(**loop, UV_RUN_DEFAULT);
+            check_for_pause();
+        }
+    } else {
         uv_run(**loop, UV_RUN_DEFAULT);
-        check_for_pause();
     }
 
     // Run the event loop once more to make sure our async delete handlers are called.
