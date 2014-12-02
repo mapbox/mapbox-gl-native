@@ -1,5 +1,5 @@
-#include <mbgl/platform/android/asset_request.hpp>
-#include <mbgl/platform/android/asset_request_baton.hpp>
+#include <mbgl/storage/asset_request.hpp>
+#include <mbgl/storage/asset_request_baton.hpp>
 #include <mbgl/storage/response.hpp>
 
 #include <uv.h>
