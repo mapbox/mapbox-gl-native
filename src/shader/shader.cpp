@@ -43,7 +43,7 @@ Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSo
             GLint logLength;
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
             if (logLength > 0) {
-                GLchar *log = (GLchar *)malloc(logLength);
+                GLchar *log = reinterpret_cast<GLchar *>(malloc(logLength));
                 glGetProgramInfoLog(program, logLength, &logLength, log);
                 Log::Error(Event::Shader, "Program failed to link: %s", log);
                 free(log);
@@ -69,7 +69,7 @@ Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSo
             GLint logLength;
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
             if (logLength > 0) {
-                GLchar *log = (GLchar *)malloc(logLength);
+                GLchar *log = reinterpret_cast<GLchar *>(malloc(logLength));
                 glGetProgramInfoLog(program, logLength, &logLength, log);
                 Log::Error(Event::Shader, "Program failed to validate: %s", log);
                 free(log);
@@ -110,7 +110,7 @@ bool Shader::compileShader(GLuint *shader, GLenum type, const GLchar *source) {
         GLint logLength;
         glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &logLength);
         if (logLength > 0) {
-            GLchar *log = (GLchar *)malloc(logLength);
+            GLchar *log = reinterpret_cast<GLchar *>(malloc(logLength));
             glGetShaderInfoLog(*shader, logLength, &logLength, log);
             Log::Error(Event::Shader, "Shader failed to compile: %s", log);
             free(log);

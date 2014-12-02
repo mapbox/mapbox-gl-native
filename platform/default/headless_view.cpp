@@ -49,7 +49,23 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display)
 
 void HeadlessView::loadExtensions() {
     make_active();
-    const std::string extensions = (char *)glGetString(GL_EXTENSIONS);
+
+    std::string extensions;
+    if (using_gl_3_or_newer) {
+#ifdef GL_VERSION_3_0
+        GLuint num_extensions = 0;
+        glGetIntegerv(GL_NUM_EXTENSIONS, reinterpret_cast<GLint *>(&num_extensions));
+        for (GLuint i = 0; i < num_extensions; i++) {
+            extensions.append(reinterpret_cast<const char *>(glGetStringi(GL_EXTENSIONS, i)));
+            extensions.append(" ");
+        }
+#else
+        throw std::runtime_error("Using GL 3.0+ context with out correct headers.\n");
+#endif
+    } else {
+        extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
+    }
+
 
 #ifdef MBGL_USE_CGL
     if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
@@ -90,7 +106,7 @@ static const core_profile_version core_profile_versions[] = {
     {0, 0},
 };
 
-GLXContext createCoreProfile(Display *dpy, GLXFBConfig fbconfig) {
+GLXContext createCoreProfile(Display *dpy, GLXFBConfig fbconfig, bool& using_gl_3_or_newer) {
     static bool context_creation_failed = false;
     GLXContext ctx = 0;
 
@@ -103,7 +119,8 @@ GLXContext createCoreProfile(Display *dpy, GLXFBConfig fbconfig) {
     });
 
     // Try to create core profiles from the highest known version on down.
-    for (int i = 0; !ctx && core_profile_versions[i].major; i++) {
+    int i = 0;
+    for (; !ctx && core_profile_versions[i].major; i++) {
         context_creation_failed = false;
         const int context_flags[] = {
             GLX_CONTEXT_MAJOR_VERSION_ARB, core_profile_versions[i].major,
@@ -114,6 +131,10 @@ GLXContext createCoreProfile(Display *dpy, GLXFBConfig fbconfig) {
         if (context_creation_failed) {
             ctx = 0;
         }
+    }
+
+    if (core_profile_versions[i].major >= 3) {
+        using_gl_3_or_newer = true;
     }
 
     // Restore the old error handler.
@@ -149,11 +170,11 @@ void HeadlessView::createContext() {
 #ifdef GLX_ARB_create_context
     if (glXCreateContextAttribsARB) {
         // Try to create a core profile context.
-        gl_context = createCoreProfile(x_display, fb_configs[0]);
+        gl_context = createCoreProfile(x_display, fb_configs[0], using_gl_3_or_newer);
     }
 #endif
 
-    if (!gl_context) {
+    if (gl_context == 0) {
         // Try to create a legacy context
         gl_context = glXCreateNewContext(x_display, fb_configs[0], GLX_RGBA_TYPE, 0, True);
         if (gl_context) {
@@ -331,4 +352,3 @@ void HeadlessView::make_inactive() {
 void HeadlessView::swap() {}
 
 }
-
