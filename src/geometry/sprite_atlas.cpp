@@ -201,6 +201,9 @@ void SpriteAtlas::bind(bool linear) {
     if (!texture) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
+#ifndef GL_ES_VERSION_2_0
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+#endif
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         first = true;

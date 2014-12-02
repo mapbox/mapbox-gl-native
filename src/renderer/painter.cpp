@@ -42,6 +42,19 @@ void Painter::setup() {
 #if defined(DEBUG)
     util::stopwatch stopwatch("painter setup");
 #endif
+
+    // Enable GL debugging
+    if ((gl::DebugMessageControl != nullptr) && (gl::DebugMessageCallback != nullptr)) {
+        // This will enable all messages including performance hints
+        gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+
+        // This will only enable high and medium severity messages
+        //gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, GL_TRUE);
+        //gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_MEDIUM, 0, nullptr, GL_TRUE);
+
+        gl::DebugMessageCallback(gl::debug_callback, nullptr);
+    }
+
     setupShaders();
 
     assert(iconShader);
