@@ -73,12 +73,44 @@ void GLFWView::initialize(mbgl::Map *map_) {
     {
         using namespace mbgl;
 
+        if (extensions.find("GL_KHR_debug") != std::string::npos) {
+            gl::DebugMessageControl = (gl::PFNGLDEBUGMESSAGECONTROLPROC)glfwGetProcAddress("glDebugMessageControl");
+            gl::DebugMessageInsert = (gl::PFNGLDEBUGMESSAGEINSERTPROC)glfwGetProcAddress("glDebugMessageInsert");
+            gl::DebugMessageCallback = (gl::PFNGLDEBUGMESSAGECALLBACKPROC)glfwGetProcAddress("glDebugMessageCallback");
+            gl::GetDebugMessageLog = (gl::PFNGLGETDEBUGMESSAGELOGPROC)glfwGetProcAddress("glGetDebugMessageLog");
+            gl::GetPointerv = (gl::PFNGLGETPOINTERVPROC)glfwGetProcAddress("glGetPointerv");
+            gl::PushDebugGroup = (gl::PFNGLPUSHDEBUGGROUPPROC)glfwGetProcAddress("glPushDebugGroup");
+            gl::PopDebugGroup = (gl::PFNGLPOPDEBUGGROUPPROC)glfwGetProcAddress("glPopDebugGroup");
+            gl::ObjectLabel = (gl::PFNGLOBJECTLABELPROC)glfwGetProcAddress("glObjectLabel");
+            gl::GetObjectLabel = (gl::PFNGLGETOBJECTLABELPROC)glfwGetProcAddress("glGetObjectLabel");
+            gl::ObjectPtrLabel = (gl::PFNGLOBJECTPTRLABELPROC)glfwGetProcAddress("glObjectPtrLabel");
+            gl::GetObjectPtrLabel = (gl::PFNGLGETOBJECTPTRLABELPROC)glfwGetProcAddress("glGetObjectPtrLabel");
+        } else {
+            if (extensions.find("GL_ARB_debug_output") != std::string::npos) {
+                gl::DebugMessageControl = (gl::PFNGLDEBUGMESSAGECONTROLPROC)glfwGetProcAddress("glDebugMessageControlARB");
+                gl::DebugMessageInsert = (gl::PFNGLDEBUGMESSAGEINSERTPROC)glfwGetProcAddress("glDebugMessageInsertARB");
+                gl::DebugMessageCallback = (gl::PFNGLDEBUGMESSAGECALLBACKPROC)glfwGetProcAddress("glDebugMessageCallbackARB");
+                gl::GetDebugMessageLog = (gl::PFNGLGETDEBUGMESSAGELOGPROC)glfwGetProcAddress("glGetDebugMessageLogARB");
+                gl::GetPointerv = (gl::PFNGLGETPOINTERVPROC)glfwGetProcAddress("glGetPointerv");
+            }
+
+            if (extensions.find("GL_EXT_debug_marker") != std::string::npos) {
+                gl::InsertEventMarkerEXT = (gl::PFNGLINSERTEVENTMARKEREXTPROC)glfwGetProcAddress("glInsertEventMarkerEXT");
+                gl::PushGroupMarkerEXT = (gl::PFNGLPUSHGROUPMARKEREXTPROC)glfwGetProcAddress("glPushGroupMarkerEXT");
+                gl::PopGroupMarkerEXT = (gl::PFNGLPOPGROUPMARKEREXTPROC)glfwGetProcAddress("glPopGroupMarkerEXT");
+            }
+
+            if (extensions.find("GL_EXT_debug_label") != std::string::npos) {
+                gl::LabelObjectEXT = (gl::PFNGLLABELOBJECTEXTPROC)glfwGetProcAddress("glLabelObjectEXT");
+                gl::GetObjectLabelEXT = (gl::PFNGLGETOBJECTLABELEXTPROC)glfwGetProcAddress("glGetObjectLabelEXT");
+            }
+        }
 
         if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
-            gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glfwGetProcAddress("glBindVertexArrayARB");
-            gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glfwGetProcAddress("glDeleteVertexArraysARB");
-            gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glfwGetProcAddress("glGenVertexArraysARB");
-            gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glfwGetProcAddress("glIsVertexArrayARB");
+            gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glfwGetProcAddress("glBindVertexArray");
+            gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glfwGetProcAddress("glDeleteVertexArrays");
+            gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glfwGetProcAddress("glGenVertexArrays");
+            gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glfwGetProcAddress("glIsVertexArray");
         } else if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
             gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glfwGetProcAddress("glBindVertexArrayAPPLE");
             gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glfwGetProcAddress("glDeleteVertexArraysAPPLE");
