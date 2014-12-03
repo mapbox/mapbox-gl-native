@@ -13,7 +13,7 @@ AssetRequestBaton::AssetRequestBaton(AssetRequest *request_, const std::string &
       request(request_),
       path(path_) {
 
-    asyncRun = std::make_unique<uv::async>(loop,  [this]() {
+    asyncRun = mbgl::util::make_unique<uv::async>(loop,  [this]() {
         run(this);
     });
 

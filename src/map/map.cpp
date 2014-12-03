@@ -629,7 +629,7 @@ void Map::setAppliedClasses(const std::vector<std::string> &classes) {
     }
     else {
         std::lock_guard<std::mutex> lock(appliedClassesMutex);
-        appliedClasses = std::make_unique<std::vector<std::string>>(classes);
+        appliedClasses = mbgl::util::make_unique<std::vector<std::string>>(classes);
     }
 }
 
