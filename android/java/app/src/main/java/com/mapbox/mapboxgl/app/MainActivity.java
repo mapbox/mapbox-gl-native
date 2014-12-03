@@ -87,7 +87,6 @@ public class MainActivity extends ActionBarActivity {
         setSupportActionBar(mainToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        // TODO move to layout file and save state
         // Add the spinner to select map styles
         Spinner styleSpinner = (Spinner)findViewById(R.id.spinner_style);
         ArrayAdapter styleAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),

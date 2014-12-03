@@ -390,7 +390,6 @@ void Map::setup() {
 void Map::setStyleURL(const std::string &url) {
     // TODO: Make threadsafe.
 
-    // TODO fix this properly
     styleURL = url;
     if (async) {
         stop();
