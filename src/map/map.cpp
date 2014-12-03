@@ -90,13 +90,14 @@ const static bool sqlite_version_check = []() {
 
 using namespace mbgl;
 
-Map::Map(View& view_)
+Map::Map(View& view_, FileSource& fileSource_)
     : loop(util::make_unique<uv::loop>()),
       view(view_),
 #ifndef NDEBUG
       mainThread(uv_thread_self()),
 #endif
       transform(view_),
+      fileSource(fileSource_),
       glyphAtlas(1024, 1024),
       spriteAtlas(512, 512),
       texturePool(std::make_shared<TexturePool>()),
@@ -120,7 +121,6 @@ Map::~Map() {
     glyphStore.reset();
     style.reset();
     texturePool.reset();
-    fileSource.reset();
     workers.reset();
 
     uv_run(**loop, UV_RUN_DEFAULT);
@@ -150,7 +150,6 @@ void Map::start(bool startPaused) {
 
         // Remove all of these to make sure they are destructed in the correct thread.
         glyphStore.reset();
-        fileSource.reset();
         style.reset();
         workers.reset();
         activeSources.clear();
@@ -371,11 +370,9 @@ void Map::terminate() {
 void Map::setReachability(bool reachable) {
     // Note: This function may be called from *any* thread.
     if (reachable) {
-        if (fileSource) {
-            fileSource->prepare([&]() {
-                fileSource->retryAllPending();
-            });
-        }
+        fileSource.prepare([&]() {
+            fileSource.retryAllPending();
+        });
     }
 }
 
@@ -407,11 +404,11 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     }
 
     style->loadJSON((const uint8_t *)styleJSON.c_str());
-    if (!fileSource) {
-        fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
-        glyphStore = std::make_shared<GlyphStore>(*fileSource);
+    if (!fileSource.hasLoop()) {
+        fileSource.setLoop(**loop);
+        glyphStore = std::make_shared<GlyphStore>(fileSource);
     }
-    fileSource->setBase(base);
+    fileSource.setBase(base);
     glyphStore->setURL(util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken()));
 
     style->setDefaultTransitionDuration(defaultTransitionDuration);
@@ -447,7 +444,7 @@ util::ptr<Sprite> Map::getSprite() {
     const float pixelRatio = state.getPixelRatio();
     const std::string &sprite_url = style->getSpriteURL();
     if (!sprite || sprite->pixelRatio != pixelRatio) {
-        sprite = Sprite::Create(sprite_url, pixelRatio, *fileSource);
+        sprite = Sprite::Create(sprite_url, pixelRatio, fileSource);
     }
 
     return sprite;
@@ -671,7 +668,7 @@ void Map::updateSources() {
         if (source->enabled) {
             if (!source->source) {
                 source->source = std::make_shared<Source>(source->info);
-                source->source->load(*this, *fileSource);
+                source->source->load(*this, fileSource);
             }
         } else {
             source->source.reset();
@@ -705,20 +702,20 @@ void Map::updateTiles() {
         source->source->update(*this, getWorker(),
                                style, glyphAtlas, *glyphStore,
                                spriteAtlas, getSprite(),
-                               *texturePool, *fileSource, [this](){ update(); });
+                               *texturePool, fileSource, [this](){ update(); });
     }
 }
 
 void Map::prepare() {
-    if (!fileSource) {
-        fileSource = std::make_shared<FileSource>(**loop, platform::defaultCacheDatabase());
-        glyphStore = std::make_shared<GlyphStore>(*fileSource);
+    if (!fileSource.hasLoop()) {
+        fileSource.setLoop(**loop);
+        glyphStore = std::make_shared<GlyphStore>(fileSource);
     }
 
     if (!style) {
         style = std::make_shared<Style>();
 
-        fileSource->request(ResourceType::JSON, styleURL)->onload([&](const Response &res) {
+        fileSource.request(ResourceType::JSON, styleURL)->onload([&](const Response &res) {
             if (res.code == 200) {
                 // Calculate the base
                 const size_t pos = styleURL.rfind('/');

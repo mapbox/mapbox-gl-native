@@ -14,8 +14,10 @@
 namespace uv {
 
 template <class T>
-void close(T* handle) {
-    uv_close(reinterpret_cast<uv_handle_t*>(handle), nullptr);
+void close(std::unique_ptr<T> ptr) {
+    uv_close(reinterpret_cast<uv_handle_t*>(ptr.release()), [](uv_handle_t* handle) {
+        delete reinterpret_cast<T*>(handle);
+    });
 }
 
 class thread : public mbgl::util::noncopyable {
@@ -75,19 +77,21 @@ private:
 class async : public mbgl::util::noncopyable {
 public:
     inline async(uv_loop_t* loop, std::function<void ()> fn_)
-        : fn(fn_) {
-        a.data = this;
-        if (uv_async_init(loop, &a, async_cb) != 0) {
+        : a(new uv_async_t)
+        , fn(fn_)
+    {
+        a->data = this;
+        if (uv_async_init(loop, a.get(), async_cb) != 0) {
             throw std::runtime_error("failed to initialize async");
         }
     }
 
     inline ~async() {
-        close(&a);
+        close(std::move(a));
     }
 
     inline void send() {
-        if (uv_async_send(&a) != 0) {
+        if (uv_async_send(a.get()) != 0) {
             throw std::runtime_error("failed to async send");
         }
     }
@@ -101,7 +105,7 @@ private:
         reinterpret_cast<async*>(a->data)->fn();
     }
 
-    uv_async_t a;
+    std::unique_ptr<uv_async_t> a;
     std::function<void ()> fn;
 };
 

@@ -37,6 +37,7 @@
         '../platform/darwin/http_request_baton_cocoa.mm',
         '../platform/darwin/image.mm',
         '../platform/default/asset_request_baton_noop.cpp',
+        '../platform/default/caching_http_file_source.cpp',
       ],
       'include_dirs': [
         '../include',
