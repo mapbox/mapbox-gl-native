@@ -627,9 +627,9 @@ void Map::setAppliedClasses(const std::vector<std::string> &classes) {
         }
     }
     else {
-        appliedClassesMutex.lock();
+        std::lock_guard
+        d::lock_guard<std::mutex> lock(appliedClassesMutex);
         appliedClasses = std::make_unique<std::vector<std::string>>(classes);
-        appliedClassesMutex.unlock();
     }
 }
 
