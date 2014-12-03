@@ -59,7 +59,7 @@ private:
     GLuint fbo = 0;
     GLuint fbo_depth_stencil = 0;
     GLuint fbo_color = 0;
-    bool using_gl_3_or_newer = false;
+    bool usingGl3OrNewer = false;
 };
 
 }

@@ -7,32 +7,32 @@
 namespace mbgl {
 namespace android {
 
-extern std::string cache_path;
-extern std::string data_path;
-extern std::string apk_path;
+extern std::string cachePath;
+extern std::string dataPath;
+extern std::string apkPath;
 
-extern jmethodID on_map_changed_id;
-extern jmethodID on_fps_changed_id;
+extern jmethodID onMapChangedId;
+extern jmethodID onFpsChangedId;
 
-extern jclass lon_lat_class;
-extern jmethodID lon_lat_constructor_id;
-extern jfieldID lon_lat_lon_id;
-extern jfieldID lon_lat_lat_id;
+extern jclass lonLatClass;
+extern jmethodID lonLatConstructorId;
+extern jfieldID lonLatLonId;
+extern jfieldID lonLatLatId;
 
-extern jclass lon_lat_zoom_class;
-extern jmethodID lon_lat_zoom_constructor_id;
-extern jfieldID lon_lat_zoom_lon_id;
-extern jfieldID lon_lat_zoom_lat_id;
-extern jfieldID lon_lat_zoom_zoom_id;
+extern jclass lonLatZoomClass;
+extern jmethodID lonLatZoomConstructorId;
+extern jfieldID lonLatZoomLonId;
+extern jfieldID lonLatZoomLatId;
+extern jfieldID lonLatZoomZoomId;
 
-extern jclass runtime_exception_class;
-extern jclass null_pointer_exception_class;;
+extern jclass runtimeExceptionClass;
+extern jclass nullPointerExceptionClass;;
 
-extern jmethodID list_to_array_id;
+extern jmethodID listToArrayId;
 
-extern jclass array_list_class;
-extern jmethodID array_list_constructor_id;
-extern jmethodID array_list_add_id;
+extern jclass arrayListClass;
+extern jmethodID arrayListConstructorId;
+extern jmethodID arrayListAddId;
 
 }
 }

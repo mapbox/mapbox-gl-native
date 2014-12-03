@@ -26,11 +26,11 @@ public:
     const StyleBucketRaster &properties;
 
 private:
-    GLint previous_fbo = 0;
+    GLint previousFbo = 0;
     GLuint fbo = 0;
     GLuint texture = 0;
-    GLuint fbo_depth= 0;
-    GLuint fbo_stencil = 0;
+    GLuint fboDepth= 0;
+    GLuint fboStencil = 0;
 };
 
 }

@@ -161,13 +161,13 @@ bool NativeMapView::initializeDisplay() {
     // Detect if we are in emulator
     char prop[PROP_VALUE_MAX];
     __system_property_get("ro.kernel.qemu", prop);
-    bool in_emulator = strtol(prop, nullptr, 0) == 1;
-    if (in_emulator) {
+    bool inEmulator = strtol(prop, nullptr, 0) == 1;
+    if (inEmulator) {
         mbgl::Log::Warning(mbgl::Event::Android, "In emulator! Enabling hacks :-(");
     }
 
     // Get all configs at least RGB 565 with 16 depth and 8 stencil
-    EGLint config_attribs[] = {
+    EGLint configAttribs[] = {
         EGL_CONFIG_CAVEAT, EGL_NONE,
         EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
         EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
@@ -177,30 +177,30 @@ bool NativeMapView::initializeDisplay() {
         EGL_BLUE_SIZE, 5,
         EGL_DEPTH_SIZE, 16,
         EGL_STENCIL_SIZE, 8,
-        (in_emulator ? EGL_NONE : EGL_CONFORMANT), EGL_OPENGL_ES2_BIT, // Ugly hack
-        (in_emulator ? EGL_NONE : EGL_COLOR_BUFFER_TYPE), EGL_RGB_BUFFER, // Ugly hack
+        (inEmulator ? EGL_NONE : EGL_CONFORMANT), EGL_OPENGL_ES2_BIT, // Ugly hack
+        (inEmulator ? EGL_NONE : EGL_COLOR_BUFFER_TYPE), EGL_RGB_BUFFER, // Ugly hack
         EGL_NONE
     };
-    EGLint num_configs;
-    if (!eglChooseConfig(display, config_attribs, nullptr, 0, &num_configs)) {
+    EGLint numConfigs;
+    if (!eglChooseConfig(display, configAttribs, nullptr, 0, &numConfigs)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig(NULL) returned error %d", eglGetError());
         terminateDisplay();
         return false;
     }
-    if (num_configs < 1) {
+    if (numConfigs < 1) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig() returned no configs.");
         terminateDisplay();
         return false;
     }
 
-    const std::unique_ptr<EGLConfig[]> configs = mbgl::util::make_unique<EGLConfig[]>(num_configs);
-    if (!eglChooseConfig(display, config_attribs, configs.get(), num_configs, &num_configs)) {
+    const std::unique_ptr<EGLConfig[]> configs = mbgl::util::make_unique<EGLConfig[]>(numConfigs);
+    if (!eglChooseConfig(display, configAttribs, configs.get(), numConfigs, &numConfigs)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig() returned error %d", eglGetError());
         terminateDisplay();
         return false;
     }
 
-    config = chooseConfig(configs.get(), num_configs);
+    config = chooseConfig(configs.get(), numConfigs);
     if (config == nullptr) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "No config chosen");
         terminateDisplay();
@@ -251,11 +251,11 @@ bool NativeMapView::initializeContext() {
     assert(context == EGL_NO_CONTEXT);
     assert(config != nullptr);
 
-    const EGLint context_attribs[] = {
+    const EGLint contextAttribs[] = {
         EGL_CONTEXT_CLIENT_VERSION, 2,
         EGL_NONE
     };
-    context = eglCreateContext(display, config, EGL_NO_CONTEXT, context_attribs);
+    context = eglCreateContext(display, config, EGL_NO_CONTEXT, contextAttribs);
     if (context == EGL_NO_CONTEXT) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateContext() returned error %d", eglGetError());
         terminateContext();
@@ -267,8 +267,8 @@ bool NativeMapView::initializeContext() {
 
 void NativeMapView::terminateContext() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::terminateContext");
-
     if (display != EGL_NO_DISPLAY) {
+
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
                     eglGetError());
@@ -298,18 +298,18 @@ bool NativeMapView::createSurface(ANativeWindow* window_) {
 
     ANativeWindow_setBuffersGeometry(window, 0, 0, format);
 
-    const EGLint surface_attribs[] = {
+    const EGLint surfaceAttribs[] = {
         EGL_NONE
     };
-    surface = eglCreateWindowSurface(display, config, window, surface_attribs);
+    surface = eglCreateWindowSurface(display, config, window, surfaceAttribs);
     if (surface == EGL_NO_SURFACE) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateWindowSurface() returned error %d", eglGetError());
         destroySurface();
         return false;
     }
 
-    if (!first_time) {
-        first_time = true;
+    if (!firstTime) {
+        firstTime = true;
 
         if (!eglMakeCurrent(display, surface, surface, context)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d", eglGetError());
@@ -385,15 +385,15 @@ typedef enum {
 // Tuple is <buffer_format, depth_stencil_format, is_not_conformant, is_caveat, config_num, config_id>
 typedef std::tuple<BufferFormat, DepthStencilFormat, bool, bool, int, EGLConfig> ConfigProperties;
 
-EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_configs) {
-    mbgl::Log::Info(mbgl::Event::OpenGL, "Found %d configs", num_configs);
+EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint numConfigs) {
+    mbgl::Log::Info(mbgl::Event::OpenGL, "Found %d configs", numConfigs);
 
     // Create a list of configs that pass our filters
-    std::list<ConfigProperties> config_list;
-    for (int i = 0; i < num_configs; i++) {
+    std::list<ConfigProperties> configList;
+    for (int i = 0; i < numConfigs; i++) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Config %d:", i);
 
-        EGLint caveat, conformant, bits, red, green, blue, alpha, alpha_mask, depth, stencil, sample_buffers, samples;
+        EGLint caveat, conformant, bits, red, green, blue, alpha, alphaMask, depth, stencil, sampleBuffers, samples;
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_CONFIG_CAVEAT, &caveat)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_CONFIG_CAVEAT) returned error %d", eglGetError());
@@ -430,7 +430,7 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_conf
             return nullptr;
         }
 
-        if (!eglGetConfigAttrib(display, configs[i], EGL_ALPHA_MASK_SIZE, &alpha_mask)) {
+        if (!eglGetConfigAttrib(display, configs[i], EGL_ALPHA_MASK_SIZE, &alphaMask)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_ALPHA_MASK_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
@@ -445,7 +445,7 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_conf
             return nullptr;
         }
 
-        if (!eglGetConfigAttrib(display, configs[i], EGL_SAMPLE_BUFFERS, &sample_buffers)) {
+        if (!eglGetConfigAttrib(display, configs[i], EGL_SAMPLE_BUFFERS, &sampleBuffers)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_SAMPLE_BUFFERS) returned error %d", eglGetError());
             return nullptr;
         }
@@ -462,76 +462,76 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint num_conf
         mbgl::Log::Info(mbgl::Event::OpenGL, "...Green: %d", green);
         mbgl::Log::Info(mbgl::Event::OpenGL, "...Blue: %d", blue);
         mbgl::Log::Info(mbgl::Event::OpenGL, "...Alpha: %d", alpha);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "...Alpha mask: %d", alpha_mask);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Alpha mask: %d", alphaMask);
         mbgl::Log::Info(mbgl::Event::OpenGL, "...Depth: %d", depth);
         mbgl::Log::Info(mbgl::Event::OpenGL, "...Stencil: %d", stencil);
-        mbgl::Log::Info(mbgl::Event::OpenGL, "...Sample buffers: %d", sample_buffers);
+        mbgl::Log::Info(mbgl::Event::OpenGL, "...Sample buffers: %d", sampleBuffers);
         mbgl::Log::Info(mbgl::Event::OpenGL, "...Samples: %d", samples);
 
-        bool config_ok = true;
-        config_ok &= (depth == 24) || (depth == 16);
-        config_ok &= stencil == 8;
-        config_ok &= sample_buffers == 0;
-        config_ok &= samples == 0;
+        bool configOk = true;
+        configOk &= (depth == 24) || (depth == 16);
+        configOk &= stencil == 8;
+        configOk &= sampleBuffers == 0;
+        configOk &= samples == 0;
 
         // Filter our configs first for depth, stencil and anti-aliasing
-        if (config_ok) {
+        if (configOk) {
             // Work out the config's buffer format
-            BufferFormat buffer_format;
+            BufferFormat bufferFormat;
             if ((bits == 16) && (red == 5) && (green == 6) && (blue == 5) && (alpha == 0)) {
-                buffer_format = Format16Bit;
+                bufferFormat = Format16Bit;
             } else if ((bits == 32) && (red == 8) && (green == 8) && (blue == 8) && (alpha == 0)) {
-                buffer_format = Format32BitNoAlpha;
+                bufferFormat = Format32BitNoAlpha;
             } else if ((bits == 32) && (red == 8) && (green == 8) && (blue == 8) && (alpha == 8)) {
-                buffer_format = Format32BitAlpha;
+                bufferFormat = Format32BitAlpha;
             } else if ((bits == 24) && (red == 8) && (green == 8) && (blue == 8) && (alpha == 0)) {
-                buffer_format = Format24Bit;
+                bufferFormat = Format24Bit;
             } else {
-                buffer_format = Unknown;
+                bufferFormat = Unknown;
             }
 
             // Work out the config's depth stencil format
-            DepthStencilFormat depth_stencil_format;
+            DepthStencilFormat depthStencilFormat;
             if ((depth == 16) && (stencil == 8)) {
-                depth_stencil_format = Format16Depth8Stencil;
+                depthStencilFormat = Format16Depth8Stencil;
             } else {
-                depth_stencil_format = Format24Depth8Stencil;
+                depthStencilFormat = Format24Depth8Stencil;
             }
 
-            bool is_not_conformant = (conformant & EGL_OPENGL_ES2_BIT) != EGL_OPENGL_ES2_BIT;
-            bool is_caveat = caveat != EGL_NONE;
-            EGLConfig config_id = configs[i];
+            bool isNotConformant = (conformant & EGL_OPENGL_ES2_BIT) != EGL_OPENGL_ES2_BIT;
+            bool isCaveat = caveat != EGL_NONE;
+            EGLConfig configId = configs[i];
 
             // Ignore formats we don't recognise
-            if (buffer_format != Unknown)
+            if (bufferFormat != Unknown)
             {
-                config_list.push_back(std::make_tuple(buffer_format, depth_stencil_format, is_not_conformant, is_caveat, i, config_id));
+                configList.push_back(std::make_tuple(bufferFormat, depthStencilFormat, isNotConformant, isCaveat, i, configId));
             }
         }
     }
 
-    if (config_list.empty()) {
+    if (configList.empty()) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "Config list was empty.");
     }
 
     // Sort the configs to find the best one
-    config_list.sort();
-    using_depth24 = std::get<1>(config_list.front()) == Format24Depth8Stencil;
-    bool is_conformant = !std::get<2>(config_list.front());
-    bool is_caveat = std::get<3>(config_list.front());
-    int config_num = std::get<4>(config_list.front());
-    EGLConfig config_id = std::get<5>(config_list.front());
+    configList.sort();
+    usingDepth24 = std::get<1>(configList.front()) == Format24Depth8Stencil;
+    bool isConformant = !std::get<2>(configList.front());
+    bool isCaveat = std::get<3>(configList.front());
+    int configNum = std::get<4>(configList.front());
+    EGLConfig configId = std::get<5>(configList.front());
 
-    mbgl::Log::Info(mbgl::Event::OpenGL, "Chosen config is %d", config_num);
+    mbgl::Log::Info(mbgl::Event::OpenGL, "Chosen config is %d", configNum);
 
-    if (is_caveat) {
+    if (isCaveat) {
         mbgl::Log::Warning(mbgl::Event::OpenGL, "Chosen config has a caveat.");
     }
-    if (!is_conformant) {
+    if (!isConformant) {
         mbgl::Log::Warning(mbgl::Event::OpenGL, "Chosen config is not conformant.");
     }
 
-    return config_id;
+    return configId;
 }
 
 void NativeMapView::start() {
@@ -578,13 +578,13 @@ void NativeMapView::loadExtensions() {
 
     if (extensions.find("GL_OES_packed_depth_stencil") != std::string::npos) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_packed_depth_stencil.");
-        gl::is_packed_depth_stencil_supported = true;
+        gl::isPackedDepthStencilSupported = true;
     }
 
     if (extensions.find("GL_OES_depth24") != std::string::npos) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_depth24.");
-        if (using_depth24) {
-            gl::is_depth24_supported = true;
+        if (usingDepth24) {
+            gl::isDepth24Supported = true;
         } else {
             mbgl::Log::Info(mbgl::Event::OpenGL, "Preferring 16 bit depth.");
         }
@@ -600,11 +600,11 @@ void NativeMapView::stop() {
 }
 
 
-void NativeMapView::pause(bool wait_for_pause) {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause %s", (wait_for_pause) ? "true" : "false");
+void NativeMapView::pause(bool waitForPause) {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause %s", (waitForPause) ? "true" : "false");
 
     if ((display != EGL_NO_DISPLAY) && (context != EGL_NO_CONTEXT)) {
-        map.pause(wait_for_pause);
+        map.pause(waitForPause);
     }
 }
 
@@ -651,7 +651,7 @@ void NativeMapView::notifyMapChange() {
         }
     }
 
-    env->CallVoidMethod(obj, on_map_changed_id);
+    env->CallVoidMethod(obj, onMapChangedId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
     }
@@ -668,28 +668,28 @@ void NativeMapView::notifyMapChange() {
 void NativeMapView::enableFps(bool enable) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::enableFps()");
 
-    fps_enabled = enable;
+    fpsEnabled = enable;
 }
 
 void NativeMapView::updateFps() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::updateFps()");
 
-    if (!fps_enabled) {
+    if (!fpsEnabled) {
         return;
     }
 
     static int frames = 0;
-    static int64_t time_elapsed = 0LL;
+    static int64_t timeElapsed = 0LL;
 
     frames++;
     struct timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
-    int64_t current_time = now.tv_sec*1000000000LL + now.tv_nsec;
+    int64_t currentTime = now.tv_sec*1000000000LL + now.tv_nsec;
 
-    if (current_time - time_elapsed >= 1) {
-        fps = frames / ((current_time - time_elapsed) / 1E9);
+    if (currentTime - timeElapsed >= 1) {
+        fps = frames / ((currentTime - timeElapsed) / 1E9);
         mbgl::Log::Debug(mbgl::Event::Render, "FPS: %4.2f", fps);
-        time_elapsed = current_time;
+        timeElapsed = currentTime;
         frames = 0;
     }
 
@@ -704,8 +704,8 @@ void NativeMapView::updateFps() {
 
     jint ret;
     JNIEnv* env = nullptr;
-                  bool detach = false;
-                                ret = vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6);
+    bool detach = false;
+    ret = vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6);
     if (ret != JNI_OK) {
         if (ret != JNI_EDETACHED) {
             mbgl::Log::Error(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
@@ -720,7 +720,7 @@ void NativeMapView::updateFps() {
         }
     }
 
-    env->CallVoidMethod(obj, on_fps_changed_id, fps);
+    env->CallVoidMethod(obj, onFpsChangedId, fps);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
     }

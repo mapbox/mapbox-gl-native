@@ -9,7 +9,7 @@
 
 namespace mbgl {
 
-int AndroidLogBackend::severity_to_priority(EventSeverity severity) {
+int AndroidLogBackend::severityToPriority(EventSeverity severity) {
     switch(severity) {
     case EventSeverity::Debug:
         return ANDROID_LOG_DEBUG;
@@ -22,14 +22,14 @@ int AndroidLogBackend::severity_to_priority(EventSeverity severity) {
 
     case EventSeverity::Error:
         return ANDROID_LOG_ERROR;
-        
+
     default:
         return ANDROID_LOG_VERBOSE;
     }
 }
 
 void AndroidLogBackend::record(EventSeverity severity, Event event, const std::string &msg) {
-    __android_log_print(severity_to_priority(severity), EventClass(event).c_str(), "%s", msg.c_str());
+    __android_log_print(severityToPriority(severity), EventClass(event).c_str(), "%s", msg.c_str());
 }
 
 void AndroidLogBackend::record(EventSeverity severity, Event event, const char* format, ...) {
@@ -42,18 +42,18 @@ void AndroidLogBackend::record(EventSeverity severity, Event event, const char* 
 
     va_end(args);
 
-    __android_log_print(severity_to_priority(severity), EventClass(event).c_str(), "%s", buf);
+    __android_log_print(severityToPriority(severity), EventClass(event).c_str(), "%s", buf);
 
     delete buf;
     buf  = nullptr;
 }
 
 void AndroidLogBackend::record(EventSeverity severity, Event event, int64_t code) {
-    __android_log_print(severity_to_priority(severity), EventClass(event).c_str(), "(%" PRId64 ")", code);
+    __android_log_print(severityToPriority(severity), EventClass(event).c_str(), "(%" PRId64 ")", code);
 }
 
 void AndroidLogBackend::record(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
-    __android_log_print(severity_to_priority(severity), EventClass(event).c_str(), "(%" PRId64 ") %s", code, msg.c_str());
+    __android_log_print(severityToPriority(severity), EventClass(event).c_str(), "(%" PRId64 ") %s", code, msg.c_str());
 }
 
 }

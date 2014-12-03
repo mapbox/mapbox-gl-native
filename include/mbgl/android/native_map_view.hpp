@@ -55,7 +55,7 @@ public:
     void stop();
 
     void resume();
-    void pause(bool wait_for_pause = false);
+    void pause(bool waitForPause = false);
 
     void notifyMapChange();
 
@@ -63,7 +63,7 @@ public:
     void updateFps();
 
 private:
-    EGLConfig chooseConfig(const EGLConfig configs[], EGLint num_configs);
+    EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 
     void loadExtensions();
 
@@ -83,14 +83,14 @@ private:
     EGLConfig config = nullptr;
     EGLint format = -1;
 
-    std::string style_url;
-    std::string api_key;
+    std::string styleUrl;
+    std::string apiKey;
 
-    bool first_time = false;
+    bool firstTime = false;
 
-    bool using_depth24 = false;
+    bool usingDepth24 = false;
 
-    bool fps_enabled = false;
+    bool fpsEnabled = false;
     double fps = 0.0;
 };
 

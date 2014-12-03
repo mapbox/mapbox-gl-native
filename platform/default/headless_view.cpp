@@ -53,7 +53,7 @@ void HeadlessView::loadExtensions() {
     make_active();
 
     std::string extensions;
-    if (using_gl_3_or_newer) {
+    if (usingGl3OrNewer) {
 #ifdef GL_VERSION_3_0
         GLuint num_extensions = 0;
         glGetIntegerv(GL_NUM_EXTENSIONS, reinterpret_cast<GLint *>(&num_extensions));
@@ -108,7 +108,7 @@ static const core_profile_version core_profile_versions[] = {
     {0, 0},
 };
 
-GLXContext createCoreProfile(Display *dpy, GLXFBConfig fbconfig, bool& using_gl_3_or_newer) {
+GLXContext createCoreProfile(Display *dpy, GLXFBConfig fbconfig, bool& usingGl3OrNewer) {
     static bool context_creation_failed = false;
     GLXContext ctx = 0;
 
@@ -136,7 +136,7 @@ GLXContext createCoreProfile(Display *dpy, GLXFBConfig fbconfig, bool& using_gl_
     }
 
     if (core_profile_versions[i].major >= 3) {
-        using_gl_3_or_newer = true;
+        usingGl3OrNewer = true;
     }
 
     // Restore the old error handler.
@@ -172,7 +172,7 @@ void HeadlessView::createContext() {
 #ifdef GLX_ARB_create_context
     if (glXCreateContextAttribsARB) {
         // Try to create a core profile context.
-        gl_context = createCoreProfile(x_display, fb_configs[0], using_gl_3_or_newer);
+        gl_context = createCoreProfile(x_display, fb_configs[0], usingGl3OrNewer);
     }
 #endif
 

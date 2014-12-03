@@ -417,13 +417,13 @@ size_t curl_header_cb(char * const buffer, const size_t size, const size_t nmemb
 static CURLcode sslctx_function(CURL */*curl*/, void *sslctx, void */*parm*/) {
 
     int error = 0;
-    struct zip *apk = zip_open(mbgl::android::apk_path.c_str(), 0, &error);
+    struct zip *apk = zip_open(mbgl::android::apkPath.c_str(), 0, &error);
     if (apk == nullptr) {
         return CURLE_SSL_CACERT_BADFILE;
     }
 
-    struct zip_file *apk_file = zip_fopen(apk, "assets/ca-bundle.crt", ZIP_FL_NOCASE);
-    if (apk_file == nullptr) {
+    struct zip_file *apkFile = zip_fopen(apk, "assets/ca-bundle.crt", ZIP_FL_NOCASE);
+    if (apkFile == nullptr) {
         zip_close(apk);
         apk = nullptr;
         return CURLE_SSL_CACERT_BADFILE;
@@ -431,16 +431,16 @@ static CURLcode sslctx_function(CURL */*curl*/, void *sslctx, void */*parm*/) {
 
     struct zip_stat stat;
     if (zip_stat(apk, "assets/ca-bundle.crt", ZIP_FL_NOCASE, &stat) != 0) {
-        zip_fclose(apk_file);
-        apk_file = nullptr;
+        zip_fclose(apkFile);
+        apkFile = nullptr;
         zip_close(apk);
         apk = nullptr;
         return CURLE_SSL_CACERT_BADFILE;
     }
 
     if (stat.size > std::numeric_limits<int>::max()) {
-        zip_fclose(apk_file);
-        apk_file = nullptr;
+        zip_fclose(apkFile);
+        apkFile = nullptr;
         zip_close(apk);
         apk = nullptr;
         return CURLE_SSL_CACERT_BADFILE;
@@ -448,9 +448,9 @@ static CURLcode sslctx_function(CURL */*curl*/, void *sslctx, void */*parm*/) {
 
     const std::unique_ptr<char[]> pem = util::make_unique<char[]>(stat.size);
 
-    if (static_cast<zip_uint64_t>(zip_fread(apk_file, reinterpret_cast<void *>(pem.get()), stat.size)) != stat.size) {
-        zip_fclose(apk_file);
-        apk_file = nullptr;
+    if (static_cast<zip_uint64_t>(zip_fread(apkFile, reinterpret_cast<void *>(pem.get()), stat.size)) != stat.size) {
+        zip_fclose(apkFile);
+        apkFile = nullptr;
         zip_close(apk);
         apk = nullptr;
         return CURLE_SSL_CACERT_BADFILE;
@@ -498,8 +498,8 @@ static CURLcode sslctx_function(CURL */*curl*/, void *sslctx, void */*parm*/) {
     BIO_free(bio);
     bio = nullptr;
 
-    zip_fclose(apk_file);
-    apk_file = nullptr;
+    zip_fclose(apkFile);
+    apkFile = nullptr;
     zip_close(apk);
     apk = nullptr;
 

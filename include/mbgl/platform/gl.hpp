@@ -129,10 +129,10 @@ extern PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays;
 extern PFNGLGENVERTEXARRAYSPROC GenVertexArrays;
 extern PFNGLISVERTEXARRAYPROC IsVertexArray;
 
-extern bool is_packed_depth_stencil_supported;
+extern bool isPackedDepthStencilSupported;
 #define GL_DEPTH24_STENCIL8 0x88F0
 
-extern bool is_depth24_supported;
+extern bool isDepth24Supported;
 #define GL_DEPTH_COMPONENT24 0x81A6
 
 // Debug group markers, useful for debugging on iOS

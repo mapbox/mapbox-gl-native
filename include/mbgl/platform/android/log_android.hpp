@@ -7,7 +7,7 @@ namespace mbgl {
 
 class AndroidLogBackend : public LogBackend {
 private:
-    int severity_to_priority(EventSeverity severity);
+    int severityToPriority(EventSeverity severity);
 
 public:
     inline ~AndroidLogBackend() = default;

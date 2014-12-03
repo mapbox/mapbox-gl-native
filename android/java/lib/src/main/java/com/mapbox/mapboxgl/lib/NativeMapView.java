@@ -187,14 +187,14 @@ class NativeMapView {
         return nativeGetDefaultTransitionDuration(mNativeMapViewPtr);
     }
 
-    public void setDefaultTransitionDuration(long durationMilliseconds) {
-        if (durationMilliseconds < 0) {
+    public void setDefaultTransitionDuration(long milliseconds) {
+        if (milliseconds < 0) {
             throw new IllegalArgumentException(
                     "durationMilliseconds cannot be negative.");
         }
 
         nativeSetDefaultTransitionDuration(mNativeMapViewPtr,
-                durationMilliseconds);
+                milliseconds);
     }
 
     public void setStyleUrl(String url) {
@@ -456,7 +456,7 @@ class NativeMapView {
     private native List<String> nativeGetAppliedClasses(long nativeMapViewPtr);
 
     private native void nativeSetDefaultTransitionDuration(
-            long nativeMapViewPtr, long durationMilliseconds);
+            long nativeMapViewPtr, long milliseconds);
 
     private native long nativeGetDefaultTransitionDuration(long nativeMapViewPtr);
 
