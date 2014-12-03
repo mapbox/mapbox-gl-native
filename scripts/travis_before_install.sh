@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -x
 set -e
 set -o pipefail
 
@@ -43,38 +44,38 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         sudo apt-get -y install lib32stdc++6 lib32z1 jq
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
 
-        echo "debug: inserting access token"
+        echo "inserting access token"
         sed -i "s/access token goes here/${ANDROID_KEY}/g" android/java/app/src/main/java/com/mapbox/mapboxgl/app/MapFragment.java
 
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
-        echo "debug: installing 7z"
+        echo "installing 7z"
         MASON_PLATFORM= ./.mason/mason install 7z 9.20
 
-        echo "debug: setting 7z path"
+        echo "setting 7z path"
         SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
 
-        echo "debug: fetching NDK"
+        echo "fetching NDK"
         wget http://dl.google.com/android/ndk/android-ndk-r10c-darwin-x86_64.bin
 
-        echo "debug: chmod NDK"
+        echo "chmod NDK"
         chmod a+x ./android-ndk-r10c-darwin-x86_64.bin
 
-        echo "debug: unpacking NDK"
+        echo "unpacking NDK"
         $SEVEN_ZIP_PATH x ./android-ndk-r10c-darwin-x86_64.bin > .tmp-ndk-log
         rm .tmp-ndk-log
 
-        echo "debug: fetching SDK"
+        echo "fetching SDK"
         wget http://dl.google.com/android/android-sdk_r23.0.2-macosx.zip
 
-        echo "debug: unpacking SDK"
+        echo "unpacking SDK"
         unzip -qq android-sdk_r23.0.2-macosx.zip
         mv ./android-sdk-macosx ./android-sdk
 
-        echo "debug: installing SDK"
+        echo "installing SDK"
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
 
-        echo "debug: inserting access token"
+        echo "inserting access token"
         sed -i "s/access token goes here/${ANDROID_KEY}/g" android/java/app/src/main/java/com/mapbox/mapboxgl/app/MapFragment.java
 
     fi
