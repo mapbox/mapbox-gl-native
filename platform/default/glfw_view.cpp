@@ -263,12 +263,6 @@ void GLFWView::notify() {
 
 void GLFWView::swap() {
     glfwPostEmptyEvent();
-
-    double lon, lat, zoom;
-    map->getLonLatZoom(lon, lat, zoom);
-    const double bearing = map->getBearing();
-    const std::string title = mbgl::util::sprintf<128>("Mapbox GL – %.2f/%.6f/%.6f/%.1f", zoom, lat, lon, bearing);
-    glfwSetWindowTitle(window, title.c_str());
 }
 
 void GLFWView::notify_map_change(mbgl::MapChange /*change*/, mbgl::timestamp /*delay*/) {
