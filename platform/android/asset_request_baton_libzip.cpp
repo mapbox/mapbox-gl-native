@@ -2,8 +2,7 @@
 #include <mbgl/storage/asset_request_baton.hpp>
 #include <mbgl/storage/asset_request.hpp>
 #include <mbgl/storage/response.hpp>
-
-#include <boost/make_unique.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <cerrno>
 // NOTE a bug in the Android NDK breaks std::errno
@@ -28,7 +27,7 @@ void AssetRequestBaton::run(AssetRequestBaton *ptr) {
     if ((apk == nullptr) || ptr->canceled || !ptr->request) {
         // Opening the APK failed or was canceled. There isn't much left we can do.
         const int message_size = zip_error_to_str(nullptr, 0, error, errno);
-        const std::unique_ptr<char[]> message = boost::make_unique<char[]>(message_size);
+        const std::unique_ptr<char[]> message = mbgl::util::make_unique<char[]>(message_size);
         zip_error_to_str(message.get(), 0, error, errno);
         notify_error(ptr, 500, message.get());
         cleanup(ptr);
@@ -61,7 +60,7 @@ void AssetRequestBaton::run(AssetRequestBaton *ptr) {
         return;
     }
 
-    const std::unique_ptr<char[]> data = boost::make_unique<char[]>(stat.size);
+    const std::unique_ptr<char[]> data = mbgl::util::make_unique<char[]>(stat.size);
 
     if (static_cast<zip_uint64_t>(zip_fread(apk_file, reinterpret_cast<void *>(data.get()), stat.size)) != stat.size || ptr->canceled || !ptr->request) {
         // Reading failed or was canceled. We already have an open file handle

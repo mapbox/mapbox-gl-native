@@ -4,8 +4,6 @@
 #include <list>
 #include <tuple>
 
-#include <boost/make_unique.hpp>
-
 #include <sys/system_properties.h>
 
 #include <GLES2/gl2.h>
@@ -15,6 +13,7 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/std.hpp>
 
 namespace mbgl {
 namespace android {
@@ -194,7 +193,7 @@ bool NativeMapView::initializeDisplay() {
         return false;
     }
 
-    const std::unique_ptr<EGLConfig[]> configs = boost::make_unique<EGLConfig[]>(num_configs); //  switch to std::make_unique in C++14
+    const std::unique_ptr<EGLConfig[]> configs = mbgl::util::make_unique<EGLConfig[]>(num_configs);
     if (!eglChooseConfig(display, config_attribs, configs.get(), num_configs, &num_configs)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig() returned error %d", eglGetError());
         terminateDisplay();

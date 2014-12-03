@@ -8,7 +8,6 @@
 #ifdef __ANDROID__
     #include <mbgl/android/jni.hpp>
     #include <zip.h>
-    #include <boost/make_unique.hpp>
     #include <openssl/ssl.h>
 #endif
 
@@ -447,7 +446,7 @@ static CURLcode sslctx_function(CURL */*curl*/, void *sslctx, void */*parm*/) {
         return CURLE_SSL_CACERT_BADFILE;
     }
 
-    const std::unique_ptr<char[]> pem = boost::make_unique<char[]>(stat.size);
+    const std::unique_ptr<char[]> pem = util::make_unique<char[]>(stat.size);
 
     if (static_cast<zip_uint64_t>(zip_fread(apk_file, reinterpret_cast<void *>(pem.get()), stat.size)) != stat.size) {
         zip_fclose(apk_file);
