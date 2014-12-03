@@ -19,7 +19,7 @@ struct FileRequestBaton {
     static void notify_error(uv_fs_t *req);
     static void cleanup(uv_fs_t *req);
 
-    const unsigned long thread_id;
+    const unsigned long threadId;
     FileRequest *request = nullptr;
     uv_fs_t req;
     uv_file fd = -1;

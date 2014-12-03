@@ -47,7 +47,7 @@ struct HTTPRequestBaton {
     HTTPRequestBaton(const std::string &path);
     ~HTTPRequestBaton();
 
-    const unsigned long thread_id;
+    const unsigned long threadId;
     const std::string path;
 
     HTTPRequest *request = nullptr;

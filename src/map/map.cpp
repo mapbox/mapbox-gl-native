@@ -22,6 +22,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/uv.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -627,8 +628,7 @@ void Map::setAppliedClasses(const std::vector<std::string> &classes) {
         }
     }
     else {
-        std::lock_guard
-        d::lock_guard<std::mutex> lock(appliedClassesMutex);
+        std::lock_guard<std::mutex> lock(appliedClassesMutex);
         appliedClasses = std::make_unique<std::vector<std::string>>(classes);
     }
 }

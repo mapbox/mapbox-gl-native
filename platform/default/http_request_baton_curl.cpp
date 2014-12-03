@@ -595,14 +595,14 @@ void create_thread() {
 
 // This function must be run from the main thread (== where the HTTPRequestBaton was created)
 void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
-    assert(uv_thread_self() == ptr->thread_id);
+    assert(uv_thread_self() == ptr->threadId);
     uv_once(&once, create_thread);
     uv_messenger_send(&start_messenger, new util::ptr<HTTPRequestBaton>(ptr));
 }
 
 // This function must be run from the main thread (== where the HTTPRequestBaton was created)
 void HTTPRequestBaton::stop(const util::ptr<HTTPRequestBaton> &ptr) {
-    assert(uv_thread_self() == ptr->thread_id);
+    assert(uv_thread_self() == ptr->threadId);
     uv_once(&once, create_thread);
     uv_messenger_send(&stop_messenger, new util::ptr<HTTPRequestBaton>(ptr));
 }

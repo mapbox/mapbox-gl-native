@@ -4,19 +4,19 @@
 
 namespace mbgl {
 
-void AssetRequestBaton::run(uv_async_t *async) {
-    AssetRequestBaton *ptr = (AssetRequestBaton *)async->data;
-    assert(ptr->thread_id == uv_thread_self());
+void AssetRequestBaton::run(AssetRequestBaton *ptr) {
+    assert(ptr->threadId == uv_thread_self());
 
     if (ptr->canceled || !ptr->request) {
         // Either the AssetRequest object has been destructed, or the
         // request was canceled.
-        cleanup(async);
+        cleanup(ptr);
         return;
     }
 
-    notify_error(async, 500, "Assets not implemented on this platform.");
-    cleanup(async);
+    // Just return a 500 error until implemented properly
+    notify_error(ptr, 500, "Assets not implemented on this platform.");
+    cleanup(ptr);
 }
 
 }

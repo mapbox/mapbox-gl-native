@@ -2,29 +2,27 @@
 #define MBGL_STORAGE_ASSET_REQUEST_BATON
 
 #include <mbgl/storage/asset_request.hpp>
-
-#include <uv.h>
+#include <mbgl/util/uv.hpp>
 
 namespace mbgl {
 
 struct AssetRequestBaton {
     AssetRequestBaton(AssetRequest *request_, const std::string &path, uv_loop_t *loop);
-    ~AssetRequestBaton();
 
-    const unsigned long thread_id;
+    const unsigned long threadId;
     AssetRequest *request = nullptr;
-    std::unique_ptr<uv_async_t> async_run;
+    std::unique_ptr<uv::async> asyncRun;
     std::string path;
     bool canceled = false;
 
     void cancel();
-    static void notify_error(uv_async_t *async, const int code, const char *message);
-    static void cleanup(uv_async_t *async);
+    static void notify_error(AssetRequestBaton *ptr, const int code, const char *message);
+    static void cleanup(AssetRequestBaton *ptr);
 
     // IMPLEMENT THIS PLATFORM SPECIFIC FUNCTION:
 
     // Called to load the asset. Platform-specific implementation.
-    static void run(uv_async_t *async);
+    static void run(AssetRequestBaton *ptr);
 
 };
 
