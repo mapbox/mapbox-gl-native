@@ -25,7 +25,7 @@ case ${MASON_PLATFORM} in
         BOOST_VERSION=system
         ;;
     *)
-        GLFW_VERSION=a21f2377
+        GLFW_VERSION=e1ae9af5
         SQLITE_VERSION=system
         LIBPNG_VERSION=1.6.13
         LIBJPEG_VERSION=v8d
