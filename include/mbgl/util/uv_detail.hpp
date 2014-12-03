@@ -73,7 +73,6 @@ private:
 };
 
 class async : public mbgl::util::noncopyable {
-    friend class cond;
 public:
     inline async(uv_loop_t* loop, std::function<void ()> fn_)
         : fn(fn_) {
