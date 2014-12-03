@@ -25,7 +25,7 @@ void AssetRequestBaton::cancel() {
 }
 
 void AssetRequestBaton::notify_error(AssetRequestBaton *ptr, const int code, const char *message) {
-    assert(ptr->threadId == uv_thread_self());
+    assert(uv_thread_self() == ptr->threadId);
 
     if (ptr->request && !ptr->canceled) {
         ptr->request->response = std::unique_ptr<Response>(new Response);
@@ -36,7 +36,7 @@ void AssetRequestBaton::notify_error(AssetRequestBaton *ptr, const int code, con
 }
 
 void AssetRequestBaton::cleanup(AssetRequestBaton *ptr) {
-    assert(ptr->threadId == uv_thread_self());
+    assert(uv_thread_self() == ptr->threadId);
 
     if (ptr->request) {
         ptr->request->ptr = nullptr;

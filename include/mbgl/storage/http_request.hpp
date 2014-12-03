@@ -40,10 +40,10 @@ private:
     void removeBackoffTimer();
 
 private:
-    const unsigned long thread_id;
+    const unsigned long threadId;
     uv_loop_t *const loop;
     CacheRequestBaton *cache_baton = nullptr;
-    util::ptr<HTTPRequestBaton> http_baton;
+    util::ptr<HTTPRequestBaton> httpBaton;
     uv_timer_t *backoff_timer = nullptr;
     util::ptr<SQLiteStore> store;
     const ResourceType type;

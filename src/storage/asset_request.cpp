@@ -15,7 +15,7 @@ AssetRequest::AssetRequest(const std::string &path_, uv_loop_t *loop)
 }
 
 void AssetRequest::cancel() {
-    assert(thread_id == uv_thread_self());
+    assert(uv_thread_self() == threadId);
 
     if (ptr) {
         ptr->cancel();
@@ -30,7 +30,7 @@ void AssetRequest::cancel() {
 }
 
 AssetRequest::~AssetRequest() {
-    assert(thread_id == uv_thread_self());
+    assert(uv_thread_self() == threadId);
     cancel();
 }
 

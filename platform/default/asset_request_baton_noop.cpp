@@ -2,10 +2,12 @@
 #include <mbgl/storage/asset_request.hpp>
 #include <mbgl/storage/response.hpp>
 
+#include <uv.h>
+
 namespace mbgl {
 
 void AssetRequestBaton::run(AssetRequestBaton *ptr) {
-    assert(ptr->threadId == uv_thread_self());
+    assert(uv_thread_self() == ptr->threadId);
 
     if (ptr->canceled || !ptr->request) {
         // Either the AssetRequest object has been destructed, or the

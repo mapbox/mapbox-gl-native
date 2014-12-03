@@ -19,13 +19,13 @@ void invoke(const std::forward_list<std::unique_ptr<Callback>> &list, Args&& ...
     }
 }
 
-BaseRequest::BaseRequest(const std::string &path_) : thread_id(uv_thread_self()), path(path_) {
+BaseRequest::BaseRequest(const std::string &path_) : threadId(uv_thread_self()), path(path_) {
 }
 
 // A base request can only be "canceled" by destroying the object. In that case, we'll have to
 // notify all cancel callbacks.
 BaseRequest::~BaseRequest() {
-    assert(thread_id == uv_thread_self());
+    assert(uv_thread_self() == threadId);
     notify();
 }
 
@@ -34,7 +34,7 @@ void BaseRequest::retryImmediately() {
 }
 
 void BaseRequest::notify() {
-    assert(thread_id == uv_thread_self());
+    assert(uv_thread_self() == threadId);
 
     // The parameter exists solely so that any calls to ->remove()
     // are not going to cause deallocation of this object while this call is in progress.
@@ -55,7 +55,7 @@ void BaseRequest::notify() {
 }
 
 Callback *BaseRequest::add(Callback &&callback, const util::ptr<BaseRequest> &request) {
-    assert(thread_id == uv_thread_self());
+    assert(uv_thread_self() == threadId);
     assert(this == request.get());
 
     if (response) {
@@ -75,7 +75,7 @@ Callback *BaseRequest::add(Callback &&callback, const util::ptr<BaseRequest> &re
 }
 
 void BaseRequest::remove(Callback *callback) {
-    assert(thread_id == uv_thread_self());
+    assert(uv_thread_self() == threadId);
     callbacks.remove_if([=](const std::unique_ptr<Callback> &cb) {
         return cb.get() == callback;
     });
