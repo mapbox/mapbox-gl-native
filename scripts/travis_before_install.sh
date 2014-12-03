@@ -33,16 +33,19 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         mapbox_time_finish
 
         echo "debug: fetching JDK"
-        mapbox_time "fetching JDK" \
+        mapbox_time_start "fetching JDK"
         wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-linux-x64.tar.gz
+        mapbox_time_finish
 
         echo "debug: unpacking JDK"
-        mapbox_time "unpacking JDK" \
+        mapbox_time_start "unpacking JDK"
         tar -xzf ./jdk-7u71-linux-x64.tar.gz
+        mapbox_time_finish
 
         echo "debug: fetching SDK"
-        mapbox_time "fetching SDK" \
+        mapbox_time_start "fetching SDK"
         wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
+        mapbox_time_finish
 
         echo "debug: unpacking SDK"
         mapbox_time_start "unpacking SDK"
@@ -84,8 +87,9 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
         mapbox_time_finish
 
         echo "debug: fetching SDK"
-        mapbox_time "fetching SDK" \
+        mapbox_time_start "fetching SDK"
         wget http://dl.google.com/android/android-sdk_r23.0.2-macosx.zip
+        mapbox_time_finish
 
         echo "debug: unpacking SDK"
         mapbox_time_start "unpacking SDK"
