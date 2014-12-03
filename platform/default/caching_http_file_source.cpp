@@ -9,20 +9,6 @@
 
 namespace mbgl {
 
-CachingHTTPFileSource::CachingHTTPFileSource(uv_loop_t* loop_, const std::string &path_)
-    : thread_id(uv_thread_self()),
-      path(path_),
-      store(!path.empty() ? util::ptr<SQLiteStore>(new SQLiteStore(loop_, path)) : nullptr),
-      loop(loop_),
-      queue(new uv_messenger_t) {
-
-    uv_messenger_init(loop, queue, [](void *ptr) {
-        std::unique_ptr<std::function<void()>> fn { reinterpret_cast<std::function<void()> *>(ptr) };
-        (*fn)();
-    });
-    uv_unref((uv_handle_t *)&queue->async);
-}
-
 CachingHTTPFileSource::CachingHTTPFileSource(const std::string &path_)
     : path(path_) {}
 

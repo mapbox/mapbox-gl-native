@@ -14,7 +14,6 @@ class SQLiteStore;
 
 class CachingHTTPFileSource : public FileSource {
 public:
-    CachingHTTPFileSource(uv_loop_t*, const std::string &path_);
     CachingHTTPFileSource(const std::string &path_);
     ~CachingHTTPFileSource();
 
