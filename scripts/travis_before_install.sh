@@ -11,11 +11,11 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         echo "load submodules"
         git submodule update --init --recursive
 
-        echo "installing 7z"
-        MASON_PLATFORM= ./.mason/mason install 7z 9.20
+        #echo "installing 7z"
+        #MASON_PLATFORM= ./.mason/mason install 7z 9.20
 
-        echo "setting 7z path"
-        SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
+        #echo "setting 7z path"
+        #SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
 
         echo "fetching NDK"
         wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
@@ -24,8 +24,9 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         chmod a+x ./android-ndk-r10c-linux-x86_64.bin
 
         echo "unpacking NDK"
-        $SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > .tmp-ndk-log
-        rm .tmp-ndk-log
+        #$SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > .tmp-ndk-log
+        #rm .tmp-ndk-log
+        ./android-ndk-r10c-linux-x86_64.bin
 
         echo "fetching JDK"
         wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-linux-x64.tar.gz
@@ -49,11 +50,11 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
 
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
-        echo "installing 7z"
-        MASON_PLATFORM= ./.mason/mason install 7z 9.20
+        #echo "installing 7z"
+        #MASON_PLATFORM= ./.mason/mason install 7z 9.20
 
-        echo "setting 7z path"
-        SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
+        #echo "setting 7z path"
+        #SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
 
         echo "fetching NDK"
         wget http://dl.google.com/android/ndk/android-ndk-r10c-darwin-x86_64.bin
@@ -62,8 +63,9 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
         chmod a+x ./android-ndk-r10c-darwin-x86_64.bin
 
         echo "unpacking NDK"
-        $SEVEN_ZIP_PATH x ./android-ndk-r10c-darwin-x86_64.bin > .tmp-ndk-log
-        rm .tmp-ndk-log
+        #$SEVEN_ZIP_PATH x ./android-ndk-r10c-darwin-x86_64.bin > .tmp-ndk-log
+        #rm .tmp-ndk-log
+        ./android-ndk-r10c-darwin-x86_64.bin
 
         echo "fetching SDK"
         wget http://dl.google.com/android/android-sdk_r23.0.2-macosx.zip
