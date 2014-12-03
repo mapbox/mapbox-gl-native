@@ -34,7 +34,7 @@ class Map : private util::noncopyable {
     typedef void (*stop_callback)(void *);
 
 public:
-    explicit Map(View &view);
+    explicit Map(View&, FileSource&);
     ~Map();
 
     // Start the map render thread. It is asynchronous.
@@ -197,7 +197,7 @@ private:
     Transform transform;
     TransformState state;
 
-    util::ptr<FileSource> fileSource;
+    FileSource& fileSource;
 
     util::ptr<Style> style;
     GlyphAtlas glyphAtlas;

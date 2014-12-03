@@ -1,4 +1,4 @@
-#include <mbgl/storage/file_source.hpp>
+#include <mbgl/platform/default/caching_http_file_source.hpp>
 #include <mbgl/storage/file_request.hpp>
 #include <mbgl/storage/http_request.hpp>
 #include <mbgl/storage/sqlite_store.hpp>
@@ -10,8 +10,9 @@
 
 namespace mbgl {
 
-FileSource::FileSource(uv_loop_t *loop_, const std::string &path)
+CachingHTTPFileSource::CachingHTTPFileSource(uv_loop_t* loop_, const std::string &path_)
     : thread_id(uv_thread_self()),
+      path(path_),
       store(!path.empty() ? util::ptr<SQLiteStore>(new SQLiteStore(loop_, path)) : nullptr),
       loop(loop_),
       queue(new uv_messenger_t) {
@@ -23,34 +24,56 @@ FileSource::FileSource(uv_loop_t *loop_, const std::string &path)
     uv_unref((uv_handle_t *)&queue->async);
 }
 
-FileSource::~FileSource() {
-    // FIXME temp fix for #608 crash
-    //assert(thread_id == uv_thread_self());
-    uv_messenger_stop(queue, [](uv_messenger_t *msgr) {
-        delete msgr;
-    });
+CachingHTTPFileSource::CachingHTTPFileSource(const std::string &path_)
+    : path(path_) {}
 
-    util::ptr<BaseRequest> req;
+CachingHTTPFileSource::~CachingHTTPFileSource() {
+    if (hasLoop()) {
+        // FIXME temp fix for #608 crash
+        // assert(thread_id == uv_thread_self());
+        uv_messenger_stop(queue, [](uv_messenger_t *msgr) {
+            delete msgr;
+        });
 
-    // Send a cancel() message to all requests that we are still holding.
-    for (const std::pair<std::string, std::weak_ptr<BaseRequest>> &pair : pending) {
-        if ((req = pair.second.lock())) {
-            req->cancel();
+        util::ptr<BaseRequest> req;
+
+        // Send a cancel() message to all requests that we are still holding.
+        for (const std::pair<std::string, std::weak_ptr<BaseRequest>> &pair : pending) {
+            if ((req = pair.second.lock())) {
+                req->cancel();
+            }
         }
     }
 }
 
-void FileSource::setBase(const std::string &value) {
+void CachingHTTPFileSource::setLoop(uv_loop_t* loop_) {
+    thread_id = uv_thread_self();
+    store = !path.empty() ? util::ptr<SQLiteStore>(new SQLiteStore(loop_, path)) : nullptr;
+    loop = loop_;
+    queue = new uv_messenger_t;
+
+    uv_messenger_init(loop, queue, [](void *ptr) {
+        std::unique_ptr<std::function<void()>> fn { reinterpret_cast<std::function<void()> *>(ptr) };
+        (*fn)();
+    });
+    uv_unref((uv_handle_t *)&queue->async);
+}
+
+bool CachingHTTPFileSource::hasLoop() {
+    return loop;
+}
+
+void CachingHTTPFileSource::setBase(const std::string &value) {
     assert(thread_id == uv_thread_self());
     base = value;
 }
 
-const std::string &FileSource::getBase() const {
+const std::string &CachingHTTPFileSource::getBase() const {
     assert(thread_id == uv_thread_self());
     return base;
 }
 
-std::unique_ptr<Request> FileSource::request(ResourceType type, const std::string &url) {
+std::unique_ptr<Request> CachingHTTPFileSource::request(ResourceType type, const std::string &url) {
     assert(thread_id == uv_thread_self());
 
     // Make URL absolute.
@@ -87,7 +110,7 @@ std::unique_ptr<Request> FileSource::request(ResourceType type, const std::strin
     return util::make_unique<Request>(req);
 }
 
-void FileSource::prepare(std::function<void()> fn) {
+void CachingHTTPFileSource::prepare(std::function<void()> fn) {
     if (thread_id == uv_thread_self()) {
         fn();
     } else {
@@ -95,7 +118,7 @@ void FileSource::prepare(std::function<void()> fn) {
     }
 }
 
-void FileSource::retryAllPending() {
+void CachingHTTPFileSource::retryAllPending() {
     assert(thread_id == uv_thread_self());
 
     util::ptr<BaseRequest> req;
