@@ -449,7 +449,7 @@ bool StyleParser::parseOptionalProperty(const char *property_name, const std::ve
 
 std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
     if (value.IsArray()) {
-        std::unique_ptr<StyleLayerGroup> group = std::make_unique<StyleLayerGroup>();
+        std::unique_ptr<StyleLayerGroup> group = util::make_unique<StyleLayerGroup>();
         for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
             util::ptr<StyleLayer> layer = createLayer(value[i]);
             if (layer) {

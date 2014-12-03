@@ -1,6 +1,7 @@
 #include <mbgl/storage/sqlite_store.hpp>
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/sqlite3.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <mbgl/util/uv-worker.h>
 
@@ -127,7 +128,7 @@ void SQLiteStore::get(const std::string &path, GetCallback callback, void *ptr) 
         stmt.bind(1, url.c_str());
         if (stmt.run()) {
             // There is data.
-            baton->response = std::unique_ptr<Response>(new Response);
+            baton->response = util::make_unique<Response>();
 
             baton->response->code = stmt.get<int>(0);
             baton->type = ResourceType(stmt.get<int>(1));

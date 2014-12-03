@@ -3,6 +3,7 @@
 #include <mbgl/storage/http_request.hpp>
 #include <mbgl/storage/sqlite_store.hpp>
 #include <mbgl/util/uv-messenger.h>
+#include <mbgl/util/std.hpp>
 
 #include <uv.h>
 
@@ -79,7 +80,7 @@ std::unique_ptr<Request> FileSource::request(ResourceType type, const std::strin
         pending.emplace(absoluteURL, req);
     }
 
-    return std::unique_ptr<Request>(new Request(req));
+    return util::make_unique<Request>(req);
 }
 
 void FileSource::prepare(std::function<void()> fn) {

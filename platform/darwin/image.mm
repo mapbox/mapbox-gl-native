@@ -1,4 +1,5 @@
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/std.hpp>
 
 #import <ImageIO/ImageIO.h>
 
@@ -97,7 +98,7 @@ Image::Image(const std::string &source_data) {
     height = uint32_t(CGImageGetHeight(image));
     CGRect rect = {{ 0, 0 }, { static_cast<CGFloat>(width), static_cast<CGFloat>(height) }};
 
-    img = ::std::unique_ptr<char[]>(new char[width * height * 4]());
+    img = util::make_unique<char[]>(width * height * 4);
     CGContextRef context = CGBitmapContextCreate(img.get(), width, height, 8, width * 4,
         color_space, kCGImageAlphaPremultipliedLast);
     if (!context) {
