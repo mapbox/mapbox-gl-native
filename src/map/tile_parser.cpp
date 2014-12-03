@@ -35,7 +35,7 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile_,
                        GlyphStore & glyphStore_,
                        SpriteAtlas & spriteAtlas_,
                        const util::ptr<Sprite> &sprite_,
-                       Texturepool& texturePool_)
+                       TexturePool& texturePool_)
     : vector_data(pbf((const uint8_t *)data.data(), data.size())),
       tile(tile_),
       style(style_),
@@ -119,7 +119,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(util::ptr<StyleBucket> bucket_d
             fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucket_desc->name.c_str(), bucket_desc->source_layer.c_str());
         }
     } else if (bucket_desc->render.is<StyleBucketRaster>() && bucket_desc->render.get<StyleBucketRaster>().prerendered == true) {
-        return createRasterBucket(texturePool, bucket_desc->render.get<StyleBucketRaster>());
+        return createRasterBucket(bucket_desc->render.get<StyleBucketRaster>());
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
         if (debug::tileParseWarnings) {
@@ -155,8 +155,8 @@ std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& laye
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createRasterBucket(Texturepool& texturepool, const StyleBucketRaster &raster) {
-    std::unique_ptr<RasterBucket> bucket = std::make_unique<RasterBucket>(texturepool, raster);
+std::unique_ptr<Bucket> TileParser::createRasterBucket(const StyleBucketRaster &raster) {
+    std::unique_ptr<RasterBucket> bucket = std::make_unique<RasterBucket>(texturePool, raster);
     return obsolete() ? nullptr : std::move(bucket);
 }
 

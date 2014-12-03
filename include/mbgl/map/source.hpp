@@ -23,7 +23,7 @@ class GlyphStore;
 class SpriteAtlas;
 class Sprite;
 class FileSource;
-class Texturepool;
+class TexturePool;
 class Style;
 class Painter;
 class StyleLayer;
@@ -39,7 +39,7 @@ public:
                 util::ptr<Style>,
                 GlyphAtlas&, GlyphStore&,
                 SpriteAtlas&, util::ptr<Sprite>,
-                Texturepool&, FileSource&,
+                TexturePool&, FileSource&,
                 std::function<void ()> callback);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
@@ -63,7 +63,7 @@ private:
                             util::ptr<Style>,
                             GlyphAtlas&, GlyphStore&,
                             SpriteAtlas&, util::ptr<Sprite>,
-                            FileSource&, Texturepool&,
+                            FileSource&, TexturePool&,
                             const Tile::ID&,
                             std::function<void ()> callback);
 

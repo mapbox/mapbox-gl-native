@@ -12,14 +12,14 @@ VectorTileData::VectorTileData(Tile::ID const& id_,
                                float mapMaxZoom, util::ptr<Style> style_,
                                GlyphAtlas& glyphAtlas_, GlyphStore& glyphStore_,
                                SpriteAtlas& spriteAtlas_, util::ptr<Sprite> sprite_,
-                               Texturepool& texturepool_,
+                               TexturePool& texturePool_,
                                const SourceInfo& source_)
     : TileData(id_, source_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
-      texturepool(texturepool_),
+      texturePool(texturePool_),
       style(style_),
       depth(id.z >= source.max_zoom ? mapMaxZoom - id.z : 1) {
 }
@@ -41,7 +41,7 @@ void VectorTileData::parse() {
         TileParser parser(data, *this, style,
                           glyphAtlas, glyphStore,
                           spriteAtlas, sprite,
-                          texturepool);
+                          texturePool);
         parser.parse();
     } catch (const std::exception& ex) {
 #if defined(DEBUG)

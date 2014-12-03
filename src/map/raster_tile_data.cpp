@@ -5,9 +5,9 @@
 using namespace mbgl;
 
 
-RasterTileData::RasterTileData(Tile::ID const& id_, Texturepool& texturepool, const SourceInfo& source_)
+RasterTileData::RasterTileData(Tile::ID const& id_, TexturePool& texturePool, const SourceInfo& source_)
     : TileData(id_, source_),
-    bucket(texturepool, properties) {
+    bucket(texturePool, properties) {
 }
 
 RasterTileData::~RasterTileData() {

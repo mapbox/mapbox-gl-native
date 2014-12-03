@@ -11,13 +11,13 @@
 
 using namespace mbgl;
 
-Raster::Raster(Texturepool& texturepool_)
-    : texturepool(texturepool_)
+Raster::Raster(TexturePool& texturePool_)
+    : texturePool(texturePool_)
 {}
 
 Raster::~Raster() {
     if (textured) {
-        texturepool.removeTextureID(texture);
+        texturePool.removeTextureID(texture);
     }
 }
 
@@ -46,7 +46,7 @@ void Raster::bind(bool linear) {
     }
 
     if (img && !textured) {
-        texture = texturepool.getTextureID();
+        texture = texturePool.getTextureID();
         glBindTexture(GL_TEXTURE_2D, texture);
 #ifndef GL_ES_VERSION_2_0
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);

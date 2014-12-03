@@ -24,7 +24,7 @@ class GlyphAtlas;
 class GlyphStore;
 class SpriteAtlas;
 class Sprite;
-class Texturepool;
+class TexturePool;
 class Style;
 
 class VectorTileData : public TileData {
@@ -35,7 +35,7 @@ public:
                    float mapMaxZoom, util::ptr<Style>,
                    GlyphAtlas&, GlyphStore&,
                    SpriteAtlas&, util::ptr<Sprite>,
-                   Texturepool&,
+                   TexturePool&,
                    const SourceInfo&);
     ~VectorTileData();
 
@@ -62,7 +62,7 @@ protected:
     GlyphStore& glyphStore;
     SpriteAtlas& spriteAtlas;
     util::ptr<Sprite> sprite;
-    Texturepool& texturepool;
+    TexturePool& texturePool;
     util::ptr<Style> style;
 
 public:

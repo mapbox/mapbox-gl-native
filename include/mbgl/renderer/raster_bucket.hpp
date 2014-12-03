@@ -16,7 +16,7 @@ class VertexArrayObject;
 
 class RasterBucket : public Bucket {
 public:
-    RasterBucket(Texturepool&, const StyleBucketRaster&);
+    RasterBucket(TexturePool&, const StyleBucketRaster&);
 
     virtual void render(Painter& painter, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     virtual bool hasData() const;

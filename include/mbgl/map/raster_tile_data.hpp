@@ -10,13 +10,13 @@ namespace mbgl {
 class Painter;
 class SourceInfo;
 class StyleLayer;
-class Texturepool;
+class TexturePool;
 
 class RasterTileData : public TileData {
     friend class TileParser;
 
 public:
-    RasterTileData(Tile::ID const& id, Texturepool&, const SourceInfo&);
+    RasterTileData(Tile::ID const& id, TexturePool&, const SourceInfo&);
     ~RasterTileData();
 
     virtual void parse();
