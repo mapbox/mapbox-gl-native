@@ -7,57 +7,41 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
 
     if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
 
-        echo "debug: load submodules"
+        echo "load submodules"
         git submodule update --init --recursive
 
-        echo "debug: installing 7z"
-        mapbox_time_start "installing 7z"
+        echo "installing 7z"
         MASON_PLATFORM= ./.mason/mason install 7z 9.20
-        mapbox_time_finish
 
-        echo "debug: setting 7z path"
+        echo "setting 7z path"
         SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
 
-        echo "debug: fetching NDK"
-        mapbox_time_start "fetching NDK"
+        echo "fetching NDK"
         wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
-        mapbox_time_finish
 
-        echo "debug: chmod NDK"
+        echo "chmod NDK"
         chmod a+x ./android-ndk-r10c-linux-x86_64.bin
 
-        echo "debug: unpacking NDK"
-        mapbox_time_start "unpacking NDK"
+        echo "unpacking NDK"
         $SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > .tmp-ndk-log
         rm .tmp-ndk-log
-        mapbox_time_finish
 
-        echo "debug: fetching JDK"
-        mapbox_time_start "fetching JDK"
+        echo "fetching JDK"
         wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-linux-x64.tar.gz
-        mapbox_time_finish
 
-        echo "debug: unpacking JDK"
-        mapbox_time_start "unpacking JDK"
+        echo "unpacking JDK"
         tar -xzf ./jdk-7u71-linux-x64.tar.gz
-        mapbox_time_finish
 
-        echo "debug: fetching SDK"
-        mapbox_time_start "fetching SDK"
+        echo "fetching SDK"
         wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
-        mapbox_time_finish
 
-        echo "debug: unpacking SDK"
-        mapbox_time_start "unpacking SDK"
+        echo "unpacking SDK"
         tar -xzf ./android-sdk_r23.0.2-linux.tgz
         mv ./android-sdk-linux ./android-sdk
-        mapbox_time_finish
 
-        echo "debug: installing SDK"
-        mapbox_time_start "installing SDK"
+        echo "installing SDK"
         sudo apt-get -y install lib32stdc++6 lib32z1 jq
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
-        mapbox_time_finish
 
         echo "debug: inserting access token"
         sed -i "s/access token goes here/${ANDROID_KEY}/g" android/java/app/src/main/java/com/mapbox/mapboxgl/app/MapFragment.java
@@ -65,42 +49,30 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
         echo "debug: installing 7z"
-        mapbox_time_start "installing 7z"
         MASON_PLATFORM= ./.mason/mason install 7z 9.20
-        mapbox_time_finish
 
         echo "debug: setting 7z path"
         SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
 
         echo "debug: fetching NDK"
-        mapbox_time_start "fetching NDK"
         wget http://dl.google.com/android/ndk/android-ndk-r10c-darwin-x86_64.bin
-        mapbox_time_finish
 
         echo "debug: chmod NDK"
         chmod a+x ./android-ndk-r10c-darwin-x86_64.bin
 
         echo "debug: unpacking NDK"
-        mapbox_time_start "unpacking NDK"
         $SEVEN_ZIP_PATH x ./android-ndk-r10c-darwin-x86_64.bin > .tmp-ndk-log
         rm .tmp-ndk-log
-        mapbox_time_finish
 
         echo "debug: fetching SDK"
-        mapbox_time_start "fetching SDK"
         wget http://dl.google.com/android/android-sdk_r23.0.2-macosx.zip
-        mapbox_time_finish
 
         echo "debug: unpacking SDK"
-        mapbox_time_start "unpacking SDK"
         unzip -qq android-sdk_r23.0.2-macosx.zip
         mv ./android-sdk-macosx ./android-sdk
-        mapbox_time_finish
 
         echo "debug: installing SDK"
-        mapbox_time_start "installing SDK"
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
-        mapbox_time_finish
 
         echo "debug: inserting access token"
         sed -i "s/access token goes here/${ANDROID_KEY}/g" android/java/app/src/main/java/com/mapbox/mapboxgl/app/MapFragment.java
