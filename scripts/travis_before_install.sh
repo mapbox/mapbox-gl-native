@@ -11,43 +11,43 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         git submodule update --init --recursive
 
         echo "debug: installing 7z"
-        #mapbox_time "installing 7z" \
+        mapbox_time "installing 7z" \
         MASON_PLATFORM= ./.mason/mason install 7z 9.20
 
         echo "debug: setting 7z path"
         SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
 
         echo "debug: fetching NDK"
-        #mapbox_time "fetching NDK" \
+        mapbox_time "fetching NDK" \
         wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
 
         echo "debug: chmod NDK"
         chmod a+x ./android-ndk-r10c-linux-x86_64.bin
 
         echo "debug: unpacking NDK"
-        #mapbox_time "unpacking NDK" \
+        mapbox_time "unpacking NDK" \
         $SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > .tmp-ndk-log
         rm .tmp-ndk-log
 
         echo "debug: fetching JDK"
-        #mapbox_time "fetching JDK" \
+        mapbox_time "fetching JDK" \
         wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-linux-x64.tar.gz
 
         echo "debug: unpacking JDK"
-        #mapbox_time "unpacking JDK" \
+        mapbox_time "unpacking JDK" \
         tar -xzf ./jdk-7u71-linux-x64.tar.gz
 
         echo "debug: fetching SDK"
-        #mapbox_time "fetching SDK" \
+        mapbox_time "fetching SDK" \
         wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
 
         echo "debug: unpacking SDK"
-        #mapbox_time "unpacking SDK" \
+        mapbox_time "unpacking SDK" \
         tar -xzf ./android-sdk_r23.0.2-linux.tgz
         mv ./android-sdk-linux ./android-sdk
 
         echo "debug: installing SDK"
-        #mapbox_time "installing SDK" \
+        mapbox_time "installing SDK" \
         sudo apt-get -y install lib32stdc++6 lib32z1 jq
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
 
@@ -57,43 +57,35 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
         echo "debug: installing 7z"
-        #mapbox_time "installing 7z" \
+        mapbox_time "installing 7z" \
         MASON_PLATFORM= ./.mason/mason install 7z 9.20
 
         echo "debug: setting 7z path"
         SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
 
         echo "debug: fetching NDK"
-        #mapbox_time "fetching NDK" \
+        mapbox_time "fetching NDK" \
         wget http://dl.google.com/android/ndk/android-ndk-r10c-darwin-x86_64.bin
 
         echo "debug: chmod NDK"
         chmod a+x ./android-ndk-r10c-darwin-x86_64.bin
 
         echo "debug: unpacking NDK"
-        #mapbox_time "unpacking NDK" \
+        mapbox_time "unpacking NDK" \
         $SEVEN_ZIP_PATH x ./android-ndk-r10c-darwin-x86_64.bin > .tmp-ndk-log
         rm .tmp-ndk-log
 
-        echo "debug: fetching JDK"
-        #mapbox_time "fetching JDK" \
-        wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-macosx-x64.dmg
-
-        echo "debug: unpacking JDK"
-        #mapbox_time "unpacking JDK" \
-        # TODO how to do this?
-
         echo "debug: fetching SDK"
-        #mapbox_time "fetching SDK" \
+        mapbox_time "fetching SDK" \
         wget http://dl.google.com/android/android-sdk_r23.0.2-macosx.zip
 
         echo "debug: unpacking SDK"
-        #mapbox_time "unpacking SDK" \
+        mapbox_time "unpacking SDK" \
         unzip -qq android-sdk_r23.0.2-macosx.zip
         mv ./android-sdk-macosx ./android-sdk
 
         echo "debug: installing SDK"
-        #mapbox_time "installing SDK" \
+        mapbox_time "installing SDK" \
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
 
         echo "debug: inserting access token"
