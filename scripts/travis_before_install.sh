@@ -19,8 +19,9 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
 
         echo "debug: fetching NDK"
-        mapbox_time "fetching NDK" \
+        mapbox_time_start "fetching NDK"
         wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
+        mapbox_time_finish
 
         echo "debug: chmod NDK"
         chmod a+x ./android-ndk-r10c-linux-x86_64.bin
