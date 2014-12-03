@@ -88,7 +88,7 @@ void MBGLView::notify_map_change(mbgl::MapChange /* change */, mbgl::timestamp /
     nativeView.notifyMapChange();
 }
 
-NativeMapView::NativeMapView(JNIEnv* env, jobject obj_) : view(*this), map(view) {
+NativeMapView::NativeMapView(JNIEnv* env, jobject obj_) : view(*this), fileSource(mbgl::platform::defaultCacheDatabase()), map(view, fileSource) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
 
     assert(env != nullptr);

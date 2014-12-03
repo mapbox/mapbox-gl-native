@@ -4,6 +4,8 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/platform/default/caching_http_file_source.hpp>
+
 #include <string>
 #include <jni.h>
 #include <android/native_window.h>
@@ -74,6 +76,7 @@ private:
     ANativeWindow* window = nullptr;
 
     MBGLView view; // Must be before map
+    mbgl::CachingHTTPFileSource fileSource;
     mbgl::Map map;
 
     EGLDisplay display = EGL_NO_DISPLAY;
