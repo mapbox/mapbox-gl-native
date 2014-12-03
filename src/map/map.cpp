@@ -132,7 +132,7 @@ uv::worker &Map::getWorker() {
     return *workers;
 }
 
-void Map::start(bool start_paused) {
+void Map::start(bool startPaused) {
     assert(uv_thread_self() == mainThread);
     assert(!async);
 
@@ -186,7 +186,7 @@ void Map::start(bool start_paused) {
     });
 
     // Do we need to pause first?
-    if (start_paused) {
+    if (startPaused) {
         pause();
     }
 
@@ -239,32 +239,32 @@ void Map::stop(stop_callback cb, void *data) {
     async = false;
 }
 
-void Map::pause(bool wait_for_pause) {
-    assert(uv_thread_self() == main_thread);
+void Map::pause(bool waitForPause) {
+    assert(uv_thread_self() == mainThread);
     assert(async);
-    mutex_run.lock();
+    mutexRun.lock();
     pausing = true;
-    mutex_run.unlock();
+    mutexRun.unlock();
 
     uv_stop(**loop);
     rerender(); // Needed to ensure uv_stop is seen and uv_run exits, otherwise we deadlock on wait_for_pause
 
-    if (wait_for_pause) {
-        std::unique_lock<std::mutex> lock_pause (mutex_pause);
-        while (!is_paused) {
-            cond_pause.wait(lock_pause);
+    if (waitForPause) {
+        std::unique_lock<std::mutex> lockPause (mutexPause);
+        while (!isPaused) {
+            condPause.wait(lockPause);
         }
     }
 }
 
 void Map::resume() {
-    assert(uv_thread_self() == main_thread);
+    assert(uv_thread_self() == mainThread);
     assert(async);
 
-    mutex_run.lock();
+    mutexRun.lock();
     pausing = false;
-    cond_run.notify_all();
-    mutex_run.unlock();
+    condRun.notify_all();
+    mutexRun.unlock();
 }
 
 void Map::run() {
@@ -280,7 +280,7 @@ void Map::run() {
     assert(uv_thread_self() == mapThread);
 
     if (async) {
-        check_for_pause();
+        checkForPause();
     }
 
     setup();
@@ -290,7 +290,7 @@ void Map::run() {
         terminating = false;
         while(!terminating) {
             uv_run(**loop, UV_RUN_DEFAULT);
-            check_for_pause();
+            checkForPause();
         }
     } else {
         uv_run(**loop, UV_RUN_DEFAULT);
@@ -315,24 +315,24 @@ void Map::run() {
 #endif
 }
 
-void Map::check_for_pause() {
-    std::unique_lock<std::mutex> lock_run (mutex_run);
+void Map::checkForPause() {
+    std::unique_lock<std::mutex> lockRun (mutexRun);
     while (pausing) {
         view.make_inactive();
 
-        mutex_pause.lock();
-        is_paused = true;
-        cond_pause.notify_all();
-        mutex_pause.unlock();
+        mutexPause.lock();
+        isPaused = true;
+        condPause.notify_all();
+        mutexPause.unlock();
 
-        cond_run.wait(lock_run);
+        condRun.wait(lockRun);
 
         view.make_active();
     }
 
-    mutex_pause.lock();
-    is_paused = false;
-    mutex_pause.unlock();
+    mutexPause.lock();
+    isPaused = false;
+    mutexPause.unlock();
 }
 
 void Map::rerender() {
@@ -460,8 +460,8 @@ void Map::resize(uint16_t width, uint16_t height, float ratio) {
     resize(width, height, ratio, width * ratio, height * ratio);
 }
 
-void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height) {
-    if (transform.resize(width, height, ratio, fb_width, fb_height)) {
+void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight) {
+    if (transform.resize(width, height, ratio, fbWidth, fbHeight)) {
         update();
     }
 }

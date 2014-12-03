@@ -38,7 +38,7 @@ public:
     ~Map();
 
     // Start the map render thread. It is asynchronous.
-    void start(bool start_paused = false);
+    void start(bool startPaused = false);
 
     // Stop the map render thread. This call will block until the map rendering thread stopped.
     // The optional callback function will be invoked repeatedly until the map thread is stopped.
@@ -48,7 +48,7 @@ public:
     void stop(stop_callback cb = nullptr, void *data = nullptr);
 
     // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
-    void pause(bool wait_for_pause = false);
+    void pause(bool waitForPause = false);
 
     // Resumes a paused render thread
     void resume();
@@ -76,7 +76,7 @@ public:
 
     // Size
     void resize(uint16_t width, uint16_t height, float ratio = 1);
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
+    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
     // Styling
     void setAppliedClasses(const std::vector<std::string> &classes);
@@ -140,7 +140,7 @@ private:
     uv::worker& getWorker();
 
     // Checks if render thread needs to pause
-    void check_for_pause();
+    void checkForPause();
 
     // Setup
     void setup();
@@ -166,11 +166,11 @@ private:
 
     bool terminating = false;
     bool pausing = false;
-    bool is_paused = false;
-    std::mutex mutex_run;
-    std::condition_variable cond_run;
-    std::mutex mutex_pause;
-    std::condition_variable cond_pause;
+    bool isPaused = false;
+    std::mutex mutexRun;
+    std::condition_variable condRun;
+    std::mutex mutexPause;
+    std::condition_variable condPause;
 
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
     // render the map.
