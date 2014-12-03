@@ -43,10 +43,9 @@ Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSo
             GLint logLength;
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
             if (logLength > 0) {
-                GLchar *log = reinterpret_cast<GLchar *>(malloc(logLength));
-                glGetProgramInfoLog(program, logLength, &logLength, log);
-                Log::Error(Event::Shader, "Program failed to link: %s", log);
-                free(log);
+                std::unique_ptr<GLchar[]> log = mbgl::util::make_unique<GLchar[]>(logLength);
+                glGetProgramInfoLog(program, logLength, &logLength, log.get());
+                Log::Error(Event::Shader, "Program failed to link: %s", log.get());
             }
 
             glDeleteShader(vertShader);
@@ -69,10 +68,9 @@ Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSo
             GLint logLength;
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
             if (logLength > 0) {
-                GLchar *log = reinterpret_cast<GLchar *>(malloc(logLength));
-                glGetProgramInfoLog(program, logLength, &logLength, log);
-                Log::Error(Event::Shader, "Program failed to validate: %s", log);
-                free(log);
+                std::unique_ptr<GLchar[]> log = mbgl::util::make_unique<GLchar[]>(logLength);
+                glGetProgramInfoLog(program, logLength, &logLength, log.get());
+                Log::Error(Event::Shader, "Program failed to validate: %s", log.get());
             }
 
             glDeleteShader(vertShader);
@@ -110,10 +108,9 @@ bool Shader::compileShader(GLuint *shader, GLenum type, const GLchar *source) {
         GLint logLength;
         glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &logLength);
         if (logLength > 0) {
-            GLchar *log = reinterpret_cast<GLchar *>(malloc(logLength));
-            glGetShaderInfoLog(*shader, logLength, &logLength, log);
-            Log::Error(Event::Shader, "Shader failed to compile: %s", log);
-            free(log);
+            std::unique_ptr<GLchar[]> log = mbgl::util::make_unique<GLchar[]>(logLength);
+            glGetShaderInfoLog(*shader, logLength, &logLength, log.get());
+            Log::Error(Event::Shader, "Shader failed to compile: %s", log.get());
         }
 
         glDeleteShader(*shader);
