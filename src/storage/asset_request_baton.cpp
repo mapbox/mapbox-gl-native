@@ -42,10 +42,10 @@ void AssetRequestBaton::cleanup(AssetRequestBaton *ptr) {
         ptr->request->ptr = nullptr;
     }
 
+    ptr->asyncRun.reset();
+
     delete ptr;
     ptr = nullptr;
-
-    ptr->asyncRun.reset();
 }
 
 }

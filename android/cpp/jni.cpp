@@ -59,7 +59,7 @@ jclass nullPointerExceptionClass = nullptr;
 jmethodID listToArrayId = nullptr;
 
 jclass arrayListClass = nullptr;
-jmethodID arraylistConstructorId = nullptr;
+jmethodID arrayListConstructorId = nullptr;
 jmethodID arrayListAddId = nullptr;
 
 bool throw_error(JNIEnv* env, const char* msg) {
