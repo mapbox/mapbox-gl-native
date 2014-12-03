@@ -2,6 +2,7 @@
 #include <mbgl/platform/darwin/log_nslog.hpp>
 #include <mbgl/platform/darwin/Reachability.h>
 #include <mbgl/platform/default/glfw_view.hpp>
+#include <mbgl/platform/default/caching_http_file_source.hpp>
 
 #import <Foundation/Foundation.h>
 
@@ -72,7 +73,8 @@ int main() {
     mbgl::Log::Set<mbgl::NSLogBackend>();
 
     GLFWView view;
-    mbgl::Map map(view);
+    mbgl::CachingHTTPFileSource fileSource(mbgl::platform::defaultCacheDatabase());
+    mbgl::Map map(view, fileSource);
     mbgl::Map *map_ptr = &map;
 
     URLHandler *handler = [[URLHandler alloc] init];

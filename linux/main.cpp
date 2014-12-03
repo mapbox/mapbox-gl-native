@@ -4,6 +4,7 @@
 #include <mbgl/platform/default/settings_json.hpp>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/platform/default/log_stderr.hpp>
+#include <mbgl/platform/default/caching_http_file_source.hpp>
 
 #include <signal.h>
 #include <getopt.h>
@@ -63,7 +64,8 @@ int main(int argc, char *argv[]) {
     sigaction(SIGINT, &sigIntHandler, NULL);
 
     view = new GLFWView();
-    mbgl::Map map(*view);
+    mbgl::CachingHTTPFileSource fileSource(mbgl::platform::defaultCacheDatabase());
+    mbgl::Map map(*view, fileSource);
 
     // Load settings
     mbgl::Settings_JSON settings;
