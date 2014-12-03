@@ -79,8 +79,8 @@ void GLFWView::initialize(mbgl::Map *map_) {
             gl::DebugMessageCallback = (gl::PFNGLDEBUGMESSAGECALLBACKPROC)glfwGetProcAddress("glDebugMessageCallback");
             gl::GetDebugMessageLog = (gl::PFNGLGETDEBUGMESSAGELOGPROC)glfwGetProcAddress("glGetDebugMessageLog");
             gl::GetPointerv = (gl::PFNGLGETPOINTERVPROC)glfwGetProcAddress("glGetPointerv");
-            //gl::PushDebugGroup = (gl::PFNGLPUSHDEBUGGROUPPROC)glfwGetProcAddress("glPushDebugGroup");
-            //gl::PopDebugGroup = (gl::PFNGLPOPDEBUGGROUPPROC)glfwGetProcAddress("glPopDebugGroup");
+            gl::PushDebugGroup = (gl::PFNGLPUSHDEBUGGROUPPROC)glfwGetProcAddress("glPushDebugGroup");
+            gl::PopDebugGroup = (gl::PFNGLPOPDEBUGGROUPPROC)glfwGetProcAddress("glPopDebugGroup");
             gl::ObjectLabel = (gl::PFNGLOBJECTLABELPROC)glfwGetProcAddress("glObjectLabel");
             gl::GetObjectLabel = (gl::PFNGLGETOBJECTLABELPROC)glfwGetProcAddress("glGetObjectLabel");
             gl::ObjectPtrLabel = (gl::PFNGLOBJECTPTRLABELPROC)glfwGetProcAddress("glObjectPtrLabel");
