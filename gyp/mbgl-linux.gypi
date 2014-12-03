@@ -35,8 +35,8 @@
         '../platform/default/image_reader.cpp',
         '../platform/default/png_reader.cpp',
         '../platform/default/jpeg_reader.cpp',
-        '../platform/default/asset_request_baton_noop.cpp',
         '../platform/default/caching_http_file_source.cpp',
+        '../platform/default/asset_request_baton_noop.cpp',
       ],
       'include_dirs': [
         '../include',

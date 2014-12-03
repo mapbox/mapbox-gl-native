@@ -30,7 +30,7 @@ CachingHTTPFileSource::CachingHTTPFileSource(const std::string &path_)
 CachingHTTPFileSource::~CachingHTTPFileSource() {
     if (hasLoop()) {
         // FIXME temp fix for #608 crash
-        //assert(thread_id == uv_thread_self());
+        // assert(thread_id == uv_thread_self());
         uv_messenger_stop(queue, [](uv_messenger_t *msgr) {
             delete msgr;
         });
