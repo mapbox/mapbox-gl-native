@@ -1,6 +1,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <png.h>
 
@@ -81,7 +82,7 @@ Image::Image(std::string const& data)
         auto reader = getImageReader(data.c_str(), data.size());
         width = reader->width();
         height = reader->height();
-        img = ::std::unique_ptr<char[]>(new char[width * height * 4]());
+        img = util::make_unique<char[]>(width * height * 4);
         reader->read(0, 0, width, height, img.get());
     }
     catch (ImageReaderException const& ex)

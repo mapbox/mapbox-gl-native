@@ -1,6 +1,8 @@
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 
+#include <mbgl/util/std.hpp>
+
 #include <stdexcept>
 #include <sstream>
 #include <string>
@@ -253,14 +255,14 @@ std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
     const unsigned int w = width_ * pixelRatio_;
     const unsigned int h = height_ * pixelRatio_;
 
-    auto pixels = std::unique_ptr<uint32_t[]>(new uint32_t[w * h]);
+    auto pixels = util::make_unique<uint32_t[]>(w * h);
 
     make_active();
     glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
     make_inactive();
 
     const int stride = w * 4;
-    auto tmp = std::unique_ptr<char[]>(new char[stride]());
+    auto tmp = util::make_unique<char[]>(stride);
     char *rgba = reinterpret_cast<char *>(pixels.get());
     for (int i = 0, j = height_ - 1; i < j; i++, j--) {
         std::memcpy(tmp.get(), rgba + i * stride, stride);

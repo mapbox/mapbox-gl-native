@@ -164,7 +164,7 @@ TileData::State Source::addTile(Map& map, uv::worker& worker,
         return state;
     }
 
-    auto pos = tiles.emplace(id, std::make_unique<Tile>(id));
+    auto pos = tiles.emplace(id, util::make_unique<Tile>(id));
     Tile& new_tile = *pos.first->second;
 
     // We couldn't find the tile in the list. Create a new one.

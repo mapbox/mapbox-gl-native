@@ -51,7 +51,7 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
             } else {
                 // TODO: Use different codes for host not found, timeout, invalid URL etc.
                 // These can be categorized in temporary and permanent errors.
-                baton->response = std::make_unique<Response>();
+                baton->response = util::make_unique<Response>();
                 baton->response->code = [(NSHTTPURLResponse *)res statusCode];
                 baton->response->message = [[error localizedDescription] UTF8String];
 
@@ -86,7 +86,7 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
                 // Assume a Response object already exists.
                 assert(baton->response);
             } else {
-                baton->response = std::make_unique<Response>();
+                baton->response = util::make_unique<Response>();
                 baton->response->code = code;
                 baton->response->data = {(const char *)[data bytes], [data length]};
             }
@@ -117,7 +117,7 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
         } else {
             // This should never happen.
             baton->type = HTTPResponseType::PermanentError;
-            baton->response = std::make_unique<Response>();
+            baton->response = util::make_unique<Response>();
             baton->response->code = -1;
             baton->response->message = "response class is not NSHTTPURLResponse";
         }

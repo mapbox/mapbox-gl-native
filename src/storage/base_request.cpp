@@ -1,6 +1,7 @@
 #include <mbgl/storage/base_request.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/request.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <uv.h>
 
@@ -68,7 +69,7 @@ Callback *BaseRequest::add(Callback &&callback, const util::ptr<BaseRequest> &re
         return nullptr;
     } else {
         self = request;
-        callbacks.push_front(std::unique_ptr<Callback>(new Callback(std::move(callback))));
+        callbacks.push_front(util::make_unique<Callback>(std::move(callback)));
         return callbacks.front().get();
     }
 }

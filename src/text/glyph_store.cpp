@@ -271,7 +271,7 @@ std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::string &fon
     auto range_it = rangeSets.find(range);
     if (range_it == rangeSets.end()) {
         // We don't have this glyph set yet for this font stack.
-        range_it = rangeSets.emplace(range, std::make_unique<GlyphPBF>(glyphURL, fontStack, range, fileSource)).first;
+        range_it = rangeSets.emplace(range, util::make_unique<GlyphPBF>(glyphURL, fontStack, range, fileSource)).first;
     }
 
     return range_it->second->getFuture();
@@ -280,7 +280,7 @@ std::shared_future<GlyphPBF &> GlyphStore::loadGlyphRange(const std::string &fon
 FontStack &GlyphStore::createFontStack(const std::string &fontStack) {
     auto stack_it = stacks.find(fontStack);
     if (stack_it == stacks.end()) {
-        stack_it = stacks.emplace(fontStack, std::make_unique<FontStack>()).first;
+        stack_it = stacks.emplace(fontStack, util::make_unique<FontStack>()).first;
     }
     return *stack_it->second.get();
 }

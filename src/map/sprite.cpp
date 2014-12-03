@@ -101,7 +101,7 @@ bool Sprite::isLoaded() const {
 }
 
 void Sprite::parseImage() {
-    raster = std::make_unique<util::Image>(image);
+    raster = util::make_unique<util::Image>(image);
     if (!*raster) {
         raster.reset();
     }

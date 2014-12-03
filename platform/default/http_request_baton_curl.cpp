@@ -3,6 +3,7 @@
 #include <mbgl/util/uv-messenger.h>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/std.hpp>
 
 #ifdef __ANDROID__
     #include <mbgl/android/jni.hpp>
@@ -122,7 +123,7 @@ struct Context {
 
         CURLMcode error = curl_multi_remove_handle(multi, handle);
         if (error != CURLM_OK) {
-            baton->response = std::unique_ptr<Response>(new Response());
+            baton->response = util::make_unique<Response>();
             baton->response->code = -1;
             baton->response->message = curl_multi_strerror(error);
         }
@@ -534,7 +535,7 @@ void start_request(void *const ptr) {
     }
 
     if (!context->baton->response) {
-        context->baton->response = std::unique_ptr<Response>(new Response());
+        context->baton->response = util::make_unique<Response>();
     }
 
     // Carry on the shared pointer in the private information of the CURL handle.

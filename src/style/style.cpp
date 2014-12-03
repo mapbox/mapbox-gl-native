@@ -18,7 +18,7 @@
 namespace mbgl {
 
 Style::Style()
-    : mtx(std::make_unique<uv::rwlock>()) {
+    : mtx(util::make_unique<uv::rwlock>()) {
 }
 
 // Note: This constructor is seemingly empty, but we need to declare it anyway

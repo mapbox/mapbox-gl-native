@@ -44,7 +44,7 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile_,
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
       texturePool(texturePool_),
-      collision(std::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
+      collision(util::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
     assert(&tile != nullptr);
     assert(style);
     assert(sprite);
@@ -150,24 +150,24 @@ void TileParser::addBucketGeometries(Bucket& bucket, const VectorTileLayer& laye
 }
 
 std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketFill &fill) {
-    std::unique_ptr<FillBucket> bucket = std::make_unique<FillBucket>(tile.fillVertexBuffer, tile.triangleElementsBuffer, tile.lineElementsBuffer, fill);
+    std::unique_ptr<FillBucket> bucket = util::make_unique<FillBucket>(tile.fillVertexBuffer, tile.triangleElementsBuffer, tile.lineElementsBuffer, fill);
     addBucketGeometries(bucket, layer, filter);
     return obsolete() ? nullptr : std::move(bucket);
 }
 
 std::unique_ptr<Bucket> TileParser::createRasterBucket(const StyleBucketRaster &raster) {
-    std::unique_ptr<RasterBucket> bucket = std::make_unique<RasterBucket>(texturePool, raster);
+    std::unique_ptr<RasterBucket> bucket = util::make_unique<RasterBucket>(texturePool, raster);
     return obsolete() ? nullptr : std::move(bucket);
 }
 
 std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketLine &line) {
-    std::unique_ptr<LineBucket> bucket = std::make_unique<LineBucket>(tile.lineVertexBuffer, tile.triangleElementsBuffer, tile.pointElementsBuffer, line);
+    std::unique_ptr<LineBucket> bucket = util::make_unique<LineBucket>(tile.lineVertexBuffer, tile.triangleElementsBuffer, tile.pointElementsBuffer, line);
     addBucketGeometries(bucket, layer, filter);
     return obsolete() ? nullptr : std::move(bucket);
 }
 
 std::unique_ptr<Bucket> TileParser::createSymbolBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketSymbol &symbol) {
-    std::unique_ptr<SymbolBucket> bucket = std::make_unique<SymbolBucket>(symbol, *collision);
+    std::unique_ptr<SymbolBucket> bucket = util::make_unique<SymbolBucket>(symbol, *collision);
     bucket->addFeatures(layer, filter, tile.id, spriteAtlas, *sprite, glyphAtlas, glyphStore);
     return obsolete() ? nullptr : std::move(bucket);
 }

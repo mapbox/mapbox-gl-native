@@ -1,6 +1,7 @@
 #include <mbgl/storage/file_request_baton.hpp>
 #include <mbgl/storage/file_request.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <limits>
 
@@ -29,7 +30,7 @@ void FileRequestBaton::notify_error(uv_fs_t *req) {
     assert(ptr->thread_id == uv_thread_self());
 
     if (ptr->request && req->result < 0 && !ptr->canceled && req->result != UV_ECANCELED) {
-        ptr->request->response = std::unique_ptr<Response>(new Response);
+        ptr->request->response = util::make_unique<Response>();
         ptr->request->response->code = req->result == UV_ENOENT ? 404 : 500;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
         ptr->request->response->message = uv_strerror(uv_last_error(req->loop));
@@ -86,7 +87,7 @@ void FileRequestBaton::file_stated(uv_fs_t *req) {
             // File is too large for us to open this way because uv_buf's only support unsigned
             // ints as maximum size.
             if (ptr->request) {
-                ptr->request->response = std::unique_ptr<Response>(new Response);
+                ptr->request->response = util::make_unique<Response>();
                 ptr->request->response->code = UV_EFBIG;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
                 ptr->request->response->message = uv_strerror(uv_err_t {UV_EFBIG, 0});
@@ -123,7 +124,7 @@ void FileRequestBaton::file_read(uv_fs_t *req) {
     } else {
         // File was successfully read.
         if (ptr->request) {
-            ptr->request->response = std::unique_ptr<Response>(new Response);
+            ptr->request->response = util::make_unique<Response>();
             ptr->request->response->code = 200;
             ptr->request->response->data = std::move(ptr->body);
             ptr->request->notify();

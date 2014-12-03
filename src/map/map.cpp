@@ -91,7 +91,7 @@ const static bool sqlite_version_check = []() {
 using namespace mbgl;
 
 Map::Map(View& view_)
-    : loop(std::make_unique<uv::loop>()),
+    : loop(util::make_unique<uv::loop>()),
       view(view_),
 #ifndef NDEBUG
       mainThread(uv_thread_self()),
@@ -128,7 +128,7 @@ Map::~Map() {
 
 uv::worker &Map::getWorker() {
     if (!workers) {
-        workers = std::make_unique<uv::worker>(**loop, 4, "Tile Worker");
+        workers = util::make_unique<uv::worker>(**loop, 4, "Tile Worker");
     }
     return *workers;
 }
@@ -145,7 +145,7 @@ void Map::start(bool startPaused) {
     isStopped = false;
 
     // Setup async notifications
-    asyncTerminate = std::make_unique<uv::async>(**loop, [this]() {
+    asyncTerminate = util::make_unique<uv::async>(**loop, [this]() {
         assert(uv_thread_self() == mapThread);
 
         // Remove all of these to make sure they are destructed in the correct thread.
@@ -163,7 +163,7 @@ void Map::start(bool startPaused) {
         asyncTerminate.reset();
     });
 
-    asyncRender = std::make_unique<uv::async>(**loop, [this]() {
+    asyncRender = util::make_unique<uv::async>(**loop, [this]() {
         assert(uv_thread_self() == mapThread);
 
         if (state.hasSize()) {
@@ -182,7 +182,7 @@ void Map::start(bool startPaused) {
         }
     });
 
-    asyncCleanup = std::make_unique<uv::async>(**loop, [this]() {
+    asyncCleanup = util::make_unique<uv::async>(**loop, [this]() {
         painter.cleanup();
     });
 
@@ -191,7 +191,7 @@ void Map::start(bool startPaused) {
         pause();
     }
 
-    thread = std::make_unique<uv::thread>([this]() {
+    thread = util::make_unique<uv::thread>([this]() {
 #ifndef NDEBUG
         mapThread = uv_thread_self();
 #endif

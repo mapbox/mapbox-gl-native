@@ -89,18 +89,18 @@ void Painter::setup() {
 }
 
 void Painter::setupShaders() {
-    if (!plainShader) plainShader = std::make_unique<PlainShader>();
-    if (!outlineShader) outlineShader = std::make_unique<OutlineShader>();
-    if (!lineShader) lineShader = std::make_unique<LineShader>();
-    if (!linejoinShader) linejoinShader = std::make_unique<LinejoinShader>();
-    if (!linepatternShader) linepatternShader = std::make_unique<LinepatternShader>();
-    if (!patternShader) patternShader = std::make_unique<PatternShader>();
-    if (!iconShader) iconShader = std::make_unique<IconShader>();
-    if (!rasterShader) rasterShader = std::make_unique<RasterShader>();
-    if (!sdfGlyphShader) sdfGlyphShader = std::make_unique<SDFGlyphShader>();
-    if (!sdfIconShader) sdfIconShader = std::make_unique<SDFIconShader>();
-    if (!dotShader) dotShader = std::make_unique<DotShader>();
-    if (!gaussianShader) gaussianShader = std::make_unique<GaussianShader>();
+    if (!plainShader) plainShader = util::make_unique<PlainShader>();
+    if (!outlineShader) outlineShader = util::make_unique<OutlineShader>();
+    if (!lineShader) lineShader = util::make_unique<LineShader>();
+    if (!linejoinShader) linejoinShader = util::make_unique<LinejoinShader>();
+    if (!linepatternShader) linepatternShader = util::make_unique<LinepatternShader>();
+    if (!patternShader) patternShader = util::make_unique<PatternShader>();
+    if (!iconShader) iconShader = util::make_unique<IconShader>();
+    if (!rasterShader) rasterShader = util::make_unique<RasterShader>();
+    if (!sdfGlyphShader) sdfGlyphShader = util::make_unique<SDFGlyphShader>();
+    if (!sdfIconShader) sdfIconShader = util::make_unique<SDFIconShader>();
+    if (!dotShader) dotShader = util::make_unique<DotShader>();
+    if (!gaussianShader) gaussianShader = util::make_unique<GaussianShader>();
 }
 
 void Painter::deleteShaders() {
