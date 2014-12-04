@@ -14,6 +14,7 @@ namespace mbgl {
 
 class FileSource : public util::noncopyable {
 public:
+    virtual ~FileSource() = default;
     virtual void setLoop(uv_loop_t*) = 0;
     virtual bool hasLoop() = 0;
     virtual void setBase(const std::string &value) = 0;
