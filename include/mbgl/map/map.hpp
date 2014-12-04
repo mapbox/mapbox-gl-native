@@ -122,9 +122,6 @@ public:
     void toggleDebug();
     bool getDebug() const;
 
-    // Call this when the network reachability changed.
-    void setReachability(bool status);
-
     inline const TransformState &getState() const { return state; }
     inline timestamp getTime() const { return animationTime; }
 

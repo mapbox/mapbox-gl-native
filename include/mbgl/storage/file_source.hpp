@@ -21,7 +21,6 @@ public:
     virtual void setBase(const std::string &value) = 0;
     virtual std::unique_ptr<Request> request(ResourceType type, const std::string &url) = 0;
     virtual void prepare(std::function<void()> fn) = 0;
-    virtual void retryAllPending() = 0;
 };
 
 }

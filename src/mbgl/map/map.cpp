@@ -286,15 +286,6 @@ void Map::terminate() {
     painter->terminate();
 }
 
-void Map::setReachability(bool reachable) {
-    // Note: This function may be called from *any* thread.
-    if (reachable) {
-        fileSource.prepare([&]() {
-            fileSource.retryAllPending();
-        });
-    }
-}
-
 #pragma mark - Setup
 
 void Map::setup() {

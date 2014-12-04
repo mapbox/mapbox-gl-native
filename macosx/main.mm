@@ -76,7 +76,7 @@ int main() {
     GLFWView view;
     mbgl::CachingHTTPFileSource fileSource(mbgl::platform::defaultCacheDatabase());
     mbgl::Map map(view, fileSource);
-    mbgl::Map *map_ptr = &map;
+    mbgl::CachingHTTPFileSource *fileSourcePtr = &fileSource;
 
     URLHandler *handler = [[URLHandler alloc] init];
     [handler setMap:&map];
@@ -86,7 +86,7 @@ int main() {
     // Notify map object when network reachability status changes.
     Reachability* reachability = [Reachability reachabilityForInternetConnection];
     reachability.reachableBlock = ^(Reachability *) {
-        map_ptr->setReachability(true);
+        fileSourcePtr->setReachability(true);
     };
     [reachability startNotifier];
 

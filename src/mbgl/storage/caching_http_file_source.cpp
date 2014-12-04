@@ -100,16 +100,17 @@ void CachingHTTPFileSource::prepare(std::function<void()> fn) {
     }
 }
 
-void CachingHTTPFileSource::retryAllPending() {
-    assert(thread_id == std::this_thread::get_id());
-
-    util::ptr<BaseRequest> req;
-    for (const std::pair<std::string, std::weak_ptr<BaseRequest>> &pair : pending) {
-        if ((req = pair.second.lock())) {
-            req->retryImmediately();
-        }
+void CachingHTTPFileSource::setReachability(bool reachable) {
+    if (reachable && loop) {
+        prepare([this]() {
+            util::ptr<BaseRequest> req;
+            for (const std::pair<std::string, std::weak_ptr<BaseRequest>> &pair : pending) {
+                if ((req = pair.second.lock())) {
+                    req->retryImmediately();
+                }
+            }
+        });
     }
-
 }
 
 }

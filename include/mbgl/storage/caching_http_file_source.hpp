@@ -30,7 +30,8 @@ public:
 
     void prepare(std::function<void()> fn);
 
-    void retryAllPending();
+    // Call this when the network status reachability changed.
+    void setReachability(bool reachable);
 
 private:
     std::thread::id thread_id;
