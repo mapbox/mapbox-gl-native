@@ -8,7 +8,6 @@ GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
 }
 
 GLFWView::~GLFWView() {
-    map->terminate();
     glfwTerminate();
 }
 
