@@ -22,9 +22,13 @@ struct CacheRequestBaton {
 };
 
 HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path_, uv_loop_t *loop_, util::ptr<SQLiteStore> store_)
+<<<<<<< HEAD
     : BaseRequest(path_), threadId(uv_thread_self()), loop(loop_), store(store_), type(type_) {
     Log::Debug(Event::HttpRequest, "HTTPRequest %s", path.c_str());
 
+=======
+    : BaseRequest(path_), thread_id(std::this_thread::get_id()), loop(loop_), store(store_), type(type_) {
+>>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
     if (store) {
         startCacheRequest();
     } else {
@@ -33,7 +37,11 @@ HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path_, uv_loop_t
 }
 
 void HTTPRequest::startCacheRequest() {
+<<<<<<< HEAD
     assert(uv_thread_self() == threadId);
+=======
+    assert(std::this_thread::get_id() == thread_id);
+>>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
 
     cache_baton = new CacheRequestBaton;
     cache_baton->request = this;
@@ -50,7 +58,11 @@ void HTTPRequest::startCacheRequest() {
 }
 
 void HTTPRequest::handleCacheResponse(std::unique_ptr<Response> &&res) {
+<<<<<<< HEAD
     assert(uv_thread_self() == threadId);
+=======
+    assert(std::this_thread::get_id() == thread_id);
+>>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
 
     if (res) {
         // This entry was stored in the cache. Now determine if we need to revalidate.
@@ -71,8 +83,13 @@ void HTTPRequest::handleCacheResponse(std::unique_ptr<Response> &&res) {
 }
 
 void HTTPRequest::startHTTPRequest(std::unique_ptr<Response> &&res) {
+<<<<<<< HEAD
     assert(uv_thread_self() == threadId);
     assert(!httpBaton);
+=======
+    assert(std::this_thread::get_id() == thread_id);
+    assert(!http_baton);
+>>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
 
     httpBaton = std::make_shared<HTTPRequestBaton>(path);
     httpBaton->request = this;
@@ -107,8 +124,13 @@ void HTTPRequest::startHTTPRequest(std::unique_ptr<Response> &&res) {
 
 
 void HTTPRequest::handleHTTPResponse(HTTPResponseType responseType, std::unique_ptr<Response> &&res) {
+<<<<<<< HEAD
     assert(uv_thread_self() == threadId);
     assert(!httpBaton);
+=======
+    assert(std::this_thread::get_id() == thread_id);
+    assert(!http_baton);
+>>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
     assert(!response);
 
     switch (responseType) {
@@ -195,7 +217,11 @@ void HTTPRequest::handleHTTPResponse(HTTPResponseType responseType, std::unique_
 using RetryBaton = std::pair<HTTPRequest *, std::unique_ptr<Response>>;
 
 void HTTPRequest::retryHTTPRequest(std::unique_ptr<Response> &&res, uint64_t timeout) {
+<<<<<<< HEAD
     assert(uv_thread_self() == threadId);
+=======
+    assert(std::this_thread::get_id() == thread_id);
+>>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
     assert(!backoff_timer);
     backoff_timer = new uv_timer_t();
     uv_timer_init(loop, backoff_timer);
@@ -215,16 +241,28 @@ void HTTPRequest::retryHTTPRequest(std::unique_ptr<Response> &&res, uint64_t tim
 }
 
 void HTTPRequest::removeHTTPBaton() {
+<<<<<<< HEAD
     assert(uv_thread_self() == threadId);
     if (httpBaton) {
         httpBaton->request = nullptr;
         HTTPRequestBaton::stop(httpBaton);
         httpBaton.reset();
+=======
+    assert(std::this_thread::get_id() == thread_id);
+    if (http_baton) {
+        http_baton->request = nullptr;
+        HTTPRequestBaton::stop(http_baton);
+        http_baton.reset();
+>>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
     }
 }
 
 void HTTPRequest::removeCacheBaton() {
+<<<<<<< HEAD
     assert(uv_thread_self() == threadId);
+=======
+    assert(std::this_thread::get_id() == thread_id);
+>>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
     if (cache_baton) {
         // Make sre that this object doesn't accidentally get accessed when it is destructed before
         // the callback returned. They are being run in the same thread, so just setting it to
@@ -237,7 +275,11 @@ void HTTPRequest::removeCacheBaton() {
 }
 
 void HTTPRequest::removeBackoffTimer() {
+<<<<<<< HEAD
     assert(uv_thread_self() == threadId);
+=======
+    assert(std::this_thread::get_id() == thread_id);
+>>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
     if (backoff_timer) {
         delete static_cast<RetryBaton *>(backoff_timer->data);
         uv_timer_stop(backoff_timer);
@@ -247,8 +289,13 @@ void HTTPRequest::removeBackoffTimer() {
 }
 
 void HTTPRequest::retryImmediately() {
+<<<<<<< HEAD
     assert(uv_thread_self() == threadId);
     if (!cache_baton && !httpBaton) {
+=======
+    assert(std::this_thread::get_id() == thread_id);
+    if (!cache_baton && !http_baton) {
+>>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
         if (backoff_timer) {
             // Retry immediately.
             uv_timer_stop(backoff_timer);
@@ -264,7 +311,11 @@ void HTTPRequest::retryImmediately() {
 }
 
 void HTTPRequest::cancel() {
+<<<<<<< HEAD
     assert(uv_thread_self() == threadId);
+=======
+    assert(std::this_thread::get_id() == thread_id);
+>>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
     removeCacheBaton();
     removeHTTPBaton();
     removeBackoffTimer();
@@ -273,7 +324,11 @@ void HTTPRequest::cancel() {
 
 
 HTTPRequest::~HTTPRequest() {
+<<<<<<< HEAD
     assert(uv_thread_self() == threadId);
+=======
+    assert(std::this_thread::get_id() == thread_id);
+>>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
     cancel();
 }
 

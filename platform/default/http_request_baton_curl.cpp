@@ -17,6 +17,7 @@
 #include <queue>
 #include <cassert>
 #include <cstring>
+#include <thread>
 
 
 // Check curl library version.
@@ -76,7 +77,7 @@ static uv_loop_t *loop = nullptr;
 static uv_messenger_t start_messenger;
 static uv_messenger_t stop_messenger;
 static uv_thread_t thread;
-static unsigned long thread_id;
+static std::thread::id thread_id;
 
 // Used as the CURL timer function to periodically check for socket updates.
 static uv_timer_t timeout;
@@ -321,7 +322,7 @@ void thread_init(void *) {
 #ifdef __APPLE__
     pthread_setname_np("CURL");
 #endif
-    thread_id = uv_thread_self();
+    thread_id = std::this_thread::get_id();
 
     if (curl_global_init(CURL_GLOBAL_ALL)) {
         throw std::runtime_error("Could not init cURL");
@@ -363,7 +364,7 @@ void thread_init(void *) {
     curl_share_cleanup(share);
     share = nullptr;
 
-    thread_id = -1;
+    thread_id = std::thread::id();
 }
 
 // This function is called when we have new data for a request. We just append it to the string
@@ -510,7 +511,7 @@ static CURLcode sslctx_function(CURL */*curl*/, void *sslctx, void */*parm*/) {
 
 // This function must run in the CURL thread.
 void start_request(void *const ptr) {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
 
     // The Context object stores information that we need to retain throughout the request, such
     // as the actual CURL easy handle, the baton, and the list of headers. The Context itself is
@@ -559,7 +560,7 @@ void start_request(void *const ptr) {
 
 // This function must run in the CURL thread.
 void stop_request(void *const ptr) {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     auto baton = *(util::ptr<HTTPRequestBaton> *)ptr;
     delete (util::ptr<HTTPRequestBaton> *)ptr;
     assert(baton);
@@ -595,14 +596,14 @@ void create_thread() {
 
 // This function must be run from the main thread (== where the HTTPRequestBaton was created)
 void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
-    assert(uv_thread_self() == ptr->threadId);
+    assert(std::this_thread::get_id() == ptr->threadId);
     uv_once(&once, create_thread);
     uv_messenger_send(&start_messenger, new util::ptr<HTTPRequestBaton>(ptr));
 }
 
 // This function must be run from the main thread (== where the HTTPRequestBaton was created)
 void HTTPRequestBaton::stop(const util::ptr<HTTPRequestBaton> &ptr) {
-    assert(uv_thread_self() == ptr->threadId);
+    assert(std::this_thread::get_id() == ptr->threadId);
     uv_once(&once, create_thread);
     uv_messenger_send(&stop_messenger, new util::ptr<HTTPRequestBaton>(ptr));
 }

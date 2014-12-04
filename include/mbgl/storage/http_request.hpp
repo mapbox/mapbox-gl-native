@@ -8,6 +8,7 @@
 #include <string>
 #include <memory>
 #include <cassert>
+#include <thread>
 
 typedef struct uv_loop_s uv_loop_t;
 typedef struct uv_timer_s uv_timer_t;
@@ -40,7 +41,7 @@ private:
     void removeBackoffTimer();
 
 private:
-    const unsigned long threadId;
+    const std::thread::id threadId;
     uv_loop_t *const loop;
     CacheRequestBaton *cache_baton = nullptr;
     util::ptr<HTTPRequestBaton> httpBaton;

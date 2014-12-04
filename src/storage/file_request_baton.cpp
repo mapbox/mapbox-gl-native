@@ -8,7 +8,7 @@
 namespace mbgl {
 
 FileRequestBaton::FileRequestBaton(FileRequest *request_, const std::string &path, uv_loop_t *loop)
-    : threadId(uv_thread_self()), request(request_) {
+    : threadId(std::this_thread::get_id()), request(request_) {
     req.data = this;
     uv_fs_open(loop, &req, path.c_str(), O_RDONLY, S_IRUSR, file_opened);
 }
@@ -27,7 +27,7 @@ void FileRequestBaton::cancel() {
 
 void FileRequestBaton::notify_error(uv_fs_t *req) {
     FileRequestBaton *ptr = reinterpret_cast<FileRequestBaton *>(req->data);
-    assert(ptr->threadId == uv_thread_self());
+    assert(std::this_thread::get_id() == ptr->threadId);
 
     if (ptr->request && req->result < 0 && !ptr->canceled && req->result != UV_ECANCELED) {
         ptr->request->response = util::make_unique<Response>();
@@ -43,7 +43,7 @@ void FileRequestBaton::notify_error(uv_fs_t *req) {
 
 void FileRequestBaton::file_opened(uv_fs_t *req) {
     FileRequestBaton *ptr = reinterpret_cast<FileRequestBaton *>(req->data);
-    assert(ptr->threadId == uv_thread_self());
+    assert(std::this_thread::get_id() == ptr->threadId);
 
     if (req->result < 0) {
         // Opening failed or was canceled. There isn't much left we can do.
@@ -68,7 +68,7 @@ void FileRequestBaton::file_opened(uv_fs_t *req) {
 
 void FileRequestBaton::file_stated(uv_fs_t *req) {
     FileRequestBaton *ptr = reinterpret_cast<FileRequestBaton *>(req->data);
-    assert(ptr->threadId == uv_thread_self());
+    assert(std::this_thread::get_id() == ptr->threadId);
 
     if (req->result != 0 || ptr->canceled || !ptr->request) {
         // Stating failed or was canceled. We already have an open file handle
@@ -115,7 +115,7 @@ void FileRequestBaton::file_stated(uv_fs_t *req) {
 
 void FileRequestBaton::file_read(uv_fs_t *req) {
     FileRequestBaton *ptr = reinterpret_cast<FileRequestBaton *>(req->data);
-    assert(ptr->threadId == uv_thread_self());
+    assert(std::this_thread::get_id() == ptr->threadId);
 
     if (req->result < 0 || ptr->canceled || !ptr->request) {
         // Reading failed or was canceled. We already have an open file handle
@@ -136,7 +136,7 @@ void FileRequestBaton::file_read(uv_fs_t *req) {
 }
 
 void FileRequestBaton::file_closed(uv_fs_t *req) {
-    assert(reinterpret_cast<FileRequestBaton *>(req->data)->threadId == uv_thread_self());
+    assert(std::this_thread::get_id() == reinterpret_cast<FileRequestBaton *>(req->data)->thread_id);
 
     if (req->result < 0) {
         // Closing the file failed. But there isn't anything we can do.
@@ -147,7 +147,7 @@ void FileRequestBaton::file_closed(uv_fs_t *req) {
 
 void FileRequestBaton::cleanup(uv_fs_t *req) {
     FileRequestBaton *ptr = reinterpret_cast<FileRequestBaton *>(req->data);
-    assert(ptr->threadId == uv_thread_self());
+    assert(std::this_thread::get_id() == ptr->threadId);
 
     if (ptr->request) {
         ptr->request->ptr = nullptr;

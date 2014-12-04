@@ -7,6 +7,7 @@
 #include <uv.h>
 
 #include <string>
+#include <thread>
 
 typedef struct uv_worker_s uv_worker_t;
 
@@ -37,7 +38,7 @@ private:
     static void deliverResult(uv_work_t *req, int status);
 
 private:
-    const unsigned long thread_id;
+    const std::thread::id thread_id;
     util::ptr<mapbox::sqlite::Database> db;
     uv_worker_t *worker = nullptr;
 };

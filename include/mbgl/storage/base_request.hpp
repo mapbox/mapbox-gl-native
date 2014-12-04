@@ -7,7 +7,7 @@
 #include <string>
 #include <forward_list>
 #include <functional>
-
+#include <thread>
 
 typedef struct uv_loop_s uv_loop_t;
 typedef struct uv_async_s uv_async_t;
@@ -46,7 +46,7 @@ public:
     virtual void retryImmediately();
 
 public:
-    const unsigned long threadId;
+    const std::thread::id threadId;
     const std::string path;
     std::unique_ptr<Response> response;
 
