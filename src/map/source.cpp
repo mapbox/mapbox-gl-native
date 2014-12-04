@@ -88,13 +88,13 @@ size_t Source::getTileCount() const {
 void Source::drawClippingMasks(Painter &painter) {
     for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
         Tile &tile = *pair.second;
-        gl::group group(util::sprintf<32>("mask %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
+        gl::group group(std::string { "mask: " } + std::string(tile.id));
         painter.drawClippingMask(tile.matrix, tile.clip);
     }
 }
 
 void Source::render(Painter &painter, util::ptr<StyleLayer> layer_desc) {
-    gl::group group(std::string("layer: ") + layer_desc->id);
+    gl::group group(std::string { "layer: " } + layer_desc->id);
     for (const std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
         Tile &tile = *pair.second;
         if (tile.data && tile.data->state == TileData::State::parsed) {

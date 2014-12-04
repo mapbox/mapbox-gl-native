@@ -6,7 +6,7 @@
 using namespace mbgl;
 
 void Painter::renderTileDebug(const Tile& tile) {
-    gl::group group(util::sprintf<32>("debug %d/%d/%d", tile.id.z, tile.id.y, tile.id.z));
+    gl::group group(std::string { "debug " } + std::string(tile.id));
     assert(tile.data);
     if (debug) {
         prepareTile(tile);

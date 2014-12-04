@@ -1,5 +1,7 @@
 #include <mbgl/map/tile.hpp>
 #include <mbgl/util/vec.hpp>
+#include <mbgl/util/string.hpp>
+
 
 #include <cassert>
 
@@ -49,6 +51,11 @@ bool Tile::ID::isChildOf(const Tile::ID &parent_id) const {
     int32_t scale = std::pow(2, z - parent_id.z);
     return parent_id.x == ((x < 0 ? x - scale + 1 : x) / scale) &&
            parent_id.y == y / scale;
+}
+
+
+Tile::ID::operator std::string() const {
+    return util::toString(z) + "/" + util::toString(x) + "/" + util::toString(y);
 }
 
 

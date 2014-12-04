@@ -1,11 +1,5 @@
 #include <mbgl/style/value.hpp>
-
-#pragma GCC diagnostic push
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
-#include <boost/lexical_cast.hpp>
-#pragma GCC diagnostic pop
+#include <mbgl/util/string.hpp>
 
 mbgl::Value mbgl::parseValue(pbf data) {
     while (data.next())
@@ -37,9 +31,9 @@ mbgl::Value mbgl::parseValue(pbf data) {
 std::string mbgl::toString(const mbgl::Value& value) {
     if (value.is<std::string>()) return value.get<std::string>();
     else if (value.is<bool>()) return value.get<bool>() ? "true" : "false";
-    else if (value.is<int64_t>()) return std::to_string(value.get<int64_t>());
-    else if (value.is<uint64_t>()) return std::to_string(value.get<uint64_t>());
-    else if (value.is<double>()) return boost::lexical_cast<std::string>(value.get<double>());
+    else if (value.is<int64_t>()) return util::toString(value.get<int64_t>());
+    else if (value.is<uint64_t>()) return util::toString(value.get<uint64_t>());
+    else if (value.is<double>()) return util::toString(value.get<double>());
     else return "null";
 }
 

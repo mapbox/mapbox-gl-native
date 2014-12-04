@@ -11,7 +11,7 @@ using namespace mbgl;
 
 TileData::TileData(Tile::ID const& id_, const SourceInfo& source_)
     : id(id_),
-      name(util::sprintf<32>("%d/%d/%d", id.z, id.x, id.y)),
+      name(id),
       state(State::initial),
       source(source_),
       debugBucket(debugFontBuffer) {
@@ -24,7 +24,7 @@ TileData::~TileData() {
 }
 
 const std::string TileData::toString() const {
-    return util::sprintf<32>("[tile %d/%d/%d]", id.z, id.x, id.y);
+    return std::string { "[tile " } + name + "]";
 }
 
 void TileData::request(uv::worker& worker, FileSource& fileSource,
@@ -34,9 +34,9 @@ void TileData::request(uv::worker& worker, FileSource& fileSource,
 
     std::string url = source.tiles[(id.x + id.y) % source.tiles.size()];
     url = util::replaceTokens(url, [&](const std::string &token) -> std::string {
-        if (token == "z") return std::to_string(id.z);
-        if (token == "x") return std::to_string(id.x);
-        if (token == "y") return std::to_string(id.y);
+        if (token == "z") return util::toString(id.z);
+        if (token == "x") return util::toString(id.x);
+        if (token == "y") return util::toString(id.y);
         if (token == "prefix") {
             std::string prefix { 2 };
             prefix[0] = "0123456789abcdef"[id.x % 16];

@@ -1,6 +1,7 @@
 #ifndef DISABLE_STOPWATCH
 #include <mbgl/util/stopwatch.hpp>
 #include <mbgl/util/time.hpp>
+#include <mbgl/util/string.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <iostream>
@@ -23,7 +24,7 @@ stopwatch::stopwatch(const std::string &name_, EventSeverity severity_, Event ev
 void stopwatch::report(const std::string &name_) {
     timestamp duration = now() - start;
 
-    Log::Record(severity, event, name_ + ": " + std::to_string((double)(duration) / 1_millisecond) + "ms");
+    Log::Record(severity, event, name_ + ": " + util::toString(double(duration) / 1_millisecond) + "ms");
     start += duration;
 }
 

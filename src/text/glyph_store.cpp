@@ -143,7 +143,7 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, Gl
     // Load the glyph set URL
     std::string url = util::replaceTokens(glyphURL, [&](const std::string &name) -> std::string {
         if (name == "fontstack") return util::percentEncode(fontStack);
-        if (name == "range") return std::to_string(glyphRange.first) + "-" + std::to_string(glyphRange.second);
+        if (name == "range") return util::toString(glyphRange.first) + "-" + util::toString(glyphRange.second);
         return "";
     });
 
@@ -153,7 +153,7 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, Gl
         request->onload([&, url](const Response &res) {
             if (res.code != 200) {
                 // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
-                const std::string msg = util::sprintf<255>("[ERROR] failed to load glyphs (%d): %s\n", res.code, res.message.c_str());
+                const std::string msg = std::string { "[ERROR] failed to load glyphs (" } + util::toString(res.code) + "): " + res.message;
                 promise.set_exception(std::make_exception_ptr(std::runtime_error(msg)));
             } else {
                 // Transfer the data to the GlyphSet and signal its availability.
