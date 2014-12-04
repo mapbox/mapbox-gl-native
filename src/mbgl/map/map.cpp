@@ -151,6 +151,8 @@ void Map::start() {
         workers.reset();
         activeSources.clear();
 
+        fileSource.clearLoop();
+
         // Closes all open handles on the loop. This means that the loop will automatically terminate.
         asyncCleanup.reset();
         asyncRender.reset();
@@ -310,10 +312,7 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
         style = std::make_shared<Style>();
     }
     style->loadJSON((const uint8_t *)styleJSON.c_str());
-    if (!fileSource.hasLoop()) {
-        fileSource.setLoop(**loop);
-        glyphStore = std::make_shared<GlyphStore>(fileSource);
-    }
+    glyphStore = std::make_shared<GlyphStore>(fileSource);
     fileSource.setBase(base);
     glyphStore->setURL(util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken()));
     update();

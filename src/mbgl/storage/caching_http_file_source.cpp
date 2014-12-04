@@ -13,21 +13,6 @@ CachingHTTPFileSource::CachingHTTPFileSource(const std::string &path_)
     : path(path_) {}
 
 CachingHTTPFileSource::~CachingHTTPFileSource() {
-    if (hasLoop()) {
-        assert(thread_id == std::this_thread::get_id());
-        uv_messenger_stop(queue, [](uv_messenger_t *msgr) {
-            delete msgr;
-        });
-
-        util::ptr<BaseRequest> req;
-
-        // Send a cancel() message to all requests that we are still holding.
-        for (const std::pair<std::string, std::weak_ptr<BaseRequest>> &pair : pending) {
-            if ((req = pair.second.lock())) {
-                req->cancel();
-            }
-        }
-    }
 }
 
 void CachingHTTPFileSource::setLoop(uv_loop_t* loop_) {
@@ -45,6 +30,26 @@ void CachingHTTPFileSource::setLoop(uv_loop_t* loop_) {
 
 bool CachingHTTPFileSource::hasLoop() {
     return loop;
+}
+
+void CachingHTTPFileSource::clearLoop() {
+    assert(thread_id == std::this_thread::get_id());
+    assert(loop);
+
+    uv_messenger_stop(queue, [](uv_messenger_t *msgr) {
+        delete msgr;
+    });
+
+    util::ptr<BaseRequest> req;
+
+    // Send a cancel() message to all requests that we are still holding.
+    for (const std::pair<std::string, std::weak_ptr<BaseRequest>> &pair : pending) {
+        if ((req = pair.second.lock())) {
+            req->cancel();
+        }
+    }
+
+    store.reset();
 }
 
 void CachingHTTPFileSource::setBase(const std::string &value) {

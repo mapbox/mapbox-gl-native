@@ -21,6 +21,7 @@ public:
     // Stores and checks the libuv loop for requests
     void setLoop(uv_loop_t*);
     bool hasLoop();
+    void clearLoop();
 
     // Stores and retrieves the base path/URL for relative requests
     void setBase(const std::string &value);
