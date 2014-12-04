@@ -204,14 +204,14 @@ void Map::start() {
     });
 }
 
-void Map::stop(stop_callback cb, void *data) {
+void Map::stop(std::function<void ()> callback) {
     assert(std::this_thread::get_id() == mainThread);
     assert(mainThread != mapThread);
     assert(async);
 
     asyncTerminate->send();
 
-    if (cb) {
+    if (callback) {
         // Wait until the render thread stopped. We are using this construct instead of plainly
         // relying on the thread_join because the system might need to run things in the current
         // thread that is required for the render thread to terminate correctly. This is for example
@@ -219,7 +219,7 @@ void Map::stop(stop_callback cb, void *data) {
         // thread (== main thread) is blocked. The callback function should use an efficient waiting
         // function to avoid a busy waiting loop.
         while (!isStopped) {
-            cb(data);
+            callback();
         }
     }
 

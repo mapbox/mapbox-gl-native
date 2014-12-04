@@ -239,7 +239,7 @@ int GLFWView::run() {
         glfwWaitEvents();
     }
 
-    map->stop([](void *) {
+    map->stop([]() {
         glfwWaitEvents();
     });
 

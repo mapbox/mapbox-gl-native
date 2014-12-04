@@ -13,6 +13,7 @@
 #include <iosfwd>
 #include <set>
 #include <vector>
+#include <functional>
 
 namespace mbgl {
 
@@ -31,8 +32,6 @@ class GlyphAtlas;
 class SpriteAtlas;
 
 class Map : private util::noncopyable {
-    typedef void (*stop_callback)(void *);
-
 public:
     explicit Map(View&, FileSource&);
     ~Map();
@@ -43,9 +42,8 @@ public:
     // Stop the map render thread. This call will block until the map rendering thread stopped.
     // The optional callback function will be invoked repeatedly until the map thread is stopped.
     // The callback function should wait until it is woken up again by view.notify(), otherwise
-    // this will be a busy waiting loop. The optional data parameter will be passed to the callback
-    // function.
-    void stop(stop_callback cb = nullptr, void *data = nullptr);
+    // this will be a busy waiting loop.
+    void stop(std::function<void ()> callback = std::function<void ()>());
 
     // Runs the map event loop. ONLY run this function when you want to get render a single frame
     // with this map object. It will *not* spawn a separate thread and instead block until the
