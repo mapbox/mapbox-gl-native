@@ -96,6 +96,7 @@ Map::Map(View& view_, FileSource& fileSource_)
       transform(view_),
       fileSource(fileSource_),
       glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
+      glyphStore(std::make_shared<GlyphStore>(fileSource)),
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
       texturePool(std::make_shared<TexturePool>()),
       painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas))
@@ -146,7 +147,6 @@ void Map::start() {
         assert(std::this_thread::get_id() == mapThread);
 
         // Remove all of these to make sure they are destructed in the correct thread.
-        glyphStore.reset();
         style.reset();
         workers.reset();
         activeSources.clear();
@@ -312,7 +312,6 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
         style = std::make_shared<Style>();
     }
     style->loadJSON((const uint8_t *)styleJSON.c_str());
-    glyphStore = std::make_shared<GlyphStore>(fileSource);
     fileSource.setBase(base);
     glyphStore->setURL(util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken()));
     update();
@@ -588,7 +587,6 @@ void Map::updateTiles() {
 void Map::prepare() {
     if (!fileSource.hasLoop()) {
         fileSource.setLoop(**loop);
-        glyphStore = std::make_shared<GlyphStore>(fileSource);
     }
 
     if (!style) {
