@@ -136,7 +136,7 @@ void FileRequestBaton::file_read(uv_fs_t *req) {
 }
 
 void FileRequestBaton::file_closed(uv_fs_t *req) {
-    assert(std::this_thread::get_id() == reinterpret_cast<FileRequestBaton *>(req->data)->thread_id);
+    assert(std::this_thread::get_id() == reinterpret_cast<FileRequestBaton *>(req->data)->threadId);
 
     if (req->result < 0) {
         // Closing the file failed. But there isn't anything we can do.

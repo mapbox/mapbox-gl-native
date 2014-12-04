@@ -240,7 +240,7 @@ void Map::stop(stop_callback cb, void *data) {
 }
 
 void Map::pause(bool waitForPause) {
-    assert(uv_thread_self() == mainThread);
+    assert(std::this_thread::get_id() == mainThread);
     assert(async);
     mutexRun.lock();
     pausing = true;
@@ -258,7 +258,7 @@ void Map::pause(bool waitForPause) {
 }
 
 void Map::resume() {
-    assert(uv_thread_self() == mainThread);
+    assert(std::this_thread::get_id() == mainThread);
     assert(async);
 
     mutexRun.lock();
