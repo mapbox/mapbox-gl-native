@@ -1,8 +1,9 @@
 #ifndef MBGL_STORAGE_REQUEST
 #define MBGL_STORAGE_REQUEST
 
-#include <mbgl/storage/request_callback.hpp>
-#include <mbgl/storage/response.hpp>
+#include "request_callback.hpp"
+#include "response.hpp"
+
 #include <mbgl/util/ptr.hpp>
 
 #include <thread>

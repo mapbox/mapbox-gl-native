@@ -1,7 +1,7 @@
 #ifndef MBGL_STORAGE_HTTP_REQUEST_BATON
 #define MBGL_STORAGE_HTTP_REQUEST_BATON
 
-#include <mbgl/storage/response.hpp>
+#include "response.hpp"
 #include <mbgl/util/ptr.hpp>
 
 #include <string>

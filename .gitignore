@@ -6,7 +6,6 @@
 /mason_packages
 /config.gypi
 /config-ios.gypi
-/config/constants_local.cpp
 /build
 /include/mbgl/shader/shaders.hpp
 /src/shader/shaders_gl.cpp

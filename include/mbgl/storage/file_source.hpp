@@ -2,13 +2,14 @@
 #define MBGL_STORAGE_FILE_SOURCE
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/storage/resource_type.hpp>
-#include <mbgl/storage/request.hpp>
+#include "resource_type.hpp"
+#include "request.hpp"
 
 #include <string>
 #include <functional>
 
 typedef struct uv_loop_s uv_loop_t;
+
 
 namespace mbgl {
 

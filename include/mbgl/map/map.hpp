@@ -2,9 +2,6 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/map/transform.hpp>
-#include <mbgl/renderer/painter.hpp>
-#include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/uv.hpp>
@@ -19,6 +16,7 @@
 
 namespace mbgl {
 
+class Painter;
 class GlyphStore;
 class LayerDescription;
 class Sprite;
@@ -29,6 +27,8 @@ class StyleSource;
 class TexturePool;
 class FileSource;
 class View;
+class GlyphAtlas;
+class SpriteAtlas;
 
 class Map : private util::noncopyable {
     typedef void (*stop_callback)(void *);
@@ -182,13 +182,13 @@ private:
     FileSource& fileSource;
 
     util::ptr<Style> style;
-    GlyphAtlas glyphAtlas;
+    const std::unique_ptr<GlyphAtlas> glyphAtlas;
     util::ptr<GlyphStore> glyphStore;
-    SpriteAtlas spriteAtlas;
+    const std::unique_ptr<SpriteAtlas> spriteAtlas;
     util::ptr<Sprite> sprite;
     util::ptr<TexturePool> texturePool;
 
-    Painter painter;
+    const std::unique_ptr<Painter> painter;
 
     std::string styleURL;
     std::string styleJSON = "";
