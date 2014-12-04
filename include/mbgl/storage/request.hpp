@@ -5,6 +5,7 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/ptr.hpp>
 
+#include <thread>
 #include <forward_list>
 
 typedef struct uv_loop_s uv_loop_t;
@@ -29,7 +30,7 @@ public:
     void cancel();
 
 private:
-    const unsigned long thread_id;
+    const std::thread::id thread_id;
     util::ptr<BaseRequest> base;
     std::forward_list<Callback *> callbacks;
 };

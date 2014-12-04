@@ -14,7 +14,7 @@ CachingHTTPFileSource::CachingHTTPFileSource(const std::string &path_)
 
 CachingHTTPFileSource::~CachingHTTPFileSource() {
     if (hasLoop()) {
-        assert(thread_id == uv_thread_self());
+        assert(thread_id == std::this_thread::get_id());
         uv_messenger_stop(queue, [](uv_messenger_t *msgr) {
             delete msgr;
         });
@@ -31,7 +31,7 @@ CachingHTTPFileSource::~CachingHTTPFileSource() {
 }
 
 void CachingHTTPFileSource::setLoop(uv_loop_t* loop_) {
-    thread_id = uv_thread_self();
+    thread_id = std::this_thread::get_id();
     store = !path.empty() ? util::ptr<SQLiteStore>(new SQLiteStore(loop_, path)) : nullptr;
     loop = loop_;
     queue = new uv_messenger_t;
@@ -48,17 +48,17 @@ bool CachingHTTPFileSource::hasLoop() {
 }
 
 void CachingHTTPFileSource::setBase(const std::string &value) {
-    assert(thread_id == uv_thread_self());
+    assert(thread_id == std::this_thread::get_id());
     base = value;
 }
 
 const std::string &CachingHTTPFileSource::getBase() const {
-    assert(thread_id == uv_thread_self());
+    assert(thread_id == std::this_thread::get_id());
     return base;
 }
 
 std::unique_ptr<Request> CachingHTTPFileSource::request(ResourceType type, const std::string &url) {
-    assert(thread_id == uv_thread_self());
+    assert(thread_id == std::this_thread::get_id());
 
     // Make URL absolute.
     const std::string absoluteURL = [&]() -> std::string {
@@ -93,7 +93,7 @@ std::unique_ptr<Request> CachingHTTPFileSource::request(ResourceType type, const
 }
 
 void CachingHTTPFileSource::prepare(std::function<void()> fn) {
-    if (thread_id == uv_thread_self()) {
+    if (thread_id == std::this_thread::get_id()) {
         fn();
     } else {
         uv_messenger_send(queue, new std::function<void()>(std::move(fn)));
@@ -101,7 +101,7 @@ void CachingHTTPFileSource::prepare(std::function<void()> fn) {
 }
 
 void CachingHTTPFileSource::retryAllPending() {
-    assert(thread_id == uv_thread_self());
+    assert(thread_id == std::this_thread::get_id());
 
     util::ptr<BaseRequest> req;
     for (const std::pair<std::string, std::weak_ptr<BaseRequest>> &pair : pending) {

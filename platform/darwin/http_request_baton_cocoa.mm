@@ -15,7 +15,7 @@ dispatch_once_t request_initialize = 0;
 NSURLSession *session = nullptr;
 
 void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
-    assert(uv_thread_self() == ptr->thread_id);
+    assert(std::this_thread::get_id() == ptr->thread_id);
 
     // Starts the request.
     util::ptr<HTTPRequestBaton> baton = ptr;
@@ -131,7 +131,7 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
 }
 
 void HTTPRequestBaton::stop(const util::ptr<HTTPRequestBaton> &ptr) {
-    assert(uv_thread_self() == ptr->thread_id);
+    assert(std::this_thread::get_id() == ptr->thread_id);
     assert(ptr->ptr);
 
     NSURLSessionDataTask *task = CFBridgingRelease(ptr->ptr);

@@ -3,6 +3,7 @@
 
 #include <mbgl/storage/file_source.hpp>
 
+#include <thread>
 #include <unordered_map>
 
 typedef struct uv_messenger_s uv_messenger_t;
@@ -32,7 +33,7 @@ public:
     void retryAllPending();
 
 private:
-    unsigned long thread_id;
+    std::thread::id thread_id;
 
     // Path to the cache database.
     std::string path;

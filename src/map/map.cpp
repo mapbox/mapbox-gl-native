@@ -89,7 +89,7 @@ Map::Map(View& view_, FileSource& fileSource_)
     : loop(util::make_unique<uv::loop>()),
       view(view_),
 #ifndef NDEBUG
-      mainThread(uv_thread_self()),
+      mainThread(std::this_thread::get_id()),
 #endif
       transform(view_),
       fileSource(fileSource_),
@@ -129,7 +129,7 @@ uv::worker &Map::getWorker() {
 }
 
 void Map::start() {
-    assert(uv_thread_self() == mainThread);
+    assert(std::this_thread::get_id() == mainThread);
     assert(!async);
 
     // When starting map rendering in another thread, we perform async/continuously
@@ -141,7 +141,7 @@ void Map::start() {
 
     // Setup async notifications
     asyncTerminate = util::make_unique<uv::async>(**loop, [this]() {
-        assert(uv_thread_self() == mapThread);
+        assert(std::this_thread::get_id() == mapThread);
 
         // Remove all of these to make sure they are destructed in the correct thread.
         glyphStore.reset();
@@ -156,7 +156,7 @@ void Map::start() {
     });
 
     asyncRender = util::make_unique<uv::async>(**loop, [this]() {
-        assert(uv_thread_self() == mapThread);
+        assert(std::this_thread::get_id() == mapThread);
 
         if (state.hasSize()) {
             if (isRendered.test_and_set() == false) {
@@ -178,9 +178,9 @@ void Map::start() {
         painter.cleanup();
     });
 
-    thread = util::make_unique<uv::thread>([this]() {
+    thread = std::thread([this]() {
 #ifndef NDEBUG
-        mapThread = uv_thread_self();
+        mapThread = std::this_thread::get_id();
 #endif
 
 #ifdef __APPLE__
@@ -190,7 +190,7 @@ void Map::start() {
         run();
 
 #ifndef NDEBUG
-        mapThread = -1;
+        mapThread = std::thread::id();
 #endif
 
         // Make sure that the stop() function knows when to stop invoking the callback function.
@@ -200,7 +200,7 @@ void Map::start() {
 }
 
 void Map::stop(stop_callback cb, void *data) {
-    assert(uv_thread_self() == mainThread);
+    assert(std::this_thread::get_id() == mainThread);
     assert(mainThread != mapThread);
     assert(async);
 
@@ -220,7 +220,7 @@ void Map::stop(stop_callback cb, void *data) {
 
     // If a callback function was provided, this should return immediately because the thread has
     // already finished executing.
-    thread->join();
+    thread.join();
 
     async = false;
 }
@@ -231,7 +231,7 @@ void Map::run() {
         mapThread = mainThread;
     }
 #endif
-    assert(uv_thread_self() == mapThread);
+    assert(std::this_thread::get_id() == mapThread);
 
     setup();
     prepare();
@@ -245,7 +245,7 @@ void Map::run() {
     if (!async) {
         render();
 #ifndef NDEBUG
-        mapThread = -1;
+        mapThread = std::thread::id();
 #endif
     }
 }
@@ -294,7 +294,7 @@ void Map::setReachability(bool reachable) {
 #pragma mark - Setup
 
 void Map::setup() {
-    assert(uv_thread_self() == mapThread);
+    assert(std::this_thread::get_id() == mapThread);
     view.make_active();
     painter.setup();
     view.make_inactive();
@@ -536,7 +536,7 @@ void Map::setDefaultTransitionDuration(uint64_t milliseconds) {
 }
 
 void Map::updateSources() {
-    assert(uv_thread_self() == mapThread);
+    assert(std::this_thread::get_id() == mapThread);
 
     // First, disable all existing sources.
     for (const auto& source : activeSources) {

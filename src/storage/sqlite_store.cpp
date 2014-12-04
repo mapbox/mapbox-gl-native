@@ -58,7 +58,7 @@ std::string unifyMapboxURLs(const std::string &url) {
 namespace mbgl {
 
 SQLiteStore::SQLiteStore(uv_loop_t *loop, const std::string &path)
-    : thread_id(uv_thread_self()),
+    : thread_id(std::this_thread::get_id()),
       db(std::make_shared<Database>(path.c_str(), ReadWrite | Create)) {
     createSchema();
     worker = new uv_worker_t;
@@ -103,7 +103,7 @@ struct GetBaton {
 };
 
 void SQLiteStore::get(const std::string &path, GetCallback callback, void *ptr) {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     if (!db || !*db) {
         if (callback) {
             callback(nullptr, ptr);
@@ -160,7 +160,7 @@ struct PutBaton {
 };
 
 void SQLiteStore::put(const std::string &path, ResourceType type, const Response &response) {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     if (!db) return;
 
     PutBaton *put_baton = new PutBaton;
@@ -204,7 +204,7 @@ struct ExpirationBaton {
 };
 
 void SQLiteStore::updateExpiration(const std::string &path, int64_t expires) {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     if (!db || !*db) return;
 
     ExpirationBaton *expiration_baton = new ExpirationBaton;

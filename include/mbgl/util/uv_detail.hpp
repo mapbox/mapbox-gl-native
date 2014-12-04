@@ -20,30 +20,6 @@ void close(std::unique_ptr<T> ptr) {
     });
 }
 
-class thread : public mbgl::util::noncopyable {
-public:
-    inline thread(std::function<void ()> fn_)
-        : fn(fn_) {
-        if (uv_thread_create(&t, thread_cb, this) != 0) {
-            throw std::runtime_error("failed to initialize thread");
-        }
-    }
-
-    void join() {
-        if (uv_thread_join(&t) != 0) {
-            throw std::runtime_error("failed to join thred");
-        }
-    }
-
-private:
-    static void thread_cb(void* data) {
-        reinterpret_cast<thread*>(data)->fn();
-    }
-
-    uv_thread_t t;
-    std::function<void ()> fn;
-};
-
 class loop : public mbgl::util::noncopyable {
 public:
     inline loop() {
@@ -107,30 +83,6 @@ private:
 
     std::unique_ptr<uv_async_t> a;
     std::function<void ()> fn;
-};
-
-class mutex : public mbgl::util::noncopyable {
-public:
-    inline mutex() {
-        if (uv_mutex_init(&mtx) != 0) {
-            throw std::runtime_error("failed to initialize mutex");
-        }
-    }
-    inline ~mutex() { uv_mutex_destroy(&mtx); }
-    inline void lock() { uv_mutex_lock(&mtx); }
-    inline void unlock() { uv_mutex_unlock(&mtx); }
-
-private:
-    uv_mutex_t mtx;
-};
-
-class lock : public mbgl::util::noncopyable {
-public:
-    lock(mutex &mtx_) : mtx(mtx_) { mtx.lock(); }
-    ~lock() { mtx.unlock(); }
-
-private:
-    mutex &mtx;
 };
 
 class rwlock : public mbgl::util::noncopyable {

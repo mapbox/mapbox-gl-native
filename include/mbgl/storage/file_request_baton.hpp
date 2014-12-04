@@ -2,6 +2,7 @@
 #define MBGL_STORAGE_FILE_REQUEST_BATON
 
 #include <mbgl/storage/file_request.hpp>
+#include <thread>
 
 #include <uv.h>
 
@@ -19,7 +20,7 @@ struct FileRequestBaton {
     static void notify_error(uv_fs_t *req);
     static void cleanup(uv_fs_t *req);
 
-    const unsigned long thread_id;
+    const std::thread::id thread_id;
     FileRequest *request = nullptr;
     uv_fs_t req;
     uv_file fd = -1;

@@ -15,7 +15,7 @@ FileRequest::FileRequest(const std::string &path_, uv_loop_t *loop)
 }
 
 void FileRequest::cancel() {
-    assert(thread_id == uv_thread_self());
+    assert(thread_id == std::this_thread::get_id());
 
     if (ptr) {
         ptr->cancel();
@@ -30,7 +30,7 @@ void FileRequest::cancel() {
 }
 
 FileRequest::~FileRequest() {
-    assert(thread_id == uv_thread_self());
+    assert(thread_id == std::this_thread::get_id());
     cancel();
 }
 

@@ -9,8 +9,10 @@
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
+
 #include <cstdint>
 #include <atomic>
+#include <thread>
 #include <iosfwd>
 #include <set>
 #include <vector>
@@ -147,7 +149,7 @@ private:
     bool async = false;
     std::unique_ptr<uv::loop> loop;
     std::unique_ptr<uv::worker> workers;
-    std::unique_ptr<uv::thread> thread;
+    std::thread thread;
     std::unique_ptr<uv::async> asyncTerminate;
     std::unique_ptr<uv::async> asyncRender;
     std::unique_ptr<uv::async> asyncCleanup;
@@ -170,8 +172,8 @@ private:
     View &view;
 
 #ifndef NDEBUG
-    const unsigned long mainThread;
-    unsigned long mapThread = -1;
+    const std::thread::id mainThread;
+    std::thread::id mapThread;
 #endif
 
     Transform transform;

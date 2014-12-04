@@ -5,6 +5,7 @@
 #include <mbgl/util/ptr.hpp>
 
 #include <string>
+#include <thread>
 
 typedef struct uv_async_s uv_async_t;
 
@@ -47,7 +48,7 @@ struct HTTPRequestBaton {
     HTTPRequestBaton(const std::string &path);
     ~HTTPRequestBaton();
 
-    const unsigned long thread_id;
+    const std::thread::id thread_id;
     const std::string path;
 
     HTTPRequest *request = nullptr;

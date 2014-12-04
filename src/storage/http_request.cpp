@@ -21,7 +21,7 @@ struct CacheRequestBaton {
 };
 
 HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path_, uv_loop_t *loop_, util::ptr<SQLiteStore> store_)
-    : BaseRequest(path_), thread_id(uv_thread_self()), loop(loop_), store(store_), type(type_) {
+    : BaseRequest(path_), thread_id(std::this_thread::get_id()), loop(loop_), store(store_), type(type_) {
     if (store) {
         startCacheRequest();
     } else {
@@ -30,7 +30,7 @@ HTTPRequest::HTTPRequest(ResourceType type_, const std::string &path_, uv_loop_t
 }
 
 void HTTPRequest::startCacheRequest() {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
 
     cache_baton = new CacheRequestBaton;
     cache_baton->request = this;
@@ -47,7 +47,7 @@ void HTTPRequest::startCacheRequest() {
 }
 
 void HTTPRequest::handleCacheResponse(std::unique_ptr<Response> &&res) {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
 
     if (res) {
         // This entry was stored in the cache. Now determine if we need to revalidate.
@@ -68,7 +68,7 @@ void HTTPRequest::handleCacheResponse(std::unique_ptr<Response> &&res) {
 }
 
 void HTTPRequest::startHTTPRequest(std::unique_ptr<Response> &&res) {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     assert(!http_baton);
 
     http_baton = std::make_shared<HTTPRequestBaton>(path);
@@ -104,7 +104,7 @@ void HTTPRequest::startHTTPRequest(std::unique_ptr<Response> &&res) {
 
 
 void HTTPRequest::handleHTTPResponse(HTTPResponseType responseType, std::unique_ptr<Response> &&res) {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     assert(!http_baton);
     assert(!response);
 
@@ -192,7 +192,7 @@ void HTTPRequest::handleHTTPResponse(HTTPResponseType responseType, std::unique_
 using RetryBaton = std::pair<HTTPRequest *, std::unique_ptr<Response>>;
 
 void HTTPRequest::retryHTTPRequest(std::unique_ptr<Response> &&res, uint64_t timeout) {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     assert(!backoff_timer);
     backoff_timer = new uv_timer_t();
     uv_timer_init(loop, backoff_timer);
@@ -212,7 +212,7 @@ void HTTPRequest::retryHTTPRequest(std::unique_ptr<Response> &&res, uint64_t tim
 }
 
 void HTTPRequest::removeHTTPBaton() {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     if (http_baton) {
         http_baton->request = nullptr;
         HTTPRequestBaton::stop(http_baton);
@@ -221,7 +221,7 @@ void HTTPRequest::removeHTTPBaton() {
 }
 
 void HTTPRequest::removeCacheBaton() {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     if (cache_baton) {
         // Make sre that this object doesn't accidentally get accessed when it is destructed before
         // the callback returned. They are being run in the same thread, so just setting it to
@@ -234,7 +234,7 @@ void HTTPRequest::removeCacheBaton() {
 }
 
 void HTTPRequest::removeBackoffTimer() {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     if (backoff_timer) {
         delete static_cast<RetryBaton *>(backoff_timer->data);
         uv_timer_stop(backoff_timer);
@@ -244,7 +244,7 @@ void HTTPRequest::removeBackoffTimer() {
 }
 
 void HTTPRequest::retryImmediately() {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     if (!cache_baton && !http_baton) {
         if (backoff_timer) {
             // Retry immediately.
@@ -261,7 +261,7 @@ void HTTPRequest::retryImmediately() {
 }
 
 void HTTPRequest::cancel() {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     removeCacheBaton();
     removeHTTPBaton();
     removeBackoffTimer();
@@ -270,7 +270,7 @@ void HTTPRequest::cancel() {
 
 
 HTTPRequest::~HTTPRequest() {
-    assert(uv_thread_self() == thread_id);
+    assert(std::this_thread::get_id() == thread_id);
     cancel();
 }
 

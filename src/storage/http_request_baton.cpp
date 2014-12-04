@@ -3,7 +3,7 @@
 
 namespace mbgl {
 
-HTTPRequestBaton::HTTPRequestBaton(const std::string &path_) : thread_id(uv_thread_self()), path(path_) {
+HTTPRequestBaton::HTTPRequestBaton(const std::string &path_) : thread_id(std::this_thread::get_id()), path(path_) {
 }
 
 HTTPRequestBaton::~HTTPRequestBaton() {
