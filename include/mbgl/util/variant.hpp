@@ -10,7 +10,7 @@
 #include <iosfwd>
 #include <string>
 
-#include "recursive_wrapper.hpp"
+#include <mbgl/util/recursive_wrapper.hpp>
 
 #ifdef _MSC_VER
  // http://msdn.microsoft.com/en-us/library/z8y1yy88.aspx

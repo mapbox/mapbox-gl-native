@@ -10,6 +10,7 @@
 
 typedef struct uv_loop_s uv_loop_t;
 
+
 namespace mbgl {
 
 class FileSource : public util::noncopyable {

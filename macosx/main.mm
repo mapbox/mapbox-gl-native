@@ -1,8 +1,9 @@
+#include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/settings_nsuserdefaults.hpp>
 #include <mbgl/platform/darwin/log_nslog.hpp>
 #include <mbgl/platform/darwin/Reachability.h>
 #include <mbgl/platform/default/glfw_view.hpp>
-#include <mbgl/platform/default/caching_http_file_source.hpp>
+#include <mbgl/storage/caching_http_file_source.hpp>
 
 #import <Foundation/Foundation.h>
 

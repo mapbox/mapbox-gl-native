@@ -1,7 +1,7 @@
 #ifndef MBGL_COMMON_HEADLESS_DISPLAY
 #define MBGL_COMMON_HEADLESS_DISPLAY
 
-#include "headless_view.hpp"
+#include <mbgl/platform/default/headless_view.hpp>
 
 namespace mbgl {
 

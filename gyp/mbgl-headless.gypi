@@ -29,7 +29,6 @@
       'sources': [
         '../platform/default/headless_view.cpp',
         '../platform/default/headless_display.cpp',
-        '../platform/default/caching_http_file_source.cpp',
       ],
     },
   ],

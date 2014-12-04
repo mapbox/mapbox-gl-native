@@ -1,7 +1,7 @@
 #ifndef MBGL_PLATFORM_LOG
 #define MBGL_PLATFORM_LOG
 
-#include "event.hpp"
+#include <mbgl/platform/event.hpp>
 
 #include <mbgl/util/std.hpp>
 

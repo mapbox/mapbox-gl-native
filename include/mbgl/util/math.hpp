@@ -4,7 +4,7 @@
 #include <cmath>
 #include <array>
 
-#include "vec.hpp"
+#include <mbgl/util/vec.hpp>
 
 namespace mbgl {
 namespace util {

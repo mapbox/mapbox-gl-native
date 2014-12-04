@@ -32,7 +32,7 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <libtess2/tesselator.h>
+#include "tesselator.h"
 
 typedef struct TESSmesh TESSmesh;
 typedef struct TESSvertex TESSvertex;
