@@ -33,7 +33,7 @@ public:
     void retryAllPending();
 
 private:
-    std::thread::id thread_id;
+    std::thread::id threadId;
 
     // Path to the cache database.
     std::string path;

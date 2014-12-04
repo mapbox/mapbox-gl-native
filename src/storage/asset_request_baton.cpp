@@ -4,12 +4,10 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
 
-#include <uv.h>
-
 namespace mbgl {
 
 AssetRequestBaton::AssetRequestBaton(AssetRequest *request_, const std::string &path_, uv_loop_t *loop)
-    : threadId(uv_thread_self()),
+    : threadId(std::this_thread::get_id()),
       request(request_),
       path(path_) {
 
@@ -25,7 +23,7 @@ void AssetRequestBaton::cancel() {
 }
 
 void AssetRequestBaton::notify_error(AssetRequestBaton *ptr, const int code, const char *message) {
-    assert(uv_thread_self() == ptr->threadId);
+    assert(std::this_thread::get_id() == ptr->threadId);
 
     if (ptr->request && !ptr->canceled) {
         ptr->request->response = std::unique_ptr<Response>(new Response);
@@ -36,7 +34,7 @@ void AssetRequestBaton::notify_error(AssetRequestBaton *ptr, const int code, con
 }
 
 void AssetRequestBaton::cleanup(AssetRequestBaton *ptr) {
-    assert(uv_thread_self() == ptr->threadId);
+    assert(std::this_thread::get_id() == ptr->threadId);
 
     if (ptr->request) {
         ptr->request->ptr = nullptr;

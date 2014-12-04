@@ -133,13 +133,8 @@ uv::worker &Map::getWorker() {
     return *workers;
 }
 
-<<<<<<< HEAD
 void Map::start(bool startPaused) {
-    assert(uv_thread_self() == mainThread);
-=======
-void Map::start() {
     assert(std::this_thread::get_id() == mainThread);
->>>>>>> 57249ca32c7b0684be36f5195d4967e6517fe75b
     assert(!async);
 
     // When starting map rendering in another thread, we perform async/continuously

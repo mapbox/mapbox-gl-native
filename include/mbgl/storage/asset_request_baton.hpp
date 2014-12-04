@@ -3,13 +3,16 @@
 
 #include <mbgl/storage/asset_request.hpp>
 #include <mbgl/util/uv.hpp>
+#include <thread>
+
+#include <uv.h>
 
 namespace mbgl {
 
 struct AssetRequestBaton {
     AssetRequestBaton(AssetRequest *request_, const std::string &path, uv_loop_t *loop);
 
-    const unsigned long threadId;
+    const std::thread::id threadId;
     AssetRequest *request = nullptr;
     std::unique_ptr<uv::async> asyncRun;
     std::string path;

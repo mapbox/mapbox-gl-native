@@ -33,7 +33,7 @@ CachingHTTPFileSource::~CachingHTTPFileSource() {
 }
 
 void CachingHTTPFileSource::setLoop(uv_loop_t* loop_) {
-    thread_id = std::this_thread::get_id();
+    threadId = std::this_thread::get_id();
     store = !path.empty() ? util::ptr<SQLiteStore>(new SQLiteStore(loop_, path)) : nullptr;
     loop = loop_;
     queue = new uv_messenger_t;
@@ -50,17 +50,17 @@ bool CachingHTTPFileSource::hasLoop() {
 }
 
 void CachingHTTPFileSource::setBase(const std::string &value) {
-    assert(thread_id == std::this_thread::get_id());
+    assert(std::this_thread::get_id() == threadId);
     base = value;
 }
 
 const std::string &CachingHTTPFileSource::getBase() const {
-    assert(thread_id == std::this_thread::get_id());
+    assert(std::this_thread::get_id() == threadId);
     return base;
 }
 
 std::unique_ptr<Request> CachingHTTPFileSource::request(ResourceType type, const std::string &url) {
-    assert(thread_id == std::this_thread::get_id());
+    assert(std::this_thread::get_id() == threadId);
 
     // Make URL absolute.
     const std::string absoluteURL = [&]() -> std::string {
@@ -97,7 +97,7 @@ std::unique_ptr<Request> CachingHTTPFileSource::request(ResourceType type, const
 }
 
 void CachingHTTPFileSource::prepare(std::function<void()> fn) {
-    if (thread_id == std::this_thread::get_id()) {
+    if (std::this_thread::get_id() == threadId) {
         fn();
     } else {
         uv_messenger_send(queue, new std::function<void()>(std::move(fn)));
@@ -105,7 +105,7 @@ void CachingHTTPFileSource::prepare(std::function<void()> fn) {
 }
 
 void CachingHTTPFileSource::retryAllPending() {
-    assert(thread_id == std::this_thread::get_id());
+    assert(std::this_thread::get_id() == threadId);
 
     util::ptr<BaseRequest> req;
     for (const std::pair<std::string, std::weak_ptr<BaseRequest>> &pair : pending) {

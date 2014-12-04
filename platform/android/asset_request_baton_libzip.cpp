@@ -9,12 +9,11 @@
 // See https://code.google.com/p/android/issues/detail?id=72349
 // After this is fixed change usage errno to std::errno
 #include <zip.h>
-#include <uv.h>
 
 namespace mbgl {
 
 void AssetRequestBaton::run(AssetRequestBaton *ptr) {
-    assert(uv_thread_self() == ptr->threadId);
+    assert(std::this_thread::get_id() == ptr->threadId);
 
     if (ptr->canceled || !ptr->request) {
         // Either the AssetRequest object has been destructed, or the
