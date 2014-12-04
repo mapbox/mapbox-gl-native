@@ -56,9 +56,6 @@ public:
     // Forces a map update: always triggers a rerender.
     void update();
 
-    // Triggers a cleanup that releases resources.
-    void cleanup();
-
     // Releases resources immediately
     void terminate();
 
@@ -145,7 +142,6 @@ private:
     std::thread thread;
     std::unique_ptr<uv::async> asyncTerminate;
     std::unique_ptr<uv::async> asyncRender;
-    std::unique_ptr<uv::async> asyncCleanup;
 
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
     // render the map.

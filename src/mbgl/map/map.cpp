@@ -153,7 +153,6 @@ void Map::start() {
         fileSource.clearLoop();
 
         // Closes all open handles on the loop. This means that the loop will automatically terminate.
-        asyncCleanup.reset();
         asyncRender.reset();
         asyncTerminate.reset();
     });
@@ -175,11 +174,6 @@ void Map::start() {
                 }
             }
         }
-    });
-
-    asyncCleanup = util::make_unique<uv::async>(**loop, [this]() {
-        assert(painter);
-        painter->cleanup();
     });
 
     thread = std::thread([this]() {
@@ -274,12 +268,6 @@ bool Map::needsSwap() {
 void Map::swapped() {
     isRendered.clear();
     rerender();
-}
-
-void Map::cleanup() {
-    if (asyncCleanup != nullptr) {
-        asyncCleanup->send();
-    }
 }
 
 void Map::terminate() {
