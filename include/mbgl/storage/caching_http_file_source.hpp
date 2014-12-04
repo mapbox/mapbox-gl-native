@@ -1,7 +1,7 @@
 #ifndef MBGL_STORAGE_CACHING_HTTP_FILE_SOURCE
 #define MBGL_STORAGE_CACHING_HTTP_FILE_SOURCE
 
-#include "file_source.hpp"
+#include <mbgl/storage/file_source.hpp>
 
 #include <thread>
 #include <unordered_map>

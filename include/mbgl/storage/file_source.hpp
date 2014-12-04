@@ -2,8 +2,8 @@
 #define MBGL_STORAGE_FILE_SOURCE
 
 #include <mbgl/util/noncopyable.hpp>
-#include "resource_type.hpp"
-#include "request.hpp"
+#include <mbgl/storage/resource_type.hpp>
+#include <mbgl/storage/request.hpp>
 
 #include <string>
 #include <functional>
