@@ -64,8 +64,6 @@ public:
     // Perform cleanup tasks that prepare shutting down the app. This doesn't mean that the
     // app will be shut down. That means all operations must be automatically be reversed (e.g. through
     // lazy initialization) in case rendering continues.
-    void cleanup();
-
     void terminate();
 
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
