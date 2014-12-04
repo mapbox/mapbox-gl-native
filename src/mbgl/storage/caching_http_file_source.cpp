@@ -53,12 +53,10 @@ void CachingHTTPFileSource::clearLoop() {
 }
 
 void CachingHTTPFileSource::setBase(const std::string &value) {
-    assert(thread_id == std::this_thread::get_id());
     base = value;
 }
 
 const std::string &CachingHTTPFileSource::getBase() const {
-    assert(thread_id == std::this_thread::get_id());
     return base;
 }
 
