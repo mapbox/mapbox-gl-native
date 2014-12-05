@@ -80,7 +80,6 @@ Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSo
             glDeleteProgram(program);
             program = 0;
         }
-
     }
 
     // Remove the compiled shaders; they are now part of the program.
