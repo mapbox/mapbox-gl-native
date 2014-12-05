@@ -570,14 +570,10 @@ void NativeMapView::loadExtensions() {
         gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)eglGetProcAddress("glDeleteVertexArraysOES");
         gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)eglGetProcAddress("glGenVertexArraysOES");
         gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)eglGetProcAddress("glIsVertexArrayOES");
-
-        if ((gl::BindVertexArray == nullptr) || (gl::DeleteVertexArrays == nullptr) || (gl::GenVertexArrays == nullptr) || (gl::IsVertexArray == nullptr)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "Could not load GL_OES_vertex_array_object functions.");
-            gl::BindVertexArray = nullptr;
-            gl::DeleteVertexArrays = nullptr;
-            gl::GenVertexArrays = nullptr;
-            gl::IsVertexArray = nullptr;
-        }
+        assert(gl::BindVertexArray != nullptr);
+        assert(gl::DeleteVertexArrays != nullptr);
+        assert(gl::GenVertexArrays != nullptr);
+        assert(gl::IsVertexArray != nullptr);
     }
 
     if (extensions.find("GL_OES_packed_depth_stencil") != std::string::npos) {
