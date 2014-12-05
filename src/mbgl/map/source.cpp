@@ -37,10 +37,9 @@ void Source::load(Map& map, FileSource& fileSource) {
         return;
     }
 
-    std::string url = util::mapbox::normalizeSourceURL(info.url, map.getAccessToken());
     util::ptr<Source> source = shared_from_this();
 
-    fileSource.request(ResourceType::JSON, url)->onload([source, &map](const Response &res) {
+    fileSource.request(ResourceType::JSON, info.url)->onload([source, &map](const Response &res) {
         if (res.code != 200) {
             Log::Warning(Event::General, "failed to load source TileJSON");
             return;

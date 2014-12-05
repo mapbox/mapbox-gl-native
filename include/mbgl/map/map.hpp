@@ -78,8 +78,6 @@ public:
     void setStyleURL(const std::string &url);
     void setStyleJSON(std::string newStyleJSON, const std::string &base = "");
     std::string getStyleJSON() const;
-    void setAccessToken(std::string accessToken);
-    std::string getAccessToken() const;
 
     // Transition
     void cancelTransitions();
@@ -187,7 +185,6 @@ private:
 
     std::string styleURL;
     std::string styleJSON = "";
-    std::string accessToken = "";
 
     bool debug = false;
     timestamp animationTime = 0;

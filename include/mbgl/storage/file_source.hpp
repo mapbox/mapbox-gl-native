@@ -21,7 +21,7 @@ public:
     virtual bool hasLoop() = 0;
     virtual void clearLoop() = 0;
 
-    virtual void setBase(const std::string &value) = 0;
+    virtual void setBase(std::string) = 0;
     virtual std::unique_ptr<Request> request(ResourceType type, const std::string &url) = 0;
     virtual void prepare(std::function<void()> fn) = 0;
 };

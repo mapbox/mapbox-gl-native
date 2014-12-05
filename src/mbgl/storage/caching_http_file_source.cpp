@@ -3,6 +3,7 @@
 #include <mbgl/storage/http_request.hpp>
 #include <mbgl/storage/sqlite_store.hpp>
 #include <mbgl/util/uv-messenger.h>
+#include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/std.hpp>
 
 #include <uv.h>
@@ -52,44 +53,51 @@ void CachingHTTPFileSource::clearLoop() {
     store.reset();
 }
 
-void CachingHTTPFileSource::setBase(const std::string &value) {
-    base = value;
+void CachingHTTPFileSource::setBase(std::string value) {
+    // TODO: Make threadsafe.
+    base.swap(value);
 }
 
-const std::string &CachingHTTPFileSource::getBase() const {
-    return base;
+void CachingHTTPFileSource::setAccessToken(std::string value) {
+    // TODO: Make threadsafe.
+    accessToken.swap(value);
 }
 
-std::unique_ptr<Request> CachingHTTPFileSource::request(ResourceType type, const std::string &url) {
+std::unique_ptr<Request> CachingHTTPFileSource::request(ResourceType type, const std::string& url_) {
     assert(thread_id == std::this_thread::get_id());
 
+    std::string url = url_;
+
     // Make URL absolute.
-    const std::string absoluteURL = [&]() -> std::string {
-        const size_t separator = url.find("://");
-        if (separator == std::string::npos) {
-            // Relative URL.
-            return base + url;
-        } else {
-            return url;
-        }
-    }();
+    const size_t separator = url.find("://");
+    if (separator == std::string::npos) {
+        url = base + url;
+    }
+
+    // Normalize mapbox:// URLs.
+    switch (type) {
+    case ResourceType::Glyphs:
+        url = util::mapbox::normalizeGlyphsURL(url, accessToken);
+    default:
+        url = util::mapbox::normalizeSourceURL(url, accessToken);
+    }
 
     util::ptr<BaseRequest> req;
 
     // First, try to find an existing Request object.
-    auto it = pending.find(absoluteURL);
+    auto it = pending.find(url);
     if (it != pending.end()) {
         req = it->second.lock();
     }
 
     if (!req) {
-        if (absoluteURL.substr(0, 7) == "file://") {
-            req = std::make_shared<FileRequest>(absoluteURL.substr(7), loop);
+        if (url.substr(0, 7) == "file://") {
+            req = std::make_shared<FileRequest>(url.substr(7), loop);
         } else {
-            req = std::make_shared<HTTPRequest>(type, absoluteURL, loop, store);
+            req = std::make_shared<HTTPRequest>(type, url, loop, store);
         }
 
-        pending.emplace(absoluteURL, req);
+        pending.emplace(url, req);
     }
 
     return util::make_unique<Request>(req);

@@ -96,11 +96,10 @@ int main() {
     map.setBearing(settings.bearing);
     map.setDebug(settings.debug);
 
-
     // Set access token if present
     NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
-    if ( ! accessToken) mbgl::Log::Warning(mbgl::Event::Setup, "No access token set. Mapbox vector tiles won't work.");
-    if (accessToken) map.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+    if (!accessToken) mbgl::Log::Warning(mbgl::Event::Setup, "No access token set. Mapbox vector tiles won't work.");
+    if (accessToken) fileSource.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
 
     // Load style
     const std::string path([[[NSBundle mainBundle] pathForResource:@"bright-v6" ofType:@"json" inDirectory:@"styles/"] UTF8String]);

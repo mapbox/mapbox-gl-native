@@ -23,9 +23,11 @@ public:
     bool hasLoop();
     void clearLoop();
 
-    // Stores and retrieves the base path/URL for relative requests
-    void setBase(const std::string &value);
-    const std::string &getBase() const;
+    // Set the base path/URL for relative requests
+    void setBase(std::string);
+
+    // Set the Mapbox API access token
+    void setAccessToken(std::string);
 
     std::unique_ptr<Request> request(ResourceType type, const std::string &url);
 
@@ -36,6 +38,9 @@ public:
 
 private:
     std::thread::id thread_id;
+
+    // Mapbox API access token.
+    std::string accessToken;
 
     // Path to the cache database.
     std::string path;

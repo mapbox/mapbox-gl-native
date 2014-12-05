@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     if (token == nullptr) {
         mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
     } else {
-        map.setAccessToken(std::string(token));
+        fileSource.setAccessToken(std::string(token));
     }
 
     // Load style
