@@ -2,16 +2,16 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/io.hpp>
 #include <mbgl/util/std.hpp>
 
+#include <mbgl/util/io.hpp>
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/platform/default/caching_http_file_source.hpp>
+#include <mbgl/storage/caching_http_file_source.hpp>
 
 #include "./fixtures/fixture_log.hpp"
 

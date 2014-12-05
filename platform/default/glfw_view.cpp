@@ -1,8 +1,6 @@
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/platform/gl.hpp>
 
-#include <mbgl/util/string.hpp>
-
 GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
 #ifdef NVIDIA
     glDiscardFramebufferEXT = (PFNGLDISCARDFRAMEBUFFEREXTPROC)glfwGetProcAddress("glDiscardFramebufferEXT");
@@ -10,7 +8,6 @@ GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
 }
 
 GLFWView::~GLFWView() {
-    map->terminate();
     glfwTerminate();
 }
 
@@ -242,7 +239,7 @@ int GLFWView::run() {
         glfwWaitEvents();
     }
 
-    map->stop([](void *) {
+    map->stop([]() {
         glfwWaitEvents();
     });
 

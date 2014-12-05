@@ -2,9 +2,6 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/map/transform.hpp>
-#include <mbgl/renderer/painter.hpp>
-#include <mbgl/geometry/glyph_atlas.hpp>
-#include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/uv.hpp>
@@ -18,9 +15,11 @@
 #include <vector>
 #include <mutex>
 #include <condition_variable>
+#include <functional>
 
 namespace mbgl {
 
+class Painter;
 class GlyphStore;
 class LayerDescription;
 class Sprite;
@@ -31,10 +30,10 @@ class StyleSource;
 class TexturePool;
 class FileSource;
 class View;
+class GlyphAtlas;
+class SpriteAtlas;
 
 class Map : private util::noncopyable {
-    typedef void (*stop_callback)(void *);
-
 public:
     explicit Map(View&, FileSource&);
     ~Map();
@@ -45,9 +44,8 @@ public:
     // Stop the map render thread. This call will block until the map rendering thread stopped.
     // The optional callback function will be invoked repeatedly until the map thread is stopped.
     // The callback function should wait until it is woken up again by view.notify(), otherwise
-    // this will be a busy waiting loop. The optional data parameter will be passed to the callback
-    // function.
-    void stop(stop_callback cb = nullptr, void *data = nullptr);
+    // this will be a busy waiting loop.
+    void stop(std::function<void ()> callback = std::function<void ()>());
 
     // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
     void pause(bool waitForPause = false);
@@ -89,8 +87,6 @@ public:
     void setStyleURL(const std::string &url);
     void setStyleJSON(std::string newStyleJSON, const std::string &base = "");
     std::string getStyleJSON() const;
-    void setAccessToken(std::string accessToken);
-    std::string getAccessToken() const;
 
     // Transition
     void cancelTransitions();
@@ -130,9 +126,6 @@ public:
     void setDebug(bool value);
     void toggleDebug();
     bool getDebug() const;
-
-    // Call this when the network reachability changed.
-    void setReachability(bool status);
 
     inline const TransformState &getState() const { return state; }
     inline timestamp getTime() const { return animationTime; }
@@ -202,17 +195,16 @@ private:
     FileSource& fileSource;
 
     util::ptr<Style> style;
-    GlyphAtlas glyphAtlas;
+    const std::unique_ptr<GlyphAtlas> glyphAtlas;
     util::ptr<GlyphStore> glyphStore;
-    SpriteAtlas spriteAtlas;
+    const std::unique_ptr<SpriteAtlas> spriteAtlas;
     util::ptr<Sprite> sprite;
     util::ptr<TexturePool> texturePool;
 
-    Painter painter;
+    const std::unique_ptr<Painter> painter;
 
     std::string styleURL;
     std::string styleJSON = "";
-    std::string accessToken = "";
 
     std::atomic_uint_fast64_t defaultTransitionDuration;
 

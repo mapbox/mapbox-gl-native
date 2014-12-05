@@ -4,7 +4,6 @@
 #include <mbgl/map/tile.hpp>
 
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/util/vec.hpp>
 
 #include <cstdint>
 #include <array>

@@ -4,7 +4,7 @@
 #include <mbgl/platform/default/settings_json.hpp>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/platform/default/log_stderr.hpp>
-#include <mbgl/platform/default/caching_http_file_source.hpp>
+#include <mbgl/storage/caching_http_file_source.hpp>
 
 #include <signal.h>
 #include <getopt.h>
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     if (token == nullptr) {
         mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
     } else {
-        map.setAccessToken(std::string(token));
+        fileSource.setAccessToken(std::string(token));
     }
 
     // Load style

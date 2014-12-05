@@ -44,10 +44,6 @@ public:
             return ((std::pow(2, z) * y + x) * 32) + z;
         }
 
-        inline operator std::string() const {
-            return std::to_string(z) + "/" + std::to_string(x) + "/" + std::to_string(y);
-        }
-
         inline bool operator==(const ID& rhs) const {
             return w == rhs.w && z == rhs.z && x == rhs.x && y == rhs.y;
         }
@@ -67,6 +63,7 @@ public:
         ID normalized() const;
         std::forward_list<ID> children(int32_t z) const;
         bool isChildOf(const Tile::ID &id) const;
+        operator std::string() const;
     };
 
     static std::forward_list<Tile::ID> cover(int8_t z, const box& bounds);

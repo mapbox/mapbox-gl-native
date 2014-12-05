@@ -105,11 +105,6 @@ struct vec4 {
 };
 
 
-struct box {
-    vec2<double> tl, tr, bl, br;
-    vec2<double> center;
-};
-
 typedef vec2<int16_t> Coordinate;
 
 }

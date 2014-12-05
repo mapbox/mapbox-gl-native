@@ -1,40 +1,30 @@
 #include <mbgl/platform/default/settings_json.hpp>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/filestream.h>
-#include <rapidjson/document.h>
-#include <stdio.h>
+#include <fstream>
 
 using namespace mbgl;
 
 Settings_JSON::Settings_JSON() { load(); }
 
 void Settings_JSON::load() {
-    FILE *settingsFile = fopen("/tmp/mbgl-native.json", "r");
-    if (settingsFile != NULL) {
-        rapidjson::FileStream is(settingsFile);
-        rapidjson::Document document;
-        document.ParseStream<0>(is);
-        if (document.IsArray()) {
-            longitude = document[rapidjson::SizeType(0)].GetDouble();
-            latitude = document[1].GetDouble();
-            zoom = document[2].GetDouble();
-            bearing = document[3].GetDouble();
-            debug = document[4].GetBool();
-        }
+    std::ifstream file("/tmp/mbgl-native.cfg");
+    if (file) {
+        file >> longitude;
+        file >> latitude;
+        file >> zoom;
+        file >> bearing;
+        file >> debug;
     }
 }
 
 void Settings_JSON::save() {
-
-    rapidjson::FileStream s(fopen("/tmp/mbgl-native.json", "w"));
-    rapidjson::PrettyWriter<rapidjson::FileStream> writer(s);
-    writer.StartArray();
-    writer.Double(longitude);
-    writer.Double(latitude);
-    writer.Double(zoom);
-    writer.Double(bearing);
-    writer.Bool(debug);
-    writer.EndArray();
+    std::ofstream file("/tmp/mbgl-native.cfg");
+    if (file) {
+        file << longitude << std::endl;
+        file << latitude << std::endl;
+        file << zoom << std::endl;
+        file << bearing << std::endl;
+        file << debug << std::endl;
+    }
 }
 
 void Settings_JSON::clear() {
