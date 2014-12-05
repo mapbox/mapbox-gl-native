@@ -13,11 +13,11 @@ struct FileRequestBaton {
     ~FileRequestBaton();
 
     void cancel();
-    static void file_opened(uv_fs_t *req);
-    static void file_stated(uv_fs_t *req);
-    static void file_read(uv_fs_t *req);
-    static void file_closed(uv_fs_t *req);
-    static void notify_error(uv_fs_t *req);
+    static void fileOpened(uv_fs_t *req);
+    static void fileStated(uv_fs_t *req);
+    static void fileRead(uv_fs_t *req);
+    static void fileClosed(uv_fs_t *req);
+    static void notifyError(uv_fs_t *req);
     static void cleanup(uv_fs_t *req);
 
     const std::thread::id threadId;

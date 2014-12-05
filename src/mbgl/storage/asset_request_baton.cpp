@@ -22,13 +22,24 @@ void AssetRequestBaton::cancel() {
     canceled = true;
 }
 
-void AssetRequestBaton::notify_error(AssetRequestBaton *ptr, const int code, const char *message) {
+void AssetRequestBaton::notifyError(AssetRequestBaton *ptr, const int code, const char *message) {
     assert(std::this_thread::get_id() == ptr->threadId);
 
     if (ptr->request && !ptr->canceled) {
         ptr->request->response = std::unique_ptr<Response>(new Response);
         ptr->request->response->code = code;
         ptr->request->response->message = message;
+        ptr->request->notify();
+    }
+}
+
+void AssetRequestBaton::notifySuccess(AssetRequestBaton *ptr, const std::string body) {
+assert(std::this_thread::get_id() == ptr->threadId);
+
+    if (ptr->request && !ptr->canceled) {
+        ptr->request->response = std::unique_ptr<Response>(new Response);
+        ptr->request->response->code = 200;
+        ptr->request->response->data = body;
         ptr->request->notify();
     }
 }

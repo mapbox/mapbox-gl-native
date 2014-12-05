@@ -39,7 +39,6 @@
         '../platform/default/image_reader.cpp',
         '../platform/default/png_reader.cpp',
         '../platform/default/jpeg_reader.cpp',
-        '../platform/default/caching_http_file_source.cpp',
       ],
       'include_dirs': [
         '../include',

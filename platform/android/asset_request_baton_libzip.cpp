@@ -1,6 +1,6 @@
+#include <mbgl/mbgl.hpp>
 #include <mbgl/android/jni.hpp>
 #include <mbgl/storage/asset_request_baton.hpp>
-#include <mbgl/storage/asset_request.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/std.hpp>
 
@@ -29,7 +29,7 @@ void AssetRequestBaton::run(AssetRequestBaton *ptr) {
         const int messageSize = zip_error_to_str(nullptr, 0, error, errno);
         const std::unique_ptr<char[]> message = mbgl::util::make_unique<char[]>(messageSize);
         zip_error_to_str(message.get(), 0, error, errno);
-        notify_error(ptr, 500, message.get());
+        notifyError(ptr, 500, message.get());
         cleanup(ptr);
         return;
     }
@@ -40,7 +40,7 @@ void AssetRequestBaton::run(AssetRequestBaton *ptr) {
         // Opening the asset failed or was canceled. We already have an open file handle
         // though, which we'll have to close.
         zip_error_get(apk, &error, nullptr);
-        notify_error(ptr, error == ZIP_ER_NOENT ? 404 : 500, zip_strerror(apk));
+        notifyError(ptr, error == ZIP_ER_NOENT ? 404 : 500, zip_strerror(apk));
         zip_close(apk);
         apk = nullptr;
         cleanup(ptr);
@@ -51,7 +51,7 @@ void AssetRequestBaton::run(AssetRequestBaton *ptr) {
     if ((zip_stat(apk, apkFilePath.c_str(), ZIP_FL_NOCASE, &stat) != 0) || ptr->canceled || !ptr->request) {
         // Stating failed or was canceled. We already have an open file handle
         // though, which we'll have to close.
-        notify_error(ptr, 500, zip_strerror(apk));
+        notifyError(ptr, 500, zip_strerror(apk));
         zip_fclose(apkFile);
         apkFile = nullptr;
         zip_close(apk);
@@ -65,7 +65,7 @@ void AssetRequestBaton::run(AssetRequestBaton *ptr) {
     if (static_cast<zip_uint64_t>(zip_fread(apkFile, reinterpret_cast<void *>(data.get()), stat.size)) != stat.size || ptr->canceled || !ptr->request) {
         // Reading failed or was canceled. We already have an open file handle
         // though, which we'll have to close.
-        notify_error(ptr, 500, zip_file_strerror(apkFile));
+        notifyError(ptr, 500, zip_file_strerror(apkFile));
         zip_fclose(apkFile);
         apkFile = nullptr;
         zip_close(apk);
@@ -74,13 +74,8 @@ void AssetRequestBaton::run(AssetRequestBaton *ptr) {
         return;
     }
 
-    if (ptr->request) {
-        ptr->request->response = std::unique_ptr<Response>(new Response);
-        ptr->request->response->code = 200;
-        std::string body(data.get(), stat.size);
-        ptr->request->response->data = body;
-        ptr->request->notify();
-    }
+    std::string body(data.get(), stat.size);
+    notifySuccess(ptr, body);
 
     if (zip_fclose(apkFile) != 0) {
         // Closing the asset failed. But there isn't anything we can do.

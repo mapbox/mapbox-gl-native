@@ -418,7 +418,7 @@ void JNICALL nativeSetAccessToken(JNIEnv* env, jobject obj, jlong nativeMapViewP
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetAccessToken");
     assert(nativeMapViewPtr != 0);
     NativeMapView* nativeMapView = reinterpret_cast<NativeMapView*>(nativeMapViewPtr);
-    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, nativeMapView->getMap().setAccessToken(std_string_from_jstring(env, accessToken))));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, nativeMapView->getFileSource().setAccessToken(std_string_from_jstring(env, accessToken))));
 }
 
 jstring JNICALL nativeGetAccessToken(JNIEnv* env, jobject obj, jlong nativeMapViewPtr) {
@@ -426,7 +426,7 @@ jstring JNICALL nativeGetAccessToken(JNIEnv* env, jobject obj, jlong nativeMapVi
     assert(nativeMapViewPtr != 0);
     NativeMapView* nativeMapView = reinterpret_cast<NativeMapView*>(nativeMapViewPtr);
     jstring ret = nullptr;
-    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = std_string_to_jstring(env, nativeMapView->getMap().getAccessToken())));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, ret = std_string_to_jstring(env, nativeMapView->getFileSource().getAccessToken())));
     return ret;
 }
 
@@ -699,7 +699,7 @@ void JNICALL nativeSetReachability(JNIEnv* env, jobject obj, jlong nativeMapView
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetReachability");
     assert(nativeMapViewPtr != 0);
     NativeMapView* nativeMapView = reinterpret_cast<NativeMapView*>(nativeMapViewPtr);
-    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, nativeMapView->getMap().setReachability(status)));
+    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, nativeMapView->getFileSource().setReachability(status)));
 }
 
 }

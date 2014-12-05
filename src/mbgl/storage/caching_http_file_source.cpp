@@ -64,8 +64,12 @@ void CachingHTTPFileSource::setAccessToken(std::string value) {
     accessToken.swap(value);
 }
 
+std::string CachingHTTPFileSource::getAccessToken() const {
+    return accessToken;
+}
+
 std::unique_ptr<Request> CachingHTTPFileSource::request(ResourceType type, const std::string& url_) {
-    assert(tstd::this_thread::get_id() == threadId);
+    assert(std::this_thread::get_id() == threadId);
 
     std::string url = url_;
 

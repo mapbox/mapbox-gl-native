@@ -4,7 +4,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/platform/default/caching_http_file_source.hpp>
+#include <mbgl/storage/caching_http_file_source.hpp>
 
 #include <string>
 #include <jni.h>
@@ -42,6 +42,10 @@ public:
 
     mbgl::Map& getMap() {
         return map;
+    }
+
+    mbgl::CachingHTTPFileSource& getFileSource() {
+        return fileSource;
     }
 
     bool initializeDisplay();

@@ -29,6 +29,9 @@ public:
     // Set the Mapbox API access token
     void setAccessToken(std::string);
 
+    // Get the Mapbox API access token
+    std::string getAccessToken() const;
+
     std::unique_ptr<Request> request(ResourceType type, const std::string &url);
 
     void prepare(std::function<void()> fn);
