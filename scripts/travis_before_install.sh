@@ -15,7 +15,7 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         wget https://s3.amazonaws.com/mapbox-playground/leith/android-ndk-r10c-linux-x86_64.tar.gz
 
         echo "unpacking NDK"
-        wge -xzf ./android-ndk-r10c-linux-x86_64.tar.gz
+        tar -xzf ./android-ndk-r10c-linux-x86_64.tar.gz
 
         echo "fetching JDK"
         wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-linux-x64.tar.gz
