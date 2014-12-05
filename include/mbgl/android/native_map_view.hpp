@@ -14,12 +14,10 @@
 namespace mbgl {
 namespace android {
 
-class NativeMapView;
-
-class MBGLView: public mbgl::View, private mbgl::util::noncopyable {
+class NativeMapView : public mbgl::View, private mbgl::util::noncopyable {
 public:
-    explicit MBGLView(NativeMapView& nativeView_) : nativeView(nativeView_) {
-    }
+    NativeMapView(JNIEnv* env, jobject obj);
+    virtual ~NativeMapView();
 
     void make_active() override;
     void make_inactive() override;
@@ -27,26 +25,10 @@ public:
     void swap() override;
 
     void notify() override;
-    void notify_map_change(mbgl::MapChange change, mbgl::timestamp delay = 0) override;
+    void notify_map_change(mbgl::MapChange change, mbgl::timestamp delay) override;
 
-private:
-    NativeMapView& nativeView;
-};
-
-class NativeMapView : private mbgl::util::noncopyable {
-    friend class MBGLView;
-
-public:
-    NativeMapView(JNIEnv* env, jobject obj);
-    ~NativeMapView();
-
-    mbgl::Map& getMap() {
-        return map;
-    }
-
-    mbgl::CachingHTTPFileSource& getFileSource() {
-        return fileSource;
-    }
+    mbgl::Map& getMap();
+    mbgl::CachingHTTPFileSource& getFileSource();
 
     bool initializeDisplay();
     void terminateDisplay();
@@ -63,8 +45,6 @@ public:
     void resume();
     void pause(bool waitForPause = false);
 
-    void notifyMapChange();
-
     void enableFps(bool enable);
     void updateFps();
 
@@ -79,7 +59,6 @@ private:
 
     ANativeWindow* window = nullptr;
 
-    MBGLView view; // Must be before map
     mbgl::CachingHTTPFileSource fileSource;
     mbgl::Map map;
 

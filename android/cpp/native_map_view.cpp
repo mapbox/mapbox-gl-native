@@ -47,49 +47,7 @@ void log_gl_string(GLenum name, const char* label) {
     }
 }
 
-void MBGLView::make_active() {
-    mbgl::Log::Debug(mbgl::Event::Android, "MBGLView::make_active");
-    if ((nativeView.display != EGL_NO_DISPLAY) && (nativeView.surface != EGL_NO_SURFACE) && (nativeView.context != EGL_NO_CONTEXT)) {
-        if (!eglMakeCurrent(nativeView.display, nativeView.surface, nativeView.surface, nativeView.context)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d", eglGetError());
-        }
-    } else {
-        mbgl::Log::Info(mbgl::Event::Android, "Not activating as we are not ready");
-    }
-}
-
-void MBGLView::make_inactive() {
-    mbgl::Log::Debug(mbgl::Event::Android, "MBGLView::make_inactive");
-    if (!eglMakeCurrent(nativeView.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
-    }
-}
-
-void MBGLView::swap() {
-    mbgl::Log::Debug(mbgl::Event::Android, "MBGLView::swap");
-
-    if (map->needsSwap() && (nativeView.display != EGL_NO_DISPLAY) && (nativeView.surface != EGL_NO_SURFACE)) {
-        if (!eglSwapBuffers(nativeView.display, nativeView.surface)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d", eglGetError());
-        }
-        map->swapped();
-        nativeView.updateFps();
-    } else {
-        mbgl::Log::Info(mbgl::Event::Android, "Not swapping as we are not ready");
-    }
-}
-
-void MBGLView::notify() {
-    mbgl::Log::Debug(mbgl::Event::Android, "MBGLView::notify()");
-    // noop
-}
-
-void MBGLView::notify_map_change(mbgl::MapChange /* change */, mbgl::timestamp /* delay */) {
-    mbgl::Log::Debug(mbgl::Event::Android, "MBGLView::notify_map_change()");
-    nativeView.notifyMapChange();
-}
-
-NativeMapView::NativeMapView(JNIEnv* env, jobject obj_) : view(*this), fileSource(mbgl::platform::defaultCacheDatabase()), map(view, fileSource) {
+NativeMapView::NativeMapView(JNIEnv* env, jobject obj_) : mbgl::View(*this), fileSource(mbgl::platform::defaultCacheDatabase()), map(*this, fileSource) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
 
     assert(env != nullptr);
@@ -126,6 +84,51 @@ NativeMapView::~NativeMapView() {
     }
     obj = nullptr;
     vm = nullptr;
+}
+
+void NativeMapView::make_active() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::make_active");
+    if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
+        if (!eglMakeCurrent(display, surface, surface, context)) {
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d", eglGetError());
+        }
+    } else {
+        mbgl::Log::Info(mbgl::Event::Android, "Not activating as we are not ready");
+    }
+}
+
+void NativeMapView::make_inactive() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::make_inactive");
+    if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
+    }
+}
+
+void NativeMapView::swap() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::swap");
+
+    if (map.needsSwap() && (display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
+        if (!eglSwapBuffers(display, surface)) {
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d", eglGetError());
+        }
+        map.swapped();
+        updateFps();
+    } else {
+        mbgl::Log::Info(mbgl::Event::Android, "Not swapping as we are not ready");
+    }
+}
+
+void NativeMapView::notify() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::notify()");
+    // noop
+}
+
+mbgl::Map& NativeMapView::getMap() {
+    return map;
+}
+
+mbgl::CachingHTTPFileSource& NativeMapView::getFileSource() {
+    return fileSource;
 }
 
 bool NativeMapView::initializeDisplay() {
@@ -622,7 +625,7 @@ void NativeMapView::resume() {
     }
 }
 
-void NativeMapView::notifyMapChange() {
+void NativeMapView::notify_map_change(mbgl::MapChange, mbgl::timestamp) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::notify_map_change()");
 
     assert(vm != nullptr);
