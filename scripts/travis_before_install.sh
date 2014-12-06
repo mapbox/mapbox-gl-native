@@ -11,11 +11,21 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         echo "load submodules"
         git submodule update --init --recursive
 
+        echo "installing 7z"
+        MASON_PLATFORM= ./.mason/mason install 7z 9.20
+
+        echo "setting 7z path"
+        SEVEN_ZIP_PATH="$(MASON_PLATFORM= ./.mason/mason prefix 7z 9.20)/bin/7za"
+
         echo "fetching NDK"
-        wget https://s3.amazonaws.com/mapbox-playground/leith/android-ndk-r10c-linux-x86_64.tar.gz
+        wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
+
+        echo "chmod NDK"
+        chmod a+x ./android-ndk-r10c-linux-x86_64.bin
 
         echo "unpacking NDK"
-        tar -xzf ./android-ndk-r10c-linux-x86_64.tar.gz
+        $SEVEN_ZIP_PATH x ./android-ndk-r10c-linux-x86_64.bin > .tmp-ndk-log
+        rm .tmp-ndk-log
 
         echo "fetching JDK"
         wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-linux-x64.tar.gz
