@@ -70,6 +70,10 @@ PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays = nullptr;
 PFNGLGENVERTEXARRAYSPROC GenVertexArrays = nullptr;
 PFNGLISVERTEXARRAYPROC IsVertexArray = nullptr;
 
+PFNGLGETPROGRAMBINARYPROC GetProgramBinary = nullptr;
+PFNGLPROGRAMBINARYPROC ProgramBinary = nullptr;
+PFNGLPROGRAMPARAMETERIPROC ProgramParameteri = nullptr;
+
 }
 }
 
