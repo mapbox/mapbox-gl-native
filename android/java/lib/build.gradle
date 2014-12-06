@@ -5,7 +5,6 @@ android {
     buildToolsVersion "21.1.1"
 
     defaultConfig {
-        applicationId "com.mapbox.mapboxgl.lib"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 2
@@ -19,11 +18,11 @@ android {
 
     buildTypes {
         debug {
-            jniDebugBuild true
+            jniDebuggable true
         }
 
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
