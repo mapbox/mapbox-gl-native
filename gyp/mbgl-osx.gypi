@@ -7,6 +7,7 @@
       'hard_dependency': 1,
       'sources': [
         '../platform/osx/cache_database_application_support.mm',
+        '../platform/osx/shader_cache_application_support.mm',
         '../platform/darwin/log_nslog.mm',
         '../platform/darwin/string_nsstring.mm',
         '../platform/darwin/http_request_baton_cocoa.mm',

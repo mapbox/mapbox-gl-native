@@ -70,11 +70,13 @@ PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays = nullptr;
 PFNGLGENVERTEXARRAYSPROC GenVertexArrays = nullptr;
 PFNGLISVERTEXARRAYPROC IsVertexArray = nullptr;
 
-// GL_OES_packed_depth_stencil
 bool isPackedDepthStencilSupported = false;
 
-// GL_OES_depth24
 bool isDepth24Supported = false;
+
+PFNGLGETPROGRAMBINARYPROC GetProgramBinary = nullptr;
+PFNGLPROGRAMBINARYPROC ProgramBinary = nullptr;
+PFNGLPROGRAMPARAMETERIPROC ProgramParameteri = nullptr;
 
 }
 }

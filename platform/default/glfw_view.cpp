@@ -82,6 +82,17 @@ void GLFWView::initialize(mbgl::Map *map_) {
             gl::GetObjectLabel = (gl::PFNGLGETOBJECTLABELPROC)glfwGetProcAddress("glGetObjectLabel");
             gl::ObjectPtrLabel = (gl::PFNGLOBJECTPTRLABELPROC)glfwGetProcAddress("glObjectPtrLabel");
             gl::GetObjectPtrLabel = (gl::PFNGLGETOBJECTPTRLABELPROC)glfwGetProcAddress("glGetObjectPtrLabel");
+            assert(gl::DebugMessageControl != nullptr);
+            assert(gl::DebugMessageInsert != nullptr);
+            assert(gl::DebugMessageCallback != nullptr);
+            assert(gl::GetDebugMessageLog != nullptr);
+            assert(gl::GetPointerv != nullptr);
+            assert(gl::PushDebugGroup != nullptr);
+            assert(gl::PopDebugGroup != nullptr);
+            assert(gl::ObjectLabel != nullptr);
+            assert(gl::GetObjectLabel != nullptr);
+            assert(gl::ObjectPtrLabel != nullptr);
+            assert(gl::GetObjectPtrLabel != nullptr);
         } else {
             if (extensions.find("GL_ARB_debug_output") != std::string::npos) {
                 gl::DebugMessageControl = (gl::PFNGLDEBUGMESSAGECONTROLPROC)glfwGetProcAddress("glDebugMessageControlARB");
@@ -89,17 +100,27 @@ void GLFWView::initialize(mbgl::Map *map_) {
                 gl::DebugMessageCallback = (gl::PFNGLDEBUGMESSAGECALLBACKPROC)glfwGetProcAddress("glDebugMessageCallbackARB");
                 gl::GetDebugMessageLog = (gl::PFNGLGETDEBUGMESSAGELOGPROC)glfwGetProcAddress("glGetDebugMessageLogARB");
                 gl::GetPointerv = (gl::PFNGLGETPOINTERVPROC)glfwGetProcAddress("glGetPointerv");
+                assert(gl::DebugMessageControl != nullptr);
+                assert(gl::DebugMessageInsert != nullptr);
+                assert(gl::DebugMessageCallback != nullptr);
+                assert(gl::GetDebugMessageLog != nullptr);
+                assert(gl::GetPointerv != nullptr);
             }
 
             if (extensions.find("GL_EXT_debug_marker") != std::string::npos) {
                 gl::InsertEventMarkerEXT = (gl::PFNGLINSERTEVENTMARKEREXTPROC)glfwGetProcAddress("glInsertEventMarkerEXT");
                 gl::PushGroupMarkerEXT = (gl::PFNGLPUSHGROUPMARKEREXTPROC)glfwGetProcAddress("glPushGroupMarkerEXT");
                 gl::PopGroupMarkerEXT = (gl::PFNGLPOPGROUPMARKEREXTPROC)glfwGetProcAddress("glPopGroupMarkerEXT");
+                assert(gl::InsertEventMarkerEXT != nullptr);
+                assert(gl::PushGroupMarkerEXT != nullptr);
+                assert(gl::PopGroupMarkerEXT != nullptr);
             }
 
             if (extensions.find("GL_EXT_debug_label") != std::string::npos) {
                 gl::LabelObjectEXT = (gl::PFNGLLABELOBJECTEXTPROC)glfwGetProcAddress("glLabelObjectEXT");
                 gl::GetObjectLabelEXT = (gl::PFNGLGETOBJECTLABELEXTPROC)glfwGetProcAddress("glGetObjectLabelEXT");
+                assert(gl::LabelObjectEXT != nullptr);
+                assert(gl::GetObjectLabelEXT != nullptr);
             }
         }
 
@@ -108,11 +129,28 @@ void GLFWView::initialize(mbgl::Map *map_) {
             gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glfwGetProcAddress("glDeleteVertexArrays");
             gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glfwGetProcAddress("glGenVertexArrays");
             gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glfwGetProcAddress("glIsVertexArray");
+            assert(gl::BindVertexArray != nullptr);
+            assert(gl::DeleteVertexArrays != nullptr);
+            assert(gl::GenVertexArrays != nullptr);
+            assert(gl::IsVertexArray != nullptr);
         } else if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
             gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glfwGetProcAddress("glBindVertexArrayAPPLE");
             gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glfwGetProcAddress("glDeleteVertexArraysAPPLE");
             gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glfwGetProcAddress("glGenVertexArraysAPPLE");
             gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glfwGetProcAddress("glIsVertexArrayAPPLE");
+            assert(gl::BindVertexArray != nullptr);
+            assert(gl::DeleteVertexArrays != nullptr);
+            assert(gl::GenVertexArrays != nullptr);
+            assert(gl::IsVertexArray != nullptr);
+        }
+
+        if (extensions.find("GL_ARB_get_program_binary") != std::string::npos) {
+            gl::GetProgramBinary = (gl::PFNGLGETPROGRAMBINARYPROC)glfwGetProcAddress("glGetProgramBinary");
+            gl::ProgramBinary = (gl::PFNGLPROGRAMBINARYPROC)glfwGetProcAddress("glProgramBinary");
+            gl::ProgramParameteri = (gl::PFNGLPROGRAMPARAMETERIPROC)glfwGetProcAddress("glProgramParameteri");
+            assert(gl::GetProgramBinary != nullptr);
+            assert(gl::ProgramBinary != nullptr);
+            assert(gl::ProgramParameteri != nullptr);
         }
     }
 
