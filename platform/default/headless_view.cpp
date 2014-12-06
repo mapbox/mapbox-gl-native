@@ -85,6 +85,11 @@ void HeadlessView::loadExtensions() {
         gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glXGetProcAddress((const GLubyte *)"glIsVertexArrayARB");
     }
 #endif
+
+    // HeadlessView requires packed depth stencil
+    gl::isPackedDepthStencilSupported = true;
+    gl::isDepth24Supported = true;
+
     make_inactive();
 }
 
