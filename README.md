@@ -19,7 +19,12 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 
 # Build instructions
 
-We try to link to as many system-provided libraries as possible. When these are unavailable or too outdated, we run a thin build-script layer called [Mason](https://github.com/mapbox/mason) to automate builds, and load precompiled binary packages when possible.
+	We try to link to as many system-provided libraries as possible. When these are unavailable or too outdated, we run a thin build-script layer called [Mason](https://github.com/mapbox/mason) to automate builds, and load precompiled binary packages when possible. To run the bundled app you'll need the bundled styles `mapbox-gl-styles` which means pulling down the git modules with:
+
+```
+git submodule init
+git submodule update
+```
 
 ## OS X
 
