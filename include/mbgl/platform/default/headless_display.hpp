@@ -15,8 +15,8 @@ public:
 #endif
 
 #if MBGL_USE_GLX
-    Display *x_display = nullptr;
-    GLXFBConfig *fb_configs = nullptr;
+    Display *xDisplay = nullptr;
+    GLXFBConfig *fbConfigs = nullptr;
 #endif
 };
 
