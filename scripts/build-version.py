@@ -5,13 +5,16 @@ import sys, os, errno
 
 output_dir = sys.argv[1]
 
-# When they're identical, the git describe can't find a tag and reports the rev instead.
-if sys.argv[2] == sys.argv[3]:
+if len(sys.argv) <= 3:
     tag = [0, 0, 0]
+    rev = sys.argv[2][0:8]
 else:
-    tag = map(int, sys.argv[2].split('.'))
-
-rev = sys.argv[3][0:8]
+    # When they're identical, the git describe can't find a tag and reports the rev instead.
+    if sys.argv[2] == sys.argv[3]:
+        tag = [0, 0, 0]
+    else:
+        tag = map(int, sys.argv[2].split('.'))
+    rev = sys.argv[3][0:8]
 
 
 def mkdir_p(path):
