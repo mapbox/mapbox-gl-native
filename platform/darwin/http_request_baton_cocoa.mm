@@ -2,6 +2,7 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/parsedate.h>
 #include <mbgl/util/time.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <uv.h>
 
@@ -39,6 +40,8 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
             [request addValue:@(time.c_str()) forHTTPHeaderField:@"If-Modified-Since"];
         }
     }
+
+    [request addValue:@(util::userAgent) forHTTPHeaderField:@"User-Agent"];
 
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
                                             completionHandler:^(NSData *data, NSURLResponse *res, NSError *error) {

@@ -3,6 +3,7 @@
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <uv.h>
 #include <curl/curl.h>
@@ -444,6 +445,7 @@ void start_request(void *const ptr) {
     curl_easy_setopt(context->handle, CURLOPT_HEADERFUNCTION, curl_header_cb);
     curl_easy_setopt(context->handle, CURLOPT_HEADERDATA, &context->baton->response);
     curl_easy_setopt(context->handle, CURLOPT_ACCEPT_ENCODING, "gzip, deflate");
+    curl_easy_setopt(context->handle, CURLOPT_USERAGENT, util::userAgent);
     curl_easy_setopt(context->handle, CURLOPT_SHARE, share);
 
     // Start requesting the information.
