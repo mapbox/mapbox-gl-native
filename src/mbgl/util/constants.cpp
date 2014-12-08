@@ -1,6 +1,7 @@
 #include <mbgl/util/constants.hpp>
 
 const float mbgl::util::tileSize = 512.0f;
+const char *mbgl::util::userAgent = "MapboxGL/1.0 (+https://mapbox.com/mapbox-gl/)";
 
 #if defined(DEBUG)
 const bool mbgl::debug::tileParseWarnings = false;
