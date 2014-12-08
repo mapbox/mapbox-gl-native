@@ -2,6 +2,7 @@
   'includes': [
     './gyp/common.gypi',
     './gyp/shaders.gypi',
+    './gyp/version.gypi',
     './gyp/styles.gypi',
     './gyp/certificates.gypi',
     './gyp/mbgl-core.gypi',

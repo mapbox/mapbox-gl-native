@@ -30,6 +30,9 @@
       'type': 'static_library',
       'standalone_static_library': 1,
       'hard_dependency': 1,
+      'dependencies': [
+        'version',
+      ],
       'sources': [
         '../platform/ios/cache_database_library.mm',
         '../platform/ios/shader_cache_library.mm',

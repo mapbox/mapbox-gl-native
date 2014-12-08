@@ -5,6 +5,9 @@
       'type': 'static_library',
       'standalone_static_library': 1,
       'hard_dependency': 1,
+      'dependencies': [
+        'version',
+      ],
       'variables': {
         'cflags_cc': [
           '<@(png_cflags)',
