@@ -99,10 +99,6 @@ class NativeMapView {
         nativeUpdate(mNativeMapViewPtr);
     }
 
-    public void cleanup() {
-        nativeCleanup(mNativeMapViewPtr);
-    }
-
     public void terminate() {
         nativeTerminate(mNativeMapViewPtr);
     }
@@ -435,8 +431,6 @@ class NativeMapView {
     private native void nativeRerender(long nativeMapViewPtr);
 
     private native void nativeUpdate(long nativeMapViewPtr);
-
-    private native void nativeCleanup(long nativeMapViewPtr);
 
     private native void nativeTerminate(long nativeMapViewPtr);
 

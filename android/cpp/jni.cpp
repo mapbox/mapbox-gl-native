@@ -302,13 +302,6 @@ void JNICALL nativeUpdate(JNIEnv* env, jobject obj, jlong nativeMapViewPtr) {
     COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, nativeMapView->getMap().update()));
 }
 
-void JNICALL nativeCleanup(JNIEnv* env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeCleanup");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView* nativeMapView = reinterpret_cast<NativeMapView*>(nativeMapViewPtr);
-    COFFEE_TRY_JNI(env, CPP_TRY_JNI(env, nativeMapView->getMap().cleanup()));
-}
-
 void JNICALL nativeTerminate(JNIEnv* env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeTerminate");
     assert(nativeMapViewPtr != 0);
@@ -833,7 +826,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     // NOTE: if you get java.lang.UnsatisfiedLinkError you likely forgot to set the size of the array correctly (too large)
-    std::array<JNINativeMethod, 60> methods = {{ // Can remove the extra brace in C++14
+    std::array<JNINativeMethod, 59> methods = {{ // Can remove the extra brace in C++14
         { "nativeCreate", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J", reinterpret_cast<void*>(&nativeCreate) },
         { "nativeDestroy", "(J)V", reinterpret_cast<void*>(&nativeDestroy) },
         { "nativeInitializeDisplay", "(J)V", reinterpret_cast<void*>(&nativeInitializeDisplay) },
@@ -849,7 +842,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         { "nativeRun", "(J)V", reinterpret_cast<void*>(&nativeRun) },
         { "nativeRerender", "(J)V", reinterpret_cast<void*>(&nativeRerender) },
         { "nativeUpdate", "(J)V", reinterpret_cast<void*>(&nativeUpdate) },
-        { "nativeCleanup", "(J)V", reinterpret_cast<void*>(&nativeCleanup) },
         { "nativeTerminate", "(J)V", reinterpret_cast<void*>(&nativeTerminate) },
         { "nativeNeedsSwap", "(J)Z", reinterpret_cast<void*>(&nativeNeedsSwap) },
         { "nativeSwapped", "(J)V", reinterpret_cast<void*>(&nativeSwapped) },
