@@ -5,6 +5,9 @@
       'type': 'static_library',
       'standalone_static_library': 1,
       'hard_dependency': 1,
+      'dependencies': [
+        'version',
+      ],
       'sources': [
         '../platform/osx/cache_database_application_support.mm',
         '../platform/osx/shader_cache_application_support.mm',
