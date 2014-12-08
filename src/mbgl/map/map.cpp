@@ -160,7 +160,6 @@ void Map::start(bool startPaused) {
         terminating = true;
 
         // Closes all open handles on the loop. This means that the loop will automatically terminate.
-        asyncCleanup.reset();
         asyncRender.reset();
         asyncTerminate.reset();
     });
@@ -182,11 +181,6 @@ void Map::start(bool startPaused) {
                 }
             }
         }
-    });
-
-    asyncCleanup = util::make_unique<uv::async>(**loop, [this]() {
-        assert(painter);
-        painter->cleanup();
     });
 
     // Do we need to pause first?
@@ -359,12 +353,6 @@ bool Map::needsSwap() {
 void Map::swapped() {
     isRendered.clear();
     rerender();
-}
-
-void Map::cleanup() {
-    if (asyncCleanup != nullptr) {
-        asyncCleanup->send();
-    }
 }
 
 void Map::terminate() {

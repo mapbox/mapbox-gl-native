@@ -31,7 +31,6 @@ Painter::Painter(SpriteAtlas& spriteAtlas_, GlyphAtlas& glyphAtlas_)
 }
 
 Painter::~Painter() {
-    cleanup();
 }
 
 bool Painter::needsAnimation() const {
@@ -118,11 +117,7 @@ void Painter::deleteShaders() {
     gaussianShader = nullptr;
 }
 
-void Painter::cleanup() {
-}
-
 void Painter::terminate() {
-    cleanup();
     deleteShaders();
 }
 
