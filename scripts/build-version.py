@@ -4,7 +4,13 @@ import sys, os, errno
 
 
 output_dir = sys.argv[1]
-tag = map(int, sys.argv[2].split('.'))
+
+# When they're identical, the git describe can't find a tag and reports the rev instead.
+if sys.argv[2] == sys.argv[3]:
+    tag = [0, 0, 0]
+else:
+    tag = map(int, sys.argv[2].split('.'))
+
 rev = sys.argv[3]
 
 

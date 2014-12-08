@@ -14,7 +14,7 @@
             '<(SHARED_INTERMEDIATE_DIR)/include/mbgl/util/version.hpp',
             '<(SHARED_INTERMEDIATE_DIR)/src/mbgl/util/mbgl_version.cpp',
           ],
-          'action': ['<@(python)', 'scripts/build-version.py', '<(SHARED_INTERMEDIATE_DIR)', '<!@(git describe --tags --abbrev=0)', '<!@(git rev-parse --short HEAD)'],
+          'action': ['<@(python)', 'scripts/build-version.py', '<(SHARED_INTERMEDIATE_DIR)', '<!@(git describe --tags --always --abbrev=8)', '<!@(git rev-parse --short=8 HEAD)'],
         }
       ],
       'direct_dependent_settings': {
