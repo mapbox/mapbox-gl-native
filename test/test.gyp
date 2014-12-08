@@ -1,6 +1,7 @@
 {
   'includes': [
     '../gyp/common.gypi',
+    '../gyp/version.gypi',
     '../gyp/mbgl-platform.gypi',
   ],
   'variables' : {
