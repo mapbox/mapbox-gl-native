@@ -46,19 +46,19 @@ private:
     float pixelRatio_;
 
 #if MBGL_USE_CGL
-    CGLContextObj gl_context;
+    CGLContextObj glContext;
 #endif
 
 #if MBGL_USE_GLX
-    Display *x_display = nullptr;
-    GLXFBConfig *fb_configs = nullptr;
-    GLXContext gl_context = 0;
-    GLXPbuffer glx_pbuffer = 0;
+    Display *xDisplay = nullptr;
+    GLXFBConfig *fbConfigs = nullptr;
+    GLXContext glContext = 0;
+    GLXPbuffer glxPbuffer = 0;
 #endif
 
     GLuint fbo = 0;
-    GLuint fbo_depth_stencil = 0;
-    GLuint fbo_color = 0;
+    GLuint fboDepthStencil = 0;
+    GLuint fboColor = 0;
 };
 
 }
