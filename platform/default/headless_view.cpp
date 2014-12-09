@@ -232,7 +232,7 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
             case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: error << "incomplete draw buffer.\n"; break;
             case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT: error << "incomplete read buffer.\n"; break;
             case GL_FRAMEBUFFER_UNSUPPORTED: error << "unsupported.\n"; break;
-            default: error << "othe.r\n"; break;
+            default: error << "other\n"; break;
         }
         throw std::runtime_error(error.str());
     }
