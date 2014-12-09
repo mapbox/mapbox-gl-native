@@ -60,30 +60,3 @@ header_path = os.path.join(output_dir, 'include/mbgl/util/version.hpp')
 mkdir_p(os.path.dirname(header_path))
 with open(header_path, 'w') as f: f.write(header)
 
-source = """// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-#include <mbgl/util/version.hpp>
-
-namespace mbgl {{
-namespace version {{
-
-const int major = {major};
-const int minor = {minor};
-const int patch = {patch};
-const char *revision = "{rev}";
-const char *string = "{major}.{minor}.{patch}";
-const unsigned int number = 0x{major:02x}{minor:02x}{patch:02x};
-
-}}
-}}
-""".format(
-    major = tag[0],
-    minor = tag[1],
-    patch = tag[2],
-    rev = rev
-)
-
-# Note: We can't use version.cpp since libuv already has a file named version.c.
-# Having another one here would overwrite that file and cause missing symbols errors.
-source_path = os.path.join(output_dir, 'src/mbgl/util/mbgl_version.cpp')
-mkdir_p(os.path.dirname(source_path))
-with open(source_path, 'w') as f: f.write(source)
