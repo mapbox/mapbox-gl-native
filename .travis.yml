@@ -46,6 +46,7 @@ env:
    - TERM=dumb
 
 before_install:
+- sudo ps aux
 - source ./scripts/local_mason.sh
 - source ./scripts/travis_helper.sh
 - source ./scripts/flags.sh
