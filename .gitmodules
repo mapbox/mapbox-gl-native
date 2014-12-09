@@ -13,6 +13,3 @@
 [submodule "styles"]
 	path = styles
 	url = https://github.com/mapbox/mapbox-gl-styles.git
-[submodule "android-ndk"]
-	path = android-ndk
-	url = https://github.com/mapbox/android-ndk.git

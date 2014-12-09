@@ -49,8 +49,8 @@ before_install:
 - source ./scripts/local_mason.sh
 - source ./scripts/travis_helper.sh
 - source ./scripts/flags.sh
-- export ANDROID_NDK_PATH="$(pwd)/android-ndk"
-- export NDK_HOME="$(pwd)/android-ndk"
+- export ANDROID_NDK_PATH="$(pwd)/android-ndk-r10c"
+- export NDK_HOME="$(pwd)/android-ndk-r10c"
 - if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then export JAVA_HOME="$(pwd)/jdk1.7.0_71"; fi
 - export ANDROID_HOME="$(pwd)/android-sdk"
 - ./scripts/travis_before_install.sh
