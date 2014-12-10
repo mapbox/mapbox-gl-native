@@ -77,7 +77,7 @@ PFNGLPROGRAMPARAMETERIPROC ProgramParameteri = nullptr;
 }
 }
 
-void _CHECK_GL_ERROR(const char *cmd, const char *file, int line) {
+void _CHECK_GL_ERROR(const char */*cmd*/, const char *file, int line) {
     //std::cout <<  cmd << ";" << std::endl;
 
     GLenum err;
