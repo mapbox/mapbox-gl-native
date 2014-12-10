@@ -10,6 +10,7 @@ namespace android {
 extern std::string cachePath;
 extern std::string dataPath;
 extern std::string apkPath;
+extern std::string androidRelease;
 
 extern jmethodID onMapChangedId;
 extern jmethodID onFpsChangedId;

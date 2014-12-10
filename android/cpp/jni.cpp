@@ -10,6 +10,7 @@
 #include <jni.h>
 
 #include <android/native_window_jni.h>
+#include <sys/system_properties.h>
 
 #include <coffeecatch/coffeejni.h>
 
@@ -38,6 +39,7 @@ namespace android {
 std::string cachePath;
 std::string dataPath;
 std::string apkPath;
+std::string androidRelease;
 
 jmethodID onMapChangedId = nullptr;
 jmethodID onFpsChangedId = nullptr;
@@ -932,6 +934,11 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(nullPointerExceptionClass);
         return JNI_ERR;
     }
+
+
+    char release[PROP_VALUE_MAX] = "";
+    __system_property_get("ro.build.version.release", release);
+    androidRelease = std::string(release);
 
     return JNI_VERSION_1_6;
 }
