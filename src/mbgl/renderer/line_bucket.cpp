@@ -368,7 +368,7 @@ void LineBucket::drawLines(LineShader& shader) {
             continue;
         }
         group.array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
-        glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group.vertex_length * vertexBuffer.itemSize;
         elements_index += group.elements_length * triangleElementsBuffer.itemSize;
     }
@@ -382,7 +382,7 @@ void LineBucket::drawLinePatterns(LinepatternShader& shader) {
             continue;
         }
         group.array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
-        glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group.vertex_length * vertexBuffer.itemSize;
         elements_index += group.elements_length * triangleElementsBuffer.itemSize;
     }
@@ -396,7 +396,7 @@ void LineBucket::drawPoints(LinejoinShader& shader) {
             continue;
         }
         group.array[0].bind(shader, vertexBuffer, pointElementsBuffer, vertex_index);
-        glDrawElements(GL_POINTS, group.elements_length, GL_UNSIGNED_SHORT, elements_index);
+        MBGL_CHECK_ERROR(glDrawElements(GL_POINTS, group.elements_length, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group.vertex_length * vertexBuffer.itemSize;
         elements_index += group.elements_length * pointElementsBuffer.itemSize;
     }
