@@ -18,31 +18,35 @@ HeadlessDisplay::HeadlessDisplay() {
 
     GLint num;
     CGLError error = CGLChoosePixelFormat(attributes, &pixelFormat, &num);
-    if (error) {
-        fprintf(stderr, "Error pixel format: %s\n", CGLErrorString(error));
+    if (error != kCGLNoError) {
+        throw std::runtime_error(std::string("Error choosing pixel format:") + CGLErrorString(error) + "\n");
+        return;
+    }
+    if (num <= 0) {
+        throw std::runtime_error("No pixel formats found.");
         return;
     }
 #endif
 
 #if MBGL_USE_GLX
     if (!XInitThreads()) {
-        throw std::runtime_error("Failed to XInitThreads");
+        throw std::runtime_error("Failed to XInitThreads.");
     }
 
-    x_display = XOpenDisplay(nullptr);
-    if (x_display == nullptr) {
-        throw std::runtime_error("Failed to open X display");
+    xDisplay = XOpenDisplay(nullptr);
+    if (xDisplay == nullptr) {
+        throw std::runtime_error("Failed to open X display.");
     }
 
-    const char *extensions = (char *)glXQueryServerString(x_display, DefaultScreen(x_display), GLX_EXTENSIONS);
+    const char *extensions = (char *)glXQueryServerString(xDisplay, DefaultScreen(xDisplay), GLX_EXTENSIONS);
     if (!extensions) {
-        throw std::runtime_error("Cannot read GLX extensions");
+        throw std::runtime_error("Cannot read GLX extensions.");
     }
     if (!strstr(extensions,"GLX_SGIX_fbconfig")) {
-        throw std::runtime_error("Extension GLX_SGIX_fbconfig was not found");
+        throw std::runtime_error("Extension GLX_SGIX_fbconfig was not found.");
     }
     if (!strstr(extensions, "GLX_SGIX_pbuffer")) {
-        throw std::runtime_error("Cannot find glXCreateContextAttribsARB");
+        throw std::runtime_error("Cannot find glXCreateContextAttribsARB.");
     }
 
     // We're creating a dummy pbuffer anyway that we're not using.
@@ -52,9 +56,12 @@ HeadlessDisplay::HeadlessDisplay() {
     };
 
     int configs = 0;
-    fb_configs = glXChooseFBConfig(x_display, DefaultScreen(x_display), pixelFormat, &configs);
+    fbConfigs = glXChooseFBConfig(xDisplay, DefaultScreen(xDisplay), pixelFormat, &configs);
+    if (fbConfigs == nullptr) {
+        throw std::runtime_error("Failed to glXChooseFBConfig.");
+    }
     if (configs <= 0) {
-        throw std::runtime_error("No Framebuffer configurations");
+        throw std::runtime_error("No Framebuffer configurations.");
     }
 #endif
 }
@@ -65,10 +72,9 @@ HeadlessDisplay::~HeadlessDisplay() {
 #endif
 
 #if MBGL_USE_GLX
-    XFree(fb_configs);
-    XCloseDisplay(x_display);
+    XFree(fbConfigs);
+    XCloseDisplay(xDisplay);
 #endif
 }
 
 }
-

@@ -65,7 +65,6 @@ void GLFWView::initialize(mbgl::Map *map_) {
     glfwSetScrollCallback(window, scroll);
     glfwSetKeyCallback(window, key);
 
-
     const std::string extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
     {
         using namespace mbgl;
