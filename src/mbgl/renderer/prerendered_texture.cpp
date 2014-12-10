@@ -18,12 +18,12 @@ PrerenderedTexture::~PrerenderedTexture() {
     }
 
     if (fboDepth != 0) {
-        glDeleteRenderbuffers(1, &fboDepth);
+        MBGL_CHECK_ERROR(glDeleteRenderbuffers(1, &fboDepth));
         fboDepth = 0;
     }
 
     if (fboStencil != 0) {
-        glDeleteRenderbuffers(1, &fboStencil);
+        MBGL_CHECK_ERROR(glDeleteRenderbuffers(1, &fboStencil));
         fboStencil = 0;
     }
 
@@ -99,8 +99,8 @@ void PrerenderedTexture::bindFramebuffer() {
             MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fboDepth));
 #endif
         } else {
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fboDepth);
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fboStencil);
+            MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fboDepth));
+            MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fboStencil));
         }
 
         GLenum status = MBGL_CHECK_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
