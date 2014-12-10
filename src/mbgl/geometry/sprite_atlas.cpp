@@ -199,22 +199,22 @@ void SpriteAtlas::setSprite(util::ptr<Sprite> sprite_) {
 void SpriteAtlas::bind(bool linear) {
     bool first = false;
     if (!texture) {
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        CHECK_ERROR(glGenTextures(1, &texture));
+        CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
 #ifndef GL_ES_VERSION_2_0
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+        CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+        CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         first = true;
     } else {
-        glBindTexture(GL_TEXTURE_2D, texture);
+        CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
     }
 
     GLuint filter_val = linear ? GL_LINEAR : GL_NEAREST;
     if (filter_val != filter) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_val);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_val);
+        CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_val));
+        CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_val));
         filter = filter_val;
     }
 
@@ -255,7 +255,7 @@ void SpriteAtlas::bind(bool linear) {
 SpriteAtlas::~SpriteAtlas() {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    glDeleteTextures(1, &texture);
+    CHECK_ERROR(glDeleteTextures(1, &texture));
     texture = 0;
     ::operator delete(data), data = nullptr;
 }

@@ -45,13 +45,13 @@ void Painter::setup() {
     // Enable GL debugging
     if ((gl::DebugMessageControl != nullptr) && (gl::DebugMessageCallback != nullptr)) {
         // This will enable all messages including performance hints
-        gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+        CHECK_ERROR(gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE));
 
         // This will only enable high and medium severity messages
         //gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, GL_TRUE);
         //gl::DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_MEDIUM, 0, nullptr, GL_TRUE);
 
-        gl::DebugMessageCallback(gl::debug_callback, nullptr);
+        CHECK_ERROR(gl::DebugMessageCallback(gl::debug_callback, nullptr));
     }
 
     setupShaders();
@@ -74,17 +74,17 @@ void Painter::setup() {
     // We are blending new pixels on top of old pixels. Since we have depth testing
     // and are drawing opaque fragments first front-to-back, then translucent
     // fragments back-to-front, this shades the fewest fragments possible.
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    CHECK_ERROR(glEnable(GL_BLEND));
+    CHECK_ERROR(glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
 
     // Set clear values
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClearDepth(1.0f);
-    glClearStencil(0x0);
+    CHECK_ERROR(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
+    CHECK_ERROR(glClearDepth(1.0f));
+    CHECK_ERROR(glClearStencil(0x0));
 
     // Stencil test
-    glEnable(GL_STENCIL_TEST);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    CHECK_ERROR(glEnable(GL_STENCIL_TEST));
+    CHECK_ERROR(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
 }
 
 void Painter::setupShaders() {
@@ -125,7 +125,7 @@ void Painter::resize() {
     if (gl_viewport != state.getFramebufferDimensions()) {
         gl_viewport = state.getFramebufferDimensions();
         assert(gl_viewport[0] > 0 && gl_viewport[1] > 0);
-        glViewport(0, 0, gl_viewport[0], gl_viewport[1]);
+        CHECK_ERROR(glViewport(0, 0, gl_viewport[0], gl_viewport[1]));
     }
 }
 
@@ -135,28 +135,28 @@ void Painter::setDebug(bool enabled) {
 
 void Painter::useProgram(uint32_t program) {
     if (gl_program != program) {
-        glUseProgram(program);
+        CHECK_ERROR(glUseProgram(program));
         gl_program = program;
     }
 }
 
 void Painter::lineWidth(float line_width) {
     if (gl_lineWidth != line_width) {
-        glLineWidth(line_width);
+        CHECK_ERROR(glLineWidth(line_width));
         gl_lineWidth = line_width;
     }
 }
 
 void Painter::depthMask(bool value) {
     if (gl_depthMask != value) {
-        glDepthMask(value ? GL_TRUE : GL_FALSE);
+        CHECK_ERROR(glDepthMask(value ? GL_TRUE : GL_FALSE));
         gl_depthMask = value;
     }
 }
 
 void Painter::depthRange(const float near, const float far) {
     if (gl_depthRange[0] != near || gl_depthRange[1] != far) {
-        glDepthRange(near, far);
+        CHECK_ERROR(glDepthRange(near, far));
         gl_depthRange = {{ near, far }};
     }
 }
@@ -179,17 +179,17 @@ void Painter::changeMatrix() {
 
 void Painter::clear() {
     gl::group group("clear");
-    glStencilMask(0xFF);
+    CHECK_ERROR(glStencilMask(0xFF));
     depthMask(true);
 
-    glClearColor(0, 0, 0, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    CHECK_ERROR(glClearColor(0, 0, 0, 0));
+    CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
 void Painter::setOpaque() {
     if (pass != RenderPass::Opaque) {
         pass = RenderPass::Opaque;
-        glDisable(GL_BLEND);
+        CHECK_ERROR(glDisable(GL_BLEND));
         depthMask(true);
     }
 }
@@ -197,7 +197,7 @@ void Painter::setOpaque() {
 void Painter::setTranslucent() {
     if (pass != RenderPass::Translucent) {
         pass = RenderPass::Translucent;
-        glEnable(GL_BLEND);
+        CHECK_ERROR(glEnable(GL_BLEND));
         depthMask(false);
     }
 }
@@ -209,7 +209,7 @@ void Painter::setStrata(float value) {
 void Painter::prepareTile(const Tile& tile) {
     const GLint ref = (GLint)tile.clip.reference.to_ulong();
     const GLuint mask = (GLuint)tile.clip.mask.to_ulong();
-    glStencilFunc(GL_EQUAL, ref, mask);
+    CHECK_ERROR(glStencilFunc(GL_EQUAL, ref, mask));
 }
 
 void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>& sources,
@@ -244,7 +244,7 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
         source->source->finishRender(*this);
     }
 
-    glFlush();
+    CHECK_ERROR(glFlush());
 }
 
 void Painter::renderLayers(util::ptr<StyleLayerGroup> group) {
@@ -427,10 +427,10 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
         backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
     }
 
-    glDisable(GL_STENCIL_TEST);
+    CHECK_ERROR(glDisable(GL_STENCIL_TEST));
     depthRange(strata + strata_epsilon, 1.0f);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glEnable(GL_STENCIL_TEST);
+    CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+    CHECK_ERROR(glEnable(GL_STENCIL_TEST));
 }
 
 mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor) {

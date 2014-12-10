@@ -6,18 +6,18 @@
 using namespace mbgl;
 
 void Painter::preparePrerender(RasterBucket &bucket) {
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_STENCIL_TEST);
+    CHECK_ERROR(glDisable(GL_DEPTH_TEST));
+    CHECK_ERROR(glDisable(GL_STENCIL_TEST));
 
 // Render the actual tile.
 #if GL_EXT_discard_framebuffer
     const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
-    glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+    CHECK_ERROR(glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards));
 #endif
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    CHECK_ERROR(glClearColor(0.0, 0.0, 0.0, 0.0));
+    CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
 
-    glViewport(0, 0, bucket.properties.size, bucket.properties.size);
+    CHECK_ERROR(glViewport(0, 0, bucket.properties.size, bucket.properties.size));
 }
 
 void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties) {
@@ -30,7 +30,7 @@ void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix,
 
     depthRange(strata, 1.0f);
 
-    glActiveTexture(GL_TEXTURE0);
+    CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
     rasterShader->u_image = 0;
     rasterShader->u_buffer = buffer;
     rasterShader->u_opacity = properties.opacity;
@@ -41,5 +41,5 @@ void Painter::renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix,
     rasterShader->u_spin_weights = spinWeights(properties.hue_rotate);
     bucket.texture.bindTexture();
     coveringRasterArray.bind(*rasterShader, tileStencilBuffer, BUFFER_OFFSET(0));
-    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
+    CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index()));
 }

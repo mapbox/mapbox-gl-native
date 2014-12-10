@@ -397,7 +397,7 @@ void SymbolBucket::drawGlyphs(SDFShader &shader) {
     char *elements_index = BUFFER_OFFSET(0);
     for (TextElementGroup &group : text.groups) {
         group.array[0].bind(shader, text.vertices, text.triangles, vertex_index);
-        glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
+        CHECK_ERROR(glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group.vertex_length * text.vertices.itemSize;
         elements_index += group.elements_length * text.triangles.itemSize;
     }
@@ -408,7 +408,7 @@ void SymbolBucket::drawIcons(SDFShader &shader) {
     char *elements_index = BUFFER_OFFSET(0);
     for (IconElementGroup &group : icon.groups) {
         group.array[0].bind(shader, icon.vertices, icon.triangles, vertex_index);
-        glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
+        CHECK_ERROR(glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group.vertex_length * icon.vertices.itemSize;
         elements_index += group.elements_length * icon.triangles.itemSize;
     }
@@ -419,7 +419,7 @@ void SymbolBucket::drawIcons(IconShader &shader) {
     char *elements_index = BUFFER_OFFSET(0);
     for (IconElementGroup &group : icon.groups) {
         group.array[1].bind(shader, icon.vertices, icon.triangles, vertex_index);
-        glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index);
+        CHECK_ERROR(glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group.vertex_length * icon.vertices.itemSize;
         elements_index += group.elements_length * icon.triangles.itemSize;
     }

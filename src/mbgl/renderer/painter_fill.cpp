@@ -76,7 +76,7 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
             patternShader->u_mix = mix;
             patternShader->u_patternmatrix = patternMatrix;
 
-            glActiveTexture(GL_TEXTURE0);
+            CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
             spriteAtlas.bind(true);
 
             // Draw the actual triangles into the color & stencil buffer.

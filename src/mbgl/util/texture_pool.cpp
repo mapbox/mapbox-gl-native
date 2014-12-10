@@ -9,7 +9,7 @@ using namespace mbgl;
 GLuint TexturePool::getTextureID() {
     if (texture_ids.empty()) {
         GLuint new_texture_ids[TextureMax];
-        glGenTextures(TextureMax, new_texture_ids);
+        CHECK_ERROR(glGenTextures(TextureMax, new_texture_ids));
         for (uint32_t id = 0; id < TextureMax; id++) {
             texture_ids.insert(new_texture_ids[id]);
         }
@@ -51,7 +51,7 @@ void TexturePool::clearTextureIDs() {
     }
 
     if (!ids_to_remove.empty()) {
-        glDeleteTextures((GLsizei)ids_to_remove.size(), &ids_to_remove[0]);
+        CHECK_ERROR(glDeleteTextures((GLsizei)ids_to_remove.size(), &ids_to_remove[0]));
     }
 
     texture_ids.clear();

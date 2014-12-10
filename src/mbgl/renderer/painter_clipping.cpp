@@ -10,9 +10,9 @@ void Painter::drawClippingMasks(const std::set<util::ptr<StyleSource>> &sources)
     gl::group group("clipping masks");
 
     useProgram(plainShader->program);
-    glDisable(GL_DEPTH_TEST);
+    CHECK_ERROR(glDisable(GL_DEPTH_TEST));
     depthMask(false);
-    glColorMask(false, false, false, false);
+    CHECK_ERROR(glColorMask(false, false, false, false));
     depthRange(1.0f, 1.0f);
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0));
@@ -21,10 +21,10 @@ void Painter::drawClippingMasks(const std::set<util::ptr<StyleSource>> &sources)
         source->source->drawClippingMasks(*this);
     }
 
-    glEnable(GL_DEPTH_TEST);
-    glColorMask(true, true, true, true);
+    CHECK_ERROR(glEnable(GL_DEPTH_TEST));
+    CHECK_ERROR(glColorMask(true, true, true, true));
     depthMask(true);
-    glStencilMask(0x0);
+    CHECK_ERROR(glStencilMask(0x0));
 }
 
 void Painter::drawClippingMask(const mat4& matrix, const ClipID &clip) {
@@ -32,8 +32,8 @@ void Painter::drawClippingMask(const mat4& matrix, const ClipID &clip) {
 
     const GLint ref = (GLint)(clip.reference.to_ulong());
     const GLuint mask = (GLuint)(clip.mask.to_ulong());
-    glStencilFunc(GL_ALWAYS, ref, mask);
-    glStencilMask(mask);
+    CHECK_ERROR(glStencilFunc(GL_ALWAYS, ref, mask));
+    CHECK_ERROR(glStencilMask(mask));
 
-    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index());
+    CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index()));
 }

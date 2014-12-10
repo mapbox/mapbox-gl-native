@@ -8,7 +8,7 @@ VertexArrayObject::~VertexArrayObject() {
     if (!gl::DeleteVertexArrays) return;
 
     if (vao) {
-        gl::DeleteVertexArrays(1, &vao);
+        CHECK_ERROR(gl::DeleteVertexArrays(1, &vao));
     }
 }
 
@@ -23,9 +23,9 @@ void VertexArrayObject::bindVertexArrayObject() {
     }
 
     if (!vao) {
-        gl::GenVertexArrays(1, &vao);
+        CHECK_ERROR(gl::GenVertexArrays(1, &vao));
     }
-    gl::BindVertexArray(vao);
+    CHECK_ERROR(gl::BindVertexArray(vao));
 }
 
 void VertexArrayObject::verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer,
