@@ -13,7 +13,7 @@ PrerenderedTexture::PrerenderedTexture(const StyleBucketRaster &properties_)
 
 PrerenderedTexture::~PrerenderedTexture() {
     if (texture != 0) {
-        glDeleteTextures(1, &texture);
+        MBGL_CHECK_ERROR(glDeleteTextures(1, &texture));
         texture = 0;
     }
 
@@ -28,7 +28,7 @@ PrerenderedTexture::~PrerenderedTexture() {
     }
 
     if (fbo != 0) {
-        glDeleteFramebuffers(1, &fbo);
+        MBGL_CHECK_ERROR(glDeleteFramebuffers(1, &fbo));
         fbo = 0;
     }
 }
@@ -40,70 +40,70 @@ void PrerenderedTexture::bindTexture() {
         unbindFramebuffer();
     }
 
-    glBindTexture(GL_TEXTURE_2D, texture);
+    MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
 }
 
 void PrerenderedTexture::bindFramebuffer() {
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFbo);
+    MBGL_CHECK_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFbo));
 
     if (texture == 0) {
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        MBGL_CHECK_ERROR(glGenTextures(1, &texture));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
 #ifndef GL_ES_VERSION_2_0
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, properties.size, properties.size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        MBGL_CHECK_ERROR(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+        MBGL_CHECK_ERROR(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+        MBGL_CHECK_ERROR(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+        MBGL_CHECK_ERROR(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+        MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, properties.size, properties.size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
     }
 
     if (fboDepth == 0) {
         // Create depth buffer
-        glGenRenderbuffers(1, &fboDepth);
-        glBindRenderbuffer(GL_RENDERBUFFER, fboDepth);
+        MBGL_CHECK_ERROR(glGenRenderbuffers(1, &fboDepth));
+        MBGL_CHECK_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, fboDepth));
         if (gl::isPackedDepthStencilSupported) {
-            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, properties.size, properties.size);
+            MBGL_CHECK_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, properties.size, properties.size));
         } else {
             if (gl::isDepth24Supported) {
-                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, properties.size, properties.size);
+                MBGL_CHECK_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, properties.size, properties.size));
             } else {
-                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, properties.size, properties.size);
+                MBGL_CHECK_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, properties.size, properties.size));
             }
         }
 
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        MBGL_CHECK_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, 0));
     }
 
     if (!gl::isPackedDepthStencilSupported && (fboStencil == 0)) {
         // Create stencil buffer
-        glGenRenderbuffers(1, &fboStencil);
-        glBindRenderbuffer(GL_RENDERBUFFER, fboStencil);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, properties.size, properties.size);
+        MBGL_CHECK_ERROR(glGenRenderbuffers(1, &fboStencil));
+        MBGL_CHECK_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, fboStencil));
+        MBGL_CHECK_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, properties.size, properties.size));
 
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        MBGL_CHECK_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, 0));
     }
 
     if (fbo == 0) {
-        glGenFramebuffers(1, &fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+        MBGL_CHECK_ERROR(glGenFramebuffers(1, &fbo));
+        MBGL_CHECK_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
+        MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0));
 
         if (gl::isPackedDepthStencilSupported) {
 #ifdef GL_ES_VERSION_2_0
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fboDepth);
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fboDepth);
+            MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fboDepth));
+            MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fboDepth));
 #else
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fboDepth);
+            MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fboDepth));
 #endif
         } else {
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fboDepth);
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fboStencil);
         }
 
-        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        GLenum status = MBGL_CHECK_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "Couldn't create framebuffer: ");
             switch (status) {
@@ -120,15 +120,15 @@ void PrerenderedTexture::bindFramebuffer() {
             return;
         }
     } else {
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        MBGL_CHECK_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
     }
 }
 
 void PrerenderedTexture::unbindFramebuffer() {
-    glBindFramebuffer(GL_FRAMEBUFFER, previousFbo);
+    MBGL_CHECK_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, previousFbo));
 
     if (fbo != 0) {
-        glDeleteFramebuffers(1, &fbo);
+        MBGL_CHECK_ERROR(glDeleteFramebuffers(1, &fbo));
         fbo = 0;
     }
 }
@@ -138,49 +138,48 @@ void PrerenderedTexture::blur(Painter& painter, uint16_t passes) {
 
     // Create a secondary texture
     GLuint secondaryTexture;
-    glGenTextures(1, &secondaryTexture);
-    glBindTexture(GL_TEXTURE_2D, secondaryTexture);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, properties.size, properties.size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
+    MBGL_CHECK_ERROR(glGenTextures(1, &secondaryTexture));
+    MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, secondaryTexture));
+    MBGL_CHECK_ERROR(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    MBGL_CHECK_ERROR(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+    MBGL_CHECK_ERROR(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    MBGL_CHECK_ERROR(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+    MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, properties.size, properties.size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
+    MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
 
     painter.useProgram(painter.gaussianShader->program);
     painter.gaussianShader->u_matrix = painter.flipMatrix;
     painter.gaussianShader->u_image = 0;
-    glActiveTexture(GL_TEXTURE0);
+    MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
 
     for (int i = 0; i < passes; i++) {
         // Render horizontal
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, secondaryTexture, 0);
-#if GL_EXT_discard_framebuffer && !__ANDROID__
+        MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, secondaryTexture, 0));
+#if GL_EXT_discard_framebuffer
         const GLenum discards[] = { GL_COLOR_ATTACHMENT0 };
-        glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+        MBGL_CHECK_ERROR(glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards));
 #endif
-        glClear(GL_COLOR_BUFFER_BIT);
+        MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
 
         painter.gaussianShader->u_offset = {{ 1.0f / float(properties.size), 0 }};
-        glBindTexture(GL_TEXTURE_2D, originalTexture);
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, originalTexture));
         painter.coveringGaussianArray.bind(*painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
-        glDrawArrays(GL_TRIANGLES, 0, (GLsizei)painter.tileStencilBuffer.index());
+        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)painter.tileStencilBuffer.index()));
 
 
 
         // Render vertical
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, originalTexture, 0);
-#if GL_EXT_discard_framebuffer && !__ANDROID__
-        glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+        MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, originalTexture, 0));
+#if GL_EXT_discard_framebuffer
+        MBGL_CHECK_ERROR(glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards));
 #endif
-        glClear(GL_COLOR_BUFFER_BIT);
+        MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
 
         painter.gaussianShader->u_offset = {{ 0, 1.0f / float(properties.size) }};
-        glBindTexture(GL_TEXTURE_2D, secondaryTexture);
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, secondaryTexture));
         painter.coveringGaussianArray.bind(*painter.gaussianShader, painter.tileStencilBuffer, BUFFER_OFFSET(0));
-        glDrawArrays(GL_TRIANGLES, 0, (GLsizei)painter.tileStencilBuffer.index());
+        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)painter.tileStencilBuffer.index()));
     }
 
-    glDeleteTextures(1, &secondaryTexture);
+    MBGL_CHECK_ERROR(glDeleteTextures(1, &secondaryTexture));
 }

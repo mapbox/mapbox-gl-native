@@ -57,18 +57,18 @@ void HeadlessView::loadExtensions() {
     if (usingGl3OrNewer) {
 #ifdef GL_VERSION_3_0
         GLuint num_extensions = 0;
-        glGetIntegerv(GL_NUM_EXTENSIONS, reinterpret_cast<GLint *>(&num_extensions));
+        MBGL_CHECK_ERROR(glGetIntegerv(GL_NUM_EXTENSIONS, reinterpret_cast<GLint *>(&num_extensions)));
         for (GLuint i = 0; i < num_extensions; i++) {
-            extensions.append(reinterpret_cast<const char *>(glGetStringi(GL_EXTENSIONS, i)));
+            std::string extension = MBGL_CHECK_ERROR(reinterpret_cast<const char *>(glGetStringi(GL_EXTENSIONS, i)));
+            extensions.append(extension);
             extensions.append(" ");
         }
 #else
         throw std::runtime_error("Using GL 3.0+ context with out correct headers.\n");
 #endif
     } else {
-        extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
+        extensions = MBGL_CHECK_ERROR(reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
     }
-
 
 #ifdef MBGL_USE_CGL
     if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
@@ -229,23 +229,23 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
     make_active();
 
     // Create depth/stencil buffer
-    glGenRenderbuffersEXT(1, &fboDepthStencil);
-    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fboDepthStencil);
-    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, w, h);
-    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+    MBGL_CHECK_ERROR(glGenRenderbuffersEXT(1, &fboDepthStencil));
+    MBGL_CHECK_ERROR(glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fboDepthStencil));
+    MBGL_CHECK_ERROR(glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, w, h));
+    MBGL_CHECK_ERROR(glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0));
 
-    glGenRenderbuffersEXT(1, &fboColor);
-    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fboColor);
-    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_RGBA8, w, h);
-    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+    MBGL_CHECK_ERROR(glGenRenderbuffersEXT(1, &fboColor));
+    MBGL_CHECK_ERROR(glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fboColor));
+    MBGL_CHECK_ERROR(glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_RGBA8, w, h));
+    MBGL_CHECK_ERROR(glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0));
 
-    glGenFramebuffersEXT(1, &fbo);
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+    MBGL_CHECK_ERROR(glGenFramebuffersEXT(1, &fbo));
+    MBGL_CHECK_ERROR(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo));
 
-    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, fboColor);
-    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER_EXT, fboDepthStencil);
+    MBGL_CHECK_ERROR(glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, fboColor));
+    MBGL_CHECK_ERROR(glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER_EXT, fboDepthStencil));
 
-    GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+    GLenum status = MBGL_CHECK_ERROR(glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT));
 
     if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
         std::stringstream error("Couldn't create framebuffer: ");
@@ -272,7 +272,7 @@ std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
     auto pixels = util::make_unique<uint32_t[]>(w * h);
 
     make_active();
-    glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
+    MBGL_CHECK_ERROR(glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get()));
     make_inactive();
 
     const int stride = w * 4;
@@ -290,20 +290,20 @@ std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
 void HeadlessView::clear_buffers() {
     make_active();
 
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    MBGL_CHECK_ERROR(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0));
 
     if (fbo) {
-        glDeleteFramebuffersEXT(1, &fbo);
+        MBGL_CHECK_ERROR(glDeleteFramebuffersEXT(1, &fbo));
         fbo = 0;
     }
 
     if (fboColor) {
-        glDeleteTextures(1, &fboColor);
+        MBGL_CHECK_ERROR(glDeleteTextures(1, &fboColor));
         fboColor = 0;
     }
 
     if (fboDepthStencil) {
-        glDeleteRenderbuffersEXT(1, &fboDepthStencil);
+        MBGL_CHECK_ERROR(glDeleteRenderbuffersEXT(1, &fboDepthStencil));
         fboDepthStencil = 0;
     }
 

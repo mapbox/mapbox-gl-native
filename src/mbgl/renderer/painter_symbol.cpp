@@ -118,7 +118,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
 
     const SymbolProperties &properties = layer_desc->getProperties<SymbolProperties>();
 
-    glDisable(GL_STENCIL_TEST);
+    MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));
 
     if (bucket.hasIconData()) {
         bool sdf = bucket.sdfIcons;
@@ -204,5 +204,5 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
                   &SymbolBucket::drawGlyphs);
     }
 
-    glEnable(GL_STENCIL_TEST);
+    MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
 }

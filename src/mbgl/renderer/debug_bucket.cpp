@@ -23,10 +23,10 @@ bool DebugBucket::hasData() const {
 
 void DebugBucket::drawLines(PlainShader& shader) {
     array.bind(shader, fontBuffer, BUFFER_OFFSET(0));
-    glDrawArrays(GL_LINES, 0, (GLsizei)(fontBuffer.index()));
+    MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, (GLsizei)(fontBuffer.index())));
 }
 
 void DebugBucket::drawPoints(PlainShader& shader) {
     array.bind(shader, fontBuffer, BUFFER_OFFSET(0));
-    glDrawArrays(GL_POINTS, 0, (GLsizei)(fontBuffer.index()));
+    MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, (GLsizei)(fontBuffer.index())));
 }

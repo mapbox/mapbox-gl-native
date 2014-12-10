@@ -19,10 +19,10 @@ GaussianShader::GaussianShader()
         return;
     }
 
-    a_pos = glGetAttribLocation(program, "a_pos");
+    a_pos = MBGL_CHECK_ERROR(glGetAttribLocation(program, "a_pos"));
 }
 
 void GaussianShader::bind(char *offset) {
-    glEnableVertexAttribArray(a_pos);
-    glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset);
+    MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
+    MBGL_CHECK_ERROR(glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset));
 }
