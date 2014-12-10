@@ -4,6 +4,7 @@
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/version.hpp>
 
 #ifdef __ANDROID__
     #include <mbgl/android/jni.hpp>
@@ -13,6 +14,8 @@
 
 #include <uv.h>
 #include <curl/curl.h>
+
+#include <sys/utsname.h>
 
 #include <queue>
 #include <cassert>
@@ -509,9 +512,22 @@ static CURLcode sslctx_function(CURL */*curl*/, void *sslctx, void */*parm*/) {
 }
 #endif
 
+std::string buildUserAgentString() {
+#ifdef __ANDROID__
+    return util::sprintf<128>("MapboxGL/%d.%d.%d (+https://mapbox.com/mapbox-gl/; %s; %s %s)",
+        version::major, version::minor, version::patch, version::revision, "Android", mbgl::android::androidRelease.c_str());
+#else
+    utsname name;
+    uname(&name);
+    return util::sprintf<128>("MapboxGL/%d.%d.%d (+https://mapbox.com/mapbox-gl/; %s; %s %s)",
+        version::major, version::minor, version::patch, version::revision, name.sysname, name.release);
+#endif
+}
+
 // This function must run in the CURL thread.
 void start_request(void *const ptr) {
     assert(std::this_thread::get_id() == thread_id);
+    static const std::string userAgent = buildUserAgentString();
 
     // The Context object stores information that we need to retain throughout the request, such
     // as the actual CURL easy handle, the baton, and the list of headers. The Context itself is
@@ -553,6 +569,8 @@ void start_request(void *const ptr) {
     curl_easy_setopt(context->handle, CURLOPT_HEADERFUNCTION, curl_header_cb);
     curl_easy_setopt(context->handle, CURLOPT_HEADERDATA, &context->baton->response);
     curl_easy_setopt(context->handle, CURLOPT_ACCEPT_ENCODING, "gzip, deflate");
+    curl_easy_setopt(context->handle, CURLOPT_USERAGENT, userAgent.c_str());
+    curl_easy_setopt(context->handle, CURLOPT_SHARE, share);
 
     // Start requesting the information.
     curl_multi_add_handle(multi, context->handle);

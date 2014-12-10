@@ -8,7 +8,6 @@ namespace mbgl {
 namespace util {
 
 extern const float tileSize;
-
 }
 
 namespace debug {

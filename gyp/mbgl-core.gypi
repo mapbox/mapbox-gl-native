@@ -7,6 +7,7 @@
       'hard_dependency': 1,
       'dependencies': [
           'shaders',
+          'version',
       ],
       'variables': {
         'cflags_cc': [

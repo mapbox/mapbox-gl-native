@@ -2,6 +2,7 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/parsedate.h>
 #include <mbgl/util/time.hpp>
+#include <mbgl/util/version.hpp>
 
 #include <uv.h>
 
@@ -13,6 +14,8 @@ namespace mbgl {
 
 dispatch_once_t request_initialize = 0;
 NSURLSession *session = nullptr;
+
+NSString *userAgent = nil;
 
 void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
     assert(std::this_thread::get_id() == ptr->threadId);
@@ -28,6 +31,14 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
         sessionConfig.URLCache = nil;
 
         session = [NSURLSession sessionWithConfiguration:sessionConfig];
+
+        // Write user agent string
+        NSDictionary *systemVersion = [NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"];
+        userAgent = [NSString stringWithFormat:@"MapboxGL/%d.%d.%d (+https://mapbox.com/mapbox-gl/; %s; %@ %@)",
+            version::major, version::minor, version::patch, version::revision,
+            [systemVersion objectForKey:@"ProductName"],
+            [systemVersion objectForKey:@"ProductVersion"]
+        ];
     });
 
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@(baton->path.c_str())]];
@@ -39,6 +50,8 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
             [request addValue:@(time.c_str()) forHTTPHeaderField:@"If-Modified-Since"];
         }
     }
+
+    [request addValue:userAgent forHTTPHeaderField:@"User-Agent"];
 
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
                                             completionHandler:^(NSData *data, NSURLResponse *res, NSError *error) {
