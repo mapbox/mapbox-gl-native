@@ -2,6 +2,7 @@
 #define MBGL_RENDERER_GL
 
 #include <string>
+#include <stdexcept>
 
 #if __APPLE__
     #include "TargetConditionals.h"
@@ -28,6 +29,12 @@
 
 namespace mbgl {
 namespace gl {
+
+struct Error : ::std::runtime_error {
+    inline Error(GLenum err, const std::string &msg) : ::std::runtime_error(msg), code(err) {};
+    const GLenum code;
+};
+
 
 // GL_KHR_debug / GL_ARB_debug_output
 #define GL_DEBUG_OUTPUT_SYNCHRONOUS       0x8242
