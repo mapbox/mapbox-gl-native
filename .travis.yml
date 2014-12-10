@@ -46,6 +46,8 @@ env:
    - TERM=dumb
 
 before_install:
+- sudo service mysqld stop
+- sudo service postgresql stop
 - sudo ps aux
 - source ./scripts/local_mason.sh
 - source ./scripts/travis_helper.sh
