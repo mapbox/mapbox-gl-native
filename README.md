@@ -153,7 +153,7 @@ Run:
 
     make android
 
-You can then open `android/java` in Android Studio.
+You can then open `android/java` in Android Studio via "Import Non-Android Studio Project".
 
 # Troubleshooting
 
