@@ -73,7 +73,7 @@ void GLFWView::initialize(mbgl::Map *map_) {
     glfwSetScrollCallback(window, scroll);
     glfwSetKeyCallback(window, key);
 
-    const std::string extensions = (char *)CHECK_ERROR(glGetString(GL_EXTENSIONS));
+    const std::string extensions = (char *)MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS));
     {
         using namespace mbgl;
 
@@ -353,9 +353,9 @@ void show_debug_image(std::string name, const char *data, size_t width, size_t h
     glfwGetFramebufferSize(debug_window, &fb_width, &fb_height);
     float scale = (float)fb_width / (float)width;
 
-    CHECK_ERROR(glPixelZoom(scale, -scale));
-    CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
-    CHECK_ERROR(glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data));
+    MBGL_CHECK_ERROR(glPixelZoom(scale, -scale));
+    MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
+    MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data));
     glfwSwapBuffers(debug_window);
 
     glfwMakeContextCurrent(current_window);
@@ -385,13 +385,13 @@ void show_color_debug_image(std::string name, const char *data, size_t logical_w
     float x_scale = (float)fb_width / (float)width;
     float y_scale = (float)fb_height / (float)height;
 
-    CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
-    CHECK_ERROR(glEnable(GL_BLEND));
-    CHECK_ERROR(glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
+    MBGL_CHECK_ERROR(glEnable(GL_BLEND));
+    MBGL_CHECK_ERROR(glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-    CHECK_ERROR(glPixelZoom(x_scale, -y_scale));
-    CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
-    CHECK_ERROR(glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data));
+    MBGL_CHECK_ERROR(glPixelZoom(x_scale, -y_scale));
+    MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
+    MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data));
     glfwSwapBuffers(debug_window);
 
     glfwMakeContextCurrent(current_window);

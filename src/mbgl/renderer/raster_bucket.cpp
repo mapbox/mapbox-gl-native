@@ -21,14 +21,14 @@ void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices
     raster.bind(true);
     shader.u_image = 0;
     array.bind(shader, vertices, BUFFER_OFFSET(0));
-    CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index()));
+    MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index()));
 }
 
 void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array, GLuint texture_) {
     raster.bind(texture_);
     shader.u_image = 0;
     array.bind(shader, vertices, BUFFER_OFFSET(0));
-    CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index()));
+    MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index()));
 }
 
 bool RasterBucket::hasData() const {

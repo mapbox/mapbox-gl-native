@@ -44,10 +44,10 @@ void Painter::renderRaster(RasterBucket& bucket, util::ptr<StyleLayer> layer_des
 
             bucket.texture.unbindFramebuffer();
 
-            CHECK_ERROR(glEnable(GL_DEPTH_TEST));
-            CHECK_ERROR(glEnable(GL_STENCIL_TEST));
+            MBGL_CHECK_ERROR(glEnable(GL_DEPTH_TEST));
+            MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
 
-            CHECK_ERROR(glViewport(0, 0, gl_viewport[0], gl_viewport[1]));
+            MBGL_CHECK_ERROR(glViewport(0, 0, gl_viewport[0], gl_viewport[1]));
 
         }
 

@@ -21,7 +21,7 @@ public:
     ~Buffer() {
         cleanup();
         if (buffer != 0) {
-            CHECK_ERROR(glDeleteBuffers(1, &buffer));
+            MBGL_CHECK_ERROR(glDeleteBuffers(1, &buffer));
             buffer = 0;
         }
     }
@@ -39,16 +39,16 @@ public:
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
     void bind(bool force = false) {
         if (buffer == 0) {
-            CHECK_ERROR(glGenBuffers(1, &buffer));
+            MBGL_CHECK_ERROR(glGenBuffers(1, &buffer));
             force = true;
         }
-        CHECK_ERROR(glBindBuffer(bufferType, buffer));
+        MBGL_CHECK_ERROR(glBindBuffer(bufferType, buffer));
         if (force) {
             if (array == nullptr) {
                 throw std::runtime_error("Buffer was already deleted or doesn't contain elements");
             }
 
-            CHECK_ERROR(glBufferData(bufferType, pos, array, GL_STATIC_DRAW));
+            MBGL_CHECK_ERROR(glBufferData(bufferType, pos, array, GL_STATIC_DRAW));
             if (!retainAfterUpload) {
                 cleanup();
             }

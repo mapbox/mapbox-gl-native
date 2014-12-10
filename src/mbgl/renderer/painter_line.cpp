@@ -55,7 +55,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 #if defined(GL_ES_VERSION_2_0)
         linejoinShader->u_size = pointSize;
 #else
-        CHECK_ERROR(glPointSize(pointSize));
+        MBGL_CHECK_ERROR(glPointSize(pointSize));
 #endif
         bucket.drawPoints(*linejoinShader);
     }
@@ -80,7 +80,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linepatternShader->u_fade = fade;
 
         spriteAtlas.bind(true);
-        CHECK_ERROR(glDepthRange(strata + strata_epsilon, 1.0f));  // may or may not matter
+        MBGL_CHECK_ERROR(glDepthRange(strata + strata_epsilon, 1.0f));  // may or may not matter
 
         bucket.drawLinePatterns(*linepatternShader);
 

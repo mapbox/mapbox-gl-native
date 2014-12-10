@@ -142,22 +142,22 @@ void GlyphAtlas::removeGlyphs(uint64_t tile_id) {
 
 void GlyphAtlas::bind() {
     if (!texture) {
-        CHECK_ERROR(glGenTextures(1, &texture));
-        CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
+        MBGL_CHECK_ERROR(glGenTextures(1, &texture));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
 #ifndef GL_ES_VERSION_2_0
-        CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
-        CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-        CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-        CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-        CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     } else {
-        CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
     }
 
     if (dirty) {
         std::lock_guard<std::mutex> lock(mtx);
-        CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data.get()));
+        MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data.get()));
         dirty = false;
 
 #if defined(DEBUG)

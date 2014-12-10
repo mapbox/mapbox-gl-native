@@ -172,6 +172,9 @@ struct group {
     inline group(const std::string &str) { start_group(str); }
     ~group() { end_group(); };
 };
+
+void checkError(const char *cmd, const char *file, int line);
+
 }
 }
 
@@ -180,12 +183,10 @@ struct group {
     #define glDepthRange glDepthRangef
 #endif
 
-void _CHECK_GL_ERROR(const char *cmd, const char *file, int line);
-
-#define _CHECK_ERROR(cmd, file, line) \
-    cmd; \
-    do { _CHECK_GL_ERROR(#cmd, file, line); } while (false);
-
-#define CHECK_ERROR(cmd) _CHECK_ERROR(cmd, __FILE__, __LINE__)
+#if defined(DEBUG)
+#define MBGL_CHECK_ERROR(cmd) ([&]() { struct _ { inline ~_() { ::mbgl::gl::checkError(#cmd, __FILE__, __LINE__); } } _; return cmd; }())
+#else
+#define MBGL_CHECK_ERROR(cmd) (cmd)
+#endif
 
 #endif
