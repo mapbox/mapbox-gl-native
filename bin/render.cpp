@@ -35,6 +35,7 @@ int main(int argc, char *argv[]) {
     int height = 256;
     double pixelRatio = 1.0;
     std::string output = "out.png";
+    std::string cache = "cache.sqlite";
     std::vector<std::string> classes;
     std::string token;
 
@@ -50,6 +51,7 @@ int main(int argc, char *argv[]) {
         ("class,c", po::value(&classes)->value_name("name"), "Class name")
         ("token,t", po::value(&token)->value_name("key")->default_value(token), "Mapbox access token")
         ("output,o", po::value(&output)->value_name("file")->default_value(output), "Output file name")
+        ("cache,d", po::value(&cache)->value_name("file")->default_value(cache), "Cache database file name")
     ;
 
     try {
@@ -72,7 +74,7 @@ int main(int argc, char *argv[]) {
     Log::Set<StderrLogBackend>();
 #endif
 
-    CachingHTTPFileSource fileSource("");
+    CachingHTTPFileSource fileSource(cache);
 
     // Try to load the token from the environment.
     if (!token.size()) {
