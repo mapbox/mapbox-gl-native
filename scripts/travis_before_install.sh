@@ -42,7 +42,7 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
 
         echo "installing SDK"
         sudo apt-get update -y
-        sudo apt-get -y install lib32stdc++6 lib32z1 jq
+        sudo apt-get -y install lib32stdc++6 lib32z1
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
 
         echo "inserting access token"
