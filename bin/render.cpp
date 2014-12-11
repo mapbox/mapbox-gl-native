@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
 
     po::options_description desc("Allowed options");
     desc.add_options()
-        ("style,s", po::value(&style_path)->required()->value_name("json")->default_value(style_path),"Map stylesheet")
+        ("style,s", po::value(&style_path)->required()->value_name("json"), "Map stylesheet")
         ("lon,x", po::value(&lon)->value_name("degrees")->default_value(lon), "Longitude")
         ("lat,y", po::value(&lat)->value_name("degrees")->default_value(lat), "Latitude in degrees")
         ("zoom,z", po::value(&zoom)->value_name("number")->default_value(zoom), "Zoom level")
