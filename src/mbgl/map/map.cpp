@@ -91,6 +91,7 @@ Map::Map(View& view_, FileSource& fileSource_)
       view(view_),
 #ifndef NDEBUG
       mainThread(std::this_thread::get_id()),
+      mapThread(mainThread),
 #endif
       transform(view_),
       fileSource(fileSource_),
@@ -119,6 +120,7 @@ Map::~Map() {
     style.reset();
     texturePool.reset();
     workers.reset();
+    fileSource.clearLoop();
 
     uv_run(**loop, UV_RUN_DEFAULT);
 }
