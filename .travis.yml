@@ -46,8 +46,8 @@ env:
    - TERM=dumb
 
 before_install:
-- sudo service mysql stop
-- sudo service postgresql stop
+- if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then sudo service mysql stop; fi
+- if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then sudo service postgresql stop; fi
 - source ./scripts/local_mason.sh
 - source ./scripts/travis_helper.sh
 - source ./scripts/flags.sh
