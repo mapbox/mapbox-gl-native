@@ -48,7 +48,6 @@ env:
 before_install:
 - sudo service mysql stop
 - sudo service postgresql stop
-- sudo ps aux
 - source ./scripts/local_mason.sh
 - source ./scripts/travis_helper.sh
 - source ./scripts/flags.sh
@@ -57,8 +56,8 @@ before_install:
 - if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then export JAVA_HOME="$(pwd)/jdk1.7.0_71"; fi
 - export ANDROID_HOME="$(pwd)/android-sdk"
 - ./scripts/travis_before_install.sh
-- if [[ ${TRAVIS_OS_NAME} == "linux" && ${MASON_PLATFORM} != "android"]]; then export LD_LIBRARY_PATH=`mason prefix mesa 10.3.1`/lib; fi
-- if [[ ${TRAVIS_OS_NAME} == "linux" && ${MASON_PLATFORM} != "android"]]; then glxinfo; fi
+- if [[ ${TRAVIS_OS_NAME} == "linux" && ${MASON_PLATFORM} != "android" ]]; then export LD_LIBRARY_PATH=`mason prefix mesa 10.3.1`/lib; fi
+- if [[ ${TRAVIS_OS_NAME} == "linux" && ${MASON_PLATFORM} != "android" ]]; then glxinfo; fi
 
 install:
 - make config.gypi

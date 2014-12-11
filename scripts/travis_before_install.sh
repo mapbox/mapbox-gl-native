@@ -62,6 +62,8 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         echo "chmod NDK"
         chmod a+x ./android-ndk-r10c-darwin-x86_64.bin
 
+        sudo ps aux
+
         echo "unpacking NDK"
         $SEVEN_ZIP_PATH x ./android-ndk-r10c-darwin-x86_64.bin > .tmp-ndk-log
         rm .tmp-ndk-log
