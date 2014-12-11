@@ -19,6 +19,10 @@ class Sprite;
 class SpritePosition;
 
 struct SpriteAtlasPosition {
+    inline SpriteAtlasPosition(const std::array<float, 2> size_ = {{0, 0}},
+                               const std::array<float, 2> tl_ = {{0, 0}},
+                               const std::array<float, 2> br_ = {{0, 0}})
+        : size(size_), tl(tl_), br(br_) {}
     std::array<float, 2> size;
     std::array<float, 2> tl;
     std::array<float, 2> br;
