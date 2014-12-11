@@ -79,7 +79,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linepatternShader->u_pattern_br = imagePos.br;
         linepatternShader->u_fade = fade;
 
-        glActiveTexture(GL_TEXTURE0);
+        MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
         spriteAtlas.bind(true);
         MBGL_CHECK_ERROR(glDepthRange(strata + strata_epsilon, 1.0f));  // may or may not matter
 
