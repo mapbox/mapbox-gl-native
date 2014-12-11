@@ -34,21 +34,22 @@ int main(int argc, char *argv[]) {
     int width = 256;
     int height = 256;
     double pixelRatio = 1.0;
-    const char *output = "out.png";
+    std::string output = "out.png";
     std::vector<std::string> classes;
     std::string token;
 
     po::options_description desc("Allowed options");
     desc.add_options()
-        ("style,s", po::value(&style_path)->required()->value_name("json"),"Map stylesheet")
-        ("lon,x", po::value(&lon)->value_name("degrees"), "Longitude")
-        ("lat,y", po::value(&lat)->value_name("degrees"), "Latitude in degrees")
-        ("zoom,z", po::value(&zoom)->value_name("number"), "Zoom level")
-        ("bearing,b", po::value(&bearing)->value_name("degrees"), "Bearing")
-        ("width,w", po::value(&width)->value_name("pixels"), "Image width")
-        ("height,h", po::value(&height)->value_name("pixels"), "Image height")
+        ("style,s", po::value(&style_path)->required()->value_name("json")->default_value(style_path),"Map stylesheet")
+        ("lon,x", po::value(&lon)->value_name("degrees")->default_value(lon), "Longitude")
+        ("lat,y", po::value(&lat)->value_name("degrees")->default_value(lat), "Latitude in degrees")
+        ("zoom,z", po::value(&zoom)->value_name("number")->default_value(zoom), "Zoom level")
+        ("bearing,b", po::value(&bearing)->value_name("degrees")->default_value(bearing), "Bearing")
+        ("width,w", po::value(&width)->value_name("pixels")->default_value(width), "Image width")
+        ("height,h", po::value(&height)->value_name("pixels")->default_value(height), "Image height")
         ("class,c", po::value(&classes)->value_name("name"), "Class name")
-        ("token,t", po::value(&token)->value_name("key"), "Mapbox access token")
+        ("token,t", po::value(&token)->value_name("key")->default_value(token), "Mapbox access token")
+        ("output,o", po::value(&output)->value_name("file")->default_value(output), "Output file name")
     ;
 
     try {
