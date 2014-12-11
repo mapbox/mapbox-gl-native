@@ -3,7 +3,9 @@
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     export DISPLAY=:99.0
 
-    sh -e /etc/init.d/xvfb start
+    if [[ ${MASON_PLATFORM} != "android" ]]; then
+        sh -e /etc/init.d/xvfb start
+    fi
 
     # use g++ that supports c++11
     if [[ ${CXX} == "g++" ]]; then

@@ -48,7 +48,7 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         echo "inserting access token"
         sed -i "s/access token goes here/${ANDROID_KEY}/g" android/java/app/src/main/java/com/mapbox/mapboxgl/app/MapFragment.java
 
-elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
+    elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
         echo "installing 7z"
         MASON_PLATFORM= ./.mason/mason install 7z 9.20
@@ -104,15 +104,17 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
                             libboost1.55-dev libcurl4-openssl-dev \
                             libpng-dev libsqlite3-dev
 
-    echo "install_opengl"
-    sudo apt-get -y install mesa-utils libxi-dev x11proto-randr-dev \
-                            x11proto-xext-dev libxrandr-dev \
-                            x11proto-xf86vidmode-dev libxxf86vm-dev \
-                            libxcursor-dev libxinerama-dev \
-                            llvm-3.4 # required for mesa
+    if [[ ${MASON_PLATFORM} != "android" ]]; then
+        echo "install_opengl"
+        sudo apt-get -y install mesa-utils libxi-dev x11proto-randr-dev \
+                                x11proto-xext-dev libxrandr-dev \
+                                x11proto-xf86vidmode-dev libxxf86vm-dev \
+                                libxcursor-dev libxinerama-dev \
+                                llvm-3.4 # required for mesa
 
-    echo "install_mesa"
-    MASON_PLATFORM= mason install mesa 10.3.1
+        echo "install_mesa"
+        MASON_PLATFORM= mason install mesa 10.3.1
+    fi
 
     echo "install_awscli"
     sudo pip install awscli

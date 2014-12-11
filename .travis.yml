@@ -57,8 +57,8 @@ before_install:
 - if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then export JAVA_HOME="$(pwd)/jdk1.7.0_71"; fi
 - export ANDROID_HOME="$(pwd)/android-sdk"
 - ./scripts/travis_before_install.sh
-- if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then export LD_LIBRARY_PATH=`mason prefix mesa 10.3.1`/lib; fi
-- if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then glxinfo; fi
+- if [[ ${TRAVIS_OS_NAME} == "linux" && ${MASON_PLATFORM} != "android"]]; then export LD_LIBRARY_PATH=`mason prefix mesa 10.3.1`/lib; fi
+- if [[ ${TRAVIS_OS_NAME} == "linux" && ${MASON_PLATFORM} != "android"]]; then glxinfo; fi
 
 install:
 - make config.gypi
