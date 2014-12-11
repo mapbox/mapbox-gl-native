@@ -61,7 +61,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
     }
 
     if (properties.image.size()) {
-        SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image);
+        SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image, true);
 
         float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
         float fade = std::fmod(state.getZoom(), 1.0);
@@ -79,6 +79,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linepatternShader->u_pattern_br = imagePos.br;
         linepatternShader->u_fade = fade;
 
+        glActiveTexture(GL_TEXTURE0);
         spriteAtlas.bind(true);
         MBGL_CHECK_ERROR(glDepthRange(strata + strata_epsilon, 1.0f));  // may or may not matter
 

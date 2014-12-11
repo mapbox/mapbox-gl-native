@@ -77,15 +77,12 @@ void copy_bitmap(const uint32_t *src, const int src_stride, const int src_x, con
     }
 }
 
-Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t pixel_width, size_t pixel_height) {
-    uint16_t pack_width = pixel_width + buffer * 2;
-    uint16_t pack_height = pixel_height + buffer * 2;
-
+Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width, const size_t pixel_height) {
     // Increase to next number divisible by 4, but at least 1.
     // This is so we can scale down the texture coordinates and pack them
     // into 2 bytes rather than 4 bytes.
-    pack_width += (4 - pack_width % 4);
-    pack_height += (4 - pack_height % 4);
+    const uint16_t pack_width = pixel_width + (4 - pixel_width % 4);
+    const uint16_t pack_height = pixel_height + (4 - pixel_width % 4);
 
     // We have to allocate a new area in the bin, and store an empty image in it.
     // Add a 1px border around every image.
@@ -96,8 +93,6 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(size_t pixel_width, size
 
     rect.x += buffer;
     rect.y += buffer;
-    rect.w = pixel_width;
-    rect.h = pixel_height;
 
     return rect;
 }
@@ -132,15 +127,24 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string& name) {
 
 SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, bool repeating) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
-    // `repeating` indicates that the image will be used in a repeating pattern
-    // repeating pattern images are assumed to have a 1px padding that mirrors the opposite edge
-    // positions for repeating images are adjusted to exclude the edge
+
     Rect<dimension> rect = getImage(name);
-    const int r = repeating ? 1 : 0;
+    if (repeating) {
+        // When the image is repeating, get the correct position of the image, rather than the
+        // one rounded up to 4 pixels.
+        const SpritePosition &pos = sprite->getSpritePosition(name);
+        if (!pos.width || !pos.height) {
+            return SpriteAtlasPosition {};
+        }
+
+        rect.w = pos.width;
+        rect.h = pos.height;
+    }
+
     return SpriteAtlasPosition {
-        {{ float(rect.w)           / pixelRatio, float(rect.h)            / pixelRatio }},
-        {{ float(rect.x + r)            / width, float(rect.y + r)            / height }},
-        {{ float(rect.x + rect.w - 2*r) / width, float(rect.y + rect.h - 2*r) / height }}
+        {{ float(rect.w)     / pixelRatio, float(rect.h)      / pixelRatio }},
+        {{ float(rect.x)          / width, float(rect.y)          / height }},
+        {{ float(rect.x + rect.w) / width, float(rect.y + rect.h) / height }}
     };
 }
 
