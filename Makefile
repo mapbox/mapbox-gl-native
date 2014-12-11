@@ -53,6 +53,10 @@ build/linux/Makefile: linux/mapboxgl-app.gyp config.gypi
 build/macosx/Makefile: macosx/mapboxgl-app.gyp config.gypi
 	deps/run_gyp macosx/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=osx --depth=. -Goutput_dir=.. --generator-output=./build/macosx -f make
 
+.PHONY: build/render/Makefile
+build/render/Makefile: bin/render.gyp config.gypi
+	deps/run_gyp bin/render.gyp -Iconfig.gypi -Dplatform=osx --depth=. -Goutput_dir=.. --generator-output=./build/render -f make
+
 .PHONY: build/test/test.xcodeproj
 build/test/test.xcodeproj: test/test.gyp config.gypi
 	deps/run_gyp test/test.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build -f xcode
@@ -100,6 +104,10 @@ osx: build/macosx/Makefile
 # Executes the OS X binary
 run-osx: osx
 	build/$(BUILDTYPE)/Mapbox\ GL.app/Contents/MacOS/MAPBOX\ GL
+
+# Builds the CLI render app
+render: build/render/Makefile
+	$(MAKE) -C build/render BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-render
 
 ##### Xcode projects ###########################################################
 

@@ -253,6 +253,8 @@ void Map::rerender() {
     // (== async rendering).
     if (async) {
         asyncRender->send();
+    } else {
+        prepare();
     }
 }
 
