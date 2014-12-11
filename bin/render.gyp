@@ -1,8 +1,6 @@
 {
   'includes': [
     '../gyp/common.gypi',
-    '../gyp/version.gypi',
-    '../gyp/mbgl-platform.gypi',
   ],
   'targets': [
     {
@@ -45,9 +43,9 @@
       ],
       'include_dirs': [ '../src' ],
       'dependencies': [
-        '../mapboxgl.gyp:mbgl-core',
+        '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:mbgl-headless',
-        '<(platform_library)',
+        '../mapboxgl.gyp:mbgl-<(platform)',
       ],
     },
   ],

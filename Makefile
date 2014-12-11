@@ -55,7 +55,7 @@ build/macosx/Makefile: macosx/mapboxgl-app.gyp config.gypi
 
 .PHONY: build/render/Makefile
 build/render/Makefile: bin/render.gyp config.gypi
-	deps/run_gyp bin/render.gyp -Iconfig.gypi -Dplatform=osx --depth=. -Goutput_dir=.. --generator-output=./build/render -f make
+	deps/run_gyp bin/render.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/render -f make
 
 .PHONY: build/test/test.xcodeproj
 build/test/test.xcodeproj: test/test.gyp config.gypi
@@ -72,6 +72,10 @@ build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj: ios/mapbox-gl-cocoa/app/ma
 .PHONY: build/linux/mapboxgl-app.xcodeproj
 build/linux/mapboxgl-app.xcodeproj: linux/mapboxgl-app.gyp config.gypi
 	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=linux --depth=. --generator-output=./build -f xcode
+
+.PHONY: build/bin/render.xcodeproj
+build/bin/render.xcodeproj: bin/render.gyp config.gypi
+	deps/run_gyp bin/render.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. --generator-output=./build -f xcode
 
 ##### Test cases ###############################################################
 
@@ -127,6 +131,9 @@ xproj: build/macosx/mapboxgl-app.xcodeproj
 
 iproj: build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
 	open ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
+
+rproj: build/bin/render.xcodeproj
+	open ./build/bin/render.xcodeproj
 
 # build Linux project for Xcode (Runs on Mac OS X too, but without platform-specific code)
 lproj: build/linux/mapboxgl-app.xcodeproj
