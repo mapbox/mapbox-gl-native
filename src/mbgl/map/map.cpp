@@ -109,7 +109,7 @@ Map::Map(View& view_, FileSource& fileSource_)
 }
 
 Map::~Map() {
-    if (async) {
+    if (mode == Mode::Continuous) {
         stop();
     }
 
@@ -120,7 +120,6 @@ Map::~Map() {
     style.reset();
     texturePool.reset();
     workers.reset();
-    fileSource.clearLoop();
 
     uv_run(**loop, UV_RUN_DEFAULT);
 }
@@ -134,11 +133,11 @@ uv::worker &Map::getWorker() {
 
 void Map::start() {
     assert(std::this_thread::get_id() == mainThread);
-    assert(!async);
+    assert(mode == Mode::None);
 
     // When starting map rendering in another thread, we perform async/continuously
     // updated rendering. Only in these cases, we attach the async handlers.
-    async = true;
+    mode = Mode::Continuous;
 
     // Reset the flag.
     isStopped = false;
@@ -202,7 +201,7 @@ void Map::start() {
 void Map::stop(std::function<void ()> callback) {
     assert(std::this_thread::get_id() == mainThread);
     assert(mainThread != mapThread);
-    assert(async);
+    assert(mode == Mode::Continuous);
 
     asyncTerminate->send();
 
@@ -222,13 +221,14 @@ void Map::stop(std::function<void ()> callback) {
     // already finished executing.
     thread.join();
 
-    async = false;
+    mode = Mode::None;
 }
 
 void Map::run() {
 #ifndef NDEBUG
-    if (!async) {
+    if (mode == Mode::None) {
         mapThread = mainThread;
+        mode = Mode::Static;
     }
 #endif
     assert(std::this_thread::get_id() == mapThread);
@@ -242,21 +242,24 @@ void Map::run() {
 
     // If the map rendering wasn't started asynchronously, we perform one render
     // *after* all events have been processed.
-    if (!async) {
+    if (mode == Mode::Static) {
         render();
 #ifndef NDEBUG
         mapThread = std::thread::id();
 #endif
+        mode = Mode::None;
+        fileSource.clearLoop();
     }
 }
 
 void Map::rerender() {
-    // We only send render events if we want to continuously update the map
-    // (== async rendering).
-    if (async) {
-        asyncRender->send();
-    } else {
+    if (mode == Mode::Static) {
         prepare();
+    } else if (mode == Mode::Continuous) {
+        // We only send render events if we want to continuously update the map
+        // (== async rendering).
+        assert(asyncRender);
+        asyncRender->send();
     }
 }
 
