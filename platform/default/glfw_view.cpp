@@ -385,9 +385,10 @@ void show_color_debug_image(std::string name, const char *data, size_t logical_w
     float x_scale = (float)fb_width / (float)width;
     float y_scale = (float)fb_height / (float)height;
 
+    MBGL_CHECK_ERROR(glClearColor(0.8, 0.8, 0.8, 1));
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
     MBGL_CHECK_ERROR(glEnable(GL_BLEND));
-    MBGL_CHECK_ERROR(glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
     MBGL_CHECK_ERROR(glPixelZoom(x_scale, -y_scale));
     MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
