@@ -17,6 +17,8 @@ CachingHTTPFileSource::~CachingHTTPFileSource() {
 }
 
 void CachingHTTPFileSource::setLoop(uv_loop_t* loop_) {
+    assert(!loop);
+
     thread_id = std::this_thread::get_id();
     store = !path.empty() ? util::ptr<SQLiteStore>(new SQLiteStore(loop_, path)) : nullptr;
     loop = loop_;
@@ -51,6 +53,8 @@ void CachingHTTPFileSource::clearLoop() {
     }
 
     store.reset();
+
+    loop = nullptr;
 }
 
 void CachingHTTPFileSource::setBase(std::string value) {
