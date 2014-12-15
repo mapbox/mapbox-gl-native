@@ -225,12 +225,12 @@ void Map::stop(std::function<void ()> callback) {
 }
 
 void Map::run() {
-#ifndef NDEBUG
     if (mode == Mode::None) {
+#ifndef NDEBUG
         mapThread = mainThread;
+#endif
         mode = Mode::Static;
     }
-#endif
     assert(std::this_thread::get_id() == mapThread);
 
     setup();
