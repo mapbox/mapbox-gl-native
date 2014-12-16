@@ -1,5 +1,6 @@
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/std.hpp>
 
@@ -8,12 +9,6 @@
 #include <string>
 #include <cstring>
 #include <cassert>
-
-#if MBGL_USE_GLX
-#ifdef GLX_ARB_create_context
-static PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = nullptr;
-#endif
-#endif
 
 #ifdef MBGL_USE_CGL
 #include <CoreFoundation/CoreFoundation.h>
@@ -86,59 +81,6 @@ void HeadlessView::loadExtensions() {
     make_inactive();
 }
 
-
-#if MBGL_USE_GLX
-#ifdef GLX_ARB_create_context
-
-// These are all of the OpenGL Core profile version that we know about.
-struct core_profile_version { int major, minor; };
-static const core_profile_version coreProfileVersions[] = {
-    {4, 5},
-    {4, 4},
-    {4, 3},
-    {4, 2},
-    {4, 1},
-    {4, 0},
-    {3, 3},
-    {3, 2},
-    {3, 1},
-    {3, 0},
-    {0, 0},
-};
-
-GLXContext createCoreProfile(Display *dpy, GLXFBConfig fbconfig) {
-    static bool contextCreationFailed = false;
-    GLXContext ctx = 0;
-
-    // Set the Error Handler to avoid crashing the program when the context creation fails.
-    // It is expected that some context creation attempts fail, e.g. because the OpenGL
-    // implementation does not support the version we're requesting.
-    int (*previousErrorHandler)(Display *, XErrorEvent *) = XSetErrorHandler([](Display *, XErrorEvent *) {
-        contextCreationFailed = true;
-        return 0;
-    });
-
-    // Try to create core profiles from the highest known version on down.
-    for (int i = 0; !ctx && coreProfileVersions[i].major; i++) {
-        contextCreationFailed = false;
-        const int contextFlags[] = {
-            GLX_CONTEXT_MAJOR_VERSION_ARB, coreProfileVersions[i].major,
-            GLX_CONTEXT_MINOR_VERSION_ARB, coreProfileVersions[i].minor,
-            0
-        };
-        ctx = glXCreateContextAttribsARB(dpy, fbconfig, 0, True, contextFlags);
-        if (contextCreationFailed) {
-            ctx = 0;
-        }
-    }
-
-    // Restore the old error handler.
-    XSetErrorHandler(previousErrorHandler);
-    return ctx;
-}
-#endif
-#endif
-
 void HeadlessView::createContext() {
 #if MBGL_USE_CGL
     CGLError error = CGLCreateContext(display_->pixelFormat, NULL, &glContext);
@@ -153,27 +95,15 @@ void HeadlessView::createContext() {
 #endif
 
 #if MBGL_USE_GLX
-#ifdef GLX_ARB_create_context
-    if (glXCreateContextAttribsARB == nullptr) {
-        glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)glXGetProcAddressARB((const GLubyte *)"glXCreateContextAttribsARB");
-    }
-#endif
-
     xDisplay = display_->xDisplay;
     fbConfigs = display_->fbConfigs;
-
-#ifdef GLX_ARB_create_context
-    if (glXCreateContextAttribsARB) {
-        // Try to create a core profile context.
-        glContext = createCoreProfile(xDisplay, fbConfigs[0]);
-    }
-#endif
 
     if (!glContext) {
         // Try to create a legacy context
         glContext = glXCreateNewContext(xDisplay, fbConfigs[0], GLX_RGBA_TYPE, 0, True);
         if (glContext) {
             if (!glXIsDirect(xDisplay, glContext)) {
+                mbgl::Log::Error(mbgl::Event::OpenGL, "Failed to create direct OpenGL Legacy context");
                 glXDestroyContext(xDisplay, glContext);
                 glContext = 0;
             }
