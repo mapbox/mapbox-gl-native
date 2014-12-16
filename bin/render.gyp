@@ -46,6 +46,7 @@
         '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:mbgl-headless',
         '../mapboxgl.gyp:mbgl-<(platform)',
+        '../mapboxgl.gyp:copy_certificate_bundle',
       ],
     },
   ],
