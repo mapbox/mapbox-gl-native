@@ -78,7 +78,10 @@ int main(int argc, char *argv[]) {
 
     // Try to load the token from the environment.
     if (!token.size()) {
-        token = getenv("MAPBOX_ACCESS_TOKEN");
+        const char *token_ptr = getenv("MAPBOX_ACCESS_TOKEN");
+        if (token_ptr) {
+            token = token_ptr;
+        }
     }
 
     // Set access token if present

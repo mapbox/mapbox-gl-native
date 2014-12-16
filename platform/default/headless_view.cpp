@@ -52,32 +52,36 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display)
 
 void HeadlessView::loadExtensions() {
     make_active();
-    const std::string extensions = (char *)MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS));
+    const char *extension_ptr = (char *)MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS));
+
+    if (extension_ptr) {
+        const std::string extensions = extension_ptr;
 
 #ifdef MBGL_USE_CGL
-    if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
-        gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)CGLGetProcAddress("glBindVertexArrayAPPLE");
-        gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)CGLGetProcAddress("glDeleteVertexArraysAPPLE");
-        gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)CGLGetProcAddress("glGenVertexArraysAPPLE");
-        gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)CGLGetProcAddress("glIsVertexArrayAPPLE");
-        assert(gl::BindVertexArray != nullptr);
-        assert(gl::DeleteVertexArrays != nullptr);
-        assert(gl::GenVertexArrays != nullptr);
-        assert(gl::IsVertexArray != nullptr);
-    }
+        if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
+            gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)CGLGetProcAddress("glBindVertexArrayAPPLE");
+            gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)CGLGetProcAddress("glDeleteVertexArraysAPPLE");
+            gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)CGLGetProcAddress("glGenVertexArraysAPPLE");
+            gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)CGLGetProcAddress("glIsVertexArrayAPPLE");
+            assert(gl::BindVertexArray != nullptr);
+            assert(gl::DeleteVertexArrays != nullptr);
+            assert(gl::GenVertexArrays != nullptr);
+            assert(gl::IsVertexArray != nullptr);
+        }
 #endif
 #ifdef MBGL_USE_GLX
-    if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
-        gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glXGetProcAddress((const GLubyte *)"glBindVertexArray");
-        gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glXGetProcAddress((const GLubyte *)"glDeleteVertexArrays");
-        gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glXGetProcAddress((const GLubyte *)"glGenVertexArrays");
-        gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glXGetProcAddress((const GLubyte *)"glIsVertexArray");
-        assert(gl::BindVertexArray != nullptr);
-        assert(gl::DeleteVertexArrays != nullptr);
-        assert(gl::GenVertexArrays != nullptr);
-        assert(gl::IsVertexArray != nullptr);
-    }
+        if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
+            gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glXGetProcAddress((const GLubyte *)"glBindVertexArray");
+            gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glXGetProcAddress((const GLubyte *)"glDeleteVertexArrays");
+            gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glXGetProcAddress((const GLubyte *)"glGenVertexArrays");
+            gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glXGetProcAddress((const GLubyte *)"glIsVertexArray");
+            assert(gl::BindVertexArray != nullptr);
+            assert(gl::DeleteVertexArrays != nullptr);
+            assert(gl::GenVertexArrays != nullptr);
+            assert(gl::IsVertexArray != nullptr);
+        }
 #endif
+    }
 
     make_inactive();
 }
