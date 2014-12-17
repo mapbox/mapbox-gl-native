@@ -5,9 +5,10 @@
 namespace mbgl {
 namespace platform {
 
-// Returns the path to the default cache database on this system.
+// Returns the path the application root.
 std::string applicationRoot() {
-    return uv::cwd();
+    static const std::string root = uv::cwd();
+    return root;
 }
 
 }
