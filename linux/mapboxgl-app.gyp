@@ -48,6 +48,7 @@
       'dependencies': [
         '../mapboxgl.gyp:mbgl-standalone',
         '../mapboxgl.gyp:mbgl-linux',
+        '../mapboxgl.gyp:bundle_styles',
         '../mapboxgl.gyp:copy_certificate_bundle',
       ],
       'copies': [{

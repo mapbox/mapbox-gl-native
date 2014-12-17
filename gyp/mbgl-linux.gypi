@@ -34,7 +34,9 @@
         '../platform/default/shader_cache_tmp.cpp',
         '../platform/default/log_stderr.cpp',
         '../platform/default/string_stdlib.cpp',
+        '../platform/default/asset_request_libuv.cpp',
         '../platform/default/http_request_baton_curl.cpp',
+        '../platform/default/application_root.cpp',
         '../platform/default/image.cpp',
         '../platform/default/image_reader.cpp',
         '../platform/default/png_reader.cpp',
@@ -42,6 +44,7 @@
       ],
       'include_dirs': [
         '../include',
+        '../src',
       ],
       'link_settings': {
         'libraries': [
