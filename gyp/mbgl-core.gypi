@@ -55,7 +55,7 @@
       ],
       'variables': {
         'core_lib':'<(PRODUCT_DIR)/libmbgl-core.a',
-        'standalone_lib':'<(standalone_product_dir)/libmbgl.a'
+        'standalone_lib':'<(PRODUCT_DIR)/libmbgl.a'
       },
       'direct_dependent_settings': {
         'include_dirs': [
