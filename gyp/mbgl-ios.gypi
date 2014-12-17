@@ -40,9 +40,11 @@
         '../platform/darwin/string_nsstring.mm',
         '../platform/darwin/http_request_baton_cocoa.mm',
         '../platform/darwin/image.mm',
+        '../platform/default/file_request_libuv.cpp',
       ],
       'include_dirs': [
         '../include',
+        '../src',
       ],
       'xcode_settings': {
         'OTHER_CPLUSPLUSFLAGS': [ '<@(uv_cflags)' ],

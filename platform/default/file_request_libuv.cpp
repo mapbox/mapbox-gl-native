@@ -1,11 +1,33 @@
-#include <mbgl/storage/file_request_baton.hpp>
 #include <mbgl/storage/file_request.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/std.hpp>
 
+#include <uv.h>
+
 #include <limits>
 
 namespace mbgl {
+
+struct FileRequestBaton {
+    FileRequestBaton(FileRequest *request_, const std::string &path, uv_loop_t *loop);
+    ~FileRequestBaton();
+
+    void cancel();
+    static void file_opened(uv_fs_t *req);
+    static void file_stated(uv_fs_t *req);
+    static void file_read(uv_fs_t *req);
+    static void file_closed(uv_fs_t *req);
+    static void notify_error(uv_fs_t *req);
+    static void cleanup(uv_fs_t *req);
+
+    const std::thread::id thread_id;
+    FileRequest *request = nullptr;
+    uv_fs_t req;
+    uv_file fd = -1;
+    bool canceled = false;
+    std::string body;
+    uv_buf_t buffer;
+};
 
 FileRequestBaton::FileRequestBaton(FileRequest *request_, const std::string &path, uv_loop_t *loop)
     : thread_id(std::this_thread::get_id()), request(request_) {
@@ -155,6 +177,33 @@ void FileRequestBaton::cleanup(uv_fs_t *req) {
 
     uv_fs_req_cleanup(req);
     delete ptr;
+}
+
+
+FileRequest::FileRequest(const std::string &path_, uv_loop_t *loop)
+    : BaseRequest(path_), ptr(new FileRequestBaton(this, path, loop)) {
+}
+
+void FileRequest::cancel() {
+    assert(thread_id == std::this_thread::get_id());
+
+    if (ptr) {
+        ptr->cancel();
+
+        // When deleting a FileRequest object with a uv_fs_* call is in progress, we are making sure
+        // that the callback doesn't accidentally reference this object again.
+        ptr->request = nullptr;
+        ptr = nullptr;
+    }
+
+    notify();
+}
+
+FileRequest::~FileRequest() {
+    assert(thread_id == std::this_thread::get_id());
+    cancel();
+
+    // Note: The FileRequestBaton object is deleted in FileRequestBaton::cleanup().
 }
 
 }

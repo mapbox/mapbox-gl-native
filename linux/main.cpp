@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 
     // Load style
     if (style.empty())
-        style = std::string("file://") + uv::cwd() + std::string("/../../styles/styles/bright-v6.json");
+        style = std::string("file://") + uv::cwd() + std::string("/styles/bright-v6.json");
 
     map.setStyleURL(style);
 
