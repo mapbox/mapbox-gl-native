@@ -102,9 +102,7 @@ int main() {
     if (accessToken) fileSource.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
 
     // Load style
-    const std::string path([[[NSBundle mainBundle] pathForResource:@"bright-v6" ofType:@"json" inDirectory:@"styles/"] UTF8String]);
-
-    map.setStyleURL(std::string("file://") + path);
+    map.setStyleURL("asset://styles/bright-v6.json");
 
     int ret = view.run();
 

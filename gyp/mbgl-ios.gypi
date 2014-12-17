@@ -39,8 +39,9 @@
         '../platform/darwin/log_nslog.mm',
         '../platform/darwin/string_nsstring.mm',
         '../platform/darwin/http_request_baton_cocoa.mm',
+        '../platform/darwin/application_root.mm',
         '../platform/darwin/image.mm',
-        '../platform/default/file_request_libuv.cpp',
+        '../platform/default/asset_request_libuv.cpp',
       ],
       'include_dirs': [
         '../include',
