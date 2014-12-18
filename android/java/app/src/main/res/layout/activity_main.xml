@@ -32,8 +32,8 @@
 
         <ImageView
             android:id="@+id/view_compass"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="right|top"
             android:padding="10dp"
             android:contentDescription="@string/compass_desc"
