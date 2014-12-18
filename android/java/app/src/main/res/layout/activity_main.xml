@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right|top"
             android:padding="10dp"
-            android:contentDescription="Map compass. Click to reset the map rotation to North."
+            android:contentDescription="@string/compass_desc"
             android:src="@drawable/compass"/>
 
         <TextView
