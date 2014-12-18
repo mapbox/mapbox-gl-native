@@ -21,7 +21,7 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 
 We try to link to as many system-provided libraries as possible. When these are unavailable or too outdated, we run a thin build-script layer called [Mason](https://github.com/mapbox/mason) to automate builds, and load precompiled binary packages when possible.
 
-Be sure to pull down all submodules first: 
+Be sure to pull down all submodules first:
 
     git submodule init
     git submodule update
@@ -114,7 +114,7 @@ Or the OPEN JDK:
 
     sudo apt-get install -y openjdk-7-jdk
 
-Install Android NDK: 
+Install Android NDK:
 
     sudo apt-get install p7zip-full
     wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
@@ -123,7 +123,7 @@ Install Android NDK:
     export ANDROID_NDK_PATH="$(pwd)/android-ndk-r10c"
     export NDK_PATH=${ANDROID_NDK_PATH}
 
-Install Android SDK: 
+Install Android SDK:
 
     sudo apt-get install lib32stdc++6 lib32z1
     wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
@@ -131,7 +131,7 @@ Install Android SDK:
     ./android-sdk-linux/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
     export ANDROID_HOME="$(pwd)/android-sdk-linux"
 
-Run: 
+Run:
 
     make android
 
@@ -141,11 +141,11 @@ You can also open `android/java` in Android Studio.
 
 ## Android (on OS X)
 
-Install the [Android NDK](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X. 
+Install the [Android NDK](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X.
 
     export ANDROID_NDK_PATH="/dir/to/android-ndk-r10c"
 
-Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html). The latest versions recommend that you place the SDK someplace like `/usr/local/android-sdk-macosx`. 
+Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html). The latest versions recommend that you place the SDK someplace like `/usr/local/android-sdk-macosx`.
 
     export ANDROID_HOME="/dir/to/android-sdk-macosx"
 
@@ -175,7 +175,7 @@ For iOS and OS X use of the demo apps in Xcode, setup the access token by editin
 
 For Linux, set the environment variable `MAPBOX_ACCESS_TOKEN` to your token.
 
-For Android, open the class MapFragment and look for the line with `mMap.setAccessToken("access token goes here");`.
+For Android, create the file `android/java/app/src/main/res/raw/token.txt` and insert the token as a single line.
 
 # Style
 

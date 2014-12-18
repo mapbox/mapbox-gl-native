@@ -46,7 +46,7 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.2,android-21,extra-android-m2repository,extra-google-m2repository
 
         echo "inserting access token"
-        sed -i "s/access token goes here/${ANDROID_KEY}/g" android/java/app/src/main/java/com/mapbox/mapboxgl/app/MapFragment.java
+        echo "${ANDROID_KEY}" > android/java/app/src/res/token.txt
 
     elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
@@ -79,7 +79,7 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.2,android-21,extra-android-m2repository,extra-google-m2repository
 
         echo "inserting access token"
-        sed -i "" "s/access token goes here/${ANDROID_KEY}/g" android/java/app/src/main/java/com/mapbox/mapboxgl/app/MapFragment.java
+        echo "${ANDROID_KEY}" > android/java/app/src/res/token.txt
 
     fi
 
