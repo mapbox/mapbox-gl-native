@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         minSdkVersion 14
@@ -34,6 +34,6 @@ configurations {
 
 dependencies {
     compile 'commons-validator:commons-validator:1.4.0'
-    compile 'com.android.support:support-annotations:21.0.0'
-    compile 'com.android.support:support-v4:21.0.0'
+    compile 'com.android.support:support-annotations:21.0.3'
+    compile 'com.android.support:support-v4:21.0.3'
 }
