@@ -45,7 +45,8 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.2,android-21,extra-android-m2repository,extra-google-m2repository
 
         echo "inserting access token"
-        echo "${ANDROID_KEY}" >> ./android/java/app/src/main/res/token.txt
+        mkdir ./android/java/app/src/main/res/raw/
+        echo "${ANDROID_KEY}" >> ./android/java/app/src/main/res/raw/token.txt
 
     elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
@@ -76,7 +77,8 @@ if [[ "${MASON_PLATFORM}" == "android" ]]; then
         echo y | ./android-sdk/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.2,android-21,extra-android-m2repository,extra-google-m2repository
 
         echo "inserting access token"
-        echo "${ANDROID_KEY}" >> ./android/java/app/src/main/res/token.txt
+        mkdir ./android/java/app/src/main/res/raw/
+        echo "${ANDROID_KEY}" >> ./android/java/app/src/main/res/raw/token.txt
 
     fi
 
