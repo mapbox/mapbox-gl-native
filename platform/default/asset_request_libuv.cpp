@@ -30,8 +30,16 @@ struct AssetRequestBaton {
     uv_buf_t buffer;
 };
 
-AssetRequestBaton::AssetRequestBaton(AssetRequest *request_, const std::string &path, uv_loop_t *loop)
-    : threadId(std::this_thread::get_id()), request(request_) {
+void AssetRequestBaton::run(AssetRequestBaton *ptr) {
+    assert(std::this_thread::get_id() == ptr->threadId);
+
+    if (ptr->canceled || !ptr->request) {
+        // Either the AssetRequest object has been destructed, or the
+        // request was canceled.
+        cleanup(ptr);
+        return;
+    }
+
     req.data = this;
     uv_fs_open(loop, &req, path.c_str(), O_RDONLY, S_IRUSR, fileOpened);
 }
@@ -48,11 +56,17 @@ void AssetRequestBaton::cancel() {
     uv_cancel((uv_req_t *)&req);
 }
 
-void AssetRequestBaton::notifyError(uv_fs_t *req) {
-    AssetRequestBaton *ptr = reinterpret_cast<AssetRequestBaton *>(req->data);
+void AssetRequestBaton::run(AssetRequestBaton *ptr) {
     assert(std::this_thread::get_id() == ptr->threadId);
 
-    if (ptr->request && req->result < 0 && !ptr->canceled && req->result != UV_ECANCELED) {
+    if (ptr->canceled || !ptr->request) {
+        // Either the AssetRequest object has been destructed, or the
+        // request was canceled.
+        cleanup(ptr);
+        return;
+    }
+
+    rf (ptr->request && req->result < 0 && !ptr->canceled && req->result != UV_ECANCELED) {
         ptr->request->response = util::make_unique<Response>();
         ptr->request->response->code = req->result == UV_ENOENT ? 404 : 500;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
