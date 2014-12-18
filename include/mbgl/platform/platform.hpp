@@ -23,6 +23,8 @@ std::string defaultCacheDatabase();
 // Returns the path to the default shader cache on this system.
 std::string defaultShaderCache();
 
+std::string applicationRoot();
+
 // Shows an alpha image with the specified dimensions in a named window.
 void show_debug_image(std::string name, const char *data, size_t width, size_t height);
 

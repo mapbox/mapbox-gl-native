@@ -1,22 +1,45 @@
-#include <mbgl/storage/file_request_baton.hpp>
-#include <mbgl/storage/file_request.hpp>
+#include <mbgl/storage/asset_request.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/platform/platform.hpp>
 #include <mbgl/util/std.hpp>
+
+#include <uv.h>
 
 #include <limits>
 
 namespace mbgl {
 
-FileRequestBaton::FileRequestBaton(FileRequest *request_, const std::string &path, uv_loop_t *loop)
+struct AssetRequestBaton {
+    AssetRequestBaton(AssetRequest *request_, const std::string &path, uv_loop_t *loop);
+    ~AssetRequestBaton();
+
+    void cancel();
+    static void fileOpened(uv_fs_t *req);
+    static void fileStated(uv_fs_t *req);
+    static void fileRead(uv_fs_t *req);
+    static void fileClosed(uv_fs_t *req);
+    static void notifyError(uv_fs_t *req);
+    static void cleanup(uv_fs_t *req);
+
+    const std::thread::id threadId;
+    AssetRequest *request = nullptr;
+    uv_fs_t req;
+    uv_file fd = -1;
+    bool canceled = false;
+    std::string body;
+    uv_buf_t buffer;
+};
+
+AssetRequestBaton::AssetRequestBaton(AssetRequest *request_, const std::string &path, uv_loop_t *loop)
     : threadId(std::this_thread::get_id()), request(request_) {
     req.data = this;
     uv_fs_open(loop, &req, path.c_str(), O_RDONLY, S_IRUSR, fileOpened);
 }
 
-FileRequestBaton::~FileRequestBaton() {
+AssetRequestBaton::~AssetRequestBaton() {
 }
 
-void FileRequestBaton::cancel() {
+void AssetRequestBaton::cancel() {
     canceled = true;
 
     // uv_cancel fails frequently when the request has already been started.
@@ -25,8 +48,8 @@ void FileRequestBaton::cancel() {
     uv_cancel((uv_req_t *)&req);
 }
 
-void FileRequestBaton::notifyError(uv_fs_t *req) {
-    FileRequestBaton *ptr = reinterpret_cast<FileRequestBaton *>(req->data);
+void AssetRequestBaton::notifyError(uv_fs_t *req) {
+    AssetRequestBaton *ptr = reinterpret_cast<AssetRequestBaton *>(req->data);
     assert(std::this_thread::get_id() == ptr->threadId);
 
     if (ptr->request && req->result < 0 && !ptr->canceled && req->result != UV_ECANCELED) {
@@ -41,8 +64,8 @@ void FileRequestBaton::notifyError(uv_fs_t *req) {
     }
 }
 
-void FileRequestBaton::fileOpened(uv_fs_t *req) {
-    FileRequestBaton *ptr = reinterpret_cast<FileRequestBaton *>(req->data);
+void AssetRequestBaton::fileOpened(uv_fs_t *req) {
+    AssetRequestBaton *ptr = reinterpret_cast<AssetRequestBaton *>(req->data);
     assert(std::this_thread::get_id() == ptr->threadId);
 
     if (req->result < 0) {
@@ -56,7 +79,7 @@ void FileRequestBaton::fileOpened(uv_fs_t *req) {
         uv_fs_req_cleanup(req);
 
         if (ptr->canceled || !ptr->request) {
-            // Either the FileRequest object has been destructed, or the
+            // Either the AssetRequest object has been destructed, or the
             // request was canceled.
             uv_fs_close(req->loop, req, fd, fileClosed);
         } else {
@@ -66,8 +89,8 @@ void FileRequestBaton::fileOpened(uv_fs_t *req) {
     }
 }
 
-void FileRequestBaton::fileStated(uv_fs_t *req) {
-    FileRequestBaton *ptr = reinterpret_cast<FileRequestBaton *>(req->data);
+void AssetRequestBaton::fileStated(uv_fs_t *req) {
+    AssetRequestBaton *ptr = reinterpret_cast<AssetRequestBaton *>(req->data);
     assert(std::this_thread::get_id() == ptr->threadId);
 
     if (req->result != 0 || ptr->canceled || !ptr->request) {
@@ -113,8 +136,8 @@ void FileRequestBaton::fileStated(uv_fs_t *req) {
     }
 }
 
-void FileRequestBaton::fileRead(uv_fs_t *req) {
-    FileRequestBaton *ptr = reinterpret_cast<FileRequestBaton *>(req->data);
+void AssetRequestBaton::fileRead(uv_fs_t *req) {
+    AssetRequestBaton *ptr = reinterpret_cast<AssetRequestBaton *>(req->data);
     assert(std::this_thread::get_id() == ptr->threadId);
 
     if (req->result < 0 || ptr->canceled || !ptr->request) {
@@ -135,8 +158,8 @@ void FileRequestBaton::fileRead(uv_fs_t *req) {
     uv_fs_close(req->loop, req, ptr->fd, fileClosed);
 }
 
-void FileRequestBaton::fileClosed(uv_fs_t *req) {
-    assert(std::this_thread::get_id() == reinterpret_cast<FileRequestBaton *>(req->data)->threadId);
+void AssetRequestBaton::fileClosed(uv_fs_t *req) {
+    assert(std::this_thread::get_id() == (reinterpret_cast<AssetRequestBaton *>(req->data))->threadId);
 
     if (req->result < 0) {
         // Closing the file failed. But there isn't anything we can do.
@@ -145,8 +168,8 @@ void FileRequestBaton::fileClosed(uv_fs_t *req) {
     cleanup(req);
 }
 
-void FileRequestBaton::cleanup(uv_fs_t *req) {
-    FileRequestBaton *ptr = reinterpret_cast<FileRequestBaton *>(req->data);
+void AssetRequestBaton::cleanup(uv_fs_t *req) {
+    AssetRequestBaton *ptr = reinterpret_cast<AssetRequestBaton *>(req->data);
     assert(std::this_thread::get_id() == ptr->threadId);
 
     if (ptr->request) {
@@ -156,6 +179,45 @@ void FileRequestBaton::cleanup(uv_fs_t *req) {
     uv_fs_req_cleanup(req);
     delete ptr;
     ptr = nullptr;
+}
+
+
+AssetRequest::AssetRequest(const std::string &path_, uv_loop_t *loop)
+    : BaseRequest(path_) {
+    if (!path.empty() && path[0] == '/') {
+        // This is an absolute path. We don't allow this. Note that this is not a way to absolutely
+        // prevent access to resources outside the application bundle; e.g. there could be symlinks
+        // in the application bundle that link to outside. We don't care about these.
+        response = util::make_unique<Response>();
+        response->code = 403;
+        response->message = "Path is outside the application bundle";
+        notify();
+    } else {
+        // Note: The AssetRequestBaton object is deleted in AssetRequestBaton::cleanup().
+        ptr = new AssetRequestBaton(this, platform::applicationRoot() + "/" + path, loop);
+    }
+}
+
+void AssetRequest::cancel() {
+    assert(std::this_thread::get_id() == threadId);
+
+    if (ptr) {
+        ptr->cancel();
+
+        // When deleting a AssetRequest object with a uv_fs_* call is in progress, we are making sure
+        // that the callback doesn't accidentally reference this object again.
+        ptr->request = nullptr;
+        ptr = nullptr;
+    }
+
+    notify();
+}
+
+AssetRequest::~AssetRequest() {
+    assert(std::this_thread::get_id() == threadId);
+    cancel();
+
+    // Note: The AssetRequestBaton object is deleted in AssetRequestBaton::cleanup().
 }
 
 }
