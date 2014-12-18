@@ -36,7 +36,7 @@
         '../platform/android/cache_database_data.cpp',
         '../platform/android/shader_cache_data.cpp',
         '../platform/android/log_android.cpp',
-        '../platform/android/asset_request_baton_libzip.cpp',
+        '../platform/android/asset_request_libzip.cpp',
         '../platform/default/string_stdlib.cpp',
         '../platform/default/http_request_baton_curl.cpp',
         '../platform/default/image.cpp',
@@ -46,6 +46,7 @@
       ],
       'include_dirs': [
         '../include',
+        '../src',
       ],
       'link_settings': {
         'libraries': [
