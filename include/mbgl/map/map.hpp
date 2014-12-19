@@ -136,7 +136,14 @@ private:
     // Unconditionally performs a render with the current map state.
     void render();
 
-    bool async = false;
+    enum class Mode : uint8_t {
+        None, // we're not doing any processing
+        Continuous, // continually updating map
+        Static, // a once-off static image.
+    };
+
+    Mode mode = Mode::None;
+
     std::unique_ptr<uv::loop> loop;
     std::unique_ptr<uv::worker> workers;
     std::thread thread;
