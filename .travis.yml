@@ -5,10 +5,10 @@ matrix:
     - os: linux
   include:
     - os: linux
-      env: BUILDTYPE=Release JOBS=16 MASON_PLATFORM=android TESTMUNK=yes
+      env: BUILDTYPE=Release MASON_PLATFORM=android TESTMUNK=yes
       compiler: clang
     - os: linux
-      env: BUILDTYPE=Debug JOBS=16 MASON_PLATFORM=android TESTMUNK=no
+      env: BUILDTYPE=Debug MASON_PLATFORM=android TESTMUNK=no
       compiler: clang
     - os: linux
       env: BUILDTYPE=Release JOBS=16

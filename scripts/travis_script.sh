@@ -8,7 +8,7 @@ git submodule update --init styles
 
 if [[ $MASON_PLATFORM == "android" ]]; then
     mapbox_time "compile_program" \
-    make android -j$JOBS BUILDTYPE=${BUILDTYPE}
+    make android BUILDTYPE=${BUILDTYPE}
 
     if [[ $TESTMUNK == "yes" ]]; then
         mapbox_time_start "upload_testmunk"
