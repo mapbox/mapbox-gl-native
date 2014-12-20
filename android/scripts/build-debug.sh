@@ -5,4 +5,4 @@ set -o pipefail
 
 export BUILDTYPE=Debug TESTMUNK=no
 
-./common.sh $1
+./android/scripts/common.sh $1
