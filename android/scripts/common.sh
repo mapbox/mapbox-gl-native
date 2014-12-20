@@ -14,4 +14,7 @@ export MASON_PLATFORM=android
 mkdir ./android/java/app/src/main/res/raw/
 echo "${ANDROID_KEY}" >> ./android/java/app/src/main/res/raw/token.txt
 
-make android -j$JOBS BUILDTYPE=${BUILDTYPE}
+make android BUILDTYPE=$BUILDTYPE
+
+aws s3 cp ./android/java/app/build/outputs/apk/app-debug.apk s3://mapbox-gl-testing/android/${NAME}/app-debug.apk
+aws s3 cp ./android/java/app/build/outputs/apk/app-release-unsigned.apk s3://mapbox-gl-testing/android/${NAME}/app-release-unsigned.apk
