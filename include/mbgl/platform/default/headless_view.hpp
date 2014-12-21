@@ -59,7 +59,6 @@ private:
     GLuint fbo = 0;
     GLuint fboDepthStencil = 0;
     GLuint fboColor = 0;
-    bool usingGl3OrNewer = false;
 };
 
 }
