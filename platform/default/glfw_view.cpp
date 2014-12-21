@@ -152,12 +152,16 @@ void GLFWView::initialize(mbgl::Map *map_) {
         }
 
         if (extensions.find("GL_ARB_get_program_binary") != std::string::npos) {
-            gl::GetProgramBinary = (gl::PFNGLGETPROGRAMBINARYPROC)glfwGetProcAddress("glGetProgramBinary");
-            gl::ProgramBinary = (gl::PFNGLPROGRAMBINARYPROC)glfwGetProcAddress("glProgramBinary");
-            gl::ProgramParameteri = (gl::PFNGLPROGRAMPARAMETERIPROC)glfwGetProcAddress("glProgramParameteri");
-            assert(gl::GetProgramBinary != nullptr);
-            assert(gl::ProgramBinary != nullptr);
-            assert(gl::ProgramParameteri != nullptr);
+            GLint numBinaryFormats;
+            MBGL_CHECK_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats));
+            if (numBinaryFormats > 0) {
+                gl::GetProgramBinary = (gl::PFNGLGETPROGRAMBINARYPROC)glfwGetProcAddress("glGetProgramBinary");
+                gl::ProgramBinary = (gl::PFNGLPROGRAMBINARYPROC)glfwGetProcAddress("glProgramBinary");
+                gl::ProgramParameteri = (gl::PFNGLPROGRAMPARAMETERIPROC)glfwGetProcAddress("glProgramParameteri");
+                assert(gl::GetProgramBinary != nullptr);
+                assert(gl::ProgramBinary != nullptr);
+                assert(gl::ProgramParameteri != nullptr);
+            }
         }
 
         // Require packed depth stencil

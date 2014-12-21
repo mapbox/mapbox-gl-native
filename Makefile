@@ -53,6 +53,10 @@ build/linux/Makefile: linux/mapboxgl-app.gyp config.gypi
 build/macosx/Makefile: macosx/mapboxgl-app.gyp config.gypi
 	deps/run_gyp macosx/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=osx --depth=. -Goutput_dir=.. --generator-output=./build/macosx -f make
 
+.PHONY: build/render/Makefile
+build/render/Makefile: bin/render.gyp config.gypi
+	deps/run_gyp bin/render.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/render -f make
+
 .PHONY: build/test/test.xcodeproj
 build/test/test.xcodeproj: test/test.gyp config.gypi
 	deps/run_gyp test/test.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build -f xcode
@@ -68,6 +72,10 @@ build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj: ios/mapbox-gl-cocoa/app/ma
 .PHONY: build/linux/mapboxgl-app.xcodeproj
 build/linux/mapboxgl-app.xcodeproj: linux/mapboxgl-app.gyp config.gypi
 	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=linux --depth=. --generator-output=./build -f xcode
+
+.PHONY: build/bin/render.xcodeproj
+	build/bin/render.xcodeproj: bin/render.gyp config.gypi
+	deps/run_gyp bin/render.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. --generator-output=./build -f xcode
 
 .PHONY: android
 android:
@@ -126,6 +134,10 @@ osx: build/macosx/Makefile
 run-osx: osx
 	build/$(BUILDTYPE)/Mapbox\ GL.app/Contents/MacOS/MAPBOX\ GL
 
+# Builds the CLI render app
+render: build/render/Makefile
+	$(MAKE) -C build/render BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-render
+
 ##### Xcode projects ###########################################################
 
 clear_xcode_cache:
@@ -144,6 +156,9 @@ xproj: build/macosx/mapboxgl-app.xcodeproj
 
 iproj: build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
 	open ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
+
+rproj: build/bin/render.xcodeproj
+	open ./build/bin/render.xcodeproj
 
 # build Linux project for Xcode (Runs on Mac OS X too, but without platform-specific code)
 lproj: build/linux/mapboxgl-app.xcodeproj
