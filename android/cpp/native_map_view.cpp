@@ -86,8 +86,8 @@ NativeMapView::~NativeMapView() {
     vm = nullptr;
 }
 
-void NativeMapView::make_active() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::make_active");
+void NativeMapView::activate() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::activate");
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
         if (!eglMakeCurrent(display, surface, surface, context)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d", eglGetError());
@@ -97,8 +97,8 @@ void NativeMapView::make_active() {
     }
 }
 
-void NativeMapView::make_inactive() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::make_inactive");
+void NativeMapView::deactivate() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::deactivate");
     if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
     }
@@ -674,15 +674,15 @@ void NativeMapView::resume() {
     }
 }
 
-void NativeMapView::notify_map_change(mbgl::MapChange, mbgl::timestamp) {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::notify_map_change()");
+void NativeMapView::notifyMapChange(mbgl::MapChange, mbgl::timestamp) {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::notifyMapChange()");
 
     assert(vm != nullptr);
     assert(obj != nullptr);
 
     JavaVMAttachArgs args = {
         JNI_VERSION_1_2,
-        "NativeMapView::notify_map_change()",
+        "NativeMapView::notifyMapChange()",
         NULL
     };
 

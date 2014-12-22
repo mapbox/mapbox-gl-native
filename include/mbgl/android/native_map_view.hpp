@@ -19,13 +19,13 @@ public:
     NativeMapView(JNIEnv* env, jobject obj);
     virtual ~NativeMapView();
 
-    void make_active() override;
-    void make_inactive() override;
+    void activate() override;
+    void deactivate() override;
 
     void swap() override;
 
     void notify() override;
-    void notify_map_change(mbgl::MapChange change, mbgl::timestamp delay) override;
+    void notifyMapChange(mbgl::MapChange change, mbgl::timestamp delay) override;
 
     mbgl::Map& getMap();
     mbgl::CachingHTTPFileSource& getFileSource();
