@@ -31,13 +31,13 @@ public:
     std::unique_ptr<uint32_t[]> readPixels();
 
     void notify();
-    void notify_map_change(MapChange change, timestamp delay = 0);
-    void make_active();
-    void make_inactive();
+    void notifyMapChange(MapChange change, timestamp delay = 0);
+    void activate();
+    void deactivate();
     void swap();
 
 private:
-    void clear_buffers();
+    void clearBuffers();
 
 private:
     std::shared_ptr<HeadlessDisplay> display_;

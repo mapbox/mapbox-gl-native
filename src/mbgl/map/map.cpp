@@ -33,7 +33,7 @@
 #include <uv.h>
 
 // Check libuv library version.
-const static bool uv_version_check = []() {
+const static bool uvVersionCheck = []() {
     const unsigned int version = uv_version();
     const unsigned int major = (version >> 16) & 0xFF;
     const unsigned int minor = (version >> 8) & 0xFF;
@@ -55,7 +55,7 @@ const static bool uv_version_check = []() {
 
 #include <zlib.h>
 // Check zlib library version.
-const static bool zlib_version_check = []() {
+const static bool zlibVersionCheck = []() {
     const char *const version = zlibVersion();
     if (version[0] != ZLIB_VERSION[0]) {
         throw std::runtime_error(mbgl::util::sprintf<96>(
@@ -68,7 +68,7 @@ const static bool zlib_version_check = []() {
 
 #include <sqlite3.h>
 // Check sqlite3 library version.
-const static bool sqlite_version_check = []() {
+const static bool sqliteVersionCheck = []() {
     if (sqlite3_libversion_number() != SQLITE_VERSION_NUMBER) {
         throw std::runtime_error(mbgl::util::sprintf<96>(
             "sqlite3 libversion mismatch: headers report %d, but library reports %d",
@@ -287,9 +287,9 @@ void Map::terminate() {
 void Map::setup() {
     assert(std::this_thread::get_id() == mapThread);
     assert(painter);
-    view.make_active();
+    view.activate();
     painter->setup();
-    view.make_inactive();
+    view.deactivate();
 }
 
 void Map::setStyleURL(const std::string &url) {
@@ -613,7 +613,7 @@ void Map::prepare() {
 }
 
 void Map::render() {
-    view.make_active();
+    view.activate();
 
     assert(painter);
     painter->render(*style, activeSources,
@@ -623,5 +623,5 @@ void Map::render() {
         update();
     }
 
-    view.make_inactive();
+    view.deactivate();
 }
