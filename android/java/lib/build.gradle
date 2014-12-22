@@ -16,6 +16,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 
+    lintOptions {
+        checkAllWarnings true
+    }
+
     buildTypes {
         debug {
             jniDebuggable true
