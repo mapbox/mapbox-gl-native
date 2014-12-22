@@ -589,6 +589,59 @@ void NativeMapView::loadExtensions() {
             mbgl::Log::Info(mbgl::Event::OpenGL, "Preferring 16 bit depth.");
         }
     }
+
+    if (extensions.find("GL_OES_get_program_binary") != std::string::npos) {
+        GLint numBinaryFormats;
+        MBGL_CHECK_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats));
+        if (numBinaryFormats > 0) {
+            gl::GetProgramBinary = (gl::PFNGLGETPROGRAMBINARYPROC)eglGetProcAddress("glGetProgramBinaryOES");
+            gl::ProgramBinary = (gl::PFNGLPROGRAMBINARYPROC)eglGetProcAddress("glProgramBinaryOES");
+            gl::ProgramParameteri = nullptr; // This does not exist until GLES 3.0
+            assert(gl::GetProgramBinary != nullptr);
+            assert(gl::ProgramBinary != nullptr);
+        }
+    }
+
+    if (extensions.find("GL_KHR_debug") != std::string::npos) {
+        gl::DebugMessageControl = (gl::PFNGLDEBUGMESSAGECONTROLPROC)eglGetProcAddress("glDebugMessageControl");
+        gl::DebugMessageInsert = (gl::PFNGLDEBUGMESSAGEINSERTPROC)eglGetProcAddress("glDebugMessageInsert");
+        gl::DebugMessageCallback = (gl::PFNGLDEBUGMESSAGECALLBACKPROC)eglGetProcAddress("glDebugMessageCallback");
+        gl::GetDebugMessageLog = (gl::PFNGLGETDEBUGMESSAGELOGPROC)eglGetProcAddress("glGetDebugMessageLog");
+        gl::GetPointerv = (gl::PFNGLGETPOINTERVPROC)eglGetProcAddress("glGetPointerv");
+        gl::PushDebugGroup = (gl::PFNGLPUSHDEBUGGROUPPROC)eglGetProcAddress("glPushDebugGroup");
+        gl::PopDebugGroup = (gl::PFNGLPOPDEBUGGROUPPROC)eglGetProcAddress("glPopDebugGroup");
+        gl::ObjectLabel = (gl::PFNGLOBJECTLABELPROC)eglGetProcAddress("glObjectLabel");
+        gl::GetObjectLabel = (gl::PFNGLGETOBJECTLABELPROC)eglGetProcAddress("glGetObjectLabel");
+        gl::ObjectPtrLabel = (gl::PFNGLOBJECTPTRLABELPROC)eglGetProcAddress("glObjectPtrLabel");
+        gl::GetObjectPtrLabel = (gl::PFNGLGETOBJECTPTRLABELPROC)eglGetProcAddress("glGetObjectPtrLabel");
+        assert(gl::DebugMessageControl != nullptr);
+        assert(gl::DebugMessageInsert != nullptr);
+        assert(gl::DebugMessageCallback != nullptr);
+        assert(gl::GetDebugMessageLog != nullptr);
+        assert(gl::GetPointerv != nullptr);
+        assert(gl::PushDebugGroup != nullptr);
+        assert(gl::PopDebugGroup != nullptr);
+        assert(gl::ObjectLabel != nullptr);
+        assert(gl::GetObjectLabel != nullptr);
+        assert(gl::ObjectPtrLabel != nullptr);
+        assert(gl::GetObjectPtrLabel != nullptr);
+    } else {
+        if (extensions.find("GL_EXT_debug_marker") != std::string::npos) {
+            gl::InsertEventMarkerEXT = (gl::PFNGLINSERTEVENTMARKEREXTPROC)eglGetProcAddress("glInsertEventMarkerEXT");
+            gl::PushGroupMarkerEXT = (gl::PFNGLPUSHGROUPMARKEREXTPROC)eglGetProcAddress("glPushGroupMarkerEXT");
+            gl::PopGroupMarkerEXT = (gl::PFNGLPOPGROUPMARKEREXTPROC)eglGetProcAddress("glPopGroupMarkerEXT");
+            assert(gl::InsertEventMarkerEXT != nullptr);
+            assert(gl::PushGroupMarkerEXT != nullptr);
+            assert(gl::PopGroupMarkerEXT != nullptr);
+        }
+
+        if (extensions.find("GL_EXT_debug_label") != std::string::npos) {
+            gl::LabelObjectEXT = (gl::PFNGLLABELOBJECTEXTPROC)eglGetProcAddress("glLabelObjectEXT");
+            gl::GetObjectLabelEXT = (gl::PFNGLGETOBJECTLABELEXTPROC)eglGetProcAddress("glGetObjectLabelEXT");
+            assert(gl::LabelObjectEXT != nullptr);
+            assert(gl::GetObjectLabelEXT != nullptr);
+        }
+    }
 }
 
 void NativeMapView::stop() {
