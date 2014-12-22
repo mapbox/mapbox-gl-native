@@ -24,7 +24,7 @@ CGLProc CGLGetProcAddress(const char *proc) {
     }
 
     CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault, proc, kCFStringEncodingASCII);
-    CGLProc symbol = (CGLProc)CFBundleGetFunctionPointerForName(framework, name);
+    CGLProc symbol = reinterpret_cast<CGLProc>(CFBundleGetFunctionPointerForName(framework, name));
     CFRelease(name);
     return symbol;
 }
@@ -46,19 +46,18 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display)
 }
 
 void HeadlessView::loadExtensions() {
-    make_active();
-
-    const char *extensionPtr = (char *)MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS));
+    activate();
+    const char *extensionPtr = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
 
     if (extensionPtr) {
         const std::string extensions = extensionPtr;
 
 #ifdef MBGL_USE_CGL
         if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
-            gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)CGLGetProcAddress("glBindVertexArrayAPPLE");
-            gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)CGLGetProcAddress("glDeleteVertexArraysAPPLE");
-            gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)CGLGetProcAddress("glGenVertexArraysAPPLE");
-            gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)CGLGetProcAddress("glIsVertexArrayAPPLE");
+            gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(CGLGetProcAddress("glBindVertexArrayAPPLE"));
+            gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(CGLGetProcAddress("glDeleteVertexArraysAPPLE"));
+            gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(CGLGetProcAddress("glGenVertexArraysAPPLE"));
+            gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(CGLGetProcAddress("glIsVertexArrayAPPLE"));
             assert(gl::BindVertexArray != nullptr);
             assert(gl::DeleteVertexArrays != nullptr);
             assert(gl::GenVertexArrays != nullptr);
@@ -67,10 +66,10 @@ void HeadlessView::loadExtensions() {
 #endif
 #ifdef MBGL_USE_GLX
         if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
-            gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glXGetProcAddress((const GLubyte *)"glBindVertexArray");
-            gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glXGetProcAddress((const GLubyte *)"glDeleteVertexArrays");
-            gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glXGetProcAddress((const GLubyte *)"glGenVertexArrays");
-            gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glXGetProcAddress((const GLubyte *)"glIsVertexArray");
+            gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(glXGetProcAddress((const GLubyte *)"glBindVertexArray"));
+            gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(glXGetProcAddress((const GLubyte *)"glDeleteVertexArrays"));
+            gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(glXGetProcAddress((const GLubyte *)"glGenVertexArrays"));
+            gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(glXGetProcAddress((const GLubyte *)"glIsVertexArray"));
             assert(gl::BindVertexArray != nullptr);
             assert(gl::DeleteVertexArrays != nullptr);
             assert(gl::GenVertexArrays != nullptr);
@@ -83,7 +82,7 @@ void HeadlessView::loadExtensions() {
     gl::isPackedDepthStencilSupported = true;
     gl::isDepth24Supported = true;
 
-    make_inactive();
+    deactivate();
 }
 
 void HeadlessView::createContext() {
@@ -131,7 +130,7 @@ void HeadlessView::createContext() {
 }
 
 void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
-    clear_buffers();
+    clearBuffers();
 
     width_ = width;
     height_ = height;
@@ -140,7 +139,7 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
     const unsigned int w = width_ * pixelRatio_;
     const unsigned int h = height_ * pixelRatio_;
 
-    make_active();
+    activate();
 
     // Create depth/stencil buffer
     MBGL_CHECK_ERROR(glGenRenderbuffersEXT(1, &fboDepthStencil));
@@ -176,7 +175,7 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
         throw std::runtime_error(error.str());
     }
 
-    make_inactive();
+    deactivate();
 }
 
 std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
@@ -185,9 +184,9 @@ std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
 
     auto pixels = util::make_unique<uint32_t[]>(w * h);
 
-    make_active();
+    activate();
     MBGL_CHECK_ERROR(glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get()));
-    make_inactive();
+    deactivate();
 
     const int stride = w * 4;
     auto tmp = util::make_unique<char[]>(stride);
@@ -201,8 +200,8 @@ std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
     return pixels;
 }
 
-void HeadlessView::clear_buffers() {
-    make_active();
+void HeadlessView::clearBuffers() {
+    activate();
 
     MBGL_CHECK_ERROR(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0));
 
@@ -221,11 +220,11 @@ void HeadlessView::clear_buffers() {
         fboDepthStencil = 0;
     }
 
-    make_inactive();
+    deactivate();
 }
 
 HeadlessView::~HeadlessView() {
-    clear_buffers();
+    clearBuffers();
 
 #if MBGL_USE_CGL
     CGLDestroyContext(glContext);
@@ -245,11 +244,11 @@ void HeadlessView::notify() {
     // no-op
 }
 
-void HeadlessView::notify_map_change(mbgl::MapChange /*change*/, mbgl::timestamp /*delay*/) {
+void HeadlessView::notifyMapChange(mbgl::MapChange /*change*/, mbgl::timestamp /*delay*/) {
     // no-op
 }
 
-void HeadlessView::make_active() {
+void HeadlessView::activate() {
 #if MBGL_USE_CGL
     CGLError error = CGLSetCurrentContext(glContext);
     if (error != kCGLNoError) {
@@ -264,7 +263,7 @@ void HeadlessView::make_active() {
 #endif
 }
 
-void HeadlessView::make_inactive() {
+void HeadlessView::deactivate() {
 #if MBGL_USE_CGL
     CGLError error = CGLSetCurrentContext(nullptr);
     if (error != kCGLNoError) {
