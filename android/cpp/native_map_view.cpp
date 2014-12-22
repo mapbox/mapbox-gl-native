@@ -566,10 +566,10 @@ void NativeMapView::loadExtensions() {
 
     if (extensions.find("GL_OES_vertex_array_object") != std::string::npos) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_vertex_array_object.");
-        gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)eglGetProcAddress("glBindVertexArrayOES");
-        gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)eglGetProcAddress("glDeleteVertexArraysOES");
-        gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)eglGetProcAddress("glGenVertexArraysOES");
-        gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)eglGetProcAddress("glIsVertexArrayOES");
+        gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(eglGetProcAddress("glBindVertexArrayOES"));
+        gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(eglGetProcAddress("glDeleteVertexArraysOES"));
+        gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(eglGetProcAddress("glGenVertexArraysOES"));
+        gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(eglGetProcAddress("glIsVertexArrayOES"));
         assert(gl::BindVertexArray != nullptr);
         assert(gl::DeleteVertexArrays != nullptr);
         assert(gl::GenVertexArrays != nullptr);
@@ -594,8 +594,8 @@ void NativeMapView::loadExtensions() {
         GLint numBinaryFormats;
         MBGL_CHECK_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats));
         if (numBinaryFormats > 0) {
-            gl::GetProgramBinary = (gl::PFNGLGETPROGRAMBINARYPROC)eglGetProcAddress("glGetProgramBinaryOES");
-            gl::ProgramBinary = (gl::PFNGLPROGRAMBINARYPROC)eglGetProcAddress("glProgramBinaryOES");
+            gl::GetProgramBinary = reinterpret_cast<gl::PFNGLGETPROGRAMBINARYPROC>(eglGetProcAddress("glGetProgramBinaryOES"));
+            gl::ProgramBinary = reinterpret_cast<gl::PFNGLPROGRAMBINARYPROC>(eglGetProcAddress("glProgramBinaryOES"));
             gl::ProgramParameteri = nullptr; // This does not exist until GLES 3.0
             assert(gl::GetProgramBinary != nullptr);
             assert(gl::ProgramBinary != nullptr);
@@ -603,17 +603,17 @@ void NativeMapView::loadExtensions() {
     }
 
     if (extensions.find("GL_KHR_debug") != std::string::npos) {
-        gl::DebugMessageControl = (gl::PFNGLDEBUGMESSAGECONTROLPROC)eglGetProcAddress("glDebugMessageControl");
-        gl::DebugMessageInsert = (gl::PFNGLDEBUGMESSAGEINSERTPROC)eglGetProcAddress("glDebugMessageInsert");
-        gl::DebugMessageCallback = (gl::PFNGLDEBUGMESSAGECALLBACKPROC)eglGetProcAddress("glDebugMessageCallback");
-        gl::GetDebugMessageLog = (gl::PFNGLGETDEBUGMESSAGELOGPROC)eglGetProcAddress("glGetDebugMessageLog");
-        gl::GetPointerv = (gl::PFNGLGETPOINTERVPROC)eglGetProcAddress("glGetPointerv");
-        gl::PushDebugGroup = (gl::PFNGLPUSHDEBUGGROUPPROC)eglGetProcAddress("glPushDebugGroup");
-        gl::PopDebugGroup = (gl::PFNGLPOPDEBUGGROUPPROC)eglGetProcAddress("glPopDebugGroup");
-        gl::ObjectLabel = (gl::PFNGLOBJECTLABELPROC)eglGetProcAddress("glObjectLabel");
-        gl::GetObjectLabel = (gl::PFNGLGETOBJECTLABELPROC)eglGetProcAddress("glGetObjectLabel");
-        gl::ObjectPtrLabel = (gl::PFNGLOBJECTPTRLABELPROC)eglGetProcAddress("glObjectPtrLabel");
-        gl::GetObjectPtrLabel = (gl::PFNGLGETOBJECTPTRLABELPROC)eglGetProcAddress("glGetObjectPtrLabel");
+        gl::DebugMessageControl = reinterpret_cast<gl::PFNGLDEBUGMESSAGECONTROLPROC>(eglGetProcAddress("glDebugMessageControl"));
+        gl::DebugMessageInsert = reinterpret_cast<gl::PFNGLDEBUGMESSAGEINSERTPROC>(eglGetProcAddress("glDebugMessageInsert"));
+        gl::DebugMessageCallback = reinterpret_cast<gl::PFNGLDEBUGMESSAGECALLBACKPROC>(eglGetProcAddress("glDebugMessageCallback"));
+        gl::GetDebugMessageLog = reinterpret_cast<gl::PFNGLGETDEBUGMESSAGELOGPROC>(eglGetProcAddress("glGetDebugMessageLog"));
+        gl::GetPointerv = reinterpret_cast<gl::PFNGLGETPOINTERVPROC>(eglGetProcAddress("glGetPointerv"));
+        gl::PushDebugGroup = reinterpret_cast<gl::PFNGLPUSHDEBUGGROUPPROC>(eglGetProcAddress("glPushDebugGroup"));
+        gl::PopDebugGroup = reinterpret_cast<gl::PFNGLPOPDEBUGGROUPPROC>(eglGetProcAddress("glPopDebugGroup"));
+        gl::ObjectLabel = reinterpret_cast<gl::PFNGLOBJECTLABELPROC>(eglGetProcAddress("glObjectLabel"));
+        gl::GetObjectLabel = reinterpret_cast<gl::PFNGLGETOBJECTLABELPROC>(eglGetProcAddress("glGetObjectLabel"));
+        gl::ObjectPtrLabel = reinterpret_cast<gl::PFNGLOBJECTPTRLABELPROC>(eglGetProcAddress("glObjectPtrLabel"));
+        gl::GetObjectPtrLabel = reinterpret_cast<gl::PFNGLGETOBJECTPTRLABELPROC>(eglGetProcAddress("glGetObjectPtrLabel"));
         assert(gl::DebugMessageControl != nullptr);
         assert(gl::DebugMessageInsert != nullptr);
         assert(gl::DebugMessageCallback != nullptr);
@@ -627,17 +627,17 @@ void NativeMapView::loadExtensions() {
         assert(gl::GetObjectPtrLabel != nullptr);
     } else {
         if (extensions.find("GL_EXT_debug_marker") != std::string::npos) {
-            gl::InsertEventMarkerEXT = (gl::PFNGLINSERTEVENTMARKEREXTPROC)eglGetProcAddress("glInsertEventMarkerEXT");
-            gl::PushGroupMarkerEXT = (gl::PFNGLPUSHGROUPMARKEREXTPROC)eglGetProcAddress("glPushGroupMarkerEXT");
-            gl::PopGroupMarkerEXT = (gl::PFNGLPOPGROUPMARKEREXTPROC)eglGetProcAddress("glPopGroupMarkerEXT");
+            gl::InsertEventMarkerEXT = reinterpret_cast<gl::PFNGLINSERTEVENTMARKEREXTPROC>(eglGetProcAddress("glInsertEventMarkerEXT"));
+            gl::PushGroupMarkerEXT = reinterpret_cast<gl::PFNGLPUSHGROUPMARKEREXTPROC>(eglGetProcAddress("glPushGroupMarkerEXT"));
+            gl::PopGroupMarkerEXT = reinterpret_cast<gl::PFNGLPOPGROUPMARKEREXTPROC>(eglGetProcAddress("glPopGroupMarkerEXT"));
             assert(gl::InsertEventMarkerEXT != nullptr);
             assert(gl::PushGroupMarkerEXT != nullptr);
             assert(gl::PopGroupMarkerEXT != nullptr);
         }
 
         if (extensions.find("GL_EXT_debug_label") != std::string::npos) {
-            gl::LabelObjectEXT = (gl::PFNGLLABELOBJECTEXTPROC)eglGetProcAddress("glLabelObjectEXT");
-            gl::GetObjectLabelEXT = (gl::PFNGLGETOBJECTLABELEXTPROC)eglGetProcAddress("glGetObjectLabelEXT");
+            gl::LabelObjectEXT = reinterpret_cast<gl::PFNGLLABELOBJECTEXTPROC>(eglGetProcAddress("glLabelObjectEXT"));
+            gl::GetObjectLabelEXT = reinterpret_cast<gl::PFNGLGETOBJECTLABELEXTPROC>(eglGetProcAddress("glGetObjectLabelEXT"));
             assert(gl::LabelObjectEXT != nullptr);
             assert(gl::GetObjectLabelEXT != nullptr);
         }
