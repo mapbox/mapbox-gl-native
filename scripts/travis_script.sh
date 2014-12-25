@@ -11,11 +11,11 @@ if [[ $MASON_PLATFORM == "android" ]]; then
     #make android BUILDTYPE=${BUILDTYPE}
     ./android/scrips/run-build.sh
 
-    if [[ $TESTMUNK == "yes" ]]; then
+    #if [[ $TESTMUNK == "yes" ]]; then
         #mapbox_time_start "upload_testmunk"
         #(cd ./android/test/ && ./upload_testmunk.sh ../java/app/build/outputs/apk/app-debug.apk)
         #mapbox_time_finish
-    fi
+    #fi
 
 elif [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #
