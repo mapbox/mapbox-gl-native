@@ -161,7 +161,7 @@ void GlyphAtlas::bind() {
         dirty = false;
 
 #if defined(DEBUG)
-        // platform::show_debug_image("Glyph Atlas", data, width, height);
+        // platform::showDebugImage("Glyph Atlas", data, width, height);
 #endif
     }
 };
