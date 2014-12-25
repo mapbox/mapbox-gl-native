@@ -44,7 +44,7 @@ before_install:
 - if [[ ${TRAVIS_OS_NAME} == "linux" && ${MASON_PLATFORM} != "android" ]]; then glxinfo; fi
 
 install:
-- make config.gypi
+- if [[ ${MASON_PLATFORM} != "android" ]]; then make config.gypi; fi
 - ulimit -c
 
 before_script:
