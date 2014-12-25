@@ -9,7 +9,7 @@ git submodule update --init styles
 if [[ $MASON_PLATFORM == "android" ]]; then
     #mapbox_time "compile_program" \
     #make android BUILDTYPE=${BUILDTYPE}
-    ./android/scrips/run-build.sh
+    ./android/scripts/run-build.sh
 
     #if [[ $TESTMUNK == "yes" ]]; then
         #mapbox_time_start "upload_testmunk"
