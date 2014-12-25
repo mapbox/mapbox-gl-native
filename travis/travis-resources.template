@@ -78,6 +78,34 @@
                                 }
                             ]
                         }
+                    },
+                    {
+                        "PolicyName": "android",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:GetObject"
+                                    ],
+                                    "Resource": [
+                                        "arn:aws:s3:::android-gl-build/*"
+                                    ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "ec2:DescribeInstances",
+                                        "ec2:RunInstances",
+                                        "ec2:CreateTags",
+                                        "ec2:GetConsoleOutput"
+                                    ],
+                                    "Resource": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
                     }
                 ]
             }
@@ -99,7 +127,7 @@
         },
         "SecretAccessKey": {
             "Value": {
-                "Fn::GetAtt": [ 
+                "Fn::GetAtt": [
                     "BuildUserKey",
                     "SecretAccessKey"
                 ]
@@ -107,4 +135,3 @@
         }
     }
 }
-
