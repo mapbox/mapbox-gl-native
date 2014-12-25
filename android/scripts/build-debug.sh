@@ -3,6 +3,6 @@
 set -e
 set -o pipefail
 
-export BUILDTYPE=Debug TESTMUNK=no
+export BUILDTYPE=Debug
 
 ./android/scripts/common.sh $1

@@ -12,7 +12,6 @@ instance_name="android-gl-build-$TRAVIS_REPO_SLUG-$TRAVIS_JOB_NUMBER"
 echo $ami_name
 
 NAME=$TRAVIS_REPO_SLUG/$TRAVIS_JOB_NUMBER
-CONFIG=debug
 
 user_data="#!/bin/bash
     cd /android
@@ -26,6 +25,7 @@ user_data="#!/bin/bash
     export JAVA_HOME=/android/jdk1.7.0_71
     export ANDROID_HOME=/android/android-sdk-linux
     export PATH=\$PATH:/android/jdk1.7.0_71/bin
+    export ANDROID_KEY=$ANDROID_KEY
 
     if ./android/scripts/build-$CONFIG.sh $NAME &>../build.log; then
         echo 'ANDROID BUILD PASSED'
@@ -34,8 +34,7 @@ user_data="#!/bin/bash
     fi
     popd
 
-    #aws s3 cp --region us-east-1 build.log s3://android-gl-build/${NAME}/build-log.txt
-    aws s3 cp --region us-east-1 build.log s3://android-gl-build/test/build-log.txt
+    aws s3 cp --region us-east-1 build.log s3://android-gl-build/${NAME}/build-log.txt
     shutdown -P now"
 
 id=$(aws ec2 run-instances \
@@ -63,11 +62,13 @@ echo "Build finished"
 
 output=$(aws ec2 get-console-output --region $region --instance-id $id | jq -r '.Output')
 
-aws s3 cp --region $region s3://android-gl-build/test/build-log.txt build.log
+aws s3 cp --region $region s3://android-gl-build/${NAME}/build-log.txt build.log
 cat build.log
 
 if [[ $output == *"ANDROID BUILD PASSED"* ]]; then
     echo "ANDROID BUILD PASSED"
+    exit 0
 else
     echo "ANDROID BUILD FAILED"
+    exit 1
 fi

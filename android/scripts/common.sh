@@ -16,5 +16,5 @@ echo "${ANDROID_KEY}" >> ./android/java/app/src/main/res/raw/token.txt
 
 make android BUILDTYPE=$BUILDTYPE
 
-#aws s3 cp ./android/java/app/build/outputs/apk/app-debug.apk s3://android-gl-build/${NAME}/app-debug.apk
-#aws s3 cp ./android/java/app/build/outputs/apk/app-release-unsigned.apk s3://android-gl-build/${NAME}/app-release-unsigned.apk
+aws s3 cp ./android/java/app/build/outputs/apk/app-debug.apk s3://android-gl-build/${NAME}/app-debug.apk
+aws s3 cp ./android/java/app/build/outputs/apk/app-release-unsigned.apk s3://android-gl-build/${NAME}/app-release-unsigned.apk
