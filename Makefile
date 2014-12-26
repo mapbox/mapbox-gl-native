@@ -93,7 +93,7 @@ android:
 	export PATH="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env PATH`:${PATH}" && \
 	MASON_PLATFORM=android ./configure config-android.gypi && \
 	deps/run_gyp android/mapboxgl-app.gyp -Iconfig-android.gypi -Dplatform=android --depth=. --generator-output=./build/android -f make-android && \
-	$(MAKE) -C build/android BUILDTYPE=$(BUILDTYPE) V=$(V) androidapp && \
+	$(MAKE) -C build/android -j$(JOBS) BUILDTYPE=$(BUILDTYPE) V=$(V) androidapp && \
 	mkdir -p android/java/lib/src/main/jniLibs/armeabi-v7a && \
 	cp build/android/out/$(BUILDTYPE)/lib.target/libmapbox-gl.so android/java/lib/src/main/jniLibs/armeabi-v7a/libmapbox-gl.so && \
 	mkdir -p android/java/lib/src/main/assets && \
