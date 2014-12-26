@@ -148,7 +148,7 @@
                                         "s3:PutObject"
                                     ],
                                     "Resource": [
-                                        "arn:aws:s3:::android-gl-build/*"
+                                        "arn:aws:s3:::mapbox-gl-testing/android/*"
                                     ]
                                 }
                             ]

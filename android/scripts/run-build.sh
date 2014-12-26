@@ -6,7 +6,7 @@ set -o pipefail
 cwd=$(pwd)
 
 region="us-east-1"
-region_ami="ami-c0412ea8"
+region_ami="ami-e40d648c"
 sleep=10
 instance_name="android-gl-build-$TRAVIS_REPO_SLUG-$TRAVIS_JOB_NUMBER"
 echo $ami_name
