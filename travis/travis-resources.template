@@ -103,6 +103,16 @@
                                     "Resource": [
                                         "*"
                                     ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": "iam:PassRole",
+                                    "Resource": {
+                                        "Fn::GetAtt": [
+                                            "AndroidRole",
+                                            "Arn"
+                                        ]
+                                    }
                                 }
                             ]
                         }
