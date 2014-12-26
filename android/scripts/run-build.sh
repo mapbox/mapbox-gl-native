@@ -34,7 +34,7 @@ user_data="#!/bin/bash
     fi
     popd
 
-    aws s3 cp --region us-east-1 build.log s3://android-gl-build/${NAME}/build-log.txt
+    aws s3 cp --region us-east-1 build.log s3://mapbox-gl-testing/android/${NAME}/build-log.txt
     shutdown -P now"
 
 id=$(aws ec2 run-instances \
@@ -62,7 +62,7 @@ echo "Build finished"
 
 output=$(aws ec2 get-console-output --region $region --instance-id $id | jq -r '.Output')
 
-aws s3 cp --region $region s3://android-gl-build/${NAME}/build-log.txt build.log
+aws s3 cp --region $region s3://mapbox-gl-testing/android/${NAME}/build-log.txt build.log
 cat build.log
 
 if [[ $output == *"ANDROID BUILD PASSED"* ]]; then
