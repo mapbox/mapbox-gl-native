@@ -117,6 +117,56 @@
                     "Ref": "BuildUser"
                 }
             }
+        },
+        "AndroidRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "android",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:PutObject"
+                                    ],
+                                    "Resource": [
+                                        "arn:aws:s3:::android-gl-build/*"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "Path": "/android-gl-build/travis/role/"
+            }
+        },
+        "AndroidInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Roles": [
+                    {
+                        "Ref": "AndroidRole"
+                    }
+                ],
+                "Path": "/android-gl-build/travis/instance-profile/"
+            }
         }
     },
     "Outputs": {
@@ -130,6 +180,22 @@
                 "Fn::GetAtt": [
                     "BuildUserKey",
                     "SecretAccessKey"
+                ]
+            }
+        },
+        "AndroidInstanceProfile": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "AndroidInstanceProfile",
+                    "Arn"
+                ]
+            }
+        },
+        "AndroidRole": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "AndroidRole",
+                    "Arn"
                 ]
             }
         }

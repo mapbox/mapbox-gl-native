@@ -12,7 +12,7 @@ export CXXFLAGS="-Wno-unknown-warning-option -Wno-unused-local-typedefs -Wno-unk
 export MASON_PLATFORM=android
 
 mkdir ./android/java/app/src/main/res/raw/
-echo "${ANDROID_KEY}" >> ./android/java/app/src/main/res/raw/token.txt
+echo "${MAPBOX_ACCESS_TOKEN}" >> ./android/java/app/src/main/res/raw/token.txt
 
 make android BUILDTYPE=$BUILDTYPE
 

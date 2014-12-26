@@ -25,7 +25,7 @@ user_data="#!/bin/bash
     export JAVA_HOME=/android/jdk1.7.0_71
     export ANDROID_HOME=/android/android-sdk-linux
     export PATH=\$PATH:/android/jdk1.7.0_71/bin
-    export ANDROID_KEY=$ANDROID_KEY
+    export MAPBOX_ACCESS_TOKEN=$MAPBOX_ACCESS_TOKEN
 
     if ./android/scripts/build-$CONFIG.sh $NAME &>../build.log; then
         echo 'ANDROID BUILD PASSED'
@@ -42,7 +42,7 @@ id=$(aws ec2 run-instances \
     --image-id $region_ami \
     --count 1 \
     --instance-type m3.large \
-    --iam-instance-profile Name="android-gl-build" \
+    --iam-instance-profile Arn="$ANDROID_BUILD_INSTANCE_PROFILE" \
     --instance-initiated-shutdown-behavior terminate \
     --user-data "$user_data" | jq -r '.Instances[0].InstanceId')
 
