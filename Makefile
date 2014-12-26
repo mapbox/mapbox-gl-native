@@ -100,7 +100,7 @@ android:
 	cp build/android/out/$(BUILDTYPE)/ca-bundle.crt android/java/lib/src/main/assets/ca-bundle.crt && \
 	cp -r build/android/out/$(BUILDTYPE)/styles android/java/lib/src/main/assets/styles && \
 	cd android/java && \
-	./gradlew build
+	./gradlew --parallel-threads=$(JOBS) build
 
 ##### Test cases ###############################################################
 

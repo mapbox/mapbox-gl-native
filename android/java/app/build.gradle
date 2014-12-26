@@ -4,6 +4,10 @@ android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
 
+    repositories {
+        jcenter()
+    }
+
     defaultConfig {
         applicationId "com.mapbox.mapboxgl.app"
         minSdkVersion 14
