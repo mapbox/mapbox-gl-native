@@ -11,14 +11,19 @@ sleep=10
 instance_name="android-gl-build-$TRAVIS_REPO_SLUG-$TRAVIS_JOB_NUMBER"
 echo $ami_name
 
-NAME=$TRAVIS_REPO_SLUG/$TRAVIS_JOB_NUMBER
+NAME=$TRAVIS_JOB_ID
 
 user_data="#!/bin/bash
     cd /android
     git clone git://github.com/mapbox/mapbox-gl-native.git
 
     pushd mapbox-gl-native
-    git checkout `git rev-parse HEAD`
+    if [[ $TRAVIS_PULL_REQUEST == 'false' ]]; then
+        git checkout $TRAVIS_COMMIT
+    else
+        git fetch origin +refs/pull/$TRAVIS_PULL_REQUEST/merge:
+        git checkout FETCH_HEAD
+    fi
     git submodule update --init --recursive
 
     export ANDROID_NDK_PATH=/android/android-ndk-r10c
