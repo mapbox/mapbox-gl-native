@@ -2,6 +2,7 @@ BUILDTYPE ?= Release
 PYTHON ?= python
 V ?= 1
 PREFIX ?= /usr/local
+JOBS ?= 1
 
 ifeq ($(shell uname -s), Darwin)
 PLATFORM ?= osx
