@@ -16,7 +16,7 @@ namespace android {
 
 class NativeMapView : public mbgl::View, private mbgl::util::noncopyable {
 public:
-    NativeMapView(JNIEnv* env, jobject obj);
+    NativeMapView(JNIEnv *env, jobject obj);
     virtual ~NativeMapView();
 
     void activate() override;
@@ -27,8 +27,8 @@ public:
     void notify() override;
     void notifyMapChange(mbgl::MapChange change, mbgl::timestamp delay) override;
 
-    mbgl::Map& getMap();
-    mbgl::CachingHTTPFileSource& getFileSource();
+    mbgl::Map &getMap();
+    mbgl::CachingHTTPFileSource &getFileSource();
 
     bool initializeDisplay();
     void terminateDisplay();
@@ -36,7 +36,7 @@ public:
     bool initializeContext();
     void terminateContext();
 
-    bool createSurface(ANativeWindow* window);
+    bool createSurface(ANativeWindow *window);
     void destroySurface();
 
     void start();
@@ -54,10 +54,10 @@ private:
     void loadExtensions();
 
 private:
-    JavaVM* vm = nullptr;
+    JavaVM *vm = nullptr;
     jobject obj = nullptr;
 
-    ANativeWindow* window = nullptr;
+    ANativeWindow *window = nullptr;
 
     mbgl::CachingHTTPFileSource fileSource;
     mbgl::Map map;
@@ -79,7 +79,6 @@ private:
     bool fpsEnabled = false;
     double fps = 0.0;
 };
-
 }
 }
 

@@ -19,10 +19,11 @@
 namespace mbgl {
 namespace android {
 
-void log_egl_string(EGLDisplay display, EGLint name, const char* label) {
-    const char* str = eglQueryString(display, name);
+void log_egl_string(EGLDisplay display, EGLint name, const char *label) {
+    const char *str = eglQueryString(display, name);
     if (str == nullptr) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "eglQueryString(%d) returned error %d", name, eglGetError());
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglQueryString(%d) returned error %d", name,
+                         eglGetError());
     } else {
         char buf[513];
         for (int len = std::strlen(str), pos = 0; len > 0; len -= 512, pos += 512) {
@@ -33,13 +34,15 @@ void log_egl_string(EGLDisplay display, EGLint name, const char* label) {
     }
 }
 
-void log_gl_string(GLenum name, const char* label) {
-    const GLubyte* str = glGetString(name);
+void log_gl_string(GLenum name, const char *label) {
+    const GLubyte *str = glGetString(name);
     if (str == nullptr) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "glGetString(%d) returned error %d", name, glGetError());
+        mbgl::Log::Error(mbgl::Event::OpenGL, "glGetString(%d) returned error %d", name,
+                         glGetError());
     } else {
         char buf[513];
-        for (int len = std::strlen(reinterpret_cast<const char *>(str)), pos = 0; len > 0; len -= 512, pos += 512) {
+        for (int len = std::strlen(reinterpret_cast<const char *>(str)), pos = 0; len > 0;
+             len -= 512, pos += 512) {
             strncpy(buf, reinterpret_cast<const char *>(str) + pos, 512);
             buf[512] = 0;
             mbgl::Log::Info(mbgl::Event::OpenGL, "GL %s: %s", label, buf);
@@ -47,7 +50,10 @@ void log_gl_string(GLenum name, const char* label) {
     }
 }
 
-NativeMapView::NativeMapView(JNIEnv* env, jobject obj_) : mbgl::View(*this), fileSource(mbgl::platform::defaultCacheDatabase()), map(*this, fileSource) {
+NativeMapView::NativeMapView(JNIEnv *env, jobject obj_)
+    : mbgl::View(*this),
+      fileSource(mbgl::platform::defaultCacheDatabase()),
+      map(*this, fileSource) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
 
     assert(env != nullptr);
@@ -75,8 +81,8 @@ NativeMapView::~NativeMapView() {
     assert(obj != nullptr);
 
     jint ret;
-    JNIEnv* env = nullptr;
-    ret = vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6);
+    JNIEnv *env = nullptr;
+    ret = vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
     if (ret == JNI_OK) {
         env->DeleteGlobalRef(obj);
     } else {
@@ -90,7 +96,8 @@ void NativeMapView::activate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::activate");
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
         if (!eglMakeCurrent(display, surface, surface, context)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
+                             eglGetError());
         }
     } else {
         mbgl::Log::Info(mbgl::Event::Android, "Not activating as we are not ready");
@@ -100,7 +107,8 @@ void NativeMapView::activate() {
 void NativeMapView::deactivate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::deactivate");
     if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
+                         eglGetError());
     }
 }
 
@@ -109,7 +117,8 @@ void NativeMapView::swap() {
 
     if (map.needsSwap() && (display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
         if (!eglSwapBuffers(display, surface)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d",
+                             eglGetError());
         }
         map.swapped();
         updateFps();
@@ -123,13 +132,9 @@ void NativeMapView::notify() {
     // noop
 }
 
-mbgl::Map& NativeMapView::getMap() {
-    return map;
-}
+mbgl::Map &NativeMapView::getMap() { return map; }
 
-mbgl::CachingHTTPFileSource& NativeMapView::getFileSource() {
-    return fileSource;
-}
+mbgl::CachingHTTPFileSource &NativeMapView::getFileSource() { return fileSource; }
 
 bool NativeMapView::initializeDisplay() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::initializeDisplay");
@@ -152,7 +157,8 @@ bool NativeMapView::initializeDisplay() {
         return false;
     }
     if ((major <= 1) && (minor < 3)) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "EGL version is too low, need 1.3, got %d.%d", major, minor);
+        mbgl::Log::Error(mbgl::Event::OpenGL, "EGL version is too low, need 1.3, got %d.%d", major,
+                         minor);
         terminateDisplay();
         return false;
     }
@@ -172,22 +178,19 @@ bool NativeMapView::initializeDisplay() {
 
     // Get all configs at least RGB 565 with 16 depth and 8 stencil
     EGLint configAttribs[] = {
-        EGL_CONFIG_CAVEAT, EGL_NONE,
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-        EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-        EGL_BUFFER_SIZE, 16,
-        EGL_RED_SIZE, 5,
-        EGL_GREEN_SIZE, 6,
-        EGL_BLUE_SIZE, 5,
-        EGL_DEPTH_SIZE, 16,
-        EGL_STENCIL_SIZE, 8,
-        (inEmulator ? EGL_NONE : EGL_CONFORMANT), EGL_OPENGL_ES2_BIT, // Ugly hack
-        (inEmulator ? EGL_NONE : EGL_COLOR_BUFFER_TYPE), EGL_RGB_BUFFER, // Ugly hack
-        EGL_NONE
-    };
+        EGL_CONFIG_CAVEAT,                               EGL_NONE,           EGL_RENDERABLE_TYPE,
+        EGL_OPENGL_ES2_BIT,                              EGL_SURFACE_TYPE,   EGL_WINDOW_BIT,
+        EGL_BUFFER_SIZE,                                 16,                 EGL_RED_SIZE,
+        5,                                               EGL_GREEN_SIZE,     6,
+        EGL_BLUE_SIZE,                                   5,                  EGL_DEPTH_SIZE,
+        16,                                              EGL_STENCIL_SIZE,   8,
+        (inEmulator ? EGL_NONE : EGL_CONFORMANT),        EGL_OPENGL_ES2_BIT, // Ugly hack
+        (inEmulator ? EGL_NONE : EGL_COLOR_BUFFER_TYPE), EGL_RGB_BUFFER,     // Ugly hack
+        EGL_NONE};
     EGLint numConfigs;
     if (!eglChooseConfig(display, configAttribs, nullptr, 0, &numConfigs)) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig(NULL) returned error %d", eglGetError());
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig(NULL) returned error %d",
+                         eglGetError());
         terminateDisplay();
         return false;
     }
@@ -212,7 +215,8 @@ bool NativeMapView::initializeDisplay() {
     }
 
     if (!eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format)) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib() returned error %d", eglGetError());
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib() returned error %d",
+                         eglGetError());
         terminateDisplay();
         return false;
     }
@@ -228,18 +232,20 @@ void NativeMapView::terminateDisplay() {
         // Destroy the surface first, if it still exists. This call needs a valid surface.
         if (surface != EGL_NO_SURFACE) {
             if (!eglDestroySurface(display, surface)) {
-                mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroySurface() returned error %d", eglGetError());
+                mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroySurface() returned error %d",
+                                 eglGetError());
             }
             surface = EGL_NO_SURFACE;
         }
 
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
-                    eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
         }
 
         if (!eglTerminate(display)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglTerminate() returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglTerminate() returned error %d",
+                             eglGetError());
         }
     }
 
@@ -255,13 +261,11 @@ bool NativeMapView::initializeContext() {
     assert(context == EGL_NO_CONTEXT);
     assert(config != nullptr);
 
-    const EGLint contextAttribs[] = {
-        EGL_CONTEXT_CLIENT_VERSION, 2,
-        EGL_NONE
-    };
+    const EGLint contextAttribs[] = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
     context = eglCreateContext(display, config, EGL_NO_CONTEXT, contextAttribs);
     if (context == EGL_NO_CONTEXT) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateContext() returned error %d", eglGetError());
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateContext() returned error %d",
+                         eglGetError());
         terminateContext();
         return false;
     }
@@ -274,13 +278,14 @@ void NativeMapView::terminateContext() {
     if (display != EGL_NO_DISPLAY) {
 
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
-                    eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
         }
 
         if (context != EGL_NO_CONTEXT) {
             if (!eglDestroyContext(display, context)) {
-                mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroyContext() returned error %d", eglGetError());
+                mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroyContext() returned error %d",
+                                 eglGetError());
             }
         }
     }
@@ -288,7 +293,7 @@ void NativeMapView::terminateContext() {
     context = EGL_NO_CONTEXT;
 }
 
-bool NativeMapView::createSurface(ANativeWindow* window_) {
+bool NativeMapView::createSurface(ANativeWindow *window_) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::createSurface");
 
     assert(window == nullptr);
@@ -302,12 +307,11 @@ bool NativeMapView::createSurface(ANativeWindow* window_) {
 
     ANativeWindow_setBuffersGeometry(window, 0, 0, format);
 
-    const EGLint surfaceAttribs[] = {
-        EGL_NONE
-    };
+    const EGLint surfaceAttribs[] = {EGL_NONE};
     surface = eglCreateWindowSurface(display, config, window, surfaceAttribs);
     if (surface == EGL_NO_SURFACE) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateWindowSurface() returned error %d", eglGetError());
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateWindowSurface() returned error %d",
+                         eglGetError());
         destroySurface();
         return false;
     }
@@ -316,19 +320,23 @@ bool NativeMapView::createSurface(ANativeWindow* window_) {
         firstTime = true;
 
         if (!eglMakeCurrent(display, surface, surface, context)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
+                             eglGetError());
         }
 
         log_gl_string(GL_VENDOR, "Vendor");
         log_gl_string(GL_RENDERER, "Renderer");
         log_gl_string(GL_VERSION, "Version");
-        log_gl_string(GL_SHADING_LANGUAGE_VERSION, "SL Version"); // In the emulator this returns NULL with error code 0? https://code.google.com/p/android/issues/detail?id=78977
+        log_gl_string(GL_SHADING_LANGUAGE_VERSION,
+                      "SL Version"); // In the emulator this returns NULL with error code 0?
+                                     // https://code.google.com/p/android/issues/detail?id=78977
         log_gl_string(GL_EXTENSIONS, "Extensions");
 
         loadExtensions();
 
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
         }
     }
 
@@ -344,7 +352,8 @@ void NativeMapView::destroySurface() {
 
     if (surface != EGL_NO_SURFACE) {
         if (!eglDestroySurface(display, surface)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroySurface() returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroySurface() returned error %d",
+                             eglGetError());
         }
     }
 
@@ -386,7 +395,8 @@ typedef enum {
     Format24Depth8Stencil = 0,
 } DepthStencilFormat;
 
-// Tuple is <buffer_format, depth_stencil_format, is_not_conformant, is_caveat, config_num, config_id>
+// Tuple is <buffer_format, depth_stencil_format, is_not_conformant, is_caveat, config_num,
+// config_id>
 typedef std::tuple<BufferFormat, DepthStencilFormat, bool, bool, int, EGLConfig> ConfigProperties;
 
 EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint numConfigs) {
@@ -397,65 +407,83 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint numConfi
     for (int i = 0; i < numConfigs; i++) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Config %d:", i);
 
-        EGLint caveat, conformant, bits, red, green, blue, alpha, alphaMask, depth, stencil, sampleBuffers, samples;
+        EGLint caveat, conformant, bits, red, green, blue, alpha, alphaMask, depth, stencil,
+            sampleBuffers, samples;
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_CONFIG_CAVEAT, &caveat)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_CONFIG_CAVEAT) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglGetConfigAttrib(EGL_CONFIG_CAVEAT) returned error %d",
+                             eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_CONFORMANT, &conformant)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_CONFORMANT) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglGetConfigAttrib(EGL_CONFORMANT) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_BUFFER_SIZE, &bits)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_BUFFER_SIZE) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglGetConfigAttrib(EGL_BUFFER_SIZE) returned error %d",
+                             eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_RED_SIZE, &red)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_RED_SIZE) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglGetConfigAttrib(EGL_RED_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_GREEN_SIZE, &green)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_GREEN_SIZE) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglGetConfigAttrib(EGL_GREEN_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_BLUE_SIZE, &blue)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_BLUE_SIZE) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglGetConfigAttrib(EGL_BLUE_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_ALPHA_SIZE, &alpha)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_ALPHA_SIZE) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglGetConfigAttrib(EGL_ALPHA_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_ALPHA_MASK_SIZE, &alphaMask)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_ALPHA_MASK_SIZE) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglGetConfigAttrib(EGL_ALPHA_MASK_SIZE) returned error %d",
+                             eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_DEPTH_SIZE, &depth)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_DEPTH_SIZE) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglGetConfigAttrib(EGL_DEPTH_SIZE) returned error %d", eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_STENCIL_SIZE, &stencil)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_STENCIL_SIZE) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglGetConfigAttrib(EGL_STENCIL_SIZE) returned error %d",
+                             eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_SAMPLE_BUFFERS, &sampleBuffers)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_SAMPLE_BUFFERS) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglGetConfigAttrib(EGL_SAMPLE_BUFFERS) returned error %d",
+                             eglGetError());
             return nullptr;
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_SAMPLES, &samples)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib(EGL_SAMPLES) returned error %d", eglGetError());
+            mbgl::Log::Error(mbgl::Event::OpenGL,
+                             "eglGetConfigAttrib(EGL_SAMPLES) returned error %d", eglGetError());
             return nullptr;
         }
 
@@ -507,9 +535,9 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint numConfi
             EGLConfig configId = configs[i];
 
             // Ignore formats we don't recognise
-            if (bufferFormat != Unknown)
-            {
-                configList.push_back(std::make_tuple(bufferFormat, depthStencilFormat, isNotConformant, isCaveat, i, configId));
+            if (bufferFormat != Unknown) {
+                configList.push_back(std::make_tuple(bufferFormat, depthStencilFormat,
+                                                     isNotConformant, isCaveat, i, configId));
             }
         }
     }
@@ -556,20 +584,25 @@ void NativeMapView::start() {
 }
 
 void NativeMapView::loadExtensions() {
-    const GLubyte* str = glGetString(GL_EXTENSIONS);
+    const GLubyte *str = glGetString(GL_EXTENSIONS);
     if (str == nullptr) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "glGetString(GL_EXTENSIONS) returned error %d", glGetError());
+        mbgl::Log::Error(mbgl::Event::OpenGL, "glGetString(GL_EXTENSIONS) returned error %d",
+                         glGetError());
         return;
     }
 
-    std::string extensions(reinterpret_cast<const char*>(str));
+    std::string extensions(reinterpret_cast<const char *>(str));
 
     if (extensions.find("GL_OES_vertex_array_object") != std::string::npos) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_vertex_array_object.");
-        gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(eglGetProcAddress("glBindVertexArrayOES"));
-        gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(eglGetProcAddress("glDeleteVertexArraysOES"));
-        gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(eglGetProcAddress("glGenVertexArraysOES"));
-        gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(eglGetProcAddress("glIsVertexArrayOES"));
+        gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(
+            eglGetProcAddress("glBindVertexArrayOES"));
+        gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(
+            eglGetProcAddress("glDeleteVertexArraysOES"));
+        gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(
+            eglGetProcAddress("glGenVertexArraysOES"));
+        gl::IsVertexArray =
+            reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(eglGetProcAddress("glIsVertexArrayOES"));
         assert(gl::BindVertexArray != nullptr);
         assert(gl::DeleteVertexArrays != nullptr);
         assert(gl::GenVertexArrays != nullptr);
@@ -594,8 +627,10 @@ void NativeMapView::loadExtensions() {
         GLint numBinaryFormats;
         MBGL_CHECK_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats));
         if (numBinaryFormats > 0) {
-            gl::GetProgramBinary = reinterpret_cast<gl::PFNGLGETPROGRAMBINARYPROC>(eglGetProcAddress("glGetProgramBinaryOES"));
-            gl::ProgramBinary = reinterpret_cast<gl::PFNGLPROGRAMBINARYPROC>(eglGetProcAddress("glProgramBinaryOES"));
+            gl::GetProgramBinary = reinterpret_cast<gl::PFNGLGETPROGRAMBINARYPROC>(
+                eglGetProcAddress("glGetProgramBinaryOES"));
+            gl::ProgramBinary = reinterpret_cast<gl::PFNGLPROGRAMBINARYPROC>(
+                eglGetProcAddress("glProgramBinaryOES"));
             gl::ProgramParameteri = nullptr; // This does not exist until GLES 3.0
             assert(gl::GetProgramBinary != nullptr);
             assert(gl::ProgramBinary != nullptr);
@@ -603,17 +638,28 @@ void NativeMapView::loadExtensions() {
     }
 
     if (extensions.find("GL_KHR_debug") != std::string::npos) {
-        gl::DebugMessageControl = reinterpret_cast<gl::PFNGLDEBUGMESSAGECONTROLPROC>(eglGetProcAddress("glDebugMessageControl"));
-        gl::DebugMessageInsert = reinterpret_cast<gl::PFNGLDEBUGMESSAGEINSERTPROC>(eglGetProcAddress("glDebugMessageInsert"));
-        gl::DebugMessageCallback = reinterpret_cast<gl::PFNGLDEBUGMESSAGECALLBACKPROC>(eglGetProcAddress("glDebugMessageCallback"));
-        gl::GetDebugMessageLog = reinterpret_cast<gl::PFNGLGETDEBUGMESSAGELOGPROC>(eglGetProcAddress("glGetDebugMessageLog"));
-        gl::GetPointerv = reinterpret_cast<gl::PFNGLGETPOINTERVPROC>(eglGetProcAddress("glGetPointerv"));
-        gl::PushDebugGroup = reinterpret_cast<gl::PFNGLPUSHDEBUGGROUPPROC>(eglGetProcAddress("glPushDebugGroup"));
-        gl::PopDebugGroup = reinterpret_cast<gl::PFNGLPOPDEBUGGROUPPROC>(eglGetProcAddress("glPopDebugGroup"));
-        gl::ObjectLabel = reinterpret_cast<gl::PFNGLOBJECTLABELPROC>(eglGetProcAddress("glObjectLabel"));
-        gl::GetObjectLabel = reinterpret_cast<gl::PFNGLGETOBJECTLABELPROC>(eglGetProcAddress("glGetObjectLabel"));
-        gl::ObjectPtrLabel = reinterpret_cast<gl::PFNGLOBJECTPTRLABELPROC>(eglGetProcAddress("glObjectPtrLabel"));
-        gl::GetObjectPtrLabel = reinterpret_cast<gl::PFNGLGETOBJECTPTRLABELPROC>(eglGetProcAddress("glGetObjectPtrLabel"));
+        gl::DebugMessageControl = reinterpret_cast<gl::PFNGLDEBUGMESSAGECONTROLPROC>(
+            eglGetProcAddress("glDebugMessageControl"));
+        gl::DebugMessageInsert = reinterpret_cast<gl::PFNGLDEBUGMESSAGEINSERTPROC>(
+            eglGetProcAddress("glDebugMessageInsert"));
+        gl::DebugMessageCallback = reinterpret_cast<gl::PFNGLDEBUGMESSAGECALLBACKPROC>(
+            eglGetProcAddress("glDebugMessageCallback"));
+        gl::GetDebugMessageLog = reinterpret_cast<gl::PFNGLGETDEBUGMESSAGELOGPROC>(
+            eglGetProcAddress("glGetDebugMessageLog"));
+        gl::GetPointerv =
+            reinterpret_cast<gl::PFNGLGETPOINTERVPROC>(eglGetProcAddress("glGetPointerv"));
+        gl::PushDebugGroup =
+            reinterpret_cast<gl::PFNGLPUSHDEBUGGROUPPROC>(eglGetProcAddress("glPushDebugGroup"));
+        gl::PopDebugGroup =
+            reinterpret_cast<gl::PFNGLPOPDEBUGGROUPPROC>(eglGetProcAddress("glPopDebugGroup"));
+        gl::ObjectLabel =
+            reinterpret_cast<gl::PFNGLOBJECTLABELPROC>(eglGetProcAddress("glObjectLabel"));
+        gl::GetObjectLabel =
+            reinterpret_cast<gl::PFNGLGETOBJECTLABELPROC>(eglGetProcAddress("glGetObjectLabel"));
+        gl::ObjectPtrLabel =
+            reinterpret_cast<gl::PFNGLOBJECTPTRLABELPROC>(eglGetProcAddress("glObjectPtrLabel"));
+        gl::GetObjectPtrLabel = reinterpret_cast<gl::PFNGLGETOBJECTPTRLABELPROC>(
+            eglGetProcAddress("glGetObjectPtrLabel"));
         assert(gl::DebugMessageControl != nullptr);
         assert(gl::DebugMessageInsert != nullptr);
         assert(gl::DebugMessageCallback != nullptr);
@@ -627,17 +673,22 @@ void NativeMapView::loadExtensions() {
         assert(gl::GetObjectPtrLabel != nullptr);
     } else {
         if (extensions.find("GL_EXT_debug_marker") != std::string::npos) {
-            gl::InsertEventMarkerEXT = reinterpret_cast<gl::PFNGLINSERTEVENTMARKEREXTPROC>(eglGetProcAddress("glInsertEventMarkerEXT"));
-            gl::PushGroupMarkerEXT = reinterpret_cast<gl::PFNGLPUSHGROUPMARKEREXTPROC>(eglGetProcAddress("glPushGroupMarkerEXT"));
-            gl::PopGroupMarkerEXT = reinterpret_cast<gl::PFNGLPOPGROUPMARKEREXTPROC>(eglGetProcAddress("glPopGroupMarkerEXT"));
+            gl::InsertEventMarkerEXT = reinterpret_cast<gl::PFNGLINSERTEVENTMARKEREXTPROC>(
+                eglGetProcAddress("glInsertEventMarkerEXT"));
+            gl::PushGroupMarkerEXT = reinterpret_cast<gl::PFNGLPUSHGROUPMARKEREXTPROC>(
+                eglGetProcAddress("glPushGroupMarkerEXT"));
+            gl::PopGroupMarkerEXT = reinterpret_cast<gl::PFNGLPOPGROUPMARKEREXTPROC>(
+                eglGetProcAddress("glPopGroupMarkerEXT"));
             assert(gl::InsertEventMarkerEXT != nullptr);
             assert(gl::PushGroupMarkerEXT != nullptr);
             assert(gl::PopGroupMarkerEXT != nullptr);
         }
 
         if (extensions.find("GL_EXT_debug_label") != std::string::npos) {
-            gl::LabelObjectEXT = reinterpret_cast<gl::PFNGLLABELOBJECTEXTPROC>(eglGetProcAddress("glLabelObjectEXT"));
-            gl::GetObjectLabelEXT = reinterpret_cast<gl::PFNGLGETOBJECTLABELEXTPROC>(eglGetProcAddress("glGetObjectLabelEXT"));
+            gl::LabelObjectEXT = reinterpret_cast<gl::PFNGLLABELOBJECTEXTPROC>(
+                eglGetProcAddress("glLabelObjectEXT"));
+            gl::GetObjectLabelEXT = reinterpret_cast<gl::PFNGLGETOBJECTLABELEXTPROC>(
+                eglGetProcAddress("glGetObjectLabelEXT"));
             assert(gl::LabelObjectEXT != nullptr);
             assert(gl::GetObjectLabelEXT != nullptr);
         }
@@ -652,9 +703,9 @@ void NativeMapView::stop() {
     }
 }
 
-
 void NativeMapView::pause(bool waitForPause) {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause %s", (waitForPause) ? "true" : "false");
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause %s",
+                     (waitForPause) ? "true" : "false");
 
     if ((display != EGL_NO_DISPLAY) && (context != EGL_NO_CONTEXT)) {
         map.pause(waitForPause);
@@ -680,16 +731,12 @@ void NativeMapView::notifyMapChange(mbgl::MapChange, mbgl::timestamp) {
     assert(vm != nullptr);
     assert(obj != nullptr);
 
-    JavaVMAttachArgs args = {
-        JNI_VERSION_1_2,
-        "NativeMapView::notifyMapChange()",
-        NULL
-    };
+    JavaVMAttachArgs args = {JNI_VERSION_1_2, "NativeMapView::notifyMapChange()", NULL};
 
     jint ret;
-    JNIEnv* env = nullptr;
+    JNIEnv *env = nullptr;
     bool detach = false;
-    ret = vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6);
+    ret = vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
     if (ret != JNI_OK) {
         if (ret != JNI_EDETACHED) {
             mbgl::Log::Error(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
@@ -737,7 +784,7 @@ void NativeMapView::updateFps() {
     frames++;
     struct timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
-    int64_t currentTime = now.tv_sec*1000000000LL + now.tv_nsec;
+    int64_t currentTime = now.tv_sec * 1000000000LL + now.tv_nsec;
 
     if (currentTime - timeElapsed >= 1) {
         fps = frames / ((currentTime - timeElapsed) / 1E9);
@@ -749,16 +796,12 @@ void NativeMapView::updateFps() {
     assert(vm != nullptr);
     assert(obj != nullptr);
 
-    JavaVMAttachArgs args = {
-        JNI_VERSION_1_2,
-        "NativeMapView::updateFps()",
-        NULL
-    };
+    JavaVMAttachArgs args = {JNI_VERSION_1_2, "NativeMapView::updateFps()", NULL};
 
     jint ret;
-    JNIEnv* env = nullptr;
+    JNIEnv *env = nullptr;
     bool detach = false;
-    ret = vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6);
+    ret = vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
     if (ret != JNI_OK) {
         if (ret != JNI_EDETACHED) {
             mbgl::Log::Error(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
@@ -786,6 +829,5 @@ void NativeMapView::updateFps() {
     }
     env = nullptr;
 }
-
 }
 }
