@@ -20,5 +20,5 @@ aws s3 cp ./android/java/app/build/outputs/apk/app-debug.apk s3://mapbox-gl-test
 aws s3 cp ./android/java/app/build/outputs/apk/app-release-unsigned.apk s3://mapbox-gl-testing/android/${NAME}/app-release-unsigned.apk
 
 if [[ $TESTMUNK == "yes" ]]; then
-    ./android/scipts/upload-testmunk.sh ./android/java/app/build/outputs/apk/app-debug.apk
+    ./android/scripts/upload-testmunk.sh ./android/java/app/build/outputs/apk/app-debug.apk
 fi
