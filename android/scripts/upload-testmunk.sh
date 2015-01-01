@@ -11,13 +11,12 @@ echo "submitting testrun to testmunk"
 
 echo "uploading features..."
 
-zip -r features.zip features/
-RESPONSE=$(curl -f -H "Accept: application/vnd.testmunk.v1+json" -F "file=@features.zip" "https://${TESTMUNK_KEY}@api.testmunk.com/apps/${APP_NAME}/testcases")
+zip -r android/test/features.zip android/test/features/
+RESPONSE=$(curl -f -H "Accept: application/vnd.testmunk.v1+json" -F "file=@android/test/features.zip" "https://${TESTMUNK_KEY}@api.testmunk.com/apps/${APP_NAME}/testcases")
 
 echo "uploading apk..."
 
-cd `dirname ${APK_PATH}`
-RESPONSE=$(curl -f -H "Accept: application/vnd.testmunk.v1+json" -F "file=@`basename ${APK_PATH}`" -F "email=${EMAIL}" -F "autoStart=true" -F "public=true" "https://${TESTMUNK_KEY}@api.testmunk.com/apps/${APP_NAME}/testruns")
+RESPONSE=$(curl -f -H "Accept: application/vnd.testmunk.v1+json" -F "file=@${APK_PATH}" -F "email=${EMAIL}" -F "autoStart=true" -F "public=true" "https://${TESTMUNK_KEY}@api.testmunk.com/apps/${APP_NAME}/testruns")
 
 TESTRUN_ID=$(echo "${RESPONSE}" | jq -r '.id')
 TESTRUN_NAME=$(echo "${RESPONSE}" | jq -r '.name')
