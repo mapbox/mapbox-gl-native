@@ -106,40 +106,30 @@ Set an access token as described below, and then run:
 
 Install a few build depedencies:
 
-    apt-get install -y make pkg-config
+    apt-get install -y make git build-essential automake \
+    libtool make cmake pkg-config lib32stdc++6 lib32z1
 
 Install Oracle JDK 7 (requires license agreement) from http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 
-Or the OPEN JDK:
+    export JAVA_HOME="/dir/to/jdk1.7.0_71"
 
-    sudo apt-get install -y openjdk-7-jdk
+Install the [Android NDK](https://developer.android.com/tools/sdk/ndk/index.html).
 
-Install Android NDK:
+    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10c"
 
-    sudo apt-get install p7zip-full
-    wget http://dl.google.com/android/ndk/android-ndk-r10c-linux-x86_64.bin
-    chmod +x android-ndk-r10c-linux-x86_64.bin
-    7z x ./android-ndk-r10c-linux-x86_64.bin > /dev/null
-    export ANDROID_NDK_PATH="$(pwd)/android-ndk-r10c"
-    export NDK_PATH=${ANDROID_NDK_PATH}
+Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html).
 
-Install Android SDK:
-
-    sudo apt-get install lib32stdc++6 lib32z1
-    wget http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz
-    tar -xzf ./android-sdk_r23.0.2-linux.tgz
-    ./android-sdk-linux/tools/android update sdk -u -a -t tools,platform-tools,build-tools-21.1.1,android-21,extra-android-m2repository,extra-google-m2repository
-    export ANDROID_HOME="$(pwd)/android-sdk-linux"
+    export ANDROID_HOME="/dir/to/android-sdk-linux"
 
 Run:
 
     make android
 
-APKs for testing are output to `android/java/app/build/outputs/apk/app-debug.apk`
-
-You can also open `android/java` in Android Studio.
+You can then open `android/java` in Android Studio via "Import Non-Android Studio Project".
 
 ## Android (on OS X)
+
+Install Oracle JDK 7 (requires license agreement) from http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 
 Install the [Android NDK](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X.
 
