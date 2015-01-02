@@ -23,4 +23,3 @@ TESTRUN_NAME=$(echo "${RESPONSE}" | jq -r '.name')
 
 echo "successully uploaded to Testmunk as '${TESTRUN_NAME}'"
 echo "public link to test results: https://www.testmunk.com/testrun/${TESTRUN_ID}"
-cd -
