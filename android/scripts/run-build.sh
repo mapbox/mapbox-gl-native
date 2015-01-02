@@ -31,6 +31,7 @@ user_data="#!/bin/bash
     export ANDROID_HOME=/android/android-sdk-linux
     export PATH=\$PATH:/android/jdk1.7.0_71/bin
     export MAPBOX_ACCESS_TOKEN=$MAPBOX_ACCESS_TOKEN
+    export TESTMUNK_KEY=$TESTMUNK_KEY
 
     if ./android/scripts/build-$CONFIG.sh $NAME &>../build.log; then
         echo 'ANDROID BUILD PASSED'
