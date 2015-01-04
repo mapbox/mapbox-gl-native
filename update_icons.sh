@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
-
 if [[ -z `which iconoblast` ]]; then
     echo "Requires https://github.com/mapbox/iconoblast!"
     exit 1
