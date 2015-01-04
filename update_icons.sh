@@ -11,7 +11,7 @@ repo=`git remote show origin | grep 'Fetch URL' | sed -e 's/.*github\.com:mapbox
 
 pwd=`pwd`
 cd android/java/app/src/main/res
-for folder in `find . -type d -name drawable-\* -maxdepth 1`
+for folder in `find . -maxdepth 1 -type d -name drawable-\*`
 do
     cd ${folder}
     cp icon.png icon_burned.png
