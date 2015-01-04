@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 export PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
 
