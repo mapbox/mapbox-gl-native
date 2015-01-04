@@ -405,7 +405,7 @@ public class MapView extends SurfaceView {
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
         outState.putString(STATE_STYLE_URL, getStyleUrl());
         outState.putString(STATE_ACCESS_TOKEN, getAccessToken());
-        outState.putStringArrayList(STATE_APPLIED_CLASSES, new ArrayList<String>(getAppliedStyleClasses()));
+        //outState.putStringArrayList(STATE_APPLIED_CLASSES, new ArrayList<String>(getAppliedStyleClasses()));
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
     }
 

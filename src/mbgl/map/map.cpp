@@ -602,8 +602,7 @@ void Map::setAppliedClasses(const std::vector<std::string> &classes) {
         if (style->hasTransitions()) {
             update();
         }
-    }
-    else {
+    } else {
         std::lock_guard<std::mutex> lock(appliedClassesMutex);
         appliedClasses = mbgl::util::make_unique<std::vector<std::string>>(classes);
     }
@@ -618,7 +617,7 @@ void Map::toggleClass(const std::string &name) {
 }
 
 const std::vector<std::string> &Map::getAppliedClasses() const {
-   return style->getAppliedClasses();
+    return style->getAppliedClasses();
 }
 
 void Map::setDefaultTransitionDuration(uint64_t milliseconds) {

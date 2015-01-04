@@ -624,6 +624,7 @@ void NativeMapView::loadExtensions() {
     }
 
     if (extensions.find("GL_OES_get_program_binary") != std::string::npos) {
+        mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_get_program_binary.");
         GLint numBinaryFormats;
         MBGL_CHECK_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats));
         if (numBinaryFormats > 0) {
@@ -638,6 +639,7 @@ void NativeMapView::loadExtensions() {
     }
 
     if (extensions.find("GL_KHR_debug") != std::string::npos) {
+        mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_KHR_debug.");
         gl::DebugMessageControl = reinterpret_cast<gl::PFNGLDEBUGMESSAGECONTROLPROC>(
             eglGetProcAddress("glDebugMessageControl"));
         gl::DebugMessageInsert = reinterpret_cast<gl::PFNGLDEBUGMESSAGEINSERTPROC>(
@@ -673,6 +675,7 @@ void NativeMapView::loadExtensions() {
         assert(gl::GetObjectPtrLabel != nullptr);
     } else {
         if (extensions.find("GL_EXT_debug_marker") != std::string::npos) {
+            mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_EXT_debug_marker.");
             gl::InsertEventMarkerEXT = reinterpret_cast<gl::PFNGLINSERTEVENTMARKEREXTPROC>(
                 eglGetProcAddress("glInsertEventMarkerEXT"));
             gl::PushGroupMarkerEXT = reinterpret_cast<gl::PFNGLPUSHGROUPMARKEREXTPROC>(
@@ -685,6 +688,7 @@ void NativeMapView::loadExtensions() {
         }
 
         if (extensions.find("GL_EXT_debug_label") != std::string::npos) {
+            mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_EXT_debug_label.");
             gl::LabelObjectEXT = reinterpret_cast<gl::PFNGLLABELOBJECTEXTPROC>(
                 eglGetProcAddress("glLabelObjectEXT"));
             gl::GetObjectLabelEXT = reinterpret_cast<gl::PFNGLGETOBJECTLABELEXTPROC>(
