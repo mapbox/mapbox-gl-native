@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, os, errno
+import sys, os, errno, re
 
 
 output_dir = sys.argv[1]
@@ -13,7 +13,8 @@ else:
     if sys.argv[2] == sys.argv[3]:
         tag = [0, 0, 0]
     else:
-        tag = map(int, sys.argv[2].split('.'))
+	ver = re.sub("[^0-9.]", "", sys.argv[2])
+        tag = map(int, ver.split('.'))
     rev = sys.argv[3][0:8]
 
 
