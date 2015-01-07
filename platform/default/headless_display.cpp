@@ -11,9 +11,9 @@ HeadlessDisplay::HeadlessDisplay() {
     // If it is, use kCGLOGLPVersion_3_2_Core and enable that extension.
     CGLPixelFormatAttribute attributes[] = {
         kCGLPFAOpenGLProfile,
-        (CGLPixelFormatAttribute) kCGLOGLPVersion_Legacy,
+        static_cast<CGLPixelFormatAttribute>(kCGLOGLPVersion_Legacy),
         kCGLPFAAccelerated,
-        (CGLPixelFormatAttribute) 0
+        static_cast<CGLPixelFormatAttribute>(0)
     };
 
     GLint num;
@@ -38,7 +38,7 @@ HeadlessDisplay::HeadlessDisplay() {
         throw std::runtime_error("Failed to open X display.");
     }
 
-    const char *extensions = (char *)glXQueryServerString(xDisplay, DefaultScreen(xDisplay), GLX_EXTENSIONS);
+    const char *extensions = reinterpret_cast<const char *>(glXQueryServerString(xDisplay, DefaultScreen(xDisplay), GLX_EXTENSIONS));
     if (!extensions) {
         throw std::runtime_error("Cannot read GLX extensions.");
     }

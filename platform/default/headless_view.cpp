@@ -1,5 +1,6 @@
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/std.hpp>
 
@@ -8,12 +9,6 @@
 #include <string>
 #include <cstring>
 #include <cassert>
-
-#if MBGL_USE_GLX
-#ifdef GLX_ARB_create_context
-static PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = nullptr;
-#endif
-#endif
 
 #ifdef MBGL_USE_CGL
 #include <CoreFoundation/CoreFoundation.h>
@@ -29,7 +24,7 @@ CGLProc CGLGetProcAddress(const char *proc) {
     }
 
     CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault, proc, kCFStringEncodingASCII);
-    CGLProc symbol = (CGLProc)CFBundleGetFunctionPointerForName(framework, name);
+    CGLProc symbol = reinterpret_cast<CGLProc>(CFBundleGetFunctionPointerForName(framework, name));
     CFRelease(name);
     return symbol;
 }
@@ -51,89 +46,40 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display)
 }
 
 void HeadlessView::loadExtensions() {
-    make_active();
-    const std::string extensions = (char *)MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS));
+    activate();
+    const char *extension_ptr = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
+
+    if (extension_ptr) {
+        const std::string extensions = extension_ptr;
 
 #ifdef MBGL_USE_CGL
-    if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
-        gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)CGLGetProcAddress("glBindVertexArrayAPPLE");
-        gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)CGLGetProcAddress("glDeleteVertexArraysAPPLE");
-        gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)CGLGetProcAddress("glGenVertexArraysAPPLE");
-        gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)CGLGetProcAddress("glIsVertexArrayAPPLE");
-        assert(gl::BindVertexArray != nullptr);
-        assert(gl::DeleteVertexArrays != nullptr);
-        assert(gl::GenVertexArrays != nullptr);
-        assert(gl::IsVertexArray != nullptr);
-    }
+        if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
+            gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(CGLGetProcAddress("glBindVertexArrayAPPLE"));
+            gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(CGLGetProcAddress("glDeleteVertexArraysAPPLE"));
+            gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(CGLGetProcAddress("glGenVertexArraysAPPLE"));
+            gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(CGLGetProcAddress("glIsVertexArrayAPPLE"));
+            assert(gl::BindVertexArray != nullptr);
+            assert(gl::DeleteVertexArrays != nullptr);
+            assert(gl::GenVertexArrays != nullptr);
+            assert(gl::IsVertexArray != nullptr);
+        }
 #endif
 #ifdef MBGL_USE_GLX
-    if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
-        gl::BindVertexArray = (gl::PFNGLBINDVERTEXARRAYPROC)glXGetProcAddress((const GLubyte *)"glBindVertexArray");
-        gl::DeleteVertexArrays = (gl::PFNGLDELETEVERTEXARRAYSPROC)glXGetProcAddress((const GLubyte *)"glDeleteVertexArrays");
-        gl::GenVertexArrays = (gl::PFNGLGENVERTEXARRAYSPROC)glXGetProcAddress((const GLubyte *)"glGenVertexArrays");
-        gl::IsVertexArray = (gl::PFNGLISVERTEXARRAYPROC)glXGetProcAddress((const GLubyte *)"glIsVertexArray");
-        assert(gl::BindVertexArray != nullptr);
-        assert(gl::DeleteVertexArrays != nullptr);
-        assert(gl::GenVertexArrays != nullptr);
-        assert(gl::IsVertexArray != nullptr);
-    }
-#endif
-
-    make_inactive();
-}
-
-
-#if MBGL_USE_GLX
-#ifdef GLX_ARB_create_context
-
-// These are all of the OpenGL Core profile version that we know about.
-struct core_profile_version { int major, minor; };
-static const core_profile_version coreProfileVersions[] = {
-    {4, 5},
-    {4, 4},
-    {4, 3},
-    {4, 2},
-    {4, 1},
-    {4, 0},
-    {3, 3},
-    {3, 2},
-    {3, 1},
-    {3, 0},
-    {0, 0},
-};
-
-GLXContext createCoreProfile(Display *dpy, GLXFBConfig fbconfig) {
-    static bool contextCreationFailed = false;
-    GLXContext ctx = 0;
-
-    // Set the Error Handler to avoid crashing the program when the context creation fails.
-    // It is expected that some context creation attempts fail, e.g. because the OpenGL
-    // implementation does not support the version we're requesting.
-    int (*previousErrorHandler)(Display *, XErrorEvent *) = XSetErrorHandler([](Display *, XErrorEvent *) {
-        contextCreationFailed = true;
-        return 0;
-    });
-
-    // Try to create core profiles from the highest known version on down.
-    for (int i = 0; !ctx && coreProfileVersions[i].major; i++) {
-        contextCreationFailed = false;
-        const int contextFlags[] = {
-            GLX_CONTEXT_MAJOR_VERSION_ARB, coreProfileVersions[i].major,
-            GLX_CONTEXT_MINOR_VERSION_ARB, coreProfileVersions[i].minor,
-            0
-        };
-        ctx = glXCreateContextAttribsARB(dpy, fbconfig, 0, True, contextFlags);
-        if (contextCreationFailed) {
-            ctx = 0;
+        if (extensions.find("GL_ARB_vertex_array_object") != std::string::npos) {
+            gl::BindVertexArray = reinterpret_cast<gl::PFNGLBINDVERTEXARRAYPROC>(glXGetProcAddress((const GLubyte *)"glBindVertexArray"));
+            gl::DeleteVertexArrays = reinterpret_cast<gl::PFNGLDELETEVERTEXARRAYSPROC>(glXGetProcAddress((const GLubyte *)"glDeleteVertexArrays"));
+            gl::GenVertexArrays = reinterpret_cast<gl::PFNGLGENVERTEXARRAYSPROC>(glXGetProcAddress((const GLubyte *)"glGenVertexArrays"));
+            gl::IsVertexArray = reinterpret_cast<gl::PFNGLISVERTEXARRAYPROC>(glXGetProcAddress((const GLubyte *)"glIsVertexArray"));
+            assert(gl::BindVertexArray != nullptr);
+            assert(gl::DeleteVertexArrays != nullptr);
+            assert(gl::GenVertexArrays != nullptr);
+            assert(gl::IsVertexArray != nullptr);
         }
+#endif
     }
 
-    // Restore the old error handler.
-    XSetErrorHandler(previousErrorHandler);
-    return ctx;
+    deactivate();
 }
-#endif
-#endif
 
 void HeadlessView::createContext() {
 #if MBGL_USE_CGL
@@ -149,27 +95,15 @@ void HeadlessView::createContext() {
 #endif
 
 #if MBGL_USE_GLX
-#ifdef GLX_ARB_create_context
-    if (glXCreateContextAttribsARB == nullptr) {
-        glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)glXGetProcAddressARB((const GLubyte *)"glXCreateContextAttribsARB");
-    }
-#endif
-
     xDisplay = display_->xDisplay;
     fbConfigs = display_->fbConfigs;
-
-#ifdef GLX_ARB_create_context
-    if (glXCreateContextAttribsARB) {
-        // Try to create a core profile context.
-        glContext = createCoreProfile(xDisplay, fbConfigs[0]);
-    }
-#endif
 
     if (!glContext) {
         // Try to create a legacy context
         glContext = glXCreateNewContext(xDisplay, fbConfigs[0], GLX_RGBA_TYPE, 0, True);
         if (glContext) {
             if (!glXIsDirect(xDisplay, glContext)) {
+                mbgl::Log::Error(mbgl::Event::OpenGL, "Failed to create direct OpenGL Legacy context");
                 glXDestroyContext(xDisplay, glContext);
                 glContext = 0;
             }
@@ -192,7 +126,7 @@ void HeadlessView::createContext() {
 }
 
 void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
-    clear_buffers();
+    clearBuffers();
 
     width_ = width;
     height_ = height;
@@ -201,7 +135,7 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
     const unsigned int w = width_ * pixelRatio_;
     const unsigned int h = height_ * pixelRatio_;
 
-    make_active();
+    activate();
 
     // Create depth/stencil buffer
     MBGL_CHECK_ERROR(glGenRenderbuffersEXT(1, &fboDepthStencil));
@@ -237,7 +171,7 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
         throw std::runtime_error(error.str());
     }
 
-    make_inactive();
+    deactivate();
 }
 
 std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
@@ -246,9 +180,9 @@ std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
 
     auto pixels = util::make_unique<uint32_t[]>(w * h);
 
-    make_active();
+    activate();
     MBGL_CHECK_ERROR(glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get()));
-    make_inactive();
+    deactivate();
 
     const int stride = w * 4;
     auto tmp = util::make_unique<char[]>(stride);
@@ -262,8 +196,8 @@ std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
     return pixels;
 }
 
-void HeadlessView::clear_buffers() {
-    make_active();
+void HeadlessView::clearBuffers() {
+    activate();
 
     MBGL_CHECK_ERROR(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0));
 
@@ -282,11 +216,11 @@ void HeadlessView::clear_buffers() {
         fboDepthStencil = 0;
     }
 
-    make_inactive();
+    deactivate();
 }
 
 HeadlessView::~HeadlessView() {
-    clear_buffers();
+    clearBuffers();
 
 #if MBGL_USE_CGL
     CGLDestroyContext(glContext);
@@ -306,11 +240,11 @@ void HeadlessView::notify() {
     // no-op
 }
 
-void HeadlessView::notify_map_change(mbgl::MapChange /*change*/, mbgl::timestamp /*delay*/) {
+void HeadlessView::notifyMapChange(mbgl::MapChange /*change*/, mbgl::timestamp /*delay*/) {
     // no-op
 }
 
-void HeadlessView::make_active() {
+void HeadlessView::activate() {
 #if MBGL_USE_CGL
     CGLError error = CGLSetCurrentContext(glContext);
     if (error != kCGLNoError) {
@@ -325,7 +259,7 @@ void HeadlessView::make_active() {
 #endif
 }
 
-void HeadlessView::make_inactive() {
+void HeadlessView::deactivate() {
 #if MBGL_USE_CGL
     CGLError error = CGLSetCurrentContext(nullptr);
     if (error != kCGLNoError) {

@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
             // handle fullscreen_flag
             break;
         case 's':
-            style = std::string("file://") + std::string(optarg);
+            style = std::string("asset://") + std::string(optarg);
         default:
             break;
         }
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 
     // Load style
     if (style.empty())
-        style = std::string("file://") + uv::cwd() + std::string("/../../styles/styles/bright-v6.json");
+        style = std::string("asset://") + std::string("styles/bright-v6.json");
 
     map.setStyleURL(style);
 

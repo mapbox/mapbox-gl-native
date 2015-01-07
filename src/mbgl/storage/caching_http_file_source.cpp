@@ -1,5 +1,5 @@
 #include <mbgl/storage/caching_http_file_source.hpp>
-#include <mbgl/storage/file_request.hpp>
+#include <mbgl/storage/asset_request.hpp>
 #include <mbgl/storage/http_request.hpp>
 #include <mbgl/storage/sqlite_store.hpp>
 #include <mbgl/util/uv-messenger.h>
@@ -17,6 +17,8 @@ CachingHTTPFileSource::~CachingHTTPFileSource() {
 }
 
 void CachingHTTPFileSource::setLoop(uv_loop_t* loop_) {
+    assert(!loop);
+
     thread_id = std::this_thread::get_id();
     store = !path.empty() ? util::ptr<SQLiteStore>(new SQLiteStore(loop_, path)) : nullptr;
     loop = loop_;
@@ -51,6 +53,8 @@ void CachingHTTPFileSource::clearLoop() {
     }
 
     store.reset();
+
+    loop = nullptr;
 }
 
 void CachingHTTPFileSource::setBase(std::string value) {
@@ -91,8 +95,8 @@ std::unique_ptr<Request> CachingHTTPFileSource::request(ResourceType type, const
     }
 
     if (!req) {
-        if (url.substr(0, 7) == "file://") {
-            req = std::make_shared<FileRequest>(url.substr(7), loop);
+        if (url.substr(0, 8) == "asset://") {
+            req = std::make_shared<AssetRequest>(url.substr(8), loop);
         } else {
             req = std::make_shared<HTTPRequest>(type, url, loop, store);
         }

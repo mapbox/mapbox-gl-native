@@ -21,6 +21,11 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 
 We try to link to as many system-provided libraries as possible. When these are unavailable or too outdated, we run a thin build-script layer called [Mason](https://github.com/mapbox/mason) to automate builds, and load precompiled binary packages when possible.
 
+Be sure to pull down all submodules first: 
+
+    git submodule init
+    git submodule update
+
 ## OS X
 
 On OS X, we are using `zlib`, `SQLite3`, `libcurl` and `libpng` provided by the operating system. In addition to that, you need to have the Boost headers installed. To install all prerequisites, use [Homebrew](http://brew.sh/) and type `brew install pkg-config boost`.
@@ -43,12 +48,7 @@ iOS makes use of a Cocoa-specific API called [`mapbox-gl-cocoa`](https://github.
 
 If you intend to develop here, `mapbox-gl-cocoa` is included as a submodule of the overall build setup.
 
-To pull down the submodule(s), run:
-
-    git submodule init
-    git submodule update
-
-Then, you can run `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. This will automatically install required dependencies as well.
+You can run `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. This will automatically install required dependencies as well.
 
 Note that if you are doing OS X development as well, to toggle from OS X back to iOS, you will need to `make iproj` again.
 
@@ -117,9 +117,9 @@ The demo applications use Mapbox vector tiles, which **require a Mapbox account 
 
 For iOS and OS X use of the demo apps in Xcode, setup the access token by editing the scheme for the application target, then adding an environment variable with the name `MAPBOX_ACCESS_TOKEN`.
 
-![edit scheme](https://cloud.githubusercontent.com/assets/98601/3647749/30f74f26-1102-11e4-84af-f1be853b4e38.png)
+![edit scheme](https://cloud.githubusercontent.com/assets/98601/5460702/c4610262-8519-11e4-873a-8597821da468.png)
 
-![setting access token in Xcode scheme](https://cloud.githubusercontent.com/assets/52399/3543326/9e7cfbb8-0860-11e4-8def-3684a9028b61.png)
+![setting access token in Xcode scheme](https://cloud.githubusercontent.com/assets/162976/5349358/0a086f00-7f8c-11e4-8433-bdbaccda2b58.png)
 
 For Linux, set the environment variable `MAPBOX_ACCESS_TOKEN` to your token.
 
