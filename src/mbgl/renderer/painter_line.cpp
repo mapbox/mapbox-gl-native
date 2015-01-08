@@ -15,13 +15,25 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 
     const LineProperties &properties = layer_desc->getProperties<LineProperties>();
 
+    // the distance over which the line edge fades out.
+    // Retina devices need a smaller distance to avoid aliasing.
     float antialiasing = 1 / state.getPixelRatio();
-    float width = properties.width;
-    float offset = properties.gap_width == 0 ? 0 : (properties.gap_width + width) / 2;
-    float blur = properties.blur + antialiasing;
 
-    float inset = std::fmin((std::fmax(-1, offset - width / 2 - antialiasing / 2) + 1), 16.0f);
-    float outset = std::fmin(offset + width / 2 + antialiasing / 2, 16.0f);
+    float blur = properties.blur + antialiasing;
+    float edgeWidth = properties.width / 2.0;
+    float inset = -1;
+    float offset = 0;
+    float shift = 0;
+
+    if (properties.gap_width != 0) {
+        inset = properties.gap_width / 2.0 + antialiasing * 0.5;
+        edgeWidth = properties.width;
+
+        // shift outer lines half a pixel towards the middle to eliminate the crack
+        offset = inset - antialiasing / 2.0;
+    }
+
+    float outset = offset + edgeWidth + antialiasing / 2.0 + shift;
 
     Color color = properties.color;
     color[0] *= properties.opacity;
