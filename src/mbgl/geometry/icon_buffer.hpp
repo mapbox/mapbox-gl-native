@@ -8,7 +8,7 @@
 namespace mbgl {
 
     class IconVertexBuffer : public Buffer<
-    20
+    16
     > {
     public:
         static const double angleFactor;

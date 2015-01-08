@@ -391,9 +391,10 @@ void showColorDebugImage(std::string name, const char *data, size_t logicalWidth
     float xScale = static_cast<float>(fbWidth) / static_cast<float>(width);
     float yScale = static_cast<float>(fbHeight) / static_cast<float>(height);
 
+    MBGL_CHECK_ERROR(glClearColor(0.8, 0.8, 0.8, 1));
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
     MBGL_CHECK_ERROR(glEnable(GL_BLEND));
-    MBGL_CHECK_ERROR(glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
     MBGL_CHECK_ERROR(glPixelZoom(xScale, -yScale));
     MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));

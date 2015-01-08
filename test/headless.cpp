@@ -222,7 +222,7 @@ INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest, ::testing::ValuesIn([] {
 
     for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
         const std::string name = dp->d_name;
-        if (name != "." && name != ".." && name != "index.html") {
+        if (name != "index.html" && !(name.size() >= 1 && name[0] == '.')) {
             names.push_back(name);
         }
     }

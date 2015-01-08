@@ -244,8 +244,6 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
     for (const util::ptr<StyleSource> &source : sources) {
         source->source->finishRender(*this);
     }
-
-    MBGL_CHECK_ERROR(glFlush());
 }
 
 void Painter::renderLayers(util::ptr<StyleLayerGroup> group) {
