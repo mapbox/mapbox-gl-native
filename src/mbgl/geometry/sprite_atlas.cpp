@@ -137,12 +137,12 @@ SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, bool repea
             return SpriteAtlasPosition {};
         }
 
-        rect.w = pos.width;
-        rect.h = pos.height;
+        rect.w = pos.width / pos.pixelRatio;
+        rect.h = pos.height / pos.pixelRatio;
     }
 
     return SpriteAtlasPosition {
-        {{ float(rect.w)     / pixelRatio, float(rect.h)      / pixelRatio }},
+        {{ float(rect.w), float(rect.h) }},
         {{ float(rect.x)          / width, float(rect.y)          / height }},
         {{ float(rect.x + rect.w) / width, float(rect.y + rect.h) / height }}
     };
