@@ -16,6 +16,7 @@
 #include <mbgl/util/utf.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/util/merge_lines.hpp>
 
 namespace mbgl {
 
@@ -145,7 +146,37 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
 
     const FontStack &fontStack = glyphStore.getFontStack(properties.text.font);
 
-    for (const SymbolFeature &feature : features) {
+    std::vector<std::vector<std::vector<Coordinate>>> geometries;
+
+    for (unsigned int k = 0; k < features.size(); k++) {
+        const SymbolFeature &feature = features[k];
+
+        geometries.emplace_back();
+        std::vector<std::vector<Coordinate>> &multiline = geometries.back();
+
+        // Decode all lines.
+        Geometry::command cmd;
+        bool first = true;
+        pbf geom(feature.geometry);
+        Geometry geometry(geom);
+        int32_t x, y;
+        while ((cmd = geometry.next(x, y)) != Geometry::end) {
+            if (first || cmd == Geometry::move_to) {
+                multiline.emplace_back();
+                first = false;
+            }
+            multiline.back().emplace_back(x, y);
+        }
+    }
+
+    if (properties.placement == PlacementType::Line) {
+        util::mergeLines(features, geometries);
+    }
+
+    for (unsigned int k = 0; k < geometries.size(); k++) {
+        if (!geometries[k].size()) continue;
+        const SymbolFeature &feature = features[k];
+
         Shaping shaping;
         Rect<uint16_t> image;
         GlyphPositions face;
@@ -181,32 +212,13 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
 
         // if either shaping or icon position is present, add the feature
         if (shaping.size() || image) {
-            addFeature(feature.geometry, shaping, face, image);
-        }
-    }
-}
-
-void SymbolBucket::addFeature(const pbf &geom_pbf, const Shaping &shaping,
-                              const GlyphPositions &face, const Rect<uint16_t> &image) {
-    // Decode all lines.
-    std::vector<Coordinate> line;
-    Geometry::command cmd;
-
-    Coordinate coord;
-    pbf geom(geom_pbf);
-    Geometry geometry(geom);
-    int32_t x, y;
-    while ((cmd = geometry.next(x, y)) != Geometry::end) {
-        if (cmd == Geometry::move_to) {
-            if (!line.empty()) {
-                addFeature(line, shaping, face, image);
-                line.clear();
+            std::vector<std::vector<Coordinate>> &multiline = geometries[k];
+            for (const std::vector<Coordinate> &line : multiline) {
+                if (line.size()) {
+                    addFeature(line, shaping, face, image);
+                }
             }
         }
-        line.emplace_back(x, y);
-    }
-    if (line.size()) {
-        addFeature(line, shaping, face, image);
     }
 }
 
