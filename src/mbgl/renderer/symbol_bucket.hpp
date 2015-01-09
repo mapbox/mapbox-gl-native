@@ -30,7 +30,7 @@ class FontStack;
 
 class SymbolFeature {
 public:
-    pbf geometry;
+    std::vector<std::vector<Coordinate>> geometry;
     std::u32string label;
     std::string sprite;
 };
