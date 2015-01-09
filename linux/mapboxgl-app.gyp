@@ -33,6 +33,7 @@
           '<@(sqlite3_ldflags)',
           '<@(glfw3_static_libs)',
           '<@(glfw3_ldflags)',
+          '<@(curl_static_libs)',
           '<@(curl_ldflags)',
           '<@(zlib_ldflags)',
         ],
