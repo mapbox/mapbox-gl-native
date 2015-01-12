@@ -61,10 +61,7 @@ void GLFWView::initialize(mbgl::Map *map_) {
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
-    int fbWidth, fbHeight;
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-
-    resize(window, 0, 0);
+    resize(window, width, height);
 
     glfwSetCursorPosCallback(window, mouseMove);
     glfwSetMouseButtonCallback(window, mouseClick);
