@@ -29,7 +29,7 @@ case ${MASON_PLATFORM} in
         SQLITE_VERSION=3.8.6
         LIBPNG_VERSION=1.6.13
         LIBJPEG_VERSION=v8d
-        LIBCURL_VERSION=7.38.0
+        LIBCURL_VERSION=7.38.0-boringssl
         LIBUV_VERSION=0.10.28
         ZLIB_VERSION=system
         BOOST_VERSION=system
