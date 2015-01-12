@@ -58,6 +58,7 @@ void GLFWView::initialize(mbgl::Map *map_) {
 
     glfwSetWindowUserPointer(window, this);
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
@@ -277,12 +278,6 @@ int GLFWView::run() {
     map->start();
 
     while (!glfwWindowShouldClose(window)) {
-        if (map->needsSwap()) {
-            glfwSwapBuffers(window);
-            map->swapped();
-            fps();
-        }
-
         glfwWaitEvents();
     }
 
@@ -306,7 +301,9 @@ void GLFWView::notify() {
 }
 
 void GLFWView::swap() {
-    glfwPostEmptyEvent();
+    glfwSwapBuffers(window);
+    map->swapped();
+    fps();
 }
 
 void GLFWView::notifyMapChange(mbgl::MapChange /*change*/, mbgl::timestamp /*delay*/) {
