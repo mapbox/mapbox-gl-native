@@ -33,10 +33,6 @@
 
 #include <uv.h>
 
-#ifdef __ANDROID__
-    #include <coffeecatch/coffeecatch.h>
-#endif
-
 // Check libuv library version.
 const static bool uvVersionCheck = []() {
     const unsigned int version = uv_version();
@@ -267,10 +263,6 @@ void Map::resume() {
 }
 
 void Map::run() {
-#ifdef __ANDROID__
-    COFFEE_TRY() {
-#endif
-
     if (mode == Mode::None) {
 #ifndef NDEBUG
         mapThread = mainThread;
@@ -309,12 +301,6 @@ void Map::run() {
         mode = Mode::None;
         fileSource.clearLoop();
     }
-#ifdef __ANDROID__
-    } COFFEE_CATCH() {
-        Log::Error(Event::Crash, "Map::run() crash:\n%s", coffeecatch_get_message());
-        abort();
-    }
-#endif
 }
 
 void Map::checkForPause() {

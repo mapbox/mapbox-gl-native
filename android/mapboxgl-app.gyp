@@ -10,8 +10,6 @@
       'sources': [
         './cpp/native_map_view.cpp',
         './cpp/jni.cpp',
-        './cpp/coffeecatch.c',
-        './cpp/coffeejni.c',
       ],
       'cflags_cc': [
         '-I<(boost_root)/include',
