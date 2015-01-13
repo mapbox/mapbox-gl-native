@@ -165,7 +165,7 @@ For iOS and OS X use of the demo apps in Xcode, setup the access token by editin
 
 For Linux, set the environment variable `MAPBOX_ACCESS_TOKEN` to your token.
 
-For Android, create the file `android/java/app/src/main/res/raw/token.txt` and insert the token as a single line.
+For Android, gradle will take the value of `MAPBOX_ACCESS_TOKEN` and save it to `android/java/app/src/main/res/raw/token.txt` where the app will read it from.
 
 # Style
 

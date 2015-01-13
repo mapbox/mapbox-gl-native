@@ -1,5 +1,14 @@
 apply plugin: 'com.android.application'
 
+task accessToken {
+    def tokenFile = new File("app/src/main/res/raw/token.txt")
+    tokenFile.write(System.getenv('MAPBOX_ACCESS_TOKEN'))
+}
+
+gradle.projectsEvaluated {
+    preBuild.dependsOn('accessToken')
+}
+
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
