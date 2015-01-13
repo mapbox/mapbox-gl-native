@@ -623,21 +623,6 @@ void NativeMapView::loadExtensions() {
         }
     }
 
-    if (extensions.find("GL_OES_get_program_binary") != std::string::npos) {
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_get_program_binary.");
-        GLint numBinaryFormats;
-        MBGL_CHECK_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats));
-        if (numBinaryFormats > 0) {
-            gl::GetProgramBinary = reinterpret_cast<gl::PFNGLGETPROGRAMBINARYPROC>(
-                eglGetProcAddress("glGetProgramBinaryOES"));
-            gl::ProgramBinary = reinterpret_cast<gl::PFNGLPROGRAMBINARYPROC>(
-                eglGetProcAddress("glProgramBinaryOES"));
-            gl::ProgramParameteri = nullptr; // This does not exist until GLES 3.0
-            assert(gl::GetProgramBinary != nullptr);
-            assert(gl::ProgramBinary != nullptr);
-        }
-    }
-
     if (extensions.find("GL_KHR_debug") != std::string::npos) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_KHR_debug.");
         gl::DebugMessageControl = reinterpret_cast<gl::PFNGLDEBUGMESSAGECONTROLPROC>(
