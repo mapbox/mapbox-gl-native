@@ -8,6 +8,8 @@
 namespace mbgl {
 namespace util {
 
+const static std::string tokenReservedChars = "{}()[]<>$=:;.,^";
+
 // Replaces {tokens} in a string by calling the lookup function.
 template <typename Lookup>
 std::string replaceTokens(const std::string &source, const Lookup &lookup) {
@@ -22,7 +24,7 @@ std::string replaceTokens(const std::string &source, const Lookup &lookup) {
         result.append(pos, brace);
         pos = brace;
         if (pos != end) {
-            for (brace++; brace != end && (std::isalnum(*brace) || *brace == '_'); brace++);
+            for (brace++; brace != end && tokenReservedChars.find(*brace) == std::string::npos; brace++);
             if (brace != end && *brace == '}') {
                 result.append(lookup({ pos + 1, brace }));
                 pos = brace + 1;
