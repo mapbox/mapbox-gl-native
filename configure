@@ -26,7 +26,7 @@ case ${MASON_PLATFORM} in
         ;;
     *)
         GLFW_VERSION=e1ae9af5
-        SQLITE_VERSION=system
+        SQLITE_VERSION=3.8.6
         LIBPNG_VERSION=1.6.13
         LIBJPEG_VERSION=v8d
         LIBCURL_VERSION=system
