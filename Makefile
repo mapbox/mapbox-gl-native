@@ -117,6 +117,7 @@ render: build/render/Makefile
 
 .PHONY: clear_xcode_cache
 clear_xcode_cache:
+ifeq ($(PLATFORM), osx)
 	@CUSTOM_DD=`defaults read com.apple.dt.Xcode IDECustomDerivedDataLocation 2>/dev/null`; \
 	if [[ $$CUSTOM_DD ]]; then \
 		echo clearing files in $$CUSTOM_DD older than one day; \
@@ -130,6 +131,7 @@ clear_xcode_cache:
 		echo 'removing ~/Library/Application\ Support/Mapbox\ GL/cache.db'; \
 		rm ~/Library/Application\ Support/Mapbox\ GL/cache.db; \
 	fi
+endif
 
 xproj: build/macosx/mapboxgl-app.xcodeproj
 	open ./build/macosx/mapboxgl-app.xcodeproj
