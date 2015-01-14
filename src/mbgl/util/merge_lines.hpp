@@ -79,8 +79,8 @@ void mergeLines(std::vector<SymbolFeature> &features) {
             unsigned int j = mergeFromLeft(features, leftIndex, leftKey, right, geometry);
             unsigned int i = mergeFromRight(features, rightIndex, left, rightKey, features[j].geometry);
 
-            leftIndex.erase(leftIndex.find(leftKey));
-            rightIndex.erase(rightIndex.find(rightKey));
+            leftIndex.erase(leftKey);
+            rightIndex.erase(rightKey);
             rightIndex[getKey(feature.label, features[i].geometry, true)] = i;
 
         } else if (left != rightIndex.end()) {
