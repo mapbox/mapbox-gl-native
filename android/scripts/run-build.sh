@@ -54,6 +54,8 @@ id=$(aws ec2 run-instances \
 
 echo "Instance: $region $id"
 
+sleep 10
+
 result=$(aws ec2 create-tags --region $region --resources $id --tags "Key=Name,Value=$instance_name")
 
 instance_status_terminated=$(aws ec2 describe-instances --region $region --instance-id $id | jq -r '.Reservations[0].Instances[0].State.Name')
