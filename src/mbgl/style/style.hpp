@@ -25,7 +25,6 @@ class Style {
 public:
     struct exception : std::runtime_error { exception(const char *msg) : std::runtime_error(msg) {} };
 
-public:
     Style();
     ~Style();
 
@@ -35,31 +34,20 @@ public:
     void updateProperties(float z, timestamp t);
 
     void setDefaultTransitionDuration(uint16_t duration_milliseconds = 0);
-
-    void setAppliedClasses(const std::vector<std::string> &classes);
-    const std::vector<std::string> &getAppliedClasses() const;
-    void toggleClass(const std::string &name);
-
-    // Updates the styling information to reflect the current array
-    // of applied classes.
-    void updateClasses();
+    void cascadeClasses(const std::vector<std::string>&);
 
     bool hasTransitions() const;
 
     const std::string &getSpriteURL() const;
 
-public:
     util::ptr<StyleLayerGroup> layers;
     std::vector<std::string> appliedClasses;
     std::string glyph_url;
 
 private:
     std::string sprite_url;
-
-private:
     PropertyTransition defaultTransition;
     bool initial_render_complete = false;
-
     std::unique_ptr<uv::rwlock> mtx;
 };
 

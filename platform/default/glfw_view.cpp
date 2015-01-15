@@ -184,7 +184,11 @@ void GLFWView::key(GLFWwindow *window, int key, int /*scancode*/, int action, in
         case GLFW_KEY_R:
             if (!mods) {
                 view->map->setDefaultTransitionDuration(300);
-                view->map->toggleClass("night");
+                if (view->map->hasClass("night")) {
+                    view->map->removeClass("night");
+                } else {
+                    view->map->addClass("night");
+                }
             }
             break;
         case GLFW_KEY_N:
