@@ -131,7 +131,6 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         lineShader->u_blur = blur;
 
         lineShader->u_color = color;
-        lineShader->u_dasharray = {{ 1, -1 }};
 
         bucket.drawLines(*lineShader);
     }
