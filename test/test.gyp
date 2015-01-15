@@ -7,6 +7,7 @@
   'variables' : {
     'ldflags': [
       '<@(uv_ldflags)',
+      '<@(sqlite3_static_libs)',
       '<@(sqlite3_ldflags)',
       '<@(curl_ldflags)',
       '<@(png_ldflags)',
@@ -167,6 +168,25 @@
         }]
       ]
     },
+    { 'target_name': 'merge_lines',
+      'product_name': 'test_merge_lines',
+      'type': 'executable',
+      'sources': [
+        './main.cpp',
+        './merge_lines.cpp',
+      ],
+      'dependencies': [
+        '../deps/gtest/gtest.gyp:gtest',
+        '../mapboxgl.gyp:mbgl-standalone',
+      ],
+      'include_dirs': [ '../src' ],
+      'conditions': [
+        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+        }, {
+          'libraries': [ '<@(ldflags)' ],
+        }]
+      ]
+    },
     { 'target_name': 'headless',
       'product_name': 'test_headless',
       'type': 'executable',
@@ -236,6 +256,7 @@
         'variant',
         'tile',
         'functions',
+        'merge_lines',
         'headless',
         'style_parser',
         'comparisons',

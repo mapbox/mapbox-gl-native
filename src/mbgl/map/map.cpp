@@ -301,6 +301,8 @@ void Map::run() {
         mode = Mode::None;
         fileSource.clearLoop();
     }
+
+    terminate();
 }
 
 void Map::checkForPause() {
@@ -329,8 +331,9 @@ void Map::rerender() {
     } else if (mode == Mode::Continuous) {
         // We only send render events if we want to continuously update the map
         // (== async rendering).
-        assert(asyncRender);
-        asyncRender->send();
+        if (asyncRender) {
+            asyncRender->send();
+        }
     }
 }
 
@@ -350,7 +353,9 @@ void Map::swapped() {
 
 void Map::terminate() {
     assert(painter);
+    view.activate();
     painter->terminate();
+    view.deactivate();
 }
 
 #pragma mark - Setup

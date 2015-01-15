@@ -39,6 +39,7 @@
         'ldflags': [
           '<@(uv_ldflags)',
           '<@(uv_static_libs)',
+          '<@(sqlite3_static_libs)',
           '<@(sqlite3_ldflags)',
           '<@(glfw3_static_libs)',
           '<@(glfw3_ldflags)',

@@ -85,6 +85,7 @@
               '<(standalone_lib)',
               '<@(uv_static_libs)',
               '<@(curl_static_libs)',
+              '<@(sqlite3_static_libs)',
               '<(core_lib)'
           ],
         }
