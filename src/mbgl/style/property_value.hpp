@@ -16,7 +16,7 @@ typedef mapbox::util::variant<
     Function<bool>,
     Function<float>,
     Function<Color>,
-    std::vector<float>
+    Function<std::vector<float>>
 > PropertyValue;
 
 }
