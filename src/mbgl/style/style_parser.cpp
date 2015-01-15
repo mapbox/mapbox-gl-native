@@ -314,33 +314,12 @@ bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKe
     return parsed;
 }
 
-template <typename T>
-bool StyleParser::setProperty(JSVal value, const char *property_name, T &target) {
-    bool parsed;
-    T result;
-    std::tie(parsed, result) = parseProperty<T>(value, property_name);
-    if (parsed) {
-        target = std::move(result);
-    }
-    return parsed;
-}
-
-
 template<typename T>
 bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
     } else {
         return setProperty<T>(replaceConstant(value[property_name]), property_name, key, klass);
-    }
-}
-
-template <typename T>
-bool StyleParser::parseOptionalProperty(const char *property_name, T &target, JSVal value) {
-    if (!value.HasMember(property_name)) {
-         return false;
-    } else {
-        return setProperty<T>(replaceConstant(value[property_name]), property_name, target);
     }
 }
 
