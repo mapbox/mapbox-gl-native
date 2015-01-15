@@ -4,6 +4,7 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/map/map.hpp>
 
 using namespace mbgl;
@@ -41,9 +42,6 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    float dash_length = properties.dash_array[0];
-    float dash_gap = properties.dash_array[1];
-
     float ratio = state.getPixelRatio();
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
@@ -72,7 +70,33 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         bucket.drawPoints(*linejoinShader);
     }
 
-    if (properties.image.size()) {
+    if (properties.dash_array.size() && properties.dash_array[1] > 0) {
+
+        useProgram(linesdfShader->program);
+
+        linesdfShader->u_matrix = vtxMatrix;
+        linesdfShader->u_exmatrix = extrudeMatrix;
+        linesdfShader->u_linewidth = {{ outset, inset }};
+        linesdfShader->u_ratio = ratio;
+        linesdfShader->u_blur = blur;
+        linesdfShader->u_color = color;
+
+        std::vector<float> dash = { properties.dash_array[0], properties.dash_array[1] };
+        LinePatternPos pos = lineAtlas.getDashPosition(dash, false);
+        lineAtlas.bind();
+
+        float patternratio = std::pow(2.0, std::floor(std::log2(state.getScale())) - id.z) / 8.0;
+        float scaleX = patternratio / pos.width / properties.dash_line_width;
+        float scaleY = -pos.height / 2.0;
+
+        linesdfShader->u_patternscale = {{ scaleX, scaleY }};
+        linesdfShader->u_tex_y = pos.y;
+        linesdfShader->u_image = 0;
+        linesdfShader->u_sdfgamma = lineAtlas.width / (properties.dash_line_width * pos.width * 256.0 * state.getPixelRatio());
+
+        bucket.drawLineSDF(*linesdfShader);
+
+    } else if (properties.image.size()) {
         SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image, true);
 
         float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
@@ -107,7 +131,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         lineShader->u_blur = blur;
 
         lineShader->u_color = color;
-        lineShader->u_dasharray = {{ dash_length, dash_gap }};
+        lineShader->u_dasharray = {{ 1, -1 }};
 
         bucket.drawLines(*lineShader);
     }
