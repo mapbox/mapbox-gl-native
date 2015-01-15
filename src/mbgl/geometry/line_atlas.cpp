@@ -27,7 +27,7 @@ LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, b
     std::string key = sskey.str();
 
     if (positions.find(key) == positions.end()) {
-        fprintf(stderr, "add %s\n", key.c_str());
+        //fprintf(stderr, "add %s\n", key.c_str());
         positions[key] = addDash(dasharray, round);
     }
 
@@ -73,12 +73,12 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
             int signedDistance;
 
             if (round) {
-                float distMiddle = n ? y / n * halfWidth : 0;
-                float distEdge = halfWidth - fabs(distMiddle);
+                float distMiddle = n ? (float)y / n * (halfWidth + 1) : 0;
                 if (inside) {
+                    float distEdge = halfWidth - fabs(distMiddle);
                     signedDistance = sqrt(dist * dist + distEdge * distEdge);
                 } else {
-                    signedDistance = halfWidth = sqrt(dist * dist + distMiddle * distMiddle);
+                    signedDistance = halfWidth - sqrt(dist * dist + distMiddle * distMiddle);
                 }
 
             } else {
@@ -91,7 +91,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
 
     LinePatternPos position;
     position.y = (0.5 + nextRow + n) / height;
-    position.height = 2 * n / height;
+    position.height = (2.0 * n) / height;
     position.width = length;
 
     nextRow += dashheight;

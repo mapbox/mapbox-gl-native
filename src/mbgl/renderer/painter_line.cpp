@@ -81,7 +81,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linesdfShader->u_blur = blur;
         linesdfShader->u_color = color;
 
-        LinePatternPos pos = lineAtlas.getDashPosition(properties.dash_array, false);
+        LinePatternPos pos = lineAtlas.getDashPosition(properties.dash_array, bucket.properties.cap == CapType::Round);
         lineAtlas.bind();
 
         float patternratio = std::pow(2.0, std::floor(std::log2(state.getScale())) - id.z) / 8.0;
