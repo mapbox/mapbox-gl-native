@@ -6,7 +6,7 @@ set -o pipefail
 cwd=$(pwd)
 
 region="us-east-1"
-region_ami="ami-56d1bb3e"
+region_ami="ami-f0ed9098"
 sleep=10
 instance_name="android-gl-build-$TRAVIS_REPO_SLUG-$TRAVIS_JOB_NUMBER"
 echo $ami_name
@@ -26,7 +26,7 @@ user_data="#!/bin/bash
     fi
     git submodule update --init --recursive
 
-    export ANDROID_NDK_PATH=/android/android-ndk-r10c
+    export ANDROID_NDK_PATH=/android/android-ndk-r10d
     export JAVA_HOME=/android/jdk1.7.0_71
     export ANDROID_HOME=/android/android-sdk-linux
     export PATH=\$PATH:/android/jdk1.7.0_71/bin
