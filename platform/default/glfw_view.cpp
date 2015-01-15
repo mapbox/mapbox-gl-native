@@ -282,6 +282,9 @@ int GLFWView::run() {
         glfwWaitEvents();
     });
 
+    // Terminate here to save binary shaders
+    map->terminate();
+
     return 0;
 }
 

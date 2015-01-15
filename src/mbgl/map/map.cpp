@@ -250,8 +250,6 @@ void Map::run() {
         mode = Mode::None;
         fileSource.clearLoop();
     }
-
-    terminate();
 }
 
 void Map::rerender() {
