@@ -15,9 +15,15 @@ LineAtlas::LineAtlas(uint16_t w, uint16_t h)
 }
 
 LineAtlas::~LineAtlas() {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    MBGL_CHECK_ERROR(glDeleteTextures(1, &texture));
+    texture = 0;
 }
 
 LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
     std::ostringstream sskey;
 
     for (const float &part : dasharray) {
@@ -103,21 +109,48 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
 };
 
 void LineAtlas::bind() {
+    bool first = false;
     if (!texture) {
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        MBGL_CHECK_ERROR(glGenTextures(1, &texture));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         dirty = true;
     } else {
-        glBindTexture(GL_TEXTURE_2D, texture);
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
     }
 
-    dirty = true;
-
     if (dirty) {
+        std::lock_guard<std::recursive_mutex> lock(mtx);
+        if (first) {
+            glTexImage2D(
+                GL_TEXTURE_2D, // GLenum target
+                0, // GLint level
+                GL_ALPHA, // GLint internalformat
+                width, // GLsizei width
+                height, // GLsizei height
+                0, // GLint border
+                GL_ALPHA, // GLenum format
+                GL_UNSIGNED_BYTE, // GLenum type
+                data // const GLvoid * data
+            );
+        } else {
+            glTexSubImage2D(
+                GL_TEXTURE_2D, // GLenum target
+                0, // GLint level
+                0, // GLint xoffset
+                0, // GLint yoffset
+                width, // GLsizei width
+                height, // GLsizei height
+                GL_ALPHA, // GLenum format
+                GL_UNSIGNED_BYTE, // GLenum type
+                data // const GLvoid *pixels
+            );
+        }
+
+
         // TODO use texsubimage for updates
         // TODO lock?
         glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <map>
-
+#include <mutex>
 #include <atomic>
 
 namespace mbgl {
@@ -28,6 +28,7 @@ public:
     const int height;
 
 private:
+    std::recursive_mutex mtx;
     char *const data = nullptr;
     std::atomic<bool> dirty;
     uint32_t texture = 0;
