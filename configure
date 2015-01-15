@@ -24,12 +24,21 @@ case ${MASON_PLATFORM} in
         ZLIB_VERSION=system
         BOOST_VERSION=system
         ;;
+    'osx')
+        GLFW_VERSION=e1ae9af5
+        SQLITE_VERSION=3.8.6
+        LIBPNG_VERSION=1.6.13
+        LIBJPEG_VERSION=v8d
+        LIBUV_VERSION=0.10.28
+        ZLIB_VERSION=system
+        BOOST_VERSION=system
+        ;;
     *)
         GLFW_VERSION=e1ae9af5
         SQLITE_VERSION=3.8.6
         LIBPNG_VERSION=1.6.13
         LIBJPEG_VERSION=v8d
-        LIBCURL_VERSION=system
+        LIBCURL_VERSION=7.38.0
         LIBUV_VERSION=0.10.28
         ZLIB_VERSION=system
         BOOST_VERSION=system

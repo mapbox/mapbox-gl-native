@@ -25,6 +25,7 @@
           '<@(png_ldflags)',
           '<@(jpeg_ldflags)',
           '<@(uv_ldflags)',
+          '<@(curl_static_libs)',
           '<@(curl_ldflags)',
           '<@(nu_ldflags)',
         ],

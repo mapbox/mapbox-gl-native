@@ -9,7 +9,6 @@
       '<@(uv_ldflags)',
       '<@(sqlite3_static_libs)',
       '<@(sqlite3_ldflags)',
-      '<@(curl_ldflags)',
       '<@(png_ldflags)',
     ],
   },
@@ -29,7 +28,11 @@
       'conditions': [
         ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
         }, {
-          'libraries': [ '<@(ldflags)' ],
+          'libraries': [
+            '<@(ldflags)',
+            '<@(curl_static_libs)',
+            '<@(curl_ldflags)',
+          ],
         }]
       ]
     },
