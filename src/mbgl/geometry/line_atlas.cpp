@@ -17,7 +17,7 @@ LineAtlas::LineAtlas(uint16_t w, uint16_t h)
 LineAtlas::~LineAtlas() {
 }
 
-LinePatternPos LineAtlas::getDashPosition(std::vector<float> &dasharray, bool round) {
+LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round) {
     std::ostringstream sskey;
 
     for (const float &part : dasharray) {
@@ -34,7 +34,7 @@ LinePatternPos LineAtlas::getDashPosition(std::vector<float> &dasharray, bool ro
     return positions[key];
 }
 
-LinePatternPos LineAtlas::addDash(std::vector<float> &dasharray, bool round) {
+LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool round) {
 
     int n = round ? 7 : 0;
     int dashheight = 2 * n + 1;

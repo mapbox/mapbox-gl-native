@@ -332,6 +332,24 @@ template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value,
     return std::tuple<bool, std::string> { true, { value.GetString(), value.GetStringLength() } };
 }
 
+template<> std::tuple<bool, std::vector<float>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+    if (!value.IsArray()) {
+        Log::Warning(Event::ParseStyle, "value of '%s' must be an array", property_name);
+        return std::tuple<bool, std::vector<float>> { false, std::vector<float>() };
+    }
+
+    std::vector<float> vec;
+    for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+        JSVal part = value[i];
+        if (!part.IsNumber()) {
+            Log::Warning(Event::ParseStyle, "value of '%s' must be an array of numbers", property_name);
+            return std::tuple<bool, std::vector<float>> { false, std::vector<float>() };
+        }
+        vec.push_back(part.GetDouble());
+    }
+    return std::tuple<bool, std::vector<float>> { true, vec };
+}
+
 template<> std::tuple<bool, TranslateAnchorType> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", property_name);
@@ -567,8 +585,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("line-gap-width-transition", Key::LineGapWidth, klass, value);
     parseOptionalProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("line-blur-transition", Key::LineBlur, klass, value);
-    parseOptionalProperty<Function<float>>("line-dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);
-    parseOptionalProperty<PropertyTransition>("line-dasharray-transition", Key::LineDashArray, klass, value);
+    parseOptionalProperty<std::vector<float>>("line-dasharray", Key::LineDashArray, klass, value);
     parseOptionalProperty<std::string>("line-image", Key::LineImage, klass, value);
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);

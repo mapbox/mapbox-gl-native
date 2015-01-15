@@ -5,6 +5,8 @@
 #include <mbgl/style/function_properties.hpp>
 #include <mbgl/style/types.hpp>
 
+#include <vector>
+
 namespace mbgl {
 
 typedef mapbox::util::variant<
@@ -13,7 +15,8 @@ typedef mapbox::util::variant<
     RotateAnchorType,
     Function<bool>,
     Function<float>,
-    Function<Color>
+    Function<Color>,
+    std::vector<float>
 > PropertyValue;
 
 }

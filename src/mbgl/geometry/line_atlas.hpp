@@ -21,8 +21,8 @@ public:
 
     void bind();
 
-    LinePatternPos getDashPosition(std::vector<float>&, bool);
-    LinePatternPos addDash(std::vector<float> &dasharray, bool round);
+    LinePatternPos getDashPosition(const std::vector<float>&, bool);
+    LinePatternPos addDash(const std::vector<float> &dasharray, bool round);
 
     const int width;
     const int height;

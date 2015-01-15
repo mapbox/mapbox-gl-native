@@ -9,6 +9,7 @@
 #include <string>
 #include <type_traits>
 #include <memory>
+#include <vector>
 
 namespace mbgl {
 
@@ -36,7 +37,7 @@ struct LineProperties {
     float width = 1;
     float gap_width = 0;
     float blur = 0;
-    std::array<float, 2> dash_array = {{ 1, -1 }};
+    std::vector<float> dash_array;
     float dash_line_width = 1;
     std::string image;
 

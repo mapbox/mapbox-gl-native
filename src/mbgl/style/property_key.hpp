@@ -24,8 +24,6 @@ enum class PropertyKey {
     LineGapWidth,
     LineBlur,
     LineDashArray, // for transitions only
-    LineDashLand,
-    LineDashGap,
     LineImage,
 
     IconOpacity,

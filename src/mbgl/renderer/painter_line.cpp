@@ -70,7 +70,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         bucket.drawPoints(*linejoinShader);
     }
 
-    if (properties.dash_array.size() && properties.dash_array[1] > 0) {
+    if (properties.dash_array.size()) {
 
         useProgram(linesdfShader->program);
 
@@ -81,8 +81,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linesdfShader->u_blur = blur;
         linesdfShader->u_color = color;
 
-        std::vector<float> dash = { properties.dash_array[0], properties.dash_array[1] };
-        LinePatternPos pos = lineAtlas.getDashPosition(dash, false);
+        LinePatternPos pos = lineAtlas.getDashPosition(properties.dash_array, false);
         lineAtlas.bind();
 
         float patternratio = std::pow(2.0, std::floor(std::log2(state.getScale())) - id.z) / 8.0;

@@ -185,8 +185,7 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const times
     applyTransitionedStyleProperty(PropertyKey::LineWidth, line.width, z, now);
     applyTransitionedStyleProperty(PropertyKey::LineGapWidth, line.gap_width, z, now);
     applyTransitionedStyleProperty(PropertyKey::LineBlur, line.blur, z, now);
-    applyTransitionedStyleProperty(PropertyKey::LineDashLand, line.dash_array[0], z, now);
-    applyTransitionedStyleProperty(PropertyKey::LineDashGap, line.dash_array[1], z, now);
+    applyStyleProperty(PropertyKey::LineDashArray, line.dash_array, z, now);
     applyStyleProperty(PropertyKey::LineImage, line.image, z, now);
 
     // for scaling dasharrays

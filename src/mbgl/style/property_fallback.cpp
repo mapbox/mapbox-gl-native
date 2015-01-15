@@ -20,8 +20,6 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
     { PropertyKey::LineWidth, defaultStyleProperties<LineProperties>().width },
     { PropertyKey::LineGapWidth, defaultStyleProperties<LineProperties>().gap_width },
     { PropertyKey::LineBlur, defaultStyleProperties<LineProperties>().blur },
-    { PropertyKey::LineDashLand, defaultStyleProperties<LineProperties>().dash_array[0] },
-    { PropertyKey::LineDashGap, defaultStyleProperties<LineProperties>().dash_array[1] },
 
     { PropertyKey::IconOpacity, defaultStyleProperties<SymbolProperties>().icon.opacity },
     { PropertyKey::IconRotate, defaultStyleProperties<SymbolProperties>().icon.rotate },
