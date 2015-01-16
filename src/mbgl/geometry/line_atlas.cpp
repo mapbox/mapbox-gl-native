@@ -57,6 +57,9 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
 
     float stretch = width / length;
     float halfWidth = stretch * 0.5;
+    // If dasharray has an odd length, both the first and last parts
+    // are dashes and should be joined seamlessly.
+    bool oddLength = dasharray.size() % 2 == 1;
 
     for (int y = -n; y <= n; y++) {
         int row = nextRow + n + y;
@@ -64,13 +67,22 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
 
         float left = 0;
         float right = dasharray[0];
-        int partIndex = 1;
+        unsigned int partIndex = 1;
+
+        if (oddLength) {
+            left -= dasharray.back();
+        }
 
         for (int x = 0; x < width; x++) {
 
             while (right < x / stretch) {
                 left = right;
                 right = right + dasharray[partIndex];
+
+                if (oddLength && partIndex == dasharray.size() - 1) {
+                    right += dasharray.front();
+                }
+
                 partIndex++;
             }
 
