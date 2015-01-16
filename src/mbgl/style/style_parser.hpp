@@ -75,8 +75,6 @@ private:
     std::tuple<bool, T> parseProperty(JSVal value, const char *property_name);
 
     template <typename T>
-    bool parseFunction(PropertyKey key, ClassProperties &klass, JSVal value);
-    template <typename T>
     std::tuple<bool, Function<T>> parseFunction(JSVal value);
     template <typename T>
     T parseFunctionArgument(JSVal value);

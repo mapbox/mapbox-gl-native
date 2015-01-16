@@ -317,17 +317,6 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
 
 
 template <typename T>
-bool StyleParser::parseFunction(PropertyKey key, ClassProperties &klass, JSVal value) {
-    bool parsed;
-    Function<T> function;
-    std::tie(parsed, function) = parseFunction<T>(value);
-    if (parsed) {
-        klass.set(key, function);
-    }
-    return parsed;
-}
-
-template <typename T>
 bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass) {
     bool parsed;
     T result;
