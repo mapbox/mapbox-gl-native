@@ -111,6 +111,8 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
 };
 
 void LineAtlas::bind() {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
     bool first = false;
     if (!texture) {
         MBGL_CHECK_ERROR(glGenTextures(1, &texture));
@@ -119,13 +121,12 @@ void LineAtlas::bind() {
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-        dirty = true;
+        first = true;
     } else {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
     }
 
     if (dirty) {
-        std::lock_guard<std::recursive_mutex> lock(mtx);
         if (first) {
             glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target
@@ -153,9 +154,6 @@ void LineAtlas::bind() {
         }
 
 
-        // TODO use texsubimage for updates
-        // TODO lock?
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
         dirty = false;
     }
 };
