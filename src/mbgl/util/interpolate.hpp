@@ -22,8 +22,7 @@ inline std::array<T, 4> interpolate(const std::array<T, 4>& a, const std::array<
     }};
 }
 
-inline std::vector<float> interpolate(const std::vector<float> &a, const std::vector<float> &b, const double t) {
-    fprintf(stderr, "interpolate this\n");
+inline std::vector<float> interpolate(const std::vector<float> &a, const std::vector<float>, const double) {
     return a;
 }
 
