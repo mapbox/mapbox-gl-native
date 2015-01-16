@@ -32,7 +32,7 @@ private:
     char *const data = nullptr;
     std::atomic<bool> dirty;
     uint32_t texture = 0;
-    uint32_t nextRow = 0;
+    int nextRow = 0;
     std::map<std::string, LinePatternPos> positions;
 };
 

@@ -33,7 +33,6 @@ LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, b
     std::string key = sskey.str();
 
     if (positions.find(key) == positions.end()) {
-        //fprintf(stderr, "add %s\n", key.c_str());
         positions[key] = addDash(dasharray, round);
     }
 
@@ -46,7 +45,10 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
     int dashheight = 2 * n + 1;
     const uint8_t offset = 128;
 
-    // TODO check if enough space
+    if (nextRow + dashheight > height) {
+        fprintf(stderr, "[WARNING] line atlas bitmap overflow\n");
+        return LinePatternPos();
+    }
 
     float length = 0;
     for (const float &part : dasharray) {
