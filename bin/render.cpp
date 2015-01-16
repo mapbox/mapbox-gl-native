@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     Map map(view, fileSource);
 
     map.setStyleJSON(style, ".");
-    map.setAppliedClasses(classes);
+    map.setClasses(classes);
 
     view.resize(width, height, pixelRatio);
     map.resize(width, height, pixelRatio);
