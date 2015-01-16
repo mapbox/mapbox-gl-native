@@ -39,7 +39,7 @@ public:
                 util::ptr<Style>,
                 GlyphAtlas&, GlyphStore&,
                 SpriteAtlas&, util::ptr<Sprite>,
-                TexturePool&, FileSource&,
+                TexturePool&, FileSource&, uv_loop_t& loop,
                 std::function<void ()> callback);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
@@ -63,7 +63,7 @@ private:
                             util::ptr<Style>,
                             GlyphAtlas&, GlyphStore&,
                             SpriteAtlas&, util::ptr<Sprite>,
-                            FileSource&, TexturePool&,
+                            FileSource&, uv_loop_t &, TexturePool&,
                             const Tile::ID&,
                             std::function<void ()> callback);
 

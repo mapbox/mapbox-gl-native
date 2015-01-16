@@ -5,6 +5,7 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
+#include <mbgl/platform/log.hpp>
 
 using namespace mbgl;
 
@@ -13,8 +14,8 @@ VectorTileData::VectorTileData(Tile::ID const& id_,
                                GlyphAtlas& glyphAtlas_, GlyphStore& glyphStore_,
                                SpriteAtlas& spriteAtlas_, util::ptr<Sprite> sprite_,
                                TexturePool& texturePool_,
-                               const SourceInfo& source_)
-    : TileData(id_, source_),
+                               const SourceInfo& source_, FileSource &fileSource_)
+    : TileData(id_, source_, fileSource_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
@@ -44,10 +45,8 @@ void VectorTileData::parse() {
                           texturePool);
         parser.parse();
     } catch (const std::exception& ex) {
-#if defined(DEBUG)
-        fprintf(stderr, "[%p] exception [%d/%d/%d]... failed: %s\n", this, id.z, id.x, id.y, ex.what());
-#endif
-        cancel();
+        Log::Error(Event::ParseTile, "Parsing [%d/%d/%d] failed: %s", id.z, id.x, id.y, ex.what());
+        state = State::obsolete;
         return;
     }
 

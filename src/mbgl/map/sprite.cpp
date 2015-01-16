@@ -52,6 +52,7 @@ Sprite::operator bool() const {
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
 void Sprite::load(FileSource& fileSource) {
+
     if (!valid) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
         loadedImage = true;
@@ -62,26 +63,26 @@ void Sprite::load(FileSource& fileSource) {
 
     util::ptr<Sprite> sprite = shared_from_this();
 
-    fileSource.request(ResourceType::JSON, jsonURL)->onload([sprite](const Response &res) {
-        if (res.code == 200) {
+    fileSource.request({ Resource::Kind::JSON, jsonURL }, [sprite](const Response &res) {
+        if (res.status == Response::Successful) {
             sprite->body = res.data;
             sprite->parseJSON();
             sprite->complete();
         } else {
-            Log::Warning(Event::Sprite, "Failed to load sprite info: Error %d: %s", res.code, res.message.c_str());
+            Log::Warning(Event::Sprite, "Failed to load sprite info: %s", res.message.c_str());
             if (!sprite->future.valid()) {
                 sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res.message)));
             }
         }
     });
 
-    fileSource.request(ResourceType::Image, spriteURL)->onload([sprite](const Response &res) {
-        if (res.code == 200) {
+    fileSource.request({ Resource::Kind::Image, spriteURL }, [sprite](const Response &res) {
+        if (res.status == Response::Successful) {
             sprite->image = res.data;
             sprite->parseImage();
             sprite->complete();
         } else {
-            Log::Warning(Event::Sprite, "Failed to load sprite image: Error %d: %s", res.code, res.message.c_str());
+            Log::Warning(Event::Sprite, "Failed to load sprite image: Error %s", res.message.c_str());
             if (!sprite->future.valid()) {
                 sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res.message)));
             }

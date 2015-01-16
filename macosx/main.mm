@@ -3,7 +3,9 @@
 #include <mbgl/platform/darwin/log_nslog.hpp>
 #include <mbgl/platform/darwin/Reachability.h>
 #include <mbgl/platform/default/glfw_view.hpp>
-#include <mbgl/storage/caching_http_file_source.hpp>
+#include <mbgl/storage/default/default_file_source.hpp>
+#include <mbgl/storage/default/sqlite_cache.hpp>
+#include <mbgl/storage/network_status.hpp>
 
 #import <Foundation/Foundation.h>
 
@@ -74,9 +76,10 @@ int main() {
     mbgl::Log::Set<mbgl::NSLogBackend>();
 
     GLFWView view;
-    mbgl::CachingHTTPFileSource fileSource(mbgl::platform::defaultCacheDatabase());
+
+    mbgl::SQLiteCache cache(mbgl::platform::defaultCacheDatabase());
+    mbgl::DefaultFileSource fileSource(&cache);
     mbgl::Map map(view, fileSource);
-    mbgl::CachingHTTPFileSource *fileSourcePtr = &fileSource;
 
     URLHandler *handler = [[URLHandler alloc] init];
     [handler setMap:&map];
@@ -86,7 +89,7 @@ int main() {
     // Notify map object when network reachability status changes.
     Reachability* reachability = [Reachability reachabilityForInternetConnection];
     reachability.reachableBlock = ^(Reachability *) {
-        fileSourcePtr->setReachability(true);
+        mbgl::NetworkStatus::Reachable();
     };
     [reachability startNotifier];
 
@@ -99,7 +102,7 @@ int main() {
     // Set access token if present
     NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
     if (!accessToken) mbgl::Log::Warning(mbgl::Event::Setup, "No access token set. Mapbox vector tiles won't work.");
-    if (accessToken) fileSource.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+    if (accessToken) map.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
 
     // Load style
     map.setStyleURL("asset://styles/bright-v7.json");

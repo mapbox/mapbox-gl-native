@@ -47,7 +47,10 @@
         '../src',
       ],
       'xcode_settings': {
-        'OTHER_CPLUSPLUSFLAGS': [ '<@(uv_cflags)' ],
+        'OTHER_CPLUSPLUSFLAGS': [
+          '<@(uv_cflags)',
+          '-I<(boost_root)/include',
+        ],
       },
       'direct_dependent_settings': {
         'include_dirs': [

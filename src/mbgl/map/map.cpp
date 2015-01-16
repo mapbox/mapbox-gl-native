@@ -24,6 +24,7 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/uv.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -127,9 +128,7 @@ Map::~Map() {
 }
 
 uv::worker &Map::getWorker() {
-    if (!workers) {
-        workers = util::make_unique<uv::worker>(**loop, 4, "Tile Worker");
-    }
+    assert(workers);
     return *workers;
 }
 
@@ -152,8 +151,6 @@ void Map::start(bool startPaused) {
         style.reset();
         workers.reset();
         activeSources.clear();
-
-        fileSource.clearLoop();
 
         terminating = true;
 
@@ -194,6 +191,8 @@ void Map::start(bool startPaused) {
 #ifdef __APPLE__
         pthread_setname_np("Map");
 #endif
+
+        workers = util::make_unique<uv::worker>(**loop, 4, "Tile Worker");
 
         run();
 
@@ -301,7 +300,6 @@ void Map::run() {
         mapThread = std::thread::id();
 #endif
         mode = Mode::None;
-        fileSource.clearLoop();
     }
 
     view.deactivate();
@@ -386,12 +384,13 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
         style = std::make_shared<Style>();
     }
 
+    style->base = base;
     style->loadJSON((const uint8_t *)styleJSON.c_str());
     style->cascadeClasses(classes);
-    fileSource.setBase(base);
-    glyphStore->setURL(style->glyph_url);
-
     style->setDefaultTransitionDuration(defaultTransitionDuration);
+
+    const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
+    glyphStore->setURL(glyphURL);
 
     update();
 }
@@ -559,6 +558,15 @@ void Map::stopRotating() {
     update();
 }
 
+#pragma mark - Access Token
+
+void Map::setAccessToken(const std::string &token) {
+    accessToken = token;
+}
+
+const std::string &Map::getAccessToken() const {
+    return accessToken;
+}
 
 #pragma mark - Toggles
 
@@ -674,20 +682,16 @@ void Map::updateTiles() {
         source->source->update(*this, getWorker(),
                                style, *glyphAtlas, *glyphStore,
                                *spriteAtlas, getSprite(),
-                               *texturePool, fileSource, [this](){ update(); });
+                               *texturePool, fileSource, ***loop, [this](){ update(); });
     }
 }
 
 void Map::prepare() {
-    if (!fileSource.hasLoop()) {
-        fileSource.setLoop(**loop);
-    }
-
     if (!style) {
         style = std::make_shared<Style>();
 
-        fileSource.request(ResourceType::JSON, styleURL)->onload([&](const Response &res) {
-            if (res.code == 200) {
+        fileSource.request({ Resource::Kind::JSON, styleURL}, **loop, [&](const Response &res) {
+            if (res.status == Response::Successful) {
                 // Calculate the base
                 const size_t pos = styleURL.rfind('/');
                 std::string base = "";
@@ -697,7 +701,7 @@ void Map::prepare() {
 
                 setStyleJSON(res.data, base);
             } else {
-                Log::Error(Event::Setup, "loading style failed: %ld (%s)", res.code, res.message.c_str());
+                Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
             }
         });
     }

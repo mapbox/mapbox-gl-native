@@ -22,4 +22,12 @@ std::string cwd() {
 #endif
 }
 
+const char *getFileRequestError(uv_fs_t *req) {
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+    return uv_strerror(uv_last_error(req->loop));
+#else
+    return uv_strerror(int(req->result));
+#endif
+}
+
 }

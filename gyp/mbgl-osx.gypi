@@ -12,7 +12,7 @@
         '../platform/osx/cache_database_application_support.mm',
         '../platform/darwin/log_nslog.mm',
         '../platform/darwin/string_nsstring.mm',
-        '../platform/darwin/http_request_baton_cocoa.mm',
+        '../platform/darwin/http_request_cocoa.mm',
         '../platform/darwin/application_root.mm',
         '../platform/darwin/image.mm',
         '../platform/default/asset_request_libuv.cpp',
@@ -22,7 +22,10 @@
         '../src',
       ],
       'xcode_settings': {
-        'OTHER_CPLUSPLUSFLAGS': [ '<@(uv_cflags)' ],
+        'OTHER_CPLUSPLUSFLAGS': [
+          '<@(uv_cflags)',
+          '-I<(boost_root)/include',
+        ],
       },
       'direct_dependent_settings': {
         'include_dirs': [

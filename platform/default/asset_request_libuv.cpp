@@ -1,19 +1,26 @@
-#include <mbgl/storage/asset_request.hpp>
+#include <mbgl/storage/default/asset_request.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/platform/platform.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/util.hpp>
+#include <mbgl/util/uv.hpp>
 
 #include <uv.h>
+#include <boost/algorithm/string.hpp>
 
-#include <limits>
+#include <cassert>
+
+
+namespace algo = boost::algorithm;
 
 namespace mbgl {
 
-struct AssetRequestBaton {
-    AssetRequestBaton(AssetRequest *request_, const std::string &path, uv_loop_t *loop);
-    ~AssetRequestBaton();
+class AssetRequestImpl {
+    MBGL_STORE_THREAD(tid)
 
-    void cancel();
+public:
+    AssetRequestImpl(AssetRequest *request, uv_loop_t *loop);
+    ~AssetRequestImpl();
+
     static void fileOpened(uv_fs_t *req);
     static void fileStated(uv_fs_t *req);
     static void fileRead(uv_fs_t *req);
@@ -21,52 +28,32 @@ struct AssetRequestBaton {
     static void notifyError(uv_fs_t *req);
     static void cleanup(uv_fs_t *req);
 
-    const std::thread::id threadId;
+
     AssetRequest *request = nullptr;
+    bool canceled = false;
     uv_fs_t req;
     uv_file fd = -1;
-    bool canceled = false;
-    std::string body;
     uv_buf_t buffer;
+    std::unique_ptr<Response> response;
 };
 
-AssetRequestBaton::AssetRequestBaton(AssetRequest *request_, const std::string &path, uv_loop_t *loop)
-    : threadId(std::this_thread::get_id()), request(request_) {
-    req.data = this;
-    uv_fs_open(loop, &req, path.c_str(), O_RDONLY, S_IRUSR, fileOpened);
-}
+AssetRequestImpl::~AssetRequestImpl() {
+    MBGL_VERIFY_THREAD(tid);
 
-AssetRequestBaton::~AssetRequestBaton() {
-}
-
-void AssetRequestBaton::cancel() {
-    canceled = true;
-
-    // uv_cancel fails frequently when the request has already been started.
-    // In that case, we have to let it complete and check the canceled bool
-    // instead.
-    uv_cancel((uv_req_t *)&req);
-}
-
-void AssetRequestBaton::notifyError(uv_fs_t *req) {
-    AssetRequestBaton *ptr = reinterpret_cast<AssetRequestBaton *>(req->data);
-    assert(std::this_thread::get_id() == ptr->threadId);
-
-    if (ptr->request && req->result < 0 && !ptr->canceled && req->result != UV_ECANCELED) {
-        ptr->request->response = util::make_unique<Response>();
-        ptr->request->response->code = req->result == UV_ENOENT ? 404 : 500;
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-        ptr->request->response->message = uv_strerror(uv_last_error(req->loop));
-#else
-        ptr->request->response->message = uv_strerror(int(req->result));
-#endif
-        ptr->request->notify();
+    if (request) {
+        request->ptr = nullptr;
     }
 }
 
-void AssetRequestBaton::fileOpened(uv_fs_t *req) {
-    AssetRequestBaton *ptr = reinterpret_cast<AssetRequestBaton *>(req->data);
-    assert(std::this_thread::get_id() == ptr->threadId);
+AssetRequestImpl::AssetRequestImpl(AssetRequest *request_, uv_loop_t *loop) : request(request_) {
+    req.data = this;
+    uv_fs_open(loop, &req, (request->resource.url.substr(8)).c_str(), O_RDONLY, S_IRUSR, fileOpened);
+}
+
+void AssetRequestImpl::fileOpened(uv_fs_t *req) {
+    assert(req->data);
+    auto self = reinterpret_cast<AssetRequestImpl *>(req->data);
+    MBGL_VERIFY_THREAD(self->tid);
 
     if (req->result < 0) {
         // Opening failed or was canceled. There isn't much left we can do.
@@ -78,88 +65,93 @@ void AssetRequestBaton::fileOpened(uv_fs_t *req) {
         // We're going to reuse this handle, so we need to cleanup first.
         uv_fs_req_cleanup(req);
 
-        if (ptr->canceled || !ptr->request) {
-            // Either the AssetRequest object has been destructed, or the
-            // request was canceled.
+        if (self->canceled) {
+            // The request was canceled.
             uv_fs_close(req->loop, req, fd, fileClosed);
         } else {
-            ptr->fd = fd;
+            self->fd = fd;
             uv_fs_fstat(req->loop, req, fd, fileStated);
         }
     }
 }
 
-void AssetRequestBaton::fileStated(uv_fs_t *req) {
-    AssetRequestBaton *ptr = reinterpret_cast<AssetRequestBaton *>(req->data);
-    assert(std::this_thread::get_id() == ptr->threadId);
+void AssetRequestImpl::fileStated(uv_fs_t *req) {
+    assert(req->data);
+    auto self = reinterpret_cast<AssetRequestImpl *>(req->data);
+    MBGL_VERIFY_THREAD(self->tid);
 
-    if (req->result != 0 || ptr->canceled || !ptr->request) {
+    if (req->result != 0 || self->canceled) {
         // Stating failed or was canceled. We already have an open file handle
         // though, which we'll have to close.
         notifyError(req);
 
         uv_fs_req_cleanup(req);
-        uv_fs_close(req->loop, req, ptr->fd, fileClosed);
+        uv_fs_close(req->loop, req, self->fd, fileClosed);
     } else {
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-        const uv_statbuf_t *stat = static_cast<const uv_statbuf_t *>(req->ptr);
+        auto stat = static_cast<const uv_statbuf_t *>(req->ptr);
 #else
-        const uv_stat_t *stat = static_cast<const uv_stat_t *>(req->ptr);
+        auto stat = static_cast<const uv_stat_t *>(req->ptr);
 #endif
         if (stat->st_size > std::numeric_limits<int>::max()) {
             // File is too large for us to open this way because uv_buf's only support unsigned
             // ints as maximum size.
-            if (ptr->request) {
-                ptr->request->response = util::make_unique<Response>();
-                ptr->request->response->code = UV_EFBIG;
+            auto response = util::make_unique<Response>();
+            response->status = Response::Error;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-                ptr->request->response->message = uv_strerror(uv_err_t {UV_EFBIG, 0});
+            response->message = uv_strerror(uv_err_t {UV_EFBIG, 0});
 #else
-                ptr->request->response->message = uv_strerror(UV_EFBIG);
+            response->message = uv_strerror(UV_EFBIG);
 #endif
-                ptr->request->notify();
-            }
+            assert(self->request);
+            self->request->notify(std::move(response), FileCache::Hint::No);
+            delete self->request;
 
             uv_fs_req_cleanup(req);
-            uv_fs_close(req->loop, req, ptr->fd, fileClosed);
+            uv_fs_close(req->loop, req, self->fd, fileClosed);
         } else {
-            const unsigned int size = (unsigned int)(stat->st_size);
-            ptr->body.resize(size);
-            ptr->buffer = uv_buf_init(const_cast<char *>(ptr->body.data()), size);
+            self->response = util::make_unique<Response>();
+            self->response->modified = stat->st_mtimespec.tv_sec;
+            self->response->etag = std::to_string(stat->st_ino);
+            const auto size = (unsigned int)(stat->st_size);
+            self->response->data.resize(size);
+            self->buffer = uv_buf_init(const_cast<char *>(self->response->data.data()), size);
             uv_fs_req_cleanup(req);
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-            uv_fs_read(req->loop, req, ptr->fd, ptr->buffer.base, ptr->buffer.len, -1, fileRead);
+            uv_fs_read(req->loop, req, self->fd, self->buffer.base, self->buffer.len, -1, fileRead);
 #else
-            uv_fs_read(req->loop, req, ptr->fd, &ptr->buffer, 1, 0, fileRead);
+            uv_fs_read(req->loop, req, self->fd, &self->buffer, 1, 0, fileRead);
 #endif
         }
     }
 }
 
-void AssetRequestBaton::fileRead(uv_fs_t *req) {
-    AssetRequestBaton *ptr = reinterpret_cast<AssetRequestBaton *>(req->data);
-    assert(std::this_thread::get_id() == ptr->threadId);
+void AssetRequestImpl::fileRead(uv_fs_t *req) {
+    assert(req->data);
+    auto self = reinterpret_cast<AssetRequestImpl *>(req->data);
+    MBGL_VERIFY_THREAD(self->tid);
 
-    if (req->result < 0 || ptr->canceled || !ptr->request) {
-        // Reading failed or was canceled. We already have an open file handle
+    if (req->result < 0 || self->canceled) {
+        // Stating failed or was canceled. We already have an open file handle
         // though, which we'll have to close.
         notifyError(req);
     } else {
         // File was successfully read.
-        if (ptr->request) {
-            ptr->request->response = util::make_unique<Response>();
-            ptr->request->response->code = 200;
-            ptr->request->response->data = std::move(ptr->body);
-            ptr->request->notify();
-        }
+        self->response->status = Response::Successful;
+        assert(self->request);
+        self->request->notify(std::move(self->response), FileCache::Hint::No);
+        delete self->request;
     }
 
     uv_fs_req_cleanup(req);
-    uv_fs_close(req->loop, req, ptr->fd, fileClosed);
+    uv_fs_close(req->loop, req, self->fd, fileClosed);
 }
 
-void AssetRequestBaton::fileClosed(uv_fs_t *req) {
-    assert(std::this_thread::get_id() == (reinterpret_cast<AssetRequestBaton *>(req->data))->threadId);
+void AssetRequestImpl::fileClosed(uv_fs_t *req) {
+    assert(req->data);
+    auto self = reinterpret_cast<AssetRequestImpl *>(req->data);
+    MBGL_VERIFY_THREAD(self->tid);
+    (void(self)); // Silence unused variable error in Release mode
 
     if (req->result < 0) {
         // Closing the file failed. But there isn't anything we can do.
@@ -168,56 +160,70 @@ void AssetRequestBaton::fileClosed(uv_fs_t *req) {
     cleanup(req);
 }
 
-void AssetRequestBaton::cleanup(uv_fs_t *req) {
-    AssetRequestBaton *ptr = reinterpret_cast<AssetRequestBaton *>(req->data);
-    assert(std::this_thread::get_id() == ptr->threadId);
+void AssetRequestImpl::notifyError(uv_fs_t *req) {
+    assert(req->data);
+    auto self = reinterpret_cast<AssetRequestImpl *>(req->data);
+    MBGL_VERIFY_THREAD(self->tid);
 
-    if (ptr->request) {
-        ptr->request->ptr = nullptr;
+    if (req->result < 0 && !self->canceled && req->result != UV_ECANCELED) {
+        auto response = util::make_unique<Response>();
+        response->status = Response::Error;
+        response->message = uv::getFileRequestError(req);
+        assert(self->request);
+        self->request->notify(std::move(response), FileCache::Hint::No);
+        delete self->request;
     }
+}
 
+void AssetRequestImpl::cleanup(uv_fs_t *req) {
+    assert(req->data);
+    auto self = reinterpret_cast<AssetRequestImpl *>(req->data);
+    MBGL_VERIFY_THREAD(self->tid);
     uv_fs_req_cleanup(req);
-    delete ptr;
-    ptr = nullptr;
+    delete self;
 }
 
+// -------------------------------------------------------------------------------------------------
 
-AssetRequest::AssetRequest(const std::string &path_, uv_loop_t *loop)
-    : BaseRequest(path_) {
-    if (!path.empty() && path[0] == '/') {
-        // This is an absolute path. We don't allow this. Note that this is not a way to absolutely
-        // prevent access to resources outside the application bundle; e.g. there could be symlinks
-        // in the application bundle that link to outside. We don't care about these.
-        response = util::make_unique<Response>();
-        response->code = 403;
-        response->message = "Path is outside the application bundle";
-        notify();
-    } else {
-        // Note: The AssetRequestBaton object is deleted in AssetRequestBaton::cleanup().
-        ptr = new AssetRequestBaton(this, platform::applicationRoot() + "/" + path, loop);
-    }
-}
-
-void AssetRequest::cancel() {
-    assert(std::this_thread::get_id() == threadId);
-
-    if (ptr) {
-        ptr->cancel();
-
-        // When deleting a AssetRequest object with a uv_fs_* call is in progress, we are making sure
-        // that the callback doesn't accidentally reference this object again.
-        ptr->request = nullptr;
-        ptr = nullptr;
-    }
-
-    notify();
+AssetRequest::AssetRequest(DefaultFileSource *source, const Resource &resource)
+    : SharedRequestBase(source, resource) {
+    assert(algo::starts_with(resource.url, "asset://"));
 }
 
 AssetRequest::~AssetRequest() {
-    assert(std::this_thread::get_id() == threadId);
-    cancel();
+    MBGL_VERIFY_THREAD(tid);
 
-    // Note: The AssetRequestBaton object is deleted in AssetRequestBaton::cleanup().
+    if (ptr) {
+        reinterpret_cast<AssetRequestImpl *>(ptr)->request = nullptr;
+    }
+}
+
+void AssetRequest::start(uv_loop_t *loop, std::unique_ptr<Response> response) {
+    MBGL_VERIFY_THREAD(tid);
+
+    // We're ignoring the existing response if any.
+    (void(response));
+
+    assert(!ptr);
+    ptr = new AssetRequestImpl(this, loop);
+    // Note: the AssetRequestImpl deletes itself.
+}
+
+void AssetRequest::cancel() {
+    MBGL_VERIFY_THREAD(tid);
+
+    if (ptr) {
+        reinterpret_cast<AssetRequestImpl *>(ptr)->canceled = true;
+
+        // uv_cancel fails frequently when the request has already been started.
+        // In that case, we have to let it complete and check the canceled bool
+        // instead. The cancelation callback will delete the AssetRequest object.
+        uv_cancel((uv_req_t *)&reinterpret_cast<AssetRequestImpl *>(ptr)->req);
+    } else {
+        // This request is canceled before we called start. We're safe to delete
+        // ourselves now.
+        delete this;
+    }
 }
 
 }

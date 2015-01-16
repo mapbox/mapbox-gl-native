@@ -43,6 +43,7 @@ public:
     util::ptr<StyleLayerGroup> layers;
     std::vector<std::string> appliedClasses;
     std::string glyph_url;
+    std::string base;
 
 private:
     std::string sprite_url;

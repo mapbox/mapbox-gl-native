@@ -148,27 +148,22 @@ GlyphPBF::GlyphPBF(const std::string &glyphURL, const std::string &fontStack, Gl
     });
 
     // The prepare call jumps back to the main thread.
-    fileSource.prepare([&, url] {
-        auto request = fileSource.request(ResourceType::Glyphs, url);
-        request->onload([&, url](const Response &res) {
-            if (res.code != 200) {
-                // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
-                const std::string msg = std::string { "[ERROR] failed to load glyphs (" } + util::toString(res.code) + "): " + res.message;
-                promise.set_exception(std::make_exception_ptr(std::runtime_error(msg)));
-            } else {
-                // Transfer the data to the GlyphSet and signal its availability.
-                // Once it is available, the caller will need to call parse() to actually
-                // parse the data we received. We are not doing this here since this callback is being
-                // called from another (unknown) thread.
-                data = res.data;
-                promise.set_value(*this);
-            }
-        });
-        request->oncancel([&]() {
-            promise.set_exception(std::make_exception_ptr(std::runtime_error("Loading glyphs was canceled")));
-        });
+    fileSource.request({ Resource::Kind::Glyphs, url }, [&, url](const Response &res) {
+        if (res.status != Response::Successful) {
+            // Something went wrong with loading the glyph pbf. Pass on the error to the future listeners.
+            const std::string msg = std::string { "[ERROR] failed to load glyphs: " } + res.message;
+            promise.set_exception(std::make_exception_ptr(std::runtime_error(msg)));
+        } else {
+            // Transfer the data to the GlyphSet and signal its availability.
+            // Once it is available, the caller will need to call parse() to actually
+            // parse the data we received. We are not doing this here since this callback is being
+            // called from another (unknown) thread.
+            data = res.data;
+            promise.set_value(*this);
+        }
     });
 }
+
 
 std::shared_future<GlyphPBF &> GlyphPBF::getFuture() {
     return future;
