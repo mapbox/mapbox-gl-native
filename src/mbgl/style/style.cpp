@@ -48,31 +48,9 @@ void Style::setDefaultTransitionDuration(uint16_t duration_milliseconds) {
     defaultTransition.duration = duration_milliseconds;
 }
 
-const std::vector<std::string> &Style::getAppliedClasses() const {
-    return appliedClasses;
-}
-
-void Style::setAppliedClasses(const std::vector<std::string> &class_names) {
-    appliedClasses = class_names;
-    updateClasses();
-}
-
-void Style::toggleClass(const std::string &name) {
-    if (name.length()) {
-        auto it = std::find(appliedClasses.begin(), appliedClasses.end(), name);
-        if (it == appliedClasses.end()) {
-            appliedClasses.push_back(name);
-        } else {
-            appliedClasses.erase(it);
-        }
-    }
-
-    updateClasses();
-}
-
-void Style::updateClasses() {
+void Style::cascadeClasses(const std::vector<std::string>& classes) {
     if (layers) {
-        layers->setClasses(appliedClasses, util::now(), defaultTransition);
+        layers->setClasses(classes, util::now(), defaultTransition);
     }
 }
 
@@ -102,8 +80,6 @@ void Style::loadJSON(const uint8_t *const data) {
     layers = parser.getLayers();
     sprite_url = parser.getSprite();
     glyph_url = parser.getGlyphURL();
-
-    updateClasses();
 }
 
 }

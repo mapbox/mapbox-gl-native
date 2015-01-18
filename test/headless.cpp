@@ -190,8 +190,8 @@ TEST_P(HeadlessTest, render) {
         CachingHTTPFileSource fileSource(platform::defaultCacheDatabase());
         Map map(view, fileSource);
 
+        map.setClasses(classes);
         map.setStyleJSON(style, base_directory);
-        map.setAppliedClasses(classes);
 
         view.resize(width, height, pixelRatio);
         map.resize(width, height, pixelRatio);

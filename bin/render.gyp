@@ -19,6 +19,7 @@
         'ldflags': [
           '<@(glfw3_ldflags)',
           '<@(uv_ldflags)',
+          '<@(sqlite3_static_libs)',
           '<@(sqlite3_ldflags)',
           '<@(curl_ldflags)',
           '<@(png_ldflags)',

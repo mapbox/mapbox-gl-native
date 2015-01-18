@@ -76,9 +76,12 @@ public:
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
     // Styling
-    void setAppliedClasses(const std::vector<std::string> &classes);
-    void toggleClass(const std::string &name);
-    const std::vector<std::string> &getAppliedClasses() const;
+    void addClass(const std::string&);
+    void removeClass(const std::string&);
+    bool hasClass(const std::string&) const;
+    void setClasses(const std::vector<std::string>&);
+    std::vector<std::string> getClasses() const;
+
     void setDefaultTransitionDuration(uint64_t milliseconds = 0);
     uint64_t getDefaultTransitionDuration();
     void setStyleURL(const std::string &url);
@@ -208,6 +211,7 @@ private:
 
     std::string styleURL;
     std::string styleJSON = "";
+    std::vector<std::string> classes;
 
     std::atomic_uint_fast64_t defaultTransitionDuration;
 
