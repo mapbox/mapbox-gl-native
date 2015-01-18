@@ -33,7 +33,6 @@ import org.apache.commons.validator.routines.UrlValidator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UnknownFormatConversionException;
 
 // Custom view that shows a Map
 // Based on SurfaceView as we use OpenGL ES to render
@@ -57,7 +56,7 @@ public class MapView extends SurfaceView {
     private static final String STATE_DEBUG_ACTIVE = "debugActive";
     private static final String STATE_STYLE_URL = "styleUrl";
     private static final String STATE_ACCESS_TOKEN = "accessToken";
-    private static final String STATE_APPLIED_CLASSES = "appliedClasses";
+    private static final String STATE_CLASSES = "classes";
     private static final String STATE_DEFAULT_TRANSITION_DURATION = "defaultTransitionDuration";
 
     //
@@ -346,17 +345,17 @@ public class MapView extends SurfaceView {
     // Style methods
     //
 
-    public List<String> getAppliedStyleClasses() {
-        return mNativeMapView.getAppliedClasses();
+    public List<String> getClasses() {
+        return mNativeMapView.getClasses();
     }
 
-    public void setAppliedStyleClasses(List<String> styleClasses) {
-        setAppliedStyleClasses(styleClasses, 0);
+    public void setClasses(List<String> classes) {
+        setClasses(classes, 0);
     }
 
-    public void setAppliedStyleClasses(List<String> styleClasses, long transitionDuration) {
+    public void setClasses(List<String> classes, long transitionDuration) {
         mNativeMapView.setDefaultTransitionDuration(transitionDuration);
-        mNativeMapView.setAppliedClasses(styleClasses);
+        mNativeMapView.setClasses(classes);
     }
 
     //
@@ -378,9 +377,9 @@ public class MapView extends SurfaceView {
             setDebugActive(savedInstanceState.getBoolean(STATE_DEBUG_ACTIVE));
             setStyleUrl(savedInstanceState.getString(STATE_STYLE_URL));
             setAccessToken(savedInstanceState.getString(STATE_ACCESS_TOKEN));
-            List<String> appliedClasses = savedInstanceState.getStringArrayList(STATE_APPLIED_CLASSES);
+            List<String> appliedClasses = savedInstanceState.getStringArrayList(STATE_CLASSES);
             if (!appliedClasses.isEmpty()) {
-                setAppliedStyleClasses(appliedClasses);
+                setClasses(appliedClasses);
             }
             mNativeMapView.setDefaultTransitionDuration(savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
         }
@@ -405,7 +404,7 @@ public class MapView extends SurfaceView {
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
         outState.putString(STATE_STYLE_URL, getStyleUrl());
         outState.putString(STATE_ACCESS_TOKEN, getAccessToken());
-        //outState.putStringArrayList(STATE_APPLIED_CLASSES, new ArrayList<String>(getAppliedStyleClasses()));
+        outState.putStringArrayList(STATE_CLASSES, new ArrayList<String>(getClasses()));
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
     }
 

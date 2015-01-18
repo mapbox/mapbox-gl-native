@@ -167,12 +167,24 @@ class NativeMapView {
         nativeResize(mNativeMapViewPtr, width, height, ratio, fbWidth, fbHeight);
     }
 
-    public void setAppliedClasses(List<String> classes) {
-        nativeSetAppliedClasses(mNativeMapViewPtr, classes);
+    public void addClass(String clazz) {
+        nativeAddClass(mNativeMapViewPtr, clazz);
     }
 
-    public List<String> getAppliedClasses() {
-        return nativeGetAppliedClasses(mNativeMapViewPtr);
+    public void removeClass(String clazz) {
+        nativeRemoveClass(mNativeMapViewPtr, clazz);
+    }
+
+    public boolean hasClass(String clazz) {
+        return nativeHasClass(mNativeMapViewPtr, clazz);
+    }
+
+    public void setClasses(List<String> classes) {
+        nativeSetClasses(mNativeMapViewPtr, classes);
+    }
+
+    public List<String> getClasses() {
+        return nativeGetClasses(mNativeMapViewPtr);
     }
 
     public void setDefaultTransitionDuration() {
@@ -444,10 +456,16 @@ class NativeMapView {
     private native void nativeResize(long nativeMapViewPtr, int width,
             int height, float ratio, int fbWidth, int fbHeight);
 
-    private native void nativeSetAppliedClasses(long nativeMapViewPtr,
+    private native void nativeAddClass(long nativeMapViewPtr, String clazz);
+
+    private native void nativeRemoveClass(long nativeMapViewPtr, String clazz);
+
+    private native boolean nativeHasClass(long nativeMapViewPtr, String clazz);
+
+    private native void nativeSetClasses(long nativeMapViewPtr,
             List<String> classes);
 
-    private native List<String> nativeGetAppliedClasses(long nativeMapViewPtr);
+    private native List<String> nativeGetClasses(long nativeMapViewPtr);
 
     private native void nativeSetDefaultTransitionDuration(
             long nativeMapViewPtr, long milliseconds);

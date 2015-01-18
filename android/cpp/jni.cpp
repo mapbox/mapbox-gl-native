@@ -334,19 +334,40 @@ void JNICALL nativeResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint
     nativeMapView->getMap().resize(width, height, ratio, fbWidth, fbHeight);
 }
 
-void JNICALL
-nativeSetAppliedClasses(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject classes) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetAppliedClasses");
+void JNICALL nativeRemoveClass(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring clazz) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeRemoveClass");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().setAppliedClasses(std_vector_string_from_jobject(env, classes));
+    nativeMapView->getMap().removeClass(std_string_from_jstring(env, clazz));
 }
 
-jobject JNICALL nativeGetAppliedClasses(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetAppliedClasses");
+jboolean JNICALL nativeHasClass(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring clazz) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeHasClass");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    return std_vector_string_to_jobject(env, nativeMapView->getMap().getAppliedClasses());
+    return nativeMapView->getMap().hasClass(std_string_from_jstring(env, clazz));
+}
+
+void JNICALL nativeAddClass(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring clazz) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddClass");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().addClass(std_string_from_jstring(env, clazz));
+}
+
+void JNICALL
+nativeSetClasses(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject classes) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetClasses");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().setClasses(std_vector_string_from_jobject(env, classes));
+}
+
+jobject JNICALL nativeGetClasses(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetClasses");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    return std_vector_string_to_jobject(env, nativeMapView->getMap().getClasses());
 }
 
 void JNICALL nativeSetDefaultTransitionDuration(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
@@ -806,7 +827,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     // NOTE: if you get java.lang.UnsatisfiedLinkError you likely forgot to set the size of the
     // array correctly (too large)
-    std::array<JNINativeMethod, 59> methods = {{ // Can remove the extra brace in C++14
+    std::array<JNINativeMethod, 62> methods = {{ // Can remove the extra brace in C++14
         {"nativeCreate", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J",
          reinterpret_cast<void *>(&nativeCreate)},
         {"nativeDestroy", "(J)V", reinterpret_cast<void *>(&nativeDestroy)},
@@ -834,10 +855,16 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeResize", "(JIIFII)V",
          reinterpret_cast<void *>(static_cast<void JNICALL (
              *)(JNIEnv *, jobject, jlong, jint, jint, jfloat, jint, jint)>(&nativeResize))},
-        {"nativeSetAppliedClasses", "(JLjava/util/List;)V",
-         reinterpret_cast<void *>(&nativeSetAppliedClasses)},
-        {"nativeGetAppliedClasses", "(J)Ljava/util/List;",
-         reinterpret_cast<void *>(&nativeGetAppliedClasses)},
+        {"nativeAddClass", "(JLjava/lang/String;)V",
+         reinterpret_cast<void *>(&nativeAddClass)},
+        {"nativeRemoveClass", "(JLjava/lang/String;)V",
+         reinterpret_cast<void *>(&nativeRemoveClass)},
+        {"nativeHasClass", "(JLjava/lang/String;)Z",
+         reinterpret_cast<void *>(&nativeHasClass)},
+        {"nativeSetClasses", "(JLjava/util/List;)V",
+         reinterpret_cast<void *>(&nativeSetClasses)},
+        {"nativeGetClasses", "(J)Ljava/util/List;",
+         reinterpret_cast<void *>(&nativeGetClasses)},
         {"nativeSetDefaultTransitionDuration", "(JJ)V",
          reinterpret_cast<void *>(&nativeSetDefaultTransitionDuration)},
         {"nativeGetDefaultTransitionDuration", "(J)J",

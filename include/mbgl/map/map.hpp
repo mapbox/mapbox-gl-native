@@ -215,9 +215,6 @@ private:
 
     std::atomic_uint_fast64_t defaultTransitionDuration;
 
-    util::ptr<std::vector<std::string>> appliedClasses;
-    std::mutex appliedClassesMutex;
-
     bool debug = false;
     timestamp animationTime = 0;
 
