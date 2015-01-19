@@ -8,6 +8,7 @@
     'ldflags': [
       '<@(uv_ldflags)',
       '<@(sqlite3_static_libs)',
+      '<@(uv_static_libs)',
       '<@(sqlite3_ldflags)',
       '<@(curl_ldflags)',
       '<@(png_ldflags)',
@@ -210,7 +211,7 @@
       ],
       'dependencies': [
         '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-standalone',
+        '../mapboxgl.gyp:mbgl-core',
         '../mapboxgl.gyp:mbgl-headless',
         '<(platform_library)',
       ],

@@ -11,10 +11,6 @@
 #include <map>
 #include <cassert>
 
-dispatch_once_t request_initialize = 0;
-NSURLSession *session = nullptr;
-NSString *userAgent = nil;
-
 namespace mbgl {
 
 enum class ResponseStatus : uint8_t {
@@ -84,12 +80,39 @@ private:
 class HTTPCocoaContext : public HTTPContext<HTTPCocoaContext> {
 public:
     HTTPCocoaContext(uv_loop_t *loop);
+    ~HTTPCocoaContext();
+
+    NSURLSession *session = nil;
+    NSString *userAgent = nil;
 };
 
 template<> pthread_key_t HTTPContext<HTTPCocoaContext>::key{};
 template<> pthread_once_t HTTPContext<HTTPCocoaContext>::once = PTHREAD_ONCE_INIT;
 
-HTTPCocoaContext::HTTPCocoaContext(uv_loop_t *loop_) : HTTPContext(loop_) {}
+HTTPCocoaContext::HTTPCocoaContext(uv_loop_t *loop_) : HTTPContext(loop_) {
+    @autoreleasepool {
+        NSURLSessionConfiguration *sessionConfig =
+                [NSURLSessionConfiguration defaultSessionConfiguration];
+        sessionConfig.timeoutIntervalForResource = 30;
+        sessionConfig.HTTPMaximumConnectionsPerHost = 8;
+        sessionConfig.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+        sessionConfig.URLCache = nil;
+
+        session = [NSURLSession sessionWithConfiguration:sessionConfig];
+        [session retain];
+
+        // Write user agent string
+        userAgent = @"MapboxGL";
+    }
+}
+
+HTTPCocoaContext::~HTTPCocoaContext() {
+    [session release];
+    session = nullptr;
+
+    [userAgent release];
+    userAgent = nullptr;
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -128,18 +151,22 @@ void HTTPRequestImpl::start() {
             }
         }
 
-        [req addValue:userAgent forHTTPHeaderField:@"User-Agent"];
+        [req addValue:context->userAgent forHTTPHeaderField:@"User-Agent"];
 
-        task = [session dataTaskWithRequest:req
+        task = [context->session dataTaskWithRequest:req
                           completionHandler:^(NSData *data, NSURLResponse *res,
                                               NSError *error) { handleResult(data, res, error); }];
         [req release];
+        [task retain];
         [task resume];
     }
 }
 
 void HTTPRequestImpl::handleResponse() {
-    task = nullptr;
+    if (task) {
+        [task release];
+        task = nullptr;
+    }
 
     if (request) {
         if (status == ResponseStatus::TemporaryError && attempts < maxAttempts) {
@@ -171,8 +198,11 @@ void HTTPRequestImpl::cancel() {
     context->removeRequest(request);
     request = nullptr;
 
-    [task cancel];
-    task = nullptr;
+    if (task) {
+        [task cancel];
+        [task release];
+        task = nullptr;
+    }
 }
 
 HTTPRequestImpl::~HTTPRequestImpl() {
@@ -340,20 +370,6 @@ void HTTPRequestImpl::restart(uv_timer_t *timer, int) {
 
 HTTPRequest::HTTPRequest(DefaultFileSource *source, const Resource &resource)
     : SharedRequestBase(source, resource) {
-    // Global initialization.
-    dispatch_once(&request_initialize, ^{
-        NSURLSessionConfiguration *sessionConfig =
-            [NSURLSessionConfiguration defaultSessionConfiguration];
-        sessionConfig.timeoutIntervalForResource = 30;
-        sessionConfig.HTTPMaximumConnectionsPerHost = 8;
-        sessionConfig.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
-        sessionConfig.URLCache = nil;
-
-        session = [NSURLSession sessionWithConfiguration:sessionConfig];
-
-        // Write user agent string
-        userAgent = @"MapboxGL";
-    });
 }
 
 HTTPRequest::~HTTPRequest() {

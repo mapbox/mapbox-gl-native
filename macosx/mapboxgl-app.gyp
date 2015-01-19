@@ -55,6 +55,9 @@
           'ldflags': [ '<@(ldflags)' ],
         }]
       ],
+      'include_dirs': [
+        '../src'
+      ],
       'dependencies': [
         '../mapboxgl.gyp:bundle_styles',
         '../mapboxgl.gyp:mbgl-core',

@@ -20,25 +20,28 @@ Request::Request(const Resource &resource_, uv_loop_t *loop, Callback callback_)
     if (loop) {
         notify_async = new uv_async_t;
         notify_async->data = this;
-        uv_async_init(loop, notify_async, [](uv_async_t *async, int) {
-            auto request = reinterpret_cast<Request *>(async->data);
-            uv::close(async);
-
-            if (!request->destruct_async) {
-                // We haven't created a cancel request, so we can safely delete this Request object
-                // since it won't be accessed in the future.
-                assert(request->response);
-                request->callback(*request->response);
-                delete request;
-            } else {
-                // Otherwise, we're waiting for for the destruct notification to be delivered in order
-                // to delete the Request object. We're doing this since we can't know whether the
-                // DefaultFileSource is still sending a cancel event, which means this object must still
-                // exist.
-            }
-        });
+        uv_async_init(loop, notify_async, notifyCallback);
     }
 }
+
+void Request::notifyCallback(uv_async_t *async, int) {
+    auto request = reinterpret_cast<Request *>(async->data);
+    uv::close(async);
+
+    if (!request->destruct_async) {
+        // We haven't created a cancel request, so we can safely delete this Request object
+        // since it won't be accessed in the future.
+        assert(request->response);
+        request->callback(*request->response);
+        delete request;
+    } else {
+        // Otherwise, we're waiting for for the destruct notification to be delivered in order
+        // to delete the Request object. We're doing this since we can't know whether the
+        // DefaultFileSource is still sending a cancel event, which means this object must still
+        // exist.
+    }
+}
+
 
 Request::~Request() {
     if (notify_async) {
@@ -64,12 +67,14 @@ void Request::cancel() {
     assert(!destruct_async);
     destruct_async = new uv_async_t;
     destruct_async->data = this;
-    uv_async_init(notify_async->loop, destruct_async, [](uv_async_t *async, int) {
-        // The destruct_async will be invoked *after* the notify_async callback has already run.
-        auto request = reinterpret_cast<Request *>(async->data);
-        uv::close(async);
-        delete request;
-    });
+    uv_async_init(notify_async->loop, destruct_async, cancelCallback);
+}
+
+void Request::cancelCallback(uv_async_t *async, int) {
+    // The destruct_async will be invoked *after* the notify_async callback has already run.
+    auto request = reinterpret_cast<Request *>(async->data);
+    uv::close(async);
+    delete request;
 }
 
 // This gets called from the FileSource thread, and will only ever be invoked after cancel() was called

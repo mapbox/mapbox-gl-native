@@ -11,7 +11,7 @@
 
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/storage/caching_http_file_source.hpp>
+#include <mbgl/storage/default/default_file_source.hpp>
 
 #include "./fixtures/fixture_log.hpp"
 
@@ -191,7 +191,7 @@ TEST_P(HeadlessTest, render) {
         }
 
         HeadlessView view(env->display);
-        CachingHTTPFileSource fileSource(platform::defaultCacheDatabase());
+        mbgl::DefaultFileSource fileSource(nullptr);
         Map map(view, fileSource);
 
         map.setClasses(classes);

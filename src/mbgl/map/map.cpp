@@ -192,8 +192,6 @@ void Map::start(bool startPaused) {
         pthread_setname_np("Map");
 #endif
 
-        workers = util::make_unique<uv::worker>(**loop, 4, "Tile Worker");
-
         run();
 
 #ifndef NDEBUG
@@ -276,6 +274,9 @@ void Map::run() {
     }
 
     view.activate();
+
+    workers = util::make_unique<uv::worker>(**loop, 4, "Tile Worker");
+
     setup();
     prepare();
 
