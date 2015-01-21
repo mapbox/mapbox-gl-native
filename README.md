@@ -21,14 +21,14 @@ implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
 
 We try to link to as many system-provided libraries as possible. When these are unavailable or too outdated, we run a thin build-script layer called [Mason](https://github.com/mapbox/mason) to automate builds, and load precompiled binary packages when possible.
 
-Be sure to pull down all submodules first: 
+Be sure to pull down all submodules first:
 
     git submodule init
     git submodule update
 
 ## OS X
 
-On OS X, we are using `zlib`, `SQLite3`, `libcurl` and `libpng` provided by the operating system. In addition to that, you need to have the Boost headers installed. To install all prerequisites, use [Homebrew](http://brew.sh/) and type `brew install pkg-config boost`.
+On OS X, we are using `zlib`, `SQLite3`, `libcurl` and `libpng` provided by the operating system. In addition to that, you need to have the Boost headers installed and ImageMagick for running tests. To install all prerequisites, use [Homebrew](http://brew.sh/) and type `brew install pkg-config boost imagemagick`.
 
 To create projects, you can run:
 
