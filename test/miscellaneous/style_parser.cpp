@@ -1,22 +1,16 @@
-#include "gtest/gtest.h"
+#include "../util.hpp"
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/io.hpp>
 
 #include <rapidjson/document.h>
 
-#include "./fixtures/fixture_log.hpp"
+#include "../fixtures/fixture_log.hpp"
 
 #include <iostream>
 #include <fstream>
 
 #include <dirent.h>
-
-const std::string base_directory = []{
-    std::string fn = __FILE__;
-    fn.erase(fn.find_last_of("/"));
-    return fn + "/fixtures/style_parser";
-}();
 
 using namespace mbgl;
 
@@ -26,7 +20,7 @@ typedef std::vector<Message> Messages;
 class StyleParserTest : public ::testing::TestWithParam<std::string> {};
 
 TEST_P(StyleParserTest, ParseStyle) {
-    const std::string &base = base_directory + "/" + GetParam();
+    const std::string &base = "test/fixtures/style_parser/" + GetParam();
 
     const std::string style_path = base + ".style.json";
     const std::string info = util::read_file(base + ".info.json");
@@ -83,19 +77,18 @@ INSTANTIATE_TEST_CASE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
     std::vector<std::string> names;
     const std::string ending = ".info.json";
 
-    DIR *dir = opendir(base_directory.c_str());
-    if (dir == nullptr) {
-        return names;
-    }
-
-    for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
-        const std::string name = dp->d_name;
-        if (name.length() >= ending.length() && name.compare(name.length() - ending.length(), ending.length(), ending) == 0) {
-            names.push_back(name.substr(0, name.length() - ending.length()));
+    const std::string style_directory = "test/fixtures/style_parser";
+    DIR *dir = opendir(style_directory.c_str());
+    if (dir != nullptr) {
+        for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
+            const std::string name = dp->d_name;
+            if (name.length() >= ending.length() && name.compare(name.length() - ending.length(), ending.length(), ending) == 0) {
+                names.push_back(name.substr(0, name.length() - ending.length()));
+            }
         }
+        closedir(dir);
     }
 
-    closedir(dir);
-
+    EXPECT_GT(names.size(), 0ul);
     return names;
 }()));

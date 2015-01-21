@@ -72,12 +72,35 @@
 }
 @end
 
+// Returns the path to the default cache database on this system.
+std::string defaultCacheDatabase() {
+    NSArray *paths =
+        NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+    if ([paths count] == 0) {
+        // Disable the cache if we don't have a location to write.
+        return "";
+    }
+
+    NSString *path = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"Mapbox GL"];
+
+    if (![[NSFileManager defaultManager] createDirectoryAtPath:path
+                                   withIntermediateDirectories:YES
+                                                    attributes:nil
+                                                         error:nil]) {
+        // Disable the cache if we couldn't create the directory.
+        return "";
+    }
+
+    return [[path stringByAppendingPathComponent:@"cache.db"] UTF8String];
+}
+
+
 int main() {
     mbgl::Log::Set<mbgl::NSLogBackend>();
 
     GLFWView view;
 
-    mbgl::SQLiteCache cache(mbgl::platform::defaultCacheDatabase());
+    mbgl::SQLiteCache cache(defaultCacheDatabase());
     mbgl::DefaultFileSource fileSource(&cache);
     mbgl::Map map(view, fileSource);
 

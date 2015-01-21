@@ -92,7 +92,6 @@ void Sprite::load(FileSource& fileSource) {
 
 void Sprite::complete() {
     if (loadedImage && loadedJSON) {
-        Log::Info(Event::Sprite, "loaded %s", spriteURL.c_str());
         promise.set_value();
     }
 }

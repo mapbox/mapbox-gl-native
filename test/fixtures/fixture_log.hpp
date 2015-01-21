@@ -7,6 +7,8 @@
 
 #include <vector>
 #include <cstdarg>
+#include <iostream>
+
 
 namespace mbgl {
 
@@ -37,13 +39,13 @@ public:
         mutable bool checked = false;
     };
 
-    ~FixtureLogBackend();
+    inline ~FixtureLogBackend();
 
-    void record(EventSeverity severity, Event event, const std::string &msg) {
+    inline void record(EventSeverity severity, Event event, const std::string &msg) {
         messages.emplace_back(severity, event, msg);
     }
 
-    void record(EventSeverity severity, Event event, const char* format, ...) {
+    inline void record(EventSeverity severity, Event event, const char* format, ...) {
         va_list args;
         va_start(args, format);
         const size_t len = vsnprintf(NULL, 0, format, args);
@@ -55,24 +57,63 @@ public:
         messages.emplace_back(severity, event, std::string { buffer.get(), len });
     }
 
-    void record(EventSeverity severity, Event event, int64_t code) {
+    inline void record(EventSeverity severity, Event event, int64_t code) {
         messages.emplace_back(severity, event, code);
     }
 
-    void record(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
+    inline void record(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
         messages.emplace_back(severity, event, code, msg);
     }
 
-    size_t count(const LogMessage &message) const;
-    std::vector<LogMessage> unchecked() const;
+    inline size_t count(const LogMessage &message) const;
+    inline std::vector<LogMessage> unchecked() const;
 
 public:
     std::vector<LogMessage> messages;
 };
 
-::std::ostream& operator<<(::std::ostream& os, const std::vector<FixtureLogBackend::LogMessage>& messages);
-::std::ostream& operator<<(::std::ostream& os, const FixtureLogBackend::LogMessage& message);
+inline ::std::ostream& operator<<(::std::ostream& os, const std::vector<FixtureLogBackend::LogMessage>& messages);
+inline ::std::ostream& operator<<(::std::ostream& os, const FixtureLogBackend::LogMessage& message);
 
+FixtureLogBackend::~FixtureLogBackend() {
+    std::cerr << unchecked();
+}
+
+size_t FixtureLogBackend::count(const LogMessage &message) const {
+    size_t message_count = 0;
+    for (const LogMessage &msg : messages) {
+        if (msg == message) {
+            message_count++;
+            msg.checked = true;
+        }
+    }
+    return message_count;
+}
+
+std::vector<FixtureLogBackend::LogMessage> FixtureLogBackend::unchecked() const {
+    std::vector<LogMessage> unchecked_messages;
+    for (const LogMessage &msg : messages) {
+        if (!msg.checked) {
+            unchecked_messages.push_back(msg);
+            msg.checked = true;
+        }
+    }
+    return unchecked_messages;
+}
+
+::std::ostream& operator<<(::std::ostream& os, const std::vector<FixtureLogBackend::LogMessage>& messages) {
+    for (const FixtureLogBackend::LogMessage &message : messages) {
+        os << "- " << message;
+    }
+    return os;
+}
+
+::std::ostream& operator<<(::std::ostream& os, const FixtureLogBackend::LogMessage& message) {
+    os << "[\"" << message.severity.get() << "\", \"" << message.event.get() << "\"";
+    if (message.code) os << ", " << message.code.get();
+    if (message.msg) os << ", \"" << message.msg.get() << "\"";
+    return os << "]" << std::endl;
+}
 
 }
 

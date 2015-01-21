@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     sigaction(SIGINT, &sigIntHandler, NULL);
 
     view = new GLFWView();
-    mbgl::CachingHTTPFileSource fileSource(mbgl::platform::defaultCacheDatabase());
+    mbgl::CachingHTTPFileSource fileSource();
     mbgl::Map map(*view, fileSource);
 
     // Load settings

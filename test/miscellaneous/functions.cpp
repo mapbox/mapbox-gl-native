@@ -1,5 +1,5 @@
 #include <iostream>
-#include "gtest/gtest.h"
+#include "../util.hpp"
 
 #include <mbgl/style/function_properties.hpp>
 

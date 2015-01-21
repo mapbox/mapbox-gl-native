@@ -52,9 +52,14 @@ void log_gl_string(GLenum name, const char *label) {
     }
 }
 
+// Returns the path to the default cache database on this system.
+std::string defaultCacheDatabase() {
+    return mbgl::android::cachePath + "/mbgl-cache.db";
+}
+
 NativeMapView::NativeMapView(JNIEnv *env, jobject obj_)
     : mbgl::View(*this),
-      fileSource(mbgl::platform::defaultCacheDatabase()),
+      fileSource(defaultCacheDatabase()),
       map(*this, fileSource) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
 

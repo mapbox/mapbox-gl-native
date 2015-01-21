@@ -4,265 +4,73 @@
     '../gyp/version.gypi',
     '../gyp/mbgl-platform.gypi',
   ],
-  'variables' : {
-    'ldflags': [
-      '<@(uv_ldflags)',
-      '<@(sqlite3_static_libs)',
-      '<@(uv_static_libs)',
-      '<@(sqlite3_ldflags)',
-      '<@(curl_ldflags)',
-      '<@(png_ldflags)',
-    ],
-  },
   'targets': [
-    { 'target_name': 'rotation_range',
-      'product_name': 'test_rotation_range',
-      'type': 'executable',
-      'sources': [
-        './main.cpp',
-        './rotation_range.cpp',
-      ],
-      'dependencies': [
-        '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-standalone',
-      ],
-      'include_dirs': [ '../src' ],
-      'conditions': [
-        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
-        }, {
-          'libraries': [ '<@(ldflags)' ],
-        }]
-      ]
-    },
-    { 'target_name': 'clip_ids',
-      'product_name': 'test_clip_ids',
-      'type': 'executable',
-      'sources': [
-        './main.cpp',
-        './clip_ids.cpp',
-      ],
-      'dependencies': [
-        '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-standalone',
-      ],
-      'include_dirs': [ '../src' ],
-      'conditions': [
-        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)'] }
-        }, {
-          'libraries': [ '<@(ldflags)' ],
-        }]
-      ]
-    },
-    { 'target_name': 'enums',
-      'product_name': 'test_enums',
-      'type': 'executable',
-      'sources': [
-        './main.cpp',
-        './enums.cpp',
-      ],
-      'dependencies': [
-        '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-standalone',
-      ],
-      'include_dirs': [ '../src' ],
-      'conditions': [
-        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)'] }
-        }, {
-          'libraries': [ '<@(ldflags)' ],
-        }]
-      ]
-    },
-    { 'target_name': 'style_parser',
-      'product_name': 'test_style_parser',
-      'type': 'executable',
-      'sources': [
-        './main.cpp',
-        './style_parser.cpp',
-        './fixtures/fixture_log.hpp',
-        './fixtures/fixture_log.cpp',
-      ],
-      'dependencies': [
-        '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-standalone'
-      ],
-      'include_dirs': [ '../src' ],
-      'conditions': [
-        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
-        }, {
-          'libraries': [ '<@(ldflags)' ],
-        }]
-      ]
-    },
-    { 'target_name': 'variant',
-      'product_name': 'test_variant',
-      'type': 'executable',
-      'sources': [
-        './main.cpp',
-        './variant.cpp',
-      ],
-      'dependencies': [
-        '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-standalone',
-      ],
-      'include_dirs': [ '../src' ],
-      'conditions': [
-        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
-        }, {
-          'libraries': [ '<@(ldflags)' ],
-        }]
-      ]
-    },
-    { 'target_name': 'comparisons',
-      'product_name': 'test_comparisons',
-      'type': 'executable',
-      'sources': [
-        './main.cpp',
-        './comparisons.cpp',
-      ],
-      'dependencies': [
-        '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-standalone',
-      ],
-      'include_dirs': [ '../src' ],
-      'conditions': [
-        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
-        }, {
-          'libraries': [ '<@(ldflags)' ],
-        }]
-      ]
-    },
-    { 'target_name': 'tile',
-      'product_name': 'test_tile',
-      'type': 'executable',
-      'sources': [
-        './main.cpp',
-        './tile.cpp',
-      ],
-      'dependencies': [
-        '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-standalone',
-      ],
-      'include_dirs': [ '../src' ],
-      'conditions': [
-        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
-        }, {
-          'libraries': [ '<@(ldflags)' ],
-        }]
-      ]
-    },
-    { 'target_name': 'functions',
-      'product_name': 'test_functions',
-      'type': 'executable',
-      'sources': [
-        './main.cpp',
-        './functions.cpp',
-      ],
-      'dependencies': [
-        '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-standalone',
-      ],
-      'include_dirs': [ '../src' ],
-      'conditions': [
-        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
-        }, {
-          'libraries': [ '<@(ldflags)' ],
-        }]
-      ]
-    },
-    { 'target_name': 'merge_lines',
-      'product_name': 'test_merge_lines',
-      'type': 'executable',
-      'sources': [
-        './main.cpp',
-        './merge_lines.cpp',
-      ],
-      'dependencies': [
-        '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-standalone',
-      ],
-      'include_dirs': [ '../src' ],
-      'conditions': [
-        ['OS == "mac"', { 'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
-        }, {
-          'libraries': [ '<@(ldflags)' ],
-        }]
-      ]
-    },
-    { 'target_name': 'headless',
-      'product_name': 'test_headless',
-      'type': 'executable',
-      'sources': [
-        './headless.cpp',
-        './fixtures/fixture_log.cpp',
-      ],
-      'conditions': [
-        # add libuv include path and OpenGL libs
-        ['OS == "mac"',
-          {
-            'xcode_settings': {
-              'OTHER_CPLUSPLUSFLAGS': ['<@(uv_cflags)','<@(png_cflags)'],
-              'OTHER_LDFLAGS': ['<@(glfw3_ldflags)', '<@(ldflags)'],
-            },
-          },
-          {
-            'cflags': ['<@(uv_cflags)','<@(png_cflags)'],
-            'libraries': ['<@(glfw3_ldflags)', '<@(ldflags)'],
-          }],
-      ],
-      'dependencies': [
-        '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-core',
-        '../mapboxgl.gyp:mbgl-headless',
-        '<(platform_library)',
-      ],
-      'include_dirs': [ '../src' ]
-    },
-    { 'target_name': 'text_conversions',
-      'product_name': 'test_text_conversions',
-      'type': 'executable',
-      'sources': [
-        './main.cpp',
-        './text_conversions.cpp',
-      ],
-      'dependencies': [
-        '../deps/gtest/gtest.gyp:gtest',
-        '../mapboxgl.gyp:mbgl-standalone',
-        '<(platform_library)',
-      ],
-      'include_dirs': [ '../src' ],
-      'variables': {
-        'cflags_cc': [
-          '-I<(boost_root)/include',
-        ]
+    { 'target_name': 'test_base',
+      'type': 'none',
+      'direct_dependent_settings': {
+        'include_dirs': [ '../include', '../src' ],
       },
-      'conditions': [
-        ['OS == "mac"', {
-          'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
-            'OTHER_LDFLAGS': [ '<@(ldflags)', '-framework Foundation' ]
-          },
-        }, {
-          'cflags_cc': [ '<@(cflags_cc)' ],
-          'libraries': [ '<@(ldflags)'],
-        }]
-      ]
+      'link_settings': {
+        'libraries': [
+          '<@(uv_static_libs)',
+          '<@(glfw3_static_libs)',
+          '<@(sqlite3_static_libs)',
+          '<@(zlib_static_libs)',
+        ],
+        'xcode_settings': {
+          'OTHER_LDFLAGS': [
+            '<@(uv_ldflags)',
+            '<@(glfw3_ldflags)',
+            '<@(sqlite3_ldflags)',
+            '<@(zlib_ldflags)',
+          ],
+          'OTHER_CFLAGS': [ '<@(uv_cflags)' ],
+          'OTHER_CPLUSPLUSFLAGS': [ '<@(uv_cflags)' ],
+        },
+        'cflags': [ '<@(uv_cflags)' ],
+        'cxxflags': [ '<@(uv_cflags)' ],
+      },
     },
+
     # Build all targets
     { 'target_name': 'test',
-      'type': 'none',
+      'type': 'executable',
       'dependencies': [
-        'rotation_range',
-        'clip_ids',
-        'enums',
-        'variant',
-        'tile',
-        'functions',
-        'merge_lines',
-        'headless',
-        'style_parser',
-        'comparisons',
-        'text_conversions',
+        'test_base',
+        '../mapboxgl.gyp:mbgl-core',
+        '../mapboxgl.gyp:mbgl-<(platform)',
+        '../mapboxgl.gyp:mbgl-headless',
+        '../deps/gtest/gtest.gyp:gtest'
       ],
-    }
+      'sources': [
+        'main.cpp',
+
+        'headless/headless.cpp',
+
+        'miscellaneous/clip_ids.cpp',
+        'miscellaneous/comparisons.cpp',
+        'miscellaneous/enums.cpp',
+        'miscellaneous/functions.cpp',
+        'miscellaneous/merge_lines.cpp',
+        'miscellaneous/rotation_range.cpp',
+        'miscellaneous/style_parser.cpp',
+        'miscellaneous/text_conversions.cpp',
+        'miscellaneous/tile.cpp',
+        'miscellaneous/variant.cpp',
+
+        'storage/cache_response.cpp',
+        'storage/cache_revalidate.cpp',
+        'storage/directory_reading.cpp',
+        'storage/file_reading.cpp',
+        'storage/http_cancel.cpp',
+        'storage/http_coalescing.cpp',
+        'storage/http_error.cpp',
+        'storage/http_header_parsing.cpp',
+        'storage/http_load.cpp',
+        'storage/http_noloop.cpp',
+        'storage/http_other_loop.cpp',
+        'storage/http_reading.cpp',
+      ],
+    },
   ]
 }

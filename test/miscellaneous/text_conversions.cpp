@@ -1,5 +1,5 @@
 #include <iostream>
-#include "gtest/gtest.h"
+#include "../util.hpp"
 
 #include <mbgl/util/utf.hpp>
 #include <mbgl/platform/platform.hpp>

@@ -1,4 +1,5 @@
-#include "gtest/gtest.h"
+#include "../util.hpp"
+#include "../fixtures/server_environment.hpp"
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/image.hpp>
@@ -13,81 +14,9 @@
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/storage/default/default_file_source.hpp>
 
-#include "./fixtures/fixture_log.hpp"
+#include "../fixtures/fixture_log.hpp"
 
-#include <dirent.h>
-#include <signal.h>
-#include <libgen.h>
-#ifdef __linux__
-#include <sys/prctl.h>
-#endif
-
-std::string base_directory;
-
-namespace mbgl {
-namespace platform {
-
-std::string defaultCacheDatabase() {
-    // Disables the cache.
-    return "";
-}
-}
-}
-
-class ServerEnvironment : public ::testing::Environment {
-public:
-    virtual void SetUp() {
-        pid = fork();
-        if (pid < 0) {
-            throw std::runtime_error("Cannot create web server");
-        } else if (pid == 0) {
-#ifdef __linux__
-            prctl(PR_SET_PDEATHSIG, SIGHUP);
-#endif
-            const auto executable = base_directory + "bin/server.py";
-            const char *port = "2900";
-            char *arg[] = { const_cast<char *>(executable.c_str()), const_cast<char *>(port), nullptr };
-            int ret = execv(executable.c_str(), arg);
-            // This call should not return. In case execve failed, we exit anyway.
-            if (ret < 0) {
-                fprintf(stderr, "Failed to start server: %s\n", strerror(errno));
-            }
-            exit(0);
-        } else {
-            display = std::make_shared<mbgl::HeadlessDisplay>();
-        }
-    }
-    virtual void TearDown() {
-        ASSERT_TRUE(pid);
-        kill(pid, SIGHUP);
-    }
-
-    std::shared_ptr<mbgl::HeadlessDisplay> display;
-
-private:
-    pid_t pid = 0;
-};
-
-
-ServerEnvironment* env = nullptr;
-
-
-GTEST_API_ int main(int argc, char *argv[]) {
-    // Note: glibc's dirname() **modifies** the argument and can't handle static strings.
-    std::string file { __FILE__ }; file = dirname(const_cast<char *>(file.c_str()));
-    if (file[0] == '/') {
-        // If __FILE__ is an absolute path, we don't have to guess from the argv 0.
-        base_directory = file + "/suite/";
-    } else {
-        std::string argv0 { argv[0] }; argv0 = dirname(const_cast<char *>(argv0.c_str()));
-        base_directory = argv0 + "/" + file + "/suite/";
-    }
-
-    testing::InitGoogleTest(&argc, argv);
-    env = new ServerEnvironment();
-    ::testing::AddGlobalTestEnvironment(env);
-    return RUN_ALL_TESTS();
-}
+std::shared_ptr<mbgl::HeadlessDisplay> display;
 
 void rewriteLocalScheme(rapidjson::Value &value, rapidjson::Document::AllocatorType &allocator) {
     ASSERT_TRUE(value.IsString());
@@ -105,8 +34,8 @@ TEST_P(HeadlessTest, render) {
 
     const std::string& base = GetParam();
 
-    std::string style = util::read_file(base_directory + "tests/" + base + "/style.json");
-    std::string info = util::read_file(base_directory + "tests/" + base + "/info.json");
+    std::string style = util::read_file("test/suite/tests/" + base + "/style.json");
+    std::string info = util::read_file("test/suite/tests/" + base + "/info.json");
 
     // Parse style.
     rapidjson::Document styleDoc;
@@ -169,7 +98,7 @@ TEST_P(HeadlessTest, render) {
 
         if (value.HasMember("center")) ASSERT_TRUE(value["center"].IsArray());
 
-        const std::string actual_image = base_directory + "tests/" + base + "/" + name +  "/actual.png";
+        const std::string actual_image = "test/suite/tests/" + base + "/" + name +  "/actual.png";
 
         const double zoom = value.HasMember("zoom") ? value["zoom"].GetDouble() : 0;
         const double bearing = value.HasMember("bearing") ? value["bearing"].GetDouble() : 0;
@@ -190,18 +119,21 @@ TEST_P(HeadlessTest, render) {
             }
         }
 
-        HeadlessView view(env->display);
+        if (!display) {
+            display = std::make_shared<mbgl::HeadlessDisplay>();
+        }
+
+        HeadlessView view(display);
         mbgl::DefaultFileSource fileSource(nullptr);
         Map map(view, fileSource);
 
         map.setClasses(classes);
-        map.setStyleJSON(style, base_directory);
+        map.setStyleJSON(style, "test/suite");
 
         view.resize(width, height, pixelRatio);
         map.resize(width, height, pixelRatio);
         map.setLonLatZoom(longitude, latitude, zoom);
         map.setBearing(bearing);
-
 
         // Run the loop. It will terminate when we don't have any further listeners.
         map.run();
@@ -219,19 +151,17 @@ TEST_P(HeadlessTest, render) {
 INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest, ::testing::ValuesIn([] {
     std::vector<std::string> names;
 
-    DIR *dir = opendir((base_directory + "tests").c_str());
-    if (dir == nullptr) {
-        return names;
-    }
-
-    for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
-        const std::string name = dp->d_name;
-        if (name != "index.html" && !(name.size() >= 1 && name[0] == '.')) {
-            names.push_back(name);
+    DIR *dir = opendir("test/suite/tests");
+    if (dir != nullptr) {
+        for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
+            const std::string name = dp->d_name;
+            if (name != "index.html" && !(name.size() >= 1 && name[0] == '.')) {
+                names.push_back(name);
+            }
         }
+        closedir(dir);
     }
 
-    closedir(dir);
-
+    EXPECT_GT(names.size(), 0ul);
     return names;
 }()));

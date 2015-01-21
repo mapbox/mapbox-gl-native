@@ -3,13 +3,13 @@
 set -e
 set -o pipefail
 
-cd build/${BUILDTYPE:-Release}
-
-for TEST in ./test_* ; do
+for TEST in build/${BUILDTYPE:-Release}/test* ; do
     # allow writing core files
     ulimit -c unlimited -S
     echo 'ulimit -c: '`ulimit -c`
-    echo '/proc/sys/kernel/core_pattern: '`cat /proc/sys/kernel/core_pattern`
+    if [ -f /proc/sys/kernel/core_pattern ]; then
+        echo '/proc/sys/kernel/core_pattern: '`cat /proc/sys/kernel/core_pattern`
+    fi
 
     if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
         sysctl kernel.core_pattern

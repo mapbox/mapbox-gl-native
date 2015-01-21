@@ -33,7 +33,6 @@
         ],
       },
       'sources': [
-        '../platform/android/cache_database_data.cpp',
         '../platform/android/log_android.cpp',
         '../platform/android/asset_request_libzip.cpp',
         '../platform/default/string_stdlib.cpp',
