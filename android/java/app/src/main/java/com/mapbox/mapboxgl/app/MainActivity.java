@@ -1,14 +1,6 @@
 package com.mapbox.mapboxgl.app;
 
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,9 +14,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbox.mapboxgl.lib.LonLatZoom;
 import com.mapbox.mapboxgl.lib.MapView;
+import com.mapzen.android.lost.LocationClient;
+import com.mapzen.android.lost.LocationListener;
+import com.mapzen.android.lost.LocationRequest;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -34,9 +30,6 @@ public class MainActivity extends ActionBarActivity {
 
     // Tag used for logging
     private static final String TAG = "MainActivity";
-
-    // Used for GPS
-    private static final String SINGLE_LOCATION_UPDATE_ACTION = "com.mapbox.mapboxgl.app.SINGLE_LOCATION_UPDATE_ACTION";
 
     //
     // Instance members
@@ -52,9 +45,10 @@ public class MainActivity extends ActionBarActivity {
     private ImageView mCompassView;
 
     // Used for GPS
-    private LocationManager mLocationManager;
-    private PendingIntent mLocationPendingIntent;
-    private LocationReceiver mLocationReceiver;
+    private boolean mIsGpsOn = false;
+    private LocationClient mLocationClient;
+    private LocationListener mLocationListener;
+    private LocationRequest mLocationRequest;
 
     //
     // Lifecycle events
@@ -65,10 +59,6 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(TAG, "onCreate");
-
-        Intent locationIntent = new Intent(SINGLE_LOCATION_UPDATE_ACTION);
-        mLocationManager = (LocationManager)getSystemService(getApplicationContext().LOCATION_SERVICE);
-        mLocationPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Load the layout
         setContentView(R.layout.activity_main);
@@ -93,6 +83,33 @@ public class MainActivity extends ActionBarActivity {
                 R.array.style_list, android.R.layout.simple_spinner_dropdown_item);
         styleSpinner.setAdapter(styleAdapter);
         styleSpinner.setOnItemSelectedListener(new StyleSpinnerListener());
+
+        // Prepare for GPS
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setInterval(0);
+        mLocationRequest.setSmallestDisplacement(0);
+
+        mLocationClient = new LocationClient(getApplicationContext(), new LocationClient.ConnectionCallbacks() {
+            @Override
+            public void onConnected(Bundle connectionHint) {
+                updateLocation(mLocationClient.getLastLocation());
+
+                mLocationListener = new LocationListener() {
+                    @Override
+                    public void onLocationChanged(Location location) {
+                        //Toast.makeText(getApplicationContext(), "Location: " + location.toString(), Toast.LENGTH_SHORT).show();
+                        updateLocation(location);
+                    }
+                };
+
+                mLocationClient.requestLocationUpdates(mLocationRequest, mLocationListener);
+            }
+
+            @Override
+            public void onDisconnected() {
+                mLocationListener = null;
+            }
+        });
     }
 
     // Called when our app goes into the background
@@ -101,13 +118,23 @@ public class MainActivity extends ActionBarActivity {
         super.onPause();
         Log.v(TAG, "onPause");
 
-        // Cancel any outstanding GPS
-        if (mLocationReceiver != null) {
-            getApplicationContext().unregisterReceiver(mLocationReceiver);
-            mLocationReceiver = null;
+        // Cancel GPS
+        if (mIsGpsOn) {
+            mLocationClient.disconnect();
         }
+    }
 
-        mLocationManager.removeUpdates(mLocationPendingIntent);
+    // Called when our app comes into the foreground
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.v(TAG, "onResume");
+
+        // Restart GPS
+        // Cancel any outstanding GPS
+        if (mIsGpsOn) {
+            mLocationClient.connect();
+        }
     }
 
     //
@@ -127,19 +154,17 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_gps:
-                // Get a GPS position
-                Criteria criteria = new Criteria();
-                criteria.setAccuracy(Criteria.ACCURACY_LOW);
-                String provider = mLocationManager.getBestProvider(criteria, true);
-                Location location = mLocationManager.getLastKnownLocation(provider);
-                if (location != null) {
-                    LonLatZoom coordinate = new LonLatZoom(location.getLongitude(), location.getLatitude(), 15);
-                    mMapFragment.getMap().setCenterCoordinate(coordinate, true);
+                // Toggle GPS position updates
+                if (mIsGpsOn) {
+                    mIsGpsOn = false;
+                    item.setIcon(R.drawable.ic_action_location_searching);
+                    mLocationClient.disconnect();
+
+                } else {
+                    mIsGpsOn = true;
+                    item.setIcon(R.drawable.ic_action_location_found);
+                    mLocationClient.connect();
                 }
-                IntentFilter locationIntentFilter = new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION);
-                mLocationReceiver = new LocationReceiver();
-                getApplicationContext().registerReceiver(mLocationReceiver, locationIntentFilter);
-                mLocationManager.requestSingleUpdate(provider, mLocationPendingIntent);
                 return true;
 
             case R.id.action_debug:
@@ -160,21 +185,11 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    // This class handles location events
-    private class LocationReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            context.unregisterReceiver(this);
-
-            Location location = (Location)intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
-            if (location != null) {
-                LonLatZoom coordinate = new LonLatZoom(location.getLongitude(), location.getLatitude(), 15);
-                mMapFragment.getMap().setCenterCoordinate(coordinate, true);
-            }
-
-            mLocationManager.removeUpdates(mLocationPendingIntent);
-            mLocationReceiver = null;
+    // Handles location updates from GPS
+    private void updateLocation(Location location) {
+        if (location != null) {
+            LonLatZoom coordinate = new LonLatZoom(location.getLongitude(), location.getLatitude(), 16);
+            mMapFragment.getMap().setCenterCoordinate(coordinate, true);
         }
     }
 
