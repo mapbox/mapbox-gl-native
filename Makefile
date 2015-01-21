@@ -148,15 +148,9 @@ lproj: build/linux/mapboxgl-app.xcodeproj
 .PHONY: clear_sqlite_cache
 clear_sqlite_cache:
 ifeq ($(PLATFORM), osx)
-	if [ -e ~/Library/Application\ Support/Mapbox\ GL/cache.db ]; then \
-		echo 'removing ~/Library/Application\ Support/Mapbox\ GL/cache.db'; \
-		rm ~/Library/Application\ Support/Mapbox\ GL/cache.db; \
-	fi
+	rm -f ~/Library/Application\ Support/Mapbox\ GL/cache.db
 else
-	if [ -e /tmp/mbgl-cache.db ]; then \
-		echo 'removing /tmp/mbgl-cache.db'; \
-		rm /tmp/mbgl-cache.db; \
-	fi
+	rm -f /tmp/mbgl-cache.db
 endif
 
 clean: clear_sqlite_cache clear_xcode_cache
