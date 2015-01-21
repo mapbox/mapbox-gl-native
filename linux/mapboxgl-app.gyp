@@ -34,7 +34,7 @@
           '<@(glfw3_static_libs)',
           '<@(glfw3_ldflags)',
           '<@(curl_static_libs)',
-          '<@(curl_ldflags)',
+          '<@(boringssl_static_libs)',
           '<@(zlib_ldflags)',
         ],
       },
