@@ -14,6 +14,7 @@
           '<@(jpeg_cflags)',
           '<@(uv_cflags)',
           '<@(curl_cflags)',
+          '<@(boringssl_cflags)',
           '<@(nu_cflags)',
           '-I<(boost_root)/include',
         ],

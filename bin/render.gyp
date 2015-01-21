@@ -22,7 +22,7 @@
           '<@(sqlite3_static_libs)',
           '<@(sqlite3_ldflags)',
           '<@(curl_static_libs)',
-          '<@(curl_ldflags)',
+          '<@(boringssl_static_libs)',
           '<@(png_ldflags)',
           '<@(uv_static_libs)',
           '-L<(boost_root)/lib',
