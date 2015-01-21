@@ -127,10 +127,6 @@ ifeq ($(PLATFORM), osx)
 		echo 'clearing files in ~/Library/Developer/Xcode/DerivedData/mapboxgl-app-* older than one day'; \
 		find ~/Library/Developer/Xcode/DerivedData/mapboxgl-app-* -mtime +1 | xargs rm -rf; \
 	fi; \
-	if [[ -e ~/Library/Application\ Support/Mapbox\ GL/cache.db ]]; then \
-		echo 'removing ~/Library/Application\ Support/Mapbox\ GL/cache.db'; \
-		rm ~/Library/Application\ Support/Mapbox\ GL/cache.db; \
-	fi
 endif
 
 xproj: build/macosx/mapboxgl-app.xcodeproj
@@ -149,7 +145,21 @@ lproj: build/linux/mapboxgl-app.xcodeproj
 
 ##### Maintenace operations ####################################################
 
-clean: clear_xcode_cache
+.PHONY: clear_sqlite_cache
+clear_sqlite_cache:
+ifeq ($(PLATFORM), osx)
+	if [ -e ~/Library/Application\ Support/Mapbox\ GL/cache.db ]; then \
+		echo 'removing ~/Library/Application\ Support/Mapbox\ GL/cache.db'; \
+		rm ~/Library/Application\ Support/Mapbox\ GL/cache.db; \
+	fi
+else
+	if [ -e /tmp/mbgl-cache.db ]; then \
+		echo 'removing /tmp/mbgl-cache.db'; \
+		rm /tmp/mbgl-cache.db; \
+	fi
+endif
+
+clean: clear_sqlite_cache clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
 	-rm -rf ./macosx/build/
