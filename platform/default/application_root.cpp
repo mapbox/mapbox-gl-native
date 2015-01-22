@@ -5,11 +5,10 @@
 namespace mbgl {
 namespace platform {
 
-// Returns the path the application root.
-std::string applicationRoot() {
+// Returns the path to the root folder of the application.
+const std::string &applicationRoot() {
     static const std::string root = uv::cwd();
     return root;
 }
-
 }
 }

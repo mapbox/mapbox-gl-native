@@ -9,7 +9,6 @@
         'version',
       ],
       'sources': [
-        '../platform/osx/shader_cache_application_support.mm',
         '../platform/darwin/log_nslog.mm',
         '../platform/darwin/string_nsstring.mm',
         '../platform/darwin/http_request_cocoa.mm',

@@ -3,6 +3,7 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/uv.hpp>
+#include <mbgl/platform/platform.hpp>
 
 #include <uv.h>
 #include <boost/algorithm/string.hpp>
@@ -47,7 +48,18 @@ AssetRequestImpl::~AssetRequestImpl() {
 
 AssetRequestImpl::AssetRequestImpl(AssetRequest *request_, uv_loop_t *loop) : request(request_) {
     req.data = this;
-    uv_fs_open(loop, &req, (request->resource.url.substr(8)).c_str(), O_RDONLY, S_IRUSR, fileOpened);
+
+    const auto &url = request->resource.url;
+    std::string path;
+    if (url.size() <= 8 || url[8] == '/') {
+        // This is an empty or absolute path.
+        path = url.substr(8);
+    } else {
+        // This is a relative path. Prefix with the application root.
+        path = platform::applicationRoot() + "/" + url.substr(8);
+    }
+
+    uv_fs_open(loop, &req, path.c_str(), O_RDONLY, S_IRUSR, fileOpened);
 }
 
 void AssetRequestImpl::fileOpened(uv_fs_t *req) {

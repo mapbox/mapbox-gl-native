@@ -5,6 +5,7 @@
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/async_queue.hpp>
 #include <mbgl/util/variant.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include "../util/sqlite3.hpp"
 #include "../util/compression.hpp"
@@ -139,17 +140,32 @@ void SQLiteCache::put(const Resource &resource, std::shared_ptr<const Response> 
 void SQLiteCache::createDatabase() {
     db = util::make_unique<Database>(path.c_str(), ReadWrite | Create);
 
-    db->exec("CREATE TABLE IF NOT EXISTS `http_cache` ("
-         "    `url` TEXT PRIMARY KEY NOT NULL,"
-         "    `status` INTEGER NOT NULL," // The response status (Successful or Error).
-         "    `kind` INTEGER NOT NULL," // The kind of file.
-         "    `modified` INTEGER," // Timestamp when the file was last modified.
-         "    `etag` TEXT,"
-         "    `expires` INTEGER," // Timestamp when the server says the file expires.
-         "    `data` BLOB,"
-         "    `compressed` INTEGER NOT NULL DEFAULT 0" // Whether the data is compressed.
-         ");"
-         "CREATE INDEX IF NOT EXISTS `http_cache_kind_idx` ON `http_cache` (`kind`);");
+    constexpr const char *const sql = ""
+        "CREATE TABLE IF NOT EXISTS `http_cache` ("
+        "    `url` TEXT PRIMARY KEY NOT NULL,"
+        "    `status` INTEGER NOT NULL," // The response status (Successful or Error).
+        "    `kind` INTEGER NOT NULL," // The kind of file.
+        "    `modified` INTEGER," // Timestamp when the file was last modified.
+        "    `etag` TEXT,"
+        "    `expires` INTEGER," // Timestamp when the server says the file expires.
+        "    `data` BLOB,"
+        "    `compressed` INTEGER NOT NULL DEFAULT 0" // Whether the data is compressed.
+        ");"
+        "CREATE INDEX IF NOT EXISTS `http_cache_kind_idx` ON `http_cache` (`kind`);";
+
+    try {
+        db->exec(sql);
+    } catch(mapbox::sqlite::Exception &) {
+        // Creating the database table + index failed. That means there may already be one, likely
+        // with different columsn. Drop it and try to create a new one.
+        try {
+            db->exec("DROP TABLE IF EXISTS `http_cache`");
+            db->exec(sql);
+        } catch (mapbox::sqlite::Exception &ex) {
+            Log::Error(Event::Database, "Failed to create database: %s", ex.what());
+            db.release();
+        }
+    }
 }
 
 void SQLiteCache::process(GetAction &action) {

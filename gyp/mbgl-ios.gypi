@@ -10,7 +10,7 @@
           'IPHONEOS_DEPLOYMENT_TARGET':'7.0',
           'TARGETED_DEVICE_FAMILY': '1,2',
           'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
-          'CLANG_ENABLE_OBJC_ARC': 'YES',
+          'CLANG_ENABLE_OBJC_ARC': 'NO',
           'CODE_SIGN_IDENTITY': 'iPhone Developer',
           'SKIP_INSTALL': 'YES'
         },
@@ -34,10 +34,9 @@
         'version',
       ],
       'sources': [
-        '../platform/ios/cache_database_library.mm',
         '../platform/darwin/log_nslog.mm',
         '../platform/darwin/string_nsstring.mm',
-        '../platform/darwin/http_request_baton_cocoa.mm',
+        '../platform/darwin/http_request_cocoa.mm',
         '../platform/darwin/application_root.mm',
         '../platform/darwin/image.mm',
         '../platform/default/asset_request_libuv.cpp',

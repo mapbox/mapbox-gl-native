@@ -73,27 +73,29 @@
 @end
 
 // Returns the path to the default cache database on this system.
-std::string defaultCacheDatabase() {
-    NSArray *paths =
-        NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-    if ([paths count] == 0) {
-        // Disable the cache if we don't have a location to write.
-        return "";
-    }
+const std::string &defaultCacheDatabase() {
+    static const std::string path = []() -> std::string {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(
+            NSApplicationSupportDirectory, NSUserDomainMask, YES);
+        if ([paths count] == 0) {
+            // Disable the cache if we don't have a location to write.
+            return "";
+        }
 
-    NSString *path = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"Mapbox GL"];
+        NSString *p = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"Mapbox GL"];
 
-    if (![[NSFileManager defaultManager] createDirectoryAtPath:path
-                                   withIntermediateDirectories:YES
-                                                    attributes:nil
-                                                         error:nil]) {
-        // Disable the cache if we couldn't create the directory.
-        return "";
-    }
+        if (![[NSFileManager defaultManager] createDirectoryAtPath:p
+                                       withIntermediateDirectories:YES
+                                                        attributes:nil
+                                                             error:nil]) {
+            // Disable the cache if we couldn't create the directory.
+            return "";
+        }
 
-    return [[path stringByAppendingPathComponent:@"cache.db"] UTF8String];
+        return [[p stringByAppendingPathComponent:@"cache.db"] UTF8String];
+    }();
+    return path;
 }
-
 
 int main() {
     mbgl::Log::Set<mbgl::NSLogBackend>();
