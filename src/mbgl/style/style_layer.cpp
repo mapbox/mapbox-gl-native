@@ -183,16 +183,8 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const times
     applyStyleProperty(PropertyKey::LineDashArray, line.dash_array, z, now);
     applyStyleProperty(PropertyKey::LineImage, line.image, z, now);
 
-    // scale dash width by line-gap-width if present
-    applyStyleProperty(PropertyKey::LineGapWidth, line.dash_line_width, std::floor(z), now + 10000);
-    if (line.dash_line_width <= 0) {
-        // otherwise scale by line-width
-        applyStyleProperty(PropertyKey::LineWidth, line.dash_line_width, std::floor(z), now + 10000);
-        if (line.dash_line_width <= 0) {
-            // otherwise scale by default line-width value
-            line.dash_line_width = line.width;
-        }
-    }
+    // for scaling dasharrays
+    applyStyleProperty(PropertyKey::LineWidth, line.dash_line_width, std::floor(z), now + 10000);
 }
 
 template <>
