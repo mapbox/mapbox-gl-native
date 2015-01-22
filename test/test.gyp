@@ -1,49 +1,21 @@
 {
   'includes': [
     '../gyp/common.gypi',
-    '../gyp/version.gypi',
-    '../gyp/mbgl-platform.gypi',
   ],
   'targets': [
-    { 'target_name': 'test_base',
-      'type': 'none',
-      'direct_dependent_settings': {
-        'include_dirs': [ '../include', '../src' ],
-      },
-      'link_settings': {
-        'libraries': [
-          '<@(uv_static_libs)',
-          '<@(glfw3_static_libs)',
-          '<@(sqlite3_static_libs)',
-          '<@(zlib_static_libs)',
-        ],
-        'xcode_settings': {
-          'OTHER_LDFLAGS': [
-            '<@(uv_ldflags)',
-            '<@(glfw3_ldflags)',
-            '<@(sqlite3_ldflags)',
-            '<@(zlib_ldflags)',
-          ],
-          'OTHER_CFLAGS': [ '<@(uv_cflags)' ],
-          'OTHER_CPLUSPLUSFLAGS': [ '<@(uv_cflags)' ],
-        },
-        'cflags': [ '<@(uv_cflags)' ],
-        'cxxflags': [ '<@(uv_cflags)' ],
-      },
-    },
-
-    # Build all targets
     { 'target_name': 'test',
       'type': 'executable',
+      'include_dirs': [ '../include', '../src' ],
       'dependencies': [
-        'test_base',
         '../mapboxgl.gyp:mbgl-core',
         '../mapboxgl.gyp:mbgl-<(platform)',
         '../mapboxgl.gyp:mbgl-headless',
         '../deps/gtest/gtest.gyp:gtest'
       ],
       'sources': [
-        'main.cpp',
+        'fixtures/main.cpp',
+        'fixtures/util.cpp',
+        'fixtures/fixture_log.cpp',
 
         'headless/headless.cpp',
 
@@ -58,6 +30,7 @@
         'miscellaneous/tile.cpp',
         'miscellaneous/variant.cpp',
 
+        'storage/storage.cpp',
         'storage/cache_response.cpp',
         'storage/cache_revalidate.cpp',
         'storage/directory_reading.cpp',
@@ -71,6 +44,32 @@
         'storage/http_other_loop.cpp',
         'storage/http_reading.cpp',
       ],
+      'libraries': [
+        '<@(uv_static_libs)',
+        '<@(glfw3_static_libs)',
+        '<@(sqlite3_static_libs)',
+        '<@(zlib_static_libs)',
+      ],
+      'variables': {
+        'cxxflags': [
+          '<@(uv_cflags)',
+          '-I<(boost_root)/include',
+        ],
+        'ldflags': [
+          '<@(uv_ldflags)',
+          '<@(glfw3_ldflags)',
+          '<@(sqlite3_ldflags)',
+          '<@(zlib_ldflags)',
+        ],
+      },
+      'xcode_settings': {
+        'OTHER_CFLAGS': [ '<@(cxxflags)' ],
+        'OTHER_CPLUSPLUSFLAGS': [ '<@(cxxflags)' ],
+        'OTHER_LDFLAGS': [ '<@(ldflags)' ],
+      },
+      'cflags': [ '<@(cxxflags)' ],
+      'cxxflags': [ '<@(cxxflags)' ],
+      'ldflags': [ '<@(ldflags)' ],
     },
   ]
 }

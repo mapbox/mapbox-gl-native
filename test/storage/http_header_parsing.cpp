@@ -1,4 +1,4 @@
-#include "../util.hpp"
+#include "storage.hpp"
 
 #include <uv.h>
 
@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-TEST(Storage, HTTPHeaderParsing) {
+TEST_F(Storage, HTTPHeaderParsing) {
     SCOPED_TEST(HTTPExpiresTest)
     SCOPED_TEST(HTTPCacheControlTest)
 

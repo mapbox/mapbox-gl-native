@@ -1,10 +1,10 @@
-#include "../util.hpp"
+#include "storage.hpp"
 
 #include <uv.h>
 
 #include <mbgl/storage/default/default_file_source.hpp>
 
-TEST(Storage, HTTPCoalescing) {
+TEST_F(Storage, HTTPCoalescing) {
     SCOPED_TEST(HTTPCoalescing)
 
     static int counter = 0;

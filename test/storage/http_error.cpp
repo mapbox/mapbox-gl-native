@@ -1,4 +1,4 @@
-#include "../util.hpp"
+#include "storage.hpp"
 
 #include <uv.h>
 
@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-TEST(Storage, HTTPError) {
+TEST_F(Storage, HTTPError) {
     SCOPED_TEST(HTTPTemporaryError)
     SCOPED_TEST(HTTPConnectionError)
 

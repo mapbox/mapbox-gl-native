@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../util.hpp"
+#include "../fixtures/util.hpp"
 
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/style/filter_expression.hpp>

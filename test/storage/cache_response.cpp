@@ -1,11 +1,11 @@
-#include "../util.hpp"
+#include "storage.hpp"
 
 #include <uv.h>
 
 #include <mbgl/storage/default/default_file_source.hpp>
 #include <mbgl/storage/default/sqlite_cache.hpp>
 
-TEST(Storage, CacheResponse) {
+TEST_F(Storage, CacheResponse) {
     SCOPED_TEST(CacheResponse);
 
     using namespace mbgl;

@@ -92,7 +92,7 @@ app.get('/load/:number(\\d+)', function(req, res) {
 var server = app.listen(3000, function () {
     var host = server.address().address;
     var port = server.address().port;
-    console.log('Test server listening at http://%s:%s', host, port);
+    console.warn('Storage test server listening at http://%s:%s', host, port);
 
     if (process.argv[2]) {
         // Allow the test to continue running.

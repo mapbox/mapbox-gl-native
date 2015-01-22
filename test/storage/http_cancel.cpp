@@ -1,4 +1,4 @@
-#include "../util.hpp"
+#include "storage.hpp"
 
 #include <uv.h>
 
@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-TEST(Storage, HTTPCancel) {
+TEST_F(Storage, HTTPCancel) {
     SCOPED_TEST(HTTPCancel)
 
     using namespace mbgl;
@@ -24,7 +24,7 @@ TEST(Storage, HTTPCancel) {
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
 
-TEST(Storage, HTTPCancelMultiple) {
+TEST_F(Storage, HTTPCancelMultiple) {
     SCOPED_TEST(HTTPCancelMultiple)
 
     using namespace mbgl;

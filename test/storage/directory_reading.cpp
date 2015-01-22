@@ -1,17 +1,18 @@
-#include "../util.hpp"
+#include "storage.hpp"
 
 #include <uv.h>
 
 #include <mbgl/storage/default/default_file_source.hpp>
 
-TEST(Storage, ReadDirectory) {
+TEST_F(Storage, ReadDirectory) {
     SCOPED_TEST(ReadDirectory)
 
     using namespace mbgl;
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
-    fs.request({ Resource::Unknown, "asset://test/fixtures/storage" }, uv_default_loop(), [&](const Response &res) {
+    const auto dir = std::string { "asset://" } + mbgl::test::getBaseDirectory() + "/fixtures/storage";
+    fs.request({ Resource::Unknown, dir }, uv_default_loop(), [&](const Response &res) {
         EXPECT_EQ(res.status, Response::Error);
         EXPECT_EQ(res.data.size(), 0ul);
         EXPECT_EQ(res.expires, 0);

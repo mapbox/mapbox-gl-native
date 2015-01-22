@@ -1,10 +1,10 @@
-#include "../util.hpp"
+#include "storage.hpp"
 
 #include <uv.h>
 
 #include <mbgl/storage/default/default_file_source.hpp>
 
-TEST(Storage, HTTPOtherLoop) {
+TEST_F(Storage, HTTPOtherLoop) {
     SCOPED_TEST(HTTPOtherLoop)
 
     using namespace mbgl;

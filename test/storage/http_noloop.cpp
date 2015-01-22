@@ -1,11 +1,11 @@
-#include "../util.hpp"
+#include "storage.hpp"
 
 #include <uv.h>
 
 #include <mbgl/storage/default/default_file_source.hpp>
 #include <mbgl/util/uv.hpp>
 
-TEST(Storage, HTTPNoLoop) {
+TEST_F(Storage, HTTPNoLoop) {
     SCOPED_TEST(HTTPNoLoop)
 
     using namespace mbgl;

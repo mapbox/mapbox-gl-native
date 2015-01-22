@@ -1,4 +1,4 @@
-#include "../util.hpp"
+#include "../fixtures/util.hpp"
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/io.hpp>

@@ -1,11 +1,11 @@
-#include "../util.hpp"
+#include "storage.hpp"
 
 #include <uv.h>
 
 #include <mbgl/storage/default/default_file_source.hpp>
 #include <mbgl/storage/default/sqlite_cache.hpp>
 
-TEST(Storage, CacheRevalidate) {
+TEST_F(Storage, CacheRevalidate) {
     SCOPED_TEST(CacheRevalidateSame)
     SCOPED_TEST(CacheRevalidateModified)
     SCOPED_TEST(CacheRevalidateEtag)

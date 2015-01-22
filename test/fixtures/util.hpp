@@ -11,4 +11,14 @@
         ~name() { if (!completed) ADD_FAILURE() << #name " didn't complete."; } \
     } name;
 
+namespace mbgl {
+namespace test {
+
+const std::string &getBaseDirectory();
+pid_t startServer(const char *executable);
+void stopServer(pid_t pid);
+
+}
+}
+
 #endif

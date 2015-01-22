@@ -1,5 +1,5 @@
-#include "../util.hpp"
-#include "../fixtures/server_environment.hpp"
+#include "../fixtures/util.hpp"
+#include "../fixtures/fixture_log.hpp"
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/image.hpp>
@@ -14,9 +14,7 @@
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/storage/default/default_file_source.hpp>
 
-#include "../fixtures/fixture_log.hpp"
-
-std::shared_ptr<mbgl::HeadlessDisplay> display;
+#include <dirent.h>
 
 void rewriteLocalScheme(rapidjson::Value &value, rapidjson::Document::AllocatorType &allocator) {
     ASSERT_TRUE(value.IsString());
@@ -27,7 +25,27 @@ void rewriteLocalScheme(rapidjson::Value &value, rapidjson::Document::AllocatorT
     }
 }
 
-class HeadlessTest : public ::testing::TestWithParam<std::string> {};
+
+class HeadlessTest : public ::testing::TestWithParam<std::string> {
+public:
+    static void SetUpTestCase() {
+        const auto server = mbgl::test::getBaseDirectory() + "/headless/server.js";
+        pid = mbgl::test::startServer(server.c_str());
+        display = std::make_shared<mbgl::HeadlessDisplay>();
+    }
+
+    static void TearDownTestCase() {
+        display.reset();
+        mbgl::test::stopServer(pid);
+    }
+
+protected:
+    static pid_t pid;
+    static std::shared_ptr<mbgl::HeadlessDisplay> display;
+};
+
+pid_t HeadlessTest::pid = 0;
+std::shared_ptr<mbgl::HeadlessDisplay> HeadlessTest::display;
 
 TEST_P(HeadlessTest, render) {
     using namespace mbgl;
@@ -119,10 +137,6 @@ TEST_P(HeadlessTest, render) {
             }
         }
 
-        if (!display) {
-            display = std::make_shared<mbgl::HeadlessDisplay>();
-        }
-
         HeadlessView view(display);
         mbgl::DefaultFileSource fileSource(nullptr);
         Map map(view, fileSource);
@@ -151,7 +165,8 @@ TEST_P(HeadlessTest, render) {
 INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest, ::testing::ValuesIn([] {
     std::vector<std::string> names;
 
-    DIR *dir = opendir("test/suite/tests");
+    const auto tests = mbgl::test::getBaseDirectory() + "/suite/tests";
+    DIR *dir = opendir(tests.c_str());
     if (dir != nullptr) {
         for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
             const std::string name = dp->d_name;

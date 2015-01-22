@@ -1,10 +1,10 @@
-#include "../util.hpp"
+#include "storage.hpp"
 
 #include <uv.h>
 
 #include <mbgl/storage/default/default_file_source.hpp>
 
-TEST(Storage, HTTPReading) {
+TEST_F(Storage, HTTPReading) {
     SCOPED_TEST(HTTPTest)
     SCOPED_TEST(HTTP404)
 
