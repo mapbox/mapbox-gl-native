@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 
     // Load style
     if (style.empty())
-        style = std::string("asset://") + std::string("styles/bright-v6.json");
+        style = std::string("asset://") + std::string("styles/bright-v7.json");
 
     map.setStyleURL(style);
 

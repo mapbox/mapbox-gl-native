@@ -102,7 +102,7 @@ int main() {
     if (accessToken) fileSource.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
 
     // Load style
-    map.setStyleURL("asset://styles/bright-v6.json");
+    map.setStyleURL("asset://styles/bright-v7.json");
 
     int ret = view.run();
 
