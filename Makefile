@@ -105,8 +105,6 @@ android:
 
 test: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
-	./scripts/run_tests.sh
-
 
 test-%: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test

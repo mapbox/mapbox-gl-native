@@ -16,6 +16,9 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     sysctl kernel.core_pattern
 fi
 
+# install test server dependencies
+(cd test; npm install express@4.11)
+
 RESULT=0
 ${CMD} "$@" || RESULT=$?
 

@@ -96,28 +96,28 @@ SharedRequestBase *DefaultFileSource::find(const Resource &resource) {
 }
 
 Request *DefaultFileSource::request(const Resource &resource, uv_loop_t *l, Callback callback) {
-    auto request = new Request(resource, l, std::move(callback));
+    auto req = new Request(resource, l, std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().
-    queue->send(AddRequestAction{ request });
-    return request;
+    queue->send(AddRequestAction{ req });
+    return req;
 }
 
 void DefaultFileSource::request(const Resource &resource, Callback callback) {
-    auto request = new Request(resource, nullptr, std::move(callback));
+    auto req = new Request(resource, nullptr, std::move(callback));
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().
-    queue->send(AddRequestAction{ request });
+    queue->send(AddRequestAction{ req });
 }
 
-void DefaultFileSource::cancel(Request *request) {
-    request->cancel();
+void DefaultFileSource::cancel(Request *req) {
+    req->cancel();
 
     // This function can be called from any thread. Make sure we're executing the actual call in the
     // file source loop by sending it over the queue. It will be processed in processAction().
-    queue->send(RemoveRequestAction{ request });
+    queue->send(RemoveRequestAction{ req });
 }
 
 void DefaultFileSource::process(AddRequestAction &action) {

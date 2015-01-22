@@ -49,6 +49,7 @@
         '<@(glfw3_static_libs)',
         '<@(sqlite3_static_libs)',
         '<@(zlib_static_libs)',
+        '<@(curl_static_libs)',
       ],
       'variables': {
         'cxxflags': [
@@ -60,16 +61,22 @@
           '<@(glfw3_ldflags)',
           '<@(sqlite3_ldflags)',
           '<@(zlib_ldflags)',
+          '<@(curl_ldflags)',
         ],
       },
-      'xcode_settings': {
-        'OTHER_CFLAGS': [ '<@(cxxflags)' ],
-        'OTHER_CPLUSPLUSFLAGS': [ '<@(cxxflags)' ],
-        'OTHER_LDFLAGS': [ '<@(ldflags)' ],
-      },
-      'cflags': [ '<@(cxxflags)' ],
-      'cxxflags': [ '<@(cxxflags)' ],
-      'ldflags': [ '<@(ldflags)' ],
+      'conditions': [
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'OTHER_CFLAGS': [ '<@(cxxflags)' ],
+            'OTHER_CPLUSPLUSFLAGS': [ '<@(cxxflags)' ],
+            'OTHER_LDFLAGS': [ '<@(ldflags)' ],
+          },
+        }, {
+         'cflags': [ '<@(cxxflags)' ],
+         'cxxflags': [ '<@(cxxflags)' ],
+         'libraries': [ '<@(ldflags)' ],
+        }],
+      ],
     },
   ]
 }

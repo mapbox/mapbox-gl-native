@@ -111,7 +111,11 @@ void AssetRequestImpl::fileStated(uv_fs_t *req) {
             uv_fs_close(req->loop, req, self->fd, fileClosed);
         } else {
             self->response = util::make_unique<Response>();
+#ifdef __APPLE__
             self->response->modified = stat->st_mtimespec.tv_sec;
+#else
+            self->response->modified = stat->st_mtime;
+#endif
             self->response->etag = std::to_string(stat->st_ino);
             const auto size = (unsigned int)(stat->st_size);
             self->response->data.resize(size);
@@ -185,8 +189,8 @@ void AssetRequestImpl::cleanup(uv_fs_t *req) {
 
 // -------------------------------------------------------------------------------------------------
 
-AssetRequest::AssetRequest(DefaultFileSource *source, const Resource &resource)
-    : SharedRequestBase(source, resource) {
+AssetRequest::AssetRequest(DefaultFileSource *source_, const Resource &resource_)
+    : SharedRequestBase(source_, resource_) {
     assert(algo::starts_with(resource.url, "asset://"));
 }
 

@@ -4,6 +4,7 @@
 #include <mbgl/util/noncopyable.hpp>
 
 #include <functional>
+#include <memory>
 
 namespace mbgl {
 

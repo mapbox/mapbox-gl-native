@@ -9,7 +9,7 @@
 #include <queue>
 #include <map>
 #include <cassert>
-
+#include <cstring>
 
 void handleError(CURLMcode code) {
     if (code != CURLM_OK) {
@@ -599,8 +599,8 @@ void HTTPRequestImpl::handleResult(CURLcode code) {
 
 // -------------------------------------------------------------------------------------------------
 
-HTTPRequest::HTTPRequest(DefaultFileSource *source, const Resource &resource)
-    : SharedRequestBase(source, resource) {
+HTTPRequest::HTTPRequest(DefaultFileSource *source_, const Resource &resource_)
+    : SharedRequestBase(source_, resource_) {
 }
 
 HTTPRequest::~HTTPRequest() {
