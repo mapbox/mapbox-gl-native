@@ -143,19 +143,17 @@ render: build/render/Makefile
 
 .PHONY: clear_xcode_cache
 clear_xcode_cache:
+ifeq ($(PLATFORM), osx)
 	@CUSTOM_DD=`defaults read com.apple.dt.Xcode IDECustomDerivedDataLocation 2>/dev/null`; \
-	if [[ $$CUSTOM_DD ]]; then \
+	if [ $$CUSTOM_DD ]; then \
 		echo clearing files in $$CUSTOM_DD older than one day; \
 		find $$CUSTOM_DD/mapboxgl-app-* -mtime +1 | xargs rm -rf; \
 	fi; \
-	if [[ -d ~/Library/Developer/Xcode/DerivedData/ ]] && [[ ! $$CUSTOM_DD ]]; then \
+	if [ -d ~/Library/Developer/Xcode/DerivedData/ ] && [ ! $$CUSTOM_DD ]; then \
 		echo 'clearing files in ~/Library/Developer/Xcode/DerivedData/mapboxgl-app-* older than one day'; \
 		find ~/Library/Developer/Xcode/DerivedData/mapboxgl-app-* -mtime +1 | xargs rm -rf; \
-	fi; \
-	if [[ -e ~/Library/Application\ Support/Mapbox\ GL/cache.db ]]; then \
-		echo 'removing ~/Library/Application\ Support/Mapbox\ GL/cache.db'; \
-		rm ~/Library/Application\ Support/Mapbox\ GL/cache.db; \
 	fi
+endif
 
 xproj: build/macosx/mapboxgl-app.xcodeproj
 	open ./build/macosx/mapboxgl-app.xcodeproj
@@ -173,7 +171,15 @@ lproj: build/linux/mapboxgl-app.xcodeproj
 
 ##### Maintenace operations ####################################################
 
-clean: clear_xcode_cache
+.PHONY: clear_sqlite_cache
+clear_sqlite_cache:
+ifeq ($(PLATFORM), osx)
+	rm -f ~/Library/Application\ Support/Mapbox\ GL/cache.db
+else
+	rm -f /tmp/mbgl-cache.db
+endif
+
+clean: clear_sqlite_cache clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
 	-rm -rf ./macosx/build/
