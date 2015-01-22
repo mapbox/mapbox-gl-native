@@ -275,6 +275,7 @@ void Map::run() {
         checkForPause();
     }
 
+    view.activate();
     setup();
     prepare();
 
@@ -301,6 +302,8 @@ void Map::run() {
         mode = Mode::None;
         fileSource.clearLoop();
     }
+
+    view.deactivate();
 }
 
 void Map::checkForPause() {
@@ -351,7 +354,6 @@ void Map::swapped() {
 
 void Map::terminate() {
     assert(painter);
-    view.activate();
     painter->terminate();
     view.deactivate();
 }
@@ -361,7 +363,6 @@ void Map::terminate() {
 void Map::setup() {
     assert(std::this_thread::get_id() == mapThread);
     assert(painter);
-    view.activate();
     painter->setup();
 }
 
