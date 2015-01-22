@@ -51,6 +51,7 @@ public:
     ~HTTPRequestImpl();
 
     void cancel();
+    void cancelTimer();
 
     void start();
     void handleResult(NSData *data, NSURLResponse *res, NSError *error);
@@ -198,6 +199,9 @@ void HTTPRequestImpl::cancel() {
     context->removeRequest(request);
     request = nullptr;
 
+    // Stop the backoff timer to avoid re-triggering this request.
+    cancelTimer();
+
     if (task) {
         [task cancel];
         [task release];
@@ -205,9 +209,20 @@ void HTTPRequestImpl::cancel() {
     }
 }
 
+void HTTPRequestImpl::cancelTimer() {
+    if (timer) {
+        uv_timer_stop(timer);
+        uv::close(timer);
+        timer = nullptr;
+    }
+}
+
 HTTPRequestImpl::~HTTPRequestImpl() {
     assert(!task);
     assert(async);
+
+    // Stop the backoff timer to avoid re-triggering this request.
+    cancelTimer();
 
     uv::close(async);
 
