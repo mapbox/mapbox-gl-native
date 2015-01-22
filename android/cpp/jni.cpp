@@ -190,7 +190,11 @@ void JNICALL nativeInitializeDisplay(JNIEnv *env, jobject obj, jlong nativeMapVi
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeInitializeDisplay");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    if (!nativeMapView->initializeDisplay()) {
+
+    try
+    {
+        nativeMapView->initializeDisplay();
+    } catch(const std::exception& e) {
         throw_error(env, "Unable to initialize GL display.");
     }
 }
@@ -206,7 +210,10 @@ void JNICALL nativeInitializeContext(JNIEnv *env, jobject obj, jlong nativeMapVi
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeInitializeContext");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    if (!nativeMapView->initializeContext()) {
+
+    try {
+        nativeMapView->initializeContext();
+    } catch(const std::exception& e) {
         throw_error(env, "Unable to initialize GL context.");
     }
 }
@@ -224,7 +231,9 @@ nativeCreateSurface(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject su
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
-    if (!nativeMapView->createSurface(ANativeWindow_fromSurface(env, surface))) {
+    try {
+        nativeMapView->createSurface(ANativeWindow_fromSurface(env, surface));
+    } catch(const std::exception& e) {
         throw_error(env, "Unable to create GL surface.");
     }
 }
@@ -980,7 +989,7 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     jint ret = vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
     if (ret != JNI_OK) {
         mbgl::Log::Error(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
-        return;
+        throw new std::runtime_error("GetEnv() failed");
     }
 
     env->DeleteGlobalRef(lonLatClass);

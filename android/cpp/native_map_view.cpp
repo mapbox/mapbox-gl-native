@@ -24,6 +24,7 @@ void log_egl_string(EGLDisplay display, EGLint name, const char *label) {
     if (str == nullptr) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglQueryString(%d) returned error %d", name,
                          eglGetError());
+        throw new std::runtime_error("eglQueryString() failed");
     } else {
         char buf[513];
         for (int len = std::strlen(str), pos = 0; len > 0; len -= 512, pos += 512) {
@@ -39,6 +40,7 @@ void log_gl_string(GLenum name, const char *label) {
     if (str == nullptr) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "glGetString(%d) returned error %d", name,
                          glGetError());
+        throw new std::runtime_error("glGetString() failed");
     } else {
         char buf[513];
         for (int len = std::strlen(reinterpret_cast<const char *>(str)), pos = 0; len > 0;
@@ -86,7 +88,8 @@ NativeMapView::~NativeMapView() {
     if (ret == JNI_OK) {
         env->DeleteGlobalRef(obj);
     } else {
-        mbgl::Log::Debug(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
+        mbgl::Log::Error(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
+        throw new std::runtime_error("GetEnv() failed");
     }
     obj = nullptr;
     vm = nullptr;
@@ -98,6 +101,7 @@ void NativeMapView::activate() {
         if (!eglMakeCurrent(display, surface, surface, context)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
                              eglGetError());
+            throw new std::runtime_error("eglMakeCurrent() failed");
         }
     } else {
         mbgl::Log::Info(mbgl::Event::Android, "Not activating as we are not ready");
@@ -109,6 +113,7 @@ void NativeMapView::deactivate() {
     if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
                          eglGetError());
+        throw new std::runtime_error("eglMakeCurrent() failed");
     }
 }
 
@@ -119,6 +124,7 @@ void NativeMapView::swap() {
         if (!eglSwapBuffers(display, surface)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d",
                              eglGetError());
+            throw new std::runtime_error("eglSwapBuffers() failed");
         }
         map.swapped();
         updateFps();
@@ -136,7 +142,14 @@ mbgl::Map &NativeMapView::getMap() { return map; }
 
 mbgl::CachingHTTPFileSource &NativeMapView::getFileSource() { return fileSource; }
 
-bool NativeMapView::initializeDisplay() {
+bool NativeMapView::inEmulator() {
+    // Detect if we are in emulator
+    char prop[PROP_VALUE_MAX];
+    __system_property_get("ro.kernel.qemu", prop);
+    return strtol(prop, nullptr, 0) == 1;
+}
+
+void NativeMapView::initializeDisplay() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::initializeDisplay");
 
     assert(display == EGL_NO_DISPLAY);
@@ -146,21 +159,18 @@ bool NativeMapView::initializeDisplay() {
     display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (display == EGL_NO_DISPLAY) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetDisplay() returned error %d", eglGetError());
-        terminateDisplay();
-        return false;
+        throw new std::runtime_error("eglGetDisplay() failed");
     }
 
     EGLint major, minor;
     if (!eglInitialize(display, &major, &minor)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglInitialize() returned error %d", eglGetError());
-        terminateDisplay();
-        return false;
+        throw new std::runtime_error("eglInitialize() failed");
     }
     if ((major <= 1) && (minor < 3)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "EGL version is too low, need 1.3, got %d.%d", major,
                          minor);
-        terminateDisplay();
-        return false;
+        throw new std::runtime_error("EGL version is too low");
     }
 
     log_egl_string(display, EGL_VENDOR, "Vendor");
@@ -169,10 +179,7 @@ bool NativeMapView::initializeDisplay() {
     log_egl_string(display, EGL_EXTENSIONS, "Client Extensions");
 
     // Detect if we are in emulator
-    char prop[PROP_VALUE_MAX];
-    __system_property_get("ro.kernel.qemu", prop);
-    bool inEmulator = strtol(prop, nullptr, 0) == 1;
-    if (inEmulator) {
+    if (inEmulator()) {
         mbgl::Log::Warning(mbgl::Event::Android, "In emulator! Enabling hacks :-(");
     }
 
@@ -184,45 +191,38 @@ bool NativeMapView::initializeDisplay() {
         5,                                               EGL_GREEN_SIZE,     6,
         EGL_BLUE_SIZE,                                   5,                  EGL_DEPTH_SIZE,
         16,                                              EGL_STENCIL_SIZE,   8,
-        (inEmulator ? EGL_NONE : EGL_CONFORMANT),        EGL_OPENGL_ES2_BIT, // Ugly hack
-        (inEmulator ? EGL_NONE : EGL_COLOR_BUFFER_TYPE), EGL_RGB_BUFFER,     // Ugly hack
+        (inEmulator() ? EGL_NONE : EGL_CONFORMANT),        EGL_OPENGL_ES2_BIT, // Ugly hack
+        (inEmulator() ? EGL_NONE : EGL_COLOR_BUFFER_TYPE), EGL_RGB_BUFFER,     // Ugly hack
         EGL_NONE};
     EGLint numConfigs;
     if (!eglChooseConfig(display, configAttribs, nullptr, 0, &numConfigs)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig(NULL) returned error %d",
                          eglGetError());
-        terminateDisplay();
-        return false;
+        throw new std::runtime_error("eglChooseConfig() failed");
     }
     if (numConfigs < 1) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig() returned no configs.");
-        terminateDisplay();
-        return false;
+        throw new std::runtime_error("eglChooseConfig() failed");
     }
 
     const std::unique_ptr<EGLConfig[]> configs = mbgl::util::make_unique<EGLConfig[]>(numConfigs);
     if (!eglChooseConfig(display, configAttribs, configs.get(), numConfigs, &numConfigs)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig() returned error %d", eglGetError());
-        terminateDisplay();
-        return false;
+        throw new std::runtime_error("eglChooseConfig() failed");
     }
 
     config = chooseConfig(configs.get(), numConfigs);
     if (config == nullptr) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "No config chosen");
-        terminateDisplay();
-        return false;
+        throw new std::runtime_error("No config chosen");
     }
 
     if (!eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetConfigAttrib() returned error %d",
                          eglGetError());
-        terminateDisplay();
-        return false;
+        throw new std::runtime_error("eglGetConfigAttrib() failed");
     }
     mbgl::Log::Info(mbgl::Event::OpenGL, "Chosen window format is %d", format);
-
-    return true;
 }
 
 void NativeMapView::terminateDisplay() {
@@ -234,6 +234,7 @@ void NativeMapView::terminateDisplay() {
             if (!eglDestroySurface(display, surface)) {
                 mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroySurface() returned error %d",
                                  eglGetError());
+                throw new std::runtime_error("eglDestroySurface() failed");
             }
             surface = EGL_NO_SURFACE;
         }
@@ -241,11 +242,13 @@ void NativeMapView::terminateDisplay() {
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
+            throw new std::runtime_error("eglMakeCurrent() failed");
         }
 
         if (!eglTerminate(display)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglTerminate() returned error %d",
                              eglGetError());
+            throw new std::runtime_error("eglTerminate() failed");
         }
     }
 
@@ -254,7 +257,7 @@ void NativeMapView::terminateDisplay() {
     format = -1;
 }
 
-bool NativeMapView::initializeContext() {
+void NativeMapView::initializeContext() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::initializeContext");
 
     assert(display != EGL_NO_DISPLAY);
@@ -266,11 +269,8 @@ bool NativeMapView::initializeContext() {
     if (context == EGL_NO_CONTEXT) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateContext() returned error %d",
                          eglGetError());
-        terminateContext();
-        return false;
+        throw new std::runtime_error("eglCreateContext() failed");
     }
-
-    return true;
 }
 
 void NativeMapView::terminateContext() {
@@ -280,12 +280,14 @@ void NativeMapView::terminateContext() {
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
+            throw new std::runtime_error("eglMakeCurrent() failed");
         }
 
         if (context != EGL_NO_CONTEXT) {
             if (!eglDestroyContext(display, context)) {
                 mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroyContext() returned error %d",
                                  eglGetError());
+                throw new std::runtime_error("eglDestroyContext() failed");
             }
         }
     }
@@ -293,7 +295,7 @@ void NativeMapView::terminateContext() {
     context = EGL_NO_CONTEXT;
 }
 
-bool NativeMapView::createSurface(ANativeWindow *window_) {
+void NativeMapView::createSurface(ANativeWindow *window_) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::createSurface");
 
     assert(window == nullptr);
@@ -312,8 +314,7 @@ bool NativeMapView::createSurface(ANativeWindow *window_) {
     if (surface == EGL_NO_SURFACE) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateWindowSurface() returned error %d",
                          eglGetError());
-        destroySurface();
-        return false;
+        throw new std::runtime_error("eglCreateWindowSurface() failed");
     }
 
     if (!firstTime) {
@@ -322,14 +323,17 @@ bool NativeMapView::createSurface(ANativeWindow *window_) {
         if (!eglMakeCurrent(display, surface, surface, context)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
                              eglGetError());
+            throw new std::runtime_error("eglMakeCurrent() failed");
         }
 
         log_gl_string(GL_VENDOR, "Vendor");
         log_gl_string(GL_RENDERER, "Renderer");
         log_gl_string(GL_VERSION, "Version");
-        log_gl_string(GL_SHADING_LANGUAGE_VERSION,
-                      "SL Version"); // In the emulator this returns NULL with error code 0?
-                                     // https://code.google.com/p/android/issues/detail?id=78977
+        if (!inEmulator()) {
+            log_gl_string(GL_SHADING_LANGUAGE_VERSION,
+                        "SL Version"); // In the emulator this returns NULL with error code 0?
+                                        // https://code.google.com/p/android/issues/detail?id=78977
+        }
         log_gl_string(GL_EXTENSIONS, "Extensions");
 
         loadExtensions();
@@ -337,12 +341,11 @@ bool NativeMapView::createSurface(ANativeWindow *window_) {
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
+            throw new std::runtime_error("eglMakeCurrent() failed");
         }
     }
 
     resume();
-
-    return true;
 }
 
 void NativeMapView::destroySurface() {
@@ -354,6 +357,7 @@ void NativeMapView::destroySurface() {
         if (!eglDestroySurface(display, surface)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroySurface() returned error %d",
                              eglGetError());
+            throw new std::runtime_error("eglDestroySurface() failed");
         }
     }
 
@@ -414,77 +418,77 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint numConfi
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglGetConfigAttrib(EGL_CONFIG_CAVEAT) returned error %d",
                              eglGetError());
-            return nullptr;
+            throw new std::runtime_error("eglGetConfigAttrib() failed");
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_CONFORMANT, &conformant)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglGetConfigAttrib(EGL_CONFORMANT) returned error %d", eglGetError());
-            return nullptr;
+            throw new std::runtime_error("eglGetConfigAttrib() failed");
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_BUFFER_SIZE, &bits)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglGetConfigAttrib(EGL_BUFFER_SIZE) returned error %d",
                              eglGetError());
-            return nullptr;
+            throw new std::runtime_error("eglGetConfigAttrib() failed");
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_RED_SIZE, &red)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglGetConfigAttrib(EGL_RED_SIZE) returned error %d", eglGetError());
-            return nullptr;
+            throw new std::runtime_error("eglGetConfigAttrib() failed");
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_GREEN_SIZE, &green)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglGetConfigAttrib(EGL_GREEN_SIZE) returned error %d", eglGetError());
-            return nullptr;
+            throw new std::runtime_error("eglGetConfigAttrib() failed");
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_BLUE_SIZE, &blue)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglGetConfigAttrib(EGL_BLUE_SIZE) returned error %d", eglGetError());
-            return nullptr;
+            throw new std::runtime_error("eglGetConfigAttrib() failed");
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_ALPHA_SIZE, &alpha)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglGetConfigAttrib(EGL_ALPHA_SIZE) returned error %d", eglGetError());
-            return nullptr;
+            throw new std::runtime_error("eglGetConfigAttrib() failed");
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_ALPHA_MASK_SIZE, &alphaMask)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglGetConfigAttrib(EGL_ALPHA_MASK_SIZE) returned error %d",
                              eglGetError());
-            return nullptr;
+            throw new std::runtime_error("eglGetConfigAttrib() failed");
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_DEPTH_SIZE, &depth)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglGetConfigAttrib(EGL_DEPTH_SIZE) returned error %d", eglGetError());
-            return nullptr;
+            throw new std::runtime_error("eglGetConfigAttrib() failed");
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_STENCIL_SIZE, &stencil)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglGetConfigAttrib(EGL_STENCIL_SIZE) returned error %d",
                              eglGetError());
-            return nullptr;
+            throw new std::runtime_error("eglGetConfigAttrib() failed");
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_SAMPLE_BUFFERS, &sampleBuffers)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglGetConfigAttrib(EGL_SAMPLE_BUFFERS) returned error %d",
                              eglGetError());
-            return nullptr;
+            throw new std::runtime_error("eglGetConfigAttrib() failed");
         }
 
         if (!eglGetConfigAttrib(display, configs[i], EGL_SAMPLES, &samples)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglGetConfigAttrib(EGL_SAMPLES) returned error %d", eglGetError());
-            return nullptr;
+            throw new std::runtime_error("eglGetConfigAttrib() failed");
         }
 
         mbgl::Log::Info(mbgl::Event::OpenGL, "...Caveat: %d", caveat);
@@ -729,12 +733,12 @@ void NativeMapView::notifyMapChange(mbgl::MapChange, mbgl::timestamp) {
     if (ret != JNI_OK) {
         if (ret != JNI_EDETACHED) {
             mbgl::Log::Error(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
-            return;
+            throw new std::runtime_error("GetEnv() failed");
         } else {
             ret = vm->AttachCurrentThread(&env, &args);
             if (ret != JNI_OK) {
                 mbgl::Log::Error(mbgl::Event::JNI, "AttachCurrentThread() failed with %i", ret);
-                return;
+                throw new std::runtime_error("AttachCurrentThread() failed");
             }
             detach = true;
         }
@@ -748,7 +752,7 @@ void NativeMapView::notifyMapChange(mbgl::MapChange, mbgl::timestamp) {
     if (detach) {
         if ((ret = vm->DetachCurrentThread()) != JNI_OK) {
             mbgl::Log::Error(mbgl::Event::JNI, "DetachCurrentThread() failed with %i", ret);
-            return;
+            throw new std::runtime_error("DetachCurrentThread() failed");
         }
     }
     env = nullptr;
@@ -794,12 +798,12 @@ void NativeMapView::updateFps() {
     if (ret != JNI_OK) {
         if (ret != JNI_EDETACHED) {
             mbgl::Log::Error(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
-            return;
+            throw new std::runtime_error("GetEnv() failed");
         } else {
             ret = vm->AttachCurrentThread(&env, &args);
             if (ret != JNI_OK) {
                 mbgl::Log::Error(mbgl::Event::JNI, "AttachCurrentThread() failed with %i", ret);
-                return;
+                throw new std::runtime_error("AttachCurrentThread() failed");
             }
             detach = true;
         }
@@ -813,7 +817,7 @@ void NativeMapView::updateFps() {
     if (detach) {
         if ((ret = vm->DetachCurrentThread()) != JNI_OK) {
             mbgl::Log::Error(mbgl::Event::JNI, "DetachCurrentThread() failed with %i", ret);
-            return;
+            throw new std::runtime_error("DetachCurrentThread() failed");
         }
     }
     env = nullptr;

@@ -30,13 +30,13 @@ public:
     mbgl::Map &getMap();
     mbgl::CachingHTTPFileSource &getFileSource();
 
-    bool initializeDisplay();
+    void initializeDisplay();
     void terminateDisplay();
 
-    bool initializeContext();
+    void initializeContext();
     void terminateContext();
 
-    bool createSurface(ANativeWindow *window);
+    void createSurface(ANativeWindow *window);
     void destroySurface();
 
     void start();
@@ -52,6 +52,8 @@ private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 
     void loadExtensions();
+
+    bool inEmulator();
 
 private:
     JavaVM *vm = nullptr;
