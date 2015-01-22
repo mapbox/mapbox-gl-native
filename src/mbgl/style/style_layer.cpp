@@ -180,9 +180,19 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const times
     applyTransitionedStyleProperty(PropertyKey::LineWidth, line.width, z, now);
     applyTransitionedStyleProperty(PropertyKey::LineGapWidth, line.gap_width, z, now);
     applyTransitionedStyleProperty(PropertyKey::LineBlur, line.blur, z, now);
-    applyTransitionedStyleProperty(PropertyKey::LineDashLand, line.dash_array[0], z, now);
-    applyTransitionedStyleProperty(PropertyKey::LineDashGap, line.dash_array[1], z, now);
+    applyStyleProperty(PropertyKey::LineDashArray, line.dash_array, z, now);
     applyStyleProperty(PropertyKey::LineImage, line.image, z, now);
+
+    // scale dash width by line-gap-width if present
+    applyStyleProperty(PropertyKey::LineGapWidth, line.dash_line_width, std::floor(z), now + 10000);
+    if (line.dash_line_width <= 0) {
+        // otherwise scale by line-width
+        applyStyleProperty(PropertyKey::LineWidth, line.dash_line_width, std::floor(z), now + 10000);
+        if (line.dash_line_width <= 0) {
+            // otherwise scale by default line-width value
+            line.dash_line_width = line.width;
+        }
+    }
 }
 
 template <>

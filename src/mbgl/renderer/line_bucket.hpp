@@ -16,11 +16,12 @@ class LineVertexBuffer;
 class TriangleElementsBuffer;
 class LineShader;
 class LinejoinShader;
+class LineSDFShader;
 class LinepatternShader;
 struct pbf;
 
 class LineBucket : public Bucket {
-    typedef ElementGroup<2> triangle_group_type;
+    typedef ElementGroup<3> triangle_group_type;
     typedef ElementGroup<1> point_group_type;
 
 public:
@@ -38,6 +39,7 @@ public:
     bool hasPoints() const;
 
     void drawLines(LineShader& shader);
+    void drawLineSDF(LineSDFShader& shader);
     void drawLinePatterns(LinepatternShader& shader);
     void drawPoints(LinejoinShader& shader);
 

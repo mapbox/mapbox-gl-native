@@ -2,6 +2,7 @@
 #define MBGL_UTIL_INTERPOLATE
 
 #include <array>
+#include <vector>
 
 namespace mbgl {
 namespace util {
@@ -19,6 +20,10 @@ inline std::array<T, 4> interpolate(const std::array<T, 4>& a, const std::array<
         interpolate(a[2], b[2], t),
         interpolate(a[3], b[3], t)
     }};
+}
+
+inline std::vector<float> interpolate(const std::vector<float> &a, const std::vector<float>, const double) {
+    return a;
 }
 
 }

@@ -69,17 +69,11 @@ private:
     template <typename T>
     bool parseOptionalProperty(const char *property_name, const std::vector<PropertyKey> &keys, ClassProperties &klass, JSVal value);
     template <typename T>
-    bool parseOptionalProperty(const char *property_name, T &target, JSVal value);
-    template <typename T>
     bool setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass);
-    template <typename T>
-    bool setProperty(JSVal value, const char *property_name, T &target);
 
     template <typename T>
     std::tuple<bool, T> parseProperty(JSVal value, const char *property_name);
 
-    template <typename T>
-    bool parseFunction(PropertyKey key, ClassProperties &klass, JSVal value);
     template <typename T>
     std::tuple<bool, Function<T>> parseFunction(JSVal value);
     template <typename T>

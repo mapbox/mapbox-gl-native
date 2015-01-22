@@ -209,6 +209,24 @@ Color parseColor(JSVal value) {
                   css_color.a}};
 }
 
+std::tuple<bool,std::vector<float>> parseFloatArray(JSVal value) {
+    if (!value.IsArray()) {
+        Log::Warning(Event::ParseStyle, "dasharray value must be an array of numbers");
+        return std::tuple<bool, std::vector<float>> { false, std::vector<float>() };
+    }
+
+    std::vector<float> vec;
+    for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+        JSVal part = value[i];
+        if (!part.IsNumber()) {
+            Log::Warning(Event::ParseStyle, "dasharray value must be an array of numbers");
+            return std::tuple<bool, std::vector<float>> { false, std::vector<float>() };
+        }
+        vec.push_back(part.GetDouble());
+    }
+    return std::tuple<bool, std::vector<float>> { true, vec };
+}
+
 template <>
 bool StyleParser::parseFunctionArgument(JSVal value) {
     JSVal rvalue = replaceConstant(value);
@@ -237,6 +255,12 @@ template <>
 Color StyleParser::parseFunctionArgument(JSVal value) {
     JSVal rvalue = replaceConstant(value);
     return parseColor(rvalue);
+}
+
+template <>
+std::vector<float> StyleParser::parseFunctionArgument(JSVal value) {
+    JSVal rvalue = replaceConstant(value);
+    return std::get<1>(parseFloatArray(rvalue));
 }
 
 template <typename T> inline float defaultBaseValue() { return 1.75; }
@@ -293,17 +317,6 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
 
 
 template <typename T>
-bool StyleParser::parseFunction(PropertyKey key, ClassProperties &klass, JSVal value) {
-    bool parsed;
-    Function<T> function;
-    std::tie(parsed, function) = parseFunction<T>(value);
-    if (parsed) {
-        klass.set(key, function);
-    }
-    return parsed;
-}
-
-template <typename T>
 bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass) {
     bool parsed;
     T result;
@@ -314,33 +327,12 @@ bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKe
     return parsed;
 }
 
-template <typename T>
-bool StyleParser::setProperty(JSVal value, const char *property_name, T &target) {
-    bool parsed;
-    T result;
-    std::tie(parsed, result) = parseProperty<T>(value, property_name);
-    if (parsed) {
-        target = std::move(result);
-    }
-    return parsed;
-}
-
-
 template<typename T>
 bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
     } else {
         return setProperty<T>(replaceConstant(value[property_name]), property_name, key, klass);
-    }
-}
-
-template <typename T>
-bool StyleParser::parseOptionalProperty(const char *property_name, T &target, JSVal value) {
-    if (!value.HasMember(property_name)) {
-         return false;
-    } else {
-        return setProperty<T>(replaceConstant(value[property_name]), property_name, target);
     }
 }
 
@@ -423,6 +415,18 @@ template<> std::tuple<bool, Function<Color>> StyleParser::parseProperty(JSVal va
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a color, or a color function", property_name);
         return std::tuple<bool, Function<Color>> { false, ConstantFunction<Color>(Color {{ 0, 0, 0, 0 }}) };
+    }
+}
+
+template<> std::tuple<bool, Function<std::vector<float>>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+    if (value.IsObject()) {
+        return parseFunction<std::vector<float>>(value);
+    } else if (value.IsArray()) {
+        std::tuple<bool, std::vector<float>> parsed = parseFloatArray(value);
+        return std::tuple<bool, Function<std::vector<float>>> { std::get<0>(parsed), ConstantFunction<std::vector<float>>(std::get<1>(parsed)) };
+    } else {
+        Log::Warning(Event::ParseStyle, "value of '%s' must be an array of numbers, or a number array function", property_name);
+        return std::tuple<bool, Function<std::vector<float>>> { false, ConstantFunction<std::vector<float>>(std::vector<float>()) };
     }
 }
 
@@ -584,8 +588,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("line-gap-width-transition", Key::LineGapWidth, klass, value);
     parseOptionalProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("line-blur-transition", Key::LineBlur, klass, value);
-    parseOptionalProperty<Function<float>>("line-dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);
-    parseOptionalProperty<PropertyTransition>("line-dasharray-transition", Key::LineDashArray, klass, value);
+    parseOptionalProperty<Function<std::vector<float>>>("line-dasharray", Key::LineDashArray, klass, value);
     parseOptionalProperty<std::string>("line-image", Key::LineImage, klass, value);
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
