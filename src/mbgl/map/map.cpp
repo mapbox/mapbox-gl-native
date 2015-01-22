@@ -575,12 +575,8 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
     }
     for (const util::ptr<StyleLayer> &layer : group->layers) {
         if (!layer) continue;
-        if (layer->bucket) {
-            if (layer->bucket->style_source) {
-                (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
-            }
-        } else if (layer->layers) {
-            updateSources(layer->layers);
+        if (layer->bucket && layer->bucket->style_source) {
+            (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
         }
     }
 }

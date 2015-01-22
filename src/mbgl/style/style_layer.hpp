@@ -79,9 +79,6 @@ public:
     // Stores the evaluated, and cascaded styling information, specific to this
     // layer's type.
     StyleProperties properties;
-
-    // Child layer array (if this layer has child layers).
-    util::ptr<StyleLayerGroup> layers;
 };
 
 }

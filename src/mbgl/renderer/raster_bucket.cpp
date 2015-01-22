@@ -5,7 +5,6 @@ using namespace mbgl;
 
 RasterBucket::RasterBucket(TexturePool& texturePool, const StyleBucketRaster& properties_)
 : properties(properties_),
-  texture(properties_),
   raster(texturePool) {
 }
 

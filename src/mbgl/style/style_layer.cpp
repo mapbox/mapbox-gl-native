@@ -51,11 +51,6 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const t
             appliedProperties.add(ClassID::Fallback, begin, end, value);
         }
     }
-
-    // Update all child layers as well.
-    if (layers) {
-        layers->setClasses(class_names, now, defaultTransition);
-    }
 }
 
 // Helper function for applying all properties of a a single class that haven't been applied yet.
@@ -239,10 +234,6 @@ void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const
 }
 
 void StyleLayer::updateProperties(float z, const timestamp now) {
-    if (layers) {
-        layers->updateProperties(z, now);
-    }
-
     cleanupAppliedStyleProperties(now);
 
     switch (type) {

@@ -490,10 +490,6 @@ util::ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
         util::ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
             layer_id, std::move(paints));
 
-        if (value.HasMember("layers")) {
-            layer->layers = createLayers(value["layers"]);
-        }
-
         // Store the layer ID so we can reference it later.
         layers.emplace(layer_id, std::pair<JSVal, util::ptr<StyleLayer>> { value, layer });
 
@@ -523,7 +519,7 @@ void StyleParser::parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair) {
         }
     }
 
-    if (layer->bucket || (layer->layers && layer->type != StyleLayerType::Raster)) {
+    if (layer->bucket) {
         // Skip parsing this again. We already have a valid layer definition.
         return;
     }
@@ -661,18 +657,9 @@ void StyleParser::parseReference(JSVal value, util::ptr<StyleLayer> &layer) {
     parseLayer(it->second);
     stack.pop_front();
 
-
     util::ptr<StyleLayer> reference = it->second.second;
-
     layer->type = reference->type;
-
-    if (reference->layers) {
-        Log::Warning(Event::ParseStyle, "layer '%s' references composite layer", layer->id.c_str());
-        // We cannot parse this layer further.
-        return;
-    } else {
-        layer->bucket = reference->bucket;
-    }
+    layer->bucket = reference->bucket;
 }
 
 #pragma mark - Parse Bucket
@@ -810,17 +797,6 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleLayer> &layer) {
         parseRenderProperty(value, render.text.allow_overlap, "text-allow-overlap");
         parseRenderProperty(value, render.text.ignore_placement, "text-ignore-placement");
         parseRenderProperty(value, render.text.optional, "text-optional");
-    } break;
-
-    case StyleLayerType::Raster: {
-        StyleBucketRaster &render = bucket.render.get<StyleBucketRaster>();
-
-        parseRenderProperty(value, render.size, "raster-size");
-        parseRenderProperty(value, render.blur, "raster-blur");
-        parseRenderProperty(value, render.buffer, "raster-buffer");
-        if (layer->layers) {
-            render.prerendered = true;
-        }
     } break;
 
     default:

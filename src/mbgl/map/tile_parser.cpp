@@ -70,10 +70,8 @@ void TileParser::parseStyleLayers(util::ptr<StyleLayerGroup> group) {
         if (layer_desc->isBackground()) {
             // background is a special, fake bucket
             continue;
-        } else if (layer_desc->layers) {
-            // This is a layer group.
-            parseStyleLayers(layer_desc->layers);
         }
+
         if (layer_desc->bucket) {
             // This is a singular layer. Check if this bucket already exists. If not,
             // parse this bucket.
@@ -88,7 +86,7 @@ void TileParser::parseStyleLayers(util::ptr<StyleLayerGroup> group) {
                 }
             }
         } else {
-            fprintf(stderr, "[WARNING] layer '%s' does not have child layers or buckets\n", layer_desc->id.c_str());
+            fprintf(stderr, "[WARNING] layer '%s' does not have buckets\n", layer_desc->id.c_str());
         }
     }
 }
@@ -117,8 +115,6 @@ std::unique_ptr<Bucket> TileParser::createBucket(util::ptr<StyleBucket> bucket_d
         } else {
             fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucket_desc->name.c_str(), bucket_desc->source_layer.c_str());
         }
-    } else if (bucket_desc->render.is<StyleBucketRaster>() && bucket_desc->render.get<StyleBucketRaster>().prerendered == true) {
-        return createRasterBucket(bucket_desc->render.get<StyleBucketRaster>());
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
         if (debug::tileParseWarnings) {

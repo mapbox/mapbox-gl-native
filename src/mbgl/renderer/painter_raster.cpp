@@ -9,53 +9,11 @@
 
 using namespace mbgl;
 
-void Painter::renderRaster(RasterBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix) {
+void Painter::renderRaster(RasterBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID&, const mat4 &matrix) {
     if (pass != RenderPass::Translucent) return;
 
     const RasterProperties &properties = layer_desc->getProperties<RasterProperties>();
 
-    if (layer_desc->layers) {
-
-        if (!bucket.texture.getTexture()) {
-
-            bucket.texture.bindFramebuffer();
-
-            preparePrerender(bucket);
-
-            const int buffer = bucket.properties.buffer * 4096.0f;
-
-            const mat4 preMatrix = [&]{
-                mat4 vtxMatrix;
-                matrix::ortho(vtxMatrix, -buffer, 4096 + buffer, -4096 - buffer, buffer, 0, 1);
-                matrix::translate(vtxMatrix, vtxMatrix, 0, -4096, 0);
-                return vtxMatrix;
-            }();
-
-            for (const util::ptr<StyleLayer> &layer : layer_desc->layers->layers) {
-                setOpaque();
-                renderLayer(layer, &id, &preMatrix);
-                setTranslucent();
-                renderLayer(layer, &id, &preMatrix);
-            }
-
-            if (bucket.properties.blur > 0) {
-                bucket.texture.blur(*this, bucket.properties.blur);
-            }
-
-            bucket.texture.unbindFramebuffer();
-
-            MBGL_CHECK_ERROR(glEnable(GL_DEPTH_TEST));
-            MBGL_CHECK_ERROR(glEnable(GL_STENCIL_TEST));
-
-            MBGL_CHECK_ERROR(glViewport(0, 0, gl_viewport[0], gl_viewport[1]));
-
-        }
-
-        renderPrerenderedTexture(bucket, matrix, properties);
-
-    }
-
-    // Only draw non-prerendered raster here
     if (bucket.hasData()) {
         depthMask(false);
 
@@ -75,7 +33,6 @@ void Painter::renderRaster(RasterBucket& bucket, util::ptr<StyleLayer> layer_des
 
         depthMask(true);
     }
-
 }
 
 float Painter::saturationFactor(float saturation) {
