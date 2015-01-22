@@ -103,6 +103,7 @@ public:
     StyleBucketRender render = std::false_type();
     float min_zoom = -std::numeric_limits<float>::infinity();
     float max_zoom = std::numeric_limits<float>::infinity();
+    VisibilityType visibility = VisibilityType::Visible;
 };
 
 

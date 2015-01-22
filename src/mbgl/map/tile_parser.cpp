@@ -102,6 +102,7 @@ std::unique_ptr<Bucket> TileParser::createBucket(util::ptr<StyleBucket> bucket_d
     // Skip this bucket if we are to not render this
     if (tile.id.z < std::floor(bucket_desc->min_zoom) && std::floor(bucket_desc->min_zoom) < tile.source.max_zoom) return nullptr;
     if (tile.id.z >= std::ceil(bucket_desc->max_zoom)) return nullptr;
+    if (bucket_desc->visibility == mbgl::VisibilityType::None) return nullptr;
 
     auto layer_it = vector_data.layers.find(bucket_desc->source_layer);
     if (layer_it != vector_data.layers.end()) {

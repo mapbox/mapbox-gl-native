@@ -290,6 +290,7 @@ void Painter::renderLayers(util::ptr<StyleLayerGroup> group) {
 }
 
 void Painter::renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id, const mat4* matrix) {
+    if (layer_desc->bucket->visibility == VisibilityType::None) return;
     if (layer_desc->type == StyleLayerType::Background) {
         // This layer defines a background color/image.
 
