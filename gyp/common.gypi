@@ -59,11 +59,11 @@
         }
       },
       'Release': {
-        'cflags_cc': [ '-O3' ],
+        'cflags_cc': [ '-g', '-O3' ],
         'defines': [ 'NDEBUG' ],
         'xcode_settings': {
           'GCC_OPTIMIZATION_LEVEL': '3',
-          'GCC_GENERATE_DEBUGGING_SYMBOLS': 'NO',
+          'GCC_GENERATE_DEBUGGING_SYMBOLS': 'YES',
           'DEAD_CODE_STRIPPING': 'YES',
           'GCC_INLINES_ARE_PRIVATE_EXTERN': 'NO'
         }
