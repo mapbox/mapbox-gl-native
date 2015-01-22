@@ -21,17 +21,13 @@ struct Resource {
     inline bool operator==(const Resource &res) const {
         return kind == res.kind && url == res.url;
     }
-};
 
-}
+    struct Hash {
+        std::size_t operator()(Resource const& r) const {
+            return std::hash<std::string>()(r.url) ^ (std::hash<uint8_t>()(r.kind) << 1);
+        }
+    };
 
-// Specialize std::hash for use in std::unordered_map
-namespace std {
-
-template<> struct hash<mbgl::Resource> {
-    std::size_t operator()(mbgl::Resource const& r) const {
-        return std::hash<std::string>()(r.url) ^ (std::hash<uint8_t>()(r.kind) << 1);
-    }
 };
 
 }

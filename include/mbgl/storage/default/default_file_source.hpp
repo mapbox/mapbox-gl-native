@@ -47,7 +47,7 @@ private:
 
     SharedRequestBase *find(const Resource &resource);
 
-    std::unordered_map<Resource, SharedRequestBase *> pending;
+    std::unordered_map<Resource, SharedRequestBase *, Resource::Hash> pending;
 
     uv_loop_t *loop = nullptr;
     FileCache *cache = nullptr;
