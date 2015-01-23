@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 
 task accessToken {
+    def rawDir = new File("app/src/main/res/raw")
+    rawDir.mkdirs()
     def tokenFile = new File("app/src/main/res/raw/token.txt")
     tokenFile.write(System.getenv('MAPBOX_ACCESS_TOKEN'))
 }
