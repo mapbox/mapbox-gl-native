@@ -17,7 +17,7 @@ typedef void (*uv_worker_after_cb)(void *data);
 typedef void (*uv_worker_close_cb)(uv_worker_t *worker);
 
 struct uv_worker_s {
-#ifndef NDEBUG
+#ifdef DEBUG
     unsigned long thread_id;
 #endif
     uv_loop_t *loop;

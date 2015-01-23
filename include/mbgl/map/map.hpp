@@ -198,7 +198,7 @@ private:
 
     View &view;
 
-#ifndef NDEBUG
+#ifdef DEBUG
     const std::thread::id mainThread;
     std::thread::id mapThread;
 #endif

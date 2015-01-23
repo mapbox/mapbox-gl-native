@@ -69,7 +69,7 @@
         '<@(curl_static_libs)',
       ],
       'variables': {
-        'cxxflags': [
+        'cflags_cc': [
           '<@(uv_cflags)',
           '-I<(boost_root)/include',
         ],
@@ -84,13 +84,11 @@
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {
-            'OTHER_CFLAGS': [ '<@(cxxflags)' ],
-            'OTHER_CPLUSPLUSFLAGS': [ '<@(cxxflags)' ],
+            'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
             'OTHER_LDFLAGS': [ '<@(ldflags)' ],
           },
         }, {
-         'cflags': [ '<@(cxxflags)' ],
-         'cxxflags': [ '<@(cxxflags)' ],
+         'cflags_cc': [ '<@(cflags_cc)' ],
          'libraries': [ '<@(ldflags)' ],
         }],
       ],

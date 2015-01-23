@@ -59,7 +59,7 @@ using namespace mbgl;
 Map::Map(View& view_, FileSource& fileSource_)
     : loop(util::make_unique<uv::loop>()),
       view(view_),
-#ifndef NDEBUG
+#ifdef DEBUG
       mainThread(std::this_thread::get_id()),
       mapThread(mainThread),
 #endif
@@ -152,7 +152,7 @@ void Map::start(bool startPaused) {
     }
 
     thread = std::thread([this]() {
-#ifndef NDEBUG
+#ifdef DEBUG
         mapThread = std::this_thread::get_id();
 #endif
 
@@ -162,7 +162,7 @@ void Map::start(bool startPaused) {
 
         run();
 
-#ifndef NDEBUG
+#ifdef DEBUG
         mapThread = std::thread::id();
 #endif
 
@@ -230,7 +230,7 @@ void Map::resume() {
 
 void Map::run() {
     if (mode == Mode::None) {
-#ifndef NDEBUG
+#ifdef DEBUG
         mapThread = mainThread;
 #endif
         mode = Mode::Static;
@@ -265,7 +265,7 @@ void Map::run() {
     // *after* all events have been processed.
     if (mode == Mode::Static) {
         render();
-#ifndef NDEBUG
+#ifdef DEBUG
         mapThread = std::thread::id();
 #endif
         mode = Mode::None;

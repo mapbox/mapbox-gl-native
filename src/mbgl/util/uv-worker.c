@@ -25,7 +25,7 @@ void uv__worker_free_messenger(uv_messenger_t *msgr) {
 void uv__worker_thread_finished(uv__worker_thread_t *worker_thread) {
     uv_worker_t *worker = worker_thread->worker;
 
-#ifndef NDEBUG
+#ifdef DEBUG
     assert(uv_thread_self() == worker->thread_id);
 #endif
 
@@ -101,7 +101,7 @@ void uv__worker_thread_loop(void *ptr) {
 }
 
 int uv_worker_init(uv_worker_t *worker, uv_loop_t *loop, int count, const char *name) {
-#ifndef NDEBUG
+#ifdef DEBUG
     worker->thread_id = uv_thread_self();
 #endif
     worker->loop = loop;
@@ -134,7 +134,7 @@ int uv_worker_init(uv_worker_t *worker, uv_loop_t *loop, int count, const char *
 
 void uv_worker_send(uv_worker_t *worker, void *data, uv_worker_cb work_cb,
                     uv_worker_after_cb after_work_cb) {
-#ifndef NDEBUG
+#ifdef DEBUG
     assert(uv_thread_self() == worker->thread_id);
 #endif
 
@@ -155,7 +155,7 @@ void uv_worker_send(uv_worker_t *worker, void *data, uv_worker_cb work_cb,
 }
 
 void uv_worker_close(uv_worker_t *worker, uv_worker_close_cb close_cb) {
-#ifndef NDEBUG
+#ifdef DEBUG
     assert(uv_thread_self() == worker->thread_id);
 #endif
 

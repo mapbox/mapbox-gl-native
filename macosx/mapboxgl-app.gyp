@@ -29,7 +29,7 @@
       ],
 
       'variables' : {
-        'cxxflags': [
+        'cflags_cc': [
           '<@(glfw3_cflags)',
         ],
         'ldflags': [
@@ -48,7 +48,7 @@
       'xcode_settings': {
         'SDKROOT': 'macosx',
         'SUPPORTED_PLATFORMS':'macosx',
-        'OTHER_CPLUSPLUSFLAGS': [ '<@(cxxflags)' ],
+        'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'OTHER_LDFLAGS': [ '<@(ldflags)' ],
         'SDKROOT': 'macosx',
         'INFOPLIST_FILE': 'Info.plist',

@@ -23,7 +23,7 @@
       ],
 
       'variables' : {
-        'cxxflags': [
+        'cflags_cc': [
           '<@(glfw3_cflags)',
         ],
         'ldflags': [
@@ -38,11 +38,11 @@
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS': [ '<@(cxxflags)' ],
+            'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
             'OTHER_LDFLAGS': [ '<@(ldflags)' ],
           }
         }, {
-          'cxxflags': [ '<@(cxxflags)' ],
+          'cflags_cc': [ '<@(cflags_cc)' ],
           'ldflags': [ '<@(ldflags)' ],
         }]
       ],
