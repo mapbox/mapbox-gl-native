@@ -113,9 +113,9 @@ Install Oracle JDK 7 (requires license agreement) from http://www.oracle.com/tec
 
     export JAVA_HOME="/dir/to/jdk1.7.0_71"
 
-Install the [Android NDK](https://developer.android.com/tools/sdk/ndk/index.html).
+Install the [Android NDK Revision 10d](https://developer.android.com/tools/sdk/ndk/index.html).
 
-    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10c"
+    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10d"
 
 Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html).
 
@@ -131,9 +131,9 @@ You can then open `android/java` in Android Studio via "Import Non-Android Studi
 
 Install Oracle JDK 7 (requires license agreement) from http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 
-Install the [Android NDK](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X.
+Install the [Android NDK Revision 10d](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X.
 
-    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10c"
+    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10d"
 
 Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html). The latest versions recommend that you place the SDK someplace like `/usr/local/android-sdk-macosx`.
 
