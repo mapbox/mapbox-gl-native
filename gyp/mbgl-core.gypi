@@ -9,18 +9,9 @@
           'shaders',
           'version',
       ],
-      'variables': {
-        'cflags_cc': [
-          '<@(uv_cflags)',
-          '<@(sqlite3_cflags)',
-          '<@(zlib_cflags)',
-          '-I<(boost_root)/include',
-        ],
-        'cflags': [
-          '<@(uv_cflags)','-fPIC'
-        ],
-      },
+
       'sources': [
+        '<!@(find src -name "*.hpp")',
         '<!@(find src -name "*.cpp")',
         '<!@(find src -name "*.c")',
         '<!@(find src -name "*.h")',
@@ -29,25 +20,60 @@
         '<!@(find src -name "*.glsl")',
         'bin/style.json'
       ],
+
+      'variables': {
+        'cflags_cc': [
+          '<@(uv_cflags)',
+          '-I<(boost_root)/include',
+        ],
+        'cflags': [
+          '<@(uv_cflags)',
+          '-fPIC'
+        ],
+        'ldflags': [
+          '<@(uv_ldflags)',
+        ],
+        'libraries': [
+          '<@(uv_static_libs)',
+        ],
+      },
+
       'include_dirs': [
         '../include',
         '../src',
       ],
+
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
             'OTHER_CFLAGS': [ '<@(cflags)' ],
-            'SKIP_INSTALL': 'YES'
           },
         }, {
           'cflags_cc': [ '<@(cflags_cc)' ],
           'cflags': [ '<@(cflags)' ],
         }]
-      ]
+      ],
+
+      'link_settings': {
+        'libraries': [ '<@(libraries)' ],
+        'conditions': [
+          ['OS == "mac"', {
+            'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+          }, {
+            'ldflags': [ '<@(ldflags)' ],
+          }]
+        ],
+      },
+
+      'direct_dependent_settings': {
+        'include_dirs': [
+          '../include',
+        ],
+      },
     },
-    {
-      'target_name': 'mbgl-standalone',
+
+    { 'target_name': 'mbgl-standalone',
       'type': 'none',
       'hard_dependency': 1,
       'dependencies': [

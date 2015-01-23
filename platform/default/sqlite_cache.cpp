@@ -7,8 +7,8 @@
 #include <mbgl/util/variant.hpp>
 #include <mbgl/platform/log.hpp>
 
-#include "../util/sqlite3.hpp"
-#include "../util/compression.hpp"
+#include "sqlite3.hpp"
+#include "compression.hpp"
 
 #include <uv.h>
 

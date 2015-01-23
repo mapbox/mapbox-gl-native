@@ -39,8 +39,8 @@ install: build/mbgl/Makefile
 #### Build scripts #############################################################
 
 .PHONY: build/mbgl/Makefile
-build/mbgl/Makefile: mapboxgl.gyp config.gypi
-	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) -Dinstall_prefix=$(PREFIX) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
+build/mbgl/Makefile: mbgl.gyp config.gypi
+	deps/run_gyp mbgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) -Dinstall_prefix=$(PREFIX) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
 
 .PHONY: build/test/Makefile
 build/test/Makefile: test/test.gyp config.gypi

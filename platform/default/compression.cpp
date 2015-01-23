@@ -1,9 +1,24 @@
-#include <mbgl/util/compression.hpp>
+#include "compression.hpp"
 
 #include <zlib.h>
 
 #include <cstring>
 #include <stdexcept>
+
+
+// Check zlib library version.
+const static bool zlibVersionCheck = []() {
+    const char *const version = zlibVersion();
+    if (version[0] != ZLIB_VERSION[0]) {
+        char message[96];
+        snprintf(message, 96, "zlib version mismatch: headers report %s, but library reports %s",
+                 ZLIB_VERSION, version);
+        throw std::runtime_error(message);
+    }
+
+    return true;
+}();
+
 
 namespace mbgl {
 namespace util {

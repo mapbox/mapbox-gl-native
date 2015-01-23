@@ -6,16 +6,18 @@
           'type': 'none',
           'hard_dependency': 1,
           'dependencies': [
-            'mbgl-core',
+            '<(core_library)',
+            '<(headless_library)',
+            '<(platform_library)',
+            '<(storage_library)',
             'mbgl-standalone',
-            'mbgl-headless',
-            'mbgl-<(platform)',
           ],
           'copies': [
             { 'files': [ '<(standalone_product_dir)/libmbgl.a' ], 'destination': '<(install_prefix)/lib' },
             { 'files': [ '<(PRODUCT_DIR)/libmbgl-core.a' ], 'destination': '<(install_prefix)/lib' },
             { 'files': [ '<(PRODUCT_DIR)/libmbgl-headless.a' ], 'destination': '<(install_prefix)/lib' },
-            { 'files': [ '<(PRODUCT_DIR)/libmbgl-<(platform).a' ], 'destination': '<(install_prefix)/lib' },
+            { 'files': [ '<(PRODUCT_DIR)/lib<(platform_library).a' ], 'destination': '<(install_prefix)/lib' },
+            { 'files': [ '<(PRODUCT_DIR)/lib<(storage_library).a' ], 'destination': '<(install_prefix)/lib' },
             { 'files': [ '../include/mbgl' ], 'destination': '<(install_prefix)/include' },
           ],
           'variables': {

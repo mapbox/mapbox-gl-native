@@ -20,9 +20,10 @@
       'include_dirs': [ '../include', '../src' ],
       'dependencies': [
         'symlink_TEST_DATA',
-        '../mapboxgl.gyp:mbgl-core',
-        '../mapboxgl.gyp:mbgl-<(platform)',
-        '../mapboxgl.gyp:mbgl-headless',
+        '../mbgl.gyp:<(core_library)',
+        '../mbgl.gyp:<(platform_library)',
+        '../mbgl.gyp:<(storage_library)',
+        '../mbgl.gyp:<(headless_library)',
         '../deps/gtest/gtest.gyp:gtest'
       ],
       'sources': [

@@ -1,19 +1,47 @@
 {
   'variables': {
     'install_prefix%': '',
-    'standalone_product_dir':'<!@(pwd)/build'
+    'standalone_product_dir':'<!@(pwd)/build',
+    'core_library%': 'mbgl-core',
+    'headless_library%': 'mbgl-headless',
   },
+  'conditions': [
+    ['platform == "osx"', {
+      'variables': {
+        'platform_library%': 'mbgl-osx',
+        'storage_library%': 'mbgl-storage-cocoa',
+      },
+    }],
+    ['platform == "ios"', {
+      'variables': {
+        'platform_library%': 'mbgl-ios',
+        'storage_library%': 'mbgl-storage-cocoa',
+      },
+    }],
+    ['platform == "linux"', {
+      'variables': {
+        'platform_library%': 'mbgl-linux',
+        'storage_library%': 'mbgl-storage-curl',
+      },
+    }],
+    ['platform == "android"', {
+      'variables': {
+        'platform_library%': 'mbgl-android',
+        'storage_library%': 'mbgl-storage-curl',
+      },
+    }],
+  ],
   'target_defaults': {
     'default_configuration': 'Release',
     'conditions': [
       ['OS=="mac"', {
         'xcode_settings': {
-          'MACOSX_DEPLOYMENT_TARGET':'10.9',
+          'MACOSX_DEPLOYMENT_TARGET': '10.9',
           'CLANG_CXX_LIBRARY': 'libc++',
-          'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
+          'CLANG_CXX_LANGUAGE_STANDARD': 'c++11',
           'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
           'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
-          'GCC_ENABLE_CPP_RTTI':'YES',
+          'GCC_ENABLE_CPP_RTTI': 'YES',
           'OTHER_CPLUSPLUSFLAGS': [
             '-Werror',
             '-Wall',
@@ -38,6 +66,7 @@
           ['OS=="mac"', {
             'xcode_settings': {
               'OTHER_CPLUSPLUSFLAGS': [ '-fPIC' ],
+              'SKIP_INSTALL': 'YES',
             },
           }, {
             'cflags_cc': [ '-fPIC' ],
@@ -46,14 +75,10 @@
             'xcode_settings': {
               'SDKROOT': 'iphoneos',
               'SUPPORTED_PLATFORMS': 'iphonesimulator iphoneos',
-              'CLANG_CXX_LIBRARY': 'libc++',
-              'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
-              'IPHONEOS_DEPLOYMENT_TARGET':'7.0',
+              'IPHONEOS_DEPLOYMENT_TARGET': '7.0',
               'TARGETED_DEVICE_FAMILY': '1,2',
               'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
-              'CLANG_ENABLE_OBJC_ARC': 'NO',
               'CODE_SIGN_IDENTITY': 'iPhone Developer',
-              'SKIP_INSTALL': 'YES'
             },
             'configurations': {
               'Release': {

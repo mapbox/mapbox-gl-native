@@ -8,9 +8,6 @@
         'cflags_cc': [
           '<@(uv_cflags)',
         ],
-        'cflags': [
-          '<@(uv_cflags)',
-        ],
       },
       'include_dirs': [
         '../include',
@@ -19,11 +16,9 @@
         ['OS == "mac"', {
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
-            'OTHER_CFLAGS': [ '<@(cflags)' ],
           }
         }, {
           'cflags_cc': [ '<@(cflags_cc)' ],
-          'cflags': [ '<@(cflags)' ],
         }]
       ],
       'sources': [
