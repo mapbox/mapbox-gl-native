@@ -60,8 +60,20 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         // Image fill.
         if (pass == RenderPass::Translucent) {
             const SpriteAtlasPosition pos = spriteAtlas.getPosition(properties.image, true);
-            const float mix = std::fmod(float(state.getZoom()), 1.0f);
-            const float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
+            float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
+
+            float mix;
+            float duration = 300 * 1_millisecond;
+            const float fraction = std::fmod(float(state.getZoom()), 1.0f);
+            float t = std::min((util::now() - lastIntegerZoomTime) / duration, 1.0f);
+            if (state.getZoom() > lastIntegerZoom) {
+                // zooming in
+                mix = fraction + (1.0f - fraction) * t;
+                factor *= 2.0;
+            } else {
+                // zooming out
+                mix = fraction - fraction * t;
+            }
 
             mat3 patternMatrix;
             matrix::identity(patternMatrix);
