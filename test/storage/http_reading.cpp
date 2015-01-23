@@ -15,23 +15,23 @@ TEST_F(Storage, HTTPReading) {
     const auto mainThread = uv_thread_self();
 
     fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), [&](const Response &res) {
-        EXPECT_EQ(mainThread, uv_thread_self());
-        EXPECT_EQ(res.status, Response::Successful);
-        EXPECT_EQ(res.data, "Hello World!");
-        EXPECT_EQ(res.expires, 0);
-        EXPECT_EQ(res.modified, 0);
-        EXPECT_EQ(res.etag, "");
-        EXPECT_EQ(res.message, "");
+        EXPECT_EQ(uv_thread_self(), mainThread);
+        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ("Hello World!", res.data);
+        EXPECT_EQ(0, res.expires);
+        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ("", res.etag);
+        EXPECT_EQ("", res.message);
         HTTPTest.finish();
     });
 
     fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" }, uv_default_loop(), [&](const Response &res) {
-        EXPECT_EQ(mainThread, uv_thread_self());
-        EXPECT_EQ(res.status, Response::Error);
-        EXPECT_EQ(res.message, "HTTP status code 404");
-        EXPECT_EQ(res.expires, 0);
-        EXPECT_EQ(res.modified, 0);
-        EXPECT_EQ(res.etag, "");
+        EXPECT_EQ(uv_thread_self(), mainThread);
+        EXPECT_EQ(Response::Error, res.status);
+        EXPECT_EQ("HTTP status code 404", res.message);
+        EXPECT_EQ(0, res.expires);
+        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ("", res.etag);
         HTTP404.finish();
     });
 

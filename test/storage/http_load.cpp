@@ -18,12 +18,12 @@ TEST_F(Storage, HTTPLoad) {
     std::function<void()> req = [&]() {
         const auto current = number++;
         fs.request({ Resource::Unknown, std::string("http://127.0.0.1:3000/load/") +  std::to_string(current) }, uv_default_loop(), [&, current](const Response &res) {
-            EXPECT_EQ(res.status, Response::Successful);
-            EXPECT_EQ(res.data, std::string("Request ") +  std::to_string(current));
-            EXPECT_EQ(res.expires, 0);
-            EXPECT_EQ(res.modified, 0);
-            EXPECT_EQ(res.etag, "");
-            EXPECT_EQ(res.message, "");
+            EXPECT_EQ(Response::Successful, res.status);
+            EXPECT_EQ(std::string("Request ") +  std::to_string(current), res.data);
+            EXPECT_EQ(0, res.expires);
+            EXPECT_EQ(0, res.modified);
+            EXPECT_EQ("", res.etag);
+            EXPECT_EQ("", res.message);
 
             if (number <= max) {
                 req();

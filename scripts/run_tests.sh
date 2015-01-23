@@ -17,7 +17,9 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
 fi
 
 # install test server dependencies
-(cd test; npm install express@4.11)
+if [ ! -d "test/node_modules/express" ]; then
+    (cd test; npm install express@4.11.1)
+fi
 
 RESULT=0
 ${CMD} "$@" || RESULT=$?

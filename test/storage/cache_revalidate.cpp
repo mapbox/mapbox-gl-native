@@ -17,22 +17,22 @@ TEST_F(Storage, CacheRevalidate) {
 
     const Resource revalidateSame { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     fs.request(revalidateSame, uv_default_loop(), [&](const Response &res) {
-        EXPECT_EQ(res.status, Response::Successful);
-        EXPECT_EQ(res.data, "Response");
-        EXPECT_EQ(res.expires, 0);
-        EXPECT_EQ(res.modified, 0);
-        EXPECT_EQ(res.etag, "snowfall");
-        EXPECT_EQ(res.message, "");
+        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ("Response", res.data);
+        EXPECT_EQ(0, res.expires);
+        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ("snowfall", res.etag);
+        EXPECT_EQ("", res.message);
 
         fs.request(revalidateSame, uv_default_loop(), [&, res](const Response &res2) {
-            EXPECT_EQ(res2.status, Response::Successful);
-            EXPECT_EQ(res2.data, "Response");
+            EXPECT_EQ(Response::Successful, res2.status);
+            EXPECT_EQ("Response", res2.data);
             // We use this to indicate that a 304 reply came back.
-            EXPECT_GT(res2.expires, 0);
-            EXPECT_EQ(res2.modified, 0);
+            EXPECT_LT(0, res2.expires);
+            EXPECT_EQ(0, res2.modified);
             // We're not sending the ETag in the 304 reply, but it should still be there.
-            EXPECT_EQ(res2.etag, "snowfall");
-            EXPECT_EQ(res2.message, "");
+            EXPECT_EQ("snowfall", res2.etag);
+            EXPECT_EQ("", res2.message);
 
             CacheRevalidateSame.finish();
         });
@@ -40,21 +40,21 @@ TEST_F(Storage, CacheRevalidate) {
 
     const Resource revalidateModified { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
     fs.request(revalidateModified, uv_default_loop(), [&](const Response &res) {
-        EXPECT_EQ(res.status, Response::Successful);
-        EXPECT_EQ(res.data, "Response");
-        EXPECT_EQ(res.expires, 0);
-        EXPECT_EQ(res.modified, 1420070400);
-        EXPECT_EQ(res.etag, "");
-        EXPECT_EQ(res.message, "");
+        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ("Response", res.data);
+        EXPECT_EQ(0, res.expires);
+        EXPECT_EQ(1420070400, res.modified);
+        EXPECT_EQ("", res.etag);
+        EXPECT_EQ("", res.message);
 
         fs.request(revalidateModified, uv_default_loop(), [&, res](const Response &res2) {
-            EXPECT_EQ(res2.status, Response::Successful);
-            EXPECT_EQ(res2.data, "Response");
+            EXPECT_EQ(Response::Successful, res2.status);
+            EXPECT_EQ("Response", res2.data);
             // We use this to indicate that a 304 reply came back.
-            EXPECT_GT(res2.expires, 0);
-            EXPECT_EQ(res2.modified, 1420070400);
-            EXPECT_EQ(res2.etag, "");
-            EXPECT_EQ(res2.message, "");
+            EXPECT_LT(0, res2.expires);
+            EXPECT_EQ(1420070400, res2.modified);
+            EXPECT_EQ("", res2.etag);
+            EXPECT_EQ("", res2.message);
 
             CacheRevalidateModified.finish();
         });
@@ -62,20 +62,20 @@ TEST_F(Storage, CacheRevalidate) {
 
     const Resource revalidateEtag { Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
     fs.request(revalidateEtag, uv_default_loop(), [&](const Response &res) {
-        EXPECT_EQ(res.status, Response::Successful);
-        EXPECT_EQ(res.data, "Response 1");
-        EXPECT_EQ(res.expires, 0);
-        EXPECT_EQ(res.modified, 0);
-        EXPECT_EQ(res.etag, "response-1");
-        EXPECT_EQ(res.message, "");
+        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ("Response 1", res.data);
+        EXPECT_EQ(0, res.expires);
+        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ("response-1", res.etag);
+        EXPECT_EQ("", res.message);
 
         fs.request(revalidateEtag, uv_default_loop(), [&, res](const Response &res2) {
-            EXPECT_EQ(res2.status, Response::Successful);
-            EXPECT_EQ(res2.data, "Response 2");
-            EXPECT_EQ(res2.expires, 0);
-            EXPECT_EQ(res2.modified, 0);
-            EXPECT_EQ(res2.etag, "response-2");
-            EXPECT_EQ(res2.message, "");
+            EXPECT_EQ(Response::Successful, res2.status);
+            EXPECT_EQ("Response 2", res2.data);
+            EXPECT_EQ(0, res2.expires);
+            EXPECT_EQ(0, res2.modified);
+            EXPECT_EQ("response-2", res2.etag);
+            EXPECT_EQ("", res2.message);
 
             CacheRevalidateEtag.finish();
         });

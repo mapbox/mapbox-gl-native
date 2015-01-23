@@ -36,12 +36,12 @@ TEST_F(Storage, HTTPCancelMultiple) {
         ADD_FAILURE() << "Callback should not be called";
     });
     fs.request(resource, uv_default_loop(), [&](const Response &res) {
-        EXPECT_EQ(res.status, Response::Successful);
-        EXPECT_EQ(res.data, "Hello World!");
-        EXPECT_EQ(res.expires, 0);
-        EXPECT_EQ(res.modified, 0);
-        EXPECT_EQ(res.etag, "");
-        EXPECT_EQ(res.message, "");
+        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ("Hello World!", res.data);
+        EXPECT_EQ(0, res.expires);
+        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ("", res.etag);
+        EXPECT_EQ("", res.message);
         HTTPCancelMultiple.finish();
     });
     fs.cancel(req2);

@@ -13,12 +13,12 @@ TEST_F(Storage, HTTPOtherLoop) {
     DefaultFileSource fs(nullptr);
 
     fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), [&](const Response &res) {
-        EXPECT_EQ(res.status, Response::Successful);
-        EXPECT_EQ(res.data, "Hello World!");
-        EXPECT_EQ(res.expires, 0);
-        EXPECT_EQ(res.modified, 0);
-        EXPECT_EQ(res.etag, "");
-        EXPECT_EQ(res.message, "");
+        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ("Hello World!", res.data);
+        EXPECT_EQ(0, res.expires);
+        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ("", res.etag);
+        EXPECT_EQ("", res.message);
         HTTPOtherLoop.finish();
     });
 

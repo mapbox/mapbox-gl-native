@@ -23,15 +23,15 @@ TEST_F(Storage, HTTPCoalescing) {
         if (!reference) {
             reference = &res;
         } else {
-            EXPECT_EQ(reference, &res);
+            EXPECT_EQ(&res, reference);
         }
 
-        EXPECT_EQ(res.status, Response::Successful);
-        EXPECT_EQ(res.data, "Hello World!");
-        EXPECT_EQ(res.expires, 0);
-        EXPECT_EQ(res.modified, 0);
-        EXPECT_EQ(res.etag, "");
-        EXPECT_EQ(res.message, "");
+        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ("Hello World!", res.data);
+        EXPECT_EQ(0, res.expires);
+        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ("", res.etag);
+        EXPECT_EQ("", res.message);
 
         if (counter >= total) {
             HTTPCoalescing.finish();

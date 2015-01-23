@@ -21,13 +21,13 @@ TEST_F(Storage, HTTPNoLoop) {
     });
 
     fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, [&](const Response &res) {
-        EXPECT_NE(mainThread, uv_thread_self()) << "Response was called in the same thread";
-        EXPECT_EQ(res.status, Response::Successful);
-        EXPECT_EQ(res.data, "Hello World!");
-        EXPECT_EQ(res.expires, 0);
-        EXPECT_EQ(res.modified, 0);
-        EXPECT_EQ(res.etag, "");
-        EXPECT_EQ(res.message, "");
+        EXPECT_NE(uv_thread_self(), mainThread) << "Response was called in the same thread";
+        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ("Hello World!", res.data);
+        EXPECT_EQ(0, res.expires);
+        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ("", res.etag);
+        EXPECT_EQ("", res.message);
         HTTPNoLoop.finish();
 
         uv_async_send(async);

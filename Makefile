@@ -106,8 +106,7 @@ android:
 test: build/test/Makefile
 	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
 
-test-%: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
+test-%: test
 	./scripts/run_tests.sh --gtest_filter=$*
 
 # build Mac OS X project for Xcode

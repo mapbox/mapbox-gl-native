@@ -3,6 +3,7 @@
 #include <uv.h>
 
 #include <mbgl/storage/default/default_file_source.hpp>
+#include <mbgl/platform/platform.hpp>
 
 TEST_F(Storage, EmptyFile) {
     SCOPED_TEST(EmptyFile)
@@ -11,14 +12,15 @@ TEST_F(Storage, EmptyFile) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
-    const auto file = std::string { "asset://" } + mbgl::test::getBaseDirectory() + "/fixtures/storage/empty";
-    fs.request({ Resource::Unknown, file }, uv_default_loop(), [&](const Response &res) {
-        EXPECT_EQ(res.status, Response::Successful);
-        EXPECT_EQ(res.data.size(), 0ul);
-        EXPECT_EQ(res.expires, 0);
-        EXPECT_GT(res.modified, 0);
-        EXPECT_NE(res.etag, "");
-        EXPECT_EQ(res.message, "");
+    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" },
+               uv_default_loop(),
+               [&](const Response &res) {
+        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ(0ul, res.data.size());
+        EXPECT_EQ(0, res.expires);
+        EXPECT_LT(1420000000, res.modified);
+        EXPECT_NE("", res.etag);
+        EXPECT_EQ("", res.message);
         EmptyFile.finish();
     });
 
@@ -32,14 +34,15 @@ TEST_F(Storage, NonExistentFile) {
 
     DefaultFileSource fs(nullptr, uv_default_loop());
 
-    const auto file = std::string { "asset://" } + mbgl::test::getBaseDirectory() + "/fixtures/storage/does_not_exist";
-    fs.request({ Resource::Unknown, file }, uv_default_loop(), [&](const Response &res) {
-        EXPECT_EQ(res.status, Response::Error);
-        EXPECT_EQ(res.data.size(), 0ul);
-        EXPECT_EQ(res.expires, 0);
-        EXPECT_EQ(res.modified, 0);
-        EXPECT_EQ(res.etag, "");
-        EXPECT_EQ(res.message, "no such file or directory");
+    fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" },
+               uv_default_loop(),
+               [&](const Response &res) {
+        EXPECT_EQ(Response::Error, res.status);
+        EXPECT_EQ(0ul, res.data.size());
+        EXPECT_EQ(0, res.expires);
+        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ("", res.etag);
+        EXPECT_EQ("no such file or directory", res.message);
         NonExistentFile.finish();
     });
 

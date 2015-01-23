@@ -16,20 +16,20 @@ TEST_F(Storage, CacheResponse) {
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
 
     fs.request(resource, uv_default_loop(), [&](const Response &res) {
-        EXPECT_EQ(res.status, Response::Successful);
-        EXPECT_EQ(res.data, "Response 1");
-        EXPECT_GT(res.expires, 0);
-        EXPECT_EQ(res.modified, 0);
-        EXPECT_EQ(res.etag, "");
-        EXPECT_EQ(res.message, "");
+        EXPECT_EQ(Response::Successful, res.status);
+        EXPECT_EQ("Response 1", res.data);
+        EXPECT_LT(0, res.expires);
+        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ("", res.etag);
+        EXPECT_EQ("", res.message);
 
         fs.request(resource, uv_default_loop(), [&, res](const Response &res2) {
-            EXPECT_EQ(res2.status, res.status);
-            EXPECT_EQ(res2.data, res.data);
-            EXPECT_EQ(res2.expires, res.expires);
-            EXPECT_EQ(res2.modified, res.modified);
-            EXPECT_EQ(res2.etag, res.etag);
-            EXPECT_EQ(res2.message, res.message);
+            EXPECT_EQ(res.status, res2.status);
+            EXPECT_EQ(res.data, res2.data);
+            EXPECT_EQ(res.expires, res2.expires);
+            EXPECT_EQ(res.modified, res2.modified);
+            EXPECT_EQ(res.etag, res2.etag);
+            EXPECT_EQ(res.message, res2.message);
 
             CacheResponse.finish();
         });

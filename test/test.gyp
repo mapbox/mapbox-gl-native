@@ -3,10 +3,23 @@
     '../gyp/common.gypi',
   ],
   'targets': [
+    { 'target_name': 'symlink_TEST_DATA',
+      'type': 'none',
+      'hard_dependency': 1,
+      'actions': [
+        {
+          'action_name': 'Symlink Fixture Directory',
+          'inputs': ['<!@(pwd)'],
+          'outputs': ['<(PRODUCT_DIR)/TEST_DATA'], # symlinks the test dir into TEST_DATA
+          'action': ['ln', '-s', '-f', '-n', '<@(_inputs)', '<@(_outputs)' ],
+        }
+      ],
+    },
     { 'target_name': 'test',
       'type': 'executable',
       'include_dirs': [ '../include', '../src' ],
       'dependencies': [
+        'symlink_TEST_DATA',
         '../mapboxgl.gyp:mbgl-core',
         '../mapboxgl.gyp:mbgl-<(platform)',
         '../mapboxgl.gyp:mbgl-headless',
@@ -14,7 +27,9 @@
       ],
       'sources': [
         'fixtures/main.cpp',
+        'fixtures/util.hpp',
         'fixtures/util.cpp',
+        'fixtures/fixture_log.hpp',
         'fixtures/fixture_log.cpp',
 
         'headless/headless.cpp',
@@ -30,6 +45,7 @@
         'miscellaneous/tile.cpp',
         'miscellaneous/variant.cpp',
 
+        'storage/storage.hpp',
         'storage/storage.cpp',
         'storage/cache_response.cpp',
         'storage/cache_revalidate.cpp',
