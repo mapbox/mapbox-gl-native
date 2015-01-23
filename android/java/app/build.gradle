@@ -4,7 +4,11 @@ task accessToken {
     def rawDir = new File("app/src/main/res/raw")
     rawDir.mkdirs()
     def tokenFile = new File("app/src/main/res/raw/token.txt")
-    tokenFile.write(System.getenv('MAPBOX_ACCESS_TOKEN'))
+    String token = System.getenv('MAPBOX_ACCESS_TOKEN')
+    if (token == null) {
+        throw new InvalidUserDataException("You must set the MAPBOX_ACCESS_TOKEN environment variable.")
+    }
+    tokenFile.write(token)
 }
 
 gradle.projectsEvaluated {
