@@ -41,7 +41,28 @@
             },
           }, {
             'cflags_cc': [ '-fPIC' ],
-          }]
+          }],
+          ['platform == "ios"', {
+            'xcode_settings': {
+              'SDKROOT': 'iphoneos',
+              'SUPPORTED_PLATFORMS': 'iphonesimulator iphoneos',
+              'CLANG_CXX_LIBRARY': 'libc++',
+              'CLANG_CXX_LANGUAGE_STANDARD':'c++11',
+              'IPHONEOS_DEPLOYMENT_TARGET':'7.0',
+              'TARGETED_DEVICE_FAMILY': '1,2',
+              'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
+              'CLANG_ENABLE_OBJC_ARC': 'NO',
+              'CODE_SIGN_IDENTITY': 'iPhone Developer',
+              'SKIP_INSTALL': 'YES'
+            },
+            'configurations': {
+              'Release': {
+                'xcode_settings': {
+                  'ARCHS': [ "armv7", "armv7s", "arm64", "i386", "x86_64" ],
+                },
+              },
+            },
+          }],
         ],
       }],
     ],
