@@ -92,10 +92,23 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         float scaleX = patternratio / pos.width / properties.dash_line_width;
         float scaleY = -pos.height / 2.0;
 
-        linesdfShader->u_patternscale = {{ scaleX, scaleY }};
-        linesdfShader->u_tex_y = pos.y;
+        float mix;
+        if (state.getZoom() > lastIntegerZoom) {
+            // zooming in
+            mix = fraction + (1.0f - fraction) * t;
+            scaleX /= 2.0;
+        } else {
+            // zooming out
+            mix = fraction - fraction * t;
+        }
+
+        linesdfShader->u_patternscale_a = {{ scaleX, scaleY }};
+        linesdfShader->u_tex_y_a = pos.y;
+        linesdfShader->u_patternscale_b = {{ scaleX * 2.0f, scaleY }};
+        linesdfShader->u_tex_y_b = pos.y;
         linesdfShader->u_image = 0;
         linesdfShader->u_sdfgamma = lineAtlas.width / (properties.dash_line_width * pos.width * 256.0 * state.getPixelRatio());
+        linesdfShader->u_mix = mix;
 
         bucket.drawLineSDF(*linesdfShader);
 
