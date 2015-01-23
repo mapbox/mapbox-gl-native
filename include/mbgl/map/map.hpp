@@ -32,6 +32,7 @@ class FileSource;
 class View;
 class GlyphAtlas;
 class SpriteAtlas;
+class LineAtlas;
 
 class Map : private util::noncopyable {
 public:
@@ -205,6 +206,7 @@ private:
     util::ptr<GlyphStore> glyphStore;
     const std::unique_ptr<SpriteAtlas> spriteAtlas;
     util::ptr<Sprite> sprite;
+    const std::unique_ptr<LineAtlas> lineAtlas;
     util::ptr<TexturePool> texturePool;
 
     const std::unique_ptr<Painter> painter;

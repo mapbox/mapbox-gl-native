@@ -163,6 +163,10 @@ TEST_P(HeadlessTest, render) {
         };
         const rapidjson::Value& value = it->value;
         ASSERT_TRUE(value.IsObject());
+
+        if (value.HasMember("native") && !value["native"].GetBool())
+            continue;
+
         if (value.HasMember("center")) ASSERT_TRUE(value["center"].IsArray());
 
         const std::string actual_image = base_directory + "tests/" + base + "/" + name +  "/actual.png";

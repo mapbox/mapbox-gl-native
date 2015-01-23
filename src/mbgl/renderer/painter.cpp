@@ -24,9 +24,10 @@ using namespace mbgl;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(SpriteAtlas& spriteAtlas_, GlyphAtlas& glyphAtlas_)
+Painter::Painter(SpriteAtlas& spriteAtlas_, GlyphAtlas& glyphAtlas_, LineAtlas& lineAtlas_)
     : spriteAtlas(spriteAtlas_)
     , glyphAtlas(glyphAtlas_)
+    , lineAtlas(lineAtlas_)
 {
 }
 
@@ -93,6 +94,7 @@ void Painter::setupShaders() {
     if (!outlineShader) outlineShader = util::make_unique<OutlineShader>();
     if (!lineShader) lineShader = util::make_unique<LineShader>();
     if (!linejoinShader) linejoinShader = util::make_unique<LinejoinShader>();
+    if (!linesdfShader) linesdfShader = util::make_unique<LineSDFShader>();
     if (!linepatternShader) linepatternShader = util::make_unique<LinepatternShader>();
     if (!patternShader) patternShader = util::make_unique<PatternShader>();
     if (!iconShader) iconShader = util::make_unique<IconShader>();

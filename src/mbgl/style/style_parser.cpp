@@ -209,6 +209,24 @@ Color parseColor(JSVal value) {
                   css_color.a}};
 }
 
+std::tuple<bool,std::vector<float>> parseFloatArray(JSVal value) {
+    if (!value.IsArray()) {
+        Log::Warning(Event::ParseStyle, "dasharray value must be an array of numbers");
+        return std::tuple<bool, std::vector<float>> { false, std::vector<float>() };
+    }
+
+    std::vector<float> vec;
+    for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+        JSVal part = value[i];
+        if (!part.IsNumber()) {
+            Log::Warning(Event::ParseStyle, "dasharray value must be an array of numbers");
+            return std::tuple<bool, std::vector<float>> { false, std::vector<float>() };
+        }
+        vec.push_back(part.GetDouble());
+    }
+    return std::tuple<bool, std::vector<float>> { true, vec };
+}
+
 template <>
 bool StyleParser::parseFunctionArgument(JSVal value) {
     JSVal rvalue = replaceConstant(value);
@@ -237,6 +255,12 @@ template <>
 Color StyleParser::parseFunctionArgument(JSVal value) {
     JSVal rvalue = replaceConstant(value);
     return parseColor(rvalue);
+}
+
+template <>
+std::vector<float> StyleParser::parseFunctionArgument(JSVal value) {
+    JSVal rvalue = replaceConstant(value);
+    return std::get<1>(parseFloatArray(rvalue));
 }
 
 template <typename T> inline float defaultBaseValue() { return 1.75; }
@@ -293,17 +317,6 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
 
 
 template <typename T>
-bool StyleParser::parseFunction(PropertyKey key, ClassProperties &klass, JSVal value) {
-    bool parsed;
-    Function<T> function;
-    std::tie(parsed, function) = parseFunction<T>(value);
-    if (parsed) {
-        klass.set(key, function);
-    }
-    return parsed;
-}
-
-template <typename T>
 bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass) {
     bool parsed;
     T result;
@@ -314,33 +327,12 @@ bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKe
     return parsed;
 }
 
-template <typename T>
-bool StyleParser::setProperty(JSVal value, const char *property_name, T &target) {
-    bool parsed;
-    T result;
-    std::tie(parsed, result) = parseProperty<T>(value, property_name);
-    if (parsed) {
-        target = std::move(result);
-    }
-    return parsed;
-}
-
-
 template<typename T>
 bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value) {
     if (!value.HasMember(property_name)) {
         return false;
     } else {
         return setProperty<T>(replaceConstant(value[property_name]), property_name, key, klass);
-    }
-}
-
-template <typename T>
-bool StyleParser::parseOptionalProperty(const char *property_name, T &target, JSVal value) {
-    if (!value.HasMember(property_name)) {
-         return false;
-    } else {
-        return setProperty<T>(replaceConstant(value[property_name]), property_name, target);
     }
 }
 
@@ -426,6 +418,18 @@ template<> std::tuple<bool, Function<Color>> StyleParser::parseProperty(JSVal va
     }
 }
 
+template<> std::tuple<bool, Function<std::vector<float>>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+    if (value.IsObject()) {
+        return parseFunction<std::vector<float>>(value);
+    } else if (value.IsArray()) {
+        std::tuple<bool, std::vector<float>> parsed = parseFloatArray(value);
+        return std::tuple<bool, Function<std::vector<float>>> { std::get<0>(parsed), ConstantFunction<std::vector<float>>(std::get<1>(parsed)) };
+    } else {
+        Log::Warning(Event::ParseStyle, "value of '%s' must be an array of numbers, or a number array function", property_name);
+        return std::tuple<bool, Function<std::vector<float>>> { false, ConstantFunction<std::vector<float>>(std::vector<float>()) };
+    }
+}
+
 template <typename T>
 bool StyleParser::parseOptionalProperty(const char *property_name, const std::vector<PropertyKey> &keys, ClassProperties &klass, JSVal value) {
     if (value.HasMember(property_name)) {
@@ -490,10 +494,6 @@ util::ptr<StyleLayer> StyleParser::createLayer(JSVal value) {
         util::ptr<StyleLayer> layer = std::make_shared<StyleLayer>(
             layer_id, std::move(paints));
 
-        if (value.HasMember("layers")) {
-            layer->layers = createLayers(value["layers"]);
-        }
-
         // Store the layer ID so we can reference it later.
         layers.emplace(layer_id, std::pair<JSVal, util::ptr<StyleLayer>> { value, layer });
 
@@ -523,7 +523,7 @@ void StyleParser::parseLayer(std::pair<JSVal, util::ptr<StyleLayer>> &pair) {
         }
     }
 
-    if (layer->bucket || (layer->layers && layer->type != StyleLayerType::Raster)) {
+    if (layer->bucket) {
         // Skip parsing this again. We already have a valid layer definition.
         return;
     }
@@ -588,8 +588,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("line-gap-width-transition", Key::LineGapWidth, klass, value);
     parseOptionalProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("line-blur-transition", Key::LineBlur, klass, value);
-    parseOptionalProperty<Function<float>>("line-dasharray", { Key::LineDashLand, Key::LineDashGap }, klass, value);
-    parseOptionalProperty<PropertyTransition>("line-dasharray-transition", Key::LineDashArray, klass, value);
+    parseOptionalProperty<Function<std::vector<float>>>("line-dasharray", Key::LineDashArray, klass, value);
     parseOptionalProperty<std::string>("line-image", Key::LineImage, klass, value);
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
@@ -661,18 +660,9 @@ void StyleParser::parseReference(JSVal value, util::ptr<StyleLayer> &layer) {
     parseLayer(it->second);
     stack.pop_front();
 
-
     util::ptr<StyleLayer> reference = it->second.second;
-
     layer->type = reference->type;
-
-    if (reference->layers) {
-        Log::Warning(Event::ParseStyle, "layer '%s' references composite layer", layer->id.c_str());
-        // We cannot parse this layer further.
-        return;
-    } else {
-        layer->bucket = reference->bucket;
-    }
+    layer->bucket = reference->bucket;
 }
 
 #pragma mark - Parse Bucket
@@ -810,17 +800,6 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleLayer> &layer) {
         parseRenderProperty(value, render.text.allow_overlap, "text-allow-overlap");
         parseRenderProperty(value, render.text.ignore_placement, "text-ignore-placement");
         parseRenderProperty(value, render.text.optional, "text-optional");
-    } break;
-
-    case StyleLayerType::Raster: {
-        StyleBucketRaster &render = bucket.render.get<StyleBucketRaster>();
-
-        parseRenderProperty(value, render.size, "raster-size");
-        parseRenderProperty(value, render.blur, "raster-blur");
-        parseRenderProperty(value, render.buffer, "raster-buffer");
-        if (layer->layers) {
-            render.prerendered = true;
-        }
     } break;
 
     default:

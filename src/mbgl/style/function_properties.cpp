@@ -12,6 +12,7 @@ inline T defaultStopsValue();
 template <> inline bool defaultStopsValue() { return true; }
 template <> inline float defaultStopsValue() { return 1.0f; }
 template <> inline Color defaultStopsValue() { return {{ 0, 0, 0, 1 }}; }
+template <> inline std::vector<float> defaultStopsValue() { return {{ 1, 0 }}; }
 
 
 template <typename T>
@@ -64,5 +65,6 @@ T StopsFunction<T>::evaluate(float z) const {
 template bool StopsFunction<bool>::evaluate(float z) const;
 template float StopsFunction<float>::evaluate(float z) const;
 template Color StopsFunction<Color>::evaluate(float z) const;
+template std::vector<float> StopsFunction<std::vector<float>>::evaluate(float z) const;
 
 }

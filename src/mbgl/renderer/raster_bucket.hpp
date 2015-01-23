@@ -3,7 +3,6 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/util/raster.hpp>
-#include <mbgl/renderer/prerendered_texture.hpp>
 #include <mbgl/style/style_bucket.hpp>
 
 
@@ -24,7 +23,6 @@ public:
     bool setImage(const std::string &data);
 
     const StyleBucketRaster &properties;
-    PrerenderedTexture texture;
 
     void drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array);
 

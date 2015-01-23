@@ -5,7 +5,6 @@
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/ptr.hpp>
-#include <mbgl/renderer/prerendered_texture.hpp>
 
 #include <string>
 #include <mutex>

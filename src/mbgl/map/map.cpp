@@ -20,6 +20,7 @@
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
+#include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
@@ -99,8 +100,9 @@ Map::Map(View& view_, FileSource& fileSource_)
       glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
       glyphStore(std::make_shared<GlyphStore>(fileSource)),
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
+      lineAtlas(util::make_unique<LineAtlas>(512, 512)),
       texturePool(std::make_shared<TexturePool>()),
-      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas))
+      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas))
 {
     view.initialize(this);
     // Make sure that we're doing an initial drawing in all cases.
@@ -662,12 +664,8 @@ void Map::updateSources(const util::ptr<StyleLayerGroup> &group) {
     }
     for (const util::ptr<StyleLayer> &layer : group->layers) {
         if (!layer) continue;
-        if (layer->bucket) {
-            if (layer->bucket->style_source) {
-                (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
-            }
-        } else if (layer->layers) {
-            updateSources(layer->layers);
+        if (layer->bucket && layer->bucket->style_source) {
+            (*activeSources.emplace(layer->bucket->style_source).first)->enabled = true;
         }
     }
 }

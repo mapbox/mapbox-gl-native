@@ -51,11 +51,6 @@ void StyleLayer::setClasses(const std::vector<std::string> &class_names, const t
             appliedProperties.add(ClassID::Fallback, begin, end, value);
         }
     }
-
-    // Update all child layers as well.
-    if (layers) {
-        layers->setClasses(class_names, now, defaultTransition);
-    }
 }
 
 // Helper function for applying all properties of a a single class that haven't been applied yet.
@@ -185,9 +180,11 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const times
     applyTransitionedStyleProperty(PropertyKey::LineWidth, line.width, z, now);
     applyTransitionedStyleProperty(PropertyKey::LineGapWidth, line.gap_width, z, now);
     applyTransitionedStyleProperty(PropertyKey::LineBlur, line.blur, z, now);
-    applyTransitionedStyleProperty(PropertyKey::LineDashLand, line.dash_array[0], z, now);
-    applyTransitionedStyleProperty(PropertyKey::LineDashGap, line.dash_array[1], z, now);
+    applyStyleProperty(PropertyKey::LineDashArray, line.dash_array, z, now);
     applyStyleProperty(PropertyKey::LineImage, line.image, z, now);
+
+    // for scaling dasharrays
+    applyStyleProperty(PropertyKey::LineWidth, line.dash_line_width, std::floor(z), now + 10000);
 }
 
 template <>
@@ -239,10 +236,6 @@ void StyleLayer::applyStyleProperties<BackgroundProperties>(const float z, const
 }
 
 void StyleLayer::updateProperties(float z, const timestamp now) {
-    if (layers) {
-        layers->updateProperties(z, now);
-    }
-
     cleanupAppliedStyleProperties(now);
 
     switch (type) {
