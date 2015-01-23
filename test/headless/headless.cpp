@@ -4,7 +4,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/std.hpp>
-#include <mbgl/platform/platform.hpp>
 
 #include <mbgl/util/io.hpp>
 #include <rapidjson/document.h>
@@ -30,7 +29,7 @@ void rewriteLocalScheme(rapidjson::Value &value, rapidjson::Document::AllocatorT
 class HeadlessTest : public ::testing::TestWithParam<std::string> {
 public:
     static void SetUpTestCase() {
-        const auto server = mbgl::platform::applicationRoot() + "/TEST_DATA/headless/server.js";
+        const auto server = mbgl::test::getBaseDirectory() + "/headless/server.js";
         pid = mbgl::test::startServer(server.c_str());
         display = std::make_shared<mbgl::HeadlessDisplay>();
     }
