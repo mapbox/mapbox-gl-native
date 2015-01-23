@@ -48,7 +48,8 @@
                     '<(platform)',
                     '<@(sqlite3_static_libs)',
                     '<@(sqlite3_ldflags)',
-                    '<@(curl_ldflags)',
+                    '<@(curl_static_libs)',
+                    '<@(boringssl_static_libs)',
                     '<@(png_ldflags)',
                     '<@(other_ldflags)'
                 ]

@@ -29,7 +29,8 @@ case ${MASON_PLATFORM} in
         SQLITE_VERSION=3.8.6
         LIBPNG_VERSION=1.6.13
         LIBJPEG_VERSION=v8d
-        LIBCURL_VERSION=system
+        LIBCURL_VERSION=7.38.0-boringssl
+        BORINGSSL_VERSION=d3bcf13
         LIBUV_VERSION=0.10.28
         ZLIB_VERSION=system
         BOOST_VERSION=system
@@ -76,6 +77,15 @@ if [ ! -z ${LIBCURL_VERSION} ]; then
     CONFIG+="    'curl_ldflags': $(quote_flags $(mason ldflags libcurl ${LIBCURL_VERSION})),"$LN
 else
     CONFIG+="    'curl_static_libs': [],"$LN
+fi
+
+if [ ! -z ${BORINGSSL_VERSION} ]; then
+    mason install boringssl ${BORINGSSL_VERSION}
+    CONFIG+="    'boringssl_static_libs': $(quote_flags $(mason static_libs boringssl ${BORINGSSL_VERSION})),"$LN
+    CONFIG+="    'boringssl_cflags': $(quote_flags $(mason cflags boringssl ${BORINGSSL_VERSION})),"$LN
+    CONFIG+="    'boringssl_ldflags': $(quote_flags $(mason ldflags boringssl ${BORINGSSL_VERSION})),"$LN
+else
+    CONFIG+="    'boringssl_static_libs': [],"$LN
 fi
 
 if [ ! -z ${GLFW_VERSION} ]; then
