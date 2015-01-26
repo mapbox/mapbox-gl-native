@@ -2,6 +2,7 @@
 #include <sqlite3.h>
 
 #include <cassert>
+#include <cstring>
 
 // Check sqlite3 library version.
 const static bool sqliteVersionCheck = []() {

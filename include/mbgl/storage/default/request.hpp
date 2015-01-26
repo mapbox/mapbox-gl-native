@@ -7,6 +7,7 @@
 #include <mbgl/util/noncopyable.hpp>
 
 #include <functional>
+#include <memory>
 
 typedef struct uv_async_s uv_async_t;
 typedef struct uv_loop_s uv_loop_t;
