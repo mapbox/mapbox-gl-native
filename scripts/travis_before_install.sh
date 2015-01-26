@@ -12,31 +12,31 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     fi
     sudo add-apt-repository --yes ppa:boost-latest/ppa
 
-    mapbox_time "apt_update"
+    mapbox_time "apt_update" \
     sudo apt-get update -y
 
-    echo "install_gcc"
+    mapbox_time "install_gcc" \
     sudo apt-get -y install gcc-4.8 g++-4.8
 
-    echo "install_build_tools"
+    mapbox_time "install_build_tools" \
     sudo apt-get -y install git build-essential zlib1g-dev automake gdb \
                             libtool xutils-dev make cmake pkg-config python-pip \
                             libboost1.55-dev libcurl4-openssl-dev \
                             libpng-dev libsqlite3-dev
 
     if [[ ${MASON_PLATFORM} != "android" ]]; then
-        echo "install_opengl"
+        mapbox_time "install_opengl" \
         sudo apt-get -y install mesa-utils libxi-dev x11proto-randr-dev \
                                 x11proto-xext-dev libxrandr-dev \
                                 x11proto-xf86vidmode-dev libxxf86vm-dev \
                                 libxcursor-dev libxinerama-dev \
                                 llvm-3.4 # required for mesa
 
-        echo "install_mesa"
+        mapbox_time "install_mesa" \
         MASON_PLATFORM= mason install mesa 10.3.1
     fi
 
-    echo "install_awscli"
+    mapbox_time "install_awscli" \
     sudo pip install awscli
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     #
