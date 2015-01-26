@@ -161,6 +161,10 @@ void GLFWView::initialize(mbgl::Map *map_) {
                 assert(gl::ProgramParameteri != nullptr);
             }
         }
+
+        // Require packed depth stencil
+        gl::isPackedDepthStencilSupported = true;
+        gl::isDepth24Supported = true;
     }
 
     glfwMakeContextCurrent(nullptr);

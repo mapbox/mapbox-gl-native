@@ -41,11 +41,11 @@ private:
     void removeBackoffTimer();
 
 private:
-    const std::thread::id thread_id;
+    const std::thread::id threadId;
     uv_loop_t *const loop;
-    CacheRequestBaton *cache_baton = nullptr;
-    util::ptr<HTTPRequestBaton> http_baton;
-    uv_timer_t *backoff_timer = nullptr;
+    CacheRequestBaton *cacheBaton = nullptr;
+    util::ptr<HTTPRequestBaton> httpBaton;
+    uv_timer_t *backoffTimer = nullptr;
     util::ptr<SQLiteStore> store;
     const ResourceType type;
     uint8_t attempts = 0;

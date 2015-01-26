@@ -18,7 +18,8 @@
     #else
         #error Unsupported Apple platform
     #endif
-#elif MBGL_USE_GLES2
+#elif __ANDROID__
+    #define GL_GLEXT_PROTOTYPES
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>
 #else
@@ -35,6 +36,13 @@ struct Error : ::std::runtime_error {
     const GLenum code;
 };
 
+void checkError(const char *cmd, const char *file, int line);
+
+#if defined(DEBUG)
+#define MBGL_CHECK_ERROR(cmd) ([&]() { struct _ { inline ~_() { ::mbgl::gl::checkError(#cmd, __FILE__, __LINE__); } } _; return cmd; }())
+#else
+#define MBGL_CHECK_ERROR(cmd) (cmd)
+#endif
 
 // GL_KHR_debug / GL_ARB_debug_output
 #define GL_DEBUG_OUTPUT_SYNCHRONOUS       0x8242
@@ -136,6 +144,14 @@ extern PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays;
 extern PFNGLGENVERTEXARRAYSPROC GenVertexArrays;
 extern PFNGLISVERTEXARRAYPROC IsVertexArray;
 
+// GL_EXT_packed_depth_stencil / GL_OES_packed_depth_stencil
+extern bool isPackedDepthStencilSupported;
+#define GL_DEPTH24_STENCIL8 0x88F0
+
+// GL_OES_depth24
+extern bool isDepth24Supported;
+#define GL_DEPTH_COMPONENT24 0x81A6
+
 // GL_ARB_get_program_binary / GL_OES_get_program_binary
 #define GL_PROGRAM_BINARY_RETRIEVABLE_HINT 0x8257
 #define GL_PROGRAM_BINARY_LENGTH           0x8741
@@ -153,9 +169,9 @@ extern PFNGLPROGRAMPARAMETERIPROC ProgramParameteri;
 // static int indent = 0;
 inline void start_group(const std::string &str) {
     if (gl::PushDebugGroup != nullptr) {
-        gl::PushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, GLsizei(str.size()), str.c_str());
+        MBGL_CHECK_ERROR(gl::PushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, GLsizei(str.size()), str.c_str()));
     } else if (gl::PushGroupMarkerEXT != nullptr) {
-        gl::PushGroupMarkerEXT(GLsizei(str.size()), str.c_str());
+        MBGL_CHECK_ERROR(gl::PushGroupMarkerEXT(GLsizei(str.size()), str.c_str()));
     }
     // fprintf(stderr, "%s%s\n", std::string(indent * 4, ' ').c_str(), str.c_str());
     // indent++;
@@ -163,9 +179,9 @@ inline void start_group(const std::string &str) {
 
 inline void end_group() {
     if (gl::PopDebugGroup != nullptr) {
-        gl::PopDebugGroup();
+        MBGL_CHECK_ERROR(gl::PopDebugGroup());
     } else if (gl::PopGroupMarkerEXT != nullptr) {
-        gl::PopGroupMarkerEXT();
+        MBGL_CHECK_ERROR(gl::PopGroupMarkerEXT());
     }
     // indent--;
 }
@@ -174,13 +190,10 @@ inline void start_group(const std::string &) {}
 inline void end_group() {}
 #endif
 
-
 struct group {
     inline group(const std::string &str) { start_group(str); }
     ~group() { end_group(); };
 };
-
-void checkError(const char *cmd, const char *file, int line);
 
 }
 }
@@ -188,12 +201,6 @@ void checkError(const char *cmd, const char *file, int line);
 #ifdef GL_ES_VERSION_2_0
     #define glClearDepth glClearDepthf
     #define glDepthRange glDepthRangef
-#endif
-
-#if defined(DEBUG)
-#define MBGL_CHECK_ERROR(cmd) ([&]() { struct _ { inline ~_() { ::mbgl::gl::checkError(#cmd, __FILE__, __LINE__); } } _; return cmd; }())
-#else
-#define MBGL_CHECK_ERROR(cmd) (cmd)
 #endif
 
 #endif

@@ -2,6 +2,7 @@ BUILDTYPE ?= Release
 PYTHON ?= python
 V ?= 1
 PREFIX ?= /usr/local
+JOBS ?= 1
 
 ifeq ($(shell uname -s), Darwin)
 PLATFORM ?= osx
@@ -74,8 +75,33 @@ build/linux/mapboxgl-app.xcodeproj: linux/mapboxgl-app.gyp config.gypi
 	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=linux --depth=. --generator-output=./build -f xcode
 
 .PHONY: build/bin/render.xcodeproj
-build/bin/render.xcodeproj: bin/render.gyp config.gypi
+	build/bin/render.xcodeproj: bin/render.gyp config.gypi
 	deps/run_gyp bin/render.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. --generator-output=./build -f xcode
+
+.PHONY: android
+android:
+	./scripts/local_mason.sh && \
+	MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env PATH && \
+	export CXX="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CXX`" && \
+	export CC="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CC`" && \
+	export LD="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env LD`" && \
+	export LINK="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CXX`" && \
+	export AR="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env AR`" && \
+	export RANLIB="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env RANLIB`" && \
+	export LDFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env LDFLAGS` ${LDFLAGS}" && \
+	export CFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CFLAGS` ${CFLAGS}" && \
+	export CPPFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CPPFLAGS` ${CPPFLAGS}" && \
+	export PATH="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env PATH`:${PATH}" && \
+	MASON_PLATFORM=android ./configure config-android.gypi && \
+	deps/run_gyp android/mapboxgl-app.gyp -Iconfig-android.gypi -Dplatform=android --depth=. --generator-output=./build/android -f make-android && \
+	$(MAKE) -C build/android -j$(JOBS) BUILDTYPE=$(BUILDTYPE) V=$(V) androidapp && \
+	mkdir -p android/java/lib/src/main/jniLibs/armeabi-v7a && \
+	cp build/android/out/$(BUILDTYPE)/lib.target/libmapbox-gl.so android/java/lib/src/main/jniLibs/armeabi-v7a/libmapbox-gl.so && \
+	mkdir -p android/java/lib/src/main/assets && \
+	cp build/android/out/$(BUILDTYPE)/ca-bundle.crt android/java/lib/src/main/assets/ca-bundle.crt && \
+	cp -r build/android/out/$(BUILDTYPE)/styles android/java/lib/src/main/assets/styles && \
+	cd android/java && \
+	./gradlew --parallel-threads=$(JOBS) build
 
 ##### Test cases ###############################################################
 
@@ -157,7 +183,10 @@ clean: clear_sqlite_cache clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
 	-rm -rf ./macosx/build/
-	-rm -rf ./config.gypi ./config-ios.gypi
+	-rm -rf ./config.gypi ./config-ios.gypi ./config-android.gypi
+	-rm -rf ./android/java/build ./android/java/app/build ./android/java/lib/build
+	-rm -rf ./android/java/lib/src/main/jniLibs ./android/java/lib/src/main/assets
+	-rm -f ./android/test/features.zip
 
 distclean: clean
 	-rm -rf ./mason_packages

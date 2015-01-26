@@ -18,7 +18,7 @@ NSURLSession *session = nullptr;
 NSString *userAgent = nil;
 
 void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
-    assert(std::this_thread::get_id() == ptr->thread_id);
+    assert(std::this_thread::get_id() == ptr->threadId);
 
     // Starts the request.
     util::ptr<HTTPRequestBaton> baton = ptr;
@@ -144,7 +144,7 @@ void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
 }
 
 void HTTPRequestBaton::stop(const util::ptr<HTTPRequestBaton> &ptr) {
-    assert(std::this_thread::get_id() == ptr->thread_id);
+    assert(std::this_thread::get_id() == ptr->threadId);
     assert(ptr->ptr);
 
     NSURLSessionDataTask *task = CFBridgingRelease(ptr->ptr);

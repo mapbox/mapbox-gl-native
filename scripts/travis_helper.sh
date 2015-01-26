@@ -32,6 +32,26 @@ function mapbox_time {
     mapbox_time_finish $name $timer_id
 }
 
+if [[ "${TRAVIS_COMMIT:-false}" == false ]]; then
+function travis_fold {
+  local action=$1
+  local name=$2
+  echo -en "travis_fold:${action}:${name}\r${ANSI_CLEAR}"
+}
+function travis_nanoseconds {
+  local cmd="date"
+  local format="+%s%N"
+  local os=$(uname)
+
+  if hash gdate > /dev/null 2>&1; then
+    cmd="gdate" # use gdate if available
+  elif [[ "$os" = Darwin ]]; then
+    format="+%s000000000" # fallback to second precision on darwin (does not support %N)
+  fi
+
+  $cmd -u $format
+}
+fi
 
 export ANSI_CLEAR
 export -f travis_fold

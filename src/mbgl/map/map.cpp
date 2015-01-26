@@ -24,6 +24,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/uv.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -133,7 +134,7 @@ uv::worker &Map::getWorker() {
     return *workers;
 }
 
-void Map::start() {
+void Map::start(bool startPaused) {
     assert(std::this_thread::get_id() == mainThread);
     assert(mode == Mode::None);
 
@@ -154,6 +155,8 @@ void Map::start() {
         activeSources.clear();
 
         fileSource.clearLoop();
+
+        terminating = true;
 
         // Closes all open handles on the loop. This means that the loop will automatically terminate.
         asyncRender.reset();
@@ -178,6 +181,11 @@ void Map::start() {
             }
         }
     });
+
+    // Do we need to pause first?
+    if (startPaused) {
+        pause();
+    }
 
     thread = std::thread([this]() {
 #ifndef NDEBUG
@@ -207,6 +215,8 @@ void Map::stop(std::function<void ()> callback) {
 
     asyncTerminate->send();
 
+    resume();
+
     if (callback) {
         // Wait until the render thread stopped. We are using this construct instead of plainly
         // relying on the thread_join because the system might need to run things in the current
@@ -226,6 +236,34 @@ void Map::stop(std::function<void ()> callback) {
     mode = Mode::None;
 }
 
+void Map::pause(bool waitForPause) {
+    assert(std::this_thread::get_id() == mainThread);
+    assert(mode == Mode::Continuous);
+    mutexRun.lock();
+    pausing = true;
+    mutexRun.unlock();
+
+    uv_stop(**loop);
+    rerender(); // Needed to ensure uv_stop is seen and uv_run exits, otherwise we deadlock on wait_for_pause
+
+    if (waitForPause) {
+        std::unique_lock<std::mutex> lockPause (mutexPause);
+        while (!isPaused) {
+            condPause.wait(lockPause);
+        }
+    }
+}
+
+void Map::resume() {
+    assert(std::this_thread::get_id() == mainThread);
+    assert(mode == Mode::Continuous);
+
+    mutexRun.lock();
+    pausing = false;
+    condRun.notify_all();
+    mutexRun.unlock();
+}
+
 void Map::run() {
     if (mode == Mode::None) {
 #ifndef NDEBUG
@@ -235,9 +273,23 @@ void Map::run() {
     }
     assert(std::this_thread::get_id() == mapThread);
 
+    if (mode == Mode::Continuous) {
+        checkForPause();
+    }
+
+    view.activate();
     setup();
     prepare();
-    uv_run(**loop, UV_RUN_DEFAULT);
+
+    if (mode == Mode::Continuous) {
+        terminating = false;
+        while(!terminating) {
+            uv_run(**loop, UV_RUN_DEFAULT);
+            checkForPause();
+        }
+    } else {
+        uv_run(**loop, UV_RUN_DEFAULT);
+    }
 
     // Run the event loop once more to make sure our async delete handlers are called.
     uv_run(**loop, UV_RUN_ONCE);
@@ -252,6 +304,28 @@ void Map::run() {
         mode = Mode::None;
         fileSource.clearLoop();
     }
+
+    view.deactivate();
+}
+
+void Map::checkForPause() {
+    std::unique_lock<std::mutex> lockRun (mutexRun);
+    while (pausing) {
+        view.deactivate();
+
+        mutexPause.lock();
+        isPaused = true;
+        condPause.notify_all();
+        mutexPause.unlock();
+
+        condRun.wait(lockRun);
+
+        view.activate();
+    }
+
+    mutexPause.lock();
+    isPaused = false;
+    mutexPause.unlock();
 }
 
 void Map::rerender() {
@@ -282,7 +356,6 @@ void Map::swapped() {
 
 void Map::terminate() {
     assert(painter);
-    view.activate();
     painter->terminate();
     view.deactivate();
 }
@@ -292,14 +365,17 @@ void Map::terminate() {
 void Map::setup() {
     assert(std::this_thread::get_id() == mapThread);
     assert(painter);
-    view.activate();
     painter->setup();
-    view.deactivate();
 }
 
 void Map::setStyleURL(const std::string &url) {
     // TODO: Make threadsafe.
+
     styleURL = url;
+    if (mode == Mode::Continuous) {
+        stop();
+        start();
+    }
 }
 
 
@@ -310,10 +386,14 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     if (!style) {
         style = std::make_shared<Style>();
     }
+
     style->loadJSON((const uint8_t *)styleJSON.c_str());
     style->cascadeClasses(classes);
     fileSource.setBase(base);
     glyphStore->setURL(style->glyph_url);
+
+    style->setDefaultTransitionDuration(defaultTransitionDuration);
+
     update();
 }
 
@@ -338,8 +418,8 @@ void Map::resize(uint16_t width, uint16_t height, float ratio) {
     resize(width, height, ratio, width * ratio, height * ratio);
 }
 
-void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height) {
-    if (transform.resize(width, height, ratio, fb_width, fb_height)) {
+void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight) {
+    if (transform.resize(width, height, ratio, fbWidth, fbHeight)) {
         update();
     }
 }
@@ -539,7 +619,14 @@ std::vector<std::string> Map::getClasses() const {
 }
 
 void Map::setDefaultTransitionDuration(uint64_t milliseconds) {
-    style->setDefaultTransitionDuration(milliseconds);
+    defaultTransitionDuration = milliseconds;
+    if (style) {
+        style->setDefaultTransitionDuration(milliseconds);
+    }
+}
+
+uint64_t Map::getDefaultTransitionDuration() {
+    return defaultTransitionDuration;
 }
 
 void Map::updateSources() {
@@ -636,8 +723,6 @@ void Map::prepare() {
 }
 
 void Map::render() {
-    view.activate();
-
     assert(painter);
     painter->render(*style, activeSources,
                    state, animationTime);
@@ -645,6 +730,4 @@ void Map::render() {
     if (transform.needsTransition() || style->hasTransitions()) {
         update();
     }
-
-    view.deactivate();
 }

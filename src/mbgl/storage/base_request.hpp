@@ -46,7 +46,7 @@ public:
     virtual void retryImmediately();
 
 public:
-    const std::thread::id thread_id;
+    const std::thread::id threadId;
     const std::string path;
     std::unique_ptr<Response> response;
 

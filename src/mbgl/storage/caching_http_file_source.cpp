@@ -2,6 +2,7 @@
 #include <mbgl/storage/asset_request.hpp>
 #include <mbgl/storage/http_request.hpp>
 #include <mbgl/storage/sqlite_store.hpp>
+#include <mbgl/storage/asset_request.hpp>
 #include <mbgl/util/uv-messenger.h>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/std.hpp>
@@ -19,7 +20,7 @@ CachingHTTPFileSource::~CachingHTTPFileSource() {
 void CachingHTTPFileSource::setLoop(uv_loop_t* loop_) {
     assert(!loop);
 
-    thread_id = std::this_thread::get_id();
+    threadId = std::this_thread::get_id();
     store = !path.empty() ? util::ptr<SQLiteStore>(new SQLiteStore(loop_, path)) : nullptr;
     loop = loop_;
     queue = new uv_messenger_t;
@@ -36,7 +37,7 @@ bool CachingHTTPFileSource::hasLoop() {
 }
 
 void CachingHTTPFileSource::clearLoop() {
-    assert(thread_id == std::this_thread::get_id());
+    assert(std::this_thread::get_id() == threadId);
     assert(loop);
 
     uv_messenger_stop(queue, [](uv_messenger_t *msgr) {
@@ -67,8 +68,12 @@ void CachingHTTPFileSource::setAccessToken(std::string value) {
     accessToken.swap(value);
 }
 
+std::string CachingHTTPFileSource::getAccessToken() const {
+    return accessToken;
+}
+
 std::unique_ptr<Request> CachingHTTPFileSource::request(ResourceType type, const std::string& url_) {
-    assert(thread_id == std::this_thread::get_id());
+    assert(std::this_thread::get_id() == threadId);
 
     std::string url = url_;
 
@@ -108,7 +113,7 @@ std::unique_ptr<Request> CachingHTTPFileSource::request(ResourceType type, const
 }
 
 void CachingHTTPFileSource::prepare(std::function<void()> fn) {
-    if (thread_id == std::this_thread::get_id()) {
+    if (std::this_thread::get_id() == threadId) {
         fn();
     } else {
         uv_messenger_send(queue, new std::function<void()>(std::move(fn)));

@@ -24,16 +24,17 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
                             libboost1.55-dev libcurl4-openssl-dev \
                             libpng-dev libsqlite3-dev
 
-    mapbox_time "install_opengl" \
-    sudo apt-get -y install mesa-utils libxi-dev x11proto-randr-dev \
-                            x11proto-xext-dev libxrandr-dev \
-                            x11proto-xf86vidmode-dev libxxf86vm-dev \
-                            libxcursor-dev libxinerama-dev \
-                            llvm-3.4 # required for mesa
+    if [[ ${MASON_PLATFORM} != "android" ]]; then
+        mapbox_time "install_opengl" \
+        sudo apt-get -y install mesa-utils libxi-dev x11proto-randr-dev \
+                                x11proto-xext-dev libxrandr-dev \
+                                x11proto-xf86vidmode-dev libxxf86vm-dev \
+                                libxcursor-dev libxinerama-dev \
+                                llvm-3.4 # required for mesa
 
-
-    mapbox_time "install_mesa" \
-    mason install mesa 10.3.1
+        mapbox_time "install_mesa" \
+        mason install mesa 10.3.1
+    fi
 
     mapbox_time "install_awscli" \
     sudo pip install awscli

@@ -1,0 +1,21 @@
+# Gradle files
+.gradle/
+
+# IntelliJ files
+.idea
+*.iml
+
+# Build files
+build/
+*/build/
+*.so
+*.apk
+
+# Lib assets
+lib/src/main/assets/
+
+# Local settings
+local.properties
+
+# Token file
+app/src/main/res/raw/token.txt

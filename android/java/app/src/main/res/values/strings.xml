@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Mapbox GL</string>
+
+    <string name="action_gps">Toggle GPS location</string>
+
+    <string name="action_debug">Toggle debug mode</string>
+
+    <string name="label_fps">FPS:</string>
+
+    <string name="compass_desc">Map compass. Click to reset the map rotation to North.</string>
+
+    <string-array name="style_list">
+        <item>Bright</item>
+        <item>Basic</item>
+        <item>Outdoors</item>
+        <item>Satellite</item>
+        <!--<item>Pencil</item>-->
+        <!--<item>Empty</item>-->
+    </string-array>
+
+</resources>

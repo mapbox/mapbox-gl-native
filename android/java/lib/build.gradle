@@ -1,0 +1,47 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    repositories {
+        jcenter()
+    }
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 21
+        versionCode 3
+        versionName "0.1.2"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    lintOptions {
+        checkAllWarnings true
+    }
+
+    buildTypes {
+        debug {
+            jniDebuggable true
+        }
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+configurations {
+    all*.exclude group: 'commons-logging', module: 'commons-logging'
+}
+
+dependencies {
+    compile 'commons-validator:commons-validator:1.4.0'
+    compile 'com.android.support:support-annotations:21.0.3'
+    compile 'com.android.support:support-v4:21.0.3'
+}

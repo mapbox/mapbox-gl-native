@@ -1,7 +1,7 @@
 [![Travis](https://api.travis-ci.org/mapbox/mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/mapbox-gl-native/builds)
 
 An OpenGL renderer for [Mapbox Vector Tiles](https://www.mapbox.com/blog/vector-tiles),
-implemented in C++11, currently targeting iOS, OS X, and Ubuntu Linux.
+implemented in C++11, currently targeting iOS, OS X, Android, and Ubuntu Linux.
 
 # Depends
 
@@ -62,9 +62,9 @@ We are using Ubuntu for development. While the software should work on other dis
 
 Install GCC 4.8+ if you are running Ubuntu 13.10 or older. Alternatively, you can also use Clang 3.4+.
 
-	sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
-	sudo apt-get update
-	sudo apt-get install gcc-4.8 g++-4.8
+    sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+    sudo apt-get update
+    sudo apt-get install gcc-4.8 g++-4.8
 
 Ensure you have git and other build essentials:
 
@@ -81,17 +81,17 @@ Install glfw3 dependencies:
 
 Finally, install Boost. If you're running Ubuntu 12.04 or older, you need to install a backport PPA since the version provided by APT doesn't contain Boost Geometry:
 
-	sudo add-apt-repository --yes ppa:boost-latest/ppa
-	sudo apt-get update
-	sudo apt-get install libboost1.55-dev
+    sudo add-apt-repository --yes ppa:boost-latest/ppa
+    sudo apt-get update
+    sudo apt-get install libboost1.55-dev
 
 Otherwise, you can just install
 
-	sudo apt-get install libboost-dev
+    sudo apt-get install libboost-dev
 
 Once you're done installing the build dependencies, you can get started by running
 
-	./configure
+    ./configure
 
 Then, you can then proceed to build the library:
 
@@ -102,6 +102,48 @@ Set an access token as described below, and then run:
 
 	make run-linux
 
+## Android (on Linux)
+
+Install a few build depedencies:
+
+    apt-get install -y make git build-essential automake \
+    libtool make cmake pkg-config lib32stdc++6 lib32z1
+
+Install Oracle JDK 7 (requires license agreement) from http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
+
+    export JAVA_HOME="/dir/to/jdk1.7.0_71"
+
+Install the [Android NDK Revision 10d](https://developer.android.com/tools/sdk/ndk/index.html).
+
+    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10d"
+
+Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html).
+
+    export ANDROID_HOME="/dir/to/android-sdk-linux"
+
+Run:
+
+    make android
+
+You can then open `android/java` in Android Studio via "Import Non-Android Studio Project".
+
+## Android (on OS X)
+
+Install Oracle JDK 7 (requires license agreement) from http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
+
+Install the [Android NDK Revision 10d](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X.
+
+    export ANDROID_NDK_PATH="/dir/to/android-ndk-r10d"
+
+Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html). The latest versions recommend that you place the SDK someplace like `/usr/local/android-sdk-macosx`.
+
+    export ANDROID_HOME="/dir/to/android-sdk-macosx"
+
+Run:
+
+    make android
+
+You can then open `android/java` in Android Studio via "Import Non-Android Studio Project".
 
 # Troubleshooting
 
@@ -122,6 +164,8 @@ For iOS and OS X use of the demo apps in Xcode, setup the access token by editin
 ![setting access token in Xcode scheme](https://cloud.githubusercontent.com/assets/162976/5349358/0a086f00-7f8c-11e4-8433-bdbaccda2b58.png)
 
 For Linux, set the environment variable `MAPBOX_ACCESS_TOKEN` to your token.
+
+For Android, gradle will take the value of `MAPBOX_ACCESS_TOKEN` and save it to `android/java/app/src/main/res/raw/token.txt` where the app will read it from.
 
 # Style
 

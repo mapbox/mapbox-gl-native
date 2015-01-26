@@ -47,10 +47,10 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display)
 
 void HeadlessView::loadExtensions() {
     activate();
-    const char *extension_ptr = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
+    const char *extensionPtr = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
 
-    if (extension_ptr) {
-        const std::string extensions = extension_ptr;
+    if (extensionPtr) {
+        const std::string extensions = extensionPtr;
 
 #ifdef MBGL_USE_CGL
         if (extensions.find("GL_APPLE_vertex_array_object") != std::string::npos) {
@@ -77,6 +77,10 @@ void HeadlessView::loadExtensions() {
         }
 #endif
     }
+
+    // HeadlessView requires packed depth stencil
+    gl::isPackedDepthStencilSupported = true;
+    gl::isDepth24Supported = true;
 
     deactivate();
 }

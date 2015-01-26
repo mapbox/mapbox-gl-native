@@ -13,6 +13,8 @@
 #include <iosfwd>
 #include <set>
 #include <vector>
+#include <mutex>
+#include <condition_variable>
 #include <functional>
 
 namespace mbgl {
@@ -38,13 +40,19 @@ public:
     ~Map();
 
     // Start the map render thread. It is asynchronous.
-    void start();
+    void start(bool startPaused = false);
 
     // Stop the map render thread. This call will block until the map rendering thread stopped.
     // The optional callback function will be invoked repeatedly until the map thread is stopped.
     // The callback function should wait until it is woken up again by view.notify(), otherwise
     // this will be a busy waiting loop.
     void stop(std::function<void ()> callback = std::function<void ()>());
+
+    // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
+    void pause(bool waitForPause = false);
+
+    // Resumes a paused render thread
+    void resume();
 
     // Runs the map event loop. ONLY run this function when you want to get render a single frame
     // with this map object. It will *not* spawn a separate thread and instead block until the
@@ -66,7 +74,7 @@ public:
 
     // Size
     void resize(uint16_t width, uint16_t height, float ratio = 1);
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
+    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
     // Styling
     void addClass(const std::string&);
@@ -76,6 +84,7 @@ public:
     std::vector<std::string> getClasses() const;
 
     void setDefaultTransitionDuration(uint64_t milliseconds = 0);
+    uint64_t getDefaultTransitionDuration();
     void setStyleURL(const std::string &url);
     void setStyleJSON(std::string newStyleJSON, const std::string &base = "");
     std::string getStyleJSON() const;
@@ -126,6 +135,9 @@ private:
     util::ptr<Sprite> getSprite();
     uv::worker& getWorker();
 
+    // Checks if render thread needs to pause
+    void checkForPause();
+
     // Setup
     void setup();
 
@@ -153,6 +165,14 @@ private:
     std::thread thread;
     std::unique_ptr<uv::async> asyncTerminate;
     std::unique_ptr<uv::async> asyncRender;
+
+    bool terminating = false;
+    bool pausing = false;
+    bool isPaused = false;
+    std::mutex mutexRun;
+    std::condition_variable condRun;
+    std::mutex mutexPause;
+    std::condition_variable condPause;
 
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
     // render the map.
@@ -194,6 +214,8 @@ private:
     std::string styleURL;
     std::string styleJSON = "";
     std::vector<std::string> classes;
+
+    std::atomic_uint_fast64_t defaultTransitionDuration;
 
     bool debug = false;
     timestamp animationTime = 0;

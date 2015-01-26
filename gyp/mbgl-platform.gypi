@@ -12,5 +12,9 @@
       'includes': ['mbgl-linux.gypi'],
       'variables': { 'platform_library': 'mbgl-linux' },
     }],
+    ['platform == "android"', {
+      'includes': ['mbgl-android.gypi'],
+      'variables': { 'platform_library': 'mbgl-android' },
+    }],
   ],
 }

@@ -155,6 +155,8 @@ TEST_P(HeadlessTest, render) {
 
     Log::Set<FixtureLogBackend>();
 
+    Log::Info(Event::General, "test fixture %s", base.c_str());
+
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
         const std::string name {
             it->name.GetString(), it->name.GetStringLength()

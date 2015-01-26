@@ -1,9 +1,16 @@
+#include <mbgl/mbgl.hpp>
 #include <mbgl/storage/http_request_baton.hpp>
 #include <mbgl/util/uv-messenger.h>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/version.hpp>
+
+#ifdef __ANDROID__
+    #include <mbgl/android/jni.hpp>
+    #include <zip.h>
+    #include <openssl/ssl.h>
+#endif
 
 #include <uv.h>
 #include <curl/curl.h>
@@ -408,11 +415,113 @@ size_t curl_header_cb(char * const buffer, const size_t size, const size_t nmemb
     return length;
 }
 
+// This function is called to load the CA bundle
+// from http://curl.haxx.se/libcurl/c/cacertinmem.html
+#ifdef __ANDROID__
+static CURLcode sslctx_function(CURL */*curl*/, void *sslctx, void */*parm*/) {
+
+    int error = 0;
+    struct zip *apk = zip_open(mbgl::android::apkPath.c_str(), 0, &error);
+    if (apk == nullptr) {
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    struct zip_file *apkFile = zip_fopen(apk, "assets/ca-bundle.crt", ZIP_FL_NOCASE);
+    if (apkFile == nullptr) {
+        zip_close(apk);
+        apk = nullptr;
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    struct zip_stat stat;
+    if (zip_stat(apk, "assets/ca-bundle.crt", ZIP_FL_NOCASE, &stat) != 0) {
+        zip_fclose(apkFile);
+        apkFile = nullptr;
+        zip_close(apk);
+        apk = nullptr;
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    if (stat.size > std::numeric_limits<int>::max()) {
+        zip_fclose(apkFile);
+        apkFile = nullptr;
+        zip_close(apk);
+        apk = nullptr;
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    const std::unique_ptr<char[]> pem = util::make_unique<char[]>(stat.size);
+
+    if (static_cast<zip_uint64_t>(zip_fread(apkFile, reinterpret_cast<void *>(pem.get()), stat.size)) != stat.size) {
+        zip_fclose(apkFile);
+        apkFile = nullptr;
+        zip_close(apk);
+        apk = nullptr;
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    // get a pointer to the X509 certificate store (which may be empty!)
+    X509_STORE *store = SSL_CTX_get_cert_store((SSL_CTX *)sslctx);
+    if (store == nullptr) {
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    // get a BIO
+    BIO *bio = BIO_new_mem_buf(pem.get(), static_cast<int>(stat.size));
+    if (bio == nullptr) {
+        store = nullptr;
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+
+    // use it to read the PEM formatted certificate from memory into an X509
+    // structure that SSL can use
+    X509 *cert = nullptr;
+    while (PEM_read_bio_X509(bio, &cert, 0, nullptr) != nullptr) {
+        if (cert == nullptr) {
+            BIO_free(bio);
+            bio = nullptr;
+            store = nullptr;
+            return CURLE_SSL_CACERT_BADFILE;
+        }
+
+        // add our certificate to this store
+        if (X509_STORE_add_cert(store, cert) == 0) {
+            X509_free(cert);
+            cert = nullptr;
+            BIO_free(bio);
+            bio = nullptr;
+            store = nullptr;
+            return CURLE_SSL_CACERT_BADFILE;
+        }
+
+        X509_free(cert);
+        cert = nullptr;
+    }
+
+    // decrease reference counts
+    BIO_free(bio);
+    bio = nullptr;
+
+    zip_fclose(apkFile);
+    apkFile = nullptr;
+    zip_close(apk);
+    apk = nullptr;
+
+    // all set to go
+    return CURLE_OK;
+}
+#endif
+
 std::string buildUserAgentString() {
+#ifdef __ANDROID__
+    return util::sprintf<128>("MapboxGL/%d.%d.%d (+https://mapbox.com/mapbox-gl/; %s; %s %s)",
+        version::major, version::minor, version::patch, version::revision, "Android", mbgl::android::androidRelease.c_str());
+#else
     utsname name;
     uname(&name);
     return util::sprintf<128>("MapboxGL/%d.%d.%d (+https://mapbox.com/mapbox-gl/; %s; %s %s)",
         version::major, version::minor, version::patch, version::revision, name.sysname, name.release);
+#endif
 }
 
 // This function must run in the CURL thread.
@@ -447,7 +556,12 @@ void start_request(void *const ptr) {
 
     // Carry on the shared pointer in the private information of the CURL handle.
     curl_easy_setopt(context->handle, CURLOPT_PRIVATE, context);
+#ifndef __ANDROID__
     curl_easy_setopt(context->handle, CURLOPT_CAINFO, "ca-bundle.crt");
+#else
+    curl_easy_setopt(context->handle, CURLOPT_SSLCERTTYPE, "PEM");
+    curl_easy_setopt(context->handle, CURLOPT_SSL_CTX_FUNCTION, sslctx_function);
+#endif
     curl_easy_setopt(context->handle, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(context->handle, CURLOPT_URL, context->baton->path.c_str());
     curl_easy_setopt(context->handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
@@ -500,14 +614,14 @@ void create_thread() {
 
 // This function must be run from the main thread (== where the HTTPRequestBaton was created)
 void HTTPRequestBaton::start(const util::ptr<HTTPRequestBaton> &ptr) {
-    assert(std::this_thread::get_id() == ptr->thread_id);
+    assert(std::this_thread::get_id() == ptr->threadId);
     uv_once(&once, create_thread);
     uv_messenger_send(&start_messenger, new util::ptr<HTTPRequestBaton>(ptr));
 }
 
 // This function must be run from the main thread (== where the HTTPRequestBaton was created)
 void HTTPRequestBaton::stop(const util::ptr<HTTPRequestBaton> &ptr) {
-    assert(std::this_thread::get_id() == ptr->thread_id);
+    assert(std::this_thread::get_id() == ptr->threadId);
     uv_once(&once, create_thread);
     uv_messenger_send(&stop_messenger, new util::ptr<HTTPRequestBaton>(ptr));
 }
