@@ -33,7 +33,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
                                 llvm-3.4 # required for mesa
 
         mapbox_time "install_mesa" \
-        MASON_PLATFORM= mason install mesa 10.3.1
+        mason install mesa 10.3.1
     fi
 
     mapbox_time "install_awscli" \
