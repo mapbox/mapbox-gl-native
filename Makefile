@@ -10,7 +10,7 @@ endif
 PLATFORM ?= linux
 
 .PHONY: all
-all: mbgl-core mbgl-platform mbgl-headless
+all: mbgl
 
 config.gypi: configure
 	./configure
@@ -20,27 +20,23 @@ config-ios.gypi: configure
 
 #### Library builds ############################################################
 
-.PHONY: mbgl-core
-mbgl-core: build/mbgl/Makefile
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-core
-
-.PHONY: mbgl-platform
-mbgl-platform: build/mbgl/Makefile
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-$(PLATFORM)
-
-.PHONY: mbgl-headless
-mbgl-headless: build/mbgl/Makefile
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-headless
+.PHONY: mbgl
+mbgl: build/mbgl/Makefile
+	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-core mbgl-$(PLATFORM) mbgl-headless
 
 .PHONY: install
 install: build/mbgl/Makefile
 	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) install
 
+.PHONY: standalone
+standalone: build/mbgl/Makefile
+	LINK=`pwd`/gyp/link.py $(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) standalone
+
 #### Build scripts #############################################################
 
 .PHONY: build/mbgl/Makefile
 build/mbgl/Makefile: mbgl.gyp config.gypi
-	deps/run_gyp mbgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) -Dinstall_prefix=$(PREFIX) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
+	deps/run_gyp mbgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
 
 .PHONY: build/test/Makefile
 build/test/Makefile: test/test.gyp config.gypi

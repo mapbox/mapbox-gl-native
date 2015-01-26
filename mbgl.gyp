@@ -7,26 +7,26 @@
     './gyp/certificates.gypi',
     './gyp/mbgl-core.gypi',
     './gyp/mbgl-headless.gypi',
-    './gyp/mbgl-storage-curl.gypi',
-    './gyp/install.gypi',
+    './gyp/mbgl-standalone.gypi',
   ],
 
   'conditions': [
     ['platform == "osx"', {
       'includes': [
         './gyp/mbgl-osx.gypi',
-        './gyp/mbgl-storage-cocoa.gypi'
+        './gyp/mbgl-storage-cocoa.gypi',
       ],
     }],
     ['platform == "ios"', {
       'includes': [
         './gyp/mbgl-ios.gypi',
-        './gyp/mbgl-storage-cocoa.gypi'
+        './gyp/mbgl-storage-cocoa.gypi',
       ],
     }],
     ['platform == "linux"', {
       'includes': [
-        './gyp/mbgl-linux.gypi'
+        './gyp/mbgl-linux.gypi',
+        './gyp/mbgl-storage-curl.gypi',
       ],
     }],
     ['platform == "android"', {

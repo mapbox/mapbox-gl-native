@@ -98,7 +98,7 @@
         'xcode_settings': {
           'GCC_OPTIMIZATION_LEVEL': '3',
           'GCC_GENERATE_DEBUGGING_SYMBOLS': 'YES',
-          'DEAD_CODE_STRIPPING': 'YES',
+          'DEAD_CODE_STRIPPING': 'NO',
           'GCC_INLINES_ARE_PRIVATE_EXTERN': 'NO'
         }
       },

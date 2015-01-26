@@ -3,6 +3,7 @@
 *.o
 *.actual.png
 *.diff.png
+*.pyc
 /mason_packages
 /config.gypi
 /config-ios.gypi
