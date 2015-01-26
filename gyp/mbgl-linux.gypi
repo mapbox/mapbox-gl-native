@@ -12,8 +12,6 @@
       'sources': [
         '../platform/default/log_stderr.cpp',
         '../platform/default/string_stdlib.cpp',
-        '../platform/default/http_request_curl.cpp',
-        '../platform/default/asset_request_libuv.cpp',
         '../platform/default/application_root.cpp',
         '../platform/default/image.cpp',
         '../platform/default/image_reader.cpp',
@@ -33,7 +31,6 @@
           '<@(png_ldflags)',
           '<@(jpeg_ldflags)',
           '<@(uv_ldflags)',
-          '<@(curl_ldflags)',
           '<@(nu_ldflags)',
         ],
         'libraries': [
@@ -60,12 +57,12 @@
       ],
 
       'link_settings': {
-        'libraries': [ '<@(libraries)' ],
         'conditions': [
           ['OS == "mac"', {
+            'libraries': [ '<@(libraries)' ],
             'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
           }, {
-            'ldflags': [ '<@(ldflags)' ],
+            'libraries': [ '<@(libraries)', '<@(ldflags)' ],
           }]
         ],
       },

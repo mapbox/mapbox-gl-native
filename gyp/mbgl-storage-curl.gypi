@@ -25,16 +25,19 @@
         'cflags_cc': [
           '<@(uv_cflags)',
           '<@(sqlite3_cflags)',
+          '<@(curl_cflags)',
           '-I<(boost_root)/include',
         ],
         'ldflags': [
           '<@(uv_ldflags)',
           '<@(sqlite3_ldflags)',
+          '<@(curl_ldflags)',
           '<@(zlib_ldflags)',
         ],
         'libraries': [
           '<@(uv_static_libs)',
           '<@(sqlite3_static_libs)',
+          '<@(curl_static_libs)',
           '<@(zlib_static_libs)',
         ],
       },
@@ -50,12 +53,12 @@
       ],
 
       'link_settings': {
-        'libraries': [ '<@(libraries)' ],
         'conditions': [
           ['OS == "mac"', {
+            'libraries': [ '<@(libraries)' ],
             'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
           }, {
-            'ldflags': [ '<@(ldflags)' ],
+            'libraries': [ '<@(libraries)', '<@(ldflags)' ],
           }]
         ],
       },

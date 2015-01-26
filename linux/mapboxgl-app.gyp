@@ -34,16 +34,16 @@
         ],
       },
 
-      'libraries': [ '<@(libraries)' ],
       'conditions': [
         ['OS == "mac"', {
+          'libraries': [ '<@(libraries)' ],
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
             'OTHER_LDFLAGS': [ '<@(ldflags)' ],
           }
         }, {
           'cflags_cc': [ '<@(cflags_cc)' ],
-          'ldflags': [ '<@(ldflags)' ],
+          'libraries': [ '<@(libraries)', '<@(ldflags)' ],
         }]
       ],
 

@@ -56,12 +56,12 @@
       ],
 
       'link_settings': {
-        'libraries': [ '<@(libraries)' ],
         'conditions': [
           ['OS == "mac"', {
+            'libraries': [ '<@(libraries)' ],
             'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
           }, {
-            'ldflags': [ '<@(ldflags)' ],
+            'libraries': [ '<@(libraries)', '<@(ldflags)' ],
           }]
         ],
       },
