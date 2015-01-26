@@ -733,6 +733,7 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleLayer> &layer) {
     }
 
     StyleBucket &bucket = *layer->bucket;
+    parseRenderProperty<VisibilityTypeClass>(value, bucket.visibility, "visibility");
 
     switch (layer->type) {
     case StyleLayerType::Fill: {
