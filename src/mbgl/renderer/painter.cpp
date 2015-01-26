@@ -232,7 +232,7 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
 
     drawClippingMasks(sources);
 
-    frameHistory.record(time, state.getNormalizedZoom());
+    recordZoom(time, state.getNormalizedZoom());
 
     // Actually render the layers
     if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
@@ -459,4 +459,27 @@ mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &t
 
         return vtxMatrix;
     }
+}
+
+void Painter::recordZoom(const timestamp time, const float zoom) {
+    frameHistory.record(time, zoom);
+
+    if (lastZoom < 0) {
+        // first frame ever
+        lastIntegerZoom = std::floor(zoom);
+        lastZoom = zoom;
+    }
+
+    // check whether an integer zoom level was passed since the last frame
+    // and if yes, record it with the time. Used for transitioning patterns.
+    if (std::floor(lastZoom) < std::floor(zoom)) {
+        lastIntegerZoom = std::floor(zoom);
+        lastIntegerZoomTime = time;
+
+    } else if (std::floor(lastZoom) > std::floor(zoom)) {
+        lastIntegerZoom = std::floor(zoom) + 1;
+        lastIntegerZoomTime = time;
+    }
+
+    lastZoom = zoom;
 }
