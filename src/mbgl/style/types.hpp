@@ -50,6 +50,18 @@ MBGL_DEFINE_ENUM_CLASS(SourceTypeClass, SourceType, {
 
 // -------------------------------------------------------------------------------------------------
 
+enum class VisibilityType : bool {
+    Visible,
+    None,
+};
+
+MBGL_DEFINE_ENUM_CLASS(VisibilityTypeClass, VisibilityType, {
+    { VisibilityType::Visible, "visible" },
+    { VisibilityType::None, "none" },
+});
+
+// -------------------------------------------------------------------------------------------------
+
 enum class WindingType : bool {
     EvenOdd,
     NonZero,

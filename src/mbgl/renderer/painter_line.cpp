@@ -91,7 +91,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linesdfShader->u_patternscale = {{ scaleX, scaleY }};
         linesdfShader->u_tex_y = pos.y;
         linesdfShader->u_image = 0;
-        linesdfShader->u_sdfgamma = lineAtlas.width / (properties.dash_line_width * pos.width * 256.0 * state.getPixelRatio());
+        linesdfShader->u_sdfgamma = lineAtlas.width / (properties.dash_line_width * pos.width * 256.0 * state.getPixelRatio()) / 2;
 
         bucket.drawLineSDF(*linesdfShader);
 
