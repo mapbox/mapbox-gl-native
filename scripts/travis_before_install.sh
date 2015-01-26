@@ -12,7 +12,7 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     fi
     sudo add-apt-repository --yes ppa:boost-latest/ppa
 
-    echo "apt_update"
+    mapbox_time "apt_update"
     sudo apt-get update -y
 
     echo "install_gcc"
