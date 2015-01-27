@@ -104,7 +104,7 @@ Set an access token as described below, and then run:
 
 ## Android (on Linux)
 
-Install a few build depedencies:
+Install a few build dependencies:
 
     apt-get install -y make git build-essential automake \
     libtool make cmake pkg-config lib32stdc++6 lib32z1
@@ -187,7 +187,6 @@ Some styles in JSON format are included at `./styles`. See the [style spec](http
 - Use two fingers to rotate
 - Double-tap to zoom in one level
 - Two-finger single-tap to zoom out one level
-- Single-tap to toggle the command palette visibility for resetting north & the transform, toggling debug, and locating the user
 - Double-tap, long-pressing the second, then pan up and down to "quick zoom" (iPhone only, meant for one-handed use)
 
 # Other notes
