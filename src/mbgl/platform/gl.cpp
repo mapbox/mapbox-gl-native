@@ -74,10 +74,6 @@ bool isPackedDepthStencilSupported = false;
 
 bool isDepth24Supported = false;
 
-PFNGLGETPROGRAMBINARYPROC GetProgramBinary = nullptr;
-PFNGLPROGRAMBINARYPROC ProgramBinary = nullptr;
-PFNGLPROGRAMPARAMETERIPROC ProgramParameteri = nullptr;
-
 void checkError(const char *cmd, const char *file, int line) {
     const GLenum err = glGetError();
     if (err != GL_NO_ERROR) {

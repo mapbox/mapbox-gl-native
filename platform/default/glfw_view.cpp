@@ -149,19 +149,6 @@ void GLFWView::initialize(mbgl::Map *map_) {
             assert(gl::IsVertexArray != nullptr);
         }
 
-        if (extensions.find("GL_ARB_get_program_binary") != std::string::npos) {
-            GLint numBinaryFormats;
-            MBGL_CHECK_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats));
-            if (numBinaryFormats > 0) {
-                gl::GetProgramBinary = reinterpret_cast<gl::PFNGLGETPROGRAMBINARYPROC>(glfwGetProcAddress("glGetProgramBinary"));
-                gl::ProgramBinary = reinterpret_cast<gl::PFNGLPROGRAMBINARYPROC>(glfwGetProcAddress("glProgramBinary"));
-                gl::ProgramParameteri = reinterpret_cast<gl::PFNGLPROGRAMPARAMETERIPROC>(glfwGetProcAddress("glProgramParameteri"));
-                assert(gl::GetProgramBinary != nullptr);
-                assert(gl::ProgramBinary != nullptr);
-                assert(gl::ProgramParameteri != nullptr);
-            }
-        }
-
         // Require packed depth stencil
         gl::isPackedDepthStencilSupported = true;
         gl::isDepth24Supported = true;

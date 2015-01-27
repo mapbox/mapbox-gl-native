@@ -152,18 +152,6 @@ extern bool isPackedDepthStencilSupported;
 extern bool isDepth24Supported;
 #define GL_DEPTH_COMPONENT24 0x81A6
 
-// GL_ARB_get_program_binary / GL_OES_get_program_binary
-#define GL_PROGRAM_BINARY_RETRIEVABLE_HINT 0x8257
-#define GL_PROGRAM_BINARY_LENGTH           0x8741
-#define GL_NUM_PROGRAM_BINARY_FORMATS      0x87FE
-#define GL_PROGRAM_BINARY_FORMATS          0x87FF
-typedef void (* PFNGLGETPROGRAMBINARYPROC) (GLuint program, GLsizei bufSize, GLsizei *length, GLenum *binaryFormat, void *binary);
-typedef void (* PFNGLPROGRAMBINARYPROC) (GLuint program, GLenum binaryFormat, const void *binary, GLsizei length);
-typedef void (* PFNGLPROGRAMPARAMETERIPROC) (GLuint program, GLenum pname, GLint value);
-extern PFNGLGETPROGRAMBINARYPROC GetProgramBinary;
-extern PFNGLPROGRAMBINARYPROC ProgramBinary;
-extern PFNGLPROGRAMPARAMETERIPROC ProgramParameteri;
-
 // Debug group markers, useful for debugging on iOS
 #if defined(DEBUG)
 // static int indent = 0;
