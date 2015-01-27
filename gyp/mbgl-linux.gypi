@@ -31,7 +31,6 @@
       },
       'sources': [
         '../platform/default/cache_database_tmp.cpp',
-        '../platform/default/shader_cache_tmp.cpp',
         '../platform/default/log_stderr.cpp',
         '../platform/default/string_stdlib.cpp',
         '../platform/default/asset_request_libuv.cpp',
