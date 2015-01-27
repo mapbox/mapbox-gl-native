@@ -135,9 +135,9 @@ Install the [Android NDK Revision 10d](https://developer.android.com/tools/sdk/n
 
     export ANDROID_NDK_PATH="/dir/to/android-ndk-r10d"
 
-Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html). The latest versions recommend that you place the SDK someplace like `/usr/local/android-sdk-macosx`.
+Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html). To install it, open Android Studio. By default, the SDK will be installed to `~/Library/Android/sdk`. In case you get an error message telling you that it can't find a JVM, it's because you installed a custom Java VM from Oracle. Follow [these instructions](http://tools.android.com/recent/androidstudio1rc3_releasecandidate3released) to start Android Studio. Make sure all environment variables are absolute; don't use `~` to indicate the home directory.
 
-    export ANDROID_HOME="/dir/to/android-sdk-macosx"
+    export ANDROID_HOME="/Users/username/Library/Android/sdk"
 
 Run:
 
