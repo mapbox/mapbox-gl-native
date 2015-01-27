@@ -201,32 +201,32 @@ public class MainActivity extends ActionBarActivity {
             switch(position) {
                 // Bright
                 case 0:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/bright-v6.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/bright-v7.json");
                     break;
 
                 // Basic
                 case 1:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/basic-v6.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/basic-v7.json");
                     break;
 
                 // Outdoors
                 case 2:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/outdoors-v6.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/outdoors-v7.json");
                     break;
 
                 // Satellite
                 case 3:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/satellite-v6.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/satellite-v7.json");
                     break;
 
                 // Pencil
                 case 4:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/pencil-v6.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/pencil-v7.json");
                     break;
 
                 // Empty
                 case 5:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/empty-v6.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/empty-v7.json");
                     break;
 
                 default:
