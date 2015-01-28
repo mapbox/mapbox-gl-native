@@ -94,9 +94,9 @@ android:
 	export PATH="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env PATH`:${PATH}" && \
 	export JNIDIR="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env JNIDIR`" && \
 	MASON_PLATFORM=android MASON_ANDROID_ABI=$(MASON_ANDROID_ABI) ./configure config-android.gypi && \
-	deps/run_gyp android/mapboxgl-app.gyp -Iconfig-android.gypi -Dplatform=android --depth=. --generator-output=./build/android -f make-android && \
-	$(MAKE) -C build/android -j$(JOBS) BUILDTYPE=$(BUILDTYPE) V=$(V) androidapp && \
-	BUILDTYPE=$(BUILDTYPE) ./android/scripts/copy-files.sh && \
+	deps/run_gyp android/mapboxgl-app.gyp -Iconfig-android.gypi -Dplatform=android --depth=. --generator-output=./build/android/$(MASON_ANDROID_ABI) -f make-android && \
+	$(MAKE) -C build/android/$(MASON_ANDROID_ABI) -j$(JOBS) BUILDTYPE=$(BUILDTYPE) V=$(V) androidapp && \
+	BUILDTYPE=$(BUILDTYPE) MASON_ANDROID_ABI=$(MASON_ANDROID_ABI) ./android/scripts/copy-files.sh && \
 	cd android/java && \
 	./gradlew --parallel-threads=$(JOBS) build
 
