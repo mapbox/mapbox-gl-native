@@ -81,25 +81,22 @@ build/linux/mapboxgl-app.xcodeproj: linux/mapboxgl-app.gyp config.gypi
 .PHONY: android
 android:
 	./scripts/local_mason.sh && \
-	MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env PATH && \
-	export CXX="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CXX`" && \
-	export CC="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CC`" && \
-	export LD="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env LD`" && \
-	export LINK="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CXX`" && \
-	export AR="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env AR`" && \
-	export RANLIB="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env RANLIB`" && \
-	export LDFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env LDFLAGS` ${LDFLAGS}" && \
-	export CFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CFLAGS` ${CFLAGS}" && \
-	export CPPFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env CPPFLAGS` ${CPPFLAGS}" && \
-	export PATH="`MASON_DIR=./.mason MASON_PLATFORM=android ./.mason/mason env PATH`:${PATH}" && \
-	MASON_PLATFORM=android ./configure config-android.gypi && \
+	MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=$(MASON_ANDROID_ABI) ./.mason/mason env PATH && \
+	export CXX="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CXX`" && \
+	export CC="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CC`" && \
+	export LD="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env LD`" && \
+	export LINK="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CXX`" && \
+	export AR="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env AR`" && \
+	export RANLIB="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env RANLIB`" && \
+	export LDFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env LDFLAGS` ${LDFLAGS}" && \
+	export CFLAGS="`MASON_DIR=./.mason MASON_PLATFORM= MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CFLAGS` ${CFLAGS}" && \
+	export CPPFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CPPFLAGS` ${CPPFLAGS}" && \
+	export PATH="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env PATH`:${PATH}" && \
+	export JNIDIR="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env JNIDIR`" && \
+	MASON_PLATFORM=android MASON_ANDROID_ABI=$(MASON_ANDROID_ABI) ./configure config-android.gypi && \
 	deps/run_gyp android/mapboxgl-app.gyp -Iconfig-android.gypi -Dplatform=android --depth=. --generator-output=./build/android -f make-android && \
 	$(MAKE) -C build/android -j$(JOBS) BUILDTYPE=$(BUILDTYPE) V=$(V) androidapp && \
-	mkdir -p android/java/lib/src/main/jniLibs/armeabi-v7a && \
-	cp build/android/out/$(BUILDTYPE)/lib.target/libmapbox-gl.so android/java/lib/src/main/jniLibs/armeabi-v7a/libmapbox-gl.so && \
-	mkdir -p android/java/lib/src/main/assets && \
-	cp build/android/out/$(BUILDTYPE)/ca-bundle.crt android/java/lib/src/main/assets/ca-bundle.crt && \
-	cp -r build/android/out/$(BUILDTYPE)/styles android/java/lib/src/main/assets/styles && \
+	BUILDTYPE=$(BUILDTYPE) ./android/scripts/copy-files.sh && \
 	cd android/java && \
 	./gradlew --parallel-threads=$(JOBS) build
 
