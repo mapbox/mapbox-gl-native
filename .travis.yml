@@ -5,10 +5,25 @@ matrix:
     - os: linux
   include:
     - os: linux
-      env: CONFIG=release MASON_PLATFORM=android TESTMUNK=yes
+      env: CONFIG=release MASON_PLATFORM=android MASON_ANDROID_ABI=arm-v7 TESTMUNK=yes
       compiler: clang
     - os: linux
-      env: CONFIG=debug MASON_PLATFORM=android TESTMUNK=no
+      env: CONFIG=debug MASON_PLATFORM=android MASON_ANDROID_ABI=arm-v7 TESTMUNK=no
+      compiler: clang
+    - os: linux
+      env: CONFIG=release MASON_PLATFORM=android MASON_ANDROID_ABI=arm-v5 TESTMUNK=no
+      compiler: clang
+    - os: linux
+      env: CONFIG=release MASON_PLATFORM=android MASON_ANDROID_ABI=arm-v8 TESTMUNK=no
+      compiler: clang
+    - os: linux
+      env: CONFIG=release MASON_PLATFORM=android MASON_ANDROID_ABI=x86 TESTMUNK=no
+      compiler: clang
+    - os: linux
+      env: CONFIG=release MASON_PLATFORM=android MASON_ANDROID_ABI=mips TESTMUNK=no
+      compiler: clang
+    - os: linux
+      env: CONFIG=release MASON_PLATFORM=android MASON_ANDROID_ABI=mips-64 TESTMUNK=no
       compiler: clang
     - os: linux
       env: BUILDTYPE=Release JOBS=16
