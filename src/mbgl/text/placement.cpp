@@ -130,15 +130,13 @@ GlyphBox getMergedBoxes(const GlyphBoxes &glyphs, const Anchor &anchor) {
 
 Placement Placement::getIcon(Anchor &anchor, const Rect<uint16_t> &image, float boxScale,
                              const std::vector<Coordinate> &line, const StyleBucketSymbol &props) {
-    const float x = image.w / 2.0f; // No need to divide by image.pixelRatio here?
-    const float y = image.h / 2.0f; // image.pixelRatio;
 
     const float dx = props.icon.offset.x;
     const float dy = props.icon.offset.y;
-    float x1 = (dx - x);
-    float x2 = (dx + x);
-    float y1 = (dy - y);
-    float y2 = (dy + y);
+    float x1 = dx - image.originalW / 2.0f;
+    float x2 = x1 + image.w;
+    float y1 = dy - image.originalH / 2.0f;
+    float y2 = y1 + image.h;
 
     vec2<float> tl{x1, y1};
     vec2<float> tr{x2, y1};
