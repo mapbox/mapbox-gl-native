@@ -28,13 +28,13 @@ extern jfieldID lonLatZoomZoomId;
 
 extern jclass runtimeExceptionClass;
 extern jclass nullPointerExceptionClass;
-;
 
 extern jmethodID listToArrayId;
 
 extern jclass arrayListClass;
 extern jmethodID arrayListConstructorId;
 extern jmethodID arrayListAddId;
+
 }
 }
 
