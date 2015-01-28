@@ -22,6 +22,7 @@ android {
 
     lintOptions {
         checkAllWarnings true
+        disable 'IconMissingDensityFolder'
     }
 
     buildTypes {
@@ -38,10 +39,11 @@ android {
 
 configurations {
     all*.exclude group: 'commons-logging', module: 'commons-logging'
+    all*.exclude group: 'commons-collections', module: 'commons-collections'
 }
 
 dependencies {
-    compile 'commons-validator:commons-validator:1.4.0'
+    compile 'commons-validator:commons-validator:1.4.1'
     compile 'com.android.support:support-annotations:21.0.3'
     compile 'com.android.support:support-v4:21.0.3'
 }

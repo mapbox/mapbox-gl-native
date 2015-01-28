@@ -46,6 +46,7 @@ android {
     lintOptions {
         checkAllWarnings true
         disable 'UnusedAttribute'
+        //disable 'IconDensities'
     }
 
     buildTypes {
