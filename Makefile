@@ -62,6 +62,7 @@ CONFIG_STRING += -Dplatform_lib=$(PLATFORM)
 CONFIG_STRING += -Dasset_lib=$(ASSET)
 CONFIG_STRING += -Dhttp_lib=$(HTTP)
 CONFIG_STRING += -Dcache_lib=$(CACHE)
+CONFIG_STRING += -Dinstall_prefix=$(PREFIX)
 CONFIG_STRING += --depth=.
 CONFIG_STRING += -Goutput_dir=..
 

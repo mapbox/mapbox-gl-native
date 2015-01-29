@@ -8,6 +8,7 @@
     './gyp/standalone.gypi',
     './gyp/core.gypi',
     './gyp/none.gypi',
+    './gyp/install.gypi',
   ],
   'conditions': [
     ['headless_lib == "cgl"', { 'includes': [ './gyp/headless-cgl.gypi' ] } ],
