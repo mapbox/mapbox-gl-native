@@ -12,7 +12,7 @@
 
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/storage/default/default_file_source.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 
 #include <dirent.h>
 

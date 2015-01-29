@@ -18,6 +18,7 @@
 #include <mbgl/platform/android/log_android.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/storage/network_status.hpp>
 
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
@@ -423,14 +424,14 @@ nativeSetAccessToken(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring a
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetAccessToken");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getFileSource().setAccessToken(std_string_from_jstring(env, accessToken));
+    nativeMapView->getMap().setAccessToken(std_string_from_jstring(env, accessToken));
 }
 
 jstring JNICALL nativeGetAccessToken(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetAccessToken");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    return std_string_to_jstring(env, nativeMapView->getFileSource().getAccessToken());
+    return std_string_to_jstring(env, nativeMapView->getMap().getAccessToken());
 }
 
 void JNICALL nativeCancelTransitions(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -701,8 +702,9 @@ void JNICALL
 nativeSetReachability(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jboolean status) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetReachability");
     assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getFileSource().setReachability(status);
+    if (status) {
+        mbgl::NetworkStatus::Reachable();
+    }
 }
 }
 

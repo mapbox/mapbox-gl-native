@@ -1,4 +1,4 @@
-#include <mbgl/storage/default/default_file_source.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/default/request.hpp>
 #include <mbgl/storage/default/asset_request.hpp>
 #include <mbgl/storage/default/http_request.hpp>

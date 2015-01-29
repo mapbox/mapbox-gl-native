@@ -2,7 +2,7 @@
 
 #include <uv.h>
 
-#include <mbgl/storage/default/default_file_source.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 
 TEST_F(Storage, HTTPOtherLoop) {
     SCOPED_TEST(HTTPOtherLoop)

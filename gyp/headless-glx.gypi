@@ -1,7 +1,7 @@
 {
   'targets': [
-    { 'target_name': 'mbgl-headless',
-      'product_name': 'mbgl-headless',
+    { 'target_name': 'headless-glx',
+      'product_name': 'mbgl-headless-glx',
       'type': 'static_library',
       'standalone_static_library': 1,
 

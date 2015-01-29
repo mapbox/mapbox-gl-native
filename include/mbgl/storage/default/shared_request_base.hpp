@@ -3,10 +3,9 @@
 
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/file_cache.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/noncopyable.hpp>
-
-#include "default_file_source.hpp"
 
 #include <string>
 #include <set>

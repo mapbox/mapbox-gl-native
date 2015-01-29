@@ -99,7 +99,11 @@ private:
     static size_t writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp);
 
     void retry(uint64_t timeout);
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
     static void restart(uv_timer_t *timer, int);
+#else
+    static void restart(uv_timer_t *timer);
+#endif
     void finish(ResponseStatus status);
     void start();
 
@@ -161,8 +165,8 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-template<> pthread_key_t HTTPContext<HTTPCURLContext>::key{};
-template<> pthread_once_t HTTPContext<HTTPCURLContext>::once = PTHREAD_ONCE_INIT;
+template<> pthread_key_t ThreadContext<HTTPCURLContext>::key{};
+template<> pthread_once_t ThreadContext<HTTPCURLContext>::once = PTHREAD_ONCE_INIT;
 
 HTTPCURLContext::HTTPCURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
     if (curl_global_init(CURL_GLOBAL_ALL)) {
@@ -491,7 +495,11 @@ void HTTPRequestImpl::retryImmediately() {
     }
 }
 
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
 void HTTPRequestImpl::restart(uv_timer_t *timer, int) {
+#else
+void HTTPRequestImpl::restart(uv_timer_t *timer) {
+#endif
     // Restart the request.
     auto baton = reinterpret_cast<HTTPRequestImpl *>(timer->data);
 

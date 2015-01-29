@@ -1,7 +1,7 @@
 {
   'targets': [
-    { 'target_name': 'mbgl-linux',
-      'product_name': 'mbgl-linux',
+    { 'target_name': 'platform-linux',
+      'product_name': 'mbgl-platform-linux',
       'type': 'static_library',
       'standalone_static_library': 1,
       'hard_dependency': 1,
@@ -13,6 +13,7 @@
         '../platform/default/log_stderr.cpp',
         '../platform/default/string_stdlib.cpp',
         '../platform/default/application_root.cpp',
+        '../platform/default/asset_root.cpp',
         '../platform/default/image.cpp',
         '../platform/default/image_reader.cpp',
         '../platform/default/png_reader.cpp',

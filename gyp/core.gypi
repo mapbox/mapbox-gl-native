@@ -1,6 +1,6 @@
 {
   'targets': [
-    { 'target_name': 'mbgl-core',
+    { 'target_name': 'core',
       'product_name': 'mbgl-core',
       'type': 'static_library',
       'standalone_static_library': 1,

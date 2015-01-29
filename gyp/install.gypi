@@ -6,18 +6,22 @@
           'type': 'none',
           'hard_dependency': 1,
           'dependencies': [
-            '<(core_library)',
-            '<(headless_library)',
-            '<(platform_library)',
-            '<(storage_library)',
+            'core',
+            '<(headless_lib)',
+            '<(platform_lib)',
+            '<(http_lib)',
+            '<(asset_lib)',
+            '<(cache_lib)',
             'mbgl-standalone',
           ],
           'copies': [
             { 'files': [ '<(standalone_product_dir)/libmbgl.a' ], 'destination': '<(install_prefix)/lib' },
             { 'files': [ '<(PRODUCT_DIR)/libmbgl-core.a' ], 'destination': '<(install_prefix)/lib' },
-            { 'files': [ '<(PRODUCT_DIR)/libmbgl-headless.a' ], 'destination': '<(install_prefix)/lib' },
-            { 'files': [ '<(PRODUCT_DIR)/lib<(platform_library).a' ], 'destination': '<(install_prefix)/lib' },
-            { 'files': [ '<(PRODUCT_DIR)/lib<(storage_library).a' ], 'destination': '<(install_prefix)/lib' },
+            { 'files': [ '<(PRODUCT_DIR)/lib<(headless_lib).a' ], 'destination': '<(install_prefix)/lib' },
+            { 'files': [ '<(PRODUCT_DIR)/lib<(platform_lib).a' ], 'destination': '<(install_prefix)/lib' },
+            { 'files': [ '<(PRODUCT_DIR)/lib<(http_lib).a' ], 'destination': '<(install_prefix)/lib' },
+            { 'files': [ '<(PRODUCT_DIR)/lib<(asset_lib).a' ], 'destination': '<(install_prefix)/lib' },
+            { 'files': [ '<(PRODUCT_DIR)/lib<(cache_lib).a' ], 'destination': '<(install_prefix)/lib' },
             { 'files': [ '../include/mbgl' ], 'destination': '<(install_prefix)/include' },
           ],
           'variables': {
@@ -36,7 +40,7 @@
             ],
           },
           'actions': [
-              { 'action_name': 'mbgl-config',  
+              { 'action_name': 'mbgl-config',
                 'inputs': [
                     '../utils/mbgl-config/mbgl-config.template.sh',
                     '../utils/mbgl-config/build.sh',
@@ -47,7 +51,6 @@
                 'action': [
                     './utils/mbgl-config/build.sh',
                     '<(install_prefix)',
-                    '<(platform)',
                     '<@(sqlite3_static_libs)',
                     '<@(sqlite3_ldflags)',
                     '<@(curl_ldflags)',

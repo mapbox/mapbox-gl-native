@@ -20,10 +20,12 @@
       'include_dirs': [ '../include', '../src' ],
       'dependencies': [
         'symlink_TEST_DATA',
-        '../mbgl.gyp:<(core_library)',
-        '../mbgl.gyp:<(platform_library)',
-        '../mbgl.gyp:<(storage_library)',
-        '../mbgl.gyp:<(headless_library)',
+        '../mbgl.gyp:core',
+        '../mbgl.gyp:platform-<(platform_lib)',
+        '../mbgl.gyp:http-<(http_lib)',
+        '../mbgl.gyp:asset-<(asset_lib)',
+        '../mbgl.gyp:cache-<(cache_lib)',
+        '../mbgl.gyp:headless-<(headless_lib)',
         '../deps/gtest/gtest.gyp:gtest'
       ],
       'sources': [

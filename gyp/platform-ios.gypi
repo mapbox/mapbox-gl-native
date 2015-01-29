@@ -1,7 +1,7 @@
 {
   'targets': [
-    { 'target_name': 'mbgl-osx',
-      'product_name': 'mbgl-osx',
+    { 'target_name': 'platform-ios',
+      'product_name': 'mbgl-platform-ios',
       'type': 'static_library',
       'standalone_static_library': 1,
       'hard_dependency': 1,
@@ -13,6 +13,7 @@
         '../platform/darwin/log_nslog.mm',
         '../platform/darwin/string_nsstring.mm',
         '../platform/darwin/application_root.mm',
+        '../platform/darwin/asset_root.mm',
         '../platform/darwin/image.mm',
       ],
 
@@ -25,15 +26,13 @@
           '<@(uv_static_libs)',
         ],
         'ldflags': [
-          '-framework Foundation',
           '-framework ImageIO',
-          '-framework CoreServices',
+          '-framework MobileCoreServices',
         ],
       },
 
       'include_dirs': [
         '../include',
-        '../src',
       ],
 
       'xcode_settings': {

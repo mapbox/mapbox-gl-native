@@ -20,11 +20,15 @@ Request::Request(const Resource &resource_, uv_loop_t *loop, Callback callback_)
     if (loop) {
         notify_async = new uv_async_t;
         notify_async->data = this;
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+        uv_async_init(loop, notify_async, [](uv_async_t *async, int) { notifyCallback(async); });
+#else
         uv_async_init(loop, notify_async, notifyCallback);
+#endif
     }
 }
 
-void Request::notifyCallback(uv_async_t *async, int) {
+void Request::notifyCallback(uv_async_t *async) {
     auto request = reinterpret_cast<Request *>(async->data);
     uv::close(async);
 
@@ -67,10 +71,14 @@ void Request::cancel() {
     assert(!destruct_async);
     destruct_async = new uv_async_t;
     destruct_async->data = this;
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
+    uv_async_init(notify_async->loop, destruct_async, [](uv_async_t *async, int) { cancelCallback(async); });
+#else
     uv_async_init(notify_async->loop, destruct_async, cancelCallback);
+#endif
 }
 
-void Request::cancelCallback(uv_async_t *async, int) {
+void Request::cancelCallback(uv_async_t *async) {
     // The destruct_async will be invoked *after* the notify_async callback has already run.
     auto request = reinterpret_cast<Request *>(async->data);
     uv::close(async);

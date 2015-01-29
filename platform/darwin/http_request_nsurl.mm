@@ -43,7 +43,7 @@ enum class ResponseStatus : uint8_t {
 
 // -------------------------------------------------------------------------------------------------
 
-class HTTPCocoaContext;
+class HTTPNSURLContext;
 
 class HTTPRequestImpl {
 public:
@@ -62,7 +62,7 @@ public:
     static void restart(uv_timer_t *timer, int);
 
 private:
-    HTTPCocoaContext *context = nullptr;
+    HTTPNSURLContext *context = nullptr;
     HTTPRequest *request = nullptr;
     NSURLSessionDataTask *task = nullptr;
     std::unique_ptr<Response> response;
@@ -78,19 +78,19 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-class HTTPCocoaContext : public HTTPContext<HTTPCocoaContext> {
+class HTTPNSURLContext : public HTTPContext<HTTPNSURLContext> {
 public:
-    HTTPCocoaContext(uv_loop_t *loop);
-    ~HTTPCocoaContext();
+    HTTPNSURLContext(uv_loop_t *loop);
+    ~HTTPNSURLContext();
 
     NSURLSession *session = nil;
     NSString *userAgent = nil;
 };
 
-template<> pthread_key_t HTTPContext<HTTPCocoaContext>::key{};
-template<> pthread_once_t HTTPContext<HTTPCocoaContext>::once = PTHREAD_ONCE_INIT;
+template<> pthread_key_t ThreadContext<HTTPNSURLContext>::key{};
+template<> pthread_once_t ThreadContext<HTTPNSURLContext>::once = PTHREAD_ONCE_INIT;
 
-HTTPCocoaContext::HTTPCocoaContext(uv_loop_t *loop_) : HTTPContext(loop_) {
+HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContext(loop_) {
     @autoreleasepool {
         NSURLSessionConfiguration *sessionConfig =
                 [NSURLSessionConfiguration defaultSessionConfiguration];
@@ -107,7 +107,7 @@ HTTPCocoaContext::HTTPCocoaContext(uv_loop_t *loop_) : HTTPContext(loop_) {
     }
 }
 
-HTTPCocoaContext::~HTTPCocoaContext() {
+HTTPNSURLContext::~HTTPNSURLContext() {
     [session release];
     session = nullptr;
 
@@ -119,7 +119,7 @@ HTTPCocoaContext::~HTTPCocoaContext() {
 
 HTTPRequestImpl::HTTPRequestImpl(HTTPRequest *request_, uv_loop_t *loop,
                                  std::unique_ptr<Response> existingResponse_)
-    : context(HTTPCocoaContext::Get(loop)),
+    : context(HTTPNSURLContext::Get(loop)),
       request(request_),
       existingResponse(std::move(existingResponse_)),
       async(new uv_async_t) {

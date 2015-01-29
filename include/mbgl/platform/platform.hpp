@@ -20,6 +20,9 @@ std::string lowercase(const std::string &string);
 // Returns the path to the root folder of the application.
 const std::string &applicationRoot();
 
+// Returns the path to the asset location.
+const std::string &assetRoot();
+
 // Shows an alpha image with the specified dimensions in a named window.
 void show_debug_image(std::string name, const char *data, size_t width, size_t height);
 

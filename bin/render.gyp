@@ -3,51 +3,54 @@
     '../gyp/common.gypi',
   ],
   'targets': [
-    {
-      'target_name': 'mbgl-render',
+    { 'target_name': 'mbgl-render',
       'product_name': 'mbgl-render',
       'type': 'executable',
+
+      'dependencies': [
+        '../mbgl.gyp:core',
+        '../mbgl.gyp:platform-<(platform_lib)',
+        '../mbgl.gyp:headless-<(headless_lib)',
+        '../mbgl.gyp:http-<(http_lib)',
+        '../mbgl.gyp:asset-<(asset_lib)',
+        '../mbgl.gyp:cache-<(cache_lib)',
+        '../mbgl.gyp:copy_certificate_bundle',
+      ],
+
+      'include_dirs': [
+        '../src',
+      ],
+
       'sources': [
         './render.cpp',
       ],
+
       'variables' : {
-        'cflags': [
-          '<@(uv_cflags)',
-          '<@(png_cflags)',
+        'cflags_cc': [
+          '<@(glfw3_cflags)',
           '-I<(boost_root)/include',
         ],
         'ldflags': [
           '<@(glfw3_ldflags)',
-          '<@(uv_ldflags)',
-          '<@(sqlite3_static_libs)',
-          '<@(sqlite3_ldflags)',
-          '<@(curl_ldflags)',
-          '<@(png_ldflags)',
-          '<@(uv_static_libs)',
           '-L<(boost_root)/lib',
           '-lboost_program_options'
         ],
+        'libraries': [
+          '<@(glfw3_static_libs)',
+        ],
       },
+
       'conditions': [
-        # add libuv include path and OpenGL libs
-        ['OS == "mac"',
-          {
-            'xcode_settings': {
-              'OTHER_CPLUSPLUSFLAGS': ['<@(cflags)'],
-              'OTHER_LDFLAGS': ['<@(ldflags)'],
-            },
-          },
-          {
-            'cflags': ['<@(cflags)'],
-            'libraries': ['<@(ldflags)'],
-          }],
-      ],
-      'include_dirs': [ '../src' ],
-      'dependencies': [
-        '../mbgl.gyp:<(core_library)',
-        '../mbgl.gyp:<(headless_library)',
-        '../mbgl.gyp:<(platform_library)',
-        '../mbgl.gyp:copy_certificate_bundle',
+        ['OS == "mac"', {
+          'libraries': [ '<@(libraries)' ],
+          'xcode_settings': {
+            'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
+            'OTHER_LDFLAGS': [ '<@(ldflags)' ],
+          }
+        }, {
+          'cflags_cc': [ '<@(cflags_cc)' ],
+          'libraries': [ '<@(libraries)', '<@(ldflags)' ],
+        }]
       ],
     },
   ],

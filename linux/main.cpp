@@ -4,7 +4,7 @@
 #include <mbgl/platform/default/settings_json.hpp>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/platform/default/log_stderr.hpp>
-#include <mbgl/storage/default/default_file_source.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/default/sqlite_cache.hpp>
 
 #include <signal.h>

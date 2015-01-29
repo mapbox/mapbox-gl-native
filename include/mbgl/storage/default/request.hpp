@@ -33,8 +33,8 @@ public:
     void cancel();
 
 private:
-    static void notifyCallback(uv_async_t *async, int);
-    static void cancelCallback(uv_async_t *async, int);
+    static void notifyCallback(uv_async_t *async);
+    static void cancelCallback(uv_async_t *async);
 
 private:
     uv_async_t *notify_async = nullptr;

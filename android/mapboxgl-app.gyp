@@ -3,14 +3,24 @@
     '../gyp/common.gypi',
   ],
   'targets': [
-    {
-      'target_name': 'androidapp',
+    { 'target_name': 'androidapp',
       'product_name': 'mapbox-gl',
       'type': 'shared_library',
+
+      'dependencies': [
+        '../mbgl.gyp:core',
+        '../mbgl.gyp:platform-<(platform_lib)',
+        '../mbgl.gyp:http-<(http_lib)',
+        '../mbgl.gyp:asset-<(asset_lib)',
+        '../mbgl.gyp:cache-<(cache_lib)',
+        '../mbgl.gyp:copy_certificate_bundle',
+      ],
+
       'sources': [
         './cpp/native_map_view.cpp',
         './cpp/jni.cpp',
       ],
+
       'cflags_cc': [
         '-I<(boost_root)/include',
       ],
@@ -49,11 +59,6 @@
         }, {
           'libraries': [ '<@(ldflags)' ],
         }]
-      ],
-      'dependencies': [
-        '../mapboxgl.gyp:mbgl-standalone',
-        '../mapboxgl.gyp:mbgl-android',
-        '../mapboxgl.gyp:copy_certificate_bundle',
       ],
       'copies': [{
         'files': [ '../styles' ],

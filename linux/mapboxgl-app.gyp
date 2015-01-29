@@ -8,9 +8,11 @@
       'type': 'executable',
 
       'dependencies': [
-        '../mbgl.gyp:<(core_library)',
-        '../mbgl.gyp:<(platform_library)',
-        '../mbgl.gyp:<(storage_library)',
+        '../mbgl.gyp:core',
+        '../mbgl.gyp:platform-<(platform_lib)',
+        '../mbgl.gyp:http-<(http_lib)',
+        '../mbgl.gyp:asset-<(asset_lib)',
+        '../mbgl.gyp:cache-<(cache_lib)',
         '../mbgl.gyp:bundle_styles',
         '../mbgl.gyp:copy_certificate_bundle',
       ],
