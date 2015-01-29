@@ -24,6 +24,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.widget.ArrayAdapter;
 import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
@@ -356,6 +357,28 @@ public class MapView extends SurfaceView {
     public void setClasses(List<String> classes, long transitionDuration) {
         mNativeMapView.setDefaultTransitionDuration(transitionDuration);
         mNativeMapView.setClasses(classes);
+    }
+
+    public void addClass(String clazz) {
+        mNativeMapView.addClass(clazz);
+    }
+
+    public void removeClass(String clazz) {
+        mNativeMapView.removeClass(clazz);
+    }
+
+    public boolean hasClass(String clazz) {
+        return mNativeMapView.hasClass(clazz);
+    }
+
+    public void removeAllClasses() {
+        removeAllClasses(0);
+    }
+
+    public void removeAllClasses(long transitionDuration) {
+        mNativeMapView.setDefaultTransitionDuration(transitionDuration);
+        ArrayList<String> classes = new ArrayList<String>(0);
+        setClasses(classes);
     }
 
     //
@@ -1144,7 +1167,6 @@ public class MapView extends SurfaceView {
             }
         }
     }
-
 
     // Called when our Internet connectivity has changed
     private void onConnectivityChanged(boolean isConnected) {

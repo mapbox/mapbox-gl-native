@@ -15,6 +15,12 @@
             android:id="@+id/spinner_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
+        <Spinner
+            android:id="@+id/spinner_class"
+            android:visibility="invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </android.support.v7.widget.Toolbar>
 
     <FrameLayout

@@ -22,6 +22,9 @@ import com.mapzen.android.lost.LocationClient;
 import com.mapzen.android.lost.LocationListener;
 import com.mapzen.android.lost.LocationRequest;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 public class MainActivity extends ActionBarActivity {
 
     //
@@ -49,6 +52,11 @@ public class MainActivity extends ActionBarActivity {
     private LocationClient mLocationClient;
     private LocationListener mLocationListener;
     private LocationRequest mLocationRequest;
+
+    // Used for the class spinner
+    Spinner mClassSpinner;
+    ArrayAdapter mOutdoorsClassAdapter;
+    ArrayAdapter mSatelliteClassAdapter;
 
     //
     // Lifecycle events
@@ -83,6 +91,13 @@ public class MainActivity extends ActionBarActivity {
                 R.array.style_list, android.R.layout.simple_spinner_dropdown_item);
         styleSpinner.setAdapter(styleAdapter);
         styleSpinner.setOnItemSelectedListener(new StyleSpinnerListener());
+
+        // Add the spinner to select class styles
+        mClassSpinner = (Spinner)findViewById(R.id.spinner_class);
+        mOutdoorsClassAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
+                R.array.outdoors_class_list, android.R.layout.simple_spinner_dropdown_item);
+        mSatelliteClassAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
+                R.array.satellite_class_list, android.R.layout.simple_spinner_dropdown_item);
 
         // Prepare for GPS
         mLocationRequest = LocationRequest.create();
@@ -202,31 +217,55 @@ public class MainActivity extends ActionBarActivity {
                 // Bright
                 case 0:
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/bright-v7.json");
+                    mMapFragment.getMap().removeAllClasses();
+                    mClassSpinner.setVisibility(View.INVISIBLE);
+                    mClassSpinner.setAdapter(null);
+                    mClassSpinner.setOnItemSelectedListener(null);
                     break;
 
                 // Basic
                 case 1:
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/basic-v7.json");
+                    mMapFragment.getMap().removeAllClasses();
+                    mClassSpinner.setVisibility(View.INVISIBLE);
+                    mClassSpinner.setAdapter(null);
+                    mClassSpinner.setOnItemSelectedListener(null);
                     break;
 
                 // Outdoors
                 case 2:
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/outdoors-v7.json");
+                    mMapFragment.getMap().removeAllClasses();
+                    mClassSpinner.setVisibility(View.VISIBLE);
+                    mClassSpinner.setAdapter(mOutdoorsClassAdapter);
+                    mClassSpinner.setOnItemSelectedListener(new OutdoorClassSpinnerListener());
                     break;
 
                 // Satellite
                 case 3:
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/satellite-v7.json");
+                    mMapFragment.getMap().removeAllClasses();
+                    mClassSpinner.setVisibility(View.VISIBLE);
+                    mClassSpinner.setAdapter(mSatelliteClassAdapter);
+                    mClassSpinner.setOnItemSelectedListener(new SatelliteClassSpinnerListener());
                     break;
 
                 // Pencil
                 case 4:
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/pencil-v7.json");
+                    mMapFragment.getMap().removeAllClasses();
+                    mClassSpinner.setVisibility(View.INVISIBLE);
+                    mClassSpinner.setAdapter(null);
+                    mClassSpinner.setOnItemSelectedListener(null);
                     break;
 
                 // Empty
                 case 5:
                     mMapFragment.getMap().setStyleUrl("asset://styles/styles/empty-v7.json");
+                    mMapFragment.getMap().removeAllClasses();
+                    mClassSpinner.setVisibility(View.INVISIBLE);
+                    mClassSpinner.setAdapter(null);
+                    mClassSpinner.setOnItemSelectedListener(null);
                     break;
 
                 default:
@@ -238,6 +277,76 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
             mMapFragment.getMap().setStyleUrl("");
+        }
+    }
+
+    // This class handles outdoor class change events
+    private class OutdoorClassSpinnerListener implements AdapterView.OnItemSelectedListener {
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            ArrayList<String> classes = new ArrayList<String>(1);
+
+            switch(position) {
+                // Day
+                case 0:
+                    classes.add("day");
+                    mMapFragment.getMap().setClasses(classes);
+                    break;
+
+                // Night
+                case 1:
+                    classes.add("night");
+                    mMapFragment.getMap().setClasses(classes);
+                    break;
+
+                default:
+                    onNothingSelected(parent);
+                    break;
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            mMapFragment.getMap().removeAllClasses();
+        }
+    }
+
+    // This class handles satellite class change events
+    private class SatelliteClassSpinnerListener implements AdapterView.OnItemSelectedListener {
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            ArrayList<String> classes = new ArrayList<String>(2);
+
+            switch(position) {
+                // Labels + Contours
+                case 0:
+                    classes.add("labels");
+                    classes.add("contours");
+                    mMapFragment.getMap().setClasses(classes);
+                    break;
+
+                // Labels Only
+                case 1:
+                    classes.add("labels");
+                    mMapFragment.getMap().setClasses(classes);
+                    break;
+
+                // No Labels
+                case 2:
+                    mMapFragment.getMap().setClasses(classes);
+                    break;
+
+                default:
+                    onNothingSelected(parent);
+                    break;
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            mMapFragment.getMap().removeAllClasses();
         }
     }
 
