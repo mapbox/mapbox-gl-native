@@ -57,6 +57,12 @@ PYTHON=`which python || abort 'Cannot find python'`
 >&2 ${PYTHON} --version
 >&2 echo -en "\033[0m";
 
+PKG_CONFIG=`which pkg-config || abort 'Cannot find pkg-config'`
+
+>&2 echo -en "\033[1m\033[32m* Using pkg-config "
+>&2 ${PKG_CONFIG} --version
+>&2 echo -en "\033[0m";
+
 function quote_flags {
     ${PYTHON} -c "import sys, re; print filter(None, re.split('(?<!-framework)\s+', ' '.join(sys.argv[1:])))" "$@"
 }
