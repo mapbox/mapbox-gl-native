@@ -7,12 +7,12 @@
           'hard_dependency': 1,
           'dependencies': [
             'core',
-            '<(headless_lib)',
-            '<(platform_lib)',
-            '<(http_lib)',
-            '<(asset_lib)',
-            '<(cache_lib)',
-            'mbgl-standalone',
+            'platform-<(platform_lib)',
+            'http-<(http_lib)',
+            'asset-<(asset_lib)',
+            'cache-<(cache_lib)',
+            'headless-<(headless_lib)',
+            'standalone',
           ],
           'copies': [
             { 'files': [ '<(standalone_product_dir)/libmbgl.a' ], 'destination': '<(install_prefix)/lib' },
