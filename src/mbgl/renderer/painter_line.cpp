@@ -138,6 +138,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linepatternShader->u_pattern_tl = imagePos.tl;
         linepatternShader->u_pattern_br = imagePos.br;
         linepatternShader->u_fade = fade;
+        linepatternShader->u_opacity = properties.opacity;
 
         MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
         spriteAtlas.bind(true);
