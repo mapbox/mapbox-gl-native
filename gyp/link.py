@@ -17,6 +17,8 @@ while i < l:
 
     if arg[0:2] == '-l':
         flags.append(arg)
+    elif arg[0:2] == '-L':
+        flags.append(arg)
     elif arg == '-arch':
         i += 1
     elif arg == '-framework':
