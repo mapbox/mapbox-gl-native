@@ -16,8 +16,19 @@
         <item>Basic</item>
         <item>Outdoors</item>
         <item>Satellite</item>
-        <!--<item>Pencil</item>-->
-        <!--<item>Empty</item>-->
+        <item>Pencil</item>
+        <item>Empty</item>
+    </string-array>
+
+    <string-array name="outdoors_class_list">
+        <item>Day</item>
+        <item>Night</item>
+    </string-array>
+
+    <string-array name="satellite_class_list">
+        <item>Labels + Contours</item>
+        <item>Labels Only</item>
+        <item>No Labels</item>
     </string-array>
 
 </resources>
