@@ -1,7 +1,6 @@
 {
   'variables': {
     'install_prefix%': '',
-    'standalone_product_dir':'<!@(pwd)/build',
   },
   'target_defaults': {
     'default_configuration': 'Release',

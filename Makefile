@@ -75,7 +75,7 @@ mbgl: build/mbgl/Makefile
 
 .PHONY: install
 install: build/mbgl/Makefile
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) install
+	LINK=`pwd`/gyp/link.py $(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) install
 
 .PHONY: standalone
 standalone: build/mbgl/Makefile

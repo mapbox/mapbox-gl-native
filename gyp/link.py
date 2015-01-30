@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import os
 from merge_static_libs import MergeLibs
 
 args = sys.argv[1:]
@@ -30,5 +31,15 @@ while i < l:
         print 'Ignored linker directive: ' + arg
 
     i += 1
+
+flags.reverse()
+unique_flags = []
+for flag in flags:
+    if flag not in unique_flags:
+        unique_flags.append(flag)
+unique_flags.reverse()
+
+with open(out_lib + '.ldflags', 'w+') as f:
+    f.write(' '.join(unique_flags));
 
 MergeLibs(in_libs, out_lib)
