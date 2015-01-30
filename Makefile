@@ -88,6 +88,7 @@ android:
 	export LINK="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CXX`" && \
 	export AR="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env AR`" && \
 	export RANLIB="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env RANLIB`" && \
+	export STRIP="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env STRIP`" && \
 	export LDFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env LDFLAGS` ${LDFLAGS}" && \
 	export CFLAGS="`MASON_DIR=./.mason MASON_PLATFORM= MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CFLAGS` ${CFLAGS}" && \
 	export CPPFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CPPFLAGS` ${CPPFLAGS}" && \
