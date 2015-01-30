@@ -1,5 +1,6 @@
 BUILDTYPE ?= Release
 PYTHON ?= python
+PREFIX ?= /usr/local
 JOBS ?= 1
 
 ifeq ($(shell uname -s), Darwin)
@@ -98,7 +99,7 @@ __%__/test: config-%.gypi
 	deps/run_gyp test/test.gyp -Iconfig-$*.gypi $(CONFIG_STRING) --generator-output=./build/test -f make
 
 .PHONY: build/linux/Makefile
-build/linux/Makefile: linux/mapboxgl-app.gyp config.gypi __linux__/linux
+build/linux/Makefile: linux/mapboxgl-app.gyp __linux__/linux
 __linux__/linux: config-linux.gypi
 	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig-linux.gypi $(CONFIG_STRING) --generator-output=./build/linux -f make
 
