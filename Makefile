@@ -1,6 +1,5 @@
 BUILDTYPE ?= Release
 PYTHON ?= python
-PREFIX ?= /usr/local
 JOBS ?= 1
 
 ifeq ($(shell uname -s), Darwin)
@@ -8,25 +7,14 @@ DEFAULT_HOST ?= osx
 endif
 DEFAULT_HOST ?= linux
 
+ANDROID_ABI ?= arm-v7
+
 .PHONY: all
 all: mbgl
 
-
-#### Dependencies ##############################################################
-
-config.gypi: configure
-	./configure
-
-config-ios.gypi: configure
-	MASON_PLATFORM=ios ./configure config-ios.gypi
-
-config-android.gypi: configure __android__/configure
-__android__/configure:
-	$(ENV) ./configure config-android.gypi
-
-
 #### Configuration defaults ####################################################
 
+__osx__/%: ENV = MASON_PLATFORM=osx
 __osx__/%: HOST ?= osx
 __osx__/%: HEADLESS ?= cgl
 __osx__/%: PLATFORM ?= osx
@@ -34,6 +22,7 @@ __osx__/%: ASSET ?= fs
 __osx__/%: HTTP ?= nsurl
 __osx__/%: CACHE ?= sqlite
 
+__ios__/%: ENV = MASON_PLATFORM=ios
 __ios__/%: HOST = ios
 __ios__/%: HEADLESS ?= none
 __ios__/%: PLATFORM ?= ios
@@ -41,6 +30,7 @@ __ios__/%: ASSET ?= fs
 __ios__/%: HTTP ?= nsurl
 __ios__/%: CACHE ?= sqlite
 
+__linux__/%: ENV = MASON_PLATFORM=linux
 __linux__/%: HOST = linux
 __linux__/%: HEADLESS ?= glx
 __linux__/%: PLATFORM ?= linux
@@ -48,13 +38,15 @@ __linux__/%: ASSET ?= fs
 __linux__/%: HTTP ?= curl
 __linux__/%: CACHE ?= sqlite
 
-__android__/%: ENV=$(shell ./scripts/android_env.sh)
-__android__/%: HOST = android
-__android__/%: HEADLESS ?= none
-__android__/%: PLATFORM ?= android
-__android__/%: ASSET ?= zip
-__android__/%: HTTP ?= curl
-__android__/%: CACHE ?= sqlite
+__android-%__/gyp: ENV = $(shell MASON_ANDROID_ABI=$* ./scripts/android_env.sh)
+__android-%__/build: ENV = $(shell MASON_ANDROID_ABI=$* ./scripts/android_env.sh)
+
+__android-%__/gyp: HOST = android
+__android-%__/gyp: HEADLESS ?= none
+__android-%__/gyp: PLATFORM ?= android
+__android-%__/gyp: ASSET ?= zip
+__android-%__/gyp: HTTP ?= curl
+__android-%__/gyp: CACHE ?= sqlite
 
 CONFIG_STRING += -Dhost=$(HOST)
 CONFIG_STRING += -Dheadless_lib=$(HEADLESS)
@@ -66,6 +58,17 @@ CONFIG_STRING += -Dinstall_prefix=$(PREFIX)
 CONFIG_STRING += --depth=.
 CONFIG_STRING += -Goutput_dir=..
 
+#### Dependencies ##############################################################
+
+.PHONY: FORCE
+FORCE:
+
+.PRECIOUS: config-%.gypi
+config-%.gypi: configure __%__/configure
+	cat config-$*.gypi
+
+__%__/configure:
+	$(ENV) ./configure config-$*.gypi
 
 #### Library builds ############################################################
 
@@ -85,72 +88,65 @@ standalone: build/mbgl/Makefile
 #### Application buidls ########################################################
 
 .PHONY: build/mbgl/Makefile
-build/mbgl/Makefile: mbgl.gyp config.gypi __$(DEFAULT_HOST)__/mbgl
-__%__/mbgl:
-	deps/run_gyp mbgl.gyp -Iconfig.gypi $(CONFIG_STRING) --generator-output=./build/mbgl -f make
+build/mbgl/Makefile: mbgl.gyp __$(DEFAULT_HOST)__/mbgl
+__%__/mbgl: config-%.gypi
+	deps/run_gyp mbgl.gyp -Iconfig-$*.gypi $(CONFIG_STRING) --generator-output=./build/mbgl -f make
 
 .PHONY: build/test/Makefile
-build/test/Makefile: test/test.gyp config.gypi __$(DEFAULT_HOST)__/test
-__%__/test:
-	deps/run_gyp test/test.gyp -Iconfig.gypi $(CONFIG_STRING) --generator-output=./build/test -f make
+build/test/Makefile: test/test.gyp __$(DEFAULT_HOST)__/test
+__%__/test: config-%.gypi
+	deps/run_gyp test/test.gyp -Iconfig-$*.gypi $(CONFIG_STRING) --generator-output=./build/test -f make
 
 .PHONY: build/linux/Makefile
 build/linux/Makefile: linux/mapboxgl-app.gyp config.gypi __linux__/linux
-__linux__/linux:
-	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig.gypi $(CONFIG_STRING) --generator-output=./build/linux -f make
+__linux__/linux: config-linux.gypi
+	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig-linux.gypi $(CONFIG_STRING) --generator-output=./build/linux -f make
 
 .PHONY: build/macosx/Makefile
-build/macosx/Makefile: macosx/mapboxgl-app.gyp config.gypi __osx__/osx
-__osx__/osx:
-	deps/run_gyp macosx/mapboxgl-app.gyp -Iconfig.gypi $(CONFIG_STRING) --generator-output=./build/macosx -f make
+build/macosx/Makefile: macosx/mapboxgl-app.gyp __osx__/osx
+__osx__/osx: config-osx.gypi
+	deps/run_gyp macosx/mapboxgl-app.gyp -Iconfig-osx.gypi $(CONFIG_STRING) --generator-output=./build/macosx -f make
 
 .PHONY: build/render/Makefile
-build/render/Makefile: bin/render.gyp config.gypi __$(DEFAULT_HOST)__/render
-__%__/render:
-	deps/run_gyp bin/render.gyp -Iconfig.gypi $(CONFIG_STRING) --generator-output=./build/render -f make
+build/render/Makefile: bin/render.gyp __$(DEFAULT_HOST)__/render
+__%__/render: config-%.gypi
+	deps/run_gyp bin/render.gyp -Iconfig-$*.gypi $(CONFIG_STRING) --generator-output=./build/render -f make
 
 .PHONY: build/test/test.xcodeproj
-build/test/test.xcodeproj: test/test.gyp config.gypi __osx__/test-xcode
-__osx__/test-xcode:
-	deps/run_gyp test/test.gyp -Iconfig.gypi $(CONFIG_STRING) --generator-output=./build -f xcode
+build/test/test.xcodeproj: test/test.gyp __osx__/test-xcode
+__osx__/test-xcode: config-osx.gypi
+	deps/run_gyp test/test.gyp -Iconfig-osx.gypi $(CONFIG_STRING) --generator-output=./build -f xcode
 
 .PHONY: build/macosx/mapboxgl-app.xcodeproj
-build/macosx/mapboxgl-app.xcodeproj: macosx/mapboxgl-app.gyp config.gypi __osx__/app-xcode
-__osx__/app-xcode:
-	deps/run_gyp macosx/mapboxgl-app.gyp -Iconfig.gypi $(CONFIG_STRING) --generator-output=./build -f xcode
+build/macosx/mapboxgl-app.xcodeproj: macosx/mapboxgl-app.gyp __osx__/app-xcode
+__osx__/app-xcode: config-osx.gypi
+	deps/run_gyp macosx/mapboxgl-app.gyp -Iconfig-osx.gypi $(CONFIG_STRING) --generator-output=./build -f xcode
 
 .PHONY: build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
-build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj: ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp config-ios.gypi __ios__/app-xcode
-__ios__/app-xcode:
-	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp -Iconfig-ios.gypi $(CONFIG_STRING) --generator-output=./build -f xcode
+build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj: ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp __ios__/app-xcode
+__ios__/app-xcode: config-ios.gypi
+	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp -Iconfig-ios.gypi $(CONFIG_STRING) -Goutput_dir=. --generator-output=./build -f xcode
 
 .PHONY: build/linux/mapboxgl-app.xcodeproj
-build/linux/mapboxgl-app.xcodeproj: linux/mapboxgl-app.gyp config.gypi __linux__/app-xcode
-__linux__/app-xcode:
-	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig.gypi $(CONFIG_STRING) --generator-output=./build -f xcode
+build/linux/mapboxgl-app.xcodeproj: linux/mapboxgl-app.gyp __linux__/app-xcode
+__linux__/app-xcode: config-osx.gypi
+	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig-osx.gypi $(CONFIG_STRING) --generator-output=./build -f xcode
 
 .PHONY: build/bin/render.xcodeproj
-build/bin/render.xcodeproj: bin/render.gyp config.gypi __$(HOST)__/render-xcode
-__%__/render-xcode:
-	deps/run_gyp bin/render.gyp -Iconfig.gypi $(CONFIG_STRING) --generator-output=./build -f xcode
+build/bin/render.xcodeproj: bin/render.gyp __osx__/render-xcode
+__osx__/render-xcode:config-osx.gypi
+	deps/run_gyp bin/render.gyp -Iconfig-osx.gypi $(CONFIG_STRING) --generator-output=./build -f xcode
 
-.PHONY: build/android/Makefile
-build/android/Makefile: android/mapboxgl-app.gyp config.gypi __android__/android-make
-__android__/android-make:
-	@echo deps/run_gyp android/mapboxgl-app.gyp -Iconfig-android.gypi $(CONFIG_STRING) --generator-output=./build/android -f make-android
-	@$(ENV) deps/run_gyp android/mapboxgl-app.gyp -Iconfig-android.gypi $(CONFIG_STRING) --generator-output=./build/android -f make-android
+build/android-%/Makefile: android/mapboxgl-app.gyp __android-%__/gyp
+	@# leave this line here
 
-.PHONY: android
-android: __android__/android
-__android__/android: build/android/Makefile
-	@echo $(MAKE) -C build/android BUILDTYPE=$(BUILDTYPE) androidapp
-	@$(ENV) $(MAKE) -C build/android BUILDTYPE=$(BUILDTYPE) androidapp
-	mkdir -p android/java/lib/src/main/jniLibs/armeabi-v7a
-	cp build/$(BUILDTYPE)/lib.target/libmapbox-gl.so android/java/lib/src/main/jniLibs/armeabi-v7a/libmapbox-gl.so
-	mkdir -p android/java/lib/src/main/assets
-	cp build/$(BUILDTYPE)/ca-bundle.crt android/java/lib/src/main/assets/ca-bundle.crt
-	cp -r build/$(BUILDTYPE)/styles android/java/lib/src/main/assets/styles
-	cd android/java && ./gradlew --parallel-threads=$(JOBS) build
+__android-%__/gyp: GYP_CMD = deps/run_gyp android/mapboxgl-app.gyp -Iconfig-android-$*.gypi $(CONFIG_STRING) -Goutput_dir=. --generator-output=./build/android-$* -f make-android
+__android-%__/gyp: config-android-%.gypi
+	@echo $(GYP_CMD) ; $(ENV) $(GYP_CMD)
+
+__android-%__/build: MAKE_CMD = $(MAKE) -C build/android-$* BUILDTYPE=$(BUILDTYPE) androidapp
+__android-%__/build: build/android-%/Makefile
+	@echo $(MAKE_CMD) ; $(ENV) $(MAKE_CMD)
 
 
 ##### Test cases ###############################################################
@@ -183,6 +179,19 @@ osx: build/macosx/Makefile
 # Executes the OS X binary
 run-osx: osx
 	build/$(BUILDTYPE)/Mapbox\ GL.app/Contents/MacOS/MAPBOX\ GL
+
+# Builds the iOS app with Xcode.
+ios: build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
+	xcodebuild -project ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO -jobs $JOBS
+
+# Builds the selected/default Android library
+android: __android-$(ANDROID_ABI)__/build
+	cd android/java && ./gradlew --parallel-threads=$(JOBS) build
+
+# Builds all android architectures. As new architectures appear, add them to this list.
+android-all: __android-arm-v7__/build
+android-all: __android-arm-v8__/build
+android-all: android
 
 # Builds the CLI render app
 render: build/render/Makefile
@@ -231,8 +240,7 @@ endif
 clean: clear_sqlite_cache clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
-	-rm -rf ./macosx/build/
-	-rm -rf ./config.gypi ./config-ios.gypi ./config-android.gypi
+	-rm -rf ./config-*.gypi
 	-rm -rf ./android/java/build ./android/java/app/build ./android/java/lib/build
 	-rm -rf ./android/java/lib/src/main/jniLibs ./android/java/lib/src/main/assets
 	-rm -f ./android/test/features.zip

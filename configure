@@ -163,5 +163,3 @@ CONFIG+="  }
 "
 
 echo "${CONFIG}" > ${CONFIG_FILE}
-
-cat ${CONFIG_FILE}

@@ -3,9 +3,10 @@
     '../gyp/common.gypi',
   ],
   'targets': [
-    { 'target_name': 'androidapp',
+    { 'target_name': 'android-lib',
       'product_name': 'mapbox-gl',
       'type': 'shared_library',
+      'hard_dependency': 1,
 
       'dependencies': [
         '../mbgl.gyp:core',
@@ -13,7 +14,6 @@
         '../mbgl.gyp:http-<(http_lib)',
         '../mbgl.gyp:asset-<(asset_lib)',
         '../mbgl.gyp:cache-<(cache_lib)',
-        '../mbgl.gyp:copy_certificate_bundle',
       ],
 
       'sources': [
@@ -60,10 +60,31 @@
           'libraries': [ '<@(ldflags)' ],
         }]
       ],
-      'copies': [{
-        'files': [ '../styles' ],
-        'destination': '<(PRODUCT_DIR)'
-      }],
+    },
+
+
+    { 'target_name': 'androidapp',
+      'type': 'none',
+      'hard_dependency': 1,
+
+      'variables': {
+        'pwd': '<!(pwd)',
+      },
+
+      'copies': [
+        {
+          'files': [ '<(PRODUCT_DIR)/lib.target/libmapbox-gl.so' ],
+          'destination': '<(pwd)/java/lib/src/main/jniLibs/$(JNIDIR)'
+        },
+        {
+          'files': [ '../common/ca-bundle.crt' ],
+          'destination': '<(pwd)/java/lib/src/main/assets'
+        },
+        {
+          'files': [ '../styles/styles' ],
+          'destination': '<(pwd)/java/lib/src/main/assets'
+        },
+      ],
     },
   ],
 }
