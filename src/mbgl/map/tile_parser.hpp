@@ -3,6 +3,8 @@
 
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/style/filter_expression.hpp>
+#include <mbgl/style/class_properties.hpp>
+#include <mbgl/style/style_bucket.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -48,6 +50,10 @@ public:
 private:
     bool obsolete() const;
     void parseStyleLayers(util::ptr<StyleLayerGroup> group);
+
+    template <typename T> void applyLayoutProperties(StyleBucket &bucket, float z);
+    template <typename T> void applyLayoutProperty(PropertyKey key, ClassProperties &classProperties, T &, float z);
+
     std::unique_ptr<Bucket> createBucket(util::ptr<StyleBucket> bucket_desc);
 
     std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketFill &fill);

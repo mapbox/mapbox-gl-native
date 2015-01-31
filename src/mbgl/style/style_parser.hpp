@@ -53,7 +53,7 @@ private:
     void parsePaint(JSVal, ClassProperties &properties);
     void parseReference(JSVal value, util::ptr<StyleLayer> &layer);
     void parseBucket(JSVal value, util::ptr<StyleLayer> &layer);
-    void parseLayout(JSVal value, util::ptr<StyleLayer> &layer);
+    void parseLayout(JSVal value, util::ptr<StyleBucket> &bucket);
     void parseSprite(JSVal value);
     void parseGlyphURL(JSVal value);
 
@@ -64,6 +64,8 @@ private:
     bool parseRenderProperty(JSVal value, T &target, const char *name);
 
     // Parses optional properties into style class properties.
+    template <typename T>
+    void parseVisibility(StyleBucket &bucket, JSVal value);
     template <typename T>
     bool parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value);
     template <typename T>

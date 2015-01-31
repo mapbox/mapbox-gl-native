@@ -9,6 +9,7 @@
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/style/class_properties.hpp>
 
 #include <forward_list>
 
@@ -52,7 +53,7 @@ public:
         float rotate = 0.0f;
         float padding = 2.0f;
         bool keep_upright = false;
-        vec2<float> offset = {0, 0};
+        std::array<float, 2> offset = {{ 0, 0 }};
     } icon;
 
     struct {
@@ -60,9 +61,9 @@ public:
         std::string field;
         std::string font;
         float max_size = 16.0f;
-        float max_width = 15.0f * 24 /* em */;
-        float line_height = 1.2f * 24 /* em */;
-        float letter_spacing = 0.0f * 24 /* em */;
+        float max_width = 15.0f /* em */;
+        float line_height = 1.2f /* em */;
+        float letter_spacing = 0.0f /* em */;
         TextJustifyType justify = TextJustifyType::Center;
         TextAnchorType anchor = TextAnchorType::Center;
         float max_angle = 45.0f /* degrees */;
@@ -71,7 +72,7 @@ public:
         float padding = 2.0f;
         bool keep_upright = true;
         TextTransformType transform = TextTransformType::None;
-        vec2<float> offset = {0, 0};
+        std::array<float, 2> offset = {{ 0, 0 }};
         bool allow_overlap = false;
         bool ignore_placement = false;
         bool optional = false;
@@ -82,8 +83,12 @@ class StyleBucketRaster {
 public:
 };
 
+class StyleBucketBackground {
+public:
+};
+
 typedef mapbox::util::variant<StyleBucketFill, StyleBucketLine, StyleBucketSymbol,
-                              StyleBucketRaster, std::false_type> StyleBucketRender;
+                              StyleBucketRaster, StyleBucketBackground, std::false_type> StyleBucketRender;
 
 
 class StyleBucket {
@@ -91,18 +96,20 @@ public:
     typedef util::ptr<StyleBucket> Ptr;
 
     StyleBucket(StyleLayerType type);
-
+    StyleLayerType type;
     std::string name;
     util::ptr<StyleSource> style_source;
     std::string source_layer;
     FilterExpression filter;
+    ClassProperties layout;
     StyleBucketRender render = std::false_type();
     float min_zoom = -std::numeric_limits<float>::infinity();
     float max_zoom = std::numeric_limits<float>::infinity();
     VisibilityType visibility = VisibilityType::Visible;
 };
 
-
+template <typename T>
+const T &defaultLayoutProperties();
 
 };
 

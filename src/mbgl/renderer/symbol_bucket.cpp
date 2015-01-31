@@ -177,13 +177,13 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
         if (feature.label.length()) {
             shaping = fontStack.getShaping(
                 /* string */ feature.label,
-                /* maxWidth */ properties.text.max_width,
-                /* lineHeight */ properties.text.line_height,
+                /* maxWidth: ems */ properties.text.max_width * 24,
+                /* lineHeight: ems */ properties.text.line_height * 24,
                 /* horizontalAlign */ horizontalAlign,
                 /* verticalAlign */ verticalAlign,
                 /* justify */ justify,
-                /* spacing */ properties.text.letter_spacing,
-                /* translate */ properties.text.offset);
+                /* spacing: ems */ properties.text.letter_spacing * 24,
+                /* translate */ vec2<float>(properties.text.offset[0], properties.text.offset[1]));
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {

@@ -26,7 +26,7 @@ public:
     std::list<AppliedClassProperty> properties;
 
 public:
-    // Returns thie ID of the most recent
+    // Returns the ID of the most recent
     ClassID mostRecent() const;
     void add(ClassID class_id, std::chrono::steady_clock::time_point begin, std::chrono::steady_clock::time_point end, const PropertyValue &value);
     bool hasTransitions() const;

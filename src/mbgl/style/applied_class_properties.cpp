@@ -8,7 +8,7 @@ AppliedClassProperty::AppliedClassProperty(ClassID class_id, std::chrono::steady
     end(end_),
     value(value_) {}
 
-// Returns thie ID of the most recent
+// Returns the ID of the most recent
 ClassID AppliedClassProperties::mostRecent() const {
     return properties.size() ? properties.back().name : ClassID::Fallback;
 }
