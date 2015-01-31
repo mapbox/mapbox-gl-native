@@ -15,7 +15,6 @@
           'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
           'GCC_ENABLE_CPP_RTTI':'YES',
           'OTHER_CPLUSPLUSFLAGS': [
-            '-Werror',
             '-Wall',
             '-Wextra',
             '-Wshadow',
@@ -50,7 +49,7 @@
         ],
       }],
     ],
-    'cflags_cc': [ '-std=c++11', '-Werror', '-Wall', '-Wextra', '-Wshadow', '-frtti', '-fexceptions' ],
+    'cflags_cc': [ '-std=c++11', '-Wall', '-Wextra', '-Wshadow', '-frtti', '-fexceptions' ],
     'configurations': {
       'Debug': {
         'cflags_cc': [ '-g', '-O0', '-fno-omit-frame-pointer','-fwrapv', '-fstack-protector-all', '-fno-common' ],
