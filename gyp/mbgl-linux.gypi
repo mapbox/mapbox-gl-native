@@ -48,6 +48,8 @@
       'link_settings': {
         'libraries': [
           '<@(png_static_libs)',
+          '<@(jpeg_static_libs)',
+          '<@(nu_static_libs)'
         ],
       },
       'conditions': [
