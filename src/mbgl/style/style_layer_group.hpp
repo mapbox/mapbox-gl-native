@@ -11,7 +11,7 @@ class StyleLayerGroup {
 public:
     void setClasses(const std::vector<std::string> &class_names, timestamp now,
                     const PropertyTransition &defaultTransition);
-    void updateProperties(float z, timestamp t);
+    void updateProperties(float z, timestamp t, ZoomHistory &zoomHistory);
 
     bool hasTransitions() const;
 public:

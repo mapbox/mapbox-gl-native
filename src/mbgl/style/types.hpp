@@ -11,6 +11,16 @@ namespace mbgl {
 // Stores a premultiplied color, with all four channels ranging from 0..1
 typedef std::array<float, 4> Color;
 
+
+template <typename T>
+struct Faded {
+    T low;
+    float lowScale;
+    T high;
+    float highScale;
+    float t;
+};
+
 // -------------------------------------------------------------------------------------------------
 
 enum class StyleLayerType : uint8_t {

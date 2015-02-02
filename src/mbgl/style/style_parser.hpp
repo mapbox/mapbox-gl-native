@@ -77,7 +77,11 @@ private:
     template <typename T>
     std::tuple<bool, Function<T>> parseFunction(JSVal value);
     template <typename T>
+    std::tuple<bool, FadedStopsFunction<T>> parseFadedStopsFunction(JSVal value);
+    template <typename T>
     T parseFunctionArgument(JSVal value);
+    template <typename T>
+    std::tuple<bool, std::vector<std::pair<float, T>>> parseStops(JSVal value);
 
     FilterExpression parseFilter(JSVal);
 

@@ -3,7 +3,7 @@
 
 #include <mbgl/util/variant.hpp>
 #include <mbgl/style/types.hpp>
-#include <mbgl/style/function_properties.hpp>
+#include <mbgl/style/fadedfunction_properties.hpp>
 
 #include <array>
 #include <string>
@@ -21,7 +21,7 @@ struct FillProperties {
     Color stroke_color = {{ 0, 0, 0, -1 }};
     std::array<float, 2> translate = {{ 0, 0 }};
     TranslateAnchorType translateAnchor = TranslateAnchorType::Map;
-    std::string image;
+    Faded<std::string> image;
 
     inline bool isVisible() const {
         return opacity > 0 && (fill_color[3] > 0 || stroke_color[3] > 0);

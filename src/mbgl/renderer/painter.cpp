@@ -385,8 +385,8 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
 
         useProgram(patternShader->program);
         patternShader->u_matrix = identityMatrix;
-        patternShader->u_pattern_tl = imagePos.tl;
-        patternShader->u_pattern_br = imagePos.br;
+        patternShader->u_pattern_tl_a = imagePos.tl;
+        patternShader->u_pattern_br_a = imagePos.br;
         patternShader->u_mix = zoomFraction;
         patternShader->u_opacity = properties.opacity;
 
@@ -408,7 +408,7 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
         matrix::scale(matrix, matrix,
                        scale * state.getWidth()  / 2,
                       -scale * state.getHeight() / 2);
-        patternShader->u_patternmatrix = matrix;
+        patternShader->u_patternmatrix_a = matrix;
 
         backgroundBuffer.bind();
         patternShader->bind(0);

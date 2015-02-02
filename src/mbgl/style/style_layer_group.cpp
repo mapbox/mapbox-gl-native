@@ -11,10 +11,10 @@ void StyleLayerGroup::setClasses(const std::vector<std::string> &class_names, ti
     }
 }
 
-void StyleLayerGroup::updateProperties(float z, timestamp t) {
+void StyleLayerGroup::updateProperties(float z, timestamp t, ZoomHistory &zoomHistory) {
     for (const util::ptr<StyleLayer> &layer: layers) {
         if (layer) {
-            layer->updateProperties(z, t);
+            layer->updateProperties(z, t, zoomHistory);
         }
     }
 }

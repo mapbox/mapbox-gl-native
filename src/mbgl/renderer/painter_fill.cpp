@@ -33,7 +33,7 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         stroke_color[3] *= properties.opacity;
     }
 
-    const bool pattern = properties.image.size();
+    const bool pattern = properties.image.low.size();
 
     bool outline = properties.antialias && !pattern && properties.stroke_color != properties.fill_color;
     bool fringeline = properties.antialias && !pattern && properties.stroke_color == properties.fill_color;
@@ -59,34 +59,32 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
     if (pattern) {
         // Image fill.
         if (pass == RenderPass::Translucent) {
-            const SpriteAtlasPosition pos = spriteAtlas.getPosition(properties.image, true);
+            const SpriteAtlasPosition posA = spriteAtlas.getPosition(properties.image.low, true);
+            const SpriteAtlasPosition posB = spriteAtlas.getPosition(properties.image.high, true);
             float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
 
-            float mix;
-            float duration = 300 * 1_millisecond;
-            const float fraction = std::fmod(float(state.getZoom()), 1.0f);
-            float t = std::min((util::now() - lastIntegerZoomTime) / duration, 1.0f);
-            if (state.getZoom() > lastIntegerZoom) {
-                // zooming in
-                mix = fraction + (1.0f - fraction) * t;
-                factor *= 2.0;
-            } else {
-                // zooming out
-                mix = fraction - fraction * t;
-            }
-
-            mat3 patternMatrix;
-            matrix::identity(patternMatrix);
-            matrix::scale(patternMatrix, patternMatrix, 1.0f / (pos.size[0] * factor), 1.0f / (pos.size[1] * factor));
+            mat3 patternMatrixA;
+            matrix::identity(patternMatrixA);
+            matrix::scale(patternMatrixA, patternMatrixA,
+                    1.0f / (posA.size[0] * factor * properties.image.lowScale),
+                    1.0f / (posA.size[1] * factor * properties.image.lowScale));
+            mat3 patternMatrixB;
+            matrix::identity(patternMatrixB);
+            matrix::scale(patternMatrixB, patternMatrixB,
+                    1.0f / (posB.size[0] * factor * properties.image.highScale),
+                    1.0f / (posB.size[1] * factor * properties.image.highScale));
 
             useProgram(patternShader->program);
             patternShader->u_matrix = vtxMatrix;
-            patternShader->u_pattern_tl = pos.tl;
-            patternShader->u_pattern_br = pos.br;
+            patternShader->u_pattern_tl_a = posA.tl;
+            patternShader->u_pattern_br_a = posA.br;
+            patternShader->u_pattern_tl_b = posB.tl;
+            patternShader->u_pattern_br_b = posB.br;
             patternShader->u_opacity = properties.opacity;
             patternShader->u_image = 0;
-            patternShader->u_mix = mix;
-            patternShader->u_patternmatrix = patternMatrix;
+            patternShader->u_mix = properties.image.t;
+            patternShader->u_patternmatrix_a = patternMatrixA;
+            patternShader->u_patternmatrix_b = patternMatrixB;
 
             MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
             spriteAtlas.bind(true);

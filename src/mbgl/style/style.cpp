@@ -29,8 +29,10 @@ Style::~Style() {}
 void Style::updateProperties(float z, timestamp now) {
     uv::writelock lock(mtx);
 
+    zoomHistory.update(z, now);
+
     if (layers) {
-        layers->updateProperties(z, now);
+        layers->updateProperties(z, now, zoomHistory);
     }
 
     // Apply transitions after the first time.
