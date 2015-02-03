@@ -7,8 +7,6 @@ NAME=$1
 export JOBS=2
 
 export CC=clang CXX=clang++
-export CXXFLAGS="-Wno-unknown-warning-option -Wno-unused-local-typedefs -Wno-unknown-pragmas ${CXXFLAGS}";
-
 export MASON_PLATFORM=android
 
 mkdir ./android/java/app/src/main/res/raw/

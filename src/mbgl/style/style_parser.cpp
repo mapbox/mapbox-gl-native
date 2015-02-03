@@ -367,14 +367,14 @@ template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal
     PropertyTransition transition;
     if (value.IsObject()) {
         if (value.HasMember("duration") && value["duration"].IsNumber()) {
-            transition.duration = value["duration"].GetUint();
+            transition.duration = std::chrono::milliseconds(value["duration"].GetUint());
         }
         if (value.HasMember("delay") && value["delay"].IsNumber()) {
-            transition.delay = value["delay"].GetUint();
+            transition.delay = std::chrono::milliseconds(value["delay"].GetUint());
         }
     }
 
-    if (transition.duration == 0 && transition.delay == 0) {
+    if (transition.duration == std::chrono::steady_clock::duration::zero() && transition.delay == std::chrono::steady_clock::duration::zero()) {
         return std::tuple<bool, PropertyTransition> { false, std::move(transition) };
     }
 

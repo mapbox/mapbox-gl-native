@@ -2,7 +2,6 @@
 #include <mbgl/platform/gl.hpp>
 
 #include <mbgl/util/raster.hpp>
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/std.hpp>
 
@@ -91,15 +90,15 @@ void Raster::bind(const GLuint custom_texture) {
 }
 
 void Raster::beginFadeInTransition() {
-    timestamp start = util::now();
-    fade_transition = std::make_shared<util::ease_transition<double>>(opacity, 1.0, opacity, start, 250_milliseconds);
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    fade_transition = std::make_shared<util::ease_transition<double>>(opacity, 1.0, opacity, start, std::chrono::milliseconds(250));
 }
 
 bool Raster::needsTransition() const {
     return fade_transition != nullptr;
 }
 
-void Raster::updateTransitions(timestamp now) {
+void Raster::updateTransitions(std::chrono::steady_clock::time_point now) {
     if (fade_transition->update(now) == util::transition::complete) {
         fade_transition = nullptr;
     }

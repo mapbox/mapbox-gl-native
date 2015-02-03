@@ -22,18 +22,13 @@
             '-Wno-variadic-macros',
             '-frtti',
             '-fexceptions',
-            '-Wno-error=unused-parameter',
           ],
           'GCC_WARN_PEDANTIC': 'YES',
           'GCC_WARN_UNINITIALIZED_AUTOS': 'YES_AGGRESSIVE',
         },
       }],
       ['OS=="linux"', {
-        'cflags_cc': [
-          '-Wno-unknown-pragmas', # We are using '#pragma mark', but it is only available on Darwin.
-          '-Wno-literal-suffix', # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61653
-          '-Wno-unknown-warning-option',
-          '-Wno-error=unused-parameter',
+        'cflags_cc': ['-Wno-unknown-pragmas', # We are using '#pragma mark', but it is only available on Darwin.
         ],
       }],
     ],

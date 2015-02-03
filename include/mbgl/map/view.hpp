@@ -1,7 +1,7 @@
 #ifndef MBGL_MAP_VIEW
 #define MBGL_MAP_VIEW
 
-#include <mbgl/util/time.hpp>
+#include <chrono>
 
 namespace mbgl {
 
@@ -44,7 +44,7 @@ public:
     // Notifies a watcher of map x/y/scale/rotation changes.
     // Must only be called from the same thread that caused the change.
     // Must not be called from the render thread.
-    virtual void notifyMapChange(MapChange change, timestamp delay = 0) = 0;
+    virtual void notifyMapChange(MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero()) = 0;
 
 protected:
     mbgl::Map *map = nullptr;

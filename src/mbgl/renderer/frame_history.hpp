@@ -4,15 +4,15 @@
 #include <deque>
 #include <cassert>
 #include <cmath>
+#include <chrono>
 
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/util/time.hpp>
 
 namespace mbgl {
 
 struct FrameSnapshot {
-    explicit inline FrameSnapshot(timestamp t_, float z_) : t(t_), z(z_) {}
-    float t;
+    explicit inline FrameSnapshot(std::chrono::steady_clock::time_point now_, float z_) : now(now_), z(z_) {}
+    std::chrono::steady_clock::time_point now;
     float z;
 };
 
@@ -26,10 +26,10 @@ struct FadeProperties {
 class FrameHistory {
 public:
     // Record frame history that will be used to calculate fading params
-    void record(timestamp now, float zoom);
+    void record(std::chrono::steady_clock::time_point now, float zoom);
 
-    bool needsAnimation(timestamp duration) const;
-    FadeProperties getFadeProperties(timestamp duration);
+    bool needsAnimation(std::chrono::steady_clock::duration duration) const;
+    FadeProperties getFadeProperties(std::chrono::steady_clock::duration duration);
 
 public:
     std::deque<FrameSnapshot> history;

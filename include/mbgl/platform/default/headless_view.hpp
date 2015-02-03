@@ -31,7 +31,7 @@ public:
     std::unique_ptr<uint32_t[]> readPixels();
 
     void notify();
-    void notifyMapChange(MapChange change, timestamp delay = 0);
+    void notifyMapChange(MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero());
     void activate();
     void deactivate();
     void swap();

@@ -25,7 +25,7 @@ public:
     void swap() override;
 
     void notify() override;
-    void notifyMapChange(mbgl::MapChange change, mbgl::timestamp delay) override;
+    void notifyMapChange(mbgl::MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero()) override;
 
     mbgl::Map &getMap();
     mbgl::CachingHTTPFileSource &getFileSource();

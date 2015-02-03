@@ -63,9 +63,9 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
             float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
 
             float mix;
-            float duration = 300 * 1_millisecond;
+            std::chrono::steady_clock::duration duration = std::chrono::milliseconds(300);
             const float fraction = std::fmod(float(state.getZoom()), 1.0f);
-            float t = std::min((util::now() - lastIntegerZoomTime) / duration, 1.0f);
+            float t = std::min(static_cast<float>((std::chrono::steady_clock::now() - lastIntegerZoomTime) / duration), 1.0f);
             if (state.getZoom() > lastIntegerZoom) {
                 // zooming in
                 mix = fraction + (1.0f - fraction) * t;

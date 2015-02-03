@@ -28,6 +28,7 @@
 #include <map>
 #include <unordered_map>
 #include <set>
+#include <chrono>
 
 namespace mbgl {
 
@@ -78,7 +79,7 @@ public:
     void render(const Style& style,
                 const std::set<util::ptr<StyleSource>>& sources,
                 TransformState state,
-                timestamp time);
+                std::chrono::steady_clock::time_point time);
 
     void renderLayers(util::ptr<StyleLayerGroup> group);
     void renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
@@ -139,7 +140,7 @@ private:
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor);
 
     void prepareTile(const Tile& tile);
-    void recordZoom(const timestamp time, const float zoom);
+    void recordZoom(const std::chrono::steady_clock::time_point time, const float zoom);
 
     template <typename BucketProperties, typename StyleProperties>
     void renderSDF(SymbolBucket &bucket,
@@ -193,7 +194,7 @@ private:
     const float strata_epsilon = 1.0f / (1 << 16);
 
     int lastIntegerZoom;
-    timestamp lastIntegerZoomTime = 0;
+    std::chrono::steady_clock::time_point lastIntegerZoomTime = std::chrono::steady_clock::time_point::min();
     float lastZoom = -1;
 
 public:

@@ -2,7 +2,7 @@
 
 namespace mbgl {
 
-void StyleLayerGroup::setClasses(const std::vector<std::string> &class_names, timestamp now,
+void StyleLayerGroup::setClasses(const std::vector<std::string> &class_names, std::chrono::steady_clock::time_point now,
                                  const PropertyTransition &defaultTransition) {
     for (const util::ptr<StyleLayer> &layer : layers) {
         if (layer) {
@@ -11,10 +11,10 @@ void StyleLayerGroup::setClasses(const std::vector<std::string> &class_names, ti
     }
 }
 
-void StyleLayerGroup::updateProperties(float z, timestamp t) {
+void StyleLayerGroup::updateProperties(float z, std::chrono::steady_clock::time_point now) {
     for (const util::ptr<StyleLayer> &layer: layers) {
         if (layer) {
-            layer->updateProperties(z, t);
+            layer->updateProperties(z, now);
         }
     }
 }
