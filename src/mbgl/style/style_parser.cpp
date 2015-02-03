@@ -653,7 +653,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("line-blur-transition", Key::LineBlur, klass, value);
     parseOptionalProperty<Function<std::vector<float>>>("line-dasharray", Key::LineDashArray, klass, value);
-    parseOptionalProperty<std::string>("line-image", Key::LineImage, klass, value);
+    parseOptionalProperty<FadedStopsFunction<Faded<std::string>>>("line-image", Key::LineImage, klass, value);
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("icon-opacity-transition", Key::IconOpacity, klass, value);

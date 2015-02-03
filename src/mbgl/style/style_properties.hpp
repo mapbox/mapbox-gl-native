@@ -39,7 +39,7 @@ struct LineProperties {
     float blur = 0;
     std::vector<float> dash_array;
     float dash_line_width = 1;
-    std::string image;
+    Faded<std::string> image;
 
     inline bool isVisible() const {
         return opacity > 0 && color[3] > 0 && width > 0;

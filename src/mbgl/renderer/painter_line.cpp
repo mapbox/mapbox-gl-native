@@ -112,19 +112,11 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 
         bucket.drawLineSDF(*linesdfShader);
 
-    } else if (properties.image.size()) {
-        SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image, true);
+    } else if (properties.image.low.size()) {
+        SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.low, true);
+        SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.high, true);
 
         float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
-        float fade;
-        if (state.getZoom() > lastIntegerZoom) {
-            // zooming in
-            fade = fraction + (1.0f - fraction) * t;
-            factor *= 2.0;
-        } else {
-            // zooming out
-            fade = fraction - fraction * t;
-        }
 
         useProgram(linepatternShader->program);
 
@@ -134,10 +126,13 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linepatternShader->u_ratio = ratio;
         linepatternShader->u_blur = blur;
 
-        linepatternShader->u_pattern_size = {{imagePos.size[0] * factor, imagePos.size[1]}};
-        linepatternShader->u_pattern_tl = imagePos.tl;
-        linepatternShader->u_pattern_br = imagePos.br;
-        linepatternShader->u_fade = fade;
+        linepatternShader->u_pattern_size_a = {{imagePosA.size[0] * factor * properties.image.lowScale, imagePosA.size[1]}};
+        linepatternShader->u_pattern_tl_a = imagePosA.tl;
+        linepatternShader->u_pattern_br_a = imagePosA.br;
+        linepatternShader->u_pattern_size_b = {{imagePosB.size[0] * factor * properties.image.highScale, imagePosB.size[1]}};
+        linepatternShader->u_pattern_tl_b = imagePosB.tl;
+        linepatternShader->u_pattern_br_b = imagePosB.br;
+        linepatternShader->u_fade = properties.image.t;
         linepatternShader->u_opacity = properties.opacity;
 
         MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));

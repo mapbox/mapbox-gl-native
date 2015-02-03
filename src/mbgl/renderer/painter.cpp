@@ -427,6 +427,7 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
                       -scale * state.getHeight() / 2);
 
         patternShader->u_patternmatrix_a = matrixA;
+        patternShader->u_patternmatrix_b = matrixB;
 
         backgroundBuffer.bind();
         patternShader->bind(0);
