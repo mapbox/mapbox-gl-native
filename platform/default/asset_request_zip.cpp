@@ -7,7 +7,13 @@
 
 #include "uv_zip.h"
 
+#pragma GCC diagnostic push
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#pragma GCC diagnostic ignored "-Wshadow"
+#endif
 #include <boost/algorithm/string.hpp>
+#pragma GCC diagnostic pop
 
 #include <forward_list>
 
