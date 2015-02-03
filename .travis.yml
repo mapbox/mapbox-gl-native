@@ -37,6 +37,10 @@ matrix:
     - os: osx
       env: BUILDTYPE=Debug JOBS=8
       compiler: clang
+  allow_failures:
+    - os: linux
+      env: CONFIG=release MASON_PLATFORM=android MASON_ANDROID_ABI=mips-64 TESTMUNK=no
+      compiler: clang
 
 env:
   global:
