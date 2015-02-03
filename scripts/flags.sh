@@ -30,6 +30,3 @@ if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #     fi
     # fi
 fi
-
-# turn off a few warnings
-export CXXFLAGS="-Wno-unknown-warning-option -Wno-unused-local-typedefs -Wno-unknown-pragmas ${CXXFLAGS}";

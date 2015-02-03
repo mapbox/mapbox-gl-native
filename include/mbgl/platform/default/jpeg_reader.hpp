@@ -9,7 +9,13 @@ extern "C"
 #include <jpeglib.h>
 }
 
+#pragma GCC diagnostic push
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#pragma GCC diagnostic ignored "-Wshadow"
+#endif
 #include <boost/iostreams/stream.hpp>
+#pragma GCC diagnostic pop
 
 namespace mbgl { namespace util {
 
