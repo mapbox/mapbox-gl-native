@@ -258,9 +258,11 @@ Color StyleParser::parseFunctionArgument(JSVal value) {
 }
 
 template <>
-std::vector<float> StyleParser::parseFunctionArgument(JSVal value) {
+Faded<std::vector<float>> StyleParser::parseFunctionArgument(JSVal value) {
+    Faded<std::vector<float>> parsed;
     JSVal rvalue = replaceConstant(value);
-    return std::get<1>(parseFloatArray(rvalue));
+    parsed.low = std::get<1>(parseFloatArray(rvalue));
+    return parsed;
 }
 
 template <>
@@ -469,15 +471,17 @@ template<> std::tuple<bool, Function<Color>> StyleParser::parseProperty(JSVal va
     }
 }
 
-template<> std::tuple<bool, Function<std::vector<float>>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> std::tuple<bool, FadedStopsFunction<Faded<std::vector<float>>>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (value.IsObject()) {
-        return parseFunction<std::vector<float>>(value);
+        return parseFadedStopsFunction<Faded<std::vector<float>>>(value);
     } else if (value.IsArray()) {
-        std::tuple<bool, std::vector<float>> parsed = parseFloatArray(value);
-        return std::tuple<bool, Function<std::vector<float>>> { std::get<0>(parsed), ConstantFunction<std::vector<float>>(std::get<1>(parsed)) };
+        Faded<std::vector<float>> parsed;
+        std::tuple<bool, std::vector<float>> floatarray = parseFloatArray(value);
+        parsed.low = std::get<1>(floatarray);
+        return std::tuple<bool, FadedStopsFunction<Faded<std::vector<float>>>> { std::get<0>(floatarray),  parsed };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be an array of numbers, or a number array function", property_name);
-        return std::tuple<bool, Function<std::vector<float>>> { false, ConstantFunction<std::vector<float>>(std::vector<float>()) };
+        return std::tuple<bool, FadedStopsFunction<Faded<std::vector<float>>>> { false, {} };
     }
 }
 
@@ -652,7 +656,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("line-gap-width-transition", Key::LineGapWidth, klass, value);
     parseOptionalProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("line-blur-transition", Key::LineBlur, klass, value);
-    parseOptionalProperty<Function<std::vector<float>>>("line-dasharray", Key::LineDashArray, klass, value);
+    parseOptionalProperty<FadedStopsFunction<Faded<std::vector<float>>>>("line-dasharray", Key::LineDashArray, klass, value);
     parseOptionalProperty<FadedStopsFunction<Faded<std::string>>>("line-image", Key::LineImage, klass, value);
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);

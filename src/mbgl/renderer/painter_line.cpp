@@ -70,11 +70,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         bucket.drawPoints(*linejoinShader);
     }
 
-    float duration = 300 * 1_millisecond;
-    const float fraction = std::fmod(float(state.getZoom()), 1.0f);
-    float t = std::min((util::now() - lastIntegerZoomTime) / duration, 1.0f);
-
-    if (properties.dash_array.size()) {
+    if (properties.dash_array.low.size()) {
 
         useProgram(linesdfShader->program);
 
@@ -85,30 +81,23 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linesdfShader->u_blur = blur;
         linesdfShader->u_color = color;
 
-        LinePatternPos pos = lineAtlas.getDashPosition(properties.dash_array, bucket.properties.cap == CapType::Round);
+        LinePatternPos posA = lineAtlas.getDashPosition(properties.dash_array.low, bucket.properties.cap == CapType::Round);
+        LinePatternPos posB = lineAtlas.getDashPosition(properties.dash_array.high, bucket.properties.cap == CapType::Round);
         lineAtlas.bind();
 
         float patternratio = std::pow(2.0, std::floor(std::log2(state.getScale())) - id.z) / 8.0;
-        float scaleX = patternratio / pos.width / properties.dash_line_width;
-        float scaleY = -pos.height / 2.0;
+        float scaleXA = patternratio / posA.width / properties.dash_line_width / properties.dash_array.lowScale;
+        float scaleYA = -posA.height / 2.0;
+        float scaleXB = patternratio / posB.width / properties.dash_line_width / properties.dash_array.highScale;
+        float scaleYB = -posB.height / 2.0;
 
-        float mix;
-        if (state.getZoom() > lastIntegerZoom) {
-            // zooming in
-            mix = fraction + (1.0f - fraction) * t;
-            scaleX /= 2.0;
-        } else {
-            // zooming out
-            mix = fraction - fraction * t;
-        }
-
-        linesdfShader->u_patternscale_a = {{ scaleX, scaleY }};
-        linesdfShader->u_tex_y_a = pos.y;
-        linesdfShader->u_patternscale_b = {{ scaleX * 2.0f, scaleY }};
-        linesdfShader->u_tex_y_b = pos.y;
+        linesdfShader->u_patternscale_a = {{ scaleXA, scaleYA }};
+        linesdfShader->u_tex_y_a = posA.y;
+        linesdfShader->u_patternscale_b = {{ scaleXB, scaleYB }};
+        linesdfShader->u_tex_y_b = posB.y;
         linesdfShader->u_image = 0;
-        linesdfShader->u_sdfgamma = lineAtlas.width / (properties.dash_line_width * pos.width * 256.0 * state.getPixelRatio()) / 2;
-        linesdfShader->u_mix = mix;
+        linesdfShader->u_sdfgamma = lineAtlas.width / (properties.dash_line_width * std::min(posA.width, posB.width) * 256.0 * state.getPixelRatio()) / 2;
+        linesdfShader->u_mix = properties.dash_array.t;
 
         bucket.drawLineSDF(*linesdfShader);
 

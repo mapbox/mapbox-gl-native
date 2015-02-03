@@ -17,7 +17,7 @@ typedef mapbox::util::variant<
     Function<bool>,
     Function<float>,
     Function<Color>,
-    Function<std::vector<float>>,
+    FadedStopsFunction<Faded<std::vector<float>>>,
     FadedStopsFunction<Faded<std::string>>
 > PropertyValue;
 

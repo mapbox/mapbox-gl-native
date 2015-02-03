@@ -47,5 +47,6 @@ T FadedStopsFunction<T>::evaluate(float z, const ZoomHistory &zh) const {
 }
 
 template Faded<std::string> FadedStopsFunction<Faded<std::string>>::evaluate(float z, const ZoomHistory &zoomHistory) const;
+template Faded<std::vector<float>> FadedStopsFunction<Faded<std::vector<float>>>::evaluate(float z, const ZoomHistory &zoomHistory) const;
 
 }
