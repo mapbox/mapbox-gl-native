@@ -3,7 +3,10 @@
 set -e
 set -o pipefail
 
-CMD="build/${BUILDTYPE:-Release}/test"
+if [ `uname -s` = 'Darwin' ]; then HOST=${HOST:-osx} ; else HOST=${HOST:-linux} ; fi
+
+CMD=$1
+shift
 
 # allow writing core files
 ulimit -c unlimited -S

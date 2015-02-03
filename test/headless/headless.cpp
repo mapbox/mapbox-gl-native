@@ -10,6 +10,7 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
+#include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -29,7 +30,7 @@ void rewriteLocalScheme(rapidjson::Value &value, rapidjson::Document::AllocatorT
 class HeadlessTest : public ::testing::TestWithParam<std::string> {
 public:
     static void SetUpTestCase() {
-        const auto server = mbgl::test::getBaseDirectory() + "/headless/server.js";
+        const auto server = mbgl::platform::applicationRoot() + "/TEST_DATA/headless/server.js";
         pid = mbgl::test::startServer(server.c_str());
         display = std::make_shared<mbgl::HeadlessDisplay>();
     }
@@ -165,7 +166,7 @@ TEST_P(HeadlessTest, render) {
 INSTANTIATE_TEST_CASE_P(Headless, HeadlessTest, ::testing::ValuesIn([] {
     std::vector<std::string> names;
 
-    const auto tests = mbgl::test::getBaseDirectory() + "/suite/tests";
+    const auto tests = mbgl::platform::applicationRoot() + "/TEST_DATA/suite/tests";
     DIR *dir = opendir(tests.c_str());
     if (dir != nullptr) {
         for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {

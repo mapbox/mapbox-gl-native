@@ -14,7 +14,6 @@
 namespace mbgl {
 namespace test {
 
-const std::string &getBaseDirectory();
 pid_t startServer(const char *executable);
 void stopServer(pid_t pid);
 

@@ -20,7 +20,7 @@
       'variables': {
         'cflags_cc': [
           '<@(uv_cflags)',
-          '-I<(boost_root)/include',
+          '<@(boost_cflags)',
         ],
         'libraries': [
           '<@(uv_static_libs)',

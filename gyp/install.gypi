@@ -17,11 +17,17 @@
 
           'copies': [
             { 'files': [ '<(PRODUCT_DIR)/libmbgl.a' ], 'destination': '<(install_prefix)/lib' },
-            { 'files': [ '../include/mbgl' ], 'destination': '<(install_prefix)/include' },
             { 'files': [ '<(SHARED_INTERMEDIATE_DIR)/include/mbgl/util/version.hpp' ], 'destination': '<(install_prefix)/include/mbgl/util' },
           ],
 
           'actions': [
+            {
+              'action_name': 'Copy header files',
+              'inputs': [ '../include/mbgl/mbgl.hpp' ],
+              'outputs': [ '../include/mbgl/mbgl.hpp' ],
+              'action': [ 'cp', '-r', 'include', '<(install_prefix)/' ]
+            },
+
             { 'action_name': 'mbgl-config',
               'inputs': [
                 '../utils/mbgl-config/mbgl-config.template.sh',

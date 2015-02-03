@@ -22,7 +22,7 @@
       ],
 
       'cflags_cc': [
-        '-I<(boost_root)/include',
+        '<@(boost_cflags)',
       ],
       'libraries': [
           '<@(openssl_static_libs)',
@@ -73,16 +73,20 @@
 
       'copies': [
         {
-          'files': [ '<(PRODUCT_DIR)/lib.target/libmapbox-gl.so' ],
-          'destination': '<(pwd)/java/lib/src/main/jniLibs/$(JNIDIR)'
-        },
-        {
-          'files': [ '../common/ca-bundle.crt' ],
+          'files': [
+            '../common/ca-bundle.crt',
+            '../styles/styles'
+          ],
           'destination': '<(pwd)/java/lib/src/main/assets'
         },
+      ],
+
+      'actions': [
         {
-          'files': [ '../styles/styles' ],
-          'destination': '<(pwd)/java/lib/src/main/assets'
+          'action_name': 'Strip dynamic library',
+          'inputs': [ '<(PRODUCT_DIR)/lib.target/libmapbox-gl.so' ],
+          'outputs': [ '<(pwd)/java/lib/src/main/jniLibs/$(JNIDIR)/libmapbox-gl.so' ],
+          'action': [ '$(STRIP)', '<@(_inputs)', '-o', '<@(_outputs)' ]
         },
       ],
     },

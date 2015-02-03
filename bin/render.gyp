@@ -28,11 +28,11 @@
       'variables' : {
         'cflags_cc': [
           '<@(glfw3_cflags)',
-          '-I<(boost_root)/include',
+          '<@(boost_cflags)',
         ],
         'ldflags': [
           '<@(glfw3_ldflags)',
-          '-L<(boost_root)/lib',
+          '<@(boost_ldflags)',
           '-lboost_program_options'
         ],
         'libraries': [

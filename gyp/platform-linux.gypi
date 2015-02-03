@@ -26,7 +26,7 @@
           '<@(jpeg_cflags)',
           '<@(uv_cflags)',
           '<@(nu_cflags)',
-          '-I<(boost_root)/include',
+          '<@(boost_cflags)',
         ],
         'ldflags': [
           '<@(png_ldflags)',
