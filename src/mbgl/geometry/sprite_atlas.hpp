@@ -46,7 +46,7 @@ public:
     // This getter attempts to read the image from the sprite if it is already loaded.
     // In that case, it copies it into the sprite atlas and returns the dimensions.
     // Otherwise, it returns a 0/0/0/0 rect.
-    Rect<dimension> getImage(const std::string& name);
+    Rect<dimension> getImage(const std::string& name, const bool wrap);
 
     SpriteAtlasPosition getPosition(const std::string& name, bool repeating = false);
 
@@ -66,7 +66,7 @@ public:
 private:
     void allocate();
     Rect<SpriteAtlas::dimension> allocateImage(size_t width, size_t height);
-    void copy(const Rect<dimension>& dst, const SpritePosition& src);
+    void copy(const Rect<dimension>& dst, const SpritePosition& src, const bool wrap);
 
     std::recursive_mutex mtx;
     float pixelRatio = 1.0f;
