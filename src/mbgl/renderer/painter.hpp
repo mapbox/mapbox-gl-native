@@ -139,7 +139,6 @@ private:
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const Tile::ID &id, TranslateAnchorType anchor);
 
     void prepareTile(const Tile& tile);
-    void recordZoom(const timestamp time, const float zoom);
 
     template <typename BucketProperties, typename StyleProperties>
     void renderSDF(SymbolBucket &bucket,
@@ -191,10 +190,6 @@ private:
     float strata = 0;
     RenderPass pass = RenderPass::Opaque;
     const float strata_epsilon = 1.0f / (1 << 16);
-
-    int lastIntegerZoom;
-    timestamp lastIntegerZoomTime = 0;
-    float lastZoom = -1;
 
 public:
     FrameHistory frameHistory;
