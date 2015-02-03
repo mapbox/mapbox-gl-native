@@ -34,6 +34,7 @@ user_data="#!/bin/bash
     export TESTMUNK_KEY=$TESTMUNK_KEY
     export TESTMUNK=$TESTMUNK
     export MASON_ANDROID_ABI=$MASON_ANDROID_ABI
+    export ANDROID_ABI=$MASON_ANDROID_ABI
 
     if ./android/scripts/build-$CONFIG.sh $NAME &>../build.log; then
         echo 'ANDROID BUILD PASSED'
