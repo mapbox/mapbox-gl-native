@@ -195,7 +195,7 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
         // if feature has icon, get sprite atlas position
         if (feature.sprite.length()) {
             sprite.waitUntilLoaded();
-            image = spriteAtlas.getImage(feature.sprite);
+            image = spriteAtlas.getImage(feature.sprite, false);
 
             if (sprite.getSpritePosition(feature.sprite).sdf) {
                 sdfIcons = true;
