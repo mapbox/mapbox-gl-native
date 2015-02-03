@@ -126,7 +126,7 @@ xtest-proj: Xcode/test
 	open ./build/osx/test/test.xcodeproj
 
 xtest: Xcode/test
-	xcodebuild -project ./build/osx/test/test.xcodeproj -configuration $(BUILDTYPE) -scheme test -derivedDataPath build/osx -jobs `sysctl -n hw.ncpu`
+	xcodebuild -project ./build/osx/test/test.xcodeproj -configuration $(BUILDTYPE) -target test -jobs `sysctl -n hw.ncpu`
 
 xtest-%: xtest
 	./scripts/run_tests.sh "build/osx/Build/Products/$(BUILDTYPE)/test" --gtest_filter=$*
@@ -155,7 +155,7 @@ xosx-proj: Xcode/osx
 	open ./build/osx/macosx/mapboxgl-app.xcodeproj
 
 xosx: Xcode/osx
-	xcodebuild -project ./build/osx/macosx/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -scheme osxapp -derivedDataPath build/osx -jobs `sysctl -n hw.ncpu`
+	xcodebuild -project ./build/osx/macosx/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target osxapp -jobs `sysctl -n hw.ncpu`
 
 run-xosx: xosx
 	"build/osx/Build/Products/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
@@ -176,7 +176,7 @@ ios-proj: Xcode/ios
 	open ./build/ios/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
 
 ios: Xcode/ios
-	xcodebuild -sdk iphonesimulator ONLY_ACTIVE_ARCH=YES -project ./build/ios/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -scheme iosapp -derivedDataPath build/ios -jobs `sysctl -n hw.ncpu`
+	xcodebuild -sdk iphonesimulator ARCHS=x86_64 -project ./build/ios/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target iosapp -jobs `sysctl -n hw.ncpu`
 
 # Legacy name
 iproj: ios-proj
@@ -205,7 +205,7 @@ xlinux-proj: Xcode/linux
 	open ./build/osx/linux/mapboxgl-app.xcodeproj
 
 xlinux: Xcode/linux
-	xcodebuild -project ./build/osx/linux/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -scheme linuxapp -derivedDataPath build/osx
+	xcodebuild -project ./build/osx/linux/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target linuxapp
 
 run-xlinux: xlinux
 	"build/osx/Build/Products/$(BUILDTYPE)/mapbox-gl"
