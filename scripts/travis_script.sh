@@ -23,7 +23,7 @@ elif [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     git submodule update --init test/suite
 
     mapbox_time "run_tests" \
-    ./scripts/run_tests.sh
+    make test-* BUILDTYPE=${BUILDTYPE}
 
     mapbox_time "compare_results" \
     ./scripts/compare_images.sh
@@ -38,11 +38,8 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     #
     # build OS X
     #
-    mapbox_time "create_osx_project" \
-    make build/macosx/mapboxgl-app.xcodeproj
-
-    mapbox_time "build_osx" \
-    xcodebuild -project ./build/macosx/mapboxgl-app.xcodeproj -jobs $JOBS
+    mapbox_time "build_osx_project" \
+    make xosx -j$JOBS
 
     #
     # build iOS
@@ -50,9 +47,6 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     mapbox_time "checkout_cocoa_bindings" \
     git submodule update --init ios/mapbox-gl-cocoa
 
-    mapbox_time "create_ios_project" \
-    make build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
-
-    mapbox_time "build_ios" \
-    xcodebuild -project ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO -jobs $JOBS
+    mapbox_time "build_ios_project" \
+    make ios -j$JOBS
 fi
