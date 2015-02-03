@@ -376,39 +376,57 @@ void Painter::renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc
 void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
     const BackgroundProperties& properties = layer_desc->getProperties<BackgroundProperties>();
 
-    if (properties.image.size()) {
+    if (properties.image.low.size()) {
         if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))
             return;
 
-        SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image, true);
+        SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.low, true);
+        SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.high, true);
         float zoomFraction = state.getZoomFraction();
 
         useProgram(patternShader->program);
         patternShader->u_matrix = identityMatrix;
-        patternShader->u_pattern_tl_a = imagePos.tl;
-        patternShader->u_pattern_br_a = imagePos.br;
+        patternShader->u_pattern_tl_a = imagePosA.tl;
+        patternShader->u_pattern_br_a = imagePosA.br;
+        patternShader->u_pattern_tl_b = imagePosB.tl;
+        patternShader->u_pattern_br_b = imagePosB.br;
         patternShader->u_mix = zoomFraction;
         patternShader->u_opacity = properties.opacity;
 
-        std::array<float, 2> size = imagePos.size;
         double lon, lat;
         state.getLonLat(lon, lat);
         std::array<float, 2> center = state.locationCoordinate(lon, lat);
         float scale = 1 / std::pow(2, zoomFraction);
 
-        mat3 matrix;
-        matrix::identity(matrix);
-        matrix::scale(matrix, matrix,
-                      1.0f / size[0],
-                      1.0f / size[1]);
-        matrix::translate(matrix, matrix,
-                          std::fmod(center[0] * 512, size[0]),
-                          std::fmod(center[1] * 512, size[1]));
-        matrix::rotate(matrix, matrix, -state.getAngle());
-        matrix::scale(matrix, matrix,
+        std::array<float, 2> sizeA = imagePosA.size;
+        mat3 matrixA;
+        matrix::identity(matrixA);
+        matrix::scale(matrixA, matrixA,
+                      1.0f / (sizeA[0] * properties.image.lowScale),
+                      1.0f / (sizeA[1] * properties.image.lowScale));
+        matrix::translate(matrixA, matrixA,
+                          std::fmod(center[0] * 512, sizeA[0] * properties.image.lowScale),
+                          std::fmod(center[1] * 512, sizeA[1] * properties.image.lowScale));
+        matrix::rotate(matrixA, matrixA, -state.getAngle());
+        matrix::scale(matrixA, matrixA,
                        scale * state.getWidth()  / 2,
                       -scale * state.getHeight() / 2);
-        patternShader->u_patternmatrix_a = matrix;
+
+        std::array<float, 2> sizeB = imagePosB.size;
+        mat3 matrixB;
+        matrix::identity(matrixB);
+        matrix::scale(matrixB, matrixB,
+                      1.0f / (sizeB[0] * properties.image.highScale),
+                      1.0f / (sizeB[1] * properties.image.highScale));
+        matrix::translate(matrixB, matrixB,
+                          std::fmod(center[0] * 512, sizeB[0] * properties.image.highScale),
+                          std::fmod(center[1] * 512, sizeB[1] * properties.image.highScale));
+        matrix::rotate(matrixB, matrixB, -state.getAngle());
+        matrix::scale(matrixB, matrixB,
+                       scale * state.getWidth()  / 2,
+                      -scale * state.getHeight() / 2);
+
+        patternShader->u_patternmatrix_a = matrixA;
 
         backgroundBuffer.bind();
         patternShader->bind(0);

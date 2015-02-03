@@ -703,7 +703,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
 
     parseOptionalProperty<Function<float>>("background-opacity", Key::BackgroundOpacity, klass, value);
     parseOptionalProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
-    parseOptionalProperty<std::string>("background-image", Key::BackgroundImage, klass, value);
+    parseOptionalProperty<FadedStopsFunction<Faded<std::string>>>("background-image", Key::BackgroundImage, klass, value);
 }
 
 void StyleParser::parseReference(JSVal value, util::ptr<StyleLayer> &layer) {
