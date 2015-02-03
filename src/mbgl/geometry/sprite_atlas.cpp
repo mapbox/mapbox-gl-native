@@ -71,7 +71,7 @@ void copy_bitmap(const uint32_t *src, const int src_stride, const int src_x, con
     dst += dst_y * dst_stride + dst_x;
     if (wrap) {
         dst -= dst_stride;
-        int srcI;
+        int srcI = 0;
         // add 1 pixel wrapped padding on each side of the image
         for (int y = 0; y < height; y++, srcI = (((y + height) % height) + src_y) * src_stride + src_x, dst += dst_stride) {
             for (int x = -1; x <= width; x++) {
