@@ -69,17 +69,23 @@ private:
     template <typename T>
     bool parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value);
     template <typename T>
+    bool parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value, const char *transition_name);
+    template <typename T>
     bool parseOptionalProperty(const char *property_name, const std::vector<PropertyKey> &keys, ClassProperties &klass, JSVal value);
     template <typename T>
     bool setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass);
+    template <typename T>
+    bool setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass, JSVal transition);
 
     template <typename T>
     std::tuple<bool, T> parseProperty(JSVal value, const char *property_name);
+    template <typename T>
+    std::tuple<bool, T> parseProperty(JSVal value, const char *property_name, JSVal transition);
 
     template <typename T>
     std::tuple<bool, Function<T>> parseFunction(JSVal value);
     template <typename T>
-    std::tuple<bool, PiecewiseConstantFunction<T>> parsePiecewiseConstantFunction(JSVal value);
+    std::tuple<bool, PiecewiseConstantFunction<T>> parsePiecewiseConstantFunction(JSVal value, std::chrono::steady_clock::duration duration);
     template <typename T>
     T parseFunctionArgument(JSVal value);
     template <typename T>
