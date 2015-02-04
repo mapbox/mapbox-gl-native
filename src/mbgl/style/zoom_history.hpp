@@ -17,7 +17,7 @@ struct ZoomHistory {
             first = false;
 
             lastIntegerZoom = std::floor(z);
-            lastIntegerZoomTime = std::chrono::steady_clock::time_point::min();
+            lastIntegerZoomTime = std::chrono::steady_clock::time_point(std::chrono::steady_clock::duration(0));
             lastZoom = z;
         }
 

@@ -341,7 +341,7 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
     return std::tuple<bool, Function<T>> { true, StopsFunction<T>(std::get<1>(stops), base) };
 }
 
-template <typename T> inline std::chrono::duration<float> defaultDurationValue() { return std::chrono::duration<float>(300.0f); }
+template <typename T> inline std::chrono::duration<float> defaultDurationValue() { return std::chrono::milliseconds(300); }
 
 template <typename T>
 std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConstantFunction(JSVal value) {
@@ -355,7 +355,7 @@ std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConsta
     if (value.HasMember("duration")) {
         JSVal value_duration = value["duration"];
         if (value_duration.IsNumber()) {
-            duration = static_cast<std::chrono::duration<float>>(value_duration.GetDouble());
+            duration = std::chrono::milliseconds(value_duration.GetUint());
         } else {
             Log::Warning(Event::ParseStyle, "duration must be numeric");
         }
