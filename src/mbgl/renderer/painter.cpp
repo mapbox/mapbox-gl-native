@@ -375,12 +375,12 @@ void Painter::renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc
 void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
     const BackgroundProperties& properties = layer_desc->getProperties<BackgroundProperties>();
 
-    if (properties.image.low.size()) {
+    if (properties.image.to.size()) {
         if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))
             return;
 
-        SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.low, true);
-        SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.high, true);
+        SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.from, true);
+        SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.to, true);
         float zoomFraction = state.getZoomFraction();
 
         useProgram(patternShader->program);
@@ -401,11 +401,11 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
         mat3 matrixA;
         matrix::identity(matrixA);
         matrix::scale(matrixA, matrixA,
-                      1.0f / (sizeA[0] * properties.image.lowScale),
-                      1.0f / (sizeA[1] * properties.image.lowScale));
+                      1.0f / (sizeA[0] * properties.image.fromScale),
+                      1.0f / (sizeA[1] * properties.image.fromScale));
         matrix::translate(matrixA, matrixA,
-                          std::fmod(center[0] * 512, sizeA[0] * properties.image.lowScale),
-                          std::fmod(center[1] * 512, sizeA[1] * properties.image.lowScale));
+                          std::fmod(center[0] * 512, sizeA[0] * properties.image.fromScale),
+                          std::fmod(center[1] * 512, sizeA[1] * properties.image.fromScale));
         matrix::rotate(matrixA, matrixA, -state.getAngle());
         matrix::scale(matrixA, matrixA,
                        scale * state.getWidth()  / 2,
@@ -415,11 +415,11 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
         mat3 matrixB;
         matrix::identity(matrixB);
         matrix::scale(matrixB, matrixB,
-                      1.0f / (sizeB[0] * properties.image.highScale),
-                      1.0f / (sizeB[1] * properties.image.highScale));
+                      1.0f / (sizeB[0] * properties.image.toScale),
+                      1.0f / (sizeB[1] * properties.image.toScale));
         matrix::translate(matrixB, matrixB,
-                          std::fmod(center[0] * 512, sizeB[0] * properties.image.highScale),
-                          std::fmod(center[1] * 512, sizeB[1] * properties.image.highScale));
+                          std::fmod(center[0] * 512, sizeB[0] * properties.image.toScale),
+                          std::fmod(center[1] * 512, sizeB[1] * properties.image.toScale));
         matrix::rotate(matrixB, matrixB, -state.getAngle());
         matrix::scale(matrixB, matrixB,
                        scale * state.getWidth()  / 2,

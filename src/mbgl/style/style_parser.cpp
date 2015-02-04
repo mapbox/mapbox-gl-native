@@ -261,7 +261,7 @@ template <>
 Faded<std::vector<float>> StyleParser::parseFunctionArgument(JSVal value) {
     Faded<std::vector<float>> parsed;
     JSVal rvalue = replaceConstant(value);
-    parsed.low = std::get<1>(parseFloatArray(rvalue));
+    parsed.to = std::get<1>(parseFloatArray(rvalue));
     return parsed;
 }
 
@@ -270,7 +270,7 @@ Faded<std::string> StyleParser::parseFunctionArgument(JSVal value) {
     JSVal rvalue = replaceConstant(value);
     if (rvalue.IsString()) {
         Faded<std::string> parsed;
-        parsed.low = { value.GetString(), value.GetStringLength() };
+        parsed.to = { value.GetString(), value.GetStringLength() };
         return parsed;
     } else {
         Log::Warning(Event::ParseStyle, "function argument must be a string");
@@ -560,7 +560,7 @@ template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>
     } else if (value.IsArray()) {
         Faded<std::vector<float>> parsed;
         std::tuple<bool, std::vector<float>> floatarray = parseFloatArray(value);
-        parsed.low = std::get<1>(floatarray);
+        parsed.to = std::get<1>(floatarray);
         return std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>> { std::get<0>(floatarray),  parsed };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be an array of numbers, or a number array function", property_name);
@@ -573,7 +573,7 @@ template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> Style
         return parsePiecewiseConstantFunction<Faded<std::string>>(value);
     } else if (value.IsString()) {
         Faded<std::string> parsed;
-        parsed.low = { value.GetString(), value.GetStringLength() };
+        parsed.to = { value.GetString(), value.GetStringLength() };
         return std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> { true,  parsed };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be string or a string function", property_name);

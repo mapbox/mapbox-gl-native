@@ -70,7 +70,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         bucket.drawPoints(*linejoinShader);
     }
 
-    if (properties.dash_array.low.size()) {
+    if (properties.dash_array.from.size()) {
 
         useProgram(linesdfShader->program);
 
@@ -81,14 +81,14 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linesdfShader->u_blur = blur;
         linesdfShader->u_color = color;
 
-        LinePatternPos posA = lineAtlas.getDashPosition(properties.dash_array.low, bucket.properties.cap == CapType::Round);
-        LinePatternPos posB = lineAtlas.getDashPosition(properties.dash_array.high, bucket.properties.cap == CapType::Round);
+        LinePatternPos posA = lineAtlas.getDashPosition(properties.dash_array.from, bucket.properties.cap == CapType::Round);
+        LinePatternPos posB = lineAtlas.getDashPosition(properties.dash_array.to, bucket.properties.cap == CapType::Round);
         lineAtlas.bind();
 
         float patternratio = std::pow(2.0, std::floor(std::log2(state.getScale())) - id.z) / 8.0;
-        float scaleXA = patternratio / posA.width / properties.dash_line_width / properties.dash_array.lowScale;
+        float scaleXA = patternratio / posA.width / properties.dash_line_width / properties.dash_array.fromScale;
         float scaleYA = -posA.height / 2.0;
-        float scaleXB = patternratio / posB.width / properties.dash_line_width / properties.dash_array.highScale;
+        float scaleXB = patternratio / posB.width / properties.dash_line_width / properties.dash_array.toScale;
         float scaleYB = -posB.height / 2.0;
 
         linesdfShader->u_patternscale_a = {{ scaleXA, scaleYA }};
@@ -101,9 +101,9 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 
         bucket.drawLineSDF(*linesdfShader);
 
-    } else if (properties.image.low.size()) {
-        SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.low, true);
-        SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.high, true);
+    } else if (properties.image.from.size()) {
+        SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.from, true);
+        SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.to, true);
 
         float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
 
@@ -115,10 +115,10 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linepatternShader->u_ratio = ratio;
         linepatternShader->u_blur = blur;
 
-        linepatternShader->u_pattern_size_a = {{imagePosA.size[0] * factor * properties.image.lowScale, imagePosA.size[1]}};
+        linepatternShader->u_pattern_size_a = {{imagePosA.size[0] * factor * properties.image.fromScale, imagePosA.size[1]}};
         linepatternShader->u_pattern_tl_a = imagePosA.tl;
         linepatternShader->u_pattern_br_a = imagePosA.br;
-        linepatternShader->u_pattern_size_b = {{imagePosB.size[0] * factor * properties.image.highScale, imagePosB.size[1]}};
+        linepatternShader->u_pattern_size_b = {{imagePosB.size[0] * factor * properties.image.toScale, imagePosB.size[1]}};
         linepatternShader->u_pattern_tl_b = imagePosB.tl;
         linepatternShader->u_pattern_br_b = imagePosB.br;
         linepatternShader->u_fade = properties.image.t;

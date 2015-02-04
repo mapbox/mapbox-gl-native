@@ -33,13 +33,13 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         stroke_color[3] *= properties.opacity;
     }
 
-    const bool pattern = properties.image.low.size();
+    const bool pattern = properties.image.from.size();
 
     bool outline = properties.antialias && !pattern && properties.stroke_color != properties.fill_color;
     bool fringeline = properties.antialias && !pattern && properties.stroke_color == properties.fill_color;
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
-    // below, we have to draw the outline first (!)
+    // befrom, we have to draw the outline first (!)
     if (outline && pass == RenderPass::Translucent) {
         useProgram(outlineShader->program);
         outlineShader->u_matrix = vtxMatrix;
@@ -59,20 +59,20 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
     if (pattern) {
         // Image fill.
         if (pass == RenderPass::Translucent) {
-            const SpriteAtlasPosition posA = spriteAtlas.getPosition(properties.image.low, true);
-            const SpriteAtlasPosition posB = spriteAtlas.getPosition(properties.image.high, true);
+            const SpriteAtlasPosition posA = spriteAtlas.getPosition(properties.image.from, true);
+            const SpriteAtlasPosition posB = spriteAtlas.getPosition(properties.image.to, true);
             float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
 
             mat3 patternMatrixA;
             matrix::identity(patternMatrixA);
             matrix::scale(patternMatrixA, patternMatrixA,
-                    1.0f / (posA.size[0] * factor * properties.image.lowScale),
-                    1.0f / (posA.size[1] * factor * properties.image.lowScale));
+                    1.0f / (posA.size[0] * factor * properties.image.fromScale),
+                    1.0f / (posA.size[1] * factor * properties.image.fromScale));
             mat3 patternMatrixB;
             matrix::identity(patternMatrixB);
             matrix::scale(patternMatrixB, patternMatrixB,
-                    1.0f / (posB.size[0] * factor * properties.image.highScale),
-                    1.0f / (posB.size[1] * factor * properties.image.highScale));
+                    1.0f / (posB.size[0] * factor * properties.image.toScale),
+                    1.0f / (posB.size[1] * factor * properties.image.toScale));
 
             useProgram(patternShader->program);
             patternShader->u_matrix = vtxMatrix;

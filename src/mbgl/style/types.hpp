@@ -14,10 +14,10 @@ typedef std::array<float, 4> Color;
 
 template <typename T>
 struct Faded {
-    T low;
-    float lowScale;
-    T high;
-    float highScale;
+    T from;
+    float fromScale;
+    T to;
+    float toScale;
     float t;
 };
 

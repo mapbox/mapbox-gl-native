@@ -21,26 +21,28 @@ T PiecewiseConstantFunction<T>::evaluate(float z, const ZoomHistory &zh) const {
 
     float fraction = std::fmod(z, 1.0f);
     float t = std::min((std::chrono::steady_clock::now() - zh.lastIntegerZoomTime) / duration, 1.0f);
-    float scale = 1.0f;
-    uint32_t low, high;
+    float fromScale = 1.0f;
+    float toScale = 1.0f;
+    uint32_t from, to;
 
     if (z > zh.lastIntegerZoom) {
         result.t = fraction + (1.0f - fraction) * t;
-        scale *= 2.0f;
-        low = getBiggestStopLessThan(values, z - 1.0f);
-        high = getBiggestStopLessThan(values, z);
+        from = getBiggestStopLessThan(values, z - 1.0f);
+        to = getBiggestStopLessThan(values, z);
+        fromScale *= 2.0f;
 
     } else {
-        result.t = fraction - fraction * t;
-        low = getBiggestStopLessThan(values, z);
-        high = getBiggestStopLessThan(values, z + 1.0f);
+        result.t = 1 - (1 - t) * fraction;
+        to = getBiggestStopLessThan(values, z);
+        from = getBiggestStopLessThan(values, z + 1.0f);
+        fromScale /= 2.0f;
     }
 
 
-    result.low = values[low].second.low;
-    result.high = values[high].second.low;
-    result.lowScale = scale;
-    result.highScale = scale / 2;
+    result.from = values[from].second.to;
+    result.to = values[to].second.to;
+    result.fromScale = fromScale;
+    result.toScale = toScale;
     return result;
 }
 
