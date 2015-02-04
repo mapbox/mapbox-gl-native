@@ -37,6 +37,11 @@ class GlyphAtlas;
 class SpriteAtlas;
 class LineAtlas;
 
+struct exception : std::runtime_error {
+    inline exception(const char *msg) : std::runtime_error(msg) {
+    }
+};
+
 class Map : private util::noncopyable {
 public:
     explicit Map(View&, FileSource&);

@@ -184,6 +184,16 @@ android-deploy: $(ANDROID_ABIS)
 	cd android/java/MapboxGLAndroidSDK && chmod ugo+x deploy.sh && ./deploy.sh
 
 
+##### Render builds ############################################################
+
+.PRECIOUS: Makefile/render
+Makefile/render: bin/render.gyp config/$(HOST).gypi
+	deps/run_gyp bin/render.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
+
+render: Makefile/render
+	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) mbgl-render
+
+
 ##### Maintenace operations ####################################################
 
 .PHONY: clear_xcode_cache
