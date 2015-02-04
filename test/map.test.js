@@ -4,6 +4,38 @@
 var assert = require('assert');
 
 var mbgl = require('..');
+var fs = require('fs');
+var path = require('path');
+var mkdirp = require('mkdirp');
+
+mkdirp.sync('test/results');
+
+var style = {
+    'version': 7,
+    'name': 'Empty',
+    'sources': {
+        'mapbox': {
+          'type': 'vector',
+          'url': './fixtures/tiles.tilejson',
+          'maxzoom': 15
+        }
+    },
+    'layers': [{
+        'id': 'background',
+        'type': 'background',
+        'paint': {
+            'background-color': 'white'
+        }
+    }, {
+        'id': 'water',
+        'type': 'fill',
+        'source': 'mapbox',
+        'source-layer': 'water',
+        'paint': {
+            'fill-color': 'blue'
+        }
+    }]
+};
 
 describe('Map', function() {
 
@@ -29,30 +61,30 @@ describe('Map', function() {
         });
 
         it('should require the FileSource object to have request and cancel methods', function() {
-            var fs = new mbgl.FileSource();
+            var fileSource = new mbgl.FileSource();
 
             assert.throws(function() {
-                new mbgl.Map(fs);
+                new mbgl.Map(fileSource);
             }, /FileSource must have a request member function/);
 
-            fs.request = 'test';
+            fileSource.request = 'test';
             assert.throws(function() {
-                new mbgl.Map(fs);
+                new mbgl.Map(fileSource);
             }, /FileSource must have a request member function/);
 
-            fs.request = function() {};
+            fileSource.request = function() {};
             assert.throws(function() {
-                new mbgl.Map(fs);
+                new mbgl.Map(fileSource);
             }, /FileSource must have a cancel member function/);
 
-            fs.cancel = 'test';
+            fileSource.cancel = 'test';
             assert.throws(function() {
-                new mbgl.Map(fs);
+                new mbgl.Map(fileSource);
             }, /FileSource must have a cancel member function/);
 
-            fs.cancel = function() {};
+            fileSource.cancel = function() {};
             assert.doesNotThrow(function() {
-                new mbgl.Map(fs);
+                new mbgl.Map(fileSource);
             });
         });
 
@@ -61,11 +93,12 @@ describe('Map', function() {
     describe('load styles', function() {
         var map;
 
+        var fileSource = new mbgl.FileSource();
+        fileSource.request = function() {};
+        fileSource.cancel = function() {};
+
         beforeEach(function() {
-            var fs = new mbgl.FileSource();
-            fs.request = function() {};
-            fs.cancel = function() {};
-            map = new mbgl.Map(fs);
+            map = new mbgl.Map(fileSource);
         });
 
         afterEach(function() {
@@ -82,28 +115,40 @@ describe('Map', function() {
             }, /Expect either an object or array at root/);
         });
 
-        it('accepts a stylesheet string', function() {
+        it('accepts an empty stylesheet string', function() {
             map.load('{}');
         });
 
+        it('accepts a JSON stylesheet', function() {
+            map.load(style);
+        });
+
+        it('accepts a stringified stylesheet', function() {
+            map.load(JSON.stringify(style));
+        });
     });
 
-
-    describe('render arguments', function() {
+    describe('render argument requirements', function() {
         var map;
 
+        var fileSource = new mbgl.FileSource();
+        fileSource.request = function(req) {
+            fs.readFile(path.join('test', req.url), function(err, data) {
+                req.respond(err, { data: data });
+                assert.ifError(err);
+            });
+        };
+        fileSource.cancel = function() {};
+
         beforeEach(function() {
-            var fs = new mbgl.FileSource();
-            fs.request = function() {};
-            fs.cancel = function() {};
-            map = new mbgl.Map(fs);
+            map = new mbgl.Map(fileSource);
         });
 
         afterEach(function() {
             map = null;
         });
 
-        it('requires a string or object as the first parameter', function() {
+        it('requires an object as the first parameter', function() {
             assert.throws(function() {
                 map.render();
             }, /First argument must be an options object/);
@@ -123,12 +168,22 @@ describe('Map', function() {
             }, /Second argument must be a callback function/);
         });
 
-        it('requires a callback as the second parameter', function(done) {
+        it('requires a style to be set', function(done) {
             map.render({}, function(err) {
-                done(err);
+                assert.ok(err);
+                assert.equal(err.message, 'Style is not set');
+                done();
             });
         });
 
+        it('returns an image', function(done) {
+            map.load(style);
+            map.render({}, function(err, data) {
+                assert.ifError(err);
+                fs.writeFileSync('test/results/image.png', data);
+                done();
+            });
+        });
     });
 
 });

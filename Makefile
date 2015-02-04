@@ -11,6 +11,10 @@ HOST ?= osx
 endif
 HOST ?= linux
 
+# Explicitly disable the default FileSource implementation
+ASSET = none
+HTTP = none
+CACHE = none
 
 include $(MBGL)/config/defaults.mk
 

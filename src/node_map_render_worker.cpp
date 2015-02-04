@@ -16,7 +16,6 @@ NodeMap::RenderWorker::~RenderWorker() {
 }
 
 void NodeMap::RenderWorker::Execute() {
-    fprintf(stderr, "executing render worker\n");
     try {
         nodeMap->view.resize(options->width, options->height, options->ratio);
         nodeMap->map.setAccessToken(options->accessToken);
@@ -28,12 +27,11 @@ void NodeMap::RenderWorker::Execute() {
         // Run the loop. It will terminate when we don't have any further listeners.
         nodeMap->map.run();
 
-        fprintf(stderr, "run completed\n");
         const unsigned int width = options->width * options->ratio;
         const unsigned int height = options->height * options->ratio;
-        image = mbgl::util::compress_png(width, height, nodeMap->view.readPixels().get());
-        fprintf(stderr, "png compressed\n");
-    } catch (const std::exception &ex) {
+        auto pixels = nodeMap->view.readPixels();
+        image = mbgl::util::compress_png(width, height, pixels.get());
+    } catch (mbgl::exception &ex) {
         SetErrorMessage(ex.what());
     }
 }
