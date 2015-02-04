@@ -70,9 +70,9 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         bucket.drawPoints(*linejoinShader);
     }
 
-    float duration = 300 * 1_millisecond;
+    std::chrono::steady_clock::duration duration = std::chrono::milliseconds(300);
     const float fraction = std::fmod(float(state.getZoom()), 1.0f);
-    float t = std::min((util::now() - lastIntegerZoomTime) / duration, 1.0f);
+    float t = std::min(static_cast<float>(std::chrono::duration<float>(std::chrono::steady_clock::now() - lastIntegerZoomTime) / duration), 1.0f);
 
     if (properties.dash_array.size()) {
 

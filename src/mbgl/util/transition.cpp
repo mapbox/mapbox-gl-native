@@ -10,7 +10,7 @@ UnitBezier ease(0, 0, 0.25, 1);
 transition::~transition() {}
 
 template <typename T>
-transition::state ease_transition<T>::update(timestamp now) const {
+transition::state ease_transition<T>::update(std::chrono::steady_clock::time_point now) const {
     float t = progress(now);
     if (t >= 1) {
         value = to;

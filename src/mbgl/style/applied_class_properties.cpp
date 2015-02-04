@@ -2,7 +2,7 @@
 
 namespace mbgl {
 
-AppliedClassProperty::AppliedClassProperty(ClassID class_id, timestamp begin_, timestamp end_, const PropertyValue &value_)
+AppliedClassProperty::AppliedClassProperty(ClassID class_id, std::chrono::steady_clock::time_point begin_, std::chrono::steady_clock::time_point end_, const PropertyValue &value_)
     : name(class_id),
     begin(begin_),
     end(end_),
@@ -13,7 +13,7 @@ ClassID AppliedClassProperties::mostRecent() const {
     return properties.size() ? properties.back().name : ClassID::Fallback;
 }
 
-void AppliedClassProperties::add(ClassID class_id, timestamp begin, timestamp end, const PropertyValue &value) {
+void AppliedClassProperties::add(ClassID class_id, std::chrono::steady_clock::time_point begin, std::chrono::steady_clock::time_point end, const PropertyValue &value) {
     properties.emplace_back(class_id, begin, end, value);
 }
 
@@ -23,7 +23,7 @@ bool AppliedClassProperties::hasTransitions() const {
 
 // Erase all items in the property list that are before a completed transition.
 // Then, if the only remaining property is a Fallback value, remove it too.
-void AppliedClassProperties::cleanup(timestamp now) {
+void AppliedClassProperties::cleanup(std::chrono::steady_clock::time_point now) {
     // Iterate backwards, but without using the rbegin/rend interface since we need forward
     // iterators to use .erase().
     for (auto it = properties.end(), begin = properties.begin(); it != begin;) {

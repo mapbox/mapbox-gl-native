@@ -5,7 +5,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/util/transition.hpp>
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/clip_ids.hpp>
 #include <mbgl/util/string.hpp>
@@ -435,13 +434,13 @@ void Map::cancelTransitions() {
 
 #pragma mark - Position
 
-void Map::moveBy(double dx, double dy, double duration) {
-    transform.moveBy(dx, dy, duration * 1_second);
+void Map::moveBy(double dx, double dy, std::chrono::steady_clock::duration duration) {
+    transform.moveBy(dx, dy, duration);
     update();
 }
 
-void Map::setLonLat(double lon, double lat, double duration) {
-    transform.setLonLat(lon, lat, duration * 1_second);
+void Map::setLonLat(double lon, double lat, std::chrono::steady_clock::duration duration) {
+    transform.setLonLat(lon, lat, duration);
     update();
 }
 
@@ -469,13 +468,13 @@ void Map::resetPosition() {
 
 #pragma mark - Scale
 
-void Map::scaleBy(double ds, double cx, double cy, double duration) {
-    transform.scaleBy(ds, cx, cy, duration * 1_second);
+void Map::scaleBy(double ds, double cx, double cy, std::chrono::steady_clock::duration duration) {
+    transform.scaleBy(ds, cx, cy, duration);
     update();
 }
 
-void Map::setScale(double scale, double cx, double cy, double duration) {
-    transform.setScale(scale, cx, cy, duration * 1_second);
+void Map::setScale(double scale, double cx, double cy, std::chrono::steady_clock::duration duration) {
+    transform.setScale(scale, cx, cy, duration);
     update();
 }
 
@@ -483,8 +482,8 @@ double Map::getScale() const {
     return transform.getScale();
 }
 
-void Map::setZoom(double zoom, double duration) {
-    transform.setZoom(zoom, duration * 1_second);
+void Map::setZoom(double zoom, std::chrono::steady_clock::duration duration) {
+    transform.setZoom(zoom, duration);
     update();
 }
 
@@ -492,8 +491,8 @@ double Map::getZoom() const {
     return transform.getZoom();
 }
 
-void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
-    transform.setLonLatZoom(lon, lat, zoom, duration * 1_second);
+void Map::setLonLatZoom(double lon, double lat, double zoom, std::chrono::steady_clock::duration duration) {
+    transform.setLonLatZoom(lon, lat, zoom, duration);
     update();
 }
 
@@ -526,13 +525,13 @@ double Map::getMaxZoom() const {
 
 #pragma mark - Rotation
 
-void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) {
-    transform.rotateBy(sx, sy, ex, ey, duration * 1_second);
+void Map::rotateBy(double sx, double sy, double ex, double ey, std::chrono::steady_clock::duration duration) {
+    transform.rotateBy(sx, sy, ex, ey, duration);
     update();
 }
 
-void Map::setBearing(double degrees, double duration) {
-    transform.setAngle(-degrees * M_PI / 180, duration * 1_second);
+void Map::setBearing(double degrees, std::chrono::steady_clock::duration duration) {
+    transform.setAngle(-degrees * M_PI / 180, duration);
     update();
 }
 
@@ -546,7 +545,7 @@ double Map::getBearing() const {
 }
 
 void Map::resetNorth() {
-    transform.setAngle(0, 500_milliseconds);
+    transform.setAngle(0, std::chrono::milliseconds(500));
     update();
 }
 
@@ -618,14 +617,14 @@ std::vector<std::string> Map::getClasses() const {
    return classes;
 }
 
-void Map::setDefaultTransitionDuration(uint64_t milliseconds) {
-    defaultTransitionDuration = milliseconds;
+void Map::setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
+    defaultTransitionDuration = duration;
     if (style) {
-        style->setDefaultTransitionDuration(milliseconds);
+        style->setDefaultTransitionDuration(duration);
     }
 }
 
-uint64_t Map::getDefaultTransitionDuration() {
+std::chrono::steady_clock::duration Map::getDefaultTransitionDuration() {
     return defaultTransitionDuration;
 }
 
@@ -704,14 +703,14 @@ void Map::prepare() {
     }
 
     // Update transform transitions.
-    animationTime = util::now();
+    animationTime = std::chrono::steady_clock::now();
     if (transform.needsTransition()) {
         transform.updateTransitions(animationTime);
     }
 
     state = transform.currentState();
 
-    animationTime = util::now();
+    animationTime = std::chrono::steady_clock::now();
     updateSources();
     style->updateProperties(state.getNormalizedZoom(), animationTime);
 

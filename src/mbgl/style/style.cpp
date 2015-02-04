@@ -4,7 +4,6 @@
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/error.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/uv_detail.hpp>
@@ -26,7 +25,7 @@ Style::Style()
 // for deleting the std::unique_ptr<uv::rwlock>.
 Style::~Style() {}
 
-void Style::updateProperties(float z, timestamp now) {
+void Style::updateProperties(float z, std::chrono::steady_clock::time_point now) {
     uv::writelock lock(mtx);
 
     if (layers) {
@@ -44,13 +43,13 @@ const std::string &Style::getSpriteURL() const {
     return sprite_url;
 }
 
-void Style::setDefaultTransitionDuration(uint16_t duration_milliseconds) {
-    defaultTransition.duration = duration_milliseconds;
+void Style::setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
+    defaultTransition.duration = duration;
 }
 
 void Style::cascadeClasses(const std::vector<std::string>& classes) {
     if (layers) {
-        layers->setClasses(classes, util::now(), defaultTransition);
+        layers->setClasses(classes, std::chrono::steady_clock::now(), defaultTransition);
     }
 }
 

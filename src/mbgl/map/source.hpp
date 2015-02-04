@@ -6,7 +6,6 @@
 #include <mbgl/style/style_source.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/ptr.hpp>
 
@@ -14,6 +13,7 @@
 #include <forward_list>
 #include <iosfwd>
 #include <map>
+#include <chrono>
 
 namespace mbgl {
 
@@ -75,7 +75,7 @@ private:
     bool loaded = false;
 
     // Stores the time when this source was most recently updated.
-    timestamp updated = 0;
+    std::chrono::steady_clock::time_point updated = std::chrono::steady_clock::time_point::min();
 
     std::map<Tile::ID, std::unique_ptr<Tile>> tiles;
     std::map<Tile::ID, std::weak_ptr<TileData>> tile_data;

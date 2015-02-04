@@ -46,6 +46,9 @@ public class MapView extends SurfaceView {
     // Tag used for logging
     private static final String TAG = "MapView";
 
+    // Used for animation
+    private static final long ANIMATION_DURATION = 300;
+
     // Used for saving instance state
     private static final String STATE_CENTER_COORDINATE = "centerCoordinate";
     private static final String STATE_CENTER_DIRECTION = "centerDirection";
@@ -188,7 +191,7 @@ public class MapView extends SurfaceView {
         if (!isInEditMode()) {
             if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
                 mZoomButtonsController = new ZoomButtonsController(this);
-                mZoomButtonsController.setZoomSpeed(300);
+                mZoomButtonsController.setZoomSpeed(ANIMATION_DURATION);
                 mZoomButtonsController.setOnZoomListener(new OnZoomListener());
             }
 
@@ -213,7 +216,7 @@ public class MapView extends SurfaceView {
     }
 
     public void setCenterCoordinate(LonLat centerCoordinate, boolean animated) {
-        double duration = animated ? 0.3 : 0.0;
+        long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.setLonLat(centerCoordinate, duration);
     }
 
@@ -223,7 +226,7 @@ public class MapView extends SurfaceView {
 
     public void setCenterCoordinate(LonLatZoom centerCoordinate,
             boolean animated) {
-        double duration = animated ? 0.3 : 0.0;
+        long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.setLonLatZoom(centerCoordinate, duration);
     }
 
@@ -243,8 +246,7 @@ public class MapView extends SurfaceView {
     }
 
     public void setDirection(double direction, boolean animated) {
-        double duration = animated ? 0.3 : 0.0;
-
+        long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.setBearing(-direction, duration);
     }
 
@@ -265,7 +267,7 @@ public class MapView extends SurfaceView {
     }
 
     public void setZoomLevel(double zoomLevel, boolean animated) {
-        double duration = animated ? 0.3 : 0.0;
+        long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.setZoom(zoomLevel, duration);
     }
 
@@ -565,10 +567,10 @@ public class MapView extends SurfaceView {
         mNativeMapView.cancelTransitions();
 
         if (zoomIn) {
-            mNativeMapView.scaleBy(2.0, x / mScreenDensity, y / mScreenDensity, 0.3);
+            mNativeMapView.scaleBy(2.0, x / mScreenDensity, y / mScreenDensity, ANIMATION_DURATION);
         } else {
             // TODO two finger tap zoom out
-            mNativeMapView.scaleBy(0.5, x / mScreenDensity, y / mScreenDensity, 0.3);
+            mNativeMapView.scaleBy(0.5, x / mScreenDensity, y / mScreenDensity, ANIMATION_DURATION);
         }
     }
 
@@ -695,7 +697,7 @@ public class MapView extends SurfaceView {
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
-            mNativeMapView.moveBy(velocityX * duration / 2.0 / mScreenDensity, velocityY * duration / 2.0 / mScreenDensity, duration);
+            mNativeMapView.moveBy(velocityX * duration / 2.0 / mScreenDensity, velocityY * duration / 2.0 / mScreenDensity, (long)(duration * 1000.0f));
 
             return true;
         }

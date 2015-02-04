@@ -5,6 +5,7 @@
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/math.hpp>
+
 #include <cmath>
 
 using namespace mbgl;
@@ -52,7 +53,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     sdfShader.u_angle = (int32_t)(angle + 256) % 256;
     sdfShader.u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
-    FadeProperties f = frameHistory.getFadeProperties(300_milliseconds);
+    FadeProperties f = frameHistory.getFadeProperties(std::chrono::milliseconds(300));
     sdfShader.u_fadedist = f.fadedist * 10;
     sdfShader.u_minfadezoom = std::floor(f.minfadezoom * 10);
     sdfShader.u_maxfadezoom = std::floor(f.maxfadezoom * 10);

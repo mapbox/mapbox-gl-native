@@ -4,7 +4,6 @@
 #include <mbgl/style/property_transition.hpp>
 #include <mbgl/style/style_source.hpp>
 
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
 
@@ -14,6 +13,7 @@
 #include <unordered_map>
 #include <vector>
 #include <set>
+#include <chrono>
 
 namespace mbgl {
 
@@ -31,9 +31,9 @@ public:
     void loadJSON(const uint8_t *const data);
 
     size_t layerCount() const;
-    void updateProperties(float z, timestamp t);
+    void updateProperties(float z, std::chrono::steady_clock::time_point now);
 
-    void setDefaultTransitionDuration(uint16_t duration_milliseconds = 0);
+    void setDefaultTransitionDuration(std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void cascadeClasses(const std::vector<std::string>&);
 
     bool hasTransitions() const;

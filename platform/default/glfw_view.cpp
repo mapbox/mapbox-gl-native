@@ -174,7 +174,7 @@ void GLFWView::key(GLFWwindow *window, int key, int /*scancode*/, int action, in
             break;
         case GLFW_KEY_R:
             if (!mods) {
-                view->map->setDefaultTransitionDuration(300);
+                view->map->setDefaultTransitionDuration(std::chrono::milliseconds(300));
                 if (view->map->hasClass("night")) {
                     view->map->removeClass("night");
                 } else {
@@ -239,9 +239,9 @@ void GLFWView::mouseClick(GLFWwindow *window, int button, int action, int modifi
             double now = glfwGetTime();
             if (now - view->lastClick < 0.4 /* ms */) {
                 if (modifiers & GLFW_MOD_SHIFT) {
-                    view->map->scaleBy(0.5, view->lastX, view->lastY, 0.5);
+                    view->map->scaleBy(0.5, view->lastX, view->lastY, std::chrono::milliseconds(500));
                 } else {
-                    view->map->scaleBy(2.0, view->lastX, view->lastY, 0.5);
+                    view->map->scaleBy(2.0, view->lastX, view->lastY, std::chrono::milliseconds(500));
                 }
             }
             view->lastClick = now;
@@ -301,7 +301,7 @@ void GLFWView::swap() {
     fps();
 }
 
-void GLFWView::notifyMapChange(mbgl::MapChange /*change*/, mbgl::timestamp /*delay*/) {
+void GLFWView::notifyMapChange(mbgl::MapChange /*change*/, std::chrono::steady_clock::duration /*delay*/) {
     // no-op
 }
 
