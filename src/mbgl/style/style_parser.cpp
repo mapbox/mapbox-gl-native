@@ -268,13 +268,13 @@ Faded<std::vector<float>> StyleParser::parseFunctionArgument(JSVal value) {
 template <>
 Faded<std::string> StyleParser::parseFunctionArgument(JSVal value) {
     JSVal rvalue = replaceConstant(value);
+    Faded<std::string> parsed;
     if (rvalue.IsString()) {
-        Faded<std::string> parsed;
         parsed.to = { value.GetString(), value.GetStringLength() };
         return parsed;
     } else {
         Log::Warning(Event::ParseStyle, "function argument must be a string");
-        return {};
+        return parsed;
     }
 }
 
@@ -308,7 +308,7 @@ std::tuple<bool, std::vector<std::pair<float, T>>> StyleParser::parseStops(JSVal
             return std::tuple<bool, std::vector<std::pair<float, T>>> { false, {}};
         }
     }
-    return { true, stops };
+    return std::tuple<bool, std::vector<std::pair<float, T>>>(true, stops);
 }
 
 template <typename T> inline float defaultBaseValue() { return 1.75; }
@@ -341,24 +341,11 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value) {
     return std::tuple<bool, Function<T>> { true, StopsFunction<T>(std::get<1>(stops), base) };
 }
 
-template <typename T> inline std::chrono::duration<float> defaultDurationValue() { return std::chrono::milliseconds(300); }
-
 template <typename T>
-std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConstantFunction(JSVal value) {
+std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConstantFunction(JSVal value, std::chrono::steady_clock::duration duration) {
     if (!value.HasMember("stops")) {
         Log::Warning(Event::ParseStyle, "function must specify a function type");
         return std::tuple<bool, PiecewiseConstantFunction<T>> { false, {} };
-    }
-
-    std::chrono::duration<float> duration = defaultDurationValue<T>();
-
-    if (value.HasMember("duration")) {
-        JSVal value_duration = value["duration"];
-        if (value_duration.IsNumber()) {
-            duration = std::chrono::milliseconds(value_duration.GetUint());
-        } else {
-            Log::Warning(Event::ParseStyle, "duration must be numeric");
-        }
     }
 
     auto stops = parseStops<T>(value["stops"]);
@@ -373,6 +360,15 @@ std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConsta
 template <typename T>
 bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass) {
     auto res = parseProperty<T>(value, property_name);
+    if (std::get<0>(res)) {
+        klass.set(key, std::get<1>(res));
+    }
+    return std::get<0>(res);
+}
+
+template <typename T>
+bool StyleParser::setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass, JSVal transition) {
+    auto res = parseProperty<T>(value, property_name, transition);
     if (std::get<0>(res)) {
         klass.set(key, std::get<1>(res));
     }
@@ -399,6 +395,21 @@ bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey k
         return setProperty<T>(replaceConstant(value[property_name]), property_name, key, klass);
     }
 }
+
+template<typename T>
+bool StyleParser::parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value, const char *transition_name) {
+    if (!value.HasMember(property_name)) {
+        return false;
+    } else {
+        if (value.HasMember(transition_name)) {
+            return setProperty<T>(replaceConstant(value[property_name]), property_name, key, klass, value[transition_name]);
+        } else {
+            JSVal val(rapidjson::kObjectType);
+            return setProperty<T>(replaceConstant(value[property_name]), property_name, key, klass, val);
+        }
+    }
+}
+
 
 template<> std::tuple<bool, std::string> StyleParser::parseProperty(JSVal value, const char *property_name) {
     if (!value.IsString()) {
@@ -554,27 +565,38 @@ template<> std::tuple<bool, Function<Color>> StyleParser::parseProperty(JSVal va
     }
 }
 
-template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
+    std::chrono::steady_clock::duration duration = std::chrono::milliseconds(300);
+    if (transition.HasMember("duration")) {
+        duration = std::chrono::milliseconds(transition["duration"].GetUint());
+    }
+
     if (value.IsObject()) {
-        return parsePiecewiseConstantFunction<Faded<std::vector<float>>>(value);
+        return parsePiecewiseConstantFunction<Faded<std::vector<float>>>(value, duration);
     } else if (value.IsArray()) {
         Faded<std::vector<float>> parsed;
         std::tuple<bool, std::vector<float>> floatarray = parseFloatArray(value);
         parsed.to = std::get<1>(floatarray);
-        return std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>> { std::get<0>(floatarray),  parsed };
+        return std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>> { std::get<0>(floatarray),  { parsed, duration } };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be an array of numbers, or a number array function", property_name);
         return std::tuple<bool, PiecewiseConstantFunction<Faded<std::vector<float>>>> { false, {} };
     }
 }
 
-template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> StyleParser::parseProperty(JSVal value, const char *property_name, JSVal transition) {
+
+    std::chrono::steady_clock::duration duration = std::chrono::milliseconds(300);
+    if (transition.HasMember("duration")) {
+        duration = std::chrono::milliseconds(transition["duration"].GetUint());
+    }
+
     if (value.IsObject()) {
-        return parsePiecewiseConstantFunction<Faded<std::string>>(value);
+        return parsePiecewiseConstantFunction<Faded<std::string>>(value, duration);
     } else if (value.IsString()) {
         Faded<std::string> parsed;
         parsed.to = { value.GetString(), value.GetStringLength() };
-        return std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> { true,  parsed };
+        return std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> { true,  { parsed, duration } };
     } else {
         Log::Warning(Event::ParseStyle, "value of '%s' must be string or a string function", property_name);
         return std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> { false, {} };
@@ -724,7 +746,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<float>>("fill-translate", { Key::FillTranslateX, Key::FillTranslateY }, klass, value);
     parseOptionalProperty<PropertyTransition>("fill-translate-transition", Key::FillTranslate, klass, value);
     parseOptionalProperty<TranslateAnchorType>("fill-translate-anchor", Key::FillTranslateAnchor, klass, value);
-    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("fill-image", Key::FillImage, klass, value);
+    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("fill-image", Key::FillImage, klass, value, "fill-image-transition");
 
     parseOptionalProperty<Function<float>>("line-opacity", Key::LineOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("line-opacity-transition", Key::LineOpacity, klass, value);
@@ -739,8 +761,8 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("line-gap-width-transition", Key::LineGapWidth, klass, value);
     parseOptionalProperty<Function<float>>("line-blur", Key::LineBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("line-blur-transition", Key::LineBlur, klass, value);
-    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::vector<float>>>>("line-dasharray", Key::LineDashArray, klass, value);
-    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("line-image", Key::LineImage, klass, value);
+    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::vector<float>>>>("line-dasharray", Key::LineDashArray, klass, value, "line-dasharray-transition");
+    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("line-image", Key::LineImage, klass, value, "line-image-transition");
 
     parseOptionalProperty<Function<float>>("icon-opacity", Key::IconOpacity, klass, value);
     parseOptionalProperty<PropertyTransition>("icon-opacity-transition", Key::IconOpacity, klass, value);
@@ -790,7 +812,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
 
     parseOptionalProperty<Function<float>>("background-opacity", Key::BackgroundOpacity, klass, value);
     parseOptionalProperty<Function<Color>>("background-color", Key::BackgroundColor, klass, value);
-    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("background-image", Key::BackgroundImage, klass, value);
+    parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("background-image", Key::BackgroundImage, klass, value, "background-image-transition");
 }
 
 void StyleParser::parseLayout(JSVal value, util::ptr<StyleBucket> &bucket) {

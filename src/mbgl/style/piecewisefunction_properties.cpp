@@ -6,7 +6,7 @@
 namespace mbgl {
 
 template <typename T>
-uint32_t getBiggestStopLessThan(std::vector<std::pair<float, T>> stops, float z) {
+size_t getBiggestStopLessThan(std::vector<std::pair<float, T>> stops, float z) {
     for (uint32_t i = 0; i < stops.size(); i++) {
         if (stops[i].first > z) {
             return i == 0 ? i : i - 1;
@@ -23,7 +23,7 @@ T PiecewiseConstantFunction<T>::evaluate(float z, const ZoomHistory &zh) const {
     float t = std::min((std::chrono::steady_clock::now() - zh.lastIntegerZoomTime) / duration, 1.0f);
     float fromScale = 1.0f;
     float toScale = 1.0f;
-    uint32_t from, to;
+    size_t from, to;
 
     if (z > zh.lastIntegerZoom) {
         result.t = fraction + (1.0f - fraction) * t;
