@@ -5,9 +5,10 @@
 *.diff.png
 *.pyc
 /mason_packages
-/config-*.gypi
+/config/*.gypi
 /build
 /macosx/build
+/linux/build
 /test/build
 /test/node_modules
 /include/mbgl/shader/shaders.hpp
