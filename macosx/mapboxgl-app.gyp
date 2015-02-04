@@ -3,10 +3,24 @@
     '../gyp/common.gypi',
   ],
   'targets': [
-    {
-      'target_name': 'osxapp',
+    { 'target_name': 'osxapp',
       'product_name': 'Mapbox GL',
       'type': 'executable',
+      'product_extension': 'app',
+      'mac_bundle': 1,
+      'mac_bundle_resources': [
+        'Icon.icns',
+      ],
+
+      'dependencies': [
+        '../mbgl.gyp:bundle_styles',
+        '../mbgl.gyp:core',
+        '../mbgl.gyp:platform-<(platform_lib)',
+        '../mbgl.gyp:http-<(http_lib)',
+        '../mbgl.gyp:asset-<(asset_lib)',
+        '../mbgl.gyp:cache-<(cache_lib)',
+      ],
+
       'sources': [
         './main.mm',
         '../platform/darwin/settings_nsuserdefaults.hpp',
@@ -15,51 +29,34 @@
         '../platform/default/glfw_view.hpp',
         '../platform/default/glfw_view.cpp',
       ],
-      'product_extension': 'app',
-      'mac_bundle': 1,
-      'mac_bundle_resources': [
-        'Icon.icns',
+
+      'variables' : {
+        'cflags_cc': [
+          '<@(glfw3_cflags)',
+        ],
+        'ldflags': [
+          '-framework SystemConfiguration', # For NSUserDefaults and Reachability
+          '<@(glfw3_ldflags)',
+        ],
+        'libraries': [
+          '<@(glfw3_static_libs)',
+        ],
+      },
+
+      'libraries': [
+        '<@(libraries)',
       ],
+
       'xcode_settings': {
         'SDKROOT': 'macosx',
         'SUPPORTED_PLATFORMS':'macosx',
-        'OTHER_CPLUSPLUSFLAGS': [
-          '<@(glfw3_cflags)'
-        ],
-        'OTHER_LDFLAGS': [
-          '<@(glfw3_ldflags)',
-          '-framework SystemConfiguration',
-        ],
+        'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
+        'OTHER_LDFLAGS': [ '<@(ldflags)' ],
         'SDKROOT': 'macosx',
         'INFOPLIST_FILE': 'Info.plist',
-        'MACOSX_DEPLOYMENT_TARGET':'10.9',
+        'MACOSX_DEPLOYMENT_TARGET': '10.9',
         'CLANG_ENABLE_OBJC_ARC': 'YES'
       },
-      'variables' : {
-        'ldflags': [
-          '<@(uv_ldflags)',
-          '<@(uv_static_libs)',
-          '<@(sqlite3_static_libs)',
-          '<@(sqlite3_ldflags)',
-          '<@(glfw3_static_libs)',
-          '<@(glfw3_ldflags)',
-          '<@(zlib_ldflags)',
-        ]
-      },
-      'conditions': [
-        ['OS == "mac"', {
-          'xcode_settings': {
-            'OTHER_LDFLAGS': [ '<@(ldflags)' ],
-          }
-        }, {
-          'ldflags': [ '<@(ldflags)' ],
-        }]
-      ],
-      'dependencies': [
-        '../mapboxgl.gyp:bundle_styles',
-        '../mapboxgl.gyp:mbgl-core',
-        '../mapboxgl.gyp:mbgl-osx',
-      ]
     }
   ]
 }

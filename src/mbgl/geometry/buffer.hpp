@@ -80,7 +80,7 @@ protected:
             }
         }
         pos += itemSize;
-        return static_cast<char *>(array) + (pos - itemSize);
+        return reinterpret_cast<char *>(array) + (pos - itemSize);
     }
 
     // Get a pointer to the item at a given index.
@@ -92,7 +92,7 @@ protected:
         if (i * itemSize >= pos) {
             throw new std::runtime_error("Can't get element after array bounds");
         } else {
-            return static_cast<char *>(array) + (i * itemSize);
+            return reinterpret_cast<char *>(array) + (i * itemSize);
         }
     }
 

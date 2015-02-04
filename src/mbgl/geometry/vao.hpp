@@ -11,15 +11,8 @@ namespace mbgl {
 
 class VertexArrayObject : public util::noncopyable {
 public:
-    inline VertexArrayObject() {};
-
-    inline VertexArrayObject(VertexArrayObject &&rhs) noexcept
-        : vao(rhs.vao),
-          bound_shader(rhs.bound_shader),
-          bound_shader_name(rhs.bound_shader_name),
-          bound_vertex_buffer(rhs.bound_vertex_buffer),
-          bound_elements_buffer(rhs.bound_elements_buffer),
-          bound_offset(rhs.bound_offset) {};
+    VertexArrayObject();
+    ~VertexArrayObject();
 
     template <typename Shader, typename VertexBuffer>
     inline void bind(Shader& shader, VertexBuffer &vertexBuffer, char *offset) {
@@ -50,7 +43,9 @@ public:
         }
     }
 
-    ~VertexArrayObject();
+    inline GLuint getID() const {
+        return vao;
+    }
 
 private:
     void bindVertexArrayObject();

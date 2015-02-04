@@ -4,7 +4,8 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/storage/caching_http_file_source.hpp>
+#include <mbgl/storage/default/sqlite_cache.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 
 #include <string>
 #include <jni.h>
@@ -28,7 +29,7 @@ public:
     void notifyMapChange(mbgl::MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero()) override;
 
     mbgl::Map &getMap();
-    mbgl::CachingHTTPFileSource &getFileSource();
+    mbgl::DefaultFileSource &getFileSource();
 
     void initializeDisplay();
     void terminateDisplay();
@@ -61,7 +62,8 @@ private:
 
     ANativeWindow *window = nullptr;
 
-    mbgl::CachingHTTPFileSource fileSource;
+    mbgl::SQLiteCache fileCache;
+    mbgl::DefaultFileSource fileSource;
     mbgl::Map map;
 
     EGLDisplay display = EGL_NO_DISPLAY;

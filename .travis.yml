@@ -53,13 +53,13 @@ before_install:
 - if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then sudo service postgresql stop; fi
 - source ./scripts/local_mason.sh
 - source ./scripts/travis_helper.sh
+- source ./scripts/install_node.sh
 - source ./scripts/flags.sh
 - ./scripts/travis_before_install.sh
 - if [[ ${TRAVIS_OS_NAME} == "linux" && ${MASON_PLATFORM} != "android" ]]; then export LD_LIBRARY_PATH=`mason prefix mesa 10.4.3`/lib; fi
 - if [[ ${TRAVIS_OS_NAME} == "linux" && ${MASON_PLATFORM} != "android" ]]; then glxinfo; fi
 
 install:
-- if [[ ${MASON_PLATFORM} != "android" ]]; then make config.gypi; fi
 - ulimit -c
 
 before_script:

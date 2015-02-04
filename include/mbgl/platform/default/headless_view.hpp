@@ -7,6 +7,7 @@
 #define GL_GLEXT_PROTOTYPES
 #include <mbgl/platform/default/glx.h>
 #define MBGL_USE_GLX 1
+#undef Status
 #endif
 
 #include <mbgl/map/view.hpp>

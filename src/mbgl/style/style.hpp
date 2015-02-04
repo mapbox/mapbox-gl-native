@@ -21,7 +21,7 @@ class Sprite;
 class StyleLayer;
 class StyleLayerGroup;
 
-class Style {
+class Style : public util::noncopyable {
 public:
     struct exception : std::runtime_error { exception(const char *msg) : std::runtime_error(msg) {} };
 
@@ -43,6 +43,7 @@ public:
     util::ptr<StyleLayerGroup> layers;
     std::vector<std::string> appliedClasses;
     std::string glyph_url;
+    std::string base;
 
 private:
     std::string sprite_url;

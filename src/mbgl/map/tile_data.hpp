@@ -18,6 +18,8 @@ namespace uv {
 class worker;
 }
 
+typedef struct uv_loop_s uv_loop_t;
+
 namespace mbgl {
 
 class Map;
@@ -46,10 +48,10 @@ public:
     };
 
 public:
-    TileData(Tile::ID const& id, const SourceInfo&);
+    TileData(Tile::ID const& id, const SourceInfo&, FileSource&);
     ~TileData();
 
-    void request(uv::worker&, FileSource&, float pixelRatio, std::function<void ()> callback);
+    void request(uv::worker&, uv_loop_t&, float pixelRatio, std::function<void ()> callback);
     void reparse(uv::worker&, std::function<void ()> callback);
     void cancel();
     const std::string toString() const;
@@ -71,9 +73,10 @@ public:
 
 public:
     const SourceInfo& source;
+    FileSource& fileSource;
 
 protected:
-    std::unique_ptr<Request> req;
+    Request *req = nullptr;
     std::string data;
 
     // Contains the tile ID string for painting debug information.

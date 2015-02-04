@@ -24,12 +24,6 @@ if test $# -eq 0; then
     usage 1
 fi
 
-if [ ${CONFIG_MBGL_PLATFORM} == 'linux' ]; then
-    LIBS="-Wl,--start-group -lmbgl-core -lmbgl-${CONFIG_MBGL_PLATFORM} -Wl,--end-group -lmbgl-headless"
-else
-    LIBS="-lmbgl-core -lmbgl-${CONFIG_MBGL_PLATFORM} -lmbgl-headless"
-fi
-
 while test $# -gt 0; do
     case "$1" in
     esac
@@ -49,7 +43,7 @@ while test $# -gt 0; do
       ;;
 
     --libs)
-      echo -L${CONFIG_MBGL_PREFIX}/lib ${LIBS} ${CONFIG_MBGL_LDFLAGS}
+      echo ${CONFIG_MBGL_PREFIX}/lib/libmbgl.a ${CONFIG_MBGL_LDFLAGS}
       ;;
 
     --includedir)

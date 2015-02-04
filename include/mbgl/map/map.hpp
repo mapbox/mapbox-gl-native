@@ -123,6 +123,10 @@ public:
     void startRotating();
     void stopRotating();
 
+    // API
+    void setAccessToken(const std::string &token);
+    const std::string &getAccessToken() const;
+
     // Debug
     void setDebug(bool value);
     void toggleDebug();
@@ -160,7 +164,10 @@ private:
 
     Mode mode = Mode::None;
 
+public: // TODO: make private again
     std::unique_ptr<uv::loop> loop;
+
+private:
     std::unique_ptr<uv::worker> workers;
     std::thread thread;
     std::unique_ptr<uv::async> asyncTerminate;
@@ -191,7 +198,7 @@ private:
 
     View &view;
 
-#ifndef NDEBUG
+#ifdef DEBUG
     const std::thread::id mainThread;
     std::thread::id mapThread;
 #endif
@@ -214,6 +221,7 @@ private:
     std::string styleURL;
     std::string styleJSON = "";
     std::vector<std::string> classes;
+    std::string accessToken;
 
     std::chrono::steady_clock::duration defaultTransitionDuration;
 

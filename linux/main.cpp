@@ -4,7 +4,8 @@
 #include <mbgl/platform/default/settings_json.hpp>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/platform/default/log_stderr.hpp>
-#include <mbgl/storage/caching_http_file_source.hpp>
+#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/default/sqlite_cache.hpp>
 
 #include <signal.h>
 #include <getopt.h>
@@ -64,7 +65,9 @@ int main(int argc, char *argv[]) {
     sigaction(SIGINT, &sigIntHandler, NULL);
 
     view = new GLFWView();
-    mbgl::CachingHTTPFileSource fileSource(mbgl::platform::defaultCacheDatabase());
+
+    mbgl::SQLiteCache cache("/tmp/mbgl-cache.db");
+    mbgl::DefaultFileSource fileSource(&cache);
     mbgl::Map map(*view, fileSource);
 
     // Load settings
@@ -78,12 +81,13 @@ int main(int argc, char *argv[]) {
     if (token == nullptr) {
         mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
     } else {
-        fileSource.setAccessToken(std::string(token));
+        map.setAccessToken(std::string(token));
     }
 
     // Load style
-    if (style.empty())
+    if (style.empty()) {
         style = std::string("asset://") + std::string("styles/bright-v7.json");
+    }
 
     map.setStyleURL(style);
 

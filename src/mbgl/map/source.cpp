@@ -15,6 +15,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/uv_detail.hpp>
 
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
@@ -39,8 +40,9 @@ void Source::load(Map& map, FileSource& fileSource) {
 
     util::ptr<Source> source = shared_from_this();
 
-    fileSource.request(ResourceType::JSON, info.url)->onload([source, &map](const Response &res) {
-        if (res.code != 200) {
+    const std::string url = util::mapbox::normalizeSourceURL(info.url, map.getAccessToken());
+    fileSource.request({ Resource::Kind::JSON, url }, **map.loop, [source, &map](const Response &res) {
+        if (res.status != Response::Successful) {
             Log::Warning(Event::General, "failed to load source TileJSON");
             return;
         }
@@ -155,7 +157,7 @@ TileData::State Source::addTile(Map& map, uv::worker& worker,
                                 util::ptr<Style> style,
                                 GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
                                 SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
-                                FileSource& fileSource, TexturePool& texturePool,
+                                FileSource& fileSource, uv_loop_t &loop, TexturePool& texturePool,
                                 const Tile::ID& id,
                                 std::function<void ()> callback) {
     const TileData::State state = hasTile(id);
@@ -188,14 +190,14 @@ TileData::State Source::addTile(Map& map, uv::worker& worker,
             new_tile.data = std::make_shared<VectorTileData>(normalized_id, map.getMaxZoom(), style,
                                                              glyphAtlas, glyphStore,
                                                              spriteAtlas, sprite,
-                                                             texturePool, info);
+                                                             texturePool, info, fileSource);
         } else if (info.type == SourceType::Raster) {
-            new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info);
+            new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info, fileSource);
         } else {
             throw std::runtime_error("source type not implemented");
         }
 
-        new_tile.data->request(worker, fileSource, map.getState().getPixelRatio(), callback);
+        new_tile.data->request(worker, loop, map.getState().getPixelRatio(), callback);
         tile_data.emplace(new_tile.data->id, new_tile.data);
     }
 
@@ -286,7 +288,7 @@ void Source::update(Map& map, uv::worker& worker,
                     util::ptr<Style> style,
                     GlyphAtlas& glyphAtlas, GlyphStore& glyphStore,
                     SpriteAtlas& spriteAtlas, util::ptr<Sprite> sprite,
-                    TexturePool& texturePool, FileSource& fileSource,
+                    TexturePool& texturePool, FileSource& fileSource, uv_loop_t& loop,
                     std::function<void ()> callback) {
     if (!loaded || map.getTime() <= updated)
         return;
@@ -310,7 +312,7 @@ void Source::update(Map& map, uv::worker& worker,
         const TileData::State state = addTile(map, worker, style,
                                               glyphAtlas, glyphStore,
                                               spriteAtlas, sprite,
-                                              fileSource, texturePool,
+                                              fileSource, loop, texturePool,
                                               id, callback);
 
         if (state != TileData::State::parsed) {
