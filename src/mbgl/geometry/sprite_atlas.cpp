@@ -66,20 +66,24 @@ bool SpriteAtlas::resize(const float newRatio) {
 }
 
 void copy_bitmap(const uint32_t *src, const int src_stride, const int src_x, const int src_y,
-                uint32_t *dst, const int dst_stride, const int dst_x, const int dst_y,
+                uint32_t *dst, const int dst_stride, const int dst_height, const int dst_x, const int dst_y,
                 const int width, const int height, const bool wrap) {
-    dst += dst_y * dst_stride + dst_x;
     if (wrap) {
-        dst -= dst_stride;
-        int srcI = 0;
-        // add 1 pixel wrapped padding on each side of the image
-        for (int y = 0; y < height; y++, srcI = (((y + height) % height) + src_y) * src_stride + src_x, dst += dst_stride) {
+
+        for (int y = -1; y <= height; y++) {
+            int dst_y_wrapped = (y + dst_y + dst_height) % dst_height;
+            int src_y_wrapped = ((y + height) % height) + src_y;
+            int srcI = src_y_wrapped * src_stride + src_x;
+            int dstI = dst_y_wrapped * dst_stride;
             for (int x = -1; x <= width; x++) {
-                dst[x] = src[srcI + ((x + width) % width)];
+                int dst_x_wrapped = (x + dst_x + dst_stride) % dst_stride;
+                int src_x_wrapped = (x + width) % width;
+                dst[dstI + dst_x_wrapped] = src[srcI + src_x_wrapped];
             }
         }
 
     } else {
+        dst += dst_y * dst_stride + dst_x;
         src += src_y * src_stride + src_x;
         for (int y = 0; y < height; y++, src += src_stride, dst += dst_stride) {
             for (int x = 0; x < width; x++) {
@@ -183,6 +187,7 @@ void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src, co
         /* source y */       src.y,
         /* dest buffer */    dst_img,
         /* dest stride */    width * pixelRatio,
+        /* dest height */    height * pixelRatio,
         /* dest x */         dst.x * pixelRatio,
         /* dest y */         dst.y * pixelRatio,
         /* icon dimension */ src.width,
@@ -230,8 +235,8 @@ void SpriteAtlas::bind(bool linear) {
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
         first = true;
     } else {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
