@@ -241,6 +241,10 @@ void Map::run() {
         checkForPause();
     }
 
+    if (!style) {
+        throw exception("Style is not set");
+    }
+
     view.activate();
 
     workers = util::make_unique<uv::worker>(**loop, 4, "Tile Worker");
