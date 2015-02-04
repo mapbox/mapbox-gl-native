@@ -24,7 +24,7 @@ build: build/Makefile
 build/Makefile: $(MBGL)/config/$(HOST).gypi
 	@node-gyp configure -- \
 		-Dmbgl=$(MBGL) \
-		-Dhost=osx \
+		-Dhost=$(HOST) \
 		-I$(MBGL)/config/$(HOST).gypi \
 		$(LIBS_$(HOST)) \
 		-Duv_static_libs= -Duv_ldflags= \
