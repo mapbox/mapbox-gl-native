@@ -79,7 +79,7 @@ private:
     template <typename T>
     std::tuple<bool, Function<T>> parseFunction(JSVal value);
     template <typename T>
-    std::tuple<bool, FadedStopsFunction<T>> parseFadedStopsFunction(JSVal value);
+    std::tuple<bool, PiecewiseConstantFunction<T>> parsePiecewiseConstantFunction(JSVal value);
     template <typename T>
     T parseFunctionArgument(JSVal value);
     template <typename T>

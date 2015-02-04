@@ -3,7 +3,7 @@
 
 #include <mbgl/util/variant.hpp>
 #include <mbgl/style/function_properties.hpp>
-#include <mbgl/style/fadedfunction_properties.hpp>
+#include <mbgl/style/piecewisefunction_properties.hpp>
 #include <mbgl/style/types.hpp>
 
 #include <vector>
@@ -26,8 +26,8 @@ typedef mapbox::util::variant<
     Function<bool>,
     Function<float>,
     Function<Color>,
-    FadedStopsFunction<Faded<std::vector<float>>>,
-    FadedStopsFunction<Faded<std::string>>
+    PiecewiseConstantFunction<Faded<std::vector<float>>>,
+    PiecewiseConstantFunction<Faded<std::string>>
 > PropertyValue;
 
 }

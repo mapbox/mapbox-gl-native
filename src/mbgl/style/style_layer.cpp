@@ -105,7 +105,7 @@ struct PropertyEvaluator {
         return mapbox::util::apply_visitor(FunctionEvaluator<T>(z), value);
     }
 
-    T operator()(const FadedStopsFunction<T> &value) const {
+    T operator()(const PiecewiseConstantFunction<T> &value) const {
         return value.evaluate(z, zoomHistory);
     }
 

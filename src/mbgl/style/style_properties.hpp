@@ -3,7 +3,7 @@
 
 #include <mbgl/util/variant.hpp>
 #include <mbgl/style/types.hpp>
-#include <mbgl/style/fadedfunction_properties.hpp>
+#include <mbgl/style/piecewisefunction_properties.hpp>
 
 #include <array>
 #include <string>

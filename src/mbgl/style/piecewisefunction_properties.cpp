@@ -1,4 +1,4 @@
-#include <mbgl/style/fadedfunction_properties.hpp>
+#include <mbgl/style/piecewisefunction_properties.hpp>
 #include <mbgl/style/types.hpp>
 
 #include <cmath>
@@ -16,7 +16,7 @@ uint32_t getBiggestStopLessThan(std::vector<std::pair<float, T>> stops, float z)
 }
 
 template <typename T>
-T FadedStopsFunction<T>::evaluate(float z, const ZoomHistory &zh) const {
+T PiecewiseConstantFunction<T>::evaluate(float z, const ZoomHistory &zh) const {
     T result;
 
     float fraction = std::fmod(z, 1.0f);
@@ -44,7 +44,7 @@ T FadedStopsFunction<T>::evaluate(float z, const ZoomHistory &zh) const {
     return result;
 }
 
-template Faded<std::string> FadedStopsFunction<Faded<std::string>>::evaluate(float z, const ZoomHistory &zoomHistory) const;
-template Faded<std::vector<float>> FadedStopsFunction<Faded<std::vector<float>>>::evaluate(float z, const ZoomHistory &zoomHistory) const;
+template Faded<std::string> PiecewiseConstantFunction<Faded<std::string>>::evaluate(float z, const ZoomHistory &zoomHistory) const;
+template Faded<std::vector<float>> PiecewiseConstantFunction<Faded<std::vector<float>>>::evaluate(float z, const ZoomHistory &zoomHistory) const;
 
 }
