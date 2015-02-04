@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-CONFIG_FILE=${1:-config.gypi}
+CONFIG_FILE=$1
 
 if [ `uname -s` = 'Darwin' ]; then
     MASON_PLATFORM=${MASON_PLATFORM:-osx}
@@ -51,6 +51,18 @@ case ${MASON_PLATFORM} in
 esac
 
 function abort { >&2 echo -e "\033[1m\033[31m$1\033[0m"; exit 1; }
+
+if [ -z ${CONFIG_FILE} ]; then
+    abort 'You need to specify an output path for the configuration file'
+fi
+
+if [[ ${MASON_PLATFORM} = 'android' && -z ${MASON_ANDROID_ABI} ]]; then
+    abort 'You need to specify an ABI for android platforms'
+fi
+
+echo -n "MASON_PLATFORM=${MASON_PLATFORM} "
+if [ ${MASON_PLATFORM} = 'android' ]; then echo -n "MASON_ANDROID_ABI=${MASON_ANDROID_ABI} " ; fi
+echo $0 $@
 
 PYTHON=`which python || abort 'Cannot find python'`
 
@@ -164,3 +176,4 @@ CONFIG+="  }
 "
 
 echo "${CONFIG}" > ${CONFIG_FILE}
+cat ${CONFIG_FILE}
