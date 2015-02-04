@@ -244,7 +244,7 @@ void HeadlessView::notify() {
     // no-op
 }
 
-void HeadlessView::notifyMapChange(mbgl::MapChange /*change*/, mbgl::timestamp /*delay*/) {
+void HeadlessView::notifyMapChange(mbgl::MapChange /*change*/, std::chrono::steady_clock::duration /*delay*/) {
     // no-op
 }
 

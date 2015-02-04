@@ -4,6 +4,9 @@
 
 namespace mbgl {
 
+VertexArrayObject::VertexArrayObject() {
+}
+
 VertexArrayObject::~VertexArrayObject() {
     if (!gl::DeleteVertexArrays) return;
 

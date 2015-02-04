@@ -1,143 +1,174 @@
 BUILDTYPE ?= Release
 PYTHON ?= python
-V ?= 1
 PREFIX ?= /usr/local
+ANDROID_ABI ?= arm-v7
 JOBS ?= 1
 
 ifeq ($(shell uname -s), Darwin)
-PLATFORM ?= osx
+HOST ?= osx
 endif
-PLATFORM ?= linux
+HOST ?= linux
 
-.PHONY: all
-all: mbgl-core mbgl-platform mbgl-headless
+all: mbgl
 
-config.gypi: configure
-	./configure
+include config/defaults.mk
 
-config-ios.gypi: configure
-	MASON_PLATFORM=ios ./configure config-ios.gypi
+#### Dependencies ##############################################################
+
+# Wildcard targets get removed after build by default, but we want to preserve the config.
+.PRECIOUS: config/%.gypi
+config/%.gypi: CMD = ./configure config/$*.gypi
+config/%.gypi: configure
+	@$(ENV_$*) ./scripts/flock.py build/Configure.lock ./configure config/$*.gypi
 
 #### Library builds ############################################################
 
-.PHONY: mbgl-core
-mbgl-core: build/mbgl/Makefile
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-core
+.PRECOIUS: Makefile/mbgl
+Makefile/mbgl: config/$(HOST).gypi
+	deps/run_gyp mbgl.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
 
-.PHONY: mbgl-platform
-mbgl-platform: build/mbgl/Makefile
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-$(PLATFORM)
+mbgl: Makefile/mbgl
+	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) everything
 
-.PHONY: mbgl-headless
-mbgl-headless: build/mbgl/Makefile
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-headless
+standalone: Makefile/mbgl
+	LINK=`pwd`/gyp/link.py $(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) standalone
 
-.PHONY: install
-install: build/mbgl/Makefile
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) install
-
-#### Build scripts #############################################################
-
-.PHONY: build/mbgl/Makefile
-build/mbgl/Makefile: mapboxgl.gyp config.gypi
-	deps/run_gyp mapboxgl.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) -Dinstall_prefix=$(PREFIX) --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
-
-.PHONY: build/test/Makefile
-build/test/Makefile: test/test.gyp config.gypi
-	deps/run_gyp test/test.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
-
-.PHONY: build/linux/Makefile
-build/linux/Makefile: linux/mapboxgl-app.gyp config.gypi
-	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=linux --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
-
-.PHONY: build/macosx/Makefile
-build/macosx/Makefile: macosx/mapboxgl-app.gyp config.gypi
-	deps/run_gyp macosx/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=osx --depth=. -Goutput_dir=.. --generator-output=./build/macosx -f make
-
-.PHONY: build/render/Makefile
-build/render/Makefile: bin/render.gyp config.gypi
-	deps/run_gyp bin/render.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build/render -f make
-
-.PHONY: build/test/test.xcodeproj
-build/test/test.xcodeproj: test/test.gyp config.gypi
-	deps/run_gyp test/test.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. -Goutput_dir=.. --generator-output=./build -f xcode
-
-.PHONY: build/macosx/mapboxgl-app.xcodeproj
-build/macosx/mapboxgl-app.xcodeproj: macosx/mapboxgl-app.gyp config.gypi
-	deps/run_gyp macosx/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=osx --depth=. --generator-output=./build -f xcode
-
-.PHONY: build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
-build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj: ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp config-ios.gypi
-	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp -Iconfig-ios.gypi -Dplatform=ios --depth=. --generator-output=./build -f xcode
-
-.PHONY: build/linux/mapboxgl-app.xcodeproj
-build/linux/mapboxgl-app.xcodeproj: linux/mapboxgl-app.gyp config.gypi
-	deps/run_gyp linux/mapboxgl-app.gyp -Iconfig.gypi -Dplatform=linux --depth=. --generator-output=./build -f xcode
-
-.PHONY: build/bin/render.xcodeproj
-	build/bin/render.xcodeproj: bin/render.gyp config.gypi
-	deps/run_gyp bin/render.gyp -Iconfig.gypi -Dplatform=$(PLATFORM) --depth=. --generator-output=./build -f xcode
-
-.PHONY: android
-android:
-	./scripts/local_mason.sh && \
-	MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=$(MASON_ANDROID_ABI) ./.mason/mason env PATH && \
-	export CXX="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CXX`" && \
-	export CC="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CC`" && \
-	export LD="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env LD`" && \
-	export LINK="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CXX`" && \
-	export AR="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env AR`" && \
-	export RANLIB="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env RANLIB`" && \
-	export STRIP="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env STRIP`" && \
-	export LDFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env LDFLAGS` ${LDFLAGS}" && \
-	export CFLAGS="`MASON_DIR=./.mason MASON_PLATFORM= MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CFLAGS` ${CFLAGS}" && \
-	export CPPFLAGS="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env CPPFLAGS` ${CPPFLAGS}" && \
-	export PATH="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env PATH`:${PATH}" && \
-	export JNIDIR="`MASON_DIR=./.mason MASON_PLATFORM=android MASON_ANDROID_ABI=${MASON_ANDROID_ABI} ./.mason/mason env JNIDIR`" && \
-	MASON_PLATFORM=android MASON_ANDROID_ABI=$(MASON_ANDROID_ABI) ./configure config-android.gypi && \
-	deps/run_gyp android/mapboxgl-app.gyp -Iconfig-android.gypi -Dplatform=android --depth=. --generator-output=./build/android/$(MASON_ANDROID_ABI) -f make-android && \
-	$(MAKE) -C build/android/$(MASON_ANDROID_ABI) -j$(JOBS) BUILDTYPE=$(BUILDTYPE) V=$(V) androidapp && \
-	BUILDTYPE=$(BUILDTYPE) MASON_ANDROID_ABI=$(MASON_ANDROID_ABI) ./android/scripts/copy-files.sh && \
-	cd android/java && \
-	./gradlew --parallel-threads=$(JOBS) build
-
-##### Test cases ###############################################################
-
-test: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
-
-test_%: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
-	(cd build/$(BUILDTYPE) && exec ./test_$*)
-
-# build Mac OS X project for Xcode
-xtest: build/test/test.xcodeproj
-	open ./build/test/test.xcodeproj
-
-##### Makefile builds ##########################################################
+install: Makefile/mbgl
+	LINK=`pwd`/gyp/link.py $(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) install
 
 
-# Builds the linux app with make.
-linux: build/linux/Makefile
-	$(MAKE) -C build/linux BUILDTYPE=$(BUILDTYPE) V=$(V) linuxapp
+##### Test builds ##############################################################
 
-# Executes the Linux binary
-run-linux: linux
-	(cd build/$(BUILDTYPE) && ./mapbox-gl)
+.PRECIOUS: Makefile/test
+Makefile/test: test/test.gyp config/$(HOST).gypi
+	deps/run_gyp test/test.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
 
-# Builds the OS X app with make.
-osx: build/macosx/Makefile
-	$(MAKE) -C build/macosx BUILDTYPE=$(BUILDTYPE) V=$(V) osxapp
+test: Makefile/test
+	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) test
 
-# Executes the OS X binary
+test-%: test
+	./scripts/run_tests.sh "build/$(HOST)/$(BUILDTYPE)/test" --gtest_filter=$*
+
+
+.PRECIOUS: Xcode/test
+Xcode/test: test/test.gyp config/osx.gypi
+	deps/run_gyp test/test.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f xcode
+
+.PHONY: lproj lbuild run-xlinux
+xtest-proj: Xcode/test
+	open ./build/osx/test/test.xcodeproj
+
+xtest: Xcode/test
+	xcodebuild -project ./build/osx/test/test.xcodeproj -configuration $(BUILDTYPE) -target test -jobs `sysctl -n hw.ncpu`
+
+xtest-%: xtest
+	./scripts/run_tests.sh "build/osx/Build/Products/$(BUILDTYPE)/test" --gtest_filter=$*
+
+
+#### Mac OS X application builds ###############################################
+
+.PRECIOUS: Makefile/osx
+Makefile/osx: macosx/mapboxgl-app.gyp config/osx.gypi
+	deps/run_gyp macosx/mapboxgl-app.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f make
+
+.PHONY: osx run-osx
+osx: Makefile/osx
+	$(MAKE) -C build/osx BUILDTYPE=$(BUILDTYPE) osxapp
+
 run-osx: osx
-	build/$(BUILDTYPE)/Mapbox\ GL.app/Contents/MacOS/MAPBOX\ GL
+	"build/osx/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 
-# Builds the CLI render app
-render: build/render/Makefile
-	$(MAKE) -C build/render BUILDTYPE=$(BUILDTYPE) V=$(V) mbgl-render
 
-##### Xcode projects ###########################################################
+.PRECIOUS: Xcode/osx
+Xcode/osx: macosx/mapboxgl-app.gyp config/osx.gypi
+	deps/run_gyp macosx/mapboxgl-app.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f xcode
+
+.PHONY: xosx-proj xosx run-xosx
+xosx-proj: Xcode/osx
+	open ./build/osx/macosx/mapboxgl-app.xcodeproj
+
+xosx: Xcode/osx
+	xcodebuild -project ./build/osx/macosx/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target osxapp -jobs `sysctl -n hw.ncpu`
+
+run-xosx: xosx
+	"build/osx/Build/Products/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
+
+# Legacy name
+xproj: xosx-proj
+
+
+
+#### iOS application builds ####################################################
+
+.PRECIOUS: Xcode/ios
+Xcode/ios: ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp config/ios.gypi
+	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
+
+.PHONY: ios-proj ios run-ios
+ios-proj: Xcode/ios
+	open ./build/ios/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
+
+ios: Xcode/ios
+	xcodebuild -sdk iphonesimulator ARCHS=x86_64 -project ./build/ios/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target iosapp -jobs `sysctl -n hw.ncpu`
+
+# Legacy name
+iproj: ios-proj
+
+
+#### Linux application builds ##################################################
+
+.PRECIOUS: Makefile/linux
+Makefile/linux: linux/mapboxgl-app.gyp config/$(HOST).gypi
+	deps/run_gyp linux/mapboxgl-app.gyp $(CONFIG_$(HOST)) $(LIBS_linux) --generator-output=./build/$(HOST) -f make
+
+.PHONY: linux run-linux
+linux: Makefile/linux
+	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) linuxapp
+
+run-linux: linux
+	(cd build/$(HOST)/$(BUILDTYPE) && ./mapbox-gl)
+
+
+.PRECIOUS: Xcode/linux
+Xcode/linux: linux/mapboxgl-app.gyp config/osx.gypi
+	deps/run_gyp linux/mapboxgl-app.gyp $(CONFIG_osx) $(LIBS_linux) --generator-output=./build/osx -f xcode
+
+.PHONY: lproj lbuild run-xlinux
+xlinux-proj: Xcode/linux
+	open ./build/osx/linux/mapboxgl-app.xcodeproj
+
+xlinux: Xcode/linux
+	xcodebuild -project ./build/osx/linux/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target linuxapp
+
+run-xlinux: xlinux
+	"build/osx/Build/Products/$(BUILDTYPE)/mapbox-gl"
+
+# Legacy name
+lproj: xlinux-proj
+
+
+#### Android libaries #########################################################
+
+.PRECIOUS: Makefile/android-%
+Makefile/android-%: CMD = deps/run_gyp android/mapboxgl-app.gyp $(CONFIG_android-$*) $(LIBS_android) --generator-output=./build/android-$* -f make-android
+Makefile/android-%: config/android-%.gypi
+	@echo $(CMD)
+	@$(ENV_android-$*) $(CMD)
+
+# Builds a particular android architecture.
+android-lib-%: Makefile/android-%
+	@$(ENV_android-$*) ./scripts/flock.py -v build/Android.lock $(MAKE) -C build/android-$* BUILDTYPE=$(BUILDTYPE) androidapp
+
+# Builds the selected/default Android library
+android: android-lib-$(ANDROID_ABI)
+	cd android/java && ./gradlew --parallel-threads=$(JOBS) build
+
+# Builds all android architectures.
+android-all: $(ANDROID_ABIS)
+	cd android/java && ./gradlew --parallel-threads=$(JOBS) build
+
+
+##### Maintenace operations ####################################################
 
 .PHONY: clear_xcode_cache
 clear_xcode_cache:
@@ -153,22 +184,6 @@ ifeq ($(PLATFORM), osx)
 	fi
 endif
 
-xproj: build/macosx/mapboxgl-app.xcodeproj
-	open ./build/macosx/mapboxgl-app.xcodeproj
-
-iproj: build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
-	open ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
-
-rproj: build/bin/render.xcodeproj
-	open ./build/bin/render.xcodeproj
-
-# build Linux project for Xcode (Runs on Mac OS X too, but without platform-specific code)
-lproj: build/linux/mapboxgl-app.xcodeproj
-	open ./build/linux/mapboxgl-app.xcodeproj
-
-
-##### Maintenace operations ####################################################
-
 .PHONY: clear_sqlite_cache
 clear_sqlite_cache:
 ifeq ($(PLATFORM), osx)
@@ -180,8 +195,12 @@ endif
 clean: clear_sqlite_cache clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
-	-rm -rf ./macosx/build/
-	-rm -rf ./config.gypi ./config-ios.gypi ./config-android.gypi
+	-rm -rf ./macosx/build
+	-rm -rf ./linux/build
+	-rm -rf ./ios/mapbox-gl-cocoa/build
+	-rm -rf ./ios/mapbox-gl-cocoa/app/build
+	-rm -rf ./test/build
+	-rm -rf ./config/*.gypi
 	-rm -rf ./android/java/build ./android/java/app/build ./android/java/lib/build
 	-rm -rf ./android/java/lib/src/main/jniLibs ./android/java/lib/src/main/assets
 	-rm -f ./android/test/features.zip

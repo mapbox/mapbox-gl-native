@@ -66,13 +66,29 @@ bool SpriteAtlas::resize(const float newRatio) {
 }
 
 void copy_bitmap(const uint32_t *src, const int src_stride, const int src_x, const int src_y,
-                uint32_t *dst, const int dst_stride, const int dst_x, const int dst_y,
-                const int width, const int height) {
-    src += src_y * src_stride + src_x;
-    dst += dst_y * dst_stride + dst_x;
-    for (int y = 0; y < height; y++, src += src_stride, dst += dst_stride) {
-        for (int x = 0; x < width; x++) {
-            dst[x] = src[x];
+                uint32_t *dst, const int dst_stride, const int dst_height, const int dst_x, const int dst_y,
+                const int width, const int height, const bool wrap) {
+    if (wrap) {
+
+        for (int y = -1; y <= height; y++) {
+            int dst_y_wrapped = (y + dst_y + dst_height) % dst_height;
+            int src_y_wrapped = ((y + height) % height) + src_y;
+            int srcI = src_y_wrapped * src_stride + src_x;
+            int dstI = dst_y_wrapped * dst_stride;
+            for (int x = -1; x <= width; x++) {
+                int dst_x_wrapped = (x + dst_x + dst_stride) % dst_stride;
+                int src_x_wrapped = (x + width) % width;
+                dst[dstI + dst_x_wrapped] = src[srcI + src_x_wrapped];
+            }
+        }
+
+    } else {
+        dst += dst_y * dst_stride + dst_x;
+        src += src_y * src_stride + src_x;
+        for (int y = 0; y < height; y++, src += src_stride, dst += dst_stride) {
+            for (int x = 0; x < width; x++) {
+                dst[x] = src[x];
+            }
         }
     }
 }
@@ -97,7 +113,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width
     return rect;
 }
 
-Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string& name) {
+Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string& name, const bool wrap) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     auto rect_it = images.find(name);
@@ -120,7 +136,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string& name) {
 
     images.emplace(name, rect);
 
-    copy(rect, pos);
+    copy(rect, pos, wrap);
 
     return rect;
 }
@@ -128,7 +144,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::getImage(const std::string& name) {
 SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, bool repeating) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    Rect<dimension> rect = getImage(name);
+    Rect<dimension> rect = getImage(name, repeating);
     if (repeating) {
         // When the image is repeating, get the correct position of the image, rather than the
         // one rounded up to 4 pixels.
@@ -157,7 +173,7 @@ void SpriteAtlas::allocate() {
     }
 }
 
-void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src) {
+void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src, const bool wrap) {
     if (!sprite->raster) return;
     const uint32_t *src_img = reinterpret_cast<const uint32_t *>(sprite->raster->getData());
     if (!src_img) return;
@@ -171,10 +187,12 @@ void SpriteAtlas::copy(const Rect<dimension>& dst, const SpritePosition& src) {
         /* source y */       src.y,
         /* dest buffer */    dst_img,
         /* dest stride */    width * pixelRatio,
+        /* dest height */    height * pixelRatio,
         /* dest x */         dst.x * pixelRatio,
         /* dest y */         dst.y * pixelRatio,
         /* icon dimension */ src.width,
-        /* icon dimension */ src.height
+        /* icon dimension */ src.height,
+        /* wrap padding */   wrap
     );
 
     dirty = true;
@@ -188,7 +206,7 @@ void SpriteAtlas::setSprite(util::ptr<Sprite> sprite_) {
     if (!sprite->isLoaded()) return;
 
     util::erase_if(uninitialized, [this](const std::string &name) {
-        Rect<dimension> dst = getImage(name);
+        Rect<dimension> dst = getImage(name, false);
         const SpritePosition& src = sprite->getSpritePosition(name);
         if (!src) {
             if (debug::spriteWarnings) {
@@ -198,7 +216,7 @@ void SpriteAtlas::setSprite(util::ptr<Sprite> sprite_) {
         }
 
         if (src.width == dst.w * pixelRatio && src.height == dst.h * pixelRatio && src.pixelRatio == pixelRatio) {
-            copy(dst, src);
+            copy(dst, src, false);
             return true;
         } else {
             if (debug::spriteWarnings) {
@@ -217,8 +235,8 @@ void SpriteAtlas::bind(bool linear) {
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
         first = true;
     } else {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));

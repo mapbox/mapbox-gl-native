@@ -4,6 +4,7 @@
 #include <mbgl/platform/event.hpp>
 
 #include <string>
+#include <chrono>
 
 namespace mbgl {
 namespace util {
@@ -22,7 +23,7 @@ private:
     const std::string name;
     EventSeverity severity = EventSeverity::Debug;
     Event event = Event::General;
-    uint64_t start;
+    std::chrono::steady_clock::time_point start;
 };
 #else
 class stopwatch {

@@ -2,9 +2,11 @@ Standard: Cpp11
 IndentWidth: 4
 AccessModifierOffset: -4
 UseTab: Never
-BinPackParameters: true
+BinPackParameters: false
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 AlwaysBreakTemplateDeclarations: true
 NamespaceIndentation: None
@@ -12,5 +14,5 @@ PointerBindsToType: false
 SpacesInParentheses: false
 BreakBeforeBraces: Attach
 ColumnLimit: 100
-Cpp11BracedListStyle: true
+Cpp11BracedListStyle: false
 SpacesBeforeTrailingComments: 1

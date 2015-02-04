@@ -3,7 +3,6 @@
 
 #include <mbgl/map/transform.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
 
@@ -16,6 +15,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <functional>
+#include <chrono>
 
 namespace mbgl {
 
@@ -83,8 +83,8 @@ public:
     void setClasses(const std::vector<std::string>&);
     std::vector<std::string> getClasses() const;
 
-    void setDefaultTransitionDuration(uint64_t milliseconds = 0);
-    uint64_t getDefaultTransitionDuration();
+    void setDefaultTransitionDuration(std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    std::chrono::steady_clock::duration getDefaultTransitionDuration();
     void setStyleURL(const std::string &url);
     void setStyleJSON(std::string newStyleJSON, const std::string &base = "");
     std::string getStyleJSON() const;
@@ -93,20 +93,20 @@ public:
     void cancelTransitions();
 
     // Position
-    void moveBy(double dx, double dy, double duration = 0);
-    void setLonLat(double lon, double lat, double duration = 0);
+    void moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void setLonLat(double lon, double lat, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void getLonLat(double &lon, double &lat) const;
     void startPanning();
     void stopPanning();
     void resetPosition();
 
     // Scale
-    void scaleBy(double ds, double cx = -1, double cy = -1, double duration = 0);
-    void setScale(double scale, double cx = -1, double cy = -1, double duration = 0);
+    void scaleBy(double ds, double cx = -1, double cy = -1, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void setScale(double scale, double cx = -1, double cy = -1, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     double getScale() const;
-    void setZoom(double zoom, double duration = 0);
+    void setZoom(double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     double getZoom() const;
-    void setLonLatZoom(double lon, double lat, double zoom, double duration = 0);
+    void setLonLatZoom(double lon, double lat, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void getLonLatZoom(double &lon, double &lat, double &zoom) const;
     void resetZoom();
     void startScaling();
@@ -115,13 +115,17 @@ public:
     double getMaxZoom() const;
 
     // Rotation
-    void rotateBy(double sx, double sy, double ex, double ey, double duration = 0);
-    void setBearing(double degrees, double duration = 0);
+    void rotateBy(double sx, double sy, double ex, double ey, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void setBearing(double degrees, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void setBearing(double degrees, double cx, double cy);
     double getBearing() const;
     void resetNorth();
     void startRotating();
     void stopRotating();
+
+    // API
+    void setAccessToken(const std::string &token);
+    const std::string &getAccessToken() const;
 
     // Debug
     void setDebug(bool value);
@@ -129,7 +133,7 @@ public:
     bool getDebug() const;
 
     inline const TransformState &getState() const { return state; }
-    inline timestamp getTime() const { return animationTime; }
+    inline std::chrono::steady_clock::time_point getTime() const { return animationTime; }
 
 private:
     util::ptr<Sprite> getSprite();
@@ -160,7 +164,10 @@ private:
 
     Mode mode = Mode::None;
 
+public: // TODO: make private again
     std::unique_ptr<uv::loop> loop;
+
+private:
     std::unique_ptr<uv::worker> workers;
     std::thread thread;
     std::unique_ptr<uv::async> asyncTerminate;
@@ -191,7 +198,7 @@ private:
 
     View &view;
 
-#ifndef NDEBUG
+#ifdef DEBUG
     const std::thread::id mainThread;
     std::thread::id mapThread;
 #endif
@@ -214,11 +221,12 @@ private:
     std::string styleURL;
     std::string styleJSON = "";
     std::vector<std::string> classes;
+    std::string accessToken;
 
-    std::atomic_uint_fast64_t defaultTransitionDuration;
+    std::chrono::steady_clock::duration defaultTransitionDuration;
 
     bool debug = false;
-    timestamp animationTime = 0;
+    std::chrono::steady_clock::time_point animationTime = std::chrono::steady_clock::time_point::min();
 
     std::set<util::ptr<StyleSource>> activeSources;
 };

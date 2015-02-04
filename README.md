@@ -36,6 +36,7 @@ To create projects, you can run:
 - `make lproj`: Creates an Xcode project with platform-independent handlers for downloads and settings storage. This is what is also being built on Linux.
 - `make osx run-osx`: Builds and runs the OS X application on the command line with `xcodebuild`.
 - `make linux run-linux`: Builds and runs the Linux application with `make`.
+- `make test-*` Builds and runs all tests. You can specify individual tests by replacing * with their name.
 
 Note that you can't have more than one project in Xcode open at a time since they the static library project is shared across the OS X, Linux and iOS project.
 

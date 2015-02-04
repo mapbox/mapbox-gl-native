@@ -13,3 +13,7 @@
 [submodule "styles"]
 	path = styles
 	url = https://github.com/mapbox/mapbox-gl-styles.git
+
+[submodule "app/ios"]
+	path = app/ios
+	url = https://github.com/mapbox/mapbox-gl-cocoa.git

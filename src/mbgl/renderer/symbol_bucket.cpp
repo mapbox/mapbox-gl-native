@@ -177,13 +177,13 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
         if (feature.label.length()) {
             shaping = fontStack.getShaping(
                 /* string */ feature.label,
-                /* maxWidth */ properties.text.max_width,
-                /* lineHeight */ properties.text.line_height,
+                /* maxWidth: ems */ properties.text.max_width * 24,
+                /* lineHeight: ems */ properties.text.line_height * 24,
                 /* horizontalAlign */ horizontalAlign,
                 /* verticalAlign */ verticalAlign,
                 /* justify */ justify,
-                /* spacing */ properties.text.letter_spacing,
-                /* translate */ properties.text.offset);
+                /* spacing: ems */ properties.text.letter_spacing * 24,
+                /* translate */ vec2<float>(properties.text.offset[0], properties.text.offset[1]));
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {
@@ -195,7 +195,7 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
         // if feature has icon, get sprite atlas position
         if (feature.sprite.length()) {
             sprite.waitUntilLoaded();
-            image = spriteAtlas.getImage(feature.sprite);
+            image = spriteAtlas.getImage(feature.sprite, false);
 
             if (sprite.getSpritePosition(feature.sprite).sdf) {
                 sdfIcons = true;
@@ -322,19 +322,19 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
                 collision.insert(glyphPlacement.boxes, anchor, glyphScale, glyphRange,
                                  horizontalText);
             }
-            if (inside) addSymbols(text, glyphPlacement.shapes, glyphScale, glyphRange);
+            if (inside) addSymbols<TextBuffer, TextElementGroup>(text, glyphPlacement.shapes, glyphScale, glyphRange);
         }
 
         if (iconScale && std::isfinite(iconScale)) {
             if (!properties.icon.ignore_placement) {
                 collision.insert(iconPlacement.boxes, anchor, iconScale, iconRange, horizontalIcon);
             }
-            if (inside) addSymbols(icon, iconPlacement.shapes, iconScale, iconRange);
+            if (inside) addSymbols<IconBuffer, IconElementGroup>(icon, iconPlacement.shapes, iconScale, iconRange);
         }
     }
 }
 
-template <typename Buffer>
+template <typename Buffer, typename GroupType>
 void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale,
                               PlacementRange placementRange) {
     const float zoom = collision.zoom;
@@ -366,14 +366,15 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
         const int glyph_vertex_length = 4;
 
         if (!buffer.groups.size() ||
-            (buffer.groups.back().vertex_length + glyph_vertex_length > 65535)) {
+            (buffer.groups.back()->vertex_length + glyph_vertex_length > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            buffer.groups.emplace_back();
+            buffer.groups.emplace_back(util::make_unique<GroupType>());
         }
 
         // We're generating triangle fans, so we always start with the first
         // coordinate in this polygon.
-        auto &triangleGroup = buffer.groups.back();
+        assert(buffer.groups.back());
+        auto &triangleGroup = *buffer.groups.back();
         uint32_t triangleIndex = triangleGroup.vertex_length;
 
         // coordinates (2 triangles)
@@ -398,33 +399,36 @@ void SymbolBucket::addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float
 void SymbolBucket::drawGlyphs(SDFShader &shader) {
     char *vertex_index = BUFFER_OFFSET(0);
     char *elements_index = BUFFER_OFFSET(0);
-    for (TextElementGroup &group : text.groups) {
-        group.array[0].bind(shader, text.vertices, text.triangles, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
-        vertex_index += group.vertex_length * text.vertices.itemSize;
-        elements_index += group.elements_length * text.triangles.itemSize;
+    for (auto &group : text.groups) {
+        assert(group);
+        group->array[0].bind(shader, text.vertices, text.triangles, vertex_index);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        vertex_index += group->vertex_length * text.vertices.itemSize;
+        elements_index += group->elements_length * text.triangles.itemSize;
     }
 }
 
 void SymbolBucket::drawIcons(SDFShader &shader) {
     char *vertex_index = BUFFER_OFFSET(0);
     char *elements_index = BUFFER_OFFSET(0);
-    for (IconElementGroup &group : icon.groups) {
-        group.array[0].bind(shader, icon.vertices, icon.triangles, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
-        vertex_index += group.vertex_length * icon.vertices.itemSize;
-        elements_index += group.elements_length * icon.triangles.itemSize;
+    for (auto &group : icon.groups) {
+        assert(group);
+        group->array[0].bind(shader, icon.vertices, icon.triangles, vertex_index);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        vertex_index += group->vertex_length * icon.vertices.itemSize;
+        elements_index += group->elements_length * icon.triangles.itemSize;
     }
 }
 
 void SymbolBucket::drawIcons(IconShader &shader) {
     char *vertex_index = BUFFER_OFFSET(0);
     char *elements_index = BUFFER_OFFSET(0);
-    for (IconElementGroup &group : icon.groups) {
-        group.array[1].bind(shader, icon.vertices, icon.triangles, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
-        vertex_index += group.vertex_length * icon.vertices.itemSize;
-        elements_index += group.elements_length * icon.triangles.itemSize;
+    for (auto &group : icon.groups) {
+        assert(group);
+        group->array[1].bind(shader, icon.vertices, icon.triangles, vertex_index);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        vertex_index += group->vertex_length * icon.vertices.itemSize;
+        elements_index += group->elements_length * icon.triangles.itemSize;
     }
 }
 }

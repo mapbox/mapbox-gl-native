@@ -1,8 +1,7 @@
 #ifndef MBGL_STYLE_ZOOM_HISTORY
 #define MBGL_STYLE_ZOOM_HISTORY
 
-#include <mbgl/util/time.hpp>
-
+#include <chrono>
 #include <cmath>
 
 namespace mbgl {
@@ -10,15 +9,15 @@ namespace mbgl {
 struct ZoomHistory {
     float lastZoom;
     float lastIntegerZoom;
-    timestamp lastIntegerZoomTime;
+    std::chrono::steady_clock::time_point lastIntegerZoomTime;
     bool first = true;
 
-    void update(float z, timestamp now) {
+    void update(float z, std::chrono::steady_clock::time_point now) {
         if (first) {
             first = false;
 
             lastIntegerZoom = std::floor(z);
-            lastIntegerZoomTime = 0;
+            lastIntegerZoomTime = std::chrono::steady_clock::time_point::min();
             lastZoom = z;
         }
 

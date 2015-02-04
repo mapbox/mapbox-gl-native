@@ -20,9 +20,7 @@ T FadedStopsFunction<T>::evaluate(float z, const ZoomHistory &zh) const {
     T result;
 
     float fraction = std::fmod(z, 1.0f);
-    float tDiff = (util::now() - zh.lastIntegerZoomTime) / 1_millisecond;
-    float fDuration = duration / 1_millisecond;
-    float t = std::min(tDiff / fDuration, 1.0f);
+    float t = std::min((std::chrono::steady_clock::now() - zh.lastIntegerZoomTime) / duration, 1.0f);
     float scale = 1.0f;
     uint32_t low, high;
 

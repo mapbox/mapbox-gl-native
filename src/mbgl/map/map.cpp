@@ -5,7 +5,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/util/transition.hpp>
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/clip_ids.hpp>
 #include <mbgl/util/string.hpp>
@@ -25,6 +24,7 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/uv.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -54,44 +54,12 @@ const static bool uvVersionCheck = []() {
     return true;
 }();
 
-
-#include <zlib.h>
-// Check zlib library version.
-const static bool zlibVersionCheck = []() {
-    const char *const version = zlibVersion();
-    if (version[0] != ZLIB_VERSION[0]) {
-        throw std::runtime_error(mbgl::util::sprintf<96>(
-            "zlib version mismatch: headers report %s, but library reports %s", ZLIB_VERSION, version));
-    }
-
-    return true;
-}();
-
-
-#include <sqlite3.h>
-// Check sqlite3 library version.
-const static bool sqliteVersionCheck = []() {
-    if (sqlite3_libversion_number() != SQLITE_VERSION_NUMBER) {
-        throw std::runtime_error(mbgl::util::sprintf<96>(
-            "sqlite3 libversion mismatch: headers report %d, but library reports %d",
-            SQLITE_VERSION_NUMBER, sqlite3_libversion_number()));
-    }
-    if (strcmp(sqlite3_sourceid(), SQLITE_SOURCE_ID) != 0) {
-        throw std::runtime_error(mbgl::util::sprintf<256>(
-            "sqlite3 sourceid mismatch: headers report \"%s\", but library reports \"%s\"",
-            SQLITE_SOURCE_ID, sqlite3_sourceid()));
-    }
-
-    return true;
-}();
-
-
 using namespace mbgl;
 
 Map::Map(View& view_, FileSource& fileSource_)
     : loop(util::make_unique<uv::loop>()),
       view(view_),
-#ifndef NDEBUG
+#ifdef DEBUG
       mainThread(std::this_thread::get_id()),
       mapThread(mainThread),
 #endif
@@ -128,9 +96,7 @@ Map::~Map() {
 }
 
 uv::worker &Map::getWorker() {
-    if (!workers) {
-        workers = util::make_unique<uv::worker>(**loop, 4, "Tile Worker");
-    }
+    assert(workers);
     return *workers;
 }
 
@@ -153,8 +119,6 @@ void Map::start(bool startPaused) {
         style.reset();
         workers.reset();
         activeSources.clear();
-
-        fileSource.clearLoop();
 
         terminating = true;
 
@@ -188,7 +152,7 @@ void Map::start(bool startPaused) {
     }
 
     thread = std::thread([this]() {
-#ifndef NDEBUG
+#ifdef DEBUG
         mapThread = std::this_thread::get_id();
 #endif
 
@@ -198,7 +162,7 @@ void Map::start(bool startPaused) {
 
         run();
 
-#ifndef NDEBUG
+#ifdef DEBUG
         mapThread = std::thread::id();
 #endif
 
@@ -266,7 +230,7 @@ void Map::resume() {
 
 void Map::run() {
     if (mode == Mode::None) {
-#ifndef NDEBUG
+#ifdef DEBUG
         mapThread = mainThread;
 #endif
         mode = Mode::Static;
@@ -278,6 +242,9 @@ void Map::run() {
     }
 
     view.activate();
+
+    workers = util::make_unique<uv::worker>(**loop, 4, "Tile Worker");
+
     setup();
     prepare();
 
@@ -298,11 +265,10 @@ void Map::run() {
     // *after* all events have been processed.
     if (mode == Mode::Static) {
         render();
-#ifndef NDEBUG
+#ifdef DEBUG
         mapThread = std::thread::id();
 #endif
         mode = Mode::None;
-        fileSource.clearLoop();
     }
 
     view.deactivate();
@@ -387,12 +353,13 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
         style = std::make_shared<Style>();
     }
 
+    style->base = base;
     style->loadJSON((const uint8_t *)styleJSON.c_str());
     style->cascadeClasses(classes);
-    fileSource.setBase(base);
-    glyphStore->setURL(style->glyph_url);
-
     style->setDefaultTransitionDuration(defaultTransitionDuration);
+
+    const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
+    glyphStore->setURL(glyphURL);
 
     update();
 }
@@ -435,13 +402,13 @@ void Map::cancelTransitions() {
 
 #pragma mark - Position
 
-void Map::moveBy(double dx, double dy, double duration) {
-    transform.moveBy(dx, dy, duration * 1_second);
+void Map::moveBy(double dx, double dy, std::chrono::steady_clock::duration duration) {
+    transform.moveBy(dx, dy, duration);
     update();
 }
 
-void Map::setLonLat(double lon, double lat, double duration) {
-    transform.setLonLat(lon, lat, duration * 1_second);
+void Map::setLonLat(double lon, double lat, std::chrono::steady_clock::duration duration) {
+    transform.setLonLat(lon, lat, duration);
     update();
 }
 
@@ -469,13 +436,13 @@ void Map::resetPosition() {
 
 #pragma mark - Scale
 
-void Map::scaleBy(double ds, double cx, double cy, double duration) {
-    transform.scaleBy(ds, cx, cy, duration * 1_second);
+void Map::scaleBy(double ds, double cx, double cy, std::chrono::steady_clock::duration duration) {
+    transform.scaleBy(ds, cx, cy, duration);
     update();
 }
 
-void Map::setScale(double scale, double cx, double cy, double duration) {
-    transform.setScale(scale, cx, cy, duration * 1_second);
+void Map::setScale(double scale, double cx, double cy, std::chrono::steady_clock::duration duration) {
+    transform.setScale(scale, cx, cy, duration);
     update();
 }
 
@@ -483,8 +450,8 @@ double Map::getScale() const {
     return transform.getScale();
 }
 
-void Map::setZoom(double zoom, double duration) {
-    transform.setZoom(zoom, duration * 1_second);
+void Map::setZoom(double zoom, std::chrono::steady_clock::duration duration) {
+    transform.setZoom(zoom, duration);
     update();
 }
 
@@ -492,8 +459,8 @@ double Map::getZoom() const {
     return transform.getZoom();
 }
 
-void Map::setLonLatZoom(double lon, double lat, double zoom, double duration) {
-    transform.setLonLatZoom(lon, lat, zoom, duration * 1_second);
+void Map::setLonLatZoom(double lon, double lat, double zoom, std::chrono::steady_clock::duration duration) {
+    transform.setLonLatZoom(lon, lat, zoom, duration);
     update();
 }
 
@@ -526,13 +493,13 @@ double Map::getMaxZoom() const {
 
 #pragma mark - Rotation
 
-void Map::rotateBy(double sx, double sy, double ex, double ey, double duration) {
-    transform.rotateBy(sx, sy, ex, ey, duration * 1_second);
+void Map::rotateBy(double sx, double sy, double ex, double ey, std::chrono::steady_clock::duration duration) {
+    transform.rotateBy(sx, sy, ex, ey, duration);
     update();
 }
 
-void Map::setBearing(double degrees, double duration) {
-    transform.setAngle(-degrees * M_PI / 180, duration * 1_second);
+void Map::setBearing(double degrees, std::chrono::steady_clock::duration duration) {
+    transform.setAngle(-degrees * M_PI / 180, duration);
     update();
 }
 
@@ -546,7 +513,7 @@ double Map::getBearing() const {
 }
 
 void Map::resetNorth() {
-    transform.setAngle(0, 500_milliseconds);
+    transform.setAngle(0, std::chrono::milliseconds(500));
     update();
 }
 
@@ -560,6 +527,15 @@ void Map::stopRotating() {
     update();
 }
 
+#pragma mark - Access Token
+
+void Map::setAccessToken(const std::string &token) {
+    accessToken = token;
+}
+
+const std::string &Map::getAccessToken() const {
+    return accessToken;
+}
 
 #pragma mark - Toggles
 
@@ -618,14 +594,14 @@ std::vector<std::string> Map::getClasses() const {
    return classes;
 }
 
-void Map::setDefaultTransitionDuration(uint64_t milliseconds) {
-    defaultTransitionDuration = milliseconds;
+void Map::setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
+    defaultTransitionDuration = duration;
     if (style) {
-        style->setDefaultTransitionDuration(milliseconds);
+        style->setDefaultTransitionDuration(duration);
     }
 }
 
-uint64_t Map::getDefaultTransitionDuration() {
+std::chrono::steady_clock::duration Map::getDefaultTransitionDuration() {
     return defaultTransitionDuration;
 }
 
@@ -675,20 +651,16 @@ void Map::updateTiles() {
         source->source->update(*this, getWorker(),
                                style, *glyphAtlas, *glyphStore,
                                *spriteAtlas, getSprite(),
-                               *texturePool, fileSource, [this](){ update(); });
+                               *texturePool, fileSource, ***loop, [this](){ update(); });
     }
 }
 
 void Map::prepare() {
-    if (!fileSource.hasLoop()) {
-        fileSource.setLoop(**loop);
-    }
-
     if (!style) {
         style = std::make_shared<Style>();
 
-        fileSource.request(ResourceType::JSON, styleURL)->onload([&](const Response &res) {
-            if (res.code == 200) {
+        fileSource.request({ Resource::Kind::JSON, styleURL}, **loop, [&](const Response &res) {
+            if (res.status == Response::Successful) {
                 // Calculate the base
                 const size_t pos = styleURL.rfind('/');
                 std::string base = "";
@@ -698,20 +670,20 @@ void Map::prepare() {
 
                 setStyleJSON(res.data, base);
             } else {
-                Log::Error(Event::Setup, "loading style failed: %ld (%s)", res.code, res.message.c_str());
+                Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
             }
         });
     }
 
     // Update transform transitions.
-    animationTime = util::now();
+    animationTime = std::chrono::steady_clock::now();
     if (transform.needsTransition()) {
         transform.updateTransitions(animationTime);
     }
 
     state = transform.currentState();
 
-    animationTime = util::now();
+    animationTime = std::chrono::steady_clock::now();
     updateSources();
     style->updateProperties(state.getNormalizedZoom(), animationTime);
 

@@ -131,8 +131,8 @@ GlyphBox getMergedBoxes(const GlyphBoxes &glyphs, const Anchor &anchor) {
 Placement Placement::getIcon(Anchor &anchor, const Rect<uint16_t> &image, float boxScale,
                              const std::vector<Coordinate> &line, const StyleBucketSymbol &props) {
 
-    const float dx = props.icon.offset.x;
-    const float dy = props.icon.offset.y;
+    const float dx = props.icon.offset[0];
+    const float dy = props.icon.offset[1];
     float x1 = dx - image.originalW / 2.0f;
     float x2 = x1 + image.w;
     float y1 = dy - image.originalH / 2.0f;

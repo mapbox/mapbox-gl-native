@@ -54,7 +54,8 @@ void log_gl_string(GLenum name, const char *label) {
 
 NativeMapView::NativeMapView(JNIEnv *env, jobject obj_)
     : mbgl::View(*this),
-      fileSource(mbgl::platform::defaultCacheDatabase()),
+      fileCache(mbgl::android::cachePath + "/mbgl-cache.db"),
+      fileSource(&fileCache),
       map(*this, fileSource) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
 
@@ -140,7 +141,7 @@ void NativeMapView::notify() {
 
 mbgl::Map &NativeMapView::getMap() { return map; }
 
-mbgl::CachingHTTPFileSource &NativeMapView::getFileSource() { return fileSource; }
+mbgl::DefaultFileSource &NativeMapView::getFileSource() { return fileSource; }
 
 bool NativeMapView::inEmulator() {
     // Detect if we are in emulator
@@ -718,7 +719,7 @@ void NativeMapView::resume() {
     }
 }
 
-void NativeMapView::notifyMapChange(mbgl::MapChange, mbgl::timestamp) {
+void NativeMapView::notifyMapChange(mbgl::MapChange, std::chrono::steady_clock::duration) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::notifyMapChange()");
 
     assert(vm != nullptr);

@@ -91,6 +91,100 @@ void TileParser::parseStyleLayers(util::ptr<StyleLayerGroup> group) {
     }
 }
 
+template <typename T>
+struct PropertyEvaluator {
+    typedef T result_type;
+    PropertyEvaluator(float z_) : z(z_) {}
+
+    template <typename P, typename std::enable_if<std::is_convertible<P, T>::value, int>::type = 0>
+    T operator()(const P &value) const {
+        return value;
+    }
+
+    T operator()(const Function<T> &value) const {
+        return mapbox::util::apply_visitor(FunctionEvaluator<T>(z), value);
+    }
+
+    template <typename P, typename std::enable_if<!std::is_convertible<P, T>::value, int>::type = 0>
+    T operator()(const P &) const {
+        return T();
+    }
+
+private:
+    const float z;
+};
+
+template <typename T>
+void TileParser::applyLayoutProperty(PropertyKey key, ClassProperties &classProperties, T &target, const float z) {
+    auto it = classProperties.properties.find(key);
+    if (it != classProperties.properties.end()) {
+        const PropertyEvaluator<T> evaluator(z);
+        target = mapbox::util::apply_visitor(evaluator, it->second);
+
+    }
+}
+
+template <>
+void TileParser::applyLayoutProperties<FillProperties>(StyleBucket &bucket_desc, const float) {
+    bucket_desc.render.set<StyleBucketFill>();
+    // no-op; Fill buckets don't currently have any applicable layout properties
+}
+
+template<>
+void TileParser::applyLayoutProperties<LineProperties>(StyleBucket &bucket_desc, const float z) {
+    bucket_desc.render.set<StyleBucketLine>();
+    StyleBucketLine &line = bucket_desc.render.get<StyleBucketLine>();
+    applyLayoutProperty(PropertyKey::LineCap, bucket_desc.layout, line.cap, z);
+    applyLayoutProperty(PropertyKey::LineJoin, bucket_desc.layout, line.join, z);
+    applyLayoutProperty(PropertyKey::LineMiterLimit, bucket_desc.layout, line.miter_limit, z);
+    applyLayoutProperty(PropertyKey::LineRoundLimit, bucket_desc.layout, line.round_limit, z);
+}
+
+template<>
+void TileParser::applyLayoutProperties<SymbolProperties>(StyleBucket &bucket_desc, const float z) {
+    bucket_desc.render.set<StyleBucketSymbol>();
+    StyleBucketSymbol &symbol = bucket_desc.render.get<StyleBucketSymbol>();
+    applyLayoutProperty(PropertyKey::SymbolPlacement, bucket_desc.layout, symbol.placement, z);
+    if (symbol.placement == PlacementType::Line) {
+        symbol.icon.rotation_alignment = RotationAlignmentType::Map;
+        symbol.text.rotation_alignment = RotationAlignmentType::Map;
+    };
+    applyLayoutProperty(PropertyKey::SymbolMinDistance, bucket_desc.layout, symbol.min_distance, z);
+    applyLayoutProperty(PropertyKey::SymbolAvoidEdges, bucket_desc.layout, symbol.avoid_edges, z);
+
+    applyLayoutProperty(PropertyKey::IconAllowOverlap, bucket_desc.layout, symbol.icon.allow_overlap, z);
+    applyLayoutProperty(PropertyKey::IconIgnorePlacement, bucket_desc.layout, symbol.icon.ignore_placement, z);
+    applyLayoutProperty(PropertyKey::IconOptional, bucket_desc.layout, symbol.icon.optional, z);
+    applyLayoutProperty(PropertyKey::IconRotationAlignment, bucket_desc.layout, symbol.icon.rotation_alignment, z);
+    applyLayoutProperty(PropertyKey::IconMaxSize, bucket_desc.layout, symbol.icon.max_size, z);
+    applyLayoutProperty(PropertyKey::IconImage, bucket_desc.layout, symbol.icon.image, z);
+    applyLayoutProperty(PropertyKey::IconPadding, bucket_desc.layout, symbol.icon.padding, z);
+    applyLayoutProperty(PropertyKey::IconRotate, bucket_desc.layout, symbol.icon.rotate, z);
+    applyLayoutProperty(PropertyKey::IconKeepUpright, bucket_desc.layout, symbol.icon.keep_upright, z);
+    applyLayoutProperty(PropertyKey::IconOffsetX, bucket_desc.layout, symbol.icon.offset[0], z);
+    applyLayoutProperty(PropertyKey::IconOffsetY, bucket_desc.layout, symbol.icon.offset[1], z);
+
+    applyLayoutProperty(PropertyKey::TextRotationAlignment, bucket_desc.layout, symbol.text.rotation_alignment, z);
+    applyLayoutProperty(PropertyKey::TextField, bucket_desc.layout, symbol.text.field, z);
+    applyLayoutProperty(PropertyKey::TextFont, bucket_desc.layout, symbol.text.font, z);
+    applyLayoutProperty(PropertyKey::TextMaxSize, bucket_desc.layout, symbol.text.max_size, z);
+    applyLayoutProperty(PropertyKey::TextMaxWidth, bucket_desc.layout, symbol.text.max_width, z);
+    applyLayoutProperty(PropertyKey::TextLineHeight, bucket_desc.layout, symbol.text.line_height, z);
+    applyLayoutProperty(PropertyKey::TextLetterSpacing, bucket_desc.layout, symbol.text.letter_spacing, z);
+    applyLayoutProperty(PropertyKey::TextMaxAngle, bucket_desc.layout, symbol.text.max_angle, z);
+    applyLayoutProperty(PropertyKey::TextRotate, bucket_desc.layout, symbol.text.rotate, z);
+    applyLayoutProperty(PropertyKey::TextPadding, bucket_desc.layout, symbol.text.padding, z);
+    applyLayoutProperty(PropertyKey::TextIgnorePlacement, bucket_desc.layout, symbol.text.ignore_placement, z);
+    applyLayoutProperty(PropertyKey::TextOptional, bucket_desc.layout, symbol.text.optional, z);
+    applyLayoutProperty(PropertyKey::TextJustify, bucket_desc.layout, symbol.text.justify, z);
+    applyLayoutProperty(PropertyKey::TextAnchor, bucket_desc.layout, symbol.text.anchor, z);
+    applyLayoutProperty(PropertyKey::TextKeepUpright, bucket_desc.layout, symbol.text.keep_upright, z);
+    applyLayoutProperty(PropertyKey::TextTransform, bucket_desc.layout, symbol.text.transform, z);
+    applyLayoutProperty(PropertyKey::TextOffsetX, bucket_desc.layout, symbol.text.offset[0], z);
+    applyLayoutProperty(PropertyKey::TextOffsetY, bucket_desc.layout, symbol.text.offset[1], z);
+    applyLayoutProperty(PropertyKey::TextAllowOverlap, bucket_desc.layout, symbol.text.allow_overlap, z);
+}
+
 std::unique_ptr<Bucket> TileParser::createBucket(util::ptr<StyleBucket> bucket_desc) {
     if (!bucket_desc) {
         fprintf(stderr, "missing bucket desc\n");
@@ -105,13 +199,16 @@ std::unique_ptr<Bucket> TileParser::createBucket(util::ptr<StyleBucket> bucket_d
     auto layer_it = vector_data.layers.find(bucket_desc->source_layer);
     if (layer_it != vector_data.layers.end()) {
         const VectorTileLayer &layer = layer_it->second;
-        if (bucket_desc->render.is<StyleBucketFill>()) {
+        if (bucket_desc->type == StyleLayerType::Fill) {
+            applyLayoutProperties<FillProperties>(*bucket_desc, tile.id.z);
             return createFillBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketFill>());
-        } else if (bucket_desc->render.is<StyleBucketLine>()) {
+        } else if (bucket_desc->type == StyleLayerType::Line) {
+            applyLayoutProperties<LineProperties>(*bucket_desc, tile.id.z);
             return createLineBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketLine>());
-        } else if (bucket_desc->render.is<StyleBucketSymbol>()) {
+        } else if (bucket_desc->type == StyleLayerType::Symbol) {
+            applyLayoutProperties<SymbolProperties>(*bucket_desc, tile.id.z);
             return createSymbolBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketSymbol>());
-        } else if (bucket_desc->render.is<StyleBucketRaster>()) {
+        } else if (bucket_desc->type == StyleLayerType::Raster) {
             return nullptr;
         } else {
             fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucket_desc->name.c_str(), bucket_desc->source_layer.c_str());

@@ -1,5 +1,6 @@
 #include <mbgl/style/property_fallback.hpp>
 #include <mbgl/style/style_properties.hpp>
+#include <mbgl/style/style_bucket.hpp>
 
 namespace mbgl {
 
@@ -52,6 +53,48 @@ const std::map<PropertyKey, PropertyValue> PropertyFallbackValue::properties = {
 
     { PropertyKey::BackgroundOpacity, defaultStyleProperties<BackgroundProperties>().opacity },
     { PropertyKey::BackgroundColor, defaultStyleProperties<BackgroundProperties>().color },
+
+    { PropertyKey::LineCap, defaultLayoutProperties<StyleBucketLine>().cap },
+    { PropertyKey::LineJoin, defaultLayoutProperties<StyleBucketLine>().join },
+    { PropertyKey::LineMiterLimit, defaultLayoutProperties<StyleBucketLine>().miter_limit },
+    { PropertyKey::LineRoundLimit, defaultLayoutProperties<StyleBucketLine>().round_limit },
+
+    { PropertyKey::SymbolPlacement, defaultLayoutProperties<StyleBucketSymbol>().placement },
+    { PropertyKey::SymbolMinDistance, defaultLayoutProperties<StyleBucketSymbol>().min_distance },
+    { PropertyKey::SymbolAvoidEdges, defaultLayoutProperties<StyleBucketSymbol>().avoid_edges },
+
+    { PropertyKey::IconAllowOverlap, defaultLayoutProperties<StyleBucketSymbol>().icon.allow_overlap },
+    { PropertyKey::IconIgnorePlacement, defaultLayoutProperties<StyleBucketSymbol>().icon.ignore_placement },
+    { PropertyKey::IconOptional, defaultLayoutProperties<StyleBucketSymbol>().icon.optional },
+    { PropertyKey::IconRotationAlignment, defaultLayoutProperties<StyleBucketSymbol>().icon.rotation_alignment },
+    { PropertyKey::IconMaxSize, defaultLayoutProperties<StyleBucketSymbol>().icon.max_size },
+    { PropertyKey::IconImage, defaultLayoutProperties<StyleBucketSymbol>().icon.image },
+    { PropertyKey::IconRotate, defaultLayoutProperties<StyleBucketSymbol>().icon.rotate },
+    { PropertyKey::IconPadding, defaultLayoutProperties<StyleBucketSymbol>().icon.padding },
+    { PropertyKey::IconKeepUpright, defaultLayoutProperties<StyleBucketSymbol>().icon.keep_upright },
+    { PropertyKey::IconOffsetX, defaultLayoutProperties<StyleBucketSymbol>().icon.offset[0] },
+    { PropertyKey::IconOffsetY, defaultLayoutProperties<StyleBucketSymbol>().icon.offset[1] },
+
+    { PropertyKey::TextRotationAlignment, defaultLayoutProperties<StyleBucketSymbol>().text.rotation_alignment },
+    { PropertyKey::TextField, defaultLayoutProperties<StyleBucketSymbol>().text.field },
+    { PropertyKey::TextFont, defaultLayoutProperties<StyleBucketSymbol>().text.font },
+    { PropertyKey::TextMaxSize, defaultLayoutProperties<StyleBucketSymbol>().text.max_size },
+    { PropertyKey::TextMaxWidth, defaultLayoutProperties<StyleBucketSymbol>().text.max_width },
+    { PropertyKey::TextLineHeight, defaultLayoutProperties<StyleBucketSymbol>().text.line_height },
+    { PropertyKey::TextLetterSpacing, defaultLayoutProperties<StyleBucketSymbol>().text.letter_spacing },
+    { PropertyKey::TextJustify, defaultLayoutProperties<StyleBucketSymbol>().text.justify },
+    { PropertyKey::TextAnchor, defaultLayoutProperties<StyleBucketSymbol>().text.anchor },
+    { PropertyKey::TextMaxAngle, defaultLayoutProperties<StyleBucketSymbol>().text.max_angle },
+    { PropertyKey::TextRotate, defaultLayoutProperties<StyleBucketSymbol>().text.rotate },
+    { PropertyKey::TextPadding, defaultLayoutProperties<StyleBucketSymbol>().text.padding },
+    { PropertyKey::TextKeepUpright, defaultLayoutProperties<StyleBucketSymbol>().text.keep_upright },
+    { PropertyKey::TextTransform, defaultLayoutProperties<StyleBucketSymbol>().text.transform },
+    { PropertyKey::TextOffsetX, defaultLayoutProperties<StyleBucketSymbol>().text.offset[0] },
+    { PropertyKey::TextOffsetY, defaultLayoutProperties<StyleBucketSymbol>().text.offset[1] },
+    { PropertyKey::TextAllowOverlap, defaultLayoutProperties<StyleBucketSymbol>().text.allow_overlap },
+    { PropertyKey::TextIgnorePlacement, defaultLayoutProperties<StyleBucketSymbol>().text.ignore_placement },
+    { PropertyKey::TextOptional, defaultLayoutProperties<StyleBucketSymbol>().text.optional },
+
 };
 
 const PropertyValue PropertyFallbackValue::defaultProperty = false;

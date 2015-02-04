@@ -28,6 +28,7 @@
 #include <map>
 #include <unordered_map>
 #include <set>
+#include <chrono>
 
 namespace mbgl {
 
@@ -78,7 +79,7 @@ public:
     void render(const Style& style,
                 const std::set<util::ptr<StyleSource>>& sources,
                 TransformState state,
-                timestamp time);
+                std::chrono::steady_clock::time_point time);
 
     void renderLayers(util::ptr<StyleLayerGroup> group);
     void renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);

@@ -3,11 +3,11 @@
 using namespace mbgl;
 
 // Record frame history that will be used to calculate fading params
-void FrameHistory::record(timestamp now, float zoom) {
+void FrameHistory::record(std::chrono::steady_clock::time_point now, float zoom) {
     // first frame ever
     if (!history.size()) {
-        history.emplace_back(FrameSnapshot{0, zoom});
-        history.emplace_back(FrameSnapshot{0, zoom});
+        history.emplace_back(FrameSnapshot{std::chrono::steady_clock::time_point::min(), zoom});
+        history.emplace_back(FrameSnapshot{std::chrono::steady_clock::time_point::min(), zoom});
     }
 
     if (history.size() > 0 || history.back().z != zoom) {
@@ -15,7 +15,7 @@ void FrameHistory::record(timestamp now, float zoom) {
     }
 }
 
-bool FrameHistory::needsAnimation(const timestamp duration) const {
+bool FrameHistory::needsAnimation(const std::chrono::steady_clock::duration duration) const {
     if (!history.size()) {
         return false;
     }
@@ -26,7 +26,7 @@ bool FrameHistory::needsAnimation(const timestamp duration) const {
     const FrameSnapshot &pivot = history.back();
 
     int i = -1;
-    while ((int)history.size() > i + 1 && history[i + 1].t + duration < pivot.t) {
+    while ((int)history.size() > i + 1 && history[i + 1].now + duration < pivot.now) {
         i++;
     }
 
@@ -47,16 +47,16 @@ bool FrameHistory::needsAnimation(const timestamp duration) const {
     return false;
 }
 
-FadeProperties FrameHistory::getFadeProperties(timestamp duration)
+FadeProperties FrameHistory::getFadeProperties(std::chrono::steady_clock::duration duration)
 {
-    const timestamp currentTime = util::now();
+    const std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
 
     // Remove frames until only one is outside the duration, or until there are only three
-    while (history.size() > 3 && history[1].t + duration < currentTime) {
+    while (history.size() > 3 && history[1].now + duration < currentTime) {
         history.pop_front();
     }
 
-    if (history[1].t + duration < currentTime) {
+    if (history[1].now + duration < currentTime) {
         history[0].z = history[1].z;
     }
 
@@ -69,12 +69,13 @@ FadeProperties FrameHistory::getFadeProperties(timestamp duration)
 
     // Calculate the speed of zooming, and how far it would zoom in terms of zoom levels in one
     // duration
-    float zoomDiff = endingZ - history[1].z, timeDiff = lastFrame.t - history[1].t;
+    float zoomDiff = endingZ - history[1].z;
+    std::chrono::duration<float> timeDiff = lastFrame.now - history[1].now;
     float fadedist = zoomDiff / (timeDiff / duration);
 
     // At end of a zoom when the zoom stops changing continue pretending to zoom at that speed
     // bump is how much farther it would have been if it had continued zooming at the same rate
-    float bump = (currentTime - lastFrame.t) / duration * fadedist;
+    float bump = std::chrono::duration<float>(currentTime - lastFrame.now) / duration * fadedist;
 
     return FadeProperties {
         fadedist,

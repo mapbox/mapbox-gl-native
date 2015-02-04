@@ -72,18 +72,6 @@ MBGL_DEFINE_ENUM_CLASS(VisibilityTypeClass, VisibilityType, {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class WindingType : bool {
-    EvenOdd,
-    NonZero,
-};
-
-MBGL_DEFINE_ENUM_CLASS(WindingTypeClass, WindingType, {
-    { WindingType::EvenOdd, "even-odd" },
-    { WindingType::NonZero, "non-zero" },
-});
-
-// -------------------------------------------------------------------------------------------------
-
 enum class CapType : uint8_t {
     Round,
     Butt,

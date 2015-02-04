@@ -55,8 +55,8 @@ private:
     const size_t triangle_elements_start;
     const size_t point_elements_start;
 
-    std::vector<triangle_group_type> triangleGroups;
-    std::vector<point_group_type> pointGroups;
+    std::vector<std::unique_ptr<triangle_group_type>> triangleGroups;
+    std::vector<std::unique_ptr<point_group_type>> pointGroups;
 };
 
 }

@@ -7,6 +7,7 @@
 #define GL_GLEXT_PROTOTYPES
 #include <mbgl/platform/default/glx.h>
 #define MBGL_USE_GLX 1
+#undef Status
 #endif
 
 #include <mbgl/map/view.hpp>
@@ -31,7 +32,7 @@ public:
     std::unique_ptr<uint32_t[]> readPixels();
 
     void notify();
-    void notifyMapChange(MapChange change, timestamp delay = 0);
+    void notifyMapChange(MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero());
     void activate();
     void deactivate();
     void swap();

@@ -81,7 +81,7 @@ private:
 
 
     // Adds placed items to the buffer.
-    template <typename Buffer>
+    template <typename Buffer, typename GroupType>
     void addSymbols(Buffer &buffer, const PlacedGlyphs &symbols, float scale, PlacementRange placementRange);
 
     // Adds glyphs to the glyph atlas so that they have a left/top/width/height coordinates associated to them that we can use for writing to a buffer.
@@ -95,16 +95,16 @@ public:
 private:
     Collision &collision;
 
-    struct {
+    struct TextBuffer {
         TextVertexBuffer vertices;
         TriangleElementsBuffer triangles;
-        std::vector<TextElementGroup> groups;
+        std::vector<std::unique_ptr<TextElementGroup>> groups;
     } text;
 
-    struct {
+    struct IconBuffer {
         IconVertexBuffer vertices;
         TriangleElementsBuffer triangles;
-        std::vector<IconElementGroup> groups;
+        std::vector<std::unique_ptr<IconElementGroup>> groups;
     } icon;
 
 };

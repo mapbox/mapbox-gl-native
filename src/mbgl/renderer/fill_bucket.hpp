@@ -72,8 +72,8 @@ private:
     const size_t line_elements_start;
     VertexArrayObject array;
 
-    std::vector<triangle_group_type> triangleGroups;
-    std::vector<line_group_type> lineGroups;
+    std::vector<std::unique_ptr<triangle_group_type>> triangleGroups;
+    std::vector<std::unique_ptr<line_group_type>> lineGroups;
 
     std::vector<ClipperLib::IntPoint> line;
     bool hasVertices = false;

@@ -6,6 +6,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/vector_tile.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <mbgl/platform/gl.hpp>
 
@@ -111,12 +112,13 @@ void FillBucket::tessellate() {
         throw geometry_too_long_exception();
     }
 
-    if (!lineGroups.size() || (lineGroups.back().vertex_length + total_vertex_count > 65535)) {
+    if (!lineGroups.size() || (lineGroups.back()->vertex_length + total_vertex_count > 65535)) {
         // Move to a new group because the old one can't hold the geometry.
-        lineGroups.emplace_back();
+        lineGroups.emplace_back(util::make_unique<line_group_type>());
     }
 
-    line_group_type& lineGroup = lineGroups.back();
+    assert(lineGroups.back());
+    line_group_type& lineGroup = *lineGroups.back();
     uint32_t lineIndex = lineGroup.vertex_length;
 
     for (const std::vector<ClipperLib::IntPoint>& polygon : polygons) {
@@ -157,14 +159,15 @@ void FillBucket::tessellate() {
             }
         }
 
-        if (!triangleGroups.size() || (triangleGroups.back().vertex_length + total_vertex_count > 65535)) {
+        if (!triangleGroups.size() || (triangleGroups.back()->vertex_length + total_vertex_count > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            triangleGroups.emplace_back();
+            triangleGroups.emplace_back(util::make_unique<triangle_group_type>());
         }
 
         // We're generating triangle fans, so we always start with the first
         // coordinate in this polygon.
-        triangle_group_type& triangleGroup = triangleGroups.back();
+        assert(triangleGroups.back());
+        triangle_group_type& triangleGroup = *triangleGroups.back();
         uint32_t triangleIndex = triangleGroup.vertex_length;
 
         for (int i = 0; i < triangle_count; ++i) {
@@ -215,32 +218,35 @@ bool FillBucket::hasData() const {
 void FillBucket::drawElements(PlainShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
     char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
-    for (triangle_group_type& group : triangleGroups) {
-        group.array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
-        vertex_index += group.vertex_length * vertexBuffer.itemSize;
-        elements_index += group.elements_length * triangleElementsBuffer.itemSize;
+    for (auto& group : triangleGroups) {
+        assert(group);
+        group->array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        vertex_index += group->vertex_length * vertexBuffer.itemSize;
+        elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
 void FillBucket::drawElements(PatternShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
     char *elements_index = BUFFER_OFFSET(triangle_elements_start * triangleElementsBuffer.itemSize);
-    for (triangle_group_type& group : triangleGroups) {
-        group.array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group.elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
-        vertex_index += group.vertex_length * vertexBuffer.itemSize;
-        elements_index += group.elements_length * triangleElementsBuffer.itemSize;
+    for (auto& group : triangleGroups) {
+        assert(group);
+        group->array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        vertex_index += group->vertex_length * vertexBuffer.itemSize;
+        elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
 void FillBucket::drawVertices(OutlineShader& shader) {
     char *vertex_index = BUFFER_OFFSET(vertex_start * vertexBuffer.itemSize);
     char *elements_index = BUFFER_OFFSET(line_elements_start * lineElementsBuffer.itemSize);
-    for (line_group_type& group : lineGroups) {
-        group.array[0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index);
-        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group.elements_length * 2, GL_UNSIGNED_SHORT, elements_index));
-        vertex_index += group.vertex_length * vertexBuffer.itemSize;
-        elements_index += group.elements_length * lineElementsBuffer.itemSize;
+    for (auto& group : lineGroups) {
+        assert(group);
+        group->array[0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index);
+        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT, elements_index));
+        vertex_index += group->vertex_length * vertexBuffer.itemSize;
+        elements_index += group->elements_length * lineElementsBuffer.itemSize;
     }
 }

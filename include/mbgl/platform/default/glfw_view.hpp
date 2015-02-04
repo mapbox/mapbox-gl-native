@@ -2,7 +2,6 @@
 #define MBGL_COMMON_GLFW_VIEW
 
 #include <mbgl/mbgl.hpp>
-#include <mbgl/util/time.hpp>
 
 #ifdef NVIDIA
 #define GLFW_INCLUDE_ES2
@@ -19,7 +18,7 @@ public:
     void activate();
     void deactivate();
     void notify();
-    void notifyMapChange(mbgl::MapChange change, mbgl::timestamp delay = 0);
+    void notifyMapChange(mbgl::MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero());
 
     static void key(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void scroll(GLFWwindow *window, double xoffset, double yoffset);

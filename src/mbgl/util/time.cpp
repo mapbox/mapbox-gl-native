@@ -4,10 +4,6 @@
 namespace mbgl {
 namespace util {
 
-timestamp now() {
-    return uv_hrtime();
-}
-
 static const char *week[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 static const char *months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};

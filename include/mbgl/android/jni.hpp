@@ -2,7 +2,11 @@
 #define MBGL_ANDROID_JNI
 
 #include <string>
-#include <jni.h>
+
+// Forward definition of JNI types
+typedef class _jclass* jclass;
+typedef struct _jmethodID* jmethodID;
+typedef struct _jfieldID* jfieldID;
 
 namespace mbgl {
 namespace android {

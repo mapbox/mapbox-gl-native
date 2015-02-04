@@ -5,7 +5,6 @@
 #include <mbgl/style/style_source.hpp>
 #include <mbgl/style/zoom_history.hpp>
 
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
 
@@ -15,6 +14,7 @@
 #include <unordered_map>
 #include <vector>
 #include <set>
+#include <chrono>
 
 namespace mbgl {
 
@@ -22,7 +22,7 @@ class Sprite;
 class StyleLayer;
 class StyleLayerGroup;
 
-class Style {
+class Style : public util::noncopyable {
 public:
     struct exception : std::runtime_error { exception(const char *msg) : std::runtime_error(msg) {} };
 
@@ -32,9 +32,9 @@ public:
     void loadJSON(const uint8_t *const data);
 
     size_t layerCount() const;
-    void updateProperties(float z, timestamp t);
+    void updateProperties(float z, std::chrono::steady_clock::time_point now);
 
-    void setDefaultTransitionDuration(uint16_t duration_milliseconds = 0);
+    void setDefaultTransitionDuration(std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void cascadeClasses(const std::vector<std::string>&);
 
     bool hasTransitions() const;
@@ -44,6 +44,7 @@ public:
     util::ptr<StyleLayerGroup> layers;
     std::vector<std::string> appliedClasses;
     std::string glyph_url;
+    std::string base;
 
 private:
     std::string sprite_url;

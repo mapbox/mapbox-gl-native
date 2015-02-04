@@ -36,7 +36,7 @@ public:
                    GlyphAtlas&, GlyphStore&,
                    SpriteAtlas&, util::ptr<Sprite>,
                    TexturePool&,
-                   const SourceInfo&);
+                   const SourceInfo&, FileSource &);
     ~VectorTileData();
 
     virtual void parse();

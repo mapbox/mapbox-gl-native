@@ -5,7 +5,6 @@
 #include <mbgl/style/style_bucket.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/clip_ids.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
@@ -35,7 +34,7 @@ Painter::~Painter() {
 }
 
 bool Painter::needsAnimation() const {
-    return frameHistory.needsAnimation(300);
+    return frameHistory.needsAnimation(std::chrono::milliseconds(300));
 }
 
 void Painter::setup() {
@@ -216,7 +215,7 @@ void Painter::prepareTile(const Tile& tile) {
 }
 
 void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>& sources,
-                     TransformState state_, timestamp time) {
+                     TransformState state_, std::chrono::steady_clock::time_point time) {
     state = state_;
 
     clear();

@@ -234,18 +234,18 @@ class NativeMapView {
     }
 
     public void moveBy(double dx, double dy) {
-        moveBy(dx, dy, 0.0);
+        moveBy(dx, dy, 0);
     }
 
-    public void moveBy(double dx, double dy, double duration) {
+    public void moveBy(double dx, double dy, long duration) {
         nativeMoveBy(mNativeMapViewPtr, dx, dy, duration);
     }
 
     public void setLonLat(LonLat lonLat) {
-        setLonLat(lonLat, 0.0);
+        setLonLat(lonLat, 0);
     }
 
-    public void setLonLat(LonLat lonLat, double duration) {
+    public void setLonLat(LonLat lonLat, long duration) {
         nativeSetLonLat(mNativeMapViewPtr, lonLat, duration);
     }
 
@@ -270,10 +270,10 @@ class NativeMapView {
     }
 
     public void scaleBy(double ds, double cx, double cy) {
-        scaleBy(ds, cx, cy, 0.0);
+        scaleBy(ds, cx, cy, 0);
     }
 
-    public void scaleBy(double ds, double cx, double cy, double duration) {
+    public void scaleBy(double ds, double cx, double cy, long duration) {
         nativeScaleBy(mNativeMapViewPtr, ds, cx, cy, duration);
     }
 
@@ -282,10 +282,10 @@ class NativeMapView {
     }
 
     public void setScale(double scale, double cx, double cy) {
-        setScale(scale, cx, cy, 0.0);
+        setScale(scale, cx, cy, 0);
     }
 
-    public void setScale(double scale, double cx, double cy, double duration) {
+    public void setScale(double scale, double cx, double cy, long duration) {
         nativeSetScale(mNativeMapViewPtr, scale, cx, cy, duration);
     }
 
@@ -294,10 +294,10 @@ class NativeMapView {
     }
 
     public void setZoom(double zoom) {
-        setZoom(zoom, 0.0);
+        setZoom(zoom, 0);
     }
 
-    public void setZoom(double zoom, double duration) {
+    public void setZoom(double zoom, long duration) {
         nativeSetZoom(mNativeMapViewPtr, zoom, duration);
     }
 
@@ -306,10 +306,10 @@ class NativeMapView {
     }
 
     public void setLonLatZoom(LonLatZoom lonLatZoom) {
-        setLonLatZoom(lonLatZoom, 0.0);
+        setLonLatZoom(lonLatZoom, 0);
     }
 
-    public void setLonLatZoom(LonLatZoom lonLatZoom, double duration) {
+    public void setLonLatZoom(LonLatZoom lonLatZoom, long duration) {
         nativeSetLonLatZoom(mNativeMapViewPtr, lonLatZoom, duration);
     }
 
@@ -338,19 +338,19 @@ class NativeMapView {
     }
 
     public void rotateBy(double sx, double sy, double ex, double ey) {
-        rotateBy(sx, sy, ex, ey, 0.0);
+        rotateBy(sx, sy, ex, ey, 0);
     }
 
     public void rotateBy(double sx, double sy, double ex, double ey,
-            double duration) {
+                         long duration) {
         nativeRotateBy(mNativeMapViewPtr, sx, sy, ex, ey, duration);
     }
 
     public void setBearing(double degrees) {
-        setBearing(degrees, 0.0);
+        setBearing(degrees, 0);
     }
 
-    public void setBearing(double degrees, double duration) {
+    public void setBearing(double degrees, long duration) {
         nativeSetBearing(mNativeMapViewPtr, degrees, duration);
     }
 
@@ -468,7 +468,7 @@ class NativeMapView {
     private native List<String> nativeGetClasses(long nativeMapViewPtr);
 
     private native void nativeSetDefaultTransitionDuration(
-            long nativeMapViewPtr, long milliseconds);
+            long nativeMapViewPtr, long duration);
 
     private native long nativeGetDefaultTransitionDuration(long nativeMapViewPtr);
 
@@ -486,10 +486,10 @@ class NativeMapView {
     private native void nativeCancelTransitions(long nativeMapViewPtr);
 
     private native void nativeMoveBy(long nativeMapViewPtr, double dx,
-            double dy, double duration);
+            double dy, long duration);
 
     private native void nativeSetLonLat(long nativeMapViewPtr, LonLat lonLat,
-            double duration);
+                                        long duration);
 
     private native LonLat nativeGetLonLat(long nativeMapViewPtr);
 
@@ -500,20 +500,20 @@ class NativeMapView {
     private native void nativeResetPosition(long nativeMapViewPtr);
 
     private native void nativeScaleBy(long nativeMapViewPtr, double ds,
-            double cx, double cy, double duration);
+            double cx, double cy, long duration);
 
     private native void nativeSetScale(long nativeMapViewPtr, double scale,
-            double cx, double cy, double duration);
+            double cx, double cy, long duration);
 
     private native double nativeGetScale(long nativeMapViewPtr);
 
     private native void nativeSetZoom(long nativeMapViewPtr, double zoom,
-            double duration);
+                                      long duration);
 
     private native double nativeGetZoom(long nativeMapViewPtr);
 
     private native void nativeSetLonLatZoom(long nativeMapViewPtr,
-            LonLatZoom lonLatZoom, double duration);
+            LonLatZoom lonLatZoom, long duration);
 
     private native LonLatZoom nativeGetLonLatZoom(long nativeMapViewPtr);
 
@@ -528,10 +528,10 @@ class NativeMapView {
     private native double nativeGetMaxZoom(long nativeMapViewPtr);
 
     private native void nativeRotateBy(long nativeMapViewPtr, double sx,
-            double sy, double ex, double ey, double duration);
+            double sy, double ex, double ey, long duration);
 
     private native void nativeSetBearing(long nativeMapViewPtr, double degrees,
-            double duration);
+            long duration);
 
     private native void nativeSetBearing(long nativeMapViewPtr, double degrees,
             double cx, double cy);

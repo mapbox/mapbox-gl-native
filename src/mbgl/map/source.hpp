@@ -6,7 +6,6 @@
 #include <mbgl/style/style_source.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/ptr.hpp>
 
@@ -14,6 +13,7 @@
 #include <forward_list>
 #include <iosfwd>
 #include <map>
+#include <chrono>
 
 namespace mbgl {
 
@@ -39,7 +39,7 @@ public:
                 util::ptr<Style>,
                 GlyphAtlas&, GlyphStore&,
                 SpriteAtlas&, util::ptr<Sprite>,
-                TexturePool&, FileSource&,
+                TexturePool&, FileSource&, uv_loop_t& loop,
                 std::function<void ()> callback);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
@@ -63,7 +63,7 @@ private:
                             util::ptr<Style>,
                             GlyphAtlas&, GlyphStore&,
                             SpriteAtlas&, util::ptr<Sprite>,
-                            FileSource&, TexturePool&,
+                            FileSource&, uv_loop_t &, TexturePool&,
                             const Tile::ID&,
                             std::function<void ()> callback);
 
@@ -75,7 +75,7 @@ private:
     bool loaded = false;
 
     // Stores the time when this source was most recently updated.
-    timestamp updated = 0;
+    std::chrono::steady_clock::time_point updated = std::chrono::steady_clock::time_point::min();
 
     std::map<Tile::ID, std::unique_ptr<Tile>> tiles;
     std::map<Tile::ID, std::weak_ptr<TileData>> tile_data;
