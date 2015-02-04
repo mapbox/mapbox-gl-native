@@ -1,0 +1,16 @@
+{
+  "name": "mbgl",
+  "version": "0.0.1",
+  "main": "lib/mbgl.node",
+  "dependencies": {
+    "mocha": "^2.1.0",
+    "nan": "^1.4.1",
+    "request": "^2.51.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "install": "make",
+    "test": "mocha -R spec test"
+  },
+  "gypfile": true
+}
