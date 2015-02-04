@@ -19,7 +19,6 @@ class Source;
 
 class StyleBucketFill {
 public:
-    WindingType winding = WindingType::NonZero;
 };
 
 class StyleBucketLine {
@@ -68,7 +67,6 @@ public:
         TextAnchorType anchor = TextAnchorType::Center;
         float max_angle = 45.0f /* degrees */;
         float rotate = 0.0f;
-        float slant = 0.0f;
         float padding = 2.0f;
         bool keep_upright = true;
         TextTransformType transform = TextTransformType::None;
