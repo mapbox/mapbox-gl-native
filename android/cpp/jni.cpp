@@ -327,18 +327,6 @@ void JNICALL nativeSwapped(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
 }
 
 void JNICALL nativeResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height,
-                          jfloat ratio) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeResize");
-    assert(nativeMapViewPtr != 0);
-    assert(width >= 0);
-    assert(height >= 0);
-    assert(width <= UINT16_MAX);
-    assert(height <= UINT16_MAX);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().resize(width, height, ratio);
-}
-
-void JNICALL nativeResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height,
                           jfloat ratio, jint fbWidth, jint fbHeight) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeResize");
     assert(nativeMapViewPtr != 0);
@@ -351,7 +339,7 @@ void JNICALL nativeResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint
     assert(fbWidth <= UINT16_MAX);
     assert(fbHeight <= UINT16_MAX);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().resize(width, height, ratio, fbWidth, fbHeight);
+    nativeMapView->resize(width, height, ratio, fbWidth, fbHeight);
 }
 
 void JNICALL nativeRemoveClass(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring clazz) {
@@ -1014,7 +1002,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     // NOTE: if you get java.lang.UnsatisfiedLinkError you likely forgot to set the size of the
     // array correctly (too large)
-    std::array<JNINativeMethod, 67> methods = {{ // Can remove the extra brace in C++14
+    std::array<JNINativeMethod, 66> methods = {{ // Can remove the extra brace in C++14
         {"nativeCreate", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J",
          reinterpret_cast<void *>(&nativeCreate)},
         {"nativeDestroy", "(J)V", reinterpret_cast<void *>(&nativeDestroy)},
@@ -1035,10 +1023,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeTerminate", "(J)V", reinterpret_cast<void *>(&nativeTerminate)},
         {"nativeNeedsSwap", "(J)Z", reinterpret_cast<void *>(&nativeNeedsSwap)},
         {"nativeSwapped", "(J)V", reinterpret_cast<void *>(&nativeSwapped)},
-        {"nativeResize", "(JIIF)V",
-         reinterpret_cast<void *>(
-             static_cast<void JNICALL (*)(JNIEnv *, jobject, jlong, jint, jint, jfloat)>(
-                 &nativeResize))},
         {"nativeResize", "(JIIFII)V",
          reinterpret_cast<void *>(static_cast<void JNICALL (
              *)(JNIEnv *, jobject, jlong, jint, jint, jfloat, jint, jint)>(&nativeResize))},

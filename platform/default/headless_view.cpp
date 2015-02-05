@@ -131,7 +131,7 @@ void HeadlessView::createContext() {
 #endif
 }
 
-void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
+void HeadlessView::resize(const uint16_t width, const uint16_t height, const float pixelRatio) {
     clearBuffers();
 
     width_ = width;
@@ -176,6 +176,8 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
         }
         throw std::runtime_error(error.str());
     }
+
+    View::resize(width, height, pixelRatio, w, h);
 
     deactivate();
 }

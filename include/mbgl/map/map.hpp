@@ -43,6 +43,8 @@ struct exception : std::runtime_error {
 };
 
 class Map : private util::noncopyable {
+    friend class View;
+
 public:
     explicit Map(View&, FileSource&);
     ~Map();
@@ -79,10 +81,6 @@ public:
     // Controls buffer swapping.
     bool needsSwap();
     void swapped();
-
-    // Size
-    void resize(uint16_t width, uint16_t height, float ratio = 1);
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
     // Styling
     void addClass(const std::string&);
@@ -152,6 +150,10 @@ public:
     inline std::chrono::steady_clock::time_point getTime() const { return animationTime; }
 
 private:
+    // This may only be called by the View object.
+    void resize(uint16_t width, uint16_t height, float ratio = 1);
+    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
+
     util::ptr<Sprite> getSprite();
     uv::worker& getWorker();
 

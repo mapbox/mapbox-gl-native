@@ -146,7 +146,6 @@ TEST_P(HeadlessTest, render) {
         map.setStyleJSON(style, "test/suite");
 
         view.resize(width, height, pixelRatio);
-        map.resize(width, height, pixelRatio);
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
         map.setBearing(bearing);
 

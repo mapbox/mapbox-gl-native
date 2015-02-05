@@ -823,5 +823,10 @@ void NativeMapView::updateFps() {
     }
     env = nullptr;
 }
+
+void NativeMapView::resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight) {
+    View::resize(width, height, ratio, fbWidth, fbHeight);
+}
+
 }
 }

@@ -20,11 +20,11 @@ public:
     void notify();
     void notifyMapChange(mbgl::MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero());
 
-    static void key(GLFWwindow *window, int key, int scancode, int action, int mods);
-    static void scroll(GLFWwindow *window, double xoffset, double yoffset);
-    static void resize(GLFWwindow *window, int width, int height);
-    static void mouseClick(GLFWwindow *window, int button, int action, int modifiers);
-    static void mouseMove(GLFWwindow *window, double x, double y);
+    static void onKey(GLFWwindow *window, int key, int scancode, int action, int mods);
+    static void onScroll(GLFWwindow *window, double xoffset, double yoffset);
+    static void onResize(GLFWwindow *window, int width, int height);
+    static void onMouseClick(GLFWwindow *window, int button, int action, int modifiers);
+    static void onMouseMove(GLFWwindow *window, double x, double y);
 
     static void eventloop(void *arg);
 
