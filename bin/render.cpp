@@ -3,10 +3,6 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/io.hpp>
 
-#include <rapidjson/document.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/stringbuffer.h>
-
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -103,13 +99,11 @@ int main(int argc, char *argv[]) {
     map.setLatLonZoom(LatLng(lat, lon), zoom);
     map.setBearing(bearing);
 
-    std::unique_ptr<uint32_t[]> pixels;
-
     // Run the loop. It will terminate when we don't have any further listeners.
     map.run();
 
     // Get the data from the GPU.
-    pixels = view.readPixels();
+    auto pixels = view.readPixels();
 
     const unsigned int w = width * pixelRatio;
     const unsigned int h = height * pixelRatio;
