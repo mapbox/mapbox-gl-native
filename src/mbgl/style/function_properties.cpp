@@ -14,6 +14,16 @@ template <> inline float defaultStopsValue() { return 1.0f; }
 template <> inline Color defaultStopsValue() { return {{ 0, 0, 0, 1 }}; }
 template <> inline std::vector<float> defaultStopsValue() { return {{ 1, 0 }}; }
 
+template <> inline std:: string defaultStopsValue() { return {}; }
+template <> inline TranslateAnchorType defaultStopsValue() { return {}; };
+template <> inline RotateAnchorType defaultStopsValue() { return {}; };
+template <> inline CapType defaultStopsValue() { return {}; };
+template <> inline JoinType defaultStopsValue() { return {}; };
+template <> inline PlacementType defaultStopsValue() { return {}; };
+template <> inline TextAnchorType defaultStopsValue() { return {}; };
+template <> inline TextJustifyType defaultStopsValue() { return {}; };
+template <> inline TextTransformType defaultStopsValue() { return {}; };
+template <> inline RotationAlignmentType defaultStopsValue() { return {}; };
 
 template <typename T>
 T StopsFunction<T>::evaluate(float z) const {
@@ -67,4 +77,14 @@ template float StopsFunction<float>::evaluate(float z) const;
 template Color StopsFunction<Color>::evaluate(float z) const;
 template std::vector<float> StopsFunction<std::vector<float>>::evaluate(float z) const;
 
+template std::string StopsFunction<std::string>::evaluate(float z) const;
+template TranslateAnchorType StopsFunction<TranslateAnchorType>::evaluate(float z) const;
+template RotateAnchorType StopsFunction<RotateAnchorType>::evaluate(float z) const;
+template CapType StopsFunction<CapType>::evaluate(float z) const;
+template JoinType StopsFunction<JoinType>::evaluate(float z) const;
+template PlacementType StopsFunction<PlacementType>::evaluate(float z) const;
+template TextAnchorType StopsFunction<TextAnchorType>::evaluate(float z) const;
+template TextJustifyType StopsFunction<TextJustifyType>::evaluate(float z) const;
+template TextTransformType StopsFunction<TextTransformType>::evaluate(float z) const;
+template RotationAlignmentType StopsFunction<RotationAlignmentType>::evaluate(float z) const;
 }
