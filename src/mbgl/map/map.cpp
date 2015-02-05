@@ -241,7 +241,7 @@ void Map::run() {
         checkForPause();
     }
 
-    if (!style) {
+    if (!style && styleURL.empty()) {
         throw exception("Style is not set");
     }
 
