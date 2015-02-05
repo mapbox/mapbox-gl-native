@@ -1,0 +1,659 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DD043327196DB9BC00E6F39D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD043326196DB9BC00E6F39D /* Foundation.framework */; };
+		DD043329196DB9BC00E6F39D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD043328196DB9BC00E6F39D /* CoreGraphics.framework */; };
+		DD04332B196DB9BC00E6F39D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD04332A196DB9BC00E6F39D /* UIKit.framework */; };
+		DD043363196DBBD500E6F39D /* MGLTAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */; };
+		DD043364196DBBD500E6F39D /* MGLTViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043360196DBBD500E6F39D /* MGLTViewController.m */; };
+		DD043366196DBBE000E6F39D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043365196DBBE000E6F39D /* main.m */; };
+		DD1A9EA8199BEA0D007BC651 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = DD1A9EA7199BEA0D007BC651 /* libc++.dylib */; };
+		DD61240819CCF06E006845B1 /* libMapboxGL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DD61240619CCF06E006845B1 /* libMapboxGL.a */; };
+		DD61240919CCF06E006845B1 /* MapboxGL.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DD61240719CCF06E006845B1 /* MapboxGL.bundle */; };
+		DD8A790D196DC0A900FAD883 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = DD8A790C196DC0A900FAD883 /* libz.dylib */; };
+		DD8A790F196DC0AD00FAD883 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD8A790E196DC0AD00FAD883 /* GLKit.framework */; };
+		DD8A7911196DC0BB00FAD883 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD8A7910196DC0BB00FAD883 /* CoreLocation.framework */; };
+		DD96917919F1C08400729E7D /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = DD96917819F1C08400729E7D /* libsqlite3.dylib */; };
+		DD96918119F1C09200729E7D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD96918019F1C09200729E7D /* SystemConfiguration.framework */; };
+		DDBD0154196DC3D70033959E /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DDBD0153196DC3D70033959E /* XCTest.framework */; };
+		DDBD0155196DC3D70033959E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD043326196DB9BC00E6F39D /* Foundation.framework */; };
+		DDBD0156196DC3D70033959E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD04332A196DB9BC00E6F39D /* UIKit.framework */; };
+		DDBD016C196DC4740033959E /* MapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DDBD0168196DC4740033959E /* MapViewTests.m */; };
+		DDBD016D196DC4740033959E /* KIFTestActor+MapboxGL.m in Sources */ = {isa = PBXBuildFile; fileRef = DDBD016A196DC4740033959E /* KIFTestActor+MapboxGL.m */; };
+		DDBD016E196DC4A10033959E /* libKIF.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DDBD0144196DC3AE0033959E /* libKIF.a */; };
+		DDBD016F196DC4A90033959E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD043328196DB9BC00E6F39D /* CoreGraphics.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DDBD0143196DC3AE0033959E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DDBD013A196DC3AE0033959E /* KIF.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EABD46AA1857A0C700A5F081;
+			remoteInfo = KIF;
+		};
+		DDBD0145196DC3AE0033959E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DDBD013A196DC3AE0033959E /* KIF.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EB72047C1680DDAD00278DA2;
+			remoteInfo = "KIF-OCUnit";
+		};
+		DDBD0147196DC3AE0033959E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DDBD013A196DC3AE0033959E /* KIF.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EB60ECC1177F8C83005A041A;
+			remoteInfo = "Test Host";
+		};
+		DDBD0149196DC3AE0033959E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DDBD013A196DC3AE0033959E /* KIF.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EABD46CD1857A0F300A5F081;
+			remoteInfo = "KIF Tests";
+		};
+		DDBD014B196DC3AE0033959E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DDBD013A196DC3AE0033959E /* KIF.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EB60ECEB177F8DB3005A041A;
+			remoteInfo = "KIF Tests-OCUnit";
+		};
+		DDBD0160196DC3D70033959E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DD04331B196DB9BC00E6F39D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DD043322196DB9BC00E6F39D;
+			remoteInfo = "Mapbox GL Tests";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		DD043323196DB9BC00E6F39D /* Mapbox GL Tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL Tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD043326196DB9BC00E6F39D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		DD043328196DB9BC00E6F39D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		DD04332A196DB9BC00E6F39D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTAppDelegate.m; sourceTree = SOURCE_ROOT; };
+		DD043360196DBBD500E6F39D /* MGLTViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTViewController.m; sourceTree = SOURCE_ROOT; };
+		DD043361196DBBD500E6F39D /* MGLTViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLTViewController.h; sourceTree = SOURCE_ROOT; };
+		DD043362196DBBD500E6F39D /* MGLTAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLTAppDelegate.h; sourceTree = SOURCE_ROOT; };
+		DD043365196DBBE000E6F39D /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
+		DD043367196DBCC200E6F39D /* App-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "App-Info.plist"; sourceTree = SOURCE_ROOT; };
+		DD1A9EA7199BEA0D007BC651 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		DD61240019CCF06E006845B1 /* MGLMapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLMapView.h; path = ../dist/static/Headers/MGLMapView.h; sourceTree = SOURCE_ROOT; };
+		DD61240119CCF06E006845B1 /* MGLStyleFunctionValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLStyleFunctionValue.h; path = ../dist/static/Headers/MGLStyleFunctionValue.h; sourceTree = SOURCE_ROOT; };
+		DD61240219CCF06E006845B1 /* MGLTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLTypes.h; path = ../dist/static/Headers/MGLTypes.h; sourceTree = SOURCE_ROOT; };
+		DD61240319CCF06E006845B1 /* NSArray+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSArray+MGLAdditions.h"; path = "../dist/static/Headers/NSArray+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
+		DD61240419CCF06E006845B1 /* NSDictionary+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDictionary+MGLAdditions.h"; path = "../dist/static/Headers/NSDictionary+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
+		DD61240519CCF06E006845B1 /* UIColor+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+MGLAdditions.h"; path = "../dist/static/Headers/UIColor+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
+		DD61240619CCF06E006845B1 /* libMapboxGL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMapboxGL.a; path = ../dist/static/libMapboxGL.a; sourceTree = SOURCE_ROOT; };
+		DD61240719CCF06E006845B1 /* MapboxGL.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = MapboxGL.bundle; path = ../dist/static/MapboxGL.bundle; sourceTree = SOURCE_ROOT; };
+		DD8A790C196DC0A900FAD883 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		DD8A790E196DC0AD00FAD883 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		DD8A7910196DC0BB00FAD883 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		DD96917819F1C08400729E7D /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		DD96918019F1C09200729E7D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		DDBD013A196DC3AE0033959E /* KIF.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = KIF.xcodeproj; path = KIF/KIF.xcodeproj; sourceTree = SOURCE_ROOT; };
+		DDBD0152196DC3D70033959E /* Test Bundle.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Test Bundle.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DDBD0153196DC3D70033959E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		DDBD0165196DC4560033959E /* Bundle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Bundle-Info.plist"; sourceTree = SOURCE_ROOT; };
+		DDBD0168196DC4740033959E /* MapViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapViewTests.m; sourceTree = SOURCE_ROOT; };
+		DDBD0169196DC4740033959E /* MapViewTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapViewTests.h; sourceTree = SOURCE_ROOT; };
+		DDBD016A196DC4740033959E /* KIFTestActor+MapboxGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "KIFTestActor+MapboxGL.m"; sourceTree = SOURCE_ROOT; };
+		DDBD016B196DC4740033959E /* KIFTestActor+MapboxGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "KIFTestActor+MapboxGL.h"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DD043320196DB9BC00E6F39D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD043329196DB9BC00E6F39D /* CoreGraphics.framework in Frameworks */,
+				DD8A7911196DC0BB00FAD883 /* CoreLocation.framework in Frameworks */,
+				DD043327196DB9BC00E6F39D /* Foundation.framework in Frameworks */,
+				DD8A790F196DC0AD00FAD883 /* GLKit.framework in Frameworks */,
+				DD96918119F1C09200729E7D /* SystemConfiguration.framework in Frameworks */,
+				DD04332B196DB9BC00E6F39D /* UIKit.framework in Frameworks */,
+				DD61240819CCF06E006845B1 /* libMapboxGL.a in Frameworks */,
+				DD1A9EA8199BEA0D007BC651 /* libc++.dylib in Frameworks */,
+				DD96917919F1C08400729E7D /* libsqlite3.dylib in Frameworks */,
+				DD8A790D196DC0A900FAD883 /* libz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DDBD014F196DC3D70033959E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDBD016F196DC4A90033959E /* CoreGraphics.framework in Frameworks */,
+				DDBD0155196DC3D70033959E /* Foundation.framework in Frameworks */,
+				DDBD0156196DC3D70033959E /* UIKit.framework in Frameworks */,
+				DDBD0154196DC3D70033959E /* XCTest.framework in Frameworks */,
+				DDBD016E196DC4A10033959E /* libKIF.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DD04331A196DB9BC00E6F39D = {
+			isa = PBXGroup;
+			children = (
+				DD04332C196DB9BC00E6F39D /* App */,
+				DDBD0139196DC38D0033959E /* Tests */,
+				DD043325196DB9BC00E6F39D /* Frameworks */,
+				DD043324196DB9BC00E6F39D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DD043324196DB9BC00E6F39D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DD043323196DB9BC00E6F39D /* Mapbox GL Tests.app */,
+				DDBD0152196DC3D70033959E /* Test Bundle.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DD043325196DB9BC00E6F39D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DD96918019F1C09200729E7D /* SystemConfiguration.framework */,
+				DD96917819F1C08400729E7D /* libsqlite3.dylib */,
+				DD043328196DB9BC00E6F39D /* CoreGraphics.framework */,
+				DD8A7910196DC0BB00FAD883 /* CoreLocation.framework */,
+				DD043326196DB9BC00E6F39D /* Foundation.framework */,
+				DD8A790E196DC0AD00FAD883 /* GLKit.framework */,
+				DD04332A196DB9BC00E6F39D /* UIKit.framework */,
+				DDBD0153196DC3D70033959E /* XCTest.framework */,
+				DD1A9EA7199BEA0D007BC651 /* libc++.dylib */,
+				DD8A790C196DC0A900FAD883 /* libz.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DD04332C196DB9BC00E6F39D /* App */ = {
+			isa = PBXGroup;
+			children = (
+				DD043362196DBBD500E6F39D /* MGLTAppDelegate.h */,
+				DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */,
+				DD043361196DBBD500E6F39D /* MGLTViewController.h */,
+				DD043360196DBBD500E6F39D /* MGLTViewController.m */,
+				DD8A77AD196DBFDA00FAD883 /* GL Library */,
+				DD04332D196DB9BC00E6F39D /* Supporting Files */,
+			);
+			name = App;
+			path = "Mapbox GL Tests";
+			sourceTree = "<group>";
+		};
+		DD04332D196DB9BC00E6F39D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				DD043367196DBCC200E6F39D /* App-Info.plist */,
+				DD043365196DBBE000E6F39D /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		DD6123FF19CCF06E006845B1 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				DD61240019CCF06E006845B1 /* MGLMapView.h */,
+				DD61240119CCF06E006845B1 /* MGLStyleFunctionValue.h */,
+				DD61240219CCF06E006845B1 /* MGLTypes.h */,
+				DD61240319CCF06E006845B1 /* NSArray+MGLAdditions.h */,
+				DD61240419CCF06E006845B1 /* NSDictionary+MGLAdditions.h */,
+				DD61240519CCF06E006845B1 /* UIColor+MGLAdditions.h */,
+			);
+			name = Headers;
+			path = ../../dist/static/Headers;
+			sourceTree = SOURCE_ROOT;
+		};
+		DD8A77AD196DBFDA00FAD883 /* GL Library */ = {
+			isa = PBXGroup;
+			children = (
+				DD6123FF19CCF06E006845B1 /* Headers */,
+				DD61240619CCF06E006845B1 /* libMapboxGL.a */,
+				DD61240719CCF06E006845B1 /* MapboxGL.bundle */,
+			);
+			name = "GL Library";
+			sourceTree = "<group>";
+		};
+		DDBD0139196DC38D0033959E /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				DDBD016B196DC4740033959E /* KIFTestActor+MapboxGL.h */,
+				DDBD016A196DC4740033959E /* KIFTestActor+MapboxGL.m */,
+				DDBD0169196DC4740033959E /* MapViewTests.h */,
+				DDBD0168196DC4740033959E /* MapViewTests.m */,
+				DDBD0167196DC46B0033959E /* Supporting Files */,
+				DDBD014D196DC3B00033959E /* KIF */,
+			);
+			name = Tests;
+			path = "Mapbox GL Tests";
+			sourceTree = "<group>";
+		};
+		DDBD013B196DC3AE0033959E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DDBD0144196DC3AE0033959E /* libKIF.a */,
+				DDBD0146196DC3AE0033959E /* libKIF-OCUnit.a */,
+				DDBD0148196DC3AE0033959E /* Test Host.app */,
+				DDBD014A196DC3AE0033959E /* KIF Tests - XCTest.xctest */,
+				DDBD014C196DC3AE0033959E /* KIF Tests-OCUnit.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DDBD014D196DC3B00033959E /* KIF */ = {
+			isa = PBXGroup;
+			children = (
+				DDBD013A196DC3AE0033959E /* KIF.xcodeproj */,
+			);
+			name = KIF;
+			sourceTree = "<group>";
+		};
+		DDBD0167196DC46B0033959E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				DDBD0165196DC4560033959E /* Bundle-Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DD043322196DB9BC00E6F39D /* Mapbox GL Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DD043358196DB9BC00E6F39D /* Build configuration list for PBXNativeTarget "Mapbox GL Tests" */;
+			buildPhases = (
+				DD04331F196DB9BC00E6F39D /* Sources */,
+				DD043320196DB9BC00E6F39D /* Frameworks */,
+				DD043321196DB9BC00E6F39D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Mapbox GL Tests";
+			productName = "Mapbox GL Tests";
+			productReference = DD043323196DB9BC00E6F39D /* Mapbox GL Tests.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DDBD0151196DC3D70033959E /* Test Bundle */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DDBD0162196DC3D70033959E /* Build configuration list for PBXNativeTarget "Test Bundle" */;
+			buildPhases = (
+				DDBD014E196DC3D70033959E /* Sources */,
+				DDBD014F196DC3D70033959E /* Frameworks */,
+				DDBD0150196DC3D70033959E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DDBD0161196DC3D70033959E /* PBXTargetDependency */,
+			);
+			name = "Test Bundle";
+			productName = "Test Bundle";
+			productReference = DDBD0152196DC3D70033959E /* Test Bundle.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DD04331B196DB9BC00E6F39D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = MGLT;
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = Mapbox;
+				TargetAttributes = {
+					DDBD0151196DC3D70033959E = {
+						TestTargetID = DD043322196DB9BC00E6F39D;
+					};
+				};
+			};
+			buildConfigurationList = DD04331E196DB9BC00E6F39D /* Build configuration list for PBXProject "ios-tests" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DD04331A196DB9BC00E6F39D;
+			productRefGroup = DD043324196DB9BC00E6F39D /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = DDBD013B196DC3AE0033959E /* Products */;
+					ProjectRef = DDBD013A196DC3AE0033959E /* KIF.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				DD043322196DB9BC00E6F39D /* Mapbox GL Tests */,
+				DDBD0151196DC3D70033959E /* Test Bundle */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		DDBD0144196DC3AE0033959E /* libKIF.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libKIF.a;
+			remoteRef = DDBD0143196DC3AE0033959E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DDBD0146196DC3AE0033959E /* libKIF-OCUnit.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libKIF-OCUnit.a";
+			remoteRef = DDBD0145196DC3AE0033959E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DDBD0148196DC3AE0033959E /* Test Host.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = "Test Host.app";
+			remoteRef = DDBD0147196DC3AE0033959E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DDBD014A196DC3AE0033959E /* KIF Tests - XCTest.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "KIF Tests - XCTest.xctest";
+			remoteRef = DDBD0149196DC3AE0033959E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DDBD014C196DC3AE0033959E /* KIF Tests-OCUnit.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "KIF Tests-OCUnit.octest";
+			remoteRef = DDBD014B196DC3AE0033959E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DD043321196DB9BC00E6F39D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD61240919CCF06E006845B1 /* MapboxGL.bundle in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DDBD0150196DC3D70033959E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DD04331F196DB9BC00E6F39D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD043364196DBBD500E6F39D /* MGLTViewController.m in Sources */,
+				DD043366196DBBE000E6F39D /* main.m in Sources */,
+				DD043363196DBBD500E6F39D /* MGLTAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DDBD014E196DC3D70033959E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDBD016D196DC4740033959E /* KIFTestActor+MapboxGL.m in Sources */,
+				DDBD016C196DC4740033959E /* MapViewTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DDBD0161196DC3D70033959E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DD043322196DB9BC00E6F39D /* Mapbox GL Tests */;
+			targetProxy = DDBD0160196DC3D70033959E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		DD043356196DB9BC00E6F39D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DD043357196DB9BC00E6F39D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DD043359196DB9BC00E6F39D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					armv7,
+					armv7s,
+					arm64,
+					i386,
+					x86_64,
+				);
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../dist/static/Headers,
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/App-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					../dist/static,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		DD04335A196DB9BC00E6F39D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					armv7,
+					armv7s,
+					arm64,
+					i386,
+					x86_64,
+				);
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../dist/static/Headers,
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/App-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					../dist/static,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		DDBD0163196DC3D70033959E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Mapbox GL Tests.app/Mapbox GL Tests";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					"KIF_XCTEST=1",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../dist/static/Headers,
+				);
+				INFOPLIST_FILE = "Bundle-Info.plist";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					XCTest,
+					"-ObjC",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		DDBD0164196DC3D70033959E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Mapbox GL Tests.app/Mapbox GL Tests";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = "KIF_XCTEST=1";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../dist/static/Headers,
+				);
+				INFOPLIST_FILE = "Bundle-Info.plist";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					XCTest,
+					"-ObjC",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DD04331E196DB9BC00E6F39D /* Build configuration list for PBXProject "ios-tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DD043356196DB9BC00E6F39D /* Debug */,
+				DD043357196DB9BC00E6F39D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DD043358196DB9BC00E6F39D /* Build configuration list for PBXNativeTarget "Mapbox GL Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DD043359196DB9BC00E6F39D /* Debug */,
+				DD04335A196DB9BC00E6F39D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DDBD0162196DC3D70033959E /* Build configuration list for PBXNativeTarget "Test Bundle" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DDBD0163196DC3D70033959E /* Debug */,
+				DDBD0164196DC3D70033959E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DD04331B196DB9BC00E6F39D /* Project object */;
+}

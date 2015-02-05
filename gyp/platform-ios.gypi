@@ -15,6 +15,18 @@
         '../platform/darwin/application_root.mm',
         '../platform/darwin/asset_root.mm',
         '../platform/darwin/image.mm',
+        '../include/mbgl/ios/MGLMapView.h',
+        '../platform/ios/MGLMapView.mm',
+        '../include/mbgl/ios/MGLStyleFunctionValue.h',
+        '../platform/ios/MGLStyleFunctionValue.m',
+        '../include/mbgl/ios/MGLTypes.h',
+        '../platform/ios/MGLTypes.m',
+        '../include/mbgl/ios/NSArray+MGLAdditions.h',
+        '../platform/ios/NSArray+MGLAdditions.m',
+        '../include/mbgl/ios/NSDictionary+MGLAdditions.h',
+        '../platform/ios/NSDictionary+MGLAdditions.m',
+        '../include/mbgl/ios/UIColor+MGLAdditions.h',
+        '../platform/ios/UIColor+MGLAdditions.m',
       ],
 
       'variables': {
@@ -28,6 +40,11 @@
         'ldflags': [
           '-framework ImageIO',
           '-framework MobileCoreServices',
+          '-framework GLKit',
+          '-framework OpenGLES',
+          '-framework CoreGraphics',
+          '-framework CoreLocation',
+          '-framework UIKit',
         ],
       },
 
@@ -37,6 +54,7 @@
 
       'xcode_settings': {
         'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
+        'CLANG_ENABLE_OBJC_ARC': 'YES',
       },
 
       'link_settings': {
@@ -49,6 +67,9 @@
       'direct_dependent_settings': {
         'include_dirs': [
           '../include',
+        ],
+        'mac_bundle_resources': [
+          '<!@(find ./platform/ios/resources -type f)',
         ],
       },
     },
