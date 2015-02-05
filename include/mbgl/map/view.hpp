@@ -47,6 +47,10 @@ public:
     virtual void notifyMapChange(MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero()) = 0;
 
 protected:
+    // Resizes the view
+    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
+
+protected:
     mbgl::Map *map = nullptr;
 };
 }
