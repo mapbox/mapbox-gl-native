@@ -1,0 +1,42 @@
+language: cpp
+
+matrix:
+  include:
+  - os: linux
+    compiler: clang
+  - os: linux
+    compiler: gcc
+    env: JOBS=8
+  - os: osx
+    compiler: clang
+
+env:
+  global:
+  - NODE_NVM_VERSION: "0.10"
+  - LD_LIBRARY_PATH: "/usr/local/lib"
+  - secure: jkwZnKr5dcM9MQ6mOytnp6FHkbydSfa1L8d4jFp4v4K6Ee/iQh1YIq9c/J1zC0WLyuGokVGaijkKr6CW4nGZ5H8ygBtPo09imnRyH8X0bO5mEjl+KhbpdFqkXVLerpnAGMO7D6+6BtWJlK5uTDWhpeS7YayB3YfETVkllf4n6F8=
+  - secure: ZBiq+KPVM72MF0rtvpui5l7curGXckz4Pefc1L04U6dd/MPa22StvCgXBG7DKhLwI5OgHE1da769asQ3rub/pDOonxAi7fHo3+r/ocbSBZeeaj+p5i5wavppOzD27gCLrpOnSQBk0DfoD+xOM8ZCfIttBbOBMRZ1dpWFG98bJ4c=
+
+before_install:
+- ./scripts/install_nvm.sh
+- cd ./vendor/mbgl && source ./scripts/local_mason.sh && cd ../../
+- source ./vendor/mbgl/scripts/travis_helper.sh
+- source ./vendor/mbgl/scripts/flags.sh
+- source ./vendor/mbgl/scripts/travis_before_install.sh
+- if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then export LD_LIBRARY_PATH=`mason prefix mesa 10.4.3`/lib:$LD_LIBRARY_PATH; glxinfo; fi
+
+install:
+- npm install
+
+before_script:
+# Set the core file limit to unlimited so a core file is generated upon crash
+- ulimit -c unlimited -S
+
+script:
+- ./scripts/travis_test.sh
+
+after_success:
+- ./scripts/travis_publish.sh
+
+git:
+  submodules: true

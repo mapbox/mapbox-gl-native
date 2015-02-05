@@ -19,7 +19,6 @@ void NodeMap::RenderWorker::Execute() {
     try {
         nodeMap->view.resize(options->width, options->height, options->ratio);
         nodeMap->map.setAccessToken(options->accessToken);
-        nodeMap->map.resize(options->width, options->height, options->ratio);
         nodeMap->map.setClasses(options->classes);
         nodeMap->map.setLonLatZoom(options->longitude, options->latitude, options->zoom);
         nodeMap->map.setBearing(options->bearing);
