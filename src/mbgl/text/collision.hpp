@@ -7,9 +7,9 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #pragma GCC diagnostic ignored "-Wshadow"
-#pragma GCC diagnostic ignored "-Wshorten-64-to-32"
 #ifdef __clang__
 #pragma GCC diagnostic ignored "-Wdeprecated-register"
+#pragma GCC diagnostic ignored "-Wshorten-64-to-32"
 #else
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
