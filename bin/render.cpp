@@ -32,8 +32,8 @@ int main(int argc, char *argv[]) {
     double zoom = 0;
     double bearing = 0;
 
-    int width = 256;
-    int height = 256;
+    int width = 512;
+    int height = 512;
     double pixelRatio = 1.0;
     std::string output = "out.png";
     std::string cache_file = "cache.sqlite";
