@@ -28,6 +28,10 @@ global: build
 build: build/Makefile
 	@node-gyp build $(DEBUG_FLAG) -- -j$(JOBS)
 
+.PHONY: vendor/mbgl
+vendor/mbgl:
+	git submodule update --init
+
 .PHONY: build/Makefile
 build/Makefile: $(MBGL)/config/$(HOST).gypi
 	@node-gyp configure -- \
@@ -38,7 +42,7 @@ build/Makefile: $(MBGL)/config/$(HOST).gypi
 		-Duv_static_libs= -Duv_ldflags= \
 		-Goutput_dir=.
 
-$(MBGL)/config/%.gypi: $(MBGL)/configure
+$(MBGL)/config/%.gypi: $(MBGL) $(MBGL)/configure
 	make -C $(MBGL) config/$*.gypi
 
 .PHONY: test
