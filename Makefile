@@ -8,8 +8,12 @@ endif
 
 ifeq ($(shell uname -s), Darwin)
 HOST ?= osx
+JOBS = $(shell sysctl -n hw.ncpu)
 endif
+ifeq ($(shell uname -s), Linux)
 HOST ?= linux
+JOBS = $(shell nproc)
+endif
 
 # Explicitly disable the default FileSource implementation
 ASSET = none
@@ -22,7 +26,7 @@ global: build
 
 .PHONY: build
 build: build/Makefile
-	@node-gyp build $(DEBUG_FLAG) -- -j8
+	@node-gyp build $(DEBUG_FLAG) -- -j$(JOBS)
 
 .PHONY: build/Makefile
 build/Makefile: $(MBGL)/config/$(HOST).gypi
