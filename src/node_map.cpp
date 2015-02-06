@@ -68,7 +68,7 @@ const std::string StringifyStyle(v8::Handle<v8::Value> styleHandle) {
 NAN_METHOD(NodeMap::Load) {
     NanScope();
 
-    if (args.Length() != 1) {
+    if (args.Length() < 1) {
         return NanThrowError("Requires a map style as first argument");
     }
 
