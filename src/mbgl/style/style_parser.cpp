@@ -243,12 +243,12 @@ std::tuple<bool, std::array<float, 2>> StyleParser::parseProperty(JSVal value, c
 }
 
 template <>
-std::tuple<bool, float> StyleParser::parseProperty(JSVal value, const char*) {
+std::tuple<bool, float> StyleParser::parseProperty(JSVal value, const char* property_name) {
     JSVal rvalue = replaceConstant(value);
     if (rvalue.IsNumber()) {
         return std::tuple<bool, float> { true, rvalue.GetDouble() };
     } else {
-        Log::Warning(Event::ParseStyle, "function argument must be a numeric value");
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a number, or a number function", property_name);
         return std::tuple<bool, float> { false, 0.0f };
     }
 }
@@ -268,20 +268,20 @@ std::tuple<bool, Faded<std::vector<float>>> StyleParser::parseProperty(JSVal val
 }
 
 template <>
-std::tuple<bool, Faded<std::string>> StyleParser::parseProperty(JSVal value, const char*) {
+std::tuple<bool, Faded<std::string>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     JSVal rvalue = replaceConstant(value);
     Faded<std::string> parsed;
     if (rvalue.IsString()) {
         parsed.to = { value.GetString(), value.GetStringLength() };
         return std::tuple<bool, Faded<std::string>> { true, parsed };
     } else {
-        Log::Warning(Event::ParseStyle, "function argument must be a string");
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a string, or a string function", property_name);
         return std::tuple<bool, Faded<std::string>> { false, parsed };
     }
 }
 
 template <typename T>
-std::tuple<bool, std::vector<std::pair<float, T>>> StyleParser::parseStops(JSVal value_stops) {
+std::tuple<bool, std::vector<std::pair<float, T>>> StyleParser::parseStops(JSVal value_stops, const char *property_name) {
 
     if (!value_stops.IsArray()) {
         Log::Warning(Event::ParseStyle, "stops function must specify a stops array");
@@ -304,7 +304,7 @@ std::tuple<bool, std::vector<std::pair<float, T>>> StyleParser::parseStops(JSVal
                 return std::tuple<bool, std::vector<std::pair<float, T>>> { false, {}};
             }
 
-            stops.emplace_back(z.GetDouble(), std::get<1>(parseProperty<T>(replaceConstant(stop[rapidjson::SizeType(1)]), "")));
+            stops.emplace_back(z.GetDouble(), std::get<1>(parseProperty<T>(replaceConstant(stop[rapidjson::SizeType(1)]), property_name)));
         } else {
             Log::Warning(Event::ParseStyle, "function argument must be a numeric value");
             return std::tuple<bool, std::vector<std::pair<float, T>>> { false, {}};
@@ -317,10 +317,10 @@ template <typename T> inline float defaultBaseValue() { return 1.75; }
 template <> inline float defaultBaseValue<Color>() { return 1.0; }
 
 template <typename T>
-std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value, const char *) {
+std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value, const char *property_name) {
     
     if (!value.IsObject()) {
-        return std::tuple<bool, Function<T>> { true, ConstantFunction<T>(std::get<1>(parseProperty<T>(value, ""))) };
+        return std::tuple<bool, Function<T>> { true, ConstantFunction<T>(std::get<1>(parseProperty<T>(value, property_name))) };
     }
 
     if (!value.HasMember("stops")) {
@@ -339,7 +339,7 @@ std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value, const char
         }
     }
 
-    auto stops = parseStops<T>(value["stops"]);
+    auto stops = parseStops<T>(value["stops"], property_name);
 
     if (!std::get<0>(stops)) {
         return std::tuple<bool, Function<T>> { false, ConstantFunction<T>(T()) };
@@ -355,7 +355,7 @@ std::tuple<bool, PiecewiseConstantFunction<T>> StyleParser::parsePiecewiseConsta
         return std::tuple<bool, PiecewiseConstantFunction<T>> { false, {} };
     }
 
-    auto stops = parseStops<T>(value["stops"]);
+    auto stops = parseStops<T>(value["stops"], "");
 
     if (!std::get<0>(stops)) {
         return std::tuple<bool, PiecewiseConstantFunction<T>> { false, {} };

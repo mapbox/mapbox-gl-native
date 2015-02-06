@@ -85,7 +85,7 @@ private:
     template <typename T>
     std::tuple<bool, PiecewiseConstantFunction<T>> parsePiecewiseConstantFunction(JSVal value, std::chrono::steady_clock::duration duration);
     template <typename T>
-    std::tuple<bool, std::vector<std::pair<float, T>>> parseStops(JSVal value);
+    std::tuple<bool, std::vector<std::pair<float, T>>> parseStops(JSVal value, const char *property_name);
 
     FilterExpression parseFilter(JSVal);
 
