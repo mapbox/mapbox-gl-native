@@ -10,6 +10,7 @@
 #include <mbgl/util/util.hpp>
 
 #include <mbgl/util/variant.hpp>
+#include <mbgl/platform/log.hpp>
 
 #pragma GCC diagnostic push
 #ifndef __clang__

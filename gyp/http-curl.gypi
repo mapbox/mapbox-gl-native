@@ -14,6 +14,24 @@
         '../include',
       ],
 
+      'conditions': [
+        ['host == "android"', {
+          'variables': {
+            # Android uses libzip and openssl to set CURL's CA bundle.
+            'cflags_cc': [ '<@(zip_cflags)', '<@(openssl_cflags)' ],
+            'ldflags': [ '<@(zip_ldflags)', ],
+            'libraries': [ '<@(zip_static_libs)', ],
+          },
+        }],
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
+          },
+        }, {
+         'cflags_cc': [ '<@(cflags_cc)' ],
+        }],
+      ],
+
       'variables': {
         'cflags_cc': [
           '<@(uv_cflags)',
@@ -29,16 +47,6 @@
           '<@(curl_static_libs)',
         ],
       },
-
-      'conditions': [
-        ['OS == "mac"', {
-          'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
-          },
-        }, {
-         'cflags_cc': [ '<@(cflags_cc)' ],
-        }],
-      ],
 
       'link_settings': {
         'conditions': [

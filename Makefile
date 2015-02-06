@@ -166,6 +166,9 @@ android-lib-%: Makefile/android-%
 	@$(ENV_android-$*) ./scripts/flock.py -v build/Android.lock $(MAKE) -C build/android-$* BUILDTYPE=$(BUILDTYPE) androidapp
 
 # Builds the selected/default Android library
+android-lib: android-lib-$(ANDROID_ABI)
+
+# Builds the selected/default Android library
 android: android-lib-$(ANDROID_ABI)
 	cd android/java && ./gradlew --parallel-threads=$(JOBS) build
 

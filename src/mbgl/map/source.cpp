@@ -43,7 +43,7 @@ void Source::load(Map& map, FileSource& fileSource) {
     const std::string url = util::mapbox::normalizeSourceURL(info.url, map.getAccessToken());
     fileSource.request({ Resource::Kind::JSON, url }, **map.loop, [source, &map](const Response &res) {
         if (res.status != Response::Successful) {
-            Log::Warning(Event::General, "failed to load source TileJSON");
+            Log::Warning(Event::General, "Failed to load source TileJSON: %s", res.message.c_str());
             return;
         }
 
@@ -51,7 +51,7 @@ void Source::load(Map& map, FileSource& fileSource) {
         d.Parse<0>(res.data.c_str());
 
         if (d.HasParseError()) {
-            Log::Warning(Event::General, "invalid source TileJSON");
+            Log::Warning(Event::General, "Invalid source TileJSON; Parse Error at %d: %s", d.GetErrorOffset(), d.GetParseError());
             return;
         }
 
