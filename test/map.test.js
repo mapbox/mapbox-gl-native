@@ -10,32 +10,7 @@ var mkdirp = require('mkdirp');
 
 mkdirp.sync('test/results');
 
-var style = {
-    'version': 7,
-    'name': 'Empty',
-    'sources': {
-        'mapbox': {
-          'type': 'vector',
-          'url': './fixtures/tiles.tilejson',
-          'maxzoom': 15
-        }
-    },
-    'layers': [{
-        'id': 'background',
-        'type': 'background',
-        'paint': {
-            'background-color': 'white'
-        }
-    }, {
-        'id': 'water',
-        'type': 'fill',
-        'source': 'mapbox',
-        'source-layer': 'water',
-        'paint': {
-            'fill-color': 'blue'
-        }
-    }]
-};
+var style = require('./fixtures/style.json');
 
 describe('Map', function() {
 
