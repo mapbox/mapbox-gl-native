@@ -246,17 +246,17 @@ template <>
 std::tuple<bool, float> StyleParser::parseProperty(JSVal value, const char*) {
     JSVal rvalue = replaceConstant(value);
     if (rvalue.IsNumber()) {
-        return { true, rvalue.GetDouble() };
+        return std::tuple<bool, float> { true, rvalue.GetDouble() };
     } else {
         Log::Warning(Event::ParseStyle, "function argument must be a numeric value");
-        return { false, 0.0f };
+        return std::tuple<bool, float> { false, 0.0f };
     }
 }
 
 template <>
 std::tuple<bool, Color> StyleParser::parseProperty(JSVal value, const char*) {
     JSVal rvalue = replaceConstant(value);
-    return { true, parseColor(rvalue) };
+    return std::tuple<bool, Color> { true, parseColor(rvalue) };
 }
 
 template <>
@@ -264,7 +264,7 @@ std::tuple<bool, Faded<std::vector<float>>> StyleParser::parseProperty(JSVal val
     Faded<std::vector<float>> parsed;
     JSVal rvalue = replaceConstant(value);
     parsed.to = std::get<1>(parseFloatArray(rvalue));
-    return { true, parsed };
+    return std::tuple<bool, Faded<std::vector<float>>> { true, parsed };
 }
 
 template <>
@@ -273,10 +273,10 @@ std::tuple<bool, Faded<std::string>> StyleParser::parseProperty(JSVal value, con
     Faded<std::string> parsed;
     if (rvalue.IsString()) {
         parsed.to = { value.GetString(), value.GetStringLength() };
-        return { true, parsed };
+        return std::tuple<bool, Faded<std::string>> { true, parsed };
     } else {
         Log::Warning(Event::ParseStyle, "function argument must be a string");
-        return { false, parsed };
+        return std::tuple<bool, Faded<std::string>> { false, parsed };
     }
 }
 
