@@ -11,7 +11,7 @@
   "devDependencies": {},
   "scripts": {
     "install": "make",
-    "test": "mocha -R spec test"
+    "test": "make test"
   },
   "gypfile": true
 }
