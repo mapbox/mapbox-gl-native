@@ -43,8 +43,6 @@ NAN_METHOD(NodeRequest::New) {
     NanReturnValue(args.This());
 }
 
-// TODO: retain the NodeFileSource in a permanent handle!
-
 v8::Handle<v8::Object> NodeRequest::Create(v8::Handle<v8::Object> source, mbgl::Request *request) {
     NanScope();
     v8::Local<v8::Value> argv[] = { v8::Local<v8::Object>::New(source), NanNew<v8::External>(request) };
