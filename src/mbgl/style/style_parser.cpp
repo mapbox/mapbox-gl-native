@@ -630,25 +630,6 @@ template<> std::tuple<bool, PiecewiseConstantFunction<Faded<std::string>>> Style
     }
 }
 
-template <typename T>
-bool StyleParser::parseOptionalProperty(const char *property_name, const std::vector<PropertyKey> &keys, ClassProperties &klass, JSVal value) {
-    if (value.HasMember(property_name)) {
-        JSVal rvalue = replaceConstant(value[property_name]);
-        if (!rvalue.IsArray()) {
-            Log::Warning(Event::ParseStyle, "array value must be an array");
-        }
-
-        if (rvalue.Size() != keys.size()) {
-            Log::Warning(Event::ParseStyle, "array value has unexpected number of elements");
-        }
-
-        for (uint16_t i = 0; i < keys.size(); i++) {
-            setProperty<T>(rvalue[(rapidjson::SizeType)i], property_name, keys[i], klass);
-        }
-    }
-    return true;
-}
-
 #pragma mark - Parse Layers
 
 std::unique_ptr<StyleLayerGroup> StyleParser::createLayers(JSVal value) {
@@ -828,7 +809,8 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("raster-opacity-transition", Key::RasterOpacity, klass, value);
     parseOptionalProperty<Function<float>>("raster-hue-rotate", Key::RasterHueRotate, klass, value);
     parseOptionalProperty<PropertyTransition>("raster-hue-rotate-transition", Key::RasterHueRotate, klass, value);
-    parseOptionalProperty<Function<float>>("raster-brightness", { Key::RasterBrightnessLow, Key::RasterBrightnessHigh }, klass, value);
+    parseOptionalProperty<Function<float>>("raster-brightness-min", Key::RasterBrightnessLow, klass, value);
+    parseOptionalProperty<Function<float>>("raster-brightness-max", Key::RasterBrightnessLow, klass, value);
     parseOptionalProperty<PropertyTransition>("raster-brightness-transition", Key::RasterBrightness, klass, value);
     parseOptionalProperty<Function<float>>("raster-saturation", Key::RasterSaturation, klass, value);
     parseOptionalProperty<PropertyTransition>("raster-saturation-transition", Key::RasterSaturation, klass, value);
