@@ -7,6 +7,7 @@
 #include <mbgl/style/types.hpp>
 
 #include <vector>
+#include <array>
 
 namespace mbgl {
 
@@ -22,6 +23,7 @@ typedef mapbox::util::variant<
     Function<TextTransformType>,
     Function<TextJustifyType>,
     Function<TextAnchorType>,
+    Function<std::array<float, 2>>,
     Function<bool>,
     Function<float>,
     Function<Color>,

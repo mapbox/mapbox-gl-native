@@ -24,6 +24,14 @@ inline std::array<T, 4> interpolate(const std::array<T, 4>& a, const std::array<
     }};
 }
 
+template <typename T>
+inline std::array<T, 2> interpolate(const std::array<T, 2>& a, const std::array<T, 2>& b, const double t) {
+    return {{
+        interpolate(a[0], b[0], t),
+        interpolate(a[1], b[1], t)
+    }};
+}
+
 // fake interpolations that just return the first value
 template<> inline bool interpolate(const bool a, const bool, const double) { return a; }
 template<> inline std::vector<float> interpolate(const std::vector<float> a, const std::vector<float>, const double) { return a; }

@@ -228,6 +228,21 @@ std::tuple<bool,std::vector<float>> parseFloatArray(JSVal value) {
 }
 
 template <>
+std::tuple<bool, std::array<float, 2>> StyleParser::parseProperty(JSVal value, const char*) {
+    if (value.IsArray() && value.Size() == 2 &&
+            value[rapidjson::SizeType(0)].IsNumber() &&
+            value[rapidjson::SizeType(1)].IsNumber()) {
+
+        float first = value[rapidjson::SizeType(0)].GetDouble();
+        float second = value[rapidjson::SizeType(1)].GetDouble();
+        return std::tuple<bool, std::array<float, 2>> { false, {{ first, second }} };
+    } else {
+        Log::Warning(Event::ParseStyle, "value must be array of two numbers");
+        return std::tuple<bool, std::array<float, 2>> { false, {{ 0.0f, 0.0f }} };
+    }
+}
+
+template <>
 std::tuple<bool, float> StyleParser::parseProperty(JSVal value, const char*) {
     JSVal rvalue = replaceConstant(value);
     if (rvalue.IsNumber()) {
@@ -520,6 +535,10 @@ template<> std::tuple<bool, PropertyTransition> StyleParser::parseProperty(JSVal
     return std::tuple<bool, PropertyTransition> { true, std::move(transition) };
 }
 
+template<> std::tuple<bool, Function<std::array<float, 2>>> StyleParser::parseProperty(JSVal value, const char *property_name) {
+    return parseFunction<std::array<float, 2>>(value, property_name);
+}
+
 template<> std::tuple<bool, Function<std::string>> StyleParser::parseProperty(JSVal value, const char *property_name) {
     return parseFunction<std::string>(value, property_name);
 }
@@ -751,7 +770,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("fill-color-transition", Key::FillColor, klass, value);
     parseOptionalProperty<Function<Color>>("fill-outline-color", Key::FillOutlineColor, klass, value);
     parseOptionalProperty<PropertyTransition>("fill-outline-color-transition", Key::FillOutlineColor, klass, value);
-    parseOptionalProperty<Function<float>>("fill-translate", { Key::FillTranslateX, Key::FillTranslateY }, klass, value);
+    parseOptionalProperty<Function<std::array<float, 2>>>("fill-translate", Key::FillTranslate, klass, value);
     parseOptionalProperty<PropertyTransition>("fill-translate-transition", Key::FillTranslate, klass, value);
     parseOptionalProperty<Function<TranslateAnchorType>>("fill-translate-anchor", Key::FillTranslateAnchor, klass, value);
     parseOptionalProperty<PiecewiseConstantFunction<Faded<std::string>>>("fill-image", Key::FillImage, klass, value, "fill-image-transition");
@@ -760,7 +779,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("line-opacity-transition", Key::LineOpacity, klass, value);
     parseOptionalProperty<Function<Color>>("line-color", Key::LineColor, klass, value);
     parseOptionalProperty<PropertyTransition>("line-color-transition", Key::LineColor, klass, value);
-    parseOptionalProperty<Function<float>>("line-translate", { Key::LineTranslateX, Key::LineTranslateY }, klass, value);
+    parseOptionalProperty<Function<std::array<float,2>>>("line-translate", Key::LineTranslate, klass, value);
     parseOptionalProperty<PropertyTransition>("line-translate-transition", Key::LineTranslate, klass, value);
     parseOptionalProperty<Function<TranslateAnchorType>>("line-translate-anchor", Key::LineTranslateAnchor, klass, value);
     parseOptionalProperty<Function<float>>("line-width", Key::LineWidth, klass, value);
@@ -785,7 +804,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("icon-halo-width-transition", Key::IconHaloWidth, klass, value);
     parseOptionalProperty<Function<float>>("icon-halo-blur", Key::IconHaloBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("icon-halo-blur-transition", Key::IconHaloBlur, klass, value);
-    parseOptionalProperty<Function<float>>("icon-translate", { Key::IconTranslateX, Key::IconTranslateY }, klass, value);
+    parseOptionalProperty<Function<std::array<float, 2>>>("icon-translate", Key::IconTranslate, klass, value);
     parseOptionalProperty<PropertyTransition>("icon-translate-transition", Key::IconTranslate, klass, value);
     parseOptionalProperty<Function<TranslateAnchorType>>("icon-translate-anchor", Key::IconTranslateAnchor, klass, value);
 
@@ -801,7 +820,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<PropertyTransition>("text-halo-width-transition", Key::TextHaloWidth, klass, value);
     parseOptionalProperty<Function<float>>("text-halo-blur", Key::TextHaloBlur, klass, value);
     parseOptionalProperty<PropertyTransition>("text-halo-blur-transition", Key::TextHaloBlur, klass, value);
-    parseOptionalProperty<Function<float>>("text-translate", { Key::TextTranslateX, Key::TextTranslateY }, klass, value);
+    parseOptionalProperty<Function<std::array<float, 2>>>("text-translate", Key::TextTranslate, klass, value);
     parseOptionalProperty<PropertyTransition>("text-translate-transition", Key::TextTranslate, klass, value);
     parseOptionalProperty<Function<TranslateAnchorType>>("text-translate-anchor", Key::TextTranslateAnchor, klass, value);
 
@@ -845,7 +864,7 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleBucket> &bucket) {
     parseOptionalProperty<Function<float>>("icon-rotate", Key::IconRotate, bucket->layout, value);
     parseOptionalProperty<Function<float>>("icon-padding", Key::IconPadding, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("icon-keep-upright", Key::IconKeepUpright, bucket->layout, value);
-    parseOptionalProperty<Function<float>>("icon-offset", { Key::IconOffsetX, Key::IconOffsetY }, bucket->layout, value);
+    parseOptionalProperty<Function<std::array<float, 2>>>("icon-offset", Key::IconOffset, bucket->layout, value);
     parseOptionalProperty<Function<RotationAlignmentType>>("text-rotation-alignment", Key::TextRotationAlignment, bucket->layout, value);
     parseOptionalProperty<Function<std::string>>("text-field", Key::TextField, bucket->layout, value);
     parseOptionalProperty<Function<std::string>>("text-font", Key::TextFont, bucket->layout, value);
@@ -860,7 +879,7 @@ void StyleParser::parseLayout(JSVal value, util::ptr<StyleBucket> &bucket) {
     parseOptionalProperty<Function<float>>("text-padding", Key::TextPadding, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("text-keep-upright", Key::TextKeepUpright, bucket->layout, value);
     parseOptionalProperty<Function<TextTransformType>>("text-transform", Key::TextTransform, bucket->layout, value);
-    parseOptionalProperty<Function<float>>("text-offset", { Key::TextOffsetX, Key::TextOffsetY }, bucket->layout, value);
+    parseOptionalProperty<Function<std::array<float, 2>>>("text-offset", Key::TextOffset, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("text-allow-overlap", Key::TextAllowOverlap, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("text-ignore-placement", Key::TextIgnorePlacement, bucket->layout, value);
     parseOptionalProperty<Function<bool>>("text-optional", Key::TextOptional, bucket->layout, value);

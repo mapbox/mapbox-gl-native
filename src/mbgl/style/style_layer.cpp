@@ -167,8 +167,7 @@ void StyleLayer::applyStyleProperties<FillProperties>(const float z, const std::
     applyTransitionedStyleProperty(PropertyKey::FillOpacity, fill.opacity, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::FillColor, fill.fill_color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::FillOutlineColor, fill.stroke_color, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::FillTranslateX, fill.translate[0], z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::FillTranslateY, fill.translate[1], z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::FillTranslate, fill.translate, z, now, zoomHistory);
     applyStyleProperty(PropertyKey::FillTranslateAnchor, fill.translateAnchor, z, now, zoomHistory);
     applyStyleProperty(PropertyKey::FillImage, fill.image, z, now, zoomHistory);
 }
@@ -179,8 +178,7 @@ void StyleLayer::applyStyleProperties<LineProperties>(const float z, const std::
     LineProperties &line = properties.get<LineProperties>();
     applyTransitionedStyleProperty(PropertyKey::LineOpacity, line.opacity, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::LineColor, line.color, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::LineTranslateX, line.translate[0], z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::LineTranslateY, line.translate[1], z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::LineTranslate, line.translate, z, now, zoomHistory);
     applyStyleProperty(PropertyKey::LineTranslateAnchor, line.translateAnchor, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::LineWidth, line.width, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::LineGapWidth, line.gap_width, z, now, zoomHistory);
@@ -203,8 +201,7 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const std
     applyTransitionedStyleProperty(PropertyKey::IconHaloColor, symbol.icon.halo_color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconHaloWidth, symbol.icon.halo_width, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::IconHaloBlur, symbol.icon.halo_blur, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::IconTranslateX, symbol.icon.translate[0], z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::IconTranslateY, symbol.icon.translate[1], z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::IconTranslate, symbol.icon.translate, z, now, zoomHistory);
     applyStyleProperty(PropertyKey::IconTranslateAnchor, symbol.icon.translate_anchor, z, now, zoomHistory);
 
     applyTransitionedStyleProperty(PropertyKey::TextOpacity, symbol.text.opacity, z, now, zoomHistory);
@@ -213,8 +210,7 @@ void StyleLayer::applyStyleProperties<SymbolProperties>(const float z, const std
     applyTransitionedStyleProperty(PropertyKey::TextHaloColor, symbol.text.halo_color, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextHaloWidth, symbol.text.halo_width, z, now, zoomHistory);
     applyTransitionedStyleProperty(PropertyKey::TextHaloBlur, symbol.text.halo_blur, z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::TextTranslateX, symbol.text.translate[0], z, now, zoomHistory);
-    applyTransitionedStyleProperty(PropertyKey::TextTranslateY, symbol.text.translate[1], z, now, zoomHistory);
+    applyTransitionedStyleProperty(PropertyKey::TextTranslate, symbol.text.translate, z, now, zoomHistory);
     applyStyleProperty(PropertyKey::TextTranslateAnchor, symbol.text.translate_anchor, z, now, zoomHistory);
 }
 
