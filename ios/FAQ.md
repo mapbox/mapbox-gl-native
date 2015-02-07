@@ -1,10 +1,10 @@
-# Mapbox GL Cocoa FAQ
+# Mapbox GL for iOS FAQ
 
 Mapbox GL is a completely new renderer technology which will eventually replace and/or merge Mapbox's existing iOS toolsets, the [Mapbox iOS SDK](http://www.mapbox.com/mapbox-ios-sdk/) and [MBXMapKit](https://www.mapbox.com/mbxmapkit/). This FAQ shares our current plans for that migration. The plans are subject to change as Mapbox GL matures, but we wanted to both clarify our thinking as well as set expectations for where things are headed. 
 
 ### When will Mapbox GL be released? 
 
-The library is [open source](https://github.com/mapbox/mapbox-gl-cocoa) right now, but an official, production-recommended release will come later in 2014. 
+The library is [open source](https://github.com/mapbox/mapbox-gl-native) right now, but an official, production-recommended release will come later in 2015. 
 
 ### What iOS versions will be supported? 
 
@@ -32,13 +32,13 @@ Both the Mapbox iOS SDK and MBXMapKit feature robust support for offline caching
 
 We're likely going to take a similar approach to both performance caching and offline maps as is done with the `0.3.0` release of MBXMapKit. That is, `NSURLCache` will be used for performance caching and specific, separate offline map database management will be used for fetching areas of map tiles. This is a cleaner design than exists in the SDK, which combines performance and offline caches and has a non-intuitive configuration API. 
 
-We're not sure yet if we're going to port over MBTiles support to Mapbox GL. 
+We will likely also port over MBTiles support to Mapbox GL. 
 
 #### UTFGrid interactivity
 
 [UTFGrid](https://github.com/mapbox/utfgrid-spec) is a technology for enabling interactive features in raster tiles. Support for the technology is provided in the Mapbox iOS SDK with categories in `RMInteractiveSource` in combination with either `RMMapboxSource` or `RMMBTilesSource`. 
 
-Current plans include allowing the basic key-value querying functionality of UTFGrid with Mapbox GL Cocoa sources. 
+Mapbox GL obsoletes this sort of pixel-based interactivity since the source data used for rendering can be queried on-device, so we are unlikely to port UTFGrid over to GL. 
 
 #### Annotation clustering
 
