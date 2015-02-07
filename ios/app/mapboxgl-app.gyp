@@ -22,20 +22,13 @@
       ],
 
       'sources': [
-        'main.m',
-        'MBXAppDelegate.h',
-        'MBXAppDelegate.m',
-        'MBXViewController.h',
-        'MBXViewController.mm',
-        '../platform/darwin/settings_nsuserdefaults.mm',
-        '../platform/darwin/Reachability.m',
+        './main.m',
+        './MBXAppDelegate.h',
+        './MBXAppDelegate.m',
+        './MBXViewController.h',
+        './MBXViewController.mm',
+        '../../platform/darwin/settings_nsuserdefaults.mm',
       ],
-
-      'variables' : {
-        'ldflags': [
-          '-framework SystemConfiguration', # For NSUserDefaults and Reachability
-        ],
-      },
 
       'xcode_settings': {
         'SDKROOT': 'iphoneos',
