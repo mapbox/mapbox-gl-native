@@ -104,12 +104,12 @@ xproj: xosx-proj
 #### iOS application builds ####################################################
 
 .PRECIOUS: Xcode/ios
-Xcode/ios: ios/mapboxgl-app.gyp config/ios.gypi
-	deps/run_gyp ios/mapboxgl-app.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
+Xcode/ios: ios/app/mapboxgl-app.gyp config/ios.gypi
+	deps/run_gyp ios/app/mapboxgl-app.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
 
 .PHONY: ios-proj ios run-ios
 ios-proj: Xcode/ios
-	open ./build/ios/ios/mapboxgl-app.xcodeproj
+	open ./build/ios/ios/app/mapboxgl-app.xcodeproj
 
 ios: Xcode/ios
 	xcodebuild -sdk iphoneos ARCHS="arm64 armv7 armv7s" -project ./build/ios/ios/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target iosapp -jobs `sysctl -n hw.ncpu`
