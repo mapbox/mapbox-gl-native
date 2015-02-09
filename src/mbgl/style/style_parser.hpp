@@ -87,6 +87,8 @@ private:
     template <typename T>
     std::tuple<bool, std::vector<std::pair<float, T>>> parseStops(JSVal value, const char *property_name);
 
+    std::tuple<bool,std::vector<float>> parseFloatArray(JSVal value);
+
     FilterExpression parseFilter(JSVal);
 
 private:

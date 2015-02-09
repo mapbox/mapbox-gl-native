@@ -209,7 +209,7 @@ Color parseColor(JSVal value) {
                   css_color.a}};
 }
 
-std::tuple<bool,std::vector<float>> parseFloatArray(JSVal value) {
+std::tuple<bool,std::vector<float>> StyleParser::parseFloatArray(JSVal value) {
     if (!value.IsArray()) {
         Log::Warning(Event::ParseStyle, "dasharray value must be an array of numbers");
         return std::tuple<bool, std::vector<float>> { false, std::vector<float>() };
@@ -217,7 +217,7 @@ std::tuple<bool,std::vector<float>> parseFloatArray(JSVal value) {
 
     std::vector<float> vec;
     for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-        JSVal part = value[i];
+        JSVal part = replaceConstant(value[i]);
         if (!part.IsNumber()) {
             Log::Warning(Event::ParseStyle, "dasharray value must be an array of numbers");
             return std::tuple<bool, std::vector<float>> { false, std::vector<float>() };
