@@ -810,7 +810,7 @@ void StyleParser::parsePaint(JSVal value, ClassProperties &klass) {
     parseOptionalProperty<Function<float>>("raster-hue-rotate", Key::RasterHueRotate, klass, value);
     parseOptionalProperty<PropertyTransition>("raster-hue-rotate-transition", Key::RasterHueRotate, klass, value);
     parseOptionalProperty<Function<float>>("raster-brightness-min", Key::RasterBrightnessLow, klass, value);
-    parseOptionalProperty<Function<float>>("raster-brightness-max", Key::RasterBrightnessLow, klass, value);
+    parseOptionalProperty<Function<float>>("raster-brightness-max", Key::RasterBrightnessHigh, klass, value);
     parseOptionalProperty<PropertyTransition>("raster-brightness-transition", Key::RasterBrightness, klass, value);
     parseOptionalProperty<Function<float>>("raster-saturation", Key::RasterSaturation, klass, value);
     parseOptionalProperty<PropertyTransition>("raster-saturation-transition", Key::RasterSaturation, klass, value);
