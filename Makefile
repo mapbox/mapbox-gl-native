@@ -115,7 +115,7 @@ ios: Xcode/ios
 	xcodebuild -sdk iphoneos ARCHS="arm64 armv7 armv7s" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Release -target iosapp -jobs `sysctl -n hw.ncpu`
 
 isim: Xcode/ios
-	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target iosapp -jobs `sysctl -n hw.ncpu`
+	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Debug -target iosapp -jobs `sysctl -n hw.ncpu`
 
 # Legacy name
 iproj: ios-proj
