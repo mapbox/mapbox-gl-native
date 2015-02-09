@@ -83,7 +83,7 @@ script:
 - ./scripts/travis_script.sh
 
 after_script:
-- ./scripts/ios_travis/remove_key.sh
+- ./scripts/ios_travis/remove-key.sh
 
 notifications:
   hipchat:
