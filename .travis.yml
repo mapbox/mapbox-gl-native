@@ -49,7 +49,7 @@ env:
    - TERM: dumb
    # begin iOS code signing
    - secure: "I6Iu75X1E+js5tzijtKi1EGtIuBcA4/25nDYe0svV4HAtujY71ZJZ4eB6355CKhFXpLXrF3i7eKVX3v+zWS0QROPEWacgsqsvNg+Ba9cnznW/faUSOYekCfhzWd/6reYDM7KzKAQwSUHLk9JIWK/kkmi4r+vVJK7h+tjPllK5YA="
-   - IOS_APP_NAME="MapboxGL"
+   - IOS_APP_NAME="Mapbox GL"
    - 'IOS_DEVELOPER_NAME="iPhone Distribution: Mapbox, Inc."'
    - IOS_PROFILE_NAME="ios-adhoc"
    - secure: "nQqSM8rd7OHtV4MqmNqVnkrVHqxKqQsaWRYk4/nPdhbeVWtTtkk0df711LrF1TUtbEPEewHxYUvTZ/UXmwJNeoKdzTHavI8hnatRkgjyxGERPn1il1Otelht9I+LQQHf+plrpRjVWBrNIW0Zox1B3cqn6d3NglpbXrEQ2EjYGNA="
