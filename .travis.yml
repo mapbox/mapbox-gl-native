@@ -74,8 +74,8 @@ before_script:
  - ulimit -c unlimited -S
  # begin iOS code signing
  - openssl aes-256-cbc -k "$IOS_ENCRYPTION_SECRET" -in scripts/ios_travis/ios-adhoc.mobileprovision.enc -d -a -out scripts/ios_travis/ios-adhoc.mobileprovision
+ - openssl aes-256-cbc -k "$IOS_ENCRYPTION_SECRET" -in scripts/ios_travis/ios-dist.cer.enc              -d -a -out scripts/ios_travis/ios-dist.cer
  - openssl aes-256-cbc -k "$IOS_ENCRYPTION_SECRET" -in scripts/ios_travis/ios-dist.p12.enc              -d -a -out scripts/ios_travis/ios-dist.p12
- - openssl aes-256-cbc -k "$IOS_ENCRYPTION_SECRET" -in scripts/ios_travis/ios-dist.pem.enc              -d -a -out scripts/ios_travis/ios-dist.pem
  - ./scripts/ios_travis/add-key.sh
  # end iOS code signing
 
