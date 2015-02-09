@@ -104,7 +104,7 @@ void HeadlessView::createContext() {
 
     if (!glContext) {
         // Try to create a legacy context
-        glContext = glXCreateNewContext(xDisplay, fbConfigs[0], GLX_RGBA_TYPE, 0, True);
+        glContext = glXCreateNewContext(xDisplay, fbConfigs[0], GLX_RGBA_TYPE, 0, 1);
         if (glContext) {
             if (!glXIsDirect(xDisplay, glContext)) {
                 mbgl::Log::Error(mbgl::Event::OpenGL, "Failed to create direct OpenGL Legacy context");
