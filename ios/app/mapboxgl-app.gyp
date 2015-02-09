@@ -47,7 +47,7 @@
         },
         'Release': {
           'xcode_settings': {
-            'CODE_SIGN_IDENTITY': 'iPhone Distribution: Mapbox, Inc.',
+            'CODE_SIGN_IDENTITY': 'iOS Distribution: Mapbox, Inc.',
             'ARCHS': [ "armv7", "armv7s", "arm64", "i386", "x86_64" ],
           },
         },
