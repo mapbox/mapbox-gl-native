@@ -49,11 +49,6 @@ android {
         mavenCentral()
     }
 
-    defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 21
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
@@ -71,6 +66,7 @@ android {
 
         release {
             minifyEnabled false
+            jniDebuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
