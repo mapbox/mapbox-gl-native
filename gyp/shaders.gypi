@@ -16,7 +16,7 @@
             '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gl.cpp',
             '<(SHARED_INTERMEDIATE_DIR)/src/shader/shaders_gles2.cpp',
           ],
-          'action': ['<@(python)', 'scripts/build-shaders.py', '<(SHARED_INTERMEDIATE_DIR)', '<@(_inputs)'],
+          'action': ['scripts/build-shaders.py', '<(SHARED_INTERMEDIATE_DIR)', '<@(_inputs)'],
         }
       ],
       'direct_dependent_settings': {
