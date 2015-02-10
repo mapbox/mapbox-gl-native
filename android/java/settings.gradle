@@ -1,2 +1,2 @@
-include ':app'
+include ':MapboxGLAndroidSDKTestApp'
 include ':lib'
