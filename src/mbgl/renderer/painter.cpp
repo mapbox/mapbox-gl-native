@@ -231,7 +231,7 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
 
     drawClippingMasks(sources);
 
-    recordZoom(time, state.getNormalizedZoom());
+    frameHistory.record(time, state.getNormalizedZoom());
 
     // Actually render the layers
     if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
@@ -375,39 +375,58 @@ void Painter::renderTileLayer(const Tile& tile, util::ptr<StyleLayer> layer_desc
 void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
     const BackgroundProperties& properties = layer_desc->getProperties<BackgroundProperties>();
 
-    if (properties.image.size()) {
+    if (properties.image.to.size()) {
         if ((properties.opacity >= 1.0f) != (pass == RenderPass::Opaque))
             return;
 
-        SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image, true);
+        SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.from, true);
+        SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.to, true);
         float zoomFraction = state.getZoomFraction();
 
         useProgram(patternShader->program);
         patternShader->u_matrix = identityMatrix;
-        patternShader->u_pattern_tl = imagePos.tl;
-        patternShader->u_pattern_br = imagePos.br;
-        patternShader->u_mix = zoomFraction;
+        patternShader->u_pattern_tl_a = imagePosA.tl;
+        patternShader->u_pattern_br_a = imagePosA.br;
+        patternShader->u_pattern_tl_b = imagePosB.tl;
+        patternShader->u_pattern_br_b = imagePosB.br;
+        patternShader->u_mix = properties.image.t;
         patternShader->u_opacity = properties.opacity;
 
-        std::array<float, 2> size = imagePos.size;
         double lon, lat;
         state.getLonLat(lon, lat);
         std::array<float, 2> center = state.locationCoordinate(lon, lat);
         float scale = 1 / std::pow(2, zoomFraction);
 
-        mat3 matrix;
-        matrix::identity(matrix);
-        matrix::scale(matrix, matrix,
-                      1.0f / size[0],
-                      1.0f / size[1]);
-        matrix::translate(matrix, matrix,
-                          std::fmod(center[0] * 512, size[0]),
-                          std::fmod(center[1] * 512, size[1]));
-        matrix::rotate(matrix, matrix, -state.getAngle());
-        matrix::scale(matrix, matrix,
+        std::array<float, 2> sizeA = imagePosA.size;
+        mat3 matrixA;
+        matrix::identity(matrixA);
+        matrix::scale(matrixA, matrixA,
+                      1.0f / (sizeA[0] * properties.image.fromScale),
+                      1.0f / (sizeA[1] * properties.image.fromScale));
+        matrix::translate(matrixA, matrixA,
+                          std::fmod(center[0] * 512, sizeA[0] * properties.image.fromScale),
+                          std::fmod(center[1] * 512, sizeA[1] * properties.image.fromScale));
+        matrix::rotate(matrixA, matrixA, -state.getAngle());
+        matrix::scale(matrixA, matrixA,
                        scale * state.getWidth()  / 2,
                       -scale * state.getHeight() / 2);
-        patternShader->u_patternmatrix = matrix;
+
+        std::array<float, 2> sizeB = imagePosB.size;
+        mat3 matrixB;
+        matrix::identity(matrixB);
+        matrix::scale(matrixB, matrixB,
+                      1.0f / (sizeB[0] * properties.image.toScale),
+                      1.0f / (sizeB[1] * properties.image.toScale));
+        matrix::translate(matrixB, matrixB,
+                          std::fmod(center[0] * 512, sizeB[0] * properties.image.toScale),
+                          std::fmod(center[1] * 512, sizeB[1] * properties.image.toScale));
+        matrix::rotate(matrixB, matrixB, -state.getAngle());
+        matrix::scale(matrixB, matrixB,
+                       scale * state.getWidth()  / 2,
+                      -scale * state.getHeight() / 2);
+
+        patternShader->u_patternmatrix_a = matrixA;
+        patternShader->u_patternmatrix_b = matrixB;
 
         backgroundBuffer.bind();
         patternShader->bind(0);
@@ -458,27 +477,4 @@ mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &t
 
         return vtxMatrix;
     }
-}
-
-void Painter::recordZoom(const std::chrono::steady_clock::time_point time, const float zoom) {
-    frameHistory.record(time, zoom);
-
-    if (lastZoom < 0) {
-        // first frame ever
-        lastIntegerZoom = std::floor(zoom);
-        lastZoom = zoom;
-    }
-
-    // check whether an integer zoom level was passed since the last frame
-    // and if yes, record it with the time. Used for transitioning patterns.
-    if (std::floor(lastZoom) < std::floor(zoom)) {
-        lastIntegerZoom = std::floor(zoom);
-        lastIntegerZoomTime = time;
-
-    } else if (std::floor(lastZoom) > std::floor(zoom)) {
-        lastIntegerZoom = std::floor(zoom) + 1;
-        lastIntegerZoomTime = time;
-    }
-
-    lastZoom = zoom;
 }

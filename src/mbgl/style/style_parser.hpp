@@ -69,17 +69,25 @@ private:
     template <typename T>
     bool parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value);
     template <typename T>
-    bool parseOptionalProperty(const char *property_name, const std::vector<PropertyKey> &keys, ClassProperties &klass, JSVal value);
+    bool parseOptionalProperty(const char *property_name, PropertyKey key, ClassProperties &klass, JSVal value, const char *transition_name);
     template <typename T>
     bool setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass);
+    template <typename T>
+    bool setProperty(JSVal value, const char *property_name, PropertyKey key, ClassProperties &klass, JSVal transition);
 
     template <typename T>
     std::tuple<bool, T> parseProperty(JSVal value, const char *property_name);
+    template <typename T>
+    std::tuple<bool, T> parseProperty(JSVal value, const char *property_name, JSVal transition);
 
     template <typename T>
-    std::tuple<bool, Function<T>> parseFunction(JSVal value);
+    std::tuple<bool, Function<T>> parseFunction(JSVal value, const char *);
     template <typename T>
-    T parseFunctionArgument(JSVal value);
+    std::tuple<bool, PiecewiseConstantFunction<T>> parsePiecewiseConstantFunction(JSVal value, std::chrono::steady_clock::duration duration);
+    template <typename T>
+    std::tuple<bool, std::vector<std::pair<float, T>>> parseStops(JSVal value, const char *property_name);
+
+    std::tuple<bool,std::vector<float>> parseFloatArray(JSVal value);
 
     FilterExpression parseFilter(JSVal);
 

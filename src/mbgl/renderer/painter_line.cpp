@@ -70,11 +70,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         bucket.drawPoints(*linejoinShader);
     }
 
-    std::chrono::steady_clock::duration duration = std::chrono::milliseconds(300);
-    const float fraction = std::fmod(float(state.getZoom()), 1.0f);
-    float t = std::min(static_cast<float>(std::chrono::duration<float>(std::chrono::steady_clock::now() - lastIntegerZoomTime) / duration), 1.0f);
-
-    if (properties.dash_array.size()) {
+    if (properties.dash_array.from.size()) {
 
         useProgram(linesdfShader->program);
 
@@ -85,46 +81,31 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linesdfShader->u_blur = blur;
         linesdfShader->u_color = color;
 
-        LinePatternPos pos = lineAtlas.getDashPosition(properties.dash_array, bucket.properties.cap == CapType::Round);
+        LinePatternPos posA = lineAtlas.getDashPosition(properties.dash_array.from, bucket.properties.cap == CapType::Round);
+        LinePatternPos posB = lineAtlas.getDashPosition(properties.dash_array.to, bucket.properties.cap == CapType::Round);
         lineAtlas.bind();
 
         float patternratio = std::pow(2.0, std::floor(std::log2(state.getScale())) - id.z) / 8.0;
-        float scaleX = patternratio / pos.width / properties.dash_line_width;
-        float scaleY = -pos.height / 2.0;
+        float scaleXA = patternratio / posA.width / properties.dash_line_width / properties.dash_array.fromScale;
+        float scaleYA = -posA.height / 2.0;
+        float scaleXB = patternratio / posB.width / properties.dash_line_width / properties.dash_array.toScale;
+        float scaleYB = -posB.height / 2.0;
 
-        float mix;
-        if (state.getZoom() > lastIntegerZoom) {
-            // zooming in
-            mix = fraction + (1.0f - fraction) * t;
-            scaleX /= 2.0;
-        } else {
-            // zooming out
-            mix = fraction - fraction * t;
-        }
-
-        linesdfShader->u_patternscale_a = {{ scaleX, scaleY }};
-        linesdfShader->u_tex_y_a = pos.y;
-        linesdfShader->u_patternscale_b = {{ scaleX * 2.0f, scaleY }};
-        linesdfShader->u_tex_y_b = pos.y;
+        linesdfShader->u_patternscale_a = {{ scaleXA, scaleYA }};
+        linesdfShader->u_tex_y_a = posA.y;
+        linesdfShader->u_patternscale_b = {{ scaleXB, scaleYB }};
+        linesdfShader->u_tex_y_b = posB.y;
         linesdfShader->u_image = 0;
-        linesdfShader->u_sdfgamma = lineAtlas.width / (properties.dash_line_width * pos.width * 256.0 * state.getPixelRatio()) / 2;
-        linesdfShader->u_mix = mix;
+        linesdfShader->u_sdfgamma = lineAtlas.width / (properties.dash_line_width * std::min(posA.width, posB.width) * 256.0 * state.getPixelRatio()) / 2;
+        linesdfShader->u_mix = properties.dash_array.t;
 
         bucket.drawLineSDF(*linesdfShader);
 
-    } else if (properties.image.size()) {
-        SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image, true);
+    } else if (properties.image.from.size()) {
+        SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.from, true);
+        SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.to, true);
 
         float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z);
-        float fade;
-        if (state.getZoom() > lastIntegerZoom) {
-            // zooming in
-            fade = fraction + (1.0f - fraction) * t;
-            factor *= 2.0;
-        } else {
-            // zooming out
-            fade = fraction - fraction * t;
-        }
 
         useProgram(linepatternShader->program);
 
@@ -134,10 +115,13 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linepatternShader->u_ratio = ratio;
         linepatternShader->u_blur = blur;
 
-        linepatternShader->u_pattern_size = {{imagePos.size[0] * factor, imagePos.size[1]}};
-        linepatternShader->u_pattern_tl = imagePos.tl;
-        linepatternShader->u_pattern_br = imagePos.br;
-        linepatternShader->u_fade = fade;
+        linepatternShader->u_pattern_size_a = {{imagePosA.size[0] * factor * properties.image.fromScale, imagePosA.size[1]}};
+        linepatternShader->u_pattern_tl_a = imagePosA.tl;
+        linepatternShader->u_pattern_br_a = imagePosA.br;
+        linepatternShader->u_pattern_size_b = {{imagePosB.size[0] * factor * properties.image.toScale, imagePosB.size[1]}};
+        linepatternShader->u_pattern_tl_b = imagePosB.tl;
+        linepatternShader->u_pattern_br_b = imagePosB.br;
+        linepatternShader->u_fade = properties.image.t;
         linepatternShader->u_opacity = properties.opacity;
 
         MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
