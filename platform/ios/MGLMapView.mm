@@ -219,6 +219,14 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
             gl::GenVertexArrays = glGenVertexArraysOES;
             gl::IsVertexArray = glIsVertexArrayOES;
         }
+
+        if (extensions.find("GL_OES_packed_depth_stencil") != std::string::npos) {
+            gl::isPackedDepthStencilSupported = YES;
+        }
+
+        if (extensions.find("GL_OES_depth24") != std::string::npos) {
+            gl::isDepth24Supported = YES;
+        }
     }
 
     // setup mbgl map
