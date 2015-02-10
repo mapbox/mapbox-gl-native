@@ -8,11 +8,15 @@ endif
 
 ifeq ($(shell uname -s), Darwin)
 HOST ?= osx
+ifeq ($(JOBS),)
 JOBS = $(shell sysctl -n hw.ncpu)
+endif
 endif
 ifeq ($(shell uname -s), Linux)
 HOST ?= linux
+ifeq ($(JOBS),)
 JOBS = $(shell nproc)
+endif
 endif
 
 # Explicitly disable the default FileSource implementation
@@ -26,7 +30,7 @@ global: build
 
 .PHONY: build
 build: build/Makefile
-	@node-gyp build $(DEBUG_FLAG) -- -j$(JOBS)
+	@node-gyp build $(DEBUG_FLAG) --clang -- -j$(JOBS)
 
 .PHONY: vendor/mbgl
 vendor/mbgl:
@@ -34,7 +38,7 @@ vendor/mbgl:
 
 .PHONY: build/Makefile
 build/Makefile: $(MBGL)/config/$(HOST).gypi
-	@node-gyp configure -- \
+	@node-gyp configure --clang -- \
 		-Dmbgl=$(MBGL) \
 		-Dhost=$(HOST) \
 		-I$(MBGL)/config/$(HOST).gypi \
@@ -52,4 +56,4 @@ test: build
 .PHONY: clean
 clean:
 	rm -rf build
-	rm $(MBGL)/config.gypi
+	rm -f $(MBGL)/config/$(HOST).gypi

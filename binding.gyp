@@ -23,24 +23,27 @@
 
       'variables': {
         'cflags_cc': [
-          '-std=c++11',
-          '-stdlib=libc++',
-          '-Wno-unused-parameter'
+          '-Wno-unused-parameter',
         ],
       },
 
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {
+            "CLANG_CXX_LIBRARY": "libc++",
+            "CLANG_CXX_LANGUAGE_STANDARD":"c++11",
+            "GCC_VERSION": "com.apple.compilers.llvm.clang.1_0",
             'MACOSX_DEPLOYMENT_TARGET': '10.7',
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
-            'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'
+            'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
           }
         }, {
           'cflags_cc': [
-            '<@(cflags_cc)',
+            '-std=c++11',
             '-fexceptions',
+            '<@(cflags_cc)',
           ],
+          'libraries': [ '<@(glfw3_ldflags)' ],
         }]
       ],
     },
