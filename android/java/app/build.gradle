@@ -8,6 +8,7 @@ buildscript {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'checkstyle'
 
 task accessToken {
     def rawDir = new File("app/src/main/res/raw")
@@ -55,6 +56,7 @@ android {
     lintOptions {
         checkAllWarnings true
         disable 'UnusedAttribute'
+        abortOnError false
         //disable 'IconDensities'
     }
 
@@ -67,9 +69,27 @@ android {
 }
 
 dependencies {
-    compile project(':lib')
+    compile(project(':lib')) {
+        transitive = true
+    }
     compile 'com.android.support:support-annotations:21.0.0'
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.mapzen.android:lost:0.2'
+}
+
+checkstyle {
+    configFile project.file('../checks.xml')
+    showViolations true
+}
+
+android.applicationVariants.all { variant ->
+    def name = variant.buildType.name
+    def checkstyle = project.tasks.create "checkstyle${name.capitalize()}", Checkstyle
+    checkstyle.dependsOn variant.javaCompile
+    checkstyle.source variant.javaCompile.source
+    checkstyle.classpath = project.fileTree(variant.javaCompile.destinationDir)
+    checkstyle.exclude('**/BuildConfig.java')
+    checkstyle.exclude('**/R.java')
+    project.tasks.getByName("check").dependsOn checkstyle
 }
