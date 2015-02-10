@@ -28,7 +28,7 @@ Be sure to pull down all submodules first:
 
 ## OS X
 
-On OS X, we are using `zlib`, `SQLite3`, `libcurl` and `libpng` provided by the operating system. In addition to that, you need to have the Boost headers installed and ImageMagick for running tests. To install all prerequisites, use [Homebrew](http://brew.sh/) and type `brew install pkg-config boost imagemagick`.
+Prerequisites include the Boost headers (for routines provided therein) and ImageMagick (for tests). To install all prerequisites, use [Homebrew](http://brew.sh/) and type `brew install pkg-config boost imagemagick`.
 
 To create projects, you can run:
 
