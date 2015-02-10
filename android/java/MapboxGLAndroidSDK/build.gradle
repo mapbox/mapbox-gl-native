@@ -103,8 +103,7 @@ android.libraryVariants.all { variant ->
     checkstyle.classpath = project.fileTree(variant.javaCompile.destinationDir)
     checkstyle.exclude('**/BuildConfig.java')
     checkstyle.exclude('**/R.java')
-    checkstyle.exclude('**/uk/co/senab/bitmapcache/*')
-    checkstyle.exclude('**/com/cocoahero/android/geojson/**')
+    checkstyle.exclude('**/com/almeros/android/multitouch/**')
     project.tasks.getByName("check").dependsOn checkstyle
 }
 
