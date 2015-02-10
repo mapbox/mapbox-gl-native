@@ -389,7 +389,7 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
         patternShader->u_pattern_br_a = imagePosA.br;
         patternShader->u_pattern_tl_b = imagePosB.tl;
         patternShader->u_pattern_br_b = imagePosB.br;
-        patternShader->u_mix = zoomFraction;
+        patternShader->u_mix = properties.image.t;
         patternShader->u_opacity = properties.opacity;
 
         double lon, lat;
