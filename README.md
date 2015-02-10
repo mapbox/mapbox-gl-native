@@ -45,17 +45,15 @@ Target OS: 10.9+
 
 ## iOS
 
-iOS makes use of a Cocoa-specific API called [`mapbox-gl-cocoa`](https://github.com/mapbox/mapbox-gl-cocoa). If you are just interested in running Mapbox GL on iOS and not developing with it, head to that project and you can use this library as a pre-built static library instead. A `UIView` interface to the map view and bundle resources are provided there.
+If you just want to install the library for iOS and try it out as an Objective-C consumer, run `./scripts/package_ios.sh`. It will require the Boost headers to be installed, so use [Homebrew](http://brew.sh/) to install it via `brew install boost`. The script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, and a `Headers` folder. 
 
-If you intend to develop here, `mapbox-gl-cocoa` is included as a submodule of the overall build setup.
+If you want to build from source and/or contribute to development of the project, you can run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app. 
 
-You can run `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. This will automatically install required dependencies as well.
+Target devices: iPhone 4S and above (5, 5c, 5s, 6, 6 Plus) and iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2).
 
-Note that if you are doing OS X development as well, to toggle from OS X back to iOS, you will need to `make iproj` again.
+iOS SDK: 8.1
+Supported iOS: 7.0+
 
-Target devices: iPhone 4S and above (5, 5c, 5s, 6, 6 Plus) and iPad 2 and above (3, 4, Mini , Air, Mini 2, Air 2).
-
-Target OS: 7.0+
 
 ## Linux
 

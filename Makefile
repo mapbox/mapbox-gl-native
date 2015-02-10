@@ -23,7 +23,7 @@ config/%.gypi: configure
 
 #### Library builds ############################################################
 
-.PRECOIUS: Makefile/mbgl
+.PRECIOUS: Makefile/mbgl
 Makefile/mbgl: config/$(HOST).gypi
 	deps/run_gyp mbgl.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
 
@@ -36,6 +36,9 @@ standalone: Makefile/mbgl
 install: Makefile/mbgl
 	LINK=`pwd`/gyp/link.py $(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) install
 
+.PRECIOUS: Xcode/mbgl
+Xcode/mbgl: config/$(HOST).gypi
+	deps/run_gyp mbgl.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f xcode
 
 ##### Test builds ##############################################################
 
@@ -101,15 +104,18 @@ xproj: xosx-proj
 #### iOS application builds ####################################################
 
 .PRECIOUS: Xcode/ios
-Xcode/ios: ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp config/ios.gypi
-	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
+Xcode/ios: ios/app/mapboxgl-app.gyp config/ios.gypi
+	deps/run_gyp ios/app/mapboxgl-app.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
 
 .PHONY: ios-proj ios run-ios
 ios-proj: Xcode/ios
-	open ./build/ios/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
+	open ./build/ios/ios/app/mapboxgl-app.xcodeproj
 
 ios: Xcode/ios
-	xcodebuild -sdk iphonesimulator ARCHS=x86_64 -project ./build/ios/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target iosapp -jobs `sysctl -n hw.ncpu`
+	xcodebuild -sdk iphoneos ARCHS="arm64 armv7 armv7s" PROVISIONING_PROFILE="2b532944-bf3d-4bf4-aa6c-a81676984ae8" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Release -target iosapp -jobs `sysctl -n hw.ncpu`
+
+isim: Xcode/ios
+	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Debug -target iosapp -jobs `sysctl -n hw.ncpu`
 
 # Legacy name
 iproj: ios-proj
@@ -197,8 +203,7 @@ clean: clear_sqlite_cache clear_xcode_cache
 	-rm -rf ./build/
 	-rm -rf ./macosx/build
 	-rm -rf ./linux/build
-	-rm -rf ./ios/mapbox-gl-cocoa/build
-	-rm -rf ./ios/mapbox-gl-cocoa/app/build
+	-rm -rf ./ios/build
 	-rm -rf ./test/build
 	-rm -rf ./config/*.gypi
 	-rm -rf ./android/java/build ./android/java/app/build ./android/java/lib/build

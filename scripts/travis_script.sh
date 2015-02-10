@@ -44,9 +44,8 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     #
     # build iOS
     #
-    mapbox_time "checkout_cocoa_bindings" \
-    git submodule update --init ios/mapbox-gl-cocoa
-
-    mapbox_time "build_ios_project" \
+    mapbox_time "build_ios_project_device_release" \
     make ios -j$JOBS
+    mapbox_time "build_ios_project_simulator_debug" \
+    make isim -j$JOBS
 fi
