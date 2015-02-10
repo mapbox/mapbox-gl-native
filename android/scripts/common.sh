@@ -16,7 +16,3 @@ make android BUILDTYPE=$BUILDTYPE JOBS=$JOBS
 
 aws s3 cp ./android/java/app/build/outputs/apk/app-debug.apk s3://mapbox-gl-testing/android/${NAME}/app-debug.apk
 aws s3 cp ./android/java/app/build/outputs/apk/app-release-unsigned.apk s3://mapbox-gl-testing/android/${NAME}/app-release-unsigned.apk
-
-if [[ $TESTMUNK == "yes" ]]; then
-    ./android/scripts/upload-testmunk.sh ./android/java/app/build/outputs/apk/app-debug.apk
-fi
