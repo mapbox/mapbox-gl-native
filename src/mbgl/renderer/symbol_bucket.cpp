@@ -238,9 +238,26 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
     Anchors anchors;
 
     if (properties.placement == PlacementType::Line) {
+        float textResampleOffset = 0;
+        float iconResampleOffset = 0;
+
+        if (shaping.size()) {
+            float minX = std::numeric_limits<float>::infinity();
+            float maxX = -std::numeric_limits<float>::infinity();
+            for (const auto &glyph : shaping) {
+                minX = std::min(minX, glyph.x);
+                maxX = std::max(maxX, glyph.x);
+            }
+            const float labelLength = maxX - minX;
+            textResampleOffset = (labelLength / 2.0 + glyphSize) * fontScale;
+        }
+        if (image) {
+            iconResampleOffset = image.w;
+        }
+
         // Line labels
         anchors = resample(line, properties.min_distance, minScale, collision.maxPlacementScale,
-                           collision.tilePixelRatio);
+                           collision.tilePixelRatio, std::max(iconResampleOffset, textResampleOffset));
 
         // Sort anchors by segment so that we can start placement with the
         // anchors that can be shown at the lowest zoom levels.
