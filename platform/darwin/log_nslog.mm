@@ -10,7 +10,6 @@ void NSLogBackend::record(EventSeverity severity, Event event, const std::string
     NSString *message =
         [[NSString alloc] initWithBytes:msg.data() length:msg.size() encoding:NSUTF8StringEncoding];
     NSLog(@"[%s] %s: %@", EventSeverityClass(severity).c_str(), EventClass(event).c_str(), message);
-    [message release];
 }
 
 void NSLogBackend::record(EventSeverity severity, Event event, const char *format, ...) {
@@ -37,7 +36,6 @@ void NSLogBackend::record(EventSeverity severity, Event event, int64_t code,
         [[NSString alloc] initWithBytes:msg.data() length:msg.size() encoding:NSUTF8StringEncoding];
     NSLog(@"[%s] %s: (%lld) %@", EventSeverityClass(severity).c_str(), EventClass(event).c_str(),
           code, message);
-    [message release];
 }
 
 }

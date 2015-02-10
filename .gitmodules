@@ -1,7 +1,3 @@
-[submodule "ios/mapbox-gl-cocoa"]
-	path = ios/mapbox-gl-cocoa
-	url = https://github.com/mapbox/mapbox-gl-cocoa.git
-
 [submodule "test/suite"]
 	path = test/suite
 	url = https://github.com/mapbox/mapbox-gl-test-suite.git
@@ -14,6 +10,6 @@
 	path = styles
 	url = https://github.com/mapbox/mapbox-gl-styles.git
 
-[submodule "app/ios"]
-	path = app/ios
-	url = https://github.com/mapbox/mapbox-gl-cocoa.git
+[submodule "test/ios/KIF"]
+	path = test/ios/KIF
+	url = https://github.com/mapbox/KIF.git

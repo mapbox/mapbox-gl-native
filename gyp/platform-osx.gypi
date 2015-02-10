@@ -39,6 +39,7 @@
 
       'xcode_settings': {
         'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
+        'CLANG_ENABLE_OBJC_ARC': 'YES',
       },
 
       'link_settings': {
