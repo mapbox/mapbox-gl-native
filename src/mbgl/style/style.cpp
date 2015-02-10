@@ -28,8 +28,10 @@ Style::~Style() {}
 void Style::updateProperties(float z, std::chrono::steady_clock::time_point now) {
     uv::writelock lock(mtx);
 
+    zoomHistory.update(z, now);
+
     if (layers) {
-        layers->updateProperties(z, now);
+        layers->updateProperties(z, now, zoomHistory);
     }
 
     // Apply transitions after the first time.

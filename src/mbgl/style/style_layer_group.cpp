@@ -11,10 +11,10 @@ void StyleLayerGroup::setClasses(const std::vector<std::string> &class_names, st
     }
 }
 
-void StyleLayerGroup::updateProperties(float z, std::chrono::steady_clock::time_point now) {
+void StyleLayerGroup::updateProperties(float z, std::chrono::steady_clock::time_point now, ZoomHistory &zoomHistory) {
     for (const util::ptr<StyleLayer> &layer: layers) {
         if (layer) {
-            layer->updateProperties(z, now);
+            layer->updateProperties(z, now, zoomHistory);
         }
     }
 }

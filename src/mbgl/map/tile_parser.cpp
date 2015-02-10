@@ -161,8 +161,7 @@ void TileParser::applyLayoutProperties<SymbolProperties>(StyleBucket &bucket_des
     applyLayoutProperty(PropertyKey::IconPadding, bucket_desc.layout, symbol.icon.padding, z);
     applyLayoutProperty(PropertyKey::IconRotate, bucket_desc.layout, symbol.icon.rotate, z);
     applyLayoutProperty(PropertyKey::IconKeepUpright, bucket_desc.layout, symbol.icon.keep_upright, z);
-    applyLayoutProperty(PropertyKey::IconOffsetX, bucket_desc.layout, symbol.icon.offset[0], z);
-    applyLayoutProperty(PropertyKey::IconOffsetY, bucket_desc.layout, symbol.icon.offset[1], z);
+    applyLayoutProperty(PropertyKey::IconOffset, bucket_desc.layout, symbol.icon.offset, z);
 
     applyLayoutProperty(PropertyKey::TextRotationAlignment, bucket_desc.layout, symbol.text.rotation_alignment, z);
     applyLayoutProperty(PropertyKey::TextField, bucket_desc.layout, symbol.text.field, z);
@@ -180,8 +179,7 @@ void TileParser::applyLayoutProperties<SymbolProperties>(StyleBucket &bucket_des
     applyLayoutProperty(PropertyKey::TextAnchor, bucket_desc.layout, symbol.text.anchor, z);
     applyLayoutProperty(PropertyKey::TextKeepUpright, bucket_desc.layout, symbol.text.keep_upright, z);
     applyLayoutProperty(PropertyKey::TextTransform, bucket_desc.layout, symbol.text.transform, z);
-    applyLayoutProperty(PropertyKey::TextOffsetX, bucket_desc.layout, symbol.text.offset[0], z);
-    applyLayoutProperty(PropertyKey::TextOffsetY, bucket_desc.layout, symbol.text.offset[1], z);
+    applyLayoutProperty(PropertyKey::TextOffset, bucket_desc.layout, symbol.text.offset, z);
     applyLayoutProperty(PropertyKey::TextAllowOverlap, bucket_desc.layout, symbol.text.allow_overlap, z);
 }
 

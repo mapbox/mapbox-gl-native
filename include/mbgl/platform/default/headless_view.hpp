@@ -5,9 +5,12 @@
 #define MBGL_USE_CGL 1
 #else
 #define GL_GLEXT_PROTOTYPES
-#include <mbgl/platform/default/glx.h>
 #define MBGL_USE_GLX 1
-#undef Status
+typedef struct _XDisplay Display;
+typedef struct __GLXcontextRec* GLXContext;
+typedef struct __GLXFBConfigRec* GLXFBConfig;
+typedef long unsigned int XID;
+typedef XID GLXPbuffer;
 #endif
 
 #include <mbgl/map/view.hpp>
