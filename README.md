@@ -40,19 +40,18 @@ To create projects, you can run:
 
 Note that you can't have more than one project in Xcode open at a time since they the static library project is shared across the OS X, Linux and iOS project.
 
-Target OS: 10.9+
+Target OS X: 10.9+
 
 
 ## iOS
 
-If you just want to install the library for iOS and try it out as an Objective-C consumer, run `./scripts/package_ios.sh`. It will require the Boost headers to be installed, so use [Homebrew](http://brew.sh/) to install it via `brew install boost`. The script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, and a `Headers` folder. 
+If you merely want to install the library for iOS and try it out as an Objective-C consumer, run `./scripts/package_ios.sh`. It requires the Boost headers to be installed, so use [Homebrew](http://brew.sh/) to install them (`brew install boost`). The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, and a `Headers` folder. 
 
-If you want to build from source and/or contribute to development of the project, you can run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app. 
+If you want to build from source and/or contribute to development of the project, run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app. 
 
 Target devices: iPhone 4S and above (5, 5c, 5s, 6, 6 Plus) and iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2).
 
-iOS SDK: 8.1
-Supported iOS: 7.0+
+Target iOS: 7.0 through 8.1
 
 
 ## Linux
