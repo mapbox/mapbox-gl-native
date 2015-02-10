@@ -2,12 +2,11 @@
 .gradle/
 
 # IntelliJ files
-.idea
+.idea/
 *.iml
 
 # Build files
 build/
-*/build/
 *.so
 *.apk
 
@@ -18,4 +17,4 @@ lib/src/main/assets/
 local.properties
 
 # Token file
-app/src/main/res/raw/token.txt
+MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt
