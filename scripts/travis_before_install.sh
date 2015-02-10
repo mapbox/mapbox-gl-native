@@ -47,4 +47,7 @@ elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
     mapbox_time "install_awscli" \
     sudo pip install awscli
+
+    mapbox_time "install_xcpretty" \
+    gem install xcpretty --no-rdoc --no-ri --no-document --quiet
 fi
