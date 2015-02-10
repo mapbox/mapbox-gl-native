@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.0.0'
@@ -14,7 +14,7 @@ android {
     buildToolsVersion "21.1.2"
 
     repositories {
-        jcenter()
+        mavenCentral()
     }
 
     defaultConfig {
