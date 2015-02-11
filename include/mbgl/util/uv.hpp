@@ -60,6 +60,39 @@ private:
     rwlock *mtx = nullptr;
 };
 
+template <class T>
+class exclusive {
+public:
+    exclusive(T& val, mutex &mtx) : ptr(&val), lock(mtx) {}
+    exclusive(T *val, mutex &mtx) : ptr(val), lock(mtx) {}
+    exclusive(mutex &mtx) : lock(mtx) {}
+    exclusive(const std::unique_ptr<mutex> &mtx) : lock(mtx) {}
+    exclusive(const exclusive &) = delete;
+    exclusive(exclusive &&) = default;
+    exclusive &operator=(const exclusive &) = delete;
+    exclusive &operator=(exclusive &&) = default;
+
+    T *operator->() { return ptr; }
+    const T *operator->() const { return ptr; }
+    T *operator*() { return ptr; }
+    const T *operator*() const { return ptr; }
+    operator T&() { return *ptr; }
+    operator const T&() const { return *ptr; }
+
+    void operator<<(T& val) { operator<<(&val); }
+    void operator<<(T *val) {
+        if (ptr) {
+            throw std::runtime_error("exclusive<> was assigned before");
+        }
+        ptr = val;
+    }
+
+private:
+    T *ptr = nullptr;
+    lock lock;
+};
+
+
 
 const char *getFileRequestError(uv_fs_t *req);
 
