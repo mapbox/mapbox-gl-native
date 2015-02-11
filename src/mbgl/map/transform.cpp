@@ -1,0 +1,614 @@
+#include <mbgl/map/transform.hpp>
+#include <mbgl/map/view.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/mat4.hpp>
+#include <mbgl/util/std.hpp>
+#include <mbgl/util/math.hpp>
+#include <mbgl/util/transition.hpp>
+#include <mbgl/platform/platform.hpp>
+
+#include <cstdio>
+
+using namespace mbgl;
+
+const double DEG2RAD = M_PI / 180.0;
+const double RAD2DEG = 180.0 / M_PI;
+const double M2PI = 2 * M_PI;
+const double EARTH_RADIUS_M = 6378137;
+const double LATITUDE_MAX = 85.05112878;
+
+Transform::Transform(View &view_)
+    : view(view_)
+{
+}
+
+#pragma mark - Map View
+
+bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
+                       const uint16_t fb_w, const uint16_t fb_h) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    if (final.width != w || final.height != h || final.pixelRatio != ratio ||
+        final.framebuffer[0] != fb_w || final.framebuffer[1] != fb_h) {
+
+        view.notifyMapChange(MapChangeRegionWillChange);
+
+        current.width = final.width = w;
+        current.height = final.height = h;
+        current.pixelRatio = final.pixelRatio = ratio;
+        current.framebuffer[0] = final.framebuffer[0] = fb_w;
+        current.framebuffer[1] = final.framebuffer[1] = fb_h;
+        constrain(current.scale, current.y);
+
+        view.notifyMapChange(MapChangeRegionDidChange);
+
+        return true;
+    } else {
+        return false;
+    }
+}
+
+#pragma mark - Position
+
+void Transform::moveBy(const double dx, const double dy, const std::chrono::steady_clock::duration duration) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    _moveBy(dx, dy, duration);
+}
+
+void Transform::_moveBy(const double dx, const double dy, const std::chrono::steady_clock::duration duration) {
+    // This is only called internally, so we don't need a lock here.
+
+    view.notifyMapChange(duration != std::chrono::steady_clock::duration::zero() ?
+                           MapChangeRegionWillChangeAnimated :
+                           MapChangeRegionWillChange);
+
+    final.x = current.x + std::cos(current.angle) * dx + std::sin(current.angle) * dy;
+    final.y = current.y + std::cos(current.angle) * dy + std::sin(-current.angle) * dx;
+
+    constrain(final.scale, final.y);
+
+    if (duration == std::chrono::steady_clock::duration::zero()) {
+        current.x = final.x;
+        current.y = final.y;
+    } else {
+        // Use a common start time for all of the transitions to avoid divergent transitions.
+        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+        transitions.emplace_front(
+            std::make_shared<util::ease_transition<double>>(current.x, final.x, current.x, start, duration));
+        transitions.emplace_front(
+            std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
+    }
+
+    view.notifyMapChange(duration != std::chrono::steady_clock::duration::zero() ?
+                           MapChangeRegionDidChangeAnimated :
+                           MapChangeRegionDidChange,
+                           duration);
+}
+
+void Transform::setLatLng(const LatLng latLng, const std::chrono::steady_clock::duration duration) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    const double m = 1 - 1e-15;
+    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * latLng.latitude), -m), m);
+
+    double xn = -latLng.longitude * Bc;
+    double yn = 0.5 * Cc * std::log((1 + f) / (1 - f));
+
+    _setScaleXY(current.scale, xn, yn, duration);
+}
+
+void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const std::chrono::steady_clock::duration duration) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    double new_scale = std::pow(2.0, zoom);
+
+    const double s = new_scale * util::tileSize;
+    Bc = s / 360;
+    Cc = s / M2PI;
+
+    const double m = 1 - 1e-15;
+    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * latLng.latitude), -m), m);
+
+    double xn = -latLng.longitude * Bc;
+    double yn = 0.5 * Cc * std::log((1 + f) / (1 - f));
+
+    _setScaleXY(new_scale, xn, yn, duration);
+}
+
+const LatLng Transform::getLatLng() const {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    LatLng ll;
+
+    ll.longitude = -final.x / Bc;
+    ll.latitude  = RAD2DEG * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
+
+    return ll;
+
+    // final.getLonLat(lon, lat);
+}
+
+void Transform::getLatLngZoom(LatLng &latLng, double &zoom) const {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    latLng = getLatLng();
+    zoom = getZoom();
+}
+
+void Transform::startPanning() {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    _clearPanning();
+
+    // Add a 200ms timeout for resetting this to false
+    current.panning = true;
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    pan_timeout = std::make_shared<util::timeout<bool>>(false, current.panning, start, std::chrono::steady_clock::duration(200));
+    transitions.emplace_front(pan_timeout);
+}
+
+void Transform::stopPanning() {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    _clearPanning();
+}
+
+void Transform::_clearPanning() {
+    current.panning = false;
+    if (pan_timeout) {
+        transitions.remove(pan_timeout);
+        pan_timeout.reset();
+    }
+}
+
+#pragma mark - Zoom
+
+void Transform::scaleBy(const double ds, const double cx, const double cy, const std::chrono::steady_clock::duration duration) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    // clamp scale to min/max values
+    double new_scale = current.scale * ds;
+    if (new_scale < min_scale) {
+        new_scale = min_scale;
+    } else if (new_scale > max_scale) {
+        new_scale = max_scale;
+    }
+
+    _setScale(new_scale, cx, cy, duration);
+}
+
+void Transform::setScale(const double scale, const double cx, const double cy,
+                         const std::chrono::steady_clock::duration duration) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    _setScale(scale, cx, cy, duration);
+}
+
+void Transform::setZoom(const double zoom, const std::chrono::steady_clock::duration duration) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    _setScale(std::pow(2.0, zoom), -1, -1, duration);
+}
+
+double Transform::getZoom() const {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    return std::log(final.scale) / M_LN2;
+}
+
+double Transform::getScale() const {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    return final.scale;
+}
+
+void Transform::startScaling() {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    _clearScaling();
+
+    // Add a 200ms timeout for resetting this to false
+    current.scaling = true;
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    scale_timeout = std::make_shared<util::timeout<bool>>(false, current.scaling, start, std::chrono::milliseconds(200));
+    transitions.emplace_front(scale_timeout);
+}
+
+void Transform::stopScaling() {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    _clearScaling();
+}
+
+double Transform::getMinZoom() const {
+    double test_scale = current.scale;
+    double test_y = current.y;
+    constrain(test_scale, test_y);
+
+    return std::log2(std::fmin(min_scale, test_scale));
+}
+
+double Transform::getMaxZoom() const {
+    return std::log2(max_scale);
+}
+
+void Transform::_clearScaling() {
+    // This is only called internally, so we don't need a lock here.
+
+    current.scaling = false;
+    if (scale_timeout) {
+        transitions.remove(scale_timeout);
+        scale_timeout.reset();
+    }
+}
+
+void Transform::_setScale(double new_scale, double cx, double cy, const std::chrono::steady_clock::duration duration) {
+    // This is only called internally, so we don't need a lock here.
+
+    // Ensure that we don't zoom in further than the maximum allowed.
+    if (new_scale < min_scale) {
+        new_scale = min_scale;
+    } else if (new_scale > max_scale) {
+        new_scale = max_scale;
+    }
+
+    // Zoom in on the center if we don't have click or gesture anchor coordinates.
+    if (cx < 0 || cy < 0) {
+        cx = current.width / 2;
+        cy = current.height / 2;
+    }
+
+    // Account for the x/y offset from the center (= where the user clicked or pinched)
+    const double factor = new_scale / current.scale;
+    const double dx = (cx - current.width / 2) * (1.0 - factor);
+    const double dy = (cy - current.height / 2) * (1.0 - factor);
+
+    // Account for angle
+    const double angle_sin = std::sin(-current.angle);
+    const double angle_cos = std::cos(-current.angle);
+    const double ax = angle_cos * dx - angle_sin * dy;
+    const double ay = angle_sin * dx + angle_cos * dy;
+
+    const double xn = current.x * factor + ax;
+    const double yn = current.y * factor + ay;
+
+    _setScaleXY(new_scale, xn, yn, duration);
+}
+
+void Transform::_setScaleXY(const double new_scale, const double xn, const double yn,
+                            const std::chrono::steady_clock::duration duration) {
+    // This is only called internally, so we don't need a lock here.
+
+    view.notifyMapChange(duration != std::chrono::steady_clock::duration::zero() ?
+                           MapChangeRegionWillChangeAnimated :
+                           MapChangeRegionWillChange);
+
+    final.scale = new_scale;
+    final.x = xn;
+    final.y = yn;
+
+    constrain(final.scale, final.y);
+
+    if (duration == std::chrono::steady_clock::duration::zero()) {
+        current.scale = final.scale;
+        current.x = final.x;
+        current.y = final.y;
+    } else {
+        // Use a common start time for all of the transitions to avoid divergent transitions.
+        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
+            current.scale, final.scale, current.scale, start, duration));
+        transitions.emplace_front(
+            std::make_shared<util::ease_transition<double>>(current.x, final.x, current.x, start, duration));
+        transitions.emplace_front(
+            std::make_shared<util::ease_transition<double>>(current.y, final.y, current.y, start, duration));
+    }
+
+    const double s = final.scale * util::tileSize;
+    Bc = s / 360;
+    Cc = s / M2PI;
+
+    view.notifyMapChange(duration != std::chrono::steady_clock::duration::zero() ?
+                           MapChangeRegionDidChangeAnimated :
+                           MapChangeRegionDidChange,
+                           duration);
+}
+
+#pragma mark - Constraints
+
+void Transform::constrain(double& scale, double& y) const {
+    // Constrain minimum zoom to avoid zooming out far enough to show off-world areas.
+    if (scale < (current.height / util::tileSize)) scale = (current.height / util::tileSize);
+
+    // Constrain min/max vertical pan to avoid showing off-world areas.
+    double max_y = ((scale * util::tileSize) - current.height) / 2;
+
+    if (y > max_y) y = max_y;
+    if (y < -max_y) y = -max_y;
+}
+
+#pragma mark - Angle
+
+void Transform::rotateBy(const double start_x, const double start_y, const double end_x,
+                         const double end_y, const std::chrono::steady_clock::duration duration) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    double center_x = current.width / 2, center_y = current.height / 2;
+
+    const double begin_center_x = start_x - center_x;
+    const double begin_center_y = start_y - center_y;
+
+    const double beginning_center_dist =
+        std::sqrt(begin_center_x * begin_center_x + begin_center_y * begin_center_y);
+
+    // If the first click was too close to the center, move the center of rotation by 200 pixels
+    // in the direction of the click.
+    if (beginning_center_dist < 200) {
+        const double offset_x = -200, offset_y = 0;
+        const double rotate_angle = std::atan2(begin_center_y, begin_center_x);
+        const double rotate_angle_sin = std::sin(rotate_angle);
+        const double rotate_angle_cos = std::cos(rotate_angle);
+        center_x = start_x + rotate_angle_cos * offset_x - rotate_angle_sin * offset_y;
+        center_y = start_y + rotate_angle_sin * offset_x + rotate_angle_cos * offset_y;
+    }
+
+    const double first_x = start_x - center_x, first_y = start_y - center_y;
+    const double second_x = end_x - center_x, second_y = end_y - center_y;
+
+    const double ang = current.angle + util::angle_between(first_x, first_y, second_x, second_y);
+
+    _setAngle(ang, duration);
+}
+
+void Transform::setAngle(const double new_angle, const std::chrono::steady_clock::duration duration) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    _setAngle(new_angle, duration);
+}
+
+void Transform::setAngle(const double new_angle, const double cx, const double cy) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    double dx = 0, dy = 0;
+
+    if (cx >= 0 && cy >= 0) {
+        dx = (final.width / 2) - cx;
+        dy = (final.height / 2) - cy;
+        _moveBy(dx, dy, std::chrono::steady_clock::duration::zero());
+    }
+
+    _setAngle(new_angle, std::chrono::steady_clock::duration::zero());
+
+    if (cx >= 0 && cy >= 0) {
+        _moveBy(-dx, -dy, std::chrono::steady_clock::duration::zero());
+    }
+}
+
+void Transform::_setAngle(double new_angle, const std::chrono::steady_clock::duration duration) {
+    // This is only called internally, so we don't need a lock here.
+
+    view.notifyMapChange(duration != std::chrono::steady_clock::duration::zero() ?
+                           MapChangeRegionWillChangeAnimated :
+                           MapChangeRegionWillChange);
+
+    while (new_angle > M_PI)
+        new_angle -= M2PI;
+    while (new_angle <= -M_PI)
+        new_angle += M2PI;
+
+    final.angle = new_angle;
+
+    if (duration == std::chrono::steady_clock::duration::zero()) {
+        current.angle = final.angle;
+    } else {
+        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+        transitions.emplace_front(std::make_shared<util::ease_transition<double>>(
+            current.angle, final.angle, current.angle, start, duration));
+    }
+
+    view.notifyMapChange(duration != std::chrono::steady_clock::duration::zero() ?
+                           MapChangeRegionDidChangeAnimated :
+                           MapChangeRegionDidChange,
+                           duration);
+}
+
+double Transform::getAngle() const {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    return final.angle;
+}
+
+void Transform::startRotating() {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    _clearRotating();
+
+    // Add a 200ms timeout for resetting this to false
+    current.rotating = true;
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    rotate_timeout = std::make_shared<util::timeout<bool>>(false, current.rotating, start, std::chrono::milliseconds(200));
+    transitions.emplace_front(rotate_timeout);
+}
+
+void Transform::stopRotating() {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    _clearRotating();
+}
+
+void Transform::_clearRotating() {
+    // This is only called internally, so we don't need a lock here.
+
+    current.rotating = false;
+    if (rotate_timeout) {
+        transitions.remove(rotate_timeout);
+        rotate_timeout.reset();
+    }
+}
+
+#pragma mark - Projection & conversion
+
+void Transform::getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const {
+    const double d = EARTH_RADIUS_M * M_PI;
+
+    sw.easting  = -d;
+    sw.northing = -d;
+
+    ne.easting  =  d;
+    ne.northing =  d;
+}
+
+void Transform::getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const {
+    ProjectedMeters projectedMetersSW, projectedMetersNE;
+
+    getWorldBoundsMeters(projectedMetersSW, projectedMetersNE);
+
+    sw = latLngForProjectedMeters(projectedMetersSW);
+    ne = latLngForProjectedMeters(projectedMetersNE);
+}
+
+double Transform::getMetersPerPixelAtLatitude(const double lat, const double zoom) const {
+    const double mapPixelWidthAtZoom = std::pow(2.0, zoom) * util::tileSize;
+    const double constrainedLatitude = std::fmin(std::fmax(lat, -LATITUDE_MAX), LATITUDE_MAX);
+
+    return std::cos(constrainedLatitude * DEG2RAD) * M2PI * EARTH_RADIUS_M / mapPixelWidthAtZoom;
+}
+
+const ProjectedMeters Transform::projectedMetersForLatLng(const LatLng latLng) const {
+    const double constrainedLatitude = std::fmin(std::fmax(latLng.latitude, -LATITUDE_MAX), LATITUDE_MAX);
+
+    const double m = 1 - 1e-15;
+    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * constrainedLatitude), -m), m);
+
+    const double easting  = EARTH_RADIUS_M * latLng.longitude * DEG2RAD;
+    const double northing = 0.5 * EARTH_RADIUS_M * std::log((1 + f) / (1 - f));
+
+    return { northing, easting };
+}
+
+const LatLng Transform::latLngForProjectedMeters(const ProjectedMeters projectedMeters) const {
+    double latitude = (2 * std::atan(std::exp(projectedMeters.northing / EARTH_RADIUS_M)) - (M_PI / 2)) * RAD2DEG;
+    double longitude = projectedMeters.easting * RAD2DEG / EARTH_RADIUS_M;
+
+    latitude = std::fmin(std::fmax(latitude, -LATITUDE_MAX), LATITUDE_MAX);
+
+    while (longitude >  180) longitude -= 180;
+    while (longitude < -180) longitude += 180;
+
+    return { latitude, longitude };
+}
+
+void Transform::offsetForLatLng(const LatLng latLng, double &x, double &y) const {
+    LatLng ll;
+    double zoom;
+    getLatLngZoom(ll, zoom);
+
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    const double centerX = final.width  / 2;
+    const double centerY = final.height / 2;
+
+    const double m = getMetersPerPixelAtLatitude(0, zoom);
+
+    const double angle_sin = std::sin(-current.angle);
+    const double angle_cos = std::cos(-current.angle);
+
+    const ProjectedMeters givenMeters = projectedMetersForLatLng(latLng);
+
+    const double givenAbsoluteX = givenMeters.easting  / m;
+    const double givenAbsoluteY = givenMeters.northing / m;
+
+    const ProjectedMeters centerMeters = projectedMetersForLatLng(ll);
+
+    const double centerAbsoluteX = centerMeters.easting  / m;
+    const double centerAbsoluteY = centerMeters.northing / m;
+
+    const double deltaX = givenAbsoluteX - centerAbsoluteX;
+    const double deltaY = givenAbsoluteY - centerAbsoluteY;
+
+    const double translatedX = deltaX + centerX;
+    const double translatedY = deltaY + centerY;
+
+    const double rotatedX = translatedX * angle_cos - translatedY * angle_sin;
+    const double rotatedY = translatedX * angle_sin + translatedY * angle_cos;
+
+    const double rotatedCenterX = centerX * angle_cos - centerY * angle_sin;
+    const double rotatedCenterY = centerX * angle_sin + centerY * angle_cos;
+
+    x = rotatedX + (centerX - rotatedCenterX);
+    y = rotatedY + (centerY - rotatedCenterY);
+}
+
+const LatLng Transform::latLngForOffset(const double x, const double y) const {
+    LatLng ll;
+    double zoom;
+    getLatLngZoom(ll, zoom);
+
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    const double centerX = final.width  / 2;
+    const double centerY = final.height / 2;
+
+    const double m = getMetersPerPixelAtLatitude(0, zoom);
+
+    const double angle_sin = std::sin(current.angle);
+    const double angle_cos = std::cos(current.angle);
+
+    const double unrotatedCenterX = centerX * angle_cos - centerY * angle_sin;
+    const double unrotatedCenterY = centerX * angle_sin + centerY * angle_cos;
+
+    const double unrotatedX = x * angle_cos - y * angle_sin;
+    const double unrotatedY = x * angle_sin + y * angle_cos;
+
+    const double givenX = unrotatedX + (centerX - unrotatedCenterX);
+    const double givenY = unrotatedY + (centerY - unrotatedCenterY);
+
+    const ProjectedMeters centerMeters = projectedMetersForLatLng(ll);
+
+    const double centerAbsoluteX = centerMeters.easting  / m;
+    const double centerAbsoluteY = centerMeters.northing / m;
+
+    const double givenAbsoluteX = givenX + centerAbsoluteX - centerX;
+    const double givenAbsoluteY = givenY + centerAbsoluteY - centerY;
+
+    const ProjectedMeters givenMeters = { givenAbsoluteY * m, givenAbsoluteX * m };
+
+    return latLngForProjectedMeters(givenMeters);
+}
+
+#pragma mark - Transition
+
+bool Transform::needsTransition() const {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    return !transitions.empty();
+}
+
+void Transform::updateTransitions(const std::chrono::steady_clock::time_point now) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    transitions.remove_if([now](const util::ptr<util::transition> &transition) {
+        return transition->update(now) == util::transition::complete;
+    });
+}
+
+void Transform::cancelTransitions() {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    transitions.clear();
+}
+
+#pragma mark - Transform state
+
+const TransformState Transform::currentState() const {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    return current;
+}
+
+const TransformState Transform::finalState() const {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+
+    return final;
+}

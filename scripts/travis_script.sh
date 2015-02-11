@@ -3,30 +3,49 @@
 set -e
 set -o pipefail
 
-if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
+mapbox_time "checkout_styles" \
+git submodule update --init styles
+
+if [[ $MASON_PLATFORM == "android" ]]; then
+    ./android/scripts/run-build.sh
+
+elif [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
     #
     # build & test Linux
     #
-    make linux -j4 BUILDTYPE=${BUILDTYPE}
-    make test -j4 BUILDTYPE=${BUILDTYPE}
-    ./scripts/run_tests.sh
-    (cd ./node_modules/mapbox-gl-test-suite/ && (./bin/compare_images.js || true))
+    mapbox_time "compile_program" \
+    make linux -j$JOBS BUILDTYPE=${BUILDTYPE}
+
+    mapbox_time "compile_tests" \
+    make test -j$JOBS BUILDTYPE=${BUILDTYPE}
+
+    mapbox_time "checkout_test_suite" \
+    git submodule update --init test/suite
+
+    mapbox_time "run_tests" \
+    make test-* BUILDTYPE=${BUILDTYPE}
+
+    mapbox_time "compare_results" \
+    ./scripts/compare_images.sh
 
     if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
-        (cd ./node_modules/mapbox-gl-test-suite/ && ./bin/deploy_results.sh)
+        mapbox_time_start "deploy_results"
+        (cd ./test/suite/ && ./bin/deploy_results.sh)
+        mapbox_time_finish
     fi
 
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
     #
     # build OS X
     #
-    make xproj-cli
-    xcodebuild -project ./build/macosx/mapboxgl-app.xcodeproj -jobs 4
+    mapbox_time "build_osx_project" \
+    make xosx -j$JOBS
+
     #
     # build iOS
     #
-    git submodule init
-    git submodule update
-    make iproj-cli
-    xcodebuild -project ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO -jobs 4
+    mapbox_time "build_ios_project_device_release" \
+    make ios -j$JOBS
+    mapbox_time "build_ios_project_simulator_debug" \
+    make isim -j$JOBS
 fi

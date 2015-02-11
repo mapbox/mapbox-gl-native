@@ -30,7 +30,7 @@
 */
 
 #include <stddef.h>
-#include <libtess2/tesselator.h>
+#include "tesselator.h"
 #include "bucketalloc.h"
 #include "dict.h"
 

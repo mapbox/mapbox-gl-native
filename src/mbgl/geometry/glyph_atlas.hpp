@@ -1,0 +1,54 @@
+#ifndef MBGL_GEOMETRY_GLYPH_ATLAS
+#define MBGL_GEOMETRY_GLYPH_ATLAS
+
+#include <mbgl/geometry/binpack.hpp>
+#include <mbgl/text/glyph_store.hpp>
+#include <mbgl/util/noncopyable.hpp>
+
+#include <string>
+#include <set>
+#include <map>
+#include <mutex>
+#include <atomic>
+
+namespace mbgl {
+
+class GlyphAtlas : public util::noncopyable {
+public:
+
+private:
+    struct GlyphValue {
+        GlyphValue(const Rect<uint16_t>& rect_, uint64_t id)
+            : rect(rect_), ids({ id }) {}
+        Rect<uint16_t> rect;
+        std::set<uint64_t> ids;
+    };
+
+    Rect<uint16_t> addGlyph_impl(uint64_t tile_id, const std::string& face_name,
+                                 const SDFGlyph& glyph);
+public:
+    GlyphAtlas(uint16_t width, uint16_t height);
+
+    Rect<uint16_t> addGlyph(uint64_t tile_id, const std::string& face_name,
+                            const SDFGlyph& glyph);
+    void addGlyphs(uint64_t tileid, std::u32string const& text, std::string const& stackname,
+                   FontStack const& fontStack, GlyphPositions & face);
+    void removeGlyphs(uint64_t tile_id);
+    void bind();
+
+public:
+    const uint16_t width = 0;
+    const uint16_t height = 0;
+
+private:
+    std::mutex mtx;
+    BinPack<uint16_t> bin;
+    std::map<std::string, std::map<uint32_t, GlyphValue>> index;
+    std::unique_ptr<char[]> data;
+    std::atomic<bool> dirty;
+    uint32_t texture = 0;
+};
+
+};
+
+#endif

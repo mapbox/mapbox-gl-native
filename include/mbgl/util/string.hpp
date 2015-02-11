@@ -3,8 +3,26 @@
 
 #include <string>
 
+#pragma GCC diagnostic push
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#endif
+#include <boost/lexical_cast.hpp>
+#pragma GCC diagnostic pop
+
 namespace mbgl {
 namespace util {
+
+template <typename... Args>
+inline std::string toString(Args&&... args) {
+    return boost::lexical_cast<std::string>(::std::forward<Args>(args)...);
+}
+
+// boost::lexical_cast() treats this as a character, but we are using it as number types.
+inline std::string toString(int8_t num) {
+    return boost::lexical_cast<std::string>(int(num));
+}
+
 
 template<size_t max, typename... Args>
 inline std::string sprintf(const char *msg, Args... args) {

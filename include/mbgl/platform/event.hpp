@@ -32,6 +32,11 @@ enum class Event : uint8_t {
     Database,
     HttpRequest,
     Sprite,
+    Image,
+    OpenGL,
+    JNI,
+    Android,
+    Crash
 };
 
 MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
@@ -44,6 +49,11 @@ MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
     { Event::Database, "Database" },
     { Event::HttpRequest, "HttpRequest" },
     { Event::Sprite, "Sprite" },
+    { Event::Image, "Image" },
+    { Event::OpenGL, "OpenGL" },
+    { Event::JNI, "JNI" },
+    { Event::Android, "Android" },
+    { Event::Crash, "Crash" },
     { Event(-1), "Unknown" },
 });
 
@@ -58,11 +68,12 @@ struct EventPermutation {
 };
 
 constexpr EventSeverity disabledEventSeverities[] = {
-#if !DEBUG
-    EventSeverity::Debug,
+#if DEBUG
+    EventSeverity(-1) // Avoid zero size array
+#else
+    EventSeverity::Debug
 #endif
 };
-
 
 constexpr Event disabledEvents[] = {
     Event(-1) // Avoid zero size array

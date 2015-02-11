@@ -1,7 +1,7 @@
 #ifndef MBGL_MAP_VIEW
 #define MBGL_MAP_VIEW
 
-#include <mbgl/util/time.hpp>
+#include <chrono>
 
 namespace mbgl {
 
@@ -22,8 +22,8 @@ enum MapChange : uint8_t {
 
 class View {
 public:
-    virtual void initialize(Map *map) {
-        this->map = map;
+    virtual void initialize(Map *map_) {
+        map = map_;
     }
 
     // Called from the render (=GL) thread. Signals that the context should
@@ -33,20 +33,18 @@ public:
     // Called from the render thread. Makes the GL context active in the current
     // thread. This is typically just called once at the beginning of the
     // renderer setup since the render thread doesn't switch the contexts.
-    virtual void make_active() = 0;
+    virtual void activate() = 0;
 
-    // Returns the base framebuffer object, if any, and 0 if using the system
-    // provided framebuffer.
-    virtual unsigned int root_fbo() {
-        return 0;
-    }
+    // Called from the render thread. Makes the GL context inactive in the current
+    // thread. This is called once just before the rendering thread terminates.
+    virtual void deactivate() = 0;
 
     virtual void notify() = 0;
 
     // Notifies a watcher of map x/y/scale/rotation changes.
     // Must only be called from the same thread that caused the change.
     // Must not be called from the render thread.
-    virtual void notify_map_change(MapChange change, timestamp delay = 0) = 0;
+    virtual void notifyMapChange(MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero()) = 0;
 
 protected:
     mbgl::Map *map = nullptr;

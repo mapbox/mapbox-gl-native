@@ -3,50 +3,57 @@
 
 #include <mbgl/map/geography.h>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/renderer/painter.hpp>
-
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
 
 #include <cstdint>
 #include <atomic>
+#include <thread>
 #include <iosfwd>
 #include <set>
 #include <vector>
+#include <mutex>
+#include <condition_variable>
+#include <functional>
+#include <chrono>
 
 namespace mbgl {
 
-class GlyphAtlas;
+class Painter;
 class GlyphStore;
 class LayerDescription;
-class SpriteAtlas;
 class Sprite;
 class Style;
 class StyleLayer;
 class StyleLayerGroup;
 class StyleSource;
-class Texturepool;
+class TexturePool;
 class FileSource;
 class View;
+class GlyphAtlas;
+class SpriteAtlas;
+class LineAtlas;
 
 class Map : private util::noncopyable {
-    typedef void (*stop_callback)(void *);
-
 public:
-    explicit Map(View &view);
+    explicit Map(View&, FileSource&);
     ~Map();
 
     // Start the map render thread. It is asynchronous.
-    void start();
+    void start(bool startPaused = false);
 
     // Stop the map render thread. This call will block until the map rendering thread stopped.
     // The optional callback function will be invoked repeatedly until the map thread is stopped.
     // The callback function should wait until it is woken up again by view.notify(), otherwise
-    // this will be a busy waiting loop. The optional data parameter will be passed to the callback
-    // function.
-    void stop(stop_callback cb = nullptr, void *data = nullptr);
+    // this will be a busy waiting loop.
+    void stop(std::function<void ()> callback = std::function<void ()>());
+
+    // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
+    void pause(bool waitForPause = false);
+
+    // Resumes a paused render thread
+    void resume();
 
     // Runs the map event loop. ONLY run this function when you want to get render a single frame
     // with this map object. It will *not* spawn a separate thread and instead block until the
@@ -56,13 +63,11 @@ public:
     // Triggers a lazy rerender: only performs a render when the map is not clean.
     void rerender();
 
-    void renderLayer(util::ptr<StyleLayer> layer_desc, RenderPass pass, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
-
     // Forces a map update: always triggers a rerender.
     void update();
 
-    // Triggers a cleanup that releases resources.
-    void cleanup();
+    // Releases resources immediately
+    void terminate();
 
     // Controls buffer swapping.
     bool needsSwap();
@@ -70,38 +75,39 @@ public:
 
     // Size
     void resize(uint16_t width, uint16_t height, float ratio = 1);
-    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fb_width, uint16_t fb_height);
+    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
     // Styling
-    const std::set<util::ptr<StyleSource>> getActiveSources() const;
-    void setAppliedClasses(const std::vector<std::string> &classes);
-    void toggleClass(const std::string &name);
-    const std::vector<std::string> &getAppliedClasses() const;
-    void setDefaultTransitionDuration(uint64_t duration_milliseconds = 0);
+    void addClass(const std::string&);
+    void removeClass(const std::string&);
+    bool hasClass(const std::string&) const;
+    void setClasses(const std::vector<std::string>&);
+    std::vector<std::string> getClasses() const;
+
+    void setDefaultTransitionDuration(std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    std::chrono::steady_clock::duration getDefaultTransitionDuration();
     void setStyleURL(const std::string &url);
     void setStyleJSON(std::string newStyleJSON, const std::string &base = "");
     std::string getStyleJSON() const;
-    void setAccessToken(std::string access_token);
-    std::string getAccessToken() const;
 
     // Transition
     void cancelTransitions();
 
     // Position
-    void moveBy(double dx, double dy, double duration = 0);
-    void setLatLng(LatLng latLng, double duration = 0);
+    void moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void setLatLon(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     const LatLng getLatLng() const;
     void startPanning();
     void stopPanning();
     void resetPosition();
 
     // Scale
-    void scaleBy(double ds, double cx = -1, double cy = -1, double duration = 0);
-    void setScale(double scale, double cx = -1, double cy = -1, double duration = 0);
+    void scaleBy(double ds, double cx = -1, double cy = -1, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void setScale(double scale, double cx = -1, double cy = -1, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     double getScale() const;
-    void setZoom(double zoom, double duration = 0);
+    void setZoom(double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     double getZoom() const;
-    void setLatLngZoom(LatLng latLng, double zoom, double duration = 0);
+    void setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void getLatLngZoom(LatLng &latLng, double &zoom) const;
     void resetZoom();
     void startScaling();
@@ -110,14 +116,17 @@ public:
     double getMaxZoom() const;
 
     // Rotation
-    void rotateBy(double sx, double sy, double ex, double ey, double duration = 0);
-    void setBearing(double degrees, double duration = 0);
+    void rotateBy(double sx, double sy, double ex, double ey, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void setBearing(double degrees, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void setBearing(double degrees, double cx, double cy);
     double getBearing() const;
     void resetNorth();
     void startRotating();
     void stopRotating();
-    bool canRotate();
+
+    // API
+    void setAccessToken(const std::string &token);
+    const std::string &getAccessToken() const;
 
     // Projection
     void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;
@@ -133,109 +142,103 @@ public:
     void toggleDebug();
     bool getDebug() const;
 
-    // Call this when the network reachability changed.
-    void setReachability(bool status);
-
-public:
     inline const TransformState &getState() const { return state; }
-    inline util::ptr<FileSource> getFileSource() const { return fileSource; }
-    inline util::ptr<Style> getStyle() const { return style; }
-    inline util::ptr<GlyphAtlas> getGlyphAtlas() { return glyphAtlas; }
-    inline util::ptr<GlyphStore> getGlyphStore() { return glyphStore; }
-    inline util::ptr<SpriteAtlas> getSpriteAtlas() { return spriteAtlas; }
-    util::ptr<Sprite> getSprite();
-    inline util::ptr<Texturepool> getTexturepool() { return texturepool; }
-    inline util::ptr<uv::loop> getLoop() { return loop; }
-    uv::worker &getWorker();
-    inline timestamp getAnimationTime() const { return animationTime; }
-    inline timestamp getTime() const { return animationTime; }
-    void updateTiles();
+    inline std::chrono::steady_clock::time_point getTime() const { return animationTime; }
 
 private:
-    // uv async callbacks
-    static void render(uv_async_t *async);
-    static void terminate(uv_async_t *async);
-    static void cleanup(uv_async_t *async);
-    static void delete_async(uv_handle_t *handle);
+    util::ptr<Sprite> getSprite();
+    uv::worker& getWorker();
+
+    // Checks if render thread needs to pause
+    void checkForPause();
 
     // Setup
     void setup();
 
+    void updateTiles();
     void updateSources();
     void updateSources(const util::ptr<StyleLayerGroup> &group);
-
-    void updateRenderState();
-
-    size_t countLayers(const std::vector<LayerDescription>& layers);
 
     // Prepares a map render by updating the tiles we need for the current view, as well as updating
     // the stylesheet.
     void prepare();
 
-
     // Unconditionally performs a render with the current map state.
     void render();
-    void renderLayers(util::ptr<StyleLayerGroup> group);
+
+    enum class Mode : uint8_t {
+        None, // we're not doing any processing
+        Continuous, // continually updating map
+        Static, // a once-off static image.
+    };
+
+    Mode mode = Mode::None;
+
+public: // TODO: make private again
+    std::unique_ptr<uv::loop> loop;
 
 private:
-    bool async = false;
-    util::ptr<uv::loop> loop;
     std::unique_ptr<uv::worker> workers;
-    std::unique_ptr<uv::thread> thread;
-    std::unique_ptr<uv_async_t> async_terminate;
-    std::unique_ptr<uv_async_t> async_render;
-    std::unique_ptr<uv_async_t> async_cleanup;
+    std::thread thread;
+    std::unique_ptr<uv::async> asyncTerminate;
+    std::unique_ptr<uv::async> asyncRender;
 
-private:
+    bool terminating = false;
+    bool pausing = false;
+    bool isPaused = false;
+    std::mutex mutexRun;
+    std::condition_variable condRun;
+    std::mutex mutexPause;
+    std::condition_variable condPause;
+
     // If cleared, the next time the render thread attempts to render the map, it will *actually*
     // render the map.
-    std::atomic_flag is_clean = ATOMIC_FLAG_INIT;
+    std::atomic_flag isClean = ATOMIC_FLAG_INIT;
 
     // If this flag is cleared, the current back buffer is ready for being swapped with the front
     // buffer (i.e. it has rendered data).
-    std::atomic_flag is_swapped = ATOMIC_FLAG_INIT;
+    std::atomic_flag isSwapped = ATOMIC_FLAG_INIT;
 
     // This is cleared once the current front buffer has been presented and the back buffer is
     // ready for rendering.
-    std::atomic_flag is_rendered = ATOMIC_FLAG_INIT;
+    std::atomic_flag isRendered = ATOMIC_FLAG_INIT;
 
     // Stores whether the map thread has been stopped already.
-    std::atomic_bool is_stopped;
+    std::atomic_bool isStopped;
 
-public:
     View &view;
 
-private:
-#ifndef NDEBUG
-    const unsigned long main_thread;
-    unsigned long map_thread = -1;
+#ifdef DEBUG
+    const std::thread::id mainThread;
+    std::thread::id mapThread;
 #endif
 
     Transform transform;
     TransformState state;
 
-    util::ptr<FileSource> fileSource;
+    FileSource& fileSource;
 
     util::ptr<Style> style;
-    util::ptr<GlyphAtlas> glyphAtlas;
+    const std::unique_ptr<GlyphAtlas> glyphAtlas;
     util::ptr<GlyphStore> glyphStore;
-    util::ptr<SpriteAtlas> spriteAtlas;
+    const std::unique_ptr<SpriteAtlas> spriteAtlas;
     util::ptr<Sprite> sprite;
-    util::ptr<Texturepool> texturepool;
+    const std::unique_ptr<LineAtlas> lineAtlas;
+    util::ptr<TexturePool> texturePool;
 
-    Painter painter;
+    const std::unique_ptr<Painter> painter;
 
     std::string styleURL;
     std::string styleJSON = "";
-    std::string accessToken = "";
+    std::vector<std::string> classes;
+    std::string accessToken;
+
+    std::chrono::steady_clock::duration defaultTransitionDuration;
 
     bool debug = false;
-    timestamp animationTime = 0;
-
-    int indent = 0;
+    std::chrono::steady_clock::time_point animationTime = std::chrono::steady_clock::time_point::min();
 
     std::set<util::ptr<StyleSource>> activeSources;
-
 };
 
 }

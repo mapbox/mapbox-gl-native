@@ -1,61 +1,58 @@
 {
   'includes': [
-    '../common.gypi',
-    '../config.gypi',
+    '../gyp/common.gypi',
   ],
   'targets': [
-    {
-      'target_name': 'linuxapp',
+    { 'target_name': 'linuxapp',
       'product_name': 'mapbox-gl',
       'type': 'executable',
-      'sources': [
-        './main.cpp',
-        '../common/settings_json.cpp',
-        '../common/settings_json.hpp',
-        '../common/platform_default.cpp',
-        '../common/glfw_view.hpp',
-        '../common/glfw_view.cpp',
-        '../common/http_request_baton_curl.cpp',
-        '../common/linux.cpp',
-        '../common/stderr_log.hpp',
-        '../common/stderr_log.cpp',
+
+      'dependencies': [
+        '../mbgl.gyp:core',
+        '../mbgl.gyp:platform-<(platform_lib)',
+        '../mbgl.gyp:http-<(http_lib)',
+        '../mbgl.gyp:asset-<(asset_lib)',
+        '../mbgl.gyp:cache-<(cache_lib)',
+        '../mbgl.gyp:bundle_styles',
+        '../mbgl.gyp:copy_certificate_bundle',
       ],
+
+      'sources': [
+        'main.cpp',
+        '../platform/default/settings_json.cpp',
+        '../platform/default/glfw_view.cpp',
+        '../platform/default/log_stderr.cpp',
+      ],
+
+      'variables' : {
+        'cflags_cc': [
+          '<@(glfw3_cflags)',
+        ],
+        'ldflags': [
+          '<@(glfw3_ldflags)',
+        ],
+        'libraries': [
+          '<@(glfw3_static_libs)',
+        ],
+      },
 
       'conditions': [
-        ['OS == "mac"',
-
-        # Mac OS X
-        {
+        ['OS == "mac"', {
+          'libraries': [ '<@(libraries)' ],
           'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS':[
-              '<@(glfw3_cflags)',
-              '<@(curl_cflags)',
-            ],
-            'OTHER_LDFLAGS': [
-              '<@(glfw3_libraries)',
-            ],
+            'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
+            'OTHER_LDFLAGS': [ '<@(ldflags)' ],
           }
-        },
+        }, {
+          'cflags_cc': [ '<@(cflags_cc)' ],
+          'libraries': [ '<@(libraries)', '<@(ldflags)' ],
+        }]
+      ],
 
-        # Non-Mac OS X
-        {
-          'cflags': [
-            '<@(glfw3_cflags)',
-            '<@(curl_cflags)',
-          ],
-          'link_settings': {
-            'libraries': [
-              '<@(glfw3_libraries)',
-              '-lboost_regex'
-            ],
-          },
-        }],
-      ],
-      'dependencies': [
-        '../mapboxgl.gyp:mapboxgl',
-        '../mapboxgl.gyp:copy_styles',
-        '../mapboxgl.gyp:copy_certificate_bundle',
-      ],
+      'copies': [{
+        'files': [ '../styles/styles' ],
+        'destination': '<(PRODUCT_DIR)'
+      }],
     },
   ],
 }

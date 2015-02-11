@@ -1,111 +1,214 @@
 BUILDTYPE ?= Release
 PYTHON ?= python
-V ?= 1
+PREFIX ?= /usr/local
+ANDROID_ABI ?= arm-v7
+JOBS ?= 1
 
-all: setup
+ifeq ($(shell uname -s), Darwin)
+HOST ?= osx
+endif
+HOST ?= linux
 
-setup: config.gypi
+all: mbgl
 
-config.gypi:
-	./setup-libraries.sh
+include config/defaults.mk
 
-xlibs:
-	@./mapnik-packaging/osx/darwin_configure.sh osx
+#### Dependencies ##############################################################
 
-ilibs:
-	@./mapnik-packaging/osx/darwin_configure.sh ios
+# Wildcard targets get removed after build by default, but we want to preserve the config.
+.PRECIOUS: config/%.gypi
+config/%.gypi: CMD = ./configure config/$*.gypi
+config/%.gypi: configure
+	@$(ENV_$*) ./scripts/flock.py build/Configure.lock ./configure config/$*.gypi
 
-# Builds the regular library
-mbgl: config.gypi mapboxgl.gyp node
-	deps/run_gyp mapboxgl.gyp --depth=. -Goutput_dir=.. --generator-output=./build/mbgl -f make
-	$(MAKE) -C build/mbgl BUILDTYPE=$(BUILDTYPE) V=$(V) mapboxgl
+#### Library builds ############################################################
 
-node:
-	@if [ ! `which node` ]; then echo 'error: depends on node.js. please make sure node is on your PATH'; exit 1; fi;
+.PRECIOUS: Makefile/mbgl
+Makefile/mbgl: config/$(HOST).gypi
+	deps/run_gyp mbgl.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
 
-##### Test cases ###############################################################
+mbgl: Makefile/mbgl
+	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) everything
 
-build/test/Makefile: src common config.gypi test/test.gyp
-	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build/test -f make
+standalone: Makefile/mbgl
+	LINK=`pwd`/gyp/link.py $(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) standalone
 
-test: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) test
+install: Makefile/mbgl
+	LINK=`pwd`/gyp/link.py $(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) install
 
-test_%: build/test/Makefile
-	$(MAKE) -C build/test BUILDTYPE=$(BUILDTYPE) V=$(V) $*
-	(cd build/$(BUILDTYPE) && exec ./test_$*)
+.PRECIOUS: Xcode/mbgl
+Xcode/mbgl: config/$(HOST).gypi
+	deps/run_gyp mbgl.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f xcode
 
-# build Mac OS X project for Xcode
-xtest: config.gypi clear_xcode_cache node
-	deps/run_gyp test/test.gyp --depth=. -Goutput_dir=.. --generator-output=./build -f xcode
-	open ./build/test/test.xcodeproj
+##### Test builds ##############################################################
 
-##### Makefile builds ##########################################################
+.PRECIOUS: Makefile/test
+Makefile/test: test/test.gyp config/$(HOST).gypi
+	deps/run_gyp test/test.gyp $(CONFIG_$(HOST)) $(LIBS_$(HOST)) --generator-output=./build/$(HOST) -f make
 
+test: Makefile/test
+	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) test
 
-# Builds the linux app with make.
-linux: config.gypi linux/mapboxgl-app.gyp node
-	deps/run_gyp linux/mapboxgl-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/linux -f make
-	$(MAKE) -C build/linux BUILDTYPE=$(BUILDTYPE) V=$(V) linuxapp
-
-# Executes the Linux binary
-run-linux: linux
-	(cd build/$(BUILDTYPE) && ./mapbox-gl)
+test-%: test
+	./scripts/run_tests.sh "build/$(HOST)/$(BUILDTYPE)/test" --gtest_filter=$*
 
 
+.PRECIOUS: Xcode/test
+Xcode/test: test/test.gyp config/osx.gypi
+	deps/run_gyp test/test.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f xcode
 
-# Builds the OS X app with make.
-osx: config.gypi macosx/mapboxgl-app.gyp node
-	deps/run_gyp macosx/mapboxgl-app.gyp --depth=. -Goutput_dir=.. --generator-output=./build/macosx -f make
-	$(MAKE) -C build/macosx BUILDTYPE=$(BUILDTYPE) V=$(V) osxapp
+.PHONY: lproj lbuild run-xlinux
+xtest-proj: Xcode/test
+	open ./build/osx/test/test.xcodeproj
 
-# Executes the OS X binary
+xtest: Xcode/test
+	xcodebuild -project ./build/osx/test/test.xcodeproj -configuration $(BUILDTYPE) -target test -jobs `sysctl -n hw.ncpu`
+
+xtest-%: xtest
+	./scripts/run_tests.sh "build/osx/Build/Products/$(BUILDTYPE)/test" --gtest_filter=$*
+
+
+#### Mac OS X application builds ###############################################
+
+.PRECIOUS: Makefile/osx
+Makefile/osx: macosx/mapboxgl-app.gyp config/osx.gypi
+	deps/run_gyp macosx/mapboxgl-app.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f make
+
+.PHONY: osx run-osx
+osx: Makefile/osx
+	$(MAKE) -C build/osx BUILDTYPE=$(BUILDTYPE) osxapp
+
 run-osx: osx
-	build/$(BUILDTYPE)/Mapbox\ GL.app/Contents/MacOS/MAPBOX\ GL
+	"build/osx/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 
-##### Xcode projects ###########################################################
 
-clear_xcode_cache:
-    @CUSTOM_DD=`defaults read com.apple.dt.Xcode IDECustomDerivedDataLocation 2>/dev/null`; \
-    if [[ $$CUSTOM_DD ]]; then \
-        echo clearing files in $$CUSTOM_DD older than one day; \
-        find $$CUSTOM_DD/mapboxgl-app-* -mtime +1 | xargs rm -rf; \
-    fi; \
-    if [[ -d ~/Library/Developer/Xcode/DerivedData/ ]] && [[ ! $$CUSTOM_DD ]]; then \
-        echo 'clearing files in ~/Library/Developer/Xcode/DerivedData/mapboxgl-app-* older than one day'; \
-        find ~/Library/Developer/Xcode/DerivedData/mapboxgl-app-* -mtime +1 | xargs rm -rf; \
-    fi
+.PRECIOUS: Xcode/osx
+Xcode/osx: macosx/mapboxgl-app.gyp config/osx.gypi
+	deps/run_gyp macosx/mapboxgl-app.gyp $(CONFIG_osx) $(LIBS_osx) --generator-output=./build/osx -f xcode
 
-# build Mac OS X project for Xcode
-xproj-cli: config.gypi xlibs macosx/mapboxgl-app.gyp clear_xcode_cache node
-	deps/run_gyp macosx/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
+.PHONY: xosx-proj xosx run-xosx
+xosx-proj: Xcode/osx
+	open ./build/osx/macosx/mapboxgl-app.xcodeproj
 
-xproj: xproj-cli
-	open ./build/macosx/mapboxgl-app.xcodeproj
+xosx: Xcode/osx
+	xcodebuild -project ./build/osx/macosx/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target osxapp -jobs `sysctl -n hw.ncpu`
 
-# build iOS project for Xcode
-iproj-cli: config.gypi ilibs ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp clear_xcode_cache node
-	deps/run_gyp ios/mapbox-gl-cocoa/app/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
+run-xosx: xosx
+	"build/osx/Build/Products/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 
-iproj: iproj-cli
-	open ./build/ios/mapbox-gl-cocoa/app/mapboxgl-app.xcodeproj
+# Legacy name
+xproj: xosx-proj
 
-# build Linux project for Xcode (Runs on Mac OS X too, but without platform-specific code)
-lproj: config.gypi linux/mapboxgl-app.gyp clear_xcode_cache node
-	deps/run_gyp linux/mapboxgl-app.gyp --depth=. --generator-output=./build -f xcode
-	open ./build/linux/mapboxgl-app.xcodeproj
+
+
+#### iOS application builds ####################################################
+
+.PRECIOUS: Xcode/ios
+Xcode/ios: ios/app/mapboxgl-app.gyp config/ios.gypi
+	deps/run_gyp ios/app/mapboxgl-app.gyp $(CONFIG_ios) $(LIBS_ios) --generator-output=./build/ios -f xcode
+
+.PHONY: ios-proj ios run-ios
+ios-proj: Xcode/ios
+	open ./build/ios/ios/app/mapboxgl-app.xcodeproj
+
+ios: Xcode/ios
+	xcodebuild -sdk iphoneos ARCHS="arm64 armv7 armv7s" PROVISIONING_PROFILE="2b532944-bf3d-4bf4-aa6c-a81676984ae8" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Release -target iosapp -jobs `sysctl -n hw.ncpu`
+
+isim: Xcode/ios
+	xcodebuild -sdk iphonesimulator ARCHS="x86_64 i386" -project ./build/ios/ios/app/mapboxgl-app.xcodeproj -configuration Debug -target iosapp -jobs `sysctl -n hw.ncpu`
+
+# Legacy name
+iproj: ios-proj
+
+
+#### Linux application builds ##################################################
+
+.PRECIOUS: Makefile/linux
+Makefile/linux: linux/mapboxgl-app.gyp config/$(HOST).gypi
+	deps/run_gyp linux/mapboxgl-app.gyp $(CONFIG_$(HOST)) $(LIBS_linux) --generator-output=./build/$(HOST) -f make
+
+.PHONY: linux run-linux
+linux: Makefile/linux
+	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) linuxapp
+
+run-linux: linux
+	(cd build/$(HOST)/$(BUILDTYPE) && ./mapbox-gl)
+
+
+.PRECIOUS: Xcode/linux
+Xcode/linux: linux/mapboxgl-app.gyp config/osx.gypi
+	deps/run_gyp linux/mapboxgl-app.gyp $(CONFIG_osx) $(LIBS_linux) --generator-output=./build/osx -f xcode
+
+.PHONY: lproj lbuild run-xlinux
+xlinux-proj: Xcode/linux
+	open ./build/osx/linux/mapboxgl-app.xcodeproj
+
+xlinux: Xcode/linux
+	xcodebuild -project ./build/osx/linux/mapboxgl-app.xcodeproj -configuration $(BUILDTYPE) -target linuxapp
+
+run-xlinux: xlinux
+	"build/osx/Build/Products/$(BUILDTYPE)/mapbox-gl"
+
+# Legacy name
+lproj: xlinux-proj
+
+
+#### Android libaries #########################################################
+
+.PRECIOUS: Makefile/android-%
+Makefile/android-%: CMD = deps/run_gyp android/mapboxgl-app.gyp $(CONFIG_android-$*) $(LIBS_android) --generator-output=./build/android-$* -f make-android
+Makefile/android-%: config/android-%.gypi
+	@echo $(CMD)
+	@$(ENV_android-$*) $(CMD)
+
+# Builds a particular android architecture.
+android-lib-%: Makefile/android-%
+	@$(ENV_android-$*) ./scripts/flock.py -v build/Android.lock $(MAKE) -C build/android-$* BUILDTYPE=$(BUILDTYPE) androidapp
+
+# Builds the selected/default Android library
+android: android-lib-$(ANDROID_ABI)
+	cd android/java && ./gradlew --parallel-threads=$(JOBS) build
+
+# Builds all android architectures.
+android-all: $(ANDROID_ABIS)
+	cd android/java && ./gradlew --parallel-threads=$(JOBS) build
 
 
 ##### Maintenace operations ####################################################
 
-clean: clear_xcode_cache
+.PHONY: clear_xcode_cache
+clear_xcode_cache:
+ifeq ($(PLATFORM), osx)
+	@CUSTOM_DD=`defaults read com.apple.dt.Xcode IDECustomDerivedDataLocation 2>/dev/null`; \
+	if [ $$CUSTOM_DD ]; then \
+		echo clearing files in $$CUSTOM_DD older than one day; \
+		find $$CUSTOM_DD/mapboxgl-app-* -mtime +1 | xargs rm -rf; \
+	fi; \
+	if [ -d ~/Library/Developer/Xcode/DerivedData/ ] && [ ! $$CUSTOM_DD ]; then \
+		echo 'clearing files in ~/Library/Developer/Xcode/DerivedData/mapboxgl-app-* older than one day'; \
+		find ~/Library/Developer/Xcode/DerivedData/mapboxgl-app-* -mtime +1 | xargs rm -rf; \
+	fi
+endif
+
+.PHONY: clear_sqlite_cache
+clear_sqlite_cache:
+ifeq ($(PLATFORM), osx)
+	rm -f ~/Library/Application\ Support/Mapbox\ GL/cache.db
+else
+	rm -f /tmp/mbgl-cache.db
+endif
+
+clean: clear_sqlite_cache clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
-	-rm -rf ./config.gypi
+	-rm -rf ./macosx/build
+	-rm -rf ./linux/build
+	-rm -rf ./ios/build
+	-rm -rf ./test/build
+	-rm -rf ./config/*.gypi
+	-rm -rf ./android/java/build ./android/java/app/build ./android/java/lib/build
+	-rm -rf ./android/java/lib/src/main/jniLibs ./android/java/lib/src/main/assets
+	-rm -f ./android/test/features.zip
 
 distclean: clean
-	-rm -rf ./mapnik-packaging/osx/out/build-*
-	-rm -rf ./mapnik-packaging/osx/out/universal
-	-find ./mapnik-packaging/osx/out/packages -type d ! -name 'packages' -maxdepth 1 -exec rm -rf {} \;
-
-.PHONY: mbgl test linux build/test/Makefile
+	-rm -rf ./mason_packages

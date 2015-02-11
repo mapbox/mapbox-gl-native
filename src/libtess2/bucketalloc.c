@@ -35,7 +35,7 @@ extern "C" {
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <libtess2/tesselator.h>
+#include "tesselator.h"
 
 //#define CHECK_BOUNDS
 
@@ -59,7 +59,7 @@ struct BucketAlloc
 
 static int CreateBucket( struct BucketAlloc* ba )
 {
-	size_t size;
+	unsigned int size;
 	Bucket* bucket;
 	void* freelist;
 	unsigned char* head;

@@ -1,7 +1,9 @@
 #ifndef MBGL_PLATFORM_LOG
 #define MBGL_PLATFORM_LOG
 
-#include "event.hpp"
+#include <mbgl/platform/event.hpp>
+
+#include <mbgl/util/std.hpp>
 
 #include <memory>
 #include <string>
@@ -19,9 +21,9 @@ public:
 
 class Log {
 private:
-    template <typename T>
-    constexpr static bool includes(const T e, T const *l, const size_t i = 0) {
-        return i >= sizeof l ? false : *(l + i) == e ? true : includes(e, l, i + 1);
+    template <typename T, size_t N>
+    constexpr static bool includes(const T e, const T (&l)[N], const size_t i = 0) {
+        return i < N && (l[i] == e || includes(e, l, i + 1));
     }
 
 public:
@@ -58,7 +60,7 @@ public:
 
     template<typename T, typename ...Args>
     static inline const T &Set(Args&& ...args) {
-        Backend = ::std::unique_ptr<T>(new T(::std::forward<Args>(args)...));
+        Backend = util::make_unique<T>(::std::forward<Args>(args)...);
         return *dynamic_cast<T *>(Backend.get());
     }
 

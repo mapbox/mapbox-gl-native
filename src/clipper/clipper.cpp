@@ -38,7 +38,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <clipper/clipper.hpp>
+#include "clipper.hpp"
 #include <cmath>
 #include <vector>
 #include <algorithm>
@@ -47,6 +47,8 @@
 #include <cstdlib>
 #include <ostream>
 #include <functional>
+
+#pragma GCC diagnostic ignored "-Wshadow"
 
 namespace ClipperLib {
 
@@ -3242,7 +3244,7 @@ void Clipper::BuildResult(Paths &polys)
     int cnt = PointCount(p);
     if (cnt < 2) continue;
     pg.reserve(cnt);
-    for (int i = 0; i < cnt; ++i)
+    for (int j = 0; j < cnt; ++j)
     {
       pg.push_back(p->Pt);
       p = p->Prev;

@@ -1,15 +1,17 @@
 #include <mbgl/mbgl.hpp>
-#include <mbgl/platform/platform.hpp>
 #include <mbgl/util/uv.hpp>
+#include <mbgl/platform/platform.hpp>
+#include <mbgl/platform/default/settings_json.hpp>
+#include <mbgl/platform/default/glfw_view.hpp>
+#include <mbgl/platform/default/log_stderr.hpp>
+#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/default/sqlite_cache.hpp>
 
 #include <signal.h>
 #include <getopt.h>
 #include <fstream>
 #include <sstream>
 
-#include "../common/settings_json.hpp"
-#include "../common/glfw_view.hpp"
-#include "../common/stderr_log.hpp"
 
 GLFWView *view = nullptr;
 
@@ -27,16 +29,32 @@ int main(int argc, char *argv[]) {
     mbgl::Log::Set<mbgl::StderrLogBackend>();
 
     int fullscreen_flag = 0;
+    std::string style;
 
     const struct option long_options[] = {
-        {"fullscreen", no_argument, &fullscreen_flag, 1},
+        {"fullscreen", no_argument, &fullscreen_flag, 'f'},
+        {"style", required_argument, 0, 's'},
         {0, 0, 0, 0}
     };
 
     while (true) {
         int option_index = 0;
-        int c = getopt_long(argc, argv, "f", long_options, &option_index);
-        if (c == -1) break;
+        int opt = getopt_long(argc, argv, "fs:", long_options, &option_index);
+        if (opt == -1) break;
+        switch (opt)
+        {
+        case 0:
+            if (long_options[option_index].flag != 0)
+                break;
+        case 'f':
+            // handle fullscreen_flag
+            break;
+        case 's':
+            style = std::string("asset://") + std::string(optarg);
+        default:
+            break;
+        }
+
     }
 
     // sigint handling
@@ -47,7 +65,10 @@ int main(int argc, char *argv[]) {
     sigaction(SIGINT, &sigIntHandler, NULL);
 
     view = new GLFWView();
-    mbgl::Map map(*view);
+
+    mbgl::SQLiteCache cache("/tmp/mbgl-cache.db");
+    mbgl::DefaultFileSource fileSource(&cache);
+    mbgl::Map map(*view, fileSource);
 
     // Load settings
     mbgl::Settings_JSON settings;
@@ -64,7 +85,10 @@ int main(int argc, char *argv[]) {
     }
 
     // Load style
-    const std::string style = std::string("file://") + uv::cwd() + std::string("/styles/bright/style.json");
+    if (style.empty()) {
+        style = std::string("asset://") + std::string("styles/bright-v7.json");
+    }
+
     map.setStyleURL(style);
 
     int ret = view->run();

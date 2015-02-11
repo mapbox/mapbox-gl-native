@@ -4,7 +4,6 @@
 #include <mbgl/map/tile.hpp>
 
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/util/vec.hpp>
 
 #include <cstdint>
 #include <array>
@@ -29,10 +28,17 @@ public:
     const std::array<uint16_t, 2> getFramebufferDimensions() const;
     float getPixelRatio() const;
 
+    float worldSize() const;
+    float lngX(float lon) const;
+    float latY(float lat) const;
+    std::array<float, 2> locationCoordinate(float lon, float lat) const;
+    void getLonLat(double &lon, double &lat) const;
+
     // Zoom
     float getNormalizedZoom() const;
-    int32_t getIntegerZoom() const;
     double getZoom() const;
+    int32_t getIntegerZoom() const;
+    double getZoomFraction() const;
     double getScale() const;
 
     // Rotation
@@ -63,7 +69,7 @@ private:
     // map position
     double x = 0, y = 0;
     double angle = 0;
-    double scale = std::numeric_limits<double>::infinity();
+    double scale = 1;
 };
 
 }

@@ -1,144 +1,179 @@
-#!/usr/bin/env python
-import optparse
-import os
-import pprint
-import re
-import shlex
-import subprocess
-import sys
+#!/usr/bin/env bash
 
-root_dir = os.path.dirname(__file__)
+set -e
+set -o pipefail
 
-# parse our options
-parser = optparse.OptionParser()
+CONFIG_FILE=$1
 
-parser.add_option("--debug",
-    action="store_true",
-    dest="debug",
-    help="Also build debug build")
+if [ `uname -s` = 'Darwin' ]; then
+    MASON_PLATFORM=${MASON_PLATFORM:-osx}
+fi
 
-parser.add_option("--node",
-    action="store",
-    dest="node",
-    help="Name of the node executable (defaults to node)")
+function finish {
+    >&2 echo -en "\033[0m";
+}
+trap finish EXIT
 
-parser.add_option("--npm",
-    action="store",
-    dest="npm",
-    help="Name of the npm executable (defaults to npm)")
+# Install mason
+. ./scripts/local_mason.sh
 
-parser.add_option("--pkg-config-root",
-    action="store",
-    dest="pkgconfig_root",
-    help="Path to pkg-config directory")
+case ${MASON_PLATFORM} in
+    'ios')
+        SQLITE_VERSION=system
+        LIBUV_VERSION=0.10.28
+        ZLIB_VERSION=system
+        BOOST_VERSION=system
+        ;;
+    'android')
+        SQLITE_VERSION=3.8.8.1
+        LIBPNG_VERSION=1.6.16
+        LIBJPEG_VERSION=v9a
+        OPENSSL_VERSION=1.0.1l
+        LIBCURL_VERSION=7.40.0
+        LIBUV_VERSION=0.11.29
+        ZLIB_VERSION=system
+        BOOST_VERSION=1.57.0
+        NUNICODE_VERSION=1.5.1
+        LIBZIP_VERSION=0.11.2
+        ;;
+    *)
+        GLFW_VERSION=e1ae9af5
+        SQLITE_VERSION=3.8.8.1
+        LIBPNG_VERSION=1.6.16
+        LIBJPEG_VERSION=v9a
+        LIBCURL_VERSION=system
+        LIBUV_VERSION=0.10.28
+        ZLIB_VERSION=system
+        BOOST_VERSION=system
+        NUNICODE_VERSION=1.5.1
+        LIBZIP_VERSION=0.11.2
+        ;;
+esac
 
-parser.add_option("--boost",
-    action="store",
-    dest="boost_root",
-    help="Path to boost (defaults to /usr/local)")
+function abort { >&2 echo -e "\033[1m\033[31m$1\033[0m"; exit 1; }
 
-(options, args) = parser.parse_args()
+if [ -z ${CONFIG_FILE} ]; then
+    abort 'You need to specify an output path for the configuration file'
+fi
 
-def pkg_config(pkg, pkgconfig_root):
-  env = os.environ.copy()
-  if pkgconfig_root:
-    env["PKG_CONFIG_PATH"] = pkgconfig_root
-  env["PKG_CONFIG_ALLOW_SYSTEM_CFLAGS"] = "1"
-  env["PKG_CONFIG_ALLOW_SYSTEM_LIBS"] = "1"
-  cmd = subprocess.Popen(['pkg-config', '--static', '--libs', pkg], stdout=subprocess.PIPE, env=env)
-  libs, ret = cmd.communicate()
-  if (ret): return None
+if [[ ${MASON_PLATFORM} = 'android' && -z ${MASON_ANDROID_ABI} ]]; then
+    abort 'You need to specify an ABI for android platforms'
+fi
 
-  cmd = subprocess.Popen(['pkg-config', '--static', '--cflags', pkg], stdout=subprocess.PIPE, env=env)
-  cflags, ret = cmd.communicate()
-  if (ret): return None
+echo -n "MASON_PLATFORM=${MASON_PLATFORM} "
+if [ ${MASON_PLATFORM} = 'android' ]; then echo -n "MASON_ANDROID_ABI=${MASON_ANDROID_ABI} " ; fi
+echo $0 $@
 
-  return (libs, cflags)
+PYTHON=`which python || abort 'Cannot find python'`
 
-def configure_mbgl(o):
-  if options.boost_root:
-      o['variables']['boost_root'] = options.boost_root
-  else:
-      o['variables']['boost_root'] = '/usr/local'
-  if options.node:
-      o['variables']['node'] = options.node
-  else:
-      o['variables']['node'] = 'node'
-  if options.npm:
-      o['variables']['npm'] = options.npm
-  else:
-      o['variables']['npm'] = 'npm'
-  o['target_defaults']['default_configuration'] = 'Debug' if options.debug else 'Release'
+>&2 echo -en "\033[1m\033[32m* Using "
+>&2 ${PYTHON} --version
+>&2 echo -en "\033[0m";
 
+PKG_CONFIG=`which pkg-config || abort 'Cannot find pkg-config'`
 
-def fix_frameworks(libs):
-  # don't split "-framework Foo"
-  return re.split('(?<!-framework)\s+', libs.strip())
+>&2 echo -en "\033[1m\033[32m* Using pkg-config "
+>&2 ${PKG_CONFIG} --version
+>&2 echo -en "\033[0m";
 
-def configure_glfw3(o):
-  ret = pkg_config('glfw3', options.pkgconfig_root)
-  if not ret:
-      sys.stderr.write('could not find glfw3 with pkg-config')
-      sys.exit(-1)
-  o['variables']['glfw3_libraries'] = fix_frameworks(ret[0])
-  o['variables']['glfw3_cflags'] = ret[1].split()
-
-def configure_uv(o):
-  ret = pkg_config('libuv', options.pkgconfig_root)
-  if not ret:
-      sys.stderr.write('could not find uv with pkg-config')
-      sys.exit(-1)
-  o['variables']['uv_libraries'] = ret[0].split()
-  o['variables']['uv_cflags'] = ret[1].split()
-
-def configure_png(o):
-  ret = pkg_config('libpng', options.pkgconfig_root)
-  if not ret:
-      sys.stderr.write('could not find png with pkg-config')
-      sys.exit(-1)
-  o['variables']['png_libraries'] = ret[0].split()
-  o['variables']['png_cflags'] = ret[1].split()
-
-def configure_curl(o):
-  ret = pkg_config('libcurl', options.pkgconfig_root)
-  if not ret:
-      sys.stderr.write('could not find curl with pkg-config')
-      sys.exit(-1)
-  o['variables']['curl_libraries'] = ret[0].split()
-  o['variables']['curl_cflags'] = ret[1].split()
-
-def configure_sqlite3(o):
-  ret = pkg_config('sqlite3', options.pkgconfig_root)
-  if not ret:
-      sys.stderr.write('could not find sqlite3 with pkg-config')
-      sys.exit(-1)
-  o['variables']['sqlite3_libraries'] = ret[0].split()
-  o['variables']['sqlite3_cflags'] = ret[1].split()
-
-def write(filename, data):
-  filename = os.path.join(root_dir, filename)
-  print "creating ", filename
-  f = open(filename, 'w+')
-  f.write(data)
-
-output = {
-  'variables': { 'python': sys.executable },
-  'target_defaults' : {
-    'include_dirs': [],
-    'libraries': [],
-    'defines': [],
-    'cflags': []
-  }
+function quote_flags {
+    ${PYTHON} -c "import sys, re; print filter(None, re.split('(?<!-framework)\s+', ' '.join(sys.argv[1:])))" "$@"
 }
 
-if __name__ == '__main__':
-  configure_mbgl(output)
-  configure_glfw3(output)
-  configure_uv(output)
-  configure_png(output)
-  configure_curl(output)
-  configure_sqlite3(output)
-  pprint.pprint(output, indent=2)
+LN=$'\n'
 
-  write('config.gypi', "# Do not edit. Generated by the configure script.\n" +
-    pprint.pformat(output, indent=2) + "\n")
+CONFIG="# Do not edit. Generated by the configure script.
+{
+  'target_defaults': {
+    'cflags%': [],
+    'default_configuration': 'Release',
+    'defines': [],
+    'include_dirs': [],
+    'libraries': []
+  },
+  'variables': {
+    'python': '${PYTHON}',
+"
+
+if [ ! -z ${BOOST_VERSION} ]; then
+    mason install boost ${BOOST_VERSION}
+    CONFIG+="    'boost_cflags%': $(quote_flags $(mason cflags boost ${BOOST_VERSION})),"$LN
+    CONFIG+="    'boost_ldflags%': $(quote_flags $(mason ldflags boost ${BOOST_VERSION})),"$LN
+fi
+
+if [ ! -z ${OPENSSL_VERSION} ]; then
+    mason install openssl ${OPENSSL_VERSION}
+    CONFIG+="    'openssl_static_libs%': $(quote_flags $(mason static_libs openssl ${OPENSSL_VERSION})),"$LN
+    CONFIG+="    'openssl_cflags%': $(quote_flags $(mason cflags openssl ${OPENSSL_VERSION})),"$LN
+    CONFIG+="    'openssl_ldflags%': $(quote_flags $(mason ldflags openssl ${OPENSSL_VERSION})),"$LN
+fi
+
+if [ ! -z ${LIBCURL_VERSION} ]; then
+    mason install libcurl ${LIBCURL_VERSION}
+    CONFIG+="    'curl_static_libs%': $(quote_flags $(mason static_libs libcurl ${LIBCURL_VERSION})),"$LN
+    CONFIG+="    'curl_cflags%': $(quote_flags $(mason cflags libcurl ${LIBCURL_VERSION})),"$LN
+    CONFIG+="    'curl_ldflags%': $(quote_flags $(mason ldflags libcurl ${LIBCURL_VERSION})),"$LN
+fi
+
+if [ ! -z ${GLFW_VERSION} ]; then
+    mason install glfw ${GLFW_VERSION}
+    CONFIG+="    'glfw3_static_libs%': $(quote_flags $(mason static_libs glfw ${GLFW_VERSION})),"$LN
+    CONFIG+="    'glfw3_cflags%': $(quote_flags $(mason cflags glfw ${GLFW_VERSION})),"$LN
+    CONFIG+="    'glfw3_ldflags%': $(quote_flags $(mason ldflags glfw ${GLFW_VERSION})),"$LN
+fi
+
+if [ ! -z ${LIBPNG_VERSION} ]; then
+    mason install libpng ${LIBPNG_VERSION}
+    CONFIG+="    'png_static_libs%': $(quote_flags $(mason static_libs libpng ${LIBPNG_VERSION})),"$LN
+    CONFIG+="    'png_cflags%': $(quote_flags $(mason cflags libpng ${LIBPNG_VERSION})),"$LN
+    CONFIG+="    'png_ldflags%': $(quote_flags $(mason ldflags libpng ${LIBPNG_VERSION})),"$LN
+fi
+
+if [ ! -z ${LIBJPEG_VERSION} ]; then
+    mason install jpeg ${LIBJPEG_VERSION}
+    CONFIG+="    'jpeg_static_libs%': $(quote_flags $(mason static_libs jpeg ${LIBJPEG_VERSION})),"$LN
+    CONFIG+="    'jpeg_cflags%': $(quote_flags $(mason cflags jpeg ${LIBJPEG_VERSION})),"$LN
+    CONFIG+="    'jpeg_ldflags%': $(quote_flags $(mason ldflags jpeg ${LIBJPEG_VERSION})),"$LN
+fi
+
+if [ ! -z ${SQLITE_VERSION} ]; then
+    mason install sqlite ${SQLITE_VERSION}
+    CONFIG+="    'sqlite3_static_libs%': $(quote_flags $(mason static_libs sqlite ${SQLITE_VERSION})),"$LN
+    CONFIG+="    'sqlite3_cflags%': $(quote_flags $(mason cflags sqlite ${SQLITE_VERSION})),"$LN
+    CONFIG+="    'sqlite3_ldflags%': $(quote_flags $(mason ldflags sqlite ${SQLITE_VERSION})),"$LN
+fi
+
+if [ ! -z ${LIBUV_VERSION} ]; then
+    mason install libuv ${LIBUV_VERSION}
+    CONFIG+="    'uv_static_libs%': $(quote_flags $(mason static_libs libuv ${LIBUV_VERSION})),"$LN
+    CONFIG+="    'uv_cflags%': $(quote_flags $(mason cflags libuv ${LIBUV_VERSION})),"$LN
+    CONFIG+="    'uv_ldflags%': $(quote_flags $(mason ldflags libuv ${LIBUV_VERSION})),"$LN
+fi
+
+if [ ! -z ${ZLIB_VERSION} ]; then
+    mason install zlib ${ZLIB_VERSION}
+    CONFIG+="    'zlib_static_libs%': $(quote_flags $(mason static_libs zlib ${ZLIB_VERSION})),"$LN
+    CONFIG+="    'zlib_cflags%': $(quote_flags $(mason cflags zlib ${ZLIB_VERSION})),"$LN
+    CONFIG+="    'zlib_ldflags%': $(quote_flags $(mason ldflags zlib ${ZLIB_VERSION})),"$LN
+fi
+
+if [ ! -z ${NUNICODE_VERSION} ]; then
+    mason install nunicode ${NUNICODE_VERSION}
+    CONFIG+="    'nu_static_libs%': $(quote_flags $(mason static_libs nunicode ${NUNICODE_VERSION})),"$LN
+    CONFIG+="    'nu_cflags%': $(quote_flags $(mason cflags nunicode ${NUNICODE_VERSION})),"$LN
+    CONFIG+="    'nu_ldflags%': $(quote_flags $(mason ldflags nunicode ${NUNICODE_VERSION})),"$LN
+fi
+
+if [ ! -z ${LIBZIP_VERSION} ]; then
+    mason install libzip ${LIBZIP_VERSION}
+    CONFIG+="    'zip_static_libs%': $(quote_flags $(mason static_libs libzip ${LIBZIP_VERSION})),"$LN
+    CONFIG+="    'zip_cflags%': $(quote_flags $(mason cflags libzip ${LIBZIP_VERSION})),"$LN
+    CONFIG+="    'zip_ldflags%': $(quote_flags $(mason ldflags libzip ${LIBZIP_VERSION})),"$LN
+fi
+
+CONFIG+="  }
+}
+"
+
+echo "${CONFIG}" > ${CONFIG_FILE}
+cat ${CONFIG_FILE}

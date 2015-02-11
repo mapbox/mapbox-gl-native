@@ -4,7 +4,6 @@
 #include <utility>
 #include <typeinfo>
 #include <type_traits>
-#include <algorithm> // std::move/swap
 #include <stdexcept> // runtime_error
 #include <new> // operator new
 #include <cstddef> // size_t
@@ -35,7 +34,19 @@
 // translates to 100
 #define VARIANT_VERSION (VARIANT_MAJOR_VERSION*100000) + (VARIANT_MINOR_VERSION*100) + (VARIANT_PATCH_VERSION)
 
-namespace mapbox { namespace util { namespace detail {
+namespace mapbox { namespace util {
+
+// static visitor
+template <typename R = void>
+struct static_visitor
+{
+    using result_type = R;
+protected:
+    static_visitor() {}
+    ~static_visitor() {}
+};
+
+namespace detail {
 
 static constexpr std::size_t invalid_value = std::size_t(-1);
 
@@ -110,17 +121,37 @@ struct select_type<0, T, Types...>
     using type = T;
 };
 
-} // namespace detail
 
-// static visitor
-template <typename R = void>
-struct static_visitor
+template <typename T, typename R = void>
+struct enable_if_type { using type = R; };
+
+template <typename F, typename V, typename Enable = void>
+struct result_of_unary_visit
 {
-    using result_type = R;
-protected:
-    static_visitor() {}
-    ~static_visitor() {}
+    using type = typename std::result_of<F(V&)>::type;
 };
+
+template <typename F, typename V>
+struct result_of_unary_visit<F, V, typename enable_if_type<typename F::result_type>::type >
+{
+    using type = typename F::result_type;
+};
+
+template <typename F, typename V, class Enable = void>
+struct result_of_binary_visit
+{
+    using type = typename std::result_of<F(V&,V&)>::type;
+};
+
+
+template <typename F, typename V>
+struct result_of_binary_visit<F, V, typename enable_if_type<typename F::result_type>::type >
+{
+    using type = typename F::result_type;
+};
+
+
+} // namespace detail
 
 
 template <std::size_t arg1, std::size_t ... others>
@@ -226,7 +257,7 @@ struct dispatcher;
 template <typename F, typename V, typename T, typename...Types>
 struct dispatcher<F, V, T, Types...>
 {
-    using result_type = typename F::result_type;
+    using result_type = typename detail::result_of_unary_visit<F, V>::type;
     VARIANT_INLINE static result_type apply_const(V const& v, F f)
     {
         if (v.get_type_index() == sizeof...(Types))
@@ -255,7 +286,7 @@ struct dispatcher<F, V, T, Types...>
 template<typename F, typename V>
 struct dispatcher<F, V>
 {
-    using result_type = typename F::result_type;
+    using result_type = typename detail::result_of_unary_visit<F, V>::type;
     VARIANT_INLINE static result_type apply_const(V const&, F)
     {
         throw std::runtime_error(std::string("unary dispatch: FAIL ") + typeid(V).name());
@@ -274,7 +305,7 @@ struct binary_dispatcher_rhs;
 template <typename F, typename V, typename T0, typename T1, typename...Types>
 struct binary_dispatcher_rhs<F, V, T0, T1, Types...>
 {
-    using result_type = typename F::result_type;
+    using result_type = typename detail::result_of_binary_visit<F, V>::type;
     VARIANT_INLINE static result_type apply_const(V const& lhs, V const& rhs, F f)
     {
         if (rhs.get_type_index() == sizeof...(Types)) // call binary functor
@@ -306,7 +337,7 @@ struct binary_dispatcher_rhs<F, V, T0, T1, Types...>
 template<typename F, typename V, typename T>
 struct binary_dispatcher_rhs<F, V, T>
 {
-    using result_type = typename F::result_type;
+    using result_type = typename detail::result_of_binary_visit<F, V>::type;
     VARIANT_INLINE static result_type apply_const(V const&, V const&, F)
     {
         throw std::runtime_error("binary dispatch: FAIL");
@@ -324,7 +355,7 @@ struct binary_dispatcher_lhs;
 template <typename F, typename V, typename T0, typename T1, typename...Types>
 struct binary_dispatcher_lhs<F, V, T0, T1, Types...>
 {
-    using result_type = typename F::result_type;
+    using result_type = typename detail::result_of_binary_visit<F, V>::type;
     VARIANT_INLINE static result_type apply_const(V const& lhs, V const& rhs, F f)
     {
         if (lhs.get_type_index() == sizeof...(Types)) // call binary functor
@@ -354,7 +385,7 @@ struct binary_dispatcher_lhs<F, V, T0, T1, Types...>
 template<typename F, typename V, typename T>
 struct binary_dispatcher_lhs<F, V, T>
 {
-    using result_type = typename F::result_type;
+    using result_type = typename detail::result_of_binary_visit<F, V>::type;
     VARIANT_INLINE static result_type apply_const(V const&, V const&, F)
     {
         throw std::runtime_error("binary dispatch: FAIL");
@@ -372,7 +403,7 @@ struct binary_dispatcher;
 template <typename F, typename V, typename T, typename...Types>
 struct binary_dispatcher<F, V, T, Types...>
 {
-    using result_type = typename F::result_type;
+    using result_type = typename detail::result_of_binary_visit<F, V>::type;
     VARIANT_INLINE static result_type apply_const(V const& v0, V const& v1, F f)
     {
         if (v0.get_type_index() == sizeof...(Types))
@@ -417,7 +448,7 @@ struct binary_dispatcher<F, V, T, Types...>
 template<typename F, typename V>
 struct binary_dispatcher<F, V>
 {
-    using result_type = typename F::result_type;
+    using result_type = typename detail::result_of_binary_visit<F, V>::type;
     VARIANT_INLINE static result_type apply_const(V const&, V const&, F)
     {
         throw std::runtime_error("binary dispatch: FAIL");
@@ -449,7 +480,7 @@ struct less_comp
 };
 
 template <typename Variant, typename Comp>
-class comparer : public static_visitor<bool>
+class comparer
 {
 public:
     explicit comparer(Variant const& lhs) noexcept
@@ -468,7 +499,7 @@ private:
 
 // operator<< helper
 template <typename Out>
-class printer : public static_visitor<>
+class printer
 {
 public:
     explicit printer(Out & out)
@@ -515,22 +546,13 @@ public:
     VARIANT_INLINE variant(no_init)
         : type_index(detail::invalid_value) {}
 
+    // http://isocpp.org/blog/2012/11/universal-references-in-c11-scott-meyers
     template <typename T, class = typename std::enable_if<
-                         detail::is_valid_type<T, Types...>::value>::type>
-    VARIANT_INLINE explicit variant(T const& val) noexcept
-        : type_index(detail::value_traits<T, Types...>::index)
-    {
-        constexpr std::size_t index = sizeof...(Types) - detail::value_traits<T, Types...>::index - 1;
-        using target_type = typename detail::select_type<index, Types...>::type;
-        new (&data) target_type(val);
-    }
-
-    template <typename T, class = typename std::enable_if<
-                          detail::is_valid_type<T, Types...>::value>::type>
+                          detail::is_valid_type<typename std::remove_reference<T>::type, Types...>::value>::type>
     VARIANT_INLINE variant(T && val) noexcept
-        : type_index(detail::value_traits<T, Types...>::index)
+        : type_index(detail::value_traits<typename std::remove_reference<T>::type, Types...>::index)
     {
-        constexpr std::size_t index = sizeof...(Types) - detail::value_traits<T, Types...>::index - 1;
+        constexpr std::size_t index = sizeof...(Types) - detail::value_traits<typename std::remove_reference<T>::type, Types...>::index - 1;
         using target_type = typename detail::select_type<index, Types...>::type;
         new (&data) target_type(std::forward<T>(val)); // nothrow
     }
@@ -565,7 +587,7 @@ public:
     template <typename T>
     VARIANT_INLINE variant<Types...>& operator=(T && rhs) noexcept
     {
-        variant<Types...> temp(std::move(rhs));
+        variant<Types...> temp(std::forward<T>(rhs));
         swap(*this, temp);
         return *this;
     }
