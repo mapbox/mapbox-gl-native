@@ -173,6 +173,10 @@ android: android-lib-$(ANDROID_ABI)
 android-all: $(ANDROID_ABIS)
 	cd android/java && ./gradlew --parallel-threads=$(JOBS) build
 
+# Full build of GL Core for each architecture, build the Android Library, publish to Maven Central
+android-deploy: $(ANDROID_ABIS)
+	cd android/java/MapboxGLAndroidSDK && chmod ugo+x deploy.sh && ./deploy.sh
+
 
 ##### Maintenace operations ####################################################
 
