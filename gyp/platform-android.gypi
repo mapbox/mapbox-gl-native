@@ -11,6 +11,7 @@
 
       'sources': [
         '../platform/android/log_android.cpp',
+        '../platform/android/asset_root.cpp',
         '../platform/default/string_stdlib.cpp',
         '../platform/default/image.cpp',
         '../platform/default/image_reader.cpp',
