@@ -11,7 +11,7 @@ build/
 *.apk
 
 # Lib assets
-lib/src/main/assets/
+MapboxGLAndroidSDK/src/main/assets/
 
 # Local settings
 local.properties
