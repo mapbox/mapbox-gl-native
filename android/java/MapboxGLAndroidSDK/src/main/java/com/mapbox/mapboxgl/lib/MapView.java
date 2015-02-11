@@ -24,7 +24,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.widget.ArrayAdapter;
 import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
@@ -225,7 +224,7 @@ public class MapView extends SurfaceView {
     }
 
     public void setCenterCoordinate(LonLatZoom centerCoordinate,
-            boolean animated) {
+                                    boolean animated) {
         long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.setLonLatZoom(centerCoordinate, duration);
     }
@@ -233,10 +232,12 @@ public class MapView extends SurfaceView {
     public double getDirection() {
         double direction = -mNativeMapView.getBearing();
 
-        while (direction > 360)
+        while (direction > 360) {
             direction -= 360;
-        while (direction < 0)
+        }
+        while (direction < 0) {
             direction += 360;
+        }
 
         return direction;
     }
@@ -513,7 +514,7 @@ public class MapView extends SurfaceView {
         // Must handle window resizing here.
         @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int width,
-                int height) {
+                                   int height) {
             Log.v(TAG, "surfaceChanged");
             Log.i(TAG, "resize " + format + " " + width + " " + height);
             mNativeMapView.resize((int) (width / mScreenDensity), (int) (height / mScreenDensity), mScreenDensity, width, height);
@@ -588,38 +589,38 @@ public class MapView extends SurfaceView {
 
         // Handle two finger tap
         switch (event.getActionMasked()) {
-        case MotionEvent.ACTION_DOWN:
-            // First pointer down
-            break;
+            case MotionEvent.ACTION_DOWN:
+                // First pointer down
+                break;
 
-        case MotionEvent.ACTION_POINTER_DOWN:
-            // Second pointer down
-            mTwoTap = event.getPointerCount() == 2;
-            break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                // Second pointer down
+                mTwoTap = event.getPointerCount() == 2;
+                break;
 
-        case MotionEvent.ACTION_POINTER_UP:
-            // Second pointer up
-            break;
+            case MotionEvent.ACTION_POINTER_UP:
+                // Second pointer up
+                break;
 
-        case MotionEvent.ACTION_UP:
-            // First pointer up
-            long tapInterval = event.getEventTime() - event.getDownTime();
-            boolean isTap = tapInterval <= ViewConfiguration.getTapTimeout();
-            boolean inProgress = mRotateGestureDetector.isInProgress() || mScaleGestureDetector.isInProgress();
+            case MotionEvent.ACTION_UP:
+                // First pointer up
+                long tapInterval = event.getEventTime() - event.getDownTime();
+                boolean isTap = tapInterval <= ViewConfiguration.getTapTimeout();
+                boolean inProgress = mRotateGestureDetector.isInProgress() || mScaleGestureDetector.isInProgress();
 
-            if (mTwoTap && isTap && !inProgress) {
-                PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
-                zoom(false, focalPoint.x, focalPoint.y);
+                if (mTwoTap && isTap && !inProgress) {
+                    PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
+                    zoom(false, focalPoint.x, focalPoint.y);
+                    mTwoTap = false;
+                    return true;
+                }
+
                 mTwoTap = false;
-                return true;
-            }
+                break;
 
-            mTwoTap = false;
-            break;
-
-        case MotionEvent.ACTION_CANCEL:
-            mTwoTap = false;
-            break;
+            case MotionEvent.ACTION_CANCEL:
+                mTwoTap = false;
+                break;
         }
 
         boolean retVal = mGestureDetector.onTouchEvent(event);
@@ -677,7 +678,7 @@ public class MapView extends SurfaceView {
         // Called for flings
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                float velocityY) {
+                               float velocityY) {
             if (!mScrollEnabled) {
                 return false;
             }
@@ -697,7 +698,7 @@ public class MapView extends SurfaceView {
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
-            mNativeMapView.moveBy(velocityX * duration / 2.0 / mScreenDensity, velocityY * duration / 2.0 / mScreenDensity, (long)(duration * 1000.0f));
+            mNativeMapView.moveBy(velocityX * duration / 2.0 / mScreenDensity, velocityY * duration / 2.0 / mScreenDensity, (long) (duration * 1000.0f));
 
             return true;
         }
@@ -712,7 +713,7 @@ public class MapView extends SurfaceView {
 
             // Cancel any animation
             mNativeMapView.cancelTransitions(); // TODO need to test canceling
-                                                // transitions with touch
+            // transitions with touch
 
             // Scroll the map
             mNativeMapView.moveBy(-distanceX / mScreenDensity, -distanceY / mScreenDensity);
@@ -885,64 +886,64 @@ public class MapView extends SurfaceView {
 
         // Check which key was pressed via hardware/real key code
         switch (keyCode) {
-        // Tell the system to track these keys for long presses on
-        // onKeyLongPress is fired
-        case KeyEvent.KEYCODE_ENTER:
-        case KeyEvent.KEYCODE_DPAD_CENTER:
-            event.startTracking();
-            return true;
+            // Tell the system to track these keys for long presses on
+            // onKeyLongPress is fired
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+                event.startTracking();
+                return true;
 
-        case KeyEvent.KEYCODE_DPAD_LEFT:
-            if (!mScrollEnabled) {
-                return false;
-            }
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                if (!mScrollEnabled) {
+                    return false;
+                }
 
-            // Cancel any animation
-            mNativeMapView.cancelTransitions();
+                // Cancel any animation
+                mNativeMapView.cancelTransitions();
 
-            // Move left
-            mNativeMapView.moveBy(scrollDist / mScreenDensity, 0.0 / mScreenDensity);
-            return true;
+                // Move left
+                mNativeMapView.moveBy(scrollDist / mScreenDensity, 0.0 / mScreenDensity);
+                return true;
 
-        case KeyEvent.KEYCODE_DPAD_RIGHT:
-            if (!mScrollEnabled) {
-                return false;
-            }
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                if (!mScrollEnabled) {
+                    return false;
+                }
 
-            // Cancel any animation
-            mNativeMapView.cancelTransitions();
+                // Cancel any animation
+                mNativeMapView.cancelTransitions();
 
-            // Move right
-            mNativeMapView.moveBy(-scrollDist / mScreenDensity, 0.0 / mScreenDensity);
-            return true;
+                // Move right
+                mNativeMapView.moveBy(-scrollDist / mScreenDensity, 0.0 / mScreenDensity);
+                return true;
 
-        case KeyEvent.KEYCODE_DPAD_UP:
-            if (!mScrollEnabled) {
-                return false;
-            }
+            case KeyEvent.KEYCODE_DPAD_UP:
+                if (!mScrollEnabled) {
+                    return false;
+                }
 
-            // Cancel any animation
-            mNativeMapView.cancelTransitions();
+                // Cancel any animation
+                mNativeMapView.cancelTransitions();
 
-            // Move up
-            mNativeMapView.moveBy(0.0 / mScreenDensity, scrollDist / mScreenDensity);
-            return true;
+                // Move up
+                mNativeMapView.moveBy(0.0 / mScreenDensity, scrollDist / mScreenDensity);
+                return true;
 
-        case KeyEvent.KEYCODE_DPAD_DOWN:
-            if (!mScrollEnabled) {
-                return false;
-            }
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                if (!mScrollEnabled) {
+                    return false;
+                }
 
-            // Cancel any animation
-            mNativeMapView.cancelTransitions();
+                // Cancel any animation
+                mNativeMapView.cancelTransitions();
 
-            // Move down
-            mNativeMapView.moveBy(0.0 / mScreenDensity, -scrollDist / mScreenDensity);
-            return true;
+                // Move down
+                mNativeMapView.moveBy(0.0 / mScreenDensity, -scrollDist / mScreenDensity);
+                return true;
 
-        default:
-            // We are not interested in this key
-            return super.onKeyUp(keyCode, event);
+            default:
+                // We are not interested in this key
+                return super.onKeyUp(keyCode, event);
         }
     }
 
@@ -951,21 +952,21 @@ public class MapView extends SurfaceView {
     public boolean onKeyLongPress(int keyCode, KeyEvent event) {
         // Check which key was pressed via hardware/real key code
         switch (keyCode) {
-        // Tell the system to track these keys for long presses on
-        // onKeyLongPress is fired
-        case KeyEvent.KEYCODE_ENTER:
-        case KeyEvent.KEYCODE_DPAD_CENTER:
-            if (!mZoomEnabled) {
-                return false;
-            }
+            // Tell the system to track these keys for long presses on
+            // onKeyLongPress is fired
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+                if (!mZoomEnabled) {
+                    return false;
+                }
 
-            // Zoom out
-            zoom(false);
-            return true;
+                // Zoom out
+                zoom(false);
+                return true;
 
-        default:
-            // We are not interested in this key
-            return super.onKeyUp(keyCode, event);
+            default:
+                // We are not interested in this key
+                return super.onKeyUp(keyCode, event);
         }
     }
 
@@ -983,15 +984,15 @@ public class MapView extends SurfaceView {
         // Must use the key character map as physical to character is not
         // fixed/guaranteed
         switch (keyCode) {
-        case KeyEvent.KEYCODE_ENTER:
-        case KeyEvent.KEYCODE_DPAD_CENTER:
-            if (!mZoomEnabled) {
-                return false;
-            }
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+                if (!mZoomEnabled) {
+                    return false;
+                }
 
-            // Zoom in
-            zoom(true);
-            return true;
+                // Zoom in
+                zoom(true);
+                return true;
         }
 
         // We are not interested in this key
@@ -1005,58 +1006,58 @@ public class MapView extends SurfaceView {
     public boolean onTrackballEvent(MotionEvent event) {
         // Choose the action
         switch (event.getActionMasked()) {
-        // The trackball was rotated
-        case MotionEvent.ACTION_MOVE:
-            if (!mScrollEnabled) {
-                return false;
-            }
+            // The trackball was rotated
+            case MotionEvent.ACTION_MOVE:
+                if (!mScrollEnabled) {
+                    return false;
+                }
 
-            // Cancel any animation
-            mNativeMapView.cancelTransitions();
+                // Cancel any animation
+                mNativeMapView.cancelTransitions();
 
-            // Scroll the map
-            mNativeMapView.moveBy(-10.0 * event.getX() / mScreenDensity, -10.0 * event.getY() / mScreenDensity);
-            return true;
+                // Scroll the map
+                mNativeMapView.moveBy(-10.0 * event.getX() / mScreenDensity, -10.0 * event.getY() / mScreenDensity);
+                return true;
 
             // Trackball was pushed in so start tracking and tell system we are
             // interested
             // We will then get the up action
-        case MotionEvent.ACTION_DOWN:
-            // Set up a delayed callback to check if trackball is still
-            // After waiting the system long press time out
-            if (mCurrentTrackballLongPressTimeOut != null) {
-                mCurrentTrackballLongPressTimeOut.cancel();
-                mCurrentTrackballLongPressTimeOut = null;
-            }
-            mCurrentTrackballLongPressTimeOut = new TrackballLongPressTimeOut();
-            postDelayed(mCurrentTrackballLongPressTimeOut,
-                    ViewConfiguration.getLongPressTimeout());
-            return true;
+            case MotionEvent.ACTION_DOWN:
+                // Set up a delayed callback to check if trackball is still
+                // After waiting the system long press time out
+                if (mCurrentTrackballLongPressTimeOut != null) {
+                    mCurrentTrackballLongPressTimeOut.cancel();
+                    mCurrentTrackballLongPressTimeOut = null;
+                }
+                mCurrentTrackballLongPressTimeOut = new TrackballLongPressTimeOut();
+                postDelayed(mCurrentTrackballLongPressTimeOut,
+                        ViewConfiguration.getLongPressTimeout());
+                return true;
 
             // Trackball was released
-        case MotionEvent.ACTION_UP:
-            if (!mZoomEnabled) {
-                return false;
-            }
+            case MotionEvent.ACTION_UP:
+                if (!mZoomEnabled) {
+                    return false;
+                }
 
-            // Only handle if we have not already long pressed
-            if (mCurrentTrackballLongPressTimeOut != null) {
-                // Zoom in
-                zoom(true);
-            }
-            return true;
+                // Only handle if we have not already long pressed
+                if (mCurrentTrackballLongPressTimeOut != null) {
+                    // Zoom in
+                    zoom(true);
+                }
+                return true;
 
             // Trackball was cancelled
-        case MotionEvent.ACTION_CANCEL:
-            if (mCurrentTrackballLongPressTimeOut != null) {
-                mCurrentTrackballLongPressTimeOut.cancel();
-                mCurrentTrackballLongPressTimeOut = null;
-            }
-            return true;
+            case MotionEvent.ACTION_CANCEL:
+                if (mCurrentTrackballLongPressTimeOut != null) {
+                    mCurrentTrackballLongPressTimeOut.cancel();
+                    mCurrentTrackballLongPressTimeOut = null;
+                }
+                return true;
 
-        default:
-            // We are not interested in this event
-            return super.onTrackballEvent(event);
+            default:
+                // We are not interested in this event
+                return super.onTrackballEvent(event);
         }
     }
 
@@ -1100,26 +1101,26 @@ public class MapView extends SurfaceView {
         if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) == InputDevice.SOURCE_CLASS_POINTER) {
             // Choose the action
             switch (event.getActionMasked()) {
-            // Mouse scrolls
-            case MotionEvent.ACTION_SCROLL:
-                if (!mZoomEnabled) {
-                    return false;
-                }
+                // Mouse scrolls
+                case MotionEvent.ACTION_SCROLL:
+                    if (!mZoomEnabled) {
+                        return false;
+                    }
 
-                // Cancel any animation
-                mNativeMapView.cancelTransitions();
+                    // Cancel any animation
+                    mNativeMapView.cancelTransitions();
 
-                // Get the vertical scroll amount, one click = 1
-                float scrollDist = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
+                    // Get the vertical scroll amount, one click = 1
+                    float scrollDist = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
 
-                // Scale the map by the appropriate power of two factor
-                mNativeMapView.scaleBy(Math.pow(2.0, scrollDist), event.getX() / mScreenDensity, event.getY() / mScreenDensity);
+                    // Scale the map by the appropriate power of two factor
+                    mNativeMapView.scaleBy(Math.pow(2.0, scrollDist), event.getX() / mScreenDensity, event.getY() / mScreenDensity);
 
-                return true;
+                    return true;
 
-            default:
-                // We are not interested in this event
-                return super.onGenericMotionEvent(event);
+                default:
+                    // We are not interested in this event
+                    return super.onGenericMotionEvent(event);
             }
         }
 
@@ -1132,23 +1133,23 @@ public class MapView extends SurfaceView {
     @Override
     public boolean onHoverEvent(@NonNull MotionEvent event) {
         switch (event.getActionMasked()) {
-        case MotionEvent.ACTION_HOVER_ENTER:
-        case MotionEvent.ACTION_HOVER_MOVE:
-            // Show the zoom controls
-            if ((mZoomButtonsController != null) && mZoomEnabled) {
-                mZoomButtonsController.setVisible(true);
-            }
-            return true;
+            case MotionEvent.ACTION_HOVER_ENTER:
+            case MotionEvent.ACTION_HOVER_MOVE:
+                // Show the zoom controls
+                if ((mZoomButtonsController != null) && mZoomEnabled) {
+                    mZoomButtonsController.setVisible(true);
+                }
+                return true;
 
-        case MotionEvent.ACTION_HOVER_EXIT:
-            // Hide the zoom controls
-            if (mZoomButtonsController != null) {
-                mZoomButtonsController.setVisible(false);
-            }
+            case MotionEvent.ACTION_HOVER_EXIT:
+                // Hide the zoom controls
+                if (mZoomButtonsController != null) {
+                    mZoomButtonsController.setVisible(false);
+                }
 
-        default:
-            // We are not interested in this event
-            return super.onHoverEvent(event);
+            default:
+                // We are not interested in this event
+                return super.onHoverEvent(event);
         }
     }
 
