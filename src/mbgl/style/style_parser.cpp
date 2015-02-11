@@ -4,6 +4,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/vec.hpp>
+#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
@@ -319,7 +320,6 @@ template <> inline float defaultBaseValue<Color>() { return 1.0; }
 
 template <typename T>
 std::tuple<bool, Function<T>> StyleParser::parseFunction(JSVal value, const char *property_name) {
-    
     if (!value.IsObject()) {
         return std::tuple<bool, Function<T>> { true, ConstantFunction<T>(std::get<1>(parseProperty<T>(value, property_name))) };
     }

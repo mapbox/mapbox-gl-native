@@ -416,6 +416,10 @@ void Map::setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration)
     update();
 }
 
+LatLng Map::getLatLng() const {
+    return state.getLatLng();
+}
+
 void Map::startPanning() {
     transform.startPanning();
     update();
