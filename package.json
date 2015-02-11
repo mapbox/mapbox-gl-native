@@ -6,6 +6,8 @@
     "nan": "^1.4.1"
   },
   "devDependencies": {
+    "aws-sdk": "^2.1.9",
+    "mapbox-gl-test-suite": "git://github.com/mapbox/mapbox-gl-test-suite",
     "mkdirp": "^0.5.0",
     "tape": "^3.5.0"
   },

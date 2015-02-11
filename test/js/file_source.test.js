@@ -1,9 +1,9 @@
-/* jshint node: true, unused: false */
 'use strict';
 
-var test = require('tape').test;
+/* jshint node: true */
 
-var mbgl = require('..');
+var test = require('tape');
+var mbgl = require('../..');
 
 test('FileSource', function(t) {
     t.test('constructor', function(t) {

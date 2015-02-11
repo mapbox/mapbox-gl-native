@@ -49,9 +49,16 @@ build/Makefile: $(MBGL)/config/$(HOST).gypi
 $(MBGL)/config/%.gypi: $(MBGL) $(MBGL)/configure
 	make -C $(MBGL) config/$*.gypi
 
+.PHONY: test-suite
+test-suite: build
+	@(`npm bin`/tape test/render.test.js || true)
+
+.PHONY: test-js
+test-js: build
+	@`npm bin`/tape test/js/**/*.test.js
+
 .PHONY: test
-test: build
-	@`npm bin`/tape test/**/*.test.js
+test: test-js test-suite
 
 .PHONY: clean
 clean:

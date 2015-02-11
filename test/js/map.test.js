@@ -1,16 +1,16 @@
-/* jshint node: true, unused: false */
 'use strict';
 
-var test = require('tape').test;
+/* jshint node: true */
 
-var mbgl = require('..');
+var test = require('tape');
+var mbgl = require('../..');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 
 mkdirp.sync('test/results');
 
-var style = require('./fixtures/style.json');
+var style = require('../fixtures/style.json');
 
 function setup(fileSource, callback) {
     callback(new mbgl.Map(fileSource));
