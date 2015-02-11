@@ -141,8 +141,7 @@ TEST_P(HeadlessTest, render) {
             }
         }
 
-        HeadlessView view(display);
-        view.resize(width, height, pixelRatio);
+        HeadlessView view(display, width, height, pixelRatio);
 
         mbgl::DefaultFileSource fileSource(nullptr);
         Map map(view, fileSource, Map::RenderMode::Still);

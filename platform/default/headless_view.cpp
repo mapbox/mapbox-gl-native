@@ -35,17 +35,22 @@ CGLProc CGLGetProcAddress(const char *proc) {
 
 namespace mbgl {
 
-
-HeadlessView::HeadlessView()
+HeadlessView::HeadlessView(uint16_t width, uint16_t height, float pixelRatio)
     : display_(std::make_shared<HeadlessDisplay>()) {
     createContext();
     loadExtensions();
+    resize(width, height, pixelRatio);
 }
 
-HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display)
-    : display_(display) {
+HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display,
+                           uint16_t width, uint16_t height, float pixelRatio)
+    : display_(display),
+      width_(width),
+      height_(height),
+      pixelRatio_(pixelRatio) {
     createContext();
     loadExtensions();
+    resize(width, height, pixelRatio);
 }
 
 void HeadlessView::initialize(Map *map_) {

@@ -40,8 +40,7 @@ int main(int, char *[]) {
     mbgl::DefaultFileSource fileSource(&cache);
 
 
-    HeadlessView view;
-    view.resize(width, height, pixelRatio);
+    HeadlessView view(width, height, pixelRatio);
 
     Map map(view, fileSource, Map::RenderMode::Still);
 

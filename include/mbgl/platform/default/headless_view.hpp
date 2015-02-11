@@ -24,8 +24,8 @@ class HeadlessDisplay;
 
 class HeadlessView : public View {
 public:
-    HeadlessView();
-    HeadlessView(std::shared_ptr<HeadlessDisplay> display);
+    HeadlessView(uint16_t width = 256, uint16_t height = 256, float pixelRatio = 1);
+    HeadlessView(std::shared_ptr<HeadlessDisplay> display, uint16_t width = 256, uint16_t height = 256, float pixelRatio = 1);
     ~HeadlessView();
 
     void createContext();
@@ -46,9 +46,9 @@ private:
 
 private:
     std::shared_ptr<HeadlessDisplay> display_;
-    uint16_t width_;
-    uint16_t height_;
-    float pixelRatio_;
+    uint16_t width_ = 0;
+    uint16_t height_ = 0;
+    float pixelRatio_ = 0;
 
 #if MBGL_USE_CGL
     CGLContextObj glContext;
