@@ -17,17 +17,17 @@ const std::array<std::vector<float>, 4> minScaleArrays = {{
 
 Anchors resample(const std::vector<Coordinate> &vertices, float spacing,
                  const float /*minScale*/, float maxScale, const float tilePixelRatio,
-                 int offset) {
+                 float offset) {
 
     maxScale = std::round(std::fmax(std::fmin(8.0f, maxScale / 2.0f), 1.0f));
     spacing *= tilePixelRatio / maxScale;
-    offset *= tilePixelRatio / maxScale;
+    offset *= tilePixelRatio;
     const size_t index = util::clamp<size_t>(std::floor(std::log(maxScale) / std::log(2)), 0, minScaleArrays.size() - 1);
     const std::vector<float> &minScales = minScaleArrays[index];
     const size_t len = minScales.size();
 
-    float distance = spacing - offset;;
-    float markedDistance = 0.0f;
+    float distance = 0.0f;
+    float markedDistance = offset != 0.0f ? offset - spacing : offset;
     int added = 0;
 
     Anchors points;

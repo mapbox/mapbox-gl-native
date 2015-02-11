@@ -7,7 +7,7 @@
 namespace mbgl {
 
 Anchors resample(const std::vector<Coordinate> &vertices, float spacing,
-                 float minScale, float maxScale, float tilePixelRatio, int offset);
+                 float minScale, float maxScale, float tilePixelRatio, float offset);
 }
 
 #endif
