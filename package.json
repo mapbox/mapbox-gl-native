@@ -1,7 +1,21 @@
 {
   "name": "mbgl",
   "version": "0.0.1",
+  "keywords": [
+    "mapbox",
+    "gl"
+  ],
   "main": "lib/mbgl.node",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mapbox/node-mapbox-gl-native.git"
+  },
+  "licenses": [
+    {
+      "type": "BSD",
+      "url": "https://github.com/mapbox/node-mapbox-gl-native/blob/master/LICENSE.txt"
+    }
+  ],
   "dependencies": {
     "mkdirp": "^0.5.0",
     "mocha": "^2.1.0",
