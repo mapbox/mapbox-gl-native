@@ -2,10 +2,13 @@
 #define MBGL_MAP_VIEW
 
 #include <chrono>
+#include <memory>
+#include <cassert>
 
 namespace mbgl {
 
 class Map;
+class StillImage;
 
 enum MapChange : uint8_t {
     MapChangeRegionWillChange = 0,
@@ -22,7 +25,8 @@ enum MapChange : uint8_t {
 
 class View {
 public:
-    virtual void initialize(Map *map_) {
+    inline virtual void initialize(Map *map_) {
+        assert(!map);
         map = map_;
     }
 
@@ -40,6 +44,10 @@ public:
     virtual void deactivate() = 0;
 
     virtual void notify() = 0;
+
+    // Reads the pixel data from the current framebuffer. If your View implementation
+    // doesn't support reading from the framebuffer, return a null pointer.
+    virtual std::unique_ptr<StillImage> readStillImage();
 
     // Notifies a watcher of map x/y/scale/rotation changes.
     // Must only be called from the same thread that caused the change.

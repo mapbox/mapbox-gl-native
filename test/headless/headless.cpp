@@ -1,7 +1,8 @@
 #include "../fixtures/util.hpp"
-#include "../fixtures/fixture_log.hpp"
+#include <mbgl/platform/default/log_stderr.hpp>
 
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/still_image.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/std.hpp>
 
@@ -16,6 +17,8 @@
 #include <mbgl/storage/default_file_source.hpp>
 
 #include <dirent.h>
+
+#include <uv.h>
 
 void rewriteLocalScheme(rapidjson::Value &value, rapidjson::Document::AllocatorType &allocator) {
     ASSERT_TRUE(value.IsString());
@@ -101,7 +104,7 @@ TEST_P(HeadlessTest, render) {
     ASSERT_FALSE(infoDoc.HasParseError());
     ASSERT_TRUE(infoDoc.IsObject());
 
-    Log::Set<FixtureLogBackend>();
+    Log::Set<StderrLogBackend>();
 
     Log::Info(Event::General, "test fixture %s", base.c_str());
 
@@ -117,7 +120,7 @@ TEST_P(HeadlessTest, render) {
 
         if (value.HasMember("center")) ASSERT_TRUE(value["center"].IsArray());
 
-        const std::string actual_image = "test/suite/tests/" + base + "/" + name +  "/actual.png";
+        static const std::string actual_image = "test/suite/tests/" + base + "/" + name +  "/actual.png";
 
         const double zoom = value.HasMember("zoom") ? value["zoom"].GetDouble() : 0;
         const double bearing = value.HasMember("bearing") ? value["bearing"].GetDouble() : 0;
@@ -139,26 +142,36 @@ TEST_P(HeadlessTest, render) {
         }
 
         HeadlessView view(display);
+        view.resize(width, height, pixelRatio);
+
         mbgl::DefaultFileSource fileSource(nullptr);
-        Map map(view, fileSource);
+        Map map(view, fileSource, Map::RenderMode::Still);
 
         map.setClasses(classes);
         map.setStyleJSON(style, "test/suite");
 
-        view.resize(width, height, pixelRatio);
         map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
         map.setBearing(bearing);
 
-        // Run the loop. It will terminate when we don't have any further listeners.
-        map.run();
 
-        const unsigned int w = width * pixelRatio;
-        const unsigned int h = height * pixelRatio;
+        uv_async_t *async = new uv_async_t;
+        uv_async_init(uv_default_loop(), async, [](uv_async_t *as, int) {
+            std::unique_ptr<const StillImage> image(reinterpret_cast<const StillImage *>(as->data));
+            uv_close(reinterpret_cast<uv_handle_t *>(as), [](uv_handle_t *handle) {
+                delete reinterpret_cast<uv_async_t *>(handle);
+            });
 
-        auto pixels = view.readPixels();
+            const std::string png = util::compress_png(image->width, image->height, image->pixels.get());
+            util::write_file(actual_image, png);
+        });
 
-        const std::string image = util::compress_png(w, h, pixels.get());
-        util::write_file(actual_image, image);
+        map.renderStill([async](std::unique_ptr<const StillImage> image) {
+            async->data = const_cast<StillImage *>(image.release());
+            uv_async_send(async);
+        });
+
+        // This loop will terminate once the async was fired.
+        uv_run(uv_default_loop(), UV_RUN_DEFAULT);
     }
 }
 

@@ -58,8 +58,7 @@ void Source::load(Map& map, FileSource& fileSource) {
         source->info.parseTileJSONProperties(d);
         source->loaded = true;
 
-        map.update();
-
+        map.rerender();
     });
 }
 

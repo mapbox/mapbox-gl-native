@@ -8,13 +8,13 @@
       'type': 'executable',
 
       'dependencies': [
-        '../mbgl.gyp:core',
-        '../mbgl.gyp:platform-<(platform_lib)',
-        '../mbgl.gyp:headless-<(headless_lib)',
-        '../mbgl.gyp:http-<(http_lib)',
-        '../mbgl.gyp:asset-<(asset_lib)',
-        '../mbgl.gyp:cache-<(cache_lib)',
-        '../mbgl.gyp:copy_certificate_bundle',
+        'core',
+        'platform-<(platform_lib)',
+        'headless-<(headless_lib)',
+        'http-<(http_lib)',
+        'asset-<(asset_lib)',
+        'cache-<(cache_lib)',
+        'copy_certificate_bundle',
       ],
 
       'include_dirs': [
@@ -28,15 +28,18 @@
       'variables' : {
         'cflags_cc': [
           '<@(glfw3_cflags)',
+          '<@(uv_cflags)',
           '<@(boost_cflags)',
         ],
         'ldflags': [
           '<@(glfw3_ldflags)',
+          '<@(uv_ldflags)',
           '<@(boost_ldflags)',
           '-lboost_program_options'
         ],
         'libraries': [
           '<@(glfw3_static_libs)',
+          '<@(uv_static_libs)',
         ],
       },
 

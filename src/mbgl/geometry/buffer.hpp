@@ -40,6 +40,9 @@ public:
     void bind(bool force = false) {
         if (buffer == 0) {
             MBGL_CHECK_ERROR(glGenBuffers(1, &buffer));
+            if (!buffer) {
+                throw std::runtime_error("Could not generate OpenGL buffer");
+            }
             force = true;
         }
         MBGL_CHECK_ERROR(glBindBuffer(bufferType, buffer));

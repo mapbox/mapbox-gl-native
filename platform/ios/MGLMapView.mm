@@ -236,10 +236,10 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     // setup mbgl map
     //
     mbglView = new MBGLView(self);
+    mbglView->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor, _glView.drawableWidth, _glView.drawableHeight);
     mbglFileCache  = new mbgl::SQLiteCache(defaultCacheDatabase());
     mbglFileSource = new mbgl::DefaultFileSource(mbglFileCache);
     mbglMap = new mbgl::Map(*mbglView, *mbglFileSource);
-    mbglMap->resize(self.bounds.size.width, self.bounds.size.height, _glView.contentScaleFactor, _glView.drawableWidth, _glView.drawableHeight);
 
     // Notify map object when network reachability status changes.
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -489,7 +489,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    mbglMap->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
+    mbglView->resize(rect.size.width, rect.size.height, view.contentScaleFactor, view.drawableWidth, view.drawableHeight);
 }
 
 - (void)layoutSubviews
@@ -1578,15 +1578,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     return resourceBundlePath;
 }
 
-- (void)swap
-{
-    if (mbglMap->needsSwap())
-    {
-        [self.glView display];
-        mbglMap->swapped();
-    }
-}
-
 class MBGLView : public mbgl::View
 {
     public:
@@ -1621,6 +1612,11 @@ class MBGLView : public mbgl::View
         }
     }
 
+    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight) {
+        View::resize(width, height, ratio, fbWidth, fbHeight);
+    }
+
+
     void activate()
     {
         [EAGLContext setCurrentContext:nativeView.context];
@@ -1633,9 +1629,7 @@ class MBGLView : public mbgl::View
 
     void swap()
     {
-        [nativeView performSelectorOnMainThread:@selector(swap)
-                                     withObject:nil
-                                  waitUntilDone:NO];
+        [nativeView.glView display];
     }
 
     private:

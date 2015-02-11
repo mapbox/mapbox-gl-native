@@ -2,6 +2,7 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/map/source.hpp>
+#include <mbgl/map/still_image.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/util/transition.hpp>
@@ -25,6 +26,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/exception.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -56,43 +58,45 @@ const static bool uvVersionCheck = []() {
 
 using namespace mbgl;
 
-Map::Map(View& view_, FileSource& fileSource_)
-    : loop(util::make_unique<uv::loop>()),
-      view(view_),
-#ifdef DEBUG
-      mainThread(std::this_thread::get_id()),
-      mapThread(mainThread),
-#endif
-      transform(view_),
+Map::Map(View& view_, FileSource& fileSource_, RenderMode mode_)
+    : view(view_),
       fileSource(fileSource_),
-      glyphAtlas(util::make_unique<GlyphAtlas>(1024, 1024)),
-      glyphStore(std::make_shared<GlyphStore>(fileSource)),
-      spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
-      lineAtlas(util::make_unique<LineAtlas>(512, 512)),
-      texturePool(std::make_shared<TexturePool>()),
-      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas))
+      renderMode(mode_),
+      loop(util::make_unique<uv::loop>()),
+      uiThread(std::this_thread::get_id()),
+      transform(view_),
+      active(false)
 {
+    // Setup async notifications
+    asyncTerminate = util::make_unique<uv::async>(**loop, [this]() { terminate(); });
+    asyncUpdate = util::make_unique<uv::async>(**loop, [this]() { updated(); });
+
+    // Initialize the OpenGL context
     view.initialize(this);
-    // Make sure that we're doing an initial drawing in all cases.
-    isClean.clear();
-    isRendered.clear();
-    isSwapped.test_and_set();
+
+    // Start the Map thread
+    thread = std::thread([this]() { run(); });
 }
 
 Map::~Map() {
-    if (mode == Mode::Continuous) {
-        stop();
-    }
+    assert(inUIThread());
 
-    // Explicitly reset all pointers.
-    activeSources.clear();
-    sprite.reset();
-    glyphStore.reset();
-    style.reset();
-    texturePool.reset();
-    workers.reset();
+    assert(asyncTerminate);
+    asyncTerminate->send();
 
-    uv_run(**loop, UV_RUN_DEFAULT);
+    thread.join();
+
+    // Make sure that all of these are empty.
+    assert(!sprite);
+    assert(!style);
+    assert(activeSources.empty());
+    assert(!workers);
+    assert(!painter);
+    assert(!texturePool);
+    assert(!lineAtlas);
+    assert(!spriteAtlas);
+    assert(!glyphStore);
+    assert(!glyphAtlas);
 }
 
 uv::worker &Map::getWorker() {
@@ -100,256 +104,237 @@ uv::worker &Map::getWorker() {
     return *workers;
 }
 
-void Map::start(bool startPaused) {
-    assert(std::this_thread::get_id() == mainThread);
-    assert(mode == Mode::None);
-
-    // When starting map rendering in another thread, we perform async/continuously
-    // updated rendering. Only in these cases, we attach the async handlers.
-    mode = Mode::Continuous;
-
-    // Reset the flag.
-    isStopped = false;
-
-    // Setup async notifications
-    asyncTerminate = util::make_unique<uv::async>(**loop, [this]() {
-        assert(std::this_thread::get_id() == mapThread);
-
-        // Remove all of these to make sure they are destructed in the correct thread.
-        style.reset();
-        workers.reset();
-        activeSources.clear();
-
-        terminating = true;
-
-        // Closes all open handles on the loop. This means that the loop will automatically terminate.
-        asyncRender.reset();
-        asyncTerminate.reset();
-    });
-
-    asyncRender = util::make_unique<uv::async>(**loop, [this]() {
-        assert(std::this_thread::get_id() == mapThread);
-
-        if (state.hasSize()) {
-            if (isRendered.test_and_set() == false) {
-                prepare();
-                if (isClean.test_and_set() == false) {
-                    render();
-                    isSwapped.clear();
-                    view.swap();
-                } else {
-                    // We set the rendered flag in the test above, so we have to reset it
-                    // now that we're not actually rendering because the map is clean.
-                    isRendered.clear();
-                }
-            }
-        }
-    });
-
-    // Do we need to pause first?
-    if (startPaused) {
-        pause();
-    }
-
-    thread = std::thread([this]() {
-#ifdef DEBUG
-        mapThread = std::this_thread::get_id();
-#endif
-
-#ifdef __APPLE__
-        pthread_setname_np("Map");
-#endif
-
-        run();
-
-#ifdef DEBUG
-        mapThread = std::thread::id();
-#endif
-
-        // Make sure that the stop() function knows when to stop invoking the callback function.
-        isStopped = true;
-        view.notify();
-    });
+bool Map::inUIThread() const {
+    return std::this_thread::get_id() == uiThread;
 }
 
-void Map::stop(std::function<void ()> callback) {
-    assert(std::this_thread::get_id() == mainThread);
-    assert(mainThread != mapThread);
-    assert(mode == Mode::Continuous);
-
-    asyncTerminate->send();
-
-    resume();
-
-    if (callback) {
-        // Wait until the render thread stopped. We are using this construct instead of plainly
-        // relying on the thread_join because the system might need to run things in the current
-        // thread that is required for the render thread to terminate correctly. This is for example
-        // the case with Cocoa's NSURLRequest. Otherwise, we will eventually deadlock because this
-        // thread (== main thread) is blocked. The callback function should use an efficient waiting
-        // function to avoid a busy waiting loop.
-        while (!isStopped) {
-            callback();
-        }
-    }
-
-    // If a callback function was provided, this should return immediately because the thread has
-    // already finished executing.
-    thread.join();
-
-    mode = Mode::None;
+bool Map::inMapThread() const {
+    return std::this_thread::get_id() == mapThread;
 }
 
-void Map::pause(bool waitForPause) {
-    assert(std::this_thread::get_id() == mainThread);
-    assert(mode == Mode::Continuous);
-    mutexRun.lock();
-    pausing = true;
-    mutexRun.unlock();
+void Map::start() {
+    assert(inUIThread());
+    assert(renderMode == RenderMode::Continuous);
+    assert(!active);
 
-    uv_stop(**loop);
-    rerender(); // Needed to ensure uv_stop is seen and uv_run exits, otherwise we deadlock on wait_for_pause
+    active = true;
 
-    if (waitForPause) {
-        std::unique_lock<std::mutex> lockPause (mutexPause);
-        while (!isPaused) {
-            condPause.wait(lockPause);
-        }
-    }
+    update();
+
+    // TODO: Send a notification to the thread to start rendering.
 }
 
-void Map::resume() {
-    assert(std::this_thread::get_id() == mainThread);
-    assert(mode == Mode::Continuous);
+void Map::stop() {
+    assert(inUIThread());
+    assert(renderMode == RenderMode::Continuous);
+    assert(active);
 
-    mutexRun.lock();
-    pausing = false;
-    condRun.notify_all();
-    mutexRun.unlock();
+    active = false;
+
+    // TODO: Send a notification to the thread to stop rendering.
+}
+
+void Map::renderStill(StillImageCallback fn) {
+    assert(inUIThread());
+    assert(renderMode == RenderMode::Still);
+    assert(!active);
+    assert(!callback);
+
+    callback = std::move(fn);
+
+    active = true;
+
+    update();
+}
+
+// Triggers a refresh of the map based on changed UI state, e.g. the user moved the map viewport,
+// or changed any other externally accessible value of the Map object.
+void Map::update() {
+    assert(asyncUpdate);
+    asyncUpdate->send();
+}
+
+// Triggers a refresh of the map, following an updated bit of information the library itself
+// triggered. This may be the availabilty of a new tile.
+void Map::rerender() {
+    assert(inMapThread());
+    assert(asyncUpdate);
+    if (renderMode == RenderMode::Still) {
+        // Make sure the loop actually stays alive for the asyncUpdate callback to be invoked.
+        asyncUpdate->ref();
+    }
+    asyncUpdate->send();
 }
 
 void Map::run() {
-    if (mode == Mode::None) {
-#ifdef DEBUG
-        mapThread = mainThread;
+    mapThread = std::this_thread::get_id();
+
+#ifdef __APPLE__
+    pthread_setname_np("Map");
 #endif
-        mode = Mode::Static;
-    }
-    assert(std::this_thread::get_id() == mapThread);
-
-    if (mode == Mode::Continuous) {
-        checkForPause();
-    }
-
-    if (!style && styleURL.empty()) {
-        throw exception("Style is not set");
-    }
 
     view.activate();
 
+    glyphAtlas = util::make_unique<GlyphAtlas>(1024, 1024);
+    glyphStore = std::make_shared<GlyphStore>(fileSource);
+    spriteAtlas = util::make_unique<SpriteAtlas>(512, 512);
+    lineAtlas = util::make_unique<LineAtlas>(512, 512);
+    texturePool = std::make_shared<TexturePool>();
+    painter = util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas);
     workers = util::make_unique<uv::worker>(**loop, 4, "Tile Worker");
 
     setup();
-    prepare();
 
-    if (mode == Mode::Continuous) {
-        terminating = false;
-        while(!terminating) {
-            uv_run(**loop, UV_RUN_DEFAULT);
-            checkForPause();
-        }
+    if (renderMode == RenderMode::Continuous) {
+        runContinuous();
+    } else if (renderMode == RenderMode::Still) {
+        runStillImage();
     } else {
-        uv_run(**loop, UV_RUN_DEFAULT);
+        abort();
     }
 
-    // Run the event loop once more to make sure our async delete handlers are called.
-    uv_run(**loop, UV_RUN_ONCE);
-
-    // If the map rendering wasn't started asynchronously, we perform one render
-    // *after* all events have been processed.
-    if (mode == Mode::Static) {
-        render();
-#ifdef DEBUG
-        mapThread = std::thread::id();
-#endif
-        mode = Mode::None;
-    }
+    sprite.reset();
+    style.reset();
+    activeSources.clear();
+    workers.reset();
+    painter.reset();
+    texturePool.reset();
+    lineAtlas.reset();
+    spriteAtlas.reset();
+    glyphStore.reset();
+    glyphAtlas.reset();
 
     view.deactivate();
 }
 
-void Map::checkForPause() {
-    std::unique_lock<std::mutex> lockRun (mutexRun);
-    while (pausing) {
-        view.deactivate();
+void Map::updated() {
+    assert(inMapThread());
 
-        mutexPause.lock();
-        isPaused = true;
-        condPause.notify_all();
-        mutexPause.unlock();
-
-        condRun.wait(lockRun);
-
-        view.activate();
+    if (renderMode == RenderMode::Continuous) {
+        updatedContinuous();
+    } else if (renderMode == RenderMode::Still) {
+        updatedStillImage();
+    } else {
+        abort();
     }
-
-    mutexPause.lock();
-    isPaused = false;
-    mutexPause.unlock();
 }
 
-void Map::rerender() {
-    if (mode == Mode::Static) {
+void Map::runContinuous() {
+    assert(inMapThread());
+
+    // This loop will terminate once we Map object's destructor gets called and sends the
+    // asyncTerminate signal.
+    uv_run(**loop, UV_RUN_DEFAULT);
+}
+
+void Map::updatedContinuous() {
+    if (active) {
         prepare();
-    } else if (mode == Mode::Continuous) {
-        // We only send render events if we want to continuously update the map
-        // (== async rendering).
-        if (asyncRender) {
-            asyncRender->send();
+        render();
+        view.swap();
+    }
+}
+
+void Map::runStillImage() {
+    assert(inMapThread());
+
+    // When rendering still images, the Map event loop will terminate after every map image. However,
+    // the map thread stays alive, so we are restarting the event loop after every map image.
+    while (true) {
+        uv_run(**loop, UV_RUN_DEFAULT);
+
+        // After the loop terminated, these async handles may have been deleted if the terminate()
+        // callback was fired. In this case, we are exiting the loop.
+        if (asyncTerminate && asyncUpdate) {
+            // Otherwise, loop termination means that we have acquired and parsed all resources
+            // required for this map image and we can now proceed to rendering.
+            render();
+            auto image = view.readStillImage();
+
+            // We are moving the callback out of the way and empty it in case the callback function
+            // starts the next map image render.
+            assert(callback);
+            StillImageCallback cb;
+            std::swap(cb, callback);
+            active = false;
+
+            // Now we can finally invoke the callback function with the map image we rendered.
+            cb(std::move(image));
+
+            // To prepare for the next event loop run, we have to make sure the async handles keep
+            // the loop alive.
+            asyncUpdate->ref();
+            asyncTerminate->ref();
+        } else {
+            break;
         }
     }
 }
 
-void Map::update() {
-    isClean.clear();
-    rerender();
-}
+void Map::updatedStillImage() {
+    if (active) {
+        // Those two async handles are keeping the event loop alive. However, we want it to
+        // terminate after everything that is required for this image is loaded so we can do a final
+        // render. Hence, we unref these handles so that the loop can terminate. Whenever something
+        // calls rerender(), we are ref()ing the asyncUpdate handle to make sure the loop stays
+        // alive and the asyncUpdate callback is actually fired.
+        asyncUpdate->unref();
+        asyncTerminate->unref();
 
-bool Map::needsSwap() {
-    return isSwapped.test_and_set() == false;
-}
-
-void Map::swapped() {
-    isRendered.clear();
-    rerender();
+        prepare();
+    }
 }
 
 void Map::terminate() {
-    assert(painter);
-    painter->terminate();
-    view.deactivate();
+    assert(inMapThread());
+
+    assert(asyncUpdate);
+    assert(asyncTerminate);
+
+    // Closes all open handles on the loop. This means that the loop will automatically terminate.
+    asyncUpdate.reset();
+    asyncTerminate.reset();
 }
 
 #pragma mark - Setup
 
 void Map::setup() {
-    assert(std::this_thread::get_id() == mapThread);
+    assert(inMapThread());
     assert(painter);
     painter->setup();
 }
 
 void Map::setStyleURL(const std::string &url) {
-    // TODO: Make threadsafe.
-
+    assert(inUIThread());
     styleURL = url;
-    if (mode == Mode::Continuous) {
-        stop();
-        start();
-    }
+
+    update();
+}
+
+void Map::loadStyleURL() {
+    // TODO: figure out what thread this may be called from
+    sprite.reset();
+    style = std::make_shared<Style>();
+
+    fileSource.request({ Resource::Kind::JSON, styleURL}, **loop, [&](const Response &res) {
+        if (res.status == Response::Successful) {
+            // Calculate the base
+            const size_t pos = styleURL.rfind('/');
+            std::string base = "";
+            if (pos != std::string::npos) {
+                base = styleURL.substr(0, pos + 1);
+            }
+
+            setStyleJSON(res.data, base);
+        } else {
+            Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
+        }
+    });
 }
 
 
 void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
+    // TODO: figure out what thread this may be called from
     // TODO: Make threadsafe.
     styleJSON.swap(newStyleJSON);
     sprite.reset();
@@ -362,13 +347,13 @@ void Map::setStyleJSON(std::string newStyleJSON, const std::string &base) {
     style->cascadeClasses(classes);
     style->setDefaultTransitionDuration(defaultTransitionDuration);
 
-    const std::string glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
-    glyphStore->setURL(glyphURL);
+    glyphURL = util::mapbox::normalizeGlyphsURL(style->glyph_url, getAccessToken());
 
     update();
 }
 
 std::string Map::getStyleJSON() const {
+    assert(inUIThread());
     return styleJSON;
 }
 
@@ -385,11 +370,8 @@ util::ptr<Sprite> Map::getSprite() {
 
 #pragma mark - Size
 
-void Map::resize(uint16_t width, uint16_t height, float ratio) {
-    resize(width, height, ratio, width * ratio, height * ratio);
-}
-
 void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight) {
+    // This may be called from the UI and Map thread.
     if (transform.resize(width, height, ratio, fbWidth, fbHeight)) {
         update();
     }
@@ -398,6 +380,7 @@ void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth,
 #pragma mark - Transitions
 
 void Map::cancelTransitions() {
+    assert(inUIThread());
     transform.cancelTransitions();
 
     update();
@@ -407,26 +390,36 @@ void Map::cancelTransitions() {
 #pragma mark - Position
 
 void Map::moveBy(double dx, double dy, std::chrono::steady_clock::duration duration) {
+    assert(inUIThread());
     transform.moveBy(dx, dy, duration);
     update();
 }
 
 void Map::setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration) {
+    assert(inUIThread());
     transform.setLatLng(latLng, duration);
     update();
 }
 
+const LatLng getLatLng() const {
+    assert(inUIThread());
+    return state.getLatLng();
+}
+
 void Map::startPanning() {
+    assert(inUIThread());
     transform.startPanning();
     update();
 }
 
 void Map::stopPanning() {
+    assert(inUIThread());
     transform.stopPanning();
     update();
 }
 
 void Map::resetPosition() {
+    assert(inUIThread());
     transform.setAngle(0);
     transform.setLatLng(LatLng(0, 0));
     transform.setZoom(0);
@@ -437,52 +430,63 @@ void Map::resetPosition() {
 #pragma mark - Scale
 
 void Map::scaleBy(double ds, double cx, double cy, std::chrono::steady_clock::duration duration) {
+    assert(inUIThread());
     transform.scaleBy(ds, cx, cy, duration);
     update();
 }
 
 void Map::setScale(double scale, double cx, double cy, std::chrono::steady_clock::duration duration) {
+    assert(inUIThread());
     transform.setScale(scale, cx, cy, duration);
     update();
 }
 
 double Map::getScale() const {
+    assert(inUIThread());
     return transform.getScale();
 }
 
 void Map::setZoom(double zoom, std::chrono::steady_clock::duration duration) {
+    assert(inUIThread());
     transform.setZoom(zoom, duration);
     update();
 }
 
 double Map::getZoom() const {
+    assert(inUIThread());
     return transform.getZoom();
 }
 
 void Map::setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration) {
+    assert(inUIThread());
     transform.setLatLngZoom(latLng, zoom, duration);
     update();
 }
 
 void Map::resetZoom() {
+    assert(inUIThread());
     setZoom(0);
 }
 
 void Map::startScaling() {
+    assert(inUIThread());
     transform.startScaling();
     update();
 }
 
 void Map::stopScaling() {
+    assert(inUIThread());
     transform.stopScaling();
     update();
 }
 
 double Map::getMinZoom() const {
+    // TODO: figure out what thread this may be called from
     return transform.getMinZoom();
 }
 
 double Map::getMaxZoom() const {
+    // TODO: figure out what thread this may be called from
     return transform.getMaxZoom();
 }
 
@@ -490,35 +494,42 @@ double Map::getMaxZoom() const {
 #pragma mark - Rotation
 
 void Map::rotateBy(double sx, double sy, double ex, double ey, std::chrono::steady_clock::duration duration) {
+    assert(inUIThread());
     transform.rotateBy(sx, sy, ex, ey, duration);
     update();
 }
 
 void Map::setBearing(double degrees, std::chrono::steady_clock::duration duration) {
+    assert(inUIThread());
     transform.setAngle(-degrees * M_PI / 180, duration);
     update();
 }
 
 void Map::setBearing(double degrees, double cx, double cy) {
+    assert(inUIThread());
     transform.setAngle(-degrees * M_PI / 180, cx, cy);
     update();
 }
 
 double Map::getBearing() const {
+    assert(inUIThread());
     return -transform.getAngle() / M_PI * 180;
 }
 
 void Map::resetNorth() {
+    assert(inUIThread());
     transform.setAngle(0, std::chrono::milliseconds(500));
     update();
 }
 
 void Map::startRotating() {
+    assert(inUIThread());
     transform.startRotating();
     update();
 }
 
 void Map::stopRotating() {
+    assert(inUIThread());
     transform.stopRotating();
     update();
 }
@@ -526,6 +537,7 @@ void Map::stopRotating() {
 #pragma mark - Access Token
 
 void Map::setAccessToken(const std::string &token) {
+    assert(inUIThread());
     accessToken = token;
 }
 
@@ -536,6 +548,7 @@ const std::string &Map::getAccessToken() const {
 #pragma mark - Toggles
 
 void Map::setDebug(bool value) {
+    assert(inUIThread());
     debug = value;
     assert(painter);
     painter->setDebug(debug);
@@ -543,10 +556,12 @@ void Map::setDebug(bool value) {
 }
 
 void Map::toggleDebug() {
+    assert(inUIThread());
     setDebug(!debug);
 }
 
 bool Map::getDebug() const {
+    assert(inUIThread());
     return debug;
 }
 
@@ -562,6 +577,7 @@ void Map::addClass(const std::string& klass) {
 }
 
 void Map::removeClass(const std::string& klass) {
+    assert(inUIThread());
     if (!hasClass(klass)) return;
     classes.erase(std::remove(classes.begin(), classes.end(), klass), classes.end());
     if (style) {
@@ -573,6 +589,7 @@ void Map::removeClass(const std::string& klass) {
 }
 
 void Map::setClasses(const std::vector<std::string>& classes_) {
+    assert(inUIThread());
     classes = classes_;
     if (style) {
         style->cascadeClasses(classes);
@@ -583,14 +600,17 @@ void Map::setClasses(const std::vector<std::string>& classes_) {
 }
 
 bool Map::hasClass(const std::string& klass) const {
+    assert(inUIThread());
     return std::find(classes.begin(), classes.end(), klass) != classes.end();
 }
 
 std::vector<std::string> Map::getClasses() const {
+    assert(inUIThread());
    return classes;
 }
 
 void Map::setDefaultTransitionDuration(std::chrono::steady_clock::duration duration) {
+    assert(inUIThread());
     defaultTransitionDuration = duration;
     if (style) {
         style->setDefaultTransitionDuration(duration);
@@ -598,11 +618,12 @@ void Map::setDefaultTransitionDuration(std::chrono::steady_clock::duration durat
 }
 
 std::chrono::steady_clock::duration Map::getDefaultTransitionDuration() {
+    assert(inUIThread());
     return defaultTransitionDuration;
 }
 
 void Map::updateSources() {
-    assert(std::this_thread::get_id() == mapThread);
+    assert(inMapThread());
 
     // First, disable all existing sources.
     for (const auto& source : activeSources) {
@@ -647,28 +668,18 @@ void Map::updateTiles() {
         source->source->update(*this, getWorker(),
                                style, *glyphAtlas, *glyphStore,
                                *spriteAtlas, getSprite(),
-                               *texturePool, fileSource, ***loop, [this](){ update(); });
+                               *texturePool, fileSource, ***loop, [this](){ rerender(); });
     }
 }
 
 void Map::prepare() {
-    if (!style) {
-        style = std::make_shared<Style>();
+    if (!style && !styleURL.empty()) {
+        loadStyleURL();
+    }
 
-        fileSource.request({ Resource::Kind::JSON, styleURL}, **loop, [&](const Response &res) {
-            if (res.status == Response::Successful) {
-                // Calculate the base
-                const size_t pos = styleURL.rfind('/');
-                std::string base = "";
-                if (pos != std::string::npos) {
-                    base = styleURL.substr(0, pos + 1);
-                }
-
-                setStyleJSON(res.data, base);
-            } else {
-                Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
-            }
-        });
+    if (!glyphURL.empty()) {
+        glyphStore->setURL(glyphURL);
+        glyphURL.clear();
     }
 
     // Update transform transitions.
@@ -692,8 +703,8 @@ void Map::prepare() {
 
 void Map::render() {
     assert(painter);
-    painter->render(*style, activeSources,
-                    state, animationTime);
+    painter->render(*style, activeSources, state, animationTime);
+
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
         update();

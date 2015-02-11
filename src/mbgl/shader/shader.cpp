@@ -88,6 +88,7 @@ Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSo
             fragShader = 0;
             MBGL_CHECK_ERROR(glDeleteProgram(program));
             program = 0;
+            return;
         }
     }
 

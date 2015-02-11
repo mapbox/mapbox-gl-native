@@ -36,51 +36,50 @@ class View;
 class GlyphAtlas;
 class SpriteAtlas;
 class LineAtlas;
-
-struct exception : std::runtime_error {
-    inline exception(const char *msg) : std::runtime_error(msg) {
-    }
-};
+class StillImage;
 
 class Map : private util::noncopyable {
     friend class View;
 
 public:
-    explicit Map(View&, FileSource&);
+    enum class RenderMode : bool {
+        Continuous, // continually updating map
+        Still, // a one-off still image.
+    };
+
+    explicit Map(View&, FileSource&, RenderMode mode = RenderMode::Continuous);
     ~Map();
 
     // Start the map render thread. It is asynchronous.
-    void start(bool startPaused = false);
+    void start();
 
-    // Stop the map render thread. This call will block until the map rendering thread stopped.
-    // The optional callback function will be invoked repeatedly until the map thread is stopped.
-    // The callback function should wait until it is woken up again by view.notify(), otherwise
-    // this will be a busy waiting loop.
-    void stop(std::function<void ()> callback = std::function<void ()>());
+    // Stop the map render thread. The thread will not be joined, instead the map will cease to
+    // render any further things.
+    void stop();
 
-    // Pauses the render thread. The render thread will stop running but will not be terminated and will not lose state until resumed.
-    void pause(bool waitForPause = false);
+    // Renders a still image in the background thread.
+    using StillImageCallback = std::function<void(std::unique_ptr<const StillImage>)>;
+    void renderStill(StillImageCallback callback);
 
-    // Resumes a paused render thread
-    void resume();
-
+private:
     // Runs the map event loop. ONLY run this function when you want to get render a single frame
     // with this map object. It will *not* spawn a separate thread and instead block until the
     // frame is completely rendered.
     void run();
 
-    // Triggers a lazy rerender: only performs a render when the map is not clean.
-    void rerender();
+    void runContinuous();
+    void updatedContinuous();
 
-    // Forces a map update: always triggers a rerender.
+    void runStillImage();
+    void updatedStillImage();
+
+
+public:
+    // Forces a map update: always triggers a rerender. Must be called from the UI thread.
     void update();
 
-    // Releases resources immediately
-    void terminate();
-
-    // Controls buffer swapping.
-    bool needsSwap();
-    void swapped();
+    // Triggers a rerender from the map thread.
+    void rerender();
 
     // Styling
     void addClass(const std::string&);
@@ -101,7 +100,7 @@ public:
     // Position
     void moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    inline const LatLng getLatLng() const { return state.getLatLng(); }
+    const LatLng getLatLng() const;
     void startPanning();
     void stopPanning();
     void resetPosition();
@@ -151,17 +150,15 @@ public:
 
 private:
     // This may only be called by the View object.
-    void resize(uint16_t width, uint16_t height, float ratio = 1);
     void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
     util::ptr<Sprite> getSprite();
     uv::worker& getWorker();
 
-    // Checks if render thread needs to pause
-    void checkForPause();
-
     // Setup
     void setup();
+
+    void loadStyleURL();
 
     void updateTiles();
     void updateSources();
@@ -171,75 +168,60 @@ private:
     // the stylesheet.
     void prepare();
 
+
     // Unconditionally performs a render with the current map state.
     void render();
 
-    enum class Mode : uint8_t {
-        None, // we're not doing any processing
-        Continuous, // continually updating map
-        Static, // a once-off static image.
-    };
+    // Helper functions
+    bool inUIThread() const;
+    bool inMapThread() const;
 
-    Mode mode = Mode::None;
+    // This is invoked when the Map object is about to be destructed.
+    void terminate();
 
-public: // TODO: make private again
+    void updated();
+
+private:
+    View &view;
+    FileSource& fileSource;
+    const RenderMode renderMode;
+public: // TODO: Make this private again.
     std::unique_ptr<uv::loop> loop;
+private:
+    const std::thread::id uiThread;
+    std::thread::id mapThread;
+    Transform transform;
+
+    std::unique_ptr<uv::async> asyncTerminate;
+    std::unique_ptr<uv::async> asyncUpdate;
+
+    std::thread thread;
+
+
+    std::atomic<bool> active;
 
 private:
     std::unique_ptr<uv::worker> workers;
-    std::thread thread;
-    std::unique_ptr<uv::async> asyncTerminate;
-    std::unique_ptr<uv::async> asyncRender;
 
-    bool terminating = false;
-    bool pausing = false;
-    bool isPaused = false;
-    std::mutex mutexRun;
-    std::condition_variable condRun;
-    std::mutex mutexPause;
-    std::condition_variable condPause;
-
-    // If cleared, the next time the render thread attempts to render the map, it will *actually*
-    // render the map.
-    std::atomic_flag isClean = ATOMIC_FLAG_INIT;
-
-    // If this flag is cleared, the current back buffer is ready for being swapped with the front
-    // buffer (i.e. it has rendered data).
-    std::atomic_flag isSwapped = ATOMIC_FLAG_INIT;
-
-    // This is cleared once the current front buffer has been presented and the back buffer is
-    // ready for rendering.
-    std::atomic_flag isRendered = ATOMIC_FLAG_INIT;
-
-    // Stores whether the map thread has been stopped already.
-    std::atomic_bool isStopped;
-
-    View &view;
-
-#ifdef DEBUG
-    const std::thread::id mainThread;
-    std::thread::id mapThread;
-#endif
-
-    Transform transform;
     TransformState state;
 
-    FileSource& fileSource;
 
     util::ptr<Style> style;
-    const std::unique_ptr<GlyphAtlas> glyphAtlas;
+    std::unique_ptr<GlyphAtlas> glyphAtlas;
     util::ptr<GlyphStore> glyphStore;
-    const std::unique_ptr<SpriteAtlas> spriteAtlas;
+    std::unique_ptr<SpriteAtlas> spriteAtlas;
     util::ptr<Sprite> sprite;
-    const std::unique_ptr<LineAtlas> lineAtlas;
+    std::unique_ptr<LineAtlas> lineAtlas;
     util::ptr<TexturePool> texturePool;
 
-    const std::unique_ptr<Painter> painter;
+    std::unique_ptr<Painter> painter;
 
     std::string styleURL;
     std::string styleJSON = "";
     std::vector<std::string> classes;
     std::string accessToken;
+
+    std::string glyphURL;
 
     std::chrono::steady_clock::duration defaultTransitionDuration;
 
@@ -247,6 +229,8 @@ private:
     std::chrono::steady_clock::time_point animationTime = std::chrono::steady_clock::time_point::min();
 
     std::set<util::ptr<StyleSource>> activeSources;
+
+    StillImageCallback callback;
 };
 
 }

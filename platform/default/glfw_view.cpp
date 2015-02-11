@@ -1,4 +1,5 @@
 #include <mbgl/platform/default/glfw_view.hpp>
+#include <mbgl/map/still_image.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 
@@ -273,12 +274,7 @@ int GLFWView::run() {
         glfwWaitEvents();
     }
 
-    map->stop([]() {
-        glfwWaitEvents();
-    });
-
-    // Terminate here to save binary shaders
-    map->terminate();
+    map->stop();
 
     return 0;
 }
@@ -297,7 +293,6 @@ void GLFWView::notify() {
 
 void GLFWView::swap() {
     glfwSwapBuffers(window);
-    map->swapped();
     fps();
 }
 

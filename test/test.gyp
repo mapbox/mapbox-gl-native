@@ -32,6 +32,8 @@
         'fixtures/main.cpp',
         'fixtures/util.hpp',
         'fixtures/util.cpp',
+        '../include/mbgl/platform/default/log_stderr.hpp',
+        '../platform/default/log_stderr.cpp',
         'fixtures/fixture_log.hpp',
         'fixtures/fixture_log.cpp',
 

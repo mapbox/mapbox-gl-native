@@ -1,5 +1,6 @@
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/map/still_image.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/std.hpp>
@@ -45,6 +46,12 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display)
     : display_(display) {
     createContext();
     loadExtensions();
+}
+
+void HeadlessView::initialize(Map *map_) {
+    View::initialize(map_);
+
+    View::resize(width_, height_, pixelRatio_, width_ * pixelRatio_, height_ * pixelRatio_);
 }
 
 void HeadlessView::loadExtensions() {
@@ -132,6 +139,7 @@ void HeadlessView::createContext() {
 }
 
 void HeadlessView::resize(const uint16_t width, const uint16_t height, const float pixelRatio) {
+    // TODO: lazy resizing, so this is done in the Map thread.
     clearBuffers();
 
     width_ = width;
@@ -182,26 +190,27 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height, const flo
     deactivate();
 }
 
-std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
+std::unique_ptr<StillImage> HeadlessView::readStillImage() {
     const unsigned int w = width_ * pixelRatio_;
     const unsigned int h = height_ * pixelRatio_;
 
-    auto pixels = util::make_unique<uint32_t[]>(w * h);
+    auto image = util::make_unique<StillImage>();
+    image->width = w;
+    image->height = h;
+    image->pixels = util::make_unique<uint32_t[]>(w * h);
 
-    activate();
-    MBGL_CHECK_ERROR(glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get()));
-    deactivate();
+    MBGL_CHECK_ERROR(glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, image->pixels.get()));
 
     const int stride = w * 4;
     auto tmp = util::make_unique<char[]>(stride);
-    char *rgba = reinterpret_cast<char *>(pixels.get());
+    char *rgba = reinterpret_cast<char *>(image->pixels.get());
     for (int i = 0, j = height_ - 1; i < j; i++, j--) {
         std::memcpy(tmp.get(), rgba + i * stride, stride);
         std::memcpy(rgba + i * stride, rgba + j * stride, stride);
         std::memcpy(rgba + j * stride, tmp.get(), stride);
     }
 
-    return pixels;
+    return image;
 }
 
 void HeadlessView::clearBuffers() {

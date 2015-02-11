@@ -62,6 +62,14 @@ public:
         }
     }
 
+    inline void unref() {
+        uv_unref(reinterpret_cast<uv_handle_t *>(a.get()));
+    }
+
+    inline void ref() {
+        uv_ref(reinterpret_cast<uv_handle_t *>(a.get()));
+    }
+
     inline ~async() {
         close(std::move(a));
     }

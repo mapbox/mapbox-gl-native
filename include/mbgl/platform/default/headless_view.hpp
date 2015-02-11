@@ -32,8 +32,9 @@ public:
     void loadExtensions();
 
     void resize(uint16_t width, uint16_t height, float pixelRatio);
-    std::unique_ptr<uint32_t[]> readPixels();
+    std::unique_ptr<StillImage> readStillImage();
 
+    void initialize(Map *map_);
     void notify();
     void notifyMapChange(MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero());
     void activate();
