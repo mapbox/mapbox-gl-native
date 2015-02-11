@@ -103,7 +103,7 @@ function renderTest(style, info, base, key) {
                             height: info.height || 512
                         });
 
-                        t.ok(difference <= allowedDifference);
+                        t.ok(difference <= allowedDifference, 'actual matches expected');
                         t.end();
                     }
                 });
