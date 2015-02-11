@@ -20,6 +20,46 @@ class worker;
 class mutex;
 class cond;
 
+class lock {
+public:
+    lock(mutex &);
+    lock(const std::unique_ptr<mutex> &);
+    lock(const lock &) = delete;
+    lock(lock &&lock);
+    lock &operator=(const lock &lock) = delete;
+    lock &operator=(lock &&lock);
+    ~lock();
+private:
+    mutex *mtx = nullptr;
+};
+
+class readlock {
+public:
+    readlock(rwlock &);
+    readlock(const std::unique_ptr<rwlock> &);
+    readlock(const readlock &) = delete;
+    readlock(readlock &&lock);
+    readlock &operator=(const readlock &lock) = delete;
+    readlock &operator=(readlock &&lock);
+    ~readlock();
+private:
+    rwlock *mtx = nullptr;
+};
+
+class writelock {
+public:
+    writelock(rwlock &);
+    writelock(const std::unique_ptr<rwlock> &);
+    writelock(const writelock &) = delete;
+    writelock(writelock &&lock);
+    writelock &operator=(const writelock &lock) = delete;
+    writelock &operator=(writelock &&lock);
+    ~writelock();
+private:
+    rwlock *mtx = nullptr;
+};
+
+
 const char *getFileRequestError(uv_fs_t *req);
 
 template <typename T>
