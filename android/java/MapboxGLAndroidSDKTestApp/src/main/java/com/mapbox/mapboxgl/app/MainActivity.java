@@ -14,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mapbox.mapboxgl.lib.LonLatZoom;
 import com.mapbox.mapboxgl.lib.MapView;
@@ -23,7 +22,6 @@ import com.mapzen.android.lost.LocationListener;
 import com.mapzen.android.lost.LocationRequest;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -70,30 +68,30 @@ public class MainActivity extends ActionBarActivity {
 
         // Load the layout
         setContentView(R.layout.activity_main);
-        mMapFragment = (MapFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_map);
+        mMapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
         mMapFragment.getMap().setOnFpsChangedListener(new MyOnFpsChangedListener());
         mMapFragment.getMap().setOnMapChangedListener(new MyOnMapChangedListener());
 
-        mFpsTextView = (TextView)findViewById(R.id.view_fps);
+        mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
 
-        mCompassView = (ImageView)findViewById(R.id.view_compass);
+        mCompassView = (ImageView) findViewById(R.id.view_compass);
         mCompassView.setOnClickListener(new CompassOnClickListener());
 
         // Add a toolbar as the action bar
-        Toolbar mainToolbar = (Toolbar)findViewById(R.id.toolbar_main);
+        Toolbar mainToolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(mainToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Add the spinner to select map styles
-        Spinner styleSpinner = (Spinner)findViewById(R.id.spinner_style);
+        Spinner styleSpinner = (Spinner) findViewById(R.id.spinner_style);
         ArrayAdapter styleAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
                 R.array.style_list, android.R.layout.simple_spinner_dropdown_item);
         styleSpinner.setAdapter(styleAdapter);
         styleSpinner.setOnItemSelectedListener(new StyleSpinnerListener());
 
         // Add the spinner to select class styles
-        mClassSpinner = (Spinner)findViewById(R.id.spinner_class);
+        mClassSpinner = (Spinner) findViewById(R.id.spinner_class);
         mOutdoorsClassAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
                 R.array.outdoors_class_list, android.R.layout.simple_spinner_dropdown_item);
         mSatelliteClassAdapter = ArrayAdapter.createFromResource(getSupportActionBar().getThemedContext(),
@@ -364,7 +362,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onMapChanged() {
-            mCompassView.setRotation((float)mMapFragment.getMap().getDirection());
+            mCompassView.setRotation((float) mMapFragment.getMap().getDirection());
         }
     }
 
