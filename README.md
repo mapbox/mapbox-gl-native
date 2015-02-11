@@ -1,6 +1,10 @@
-This module renders map tiles with [Mapbox GL](https://github.com/mapbox/mapbox-gl-native).
+# node-mapbox-gl-native
 
-# Loading the module
+Renders map tiles with [Mapbox GL](https://github.com/mapbox/mapbox-gl-native).
+
+[![Build Status](https://api.travis-ci.com/mapbox/node-mapbox-gl-native.svg?token=Phdq58g7NsfstW6gyeYW)](https://magnum.travis-ci.com/mapbox/node-mapbox-gl-native)
+
+## Loading the module
 
 To compile this module, make sure all submodules are initialized 
 
@@ -8,7 +12,7 @@ To compile this module, make sure all submodules are initialized
 var mbgl = require('mbgl');
 ```
 
-# Rendering a map tile
+## Rendering a map tile
 
 ```js
 var map = new mbgl.Map(fileSource);
@@ -19,7 +23,13 @@ map.render({}, function(err, image) {
 });
 ```
 
-# Implementing a file source
+## Testing
+
+```
+npm test
+```
+
+## Implementing a file source
 
 When creating a `Map` object, you need to pass a `FileSource` object as the first parameter
 
