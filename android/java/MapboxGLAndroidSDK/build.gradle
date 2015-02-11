@@ -95,6 +95,11 @@ checkstyle {
     showViolations true
 }
 
+task cleanJNIBuilds {
+    def jniLibsDir = new File("MapboxGLAndroidSDK/src/main/jniLibs")
+    delete jniLibsDir.absolutePath
+}
+
 android.libraryVariants.all { variant ->
     def name = variant.buildType.name
     def checkstyle = project.tasks.create "checkstyle${name.capitalize()}", Checkstyle
