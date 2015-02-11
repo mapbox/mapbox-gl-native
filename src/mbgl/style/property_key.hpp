@@ -9,16 +9,12 @@ enum class PropertyKey {
     FillColor,
     FillOutlineColor,
     FillTranslate, // for transitions only
-    FillTranslateX,
-    FillTranslateY,
     FillTranslateAnchor,
     FillImage,
 
     LineOpacity,
     LineColor,
     LineTranslate, // for transitions only
-    LineTranslateX,
-    LineTranslateY,
     LineTranslateAnchor,
     LineWidth,
     LineGapWidth,
@@ -41,9 +37,7 @@ enum class PropertyKey {
     IconHaloColor,
     IconHaloWidth,
     IconHaloBlur,
-    IconTranslate, // for transitions only
-    IconTranslateX,
-    IconTranslateY,
+    IconTranslate,
     IconTranslateAnchor,
 
     IconAllowOverlap,
@@ -52,11 +46,10 @@ enum class PropertyKey {
     IconRotationAlignment,
     IconMaxSize,
     IconImage,
+    IconOffset,
     IconPadding,
     IconRotate,
     IconKeepUpright,
-    IconOffsetX,
-    IconOffsetY,
 
     TextOpacity,
     TextSize,
@@ -64,9 +57,7 @@ enum class PropertyKey {
     TextHaloColor,
     TextHaloWidth,
     TextHaloBlur,
-    TextTranslate, // for transitions only
-    TextTranslateX,
-    TextTranslateY,
+    TextTranslate,
     TextTranslateAnchor,
 
     TextRotationAlignment,
@@ -85,8 +76,7 @@ enum class PropertyKey {
     TextAnchor,
     TextKeepUpright,
     TextTransform,
-    TextOffsetX,
-    TextOffsetY,
+    TextOffset,
     TextAllowOverlap,
 
     RasterOpacity,

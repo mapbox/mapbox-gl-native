@@ -28,6 +28,8 @@ CGLProc CGLGetProcAddress(const char *proc) {
     CFRelease(name);
     return symbol;
 }
+#elif MBGL_USE_GLX
+#include <GL/glx.h>
 #endif
 
 namespace mbgl {
@@ -104,7 +106,7 @@ void HeadlessView::createContext() {
 
     if (!glContext) {
         // Try to create a legacy context
-        glContext = glXCreateNewContext(xDisplay, fbConfigs[0], GLX_RGBA_TYPE, 0, True);
+        glContext = glXCreateNewContext(xDisplay, fbConfigs[0], GLX_RGBA_TYPE, None, True);
         if (glContext) {
             if (!glXIsDirect(xDisplay, glContext)) {
                 mbgl::Log::Error(mbgl::Event::OpenGL, "Failed to create direct OpenGL Legacy context");
@@ -123,7 +125,7 @@ void HeadlessView::createContext() {
     int pbufferAttributes[] = {
         GLX_PBUFFER_WIDTH, 8,
         GLX_PBUFFER_HEIGHT, 8,
-        0
+        None
     };
     glxPbuffer = glXCreatePbuffer(xDisplay, fbConfigs[0], pbufferAttributes);
 #endif

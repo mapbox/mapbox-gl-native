@@ -28,7 +28,7 @@ Be sure to pull down all submodules first:
 
 ## OS X
 
-On OS X, we are using `zlib`, `SQLite3`, `libcurl` and `libpng` provided by the operating system. In addition to that, you need to have the Boost headers installed and ImageMagick for running tests. To install all prerequisites, use [Homebrew](http://brew.sh/) and type `brew install pkg-config boost imagemagick`.
+Prerequisites include the Boost headers (for routines provided therein) and ImageMagick (for tests). To install all prerequisites, use [Homebrew](http://brew.sh/) and type `brew install pkg-config boost imagemagick`.
 
 To create projects, you can run:
 
@@ -40,22 +40,19 @@ To create projects, you can run:
 
 Note that you can't have more than one project in Xcode open at a time since they the static library project is shared across the OS X, Linux and iOS project.
 
-Target OS: 10.9+
+Target OS X: 10.9+
 
 
 ## iOS
 
-iOS makes use of a Cocoa-specific API called [`mapbox-gl-cocoa`](https://github.com/mapbox/mapbox-gl-cocoa). If you are just interested in running Mapbox GL on iOS and not developing with it, head to that project and you can use this library as a pre-built static library instead. A `UIView` interface to the map view and bundle resources are provided there.
+If you merely want to install the library for iOS and try it out as an Objective-C consumer, run `./scripts/package_ios.sh`. It requires the Boost headers to be installed, so use [Homebrew](http://brew.sh/) to install them (`brew install boost`). The packaging script will produce the statically-linked `libMapboxGL.a`, `MapboxGL.bundle` for resources, and a `Headers` folder.
 
-If you intend to develop here, `mapbox-gl-cocoa` is included as a submodule of the overall build setup.
+If you want to build from source and/or contribute to development of the project, run `make iproj`, which will create and open an Xcode project which can build the entire library from source as well as an Objective-C test app.
 
-You can run `make iproj` to create and open an Xcode project with an iOS-specific view controller housing. This will automatically install required dependencies as well.
+Target devices: iPhone 4S and above (5, 5c, 5s, 6, 6 Plus) and iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2).
 
-Note that if you are doing OS X development as well, to toggle from OS X back to iOS, you will need to `make iproj` again.
+Target iOS: 7.0 through 8.1
 
-Target devices: iPhone 4S and above (5, 5c, 5s, 6, 6 Plus) and iPad 2 and above (3, 4, Mini , Air, Mini 2, Air 2).
-
-Target OS: 7.0+
 
 ## Linux
 
@@ -103,7 +100,11 @@ Set an access token as described below, and then run:
 
 	make run-linux
 
-## Android (on Linux)
+## Android
+
+Target devices: All Android devices on Android 4.0 or newer (API level >= 14)
+
+### On Linux
 
 Install a few build dependencies:
 
@@ -128,7 +129,7 @@ Run:
 
 You can then open `android/java` in Android Studio via "Import Non-Android Studio Project".
 
-## Android (on OS X)
+### On OS X
 
 Install Oracle JDK 7 (requires license agreement) from http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 
