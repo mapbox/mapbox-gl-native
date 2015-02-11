@@ -48,7 +48,7 @@ public class MapFragment extends Fragment {
             String line = reader.readLine();
             mMap.setAccessToken(line);
         } catch (IOException e) {
-            // Do nothing
+            return null;
         }
 
         // Need to pass on any saved state to the map
