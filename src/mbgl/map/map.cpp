@@ -401,7 +401,7 @@ void Map::setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration)
     update();
 }
 
-const LatLng getLatLng() const {
+const LatLng Map::getLatLng() const {
     assert(inUIThread());
     return state.getLatLng();
 }
