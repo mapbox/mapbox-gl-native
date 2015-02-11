@@ -13,11 +13,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'checkstyle'
 
 task accessToken {
-    def rawDir = new File("src/main/res/raw")
+    def rawDir = new File("MapboxGLAndroidSDKTestApp/src/main/res/raw")
     rawDir.mkdirs()
-    def tokenFile = new File("src/main/res/raw/token.txt")
+    def tokenFile = new File("MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt")
     if (!tokenFile.exists()) {
-        String token = System.getenv('MAPBOX_ACCESS_TOKEN')
+        String token = "$System.env.MAPBOX_ACCESS_TOKEN"
         if (token == null) {
             throw new InvalidUserDataException("You must set the MAPBOX_ACCESS_TOKEN environment variable.")
         }
