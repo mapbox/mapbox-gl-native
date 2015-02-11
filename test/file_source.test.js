@@ -1,19 +1,21 @@
 /* jshint node: true, unused: false */
-/* global describe, it */
 'use strict';
-var assert = require('assert');
+
+var test = require('tape').test;
 
 var mbgl = require('..');
 
-describe('FileSource', function() {
-
-    describe('constructor', function() {
-        it('must be called with new', function() {
-            assert.throws(function() {
+test('FileSource', function(t) {
+    t.test('constructor', function(t) {
+        t.test('must be called with new', function(t) {
+            t.throws(function() {
                 mbgl.FileSource();
             }, /Use the new operator to create new FileSource objects/);
+            t.end();
         });
 
+        t.end();
     });
 
+    t.end();
 });

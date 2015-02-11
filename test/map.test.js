@@ -1,7 +1,7 @@
 /* jshint node: true, unused: false */
-/* global describe, it, beforeEach, afterEach */
 'use strict';
-var assert = require('assert');
+
+var test = require('tape').test;
 
 var mbgl = require('..');
 var fs = require('fs');
@@ -12,153 +12,176 @@ mkdirp.sync('test/results');
 
 var style = require('./fixtures/style.json');
 
-describe('Map', function() {
+function setup(fileSource, callback) {
+    callback(new mbgl.Map(fileSource));
+}
 
-    describe('constructor', function() {
-        it('must be called with new', function() {
-            assert.throws(function() {
+test('Map', function(t) {
+    t.test('constructor', function(t) {
+        t.test('must be called with new', function(t) {
+            t.throws(function() {
                 mbgl.Map();
             }, /Use the new operator to create new Map objects/);
+
+            t.end();
         });
 
-        it('should require a FileSource object as first parameter', function() {
-            assert.throws(function() {
+        t.test('should require a FileSource object as first parameter', function(t) {
+            t.throws(function() {
                 new mbgl.Map();
             }, /Requires a FileSource as first argument/);
 
-            assert.throws(function() {
+            t.throws(function() {
                 new mbgl.Map('fileSource');
             }, /Requires a FileSource as first argument/);
 
-            assert.throws(function() {
+            t.throws(function() {
                 new mbgl.Map({});
             }, /Requires a FileSource as first argument/);
+
+            t.end();
         });
 
-        it('should require the FileSource object to have request and cancel methods', function() {
+        t.test('should require the FileSource object to have request and cancel methods', function(t) {
             var fileSource = new mbgl.FileSource();
 
-            assert.throws(function() {
+            t.throws(function() {
                 new mbgl.Map(fileSource);
             }, /FileSource must have a request member function/);
 
             fileSource.request = 'test';
-            assert.throws(function() {
+            t.throws(function() {
                 new mbgl.Map(fileSource);
             }, /FileSource must have a request member function/);
 
             fileSource.request = function() {};
-            assert.throws(function() {
+            t.throws(function() {
                 new mbgl.Map(fileSource);
             }, /FileSource must have a cancel member function/);
 
             fileSource.cancel = 'test';
-            assert.throws(function() {
+            t.throws(function() {
                 new mbgl.Map(fileSource);
             }, /FileSource must have a cancel member function/);
 
             fileSource.cancel = function() {};
-            assert.doesNotThrow(function() {
+            t.doesNotThrow(function() {
                 new mbgl.Map(fileSource);
             });
+
+            t.end();
         });
 
+        t.end();
     });
 
-    describe('load styles', function() {
-        var map;
-
+    t.test('load styles', function(t) {
         var fileSource = new mbgl.FileSource();
         fileSource.request = function() {};
         fileSource.cancel = function() {};
 
-        beforeEach(function() {
-            map = new mbgl.Map(fileSource);
+        t.test('requires a string or object as the first parameter', function(t) {
+            setup(fileSource, function(map) {
+                t.throws(function() {
+                    map.load();
+                }, /Requires a map style as first argument/);
+
+                t.throws(function() {
+                    map.load('invalid');
+                }, /Expect either an object or array at root/);
+                t.end();
+            });
         });
 
-        afterEach(function() {
-            map = null;
+        t.test('accepts an empty stylesheet string', function(t) {
+            setup(fileSource, function(map) {
+                t.doesNotThrow(function() {
+                    map.load('{}');
+                });
+                t.end();
+            });
         });
 
-        it('requires a string or object as the first parameter', function() {
-            assert.throws(function() {
-                map.load();
-            }, /Requires a map style as first argument/);
-
-            assert.throws(function() {
-                map.load('invalid');
-            }, /Expect either an object or array at root/);
+        t.test('accepts a JSON stylesheet', function(t) {
+            setup(fileSource, function(map) {
+                t.doesNotThrow(function() {
+                    map.load(style);
+                });
+                t.end();
+            });
         });
 
-        it('accepts an empty stylesheet string', function() {
-            map.load('{}');
+        t.test('accepts a stringified stylesheet', function(t) {
+            setup(fileSource, function(map) {
+                t.doesNotThrow(function() {
+                    map.load(JSON.stringify(style));
+                });
+                t.end();
+            });
         });
 
-        it('accepts a JSON stylesheet', function() {
-            map.load(style);
-        });
-
-        it('accepts a stringified stylesheet', function() {
-            map.load(JSON.stringify(style));
-        });
+        t.end();
     });
 
-    describe('render argument requirements', function() {
-        var map;
-
+    t.test('render argument requirements', function(t) {
         var fileSource = new mbgl.FileSource();
         fileSource.request = function(req) {
             fs.readFile(path.join('test', req.url), function(err, data) {
                 req.respond(err, { data: data });
-                assert.ifError(err);
+                t.error(err);
             });
         };
         fileSource.cancel = function() {};
 
-        beforeEach(function() {
-            map = new mbgl.Map(fileSource);
-        });
+        t.test('requires an object as the first parameter', function(t) {
+            setup(fileSource, function(map) {
+                t.throws(function() {
+                    map.render();
+                }, /First argument must be an options object/);
 
-        afterEach(function() {
-            map = null;
-        });
+                t.throws(function() {
+                    map.render('invalid');
+                }, /First argument must be an options object/);
 
-        it('requires an object as the first parameter', function() {
-            assert.throws(function() {
-                map.render();
-            }, /First argument must be an options object/);
-
-            assert.throws(function() {
-                map.render('invalid');
-            }, /First argument must be an options object/);
-        });
-
-        it('requires a callback as the second parameter', function() {
-            assert.throws(function() {
-                map.render({});
-            }, /Second argument must be a callback function/);
-
-            assert.throws(function() {
-                map.render({}, 'invalid');
-            }, /Second argument must be a callback function/);
-        });
-
-        it('requires a style to be set', function(done) {
-            map.render({}, function(err) {
-                assert.ok(err);
-                assert.equal(err.message, 'Style is not set');
-                done();
+                t.end();
             });
         });
 
-        it('returns an image', function(done) {
-            map.load(style);
-            map.render({}, function(err, data) {
-                assert.ifError(err);
-                fs.writeFileSync('test/results/image.png', data);
-                done();
+        t.test('requires a callback as the second parameter', function(t) {
+            setup(fileSource, function(map) {
+                t.throws(function() {
+                    map.render({});
+                }, /Second argument must be a callback function/);
+
+                t.throws(function() {
+                    map.render({}, 'invalid');
+                }, /Second argument must be a callback function/);
+
+                t.end();
+            });
+        });
+
+        t.test('requires a style to be set', function(t) {
+            setup(fileSource, function(map) {
+                map.render({}, function(err) {
+                    t.ok(err);
+                    t.equal(err.message, 'Style is not set');
+                    t.end();
+                });
+            });
+        });
+
+        t.test('returns an image', function(t) {
+            setup(fileSource, function(map) {
+                map.load(style);
+                map.render({}, function(err, data) {
+                    t.error(err);
+                    fs.writeFileSync('test/results/image.png', data);
+                    t.end();
+                });
             });
         });
     });
 
+    t.end();
 });

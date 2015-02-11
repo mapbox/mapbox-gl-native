@@ -51,7 +51,7 @@ $(MBGL)/config/%.gypi: $(MBGL) $(MBGL)/configure
 
 .PHONY: test
 test: build
-	@`npm bin`/mocha -R spec
+	@`npm bin`/tape test/**/*.test.js
 
 .PHONY: clean
 clean:
