@@ -8,11 +8,9 @@ using namespace mbgl;
 void Painter::renderTileDebug(const Tile& tile) {
     gl::group group(std::string { "debug " } + std::string(tile.id));
     assert(tile.data);
-    if (debug) {
-        prepareTile(tile);
-        renderDebugText(tile.data->debugBucket, tile.matrix);
-        renderDebugFrame(tile.matrix);
-    }
+    prepareTile(tile);
+    renderDebugText(tile.data->debugBucket, tile.matrix);
+    renderDebugFrame(tile.matrix);
 }
 
 void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {

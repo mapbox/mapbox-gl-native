@@ -550,8 +550,6 @@ const std::string &Map::getAccessToken() const {
 void Map::setDebug(bool value) {
     assert(inUIThread());
     debug = value;
-    assert(painter);
-    painter->setDebug(debug);
     update();
 }
 
@@ -703,7 +701,7 @@ void Map::prepare() {
 
 void Map::render() {
     assert(painter);
-    painter->render(*style, activeSources, state, animationTime);
+    painter->render(*style, activeSources, state, animationTime, debug);
 
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {

@@ -79,7 +79,8 @@ public:
     void render(const Style& style,
                 const std::set<util::ptr<StyleSource>>& sources,
                 TransformState state,
-                std::chrono::steady_clock::time_point time);
+                std::chrono::steady_clock::time_point time,
+                bool debug = false);
 
     void renderLayers(util::ptr<StyleLayerGroup> group);
     void renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id = nullptr, const mat4* matrix = nullptr);
@@ -112,9 +113,6 @@ public:
     void createPrerendered(RasterBucket& bucket, util::ptr<StyleLayer> layer_desc, const Tile::ID& id);
 
     void resize();
-
-    // Changes whether debug information is drawn onto the map
-    void setDebug(bool enabled);
 
     // Opaque/Translucent pass setting
     void setOpaque();
@@ -180,7 +178,6 @@ public:
 private:
     TransformState state;
 
-    bool debug = false;
     int indent = 0;
 
     uint32_t gl_program = 0;

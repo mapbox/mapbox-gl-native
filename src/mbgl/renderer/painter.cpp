@@ -131,10 +131,6 @@ void Painter::resize() {
     }
 }
 
-void Painter::setDebug(bool enabled) {
-    debug = enabled;
-}
-
 void Painter::useProgram(uint32_t program) {
     if (gl_program != program) {
         MBGL_CHECK_ERROR(glUseProgram(program));
@@ -215,7 +211,8 @@ void Painter::prepareTile(const Tile& tile) {
 }
 
 void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>& sources,
-                     TransformState state_, std::chrono::steady_clock::time_point time) {
+                     TransformState state_, std::chrono::steady_clock::time_point time,
+                     bool debug) {
     state = state_;
 
     clear();
@@ -242,8 +239,10 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
     // This guarantees that we have at least one function per tile called.
     // When only rendering layers via the stylesheet, it's possible that we don't
     // ever visit a tile during rendering.
-    for (const util::ptr<StyleSource> &source : sources) {
-        source->source->finishRender(*this);
+    if (debug) {
+        for (const util::ptr<StyleSource> &source : sources) {
+            source->source->renderDebug(*this);
+        }
     }
 }
 
