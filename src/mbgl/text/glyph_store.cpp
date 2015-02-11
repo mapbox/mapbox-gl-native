@@ -223,7 +223,7 @@ void GlyphPBF::parse(FontStack &stack) {
     data.clear();
 }
 
-GlyphStore::GlyphStore(FileSource& fileSource_) : fileSource(fileSource_) {}
+GlyphStore::GlyphStore(FileSource& fileSource_) : fileSource(fileSource_), mtx(util::make_unique<uv::mutex>()) {}
 
 void GlyphStore::setURL(const std::string &url) {
     glyphURL = url;
@@ -237,15 +237,14 @@ void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set
         return;
     }
 
-    FontStack *stack = nullptr;
+    uv::exclusive<FontStack> stack(mtx);
 
     std::vector<std::shared_future<GlyphPBF &>> futures;
     futures.reserve(glyphRanges.size());
     {
-        std::lock_guard<std::mutex> lock(mtx);
         auto &rangeSets = ranges[fontStack];
 
-        stack = &createFontStack(fontStack);
+        stack << createFontStack(fontStack);
 
         // Attempt to load the glyph range. If the GlyphSet already exists, we are getting back
         // the same shared_future.
@@ -258,7 +257,7 @@ void GlyphStore::waitForGlyphRanges(const std::string &fontStack, const std::set
     // When we get a result (or the GlyphSet is aready loaded), we are attempting to parse the
     // GlyphSet.
     for (std::shared_future<GlyphPBF &> &future : futures) {
-        future.get().parse(*stack);
+        future.get().parse(stack);
     }
 }
 
@@ -277,12 +276,14 @@ FontStack &GlyphStore::createFontStack(const std::string &fontStack) {
     if (stack_it == stacks.end()) {
         stack_it = stacks.emplace(fontStack, util::make_unique<FontStack>()).first;
     }
+
     return *stack_it->second.get();
 }
 
-FontStack &GlyphStore::getFontStack(const std::string &fontStack) {
-    std::lock_guard<std::mutex> lock(mtx);
-    return createFontStack(fontStack);
+uv::exclusive<FontStack> GlyphStore::getFontStack(const std::string &fontStack) {
+    uv::exclusive<FontStack> stack(mtx);
+    stack << createFontStack(fontStack);
+    return stack;
 }
 
 
