@@ -181,10 +181,13 @@ android-deploy: $(ANDROID_ABIS)
 	cd android/java/MapboxGLAndroidSDK && chmod ugo+x deploy.sh && ./deploy.sh
 
 
-##### Render builds ############################################################
+##### CLI builds ###############################################################
 
 render: Makefile/mbgl
 	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) mbgl-render
+
+load-test: Makefile/mbgl
+	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) mbgl-load-test
 
 ##### Maintenace operations ####################################################
 
