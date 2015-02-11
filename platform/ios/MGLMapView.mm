@@ -7,6 +7,7 @@
 #import <OpenGLES/EAGL.h>
 
 #include <mbgl/mbgl.hpp>
+#include <mbgl/map/geography.h>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
 #include <mbgl/storage/default_file_source.hpp>
@@ -320,7 +321,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // set initial position
     //
-    mbglMap->setLonLatZoom(0, 0, mbglMap->getMinZoom());
+    mbglMap->setLatLngZoom({ 0, 0 }, mbglMap->getMinZoom());
 
     // setup change delegate queue
     //
@@ -828,7 +829,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLonLat(coordinate.longitude, coordinate.latitude, secondsAsDuration(duration));
+    mbglMap->setLatLon({ coordinate.latitude, coordinate.longitude }, secondsAsDuration(duration));
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
@@ -838,17 +839,16 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (CLLocationCoordinate2D)centerCoordinate
 {
-    double lon, lat;
-    mbglMap->getLonLat(lon, lat);
+    mbgl::LatLng latLng = mbglMap->getLatLng();
 
-    return CLLocationCoordinate2DMake(lat, lon);
+    return CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLonLatZoom(centerCoordinate.longitude, centerCoordinate.latitude, zoomLevel, secondsAsDuration(duration));
+    mbglMap->setLatLngZoom({ centerCoordinate.latitude, centerCoordinate.longitude }, zoomLevel, secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
 }

@@ -407,13 +407,13 @@ void Map::moveBy(double dx, double dy, std::chrono::steady_clock::duration durat
     update();
 }
 
-void Map::setLonLat(double lon, double lat, std::chrono::steady_clock::duration duration) {
-    transform.setLonLat(lon, lat, duration);
+void Map::setLatLon(LatLng latLng, std::chrono::steady_clock::duration duration) {
+    transform.setLatLng(latLng, duration);
     update();
 }
 
-void Map::getLonLat(double& lon, double& lat) const {
-    transform.getLonLat(lon, lat);
+const LatLng Map::getLatLng() const {
+    return transform.getLatLng();
 }
 
 void Map::startPanning() {
@@ -428,7 +428,7 @@ void Map::stopPanning() {
 
 void Map::resetPosition() {
     transform.setAngle(0);
-    transform.setLonLat(0, 0);
+    transform.setLatLng({ 0, 0 });
     transform.setZoom(0);
     update();
 }
@@ -459,13 +459,13 @@ double Map::getZoom() const {
     return transform.getZoom();
 }
 
-void Map::setLonLatZoom(double lon, double lat, double zoom, std::chrono::steady_clock::duration duration) {
-    transform.setLonLatZoom(lon, lat, zoom, duration);
+void Map::setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration) {
+    transform.setLatLngZoom(latLng, zoom, duration);
     update();
 }
 
-void Map::getLonLatZoom(double& lon, double& lat, double& zoom) const {
-    transform.getLonLatZoom(lon, lat, zoom);
+void Map::getLatLngZoom(LatLng &latLng, double &zoom) const {
+    transform.getLatLngZoom(latLng, zoom);
 }
 
 void Map::resetZoom() {
