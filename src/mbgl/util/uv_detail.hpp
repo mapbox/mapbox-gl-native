@@ -1,6 +1,7 @@
 #ifndef MBGL_UTIL_UV_DETAIL
 #define MBGL_UTIL_UV_DETAIL
 
+#include <mbgl/util/uv.hpp>
 #include <mbgl/util/uv-worker.h>
 #include <mbgl/util/noncopyable.hpp>
 
@@ -85,6 +86,20 @@ private:
     std::function<void ()> fn;
 };
 
+class mutex : public mbgl::util::noncopyable {
+public:
+    inline mutex() {
+        if (uv_mutex_init(&mtx) != 0) {
+            throw std::runtime_error("failed to initialize mutex lock");
+        }
+    }
+    inline ~mutex() { uv_mutex_destroy(&mtx); }
+    inline void lock() { uv_mutex_lock(&mtx); }
+    inline void unlock() { uv_mutex_unlock(&mtx); }
+private:
+    uv_mutex_t mtx;
+};
+
 class rwlock : public mbgl::util::noncopyable {
 public:
     inline rwlock() {
@@ -100,26 +115,6 @@ public:
 
 private:
     uv_rwlock_t mtx;
-};
-
-class readlock : public mbgl::util::noncopyable {
-public:
-    inline readlock(rwlock &mtx_) : mtx(mtx_) { mtx.rdlock(); }
-    inline readlock(const std::unique_ptr<rwlock> &mtx_) : mtx(*mtx_) { mtx.rdlock(); }
-    inline ~readlock() { mtx.rdunlock(); }
-
-private:
-    rwlock &mtx;
-};
-
-class writelock : public mbgl::util::noncopyable {
-public:
-    inline writelock(rwlock &mtx_) : mtx(mtx_) { mtx.wrlock(); }
-    inline writelock(const std::unique_ptr<rwlock> &mtx_) : mtx(*mtx_) { mtx.wrlock(); }
-    inline ~writelock() { mtx.wrunlock(); }
-
-private:
-    rwlock &mtx;
 };
 
 class worker : public mbgl::util::noncopyable {
