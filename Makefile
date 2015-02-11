@@ -210,9 +210,8 @@ clean: clear_sqlite_cache clear_xcode_cache
 	-rm -rf ./ios/build
 	-rm -rf ./test/build
 	-rm -rf ./config/*.gypi
-	-rm -rf ./android/java/build ./android/java/app/build ./android/java/lib/build
-	-rm -rf ./android/java/lib/src/main/jniLibs ./android/java/lib/src/main/assets
-	-rm -f ./android/test/features.zip
+	-rm -rf ./android/java/build ./android/java/MapboxGLAndroidSDKTestApp/build ./android/java/MapboxGLAndroidSDK/build
+	-rm -rf ./android/java/MapboxGLAndroidSDK/src/main/jniLibs ./android/java/MapboxGLAndroidSDK/src/main/assets
 
 distclean: clean
 	-rm -rf ./mason_packages
