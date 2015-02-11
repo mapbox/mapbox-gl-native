@@ -51,7 +51,7 @@ $(MBGL)/config/%.gypi: $(MBGL) $(MBGL)/configure
 
 .PHONY: test-suite
 test-suite: build
-	@(`npm bin`/tape test/render.test.js || true)
+	-@`npm bin`/tape test/render.test.js
 
 .PHONY: test-js
 test-js: build
