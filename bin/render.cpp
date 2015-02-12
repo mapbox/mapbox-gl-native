@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
 
     view.resize(width, height, pixelRatio);
     map.resize(width, height, pixelRatio);
-    map.setLonLatZoom(lon, lat, zoom);
+    map.setLatLonZoom(LatLng(lat, lon), zoom);
     map.setBearing(bearing);
 
     std::unique_ptr<uint32_t[]> pixels;
