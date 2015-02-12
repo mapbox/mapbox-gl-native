@@ -1,11 +1,11 @@
 #ifndef MBGL_UTIL_UV_CHANNEL
 #define MBGL_UTIL_UV_CHANNEL
 
+#include <uv.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <uv.h>
 
 // Taken from http://navaneeth.github.io/blog/2013/08/02/channels-in-libuv/
 
