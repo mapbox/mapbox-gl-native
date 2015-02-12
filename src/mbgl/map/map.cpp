@@ -179,6 +179,8 @@ void Map::run() {
 
     view.activate();
 
+    view.discard();
+
     glyphAtlas = util::make_unique<GlyphAtlas>(1024, 1024);
     glyphStore = std::make_shared<GlyphStore>(fileSource);
     spriteAtlas = util::make_unique<SpriteAtlas>(512, 512);
@@ -235,7 +237,6 @@ void Map::updatedContinuous() {
     if (active) {
         prepare();
         render();
-        view.swap();
     }
 }
 
@@ -704,6 +705,8 @@ void Map::prepare() {
 }
 
 void Map::render() {
+    view.discard();
+
     assert(painter);
     painter->render(*style, activeSources, state, animationTime, debug);
 
@@ -711,4 +714,6 @@ void Map::render() {
     if (transform.needsTransition() || style->hasTransitions()) {
         update();
     }
+
+    view.swap();
 }

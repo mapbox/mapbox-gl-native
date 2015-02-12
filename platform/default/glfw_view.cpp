@@ -287,17 +287,9 @@ void GLFWView::deactivate() {
     glfwMakeContextCurrent(nullptr);
 }
 
-void GLFWView::notify() {
-    glfwPostEmptyEvent();
-}
-
 void GLFWView::swap() {
     glfwSwapBuffers(window);
     fps();
-}
-
-void GLFWView::notifyMapChange(mbgl::MapChange /*change*/, std::chrono::steady_clock::duration /*delay*/) {
-    // no-op
 }
 
 void GLFWView::fps() {

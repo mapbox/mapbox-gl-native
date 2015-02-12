@@ -1584,12 +1584,6 @@ class MBGLView : public mbgl::View
         MBGLView(MGLMapView *nativeView_) : nativeView(nativeView_) {}
         virtual ~MBGLView() {}
 
-
-    void notify()
-    {
-        // no-op
-    }
-
     void notifyMapChange(mbgl::MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero())
     {
         if (delay != std::chrono::steady_clock::duration::zero())

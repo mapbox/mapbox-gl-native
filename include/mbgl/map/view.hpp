@@ -30,9 +30,13 @@ public:
         map = map_;
     }
 
+    // Called from the render (=GL) thread. Signals that the contents of the contents
+    // may be discarded. The default is a no-op.
+    virtual void discard();
+
     // Called from the render (=GL) thread. Signals that the context should
-    // swap the front and the back buffer.
-    virtual void swap() = 0;
+    // swap the front and the back buffer. The default is a no-op.
+    virtual void swap();
 
     // Called from the render thread. Makes the GL context active in the current
     // thread. This is typically just called once at the beginning of the
@@ -43,8 +47,6 @@ public:
     // thread. This is called once just before the rendering thread terminates.
     virtual void deactivate() = 0;
 
-    virtual void notify() = 0;
-
     // Reads the pixel data from the current framebuffer. If your View implementation
     // doesn't support reading from the framebuffer, return a null pointer.
     virtual std::unique_ptr<StillImage> readStillImage();
@@ -52,7 +54,8 @@ public:
     // Notifies a watcher of map x/y/scale/rotation changes.
     // Must only be called from the same thread that caused the change.
     // Must not be called from the render thread.
-    virtual void notifyMapChange(MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero()) = 0;
+    // The default is a no-op.
+    virtual void notifyMapChange(MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero());
 
 protected:
     // Resizes the view
