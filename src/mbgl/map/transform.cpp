@@ -1,4 +1,5 @@
 #include <mbgl/map/transform.hpp>
+#include <mbgl/map/projection.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat4.hpp>
@@ -452,17 +453,17 @@ void Transform::pixelForLatLng(const LatLng latLng, double &x, double &y) const 
     const double centerX = final.width  / 2;
     const double centerY = final.height / 2;
 
-    const double m = final.getMetersPerPixelAtLatitude(0, zoom);
+    const double m = Projection::getMetersPerPixelAtLatitude(0, zoom);
 
     const double angle_sin = std::sin(-final.angle);
     const double angle_cos = std::cos(-final.angle);
 
-    const ProjectedMeters givenMeters = final.projectedMetersForLatLng(latLng);
+    const ProjectedMeters givenMeters = Projection::projectedMetersForLatLng(latLng);
 
     const double givenAbsoluteX = givenMeters.easting  / m;
     const double givenAbsoluteY = givenMeters.northing / m;
 
-    const ProjectedMeters centerMeters = final.projectedMetersForLatLng(ll);
+    const ProjectedMeters centerMeters = Projection::projectedMetersForLatLng(ll);
 
     const double centerAbsoluteX = centerMeters.easting  / m;
     const double centerAbsoluteY = centerMeters.northing / m;
@@ -491,7 +492,7 @@ const LatLng Transform::latLngForPixel(const double x, const double y) const {
     const double centerX = final.width  / 2;
     const double centerY = final.height / 2;
 
-    const double m = final.getMetersPerPixelAtLatitude(0, zoom);
+    const double m = Projection::getMetersPerPixelAtLatitude(0, zoom);
 
     const double angle_sin = std::sin(final.angle);
     const double angle_cos = std::cos(final.angle);
@@ -505,7 +506,7 @@ const LatLng Transform::latLngForPixel(const double x, const double y) const {
     const double givenX = unrotatedX + (centerX - unrotatedCenterX);
     const double givenY = unrotatedY + (centerY - unrotatedCenterY);
 
-    const ProjectedMeters centerMeters = final.projectedMetersForLatLng(ll);
+    const ProjectedMeters centerMeters = Projection::projectedMetersForLatLng(ll);
 
     const double centerAbsoluteX = centerMeters.easting  / m;
     const double centerAbsoluteY = centerMeters.northing / m;
@@ -515,7 +516,7 @@ const LatLng Transform::latLngForPixel(const double x, const double y) const {
 
     const ProjectedMeters givenMeters = { givenAbsoluteY * m, givenAbsoluteX * m };
     
-    return final.latLngForProjectedMeters(givenMeters);
+    return Projection::latLngForProjectedMeters(givenMeters);
 }
 
 

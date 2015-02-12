@@ -1,7 +1,8 @@
 #ifndef MBGL_MAP_MAP
 #define MBGL_MAP_MAP
 
-#include <mbgl/map/geography.h>
+#include <mbgl/map/geography.hpp>
+#include <mbgl/map/projection.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/uv.hpp>
@@ -129,11 +130,11 @@ public:
     const std::string &getAccessToken() const;
 
     // Projection
-    inline void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const { getState().getWorldBoundsMeters(sw, ne); }
-    inline void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const { getState().getWorldBoundsLatLng(sw, ne); }
-    inline double getMetersPerPixelAtLatitude(const double lat, const double zoom) const { return getState().getMetersPerPixelAtLatitude(lat, zoom); }
-    inline const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const { return getState().projectedMetersForLatLng(latLng); }
-    inline const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const { return getState().latLngForProjectedMeters(projectedMeters); }
+    inline void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const { Projection::getWorldBoundsMeters(sw, ne); }
+    inline void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const { Projection::getWorldBoundsLatLng(sw, ne); }
+    inline double getMetersPerPixelAtLatitude(const double lat, const double zoom) const { return Projection::getMetersPerPixelAtLatitude(lat, zoom); }
+    inline const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const { return Projection::projectedMetersForLatLng(latLng); }
+    inline const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const { return Projection::latLngForProjectedMeters(projectedMeters); }
     inline void pixelForLatLng(const LatLng latLng, double &x, double &y) const { transform.pixelForLatLng(latLng, x, y); }
     inline const LatLng latLngForPixel(const double x, const double y) const { return transform.latLngForPixel(x, y); }
 

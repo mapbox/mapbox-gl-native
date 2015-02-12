@@ -2,6 +2,7 @@
 #define MBGL_MAP_TRANSFORM
 
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/map/geography.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <cstdint>
@@ -27,7 +28,6 @@ public:
     // Position
     void moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-
     void setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     const LatLng getLatLng() const;
     void getLatLngZoom(LatLng &latLng, double& zoom) const;

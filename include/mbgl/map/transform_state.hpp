@@ -1,7 +1,6 @@
 #ifndef MBGL_MAP_TRANSFORM_STATE
 #define MBGL_MAP_TRANSFORM_STATE
 
-#include <mbgl/map/geography.h>
 #include <mbgl/map/tile.hpp>
 
 #include <mbgl/util/mat4.hpp>
@@ -44,13 +43,6 @@ public:
 
     // Rotation
     float getAngle() const;
-
-    // Projection
-    void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;
-    void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const;
-    double getMetersPerPixelAtLatitude(const double lat, const double zoom) const;
-    const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const;
-    const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const;
 
     // Changing
     bool isChanging() const;

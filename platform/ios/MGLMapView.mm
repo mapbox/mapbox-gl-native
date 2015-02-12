@@ -7,7 +7,7 @@
 #import <OpenGLES/EAGL.h>
 
 #include <mbgl/mbgl.hpp>
-#include <mbgl/map/geography.h>
+#include <mbgl/map/geography.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
 #include <mbgl/storage/default_file_source.hpp>

@@ -119,59 +119,6 @@ float TransformState::getAngle() const {
 }
 
 
-#pragma mark - Projection
-
-void TransformState::getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const {
-    const double d = util::EARTH_RADIUS_M * M_PI;
-
-    sw.easting  = -d;
-    sw.northing = -d;
-
-    ne.easting  =  d;
-    ne.northing =  d;
-}
-
-void TransformState::getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const {
-    ProjectedMeters projectedMetersSW, projectedMetersNE;
-
-    getWorldBoundsMeters(projectedMetersSW, projectedMetersNE);
-
-    sw = latLngForProjectedMeters(projectedMetersSW);
-    ne = latLngForProjectedMeters(projectedMetersNE);
-}
-
-double TransformState::getMetersPerPixelAtLatitude(const double lat, const double zoom) const {
-    const double mapPixelWidthAtZoom = std::pow(2.0, zoom) * util::tileSize;
-    const double constrainedLatitude = std::fmin(std::fmax(lat, -util::LATITUDE_MAX), util::LATITUDE_MAX);
-
-    return std::cos(constrainedLatitude * util::DEG2RAD) * util::M2PI * util::EARTH_RADIUS_M / mapPixelWidthAtZoom;
-}
-
-const ProjectedMeters TransformState::projectedMetersForLatLng(const LatLng latLng) const {
-    const double constrainedLatitude = std::fmin(std::fmax(latLng.latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
-
-    const double m = 1 - 1e-15;
-    const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * constrainedLatitude), -m), m);
-
-    const double easting  = util::EARTH_RADIUS_M * latLng.longitude * util::DEG2RAD;
-    const double northing = 0.5 * util::EARTH_RADIUS_M * std::log((1 + f) / (1 - f));
-
-    return { northing, easting };
-}
-
-const LatLng TransformState::latLngForProjectedMeters(const ProjectedMeters projectedMeters) const {
-    double latitude = (2 * std::atan(std::exp(projectedMeters.northing / util::EARTH_RADIUS_M)) - (M_PI / 2)) * util::RAD2DEG;
-    double longitude = projectedMeters.easting * util::RAD2DEG / util::EARTH_RADIUS_M;
-
-    latitude = std::fmin(std::fmax(latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
-
-    while (longitude >  180) longitude -= 180;
-    while (longitude < -180) longitude += 180;
-
-    return { latitude, longitude };
-}
-
-
 #pragma mark - Changing
 
 bool TransformState::isChanging() const {
