@@ -12,7 +12,8 @@ class StillImage : util::noncopyable {
 public:
     uint16_t width = 0;
     uint16_t height = 0;
-    std::unique_ptr<uint32_t[]> pixels;
+    using Pixel = uint32_t;
+    std::unique_ptr<Pixel[]> pixels;
 };
 
 }
