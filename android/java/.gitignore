@@ -2,20 +2,19 @@
 .gradle/
 
 # IntelliJ files
-.idea
+.idea/
 *.iml
 
 # Build files
 build/
-*/build/
 *.so
 *.apk
 
 # Lib assets
-lib/src/main/assets/
+MapboxGLAndroidSDK/src/main/assets/
 
 # Local settings
 local.properties
 
 # Token file
-app/src/main/res/raw/token.txt
+MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt

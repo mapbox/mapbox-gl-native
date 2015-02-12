@@ -86,12 +86,7 @@ after_script:
 - ./scripts/ios_travis/remove-key.sh
 
 notifications:
-  hipchat:
-    rooms:
-      secure: "SgMjGDp8MP+UTAY/aWJwSQH2hv1Q0vhEc1BdIde59+lEL3u6gNMSexUTSJoVxRlIQTFXDJBU7v58ISdgJX8cPa+UvIC8hhLsayM+cbm+J3jgy7V9E9wllq3RpmXN33TxY7nwKgWdIms2t9YKZco3y4dKKAUyHXrtMvw8NNPQM+4="
-    template:
-      - 'Build <a href="%{build_url}">#%{build_number}</a>: %{author} tested <a href="%{compare_url}">%{commit}</a> in branch <a href="https://github.com/%{repository_slug}/tree/%{branch}">%{branch}</a> of <a href="https://github.com/%{repository_slug}">%{repository_name}</a>: <b>%{commit_message}</b><br>%{message} (%{duration})'
-    format: html
-
+  slack:
+    secure: HHQYr7sF8M1SzoWSqgKVYtwAgGdLLCyTMsQjFhEEQNYO92ZwURE5s03qWTGH5k8+4Yqn26yrXt3NztLC4JIOpcGervN2mSZyq4dZgFTcWEd61igw0qwSenlwvFfbE1ASK/KYCzfyn9MIfHN+ovwLoRxXZkPwinKDvl3DXjBaFNg=
 git:
   submodules: false

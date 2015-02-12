@@ -3,29 +3,32 @@
 
 #include <mbgl/util/variant.hpp>
 #include <mbgl/style/function_properties.hpp>
+#include <mbgl/style/piecewisefunction_properties.hpp>
 #include <mbgl/style/types.hpp>
 
 #include <vector>
+#include <array>
 
 namespace mbgl {
 
 typedef mapbox::util::variant<
-    std::string,
-    TranslateAnchorType,
-    RotateAnchorType,
-    bool,
-    CapType,
-    JoinType,
+    Function<std::string>,
+    Function<TranslateAnchorType>,
+    Function<RotateAnchorType>,
+    Function<CapType>,
+    Function<JoinType>,
     VisibilityType,
-    PlacementType,
-    RotationAlignmentType,
-    TextTransformType,
-    TextJustifyType,
-    TextAnchorType,
+    Function<PlacementType>,
+    Function<RotationAlignmentType>,
+    Function<TextTransformType>,
+    Function<TextJustifyType>,
+    Function<TextAnchorType>,
+    Function<std::array<float, 2>>,
     Function<bool>,
     Function<float>,
     Function<Color>,
-    Function<std::vector<float>>
+    PiecewiseConstantFunction<Faded<std::vector<float>>>,
+    PiecewiseConstantFunction<Faded<std::string>>
 > PropertyValue;
 
 }

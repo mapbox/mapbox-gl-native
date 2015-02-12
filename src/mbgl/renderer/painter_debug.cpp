@@ -25,7 +25,7 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
 
     // Draw white outline
     plainShader->u_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
-    lineWidth(4.0f * state.getPixelRatio());
+    lineWidth(4.0f * transform.finalState().getPixelRatio());
     bucket.drawLines(*plainShader);
 
 #ifndef GL_ES_VERSION_2_0
@@ -36,7 +36,7 @@ void Painter::renderDebugText(DebugBucket& bucket, const mat4 &matrix) {
 
     // Draw black text.
     plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
-    lineWidth(2.0f * state.getPixelRatio());
+    lineWidth(2.0f * transform.finalState().getPixelRatio());
     bucket.drawLines(*plainShader);
 
     MBGL_CHECK_ERROR(glEnable(GL_DEPTH_TEST));
@@ -56,7 +56,7 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     // draw tile outline
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET(0));
     plainShader->u_color = {{ 1.0f, 0.0f, 0.0f, 1.0f }};
-    lineWidth(4.0f * state.getPixelRatio());
+    lineWidth(4.0f * transform.finalState().getPixelRatio());
     MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index()));
 
     MBGL_CHECK_ERROR(glEnable(GL_DEPTH_TEST));
@@ -87,14 +87,14 @@ void Painter::renderDebugText(const std::vector<std::string> &strings) {
         VertexArrayObject debugFontArray;
         debugFontArray.bind(*plainShader, debugFontBuffer, BUFFER_OFFSET(0));
         plainShader->u_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
-        lineWidth(4.0f * state.getPixelRatio());
+        lineWidth(4.0f * transform.finalState().getPixelRatio());
         MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, (GLsizei)debugFontBuffer.index()));
     #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glPointSize(2));
         MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, (GLsizei)debugFontBuffer.index()));
     #endif
         plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
-        lineWidth(2.0f * state.getPixelRatio());
+        lineWidth(2.0f * transform.finalState().getPixelRatio());
         MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, (GLsizei)debugFontBuffer.index()));
     }
 

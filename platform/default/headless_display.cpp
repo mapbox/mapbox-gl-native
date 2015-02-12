@@ -3,6 +3,10 @@
 #include <cstring>
 #include <stdexcept>
 
+#if MBGL_USE_GLX
+#include <GL/glx.h>
+#endif
+
 namespace mbgl {
 
 HeadlessDisplay::HeadlessDisplay() {
@@ -52,7 +56,7 @@ HeadlessDisplay::HeadlessDisplay() {
     // We're creating a dummy pbuffer anyway that we're not using.
     static int pixelFormat[] = {
         GLX_DRAWABLE_TYPE, GLX_PBUFFER_BIT,
-        0
+        None
     };
 
     int configs = 0;

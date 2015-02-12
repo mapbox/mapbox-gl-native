@@ -5,6 +5,7 @@
 #include <mbgl/style/class_properties.hpp>
 #include <mbgl/style/style_properties.hpp>
 #include <mbgl/style/applied_class_properties.hpp>
+#include <mbgl/style/zoom_history.hpp>
 
 #include <mbgl/util/ptr.hpp>
 
@@ -36,7 +37,7 @@ public:
 
     // Updates the StyleProperties information in this layer by evaluating all
     // pending transitions and applied classes in order.
-    void updateProperties(float z, std::chrono::steady_clock::time_point now);
+    void updateProperties(float z, std::chrono::steady_clock::time_point now, ZoomHistory &zoomHistory);
 
     // Sets the list of classes and creates transitions to the currently applied values.
     void setClasses(const std::vector<std::string> &class_names, std::chrono::steady_clock::time_point now,
@@ -51,9 +52,9 @@ private:
 
     // Sets the properties of this object by evaluating all pending transitions and
     // aplied classes in order.
-    template <typename T> void applyStyleProperties(float z, std::chrono::steady_clock::time_point now);
-    template <typename T> void applyStyleProperty(PropertyKey key, T &, float z, std::chrono::steady_clock::time_point now);
-    template <typename T> void applyTransitionedStyleProperty(PropertyKey key, T &, float z, std::chrono::steady_clock::time_point now);
+    template <typename T> void applyStyleProperties(float z, std::chrono::steady_clock::time_point now, const ZoomHistory &zoomHistory);
+    template <typename T> void applyStyleProperty(PropertyKey key, T &, float z, std::chrono::steady_clock::time_point now, const ZoomHistory &zoomHistory);
+    template <typename T> void applyTransitionedStyleProperty(PropertyKey key, T &, float z, std::chrono::steady_clock::time_point now, const ZoomHistory &zoomHistory);
 
     // Removes all expired style transitions.
     void cleanupAppliedStyleProperties(std::chrono::steady_clock::time_point now);

@@ -1,11 +1,23 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.10.1'
+    }
+}
+
+apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
+apply plugin: 'checkstyle'
 
 task accessToken {
-    def rawDir = new File("app/src/main/res/raw")
+    def rawDir = new File("MapboxGLAndroidSDKTestApp/src/main/res/raw")
     rawDir.mkdirs()
-    def tokenFile = new File("app/src/main/res/raw/token.txt")
+    def tokenFile = new File("MapboxGLAndroidSDKTestApp/src/main/res/raw/token.txt")
     if (!tokenFile.exists()) {
-        String token = System.getenv('MAPBOX_ACCESS_TOKEN')
+        String token = "$System.env.MAPBOX_ACCESS_TOKEN"
         if (token == null) {
             throw new InvalidUserDataException("You must set the MAPBOX_ACCESS_TOKEN environment variable.")
         }
@@ -22,7 +34,7 @@ android {
     buildToolsVersion "21.1.2"
 
     repositories {
-        jcenter()
+        mavenCentral()
     }
 
     defaultConfig {
@@ -46,6 +58,7 @@ android {
     lintOptions {
         checkAllWarnings true
         disable 'UnusedAttribute'
+        abortOnError false
         //disable 'IconDensities'
     }
 
@@ -58,9 +71,27 @@ android {
 }
 
 dependencies {
-    compile project(':lib')
+    compile(project(':MapboxGLAndroidSDK')) {
+        transitive = true
+    }
     compile 'com.android.support:support-annotations:21.0.0'
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.mapzen.android:lost:0.2'
+}
+
+checkstyle {
+    configFile project.file('../checks.xml')
+    showViolations true
+}
+
+android.applicationVariants.all { variant ->
+    def name = variant.buildType.name
+    def checkstyle = project.tasks.create "checkstyle${name.capitalize()}", Checkstyle
+    checkstyle.dependsOn variant.javaCompile
+    checkstyle.source variant.javaCompile.source
+    checkstyle.classpath = project.fileTree(variant.javaCompile.destinationDir)
+    checkstyle.exclude('**/BuildConfig.java')
+    checkstyle.exclude('**/R.java')
+    project.tasks.getByName("check").dependsOn checkstyle
 }

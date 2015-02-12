@@ -203,6 +203,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     _glView.enableSetNeedsDisplay = NO;
     _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
     _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
+    if ([UIScreen instancesRespondToSelector:@selector(nativeScale)]) {
+        _glView.contentScaleFactor = [[UIScreen mainScreen] nativeScale];
+    }
     _glView.delegate = self;
     [_glView bindDrawable];
     [self addSubview:_glView];

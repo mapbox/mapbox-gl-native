@@ -3,6 +3,7 @@
 
 #include <mbgl/style/property_transition.hpp>
 #include <mbgl/style/style_source.hpp>
+#include <mbgl/style/zoom_history.hpp>
 
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -50,6 +51,7 @@ private:
     PropertyTransition defaultTransition;
     bool initial_render_complete = false;
     std::unique_ptr<uv::rwlock> mtx;
+    ZoomHistory zoomHistory;
 };
 
 }

@@ -12,7 +12,7 @@ class StyleLayerGroup {
 public:
     void setClasses(const std::vector<std::string> &class_names, std::chrono::steady_clock::time_point now,
                     const PropertyTransition &defaultTransition);
-    void updateProperties(float z, std::chrono::steady_clock::time_point now);
+    void updateProperties(float z, std::chrono::steady_clock::time_point now, ZoomHistory &zoomHistory);
 
     bool hasTransitions() const;
 public:

@@ -52,12 +52,15 @@ public class LonLatZoom extends LonLat implements Parcelable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         LonLatZoom other = (LonLatZoom) obj;
         return super.equals(obj) && Double.doubleToLongBits(zoom) == Double.doubleToLongBits(other.zoom);
     }
