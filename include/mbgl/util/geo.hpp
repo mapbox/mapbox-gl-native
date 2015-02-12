@@ -1,5 +1,5 @@
-#ifndef MBGL_MAP_GEOGRAPHY
-#define MBGL_MAP_GEOGRAPHY
+#ifndef MBGL_UTIL_GEO
+#define MBGL_UTIL_GEO
 
 namespace mbgl {
 

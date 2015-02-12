@@ -1,11 +1,11 @@
 #include <mbgl/map/transform.hpp>
-#include <mbgl/map/projection.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/transition.hpp>
+#include <mbgl/util/projection.hpp>
 #include <mbgl/platform/platform.hpp>
 
 #include <cstdio>

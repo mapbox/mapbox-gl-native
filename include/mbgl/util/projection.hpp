@@ -1,8 +1,8 @@
-#ifndef MBGL_MAP_PROJECTION
-#define MBGL_MAP_PROJECTION
+#ifndef MBGL_UTIL_PROJECTION
+#define MBGL_UTIL_PROJECTION
 
-#include <mbgl/map/geography.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/geo.hpp>
 
 #include <cmath>
 

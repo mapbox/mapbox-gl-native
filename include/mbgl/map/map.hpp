@@ -1,9 +1,9 @@
 #ifndef MBGL_MAP_MAP
 #define MBGL_MAP_MAP
 
-#include <mbgl/map/geography.hpp>
-#include <mbgl/map/projection.hpp>
 #include <mbgl/map/transform.hpp>
+#include <mbgl/util/geo.hpp>
+#include <mbgl/util/projection.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>

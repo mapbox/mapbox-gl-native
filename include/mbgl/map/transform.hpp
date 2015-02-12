@@ -2,7 +2,7 @@
 #define MBGL_MAP_TRANSFORM
 
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/map/geography.hpp>
+#include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <cstdint>
