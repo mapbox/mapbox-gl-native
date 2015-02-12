@@ -100,6 +100,10 @@ void HeadlessView::loadExtensions() {
 }
 
 void HeadlessView::createContext() {
+    if (!display_) {
+        throw std::runtime_error("Display is not set");
+    }
+
 #if MBGL_USE_CGL
     CGLError error = CGLCreateContext(display_->pixelFormat, NULL, &glContext);
     if (error != kCGLNoError) {
