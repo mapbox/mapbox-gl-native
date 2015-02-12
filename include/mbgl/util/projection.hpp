@@ -47,7 +47,7 @@ public:
         const double easting  = util::EARTH_RADIUS_M * latLng.longitude * util::DEG2RAD;
         const double northing = 0.5 * util::EARTH_RADIUS_M * std::log((1 + f) / (1 - f));
 
-        return { northing, easting };
+        return ProjectedMeters(northing, easting);
     }
 
     static inline const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) {
@@ -59,7 +59,7 @@ public:
         while (longitude >  180) longitude -= 180;
         while (longitude < -180) longitude += 180;
         
-        return { latitude, longitude };
+        return LatLng(latitude, longitude);
     }
 };
 
