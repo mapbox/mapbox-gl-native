@@ -3,8 +3,10 @@
 
 #include "node_file_source.hpp"
 #include "node_map.hpp"
+#include "node_log.hpp"
 #include "node_request.hpp"
 #include "compress_png.hpp"
+
 
 void RegisterModule(v8::Handle<v8::Object> exports) {
     NanScope();
@@ -23,6 +25,13 @@ void RegisterModule(v8::Handle<v8::Object> exports) {
     resource->ForceSet(NanNew("Image"), NanNew(mbgl::Resource::Image), ConstantProperty);
     resource->ForceSet(NanNew("JSON"), NanNew(mbgl::Resource::JSON), ConstantProperty);
     exports->ForceSet(NanNew("Resource"), resource, ConstantProperty);
+
+    // Make the exported object inerhit from process.EventEmitter
+    auto process = NanGetCurrentContext()->Global()->Get(NanNew("process"))->ToObject();
+    auto EventEmitter = process->Get(NanNew("EventEmitter"))->ToObject();
+    exports->SetPrototype(EventEmitter->Get(NanNew("prototype")));
+
+    mbgl::Log::Set<node_mbgl::NodeLogBackend>(exports);
 }
 
 NODE_MODULE(mbgl, RegisterModule)
