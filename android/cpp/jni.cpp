@@ -467,17 +467,16 @@ void JNICALL nativeSetLonLat(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, j
         return;
     }
 
-    nativeMapView->getMap().setLonLat(lon, lat, std::chrono::milliseconds(duration));
+    nativeMapView->getMap().setLatLng(mbgl::LatLng(lat, lon), std::chrono::milliseconds(duration));
 }
 
 jobject JNICALL nativeGetLonLat(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetLonLat");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    double lon = 0.0, lat = 0.0;
-    nativeMapView->getMap().getLonLat(lon, lat);
+    mbgl::LatLng latLng = nativeMapView->getMap().getLatLng();
 
-    jobject ret = env->NewObject(lonLatClass, lonLatConstructorId, lon, lat);
+    jobject ret = env->NewObject(lonLatClass, lonLatConstructorId, latLng.longitude, latLng.latitude);
     if (ret == nullptr) {
         env->ExceptionDescribe();
         return nullptr;
@@ -569,17 +568,18 @@ void JNICALL nativeSetLonLatZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPt
         return;
     }
 
-    nativeMapView->getMap().setLonLatZoom(lon, lat, zoom, std::chrono::milliseconds(duration));
+    nativeMapView->getMap().setLatLngZoom(mbgl::LatLng(lat, lon), zoom, std::chrono::milliseconds(duration));
 }
 
 jobject JNICALL nativeGetLonLatZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetLonLatZoom");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    double lon = 0.0, lat = 0.0, zoom = 0.0;
-    nativeMapView->getMap().getLonLatZoom(lon, lat, zoom);
+    double zoom = 0.0;
+    mbgl::LatLng latLng = mbgl::LatLng();
+    nativeMapView->getMap().getLatLngZoom(latLng, zoom);
 
-    jobject ret = env->NewObject(lonLatZoomClass, lonLatZoomConstructorId, lon, lat, zoom);
+    jobject ret = env->NewObject(lonLatZoomClass, lonLatZoomConstructorId, latLng.longitude, latLng.latitude, zoom);
     if (ret == nullptr) {
         env->ExceptionDescribe();
         return nullptr;
