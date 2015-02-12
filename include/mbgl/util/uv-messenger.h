@@ -1,11 +1,11 @@
 #ifndef MBGL_UTIL_UV_MESSENGER
 #define MBGL_UTIL_UV_MESSENGER
 
+#include <uv.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <uv.h>
 
 typedef struct uv_messenger_s uv_messenger_t;
 typedef void (*uv_messenger_cb)(void *arg);
