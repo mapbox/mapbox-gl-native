@@ -1,5 +1,6 @@
 package com.mapbox.mapboxgl.lib;
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -176,7 +177,11 @@ public class MapView extends SurfaceView {
         requestFocus();
 
         // Register the SurfaceHolder callbacks
-        getHolder().addCallback(new Callbacks());
+        if (android.os.Build.VERSION.SDK_INT >= 9) {
+            getHolder().addCallback(new Callbacks2());
+        } else {
+            getHolder().addCallback(new Callbacks());
+        }
 
         // Touch gesture detectors
         mGestureDetector = new GestureDetectorCompat(context, new GestureListener());
@@ -331,7 +336,7 @@ public class MapView extends SurfaceView {
 
     private void validateAccessToken(String accessToken) {
 
-        if (accessToken.isEmpty() | (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {
+        if (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk.")) {
             throw new RuntimeException("Using MapView requires setting a valid access token. See the README.md");
         }
     }
@@ -424,11 +429,11 @@ public class MapView extends SurfaceView {
         outState.putParcelable(STATE_CENTER_COORDINATE, getCenterCoordinate());
         outState.putDouble(STATE_ZOOM_LEVEL, getZoomLevel()); // need to set zoom level first because of limitation on rotating when zoomed out
         outState.putDouble(STATE_CENTER_DIRECTION, getDirection());
-        outState.putBoolean(STATE_ZOOM_ENABLED, isZoomEnabled());
-        outState.putBoolean(STATE_SCROLL_ENABLED, isScrollEnabled());
-        outState.putBoolean(STATE_ROTATE_ENABLED, isRotateEnabled());
+        outState.putBoolean(STATE_ZOOM_ENABLED, mZoomEnabled);
+        outState.putBoolean(STATE_SCROLL_ENABLED, mScrollEnabled);
+        outState.putBoolean(STATE_ROTATE_ENABLED, mRotateEnabled);
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
-        outState.putString(STATE_STYLE_URL, getStyleUrl());
+        outState.putString(STATE_STYLE_URL, mStyleUrl);
         outState.putString(STATE_ACCESS_TOKEN, getAccessToken());
         outState.putStringArrayList(STATE_CLASSES, new ArrayList<String>(getClasses()));
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
@@ -482,16 +487,7 @@ public class MapView extends SurfaceView {
     }
 
     // This class handles SurfaceHolder callbacks
-    private class Callbacks implements SurfaceHolder.Callback2 {
-
-        // Called when we need to redraw the view
-        // This is called before our view is first visible to prevent an initial
-        // flicker (see Android SDK documentation)
-        @Override
-        public void surfaceRedrawNeeded(SurfaceHolder holder) {
-            Log.v(TAG, "surfaceRedrawNeeded");
-            mNativeMapView.update();
-        }
+    private class Callbacks implements SurfaceHolder.Callback {
 
         // Called when the native surface buffer has been created
         // Must do all EGL/GL ES initialization here
@@ -518,6 +514,19 @@ public class MapView extends SurfaceView {
             Log.v(TAG, "surfaceChanged");
             Log.i(TAG, "resize " + format + " " + width + " " + height);
             mNativeMapView.resize((int) (width / mScreenDensity), (int) (height / mScreenDensity), mScreenDensity, width, height);
+        }
+    }
+
+    @TargetApi(9)
+    private class Callbacks2 extends Callbacks implements SurfaceHolder.Callback2 {
+
+        // Called when we need to redraw the view
+        // This is called before our view is first visible to prevent an initial
+        // flicker (see Android SDK documentation)
+        @Override
+        public void surfaceRedrawNeeded(SurfaceHolder holder) {
+            Log.v(TAG, "surfaceRedrawNeeded");
+            mNativeMapView.update();
         }
     }
 
@@ -576,10 +585,10 @@ public class MapView extends SurfaceView {
     }
 
     // Called when user touches the screen, all positions are absolute
-    @Override
+    @Override @TargetApi(14)
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         // Check and ignore non touch or left clicks
-        if ((event.getButtonState() != 0) && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
+        if ((android.os.Build.VERSION.SDK_INT >= 14) && (event.getButtonState() != 0) && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
             return false;
         }
 
@@ -1092,7 +1101,7 @@ public class MapView extends SurfaceView {
 
     // Called for events that don't fit the other handlers
     // such as mouse scroll events, mouse moves, joystick, trackpad
-    @Override
+    @Override @TargetApi(12)
     public boolean onGenericMotionEvent(MotionEvent event) {
         // Mouse events
         // TODO: SOURCE_TOUCH_NAVIGATION?
@@ -1130,7 +1139,7 @@ public class MapView extends SurfaceView {
 
     // Called when the mouse pointer enters or exits the view
     // or when it fades in or out due to movement
-    @Override
+    @Override @TargetApi(14)
     public boolean onHoverEvent(@NonNull MotionEvent event) {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_HOVER_ENTER:
