@@ -120,8 +120,6 @@ const LatLng Transform::getLatLng() const {
     ll.latitude  = util::RAD2DEG * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
 
     return ll;
-
-    // final.getLonLat(lon, lat);
 }
 
 void Transform::getLatLngZoom(LatLng &latLng, double &zoom) const {
