@@ -407,7 +407,7 @@ void Map::moveBy(double dx, double dy, std::chrono::steady_clock::duration durat
     update();
 }
 
-void Map::setLatLon(LatLng latLng, std::chrono::steady_clock::duration duration) {
+void Map::setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration) {
     transform.setLatLng(latLng, duration);
     update();
 }

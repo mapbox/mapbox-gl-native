@@ -7,7 +7,7 @@
 #include <mbgl/storage/default/sqlite_cache.hpp>
 #include <mbgl/storage/network_status.hpp>
 
-#include <mbgl/map/geography.h>
+#include <mbgl/util/geo.hpp>
 
 #import <Foundation/Foundation.h>
 
@@ -33,7 +33,7 @@
         [params setObject:[parts objectAtIndex:1] forKey:[parts objectAtIndex:0]];
     }
 
-    mbgl::LatLng latLng = { 0, 0 };
+    mbgl::LatLng latLng = mbgl::LatLng(0, 0);
     double zoom = 0, bearing = 0;
     bool hasCenter = false, hasZoom = false, hasBearing = false;
 
@@ -123,7 +123,7 @@ int main() {
 
     // Load settings
     mbgl::Settings_NSUserDefaults settings;
-    map.setLatLngZoom({ settings.latitude, settings.longitude }, settings.zoom);
+    map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
     map.setBearing(settings.bearing);
     map.setDebug(settings.debug);
 

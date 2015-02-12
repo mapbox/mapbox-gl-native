@@ -822,7 +822,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLatLon(mbgl::LatLng(coordinate.latitude, coordinate.longitude), secondsAsDuration(duration));
+    mbglMap->setLatLng(mbgl::LatLng(coordinate.latitude, coordinate.longitude), secondsAsDuration(duration));
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate

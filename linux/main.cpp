@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 
     // Load settings
     mbgl::Settings_JSON settings;
-    map.setLatLngZoom({ settings.latitude, settings.longitude }, settings.zoom);
+    map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
     map.setBearing(settings.bearing);
     map.setDebug(settings.debug);
 
@@ -94,7 +94,10 @@ int main(int argc, char *argv[]) {
     int ret = view->run();
 
     // Save settings
-    map.getLatLngZoom({ settings.latitude, settings.longitude }, settings.zoom);
+    mbgl::LatLng latLng = mbgl::LatLng();
+    map.getLatLngZoom(latLng, settings.zoom);
+    settings.latitude = latLng.latitude;
+    settings.longitude = latLng.longitude;
     settings.bearing = map.getBearing();
     settings.debug = map.getDebug();
     settings.save();

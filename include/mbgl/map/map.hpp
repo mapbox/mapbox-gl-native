@@ -96,7 +96,7 @@ public:
 
     // Position
     void moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setLatLon(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     const LatLng getLatLng() const;
     void startPanning();
     void stopPanning();
