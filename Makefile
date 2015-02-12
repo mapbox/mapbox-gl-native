@@ -32,7 +32,6 @@ global: build
 build: build/Makefile
 	@node-gyp build $(DEBUG_FLAG) --clang -- -j$(JOBS)
 
-.PHONY: vendor/mbgl
 vendor/mbgl:
 	git submodule update --init
 

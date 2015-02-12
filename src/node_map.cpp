@@ -1,12 +1,24 @@
 #include "node_map.hpp"
-#include "node_map_render_worker.hpp"
 #include "node_file_source.hpp"
 
 #include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/map/still_image.hpp>
+#include <mbgl/util/exception.hpp>
 
  #include <unistd.h>
 
 namespace node_mbgl {
+
+struct NodeMap::RenderOptions {
+    double zoom = 0;
+    double bearing = 0;
+    double latitude = 0;
+    double longitude = 0;
+    unsigned int width = 512;
+    unsigned int height = 512;
+    float ratio = 1.0f;
+    std::vector<std::string> classes;
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Static Node Methods
@@ -21,6 +33,7 @@ void NodeMap::Init(v8::Handle<v8::Object> target) {
     t->InstanceTemplate()->SetInternalFieldCount(1);
     t->SetClassName(NanNew("Map"));
 
+    NODE_SET_PROTOTYPE_METHOD(t, "setAccessToken", SetAccessToken);
     NODE_SET_PROTOTYPE_METHOD(t, "load", Load);
     NODE_SET_PROTOTYPE_METHOD(t, "render", Render);
 
@@ -56,6 +69,32 @@ NAN_METHOD(NodeMap::New) {
     NanReturnValue(args.This());
 }
 
+
+NAN_METHOD(NodeMap::SetAccessToken) {
+    NanScope();
+
+    if (args.Length() < 1) {
+        return NanThrowError("Requires a string as first argument");
+    }
+
+    NanUtf8String token(args[0]);
+
+    auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
+
+    if (nodeMap->map.isRendering()) {
+        return NanThrowError("Map object is currently in use");
+    }
+
+    try {
+        nodeMap->map.setAccessToken(std::string { *token, size_t(token.length()) });
+    } catch (const std::exception &ex) {
+        return NanThrowError(ex.what());
+    }
+
+
+    NanReturnUndefined();
+}
+
 const std::string StringifyStyle(v8::Handle<v8::Value> styleHandle) {
     NanScope();
 
@@ -77,19 +116,22 @@ NAN_METHOD(NodeMap::Load) {
     if (args[0]->IsObject()) {
         style = StringifyStyle(args[0]);
     } else if (args[0]->IsString()) {
-        v8::Local<v8::String> toStr = args[0]->ToString();
-        style.resize(toStr->Utf8Length());
-        toStr->WriteUtf8(const_cast<char *>(style.data()));
+        NanUtf8String string(args[0]);
+        style = { *string, size_t(string.length()) };
     } else {
         return NanThrowTypeError("First argument must be a string or object");
     }
 
     auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
 
+    if (nodeMap->map.isRendering()) {
+        return NanThrowError("Map object is currently in use");
+    }
+
     try {
         nodeMap->map.setStyleJSON(style, ".");
     } catch (const std::exception &ex) {
-        NanThrowError(ex.what());
+        return NanThrowError(ex.what());
     }
 
     NanReturnUndefined();
@@ -110,9 +152,6 @@ std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Obje
     if (obj->Has(NanNew("width"))) { options->width = obj->Get(NanNew("width"))->IntegerValue(); }
     if (obj->Has(NanNew("height"))) { options->height = obj->Get(NanNew("height"))->IntegerValue(); }
     if (obj->Has(NanNew("ratio"))) { options->ratio = obj->Get(NanNew("ratio"))->IntegerValue(); }
-    if (obj->Has(NanNew("accessToken"))) {
-        options->accessToken = *NanUtf8String(obj->Get(NanNew("accessToken")->ToString()));
-    }
 
     if (obj->Has(NanNew("classes"))) {
         auto classes = obj->Get(NanNew("classes"))->ToObject().As<v8::Array>();
@@ -137,22 +176,98 @@ NAN_METHOD(NodeMap::Render) {
         return NanThrowTypeError("Second argument must be a callback function");
     }
 
+    auto options = ParseOptions(args[0]->ToObject());
+
     auto nodeMap = node::ObjectWrap::Unwrap<NodeMap>(args.Holder());
 
-    const bool wasEmpty = nodeMap->queue_.empty();
+    if (nodeMap->map.isRendering()) {
+        return NanThrowError("Map object is currently in use");
+    }
 
-    nodeMap->queue_.push(mbgl::util::make_unique<RenderWorker>(
-        nodeMap,
-        ParseOptions(args[0]->ToObject()),
-        new NanCallback(args[1].As<v8::Function>())));
+    assert(!nodeMap->callback);
+    assert(!nodeMap->image);
+    nodeMap->callback = std::unique_ptr<NanCallback>(new NanCallback(args[1].As<v8::Function>()));
 
-    if (wasEmpty) {
-        // When the queue was empty, there was no action in progress, so we can start a new one.
-        NanAsyncQueueWorker(nodeMap->queue_.front().release());
+    try {
+        nodeMap->startRender(std::move(options));
+    } catch (mbgl::util::Exception &ex) {
+        return NanThrowError(ex.what());
     }
 
     NanReturnUndefined();
 }
+
+void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
+    view.resize(options->width, options->height, options->ratio);
+    map.setClasses(options->classes);
+    map.setLonLatZoom(options->longitude, options->latitude, options->zoom);
+    map.setBearing(options->bearing);
+
+    map.renderStill([this](std::unique_ptr<const mbgl::StillImage> result) {
+        assert(!image);
+        image = std::move(result);
+        uv_async_send(async);
+    });
+
+    // Retain this object, otherwise it might get destructed before we are finished rendering the
+    // still image.
+    Ref();
+
+    // Similarly, we're now waiting for the async to be called, so we need to make sure that it
+    // keeps the loop alive.
+    uv_ref(reinterpret_cast<uv_handle_t *>(async));
+}
+
+void NodeMap::renderFinished() {
+    NanScope();
+
+    // We're done with this render call, so we're unrefing so that the loop could close.
+    uv_unref(reinterpret_cast<uv_handle_t *>(async));
+
+    // There is no render pending anymore, we the GC could now delete this object if it went out
+    // of scope.
+    Unref();
+
+    // Move the callback and image out of the way so that the callback can start a new render call.
+    auto cb = std::move(callback);
+    auto img = std::move(image);
+    assert(cb);
+
+    // These have to be empty to be prepared for the next render call.
+    assert(!callback);
+    assert(!image);
+
+    if (img) {
+        v8::Local<v8::Object> result = v8::Object::New();
+        result->Set(NanNew("width"), NanNew(img->width));
+        result->Set(NanNew("height"), NanNew(img->height));
+
+        v8::Local<v8::Object> pixels = NanNewBufferHandle(
+            reinterpret_cast<char *>(img->pixels.get()),
+            size_t(img->width) * size_t(img->height) * sizeof(mbgl::StillImage::Pixel),
+
+            // Retain the StillImage object until the buffer is deleted.
+            [](char *, void *hint) {
+                delete reinterpret_cast<std::unique_ptr<const mbgl::StillImage> *>(hint);
+            },
+            new std::unique_ptr<const mbgl::StillImage>(std::move(img))
+        );
+
+        result->Set(NanNew("pixels"), pixels);
+
+        v8::Local<v8::Value> argv[] = {
+            NanNull(),
+            result,
+        };
+        cb->Call(2, argv);
+    } else {
+        v8::Local<v8::Value> argv[] = {
+            NanError("Didn't get an image")
+        };
+        cb->Call(1, argv);
+    }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
@@ -165,21 +280,24 @@ std::shared_ptr<mbgl::HeadlessDisplay> sharedDisplay() {
 NodeMap::NodeMap(v8::Handle<v8::Object> source_) :
     view(sharedDisplay()),
     fs(*ObjectWrap::Unwrap<NodeFileSource>(source_)),
-    map(view, fs) {
+    map(view, fs, mbgl::Map::RenderMode::Still),
+    async(new uv_async_t) {
     source = v8::Persistent<v8::Object>::New(source_);
+    async->data = this;
+    uv_async_init(uv_default_loop(), async, [](uv_async_t *as, int) {
+        reinterpret_cast<NodeMap *>(as->data)->renderFinished();
+    });
+
+    // Make sure the async handle doesn't keep the loop alive.
+    uv_unref(reinterpret_cast<uv_handle_t *>(async));
 }
 
 NodeMap::~NodeMap() {
     source.Dispose();
-}
 
-void NodeMap::processNext() {
-    assert(!queue_.empty());
-    queue_.pop();
-    if (!queue_.empty()) {
-        // When the queue was empty, there was no action in progress, so we can start a new one.
-        NanAsyncQueueWorker(queue_.front().release());
-    }
+    uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *handle) {
+        delete reinterpret_cast<uv_async_t *>(handle);
+    });
 }
 
 }

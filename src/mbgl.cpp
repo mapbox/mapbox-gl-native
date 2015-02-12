@@ -4,6 +4,7 @@
 #include "node_file_source.hpp"
 #include "node_map.hpp"
 #include "node_request.hpp"
+#include "compress_png.hpp"
 
 void RegisterModule(v8::Handle<v8::Object> exports) {
     NanScope();
@@ -11,6 +12,7 @@ void RegisterModule(v8::Handle<v8::Object> exports) {
     node_mbgl::NodeFileSource::Init(exports);
     node_mbgl::NodeMap::Init(exports);
     node_mbgl::NodeRequest::Init(exports);
+    node_mbgl::InitCompressPNG(exports);
 
     // Exports Resource constants.
     auto ConstantProperty = static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete);

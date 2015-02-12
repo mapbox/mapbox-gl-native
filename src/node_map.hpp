@@ -23,8 +23,12 @@ class NodeMap : public node::ObjectWrap {
 public:
     static void Init(v8::Handle<v8::Object> target);
     static NAN_METHOD(New);
+    static NAN_METHOD(SetAccessToken);
     static NAN_METHOD(Load);
     static NAN_METHOD(Render);
+
+    void startRender(std::unique_ptr<NodeMap::RenderOptions> options);
+    void renderFinished();
 
     static std::unique_ptr<NodeMap::RenderOptions> ParseOptions(v8::Local<v8::Object> obj);
 
@@ -36,17 +40,19 @@ private:
     NodeMap(v8::Handle<v8::Object> source);
     ~NodeMap();
 
-    void processNext();
-
 private:
+    // For retaining the FileSource object.
     v8::Persistent<v8::Object> source;
-    v8::Persistent<v8::Object> self;
 
     mbgl::HeadlessView view;
     NodeFileSource &fs;
     mbgl::Map map;
 
-    std::queue<std::unique_ptr<RenderWorker>> queue_;
+    std::unique_ptr<const mbgl::StillImage> image;
+    std::unique_ptr<NanCallback> callback;
+
+    // Async for delivering the notifications of render completion.
+    uv_async_t *async;
 };
 
 } // end ns node_mbgl
