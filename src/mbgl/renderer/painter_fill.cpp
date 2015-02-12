@@ -49,8 +49,8 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 
         // Draw the entire line
         outlineShader->u_world = {{
-            static_cast<float>(transform.finalState().getFramebufferWidth()),
-            static_cast<float>(transform.finalState().getFramebufferHeight())
+            static_cast<float>(transform.currentState().getFramebufferWidth()),
+            static_cast<float>(transform.currentState().getFramebufferHeight())
         }};
         depthRange(strata, 1.0f);
         bucket.drawVertices(*outlineShader);
@@ -61,7 +61,7 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         if (pass == RenderPass::Translucent) {
             const SpriteAtlasPosition posA = spriteAtlas.getPosition(properties.image.from, true);
             const SpriteAtlasPosition posB = spriteAtlas.getPosition(properties.image.to, true);
-            float factor = 8.0 / std::pow(2, transform.finalState().getIntegerZoom() - id.z);
+            float factor = 8.0 / std::pow(2, transform.currentState().getIntegerZoom() - id.z);
 
             mat3 patternMatrixA;
             matrix::identity(patternMatrixA);
@@ -122,8 +122,8 @@ void Painter::renderFill(FillBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 
         // Draw the entire line
         outlineShader->u_world = {{
-            static_cast<float>(transform.finalState().getFramebufferWidth()),
-            static_cast<float>(transform.finalState().getFramebufferHeight())
+            static_cast<float>(transform.currentState().getFramebufferWidth()),
+            static_cast<float>(transform.currentState().getFramebufferHeight())
         }};
 
         depthRange(strata + strata_epsilon, 1.0f);

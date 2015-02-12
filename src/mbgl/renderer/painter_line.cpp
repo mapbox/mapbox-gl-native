@@ -18,7 +18,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
 
     // the distance over which the line edge fades out.
     // Retina devices need a smaller distance to avoid aliasing.
-    float antialiasing = 1 / transform.finalState().getPixelRatio();
+    float antialiasing = 1 / transform.currentState().getPixelRatio();
 
     float blur = properties.blur + antialiasing;
     float edgeWidth = properties.width / 2.0;
@@ -42,7 +42,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    float ratio = transform.finalState().getPixelRatio();
+    float ratio = transform.currentState().getPixelRatio();
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
 
     depthRange(strata, 1.0f);
@@ -53,15 +53,15 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linejoinShader->u_matrix = vtxMatrix;
         linejoinShader->u_color = color;
         linejoinShader->u_world = {{
-            transform.finalState().getFramebufferWidth() * 0.5f,
-            transform.finalState().getFramebufferHeight() * 0.5f
+            transform.currentState().getFramebufferWidth() * 0.5f,
+            transform.currentState().getFramebufferHeight() * 0.5f
         }};
         linejoinShader->u_linewidth = {{
-            ((outset - 0.25f) * transform.finalState().getPixelRatio()),
-            ((inset - 0.25f) * transform.finalState().getPixelRatio())
+            ((outset - 0.25f) * transform.currentState().getPixelRatio()),
+            ((inset - 0.25f) * transform.currentState().getPixelRatio())
         }};
 
-        float pointSize = std::ceil(transform.finalState().getPixelRatio() * outset * 2.0);
+        float pointSize = std::ceil(transform.currentState().getPixelRatio() * outset * 2.0);
 #if defined(GL_ES_VERSION_2_0)
         linejoinShader->u_size = pointSize;
 #else
@@ -85,7 +85,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         LinePatternPos posB = lineAtlas.getDashPosition(properties.dash_array.to, bucket.properties.cap == CapType::Round);
         lineAtlas.bind();
 
-        float patternratio = std::pow(2.0, std::floor(std::log2(transform.finalState().getScale())) - id.z) / 8.0;
+        float patternratio = std::pow(2.0, std::floor(std::log2(transform.currentState().getScale())) - id.z) / 8.0;
         float scaleXA = patternratio / posA.width / properties.dash_line_width / properties.dash_array.fromScale;
         float scaleYA = -posA.height / 2.0;
         float scaleXB = patternratio / posB.width / properties.dash_line_width / properties.dash_array.toScale;
@@ -96,7 +96,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         linesdfShader->u_patternscale_b = {{ scaleXB, scaleYB }};
         linesdfShader->u_tex_y_b = posB.y;
         linesdfShader->u_image = 0;
-        linesdfShader->u_sdfgamma = lineAtlas.width / (properties.dash_line_width * std::min(posA.width, posB.width) * 256.0 * transform.finalState().getPixelRatio()) / 2;
+        linesdfShader->u_sdfgamma = lineAtlas.width / (properties.dash_line_width * std::min(posA.width, posB.width) * 256.0 * transform.currentState().getPixelRatio()) / 2;
         linesdfShader->u_mix = properties.dash_array.t;
 
         bucket.drawLineSDF(*linesdfShader);
@@ -105,7 +105,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
         SpriteAtlasPosition imagePosA = spriteAtlas.getPosition(properties.image.from, true);
         SpriteAtlasPosition imagePosB = spriteAtlas.getPosition(properties.image.to, true);
 
-        float factor = 8.0 / std::pow(2, transform.finalState().getIntegerZoom() - id.z);
+        float factor = 8.0 / std::pow(2, transform.currentState().getIntegerZoom() - id.z);
 
         useProgram(linepatternShader->program);
 
