@@ -8,6 +8,13 @@ namespace mbgl {
 namespace util {
 
 extern const float tileSize;
+
+extern const double DEG2RAD;
+extern const double RAD2DEG;
+extern const double M2PI;
+extern const double EARTH_RADIUS_M;
+extern const double LATITUDE_MAX;
+
 }
 
 namespace debug {

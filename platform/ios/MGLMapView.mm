@@ -894,7 +894,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     convertedPoint.y = self.bounds.size.height - convertedPoint.y;
 
-    mbgl::LatLng latLng = mbglMap->latLngForOffset(convertedPoint.x, convertedPoint.y);
+    mbgl::LatLng latLng = mbglMap->latLngForPixel(convertedPoint.x, convertedPoint.y);
 
     return CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
 }
@@ -903,7 +903,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     double x, y;
 
-    mbglMap->offsetForLatLng(MGLLatLngMakeWithCoordinate(coordinate), x, y);
+    mbglMap->pixelForLatLng(MGLLatLngMakeWithCoordinate(coordinate), x, y);
 
     // flip y coordinate for iOS view origin in top left
     //

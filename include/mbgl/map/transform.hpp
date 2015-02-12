@@ -1,7 +1,6 @@
 #ifndef MBGL_MAP_TRANSFORM
 #define MBGL_MAP_TRANSFORM
 
-#include <mbgl/map/geography.h>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
@@ -55,13 +54,8 @@ public:
     void stopRotating();
 
     // Projection
-    void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;
-    void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const;
-    double getMetersPerPixelAtLatitude(const double lat, const double zoom) const;
-    const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const;
-    const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const;
-    void offsetForLatLng(const LatLng latLng, double &x, double &y) const;
-    const LatLng latLngForOffset(const double x, const double y) const;
+    void pixelForLatLng(const LatLng latLng, double &x, double &y) const;
+    const LatLng latLngForPixel(const double x, const double y) const;
 
     // Transitions
     bool needsTransition() const;

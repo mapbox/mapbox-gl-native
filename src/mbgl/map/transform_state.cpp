@@ -4,8 +4,6 @@
 
 using namespace mbgl;
 
-const double R2D = 180.0 / M_PI;
-
 #pragma mark - Matrix
 
 void TransformState::matrixFor(mat4& matrix, const Tile::ID& id) const {
@@ -90,36 +88,6 @@ float TransformState::getPixelRatio() const {
     return pixelRatio;
 }
 
-float TransformState::worldSize() const {
-    return scale * util::tileSize;
-}
-
-float TransformState::lngX(float lon) const {
-    return (180 + lon) * worldSize() / 360;
-}
-
-float TransformState::latY(float lat) const {
-    float lat_y = 180 / M_PI * std::log(std::tan(M_PI / 4 + lat * M_PI / 360));
-    return (180 - lat_y) * worldSize() / 360;
-}
-
-std::array<float, 2> TransformState::locationCoordinate(float lon, float lat) const {
-    float k = std::pow(2, getIntegerZoom()) / worldSize();
-    return {{
-        lngX(lon) * k,
-        latY(lat) * k
-    }};
-}
-
-void TransformState::getLonLat(double &lon, double &lat) const {
-    const double s = scale * util::tileSize;
-    const double Bc = s / 360;
-    const double Cc = s / (2 * M_PI);
-
-    lon = -x / Bc;
-    lat = R2D * (2 * std::atan(std::exp(y / Cc)) - 0.5 * M_PI);
-}
-
 
 #pragma mark - Zoom
 
@@ -148,6 +116,59 @@ double TransformState::getScale() const {
 
 float TransformState::getAngle() const {
     return angle;
+}
+
+
+#pragma mark - Projection
+
+void TransformState::getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const {
+    const double d = util::EARTH_RADIUS_M * M_PI;
+
+    sw.easting  = -d;
+    sw.northing = -d;
+
+    ne.easting  =  d;
+    ne.northing =  d;
+}
+
+void TransformState::getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const {
+    ProjectedMeters projectedMetersSW, projectedMetersNE;
+
+    getWorldBoundsMeters(projectedMetersSW, projectedMetersNE);
+
+    sw = latLngForProjectedMeters(projectedMetersSW);
+    ne = latLngForProjectedMeters(projectedMetersNE);
+}
+
+double TransformState::getMetersPerPixelAtLatitude(const double lat, const double zoom) const {
+    const double mapPixelWidthAtZoom = std::pow(2.0, zoom) * util::tileSize;
+    const double constrainedLatitude = std::fmin(std::fmax(lat, -util::LATITUDE_MAX), util::LATITUDE_MAX);
+
+    return std::cos(constrainedLatitude * util::DEG2RAD) * util::M2PI * util::EARTH_RADIUS_M / mapPixelWidthAtZoom;
+}
+
+const ProjectedMeters TransformState::projectedMetersForLatLng(const LatLng latLng) const {
+    const double constrainedLatitude = std::fmin(std::fmax(latLng.latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
+
+    const double m = 1 - 1e-15;
+    const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * constrainedLatitude), -m), m);
+
+    const double easting  = util::EARTH_RADIUS_M * latLng.longitude * util::DEG2RAD;
+    const double northing = 0.5 * util::EARTH_RADIUS_M * std::log((1 + f) / (1 - f));
+
+    return { northing, easting };
+}
+
+const LatLng TransformState::latLngForProjectedMeters(const ProjectedMeters projectedMeters) const {
+    double latitude = (2 * std::atan(std::exp(projectedMeters.northing / util::EARTH_RADIUS_M)) - (M_PI / 2)) * util::RAD2DEG;
+    double longitude = projectedMeters.easting * util::RAD2DEG / util::EARTH_RADIUS_M;
+
+    latitude = std::fmin(std::fmax(latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
+
+    while (longitude >  180) longitude -= 180;
+    while (longitude < -180) longitude += 180;
+
+    return { latitude, longitude };
 }
 
 

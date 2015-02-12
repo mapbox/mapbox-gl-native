@@ -129,13 +129,13 @@ public:
     const std::string &getAccessToken() const;
 
     // Projection
-    void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const;
-    void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const;
-    double getMetersPerPixelAtLatitude(const double lat, const double zoom) const;
-    const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const;
-    const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const;
-    void offsetForLatLng(const LatLng latLng, double &x, double &y) const;
-    const LatLng latLngForOffset(const double x, const double y) const;
+    inline void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const { getState().getWorldBoundsMeters(sw, ne); }
+    inline void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const { getState().getWorldBoundsLatLng(sw, ne); }
+    inline double getMetersPerPixelAtLatitude(const double lat, const double zoom) const { return getState().getMetersPerPixelAtLatitude(lat, zoom); }
+    inline const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const { return getState().projectedMetersForLatLng(latLng); }
+    inline const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const { return getState().latLngForProjectedMeters(projectedMeters); }
+    inline void pixelForLatLng(const LatLng latLng, double &x, double &y) const { transform.pixelForLatLng(latLng, x, y); }
+    inline const LatLng latLngForPixel(const double x, const double y) const { return transform.latLngForPixel(x, y); }
 
     // Debug
     void setDebug(bool value);

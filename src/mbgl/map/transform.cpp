@@ -11,12 +11,6 @@
 
 using namespace mbgl;
 
-const double DEG2RAD = M_PI / 180.0;
-const double RAD2DEG = 180.0 / M_PI;
-const double M2PI = 2 * M_PI;
-const double EARTH_RADIUS_M = 6378137;
-const double LATITUDE_MAX = 85.05112878;
-
 Transform::Transform(View &view_)
     : view(view_)
 {
@@ -90,7 +84,7 @@ void Transform::setLatLng(const LatLng latLng, const std::chrono::steady_clock::
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     const double m = 1 - 1e-15;
-    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * latLng.latitude), -m), m);
+    const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
 
     double xn = -latLng.longitude * Bc;
     double yn = 0.5 * Cc * std::log((1 + f) / (1 - f));
@@ -105,10 +99,10 @@ void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const std:
 
     const double s = new_scale * util::tileSize;
     Bc = s / 360;
-    Cc = s / M2PI;
+    Cc = s / util::M2PI;
 
     const double m = 1 - 1e-15;
-    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * latLng.latitude), -m), m);
+    const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
 
     double xn = -latLng.longitude * Bc;
     double yn = 0.5 * Cc * std::log((1 + f) / (1 - f));
@@ -122,7 +116,7 @@ const LatLng Transform::getLatLng() const {
     LatLng ll;
 
     ll.longitude = -final.x / Bc;
-    ll.latitude  = RAD2DEG * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
+    ll.latitude  = util::RAD2DEG * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
 
     return ll;
 
@@ -307,7 +301,7 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
 
     const double s = final.scale * util::tileSize;
     Bc = s / 360;
-    Cc = s / M2PI;
+    Cc = s / util::M2PI;
 
     view.notifyMapChange(duration != std::chrono::steady_clock::duration::zero() ?
                            MapChangeRegionDidChangeAnimated :
@@ -393,9 +387,9 @@ void Transform::_setAngle(double new_angle, const std::chrono::steady_clock::dur
                            MapChangeRegionWillChange);
 
     while (new_angle > M_PI)
-        new_angle -= M2PI;
+        new_angle -= util::M2PI;
     while (new_angle <= -M_PI)
-        new_angle += M2PI;
+        new_angle += util::M2PI;
 
     final.angle = new_angle;
 
@@ -447,79 +441,28 @@ void Transform::_clearRotating() {
     }
 }
 
-#pragma mark - Projection & conversion
 
-void Transform::getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const {
-    const double d = EARTH_RADIUS_M * M_PI;
+#pragma mark - Projection
 
-    sw.easting  = -d;
-    sw.northing = -d;
-
-    ne.easting  =  d;
-    ne.northing =  d;
-}
-
-void Transform::getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const {
-    ProjectedMeters projectedMetersSW, projectedMetersNE;
-
-    getWorldBoundsMeters(projectedMetersSW, projectedMetersNE);
-
-    sw = latLngForProjectedMeters(projectedMetersSW);
-    ne = latLngForProjectedMeters(projectedMetersNE);
-}
-
-double Transform::getMetersPerPixelAtLatitude(const double lat, const double zoom) const {
-    const double mapPixelWidthAtZoom = std::pow(2.0, zoom) * util::tileSize;
-    const double constrainedLatitude = std::fmin(std::fmax(lat, -LATITUDE_MAX), LATITUDE_MAX);
-
-    return std::cos(constrainedLatitude * DEG2RAD) * M2PI * EARTH_RADIUS_M / mapPixelWidthAtZoom;
-}
-
-const ProjectedMeters Transform::projectedMetersForLatLng(const LatLng latLng) const {
-    const double constrainedLatitude = std::fmin(std::fmax(latLng.latitude, -LATITUDE_MAX), LATITUDE_MAX);
-
-    const double m = 1 - 1e-15;
-    const double f = std::fmin(std::fmax(std::sin(DEG2RAD * constrainedLatitude), -m), m);
-
-    const double easting  = EARTH_RADIUS_M * latLng.longitude * DEG2RAD;
-    const double northing = 0.5 * EARTH_RADIUS_M * std::log((1 + f) / (1 - f));
-
-    return { northing, easting };
-}
-
-const LatLng Transform::latLngForProjectedMeters(const ProjectedMeters projectedMeters) const {
-    double latitude = (2 * std::atan(std::exp(projectedMeters.northing / EARTH_RADIUS_M)) - (M_PI / 2)) * RAD2DEG;
-    double longitude = projectedMeters.easting * RAD2DEG / EARTH_RADIUS_M;
-
-    latitude = std::fmin(std::fmax(latitude, -LATITUDE_MAX), LATITUDE_MAX);
-
-    while (longitude >  180) longitude -= 180;
-    while (longitude < -180) longitude += 180;
-
-    return { latitude, longitude };
-}
-
-void Transform::offsetForLatLng(const LatLng latLng, double &x, double &y) const {
+void Transform::pixelForLatLng(const LatLng latLng, double &x, double &y) const {
     LatLng ll;
     double zoom;
     getLatLngZoom(ll, zoom);
 
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     const double centerX = final.width  / 2;
     const double centerY = final.height / 2;
 
-    const double m = getMetersPerPixelAtLatitude(0, zoom);
+    const double m = final.getMetersPerPixelAtLatitude(0, zoom);
 
-    const double angle_sin = std::sin(-current.angle);
-    const double angle_cos = std::cos(-current.angle);
+    const double angle_sin = std::sin(-final.angle);
+    const double angle_cos = std::cos(-final.angle);
 
-    const ProjectedMeters givenMeters = projectedMetersForLatLng(latLng);
+    const ProjectedMeters givenMeters = final.projectedMetersForLatLng(latLng);
 
     const double givenAbsoluteX = givenMeters.easting  / m;
     const double givenAbsoluteY = givenMeters.northing / m;
 
-    const ProjectedMeters centerMeters = projectedMetersForLatLng(ll);
+    const ProjectedMeters centerMeters = final.projectedMetersForLatLng(ll);
 
     const double centerAbsoluteX = centerMeters.easting  / m;
     const double centerAbsoluteY = centerMeters.northing / m;
@@ -540,20 +483,18 @@ void Transform::offsetForLatLng(const LatLng latLng, double &x, double &y) const
     y = rotatedY + (centerY - rotatedCenterY);
 }
 
-const LatLng Transform::latLngForOffset(const double x, const double y) const {
+const LatLng Transform::latLngForPixel(const double x, const double y) const {
     LatLng ll;
     double zoom;
     getLatLngZoom(ll, zoom);
 
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     const double centerX = final.width  / 2;
     const double centerY = final.height / 2;
 
-    const double m = getMetersPerPixelAtLatitude(0, zoom);
+    const double m = final.getMetersPerPixelAtLatitude(0, zoom);
 
-    const double angle_sin = std::sin(current.angle);
-    const double angle_cos = std::cos(current.angle);
+    const double angle_sin = std::sin(final.angle);
+    const double angle_cos = std::cos(final.angle);
 
     const double unrotatedCenterX = centerX * angle_cos - centerY * angle_sin;
     const double unrotatedCenterY = centerX * angle_sin + centerY * angle_cos;
@@ -564,7 +505,7 @@ const LatLng Transform::latLngForOffset(const double x, const double y) const {
     const double givenX = unrotatedX + (centerX - unrotatedCenterX);
     const double givenY = unrotatedY + (centerY - unrotatedCenterY);
 
-    const ProjectedMeters centerMeters = projectedMetersForLatLng(ll);
+    const ProjectedMeters centerMeters = final.projectedMetersForLatLng(ll);
 
     const double centerAbsoluteX = centerMeters.easting  / m;
     const double centerAbsoluteY = centerMeters.northing / m;
@@ -573,9 +514,10 @@ const LatLng Transform::latLngForOffset(const double x, const double y) const {
     const double givenAbsoluteY = givenY + centerAbsoluteY - centerY;
 
     const ProjectedMeters givenMeters = { givenAbsoluteY * m, givenAbsoluteX * m };
-
-    return latLngForProjectedMeters(givenMeters);
+    
+    return final.latLngForProjectedMeters(givenMeters);
 }
+
 
 #pragma mark - Transition
 

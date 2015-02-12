@@ -2,6 +2,12 @@
 
 const float mbgl::util::tileSize = 512.0f;
 
+const double mbgl::util::DEG2RAD = M_PI / 180.0;
+const double mbgl::util::RAD2DEG = 180.0 / M_PI;
+const double mbgl::util::M2PI = 2 * M_PI;
+const double mbgl::util::EARTH_RADIUS_M = 6378137;
+const double mbgl::util::LATITUDE_MAX = 85.05112878;
+
 #if defined(DEBUG)
 const bool mbgl::debug::tileParseWarnings = false;
 const bool mbgl::debug::styleParseWarnings = false;

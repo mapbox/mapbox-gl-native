@@ -70,7 +70,7 @@ Map::Map(View& view_, FileSource& fileSource_)
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
       texturePool(std::make_shared<TexturePool>()),
-      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas))
+      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas, transform))
 {
     view.initialize(this);
     // Make sure that we're doing an initial drawing in all cases.
@@ -696,8 +696,7 @@ void Map::prepare() {
 
 void Map::render() {
     assert(painter);
-    painter->render(*style, activeSources,
-                   state, animationTime);
+    painter->render(*style, activeSources, animationTime);
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
         update();

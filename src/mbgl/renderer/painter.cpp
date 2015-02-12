@@ -23,8 +23,9 @@ using namespace mbgl;
 
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
-Painter::Painter(SpriteAtlas& spriteAtlas_, GlyphAtlas& glyphAtlas_, LineAtlas& lineAtlas_)
-    : spriteAtlas(spriteAtlas_)
+Painter::Painter(SpriteAtlas& spriteAtlas_, GlyphAtlas& glyphAtlas_, LineAtlas& lineAtlas_, Transform& transform_)
+    : transform(transform_)
+    , spriteAtlas(spriteAtlas_)
     , glyphAtlas(glyphAtlas_)
     , lineAtlas(lineAtlas_)
 {
@@ -124,8 +125,8 @@ void Painter::terminate() {
 }
 
 void Painter::resize() {
-    if (gl_viewport != state.getFramebufferDimensions()) {
-        gl_viewport = state.getFramebufferDimensions();
+    if (gl_viewport != transform.finalState().getFramebufferDimensions()) {
+        gl_viewport = transform.finalState().getFramebufferDimensions();
         assert(gl_viewport[0] > 0 && gl_viewport[1] > 0);
         MBGL_CHECK_ERROR(glViewport(0, 0, gl_viewport[0], gl_viewport[1]));
     }
@@ -166,12 +167,12 @@ void Painter::depthRange(const float near, const float far) {
 
 void Painter::changeMatrix() {
     // Initialize projection matrix
-    matrix::ortho(projMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, 1);
+    matrix::ortho(projMatrix, 0, transform.finalState().getWidth(), transform.finalState().getHeight(), 0, 0, 1);
 
     // The extrusion matrix.
     matrix::identity(extrudeMatrix);
     matrix::multiply(extrudeMatrix, projMatrix, extrudeMatrix);
-    matrix::rotate_z(extrudeMatrix, extrudeMatrix, state.getAngle());
+    matrix::rotate_z(extrudeMatrix, extrudeMatrix, transform.finalState().getAngle());
 
     // The native matrix is a 1:1 matrix that paints the coordinates at the
     // same screen position as the vertex specifies.
@@ -214,10 +215,7 @@ void Painter::prepareTile(const Tile& tile) {
     MBGL_CHECK_ERROR(glStencilFunc(GL_EQUAL, ref, mask));
 }
 
-void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>& sources,
-                     TransformState state_, std::chrono::steady_clock::time_point time) {
-    state = state_;
-
+void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>& sources, std::chrono::steady_clock::time_point time) {
     clear();
     resize();
     changeMatrix();
@@ -226,12 +224,12 @@ void Painter::render(const Style& style, const std::set<util::ptr<StyleSource>>&
     ClipIDGenerator generator;
     for (const util::ptr<StyleSource> &source : sources) {
         generator.update(source->source->getLoadedTiles());
-        source->source->updateMatrices(projMatrix, state);
+        source->source->updateMatrices(projMatrix, transform.finalState());
     }
 
     drawClippingMasks(sources);
 
-    recordZoom(time, state.getNormalizedZoom());
+    recordZoom(time, transform.finalState().getNormalizedZoom());
 
     // Actually render the layers
     if (debug::renderTree) { std::cout << "{" << std::endl; indent++; }
@@ -323,7 +321,7 @@ void Painter::renderLayer(util::ptr<StyleLayer> layer_desc, const Tile::ID* id, 
         // Skip this layer if it's outside the range of min/maxzoom.
         // This may occur when there /is/ a bucket created for this layer, but the min/max-zoom
         // is set to a fractional value, or value that is larger than the source maxzoom.
-        const double zoom = state.getZoom();
+        const double zoom = transform.finalState().getZoom();
         if (layer_desc->bucket->min_zoom > zoom ||
             layer_desc->bucket->max_zoom <= zoom) {
             return;
@@ -380,7 +378,7 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
             return;
 
         SpriteAtlasPosition imagePos = spriteAtlas.getPosition(properties.image, true);
-        float zoomFraction = state.getZoomFraction();
+        float zoomFraction = transform.finalState().getZoomFraction();
 
         useProgram(patternShader->program);
         patternShader->u_matrix = identityMatrix;
@@ -390,9 +388,9 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
         patternShader->u_opacity = properties.opacity;
 
         std::array<float, 2> size = imagePos.size;
-        double lon, lat;
-        state.getLonLat(lon, lat);
-        std::array<float, 2> center = state.locationCoordinate(lon, lat);
+        LatLng latLng = transform.getLatLng();
+        double centerX, centerY;
+        transform.pixelForLatLng(latLng, centerX, centerY);
         float scale = 1 / std::pow(2, zoomFraction);
 
         mat3 matrix;
@@ -401,12 +399,12 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
                       1.0f / size[0],
                       1.0f / size[1]);
         matrix::translate(matrix, matrix,
-                          std::fmod(center[0] * 512, size[0]),
-                          std::fmod(center[1] * 512, size[1]));
-        matrix::rotate(matrix, matrix, -state.getAngle());
+                          std::fmod(centerX * 512, size[0]),
+                          std::fmod(centerY * 512, size[1]));
+        matrix::rotate(matrix, matrix, -transform.finalState().getAngle());
         matrix::scale(matrix, matrix,
-                       scale * state.getWidth()  / 2,
-                      -scale * state.getHeight() / 2);
+                       scale * transform.finalState().getWidth()  / 2,
+                      -scale * transform.finalState().getHeight() / 2);
         patternShader->u_patternmatrix = matrix;
 
         backgroundBuffer.bind();
@@ -439,12 +437,12 @@ mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &t
         return matrix;
     } else {
         // TODO: Get rid of the 8 (scaling from 4096 to tile size)
-        const double factor = ((double)(1 << id.z)) / state.getScale() * (4096.0 / util::tileSize);
+        const double factor = ((double)(1 << id.z)) / transform.finalState().getScale() * (4096.0 / util::tileSize);
 
         mat4 vtxMatrix;
         if (anchor == TranslateAnchorType::Viewport) {
-            const double sin_a = std::sin(-state.getAngle());
-            const double cos_a = std::cos(-state.getAngle());
+            const double sin_a = std::sin(-transform.finalState().getAngle());
+            const double cos_a = std::cos(-transform.finalState().getAngle());
             matrix::translate(vtxMatrix, matrix,
                     factor * (translation[0] * cos_a - translation[1] * sin_a),
                     factor * (translation[0] * sin_a + translation[1] * cos_a),
