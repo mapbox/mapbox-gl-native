@@ -61,6 +61,9 @@ public:
     using StillImageCallback = std::function<void(std::unique_ptr<const StillImage>)>;
     void renderStill(StillImageCallback callback);
 
+    // Returns true when the Map object is currently used to render a map.
+    bool isRendering() const;
+
 private:
     // Runs the map event loop. ONLY run this function when you want to get render a single frame
     // with this map object. It will *not* spawn a separate thread and instead block until the

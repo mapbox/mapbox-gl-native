@@ -147,6 +147,10 @@ void Map::renderStill(StillImageCallback fn) {
     update();
 }
 
+bool Map::isRendering() const {
+    return active;
+}
+
 // Triggers a refresh of the map based on changed UI state, e.g. the user moved the map viewport,
 // or changed any other externally accessible value of the Map object.
 void Map::update() {
