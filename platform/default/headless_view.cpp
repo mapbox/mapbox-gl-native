@@ -144,6 +144,7 @@ void HeadlessView::createContext() {
 }
 
 void HeadlessView::resize(const uint16_t width, const uint16_t height, const float pixelRatio) {
+    // TODO: don't drop the framebuffer when the new width/height/pixelRatio are identical.
     // TODO: lazy resizing, so this is done in the Map thread.
     clearBuffers();
 

@@ -4,13 +4,16 @@
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/platform/gl.hpp>
 
+#include <cassert>
+
 namespace mbgl {
 
 template <typename T>
 class Uniform {
 public:
     Uniform(const GLchar* name, const Shader& shader) {
-         location = MBGL_CHECK_ERROR(glGetUniformLocation(shader.program, name));
+        assert(shader.program);
+        location = MBGL_CHECK_ERROR(glGetUniformLocation(shader.program, name));
     }
 
     void operator=(const T& t) {
@@ -33,6 +36,7 @@ public:
     typedef std::array<float, C*R> T;
 
     UniformMatrix(const GLchar* name, const Shader& shader) {
+        assert(shader.program);
         location = MBGL_CHECK_ERROR(glGetUniformLocation(shader.program, name));
     }
 
