@@ -2,6 +2,7 @@
 #define MBGL_UTIL_UV
 
 #include <string>
+#include <memory>
 
 typedef struct uv_handle_s uv_handle_t;
 typedef struct uv_async_s uv_async_t;
