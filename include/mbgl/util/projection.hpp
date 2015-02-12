@@ -22,7 +22,8 @@ public:
     }
 
     static inline void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) {
-        ProjectedMeters projectedMetersSW, projectedMetersNE;
+        ProjectedMeters projectedMetersSW = ProjectedMeters();
+        ProjectedMeters projectedMetersNE = ProjectedMeters();
 
         getWorldBoundsMeters(projectedMetersSW, projectedMetersNE);
 

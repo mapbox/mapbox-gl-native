@@ -324,7 +324,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // set initial position
     //
-    mbglMap->setLatLngZoom(MGLLatLngMake(0, 0), mbglMap->getMinZoom());
+    mbglMap->setLatLngZoom(mbgl::LatLng(0, 0), mbglMap->getMinZoom());
 
     // setup change delegate queue
     //
@@ -822,7 +822,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLatLon(MGLLatLngMakeWithCoordinate(coordinate), secondsAsDuration(duration));
+    mbglMap->setLatLon(mbgl::LatLng(coordinate.latitude, coordinate.longitude), secondsAsDuration(duration));
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
@@ -841,7 +841,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLatLngZoom(MGLLatLngMakeWithCoordinate(centerCoordinate), zoomLevel, secondsAsDuration(duration));
+    mbglMap->setLatLngZoom(mbgl::LatLng(centerCoordinate.latitude, centerCoordinate.longitude), zoomLevel, secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
 }
@@ -906,7 +906,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 {
     double x, y;
 
-    mbglMap->pixelForLatLng(MGLLatLngMakeWithCoordinate(coordinate), x, y);
+    mbglMap->pixelForLatLng(mbgl::LatLng(coordinate.latitude, coordinate.longitude), x, y);
 
     // flip y coordinate for iOS view origin in top left
     //
@@ -1587,21 +1587,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         [self.glView display];
         mbglMap->swapped();
     }
-}
-
-mbgl::LatLng MGLLatLngMake(const double lat, const double lon)
-{
-    return MGLLatLngMakeWithCoordinate(CLLocationCoordinate2DMake(lat, lon));
-}
-
-mbgl::LatLng MGLLatLngMakeWithCoordinate(CLLocationCoordinate2D coordinate)
-{
-    mbgl::LatLng latLng;
-
-    latLng.latitude  = coordinate.latitude;
-    latLng.longitude = coordinate.longitude;
-
-    return latLng;
 }
 
 class MBGLView : public mbgl::View

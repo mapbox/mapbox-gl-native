@@ -428,7 +428,7 @@ void Map::stopPanning() {
 
 void Map::resetPosition() {
     transform.setAngle(0);
-    transform.setLatLng({ 0, 0 });
+    transform.setLatLng(LatLng(0, 0));
     transform.setZoom(0);
     update();
 }
