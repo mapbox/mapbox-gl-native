@@ -65,8 +65,6 @@ function renderTest(style, info, base, key) {
                 var actual   = path.join(dir, 'actual.png');
                 var diff     = path.join(dir, 'diff.png');
 
-                console.warn(actual, expected);
-
                 if (process.env.UPDATE) {
                     fs.writeFile(expected, image, function(err) {
                         t.error(err);
@@ -81,6 +79,10 @@ function renderTest(style, info, base, key) {
 
                         compare.stderr.on('data', function (data) {
                             error += data.toString();
+                        });
+
+                        compare.on('error', function(err) {
+                            t.error(err);
                         });
 
                         compare.on('exit', function (code) {
