@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.mapbox.mapboxgl.lib.LonLatZoom;
+import com.mapbox.mapboxgl.lib.LatLngZoom;
 import com.mapbox.mapboxgl.lib.MapView;
 import com.mapzen.android.lost.LocationClient;
 import com.mapzen.android.lost.LocationListener;
@@ -201,7 +201,7 @@ public class MainActivity extends ActionBarActivity {
     // Handles location updates from GPS
     private void updateLocation(Location location) {
         if (location != null) {
-            LonLatZoom coordinate = new LonLatZoom(location.getLongitude(), location.getLatitude(), 16);
+            LatLngZoom coordinate = new LatLngZoom(location.getLongitude(), location.getLatitude(), 16);
             mMapFragment.getMap().setCenterCoordinate(coordinate, true);
         }
     }
