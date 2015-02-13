@@ -163,21 +163,23 @@ test('Map', function(t) {
 
         t.test('requires a style to be set', function(t) {
             setup(fileSource, function(map) {
-                map.render({}, function(err) {
-                    t.ok(err);
-                    t.equal(err.message, 'Style is not set');
-                    t.end();
-                });
+                t.throws(function() {
+                    map.render({}, function() {});
+                }, /Style is not set/);
+                t.end();
             });
         });
 
         t.test('returns an image', function(t) {
             setup(fileSource, function(map) {
                 map.load(style);
-                map.render({}, function(err, data) {
+                map.render({}, function(err, image) {
                     t.error(err);
-                    fs.writeFileSync('test/results/image.png', data);
-                    t.end();
+                    mbgl.compressPNG(image, function(err, data) {
+                        t.error(err);
+                        fs.writeFileSync('test/results/image.png', data);
+                        t.end();
+                    });
                 });
             });
         });

@@ -51,63 +51,68 @@ function renderTest(style, info, base, key) {
 
         map.render(info[key], function(err, image) {
             t.error(err);
-            mkdirp.sync(dir);
+            mbgl.compressPNG(image, function(err, image) {
+                t.error(err);
+                mkdirp.sync(dir);
 
-            var expected = path.join(dir, 'expected.png');
-            var actual   = path.join(dir, 'actual.png');
-            var diff     = path.join(dir, 'diff.png');
+                var expected = path.join(dir, 'expected.png');
+                var actual   = path.join(dir, 'actual.png');
+                var diff     = path.join(dir, 'diff.png');
 
-            if (process.env.UPDATE) {
-                fs.writeFile(expected, image, function(err) {
-                    t.error(err);
-                    t.end();
-                });
-            } else {
-                fs.writeFile(actual, image, function(err) {
-                    t.error(err);
+                console.warn(actual, expected);
 
-                    var compare = spawn('compare', ['-metric', 'MAE', actual, expected, diff]);
-                    var error = '';
-
-                    compare.stderr.on('data', function (data) {
-                        error += data.toString();
+                if (process.env.UPDATE) {
+                    fs.writeFile(expected, image, function(err) {
+                        t.error(err);
+                        t.end();
                     });
+                } else {
+                    fs.writeFile(actual, image, function(err) {
+                        t.error(err);
 
-                    compare.on('exit', function (code) {
-                        // The compare program returns 2 on error otherwise 0 if the images are similar or 1 if they are dissimilar.
-                        if (code === 2) {
-                            writeResult(error.trim(), Infinity);
-                        } else {
-                            var match = error.match(/^\d+(?:\.\d+)?\s+\(([^\)]+)\)\s*$/);
-                            var difference = match ? parseFloat(match[1]) : Infinity;
-                            writeResult(match ? '' : error, difference);
-                        }
-                    });
+                        var compare = spawn('compare', ['-metric', 'MAE', actual, expected, diff]);
+                        var error = '';
 
-                    compare.stdin.end();
-
-                    function writeResult(error, difference) {
-                        var allowedDifference = ('diff' in info) ? info.diff : 0.001;
-                        var color = difference <= allowedDifference ? 'green' : 'red';
-
-                        results += format(resultTemplate, {
-                            name: base,
-                            key: key,
-                            color: color,
-                            error: error ? '<p>' + error + '</p>' : '',
-                            difference: difference,
-                            zoom: info.zoom || 0,
-                            center: info.center || [0, 0],
-                            bearing: info.bearing || 0,
-                            width: info.width || 512,
-                            height: info.height || 512
+                        compare.stderr.on('data', function (data) {
+                            error += data.toString();
                         });
 
-                        t.ok(difference <= allowedDifference, 'actual matches expected');
-                        t.end();
-                    }
-                });
-            }
+                        compare.on('exit', function (code) {
+                            // The compare program returns 2 on error otherwise 0 if the images are similar or 1 if they are dissimilar.
+                            if (code === 2) {
+                                writeResult(error.trim(), Infinity);
+                            } else {
+                                var match = error.match(/^\d+(?:\.\d+)?\s+\(([^\)]+)\)\s*$/);
+                                var difference = match ? parseFloat(match[1]) : Infinity;
+                                writeResult(match ? '' : error, difference);
+                            }
+                        });
+
+                        compare.stdin.end();
+
+                        function writeResult(error, difference) {
+                            var allowedDifference = ('diff' in info) ? info.diff : 0.001;
+                            var color = difference <= allowedDifference ? 'green' : 'red';
+
+                            results += format(resultTemplate, {
+                                name: base,
+                                key: key,
+                                color: color,
+                                error: error ? '<p>' + error + '</p>' : '',
+                                difference: difference,
+                                zoom: info.zoom || 0,
+                                center: info.center || [0, 0],
+                                bearing: info.bearing || 0,
+                                width: info.width || 512,
+                                height: info.height || 512
+                            });
+
+                            t.ok(difference <= allowedDifference, 'actual matches expected');
+                            t.end();
+                        }
+                    });
+                }
+            });
         });
     };
 }

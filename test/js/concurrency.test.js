@@ -28,13 +28,19 @@ function renderTest(style, info, dir, key) {
         var map = new mbgl.Map(fileSource);
         map.load(style);
 
-        for (var i = 0; i < remaining; i++) {
+        function render() {
             map.render(info[key], function(err, image) {
                 t.error(err);
                 t.ok(true, 'render @ ' + ((+new Date) - start) + 'ms');
-                if (++completed === remaining) t.end();
+                if (++completed === remaining) {
+                    t.end();
+                } else {
+                    render();
+                }
             });
         }
+
+        render();
     };
 }
 
