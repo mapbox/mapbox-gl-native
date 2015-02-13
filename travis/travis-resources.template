@@ -8,7 +8,7 @@
             "Properties": {
                 "Policies": [
                     {
-                        "PolicyName": "list",
+                        "PolicyName": "list-testing-old",
                         "PolicyDocument": {
                             "Statement": [
                                 {
@@ -24,7 +24,7 @@
                         }
                     },
                     {
-                        "PolicyName": "build",
+                        "PolicyName": "build-testing-old",
                         "PolicyDocument": {
                             "Statement": [
                                 {
@@ -53,8 +53,13 @@
                                     ],
                                     "Effect": "Allow",
                                     "Resource": [
-                                        "arn:aws:s3:::mapbox-gl-testing"
-                                    ]
+                                        "arn:aws:s3:::mapbox"
+                                    ],
+                                    "Condition": {
+                                        "StringLike": {
+                                            "s3:prefix": "mapbox-gl-native/*"
+                                        }
+                                    }
                                 }
                             ]
                         }
@@ -73,7 +78,7 @@
                                     ],
                                     "Effect": "Allow",
                                     "Resource": [
-                                        "arn:aws:s3:::mapbox-gl-testing/*"
+                                        "arn:aws:s3:::mapbox/mapbox-gl-native/*"
                                     ]
                                 }
                             ]
@@ -139,7 +144,7 @@
                 },
                 "Policies": [
                     {
-                        "PolicyName": "android",
+                        "PolicyName": "android-testing",
                         "PolicyDocument": {
                             "Statement": [
                                 {
@@ -149,6 +154,22 @@
                                     ],
                                     "Resource": [
                                         "arn:aws:s3:::mapbox-gl-testing/android/*"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "android",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:PutObject"
+                                    ],
+                                    "Resource": [
+                                        "arn:aws:s3:::mapbox/mapbox-gl-native/android/build/*"
                                     ]
                                 }
                             ]
