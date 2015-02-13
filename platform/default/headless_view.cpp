@@ -247,7 +247,9 @@ void HeadlessView::clearBuffers() {
 }
 
 HeadlessView::~HeadlessView() {
+    activate();
     clearBuffers();
+    deactivate();
 
 #if MBGL_USE_CGL
     CGLDestroyContext(glContext);
