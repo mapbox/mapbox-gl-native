@@ -31,6 +31,9 @@ NodeLogBackend::NodeLogBackend(v8::Handle<v8::Object> target)
       })) {
     NanScope();
     module = v8::Persistent<v8::Object>::New(target);
+
+    // Don't keep the event loop alive.
+    queue->unref();
 }
 
 NodeLogBackend::~NodeLogBackend() {
