@@ -19,7 +19,7 @@ Request::Request(const Resource &resource_, uv_loop_t *loop, Callback callback_)
     // thread (the thread notify() is called from) rather than kicking back to the calling thread.
     if (loop) {
         notify_async = new uv_async_t;
-        notify_async->data = this;
+        notify_async->data = nullptr;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
         uv_async_init(loop, notify_async, [](uv_async_t *async, int) { notifyCallback(async); });
 #else
@@ -57,6 +57,8 @@ Request::~Request() {
 void Request::notify(const std::shared_ptr<const Response> &response_) {
     response = response_;
     if (notify_async) {
+        assert(!notify_async->data);
+        notify_async->data = this;
         uv_async_send(notify_async);
     } else {
         assert(response);
@@ -70,7 +72,7 @@ void Request::cancel() {
     assert(notify_async);
     assert(!destruct_async);
     destruct_async = new uv_async_t;
-    destruct_async->data = this;
+    destruct_async->data = nullptr;
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
     uv_async_init(notify_async->loop, destruct_async, [](uv_async_t *async, int) { cancelCallback(async); });
 #else
@@ -88,11 +90,9 @@ void Request::cancelCallback(uv_async_t *async) {
 // This gets called from the FileSource thread, and will only ever be invoked after cancel() was called
 // in the original requesting thread.
 void Request::destruct() {
-    if (notify_async) {
-        notify(nullptr);
-    }
-
     assert(destruct_async);
+    assert(!destruct_async->data);
+    destruct_async->data = this;
     uv_async_send(destruct_async);
 }
 
