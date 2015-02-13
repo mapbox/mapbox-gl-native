@@ -250,8 +250,9 @@ void NodeMap::renderFinished() {
             [](char *, void *hint) {
                 delete reinterpret_cast<const mbgl::StillImage *>(hint);
             },
-            const_cast<mbgl::StillImage *>(img.release())
+            const_cast<mbgl::StillImage *>(img.get())
         );
+        img.release();
 
         result->Set(NanNew("pixels"), pixels);
 
