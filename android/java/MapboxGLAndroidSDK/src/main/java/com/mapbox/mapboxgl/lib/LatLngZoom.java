@@ -2,7 +2,6 @@ package com.mapbox.mapboxgl.lib;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.mapbox.mapboxgl.lib.geometry.LatLng;
 
 public class LatLngZoom extends LatLng implements Parcelable {
@@ -19,13 +18,13 @@ public class LatLngZoom extends LatLng implements Parcelable {
 
     private double zoom;
 
-    public LatLngZoom(double lon, double lat, double zoom) {
-        super(lon, lat);
+    public LatLngZoom(double lat, double lon, double zoom) {
+        super(lat, lon);
         this.zoom = zoom;
     }
 
     public LatLngZoom(LatLng latLng, double zoom) {
-        super(latLng.getLon(), latLng.getLat());
+        super(latLng.getLatitude(), latLng.getLongitude());
         this.zoom = zoom;
     }
 
@@ -69,8 +68,7 @@ public class LatLngZoom extends LatLng implements Parcelable {
 
     @Override
     public String toString() {
-        return "LatLngZoom [lon=" + super.getLon() + ", lat=" + super.getLat() + ", zoom=" + zoom
-                + "]";
+        return "LatLngZoom [lat=" + super.getLatitude() + ", lon=" + super.getLongitude() + ", zoom=" + zoom + "]";
     }
 
     @Override
