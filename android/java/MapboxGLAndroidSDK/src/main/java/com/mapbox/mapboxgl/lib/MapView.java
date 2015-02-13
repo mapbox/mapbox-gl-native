@@ -29,6 +29,7 @@ import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
+import com.mapbox.mapboxgl.lib.geometry.LatLng;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
@@ -154,7 +155,7 @@ public class MapView extends SurfaceView {
         try {
             double centerLongitude = typedArray.getFloat(R.styleable.MapView_centerLongitude, 0.0f);
             double centerLatitude = typedArray.getFloat(R.styleable.MapView_centerLatitude, 0.0f);
-            LonLat centerCoordinate = new LonLat(centerLongitude, centerLatitude);
+            LatLng centerCoordinate = new LatLng(centerLongitude, centerLatitude);
             setCenterCoordinate(centerCoordinate);
             setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoomLevel, 0.0f)); // need to set zoom level first because of limitation on rotating when zoomed out
             setDirection(typedArray.getFloat(R.styleable.MapView_direction, 0.0f));
@@ -211,27 +212,27 @@ public class MapView extends SurfaceView {
     // Property methods
     //
 
-    public LonLat getCenterCoordinate() {
-        return mNativeMapView.getLonLat();
+    public LatLng getCenterCoordinate() {
+        return mNativeMapView.getLatLng();
     }
 
-    public void setCenterCoordinate(LonLat centerCoordinate) {
+    public void setCenterCoordinate(LatLng centerCoordinate) {
         setCenterCoordinate(centerCoordinate, false);
     }
 
-    public void setCenterCoordinate(LonLat centerCoordinate, boolean animated) {
+    public void setCenterCoordinate(LatLng centerCoordinate, boolean animated) {
         long duration = animated ? ANIMATION_DURATION : 0;
-        mNativeMapView.setLonLat(centerCoordinate, duration);
+        mNativeMapView.setLatLng(centerCoordinate, duration);
     }
 
-    public void setCenterCoordinate(LonLatZoom centerCoordinate) {
+    public void setCenterCoordinate(LatLngZoom centerCoordinate) {
         setCenterCoordinate(centerCoordinate, false);
     }
 
-    public void setCenterCoordinate(LonLatZoom centerCoordinate,
+    public void setCenterCoordinate(LatLngZoom centerCoordinate,
                                     boolean animated) {
         long duration = animated ? ANIMATION_DURATION : 0;
-        mNativeMapView.setLonLatZoom(centerCoordinate, duration);
+        mNativeMapView.setLatLngZoom(centerCoordinate, duration);
     }
 
     public double getDirection() {
@@ -398,7 +399,7 @@ public class MapView extends SurfaceView {
     public void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "onCreate");
         if (savedInstanceState != null) {
-            setCenterCoordinate((LonLat) savedInstanceState.getParcelable(STATE_CENTER_COORDINATE));
+            setCenterCoordinate((LatLng) savedInstanceState.getParcelable(STATE_CENTER_COORDINATE));
             setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL)); // need to set zoom level first because of limitation on rotating when zoomed out
             setDirection(savedInstanceState.getDouble(STATE_CENTER_DIRECTION));
             setDirection(savedInstanceState.getDouble(STATE_DIRECTION));

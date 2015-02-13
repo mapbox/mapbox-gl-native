@@ -2,32 +2,33 @@ package com.mapbox.mapboxgl.lib;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import com.mapbox.mapboxgl.lib.geometry.LatLng;
 
-public class LonLatZoom extends LonLat implements Parcelable {
+public class LatLngZoom extends LatLng implements Parcelable {
 
-    public static final Parcelable.Creator<LonLatZoom> CREATOR = new Parcelable.Creator<LonLatZoom>() {
-        public LonLatZoom createFromParcel(Parcel in) {
-            return new LonLatZoom(in);
+    public static final Parcelable.Creator<LatLngZoom> CREATOR = new Parcelable.Creator<LatLngZoom>() {
+        public LatLngZoom createFromParcel(Parcel in) {
+            return new LatLngZoom(in);
         }
 
-        public LonLatZoom[] newArray(int size) {
-            return new LonLatZoom[size];
+        public LatLngZoom[] newArray(int size) {
+            return new LatLngZoom[size];
         }
     };
 
     private double zoom;
 
-    public LonLatZoom(double lon, double lat, double zoom) {
-        super(lon, lat);
+    public LatLngZoom(double lat, double lon, double zoom) {
+        super(lat, lon);
         this.zoom = zoom;
     }
 
-    public LonLatZoom(LonLat lonLat, double zoom) {
-        super(lonLat.getLon(), lonLat.getLat());
+    public LatLngZoom(LatLng latLng, double zoom) {
+        super(latLng.getLatitude(), latLng.getLongitude());
         this.zoom = zoom;
     }
 
-    private LonLatZoom(Parcel in) {
+    private LatLngZoom(Parcel in) {
         super(in);
         zoom = in.readDouble();
     }
@@ -61,14 +62,13 @@ public class LonLatZoom extends LonLat implements Parcelable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        LonLatZoom other = (LonLatZoom) obj;
+        LatLngZoom other = (LatLngZoom) obj;
         return super.equals(obj) && Double.doubleToLongBits(zoom) == Double.doubleToLongBits(other.zoom);
     }
 
     @Override
     public String toString() {
-        return "LonLatZoom [lon=" + super.getLon() + ", lat=" + super.getLat() + ", zoom=" + zoom
-                + "]";
+        return "LatLngZoom [lat=" + super.getLatitude() + ", lon=" + super.getLongitude() + ", zoom=" + zoom + "]";
     }
 
     @Override
