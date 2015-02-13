@@ -108,7 +108,6 @@ Image::Image(const std::string &source_data) {
         CFRelease(data);
         width = 0;
         height = 0;
-        img.release();
         return;
     }
 

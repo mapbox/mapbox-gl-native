@@ -34,7 +34,7 @@ public:
         MBGL_VERIFY_THREAD(tid);
 
         if (source) {
-            source->notify(this, observers, std::shared_ptr<const Response>(response.release()),
+            source->notify(this, observers, std::shared_ptr<const Response>(std::move(response)),
                            hint);
         }
     }
