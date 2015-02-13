@@ -13,38 +13,7 @@ echo $ami_name
 
 NAME=$TRAVIS_JOB_ID
 
-user_data="#!/bin/bash
-    cd /android
-    git clone git://github.com/mapbox/mapbox-gl-native.git
-
-    pushd mapbox-gl-native
-    if [[ $TRAVIS_PULL_REQUEST == 'false' ]]; then
-        git checkout $TRAVIS_COMMIT
-    else
-        git fetch origin +refs/pull/$TRAVIS_PULL_REQUEST/merge:
-        git checkout FETCH_HEAD
-    fi
-    git submodule update --init --recursive
-
-    export ANDROID_NDK_PATH=/android/android-ndk-r10d
-    export JAVA_HOME=/android/jdk1.7.0_71
-    export ANDROID_HOME=/android/android-sdk-linux
-    export PATH=\$PATH:/android/jdk1.7.0_71/bin
-    export MAPBOX_ACCESS_TOKEN=$MAPBOX_ACCESS_TOKEN
-    export TESTMUNK_KEY=$TESTMUNK_KEY
-    export TESTMUNK=$TESTMUNK
-    export MASON_ANDROID_ABI=$MASON_ANDROID_ABI
-    export ANDROID_ABI=$MASON_ANDROID_ABI
-
-    if ./android/scripts/build-$CONFIG.sh $NAME &>../build.log; then
-        echo 'ANDROID BUILD PASSED'
-    else
-        echo 'ANDROID BUILD FAILED'
-    fi
-    popd
-
-    aws s3 cp --region us-east-1 build.log s3://mapbox-gl-testing/android/${NAME}/build-log.txt
-    shutdown -P now"
+user_data=$(cat ./android/scripts/user_data.sh)
 
 id=$(aws ec2 run-instances \
     --region $region \
