@@ -56,9 +56,6 @@ public:
 
         latitude = std::fmin(std::fmax(latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
         
-        while (longitude >  180) longitude -= 180;
-        while (longitude < -180) longitude += 180;
-        
         return LatLng(latitude, longitude);
     }
 };

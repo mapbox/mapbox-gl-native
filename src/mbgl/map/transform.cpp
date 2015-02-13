@@ -119,6 +119,33 @@ const LatLng Transform::getLatLng() const {
     ll.longitude = -final.x / Bc;
     ll.latitude  = util::RAD2DEG * (2 * std::atan(std::exp(final.y / Cc)) - 0.5 * M_PI);
 
+    // adjust for world wrap
+    while (ll.longitude >  180) ll.longitude -= 180;
+    while (ll.longitude < -180) ll.longitude += 180;
+
+    // adjust for date line
+    double w = util::tileSize * final.scale / 2;
+    double x_ = final.x;
+    if (x_ > w) {
+        while (x_ > w) {
+            x_ -= w;
+            if (ll.longitude < 0) {
+                ll.longitude += 180;
+            } else if (ll.longitude > 0) {
+                ll.longitude -= 180;
+            }
+        }
+    } else if (x_ < -w) {
+        while (x_ < -w) {
+            x_ += w;
+            if (ll.longitude < 0) {
+                ll.longitude -= 180;
+            } else if (ll.longitude > 0) {
+                ll.longitude -= 180;
+            }
+        }
+    }
+
     return ll;
 }
 
@@ -512,8 +539,18 @@ const LatLng Transform::latLngForPixel(const double x, const double y) const {
     const double givenAbsoluteX = givenX + centerAbsoluteX - centerX;
     const double givenAbsoluteY = givenY + centerAbsoluteY - centerY;
 
-    const ProjectedMeters givenMeters = { givenAbsoluteY * m, givenAbsoluteX * m };
-    
+    ProjectedMeters givenMeters = ProjectedMeters(givenAbsoluteY * m, givenAbsoluteX * m);
+
+    // adjust for date line
+    ProjectedMeters sw, ne;
+    Projection::getWorldBoundsMeters(sw, ne);
+    double d = ne.easting - sw.easting;
+    if (ll.longitude > 0 && givenMeters.easting > centerMeters.easting) givenMeters.easting -= d;
+
+    // adjust for world wrap
+    while (givenMeters.easting < sw.easting) givenMeters.easting += d;
+    while (givenMeters.easting > ne.easting) givenMeters.easting -= d;
+
     return Projection::latLngForProjectedMeters(givenMeters);
 }
 
