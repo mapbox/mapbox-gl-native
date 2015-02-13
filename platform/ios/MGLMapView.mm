@@ -24,7 +24,7 @@
 // Returns the path to the default cache database on this system.
 const std::string &defaultCacheDatabase() {
     static const std::string path = []() -> std::string {
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         if ([paths count] == 0) {
             // Disable the cache if we don't have a location to write.
             return "";
