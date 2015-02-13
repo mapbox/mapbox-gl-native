@@ -142,21 +142,24 @@ bool HeadlessView::isActive() {
 }
 
 void HeadlessView::resize(const uint16_t width, const uint16_t height, const float pixelRatio) {
+    std::lock_guard<std::mutex> lock(prospectiveMutex);
     prospective = { width, height, pixelRatio };
 }
 
-HeadlessView::Dimensions::Dimensions(uint16_t width_, uint16_t height_, float pixelRatio_) noexcept
+HeadlessView::Dimensions::Dimensions(uint16_t width_, uint16_t height_, float pixelRatio_)
     : width(width_), height(height_), pixelRatio(pixelRatio_) {
 }
 
 void HeadlessView::discard() {
     assert(isActive());
 
-    Dimensions next = prospective;
-    if (current.pixelWidth() == next.pixelWidth() && current.pixelHeight() == next.pixelHeight()) {
-        return;
+    { // Obtain the new values.
+        std::lock_guard<std::mutex> lock(prospectiveMutex);
+        if (current.pixelWidth() == prospective.pixelWidth() && current.pixelHeight() == prospective.pixelHeight()) {
+            return;
+        }
+        current = prospective;
     }
-    current = next;
 
     clearBuffers();
 
