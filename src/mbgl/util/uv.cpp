@@ -33,11 +33,11 @@ lock::lock(const std::unique_ptr<mutex> &mtx_) : mtx(mtx_.get()) {
 lock::~lock() {
     if (mtx) { mtx->unlock(); }
 }
-lock::lock(lock &&lock) {
-    std::swap(mtx, lock.mtx);
+lock::lock(lock &&other) {
+    std::swap(mtx, other.mtx);
 }
-lock &lock::operator=(lock &&lock) {
-    std::swap(mtx, lock.mtx);
+lock &lock::operator=(lock &&other) {
+    std::swap(mtx, other.mtx);
     return *this;
 }
 
