@@ -38,8 +38,8 @@ private:
     static void cancelCallback(uv_async_t *async);
 
 private:
-    uv_async_t *notify_async = nullptr;
-    uv_async_t *destruct_async = nullptr;
+    uv_async_t *notifyAsync = nullptr;
+    uv_async_t *destructAsync = nullptr;
     Callback callback;
     std::shared_ptr<const Response> response;
 
