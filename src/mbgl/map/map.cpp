@@ -158,20 +158,28 @@ bool Map::isRendering() const {
 // Triggers a refresh of the map based on changed UI state, e.g. the user moved the map viewport,
 // or changed any other externally accessible value of the Map object.
 void Map::update() {
-    assert(asyncUpdate);
-    asyncUpdate->send();
+    if (asyncUpdate) {
+        asyncUpdate->send();
+    } else {
+        // In case the asyncUpdate handle is gone, the map is about to be terminated, so we don't
+        // need to rerender anyway.
+    }
 }
 
 // Triggers a refresh of the map, following an updated bit of information the library itself
 // triggered. This may be the availabilty of a new tile.
 void Map::rerender() {
     assert(inMapThread());
-    assert(asyncUpdate);
-    if (renderMode == RenderMode::Still) {
-        // Make sure the loop actually stays alive for the asyncUpdate callback to be invoked.
-        asyncUpdate->ref();
+    if (asyncUpdate) {
+        if (renderMode == RenderMode::Still) {
+            // Make sure the loop actually stays alive for the asyncUpdate callback to be invoked.
+            asyncUpdate->ref();
+        }
+        asyncUpdate->send();
+    } else {
+        // In case the asyncUpdate handle is gone, the map is about to be terminated, so we don't
+        // need to rerender anyway.
     }
-    asyncUpdate->send();
 }
 
 void Map::run() {
