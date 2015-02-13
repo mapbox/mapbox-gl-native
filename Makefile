@@ -30,14 +30,14 @@ global: build
 
 .PHONY: build
 build: build/Makefile
-	@node-gyp build $(DEBUG_FLAG) --clang -- -j$(JOBS)
+	@node-pre-gyp build $(DEBUG_FLAG) --clang -- -j$(JOBS)
 
 vendor/mbgl:
 	git submodule update --init
 
 .PHONY: build/Makefile
 build/Makefile: $(MBGL)/config/$(HOST).gypi
-	@node-gyp configure --clang -- \
+	@node-pre-gyp configure --clang -- \
 		-Dmbgl=$(MBGL) \
 		-Dhost=$(HOST) \
 		-I$(MBGL)/config/$(HOST).gypi \
