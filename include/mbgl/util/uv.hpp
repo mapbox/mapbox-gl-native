@@ -89,7 +89,7 @@ public:
 
 private:
     T *ptr = nullptr;
-    lock lock;
+    class lock lock;
 };
 
 
