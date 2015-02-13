@@ -248,9 +248,9 @@ void NodeMap::renderFinished() {
 
             // Retain the StillImage object until the buffer is deleted.
             [](char *, void *hint) {
-                delete reinterpret_cast<std::unique_ptr<const mbgl::StillImage> *>(hint);
+                delete reinterpret_cast<const mbgl::StillImage *>(hint);
             },
-            new std::unique_ptr<const mbgl::StillImage>(std::move(img))
+            const_cast<mbgl::StillImage *>(img.release())
         );
 
         result->Set(NanNew("pixels"), pixels);
