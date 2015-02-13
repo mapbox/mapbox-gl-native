@@ -243,15 +243,15 @@ class NativeMapView {
         nativeMoveBy(mNativeMapViewPtr, dx, dy, duration);
     }
 
-    public void setLonLat(LatLng latLng) {
-        setLonLat(latLng, 0);
+    public void setLatLng(LatLng latLng) {
+        setLatLng(latLng, 0);
     }
 
-    public void setLonLat(LatLng latLng, long duration) {
+    public void setLatLng(LatLng latLng, long duration) {
         nativeSetLonLat(mNativeMapViewPtr, latLng, duration);
     }
 
-    public LatLng getLonLat() {
+    public LatLng getLatLng() {
         return nativeGetLonLat(mNativeMapViewPtr);
     }
 
@@ -307,15 +307,15 @@ class NativeMapView {
         return nativeGetZoom(mNativeMapViewPtr);
     }
 
-    public void setLonLatZoom(LatLngZoom lonLatZoom) {
-        setLonLatZoom(lonLatZoom, 0);
+    public void setLatLngZoom(LatLngZoom lonLatZoom) {
+        setLatLngZoom(lonLatZoom, 0);
     }
 
-    public void setLonLatZoom(LatLngZoom lonLatZoom, long duration) {
+    public void setLatLngZoom(LatLngZoom lonLatZoom, long duration) {
         nativeSetLonLatZoom(mNativeMapViewPtr, lonLatZoom, duration);
     }
 
-    public LatLngZoom getLonLatZoom() {
+    public LatLngZoom getLatLngZoom() {
         return nativeGetLonLatZoom(mNativeMapViewPtr);
     }
 

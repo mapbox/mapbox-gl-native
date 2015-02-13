@@ -208,7 +208,7 @@ public class MapView extends SurfaceView {
     //
 
     public LatLng getCenterCoordinate() {
-        return mNativeMapView.getLonLat();
+        return mNativeMapView.getLatLng();
     }
 
     public void setCenterCoordinate(LatLng centerCoordinate) {
@@ -217,7 +217,7 @@ public class MapView extends SurfaceView {
 
     public void setCenterCoordinate(LatLng centerCoordinate, boolean animated) {
         long duration = animated ? ANIMATION_DURATION : 0;
-        mNativeMapView.setLonLat(centerCoordinate, duration);
+        mNativeMapView.setLatLng(centerCoordinate, duration);
     }
 
     public void setCenterCoordinate(LatLngZoom centerCoordinate) {
@@ -227,7 +227,7 @@ public class MapView extends SurfaceView {
     public void setCenterCoordinate(LatLngZoom centerCoordinate,
                                     boolean animated) {
         long duration = animated ? ANIMATION_DURATION : 0;
-        mNativeMapView.setLonLatZoom(centerCoordinate, duration);
+        mNativeMapView.setLatLngZoom(centerCoordinate, duration);
     }
 
     public double getDirection() {

@@ -722,7 +722,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    lonLatClass = env->FindClass("com/mapbox/mapboxgl/lib/LonLat");
+    lonLatClass = env->FindClass("com/mapbox/mapboxgl/lib/geometry/LatLng");
     if (lonLatClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -734,19 +734,19 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    lonLatLonId = env->GetFieldID(lonLatClass, "lon", "D");
+    lonLatLonId = env->GetFieldID(lonLatClass, "longitude", "D");
     if (lonLatLonId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    lonLatLatId = env->GetFieldID(lonLatClass, "lat", "D");
+    lonLatLatId = env->GetFieldID(lonLatClass, "latitude", "D");
     if (lonLatLatId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    lonLatZoomClass = env->FindClass("com/mapbox/mapboxgl/lib/LonLatZoom");
+    lonLatZoomClass = env->FindClass("com/mapbox/mapboxgl/lib/LatLngZoom");
     if (lonLatClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -758,13 +758,13 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    lonLatZoomLonId = env->GetFieldID(lonLatZoomClass, "lon", "D");
+    lonLatZoomLonId = env->GetFieldID(lonLatZoomClass, "longitude", "D");
     if (lonLatZoomLonId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    lonLatZoomLatId = env->GetFieldID(lonLatZoomClass, "lat", "D");
+    lonLatZoomLatId = env->GetFieldID(lonLatZoomClass, "latitude", "D");
     if (lonLatZoomLatId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -892,9 +892,9 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeGetAccessToken)},
         {"nativeCancelTransitions", "(J)V", reinterpret_cast<void *>(&nativeCancelTransitions)},
         {"nativeMoveBy", "(JDDJ)V", reinterpret_cast<void *>(&nativeMoveBy)},
-        {"nativeSetLonLat", "(JLcom/mapbox/mapboxgl/lib/LonLat;J)V",
+        {"nativeSetLonLat", "(JLcom/mapbox/mapboxgl/lib/geometry/LatLng;J)V",
          reinterpret_cast<void *>(&nativeSetLonLat)},
-        {"nativeGetLonLat", "(J)Lcom/mapbox/mapboxgl/lib/LonLat;",
+        {"nativeGetLonLat", "(J)Lcom/mapbox/mapboxgl/lib/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLonLat)},
         {"nativeStartPanning", "(J)V", reinterpret_cast<void *>(&nativeStartPanning)},
         {"nativeStopPanning", "(J)V", reinterpret_cast<void *>(&nativeStopPanning)},
@@ -904,9 +904,9 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetScale", "(J)D", reinterpret_cast<void *>(&nativeGetScale)},
         {"nativeSetZoom", "(JDJ)V", reinterpret_cast<void *>(&nativeSetZoom)},
         {"nativeGetZoom", "(J)D", reinterpret_cast<void *>(&nativeGetZoom)},
-        {"nativeSetLonLatZoom", "(JLcom/mapbox/mapboxgl/lib/LonLatZoom;J)V",
+        {"nativeSetLonLatZoom", "(JLcom/mapbox/mapboxgl/lib/LatLngZoom;J)V",
          reinterpret_cast<void *>(&nativeSetLonLatZoom)},
-        {"nativeGetLonLatZoom", "(J)Lcom/mapbox/mapboxgl/lib/LonLatZoom;",
+        {"nativeGetLonLatZoom", "(J)Lcom/mapbox/mapboxgl/lib/LatLngZoom;",
          reinterpret_cast<void *>(&nativeGetLonLatZoom)},
         {"nativeResetZoom", "(J)V", reinterpret_cast<void *>(&nativeResetZoom)},
         {"nativeStartPanning", "(J)V", reinterpret_cast<void *>(&nativeStartScaling)},
