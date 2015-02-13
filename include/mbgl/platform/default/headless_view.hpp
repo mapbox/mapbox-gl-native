@@ -18,6 +18,7 @@ typedef XID GLXPbuffer;
 
 #include <memory>
 #include <thread>
+#include <atomic>
 
 namespace mbgl {
 
@@ -46,7 +47,7 @@ private:
     std::shared_ptr<HeadlessDisplay> display;
 
     struct Dimensions {
-        inline Dimensions(uint16_t width = 0, uint16_t height = 0, float pixelRatio = 0);
+        inline Dimensions(uint16_t width = 0, uint16_t height = 0, float pixelRatio = 0) noexcept;
         inline uint16_t pixelWidth() const { return width * pixelRatio; }
         inline uint16_t pixelHeight() const { return height * pixelRatio; }
 

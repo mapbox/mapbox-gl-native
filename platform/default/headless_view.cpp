@@ -145,7 +145,7 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height, const flo
     prospective = { width, height, pixelRatio };
 }
 
-HeadlessView::Dimensions::Dimensions(uint16_t width_, uint16_t height_, float pixelRatio_)
+HeadlessView::Dimensions::Dimensions(uint16_t width_, uint16_t height_, float pixelRatio_) noexcept
     : width(width_), height(height_), pixelRatio(pixelRatio_) {
 }
 
