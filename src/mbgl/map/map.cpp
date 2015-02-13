@@ -140,6 +140,10 @@ void Map::renderStill(StillImageCallback fn) {
     assert(!active);
     assert(!callback);
 
+    if (!style) {
+        throw util::Exception("Style is not set");
+    }
+
     callback = std::move(fn);
 
     active = true;
