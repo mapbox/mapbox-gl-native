@@ -37,3 +37,31 @@ TEST_F(Storage, HTTPReading) {
 
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
+
+TEST_F(Storage, HTTPNoCallback) {
+    SCOPED_TEST(HTTPTest)
+
+    using namespace mbgl;
+
+    DefaultFileSource fs(nullptr, uv_default_loop());
+
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, uv_default_loop(), nullptr);
+
+    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+
+    HTTPTest.finish();
+}
+
+TEST_F(Storage, HTTPNoCallbackNoLoop) {
+    SCOPED_TEST(HTTPTest)
+
+    using namespace mbgl;
+
+    DefaultFileSource fs(nullptr, uv_default_loop());
+
+    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, nullptr);
+
+    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+
+    HTTPTest.finish();
+}
