@@ -16,6 +16,9 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/util/std.hpp>
 
+
+pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
+
 namespace mbgl {
 namespace android {
 
@@ -337,7 +340,7 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
         }
         log_gl_string(GL_EXTENSIONS, "Extensions");
 
-        loadExtensions();
+        pthread_once(&loadGLExtensions, loadExtensions);
 
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
