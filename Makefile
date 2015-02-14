@@ -193,7 +193,7 @@ load-test: Makefile/mbgl
 
 .PHONY: clear_xcode_cache
 clear_xcode_cache:
-ifeq ($(PLATFORM), osx)
+ifeq ($(HOST), osx)
 	@CUSTOM_DD=`defaults read com.apple.dt.Xcode IDECustomDerivedDataLocation 2>/dev/null`; \
 	if [ $$CUSTOM_DD ]; then \
 		echo clearing files in $$CUSTOM_DD older than one day; \
