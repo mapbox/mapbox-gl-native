@@ -391,8 +391,7 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
         patternShader->u_opacity = properties.opacity;
 
         LatLng latLng = transform.getLatLng();
-        double centerX, centerY;
-        transform.pixelForLatLng(latLng, centerX, centerY);
+        vec2<double> center = transform.pixelForLatLng(latLng);
         float scale = 1 / std::pow(2, zoomFraction);
 
         std::array<float, 2> sizeA = imagePosA.size;
@@ -402,8 +401,8 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
                       1.0f / (sizeA[0] * properties.image.fromScale),
                       1.0f / (sizeA[1] * properties.image.fromScale));
         matrix::translate(matrixA, matrixA,
-                          std::fmod(centerX * 512, sizeA[0] * properties.image.fromScale),
-                          std::fmod(centerY * 512, sizeA[1] * properties.image.fromScale));
+                          std::fmod(center.x * 512, sizeA[0] * properties.image.fromScale),
+                          std::fmod(center.y * 512, sizeA[1] * properties.image.fromScale));
         matrix::rotate(matrixA, matrixA, -transform.currentState().getAngle());
         matrix::scale(matrixA, matrixA,
                        scale * transform.currentState().getWidth()  / 2,
@@ -416,8 +415,8 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
                       1.0f / (sizeB[0] * properties.image.toScale),
                       1.0f / (sizeB[1] * properties.image.toScale));
         matrix::translate(matrixB, matrixB,
-                          std::fmod(centerX * 512, sizeB[0] * properties.image.toScale),
-                          std::fmod(centerY * 512, sizeB[1] * properties.image.toScale));
+                          std::fmod(center.x * 512, sizeB[0] * properties.image.toScale),
+                          std::fmod(center.y * 512, sizeB[1] * properties.image.toScale));
         matrix::rotate(matrixB, matrixB, -transform.currentState().getAngle());
         matrix::scale(matrixB, matrixB,
                        scale * transform.currentState().getWidth()  / 2,

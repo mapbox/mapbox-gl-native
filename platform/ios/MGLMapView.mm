@@ -897,22 +897,20 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     //
     convertedPoint.y = self.bounds.size.height - convertedPoint.y;
 
-    mbgl::LatLng latLng = mbglMap->latLngForPixel(convertedPoint.x, convertedPoint.y);
+    mbgl::LatLng latLng = mbglMap->latLngForPixel(mbgl::vec2<double>(convertedPoint.x, convertedPoint.y));
 
     return CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
 }
 
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(UIView *)view
 {
-    double x, y;
-
-    mbglMap->pixelForLatLng(mbgl::LatLng(coordinate.latitude, coordinate.longitude), x, y);
+    mbgl::vec2<double> pixel = mbglMap->pixelForLatLng(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
 
     // flip y coordinate for iOS view origin in top left
     //
-    y = self.bounds.size.height - y;
+    pixel.y = self.bounds.size.height - pixel.y;
 
-    return [self convertPoint:CGPointMake(x, y) toView:view];
+    return [self convertPoint:CGPointMake(pixel.x, pixel.y) toView:view];
 }
 
 - (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude

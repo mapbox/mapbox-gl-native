@@ -4,6 +4,7 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/vec.hpp>
 
 #include <cstdint>
 #include <cmath>
@@ -53,8 +54,8 @@ public:
     void stopRotating();
 
     // Projection
-    void pixelForLatLng(const LatLng latLng, double &x, double &y) const;
-    const LatLng latLngForPixel(const double x, const double y) const;
+    const vec2<double> pixelForLatLng(const LatLng latLng) const;
+    const LatLng latLngForPixel(const vec2<double> pixel) const;
 
     // Transitions
     bool needsTransition() const;

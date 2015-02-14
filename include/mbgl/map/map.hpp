@@ -7,6 +7,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/vec.hpp>
 
 #include <cstdint>
 #include <atomic>
@@ -134,8 +135,8 @@ public:
     inline double getMetersPerPixelAtLatitude(const double lat, const double zoom) const { return Projection::getMetersPerPixelAtLatitude(lat, zoom); }
     inline const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const { return Projection::projectedMetersForLatLng(latLng); }
     inline const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const { return Projection::latLngForProjectedMeters(projectedMeters); }
-    inline void pixelForLatLng(const LatLng latLng, double &x, double &y) const { transform.pixelForLatLng(latLng, x, y); }
-    inline const LatLng latLngForPixel(const double x, const double y) const { return transform.latLngForPixel(x, y); }
+    inline const vec2<double> pixelForLatLng(const LatLng latLng) const { return transform.pixelForLatLng(latLng); }
+    inline const LatLng latLngForPixel(const vec2<double> pixel) const { return transform.latLngForPixel(pixel); }
 
     // Debug
     void setDebug(bool value);

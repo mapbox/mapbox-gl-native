@@ -463,7 +463,7 @@ void Transform::_clearRotating() {
 
 #pragma mark - Projection
 
-void Transform::pixelForLatLng(const LatLng latLng, double &x, double &y) const {
+const vec2<double> Transform::pixelForLatLng(const LatLng latLng) const {
     LatLng ll = getLatLng();
     double zoom = getZoom();
 
@@ -497,11 +497,13 @@ void Transform::pixelForLatLng(const LatLng latLng, double &x, double &y) const 
     const double rotatedCenterX = centerX * angle_cos - centerY * angle_sin;
     const double rotatedCenterY = centerX * angle_sin + centerY * angle_cos;
 
-    x = rotatedX + (centerX - rotatedCenterX);
-    y = rotatedY + (centerY - rotatedCenterY);
+    double x = rotatedX + (centerX - rotatedCenterX);
+    double y = rotatedY + (centerY - rotatedCenterY);
+
+    return vec2<double>(x, y);
 }
 
-const LatLng Transform::latLngForPixel(const double x, const double y) const {
+const LatLng Transform::latLngForPixel(const vec2<double> pixel) const {
     LatLng ll = getLatLng();
     double zoom = getZoom();
 
@@ -516,8 +518,8 @@ const LatLng Transform::latLngForPixel(const double x, const double y) const {
     const double unrotatedCenterX = centerX * angle_cos - centerY * angle_sin;
     const double unrotatedCenterY = centerX * angle_sin + centerY * angle_cos;
 
-    const double unrotatedX = x * angle_cos - y * angle_sin;
-    const double unrotatedY = x * angle_sin + y * angle_cos;
+    const double unrotatedX = pixel.x * angle_cos - pixel.y * angle_sin;
+    const double unrotatedY = pixel.x * angle_sin + pixel.y * angle_cos;
 
     const double givenX = unrotatedX + (centerX - unrotatedCenterX);
     const double givenY = unrotatedY + (centerY - unrotatedCenterY);
