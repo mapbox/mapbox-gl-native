@@ -2,6 +2,8 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
 
+pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
+
 GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
 #ifdef NVIDIA
     glDiscardFramebufferEXT = reinterpret_cast<PFNGLDISCARDFRAMEBUFFEREXTPROC>(glfwGetProcAddress("glDiscardFramebufferEXT"));
@@ -71,8 +73,8 @@ void GLFWView::initialize(mbgl::Map *map_) {
     glfwSetScrollCallback(window, onScroll);
     glfwSetKeyCallback(window, onKey);
 
-    const std::string extensions = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
-    {
+    pthread_once(&loadGLExtensions, [] {
+        const std::string extensions = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
         using namespace mbgl;
 
         if (extensions.find("GL_KHR_debug") != std::string::npos) {
@@ -152,7 +154,7 @@ void GLFWView::initialize(mbgl::Map *map_) {
         // Require packed depth stencil
         gl::isPackedDepthStencilSupported = true;
         gl::isDepth24Supported = true;
-    }
+    });
 
     glfwMakeContextCurrent(nullptr);
 }

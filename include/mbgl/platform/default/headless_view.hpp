@@ -60,6 +60,8 @@ private:
     GLXPbuffer glxPbuffer = 0;
 #endif
 
+    bool extensionsLoaded = false;
+
     GLuint fbo = 0;
     GLuint fboDepthStencil = 0;
     GLuint fboColor = 0;

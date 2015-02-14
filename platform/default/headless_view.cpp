@@ -10,6 +10,8 @@
 #include <cstring>
 #include <cassert>
 
+pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
+
 #ifdef MBGL_USE_CGL
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -48,10 +50,18 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display)
 }
 
 void HeadlessView::loadExtensions() {
-    activate();
-    const char *extensionPtr = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
+    if (extensionsLoaded) {
+        return;
+    }
 
-    if (extensionPtr) {
+    activate();
+
+    pthread_once(&loadGLExtensions, [] {
+        const char *extensionPtr = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
+
+        if (!extensionPtr) {
+            return;
+        }
         const std::string extensions = extensionPtr;
 
 #ifdef MBGL_USE_CGL
@@ -78,11 +88,13 @@ void HeadlessView::loadExtensions() {
             assert(gl::IsVertexArray != nullptr);
         }
 #endif
-    }
+    });
 
     // HeadlessView requires packed depth stencil
     gl::isPackedDepthStencilSupported = true;
     gl::isDepth24Supported = true;
+
+    extensionsLoaded = true;
 
     deactivate();
 }

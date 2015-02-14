@@ -16,6 +16,9 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/util/std.hpp>
 
+
+pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
+
 namespace mbgl {
 namespace android {
 
@@ -296,6 +299,8 @@ void NativeMapView::terminateContext() {
     context = EGL_NO_CONTEXT;
 }
 
+void loadExtensions();
+
 void NativeMapView::createSurface(ANativeWindow *window_) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::createSurface");
 
@@ -337,7 +342,7 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
         }
         log_gl_string(GL_EXTENSIONS, "Extensions");
 
-        loadExtensions();
+        pthread_once(&loadGLExtensions, loadExtensions);
 
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
@@ -553,7 +558,6 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint numConfi
 
     // Sort the configs to find the best one
     configList.sort();
-    usingDepth24 = std::get<1>(configList.front()) == Format24Depth8Stencil;
     bool isConformant = !std::get<2>(configList.front());
     bool isCaveat = std::get<3>(configList.front());
     int configNum = std::get<4>(configList.front());
@@ -588,7 +592,7 @@ void NativeMapView::start() {
     map.start(true);
 }
 
-void NativeMapView::loadExtensions() {
+void loadExtensions() {
     const GLubyte *str = glGetString(GL_EXTENSIONS);
     if (str == nullptr) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "glGetString(GL_EXTENSIONS) returned error %d",
@@ -620,12 +624,7 @@ void NativeMapView::loadExtensions() {
     }
 
     if (extensions.find("GL_OES_depth24") != std::string::npos) {
-        mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_depth24.");
-        if (usingDepth24) {
-            gl::isDepth24Supported = true;
-        } else {
-            mbgl::Log::Info(mbgl::Event::OpenGL, "Preferring 16 bit depth.");
-        }
+        gl::isDepth24Supported = true;
     }
 
     if (extensions.find("GL_KHR_debug") != std::string::npos) {

@@ -37,6 +37,7 @@ const std::string &defaultCacheDatabase() {
     return path;
 }
 
+static dispatch_once_t loadGLExtensions;
 
 extern NSString *const MGLStyleKeyGeneric;
 extern NSString *const MGLStyleKeyFill;
@@ -213,8 +214,9 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // load extensions
     //
-    const std::string extensions = (char *)glGetString(GL_EXTENSIONS);
-    {
+    dispatch_once(&loadGLExtensions, ^{
+        const std::string extensions = (char *)glGetString(GL_EXTENSIONS);
+
         using namespace mbgl;
 
         if (extensions.find("GL_OES_vertex_array_object") != std::string::npos) {
@@ -231,7 +233,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
         if (extensions.find("GL_OES_depth24") != std::string::npos) {
             gl::isDepth24Supported = YES;
         }
-    }
+    });
 
     // setup mbgl map
     //

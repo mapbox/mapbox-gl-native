@@ -54,8 +54,6 @@ public:
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 
-    void loadExtensions();
-
     bool inEmulator();
 
 private:
@@ -79,8 +77,6 @@ private:
     std::string apiKey;
 
     bool firstTime = false;
-
-    bool usingDepth24 = false;
 
     bool fpsEnabled = false;
     double fps = 0.0;
