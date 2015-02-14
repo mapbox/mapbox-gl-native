@@ -131,7 +131,9 @@ void Map::stop() {
 
     active = false;
 
-    // TODO: Send a notification to the thread to stop rendering.
+    // Acquire and release the lock so that this call blocks until the current
+    // render call in the Map thread is finished.
+    std::lock_guard<std::mutex> lock(rendering);
 }
 
 void Map::renderStill(StillImageCallback fn) {
@@ -717,6 +719,8 @@ void Map::prepare() {
 }
 
 void Map::render() {
+    std::lock_guard<std::mutex> lock(rendering);
+
     view.discard();
 
     assert(painter);

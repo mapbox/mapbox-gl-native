@@ -200,6 +200,7 @@ private:
 
     std::thread thread;
 
+    std::mutex rendering;
 
     std::atomic<bool> active;
 
