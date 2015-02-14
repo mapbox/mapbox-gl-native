@@ -94,10 +94,10 @@ int main(int argc, char *argv[]) {
     int ret = view->run();
 
     // Save settings
-    mbgl::LatLng latLng = mbgl::LatLng();
-    map.getLatLngZoom(latLng, settings.zoom);
+    mbgl::LatLng latLng = map.getLatLng();
     settings.latitude = latLng.latitude;
     settings.longitude = latLng.longitude;
+    settings.zoom = map.getZoom();
     settings.bearing = map.getBearing();
     settings.debug = map.getDebug();
     settings.save();

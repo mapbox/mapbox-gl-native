@@ -464,10 +464,6 @@ void Map::setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::d
     update();
 }
 
-void Map::getLatLngZoom(LatLng &latLng, double &zoom) const {
-    transform.getLatLngZoom(latLng, zoom);
-}
-
 void Map::resetZoom() {
     setZoom(0);
 }

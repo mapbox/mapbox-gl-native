@@ -575,9 +575,8 @@ jobject JNICALL nativeGetLonLatZoom(JNIEnv *env, jobject obj, jlong nativeMapVie
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetLonLatZoom");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    double zoom = 0.0;
-    mbgl::LatLng latLng = mbgl::LatLng();
-    nativeMapView->getMap().getLatLngZoom(latLng, zoom);
+    mbgl::LatLng latLng = nativeMapView->getMap().getLatLng();
+    double zoom = nativeMapView->getMap().getZoom();
 
     jobject ret = env->NewObject(lonLatZoomClass, lonLatZoomConstructorId, latLng.longitude, latLng.latitude, zoom);
     if (ret == nullptr) {

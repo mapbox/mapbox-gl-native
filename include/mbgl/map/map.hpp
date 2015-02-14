@@ -109,7 +109,6 @@ public:
     void setZoom(double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     double getZoom() const;
     void setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void getLatLngZoom(LatLng &latLng, double &zoom) const;
     void resetZoom();
     void startScaling();
     void stopScaling();

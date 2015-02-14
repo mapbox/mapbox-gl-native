@@ -30,7 +30,6 @@ public:
     void setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     const LatLng getLatLng() const;
-    void getLatLngZoom(LatLng &latLng, double& zoom) const;
     void startPanning();
     void stopPanning();
 

@@ -149,13 +149,6 @@ const LatLng Transform::getLatLng() const {
     return ll;
 }
 
-void Transform::getLatLngZoom(LatLng &latLng, double &zoom) const {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    latLng = getLatLng();
-    zoom = getZoom();
-}
-
 void Transform::startPanning() {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
@@ -471,9 +464,8 @@ void Transform::_clearRotating() {
 #pragma mark - Projection
 
 void Transform::pixelForLatLng(const LatLng latLng, double &x, double &y) const {
-    LatLng ll;
-    double zoom;
-    getLatLngZoom(ll, zoom);
+    LatLng ll = getLatLng();
+    double zoom = getZoom();
 
     const double centerX = final.width  / 2;
     const double centerY = final.height / 2;
@@ -510,9 +502,8 @@ void Transform::pixelForLatLng(const LatLng latLng, double &x, double &y) const 
 }
 
 const LatLng Transform::latLngForPixel(const double x, const double y) const {
-    LatLng ll;
-    double zoom;
-    getLatLngZoom(ll, zoom);
+    LatLng ll = getLatLng();
+    double zoom = getZoom();
 
     const double centerX = final.width  / 2;
     const double centerY = final.height / 2;

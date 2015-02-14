@@ -140,10 +140,10 @@ int main() {
     [reachability stopNotifier];
 
     // Save settings
-    mbgl::LatLng latLng;
-    map.getLatLngZoom(latLng, settings.zoom);
+    mbgl::LatLng latLng = map.getLatLng();
     settings.latitude = latLng.latitude;
     settings.longitude = latLng.longitude;
+    settings.zoom = map.getZoom();
     settings.bearing = map.getBearing();
     settings.debug = map.getDebug();
     settings.save();
