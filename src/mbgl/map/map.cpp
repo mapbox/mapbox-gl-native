@@ -70,7 +70,7 @@ Map::Map(View& view_, FileSource& fileSource_)
       spriteAtlas(util::make_unique<SpriteAtlas>(512, 512)),
       lineAtlas(util::make_unique<LineAtlas>(512, 512)),
       texturePool(std::make_shared<TexturePool>()),
-      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas, transform))
+      painter(util::make_unique<Painter>(*spriteAtlas, *glyphAtlas, *lineAtlas))
 {
     view.initialize(this);
     // Make sure that we're doing an initial drawing in all cases.
@@ -412,10 +412,6 @@ void Map::setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration)
     update();
 }
 
-const LatLng Map::getLatLng() const {
-    return transform.getLatLng();
-}
-
 void Map::startPanning() {
     transform.startPanning();
     update();
@@ -692,7 +688,8 @@ void Map::prepare() {
 
 void Map::render() {
     assert(painter);
-    painter->render(*style, activeSources, animationTime);
+    painter->render(*style, activeSources,
+                    state, animationTime);
     // Schedule another rerender when we definitely need a next frame.
     if (transform.needsTransition() || style->hasTransitions()) {
         update();

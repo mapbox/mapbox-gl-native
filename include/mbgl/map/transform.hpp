@@ -30,7 +30,7 @@ public:
     void moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    const LatLng getLatLng() const;
+    inline const LatLng getLatLng() const { return current.getLatLng(); }
     void startPanning();
     void stopPanning();
 
@@ -52,10 +52,6 @@ public:
     double getAngle() const;
     void startRotating();
     void stopRotating();
-
-    // Projection
-    const vec2<double> pixelForLatLng(const LatLng latLng) const;
-    const LatLng latLngForPixel(const vec2<double> pixel) const;
 
     // Transitions
     bool needsTransition() const;
@@ -95,9 +91,6 @@ private:
     // Limit the amount of zooming possible on the map.
     const double min_scale = std::pow(2, 0);
     const double max_scale = std::pow(2, 18);
-
-    // cache values for spherical mercator math
-    double Bc, Cc;
 
     std::forward_list<util::ptr<util::transition>> transitions;
     util::ptr<util::transition> scale_timeout;

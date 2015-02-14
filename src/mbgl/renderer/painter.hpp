@@ -22,7 +22,6 @@
 #include <mbgl/shader/dot_shader.hpp>
 #include <mbgl/shader/gaussian_shader.hpp>
 
-#include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/ptr.hpp>
 
@@ -35,6 +34,7 @@ namespace mbgl {
 
 enum class RenderPass : bool { Opaque, Translucent };
 
+class Transform;
 class Style;
 class Tile;
 class Sprite;
@@ -59,7 +59,7 @@ class RasterTileData;
 
 class Painter : private util::noncopyable {
 public:
-    Painter(SpriteAtlas&, GlyphAtlas&, LineAtlas&, Transform&);
+    Painter(SpriteAtlas&, GlyphAtlas&, LineAtlas&);
     ~Painter();
 
     void setup();
@@ -78,6 +78,7 @@ public:
 
     void render(const Style& style,
                 const std::set<util::ptr<StyleSource>>& sources,
+                TransformState state,
                 std::chrono::steady_clock::time_point time);
 
     void renderLayers(util::ptr<StyleLayerGroup> group);
@@ -177,7 +178,7 @@ public:
     }();
 
 private:
-    Transform& transform;
+    TransformState state;
 
     bool debug = false;
     int indent = 0;

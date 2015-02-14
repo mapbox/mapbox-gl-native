@@ -1,4 +1,5 @@
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/util/projection.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/box.hpp>
 
@@ -89,6 +90,45 @@ float TransformState::getPixelRatio() const {
 }
 
 
+#pragma mark - Position
+
+const LatLng TransformState::getLatLng() const {
+    LatLng ll;
+
+    ll.longitude = -x / Bc;
+    ll.latitude  = util::RAD2DEG * (2 * std::atan(std::exp(y / Cc)) - 0.5 * M_PI);
+
+    // adjust for world wrap
+    while (ll.longitude >  180) ll.longitude -= 180;
+    while (ll.longitude < -180) ll.longitude += 180;
+
+    // adjust for date line
+    double w = util::tileSize * scale / 2;
+    double x_ = x;
+    if (x_ > w) {
+        while (x_ > w) {
+            x_ -= w;
+            if (ll.longitude < 0) {
+                ll.longitude += 180;
+            } else if (ll.longitude > 0) {
+                ll.longitude -= 180;
+            }
+        }
+    } else if (x_ < -w) {
+        while (x_ < -w) {
+            x_ += w;
+            if (ll.longitude < 0) {
+                ll.longitude -= 180;
+            } else if (ll.longitude > 0) {
+                ll.longitude -= 180;
+            }
+        }
+    }
+
+    return ll;
+}
+
+
 #pragma mark - Zoom
 
 float TransformState::getNormalizedZoom() const {
@@ -116,6 +156,93 @@ double TransformState::getScale() const {
 
 float TransformState::getAngle() const {
     return angle;
+}
+
+
+#pragma mark - Projection
+
+const vec2<double> TransformState::pixelForLatLng(const LatLng latLng) const {
+    LatLng ll = getLatLng();
+    double zoom = getZoom();
+
+    const double centerX = width  / 2;
+    const double centerY = height / 2;
+
+    const double m = Projection::getMetersPerPixelAtLatitude(0, zoom);
+
+    const double angle_sin = std::sin(-angle);
+    const double angle_cos = std::cos(-angle);
+
+    const ProjectedMeters givenMeters = Projection::projectedMetersForLatLng(latLng);
+
+    const double givenAbsoluteX = givenMeters.easting  / m;
+    const double givenAbsoluteY = givenMeters.northing / m;
+
+    const ProjectedMeters centerMeters = Projection::projectedMetersForLatLng(ll);
+
+    const double centerAbsoluteX = centerMeters.easting  / m;
+    const double centerAbsoluteY = centerMeters.northing / m;
+
+    const double deltaX = givenAbsoluteX - centerAbsoluteX;
+    const double deltaY = givenAbsoluteY - centerAbsoluteY;
+
+    const double translatedX = deltaX + centerX;
+    const double translatedY = deltaY + centerY;
+
+    const double rotatedX = translatedX * angle_cos - translatedY * angle_sin;
+    const double rotatedY = translatedX * angle_sin + translatedY * angle_cos;
+
+    const double rotatedCenterX = centerX * angle_cos - centerY * angle_sin;
+    const double rotatedCenterY = centerX * angle_sin + centerY * angle_cos;
+
+    double x_ = rotatedX + (centerX - rotatedCenterX);
+    double y_ = rotatedY + (centerY - rotatedCenterY);
+
+    return vec2<double>(x_, y_);
+}
+
+const LatLng TransformState::latLngForPixel(const vec2<double> pixel) const {
+    LatLng ll = getLatLng();
+    double zoom = getZoom();
+
+    const double centerX = width  / 2;
+    const double centerY = height / 2;
+
+    const double m = Projection::getMetersPerPixelAtLatitude(0, zoom);
+
+    const double angle_sin = std::sin(angle);
+    const double angle_cos = std::cos(angle);
+
+    const double unrotatedCenterX = centerX * angle_cos - centerY * angle_sin;
+    const double unrotatedCenterY = centerX * angle_sin + centerY * angle_cos;
+
+    const double unrotatedX = pixel.x * angle_cos - pixel.y * angle_sin;
+    const double unrotatedY = pixel.x * angle_sin + pixel.y * angle_cos;
+
+    const double givenX = unrotatedX + (centerX - unrotatedCenterX);
+    const double givenY = unrotatedY + (centerY - unrotatedCenterY);
+
+    const ProjectedMeters centerMeters = Projection::projectedMetersForLatLng(ll);
+
+    const double centerAbsoluteX = centerMeters.easting  / m;
+    const double centerAbsoluteY = centerMeters.northing / m;
+
+    const double givenAbsoluteX = givenX + centerAbsoluteX - centerX;
+    const double givenAbsoluteY = givenY + centerAbsoluteY - centerY;
+
+    ProjectedMeters givenMeters = ProjectedMeters(givenAbsoluteY * m, givenAbsoluteX * m);
+
+    // adjust for date line
+    ProjectedMeters sw, ne;
+    Projection::getWorldBoundsMeters(sw, ne);
+    double d = ne.easting - sw.easting;
+    if (ll.longitude > 0 && givenMeters.easting > centerMeters.easting) givenMeters.easting -= d;
+
+    // adjust for world wrap
+    while (givenMeters.easting < sw.easting) givenMeters.easting += d;
+    while (givenMeters.easting > ne.easting) givenMeters.easting -= d;
+
+    return Projection::latLngForProjectedMeters(givenMeters);
 }
 
 

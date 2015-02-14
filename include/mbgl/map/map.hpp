@@ -98,7 +98,7 @@ public:
     // Position
     void moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    const LatLng getLatLng() const;
+    inline const LatLng getLatLng() const { return state.getLatLng(); }
     void startPanning();
     void stopPanning();
     void resetPosition();
@@ -135,8 +135,8 @@ public:
     inline double getMetersPerPixelAtLatitude(const double lat, const double zoom) const { return Projection::getMetersPerPixelAtLatitude(lat, zoom); }
     inline const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const { return Projection::projectedMetersForLatLng(latLng); }
     inline const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const { return Projection::latLngForProjectedMeters(projectedMeters); }
-    inline const vec2<double> pixelForLatLng(const LatLng latLng) const { return transform.pixelForLatLng(latLng); }
-    inline const LatLng latLngForPixel(const vec2<double> pixel) const { return transform.latLngForPixel(pixel); }
+    inline const vec2<double> pixelForLatLng(const LatLng latLng) const { return state.pixelForLatLng(latLng); }
+    inline const LatLng latLngForPixel(const vec2<double> pixel) const { return state.latLngForPixel(pixel); }
 
     // Debug
     void setDebug(bool value);
