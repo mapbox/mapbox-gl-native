@@ -22,7 +22,6 @@ class Request : private util::noncopyable {
 public:
     using Callback = std::function<void(const Response &)>;
     Request(const Resource &resource, uv_loop_t *loop, Callback callback);
-    ~Request();
 
 public:
     // May be called from any thread.
@@ -33,12 +32,14 @@ public:
     void cancel();
 
 private:
+    ~Request();
+    void invoke();
     static void notifyCallback(uv_async_t *async);
     static void cancelCallback(uv_async_t *async);
 
 private:
-    uv_async_t *notify_async = nullptr;
-    uv_async_t *destruct_async = nullptr;
+    uv_async_t *notifyAsync = nullptr;
+    uv_async_t *destructAsync = nullptr;
     Callback callback;
     std::shared_ptr<const Response> response;
 
