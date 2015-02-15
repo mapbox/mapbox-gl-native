@@ -40,8 +40,8 @@ matrix:
 
 env:
   global:
-   - secure: "MZHblLZXG/jWf2w0ZFlxCLDwx2qtGgRDODQyg1BR7JIuMz6AtWv8XR/sUczWLbiABCL0a/NzJF1g4v2pI7X69IntcjOdIABBgTh7++6+1TJ0Kp8viEltb55nQG3lHy/R6fOaI7Pj9tuCX0PCRtGA5C/fGnodLGEjy3RVOJ09ln0="		+   - secure: "XuZ5KNGVLyMC6fhUchdvMPp6NqT+WtYfIsiT8zGuzaFTfwUiwijAsSye++wZLXbWqH5DU5xHjNdBpmwT2bXjzWkyR+OYjKD7a0K3hzuGhNuSb4wcVaXr0bhsAzarFqaTXjf/Mrinl1eSLJnHY6NW9OJkyqUvi0vPY/+55Ry2WwQ="
-   - secure: "KaSQbhgjtV7ZCkesHmvrNsbQVjk5SPfGKB1VkWenRGYhLF45HpSRNwSxMQddZ566Pg7qIFgF1iWl/B0QW3B6AWL5WmzQ5AOJgwS876pNIc/UT7ubMPtgAtjpvw1bQvQP3B8MrB+3OE5c6tD+a3LhR9krV//dOsfErR5Yy+3Mbkc="		+   - secure: "Uvau7bpGpnbWnsFlgeCjPNBuw+HOQ5sZzdKGdm3wuKmPROfAoVuGb1N3mIYcL2iSiUTomn7CVoLDSXbiYSGlM6nzJ0N/dV+GMJV5f7gO/1b46hfiBNnR7eGr0oH4DzSYefS/8DcbLWFtCTePdNtvpCko/BHfcOx0WSXl2SNIFYk="
+   - secure: "MZHblLZXG/jWf2w0ZFlxCLDwx2qtGgRDODQyg1BR7JIuMz6AtWv8XR/sUczWLbiABCL0a/NzJF1g4v2pI7X69IntcjOdIABBgTh7++6+1TJ0Kp8viEltb55nQG3lHy/R6fOaI7Pj9tuCX0PCRtGA5C/fGnodLGEjy3RVOJ09ln0="
+   - secure: "KaSQbhgjtV7ZCkesHmvrNsbQVjk5SPfGKB1VkWenRGYhLF45HpSRNwSxMQddZ566Pg7qIFgF1iWl/B0QW3B6AWL5WmzQ5AOJgwS876pNIc/UT7ubMPtgAtjpvw1bQvQP3B8MrB+3OE5c6tD+a3LhR9krV//dOsfErR5Yy+3Mbkc="
    - ANDROID_BUILD_INSTANCE_PROFILE: arn:aws:iam::234858372212:instance-profile/android-gl-build/travis/instance-profile/travis-mapbox-gl-native-AndroidInstanceProfile-13EA815DD8IQ9
    - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
    - secure: "CHBiUM60TolDbQnn+4IRA/tvOKwKs3g9EDvv8YHSJMg3FuHmjKQkprBasvxf3hnTXg4WLZEubmeDcyJ6RRzPP5mMSr/hksYl0pSjj/6TUecE5fHPVVeN7txVqkpOBf9i45Y+iBUQMjBb1NnDK3pHXxpnAs1Q/pe7vReErj4GF1U="
