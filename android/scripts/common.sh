@@ -14,6 +14,6 @@ echo "${MAPBOX_ACCESS_TOKEN}" >> ./android/java/MapboxGLAndroidSDKTestApp/src/ma
 
 make android -j$JOBS BUILDTYPE=$BUILDTYPE JOBS=$JOBS
 
-aws s3 cp ./build/android-${ANDROID_ABI}/${BUILDTYPE}/lib.target/libmapbox-gl.so s3://mapbox-gl-testing/android/${NAME}/libmapbox-gl.so
-aws s3 cp ./android/java/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk s3://mapbox-gl-testing/android/${NAME}/MapboxGLAndroidSDKTestApp-debug.apk
-aws s3 cp ./android/java/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-release-unsigned.apk s3://mapbox-gl-testing/android/${NAME}/MapboxGLAndroidSDKTestApp-release-unsigned.apk
+aws s3 cp ./build/android-${ANDROID_ABI}/${BUILDTYPE}/lib.target/libmapbox-gl.so s3://mapbox/mapbox-gl-native/android/build/${NAME}/libmapbox-gl.so
+aws s3 cp ./android/java/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk s3://mapbox/mapbox-gl-native/android/build/${NAME}/MapboxGLAndroidSDKTestApp-debug.apk
+aws s3 cp ./android/java/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-release-unsigned.apk s3://mapbox/mapbox-gl-native/android/build/${NAME}/MapboxGLAndroidSDKTestApp-release-unsigned.apk
