@@ -392,9 +392,8 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
         patternShader->u_mix = properties.image.t;
         patternShader->u_opacity = properties.opacity;
 
-        double lon, lat;
-        state.getLonLat(lon, lat);
-        std::array<float, 2> center = state.locationCoordinate(lon, lat);
+        LatLng latLng = state.getLatLng();
+        vec2<double> center = state.pixelForLatLng(latLng);
         float scale = 1 / std::pow(2, zoomFraction);
 
         std::array<float, 2> sizeA = imagePosA.size;
@@ -404,8 +403,8 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
                       1.0f / (sizeA[0] * properties.image.fromScale),
                       1.0f / (sizeA[1] * properties.image.fromScale));
         matrix::translate(matrixA, matrixA,
-                          std::fmod(center[0] * 512, sizeA[0] * properties.image.fromScale),
-                          std::fmod(center[1] * 512, sizeA[1] * properties.image.fromScale));
+                          std::fmod(center.x * 512, sizeA[0] * properties.image.fromScale),
+                          std::fmod(center.y * 512, sizeA[1] * properties.image.fromScale));
         matrix::rotate(matrixA, matrixA, -state.getAngle());
         matrix::scale(matrixA, matrixA,
                        scale * state.getWidth()  / 2,
@@ -418,8 +417,8 @@ void Painter::renderBackground(util::ptr<StyleLayer> layer_desc) {
                       1.0f / (sizeB[0] * properties.image.toScale),
                       1.0f / (sizeB[1] * properties.image.toScale));
         matrix::translate(matrixB, matrixB,
-                          std::fmod(center[0] * 512, sizeB[0] * properties.image.toScale),
-                          std::fmod(center[1] * 512, sizeB[1] * properties.image.toScale));
+                          std::fmod(center.x * 512, sizeB[0] * properties.image.toScale),
+                          std::fmod(center.y * 512, sizeB[1] * properties.image.toScale));
         matrix::rotate(matrixB, matrixB, -state.getAngle());
         matrix::scale(matrixB, matrixB,
                        scale * state.getWidth()  / 2,

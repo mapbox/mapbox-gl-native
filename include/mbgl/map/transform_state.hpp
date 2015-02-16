@@ -4,6 +4,8 @@
 #include <mbgl/map/tile.hpp>
 
 #include <mbgl/util/mat4.hpp>
+#include <mbgl/util/geo.hpp>
+#include <mbgl/util/vec.hpp>
 
 #include <cstdint>
 #include <array>
@@ -34,6 +36,9 @@ public:
     std::array<float, 2> locationCoordinate(float lon, float lat) const;
     void getLonLat(double &lon, double &lat) const;
 
+    // Position
+    const LatLng getLatLng() const;
+
     // Zoom
     float getNormalizedZoom() const;
     double getZoom() const;
@@ -43,6 +48,10 @@ public:
 
     // Rotation
     float getAngle() const;
+
+    // Projection
+    const vec2<double> pixelForLatLng(const LatLng latLng) const;
+    const LatLng latLngForPixel(const vec2<double> pixel) const;
 
     // Changing
     bool isChanging() const;
@@ -60,6 +69,9 @@ private:
 
     // map scale factor
     float pixelRatio = 0;
+
+    // cache values for spherical mercator math
+    double Bc, Cc;
 
     // animation state
     bool rotating = false;

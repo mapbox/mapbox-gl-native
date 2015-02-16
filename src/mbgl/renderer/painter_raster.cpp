@@ -5,7 +5,6 @@
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/transform.hpp>
 
 using namespace mbgl;
 

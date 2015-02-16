@@ -131,6 +131,30 @@
 /** Resets the map rotation to a northern heading. */
 - (void)resetNorth;
 
+#pragma mark - Converting Map Coordinates
+
+/** @name Converting Map Coordinates */
+
+/** Converts a point in the specified view’s coordinate system to a map coordinate.
+*   @param point The point you want to convert.
+*   @param view The view that serves as the reference coordinate system for the `point` parameter.
+*   @return The map coordinate at the specified point. */
+- (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(UIView *)view;
+
+/** Converts a map coordinate to a point in the specified view.
+*   @param coordinate The map coordinate for which you want to find the corresponding point.
+*   @param view The view in whose coordinate system you want to locate the specified map coordinate. If this parameter is `nil`, the returned point is specified in the window’s coordinate system. If `view` is not `nil`, it must belong to the same window as the map view.
+*   @return The point (in the appropriate view or window coordinate system) corresponding to the specified latitude and longitude value. */
+- (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(UIView *)view;
+
+/** Returns the distance spanned by one pixel at the specified latitude and current zoom level.
+*
+*   The distance between pixels decreases as the latitude approaches the poles. This relationship parallels the relationship between longitudinal coordinates at different latitudes.
+*
+*   @param latitude The latitude for which to return the value.
+*   @return The distance (in meters) spanned by a single pixel. */
+- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude;
+
 #pragma mark - Styling the Map
 
 /** @name Styling the Map */

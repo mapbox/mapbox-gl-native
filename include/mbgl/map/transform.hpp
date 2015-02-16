@@ -2,7 +2,9 @@
 #define MBGL_MAP_TRANSFORM
 
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/vec.hpp>
 
 #include <cstdint>
 #include <cmath>
@@ -26,10 +28,9 @@ public:
 
     // Position
     void moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setLonLat(double lon, double lat, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setLonLatZoom(double lon, double lat, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void getLonLat(double& lon, double& lat) const;
-    void getLonLatZoom(double& lon, double& lat, double& zoom) const;
+    void setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    void setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    inline const LatLng getLatLng() const { return current.getLatLng(); }
     void startPanning();
     void stopPanning();
 
@@ -90,9 +91,6 @@ private:
     // Limit the amount of zooming possible on the map.
     const double min_scale = std::pow(2, 0);
     const double max_scale = std::pow(2, 18);
-
-    // cache values for spherical mercator math
-    double Bc, Cc;
 
     std::forward_list<util::ptr<util::transition>> transitions;
     util::ptr<util::transition> scale_timeout;
