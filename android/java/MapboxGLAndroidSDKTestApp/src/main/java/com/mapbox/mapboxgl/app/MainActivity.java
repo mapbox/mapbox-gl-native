@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.mapbox.mapboxgl.lib.LatLngZoom;
+import com.mapbox.mapboxgl.lib.geometry.LatLngZoom;
 import com.mapbox.mapboxgl.lib.MapView;
 import com.mapzen.android.lost.LocationClient;
 import com.mapzen.android.lost.LocationListener;
@@ -283,7 +283,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            ArrayList<String> classes = new ArrayList<String>(1);
+            ArrayList<String> classes = new ArrayList<>(1);
 
             switch(position) {
                 // Day
@@ -315,7 +315,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            ArrayList<String> classes = new ArrayList<String>(2);
+            ArrayList<String> classes = new ArrayList<>(2);
 
             switch(position) {
                 // Labels + Contours

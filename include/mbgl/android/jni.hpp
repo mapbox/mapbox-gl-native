@@ -39,6 +39,16 @@ extern jclass arrayListClass;
 extern jmethodID arrayListConstructorId;
 extern jmethodID arrayListAddId;
 
+extern jclass projectedMetersClass;
+extern jmethodID projectedMetersConstructorId;
+extern jfieldID projectedMetersNorthingId;
+extern jfieldID projectedMetersEastingId;
+
+extern jclass pointFClass;
+extern jmethodID pointFConstructorId;
+extern jfieldID pointFXId;
+extern jfieldID pointFYId;
+
 }
 }
 

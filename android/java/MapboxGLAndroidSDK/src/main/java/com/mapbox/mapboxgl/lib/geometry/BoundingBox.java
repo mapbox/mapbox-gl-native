@@ -2,6 +2,7 @@ package com.mapbox.mapboxgl.lib.geometry;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -9,8 +10,6 @@ import java.util.List;
  * A rectangular geographical area defined in latitude and longitude units.
  */
 public final class BoundingBox implements Parcelable, Serializable {
-
-    static final long serialVersionUID = 2L;
 
     private final double mLatNorth;
     private final double mLatSouth;

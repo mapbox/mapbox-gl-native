@@ -30,6 +30,7 @@ import android.widget.ZoomButtonsController;
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxgl.lib.geometry.LatLng;
+import com.mapbox.mapboxgl.lib.geometry.LatLngZoom;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
@@ -135,7 +136,6 @@ public class MapView extends SurfaceView {
 
         // Check if we are in Eclipse UI editor
         if (isInEditMode()) {
-            // TODO editor does not load properly because we don't implement this
             return;
         }
 
@@ -386,7 +386,7 @@ public class MapView extends SurfaceView {
 
     public void removeAllClasses(long transitionDuration) {
         mNativeMapView.setDefaultTransitionDuration(transitionDuration);
-        ArrayList<String> classes = new ArrayList<String>(0);
+        ArrayList<String> classes = new ArrayList<>(0);
         setClasses(classes);
     }
 
@@ -436,7 +436,7 @@ public class MapView extends SurfaceView {
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
         outState.putString(STATE_STYLE_URL, mStyleUrl);
         outState.putString(STATE_ACCESS_TOKEN, getAccessToken());
-        outState.putStringArrayList(STATE_CLASSES, new ArrayList<String>(getClasses()));
+        outState.putStringArrayList(STATE_CLASSES, new ArrayList<>(getClasses()));
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
     }
 
@@ -531,8 +531,6 @@ public class MapView extends SurfaceView {
         }
     }
 
-    // TODO examine how GLSurvaceView hadles attach/detach from window
-
     // Called when view is no longer connected
     @Override
     protected void onDetachedFromWindow() {
@@ -559,10 +557,6 @@ public class MapView extends SurfaceView {
     //
     // Draw events
     //
-
-    // TODO: onDraw for UI editor mockup?
-    // By default it just shows a gray screen with "MapView"
-    // Not too important but perhaps we could put a static demo map image there
 
     //
     // Input events
@@ -782,7 +776,7 @@ public class MapView extends SurfaceView {
                 return false;
             }
 
-            // TODO complex decision between roate or scale or both (see Google
+            // TODO complex decision between rotate or scale or both (see Google
             // Maps app)
 
             // Cancel any animation
@@ -1011,7 +1005,6 @@ public class MapView extends SurfaceView {
 
     // Called for trackball events, all motions are relative in device specific
     // units
-    // TODO: test trackball click and long click
     @Override
     public boolean onTrackballEvent(MotionEvent event) {
         // Choose the action
@@ -1105,8 +1098,6 @@ public class MapView extends SurfaceView {
     @Override @TargetApi(12)
     public boolean onGenericMotionEvent(MotionEvent event) {
         // Mouse events
-        // TODO: SOURCE_TOUCH_NAVIGATION?
-        // TODO: source device resolution?
         //if (event.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) { // this is not available before API 18
         if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) == InputDevice.SOURCE_CLASS_POINTER) {
             // Choose the action

@@ -1,10 +1,11 @@
-package com.mapbox.mapboxgl.lib;
+package com.mapbox.mapboxgl.lib.geometry;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.mapbox.mapboxgl.lib.geometry.LatLng;
 
-public class LatLngZoom extends LatLng implements Parcelable {
+import java.io.Serializable;
+
+public class LatLngZoom extends LatLng implements Parcelable, Serializable {
 
     public static final Parcelable.Creator<LatLngZoom> CREATOR = new Parcelable.Creator<LatLngZoom>() {
         public LatLngZoom createFromParcel(Parcel in) {
@@ -18,8 +19,8 @@ public class LatLngZoom extends LatLng implements Parcelable {
 
     private double zoom;
 
-    public LatLngZoom(double lat, double lon, double zoom) {
-        super(lat, lon);
+    public LatLngZoom(double latitude, double longitude, double zoom) {
+        super(latitude, longitude);
         this.zoom = zoom;
     }
 
@@ -43,13 +44,21 @@ public class LatLngZoom extends LatLng implements Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
 
         LatLngZoom that = (LatLngZoom) o;
 
-        if (Double.compare(that.zoom, zoom) != 0) return false;
+        if (Double.compare(that.zoom, zoom) != 0) {
+            return false;
+        }
 
         return true;
     }

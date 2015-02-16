@@ -1,8 +1,11 @@
 package com.mapbox.mapboxgl.lib;
 
+import android.graphics.PointF;
 import android.view.Surface;
 
 import com.mapbox.mapboxgl.lib.geometry.LatLng;
+import com.mapbox.mapboxgl.lib.geometry.LatLngZoom;
+import com.mapbox.mapboxgl.lib.geometry.ProjectedMeters;
 
 import java.util.List;
 
@@ -392,6 +395,30 @@ class NativeMapView {
         nativeSetReachability(mNativeMapViewPtr, status);
     }
 
+    //public void getWorldBoundsMeters();
+
+    //public void getWorldBoundsLatLng();
+
+    public double getMetersPerPixelAtLatitude(double lat, double zoom) {
+        return nativeGetMetersPerPixelAtLatitude(mNativeMapViewPtr, lat, zoom);
+    }
+
+    public ProjectedMeters projectedMetersForLatLng(LatLng latLng) {
+        return nativeProjectedMetersForLatLng(mNativeMapViewPtr, latLng);
+    }
+
+    public LatLng latLngForProjectedMeters(ProjectedMeters projectedMeters) {
+        return nativeLatLngForProjectedMeters(mNativeMapViewPtr, projectedMeters);
+    }
+
+    public PointF pixelForLatLng(LatLng latLng) {
+        return nativePixelForLatLng(mNativeMapViewPtr, latLng);
+    }
+
+    public LatLng latLngForPixel(PointF pixel) {
+        return nativeLatLngForPixel(mNativeMapViewPtr, pixel);
+    }
+
     //
     // Callbacks
     //
@@ -553,4 +580,18 @@ class NativeMapView {
     private native boolean nativeGetDebug(long nativeMapViewPtr);
 
     private native void nativeSetReachability(long nativeMapViewPtr, boolean status);
+
+    //private native void nativeGetWorldBoundsMeters(long nativeMapViewPtr);
+
+    //private native void nativeGetWorldBoundsLatLng(long nativeMapViewPtr);
+
+    private native double nativeGetMetersPerPixelAtLatitude(long nativeMapViewPtr, double lat, double zoom);
+
+    private native ProjectedMeters nativeProjectedMetersForLatLng(long nativeMapViewPtr, LatLng latLng);
+
+    private native LatLng nativeLatLngForProjectedMeters(long nativeMapViewPtr, ProjectedMeters projectedMeters);
+
+    private native PointF nativePixelForLatLng(long nativeMapViewPtr, LatLng latLng);
+
+    private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, PointF pixel);
 }

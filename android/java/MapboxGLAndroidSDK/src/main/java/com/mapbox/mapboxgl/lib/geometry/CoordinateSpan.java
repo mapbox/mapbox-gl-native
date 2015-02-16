@@ -3,12 +3,12 @@ package com.mapbox.mapboxgl.lib.geometry;
 /**
  * Implementation of iOS MKCoordinateSpan
  */
-public final class CoordinateSpan {
+public class CoordinateSpan {
 
     private double latitudeSpan;
     private double longitudeSpan;
 
-    public CoordinateSpan(double latitudeSpan, double longitudeSpan) {
+    public CoordinateSpan(final double latitudeSpan, final double longitudeSpan) {
         this.latitudeSpan = latitudeSpan;
         this.longitudeSpan = longitudeSpan;
     }
@@ -17,7 +17,7 @@ public final class CoordinateSpan {
         return latitudeSpan;
     }
 
-    public void setLatitudeSpan(double latitudeSpan) {
+    public void setLatitudeSpan(final double latitudeSpan) {
         this.latitudeSpan = latitudeSpan;
     }
 
@@ -25,7 +25,7 @@ public final class CoordinateSpan {
         return longitudeSpan;
     }
 
-    public void setLongitudeSpan(double longitudeSpan) {
+    public void setLongitudeSpan(final double longitudeSpan) {
         this.longitudeSpan = longitudeSpan;
     }
 }
