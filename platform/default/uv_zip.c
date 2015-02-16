@@ -6,7 +6,8 @@
 
 
 void uv__zip_open_error(uv_zip_t *zip, int error) {
-     zip->result = -error;
+    assert(zip);
+    zip->result = -error;
     if (zip->message) {
         free((char *)zip->message);
         zip->message = NULL;
@@ -17,16 +18,18 @@ void uv__zip_open_error(uv_zip_t *zip, int error) {
 }
 
 void uv__zip_store_error(uv_zip_t *zip, const char *message) {
+    assert(zip);
     if (zip->message) {
         free((char *)zip->message);
         zip->message = NULL;
     }
-    const unsigned long length = strlen(message);
+    const unsigned long length = strlen(message) + 1;
     zip->message = malloc(length);
     strncpy((char *)zip->message, message, length);
 }
 
 void uv__zip_error(uv_zip_t *zip) {
+    assert(zip);
     int error;
     zip_error_get(zip->archive, &error, NULL);
     zip->result = -error;
@@ -34,6 +37,7 @@ void uv__zip_error(uv_zip_t *zip) {
 }
 
 void uv__zip_file_error(uv_zip_t *zip) {
+    assert(zip);
     int error;
     zip_file_error_get(zip->file, &error, NULL);
     zip->result = -error;
@@ -42,6 +46,7 @@ void uv__zip_file_error(uv_zip_t *zip) {
 
 void uv__zip_work_open(uv_work_t *req) {
     uv_zip_t *zip = (uv_zip_t *)req->data;
+    assert(zip);
     assert(!zip->archive);
 
     int error;
@@ -55,6 +60,7 @@ void uv__zip_work_open(uv_work_t *req) {
 
 void uv__zip_work_fdopen(uv_work_t *req) {
     uv_zip_t *zip = (uv_zip_t *)req->data;
+    assert(zip);
     assert(!zip->archive);
 
     // extract the fd
@@ -73,6 +79,7 @@ void uv__zip_work_fdopen(uv_work_t *req) {
 
 void uv__zip_work_stat(uv_work_t *req) {
     uv_zip_t *zip = (uv_zip_t *)req->data;
+    assert(zip);
     assert(zip->archive);
     if (!zip->stat) {
         zip->stat = malloc(sizeof(struct zip_stat));
@@ -85,6 +92,7 @@ void uv__zip_work_stat(uv_work_t *req) {
 
 void uv__zip_work_fopen(uv_work_t *req) {
     uv_zip_t *zip = (uv_zip_t *)req->data;
+    assert(zip);
     assert(zip->archive);
     zip->file = zip_fopen(zip->archive, zip->path, zip->flags);
     if (!zip->file) {
@@ -94,6 +102,7 @@ void uv__zip_work_fopen(uv_work_t *req) {
 
 void uv__zip_work_fread(uv_work_t *req) {
     uv_zip_t *zip = (uv_zip_t *)req->data;
+    assert(zip);
     assert(zip->file);
     assert(zip->buf);
     zip->result = zip_fread(zip->file, zip->buf->base, zip->buf->len);
@@ -104,6 +113,7 @@ void uv__zip_work_fread(uv_work_t *req) {
 
 void uv__zip_work_fclose(uv_work_t *req) {
     uv_zip_t *zip = (uv_zip_t *)req->data;
+    assert(zip);
     assert(zip->file);
     zip->result = zip_fclose(zip->file);
     if (zip->result != 0) {
@@ -121,12 +131,14 @@ void uv__zip_work_discard(uv_work_t *req) {
 
 void uv__zip_after_work(uv_work_t *req, int status) {
     uv_zip_t *zip = (uv_zip_t *)req->data;
+    assert(zip);
     if (zip->cb) {
         zip->cb(zip);
     }
 }
 
 void uv_zip_init(uv_zip_t *zip) {
+    assert(zip);
     zip->work.data = zip;
     zip->message = NULL;
     zip->stat = NULL;
@@ -134,6 +146,7 @@ void uv_zip_init(uv_zip_t *zip) {
 }
 
 void uv_zip_cleanup(uv_zip_t *zip) {
+    assert(zip);
     zip->data = NULL;
     zip->flags = 0;
     zip->result = 0;
@@ -155,6 +168,10 @@ void uv_zip_cleanup(uv_zip_t *zip) {
 }
 
 int uv_zip_open(uv_loop_t* loop, uv_zip_t *zip, const char *path, zip_flags_t flags, uv_zip_cb cb) {
+    assert(loop);
+    assert(zip);
+    assert(path);
+    assert(strlen(path));
     zip->path = path;
     zip->flags = flags;
     zip->cb = cb;
@@ -162,6 +179,9 @@ int uv_zip_open(uv_loop_t* loop, uv_zip_t *zip, const char *path, zip_flags_t fl
 }
 
 int uv_zip_fdopen(uv_loop_t* loop, uv_zip_t *zip, uv_file fd, int flags, uv_zip_cb cb) {
+    assert(loop);
+    assert(zip);
+    assert(fd);
     zip->path = malloc(sizeof(uv_file));
     *(uv_file *)zip->path = fd;
     zip->flags = flags;
@@ -170,6 +190,10 @@ int uv_zip_fdopen(uv_loop_t* loop, uv_zip_t *zip, uv_file fd, int flags, uv_zip_
 }
 
 int uv_zip_stat(uv_loop_t* loop, uv_zip_t *zip, const char *fname, zip_flags_t flags, uv_zip_cb cb) {
+    assert(loop);
+    assert(zip);
+    assert(fname);
+    assert(strlen(fname));
     zip->path = fname;
     zip->flags = flags;
     zip->cb = cb;
@@ -177,6 +201,10 @@ int uv_zip_stat(uv_loop_t* loop, uv_zip_t *zip, const char *fname, zip_flags_t f
 }
 
 int uv_zip_fopen(uv_loop_t* loop, uv_zip_t *zip, const char *fname, zip_flags_t flags, uv_zip_cb cb) {
+    assert(loop);
+    assert(zip);
+    assert(fname);
+    assert(strlen(fname));
     zip->path = fname;
     zip->flags = flags;
     zip->cb = cb;
@@ -184,12 +212,19 @@ int uv_zip_fopen(uv_loop_t* loop, uv_zip_t *zip, const char *fname, zip_flags_t 
 }
 
 int uv_zip_fclose(uv_loop_t* loop, uv_zip_t *zip, struct zip_file *file, uv_zip_cb cb) {
+    assert(loop);
+    assert(zip);
+    assert(file);
     zip->file = file;
     zip->cb = cb;
     return uv_queue_work(loop, &zip->work, uv__zip_work_fclose, uv__zip_after_work);
 }
 
 int uv_zip_fread(uv_loop_t* loop, uv_zip_t *zip, struct zip_file *file, uv_buf_t *buf, uv_zip_cb cb) {
+    assert(loop);
+    assert(zip);
+    assert(file);
+    assert(buf);
     zip->file = file;
     zip->buf = buf;
     zip->cb = cb;
@@ -197,6 +232,8 @@ int uv_zip_fread(uv_loop_t* loop, uv_zip_t *zip, struct zip_file *file, uv_buf_t
 }
 
 int uv_zip_discard(uv_loop_t* loop, uv_zip_t *zip, uv_zip_cb cb) {
+    assert(loop);
+    assert(zip);
     zip->cb = cb;
     return uv_queue_work(loop, &zip->work, uv__zip_work_discard, uv__zip_after_work);
 }
