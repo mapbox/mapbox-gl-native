@@ -2,9 +2,12 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/map/transform.hpp>
+#include <mbgl/util/geo.hpp>
+#include <mbgl/util/projection.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/uv.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/vec.hpp>
 
 #include <cstdint>
 #include <atomic>
@@ -94,8 +97,8 @@ public:
 
     // Position
     void moveBy(double dx, double dy, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void setLonLat(double lon, double lat, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void getLonLat(double &lon, double &lat) const;
+    void setLatLng(LatLng latLng, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
+    inline const LatLng getLatLng() const { return state.getLatLng(); }
     void startPanning();
     void stopPanning();
     void resetPosition();
@@ -106,8 +109,7 @@ public:
     double getScale() const;
     void setZoom(double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     double getZoom() const;
-    void setLonLatZoom(double lon, double lat, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
-    void getLonLatZoom(double &lon, double &lat, double &zoom) const;
+    void setLatLngZoom(LatLng latLng, double zoom, std::chrono::steady_clock::duration duration = std::chrono::steady_clock::duration::zero());
     void resetZoom();
     void startScaling();
     void stopScaling();
@@ -126,6 +128,15 @@ public:
     // API
     void setAccessToken(const std::string &token);
     const std::string &getAccessToken() const;
+
+    // Projection
+    inline void getWorldBoundsMeters(ProjectedMeters &sw, ProjectedMeters &ne) const { Projection::getWorldBoundsMeters(sw, ne); }
+    inline void getWorldBoundsLatLng(LatLng &sw, LatLng &ne) const { Projection::getWorldBoundsLatLng(sw, ne); }
+    inline double getMetersPerPixelAtLatitude(const double lat, const double zoom) const { return Projection::getMetersPerPixelAtLatitude(lat, zoom); }
+    inline const ProjectedMeters projectedMetersForLatLng(const LatLng latLng) const { return Projection::projectedMetersForLatLng(latLng); }
+    inline const LatLng latLngForProjectedMeters(const ProjectedMeters projectedMeters) const { return Projection::latLngForProjectedMeters(projectedMeters); }
+    inline const vec2<double> pixelForLatLng(const LatLng latLng) const { return state.pixelForLatLng(latLng); }
+    inline const LatLng latLngForPixel(const vec2<double> pixel) const { return state.latLngForPixel(pixel); }
 
     // Debug
     void setDebug(bool value);

@@ -12,6 +12,7 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/default/sqlite_cache.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/util/geo.hpp>
 
 #import "MGLTypes.h"
 #import "MGLStyleFunctionValue.h"
@@ -92,7 +93,7 @@ NSTimeInterval const MGLAnimationDuration = 0.3;
 
 @implementation MGLMapView
 
-#pragma mark - Setup -
+#pragma mark - Setup & Teardown -
 
 @dynamic debugActive;
 
@@ -323,7 +324,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
     // set initial position
     //
-    mbglMap->setLonLatZoom(0, 0, mbglMap->getMinZoom());
+    mbglMap->setLatLngZoom(mbgl::LatLng(0, 0), mbglMap->getMinZoom());
 
     // setup change delegate queue
     //
@@ -498,18 +499,6 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [super layoutSubviews];
 }
 
-#pragma mark - Conversions -
-
-+ (CGFloat)degreesToRadians:(CGFloat)degrees
-{
-    return degrees * M_PI / 180;
-}
-
-+ (CGFloat)radiansToDegrees:(CGFloat)radians
-{
-    return radians * 180 / M_PI;
-}
-
 #pragma mark - Life Cycle -
 
 #pragma clang diagnostic push
@@ -527,6 +516,17 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     [self.glView bindDrawable];
 
     mbglMap->start();
+}
+
+- (void)tintColorDidChange
+{
+    for (UIView *subview in self.subviews)
+    {
+        if ([subview respondsToSelector:@selector(setTintColor:)])
+        {
+            subview.tintColor = self.tintColor;
+        }
+    }
 }
 
 #pragma mark - Gestures -
@@ -755,18 +755,7 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
 
-#pragma mark - Settings -
-
-- (void)tintColorDidChange
-{
-    for (UIView *subview in self.subviews)
-    {
-        if ([subview respondsToSelector:@selector(setTintColor:)])
-        {
-            subview.tintColor = self.tintColor;
-        }
-    }
-}
+#pragma mark - Properties -
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -827,11 +816,13 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
     mbglMap->toggleDebug();
 }
 
+#pragma mark - Geography -
+
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLonLat(coordinate.longitude, coordinate.latitude, secondsAsDuration(duration));
+    mbglMap->setLatLng(mbgl::LatLng(coordinate.latitude, coordinate.longitude), secondsAsDuration(duration));
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
@@ -841,17 +832,16 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 
 - (CLLocationCoordinate2D)centerCoordinate
 {
-    double lon, lat;
-    mbglMap->getLonLat(lon, lat);
+    mbgl::LatLng latLng = mbglMap->getLatLng();
 
-    return CLLocationCoordinate2DMake(lat, lon);
+    return CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
     CGFloat duration = (animated ? MGLAnimationDuration : 0);
 
-    mbglMap->setLonLatZoom(centerCoordinate.longitude, centerCoordinate.latitude, zoomLevel, secondsAsDuration(duration));
+    mbglMap->setLatLngZoom(mbgl::LatLng(centerCoordinate.latitude, centerCoordinate.longitude), zoomLevel, secondsAsDuration(duration));
 
     [self unrotateIfNeededAnimated:animated];
 }
@@ -897,6 +887,35 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 - (void)setDirection:(CLLocationDirection)direction
 {
     [self setDirection:direction animated:NO];
+}
+
+- (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(UIView *)view
+{
+    CGPoint convertedPoint = [self convertPoint:point fromView:view];
+
+    // flip y coordinate for iOS view origin top left
+    //
+    convertedPoint.y = self.bounds.size.height - convertedPoint.y;
+
+    mbgl::LatLng latLng = mbglMap->latLngForPixel(mbgl::vec2<double>(convertedPoint.x, convertedPoint.y));
+
+    return CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
+}
+
+- (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(UIView *)view
+{
+    mbgl::vec2<double> pixel = mbglMap->pixelForLatLng(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
+
+    // flip y coordinate for iOS view origin in top left
+    //
+    pixel.y = self.bounds.size.height - pixel.y;
+
+    return [self convertPoint:CGPointMake(pixel.x, pixel.y) toView:view];
+}
+
+- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude
+{
+    return mbglMap->getMetersPerPixelAtLatitude(latitude, self.zoomLevel);
 }
 
 #pragma mark - Styling -
@@ -1336,6 +1355,16 @@ mbgl::DefaultFileSource *mbglFileSource = nullptr;
 }
 
 #pragma mark - Utility -
+
++ (CGFloat)degreesToRadians:(CGFloat)degrees
+{
+    return degrees * M_PI / 180;
+}
+
++ (CGFloat)radiansToDegrees:(CGFloat)radians
+{
+    return radians * 180 / M_PI;
+}
 
 - (void)animateWithDelay:(NSTimeInterval)delay animations:(void (^)(void))animations
 {

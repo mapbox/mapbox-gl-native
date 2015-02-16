@@ -7,6 +7,8 @@
 #include <mbgl/storage/default/sqlite_cache.hpp>
 #include <mbgl/storage/network_status.hpp>
 
+#include <mbgl/util/geo.hpp>
+
 #import <Foundation/Foundation.h>
 
 @interface URLHandler : NSObject
@@ -31,15 +33,16 @@
         [params setObject:[parts objectAtIndex:1] forKey:[parts objectAtIndex:0]];
     }
 
-    double latitude = 0, longitude = 0, zoom = 0, bearing = 0;
+    mbgl::LatLng latLng = mbgl::LatLng(0, 0);
+    double zoom = 0, bearing = 0;
     bool hasCenter = false, hasZoom = false, hasBearing = false;
 
     NSString *centerString = [params objectForKey:@"center"];
     if (centerString) {
-        NSArray *latlon = [centerString componentsSeparatedByString:@","];
-        if ([latlon count] == 2) {
-            latitude = [[latlon objectAtIndex:0] doubleValue];
-            longitude = [[latlon objectAtIndex:1] doubleValue];
+        NSArray *latLngValues = [centerString componentsSeparatedByString:@","];
+        if ([latLngValues count] == 2) {
+            latLng.latitude  = [latLngValues[0] doubleValue];
+            latLng.longitude = [latLngValues[1] doubleValue];
             hasCenter = true;
         }
     }
@@ -58,9 +61,9 @@
 
     if ([self map]) {
         if (hasCenter && hasZoom) {
-            [self map]->setLonLatZoom(longitude, latitude, zoom);
+            [self map]->setLatLngZoom(latLng, zoom);
         } else if (hasCenter) {
-            [self map]->setLonLat(longitude, latitude);
+            [self map]->setLatLng(latLng);
         } else if (hasZoom) {
             [self map]->setZoom(zoom);
         }
@@ -120,7 +123,7 @@ int main() {
 
     // Load settings
     mbgl::Settings_NSUserDefaults settings;
-    map.setLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
+    map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
     map.setBearing(settings.bearing);
     map.setDebug(settings.debug);
 
@@ -137,7 +140,10 @@ int main() {
     [reachability stopNotifier];
 
     // Save settings
-    map.getLonLatZoom(settings.longitude, settings.latitude, settings.zoom);
+    mbgl::LatLng latLng = map.getLatLng();
+    settings.latitude = latLng.latitude;
+    settings.longitude = latLng.longitude;
+    settings.zoom = map.getZoom();
     settings.bearing = map.getBearing();
     settings.debug = map.getDebug();
     settings.save();

@@ -11,9 +11,6 @@
 
 using namespace mbgl;
 
-const double D2R = M_PI / 180.0;
-const double M2PI = 2 * M_PI;
-
 Transform::Transform(View &view_)
     : view(view_)
 {
@@ -83,44 +80,34 @@ void Transform::_moveBy(const double dx, const double dy, const std::chrono::ste
                            duration);
 }
 
-void Transform::setLonLat(const double lon, const double lat, const std::chrono::steady_clock::duration duration) {
+void Transform::setLatLng(const LatLng latLng, const std::chrono::steady_clock::duration duration) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    const double f = std::fmin(std::fmax(std::sin(D2R * lat), -0.9999), 0.9999);
-    double xn = -lon * Bc;
-    double yn = 0.5 * Cc * std::log((1 + f) / (1 - f));
+    const double m = 1 - 1e-15;
+    const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
+
+    double xn = -latLng.longitude * current.Bc;
+    double yn = 0.5 * current.Cc * std::log((1 + f) / (1 - f));
 
     _setScaleXY(current.scale, xn, yn, duration);
 }
 
-void Transform::setLonLatZoom(const double lon, const double lat, const double zoom,
-                              const std::chrono::steady_clock::duration duration) {
+void Transform::setLatLngZoom(const LatLng latLng, const double zoom, const std::chrono::steady_clock::duration duration) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     double new_scale = std::pow(2.0, zoom);
 
     const double s = new_scale * util::tileSize;
-    Bc = s / 360;
-    Cc = s / (2 * M_PI);
+    current.Bc = s / 360;
+    current.Cc = s / util::M2PI;
 
-    const double f = std::fmin(std::fmax(std::sin(D2R * lat), -0.9999), 0.9999);
-    double xn = -lon * Bc;
-    double yn = 0.5 * Cc * log((1 + f) / (1 - f));
+    const double m = 1 - 1e-15;
+    const double f = std::fmin(std::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
+
+    double xn = -latLng.longitude * current.Bc;
+    double yn = 0.5 * current.Cc * std::log((1 + f) / (1 - f));
 
     _setScaleXY(new_scale, xn, yn, duration);
-}
-
-void Transform::getLonLat(double &lon, double &lat) const {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    final.getLonLat(lon, lat);
-}
-
-void Transform::getLonLatZoom(double &lon, double &lat, double &zoom) const {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    getLonLat(lon, lat);
-    zoom = getZoom();
 }
 
 void Transform::startPanning() {
@@ -181,7 +168,7 @@ void Transform::setZoom(const double zoom, const std::chrono::steady_clock::dura
 double Transform::getZoom() const {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    return std::log(final.scale) / M_LN2;
+    return final.getZoom();
 }
 
 double Transform::getScale() const {
@@ -293,8 +280,8 @@ void Transform::_setScaleXY(const double new_scale, const double xn, const doubl
     }
 
     const double s = final.scale * util::tileSize;
-    Bc = s / 360;
-    Cc = s / (2 * M_PI);
+    current.Bc = s / 360;
+    current.Cc = s / util::M2PI;
 
     view.notifyMapChange(duration != std::chrono::steady_clock::duration::zero() ?
                            MapChangeRegionDidChangeAnimated :
@@ -380,9 +367,9 @@ void Transform::_setAngle(double new_angle, const std::chrono::steady_clock::dur
                            MapChangeRegionWillChange);
 
     while (new_angle > M_PI)
-        new_angle -= M2PI;
+        new_angle -= util::M2PI;
     while (new_angle <= -M_PI)
-        new_angle += M2PI;
+        new_angle += util::M2PI;
 
     final.angle = new_angle;
 
@@ -433,6 +420,7 @@ void Transform::_clearRotating() {
         rotate_timeout.reset();
     }
 }
+
 
 #pragma mark - Transition
 
