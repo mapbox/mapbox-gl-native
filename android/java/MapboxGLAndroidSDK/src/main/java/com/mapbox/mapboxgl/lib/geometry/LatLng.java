@@ -19,9 +19,9 @@ public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable,
         }
     };
 
-    private double longitude;
     private double latitude;
-    private double altitude = 0f;
+    private double longitude;
+    private double altitude = 0.0;
 
     /**
      * Construct a new latitude, longitude point given float arguments
@@ -85,30 +85,35 @@ public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable,
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!obj.getClass().equals(this.getClass())) {
-            return false;
-        }
-        final LatLng rhs = (LatLng) obj;
-        return rhs.latitude == this.latitude
-                && rhs.longitude == this.longitude
-                && rhs.altitude == this.altitude;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LatLng latLng = (LatLng) o;
+
+        if (Double.compare(latLng.altitude, altitude) != 0) return false;
+        if (Double.compare(latLng.latitude, latitude) != 0) return false;
+        if (Double.compare(latLng.longitude, longitude) != 0) return false;
+
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return (int) (37.0 * (17.0 * latitude * 1E6d + longitude * 1E6d) + altitude);
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(latitude);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(longitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(altitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
 
     @Override
     public String toString() {
-        return "LatLng [longitude=" + longitude + ", latitude=" + latitude + "]";
+        return "LatLng [longitude=" + longitude + ", latitude=" + latitude + ", altitude=" + altitude + "]";
     }
 
     @Override
@@ -128,7 +133,7 @@ public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable,
      * @param other Other LatLng to compare to
      * @return distance in meters
      */
-    public int distanceTo(final LatLng other) {
+    public double distanceTo(final LatLng other) {
 
         final double a1 = DEG2RAD * this.latitude;
         final double a2 = DEG2RAD * this.longitude;
@@ -143,6 +148,6 @@ public class LatLng implements ILatLng, GeoConstants, MathConstants, Parcelable,
         final double t3 = Math.sin(a1) * Math.sin(b1);
         final double tt = Math.acos(t1 + t2 + t3);
 
-        return (int) (RADIUS_EARTH_METERS * tt);
+        return RADIUS_EARTH_METERS * tt;
     }
 }

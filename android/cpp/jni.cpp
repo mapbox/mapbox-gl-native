@@ -33,16 +33,16 @@ std::string androidRelease;
 jmethodID onMapChangedId = nullptr;
 jmethodID onFpsChangedId = nullptr;
 
-jclass lonLatClass = nullptr;
-jmethodID lonLatConstructorId = nullptr;
-jfieldID lonLatLonId = nullptr;
-jfieldID lonLatLatId = nullptr;
+jclass latLngClass = nullptr;
+jmethodID latLngConstructorId = nullptr;
+jfieldID latLngLatitudeId = nullptr;
+jfieldID latLngLongitudeId = nullptr;
 
-jclass lonLatZoomClass = nullptr;
-jmethodID lonLatZoomConstructorId = nullptr;
-jfieldID lonLatZoomLonId = nullptr;
-jfieldID lonLatZoomLatId = nullptr;
-jfieldID lonLatZoomZoomId = nullptr;
+jclass latLngZoomClass = nullptr;
+jmethodID latLngZoomConstructorId = nullptr;
+jfieldID latLngZoomLatitudeId = nullptr;
+jfieldID latLngZoomLongitudeId = nullptr;
+jfieldID latLngZoomZoomId = nullptr;
 
 jclass runtimeExceptionClass = nullptr;
 jclass nullPointerExceptionClass = nullptr;
@@ -449,34 +449,34 @@ void JNICALL nativeMoveBy(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdou
     nativeMapView->getMap().moveBy(dx, dy, std::chrono::milliseconds(duration));
 }
 
-void JNICALL nativeSetLonLat(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject lonLat,
+void JNICALL nativeSetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject latLng,
                              jlong duration) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetLonLat");
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetLatLng");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
-    double lon = env->GetDoubleField(lonLat, lonLatLonId);
+    double latitude = env->GetDoubleField(latLng, latLngLatitudeId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return;
     }
 
-    double lat = env->GetDoubleField(lonLat, lonLatLatId);
+    double longitude = env->GetDoubleField(latLng, latLngLongitudeId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return;
     }
 
-    nativeMapView->getMap().setLatLng(mbgl::LatLng(lat, lon), std::chrono::milliseconds(duration));
+    nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), std::chrono::milliseconds(duration));
 }
 
-jobject JNICALL nativeGetLonLat(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetLonLat");
+jobject JNICALL nativeGetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetLatLng");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     mbgl::LatLng latLng = nativeMapView->getMap().getLatLng();
 
-    jobject ret = env->NewObject(lonLatClass, lonLatConstructorId, latLng.longitude, latLng.latitude);
+    jobject ret = env->NewObject(latLngClass, latLngConstructorId, latLng.latitude, latLng.longitude);
     if (ret == nullptr) {
         env->ExceptionDescribe();
         return nullptr;
@@ -544,41 +544,41 @@ jdouble JNICALL nativeGetZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) 
     return nativeMapView->getMap().getZoom();
 }
 
-void JNICALL nativeSetLonLatZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
-                                 jobject lonLatZoom, jlong duration) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetLonLatZoom");
+void JNICALL nativeSetLatLngZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
+                                 jobject latLngZoom, jlong duration) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetLatLngZoom");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
-    double lon = env->GetDoubleField(lonLatZoom, lonLatZoomLonId);
+    double latitude = env->GetDoubleField(latLngZoom, latLngZoomLatitudeId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return;
     }
 
-    double lat = env->GetDoubleField(lonLatZoom, lonLatZoomLatId);
+    double longitude = env->GetDoubleField(latLngZoom, latLngZoomLongitudeId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return;
     }
 
-    double zoom = env->GetDoubleField(lonLatZoom, lonLatZoomZoomId);
+    double zoom = env->GetDoubleField(latLngZoom, latLngZoomZoomId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return;
     }
 
-    nativeMapView->getMap().setLatLngZoom(mbgl::LatLng(lat, lon), zoom, std::chrono::milliseconds(duration));
+    nativeMapView->getMap().setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom, std::chrono::milliseconds(duration));
 }
 
-jobject JNICALL nativeGetLonLatZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetLonLatZoom");
+jobject JNICALL nativeGetLatLngZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetLatLngZoom");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     mbgl::LatLng latLng = nativeMapView->getMap().getLatLng();
     double zoom = nativeMapView->getMap().getZoom();
 
-    jobject ret = env->NewObject(lonLatZoomClass, lonLatZoomConstructorId, latLng.longitude, latLng.latitude, zoom);
+    jobject ret = env->NewObject(latLngZoomClass, latLngZoomConstructorId, latLng.longitude, latLng.latitude, zoom);
     if (ret == nullptr) {
         env->ExceptionDescribe();
         return nullptr;
@@ -721,56 +721,56 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    lonLatClass = env->FindClass("com/mapbox/mapboxgl/lib/geometry/LatLng");
-    if (lonLatClass == nullptr) {
+    latLngClass = env->FindClass("com/mapbox/mapboxgl/lib/geometry/LatLng");
+    if (latLngClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    lonLatConstructorId = env->GetMethodID(lonLatClass, "<init>", "(DD)V");
-    if (lonLatConstructorId == nullptr) {
+    latLngConstructorId = env->GetMethodID(latLngClass, "<init>", "(DD)V");
+    if (latLngConstructorId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    lonLatLonId = env->GetFieldID(lonLatClass, "longitude", "D");
-    if (lonLatLonId == nullptr) {
+    latLngLatitudeId = env->GetFieldID(latLngClass, "latitude", "D");
+    if (latLngLatitudeId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    lonLatLatId = env->GetFieldID(lonLatClass, "latitude", "D");
-    if (lonLatLatId == nullptr) {
+    latLngLongitudeId = env->GetFieldID(latLngClass, "longitude", "D");
+    if (latLngLongitudeId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    lonLatZoomClass = env->FindClass("com/mapbox/mapboxgl/lib/LatLngZoom");
-    if (lonLatClass == nullptr) {
+    latLngZoomClass = env->FindClass("com/mapbox/mapboxgl/lib/LatLngZoom");
+    if (latLngZoomClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    lonLatZoomConstructorId = env->GetMethodID(lonLatZoomClass, "<init>", "(DDD)V");
-    if (lonLatZoomConstructorId == nullptr) {
+    latLngZoomConstructorId = env->GetMethodID(latLngZoomClass, "<init>", "(DDD)V");
+    if (latLngZoomConstructorId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    lonLatZoomLonId = env->GetFieldID(lonLatZoomClass, "longitude", "D");
-    if (lonLatZoomLonId == nullptr) {
+    latLngZoomLatitudeId = env->GetFieldID(latLngZoomClass, "latitude", "D");
+    if (latLngZoomLatitudeId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    lonLatZoomLatId = env->GetFieldID(lonLatZoomClass, "latitude", "D");
-    if (lonLatZoomLatId == nullptr) {
+    latLngZoomLongitudeId = env->GetFieldID(latLngZoomClass, "longitude", "D");
+    if (latLngZoomLongitudeId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    lonLatZoomZoomId = env->GetFieldID(lonLatZoomClass, "zoom", "D");
-    if (lonLatZoomZoomId == nullptr) {
+    latLngZoomZoomId = env->GetFieldID(latLngZoomClass, "zoom", "D");
+    if (latLngZoomZoomId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -891,10 +891,10 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeGetAccessToken)},
         {"nativeCancelTransitions", "(J)V", reinterpret_cast<void *>(&nativeCancelTransitions)},
         {"nativeMoveBy", "(JDDJ)V", reinterpret_cast<void *>(&nativeMoveBy)},
-        {"nativeSetLonLat", "(JLcom/mapbox/mapboxgl/lib/geometry/LatLng;J)V",
-         reinterpret_cast<void *>(&nativeSetLonLat)},
-        {"nativeGetLonLat", "(J)Lcom/mapbox/mapboxgl/lib/geometry/LatLng;",
-         reinterpret_cast<void *>(&nativeGetLonLat)},
+        {"nativeSetLatLng", "(JLcom/mapbox/mapboxgl/lib/geometry/LatLng;J)V",
+         reinterpret_cast<void *>(&nativeSetLatLng)},
+        {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/lib/geometry/LatLng;",
+         reinterpret_cast<void *>(&nativeGetLatLng)},
         {"nativeStartPanning", "(J)V", reinterpret_cast<void *>(&nativeStartPanning)},
         {"nativeStopPanning", "(J)V", reinterpret_cast<void *>(&nativeStopPanning)},
         {"nativeResetPosition", "(J)V", reinterpret_cast<void *>(&nativeResetPosition)},
@@ -903,10 +903,10 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetScale", "(J)D", reinterpret_cast<void *>(&nativeGetScale)},
         {"nativeSetZoom", "(JDJ)V", reinterpret_cast<void *>(&nativeSetZoom)},
         {"nativeGetZoom", "(J)D", reinterpret_cast<void *>(&nativeGetZoom)},
-        {"nativeSetLonLatZoom", "(JLcom/mapbox/mapboxgl/lib/LatLngZoom;J)V",
-         reinterpret_cast<void *>(&nativeSetLonLatZoom)},
-        {"nativeGetLonLatZoom", "(J)Lcom/mapbox/mapboxgl/lib/LatLngZoom;",
-         reinterpret_cast<void *>(&nativeGetLonLatZoom)},
+        {"nativeSetLatLngZoom", "(JLcom/mapbox/mapboxgl/lib/LatLngZoom;J)V",
+         reinterpret_cast<void *>(&nativeSetLatLngZoom)},
+        {"nativeGetLatLngZoom", "(J)Lcom/mapbox/mapboxgl/lib/LatLngZoom;",
+         reinterpret_cast<void *>(&nativeGetLatLngZoom)},
         {"nativeResetZoom", "(J)V", reinterpret_cast<void *>(&nativeResetZoom)},
         {"nativeStartPanning", "(J)V", reinterpret_cast<void *>(&nativeStartScaling)},
         {"nativeStopPanning", "(J)V", reinterpret_cast<void *>(&nativeStopScaling)},
@@ -935,24 +935,24 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    lonLatClass = reinterpret_cast<jclass>(env->NewGlobalRef(lonLatClass));
-    if (lonLatClass == nullptr) {
+    latLngClass = reinterpret_cast<jclass>(env->NewGlobalRef(latLngClass));
+    if (latLngClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    lonLatZoomClass = reinterpret_cast<jclass>(env->NewGlobalRef(lonLatZoomClass));
-    if (lonLatZoomClass == nullptr) {
+    latLngZoomClass = reinterpret_cast<jclass>(env->NewGlobalRef(latLngZoomClass));
+    if (latLngZoomClass == nullptr) {
         env->ExceptionDescribe();
-        env->DeleteGlobalRef(lonLatClass);
+        env->DeleteGlobalRef(latLngClass);
         return JNI_ERR;
     }
 
     runtimeExceptionClass = reinterpret_cast<jclass>(env->NewGlobalRef(runtimeExceptionClass));
     if (runtimeExceptionClass == nullptr) {
         env->ExceptionDescribe();
-        env->DeleteGlobalRef(lonLatClass);
-        env->DeleteGlobalRef(lonLatZoomClass);
+        env->DeleteGlobalRef(latLngClass);
+        env->DeleteGlobalRef(latLngZoomClass);
         return JNI_ERR;
     }
 
@@ -960,8 +960,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         reinterpret_cast<jclass>(env->NewGlobalRef(nullPointerExceptionClass));
     if (nullPointerExceptionClass == nullptr) {
         env->ExceptionDescribe();
-        env->DeleteGlobalRef(lonLatClass);
-        env->DeleteGlobalRef(lonLatZoomClass);
+        env->DeleteGlobalRef(latLngClass);
+        env->DeleteGlobalRef(latLngZoomClass);
         env->DeleteGlobalRef(runtimeExceptionClass);
         return JNI_ERR;
     }
@@ -969,8 +969,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     arrayListClass = reinterpret_cast<jclass>(env->NewGlobalRef(arrayListClass));
     if (arrayListClass == nullptr) {
         env->ExceptionDescribe();
-        env->DeleteGlobalRef(lonLatClass);
-        env->DeleteGlobalRef(lonLatZoomClass);
+        env->DeleteGlobalRef(latLngClass);
+        env->DeleteGlobalRef(latLngZoomClass);
         env->DeleteGlobalRef(runtimeExceptionClass);
         env->DeleteGlobalRef(nullPointerExceptionClass);
         return JNI_ERR;
@@ -993,18 +993,18 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
         throw new std::runtime_error("GetEnv() failed");
     }
 
-    env->DeleteGlobalRef(lonLatClass);
-    lonLatClass = nullptr;
-    lonLatConstructorId = nullptr;
-    lonLatLonId = nullptr;
-    lonLatLatId = nullptr;
+    env->DeleteGlobalRef(latLngClass);
+    latLngClass = nullptr;
+    latLngConstructorId = nullptr;
+    latLngLongitudeId = nullptr;
+    latLngLatitudeId = nullptr;
 
-    env->DeleteGlobalRef(lonLatZoomClass);
-    lonLatZoomClass = nullptr;
-    lonLatZoomConstructorId = nullptr;
-    lonLatZoomLonId = nullptr;
-    lonLatZoomLatId = nullptr;
-    lonLatZoomZoomId = nullptr;
+    env->DeleteGlobalRef(latLngZoomClass);
+    latLngZoomClass = nullptr;
+    latLngZoomConstructorId = nullptr;
+    latLngZoomLongitudeId = nullptr;
+    latLngZoomLatitudeId = nullptr;
+    latLngZoomZoomId = nullptr;
 
     onMapChangedId = nullptr;
     onFpsChangedId = nullptr;

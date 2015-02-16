@@ -248,11 +248,11 @@ class NativeMapView {
     }
 
     public void setLatLng(LatLng latLng, long duration) {
-        nativeSetLonLat(mNativeMapViewPtr, latLng, duration);
+        nativeSetLatLng(mNativeMapViewPtr, latLng, duration);
     }
 
     public LatLng getLatLng() {
-        return nativeGetLonLat(mNativeMapViewPtr);
+        return nativeGetLatLng(mNativeMapViewPtr);
     }
 
     public void startPanning() {
@@ -307,16 +307,16 @@ class NativeMapView {
         return nativeGetZoom(mNativeMapViewPtr);
     }
 
-    public void setLatLngZoom(LatLngZoom lonLatZoom) {
-        setLatLngZoom(lonLatZoom, 0);
+    public void setLatLngZoom(LatLngZoom latLngZoom) {
+        setLatLngZoom(latLngZoom, 0);
     }
 
-    public void setLatLngZoom(LatLngZoom lonLatZoom, long duration) {
-        nativeSetLonLatZoom(mNativeMapViewPtr, lonLatZoom, duration);
+    public void setLatLngZoom(LatLngZoom latLngZoom, long duration) {
+        nativeSetLatLngZoom(mNativeMapViewPtr, latLngZoom, duration);
     }
 
     public LatLngZoom getLatLngZoom() {
-        return nativeGetLonLatZoom(mNativeMapViewPtr);
+        return nativeGetLatLngZoom(mNativeMapViewPtr);
     }
 
     public void resetZoom() {
@@ -490,10 +490,10 @@ class NativeMapView {
     private native void nativeMoveBy(long nativeMapViewPtr, double dx,
             double dy, long duration);
 
-    private native void nativeSetLonLat(long nativeMapViewPtr, LatLng latLng,
+    private native void nativeSetLatLng(long nativeMapViewPtr, LatLng latLng,
                                         long duration);
 
-    private native LatLng nativeGetLonLat(long nativeMapViewPtr);
+    private native LatLng nativeGetLatLng(long nativeMapViewPtr);
 
     private native void nativeStartPanning(long nativeMapViewPtr);
 
@@ -514,10 +514,10 @@ class NativeMapView {
 
     private native double nativeGetZoom(long nativeMapViewPtr);
 
-    private native void nativeSetLonLatZoom(long nativeMapViewPtr,
+    private native void nativeSetLatLngZoom(long nativeMapViewPtr,
             LatLngZoom lonLatZoom, long duration);
 
-    private native LatLngZoom nativeGetLonLatZoom(long nativeMapViewPtr);
+    private native LatLngZoom nativeGetLatLngZoom(long nativeMapViewPtr);
 
     private native void nativeResetZoom(long nativeMapViewPtr);
 
