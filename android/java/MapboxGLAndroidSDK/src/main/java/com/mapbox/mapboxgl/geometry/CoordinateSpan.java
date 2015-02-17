@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl.lib.geometry;
+package com.mapbox.mapboxgl.geometry;
 
 /**
  * Implementation of iOS MKCoordinateSpan

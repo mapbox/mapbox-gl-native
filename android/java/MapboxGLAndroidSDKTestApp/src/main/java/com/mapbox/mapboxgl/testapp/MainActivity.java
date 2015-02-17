@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl.app;
+package com.mapbox.mapboxgl.testapp;
 
 import android.location.Location;
 import android.os.Bundle;
@@ -15,8 +15,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.mapbox.mapboxgl.lib.geometry.LatLngZoom;
-import com.mapbox.mapboxgl.lib.MapView;
+import com.mapbox.mapboxgl.geometry.LatLngZoom;
+import com.mapbox.mapboxgl.views.MapView;
 import com.mapzen.android.lost.LocationClient;
 import com.mapzen.android.lost.LocationListener;
 import com.mapzen.android.lost.LocationRequest;
@@ -125,7 +125,7 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
-    // Called when our app goes into the background
+    // Called when our testapp goes into the background
     @Override
     public void onPause()  {
         super.onPause();
@@ -137,7 +137,7 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    // Called when our app comes into the foreground
+    // Called when our testapp comes into the foreground
     @Override
     public void onResume() {
         super.onResume();

@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl.lib.constants;
+package com.mapbox.mapboxgl.constants;
 
 public class GeoConstants {
     // http://en.wikipedia.org/wiki/Earth_radius#Equatorial_radius

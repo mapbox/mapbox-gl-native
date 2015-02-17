@@ -29,7 +29,7 @@
         android:orientation="vertical">
 
         <fragment
-            android:name="com.mapbox.mapboxgl.app.MapFragment"
+            android:name="com.mapbox.mapboxgl.testapp.MapFragment"
             android:id="@+id/fragment_map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

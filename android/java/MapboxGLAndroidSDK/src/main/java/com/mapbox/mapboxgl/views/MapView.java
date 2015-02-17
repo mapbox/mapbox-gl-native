@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl.lib;
+package com.mapbox.mapboxgl.views;
 
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
@@ -29,8 +29,8 @@ import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
-import com.mapbox.mapboxgl.lib.geometry.LatLng;
-import com.mapbox.mapboxgl.lib.geometry.LatLngZoom;
+import com.mapbox.mapboxgl.geometry.LatLng;
+import com.mapbox.mapboxgl.geometry.LatLngZoom;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
@@ -777,7 +777,7 @@ public class MapView extends SurfaceView {
             }
 
             // TODO complex decision between rotate or scale or both (see Google
-            // Maps app)
+            // Maps testapp)
 
             // Cancel any animation
             mNativeMapView.cancelTransitions();
@@ -842,7 +842,7 @@ public class MapView extends SurfaceView {
             }
 
             // TODO complex decision between rotate or scale or both (see Google
-            // Maps app). It seems if you start one or the other it takes more
+            // Maps testapp). It seems if you start one or the other it takes more
             // to start the other too. Haven't figured out what it uses to
             // decide when to transition to both at the same time.
 

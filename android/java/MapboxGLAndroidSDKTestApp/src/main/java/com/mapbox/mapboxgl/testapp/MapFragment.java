@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl.app;
+package com.mapbox.mapboxgl.testapp;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxgl.lib.MapView;
+import com.mapbox.mapboxgl.views.MapView;
 
 import java.io.BufferedReader;
 import java.io.IOException;

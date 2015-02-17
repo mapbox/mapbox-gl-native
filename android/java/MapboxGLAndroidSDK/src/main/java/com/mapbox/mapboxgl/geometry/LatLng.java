@@ -1,11 +1,11 @@
-package com.mapbox.mapboxgl.lib.geometry;
+package com.mapbox.mapboxgl.geometry;
 
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.mapbox.mapboxgl.lib.constants.GeoConstants;
-import com.mapbox.mapboxgl.lib.constants.MathConstants;
+import com.mapbox.mapboxgl.constants.GeoConstants;
+import com.mapbox.mapboxgl.constants.MathConstants;
 
 import java.io.Serializable;
 

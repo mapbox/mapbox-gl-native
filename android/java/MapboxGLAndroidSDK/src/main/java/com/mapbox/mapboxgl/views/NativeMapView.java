@@ -1,11 +1,11 @@
-package com.mapbox.mapboxgl.lib;
+package com.mapbox.mapboxgl.views;
 
 import android.graphics.PointF;
 import android.view.Surface;
 
-import com.mapbox.mapboxgl.lib.geometry.LatLng;
-import com.mapbox.mapboxgl.lib.geometry.LatLngZoom;
-import com.mapbox.mapboxgl.lib.geometry.ProjectedMeters;
+import com.mapbox.mapboxgl.geometry.LatLng;
+import com.mapbox.mapboxgl.geometry.LatLngZoom;
+import com.mapbox.mapboxgl.geometry.ProjectedMeters;
 
 import java.util.List;
 

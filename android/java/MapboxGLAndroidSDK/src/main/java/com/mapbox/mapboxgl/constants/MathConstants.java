@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl.lib.constants;
+package com.mapbox.mapboxgl.constants;
 
 public class MathConstants {
     public static final double DEG2RAD = (Math.PI / 180.0);
