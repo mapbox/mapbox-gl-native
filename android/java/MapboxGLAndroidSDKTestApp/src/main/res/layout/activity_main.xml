@@ -24,6 +24,7 @@
     </android.support.v7.widget.Toolbar>
 
     <FrameLayout
+        android:id="@+id/layout_map"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical">
@@ -46,12 +47,12 @@
             android:src="@drawable/compass"/>
 
         <TextView
-                android:id="@+id/view_fps"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/label_fps"
-                android:padding="10dp" />
+            android:id="@+id/view_fps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/label_fps"
+            android:padding="10dp" />
 
     </FrameLayout>
 </LinearLayout>

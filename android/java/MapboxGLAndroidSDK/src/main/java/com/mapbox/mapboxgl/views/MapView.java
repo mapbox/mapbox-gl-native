@@ -351,10 +351,6 @@ public class MapView extends SurfaceView {
         return mNativeMapView.getAccessToken();
     }
 
-    //
-    // Style methods
-    //
-
     public List<String> getClasses() {
         return mNativeMapView.getClasses();
     }
@@ -388,6 +384,14 @@ public class MapView extends SurfaceView {
         mNativeMapView.setDefaultTransitionDuration(transitionDuration);
         ArrayList<String> classes = new ArrayList<>(0);
         setClasses(classes);
+    }
+
+    public LatLng fromScreenLocation(PointF point) {
+        return mNativeMapView.latLngForPixel(point);
+    }
+
+    public PointF toScreenLocation(LatLng location) {
+        return mNativeMapView.pixelForLatLng(location);
     }
 
     //
@@ -777,7 +781,7 @@ public class MapView extends SurfaceView {
             }
 
             // TODO complex decision between rotate or scale or both (see Google
-            // Maps testapp)
+            // Maps app)
 
             // Cancel any animation
             mNativeMapView.cancelTransitions();
@@ -842,7 +846,7 @@ public class MapView extends SurfaceView {
             }
 
             // TODO complex decision between rotate or scale or both (see Google
-            // Maps testapp). It seems if you start one or the other it takes more
+            // Maps app). It seems if you start one or the other it takes more
             // to start the other too. Haven't figured out what it uses to
             // decide when to transition to both at the same time.
 

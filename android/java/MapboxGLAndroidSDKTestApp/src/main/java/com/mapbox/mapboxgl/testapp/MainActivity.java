@@ -1,5 +1,6 @@
 package com.mapbox.mapboxgl.testapp;
 
+import android.graphics.PointF;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -11,15 +12,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.mapbox.mapboxgl.geometry.LatLng;
 import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapbox.mapboxgl.views.MapView;
-import com.mapzen.android.lost.LocationClient;
-import com.mapzen.android.lost.LocationListener;
-import com.mapzen.android.lost.LocationRequest;
+import com.mapzen.android.lost.api.LocationListener;
+import com.mapzen.android.lost.api.LocationRequest;
+import com.mapzen.android.lost.api.LocationServices;
+import com.mapzen.android.lost.api.LostApiClient;
 
 import java.util.ArrayList;
 
@@ -45,11 +49,18 @@ public class MainActivity extends ActionBarActivity {
     // The compass
     private ImageView mCompassView;
 
+    // The FrameLayout
+    private FrameLayout mMapFrameLayout;
+
     // Used for GPS
     private boolean mIsGpsOn = false;
-    private LocationClient mLocationClient;
+    private LostApiClient mLocationClient;
     private LocationListener mLocationListener;
     private LocationRequest mLocationRequest;
+    private ImageView mGpsMarker;
+    private Location mGpsMarkerLocation;
+    private boolean mLockGpsCenter = true;
+    private boolean mLockGpsZoom = true;
 
     // Used for the class spinner
     Spinner mClassSpinner;
@@ -78,6 +89,13 @@ public class MainActivity extends ActionBarActivity {
         mCompassView = (ImageView) findViewById(R.id.view_compass);
         mCompassView.setOnClickListener(new CompassOnClickListener());
 
+        mGpsMarker = new ImageView(getApplicationContext());
+        mGpsMarker.setVisibility(View.INVISIBLE);
+        mGpsMarker.setImageResource(R.drawable.location_marker);
+
+        mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
+        mMapFrameLayout.addView(mGpsMarker);
+
         // Add a toolbar as the action bar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(mainToolbar);
@@ -98,34 +116,25 @@ public class MainActivity extends ActionBarActivity {
                 R.array.satellite_class_list, android.R.layout.simple_spinner_dropdown_item);
 
         // Prepare for GPS
+        mLocationClient = new LostApiClient.Builder(this).build();
+
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setInterval(0);
         mLocationRequest.setSmallestDisplacement(0);
 
-        mLocationClient = new LocationClient(getApplicationContext(), new LocationClient.ConnectionCallbacks() {
+        updateLocation(LocationServices.FusedLocationApi.getLastLocation());
+
+        mLocationListener = new LocationListener() {
             @Override
-            public void onConnected(Bundle connectionHint) {
-                updateLocation(mLocationClient.getLastLocation());
-
-                mLocationListener = new LocationListener() {
-                    @Override
-                    public void onLocationChanged(Location location) {
-                        //Toast.makeText(getApplicationContext(), "Location: " + location.toString(), Toast.LENGTH_SHORT).show();
-                        updateLocation(location);
-                    }
-                };
-
-                mLocationClient.requestLocationUpdates(mLocationRequest, mLocationListener);
+            public void onLocationChanged(Location location) {
+                updateLocation(location);
             }
+        };
 
-            @Override
-            public void onDisconnected() {
-                mLocationListener = null;
-            }
-        });
+        LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, mLocationListener);
     }
 
-    // Called when our testapp goes into the background
+    // Called when our app goes into the background
     @Override
     public void onPause()  {
         super.onPause();
@@ -137,7 +146,7 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    // Called when our testapp comes into the foreground
+    // Called when our app comes into the foreground
     @Override
     public void onResume() {
         super.onResume();
@@ -172,11 +181,15 @@ public class MainActivity extends ActionBarActivity {
                     mIsGpsOn = false;
                     item.setIcon(R.drawable.ic_action_location_searching);
                     mLocationClient.disconnect();
+                    mGpsMarker.setVisibility(View.INVISIBLE);
+                    mGpsMarkerLocation = null;
 
                 } else {
                     mIsGpsOn = true;
                     item.setIcon(R.drawable.ic_action_location_found);
                     mLocationClient.connect();
+                    mGpsMarker.setVisibility(View.VISIBLE);
+                    mGpsMarkerLocation = null;
                 }
                 return true;
 
@@ -201,9 +214,19 @@ public class MainActivity extends ActionBarActivity {
     // Handles location updates from GPS
     private void updateLocation(Location location) {
         if (location != null) {
-            LatLngZoom coordinate = new LatLngZoom(location.getLatitude(), location.getLongitude(), 16);
-            mMapFragment.getMap().setCenterCoordinate(coordinate, true);
+            mGpsMarkerLocation = location;
+            LatLng coordinate = new LatLng(mGpsMarkerLocation);
+            LatLngZoom zoomedCoordinate = new LatLngZoom(coordinate, 16);
+            if (mLockGpsCenter) {
+                if (mLockGpsZoom) {
+                    mMapFragment.getMap().setCenterCoordinate(zoomedCoordinate, true);
+                } else {
+                    mMapFragment.getMap().setCenterCoordinate(coordinate, true);
+                }
+            }
         }
+
+        updateMap();
     }
 
     // This class handles style change events
@@ -349,7 +372,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     // Called when FPS changes
-    public class MyOnFpsChangedListener implements MapView.OnFpsChangedListener {
+    private class MyOnFpsChangedListener implements MapView.OnFpsChangedListener {
 
         @Override
         public void onFpsChanged(double fps) {
@@ -357,17 +380,35 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    private void updateMap() {
+        mCompassView.setRotation((float) mMapFragment.getMap().getDirection());
+
+        if (mGpsMarkerLocation != null) {
+            LatLng coordinate = new LatLng(mGpsMarkerLocation);
+            PointF screenLocation = mMapFragment.getMap().toScreenLocation(coordinate);
+            mGpsMarker.setPadding((int) screenLocation.x, (int) screenLocation.y, 0, 0);
+
+            if (mGpsMarkerLocation.hasBearing()) {
+                mGpsMarker.setImageResource(R.drawable.direction_arrow);
+                mCompassView.setRotation(mGpsMarkerLocation.getBearing());
+            } else {
+                mGpsMarker.setImageResource(R.drawable.location_marker);
+                mGpsMarker.setRotation(0.0f);
+            }
+        }
+    }
+
     // Called when map state changes
-    public class MyOnMapChangedListener implements MapView.OnMapChangedListener {
+    private class MyOnMapChangedListener implements MapView.OnMapChangedListener {
 
         @Override
         public void onMapChanged() {
-            mCompassView.setRotation((float) mMapFragment.getMap().getDirection());
+            updateMap();
         }
     }
 
     // Called when someone presses the compass
-    public class CompassOnClickListener implements View.OnClickListener {
+    private class CompassOnClickListener implements View.OnClickListener {
 
         @Override
         public void onClick(View view) {
