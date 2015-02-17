@@ -122,16 +122,12 @@ public class MainActivity extends ActionBarActivity {
         mLocationRequest.setInterval(0);
         mLocationRequest.setSmallestDisplacement(0);
 
-        updateLocation(LocationServices.FusedLocationApi.getLastLocation());
-
         mLocationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 updateLocation(location);
             }
         };
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, mLocationListener);
     }
 
     // Called when our app goes into the background
@@ -142,6 +138,7 @@ public class MainActivity extends ActionBarActivity {
 
         // Cancel GPS
         if (mIsGpsOn) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mLocationListener);
             mLocationClient.disconnect();
         }
     }
@@ -156,6 +153,10 @@ public class MainActivity extends ActionBarActivity {
         // Cancel any outstanding GPS
         if (mIsGpsOn) {
             mLocationClient.connect();
+
+            updateLocation(LocationServices.FusedLocationApi.getLastLocation());
+
+            LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, mLocationListener);
         }
     }
 
