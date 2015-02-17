@@ -4,11 +4,13 @@
 #include <mbgl/storage/default/http_request.hpp>
 
 #include <mbgl/storage/response.hpp>
+#include <mbgl/platform/platform.hpp>
 
 #include <mbgl/util/async_queue.hpp>
 #include <mbgl/util/util.hpp>
 
 #include <mbgl/util/variant.hpp>
+#include <mbgl/platform/log.hpp>
 
 #pragma GCC diagnostic push
 #ifndef __clang__
@@ -49,8 +51,9 @@ struct DefaultFileSource::StopAction {
 };
 
 
-DefaultFileSource::DefaultFileSource(FileCache *cache_)
-    : loop(uv_loop_new()),
+DefaultFileSource::DefaultFileSource(FileCache *cache_, const std::string &root)
+    : assetRoot(root.empty() ? platform::assetRoot() : root),
+      loop(uv_loop_new()),
       cache(cache_),
       queue(new Queue(loop, [this](Action &action) {
           mapbox::util::apply_visitor(ActionDispatcher{*this}, action);
@@ -63,8 +66,9 @@ DefaultFileSource::DefaultFileSource(FileCache *cache_)
       }) {
 }
 
-DefaultFileSource::DefaultFileSource(FileCache *cache_, uv_loop_t *loop_)
-    : loop(loop_),
+DefaultFileSource::DefaultFileSource(FileCache *cache_, uv_loop_t *loop_, const std::string &root)
+    : assetRoot(root.empty() ? platform::assetRoot() : root),
+      loop(loop_),
       cache(cache_),
       queue(new Queue(loop, [this](Action &action) {
           mapbox::util::apply_visitor(ActionDispatcher{*this}, action);

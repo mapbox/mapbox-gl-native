@@ -78,8 +78,10 @@ protected:
 public:
     const Resource resource;
 
-private:
+protected:
     DefaultFileSource *source = nullptr;
+
+private:
     std::set<Request *> observers;
 };
 

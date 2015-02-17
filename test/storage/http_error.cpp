@@ -44,7 +44,7 @@ TEST_F(Storage, HTTPError) {
         EXPECT_LT(1.5, duration) << "Resource wasn't retried the correct number of times";
         EXPECT_GT(1.7, duration) << "Resource wasn't retried the correct number of times";
         EXPECT_EQ(Response::Error, res.status);
-        EXPECT_TRUE(res.message == "Couldn't connect to server" || res.message == "The operation couldn’t be completed. (NSURLErrorDomain error -1004.)");
+        EXPECT_TRUE(res.message == "Couldn't connect to server: couldn't connect to host" || res.message == "The operation couldn’t be completed. (NSURLErrorDomain error -1004.)") << res.message;
         EXPECT_EQ("", res.data);
         EXPECT_EQ(0, res.expires);
         EXPECT_EQ(0, res.modified);

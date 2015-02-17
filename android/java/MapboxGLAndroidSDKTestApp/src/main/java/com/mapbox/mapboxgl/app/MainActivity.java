@@ -201,7 +201,7 @@ public class MainActivity extends ActionBarActivity {
     // Handles location updates from GPS
     private void updateLocation(Location location) {
         if (location != null) {
-            LatLngZoom coordinate = new LatLngZoom(location.getLongitude(), location.getLatitude(), 16);
+            LatLngZoom coordinate = new LatLngZoom(location.getLatitude(), location.getLongitude(), 16);
             mMapFragment.getMap().setCenterCoordinate(coordinate, true);
         }
     }
@@ -214,7 +214,7 @@ public class MainActivity extends ActionBarActivity {
             switch(position) {
                 // Bright
                 case 0:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/bright-v7.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/bright-v7.json");
                     mMapFragment.getMap().removeAllClasses();
                     mClassSpinner.setVisibility(View.INVISIBLE);
                     mClassSpinner.setAdapter(null);
@@ -223,7 +223,7 @@ public class MainActivity extends ActionBarActivity {
 
                 // Basic
                 case 1:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/basic-v7.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/basic-v7.json");
                     mMapFragment.getMap().removeAllClasses();
                     mClassSpinner.setVisibility(View.INVISIBLE);
                     mClassSpinner.setAdapter(null);
@@ -232,7 +232,7 @@ public class MainActivity extends ActionBarActivity {
 
                 // Outdoors
                 case 2:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/outdoors-v7.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/outdoors-v7.json");
                     mMapFragment.getMap().removeAllClasses();
                     mClassSpinner.setVisibility(View.VISIBLE);
                     mClassSpinner.setAdapter(mOutdoorsClassAdapter);
@@ -241,7 +241,7 @@ public class MainActivity extends ActionBarActivity {
 
                 // Satellite
                 case 3:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/satellite-v7.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/satellite-v7.json");
                     mMapFragment.getMap().removeAllClasses();
                     mClassSpinner.setVisibility(View.VISIBLE);
                     mClassSpinner.setAdapter(mSatelliteClassAdapter);
@@ -250,7 +250,7 @@ public class MainActivity extends ActionBarActivity {
 
                 // Pencil
                 case 4:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/pencil-v7.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/pencil-v7.json");
                     mMapFragment.getMap().removeAllClasses();
                     mClassSpinner.setVisibility(View.INVISIBLE);
                     mClassSpinner.setAdapter(null);
@@ -259,7 +259,7 @@ public class MainActivity extends ActionBarActivity {
 
                 // Empty
                 case 5:
-                    mMapFragment.getMap().setStyleUrl("asset://styles/styles/empty-v7.json");
+                    mMapFragment.getMap().setStyleUrl("asset://styles/empty-v7.json");
                     mMapFragment.getMap().removeAllClasses();
                     mClassSpinner.setVisibility(View.INVISIBLE);
                     mClassSpinner.setAdapter(null);

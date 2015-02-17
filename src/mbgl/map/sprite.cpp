@@ -82,7 +82,7 @@ void Sprite::load(FileSource& fileSource) {
             sprite->parseImage();
             sprite->complete();
         } else {
-            Log::Warning(Event::Sprite, "Failed to load sprite image: Error %s", res.message.c_str());
+            Log::Warning(Event::Sprite, "Failed to load sprite image: %s", res.message.c_str());
             if (!sprite->future.valid()) {
                 sprite->promise.set_exception(std::make_exception_ptr(std::runtime_error(res.message)));
             }

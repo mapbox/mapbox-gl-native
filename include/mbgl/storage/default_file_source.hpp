@@ -18,8 +18,8 @@ class SharedRequestBase;
 
 class DefaultFileSource : public FileSource {
 public:
-    DefaultFileSource(FileCache *cache);
-    DefaultFileSource(FileCache *cache, uv_loop_t *loop);
+    DefaultFileSource(FileCache *cache, const std::string &root = "");
+    DefaultFileSource(FileCache *cache, uv_loop_t *loop, const std::string &root = "");
     ~DefaultFileSource();
 
     Request *request(const Resource &resource, uv_loop_t *loop, Callback callback);
@@ -29,6 +29,9 @@ public:
     enum class CacheHint : uint8_t { Full, Refresh, No };
     void notify(SharedRequestBase *sharedRequest, const std::set<Request *> &observers,
                 std::shared_ptr<const Response> response, FileCache::Hint hint);
+
+public:
+    const std::string assetRoot;
 
 private:
     struct ActionDispatcher;

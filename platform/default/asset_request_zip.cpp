@@ -2,8 +2,8 @@
 #include <mbgl/storage/default/thread_context.hpp>
 #include <mbgl/android/jni.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/util/std.hpp>
-#include <mbgl/platform/platform.hpp>
 
 #include "uv_zip.h"
 
@@ -26,12 +26,12 @@ public:
     AssetZipContext(uv_loop_t *loop);
     ~AssetZipContext();
 
-    uv_zip_t *getHandle();
-    void returnHandle(uv_zip_t *zip);
+    uv_zip_t *getHandle(const std::string &path);
+    void returnHandle(const std::string &path, uv_zip_t *zip);
 
 private:
     // A list of resuable uv_zip handles to avoid creating and destroying them all the time.
-    std::forward_list<uv_zip_t *> handles;
+    std::map<std::string, std::forward_list<uv_zip_t *>> handles;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -42,28 +42,30 @@ template<> pthread_once_t ThreadContext<AssetZipContext>::once = PTHREAD_ONCE_IN
 AssetZipContext::AssetZipContext(uv_loop_t *loop_) : ThreadContext(loop_) {
 }
 
-uv_zip_t *AssetZipContext::getHandle() {
-    if (!handles.empty()) {
-        auto zip = handles.front();
-        handles.pop_front();
+uv_zip_t *AssetZipContext::getHandle(const std::string &path) {
+    auto &list = handles[path];
+    if (!list.empty()) {
+        auto zip = list.front();
+        list.pop_front();
         return zip;
     } else {
         return nullptr;
     }
 }
 
-void AssetZipContext::returnHandle(uv_zip_t *zip) {
-    uv_zip_cleanup(zip);
-    handles.push_front(zip);
+void AssetZipContext::returnHandle(const std::string &path, uv_zip_t *zip) {
+    handles[path].push_front(zip);
 }
 
 AssetZipContext::~AssetZipContext() {
     // Close all zip handles
-    for (auto zip : handles) {
-        uv_zip_discard(loop, zip, [](uv_zip_t *zip_) {
-            uv_zip_cleanup(zip_);
-            delete zip_;
-        });
+    for (auto &list : handles) {
+        for (auto zip : list.second) {
+            uv_zip_discard(loop, zip, [](uv_zip_t *zip_) {
+                uv_zip_cleanup(zip_);
+                delete zip_;
+            });
+        }
     }
     handles.clear();
 }
@@ -82,6 +84,7 @@ public:
 private:
     AssetZipContext &context;
     AssetRequest *request = nullptr;
+    const std::string root;
     const std::string path;
     std::unique_ptr<Response> response;
     uv_buf_t buffer;
@@ -111,8 +114,9 @@ AssetRequestImpl::~AssetRequestImpl() {
 AssetRequestImpl::AssetRequestImpl(AssetRequest *request_, uv_loop_t *loop)
     : context(*AssetZipContext::Get(loop)),
       request(request_),
-      path(request->resource.url.substr(8)) {
-    auto zip = context.getHandle();
+      root(request->source->assetRoot),
+      path(std::string { "assets/" } + request->resource.url.substr(8)) {
+    auto zip = context.getHandle(root);
     if (zip) {
         archiveOpened(zip);
     } else {
@@ -124,9 +128,12 @@ void AssetRequestImpl::openZipArchive() {
     uv_fs_t *req = new uv_fs_t();
     req->data = this;
 
+    assert(request);
+    assert(request->source);
+
     // We're using uv_fs_open first to obtain a file descriptor. Then, uv_zip_fdopen will operate
     // on a read-only file.
-    uv_fs_open(context.loop, req, platform::assetRoot().c_str(), O_RDONLY, S_IRUSR, [](uv_fs_t *fsReq) {
+    uv_fs_open(context.loop, req, root.c_str(), O_RDONLY, S_IRUSR, [](uv_fs_t *fsReq) {
         if (fsReq->result < 0) {
             auto impl = reinterpret_cast<AssetRequestImpl *>(fsReq->data);
             impl->notifyError(uv::getFileRequestError(fsReq));
@@ -191,6 +198,10 @@ void AssetRequestImpl::fileStated(uv_zip_t *zip) {
             response->modified = zip->stat->mtime;
         }
 
+        if (zip->stat->valid & ZIP_STAT_INDEX) {
+            response->etag = std::to_string(zip->stat->index);
+        }
+
         uv_zip_fopen(context.loop, zip, path.c_str(), 0, INVOKE_MEMBER(fileOpened));
     }
 }
@@ -239,7 +250,7 @@ void AssetRequestImpl::fileClosed(uv_zip_t *zip) {
 void AssetRequestImpl::cleanup(uv_zip_t *zip) {
     MBGL_VERIFY_THREAD(tid);
 
-    context.returnHandle(zip);
+    context.returnHandle(root, zip);
     delete this;
 }
 
