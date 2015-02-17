@@ -850,7 +850,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    latLngClass = env->FindClass("com/mapbox/mapboxgl/lib/geometry/LatLng");
+    latLngClass = env->FindClass("com/mapbox/mapboxgl/geometry/LatLng");
     if (latLngClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -874,7 +874,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    latLngZoomClass = env->FindClass("com/mapbox/mapboxgl/lib/geometry/LatLngZoom");
+    latLngZoomClass = env->FindClass("com/mapbox/mapboxgl/geometry/LatLngZoom");
     if (latLngZoomClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -904,7 +904,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    jclass nativeMapViewClass = env->FindClass("com/mapbox/mapboxgl/lib/NativeMapView");
+    jclass nativeMapViewClass = env->FindClass("com/mapbox/mapboxgl/views/NativeMapView");
     if (nativeMapViewClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -964,7 +964,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    projectedMetersClass = env->FindClass("com/mapbox/mapboxgl/lib/geometry/ProjectedMeters");
+    projectedMetersClass = env->FindClass("com/mapbox/mapboxgl/geometry/ProjectedMeters");
     if (projectedMetersClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -1068,9 +1068,9 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeGetAccessToken)},
         {"nativeCancelTransitions", "(J)V", reinterpret_cast<void *>(&nativeCancelTransitions)},
         {"nativeMoveBy", "(JDDJ)V", reinterpret_cast<void *>(&nativeMoveBy)},
-        {"nativeSetLatLng", "(JLcom/mapbox/mapboxgl/lib/geometry/LatLng;J)V",
+        {"nativeSetLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;J)V",
          reinterpret_cast<void *>(&nativeSetLatLng)},
-        {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/lib/geometry/LatLng;",
+        {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxgl/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
         {"nativeStartPanning", "(J)V", reinterpret_cast<void *>(&nativeStartPanning)},
         {"nativeStopPanning", "(J)V", reinterpret_cast<void *>(&nativeStopPanning)},
@@ -1080,9 +1080,9 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetScale", "(J)D", reinterpret_cast<void *>(&nativeGetScale)},
         {"nativeSetZoom", "(JDJ)V", reinterpret_cast<void *>(&nativeSetZoom)},
         {"nativeGetZoom", "(J)D", reinterpret_cast<void *>(&nativeGetZoom)},
-        {"nativeSetLatLngZoom", "(JLcom/mapbox/mapboxgl/lib/geometry/LatLngZoom;J)V",
+        {"nativeSetLatLngZoom", "(JLcom/mapbox/mapboxgl/geometry/LatLngZoom;J)V",
          reinterpret_cast<void *>(&nativeSetLatLngZoom)},
-        {"nativeGetLatLngZoom", "(J)Lcom/mapbox/mapboxgl/lib/geometry/LatLngZoom;",
+        {"nativeGetLatLngZoom", "(J)Lcom/mapbox/mapboxgl/geometry/LatLngZoom;",
          reinterpret_cast<void *>(&nativeGetLatLngZoom)},
         {"nativeResetZoom", "(J)V", reinterpret_cast<void *>(&nativeResetZoom)},
         {"nativeStartPanning", "(J)V", reinterpret_cast<void *>(&nativeStartScaling)},
@@ -1109,10 +1109,10 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         //{"nativeGetWorldBoundsMeters", "(J)V", reinterpret_cast<void *>(&nativeGetWorldBoundsMeters)},
         //{"nativeGetWorldBoundsLatLng", "(J)V", reinterpret_cast<void *>(&nativeGetWorldBoundsLatLng)},
         {"nativeGetMetersPerPixelAtLatitude", "(JDD)D", reinterpret_cast<void *>(&nativeGetMetersPerPixelAtLatitude)},
-        {"nativeProjectedMetersForLatLng", "(JLcom/mapbox/mapboxgl/lib/geometry/LatLng;)Lcom/mapbox/mapboxgl/lib/geometry/ProjectedMeters;", reinterpret_cast<void *>(&nativeProjectedMetersForLatLng)},
-        {"nativeLatLngForProjectedMeters", "(JLcom/mapbox/mapboxgl/lib/geometry/ProjectedMeters;)Lcom/mapbox/mapboxgl/lib/geometry/LatLng;", reinterpret_cast<void *>(&nativeLatLngForProjectedMeters)},
-        {"nativePixelForLatLng", "(JLcom/mapbox/mapboxgl/lib/geometry/LatLng;)Landroid/graphics/PointF;", reinterpret_cast<void *>(&nativePixelForLatLng)},
-        {"nativeLatLngForPixel", "(JLandroid/graphics/PointF;)Lcom/mapbox/mapboxgl/lib/geometry/LatLng;", reinterpret_cast<void *>(&nativeLatLngForPixel)},
+        {"nativeProjectedMetersForLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)Lcom/mapbox/mapboxgl/geometry/ProjectedMeters;", reinterpret_cast<void *>(&nativeProjectedMetersForLatLng)},
+        {"nativeLatLngForProjectedMeters", "(JLcom/mapbox/mapboxgl/geometry/ProjectedMeters;)Lcom/mapbox/mapboxgl/geometry/LatLng;", reinterpret_cast<void *>(&nativeLatLngForProjectedMeters)},
+        {"nativePixelForLatLng", "(JLcom/mapbox/mapboxgl/geometry/LatLng;)Landroid/graphics/PointF;", reinterpret_cast<void *>(&nativePixelForLatLng)},
+        {"nativeLatLngForPixel", "(JLandroid/graphics/PointF;)Lcom/mapbox/mapboxgl/geometry/LatLng;", reinterpret_cast<void *>(&nativeLatLngForPixel)},
     }};
 
     if (env->RegisterNatives(nativeMapViewClass, methods.data(), methods.size()) < 0) {
