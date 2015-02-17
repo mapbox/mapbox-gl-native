@@ -201,7 +201,7 @@ public class MainActivity extends ActionBarActivity {
     // Handles location updates from GPS
     private void updateLocation(Location location) {
         if (location != null) {
-            LatLngZoom coordinate = new LatLngZoom(location.getLongitude(), location.getLatitude(), 16);
+            LatLngZoom coordinate = new LatLngZoom(location.getLatitude(), location.getLongitude(), 16);
             mMapFragment.getMap().setCenterCoordinate(coordinate, true);
         }
     }
