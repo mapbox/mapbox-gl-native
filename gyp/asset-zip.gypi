@@ -33,6 +33,9 @@
           '<@(uv_static_libs)',
           '<@(zip_static_libs)',
         ],
+        'defines': [
+          '-DMBGL_ASSET_ZIP'
+        ],
       },
 
       'conditions': [
@@ -46,6 +49,20 @@
          'cflags_cc': [ '<@(cflags_cc)' ],
         }],
       ],
+
+      'direct_dependent_settings': {
+        'conditions': [
+          ['OS == "mac"', {
+            'xcode_settings': {
+              'OTHER_CFLAGS': [ '<@(defines)' ],
+              'OTHER_CPLUSPLUSFLAGS': [ '<@(defines)' ],
+            }
+          }, {
+            'cflags': [ '<@(defines)' ],
+            'cflags_cc': [ '<@(defines)' ],
+          }]
+        ],
+      },
 
       'link_settings': {
         'conditions': [
