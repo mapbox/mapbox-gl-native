@@ -1,6 +1,6 @@
 {
   'targets': [
-    { 'target_name': 'mbgl',
+    { 'target_name': '<(module_name)',
       'dependencies': [
         './<(mbgl)/mbgl.gyp:core',
         './<(mbgl)/mbgl.gyp:platform-<(platform_lib)',
@@ -52,11 +52,11 @@
 
     { 'target_name': 'action_after_build',
       'type': 'none',
-      'dependencies': [ 'mbgl' ],
+      'dependencies': [ '<(module_name)' ],
       'copies': [
         {
-          'files': [ '<(PRODUCT_DIR)/mbgl.node' ],
-          'destination': 'lib'
+          'files': [ '<(PRODUCT_DIR)/<(module_name).node' ],
+          'destination': '<(module_path)'
         }
       ]
     }

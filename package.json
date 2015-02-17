@@ -18,8 +18,12 @@
     }
   ],
   "dependencies": {
-    "nan": "^1.4.1"
+    "nan": "^1.4.1",
+    "node-pre-gyp": "^0.6.4"
   },
+  "bundledDependencies": [
+    "node-pre-gyp"
+  ],
   "devDependencies": {
     "aws-sdk": "^2.1.9",
     "mapbox-gl-test-suite": "git://github.com/mapbox/mapbox-gl-test-suite#master",
@@ -31,5 +35,12 @@
     "install": "make",
     "test": "make test"
   },
-  "gypfile": true
+  "gypfile": true,
+  "binary": {
+    "module_name": "mbgl",
+    "module_path": "./lib/",
+    "host": "https://mapbox-node-binary.s3.amazonaws.com",
+    "remote_path": "./{name}/v{version}",
+    "package_name": "{node_abi}-{platform}-{arch}.tar.gz"
+  }
 }
