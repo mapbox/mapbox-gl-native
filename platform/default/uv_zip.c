@@ -118,6 +118,8 @@ void uv__zip_work_fclose(uv_work_t *req) {
     zip->result = zip_fclose(zip->file);
     if (zip->result != 0) {
         uv__zip_file_error(zip);
+    } else {
+        zip->file = NULL;
     }
 }
 
