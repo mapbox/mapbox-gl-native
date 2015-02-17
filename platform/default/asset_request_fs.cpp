@@ -62,7 +62,7 @@ AssetRequestImpl::AssetRequestImpl(AssetRequest *request_, uv_loop_t *loop) : re
         path = url.substr(8);
     } else {
         // This is a relative path. Prefix with the application root.
-        path = request->source->getAssetRoot() + "/" + url.substr(8);
+        path = request->source->assetRoot + "/" + url.substr(8);
     }
 
     uv_fs_open(loop, &req, path.c_str(), O_RDONLY, S_IRUSR, fileOpened);
