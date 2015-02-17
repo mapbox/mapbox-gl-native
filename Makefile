@@ -61,5 +61,5 @@ test: test-js test-suite
 
 .PHONY: clean
 clean:
-	rm -rf build
+	rm -rf build lib
 	rm -f $(MBGL)/config/$(HOST).gypi

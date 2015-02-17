@@ -32,7 +32,7 @@
     "tape": "^3.5.0"
   },
   "scripts": {
-    "install": "make",
+    "install": "node-pre-gyp install || make",
     "test": "make test"
   },
   "gypfile": true,

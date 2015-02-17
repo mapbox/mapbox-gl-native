@@ -4,13 +4,20 @@ Renders map tiles with [Mapbox GL](https://github.com/mapbox/mapbox-gl-native).
 
 [![Build Status](https://api.travis-ci.com/mapbox/node-mapbox-gl-native.svg?token=Phdq58g7NsfstW6gyeYW)](https://magnum.travis-ci.com/mapbox/node-mapbox-gl-native)
 
-## Loading the module
+## Installing
 
-To compile this module, make sure all submodules are initialized 
+By default, installs binaries. On these platforms no external dependencies are needed.
 
-```js
-var mbgl = require('mbgl');
+- 64 bit OS X or 64 bit Linux
+- Node v0.10.x
+
+Just run:
+
 ```
+npm install mbgl
+```
+
+However, other platforms will fall back to a source compile with `make build`. To compile this module, make sure all submodules are initialized.
 
 ## Rendering a map tile
 
