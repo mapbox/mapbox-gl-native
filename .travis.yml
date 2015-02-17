@@ -12,14 +12,14 @@ matrix:
 
 env:
   global:
-  - NODE_NVM_VERSION: "0.10"
+  - NODE_VERSION: "0.10.35"
   - LD_LIBRARY_PATH: "/usr/local/lib"
   - secure: jkwZnKr5dcM9MQ6mOytnp6FHkbydSfa1L8d4jFp4v4K6Ee/iQh1YIq9c/J1zC0WLyuGokVGaijkKr6CW4nGZ5H8ygBtPo09imnRyH8X0bO5mEjl+KhbpdFqkXVLerpnAGMO7D6+6BtWJlK5uTDWhpeS7YayB3YfETVkllf4n6F8=
   - secure: ZBiq+KPVM72MF0rtvpui5l7curGXckz4Pefc1L04U6dd/MPa22StvCgXBG7DKhLwI5OgHE1da769asQ3rub/pDOonxAi7fHo3+r/ocbSBZeeaj+p5i5wavppOzD27gCLrpOnSQBk0DfoD+xOM8ZCfIttBbOBMRZ1dpWFG98bJ4c=
 
 before_install:
-- ./scripts/install_nvm.sh
 - cd ./vendor/mbgl && source ./scripts/local_mason.sh && cd ../../
+- source ./scripts/install_node.sh
 - source ./vendor/mbgl/scripts/travis_helper.sh
 - source ./vendor/mbgl/scripts/flags.sh
 - source ./vendor/mbgl/scripts/travis_before_install.sh
