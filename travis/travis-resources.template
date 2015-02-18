@@ -28,26 +28,6 @@
                         }
                     },
                     {
-                        "PolicyName": "build-testing-old",
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": [
-                                        "s3:DeleteObject",
-                                        "s3:GetObject",
-                                        "s3:GetObjectAcl",
-                                        "s3:PutObject",
-                                        "s3:PutObjectAcl"
-                                    ],
-                                    "Effect": "Allow",
-                                    "Resource": [
-                                        "arn:aws:s3:::mapbox-gl-testing/*"
-                                    ]
-                                }
-                            ]
-                        }
-                    },
-                    {
                         "PolicyName": "list",
                         "PolicyDocument": {
                             "Statement": [
@@ -64,16 +44,20 @@
                         }
                     },
                     {
-                        "PolicyName": "list-testing-old",
+                        "PolicyName": "build-testing",
                         "PolicyDocument": {
                             "Statement": [
                                 {
                                     "Action": [
-                                        "s3:ListBucket"
+                                        "s3:DeleteObject",
+                                        "s3:GetObject",
+                                        "s3:GetObjectAcl",
+                                        "s3:PutObject",
+                                        "s3:PutObjectAcl"
                                     ],
                                     "Effect": "Allow",
                                     "Resource": [
-                                        "arn:aws:s3:::mapbox-gl-testing"
+                                        "arn:aws:s3:::mapbox/node-mapbox-gl-native/*"
                                     ]
                                 }
                             ]
@@ -96,26 +80,6 @@
                                             "s3:prefix": "node-mapbox-gl-native/*"
                                         }
                                     }
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "PolicyName": "build-testing",
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": [
-                                        "s3:DeleteObject",
-                                        "s3:GetObject",
-                                        "s3:GetObjectAcl",
-                                        "s3:PutObject",
-                                        "s3:PutObjectAcl"
-                                    ],
-                                    "Effect": "Allow",
-                                    "Resource": [
-                                        "arn:aws:s3:::mapbox/node-mapbox-gl-native/*"
-                                    ]
                                 }
                             ]
                         }
