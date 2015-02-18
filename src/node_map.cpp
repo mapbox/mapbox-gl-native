@@ -200,7 +200,7 @@ NAN_METHOD(NodeMap::Render) {
 void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
     view.resize(options->width, options->height, options->ratio);
     map.setClasses(options->classes);
-    map.setLonLatZoom(options->longitude, options->latitude, options->zoom);
+    map.setLatLngZoom(mbgl::LatLng(options->longitude, options->latitude), options->zoom);
     map.setBearing(options->bearing);
 
     map.renderStill([this](std::unique_ptr<const mbgl::StillImage> result) {
