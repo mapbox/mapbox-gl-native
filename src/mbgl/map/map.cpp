@@ -75,6 +75,13 @@ Map::Map(View& view_, FileSource& fileSource_, RenderMode mode_)
     view.initialize(this);
 }
 
+void Map::initialize() {
+    if (thread.get_id() == std::thread::id()) {
+        // Start the Map thread
+        thread = std::thread([this]() { run(); });
+    }
+}
+
 Map::~Map() {
     assert(inUIThread());
 
@@ -114,12 +121,9 @@ void Map::start() {
     assert(renderMode == RenderMode::Continuous);
     assert(!active);
 
-    active = true;
+    initialize();
 
-    if (!thread.joinable()) {
-        // Start the Map thread
-        thread = std::thread([this]() { run(); });
-    }
+    active = true;
 
     update();
 
@@ -149,6 +153,8 @@ void Map::renderStill(StillImageCallback fn) {
     }
 
     callback = std::move(fn);
+
+    initialize();
 
     active = true;
 

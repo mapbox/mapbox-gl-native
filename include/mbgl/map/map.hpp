@@ -65,6 +65,9 @@ public:
     bool isRendering() const;
 
 private:
+    // Will start the Map thread if it's not yet started.
+    void initialize();
+
     // Runs the map event loop. ONLY run this function when you want to get render a single frame
     // with this map object. It will *not* spawn a separate thread and instead block until the
     // frame is completely rendered.

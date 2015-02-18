@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
     map.setStyleJSON(style, ".");
     map.setClasses(classes);
 
-    map.setLatLonZoom(LatLng(lat, lon), zoom);
+    map.setLatLngZoom(LatLng(lat, lon), zoom);
     map.setBearing(bearing);
 
     uv_async_t *async = new uv_async_t;
