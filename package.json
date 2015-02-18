@@ -32,7 +32,7 @@
   },
   "scripts": {
     "install": "node-pre-gyp install || make",
-    "test": "make test | tap-spec",
+    "test": "make test",
     "rebuild": "make clean && make"
   },
   "gypfile": true,
