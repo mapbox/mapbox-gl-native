@@ -133,7 +133,7 @@ You can then open `android/java` in Android Studio via "Import Non-Android Studi
 
 Install Oracle JDK 7+:
 
-    brew cask install jdk
+    brew cask install java
 
 Install the [Android NDK Revision 10d](https://developer.android.com/tools/sdk/ndk/index.html) for 64-bit OS X:
 
@@ -146,9 +146,11 @@ Install [Android Studio](https://developer.android.com/sdk/installing/studio.htm
 
 Install the Android SDK by opening Android Studio. By default, the SDK will be installed to `/usr/local/opt/android-sdk`. In case you get an error message telling you that it can't find a JVM, it's because you installed a custom Java VM from Oracle. Follow [these instructions](http://tools.android.com/recent/androidstudio1rc3_releasecandidate3released) to start Android Studio. You'll wind up setting these environment variables in your .bash_profile or similar:
 
-    export ANDROID_HOME=/usr/local/opt/android-sdk
-    export ANDROID_NDK_PATH=/usr/local/Cellar/android-ndk/r10d
-    export STUDIO_JDK=/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk
+    echo "export ANDROID_HOME=`brew --prefix android-sdk`" >> .bash_profile
+    echo "export ANDROID_NDK_PATH=`brew --cellar android-ndk`/r10d" >> .bash_profile
+    # Replace <path to JDK> with something like /Library/Java/JavaVirtualMachines/jdk1.8.0_31.jdk
+    echo "export JAVA_HOME=<path to JDK>" >> .bash_profile
+    echo "export STUDIO_JDK=$JAVA_HOME" >> .bash_profile
 
 Run:
 
