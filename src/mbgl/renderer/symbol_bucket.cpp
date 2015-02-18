@@ -20,8 +20,10 @@
 
 namespace mbgl {
 
-SymbolBucket::SymbolBucket(const StyleBucketSymbol &properties_, Collision &collision_)
-    : properties(properties_), collision(collision_) {}
+SymbolBucket::SymbolBucket(std::unique_ptr<const StyleBucketSymbol> layout_, Collision &collision_)
+    : layout(std::move(layout_)), collision(collision_) {
+    assert(layout);
+}
 
 void SymbolBucket::render(Painter &painter, util::ptr<StyleLayer> layer_desc,
                           const Tile::ID &id, const mat4 &matrix) {
@@ -44,6 +46,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
                                                          const FilterExpression &filter,
                                                          GlyphStore &glyphStore,
                                                          const Sprite &sprite) {
+    auto &properties = *layout;
     const bool has_text = properties.text.field.size();
     const bool has_icon = properties.icon.image.size();
 
@@ -120,7 +123,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
 void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpression &filter,
                                const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
                                GlyphAtlas & glyphAtlas, GlyphStore &glyphStore) {
-
+    auto &properties = *layout;
     const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore, sprite);
 
     float horizontalAlign = 0.5;
@@ -220,6 +223,7 @@ const PlacementRange fullRange{{2 * M_PI, 0}};
 void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping &shaping,
                               const GlyphPositions &face, const Rect<uint16_t> &image) {
     assert(line.size());
+    auto &properties = *layout;
 
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;

@@ -18,18 +18,18 @@ struct geometry_too_long_exception : std::exception {};
 
 using namespace mbgl;
 
-LineBucket::LineBucket(LineVertexBuffer& vertexBuffer_,
-                       TriangleElementsBuffer& triangleElementsBuffer_,
-                       PointElementsBuffer& pointElementsBuffer_,
-                       const StyleBucketLine& properties_)
-    : properties(properties_),
+LineBucket::LineBucket(std::unique_ptr<const StyleBucketLine> layout_,
+                       LineVertexBuffer &vertexBuffer_,
+                       TriangleElementsBuffer &triangleElementsBuffer_,
+                       PointElementsBuffer &pointElementsBuffer_)
+    : layout(std::move(layout_)),
       vertexBuffer(vertexBuffer_),
       triangleElementsBuffer(triangleElementsBuffer_),
       pointElementsBuffer(pointElementsBuffer_),
       vertex_start(vertexBuffer_.index()),
       triangle_elements_start(triangleElementsBuffer_.index()),
-      point_elements_start(pointElementsBuffer_.index())
-{
+      point_elements_start(pointElementsBuffer_.index()) {
+    assert(layout);
 }
 
 void LineBucket::addGeometry(pbf& geom) {
@@ -61,6 +61,8 @@ struct TriangleElement {
 typedef uint16_t PointElement;
 
 void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
+    assert(layout);
+    auto &properties = *layout;
     // TODO: use roundLimit
     // const float roundLimit = geometry.round_limit;
 

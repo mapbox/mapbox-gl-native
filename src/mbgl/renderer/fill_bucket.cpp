@@ -31,18 +31,22 @@ void FillBucket::free(void *, void *ptr) {
     ::free(ptr);
 }
 
-FillBucket::FillBucket(FillVertexBuffer &vertexBuffer_,
+FillBucket::FillBucket(std::unique_ptr<const StyleBucketFill> layout_,
+                       FillVertexBuffer &vertexBuffer_,
                        TriangleElementsBuffer &triangleElementsBuffer_,
-                       LineElementsBuffer &lineElementsBuffer_,
-                       const StyleBucketFill &properties_)
-    : properties(properties_),
-      allocator(new TESSalloc{&alloc, &realloc, &free, nullptr, // userData
-                              64,                               // meshEdgeBucketSize
-                              64,                               // meshVertexBucketSize
-                              32,                               // meshFaceBucketSize
-                              64,                               // dictNodeBucketSize
-                              8,                                // regionBucketSize
-                              128, // extraVertices allocated for the priority queue.
+                       LineElementsBuffer &lineElementsBuffer_)
+    : layout(std::move(layout_)),
+      allocator(new TESSalloc{
+          &alloc,
+          &realloc,
+          &free,
+          nullptr, // userData
+          64,      // meshEdgeBucketSize
+          64,      // meshVertexBucketSize
+          32,      // meshFaceBucketSize
+          64,      // dictNodeBucketSize
+          8,       // regionBucketSize
+          128,     // extraVertices allocated for the priority queue.
       }),
       tesselator(tessNewTess(allocator)),
       vertexBuffer(vertexBuffer_),
@@ -52,6 +56,7 @@ FillBucket::FillBucket(FillVertexBuffer &vertexBuffer_,
       triangle_elements_start(triangleElementsBuffer_.index()),
       line_elements_start(lineElementsBuffer.index()) {
     assert(tesselator);
+    assert(layout);
 }
 
 FillBucket::~FillBucket() {

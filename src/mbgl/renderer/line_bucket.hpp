@@ -25,10 +25,10 @@ class LineBucket : public Bucket {
     typedef ElementGroup<1> point_group_type;
 
 public:
-    LineBucket(LineVertexBuffer& vertexBuffer,
-               TriangleElementsBuffer& triangleElementsBuffer,
-               PointElementsBuffer& pointElementsBuffer,
-               const StyleBucketLine& properties);
+    LineBucket(std::unique_ptr<const StyleBucketLine> layout,
+               LineVertexBuffer &vertexBuffer,
+               TriangleElementsBuffer &triangleElementsBuffer,
+               PointElementsBuffer &pointElementsBuffer);
 
     virtual void render(Painter& painter, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     virtual bool hasData() const;
@@ -44,7 +44,7 @@ public:
     void drawPoints(LinejoinShader& shader);
 
 public:
-    const StyleBucketLine &properties;
+    const std::unique_ptr<const StyleBucketLine> layout;
 
 private:
     LineVertexBuffer& vertexBuffer;

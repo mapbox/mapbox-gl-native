@@ -104,10 +104,6 @@ class StyleBucketBackground {
 public:
 };
 
-typedef mapbox::util::variant<StyleBucketFill, StyleBucketLine, StyleBucketSymbol,
-                              StyleBucketRaster, StyleBucketBackground, std::false_type> StyleBucketRender;
-
-
 class StyleBucket : public util::noncopyable {
 public:
     typedef util::ptr<StyleBucket> Ptr;
@@ -119,7 +115,6 @@ public:
     std::string source_layer;
     FilterExpression filter;
     ClassProperties layout;
-    StyleBucketRender render = std::false_type();
     float min_zoom = -std::numeric_limits<float>::infinity();
     float max_zoom = std::numeric_limits<float>::infinity();
     VisibilityType visibility = VisibilityType::Visible;
