@@ -2,6 +2,7 @@
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>

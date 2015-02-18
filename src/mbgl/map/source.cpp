@@ -190,7 +190,7 @@ TileData::State Source::addTile(Map& map, uv::worker& worker,
             new_tile.data = std::make_shared<VectorTileData>(normalized_id, map.getMaxZoom(), style,
                                                              glyphAtlas, glyphStore,
                                                              spriteAtlas, sprite,
-                                                             texturePool, info, fileSource);
+                                                             info, fileSource);
         } else if (info.type == SourceType::Raster) {
             new_tile.data = std::make_shared<RasterTileData>(normalized_id, texturePool, info, fileSource);
         } else {

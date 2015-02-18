@@ -9,20 +9,21 @@
 
 namespace mbgl {
 
+class StyleLayoutRaster;
 class RasterShader;
 class StaticVertexBuffer;
 class VertexArrayObject;
 
 class RasterBucket : public Bucket {
 public:
-    RasterBucket(TexturePool&, const StyleBucketRaster&);
+    RasterBucket(TexturePool&, const StyleLayoutRaster&);
 
     virtual void render(Painter& painter, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
     virtual bool hasData() const;
 
     bool setImage(const std::string &data);
 
-    const StyleBucketRaster &properties;
+    const StyleLayoutRaster &layout;
 
     void drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array);
 

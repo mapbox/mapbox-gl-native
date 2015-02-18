@@ -3,6 +3,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
@@ -33,8 +34,7 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile_,
                        GlyphAtlas & glyphAtlas_,
                        GlyphStore & glyphStore_,
                        SpriteAtlas & spriteAtlas_,
-                       const util::ptr<Sprite> &sprite_,
-                       TexturePool& texturePool_)
+                       const util::ptr<Sprite> &sprite_)
     : vector_data(pbf((const uint8_t *)data.data(), data.size())),
       tile(tile_),
       style(style_),
@@ -42,7 +42,6 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile_,
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
-      texturePool(texturePool_),
       collision(util::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
     assert(&tile != nullptr);
     assert(style);
@@ -56,12 +55,12 @@ void TileParser::parse() {
 
 bool TileParser::obsolete() const { return tile.state == TileData::State::obsolete; }
 
-void TileParser::parseStyleLayers(util::ptr<StyleLayerGroup> group) {
+void TileParser::parseStyleLayers(util::ptr<const StyleLayerGroup> group) {
     if (!group) {
         return;
     }
 
-    for (const util::ptr<StyleLayer> &layer_desc : group->layers) {
+    for (const util::ptr<const StyleLayer> &layer_desc : group->layers) {
         // Cancel early when parsing.
         if (obsolete()) {
             return;
@@ -78,7 +77,7 @@ void TileParser::parseStyleLayers(util::ptr<StyleLayerGroup> group) {
             auto bucket_it = tile.buckets.find(layer_desc->bucket->name);
             if (bucket_it == tile.buckets.end()) {
                 // We need to create this bucket since it doesn't exist yet.
-                std::unique_ptr<Bucket> bucket = createBucket(layer_desc->bucket);
+                std::unique_ptr<Bucket> bucket = createBucket(*layer_desc->bucket);
                 if (bucket) {
                     // Bucket creation might fail because the data tile may not
                     // contain any data that falls into this bucket.
@@ -115,35 +114,33 @@ private:
 };
 
 template <typename T>
-void TileParser::applyLayoutProperty(PropertyKey key, ClassProperties &classProperties, T &target, const float z) {
+void applyLayoutProperty(PropertyKey key, const ClassProperties &classProperties, T &target, const float z) {
     auto it = classProperties.properties.find(key);
     if (it != classProperties.properties.end()) {
         const PropertyEvaluator<T> evaluator(z);
         target = mapbox::util::apply_visitor(evaluator, it->second);
-
     }
 }
 
-template <>
-void TileParser::applyLayoutProperties<FillProperties>(StyleBucket &bucket_desc, const float) {
-    bucket_desc.render.set<StyleBucketFill>();
+std::unique_ptr<StyleLayoutFill> parseStyleLayoutFill(const StyleBucket &/*bucket*/, const float /*z*/) {
     // no-op; Fill buckets don't currently have any applicable layout properties
+    auto fillPtr = util::make_unique<StyleLayoutFill>();
+    return fillPtr;
 }
 
-template<>
-void TileParser::applyLayoutProperties<LineProperties>(StyleBucket &bucket_desc, const float z) {
-    bucket_desc.render.set<StyleBucketLine>();
-    StyleBucketLine &line = bucket_desc.render.get<StyleBucketLine>();
+std::unique_ptr<StyleLayoutLine> parseStyleLayoutLine(const StyleBucket &bucket_desc, const float z) {
+    auto linePtr = util::make_unique<StyleLayoutLine>();
+    auto &line = *linePtr;
     applyLayoutProperty(PropertyKey::LineCap, bucket_desc.layout, line.cap, z);
     applyLayoutProperty(PropertyKey::LineJoin, bucket_desc.layout, line.join, z);
     applyLayoutProperty(PropertyKey::LineMiterLimit, bucket_desc.layout, line.miter_limit, z);
     applyLayoutProperty(PropertyKey::LineRoundLimit, bucket_desc.layout, line.round_limit, z);
+    return linePtr;
 }
 
-template<>
-void TileParser::applyLayoutProperties<SymbolProperties>(StyleBucket &bucket_desc, const float z) {
-    bucket_desc.render.set<StyleBucketSymbol>();
-    StyleBucketSymbol &symbol = bucket_desc.render.get<StyleBucketSymbol>();
+std::unique_ptr<StyleLayoutSymbol> parseStyleLayoutSymbol(const StyleBucket &bucket_desc, const float z) {
+    auto symbolPtr = util::make_unique<StyleLayoutSymbol>();
+    auto &symbol = *symbolPtr;
     applyLayoutProperty(PropertyKey::SymbolPlacement, bucket_desc.layout, symbol.placement, z);
     if (symbol.placement == PlacementType::Line) {
         symbol.icon.rotation_alignment = RotationAlignmentType::Map;
@@ -181,41 +178,34 @@ void TileParser::applyLayoutProperties<SymbolProperties>(StyleBucket &bucket_des
     applyLayoutProperty(PropertyKey::TextTransform, bucket_desc.layout, symbol.text.transform, z);
     applyLayoutProperty(PropertyKey::TextOffset, bucket_desc.layout, symbol.text.offset, z);
     applyLayoutProperty(PropertyKey::TextAllowOverlap, bucket_desc.layout, symbol.text.allow_overlap, z);
+    return symbolPtr;
 }
 
-std::unique_ptr<Bucket> TileParser::createBucket(util::ptr<StyleBucket> bucket_desc) {
-    if (!bucket_desc) {
-        fprintf(stderr, "missing bucket desc\n");
-        return nullptr;
-    }
-
+std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucket_desc) {
     // Skip this bucket if we are to not render this
-    if (tile.id.z < std::floor(bucket_desc->min_zoom) && std::floor(bucket_desc->min_zoom) < tile.source.max_zoom) return nullptr;
-    if (tile.id.z >= std::ceil(bucket_desc->max_zoom)) return nullptr;
-    if (bucket_desc->visibility == mbgl::VisibilityType::None) return nullptr;
+    if (tile.id.z < std::floor(bucket_desc.min_zoom) && std::floor(bucket_desc.min_zoom) < tile.source.max_zoom) return nullptr;
+    if (tile.id.z >= std::ceil(bucket_desc.max_zoom)) return nullptr;
+    if (bucket_desc.visibility == mbgl::VisibilityType::None) return nullptr;
 
-    auto layer_it = vector_data.layers.find(bucket_desc->source_layer);
+    auto layer_it = vector_data.layers.find(bucket_desc.source_layer);
     if (layer_it != vector_data.layers.end()) {
         const VectorTileLayer &layer = layer_it->second;
-        if (bucket_desc->type == StyleLayerType::Fill) {
-            applyLayoutProperties<FillProperties>(*bucket_desc, tile.id.z);
-            return createFillBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketFill>());
-        } else if (bucket_desc->type == StyleLayerType::Line) {
-            applyLayoutProperties<LineProperties>(*bucket_desc, tile.id.z);
-            return createLineBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketLine>());
-        } else if (bucket_desc->type == StyleLayerType::Symbol) {
-            applyLayoutProperties<SymbolProperties>(*bucket_desc, tile.id.z);
-            return createSymbolBucket(layer, bucket_desc->filter, bucket_desc->render.get<StyleBucketSymbol>());
-        } else if (bucket_desc->type == StyleLayerType::Raster) {
+        if (bucket_desc.type == StyleLayerType::Fill) {
+            return createFillBucket(layer, bucket_desc);
+        } else if (bucket_desc.type == StyleLayerType::Line) {
+            return createLineBucket(layer, bucket_desc);
+        } else if (bucket_desc.type == StyleLayerType::Symbol) {
+            return createSymbolBucket(layer, bucket_desc);
+        } else if (bucket_desc.type == StyleLayerType::Raster) {
             return nullptr;
         } else {
-            fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucket_desc->name.c_str(), bucket_desc->source_layer.c_str());
+            fprintf(stderr, "[WARNING] unknown bucket render type for layer '%s' (source layer '%s')\n", bucket_desc.name.c_str(), bucket_desc.source_layer.c_str());
         }
     } else {
         // The layer specified in the bucket does not exist. Do nothing.
         if (debug::tileParseWarnings) {
             fprintf(stderr, "[WARNING] layer '%s' does not exist in tile %d/%d/%d\n",
-                    bucket_desc->source_layer.c_str(), tile.id.z, tile.id.x, tile.id.y);
+                    bucket_desc.source_layer.c_str(), tile.id.z, tile.id.x, tile.id.y);
         }
     }
 
@@ -240,27 +230,34 @@ void TileParser::addBucketGeometries(Bucket& bucket, const VectorTileLayer& laye
     }
 }
 
-std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketFill &fill) {
-    std::unique_ptr<FillBucket> bucket = util::make_unique<FillBucket>(tile.fillVertexBuffer, tile.triangleElementsBuffer, tile.lineElementsBuffer, fill);
-    addBucketGeometries(bucket, layer, filter);
+std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer &layer,
+                                                     const StyleBucket &bucket_desc) {
+    auto fill = parseStyleLayoutFill(bucket_desc, tile.id.z);
+    auto bucket = util::make_unique<FillBucket>(std::move(fill),
+                                                tile.fillVertexBuffer,
+                                                tile.triangleElementsBuffer,
+                                                tile.lineElementsBuffer);
+    addBucketGeometries(bucket, layer, bucket_desc.filter);
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createRasterBucket(const StyleBucketRaster &raster) {
-    std::unique_ptr<RasterBucket> bucket = util::make_unique<RasterBucket>(texturePool, raster);
+std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer &layer,
+                                                     const StyleBucket &bucket_desc) {
+    auto line = parseStyleLayoutLine(bucket_desc, tile.id.z);
+    auto bucket = util::make_unique<LineBucket>(std::move(line),
+                                                tile.lineVertexBuffer,
+                                                tile.triangleElementsBuffer,
+                                                tile.pointElementsBuffer);
+    addBucketGeometries(bucket, layer, bucket_desc.filter);
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketLine &line) {
-    std::unique_ptr<LineBucket> bucket = util::make_unique<LineBucket>(tile.lineVertexBuffer, tile.triangleElementsBuffer, tile.pointElementsBuffer, line);
-    addBucketGeometries(bucket, layer, filter);
+std::unique_ptr<Bucket> TileParser::createSymbolBucket(const VectorTileLayer &layer,
+                                                       const StyleBucket &bucket_desc) {
+    auto symbol = parseStyleLayoutSymbol(bucket_desc, tile.id.z);
+    auto bucket = util::make_unique<SymbolBucket>(std::move(symbol), *collision);
+    bucket->addFeatures(
+        layer, bucket_desc.filter, tile.id, spriteAtlas, *sprite, glyphAtlas, glyphStore);
     return obsolete() ? nullptr : std::move(bucket);
 }
-
-std::unique_ptr<Bucket> TileParser::createSymbolBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketSymbol &symbol) {
-    std::unique_ptr<SymbolBucket> bucket = util::make_unique<SymbolBucket>(symbol, *collision);
-    bucket->addFeatures(layer, filter, tile.id, spriteAtlas, *sprite, glyphAtlas, glyphStore);
-    return obsolete() ? nullptr : std::move(bucket);
-}
-
 }

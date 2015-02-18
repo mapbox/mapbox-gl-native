@@ -5,6 +5,7 @@
 
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/util/std.hpp>
 
@@ -31,18 +32,22 @@ void FillBucket::free(void *, void *ptr) {
     ::free(ptr);
 }
 
-FillBucket::FillBucket(FillVertexBuffer &vertexBuffer_,
+FillBucket::FillBucket(std::unique_ptr<const StyleLayoutFill> styleLayout_,
+                       FillVertexBuffer &vertexBuffer_,
                        TriangleElementsBuffer &triangleElementsBuffer_,
-                       LineElementsBuffer &lineElementsBuffer_,
-                       const StyleBucketFill &properties_)
-    : properties(properties_),
-      allocator(new TESSalloc{&alloc, &realloc, &free, nullptr, // userData
-                              64,                               // meshEdgeBucketSize
-                              64,                               // meshVertexBucketSize
-                              32,                               // meshFaceBucketSize
-                              64,                               // dictNodeBucketSize
-                              8,                                // regionBucketSize
-                              128, // extraVertices allocated for the priority queue.
+                       LineElementsBuffer &lineElementsBuffer_)
+    : styleLayout(std::move(styleLayout_)),
+      allocator(new TESSalloc{
+          &alloc,
+          &realloc,
+          &free,
+          nullptr, // userData
+          64,      // meshEdgeBucketSize
+          64,      // meshVertexBucketSize
+          32,      // meshFaceBucketSize
+          64,      // dictNodeBucketSize
+          8,       // regionBucketSize
+          128,     // extraVertices allocated for the priority queue.
       }),
       tesselator(tessNewTess(allocator)),
       vertexBuffer(vertexBuffer_),
@@ -52,6 +57,7 @@ FillBucket::FillBucket(FillVertexBuffer &vertexBuffer_,
       triangle_elements_start(triangleElementsBuffer_.index()),
       line_elements_start(lineElementsBuffer.index()) {
     assert(tesselator);
+    assert(styleLayout);
 }
 
 FillBucket::~FillBucket() {

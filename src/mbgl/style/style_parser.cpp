@@ -3,6 +3,7 @@
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/vec.hpp>
 #include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 
@@ -894,10 +895,10 @@ void StyleParser::parseReference(JSVal value, util::ptr<StyleLayer> &layer) {
 #pragma mark - Parse Bucket
 
 void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
-    layer->bucket = std::make_shared<StyleBucket>(layer->type);
+    util::ptr<StyleBucket> bucket = std::make_shared<StyleBucket>(layer->type);
 
     // We name the buckets according to the layer that defined it.
-    layer->bucket->name = layer->id;
+    bucket->name = layer->id;
 
     if (value.HasMember("source")) {
         JSVal value_source = replaceConstant(value["source"]);
@@ -905,7 +906,7 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
             const std::string source_name = { value_source.GetString(), value_source.GetStringLength() };
             auto source_it = sources.find(source_name);
             if (source_it != sources.end()) {
-                layer->bucket->style_source = source_it->second;
+                bucket->style_source = source_it->second;
             } else {
                 Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", source_name.c_str(), layer->id.c_str());
             }
@@ -917,7 +918,7 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
     if (value.HasMember("source-layer")) {
         JSVal value_source_layer = replaceConstant(value["source-layer"]);
         if (value_source_layer.IsString()) {
-            layer->bucket->source_layer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
+            bucket->source_layer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
         } else {
             Log::Warning(Event::ParseStyle, "source-layer of layer '%s' must be a string", layer->id.c_str());
         }
@@ -925,18 +926,18 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
 
     if (value.HasMember("filter")) {
         JSVal value_filter = replaceConstant(value["filter"]);
-        layer->bucket->filter = parseFilterExpression(value_filter);
+        bucket->filter = parseFilterExpression(value_filter);
     }
 
     if (value.HasMember("layout")) {
         JSVal value_render = replaceConstant(value["layout"]);
-        parseLayout(value_render, layer->bucket);
+        parseLayout(value_render, bucket);
     }
 
     if (value.HasMember("minzoom")) {
         JSVal min_zoom = value["minzoom"];
         if (min_zoom.IsNumber()) {
-            layer->bucket->min_zoom = min_zoom.GetDouble();
+            bucket->min_zoom = min_zoom.GetDouble();
         } else {
             Log::Warning(Event::ParseStyle, "minzoom of layer %s must be numeric", layer->id.c_str());
         }
@@ -945,11 +946,13 @@ void StyleParser::parseBucket(JSVal value, util::ptr<StyleLayer> &layer) {
     if (value.HasMember("maxzoom")) {
         JSVal max_zoom = value["maxzoom"];
         if (max_zoom.IsNumber()) {
-            layer->bucket->min_zoom = max_zoom.GetDouble();
+            bucket->min_zoom = max_zoom.GetDouble();
         } else {
             Log::Warning(Event::ParseStyle, "maxzoom of layer %s must be numeric", layer->id.c_str());
         }
     }
+
+    layer->bucket = bucket;
 }
 
 void StyleParser::parseSprite(JSVal value) {

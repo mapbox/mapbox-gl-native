@@ -19,6 +19,7 @@
 namespace mbgl {
 
 class Style;
+class StyleLayoutFill;
 class FillVertexBuffer;
 class TriangleElementsBuffer;
 class LineElementsBuffer;
@@ -38,10 +39,10 @@ class FillBucket : public Bucket {
     typedef ElementGroup<1> line_group_type;
 
 public:
-    FillBucket(FillVertexBuffer& vertexBuffer,
-               TriangleElementsBuffer& triangleElementsBuffer,
-               LineElementsBuffer& lineElementsBuffer,
-               const StyleBucketFill& properties);
+    FillBucket(std::unique_ptr<const StyleLayoutFill> styleLayout,
+               FillVertexBuffer &vertexBuffer,
+               TriangleElementsBuffer &triangleElementsBuffer,
+               LineElementsBuffer &lineElementsBuffer);
     ~FillBucket();
 
     virtual void render(Painter& painter, util::ptr<StyleLayer> layer_desc, const Tile::ID& id, const mat4 &matrix);
@@ -55,7 +56,7 @@ public:
     void drawVertices(OutlineShader& shader);
 
 public:
-    const StyleBucketFill &properties;
+    const std::unique_ptr<const StyleLayoutFill> styleLayout;
 
 private:
     TESSalloc *allocator;

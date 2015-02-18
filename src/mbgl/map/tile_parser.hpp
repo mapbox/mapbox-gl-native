@@ -23,10 +23,10 @@ class SpriteAtlas;
 class Sprite;
 class Style;
 class StyleBucket;
-class StyleBucketFill;
-class StyleBucketRaster;
-class StyleBucketLine;
-class StyleBucketSymbol;
+class StyleLayoutFill;
+class StyleLayoutRaster;
+class StyleLayoutLine;
+class StyleLayoutSymbol;
 class StyleLayerGroup;
 class VectorTileData;
 class Collision;
@@ -40,8 +40,7 @@ public:
                GlyphAtlas & glyphAtlas,
                GlyphStore & glyphStore,
                SpriteAtlas & spriteAtlas,
-               const util::ptr<Sprite> &sprite,
-               TexturePool& texturePool);
+               const util::ptr<Sprite> &sprite);
     ~TileParser();
 
 public:
@@ -49,17 +48,12 @@ public:
 
 private:
     bool obsolete() const;
-    void parseStyleLayers(util::ptr<StyleLayerGroup> group);
+    void parseStyleLayers(util::ptr<const StyleLayerGroup> group);
 
-    template <typename T> void applyLayoutProperties(StyleBucket &bucket, float z);
-    template <typename T> void applyLayoutProperty(PropertyKey key, ClassProperties &classProperties, T &, float z);
-
-    std::unique_ptr<Bucket> createBucket(util::ptr<StyleBucket> bucket_desc);
-
-    std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketFill &fill);
-    std::unique_ptr<Bucket> createRasterBucket(const StyleBucketRaster &raster);
-    std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketLine &line);
-    std::unique_ptr<Bucket> createSymbolBucket(const VectorTileLayer& layer, const FilterExpression &filter, const StyleBucketSymbol &symbol);
+    std::unique_ptr<Bucket> createBucket(const StyleBucket &bucket_desc);
+    std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer &layer, const StyleBucket &bucket_desc);
+    std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const StyleBucket &bucket_desc);
+    std::unique_ptr<Bucket> createSymbolBucket(const VectorTileLayer& layer, const StyleBucket &bucket_desc);
 
     template <class Bucket> void addBucketGeometries(Bucket& bucket, const VectorTileLayer& layer, const FilterExpression &filter);
 
@@ -73,7 +67,6 @@ private:
     GlyphStore & glyphStore;
     SpriteAtlas & spriteAtlas;
     util::ptr<Sprite> sprite;
-    TexturePool& texturePool;
 
     std::unique_ptr<Collision> collision;
 };

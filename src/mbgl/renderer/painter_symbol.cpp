@@ -1,6 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/map/map.hpp>
@@ -117,7 +118,8 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
         return;
     }
 
-    const SymbolProperties &properties = layer_desc->getProperties<SymbolProperties>();
+    const auto &properties = layer_desc->getProperties<SymbolProperties>();
+    const auto &layout = *bucket.styleLayout;
 
     MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));
 
@@ -125,21 +127,21 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
         bool sdf = bucket.sdfIcons;
 
         const float angleOffset =
-            bucket.properties.icon.rotation_alignment == RotationAlignmentType::Map
+            layout.icon.rotation_alignment == RotationAlignmentType::Map
                 ? state.getAngle()
                 : 0;
 
         // If layerStyle.size > bucket.info.fontSize then labels may collide
-        const float fontSize = properties.icon.size != 0 ? properties.icon.size : bucket.properties.icon.max_size;
+        const float fontSize = properties.icon.size != 0 ? properties.icon.size : layout.icon.max_size;
         const float fontScale = fontSize / 1.0f;
 
-        spriteAtlas.bind(state.isChanging() || bucket.properties.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1 || sdf);
+        spriteAtlas.bind(state.isChanging() || layout.placement == PlacementType::Line || angleOffset != 0 || fontScale != 1 || sdf);
 
         if (sdf) {
             renderSDF(bucket,
                       id,
                       matrix,
-                      bucket.properties.icon,
+                      layout.icon,
                       properties.icon,
                       1.0f,
                       {{ float(spriteAtlas.getWidth()) / 4.0f, float(spriteAtlas.getHeight()) / 4.0f }},
@@ -166,12 +168,12 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
             const float angle = std::round(state.getAngle() / M_PI * 128);
 
             // adjust min/max zooms for variable font sies
-            float zoomAdjust = std::log(fontSize / bucket.properties.icon.max_size) / std::log(2);
+            float zoomAdjust = std::log(fontSize / layout.icon.max_size) / std::log(2);
 
             iconShader->u_angle = (int32_t)(angle + 256) % 256;
 
-            bool flip = (bucket.properties.icon.rotation_alignment == RotationAlignmentType::Map)
-                && bucket.properties.icon.keep_upright;
+            bool flip = (layout.icon.rotation_alignment == RotationAlignmentType::Map)
+                && layout.icon.keep_upright;
             iconShader->u_flip = flip ? 1 : 0;
             iconShader->u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
 
@@ -192,7 +194,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
         renderSDF(bucket,
                   id,
                   matrix,
-                  bucket.properties.text,
+                  layout.text,
                   properties.text,
                   24.0f,
                   {{ float(glyphAtlas.width) / 4, float(glyphAtlas.height) / 4 }},

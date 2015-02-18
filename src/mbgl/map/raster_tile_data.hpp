@@ -3,6 +3,7 @@
 
 #include <mbgl/map/tile.hpp>
 #include <mbgl/map/tile_data.hpp>
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 
 namespace mbgl {
@@ -24,7 +25,7 @@ public:
     virtual bool hasData(StyleLayer const& layer_desc) const;
 
 protected:
-    StyleBucketRaster properties;
+    StyleLayoutRaster layout;
     RasterBucket bucket;
 };
 

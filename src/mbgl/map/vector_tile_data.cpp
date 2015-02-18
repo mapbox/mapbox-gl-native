@@ -13,14 +13,12 @@ VectorTileData::VectorTileData(Tile::ID const& id_,
                                float mapMaxZoom, util::ptr<Style> style_,
                                GlyphAtlas& glyphAtlas_, GlyphStore& glyphStore_,
                                SpriteAtlas& spriteAtlas_, util::ptr<Sprite> sprite_,
-                               TexturePool& texturePool_,
                                const SourceInfo& source_, FileSource &fileSource_)
     : TileData(id_, source_, fileSource_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
-      texturePool(texturePool_),
       style(style_),
       depth(id.z >= source.max_zoom ? mapMaxZoom - id.z : 1) {
 }
@@ -45,8 +43,7 @@ void VectorTileData::parse() {
         // is going to be discarded afterwards.
         TileParser parser(data, *this, style,
                           glyphAtlas, glyphStore,
-                          spriteAtlas, sprite,
-                          texturePool);
+                          spriteAtlas, sprite);
         // Clear the style so that we don't have a cycle in the shared_ptr references.
         style.reset();
 

@@ -18,6 +18,7 @@
 namespace mbgl {
 
 class Style;
+class StyleLayoutSymbol;
 class SDFShader;
 class IconShader;
 class DotShader;
@@ -54,7 +55,8 @@ class SymbolBucket : public Bucket {
     typedef ElementGroup<2> IconElementGroup;
 
 public:
-    SymbolBucket(const StyleBucketSymbol &properties, Collision &collision);
+    SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout, Collision &collision);
+    ~SymbolBucket();
 
     virtual void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix);
     virtual bool hasData() const;
@@ -89,7 +91,7 @@ private:
                           const FontStack &fontStack, GlyphAtlas &glyphAtlas, GlyphPositions &face);
 
 public:
-    const StyleBucketSymbol &properties;
+    const std::unique_ptr<const StyleLayoutSymbol> styleLayout;
     bool sdfIcons = false;
 
 private:

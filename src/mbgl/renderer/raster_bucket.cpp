@@ -3,8 +3,8 @@
 
 using namespace mbgl;
 
-RasterBucket::RasterBucket(TexturePool& texturePool, const StyleBucketRaster& properties_)
-: properties(properties_),
+RasterBucket::RasterBucket(TexturePool& texturePool, const StyleLayoutRaster& layout_)
+: layout(layout_),
   raster(texturePool) {
 }
 

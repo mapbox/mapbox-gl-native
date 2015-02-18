@@ -67,7 +67,7 @@ public:
 
     // Bucket information, telling the renderer how to generate the geometries
     // for this layer (feature property filters, tessellation instructions, ...).
-    util::ptr<StyleBucket> bucket;
+    util::ptr<const StyleBucket> bucket;
 
     // Contains all style classes that can be applied to this layer.
     const std::map<ClassID, ClassProperties> styles;

@@ -1,3 +1,4 @@
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
 #include <mbgl/geometry/icon_buffer.hpp>
@@ -20,8 +21,14 @@
 
 namespace mbgl {
 
-SymbolBucket::SymbolBucket(const StyleBucketSymbol &properties_, Collision &collision_)
-    : properties(properties_), collision(collision_) {}
+SymbolBucket::SymbolBucket(std::unique_ptr<const StyleLayoutSymbol> styleLayout_, Collision &collision_)
+    : styleLayout(std::move(styleLayout_)), collision(collision_) {
+    assert(styleLayout);
+}
+
+SymbolBucket::~SymbolBucket() {
+    // Do not remove. header file only contains forward definitions to unique pointers.
+}
 
 void SymbolBucket::render(Painter &painter, util::ptr<StyleLayer> layer_desc,
                           const Tile::ID &id, const mat4 &matrix) {
@@ -44,8 +51,9 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
                                                          const FilterExpression &filter,
                                                          GlyphStore &glyphStore,
                                                          const Sprite &sprite) {
-    const bool has_text = properties.text.field.size();
-    const bool has_icon = properties.icon.image.size();
+    auto &layout = *styleLayout;
+    const bool has_text = layout.text.field.size();
+    const bool has_icon = layout.icon.image.size();
 
     std::vector<SymbolFeature> features;
 
@@ -63,11 +71,11 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
         SymbolFeature ft;
 
         if (has_text) {
-            std::string u8string = util::replaceTokens(properties.text.field, feature.properties);
+            std::string u8string = util::replaceTokens(layout.text.field, feature.properties);
 
-            if (properties.text.transform == TextTransformType::Uppercase) {
+            if (layout.text.transform == TextTransformType::Uppercase) {
                 u8string = platform::uppercase(u8string);
-            } else if (properties.text.transform == TextTransformType::Lowercase) {
+            } else if (layout.text.transform == TextTransformType::Lowercase) {
                 u8string = platform::lowercase(u8string);
             }
 
@@ -82,7 +90,7 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
         }
 
         if (has_icon) {
-            ft.sprite = util::replaceTokens(properties.icon.image, feature.properties);
+            ft.sprite = util::replaceTokens(layout.icon.image, feature.properties);
         }
 
         if (ft.label.length() || ft.sprite.length()) {
@@ -107,11 +115,11 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
         }
     }
 
-    if (properties.placement == PlacementType::Line) {
+    if (layout.placement == PlacementType::Line) {
         util::mergeLines(features);
     }
 
-    glyphStore.waitForGlyphRanges(properties.text.font, ranges);
+    glyphStore.waitForGlyphRanges(layout.text.font, ranges);
     sprite.waitUntilLoaded();
 
     return features;
@@ -120,13 +128,13 @@ std::vector<SymbolFeature> SymbolBucket::processFeatures(const VectorTileLayer &
 void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpression &filter,
                                const Tile::ID &id, SpriteAtlas &spriteAtlas, Sprite &sprite,
                                GlyphAtlas & glyphAtlas, GlyphStore &glyphStore) {
-
+    auto &layout = *styleLayout;
     const std::vector<SymbolFeature> features = processFeatures(layer, filter, glyphStore, sprite);
 
     float horizontalAlign = 0.5;
     float verticalAlign = 0.5;
 
-    switch (properties.text.anchor) {
+    switch (layout.text.anchor) {
         case TextAnchorType::Top:
         case TextAnchorType::Bottom:
         case TextAnchorType::Center:
@@ -143,7 +151,7 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
             break;
     }
 
-    switch (properties.text.anchor) {
+    switch (layout.text.anchor) {
         case TextAnchorType::Left:
         case TextAnchorType::Right:
         case TextAnchorType::Center:
@@ -161,10 +169,10 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
     }
 
     float justify = 0.5;
-    if (properties.text.justify == TextJustifyType::Right) justify = 1;
-    else if (properties.text.justify == TextJustifyType::Left) justify = 0;
+    if (layout.text.justify == TextJustifyType::Right) justify = 1;
+    else if (layout.text.justify == TextJustifyType::Left) justify = 0;
 
-    const FontStack &fontStack = glyphStore.getFontStack(properties.text.font);
+    const FontStack &fontStack = glyphStore.getFontStack(layout.text.font);
 
     for (const SymbolFeature &feature : features) {
         if (!feature.geometry.size()) continue;
@@ -177,17 +185,17 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
         if (feature.label.length()) {
             shaping = fontStack.getShaping(
                 /* string */ feature.label,
-                /* maxWidth: ems */ properties.text.max_width * 24,
-                /* lineHeight: ems */ properties.text.line_height * 24,
+                /* maxWidth: ems */ layout.text.max_width * 24,
+                /* lineHeight: ems */ layout.text.line_height * 24,
                 /* horizontalAlign */ horizontalAlign,
                 /* verticalAlign */ verticalAlign,
                 /* justify */ justify,
-                /* spacing: ems */ properties.text.letter_spacing * 24,
-                /* translate */ vec2<float>(properties.text.offset[0], properties.text.offset[1]));
+                /* spacing: ems */ layout.text.letter_spacing * 24,
+                /* translate */ vec2<float>(layout.text.offset[0], layout.text.offset[1]));
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shaping.size()) {
-                SymbolBucket::addGlyphsToAtlas(id.to_uint64(), properties.text.font, feature.label, fontStack,
+                SymbolBucket::addGlyphsToAtlas(id.to_uint64(), layout.text.font, feature.label, fontStack,
                                                glyphAtlas, face);
             }
         }
@@ -220,24 +228,25 @@ const PlacementRange fullRange{{2 * M_PI, 0}};
 void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping &shaping,
                               const GlyphPositions &face, const Rect<uint16_t> &image) {
     assert(line.size());
+    auto &layout = *styleLayout;
 
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
 
     const bool horizontalText =
-        properties.text.rotation_alignment == RotationAlignmentType::Viewport;
+        layout.text.rotation_alignment == RotationAlignmentType::Viewport;
     const bool horizontalIcon =
-        properties.icon.rotation_alignment == RotationAlignmentType::Viewport;
-    const float fontScale = properties.text.max_size / glyphSize;
+        layout.icon.rotation_alignment == RotationAlignmentType::Viewport;
+    const float fontScale = layout.text.max_size / glyphSize;
     const float textBoxScale = collision.tilePixelRatio * fontScale;
-    const float iconBoxScale = collision.tilePixelRatio * properties.icon.max_size;
-    const bool iconWithoutText = properties.text.optional || !shaping.size();
-    const bool textWithoutIcon = properties.icon.optional || !image;
-    const bool avoidEdges = properties.avoid_edges && properties.placement != PlacementType::Line;
+    const float iconBoxScale = collision.tilePixelRatio * layout.icon.max_size;
+    const bool iconWithoutText = layout.text.optional || !shaping.size();
+    const bool textWithoutIcon = layout.icon.optional || !image;
+    const bool avoidEdges = layout.avoid_edges && layout.placement != PlacementType::Line;
 
     Anchors anchors;
 
-    if (properties.placement == PlacementType::Line) {
+    if (layout.placement == PlacementType::Line) {
         float resampleOffset = 0;
 
         if (shaping.size()) {
@@ -252,7 +261,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
         }
 
         // Line labels
-        anchors = resample(line, properties.min_distance, minScale, collision.maxPlacementScale,
+        anchors = resample(line, layout.min_distance, minScale, collision.maxPlacementScale,
                            collision.tilePixelRatio, resampleOffset);
 
         // Sort anchors by segment so that we can start placement with the
@@ -280,9 +289,9 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
 
         if (shaping.size()) {
             glyphPlacement = Placement::getGlyphs(anchor, origin, shaping, face, textBoxScale,
-                                                  horizontalText, line, properties);
+                                                  horizontalText, line, layout);
             glyphScale =
-                properties.text.allow_overlap
+                layout.text.allow_overlap
                     ? glyphPlacement.minScale
                     : collision.getPlacementScale(glyphPlacement.boxes, glyphPlacement.minScale, avoidEdges);
             if (!glyphScale && !iconWithoutText)
@@ -290,9 +299,9 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
         }
 
         if (image) {
-            iconPlacement = Placement::getIcon(anchor, image, iconBoxScale, line, properties);
+            iconPlacement = Placement::getIcon(anchor, image, iconBoxScale, line, layout);
             iconScale =
-                properties.icon.allow_overlap
+                layout.icon.allow_overlap
                     ? iconPlacement.minScale
                     : collision.getPlacementScale(iconPlacement.boxes, iconPlacement.minScale, avoidEdges);
             if (!iconScale && !textWithoutIcon)
@@ -309,11 +318,11 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
 
         // Get the rotation ranges it is safe to show the glyphs
         PlacementRange glyphRange =
-            (!glyphScale || properties.text.allow_overlap)
+            (!glyphScale || layout.text.allow_overlap)
                 ? fullRange
                 : collision.getPlacementRange(glyphPlacement.boxes, glyphScale, horizontalText);
         PlacementRange iconRange =
-            (!iconScale || properties.icon.allow_overlap)
+            (!iconScale || layout.icon.allow_overlap)
                 ? fullRange
                 : collision.getPlacementRange(iconPlacement.boxes, iconScale, horizontalIcon);
 
@@ -331,7 +340,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
 
         // Insert final placement into collision tree and add glyphs/icons to buffers
         if (glyphScale && std::isfinite(glyphScale)) {
-            if (!properties.text.ignore_placement) {
+            if (!layout.text.ignore_placement) {
                 collision.insert(glyphPlacement.boxes, anchor, glyphScale, glyphRange,
                                  horizontalText);
             }
@@ -339,7 +348,7 @@ void SymbolBucket::addFeature(const std::vector<Coordinate> &line, const Shaping
         }
 
         if (iconScale && std::isfinite(iconScale)) {
-            if (!properties.icon.ignore_placement) {
+            if (!layout.icon.ignore_placement) {
                 collision.insert(iconPlacement.boxes, anchor, iconScale, iconRange, horizontalIcon);
             }
             if (inside) addSymbols<IconBuffer, IconElementGroup>(icon, iconPlacement.shapes, iconScale, iconRange);
