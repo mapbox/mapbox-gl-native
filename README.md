@@ -14,7 +14,8 @@ implemented in C++11, currently targeting iOS, OS X, Android, and Ubuntu Linux.
  - [`libcurl`](http://curl.haxx.se/libcurl/) (depends on OpenSSL; Linux only)
  - Apple Command Line Tools (for build on OS X; available at [Apple Developer](https://developer.apple.com/downloads))
  - `pkg-config` (for build only)
- - [Homebrew](http://brew.sh) and [Cask](http://caskroom.io/) (for building on OS X)
+ - [Homebrew](http://brew.sh) (for building on OS X)
+ - [Cask](http://caskroom.io/) (for building Android on OS X)
  - Python 2.x (for build only)
 
 # Build instructions
@@ -102,7 +103,7 @@ Set an access token as described below, and then run:
 
 ## Android
 
-Target devices: All Android devices on Android 4.0 or newer (API level >= 14)
+Target devices: All Android devices on Android 4.0 or newer (API level >= 14).
 
 ### On Linux
 
@@ -139,7 +140,9 @@ Install the [Android NDK Revision 10d](https://developer.android.com/tools/sdk/n
 
     brew install android-ndk
 
-Install [Android Studio](https://developer.android.com/sdk/installing/studio.html) and the Android SDK:
+This will also install the dependency `android-sdk`.
+
+Install [Android Studio](https://developer.android.com/sdk/installing/studio.html):
 
     brew cask install android-studio
     android
