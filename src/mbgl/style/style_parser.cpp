@@ -3,6 +3,7 @@
 #include <mbgl/style/style_layer_group.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/vec.hpp>
 #include <mbgl/platform/log.hpp>
 #include <csscolorparser/csscolorparser.hpp>
 

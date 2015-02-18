@@ -1,6 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/map/map.hpp>
@@ -118,7 +119,7 @@ void Painter::renderSymbol(SymbolBucket &bucket, util::ptr<StyleLayer> layer_des
     }
 
     const auto &properties = layer_desc->getProperties<SymbolProperties>();
-    const auto &layout = *bucket.layout;
+    const auto &layout = *bucket.styleLayout;
 
     MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));
 

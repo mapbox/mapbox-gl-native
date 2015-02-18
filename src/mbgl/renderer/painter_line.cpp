@@ -2,6 +2,7 @@
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/map/sprite.hpp>
 #include <mbgl/geometry/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -15,7 +16,7 @@ void Painter::renderLine(LineBucket& bucket, util::ptr<StyleLayer> layer_desc, c
     if (!bucket.hasData()) return;
 
     const auto &properties = layer_desc->getProperties<LineProperties>();
-    const auto &layout = *bucket.layout;
+    const auto &layout = *bucket.styleLayout;
 
     // the distance over which the line edge fades out.
     // Retina devices need a smaller distance to avoid aliasing.

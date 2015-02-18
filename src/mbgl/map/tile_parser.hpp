@@ -23,10 +23,10 @@ class SpriteAtlas;
 class Sprite;
 class Style;
 class StyleBucket;
-class StyleBucketFill;
-class StyleBucketRaster;
-class StyleBucketLine;
-class StyleBucketSymbol;
+class StyleLayoutFill;
+class StyleLayoutRaster;
+class StyleLayoutLine;
+class StyleLayoutSymbol;
 class StyleLayerGroup;
 class VectorTileData;
 class Collision;
@@ -40,8 +40,7 @@ public:
                GlyphAtlas & glyphAtlas,
                GlyphStore & glyphStore,
                SpriteAtlas & spriteAtlas,
-               const util::ptr<Sprite> &sprite,
-               TexturePool& texturePool);
+               const util::ptr<Sprite> &sprite);
     ~TileParser();
 
 public:
@@ -53,7 +52,6 @@ private:
 
     std::unique_ptr<Bucket> createBucket(const StyleBucket &bucket_desc);
     std::unique_ptr<Bucket> createFillBucket(const VectorTileLayer &layer, const StyleBucket &bucket_desc);
-    std::unique_ptr<Bucket> createRasterBucket(const StyleBucketRaster &raster);
     std::unique_ptr<Bucket> createLineBucket(const VectorTileLayer& layer, const StyleBucket &bucket_desc);
     std::unique_ptr<Bucket> createSymbolBucket(const VectorTileLayer& layer, const StyleBucket &bucket_desc);
 
@@ -69,7 +67,6 @@ private:
     GlyphStore & glyphStore;
     SpriteAtlas & spriteAtlas;
     util::ptr<Sprite> sprite;
-    TexturePool& texturePool;
 
     std::unique_ptr<Collision> collision;
 };

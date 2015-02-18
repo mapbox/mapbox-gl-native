@@ -4,6 +4,7 @@
 
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/map/vector_tile.hpp>
 
 #include <mbgl/util/math.hpp>
@@ -18,19 +19,24 @@ struct geometry_too_long_exception : std::exception {};
 
 using namespace mbgl;
 
-LineBucket::LineBucket(std::unique_ptr<const StyleBucketLine> layout_,
+LineBucket::LineBucket(std::unique_ptr<const StyleLayoutLine> styleLayout_,
                        LineVertexBuffer &vertexBuffer_,
                        TriangleElementsBuffer &triangleElementsBuffer_,
                        PointElementsBuffer &pointElementsBuffer_)
-    : layout(std::move(layout_)),
+    : styleLayout(std::move(styleLayout_)),
       vertexBuffer(vertexBuffer_),
       triangleElementsBuffer(triangleElementsBuffer_),
       pointElementsBuffer(pointElementsBuffer_),
       vertex_start(vertexBuffer_.index()),
       triangle_elements_start(triangleElementsBuffer_.index()),
       point_elements_start(pointElementsBuffer_.index()) {
-    assert(layout);
+    assert(styleLayout);
 }
+
+LineBucket::~LineBucket() {
+    // Do not remove. header file only contains forward definitions to unique pointers.
+}
+
 
 void LineBucket::addGeometry(pbf& geom) {
     std::vector<Coordinate> line;
@@ -61,8 +67,7 @@ struct TriangleElement {
 typedef uint16_t PointElement;
 
 void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
-    assert(layout);
-    auto &properties = *layout;
+    auto &layout = *styleLayout;
     // TODO: use roundLimit
     // const float roundLimit = geometry.round_limit;
 
@@ -80,8 +85,8 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         return;
     }
 
-    CapType beginCap = properties.cap;
-    CapType endCap = closed ? CapType::Butt : properties.cap;
+    CapType beginCap = layout.cap;
+    CapType endCap = closed ? CapType::Butt : layout.cap;
 
     JoinType currentJoin = JoinType::Miter;
 
@@ -111,7 +116,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         if (currentVertex) prevVertex = currentVertex;
 
         currentVertex = vertices[i];
-        currentJoin = properties.join;
+        currentJoin = layout.join;
 
         if (prevVertex) distance += util::dist<double>(currentVertex, prevVertex);
 
@@ -164,7 +169,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
         // Switch to miter joins if the angle is very low.
         if (currentJoin != JoinType::Miter) {
-            if (std::fabs(joinAngularity) < 0.5 && roundness < properties.miter_limit) {
+            if (std::fabs(joinAngularity) < 0.5 && roundness < layout.miter_limit) {
                 currentJoin = JoinType::Miter;
             }
         }
@@ -213,14 +218,14 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
                 // The two normals are almost parallel.
                 joinNormal.x = -nextNormal.y;
                 joinNormal.y = nextNormal.x;
-            } else if (roundness > properties.miter_limit) {
+            } else if (roundness > layout.miter_limit) {
                 // If the miter grows too large, flip the direction to make a
                 // bevel join.
                 joinNormal.x = (prevNormal.x - nextNormal.x) / joinAngularity;
                 joinNormal.y = (prevNormal.y - nextNormal.y) / joinAngularity;
             }
 
-            if (roundness > properties.miter_limit) {
+            if (roundness > layout.miter_limit) {
                 flip = -flip;
             }
 

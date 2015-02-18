@@ -5,6 +5,7 @@
 
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/util/std.hpp>
 
@@ -31,11 +32,11 @@ void FillBucket::free(void *, void *ptr) {
     ::free(ptr);
 }
 
-FillBucket::FillBucket(std::unique_ptr<const StyleBucketFill> layout_,
+FillBucket::FillBucket(std::unique_ptr<const StyleLayoutFill> styleLayout_,
                        FillVertexBuffer &vertexBuffer_,
                        TriangleElementsBuffer &triangleElementsBuffer_,
                        LineElementsBuffer &lineElementsBuffer_)
-    : layout(std::move(layout_)),
+    : styleLayout(std::move(styleLayout_)),
       allocator(new TESSalloc{
           &alloc,
           &realloc,
@@ -56,7 +57,7 @@ FillBucket::FillBucket(std::unique_ptr<const StyleBucketFill> layout_,
       triangle_elements_start(triangleElementsBuffer_.index()),
       line_elements_start(lineElementsBuffer.index()) {
     assert(tesselator);
-    assert(layout);
+    assert(styleLayout);
 }
 
 FillBucket::~FillBucket() {

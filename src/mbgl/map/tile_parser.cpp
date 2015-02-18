@@ -3,6 +3,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_layer_group.hpp>
+#include <mbgl/style/style_layout.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
@@ -33,8 +34,7 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile_,
                        GlyphAtlas & glyphAtlas_,
                        GlyphStore & glyphStore_,
                        SpriteAtlas & spriteAtlas_,
-                       const util::ptr<Sprite> &sprite_,
-                       TexturePool& texturePool_)
+                       const util::ptr<Sprite> &sprite_)
     : vector_data(pbf((const uint8_t *)data.data(), data.size())),
       tile(tile_),
       style(style_),
@@ -42,7 +42,6 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile_,
       glyphStore(glyphStore_),
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
-      texturePool(texturePool_),
       collision(util::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
     assert(&tile != nullptr);
     assert(style);
@@ -123,18 +122,25 @@ void applyLayoutProperty(PropertyKey key, const ClassProperties &classProperties
     }
 }
 
-void parseLayoutProperties(StyleBucketFill &/*fill*/, const StyleBucket &/*bucket*/, const float /*z*/) {
+std::unique_ptr<StyleLayoutFill> parseStyleLayoutFill(const StyleBucket &/*bucket*/, const float /*z*/) {
     // no-op; Fill buckets don't currently have any applicable layout properties
+    auto fillPtr = util::make_unique<StyleLayoutFill>();
+    return fillPtr;
 }
 
-void parseLayoutProperties(StyleBucketLine &line, const StyleBucket &bucket_desc, const float z) {
+std::unique_ptr<StyleLayoutLine> parseStyleLayoutLine(const StyleBucket &bucket_desc, const float z) {
+    auto linePtr = util::make_unique<StyleLayoutLine>();
+    auto &line = *linePtr;
     applyLayoutProperty(PropertyKey::LineCap, bucket_desc.layout, line.cap, z);
     applyLayoutProperty(PropertyKey::LineJoin, bucket_desc.layout, line.join, z);
     applyLayoutProperty(PropertyKey::LineMiterLimit, bucket_desc.layout, line.miter_limit, z);
     applyLayoutProperty(PropertyKey::LineRoundLimit, bucket_desc.layout, line.round_limit, z);
+    return linePtr;
 }
 
-void parseLayoutProperties(StyleBucketSymbol &symbol, const StyleBucket &bucket_desc, const float z) {
+std::unique_ptr<StyleLayoutSymbol> parseStyleLayoutSymbol(const StyleBucket &bucket_desc, const float z) {
+    auto symbolPtr = util::make_unique<StyleLayoutSymbol>();
+    auto &symbol = *symbolPtr;
     applyLayoutProperty(PropertyKey::SymbolPlacement, bucket_desc.layout, symbol.placement, z);
     if (symbol.placement == PlacementType::Line) {
         symbol.icon.rotation_alignment = RotationAlignmentType::Map;
@@ -172,6 +178,7 @@ void parseLayoutProperties(StyleBucketSymbol &symbol, const StyleBucket &bucket_
     applyLayoutProperty(PropertyKey::TextTransform, bucket_desc.layout, symbol.text.transform, z);
     applyLayoutProperty(PropertyKey::TextOffset, bucket_desc.layout, symbol.text.offset, z);
     applyLayoutProperty(PropertyKey::TextAllowOverlap, bucket_desc.layout, symbol.text.allow_overlap, z);
+    return symbolPtr;
 }
 
 std::unique_ptr<Bucket> TileParser::createBucket(const StyleBucket &bucket_desc) {
@@ -225,8 +232,7 @@ void TileParser::addBucketGeometries(Bucket& bucket, const VectorTileLayer& laye
 
 std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer &layer,
                                                      const StyleBucket &bucket_desc) {
-    auto fill = util::make_unique<StyleBucketFill>();
-    parseLayoutProperties(*fill, bucket_desc, tile.id.z);
+    auto fill = parseStyleLayoutFill(bucket_desc, tile.id.z);
     auto bucket = util::make_unique<FillBucket>(std::move(fill),
                                                 tile.fillVertexBuffer,
                                                 tile.triangleElementsBuffer,
@@ -235,15 +241,9 @@ std::unique_ptr<Bucket> TileParser::createFillBucket(const VectorTileLayer &laye
     return obsolete() ? nullptr : std::move(bucket);
 }
 
-std::unique_ptr<Bucket> TileParser::createRasterBucket(const StyleBucketRaster &raster) {
-    std::unique_ptr<RasterBucket> bucket = util::make_unique<RasterBucket>(texturePool, raster);
-    return obsolete() ? nullptr : std::move(bucket);
-}
-
 std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer &layer,
                                                      const StyleBucket &bucket_desc) {
-    auto line = util::make_unique<StyleBucketLine>();
-    parseLayoutProperties(*line, bucket_desc, tile.id.z);
+    auto line = parseStyleLayoutLine(bucket_desc, tile.id.z);
     auto bucket = util::make_unique<LineBucket>(std::move(line),
                                                 tile.lineVertexBuffer,
                                                 tile.triangleElementsBuffer,
@@ -254,8 +254,7 @@ std::unique_ptr<Bucket> TileParser::createLineBucket(const VectorTileLayer &laye
 
 std::unique_ptr<Bucket> TileParser::createSymbolBucket(const VectorTileLayer &layer,
                                                        const StyleBucket &bucket_desc) {
-    auto symbol = util::make_unique<StyleBucketSymbol>();
-    parseLayoutProperties(*symbol, bucket_desc, tile.id.z);
+    auto symbol = parseStyleLayoutSymbol(bucket_desc, tile.id.z);
     auto bucket = util::make_unique<SymbolBucket>(std::move(symbol), *collision);
     bucket->addFeatures(
         layer, bucket_desc.filter, tile.id, spriteAtlas, *sprite, glyphAtlas, glyphStore);
