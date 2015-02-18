@@ -79,9 +79,14 @@ NativeMapView::NativeMapView(JNIEnv *env, jobject obj_)
 
 NativeMapView::~NativeMapView() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::~NativeMapView");
-    terminateContext();
-    destroySurface();
-    terminateDisplay();
+
+    if (context != EGL_NO_CONTEXT) {
+        terminateContext();
+    }
+
+    if (display != EGL_NO_DISPLAY) {
+        terminateDisplay();
+    }
 
     assert(vm != nullptr);
     assert(obj != nullptr);
@@ -101,19 +106,23 @@ NativeMapView::~NativeMapView() {
 
 void NativeMapView::activate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::activate");
-    if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
-        if (!eglMakeCurrent(display, surface, surface, context)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
-                             eglGetError());
-            throw new std::runtime_error("eglMakeCurrent() failed");
-        }
-    } else {
-        mbgl::Log::Info(mbgl::Event::Android, "Not activating as we are not ready");
+
+    assert(display != EGL_NO_DISPLAY);
+    assert(surface != EGL_NO_SURFACE);
+    assert(context != EGL_NO_CONTEXT);
+
+    if (!eglMakeCurrent(display, surface, surface, context)) {
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
+                         eglGetError());
+        throw new std::runtime_error("eglMakeCurrent() failed");
     }
 }
 
 void NativeMapView::deactivate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::deactivate");
+
+    assert(display != EGL_NO_DISPLAY);
+
     if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
                          eglGetError());
@@ -124,22 +133,16 @@ void NativeMapView::deactivate() {
 void NativeMapView::swap() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::swap");
 
-    if (map.needsSwap() && (display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
-        if (!eglSwapBuffers(display, surface)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d",
-                             eglGetError());
-            throw new std::runtime_error("eglSwapBuffers() failed");
-        }
-        map.swapped();
-        updateFps();
-    } else {
-        mbgl::Log::Info(mbgl::Event::Android, "Not swapping as we are not ready");
-    }
-}
+    assert(display != EGL_NO_DISPLAY);
+    assert(surface != EGL_NO_SURFACE);
 
-void NativeMapView::notify() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::notify()");
-    // noop
+    if (!eglSwapBuffers(display, surface)) {
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapBuffers() returned error %d",
+                         eglGetError());
+        throw new std::runtime_error("eglSwapBuffers() failed");
+    }
+
+    updateFps();
 }
 
 mbgl::Map &NativeMapView::getMap() { return map; }
@@ -157,6 +160,7 @@ void NativeMapView::initializeDisplay() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::initializeDisplay");
 
     assert(display == EGL_NO_DISPLAY);
+    assert(surface == EGL_NO_SURFACE);
     assert(config == nullptr);
     assert(format < 0);
 
@@ -232,28 +236,22 @@ void NativeMapView::initializeDisplay() {
 void NativeMapView::terminateDisplay() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::terminateDisplay");
 
-    if (display != EGL_NO_DISPLAY) {
-        // Destroy the surface first, if it still exists. This call needs a valid surface.
-        if (surface != EGL_NO_SURFACE) {
-            if (!eglDestroySurface(display, surface)) {
-                mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroySurface() returned error %d",
-                                 eglGetError());
-                throw new std::runtime_error("eglDestroySurface() failed");
-            }
-            surface = EGL_NO_SURFACE;
-        }
+    assert(display != EGL_NO_DISPLAY);
 
-        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL,
-                             "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
-            throw new std::runtime_error("eglMakeCurrent() failed");
-        }
+    if (surface != EGL_NO_SURFACE) {
+        destroySurface();
+    }
 
-        if (!eglTerminate(display)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglTerminate() returned error %d",
-                             eglGetError());
-            throw new std::runtime_error("eglTerminate() failed");
-        }
+    if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
+        mbgl::Log::Error(mbgl::Event::OpenGL,
+                         "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
+        throw new std::runtime_error("eglMakeCurrent() failed");
+    }
+
+    if (!eglTerminate(display)) {
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglTerminate() returned error %d",
+                         eglGetError());
+        throw new std::runtime_error("eglTerminate() failed");
     }
 
     display = EGL_NO_DISPLAY;
@@ -279,21 +277,14 @@ void NativeMapView::initializeContext() {
 
 void NativeMapView::terminateContext() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::terminateContext");
-    if (display != EGL_NO_DISPLAY) {
 
-        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL,
-                             "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
-            throw new std::runtime_error("eglMakeCurrent() failed");
-        }
+    assert(display != EGL_NO_DISPLAY);
+    assert(context != EGL_NO_CONTEXT);
 
-        if (context != EGL_NO_CONTEXT) {
-            if (!eglDestroyContext(display, context)) {
-                mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroyContext() returned error %d",
-                                 eglGetError());
-                throw new std::runtime_error("eglDestroyContext() failed");
-            }
-        }
+    if (!eglDestroyContext(display, context)) {
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroyContext() returned error %d",
+                         eglGetError());
+        throw new std::runtime_error("eglDestroyContext() failed");
     }
 
     context = EGL_NO_CONTEXT;
@@ -321,75 +312,42 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
         throw new std::runtime_error("eglCreateWindowSurface() failed");
     }
 
-    if (!firstTime) {
-        firstTime = true;
+    activate();
 
-        if (!eglMakeCurrent(display, surface, surface, context)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
-                             eglGetError());
-            throw new std::runtime_error("eglMakeCurrent() failed");
-        }
-
-        log_gl_string(GL_VENDOR, "Vendor");
-        log_gl_string(GL_RENDERER, "Renderer");
-        log_gl_string(GL_VERSION, "Version");
-        if (!inEmulator()) {
-            log_gl_string(GL_SHADING_LANGUAGE_VERSION,
-                        "SL Version"); // In the emulator this returns NULL with error code 0?
-                                        // https://code.google.com/p/android/issues/detail?id=78977
-        }
-        log_gl_string(GL_EXTENSIONS, "Extensions");
-
-        pthread_once(&loadGLExtensions, loadExtensions);
-
-        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL,
-                             "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
-            throw new std::runtime_error("eglMakeCurrent() failed");
-        }
+    log_gl_string(GL_VENDOR, "Vendor");
+    log_gl_string(GL_RENDERER, "Renderer");
+    log_gl_string(GL_VERSION, "Version");
+    if (!inEmulator()) {
+        log_gl_string(GL_SHADING_LANGUAGE_VERSION,
+                    "SL Version"); // In the emulator this returns NULL with error code 0?
+                                    // https://code.google.com/p/android/issues/detail?id=78977
     }
+    log_gl_string(GL_EXTENSIONS, "Extensions");
 
-    resume();
+    pthread_once(&loadGLExtensions, loadExtensions);
+
+    deactivate();
 }
 
 void NativeMapView::destroySurface() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::destroySurface");
 
-    pause(true);
+    assert(display != EGL_NO_DISPLAY);
+    assert(surface != EGL_NO_SURFACE);
+    assert(window != nullptr);
 
-    if (surface != EGL_NO_SURFACE) {
-        if (!eglDestroySurface(display, surface)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroySurface() returned error %d",
-                             eglGetError());
-            throw new std::runtime_error("eglDestroySurface() failed");
-        }
+    if (!eglDestroySurface(display, surface)) {
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroySurface() returned error %d",
+                         eglGetError());
+        throw new std::runtime_error("eglDestroySurface() failed");
     }
 
     surface = EGL_NO_SURFACE;
 
-    if (window != nullptr) {
-        ANativeWindow_release(window);
-        window = nullptr;
-    }
+    ANativeWindow_release(window);
+    window = nullptr;
 }
 
-// Speed
-/*
-typedef enum {
-    Format16Bit = 0,
-    Format32BitNoAlpha = 1,
-    Format32BitAlpha = 2,
-    Format24Bit = 3,
-    Unknown = 4
-} BufferFormat;
-
-typedef enum {
-    Format16Depth8Stencil = 0,
-    Format24Depth8Stencil = 1,
-} DepthStencilFormat;
-*/
-
-// Quality
 typedef enum {
     Format16Bit = 3,
     Format32BitNoAlpha = 1,
@@ -556,7 +514,6 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint numConfi
 
     // Sort the configs to find the best one
     configList.sort();
-    usingDepth24 = std::get<1>(configList.front()) == Format24Depth8Stencil;
     bool isConformant = !std::get<2>(configList.front());
     bool isCaveat = std::get<3>(configList.front());
     int configNum = std::get<4>(configList.front());
@@ -574,24 +531,9 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint numConfi
     return configId;
 }
 
-void NativeMapView::start() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::start");
-
-    if (display == EGL_NO_DISPLAY) {
-        initializeDisplay();
-    }
-
-    if (context == EGL_NO_CONTEXT) {
-        initializeContext();
-    }
-
-    assert(display != EGL_NO_DISPLAY);
-    assert(context != EGL_NO_CONTEXT);
-
-    map.start(true);
-}
-
 void NativeMapView::loadExtensions() {
+    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::loadExtensions");
+
     const GLubyte *str = glGetString(GL_EXTENSIONS);
     if (str == nullptr) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "glGetString(GL_EXTENSIONS) returned error %d",
@@ -624,11 +566,7 @@ void NativeMapView::loadExtensions() {
 
     if (extensions.find("GL_OES_depth24") != std::string::npos) {
         mbgl::Log::Info(mbgl::Event::OpenGL, "Using GL_OES_depth24.");
-        if (usingDepth24) {
-            gl::isDepth24Supported = true;
-        } else {
-            mbgl::Log::Info(mbgl::Event::OpenGL, "Preferring 16 bit depth.");
-        }
+        gl::isDepth24Supported = true;
     }
 
     if (extensions.find("GL_KHR_debug") != std::string::npos) {
@@ -689,36 +627,6 @@ void NativeMapView::loadExtensions() {
             assert(gl::LabelObjectEXT != nullptr);
             assert(gl::GetObjectLabelEXT != nullptr);
         }
-    }
-}
-
-void NativeMapView::stop() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::stop");
-
-    if ((display != EGL_NO_DISPLAY) && (context != EGL_NO_CONTEXT)) {
-        map.stop();
-    }
-}
-
-void NativeMapView::pause(bool waitForPause) {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::pause %s",
-                     (waitForPause) ? "true" : "false");
-
-    if ((display != EGL_NO_DISPLAY) && (context != EGL_NO_CONTEXT)) {
-        map.pause(waitForPause);
-    }
-}
-
-void NativeMapView::resume() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::resume");
-
-    assert(display != EGL_NO_DISPLAY);
-    assert(context != EGL_NO_CONTEXT);
-
-    if (surface != EGL_NO_SURFACE) {
-        map.resume();
-    } else {
-        mbgl::Log::Debug(mbgl::Event::Android, "Not resuming because we are not ready");
     }
 }
 
@@ -825,6 +733,11 @@ void NativeMapView::updateFps() {
         }
     }
     env = nullptr;
+}
+
+void NativeMapView::resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight)
+{
+    View::resize(width, height, ratio, fbWidth, fbHeight);
 }
 }
 }

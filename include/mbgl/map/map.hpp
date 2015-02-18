@@ -209,7 +209,6 @@ private:
 
     TransformState state;
 
-
     util::ptr<Style> style;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
     util::ptr<GlyphStore> glyphStore;

@@ -81,62 +81,8 @@ class NativeMapView {
         nativeStop(mNativeMapViewPtr);
     }
 
-    public void pause() {
-        nativePause(mNativeMapViewPtr);
-    }
-
-    public void resume() {
-        nativeResume(mNativeMapViewPtr);
-    }
-
-    public void run() {
-        nativeRun(mNativeMapViewPtr);
-    }
-
-    public void rerender() {
-        nativeRerender(mNativeMapViewPtr);
-    }
-
     public void update() {
         nativeUpdate(mNativeMapViewPtr);
-    }
-
-    public void terminate() {
-        nativeTerminate(mNativeMapViewPtr);
-    }
-
-    public boolean needsSwap() {
-        return nativeNeedsSwap(mNativeMapViewPtr);
-    }
-
-    public void swapped() {
-        nativeSwapped(mNativeMapViewPtr);
-    }
-
-    public void resize(int width, int height) {
-        resize(width, height, 1.0f);
-    }
-
-    public void resize(int width, int height, float ratio) {
-        if (width < 0) {
-            throw new IllegalArgumentException("width cannot be negative.");
-        }
-
-        if (height < 0) {
-            throw new IllegalArgumentException("height cannot be negative.");
-        }
-
-        if (width > 65535) {
-            throw new IllegalArgumentException(
-                    "width cannot be greater than 65535.");
-        }
-
-        if (height > 65535) {
-            throw new IllegalArgumentException(
-                    "height cannot be greater than 65535.");
-        }
-
-        nativeResize(mNativeMapViewPtr, width, height, ratio);
     }
 
     public void resize(int width, int height, float ratio, int fbWidth,
@@ -436,24 +382,7 @@ class NativeMapView {
 
     private native void nativeStop(long nativeMapViewPtr);
 
-    private native void nativePause(long nativeMapViewPtr);
-
-    private native void nativeResume(long nativeMapViewPtr);
-
-    private native void nativeRun(long nativeMapViewPtr);
-
-    private native void nativeRerender(long nativeMapViewPtr);
-
     private native void nativeUpdate(long nativeMapViewPtr);
-
-    private native void nativeTerminate(long nativeMapViewPtr);
-
-    private native boolean nativeNeedsSwap(long nativeMapViewPtr);
-
-    private native void nativeSwapped(long nativeMapViewPtr);
-
-    private native void nativeResize(long nativeMapViewPtr, int width,
-            int height, float ratio);
 
     private native void nativeResize(long nativeMapViewPtr, int width,
             int height, float ratio, int fbWidth, int fbHeight);

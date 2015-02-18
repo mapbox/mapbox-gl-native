@@ -73,9 +73,6 @@ Map::Map(View& view_, FileSource& fileSource_, RenderMode mode_)
 
     // Initialize the OpenGL context
     view.initialize(this);
-
-    // Start the Map thread
-    thread = std::thread([this]() { run(); });
 }
 
 Map::~Map() {
@@ -118,6 +115,11 @@ void Map::start() {
     assert(!active);
 
     active = true;
+
+    if (!thread.joinable()) {
+        // Start the Map thread
+        thread = std::thread([this]() { run(); });
+    }
 
     update();
 
@@ -346,7 +348,7 @@ void Map::loadStyleURL() {
 
             setStyleJSON(res.data, base);
         } else {
-            Log::Error(Event::Setup, "loading style failed: %s", res.message.c_str());
+            Log::Error(Event::Setup, "loading style %s failed: %s", styleURL.c_str(), res.message.c_str());
         }
     });
 }
@@ -694,6 +696,10 @@ void Map::prepare() {
         loadStyleURL();
     }
 
+    if (!style) {
+        return;
+    }
+
     if (!glyphURL.empty()) {
         glyphStore->setURL(glyphURL);
         glyphURL.clear();
@@ -720,6 +726,10 @@ void Map::prepare() {
 
 void Map::render() {
     std::lock_guard<std::mutex> lock(rendering);
+
+    if (!style) {
+        return;
+    }
 
     view.discard();
 
