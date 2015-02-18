@@ -26,7 +26,7 @@ before_install:
 - if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then export LD_LIBRARY_PATH=`mason prefix mesa 10.4.3`/lib:$LD_LIBRARY_PATH; glxinfo; fi
 
 install:
-- npm run-script rebuild
+- npm install && npm run-script rebuild
 
 before_script:
 # Set the core file limit to unlimited so a core file is generated upon crash
