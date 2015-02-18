@@ -49,11 +49,11 @@ $(MBGL)/config/%.gypi: $(MBGL) $(MBGL)/configure
 	make -C $(MBGL) config/$*.gypi
 
 .PHONY: test-suite
-test-suite: build
+test-suite:
 	-@(`npm bin`/tape test/render.test.js | `npm bin`/tap-spec)
 
 .PHONY: test-js
-test-js: build
+test-js:
 	@(`npm bin`/tape test/js/**/*.test.js | `npm bin`/tap-spec)
 
 .PHONY: test
