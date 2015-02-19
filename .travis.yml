@@ -10,6 +10,28 @@ matrix:
     env:
     - FLAVOR: linux
     - CXX: clang++-3.5
+    - NODE_EXE: "iojs"
+    - NODE_VERSION: 1.2.0
+    addons:
+      apt:
+        sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
+        packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+  - os: linux
+    compiler: clang
+    env:
+    - FLAVOR: linux
+    - CXX: clang++-3.5
+    - NODE_EXE: "node"
+    - NODE_VERSION: 0.12.0
+    addons:
+      apt:
+        sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
+        packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+  - os: linux
+    compiler: clang
+    env:
+    - FLAVOR: linux
+    - CXX: clang++-3.5
     - NODE_EXE: "node"
     - NODE_VERSION: 0.10.36
     addons:
@@ -21,12 +43,46 @@ matrix:
     env:
     - FLAVOR: linux
     - CXX: g++-4.9
+    - NODE_EXE: "iojs"
+    - NODE_VERSION: 1.2.0
+    addons:
+      apt:
+        sources: [ 'ubuntu-toolchain-r-test' ]
+        packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+  - os: linux
+    compiler: gcc
+    env:
+    - FLAVOR: linux
+    - CXX: g++-4.9
+    - NODE_EXE: "node"
+    - NODE_VERSION: 0.12.0
+    addons:
+      apt:
+        sources: [ 'ubuntu-toolchain-r-test' ]
+        packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+  - os: linux
+    compiler: gcc
+    env:
+    - FLAVOR: linux
+    - CXX: g++-4.9
     - NODE_EXE: "node"
     - NODE_VERSION: 0.10.36
     addons:
       apt:
         sources: [ 'ubuntu-toolchain-r-test' ]
         packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+  - os: osx
+    compiler: clang
+    env:
+    - FLAVOR: osx
+    - NODE_EXE: "iojs"
+    - NODE_VERSION: 1.2.0
+  - os: osx
+    compiler: clang
+    env:
+    - FLAVOR: osx
+    - NODE_EXE: "node"
+    - NODE_VERSION: 0.12.0
   - os: osx
     compiler: clang
     env:
