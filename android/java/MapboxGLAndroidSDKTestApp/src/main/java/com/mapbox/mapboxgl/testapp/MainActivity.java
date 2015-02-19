@@ -18,7 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.mapbox.mapboxgl.geometry.LatLng;
-import com.mapbox.mapboxgl.geometry.LatLngZoom;
+//import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapbox.mapboxgl.views.MapView;
 import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
@@ -59,8 +59,9 @@ public class MainActivity extends ActionBarActivity {
     private LocationRequest mLocationRequest;
     private ImageView mGpsMarker;
     private Location mGpsMarkerLocation;
-    private boolean mLockGpsCenter = true;
-    private boolean mLockGpsZoom = true;
+    //private boolean mLockGpsCenter = true;
+    //private boolean mLockGpsZoom = true;
+    private float mDensity;
 
     // Used for the class spinner
     Spinner mClassSpinner;
@@ -77,6 +78,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         Log.v(TAG, "onCreate");
 
+        mDensity = getResources().getDisplayMetrics().density;
+
         // Load the layout
         setContentView(R.layout.activity_main);
         mMapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
@@ -92,10 +95,11 @@ public class MainActivity extends ActionBarActivity {
         mGpsMarker = new ImageView(getApplicationContext());
         mGpsMarker.setVisibility(View.INVISIBLE);
         mGpsMarker.setImageResource(R.drawable.location_marker);
+        mGpsMarker.setLayoutParams(new FrameLayout.LayoutParams((int) (27.0f * mDensity), (int) (27.0f * mDensity)));
+        mGpsMarker.requestLayout();
 
         mMapFrameLayout = (FrameLayout) findViewById(R.id.layout_map);
         mMapFrameLayout.addView(mGpsMarker);
-
         // Add a toolbar as the action bar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(mainToolbar);
@@ -118,9 +122,10 @@ public class MainActivity extends ActionBarActivity {
         // Prepare for GPS
         mLocationClient = new LostApiClient.Builder(this).build();
 
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setInterval(0);
-        mLocationRequest.setSmallestDisplacement(0);
+        mLocationRequest = LocationRequest.create()
+                .setInterval(1000)
+                .setSmallestDisplacement(1)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         mLocationListener = new LocationListener() {
             @Override
@@ -138,8 +143,7 @@ public class MainActivity extends ActionBarActivity {
 
         // Cancel GPS
         if (mIsGpsOn) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mLocationListener);
-            mLocationClient.disconnect();
+            stopGps();
         }
     }
 
@@ -152,11 +156,7 @@ public class MainActivity extends ActionBarActivity {
         // Restart GPS
         // Cancel any outstanding GPS
         if (mIsGpsOn) {
-            mLocationClient.connect();
-
-            updateLocation(LocationServices.FusedLocationApi.getLastLocation());
-
-            LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, mLocationListener);
+            startGps();
         }
     }
 
@@ -179,19 +179,20 @@ public class MainActivity extends ActionBarActivity {
             case R.id.action_gps:
                 // Toggle GPS position updates
                 if (mIsGpsOn) {
+                    // Turn off
                     mIsGpsOn = false;
                     item.setIcon(R.drawable.ic_action_location_searching);
-                    mLocationClient.disconnect();
-                    mGpsMarker.setVisibility(View.INVISIBLE);
+                    stopGps();
                     mGpsMarkerLocation = null;
 
                 } else {
+                    // Turn on
                     mIsGpsOn = true;
                     item.setIcon(R.drawable.ic_action_location_found);
-                    mLocationClient.connect();
-                    mGpsMarker.setVisibility(View.VISIBLE);
                     mGpsMarkerLocation = null;
+                    startGps();
                 }
+                updateMap();
                 return true;
 
             case R.id.action_debug:
@@ -212,11 +213,24 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    // Turns the GPS location updates on
+    private void startGps() {
+        mLocationClient.connect();
+        updateLocation(LocationServices.FusedLocationApi.getLastLocation());
+        LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, mLocationListener);
+    }
+
+    // Turns the GPS location updates off
+    private void stopGps() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mLocationListener);
+        mLocationClient.disconnect();
+    }
+
     // Handles location updates from GPS
     private void updateLocation(Location location) {
         if (location != null) {
             mGpsMarkerLocation = location;
-            LatLng coordinate = new LatLng(mGpsMarkerLocation);
+            /*LatLng coordinate = new LatLng(mGpsMarkerLocation);
             LatLngZoom zoomedCoordinate = new LatLngZoom(coordinate, 16);
             if (mLockGpsCenter) {
                 if (mLockGpsZoom) {
@@ -224,7 +238,7 @@ public class MainActivity extends ActionBarActivity {
                 } else {
                     mMapFragment.getMap().setCenterCoordinate(coordinate, true);
                 }
-            }
+            }*/
         }
 
         updateMap();
@@ -385,17 +399,29 @@ public class MainActivity extends ActionBarActivity {
         mCompassView.setRotation((float) mMapFragment.getMap().getDirection());
 
         if (mGpsMarkerLocation != null) {
+            mGpsMarker.setVisibility(View.VISIBLE);
             LatLng coordinate = new LatLng(mGpsMarkerLocation);
             PointF screenLocation = mMapFragment.getMap().toScreenLocation(coordinate);
-            mGpsMarker.setPadding((int) screenLocation.x, (int) screenLocation.y, 0, 0);
 
             if (mGpsMarkerLocation.hasBearing()) {
                 mGpsMarker.setImageResource(R.drawable.direction_arrow);
-                mCompassView.setRotation(mGpsMarkerLocation.getBearing());
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) (54.0f * mDensity), (int) (54.0f * mDensity));
+                lp.leftMargin = (int) ((screenLocation.x - 54.0f / 2.0f) * mDensity);
+                lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 54.0f / 2.0f) * mDensity);
+                mGpsMarker.setLayoutParams(lp);
+                mGpsMarker.setRotation(mGpsMarkerLocation.getBearing());
+                mGpsMarker.requestLayout();
             } else {
                 mGpsMarker.setImageResource(R.drawable.location_marker);
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) (27.0f * mDensity), (int) (27.0f * mDensity));
+                lp.leftMargin = (int) ((screenLocation.x - 27.0f / 2.0f) * mDensity);
+                lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 27.0f / 2.0f) * mDensity);
+                mGpsMarker.setLayoutParams(lp);
                 mGpsMarker.setRotation(0.0f);
+                mGpsMarker.requestLayout();
             }
+        } else {
+            mGpsMarker.setVisibility(View.INVISIBLE);
         }
     }
 
