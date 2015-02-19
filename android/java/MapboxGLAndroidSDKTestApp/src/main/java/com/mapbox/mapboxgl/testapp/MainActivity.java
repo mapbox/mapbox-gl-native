@@ -1,6 +1,12 @@
 package com.mapbox.mapboxgl.testapp;
 
+import android.content.Context;
 import android.graphics.PointF;
+import android.hardware.GeomagneticField;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -40,33 +46,38 @@ public class MainActivity extends ActionBarActivity {
     // Instance members
     //
 
-    // Holds the MapFragment
+    // Used for the UI
     private MapFragment mMapFragment;
-
-    // The FPS label
     private TextView mFpsTextView;
-
-    // The compass
     private ImageView mCompassView;
-
-    // The FrameLayout
     private FrameLayout mMapFrameLayout;
+    private float mDensity;
+    Spinner mClassSpinner;
+    ArrayAdapter mOutdoorsClassAdapter;
+    ArrayAdapter mSatelliteClassAdapter;
 
     // Used for GPS
     private boolean mIsGpsOn = false;
     private LostApiClient mLocationClient;
-    private LocationListener mLocationListener;
+    private GpsListener mGpsListener;
     private LocationRequest mLocationRequest;
     private ImageView mGpsMarker;
-    private Location mGpsMarkerLocation;
+    private Location mGpsLocation;
     //private boolean mLockGpsCenter = true;
     //private boolean mLockGpsZoom = true;
-    private float mDensity;
 
-    // Used for the class spinner
-    Spinner mClassSpinner;
-    ArrayAdapter mOutdoorsClassAdapter;
-    ArrayAdapter mSatelliteClassAdapter;
+    // Used for compass
+    private SensorManager mSensorManager;
+    private Sensor mSensorAccelerometer;
+    private Sensor mSensorMagneticField;
+    private CompassListener mCompassListener;
+    private float[] mValuesAccelerometer = new float[3];
+    private float[] mValuesMagneticField = new float[3];
+    private float[] mMatrixR = new float[9];
+    private float[] mMatrixI = new float[9];
+    private float[] mMatrixValues = new float[3];
+    private float mCompassBearing;
+    private boolean mCompassValid = false;
 
     //
     // Lifecycle events
@@ -121,18 +132,16 @@ public class MainActivity extends ActionBarActivity {
 
         // Prepare for GPS
         mLocationClient = new LostApiClient.Builder(this).build();
-
         mLocationRequest = LocationRequest.create()
                 .setInterval(1000)
                 .setSmallestDisplacement(1)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mGpsListener = new GpsListener();
 
-        mLocationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                updateLocation(location);
-            }
-        };
+        mSensorManager = (SensorManager) getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+        mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        mCompassListener = new CompassListener();
     }
 
     // Called when our app goes into the background
@@ -178,18 +187,19 @@ public class MainActivity extends ActionBarActivity {
         switch (item.getItemId()) {
             case R.id.action_gps:
                 // Toggle GPS position updates
+                // TODO: how to persist this
                 if (mIsGpsOn) {
                     // Turn off
                     mIsGpsOn = false;
                     item.setIcon(R.drawable.ic_action_location_searching);
                     stopGps();
-                    mGpsMarkerLocation = null;
+                    mGpsLocation = null;
 
                 } else {
                     // Turn on
                     mIsGpsOn = true;
                     item.setIcon(R.drawable.ic_action_location_found);
-                    mGpsMarkerLocation = null;
+                    mGpsLocation = null;
                     startGps();
                 }
                 updateMap();
@@ -217,20 +227,76 @@ public class MainActivity extends ActionBarActivity {
     private void startGps() {
         mLocationClient.connect();
         updateLocation(LocationServices.FusedLocationApi.getLastLocation());
-        LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, mLocationListener);
+        LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, new GpsListener());
+        mSensorManager.registerListener(mCompassListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(mCompassListener, mSensorMagneticField, SensorManager.SENSOR_DELAY_UI);
     }
 
     // Turns the GPS location updates off
     private void stopGps() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(mLocationListener);
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGpsListener);
         mLocationClient.disconnect();
+        mSensorManager.unregisterListener(mCompassListener, mSensorAccelerometer);
+        mSensorManager.unregisterListener(mCompassListener, mSensorMagneticField);
+    }
+
+    // This class forwards location updates to updateLocation()
+    private class GpsListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            updateLocation(location);
+        }
+    }
+
+    // This class handles sensor updates to calculate compass bearing
+    private class CompassListener implements SensorEventListener {
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            switch (event.sensor.getType()) {
+                case Sensor.TYPE_ACCELEROMETER:
+                    System.arraycopy(event.values, 0, mValuesAccelerometer, 0, 3);
+                    break;
+                case Sensor.TYPE_MAGNETIC_FIELD:
+                    System.arraycopy(event.values, 0, mValuesMagneticField, 0, 3);
+                    break;
+            }
+
+            boolean valid = SensorManager.getRotationMatrix(mMatrixR, mMatrixI,
+                    mValuesAccelerometer,
+                    mValuesMagneticField);
+
+            if (valid) {
+                SensorManager.getOrientation(mMatrixR, mMatrixValues);
+                //mAzimuthRadians.putValue(mMatrixValues[0]);
+                //mAzimuth = Math.toDegrees(mAzimuthRadians.getAverage());
+
+                if (mGpsLocation != null) {
+                    GeomagneticField geomagneticField = new GeomagneticField(
+                            (float) mGpsLocation.getLatitude(),
+                            (float) mGpsLocation.getLongitude(),
+                            (float) mGpsLocation.getAltitude(),
+                            System.currentTimeMillis());
+                    mCompassBearing = (float) Math.toDegrees(mMatrixValues[0]) + geomagneticField.getDeclination();
+                    mCompassValid = true;
+                }
+            }
+
+            updateMap();
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            // TODO: ignore unreliable stuff
+        }
     }
 
     // Handles location updates from GPS
     private void updateLocation(Location location) {
         if (location != null) {
-            mGpsMarkerLocation = location;
-            /*LatLng coordinate = new LatLng(mGpsMarkerLocation);
+            mGpsLocation = location;
+            /*LatLng coordinate = new LatLng(mGpsLocation);
             LatLngZoom zoomedCoordinate = new LatLngZoom(coordinate, 16);
             if (mLockGpsCenter) {
                 if (mLockGpsZoom) {
@@ -398,18 +464,19 @@ public class MainActivity extends ActionBarActivity {
     private void updateMap() {
         mCompassView.setRotation((float) mMapFragment.getMap().getDirection());
 
-        if (mGpsMarkerLocation != null) {
+        if (mGpsLocation != null) {
             mGpsMarker.setVisibility(View.VISIBLE);
-            LatLng coordinate = new LatLng(mGpsMarkerLocation);
+            LatLng coordinate = new LatLng(mGpsLocation);
             PointF screenLocation = mMapFragment.getMap().toScreenLocation(coordinate);
 
-            if (mGpsMarkerLocation.hasBearing()) {
+            if (mGpsLocation.hasBearing() || mCompassValid) {
                 mGpsMarker.setImageResource(R.drawable.direction_arrow);
                 FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) (54.0f * mDensity), (int) (54.0f * mDensity));
                 lp.leftMargin = (int) ((screenLocation.x - 54.0f / 2.0f) * mDensity);
                 lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 54.0f / 2.0f) * mDensity);
                 mGpsMarker.setLayoutParams(lp);
-                mGpsMarker.setRotation(mGpsMarkerLocation.getBearing());
+                float bearing = mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
+                mGpsMarker.setRotation(bearing);
                 mGpsMarker.requestLayout();
             } else {
                 mGpsMarker.setImageResource(R.drawable.location_marker);
