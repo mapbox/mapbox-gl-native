@@ -1,0 +1,153 @@
+#include <mbgl/platform/platform.hpp>
+#include <mbgl/platform/log_nslog.hpp>
+#include <mbgl/platform/reachability.h>
+#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/default/sqlite_cache.hpp>
+#include <mbgl/storage/network_status.hpp>
+
+#include <mbgl/util/geo.hpp>
+
+#import <Foundation/Foundation.h>
+
+#include "settings_nsuserdefaults.hpp"
+#include "glfw_view.hpp"
+
+@interface URLHandler : NSObject
+@property (nonatomic) mbgl::Map *map;
+
+- (void)handleGetURLEvent:(NSAppleEventDescriptor *)event
+           withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
+@end
+
+@implementation URLHandler
+
+- (void)handleGetURLEvent:(NSAppleEventDescriptor *)event
+           withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
+    (void)replyEvent;
+
+    NSString* urlString = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+    for (NSString *param in [[url query] componentsSeparatedByString:@"&"]) {
+        NSArray *parts = [param componentsSeparatedByString:@"="];
+        if([parts count] < 2) continue;
+        [params setObject:[parts objectAtIndex:1] forKey:[parts objectAtIndex:0]];
+    }
+
+    mbgl::LatLng latLng = mbgl::LatLng(0, 0);
+    double zoom = 0, bearing = 0;
+    bool hasCenter = false, hasZoom = false, hasBearing = false;
+
+    NSString *centerString = [params objectForKey:@"center"];
+    if (centerString) {
+        NSArray *latLngValues = [centerString componentsSeparatedByString:@","];
+        if ([latLngValues count] == 2) {
+            latLng.latitude  = [latLngValues[0] doubleValue];
+            latLng.longitude = [latLngValues[1] doubleValue];
+            hasCenter = true;
+        }
+    }
+
+    NSString *zoomString = [params objectForKey:@"zoom"];
+    if (zoomString) {
+        zoom = [zoomString doubleValue];
+        hasZoom = true;
+    }
+
+    NSString *bearingString = [params objectForKey:@"bearing"];
+    if (bearingString) {
+        bearing = [bearingString doubleValue];
+        hasBearing = true;
+    }
+
+    if ([self map]) {
+        if (hasCenter && hasZoom) {
+            [self map]->setLatLngZoom(latLng, zoom);
+        } else if (hasCenter) {
+            [self map]->setLatLng(latLng);
+        } else if (hasZoom) {
+            [self map]->setZoom(zoom);
+        }
+
+        if (hasBearing) {
+            [self map]->setBearing(bearing);
+        }
+    }
+}
+@end
+
+// Returns the path to the default cache database on this system.
+const std::string &defaultCacheDatabase() {
+    static const std::string path = []() -> std::string {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(
+            NSApplicationSupportDirectory, NSUserDomainMask, YES);
+        if ([paths count] == 0) {
+            // Disable the cache if we don't have a location to write.
+            return "";
+        }
+
+        NSString *p = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"Mapbox GL"];
+
+        if (![[NSFileManager defaultManager] createDirectoryAtPath:p
+                                       withIntermediateDirectories:YES
+                                                        attributes:nil
+                                                             error:nil]) {
+            // Disable the cache if we couldn't create the directory.
+            return "";
+        }
+
+        return [[p stringByAppendingPathComponent:@"cache.db"] UTF8String];
+    }();
+    return path;
+}
+
+int main() {
+    mbgl::Log::Set<mbgl::NSLogBackend>();
+
+    GLFWView view;
+
+    mbgl::SQLiteCache cache(defaultCacheDatabase());
+    mbgl::DefaultFileSource fileSource(&cache);
+    mbgl::Map map(view, fileSource);
+
+    URLHandler *handler = [[URLHandler alloc] init];
+    [handler setMap:&map];
+    NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
+    [appleEventManager setEventHandler:handler andSelector:@selector(handleGetURLEvent:withReplyEvent:) forEventClass:kInternetEventClass andEventID:kAEGetURL];
+
+    // Notify map object when network reachability status changes.
+    Reachability* reachability = [Reachability reachabilityForInternetConnection];
+    reachability.reachableBlock = ^(Reachability *) {
+        mbgl::NetworkStatus::Reachable();
+    };
+    [reachability startNotifier];
+
+    // Load settings
+    mbgl::Settings_NSUserDefaults settings;
+    map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
+    map.setBearing(settings.bearing);
+    map.setDebug(settings.debug);
+
+    // Set access token if present
+    NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
+    if (!accessToken) mbgl::Log::Warning(mbgl::Event::Setup, "No access token set. Mapbox vector tiles won't work.");
+    if (accessToken) map.setAccessToken([accessToken cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+
+    // Load style
+    map.setStyleURL("asset://styles/bright-v7.json");
+
+    int ret = view.run();
+
+    [reachability stopNotifier];
+
+    // Save settings
+    mbgl::LatLng latLng = map.getLatLng();
+    settings.latitude = latLng.latitude;
+    settings.longitude = latLng.longitude;
+    settings.zoom = map.getZoom();
+    settings.bearing = map.getBearing();
+    settings.debug = map.getDebug();
+    settings.save();
+
+    return ret;
+}

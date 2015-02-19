@@ -7,15 +7,15 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
-#include <mbgl/platform/default/headless_view.hpp>
-#include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/headless_view.hpp>
+#include <mbgl/headless_display.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/default/sqlite_cache.hpp>
 
 #if __APPLE__
-#include <mbgl/platform/darwin/log_nslog.hpp>
+#include <mbgl/platform/log_nslog.hpp>
 #else
-#include <mbgl/platform/default/log_stderr.hpp>
+#include <mbgl/platform/log_stderr.hpp>
 #endif
 
 #include <boost/program_options.hpp>

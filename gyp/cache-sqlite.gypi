@@ -7,11 +7,11 @@
       'hard_dependency': 1,
 
       'sources': [
-        '../platform/default/sqlite_cache.cpp',
-        '../platform/default/sqlite3.hpp',
-        '../platform/default/sqlite3.cpp',
-        '../platform/default/compression.hpp',
-        '../platform/default/compression.cpp',
+        '../platform/default/src/sqlite_cache.cpp',
+        '../platform/default/src/sqlite3.hpp',
+        '../platform/default/src/sqlite3.cpp',
+        '../platform/default/src/compression.hpp',
+        '../platform/default/src/compression.cpp',
       ],
 
       'include_dirs': [
