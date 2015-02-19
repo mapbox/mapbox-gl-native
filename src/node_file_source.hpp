@@ -46,7 +46,11 @@ private:
     void processCancel(mbgl::Request*);
 
 private:
+#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
     std::map<mbgl::Request*, v8::Persistent<v8::Object>> pending;
+#else
+    std::map<mbgl::Request*, const v8::UniquePersistent<v8::Object> &> pending;
+#endif
     Queue *queue = nullptr;
 };
 

@@ -32,7 +32,7 @@ NodeLogObserver::NodeLogObserver(v8::Handle<v8::Object> target)
     : queue(new Queue(uv_default_loop(), [this](LogMessage &message) {
           NanScope();
 
-          auto msg = v8::Object::New();
+          auto msg = NanNew<v8::Object>();
           msg->Set(NanNew("class"), NanNew(mbgl::EventClass(message.event).c_str()));
           msg->Set(NanNew("severity"), NanNew(mbgl::EventSeverityClass(message.severity).c_str()));
           if (message.code != -1) {
@@ -49,11 +49,12 @@ NodeLogObserver::NodeLogObserver(v8::Handle<v8::Object> target)
           }
 
           v8::Local<v8::Value> argv[] = { NanNew("message"), msg };
-          auto emit = module->Get(NanNew("emit"))->ToObject();
-          emit->CallAsFunction(module, 2, argv);
+          auto handle = NanNew<v8::Object>(module);
+          auto emit = handle->Get(NanNew("emit"))->ToObject();
+          emit->CallAsFunction(handle, 2, argv);
       })) {
     NanScope();
-    module = v8::Persistent<v8::Object>::New(target);
+    NanAssignPersistent(module, target);
 
     // Don't keep the event loop alive.
     queue->unref();

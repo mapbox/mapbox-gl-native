@@ -8,15 +8,15 @@ public:
     CompressPNGWorker(NanCallback *callback_, v8::Local<v8::Object> buffer_, uint32_t width_,
                       uint32_t height_)
         : NanAsyncWorker(callback_),
-          buffer(v8::Persistent<v8::Object>::New(buffer_)),
           data(node::Buffer::Data(buffer_)),
           width(width_),
           height(height_) {
+        NanAssignPersistent(buffer, buffer_);
         assert(width * height * 4 == node::Buffer::Length(buffer_));
     }
 
     ~CompressPNGWorker() {
-        buffer.Dispose();
+        NanDisposePersistent(buffer);
     }
 
     void Execute() {
