@@ -88,7 +88,9 @@ Map::~Map() {
     assert(asyncTerminate);
     asyncTerminate->send();
 
-    thread.join();
+    if (thread.get_id() != std::thread::id()) {
+        thread.join();
+    }
 
     // Make sure that all of these are empty.
     assert(!sprite);
