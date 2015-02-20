@@ -7,8 +7,8 @@
       'hard_dependency': 1,
 
       'sources': [
-        '../platform/default/asset_request_zip.cpp',
-        '../platform/default/uv_zip.c',
+        '../platform/default/src/asset_request_zip.cpp',
+        '../platform/default/src/uv_zip.c',
       ],
 
       'include_dirs': [

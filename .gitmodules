@@ -10,6 +10,6 @@
 	path = styles
 	url = https://github.com/mapbox/mapbox-gl-styles.git
 
-[submodule "test/ios/KIF"]
-	path = test/ios/KIF
+[submodule "platform/ios/test/KIF"]
+	path = platform/ios/test/KIF
 	url = https://github.com/mapbox/KIF.git
