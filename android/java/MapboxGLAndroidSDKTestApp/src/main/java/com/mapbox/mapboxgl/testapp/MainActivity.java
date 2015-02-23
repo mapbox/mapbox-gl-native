@@ -42,6 +42,9 @@ public class MainActivity extends ActionBarActivity {
     // Tag used for logging
     private static final String TAG = "MainActivity";
 
+    // Used for saving instance state
+    private static final String STATE_IS_GPS_ON = "isGpsOn";
+
     //
     // Instance members
     //
@@ -52,9 +55,9 @@ public class MainActivity extends ActionBarActivity {
     private ImageView mCompassView;
     private FrameLayout mMapFrameLayout;
     private float mDensity;
-    Spinner mClassSpinner;
-    ArrayAdapter mOutdoorsClassAdapter;
-    ArrayAdapter mSatelliteClassAdapter;
+    private Spinner mClassSpinner;
+    private ArrayAdapter mOutdoorsClassAdapter;
+    private ArrayAdapter mSatelliteClassAdapter;
 
     // Used for GPS
     private boolean mIsGpsOn = false;
@@ -63,6 +66,7 @@ public class MainActivity extends ActionBarActivity {
     private LocationRequest mLocationRequest;
     private ImageView mGpsMarker;
     private Location mGpsLocation;
+    private MenuItem mGpsMenuItem;
     //private boolean mLockGpsCenter = true;
     //private boolean mLockGpsZoom = true;
 
@@ -88,6 +92,10 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(TAG, "onCreate");
+
+        if (savedInstanceState != null) {
+            mIsGpsOn = savedInstanceState.getBoolean(STATE_IS_GPS_ON, false);
+        }
 
         mDensity = getResources().getDisplayMetrics().density;
 
@@ -169,6 +177,16 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    // Called when we need to save instance state
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.v(TAG, "onSaveInstanceState");
+
+        outState.putBoolean(STATE_IS_GPS_ON, mIsGpsOn);
+    }
+
+
     //
     // Other events
     //
@@ -178,6 +196,12 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+        mGpsMenuItem = menu.findItem(R.id.action_gps);
+        if (mIsGpsOn) {
+            mGpsMenuItem.setIcon(R.drawable.ic_action_location_found);
+        } else {
+            mGpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -190,17 +214,12 @@ public class MainActivity extends ActionBarActivity {
                 // TODO: how to persist this
                 if (mIsGpsOn) {
                     // Turn off
-                    mIsGpsOn = false;
-                    item.setIcon(R.drawable.ic_action_location_searching);
                     stopGps();
-                    mGpsLocation = null;
-
+                    mIsGpsOn = false;
                 } else {
                     // Turn on
-                    mIsGpsOn = true;
-                    item.setIcon(R.drawable.ic_action_location_found);
-                    mGpsLocation = null;
                     startGps();
+                    mIsGpsOn = true;
                 }
                 updateMap();
                 return true;
@@ -225,6 +244,10 @@ public class MainActivity extends ActionBarActivity {
 
     // Turns the GPS location updates on
     private void startGps() {
+        if (mGpsMenuItem != null) {
+            mGpsMenuItem.setIcon(R.drawable.ic_action_location_found);
+        }
+        mGpsLocation = null;
         mLocationClient.connect();
         updateLocation(LocationServices.FusedLocationApi.getLastLocation());
         LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, new GpsListener());
@@ -234,10 +257,14 @@ public class MainActivity extends ActionBarActivity {
 
     // Turns the GPS location updates off
     private void stopGps() {
+        if (mGpsMenuItem != null) {
+            mGpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
+        }
         LocationServices.FusedLocationApi.removeLocationUpdates(mGpsListener);
         mLocationClient.disconnect();
         mSensorManager.unregisterListener(mCompassListener, mSensorAccelerometer);
         mSensorManager.unregisterListener(mCompassListener, mSensorMagneticField);
+        mGpsLocation = null;
     }
 
     // This class forwards location updates to updateLocation()
