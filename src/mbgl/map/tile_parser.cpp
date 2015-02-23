@@ -43,7 +43,6 @@ TileParser::TileParser(const std::string &data, VectorTileData &tile_,
       spriteAtlas(spriteAtlas_),
       sprite(sprite_),
       collision(util::make_unique<Collision>(tile.id.z, 4096, tile.source.tile_size, tile.depth)) {
-    assert(&tile != nullptr);
     assert(style);
     assert(sprite);
     assert(collision);
