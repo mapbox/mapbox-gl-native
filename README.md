@@ -2,7 +2,7 @@
 
 Renders map tiles with [Mapbox GL](https://github.com/mapbox/mapbox-gl-native).
 
-[![Build Status](https://api.travis-ci.com/mapbox/node-mapbox-gl-native.svg?token=Phdq58g7NsfstW6gyeYW)](https://magnum.travis-ci.com/mapbox/node-mapbox-gl-native)
+[![Build Status](https://travis-ci.org/mapbox/node-mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/node-mapbox-gl-native)
 
 ## Installing
 
