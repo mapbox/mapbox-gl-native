@@ -1,5 +1,4 @@
-#ifndef NODE_MBGL_NODE_MAP
-#define NODE_MBGL_NODE_MAP
+#pragma once
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
@@ -10,7 +9,6 @@
 #include <queue>
 
 namespace node_mbgl {
-
 
 class NodeFileSource;
 
@@ -55,6 +53,4 @@ private:
     uv_async_t *async;
 };
 
-} // end ns node_mbgl
-
-#endif
+}

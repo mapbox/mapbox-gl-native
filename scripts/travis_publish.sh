@@ -4,9 +4,9 @@ set -e
 
 # Inspect binary.
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
-    ldd ./lib/mbgl.node
+    ldd ./lib/mapbox-gl-native.node
 else
-    otool -L ./lib/mbgl.node
+    otool -L ./lib/mapbox-gl-native.node
 fi
 
 COMMIT_MESSAGE=$(git show -s --format=%B $TRAVIS_COMMIT | tr -d '\n')

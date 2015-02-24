@@ -14,7 +14,7 @@ By default, installs binaries. On these platforms no external dependencies are n
 Just run:
 
 ```
-npm install mbgl
+npm install mapbox-gl-native
 ```
 
 However, other platforms will fall back to a source compile with `make build`. To compile this module, make sure all submodules are initialized.
@@ -101,7 +101,7 @@ This is a very barebones implementation and you'll probably want a better implem
 A sample implementation that uses [`request`](https://github.com/request/request) to query data from HTTP:
 
 ```js
-var mbgl = require('./');
+var mbgl = require('mapbox-gl-native');
 var request = require('request');
 
 var fileSource = new mbgl.FileSource();

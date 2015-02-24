@@ -1,12 +1,12 @@
 {
-  "name": "mbgl",
+  "name": "mapbox-gl-native",
   "version": "0.0.1",
   "description": "Renders map tiles with Mapbox GL",
   "keywords": [
     "mapbox",
     "gl"
   ],
-  "main": "lib/mbgl.node",
+  "main": "lib/mapbox-gl-native.node",
   "repository": {
     "type": "git",
     "url": "git://github.com/mapbox/node-mapbox-gl-native.git"
@@ -38,7 +38,7 @@
   },
   "gypfile": true,
   "binary": {
-    "module_name": "mbgl",
+    "module_name": "mapbox-gl-native",
     "module_path": "./lib/",
     "host": "https://mapbox-node-binary.s3.amazonaws.com",
     "remote_path": "./{name}/v{version}",
