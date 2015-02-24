@@ -14,13 +14,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import com.mapbox.mapboxgl.lib.LatLngZoom;
 import com.mapbox.mapboxgl.lib.MapView;
 import com.mapzen.android.lost.LocationClient;
 import com.mapzen.android.lost.LocationListener;
 import com.mapzen.android.lost.LocationRequest;
-
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
@@ -31,6 +29,9 @@ public class MainActivity extends ActionBarActivity {
 
     // Tag used for logging
     private static final String TAG = "MainActivity";
+
+    // Rotation State
+    private static final String IS_GPS_ON = "isGPSOn";
 
     //
     // Instance members
@@ -50,6 +51,7 @@ public class MainActivity extends ActionBarActivity {
     private LocationClient mLocationClient;
     private LocationListener mLocationListener;
     private LocationRequest mLocationRequest;
+    private MenuItem gpsMenuItem = null;
 
     // Used for the class spinner
     Spinner mClassSpinner;
@@ -123,6 +125,11 @@ public class MainActivity extends ActionBarActivity {
                 mLocationListener = null;
             }
         });
+
+        if (savedInstanceState != null) {
+            // Restore any state that the app saved
+            mIsGpsOn = savedInstanceState.getBoolean(IS_GPS_ON);
+        }
     }
 
     // Called when our app goes into the background
@@ -150,6 +157,15 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        // Persist any state the app needs to retain
+        outState.putBoolean(IS_GPS_ON, mIsGpsOn);
+
+        super.onSaveInstanceState(outState);
+    }
+
     //
     // Other events
     //
@@ -159,6 +175,10 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+        gpsMenuItem = menu.findItem(R.id.action_gps);
+
+        // Set Menu UI to match state (ie, from restore)
+        toggleGPS(mIsGpsOn);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -167,17 +187,7 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_gps:
-                // Toggle GPS position updates
-                if (mIsGpsOn) {
-                    mIsGpsOn = false;
-                    item.setIcon(R.drawable.ic_action_location_searching);
-                    mLocationClient.disconnect();
-
-                } else {
-                    mIsGpsOn = true;
-                    item.setIcon(R.drawable.ic_action_location_found);
-                    mLocationClient.connect();
-                }
+                toggleGPS(!mIsGpsOn);
                 return true;
 
             case R.id.action_debug:
@@ -198,6 +208,24 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    /**
+     * Enabled / Disable GPS along with updating the UI
+     * @param enableGPS true if GPS is to be enabled, false if GPS is to be disabled
+     */
+    private void toggleGPS(boolean enableGPS) {
+
+       if (enableGPS) {
+           mIsGpsOn = true;
+           gpsMenuItem.setIcon(R.drawable.ic_action_location_found);
+           mLocationClient.connect();
+       } else {
+           mIsGpsOn = false;
+           gpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
+           mLocationClient.disconnect();
+       }
+    }
+
+
     // Handles location updates from GPS
     private void updateLocation(Location location) {
         if (location != null) {
@@ -211,7 +239,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            switch(position) {
+            switch (position) {
                 // Bright
                 case 0:
                     mMapFragment.getMap().setStyleUrl("asset://styles/bright-v7.json");
@@ -285,7 +313,7 @@ public class MainActivity extends ActionBarActivity {
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             ArrayList<String> classes = new ArrayList<String>(1);
 
-            switch(position) {
+            switch (position) {
                 // Day
                 case 0:
                     classes.add("day");
@@ -317,7 +345,7 @@ public class MainActivity extends ActionBarActivity {
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             ArrayList<String> classes = new ArrayList<String>(2);
 
-            switch(position) {
+            switch (position) {
                 // Labels + Contours
                 case 0:
                     classes.add("labels");
