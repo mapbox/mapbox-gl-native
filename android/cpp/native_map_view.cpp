@@ -332,8 +332,12 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
 void NativeMapView::destroySurface() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::destroySurface");
 
+    if (surface == EGL_NO_SURFACE) {
+        mbgl::Log::Debug(mbgl::Event::Android, "Surface was already destroyed!");
+        return;
+    }
+
     assert(display != EGL_NO_DISPLAY);
-    assert(surface != EGL_NO_SURFACE);
     assert(window != nullptr);
 
     if (!eglDestroySurface(display, surface)) {

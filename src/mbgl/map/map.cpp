@@ -400,10 +400,12 @@ util::ptr<Sprite> Map::getSprite() {
 #pragma mark - Size
 
 void Map::resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight) {
+    mbgl::Log::Debug(mbgl::Event::Android, "Map::resize");
     // This may be called from the UI and Map thread.
     if (transform.resize(width, height, ratio, fbWidth, fbHeight)) {
         update();
     }
+    mbgl::Log::Debug(mbgl::Event::Android, "Map::resize exit");
 }
 
 #pragma mark - Transitions

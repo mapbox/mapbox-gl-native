@@ -6,6 +6,7 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/transition.hpp>
 #include <mbgl/platform/platform.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <cstdio>
 
@@ -20,7 +21,9 @@ Transform::Transform(View &view_)
 
 bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
                        const uint16_t fb_w, const uint16_t fb_h) {
+    mbgl::Log::Debug(mbgl::Event::Android, "Transform::resize");
     std::lock_guard<std::recursive_mutex> lock(mtx);
+    mbgl::Log::Debug(mbgl::Event::Android, "Transform::resize post lock");
 
     if (final.width != w || final.height != h || final.pixelRatio != ratio ||
         final.framebuffer[0] != fb_w || final.framebuffer[1] != fb_h) {
@@ -36,8 +39,12 @@ bool Transform::resize(const uint16_t w, const uint16_t h, const float ratio,
 
         view.notifyMapChange(MapChangeRegionDidChange);
 
+
+        mbgl::Log::Debug(mbgl::Event::Android, "Transform ::resize exit true");
         return true;
     } else {
+
+        mbgl::Log::Debug(mbgl::Event::Android, "Transform ::resize exit true");
         return false;
     }
 }
