@@ -10,7 +10,7 @@
       'include_dirs': [ "<!(node -e \"require('nan')\")" ],
 
       'sources': [
-        'src/mbgl.cpp',
+        'src/node_mapbox_gl_native.cpp',
         'src/compress_png.hpp',
         'src/compress_png.cpp',
         'src/node_log.hpp',

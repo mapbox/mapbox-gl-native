@@ -34,4 +34,4 @@ void RegisterModule(v8::Handle<v8::Object> exports) {
     mbgl::Log::Set<node_mbgl::NodeLogBackend>(exports);
 }
 
-NODE_MODULE(mbgl, RegisterModule)
+NODE_MODULE(mapbox_gl_native, RegisterModule)

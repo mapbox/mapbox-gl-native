@@ -20,7 +20,7 @@
                                         "s3:PutObjectAcl"
                                     ],
                                     "Resource": [
-                                        "arn:aws:s3:::mapbox-node-binary/mbgl/*"
+                                        "arn:aws:s3:::mapbox-node-binary/mapbox-gl-native/*"
                                     ],
                                     "Effect": "Allow"
                                 }
