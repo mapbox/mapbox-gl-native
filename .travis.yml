@@ -12,10 +12,10 @@ matrix:
 
 env:
   global:
-  - NODE_VERSION: "0.10.35"
+  - NODE_VERSION: 0.10.35
   - LD_LIBRARY_PATH: "/usr/local/lib"
-  - secure: jkwZnKr5dcM9MQ6mOytnp6FHkbydSfa1L8d4jFp4v4K6Ee/iQh1YIq9c/J1zC0WLyuGokVGaijkKr6CW4nGZ5H8ygBtPo09imnRyH8X0bO5mEjl+KhbpdFqkXVLerpnAGMO7D6+6BtWJlK5uTDWhpeS7YayB3YfETVkllf4n6F8=
-  - secure: ZBiq+KPVM72MF0rtvpui5l7curGXckz4Pefc1L04U6dd/MPa22StvCgXBG7DKhLwI5OgHE1da769asQ3rub/pDOonxAi7fHo3+r/ocbSBZeeaj+p5i5wavppOzD27gCLrpOnSQBk0DfoD+xOM8ZCfIttBbOBMRZ1dpWFG98bJ4c=
+  - secure: pz/HAMQpnde//JJi3f+RcW32APN6g3QyFAH41JlZwgsM5Daj9RRoXqUcNg4hEyTvlThtc5t+wQQ2ejYAjMwDu00GAzRFJ03Sm45w2fPvith9fu4crXsyPUvWUfWPC0ajTXzorN4cwFwOoMoeo9DihLwb0EC0n4T6jWdBCae3k+s=
+  - secure: jYFAOQoMZkZVyc5AFPBKhR9oDqp5CciwCxFhVEHVjdImM+8V60loKazyw+bVLIjzKLnQbKKdiDudWL9TE1ylK/XSlF3K7o4gU2vIh5WzosKnU70Sanxd6tHt/Ui5eK+bAymKHbLdGiXIZtBZE0tML6+wgJ9vhV4ZKna5dM9tps4=
 
 before_install:
 - cd ./vendor/mbgl && source ./scripts/local_mason.sh && cd ../../
@@ -23,20 +23,19 @@ before_install:
 - source ./vendor/mbgl/scripts/travis_helper.sh
 - source ./vendor/mbgl/scripts/flags.sh
 - source ./vendor/mbgl/scripts/travis_before_install.sh
-- if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then export LD_LIBRARY_PATH=`mason prefix mesa 10.4.3`/lib:$LD_LIBRARY_PATH; glxinfo; fi
+- source ./scripts/setup_mesa.sh
 
 install:
 - npm install --build-from-source
 
 before_script:
-# Set the core file limit to unlimited so a core file is generated upon crash
 - ulimit -c unlimited -S
 
 script:
-- ./scripts/travis_test.sh
+- "./scripts/travis_test.sh"
 
 after_success:
-- ./scripts/travis_publish.sh
+- "./scripts/travis_publish.sh"
 
 git:
   submodules: true
