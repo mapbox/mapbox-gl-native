@@ -47,7 +47,7 @@ public:
     size_t getTileCount() const;
     void render(Painter &painter, util::ptr<StyleLayer> layer_desc);
     void render(Painter &painter, util::ptr<StyleLayer> layer_desc, const Tile::ID &id, const mat4 &matrix);
-    void finishRender(Painter &painter);
+    void renderDebug(Painter &painter);
 
     std::forward_list<Tile::ID> getIDs() const;
     std::forward_list<Tile *> getLoadedTiles() const;

@@ -172,7 +172,7 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
     if (layout.text.justify == TextJustifyType::Right) justify = 1;
     else if (layout.text.justify == TextJustifyType::Left) justify = 0;
 
-    const FontStack &fontStack = glyphStore.getFontStack(layout.text.font);
+    const auto &fontStack = glyphStore.getFontStack(layout.text.font);
 
     for (const SymbolFeature &feature : features) {
         if (!feature.geometry.size()) continue;
@@ -183,7 +183,7 @@ void SymbolBucket::addFeatures(const VectorTileLayer &layer, const FilterExpress
 
         // if feature has text, shape the text
         if (feature.label.length()) {
-            shaping = fontStack.getShaping(
+            shaping = fontStack->getShaping(
                 /* string */ feature.label,
                 /* maxWidth: ems */ layout.text.max_width * 24,
                 /* lineHeight: ems */ layout.text.line_height * 24,

@@ -15,17 +15,18 @@
 namespace mbgl {
 namespace android {
 
-class NativeMapView : public mbgl::View, private mbgl::util::noncopyable {
+class NativeMapView : public mbgl::View {
 public:
     NativeMapView(JNIEnv *env, jobject obj);
     virtual ~NativeMapView();
+
+    void initialize(Map *) override {};
 
     void activate() override;
     void deactivate() override;
 
     void swap() override;
 
-    void notify() override;
     void notifyMapChange(mbgl::MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero()) override;
 
     mbgl::Map &getMap();
@@ -40,19 +41,15 @@ public:
     void createSurface(ANativeWindow *window);
     void destroySurface();
 
-    void start();
-    void stop();
-
-    void resume();
-    void pause(bool waitForPause = false);
-
     void enableFps(bool enable);
     void updateFps();
+
+    void resize(uint16_t width, uint16_t height, float ratio, uint16_t fbWidth, uint16_t fbHeight);
 
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 
-    void loadExtensions();
+    static void loadExtensions();
 
     bool inEmulator();
 
@@ -75,10 +72,6 @@ private:
 
     std::string styleUrl;
     std::string apiKey;
-
-    bool firstTime = false;
-
-    bool usingDepth24 = false;
 
     bool fpsEnabled = false;
     double fps = 0.0;

@@ -93,13 +93,16 @@ public class MapView extends SurfaceView {
     private Context mContext;
 
     //
-    // Properties
+    // Properties / state
     //
 
     private boolean mZoomEnabled = true;
     private boolean mScrollEnabled = true;
     private boolean mRotateEnabled = true;
-    private String mStyleUrl;
+    private String mStyleUrl; // shadow to handle aysnc JSON loading and missing getStyleUrl
+    private boolean mIsPaused = true; // needed to handle different order between GL callbacks and activity lifecycle
+    private boolean mIsGLInitialized = false; // ^
+
 
     //
     // Constructors
@@ -421,7 +424,6 @@ public class MapView extends SurfaceView {
 
         mNativeMapView.initializeDisplay();
         mNativeMapView.initializeContext();
-        mNativeMapView.start();
     }
 
     // Called when we need to save instance state
@@ -445,7 +447,7 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onDestroy
     public void onDestroy() {
         Log.v(TAG, "onDestroy");
-        mNativeMapView.stop();
+
         mNativeMapView.terminateContext();
         mNativeMapView.terminateDisplay();
     }
@@ -460,7 +462,6 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onPause
     public void onStop() {
         Log.v(TAG, "onStop");
-        //mNativeMapView.stop();
     }
 
     // Called when we need to stop the render thread
@@ -468,11 +469,15 @@ public class MapView extends SurfaceView {
     public void onPause() {
         Log.v(TAG, "onPause");
 
+        mIsPaused = true;
+
         // Register for connectivity changes
         getContext().unregisterReceiver(mConnectivityReceiver);
         mConnectivityReceiver = null;
 
-        mNativeMapView.pause();
+        if (mIsGLInitialized) {
+            mNativeMapView.stop();
+        }
     }
 
     // Called when we need to start the render thread
@@ -481,11 +486,15 @@ public class MapView extends SurfaceView {
     public void onResume() {
         Log.v(TAG, "onResume");
 
+        mIsPaused = false;
+
         // Register for connectivity changes
         mConnectivityReceiver = new ConnectivityReceiver();
         mContext.registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        mNativeMapView.resume();
+        if (mIsGLInitialized) {
+            mNativeMapView.start();
+        }
     }
 
     // This class handles SurfaceHolder callbacks
@@ -497,6 +506,10 @@ public class MapView extends SurfaceView {
         public void surfaceCreated(SurfaceHolder holder) {
             Log.v(TAG, "surfaceCreated");
             mNativeMapView.createSurface(holder.getSurface());
+            mIsGLInitialized = true;
+            if (!mIsPaused) {
+                mNativeMapView.start();
+            }
         }
 
         // Called when the native surface buffer has been destroyed
@@ -504,7 +517,11 @@ public class MapView extends SurfaceView {
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
             Log.v(TAG, "surfaceDestroyed");
+            if (!mIsPaused) {
+                mNativeMapView.stop();
+            }
             mNativeMapView.destroySurface();
+            mIsGLInitialized = false;
         }
 
         // Called when the format or size of the native surface buffer has been

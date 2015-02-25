@@ -1,23 +1,23 @@
 #ifndef MBGL_STYLE_STYLE_BUCKET
 #define MBGL_STYLE_STYLE_BUCKET
 
-#include <mbgl/style/types.hpp>
 #include <mbgl/style/filter_expression.hpp>
-#include <mbgl/style/style_source.hpp>
 #include <mbgl/style/class_properties.hpp>
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/uv.hpp>
 
 namespace mbgl {
 
-class Source;
+class StyleSource;
 
 class StyleBucket : public util::noncopyable {
 public:
     typedef util::ptr<StyleBucket> Ptr;
 
     inline StyleBucket(StyleLayerType type_) : type(type_) {}
+
     const StyleLayerType type;
     std::string name;
     util::ptr<StyleSource> style_source;

@@ -163,7 +163,7 @@ void SQLiteCache::createDatabase() {
             db->exec(sql);
         } catch (mapbox::sqlite::Exception &ex) {
             Log::Error(Event::Database, "Failed to create database: %s", ex.what());
-            db.release();
+            db.reset();
         }
     }
 }

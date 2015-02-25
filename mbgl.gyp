@@ -8,6 +8,7 @@
     './gyp/standalone.gypi',
     './gyp/core.gypi',
     './gyp/none.gypi',
+    './gyp/install.gypi',
   ],
   'conditions': [
     ['headless_lib == "cgl" and host == "osx"', { 'includes': [ './gyp/headless-cgl.gypi' ] } ],
@@ -22,6 +23,6 @@
     ['asset_lib == "zip"', { 'includes': [ './gyp/asset-zip.gypi' ] } ],
     ['cache_lib == "sqlite"', { 'includes': [ './gyp/cache-sqlite.gypi' ] } ],
 
-    ['install_prefix != ""', { 'includes': ['./gyp/install.gypi' ] } ],
+    ['host == "osx" or host == "linux"', { 'includes': [ './bin/render.gypi' ] } ],
   ],
 }

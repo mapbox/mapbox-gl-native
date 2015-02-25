@@ -1,6 +1,9 @@
 #include <mbgl/platform/default/glfw_view.hpp>
+#include <mbgl/map/still_image.hpp>
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/platform/log.hpp>
+
+pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
 
 GLFWView::GLFWView(bool fullscreen_) : fullscreen(fullscreen_) {
 #ifdef NVIDIA
@@ -62,17 +65,17 @@ void GLFWView::initialize(mbgl::Map *map_) {
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
-    resize(window, width, height);
+    onResize(window, width, height);
 
-    glfwSetCursorPosCallback(window, mouseMove);
-    glfwSetMouseButtonCallback(window, mouseClick);
-    glfwSetWindowSizeCallback(window, resize);
-    glfwSetFramebufferSizeCallback(window, resize);
-    glfwSetScrollCallback(window, scroll);
-    glfwSetKeyCallback(window, key);
+    glfwSetCursorPosCallback(window, onMouseMove);
+    glfwSetMouseButtonCallback(window, onMouseClick);
+    glfwSetWindowSizeCallback(window, onResize);
+    glfwSetFramebufferSizeCallback(window, onResize);
+    glfwSetScrollCallback(window, onScroll);
+    glfwSetKeyCallback(window, onKey);
 
-    const std::string extensions = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
-    {
+    pthread_once(&loadGLExtensions, [] {
+        const std::string extensions = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
         using namespace mbgl;
 
         if (extensions.find("GL_KHR_debug") != std::string::npos) {
@@ -152,12 +155,12 @@ void GLFWView::initialize(mbgl::Map *map_) {
         // Require packed depth stencil
         gl::isPackedDepthStencilSupported = true;
         gl::isDepth24Supported = true;
-    }
+    });
 
     glfwMakeContextCurrent(nullptr);
 }
 
-void GLFWView::key(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
+void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
 
     if (action == GLFW_RELEASE) {
@@ -190,7 +193,7 @@ void GLFWView::key(GLFWwindow *window, int key, int /*scancode*/, int action, in
     }
 }
 
-void GLFWView::scroll(GLFWwindow *window, double /*xOffset*/, double yOffset) {
+void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     double delta = yOffset * 40;
 
@@ -213,16 +216,16 @@ void GLFWView::scroll(GLFWwindow *window, double /*xOffset*/, double yOffset) {
     view->map->scaleBy(scale, view->lastX, view->lastY);
 }
 
-void GLFWView::resize(GLFWwindow *window, int width, int height ) {
+void GLFWView::onResize(GLFWwindow *window, int width, int height ) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
 
     int fbWidth, fbHeight;
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 
-    view->map->resize(width, height, static_cast<float>(fbWidth) / static_cast<float>(width), fbWidth, fbHeight);
+    view->resize(width, height, static_cast<float>(fbWidth) / static_cast<float>(width), fbWidth, fbHeight);
 }
 
-void GLFWView::mouseClick(GLFWwindow *window, int button, int action, int modifiers) {
+void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modifiers) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT ||
@@ -249,7 +252,7 @@ void GLFWView::mouseClick(GLFWwindow *window, int button, int action, int modifi
     }
 }
 
-void GLFWView::mouseMove(GLFWwindow *window, double x, double y) {
+void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     if (view->tracking) {
         double dx = x - view->lastX;
@@ -273,12 +276,7 @@ int GLFWView::run() {
         glfwWaitEvents();
     }
 
-    map->stop([]() {
-        glfwWaitEvents();
-    });
-
-    // Terminate here to save binary shaders
-    map->terminate();
+    map->stop();
 
     return 0;
 }
@@ -291,18 +289,9 @@ void GLFWView::deactivate() {
     glfwMakeContextCurrent(nullptr);
 }
 
-void GLFWView::notify() {
-    glfwPostEmptyEvent();
-}
-
 void GLFWView::swap() {
     glfwSwapBuffers(window);
-    map->swapped();
     fps();
-}
-
-void GLFWView::notifyMapChange(mbgl::MapChange /*change*/, std::chrono::steady_clock::duration /*delay*/) {
-    // no-op
 }
 
 void GLFWView::fps() {

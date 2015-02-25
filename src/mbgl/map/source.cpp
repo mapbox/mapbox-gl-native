@@ -58,8 +58,7 @@ void Source::load(Map& map, FileSource& fileSource) {
         source->info.parseTileJSONProperties(d);
         source->loaded = true;
 
-        map.update();
-
+        map.rerender();
     });
 }
 
@@ -112,7 +111,7 @@ void Source::render(Painter &painter, util::ptr<StyleLayer> layer_desc, const Ti
     }
 }
 
-void Source::finishRender(Painter &painter) {
+void Source::renderDebug(Painter &painter) {
     for (std::pair<const Tile::ID, std::unique_ptr<Tile>> &pair : tiles) {
         Tile &tile = *pair.second;
         painter.renderTileDebug(tile);

@@ -17,6 +17,8 @@ typedef XID GLXPbuffer;
 #include <mbgl/platform/gl.hpp>
 
 #include <memory>
+#include <thread>
+#include <mutex>
 
 namespace mbgl {
 
@@ -24,33 +26,45 @@ class HeadlessDisplay;
 
 class HeadlessView : public View {
 public:
-    HeadlessView();
-    HeadlessView(std::shared_ptr<HeadlessDisplay> display);
+    HeadlessView(uint16_t width = 256, uint16_t height = 256, float pixelRatio = 1);
+    HeadlessView(std::shared_ptr<HeadlessDisplay> display, uint16_t width = 256, uint16_t height = 256, float pixelRatio = 1);
     ~HeadlessView();
 
-    void createContext();
-    void loadExtensions();
-
     void resize(uint16_t width, uint16_t height, float pixelRatio);
-    std::unique_ptr<uint32_t[]> readPixels();
+    std::unique_ptr<StillImage> readStillImage();
 
-    void notify();
-    void notifyMapChange(MapChange change, std::chrono::steady_clock::duration delay = std::chrono::steady_clock::duration::zero());
     void activate();
     void deactivate();
-    void swap();
+    void discard();
 
 private:
+    void createContext();
+    void loadExtensions();
     void clearBuffers();
+    bool isActive();
 
 private:
-    std::shared_ptr<HeadlessDisplay> display_;
-    uint16_t width_;
-    uint16_t height_;
-    float pixelRatio_;
+    std::shared_ptr<HeadlessDisplay> display;
+
+    struct Dimensions {
+        inline Dimensions(uint16_t width = 0, uint16_t height = 0, float pixelRatio = 0);
+        inline uint16_t pixelWidth() const { return width * pixelRatio; }
+        inline uint16_t pixelHeight() const { return height * pixelRatio; }
+
+        uint16_t width = 0;
+        uint16_t height = 0;
+        float pixelRatio = 0;
+    };
+
+    // These are the values that represent the state of the current framebuffer.
+    Dimensions current;
+
+    // These are the values that will be used after the next discard() event.
+    std::mutex prospectiveMutex;
+    Dimensions prospective;
 
 #if MBGL_USE_CGL
-    CGLContextObj glContext;
+    CGLContextObj glContext = nullptr;
 #endif
 
 #if MBGL_USE_GLX
@@ -60,9 +74,13 @@ private:
     GLXPbuffer glxPbuffer = 0;
 #endif
 
+    bool extensionsLoaded = false;
+
     GLuint fbo = 0;
     GLuint fboDepthStencil = 0;
     GLuint fboColor = 0;
+
+    std::thread::id thread;
 };
 
 }

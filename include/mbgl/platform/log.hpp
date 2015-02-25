@@ -61,7 +61,7 @@ public:
     template<typename T, typename ...Args>
     static inline const T &Set(Args&& ...args) {
         Backend = util::make_unique<T>(::std::forward<Args>(args)...);
-        return *dynamic_cast<T *>(Backend.get());
+        return *reinterpret_cast<T *>(Backend.get());
     }
 
 private:

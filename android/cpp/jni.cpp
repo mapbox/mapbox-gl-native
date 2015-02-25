@@ -250,42 +250,14 @@ void JNICALL nativeStart(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeStart");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->start();
+    nativeMapView->getMap().start();
 }
 
 void JNICALL nativeStop(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeStop");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->stop();
-}
-
-void JNICALL nativePause(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativePause");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->pause();
-}
-
-void JNICALL nativeResume(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeResume");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->resume();
-}
-
-void JNICALL nativeRun(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeRun");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().run();
-}
-
-void JNICALL nativeRerender(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeRerender");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().rerender();
+    nativeMapView->getMap().stop();
 }
 
 void JNICALL nativeUpdate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -293,39 +265,6 @@ void JNICALL nativeUpdate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     nativeMapView->getMap().update();
-}
-
-void JNICALL nativeTerminate(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeTerminate");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().terminate();
-}
-
-jboolean JNICALL nativeNeedsSwap(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeNeedsSwap");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    return nativeMapView->getMap().needsSwap();
-}
-
-void JNICALL nativeSwapped(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSwapped");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().swapped();
-}
-
-void JNICALL nativeResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height,
-                          jfloat ratio) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeResize");
-    assert(nativeMapViewPtr != 0);
-    assert(width >= 0);
-    assert(height >= 0);
-    assert(width <= UINT16_MAX);
-    assert(height <= UINT16_MAX);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().resize(width, height, ratio);
 }
 
 void JNICALL nativeResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint width, jint height,
@@ -341,7 +280,7 @@ void JNICALL nativeResize(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jint
     assert(fbWidth <= UINT16_MAX);
     assert(fbHeight <= UINT16_MAX);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().resize(width, height, ratio, fbWidth, fbHeight);
+    nativeMapView->resize(width, height, ratio, fbWidth, fbHeight);
 }
 
 void JNICALL nativeRemoveClass(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring clazz) {
@@ -837,7 +776,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     // NOTE: if you get java.lang.UnsatisfiedLinkError you likely forgot to set the size of the
     // array correctly (too large)
-    std::array<JNINativeMethod, 62> methods = {{ // Can remove the extra brace in C++14
+    std::array<JNINativeMethod, 54> methods = {{ // Can remove the extra brace in C++14
         {"nativeCreate", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J",
          reinterpret_cast<void *>(&nativeCreate)},
         {"nativeDestroy", "(J)V", reinterpret_cast<void *>(&nativeDestroy)},
@@ -850,18 +789,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeDestroySurface", "(J)V", reinterpret_cast<void *>(&nativeDestroySurface)},
         {"nativeStart", "(J)V", reinterpret_cast<void *>(&nativeStart)},
         {"nativeStop", "(J)V", reinterpret_cast<void *>(&nativeStop)},
-        {"nativePause", "(J)V", reinterpret_cast<void *>(&nativePause)},
-        {"nativeResume", "(J)V", reinterpret_cast<void *>(&nativeResume)},
-        {"nativeRun", "(J)V", reinterpret_cast<void *>(&nativeRun)},
-        {"nativeRerender", "(J)V", reinterpret_cast<void *>(&nativeRerender)},
         {"nativeUpdate", "(J)V", reinterpret_cast<void *>(&nativeUpdate)},
-        {"nativeTerminate", "(J)V", reinterpret_cast<void *>(&nativeTerminate)},
-        {"nativeNeedsSwap", "(J)Z", reinterpret_cast<void *>(&nativeNeedsSwap)},
-        {"nativeSwapped", "(J)V", reinterpret_cast<void *>(&nativeSwapped)},
-        {"nativeResize", "(JIIF)V",
-         reinterpret_cast<void *>(
-             static_cast<void JNICALL (*)(JNIEnv *, jobject, jlong, jint, jint, jfloat)>(
-                 &nativeResize))},
         {"nativeResize", "(JIIFII)V",
          reinterpret_cast<void *>(static_cast<void JNICALL (
              *)(JNIEnv *, jobject, jlong, jint, jint, jfloat, jint, jint)>(&nativeResize))},

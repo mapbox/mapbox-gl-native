@@ -181,11 +181,19 @@ android-deploy: $(ANDROID_ABIS)
 	cd android/java/MapboxGLAndroidSDK && chmod ugo+x deploy.sh && ./deploy.sh
 
 
+##### CLI builds ###############################################################
+
+render: Makefile/mbgl
+	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) mbgl-render
+
+load-test: Makefile/mbgl
+	$(MAKE) -C build/$(HOST) BUILDTYPE=$(BUILDTYPE) mbgl-load-test
+
 ##### Maintenace operations ####################################################
 
 .PHONY: clear_xcode_cache
 clear_xcode_cache:
-ifeq ($(PLATFORM), osx)
+ifeq ($(HOST), osx)
 	@CUSTOM_DD=`defaults read com.apple.dt.Xcode IDECustomDerivedDataLocation 2>/dev/null`; \
 	if [ $$CUSTOM_DD ]; then \
 		echo clearing files in $$CUSTOM_DD older than one day; \

@@ -1,11 +1,8 @@
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/still_image.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/io.hpp>
-
-#include <rapidjson/document.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/stringbuffer.h>
 
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
@@ -21,21 +18,22 @@
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
+#include <uv.h>
+
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
 
 int main(int argc, char *argv[]) {
-
     std::string style_path;
     double lat = 0, lon = 0;
     double zoom = 0;
     double bearing = 0;
 
-    int width = 256;
-    int height = 256;
+    int width = 512;
+    int height = 512;
     double pixelRatio = 1.0;
-    std::string output = "out.png";
+    static std::string output = "out.png";
     std::string cache_file = "cache.sqlite";
     std::vector<std::string> classes;
     std::string token;
@@ -86,9 +84,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    HeadlessView view(width, height, pixelRatio);
 
-    HeadlessView view;
-    Map map(view, fileSource);
+    Map map(view, fileSource, Map::RenderMode::Still);
 
     // Set access token if present
     if (token.size()) {
@@ -98,21 +96,25 @@ int main(int argc, char *argv[]) {
     map.setStyleJSON(style, ".");
     map.setClasses(classes);
 
-    view.resize(width, height, pixelRatio);
-    map.resize(width, height, pixelRatio);
-    map.setLatLonZoom(LatLng(lat, lon), zoom);
+    map.setLatLngZoom(LatLng(lat, lon), zoom);
     map.setBearing(bearing);
 
-    std::unique_ptr<uint32_t[]> pixels;
+    uv_async_t *async = new uv_async_t;
+    uv_async_init(uv_default_loop(), async, [](uv_async_t *as, int) {
+        std::unique_ptr<const StillImage> image(reinterpret_cast<const StillImage *>(as->data));
+        uv_close(reinterpret_cast<uv_handle_t *>(as), [](uv_handle_t *handle) {
+            delete reinterpret_cast<uv_async_t *>(handle);
+        });
 
-    // Run the loop. It will terminate when we don't have any further listeners.
-    map.run();
+        const std::string png = util::compress_png(image->width, image->height, image->pixels.get());
+        util::write_file(output, png);
+    });
 
-    // Get the data from the GPU.
-    pixels = view.readPixels();
+    map.renderStill([async](std::unique_ptr<const StillImage> image) {
+        async->data = const_cast<StillImage *>(image.release());
+        uv_async_send(async);
+    });
 
-    const unsigned int w = width * pixelRatio;
-    const unsigned int h = height * pixelRatio;
-    const std::string image = util::compress_png(w, h, pixels.get());
-    util::write_file(output, image);
+    // This loop will terminate once the async was fired.
+    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }

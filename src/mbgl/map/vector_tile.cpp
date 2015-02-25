@@ -1,5 +1,6 @@
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/style/filter_expression_private.hpp>
+#include <mbgl/util/variant_io.hpp>
 
 #include <algorithm>
 #include <iostream>

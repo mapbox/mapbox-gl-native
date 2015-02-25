@@ -1,5 +1,6 @@
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/map/still_image.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/std.hpp>
@@ -9,6 +10,8 @@
 #include <string>
 #include <cstring>
 #include <cassert>
+
+pthread_once_t loadGLExtensions = PTHREAD_ONCE_INIT;
 
 #ifdef MBGL_USE_CGL
 #include <CoreFoundation/CoreFoundation.h>
@@ -34,24 +37,28 @@ CGLProc CGLGetProcAddress(const char *proc) {
 
 namespace mbgl {
 
-
-HeadlessView::HeadlessView()
-    : display_(std::make_shared<HeadlessDisplay>()) {
-    createContext();
-    loadExtensions();
+HeadlessView::HeadlessView(uint16_t width, uint16_t height, float pixelRatio)
+    : display(std::make_shared<HeadlessDisplay>()) {
+    resize(width, height, pixelRatio);
 }
 
-HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display)
-    : display_(display) {
-    createContext();
-    loadExtensions();
+HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
+                           uint16_t width, uint16_t height, float pixelRatio)
+    : display(display_) {
+    resize(width, height, pixelRatio);
 }
 
 void HeadlessView::loadExtensions() {
-    activate();
-    const char *extensionPtr = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
+    if (extensionsLoaded) {
+        return;
+    }
 
-    if (extensionPtr) {
+    pthread_once(&loadGLExtensions, [] {
+        const char *extensionPtr = reinterpret_cast<const char *>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
+
+        if (!extensionPtr) {
+            return;
+        }
         const std::string extensions = extensionPtr;
 
 #ifdef MBGL_USE_CGL
@@ -78,18 +85,22 @@ void HeadlessView::loadExtensions() {
             assert(gl::IsVertexArray != nullptr);
         }
 #endif
-    }
+    });
 
     // HeadlessView requires packed depth stencil
     gl::isPackedDepthStencilSupported = true;
     gl::isDepth24Supported = true;
 
-    deactivate();
+    extensionsLoaded = true;
 }
 
 void HeadlessView::createContext() {
+    if (!display) {
+        throw std::runtime_error("Display is not set");
+    }
+
 #if MBGL_USE_CGL
-    CGLError error = CGLCreateContext(display_->pixelFormat, NULL, &glContext);
+    CGLError error = CGLCreateContext(display->pixelFormat, NULL, &glContext);
     if (error != kCGLNoError) {
         throw std::runtime_error(std::string("Error creating GL context object:") + CGLErrorString(error) + "\n");
     }
@@ -101,8 +112,8 @@ void HeadlessView::createContext() {
 #endif
 
 #if MBGL_USE_GLX
-    xDisplay = display_->xDisplay;
-    fbConfigs = display_->fbConfigs;
+    xDisplay = display->xDisplay;
+    fbConfigs = display->fbConfigs;
 
     if (!glContext) {
         // Try to create a legacy context
@@ -131,17 +142,34 @@ void HeadlessView::createContext() {
 #endif
 }
 
-void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
+bool HeadlessView::isActive() {
+    return std::this_thread::get_id() == thread;
+}
+
+void HeadlessView::resize(const uint16_t width, const uint16_t height, const float pixelRatio) {
+    std::lock_guard<std::mutex> lock(prospectiveMutex);
+    prospective = { width, height, pixelRatio };
+}
+
+HeadlessView::Dimensions::Dimensions(uint16_t width_, uint16_t height_, float pixelRatio_)
+    : width(width_), height(height_), pixelRatio(pixelRatio_) {
+}
+
+void HeadlessView::discard() {
+    assert(isActive());
+
+    { // Obtain the new values.
+        std::lock_guard<std::mutex> lock(prospectiveMutex);
+        if (current.pixelWidth() == prospective.pixelWidth() && current.pixelHeight() == prospective.pixelHeight()) {
+            return;
+        }
+        current = prospective;
+    }
+
     clearBuffers();
 
-    width_ = width;
-    height_ = height;
-    pixelRatio_ = pixelRatio;
-
-    const unsigned int w = width_ * pixelRatio_;
-    const unsigned int h = height_ * pixelRatio_;
-
-    activate();
+    const unsigned int w = current.width * current.pixelRatio;
+    const unsigned int h = current.height * current.pixelRatio;
 
     // Create depth/stencil buffer
     MBGL_CHECK_ERROR(glGenRenderbuffersEXT(1, &fboDepthStencil));
@@ -177,33 +205,36 @@ void HeadlessView::resize(uint16_t width, uint16_t height, float pixelRatio) {
         throw std::runtime_error(error.str());
     }
 
-    deactivate();
+    View::resize(current.width, current.height, current.pixelRatio, w, h);
 }
 
-std::unique_ptr<uint32_t[]> HeadlessView::readPixels() {
-    const unsigned int w = width_ * pixelRatio_;
-    const unsigned int h = height_ * pixelRatio_;
+std::unique_ptr<StillImage> HeadlessView::readStillImage() {
+    assert(isActive());
 
-    auto pixels = util::make_unique<uint32_t[]>(w * h);
+    const unsigned int w = current.pixelWidth();
+    const unsigned int h = current.pixelHeight();
 
-    activate();
-    MBGL_CHECK_ERROR(glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get()));
-    deactivate();
+    auto image = util::make_unique<StillImage>();
+    image->width = w;
+    image->height = h;
+    image->pixels = util::make_unique<uint32_t[]>(w * h);
+
+    MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image->pixels.get()));
 
     const int stride = w * 4;
     auto tmp = util::make_unique<char[]>(stride);
-    char *rgba = reinterpret_cast<char *>(pixels.get());
-    for (int i = 0, j = height_ - 1; i < j; i++, j--) {
+    char *rgba = reinterpret_cast<char *>(image->pixels.get());
+    for (int i = 0, j = h - 1; i < j; i++, j--) {
         std::memcpy(tmp.get(), rgba + i * stride, stride);
         std::memcpy(rgba + i * stride, rgba + j * stride, stride);
         std::memcpy(rgba + j * stride, tmp.get(), stride);
     }
 
-    return pixels;
+    return image;
 }
 
 void HeadlessView::clearBuffers() {
-    activate();
+    assert(isActive());
 
     MBGL_CHECK_ERROR(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0));
 
@@ -221,12 +252,12 @@ void HeadlessView::clearBuffers() {
         MBGL_CHECK_ERROR(glDeleteRenderbuffersEXT(1, &fboDepthStencil));
         fboDepthStencil = 0;
     }
-
-    deactivate();
 }
 
 HeadlessView::~HeadlessView() {
+    activate();
     clearBuffers();
+    deactivate();
 
 #if MBGL_USE_CGL
     CGLDestroyContext(glContext);
@@ -242,15 +273,17 @@ HeadlessView::~HeadlessView() {
 #endif
 }
 
-void HeadlessView::notify() {
-    // no-op
-}
-
-void HeadlessView::notifyMapChange(mbgl::MapChange /*change*/, std::chrono::steady_clock::duration /*delay*/) {
-    // no-op
-}
 
 void HeadlessView::activate() {
+    if (thread != std::thread::id()) {
+        throw std::runtime_error("OpenGL context was already current");
+    }
+    thread = std::this_thread::get_id();
+
+    if (!glContext) {
+        createContext();
+    }
+
 #if MBGL_USE_CGL
     CGLError error = CGLSetCurrentContext(glContext);
     if (error != kCGLNoError) {
@@ -260,12 +293,19 @@ void HeadlessView::activate() {
 
 #if MBGL_USE_GLX
     if (!glXMakeContextCurrent(xDisplay, glxPbuffer, glxPbuffer, glContext)) {
-        throw std::runtime_error("Switching OpenGL context failed.\n");
+        throw std::runtime_error("Switching OpenGL context failed");
     }
 #endif
+
+    loadExtensions();
 }
 
 void HeadlessView::deactivate() {
+    if (thread == std::thread::id()) {
+        throw std::runtime_error("OpenGL context was not current");
+    }
+    thread = std::thread::id();
+
 #if MBGL_USE_CGL
     CGLError error = CGLSetCurrentContext(nullptr);
     if (error != kCGLNoError) {
@@ -275,11 +315,9 @@ void HeadlessView::deactivate() {
 
 #if MBGL_USE_GLX
     if (!glXMakeContextCurrent(xDisplay, 0, 0, nullptr)) {
-        throw std::runtime_error("Removing OpenGL context failed.\n");
+        throw std::runtime_error("Removing OpenGL context failed");
     }
 #endif
 }
-
-void HeadlessView::swap() {}
 
 }

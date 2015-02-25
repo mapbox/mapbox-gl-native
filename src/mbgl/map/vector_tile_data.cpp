@@ -4,6 +4,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket.hpp>
+#include <mbgl/style/style_source.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/platform/log.hpp>
 
