@@ -10,6 +10,7 @@ import android.content.res.TypedArray;
 import android.graphics.PointF;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
@@ -178,7 +179,7 @@ public class MapView extends SurfaceView {
         requestFocus();
 
         // Register the SurfaceHolder callbacks
-        if (android.os.Build.VERSION.SDK_INT >= 9) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             getHolder().addCallback(new Callbacks2());
         } else {
             getHolder().addCallback(new Callbacks());
