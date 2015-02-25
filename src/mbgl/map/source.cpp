@@ -205,7 +205,6 @@ TileData::State Source::addTile(Map &map, Environment &env, uv::worker &worker,
 
 double Source::getZoom(const TransformState& state) const {
     double offset = std::log(util::tileSize / info.tile_size) / std::log(2);
-    offset += (state.getPixelRatio() > 1.0 ? 1 :0);
     return state.getZoom() + offset;
 }
 
