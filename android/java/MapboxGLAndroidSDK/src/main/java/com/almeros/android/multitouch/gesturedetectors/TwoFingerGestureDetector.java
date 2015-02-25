@@ -9,19 +9,19 @@ import android.view.ViewConfiguration;
 /**
  * @author Almer Thie (code.almeros.com) Copyright (c) 2013, Almer Thie
  *         (code.almeros.com)
- * 
+ *
  *         All rights reserved.
- * 
+ *
  *         Redistribution and use in source and binary forms, with or without
  *         modification, are permitted provided that the following conditions
  *         are met:
- * 
+ *
  *         Redistributions of source code must retain the above copyright
  *         notice, this list of conditions and the following disclaimer.
  *         Redistributions in binary form must reproduce the above copyright
  *         notice, this list of conditions and the following disclaimer in the
  *         documentation and/or other materials provided with the distribution.
- * 
+ *
  *         THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *         "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *         LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -97,7 +97,7 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
     /**
      * Return the current distance between the two pointers forming the gesture
      * in progress.
-     * 
+     *
      * @return Distance between pointers in pixels.
      */
     public float getCurrentSpan() {
@@ -112,7 +112,7 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
     /**
      * Return the previous distance between the two pointers forming the gesture
      * in progress.
-     * 
+     *
      * @return Previous distance between pointers in pixels.
      */
     public float getPreviousSpan() {
@@ -127,10 +127,10 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
     /**
      * MotionEvent has no getRawX(int) method; simulate it pending future API
      * approval.
-     * 
-     * @param event
-     * @param pointerIndex
-     * @return
+     *
+     * @param event Motion Event
+     * @param pointerIndex Pointer Index
+     * @return Raw x value or 0
      */
     protected static float getRawX(MotionEvent event, int pointerIndex) {
         float offset = event.getX() - event.getRawX();
@@ -143,10 +143,10 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
     /**
      * MotionEvent has no getRawY(int) method; simulate it pending future API
      * approval.
-     * 
-     * @param event
-     * @param pointerIndex
-     * @return
+     *
+     * @param event Motion Event
+     * @param pointerIndex Pointer Index
+     * @return Raw y value or 0
      */
     protected static float getRawY(MotionEvent event, int pointerIndex) {
         float offset = event.getY() - event.getRawY();
@@ -159,9 +159,9 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
     /**
      * Check if we have a sloppy gesture. Sloppy gestures can happen if the edge
      * of the user's hand is touching the screen, for example.
-     * 
-     * @param event
-     * @return
+     *
+     * @param event Motion Event
+     * @return {@code true} if is sloppy gesture, {@code false} if not
      */
     protected boolean isSloppyGesture(MotionEvent event) {
         // As orientation can change, query the metrics in touch down
@@ -194,8 +194,8 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
     /**
      * Determine (multi)finger focal point (a.k.a. center point between all
      * fingers)
-     * 
-     * @param e
+     *
+     * @param e Motion Event
      * @return PointF focal point
      */
     public static PointF determineFocalPoint(MotionEvent e) {
