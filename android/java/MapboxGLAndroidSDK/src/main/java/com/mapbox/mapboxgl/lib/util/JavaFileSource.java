@@ -1,14 +1,22 @@
 package com.mapbox.mapboxgl.lib.util;
 
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+
 public class JavaFileSource {
 
     private static JavaFileSource instance = null;
+
+    // Single reference to OkHttp for performance gains
+    private OkHttpClient client;
 
     /**
      * Private Constructor to support Singleton pattern
      */
     private JavaFileSource() {
         super();
+        client = new OkHttpClient();
     }
 
     /**
@@ -20,5 +28,19 @@ public class JavaFileSource {
             instance = new JavaFileSource();
         }
         return instance;
+    }
+
+    /**
+     * Make an HTTP Request
+     * @param resourceUrl URL to resource
+     * @param callback Callback class
+     * @return Request created
+     */
+    public Request request(final String resourceUrl, final Callback callback) {
+        Request request = new Request.Builder().url(resourceUrl).build();
+
+        client.newCall(request).enqueue(callback);
+
+        return request;
     }
 }
