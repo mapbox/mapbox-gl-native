@@ -31,6 +31,7 @@ dependencies {
     compile 'commons-validator:commons-validator:1.4.1'
     compile 'com.android.support:support-annotations:21.0.3'
     compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.squareup.okhttp:okhttp:2.2.0'
 }
 
 android {

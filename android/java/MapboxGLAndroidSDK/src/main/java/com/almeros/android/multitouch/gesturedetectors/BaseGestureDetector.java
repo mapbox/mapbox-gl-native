@@ -6,19 +6,19 @@ import android.view.MotionEvent;
 /**
  * @author Almer Thie (code.almeros.com) Copyright (c) 2013, Almer Thie
  *         (code.almeros.com)
- * 
+ *
  *         All rights reserved.
- * 
+ *
  *         Redistribution and use in source and binary forms, with or without
  *         modification, are permitted provided that the following conditions
  *         are met:
- * 
+ *
  *         Redistributions of source code must retain the above copyright
  *         notice, this list of conditions and the following disclaimer.
  *         Redistributions in binary form must reproduce the above copyright
  *         notice, this list of conditions and the following disclaimer in the
  *         documentation and/or other materials provided with the distribution.
- * 
+ *
  *         THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *         "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *         LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -61,9 +61,9 @@ public abstract class BaseGestureDetector {
      * detect gestures. This method delegates work to handler methods
      * (handleStartProgressEvent, handleInProgressEvent) implemented in
      * extending classes.
-     * 
-     * @param event
-     * @return
+     *
+     * @param event MotionEvent
+     * @return {@code true} as handled
      */
     public boolean onTouchEvent(MotionEvent event) {
         final int actionCode = event.getAction() & MotionEvent.ACTION_MASK;
@@ -79,9 +79,9 @@ public abstract class BaseGestureDetector {
      * Called when the current event occurred when NO gesture is in progress
      * yet. The handling in this implementation may set the gesture in progress
      * (via mGestureInProgress) or out of progress
-     * 
-     * @param actionCode
-     * @param event
+     *
+     * @param actionCode Action Code from MotionEvent
+     * @param event MotionEvent
      */
     protected abstract void handleStartProgressEvent(int actionCode,
             MotionEvent event);
@@ -90,10 +90,10 @@ public abstract class BaseGestureDetector {
      * Called when the current event occurred when a gesture IS in progress. The
      * handling in this implementation may set the gesture out of progress (via
      * mGestureInProgress).
-     * 
      *
-     * @param actionCode
-     * @param event
+     *
+     * @param actionCode Action Code from MotionEvent
+     * @param event MotionEvent
      */
     protected abstract void handleInProgressEvent(int actionCode,
             MotionEvent event);
@@ -130,7 +130,7 @@ public abstract class BaseGestureDetector {
 
     /**
      * Returns {@code true} if a gesture is currently in progress.
-     * 
+     *
      * @return {@code true} if a gesture is currently in progress, {@code false}
      *         otherwise.
      */
@@ -141,7 +141,7 @@ public abstract class BaseGestureDetector {
     /**
      * Return the time difference in milliseconds between the previous accepted
      * GestureDetector event and the current GestureDetector event.
-     * 
+     *
      * @return Time difference since the last move event in milliseconds.
      */
     public long getTimeDelta() {
@@ -151,7 +151,7 @@ public abstract class BaseGestureDetector {
     /**
      * Return the event time of the current GestureDetector event being
      * processed.
-     * 
+     *
      * @return Current GestureDetector event time in milliseconds.
      */
     public long getEventTime() {
