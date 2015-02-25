@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'com.android.tools.build:gradle:1.1.0'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.10.1'
     }
 }
@@ -53,6 +53,7 @@ android {
 
     lintOptions {
         checkAllWarnings true
+        warningsAsErrors true
         disable 'IconMissingDensityFolder'
     }
 
@@ -232,7 +233,6 @@ afterEvaluate { project ->
     }
 
     task androidJavadocs(type: Javadoc) {
-        failOnError false
         source = android.sourceSets.main.java.sourceFiles
         classpath = files(android.bootClasspath)
     }

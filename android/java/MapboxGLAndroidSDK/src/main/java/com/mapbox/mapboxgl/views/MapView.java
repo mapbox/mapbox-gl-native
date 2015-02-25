@@ -17,7 +17,6 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.ScaleGestureDetector;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -44,9 +43,6 @@ public class MapView extends SurfaceView {
     //
     // Static members
     //
-
-    // Tag used for logging
-    private static final String TAG = "MapView";
 
     // Used for animation
     private static final long ANIMATION_DURATION = 300;
@@ -129,7 +125,6 @@ public class MapView extends SurfaceView {
 
     // Common initialization code goes here
     private void initialize(Context context, AttributeSet attrs) {
-        Log.v(TAG, "initialize");
 
         // Save the context
         mContext = context;
@@ -401,7 +396,6 @@ public class MapView extends SurfaceView {
     // Called when we need to restore instance state
     // Must be called from Activity onCreate
     public void onCreate(Bundle savedInstanceState) {
-        Log.v(TAG, "onCreate");
         if (savedInstanceState != null) {
             setCenterCoordinate((LatLng) savedInstanceState.getParcelable(STATE_CENTER_COORDINATE));
             setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL)); // need to set zoom level first because of limitation on rotating when zoomed out
@@ -430,7 +424,6 @@ public class MapView extends SurfaceView {
     // Called when we need to save instance state
     // Must be called from Activity onSaveInstanceState
     public void onSaveInstanceState(Bundle outState) {
-        Log.v(TAG, "onSaveInstanceState");
         outState.putParcelable(STATE_CENTER_COORDINATE, getCenterCoordinate());
         outState.putDouble(STATE_ZOOM_LEVEL, getZoomLevel()); // need to set zoom level first because of limitation on rotating when zoomed out
         outState.putDouble(STATE_CENTER_DIRECTION, getDirection());
@@ -447,7 +440,6 @@ public class MapView extends SurfaceView {
     // Called when we need to clean up
     // Must be called from Activity onDestroy
     public void onDestroy() {
-        Log.v(TAG, "onDestroy");
         mNativeMapView.stop();
         mNativeMapView.terminateContext();
         mNativeMapView.terminateDisplay();
@@ -456,21 +448,17 @@ public class MapView extends SurfaceView {
     // Called when we need to create the GL context
     // Must be called from Activity onStart
     public void onStart() {
-        Log.v(TAG, "onStart");
+        // Do nothing
     }
 
     // Called when we need to terminate the GL context
     // Must be called from Activity onPause
     public void onStop() {
-        Log.v(TAG, "onStop");
-        //mNativeMapView.stop();
     }
 
     // Called when we need to stop the render thread
     // Must be called from Activity onPause
     public void onPause() {
-        Log.v(TAG, "onPause");
-
         // Register for connectivity changes
         getContext().unregisterReceiver(mConnectivityReceiver);
         mConnectivityReceiver = null;
@@ -482,8 +470,6 @@ public class MapView extends SurfaceView {
     // Must be called from Activity onResume
 
     public void onResume() {
-        Log.v(TAG, "onResume");
-
         // Register for connectivity changes
         mConnectivityReceiver = new ConnectivityReceiver();
         mContext.registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
@@ -498,7 +484,6 @@ public class MapView extends SurfaceView {
         // Must do all EGL/GL ES initialization here
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
-            Log.v(TAG, "surfaceCreated");
             mNativeMapView.createSurface(holder.getSurface());
         }
 
@@ -506,7 +491,6 @@ public class MapView extends SurfaceView {
         // Must do all EGL/GL ES destruction here
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
-            Log.v(TAG, "surfaceDestroyed");
             mNativeMapView.destroySurface();
         }
 
@@ -516,8 +500,6 @@ public class MapView extends SurfaceView {
         @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int width,
                                    int height) {
-            Log.v(TAG, "surfaceChanged");
-            Log.i(TAG, "resize " + format + " " + width + " " + height);
             mNativeMapView.resize((int) (width / mScreenDensity), (int) (height / mScreenDensity), mScreenDensity, width, height);
         }
     }
@@ -530,7 +512,6 @@ public class MapView extends SurfaceView {
         // flicker (see Android SDK documentation)
         @Override
         public void surfaceRedrawNeeded(SurfaceHolder holder) {
-            Log.v(TAG, "surfaceRedrawNeeded");
             mNativeMapView.update();
         }
     }
@@ -1168,7 +1149,6 @@ public class MapView extends SurfaceView {
         // Called when an action we are listening to in the manifest has been sent
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.v(TAG, "ConnectivityReceiver.onReceive: action = " + intent.getAction());
             if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
                 boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
                 onConnectivityChanged(!noConnectivity);
@@ -1178,7 +1158,6 @@ public class MapView extends SurfaceView {
 
     // Called when our Internet connectivity has changed
     private void onConnectivityChanged(boolean isConnected) {
-        Log.v(TAG, "onConnectivityChanged: " + isConnected);
         mNativeMapView.setReachability(isConnected);
     }
 

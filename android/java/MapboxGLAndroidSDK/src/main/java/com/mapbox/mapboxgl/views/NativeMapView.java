@@ -16,9 +16,6 @@ class NativeMapView {
     // Static members
     //
 
-    // Tag used for logging
-    private static final String TAG = "NativeMapView";
-
     //
     // Instance members
     //

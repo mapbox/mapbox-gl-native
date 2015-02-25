@@ -11,7 +11,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,7 +23,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.mapbox.mapboxgl.geometry.LatLng;
-//import com.mapbox.mapboxgl.geometry.LatLngZoom;
 import com.mapbox.mapboxgl.views.MapView;
 import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
@@ -38,9 +36,6 @@ public class MainActivity extends ActionBarActivity {
     //
     // Static members
     //
-
-    // Tag used for logging
-    private static final String TAG = "MainActivity";
 
     // Used for saving instance state
     private static final String STATE_IS_GPS_ON = "isGpsOn";
@@ -67,8 +62,6 @@ public class MainActivity extends ActionBarActivity {
     private ImageView mGpsMarker;
     private Location mGpsLocation;
     private MenuItem mGpsMenuItem;
-    //private boolean mLockGpsCenter = true;
-    //private boolean mLockGpsZoom = true;
 
     // Used for compass
     private SensorManager mSensorManager;
@@ -91,7 +84,6 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v(TAG, "onCreate");
 
         if (savedInstanceState != null) {
             mIsGpsOn = savedInstanceState.getBoolean(STATE_IS_GPS_ON, false);
@@ -156,32 +148,23 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onPause()  {
         super.onPause();
-        Log.v(TAG, "onPause");
 
         // Cancel GPS
-        if (mIsGpsOn) {
-            stopGps();
-        }
+        toggleGps(false);
     }
 
     // Called when our app comes into the foreground
     @Override
     public void onResume() {
         super.onResume();
-        Log.v(TAG, "onResume");
-
         // Restart GPS
-        // Cancel any outstanding GPS
-        if (mIsGpsOn) {
-            startGps();
-        }
+        toggleGps(true);
     }
 
     // Called when we need to save instance state
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.v(TAG, "onSaveInstanceState");
 
         outState.putBoolean(STATE_IS_GPS_ON, mIsGpsOn);
     }
@@ -211,16 +194,7 @@ public class MainActivity extends ActionBarActivity {
         switch (item.getItemId()) {
             case R.id.action_gps:
                 // Toggle GPS position updates
-                // TODO: how to persist this
-                if (mIsGpsOn) {
-                    // Turn off
-                    stopGps();
-                    mIsGpsOn = false;
-                } else {
-                    // Turn on
-                    startGps();
-                    mIsGpsOn = true;
-                }
+                toggleGps(!mIsGpsOn);
                 updateMap();
                 return true;
 
@@ -242,29 +216,38 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    // Turns the GPS location updates on
-    private void startGps() {
-        if (mGpsMenuItem != null) {
-            mGpsMenuItem.setIcon(R.drawable.ic_action_location_found);
-        }
-        mGpsLocation = null;
-        mLocationClient.connect();
-        updateLocation(LocationServices.FusedLocationApi.getLastLocation());
-        LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, new GpsListener());
-        mSensorManager.registerListener(mCompassListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
-        mSensorManager.registerListener(mCompassListener, mSensorMagneticField, SensorManager.SENSOR_DELAY_UI);
-    }
+    /**
+     * Enabled / Disable GPS location updates along with updating the UI
+     * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
+     */
+    private void toggleGps(boolean enableGps) {
 
-    // Turns the GPS location updates off
-    private void stopGps() {
-        if (mGpsMenuItem != null) {
-            mGpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
+        if (enableGps) {
+            if (!mIsGpsOn) {
+                mIsGpsOn = true;
+                if (mGpsMenuItem != null) {
+                    mGpsMenuItem.setIcon(R.drawable.ic_action_location_found);
+                }
+                mGpsLocation = null;
+                mLocationClient.connect();
+                updateLocation(LocationServices.FusedLocationApi.getLastLocation());
+                LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, new GpsListener());
+                mSensorManager.registerListener(mCompassListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
+                mSensorManager.registerListener(mCompassListener, mSensorMagneticField, SensorManager.SENSOR_DELAY_UI);
+            }
+        } else {
+            if (mIsGpsOn) {
+                mIsGpsOn = false;
+                if (mGpsMenuItem != null) {
+                    mGpsMenuItem.setIcon(R.drawable.ic_action_location_searching);
+                }
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGpsListener);
+                mLocationClient.disconnect();
+                mSensorManager.unregisterListener(mCompassListener, mSensorAccelerometer);
+                mSensorManager.unregisterListener(mCompassListener, mSensorMagneticField);
+                mGpsLocation = null;
+            }
         }
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGpsListener);
-        mLocationClient.disconnect();
-        mSensorManager.unregisterListener(mCompassListener, mSensorAccelerometer);
-        mSensorManager.unregisterListener(mCompassListener, mSensorMagneticField);
-        mGpsLocation = null;
     }
 
     // This class forwards location updates to updateLocation()
@@ -323,15 +306,6 @@ public class MainActivity extends ActionBarActivity {
     private void updateLocation(Location location) {
         if (location != null) {
             mGpsLocation = location;
-            /*LatLng coordinate = new LatLng(mGpsLocation);
-            LatLngZoom zoomedCoordinate = new LatLngZoom(coordinate, 16);
-            if (mLockGpsCenter) {
-                if (mLockGpsZoom) {
-                    mMapFragment.getMap().setCenterCoordinate(zoomedCoordinate, true);
-                } else {
-                    mMapFragment.getMap().setCenterCoordinate(coordinate, true);
-                }
-            }*/
         }
 
         updateMap();
@@ -342,7 +316,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            switch(position) {
+            switch (position) {
                 // Bright
                 case 0:
                     mMapFragment.getMap().setStyleUrl("asset://styles/bright-v7.json");
@@ -416,7 +390,7 @@ public class MainActivity extends ActionBarActivity {
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             ArrayList<String> classes = new ArrayList<>(1);
 
-            switch(position) {
+            switch (position) {
                 // Day
                 case 0:
                     classes.add("day");
@@ -448,7 +422,7 @@ public class MainActivity extends ActionBarActivity {
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             ArrayList<String> classes = new ArrayList<>(2);
 
-            switch(position) {
+            switch (position) {
                 // Labels + Contours
                 case 0:
                     classes.add("labels");
