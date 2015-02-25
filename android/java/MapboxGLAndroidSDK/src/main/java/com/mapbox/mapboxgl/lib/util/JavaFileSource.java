@@ -1,5 +1,6 @@
 package com.mapbox.mapboxgl.lib.util;
 
+import com.mapbox.mapboxgl.lib.constants.MapboxConstants;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -34,13 +35,13 @@ public class JavaFileSource {
      * Make an HTTP Request
      * @param resourceUrl URL to resource
      * @param callback Callback class
-     * @return Request created
      */
-    public Request request(final String resourceUrl, final Callback callback) {
-        Request request = new Request.Builder().url(resourceUrl).build();
-
+    public void request(final String resourceUrl, final Callback callback) {
+        Request request = new Request.Builder().url(resourceUrl).tag(resourceUrl.toLowerCase(MapboxConstants.MAPBOX_LOCALE)).build();
         client.newCall(request).enqueue(callback);
+    }
 
-        return request;
+    public void cancel(final String resourceUrl) {
+        client.cancel(resourceUrl.toLowerCase(MapboxConstants.MAPBOX_LOCALE));
     }
 }
