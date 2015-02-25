@@ -41,6 +41,10 @@ public class JavaFileSource {
         client.newCall(request).enqueue(callback);
     }
 
+    /**
+     * Attempt to cancel HTTP Request made
+     * @param resourceUrl URL of request to cancel
+     */
     public void cancel(final String resourceUrl) {
         client.cancel(resourceUrl.toLowerCase(MapboxConstants.MAPBOX_LOCALE));
     }
