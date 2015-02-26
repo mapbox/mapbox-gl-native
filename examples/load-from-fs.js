@@ -22,6 +22,8 @@ var map = new mbgl.Map(fileSource);
 map.load(require('../test/fixtures/style.json'));
 map.render({}, function(err, image) {
     if (err) throw err;
-    fs.writeFileSync('image.png', image);
-    console.warn('Written image.png');
+    mbgl.compressPNG(image, function(err, png) {
+        fs.writeFileSync('image.png', png);
+        console.warn('Written image.png');
+    });
 });
