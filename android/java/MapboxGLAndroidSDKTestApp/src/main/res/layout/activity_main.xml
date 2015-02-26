@@ -42,7 +42,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="end|top"
-            android:padding="10dp"
+            android:layout_margin="10dp"
             android:contentDescription="@string/compass_desc"
             android:src="@drawable/compass"/>
 
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/label_fps"
-            android:padding="10dp" />
+            android:layout_margin="10dp" />
 
     </FrameLayout>
 </LinearLayout>

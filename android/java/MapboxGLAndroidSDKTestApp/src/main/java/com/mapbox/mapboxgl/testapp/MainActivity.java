@@ -1,6 +1,7 @@
 package com.mapbox.mapboxgl.testapp;
 
 import android.content.Context;
+import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
@@ -462,8 +463,18 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    // Rotates an ImageView - does not work if the ImageView has padding, use margins
+    private void rotateImageView(ImageView imageView, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.setScale((float) imageView.getWidth() / (float) imageView.getDrawable().getIntrinsicWidth(), (float) imageView.getHeight() / (float) imageView.getDrawable().getIntrinsicHeight());
+        matrix.postRotate(angle, (float) imageView.getWidth() / 2.0f, (float) imageView.getHeight() / 2.0f);
+        imageView.setImageMatrix(matrix);
+        imageView.setScaleType(ImageView.ScaleType.MATRIX);
+    }
+
+    // Updates the UI to match the current map's position
     private void updateMap() {
-        mCompassView.setRotation((float) mMapFragment.getMap().getDirection());
+        rotateImageView(mCompassView, (float) mMapFragment.getMap().getDirection());
 
         if (mGpsLocation != null) {
             mGpsMarker.setVisibility(View.VISIBLE);
@@ -477,7 +488,7 @@ public class MainActivity extends ActionBarActivity {
                 lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 54.0f / 2.0f) * mDensity);
                 mGpsMarker.setLayoutParams(lp);
                 float bearing = mGpsLocation.hasBearing() ? mGpsLocation.getBearing() : mCompassBearing;
-                mGpsMarker.setRotation(bearing);
+                rotateImageView(mGpsMarker, bearing);
                 mGpsMarker.requestLayout();
             } else {
                 mGpsMarker.setImageResource(R.drawable.location_marker);
@@ -485,7 +496,7 @@ public class MainActivity extends ActionBarActivity {
                 lp.leftMargin = (int) ((screenLocation.x - 27.0f / 2.0f) * mDensity);
                 lp.topMargin = mMapFrameLayout.getHeight() - (int) ((screenLocation.y + 27.0f / 2.0f) * mDensity);
                 mGpsMarker.setLayoutParams(lp);
-                mGpsMarker.setRotation(0.0f);
+                rotateImageView(mGpsMarker, 0.0f);
                 mGpsMarker.requestLayout();
             }
         } else {
