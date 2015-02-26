@@ -1,4 +1,4 @@
-package com.mapbox.mapboxgl.lib.constants;
+package com.mapbox.mapboxgl.constants;
 
 import java.util.Locale;
 

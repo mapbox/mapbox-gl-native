@@ -1,6 +1,6 @@
-package com.mapbox.mapboxgl.lib.util;
+package com.mapbox.mapboxgl.util;
 
-import com.mapbox.mapboxgl.lib.constants.MapboxConstants;
+import com.mapbox.mapboxgl.constants.MapboxConstants;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
