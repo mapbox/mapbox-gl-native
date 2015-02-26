@@ -57,9 +57,9 @@ android {
 
     lintOptions {
         checkAllWarnings true
-        disable 'UnusedAttribute'
-        abortOnError false
-        //disable 'IconDensities'
+        warningsAsErrors true
+        disable 'IconDensities'
+        disable 'InvalidPackage'
     }
 
     buildTypes {
